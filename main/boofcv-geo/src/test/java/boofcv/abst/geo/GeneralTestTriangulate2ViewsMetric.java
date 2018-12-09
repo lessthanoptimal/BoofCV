@@ -18,16 +18,12 @@
 
 package boofcv.abst.geo;
 
-import boofcv.alg.geo.PerspectiveOps;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
-import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,9 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class GeneralTestTriangulateTwoViewsUncalibrated {
+public abstract class GeneralTestTriangulate2ViewsMetric {
 
-	public abstract TriangulateTwoViewsProjective createAlg();
+	public abstract Triangulate2ViewsMetric createAlg();
 
 	/**
 	 * See if it can triangulate perfect observations
@@ -62,16 +58,12 @@ public abstract class GeneralTestTriangulateTwoViewsUncalibrated {
 		viewB.y = pointB.y/pointB.z;
 
 		
-		TriangulateTwoViewsProjective alg = createAlg();
-		Point4D_F64 found = new Point4D_F64();
-
-		DMatrixRMaj P1 = new DMatrixRMaj(3,4);
-		CommonOps_DDRM.setIdentity(P1);
-		DMatrixRMaj P2 = PerspectiveOps.convertToMatrix(worldToB,null);
-
-		alg.triangulate(viewA,viewB,P1,P2,found);
-		assertEquals(found.x/found.w, world.x, 1e-8);
-		assertEquals(found.y/found.w, world.y, 1e-8);
-		assertEquals(found.z/found.w, world.z, 1e-8);
+		Triangulate2ViewsMetric alg = createAlg();
+		Point3D_F64 found = new Point3D_F64();
+		
+		alg.triangulate(viewA,viewB,worldToB,found);
+		assertEquals(found.x, world.x, 1e-8);
+		assertEquals(found.y, world.y, 1e-8);
+		assertEquals(found.z, world.z, 1e-8);
 	}
 }

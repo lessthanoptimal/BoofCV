@@ -32,12 +32,12 @@ public class ConfigTrifocalError implements Configuration {
 	/**
 	 * How to compute the error
 	 */
-	public Model model = Model.REPROJECTION;
+	public Model model = Model.REPROJECTION_REFINE;
 
 	/**
 	 * If an iterative method was selected, this specifies the convergence criteria
 	 */
-	public ConfigConverge converge = new ConfigConverge(1e-8,1e-8,10);
+	public ConfigConverge converge = new ConfigConverge(1e-8,1e-8,20);
 
 	@Override
 	public void checkValidity() {
@@ -46,13 +46,23 @@ public class ConfigTrifocalError implements Configuration {
 
 	public enum Model {
 		/**
-		 * Computes camera matrices and triangulates a point in 3D space. Reprojects the points and returns the error
+		 * Computes camera matrices and triangulates a point in 3D space. Reprojects the points and returns the error.
+		 * Triangulation is done using a linear algorithm only.
 		 *
 		 * inlier units: Pixels
 		 *
 		 * @see boofcv.alg.geo.robust.DistanceTrifocalReprojectionSq
 		 */
 		REPROJECTION,
+		/**
+		 * Computes camera matrices and triangulates a point in 3D space. Reprojects the points and returns the error.
+		 * Additional non-linear refinement is done on triangulated points.
+		 *
+		 * inlier units: Pixels
+		 *
+		 * @see boofcv.alg.geo.robust.DistanceTrifocalReprojectionSq
+		 */
+		REPROJECTION_REFINE,
 		/**
 		 * Point transfer from view 0 into 2 and 0 into 3.
 		 *

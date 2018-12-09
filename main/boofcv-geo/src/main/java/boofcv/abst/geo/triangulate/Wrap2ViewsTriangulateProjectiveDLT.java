@@ -18,46 +18,50 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.Triangulate2ViewsMetric;
-import boofcv.abst.geo.TriangulateNViewsMetric;
+import boofcv.abst.geo.Triangulate2ViewsProjective;
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
+import boofcv.alg.geo.triangulate.TriangulateProjectiveLinearDLT;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
-import georegression.struct.se.Se3_F64;
+import org.ejml.data.DMatrixRMaj;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper around {@link TriangulateMetricLinearDLT} for {@link Triangulate2ViewsMetric}.
+ * Wrapper around {@link TriangulateMetricLinearDLT} for {@link Triangulate2ViewsProjective}.
  *
  * @author Peter Abeles
  */
-public class WrapNViewsTriangulateMetricDLT implements TriangulateNViewsMetric {
+public class Wrap2ViewsTriangulateProjectiveDLT implements Triangulate2ViewsProjective {
 
-	TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
+	TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
 
-	Point4D_F64 pointH = new Point4D_F64();
+	// pixel observations
+	List<Point2D_F64> pixels = new ArrayList<>();
+	// camera matrices
+	List<DMatrixRMaj> cameras = new ArrayList<>();
 
 	@Override
-	public boolean triangulate(List<Point2D_F64> observations, List<Se3_F64> worldToView ,
-							   Point3D_F64 location ) {
+	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB, DMatrixRMaj projectionA, DMatrixRMaj projectionB, Point4D_F64 foundInA) {
 
-		if(GeometricResult.SUCCESS == alg.triangulate(observations,worldToView,pointH) ) {
-			// can't handle points at infinity with this interface
-			if( pointH.w == 0 )
-				return false;
-			location.x = pointH.x/pointH.w;
-			location.y = pointH.y/pointH.w;
-			location.z = pointH.z/pointH.w;
+		pixels.clear();
+		cameras.clear();
+
+		pixels.add(obsA);
+		pixels.add(obsB);
+		cameras.add(projectionA);
+		cameras.add(projectionB);
+
+		if(GeometricResult.SUCCESS == alg.triangulate(pixels,cameras,foundInA) ) {
 			return true;
 		}
 
 		return false;
 	}
 
-	public TriangulateMetricLinearDLT getAlgorithm() {
+	public TriangulateProjectiveLinearDLT getAlgorithm() {
 		return alg;
 	}
 }

@@ -18,8 +18,8 @@
 
 package boofcv.alg.geo;
 
-import boofcv.alg.geo.triangulate.PixelDepthLinear;
-import boofcv.alg.geo.triangulate.TriangulateGeometric;
+import boofcv.alg.geo.triangulate.PixelDepthLinearMetric;
+import boofcv.alg.geo.triangulate.Triangulate2ViewsGeometricMetric;
 import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
@@ -52,11 +52,11 @@ public class BenchmarkRuntimeTriangulate extends ArtificialStereoScene {
 
 	public class Geo2 extends PerformerBase {
 
-		TriangulateGeometric alg;
+		Triangulate2ViewsGeometricMetric alg;
 		Point3D_F64 found = new Point3D_F64();
 
 		public Geo2() {
-			alg = new TriangulateGeometric();
+			alg = new Triangulate2ViewsGeometricMetric();
 		}
 
 		@Override
@@ -68,10 +68,10 @@ public class BenchmarkRuntimeTriangulate extends ArtificialStereoScene {
 
 	public class PixelDepth extends PerformerBase {
 
-		PixelDepthLinear alg;
+		PixelDepthLinearMetric alg;
 
 		public PixelDepth() {
-			alg = new PixelDepthLinear();
+			alg = new PixelDepthLinearMetric();
 		}
 
 		@Override

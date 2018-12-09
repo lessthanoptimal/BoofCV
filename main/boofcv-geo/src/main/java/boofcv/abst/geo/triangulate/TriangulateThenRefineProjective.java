@@ -18,11 +18,8 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.Triangulate2ViewsProjective;
 import boofcv.abst.geo.TriangulateNViewsProjective;
-import boofcv.alg.geo.GeometricResult;
-import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
-import boofcv.alg.geo.triangulate.TriangulateProjectiveLinearDLT;
+import boofcv.abst.geo.TriangulateRefineProjective;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -30,24 +27,38 @@ import org.ejml.data.DMatrixRMaj;
 import java.util.List;
 
 /**
- * Wrapper around {@link TriangulateMetricLinearDLT} for {@link Triangulate2ViewsProjective}.
+ * Estimates the triangulated point then refines it
  *
  * @author Peter Abeles
  */
-public class WrapNViewsTriangulateProjectiveDLT implements TriangulateNViewsProjective {
+public class TriangulateThenRefineProjective implements TriangulateNViewsProjective {
 
-	TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
+	TriangulateNViewsProjective estimator;
+	TriangulateRefineProjective refiner;
 
-	@Override
-	public boolean triangulate(List<Point2D_F64> observations, List<DMatrixRMaj> cameraMatrices, Point4D_F64 location) {
-		if(GeometricResult.SUCCESS == alg.triangulate(observations,cameraMatrices,location) ) {
-			return true;
-		}
-
-		return false;
+	public TriangulateThenRefineProjective(TriangulateNViewsProjective estimator,
+										   TriangulateRefineProjective refiner)
+	{
+		this.estimator = estimator;
+		this.refiner = refiner;
 	}
 
-	public TriangulateProjectiveLinearDLT getAlgorithm() {
-		return alg;
+	@Override
+	public boolean triangulate(List<Point2D_F64> observations,
+							   List<DMatrixRMaj> worldToView,
+							   Point4D_F64 location) {
+
+		if( !estimator.triangulate(observations,worldToView,location))
+			return false;
+
+		return refiner.process(observations,worldToView,location,location);
+	}
+
+	public TriangulateNViewsProjective getEstimator() {
+		return estimator;
+	}
+
+	public TriangulateRefineProjective getRefiner() {
+		return refiner;
 	}
 }

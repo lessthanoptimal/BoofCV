@@ -18,15 +18,15 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.GeneralTestTriangulateTwoViewsUncalibrated;
-import boofcv.abst.geo.TriangulateTwoViewsProjective;
+import boofcv.abst.geo.GeneralTestTriangulate2ViewsProjective;
+import boofcv.abst.geo.Triangulate2ViewsProjective;
 
 /**
  * @author Peter Abeles
  */
-public class TestWrapTwoViewsTriangulateUncalibratedDLT extends GeneralTestTriangulateTwoViewsUncalibrated {
+public class TestWrapTwoViewsTriangulateUncalibratedDLT extends GeneralTestTriangulate2ViewsProjective {
 
-	public TriangulateTwoViewsProjective createAlg() {
-		return new WrapTwoViewsTriangulateProjectiveDLT();
+	public Triangulate2ViewsProjective createAlg() {
+		return new Wrap2ViewsTriangulateProjectiveDLT();
 	}
 }

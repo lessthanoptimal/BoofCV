@@ -18,51 +18,43 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.TriangulateTwoViewsProjective;
+import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
-import boofcv.alg.geo.triangulate.TriangulateProjectiveLinearDLT;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
-import org.ejml.data.DMatrixRMaj;
-
-import java.util.ArrayList;
-import java.util.List;
+import georegression.struct.se.Se3_F64;
 
 /**
- * Wrapper around {@link TriangulateMetricLinearDLT} for {@link TriangulateTwoViewsProjective}.
- *
+ * Wrapper around {@link TriangulateMetricLinearDLT} for {@link Triangulate2ViewsMetric}.
+ * 
  * @author Peter Abeles
  */
-public class WrapTwoViewsTriangulateProjectiveDLT implements TriangulateTwoViewsProjective {
+public class Wrap2ViewsTriangulateMetricDLT implements Triangulate2ViewsMetric {
 
-	TriangulateProjectiveLinearDLT alg = new TriangulateProjectiveLinearDLT();
-
-	// pixel observations
-	List<Point2D_F64> pixels = new ArrayList<>();
-	// camera matrices
-	List<DMatrixRMaj> cameras = new ArrayList<>();
-
+	TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
+	Point4D_F64 pointH = new Point4D_F64();
 
 	@Override
-	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB, DMatrixRMaj projectionA, DMatrixRMaj projectionB, Point4D_F64 foundInA) {
+	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB,
+							   Se3_F64 fromAtoB, Point3D_F64 foundInA) {
 
-		pixels.clear();
-		cameras.clear();
-
-		pixels.add(obsA);
-		pixels.add(obsB);
-		cameras.add(projectionA);
-		cameras.add(projectionB);
-
-		if(GeometricResult.SUCCESS == alg.triangulate(pixels,cameras,foundInA) ) {
+		if(GeometricResult.SUCCESS == alg.triangulate(obsA,obsB, fromAtoB,pointH) ) {
+			// can't handle points at infinity with this interface
+			if( pointH.w == 0 )
+				return false;
+			foundInA.x = pointH.x/pointH.w;
+			foundInA.y = pointH.y/pointH.w;
+			foundInA.z = pointH.z/pointH.w;
 			return true;
 		}
 
 		return false;
 	}
 
-	public TriangulateProjectiveLinearDLT getAlgorithm() {
+	public TriangulateMetricLinearDLT getAlgorithm() {
 		return alg;
 	}
+
 }

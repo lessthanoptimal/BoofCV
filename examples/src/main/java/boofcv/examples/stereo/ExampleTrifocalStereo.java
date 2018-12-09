@@ -24,8 +24,8 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.geo.Estimate1ofTrifocalTensor;
+import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.abst.geo.TriangulateNViewsMetric;
-import boofcv.abst.geo.TriangulateTwoViewsMetric;
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
@@ -520,8 +520,8 @@ public class ExampleTrifocalStereo {
 
 	public static void triangulatePoints( SceneStructureMetric structure , SceneObservations observations )
 	{
-		TriangulateNViewsMetric triangulation = FactoryMultiView.triangulateNViewCalibrated(
-				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
+		TriangulateNViewsMetric triangulation = FactoryMultiView.
+				triangulateNViewCalibrated(ConfigTriangulation.GEOMETRIC);
 
 		List<RemoveRadialPtoN_F64> list_p_to_n = new ArrayList<>();
 		for (int i = 0; i < structure.cameras.length; i++) {
@@ -579,8 +579,8 @@ public class ExampleTrifocalStereo {
 		Point2D_F64 na = new Point2D_F64();
 		Point2D_F64 nb = new Point2D_F64();
 
-		TriangulateTwoViewsMetric triangulator = FactoryMultiView.triangulateTwoViewMetric(
-				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
+		Triangulate2ViewsMetric triangulator = FactoryMultiView.
+				triangulate2ViewMetric(ConfigTriangulation.GEOMETRIC);
 
 		for (int i = 0; i < N; i++) {
 			GeometryMath_F64.mult(KA_inv,pixelsA.get(i),na);

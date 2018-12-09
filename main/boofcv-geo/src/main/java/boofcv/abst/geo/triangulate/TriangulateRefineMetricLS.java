@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RefineTriangulateMetricLS implements TriangulateRefineMetric {
+public class TriangulateRefineMetricLS implements TriangulateRefineMetric {
 
 	ResidualsTriangulateMetricSimple func = new ResidualsTriangulateMetricSimple();
 
@@ -44,7 +44,7 @@ public class RefineTriangulateMetricLS implements TriangulateRefineMetric {
 	int maxIterations;
 	double convergenceTol;
 
-	public RefineTriangulateMetricLS(double convergenceTol,
+	public TriangulateRefineMetricLS(double convergenceTol,
 									 int maxIterations)
 	{
 		this.convergenceTol = convergenceTol;

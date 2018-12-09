@@ -16,29 +16,28 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo;
+package boofcv.abst.geo.triangulate;
 
+import boofcv.abst.geo.Triangulate2ViewsMetric;
+import boofcv.alg.geo.triangulate.Triangulate2ViewsGeometricMetric;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
 /**
- * Triangulate the location of a point from two views of a feature given a calibrated
- * camera and known camera motion.
- *
+ * Wrapper around {@link Triangulate2ViewsGeometricMetric} for {@link Triangulate2ViewsMetric}.
+ * 
  * @author Peter Abeles
  */
-public interface TriangulateTwoViewsMetric {
+public class Wrap2ViewsTriangulateGeometric implements Triangulate2ViewsMetric {
 
-	/**
-	 * Triangulate the points location.
-	 *
-	 * @param obsA View from position A in normalized image coordinates.
-	 * @param obsB View from position B in normalized image coordinates.
-	 * @param fromAtoB Transform from camera location A to location B
-	 * @param foundInA The found triangulated 3D point in A's reference frame.
-	 * @return true if successful, false otherwise.
-	 */
-	boolean triangulate( Point2D_F64 obsA , Point2D_F64 obsB ,
-						 Se3_F64 fromAtoB, Point3D_F64 foundInA );
+	Triangulate2ViewsGeometricMetric alg = new Triangulate2ViewsGeometricMetric();
+
+	@Override
+	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB,
+							   Se3_F64 fromAtoB, Point3D_F64 foundInA) {
+
+		alg.triangulate(obsA,obsB, fromAtoB, foundInA);
+		return true;
+	}
 }

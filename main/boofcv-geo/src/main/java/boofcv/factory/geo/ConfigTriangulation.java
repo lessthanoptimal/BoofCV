@@ -35,6 +35,10 @@ public class ConfigTriangulation {
 	 */
 	public ConfigConverge optimization = new ConfigConverge(1e-8,1e-8,20);
 
+	public static final ConfigTriangulation DLT = new ConfigTriangulation(Type.DLT);
+	public static final ConfigTriangulation ALGEBRAIC = new ConfigTriangulation(Type.ALGEBRAIC);
+	public static final ConfigTriangulation GEOMETRIC = new ConfigTriangulation(Type.GEOMETRIC);
+
 	public ConfigTriangulation() {
 	}
 

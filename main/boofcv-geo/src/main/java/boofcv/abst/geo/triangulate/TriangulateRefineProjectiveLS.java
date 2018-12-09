@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.RefineTriangulationProjective;
+import boofcv.abst.geo.TriangulateRefineProjective;
 import boofcv.alg.geo.triangulate.ResidualsTriangulateProjective;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class RefineTriangulateProjectiveLS implements RefineTriangulationProjective {
+public class TriangulateRefineProjectiveLS implements TriangulateRefineProjective {
 
 	ResidualsTriangulateProjective func = new ResidualsTriangulateProjective();
 
@@ -43,7 +43,7 @@ public class RefineTriangulateProjectiveLS implements RefineTriangulationProject
 	int maxIterations;
 	double convergenceTol;
 
-	public RefineTriangulateProjectiveLS(double convergenceTol,
+	public TriangulateRefineProjectiveLS(double convergenceTol,
 										 int maxIterations)
 	{
 		this.convergenceTol = convergenceTol;

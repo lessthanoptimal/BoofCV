@@ -19,7 +19,7 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.abst.geo.TriangulateTwoViewsMetric;
+import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.EnumFundamental;
 import boofcv.factory.geo.FactoryMultiView;
@@ -75,7 +75,7 @@ public class TestSe3FromEssentialGenerator {
 
 		// create alg
 		Estimate1ofEpipolar essentialAlg = FactoryMultiView.fundamental_1(EnumFundamental.LINEAR_8, 0);
-		TriangulateTwoViewsMetric triangulate = FactoryMultiView.triangulateTwoViewMetric(
+		Triangulate2ViewsMetric triangulate = FactoryMultiView.triangulate2ViewMetric(
 				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
 
 		Se3FromEssentialGenerator alg = new Se3FromEssentialGenerator(essentialAlg,triangulate);

@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.robust;
 
-import boofcv.abst.geo.TriangulateTwoViewsMetric;
+import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.alg.geo.PositiveDepthConstraintCheck;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
@@ -43,12 +43,12 @@ public class SelectBestStereoTransform {
 	 * Specifies how the essential matrix is computed
 	 *
 	 */
-	public SelectBestStereoTransform(TriangulateTwoViewsMetric triangulate ) {
+	public SelectBestStereoTransform(Triangulate2ViewsMetric triangulate ) {
 		this.depthCheck = new PositiveDepthConstraintCheck(triangulate);
 	}
 
 	public SelectBestStereoTransform() {
-		this(FactoryMultiView.triangulateTwoViewMetric(new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC)) );
+		this(FactoryMultiView.triangulate2ViewMetric(new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC)) );
 	}
 
 	/**

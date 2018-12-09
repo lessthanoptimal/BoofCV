@@ -22,7 +22,7 @@ import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
-import boofcv.abst.geo.TriangulateTwoViewsMetric;
+import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.alg.feature.associate.StereoConsistencyCheck;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.StereoParameters;
@@ -83,7 +83,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 	// matches features between left and right images
 	private AssociateDescription2D<Desc> assocL2R;
 	// Estimates the 3D coordinate of a feature
-	private TriangulateTwoViewsMetric triangulate;
+	private Triangulate2ViewsMetric triangulate;
 
 	// convert for original image pixels into normalized image coordinates
 	private Point2Transform2_F64 leftImageToNorm;
@@ -128,7 +128,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 							   PointTracker<T> trackerLeft, PointTracker<T> trackerRight,
 							   DescribeRegionPoint<T,Desc> describe,
 							   AssociateDescription2D<Desc> assocL2R,
-							   TriangulateTwoViewsMetric triangulate,
+							   Triangulate2ViewsMetric triangulate,
 							   ModelMatcher<Se3_F64, Stereo2D3D> matcher,
 							   ModelFitter<Se3_F64, Stereo2D3D> modelRefiner)
 	{

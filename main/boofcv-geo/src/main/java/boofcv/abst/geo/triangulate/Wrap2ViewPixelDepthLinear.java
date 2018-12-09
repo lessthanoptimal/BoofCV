@@ -18,43 +18,31 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.TriangulateTwoViewsMetric;
-import boofcv.alg.geo.GeometricResult;
-import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
+import boofcv.abst.geo.Triangulate2ViewsMetric;
+import boofcv.alg.geo.triangulate.PixelDepthLinearMetric;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 
 /**
- * Wrapper around {@link TriangulateMetricLinearDLT} for {@link TriangulateTwoViewsMetric}.
+ * Wrapper around {@link PixelDepthLinearMetric} for {@link Triangulate2ViewsMetric}.
  * 
  * @author Peter Abeles
  */
-public class WrapTwoViewsTriangulateMetricDLT implements TriangulateTwoViewsMetric {
+public class Wrap2ViewPixelDepthLinear implements Triangulate2ViewsMetric {
 
-	TriangulateMetricLinearDLT alg = new TriangulateMetricLinearDLT();
-	Point4D_F64 pointH = new Point4D_F64();
-
+	PixelDepthLinearMetric alg = new PixelDepthLinearMetric();
+	
 	@Override
-	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB,
+	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB, 
 							   Se3_F64 fromAtoB, Point3D_F64 foundInA) {
+		
+		double depth = alg.depth2View(obsA,obsB, fromAtoB);
+		
+		foundInA.x = obsA.x*depth;
+		foundInA.y = obsA.y*depth;
+		foundInA.z = depth;
 
-		if(GeometricResult.SUCCESS == alg.triangulate(obsA,obsB, fromAtoB,pointH) ) {
-			// can't handle points at infinity with this interface
-			if( pointH.w == 0 )
-				return false;
-			foundInA.x = pointH.x/pointH.w;
-			foundInA.y = pointH.y/pointH.w;
-			foundInA.z = pointH.z/pointH.w;
-			return true;
-		}
-
-		return false;
+		return true;
 	}
-
-	public TriangulateMetricLinearDLT getAlgorithm() {
-		return alg;
-	}
-
 }

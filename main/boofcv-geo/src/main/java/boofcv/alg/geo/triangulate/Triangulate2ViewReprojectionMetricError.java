@@ -29,7 +29,7 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public class TriangulationMetricError {
+public class Triangulate2ViewReprojectionMetricError {
 
 	CameraPinhole intrinsicA;
 	CameraPinhole intrinsicB;

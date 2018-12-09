@@ -16,34 +16,29 @@
  * limitations under the License.
  */
 
-package boofcv.alg.geo.triangulate;
+package boofcv.abst.geo;
 
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import georegression.struct.se.Se3_F64;
 
 /**
+ * Triangulate the location of a point from two views of a feature given a calibrated
+ * camera and known camera motion.
+ *
  * @author Peter Abeles
  */
-public class TestTriangulateGeometric extends CommonTriangulationChecks {
+public interface Triangulate2ViewsMetric {
 
 	/**
-	 * Create 2 perfect observations and solve for the position
+	 * Triangulate the points location.
+	 *
+	 * @param obsA View from position A in normalized image coordinates.
+	 * @param obsB View from position B in normalized image coordinates.
+	 * @param fromAtoB Transform from camera location A to location B
+	 * @param foundInA The found triangulated 3D point in A's reference frame.
+	 * @return true if successful, false otherwise.
 	 */
-	@Test
-	public void triangulate_two() {
-		createMetricScene();
-
-		TriangulateGeometric alg = new TriangulateGeometric();
-
-		Point3D_F64 found = new Point3D_F64();
-		for (int i = 1; i < N; i++) {
-			alg.triangulate(obsPts.get(0),obsPts.get(i), motionWorldToCamera.get(i),found);
-
-			assertEquals(worldPoint.x,found.x,1e-8);
-			assertEquals(worldPoint.y,found.y,1e-8);
-			assertEquals(worldPoint.z,found.z,1e-8);
-		}
-	}
+	boolean triangulate( Point2D_F64 obsA , Point2D_F64 obsB ,
+						 Se3_F64 fromAtoB, Point3D_F64 foundInA );
 }

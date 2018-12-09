@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class TestRefineTriangulateMetricEuclidean extends GeneralTestRefineTriangulateMetric {
 
-	RefineTriangulateMetricLS alg = new RefineTriangulateMetricLS(1e-8,200);
+	TriangulateRefineMetricLS alg = new TriangulateRefineMetricLS(1e-8,200);
 
 	@Override
 	public void triangulate(List<Point2D_F64> obsPts, List<Se3_F64> motion,

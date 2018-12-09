@@ -28,7 +28,7 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
-public interface TriangulateTwoViewsProjective {
+public interface Triangulate2ViewsProjective {
 
 	/**
 	 * Triangulate the points 3D location from pixel observations given two views.

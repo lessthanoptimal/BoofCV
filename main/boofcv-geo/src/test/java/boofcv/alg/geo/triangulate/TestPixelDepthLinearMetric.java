@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestPixelDepthLinear {
+public class TestPixelDepthLinearMetric {
 
 	@Test
 	public void depthNView() {
@@ -68,7 +68,7 @@ public class TestPixelDepthLinear {
 		listPoint.add(x3);
 
 
-		PixelDepthLinear alg = new PixelDepthLinear();
+		PixelDepthLinearMetric alg = new PixelDepthLinearMetric();
 
 		double depth = alg.depthNView(listPoint,listMotion);
 
@@ -94,7 +94,7 @@ public class TestPixelDepthLinear {
 		Point2D_F64 x1 = new Point2D_F64(A.x/A.z,A.y/A.z);
 		Point2D_F64 x2 = new Point2D_F64(B.x/B.z,B.y/B.z);
 
-		PixelDepthLinear alg = new PixelDepthLinear();
+		PixelDepthLinearMetric alg = new PixelDepthLinearMetric();
 
 		double depth = alg.depth2View(x1, x2, motion1);
 

@@ -42,10 +42,7 @@ import boofcv.alg.geo.pose.P3PFinsterwalder;
 import boofcv.alg.geo.pose.P3PGrunert;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
 import boofcv.alg.geo.pose.PoseFromPairLinear6;
-import boofcv.alg.geo.triangulate.ResidualsTriangulateEpipolarSampson;
-import boofcv.alg.geo.triangulate.ResidualsTriangulateMetricSimple;
-import boofcv.alg.geo.triangulate.TriangulateMetricLinearDLT;
-import boofcv.alg.geo.triangulate.TriangulateProjectiveLinearDLT;
+import boofcv.alg.geo.triangulate.*;
 import boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7;
 import boofcv.misc.ConfigConverge;
 import boofcv.struct.geo.AssociatedPair;
@@ -452,21 +449,21 @@ public class FactoryMultiView {
 	/**
 	 * Triangulate two view using the Discrete Linear Transform (DLT) with a calibrated camera.
 	 *
-	 * @see WrapGeometricTriangulation
+	 * @see Wrap2ViewPixelDepthLinear
 	 * @see TriangulateMetricLinearDLT
 	 *
 	 * @return Two view triangulation algorithm
 	 */
-	public static TriangulateTwoViewsMetric triangulateTwoViewMetric(@Nullable ConfigTriangulation config ) {
+	public static Triangulate2ViewsMetric triangulate2ViewMetric(@Nullable ConfigTriangulation config ) {
 		if( config == null )
 			config = new ConfigTriangulation();
 
 		switch ( config.type ) {
 			case DLT:
-				return new WrapTwoViewsTriangulateMetricDLT();
+				return new Wrap2ViewPixelDepthLinear();
 
 			case GEOMETRIC:
-				return new WrapGeometricTriangulation();
+				return new Wrap2ViewsTriangulateGeometric();
 
 		}
 		throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
@@ -479,8 +476,16 @@ public class FactoryMultiView {
 	 *
 	 * @return Two view triangulation algorithm
 	 */
-	public static TriangulateTwoViewsProjective triangulateTwoDLT() {
-		return new WrapTwoViewsTriangulateProjectiveDLT();
+	public static Triangulate2ViewsProjective triangulate2ViewProjective(@Nullable ConfigTriangulation config ) {
+		if( config == null )
+			config = new ConfigTriangulation();
+
+		switch( config.type ) {
+			case DLT:
+				return new Wrap2ViewsTriangulateProjectiveDLT();
+
+		}
+		throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
 	}
 
 	/**
@@ -491,13 +496,16 @@ public class FactoryMultiView {
 	 * @return Two view triangulation algorithm
 	 */
 	public static TriangulateNViewsMetric triangulateNViewCalibrated(@Nullable ConfigTriangulation config ) {
+		if( config == null )
+			config = new ConfigTriangulation();
+
 		switch ( config.type ) {
 			case DLT:
 				return new WrapNViewsTriangulateMetricDLT();
 
 			case GEOMETRIC: {
 				TriangulateNViewsMetric estimator = new WrapNViewsTriangulateMetricDLT();
-				RefineTriangulateMetricLS refiner = new RefineTriangulateMetricLS(config.optimization.gtol,config.optimization.maxIterations);
+				TriangulateRefineMetricLS refiner = new TriangulateRefineMetricLS(config.optimization.gtol,config.optimization.maxIterations);
 				return new TriangulateThenRefineMetric(estimator,refiner);
 			}
 
@@ -512,19 +520,22 @@ public class FactoryMultiView {
 	 *
 	 * @return Two view triangulation algorithm
 	 */
-	public static TriangulateNViewsProjective triangulateNViewDLT() {
-		return new WrapNViewsTriangulateProjectiveDLT();
-	}
+	public static TriangulateNViewsProjective triangulateNView( @Nullable ConfigTriangulation config ) {
+		if( config == null )
+			config = new ConfigTriangulation();
 
-	/**
-	 * Triangulate two view by finding the depth of the pixel using a linear algorithm.
-	 *
-	 * @see boofcv.alg.geo.triangulate.PixelDepthLinear
-	 *
-	 * @return Two view triangulation algorithm
-	 */
-	public static TriangulateTwoViewsMetric triangulateTwoLinearDepth() {
-		return new WrapPixelDepthLinear();
+		switch( config.type) {
+			case DLT:
+				return new WrapNViewsTriangulateProjectiveDLT();
+
+			case ALGEBRAIC:
+			case GEOMETRIC: {
+				TriangulateNViewsProjective estimator = new WrapNViewsTriangulateProjectiveDLT();
+				TriangulateRefineProjectiveLS refiner = new TriangulateRefineProjectiveLS(config.optimization.gtol,config.optimization.maxIterations);
+				return new TriangulateThenRefineProjective(estimator,refiner);
+			}
+		}
+		throw new IllegalArgumentException("Unknown or unsupported type "+config.type);
 	}
 
 	/**
@@ -532,12 +543,11 @@ public class FactoryMultiView {
 	 *
 	 * @see ResidualsTriangulateEpipolarSampson
 	 *
-	 * @param convergenceTol Tolerance for finishing optimization
-	 * @param maxIterations Maximum number of allowed iterations
+	 * @param config Convergence criteria
 	 * @return Triangulation refinement algorithm.
 	 */
-	public static RefineTriangulationEpipolar triangulateRefineEpipolar( double convergenceTol, int maxIterations ) {
-		return new RefineTriangulateEpipolar(convergenceTol,maxIterations);
+	public static TriangulateRefineEpipolar triangulateRefineEpipolar(ConfigConverge config ) {
+		return new TriangulateRefineEpipolarLS(config.gtol,config.maxIterations);
 	}
 
 	/**
@@ -546,15 +556,22 @@ public class FactoryMultiView {
 	 *
 	 * @see ResidualsTriangulateMetricSimple
 	 *
-	 * @param convergenceTol Tolerance for finishing optimization
-	 * @param maxIterations Maximum number of allowed iterations
+	 * @param config Convergence criteria
 	 * @return Triangulation refinement algorithm.
 	 */
-	public static TriangulateRefineMetric triangulateRefineMetric(double convergenceTol, int maxIterations ) {
-		return new RefineTriangulateMetricLS(convergenceTol,maxIterations);
+	public static TriangulateRefineMetric triangulateRefineMetric(ConfigConverge config ) {
+		return new TriangulateRefineMetricLS(config.gtol,config.maxIterations);
 	}
 
-	public static RefineTriangulationProjective triangulateRefineProj(double convergenceTol, int maxIterations ) {
-		return new RefineTriangulateProjectiveLS(convergenceTol,maxIterations);
+	/**
+	 * Refines a projective triangulation
+	 *
+	 * @see ResidualsTriangulateProjective
+	 *
+	 * @param config Convergence criteria
+	 * @return Triangulation refinement algorithm.
+	 */
+	public static TriangulateRefineProjective triangulateRefineProj(ConfigConverge config ) {
+		return new TriangulateRefineProjectiveLS(config.gtol,config.maxIterations);
 	}
 }

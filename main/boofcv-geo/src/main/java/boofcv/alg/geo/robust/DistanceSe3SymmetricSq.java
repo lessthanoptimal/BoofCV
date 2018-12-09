@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.robust;
 
-import boofcv.abst.geo.TriangulateTwoViewsMetric;
+import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.NormalizedToPixelError;
 import boofcv.struct.calib.CameraPinhole;
@@ -62,7 +62,7 @@ public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F6
 	// transform from key frame to current frame
 	private Se3_F64 keyToCurr;
 	// triangulation algorithm
-	private TriangulateTwoViewsMetric triangulate;
+	private Triangulate2ViewsMetric triangulate;
 	// working storage
 	private Point3D_F64 p = new Point3D_F64();
 
@@ -75,7 +75,7 @@ public class DistanceSe3SymmetricSq implements DistanceFromModelMultiView<Se3_F6
 	 *
 	 * @param triangulate Triangulates the intersection of two observations
 	 */
-	public DistanceSe3SymmetricSq(TriangulateTwoViewsMetric triangulate ) {
+	public DistanceSe3SymmetricSq(Triangulate2ViewsMetric triangulate ) {
 		this.triangulate = triangulate;
 	}
 

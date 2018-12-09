@@ -29,7 +29,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 class TestRefineTriangulateProjectiveLS extends GeneralTestRefineTriangulateProjective {
-	RefineTriangulateProjectiveLS alg = new RefineTriangulateProjectiveLS(1e-8,200);
+	TriangulateRefineProjectiveLS alg = new TriangulateRefineProjectiveLS(1e-8,200);
 
 	@Override
 	public void triangulate(List<Point2D_F64> obsPts,

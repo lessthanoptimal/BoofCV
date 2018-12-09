@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface RefineTriangulationProjective {
+public interface TriangulateRefineProjective {
 
 	/**
 	 * Refines the triangulated point.

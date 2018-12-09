@@ -18,31 +18,15 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.TriangulateTwoViewsMetric;
-import boofcv.alg.geo.triangulate.PixelDepthLinear;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
-import georegression.struct.se.Se3_F64;
+import boofcv.abst.geo.GeneralTestTriangulate2ViewsMetric;
+import boofcv.abst.geo.Triangulate2ViewsMetric;
 
 /**
- * Wrapper around {@link PixelDepthLinear} for {@link TriangulateTwoViewsMetric}.
- * 
  * @author Peter Abeles
  */
-public class WrapPixelDepthLinear implements TriangulateTwoViewsMetric {
+public class TestWrap2ViewsTriangulateMetricDLT extends GeneralTestTriangulate2ViewsMetric {
 
-	PixelDepthLinear alg = new PixelDepthLinear();
-	
-	@Override
-	public boolean triangulate(Point2D_F64 obsA, Point2D_F64 obsB, 
-							   Se3_F64 fromAtoB, Point3D_F64 foundInA) {
-		
-		double depth = alg.depth2View(obsA,obsB, fromAtoB);
-		
-		foundInA.x = obsA.x*depth;
-		foundInA.y = obsA.y*depth;
-		foundInA.z = depth;
-
-		return true;
+	public Triangulate2ViewsMetric createAlg() {
+		return new Wrap2ViewsTriangulateMetricDLT();
 	}
 }

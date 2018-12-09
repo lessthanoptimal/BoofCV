@@ -36,8 +36,9 @@ Version : 0.32
   * Fixed bug in decomposeMetricCamera
   * Refine triangulation for projective geometry
   * Improvements to factory methods
-  * fundamental matrix from camera matrix
-  * consistent camera matrices from three fundamental matrices
+  * Fundamental matrix from camera matrix
+  * Consistent camera matrices from three fundamental matrices
+  * Cleaned up naming scheme for triangulation algorithms
 - SFM
   * Improvements to projective bundle adjustment
   * Projective scene structure pruning
@@ -50,6 +51,14 @@ Version : 0.32
   * Bunch of bug fixes
   * Extracts the full pinhole calibration matrix from camera characteristics
 
+TODO
+  - Trifocal Stereo
+    * Work in all example images
+    * Create regression tests from said images
+    * Add images with significant lens distortion
+  - Bundle Adjustment
+    * Calibrated homogenous coordinates
+
 TODO Remove dependency on OpenCV in Applications to reduce file size
 
 - TODO Scene Reconstruction
@@ -58,7 +67,6 @@ TODO Remove dependency on OpenCV in Applications to reduce file size
    - TODO homogeneous coordinates
 - TODO revisit stereo from uncalibrated
 - TODO Sparse Bundle Adjustment
-   - Future: Homogenoeus coordinates
    - Future: quaternion implementation
    - Future: sparse block math
 - TODO create regression for homography estimation

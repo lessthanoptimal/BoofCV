@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo;
 
-import boofcv.abst.geo.TriangulateTwoViewsMetric;
+import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import georegression.struct.point.Point2D_F64;
@@ -43,17 +43,17 @@ import georegression.transform.se.SePointOps_F64;
  */
 public class PositiveDepthConstraintCheck {
 	// algorithm used to triangulate point location
-	TriangulateTwoViewsMetric triangulate;
+	Triangulate2ViewsMetric triangulate;
 
 	// location of triangulated point in 3D space
 	Point3D_F64 P = new Point3D_F64();
 
-	public PositiveDepthConstraintCheck(TriangulateTwoViewsMetric triangulate) {
+	public PositiveDepthConstraintCheck(Triangulate2ViewsMetric triangulate) {
 		this.triangulate = triangulate;
 	}
 
 	public PositiveDepthConstraintCheck() {
-		this(FactoryMultiView.triangulateTwoViewMetric(new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC)));
+		this(FactoryMultiView.triangulate2ViewMetric(new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC)));
 	}
 
 	/**

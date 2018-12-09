@@ -19,8 +19,9 @@
 package boofcv.alg.geo.robust;
 
 import boofcv.abst.geo.TriangulateNViewsProjective;
-import boofcv.abst.geo.triangulate.RefineTriangulateProjectiveLS;
+import boofcv.abst.geo.triangulate.TriangulateRefineProjectiveLS;
 import boofcv.alg.geo.trifocal.TrifocalExtractGeometries;
+import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
@@ -51,9 +52,9 @@ public class DistanceTrifocalReprojectionSq implements DistanceFromModel<Trifoca
 	List<Point2D_F64> observations = new ArrayList<>();
 
 	TrifocalExtractGeometries extractor = new TrifocalExtractGeometries();
-	TriangulateNViewsProjective triangulator = FactoryMultiView.triangulateNViewDLT();
+	TriangulateNViewsProjective triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.DLT);
 
-	RefineTriangulateProjectiveLS refiner;
+	TriangulateRefineProjectiveLS refiner;
 
 
 	Point4D_F64 X = new Point4D_F64();
@@ -66,7 +67,7 @@ public class DistanceTrifocalReprojectionSq implements DistanceFromModel<Trifoca
 	 */
 	public DistanceTrifocalReprojectionSq( double gtol , int maxIterations ) {
 		this();
-		refiner = new RefineTriangulateProjectiveLS(gtol,maxIterations);
+		refiner = new TriangulateRefineProjectiveLS(gtol,maxIterations);
 	}
 
 	public DistanceTrifocalReprojectionSq() {

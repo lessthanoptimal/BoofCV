@@ -32,7 +32,7 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public class TriangulateGeometric {
+public class Triangulate2ViewsGeometricMetric {
 
 	// ray going from principle point to observation point
 	LineParametric3D_F64 rayA = new LineParametric3D_F64();
