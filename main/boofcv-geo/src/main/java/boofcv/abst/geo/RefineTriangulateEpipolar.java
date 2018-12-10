@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public interface TriangulateRefineEpipolar {
+public interface RefineTriangulateEpipolar {
 
 	/**
 	 * Refines the triangulated point.
@@ -44,7 +44,7 @@ public interface TriangulateRefineEpipolar {
 	 * @param refinedPt The refined estimated point position.
 	 * @return if successful or not
 	 */
-	public boolean process(List<Point2D_F64> observations,
-						   List<DMatrixRMaj> fundamentalWorldToCam ,
-						   Point3D_F64 worldPt, Point3D_F64 refinedPt);
+	boolean process(List<Point2D_F64> observations,
+					List<DMatrixRMaj> fundamentalWorldToCam ,
+					Point3D_F64 worldPt, Point3D_F64 refinedPt);
 }

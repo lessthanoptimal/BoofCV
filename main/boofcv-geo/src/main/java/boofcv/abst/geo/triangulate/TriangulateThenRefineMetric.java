@@ -18,8 +18,8 @@
 
 package boofcv.abst.geo.triangulate;
 
+import boofcv.abst.geo.RefineTriangulateMetric;
 import boofcv.abst.geo.TriangulateNViewsMetric;
-import boofcv.abst.geo.TriangulateRefineMetric;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -34,10 +34,10 @@ import java.util.List;
 public class TriangulateThenRefineMetric implements TriangulateNViewsMetric {
 
 	TriangulateNViewsMetric estimator;
-	TriangulateRefineMetric refiner;
+	RefineTriangulateMetric refiner;
 
 	public TriangulateThenRefineMetric(TriangulateNViewsMetric estimator,
-									   TriangulateRefineMetric refiner)
+									   RefineTriangulateMetric refiner)
 	{
 		this.estimator = estimator;
 		this.refiner = refiner;
@@ -58,7 +58,7 @@ public class TriangulateThenRefineMetric implements TriangulateNViewsMetric {
 		return estimator;
 	}
 
-	public TriangulateRefineMetric getRefiner() {
+	public RefineTriangulateMetric getRefiner() {
 		return refiner;
 	}
 }

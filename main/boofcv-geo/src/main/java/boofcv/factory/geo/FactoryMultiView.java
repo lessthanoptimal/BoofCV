@@ -29,6 +29,7 @@ import boofcv.abst.geo.h.HomographyTLS_to_Epipolar;
 import boofcv.abst.geo.h.LeastSquaresHomography;
 import boofcv.abst.geo.pose.*;
 import boofcv.abst.geo.triangulate.*;
+import boofcv.abst.geo.trifocal.WrapRefineThreeViewProjectiveGeometric;
 import boofcv.abst.geo.trifocal.WrapTrifocalAlgebraicPoint7;
 import boofcv.abst.geo.trifocal.WrapTrifocalLinearPoint7;
 import boofcv.alg.geo.ModelObservationResidualN;
@@ -43,6 +44,7 @@ import boofcv.alg.geo.pose.P3PGrunert;
 import boofcv.alg.geo.pose.PnPLepetitEPnP;
 import boofcv.alg.geo.pose.PoseFromPairLinear6;
 import boofcv.alg.geo.triangulate.*;
+import boofcv.alg.geo.trifocal.RefineThreeViewProjectiveGeometric;
 import boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7;
 import boofcv.misc.ConfigConverge;
 import boofcv.struct.geo.AssociatedPair;
@@ -340,6 +342,16 @@ public class FactoryMultiView {
 	}
 
 	/**
+	 * Used to refine three projective views. This is the same as refining a trifocal tensor.
+	 *
+	 * @return RefineThreeViewProjective
+	 */
+	public static RefineThreeViewProjective threeViewRefine() {
+		RefineThreeViewProjectiveGeometric alg = new RefineThreeViewProjectiveGeometric();
+		return new WrapRefineThreeViewProjectiveGeometric(alg);
+	}
+
+	/**
 	 * Creates an estimator for the PnP problem that uses only three observations, which is the minimal case
 	 * and known as P3P.
 	 *
@@ -546,7 +558,7 @@ public class FactoryMultiView {
 	 * @param config Convergence criteria
 	 * @return Triangulation refinement algorithm.
 	 */
-	public static TriangulateRefineEpipolar triangulateRefineEpipolar(ConfigConverge config ) {
+	public static RefineTriangulateEpipolar triangulateRefineEpipolar(ConfigConverge config ) {
 		return new TriangulateRefineEpipolarLS(config.gtol,config.maxIterations);
 	}
 
@@ -559,7 +571,7 @@ public class FactoryMultiView {
 	 * @param config Convergence criteria
 	 * @return Triangulation refinement algorithm.
 	 */
-	public static TriangulateRefineMetric triangulateRefineMetric(ConfigConverge config ) {
+	public static RefineTriangulateMetric triangulateRefineMetric(ConfigConverge config ) {
 		return new TriangulateRefineMetricLS(config.gtol,config.maxIterations);
 	}
 
@@ -571,7 +583,7 @@ public class FactoryMultiView {
 	 * @param config Convergence criteria
 	 * @return Triangulation refinement algorithm.
 	 */
-	public static TriangulateRefineProjective triangulateRefineProj(ConfigConverge config ) {
+	public static RefineTriangulateProjective triangulateRefineProj(ConfigConverge config ) {
 		return new TriangulateRefineProjectiveLS(config.gtol,config.maxIterations);
 	}
 }

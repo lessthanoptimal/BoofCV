@@ -150,12 +150,12 @@ public class ExampleTrifocalStereo {
 //		String name = "books";
 //		String name = "triflowers";
 //		String name = "pebbles";
-		String name = "bobcats";
+//		String name = "bobcats";
 //		String name = "deer";
 //		String name = "seal"; // TODO really confusing perspective
 //		String name = "puddle";
 //		String name = "barrel";
-//		String name = "rockview";
+		String name = "rockview";
 //		String name = "waterdrip";
 //		String name = "skull";
 //		String name = "library";
@@ -274,6 +274,13 @@ public class ExampleTrifocalStereo {
 		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
 		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
 		MultiViewOps.extractCameraMatrices(model,P2,P3);
+
+		// TODO normalize pixels for this algorithm
+		// Doesn't seem to improve results much over the algebraic refinement
+//		System.out.println("Refining projective camera matrices");
+//		RefineThreeViewProjective refineP23 = FactoryMultiView.threeViewRefine();
+//		if( !refineP23.process(inliers,P2,P3,P2,P3) )
+//			throw new RuntimeException("Can't refine P2 and P3!");
 
 		// TODO things seem to go well until converted into P or F
 		//  Notes: Trifocal transfer has a very small error, but conversion into camera matrix or fundamental seems

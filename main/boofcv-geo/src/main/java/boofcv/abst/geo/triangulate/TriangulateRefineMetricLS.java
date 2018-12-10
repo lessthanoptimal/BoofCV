@@ -18,7 +18,7 @@
 
 package boofcv.abst.geo.triangulate;
 
-import boofcv.abst.geo.TriangulateRefineMetric;
+import boofcv.abst.geo.RefineTriangulateMetric;
 import boofcv.alg.geo.triangulate.ResidualsTriangulateMetricSimple;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class TriangulateRefineMetricLS implements TriangulateRefineMetric {
+public class TriangulateRefineMetricLS implements RefineTriangulateMetric {
 
 	ResidualsTriangulateMetricSimple func = new ResidualsTriangulateMetricSimple();
 
