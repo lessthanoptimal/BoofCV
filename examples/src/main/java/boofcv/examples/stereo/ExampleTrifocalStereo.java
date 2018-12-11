@@ -24,6 +24,7 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.geo.Estimate1ofTrifocalTensor;
+import boofcv.abst.geo.RefineThreeViewProjective;
 import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.geo.bundle.BundleAdjustment;
@@ -144,6 +145,7 @@ public class ExampleTrifocalStereo {
 		showPointCloud(disparity, outLeft, leftToRight, rectifiedK,rectifiedR, minDisparity, maxDisparity);
 	}
 
+	// Regression ideas.
 	public static void main(String[] args) {
 //		String name = "rock_leaves_";
 //		String name = "chicken";
@@ -159,7 +161,7 @@ public class ExampleTrifocalStereo {
 //		String name = "waterdrip";
 //		String name = "skull";
 //		String name = "library";
-//		String name = "power_";
+//		String name = "power_"; // TODO Failing. Need to change RANSAC parameters to make it work
 		// TODO bad focal length
 //		String name = "pumpkintop";
 //		String name = "turkey";
@@ -244,7 +246,7 @@ public class ExampleTrifocalStereo {
 
 		ConfigTrifocal configTri = new ConfigTrifocal();
 		ConfigTrifocalError configError = new ConfigTrifocalError();
-		configError.model = ConfigTrifocalError.Model.REPROJECTION;
+		configError.model = ConfigTrifocalError.Model.REPROJECTION_REFINE;
 
 		Ransac<TrifocalTensor,AssociatedTriple> ransac =
 				FactoryMultiViewRobust.trifocalRansac(configTri,configError,configRansac);
@@ -275,12 +277,12 @@ public class ExampleTrifocalStereo {
 		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
 		MultiViewOps.extractCameraMatrices(model,P2,P3);
 
-		// TODO normalize pixels for this algorithm
-		// Doesn't seem to improve results much over the algebraic refinement
-//		System.out.println("Refining projective camera matrices");
-//		RefineThreeViewProjective refineP23 = FactoryMultiView.threeViewRefine();
-//		if( !refineP23.process(inliers,P2,P3,P2,P3) )
-//			throw new RuntimeException("Can't refine P2 and P3!");
+		// Most of the time this makes little difference, but in some edges cases this enables it to
+		// converge correctly
+		System.out.println("Refining projective camera matrices");
+		RefineThreeViewProjective refineP23 = FactoryMultiView.threeViewRefine(null);
+		if( !refineP23.process(inliers,P2,P3,P2,P3) )
+			throw new RuntimeException("Can't refine P2 and P3!");
 
 		// TODO things seem to go well until converted into P or F
 		//  Notes: Trifocal transfer has a very small error, but conversion into camera matrix or fundamental seems

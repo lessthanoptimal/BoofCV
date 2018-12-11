@@ -93,41 +93,45 @@ class TestScaleSceneStructure {
 
 	@Test
 	void apply_undo_projective() {
-		for (int h = 0; h < 2; h++) {
-			boolean homogenous = h == 1;
-			ScaleSceneStructure alg = new ScaleSceneStructure();
+		for (int p = 0; p < 2; p++) {
+			boolean pointsStats = p==1;
 
-			alg.medianPoint.set(0.5,0.9,1.3);
-			alg.medianDistancePoint = 1.2;
+			for (int h = 0; h < 2; h++) {
+				boolean homogenous = h == 1;
+				ScaleSceneStructure alg = new ScaleSceneStructure();
+				alg.setScalePixelsUsingStats(pointsStats);
+				alg.medianPoint.set(0.5,0.9,1.3);
+				alg.medianDistancePoint = 1.2;
 
-			SceneStructureProjective expected = new SceneStructureProjective(homogenous);
-			SceneStructureProjective found = new SceneStructureProjective(homogenous);
+				SceneStructureProjective expected = new SceneStructureProjective(homogenous);
+				SceneStructureProjective found = new SceneStructureProjective(homogenous);
 
-			SceneObservations obs = createProjectiveScene(found,0xBEEF);
-			createProjectiveScene(expected,0xBEEF);
+				SceneObservations obs = createProjectiveScene(found,0xBEEF);
+				createProjectiveScene(expected,0xBEEF);
 
-			// Should have perfect observations
-			GenericBundleAdjustmentProjectiveChecks.checkReprojectionError(found,obs,1e-4);
+				// Should have perfect observations
+				GenericBundleAdjustmentProjectiveChecks.checkReprojectionError(found,obs,1e-4);
 
-			alg.applyScale(found,obs);
+				alg.applyScale(found,obs);
 
-			// Make sure it was changed
-			if( !homogenous ) {
-				// can't normalize camera matrix in this situation
-				for (int i = 0; i < expected.views.length; i++) {
-					double error = SpecializedOps_DDRM.diffNormF(expected.views[i].worldToView, found.views[i].worldToView);
-					assertTrue(error > UtilEjml.TEST_F64);
+				// Make sure it was changed
+				if( !homogenous ) {
+					// can't normalize camera matrix in this situation
+					for (int i = 0; i < expected.views.length; i++) {
+						double error = SpecializedOps_DDRM.diffNormF(expected.views[i].worldToView, found.views[i].worldToView);
+						assertTrue(error > UtilEjml.TEST_F64);
+					}
 				}
+
+				// Must still have perfect observations if scaling was correctly applied. Otherwise solution will be changed when optimizing
+				GenericBundleAdjustmentProjectiveChecks.checkReprojectionError(found,obs,1e-4);
+
+				// Undo scaling and see if it got the original parameters back
+				alg.undoScale(found,obs);
+
+				GenericBundleAdjustmentProjectiveChecks.assertEquals(expected,found,1e-8);
+				GenericBundleAdjustmentProjectiveChecks.checkReprojectionError(found,obs,1e-4);
 			}
-
-			// Must still have perfect observations if scaling was correctly applied. Otherwise solution will be changed when optimizing
-			GenericBundleAdjustmentProjectiveChecks.checkReprojectionError(found,obs,1e-4);
-
-			// Undo scaling and see if it got the original parameters back
-			alg.undoScale(found,obs);
-
-			GenericBundleAdjustmentProjectiveChecks.assertEquals(expected,found,1e-8);
-			GenericBundleAdjustmentProjectiveChecks.checkReprojectionError(found,obs,1e-4);
 		}
 	}
 

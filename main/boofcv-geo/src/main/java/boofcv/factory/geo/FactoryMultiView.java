@@ -346,9 +346,19 @@ public class FactoryMultiView {
 	 *
 	 * @return RefineThreeViewProjective
 	 */
-	public static RefineThreeViewProjective threeViewRefine() {
-		RefineThreeViewProjectiveGeometric alg = new RefineThreeViewProjectiveGeometric();
-		return new WrapRefineThreeViewProjectiveGeometric(alg);
+	public static RefineThreeViewProjective threeViewRefine( @Nullable ConfigThreeViewRefine config ) {
+		if( config == null )
+			config = new ConfigThreeViewRefine();
+
+		switch( config.which) {
+			case GEOMETRIC:
+				RefineThreeViewProjectiveGeometric alg = new RefineThreeViewProjectiveGeometric();
+				alg.getConverge().set(config.convergence);
+				alg.setScale(config.normalizePixels);
+				return new WrapRefineThreeViewProjectiveGeometric(alg);
+		}
+
+		throw new IllegalArgumentException("Unknown algorithm "+config.which);
 	}
 
 	/**

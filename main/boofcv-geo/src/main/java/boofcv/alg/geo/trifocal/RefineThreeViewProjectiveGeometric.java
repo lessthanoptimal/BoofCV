@@ -20,6 +20,7 @@ package boofcv.alg.geo.trifocal;
 
 import boofcv.abst.geo.TriangulateNViewsProjective;
 import boofcv.abst.geo.bundle.BundleAdjustment;
+import boofcv.abst.geo.bundle.ScaleSceneStructure;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.factory.geo.ConfigBundleAdjustment;
@@ -65,6 +66,12 @@ public class RefineThreeViewProjectiveGeometric {
 	ConfigConverge converge = new ConfigConverge(1e-8,1e-8,200);
 	BundleAdjustment<SceneStructureProjective> sba;
 
+	// if true scaling is done before running bundle adjustment. Only set to false if pixel coordinate have
+	// already been scaled
+	boolean scale = true;
+
+	ScaleSceneStructure scaler = new ScaleSceneStructure();
+
 	/**
 	 * Creates a constructor using default triangulation and SBA configuration
 	 */
@@ -96,8 +103,13 @@ public class RefineThreeViewProjectiveGeometric {
 	 */
 	public boolean refine(List<AssociatedTriple> listObs , DMatrixRMaj P2 , DMatrixRMaj P3 )
 	{
+		CommonOps_DDRM.setIdentity(P1);
 		if( !initializeStructure(listObs, P2, P3) ) {
 			return false;
+		}
+
+		if( scale ) {
+			scaler.applyScale(structure,observations);
 		}
 
 		sba.setVerbose(System.out,0);
@@ -111,6 +123,12 @@ public class RefineThreeViewProjectiveGeometric {
 		// save the results
 		P2.set(structure.views[1].worldToView);
 		P3.set(structure.views[2].worldToView);
+
+		if( scale ) {
+			// don't use built in unscaling function because it undoes scaling on points. Those are disposable
+			scaler.pixelScaling.get(1).remove(P2,P2);
+			scaler.pixelScaling.get(2).remove(P3,P3);
+		}
 
 		return true;
 	}
@@ -173,5 +191,17 @@ public class RefineThreeViewProjectiveGeometric {
 
 	public BundleAdjustment<SceneStructureProjective> getSba() {
 		return sba;
+	}
+
+	public boolean isScale() {
+		return scale;
+	}
+
+	public void setScale(boolean scale) {
+		this.scale = scale;
+	}
+
+	public ConfigConverge getConverge() {
+		return converge;
 	}
 }

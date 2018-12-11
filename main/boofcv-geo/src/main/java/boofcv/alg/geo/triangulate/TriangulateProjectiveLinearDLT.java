@@ -64,10 +64,12 @@ public class TriangulateProjectiveLinearDLT {
 	 * @return true if triangulation was successful or false if it failed
 	 */
 	public GeometricResult triangulate( List<Point2D_F64> observations ,
-							 List<DMatrixRMaj> cameraMatrices,
-							 Point4D_F64 found ) {
+										List<DMatrixRMaj> cameraMatrices,
+										Point4D_F64 found ) {
 		if( observations.size() != cameraMatrices.size() )
 			throw new IllegalArgumentException("Number of observations must match the number of motions");
+
+		// TODO compute mean/std of pixels then scale with that? Forget normalize rows then
 
 		final int N = cameraMatrices.size();
 

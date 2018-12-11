@@ -18,45 +18,36 @@
 
 package boofcv.factory.geo;
 
+import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.misc.ConfigConverge;
 
 /**
+ * Configuration for
+ *
  * @author Peter Abeles
  */
-public class ConfigTriangulation {
+public class ConfigThreeViewRefine {
+	/**
+	 * If true pixel coordinates will be normalized using {@link LowLevelMultiViewOps}. Set to false
+	 * only if pixels have already been scaled.
+	 */
+	public boolean normalizePixels=true;
 
 	/**
-	 * Which algorithm to use
+	 * Convergence criteria
 	 */
-	public Type type = Type.DLT;
+	public ConfigConverge convergence = new ConfigConverge(1e-8,1e-8,100);
 
 	/**
-	 * If an iterative technique is selected this is the convergence criteria
+	 * Specifies which algorithm to apply
 	 */
-	public ConfigConverge optimization = new ConfigConverge(1e-8,1e-8,10);
+	public Algorithm which = Algorithm.GEOMETRIC;
 
-	public static final ConfigTriangulation DLT = new ConfigTriangulation(Type.DLT);
-	public static final ConfigTriangulation ALGEBRAIC = new ConfigTriangulation(Type.ALGEBRAIC);
-	public static final ConfigTriangulation GEOMETRIC = new ConfigTriangulation(Type.GEOMETRIC);
-
-	public ConfigTriangulation() {
-	}
-
-	public ConfigTriangulation(Type type) {
-		this.type = type;
-	}
-
-	public enum Type {
+	public enum Algorithm {
 		/**
-		 * Discrete lienear transform
-		 */
-		DLT,
-		/**
-		 * Optimal solution for algebraic error
-		 */
-		ALGEBRAIC,
-		/**
-		 * Optimal solution for geometric error
+		 * Minimizes geometric error. This is the same as the Gold Standard algorithm in [1]
+		 *
+		 * @see boofcv.alg.geo.trifocal.RefineThreeViewProjectiveGeometric
 		 */
 		GEOMETRIC
 	}

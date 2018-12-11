@@ -19,12 +19,13 @@
 package boofcv.abst.geo.bundle;
 
 import boofcv.abst.geo.bundle.SceneStructureCommon.Point;
+import boofcv.alg.geo.NormalizationPoint2D;
 import boofcv.alg.geo.PerspectiveOps;
 import georegression.geometry.GeometryMath_F64;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ddogleg.sorting.QuickSelect;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
@@ -66,8 +67,16 @@ public class ScaleSceneStructure {
 	 */
 	double medianDistancePoint;
 
-	// work space variables
-	Point2D_F64 tmp2 = new Point2D_F64();
+	/**
+	 * If true pixels will be scaled using mean and standard deviation. otherwise the known width/height
+	 * are used with the image center
+	 */
+	boolean scalePixelsUsingStats=true;
+
+	/**
+	 * Pixel scaling for each view
+	 */
+	public FastQueue<NormalizationPoint2D> pixelScaling = new FastQueue<>(NormalizationPoint2D.class,true);
 
 	/**
 	 * Configures how scaling is applied
@@ -113,53 +122,92 @@ public class ScaleSceneStructure {
 			applyScaleTranslation3D(structure);
 		}
 
+		// Compute pixel scaling to normalize the coordinates
+		computePixelScaling(structure, observations);
+
 		// scale and translate observations, which changes camera matrix
 		applyScaleToPixelsAndCameraMatrix(structure, observations);
 	}
 
-	void applyScaleToPixelsAndCameraMatrix(SceneStructureProjective structure ,
-										   SceneObservations observations )
-	{
-		for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
-			SceneStructureProjective.View v = structure.views[viewIdx];
-			// centering and scaling
-			float cx = v.width/2;
-			float cy = v.height/2;
-			// [1/cx 0 -0.5;0 1/cy -0.5; 0 0 1] is the scaling matrix
-
-			SceneObservations.View ov = observations.views[viewIdx];
-			for (int pixelIdx = 0; pixelIdx < ov.size(); pixelIdx++) {
-				int i = pixelIdx*2;
-				float x = ov.observations.data[i];
-				float y = ov.observations.data[i+1];
-				ov.observations.data[i] = x/cx - 0.5f;
-				ov.observations.data[i+1] = y/cy - 0.5f;
+	private void computePixelScaling(SceneStructureProjective structure, SceneObservations observations) {
+		pixelScaling.reset();
+		if( scalePixelsUsingStats ) {
+			for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
+				SceneObservations.View so = observations.views[viewIdx];
+				int N = so.size();
+				double meanX=0,meanY=0;
+				for (int i = 0,idx=0; i < N; i++) {
+					meanX += so.observations.data[idx++];
+					meanY += so.observations.data[idx++];
+				}
+				meanX /= N;meanY /= N;
+				double stdX=0,stdY=0;
+				for (int i = 0,idx=0; i < N; i++) {
+					double dx = meanX - so.observations.data[idx++];
+					double dy = meanY - so.observations.data[idx++];
+					stdX += dx*dx;
+					stdY += dy*dy;
+				}
+				stdX = Math.sqrt(stdX/N);stdY = Math.sqrt(stdY/N);
+				pixelScaling.grow().set(meanX,meanY,stdX,stdY);
 			}
-
-			PerspectiveOps.inplaceAdjustCameraMatrix(1.0/cx,1.0/cy,-0.5,-0.5,v.worldToView);
+		} else {
+			for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
+				SceneStructureProjective.View sv = structure.views[viewIdx];
+				if( sv.width <= 0 || sv.height <= 0 ) {
+					throw new IllegalArgumentException("View width and height is unknown. Scale with statistics instead");
+				}
+				pixelScaling.grow().set(sv.width/2,sv.height/2,sv.width/2,sv.height/2);
+			}
 		}
 	}
 
-	void undoScaleToPixelsAndCameraMatrix(SceneStructureProjective structure ,
+	public void applyScaleToPixelsAndCameraMatrix(SceneStructureProjective structure ,
 										   SceneObservations observations )
 	{
 		for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
-			SceneStructureProjective.View v = structure.views[viewIdx];
-			// centering and scaling
-			float cx = v.width/2;
-			float cy = v.height/2;
-			// [cx 0 cx;0 cy cy; 0 0 1] is the scaling matrix
+			NormalizationPoint2D n = pixelScaling.get(viewIdx);
 
+			float cx = (float)n.meanX;
+			float cy = (float)n.meanY;
+			float stdX = (float)n.stdX;
+			float stdY = (float)n.stdY;
+
+			SceneStructureProjective.View v = structure.views[viewIdx];
 			SceneObservations.View ov = observations.views[viewIdx];
 			for (int pixelIdx = 0; pixelIdx < ov.size(); pixelIdx++) {
 				int i = pixelIdx*2;
 				float x = ov.observations.data[i];
 				float y = ov.observations.data[i+1];
-				ov.observations.data[i] = x*cx + cx;
-				ov.observations.data[i+1] = y*cy + cy;
+				ov.observations.data[i  ] = (x - cx)/ stdX;
+				ov.observations.data[i+1] = (y - cy)/ stdY;
+			}
+			n.apply(v.worldToView,v.worldToView);
+		}
+	}
+
+	public void undoScaleToPixelsAndCameraMatrix(SceneStructureProjective structure ,
+												 SceneObservations observations )
+	{
+		for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
+			NormalizationPoint2D n = pixelScaling.get(viewIdx);
+
+			float cx = (float)n.meanX;
+			float cy = (float)n.meanY;
+			float stdX = (float)n.stdX;
+			float stdY = (float)n.stdY;
+
+			SceneStructureProjective.View v = structure.views[viewIdx];
+			SceneObservations.View ov = observations.views[viewIdx];
+			for (int pixelIdx = 0; pixelIdx < ov.size(); pixelIdx++) {
+				int i = pixelIdx*2;
+				float x = ov.observations.data[i];
+				float y = ov.observations.data[i+1];
+				ov.observations.data[i  ] = x*stdX + cx;
+				ov.observations.data[i+1] = y*stdY + cy;
 			}
 
-			PerspectiveOps.inplaceAdjustCameraMatrix(cx,cy,cx,cy,v.worldToView);
+			n.remove(v.worldToView,v.worldToView);
 		}
 	}
 
@@ -352,5 +400,13 @@ public class ScaleSceneStructure {
 			p.normalize();
 			structure.points[i].set(p.x,p.y,p.z,p.w);
 		}
+	}
+
+	public boolean isScalePixelsUsingStats() {
+		return scalePixelsUsingStats;
+	}
+
+	public void setScalePixelsUsingStats(boolean scalePixelsUsingStats) {
+		this.scalePixelsUsingStats = scalePixelsUsingStats;
 	}
 }

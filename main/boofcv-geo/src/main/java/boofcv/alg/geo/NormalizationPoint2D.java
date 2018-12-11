@@ -54,6 +54,13 @@ public class NormalizationPoint2D {
 		this.stdY = stdY;
 	}
 
+	public void set(double meanX, double stdX, double meanY, double stdY) {
+		this.meanX = meanX;
+		this.stdX = stdX;
+		this.meanY = meanY;
+		this.stdY = stdY;
+	}
+
 	/**
 	 * Applies normalization to a H=3xN matrix
 	 *

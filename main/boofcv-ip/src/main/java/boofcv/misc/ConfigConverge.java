@@ -40,6 +40,12 @@ public class ConfigConverge implements Configuration {
 	public ConfigConverge() {
 	}
 
+	public void set( ConfigConverge src ) {
+		this.ftol = src.ftol;
+		this.gtol = src.gtol;
+		this.maxIterations = src.maxIterations;
+	}
+
 	@Override
 	public void checkValidity() {
 		if( maxIterations <= 0)
