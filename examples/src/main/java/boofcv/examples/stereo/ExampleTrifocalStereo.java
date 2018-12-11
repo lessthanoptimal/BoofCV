@@ -147,7 +147,7 @@ public class ExampleTrifocalStereo {
 
 	// Regression ideas.
 	public static void main(String[] args) {
-//		String name = "rock_leaves_";
+		String name = "rock_leaves_"; // todo background resolving is sensitive
 //		String name = "chicken";
 //		String name = "books";
 //		String name = "triflowers";
@@ -157,7 +157,7 @@ public class ExampleTrifocalStereo {
 //		String name = "seal"; // TODO really confusing perspective
 //		String name = "puddle";
 //		String name = "barrel";
-		String name = "rockview";
+//		String name = "rockview"; // TODO sensitive to tuning
 //		String name = "waterdrip";
 //		String name = "skull";
 //		String name = "library";

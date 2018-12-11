@@ -19,6 +19,8 @@
 package boofcv.alg.geo.triangulate;
 
 import boofcv.alg.geo.GeometricResult;
+import boofcv.alg.geo.LowLevelMultiViewOps;
+import boofcv.alg.geo.NormalizationPoint2D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -52,6 +54,9 @@ public class TriangulateProjectiveLinearDLT {
 	// used in geometry test
 	public double singularThreshold = 1;
 
+	// used for normalizing pixel coordinates and improving linear solution
+	NormalizationPoint2D stats = new NormalizationPoint2D();
+
 	/**
 	 * <p>
 	 * Given N observations of the same point from two views and a known motion between the
@@ -69,7 +74,7 @@ public class TriangulateProjectiveLinearDLT {
 		if( observations.size() != cameraMatrices.size() )
 			throw new IllegalArgumentException("Number of observations must match the number of motions");
 
-		// TODO compute mean/std of pixels then scale with that? Forget normalize rows then
+		LowLevelMultiViewOps.computeNormalization(observations,stats);
 
 		final int N = cameraMatrices.size();
 
@@ -81,11 +86,6 @@ public class TriangulateProjectiveLinearDLT {
 			index = addView(cameraMatrices.get(i),observations.get(i),index);
 		}
 
-		// improve numerics by scaling each row individually
-		// For future reviewers of this code, you can sanity check this by randomizing the scaling and seeing if
-		// unit tests still pass.
-		normalizeRows(A);
-
 		if( !solverNull.process(A,1, nullspace) )
 			return GeometricResult.SOLVE_FAILED;
 
@@ -96,10 +96,11 @@ public class TriangulateProjectiveLinearDLT {
 			return GeometricResult.GEOMETRY_POOR;
 		}
 
-		found.x = nullspace.get(0);
-		found.y = nullspace.get(1);
-		found.z = nullspace.get(2);
-		found.w = nullspace.get(3);
+		double ns[] = nullspace.data;
+		found.x = ns[0];
+		found.y = ns[1];
+		found.z = ns[2];
+		found.w = ns[3];
 
 		return GeometricResult.SUCCESS;
 	}
@@ -109,45 +110,33 @@ public class TriangulateProjectiveLinearDLT {
 	 */
 	private int addView( DMatrixRMaj P , Point2D_F64 a , int index ) {
 
+		final double sx = stats.stdX, sy = stats.stdY;
+//		final double cx = stats.meanX, cy = stats.meanY;
+
+
 		// Easier to read the code when P is broken up this way
 		double r11 = P.data[0], r12 = P.data[1], r13 = P.data[2],  r14=P.data[3];
 		double r21 = P.data[4], r22 = P.data[5], r23 = P.data[6],  r24=P.data[7];
 		double r31 = P.data[8], r32 = P.data[9], r33 = P.data[10], r34=P.data[11];
 
+		// These rows are derived by applying the scaling matrix to pixels and camera matrix
+		// px = (a.x/sx - cx/sx)
+		// A[0,0] = a.x*r31 - r11            (before normalization)
+		// A[0,0] = px*r31 - (r11-cx*r31)/sx (after normalization)
+
 		// first row
-		A.data[index++] = a.x*r31-r11;
-		A.data[index++] = a.x*r32-r12;
-		A.data[index++] = a.x*r33-r13;
-		A.data[index++] = a.x*r34-r14;
+		A.data[index++] = (a.x*r31-r11)/sx;
+		A.data[index++] = (a.x*r32-r12)/sx;
+		A.data[index++] = (a.x*r33-r13)/sx;
+		A.data[index++] = (a.x*r34-r14)/sx;
 
 		// second row
-		A.data[index++] = a.y*r31-r21;
-		A.data[index++] = a.y*r32-r22;
-		A.data[index++] = a.y*r33-r23;
-		A.data[index++] = a.y*r34-r24;
+		A.data[index++] = (a.y*r31-r21)/sy;
+		A.data[index++] = (a.y*r32-r22)/sy;
+		A.data[index++] = (a.y*r33-r23)/sy;
+		A.data[index++] = (a.y*r34-r24)/sy;
 
 		return index;
-	}
-
-	/**
-	 * Normalized rows in A for better numerical stability. Solution is scale invariant so this will not change
-	 * the result, but will ensure all the inputs are of the same order of magnitude.
-	 */
-	public static void normalizeRows( DMatrixRMaj A ) {
-
-		int idx = 0;
-		for (int row = 0; row < A.numRows; row++) {
-			double r0 = A.data[idx];
-			double r1 = A.data[idx+1];
-			double r2 = A.data[idx+2];
-			double r3 = A.data[idx+3];
-
-			double f_norm = Math.sqrt(r0*r0 + r1*r1 + r2*r2 + r3*r3);
-			A.data[idx++] = r0/f_norm;
-			A.data[idx++] = r1/f_norm;
-			A.data[idx++] = r2/f_norm;
-			A.data[idx++] = r3/f_norm;
-		}
 	}
 
 	public double getSingularThreshold() {

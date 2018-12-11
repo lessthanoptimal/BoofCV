@@ -19,6 +19,7 @@
 package boofcv.alg.geo.triangulate;
 
 import boofcv.alg.geo.GeometricResult;
+import boofcv.alg.geo.NormalizationPoint2D;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -50,6 +51,9 @@ public class TriangulateMetricLinearDLT {
 
 	// used in geometry test
 	public double singularThreshold = 1;
+
+	// used for normalizing pixel coordinates and improving linear solution
+	NormalizationPoint2D stats = new NormalizationPoint2D();
 
 	/**
 	 * <p>
@@ -120,8 +124,6 @@ public class TriangulateMetricLinearDLT {
 	}
 
 	private GeometricResult finishSolving(Point4D_F64 foundInA) {
-		TriangulateProjectiveLinearDLT.normalizeRows(A);
-
 		if (!solverNull.process(A, 1, nullspace))
 			return GeometricResult.SOLVE_FAILED;
 
@@ -142,6 +144,9 @@ public class TriangulateMetricLinearDLT {
 
 	private int addView( Se3_F64 motion , Point2D_F64 a , int index ) {
 
+		final double sx = stats.stdX, sy = stats.stdY;
+//		final double cx = stats.meanX, cy = stats.meanY;
+
 		DMatrixRMaj R = motion.getR();
 		Vector3D_F64 T = motion.getT();
 		
@@ -149,17 +154,20 @@ public class TriangulateMetricLinearDLT {
 		double r21 = R.data[3], r22 = R.data[4], r23 = R.data[5];
 		double r31 = R.data[6], r32 = R.data[7], r33 = R.data[8];
 
+		// These rows are derived by applying the scaling matrix to pixels and camera matrix
+		// more comments are in the projective code
+
 		// first row
-		A.data[index++] = a.x*r31-r11;
-		A.data[index++] = a.x*r32-r12;
-		A.data[index++] = a.x*r33-r13;
-		A.data[index++] = a.x*T.z-T.x;
+		A.data[index++] = (a.x*r31-r11)/sx;
+		A.data[index++] = (a.x*r32-r12)/sx;
+		A.data[index++] = (a.x*r33-r13)/sx;
+		A.data[index++] = (a.x*T.z-T.x)/sx;
 
 		// second row
-		A.data[index++] = a.y*r31-r21;
-		A.data[index++] = a.y*r32-r22;
-		A.data[index++] = a.y*r33-r23;
-		A.data[index++] = a.y*T.z-T.y;
+		A.data[index++] = (a.y*r31-r21)/sy;
+		A.data[index++] = (a.y*r32-r22)/sy;
+		A.data[index++] = (a.y*r33-r23)/sy;
+		A.data[index++] = (a.y*T.z-T.y)/sy;
 		
 		return index;
 	}
