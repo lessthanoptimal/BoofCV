@@ -31,6 +31,10 @@ import boofcv.struct.image.ImageType;
 /**
  * Operations for manipulating lens distortion which do not have F32 and F64 equivalents.
  *
+ * @see LensDistortionOps_F32
+ * @see LensDistortionOps_F64
+ *
+ *
  * @author Peter Abeles
  */
 public class LensDistortionOps {

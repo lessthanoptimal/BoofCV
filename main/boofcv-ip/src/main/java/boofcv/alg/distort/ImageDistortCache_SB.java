@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -147,6 +147,18 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 	}
 
 	protected abstract void assign( int indexDst , float value );
+
+	public Point2D_F32[] getMap() {
+		return map;
+	}
+
+	public InterpolatePixelS<Input> getInterp() {
+		return interp;
+	}
+
+	public PixelTransform2_F32 getDstToSrc() {
+		return dstToSrc;
+	}
 
 	@Override
 	public void setRenderAll(boolean renderAll) {
