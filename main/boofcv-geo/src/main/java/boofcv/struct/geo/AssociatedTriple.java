@@ -92,6 +92,14 @@ public class AssociatedTriple {
 		}
 	}
 
+	public boolean isIdentical( AssociatedTriple o , double tol ) {
+		if( tol < o.p1.distance(p1) )
+			return false;
+		if( tol < o.p2.distance(p2) )
+			return false;
+		return tol >= o.p3.distance(p3);
+	}
+
 	public void print() {
 		System.out.println("AssociatedTriple( "+p1+" , "+p2+" , "+p3+" )");
 	}

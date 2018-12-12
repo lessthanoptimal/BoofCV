@@ -146,6 +146,8 @@ class TestScaleSceneStructure {
 		SceneObservations obs = createProjectiveScene(structure,0xBEEF);
 
 		ScaleSceneStructure alg = new ScaleSceneStructure();
+		alg.setScalePixelsUsingStats(false);
+		alg.computePixelScaling(structure,null);
 		alg.applyScaleToPixelsAndCameraMatrix(structure,obs);
 
 		for (int viewIdx = 0; viewIdx < obs.views.length; viewIdx++) {

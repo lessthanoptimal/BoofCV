@@ -18,16 +18,67 @@
 
 package boofcv.alg.geo.trifocal;
 
+import boofcv.struct.geo.AssociatedTriple;
+import org.ejml.UtilEjml;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestRefineThreeViewProjectiveGeometric {
+public class TestRefineThreeViewProjectiveGeometric extends CommonTrifocalChecks{
 	@Test
-	public void stuff() {
-		fail("Implement");
+	public void perfect() {
+		RefineThreeViewProjectiveGeometric alg = new RefineThreeViewProjectiveGeometric();
+
+		List<AssociatedTriple> originalPixels = new ArrayList<>();
+		for (int i = 0; i < observationsPixels.size(); i++) {
+			originalPixels.add(observationsPixels.get(i).copy());
+		}
+		DMatrixRMaj originalP2 = P2.copy();
+		DMatrixRMaj originalP3 = P3.copy();
+
+		alg.refine(observations,P2,P3);
+
+		// make sure there were no changes
+		for (int i = 0; i < originalPixels.size(); i++) {
+			assertTrue(originalPixels.get(i).isIdentical(observationsPixels.get(i), UtilEjml.TEST_F64));
+		}
+
+		assertTrue(MatrixFeatures_DDRM.isIdentical(originalP2,P2,1e-3));
+		assertTrue(MatrixFeatures_DDRM.isIdentical(originalP3,P3,1e-3));
+	}
+
+	/**
+	 * Small error in initial parameters
+	 */
+	@Test
+	public void incorrectInitial() {
+		RefineThreeViewProjectiveGeometric alg = new RefineThreeViewProjectiveGeometric();
+
+		List<AssociatedTriple> originalPixels = new ArrayList<>();
+		for (int i = 0; i < observationsPixels.size(); i++) {
+			originalPixels.add(observationsPixels.get(i).copy());
+		}
+
+		P2.data[4] += 0.6;
+		P3.data[11] += 0.6;
+
+		alg.refine(observations,P2,P3);
+
+		// make sure there were no changes
+		for (int i = 0; i < originalPixels.size(); i++) {
+			assertTrue(originalPixels.get(i).isIdentical(observationsPixels.get(i), UtilEjml.TEST_F64));
+		}
+
+		// Use the fit score since there are an infinite number of solutions
+		assertEquals(0, alg.sba.getFitScore(), 1e-8);
 	}
 }
