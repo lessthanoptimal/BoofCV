@@ -112,7 +112,7 @@ public class RefineThreeViewProjectiveGeometric {
 			scaler.applyScale(structure,observations);
 		}
 
-		sba.setVerbose(System.out,0);
+//		sba.setVerbose(System.out,0);
 		sba.setParameters(structure,observations);
 		sba.configure(converge.ftol,converge.gtol,converge.maxIterations);
 
