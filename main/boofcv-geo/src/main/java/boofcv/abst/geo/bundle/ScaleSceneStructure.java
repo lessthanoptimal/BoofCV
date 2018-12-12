@@ -129,7 +129,7 @@ public class ScaleSceneStructure {
 		applyScaleToPixelsAndCameraMatrix(structure, observations);
 	}
 
-	private void computePixelScaling(SceneStructureProjective structure, SceneObservations observations) {
+	void computePixelScaling(SceneStructureProjective structure, SceneObservations observations) {
 		pixelScaling.reset();
 		if( scalePixelsUsingStats ) {
 			for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
