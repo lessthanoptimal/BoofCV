@@ -25,7 +25,8 @@ import org.ddogleg.struct.GrowQueue_B;
 
 /**
  * Graph representation of square blobs.  Each blob can be connected to at most 4 other shapes which are directly
- * adjacent of one of the sides.
+ * adjacent of one of the sides. If lens distortion is known then all coordinates and lengths are in undistorted
+ * coordinates. This also means that in the undistorted cases pixels can be outside the image
  *
  * @author Peter Abeles
  */
