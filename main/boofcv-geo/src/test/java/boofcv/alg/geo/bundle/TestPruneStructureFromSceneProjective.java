@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.structure;
+package boofcv.alg.geo.bundle;
 
+import boofcv.abst.geo.bundle.PruneStructureFromSceneProjective;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.alg.geo.PerspectiveOps;

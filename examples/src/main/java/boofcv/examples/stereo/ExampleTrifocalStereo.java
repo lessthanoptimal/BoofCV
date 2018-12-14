@@ -28,6 +28,7 @@ import boofcv.abst.geo.RefineThreeViewProjective;
 import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.geo.bundle.BundleAdjustment;
+import boofcv.abst.geo.bundle.PruneStructureFromSceneMetric;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.descriptor.UtilFeature;
@@ -39,7 +40,6 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic.Intrinsic;
-import boofcv.alg.sfm.structure.PruneStructureFromSceneMetric;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -147,11 +147,14 @@ public class ExampleTrifocalStereo {
 
 	// Regression ideas.
 	public static void main(String[] args) {
-		String name = "rock_leaves_"; // todo background resolving is sensitive
+//		String name = "rock_leaves_"; // todo background resolving is sensitive
 //		String name = "chicken";
 //		String name = "books";
 //		String name = "triflowers";
 //		String name = "pebbles";
+		String name = "minecraft_cave_";
+//		String name = "minecraft_high_";
+//		String name = "minecraft_distant_";
 //		String name = "bobcats";
 //		String name = "deer";
 //		String name = "seal"; // TODO really confusing perspective
@@ -297,16 +300,22 @@ public class ExampleTrifocalStereo {
 		selfcalib.addCameraMatrix(P2);
 		selfcalib.addCameraMatrix(P3);
 
-		GeometricResult result = selfcalib.solve();
-		if(GeometricResult.SOLVE_FAILED == result)
-			throw new RuntimeException("Egads "+result);
-
 		List<CameraPinhole> listPinhole = new ArrayList<>();
-		for (int i = 0; i < 3; i++) {
-			Intrinsic c = selfcalib.getSolutions().get(i);
-//			c.fx = c.fy = 720;
-			CameraPinhole p = new CameraPinhole(c.fx,c.fy,0,0,0,width,height);
-			listPinhole.add(p);
+		GeometricResult result = selfcalib.solve();
+		if(GeometricResult.SOLVE_FAILED != result) {
+			for (int i = 0; i < 3; i++) {
+				Intrinsic c = selfcalib.getSolutions().get(i);
+			c.fx = c.fy = 500;
+				CameraPinhole p = new CameraPinhole(c.fx,c.fy,0,0,0,width,height);
+				listPinhole.add(p);
+			}
+		} else {
+			System.out.println("Self calibration failed!");
+			for (int i = 0; i < 3; i++) {
+				CameraPinhole p = new CameraPinhole(width/2,width/2,0,0,0,width,height);
+				listPinhole.add(p);
+			}
+
 		}
 
 		// refine doesn't do very much
@@ -322,12 +331,9 @@ public class ExampleTrifocalStereo {
 //		if( !refineDual.refine(listPinhole,selfcalib.getQ()) )
 //			throw new RuntimeException("Refine failed!");
 
-		List<Intrinsic> calibration = selfcalib.getSolutions();
 		for (int i = 0; i < 3; i++) {
-			Intrinsic c = calibration.get(i);
-			System.out.println("init   fx="+c.fx+" fy="+c.fy+" skew="+c.skew);
 			CameraPinhole r = listPinhole.get(i);
-			System.out.println("refine fx="+r.fx+" fy="+r.fy+" skew="+r.skew);
+			System.out.println("fx="+r.fx+" fy="+r.fy+" skew="+r.skew);
 		}
 
 		System.out.println("Projective to metric");
@@ -421,7 +427,7 @@ public class ExampleTrifocalStereo {
 
 		for (int i = 0; i < structure.cameras.length; i++) {
 			BundlePinholeSimplified c = structure.cameras[i].getModel();
-			c.f = selfcalib.getSolutions().get(i).fx;
+			c.f = listPinhole.get(i).fx;
 			c.k1 = c.k2 = 0;
 		}
 		// flip rotation assuming that it was done wrong
@@ -440,7 +446,7 @@ public class ExampleTrifocalStereo {
 		if( bundleAdjustment.getFitScore() > bestScore ) {
 			for (int i = 0; i < structure.cameras.length; i++) {
 				BundlePinholeSimplified c = structure.cameras[i].getModel();
-				c.f = selfcalib.getSolutions().get(i).fx;
+				c.f = listPinhole.get(i).fx;
 				c.k1 = c.k2 = 0;
 			}
 			for (int i = 0; i < structure.views.length; i++) {
@@ -466,7 +472,7 @@ public class ExampleTrifocalStereo {
 		for (int i = 0; i < structure.views.length; i++) {
 			System.out.println(structure.views[i].worldToView.toString());
 		}
-
+		System.out.println("Fit Score: "+bundleAdjustment.getFitScore());
 		// TODO take initial structure estimate and reconsider all points. See if it can be improved
 
 		System.out.println("\n\nComputing Stereo Disparity");

@@ -75,7 +75,8 @@ public class DecomposeAbsoluteDualQuadratic {
 		k.a22 = Math.abs(k.a22);
 		k.a33 = Math.abs(k.a33);
 
-		CommonOps_DDF3.cholU(k);
+		if( !CommonOps_DDF3.cholU(k) )
+			return false;
 		if( !CommonOps_DDF3.invert(k,k) )
 			return false;
 		CommonOps_DDF3.divide(k,k.a33);

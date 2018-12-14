@@ -16,11 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.structure;
+package boofcv.abst.geo.bundle;
 
-import boofcv.abst.geo.bundle.SceneObservations;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.abst.geo.bundle.SceneStructureProjective;
 import boofcv.alg.geo.PerspectiveOps;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;

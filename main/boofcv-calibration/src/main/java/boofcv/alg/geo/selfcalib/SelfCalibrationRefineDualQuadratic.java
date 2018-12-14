@@ -73,7 +73,7 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
 	DMatrixRMaj p = new DMatrixRMaj(3,1); // plane at infinity
 
 	// non-linear optimization
-	UnconstrainedLeastSquares<DMatrixRMaj> optimizer =  FactoryOptimization.levenbergMarquardt(null,true);
+	UnconstrainedLeastSquares<DMatrixRMaj> optimizer =  FactoryOptimization.levenbergMarquardt(null,false);
 	ResidualK func;
 	DGrowArray param = new DGrowArray();
 
@@ -116,7 +116,7 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
 		encode(calibration,p,param);
 
 		// Configure optimization
-		optimizer.setVerbose(System.out,0);
+//		optimizer.setVerbose(System.out,0);
 		optimizer.setFunction(func,null); // Compute using a numerical Jacobian
 		optimizer.initialize(param.data,1e-6,1e-5);
 

@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.structure;
+package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
+import boofcv.abst.geo.bundle.PruneStructureFromSceneMetric;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureCommon.Point;
 import boofcv.abst.geo.bundle.SceneStructureMetric;

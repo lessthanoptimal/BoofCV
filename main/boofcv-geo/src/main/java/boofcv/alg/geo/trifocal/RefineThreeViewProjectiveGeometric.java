@@ -19,10 +19,7 @@
 package boofcv.alg.geo.trifocal;
 
 import boofcv.abst.geo.TriangulateNViewsProjective;
-import boofcv.abst.geo.bundle.BundleAdjustment;
-import boofcv.abst.geo.bundle.ScaleSceneStructure;
-import boofcv.abst.geo.bundle.SceneObservations;
-import boofcv.abst.geo.bundle.SceneStructureProjective;
+import boofcv.abst.geo.bundle.*;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
@@ -104,9 +101,7 @@ public class RefineThreeViewProjectiveGeometric {
 	public boolean refine(List<AssociatedTriple> listObs , DMatrixRMaj P2 , DMatrixRMaj P3 )
 	{
 		CommonOps_DDRM.setIdentity(P1);
-		if( !initializeStructure(listObs, P2, P3) ) {
-			return false;
-		}
+		initializeStructure(listObs, P2, P3);
 
 		if( scale ) {
 			scaler.applyScale(structure,observations);
@@ -136,7 +131,7 @@ public class RefineThreeViewProjectiveGeometric {
 	/**
 	 * Sets up data structures for SBA
 	 */
-	private boolean initializeStructure(List<AssociatedTriple> listObs, DMatrixRMaj P2, DMatrixRMaj P3) {
+	private void initializeStructure(List<AssociatedTriple> listObs, DMatrixRMaj P2, DMatrixRMaj P3) {
 		List<DMatrixRMaj> cameraMatrices = new ArrayList<>();
 		cameraMatrices.add(P1);
 		cameraMatrices.add(P2);
@@ -155,6 +150,7 @@ public class RefineThreeViewProjectiveGeometric {
 		structure.setView(1,false,P2,0,0);
 		structure.setView(2,false,P3,0,0);
 
+		boolean needsPruning = false;
 		Point4D_F64 X = new Point4D_F64();
 		for (int i = 0; i < listObs.size(); i++) {
 			AssociatedTriple t = listObs.get(i);
@@ -163,18 +159,23 @@ public class RefineThreeViewProjectiveGeometric {
 			triangObs.set(1,t.p2);
 			triangObs.set(2,t.p3);
 
-			if( !triangulator.triangulate(triangObs,cameraMatrices,X)) {
-				return false;
+			// triangulation can fail if all 3 views have the same pixel value. This has been observed in
+			// simulated 3D scenes
+			if( triangulator.triangulate(triangObs,cameraMatrices,X)) {
+				observations.getView(0).add(i,(float)t.p1.x,(float)t.p1.y);
+				observations.getView(1).add(i,(float)t.p2.x,(float)t.p2.y);
+				observations.getView(2).add(i,(float)t.p3.x,(float)t.p3.y);
+
+				structure.points[i].set(X.x,X.y,X.z,X.w);
+			} else {
+				needsPruning = true;
 			}
-
-			observations.getView(0).add(i,(float)t.p1.x,(float)t.p1.y);
-			observations.getView(1).add(i,(float)t.p2.x,(float)t.p2.y);
-			observations.getView(2).add(i,(float)t.p3.x,(float)t.p3.y);
-
-			structure.points[i].set(X.x,X.y,X.z,X.w);
 		}
 
-		return true;
+		if( needsPruning ) {
+			PruneStructureFromSceneProjective pruner = new PruneStructureFromSceneProjective(structure,observations);
+			pruner.prunePoints(1);
+		}
 	}
 
 	public TriangulateNViewsProjective getTriangulator() {

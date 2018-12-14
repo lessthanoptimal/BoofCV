@@ -92,7 +92,8 @@ public class DistanceTrifocalReprojectionSq implements DistanceFromModel<Trifoca
 		observations.set(1,pt.p2);
 		observations.set(2,pt.p3);
 
-		triangulator.triangulate(observations,cameraMatrices,X);
+		if( !triangulator.triangulate(observations,cameraMatrices,X) )
+			return 1e200; // not returning max value out of fear of overflow
 
 		if( refiner != null )
 			refiner.process(observations,cameraMatrices,X,X);
