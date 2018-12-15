@@ -63,26 +63,28 @@ public class ImplPerspectiveOps_F64 {
 		return adjustedParam;
 	}
 
-	public static DMatrixRMaj pinholeToMatrix(double fx, double fy, double skew,
-											  double xc, double yc) {
-		return new DMatrixRMaj(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
-	}
-
-	public static DMatrixRMaj pinholeToMatrix(CameraPinhole param , DMatrixRMaj K ) {
-
+	public static DMatrixRMaj pinholeToMatrix( double fx, double fy, double skew,
+											   double cx, double cy , DMatrixRMaj K ) {
 		if( K == null ) {
 			K = new DMatrixRMaj(3,3);
+		} else {
+			K.reshape(3,3);
 		}
+
 		CommonOps_DDRM.fill(K, 0);
 
-		K.data[0] = (double) param.fx;
-		K.data[1] = (double) param.skew;
-		K.data[2] = (double) param.cx;
-		K.data[4] = (double) param.fy;
-		K.data[5] = (double) param.cy;
+		K.data[0] = fx;
+		K.data[1] = skew;
+		K.data[2] = cx;
+		K.data[4] = fy;
+		K.data[5] = cy;
 		K.data[8] = 1;
 
 		return K;
+	}
+
+	public static DMatrixRMaj pinholeToMatrix(CameraPinhole param , DMatrixRMaj K ) {
+		return pinholeToMatrix(param.fx,param.fy,param.skew,param.cx,param.cy,K);
 	}
 
 	public static DMatrix3x3 pinholeToMatrix(CameraPinhole param , DMatrix3x3 K ) {

@@ -107,10 +107,10 @@ subprojects {
         compile 'javax.annotation:jsr250-api:1.0'       // @Generated
 
         testImplementation(
-                'org.junit.jupiter:junit-jupiter-api:5.3.1'
+                'org.junit.jupiter:junit-jupiter-api:5.3.2'
         )
         testRuntimeOnly(
-                'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+                'org.junit.jupiter:junit-jupiter-engine:5.3.2'
         )
 
         experimentalImplementation project.sourceSets.main.compileClasspath

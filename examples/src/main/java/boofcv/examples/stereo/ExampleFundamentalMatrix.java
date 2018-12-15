@@ -72,11 +72,11 @@ public class ExampleFundamentalMatrix {
 	 * @return The found fundamental matrix.
 	 */
 	public static DMatrixRMaj robustFundamental( List<AssociatedPair> matches ,
-													List<AssociatedPair> inliers ) {
+												 List<AssociatedPair> inliers , double inlierThreshold ) {
 
 		ConfigRansac configRansac = new ConfigRansac();
-		configRansac.inlierThreshold = 0.1;
-		configRansac.maxIterations = 2000;
+		configRansac.inlierThreshold = inlierThreshold;
+		configRansac.maxIterations = 500;
 		ConfigFundamental configFundamental = new ConfigFundamental();
 		configFundamental.which = EnumFundamental.LINEAR_7;
 		configFundamental.numResolve = 2;
@@ -170,7 +170,7 @@ public class ExampleFundamentalMatrix {
 		// estimate and print the results using a robust and simple estimator
 		// The results should be difference since there are many false associations in the simple model
 		// Also note that the fundamental matrix is only defined up to a scale factor.
-		F = robustFundamental(matches, inliers);
+		F = robustFundamental(matches, inliers, 0.5);
 		System.out.println("Robust");
 		CommonOps_DDRM.divide(F, NormOps_DDRM.normF(F)); // scale to make comparision easier
 		F.print();

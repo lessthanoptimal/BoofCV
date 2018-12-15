@@ -25,7 +25,6 @@ import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.geo.Estimate1ofTrifocalTensor;
 import boofcv.abst.geo.RefineThreeViewProjective;
-import boofcv.abst.geo.Triangulate2ViewsMetric;
 import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.PruneStructureFromSceneMetric;
@@ -59,7 +58,6 @@ import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import boofcv.struct.image.*;
-import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -76,9 +74,35 @@ import java.util.List;
 import static boofcv.examples.stereo.ExampleStereoTwoViewsOneCamera.rectifyImages;
 import static boofcv.examples.stereo.ExampleStereoTwoViewsOneCamera.showPointCloud;
 
-// TODO Example images with significant lens distortion. BRIO?
-
 /**
+ * In this example three uncalibrated images are used to compute a point cloud. Extrinsic as well as all intrinsic
+ * parameters (e.g. focal length and lens distortion) are found. Stereo disparity is computed between two of
+ * the three views and the point cloud derived from that.
+ *
+ * Three images produce a more stable "practical" algorithm when dealing with uncalibrated images.
+ * With just two views its impossible to remove all false matches since an image feature can lie any where
+ * along an epipolar line in other other view. Even with three views, results are not always stable or 100% accurate
+ * due to scene geometry and here the views were captured. In general you want a well textured scene with objects
+ * up close and far away, and images taken with translational
+ * motion. Pure rotation and planar scenes are impossible to estimate the structure from.
+ *
+ * Steps:
+ * <ol>
+ *     <li>Feature Detection (e.g. SURF)</li>
+ *     <li>Two view association</li>
+ *     <li>Find 3 View Tracks</li>
+ *     <li>Fit Trifocal tensor using RANSAC</li>
+ *     <li>Get and refine camera matrices</li>
+ *     <li>Compute dual absolute quadratic</li>
+ *     <li>Estimate intrinsic parameters from DAC</li>
+ *     <li>Estimate metric scene structure</li>
+ *     <li>Sparse bundle adjustment</li>
+ *     <li>Tweak parameters and sparse bundle adjustment again</li>
+ *     <li>Rectify two of the images</li>
+ *     <li>Compute stereo disparity</li>
+ *     <li>Convert into a point cloud</li>
+ * </ol>
+ *
  * @author Peter Abeles
  */
 public class ExampleTrifocalStereo {
@@ -339,7 +363,7 @@ public class ExampleTrifocalStereo {
 		System.out.println("Projective to metric");
 		// convert camera matrix from projective to metric
 		DMatrixRMaj H = new DMatrixRMaj(4,4);
-		if( !MultiViewOps.computeRectifyingHomography(selfcalib.getQ(),H) )
+		if( !MultiViewOps.absoluteQuadraticToH(selfcalib.getQ(),H) )
 			throw new RuntimeException("Projective to metric failed");
 
 		DMatrixRMaj K = new DMatrixRMaj(3,3);
@@ -573,41 +597,5 @@ public class ExampleTrifocalStereo {
 			triangulation.triangulate(normObs.toList(),worldToViews,X);
 			sp.set(X.x,X.y,X.z);
 		}
-	}
-
-	public static List<Point3D_F64> triangulate( Se3_F64 a_to_b , DMatrixRMaj KA , DMatrixRMaj KB ,
-												 List<Point2D_F64> pixelsA , List<Point2D_F64> pixelsB)
-	{
-		if( pixelsA.size() != pixelsB.size() )
-			throw new IllegalArgumentException("Observation counts must match");
-
-		int N = pixelsA.size();
-
-		DMatrixRMaj KA_inv = new DMatrixRMaj(3,3);
-		DMatrixRMaj KB_inv = new DMatrixRMaj(3,3);
-
-		CommonOps_DDRM.invert(KA,KA_inv);
-		CommonOps_DDRM.invert(KB,KB_inv);
-
-		List<Point3D_F64> output = new ArrayList<>();
-
-		Point2D_F64 na = new Point2D_F64();
-		Point2D_F64 nb = new Point2D_F64();
-
-		Triangulate2ViewsMetric triangulator = FactoryMultiView.
-				triangulate2ViewMetric(ConfigTriangulation.GEOMETRIC);
-
-		for (int i = 0; i < N; i++) {
-			GeometryMath_F64.mult(KA_inv,pixelsA.get(i),na);
-			GeometryMath_F64.mult(KB_inv,pixelsB.get(i),nb);
-
-			Point3D_F64 X = new Point3D_F64();
-			if( !triangulator.triangulate(na,nb,a_to_b,X) )
-				throw new RuntimeException("Triangulation failed?!");
-
-			output.add(X);
-		}
-
-		return output;
 	}
 }

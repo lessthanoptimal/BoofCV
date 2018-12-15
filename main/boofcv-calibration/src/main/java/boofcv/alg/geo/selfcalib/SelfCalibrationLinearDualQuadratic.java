@@ -35,11 +35,16 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * <p>Computes intrinsic calibration matrix using the absolute dual quadratic, projective transforms, and by assuming
- * different elements in the calibration matrix have a linear constraint. All camera parameters which are not
- * constrained are allowed to vary from frame to frame. The solution is found by computing the null space of
- * the constrained version of the system below:</p>
+ * <p>
+ * Computes intrinsic calibration matrix for each view using projective camera matrices to compute the
+ * the dual absolute quadratic (DAQ) and by assuming different elements in the 3x3 calibration matrix
+ * have linear constraints. A minimum of three views are required to solve for the 10 unknowns in
+ * the DAQ if all constraints are applied. A solution found in the null space of the linear system below:
+ * </p>
+ *
  * <p>w<sup>*</sup><sub>i</sub> = P<sub>i</sub>*Q<sup>*</sup><sub>&infin;</sub>*P<sup>T</sup><sub>i</sub></p>
+ * <p>Where Q<sup>*</sup> is DAQ and w<sup>*</sup> is the Dual Image Absolute Cubic (DIAC)</p>
+ *
  * <p>On output, a list of intrinsic parameters is returned (fx,fy,skew) for every view which is provided.
  * For a complete discussion of the theory see the auto calibration section of [1] with missing equations
  * derived in [2].</p>

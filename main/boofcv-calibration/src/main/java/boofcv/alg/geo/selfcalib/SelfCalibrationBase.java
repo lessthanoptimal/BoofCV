@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.selfcalib;
 
+import boofcv.alg.geo.PerspectiveOps;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrix3;
 import org.ejml.data.DMatrix3x3;
@@ -66,12 +67,8 @@ public class SelfCalibrationBase {
 	 *                       to the coordinate system's origin. 3 x 4
 	 */
 	public void addCameraMatrix(DMatrixRMaj viewI ) {
-		DMatrixRMaj P = viewI;
-		DMatrixRMaj A = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.extract(P,0,3,0,3,A);
 		Projective pr = cameras.grow();
-		ConvertDMatrixStruct.convert(A,pr.A);
-		pr.a.set(P.get(0,3),P.get(1,3),P.get(2,3));
+		PerspectiveOps.projectionSplit(viewI,pr.A,pr.a);
 	}
 
 	public void addCameraMatrix(List<DMatrixRMaj> viewI_to_view0 ) {

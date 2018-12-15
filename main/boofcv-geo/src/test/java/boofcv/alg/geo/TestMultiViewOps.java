@@ -1119,7 +1119,7 @@ public class TestMultiViewOps {
 		DMatrixRMaj H = eq.lookupDDRM("H");
 		DMatrixRMaj foundH = new DMatrixRMaj(4,4);
 
-		assertTrue(MultiViewOps.computeRectifyingHomography(Q_in,foundH));
+		assertTrue(MultiViewOps.absoluteQuadraticToH(Q_in,foundH));
 
 		assertTrue(MatrixFeatures_D.isIdentical(H,foundH, UtilEjml.TEST_F64));
 	}
