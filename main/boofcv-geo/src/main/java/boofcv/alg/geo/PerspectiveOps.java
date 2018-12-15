@@ -34,6 +34,7 @@ import georegression.metric.UtilAngle;
 import georegression.struct.GeoTuple3D_F64;
 import georegression.struct.point.*;
 import georegression.struct.se.Se3_F64;
+import org.ejml.data.DMatrix3;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
@@ -194,13 +195,42 @@ public class PerspectiveOps {
 	 * @param fx Focal length x-axis in pixels
 	 * @param fy Focal length y-axis in pixels
 	 * @param skew skew in pixels
-	 * @param xc camera center x-axis in pixels
-	 * @param yc center center y-axis in pixels
+	 * @param cx camera center x-axis in pixels
+	 * @param cy center center y-axis in pixels
 	 * @return Calibration matrix 3x3
 	 */
 	public static DMatrixRMaj pinholeToMatrix(double fx, double fy, double skew,
-											  double xc, double yc) {
-		return ImplPerspectiveOps_F64.pinholeToMatrix(fx, fy, skew, xc, yc);
+											  double cx, double cy) {
+		return ImplPerspectiveOps_F64.pinholeToMatrix(fx, fy, skew, cx, cy,null);
+	}
+
+	public static void pinholeToMatrix(double fx, double fy, double skew,
+									   double cx, double cy , DMatrix3x3 K ) {
+		K.a11 = fx; K.a12 = skew; K.a13 = cx;
+		K.a22 = fy; K.a23 = cy;
+		K.a33 = 1;
+		K.a21 = K.a31 = K.a32 = 0;
+	}
+
+	/**
+	 * Analytic matrix inversion to 3x3 camera calibration matrix. Input and output
+	 * can be the same matrix. Zeros are not set.
+	 *
+	 * @param K (Input) Calibration matrix
+	 * @param Kinv (Output) inverse.
+	 */
+	public static void invertPinhole( DMatrix3x3 K , DMatrix3x3 Kinv) {
+		double fx = K.a11;
+		double skew = K.a12;
+		double cx = K.a13;
+		double fy = K.a22;
+		double cy = K.a23;
+		Kinv.a11 = 1.0/fx;
+		Kinv.a12 = -skew/(fx*fy);
+		Kinv.a13 = (skew*cy - cx*fy)/(fx*fy);
+		Kinv.a22 = 1.0/fy;
+		Kinv.a23 = -cy/fy;
+		Kinv.a33 = 1;
 	}
 
 	/**
@@ -621,6 +651,19 @@ public class PerspectiveOps {
 		T.x = P.get(0,3);
 		T.y = P.get(1,3);
 		T.z = P.get(2,3);
+	}
+
+	/**
+	 * Splits the projection matrix into a 3x3 matrix and 3x1 vector.
+	 *
+	 * @param P (Input) 3x4 projection matirx
+	 * @param M (Output) M = P(:,0:2)
+	 * @param T (Output) T = P(:,3)
+	 */
+	public static void projectionSplit( DMatrixRMaj P , DMatrix3x3 M , DMatrix3 T ) {
+		M.a11 = P.data[0]; M.a12 = P.data[1]; M.a13 = P.data[2 ]; T.a1 = P.data[3 ];
+		M.a21 = P.data[4]; M.a22 = P.data[5]; M.a23 = P.data[6 ]; T.a2 = P.data[7 ];
+		M.a31 = P.data[8]; M.a32 = P.data[9]; M.a33 = P.data[10]; T.a3 = P.data[11];
 	}
 
 	/**

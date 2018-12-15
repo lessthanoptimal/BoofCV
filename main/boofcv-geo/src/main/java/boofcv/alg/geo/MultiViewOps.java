@@ -1337,7 +1337,7 @@ public class MultiViewOps {
 	 * where P is the camera matrix, H is the homography, (K,R,t) are the intrinsic calibration matrix, rotation,
 	 * and translation
 	 *
-	 * @see MultiViewOps#computeRectifyingHomography
+	 * @see MultiViewOps#absoluteQuadraticToH
 	 * @see #decomposeMetricCamera(DMatrixRMaj, DMatrixRMaj, Se3_F64)
 	 *
 	 * @param cameraMatrix (Input) camera matrix. 3x4
@@ -1458,12 +1458,48 @@ public class MultiViewOps {
 	 * @param Q (Input) Absolute quadratic. Typically found in auto calibration. Not modified.
 	 * @param H (Output) 4x4 rectifying homography.
 	 */
-	public static boolean computeRectifyingHomography(DMatrix4x4 Q , DMatrixRMaj H ) {
+	public static boolean absoluteQuadraticToH(DMatrix4x4 Q , DMatrixRMaj H ) {
 		DecomposeAbsoluteDualQuadratic alg = new DecomposeAbsoluteDualQuadratic();
 		if( !alg.decompose(Q) )
 			return false;
 
 		return alg.computeRectifyingHomography(H);
+	}
+
+	/**
+	 * Given the calibration matrix for the first view, plane at infinity, and lambda (scaling factor) compute
+	 * the rectifying homography for changing a projective camera matrix into a metric one.
+	 *
+	 * <p>H = [K 0;v' &lambda]</p>
+	 *
+	 * @param K 3x3 calibration matrix for view 1
+	 * @param v1 plane at infinity
+	 * @param v2 plane at infinity
+	 * @param v3 plane at infinity
+	 * @param lambda scaling factor
+	 * @param H (Optional) Storage for 4x4 matrix
+	 * @return The homography
+	 */
+	public static DMatrixRMaj createProjectiveToMetric( DMatrixRMaj K ,
+														double v1 , double v2 , double v3 ,
+														double lambda,
+														@Nullable DMatrixRMaj H )
+	{
+		if( H == null )
+			H = new DMatrixRMaj(4,4);
+		else
+			H.reshape(4,4);
+
+		CommonOps_DDRM.insert(K,H,0,0);
+		H.set(0,3,0);
+		H.set(1,3,0);
+		H.set(2,3,0);
+		H.set(3,0,v1);
+		H.set(3,1,v2);
+		H.set(3,2,v3);
+		H.set(3,3,lambda);
+
+		return H;
 	}
 
 	/**

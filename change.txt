@@ -52,13 +52,17 @@ Version : 0.32
   * Bunch of bug fixes
   * Extracts the full pinhole calibration matrix from camera characteristics
 
-TODO Scale pixels in TriangulateProjectiveLinearDLT
 
-TODO
+TODO For Release
+  - Undistorted QR
   - Trifocal Stereo
     * Work in all example images
     * Create regression tests from said images
-    * Add images with significant lens distortion
+
+TODO next release
+  - Self Calibration
+    * Weighted iterated DIAC
+    * Guess and check K
   - Bundle Adjustment
     * Calibrated homogenous coordinates
 
