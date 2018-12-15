@@ -18,15 +18,11 @@
 
 package boofcv.examples.stereo;
 
-import boofcv.abst.geo.bundle.BundleAdjustment;
-import boofcv.abst.geo.bundle.ScaleSceneStructure;
-import boofcv.abst.geo.bundle.SceneObservations;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.abst.geo.bundle.*;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.selfcalib.EstimatePlaneAtInfinityGivenK;
-import boofcv.alg.sfm.structure.PruneStructureFromSceneMetric;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
