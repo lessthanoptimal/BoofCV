@@ -11,8 +11,9 @@ Version : 0.32
   * Colorized code
   * Updated detect line demo
   * Updated image enhance demo
-  * TODO Removed uncalibrated two view stereo. Never worked well!
-  * Three view stereo with self calibration
+  * Two view uncalibrated stereo re-written from scratch
+  * Three view uncalibrated stereo
+  * TODO visualization for three view assocations
 - Applications
   * All applications have a GUI
   * Centralized GUI for launching
@@ -40,6 +41,10 @@ Version : 0.32
   * Consistent camera matrices from three fundamental matrices
   * Cleaned up naming scheme for triangulation algorithms
   * Refine three view camera matrix (i.e. trifocal tensor)
+  * Many more new functions/algorithms added
+- Self Calibration
+  * Plane at infinity given intrinsic parameters
+  *  TODO SelfCalibrationGuessAndCheckF based on "Pratical Autocalibration" 2010
 - SFM
   * Improvements to projective bundle adjustment
   * Projective scene structure pruning
@@ -72,7 +77,6 @@ TODO Remove dependency on OpenCV in Applications to reduce file size
    - TODO handle situation where images are removed and exception is thrown
    - TODO Create generic image feature matching for ordered sequences of images
    - TODO homogeneous coordinates
-- TODO revisit stereo from uncalibrated
 - TODO Sparse Bundle Adjustment
    - Future: quaternion implementation
    - Future: sparse block math

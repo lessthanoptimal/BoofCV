@@ -105,7 +105,7 @@ import static boofcv.examples.stereo.ExampleStereoTwoViewsOneCamera.showPointClo
  *
  * @author Peter Abeles
  */
-public class ExampleTrifocalStereo {
+public class ExampleTrifocalStereoUncalibrated {
 
 	public static void computeStereoCloud( GrayU8 distortedLeft, GrayU8 distortedRight ,
 										   Planar<GrayU8> colorLeft, Planar<GrayU8> colorRight,

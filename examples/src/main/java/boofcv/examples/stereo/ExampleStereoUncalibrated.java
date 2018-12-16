@@ -44,7 +44,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.examples.stereo.ExampleTrifocalStereo.computeStereoCloud;
+import static boofcv.examples.stereo.ExampleTrifocalStereoUncalibrated.computeStereoCloud;
 
 /**
  * <p>
@@ -84,8 +84,8 @@ public class ExampleStereoUncalibrated {
 	public static void main( String args[] ) {
 
 		// Successful
-//		String name = "rock_leaves_";
-		String name = "pebbles";
+		String name = "rock_leaves_";
+//		String name = "pebbles";
 //		String name = "mono_wall_";
 //		String name = "barrel";
 //		String name = "power_";
@@ -186,7 +186,7 @@ public class ExampleStereoUncalibrated {
 		}
 
 		// initial location of points is found through triangulation
-		ExampleTrifocalStereo.triangulatePoints(structure,observations);
+		ExampleTrifocalStereoUncalibrated.triangulatePoints(structure,observations);
 
 		//------------------ Running Bundle Adjustment
 		System.out.println("Performing bundle adjustment");
