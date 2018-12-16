@@ -29,6 +29,7 @@ import org.ejml.dense.fixed.CommonOps_DDF3;
 /**
  * If the camera calibration is known for two views then given canonical camera projection matrices (P1 = [I|0])
  * it is possible to compute the plane a infinity and from that elevate the views from projective to metric.
+ * The solution returned is only approximate.
  *
  * <p>
  * <li>Gherardi, Riccardo, and Andrea Fusiello. "Practical autocalibration."
@@ -105,7 +106,7 @@ public class EstimatePlaneAtInfinityGivenK {
 		double n3 = w3.norm();
 		w2.divideIP(n3);
 		w3.divideIP(n3);
-		v.cross(w2,w3);
+		v.cross(w2,w3); // approximation here, w2 and w3 might not be orthogonal
 		v.x -= W.a11;
 		v.y -= W.a12;
 		v.z -= W.a13;

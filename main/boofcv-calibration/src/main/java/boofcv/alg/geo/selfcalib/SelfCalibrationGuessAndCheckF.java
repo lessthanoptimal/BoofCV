@@ -64,7 +64,8 @@ public class SelfCalibrationGuessAndCheckF {
 	boolean sameFocus;
 
 	// intrinsic camera matrix for view 1
-	DMatrixRMaj K1 = new DMatrixRMaj(3,3);
+	DMatrixRMaj K = new DMatrixRMaj(3,3);
+	DMatrixRMaj K2 = new DMatrixRMaj(3,3);
 
 	// projective to metric homography
 	DMatrixRMaj H = new DMatrixRMaj(4,4);
@@ -83,6 +84,7 @@ public class SelfCalibrationGuessAndCheckF {
 	double w_ar = 1.0/0.2;  // aspect ratio
 	double w_uo = 1.0/0.1;  // zero principle point
 
+	DMatrixRMaj tmp = new DMatrixRMaj(3,3);
 
 	public SelfCalibrationGuessAndCheckF() {
 		normalizedP = new FastQueue<DMatrixRMaj>(DMatrixRMaj.class,true ) {
@@ -102,15 +104,16 @@ public class SelfCalibrationGuessAndCheckF {
 	 * @param height Image height
 	 */
 	public void setCamera( double skew , double cx , double cy , int width , int height ) {
+
+		// Define normalization matrix
+		// center points, remove skew, scale coordinates
 		double d = Math.sqrt(width*width + height*height);
-		V.set(0,0,d); V.set(0,3,width);
-		V.set(1,1,d); V.set(1,3,height);
-		V.set(2,2,2);
-		CommonOps_DDRM.scale(0.5,V);
+		V.zero();
+		V.set(0,0,d/2); V.set(0,1,skew); V.set(0,2,cx);
+		V.set(1,1,d/2); V.set(1,2,cy);
+		V.set(2,2,1);
 
 		CommonOps_DDRM.invert(V,Vinv);
-
-		// TODO remove skew,cx,cy, ...etc
 	}
 
 	/**
@@ -133,7 +136,10 @@ public class SelfCalibrationGuessAndCheckF {
 	 * @return true if successful or false if it fails
 	 */
 	public boolean process(List<DMatrixRMaj> cameraMatrices) {
+		if( cameraMatrices.size() == 0 )
+			throw new IllegalArgumentException("Must contain at least 1 matrix");
 
+		Vinv.print();
 		// P = inv(V)*P/||P(2,0:2)||
 		this.normalizedP.reset();
 		for (int i = 0; i < cameraMatrices.size(); i++) {
@@ -144,34 +150,34 @@ public class SelfCalibrationGuessAndCheckF {
 			double scale = Math.sqrt(a0*a0 + a1*a1 + a2*a2);
 
 			DMatrixRMaj Pi = normalizedP.grow();
-			CommonOps_DDRM.mult(1.0/scale,Vinv,cameraMatrices.get(i),Pi);
+			CommonOps_DDRM.mult(1.0/1.0,Vinv,A,Pi);
 		}
-
-		// coeffients for linear to log scale
-		double b = Math.log(sampleMax/sampleMin)/(numSamples-1);
-
-
 
 		// Find the best combinations of focal lengths
 		double bestScore;
 		if( sameFocus ) {
-			bestScore = findBestFocusOne(cameraMatrices,b);
+			bestScore = findBestFocusOne(normalizedP.get(0));
 		} else {
-			bestScore = findBestFocusTwo(cameraMatrices, b);
+			bestScore = findBestFocusTwo(normalizedP.get(0));
 		}
 
-		// TODO undo normalization
+		// undo normalization
+//		CommonOps_DDRM.extract(bestH,0,0,tmp);
+//		CommonOps_DDRM.mult(V,tmp, K2);
+//		CommonOps_DDRM.insert(K2,bestH,0,0);
 
 		return bestScore != Double.MAX_VALUE;
 	}
 
-	private double findBestFocusOne(List<DMatrixRMaj> cameraMatrices, double b) {
+	private double findBestFocusOne(DMatrixRMaj P2) {
+		// coeffients for linear to log scale
+		double b = Math.log(sampleMax/sampleMin)/(numSamples-1);
 		double bestScore = Double.MAX_VALUE;
 
 		for (int i = 0; i < numSamples; i++) {
 			double f =sampleMin*Math.exp(b*i);
 
-			if( !computeRectifyH(f,f,cameraMatrices.get(1),H))
+			if( !computeRectifyH(f,f,P2,H))
 				continue;
 
 			double score = scoreResults();
@@ -179,11 +185,14 @@ public class SelfCalibrationGuessAndCheckF {
 				bestScore = score;
 				bestH.set(H);
 			}
+			System.out.println(i+"  f="+f+" score = "+score);
 		}
 		return bestScore;
 	}
 
-	private double findBestFocusTwo(List<DMatrixRMaj> cameraMatrices, double b) {
+	private double findBestFocusTwo(DMatrixRMaj P1) {
+		// coeffients for linear to log scale
+		double b = Math.log(sampleMax/sampleMin)/(numSamples-1);
 		double bestScore = Double.MAX_VALUE;
 
 		for (int i = 0; i < numSamples; i++) {
@@ -191,7 +200,7 @@ public class SelfCalibrationGuessAndCheckF {
 			for (int j = 0; j < numSamples; j++) {
 				double f2 =sampleMin*Math.exp(b*i);
 
-				if( !computeRectifyH(f1,f2,cameraMatrices.get(1),H))
+				if( !computeRectifyH(f1,f2,P1,H))
 					continue;
 
 				double score = scoreResults();
@@ -213,17 +222,28 @@ public class SelfCalibrationGuessAndCheckF {
 	 * @return true if successful
 	 */
 	boolean computeRectifyH( double f1 , double f2 , DMatrixRMaj P2, DMatrixRMaj H ) {
-		estimatePlaneInf.setCamera1(f1,f1,0,0,0);
+		K.zero();
+		K.set(0,0,f1);K.set(1,1,f1);K.set(2,2,1);
+		CommonOps_DDRM.mult(V,K,K2);
+
+		double fx = K2.get(0,0);
+		double fy = K2.get(1,1);
+		double skew = K2.get(0,1);
+		double cx = K2.get(0,2);
+		double cy = K2.get(1,2);
+		// have to undo normalization for first since its camera matrix remains un-normalized
+		estimatePlaneInf.setCamera1(fx,fy,skew,cx,cy);
 		estimatePlaneInf.setCamera2(f2,f2,0,0,0);
 
 		if( !estimatePlaneInf.estimatePlaneAtInfinity(P2,planeInf) )
 			return false;
 
-		K1.set(0,0,f1);
-		K1.set(1,1,f1);
-		K1.set(2,2,1);
+//		K2.zero();
+//		K2.set(0,0,f1*100);
+//		K2.set(1,1,f1*100);
+//		K2.set(2,2,1);
 
-		MultiViewOps.createProjectiveToMetric(K1,planeInf.x,planeInf.y,planeInf.z,1,H);
+		MultiViewOps.createProjectiveToMetric(K2,planeInf.x,planeInf.y,planeInf.z,1,H);
 		return true;
 	}
 
