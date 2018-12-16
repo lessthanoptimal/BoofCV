@@ -148,4 +148,17 @@ public class CameraPinhole extends CameraModel {
 	public <T extends CameraModel> T createLike() {
 		return (T)new CameraPinhole();
 	}
+
+	@Override
+	public String toString() {
+		return "CameraPinhole{" +
+				"fx=" + fx +
+				", fy=" + fy +
+				", skew=" + skew +
+				", cx=" + cx +
+				", cy=" + cy +
+				", width=" + width +
+				", height=" + height +
+				'}';
+	}
 }

@@ -104,9 +104,8 @@ public class EstimatePlaneAtInfinityGivenK {
 		w2.set(W.a21,W.a22,W.a23);
 		w3.set(W.a31,W.a32,W.a33);
 		double n3 = w3.norm();
-		w2.divideIP(n3);
-		w3.divideIP(n3);
 		v.cross(w2,w3); // approximation here, w2 and w3 might not be orthogonal
+		v.divideIP(n3);
 		v.x -= W.a11;
 		v.y -= W.a12;
 		v.z -= W.a13;

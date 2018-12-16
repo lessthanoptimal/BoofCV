@@ -20,9 +20,8 @@ package boofcv.examples.stereo;
 
 import boofcv.abst.geo.bundle.*;
 import boofcv.alg.geo.MultiViewOps;
-import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
-import boofcv.alg.geo.selfcalib.EstimatePlaneAtInfinityGivenK;
+import boofcv.alg.geo.selfcalib.SelfCalibrationGuessAndCheckFocus;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
@@ -34,7 +33,6 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
-import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ejml.data.DMatrixRMaj;
@@ -65,7 +63,7 @@ import static boofcv.examples.stereo.ExampleTrifocalStereoUncalibrated.computeSt
  * <ol>
  *     <li>Feature association</li>
  *     <li>RANSAC to estimate Fundamental matrix</li>
- *     <li>Guess focal length and compute projective to metric homography</li>
+ *     <li>Guess and check focal length and compute projective to metric homography</li>
  *     <li>Upgrade to metric geometry</li>
  *     <li>Set up bundle adjustment and triangulate 3D points</li>
  *     <li>Run bundle adjustment</li>
@@ -85,6 +83,7 @@ public class ExampleStereoUncalibrated {
 
 		// Successful
 		String name = "rock_leaves_";
+//		String name = "minecraft_cave_";
 //		String name = "pebbles";
 //		String name = "mono_wall_";
 //		String name = "barrel";
@@ -132,17 +131,18 @@ public class ExampleStereoUncalibrated {
 		double fx = width/2; double fy = fx;
 		double cx = width/2; double cy = height/2;
 
-		// Compute a transform from projective to metric by assuming we know the camera's calibration
-		EstimatePlaneAtInfinityGivenK estimateV = new EstimatePlaneAtInfinityGivenK();
-		estimateV.setCamera1(fx,fy,0,cx,cy);
-		estimateV.setCamera2(fx,fy,0,cx,cy);
+		// Compute an approximation of the rectifying homography by testing out numerious
+		// values for focal length
+		SelfCalibrationGuessAndCheckFocus selfcalib = new SelfCalibrationGuessAndCheckFocus();
+//		selfcalib.setVerbose(System.out,0);
+		selfcalib.setCamera(0,cx,cy,width,height);
+		selfcalib.setSingleCamera(true); // assumes the intrinsic parameters do not change between the two views
+		List<DMatrixRMaj> cameraMatrices = new ArrayList<>();
+		cameraMatrices.add(P2);
+		if( !selfcalib.process(cameraMatrices) )
+			throw new RuntimeException("Self calibration failed!");
 
-		Vector3D_F64 v = new Vector3D_F64(); // plane at infinity
-		if( !estimateV.estimatePlaneAtInfinity(P2,v))
-			throw new RuntimeException("Failed!");
-
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(fx,fy,0,cx,cy);
-		DMatrixRMaj H = MultiViewOps.createProjectiveToMetric(K,v.x,v.y,v.z,1,null);
+		DMatrixRMaj H = selfcalib.getRectifyingHomography();
 		DMatrixRMaj P2m = new DMatrixRMaj(3,4);
 		CommonOps_DDRM.mult(P2,H,P2m);
 

@@ -25,6 +25,7 @@ import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 
+import java.io.PrintStream;
 import java.util.List;
 
 /**
@@ -33,7 +34,8 @@ import java.util.List;
  *     for focal lengths of the first two views. Focal lengths are guessed using a log scale. Skew and image center
  *     are both assumed to be known and have to be specified by the user. This strategy shows better convergence
  *     than methods which attempt to guess the focal length using linear or gradient descent approaches due
- *     to the vast number of local minima in the search space.
+ *     to the vast number of local minima in the search space. Non-linear refinement is highly recommended after
+ *     using this algorithm due to its approximate nature.
  * </p>
  *
  * <ul>
@@ -51,7 +53,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class SelfCalibrationGuessAndCheckF {
+public class SelfCalibrationGuessAndCheckFocus {
 
 	// storage for internally normalized camera matrices
 	FastQueue<DMatrixRMaj> normalizedP;
@@ -63,9 +65,12 @@ public class SelfCalibrationGuessAndCheckF {
 	// if true the first two cameras are assumed to have the same or approximately the same focus length
 	boolean sameFocus;
 
-	// intrinsic camera matrix for view 1
-	DMatrixRMaj K = new DMatrixRMaj(3,3);
-	DMatrixRMaj K2 = new DMatrixRMaj(3,3);
+	// intrinsic camera calibration matrix for view 1
+	DMatrixRMaj K1 = new DMatrixRMaj(3,3);
+
+	// Work space for view 1 projective matrix
+	DMatrixRMaj P1 = new DMatrixRMaj(3,4);
+	DMatrixRMaj tmpP = new DMatrixRMaj(3,4);
 
 	// projective to metric homography
 	DMatrixRMaj H = new DMatrixRMaj(4,4);
@@ -77,7 +82,9 @@ public class SelfCalibrationGuessAndCheckF {
 
 	// Defines which focus lengths are sampled based on a log scale
 	// Note that image has been normalized and 1.0 = focal length of image diagonal
-	double sampleMin=0.3,sampleMax=3,numSamples=50;
+	double sampleMin=0.3,sampleMax=3;
+	int numSamples=50;
+	double scores[] = new double[numSamples];
 
 	// Weights for score function
 	double w_sk = 1.0/0.01; // zero skew
@@ -86,7 +93,13 @@ public class SelfCalibrationGuessAndCheckF {
 
 	DMatrixRMaj tmp = new DMatrixRMaj(3,3);
 
-	public SelfCalibrationGuessAndCheckF() {
+	// Is the best score at a local minimum? If not that means it probably diverged
+	boolean localMinimum;
+
+	// if not null debug info is printed
+	PrintStream verbose;
+
+	public SelfCalibrationGuessAndCheckFocus() {
 		normalizedP = new FastQueue<DMatrixRMaj>(DMatrixRMaj.class,true ) {
 			@Override
 			protected DMatrixRMaj createInstance() {
@@ -127,30 +140,39 @@ public class SelfCalibrationGuessAndCheckF {
 		this.sampleMin = min;
 		this.sampleMax = max;
 		this.numSamples = total;
+		this.scores = new double[numSamples];
 	}
 
 	/**
 	 * Computes the best rectifying homography given the set of camera matrices. Must call {@link #setCamera} first.
 	 *
-	 * @param cameraMatrices camera matrices for view 2 and beyound. view 1 will have P = [I|0]
+	 * @param cameraMatrices camera matrices for view 2 and beyond. view 1 is implicit and assumed to be P = [I|0]
 	 * @return true if successful or false if it fails
 	 */
 	public boolean process(List<DMatrixRMaj> cameraMatrices) {
 		if( cameraMatrices.size() == 0 )
 			throw new IllegalArgumentException("Must contain at least 1 matrix");
 
-		Vinv.print();
+		// Apply normalization as suggested in the paper, then force the first camera matrix to be [I|0] again
+		CommonOps_DDRM.setIdentity(tmpP);
+		CommonOps_DDRM.mult(Vinv,tmpP,P1);
+		MultiViewOps.projectiveToIdentityH(P1,H);
+
 		// P = inv(V)*P/||P(2,0:2)||
 		this.normalizedP.reset();
 		for (int i = 0; i < cameraMatrices.size(); i++) {
 			DMatrixRMaj A = cameraMatrices.get(i);
-			double a0 = A.get(2,0);
-			double a1 = A.get(2,1);
-			double a2 = A.get(2,2);
-			double scale = Math.sqrt(a0*a0 + a1*a1 + a2*a2);
 
 			DMatrixRMaj Pi = normalizedP.grow();
-			CommonOps_DDRM.mult(1.0/1.0,Vinv,A,Pi);
+			CommonOps_DDRM.mult(Vinv,A,tmpP);
+
+			// slightly different order for when this scaling is applied than in the paper
+			double a0 = tmpP.get(2,0);
+			double a1 = tmpP.get(2,1);
+			double a2 = tmpP.get(2,2);
+			double scale = Math.sqrt(a0*a0 + a1*a1 + a2*a2);
+
+			CommonOps_DDRM.mult(1.0/scale,tmpP,H,Pi);
 		}
 
 		// Find the best combinations of focal lengths
@@ -162,51 +184,92 @@ public class SelfCalibrationGuessAndCheckF {
 		}
 
 		// undo normalization
-//		CommonOps_DDRM.extract(bestH,0,0,tmp);
-//		CommonOps_DDRM.mult(V,tmp, K2);
-//		CommonOps_DDRM.insert(K2,bestH,0,0);
+		CommonOps_DDRM.extract(bestH,0,0,tmp);
+		CommonOps_DDRM.mult(V,tmp, K1);
+		CommonOps_DDRM.insert(K1,bestH,0,0);
 
-		return bestScore != Double.MAX_VALUE;
+		// if it's not at a local minimum it almost definately failed
+		return bestScore != Double.MAX_VALUE && localMinimum;
 	}
 
 	private double findBestFocusOne(DMatrixRMaj P2) {
+		localMinimum = false;
+
 		// coeffients for linear to log scale
 		double b = Math.log(sampleMax/sampleMin)/(numSamples-1);
 		double bestScore = Double.MAX_VALUE;
+		int bestIndex = -1;
 
 		for (int i = 0; i < numSamples; i++) {
 			double f =sampleMin*Math.exp(b*i);
 
-			if( !computeRectifyH(f,f,P2,H))
+			if( !computeRectifyH(f,f,P2,H)) {
+				scores[i] = Double.NaN;
 				continue;
+			}
 
 			double score = scoreResults();
+			scores[i] = score;
+
 			if( score < bestScore ) {
 				bestScore = score;
 				bestH.set(H);
+				bestIndex = i;
 			}
-			System.out.println(i+"  f="+f+" score = "+score);
+
+			if( verbose != null ) {
+				verbose.printf("[%3d] f=%5.2f score=%f\n",i,f,score);
+			}
 		}
+
+		if (bestIndex > 0 && bestIndex < numSamples - 1) {
+			localMinimum = bestScore < scores[bestIndex - 1] && bestScore < scores[bestIndex + 1];
+		}
+
 		return bestScore;
 	}
 
-	private double findBestFocusTwo(DMatrixRMaj P1) {
+	private double findBestFocusTwo(DMatrixRMaj P2) {
+		localMinimum = false;
+
 		// coeffients for linear to log scale
 		double b = Math.log(sampleMax/sampleMin)/(numSamples-1);
 		double bestScore = Double.MAX_VALUE;
 
 		for (int i = 0; i < numSamples; i++) {
 			double f1 =sampleMin*Math.exp(b*i);
-			for (int j = 0; j < numSamples; j++) {
-				double f2 =sampleMin*Math.exp(b*i);
 
-				if( !computeRectifyH(f1,f2,P1,H))
+			boolean minimumChanged = false;
+			int bestIndex = -1;
+
+			for (int j = 0; j < numSamples; j++) {
+				double f2 =sampleMin*Math.exp(b*j);
+
+				if( !computeRectifyH(f1,f2,P2,H)) {
+					scores[i] = Double.NaN;
 					continue;
+				}
 
 				double score = scoreResults();
+				scores[j] = score;
+
 				if( score < bestScore ) {
+					minimumChanged = true;
+					bestIndex = j;
 					bestScore = score;
 					bestH.set(H);
+				}
+
+				if( verbose != null ) {
+					verbose.printf("[%3d,%3d] f1=%5.2f f2=%5.2f score=%f\n",i,j,f1,f2,score);
+				}
+			}
+
+			if( minimumChanged ) {
+				if (bestIndex > 0 && bestIndex < numSamples - 1) {
+					localMinimum = bestScore< scores[bestIndex - 1] && bestScore < scores[bestIndex + 1];
+				} else {
+					localMinimum = false;
 				}
 			}
 		}
@@ -222,28 +285,18 @@ public class SelfCalibrationGuessAndCheckF {
 	 * @return true if successful
 	 */
 	boolean computeRectifyH( double f1 , double f2 , DMatrixRMaj P2, DMatrixRMaj H ) {
-		K.zero();
-		K.set(0,0,f1);K.set(1,1,f1);K.set(2,2,1);
-		CommonOps_DDRM.mult(V,K,K2);
 
-		double fx = K2.get(0,0);
-		double fy = K2.get(1,1);
-		double skew = K2.get(0,1);
-		double cx = K2.get(0,2);
-		double cy = K2.get(1,2);
-		// have to undo normalization for first since its camera matrix remains un-normalized
-		estimatePlaneInf.setCamera1(fx,fy,skew,cx,cy);
+		estimatePlaneInf.setCamera1(f1,f1,0,0,0);
 		estimatePlaneInf.setCamera2(f2,f2,0,0,0);
 
 		if( !estimatePlaneInf.estimatePlaneAtInfinity(P2,planeInf) )
 			return false;
 
-//		K2.zero();
-//		K2.set(0,0,f1*100);
-//		K2.set(1,1,f1*100);
-//		K2.set(2,2,1);
-
-		MultiViewOps.createProjectiveToMetric(K2,planeInf.x,planeInf.y,planeInf.z,1,H);
+		K1.zero();
+		K1.set(0,0,f1);
+		K1.set(1,1,f1);
+		K1.set(2,2,1);
+		MultiViewOps.createProjectiveToMetric(K1,planeInf.x,planeInf.y,planeInf.z,1,H);
 		return true;
 	}
 
@@ -283,7 +336,7 @@ public class SelfCalibrationGuessAndCheckF {
 		return sameFocus;
 	}
 
-	public void setSameFocus(boolean sameFocus) {
+	public void setSingleCamera(boolean sameFocus) {
 		this.sameFocus = sameFocus;
 	}
 
@@ -292,5 +345,13 @@ public class SelfCalibrationGuessAndCheckF {
 	 */
 	public DMatrixRMaj getRectifyingHomography() {
 		return bestH;
+	}
+
+	public boolean isLocalMinimum() {
+		return localMinimum;
+	}
+
+	public void setVerbose(PrintStream out , int level ) {
+		this.verbose = out;
 	}
 }
