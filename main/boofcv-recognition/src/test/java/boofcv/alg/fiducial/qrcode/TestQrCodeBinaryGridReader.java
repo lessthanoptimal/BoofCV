@@ -161,22 +161,8 @@ public class TestQrCodeBinaryGridReader {
 
 		helper.render();
 
-		helper.setLocation(helper.qr.ppDown,helper.qr.ppCorner,helper.qr.ppRight);
-		// input will be in undistorted coordinates
-		helper.distToUndist(helper.qr.ppDown);
-		helper.distToUndist(helper.qr.ppCorner);
-		helper.distToUndist(helper.qr.ppRight);
-		helper.qr.threshCorner=helper.qr.threshDown=helper.qr.threshRight = 125;
+		helper.locateQrFeatures();
 
-		// used to compute location of modules
-		double r = helper.r;
-		int N = helper.qr.getNumberOfModules();
-		double mw = helper.w/N;
-
-		// set location of alignment pattern
-		QrCode.Alignment al = helper.qr.alignment.get(0);
-		helper.simulator.computePixel(0,-r+(al.moduleX+0.5)*mw,r-(al.moduleY+0.5)*mw,al.pixel);
-		helper.p2p.compute(al.pixel.x,al.pixel.y,al.pixel);
 		return helper;
 	}
 }

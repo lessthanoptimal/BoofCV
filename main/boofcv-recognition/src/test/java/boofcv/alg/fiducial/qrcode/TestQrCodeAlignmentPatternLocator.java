@@ -18,8 +18,13 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,7 +51,44 @@ public class TestQrCodeAlignmentPatternLocator {
 
 	@Test
 	public void withLensDistortion() {
-		fail("Implement");
+		QrCodeDistortedChecks helper = new QrCodeDistortedChecks();
+		helper.qr = new QrCodeEncoder().setVersion(7).addNumeric("12340324").fixate();
+
+		helper.render();
+		helper.locateQrFeatures();
+
+		// zap the QR Locations
+		List<Point2D_F64> expected = new ArrayList<>();
+		for (int i = 0; i < helper.qr.alignment.size; i++) {
+			QrCode.Alignment al = helper.qr.alignment.get(i);
+
+			expected.add( al.pixel.copy() );
+			al.pixel.set(0,0);
+		}
+
+		QrCodeAlignmentPatternLocator<GrayF32> alg = new QrCodeAlignmentPatternLocator<>(GrayF32.class);
+		assertTrue(alg.process(helper.image,helper.qr));
+		assertFalse(checkAllMatch(helper,expected));
+
+		alg.setLensDistortion(helper.image.width,helper.image.height,helper.distortion);
+		assertTrue(alg.process(helper.image,helper.qr));
+		assertTrue(checkAllMatch(helper,expected));
+	}
+
+	private boolean checkAllMatch(QrCodeDistortedChecks helper, List<Point2D_F64> expected) {
+		assertEquals(6,helper.qr.alignment.size);
+		for (int i = 0; i < 6; i++) {
+			QrCode.Alignment al = helper.qr.alignment.get(i);
+			boolean matched = false;
+			for (int j = 0; j < 6; j++) {
+				if( al.pixel.distance(expected.get(j)) <= 0.9 ) {
+					matched = true;
+				}
+			}
+			if( !matched )
+				return false;
+		}
+		return true;
 	}
 
 	/**

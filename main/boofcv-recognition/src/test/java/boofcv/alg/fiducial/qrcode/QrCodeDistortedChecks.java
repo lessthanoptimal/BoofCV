@@ -64,7 +64,7 @@ public class QrCodeDistortedChecks {
 	}
 
 	public void setLocation(Polygon2D_F64 bl , Polygon2D_F64 tl , Polygon2D_F64 tr ) {
-		double mw = 1.5/(qr.getNumberOfModules());
+		double mw = w/qr.getNumberOfModules();
 
 		simulator.computePixel(0,-r,-r+mw*7,bl.get(0));
 		simulator.computePixel(0,-r+mw*7,-r+mw*7,bl.get(1));
@@ -86,6 +86,26 @@ public class QrCodeDistortedChecks {
 		for (int i = 0; i < t.size(); i++) {
 			Point2D_F64 p = t.get(i);
 			p2p.compute(p.x,p.y,p);
+		}
+	}
+
+	public void locateQrFeatures() {
+		setLocation(qr.ppDown,qr.ppCorner,qr.ppRight);
+		// input will be in undistorted coordinates
+		distToUndist(qr.ppDown);
+		distToUndist(qr.ppCorner);
+		distToUndist(qr.ppRight);
+		qr.threshCorner=qr.threshDown=qr.threshRight = 125;
+
+		// used to compute location of modules
+		int N = qr.getNumberOfModules();
+		double mw = w/N;
+
+		// set location of alignment pattern
+		for (int i = 0; i < qr.alignment.size; i++) {
+			QrCode.Alignment al = qr.alignment.get(i);
+			simulator.computePixel(0,-r+(al.moduleX+0.5)*mw,r-(al.moduleY+0.5)*mw,al.pixel);
+			p2p.compute(al.pixel.x,al.pixel.y,al.pixel);
 		}
 	}
 }
