@@ -19,7 +19,6 @@
 package boofcv.alg.fiducial.qrcode;
 
 
-import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.misc.ImageMiscOps;
@@ -28,15 +27,11 @@ import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.simulation.SimulatePlanarWorld;
-import boofcv.struct.calib.CameraPinholeRadial;
-import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.metric.UtilAngle;
 import georegression.struct.affine.Affine2D_F64;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
-import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.junit.jupiter.api.Test;
@@ -46,7 +41,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -75,33 +69,16 @@ public class TestQrCodePositionPatternDetector {
 	}
 
 	@Test
-	public void withLensDistortion() {
+	public void withLensDistortion()
+	{
+		// Render QR Code in a simulated world with lens distortion
+		QrCodeDistortedChecks helper = new QrCodeDistortedChecks();
 
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(250,250,0,250,250,500,500).
-				fsetRadial(-0.1,-0.0005);
-		LensDistortionRadialTangential distortion = new LensDistortionRadialTangential(intrinsic);
-		Point2Transform2_F64 p2p = distortion.undistort_F64(true,true);
+		helper.render();
 
-		QrCodeGeneratorImage renderQR = new QrCodeGeneratorImage(10);
-		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
-		simulator.setCamera(intrinsic);
-		simulator.setBackground(255);
-
-		Se3_F64 markerToWorld = eulerXyz(-0.3,0,1,0.1,Math.PI,0,null);
-//		Se3_F64 markerToWorld = eulerXyz(0,0,1,0.1,Math.PI,0,null);
-
-		QrCode qr = new QrCodeEncoder().setVersion(2).addNumeric("123").fixate();
-
-		double w = 1.5;
-		double r = w/2;
-		renderQR.setBorderModule(0);
-		renderQR.render(qr);
-		simulator.addSurface(markerToWorld,w, renderQR.getGrayF32());
-
-
-		GrayF32 image = simulator.render();
-		GrayU8 binary = new GrayU8(image.width,image.height);
-		ThresholdImageOps.threshold(image,binary,100,true);
+		SimulatePlanarWorld simulator = helper.simulator;
+		QrCode qr = helper.qr;
+		double r = helper.r;
 
 		// Compute location of each square in the image and see if the correctc oordinates are found
 		double mw = 1.5/(qr.getNumberOfModules());
@@ -109,33 +86,17 @@ public class TestQrCodePositionPatternDetector {
 		for (int i = 0; i < 3; i++) {
 			expected[i] = new Polygon2D_F64(4);
 		}
-		simulator.computePixel(0,-r,-r,expected[0].get(0));
-		simulator.computePixel(0,-r,-r+mw*7,expected[0].get(1));
-		simulator.computePixel(0,-r+mw*7,-r+mw*7,expected[0].get(2));
-		simulator.computePixel(0,-r+mw*7,-r,expected[0].get(3));
-
-		simulator.computePixel(0,-r,r,expected[1].get(0));
-		simulator.computePixel(0,-r+mw*7,r,expected[1].get(1));
-		simulator.computePixel(0,-r+mw*7,r-mw*7,expected[1].get(2));
-		simulator.computePixel(0,-r,r-mw*7,expected[1].get(3));
-
-		simulator.computePixel(0,r-mw*7,r,expected[2].get(0));
-		simulator.computePixel(0,r,r,expected[2].get(1));
-		simulator.computePixel(0,r,r-mw*7,expected[2].get(2));
-		simulator.computePixel(0,r-mw*7,r-mw*7,expected[2].get(3));
+		helper.setLocation(expected[0],expected[1],expected[2]);
 
 		// Remove lens distortion from expected corner locations
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 3; j++) {
-				Point2D_F64 p = expected[j].get(i);
-				p2p.compute(p.x,p.y,p);
-			}
+		for (int i = 0; i < expected.length; i++) {
+			helper.distToUndist(expected[i]);
 		}
 
 		QrCodePositionPatternDetector<GrayF32> alg = createAlg();
 
-		alg.setLensDistortion(intrinsic.width,intrinsic.height, distortion);
-		alg.process(image,binary);
+		alg.setLensDistortion(helper.intrinsic.width,helper.intrinsic.height, helper.distortion);
+		alg.process(helper.image,helper.binary);
 		assertEquals(3,alg.getPositionPatterns().size);
 
 		// see if the squares all match up

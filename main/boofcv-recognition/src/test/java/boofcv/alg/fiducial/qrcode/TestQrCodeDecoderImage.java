@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.qrcode;
 
 import boofcv.alg.fiducial.calib.squares.SquareEdge;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -34,7 +35,42 @@ public class TestQrCodeDecoderImage {
 
 	@Test
 	public void withLensDistortion() {
-		fail("Implement");
+		// render a distorted image
+		QrCodeDistortedChecks helper = new QrCodeDistortedChecks();
+
+		helper.render();
+
+		// find location of postion patterns and create graph
+		FastQueue<PositionPatternNode> pps = new FastQueue<>(PositionPatternNode.class,true);
+
+		pps.grow().square = new Polygon2D_F64(4);
+		pps.grow().square = new Polygon2D_F64(4);
+		pps.grow().square = new Polygon2D_F64(4);
+
+		helper.setLocation(pps.get(0).square,pps.get(1).square,pps.get(2).square);
+		for (int i = 0; i < pps.size; i++) {
+			pps.get(i).grayThreshold = 125;
+		}
+		// these numbers were found by sketching the QR code
+		connect(pps.get(2),pps.get(1),3,1);
+		connect(pps.get(0),pps.get(1),1,2);
+
+		// Should fail when run on distorted image
+		QrCodeDecoderImage<GrayF32> decoder = new QrCodeDecoderImage<>(GrayF32.class);
+		decoder.process(pps,helper.image);
+
+		assertTrue(decoder.successes.size()==0);
+
+		// now tell it how to undistort the image
+		decoder.setLensDistortion(helper.image.width,helper.image.height,helper.distortion);
+		for (int i = 0; i < pps.size; i++) {
+			helper.distToUndist(pps.get(i).square);
+		}
+		decoder.process(pps,helper.image);
+
+		assertEquals(1,decoder.successes.size());
+		QrCode found = decoder.getFound().get(0);
+		assertTrue(found.message.equals("123"));
 	}
 
 	/**
