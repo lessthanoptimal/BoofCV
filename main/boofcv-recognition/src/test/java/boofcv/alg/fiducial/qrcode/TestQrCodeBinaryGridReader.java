@@ -18,15 +18,17 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -71,9 +73,110 @@ public class TestQrCodeBinaryGridReader {
 		}
 	}
 
+	/**
+	 * See if imageToGrid behaves as expected. Coordinates it gets should already be undistorted. So it should not
+	 * be applying undistort twice or adding distortion.
+	 *
+	 * This also acts as a less trivial version of the previous unit test
+	 */
 	@Test
-	public void withLensDistortion() {
-		fail("Implement");
+	public void imageToGrid_withLensDistortion() {
+		QrCodeDistortedChecks helper = createDistortionCheck();
+		double r = helper.r;
+		int N = helper.qr.getNumberOfModules();
+
+		QrCodeBinaryGridReader<GrayF32> reader = new QrCodeBinaryGridReader<>(GrayF32.class);
+
+		reader.setLensDistortion(helper.image.width,helper.image.height,helper.distortion);
+		reader.setImage(helper.image);
+		reader.setMarker(helper.qr);
+
+		Point2D_F64 pixel = new Point2D_F64();
+		Point2D_F32 found = new Point2D_F32();
+
+		// grid coordinate system has its origin bottom left corner
+		double tol = 0.05; // could be even more precise
+		helper.simulator.computePixel(0,-r,r, pixel);
+		helper.p2p.compute(pixel.x,pixel.y,pixel);
+		reader.imageToGrid((float)pixel.x,(float)pixel.y,found);
+		assertEquals(0,found.x,tol);
+		assertEquals(0,found.y,tol);
+
+		helper.simulator.computePixel(0,-r,-r, pixel);
+		helper.p2p.compute(pixel.x,pixel.y,pixel);
+		reader.imageToGrid((float)pixel.x,(float)pixel.y,found);
+		assertEquals(0,found.x,tol);
+		assertEquals(N,found.y,tol);
+
+		helper.simulator.computePixel(0,r,r, pixel);
+		helper.p2p.compute(pixel.x,pixel.y,pixel);
+		reader.imageToGrid((float)pixel.x,(float)pixel.y,found);
+		assertEquals(N,found.x,tol);
+		assertEquals(0,found.y,tol);
 	}
 
+	/**
+	 * To read a bit lens distortion needs to be removed.
+	 */
+	@Test
+	public void readBit_withLensDistortion() {
+		QrCodeDistortedChecks helper = createDistortionCheck();
+		QrCode qr = helper.qr;
+
+		QrCodeBinaryGridReader<GrayF32> reader = new QrCodeBinaryGridReader<>(GrayF32.class);
+		reader.setImage(helper.image);
+		reader.setMarker(helper.qr);
+
+//		ShowImages.showWindow(helper.image,"ASDASDASD");
+//		BoofMiscOps.sleep(10_000);
+
+		// Should fail without the distortion model
+		assertTrue(countCorrectRead(qr,reader) < 1.0 );
+
+		// should work now
+		reader.setLensDistortion(helper.image.width,helper.image.height,helper.distortion);
+		reader.setImage(helper.image);
+		reader.setMarker(helper.qr);
+		assertTrue(countCorrectRead(qr,reader) == 1.0 );
+	}
+
+	private double countCorrectRead( QrCode qr , QrCodeBinaryGridReader<GrayF32> reader) {
+		QrCodeMaskPattern mask = qr.mask;
+		List<Point2D_I32> locations = QrCode.LOCATION_BITS[qr.version];
+		PackedBits8 bits = PackedBits8.wrap(qr.rawbits,qr.rawbits.length*8);
+
+		int success = 0;
+		for (int i = 0; i < bits.size; i++) {
+			Point2D_I32 p = locations.get(i);
+			int value = mask.apply(p.y,p.x,reader.readBit(p.y,p.x));
+			if( value == bits.get(i))
+				success++;
+		}
+		return success/(double)bits.size;
+	}
+
+	private QrCodeDistortedChecks createDistortionCheck() {
+		// Will render an image (not needed) but also computed all the distortion parameters (which we need)
+		QrCodeDistortedChecks helper = new QrCodeDistortedChecks();
+
+		helper.render();
+
+		helper.setLocation(helper.qr.ppDown,helper.qr.ppCorner,helper.qr.ppRight);
+		// input will be in undistorted coordinates
+		helper.distToUndist(helper.qr.ppDown);
+		helper.distToUndist(helper.qr.ppCorner);
+		helper.distToUndist(helper.qr.ppRight);
+		helper.qr.threshCorner=helper.qr.threshDown=helper.qr.threshRight = 125;
+
+		// used to compute location of modules
+		double r = helper.r;
+		int N = helper.qr.getNumberOfModules();
+		double mw = helper.w/N;
+
+		// set location of alignment pattern
+		QrCode.Alignment al = helper.qr.alignment.get(0);
+		helper.simulator.computePixel(0,-r+(al.moduleX+0.5)*mw,r-(al.moduleY+0.5)*mw,al.pixel);
+		helper.p2p.compute(al.pixel.x,al.pixel.y,al.pixel);
+		return helper;
+	}
 }

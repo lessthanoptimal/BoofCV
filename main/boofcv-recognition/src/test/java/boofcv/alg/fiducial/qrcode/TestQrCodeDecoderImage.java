@@ -53,7 +53,7 @@ public class TestQrCodeDecoderImage {
 		}
 		// these numbers were found by sketching the QR code
 		connect(pps.get(2),pps.get(1),3,1);
-		connect(pps.get(0),pps.get(1),1,2);
+		connect(pps.get(0),pps.get(1),0,2);
 
 		// Should fail when run on distorted image
 		QrCodeDecoderImage<GrayF32> decoder = new QrCodeDecoderImage<>(GrayF32.class);

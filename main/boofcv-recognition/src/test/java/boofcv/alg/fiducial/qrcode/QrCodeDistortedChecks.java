@@ -63,23 +63,23 @@ public class QrCodeDistortedChecks {
 		ThresholdImageOps.threshold(image,binary,100,true);
 	}
 
-	public void setLocation(Polygon2D_F64 tl , Polygon2D_F64 tr , Polygon2D_F64 bl ) {
+	public void setLocation(Polygon2D_F64 bl , Polygon2D_F64 tl , Polygon2D_F64 tr ) {
 		double mw = 1.5/(qr.getNumberOfModules());
 
-		simulator.computePixel(0,-r,-r,tl.get(0));
-		simulator.computePixel(0,-r,-r+mw*7,tl.get(1));
-		simulator.computePixel(0,-r+mw*7,-r+mw*7,tl.get(2));
-		simulator.computePixel(0,-r+mw*7,-r,tl.get(3));
+		simulator.computePixel(0,-r,-r+mw*7,bl.get(0));
+		simulator.computePixel(0,-r+mw*7,-r+mw*7,bl.get(1));
+		simulator.computePixel(0,-r+mw*7,-r,bl.get(2));
+		simulator.computePixel(0,-r,-r,bl.get(3));
 
-		simulator.computePixel(0,-r,r,tr.get(0));
-		simulator.computePixel(0,-r+mw*7,r,tr.get(1));
-		simulator.computePixel(0,-r+mw*7,r-mw*7,tr.get(2));
-		simulator.computePixel(0,-r,r-mw*7,tr.get(3));
+		simulator.computePixel(0,-r,r,tl.get(0));
+		simulator.computePixel(0,-r+mw*7,r,tl.get(1));
+		simulator.computePixel(0,-r+mw*7,r-mw*7,tl.get(2));
+		simulator.computePixel(0,-r,r-mw*7,tl.get(3));
 
-		simulator.computePixel(0,r-mw*7,r,bl.get(0));
-		simulator.computePixel(0,r,r,bl.get(1));
-		simulator.computePixel(0,r,r-mw*7,bl.get(2));
-		simulator.computePixel(0,r-mw*7,r-mw*7,bl.get(3));
+		simulator.computePixel(0,r-mw*7,r,tr.get(0));
+		simulator.computePixel(0,r,r,tr.get(1));
+		simulator.computePixel(0,r,r-mw*7,tr.get(2));
+		simulator.computePixel(0,r-mw*7,r-mw*7,tr.get(3));
 	}
 
 	public void distToUndist( Polygon2D_F64 t ) {

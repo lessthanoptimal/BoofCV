@@ -49,7 +49,6 @@ public class TestQrCodeAlignmentPatternLocator {
 		fail("Implement");
 	}
 
-
 	/**
 	 * Give it bad guess but all within the white or black dot
 	 */
