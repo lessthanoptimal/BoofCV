@@ -40,7 +40,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Generic tests for qr codes under mild lens distortion
@@ -63,12 +62,6 @@ public abstract class GenericQrCodeDetectorChecks {
 	}
 
 	protected abstract QrCodeDetector<GrayF32> createDetector();
-
-	@Test
-	public void withLensDistortion() {
-		fail("Implement");
-	}
-
 
 	/**
 	 * See if a clear well defined qr code can be detected while rating

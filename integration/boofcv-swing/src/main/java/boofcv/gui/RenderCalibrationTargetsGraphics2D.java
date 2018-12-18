@@ -67,7 +67,7 @@ public class RenderCalibrationTargetsGraphics2D extends RenderCalibrationTargets
 		}
 
 		if( offsetX <= 0 || offsetY <= 0 )
-			bufferred = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
+			bufferred = new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
 		else
 			bufferred = new BufferedImage(w+2*offsetX,h+2*offsetY,BufferedImage.TYPE_INT_RGB);
 

@@ -19,9 +19,13 @@
 package boofcv.abst.fiducial;
 
 import boofcv.abst.distort.FDistort;
-import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
+import boofcv.core.image.GConvertImage;
+import boofcv.simulation.SimulatePlanarWorld;
+import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
@@ -37,6 +41,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -52,11 +57,50 @@ public abstract class GenericFiducialDetectorChecks {
 
 	protected List<ImageType> types = new ArrayList<>();
 
-	public abstract ImageBase loadImage(ImageType imageType);
+	/**
+	 * Renders everything in gray scale first then converts it
+	 * @param intrinsic camera model
+	 * @param imageType image type for output
+	 * @return rendered image
+	 */
+	public ImageBase renderImage(CameraPinholeRadial intrinsic  , ImageType imageType) {
 
-	public abstract LensDistortionNarrowFOV loadDistortion(boolean distorted );
+		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
+		simulator.setCamera(intrinsic);
+		simulator.setBackground(255);
+
+		Se3_F64 markerToWorld = eulerXyz(-0.2,0,1.2,0.1,Math.PI,0,null);
+		simulator.addSurface(markerToWorld,1.5,renderFiducial());
+
+		GrayF32 rendered = simulator.render();
+
+		if( rendered.getImageType().isSameType(imageType)) {
+			return rendered;
+		}
+
+		switch( imageType.getFamily() ) {
+			case GRAY: {
+				ImageBase output = imageType.createImage(rendered.width,rendered.height);
+				GConvertImage.convert(rendered,output);
+				return output;
+			}
+		}
+
+		throw new RuntimeException("Currently only gray scale images supported");
+	}
+
+	public CameraPinholeRadial loadDistortion(boolean distorted ) {
+		if( distorted ) {
+			return new CameraPinholeRadial(250,250,0,250,250,500,500).
+					fsetRadial(-0.1,-0.0005);
+		} else {
+			return new CameraPinholeRadial(250,250,0,250,250,500,500);
+		}
+	}
 
 	public abstract FiducialDetector createDetector( ImageType imageType );
+
+	public abstract GrayF32 renderFiducial();
 
 	/**
 	 * Tests several items:
@@ -68,93 +112,84 @@ public abstract class GenericFiducialDetectorChecks {
 	public void checkHandleNewIntrinsic() {
 		for( ImageType type : types ) {
 
-			ImageBase image = loadImage(type);
+			// distorted camera model
+			CameraPinholeRadial instrinsic = loadDistortion(true);
+			LensDistortionRadialTangential distortion = new LensDistortionRadialTangential(instrinsic);
+
+			// render a distorted image
+			ImageBase image = renderImage(instrinsic,type);
+
+			// give it an undistored model
 			FiducialDetector detector = createDetector(type);
-
-			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
-
+			assertFalse(detector.is3D());
+			detector.setLensDistortion(new LensDistortionRadialTangential(loadDistortion(false)),
+					image.width,image.height);
+			assertTrue(detector.is3D());
 			detector.detect(image);
 
-			assertTrue(detector.totalFound()>= 1);
-			checkBounds(detector);
-
-			Results results = extractResults(detector);
-
-			// run it again with a changed intrinsic that's incorrect
-			detector.setLensDistortion(loadDistortion(false),image.width,image.height);
-			detector.detect(image);
-			checkBounds(detector);
-
-			// results should have changed
-			if( results.id.length == detector.totalFound()) {
-				assertEquals(results.id.length, detector.totalFound());
-				for (int i = 0; i < detector.totalFound(); i++) {
-					assertEquals(results.id[i],detector.getId(i));
-					Se3_F64 pose = new Se3_F64();
-					Point2D_F64 pixel = new Point2D_F64();
-					detector.getFiducialToCamera(i, pose);
-					detector.getCenter(i, pixel);
-					assertTrue(pose.getT().distance(results.pose.get(i).T) > 1e-4);
-					assertFalse(MatrixFeatures_DDRM.isIdentical(pose.getR(), results.pose.get(i).R, 1e-4));
-					// pixel location is based on the observed location, thus changing the intrinsics should not
-					// affect it
-					assertTrue(results.pixel.get(i).distance(pixel) <= 2.0 );
-				}
-			} else {
-				// clearly changed
+			// it might not be able to detect the target
+			if( detector.totalFound() >= 1 ) {
+				checkBounds(detector);
 			}
 
-			// then reproduce original
-			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
+			// Give it the correct model and this time it should work
+			detector.setLensDistortion(distortion,image.width,image.height);
+			assertTrue(detector.is3D());
 			detector.detect(image);
+			checkBounds(detector);
 
-			// see if it produced exactly the same results
-			assertEquals(results.id.length,detector.totalFound());
-			for (int i = 0; i < detector.totalFound(); i++) {
-				assertEquals(results.id[i],detector.getId(i));
-				Se3_F64 pose = new Se3_F64();
-				detector.getFiducialToCamera(i, pose);
-				assertEquals(0,pose.getT().distance(results.pose.get(i).T),1e-8);
-				assertTrue(MatrixFeatures_DDRM.isIdentical(pose.getR(),results.pose.get(i).R,1e-8));
+			assertTrue(detector.totalFound()>=1);
+
+			// Now remove the distortion model
+			detector.setLensDistortion(null,image.width,image.height);
+			assertFalse(detector.is3D());
+			detector.detect(image);
+			if( detector.totalFound() >= 1 ) {
+				checkBounds(detector);
 			}
 		}
 	}
 
 	/**
-	 * Provide an intrinsic model then remove it
+	 * Give it an undistorted image. See if it can detect the target. Now give it an distorted image with
+	 * lens parameters and see if it produces the same solution
 	 */
 	@Test
-	public void checkRemoveIntrinsic() {
-		for( ImageType type : types ) {
-			ImageBase image = loadImage(type);
+	public void checkPoseWithAndWithOutDistortion() {
+		LensDistortionRadialTangential lensDistorted = new LensDistortionRadialTangential(loadDistortion(true));
+		LensDistortionRadialTangential lensUndistorted = new LensDistortionRadialTangential(loadDistortion(false));
 
-			// detect with no intrinsics
+		for( ImageType type : types ) {
+
+			// render an undistorted image
+			ImageBase image = renderImage(loadDistortion(false),type);
+
+//			ShowImages.showWindow(image,"adsasdf");
+//			BoofMiscOps.sleep(10000);
+
 			FiducialDetector detector = createDetector(type);
+			detector.setLensDistortion(lensUndistorted,image.width,image.height);
 			detector.detect(image);
 
-			assertFalse(detector.is3D());
-			assertTrue(detector.totalFound() >= 1);
-			Results expected = extractResults(detector);
-			checkBounds(detector);
+			assertTrue(detector.totalFound()>=1);
+			Results results = extractResults(detector);
 
-			// detect with intrinsics
-			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
-			assertTrue(detector.is3D());
-			assertTrue(detector.totalFound() >= 1);
+			// feed it a distorted with and give the detector the undistortion model
+			image = renderImage(loadDistortion(true),type);
+			detector.setLensDistortion(lensDistorted,image.width,image.height);
+			detector.detect(image);
 
-			// detect without intrinsics again
-			detector.setLensDistortion(null,0,0);
-			assertFalse(detector.is3D());
-			assertTrue(detector.totalFound() >= 1);
-			Results found = extractResults(detector);
+			// see if the results are the same
+			assertEquals(results.id.length,detector.totalFound());
+			for (int i = 0; i < detector.totalFound(); i++) {
+				assertEquals(results.id[i],detector.getId(i));
+				Se3_F64 pose = new Se3_F64();
+				detector.getFiducialToCamera(i, pose);
 
-			// compare results
-			assertEquals(expected.id.length, found.id.length);
-			for (int i = 0; i < expected.id.length; i++) {
-				assertEquals(expected.id[i],found.id[i]);
-				assertTrue(expected.pose.get(i).T.distance(found.pose.get(i).T) <= 1e-4);
-				assertTrue(MatrixFeatures_DDRM.isIdentical(expected.pose.get(i).getR(), found.pose.get(i).R, 1e-4));
-				assertTrue(found.pixel.get(i).distance(expected.pixel.get(i)) <= 1e-4 );
+				// make the error relative to the translation
+				double t = pose.getT().norm();
+				assertEquals(0,pose.getT().distance(results.pose.get(i).T),t*0.01);
+				assertTrue(MatrixFeatures_DDRM.isIdentical(pose.getR(),results.pose.get(i).R,0.01));
 			}
 		}
 	}
@@ -164,13 +199,15 @@ public abstract class GenericFiducialDetectorChecks {
 	 */
 	@Test
 	public void modifyInput() {
+		CameraPinholeRadial intrinsic = loadDistortion(true);
+		LensDistortionRadialTangential lensDistorted = new LensDistortionRadialTangential(intrinsic);
 		for( ImageType type : types ) {
 
-			ImageBase image = loadImage(type);
+			ImageBase image = renderImage(intrinsic,type);
 			ImageBase orig = image.clone();
 			FiducialDetector detector = createDetector(type);
 
-			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
+			detector.setLensDistortion(lensDistorted,image.width,image.height);
 
 			detector.detect(image);
 
@@ -180,13 +217,14 @@ public abstract class GenericFiducialDetectorChecks {
 
 	@Test
 	public void checkMultipleRuns() {
-
+		CameraPinholeRadial intrinsic = loadDistortion(true);
+		LensDistortionRadialTangential lensDistorted = new LensDistortionRadialTangential(intrinsic);
 		for( ImageType type : types ) {
 
-			ImageBase image = loadImage(type);
+			ImageBase image = renderImage(intrinsic,type);
 			FiducialDetector detector = createDetector(type);
 
-			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
+			detector.setLensDistortion(lensDistorted,image.width,image.height);
 
 			detector.detect(image);
 
@@ -211,13 +249,14 @@ public abstract class GenericFiducialDetectorChecks {
 
 	@Test
 	public void checkSubImage() {
-
+		CameraPinholeRadial intrinsic = loadDistortion(true);
+		LensDistortionRadialTangential lensDistorted = new LensDistortionRadialTangential(intrinsic);
 		for( ImageType type : types ) {
 
-			ImageBase image = loadImage(type);
+			ImageBase image = renderImage(intrinsic,type);
 			FiducialDetector detector = createDetector(type);
 
-			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
+			detector.setLensDistortion(lensDistorted,image.width,image.height);
 
 			detector.detect(image);
 
@@ -255,13 +294,15 @@ public abstract class GenericFiducialDetectorChecks {
 	 */
 	@Test
 	public void checkStability() {
-
+		// has to be undistorted otherwise rescaling the image won't work
+		CameraPinholeRadial intrinsic = loadDistortion(false);
+		LensDistortionRadialTangential lensDistorted = new LensDistortionRadialTangential(intrinsic);
 		for( ImageType type : types ) {
 
-			ImageBase image = loadImage(type);
+			ImageBase image = renderImage(intrinsic,type);
 			FiducialDetector detector = createDetector(type);
 
-			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
+			detector.setLensDistortion(lensDistorted,image.width,image.height);
 
 			detector.detect(image);
 			assertTrue(detector.totalFound() >= 1);
@@ -282,9 +323,12 @@ public abstract class GenericFiducialDetectorChecks {
 			// by shrinking the image a small pixel error should result
 			// in a larger pose error, hence more unstable
 			ImageBase shrunk = image.createSameShape();
-			new FDistort(image,shrunk).affine(0.6,0,0,0.6,0,0).apply();
+			new FDistort(image,shrunk).affine(0.2,0,0,0.2,image.width/2,image.height/2).apply();
 
 			detector.detect(shrunk);
+
+//			ShowImages.showWindow(shrunk,"Shrunk");
+//			BoofMiscOps.sleep(10_000);
 
 
 			assertTrue(detector.totalFound() == foundIds.length);
@@ -310,15 +354,18 @@ public abstract class GenericFiducialDetectorChecks {
 
 	@Test
 	public void checkCenter() {
+		// It's not specified if the center should be undistorted or distorted. Just make it easier by
+		// using undistorted
+		CameraPinholeRadial intrinsic = loadDistortion(false);
+		LensDistortionRadialTangential lensDistorted = new LensDistortionRadialTangential(intrinsic);
 		for( ImageType type : types ) {
 
-			ImageBase image = loadImage(type);
+			ImageBase image = renderImage(intrinsic,type);
 			FiducialDetector detector = createDetector(type);
+			detector.setLensDistortion(lensDistorted,image.width,image.height);
 
-			// It's not specified if the center should be undistorted or distorted. Just make it easier by
-			// using undistorted
-			LensDistortionNarrowFOV distortion = loadDistortion(false);
-			detector.setLensDistortion(distortion,image.width,image.height);
+//			ShowImages.showWindow(image,"asdfasdf");
+//			BoofMiscOps.sleep(10_000);
 
 			detector.detect(image);
 
@@ -332,7 +379,7 @@ public abstract class GenericFiducialDetectorChecks {
 				detector.getCenter(i, found);
 
 				Point2D_F64 rendered = new Point2D_F64();
-				WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(distortion, fidToCam);
+				WorldToCameraToPixel worldToPixel = PerspectiveOps.createWorldToPixel(lensDistorted, fidToCam);
 				worldToPixel.transform(new Point3D_F64(0,0,0),rendered);
 
 				// see if the reprojected is near the pixel location
@@ -349,43 +396,6 @@ public abstract class GenericFiducialDetectorChecks {
 		FiducialDetector detector = createDetector(types.get(0));
 
 		assertFalse( detector.is3D() );
-	}
-
-	/**
-	 * Make sure lens distortion is removed if it was set previously and then removed
-	 */
-	@Test // TODO remove test?  This should be a non-issue now
-	public void clearLensDistortion() {
-		for( ImageType type : types ) {
-
-			ImageBase image = loadImage(type);
-			FiducialDetector detector = createDetector(type);
-
-			// save the results
-			detector.setLensDistortion(loadDistortion(false),image.width,image.height);
-			detector.detect(image);
-			assertTrue(detector.totalFound() >= 1);
-
-			Results before = extractResults(detector);
-
-			// run with lens distortion
-			detector.setLensDistortion(loadDistortion(true),image.width,image.height);
-			detector.detect(image);
-
-			// remove lens distortion
-			detector.setLensDistortion(loadDistortion(false),image.width,image.height);
-			detector.detect(image);
-
-			Results after = extractResults(detector);
-
-			// see if it's the same
-			for (int i = 0; i < after.id.length; i++) {
-				assertEquals(before.id[i], after.id[i]);
-				assertEquals(0,before.pose.get(i).T.distance(after.pose.get(i).T),1e-8);
-				assertTrue(MatrixFeatures_DDRM.isIdentical(before.pose.get(i).R,after.pose.get(i).R,1e-8));
-				assertEquals(0,before.pixel.get(i).distance(after.pixel.get(i)),1e-8);
-			}
-		}
 	}
 
 	public void checkBounds(FiducialDetector detector) {
