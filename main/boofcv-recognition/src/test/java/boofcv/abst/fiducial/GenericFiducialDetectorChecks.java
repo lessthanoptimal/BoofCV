@@ -162,22 +162,22 @@ public abstract class GenericFiducialDetectorChecks {
 		for( ImageType type : types ) {
 
 			// render an undistorted image
-			ImageBase image = renderImage(loadDistortion(false),type);
+			ImageBase imageUn = renderImage(loadDistortion(false),type);
 
 //			ShowImages.showWindow(image,"adsasdf");
 //			BoofMiscOps.sleep(10000);
 
 			FiducialDetector detector = createDetector(type);
-			detector.setLensDistortion(lensUndistorted,image.width,image.height);
-			detector.detect(image);
+			detector.setLensDistortion(lensUndistorted,imageUn.width,imageUn.height);
+			detector.detect(imageUn);
 
 			assertTrue(detector.totalFound()>=1);
 			Results results = extractResults(detector);
 
 			// feed it a distorted with and give the detector the undistortion model
-			image = renderImage(loadDistortion(true),type);
-			detector.setLensDistortion(lensDistorted,image.width,image.height);
-			detector.detect(image);
+			ImageBase imageD = renderImage(loadDistortion(true),type);
+			detector.setLensDistortion(lensDistorted,imageD.width,imageD.height);
+			detector.detect(imageD);
 
 			// see if the results are the same
 			assertEquals(results.id.length,detector.totalFound());

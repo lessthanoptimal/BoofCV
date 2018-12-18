@@ -175,26 +175,32 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 	 *              if no lens distortion
 	 */
 	public void configure(LensDistortionNarrowFOV distortion, int width , int height , boolean cache ) {
-		Point2Transform2_F32 pointSquareToInput;
-		Point2Transform2_F32 pointDistToUndist = distortion.undistort_F32(true,true);
-		Point2Transform2_F32 pointUndistToDist = distortion.distort_F32(true,true);
-		PixelTransform2_F32 distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
-		PixelTransform2_F32 undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
+		if( distortion == null ) {
+			removePerspective.setModel(new PointToPixelTransform_F32(transformHomography));
+			squareDetector.setLensDistortion(width,height,null,null);
+			undistToDist = new DoNothing2Transform2_F64();
+		} else {
+			Point2Transform2_F32 pointSquareToInput;
+			Point2Transform2_F32 pointDistToUndist = distortion.undistort_F32(true, true);
+			Point2Transform2_F32 pointUndistToDist = distortion.distort_F32(true, true);
+			PixelTransform2_F32 distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
+			PixelTransform2_F32 undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
 
-		if( cache ) {
-			distToUndist = new PixelTransformCached_F32(width, height, distToUndist);
-			undistToDist = new PixelTransformCached_F32(width, height, undistToDist);
+			if (cache) {
+				distToUndist = new PixelTransformCached_F32(width, height, distToUndist);
+				undistToDist = new PixelTransformCached_F32(width, height, undistToDist);
+			}
+
+			squareDetector.setLensDistortion(width, height, distToUndist, undistToDist);
+
+			pointSquareToInput = new SequencePoint2Transform2_F32(transformHomography, pointUndistToDist);
+
+			// provide intrinsic camera parameters
+			PixelTransform2_F32 squareToInput = new PointToPixelTransform_F32(pointSquareToInput);
+			removePerspective.setModel(squareToInput);
+
+			this.undistToDist = distortion.distort_F64(true, true);
 		}
-
-		squareDetector.setLensDistortion(width, height,distToUndist,undistToDist);
-
-		pointSquareToInput = new SequencePoint2Transform2_F32(transformHomography,pointUndistToDist);
-
-		// provide intrinsic camera parameters
-		PixelTransform2_F32 squareToInput= new PointToPixelTransform_F32(pointSquareToInput);
-		removePerspective.setModel(squareToInput);
-
-		this.undistToDist = distortion.distort_F64(true,true);
 	}
 
 	private Polygon2D_F64 interpolationHack = new Polygon2D_F64(4);
