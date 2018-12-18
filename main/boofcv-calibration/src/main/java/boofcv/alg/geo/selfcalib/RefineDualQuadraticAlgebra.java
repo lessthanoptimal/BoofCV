@@ -103,7 +103,7 @@ public class RefineDualQuadraticAlgebra extends SelfCalibrationBase
 		computeNumberOfCalibrationParameters();
 		func = new ResidualK();
 
-		if( func.getNumOfInputsN() > 3*calibration.size() )
+		if( func.getNumOfInputsN() > 6*calibration.size() )
 			throw new IllegalArgumentException("Need more views to refine. eqs="+(3*calibration.size()+" unknowns="+func.getNumOfInputsN()));
 
 		// Declared new each time to ensure all variables are properly zeroed
