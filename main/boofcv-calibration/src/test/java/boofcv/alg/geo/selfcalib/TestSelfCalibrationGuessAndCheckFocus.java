@@ -64,6 +64,7 @@ public class TestSelfCalibrationGuessAndCheckFocus {
 		CommonOps_DDRM.mult(P2a,H,P2);
 
 		SelfCalibrationGuessAndCheckFocus alg = new SelfCalibrationGuessAndCheckFocus();
+//		alg.setVerbose(System.out,0);
 		alg.setSampling(0.1,3,200);
 		alg.setSingleCamera(true);
 		alg.setCamera(skew,cx,cy,width,height);
@@ -174,12 +175,17 @@ public class TestSelfCalibrationGuessAndCheckFocus {
 		CommonOps_DDRM.mult(P2a,H,P2);
 		CommonOps_DDRM.mult(P3a,H,P3);
 
+		// make sure it is scale invariant
+		CommonOps_DDRM.scale(2.6,P2);
+
 		SelfCalibrationGuessAndCheckFocus alg = new SelfCalibrationGuessAndCheckFocus();
+//		alg.setSingleCamera(true);
 		alg.setSampling(0.1,3,200);
 		alg.setCamera(skew,cx,cy,width,height);
 
 		List<DMatrixRMaj> cameraMatrices = new ArrayList<>();
 		cameraMatrices.add(P2);
+		cameraMatrices.add(P3);
 
 		assertTrue(alg.process(cameraMatrices));
 		H = alg.getRectifyingHomography();
@@ -206,7 +212,7 @@ public class TestSelfCalibrationGuessAndCheckFocus {
 
 		CommonOps_DDRM.mult(P3,H,P1a);
 		MultiViewOps.decomposeMetricCamera(P1a,KF,new Se3_F64());
-		KF.print();
+//		KF.print();
 		assertEquals(K3.get(0,0),KF.get(0,0),12);
 		assertEquals(K3.get(1,1),KF.get(1,1),12);
 		assertEquals(K3.get(0,1),KF.get(0,1),1); // skew estimate tends to be very bad

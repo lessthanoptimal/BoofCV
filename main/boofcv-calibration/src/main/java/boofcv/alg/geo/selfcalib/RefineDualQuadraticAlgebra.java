@@ -18,6 +18,7 @@
 
 package boofcv.alg.geo.selfcalib;
 
+import boofcv.misc.ConfigConverge;
 import boofcv.struct.calib.CameraPinhole;
 import org.ddogleg.optimization.FactoryOptimization;
 import org.ddogleg.optimization.UnconstrainedLeastSquares;
@@ -65,7 +66,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
+public class RefineDualQuadraticAlgebra extends SelfCalibrationBase
 {
 	// used to find null space of Q, which is plane at infinity
 	SolveNullSpace<DMatrixRMaj> nullspace = new SolveNullSpaceSvd_DDRM();
@@ -76,6 +77,7 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
 	UnconstrainedLeastSquares<DMatrixRMaj> optimizer =  FactoryOptimization.levenbergMarquardt(null,false);
 	ResidualK func;
 	DGrowArray param = new DGrowArray();
+	ConfigConverge converge = new ConfigConverge(1e-6,1e-5,100);
 
 	// toggles for assumptions about calibration matrix
 	private boolean zeroPrinciplePoint=false;
@@ -98,13 +100,14 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
 		if( calibration.size() != cameras.size )
 			throw new RuntimeException("Calibration and cameras do not match");
 
-		if( cameras.size < 3 )
-			throw new IllegalArgumentException("At least 3 cameras are required. You should have more");
-
 		computeNumberOfCalibrationParameters();
+		func = new ResidualK();
+
+		if( func.getNumOfInputsN() > 3*calibration.size() )
+			throw new IllegalArgumentException("Need more views to refine. eqs="+(3*calibration.size()+" unknowns="+func.getNumOfInputsN()));
 
 		// Declared new each time to ensure all variables are properly zeroed
-		func = new ResidualK();
+
 
 		// plane at infinity to the null space of Q
 		ConvertDMatrixStruct.convert(Q,_Q);
@@ -118,10 +121,10 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
 		// Configure optimization
 //		optimizer.setVerbose(System.out,0);
 		optimizer.setFunction(func,null); // Compute using a numerical Jacobian
-		optimizer.initialize(param.data,1e-6,1e-5);
+		optimizer.initialize(param.data,converge.ftol,converge.gtol);
 
 		// Tell it to run for at most 100 iterations
-		if( !UtilOptimize.process(optimizer,100) )
+		if( !UtilOptimize.process(optimizer,converge.maxIterations) )
 			return false;
 
 		// extract solution
@@ -297,6 +300,10 @@ public class SelfCalibrationRefineDualQuadratic extends SelfCalibrationBase
 		public int getNumOfOutputsM() {
 			return 6* cameras.size;
 		}
+	}
+
+	public ConfigConverge getConverge() {
+		return converge;
 	}
 
 	public boolean isZeroPrinciplePoint() {

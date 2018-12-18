@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSelfCalibrationRefineDualQuadratic extends CommonAutoCalibrationChecks
+public class TestRefineDualQuadraticAlgebra extends CommonAutoCalibrationChecks
 {
 	@Test
 	public void solvePerfect() {
@@ -45,7 +45,7 @@ public class TestSelfCalibrationRefineDualQuadratic extends CommonAutoCalibratio
 			found.add(new CameraPinhole(expected.get(i)));
 		}
 
-		SelfCalibrationRefineDualQuadratic alg = new SelfCalibrationRefineDualQuadratic();
+		RefineDualQuadraticAlgebra alg = new RefineDualQuadraticAlgebra();
 		checkRefine(alg, expected, found, UtilEjml.TEST_F64);
 	}
 
@@ -64,7 +64,7 @@ public class TestSelfCalibrationRefineDualQuadratic extends CommonAutoCalibratio
 			found.get(i).cy += 2*rand.nextGaussian();
 		}
 
-		SelfCalibrationRefineDualQuadratic alg = new SelfCalibrationRefineDualQuadratic();
+		RefineDualQuadraticAlgebra alg = new RefineDualQuadraticAlgebra();
 		checkRefine(alg, expected, found, 5);
 	}
 
@@ -83,7 +83,7 @@ public class TestSelfCalibrationRefineDualQuadratic extends CommonAutoCalibratio
 			found.get(i).cy += 2*rand.nextGaussian();
 		}
 
-		SelfCalibrationRefineDualQuadratic alg = new SelfCalibrationRefineDualQuadratic();
+		RefineDualQuadraticAlgebra alg = new RefineDualQuadraticAlgebra();
 		alg.setZeroSkew(true);
 		checkRefine(alg, expected, found, 6);
 	}
@@ -101,7 +101,7 @@ public class TestSelfCalibrationRefineDualQuadratic extends CommonAutoCalibratio
 			found.get(i).fy += 1*rand.nextGaussian();
 		}
 
-		SelfCalibrationRefineDualQuadratic alg = new SelfCalibrationRefineDualQuadratic();
+		RefineDualQuadraticAlgebra alg = new RefineDualQuadraticAlgebra();
 		alg.setZeroPrinciplePoint(true);
 		checkRefine(alg, expected, found, 6);
 	}
@@ -121,12 +121,12 @@ public class TestSelfCalibrationRefineDualQuadratic extends CommonAutoCalibratio
 			found.get(i).cy += 2*rand.nextGaussian();
 		}
 
-		SelfCalibrationRefineDualQuadratic alg = new SelfCalibrationRefineDualQuadratic();
+		RefineDualQuadraticAlgebra alg = new RefineDualQuadraticAlgebra();
 		alg.setFixedAspectRatio(true);
 		checkRefine(alg, expected, found, 6);
 	}
 
-	private void checkRefine(SelfCalibrationRefineDualQuadratic alg,
+	private void checkRefine(RefineDualQuadraticAlgebra alg,
 							 List<CameraPinhole> expected, List<CameraPinhole> found, double tol) {
 		renderGood(expected);
 

@@ -161,4 +161,20 @@ public class CameraPinhole extends CameraModel {
 				", height=" + height +
 				'}';
 	}
+
+	public boolean isEquals( CameraPinhole param , double tol ) {
+		if( Math.abs(fx-param.fx) > tol )
+			return false;
+		if( Math.abs(fy-param.fy) > tol )
+			return false;
+		if( Math.abs(skew-param.skew) > tol )
+			return false;
+		if( Math.abs(cx-param.cx) > tol )
+			return false;
+		if( Math.abs(cy-param.cy) > tol )
+			return false;
+		if( width != param.width)
+			return false;
+		return height==param.height;
+	}
 }

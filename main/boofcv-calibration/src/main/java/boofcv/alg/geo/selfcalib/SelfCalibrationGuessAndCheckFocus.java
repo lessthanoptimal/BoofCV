@@ -19,8 +19,8 @@
 package boofcv.alg.geo.selfcalib;
 
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.struct.calib.CameraPinhole;
 import georegression.struct.point.Vector3D_F64;
-import georegression.struct.se.Se3_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -43,6 +43,11 @@ import java.util.List;
  *     <li>Internally, the plane at infinity is computed using the known intrinsic parameters.</li>
  *     <li>Rectifying homography is computed using known K in first view and plane at infinity. lambda of 1 is assumed</li>
  * </ul>
+ *
+ * Changes from paper:
+ * <ol>
+ *     <li>Extracting K using absolute quadratic instead of rectifying homography</li>
+ * </ol>
  *
  * @see EstimatePlaneAtInfinityGivenK
  *
@@ -76,6 +81,9 @@ public class SelfCalibrationGuessAndCheckFocus {
 	DMatrixRMaj H = new DMatrixRMaj(4,4);
 	DMatrixRMaj bestH = new DMatrixRMaj(4,4);
 
+	// Absolute dual quadratic
+	DMatrixRMaj Q = new DMatrixRMaj(4,4);
+
 	// camera normalization matrices
 	DMatrixRMaj V = new DMatrixRMaj(3,3);
 	DMatrixRMaj Vinv = new DMatrixRMaj(3,3);
@@ -90,6 +98,8 @@ public class SelfCalibrationGuessAndCheckFocus {
 	double w_sk = 1.0/0.01; // zero skew
 	double w_ar = 1.0/0.2;  // aspect ratio
 	double w_uo = 1.0/0.1;  // zero principle point
+
+	CameraPinhole intrinsic = new CameraPinhole();
 
 	DMatrixRMaj tmp = new DMatrixRMaj(3,3);
 
@@ -165,14 +175,12 @@ public class SelfCalibrationGuessAndCheckFocus {
 
 			DMatrixRMaj Pi = normalizedP.grow();
 			CommonOps_DDRM.mult(Vinv,A,tmpP);
-
-			// slightly different order for when this scaling is applied than in the paper
-			double a0 = tmpP.get(2,0);
-			double a1 = tmpP.get(2,1);
-			double a2 = tmpP.get(2,2);
+			CommonOps_DDRM.mult(tmpP,H,Pi);
+			double a0 = Pi.get(2,0);
+			double a1 = Pi.get(2,1);
+			double a2 = Pi.get(2,2);
 			double scale = Math.sqrt(a0*a0 + a1*a1 + a2*a2);
-
-			CommonOps_DDRM.mult(1.0/scale,tmpP,H,Pi);
+			CommonOps_DDRM.scale(1.0/scale,Pi);
 		}
 
 		// Find the best combinations of focal lengths
@@ -207,6 +215,7 @@ public class SelfCalibrationGuessAndCheckFocus {
 				scores[i] = Double.NaN;
 				continue;
 			}
+			MultiViewOps.rectifyHToAbsoluteQuadratic(H,Q);
 
 			double score = scoreResults();
 			scores[i] = score;
@@ -249,6 +258,7 @@ public class SelfCalibrationGuessAndCheckFocus {
 					scores[i] = Double.NaN;
 					continue;
 				}
+				MultiViewOps.rectifyHToAbsoluteQuadratic(H,Q);
 
 				double score = scoreResults();
 				scores[j] = score;
@@ -292,11 +302,24 @@ public class SelfCalibrationGuessAndCheckFocus {
 		if( !estimatePlaneInf.estimatePlaneAtInfinity(P2,planeInf) )
 			return false;
 
+		// TODO add a cost for distance from nominal and scale other cost by focal length fx for each view
+//		RefineDualQuadraticConstraint refine = new RefineDualQuadraticConstraint();
+//		refine.setZeroSkew(true);
+//		refine.setAspectRatio(true);
+//		refine.setZeroPrinciplePoint(true);
+//		refine.setKnownIntrinsic1(true);
+//		refine.setFixedCamera(false);
+//
+//		CameraPinhole intrinsic = new CameraPinhole(f1,f1,0,0,0,0,0);
+//		if( !refine.refine(normalizedP.toList(),intrinsic,planeInf))
+//			return false;
+
 		K1.zero();
 		K1.set(0,0,f1);
 		K1.set(1,1,f1);
 		K1.set(2,2,1);
 		MultiViewOps.createProjectiveToMetric(K1,planeInf.x,planeInf.y,planeInf.z,1,H);
+
 		return true;
 	}
 
@@ -308,24 +331,21 @@ public class SelfCalibrationGuessAndCheckFocus {
 	 * which gives matrices which fit the constraints lower scores.
 	 */
 	double scoreResults() {
-		DMatrixRMaj K = new DMatrixRMaj(3,3);
-		Se3_F64 a = new Se3_F64();
-		DMatrixRMaj Pn = new DMatrixRMaj(3,4);
 
 		double totalScore = 0;
 
 		for (int i = 0; i < normalizedP.size; i++) {
 			DMatrixRMaj P = normalizedP.get(i);
-			CommonOps_DDRM.mult(P,H,Pn);
-
-			// Decompose the metric camera projection matrix.
-			// NOTE: This could be speed lot and memory usage reduced by creating a class for it
-			MultiViewOps.decomposeMetricCamera(Pn,K,a);
+			MultiViewOps.intrinsicFromAbsoluteQuadratic(Q,P,intrinsic);
 
 			double score = 0;
-			score += w_sk*Math.abs(K.get(0,1));
-			score += w_ar*Math.abs(K.get(0,0)-K.get(1,1));
-			score += w_uo*(Math.abs(K.get(0,2)) + Math.abs(K.get(1,2)));
+
+			// skew should be zero
+			score += w_sk*Math.abs(intrinsic.skew);
+			// aspect ratio unity
+			score += w_ar*(Math.max(intrinsic.fx,intrinsic.fy)/Math.min(intrinsic.fx,intrinsic.fy) - 1);
+			// principle point zero
+			score += w_uo*(Math.abs(intrinsic.cx) + Math.abs(intrinsic.cy));
 
 			totalScore += score;
 		}

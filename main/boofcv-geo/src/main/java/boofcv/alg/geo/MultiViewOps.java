@@ -1448,6 +1448,7 @@ public class MultiViewOps {
 	 * a projective to metric (calibrated) geometry. See pg 464 in [1].
 	 *
 	 * <p>Q = H*I*H<sup>T</sup></p>
+	 * <p>where I = diag(1 1 1 0)</p>
 	 *
 	 * <ol>
 	 * <li> R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003 </li>
@@ -1464,6 +1465,89 @@ public class MultiViewOps {
 			return false;
 
 		return alg.computeRectifyingHomography(H);
+	}
+
+	/**
+	 * Rectifying homography to dual absolute quadratic.
+	 *
+	 * <p>Q = H*I*H<sup>T</sup> = H(:,1:3)*H(:,1:3)'</p>
+	 * <p>where I = diag(1 1 1 0)</p>
+	 *
+	 * @param H (Input) 4x4 rectifying homography.
+	 * @param Q (Output) Absolute quadratic. Typically found in auto calibration. Not modified.
+	 */
+	public static void rectifyHToAbsoluteQuadratic(DMatrixRMaj H , DMatrixRMaj Q ) {
+		int indexQ = 0;
+		for (int rowA = 0; rowA < 4; rowA++) {
+			for (int colB = 0; colB < 4; colB++) {
+				int indexA = rowA*4;
+				int indexB = colB*4;
+				double sum = 0;
+
+				for (int i = 0; i < 3; i++) {
+//					sum += H.get(rowA,i)*H.get(colB,i);
+					sum += H.data[indexA++]*H.data[indexB++];
+				}
+
+//				Q.set(rowA,colB,sum);
+				Q.data[indexQ++] = sum;
+			}
+		}
+	}
+
+	/**
+	 * Extracts the intrinsic camera matrix from a view given its camera matrix and the dual absolute quadratic.
+	 *
+	 * <p>w<sub>i</sub> = P<sub>i</sub>*Q*P<sub>i</sub><sup>T</sup>, where w<sub>i</sub> = K<sub>i</sub>*K'<sub>i</sub></p>
+	 *
+	 * @param Q (Input) Dual absolute qudratic
+	 * @param P (Input) Camera matrix for a view
+	 * @param intrinsic (Output) found intrinsic parameters
+	 */
+	public static void intrinsicFromAbsoluteQuadratic( DMatrixRMaj Q , DMatrixRMaj P , CameraPinhole intrinsic )
+	{
+		DMatrixRMaj tmp = new DMatrixRMaj(3,4);
+		DMatrixRMaj tmp2 = new DMatrixRMaj(3,3);
+		CommonOps_DDRM.mult(P,Q,tmp);
+		CommonOps_DDRM.multTransB(tmp,P,tmp2);
+
+		decomposeDiac(tmp2,intrinsic);
+	}
+
+	/**
+	 * Extracts the camera calibration matrix on the dual image of the absolute conic (DIAC). Elements
+	 * which could cause problems if negative have the absolute value taken to avoid NaN.
+	 *
+	 * The upper triangular elements in w (DIAC) are passed in.
+	 *
+	 * @param intrinsic (output) K extracted from w
+	 */
+	public static void decomposeDiac( double w11 , double w12 , double w13 , double w22 , double w23 , double w33,
+									  CameraPinhole intrinsic )
+	{
+		// divide by w33 to ensure that it is equal to one
+		double cx = w13/w33;
+		double cy = w23/w33;
+		double fy = Math.sqrt(Math.abs(w22/w33-cy*cy));
+		double skew = (w12/w33 - cx*cy)/fy;
+		double fx = Math.sqrt(Math.abs(w11/w33-skew*skew - cx*cx));
+
+		intrinsic.cx = cx;
+		intrinsic.cy = cy;
+		intrinsic.fx = fx;
+		intrinsic.fy = fy;
+		intrinsic.skew = skew;
+	}
+
+	/**
+	 * Extracts the camera calibration matrix on the dual image of the absolute conic (DIAC). Elements
+	 * which could cause problems if negative have the absolute value taken to avoid NaN.
+	 *
+	 * @param w (input) DIAC 3x3
+	 * @param intrinsic (output) K extracted from w
+	 */
+	public static void decomposeDiac( DMatrixRMaj w , CameraPinhole intrinsic ) {
+		decomposeDiac(w.data[0],w.data[1],w.data[2],w.data[4],w.data[5],w.data[8],intrinsic);
 	}
 
 	/**

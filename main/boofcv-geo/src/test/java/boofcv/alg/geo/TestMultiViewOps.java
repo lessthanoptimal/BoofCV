@@ -19,6 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.geo.h.CommonHomographyInducedPlane;
+import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.PairLineNorm;
@@ -1105,7 +1106,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void computeRectifyingHomography() {
+	public void absoluteQuadraticToH() {
 		Equation eq = new Equation();
 		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("p=rand(3,1)");
@@ -1122,6 +1123,68 @@ public class TestMultiViewOps {
 		assertTrue(MultiViewOps.absoluteQuadraticToH(Q_in,foundH));
 
 		assertTrue(MatrixFeatures_D.isIdentical(H,foundH, UtilEjml.TEST_F64));
+	}
+
+	@Test
+	public void rectifyHToAbsoluteQuadratic() {
+		Equation eq = new Equation();
+		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
+		eq.process("p=rand(3,1)");
+		eq.process("u=-p'*K");
+		eq.process("H=[K [0;0;0]; u 1]");
+		eq.process("Q=H*diag([1 1 1 0])*H'");
+
+		DMatrixRMaj Q = eq.lookupDDRM("Q");
+
+		DMatrixRMaj H = eq.lookupDDRM("H");
+		DMatrixRMaj foundQ = new DMatrixRMaj(4,4);
+
+		MultiViewOps.rectifyHToAbsoluteQuadratic(H,foundQ);
+
+		assertTrue(MatrixFeatures_D.isIdentical(Q,foundQ, UtilEjml.TEST_F64));
+	}
+
+	@Test
+	public void intrinsicFromAbsoluteQuadratic() {
+		Equation eq = new Equation();
+		eq.process("K1=[300 1 50;0 310 60; 0 0 1]");
+		eq.process("K2=[310 1 75;0 310 60; 0 0 1]");
+		eq.process("p=rand(3,1)");
+		eq.process("u=-p'*K1");
+		eq.process("H=[K1 [0;0;0]; u 1]");
+		eq.process("P=K2*[eye(3) [1;2;3]]"); // very simplistic P
+		eq.process("P=P*inv(H)"); // back to projective
+		eq.process("Q=-1.1*H*diag([1 1 1 0])*H'");
+
+		DMatrixRMaj P = eq.lookupDDRM("P");
+		DMatrixRMaj Q = eq.lookupDDRM("Q");
+		CameraPinhole intrinsic = new CameraPinhole();
+
+		MultiViewOps.intrinsicFromAbsoluteQuadratic(Q,P,intrinsic);
+
+		assertEquals(310,intrinsic.fx, 1e-6);
+		assertEquals(310,intrinsic.fy, 1e-6);
+		assertEquals(75,intrinsic.cx, 1e-6);
+		assertEquals(60,intrinsic.cy, 1e-6);
+		assertEquals(1,intrinsic.skew, 1e-6);
+	}
+
+	@Test
+	public void decomposeDiac() {
+		Equation eq = new Equation();
+		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
+		eq.process("w=1.5*K*K'");
+		DMatrixRMaj w = eq.lookupDDRM("w");
+
+		CameraPinhole intrinsic = new CameraPinhole();
+
+		MultiViewOps.decomposeDiac(w,intrinsic);
+
+		assertEquals(300,intrinsic.fx);
+		assertEquals(310,intrinsic.fy);
+		assertEquals(50,intrinsic.cx);
+		assertEquals(60,intrinsic.cy);
+		assertEquals(1,intrinsic.skew);
 	}
 
 	@Test
