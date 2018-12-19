@@ -186,7 +186,7 @@ public class ExampleStereoUncalibrated {
 		}
 
 		// initial location of points is found through triangulation
-		ExampleTrifocalStereoUncalibrated.triangulatePoints(structure,observations);
+		MultiViewOps.triangulatePoints(structure,observations);
 
 		//------------------ Running Bundle Adjustment
 		System.out.println("Performing bundle adjustment");

@@ -1227,4 +1227,8 @@ public class TestMultiViewOps {
 		}
 	}
 
+	@Test
+	public void triangulatePoints() {
+		fail("Implement");
+	}
 }

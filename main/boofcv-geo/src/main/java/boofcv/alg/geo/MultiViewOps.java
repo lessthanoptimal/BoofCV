@@ -18,6 +18,11 @@
 
 package boofcv.alg.geo;
 
+import boofcv.abst.geo.TriangulateNViewsMetric;
+import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.f.FundamentalExtractEpipoles;
 import boofcv.alg.geo.f.FundamentalToProjective;
 import boofcv.alg.geo.h.HomographyInducedStereo2Line;
@@ -27,6 +32,8 @@ import boofcv.alg.geo.impl.ProjectiveToIdentity;
 import boofcv.alg.geo.structure.DecomposeAbsoluteDualQuadratic;
 import boofcv.alg.geo.trifocal.TrifocalExtractGeometries;
 import boofcv.alg.geo.trifocal.TrifocalTransfer;
+import boofcv.factory.geo.ConfigTriangulation;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
@@ -38,6 +45,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.Tuple2;
 import org.ddogleg.struct.Tuple3;
@@ -1642,4 +1650,54 @@ public class MultiViewOps {
 
 		return new Tuple3<>(list1,list2,list3);
 	}
+
+	/**
+	 * Convience function for initializing bundle adjustment parameters. Triangulates points using camera
+	 * position and pixel observations.
+	 *
+	 * @param structure
+	 * @param observations
+	 */
+	public static void triangulatePoints(SceneStructureMetric structure , SceneObservations observations )
+	{
+		TriangulateNViewsMetric triangulation = FactoryMultiView.
+				triangulateNViewCalibrated(ConfigTriangulation.GEOMETRIC);
+
+		List<RemoveRadialPtoN_F64> list_p_to_n = new ArrayList<>();
+		for (int i = 0; i < structure.cameras.length; i++) {
+			BundlePinholeSimplified cam = (BundlePinholeSimplified)structure.cameras[i].model;
+			RemoveRadialPtoN_F64 p2n = new RemoveRadialPtoN_F64();
+			p2n.setK(cam.f,cam.f,0,0,0).setDistortion(new double[]{cam.k1,cam.k2},0,0);
+			list_p_to_n.add(p2n);
+
+		}
+
+		FastQueue<Point2D_F64> normObs = new FastQueue<>(Point2D_F64.class,true);
+		normObs.resize(3);
+
+		Point3D_F64 X = new Point3D_F64();
+
+		List<Se3_F64> worldToViews = new ArrayList<>();
+		for (int i = 0; i < structure.points.length; i++) {
+			normObs.reset();
+			worldToViews.clear();
+			SceneStructureMetric.Point sp = structure.points[i];
+			for (int j = 0; j < sp.views.size; j++) {
+				int viewIdx = sp.views.get(j);
+				SceneStructureMetric.View v = structure.views[viewIdx];
+				worldToViews.add(v.worldToView);
+
+				// get the observation in pixels
+				Point2D_F64 n = normObs.grow();
+				int pointidx = observations.views[viewIdx].point.indexOf(i);
+				observations.views[viewIdx].get(pointidx,n);
+				// convert to normalized image coordinates
+				list_p_to_n.get(v.camera).compute(n.x,n.y,n);
+			}
+
+			triangulation.triangulate(normObs.toList(),worldToViews,X);
+			sp.set(X.x,X.y,X.z);
+		}
+	}
+
 }
