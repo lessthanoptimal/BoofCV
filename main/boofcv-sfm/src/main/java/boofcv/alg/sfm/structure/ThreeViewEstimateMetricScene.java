@@ -91,12 +91,12 @@ public class ThreeViewEstimateMetricScene {
 	private int verboseLevel;
 
 	// Projective camera matrices
-	public DMatrixRMaj P1 = CommonOps_DDRM.identity(3,4);
-	public DMatrixRMaj P2 = new DMatrixRMaj(3,4);
-	public DMatrixRMaj P3 = new DMatrixRMaj(3,4);
+	protected DMatrixRMaj P1 = CommonOps_DDRM.identity(3,4);
+	protected DMatrixRMaj P2 = new DMatrixRMaj(3,4);
+	protected DMatrixRMaj P3 = new DMatrixRMaj(3,4);
 
 	// storage for pinhole cameras
-	public List<CameraPinhole> listPinhole = new ArrayList<>();
+	protected List<CameraPinhole> listPinhole = new ArrayList<>();
 
 	// Bundle adjustment data structure and tuning parameters
 	public SceneStructureMetric structure;
@@ -106,7 +106,7 @@ public class ThreeViewEstimateMetricScene {
 	private int width, height; // TODO Get size for each image individually
 
 	// metric location of each camera. The first view is always identity
-	public List<Se3_F64> worldToView = new ArrayList<>();
+	protected List<Se3_F64> worldToView = new ArrayList<>();
 
 	/**
 	 * Sets configurations to their default value
@@ -436,4 +436,7 @@ public class ThreeViewEstimateMetricScene {
 		this.verboseLevel = level;
 	}
 
+	public SceneStructureMetric getStructure() {
+		return structure;
+	}
 }

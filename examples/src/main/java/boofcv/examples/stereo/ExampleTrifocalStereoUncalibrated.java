@@ -37,6 +37,7 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic.Intrinsic;
+import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -58,6 +59,7 @@ import boofcv.struct.geo.TrifocalTensor;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
@@ -104,47 +106,29 @@ import static boofcv.examples.stereo.ExampleStereoTwoViewsOneCamera.showPointClo
  *     <li>Convert into a point cloud</li>
  * </ol>
  *
- * For a more stable and accurate version of
+ * For a more stable and accurate version this example see {@link ThreeViewEstimateMetricScene}.
  *
  * @author Peter Abeles
  */
 public class ExampleTrifocalStereoUncalibrated {
 
-	// Regression ideas.
 	public static void main(String[] args) {
-		String name = "rock_leaves_"; // todo background resolving is sensitive
-//		String name = "minecraft_cave_";
-//		String name = "bobcats";
-//		String name = "chicken";
-//		String name = "turkey";
-//		String name = "rockview"; // TODO sensitive to tuning
-//		String name = "pebbles";
-//		String name = "books";
-//		String name = "skull";
-//		String name = "triflowers";
-
-
-//		String name = "minecraft_high_";
+		String name = "rock_leaves_";
+//		String name = "mono_wall_";
+//		String name = "minecraft_cave1_";
 //		String name = "minecraft_distant_";
-//		String name = "deer";
-//		String name = "seal"; // TODO really confusing perspective
-//		String name = "puddle";
-//		String name = "barrel";
+//		String name = "bobcats_";
+//		String name = "chicken_";
+//		String name = "turkey_";
+//		String name = "rockview_";
+//		String name = "pebbles_";
+//		String name = "books_";
+//		String name = "skull_";
+//		String name = "triflowers_";
 
-//		String name = "waterdrip";
-//		String name = "skull";
-//		String name = "library";
-//		String name = "power_"; // TODO Failing. Need to change RANSAC parameters to make it work
-		// TODO bad focal length
-//		String name = "pumpkintop";
-
-//		String name = "bowl_";
-//		String name = "eggs";
-//		String name = "pelican"; // TODO really confusing perspective
-
-		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/"+name+"01.png"));
-		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/"+name+"02.png"));
-		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/"+name+"03.png"));
+		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/"+name+"01.jpg"));
+		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/"+name+"02.jpg"));
+		BufferedImage buff03 = UtilImageIO.loadImage(UtilIO.pathExample("triple/"+name+"03.jpg"));
 
 		Planar<GrayU8> color01 = ConvertBufferedImage.convertFrom(buff01,true,ImageType.pl(3,GrayU8.class));
 		Planar<GrayU8> color02 = ConvertBufferedImage.convertFrom(buff02,true,ImageType.pl(3,GrayU8.class));
@@ -154,7 +138,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		GrayU8 image02 = ConvertImage.average(color02,null);
 		GrayU8 image03 = ConvertImage.average(color03,null);
 
-		// TODO don't use scale invariant and see how it goes
+		// using SURF features. Robust and fairly fast to compute
 		DetectDescribePoint<GrayU8,BrightFeature> detDesc = FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(0, 4, 1000, 1, 9, 4, 2), null,null, GrayU8.class);
 
@@ -168,13 +152,16 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		detDesc.detect(image01);
 
+		// Converting data formats for the found features into what can be processed by SFM algorithms
+		// Notice how the image center is subtracted from the coordinates? In many cases a principle point
+		// of zero is assumed. This is a reasonable assumption in almost all modern cameras. Errors in
+		// the principle point tend to materialize as translations and are non fatal.
+
 		int width = image01.width, height = image01.height;
 		System.out.println("Image Shape "+width+" x "+height);
 		double cx = width/2;
 		double cy = height/2;
-//		double scale = Math.max(cx,cy);
 
-		// COMMENT ON center point zero
 		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 			Point2D_F64 pixel = detDesc.getLocation(i);
 			locations01.grow().set(pixel.x-cx,pixel.y-cy);
@@ -286,7 +273,7 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		System.out.println("Projective to metric");
 		// convert camera matrix from projective to metric
-		DMatrixRMaj H = new DMatrixRMaj(4,4);
+		DMatrixRMaj H = new DMatrixRMaj(4,4); // storage for rectifying homography
 		if( !MultiViewOps.absoluteQuadraticToH(selfcalib.getQ(),H) )
 			throw new RuntimeException("Projective to metric failed");
 
@@ -302,14 +289,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		MultiViewOps.projectiveToMetric(P3,H,worldToView.get(2),K);
 
 		// scale is arbitrary. Set max translation to 1
-		double maxT = 0;
-		for( Se3_F64 p : worldToView ) {
-			maxT = Math.max(maxT,p.T.norm());
-		}
-		for( Se3_F64 p : worldToView ) {
-			p.T.scale(1.0/maxT);
-			p.print();
-		}
+		adjustTranslationScale(worldToView);
 
 		// Construct bundle adjustment data structure
 		SceneStructureMetric structure = new SceneStructureMetric(false);
@@ -317,11 +297,8 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		structure.initialize(3,3,inliers.size());
 		for (int i = 0; i < listPinhole.size(); i++) {
-			CameraPinhole cp = listPinhole.get(i);
 			BundlePinholeSimplified bp = new BundlePinholeSimplified();
-
-			bp.f = cp.fx;
-
+			bp.f = listPinhole.get(i).fx;
 			structure.setCamera(i,false,bp);
 			structure.setView(i,i==0,worldToView.get(i));
 			structure.connectViewToCamera(i,i);
@@ -337,6 +314,7 @@ public class ExampleTrifocalStereoUncalibrated {
 			structure.connectPointToView(i,1);
 			structure.connectPointToView(i,2);
 		}
+
 		// Initial estimate for point 3D locations
 		triangulatePoints(structure,observations);
 
@@ -370,6 +348,12 @@ public class ExampleTrifocalStereoUncalibrated {
 		bundleAdjustment.setParameters(structure,observations);
 		bundleAdjustment.optimize(structure);
 
+		System.out.println("Final Views");
+		for (int i = 0; i < 3; i++) {
+			BundlePinholeSimplified cp = structure.getCameras()[i].getModel();
+			Vector3D_F64 T = structure.getViews()[i].worldToView.T;
+			System.out.printf("[ %d ] f = %5.1f T=%s\n",i,cp.f,T.toString());
+		}
 
 		System.out.println("\n\nComputing Stereo Disparity");
 		BundlePinholeSimplified cp = structure.getCameras()[0].getModel();
@@ -386,6 +370,17 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		// TODO dynamic max disparity
 		computeStereoCloud(image01,image02,color01,color02,intrinsic01,intrinsic02,leftToRight,0,250);
+	}
+
+	private static void adjustTranslationScale(List<Se3_F64> worldToView) {
+		double maxT = 0;
+		for( Se3_F64 p : worldToView ) {
+			maxT = Math.max(maxT,p.T.norm());
+		}
+		for( Se3_F64 p : worldToView ) {
+			p.T.scale(1.0/maxT);
+			p.print();
+		}
 	}
 
 	// TODO Do this correction without running bundle adjustment again

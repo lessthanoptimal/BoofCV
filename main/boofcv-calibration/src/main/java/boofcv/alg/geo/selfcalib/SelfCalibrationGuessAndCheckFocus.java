@@ -37,6 +37,11 @@ import java.util.List;
  *     to the vast number of local minima in the search space. Non-linear refinement is highly recommended after
  *     using this algorithm due to its approximate nature.
  * </p>
+ * <p>
+ *     NOTE: Performance on noise free synthetic data replicates paper claims. Have not been able to replicate
+ *     performance on real data. Authors were contacted for a reference implementation and was told source code
+ *     is not publicly available.
+ * </p>
  *
  * <ul>
  *     <li>if sameFocus is set to true then the first two views are assumed to have approximately the same focal length</li>
