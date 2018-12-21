@@ -13,7 +13,7 @@ Version : 0.32
   * Updated image enhance demo
   * Two view uncalibrated stereo re-written from scratch
   * Three view uncalibrated stereo
-  * TODO visualization for three view assocations
+  * Visualization for three view associations
 - Applications
   * All applications have a GUI
   * Centralized GUI for launching
@@ -59,7 +59,6 @@ Version : 0.32
 
 
 TODO For Release
-  - Visualize 3 image association
   - remove false stereo at edges of rectified image
   - Trifocal Stereo Demonstration Application
   - Trifocal Stereo

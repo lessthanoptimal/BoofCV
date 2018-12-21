@@ -44,6 +44,7 @@ import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.*;
+import boofcv.gui.feature.AssociatedTriplePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.gui.stereo.RectifiedPairPanel;
@@ -219,6 +220,13 @@ public class ExampleTrifocalStereoUncalibrated {
 		List<AssociatedTriple> inliers = ransac.getMatchSet();
 		TrifocalTensor model = ransac.getModelParameters();
 		System.out.println("Remaining after RANSAC "+inliers.size());
+
+		// Show remaining associations from RANSAC
+		AssociatedTriplePanel triplePanel = new AssociatedTriplePanel();
+		triplePanel.setPixelOffset(cx,cy);
+		triplePanel.setImages(buff01,buff02,buff03);
+		triplePanel.setAssociation(inliers);
+		ShowImages.showWindow(triplePanel,"Associations", true);
 
 		// estimate using all the inliers
 		// No need to re-scale the input because the estimator automatically adjusts the input on its own
