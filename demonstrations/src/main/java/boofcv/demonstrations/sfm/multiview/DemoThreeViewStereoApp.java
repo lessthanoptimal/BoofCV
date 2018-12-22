@@ -267,13 +267,19 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	}
 
 	private void processImages( boolean skipAssociate , boolean skipStructure ) {
+		int width = buff[0].getWidth();
+		int height = buff[0].getHeight();
+
 		SwingUtilities.invokeLater(()->{
 			// TODO disable GUI
 			controls.disableComputeButton();
+			controls.clearText();
+			controls.addText(width+" x "+height+"\n");
 		});
 
-		int width = buff[0].getWidth();
-		int height = buff[0].getHeight();
+		long time0 = System.currentTimeMillis();
+
+
 
 		double cx = width/2;
 		double cy = height/2;
@@ -294,6 +300,10 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 			// Show work in progress and items are computed
 			BoofSwingUtil.invokeNowOrLater(() -> {
+				for (int i = 0; i < 3; i++) {
+					controls.addText(String.format("Feats[%d] %d\n",i,features[i].size));
+				}
+				controls.addText("Associated "+associated.size+"\n");
 				guiAssoc.setPixelOffset(cx, cy);
 				guiAssoc.setImages(buff[0], buff[1], buff[2]);
 				guiAssoc.setAssociation(associated.toList());
@@ -303,6 +313,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		if( !skipStructure ) {
 			structureEstimator.configRansac.inlierThreshold = controls.inliers;
+			structureEstimator.pruneFraction = (100-controls.prune)/100.0;
 
 			//structureEstimator.setVerbose(System.out,0);
 			System.out.println("Computing 3D structure. triplets " + associated.size);
@@ -310,6 +321,21 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 				System.err.println("Structure estimation failed!");
 				return;
 			}
+
+			SwingUtilities.invokeLater(()->{
+				int n = structureEstimator.ransac.getMatchSet().size();
+				double score = structureEstimator.bundleAdjustment.getFitScore();
+				int numObs = structureEstimator.observations.getObservationCount();
+				int numPoints = structureEstimator.structure.points.length;
+				controls.addText(String.format("Tri Feats %d\n",n));
+				for (int i = 0; i < 3; i++) {
+					BundlePinholeSimplified c = structureEstimator.structure.cameras[i].getModel();
+					controls.addText(String.format("cam[%d] f=%.1f\n",i,c.f));
+					controls.addText(String.format("   k1=%.2f k2=%.2f\n",c.k1,c.k2));
+				}
+				controls.addText(String.format("SBA Obs %4d Pts %d\n",numObs,numPoints));
+				controls.addText(String.format("SBA fit score %.3f\n",score));
+			});
 		}
 
 		System.out.println("Computing rectification");
@@ -371,7 +397,14 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		System.out.println("Computing Point Cloud");
 		showPointCloud(disparity,visualRect1,leftToRight,rectifiedK,rectifiedR);
 
+		long time1 = System.currentTimeMillis();
+		SwingUtilities.invokeLater(()->{
+			controls.addText(String.format("ET %d (ms)",time1-time0));
+		});
+
 		System.out.println("Success!");
+
+
 	}
 
 	public <C extends ImageBase<C> >

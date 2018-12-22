@@ -47,10 +47,12 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	JSpinner sMaxDisparity;
 	JButton bCompute = new JButton("Compute");
 
+	JTextArea textInfo = new JTextArea();
+
 	int view=0;
 	int maxImageSize=800;
 	double inliers = 1.0;
-	int prune = 10;
+	int prune = 30; // percentage of features it will prune at the very end
 	boolean autoFocal=true;
 	int focal = 500;
 	int minDisparity = 0;
@@ -73,6 +75,9 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		sMinDisparity = spinner(minDisparity,0,255,10);
 		sMaxDisparity = spinner(maxDisparity,20,255,10);
 		bCompute.addActionListener(this);
+		bCompute.setMinimumSize(bCompute.getPreferredSize());
+
+		textInfo.setEditable(false);
 
 		addLabeled(imageView,"View");
 		addLabeled(sMaxSize,"Image Size");
@@ -82,10 +87,19 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		addLabeled(sFocal,"Focal");
 		addLabeled(sMinDisparity,"Min Disparity");
 		addLabeled(sMaxDisparity,"Max Disparity");
-		addVerticalGlue();
+		add(new JScrollPane(textInfo));
 		addAlignCenter(bCompute);
 
 		disableComputeButton();
+	}
+
+	public void clearText() {
+		textInfo.setText("");
+	}
+
+	public void addText( final String text ) {
+		String a = textInfo.getText()+text;
+		textInfo.setText(a);
 	}
 
 	public void setViews( int which ) {
@@ -111,6 +125,9 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 			stereoChanged = true;
 		} else if( e.getSource() == sInliers ) {
 			inliers = ((Number)sInliers.getValue()).doubleValue();
+			stereoChanged = true;
+		} else if( e.getSource() == sPrune ) {
+			prune = ((Number)sInliers.getValue()).intValue();
 			stereoChanged = true;
 		} else if( e.getSource() == sMaxSize ) {
 			maxImageSize = ((Number)sMaxSize.getValue()).intValue();
