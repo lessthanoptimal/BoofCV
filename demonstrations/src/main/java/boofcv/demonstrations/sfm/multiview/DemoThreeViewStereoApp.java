@@ -28,7 +28,7 @@ import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.image.ImagePanel;
+import boofcv.gui.feature.AssociatedTriplePanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.struct.feature.AssociatedTripleIndex;
@@ -49,7 +49,7 @@ import java.util.List;
  */
 public class DemoThreeViewStereoApp<T extends ImageGray<T>> extends DemonstrationBase {
 
-	ImagePanel gui = new ImagePanel();
+	AssociatedTriplePanel gui = new AssociatedTriplePanel();
 	DemoThreeViewControls controls = new DemoThreeViewControls();
 
 	DetectDescribePoint<T, BrightFeature> detDesc;
@@ -64,6 +64,8 @@ public class DemoThreeViewStereoApp<T extends ImageGray<T>> extends Demonstratio
 	FastQueue<Point2D_F64> locations[] = new FastQueue[3];
 	FastQueue<BrightFeature> features[] = new FastQueue[3];
 	ImageDimension dimensions[] = new ImageDimension[3];
+
+	BufferedImage buff[] = new BufferedImage[3];
 
 	public DemoThreeViewStereoApp(List<PathLabel> examples,
 								  Class<T> imageType ) {
@@ -87,10 +89,10 @@ public class DemoThreeViewStereoApp<T extends ImageGray<T>> extends Demonstratio
 	@Override
 	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 
-		if( sourceID == 0 )
-			gui.setImageRepaint(buffered);
-
+		System.out.println("Processing image "+sourceID+"  shape "+input.width+" "+input.height);
+		System.out.println("  "+inputFilePath);
 		dimensions[sourceID].set(input.width,input.height);
+		buff[sourceID] = buffered;
 
 		// assume the image center is the principle point
 		double cx = input.width/2;
@@ -107,10 +109,12 @@ public class DemoThreeViewStereoApp<T extends ImageGray<T>> extends Demonstratio
 			locations[sourceID].grow().set(pixel.x-cx,pixel.y-cy);
 			features[sourceID].grow().setTo(detDesc.getDescription(i));
 		}
+		System.out.println("   found features "+features[sourceID].size);
 
 		if( sourceID < 2 )
 			return;
 
+		System.out.println("Associating three views");
 		associateThree.setFeaturesA(features[0]);
 		associateThree.setFeaturesB(features[1]);
 		associateThree.setFeaturesC(features[2]);
@@ -123,6 +127,13 @@ public class DemoThreeViewStereoApp<T extends ImageGray<T>> extends Demonstratio
 			associated.grow().set(locations[0].get(p.a),locations[1].get(p.b),locations[2].get(p.c));
 		}
 
+
+		gui.setPixelOffset(cx,cy);
+		gui.setImages(buff[0],buff[1],buff[2]);
+		gui.setAssociation(associated.toList());
+		gui.repaint();
+
+		System.out.println("Computing structure. triplets "+associated.size);
 		if( !structureEstimator.process(associated.toList(),input.width,input.height) )
 			return;
 
@@ -132,8 +143,8 @@ public class DemoThreeViewStereoApp<T extends ImageGray<T>> extends Demonstratio
 
 	private static PathLabel createExample( String name ) {
 		String path0 = UtilIO.pathExample("triple/"+name+"_01.jpg");
-		String path1 = UtilIO.pathExample("triple/"+name+"_01.jpg");
-		String path2 = UtilIO.pathExample("triple/"+name+"_01.jpg");
+		String path1 = UtilIO.pathExample("triple/"+name+"_02.jpg");
+		String path2 = UtilIO.pathExample("triple/"+name+"_03.jpg");
 
 		return new PathLabel(name,path0,path1,path2);
 	}
