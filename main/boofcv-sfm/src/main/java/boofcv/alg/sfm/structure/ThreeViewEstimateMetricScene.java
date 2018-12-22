@@ -98,9 +98,15 @@ public class ThreeViewEstimateMetricScene {
 	// storage for pinhole cameras
 	protected List<CameraPinhole> listPinhole = new ArrayList<>();
 
+	// Refines the structure
+	public BundleAdjustment<SceneStructureMetric> bundleAdjustment;
+
 	// Bundle adjustment data structure and tuning parameters
 	public SceneStructureMetric structure;
 	public SceneObservations observations;
+
+	// How many features it will keep when pruning
+	public double pruneFraction = 0.7;
 
 	// shape of input images.
 	private int width, height; // TODO Get size for each image individually
@@ -154,7 +160,7 @@ public class ThreeViewEstimateMetricScene {
 		// Run bundle adjustment while make sure a valid solution is found
 		setupMetricBundleAdjustment(inliers);
 
-		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleAdjustmentMetric(configSBA);
+		bundleAdjustment = FactoryMultiView.bundleAdjustmentMetric(configSBA);
 		findBestValidSolution(bundleAdjustment);
 
 		// Prune outliers and run bundle adjustment one last time
@@ -199,8 +205,12 @@ public class ThreeViewEstimateMetricScene {
 	 * Prunes the features with the largest reprojection error
 	 */
 	private void pruneOutliers(BundleAdjustment<SceneStructureMetric> bundleAdjustment) {
+		System.out.println("Prune Fraction "+pruneFraction);
+		// see if it's configured to not prune
+		if( pruneFraction == 1.0 )
+			return;
 		PruneStructureFromSceneMetric pruner = new PruneStructureFromSceneMetric(structure,observations);
-		pruner.pruneObservationsByErrorRank(0.7);
+		pruner.pruneObservationsByErrorRank(pruneFraction);
 		pruner.pruneViews(10);
 		pruner.prunePoints(1);
 		bundleAdjustment.setParameters(structure,observations);
