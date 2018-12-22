@@ -317,7 +317,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		});
 
 		System.out.println("Computing Point Cloud");
-		showPointCloud(disparity,buff[0],leftToRight,rectifiedK,rectifiedR);
+		showPointCloud(disparity,visualRect1,leftToRight,rectifiedK,rectifiedR);
 
 		System.out.println("Success!");
 	}
