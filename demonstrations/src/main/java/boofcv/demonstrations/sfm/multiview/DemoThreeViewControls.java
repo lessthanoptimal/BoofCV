@@ -16,26 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.struct.image;
+package boofcv.demonstrations.sfm.multiview;
 
+import boofcv.gui.StandardAlgConfigPanel;
 
 /**
  * @author Peter Abeles
  */
-public class ImageDimension {
-	public int width;
-	public int height;
-
-	public ImageDimension(int width, int height) {
-		this.width = width;
-		this.height = height;
-	}
-
-	public ImageDimension() {
-	}
-
-	public void set( int width , int height ) {
-		this.width = width;
-		this.height = height;
-	}
+public class DemoThreeViewControls extends StandardAlgConfigPanel {
 }

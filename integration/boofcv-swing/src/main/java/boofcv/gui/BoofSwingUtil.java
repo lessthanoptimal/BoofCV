@@ -168,6 +168,23 @@ public class BoofSwingUtil {
 		}
 	}
 
+	/**
+	 * Figures out what the scale should be to fit the window inside the default display
+	 */
+	public static double selectZoomToFitInDisplay( int width , int height ) {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+		double w = screenSize.getWidth();
+		double h = screenSize.getHeight();
+
+		double scale = Math.max(width/w,height/h);
+		if( scale > 1.0 ) {
+			return 1.0/scale;
+		} else {
+			return 1.0;
+		}
+	}
+
 	public static JFormattedTextField createTextField( int current , int min , int max ) {
 		NumberFormat format = NumberFormat.getInstance();
 		NumberFormatter formatter = new NumberFormatter(format);

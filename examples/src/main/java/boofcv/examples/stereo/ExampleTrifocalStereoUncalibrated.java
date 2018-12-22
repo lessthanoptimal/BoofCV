@@ -151,8 +151,6 @@ public class ExampleTrifocalStereoUncalibrated {
 		FastQueue<BrightFeature> features02 = UtilFeature.createQueue(detDesc,100);
 		FastQueue<BrightFeature> features03 = UtilFeature.createQueue(detDesc,100);
 
-		detDesc.detect(image01);
-
 		// Converting data formats for the found features into what can be processed by SFM algorithms
 		// Notice how the image center is subtracted from the coordinates? In many cases a principle point
 		// of zero is assumed. This is a reasonable assumption in almost all modern cameras. Errors in
@@ -163,6 +161,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		double cx = width/2;
 		double cy = height/2;
 
+		detDesc.detect(image01);
 		for (int i = 0; i < detDesc.getNumberOfFeatures(); i++) {
 			Point2D_F64 pixel = detDesc.getLocation(i);
 			locations01.grow().set(pixel.x-cx,pixel.y-cy);

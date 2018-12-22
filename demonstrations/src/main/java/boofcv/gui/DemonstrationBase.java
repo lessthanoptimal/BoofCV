@@ -232,15 +232,18 @@ public abstract class DemonstrationBase extends JPanel {
 	 * Function that is invoked when an example has been selected
 	 */
 	public void openExample( Object o ) {
-		String path;
 		if (o instanceof PathLabel) {
-			path = ((PathLabel) o).getPath();
+			PathLabel p = (PathLabel)o;
+			if( p.path.length == 1 )
+				openFile(new File(p.path[0]));
+			else {
+				openFileSet(p.path);
+			}
 		} else if (o instanceof String) {
-			path = (String) o;
+			openFile(new File((String) o));
 		} else {
 			throw new IllegalArgumentException("Unknown example object type.  Please override openExample()");
 		}
-		openFile(new File(path));
 	}
 
 	/**
@@ -361,6 +364,10 @@ public abstract class DemonstrationBase extends JPanel {
 		} else if( allowImages ){
 			openImage(false,file.getName(), buffered);
 		}
+	}
+
+	public void openFileSet( String ...files ) {
+
 	}
 
 	/**

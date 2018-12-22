@@ -66,6 +66,9 @@ TODO For Release
     * Create regression tests from said images
 
 TODO next release
+  - Demonstrations
+    * Associate with Fundamental - Select different algs + inliers
+    * Associate with Trifocal Tensor
   - Self Calibration
     * Weighted iterated DIAC
   - Bundle Adjustment

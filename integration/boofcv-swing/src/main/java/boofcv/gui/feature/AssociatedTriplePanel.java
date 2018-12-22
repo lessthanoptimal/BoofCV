@@ -18,6 +18,7 @@
 
 package boofcv.gui.feature;
 
+import boofcv.gui.BoofSwingUtil;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -78,10 +79,11 @@ public class AssociatedTriplePanel extends JPanel {
 			this.image2 = image2;
 			this.image3 = image3;
 
+			// set the size so that it will fit inside the display
 			int w = image2.getWidth()+sep+image3.getWidth();
 			int h = Math.max(image2.getHeight(),image3.getHeight()) + sep + image1.getHeight();
-
-			setPreferredSize(new Dimension(w,h));
+			double scale = BoofSwingUtil.selectZoomToFitInDisplay(w,h);
+			setPreferredSize(new Dimension((int)(w*scale),(int)(h*scale)));
 			setMaximumSize(new Dimension(w,h));
 		}
 	}
