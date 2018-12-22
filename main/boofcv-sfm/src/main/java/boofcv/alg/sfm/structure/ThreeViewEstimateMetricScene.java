@@ -235,14 +235,20 @@ public class ThreeViewEstimateMetricScene {
 
 		// ensure that the points are in front of the camera and are a valid solution
 		if( checkBehindCamera(structure) ) {
+			if( verbose != null )
+				verbose.println("  flipping view");
 			flipAround(structure,observations);
+			bundleAdjustment.setParameters(structure,observations);
 			bundleAdjustment.optimize(structure);
 		}
 
 		double bestScore = bundleAdjustment.getFitScore();
-		List<Se3_F64> best = new ArrayList<>();
+		List<Se3_F64> bestPose = new ArrayList<>();
+		List<BundlePinholeSimplified> bestCameras = new ArrayList<>();
 		for (int i = 0; i < structure.views.length; i++) {
-			best.add(structure.views[i].worldToView.copy());
+			BundlePinholeSimplified c = structure.cameras[i].getModel();
+			bestPose.add(structure.views[i].worldToView.copy());
+			bestCameras.add( c.copy());
 		}
 
 		for (int i = 0; i < structure.cameras.length; i++) {
@@ -260,7 +266,10 @@ public class ThreeViewEstimateMetricScene {
 		bundleAdjustment.optimize(structure);
 
 		if( checkBehindCamera(structure) ) {
+			if( verbose != null )
+				verbose.println("  flipping view");
 			flipAround(structure,observations);
+			bundleAdjustment.setParameters(structure,observations);
 			bundleAdjustment.optimize(structure);
 		}
 
@@ -268,17 +277,18 @@ public class ThreeViewEstimateMetricScene {
 		if( verbose != null )
 			verbose.println(" ORIGINAL / NEW = " + bestScore+" / "+bundleAdjustment.getFitScore());
 		if( bundleAdjustment.getFitScore() > bestScore ) {
+			if( verbose != null )
+				verbose.println("  recomputing old structure");
 			for (int i = 0; i < structure.cameras.length; i++) {
 				BundlePinholeSimplified c = structure.cameras[i].getModel();
-				c.f = listPinhole.get(i).fx;
-				c.k1 = c.k2 = 0;
-			}
-			for (int i = 0; i < structure.views.length; i++) {
-				structure.views[i].worldToView.set(best.get(i));
+				c.set(bestCameras.get(i));
+				structure.views[i].worldToView.set(bestPose.get(i));
 			}
 			triangulatePoints(structure,observations);
 			bundleAdjustment.setParameters(structure,observations);
 			bundleAdjustment.optimize(structure);
+			if( verbose != null )
+				verbose.println("  score = "+bundleAdjustment.getFitScore());
 		}
 	}
 
@@ -407,7 +417,7 @@ public class ThreeViewEstimateMetricScene {
 	 * Checks to see if a solution was converged to where the points are behind the camera. This is
 	 * pysically impossible
 	 */
-	private static boolean checkBehindCamera(SceneStructureMetric structure ) {
+	private boolean checkBehindCamera(SceneStructureMetric structure ) {
 
 		int totalBehind = 0;
 		Point3D_F64 X = new Point3D_F64();
@@ -416,6 +426,11 @@ public class ThreeViewEstimateMetricScene {
 			if( X.z < 0 )
 				totalBehind++;
 		}
+
+		if( verbose != null ) {
+			verbose.println("points behind "+totalBehind+" / "+structure.points.length);
+		}
+
 		return totalBehind > structure.points.length/2;
 	}
 
@@ -424,6 +439,7 @@ public class ThreeViewEstimateMetricScene {
 	 * even if it's not technically something which can be inverted this way
 	 */
 	private static void flipAround(SceneStructureMetric structure, SceneObservations observations) {
+		// The first view will be identity
 		for (int i = 1; i < structure.views.length; i++) {
 			Se3_F64 w2v = structure.views[i].worldToView;
 			w2v.set(w2v.invert(null));

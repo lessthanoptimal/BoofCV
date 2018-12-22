@@ -252,6 +252,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		}
 
 		if( !skipStructure ) {
+			//structureEstimator.setVerbose(System.out,0);
 			System.out.println("Computing 3D structure. triplets " + associated.size);
 			if (!structureEstimator.process(associated.toList(), width, height)) {
 				System.err.println("Structure estimation failed!");

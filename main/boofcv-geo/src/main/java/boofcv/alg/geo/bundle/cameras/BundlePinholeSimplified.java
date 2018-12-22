@@ -20,6 +20,7 @@ package boofcv.alg.geo.bundle.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.FancyPrint;
 
 /**
  * A pinhole camera with radial distortion that is fully described using three parameters. Focal length and two
@@ -43,6 +44,15 @@ public class BundlePinholeSimplified implements BundleAdjustmentCamera {
 	public double f;
 	// radial distortion parameters
 	public double k1,k2;
+
+	public BundlePinholeSimplified() {
+	}
+
+	public BundlePinholeSimplified(double f, double k1, double k2) {
+		this.f = f;
+		this.k1 = k1;
+		this.k2 = k2;
+	}
 
 	@Override
 	public void setIntrinsic(double[] parameters, int offset) {
@@ -125,10 +135,22 @@ public class BundlePinholeSimplified implements BundleAdjustmentCamera {
 
 	@Override
 	public String toString() {
+		FancyPrint fp = new FancyPrint();
+
 		return "BundlePinholeSimplified{" +
-				"f=" + f +
-				", k1=" + k1 +
-				", k2=" + k2 +
+				"f=" + fp.s(f) +
+				", k1=" + fp.s(k1) +
+				", k2=" + fp.s(k2) +
 				'}';
+	}
+
+	public void set( BundlePinholeSimplified c ) {
+		this.f  = c.f;
+		this.k1 = c.k1;
+		this.k2 = c.k2;
+	}
+
+	public BundlePinholeSimplified copy() {
+		return new BundlePinholeSimplified(f,k1,k2);
 	}
 }

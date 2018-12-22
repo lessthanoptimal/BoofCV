@@ -1669,7 +1669,6 @@ public class MultiViewOps {
 			RemoveRadialPtoN_F64 p2n = new RemoveRadialPtoN_F64();
 			p2n.setK(cam.f,cam.f,0,0,0).setDistortion(new double[]{cam.k1,cam.k2},0,0);
 			list_p_to_n.add(p2n);
-
 		}
 
 		FastQueue<Point2D_F64> normObs = new FastQueue<>(Point2D_F64.class,true);
