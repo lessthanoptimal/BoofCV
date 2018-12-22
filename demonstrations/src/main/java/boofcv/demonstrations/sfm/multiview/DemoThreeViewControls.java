@@ -48,7 +48,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	JButton bCompute = new JButton("Compute");
 
 	int view=0;
-	int maxImageSize=500;
+	int maxImageSize=800;
 	double inliers = 1.0;
 	int prune = 10;
 	boolean autoFocal=true;
@@ -57,6 +57,10 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	int maxDisparity = 255;
 
 	DemoThreeViewStereoApp owner;
+
+	boolean scaleChanged = false;
+	boolean assocChanged = false;
+	boolean stereoChanged = false;
 
 	public DemoThreeViewControls( DemoThreeViewStereoApp owner ) {
 		this.owner = owner;
@@ -80,19 +84,40 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		addLabeled(sMaxDisparity,"Max Disparity");
 		addVerticalGlue();
 		addAlignCenter(bCompute);
+
+		disableComputeButton();
 	}
 
 	public void setViews( int which ) {
 		imageView.setSelectedIndex(which);
 	}
 
+	public void disableComputeButton() {
+		bCompute.setEnabled(false);
+
+		scaleChanged = false;
+		assocChanged = false;
+		stereoChanged = false;
+	}
+
 	@Override
 	public void stateChanged(ChangeEvent e) {
+		boolean compute = true;
 		if( e.getSource() == sMinDisparity ) {
 			minDisparity = ((Number)sMinDisparity.getValue()).intValue();
+			stereoChanged = true;
 		} else if( e.getSource() == sMaxDisparity ) {
 			maxDisparity = ((Number)sMaxDisparity.getValue()).intValue();
+			stereoChanged = true;
+		} else if( e.getSource() == sInliers ) {
+			inliers = ((Number)sInliers.getValue()).doubleValue();
+			stereoChanged = true;
+		} else if( e.getSource() == sMaxSize ) {
+			maxImageSize = ((Number)sMaxSize.getValue()).intValue();
+			scaleChanged = true;
 		}
+		if( compute )
+			bCompute.setEnabled(true);
 	}
 
 	@Override
@@ -100,6 +125,8 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		if( e.getSource() == imageView ) {
 			view = imageView.getSelectedIndex();
 			owner.updateVisibleGui();
+		} else if( e.getSource() == bCompute ) {
+			owner.handleComputePressed();
 		}
 	}
 }

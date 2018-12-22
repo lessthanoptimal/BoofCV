@@ -71,6 +71,7 @@ public abstract class DemonstrationBase extends JPanel {
 	volatile boolean inputSizeKnown = false;
 
 	protected String inputFilePath;
+	protected String inputFileSet[];
 
 	// Storage for input list of input streams.  always synchronize before manipulating
 	private final List<CacheSequenceStream> inputStreams = new ArrayList<>();
@@ -393,6 +394,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 		synchronized (inputStreams) {
 			inputMethod = InputMethod.IMAGE_SET;
+			inputFileSet = files;
 			if( threadProcess != null )
 				throw new RuntimeException("There is still an active stream thread!");
 			threadProcess = new ProcessImageSetThread(files);
@@ -829,6 +831,8 @@ public abstract class DemonstrationBase extends JPanel {
 		} else if( inputMethod == InputMethod.IMAGE ) {
 			BufferedImage buff = inputStreams.get(0).getBufferedImage();
 			openImage(true,new File(inputFilePath).getName(),buff);// TODO still does a pointless image conversion
+		} else if( inputMethod == InputMethod.IMAGE_SET ) {
+			openImageSet(inputFileSet);
 		}
 	}
 

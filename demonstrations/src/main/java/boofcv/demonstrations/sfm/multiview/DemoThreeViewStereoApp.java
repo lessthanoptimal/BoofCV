@@ -67,6 +67,7 @@ import org.ejml.ops.ConvertMatrixData;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -178,11 +179,33 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	}
 
 	void handleComputePressed() {
-		// TODO handle this
+		// If the scale changes then the images need to be loaded again because they are
+		// scaled upon input
+		if( controls.scaleChanged ) {
+			reprocessInput();
+		} else {
+			boolean skipAssociate = true;
+			boolean skipStructure = true;
+
+			if (controls.assocChanged) {
+				skipAssociate = false;
+				skipStructure = false;
+			}
+			if (controls.stereoChanged) {
+				skipStructure = false;
+			}
+
+			boolean _assoc = skipAssociate;
+			boolean _struct = skipStructure;
+
+			new Thread(()-> processImages(_assoc, _struct)).start();
+		}
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
+	public void processImage(int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input) {
+
+		BufferedImage buffered = scaleBuffered(bufferedIn);
 
 		if( sourceID == 0 ) {
 			BoofSwingUtil.invokeNowOrLater(()->{
@@ -191,6 +214,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			});
 		}
 
+		// ok this is ugly.... find a way to not convert the image twice
+		ConvertBufferedImage.convertFrom(buffered,input,true);
 		System.out.println("Processing image "+sourceID+"  shape "+input.width+" "+input.height);
 		System.out.println("  "+inputFilePath);
 		dimensions[sourceID].set(input.width,input.height);
@@ -219,8 +244,33 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		processImages(false,false);
 	}
 
+	/**
+	 * Scale buffered image so that it meets the image size restrictions
+	 */
+	private BufferedImage scaleBuffered( BufferedImage input ) {
+		int m = Math.max(input.getWidth(),input.getHeight());
+		if( m <= controls.maxImageSize )
+			return input;
+		else {
+			double scale = controls.maxImageSize/(double)m;
+			int w = (int)(scale*input.getWidth()+0.5);
+			int h = (int)(scale*input.getHeight()+0.5);
+
+			BufferedImage output = new BufferedImage(w,h,input.getType());
+			Graphics2D g2 = output.createGraphics();
+			// high quality render
+			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+			g2.setTransform(new AffineTransform(scale,0,0,scale,0,0));
+			g2.drawImage(input,0,0,null);
+			return output;
+		}
+	}
+
 	private void processImages( boolean skipAssociate , boolean skipStructure ) {
-		// TODO disable GUI
+		SwingUtilities.invokeLater(()->{
+			// TODO disable GUI
+			controls.disableComputeButton();
+		});
 
 		int width = buff[0].getWidth();
 		int height = buff[0].getHeight();
@@ -252,6 +302,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		}
 
 		if( !skipStructure ) {
+			structureEstimator.configRansac.inlierThreshold = controls.inliers;
+
 			//structureEstimator.setVerbose(System.out,0);
 			System.out.println("Computing 3D structure. triplets " + associated.size);
 			if (!structureEstimator.process(associated.toList(), width, height)) {
