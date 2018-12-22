@@ -20,8 +20,9 @@ package boofcv.examples.stereo;
 
 import boofcv.abst.geo.bundle.*;
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
-import boofcv.alg.geo.selfcalib.SelfCalibrationGuessAndCheckFocus;
+import boofcv.alg.geo.selfcalib.EstimatePlaneAtInfinityGivenK;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
@@ -33,6 +34,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
+import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ejml.data.DMatrixRMaj;
@@ -82,31 +84,25 @@ public class ExampleStereoUncalibrated {
 	public static void main( String args[] ) {
 
 		// Successful
-		String name = "rock_leaves_";
-//		String name = "minecraft_cave_";
-//		String name = "pebbles";
-//		String name = "mono_wall_";
-//		String name = "barrel";
-//		String name = "power_";
-//		String name = "triflowers";
-//		String name = "puddle";
+		String name = "mono_wall_";
+//		String name = "bobcats_";
+//		String name = "minecraft_cave1_";
+//		String name = "chicken_";
+//		String name = "books_";
 
 		// Successful Failures
-//		String name = "waterdrip";
-//		String name = "skull";
-//		String name = "deer";
-//		String name = "books";
+//		String name = "triflowers_";
 
 		// Failures
-//		String name = "rockview";
-//		String name = "bobcats";
-//		String name = "seal";
-//		String name = "turkey";
-//		String name = "chicken";
-//		String name = "library";
+//		String name = "rock_leaves_";
+//		String name = "minecraft_distant_";
+//		String name = "rockview_";
+//		String name = "pebbles_";
+//		String name = "skull_";
+//		String name = "turkey_";
 
-		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/"+name+"01.png"));
-		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/"+name+"02.png"));
+		BufferedImage buff01 = UtilImageIO.loadImage(UtilIO.pathExample("triple/"+name+"01.jpg"));
+		BufferedImage buff02 = UtilImageIO.loadImage(UtilIO.pathExample("triple/"+name+"02.jpg"));
 
 		Planar<GrayU8> color01 = ConvertBufferedImage.convertFrom(buff01,true, ImageType.pl(3,GrayU8.class));
 		Planar<GrayU8> color02 = ConvertBufferedImage.convertFrom(buff02,true, ImageType.pl(3,GrayU8.class));
@@ -131,18 +127,17 @@ public class ExampleStereoUncalibrated {
 		double fx = width/2; double fy = fx;
 		double cx = width/2; double cy = height/2;
 
-		// Compute an approximation of the rectifying homography by testing out numerious
-		// values for focal length
-		SelfCalibrationGuessAndCheckFocus selfcalib = new SelfCalibrationGuessAndCheckFocus();
-//		selfcalib.setVerbose(System.out,0);
-		selfcalib.setCamera(0,cx,cy,width,height);
-		selfcalib.setSingleCamera(true); // assumes the intrinsic parameters do not change between the two views
-		List<DMatrixRMaj> cameraMatrices = new ArrayList<>();
-		cameraMatrices.add(P2);
-		if( !selfcalib.process(cameraMatrices) )
-			throw new RuntimeException("Self calibration failed!");
+		// Compute a transform from projective to metric by assuming we know the camera's calibration
+		EstimatePlaneAtInfinityGivenK estimateV = new EstimatePlaneAtInfinityGivenK();
+		estimateV.setCamera1(fx,fy,0,cx,cy);
+		estimateV.setCamera2(fx,fy,0,cx,cy);
 
-		DMatrixRMaj H = selfcalib.getRectifyingHomography();
+		Vector3D_F64 v = new Vector3D_F64(); // plane at infinity
+		if( !estimateV.estimatePlaneAtInfinity(P2,v))
+			throw new RuntimeException("Failed!");
+
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(fx,fy,0,cx,cy);
+		DMatrixRMaj H = MultiViewOps.createProjectiveToMetric(K,v.x,v.y,v.z,1,null);
 		DMatrixRMaj P2m = new DMatrixRMaj(3,4);
 		CommonOps_DDRM.mult(P2,H,P2m);
 
