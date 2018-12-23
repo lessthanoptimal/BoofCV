@@ -79,6 +79,10 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 
 		textInfo.setEditable(false);
 
+		if( autoFocal ) {
+			sFocal.setEnabled(false);
+		}
+
 		addLabeled(imageView,"View");
 		addLabeled(sMaxSize,"Image Size");
 		addLabeled(sInliers,"Inliers");
@@ -129,6 +133,9 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		} else if( e.getSource() == sPrune ) {
 			prune = ((Number)sInliers.getValue()).intValue();
 			stereoChanged = true;
+		} else if( e.getSource() == sFocal ) {
+			focal = ((Number)sFocal.getValue()).intValue();
+			stereoChanged = true;
 		} else if( e.getSource() == sMaxSize ) {
 			maxImageSize = ((Number)sMaxSize.getValue()).intValue();
 			scaleChanged = true;
@@ -142,6 +149,11 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		if( e.getSource() == imageView ) {
 			view = imageView.getSelectedIndex();
 			owner.updateVisibleGui();
+		} else if( e.getSource() == cFocalAuto ) {
+			autoFocal = cFocalAuto.isSelected();
+			sFocal.setEnabled(!autoFocal);
+			stereoChanged = true;
+			bCompute.setEnabled(true);
 		} else if( e.getSource() == bCompute ) {
 			owner.handleComputePressed();
 		}

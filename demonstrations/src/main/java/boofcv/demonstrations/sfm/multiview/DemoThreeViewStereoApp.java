@@ -118,6 +118,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	BufferedImage visualRect1= new BufferedImage(1,1, BufferedImage.TYPE_INT_RGB),
 			visualRect2= new BufferedImage(1,1, BufferedImage.TYPE_INT_RGB);
 
+	final Object lockProcessing = new Object();
+	boolean processing = false;
+	boolean hasAllImages = false;
 
 	public DemoThreeViewStereoApp(List<PathLabel> examples) {
 		super(false, false, examples, ImageType.single(GrayU8.class));
@@ -178,7 +181,28 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		gui.repaint();
 	}
 
+	/**
+	 * Prevent the user from tring to process more than one image at once
+	 */
+	@Override
+	public void openImageSet(String ...files ) {
+		synchronized (lockProcessing) {
+			if( processing ) {
+				JOptionPane.showMessageDialog(this, "Still processing");
+				return;
+			}
+		}
+		// disable the menu until it finish processing the images
+		setMenuBarEnabled(false);
+		super.openImageSet(files);
+	}
+
 	void handleComputePressed() {
+		if( isProcessing() ) {
+			System.err.println("Not finished with previous computation");
+			return;
+		}
+
 		// If the scale changes then the images need to be loaded again because they are
 		// scaled upon input
 		if( controls.scaleChanged ) {
@@ -198,12 +222,15 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			boolean _assoc = skipAssociate;
 			boolean _struct = skipStructure;
 
-			new Thread(()-> processImages(_assoc, _struct)).start();
+			new Thread(()-> safeProcessImages(_assoc, _struct)).start();
 		}
 	}
 
 	@Override
 	public void processImage(int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input) {
+		synchronized (lockProcessing) {
+			hasAllImages = false;
+		}
 
 		BufferedImage buffered = scaleBuffered(bufferedIn);
 
@@ -241,7 +268,17 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		if( sourceID < 2 )
 			return;
 
-		processImages(false,false);
+		synchronized (lockProcessing) {
+			hasAllImages = true;
+		}
+
+		safeProcessImages(false,false);
+	}
+
+	private boolean isProcessing() {
+		synchronized (lockProcessing) {
+			return processing;
+		}
 	}
 
 	/**
@@ -266,6 +303,32 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		}
 	}
 
+	private void safeProcessImages( boolean skipAssociate , boolean skipStructure ) {
+		// bad stuff happens if processing is called twice at once
+		synchronized (lockProcessing) {
+			if( processing )
+				throw new RuntimeException("Called processing while processing!");
+			if( !hasAllImages )
+				throw new RuntimeException("Called when not ready");
+			processing = true;
+		}
+
+		// prevent user from opening another image at the same time
+		SwingUtilities.invokeLater(()->setMenuBarEnabled(false));
+
+		try {
+			processImages(skipAssociate,skipStructure);
+		} catch (RuntimeException e ) {
+
+		} finally {
+			SwingUtilities.invokeLater(()->setMenuBarEnabled(true));
+
+			synchronized (lockProcessing) {
+				processing = false;
+			}
+		}
+	}
+
 	private void processImages( boolean skipAssociate , boolean skipStructure ) {
 		int width = buff[0].getWidth();
 		int height = buff[0].getHeight();
@@ -278,8 +341,6 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		});
 
 		long time0 = System.currentTimeMillis();
-
-
 
 		double cx = width/2;
 		double cy = height/2;
@@ -314,11 +375,16 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		if( !skipStructure ) {
 			structureEstimator.configRansac.inlierThreshold = controls.inliers;
 			structureEstimator.pruneFraction = (100-controls.prune)/100.0;
+			if( controls.autoFocal ) {
+				structureEstimator.manualFocalLength = -1;
+			} else {
+				structureEstimator.manualFocalLength = controls.focal;
+			}
 
 			//structureEstimator.setVerbose(System.out,0);
 			System.out.println("Computing 3D structure. triplets " + associated.size);
 			if (!structureEstimator.process(associated.toList(), width, height)) {
-				System.err.println("Structure estimation failed!");
+				SwingUtilities.invokeLater(()-> controls.addText("SBA Failed!\n"));
 				return;
 			}
 
@@ -377,7 +443,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		});
 
 		if (rectifiedK.get(0, 0) < 0) {
-			JOptionPane.showMessageDialog(this, "Rectification Failed! aborting");
+			SwingUtilities.invokeLater(()-> controls.addText("Rectification Failed!\n"));
 			return;
 		}
 
@@ -403,8 +469,6 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		});
 
 		System.out.println("Success!");
-
-
 	}
 
 	public <C extends ImageBase<C> >

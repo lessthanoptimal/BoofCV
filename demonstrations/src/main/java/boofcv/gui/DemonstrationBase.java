@@ -211,6 +211,13 @@ public abstract class DemonstrationBase extends JPanel {
 		}
 	}
 
+	protected void setMenuBarEnabled( boolean enabled ) {
+		menuBar.setEnabled(enabled);
+		for (int i = 0; i < menuBar.getMenuCount(); i++) {
+			menuBar.getMenu(i).setEnabled(enabled);
+		}
+	}
+
 	/**
 	 * Updates the list in recent menu
 	 */

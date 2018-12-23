@@ -26,7 +26,9 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
+import boofcv.alg.geo.selfcalib.EstimatePlaneAtInfinityGivenK;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.factory.geo.*;
 import boofcv.misc.ConfigConverge;
@@ -34,6 +36,7 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
@@ -104,6 +107,9 @@ public class ThreeViewEstimateMetricScene {
 	// Bundle adjustment data structure and tuning parameters
 	public SceneStructureMetric structure;
 	public SceneObservations observations;
+
+	// If a positive number the focal length will be assumed to be that
+	public double manualFocalLength=-1;
 
 	// How many features it will keep when pruning
 	public double pruneFraction = 0.7;
@@ -205,7 +211,6 @@ public class ThreeViewEstimateMetricScene {
 	 * Prunes the features with the largest reprojection error
 	 */
 	private void pruneOutliers(BundleAdjustment<SceneStructureMetric> bundleAdjustment) {
-		System.out.println("Prune Fraction "+pruneFraction);
 		// see if it's configured to not prune
 		if( pruneFraction == 1.0 )
 			return;
@@ -362,25 +367,55 @@ public class ThreeViewEstimateMetricScene {
 	 * @return true if successful
 	 */
 	boolean projectiveToMetric() {
-		// Estimate calibration parameters
-		SelfCalibrationLinearDualQuadratic selfcalib = new SelfCalibrationLinearDualQuadratic(1.0);
-		selfcalib.addCameraMatrix(P1);
-		selfcalib.addCameraMatrix(P2);
-		selfcalib.addCameraMatrix(P3);
 
+		// homography from projective to metric
+		DMatrixRMaj H = new DMatrixRMaj(4,4);
 		listPinhole.clear();
-		GeometricResult result = selfcalib.solve();
-		if(GeometricResult.SOLVE_FAILED != result && selfcalib.getSolutions().size()==3) {
-			for (int i = 0; i < 3; i++) {
-				SelfCalibrationLinearDualQuadratic.Intrinsic c = selfcalib.getSolutions().get(i);
-				CameraPinhole p = new CameraPinhole(c.fx,c.fy,0,0,0,width,height);
-				listPinhole.add(p);
+
+		if( manualFocalLength <= 0 ) {
+			// Estimate calibration parameters
+			SelfCalibrationLinearDualQuadratic selfcalib = new SelfCalibrationLinearDualQuadratic(1.0);
+			selfcalib.addCameraMatrix(P1);
+			selfcalib.addCameraMatrix(P2);
+			selfcalib.addCameraMatrix(P3);
+
+			GeometricResult result = selfcalib.solve();
+			if (GeometricResult.SOLVE_FAILED != result && selfcalib.getSolutions().size() == 3) {
+				for (int i = 0; i < 3; i++) {
+					SelfCalibrationLinearDualQuadratic.Intrinsic c = selfcalib.getSolutions().get(i);
+					CameraPinhole p = new CameraPinhole(c.fx, c.fy, 0, 0, 0, width, height);
+					listPinhole.add(p);
+				}
+			} else {
+				// TODO Handle this better
+				System.out.println("Self calibration failed!");
+				for (int i = 0; i < 3; i++) {
+					CameraPinhole p = new CameraPinhole(width / 2, width / 2, 0, 0, 0, width, height);
+					listPinhole.add(p);
+				}
+			}
+			// convert camera matrix from projective to metric
+			if( !MultiViewOps.absoluteQuadraticToH(selfcalib.getQ(),H) ) {
+				if( verbose != null ) {
+					verbose.println("Projective to metric failed");
+				}
+				return false;
 			}
 		} else {
-			// TODO Handle this better
-			System.out.println("Self calibration failed!");
+			// Assume all cameras have a fixed known focal length
+			EstimatePlaneAtInfinityGivenK estimateV = new EstimatePlaneAtInfinityGivenK();
+			estimateV.setCamera1(manualFocalLength,manualFocalLength,0,0,0);
+			estimateV.setCamera2(manualFocalLength,manualFocalLength,0,0,0);
+
+			Vector3D_F64 v = new Vector3D_F64(); // plane at infinity
+			if( !estimateV.estimatePlaneAtInfinity(P2,v))
+				throw new RuntimeException("Failed!");
+
+			DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(manualFocalLength,manualFocalLength,0,0,0);
+			MultiViewOps.createProjectiveToMetric(K,v.x,v.y,v.z,1,H);
+
 			for (int i = 0; i < 3; i++) {
-				CameraPinhole p = new CameraPinhole(width/2,width/2,0,0,0,width,height);
+				CameraPinhole p = new CameraPinhole(manualFocalLength,manualFocalLength, 0, 0, 0, width, height);
 				listPinhole.add(p);
 			}
 		}
@@ -391,14 +426,6 @@ public class ThreeViewEstimateMetricScene {
 				verbose.println("fx=" + r.fx + " fy=" + r.fy + " skew=" + r.skew);
 			}
 			verbose.println("Projective to metric");
-		}
-		// convert camera matrix from projective to metric
-		DMatrixRMaj H = new DMatrixRMaj(4,4);
-		if( !MultiViewOps.absoluteQuadraticToH(selfcalib.getQ(),H) ) {
-			if( verbose != null ) {
-				verbose.println("Projective to metric failed");
-			}
-			return false;
 		}
 
 		DMatrixRMaj K = new DMatrixRMaj(3,3);
