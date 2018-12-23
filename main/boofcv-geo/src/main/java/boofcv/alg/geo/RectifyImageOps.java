@@ -447,7 +447,7 @@ public class RectifyImageOps {
 		// TODO make this more efficient and correct
 		int r = radius;
 		for (int y = r; y < mask.height-r; y++) {
-			int indexMsk = y*mask.stride;
+			int indexMsk = y*mask.stride+r;
 			for (int x = r; x < mask.width-r-1; x++,indexMsk++) {
 				if( (mask.data[indexMsk] + mask.data[indexMsk+1])%2 != 0 ||
 						(mask.data[indexMsk] + mask.data[indexMsk+mask.width])%2 != 0 ) {
@@ -483,7 +483,7 @@ public class RectifyImageOps {
 		// TODO make this more efficient and correct
 		int r = radius;
 		for (int y = r; y < mask.height-r; y++) {
-			int indexMsk = y*mask.stride;
+			int indexMsk = y*mask.stride+r;
 			for (int x = r; x < mask.width-r-1; x++,indexMsk++) {
 				if( (mask.data[indexMsk] + mask.data[indexMsk+1])%2 != 0 ||
 						(mask.data[indexMsk] + mask.data[indexMsk+mask.width])%2 != 0 ) {
