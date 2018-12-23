@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 
 /**
@@ -68,6 +69,30 @@ public abstract class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output
 				if( dstToSrc.distX >= 0 && dstToSrc.distX <= maxWidth &&
 						dstToSrc.distY >= 0 && dstToSrc.distY <= maxHeight ) {
 					assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
+				}
+			}
+		}
+	}
+
+	@Override
+	public void applyOnlyInside( GrayU8 mask ) {
+
+		float maxWidth = srcImg.getWidth()-1;
+		float maxHeight = srcImg.getHeight()-1;
+
+		for( int y = y0; y < y1; y++ ) {
+			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
+			int indexMsk = mask.startIndex + mask.stride*y + x0;
+
+			for( int x = x0; x < x1; x++ , indexDst++ , indexMsk++ ) {
+				dstToSrc.compute(x,y);
+
+				if( dstToSrc.distX >= 0 && dstToSrc.distX <= maxWidth &&
+						dstToSrc.distY >= 0 && dstToSrc.distY <= maxHeight ) {
+					assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
+					mask.data[indexMsk] = 1;
+				} else {
+					mask.data[indexMsk] = 0;
 				}
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 
 /**
@@ -72,6 +73,15 @@ public abstract class ImageDistortBasic
 	}
 
 	@Override
+	public void apply(Input srcImg, Output dstImg, GrayU8 mask ) {
+		init(srcImg, dstImg);
+
+		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
+
+		applyOnlyInside(mask);
+	}
+
+	@Override
 	public void apply(Input srcImg, Output dstImg, int dstX0, int dstY0, int dstX1, int dstY1) {
 		init(srcImg, dstImg);
 
@@ -93,6 +103,8 @@ public abstract class ImageDistortBasic
 
 	protected abstract void applyOnlyInside();
 
+	protected abstract void applyOnlyInside( GrayU8 mask );
+
 	@Override
 	public void setRenderAll(boolean renderAll) {
 		this.renderAll = renderAll;
@@ -101,5 +113,10 @@ public abstract class ImageDistortBasic
 	@Override
 	public boolean getRenderAll() {
 		return renderAll;
+	}
+
+	@Override
+	public PixelTransform2_F32 getModel() {
+		return dstToSrc;
 	}
 }

@@ -31,8 +31,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.CommonOps_FDRM;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -267,4 +266,15 @@ public class TestRectifyImageOps {
 		assertEquals(expected.x, found.x, 1e-4);
 		assertEquals(expected.y, found.y, 1e-4);
 	}
+
+	@Test
+	void applyMask_F32() {
+		fail("Implement");
+	}
+
+	@Test
+	void applyMask_U8() {
+		fail("Implement");
+	}
+
 }

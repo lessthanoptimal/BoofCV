@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 
 
@@ -38,7 +39,7 @@ public interface ImageDistort<Input extends ImageBase,Output extends ImageBase> 
 	 *
 	 * @param dstToSrc Pixel coordinate transformation.
 	 */
-	public void setModel( PixelTransform2_F32 dstToSrc );
+	void setModel( PixelTransform2_F32 dstToSrc );
 
 	/**
 	 * Applies the transform to the entire destination image.
@@ -46,7 +47,17 @@ public interface ImageDistort<Input extends ImageBase,Output extends ImageBase> 
 	 * @param srcImg Input image. Not modified.
 	 * @param dstImg Output image. Modified.
 	 */
-	public void apply( Input srcImg , Output dstImg );
+	void apply( Input srcImg , Output dstImg );
+
+	/**
+	 * Applies the transform, but marks pixels in the mask as 1 = inside, 0 = outside. Where
+	 * inside pixels are pixels in the dst image with an equivalent pixel in the src image's bounds
+	 *
+	 * @param srcImg Input image. Not modified.
+	 * @param dstImg Output image. Modified.
+	 * @param mask Mask. Modified.
+	 */
+	void apply( Input srcImg , Output dstImg , GrayU8 mask );
 
 	/**
 	 * Applies the transform to only the specified region inside the destination image.
@@ -58,7 +69,7 @@ public interface ImageDistort<Input extends ImageBase,Output extends ImageBase> 
 	 * @param dstX1 Right most crop boundary. Exclusive.
 	 * @param dstY1 Bottom most crop boundary. Exclusive.
 	 */
-	public void apply( Input srcImg , Output dstImg , int dstX0 , int dstY0 , int dstX1 , int dstY1 );
+	void apply( Input srcImg , Output dstImg , int dstX0 , int dstY0 , int dstX1 , int dstY1 );
 
 	/**
 	 * Specifies if the entire output image should be rendered, even if mapping to the source image is outside
@@ -66,11 +77,18 @@ public interface ImageDistort<Input extends ImageBase,Output extends ImageBase> 
 	 *
 	 * @param renderAll true to render all pixels or false only ones inside the source image
 	 */
-	public void setRenderAll( boolean renderAll );
+	void setRenderAll( boolean renderAll );
 
 	/**
 	 * Returns the render all flag
 	 * @return render all flag
 	 */
-	public boolean getRenderAll();
+	boolean getRenderAll();
+
+	/**
+	 * Returns the distortion model.
+	 * @return model dst to src
+	 */
+	PixelTransform2_F32 getModel();
+
 }

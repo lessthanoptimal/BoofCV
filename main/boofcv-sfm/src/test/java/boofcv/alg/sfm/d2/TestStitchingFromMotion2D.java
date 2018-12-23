@@ -28,6 +28,7 @@ import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.affine.Affine2D_F64;
 import org.junit.jupiter.api.Test;
@@ -323,6 +324,9 @@ public class TestStitchingFromMotion2D {
 		}
 
 		@Override
+		public void apply(ImageBase srcImg, ImageBase dstImg, GrayU8 mask) {numApply++;}
+
+		@Override
 		public void apply(ImageBase srcImg, ImageBase dstImg, int dstX0, int dstY0, int dstX1, int dstY1) {
 			numApply++;
 		}
@@ -332,5 +336,8 @@ public class TestStitchingFromMotion2D {
 
 		@Override
 		public boolean getRenderAll() {return false;}
+
+		@Override
+		public PixelTransform2_F32 getModel() {return null;}
 	}
 }

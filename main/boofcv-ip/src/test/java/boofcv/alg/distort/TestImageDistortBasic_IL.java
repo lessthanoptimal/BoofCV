@@ -26,8 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -92,6 +91,11 @@ public class TestImageDistortBasic_IL {
 		alg.setModel(tran);
 		alg.apply(new InterleavedF32(10, 15,NUM_BANDS),new InterleavedF32(10, 15,NUM_BANDS));
 		assertEquals(9*14,alg.getTotal());
+	}
+
+	@Test
+	public void applyOnlyInside_mask() {
+		fail("implement");
 	}
 
 	private static class Helper extends ImageDistortBasic_IL<InterleavedF32,InterleavedF32> {

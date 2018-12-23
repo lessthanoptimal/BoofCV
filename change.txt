@@ -29,6 +29,8 @@ Version : 0.32
   * Fixed transformChangeModel() it was undistorting twice when it should have undist then dist
   * Split some of the code between F32 and F64
   * Bound now works on arbitrary distortions
+- ImageDistort
+  * Can compute a mask that indicates which pixels were outside of the source image
 - Geometry
   * Fixed bug in Linear Trifocal Tensor estimator
   * Robust trifocal tensor estimation
@@ -42,6 +44,8 @@ Version : 0.32
   * Cleaned up naming scheme for triangulation algorithms
   * Refine three view camera matrix (i.e. trifocal tensor)
   * Many more new functions/algorithms added
+- Rectification
+  * Can apply a mask to disparity to remove false matches caused by image border in rectified images
 - Self Calibration
   * Plane at infinity given intrinsic parameters
   * SelfCalibrationGuessAndCheckF based on "Pratical Autocalibration" 2010
@@ -59,11 +63,8 @@ Version : 0.32
 
 
 TODO For Release
-  - remove false stereo at edges of rectified image
   - Trifocal Stereo Demonstration Application
-  - Trifocal Stereo
-    * Work in all example images
-    * Create regression tests from said images
+  - Fix or explain fiducial speed regression
 
 TODO next release
   - Demonstrations

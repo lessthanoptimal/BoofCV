@@ -24,8 +24,7 @@ import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -90,6 +89,11 @@ public class TestImageDistortBasic_SB {
 		alg.setModel(tran);
 		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
 		assertEquals(9*14,alg.getTotal());
+	}
+
+	@Test
+	public void applyOnlyInside_mask() {
+		fail("implement");
 	}
 
 	private static class Helper extends ImageDistortBasic_SB {

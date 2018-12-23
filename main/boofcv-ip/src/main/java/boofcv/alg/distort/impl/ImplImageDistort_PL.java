@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
 import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
 
@@ -54,6 +55,21 @@ public class ImplImageDistort_PL<Input extends ImageGray<Input>,Output extends I
 	}
 
 	@Override
+	public void apply(Planar<Input> srcImg, Planar<Output> dstImg, GrayU8 mask ) {
+		if( srcImg.getNumBands() != dstImg.getNumBands() )
+			throw new IllegalArgumentException("Number of bands must be the same. "+srcImg.getNumBands()+" vs "+dstImg.getNumBands());
+		int N = srcImg.getNumBands();
+
+		for( int i = 0; i < N; i++ ) {
+			// save a little bit of CPU by only computing the mask once
+			if( i == 0 )
+				layerDistort.apply(srcImg.getBand(i),dstImg.getBand(i),mask);
+			else
+				layerDistort.apply(srcImg.getBand(i),dstImg.getBand(i));
+		}
+	}
+
+	@Override
 	public void apply(Planar<Input> srcImg, Planar<Output> dstImg,
 					  int dstX0, int dstY0, int dstX1, int dstY1) {
 		if( srcImg.getNumBands() != dstImg.getNumBands() )
@@ -73,5 +89,10 @@ public class ImplImageDistort_PL<Input extends ImageGray<Input>,Output extends I
 	@Override
 	public boolean getRenderAll() {
 		return layerDistort.getRenderAll();
+	}
+
+	@Override
+	public PixelTransform2_F32 getModel() {
+		return layerDistort.getModel();
 	}
 }

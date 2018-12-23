@@ -139,6 +139,7 @@ public class DisparityToColorPointCloud {
 
 				value += minDisparity;
 
+				// The point lies at infinity.
 				if( value == 0 )
 					continue;
 
@@ -167,11 +168,13 @@ public class DisparityToColorPointCloud {
 			for( int pixelX = 0; pixelX < disparity.width; pixelX++ ) {
 				float value = disparity.data[index++];
 
+				// invalid disparity
 				if( value >= rangeDisparity )
 					continue;
 
 				value += minDisparity;
 
+				// The point lies at infinity.
 				if( value == 0 )
 					continue;
 

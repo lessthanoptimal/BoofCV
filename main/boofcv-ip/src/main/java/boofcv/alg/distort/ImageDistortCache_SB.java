@@ -20,6 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
 
@@ -77,6 +78,15 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 			renderAll();
 		else
 			applyOnlyInside();
+	}
+
+	@Override
+	public void apply(Input srcImg, Output dstImg, GrayU8 mask) {
+		init(srcImg, dstImg);
+
+		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
+
+		applyOnlyInside(mask);
 	}
 
 	@Override
@@ -146,6 +156,27 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 		}
 	}
 
+	public void applyOnlyInside( GrayU8 mask ) {
+		float maxWidth = srcImg.getWidth()-1;
+		float maxHeight = srcImg.getHeight()-1;
+
+		for( int y = y0; y < y1; y++ ) {
+			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
+			int indexMsk = mask.startIndex + mask.stride*y + x0;
+
+			for( int x = x0; x < x1; x++ , indexDst++ , indexMsk++ ) {
+				Point2D_F32 s = map[indexDst];
+
+				if( s.x >= 0 && s.x <= maxWidth && s.y >= 0 && s.y <= maxHeight ) {
+					assign(indexDst,interp.get(s.x, s.y));
+					mask.data[indexMsk] = 1;
+				} else {
+					mask.data[indexMsk] = 0;
+				}
+			}
+		}
+	}
+
 	protected abstract void assign( int indexDst , float value );
 
 	public Point2D_F32[] getMap() {
@@ -168,5 +199,10 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 	@Override
 	public boolean getRenderAll() {
 		return renderAll;
+	}
+
+	@Override
+	public PixelTransform2_F32 getModel() {
+		return dstToSrc;
 	}
 }

@@ -108,9 +108,10 @@ public class ExampleStereoTwoViewsOneCamera {
 		DMatrixRMaj rectifiedR = new DMatrixRMaj(3, 3);
 		GrayU8 rectifiedLeft = distortedLeft.createSameShape();
 		GrayU8 rectifiedRight = distortedRight.createSameShape();
+		GrayU8 rectifiedMask = distortedLeft.createSameShape();
 
 		rectifyImages(distortedLeft, distortedRight, leftToRight, intrinsic,intrinsic,
-				rectifiedLeft, rectifiedRight, rectifiedK,rectifiedR);
+				rectifiedLeft, rectifiedRight,rectifiedMask, rectifiedK,rectifiedR);
 
 		// compute disparity
 		StereoDisparity<GrayS16, GrayF32> disparityAlg =
@@ -126,6 +127,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		// process and return the results
 		disparityAlg.process(derivLeft, derivRight);
 		GrayF32 disparity = disparityAlg.getDisparity();
+		RectifyImageOps.applyMask(disparity,rectifiedMask,8);
 
 		// show results
 		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, minDisparity, maxDisparity, 0);
@@ -197,6 +199,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 * @param intrinsicLeft  Intrinsic camera parameters
 	 * @param rectifiedLeft  Output rectified image for left camera.
 	 * @param rectifiedRight Output rectified image for right camera.
+	 * @param rectifiedMask  Mask that indicates invalid pixels in rectified image. 1 = valid, 0 = invalid
 	 * @param rectifiedK     Output camera calibration matrix for rectified camera
 	 */
 	public static <T extends ImageBase<T>>
@@ -207,6 +210,7 @@ public class ExampleStereoTwoViewsOneCamera {
 					   CameraPinholeRadial intrinsicRight,
 					   T rectifiedLeft,
 					   T rectifiedRight,
+					   GrayU8 rectifiedMask,
 					   DMatrixRMaj rectifiedK,
 					   DMatrixRMaj rectifiedR) {
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
@@ -239,7 +243,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		ImageDistort<T,T> distortRight =
 				RectifyImageOps.rectifyImage(intrinsicRight, rect2_F32, BorderType.SKIP, distortedRight.getImageType());
 
-		distortLeft.apply(distortedLeft, rectifiedLeft);
+		distortLeft.apply(distortedLeft, rectifiedLeft,rectifiedMask);
 		distortRight.apply(distortedRight, rectifiedRight);
 	}
 

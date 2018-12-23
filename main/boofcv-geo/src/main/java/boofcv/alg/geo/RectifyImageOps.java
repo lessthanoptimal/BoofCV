@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,9 +34,7 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.*;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_FDRM;
@@ -425,6 +423,78 @@ public class RectifyImageOps {
 		ret.setModel(new PointToPixelTransform_F32(transform));
 
 		return ret;
+	}
+
+	/**
+	 * Applies a mask which indicates which pixels had mappings to the unrectified image. Pixels which were
+	 * outside of the original image will be set to 255. The border is extended because the sharp edge
+	 * can confuse disparity algorithms.
+	 *
+	 * @param disparity (Input) disparity
+	 * @param mask (Input) mask. 1 = mapping to unrectified. 0 = no mapping
+	 * @param radius How much the border is extended by
+	 */
+	public static void applyMask(GrayF32 disparity , GrayU8 mask , int radius ) {
+		if( disparity.isSubimage() || mask.isSubimage() )
+			throw new RuntimeException("Input is subimage. Currently not support but no reason why it can't be. Ask for it");
+
+		int N = disparity.width*disparity.height;
+		for (int i = 0; i < N; i++) {
+			if( mask.data[i] == 0 ) {
+				disparity.data[i] = 255;
+			}
+		}
+		// TODO make this more efficient and correct
+		int r = radius;
+		for (int y = r; y < mask.height-r; y++) {
+			int indexMsk = y*mask.stride;
+			for (int x = r; x < mask.width-r-1; x++,indexMsk++) {
+				if( (mask.data[indexMsk] + mask.data[indexMsk+1])%2 != 0 ||
+						(mask.data[indexMsk] + mask.data[indexMsk+mask.width])%2 != 0 ) {
+					for (int i = -r; i <= r; i++) {
+						for (int j = -r; j <= r; j++) {
+							disparity.unsafe_set(x+i,y+j,255);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Applies a mask which indicates which pixels had mappings to the unrectified image. Pixels which were
+	 * outside of the original image will be set to 255. The border is extended because the sharp edge
+	 * can confuse disparity algorithms.
+	 *
+	 * @param disparity (Input) disparity
+	 * @param mask (Input) mask. 1 = mapping to unrectified. 0 = no mapping
+	 * @param radius How much the border is extended by
+	 */
+	public static void applyMask(GrayU8 disparity , GrayU8 mask , int radius ) {
+		if( disparity.isSubimage() || mask.isSubimage() )
+			throw new RuntimeException("Input is subimage. Currently not support but no reason why it can't be. Ask for it");
+
+		int N = disparity.width*disparity.height;
+		for (int i = 0; i < N; i++) {
+			if( mask.data[i] == 0 ) {
+				disparity.data[i] = (byte)255;
+			}
+		}
+		// TODO make this more efficient and correct
+		int r = radius;
+		for (int y = r; y < mask.height-r; y++) {
+			int indexMsk = y*mask.stride;
+			for (int x = r; x < mask.width-r-1; x++,indexMsk++) {
+				if( (mask.data[indexMsk] + mask.data[indexMsk+1])%2 != 0 ||
+						(mask.data[indexMsk] + mask.data[indexMsk+mask.width])%2 != 0 ) {
+					for (int i = -r; i <= r; i++) {
+						for (int j = -r; j <= r; j++) {
+							disparity.unsafe_set(x+i,y+j,255);
+						}
+					}
+				}
+			}
+		}
 	}
 
 }

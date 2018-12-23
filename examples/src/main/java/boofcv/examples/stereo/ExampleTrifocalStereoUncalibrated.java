@@ -34,6 +34,7 @@ import boofcv.alg.feature.associate.AssociateThreeByPairs;
 import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
+import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic.Intrinsic;
@@ -435,8 +436,10 @@ public class ExampleTrifocalStereoUncalibrated {
 		// rectify a colored image
 		Planar<GrayU8> rectColorLeft = colorLeft.createSameShape();
 		Planar<GrayU8> rectColorRight = colorLeft.createSameShape();
+		GrayU8 rectMask = new GrayU8(colorLeft.width,colorLeft.height);
+
 		rectifyImages(colorLeft, colorRight, leftToRight, intrinsicLeft,intrinsicRight,
-				rectColorLeft, rectColorRight, rectifiedK,rectifiedR);
+				rectColorLeft, rectColorRight,rectMask, rectifiedK,rectifiedR);
 
 		if(rectifiedK.get(0,0) < 0)
 			throw new RuntimeException("Egads");
@@ -466,6 +469,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		// process and return the results
 		disparityAlg.process(derivLeft, derivRight);
 		GrayF32 disparity = disparityAlg.getDisparity();
+		RectifyImageOps.applyMask(disparity,rectMask,8);
 
 		// show results
 		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, minDisparity, maxDisparity, 0);

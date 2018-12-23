@@ -427,9 +427,10 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		// rectify a colored image
 		Planar<GrayU8> rectColor1 = new Planar<>(GrayU8.class, color1.width, color1.height, 3);
 		Planar<GrayU8> rectColor2 = new Planar<>(GrayU8.class, color2.width, color2.height, 3);
+		GrayU8 rectMask = new GrayU8(color1.width, color1.height);
 
 		rectifyImages(color1, color2, leftToRight, intrinsic01, intrinsic02,
-				rectColor1, rectColor2, rectifiedK, rectifiedR);
+				rectColor1, rectColor2,rectMask, rectifiedK, rectifiedR);
 
 		visualRect1 = ConvertBufferedImage.checkDeclare(
 				rectColor1.width, rectColor1.height, visualRect1, visualRect1.getType());
@@ -449,6 +450,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		System.out.println("Computing disparity. min="+controls.minDisparity+" max="+controls.maxDisparity);
 		GrayF32 disparity = computeDisparity(rectColor1,rectColor2);
+
+		// remove annoying false points
+		RectifyImageOps.applyMask(disparity,rectMask,8);
 
 		visualDisparity = ConvertBufferedImage.checkDeclare(
 				disparity.width,disparity.height,visualDisparity,visualDisparity.getType());
@@ -479,6 +483,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 					   CameraPinholeRadial intrinsic2,
 					   C rectified1,
 					   C rectified2,
+					   GrayU8 rectifiedMask,
 					   DMatrixRMaj rectifiedK,
 					   DMatrixRMaj rectifiedR) {
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
@@ -511,7 +516,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		ImageDistort<C,C> distortRight =
 				RectifyImageOps.rectifyImage(intrinsic2, rect2_F32, BorderType.SKIP, distorted2.getImageType());
 
-		distortLeft.apply(distorted1, rectified1);
+		rectifiedMask.reshape(rectified1.width,rectified2.height);
+		distortLeft.apply(distorted1, rectified1, rectifiedMask);
 		distortRight.apply(distorted2, rectified2);
 	}
 

@@ -32,9 +32,6 @@ import java.awt.event.ActionListener;
 public class DemoThreeViewControls extends StandardAlgConfigPanel
 	implements ChangeListener, ActionListener
 {
-	// TODO gray out compute until a change has happened
-	// TODO note what has changed so that the whole thing isn't recomputed
-
 	JComboBox imageView;
 
 	// TODO select features, e.g. sift, surf, ShiTomasi, BRIEF
