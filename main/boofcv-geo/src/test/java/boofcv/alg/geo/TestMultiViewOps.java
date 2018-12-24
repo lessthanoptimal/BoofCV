@@ -18,6 +18,8 @@
 
 package boofcv.alg.geo;
 
+import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.h.CommonHomographyInducedPlane;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.geo.AssociatedPair;
@@ -1227,8 +1229,49 @@ public class TestMultiViewOps {
 		}
 	}
 
+	/**
+	 * Construct a scene with perfect observations. See if triangulation returns the same points
+	 */
 	@Test
 	public void triangulatePoints() {
-		fail("Implement");
+		CameraPinhole intrinsic = new CameraPinhole(500,500,0,500,500,1000,1000);
+
+		List<Point3D_F64> points = UtilPoint3D_F64.random(new Point3D_F64(0,0,2),-0.5,0.5,100,rand);
+		Se3_F64 view0_to_view1 = SpecialEuclideanOps_F64.eulerXyz(0.3,0,0,0.1,-0.1,0,null);
+
+		SceneStructureMetric structure = new SceneStructureMetric(false);
+		SceneObservations observations = new SceneObservations(2);
+
+		structure.initialize(1,2,points.size());
+
+		structure.setCamera(0,true,intrinsic);
+		structure.setView(0,true,new Se3_F64());
+		structure.setView(1,false,view0_to_view1);
+		structure.connectViewToCamera(0,0);
+		structure.connectViewToCamera(1,0);
+
+		SceneObservations.View v0 = observations.getView(0);
+		SceneObservations.View v1 = observations.getView(1);
+
+		for (int i = 0; i < points.size(); i++) {
+			Point3D_F64 X = points.get(i);
+
+			Point2D_F64 p0 = PerspectiveOps.renderPixel(intrinsic,X);
+			Point2D_F64 p1 = PerspectiveOps.renderPixel(view0_to_view1,intrinsic,X);
+
+			v0.add(i,(float)p0.x,(float)p0.y);
+			v1.add(i,(float)p1.x,(float)p1.y);
+			structure.connectPointToView(i,0);
+			structure.connectPointToView(i,1);
+		}
+
+		MultiViewOps.triangulatePoints(structure,observations);
+
+		Point3D_F64 X = new Point3D_F64();
+		for (int i = 0; i < points.size(); i++) {
+			structure.getPoints()[i].get(X);
+
+			assertEquals(0, points.get(i).distance(X), UtilEjml.TEST_F64_SQ);
+		}
 	}
 }

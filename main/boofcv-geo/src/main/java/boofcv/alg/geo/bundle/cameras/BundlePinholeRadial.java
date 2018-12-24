@@ -31,10 +31,10 @@ import georegression.struct.point.Point2D_F64;
 public class BundlePinholeRadial implements BundleAdjustmentCamera {
 
 	// parameters for the camera model
-	private boolean zeroSkew=true;
-	private double fx,fy,skew,cx,cy;
-	private double r1,r2;
-	private double t1,t2;
+	public boolean zeroSkew=true;
+	public double fx,fy,skew,cx,cy;
+	public double r1,r2;
+	public double t1,t2;
 
 	public BundlePinholeRadial(boolean zeroSkew) {
 		this.zeroSkew = zeroSkew;

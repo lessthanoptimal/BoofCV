@@ -22,6 +22,8 @@ import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
+import boofcv.alg.geo.bundle.cameras.BundlePinhole;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeRadial;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.f.FundamentalExtractEpipoles;
 import boofcv.alg.geo.f.FundamentalToProjective;
@@ -1665,9 +1667,19 @@ public class MultiViewOps {
 
 		List<RemoveRadialPtoN_F64> list_p_to_n = new ArrayList<>();
 		for (int i = 0; i < structure.cameras.length; i++) {
-			BundlePinholeSimplified cam = (BundlePinholeSimplified)structure.cameras[i].model;
 			RemoveRadialPtoN_F64 p2n = new RemoveRadialPtoN_F64();
-			p2n.setK(cam.f,cam.f,0,0,0).setDistortion(new double[]{cam.k1,cam.k2},0,0);
+			if( structure.cameras[i].model instanceof BundlePinholeSimplified ) {
+				BundlePinholeSimplified cam = (BundlePinholeSimplified) structure.cameras[i].model;
+				p2n.setK(cam.f, cam.f, 0, 0, 0).setDistortion(new double[]{cam.k1, cam.k2}, 0, 0);
+			} else if( structure.cameras[i].model instanceof BundlePinhole) {
+				BundlePinhole cam = (BundlePinhole) structure.cameras[i].model;
+				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(new double[]{0,0}, 0,0);
+			} else if( structure.cameras[i].model instanceof BundlePinholeRadial ) {
+				BundlePinholeRadial cam = (BundlePinholeRadial) structure.cameras[i].model;
+				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(new double[]{cam.r1, cam.r2}, cam.t1, cam.t2);
+			} else {
+				throw new RuntimeException("Unknown camera model!");
+			}
 			list_p_to_n.add(p2n);
 		}
 
