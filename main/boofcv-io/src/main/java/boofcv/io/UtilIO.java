@@ -22,11 +22,10 @@ import boofcv.BoofVersion;
 
 import javax.swing.*;
 import java.io.*;
-import java.net.JarURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarFile;
@@ -603,6 +602,49 @@ public class UtilIO {
 		return ret;
 	}
 
+	/**
+	 * Lists all files in the directory with an MIME type that contains the string "type"
+	 */
+	public static List<String> listAllMime( String directory , String type ) {
+		List<String> ret = new ArrayList<>();
+
+		try {
+			// see if it's a URL or not
+			URL url = new URL(directory);
+			if( url.getProtocol().equals("file") ) {
+				directory = url.getFile();
+			} else if( url.getProtocol().equals("jar") ) {
+				return listJarMime(url,null,null);
+			} else {
+				throw new RuntimeException("Not sure what to do with this url. "+url.toString());
+			}
+		} catch (MalformedURLException ignore) {
+		}
+
+		File d = new File(directory);
+
+		if( !d.isDirectory() )
+			throw new IllegalArgumentException("Must specify an directory");
+
+		File []files = d.listFiles();
+		if( files == null )
+			return ret;
+
+		for( File f : files ) {
+			if( f.isDirectory() )
+				continue;
+			try {
+				String mimeType = Files.probeContentType(f.toPath());
+
+				if( mimeType.contains(type))
+					ret.add(f.getAbsolutePath());
+			} catch (IOException ignore) {}
+		}
+
+		Collections.sort(ret);
+		return ret;
+	}
+
 	private static List<String> listJarPrefix(URL url , String prefix , String suffix ) {
 		List<String> output = new ArrayList<>();
 
@@ -624,6 +666,44 @@ public class UtilIO {
 						ze.getName().length() != targetPath.length()) {
 					if( suffix == null || ze.getName().endsWith(suffix))  {
 						output.add("jar:file:"+jarfile.getName()+"!/"+ze.getName());
+					}
+				}
+			}
+
+			jarfile.close();
+			return output;
+		} catch (IOException e) {
+			return new ArrayList<>();
+		}
+	}
+
+	private static List<String> listJarMime(URL url , String prefix , String type ) {
+		List<String> output = new ArrayList<>();
+
+		FileNameMap fileNameMap = URLConnection.getFileNameMap();
+
+		JarFile jarfile;
+		try {
+			JarURLConnection connection = (JarURLConnection)url.openConnection();
+			jarfile = connection.getJarFile();
+
+			String targetPath = connection.getEntryName()+"/";
+			if( prefix != null ) {
+				targetPath += prefix;
+			}
+
+			final Enumeration e = jarfile.entries();
+			while( e.hasMoreElements() ) {
+				final ZipEntry ze = (ZipEntry) e.nextElement();
+//				System.out.println("  ze.anme="+ze.getName());
+
+				if( ze.getName().startsWith(targetPath) &&
+						ze.getName().length() != targetPath.length()) {
+					// TODO no idea if this will work and is fast
+					String path = "jar:file:"+jarfile.getName()+"!/"+ze.getName();
+					String mimeType = fileNameMap.getContentTypeFor(path);
+					if( mimeType.contains(type))  {
+						output.add(path);
 					}
 				}
 			}

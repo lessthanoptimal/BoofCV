@@ -59,7 +59,7 @@ public abstract class DemonstrationBase extends JPanel {
 	JMenu menuRecent;
 
 	// Window the application is shown in
-	JFrame window;
+	protected JFrame window;
 
 	// name of the application
 	String appName;
@@ -635,6 +635,12 @@ public abstract class DemonstrationBase extends JPanel {
 		window.setJMenuBar(menuBar);
 	}
 
+	public void displayImmediate(String appName ) {
+		this.appName = appName;
+		window = ShowImages.showWindow(this,appName,true);
+		window.setJMenuBar(menuBar);
+	}
+
 	/**
 	 * Displays a dialog box letting the user know it can't perform the requested action
 	 */
@@ -645,23 +651,30 @@ public abstract class DemonstrationBase extends JPanel {
 	private ActionListener createActionListener() {
 		return e -> {
 			if (menuItemFile == e.getSource()) {
-				List<BoofSwingUtil.FileTypes> types = new ArrayList<>();
-				if( allowImages )
-					types.add(BoofSwingUtil.FileTypes.IMAGES);
-				if( allowVideos )
-					types.add(BoofSwingUtil.FileTypes.VIDEOS);
-				BoofSwingUtil.FileTypes array[] = types.toArray(new BoofSwingUtil.FileTypes[0]);
-
-				File file = BoofSwingUtil.openFileChooser(DemonstrationBase.this,array);
-				if (file != null) {
-					openFile(file);
-				}
+				openFileMenuBar();
 			} else if (menuItemWebcam == e.getSource()) {
 				openWebcam();
 			} else if (menuItenQuit == e.getSource()) {
 				System.exit(0);
 			}
 		};
+	}
+
+	/**
+	 * Open file in the menu bar was invoked by the user
+	 */
+	protected void openFileMenuBar() {
+		List<BoofSwingUtil.FileTypes> types = new ArrayList<>();
+		if( allowImages )
+			types.add(BoofSwingUtil.FileTypes.IMAGES);
+		if( allowVideos )
+			types.add(BoofSwingUtil.FileTypes.VIDEOS);
+		BoofSwingUtil.FileTypes array[] = types.toArray(new BoofSwingUtil.FileTypes[0]);
+
+		File file = BoofSwingUtil.openFileChooser(DemonstrationBase.this,array);
+		if (file != null) {
+			openFile(file);
+		}
 	}
 
 	abstract class ProcessThread implements Runnable {

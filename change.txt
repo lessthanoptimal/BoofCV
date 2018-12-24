@@ -49,33 +49,32 @@ Version : 0.32
 - Self Calibration
   * Plane at infinity given intrinsic parameters
   * SelfCalibrationGuessAndCheckF based on "Pratical Autocalibration" 2010
+  * Linear rotation with different values in each frame
 - SFM
   * Improvements to projective bundle adjustment
   * Projective scene structure pruning
 - ImageInterleaved
   * setTo() changes number of bands if needed
   * Improved speed of Interleaved to Gray average
-- Self Calibration
-  * Linear rotation with different values in each frame
 - Android
   * Bunch of bug fixes
   * Extracts the full pinhole calibration matrix from camera characteristics
 
 
 TODO For Release
-  - Trifocal Stereo Demonstration Application
   - Fix or explain fiducial speed regression
 
 TODO next release
   - Demonstrations
     * Associate with Fundamental - Select different algs + inliers
     * Associate with Trifocal Tensor
+  - Cheirality
+    * Will also require a linear programming solution, e.g. simplex
   - Self Calibration
     * Weighted iterated DIAC
   - Bundle Adjustment
     * Calibrated homogenous coordinates
-
-TODO Remove dependency on OpenCV in Applications to reduce file size
+  - Remove dependency on OpenCV in Applications to reduce file size
 
 - TODO Scene Reconstruction
    - TODO handle situation where images are removed and exception is thrown

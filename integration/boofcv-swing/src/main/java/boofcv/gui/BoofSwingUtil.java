@@ -18,16 +18,20 @@
 
 package boofcv.gui;
 
+import boofcv.gui.dialogs.OpenImageSetDialog;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.prefs.Preferences;
@@ -41,6 +45,24 @@ public class BoofSwingUtil {
 
 	public static File saveFileChooser(Component parent, FileTypes ...filters) {
 		return fileChooser(parent,false,new File(".").getPath(),filters);
+	}
+
+	public static String[] openImageSetChooser(Window parent , OpenImageSetDialog.Mode mode , int numberOfImages) {
+		Preferences prefs;
+		if( parent == null ) {
+			prefs = Preferences.userRoot();
+		} else {
+			prefs = Preferences.userRoot().node(parent.getClass().getSimpleName());
+		}
+		File defaultPath = BoofSwingUtil.directoryUserHome();
+		String previousPath=prefs.get(KEY_PREVIOUS_SELECTION, defaultPath.getPath());
+
+		String[] response = OpenImageSetDialog.showDialog(new File(previousPath),mode,numberOfImages,parent);
+
+		if( response != null ) {
+			prefs.put(KEY_PREVIOUS_SELECTION, new File(response[0]).getParent());
+		}
+		return response;
 	}
 
 	public static File openFileChooser(Component parent, FileTypes ...filters) {
@@ -233,6 +255,10 @@ public class BoofSwingUtil {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	}
 
+	public static JButton createButtonIconGUI(String path, int width, int height) {
+		return createButtonIcon("boofcv/gui/"+path,width,height,true);
+	}
+
 	public static JButton createButtonIcon(String path, int width, int height, boolean opaque) {
 		try {
 
@@ -302,6 +328,20 @@ public class BoofSwingUtil {
 		}
 	}
 
+	/**
+	 * Uses mime type to determine if it's an image or not
+	 */
+	public static boolean isImage( File file ){
+		try {
+			String mimeType = Files.probeContentType(file.toPath());
+			if( mimeType == null )
+				return false;
+			return mimeType.startsWith("image");
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
 	private static double computeButtonScale( int width , int height,
 											  double imageWidth , double imageHeight ) {
 		double scale = 1;
@@ -315,6 +355,27 @@ public class BoofSwingUtil {
 			}
 		}
 		return scale;
+	}
+
+	public static JButton button( String name , ActionListener action ) {
+		JButton b = new JButton(name);
+		b.addActionListener(action);
+		return b;
+	}
+
+	public static JCheckBox checkbox( String name , boolean checked , ActionListener action ) {
+		JCheckBox b = new JCheckBox(name);
+		if( action != null )
+			b.addActionListener(action);
+		b.setSelected(checked);
+		return b;
+	}
+
+	public static File directoryUserHome() {
+		String home = System.getProperty("user.home");
+		if( home == null )
+			home = "";
+		return new File(home);
 	}
 
 	public enum FileTypes

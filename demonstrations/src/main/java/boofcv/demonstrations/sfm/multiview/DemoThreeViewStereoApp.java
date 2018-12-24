@@ -42,6 +42,7 @@ import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.d3.DisparityToColorPointCloud;
+import boofcv.gui.dialogs.OpenImageSetDialog;
 import boofcv.gui.feature.AssociatedTriplePanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.VisualizeImageData;
@@ -123,7 +124,12 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	boolean hasAllImages = false;
 
 	public DemoThreeViewStereoApp(List<PathLabel> examples) {
-		super(false, false, examples, ImageType.single(GrayU8.class));
+		super(true, false, examples, ImageType.single(GrayU8.class));
+
+		// remove some unused items from the menu bar. This app is an exception
+		JMenu fileMenu = menuBar.getMenu(0);
+		fileMenu.remove(1);
+		fileMenu.remove(1);
 
 		detDesc = FactoryDetectDescribe.surfStable( new ConfigFastHessian(
 				0, 4, 1000, 1, 9, 4, 2), null,null, GrayU8.class);
@@ -144,6 +150,14 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		add(BorderLayout.CENTER, gui);
 
 		setPreferredSize(new Dimension(800,600));
+	}
+
+	@Override
+	protected void openFileMenuBar() {
+		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY,3);
+		if( files == null )
+			return;
+		BoofSwingUtil.invokeNowOrLater(()->openImageSet(files));
 	}
 
 	void updateVisibleGui() {
@@ -334,7 +348,6 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		int height = buff[0].getHeight();
 
 		SwingUtilities.invokeLater(()->{
-			// TODO disable GUI
 			controls.disableComputeButton();
 			controls.clearText();
 			controls.addText(width+" x "+height+"\n");
@@ -601,8 +614,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		SwingUtilities.invokeLater(()->{
 			DemoThreeViewStereoApp app = new DemoThreeViewStereoApp(examples);
 
-			app.openExample(examples.get(0));
-			app.display("Three View Uncalibrated Structure");
+			// Processing time takes a bit so don't open right away
+//			app.openExample(examples.get(0));
+			app.displayImmediate("Three View Uncalibrated Structure");
 		});
 	}
 }
