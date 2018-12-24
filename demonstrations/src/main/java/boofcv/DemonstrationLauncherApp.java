@@ -62,6 +62,7 @@ import boofcv.demonstrations.sfm.d2.VideoStabilizeSequentialPointApp;
 import boofcv.demonstrations.sfm.d3.VisualizeDepthVisualOdometryApp;
 import boofcv.demonstrations.sfm.d3.VisualizeMonocularPlaneVisualOdometryApp;
 import boofcv.demonstrations.sfm.d3.VisualizeStereoVisualOdometryApp;
+import boofcv.demonstrations.sfm.multiview.DemoThreeViewStereoApp;
 import boofcv.demonstrations.shapes.DetectBlackEllipseApp;
 import boofcv.demonstrations.shapes.DetectBlackPolygonApp;
 import boofcv.demonstrations.shapes.DetectPolylineApp;
@@ -150,7 +151,8 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				VisualizeStereoDisparity.class,
 				VisualizeDepthVisualOdometryApp.class,
 				VisualizeMonocularPlaneVisualOdometryApp.class,
-				VisualizeStereoVisualOdometryApp.class);
+				VisualizeStereoVisualOdometryApp.class,
+				DemoThreeViewStereoApp.class);
 
 		createNodes(root,"Fiducial / Markers",
 				FiducialTrackerDemoApp.class,
