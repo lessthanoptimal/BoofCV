@@ -193,6 +193,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		gui.validate();
 		gui.repaint();
+		// this way if you press a key it manipulates the view the user just opened
+		gui.getComponent(0).requestFocus();
 	}
 
 	/**
