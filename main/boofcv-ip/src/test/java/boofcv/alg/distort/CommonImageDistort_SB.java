@@ -18,18 +18,16 @@
 
 package boofcv.alg.distort;
 
-import boofcv.alg.interpolate.InterpolatePixelMB;
-import boofcv.alg.interpolate.impl.ImplBilinearPixel_IL_F32;
+import boofcv.alg.interpolate.BilinearPixelS;
+import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.InterleavedF32;
 import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,9 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestImageDistortBasic_IL {
+public abstract class CommonImageDistort_SB {
 	Random rand = new Random(234);
-	private static final int NUM_BANDS = 2;
 	DummyInterpolate interp = new DummyInterpolate();
 
 	float offX=0,offY=0;
@@ -55,49 +52,49 @@ public class TestImageDistortBasic_IL {
 
 	@Test
 	public void applyRenderAll_true() {
-		Helper alg = new Helper(interp);
+		ImageDistortHelper alg = createAlg(interp);
 		alg.setRenderAll(true);
 
 		offX= offY=0;
 		alg.reset();
 		alg.setModel(tran);
-		alg.apply(new InterleavedF32(10, 15,NUM_BANDS), new InterleavedF32(10, 15,NUM_BANDS));
+		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
 		assertEquals(150, alg.getTotal());
 
 		offX=offY =0.1f;
 		alg.reset();
 		alg.setModel(tran);
-		alg.apply(new InterleavedF32(10, 15,NUM_BANDS), new InterleavedF32(10, 15,NUM_BANDS));
+		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
 		assertEquals(150, alg.getTotal());
 
 		offX=offY = -0.1f;
 		alg.reset();
 		alg.setModel(tran);
-		alg.apply(new InterleavedF32(10, 15,NUM_BANDS), new InterleavedF32(10, 15,NUM_BANDS));
+		alg.apply(new GrayF32(10, 15), new GrayF32(10,15));
 		assertEquals(150,alg.getTotal());
 	}
 
 	@Test
 	public void applyRenderAll_False() {
-		Helper alg = new Helper(interp);
+		ImageDistortHelper alg = createAlg(interp);
 		alg.setRenderAll(false);
 
 		offX=offY=0;
 		alg.reset();
 		alg.setModel(tran);
-		alg.apply(new InterleavedF32(10, 15,NUM_BANDS),new InterleavedF32(10, 15,NUM_BANDS));
+		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
 		assertEquals(150,alg.getTotal());
 
 		offX=offY=0.1f;
 		alg.reset();
 		alg.setModel(tran);
-		alg.apply(new InterleavedF32(10, 15,NUM_BANDS),new InterleavedF32(10, 15,NUM_BANDS));
+		alg.apply(new GrayF32(10,15),new GrayF32(10,15));
 		assertEquals(9*14,alg.getTotal());
 
 		offX=offY=-0.1f;
 		alg.reset();
 		alg.setModel(tran);
-		alg.apply(new InterleavedF32(10, 15,NUM_BANDS),new InterleavedF32(10, 15,NUM_BANDS));
+		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
 		assertEquals(9*14,alg.getTotal());
 	}
 
@@ -112,13 +109,13 @@ public class TestImageDistortBasic_IL {
 	}
 
 	public void checkMask( boolean renderAll ) {
-		InterleavedF32 src = new InterleavedF32(10,15,NUM_BANDS);
+		GrayF32 src = new GrayF32(10,15);
 		ImageMiscOps.fillUniform(src,rand,0,2);
-		InterleavedF32 dst1 = new InterleavedF32(10,15,NUM_BANDS);
-		InterleavedF32 dst2 = new InterleavedF32(10,15,NUM_BANDS);
+		GrayF32 dst1 = new GrayF32(10,15);
+		GrayF32 dst2 = new GrayF32(10,15);
 		GrayU8 mask = new GrayU8(10,15);
 
-		ImageDistort alg = new Helper(interp);
+		ImageDistort alg = createAlg(interp);
 
 		offX=offY=2;
 		alg.setRenderAll(renderAll);
@@ -139,50 +136,26 @@ public class TestImageDistortBasic_IL {
 				} else {
 					// all the pixels at and outside the boundary will be 1.1
 					if( renderAll )
-						assertEquals(1.1,dst1.getBand(x,y,0),1e-4);
+						assertEquals(1.1,dst1.get(x,y),1e-4);
 					assertEquals(0,mask.get(x,y));
 				}
 			}
 		}
 	}
 
-	private static class Helper extends ImageDistortBasic_IL<InterleavedF32,InterleavedF32> {
+	protected abstract ImageDistortHelper createAlg(BilinearPixelS<GrayF32> interp);
 
-		int total = 0;
+	protected interface ImageDistortHelper extends ImageDistort {
+		void reset();
 
-		public Helper(InterpolatePixelMB<InterleavedF32> interp) {
-			super(interp);
-		}
-
-		public void reset() {
-			total = 0;
-		}
-
-		private int getTotal() {
-			return total;
-		}
-
-		@Override
-		protected void assign(int indexDst, float value[]) {
-			total++;
-			int numBand = value.length;
-			int x = ((indexDst - dstImg.startIndex)%dstImg.stride)/numBand;
-			int y = (indexDst - dstImg.startIndex)/dstImg.stride;
-			assertTrue(dstImg.isInBounds(x,y));
-			GeneralizedImageOps.setB(dstImg,x,y,0,value[0]);
-		}
+		int getTotal();
 	}
 
-	protected static class DummyInterpolate extends ImplBilinearPixel_IL_F32 {
-
-		public DummyInterpolate() {
-			super(NUM_BANDS);
-		}
+	protected static class DummyInterpolate extends ImplBilinearPixel_F32 {
 
 		@Override
-		public void get_border(float x, float y, float value[] ) {
-			Arrays.fill(value,1.1f);
+		public float get_border(float x, float y) {
+			return 1.1f;
 		}
 	}
-
 }

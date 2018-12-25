@@ -18,85 +18,26 @@
 
 package boofcv.alg.distort;
 
+import boofcv.alg.interpolate.BilinearPixelS;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
-import org.junit.jupiter.api.Test;
+import boofcv.struct.image.ImageGray;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestImageDistortBasic_SB {
+public class TestImageDistortBasic_SB extends CommonImageDistort_SB {
 
-	DummyInterpolate interp = new DummyInterpolate();
-
-	float offX=0,offY=0;
-
-	PixelTransform2_F32 tran = new PixelTransform2_F32() {
-		@Override
-		public void compute(int x, int y) {
-			distX = x+offX;
-			distY = y+offY;
-		}
-	};
-
-	@Test
-	public void applyRenderAll_true() {
-		Helper alg = new Helper(interp);
-		alg.setRenderAll(true);
-
-		offX= offY=0;
-		alg.reset();
-		alg.setModel(tran);
-		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
-		assertEquals(150, alg.getTotal());
-
-		offX=offY =0.1f;
-		alg.reset();
-		alg.setModel(tran);
-		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
-		assertEquals(150, alg.getTotal());
-
-		offX=offY = -0.1f;
-		alg.reset();
-		alg.setModel(tran);
-		alg.apply(new GrayF32(10, 15), new GrayF32(10,15));
-		assertEquals(150,alg.getTotal());
+	@Override
+	protected ImageDistortHelper createAlg(BilinearPixelS<GrayF32> interp) {
+		return new Helper(interp);
 	}
 
-	@Test
-	public void applyRenderAll_False() {
-		Helper alg = new Helper(interp);
-		alg.setRenderAll(false);
 
-		offX=offY=0;
-		alg.reset();
-		alg.setModel(tran);
-		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
-		assertEquals(150,alg.getTotal());
-
-		offX=offY=0.1f;
-		alg.reset();
-		alg.setModel(tran);
-		alg.apply(new GrayF32(10,15),new GrayF32(10,15));
-		assertEquals(9*14,alg.getTotal());
-
-		offX=offY=-0.1f;
-		alg.reset();
-		alg.setModel(tran);
-		alg.apply(new GrayF32(10, 15), new GrayF32(10, 15));
-		assertEquals(9*14,alg.getTotal());
-	}
-
-	@Test
-	public void applyOnlyInside_mask() {
-		fail("implement");
-	}
-
-	private static class Helper extends ImageDistortBasic_SB {
+	private static class Helper extends ImageDistortBasic_SB implements ImageDistortHelper {
 
 		int total = 0;
 
@@ -108,7 +49,7 @@ public class TestImageDistortBasic_SB {
 			total = 0;
 		}
 
-		private int getTotal() {
+		public int getTotal() {
 			return total;
 		}
 
@@ -118,16 +59,8 @@ public class TestImageDistortBasic_SB {
 			int x = (indexDst - dstImg.startIndex)%dstImg.stride;
 			int y = (indexDst - dstImg.startIndex)/dstImg.stride;
 			assertTrue(dstImg.isInBounds(x,y));
+			GeneralizedImageOps.set((ImageGray)dstImg,x,y,value);
 		}
 	}
-
-	protected static class DummyInterpolate extends ImplBilinearPixel_F32 {
-
-		@Override
-		public float get_border(float x, float y) {
-			return 1.1f;
-		}
-	}
-
 
 }
