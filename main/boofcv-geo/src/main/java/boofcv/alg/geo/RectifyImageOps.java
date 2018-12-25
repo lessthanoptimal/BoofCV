@@ -428,7 +428,7 @@ public class RectifyImageOps {
 	/**
 	 * Applies a mask which indicates which pixels had mappings to the unrectified image. Pixels which were
 	 * outside of the original image will be set to 255. The border is extended because the sharp edge
-	 * can confuse disparity algorithms.
+	 * in the rectified image can cause in incorrect match between image features.
 	 *
 	 * @param disparity (Input) disparity
 	 * @param mask (Input) mask. 1 = mapping to unrectified. 0 = no mapping
@@ -444,16 +444,26 @@ public class RectifyImageOps {
 				disparity.data[i] = 255;
 			}
 		}
-		// TODO make this more efficient and correct
-		int r = radius;
-		for (int y = r; y < mask.height-r; y++) {
-			int indexMsk = y*mask.stride+r;
-			for (int x = r; x < mask.width-r-1; x++,indexMsk++) {
-				if( (mask.data[indexMsk] + mask.data[indexMsk+1])%2 != 0 ||
-						(mask.data[indexMsk] + mask.data[indexMsk+mask.width])%2 != 0 ) {
-					for (int i = -r; i <= r; i++) {
-						for (int j = -r; j <= r; j++) {
-							disparity.unsafe_set(x+i,y+j,255);
+
+		// TODO make this more efficient and correct. Update unit test
+		if( radius > 0 ) {
+			int r = radius;
+			for (int y = r; y < mask.height - r; y++) {
+				int indexMsk = y * mask.stride + r;
+				for (int x = r; x < mask.width - r-1; x++, indexMsk++) {
+					int deltaX = mask.data[indexMsk] - mask.data[indexMsk + 1];
+					int deltaY = mask.data[indexMsk] - mask.data[indexMsk + mask.stride];
+
+					if ( deltaX != 0 || deltaY != 0) {
+						// because of how the border is detected it has a bias when going from up to down
+						if( deltaX < 0 )
+							deltaX = 0;
+						if( deltaY < 0 )
+							deltaY = 0;
+						for (int i = -r; i <= r; i++) {
+							for (int j = -r; j <= r; j++) {
+								disparity.set(deltaX+x + j, deltaY+y + i, 255);
+							}
 						}
 					}
 				}
@@ -480,16 +490,26 @@ public class RectifyImageOps {
 				disparity.data[i] = (byte)255;
 			}
 		}
-		// TODO make this more efficient and correct
-		int r = radius;
-		for (int y = r; y < mask.height-r; y++) {
-			int indexMsk = y*mask.stride+r;
-			for (int x = r; x < mask.width-r-1; x++,indexMsk++) {
-				if( (mask.data[indexMsk] + mask.data[indexMsk+1])%2 != 0 ||
-						(mask.data[indexMsk] + mask.data[indexMsk+mask.width])%2 != 0 ) {
-					for (int i = -r; i <= r; i++) {
-						for (int j = -r; j <= r; j++) {
-							disparity.unsafe_set(x+i,y+j,255);
+
+		// TODO make this more efficient and correct. Update unit test
+		if( radius > 0 ) {
+			int r = radius;
+			for (int y = r; y < mask.height - r; y++) {
+				int indexMsk = y * mask.stride + r;
+				for (int x = r; x < mask.width - r-1; x++, indexMsk++) {
+					int deltaX = mask.data[indexMsk] - mask.data[indexMsk + 1];
+					int deltaY = mask.data[indexMsk] - mask.data[indexMsk + mask.stride];
+
+					if ( deltaX != 0 || deltaY != 0) {
+						// because of how the border is detected it has a bias when going from up to down
+						if( deltaX < 0 )
+							deltaX = 0;
+						if( deltaY < 0 )
+							deltaY = 0;
+						for (int i = -r; i <= r; i++) {
+							for (int j = -r; j <= r; j++) {
+								disparity.set(deltaX+x + j, deltaY+y + i, 255);
+							}
 						}
 					}
 				}

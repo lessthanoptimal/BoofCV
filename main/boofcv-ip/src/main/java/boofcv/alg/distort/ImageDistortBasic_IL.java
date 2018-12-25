@@ -69,6 +69,32 @@ public abstract class ImageDistortBasic_IL
 	}
 
 	@Override
+	public void applyAll( GrayU8 mask ) {
+
+		float maxWidth = srcImg.getWidth()-1;
+		float maxHeight = srcImg.getHeight()-1;
+
+		for( int y = y0; y < y1; y++ ) {
+			int indexDst = dstImg.startIndex + dstImg.stride*y + x0*dstImg.numBands;
+			int indexMsk = mask.startIndex + mask.stride*y + x0;
+
+			for( int x = x0; x < x1; x++ , indexDst += dstImg.numBands , indexMsk++) {
+				dstToSrc.compute(x,y);
+
+				interp.get(dstToSrc.distX, dstToSrc.distY, values);
+				assign(indexDst,values);
+
+				if( dstToSrc.distX >= 0 && dstToSrc.distX <= maxWidth &&
+						dstToSrc.distY >= 0 && dstToSrc.distY <= maxHeight ) {
+					mask.data[indexMsk] = 1;
+				} else {
+					mask.data[indexMsk] = 0;
+				}
+			}
+		}
+	}
+
+	@Override
 	public void applyOnlyInside() {
 
 		float maxWidth = srcImg.getWidth()-1;

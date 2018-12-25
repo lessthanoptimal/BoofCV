@@ -238,10 +238,12 @@ public class ExampleStereoTwoViewsOneCamera {
 		ConvertMatrixData.convert(rect1, rect1_F32);
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
+		// Extending the image prevents a harsh edge reducing false matches at the image border
+		// SKIP is another option, possibly a tinny bit faster, but has a harsh edge which will need to be filtered
 		ImageDistort<T,T> distortLeft =
-				RectifyImageOps.rectifyImage(intrinsicLeft, rect1_F32, BorderType.SKIP, distortedLeft.getImageType());
+				RectifyImageOps.rectifyImage(intrinsicLeft, rect1_F32, BorderType.EXTENDED, distortedLeft.getImageType());
 		ImageDistort<T,T> distortRight =
-				RectifyImageOps.rectifyImage(intrinsicRight, rect2_F32, BorderType.SKIP, distortedRight.getImageType());
+				RectifyImageOps.rectifyImage(intrinsicRight, rect2_F32, BorderType.EXTENDED, distortedRight.getImageType());
 
 		distortLeft.apply(distortedLeft, rectifiedLeft,rectifiedMask);
 		distortRight.apply(distortedRight, rectifiedRight);

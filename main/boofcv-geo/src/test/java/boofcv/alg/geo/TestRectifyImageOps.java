@@ -22,16 +22,20 @@ import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.CommonOps_FDRM;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -267,14 +271,105 @@ public class TestRectifyImageOps {
 		assertEquals(expected.y, found.y, 1e-4);
 	}
 
+	/**
+	 * Test it with radius = 0
+	 */
 	@Test
-	void applyMask_F32() {
-		fail("Implement");
+	void applyMask_F32_zero() {
+		GrayF32 disparity = new GrayF32(30,40);
+		GrayU8 mask = new GrayU8(disparity.width,disparity.height);
+
+		for (int row = 6; row < 32; row++) {
+			for (int col = 4; col < 25; col++) {
+				mask.set(col,row,1);
+			}
+		}
+
+		RectifyImageOps.applyMask(disparity,mask,0);
+
+		for (int i = 0; i < disparity.height; i++) {
+			for (int j = 0; j < disparity.width; j++) {
+				if( i >= 6 && i < 32 && j >= 4 && j < 25 )
+					assertEquals(  0,disparity.get(j,i), UtilEjml.TEST_F64);
+				else
+					assertEquals(255,disparity.get(j,i), UtilEjml.TEST_F64);
+			}
+		}
+	}
+
+	/**
+	 * Non-zero radius
+	 */
+	@Test
+	void applyMask_F32_radius() {
+		GrayF32 disparity = new GrayF32(30,40);
+		GrayU8 mask = new GrayU8(disparity.width,disparity.height);
+
+		for (int row = 6; row < 32; row++) {
+			for (int col = 4; col < 25; col++) {
+				mask.set(col,row,1);
+			}
+		}
+
+		RectifyImageOps.applyMask(disparity,mask,2);
+
+		for (int row = 0; row < disparity.height; row++) {
+			for (int col = 0; col < disparity.width; col++) {
+				if( row >= 8 && row < 30 && col >= 6 && col < 23 )
+					assertEquals(  0,disparity.get(col,row), UtilEjml.TEST_F64);
+				else
+					assertEquals(255,disparity.get(col,row), UtilEjml.TEST_F64);
+			}
+		}
 	}
 
 	@Test
-	void applyMask_U8() {
-		fail("Implement");
+	void applyMask_U8_zero() {
+		GrayU8 disparity = new GrayU8(30,40);
+		GrayU8 mask = new GrayU8(disparity.width,disparity.height);
+
+		for (int i = 6; i < 32; i++) {
+			for (int j = 4; j < 25; j++) {
+				mask.set(j,i,1);
+			}
+		}
+
+		RectifyImageOps.applyMask(disparity,mask,0);
+
+		for (int i = 0; i < disparity.height; i++) {
+			for (int j = 0; j < disparity.width; j++) {
+				if( i >= 6 && i < 32 && j >= 4 && j < 25 )
+					assertEquals(  0,disparity.get(j,i));
+				else
+					assertEquals(255,disparity.get(j,i));
+			}
+		}
+	}
+
+	/**
+	 * Non-zero radius
+	 */
+	@Test
+	void applyMask_U8_radius() {
+		GrayU8 disparity = new GrayU8(30,40);
+		GrayU8 mask = new GrayU8(disparity.width,disparity.height);
+
+		for (int row = 6; row < 32; row++) {
+			for (int col = 4; col < 25; col++) {
+				mask.set(col,row,1);
+			}
+		}
+
+		RectifyImageOps.applyMask(disparity,mask,2);
+
+		for (int row = 0; row < disparity.height; row++) {
+			for (int col = 0; col < disparity.width; col++) {
+				if( row >= 8 && row < 30 && col >= 6 && col < 23 )
+					assertEquals(  0,disparity.get(col,row));
+				else
+					assertEquals(255,disparity.get(col,row));
+			}
+		}
 	}
 
 }

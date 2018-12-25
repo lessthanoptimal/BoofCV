@@ -469,7 +469,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		// process and return the results
 		disparityAlg.process(derivLeft, derivRight);
 		GrayF32 disparity = disparityAlg.getDisparity();
-		RectifyImageOps.applyMask(disparity,rectMask,8);
+		RectifyImageOps.applyMask(disparity,rectMask,0);
 
 		// show results
 		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, minDisparity, maxDisparity, 0);

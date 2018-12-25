@@ -86,7 +86,10 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 
 		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
 
-		applyOnlyInside(mask);
+		if( renderAll )
+			renderAll(mask);
+		else
+			applyOnlyInside(mask);
 	}
 
 	@Override
@@ -136,6 +139,27 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 				Point2D_F32 s = map[indexDst];
 
 				assign(indexDst,interp.get(s.x, s.y));
+			}
+		}
+	}
+
+	public void renderAll( GrayU8 mask ) {
+		float maxWidth = srcImg.getWidth()-1;
+		float maxHeight = srcImg.getHeight()-1;
+
+		for( int y = y0; y < y1; y++ ) {
+			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
+			int indexMsk = mask.startIndex + mask.stride*y + x0;
+
+			for( int x = x0; x < x1; x++ , indexDst++ , indexMsk++ ) {
+				Point2D_F32 s = map[indexDst];
+
+				assign(indexDst,interp.get(s.x, s.y));
+				if( s.x >= 0 && s.x <= maxWidth && s.y >= 0 && s.y <= maxHeight ) {
+					mask.data[indexMsk] = 1;
+				} else {
+					mask.data[indexMsk] = 0;
+				}
 			}
 		}
 	}

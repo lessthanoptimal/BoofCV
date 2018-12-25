@@ -465,7 +465,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		GrayF32 disparity = computeDisparity(rectColor1,rectColor2);
 
 		// remove annoying false points
-		RectifyImageOps.applyMask(disparity,rectMask,8);
+		RectifyImageOps.applyMask(disparity,rectMask,0);
 
 		visualDisparity = ConvertBufferedImage.checkDeclare(
 				disparity.width,disparity.height,visualDisparity,visualDisparity.getType());
@@ -525,9 +525,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
 		ImageDistort<C,C> distortLeft =
-				RectifyImageOps.rectifyImage(intrinsic1, rect1_F32, BorderType.SKIP, distorted1.getImageType());
+				RectifyImageOps.rectifyImage(intrinsic1, rect1_F32, BorderType.EXTENDED, distorted1.getImageType());
 		ImageDistort<C,C> distortRight =
-				RectifyImageOps.rectifyImage(intrinsic2, rect2_F32, BorderType.SKIP, distorted2.getImageType());
+				RectifyImageOps.rectifyImage(intrinsic2, rect2_F32, BorderType.EXTENDED, distorted2.getImageType());
 
 		rectifiedMask.reshape(rectified1.width,rectified2.height);
 		distortLeft.apply(distorted1, rectified1, rectifiedMask);

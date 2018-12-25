@@ -78,7 +78,10 @@ public abstract class ImageDistortBasic
 
 		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
 
-		applyOnlyInside(mask);
+		if(renderAll)
+			applyAll(mask);
+		else
+			applyOnlyInside(mask);
 	}
 
 	@Override
@@ -100,6 +103,8 @@ public abstract class ImageDistortBasic
 	}
 
 	protected abstract void applyAll();
+
+	protected abstract void applyAll(GrayU8 mask);
 
 	protected abstract void applyOnlyInside();
 
