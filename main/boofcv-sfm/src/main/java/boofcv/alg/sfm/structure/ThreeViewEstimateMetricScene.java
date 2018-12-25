@@ -56,9 +56,13 @@ import static boofcv.alg.geo.MultiViewOps.triangulatePoints;
  *
  * Assumptions:
  * <ul>
- *     <li>Principle point is approximately in the camera center</li>
+ *     <li>Principle point is zero</li>
  *     <li>Zero skew</li>
+ *     <li>fx = fy approximately</li>
  * </ul>
+ *
+ * The zero principle point is enforced prior to calling {@link #process} by subtracting the image center from
+ * each pixel observations.
  *
  * Steps:
  * <ol>
@@ -142,7 +146,8 @@ public class ThreeViewEstimateMetricScene {
 	}
 
 	/**
-	 * Determines the metric scene
+	 * Determines the metric scene. The principle point is assumed to be zero in the passed in pixel coordinates.
+	 * Typically this is done by subtracting the image center from each pixel coordinate for each view.
 	 *
 	 * @param associated List of associated features from 3 views. pixels
 	 * @param width width of all images
