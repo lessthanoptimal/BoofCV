@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2018
+Date    : 2018/12/26
 Version : 0.32
 
 - Internally using URL to load resources (e.g. images, videos) to enable running inside of jars
@@ -59,33 +59,6 @@ Version : 0.32
 - Android
   * Bunch of bug fixes
   * Extracts the full pinhole calibration matrix from camera characteristics
-
-
-TODO For Release
-  - Fix or explain fiducial speed regression
-
-TODO next release
-  - Demonstrations
-    * Associate with Fundamental - Select different algs + inliers
-    * Associate with Trifocal Tensor
-  - Cheirality
-    * Will also require a linear programming solution, e.g. simplex
-  - Self Calibration
-    * Weighted iterated DIAC
-  - Bundle Adjustment
-    * Calibrated homogenous coordinates
-  - Remove dependency on OpenCV in Applications to reduce file size
-
-- TODO Scene Reconstruction
-   - TODO handle situation where images are removed and exception is thrown
-   - TODO Create generic image feature matching for ordered sequences of images
-   - TODO homogeneous coordinates
-- TODO Sparse Bundle Adjustment
-   - Future: quaternion implementation
-   - Future: sparse block math
-- TODO create regression for homography estimation
-
-- TODO Compare BoofCV's IPPE against original
 
 ---------------------------------------------
 Date    : 2018/10/16

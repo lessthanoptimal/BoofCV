@@ -448,7 +448,7 @@ public class RectifyImageOps {
 		// TODO make this more efficient and correct. Update unit test
 		if( radius > 0 ) {
 			int r = radius;
-			for (int y = r; y < mask.height - r; y++) {
+			for (int y = r; y < mask.height - r-1; y++) {
 				int indexMsk = y * mask.stride + r;
 				for (int x = r; x < mask.width - r-1; x++, indexMsk++) {
 					int deltaX = mask.data[indexMsk] - mask.data[indexMsk + 1];
@@ -494,7 +494,7 @@ public class RectifyImageOps {
 		// TODO make this more efficient and correct. Update unit test
 		if( radius > 0 ) {
 			int r = radius;
-			for (int y = r; y < mask.height - r; y++) {
+			for (int y = r; y < mask.height - r-1; y++) {
 				int indexMsk = y * mask.stride + r;
 				for (int x = r; x < mask.width - r-1; x++, indexMsk++) {
 					int deltaX = mask.data[indexMsk] - mask.data[indexMsk + 1];
