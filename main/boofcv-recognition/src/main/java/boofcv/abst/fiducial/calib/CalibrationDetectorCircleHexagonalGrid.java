@@ -20,6 +20,8 @@ package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.fiducial.calib.circle.DetectCircleHexagonalGrid;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
@@ -28,6 +30,8 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayF32;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
@@ -114,6 +118,20 @@ public class CalibrationDetectorCircleHexagonalGrid implements DetectorFiducialC
 	@Override
 	public List<Point2D_F64> getLayout() {
 		return layout;
+	}
+
+	@Override
+	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height) {
+		if( distortion == null )
+			detector.getEllipseDetector().setLensDistortion(null,null);
+		else {
+			Point2Transform2_F32 pointDistToUndist = distortion.undistort_F32(true, true);
+			Point2Transform2_F32 pointUndistToDist = distortion.distort_F32(true, true);
+			PixelTransform2_F32 distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
+			PixelTransform2_F32 undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
+
+			detector.getEllipseDetector().setLensDistortion(distToUndist,undistToDist);
+		}
 	}
 
 	/**

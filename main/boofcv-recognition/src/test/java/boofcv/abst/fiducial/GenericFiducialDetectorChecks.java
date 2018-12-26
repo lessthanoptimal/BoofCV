@@ -29,10 +29,12 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ejml.UtilEjml;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
@@ -57,6 +59,8 @@ public abstract class GenericFiducialDetectorChecks {
 
 	protected List<ImageType> types = new ArrayList<>();
 
+	Se3_F64 markerToWorld = eulerXyz(-0.2,0,1.2,0.1,Math.PI,0,null);
+
 	/**
 	 * Renders everything in gray scale first then converts it
 	 * @param intrinsic camera model
@@ -69,7 +73,6 @@ public abstract class GenericFiducialDetectorChecks {
 		simulator.setCamera(intrinsic);
 		simulator.setBackground(255);
 
-		Se3_F64 markerToWorld = eulerXyz(-0.2,0,1.2,0.1,Math.PI,0,null);
 		simulator.addSurface(markerToWorld,1.5,renderFiducial());
 
 		GrayF32 rendered = simulator.render();
@@ -164,7 +167,7 @@ public abstract class GenericFiducialDetectorChecks {
 			// render an undistorted image
 			ImageBase imageUn = renderImage(loadDistortion(false),type);
 
-//			ShowImages.showWindow(image,"adsasdf");
+//			ShowImages.showWindow(imageUn,"adsasdf");
 //			BoofMiscOps.sleep(10000);
 
 			FiducialDetector detector = createDetector(type);
@@ -190,6 +193,39 @@ public abstract class GenericFiducialDetectorChecks {
 				double t = pose.getT().norm();
 				assertEquals(0,pose.getT().distance(results.pose.get(i).T),t*0.01);
 				assertTrue(MatrixFeatures_DDRM.isIdentical(pose.getR(),results.pose.get(i).R,0.01));
+			}
+		}
+	}
+
+	@Test
+	public void checkPoseAccuracy() {
+
+		Se3_F64 adjustment = SpecialEuclideanOps_F64.eulerXyz(0,0,0,0,0,Math.PI,null);
+
+		for( boolean distorted : new boolean[]{false,true}) {
+//			System.out.println("distorted = "+distorted);
+			LensDistortionRadialTangential lensDistorted = new LensDistortionRadialTangential(loadDistortion(distorted));
+
+			for (ImageType type : types) {
+				FiducialDetector detector = createDetector(type);
+
+				ImageBase imageD = renderImage(loadDistortion(distorted), type);
+				detector.setLensDistortion(lensDistorted, imageD.width, imageD.height);
+				detector.detect(imageD);
+
+				assertEquals(1, detector.totalFound());
+
+				Se3_F64 pose = new Se3_F64();
+				detector.getFiducialToCamera(0, pose);
+
+				pose.T.scale(markerToWorld.T.norm()/pose.T.norm());
+				Se3_F64 diff = adjustment.concat(markerToWorld.concat(pose.invert(null),null),null);
+				double theta = ConvertRotation3D_F64.matrixToRodrigues(diff.R, null).theta;
+//				System.out.println("norm = "+diff.T.norm()+"  theta = "+theta);
+
+				// threshold selected through manual trial and error
+				assertEquals(0,diff.T.norm(), 0.015);
+				assertEquals(0,theta, 0.001);
 			}
 		}
 	}

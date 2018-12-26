@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,5 +88,23 @@ public class LensDistortionPinhole implements LensDistortionNarrowFOV {
 	@Override
 	public Point2Transform2_F32 undistort_F32(boolean pixelIn, boolean pixelOut) {
 		return distort_F32(pixelIn,pixelOut);
+	}
+
+	@Override
+	public Point2Transform2_F32 normalized_F32() {
+		PinholePtoN_F32 p2n = new PinholePtoN_F32();
+		p2n.set(p.fx,p.fy,p.skew,p.cx,p.cy);
+		return p2n;
+	}
+
+	@Override
+	public Point2Transform2_F64 normalized_F64() {
+		PinholePtoN_F64 p2n = new PinholePtoN_F64();
+		p2n.set(p.fx,p.fy,p.skew,p.cx,p.cy);
+		return p2n;
+	}
+
+	public CameraPinhole getIntrinsic() {
+		return p;
 	}
 }

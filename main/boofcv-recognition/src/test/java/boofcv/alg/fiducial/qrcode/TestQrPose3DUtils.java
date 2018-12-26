@@ -127,11 +127,11 @@ public class TestQrPose3DUtils {
 
 	private QrPose3DUtils createAlg() {
 		QrPose3DUtils alg = new QrPose3DUtils();
-		alg.setPixelToNorm((x, y, out) -> {
+		alg.setLensDistortion((x, y, out) -> {
 			// just change the point's scale to make it easy to see if it was applied
 			out.x = x*0.1;
 			out.y = y*0.1;
-		});
+		},null);
 		return alg;
 	}
 }

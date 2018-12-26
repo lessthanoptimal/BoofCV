@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,6 +17,8 @@
  */
 
 package boofcv.struct.calib;
+
+import org.ejml.FancyPrint;
 
 import java.io.Serializable;
 
@@ -115,6 +117,16 @@ public class CameraPinholeRadial extends CameraPinhole implements Serializable {
 		return t1 != 0 || t2 != 0;
 	}
 
+	public boolean isDistorted( double tol ) {
+		if( radial != null && radial.length > 0 ) {
+			for (int i = 0; i < radial.length; i++) {
+				if( Math.abs(radial[i]) > tol )
+					return true;
+			}
+		}
+		return Math.abs(t1) > tol || Math.abs(t2) > tol;
+	}
+
 	public double[] getRadial() {
 		return radial;
 	}
@@ -148,11 +160,36 @@ public class CameraPinholeRadial extends CameraPinhole implements Serializable {
 		} else {
 			System.out.println("No radial");
 		}
-		if( t1 != 0 && t2 != 0)
+		if( t1 != 0 || t2 != 0)
 			System.out.printf("tangential = ( %6.2e , %6.2e)\n", t1, t2);
 		else {
 			System.out.println("No tangential");
 		}
+	}
+
+	@Override
+	public String toString() {
+		FancyPrint fp = new FancyPrint();
+		String txt =
+				"CameraPinholeRadial{" +
+				"fx=" + fx +
+				", fy=" + fy +
+				", skew=" + skew +
+				", cx=" + cx +
+				", cy=" + cy +
+				", width=" + width +
+				", height=" + height;
+		if( radial != null ) {
+			txt += ",";
+			for( int i = 0; i < radial.length; i++ ) {
+				txt += " r"+i+"="+fp.s(radial[i]);
+			}
+		}
+		if( t1 != 0 || t2 != 0) {
+			txt += ", t1="+fp.s(t1)+" t2="+fp.s(t2);
+		}
+		txt += '}';
+		return txt;
 	}
 
 	@Override

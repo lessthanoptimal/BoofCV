@@ -46,6 +46,7 @@ public class QrPose3DUtils {
 	public List<Point3D_F64> point3D = new ArrayList<>();
 	// transform from pixel to normalzied image coordinates
 	protected Point2Transform2_F64 pixelToNorm = new DoNothing2Transform2_F64();
+	protected Point2Transform2_F64 undistToDist = new DoNothing2Transform2_F64(); // undistorted pixel to distorted
 
 	public QrPose3DUtils() {
 		for (int i = 0; i < 12; i++) {
@@ -73,6 +74,12 @@ public class QrPose3DUtils {
 		pixelControl.get(9).set(qr.ppDown.get(1));
 		pixelControl.get(10).set(qr.ppDown.get(2));
 		pixelControl.get(11).set(qr.ppDown.get(3));
+
+		// put it back into distorted pixels. Required by FiducialDetectorPnP
+		for (int i = 0; i < pixelControl.size(); i++) {
+			PointIndex2D_F64 p = pixelControl.get(i);
+			undistToDist.compute(p.x,p.y,p);
+		}
 
 		return pixelControl;
 	}
@@ -162,11 +169,13 @@ public class QrPose3DUtils {
 	/**
 	 * Specifies transform from pixel to normalize image coordinates
 	 */
-	public void setPixelToNorm(Point2Transform2_F64 pixelToNorm) {
+	public void setLensDistortion(Point2Transform2_F64 pixelToNorm, Point2Transform2_F64 undistToDist) {
 		if( pixelToNorm == null ) {
 			this.pixelToNorm = new DoNothing2Transform2_F64();
+			this.undistToDist = new DoNothing2Transform2_F64();
 		} else {
 			this.pixelToNorm = pixelToNorm;
+			this.undistToDist = undistToDist;
 		}
 	}
 

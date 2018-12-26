@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.abst.geo.calibration;
 
+import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
@@ -52,4 +53,10 @@ public interface DetectorFiducialCalibration {
 	 * @return List of calibration points
 	 */
 	List<Point2D_F64> getLayout();
+
+	/**
+	 * Explicitly handles lens distortion when detecting image features. If used, features will be found in
+	 * undistorted pixel coordinates
+	 */
+	void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height );
 }

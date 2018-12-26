@@ -21,6 +21,7 @@ package boofcv.abst.fiducial;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrPose3DUtils;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.ImageGray;
@@ -29,6 +30,7 @@ import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.shapes.Polygon2D_F64;
+import org.ejml.UtilEjml;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -57,7 +59,28 @@ public class QrCodeDetectorPnP<T extends ImageGray<T>> extends FiducialDetectorP
 	@Override
 	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height) {
 		super.setLensDistortion(distortion, width, height);
-		poseUtils.setPixelToNorm(pixelToNorm);
+		if( distortion == null ) {
+			poseUtils.setLensDistortion(null, null);
+
+			// Yes this shouldn't be hard coded to that type. It feels dirty adding lens distortion to the
+			// generic QR Code detector... deal with this later if there is more than one detector
+
+			((QrCodePreciseDetector)detector).setLensDistortion(width,height,null);
+		} else {
+			Point2D_F64 test = new Point2D_F64();
+			Point2Transform2_F64 undistToDist = distortion.distort_F64(true,true);
+			undistToDist.compute(0,0,test);
+			poseUtils.setLensDistortion(
+					distortion.undistort_F64(true, false),
+					undistToDist);
+
+			// If there's no actual distortion don't undistort the image while processing. Faster this way
+			if( test.norm() <= UtilEjml.TEST_F32) {
+				((QrCodePreciseDetector) detector).setLensDistortion(width,height,null);
+			} else {
+				((QrCodePreciseDetector) detector).setLensDistortion(width, height, distortion);
+			}
+		}
 	}
 
 	@Override

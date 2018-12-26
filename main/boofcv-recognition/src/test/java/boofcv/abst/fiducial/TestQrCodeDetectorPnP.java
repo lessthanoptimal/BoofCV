@@ -46,7 +46,7 @@ public class TestQrCodeDetectorPnP extends GenericFiducialDetectorChecks {
 	public GrayF32 renderFiducial() {
 		QrCode qr = new QrCodeEncoder().addAutomatic("THE MESSAGE").fixate();
 		QrCodeGeneratorImage generator = new QrCodeGeneratorImage(6);
-		generator.setBorderModule(0);
+		generator.setBorderModule(1); // interpolation gets messed up if it touches the border. plus scale is relative
 		generator.render(qr);
 
 		return generator.getGrayF32();

@@ -41,9 +41,11 @@ import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.ConvertFloatType;
 import georegression.struct.homography.Homography2D_F64;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.ops.ConvertDMatrixStruct;
 
@@ -186,20 +188,28 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			PixelTransform2_F32 distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
 			PixelTransform2_F32 undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
 
-			if (cache) {
-				distToUndist = new PixelTransformCached_F32(width, height, distToUndist);
-				undistToDist = new PixelTransformCached_F32(width, height, undistToDist);
+			// Sanity check to see if the camera model has no lens distortion. If there is no lens distortion then
+			// there's no need to do distort/undistort the image and everything will run faster
+			Point2D_F32 test = new Point2D_F32();
+			pointDistToUndist.compute(0,0,test);
+			if( test.norm() <= UtilEjml.TEST_F32) {
+				configure(null,width,height,false);
+			} else {
+				if (cache) {
+					distToUndist = new PixelTransformCached_F32(width, height, distToUndist);
+					undistToDist = new PixelTransformCached_F32(width, height, undistToDist);
+				}
+
+				squareDetector.setLensDistortion(width, height, distToUndist, undistToDist);
+
+				pointSquareToInput = new SequencePoint2Transform2_F32(transformHomography, pointUndistToDist);
+
+				// provide intrinsic camera parameters
+				PixelTransform2_F32 squareToInput = new PointToPixelTransform_F32(pointSquareToInput);
+				removePerspective.setModel(squareToInput);
+
+				this.undistToDist = distortion.distort_F64(true, true);
 			}
-
-			squareDetector.setLensDistortion(width, height, distToUndist, undistToDist);
-
-			pointSquareToInput = new SequencePoint2Transform2_F32(transformHomography, pointUndistToDist);
-
-			// provide intrinsic camera parameters
-			PixelTransform2_F32 squareToInput = new PointToPixelTransform_F32(pointSquareToInput);
-			removePerspective.setModel(squareToInput);
-
-			this.undistToDist = distortion.distort_F64(true, true);
 		}
 	}
 

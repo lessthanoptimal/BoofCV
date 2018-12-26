@@ -20,9 +20,11 @@ package boofcv.abst.fiducial;
 
 import boofcv.abst.fiducial.calib.*;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
@@ -32,6 +34,7 @@ import georegression.geometry.UtilPolygons2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
+import org.ejml.UtilEjml;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -70,6 +73,8 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 
 	// The 4 corners which are selected to be the boundary
 	int boundaryIndexes[];
+
+	Point2Transform2_F64 pointUndistToDist;
 
 	/**
 	 * Configure it to detect chessboard style targets
@@ -210,9 +215,39 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 
 		if( !detector.process(converted) ) {
 			targetDetected = false;
-			return;
 		} else {
 			targetDetected = true;
+
+			// put detected corners back into distorted coordinates
+			// Required for FiducialDetectorPnP
+			if( pointUndistToDist != null) {
+				CalibrationObservation detected = detector.getDetectedPoints();
+				for (int i = 0; i < detected.size(); i++) {
+					Point2D_F64 p = detected.get(i);
+					pointUndistToDist.compute(p.x,p.y,p);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height) {
+		super.setLensDistortion(distortion, width, height);
+
+		if( distortion == null )
+			pointUndistToDist = null;
+		else {
+			// verify that distortion is actually applied. If not don't undistort the image while extracting features
+			// this makes it run faster
+			pointUndistToDist = distortion.distort_F64(true, true);
+			Point2D_F64 test = new Point2D_F64();
+			pointUndistToDist.compute(0,0,test);
+			if( test.norm() <= UtilEjml.TEST_F32) {
+				detector.setLensDistortion(null, width, height);
+				pointUndistToDist = null;
+			} else {
+				detector.setLensDistortion(distortion, width, height);
+			}
 		}
 	}
 

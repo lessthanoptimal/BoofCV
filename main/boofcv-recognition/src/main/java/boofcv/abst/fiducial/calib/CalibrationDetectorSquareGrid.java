@@ -20,11 +20,15 @@ package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 
@@ -39,7 +43,7 @@ import java.util.List;
 public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibration {
 
 
-	DetectSquareGridFiducial<GrayF32> detect;
+	DetectSquareGridFiducial<GrayF32> detector;
 
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
@@ -54,7 +58,7 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 		DetectPolygonBinaryGrayRefine<GrayF32> detectorSquare =
 				FactoryShapeDetector.polygon(config.square,GrayF32.class);
 
-		detect = new DetectSquareGridFiducial<>(config.numRows,config.numCols,
+		detector = new DetectSquareGridFiducial<>(config.numRows,config.numCols,
 				spaceToSquareRatio,inputToBinary,detectorSquare);
 
 		layoutPoints = createLayout(config.numRows, config.numCols, config.squareWidth,config.spaceWidth);
@@ -63,8 +67,8 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 	@Override
 	public boolean process(GrayF32 input) {
 		detected = new CalibrationObservation(input.width,input.height);
-		if( detect.process(input) )  {
-			List<Point2D_F64> found = detect.getCalibrationPoints();
+		if( detector.process(input) )  {
+			List<Point2D_F64> found = detector.getCalibrationPoints();
 			for (int i = 0; i < found.size(); i++) {
 				detected.add( found.get(i), i );
 			}
@@ -127,8 +131,22 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 		return layoutPoints;
 	}
 
+	@Override
+	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height) {
+		if( distortion == null )
+			detector.getDetectorSquare().setLensDistortion(width,height,null,null);
+		else {
+			Point2Transform2_F32 pointDistToUndist = distortion.undistort_F32(true, true);
+			Point2Transform2_F32 pointUndistToDist = distortion.distort_F32(true, true);
+			PixelTransform2_F32 distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
+			PixelTransform2_F32 undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
+
+			detector.getDetectorSquare().setLensDistortion(width,height,distToUndist,undistToDist);
+		}
+	}
+
 	public DetectSquareGridFiducial<GrayF32> getAlgorithm() {
-		return detect;
+		return detector;
 	}
 
 	/**
@@ -136,7 +154,7 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 	 * @return number of rows
 	 */
 	public int getGridRows() {
-		return detect.getRows();
+		return detector.getRows();
 	}
 
 	/**
@@ -144,7 +162,7 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 	 * @return number of columns
 	 */
 	public int getGridColumns() {
-		return detect.getColumns();
+		return detector.getColumns();
 	}
 
 	/**
@@ -152,7 +170,7 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 	 * @return number of rows
 	 */
 	public int getPointRows() {
-		return detect.getCalibrationRows();
+		return detector.getCalibrationRows();
 	}
 
 	/**
@@ -160,6 +178,6 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 	 * @return number of columns
 	 */
 	public int getPointColumns() {
-		return detect.getCalibrationCols();
+		return detector.getCalibrationCols();
 	}
 }

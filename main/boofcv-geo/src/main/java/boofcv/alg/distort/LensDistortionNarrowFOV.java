@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,4 +61,15 @@ public interface LensDistortionNarrowFOV {
 	 */
 	Point2Transform2_F32 undistort_F32(boolean pixelIn, boolean pixelOut);
 
+	/**
+	 * Converts a pixel coordinate into a normalized image coordinate. Assumes that pixels have lens distortion
+	 * removed already
+	 */
+	Point2Transform2_F32 normalized_F32();
+
+	/**
+	 * Converts a pixel coordinate into a normalized image coordinate. Assumes that pixels have lens distortion
+	 * removed already
+	 */
+	Point2Transform2_F64 normalized_F64();
 }
