@@ -27,6 +27,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +44,13 @@ public class BoofSwingUtil {
 
 	public static final double MIN_ZOOM = 0.01;
 	public static final double MAX_ZOOM = 50;
+
+	public static boolean isRightClick(MouseEvent e) {
+		return (e.getButton()==MouseEvent.BUTTON3 ||
+				(System.getProperty("os.name").contains("Mac OS X") &&
+						(e.getModifiers() & InputEvent.BUTTON1_MASK) != 0 &&
+						(e.getModifiers() & InputEvent.CTRL_MASK) != 0));
+	}
 
 	public static File saveFileChooser(Component parent, FileTypes ...filters) {
 		return fileChooser(parent,false,new File(".").getPath(),filters);

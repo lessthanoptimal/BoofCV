@@ -260,7 +260,7 @@ public class AssociatedTriplePanel extends JPanel {
 	private class MouseHandler extends MouseAdapter {
 		@Override
 		public void mousePressed(MouseEvent e) {
-			if( SwingUtilities.isRightMouseButton(e) ) {
+			if( BoofSwingUtil.isRightClick(e) ) {
 				mode = Mode.values()[ (mode.ordinal()+1)%Mode.values().length];
 				repaint();
 			} else {
