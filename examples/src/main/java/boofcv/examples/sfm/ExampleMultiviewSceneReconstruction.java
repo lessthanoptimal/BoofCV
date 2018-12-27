@@ -59,11 +59,6 @@ import java.util.List;
  * structure from motion to understand.  In other words, this is not for beginners and requires good clean set of
  * images to work.
  *
- * TODO Update comment
- * One key element it is missing is bundle adjustment to improve the estimated camera location and 3D points.  The
- * current bundle adjustment in BoofCV is too inefficient.   Better noise removal and numerous other improvements
- * are needed before it can compete with commercial equivalents.
- *
  * @author Peter Abeles
  */
 public class ExampleMultiviewSceneReconstruction {
