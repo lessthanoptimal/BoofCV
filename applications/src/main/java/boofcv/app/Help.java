@@ -47,12 +47,12 @@ public class Help {
 			System.out.println("  "+c.getName());
 		}
 		System.out.println("Example:");
-		System.out.println("java -cp applications.jar "+options[0].getSimpleName());
+		System.out.println("java -jar applications.jar "+options[0].getSimpleName());
 	}
 
 	public static void main(String[] args) {
-		if( args.length == 2 ) {
-			if( args[1].equals("--GUI")) {
+		if( args.length == 1 ) {
+			if( args[0].equals("--GUI")) {
 				new ApplicationLauncherGui();
 				return;
 			}

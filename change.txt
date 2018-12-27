@@ -14,6 +14,10 @@ Version : 0.32
   * Two view uncalibrated stereo re-written from scratch
   * Three view uncalibrated stereo
   * Visualization for three view associations
+- Fiducials
+  * Several implementations were not properly performing sparse undistort of contours.
+  * This was fixed but might cause a noticeable performance hit, e.g. 5% to 25%.
+  * If radial + tangential terms are close to zero you can just remove them and not experience this slow down.
 - Applications
   * All applications have a GUI
   * Centralized GUI for launching

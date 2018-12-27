@@ -40,7 +40,7 @@ configurations {
 
 dependencies {
     ['boofcv-android', 'boofcv-core'].each {
-        String a -> api group: 'org.boofcv', name: a, version: '0.31' }
+        String a -> api group: 'org.boofcv', name: a, version: '0.32' }
     api fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:support-v4:27.1.1'
