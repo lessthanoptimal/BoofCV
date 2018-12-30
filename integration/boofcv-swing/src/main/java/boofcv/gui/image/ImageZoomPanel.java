@@ -201,6 +201,17 @@ public class ImageZoomPanel extends JScrollPane {
 		}
 	}
 
+	public void setScrollbarsVisible( boolean visible ) {
+		if( visible ) {
+			setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+			setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		} else {
+			setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+			setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		}
+		repaint();
+	}
+
 	public double getScale() {
 		return scale;
 	}
