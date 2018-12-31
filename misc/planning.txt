@@ -1,17 +1,3 @@
-TODO next release
-  - Demonstrations
-    * Associate with Fundamental - Select different algs + inliers
-    * Associate with Trifocal Tensor
-    * Modernize FFT demo
-  - Cheirality
-    * Will also require a linear programming solution, e.g. simplex
-  - Self Calibration
-    * Weighted iterated DIAC
-  - Bundle Adjustment
-    * Calibrated homogenous coordinates
-  - Remove dependency on OpenCV in Applications to reduce file size
-  - QR Code fiducial 3D pose regression tests
-
 - TODO Scene Reconstruction
    - TODO handle situation where images are removed and exception is thrown
    - TODO Create generic image feature matching for ordered sequences of images
@@ -19,7 +5,6 @@ TODO next release
 - TODO Sparse Bundle Adjustment
    - Future: quaternion implementation
    - Future: sparse block math
-- TODO create regression for homography estimation
 
 - TODO Compare BoofCV's IPPE against original
 

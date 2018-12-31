@@ -6,7 +6,26 @@ Date Format: year/month/day
 Date    : 2019
 Version : 0.33
 
--
+- Sparse Bundle Adjustment
+  * TODO Calibrated homogenous coordinates
+- Self Calibration
+  * TODO Weighted iterated DIAC
+
+TODO This Release
+  - Examples
+    * Planar World Simulator
+    * Point Cloud Viewer
+  - Demonstrations
+    * Associate with Fundamental - Select different algs + inliers
+    * Associate with Trifocal Tensor
+    * Modernize FFT demo
+  - Cheirality
+    * Will also require a linear programming solution, e.g. simplex
+  - Remove dependency on OpenCV in Applications to reduce file size
+  - QR Code fiducial 3D pose regression tests
+
+TODO Regression
+  - homography estimation
 
 ---------------------------------------------
 Date    : 2018/12/26
