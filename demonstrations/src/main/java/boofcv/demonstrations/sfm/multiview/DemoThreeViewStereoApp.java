@@ -28,6 +28,7 @@ import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.feature.associate.AssociateThreeByPairs;
 import boofcv.alg.filter.derivative.LaplacianEdge;
+import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
@@ -68,7 +69,6 @@ import org.ejml.ops.ConvertMatrixData;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -309,12 +309,13 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			int w = (int)(scale*input.getWidth()+0.5);
 			int h = (int)(scale*input.getHeight()+0.5);
 
+			// Use BoofCV to down sample since Graphics2D introduced too many aliasing artifacts
 			BufferedImage output = new BufferedImage(w,h,input.getType());
-			Graphics2D g2 = output.createGraphics();
-			// high quality render
-			g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-			g2.setTransform(new AffineTransform(scale,0,0,scale,0,0));
-			g2.drawImage(input,0,0,null);
+			Planar<GrayU8> a = new Planar<>(GrayU8.class,input.getWidth(),input.getHeight(),3);
+			Planar<GrayU8> b = new Planar<>(GrayU8.class,w,h,3);
+			ConvertBufferedImage.convertFrom(input,a,true);
+			AverageDownSampleOps.down(a,b);
+			ConvertBufferedImage.convertTo(b,output,true);
 			return output;
 		}
 	}
