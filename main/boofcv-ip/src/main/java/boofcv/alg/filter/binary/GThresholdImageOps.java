@@ -279,7 +279,7 @@ public class GThresholdImageOps {
          // Object 
          sum_obj = 0;
          num_obj = 0;
-         for (int ih = threshold + 1; ih < 256; ih++) {
+         for (int ih = threshold + 1; ih < length; ih++) {
             sum_obj += (double) ih * histogram[ih];
             num_obj += histogram[ih];
          }

@@ -148,6 +148,28 @@ public class TestGThresholdImageOps {
          
 			assertTrue(found >= 0 && found < 256);
 		}
+      // test on a synthetic sawtooth histogram
+      int histogram[] = new int[56];
+      histogram[0] = 10;
+      for (int i = 1; i < 11; i++) {
+         histogram[i] = histogram[i -1] + 10;
+      }
+      for (int i = 11; i < 21; i++) {
+         histogram[i] = histogram[i -1] - 10;
+      }
+      for (int i = 21; i < 41; i++) {
+         histogram[i] = histogram[i -1] + 10;
+      }
+      for (int i = 41; i < 56; i++) {
+         histogram[i] = histogram[i -1] - 10;
+      }
+      int total = 0;
+      for (int j = 0; j < histogram.length; j++) {
+         total += histogram[j];
+		}
+      int threshold = GThresholdImageOps.computeLi(histogram, histogram.length, total);
+      System.out.println("Li: " + threshold);
+      assertEquals(22, threshold);
       
    }
 
