@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -50,7 +51,7 @@ public class TestGThresholdImageOps {
 			assertEquals(best,found);
 		}
 	}
-
+   
 	private int bruteForceOtsu(int[] histogram, int total) {
 		int best = -1;
 		double bestScore = Double.MAX_VALUE;
@@ -131,6 +132,24 @@ public class TestGThresholdImageOps {
 		return (int)((bestMean0 + bestMean1)/2.0 + 0.5);
 	}
 
+   /**
+	 * Exercise Li code.  Not sure how to check its validity
+	 */
+	@Test
+	public void computeLi() {
+      for (int i = 0; i < 100; i++) {
+			int histogram[] = new int[ 256 ];
+			int total = 0;
+			for (int j = 0; j < histogram.length; j++) {
+				total += histogram[j] = rand.nextInt(400);
+			}
+
+			int found = GThresholdImageOps.computeLi(histogram,histogram.length,total);
+         
+			assertTrue(found >= 0 && found < 256);
+		}
+      
+   }
 
 	private static double[] variance( int histogram[] , int start , int stop , int allPixels) {
 		double mean = 0;
