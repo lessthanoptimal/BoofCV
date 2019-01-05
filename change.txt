@@ -6,6 +6,7 @@ Date Format: year/month/day
 Date    : 2019
 Version : 0.33
 
+- Fixed JavaDoc issue. Was no copying over doc-files
 - Sparse Bundle Adjustment
   * TODO Calibrated homogenous coordinates
 - Self Calibration
