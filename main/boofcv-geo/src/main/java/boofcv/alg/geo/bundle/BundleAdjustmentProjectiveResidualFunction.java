@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -102,7 +102,10 @@ public class BundleAdjustmentProjectiveResidualFunction
 			project3(output);
 	}
 
-	public void project3(double[] output) {
+	/**
+	 * projection from 3D coordinates
+	 */
+	private void project3(double[] output) {
 		int observationIndex = 0;
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
 			SceneStructureProjective.View view = structure.views[viewIndex];
@@ -120,7 +123,10 @@ public class BundleAdjustmentProjectiveResidualFunction
 		}
 	}
 
-	public void project4(double[] output) {
+	/**
+	 * projection from homogenous coordinates
+	 */
+	private void project4(double[] output) {
 		int observationIndex = 0;
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
 			SceneStructureProjective.View view = structure.views[viewIndex];

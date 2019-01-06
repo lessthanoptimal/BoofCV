@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,11 @@ public class TestBundleAdjustmentMetricSchurJacobian_DSCC {
 
 	@Test
 	public void compareToNumerical() {
-		SceneStructureMetric structure = createScene(rand);
+		compareToNumerical(true);
+		compareToNumerical(false);
+	}
+	public void compareToNumerical(boolean homogenous ) {
+		SceneStructureMetric structure = createScene(rand,homogenous);
 		SceneObservations observations = createObservations(rand,structure);
 
 		double param[] = new double[structure.getParameterCount()];
