@@ -25,7 +25,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
 /**
- * Renders a QR Code inside a gray scale image.
+ * Renders a QR Code inside a gray scale image. To change the color you need to change it in the renderer, which can
+ * be accessed with {@link #getRenderer()}.
  *
  * @author Peter Abeles
  */
