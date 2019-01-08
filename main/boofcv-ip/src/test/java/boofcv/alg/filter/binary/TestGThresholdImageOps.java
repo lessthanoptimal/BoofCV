@@ -132,46 +132,46 @@ public class TestGThresholdImageOps {
 		return (int)((bestMean0 + bestMean1)/2.0 + 0.5);
 	}
 
-   /**
-	 * Exercise Li code.  Not sure how to check its validity
+	/**
+	 * Exercise Li code. Not sure how to check its validity
 	 */
 	@Test
 	public void computeLi() {
-      for (int i = 0; i < 100; i++) {
-			int histogram[] = new int[ 256 ];
+		for (int i = 0; i < 100; i++) {
+			int histogram[] = new int[256];
 			int total = 0;
 			for (int j = 0; j < histogram.length; j++) {
 				total += histogram[j] = rand.nextInt(400);
 			}
 
-			int found = GThresholdImageOps.computeLi(histogram,histogram.length,total);
-         
+			int found = GThresholdImageOps.computeLi(histogram, histogram.length, total);
+
 			assertTrue(found >= 0 && found < 256);
 		}
-      // test on a synthetic sawtooth histogram
-      int histogram[] = new int[56];
-      histogram[0] = 10;
-      for (int i = 1; i < 11; i++) {
-         histogram[i] = histogram[i -1] + 10;
-      }
-      for (int i = 11; i < 21; i++) {
-         histogram[i] = histogram[i -1] - 10;
-      }
-      for (int i = 21; i < 41; i++) {
-         histogram[i] = histogram[i -1] + 10;
-      }
-      for (int i = 41; i < 56; i++) {
-         histogram[i] = histogram[i -1] - 10;
-      }
-      int total = 0;
-      for (int j = 0; j < histogram.length; j++) {
-         total += histogram[j];
+		// test on a synthetic sawtooth histogram
+		int histogram[] = new int[56];
+		histogram[0] = 10;
+		for (int i = 1; i < 11; i++) {
+			histogram[i] = histogram[i - 1] + 10;
 		}
-      int threshold = GThresholdImageOps.computeLi(histogram, histogram.length, total);
-      System.out.println("Li: " + threshold);
-      assertEquals(22, threshold);
-      
-   }
+		for (int i = 11; i < 21; i++) {
+			histogram[i] = histogram[i - 1] - 10;
+		}
+		for (int i = 21; i < 41; i++) {
+			histogram[i] = histogram[i - 1] + 10;
+		}
+		for (int i = 41; i < 56; i++) {
+			histogram[i] = histogram[i - 1] - 10;
+		}
+		int total = 0;
+		for (int j = 0; j < histogram.length; j++) {
+			total += histogram[j];
+		}
+		int threshold = GThresholdImageOps.computeLi(histogram, histogram.length, total);
+		System.out.println("Li: " + threshold);
+		assertEquals(22, threshold);
+
+	}
 
 	private static double[] variance( int histogram[] , int start , int stop , int allPixels) {
 		double mean = 0;
