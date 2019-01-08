@@ -148,6 +148,14 @@ public class TestGThresholdImageOps {
 
 			assertTrue(found >= 0 && found < 256);
 		}
+	}
+	
+	/**
+	 * Test Li method on a synthetic sawtooth histogram (similar to the 
+	 * one in Li's publication 
+	 */
+	@Test
+	public void computeLiSawtooth() {		 
 		// test on a synthetic sawtooth histogram
 		int histogram[] = new int[56];
 		histogram[0] = 10;
@@ -168,9 +176,56 @@ public class TestGThresholdImageOps {
 			total += histogram[j];
 		}
 		int threshold = GThresholdImageOps.computeLi(histogram, histogram.length, total);
-		System.out.println("Li: " + threshold);
-		assertEquals(22, threshold);
+		final int expected = 22; // this is a cheat, since I have no independent method
+		assertEquals(expected, threshold);
+	}
+	
+	/**
+	 * Exercise Huang code. Not sure how to check its validity
+	 */
+	@Test
+	public void computeHuang() {
+		for (int i = 0; i < 100; i++) {
+			int histogram[] = new int[256];
+			int total = 0;
+			for (int j = 0; j < histogram.length; j++) {
+				total += histogram[j] = rand.nextInt(400);
+			}
 
+			int found = GThresholdImageOps.computeHuang(histogram, histogram.length, total);
+
+			assertTrue(found >= 0 && found < 256);
+		}
+	}
+	
+	/**
+	 * Test Huang method on a synthetic sawtooth histogram (similar to the 
+	 * one in Li's publication 
+	 */
+	@Test
+	public void computeHuangSawtooth() {		 
+		// test on a synthetic sawtooth histogram
+		int histogram[] = new int[56];
+		histogram[0] = 10;
+		for (int i = 1; i < 11; i++) {
+			histogram[i] = histogram[i - 1] + 10;
+		}
+		for (int i = 11; i < 21; i++) {
+			histogram[i] = histogram[i - 1] - 10;
+		}
+		for (int i = 21; i < 41; i++) {
+			histogram[i] = histogram[i - 1] + 10;
+		}
+		for (int i = 41; i < 56; i++) {
+			histogram[i] = histogram[i - 1] - 10;
+		}
+		int total = 0;
+		for (int j = 0; j < histogram.length; j++) {
+			total += histogram[j];
+		}
+		int threshold = GThresholdImageOps.computeHuang(histogram, histogram.length, total);
+		final int expected = 25; // this is a cheat, since I have no independent method
+		assertEquals(expected, threshold);
 	}
 
 	private static double[] variance( int histogram[] , int start , int stop , int allPixels) {
