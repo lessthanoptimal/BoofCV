@@ -21,10 +21,12 @@ package boofcv.alg.filter.binary;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.impl.ThresholdSauvola;
 import boofcv.alg.misc.GImageStatistics;
+import boofcv.alg.misc.HistogramStatistics;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.*;
+import org.ejml.UtilEjml;
 
 
 /**
@@ -195,7 +197,7 @@ public class GThresholdImageOps {
 	/**
 	 * <p>
 	 * Computes Li's Minimum Cross Entropy thresholding from an input image. Internally it uses
-	 * {@link #computeLi(int[], int, int)} and {@link boofcv.alg.misc.GImageStatistics#histogram(ImageGray, double, int[])}
+	 * {@link #computeLi(int[], int)} and {@link boofcv.alg.misc.GImageStatistics#histogram(ImageGray, double, int[])}
 	 * </p>
 	 *
 	 * @param input Input gray-scale image
@@ -210,10 +212,7 @@ public class GThresholdImageOps {
 
 		GImageStatistics.histogram(input,minValue,histogram);
 
-		// Total number of pixels
-		int total = input.width*input.height;
-
-		return computeLi(histogram,range,total)+minValue;
+		return computeLi(histogram,range)+minValue;
 	}
    
  /**
@@ -233,34 +232,20 @@ public class GThresholdImageOps {
 	 *
 	 * @param histogram Histogram of pixel intensities.
 	 * @param length Number of elements in the histogram.
-	 * @param totalPixels Total pixels in the image
 	 * @return Selected threshold
 	 */
-	public static int computeLi(int histogram[], int length, int totalPixels) {
+	public static int computeLi(int histogram[], int length) {
+		// This function has been released by various authors under a public domain license
+
 		int threshold;
-		double sum_back; // sum of the background pixels at a given threshold 
-		double sum_obj;  // sum of the object pixels at a given threshold 
-		double num_back; // number of background pixels at a given threshold 
-		double num_obj;  // number of object pixels at a given threshold 
-		double old_thresh;
-		double new_thresh;
-		double mean_back; // mean of the background pixels at a given threshold 
-		double mean_obj;  // mean of the object pixels at a given threshold 
-		double mean;      // mean gray-level in the image 
-		double tolerance; // threshold tolerance 
+		int old_thresh;
+		double mean_back;       // mean of the background pixels at a given threshold
+		double mean_obj;        // mean of the object pixels at a given threshold
+		double tolerance = 0.5; // threshold tolerance
 		double temp;
 
-		tolerance = 0.5;
-
-		// Calculate the mean gray-level 
-		mean = 0.0;
-		for (int i = 0; i < length; i++) {
-			mean += (double) i * histogram[i];
-		}
-		mean /= totalPixels;
-
-		// Initial estimate 
-		new_thresh = mean;
+		// Calculate the mean gray-level and set the threshold initially to this
+		int new_thresh = (int)(HistogramStatistics.mean(histogram,length)+0.5);
 
 		do {
 			old_thresh = new_thresh;
@@ -268,18 +253,18 @@ public class GThresholdImageOps {
 			// range 
 			// Calculate the means of background and object pixels 
 			// Background 
-			sum_back = 0;
-			num_back = 0;
+			int sum_back = 0; // sum of the background pixels at a given threshold
+			int num_back = 0; // number of background pixels at a given threshold
 			for (int ih = 0; ih <= threshold; ih++) {
-				sum_back += (double) ih * histogram[ih];
+				sum_back += ih * histogram[ih];
 				num_back += histogram[ih];
 			}
 			mean_back = (num_back == 0 ? 0.0 : (sum_back / (double) num_back));
 			// Object 
-			sum_obj = 0;
-			num_obj = 0;
+			int sum_obj = 0; // sum of the object pixels at a given threshold
+			int num_obj = 0; // number of object pixels at a given threshold
 			for (int ih = threshold + 1; ih < length; ih++) {
-				sum_obj += (double) ih * histogram[ih];
+				sum_obj += ih * histogram[ih];
 				num_obj += histogram[ih];
 			}
 			mean_obj = (num_obj == 0 ? 0.0 : (sum_obj / (double) num_obj));
@@ -294,7 +279,7 @@ public class GThresholdImageOps {
 			//DBL_EPSILON = 2.220446049250313E-16
 			temp = (mean_back - mean_obj) / (Math.log(mean_back) - Math.log(mean_obj));
 
-			if (temp < -2.220446049250313E-16) {
+			if (temp < -UtilEjml.EPS) {
 				new_thresh = (int) (temp - 0.5);
 			} else {
 				new_thresh = (int) (temp + 0.5);
@@ -309,7 +294,7 @@ public class GThresholdImageOps {
 	/**
 	 * <p>
 	 * Computes Huang's Minimum fyzzy thresholding from an input image. Internally it uses
-	 * {@link #computeHuang(int[], int, int)} and {@link boofcv.alg.misc.GImageStatistics#histogram(ImageGray, double, int[])}
+	 * {@link #computeHuang(int[], int)} and {@link boofcv.alg.misc.GImageStatistics#histogram(ImageGray, double, int[])}
 	 * </p>
 	 *
 	 * @param input Input gray-scale image
@@ -324,10 +309,7 @@ public class GThresholdImageOps {
 
 		GImageStatistics.histogram(input,minValue,histogram);
 
-		// Total number of pixels
-		int total = input.width*input.height;
-
-		return computeHuang(histogram,range,total)+minValue;
+		return computeHuang(histogram,range)+minValue;
 	}
    
 	/**
@@ -342,63 +324,59 @@ public class GThresholdImageOps {
 	 *
 	 * @param histogram Histogram of pixel intensities.
 	 * @param length Number of elements in the histogram.
-	 * @param totalPixels Total pixels in the image
 	 * @return Selected threshold
 	 */
-	public static int computeHuang(int[] histogram, int length, int totalPixels) {
-		int threshold;
-		int ih, it;
-		int first_bin;
-		int last_bin;
-		double sum_pix;
-		double num_pix;
-		double term;
-		double ent;  // entropy 
-		double min_ent; // min entropy 
+	public static int computeHuang(int[] histogram, int length) {
+		// This function has been released by various authors under a public domain license
+
 		double mu_x;
 
-		/* Determine the first non-zero bin */
-		first_bin = 0;
-		for (ih = 0; ih < length; ih++) {
+		// Determine the first non-zero bin
+		int first_bin = 0;
+		for (int ih = 0; ih < length; ih++) {
 			if (histogram[ih] != 0) {
 				first_bin = ih;
 				break;
 			}
 		}
 
-		/* Determine the last non-zero bin */
-		last_bin = length - 1;
-		for (ih = length - 1; ih >= first_bin; ih--) {
+		// Determine the last non-zero bin
+		int last_bin = length - 1;
+		for (int ih = length - 1; ih >= first_bin; ih--) {
 			if (histogram[ih] != 0) {
 				last_bin = ih;
 				break;
 			}
 		}
-		term = 1.0 / (double) (last_bin - first_bin);
+		double term = 1.0 / (double) (last_bin - first_bin);
 		double[] mu_0 = new double[length];
-		sum_pix = num_pix = 0;
-		for (ih = first_bin; ih < length; ih++) {
-			sum_pix += (double) ih * histogram[ih];
-			num_pix += histogram[ih];
-			/* NUM_PIX cannot be zero ! */
-			mu_0[ih] = sum_pix / num_pix;
+		{
+			int sum_pix = 0, num_pix = 0;
+			for (int ih = first_bin; ih < length; ih++) {
+				sum_pix += ih * histogram[ih];
+				num_pix += histogram[ih];
+				// NUM_PIX cannot be zero !
+				mu_0[ih] = sum_pix / (double) num_pix;
+			}
 		}
 
 		double[] mu_1 = new double[length];
-		sum_pix = num_pix = 0;
-		for (ih = last_bin; ih >= 0; ih--) { // original: (ih = last_bin; ih > 0; ih--)
-			sum_pix += (double) ih * histogram[ih];
-			num_pix += histogram[ih];
-			/* NUM_PIX cannot be zero ! */
-			mu_1[ih] = sum_pix / (double) num_pix; // original: mu_1[ih -1] = sum_pix/(double) num_pix
+		{
+			int sum_pix = 0, num_pix = 0;
+			for (int ih = last_bin; ih >= 0; ih--) { // original: (ih = last_bin; ih > 0; ih--)
+				sum_pix += ih * histogram[ih];
+				num_pix += histogram[ih];
+				// NUM_PIX cannot be zero !
+				mu_1[ih] = sum_pix / (double) num_pix; // original: mu_1[ih -1] = sum_pix/(double) num_pix
+			}
 		}
 
 		/* Determine the threshold that minimizes the fuzzy entropy */
-		threshold = -1;
-		min_ent = Double.MAX_VALUE;
-		for (it = 0; it < length; it++) {
-			ent = 0.0;
-			for (ih = 0; ih <= it; ih++) {
+		int threshold = -1;
+		double min_ent = Double.MAX_VALUE; // min entropy
+		for (int it = 0; it < length; it++) {
+			double ent = 0.0;  // entropy
+			for (int ih = 0; ih <= it; ih++) {
 				/* Equation (4) in Ref. 1 */
 				mu_x = 1.0 / (1.0 + term * Math.abs(ih - mu_0[it]));
 				if (!((mu_x < 1e-06) || (mu_x > 0.999999))) {
@@ -407,7 +385,7 @@ public class GThresholdImageOps {
 				}
 			}
 
-			for (ih = it + 1; ih < length; ih++) {
+			for (int ih = it + 1; ih < length; ih++) {
 				/* Equation (4) in Ref. 1 */
 				mu_x = 1.0 / (1.0 + term * Math.abs(ih - mu_1[it]));
 				if (!((mu_x < 1e-06) || (mu_x > 0.999999))) {

@@ -139,12 +139,11 @@ public class TestGThresholdImageOps {
 	public void computeLi() {
 		for (int i = 0; i < 100; i++) {
 			int histogram[] = new int[256];
-			int total = 0;
 			for (int j = 0; j < histogram.length; j++) {
-				total += histogram[j] = rand.nextInt(400);
+				histogram[j] = rand.nextInt(400);
 			}
 
-			int found = GThresholdImageOps.computeLi(histogram, histogram.length, total);
+			int found = GThresholdImageOps.computeLi(histogram, histogram.length);
 
 			assertTrue(found >= 0 && found < 256);
 		}
@@ -155,8 +154,31 @@ public class TestGThresholdImageOps {
 	 * one in Li's publication 
 	 */
 	@Test
-	public void computeLiSawtooth() {		 
+	public void computeLi_Sawtooth() {
 		// test on a synthetic sawtooth histogram
+		int[] histogram = createSawToothHistogram();
+
+		int threshold = GThresholdImageOps.computeLi(histogram, histogram.length);
+		final int expected = 22; // this is a cheat, since I have no independent method
+		assertEquals(expected, threshold);
+	}
+
+	/**
+	 * Make sure zeros at the beginning and end of the histogram are handled correctly
+	 */
+	@Test
+	void computeLi_zeros() {
+		int[] sawTooth = createSawToothHistogram();
+		int[] histogram = new int[sawTooth.length+50];
+		for (int i = 0; i < sawTooth.length; i++) {
+			histogram[i+30] = sawTooth[i];
+		}
+		int threshold = GThresholdImageOps.computeLi(histogram, histogram.length);
+		final int expected = 30+25; // this is a cheat, since I have no independent method
+		assertEquals(expected, threshold);
+	}
+
+	private int[] createSawToothHistogram() {
 		int histogram[] = new int[56];
 		histogram[0] = 10;
 		for (int i = 1; i < 11; i++) {
@@ -171,15 +193,9 @@ public class TestGThresholdImageOps {
 		for (int i = 41; i < 56; i++) {
 			histogram[i] = histogram[i - 1] - 10;
 		}
-		int total = 0;
-		for (int j = 0; j < histogram.length; j++) {
-			total += histogram[j];
-		}
-		int threshold = GThresholdImageOps.computeLi(histogram, histogram.length, total);
-		final int expected = 22; // this is a cheat, since I have no independent method
-		assertEquals(expected, threshold);
+		return histogram;
 	}
-	
+
 	/**
 	 * Exercise Huang code. Not sure how to check its validity
 	 */
@@ -187,12 +203,11 @@ public class TestGThresholdImageOps {
 	public void computeHuang() {
 		for (int i = 0; i < 100; i++) {
 			int histogram[] = new int[256];
-			int total = 0;
 			for (int j = 0; j < histogram.length; j++) {
-				total += histogram[j] = rand.nextInt(400);
+				histogram[j] = rand.nextInt(400);
 			}
 
-			int found = GThresholdImageOps.computeHuang(histogram, histogram.length, total);
+			int found = GThresholdImageOps.computeHuang(histogram, histogram.length);
 
 			assertTrue(found >= 0 && found < 256);
 		}
@@ -203,28 +218,27 @@ public class TestGThresholdImageOps {
 	 * one in Li's publication 
 	 */
 	@Test
-	public void computeHuangSawtooth() {		 
+	void computeHuang_Sawtooth() {
 		// test on a synthetic sawtooth histogram
-		int histogram[] = new int[56];
-		histogram[0] = 10;
-		for (int i = 1; i < 11; i++) {
-			histogram[i] = histogram[i - 1] + 10;
-		}
-		for (int i = 11; i < 21; i++) {
-			histogram[i] = histogram[i - 1] - 10;
-		}
-		for (int i = 21; i < 41; i++) {
-			histogram[i] = histogram[i - 1] + 10;
-		}
-		for (int i = 41; i < 56; i++) {
-			histogram[i] = histogram[i - 1] - 10;
-		}
-		int total = 0;
-		for (int j = 0; j < histogram.length; j++) {
-			total += histogram[j];
-		}
-		int threshold = GThresholdImageOps.computeHuang(histogram, histogram.length, total);
+		int[] histogram = createSawToothHistogram();
+
+		int threshold = GThresholdImageOps.computeHuang(histogram, histogram.length);
 		final int expected = 25; // this is a cheat, since I have no independent method
+		assertEquals(expected, threshold);
+	}
+
+	/**
+	 * Make sure zeros at the beginning and end of the histogram are handled correctly
+	 */
+	@Test
+	void computeHang_zeros() {
+		int[] sawTooth = createSawToothHistogram();
+		int[] histogram = new int[sawTooth.length+50];
+		for (int i = 0; i < sawTooth.length; i++) {
+			histogram[i+30] = sawTooth[i];
+		}
+		int threshold = GThresholdImageOps.computeHuang(histogram, histogram.length);
+		final int expected = 30+25; // this is a cheat, since I have no independent method
 		assertEquals(expected, threshold);
 	}
 
