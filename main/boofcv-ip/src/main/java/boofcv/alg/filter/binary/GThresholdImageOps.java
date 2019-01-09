@@ -250,8 +250,9 @@ public class GThresholdImageOps {
 		do {
 			old_thresh = new_thresh;
 			threshold = (int) (old_thresh + 0.5);
-			// range 
+			
 			// Calculate the means of background and object pixels 
+			
 			// Background 
 			int sum_back = 0; // sum of the background pixels at a given threshold
 			int num_back = 0; // number of background pixels at a given threshold
@@ -260,6 +261,7 @@ public class GThresholdImageOps {
 				num_back += histogram[ih];
 			}
 			mean_back = (num_back == 0 ? 0.0 : (sum_back / (double) num_back));
+			
 			// Object 
 			int sum_obj = 0; // sum of the object pixels at a given threshold
 			int num_obj = 0; // number of object pixels at a given threshold
@@ -351,7 +353,7 @@ public class GThresholdImageOps {
 		double term = 1.0 / (double) (last_bin - first_bin);
 		double[] mu_0 = new double[length];
 		{
-			int sum_pix = 0, num_pix = 0;
+			double sum_pix = 0.0, num_pix = 0.0;
 			for (int ih = first_bin; ih < length; ih++) {
 				sum_pix += ih * histogram[ih];
 				num_pix += histogram[ih];
@@ -362,7 +364,7 @@ public class GThresholdImageOps {
 
 		double[] mu_1 = new double[length];
 		{
-			int sum_pix = 0, num_pix = 0;
+			double sum_pix = 0.0, num_pix = 0.0;
 			for (int ih = last_bin; ih >= 0; ih--) { // original: (ih = last_bin; ih > 0; ih--)
 				sum_pix += ih * histogram[ih];
 				num_pix += histogram[ih];
