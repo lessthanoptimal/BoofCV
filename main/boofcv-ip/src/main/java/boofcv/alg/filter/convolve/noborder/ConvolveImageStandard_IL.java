@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -299,7 +299,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel , InterleavedU8 src , InterleavedI16 dst )
+	public static void convolve( Kernel2D_S32 kernel , InterleavedU8 src , InterleavedI16 dst )
 	{
 		final int[] dataKernel = kernel.data;
 		final byte[] dataSrc = src.data;
@@ -398,7 +398,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel , InterleavedU8 src , InterleavedS32 dst )
+	public static void convolve( Kernel2D_S32 kernel , InterleavedU8 src , InterleavedS32 dst )
 	{
 		final int[] dataKernel = kernel.data;
 		final byte[] dataSrc = src.data;
@@ -534,7 +534,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel , InterleavedS16 src , InterleavedI16 dst )
+	public static void convolve( Kernel2D_S32 kernel , InterleavedS16 src , InterleavedI16 dst )
 	{
 		final int[] dataKernel = kernel.data;
 		final short[] dataSrc = src.data;
@@ -635,7 +635,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel , InterleavedU8 src , InterleavedI8 dst , int divisor )
+	public static void convolve( Kernel2D_S32 kernel , InterleavedU8 src , InterleavedI8 dst , int divisor )
 	{
 		final int[] dataKernel = kernel.data;
 		final byte[] dataSrc = src.data;
@@ -737,7 +737,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel , InterleavedS16 src , InterleavedI16 dst , int divisor )
+	public static void convolve( Kernel2D_S32 kernel , InterleavedS16 src , InterleavedI16 dst , int divisor )
 	{
 		final int[] dataKernel = kernel.data;
 		final short[] dataSrc = src.data;
@@ -763,6 +763,207 @@ public class ConvolveImageStandard_IL {
 						int indexSrc = indexSrcStart+ki*src.stride + band;
 						for( int kj = 0; kj <  kernel.width; kj++ ) {
 							total += (dataSrc[indexSrc] )* dataKernel[indexKer++];
+							indexSrc += numBands;
+						}
+					}
+					dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
+				}
+			}
+		}
+	}
+
+	public static void horizontal( Kernel1D_S32 kernel ,
+								   InterleavedU16 src, InterleavedI16 dst ) {
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
+		final int[] dataKer = kernel.data;
+
+		final int offset = kernel.getOffset();
+		final int kernelWidth = kernel.getWidth();
+		final int numBands = src.getNumBands();
+
+		final int endJ = src.width - (kernelWidth - 1);
+
+		for( int i = 0; i < src.height; i++ ) {
+			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
+
+			for (int j = 0; j < endJ; j++) {
+				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
+				for (int band = 0; band < numBands; band++) {
+					int indexSrc = indexSrcStart + band;
+					int total = 0;
+					for (int k = 0; k < kernelWidth; k++, indexSrc += numBands) {
+						total += (dataSrc[indexSrc] & 0xFFFF) * dataKer[k];
+					}
+					dataDst[indexDst++] = (short)total;
+				}
+			}
+		}
+	}
+
+	public static void vertical( Kernel1D_S32 kernel,
+								 InterleavedU16 src, InterleavedI16 dst )
+	{
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
+		final int[] dataKer = kernel.data;
+
+		final int offset = kernel.getOffset();
+		final int kernelWidth = kernel.getWidth();
+		final int numBands = src.getNumBands();
+
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
+
+		final int yEnd = imgHeight-(kernelWidth-offset-1);
+
+		for( int y = offset; y < yEnd; y++ ) {
+			int indexDst = dst.startIndex+y*dst.stride;
+			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
+
+			for (int x = 0; x < imgWidth; x++) {
+				for (int band = 0; band < numBands; band++) {
+					int indexSrc = indexSrcStart + band;
+
+					int total = 0;
+					for (int k = 0; k < kernelWidth; k++) {
+						total += (dataSrc[indexSrc] & 0xFFFF)* dataKer[k];
+						indexSrc += src.stride;
+					}
+					dataDst[indexDst++] = (short)total;
+				}
+				indexSrcStart += numBands;
+			}
+		}
+	}
+
+	public static void convolve( Kernel2D_S32 kernel , InterleavedU16 src , InterleavedI16 dst )
+	{
+		final int[] dataKernel = kernel.data;
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+		final int numBands = src.getNumBands();
+
+		int offsetL = kernel.offset;
+		int offsetR = kernel.width-kernel.offset-1;
+
+		for( int y = offsetL; y < height-offsetR; y++ ) {
+			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
+				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
+
+				for (int band = 0; band < numBands; band++) {
+					int total = 0;
+					int indexKer = 0;
+					for( int ki = 0; ki < kernel.width; ki++ ) {
+						int indexSrc = indexSrcStart+ki*src.stride + band;
+						for( int kj = 0; kj <  kernel.width; kj++ ) {
+							total += (dataSrc[indexSrc] & 0xFFFF)* dataKernel[indexKer++];
+							indexSrc += numBands;
+						}
+					}
+					dataDst[indexDst++] = (short)total;
+				}
+			}
+		}
+	}
+
+	public static void horizontal( Kernel1D_S32 kernel ,
+								   InterleavedU16 src, InterleavedI16 dst , int divisor ) {
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
+		final int[] dataKer = kernel.data;
+
+		final int offset = kernel.getOffset();
+		final int kernelWidth = kernel.getWidth();
+		final int numBands = src.getNumBands();
+		final int halfDivisor = divisor/2;
+
+		final int endJ = src.width - (kernelWidth - 1);
+
+		for( int i = 0; i < src.height; i++ ) {
+			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
+
+			for (int j = 0; j < endJ; j++) {
+				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
+				for (int band = 0; band < numBands; band++) {
+					int indexSrc = indexSrcStart + band;
+					int total = 0;
+					for (int k = 0; k < kernelWidth; k++, indexSrc += numBands) {
+						total += (dataSrc[indexSrc] & 0xFFFF) * dataKer[k];
+					}
+					dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
+				}
+			}
+		}
+	}
+
+	public static void vertical( Kernel1D_S32 kernel,
+								 InterleavedU16 src, InterleavedI16 dst , int divisor )
+	{
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
+		final int[] dataKer = kernel.data;
+
+		final int offset = kernel.getOffset();
+		final int kernelWidth = kernel.getWidth();
+		final int numBands = src.getNumBands();
+		final int halfDivisor = divisor/2;
+
+		final int imgWidth = dst.getWidth();
+		final int imgHeight = dst.getHeight();
+
+		final int yEnd = imgHeight-(kernelWidth-offset-1);
+
+		for( int y = offset; y < yEnd; y++ ) {
+			int indexDst = dst.startIndex+y*dst.stride;
+			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
+
+			for (int x = 0; x < imgWidth; x++) {
+				for (int band = 0; band < numBands; band++) {
+					int indexSrc = indexSrcStart + band;
+
+					int total = 0;
+					for (int k = 0; k < kernelWidth; k++) {
+						total += (dataSrc[indexSrc] & 0xFFFF)* dataKer[k];
+						indexSrc += src.stride;
+					}
+					dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
+				}
+				indexSrcStart += numBands;
+			}
+		}
+	}
+
+	public static void convolve( Kernel2D_S32 kernel , InterleavedU16 src , InterleavedI16 dst , int divisor )
+	{
+		final int[] dataKernel = kernel.data;
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+		final int numBands = src.getNumBands();
+		final int halfDivisor = divisor/2;
+
+		int offsetL = kernel.offset;
+		int offsetR = kernel.width-kernel.offset-1;
+
+		for( int y = offsetL; y < height-offsetR; y++ ) {
+			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
+				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
+
+				for (int band = 0; band < numBands; band++) {
+					int total = 0;
+					int indexKer = 0;
+					for( int ki = 0; ki < kernel.width; ki++ ) {
+						int indexSrc = indexSrcStart+ki*src.stride + band;
+						for( int kj = 0; kj <  kernel.width; kj++ ) {
+							total += (dataSrc[indexSrc] & 0xFFFF)* dataKernel[indexKer++];
 							indexSrc += numBands;
 						}
 					}
@@ -874,7 +1075,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel , InterleavedS32 src , InterleavedS32 dst )
+	public static void convolve( Kernel2D_S32 kernel , InterleavedS32 src , InterleavedS32 dst )
 	{
 		final int[] dataKernel = kernel.data;
 		final int[] dataSrc = src.data;
@@ -975,7 +1176,7 @@ public class ConvolveImageStandard_IL {
 		}
 	}
 
-	public static void convolve(Kernel2D_S32 kernel , InterleavedS32 src , InterleavedS32 dst , int divisor )
+	public static void convolve( Kernel2D_S32 kernel , InterleavedS32 src , InterleavedS32 dst , int divisor )
 	{
 		final int[] dataKernel = kernel.data;
 		final int[] dataSrc = src.data;

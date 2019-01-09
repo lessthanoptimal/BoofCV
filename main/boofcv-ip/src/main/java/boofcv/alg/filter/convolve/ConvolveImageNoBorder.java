@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -185,7 +185,7 @@ public class ConvolveImageNoBorder {
 								  GrayU8 input, GrayS32 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-//		if (!ConvolveImageUnrolled_U8_S32.horizontal(kernel, input, output))
+//		if (!ConvolveImageUnrolled_SB_U8_S32.horizontal(kernel, input, output))
 			ConvolveImageStandard_SB.horizontal(kernel, input, output);
 	}
 
@@ -193,7 +193,7 @@ public class ConvolveImageNoBorder {
 								  GrayU8 input, GrayS32 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-//		if (!ConvolveImageUnrolled_U8_S32.vertical(kernel, input, output))
+//		if (!ConvolveImageUnrolled_SB_U8_S32.vertical(kernel, input, output))
 			ConvolveImageStandard_SB.vertical(kernel, input, output);
 	}
 
@@ -201,7 +201,7 @@ public class ConvolveImageNoBorder {
 								  GrayU8 input, GrayS32 output) {
 		InputSanityCheck.checkSameShape(input, output);
 
-//		if (!ConvolveImageUnrolled_U8_S32.convolve(kernel, input, output))
+//		if (!ConvolveImageUnrolled_SB_U8_S32.convolve(kernel, input, output))
 			ConvolveImageStandard_SB.convolve(kernel, input, output);
 	}
 
@@ -230,7 +230,7 @@ public class ConvolveImageNoBorder {
 								  GrayU16 input, GrayI8 output, int divisor) {
 		InputSanityCheck.checkSameShape(input, output);
 
-//		if (!ConvolveImageUnrolled_U16_I8_Div.vertical(kernel, input, output, divisor))
+//		if (!ConvolveImageUnrolled_SB_U16_I8_Div.vertical(kernel, input, output, divisor))
 			ConvolveImageStandard_SB.vertical(kernel, input, output, divisor);
 	}
 
@@ -376,11 +376,56 @@ public class ConvolveImageNoBorder {
 		ConvolveImageStandard_IL.convolve(kernel, input, output, divisor);
 	}
 
+	public static void horizontal(Kernel1D_S32 kernel,
+								  GrayU16 input, GrayI16 output, int divisor) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		if (!ConvolveImageUnrolled_SB_U16_I16_Div.horizontal(kernel, input, output, divisor))
+			ConvolveImageStandard_SB.horizontal(kernel, input, output, divisor);
+	}
+
+	public static void vertical(Kernel1D_S32 kernel,
+								  GrayU16 input, GrayI16 output, int divisor) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		if (!ConvolveImageUnrolled_SB_U16_I16_Div.vertical(kernel, input, output, divisor))
+			ConvolveImageStandard_SB.vertical(kernel, input, output, divisor);
+	}
+
+	public static void convolve(Kernel2D_S32 kernel,
+								  GrayU16 input, GrayI16 output, int divisor) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		if (!ConvolveImageUnrolled_SB_U16_I16_Div.convolve(kernel, input, output, divisor))
+			ConvolveImageStandard_SB.convolve(kernel, input, output, divisor);
+	}
+
+	public static void horizontal(Kernel1D_S32 kernel,
+								  InterleavedU16 input, InterleavedI16 output, int divisor) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		ConvolveImageStandard_IL.horizontal(kernel, input, output, divisor);
+	}
+
+	public static void vertical(Kernel1D_S32 kernel,
+								  InterleavedU16 input, InterleavedI16 output, int divisor) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		ConvolveImageStandard_IL.vertical(kernel, input, output, divisor);
+	}
+
+	public static void convolve(Kernel2D_S32 kernel,
+								  InterleavedU16 input, InterleavedI16 output, int divisor) {
+		InputSanityCheck.checkSameShape(input, output);
+
+		ConvolveImageStandard_IL.convolve(kernel, input, output, divisor);
+	}
+
 	public static void vertical(Kernel1D_S32 kernel,
 								  GrayS32 input, GrayI16 output, int divisor) {
 		InputSanityCheck.checkSameShape(input, output);
 
-//		if (!ConvolveImageUnrolled_S32_I16_Div.vertical(kernel, input, output, divisor))
+//		if (!ConvolveImageUnrolled_SB_S32_I16_Div.vertical(kernel, input, output, divisor))
 			ConvolveImageStandard_SB.vertical(kernel, input, output, divisor);
 	}
 

@@ -11,6 +11,9 @@ Version : 0.33
   * Added calibrated homogenous coordinates
 - Self Calibration
   * TODO Weighted iterated DIAC
+- Improved Support for U16 images
+  * Convolution, blur, ... etc
+  * Requested by Nico Stuurman
 
 TODO This Release
   - Examples
