@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,6 +63,8 @@ public class GeneratePairwiseImageGraph {
 			similarImages.findSimilar(src,similar);
 			similarImages.lookupFeatures(src,srcFeats);
 
+			graph.nodes.get(idxTgt).totalFeatures = srcFeats.size;
+
 			for (int idxSimilar = 0; idxSimilar < similar.size(); idxSimilar++) {
 				String dst = similar.get(idxSimilar);
 				similarImages.lookupFeatures(dst,dstFeats);
@@ -82,24 +84,29 @@ public class GeneratePairwiseImageGraph {
 
 	protected void createEdge( String src , String dst ,
 							   FastQueue<AssociatedPair> pairs , FastQueue<AssociatedIndex> matches ) {
-		if( !ransac3D.process(pairs.toList()) ) {
-			return;
+		// Fitting Essential/Fundamental works when the scene is not planar and not pure rotation
+		// TODO double check that it doesn't work if those conditions are not meet
+		int countF = 0;
+		if( ransac3D.process(pairs.toList()) ) {
+			countF = ransac3D.getMatchSet().size();
 		}
-		int count3D = ransac3D.getMatchSet().size();
-		if( count3D < minimumInliers )
-			return;
 
+		// Fitting homography will work when all or part of the scene is planar or motion is pure rotation
 		int countH = 0;
 		if( ransacH.process(pairs.toList()) ) {
 			countH = ransacH.getMatchSet().size();
 		}
 
-		// TODO can SVD of F be used to see if it's pure rotation or not? It's fine if there's a translation
+		// fail if not enough features are remaining after RANSAC
+		if( Math.max(countF,countH) < minimumInliers )
+			return;
 
-		boolean is3D = count3D > countH*1.2;
+		boolean is3D = countF > countH*1.2;
 
 		PairwiseImageGraph2.Motion edge = graph.edges.grow();
 		edge.is3D = is3D;
+		edge.countF = countF;
+		edge.countH = countH;
 		edge.index = graph.edges.size-1;
 		edge.src = graph.lookupNode(src);
 		edge.dst = graph.lookupNode(dst);

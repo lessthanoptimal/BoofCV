@@ -6,7 +6,7 @@ Date Format: year/month/day
 Date    : 2019
 Version : 0.33
 
-- Fixed JavaDoc issue. Was no copying over doc-files
+- Fixed JavaDoc issue. Was not copying over doc-files
 - Sparse Bundle Adjustment
   * Added calibrated homogenous coordinates
 - Self Calibration
@@ -23,10 +23,10 @@ TODO This Release
   - Cheirality
     * Will also require a linear programming solution, e.g. simplex
   - Remove dependency on OpenCV in Applications to reduce file size
-  - QR Code fiducial 3D pose regression tests
 
 TODO Regression
   - homography estimation
+  - QR Code fiducial 3D pose regression
 
 ---------------------------------------------
 Date    : 2018/12/26
