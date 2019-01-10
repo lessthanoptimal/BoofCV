@@ -250,19 +250,18 @@ public class GThresholdImageOps {
 		do {
 			old_thresh = new_thresh;
 			threshold = (int) (old_thresh + 0.5);
-			// range 
 			// Calculate the means of background and object pixels 
 			// Background 
-			int sum_back = 0; // sum of the background pixels at a given threshold
-			int num_back = 0; // number of background pixels at a given threshold
+			long sum_back = 0; // sum of the background pixels at a given threshold
+			long num_back = 0; // number of background pixels at a given threshold
 			for (int ih = 0; ih <= threshold; ih++) {
 				sum_back += ih * histogram[ih];
 				num_back += histogram[ih];
 			}
 			mean_back = (num_back == 0 ? 0.0 : (sum_back / (double) num_back));
 			// Object 
-			int sum_obj = 0; // sum of the object pixels at a given threshold
-			int num_obj = 0; // number of object pixels at a given threshold
+			long sum_obj = 0; // sum of the object pixels at a given threshold
+			long num_obj = 0; // number of object pixels at a given threshold
 			for (int ih = threshold + 1; ih < length; ih++) {
 				sum_obj += ih * histogram[ih];
 				num_obj += histogram[ih];
@@ -329,8 +328,6 @@ public class GThresholdImageOps {
 	public static int computeHuang(int[] histogram, int length) {
 		// This function has been released by various authors under a public domain license
 
-		double mu_x;
-
 		// Determine the first non-zero bin
 		int first_bin = 0;
 		for (int ih = 0; ih < length; ih++) {
@@ -342,7 +339,7 @@ public class GThresholdImageOps {
 
 		// Determine the last non-zero bin
 		int last_bin = length - 1;
-		for (int ih = length - 1; ih >= first_bin; ih--) {
+		for (int ih = last_bin; ih >= first_bin; ih--) {
 			if (histogram[ih] != 0) {
 				last_bin = ih;
 				break;
@@ -351,7 +348,7 @@ public class GThresholdImageOps {
 		double term = 1.0 / (double) (last_bin - first_bin);
 		double[] mu_0 = new double[length];
 		{
-			int sum_pix = 0, num_pix = 0;
+			long sum_pix = 0, num_pix = 0;
 			for (int ih = first_bin; ih < length; ih++) {
 				sum_pix += ih * histogram[ih];
 				num_pix += histogram[ih];
@@ -362,12 +359,12 @@ public class GThresholdImageOps {
 
 		double[] mu_1 = new double[length];
 		{
-			int sum_pix = 0, num_pix = 0;
-			for (int ih = last_bin; ih >= 0; ih--) { // original: (ih = last_bin; ih > 0; ih--)
+			long sum_pix = 0, num_pix = 0;
+			for (int ih = last_bin; ih > 0; ih--) { // original: (ih = last_bin; ih > 0; ih--)
 				sum_pix += ih * histogram[ih];
 				num_pix += histogram[ih];
 				// NUM_PIX cannot be zero !
-				mu_1[ih] = sum_pix / (double) num_pix; // original: mu_1[ih -1] = sum_pix/(double) num_pix
+				mu_1[ih-1] = sum_pix / (double) num_pix; // original: mu_1[ih -1] = sum_pix/(double) num_pix
 			}
 		}
 
@@ -377,8 +374,8 @@ public class GThresholdImageOps {
 		for (int it = 0; it < length; it++) {
 			double ent = 0.0;  // entropy
 			for (int ih = 0; ih <= it; ih++) {
-				/* Equation (4) in Ref. 1 */
-				mu_x = 1.0 / (1.0 + term * Math.abs(ih - mu_0[it]));
+				// Equation (4) in Ref. 1
+				double mu_x = 1.0 / (1.0 + term * Math.abs(ih - mu_0[it]));
 				if (!((mu_x < 1e-06) || (mu_x > 0.999999))) {
 					/* Equation (6) & (8) in Ref. 1 */
 					ent += histogram[ih] * (-mu_x * Math.log(mu_x) - (1.0 - mu_x) * Math.log(1.0 - mu_x));
@@ -386,8 +383,8 @@ public class GThresholdImageOps {
 			}
 
 			for (int ih = it + 1; ih < length; ih++) {
-				/* Equation (4) in Ref. 1 */
-				mu_x = 1.0 / (1.0 + term * Math.abs(ih - mu_1[it]));
+				// Equation (4) in Ref. 1
+				double mu_x = 1.0 / (1.0 + term * Math.abs(ih - mu_1[it]));
 				if (!((mu_x < 1e-06) || (mu_x > 0.999999))) {
 					/* Equation (6) & (8) in Ref. 1 */
 					ent += histogram[ih] * (-mu_x * Math.log(mu_x) - (1.0 - mu_x) * Math.log(1.0 - mu_x));
