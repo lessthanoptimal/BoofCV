@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,8 @@ import org.ddogleg.struct.GrowQueue_I8;
 
 import java.io.UnsupportedEncodingException;
 
+import static boofcv.alg.fiducial.qrcode.EciEncoding.getEciCharacterSet;
+import static boofcv.alg.fiducial.qrcode.EciEncoding.guessEncoding;
 import static boofcv.alg.fiducial.qrcode.QrCode.Failure.JIS_UNAVAILABLE;
 import static boofcv.alg.fiducial.qrcode.QrCode.Failure.KANJI_UNAVAILABLE;
 import static boofcv.alg.fiducial.qrcode.QrCodeEncoder.valueToAlphanumeric;
@@ -41,6 +43,9 @@ public class QrCodeDecoderBits {
 	GrowQueue_I8 ecc = new GrowQueue_I8();
 
 	StringBuilder workString = new StringBuilder();
+
+	// Currently specified ECI encoding
+	String encodingEci;
 
 	/**
 	 * Reconstruct the data while applying error correction.
@@ -108,6 +113,7 @@ public class QrCodeDecoderBits {
 	}
 
 	public boolean decodeMessage(QrCode qr) {
+		encodingEci = null;
 		PackedBits8 bits = new PackedBits8();
 		bits.data = qr.corrected;
 		bits.size = qr.corrected.length*8;
@@ -132,10 +138,7 @@ public class QrCodeDecoderBits {
 				case ALPHANUMERIC: location = decodeAlphanumeric(qr, bits,location); break;
 				case BYTE: location = decodeByte(qr, bits,location); break;
 				case KANJI: location = decodeKanji(qr, bits,location); break;
-				case ECI:
-//					throw new RuntimeException("Not supported yet");
-					qr.failureCause = QrCode.Failure.UNKNOWN_MODE;
-					return false;
+				case ECI: location = decodeEci(bits,location);break;
 				case FNC1_FIRST:
 				case FNC1_SECOND:
 					// This isn't the proper way to handle this mode, but it
@@ -334,8 +337,11 @@ public class QrCodeDecoderBits {
 			rawdata[i] = (byte)data.read(bitLocation,8,true);
 			bitLocation += 8;
 		}
+
+		String encoding = encodingEci == null ? guessEncoding(rawdata) : encodingEci;
+
 		try {
-			workString.append( new String(rawdata, "JIS") );
+			workString.append( new String(rawdata, encoding) );
 		} catch (UnsupportedEncodingException ignored) {
 			qr.failureCause = JIS_UNAVAILABLE;
 			return -1;
@@ -386,6 +392,37 @@ public class QrCodeDecoderBits {
 			qr.failureCause = KANJI_UNAVAILABLE;
 			return -1;
 		}
+
+		return bitLocation;
+	}
+
+	/**
+	 * Decodes Extended Channel Interpretation (ECI) Mode. Allows character set to be changed
+	 *
+	 * @param data encoded data
+	 * @return Location it has read up to in bits
+	 */
+	private int decodeEci( PackedBits8 data, int bitLocation ) {
+		// number of 1 bits before first 0 define number of additional codewords
+		int firstByte = data.read(bitLocation,8,true);
+		bitLocation += 8;
+
+		int numCodeWords = 1;
+		while( firstByte != 0 ) {
+			numCodeWords++;
+			firstByte >>= 1;
+		}
+		firstByte >>= 1;
+
+		// read the 6-digit designator
+		int assignmentValue = firstByte;
+		for (int i = 1; i < numCodeWords; i++) {
+			assignmentValue <<= 8;
+			assignmentValue |= data.read(bitLocation,8,true);
+			bitLocation += 8;
+		}
+
+		encodingEci = getEciCharacterSet(assignmentValue);
 
 		return bitLocation;
 	}

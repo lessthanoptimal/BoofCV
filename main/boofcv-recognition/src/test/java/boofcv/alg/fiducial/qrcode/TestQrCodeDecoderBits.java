@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -96,7 +96,10 @@ public class TestQrCodeDecoderBits {
 		assertFalse(alg.checkPaddingBytes(qr,3));
 		qr.corrected[8] ^= 0x1101;
 		assertFalse(alg.checkPaddingBytes(qr,2));
+	}
 
-
+	@Test
+	public void decodeEci() {
+		fail("Implement");
 	}
 }

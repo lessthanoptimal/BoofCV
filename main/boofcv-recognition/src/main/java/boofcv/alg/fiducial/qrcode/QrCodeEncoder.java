@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -59,6 +60,9 @@ public class QrCodeEncoder {
 	private boolean autoErrorCorrection;
 
 	private boolean autoMask;
+
+	// Encoding for the byte character set. UTF-8 isn't standard compliant but is the most widely used
+	private Charset byteCharacterSet = StandardCharsets.UTF_8;
 
 	// workspace variables
 	PackedBits8 packed = new PackedBits8();
@@ -331,11 +335,7 @@ public class QrCodeEncoder {
 	}
 
 	public QrCodeEncoder addBytes(String message) {
-		try {
-			return addBytes(message.getBytes("JIS"));
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
+		return addBytes(message.getBytes(byteCharacterSet));
 	}
 
 	/**
@@ -800,6 +800,14 @@ public class QrCodeEncoder {
 		for (int i = 0; i < ecc.size; i++) {
 			output[i * stride + offset + startEcc] = ecc.data[i];
 		}
+	}
+
+	public Charset getByteCharacterSet() {
+		return byteCharacterSet;
+	}
+
+	public void setByteCharacterSet(Charset byteCharacterSet) {
+		this.byteCharacterSet = byteCharacterSet;
 	}
 
 	private static class MessageSegment
