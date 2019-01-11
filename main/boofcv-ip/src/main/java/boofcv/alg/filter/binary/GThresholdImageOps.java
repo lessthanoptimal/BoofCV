@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -251,7 +251,8 @@ public class GThresholdImageOps {
 			old_thresh = new_thresh;
 			threshold = (int) (old_thresh + 0.5);
 			// Calculate the means of background and object pixels 
-			// Background 
+
+			// Background
 			long sum_back = 0; // sum of the background pixels at a given threshold
 			long num_back = 0; // number of background pixels at a given threshold
 			for (int ih = 0; ih <= threshold; ih++) {
@@ -259,7 +260,8 @@ public class GThresholdImageOps {
 				num_back += histogram[ih];
 			}
 			mean_back = (num_back == 0 ? 0.0 : (sum_back / (double) num_back));
-			// Object 
+
+			// Object
 			long sum_obj = 0; // sum of the object pixels at a given threshold
 			long num_obj = 0; // number of object pixels at a given threshold
 			for (int ih = threshold + 1; ih < length; ih++) {
@@ -360,20 +362,20 @@ public class GThresholdImageOps {
 		double[] mu_1 = new double[length];
 		{
 			long sum_pix = 0, num_pix = 0;
-			for (int ih = last_bin; ih > 0; ih--) { // original: (ih = last_bin; ih > 0; ih--)
+			for (int ih = last_bin; ih >= 0; ih--) { // original: (ih = last_bin; ih > 0; ih--)
 				sum_pix += ih * histogram[ih];
 				num_pix += histogram[ih];
 				// NUM_PIX cannot be zero !
-				mu_1[ih-1] = sum_pix / (double) num_pix; // original: mu_1[ih -1] = sum_pix/(double) num_pix
+				mu_1[ih] = sum_pix / (double) num_pix; // original: mu_1[ih -1] = sum_pix/(double) num_pix
 			}
 		}
 
 		/* Determine the threshold that minimizes the fuzzy entropy */
 		int threshold = -1;
 		double min_ent = Double.MAX_VALUE; // min entropy
-		for (int it = 0; it < length; it++) {
+		for (int it = first_bin; it <= last_bin; it++) {
 			double ent = 0.0;  // entropy
-			for (int ih = 0; ih <= it; ih++) {
+			for (int ih = first_bin; ih <= it; ih++) {
 				// Equation (4) in Ref. 1
 				double mu_x = 1.0 / (1.0 + term * Math.abs(ih - mu_0[it]));
 				if (!((mu_x < 1e-06) || (mu_x > 0.999999))) {
@@ -382,7 +384,7 @@ public class GThresholdImageOps {
 				}
 			}
 
-			for (int ih = it + 1; ih < length; ih++) {
+			for (int ih = it + 1; ih <= last_bin; ih++) {
 				// Equation (4) in Ref. 1
 				double mu_x = 1.0 / (1.0 + term * Math.abs(ih - mu_1[it]));
 				if (!((mu_x < 1e-06) || (mu_x > 0.999999))) {
