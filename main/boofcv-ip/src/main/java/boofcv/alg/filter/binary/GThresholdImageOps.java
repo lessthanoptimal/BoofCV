@@ -362,11 +362,11 @@ public class GThresholdImageOps {
 		double[] mu_1 = new double[length];
 		{
 			long sum_pix = 0, num_pix = 0;
-			for (int ih = last_bin; ih > 0; ih--) { // original: (ih = last_bin; ih > 0; ih--)
+			for (int ih = last_bin; ih >= 0; ih--) { // original: (ih = last_bin; ih > 0; ih--)
 				sum_pix += ih * histogram[ih];
 				num_pix += histogram[ih];
 				// NUM_PIX cannot be zero !
-				mu_1[ih-1] = sum_pix / (double) num_pix; // original: mu_1[ih -1] = sum_pix/(double) num_pix
+				mu_1[ih] = sum_pix / (double) num_pix; // original: mu_1[ih -1] = sum_pix/(double) num_pix
 			}
 		}
 
