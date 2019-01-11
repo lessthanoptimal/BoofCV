@@ -353,7 +353,7 @@ public class GThresholdImageOps {
 		double term = 1.0 / (double) (last_bin - first_bin);
 		double[] mu_0 = new double[length];
 		{
-			double sum_pix = 0.0, num_pix = 0.0;
+			long sum_pix = 0, num_pix = 0;
 			for (int ih = first_bin; ih < length; ih++) {
 				sum_pix += ih * histogram[ih];
 				num_pix += histogram[ih];
@@ -364,7 +364,7 @@ public class GThresholdImageOps {
 
 		double[] mu_1 = new double[length];
 		{
-			double sum_pix = 0.0, num_pix = 0.0;
+			long sum_pix = 0, num_pix = 0;
 			for (int ih = last_bin; ih >= 0; ih--) { // original: (ih = last_bin; ih > 0; ih--)
 				sum_pix += ih * histogram[ih];
 				num_pix += histogram[ih];
@@ -376,9 +376,9 @@ public class GThresholdImageOps {
 		/* Determine the threshold that minimizes the fuzzy entropy */
 		int threshold = -1;
 		double min_ent = Double.MAX_VALUE; // min entropy
-		for (int it = 0; it < length; it++) {
+		for (int it = first_bin; it <= last_bin; it++) {
 			double ent = 0.0;  // entropy
-			for (int ih = 0; ih <= it; ih++) {
+			for (int ih = first_bin; ih <= it; ih++) {
 				/* Equation (4) in Ref. 1 */
 				mu_x = 1.0 / (1.0 + term * Math.abs(ih - mu_0[it]));
 				if (!((mu_x < 1e-06) || (mu_x > 0.999999))) {
@@ -387,7 +387,7 @@ public class GThresholdImageOps {
 				}
 			}
 
-			for (int ih = it + 1; ih < length; ih++) {
+			for (int ih = it + 1; ih <= last_bin; ih++) {
 				/* Equation (4) in Ref. 1 */
 				mu_x = 1.0 / (1.0 + term * Math.abs(ih - mu_1[it]));
 				if (!((mu_x < 1e-06) || (mu_x > 0.999999))) {
