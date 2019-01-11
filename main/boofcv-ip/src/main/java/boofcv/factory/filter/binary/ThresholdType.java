@@ -43,6 +43,18 @@ public enum ThresholdType {
 	 */
 	GLOBAL_OTSU(true,true),
 	/**
+	 * Global Adaptive using Li's equation.
+	 *
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeLi(int[], int)
+	 */
+	GLOBAL_LI(true,true),
+	/**
+	 * Global Adaptive using Huang's equation.
+	 *
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeHuang(int[], int)
+	 */
+	GLOBAL_HUANG(true,true),
+	/**
 	 * Locally adaptive computed using Guassian weights
 	 *
 	 * @see ThresholdImageOps#localGaussian
