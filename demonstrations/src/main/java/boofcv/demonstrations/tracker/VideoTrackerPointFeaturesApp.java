@@ -41,6 +41,8 @@ import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -68,7 +70,10 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 	MovingAverage processingTime = new MovingAverage();
 
-	int pause = 0;
+	// slow down a video
+	int delay = 0;
+
+	boolean drawFilled=true;
 
 	public VideoTrackerPointFeaturesApp(List<PathLabel> examples,
 										Class<I> imageType ) {
@@ -81,6 +86,14 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		add(BorderLayout.CENTER, gui);
 
 		setAlgorithm(0);
+
+		// toggle rendering mode when mouse clicked
+		gui.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				drawFilled = !drawFilled;
+			}
+		});
 	}
 
 	public void setAlgorithm( int which ) {
@@ -123,14 +136,14 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 	@Override
 	public void openExample(Object o) {
-		pause = 0;
+		delay = 0;
 		if (o instanceof PathLabel) {
 			if (((PathLabel) o).label.equals("Shake")) {
-				pause = 100;
+				delay = 100;
 			} else if (((PathLabel) o).label.equals("Zoom")) {
-				pause = 100;
+				delay = 100;
 			} else if (((PathLabel) o).label.equals("Rotate")) {
-				pause = 100;
+				delay = 100;
 			}
 		}
 
@@ -149,6 +162,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		gui.setPreferredSize(new Dimension(width,height));
 		BoofSwingUtil.invokeNowOrLater(()->{
 			controlPanel.setImageSize(width,height);
+			controlPanel.resetPaused();
 		});
 	}
 
@@ -157,6 +171,11 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		synchronized (this) {
 			setAlgorithm(controlPanel.algorithm);
 		}
+	}
+
+	@Override
+	public void handlePause(boolean paused) {
+		super.streamPaused = paused;
 	}
 
 	public class VisualizePanel extends ImagePanel {
@@ -178,7 +197,12 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 					double x = offsetX + scale*p.x;
 					double y = offsetY + scale*p.y;
 
-					VisualizeFeatures.drawPoint(g2, x,y, 5, new Color(red, green, blue),true,ellipse );
+					if( drawFilled )
+						VisualizeFeatures.drawPoint(g2, x,y, 5, new Color(red, green, blue),true,ellipse );
+					else {
+						g2.setColor(new Color(red, green, blue));
+						VisualizeFeatures.drawCircle(g2, x, y, 5, ellipse);
+					}
 				}
 
 				for (PointTrack p : spawnedGui.toList() ) {
@@ -232,8 +256,8 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		gui.setImageRepaint(buffered);
 
 		// some older videos are too fast if not paused
-		if( pause > 0 )
-			BoofMiscOps.sleep(pause);
+		if( delay > 0 )
+			BoofMiscOps.sleep(delay);
 	}
 
 	public static void main(String args[]) {

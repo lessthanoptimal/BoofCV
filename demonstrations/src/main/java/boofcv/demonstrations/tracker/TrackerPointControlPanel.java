@@ -49,10 +49,13 @@ public class TrackerPointControlPanel
 	// How wide a feature being tracked is
 	JSpinner spinnerWidth;
 
+	JButton buttonPause = new JButton("Pause");
+
 	public int algorithm=0;
 	public int featWidth = 5;
-	public int minFeatures = 200;
+	public int minFeatures = 400;
 	public int maxFeatures = 800;
+	public boolean paused = false;
 
 	Listener listener;
 
@@ -64,6 +67,12 @@ public class TrackerPointControlPanel
 		spinnerMinFeats = spinner(minFeatures,50,2000,10);
 		spinnerMaxFeats = spinner(maxFeatures,50,2000,10);
 
+		buttonPause.addActionListener(e->{
+			paused = !paused;
+			buttonPause.setText(paused?"Resume":"Pause");
+			listener.handlePause(paused);
+		});
+
 		addLabeled(labelSize,"Size");
 		addLabeled(labelTimeMS,"Time");
 		addLabeled(labelTrackCount,"Tracks");
@@ -71,6 +80,8 @@ public class TrackerPointControlPanel
 		addLabeled(spinnerWidth,"Feat Width");
 		addLabeled(spinnerMinFeats,"Min. Feats");
 		addLabeled(spinnerMaxFeats,"Max. Feats");
+		addVerticalGlue();
+		addAlignCenter(buttonPause);
 	}
 
 	public void setImageSize( int width , int height ) {
@@ -106,7 +117,13 @@ public class TrackerPointControlPanel
 		}
 	}
 
+	public void resetPaused() {
+		buttonPause.setText("Pause");
+	}
+
 	public interface Listener {
 		void handleAlgorithmUpdated();
+
+		void handlePause( boolean paused );
 	}
 }
