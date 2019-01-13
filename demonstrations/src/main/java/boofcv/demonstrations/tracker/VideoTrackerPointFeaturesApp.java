@@ -54,7 +54,6 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-// TODO click to pause
 public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		extends DemonstrationBase implements TrackerPointControlPanel.Listener
 {

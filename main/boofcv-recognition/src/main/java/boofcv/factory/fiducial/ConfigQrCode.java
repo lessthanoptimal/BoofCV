@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,8 +50,10 @@ public class ConfigQrCode implements Configuration {
 		// fast but does a bad job detecting fiducials that are up close
 		ConfigThresholdLocalOtsu configThreshold = ConfigThreshold.local(ThresholdType.BLOCK_OTSU,40);
 		configThreshold.useOtsu2 = true;
-		configThreshold.scale = 1.0; // 0.95 makes it better some times but worse overall
-		configThreshold.thresholdFromLocalBlocks = false;
+		// 0.95 makes it better some times but worse overall
+		configThreshold.scale = 1.0;
+		// this will hurt small distant targets but allows up close to work
+		configThreshold.thresholdFromLocalBlocks = true;
 		configThreshold.tuning = 4;
 
 		threshold = configThreshold;
