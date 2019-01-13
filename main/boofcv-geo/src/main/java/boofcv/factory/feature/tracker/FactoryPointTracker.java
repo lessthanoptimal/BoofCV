@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,6 +69,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
+import javax.annotation.Nullable;
 import java.util.Random;
 
 
@@ -117,7 +118,7 @@ public class FactoryPointTracker {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> klt(PkltConfig config, ConfigGeneralDetector configExtract,
-						Class<I> imageType, Class<D> derivType ) {
+						Class<I> imageType, @Nullable Class<D> derivType ) {
 
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
@@ -299,7 +300,7 @@ public class FactoryPointTracker {
 	 * @param derivType      Type of image used to store the image derivative. null == use default     */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> dda_ST_NCC(ConfigGeneralDetector configExtract, int describeRadius,
-									Class<I> imageType, Class<D> derivType) {
+									Class<I> imageType, @Nullable Class<D> derivType) {
 
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
@@ -425,7 +426,7 @@ public class FactoryPointTracker {
 										 ConfigSurfDescribe.Stability configDescribe,
 										 ConfigSlidingIntegral configOrientation,
 										 Class<I> imageType,
-										 Class<D> derivType) {
+										 @Nullable Class<D> derivType) {
 
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);

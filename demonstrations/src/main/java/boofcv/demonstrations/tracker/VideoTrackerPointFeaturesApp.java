@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,176 +24,235 @@ import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
-import boofcv.gui.VideoProcessAppBase;
+import boofcv.gui.BoofSwingUtil;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.GrayF32;
+import boofcv.misc.BoofMiscOps;
+import boofcv.misc.MovingAverage;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
+import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseListener;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Runs a KLT tracker through a video sequence
  *
  * @author Peter Abeles
  */
-// todo extract out base class for handling videos
-public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>, D extends ImageGray<D>>
-		extends VideoProcessAppBase<I> implements MouseListener
+// TODO click to pause
+public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
+		extends DemonstrationBase implements TrackerPointControlPanel.Listener
 {
-
-	int maxFeatures = 400;
-	int minFeatures = 150;
-
 	PointTracker<I> tracker;
 
-	ImagePanel gui = new ImagePanel();
+	VisualizePanel gui = new VisualizePanel();
+	// synchronized when manipulating
+	final FastQueue<PointTrack> tracksGui = new FastQueue<>(PointTrack.class,true);
+	final FastQueue<PointTrack> spawnedGui = new FastQueue<>(PointTrack.class,true);
 
-	BufferedImage workImage;
+	TrackerPointControlPanel controlPanel = new TrackerPointControlPanel(this);
+	Class<I> imageType;
 
-	public VideoTrackerPointFeaturesApp(Class<I> imageType, Class<D> derivType) {
-		super(1,imageType);
+	MovingAverage processingTime = new MovingAverage();
+
+	int pause = 0;
+
+	public VideoTrackerPointFeaturesApp(List<PathLabel> examples,
+										Class<I> imageType ) {
+		super(examples, ImageType.single(imageType));
+		this.imageType = imageType;
+
+		gui.setPreferredSize(new Dimension(400,400));
+
+		add(BorderLayout.WEST, controlPanel);
+		add(BorderLayout.CENTER, gui);
+
+		setAlgorithm(0);
+	}
+
+	public void setAlgorithm( int which ) {
+		int featRadius = controlPanel.featWidth/2;
 
 		PkltConfig config = new PkltConfig();
-		config.templateRadius = 3;
-		config.pyramidScaling = new int[]{1,2,4,8};
+		config.templateRadius = featRadius;
+		config.pyramidScaling = new int[]{1, 2, 4, 8};
 
 		ConfigFastHessian configFH = new ConfigFastHessian();
 		configFH.maxFeaturesPerScale = 200;
 		configFH.extractRadius = 4;
 		configFH.detectThreshold = 15f;
 
-		addAlgorithm(0,"KLT", FactoryPointTracker.klt(config, new ConfigGeneralDetector(maxFeatures, 1, 3),
-				imageType, derivType));
-		addAlgorithm(0,"ST-BRIEF", FactoryPointTracker.
-				dda_ST_BRIEF(200, new ConfigGeneralDetector(maxFeatures, 3, 1), imageType, derivType));
-		addAlgorithm(0,"ST-NCC", FactoryPointTracker.
-				dda_ST_NCC(new ConfigGeneralDetector(maxFeatures, 3, 2), 5, imageType, derivType));
-		addAlgorithm(0,"FH-SURF", FactoryPointTracker.
-				dda_FH_SURF_Fast(configFH, null, null, imageType));
-		addAlgorithm(0,"ST-SURF-KLT", FactoryPointTracker.
-				combined_ST_SURF_KLT(new ConfigGeneralDetector(maxFeatures, 3, 1),
-						config, 50, null, null, imageType, derivType));
-		addAlgorithm(0,"FH-SURF-KLT", FactoryPointTracker.combined_FH_SURF_KLT(
-				config, 50, configFH, null, null, imageType));
+		int maxFeatures = controlPanel.maxFeatures;
 
-		gui.addMouseListener(this);
-		gui.requestFocus();
-		setMainGUI(gui);
+		switch( which ) {
+			case 0: tracker = FactoryPointTracker.klt(config,
+					new ConfigGeneralDetector(maxFeatures, featRadius+2, 3),imageType,null); break;
+
+			case 1: tracker = FactoryPointTracker.dda_ST_BRIEF(
+					200, new ConfigGeneralDetector(maxFeatures, 3, 1),
+					imageType, null); break;
+
+			case 2: tracker = FactoryPointTracker.dda_ST_NCC(new ConfigGeneralDetector(
+					maxFeatures, featRadius+2, 2), 5, imageType, null); break;
+
+			case 3: tracker = FactoryPointTracker.dda_FH_SURF_Fast(
+					configFH, null, null, imageType); break;
+
+			case 4: tracker = FactoryPointTracker.combined_ST_SURF_KLT(
+					new ConfigGeneralDetector(maxFeatures, featRadius+2, 1),
+					config, 50, null, null, imageType, null); break;
+
+			case 5: tracker = FactoryPointTracker.combined_FH_SURF_KLT(
+					config, 50, configFH, null, null, imageType); break;
+		}
+		processingTime.reset();
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
+	public void openExample(Object o) {
+		pause = 0;
+		if (o instanceof PathLabel) {
+			if (((PathLabel) o).label.equals("Shake")) {
+				pause = 100;
+			} else if (((PathLabel) o).label.equals("Zoom")) {
+				pause = 100;
+			} else if (((PathLabel) o).label.equals("Rotate")) {
+				pause = 100;
+			}
+		}
+
+		super.openExample(o);
+	}
 
 	@Override
-	public void process( SimpleImageSequence<I> sequence ) {
-		stopWorker();
-		this.sequence = sequence;
+	protected void configureVideo(int which, SimpleImageSequence sequence) {
+		super.configureVideo(which, sequence);
 		sequence.setLoop(true);
-		doRefreshAll();
 	}
 
 	@Override
-	public boolean getHasProcessedImage() {
-		return workImage != null;
+	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+		super.handleInputChange(source, method, width, height);
+		gui.setPreferredSize(new Dimension(width,height));
+		BoofSwingUtil.invokeNowOrLater(()->{
+			controlPanel.setImageSize(width,height);
+		});
 	}
 
 	@Override
-	public void refreshAll(Object[] cookies) {
-		setActiveAlgorithm(0,null,cookies[0]);
+	public void handleAlgorithmUpdated() {
+		synchronized (this) {
+			setAlgorithm(controlPanel.algorithm);
+		}
+	}
+
+	public class VisualizePanel extends ImagePanel {
+		Ellipse2D.Double ellipse = new Ellipse2D.Double();
+
+		@Override
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			Graphics2D g2 = (Graphics2D) g;
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+			synchronized (tracksGui) {
+				for (PointTrack p : tracksGui.toList() ) {
+					int red = (int) (2.5 * (p.featureId % 100));
+					int green = (int) ((255.0 / 150.0) * (p.featureId % 150));
+					int blue = (int) (p.featureId % 255);
+
+					double x = offsetX + scale*p.x;
+					double y = offsetY + scale*p.y;
+
+					VisualizeFeatures.drawPoint(g2, x,y, 5, new Color(red, green, blue),true,ellipse );
+				}
+
+				for (PointTrack p : spawnedGui.toList() ) {
+					double x = offsetX + scale*p.x;
+					double y = offsetY + scale*p.y;
+					VisualizeFeatures.drawPoint(g2, x, y, 5,Color.green,true,ellipse);
+				}
+			}
+		}
 	}
 
 	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( sequence == null )
-			return;
-		
-		stopWorker();
-
-		tracker = (PointTracker<I>)cookie;
-		sequence.reset();
-
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				I image = sequence.next();
-				gui.setPreferredSize(new Dimension(image.width,image.height));
-				workImage = new BufferedImage(image.width,image.height,BufferedImage.TYPE_INT_BGR);
-				gui.setImage(workImage);
-				revalidate();
-				startWorkerThread();
-			}});
-	}
-
-	void renderFeatures( BufferedImage orig , double trackerFPS ) {
-		Graphics2D g2 = workImage.createGraphics();
-
-		g2.drawImage(orig,0,0,orig.getWidth(),orig.getHeight(),null);
-		for( PointTrack p : tracker.getActiveTracks(null) ) {
-			int red = (int)(2.5*(p.featureId%100));
-			int green = (int)((255.0/150.0)*(p.featureId%150));
-			int blue = (int)(p.featureId%255);
-			VisualizeFeatures.drawPoint(g2, (int)p.x, (int)p.y, new Color(red,green,blue));
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
+		PointTracker<I> tracker;
+		synchronized (this) {
+			tracker = this.tracker;
 		}
 
-		for( PointTrack p : tracker.getNewTracks(null) ) {
-			int x = (int)p.x;
-			int y = (int)p.y;
+		long time0 = System.nanoTime();
+		tracker.process((I)input);
 
-			VisualizeFeatures.drawPoint(g2,x,y,Color.green);
-		}
-
-		g2.setColor(Color.WHITE);
-		g2.fillRect(5,15,140,20);
-		g2.setColor(Color.BLACK);
-		g2.drawString(String.format("Tracker FPS: %3.1f",trackerFPS),10,30);
-	}
-
-	@Override
-	protected void updateAlg(I frame, BufferedImage buffImage) {
-		tracker.process(frame);
-
-		if( tracker.getActiveTracks(null).size() < minFeatures ) {
+		if (tracker.getActiveTracks(null).size() < controlPanel.minFeatures) {
 			tracker.spawnTracks();
 		}
-	}
+		long time1 = System.nanoTime();
+		processingTime.update((time1-time0)*1e-6);
 
-	@Override
-	protected void handleRunningStatus(int status) {}
+		List<PointTrack> active = tracker.getActiveTracks(null);
+		List<PointTrack> spawned = tracker.getNewTracks(null);
 
-	@Override
-	protected void updateAlgGUI(ImageGray frame, BufferedImage imageGUI, double fps) {
-		renderFeatures((BufferedImage)sequence.getGuiImage(),fps);
-	}
+		int count = active.size();
 
-	public static void main( String args[] ) {
-		Class imageType = GrayF32.class;
-		Class derivType = GrayF32.class;
+		SwingUtilities.invokeLater(()->{
+			controlPanel.setTime(processingTime.getAverage());
+			controlPanel.setTrackCount(count);
+		});
 
-//		Class defaultType = GrayU8.class;
-//		Class derivType = GrayS16.class;
+		synchronized (tracksGui) {
+			tracksGui.reset();
+			spawnedGui.reset();
 
-		VideoTrackerPointFeaturesApp app = new VideoTrackerPointFeaturesApp(imageType, derivType);
+			for (int i = 0; i < active.size(); i++) {
+				tracksGui.grow().set(active.get(i));
+			}
 
-		java.util.List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("Shake", UtilIO.pathExample("shake.mjpeg")));
-		inputs.add(new PathLabel("Zoom", UtilIO.pathExample("zoom.mjpeg")));
-		inputs.add(new PathLabel("Rotate", UtilIO.pathExample("rotate.mjpeg")));
-
-		app.setInputList(inputs);
-
-		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
+			for (int i = 0; i < spawned.size(); i++) {
+				spawnedGui.grow().set(spawned.get(i));
+			}
 		}
 
-		ShowImages.showWindow(app, "Feature Tracker",true);
+		gui.setImageRepaint(buffered);
+
+		// some older videos are too fast if not paused
+		if( pause > 0 )
+			BoofMiscOps.sleep(pause);
+	}
+
+	public static void main(String args[]) {
+		//		Class type = GrayF32.class;
+		Class type = GrayU8.class;
+
+		List<PathLabel> examples = new ArrayList<>();
+		examples.add(new PathLabel("Chipmunk", UtilIO.pathExample("tracking/chipmunk.mjpeg")));
+		examples.add(new PathLabel("Shake", UtilIO.pathExample("shake.mjpeg")));
+		examples.add(new PathLabel("Zoom", UtilIO.pathExample("zoom.mjpeg")));
+		examples.add(new PathLabel("Rotate", UtilIO.pathExample("rotate.mjpeg")));
+		examples.add(new PathLabel("Driving Snow", UtilIO.pathExample("tracking/snow_follow_car.mjpeg")));
+		examples.add(new PathLabel("Driving Night", UtilIO.pathExample("tracking/night_follow_car.mjpeg")));
+
+		SwingUtilities.invokeLater(()->{
+			VideoTrackerPointFeaturesApp app = new VideoTrackerPointFeaturesApp(examples,type);
+			app.openFile(new File(examples.get(0).getPath()));
+			app.display( "Feature Tracker");
+		});
 	}
 }
+

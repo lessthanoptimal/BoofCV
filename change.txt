@@ -21,6 +21,8 @@ Version : 0.33
 - QR Code
   * Added support for ECI, i.e. more character sets
   * Attempts to determine the encoding of BYTE mode and defaults to UTF-8 since that's more popular
+- Demonstration
+  * Modernized point tracker demo
 
 TODO This Release
   - Examples
@@ -30,7 +32,6 @@ TODO This Release
     * Associate with Fundamental - Select different algs + inliers
     * Associate with Trifocal Tensor
     * Modernize FFT demo
-    * Modernize Point Feature Tracker
   - Cheirality
     * Will also require a linear programming solution, e.g. simplex
   - Remove dependency on OpenCV in Applications to reduce file size
