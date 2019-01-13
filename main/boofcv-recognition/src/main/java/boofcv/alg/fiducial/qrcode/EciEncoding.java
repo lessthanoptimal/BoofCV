@@ -67,14 +67,25 @@ public class EciEncoding {
 		return UTF8;
 	}
 
+	/**
+	 * Checks to see if is a valid UTF-8 character. Taken from wikipedia
+	 */
 	public static boolean isValidUTF8( int v ) {
-		return (v >= 0 && v <= 0xBF) || (v >= 0xC4 && v <= 0xF4);
+		return (v >= 0 && v <= 0xBF) || (v >= 0xC3 && v <= 0xF4);
 	}
 
+	/**
+	 * Checks to see if is a valid Japanese Industrial Standard (JIS) character. Taken from wikipedia
+	 */
 	public static boolean isValidJIS( int v ) {
 		return (v >= 0x20 && v <= 0x7E) || (v >= 0xA1 && v <= 0xDF);
 	}
 
+	/**
+	 * Checks to see if valid ISO-8859-1 encoding. Taken from wikipedia.
+	 * @param v
+	 * @return
+	 */
 	public static boolean isValidIso8869_1( int v ) {
 		return (v >= 0x20 && v <= 0x7E) || (v >= 0xA0 && v <= 0xFF);
 	}

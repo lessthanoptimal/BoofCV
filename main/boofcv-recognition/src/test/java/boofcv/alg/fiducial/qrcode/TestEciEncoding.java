@@ -20,7 +20,8 @@ package boofcv.alg.fiducial.qrcode;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -28,16 +29,37 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class TestEciEncoding {
 	@Test
 	public void isValidUTF8() {
-		fail("Implement");
+		for (int i = 0; i <= 0xFF; i++) {
+			if( i <= 0xBF )
+				assertTrue(EciEncoding.isValidUTF8(i));
+			else if( i >= 0xC3 && i <= 0xF4 )
+				assertTrue(EciEncoding.isValidUTF8(i));
+			else
+				assertFalse(EciEncoding.isValidUTF8(i));
+		}
 	}
 
 	@Test
 	public void isValidJIS() {
-		fail("Implement");
+		for (int i = 0; i <= 0xFF; i++) {
+			if( i >= 0x20 && i <= 0x7E )
+				assertTrue(EciEncoding.isValidJIS(i));
+			else if( i >= 0xA1 && i <= 0xDF )
+				assertTrue(EciEncoding.isValidJIS(i));
+			else
+				assertFalse(EciEncoding.isValidJIS(i));
+		}
 	}
 
 	@Test
 	public void isValidIso8869_1() {
-		fail("Implement");
+		for (int i = 0; i <= 0xFF; i++) {
+			if( i >= 0x20 && i <= 0x7E )
+				assertTrue(EciEncoding.isValidIso8869_1(i));
+			else if( i >= 0xA0 )
+				assertTrue(EciEncoding.isValidIso8869_1(i));
+			else
+				assertFalse(EciEncoding.isValidIso8869_1(i));
+		}
 	}
 }

@@ -9,6 +9,7 @@ Version : 0.33
 - Fixed JavaDoc issue. Was not copying over doc-files
 - Sparse Bundle Adjustment
   * Added calibrated homogenous coordinates
+  * TODO Add support for rigid objects
 - Self Calibration
   * TODO Weighted iterated DIAC
 - Improved Support for U16 images
