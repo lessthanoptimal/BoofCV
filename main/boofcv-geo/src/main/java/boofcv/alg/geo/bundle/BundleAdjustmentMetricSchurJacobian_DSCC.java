@@ -139,7 +139,7 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 
 	@Override
 	public int getNumOfOutputsM() {
-		return observations.getObservationCount()*2;
+		return observations.getObservationCount(false)*2;
 	}
 
 	@Override

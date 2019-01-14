@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -108,7 +108,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	public static class Point {
 
 		/**
-		 * Where the point is in 3D or 4D space
+		 * Where the point is in the world reference frame. 3D or 4D space
 		 */
 		public double coordinate[];
 

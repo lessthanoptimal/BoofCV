@@ -32,6 +32,7 @@ import java.util.Random;
 import static boofcv.alg.geo.bundle.TestBundleAdjustmentMetricResidualFunction.createObservations;
 import static boofcv.alg.geo.bundle.TestCodecSceneStructureMetric.createScene;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -61,5 +62,13 @@ public class TestBundleAdjustmentMetricSchurJacobian_DSCC {
 
 //		DerivativeChecker.jacobianPrint(func, jac, param, 10*UtilEjml.TEST_F64_SQ );
 		assertTrue(DerivativeChecker.jacobian(func, jac, param, 10*UtilEjml.TEST_F64_SQ ));
+	}
+
+	/**
+	 * Test with a rigid object
+	 */
+	@Test
+	public void withRigidObject() {
+		fail("Implement");
 	}
 }

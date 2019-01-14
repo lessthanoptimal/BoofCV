@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -131,7 +131,7 @@ public class CodecBundleAdjustmentInTheLarge {
     public void save( File file ) throws IOException {
         PrintStream writer = new PrintStream(file);
 
-        writer.println(scene.views.length+" "+scene.points.length+" "+observations.getObservationCount());
+        writer.println(scene.views.length+" "+scene.points.length+" "+observations.getObservationCount(false));
 
         PointIndex2D_F64 o = new PointIndex2D_F64();
         for (int viewIdx = 0; viewIdx < observations.views.length; viewIdx++) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -112,7 +112,7 @@ public class BundleAdjustmentProjectiveSchurJacobian_DSCC
 
 	@Override
 	public int getNumOfOutputsM() {
-		return observations.getObservationCount()*2;
+		return observations.getObservationCount(false)*2;
 	}
 
 	@Override

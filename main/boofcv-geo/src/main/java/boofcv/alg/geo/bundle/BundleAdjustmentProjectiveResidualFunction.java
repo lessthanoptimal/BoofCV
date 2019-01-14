@@ -76,7 +76,7 @@ public class BundleAdjustmentProjectiveResidualFunction
 		this.structure = structure;
 		this.observations = observations;
 
-		numObservations = observations.getObservationCount();
+		numObservations = observations.getObservationCount(false);
 		numParameters = structure.getParameterCount();
 	}
 

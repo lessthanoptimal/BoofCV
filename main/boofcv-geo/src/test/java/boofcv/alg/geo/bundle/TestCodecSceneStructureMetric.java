@@ -37,6 +37,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestCodecSceneStructureMetric {
 	Random rand = new Random(234);
 
+	/**
+	 * Test with a rigid object
+	 */
+	@Test
+	public void withRigidObject() {
+		fail("Implement");
+	}
+
 	@Test
 	public void encode_decode() {
 		encode_decode(true);

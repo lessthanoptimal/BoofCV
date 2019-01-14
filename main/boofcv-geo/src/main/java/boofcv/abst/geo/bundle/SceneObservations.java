@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,19 +31,52 @@ import org.ddogleg.struct.GrowQueue_I32;
  */
 public class SceneObservations {
 	public View views[];
+	/**
+	 * Views of points on rigid objects
+	 */
+	public View viewsRigid[];
 
+	/**
+	 * Constructor with zero rigid objects assumed.
+	 *
+	 * @param numViews Number of views
+	 */
 	public SceneObservations(int numViews ) {
+		this(numViews,false);
+	}
+
+	/**
+	 *
+	 * @param numViews Number of views
+	 * @param rigidObjects If true then there are rigid objects that can be observed
+	 */
+	public SceneObservations(int numViews , boolean rigidObjects ) {
 		views = new View[numViews];
 		for (int i = 0; i < numViews; i++) {
 			views[i] = new View();
+		}
+		if( rigidObjects ) {
+			viewsRigid = new View[numViews];
+			for (int i = 0; i < numViews; i++) {
+				viewsRigid[i] = new View();
+			}
 		}
 	}
 
 	/**
 	 * Returns the total number of observations across all views
 	 * @return number of observations
+	 * @param rigid true to count observations of rigid objects. false = general objects
 	 */
-	public int getObservationCount() {
+	public int getObservationCount(boolean rigid) {
+		if( rigid ) {
+			return countObservations(viewsRigid);
+		} else {
+			return countObservations(views);
+		}
+	}
+
+	private int countObservations( View[] views ) {
 		int total = 0;
 		for (int i = 0; i < views.length; i++) {
 			total += views[i].point.size;

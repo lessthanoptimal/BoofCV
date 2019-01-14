@@ -26,8 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 
 import static boofcv.alg.geo.bundle.TestCodecSceneStructureMetric.createScene;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -119,5 +118,13 @@ public class TestBundleAdjustmentMetricResidualFunction {
 			}
 		}
 		return obs;
+	}
+
+	/**
+	 * Test with a rigid object
+	 */
+	@Test
+	public void withRigidObject() {
+		fail("Implement");
 	}
 }

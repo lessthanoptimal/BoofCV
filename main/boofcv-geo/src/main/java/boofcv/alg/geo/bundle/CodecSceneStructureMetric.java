@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,8 +27,9 @@ import georegression.struct.so.Rodrigues_F64;
  * Encodes and decodes the values in a {@link SceneStructureMetric} using the following
  * parameterization:<br>
  * <pre>
- * [ (X Y Z)*M ][ (rodX rodY rodZ Tx Ty Tz)*N ][ intrinsic*O ]
- * [ features  ][           views             ][ camera      ]
+ *     RT = (rodX rodY rodZ Tx Ty Tz)
+ * [ (X Y Z)*M ][  RT*len(rigid)  ][  RT*len(views) ][ intrinsic*O ]
+ * [ features  ][    rigid        ][    views       ][ camera      ]
  * </pre>
  * @author Peter Abeles
  */
@@ -48,6 +49,24 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 			p.coordinate[2] = input[index++];
 			if( structure.isHomogenous() )
 				p.coordinate[3] = input[index++];
+		}
+
+		for (int rigidIndex = 0; rigidIndex < structure.rigids.length; rigidIndex++) {
+			SceneStructureMetric.Rigid rigid = structure.rigids[rigidIndex];
+			// Decode the rigid body transform from object to world
+			if( !rigid.known ) {
+				double rodX = input[index++];
+				double rodY = input[index++];
+				double rodZ = input[index++];
+
+				rigid.objectToWorld.T.x = input[index++];
+				rigid.objectToWorld.T.y = input[index++];
+				rigid.objectToWorld.T.z = input[index++];
+
+				rodrigues.setParamVector(rodX,rodY,rodZ);
+
+				ConvertRotation3D_F64.rodriguesToMatrix(rodrigues,rigid.objectToWorld.R);
+			}
 		}
 
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
@@ -88,6 +107,22 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 			output[index++] = p.coordinate[2];
 			if( structure.isHomogenous() )
 				output[index++] = p.coordinate[3];
+		}
+
+		for (int rigidIndex = 0; rigidIndex < structure.rigids.length; rigidIndex++) {
+			SceneStructureMetric.Rigid rigid = structure.rigids[rigidIndex];
+			// Decode the rigid body transform from object to world
+			if( !rigid.known ) {
+				ConvertRotation3D_F64.matrixToRodrigues(rigid.objectToWorld.R,rodrigues);
+				rodrigues.unitAxisRotation.scale(rodrigues.theta);
+				output[index++] = rodrigues.unitAxisRotation.x;
+				output[index++] = rodrigues.unitAxisRotation.y;
+				output[index++] = rodrigues.unitAxisRotation.z;
+
+				output[index++] = rigid.objectToWorld.T.x;
+				output[index++] = rigid.objectToWorld.T.y;
+				output[index++] = rigid.objectToWorld.T.z;
+			}
 		}
 
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {

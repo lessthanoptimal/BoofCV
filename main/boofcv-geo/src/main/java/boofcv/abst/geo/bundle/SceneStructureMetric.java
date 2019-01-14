@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,12 +31,19 @@ import georegression.struct.se.Se3_F64;
  * camera image. Views have an associated camera and specify the pose of the camera when the scene was viewed. Points
  * describe the scene's 3D structure.
  *
+ * Points belonging to the general scene and rigid objects have two different sets of ID's.
+ *
  * @author Peter Abeles
  */
 public class SceneStructureMetric extends SceneStructureCommon {
 
 	public Camera[] cameras;
 	public View[] views;
+
+	// data structures for rigid objects.
+	public Rigid[] rigids;
+	// Lookup table from rigid point to rigid object
+	public int[] lookupRigid;
 
 	/**
 	 * Configure bundle adjustment
@@ -54,9 +61,22 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @param totalPoints Number of points
 	 */
 	public void initialize( int totalCameras , int totalViews , int totalPoints ) {
+		initialize(totalCameras,totalViews,totalPoints,0);
+	}
+
+	/**
+	 * Call this function first. Specifies number of each type of data which is available.
+	 *
+	 * @param totalCameras Number of cameras
+	 * @param totalViews Number of views
+	 * @param totalPoints Number of points
+	 * @param totalRigid Number of rigid objects
+	 */
+	public void initialize( int totalCameras , int totalViews , int totalPoints , int totalRigid ) {
 		cameras = new Camera[totalCameras];
 		views = new View[totalViews];
 		points = new Point[totalPoints];
+		rigids = new Rigid[totalRigid];
 
 		for (int i = 0; i < cameras.length; i++) {
 			cameras[i] = new Camera();
@@ -67,6 +87,40 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		for (int i = 0; i < points.length; i++) {
 			points[i] = new Point(pointSize);
 		}
+
+		for (int i = 0; i < rigids.length; i++) {
+			rigids[i] = new Rigid();
+		}
+		lookupRigid = null;
+	}
+
+	/**
+	 * Assigns an ID to all rigid points. This function does not need to be called by the user as it will be called
+	 * by the residual function if needed
+	 */
+	public void assignIDsToRigidPoints() {
+		// return if it has already been assigned
+		if( lookupRigid != null )
+			return;
+		// Assign a unique ID to each point belonging to a rigid object
+		// at the same time create a look up table that allows for the object that a point belongs to be quickly found
+		lookupRigid = new int[ getTotalRigidPoints() ];
+		int pointID = 0;
+		for (int i = 0; i < rigids.length; i++) {
+			Rigid r = rigids[i];
+			r.indexFirst = pointID;
+			for (int j = 0; j < r.points.length; j++, pointID++) {
+				lookupRigid[pointID] = i;
+			}
+		}
+
+	}
+
+	/**
+	 * Returns true if the scene contains rigid objects
+	 */
+	public boolean hasRigid() {
+		return rigids.length > 0;
 	}
 
 	/**
@@ -97,6 +151,25 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	public void setView(int which , boolean fixed , Se3_F64 worldToView ) {
 		views[which].known = fixed;
 		views[which].worldToView.set(worldToView);
+	}
+
+	/**
+	 * Declares the data structure for a rigid object. Location of points are set by accessing the object directly.
+	 * Rigid objects are useful in known scenes with calibration targets.
+	 *
+	 * @param which Index of rigid object
+	 * @param fixed If the pose is known or not
+	 * @param worldToObject Initial estimated location of rigid object
+	 * @param totalPoints Total number of points attached to this rigid object
+	 */
+	public void setRigid( int which , boolean fixed , Se3_F64 worldToObject , int totalPoints ) {
+		Rigid r = rigids[which] = new Rigid();
+		r.known = fixed;
+		r.objectToWorld.set(worldToObject);
+		r.points = new Point[totalPoints];
+		for (int i = 0; i < totalPoints; i++) {
+			r.points[i] = new Point(pointSize);
+		}
 	}
 
 	/**
@@ -154,6 +227,20 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	}
 
 	/**
+	 * Returns total number of points associated with rigid objects.
+	 */
+	public int getTotalRigidPoints() {
+		if( rigids == null )
+			return 0;
+
+		int total = 0;
+		for (int i = 0; i < rigids.length; i++) {
+			total += rigids[i].points.length;
+		}
+		return total;
+	}
+
+	/**
 	 * Returns the total number of parameters which will be optimised
 	 * @return number of parameters
 	 */
@@ -170,7 +257,11 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		return views;
 	}
 
+	public Rigid[] getRigids() { return rigids; }
 
+	/**
+	 * Camera which is viewing the scene. Contains intrinsic parameters.
+	 */
 	public static class Camera {
 		/**
 		 * If the parameters are assumed to be known and should not be optimised.
@@ -183,19 +274,57 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		}
 	}
 
+	/**
+	 * Observations from a camera of points.
+	 */
 	public static class View {
 		/**
 		 * If the parameters are assumed to be known and should not be optimised.
 		 */
 		public boolean known = true;
 		/**
-		 * Transform from this view to the world
+		 * Transform from world into this view
 		 */
 		public Se3_F64 worldToView = new Se3_F64();
 		/**
 		 * The camera associated with this view
 		 */
 		public int camera = -1;
+	}
+
+	/**
+	 * A set of connected points that form a rigid structure. The 3D location of points
+	 * in the rigid body's reference frame is constant.
+	 */
+	public static class Rigid {
+		public boolean known = false;
+
+		/**
+		 * Transform from world into the rigid object's frame
+		 */
+		public Se3_F64 objectToWorld = new Se3_F64();
+
+		/**
+		 * Location of points in object's reference frame. The coordinate is always fixed.
+		 */
+		public Point[] points;
+
+		/**
+		 * Index of the first point in the list
+		 */
+		public int indexFirst;
+
+		public void setPoint( int which , double x , double y , double z ) {
+			points[which].set(x,y,z);
+		}
+
+		public void setPoint( int which , double x , double y , double z , double w ) {
+			points[which].set(x,y,z,w);
+		}
+
+		public int getTotalPoints() {
+			return points.length;
+		}
 	}
 }
 

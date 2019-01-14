@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -123,7 +123,7 @@ public class ExampleMultiviewSceneReconstruction {
 		// Optimize the results
 		int pruneCycles=5;
 		for (int i = 0; i < pruneCycles; i++) {
-			System.out.println("BA + Prune iteration = "+i+"  points="+structure.points.length+"  obs="+observations.getObservationCount());
+			System.out.println("BA + Prune iteration = "+i+"  points="+structure.points.length+"  obs="+observations.getObservationCount(false));
 			bundleScale.applyScale(structure,observations);
 			sba.setParameters(structure,observations);
 			if( !sba.optimize(structure) ) {

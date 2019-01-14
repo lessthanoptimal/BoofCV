@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class ExampleBundleAdjustment {
 
 		// Print information which gives you an idea of the problem's scale
 		System.out.println("Optimizing "+parser.scene.getParameterCount()+
-				" parameters with "+parser.observations.getObservationCount()+" observations\n\n");
+				" parameters with "+parser.observations.getObservationCount(false)+" observations\n\n");
 
 		// Configure the sparse Levenberg-Marquardt solver
 		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();

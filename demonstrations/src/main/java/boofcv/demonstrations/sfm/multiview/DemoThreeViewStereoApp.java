@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -406,7 +406,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			SwingUtilities.invokeLater(()->{
 				int n = structureEstimator.ransac.getMatchSet().size();
 				double score = structureEstimator.bundleAdjustment.getFitScore();
-				int numObs = structureEstimator.observations.getObservationCount();
+				int numObs = structureEstimator.observations.getObservationCount(false);
 				int numPoints = structureEstimator.structure.points.length;
 				controls.addText(String.format("Tri Feats %d\n",n));
 				for (int i = 0; i < 3; i++) {
