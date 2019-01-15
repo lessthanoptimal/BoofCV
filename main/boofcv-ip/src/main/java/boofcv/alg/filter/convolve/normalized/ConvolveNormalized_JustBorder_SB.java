@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -916,6 +916,227 @@ public class ConvolveNormalized_JustBorder_SB {
 						int w = dataKer[indexKer+j+offsetL];
 						weight += w;
 						total += (dataSrc[indexSrc+j]) * w;
+					}
+				}
+				dataDst[indexDst++] = (short)((total+weight/2)/weight);
+			}
+		}
+	}
+
+	public static void horizontal(Kernel1D_S32 kernel, GrayU16 input, GrayI16 output ) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
+		final int[] dataKer = kernel.data;
+
+		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int i = 0; i < height; i++) {
+			int indexDest = output.startIndex + i * output.stride;
+			int j = input.startIndex + i * input.stride;
+			final int jStart = j;
+			int jEnd = j + offsetL;
+
+			for (; j < jEnd; j++) {
+				int total = 0;
+				int weight = 0;
+				int indexSrc = jStart;
+				for (int k = kernelWidth - (offsetR + 1 + j - jStart); k < kernelWidth; k++) {
+					int w = dataKer[k];
+					weight += w;
+					total += (dataSrc[indexSrc++]& 0xFFFF) * w;
+				}
+				dataDst[indexDest++] = (short)((total+weight/2)/weight);
+			}
+
+			j += width - (offsetL+offsetR);
+			indexDest += width - (offsetL+offsetR);
+
+			jEnd = jStart + width;
+			for (; j < jEnd; j++) {
+				int total = 0;
+				int weight = 0;
+				int indexSrc = j - offsetL;
+				final int kEnd = jEnd - indexSrc;
+
+				for (int k = 0; k < kEnd; k++) {
+					int w = dataKer[k];
+					weight += w;
+					total += (dataSrc[indexSrc++]& 0xFFFF) * w;
+				}
+				dataDst[indexDest++] = (short)((total+weight/2)/weight);
+			}
+		}
+	}
+
+	public static void vertical(Kernel1D_S32 kernel, GrayU16 input, GrayI16 output ) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
+		final int[] dataKer = kernel.data;
+
+		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
+
+		final int imgWidth = output.getWidth();
+		final int imgHeight = output.getHeight();
+
+		final int yEnd = imgHeight - offsetR;
+
+		for (int y = 0; y < offsetL; y++) {
+			int indexDst = output.startIndex + y * output.stride;
+			int i = input.startIndex + y * input.stride;
+			final int iEnd = i + imgWidth;
+
+			int kStart = offsetL - y;
+
+			int weight = 0;
+			for (int k = kStart; k < kernelWidth; k++) {
+				weight += dataKer[k];
+			}
+
+			for ( ; i < iEnd; i++) {
+				int total = 0;
+				int indexSrc = i - y * input.stride;
+				for (int k = kStart; k < kernelWidth; k++, indexSrc += input.stride) {
+					total += (dataSrc[indexSrc]& 0xFFFF) * dataKer[k];
+				}
+				dataDst[indexDst++] = (short)((total+weight/2)/weight);
+			}
+		}
+
+		for (int y = yEnd; y < imgHeight; y++) {
+			int indexDst = output.startIndex + y * output.stride;
+			int i = input.startIndex + y * input.stride;
+			final int iEnd = i + imgWidth;
+
+			int kEnd = imgHeight - (y - offsetL);
+
+			int weight = 0;
+			for (int k = 0; k < kEnd; k++) {
+				weight += dataKer[k];
+			}
+
+			for ( ; i < iEnd; i++) {
+				int total = 0;
+				int indexSrc = i - offsetL * input.stride;
+				for (int k = 0; k < kEnd; k++, indexSrc += input.stride) {
+					total += (dataSrc[indexSrc]& 0xFFFF) * dataKer[k];
+				}
+				dataDst[indexDst++] = (short)((total+weight/2)/weight);
+			}
+		}
+	}
+
+	public static void convolve(Kernel2D_S32 kernel, GrayU16 input, GrayI16 output ) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
+		final int[] dataKer = kernel.data;
+
+		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		// convolve across the left and right borders
+		for (int y = 0; y < height; y++) {
+
+			int minI = y >= offsetL ? -offsetL : -y;
+			int maxI = y < height - offsetR ?  offsetR : height - y - 1;
+
+			int indexDst = output.startIndex + y* output.stride;
+
+			for( int x = 0; x < offsetL; x++ ) {
+
+				int total = 0;
+				int weight = 0;
+
+				for( int i = minI; i <= maxI; i++ ) {
+					int indexSrc = input.startIndex + (y+i)* input.stride+x;
+					int indexKer = (i+offsetL)*kernelWidth;
+
+					for( int j = -x; j <= offsetR; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
+						weight += w;
+						total += (dataSrc[indexSrc+j]& 0xFFFF) * w;
+					}
+				}
+
+				dataDst[indexDst++] = (short)((total+weight/2)/weight);
+			}
+
+			indexDst = output.startIndex + y* output.stride + width-offsetR;
+			for( int x = width-offsetR; x < width; x++ ) {
+
+				int maxJ = width-x-1;
+
+				int total = 0;
+				int weight = 0;
+
+				for( int i = minI; i <= maxI; i++ ) {
+					int indexSrc = input.startIndex + (y+i)* input.stride+x;
+					int indexKer = (i+offsetL)*kernelWidth;
+
+					for( int j = -offsetL; j <= maxJ; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
+						weight += w;
+						total += (dataSrc[indexSrc+j]& 0xFFFF) * w;
+					}
+				}
+
+				dataDst[indexDst++] = (short)((total+weight/2)/weight);
+			}
+		}
+
+		// convolve across the top border while avoiding convolving the corners again
+		for (int y = 0; y < offsetL; y++) {
+
+			int indexDst = output.startIndex + y* output.stride+offsetL;
+
+			for( int x = offsetL; x < width-offsetR; x++ ) {
+
+				int total = 0;
+				int weight = 0;
+
+				for( int i = -y; i <= offsetR; i++ ) {
+					int indexSrc = input.startIndex + (y+i)* input.stride+x;
+					int indexKer = (i+offsetL)*kernelWidth;
+
+					for( int j = -offsetL; j <= offsetR; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
+						weight += w;
+						total += (dataSrc[indexSrc+j]& 0xFFFF) * w;
+					}
+				}
+				dataDst[indexDst++] = (short)((total+weight/2)/weight);
+			}
+		}
+
+		// convolve across the bottom border
+		for (int y = height-offsetR; y < height; y++) {
+
+			int maxI = height - y - 1;
+			int indexDst = output.startIndex + y* output.stride+offsetL;
+
+			for( int x = offsetL; x < width-offsetR; x++ ) {
+
+				int total = 0;
+				int weight = 0;
+
+				for( int i = -offsetL; i <= maxI; i++ ) {
+					int indexSrc = input.startIndex + (y+i)* input.stride+x;
+					int indexKer = (i+offsetL)*kernelWidth;
+
+					for( int j = -offsetL; j <= offsetR; j++ ) {
+						int w = dataKer[indexKer+j+offsetL];
+						weight += w;
+						total += (dataSrc[indexSrc+j]& 0xFFFF) * w;
 					}
 				}
 				dataDst[indexDst++] = (short)((total+weight/2)/weight);

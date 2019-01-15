@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.transform.se.SePointOps_F64;
 
 /**
@@ -68,6 +69,7 @@ public class BundleAdjustmentMetricResidualFunction
 	CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
 
 	Point3D_F64 p3 = new Point3D_F64();
+	Point4D_F64 p4 = new Point4D_F64();
 
 	/**
 	 * Specifies the scenes structure and observed feature locations
@@ -99,6 +101,17 @@ public class BundleAdjustmentMetricResidualFunction
 
 		// write the current parameters into the scene's structure
 		codec.decode(input,structure);
+
+		if( structure.homogenous )
+			project4(output);
+		else
+			project3(output);
+	}
+
+	/**
+	 * projection from 3D coordinates
+	 */
+	private void project3(double[] output) {
 		int observationIndex = 0;
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
 			SceneStructureMetric.View view = structure.views[viewIndex];
@@ -110,9 +123,36 @@ public class BundleAdjustmentMetricResidualFunction
 				SceneStructureMetric.Point worldPt = structure.points[observedPixel.index];
 				worldPt.get(p3);
 
-				SePointOps_F64.transform(view.worldToView,p3,cameraPt);
+				SePointOps_F64.transform(view.worldToView,p3, cameraPt);
 
-				camera.model.project(cameraPt.x,cameraPt.y,cameraPt.z, predictedPixel);
+				camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
+
+				int outputIndex = observationIndex*2;
+				output[outputIndex  ] = predictedPixel.x - observedPixel.x;
+				output[outputIndex+1] = predictedPixel.y - observedPixel.y;
+				observationIndex++;
+			}
+		}
+	}
+
+	/**
+	 * projection from homogenous coordinates
+	 */
+	private void project4(double[] output) {
+		int observationIndex = 0;
+		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
+			SceneStructureMetric.View view = structure.views[viewIndex];
+			SceneStructureMetric.Camera camera = structure.cameras[view.camera];
+			SceneObservations.View obsView = observations.views[viewIndex];
+
+			for (int i = 0; i < obsView.size(); i++) {
+				obsView.get(i,observedPixel);
+				SceneStructureMetric.Point worldPt = structure.points[observedPixel.index];
+				worldPt.get(p4);
+
+				SePointOps_F64.transform(view.worldToView,p4, cameraPt);
+
+				camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
 
 				int outputIndex = observationIndex*2;
 				output[outputIndex  ] = predictedPixel.x - observedPixel.x;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -50,7 +51,7 @@ public class TestGThresholdImageOps {
 			assertEquals(best,found);
 		}
 	}
-
+   
 	private int bruteForceOtsu(int[] histogram, int total) {
 		int best = -1;
 		double bestScore = Double.MAX_VALUE;
@@ -131,6 +132,115 @@ public class TestGThresholdImageOps {
 		return (int)((bestMean0 + bestMean1)/2.0 + 0.5);
 	}
 
+	/**
+	 * Exercise Li code. Not sure how to check its validity
+	 */
+	@Test
+	public void computeLi() {
+		for (int i = 0; i < 100; i++) {
+			int histogram[] = new int[256];
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] = rand.nextInt(400);
+			}
+
+			int found = GThresholdImageOps.computeLi(histogram, histogram.length);
+
+			assertTrue(found >= 0 && found < 256);
+		}
+	}
+	
+	/**
+	 * Test Li method on a synthetic sawtooth histogram (similar to the 
+	 * one in Li's publication 
+	 */
+	@Test
+	public void computeLi_Sawtooth() {
+		// test on a synthetic sawtooth histogram
+		int[] histogram = createSawToothHistogram();
+
+		int threshold = GThresholdImageOps.computeLi(histogram, histogram.length);
+		final int expected = 22; // this is a cheat, since I have no independent method
+		assertEquals(expected, threshold);
+	}
+
+	/**
+	 * Make sure zeros at the beginning and end of the histogram are handled correctly
+	 */
+	@Test
+	void computeLi_zeros() {
+		int[] sawTooth = createSawToothHistogram();
+		int[] histogram = new int[sawTooth.length+50];
+		for (int i = 0; i < sawTooth.length; i++) {
+			histogram[i+30] = sawTooth[i];
+		}
+		int threshold = GThresholdImageOps.computeLi(histogram, histogram.length);
+		final int expected = 30+25; // this is a cheat, since I have no independent method
+		assertEquals(expected, threshold);
+	}
+
+	private int[] createSawToothHistogram() {
+		int histogram[] = new int[56];
+		histogram[0] = 10;
+		for (int i = 1; i < 11; i++) {
+			histogram[i] = histogram[i - 1] + 10;
+		}
+		for (int i = 11; i < 21; i++) {
+			histogram[i] = histogram[i - 1] - 10;
+		}
+		for (int i = 21; i < 41; i++) {
+			histogram[i] = histogram[i - 1] + 10;
+		}
+		for (int i = 41; i < 56; i++) {
+			histogram[i] = histogram[i - 1] - 10;
+		}
+		return histogram;
+	}
+
+	/**
+	 * Exercise Huang code. Not sure how to check its validity
+	 */
+	@Test
+	public void computeHuang() {
+		for (int i = 0; i < 100; i++) {
+			int histogram[] = new int[256];
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] = rand.nextInt(400);
+			}
+
+			int found = GThresholdImageOps.computeHuang(histogram, histogram.length);
+
+			assertTrue(found >= 0 && found < 256);
+		}
+	}
+	
+	/**
+	 * Test Huang method on a synthetic sawtooth histogram (similar to the 
+	 * one in Li's publication 
+	 */
+	@Test
+	void computeHuang_Sawtooth() {
+		// test on a synthetic sawtooth histogram
+		int[] histogram = createSawToothHistogram();
+
+		int threshold = GThresholdImageOps.computeHuang(histogram, histogram.length);
+		final int expected = 25; // this is a cheat, since I have no independent method
+		assertEquals(expected, threshold);
+	}
+
+	/**
+	 * Make sure zeros at the beginning and end of the histogram are handled correctly
+	 */
+	@Test
+	void computeHang_zeros() {
+		int[] sawTooth = createSawToothHistogram();
+		int[] histogram = new int[sawTooth.length+50];
+		for (int i = 0; i < sawTooth.length; i++) {
+			histogram[i+30] = sawTooth[i];
+		}
+		int threshold = GThresholdImageOps.computeHuang(histogram, histogram.length);
+		final int expected = 30+25; // this is a cheat, since I have no independent method
+		assertEquals(expected, threshold);
+	}
 
 	private static double[] variance( int histogram[] , int start , int stop , int allPixels) {
 		double mean = 0;

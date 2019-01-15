@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,6 +51,33 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU8 mean(GrayU8 input, @Nullable GrayU8 output, int radius, @Nullable GrayU8 storage) {
+
+		if( radius <= 0 )
+			throw new IllegalArgumentException("Radius must be > 0");
+
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radius, storage);
+
+		if( !processed ){
+			ConvolveImageMean.horizontal(input, storage, radius);
+			ConvolveImageMean.vertical(storage, output, radius);
+		}
+
+		return output;
+	}
+
+	/**
+	 * Applies a mean box filter.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radius Radius of the box blur function.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @return Output blurred image.
+	 */
+	public static GrayU16 mean(GrayU16 input, @Nullable GrayU16 output, int radius, @Nullable GrayU16 storage) {
 
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
@@ -244,9 +271,52 @@ public class BlurImageOps {
 		return output;
 	}
 
+	/**
+	 * Applies Gaussian blur.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param sigma Gaussian distribution's sigma.  If &le; 0 then will be selected based on radius.
+	 * @param radius Radius of the Gaussian blur function. If &le; 0 then radius will be determined by sigma.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @return Output blurred image.
+	 */
+	public static GrayU16 gaussian(GrayU16 input, @Nullable GrayU16 output, double sigma , int radius,
+								  @Nullable GrayU16 storage ) {
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage,GrayU16.class);
+
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigma,radius, storage);
+
+		if( !processed ) {
+			Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class, sigma, radius);
+			ConvolveImageNormalized.horizontal(kernel, input, storage);
+			ConvolveImageNormalized.vertical(kernel, storage, output);
+		}
+
+		return output;
+	}
+
 	public static InterleavedU8 gaussian(InterleavedU8 input, @Nullable InterleavedU8 output,
 										 double sigma , int radius,
 										 InterleavedU8 storage ) {
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		boolean processed = BOverrideBlurImageOps.invokeNativeGaussian(input, output, sigma , radius, storage);
+
+		if( !processed ) {
+			Kernel1D_S32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,sigma,radius);
+			ConvolveImageNormalized.horizontal(kernel, input, storage);
+			ConvolveImageNormalized.vertical(kernel, storage, output);
+		}
+
+		return output;
+	}
+
+	public static InterleavedU16 gaussian(InterleavedU16 input, @Nullable InterleavedU16 output,
+										  double sigma , int radius,
+										  InterleavedU16 storage ) {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 

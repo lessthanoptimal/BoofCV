@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -1030,6 +1030,256 @@ public class ConvolveNormalized_JustBorder_IL {
 						weight += w;
 						for (int band = 0; band < numBands; band++) {
 							total[band] += (dataSrc[indexSrc++]) * w;
+						}
+					}
+				}
+				for (int band = 0; band < numBands; band++) {
+					dataDst[indexDst++] = (short)((total[band]+weight/2)/weight);
+				}
+			}
+		}
+	}
+
+	public static void horizontal(Kernel1D_S32 kernel, InterleavedU16 src, InterleavedI16 dst ) {
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
+
+		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+		final int numBands = src.getNumBands();
+		final int[] total = new int[ numBands ];
+
+		for (int i = 0; i < height; i++) {
+			int indexDst = dst.startIndex + i*dst.stride;
+			for (int j = 0; j < offsetL; j++) {
+				int indexSrc = src.startIndex + i*src.stride;
+				Arrays.fill(total,0);
+				int weight = 0;
+				for (int k = offsetL-j; k < kernelWidth; k++) {
+					double w = kernel.data[k];
+					weight += w;
+					for (int band = 0; band < numBands; band++) {
+						total[band] += (dataSrc[indexSrc++]& 0xFFFF) * w;
+					}
+				}
+				for (int band = 0; band < numBands; band++) {
+					dataDst[indexDst++] = (short)((total[band]+weight/2)/weight);
+				}
+			}
+
+			indexDst = dst.startIndex + i*dst.stride + (width-offsetR)*numBands;
+			for (int j = offsetR-1; j >= 0; j--) {
+				int indexSrc = src.startIndex + i*src.stride + (width-offsetL-j-1)*numBands;
+				Arrays.fill(total,0);
+				int weight = 0;
+				for (int k = 0; k <= offsetL+j; k++) {
+					double w = kernel.data[k];
+					weight += w;
+					for (int band = 0; band < numBands; band++) {
+						total[band] += (dataSrc[indexSrc++]& 0xFFFF) * w;
+					}
+				}
+				for (int band = 0; band < numBands; band++) {
+					dataDst[indexDst++] = (short)((total[band]+weight/2)/weight);
+				}
+			}
+		}
+	}
+
+	public static void vertical(Kernel1D_S32 kernel, InterleavedU16 input, InterleavedI16 output ) {
+		final short[] dataSrc = input.data;
+		final short[] dataDst = output.data;
+
+		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
+
+		final int imgWidth = output.getWidth();
+		final int imgHeight = output.getHeight();
+		final int numBands = output.getNumBands();
+		final int total[] = new int[ numBands ];
+
+		final int yEnd = imgHeight - offsetR;
+
+		for (int y = 0; y < offsetL; y++) {
+			int indexDst = output.startIndex + y*output.stride;
+			int i = input.startIndex + y*input.stride;
+			final int iEnd = i + imgWidth*numBands;
+
+			int kStart = offsetL - y;
+
+			int weight = 0;
+			for (int k = kStart; k < kernelWidth; k++) {
+				weight += kernel.data[k];
+			}
+
+			for ( ; i < iEnd; i += numBands) {
+				Arrays.fill(total,0);
+				int indexSrc = i - y * input.stride;
+				for (int k = kStart; k < kernelWidth; k++, indexSrc += input.stride) {
+					int w = kernel.data[k];
+					for (int band = 0; band < numBands; band++) {
+						total[band] += (dataSrc[indexSrc+band]& 0xFFFF) * w;
+					}
+				}
+				for (int band = 0; band < numBands; band++){
+					dataDst[indexDst++] = (short)((total[band]+weight/2)/weight);
+				}
+			}
+		}
+
+		for (int y = yEnd; y < imgHeight; y++) {
+			int indexDst = output.startIndex + y * output.stride;
+			int i = input.startIndex + y*input.stride;
+			final int iEnd = i + imgWidth*numBands;
+
+			int kEnd = imgHeight - (y - offsetL);
+
+			int weight = 0;
+			for (int k = 0; k < kEnd; k++) {
+				weight += kernel.data[k];
+			}
+
+			for ( ; i < iEnd; i+=numBands ) {
+				Arrays.fill(total,0);
+				int indexSrc = i - offsetL*input.stride;
+				for (int k = 0; k < kEnd; k++, indexSrc += input.stride) {
+					int w = kernel.data[k];
+					for (int band = 0; band < numBands; band++) {
+						total[band] += (dataSrc[indexSrc+band]& 0xFFFF) * w;
+					}
+				}
+				for (int band = 0; band < numBands; band++) {
+					dataDst[indexDst++] = (short)((total[band]+weight/2)/weight);
+				}
+			}
+		}
+	}
+
+	public static void convolve(Kernel2D_S32 kernel, InterleavedU16 src, InterleavedI16 dst ) {
+		final short[] dataSrc = src.data;
+		final short[] dataDst = dst.data;
+
+		final int kernelWidth = kernel.getWidth();
+		final int offsetL = kernel.getOffset();
+		final int offsetR = kernelWidth-offsetL-1;
+
+		final int width = src.getWidth();
+		final int height = src.getHeight();
+		final int numBands = dst.getNumBands();
+		final int total[] = new int[ numBands ];
+
+		// convolve across the left and right borders
+		for (int y = 0; y < height; y++) {
+
+			int minI = y >= offsetL ? -offsetL : -y;
+			int maxI = y < height - offsetR ?  offsetR : height - y - 1;
+
+			int indexDst = dst.startIndex + y*dst.stride;
+
+			for( int x = 0; x < offsetL; x++ ) {
+
+				Arrays.fill(total,0);
+				int weight = 0;
+
+				for( int i = minI; i <= maxI; i++ ) {
+					int indexSrc = src.startIndex + (y+i)*src.stride;
+					int indexKer = (i+offsetL)*kernelWidth;
+
+					for( int j = -x; j <= offsetR; j++ ) {
+						int w = kernel.data[indexKer+j+offsetL];
+						weight += w;
+						for (int band = 0; band < numBands; band++) {
+							total[band] += (dataSrc[indexSrc++]& 0xFFFF) * w;
+						}
+					}
+				}
+
+				for (int band = 0; band < numBands; band++) {
+					dataDst[indexDst++] = (short)((total[band]+weight/2)/weight);
+				}
+			}
+
+			indexDst = dst.startIndex + y*dst.stride + (width-offsetR)*numBands;
+			for( int x = width-offsetR; x < width; x++ ) {
+
+				int maxJ = width-x-1;
+
+				Arrays.fill(total,0);
+				int weight = 0;
+
+				for( int i = minI; i <= maxI; i++ ) {
+					int indexSrc = src.startIndex + (y+i)*src.stride + (x-offsetL)*numBands;
+					int indexKer = (i+offsetL)*kernelWidth;
+
+					for( int j = -offsetL; j <= maxJ; j++ ) {
+						int w = kernel.data[indexKer+j+offsetL];
+						weight += w;
+						for (int band = 0; band < numBands; band++) {
+							total[band] += (dataSrc[indexSrc++]& 0xFFFF) * w;
+						}
+					}
+				}
+
+				for (int band = 0; band < numBands; band++) {
+					dataDst[indexDst++] = (short)((total[band]+weight/2)/weight);
+				}
+			}
+		}
+
+		// convolve across the top border while avoiding convolving the corners again
+		for (int y = 0; y < offsetL; y++) {
+
+			int indexDst = dst.startIndex + y*dst.stride + offsetL*numBands;
+
+			for( int x = offsetL; x < width-offsetR; x++ ) {
+
+				Arrays.fill(total,0);
+				int weight = 0;
+
+				for( int i = -y; i <= offsetR; i++ ) {
+					int indexSrc = src.startIndex + (y+i)*src.stride + (x-offsetL)*numBands;
+					int indexKer = (i+offsetL)*kernelWidth;
+
+					for( int j = -offsetL; j <= offsetR; j++ ) {
+						int w = kernel.data[indexKer+j+offsetL];
+						weight += w;
+						for (int band = 0; band < numBands; band++) {
+							total[band] += (dataSrc[indexSrc++]& 0xFFFF) * w;
+						}
+					}
+				}
+
+				for (int band = 0; band < numBands; band++) {
+					dataDst[indexDst++] = (short)((total[band]+weight/2)/weight);
+				}
+			}
+		}
+
+		// convolve across the bottom border
+		for (int y = height-offsetR; y < height; y++) {
+
+			int maxI = height - y - 1;
+			int indexDst = dst.startIndex + y*dst.stride + offsetL*numBands;
+
+			for( int x = offsetL; x < width-offsetR; x++ ) {
+
+				Arrays.fill(total,0);
+				int weight = 0;
+
+				for( int i = -offsetL; i <= maxI; i++ ) {
+					int indexSrc = src.startIndex + (y+i)*src.stride + (x-offsetL)*numBands;
+					int indexKer = (i+offsetL)*kernelWidth;
+
+					for( int j = -offsetL; j <= offsetR; j++ ) {
+						int w = kernel.data[indexKer+j+offsetL];
+						weight += w;
+						for (int band = 0; band < numBands; band++) {
+							total[band] += (dataSrc[indexSrc++]& 0xFFFF) * w;
 						}
 					}
 				}

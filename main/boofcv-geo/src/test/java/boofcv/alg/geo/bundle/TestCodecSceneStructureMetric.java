@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,17 +39,24 @@ public class TestCodecSceneStructureMetric {
 
 	@Test
 	public void encode_decode() {
-		SceneStructureMetric original = createScene(rand);
+		encode_decode(true);
+		encode_decode(false);
+	}
+	public void encode_decode( boolean homogenous ) {
+		SceneStructureMetric original = createScene(rand,homogenous);
 
 		CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
 
-		int N = original.getUnknownViewCount()*6 + original.points.length*3 + original.getUnknownCameraParameterCount();
+		int pointLength = homogenous ? 4 : 3;
+		int N = original.getUnknownViewCount()*6 + original.points.length*pointLength + original.getUnknownCameraParameterCount();
+		assertEquals(N,original.getParameterCount());
 		double param[] = new double[N];
 		codec.encode(original,param);
 
-		SceneStructureMetric found = createScene(rand);
+		SceneStructureMetric found = createScene(rand,homogenous);
 		codec.decode(param,found);
 
+		assertEquals(homogenous,found.homogenous);
 		for (int i = 0; i < original.points.length; i++) {
 			assertTrue( original.points[i].distance(found.points[i]) < UtilEjml.TEST_F64);
 		}
@@ -79,8 +86,8 @@ public class TestCodecSceneStructureMetric {
 		}
 	}
 
-	public static SceneStructureMetric createScene(Random rand ) {
-		SceneStructureMetric out = new SceneStructureMetric(false);
+	public static SceneStructureMetric createScene(Random rand , boolean homogenous ) {
+		SceneStructureMetric out = new SceneStructureMetric(homogenous);
 
 		out.initialize(2,4,5);
 
@@ -89,8 +96,15 @@ public class TestCodecSceneStructureMetric {
 		out.setCamera(1,false,new CameraPinhole(201+rand.nextGaussian(),200,
 				0.01,401+rand.nextGaussian(),50+rand.nextGaussian(),1,1));
 
-		for (int i = 0; i < 5; i++) {
-			out.setPoint(i,i+1,i+2*rand.nextGaussian(),2*i-3*rand.nextGaussian());
+		if( homogenous ) {
+			for (int i = 0; i < 5; i++) {
+				double w = rand.nextDouble()*3+0.5;
+				out.setPoint(i, i + 1, i + 2 * rand.nextGaussian(), 2 * i - 3 * rand.nextGaussian(),w);
+			}
+		} else {
+			for (int i = 0; i < 5; i++) {
+				out.setPoint(i, i + 1, i + 2 * rand.nextGaussian(), 2 * i - 3 * rand.nextGaussian());
+			}
 		}
 
 		for (int i = 0; i < 4; i++) {

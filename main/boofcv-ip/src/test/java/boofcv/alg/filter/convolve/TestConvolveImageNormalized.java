@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 public class TestConvolveImageNormalized {
 	@Test
 	public void compareToNaive() {
-		int numFunctions = 30;
+		int numFunctions = 36;
 		CompareToStandardConvolutionNormalized test = new CompareToStandardConvolutionNormalized(ConvolveImageNormalized.class);
 
 		for( int i = 0; i < 2; i++ ) {

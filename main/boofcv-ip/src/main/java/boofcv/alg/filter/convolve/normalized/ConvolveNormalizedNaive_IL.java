@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -487,6 +487,130 @@ public class ConvolveNormalizedNaive_IL {
 	}
 
 	public static void convolve(Kernel2D_S32 kernel, InterleavedS16 input, InterleavedI16 output ) {
+
+		final int offset = kernel.getOffset();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+		final int numBands = input.getNumBands();
+
+		final int[] pixel = new int[ numBands ];
+		final int[] total = new int[ numBands ];
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+
+				int startX = x - offset;
+				int endX = startX + kernel.getWidth();
+
+				if( startX < 0 ) startX = 0;
+				if( endX > width ) endX = width;
+
+				int startY = y - offset;
+				int endY = startY + kernel.getWidth();
+
+				if( startY < 0 ) startY = 0;
+				if( endY > height ) endY = height;
+
+				Arrays.fill(total,0);
+				int weight = 0;
+
+				for( int i = startY; i < endY; i++ ) {
+					for( int j = startX; j < endX; j++ ) {
+						input.get(j,i, pixel);
+						int v = kernel.get(j-x+offset,i-y+offset);
+						for (int band = 0; band < numBands; band++) {
+							total[band] += pixel[band]*v;
+						}
+						weight += v;
+					}
+				}
+				for (int band = 0; band < numBands; band++) {
+					total[band] = (total[band]+weight/2)/weight;
+				}
+				output.set(x,y, total);
+			}
+		}
+	}
+
+	public static void horizontal(Kernel1D_S32 kernel, InterleavedU16 input, InterleavedI16 output ) {
+
+		final int offset = kernel.getOffset();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+		final int numBands = input.getNumBands();
+		
+		final int[] pixel = new int[ numBands ];
+		final int[] total = new int[ numBands ];
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				Arrays.fill(total,0);
+				int weight = 0;
+
+				int startX = x - offset;
+				int endX = startX+kernel.getWidth();
+
+				if( startX < 0 ) startX = 0;
+				if( endX > width ) endX = width;
+
+				for( int j = startX; j < endX; j++ ) {
+					int v = kernel.get(j-x+offset);
+					input.get(j,y, pixel);
+					for (int band = 0; band < numBands; band++) {
+						total[band] += pixel[band]*v;
+					}
+					
+					weight += v;
+				}
+				for (int band = 0; band < numBands; band++) {
+					total[band] = (total[band]+weight/2)/weight;
+				}
+				output.set(x,y, total );
+			}
+		}
+	}
+
+	public static void vertical(Kernel1D_S32 kernel, InterleavedU16 input, InterleavedI16 output ) {
+
+		final int offset = kernel.getOffset();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+		final int numBands = input.getNumBands();
+
+		final int[] pixel = new int[ numBands ];
+		final int[] total = new int[ numBands ];
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				Arrays.fill(total,0);
+				int weight = 0;
+
+				int startY = y - offset;
+				int endY = startY + kernel.getWidth();
+
+				if( startY < 0 ) startY = 0;
+				if( endY > height ) endY = height;
+
+				for( int i = startY; i < endY; i++ ) {
+					int v = kernel.get(i-y+offset);
+					input.get(x,i, pixel);
+					for (int band = 0; band < numBands; band++) {
+						total[band] += pixel[band]*v;
+					}
+					weight += v;
+				}
+				for (int band = 0; band < numBands; band++) {
+					total[band] = (total[band]+weight/2)/weight;
+				}
+				output.set(x,y, total);
+			}
+		}
+	}
+
+	public static void convolve(Kernel2D_S32 kernel, InterleavedU16 input, InterleavedI16 output ) {
 
 		final int offset = kernel.getOffset();
 

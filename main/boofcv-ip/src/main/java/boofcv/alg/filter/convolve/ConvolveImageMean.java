@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -206,6 +206,30 @@ public class ConvolveImageMean {
 	}
 
 	/**
+	 * Performs a horizontal 1D convolution which computes the mean value of elements
+	 * inside the kernel.
+	 *
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param radius Kernel size.
+	 */
+	public static void horizontal(GrayU16 input, GrayI16 output, int radius) {
+
+		boolean processed = BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, radius);
+
+		if( !processed ) {
+			Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+			if (kernel.width > input.width) {
+				ConvolveImageNormalized.horizontal(kernel, input, output);
+			} else {
+				InputSanityCheck.checkSameShape(input, output);
+				ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
+				ImplConvolveMean.horizontal(input, output, radius);
+			}
+		}
+	}
+
+	/**
 	 * Performs a vertical 1D convolution which computes the mean value of elements
 	 * inside the kernel.
 	 *
@@ -214,6 +238,30 @@ public class ConvolveImageMean {
 	 * @param radius Kernel size.
 	 */
 	public static void vertical(GrayS16 input, GrayI16 output, int radius ) {
+
+		boolean processed = BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius);
+
+		if( !processed ) {
+			Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+			if (kernel.width > input.height) {
+				ConvolveImageNormalized.vertical(kernel, input, output);
+			} else {
+				InputSanityCheck.checkSameShape(input, output);
+				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
+				ImplConvolveMean.vertical(input, output, radius);
+			}
+		}
+	}
+
+	/**
+	 * Performs a vertical 1D convolution which computes the mean value of elements
+	 * inside the kernel.
+	 *
+	 * @param input The original image. Not modified.
+	 * @param output Where the resulting image is written to. Modified.
+	 * @param radius Kernel size.
+	 */
+	public static void vertical(GrayU16 input, GrayI16 output, int radius ) {
 
 		boolean processed = BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius);
 

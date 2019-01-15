@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,6 +54,8 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 		printAllOps(AutoTypeImage.U8,AutoTypeImage.I8,true);
 //		printAllOps(AutoTypeImage.U8,AutoTypeImage.I8,false, true);
 		printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,true);
+		printAllOps(AutoTypeImage.U16,AutoTypeImage.I16,false);
+		printAllOps(AutoTypeImage.U16,AutoTypeImage.I16,true);
 		printAllOps(AutoTypeImage.S32,AutoTypeImage.I16,true,true);
 		printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,false);
 		printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,true);

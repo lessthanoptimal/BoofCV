@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 
 	@Test
 	public void compareToStandard() {
-		performTests(8);
+		performTests(10);
 	}
 
 	@Override
