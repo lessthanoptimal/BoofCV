@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,7 @@ public class TestConvolveImageStandard_SB {
 	 */
 	@Test
 	public void checkAll() {
-		int numExpected = 29;
+		int numExpected = 35;
 		Method methods[] = ConvolveImageStandard_SB.class.getMethods();
 
 		// sanity check to make sure the functions are being found

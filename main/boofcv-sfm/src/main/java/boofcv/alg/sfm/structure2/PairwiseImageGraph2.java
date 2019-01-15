@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,6 +56,7 @@ public class PairwiseImageGraph2 {
 
 	public static class View {
 		public String id;
+		public int totalFeatures;
 
 		/**
 		 * List of motions associated with this view. It can be either the src or dst
@@ -76,6 +77,15 @@ public class PairwiseImageGraph2 {
 
 		/** if this camera motion is known up to a metric transform. otherwise it will be projective */
 		public boolean is3D;
+
+		/**
+		 * Number of features from fundamental/essential
+		 */
+		public int countF;
+		/**
+		 * Number of features from homography.
+		 */
+		public int countH;
 
 		// Which features are associated with each other and in the inlier set
 		public FastQueue<AssociatedIndex> associated = new FastQueue<>(AssociatedIndex.class,true);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,6 +42,18 @@ public enum ThresholdType {
 	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeOtsu(int[], int, int)
 	 */
 	GLOBAL_OTSU(true,true),
+	/**
+	 * Global Adaptive using Li's equation.
+	 *
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeLi(int[], int)
+	 */
+	GLOBAL_LI(true,true),
+	/**
+	 * Global Adaptive using Huang's equation.
+	 *
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeHuang(int[], int)
+	 */
+	GLOBAL_HUANG(true,true),
 	/**
 	 * Locally adaptive computed using Guassian weights
 	 *

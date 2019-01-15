@@ -6,12 +6,26 @@ Date Format: year/month/day
 Date    : 2019
 Version : 0.33
 
-- Demonstrations
-  * Three View Stereo: Using AverageDownSampleOps to avoid aliasing and drastically improves performance
+- Fixed JavaDoc issue. Was not copying over doc-files
 - Sparse Bundle Adjustment
-  * TODO Calibrated homogenous coordinates
+  * Added calibrated homogenous coordinates
+  * TODO Add support for rigid objects
 - Self Calibration
   * TODO Weighted iterated DIAC
+- Improved Support for U16 images
+  * Convolution, blur, ... etc
+  * Requested by Nico Stuurman
+- Image Thresholding
+  * Added Li
+  * Added Huang
+  * Ported from ImageJ by Nico Stuurman
+- QR Code
+  * Added support for ECI, i.e. more character sets
+  * Changed default BYTE mode encoding to default to UTF-8, but attempts to see if it could be another encoding
+  * ISO 18004:2015 says it should be 8859-1 but most encoders and scanners use UTF-8 instead
+- Demonstration
+  * Modernized point tracker demo
+  * Three View Stereo: Using AverageDownSampleOps to avoid aliasing and drastically improves performance
 
 TODO This Release
   - Examples
@@ -24,10 +38,10 @@ TODO This Release
   - Cheirality
     * Will also require a linear programming solution, e.g. simplex
   - Remove dependency on OpenCV in Applications to reduce file size
-  - QR Code fiducial 3D pose regression tests
 
 TODO Regression
   - homography estimation
+  - QR Code fiducial 3D pose regression
 
 ---------------------------------------------
 Date    : 2018/12/26

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,12 @@ package boofcv.alg.filter.binary;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.impl.ThresholdSauvola;
 import boofcv.alg.misc.GImageStatistics;
+import boofcv.alg.misc.HistogramStatistics;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.*;
+import org.ejml.UtilEjml;
 
 
 /**
@@ -191,7 +193,216 @@ public class GThresholdImageOps {
 		// arbitrarily. Then if you scaled the threshold it would reject everything
 		return (int)(length*(selectedMB+selectedMF)/2.0 + 0.5);
 	}
+   
+	/**
+	 * <p>
+	 * Computes Li's Minimum Cross Entropy thresholding from an input image. Internally it uses
+	 * {@link #computeLi(int[], int)} and {@link boofcv.alg.misc.GImageStatistics#histogram(ImageGray, double, int[])}
+	 * </p>
+	 *
+	 * @param input Input gray-scale image
+	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
+	 * @return Selected threshold.
+	 */
+	public static double computeLi(ImageGray input , double minValue , double maxValue ) {
 
+		int range = (int)(1+maxValue - minValue);
+		int histogram[] = new int[ range ];
+
+		GImageStatistics.histogram(input,minValue,histogram);
+
+		return computeLi(histogram,range)+minValue;
+	}
+   
+ /**
+	 * Implements Li's Minimum Cross Entropy thresholding method This
+	 * implementation is based on the iterative version (Ref. 2) of the
+	 * algorithm. 1) Li C.H. and Lee C.K. (1993) "Minimum Cross Entropy
+	 * Thresholding" Pattern Recognition, 26(4): 617-625 2) Li C.H. and Tam
+	 * P.K.S. (1998) "An Iterative Algorithm for Minimum Cross Entropy
+	 * Thresholding"Pattern Recognition Letters, 18(8): 771-776 3) Sezgin M. and
+	 * Sankur B. (2004) "Survey over Image Thresholding Techniques and
+	 * Quantitative Performance Evaluation" Journal of Electronic Imaging, 13(1):
+	 * 146-165 http://citeseer.ist.psu.edu/sezgin04survey.html
+	 *
+	 * Ported to ImageJ plugin by G.Landini from E Celebi's fourier_0.8 routines
+	 * Ported from Imagej code (https://imagej.nih.gov/ij/developer/source/) to
+	 * BoofCV by Nico Stuurman
+	 *
+	 * @param histogram Histogram of pixel intensities.
+	 * @param length Number of elements in the histogram.
+	 * @return Selected threshold
+	 */
+	public static int computeLi(int histogram[], int length) {
+		// This function has been released by various authors under a public domain license
+
+		int threshold;
+		int old_thresh;
+		double mean_back;       // mean of the background pixels at a given threshold
+		double mean_obj;        // mean of the object pixels at a given threshold
+		double tolerance = 0.5; // threshold tolerance
+		double temp;
+
+		// Calculate the mean gray-level and set the threshold initially to this
+		int new_thresh = (int)(HistogramStatistics.mean(histogram,length)+0.5);
+
+		do {
+			old_thresh = new_thresh;
+			threshold = (int) (old_thresh + 0.5);
+			// Calculate the means of background and object pixels 
+
+			// Background
+			long sum_back = 0; // sum of the background pixels at a given threshold
+			long num_back = 0; // number of background pixels at a given threshold
+			for (int ih = 0; ih <= threshold; ih++) {
+				sum_back += ih * histogram[ih];
+				num_back += histogram[ih];
+			}
+			mean_back = (num_back == 0 ? 0.0 : (sum_back / (double) num_back));
+
+			// Object
+			long sum_obj = 0; // sum of the object pixels at a given threshold
+			long num_obj = 0; // number of object pixels at a given threshold
+			for (int ih = threshold + 1; ih < length; ih++) {
+				sum_obj += ih * histogram[ih];
+				num_obj += histogram[ih];
+			}
+			mean_obj = (num_obj == 0 ? 0.0 : (sum_obj / (double) num_obj));
+
+			/* Calculate the new threshold: Equation (7) in Ref. 2 */
+			//new_thresh = simple_round ( ( mean_back - mean_obj ) / ( Math.log ( mean_back ) - Math.log ( mean_obj ) ) );
+			//simple_round ( double x ) {
+			// return ( int ) ( IS_NEG ( x ) ? x - .5 : x + .5 );
+			//}
+			//
+			//#define IS_NEG( x ) ( ( x ) < -DBL_EPSILON ) 
+			//DBL_EPSILON = 2.220446049250313E-16
+			temp = (mean_back - mean_obj) / (Math.log(mean_back) - Math.log(mean_obj));
+
+			if (temp < -UtilEjml.EPS) {
+				new_thresh = (int) (temp - 0.5);
+			} else {
+				new_thresh = (int) (temp + 0.5);
+			}
+			//  Stop the iterations when the difference between the
+			// new and old threshold values is less than the tolerance
+		} while (Math.abs(new_thresh - old_thresh) > tolerance);
+
+		return threshold;
+	}
+
+	/**
+	 * <p>
+	 * Computes Huang's Minimum fyzzy thresholding from an input image. Internally it uses
+	 * {@link #computeHuang(int[], int)} and {@link boofcv.alg.misc.GImageStatistics#histogram(ImageGray, double, int[])}
+	 * </p>
+	 *
+	 * @param input Input gray-scale image
+	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
+	 * @return Selected threshold.
+	 */
+	public static double computeHuang(ImageGray input , double minValue , double maxValue ) {
+
+		int range = (int)(1+maxValue - minValue);
+		int histogram[] = new int[ range ];
+
+		GImageStatistics.histogram(input,minValue,histogram);
+
+		return computeHuang(histogram,range)+minValue;
+	}
+   
+	/**
+	 * Implements Huang's fuzzy thresholding method Uses Shannon's entropy
+	 * function (one can also use Yager's entropy function) Huang L.-K. and Wang
+	 * M.-J.J. (1995) "Image Thresholding by Minimizing the Measures of
+	 * Fuzziness" Pattern Recognition, 28(1): 41-51 M. Emre Celebi 06.15.2007
+	 *
+	 * Ported to ImageJ plugin by G.Landini from E Celebi's fourier_0.8 routines
+	 * Ported from Imagej code (https://imagej.nih.gov/ij/developer/source/) to
+	 * BoofCV by Nico Stuurman
+	 *
+	 * @param histogram Histogram of pixel intensities.
+	 * @param length Number of elements in the histogram.
+	 * @return Selected threshold
+	 */
+	public static int computeHuang(int[] histogram, int length) {
+		// This function has been released by various authors under a public domain license
+
+		// Determine the first non-zero bin
+		int first_bin = 0;
+		for (int ih = 0; ih < length; ih++) {
+			if (histogram[ih] != 0) {
+				first_bin = ih;
+				break;
+			}
+		}
+
+		// Determine the last non-zero bin
+		int last_bin = length - 1;
+		for (int ih = last_bin; ih >= first_bin; ih--) {
+			if (histogram[ih] != 0) {
+				last_bin = ih;
+				break;
+			}
+		}
+		double term = 1.0 / (double) (last_bin - first_bin);
+		double[] mu_0 = new double[length];
+		{
+			long sum_pix = 0, num_pix = 0;
+			for (int ih = first_bin; ih < length; ih++) {
+				sum_pix += ih * histogram[ih];
+				num_pix += histogram[ih];
+				// NUM_PIX cannot be zero !
+				mu_0[ih] = sum_pix / (double) num_pix;
+			}
+		}
+
+		double[] mu_1 = new double[length];
+		{
+			long sum_pix = 0, num_pix = 0;
+			for (int ih = last_bin; ih >= 0; ih--) { // original: (ih = last_bin; ih > 0; ih--)
+				sum_pix += ih * histogram[ih];
+				num_pix += histogram[ih];
+				// NUM_PIX cannot be zero !
+				mu_1[ih] = sum_pix / (double) num_pix; // original: mu_1[ih -1] = sum_pix/(double) num_pix
+			}
+		}
+
+		/* Determine the threshold that minimizes the fuzzy entropy */
+		int threshold = -1;
+		double min_ent = Double.MAX_VALUE; // min entropy
+		for (int it = first_bin; it <= last_bin; it++) {
+			double ent = 0.0;  // entropy
+			for (int ih = first_bin; ih <= it; ih++) {
+				// Equation (4) in Ref. 1
+				double mu_x = 1.0 / (1.0 + term * Math.abs(ih - mu_0[it]));
+				if (!((mu_x < 1e-06) || (mu_x > 0.999999))) {
+					/* Equation (6) & (8) in Ref. 1 */
+					ent += histogram[ih] * (-mu_x * Math.log(mu_x) - (1.0 - mu_x) * Math.log(1.0 - mu_x));
+				}
+			}
+
+			for (int ih = it + 1; ih <= last_bin; ih++) {
+				// Equation (4) in Ref. 1
+				double mu_x = 1.0 / (1.0 + term * Math.abs(ih - mu_1[it]));
+				if (!((mu_x < 1e-06) || (mu_x > 0.999999))) {
+					/* Equation (6) & (8) in Ref. 1 */
+					ent += histogram[ih] * (-mu_x * Math.log(mu_x) - (1.0 - mu_x) * Math.log(1.0 - mu_x));
+				}
+			}
+			/* No need to divide by NUM_ROWS * NUM_COLS * LOG(2) ! */
+			if (ent < min_ent) {
+				min_ent = ent;
+				threshold = it;
+			}
+		}
+		return threshold;
+	}
+
+	
+	
 	/**
 	 * <p>
 	 * Computes a threshold which maximizes the entropy between the foreground and background regions.  See

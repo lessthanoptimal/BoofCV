@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -200,6 +200,9 @@ public abstract class GenericFiducialDetectorChecks {
 	@Test
 	public void checkPoseAccuracy() {
 
+		// this has to do with the marker coordinate system to image coordinate system
+		// marker is +y up   +x right +z up
+		// image is  +y down +x right +z out
 		Se3_F64 adjustment = SpecialEuclideanOps_F64.eulerXyz(0,0,0,0,0,Math.PI,null);
 
 		for( boolean distorted : new boolean[]{false,true}) {

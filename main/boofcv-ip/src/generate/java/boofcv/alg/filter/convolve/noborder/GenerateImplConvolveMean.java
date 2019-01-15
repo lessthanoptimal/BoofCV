@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,7 @@ public class GenerateImplConvolveMean {
 		printPreamble();
 		addFunctions(AutoTypeImage.U8, AutoTypeImage.I8);
 		addFunctions(AutoTypeImage.S16, AutoTypeImage.I16);
+		addFunctions(AutoTypeImage.U16, AutoTypeImage.I16);
 		addFunctions(AutoTypeImage.F32, AutoTypeImage.F32);
 		addFunctions(AutoTypeImage.F64, AutoTypeImage.F64);
 		out.println("}");

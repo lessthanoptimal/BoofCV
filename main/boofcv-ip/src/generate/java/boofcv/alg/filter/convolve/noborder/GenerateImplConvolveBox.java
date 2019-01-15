@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,18 +28,16 @@ import java.io.FileNotFoundException;
  */
 public class GenerateImplConvolveBox extends CodeGeneratorBase {
 
-	String className = "ImplConvolveBox";
-
 	AutoTypeImage imageIn;
 	AutoTypeImage imageOut;
 
 	@Override
 	public void generate() throws FileNotFoundException {
-		setOutputFile(className);
 		printPreamble();
 		addFunctions(AutoTypeImage.U8, AutoTypeImage.I16);
 		addFunctions(AutoTypeImage.U8, AutoTypeImage.S32);
 		addFunctions(AutoTypeImage.S16, AutoTypeImage.I16);
+		addFunctions(AutoTypeImage.U16, AutoTypeImage.I16);
 		addFunctions(AutoTypeImage.S32, AutoTypeImage.S32);
 		addFunctions(AutoTypeImage.F32, AutoTypeImage.F32);
 		addFunctions(AutoTypeImage.F64, AutoTypeImage.F64);

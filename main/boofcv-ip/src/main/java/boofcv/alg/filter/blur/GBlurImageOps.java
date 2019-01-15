@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,9 @@ public class GBlurImageOps {
 	public static <T extends ImageBase<T>>
 	T mean(T input, @Nullable T output, int radius, @Nullable ImageBase storage ) {
 		if( input instanceof GrayU8) {
-			return (T)BlurImageOps.mean((GrayU8)input,(GrayU8)output,radius,(GrayU8)storage);
+			return (T) BlurImageOps.mean((GrayU8) input, (GrayU8) output, radius, (GrayU8) storage);
+		} else if( input instanceof GrayU16) {
+			return (T)BlurImageOps.mean((GrayU16)input,(GrayU16)output,radius,(GrayU16)storage);
 		} else if( input instanceof GrayF32) {
 			return (T)BlurImageOps.mean((GrayF32)input,(GrayF32)output,radius,(GrayF32)storage);
 		} else if( input instanceof GrayF64) {
@@ -96,6 +98,8 @@ public class GBlurImageOps {
 			case GRAY: {
 				if (input instanceof GrayU8) {
 					return (T) BlurImageOps.gaussian((GrayU8) input, (GrayU8) output, sigma, radius, (GrayU8) storage);
+				} else if (input instanceof GrayU16) {
+					return (T) BlurImageOps.gaussian((GrayU16) input, (GrayU16) output, sigma, radius, (GrayU16) storage);
 				} else if (input instanceof GrayF32) {
 					return (T) BlurImageOps.gaussian((GrayF32) input, (GrayF32) output, sigma, radius, (GrayF32) storage);
 				} else if (input instanceof GrayF64) {
@@ -108,6 +112,8 @@ public class GBlurImageOps {
 			case INTERLEAVED:{
 				if (input instanceof InterleavedU8) {
 					return (T) BlurImageOps.gaussian((InterleavedU8) input, (InterleavedU8) output, sigma, radius, (InterleavedU8) storage);
+				} else if (input instanceof InterleavedU16) {
+					return (T) BlurImageOps.gaussian((InterleavedU16) input, (InterleavedU16) output, sigma, radius, (InterleavedU16) storage);
 				} else if (input instanceof InterleavedF32) {
 					return (T) BlurImageOps.gaussian((InterleavedF32) input, (InterleavedF32) output, sigma, radius, (InterleavedF32) storage);
 				} else if (input instanceof InterleavedF64) {

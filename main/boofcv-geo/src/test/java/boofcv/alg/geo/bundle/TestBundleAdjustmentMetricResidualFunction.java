@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,14 +33,19 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * @author Peter Abeles
  */
 public class TestBundleAdjustmentMetricResidualFunction {
-	Random rand = new Random(234);
+	private Random rand = new Random(234);
 
 	/**
 	 * Makes sure that when given the same input it produces the same output
 	 */
 	@Test
 	public void multipleCalls() {
-		SceneStructureMetric structure = createScene(rand);
+		multipleCalls(true);
+		multipleCalls(false);
+	}
+
+	public void multipleCalls( boolean homogenous ) {
+		SceneStructureMetric structure = createScene(rand,homogenous);
 		SceneObservations obs = createObservations(rand,structure);
 
 		double param[] = new double[structure.getParameterCount()];
@@ -64,7 +69,11 @@ public class TestBundleAdjustmentMetricResidualFunction {
 	 */
 	@Test
 	public void changeInParamChangesOutput() {
-		SceneStructureMetric structure = createScene(rand);
+		changeInParamChangesOutput(true);
+		changeInParamChangesOutput(false);
+	}
+	public void changeInParamChangesOutput(boolean homogenous ) {
+		SceneStructureMetric structure = createScene(rand,homogenous);
 		double param[] = new double[structure.getParameterCount()];
 
 		new CodecSceneStructureMetric().encode(structure,param);

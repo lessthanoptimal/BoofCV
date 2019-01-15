@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,6 +56,8 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 		create(AutoTypeImage.U8,AutoTypeImage.I16,false);
 		create(AutoTypeImage.S16,AutoTypeImage.I16,false);
 		create(AutoTypeImage.S16,AutoTypeImage.I16,true);
+		create(AutoTypeImage.U16,AutoTypeImage.I16,false);
+		create(AutoTypeImage.U16,AutoTypeImage.I16,true);
 		create(AutoTypeImage.S32,AutoTypeImage.S32,false);
 		create(AutoTypeImage.S32,AutoTypeImage.S32,true);
 	}

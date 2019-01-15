@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -372,6 +372,99 @@ public class ConvolveNormalizedNaive_SB {
 	}
 
 	public static void convolve(Kernel2D_S32 kernel, GrayS16 input, GrayI16 output ) {
+
+		final int offset = kernel.getOffset();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+
+				int startX = x - offset;
+				int endX = startX + kernel.getWidth();
+
+				if( startX < 0 ) startX = 0;
+				if( endX > width ) endX = width;
+
+				int startY = y - offset;
+				int endY = startY + kernel.getWidth();
+
+				if( startY < 0 ) startY = 0;
+				if( endY > height ) endY = height;
+
+				int total = 0;
+				int weight = 0;
+
+				for( int i = startY; i < endY; i++ ) {
+					for( int j = startX; j < endX; j++ ) {
+						int v = kernel.get(j-x+offset,i-y+offset);
+						total += input.get(j,i)*v;
+						weight += v;
+					}
+				}
+				output.set(x,y, (total+weight/2)/weight );
+			}
+		}
+	}
+
+	public static void horizontal(Kernel1D_S32 kernel, GrayU16 input, GrayI16 output ) {
+
+		final int offset = kernel.getOffset();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+				int weight = 0;
+
+				int startX = x - offset;
+				int endX = startX+kernel.getWidth();
+
+				if( startX < 0 ) startX = 0;
+				if( endX > width ) endX = width;
+
+				for( int j = startX; j < endX; j++ ) {
+					int v = kernel.get(j-x+offset);
+					total += input.get(j,y)*v;
+					weight += v;
+				}
+				output.set(x,y, (total+weight/2)/weight );
+			}
+		}
+	}
+
+	public static void vertical(Kernel1D_S32 kernel, GrayU16 input, GrayI16 output ) {
+
+		final int offset = kernel.getOffset();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+				int weight = 0;
+
+				int startY = y - offset;
+				int endY = startY + kernel.getWidth();
+
+				if( startY < 0 ) startY = 0;
+				if( endY > height ) endY = height;
+
+				for( int i = startY; i < endY; i++ ) {
+					int v = kernel.get(i-y+offset);
+					total += input.get(x,i)*v;
+					weight += v;
+				}
+				output.set(x,y, (total+weight/2)/weight );
+			}
+		}
+	}
+
+	public static void convolve(Kernel2D_S32 kernel, GrayU16 input, GrayI16 output ) {
 
 		final int offset = kernel.getOffset();
 

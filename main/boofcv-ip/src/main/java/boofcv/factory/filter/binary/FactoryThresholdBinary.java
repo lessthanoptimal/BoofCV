@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -234,6 +234,34 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeLi(int[], int)
+	 *
+	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
+	 * @param down Should it threshold up or down.
+	 * @param inputType Type of input image
+	 * @return Filter to binary
+	 */
+	public static <T extends ImageGray<T>>
+	InputToBinary<T> globalLi(double minValue, double maxValue, boolean down, Class<T> inputType) {
+		return new GlobalLiBinaryFilter<>(minValue, maxValue, down, ImageType.single(inputType));
+	}
+
+	/**
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#computeHuang(int[], int)
+	 *
+	 * @param minValue The minimum value of a pixel in the image.  (inclusive)
+	 * @param maxValue The maximum value of a pixel in the image.  (inclusive)
+	 * @param down Should it threshold up or down.
+	 * @param inputType Type of input image
+	 * @return Filter to binary
+	 */
+	public static <T extends ImageGray<T>>
+	InputToBinary<T> globalHuang(double minValue, double maxValue, boolean down, Class<T> inputType) {
+		return new GlobalHuangBinaryFilter<>(minValue, maxValue, down, ImageType.single(inputType));
+	}
+
+	/**
 	 * Creates threshold using a config class
 	 *
 	 * @param config Configuration
@@ -252,6 +280,12 @@ public class FactoryThresholdBinary {
 
 			case GLOBAL_ENTROPY:
 				return globalEntropy(config.minPixelValue, config.maxPixelValue, config.down, inputType);
+
+			case GLOBAL_LI:
+				return globalLi(config.minPixelValue, config.maxPixelValue, config.down, inputType);
+
+			case GLOBAL_HUANG:
+				return globalHuang(config.minPixelValue, config.maxPixelValue, config.down, inputType);
 
 			case LOCAL_GAUSSIAN:
 				return localGaussian(config.width, config.scale, config.down, inputType);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.image.*;
@@ -159,6 +158,71 @@ public class ImplConvolveMean {
 			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
 				int total = totals[ x ]  - (input.data[ indexIn - backStep ]);
 				totals[ x ] = total += input.data[ indexIn ];
+
+				output.data[indexOut] = (short)((total+halfDivisor)/divisor);
+			}
+		}
+	}
+
+	public static void horizontal( GrayU16 input , GrayI16 output , int radius ) {
+		final int kernelWidth = radius*2 + 1;
+
+		final int divisor = kernelWidth;
+		final int halfDivisor = divisor/2;
+
+		for( int y = 0; y < input.height; y++ ) {
+			int indexIn = input.startIndex + input.stride*y;
+			int indexOut = output.startIndex + output.stride*y + radius;
+
+			int total = 0;
+
+			int indexEnd = indexIn + kernelWidth;
+			
+			for( ; indexIn < indexEnd; indexIn++ ) {
+				total += input.data[indexIn] & 0xFFFF;
+			}
+			output.data[indexOut++] = (short)((total+halfDivisor)/divisor);
+
+			indexEnd = indexIn + input.width - kernelWidth;
+			for( ; indexIn < indexEnd; indexIn++ ) {
+				total -= input.data[ indexIn - kernelWidth ] & 0xFFFF;
+				total += input.data[ indexIn ] & 0xFFFF;
+
+				output.data[indexOut++] = (short)((total+halfDivisor)/divisor);
+			}
+		}
+	}
+
+	public static void vertical( GrayU16 input , GrayI16 output , int radius ) {
+		final int kernelWidth = radius*2 + 1;
+
+		final int backStep = kernelWidth*input.stride;
+
+		int divisor = kernelWidth;
+		final int halfDivisor = divisor/2;
+		int totals[] = new int[ input.width ];
+
+		for( int x = 0; x < input.width; x++ ) {
+			int indexIn = input.startIndex + x;
+			int indexOut = output.startIndex + output.stride*radius + x;
+
+			int total = 0;
+			int indexEnd = indexIn + input.stride*kernelWidth;
+			for( ; indexIn < indexEnd; indexIn += input.stride) {
+				total += input.data[indexIn] & 0xFFFF;
+			}
+			totals[x] = total;
+			output.data[indexOut] = (short)((total+halfDivisor)/divisor);
+		}
+
+		// change the order it is processed in to reduce cache misses
+		for( int y = radius+1; y < output.height-radius; y++ ) {
+			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexOut = output.startIndex + y*output.stride;
+
+			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
+				int total = totals[ x ]  - (input.data[ indexIn - backStep ]& 0xFFFF);
+				totals[ x ] = total += input.data[ indexIn ]& 0xFFFF;
 
 				output.data[indexOut] = (short)((total+halfDivisor)/divisor);
 			}
