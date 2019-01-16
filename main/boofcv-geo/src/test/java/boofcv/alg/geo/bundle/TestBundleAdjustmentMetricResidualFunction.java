@@ -26,7 +26,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 
 import static boofcv.alg.geo.bundle.TestCodecSceneStructureMetric.createScene;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author Peter Abeles
@@ -39,28 +40,30 @@ public class TestBundleAdjustmentMetricResidualFunction {
 	 */
 	@Test
 	public void multipleCalls() {
-		multipleCalls(true);
-		multipleCalls(false);
+		multipleCalls(true, false);
+		multipleCalls(false, false);
+		multipleCalls(true, true);
+		multipleCalls(false, true);
 	}
 
-	public void multipleCalls( boolean homogenous ) {
-		SceneStructureMetric structure = createScene(rand,homogenous);
-		SceneObservations obs = createObservations(rand,structure);
+	public void multipleCalls(boolean homogenous, boolean hasRigid) {
+		SceneStructureMetric structure = createScene(rand, homogenous, hasRigid);
+		SceneObservations obs = createObservations(rand, structure);
 
 		double param[] = new double[structure.getParameterCount()];
 
-		new CodecSceneStructureMetric().encode(structure,param);
+		new CodecSceneStructureMetric().encode(structure, param);
 
 		BundleAdjustmentMetricResidualFunction alg = new BundleAdjustmentMetricResidualFunction();
-		alg.configure(structure,obs);
+		alg.configure(structure, obs);
 
-		double []expected = new double[alg.getNumOfOutputsM()];
-		double []found = new double[alg.getNumOfOutputsM()];
+		double[] expected = new double[alg.getNumOfOutputsM()];
+		double[] found = new double[alg.getNumOfOutputsM()];
 
-		alg.process(param,expected);
-		alg.process(param,found);
+		alg.process(param, expected);
+		alg.process(param, found);
 
-		assertArrayEquals(expected,found,UtilEjml.TEST_F64);
+		assertArrayEquals(expected, found, UtilEjml.TEST_F64);
 	}
 
 	/**
@@ -71,30 +74,31 @@ public class TestBundleAdjustmentMetricResidualFunction {
 		changeInParamChangesOutput(true);
 		changeInParamChangesOutput(false);
 	}
-	public void changeInParamChangesOutput(boolean homogenous ) {
-		SceneStructureMetric structure = createScene(rand,homogenous);
+
+	public void changeInParamChangesOutput(boolean homogenous) {
+		SceneStructureMetric structure = createScene(rand, homogenous, false);
 		double param[] = new double[structure.getParameterCount()];
 
-		new CodecSceneStructureMetric().encode(structure,param);
+		new CodecSceneStructureMetric().encode(structure, param);
 
 		// Create random observations
-		SceneObservations obs = createObservations(rand,structure);
+		SceneObservations obs = createObservations(rand, structure);
 
 		BundleAdjustmentMetricResidualFunction alg = new BundleAdjustmentMetricResidualFunction();
-		alg.configure(structure,obs);
+		alg.configure(structure, obs);
 
-		double []original = new double[alg.getNumOfOutputsM()];
-		double []found = new double[alg.getNumOfOutputsM()];
-		alg.process(param,original);
+		double[] original = new double[alg.getNumOfOutputsM()];
+		double[] found = new double[alg.getNumOfOutputsM()];
+		alg.process(param, original);
 
 		for (int paramIndex = 0; paramIndex < original.length; paramIndex++) {
 			double v = param[paramIndex];
 			param[paramIndex] += 0.001;
-			alg.process(param,found);
+			alg.process(param, found);
 
 			boolean identical = true;
 			for (int i = 0; i < found.length; i++) {
-				if( Math.abs(original[i]-found[i]) > UtilEjml.TEST_F64 ) {
+				if (Math.abs(original[i] - found[i]) > UtilEjml.TEST_F64) {
 					identical = false;
 					break;
 				}
@@ -104,27 +108,37 @@ public class TestBundleAdjustmentMetricResidualFunction {
 		}
 	}
 
-	public static SceneObservations createObservations(Random rand , SceneStructureMetric structure) {
-		SceneObservations obs = new SceneObservations(structure.views.length);
+	public static SceneObservations createObservations(Random rand, SceneStructureMetric structure) {
+		SceneObservations obs = new SceneObservations(structure.views.length, structure.hasRigid());
 
 		for (int j = 0; j < structure.points.length; j++) {
 			SceneStructureMetric.Point p = structure.points[j];
 
 			for (int i = 0; i < p.views.size; i++) {
 				SceneObservations.View v = obs.getView(p.views.get(i));
-				v.point.add( j );
-				v.observations.add( rand.nextInt(300)+20);
-				v.observations.add( rand.nextInt(300)+20);
+				v.point.add(j);
+				v.observations.add(rand.nextInt(300) + 20);
+				v.observations.add(rand.nextInt(300) + 20);
 			}
 		}
-		return obs;
-	}
 
-	/**
-	 * Test with a rigid object
-	 */
-	@Test
-	public void withRigidObject() {
-		fail("Implement");
+		if (structure.hasRigid()) {
+			for (int indexRigid = 0; indexRigid < structure.rigids.length; indexRigid++) {
+				SceneStructureMetric.Rigid r = structure.rigids[indexRigid];
+				for (int i = 0; i < r.points.length; i++) {
+					SceneStructureMetric.Point p = r.points[i];
+					int indexPoint = r.indexFirst + i;
+
+					for (int j = 0; j < p.views.size; j++) {
+						SceneObservations.View v = obs.getViewRigid(p.views.get(j));
+						v.point.add(indexPoint);
+						v.observations.add(rand.nextInt(300) + 20);
+						v.observations.add(rand.nextInt(300) + 20);
+					}
+				}
+			}
+		}
+
+		return obs;
 	}
 }

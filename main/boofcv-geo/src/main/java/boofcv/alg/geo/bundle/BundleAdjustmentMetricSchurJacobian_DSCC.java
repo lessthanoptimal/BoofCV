@@ -21,13 +21,12 @@ package boofcv.alg.geo.bundle;
 import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.alg.geo.RodriguesRotationJacobian;
-import georegression.geometry.ConvertRotation3D_F64;
+import boofcv.alg.geo.bundle.jacobians.JacobianSo3Rodrigues_F64;
+import boofcv.alg.geo.bundle.jacobians.JacobianSo3_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import georegression.struct.so.Rodrigues_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
@@ -55,18 +54,26 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 	// length of a 3D point. 3 = regular, 4 = homogenous
 	private int lengthPoint;
 
-	// used to compute the Jacobian from Rodrigues coordinates
-	private RodriguesRotationJacobian rodJacobian = new RodriguesRotationJacobian();
+	// used to compute the Jacobian of a rotation matrix
+	private JacobianSo3_F64 jacSO3 = new JacobianSo3Rodrigues_F64();
 	private Se3_F64 worldToView = new Se3_F64();
 
-	// local variable which stores the predicted location of the feature in the camera frame
-	private Rodrigues_F64 rodrigues = new Rodrigues_F64();
+	// jacobians for rigid objects
+	private JacobianSo3_F64[] rigidS03;
+
 	// feature location in world coordinates
 	private Point3D_F64 worldPt3 = new Point3D_F64();
 	private Point4D_F64 worldPt4 = new Point4D_F64();
+	// feature location in rigid body coordinates
+	private Point3D_F64 rigidPt3 = new Point3D_F64();
+	private Point4D_F64 rigidPt4 = new Point4D_F64();
 	// feature location in camera coordinates
 	private Point3D_F64 cameraPt = new Point3D_F64();
 
+	// Number of parameters to describe SE3 (rotation + translation)
+	private int lengthSE3;
+	// first index for rigid body parameters
+	private int indexFirstRigid;
 	// index in parameters of the first point
 	private int indexFirstView;
 	private int indexLastView;
@@ -74,6 +81,9 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 	private int viewParameterIndexes[];
 	// first index in input/parameters vector for each camera
 	private int cameraParameterIndexes[];
+
+	// row of the first observation of a rigid point
+	private int rowFirstRigid;
 
 	// Jacobian matrix index of x and y partial
 	private int jacRowX,jacRowY;
@@ -99,11 +109,24 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 			lengthPoint = 4;
 		}
 
+		// 3 for translation + orientation parameterization
+		lengthSE3 = 3+jacSO3.getParameterLength();
+
+		int numRigidUnknown = 0;
+		rigidS03 = new JacobianSo3_F64[structure.rigids.length];
+		for (int i = 0; i < rigidS03.length; i++) {
+			rigidS03[i] = new JacobianSo3Rodrigues_F64();
+			if( !structure.rigids[i].known ) {
+				numRigidUnknown++;
+			}
+		}
+
 		numViewsUnknown = structure.getUnknownViewCount();
 		int numCameraParameters = structure.getUnknownCameraParameterCount();
 
-		indexFirstView = structure.points.length*lengthPoint;
-		indexLastView = indexFirstView + numViewsUnknown*6;
+		indexFirstRigid = structure.points.length*lengthPoint;
+		indexFirstView = indexFirstRigid + numRigidUnknown*lengthSE3;
+		indexLastView = indexFirstView + numViewsUnknown*lengthSE3;
 		numParameters = indexLastView + numCameraParameters;
 
 		viewParameterIndexes = new int[structure.views.length];
@@ -111,7 +134,7 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 		for (int i = 0; i < structure.views.length; i++) {
 			viewParameterIndexes[i] = index;
 			if( !structure.views[i].known ) {
-				index += 6;
+				index += lengthSE3;
 			}
 		}
 
@@ -130,6 +153,8 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 
 		calibGradX = new double[largestCameraSize];
 		calibGradY = new double[largestCameraSize];
+
+		rowFirstRigid = 2*observations.getObservationCount(false);
 	}
 
 	@Override
@@ -151,6 +176,15 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 		tripletPoint.reshape(numRows,numPointParam);
 		tripletView.reshape(numRows,numViewParam);
 
+		// parse parameters for rigid bodies. the translation + rotation is the same for all views
+		int countRigidUnknown = 0;
+		for (int rigidIndex = 0; rigidIndex < structure.rigids.length; rigidIndex++) {
+			if( structure.rigids[rigidIndex].known ) {
+				rigidS03[rigidIndex].setParameters(input,indexFirstRigid+countRigidUnknown*lengthSE3);
+				countRigidUnknown++;
+			}
+		}
+
 		int observationIndex = 0;
 		// first decode the transformation
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
@@ -159,18 +193,14 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 
 			if( !view.known ) {
 				int paramIndex = viewParameterIndexes[viewIndex]+indexFirstView;
-				double rodX = input[paramIndex];
-				double rodY = input[paramIndex+1];
-				double rodZ = input[paramIndex+2];
+				jacSO3.setParameters(input,paramIndex);
+				paramIndex += jacSO3.getParameterLength();
 
-				worldToView.T.x = input[paramIndex+3];
-				worldToView.T.y = input[paramIndex+4];
-				worldToView.T.z = input[paramIndex+5];
+				worldToView.T.x = input[paramIndex];
+				worldToView.T.y = input[paramIndex+1];
+				worldToView.T.z = input[paramIndex+2];
 
-				rodrigues.setParamVector(rodX,rodY,rodZ);
-				rodJacobian.process(rodX,rodY,rodZ);
-
-				ConvertRotation3D_F64.rodriguesToMatrix(rodrigues,worldToView.R);
+				worldToView.getR().set(jacSO3.getRotationMatrix());
 			} else {
 				worldToView.set(view.worldToView);
 			}
@@ -179,63 +209,126 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 				camera.model.setIntrinsic(input,indexLastView+cameraParamStartIndex);
 			}
 
-			SceneObservations.View obsView = observations.views[viewIndex];
-
-			for (int i = 0; i < obsView.size(); i++) {
-				int featureIndex = obsView.point.get(i);
-				int columnOfPointInJac = featureIndex*lengthPoint;
-
-				if( structure.isHomogenous() ) {
-					worldPt4.x = input[columnOfPointInJac];
-					worldPt4.y = input[columnOfPointInJac + 1];
-					worldPt4.z = input[columnOfPointInJac + 2];
-					worldPt4.w = input[columnOfPointInJac + 3];
-
-					SePointOps_F64.transform(worldToView, worldPt4, cameraPt);
-				} else {
-					worldPt3.x = input[columnOfPointInJac];
-					worldPt3.y = input[columnOfPointInJac + 1];
-					worldPt3.z = input[columnOfPointInJac + 2];
-
-					SePointOps_F64.transform(worldToView, worldPt3, cameraPt);
-				}
-
-				jacRowX = observationIndex*2;
-				jacRowY = jacRowX+1;
-
-				//============ Partial of camera parameters
-				if( !camera.known ) {
-					int N = camera.model.getIntrinsicCount();
-					camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z,
-							pointGradX, pointGradY, true, calibGradX, calibGradY);
-
-					int location = indexLastView-indexFirstView+cameraParamStartIndex;
-					for (int j = 0; j < N; j++) {
-						tripletView.addItemCheck(jacRowX,location+j,calibGradX[j]);
-						tripletView.addItemCheck(jacRowY,location+j,calibGradY[j]);
-					}
-				} else {
-					camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z, pointGradX, pointGradY,
-							false, null, null);
-				}
-				//============ Partial of worldPt
-				if( structure.isHomogenous() ) {
-					partialPointH(viewIndex, view, columnOfPointInJac);
-				} else {
-					partialPoint3(viewIndex, view, columnOfPointInJac);
-				}
-
-				observationIndex++;
-			}
+			observationIndex = computeGeneralPoints(input, observationIndex, viewIndex, view, camera, cameraParamStartIndex);
+			if( observations.viewsRigid != null )
+				observationIndex = computeRigidPoints(observationIndex, viewIndex, view, camera, cameraParamStartIndex);
 		}
 
 		ConvertDMatrixStruct.convert(tripletPoint,left);
 		ConvertDMatrixStruct.convert(tripletView,right);
-
-//		left.print();
-//		right.print();
-//		System.out.println("Asdads");
 	}
+
+	private int computeGeneralPoints(double[] input, int observationIndex, int viewIndex, SceneStructureMetric.View view, SceneStructureMetric.Camera camera, int cameraParamStartIndex) {
+		SceneObservations.View obsView = observations.views[viewIndex];
+
+		for (int i = 0; i < obsView.size(); i++) {
+			int featureIndex = obsView.point.get(i);
+			int columnOfPointInJac = featureIndex*lengthPoint;
+
+			if( structure.isHomogenous() ) {
+				worldPt4.x = input[columnOfPointInJac];
+				worldPt4.y = input[columnOfPointInJac + 1];
+				worldPt4.z = input[columnOfPointInJac + 2];
+				worldPt4.w = input[columnOfPointInJac + 3];
+
+				SePointOps_F64.transform(worldToView, worldPt4, cameraPt);
+			} else {
+				worldPt3.x = input[columnOfPointInJac];
+				worldPt3.y = input[columnOfPointInJac + 1];
+				worldPt3.z = input[columnOfPointInJac + 2];
+
+				SePointOps_F64.transform(worldToView, worldPt3, cameraPt);
+			}
+
+			jacRowX = observationIndex*2;
+			jacRowY = jacRowX+1;
+
+			//============ Partial of camera parameters
+			if( !camera.known ) {
+				int N = camera.model.getIntrinsicCount();
+				camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z,
+						pointGradX, pointGradY, true, calibGradX, calibGradY);
+
+				int location = indexLastView-indexFirstView+cameraParamStartIndex;
+				for (int j = 0; j < N; j++) {
+					tripletView.addItemCheck(jacRowX,location+j,calibGradX[j]);
+					tripletView.addItemCheck(jacRowY,location+j,calibGradY[j]);
+				}
+			} else {
+				camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z, pointGradX, pointGradY,
+						false, null, null);
+			}
+			//============ Partial of worldPt
+			if( structure.isHomogenous() ) {
+				partialPointH(viewIndex, view, columnOfPointInJac);
+			} else {
+				partialPoint3(viewIndex, view, columnOfPointInJac);
+			}
+
+			observationIndex++;
+		}
+		return observationIndex;
+	}
+
+	private int computeRigidPoints(int observationIndex, int viewIndex,
+								   SceneStructureMetric.View view,
+								   SceneStructureMetric.Camera camera,
+								   int cameraParamStartIndex)
+	{
+		SceneObservations.View obsView = observations.viewsRigid[viewIndex];
+
+		for (int i = 0; i < obsView.size(); i++) {
+			int featureIndex = obsView.point.get(i);
+			int rigidIndex = structure.lookupRigid[featureIndex];
+			SceneStructureMetric.Rigid rigid = structure.rigids[rigidIndex];
+			int pointIndex = rigid.indexFirst + featureIndex-rigidIndex;
+
+			if( structure.isHomogenous() ) {
+				rigid.getPoint(pointIndex,rigidPt4);
+				SePointOps_F64.transform(rigid.objectToWorld, rigidPt4, worldPt3);
+
+			} else {
+				rigid.getPoint(pointIndex,rigidPt3);
+				SePointOps_F64.transform(rigid.objectToWorld, rigidPt3, worldPt3);
+			}
+			SePointOps_F64.transform(worldToView, worldPt3, cameraPt);
+
+			jacRowX = observationIndex*2;
+			jacRowY = jacRowX+1;
+
+			//============ Partial of camera parameters
+			if( !camera.known ) {
+				int N = camera.model.getIntrinsicCount();
+				camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z,
+						pointGradX, pointGradY, true, calibGradX, calibGradY);
+
+				int location = indexLastView-indexFirstView+cameraParamStartIndex;
+				for (int j = 0; j < N; j++) {
+					tripletView.addItemCheck(jacRowX,location+j,calibGradX[j]);
+					tripletView.addItemCheck(jacRowY,location+j,calibGradY[j]);
+				}
+			} else {
+				camera.model.jacobian(cameraPt.x, cameraPt.y, cameraPt.z, pointGradX, pointGradY,
+						false, null, null);
+			}
+
+			// TODO what should columnOfPointInJac be?
+			//============ Partial of world to view
+			partialViewSE3(viewIndex,view,worldPt3.x,worldPt3.y,worldPt3.z,1);
+
+			//============ Partial of body to world
+			// R2*(R1*X+T1)+T2
+			// [R2|T2] = world to view
+			// [R1|T1] = object to world. X = fixed point in rigid body
+			if( !rigid.known ) {
+
+			}
+
+			observationIndex++;
+		}
+		return observationIndex;
+	}
+
 
 	private void partialPoint3(int viewIndex, SceneStructureMetric.View view, int columnOfPointInJac) {
 		// partial of (R*X + T) with respect to X is a 3 by 3 matrix
@@ -243,19 +336,7 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 		// grad F(G(X)) = 2 x 3 matrix which is then multiplied by R
 		addToJacobian(tripletPoint,columnOfPointInJac,pointGradX,pointGradY,worldToView.R);
 
-		if( !view.known ) {
-			int col = viewParameterIndexes[viewIndex];
-
-			//============== Partial of view rotation parameters
-			addToJacobian(tripletView, col+0, pointGradX, pointGradY, rodJacobian.Rx, worldPt3);
-			addToJacobian(tripletView, col+1, pointGradX, pointGradY, rodJacobian.Ry, worldPt3);
-			addToJacobian(tripletView, col+2, pointGradX, pointGradY, rodJacobian.Rz, worldPt3);
-
-			//============== Partial of view translation parameters
-			tripletView.addItemCheck(jacRowX,col+3, pointGradX[0]); tripletView.addItem(jacRowY,col+3, pointGradY[0]);
-			tripletView.addItemCheck(jacRowX,col+4, pointGradX[1]); tripletView.addItem(jacRowY,col+4, pointGradY[1]);
-			tripletView.addItemCheck(jacRowX,col+5, pointGradX[2]); tripletView.addItem(jacRowY,col+5, pointGradY[2]);
-		}
+		partialViewSE3(viewIndex, view, worldPt3.x, worldPt3.y, worldPt3.z, 1);
 	}
 
 	private void partialPointH(int viewIndex, SceneStructureMetric.View view, int columnOfPointInJac) {
@@ -265,21 +346,26 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 		addToJacobian(tripletPoint,columnOfPointInJac,pointGradX,pointGradY,worldToView.R);
 		addToJacobian(tripletPoint,columnOfPointInJac+3,pointGradX,pointGradY,worldToView.T);
 
-		if( !view.known ) {
-			int col = viewParameterIndexes[viewIndex];
-			//============== Partial of view rotation parameters
-			addToJacobian(tripletView, col+0, pointGradX, pointGradY, rodJacobian.Rx, worldPt4);
-			addToJacobian(tripletView, col+1, pointGradX, pointGradY, rodJacobian.Ry, worldPt4);
-			addToJacobian(tripletView, col+2, pointGradX, pointGradY, rodJacobian.Rz, worldPt4);
-
-			//============== Partial of view translation parameters
-			double w = worldPt4.w;
-			tripletView.addItemCheck(jacRowX,col+3, pointGradX[0]*w); tripletView.addItem(jacRowY,col+3, pointGradY[0]*w);
-			tripletView.addItemCheck(jacRowX,col+4, pointGradX[1]*w); tripletView.addItem(jacRowY,col+4, pointGradY[1]*w);
-			tripletView.addItemCheck(jacRowX,col+5, pointGradX[2]*w); tripletView.addItem(jacRowY,col+5, pointGradY[2]*w);
-		}
+		partialViewSE3(viewIndex, view, worldPt4.x, worldPt4.y, worldPt4.z, worldPt4.w);
 	}
 
+	private void partialViewSE3(int viewIndex, SceneStructureMetric.View view,
+								double X, double Y, double Z , double W) {
+		if( !view.known ) {
+			int col = viewParameterIndexes[viewIndex];
+
+			//============== Partial of view rotation parameters
+			for (int i = 0; i < jacSO3.getParameterLength(); i++) {
+				addToJacobian(tripletView, col+i, pointGradX, pointGradY, jacSO3.getPartial(i),
+						X,Y,Z);
+			}
+
+			//============== Partial of view translation parameters
+			tripletView.addItemCheck(jacRowX,col+3, pointGradX[0]*W); tripletView.addItem(jacRowY,col+3, pointGradY[0]*W);
+			tripletView.addItemCheck(jacRowX,col+4, pointGradX[1]*W); tripletView.addItem(jacRowY,col+4, pointGradY[1]*W);
+			tripletView.addItemCheck(jacRowX,col+5, pointGradX[2]*W); tripletView.addItem(jacRowY,col+5, pointGradY[2]*W);
+		}
+	}
 
 	/**
 	 * J[rows,col:(col+3)] =  [a;b]*R
@@ -294,26 +380,17 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 		tripplet.addItem(jacRowY,col+2,b[0]*R.data[2] + b[1]*R.data[5] + b[2]*R.data[8]);
 	}
 
-	private void addToJacobian(DMatrixSparseTriplet tripplet, int col , double a[], double b[], DMatrixRMaj R , Point3D_F64 X  ) {
-
-		double x = R.data[0]*X.x + R.data[1]*X.y + R.data[2]*X.z;
-		double y = R.data[3]*X.x + R.data[4]*X.y + R.data[5]*X.z;
-		double z = R.data[6]*X.x + R.data[7]*X.y + R.data[8]*X.z;
-
-		tripplet.addItem(jacRowX,col,a[0]*x + a[1]*y + a[2]*z);
-		tripplet.addItem(jacRowY,col,b[0]*x + b[1]*y + b[2]*z);
-	}
-
 	private void addToJacobian(DMatrixSparseTriplet tripplet, int col , double a[], double b[],
-							   DMatrixRMaj R , Point4D_F64 X  ) {
+							   DMatrixRMaj R , double X, double Y, double Z  ) {
 
-		double x = R.data[0]*X.x + R.data[1]*X.y + R.data[2]*X.z;
-		double y = R.data[3]*X.x + R.data[4]*X.y + R.data[5]*X.z;
-		double z = R.data[6]*X.x + R.data[7]*X.y + R.data[8]*X.z;
+		double x = R.data[0]*X + R.data[1]*Y + R.data[2]*Z;
+		double y = R.data[3]*X + R.data[4]*Y + R.data[5]*Z;
+		double z = R.data[6]*X + R.data[7]*Y + R.data[8]*Z;
 
 		tripplet.addItem(jacRowX,col,a[0]*x + a[1]*y + a[2]*z);
 		tripplet.addItem(jacRowY,col,b[0]*x + b[1]*y + b[2]*z);
 	}
+
 
 	private void addToJacobian(DMatrixSparseTriplet tripplet, int col , double a[], double b[], Vector3D_F64 X  ) {
 		tripplet.addItem(jacRowX,col,a[0]*X.x + a[1]*X.y + a[2]*X.z);

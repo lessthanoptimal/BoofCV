@@ -23,6 +23,7 @@ import boofcv.struct.calib.CameraPinhole;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ejml.UtilEjml;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.jupiter.api.Test;
@@ -37,31 +38,27 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestCodecSceneStructureMetric {
 	Random rand = new Random(234);
 
-	/**
-	 * Test with a rigid object
-	 */
-	@Test
-	public void withRigidObject() {
-		fail("Implement");
-	}
-
 	@Test
 	public void encode_decode() {
-		encode_decode(true);
-		encode_decode(false);
+		encode_decode(true,false);
+		encode_decode(false,false);
+		encode_decode(true,true);
+		encode_decode(false,true);
 	}
-	public void encode_decode( boolean homogenous ) {
-		SceneStructureMetric original = createScene(rand,homogenous);
+
+	public void encode_decode( boolean homogenous , boolean hasRigid ) {
+		SceneStructureMetric original = createScene(rand,homogenous, hasRigid);
 
 		CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
 
 		int pointLength = homogenous ? 4 : 3;
-		int N = original.getUnknownViewCount()*6 + original.points.length*pointLength + original.getUnknownCameraParameterCount();
+		int N = original.getUnknownViewCount()*6 + original.getUnknownRigidCount()*6 +
+				original.points.length*pointLength + original.getUnknownCameraParameterCount();
 		assertEquals(N,original.getParameterCount());
 		double param[] = new double[N];
 		codec.encode(original,param);
 
-		SceneStructureMetric found = createScene(rand,homogenous);
+		SceneStructureMetric found = createScene(rand,homogenous, hasRigid);
 		codec.decode(param,found);
 
 		assertEquals(homogenous,found.homogenous);
@@ -92,17 +89,54 @@ public class TestCodecSceneStructureMetric {
 			assertEquals(o.worldToView.T.y,f.worldToView.T.y, UtilEjml.TEST_F64);
 			assertEquals(o.worldToView.T.z,f.worldToView.T.z, UtilEjml.TEST_F64);
 		}
+
+		for (int i = 0; i < original.rigids.length; i++) {
+			SceneStructureMetric.Rigid o = original.rigids[i];
+			SceneStructureMetric.Rigid f = found.rigids[i];
+
+			assertTrue(MatrixFeatures_DDRM.isIdentical(o.objectToWorld.R,
+					f.objectToWorld.R, UtilEjml.TEST_F64));
+			assertEquals(o.objectToWorld.T.x,f.objectToWorld.T.x, UtilEjml.TEST_F64);
+			assertEquals(o.objectToWorld.T.y,f.objectToWorld.T.y, UtilEjml.TEST_F64);
+			assertEquals(o.objectToWorld.T.z,f.objectToWorld.T.z, UtilEjml.TEST_F64);
+		}
 	}
 
-	public static SceneStructureMetric createScene(Random rand , boolean homogenous ) {
+	public static SceneStructureMetric createScene(Random rand, boolean homogenous, boolean hasRigid) {
 		SceneStructureMetric out = new SceneStructureMetric(homogenous);
 
-		out.initialize(2,4,5);
+		int numRigid = hasRigid ? 2 : 0;
+
+		out.initialize(2,4,5, numRigid);
 
 		out.setCamera(0,true,new CameraPinhole(200,300,
 				0.1,400,500,1,1));
 		out.setCamera(1,false,new CameraPinhole(201+rand.nextGaussian(),200,
 				0.01,401+rand.nextGaussian(),50+rand.nextGaussian(),1,1));
+
+		if( hasRigid ) {
+			Se3_F64 worldToRigid0 = SpecialEuclideanOps_F64.eulerXyz(
+					rand.nextGaussian()*0.2,-0.3,1.1,
+					rand.nextGaussian()*0.05,0,-0.1,null);
+			Se3_F64 worldToRigid1 = SpecialEuclideanOps_F64.eulerXyz(-0.1,-0.1,-0.3, -0.1,0.3,0,null);
+
+			out.setRigid(0,false,worldToRigid0,3);
+			out.setRigid(1,true,worldToRigid1,2);
+
+			for (int i = 0; i < out.rigids.length; i++) {
+				SceneStructureMetric.Rigid r = out.rigids[i];
+				if( homogenous ) {
+					for (int j = 0; j < r.points.length; j++) {
+						double w = rand.nextDouble()*3+0.5;
+						r.setPoint(j, rand.nextGaussian() * 0.2, rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.2,w);
+					}
+				} else {
+					for (int j = 0; j < r.points.length; j++) {
+						r.setPoint(j, rand.nextGaussian() * 0.1, rand.nextGaussian() * 0.2, rand.nextGaussian() * 0.1);
+					}
+				}
+			}
+		}
 
 		if( homogenous ) {
 			for (int i = 0; i < 5; i++) {

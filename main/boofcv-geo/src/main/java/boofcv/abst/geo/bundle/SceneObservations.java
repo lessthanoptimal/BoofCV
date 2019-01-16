@@ -30,6 +30,9 @@ import org.ddogleg.struct.GrowQueue_I32;
  * @author Peter Abeles
  */
 public class SceneObservations {
+	/**
+	 * Views of general points.
+	 */
 	public View views[];
 	/**
 	 * Views of points on rigid objects
@@ -86,6 +89,10 @@ public class SceneObservations {
 
 	public View getView( int which ) {
 		return views[which];
+	}
+
+	public View getViewRigid( int which ) {
+		return viewsRigid[which];
 	}
 
 	public static class View {

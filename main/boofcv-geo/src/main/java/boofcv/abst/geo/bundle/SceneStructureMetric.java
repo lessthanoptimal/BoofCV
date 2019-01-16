@@ -22,6 +22,8 @@ import boofcv.alg.geo.bundle.cameras.BundlePinhole;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeRadial;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeRadial;
+import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 
 /**
@@ -212,6 +214,20 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	}
 
 	/**
+	 * Returns the number of view with parameters that are not fixed
+	 * @return non-fixed view count
+	 */
+	public int getUnknownRigidCount() {
+		int total = 0;
+		for (int i = 0; i < rigids.length; i++) {
+			if( !rigids[i].known) {
+				total++;
+			}
+		}
+		return total;
+	}
+
+	/**
 	 * Counts the total number of unknown camera parameters that will be optimized/
 	 *
 	 * @return Number of parameters
@@ -246,7 +262,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 */
 	@Override
 	public int getParameterCount() {
-		return getUnknownViewCount()*6 + points.length*pointSize + getUnknownCameraParameterCount();
+		return getUnknownViewCount()*6 + getUnknownRigidCount()*6 + points.length*pointSize + getUnknownCameraParameterCount();
 	}
 
 	public Camera[] getCameras() {
@@ -320,6 +336,14 @@ public class SceneStructureMetric extends SceneStructureCommon {
 
 		public void setPoint( int which , double x , double y , double z , double w ) {
 			points[which].set(x,y,z,w);
+		}
+
+		public void getPoint(int which , Point3D_F64 p ) {
+			points[which].get(p);
+		}
+
+		public void getPoint(int which , Point4D_F64 p ) {
+			points[which].get(p);
 		}
 
 		public int getTotalPoints() {

@@ -102,14 +102,6 @@ public class BundleAdjustmentMetricResidualFunction
 		// write the current parameters into the scene's structure
 		codec.decode(input,structure);
 
-		// Project features belonging to rigid objects first
-		if( structure.hasRigid() ) {
-			if( structure.homogenous )
-				projectRigid4(output); // TODO Update
-			else
-				projectRigid3(output);
-		}
-
 		// Project the general scene now
 		if( structure.homogenous )
 			project4(output);
@@ -125,21 +117,55 @@ public class BundleAdjustmentMetricResidualFunction
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
 			SceneStructureMetric.View view = structure.views[viewIndex];
 			SceneStructureMetric.Camera camera = structure.cameras[view.camera];
-			SceneObservations.View obsView = observations.views[viewIndex];
 
-			for (int i = 0; i < obsView.size(); i++) {
-				obsView.get(i,observedPixel);
-				SceneStructureMetric.Point worldPt = structure.points[observedPixel.index];
-				worldPt.get(p3);
+			//=========== Project General Points in this View
+			{
+				SceneObservations.View obsView = observations.views[viewIndex];
+				for (int i = 0; i < obsView.size(); i++) {
+					obsView.get(i, observedPixel);
+					SceneStructureMetric.Point worldPt = structure.points[observedPixel.index];
+					worldPt.get(p3);
 
-				SePointOps_F64.transform(view.worldToView,p3, cameraPt);
+					SePointOps_F64.transform(view.worldToView, p3, cameraPt);
 
-				camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
+					camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
 
-				int outputIndex = observationIndex*2;
-				output[outputIndex  ] = predictedPixel.x - observedPixel.x;
-				output[outputIndex+1] = predictedPixel.y - observedPixel.y;
-				observationIndex++;
+					int outputIndex = observationIndex * 2;
+					output[outputIndex] = predictedPixel.x - observedPixel.x;
+					output[outputIndex + 1] = predictedPixel.y - observedPixel.y;
+					observationIndex++;
+				}
+			}
+
+			//=========== Project Rigid Object Points in this View
+			if( observations.viewsRigid != null )
+			{
+				SceneObservations.View obsView = observations.viewsRigid[viewIndex];
+				for (int i = 0; i < obsView.size(); i++) {
+					obsView.get(i,observedPixel);
+
+					// Use lookup table to figure out which rigid object it belongs to
+					int rigidIndex = structure.lookupRigid[observedPixel.index];
+					SceneStructureMetric.Rigid rigid = structure.rigids[rigidIndex];
+					// Compute the point's index on the rigid object
+					int pointIndex = observedPixel.index - rigid.indexFirst;
+
+					// Load the 3D location of point on the rigid body
+					SceneStructureMetric.Point objectPt = rigid.points[pointIndex];
+					objectPt.get(p3);
+
+					// Tranform to world frame and from world to camera
+					SePointOps_F64.transform(rigid.objectToWorld,p3, worldPt);
+					SePointOps_F64.transform(view.worldToView,worldPt, cameraPt);
+
+					// Project and compute residual
+					camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
+
+					int outputIndex = observationIndex*2;
+					output[outputIndex  ] = predictedPixel.x - observedPixel.x;
+					output[outputIndex+1] = predictedPixel.y - observedPixel.y;
+					observationIndex++;
+				}
 			}
 		}
 	}
@@ -152,98 +178,56 @@ public class BundleAdjustmentMetricResidualFunction
 		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
 			SceneStructureMetric.View view = structure.views[viewIndex];
 			SceneStructureMetric.Camera camera = structure.cameras[view.camera];
-			SceneObservations.View obsView = observations.views[viewIndex];
 
-			for (int i = 0; i < obsView.size(); i++) {
-				obsView.get(i,observedPixel);
-				SceneStructureMetric.Point worldPt = structure.points[observedPixel.index];
-				worldPt.get(p4);
+			//=========== Project General Points in this View
+			{
+				SceneObservations.View obsView = observations.views[viewIndex];
 
-				SePointOps_F64.transform(view.worldToView,p4, cameraPt);
+				for (int i = 0; i < obsView.size(); i++) {
+					obsView.get(i, observedPixel);
+					SceneStructureMetric.Point worldPt = structure.points[observedPixel.index];
+					worldPt.get(p4);
 
-				camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
+					SePointOps_F64.transform(view.worldToView, p4, cameraPt);
 
-				int outputIndex = observationIndex*2;
-				output[outputIndex  ] = predictedPixel.x - observedPixel.x;
-				output[outputIndex+1] = predictedPixel.y - observedPixel.y;
-				observationIndex++;
+					camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
+
+					int outputIndex = observationIndex * 2;
+					output[outputIndex] = predictedPixel.x - observedPixel.x;
+					output[outputIndex + 1] = predictedPixel.y - observedPixel.y;
+					observationIndex++;
+				}
 			}
-		}
-	}
 
-	/**
-	 * projection from 3D coordinates from rigid objects
-	 */
-	private void projectRigid3(double[] output) {
-		int observationIndex = 0;
+			//=========== Project Rigid Object Points in this View
+			if( observations.viewsRigid != null )
+			{
+				SceneObservations.View obsView = observations.viewsRigid[viewIndex];
 
-		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			SceneStructureMetric.View view = structure.views[viewIndex];
-			SceneStructureMetric.Camera camera = structure.cameras[view.camera];
-			SceneObservations.View obsView = observations.viewsRigid[viewIndex];
+				for (int i = 0; i < obsView.size(); i++) {
+					obsView.get(i,observedPixel);
 
+					// Use lookup table to figure out which rigid object it belongs to
+					int rigidIndex = structure.lookupRigid[observedPixel.index];
+					SceneStructureMetric.Rigid rigid = structure.rigids[rigidIndex];
+					// Compute the point's index on the rigid object
+					int pointIndex = observedPixel.index - rigid.indexFirst;
 
-			for (int i = 0; i < obsView.size(); i++) {
-				obsView.get(i,observedPixel);
+					// Load the 3D location of point on the rigid body
+					SceneStructureMetric.Point objectPt = rigid.points[pointIndex];
+					objectPt.get(p4);
 
-				// Use lookup table to figure out which rigid object it belongs to
-				int rigidIndex = structure.lookupRigid[observedPixel.index];
-				SceneStructureMetric.Rigid rigid = structure.rigids[rigidIndex];
-				// Compute the point's index on the rigid object
-				int pointIndex = observedPixel.index - rigid.indexFirst;
+					// Tranform to world frame and from world to camera
+					SePointOps_F64.transform(rigid.objectToWorld,p4, worldPt);
+					SePointOps_F64.transform(view.worldToView,worldPt, cameraPt);
 
-				// Load the 3D location of point on the rigid body
-				SceneStructureMetric.Point objectPt = rigid.points[pointIndex];
-				objectPt.get(p3);
+					camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
 
-				// Tranform to world frame and from world to camera
-				SePointOps_F64.transform(rigid.objectToWorld,p3, worldPt);
-				SePointOps_F64.transform(view.worldToView,worldPt, cameraPt);
-
-				// Project and compute residual
-				camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
-
-				int outputIndex = observationIndex*2;
-				output[outputIndex  ] = predictedPixel.x - observedPixel.x;
-				output[outputIndex+1] = predictedPixel.y - observedPixel.y;
-				observationIndex++;
-			}
-		}
-	}
-
-	/**
-	 * projection from homogenous coordinates
-	 */
-	private void projectRigid4(double[] output) {
-		int observationIndex = 0;
-		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			SceneStructureMetric.View view = structure.views[viewIndex];
-			SceneStructureMetric.Camera camera = structure.cameras[view.camera];
-			SceneObservations.View obsView = observations.views[viewIndex];
-
-			for (int i = 0; i < obsView.size(); i++) {
-				obsView.get(i,observedPixel);
-
-				// Use lookup table to figure out which rigid object it belongs to
-				int rigidIndex = structure.lookupRigid[observedPixel.index];
-				SceneStructureMetric.Rigid rigid = structure.rigids[rigidIndex];
-				// Compute the point's index on the rigid object
-				int pointIndex = observedPixel.index - rigid.indexFirst;
-
-				// Load the 3D location of point on the rigid body
-				SceneStructureMetric.Point objectPt = rigid.points[pointIndex];
-				objectPt.get(p4);
-
-				// Tranform to world frame and from world to camera
-				SePointOps_F64.transform(rigid.objectToWorld,p4, worldPt);
-				SePointOps_F64.transform(view.worldToView,worldPt, cameraPt);
-
-				camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
-
-				int outputIndex = observationIndex*2;
-				output[outputIndex  ] = predictedPixel.x - observedPixel.x;
-				output[outputIndex+1] = predictedPixel.y - observedPixel.y;
-				observationIndex++;
+					int outputIndex = observationIndex*2;
+					output[outputIndex  ] = predictedPixel.x - observedPixel.x;
+					output[outputIndex+1] = predictedPixel.y - observedPixel.y;
+					observationIndex++;
+				}
 			}
 		}
 	}
