@@ -402,17 +402,23 @@ public class QrCodeDecoderBits {
 	 * @param data encoded data
 	 * @return Location it has read up to in bits
 	 */
-	private int decodeEci( PackedBits8 data, int bitLocation ) {
+	int decodeEci( PackedBits8 data, int bitLocation ) {
+		// NOTE: I'm having trouble testing this code. Just finding an encoding which will do ECI is difficult
+		//       almost all use UTF-8 by default and that supports a lot of characters
+
 		// number of 1 bits before first 0 define number of additional codewords
 		int firstByte = data.read(bitLocation,8,true);
 		bitLocation += 8;
 
 		int numCodeWords = 1;
-		while( firstByte != 0 ) {
+		while( (firstByte&(1 << (7-numCodeWords))) != 0 ) {
 			numCodeWords++;
-			firstByte >>= 1;
 		}
-		firstByte >>= 1;
+		// trip the bits that indicate the number of code words
+		if( numCodeWords > 1) {
+			firstByte <<= numCodeWords-1;
+			firstByte >>= numCodeWords-1;
+		}
 
 		// read the 6-digit designator
 		int assignmentValue = firstByte;

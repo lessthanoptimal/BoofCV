@@ -98,8 +98,19 @@ public class TestQrCodeDecoderBits {
 		assertFalse(alg.checkPaddingBytes(qr,2));
 	}
 
+	/**
+	 * Test against example from specification
+	 */
 	@Test
-	public void decodeEci() {
-		fail("Implement");
+	public void decodeEci_IsoExample() {
+		PackedBits8 bits = new PackedBits8();
+		// ECI Assignment number
+		bits.append(0b00001001,8,false);
+
+		QrCodeDecoderBits alg = new QrCodeDecoderBits();
+
+		int newBit = alg.decodeEci(bits,0);
+		assertEquals("ISO8859_7",alg.encodingEci);
+		assertEquals(8,newBit);
 	}
 }

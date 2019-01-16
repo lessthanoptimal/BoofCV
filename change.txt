@@ -21,7 +21,8 @@ Version : 0.33
   * Ported from ImageJ by Nico Stuurman
 - QR Code
   * Added support for ECI, i.e. more character sets
-  * Attempts to determine the encoding of BYTE mode and defaults to UTF-8 since that's more popular
+  * Changed default BYTE mode encoding to default to UTF-8, but attempts to see if it could be another encoding
+  * ISO 18004:2015 says it should be 8859-1 but most encoders and scanners use UTF-8 instead
 - Demonstration
   * Modernized point tracker demo
 
