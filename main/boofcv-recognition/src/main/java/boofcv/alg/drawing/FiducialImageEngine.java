@@ -35,6 +35,10 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 	// number of pixels in the border
 	private int borderPixels;
 
+	// value of the two color squares
+	private int white = 255;
+	private int black = 0;
+
 	/**
 	 *
 	 * @param borderPixels size of white border around document
@@ -49,7 +53,7 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 
 	@Override
 	public void init() {
-		ImageMiscOps.fill(gray,255);
+		ImageMiscOps.fill(gray,white);
 	}
 
 	@Override
@@ -70,10 +74,10 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 		int WIDTH = (int)(width0 +0.5);
 		int THICKNESS = (int)(thickness +0.5);
 
-		ImageMiscOps.fillRectangle(gray,0,X0,Y0,WIDTH,THICKNESS);
-		ImageMiscOps.fillRectangle(gray,0,X0,Y0+WIDTH-THICKNESS,WIDTH,THICKNESS);
-		ImageMiscOps.fillRectangle(gray,0,X0,Y0+THICKNESS,THICKNESS,WIDTH-THICKNESS*2);
-		ImageMiscOps.fillRectangle(gray,0,X0+WIDTH-THICKNESS,Y0+THICKNESS,THICKNESS,WIDTH-THICKNESS*2);
+		ImageMiscOps.fillRectangle(gray,black,X0,Y0,WIDTH,THICKNESS);
+		ImageMiscOps.fillRectangle(gray,black,X0,Y0+WIDTH-THICKNESS,WIDTH,THICKNESS);
+		ImageMiscOps.fillRectangle(gray,black,X0,Y0+THICKNESS,THICKNESS,WIDTH-THICKNESS*2);
+		ImageMiscOps.fillRectangle(gray,black,X0+WIDTH-THICKNESS,Y0+THICKNESS,THICKNESS,WIDTH-THICKNESS*2);
 	}
 
 	@Override
@@ -93,7 +97,6 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 		return borderPixels;
 	}
 
-
 	public GrayU8 getGray() {
 		return gray;
 	}
@@ -102,5 +105,21 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 		GrayF32 out = new GrayF32(gray.width,gray.height);
 		ConvertImage.convert(gray,out);
 		return out;
+	}
+
+	public int getWhite() {
+		return white;
+	}
+
+	public void setWhite(int white) {
+		this.white = white;
+	}
+
+	public int getBlack() {
+		return black;
+	}
+
+	public void setBlack(int black) {
+		this.black = black;
 	}
 }
