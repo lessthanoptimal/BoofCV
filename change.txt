@@ -9,7 +9,10 @@ Version : 0.33
 - Fixed JavaDoc issue. Was not copying over doc-files
 - Sparse Bundle Adjustment
   * Added calibrated homogenous coordinates
-  * TODO Add support for rigid objects
+  * Added support for rigid objects
+  * TODO Added support for quaternions
+- Camera Calibration
+  * TODO switch optimization over to bundle adjustment
 - Self Calibration
   * TODO Weighted iterated DIAC
 - Improved Support for U16 images
@@ -22,7 +25,7 @@ Version : 0.33
 - QR Code
   * Added support for ECI, i.e. more character sets
   * Changed default BYTE mode encoding to default to UTF-8, but attempts to see if it could be another encoding
-  * ISO 18004:2015 says it should be 8859-1 but most encoders and scanners use UTF-8 instead
+  * ISO 18004:2015 says it should be 8859-1 but most encoders and decoders use UTF-8 instead
 - Demonstration
   * Modernized point tracker demo
 

@@ -123,7 +123,7 @@ public class ExampleMultiviewSceneReconstruction {
 		// Optimize the results
 		int pruneCycles=5;
 		for (int i = 0; i < pruneCycles; i++) {
-			System.out.println("BA + Prune iteration = "+i+"  points="+structure.points.length+"  obs="+observations.getObservationCount(false));
+			System.out.println("BA + Prune iteration = "+i+"  points="+structure.points.length+"  obs="+observations.getObservationCount());
 			bundleScale.applyScale(structure,observations);
 			sba.setParameters(structure,observations);
 			if( !sba.optimize(structure) ) {

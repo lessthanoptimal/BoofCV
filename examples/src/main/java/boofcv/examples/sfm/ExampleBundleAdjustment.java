@@ -73,7 +73,7 @@ public class ExampleBundleAdjustment {
 
 		// Print information which gives you an idea of the problem's scale
 		System.out.println("Optimizing "+parser.scene.getParameterCount()+
-				" parameters with "+parser.observations.getObservationCount(false)+" observations\n\n");
+				" parameters with "+parser.observations.getObservationCount()+" observations\n\n");
 
 		// Configure the sparse Levenberg-Marquardt solver
 		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();

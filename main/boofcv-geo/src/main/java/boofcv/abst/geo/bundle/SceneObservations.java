@@ -67,19 +67,16 @@ public class SceneObservations {
 	}
 
 	/**
-	 * Returns the total number of observations across all views
+	 * Returns the total number of observations across all views. general and rigid points
 	 * @return number of observations
-	 * @param rigid true to count observations of rigid objects. false = general objects
 	 */
-	public int getObservationCount(boolean rigid) {
-		if( rigid ) {
-			return countObservations(viewsRigid);
-		} else {
-			return countObservations(views);
-		}
+	public int getObservationCount() {
+		return countObservations(viewsRigid) + countObservations(views);
 	}
 
 	private int countObservations( View[] views ) {
+		if( views == null )
+			return 0;
 		int total = 0;
 		for (int i = 0; i < views.length; i++) {
 			total += views[i].point.size;

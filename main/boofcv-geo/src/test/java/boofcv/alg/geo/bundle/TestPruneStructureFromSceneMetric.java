@@ -52,7 +52,7 @@ public class TestPruneStructureFromSceneMetric {
 	@Test
 	public void pruneObservationsByErrorRank() {
 		createPerfectScene();
-		int N = observations.getObservationCount(false);
+		int N = observations.getObservationCount();
 		addCorruptObservations((int)(N*0.05));
 
 		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
@@ -61,7 +61,7 @@ public class TestPruneStructureFromSceneMetric {
 		alg.pruneObservationsByErrorRank(0.95);
 
 		// first see if the expected number of observations were prune
-		assertEquals(N*95/100,observations.getObservationCount(false));
+		assertEquals(N*95/100,observations.getObservationCount());
 
 		// All bad observations should have been removed
 		checkAllObservationsArePerfect();
@@ -94,7 +94,7 @@ public class TestPruneStructureFromSceneMetric {
 	@Test
 	public void pruneObservationsBehindCamera() {
 		createPerfectScene();
-		int N = observations.getObservationCount(false);
+		int N = observations.getObservationCount();
 		movePointBehindCameras((int)(N*0.1));
 
 		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
@@ -103,7 +103,7 @@ public class TestPruneStructureFromSceneMetric {
 		alg.pruneObservationsBehindCamera();
 
 		// A bunch of observations should have been pruned because 10% of the points are now behind the camera
-		assertTrue( observations.getObservationCount(false) < N*0.901);
+		assertTrue( observations.getObservationCount() < N*0.901);
 
 		// All bad observations should have been removed
 		checkAllObservationsArePerfect();
@@ -135,20 +135,20 @@ public class TestPruneStructureFromSceneMetric {
 	public void prunePoints_count() {
 		createPerfectScene();
 		int countPoints = structure.points.length;
-		int countObservations = observations.getObservationCount(false);
+		int countObservations = observations.getObservationCount();
 
 		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
 
 		// no change expected
 		alg.prunePoints(1);
 		assertEquals(countPoints,structure.points.length);
-		assertEquals(countObservations,observations.getObservationCount(false));
+		assertEquals(countObservations,observations.getObservationCount());
 
 		// this should prune a bunch
 		int threshold = structure.views.length-2;
 		alg.prunePoints(threshold);
 		assertTrue(countPoints>structure.points.length);
-		assertTrue(countObservations>observations.getObservationCount(false));
+		assertTrue(countObservations>observations.getObservationCount());
 
 		for (int pointIdx = 0; pointIdx < structure.points.length; pointIdx++) {
 			if( structure.points[pointIdx].views.size < threshold )
@@ -164,7 +164,7 @@ public class TestPruneStructureFromSceneMetric {
 	public void prunePoints_neighbors() {
 		createPerfectScene();
 		int countPoints0 = structure.points.length;
-		int countObservations0 = observations.getObservationCount(false);
+		int countObservations0 = observations.getObservationCount();
 
 		PruneStructureFromSceneMetric alg = new PruneStructureFromSceneMetric(structure,observations);
 
@@ -172,14 +172,14 @@ public class TestPruneStructureFromSceneMetric {
 		alg.prunePoints(2,0.5);
 
 		int countPoints1 = structure.points.length;
-		int countObservations1 = observations.getObservationCount(false);
+		int countObservations1 = observations.getObservationCount();
 		assertTrue(countPoints0>countPoints1 && countPoints1>0.95*countPoints0);
 		assertTrue(countObservations0>countObservations1 && countObservations1>0.95*countObservations0);
 
 		// If run a second time it should have very similar results
 		alg.prunePoints(2,0.5);
 		assertEquals(countPoints1, structure.points.length,5);
-		assertEquals(countObservations1, observations.getObservationCount(false),countObservations1*0.005);
+		assertEquals(countObservations1, observations.getObservationCount(),countObservations1*0.005);
 
 		// sanity check the modifications
 		checkAllObservationsArePerfect();
@@ -201,7 +201,7 @@ public class TestPruneStructureFromSceneMetric {
 		// everything should be pruned
 		alg.prunePoints(1,4.99);
 		assertEquals(0, structure.points.length);
-		assertEquals(0, observations.getObservationCount(false));
+		assertEquals(0, observations.getObservationCount());
 
 		// Corners should get pruned but interior ones saved
 		createPerfectScene(3,5);
@@ -217,7 +217,7 @@ public class TestPruneStructureFromSceneMetric {
 
 		// original point count
 		int pointCount = structure.points.length;
-		int observationCount = observations.getObservationCount(false);
+		int observationCount = observations.getObservationCount();
 
 		// figure out the view with the least number of observations
 		int viewWithLeast = -1;
@@ -249,7 +249,7 @@ public class TestPruneStructureFromSceneMetric {
 		// Points are not removed even if there is no view that can see them now
 		assertEquals(structure.points.length,pointCount);
 		// However the number of observations will be decreased
-		assertTrue( observations.getObservationCount(false) < observationCount);
+		assertTrue( observations.getObservationCount() < observationCount);
 
 		// sanity check the modifications
 		checkAllObservationsArePerfect();

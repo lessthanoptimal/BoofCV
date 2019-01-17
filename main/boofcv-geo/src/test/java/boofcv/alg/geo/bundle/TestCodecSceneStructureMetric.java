@@ -116,8 +116,7 @@ public class TestCodecSceneStructureMetric {
 
 		if( hasRigid ) {
 			Se3_F64 worldToRigid0 = SpecialEuclideanOps_F64.eulerXyz(
-					rand.nextGaussian()*0.2,-0.3,1.1,
-					rand.nextGaussian()*0.05,0,-0.1,null);
+					rand.nextGaussian()*0.1,0,0.15,rand.nextGaussian()*0.01-0.1,-0.01,0.2,null);
 			Se3_F64 worldToRigid1 = SpecialEuclideanOps_F64.eulerXyz(-0.1,-0.1,-0.3, -0.1,0.3,0,null);
 
 			out.setRigid(0,false,worldToRigid0,3);
@@ -136,15 +135,29 @@ public class TestCodecSceneStructureMetric {
 					}
 				}
 			}
+
+			// assign All of first rigid's points to all views
+			SceneStructureMetric.Rigid r = out.rigids[0];
+			for (int idxPoint = 0; idxPoint < r.points.length; idxPoint++) {
+				for (int i = 0; i < 4; i++) {
+					r.points[idxPoint].views.add(i);
+				}
+			}
+			// just the first point to each view after this
+			r = out.rigids[1];
+			for (int i = 0; i < 4; i++) {
+				r.points[0].views.add(i);
+			}
 		}
+		out.assignIDsToRigidPoints();
 
 		if( homogenous ) {
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < out.points.length; i++) {
 				double w = rand.nextDouble()*3+0.5;
-				out.setPoint(i, i + 1, i + 2 * rand.nextGaussian(), 2 * i - 3 * rand.nextGaussian(),w);
+				out.setPoint(i, w*(i + 1), w*(i + 2 * rand.nextGaussian()), w*(2 * i - 3 * rand.nextGaussian()),w);
 			}
 		} else {
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < out.points.length; i++) {
 				out.setPoint(i, i + 1, i + 2 * rand.nextGaussian(), 2 * i - 3 * rand.nextGaussian());
 			}
 		}
@@ -157,15 +170,15 @@ public class TestCodecSceneStructureMetric {
 				ConvertRotation3D_F64.eulerToMatrix(EulerType.YXY, i + 0.1, 2, 0, a.R);
 				a.T.set(2,3,i*7.3+5);
 			} else {
-				ConvertRotation3D_F64.eulerToMatrix(EulerType.YXY, i + 0.1, rand.nextGaussian(), 0, a.R);
-				a.T.set(rand.nextGaussian(),3*rand.nextGaussian(),i*7.3+5);
+				ConvertRotation3D_F64.eulerToMatrix(EulerType.YXY, i + 0.1, rand.nextGaussian()*0.5, 0, a.R);
+				a.T.set(rand.nextGaussian()*0.2,3*rand.nextGaussian()*0.2,i*7.3+5);
 			}
 			out.setView(i,fixed,a);
 			out.views[i].camera = i/2;
 		}
 
 		// Assign first point to all views then the other points to just one view
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < out.views.length; i++) {
 			out.points[0].views.add(i);
 		}
 		for (int i = 1; i < out.points.length; i++) {

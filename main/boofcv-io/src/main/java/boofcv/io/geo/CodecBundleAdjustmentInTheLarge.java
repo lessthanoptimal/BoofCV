@@ -131,7 +131,7 @@ public class CodecBundleAdjustmentInTheLarge {
     public void save( File file ) throws IOException {
         PrintStream writer = new PrintStream(file);
 
-        writer.println(scene.views.length+" "+scene.points.length+" "+observations.getObservationCount(false));
+        writer.println(scene.views.length+" "+scene.points.length+" "+observations.getObservationCount());
 
         PointIndex2D_F64 o = new PointIndex2D_F64();
         for (int viewIdx = 0; viewIdx < observations.views.length; viewIdx++) {

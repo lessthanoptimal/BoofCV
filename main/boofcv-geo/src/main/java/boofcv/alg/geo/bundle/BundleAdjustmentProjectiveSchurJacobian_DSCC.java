@@ -112,7 +112,7 @@ public class BundleAdjustmentProjectiveSchurJacobian_DSCC
 
 	@Override
 	public int getNumOfOutputsM() {
-		return observations.getObservationCount(false)*2;
+		return observations.getObservationCount()*2;
 	}
 
 	@Override

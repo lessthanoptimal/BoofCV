@@ -406,7 +406,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			SwingUtilities.invokeLater(()->{
 				int n = structureEstimator.ransac.getMatchSet().size();
 				double score = structureEstimator.bundleAdjustment.getFitScore();
-				int numObs = structureEstimator.observations.getObservationCount(false);
+				int numObs = structureEstimator.observations.getObservationCount();
 				int numPoints = structureEstimator.structure.points.length;
 				controls.addText(String.format("Tri Feats %d\n",n));
 				for (int i = 0; i < 3; i++) {
