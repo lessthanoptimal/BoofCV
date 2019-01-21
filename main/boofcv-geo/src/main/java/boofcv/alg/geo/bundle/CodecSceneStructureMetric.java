@@ -20,8 +20,8 @@ package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
-import georegression.geometry.ConvertRotation3D_F64;
-import georegression.struct.so.Rodrigues_F64;
+import boofcv.alg.geo.bundle.jacobians.JacobianSo3Rodrigues_F64;
+import boofcv.alg.geo.bundle.jacobians.JacobianSo3_F64;
 
 /**
  * Encodes and decodes the values in a {@link SceneStructureMetric} using the following
@@ -31,12 +31,24 @@ import georegression.struct.so.Rodrigues_F64;
  * [ (X Y Z)*M ][  RT*len(rigid)  ][  RT*len(views) ][ intrinsic*O ]
  * [ features  ][    rigid        ][    views       ][ camera      ]
  * </pre>
+ *
+ * Default encoding for rotation matrix is {@link JacobianSo3Rodrigues_F64}
+ *
  * @author Peter Abeles
  */
 public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Codec<SceneStructureMetric>
 {
-	// local variable which stores the predicted location of the feature in the camera frame
-	private Rodrigues_F64 rodrigues = new Rodrigues_F64();
+	/**
+	 * Specifies encoding/decoding of rotation for bundle adjustment. Default is {@link JacobianSo3Rodrigues_F64}
+	 */
+	public JacobianSo3_F64 rotation = new JacobianSo3Rodrigues_F64();
+
+	public CodecSceneStructureMetric() {
+	}
+
+	public CodecSceneStructureMetric(JacobianSo3_F64 rotation) {
+		this.rotation = rotation;
+	}
 
 	@Override
 	public void decode(double[] input , SceneStructureMetric structure ) {
@@ -55,17 +67,13 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 			SceneStructureMetric.Rigid rigid = structure.rigids[rigidIndex];
 			// Decode the rigid body transform from object to world
 			if( !rigid.known ) {
-				double rodX = input[index++];
-				double rodY = input[index++];
-				double rodZ = input[index++];
+				rotation.setParameters(input,index);
+				rigid.objectToWorld.R.set(rotation.getRotationMatrix());
+				index += rotation.getParameterLength();
 
 				rigid.objectToWorld.T.x = input[index++];
 				rigid.objectToWorld.T.y = input[index++];
 				rigid.objectToWorld.T.z = input[index++];
-
-				rodrigues.setParamVector(rodX,rodY,rodZ);
-
-				ConvertRotation3D_F64.rodriguesToMatrix(rodrigues,rigid.objectToWorld.R);
 			}
 		}
 
@@ -73,17 +81,13 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 			SceneStructureMetric.View view = structure.views[viewIndex];
 			// Decode the rigid body transform from world to view
 			if( !view.known ) {
-				double rodX = input[index++];
-				double rodY = input[index++];
-				double rodZ = input[index++];
+				rotation.setParameters(input,index);
+				view.worldToView.R.set(rotation.getRotationMatrix());
+				index += rotation.getParameterLength();
 
 				view.worldToView.T.x = input[index++];
 				view.worldToView.T.y = input[index++];
 				view.worldToView.T.z = input[index++];
-
-				rodrigues.setParamVector(rodX,rodY,rodZ);
-
-				ConvertRotation3D_F64.rodriguesToMatrix(rodrigues,view.worldToView.R);
 			}
 		}
 
@@ -113,11 +117,8 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 			SceneStructureMetric.Rigid rigid = structure.rigids[rigidIndex];
 			// Decode the rigid body transform from object to world
 			if( !rigid.known ) {
-				ConvertRotation3D_F64.matrixToRodrigues(rigid.objectToWorld.R,rodrigues);
-				rodrigues.unitAxisRotation.scale(rodrigues.theta);
-				output[index++] = rodrigues.unitAxisRotation.x;
-				output[index++] = rodrigues.unitAxisRotation.y;
-				output[index++] = rodrigues.unitAxisRotation.z;
+				rotation.getParameters(rigid.objectToWorld.R,output,index);
+				index += rotation.getParameterLength();
 
 				output[index++] = rigid.objectToWorld.T.x;
 				output[index++] = rigid.objectToWorld.T.y;
@@ -129,11 +130,8 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 			SceneStructureMetric.View view = structure.views[viewIndex];
 			// Decode the rigid body transform from world to view
 			if( !view.known ) {
-				ConvertRotation3D_F64.matrixToRodrigues(view.worldToView.R,rodrigues);
-				rodrigues.unitAxisRotation.scale(rodrigues.theta);
-				output[index++] = rodrigues.unitAxisRotation.x;
-				output[index++] = rodrigues.unitAxisRotation.y;
-				output[index++] = rodrigues.unitAxisRotation.z;
+				rotation.getParameters(view.worldToView.R,output,index);
+				index += rotation.getParameterLength();
 
 				output[index++] = view.worldToView.T.x;
 				output[index++] = view.worldToView.T.y;

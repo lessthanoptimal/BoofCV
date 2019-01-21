@@ -26,6 +26,15 @@ import org.ejml.data.DMatrixRMaj;
  * @author Peter Abeles
  */
 public interface JacobianSo3_F64 {
+
+	/**
+	 * Converts the 3x3 rotation matrix into encoded parameters
+	 * @param R 3x3 (Input) rotation matrix
+	 * @param parameters (Output) storage for encoded rotation matrix
+	 * @param offset index in parameters array
+	 */
+	void getParameters( DMatrixRMaj R , double parameters[] , int offset );
+
 	void setParameters( double parameters[] , int offset );
 
 	int getParameterLength();

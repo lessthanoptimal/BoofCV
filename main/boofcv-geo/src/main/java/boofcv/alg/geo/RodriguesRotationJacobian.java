@@ -52,14 +52,14 @@ public class RodriguesRotationJacobian {
 		if( theta4 == 0 ) {
 			Rx.zero();Ry.zero();Rz.zero();
 
-			Rx.set(1,2,1);
-			Rx.set(2,1,-1);
+			Rx.set(1,2,-1);
+			Rx.set(2,1,1);
 
-			Ry.set(0,2,-1);
-			Ry.set(2,0,1);
+			Ry.set(0,2,1);
+			Ry.set(2,0,-1);
 
-			Rz.set(0,1,1);
-			Rz.set(1,0,-1);
+			Rz.set(0,1,-1);
+			Rz.set(1,0,1);
 		} else {
 			// computed using sage by differentiating:
 			// R = I + (hat(w)/theta)*sin(theta) + ((hat(w)/theta)^2)*(1-cos(theta))

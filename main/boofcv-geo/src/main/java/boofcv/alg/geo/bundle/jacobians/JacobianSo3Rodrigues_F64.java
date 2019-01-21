@@ -24,7 +24,10 @@ import georegression.struct.so.Rodrigues_F64;
 import org.ejml.data.DMatrixRMaj;
 
 /**
- * Jacobian for 3-tuple encoded Rodrigues
+ * Jacobian for 3-tuple encoded Rodrigues. The rotation magnitude is the F-norm of (X,Y,Z) and the axis of
+ * rotation is the normalized X,Y,Z.
+ *
+ * @see RodriguesRotationJacobian
  *
  * @author Peter Abeles
  */
@@ -33,6 +36,14 @@ public class JacobianSo3Rodrigues_F64 implements JacobianSo3_F64 {
 
 	private Rodrigues_F64 rodrigues = new Rodrigues_F64();
 	private DMatrixRMaj R = new DMatrixRMaj(3,3);
+
+	@Override
+	public void getParameters(DMatrixRMaj R, double[] parameters, int offset) {
+		ConvertRotation3D_F64.matrixToRodrigues(R,rodrigues);
+		parameters[offset  ] = rodrigues.unitAxisRotation.x*rodrigues.theta;
+		parameters[offset+1] = rodrigues.unitAxisRotation.y*rodrigues.theta;
+		parameters[offset+2] = rodrigues.unitAxisRotation.z*rodrigues.theta;
+	}
 
 	@Override
 	public void setParameters(double[] parameters, int offset) {

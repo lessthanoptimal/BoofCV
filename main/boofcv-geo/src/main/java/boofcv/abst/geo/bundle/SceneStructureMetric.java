@@ -93,6 +93,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		for (int i = 0; i < rigids.length; i++) {
 			rigids[i] = new Rigid();
 		}
+		// forget old assignments
 		lookupRigid = null;
 	}
 

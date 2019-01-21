@@ -18,9 +18,11 @@
 
 package boofcv.alg.geo.bundle;
 
+import boofcv.abst.geo.bundle.SceneStructureMetric;
+import georegression.struct.se.Se3_F64;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
@@ -28,6 +30,22 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class TestSceneStructureMetric {
 	@Test
 	public void assignIDsToRigidPoints() {
-		fail("Implement");
+		SceneStructureMetric scene = new SceneStructureMetric(false);
+
+		scene.initialize(1,2,3,2);
+		scene.setRigid(0,false,new Se3_F64(),2);
+		scene.setRigid(1,true,new Se3_F64(),3);
+
+		scene.assignIDsToRigidPoints();
+
+		for (int i = 0; i < 2; i++) {
+			assertEquals(0,scene.lookupRigid[i]);
+		}
+		for (int i = 0; i < 3; i++) {
+			assertEquals(1,scene.lookupRigid[i+2]);
+		}
+
+		assertEquals(0,scene.rigids[0].indexFirst);
+		assertEquals(2,scene.rigids[1].indexFirst);
 	}
 }
