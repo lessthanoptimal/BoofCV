@@ -71,7 +71,7 @@ There are also several integration modules which help BoofCV interact with exter
 | boofcv-core          | All the core libraries without any of the integration modules listed below
 | boofcv-android       | Useful functions for working inside of Android devices.
 | boofcv-javacv        | [JavaCV](https://github.com/bytedeco/javacv) is a wrapper around OpenCV mainly for file IO.
-| boofcv-ffmpeg        | [javacpp-presets](https://github.com/bytedeco/javacpp-presets) their ffmepg wrapper is used for reading video files.
+| boofcv-ffmpeg        | [javacpp-presets](https://github.com/bytedeco/javacpp-presets) their ffmpeg wrapper is used for reading video files.
 | boofcv-jcodec        | [JCodec](http://jcodec.org/) is a pure Java video reader/writer.
 | boofcv-openkinect    | Used the [Kinect](http://openkinect.org) RGB-D sensor with BoofCV.
 | boofcv-swing         | Visualization using Java Swing
