@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -109,8 +109,10 @@ public class ViewedImageInfoPanel extends StandardAlgConfigPanel
 
 		if( e.getWheelRotation() > 0 )
 			curr *= 1.1;
-		else
+		else if( e.getWheelRotation() < 0 )
 			curr /= 1.1;
+		else
+			return;
 
 		setScale(curr);
 	}

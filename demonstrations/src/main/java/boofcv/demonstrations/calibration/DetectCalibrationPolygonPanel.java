@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,6 +73,7 @@ public class DetectCalibrationPolygonPanel extends DetectCalibrationPanel
 		togglePanel.add(showContour);
 		togglePanel.setMaximumSize(togglePanel.getMinimumSize());
 
+		addLabeled(labelSpeed, "Time (ms)");
 		addLabeled(successIndicator, "Found");
 		add(viewInfo);
 		addLabeled(viewSelector, "View ");

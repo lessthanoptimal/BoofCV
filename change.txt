@@ -31,6 +31,8 @@ Version : 0.33
 - Demonstration
   * Modernized point tracker demo
   * Three View Stereo: Using AverageDownSampleOps to avoid aliasing and drastically improves performance
+- Swing
+  * Touch pad "wheel" controls are less spastic in OS X
 
 TODO This Release
   - Examples

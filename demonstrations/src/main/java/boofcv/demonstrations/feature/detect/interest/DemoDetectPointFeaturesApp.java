@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,14 +111,11 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	protected void handleInputChange(int source, InputMethod method, final int width, final int height) {
 		super.handleInputChange(source, method, width, height);
 
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				double zoom = BoofSwingUtil.selectZoomToShowAll(imagePanel,width,height);
-				controls.setZoom(zoom);
-				imagePanel.getVerticalScrollBar().setValue(0);
-				imagePanel.getHorizontalScrollBar().setValue(0);
-			}
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			double zoom = BoofSwingUtil.selectZoomToShowAll(imagePanel,width,height);
+			controls.setZoom(zoom);
+			imagePanel.getVerticalScrollBar().setValue(0);
+			imagePanel.getHorizontalScrollBar().setValue(0);
 		});
 	}
 

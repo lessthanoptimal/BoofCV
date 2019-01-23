@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,6 +46,9 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 
 	// indicates if a calibration grid was found or not
 	JLabel successIndicator;
+
+	// How long the algorithm took to run
+	JLabel labelSpeed = new JLabel();
 
 	// select the calibration grid's dimensions
 	JSpinner selectRows;
@@ -135,6 +138,7 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		togglePanel.add(showShapes);
 		togglePanel.add(showContour);
 
+		addLabeled(labelSpeed, "Time (ms)");
 		addLabeled(successIndicator, "Found:", this);
 		add(viewInfo);
 		addLabeled(viewSelector, "View ", this);
@@ -160,6 +164,10 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 			gridColumns = ((Number) selectColumns.getValue()).intValue();
 			listener.calibEventDetectorModified();
 		}
+	}
+
+	public void setProcessingTime( double milliseconds ) {
+		labelSpeed.setText(String.format("%.1f",milliseconds));
 	}
 
 	public void setSuccessMessage( String message , boolean worked )

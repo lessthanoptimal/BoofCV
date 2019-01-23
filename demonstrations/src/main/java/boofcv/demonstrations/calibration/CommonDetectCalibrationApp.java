@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,8 +91,12 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				double scale = imagePanel.getScale();
-				controlPanel.setCursor(e.getX()/scale,e.getY()/scale);
+				Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
+				controlPanel.setCursor(p.x,p.y);
+
+				if( SwingUtilities.isLeftMouseButton(e)) {
+					imagePanel.centerView(p.x,p.y);
+				}
 			}
 		});
 
@@ -147,7 +151,10 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 		}
 
 		try {
+			long time0 = System.nanoTime();
 			processFrame();
+			long time1 = System.nanoTime();
+			SwingUtilities.invokeLater(()-> controlPanel.setProcessingTime((time1-time0)*1e-6));
 		} catch( RuntimeException e ) {
 			e.printStackTrace();
 			UtilImageIO.saveImage(buffered,"crash_image.png");
@@ -238,14 +245,12 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 			VisualizeBinaryData.renderBinary(getBinaryImage(), false, binary);
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				if (success)
-					controlPanel.setSuccessMessage("FOUND", true);
-				else
-					controlPanel.setSuccessMessage("FAILED", false);
-				calibEventGUI();
-			}
+		SwingUtilities.invokeLater(() -> {
+			if (success)
+				controlPanel.setSuccessMessage("FOUND", true);
+			else
+				controlPanel.setSuccessMessage("FAILED", false);
+			calibEventGUI();
 		});
 	}
 

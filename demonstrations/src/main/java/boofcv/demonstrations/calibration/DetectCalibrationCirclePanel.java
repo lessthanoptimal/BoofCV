@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,6 +76,7 @@ public class DetectCalibrationCirclePanel extends DetectCalibrationPanel {
 
 		togglePanel.setMaximumSize(togglePanel.getMinimumSize());
 
+		addLabeled(labelSpeed, "Time (ms)");
 		addLabeled(successIndicator, "Found:", this);
 		add(viewInfo);
 		addLabeled(viewSelector, "View ", this);
