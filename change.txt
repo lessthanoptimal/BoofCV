@@ -30,6 +30,7 @@ Version : 0.33
   * TODO Add perspective data set to regression. head on and skewed
 - Demonstration
   * Modernized point tracker demo
+  * Modernized FFT demo
   * Three View Stereo: Using AverageDownSampleOps to avoid aliasing and drastically improves performance
 - Swing
   * Touch pad "wheel" controls are less spastic in OS X
@@ -41,7 +42,6 @@ TODO This Release
   - Demonstrations
     * Associate with Fundamental - Select different algs + inliers
     * Associate with Trifocal Tensor
-    * Modernize FFT demo
   - Cheirality
     * Will also require a linear programming solution, e.g. simplex
   - Remove dependency on OpenCV in Applications to reduce file size
