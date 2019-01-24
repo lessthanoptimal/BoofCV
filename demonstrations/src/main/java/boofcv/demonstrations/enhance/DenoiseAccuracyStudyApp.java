@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -96,8 +96,6 @@ public class DenoiseAccuracyStudyApp {
 
 			System.out.println("Best Filter: "+best.name);
 		}
-
-
 	}
 
 
@@ -110,7 +108,6 @@ public class DenoiseAccuracyStudyApp {
 			ret.addAll( createWaveletFilters(FactoryWaveletDaub.daubJ_F32(4),numLevels,"Daub-4"));
 			ret.addAll( createWaveletFilters(FactoryWaveletCoiflet.generate_F32(6),numLevels,"Coiflet-6"));
 			ret.addAll( createWaveletFilters(FactoryWaveletDaub.biorthogonal_F32(5, BorderType.WRAP),numLevels,"Biorthogonal-5"));
-
 		}
 
 		return ret;

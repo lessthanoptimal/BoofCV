@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,12 +49,7 @@ import boofcv.demonstrations.fiducial.DetectQrCodeApp;
 import boofcv.demonstrations.fiducial.FiducialTrackerDemoApp;
 import boofcv.demonstrations.fiducial.VisualizeSquareBinaryFiducial;
 import boofcv.demonstrations.fiducial.VisualizeSquareFiducial;
-import boofcv.demonstrations.filter.DisplayGaussianKernelApp;
-import boofcv.demonstrations.filter.DisplaySteerableGaussianApp;
-import boofcv.demonstrations.filter.ShowImageBlurApp;
-import boofcv.demonstrations.filter.ShowImageDerivative;
-import boofcv.demonstrations.ip.DemonstrationInterpolateScaleApp;
-import boofcv.demonstrations.ip.VisualizeFlipRotate;
+import boofcv.demonstrations.imageprocessing.*;
 import boofcv.demonstrations.segmentation.VisualizeImageSegmentationApp;
 import boofcv.demonstrations.segmentation.VisualizeWatershedApp;
 import boofcv.demonstrations.sfm.d2.VideoMosaicSequentialPointApp;
