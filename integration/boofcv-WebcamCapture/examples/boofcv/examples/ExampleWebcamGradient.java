@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ public class ExampleWebcamGradient {
 			GImageDerivativeOps.gradient(DerivativeType.SOBEL, gray, derivX, derivY, BorderType.EXTENDED);
 
 			// visualize and display
-			BufferedImage visualized = VisualizeImageData.colorizeGradient(derivX,derivY,-1);
+			BufferedImage visualized = VisualizeImageData.colorizeGradient(derivX,derivY,-1, null);
 
 			gui.setImageUI(visualized);
 		}

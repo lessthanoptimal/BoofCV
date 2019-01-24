@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,7 @@ public class ExampleImageDerivative {
 		gui.addImage(VisualizeImageData.colorizeSign(derivX, null, -1),"Sobel X");
 		gui.addImage(VisualizeImageData.colorizeSign(derivY, null, -1),"Sobel Y");
 		// Use colors to show X and Y derivatives in one image.  Looks pretty.
-		gui.addImage(VisualizeImageData.colorizeGradient(derivX, derivY, -1),"Sobel X and Y");
+		gui.addImage(VisualizeImageData.colorizeGradient(derivX, derivY, -1, null),"Sobel X and Y");
 		gui.addImage(VisualizeImageData.colorizeSign(derivXX, null,-1),"Sobel XX");
 		gui.addImage(VisualizeImageData.colorizeSign(derivXY, null,-1),"Sobel XY");
 		gui.addImage(VisualizeImageData.colorizeSign(derivYY, null,-1),"Sobel YY");

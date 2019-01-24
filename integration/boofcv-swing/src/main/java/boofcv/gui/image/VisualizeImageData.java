@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -411,13 +411,15 @@ public class VisualizeImageData {
 	 * @param derivX (Input) Image with positive and negative values.
 	 * @param derivY (Input) Image with positive and negative values.
 	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param output
 	 * @return visualized gradient
 	 */
-	public static BufferedImage colorizeGradient(ImageGray derivX , ImageGray derivY , double maxAbsValue ){
+	public static BufferedImage colorizeGradient(ImageGray derivX, ImageGray derivY, double maxAbsValue,
+												 BufferedImage output){
 		if( derivX instanceof GrayS16) {
-			return colorizeGradient((GrayS16)derivX,(GrayS16)derivY,(int)maxAbsValue);
+			return colorizeGradient((GrayS16)derivX,(GrayS16)derivY,(int)maxAbsValue, output);
 		} else if( derivX instanceof GrayF32) {
-			return colorizeGradient((GrayF32)derivX,(GrayF32)derivY,(int)maxAbsValue);
+			return colorizeGradient((GrayF32)derivX,(GrayF32)derivY,(float)maxAbsValue, output);
 		} else {
 			throw new IllegalArgumentException("Image type not supported");
 		}
@@ -429,12 +431,14 @@ public class VisualizeImageData {
 	 * @param derivX (Input) Image with positive and negative values.
 	 * @param derivY (Input) Image with positive and negative values.
 	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param output
 	 * @return visualized gradient
 	 */
-	public static BufferedImage colorizeGradient(GrayS16 derivX , GrayS16 derivY , int maxAbsValue ) {
+	public static BufferedImage colorizeGradient(GrayS16 derivX, GrayS16 derivY, int maxAbsValue, BufferedImage output) {
 		InputSanityCheck.checkSameShape(derivX,derivY);
 
-		BufferedImage output = new BufferedImage(derivX.width,derivX.height,BufferedImage.TYPE_INT_RGB);
+		if( output == null )
+			output = new BufferedImage(derivX.width,derivX.height,BufferedImage.TYPE_INT_RGB);
 
 		WritableRaster raster = output.getRaster();
 		DataBufferInt buffer = (DataBufferInt)raster.getDataBuffer();
@@ -488,12 +492,14 @@ public class VisualizeImageData {
 	 * @param derivX (Input) Image with positive and negative values.
 	 * @param derivY (Input) Image with positive and negative values.
 	 * @param maxAbsValue  The largest absolute value of any pixel in the image.  Set to < 0 if not known.
+	 * @param output
 	 * @return visualized gradient
 	 */
-	public static BufferedImage colorizeGradient(GrayF32 derivX , GrayF32 derivY , float maxAbsValue ) {
+	public static BufferedImage colorizeGradient(GrayF32 derivX, GrayF32 derivY, float maxAbsValue, BufferedImage output) {
 		InputSanityCheck.checkSameShape(derivX,derivY);
 
-		BufferedImage output = new BufferedImage(derivX.width,derivX.height,BufferedImage.TYPE_INT_RGB);
+		if( output == null )
+			output = new BufferedImage(derivX.width,derivX.height,BufferedImage.TYPE_INT_RGB);
 
 		WritableRaster raster = output.getRaster();
 		DataBufferInt buffer = (DataBufferInt)raster.getDataBuffer();

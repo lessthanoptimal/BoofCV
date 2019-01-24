@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,7 @@ public class ExampleImageFilter {
 		GradientSobel.process(blurred, derivX, derivY, FactoryImageBorderAlgs.extend(input));
 
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY, -1);
+		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY, -1, null);
 		panel.addImage(outputImage,"Procedural Fixed Type");
 	}
 
@@ -88,7 +88,7 @@ public class ExampleImageFilter {
 		GImageDerivativeOps.gradient(DerivativeType.SOBEL,blurred, derivX, derivY, BorderType.EXTENDED);
 
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY,-1);
+		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY,-1, null);
 		panel.addImage(outputImage,"Generalized "+inputType.getSimpleName());
 	}
 
@@ -111,7 +111,7 @@ public class ExampleImageFilter {
 		gradient.process(blurred,derivX,derivY);
 
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY, -1);
+		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY, -1, null);
 		panel.addImage(outputImage,"Filter "+inputType.getSimpleName());
 	}
 
@@ -131,7 +131,7 @@ public class ExampleImageFilter {
 		GImageDerivativeOps.gradient(DerivativeType.SOBEL,blurred, derivX, derivY, BorderType.EXTENDED);
 
 		// display the results
-		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY,-1);
+		BufferedImage outputImage = VisualizeImageData.colorizeGradient(derivX, derivY,-1, null);
 		panel.addImage(outputImage,"Generalized "+inputType.getSimpleName());
 	}
 

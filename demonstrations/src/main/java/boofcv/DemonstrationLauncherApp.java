@@ -159,7 +159,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				DisplayGaussianKernelApp.class,
 				DisplaySteerableGaussianApp.class,
 				ShowImageBlurApp.class,
-				ShowImageDerivative.class,
+				ShowImageDerivativeApp.class,
 				DemonstrationInterpolateScaleApp.class,
 				VisualizeFlipRotate.class,
 				VisualizeImageSegmentationApp.class,

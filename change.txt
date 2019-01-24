@@ -30,8 +30,9 @@ Version : 0.33
   * TODO Add perspective data set to regression. head on and skewed
 - Demonstration
   * Modernized VideoTrackerPointFeaturesApp
-  * Modernized FFT demo
+  * Modernized FFT Demo
   * Modernized Blur Demo
+  * Modernized Image Derivative Demo
   * Three View Stereo: Using AverageDownSampleOps to avoid aliasing and drastically improves performance
 - Swing
   * Touch pad "wheel" controls are less spastic in OS X
