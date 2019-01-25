@@ -1,16 +1,16 @@
 
 dependencies {
-    compile project(':main:boofcv-ip')
-    compile project(':main:boofcv-io')
-    compile project(':main:boofcv-feature')
-    compile project(':main:boofcv-calibration')
-    compile project(':main:boofcv-geo')
-    compile project(':main:boofcv-sfm')
-    compile project(':main:boofcv-recognition')
-    compile project(':integration:boofcv-swing')
+    api project(':main:boofcv-ip')
+    api project(':main:boofcv-io')
+    api project(':main:boofcv-feature')
+    api project(':main:boofcv-calibration')
+    api project(':main:boofcv-geo')
+    api project(':main:boofcv-sfm')
+    api project(':main:boofcv-recognition')
+    api project(':integration:boofcv-swing')
 
-    compile project(':integration:boofcv-ffmpeg')
-    compile project(':integration:boofcv-WebcamCapture')
+    implementation project(':integration:boofcv-ffmpeg')
+    implementation project(':integration:boofcv-WebcamCapture')
 }
 
 // Create a jar which contains all the applications
@@ -23,8 +23,12 @@ task demonstrations(type: Jar) {
 
     outputs.upToDateWhen { false }
 
-    from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
+    from sourceSets.main.output
+
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
 
     doLast {
         archivePath.renameTo(file('demonstrations.jar'))

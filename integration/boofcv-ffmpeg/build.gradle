@@ -5,10 +5,10 @@
 //}
 
 dependencies {
-    implementation project(':main:boofcv-ip')
-    implementation project(':main:boofcv-io')
+    api project(':main:boofcv-ip')
+    api project(':main:boofcv-io')
 
-    implementation group: 'org.bytedeco.javacpp-presets', name: "ffmpeg", version: '3.4.1-1.4'
+    api group: 'org.bytedeco.javacpp-presets', name: "ffmpeg", version: '3.4.1-1.4'
     native_arch.each {
         implementation group: 'org.bytedeco.javacpp-presets', name: "ffmpeg", version: '3.4.1-1.4', classifier: "${it}"
     }

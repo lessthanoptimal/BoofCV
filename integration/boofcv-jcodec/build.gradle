@@ -1,8 +1,8 @@
 
 dependencies {
-    implementation project(':main:boofcv-ip')
-    implementation project(':main:boofcv-io')
-    implementation project(':integration:boofcv-swing')
+    api project(':main:boofcv-ip')
+    api project(':main:boofcv-io')
+    api project(':integration:boofcv-swing')
 
     compile group: 'org.jcodec', name: 'jcodec', version: '0.1.9'
 }

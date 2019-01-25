@@ -5,14 +5,14 @@ configurations {
 }
 
 dependencies {
-    implementation project(':main:boofcv-ip')
-    implementation project(':main:boofcv-io')
-    implementation project(':main:boofcv-geo')
-    implementation project(':main:boofcv-calibration')
+    api project(':main:boofcv-ip')
+    api project(':main:boofcv-io')
+    api project(':main:boofcv-geo')
+    api project(':main:boofcv-calibration')
 
-    implementation project(':integration:boofcv-swing')
+    api project(':integration:boofcv-swing')
 
-    implementation group: 'org.bytedeco', name: 'javacv', version: '1.4'
+    api group: 'org.bytedeco', name: 'javacv', version: '1.4'
 
     native_arch.each {
         implementation group: 'org.bytedeco.javacpp-presets', name: "opencv", version: '3.4.0-1.4', classifier: "${it}"

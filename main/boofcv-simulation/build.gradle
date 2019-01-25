@@ -1,7 +1,7 @@
 dependencies {
-    implementation project(':main:boofcv-ip')
-    implementation project(':main:boofcv-geo')
-    implementation project(':main:boofcv-io')
+    api project(':main:boofcv-ip')
+    api project(':main:boofcv-geo')
+    api project(':main:boofcv-io')
 
     testImplementation project(':integration:boofcv-swing')
 }

@@ -37,10 +37,10 @@ task unzipJar(type: Copy) {
 }
 
 dependencies {
-    implementation project(':main:boofcv-ip')
-    implementation project(':main:boofcv-feature')
-    implementation project(':main:boofcv-calibration')
-    implementation project(':main:boofcv-geo')
+    api project(':main:boofcv-ip')
+    api project(':main:boofcv-feature')
+    api project(':main:boofcv-calibration')
+    api project(':main:boofcv-geo')
 
 
     // Google doesn't provide access to an android.jar

@@ -1,9 +1,9 @@
 dependencies {
-    implementation project(':main:boofcv-ip')
-    implementation project(':integration:boofcv-swing')
-    implementation project(':main:boofcv-geo')
-    implementation project(':main:boofcv-io')
-    implementation project(':main:boofcv-sfm')
+    api project(':main:boofcv-ip')
+    api project(':integration:boofcv-swing')
+    api project(':main:boofcv-geo')
+    api project(':main:boofcv-io')
+    api project(':main:boofcv-sfm')
 
     implementation group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
     implementation group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'

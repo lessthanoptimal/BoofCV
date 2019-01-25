@@ -1,18 +1,19 @@
 
 dependencies {
-    compile project(':main:boofcv-ip')
-    compile project(':main:boofcv-io')
-    compile project(':main:boofcv-feature')
-    compile project(':main:boofcv-geo')
-    compile project(':main:boofcv-calibration')
-    compile project(':main:boofcv-sfm')
-    compile project(':main:boofcv-learning')
-    compile project(':main:boofcv-recognition')
-    compile project(':integration:boofcv-swing')
-    compile project(':integration:boofcv-ffmpeg')
-    compile project(':integration:boofcv-WebcamCapture')
+    api project(':main:boofcv-ip')
+    api project(':main:boofcv-io')
+    api project(':main:boofcv-feature')
+    api project(':main:boofcv-geo')
+    api project(':main:boofcv-calibration')
+    api project(':main:boofcv-sfm')
+    api project(':main:boofcv-learning')
+    api project(':main:boofcv-recognition')
+    api project(':integration:boofcv-swing')
 
-    compile 'org.reflections:reflections:0.9.10'
+    implementation project(':integration:boofcv-ffmpeg')
+    implementation project(':integration:boofcv-WebcamCapture')
+
+    api 'org.reflections:reflections:0.9.10'
 }
 
 // Only add javafx as a dependency if it exists. The code will run just fine without it,
@@ -39,9 +40,13 @@ task examples(type: Jar) {
     }
 
     outputs.upToDateWhen { false }
+    
+    from sourceSets.main.output
 
-    from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
 
     doLast {
         archivePath.renameTo(file('examples.jar'))

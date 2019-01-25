@@ -36,6 +36,8 @@ Version : 0.33
   * Three View Stereo: Using AverageDownSampleOps to avoid aliasing and drastically improves performance
 - Swing
   * Touch pad "wheel" controls are less spastic in OS X
+- Gradle
+  * Fixed how dependencies are referenced and Jars built. Thanks H1Gdev for pointing out this problem!
 
 TODO This Release
   - Examples
