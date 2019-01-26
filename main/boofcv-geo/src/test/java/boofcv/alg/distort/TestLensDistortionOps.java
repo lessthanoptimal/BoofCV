@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.distort.impl.ImplImageDistortCache_I8;
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_U8;
 import boofcv.core.image.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.Test;
@@ -40,8 +40,8 @@ public class TestLensDistortionOps {
 	 */
 	@Test
 	public void changeCameraModel() {
-		CameraPinholeRadial original = new CameraPinholeRadial(200,200,0,200,200,400,400);
-		CameraPinhole desired = new CameraPinholeRadial(300,300,0,200,200,400,400);
+		CameraPinholeBrown original = new CameraPinholeBrown(200,200,0,200,200,400,400);
+		CameraPinhole desired = new CameraPinholeBrown(300,300,0,200,200,400,400);
 		CameraPinhole modified = new CameraPinhole();
 		BorderType[] borders = new BorderType[]{
 				BorderType.EXTENDED,BorderType.SKIP,BorderType.ZERO,BorderType.REFLECT,BorderType.WRAP};

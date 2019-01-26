@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 
@@ -65,7 +65,7 @@ public class BenchmarkFiducialDetector<T extends ImageGray<T>> {
 	}
 
 	private static void perform(String directory, FiducialDetector detector) {
-		CameraPinholeRadial intrinsic = CalibrationIO.load(new File(directory , "intrinsic.yaml"));
+		CameraPinholeBrown intrinsic = CalibrationIO.load(new File(directory , "intrinsic.yaml"));
 
 //		intrinsic.radial = null;
 //		intrinsic.t1 = intrinsic.t2 = 0;

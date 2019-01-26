@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.fiducial;
 
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestFourPointSyntheticStability {
 
-	CameraPinholeRadial intrinsic = new CameraPinholeRadial(300,300,0,300,300,600,600).fsetRadial(0.2,0.01);
+	CameraPinholeBrown intrinsic = new CameraPinholeBrown(300,300,0,300,300,600,600).fsetRadial(0.2,0.01);
 
 
 	/**

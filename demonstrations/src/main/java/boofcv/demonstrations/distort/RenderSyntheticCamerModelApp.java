@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -63,7 +63,7 @@ public class RenderSyntheticCamerModelApp<T extends ImageBase<T>> extends Demons
 	JComboBox selectAdjustment;
 	AdjustmentType adjustment = AdjustmentType.NONE;
 
-	CameraPinholeRadial origModel = new CameraPinholeRadial(2);
+	CameraPinholeBrown origModel = new CameraPinholeBrown(2);
 
 	// distorted input
 	T dist;
@@ -132,7 +132,7 @@ public class RenderSyntheticCamerModelApp<T extends ImageBase<T>> extends Demons
 	}
 
 	@Override
-	public synchronized void updatedPinholeModel(CameraPinholeRadial desired) {
+	public synchronized void updatedPinholeModel(CameraPinholeBrown desired) {
 
 		if( undist.width != desired.width || undist.height != desired.height ) {
 			undist.reshape(desired.width, desired.height);

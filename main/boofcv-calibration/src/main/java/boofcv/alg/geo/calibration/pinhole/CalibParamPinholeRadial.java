@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.Zhang99IntrinsicParam;
 import boofcv.alg.geo.calibration.Zhang99OptimizationJacobian;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -35,7 +35,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class CalibParamPinholeRadial extends Zhang99IntrinsicParam {
-	public CameraPinholeRadial intrinsic;
+	public CameraPinholeBrown intrinsic;
 
 	private Point2D_F64 normPt = new Point2D_F64();
 
@@ -49,7 +49,7 @@ public class CalibParamPinholeRadial extends Zhang99IntrinsicParam {
 	 * @param includeTangential Should it include tangential distortion?
 	 */
 	public CalibParamPinholeRadial(boolean assumeZeroSkew, int numRadial, boolean includeTangential) {
-		this.intrinsic = new CameraPinholeRadial(numRadial);
+		this.intrinsic = new CameraPinholeBrown(numRadial);
 		this.assumeZeroSkew = assumeZeroSkew;
 		this.includeTangential = includeTangential;
 	}
@@ -151,7 +151,7 @@ public class CalibParamPinholeRadial extends Zhang99IntrinsicParam {
 	}
 
 	@Override
-	public CameraPinholeRadial getCameraModel() {
+	public CameraPinholeBrown getCameraModel() {
 		return intrinsic;
 	}
 

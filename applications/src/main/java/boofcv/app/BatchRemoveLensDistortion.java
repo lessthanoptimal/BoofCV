@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
@@ -131,8 +131,8 @@ public class BatchRemoveLensDistortion {
 			}
 		}
 
-		CameraPinholeRadial param = CalibrationIO.load(pathIntrinsic);
-		CameraPinholeRadial paramAdj = new CameraPinholeRadial();
+		CameraPinholeBrown param = CalibrationIO.load(pathIntrinsic);
+		CameraPinholeBrown paramAdj = new CameraPinholeBrown();
 
 		List<File> files = Arrays.asList(UtilIO.findMatches(new File(pathInput),regex));
 		Collections.sort(files);

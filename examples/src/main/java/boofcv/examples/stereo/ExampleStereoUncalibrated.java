@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.factory.geo.FactoryMultiView;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -227,7 +227,7 @@ public class ExampleStereoUncalibrated {
 		// display the inlier matches found using the robust estimator
 		System.out.println("\n\nComputing Stereo Disparity");
 		BundlePinholeSimplified cp = structure.getCameras()[0].getModel();
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial();
+		CameraPinholeBrown intrinsic = new CameraPinholeBrown();
 		intrinsic.fsetK(cp.f,cp.f,0,cx,cy,width,height);
 		intrinsic.fsetRadial(cp.k1,cp.k2);
 

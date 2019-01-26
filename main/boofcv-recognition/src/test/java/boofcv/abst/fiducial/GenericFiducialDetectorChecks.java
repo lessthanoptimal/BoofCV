@@ -24,7 +24,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.core.image.GConvertImage;
 import boofcv.simulation.SimulatePlanarWorld;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -67,7 +67,7 @@ public abstract class GenericFiducialDetectorChecks {
 	 * @param imageType image type for output
 	 * @return rendered image
 	 */
-	public ImageBase renderImage(CameraPinholeRadial intrinsic  , ImageType imageType) {
+	public ImageBase renderImage(CameraPinholeBrown intrinsic  , ImageType imageType) {
 
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(intrinsic);
@@ -92,12 +92,12 @@ public abstract class GenericFiducialDetectorChecks {
 		throw new RuntimeException("Currently only gray scale images supported");
 	}
 
-	public CameraPinholeRadial loadDistortion(boolean distorted ) {
+	public CameraPinholeBrown loadDistortion(boolean distorted ) {
 		if( distorted ) {
-			return new CameraPinholeRadial(250,250,0,250,250,500,500).
+			return new CameraPinholeBrown(250,250,0,250,250,500,500).
 					fsetRadial(-0.1,-0.0005);
 		} else {
-			return new CameraPinholeRadial(250,250,0,250,250,500,500);
+			return new CameraPinholeBrown(250,250,0,250,250,500,500);
 		}
 	}
 
@@ -116,7 +116,7 @@ public abstract class GenericFiducialDetectorChecks {
 		for( ImageType type : types ) {
 
 			// distorted camera model
-			CameraPinholeRadial instrinsic = loadDistortion(true);
+			CameraPinholeBrown instrinsic = loadDistortion(true);
 			LensDistortionRadialTangential distortion = new LensDistortionRadialTangential(instrinsic);
 
 			// render a distorted image
@@ -238,7 +238,7 @@ public abstract class GenericFiducialDetectorChecks {
 	 */
 	@Test
 	public void modifyInput() {
-		CameraPinholeRadial intrinsic = loadDistortion(true);
+		CameraPinholeBrown intrinsic = loadDistortion(true);
 		LensDistortionRadialTangential lensDistorted = new LensDistortionRadialTangential(intrinsic);
 		for( ImageType type : types ) {
 
@@ -256,7 +256,7 @@ public abstract class GenericFiducialDetectorChecks {
 
 	@Test
 	public void checkMultipleRuns() {
-		CameraPinholeRadial intrinsic = loadDistortion(true);
+		CameraPinholeBrown intrinsic = loadDistortion(true);
 		LensDistortionRadialTangential lensDistorted = new LensDistortionRadialTangential(intrinsic);
 		for( ImageType type : types ) {
 
@@ -288,7 +288,7 @@ public abstract class GenericFiducialDetectorChecks {
 
 	@Test
 	public void checkSubImage() {
-		CameraPinholeRadial intrinsic = loadDistortion(true);
+		CameraPinholeBrown intrinsic = loadDistortion(true);
 		LensDistortionRadialTangential lensDistorted = new LensDistortionRadialTangential(intrinsic);
 		for( ImageType type : types ) {
 
@@ -334,7 +334,7 @@ public abstract class GenericFiducialDetectorChecks {
 	@Test
 	public void checkStability() {
 		// has to be undistorted otherwise rescaling the image won't work
-		CameraPinholeRadial intrinsic = loadDistortion(false);
+		CameraPinholeBrown intrinsic = loadDistortion(false);
 		LensDistortionRadialTangential lensDistorted = new LensDistortionRadialTangential(intrinsic);
 		for( ImageType type : types ) {
 
@@ -395,7 +395,7 @@ public abstract class GenericFiducialDetectorChecks {
 	public void checkCenter() {
 		// It's not specified if the center should be undistorted or distorted. Just make it easier by
 		// using undistorted
-		CameraPinholeRadial intrinsic = loadDistortion(false);
+		CameraPinholeBrown intrinsic = loadDistortion(false);
 		LensDistortionRadialTangential lensDistorted = new LensDistortionRadialTangential(intrinsic);
 		for( ImageType type : types ) {
 

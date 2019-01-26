@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.Point2Transform3_F64;
 import boofcv.struct.distort.Point3Transform2_F64;
@@ -92,7 +92,7 @@ public class SimulatePlanarWorld {
 		setCamera( factory, model.width, model.height );
 	}
 
-	public void setCamera( CameraPinholeRadial model ) {
+	public void setCamera( CameraPinholeBrown model ) {
 		LensDistortionNarrowFOV factory = new LensDistortionRadialTangential(model);
 		setCamera( factory, model.width, model.height );
 	}

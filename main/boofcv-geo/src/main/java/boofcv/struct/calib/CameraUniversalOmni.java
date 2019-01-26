@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ package boofcv.struct.calib;
  * on the mirror parameter &xi;.  See [1] for details, but for example &xi;=0 is a pinhole camera,
  * &xi;=1 can describe fisheye cameras, but a value larger than 1 is limited to 180 degrees due to
  * multiple points on the unit sphere intersecting the same projection line.  This is the same model as
- * {@link CameraPinholeRadial} except that there is a change in reference frame which allows it to model wider FOV.</p>
+ * {@link CameraPinholeBrown} except that there is a change in reference frame which allows it to model wider FOV.</p>
  *
  * Forward Projection
  * <ol>

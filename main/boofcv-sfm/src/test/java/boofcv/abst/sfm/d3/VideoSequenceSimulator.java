@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.ImageRectangle;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageGray;
 import georegression.metric.Intersection2D_F64;
@@ -49,7 +49,7 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> {
 
 	Random rand = new Random(1234);
 
-	CameraPinholeRadial intrinsic;
+	CameraPinholeBrown intrinsic;
 	DMatrixRMaj K;
 
 	BufferedImage workImage;
@@ -67,7 +67,7 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> {
 		outputImage = GeneralizedImageOps.createSingleBand(inputType,workImage.getWidth(),workImage.getHeight());
 	}
 
-	public void setIntrinsic( CameraPinholeRadial param ) {
+	public void setIntrinsic( CameraPinholeBrown param ) {
 		this.intrinsic = param;
 		K = PerspectiveOps.pinholeToMatrix(param,(DMatrixRMaj)null);
 	}

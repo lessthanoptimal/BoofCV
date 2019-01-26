@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import boofcv.alg.interpolate.InterpolationType;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.*;
@@ -113,7 +113,7 @@ public class RectifyImageOps {
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 */
 	// TODO Delete this function?  It should reasonably fill the old view in most non-pathological cases
-	public static void fullViewLeft(CameraPinholeRadial paramLeft,
+	public static void fullViewLeft(CameraPinholeBrown paramLeft,
 									DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
 									DMatrixRMaj rectifyK)
 	{
@@ -139,7 +139,7 @@ public class RectifyImageOps {
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 */
 	// TODO Delete this function?  It should reasonably fill the old view in most non-pathological cases
-	public static void fullViewLeft(CameraPinholeRadial paramLeft,
+	public static void fullViewLeft(CameraPinholeBrown paramLeft,
 									FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
 									FMatrixRMaj rectifyK)
 	{
@@ -203,7 +203,7 @@ public class RectifyImageOps {
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 */
-	public static void allInsideLeft(CameraPinholeRadial paramLeft,
+	public static void allInsideLeft(CameraPinholeBrown paramLeft,
 									 DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
 									 DMatrixRMaj rectifyK)
 	{
@@ -223,7 +223,7 @@ public class RectifyImageOps {
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 */
-	public static void allInsideLeft(CameraPinholeRadial paramLeft,
+	public static void allInsideLeft(CameraPinholeBrown paramLeft,
 									 FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
 									 FMatrixRMaj rectifyK)
 	{
@@ -278,7 +278,7 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image.
 	 * @return Transform from rectified to unrectified pixels
 	 */
-	public static Point2Transform2_F64 transformRectToPixel(CameraPinholeRadial param,
+	public static Point2Transform2_F64 transformRectToPixel(CameraPinholeBrown param,
 															DMatrixRMaj rectify)
 	{
 		return ImplRectifyImageOps_F64.transformRectToPixel(param, rectify);
@@ -294,7 +294,7 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image.
 	 * @return Transform from rectified to unrectified pixels
 	 */
-	public static Point2Transform2_F32 transformRectToPixel(CameraPinholeRadial param,
+	public static Point2Transform2_F32 transformRectToPixel(CameraPinholeBrown param,
 															FMatrixRMaj rectify)
 	{
 		return ImplRectifyImageOps_F32.transformRectToPixel(param, rectify);
@@ -309,7 +309,7 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image. Not modified.
 	 * @return Transform from distorted pixel to rectified pixels
 	 */
-	public static Point2Transform2_F64 transformPixelToRect(CameraPinholeRadial param,
+	public static Point2Transform2_F64 transformPixelToRect(CameraPinholeBrown param,
 															DMatrixRMaj rectify)
 	{
 		return ImplRectifyImageOps_F64.transformPixelToRect(param, rectify);
@@ -324,7 +324,7 @@ public class RectifyImageOps {
 	 * @param rectify Transform for rectifying the image. Not modified.
 	 * @return Transform from distorted pixel to rectified pixels
 	 */
-	public static Point2Transform2_F32 transformPixelToRect(CameraPinholeRadial param,
+	public static Point2Transform2_F32 transformPixelToRect(CameraPinholeBrown param,
 															FMatrixRMaj rectify)
 	{
 		return ImplRectifyImageOps_F32.transformPixelToRect(param, rectify);
@@ -341,7 +341,7 @@ public class RectifyImageOps {
 	 * @param rectifyK Camera calibration matrix after rectification
 	 * @return Transform from unrectified to rectified normalized pixels
 	 */
-	public static Point2Transform2_F64 transformPixelToRectNorm(CameraPinholeRadial param,
+	public static Point2Transform2_F64 transformPixelToRectNorm(CameraPinholeBrown param,
 																DMatrixRMaj rectify,
 																DMatrixRMaj rectifyK) {
 		return ImplRectifyImageOps_F64.transformPixelToRectNorm(param, rectify, rectifyK);
@@ -358,7 +358,7 @@ public class RectifyImageOps {
 	 * @param rectifyK Camera calibration matrix after rectification
 	 * @return Transform from unrectified to rectified normalized pixels
 	 */
-	public static Point2Transform2_F32 transformPixelToRectNorm(CameraPinholeRadial param,
+	public static Point2Transform2_F32 transformPixelToRectNorm(CameraPinholeBrown param,
 																FMatrixRMaj rectify,
 																FMatrixRMaj rectifyK) {
 		return ImplRectifyImageOps_F32.transformPixelToRectNorm(param, rectify, rectifyK);
@@ -405,7 +405,7 @@ public class RectifyImageOps {
 	 * @return ImageDistort for rectifying the image.
 	 */
 	public static <T extends ImageBase<T>> ImageDistort<T,T>
-	rectifyImage(CameraPinholeRadial param, FMatrixRMaj rectify , BorderType borderType, ImageType<T> imageType)
+	rectifyImage(CameraPinholeBrown param, FMatrixRMaj rectify , BorderType borderType, ImageType<T> imageType)
 	{
 		boolean skip = borderType == BorderType.SKIP;
 		if( skip ) {

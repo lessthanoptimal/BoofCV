@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.overhead;
 
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestSelectOverheadParameters {
 
 	protected int width=320,height=240;
-	CameraPinholeRadial param = new CameraPinholeRadial(150,150,0,width/2,height/2,width,height).fsetRadial(0,0);
+	CameraPinholeBrown param = new CameraPinholeBrown(150,150,0,width/2,height/2,width,height).fsetRadial(0,0);
 	Se3_F64 cameraToPlane = new Se3_F64();
 	Se3_F64 planeToCamera;
 

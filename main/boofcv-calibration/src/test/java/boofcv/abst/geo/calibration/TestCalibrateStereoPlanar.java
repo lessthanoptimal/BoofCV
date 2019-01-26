@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.geo.calibration;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.factory.distort.LensDistortionFactory;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestCalibrateStereoPlanar {
-	CameraPinholeRadial intrinsic = new CameraPinholeRadial(200,210,0,320,240,640,480).
+	CameraPinholeBrown intrinsic = new CameraPinholeBrown(200,210,0,320,240,640,480).
 			fsetRadial(0.01, -0.02).fsetTangental(0.03,0.03);
 	Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false, true);
 
@@ -92,7 +92,7 @@ public class TestCalibrateStereoPlanar {
 		assertTrue(MatrixFeatures_DDRM.isIdentity(rightToLeft.getR(), 1e-3));
 	}
 
-	private void checkIntrinsic(CameraPinholeRadial found) {
+	private void checkIntrinsic(CameraPinholeBrown found) {
 		assertEquals(intrinsic.fx,found.fx,1e-3);
 		assertEquals(intrinsic.fy,found.fy,1e-3);
 		assertEquals(intrinsic.cx,found.cx,1e-3);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.simulation.SimulatePlanarWorld;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
@@ -228,7 +228,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	@Test
 	public void pinhole_radial_fullview() {
 
-		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("pinhole_radial.yaml"));
+		CameraPinholeBrown model = CalibrationIO.load(getClass().getResource("pinhole_radial.yaml"));
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(model);
 
@@ -282,7 +282,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	}
 
 	protected GrayF32 renderEasy( Object layout , List<Point2D_F64> locations2D ) {
-		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("pinhole_radial.yaml"));
+		CameraPinholeBrown model = CalibrationIO.load(getClass().getResource("pinhole_radial.yaml"));
 
 		if( locations2D == null )
 			locations2D = new ArrayList<>();

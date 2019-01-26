@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.javacv;
 
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -34,7 +34,7 @@ public class TestUtilOpenCV {
 	@Test
 	public void loadPinholeRadial() {
 		URL url = TestUtilOpenCV.class.getResource("pinhole_distorted.yml");
-		CameraPinholeRadial model = UtilOpenCV.loadPinholeRadial(url.getFile());
+		CameraPinholeBrown model = UtilOpenCV.loadPinholeRadial(url.getFile());
 
 		assertEquals(640, model.width);
 		assertEquals(480, model.height);
@@ -56,7 +56,7 @@ public class TestUtilOpenCV {
 
 	@Test
 	public void savePinholeRadial() {
-		CameraPinholeRadial model = new CameraPinholeRadial();
+		CameraPinholeBrown model = new CameraPinholeBrown();
 
 		model.fsetK(1,2,3,4,0.65,100,7);
 		model.fsetRadial(.1,.2,.3);
@@ -64,7 +64,7 @@ public class TestUtilOpenCV {
 
 		UtilOpenCV.save(model, "temp.yml");
 
-		CameraPinholeRadial found = UtilOpenCV.loadPinholeRadial("temp.yml");
+		CameraPinholeBrown found = UtilOpenCV.loadPinholeRadial("temp.yml");
 
 		assertEquals( model.width , found.width );
 		assertEquals( model.height , found.height );

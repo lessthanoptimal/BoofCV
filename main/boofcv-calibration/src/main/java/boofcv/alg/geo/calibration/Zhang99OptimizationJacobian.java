@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.alg.geo.RodriguesRotationJacobian;
 import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F64;
@@ -77,7 +77,7 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN<DMatrixRMaj> 
 
 	// stores the optimization parameters
 	private CalibParamPinholeRadial param;
-	private CameraPinholeRadial intrinsic;
+	private CameraPinholeBrown intrinsic;
 
 	// output index for x and y
 	int indexJacX;
@@ -119,7 +119,7 @@ public class Zhang99OptimizationJacobian implements FunctionNtoMxN<DMatrixRMaj> 
 	public void process(double[] input, DMatrixRMaj J) {
 		double output[] = J.data;
 		int index = param.setFromParam(input);
-		intrinsic = (CameraPinholeRadial)param.getCameraModel();
+		intrinsic = (CameraPinholeBrown)param.getCameraModel();
 		
 		int indexPoint = 0;
 		for( int indexView = 0; indexView < observationSets.size(); indexView++ ) {

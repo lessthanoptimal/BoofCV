@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.FastQueueArray_I32;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -53,7 +53,7 @@ public class DisplayKinectPointCloudApp {
 		String nameDepth = "basket_depth.png";
 		String nameCalib = "intrinsic.yaml";
 
-		CameraPinholeRadial param = CalibrationIO.load(new File(baseDir,nameCalib));
+		CameraPinholeBrown param = CalibrationIO.load(new File(baseDir,nameCalib));
 
 		GrayU16 depth = UtilImageIO.loadImage(new File(baseDir,nameDepth),false, ImageType.single(GrayU16.class));
 		Planar<GrayU8> rgb = UtilImageIO.loadImage(new File(baseDir,nameRgb),true, ImageType.pl(3, GrayU8.class));

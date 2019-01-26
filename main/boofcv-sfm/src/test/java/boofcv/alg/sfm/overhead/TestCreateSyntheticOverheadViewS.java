@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
@@ -39,7 +39,7 @@ public class TestCreateSyntheticOverheadViewS {
 
 	int width = 800;
 	int height = 850;
-	CameraPinholeRadial param = new CameraPinholeRadial(200,201,0,width/2,height/2,width,height).fsetRadial(0.002,0);
+	CameraPinholeBrown param = new CameraPinholeBrown(200,201,0,width/2,height/2,width,height).fsetRadial(0.002,0);
 
 	int overheadW = 500;
 	int overheadH = 600;

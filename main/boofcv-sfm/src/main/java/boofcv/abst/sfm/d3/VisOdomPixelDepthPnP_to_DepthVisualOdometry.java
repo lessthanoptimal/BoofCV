@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
@@ -105,7 +105,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	}
 
 	@Override
-	public void setCalibration(CameraPinholeRadial paramVisual, Point2Transform2_F32 visToDepth) {
+	public void setCalibration(CameraPinholeBrown paramVisual, Point2Transform2_F32 visToDepth) {
 		PointToPixelTransform_F32 visToDepth_pixel = new PointToPixelTransform_F32(visToDepth);
 		sparse3D.configure(narrow(paramVisual),visToDepth_pixel);
 

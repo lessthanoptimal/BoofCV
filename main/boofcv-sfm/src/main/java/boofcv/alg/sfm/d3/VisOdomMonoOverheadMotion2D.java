@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.alg.sfm.overhead.CreateSyntheticOverheadView;
 import boofcv.alg.sfm.overhead.OverheadView;
 import boofcv.alg.sfm.overhead.SelectOverheadParameters;
 import boofcv.factory.sfm.FactorySfmMisc;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se2_F64;
@@ -102,7 +102,7 @@ public class VisOdomMonoOverheadMotion2D<T extends ImageBase<T>>
 	 * @param intrinsic Intrinsic camera parameters
 	 * @param planeToCamera Transform from the plane to camera.
 	 */
-	public void configureCamera(CameraPinholeRadial intrinsic ,
+	public void configureCamera(CameraPinholeBrown intrinsic ,
 								Se3_F64 planeToCamera ) {
 		this.planeToCamera = planeToCamera;
 

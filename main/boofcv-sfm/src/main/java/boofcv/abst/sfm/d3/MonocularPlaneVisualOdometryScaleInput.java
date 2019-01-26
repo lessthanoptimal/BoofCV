@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -50,7 +50,7 @@ public class MonocularPlaneVisualOdometryScaleInput <T extends ImageBase<T>> imp
 
 	@Override
 	public void setCalibration( MonoPlaneParameters param ) {
-		scaleParameter.intrinsic = new CameraPinholeRadial(param.intrinsic);
+		scaleParameter.intrinsic = new CameraPinholeBrown(param.intrinsic);
 		scaleParameter.planeToCamera = param.planeToCamera.copy();
 
 		PerspectiveOps.scaleIntrinsic(scaleParameter.intrinsic, scaleFactor);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.geo.AssociatedTriple;
@@ -365,12 +365,12 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		System.out.println("\n\nComputing Stereo Disparity");
 		BundlePinholeSimplified cp = structure.getCameras()[0].getModel();
-		CameraPinholeRadial intrinsic01 = new CameraPinholeRadial();
+		CameraPinholeBrown intrinsic01 = new CameraPinholeBrown();
 		intrinsic01.fsetK(cp.f,cp.f,0,cx,cy,width,height);
 		intrinsic01.fsetRadial(cp.k1,cp.k2);
 
 		cp = structure.getCameras()[1].getModel();
-		CameraPinholeRadial intrinsic02 = new CameraPinholeRadial();
+		CameraPinholeBrown intrinsic02 = new CameraPinholeBrown();
 		intrinsic02.fsetK(cp.f,cp.f,0,cx,cy,width,height);
 		intrinsic02.fsetRadial(cp.k1,cp.k2);
 
@@ -420,8 +420,8 @@ public class ExampleTrifocalStereoUncalibrated {
 
 	public static void computeStereoCloud( GrayU8 distortedLeft, GrayU8 distortedRight ,
 										   Planar<GrayU8> colorLeft, Planar<GrayU8> colorRight,
-										   CameraPinholeRadial intrinsicLeft ,
-										   CameraPinholeRadial intrinsicRight ,
+										   CameraPinholeBrown intrinsicLeft ,
+										   CameraPinholeBrown intrinsicRight ,
 										   Se3_F64 leftToRight ,
 										   int minDisparity , int maxDisparity) {
 

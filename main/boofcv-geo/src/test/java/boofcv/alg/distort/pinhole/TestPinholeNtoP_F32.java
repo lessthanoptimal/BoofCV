@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.distort.pinhole;
 
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F32;
 import org.ejml.data.FMatrixRMaj;
@@ -34,7 +34,7 @@ public class TestPinholeNtoP_F32 {
 
 	@Test
 	public void basicTest() {
-		CameraPinholeRadial p = new CameraPinholeRadial().fsetK(1, 2, 3, 4, 5, 200, 300);
+		CameraPinholeBrown p = new CameraPinholeBrown().fsetK(1, 2, 3, 4, 5, 200, 300);
 
 		FMatrixRMaj K = PerspectiveOps.pinholeToMatrix(p, (FMatrixRMaj)null);
 

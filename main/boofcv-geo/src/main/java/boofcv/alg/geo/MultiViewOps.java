@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
 import boofcv.alg.geo.bundle.cameras.BundlePinhole;
-import boofcv.alg.geo.bundle.cameras.BundlePinholeRadial;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.f.FundamentalExtractEpipoles;
 import boofcv.alg.geo.f.FundamentalToProjective;
@@ -1674,9 +1674,9 @@ public class MultiViewOps {
 			} else if( structure.cameras[i].model instanceof BundlePinhole) {
 				BundlePinhole cam = (BundlePinhole) structure.cameras[i].model;
 				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(new double[]{0,0}, 0,0);
-			} else if( structure.cameras[i].model instanceof BundlePinholeRadial ) {
-				BundlePinholeRadial cam = (BundlePinholeRadial) structure.cameras[i].model;
-				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(new double[]{cam.r1, cam.r2}, cam.t1, cam.t2);
+			} else if( structure.cameras[i].model instanceof BundlePinholeBrown) {
+				BundlePinholeBrown cam = (BundlePinholeBrown) structure.cameras[i].model;
+				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(cam.radial, cam.t1, cam.t2);
 			} else {
 				throw new RuntimeException("Unknown camera model!");
 			}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.fiducial.qrcode;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.simulation.SimulatePlanarWorld;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -32,7 +32,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 
 public class QrCodeDistortedChecks {
-	CameraPinholeRadial intrinsic = new CameraPinholeRadial(250,250,0,250,250,500,500).
+	CameraPinholeBrown intrinsic = new CameraPinholeBrown(250,250,0,250,250,500,500).
 			fsetRadial(-0.1,-0.0005);
 //	CameraPinholeRadial intrinsic = new CameraPinholeRadial(250,250,0,250,250,500,500); // undistoretd parameters
 	LensDistortionRadialTangential distortion = new LensDistortionRadialTangential(intrinsic);

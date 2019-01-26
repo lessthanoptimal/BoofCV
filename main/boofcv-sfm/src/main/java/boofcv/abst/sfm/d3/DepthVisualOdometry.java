@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ package boofcv.abst.sfm.d3;
  * @author Peter Abeles
  */
 
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
@@ -70,7 +70,7 @@ public interface DepthVisualOdometry<Vis extends ImageBase<Vis>, Depth extends I
 	 * @param paramVisual Intrinsic parameters for visual camera
 	 * @param visToDepth Transform from visual camera pixels into depth camera pixels
 	 */
-	void setCalibration(CameraPinholeRadial paramVisual , Point2Transform2_F32 visToDepth );
+	void setCalibration(CameraPinholeBrown paramVisual , Point2Transform2_F32 visToDepth );
 
 	/**
 	 * Process the new image and update the motion estimate.  The return value must be checked

@@ -34,7 +34,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.GrayF32;
 import boofcv.visualize.PointCloudViewer;
@@ -66,7 +66,7 @@ public class ExampleMultiviewSceneReconstruction {
 	 * Process the images and reconstructor the scene as a point cloud using matching interest points between
 	 * images.
 	 */
-	public void process(CameraPinholeRadial intrinsic , List<BufferedImage> colorImages ) {
+	public void process(CameraPinholeBrown intrinsic , List<BufferedImage> colorImages ) {
 
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(null, null, null, GrayF32.class);
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
@@ -201,7 +201,7 @@ public class ExampleMultiviewSceneReconstruction {
 
 		String directory = UtilIO.pathExample("sfm/chair");
 
-		CameraPinholeRadial intrinsic = CalibrationIO.load(
+		CameraPinholeBrown intrinsic = CalibrationIO.load(
 				new File(directory,"/intrinsic_DSC-HX5_3648x2736_to_640x480.yaml"));
 
 		List<BufferedImage> images = UtilImageIO.loadImages(directory,".*jpg");

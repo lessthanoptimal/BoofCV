@@ -52,7 +52,7 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.BrightFeature;
@@ -110,8 +110,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	DMatrixRMaj rectifiedR = new DMatrixRMaj(3, 3);
 
 	// Results from bundle adjustment
-	CameraPinholeRadial intrinsic01;
-	CameraPinholeRadial intrinsic02;
+	CameraPinholeBrown intrinsic01;
+	CameraPinholeBrown intrinsic02;
 	Se3_F64 leftToRight;
 
 	// Visualized Disparity
@@ -424,12 +424,12 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		SceneStructureMetric structure = structureEstimator.getStructure();
 
 		BundlePinholeSimplified cp = structure.getCameras()[0].getModel();
-		intrinsic01 = new CameraPinholeRadial();
+		intrinsic01 = new CameraPinholeBrown();
 		intrinsic01.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[0].width, dimensions[0].height);
 		intrinsic01.fsetRadial(cp.k1, cp.k2);
 
 		cp = structure.getCameras()[1].getModel();
-		intrinsic02 = new CameraPinholeRadial();
+		intrinsic02 = new CameraPinholeBrown();
 		intrinsic02.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[1].width, dimensions[1].height);
 		intrinsic02.fsetRadial(cp.k1, cp.k2);
 
@@ -495,8 +495,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	void rectifyImages(C distorted1,
 					   C distorted2,
 					   Se3_F64 leftToRight,
-					   CameraPinholeRadial intrinsic1,
-					   CameraPinholeRadial intrinsic2,
+					   CameraPinholeBrown intrinsic1,
+					   CameraPinholeBrown intrinsic2,
 					   C rectified1,
 					   C rectified2,
 					   GrayU8 rectifiedMask,

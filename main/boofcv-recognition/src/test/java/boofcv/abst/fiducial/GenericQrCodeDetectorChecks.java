@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.misc.BoofMiscOps;
 import boofcv.simulation.SimulatePlanarWorld;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -70,7 +70,7 @@ public abstract class GenericQrCodeDetectorChecks {
 	public void rotation() {
 		QrCodeDetector<GrayF32> detector = createDetector();
 
-		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("calib/pinhole_radial.yaml"));
+		CameraPinholeBrown model = CalibrationIO.load(getClass().getResource("calib/pinhole_radial.yaml"));
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(model);
 
@@ -94,7 +94,7 @@ public abstract class GenericQrCodeDetectorChecks {
 	public void skewed() {
 		QrCodeDetector<GrayF32> detector = createDetector();
 
-		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("calib/pinhole_radial.yaml"));
+		CameraPinholeBrown model = CalibrationIO.load(getClass().getResource("calib/pinhole_radial.yaml"));
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(model);
 
@@ -119,7 +119,7 @@ public abstract class GenericQrCodeDetectorChecks {
 	public void scale() {
 		QrCodeDetector<GrayF32> detector = createDetector();
 
-		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("calib/pinhole_radial.yaml"));
+		CameraPinholeBrown model = CalibrationIO.load(getClass().getResource("calib/pinhole_radial.yaml"));
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(model);
 
@@ -143,7 +143,7 @@ public abstract class GenericQrCodeDetectorChecks {
 	public void multipleMarkers() {
 		QrCodeDetector<GrayF32> detector = createDetector();
 
-		CameraPinholeRadial model = CalibrationIO.load(getClass().getResource("calib/pinhole_radial.yaml"));
+		CameraPinholeBrown model = CalibrationIO.load(getClass().getResource("calib/pinhole_radial.yaml"));
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(model);
 

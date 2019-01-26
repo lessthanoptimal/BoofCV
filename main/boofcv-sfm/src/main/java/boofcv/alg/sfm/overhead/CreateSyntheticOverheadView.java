@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.sfm.overhead;
 
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F32;
@@ -78,7 +78,7 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase<T>>
 	 * @param overheadWidth Number of columns in overhead image
 	 * @param overheadHeight Number of rows in overhead image
 	 */
-	public void configure( CameraPinholeRadial intrinsic ,
+	public void configure( CameraPinholeBrown intrinsic ,
 						   Se3_F64 planeToCamera ,
 						   double centerX, double centerY, double cellSize ,
 						   int overheadWidth , int overheadHeight )

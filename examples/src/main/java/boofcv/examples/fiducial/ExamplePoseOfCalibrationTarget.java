@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.visualize.PointCloudViewer;
@@ -68,7 +68,7 @@ public class ExamplePoseOfCalibrationTarget {
 	public static void main( String args[] ) {
 
 		// Load camera calibration
-		CameraPinholeRadial intrinsic =
+		CameraPinholeBrown intrinsic =
 				CalibrationIO.load(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/intrinsic.yaml"));
 		LensDistortionNarrowFOV lensDistortion = new LensDistortionRadialTangential(intrinsic);
 

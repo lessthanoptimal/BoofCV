@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.javacv;
 
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.javacpp.indexer.DoubleRawIndexer;
 import org.bytedeco.javacpp.opencv_core.*;
@@ -41,7 +41,7 @@ public class UtilOpenCV {
 	 * @param fileName path to file
 	 * @return CameraPinholeRadial
 	 */
-	public static CameraPinholeRadial loadPinholeRadial( String fileName ) {
+	public static CameraPinholeBrown loadPinholeRadial(String fileName ) {
 		FileStorage fs = new FileStorage(
 				new File(fileName).getAbsolutePath(), FileStorage.READ);
 
@@ -55,7 +55,7 @@ public class UtilOpenCV {
 		Mat distortion = new Mat();
 		read(fs.get("distortion_coefficients"),distortion);
 
-		CameraPinholeRadial boof = new CameraPinholeRadial();
+		CameraPinholeBrown boof = new CameraPinholeBrown();
 		boof.width = width.get();
 		boof.height = height.get();
 
@@ -78,7 +78,7 @@ public class UtilOpenCV {
 		return boof;
 	}
 
-	public static void save( CameraPinholeRadial model , String fileName ) {
+	public static void save(CameraPinholeBrown model , String fileName ) {
 		FileStorage fs = new FileStorage(
 				new File(fileName).getAbsolutePath(), FileStorage.WRITE);
 

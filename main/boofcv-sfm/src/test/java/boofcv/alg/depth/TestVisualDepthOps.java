@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.depth;
 import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.FastQueueArray_I32;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
@@ -42,7 +42,7 @@ public class TestVisualDepthOps {
 	int width = 640;
 	int height = 480;
 
-	CameraPinholeRadial param = new CameraPinholeRadial(200,201,0,width/2,height/2,width,height).fsetRadial(0,0);
+	CameraPinholeBrown param = new CameraPinholeBrown(200,201,0,width/2,height/2,width,height).fsetRadial(0,0);
 
 	@Test
 	public void depthTo3D() {

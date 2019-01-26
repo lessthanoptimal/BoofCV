@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,12 +60,12 @@ public class CalibrationIO {
 
 		Map<String, Object> data = new HashMap<>();
 
-		if( parameters instanceof CameraPinholeRadial) {
+		if( parameters instanceof CameraPinholeBrown) {
 			out.println("# Pinhole camera model with radial and tangential distortion");
 			out.println("# (fx,fy) = focal length, (cx,cy) = principle point, (width,height) = image shape");
 			out.println("# radial = radial distortion, (t1,t2) = tangential distortion");
 			out.println();
-			putModelRadial((CameraPinholeRadial) parameters, data);
+			putModelRadial((CameraPinholeBrown) parameters, data);
 		} else if( parameters instanceof CameraUniversalOmni ) {
 			out.println("# Omnidirectional camera model with radial and tangential distortion");
 			out.println("# C. Mei, and P. Rives. \"Single view point omnidirectional camera calibration" +
@@ -263,7 +263,7 @@ public class CalibrationIO {
 
 			return (T)parameters;
 		} else if( model.equals(MODEL_PINHOLE_RADIAL_TAN) ) {
-			CameraPinholeRadial parameters = new CameraPinholeRadial();
+			CameraPinholeBrown parameters = new CameraPinholeBrown();
 
 			loadPinhole((Map<String, Object>) data.get("pinhole"), parameters);
 
@@ -341,7 +341,7 @@ public class CalibrationIO {
 		return map;
 	}
 
-	private static Map<String,Object> putModelRadial( CameraPinholeRadial parameters , Map<String,Object> map ) {
+	private static Map<String,Object> putModelRadial(CameraPinholeBrown parameters , Map<String,Object> map ) {
 		if( map == null )
 			map = new HashMap<>();
 
@@ -388,7 +388,7 @@ public class CalibrationIO {
 		return map;
 	}
 
-	private static Map<String,Object> putParamsRadialTangent(CameraPinholeRadial parameters ) {
+	private static Map<String,Object> putParamsRadialTangent(CameraPinholeBrown parameters ) {
 		Map<String,Object> map = new HashMap<>();
 
 		if( parameters.radial != null )

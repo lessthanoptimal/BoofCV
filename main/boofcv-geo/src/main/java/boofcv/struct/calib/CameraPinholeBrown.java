@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ import java.io.Serializable;
  *
  * @author Peter Abeles
  */
-public class CameraPinholeRadial extends CameraPinhole implements Serializable {
+public class CameraPinholeBrown extends CameraPinhole implements Serializable {
 
 	/** radial distortion parameters */
 	public double radial[];
@@ -48,37 +48,37 @@ public class CameraPinholeRadial extends CameraPinhole implements Serializable {
 	/**
 	 * Default constructor.  flipY is false and everything else is zero or null.
 	 */
-	public CameraPinholeRadial() {
+	public CameraPinholeBrown() {
 	}
 
-	public CameraPinholeRadial( int numRadial ) {
+	public CameraPinholeBrown(int numRadial ) {
 		radial = new double[numRadial];
 	}
 
-	public CameraPinholeRadial(CameraPinholeRadial param ) {
+	public CameraPinholeBrown(CameraPinholeBrown param ) {
 		set(param);
 	}
 
-	public CameraPinholeRadial(double fx, double fy,
-							   double skew,
-							   double cx, double cy,
-							   int width, int height ) {
+	public CameraPinholeBrown(double fx, double fy,
+							  double skew,
+							  double cx, double cy,
+							  int width, int height ) {
 		fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
-	public CameraPinholeRadial fsetK(double fx, double fy,
-									 double skew,
-									 double cx, double cy,
-									 int width, int height) {
-		return (CameraPinholeRadial)super.fsetK(fx, fy, skew, cx, cy, width, height);
+	public CameraPinholeBrown fsetK(double fx, double fy,
+									double skew,
+									double cx, double cy,
+									int width, int height) {
+		return (CameraPinholeBrown)super.fsetK(fx, fy, skew, cx, cy, width, height);
 	}
 
-	public CameraPinholeRadial fsetRadial(double ...radial ) {
+	public CameraPinholeBrown fsetRadial(double ...radial ) {
 		this.radial = radial.clone();
 		return this;
 	}
 
-	public CameraPinholeRadial fsetTangental(double t1 , double t2) {
+	public CameraPinholeBrown fsetTangental(double t1 , double t2) {
 		this.t1 = t1;
 		this.t2 = t2;
 		return this;
@@ -86,8 +86,8 @@ public class CameraPinholeRadial extends CameraPinhole implements Serializable {
 
 	@Override
 	public void set( CameraPinhole param ) {
-		if( param instanceof CameraPinholeRadial ) {
-			CameraPinholeRadial p = (CameraPinholeRadial)param;
+		if( param instanceof CameraPinholeBrown) {
+			CameraPinholeBrown p = (CameraPinholeBrown)param;
 
 			if( p.radial != null )
 				radial = p.radial.clone();
@@ -194,7 +194,7 @@ public class CameraPinholeRadial extends CameraPinhole implements Serializable {
 
 	@Override
 	public <T extends CameraModel> T createLike() {
-		CameraPinholeRadial model = new CameraPinholeRadial();
+		CameraPinholeBrown model = new CameraPinholeBrown();
 		if( radial != null )
 			model.radial = new double[ radial.length ];
 		return (T)model;

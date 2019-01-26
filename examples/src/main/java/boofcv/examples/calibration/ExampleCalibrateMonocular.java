@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 
 import java.awt.image.BufferedImage;
@@ -89,7 +89,7 @@ public class ExampleCalibrateMonocular {
 			}
 		}
 		// process and compute intrinsic parameters
-		CameraPinholeRadial intrinsic = calibrationAlg.process();
+		CameraPinholeBrown intrinsic = calibrationAlg.process();
 
 		// save results to a file and print out
 		CalibrationIO.save(intrinsic, "intrinsic.yaml");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.sfm.robust;
 
 import boofcv.alg.sfm.overhead.CameraPlaneProjection;
 import boofcv.factory.distort.LensDistortionFactory;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.sfm.PlanePtPixel;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestDistancePlane2DToPixelSq {
 
-	CameraPinholeRadial intrinsic = new CameraPinholeRadial(200,210,0,320,240,640,480).fsetRadial(0,0);
+	CameraPinholeBrown intrinsic = new CameraPinholeBrown(200,210,0,320,240,640,480).fsetRadial(0,0);
 
 	DistancePlane2DToPixelSq alg = new DistancePlane2DToPixelSq();
 	Se3_F64 planeToCamera;

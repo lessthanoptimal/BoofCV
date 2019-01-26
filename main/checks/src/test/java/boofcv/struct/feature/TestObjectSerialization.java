@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.struct.feature;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.ddogleg.struct.FastQueue;
@@ -186,10 +186,10 @@ public class TestObjectSerialization {
 
 	@Test
 	public void testIntrinsicParamters() {
-		CameraPinholeRadial original = new CameraPinholeRadial().
+		CameraPinholeBrown original = new CameraPinholeBrown().
 				fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(8,9).fsetTangental(10, 11);
 
-		CameraPinholeRadial found = serializeDeSerialize(original);
+		CameraPinholeBrown found = serializeDeSerialize(original);
 
 		assertEquals(original.fx,found.fx,1e-8);
 		assertEquals(original.fy, found.fy, 1e-8);

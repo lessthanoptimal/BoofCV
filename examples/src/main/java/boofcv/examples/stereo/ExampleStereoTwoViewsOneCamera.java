@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
@@ -81,7 +81,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		String imageDir = UtilIO.pathExample("stereo/");
 
 		// Camera parameters
-		CameraPinholeRadial intrinsic = CalibrationIO.load(new File(calibDir , "intrinsic.yaml"));
+		CameraPinholeBrown intrinsic = CalibrationIO.load(new File(calibDir , "intrinsic.yaml"));
 
 		// Input images from the camera moving left to right
 		BufferedImage origLeft = UtilImageIO.loadImage(imageDir , "mono_wall_01.jpg");
@@ -152,7 +152,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	 * @param inliers     OUTPUT: Set of inlier features from RANSAC
 	 * @return Found camera motion.  Note translation has an arbitrary scale
 	 */
-	public static Se3_F64 estimateCameraMotion(CameraPinholeRadial intrinsic,
+	public static Se3_F64 estimateCameraMotion(CameraPinholeBrown intrinsic,
 											   List<AssociatedPair> matchedNorm, List<AssociatedPair> inliers)
 	{
 		ModelMatcherMultiview<Se3_F64, AssociatedPair> epipolarMotion =
@@ -172,7 +172,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	/**
 	 * Convert a set of associated point features from pixel coordinates into normalized image coordinates.
 	 */
-	public static List<AssociatedPair> convertToNormalizedCoordinates(List<AssociatedPair> matchedFeatures, CameraPinholeRadial intrinsic) {
+	public static List<AssociatedPair> convertToNormalizedCoordinates(List<AssociatedPair> matchedFeatures, CameraPinholeBrown intrinsic) {
 
 		Point2Transform2_F64 p_to_n = LensDistortionFactory.narrow(intrinsic).undistort_F64(true, false);
 
@@ -206,8 +206,8 @@ public class ExampleStereoTwoViewsOneCamera {
 	void rectifyImages(T distortedLeft,
 					   T distortedRight,
 					   Se3_F64 leftToRight,
-					   CameraPinholeRadial intrinsicLeft,
-					   CameraPinholeRadial intrinsicRight,
+					   CameraPinholeBrown intrinsicLeft,
+					   CameraPinholeBrown intrinsicRight,
 					   T rectifiedLeft,
 					   T rectifiedRight,
 					   GrayU8 rectifiedMask,
@@ -252,7 +252,7 @@ public class ExampleStereoTwoViewsOneCamera {
 	/**
 	 * Draw inliers for debugging purposes.  Need to convert from normalized to pixel coordinates.
 	 */
-	public static void drawInliers(BufferedImage left, BufferedImage right, CameraPinholeRadial intrinsic,
+	public static void drawInliers(BufferedImage left, BufferedImage right, CameraPinholeBrown intrinsic,
 								   List<AssociatedPair> normalized) {
 		Point2Transform2_F64 n_to_p = LensDistortionFactory.narrow(intrinsic).distort_F64(false,true);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.geo.calibration;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
 import boofcv.alg.geo.calibration.pinhole.TestPinholeCalibrationZhang99;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.junit.jupiter.api.Test;
@@ -68,7 +68,7 @@ public class TestZhang99OptimizationJacobian {
 				TestPinholeCalibrationZhang99.createStandard(assumeZeroSkew, includeTangential,2,rand), 3, rand);
 
 		// give it larger values that will generate a larger derivative and pass the unit test
-		CameraPinholeRadial p = param.getIntrinsic().getCameraModel();
+		CameraPinholeBrown p = param.getIntrinsic().getCameraModel();
 		p.radial[0] = 0.2;
 		p.radial[1] = 0.25;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.distort.radtan;
 
 import boofcv.alg.distort.GeneralLensDistortionNarrowFOVChecks;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 
 /**
  * @author Peter Abeles
@@ -29,7 +29,7 @@ public class TestLensDistortionRadialTangential extends GeneralLensDistortionNar
 {
 	@Override
 	public LensDistortionNarrowFOV create() {
-		CameraPinholeRadial param = new CameraPinholeRadial(500,550,0.001,400,450,1000,800).
+		CameraPinholeBrown param = new CameraPinholeBrown(500,550,0.001,400,450,1000,800).
 				fsetRadial(0.02, 0.005);
 
 		return new LensDistortionRadialTangential(param);

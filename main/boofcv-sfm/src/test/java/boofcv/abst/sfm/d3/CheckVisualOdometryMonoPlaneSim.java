@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.sfm.d3;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 	extends VideoSequenceSimulator<I>
 {
-	CameraPinholeRadial param = new CameraPinholeRadial(150,155,0,width/2,height/2,width,height).fsetRadial(0,0);
+	CameraPinholeBrown param = new CameraPinholeBrown(150,155,0,width/2,height/2,width,height).fsetRadial(0,0);
 	MonocularPlaneVisualOdometry<I> algorithm;
 
 	I left;

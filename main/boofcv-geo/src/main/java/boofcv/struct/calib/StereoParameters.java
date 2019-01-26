@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,9 +44,9 @@ public class StereoParameters implements Serializable {
 	public static final long serialVersionUID = 1L;
 
 	/** intrinsic camera parameters of left camera */
-	public CameraPinholeRadial left;
+	public CameraPinholeBrown left;
 	/** intrinsic camera parameters of right camera */
-	public CameraPinholeRadial right;
+	public CameraPinholeBrown right;
 	/** transform from left camera to right camera */
 	public Se3_F64 rightToLeft;
 
@@ -54,22 +54,22 @@ public class StereoParameters implements Serializable {
 		this(param.left,param.right,param.getRightToLeft());
 	}
 
-	public StereoParameters(CameraPinholeRadial left,
-							CameraPinholeRadial right,
+	public StereoParameters(CameraPinholeBrown left,
+							CameraPinholeBrown right,
 							Se3_F64 rightToLeft ) {
-		this.left = new CameraPinholeRadial(left);
+		this.left = new CameraPinholeBrown(left);
 		this.rightToLeft = rightToLeft.copy();
-		this.right = new CameraPinholeRadial(right);
+		this.right = new CameraPinholeBrown(right);
 	}
 
 	public StereoParameters() {
 	}
 
-	public CameraPinholeRadial getLeft() {
+	public CameraPinholeBrown getLeft() {
 		return left;
 	}
 
-	public void setLeft(CameraPinholeRadial left) {
+	public void setLeft(CameraPinholeBrown left) {
 		this.left = left;
 	}
 
@@ -81,11 +81,11 @@ public class StereoParameters implements Serializable {
 		this.rightToLeft = rightToLeft;
 	}
 
-	public CameraPinholeRadial getRight() {
+	public CameraPinholeBrown getRight() {
 		return right;
 	}
 
-	public void setRight(CameraPinholeRadial right) {
+	public void setRight(CameraPinholeBrown right) {
 		this.right = right;
 	}
 

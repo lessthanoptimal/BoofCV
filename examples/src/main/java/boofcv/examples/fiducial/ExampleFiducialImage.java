@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
@@ -62,7 +62,7 @@ public class ExampleFiducialImage {
 //		String imageName = "image02.jpg";
 
 		// load the lens distortion parameters and the input image
-		CameraPinholeRadial param = CalibrationIO.load(new File(imagePath, "intrinsic.yaml"));
+		CameraPinholeBrown param = CalibrationIO.load(new File(imagePath, "intrinsic.yaml"));
 		LensDistortionNarrowFOV lensDistortion = new LensDistortionRadialTangential(param);
 		BufferedImage input = UtilImageIO.loadImage(imagePath, imageName);
 		GrayF32 original = ConvertBufferedImage.convertFrom(input, true, ImageType.single(GrayF32.class));

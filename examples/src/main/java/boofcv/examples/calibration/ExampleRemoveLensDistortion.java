@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
@@ -57,7 +57,7 @@ public class ExampleRemoveLensDistortion {
 		String imageDir = UtilIO.pathExample("structure/");
 
 		// load calibration parameters from the previously calibrated camera
-		CameraPinholeRadial param = CalibrationIO.load(new File(calibDir , "intrinsic.yaml"));
+		CameraPinholeBrown param = CalibrationIO.load(new File(calibDir , "intrinsic.yaml"));
 		// Specify a transform that has no lens distortion that you wish to re-render the image as having
 		CameraPinhole desired = new CameraPinhole(param);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.core.image.ConvertImageFilter;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.SequencePoint2Transform2_F32;
@@ -112,7 +112,7 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageBase<
 	}
 
 	@Override
-	public void setCalibration(CameraPinholeRadial paramVisual, Point2Transform2_F32 visToDepth) {
+	public void setCalibration(CameraPinholeBrown paramVisual, Point2Transform2_F32 visToDepth) {
 
 		// the algorithms camera model assumes no lens distortion and that skew = 0
 		CameraPinhole desired = new CameraPinhole(paramVisual);

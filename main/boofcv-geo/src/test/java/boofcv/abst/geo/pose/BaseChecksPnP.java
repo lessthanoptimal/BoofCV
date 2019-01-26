@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.geo.pose;
 
 import boofcv.factory.distort.LensDistortionFactory;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -41,7 +41,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public class BaseChecksPnP {
-	CameraPinholeRadial intrinsic = new CameraPinholeRadial(500,490,0,320,240,640,480).fsetRadial(0.1,-0.05);
+	CameraPinholeBrown intrinsic = new CameraPinholeBrown(500,490,0,320,240,640,480).fsetRadial(0.1,-0.05);
 	Random rand = new Random(234);
 
 	Se3_F64 worldToCamera0;

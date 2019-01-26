@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.sfm;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
@@ -54,8 +54,8 @@ public class TestStereoSparse3D {
 		param.rightToLeft.getT().set(0.2, 0, 0.1);
 //		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.02,0.01,-0.03,param.rightToLeft.getR());
 
-		param.left = PerspectiveOps.matrixToPinhole(K1,640,480,new CameraPinholeRadial());
-		param.right = PerspectiveOps.matrixToPinhole(K2,640,480,new CameraPinholeRadial());
+		param.left = PerspectiveOps.matrixToPinhole(K1,640,480,new CameraPinholeBrown());
+		param.right = PerspectiveOps.matrixToPinhole(K2,640,480,new CameraPinholeBrown());
 		param.left.radial = new double[2];
 		param.right.radial = new double[2];
 	}

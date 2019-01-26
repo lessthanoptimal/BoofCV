@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.alg.sfm.overhead.CameraPlaneProjection;
 import boofcv.factory.distort.LensDistortionFactory;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.sfm.PlanePtPixel;
@@ -171,7 +171,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	 *
 	 * @param intrinsic Intrinsic camera parameters
 	 */
-	public void setIntrinsic(CameraPinholeRadial intrinsic) {
+	public void setIntrinsic(CameraPinholeBrown intrinsic) {
 		planeProjection.setIntrinsic(intrinsic);
 		normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false,true);
 		pixelToNorm = LensDistortionFactory.narrow(intrinsic).undistort_F64(true,false);

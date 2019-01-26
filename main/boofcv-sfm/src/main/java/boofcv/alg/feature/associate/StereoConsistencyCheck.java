@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.feature.associate;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
@@ -55,8 +55,8 @@ public class StereoConsistencyCheck {
 	}
 
 	public void setCalibration(StereoParameters param) {
-		CameraPinholeRadial left = param.getLeft();
-		CameraPinholeRadial right = param.getRight();
+		CameraPinholeBrown left = param.getLeft();
+		CameraPinholeBrown right = param.getRight();
 
 		// compute rectification
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();

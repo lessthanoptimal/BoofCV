@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.sfm.d3;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.DoNothing2Transform2_F32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.se.Se3_F64;
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public abstract class CheckVisualOdometryDepthSim<I extends ImageGray<I>,Depth extends ImageGray<Depth>>
 	extends VideoSequenceSimulator<I>
 {
-	CameraPinholeRadial param = new CameraPinholeRadial(200,201,0,width/2,height/2,width,height).fsetRadial(0,0);
+	CameraPinholeBrown param = new CameraPinholeBrown(200,201,0,width/2,height/2,width,height).fsetRadial(0,0);
 	DepthVisualOdometry<I,Depth> algorithm;
 
 	I left;

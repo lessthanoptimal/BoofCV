@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.distort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
 import georegression.metric.Intersection2D_F32;
 import georegression.struct.affine.Affine2D_F32;
@@ -46,7 +46,7 @@ public class TestLensDistortionOps_F32 {
 		// distorted pixel in original image
 		float pixelX = 12.5f,pixelY = height-3;
 
-		CameraPinholeRadial orig = new CameraPinholeRadial().
+		CameraPinholeBrown orig = new CameraPinholeBrown().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1f, 0.05f);
 		CameraPinhole desired = new CameraPinhole(orig);
 
@@ -76,7 +76,7 @@ public class TestLensDistortionOps_F32 {
 	 */
 	@Test
 	public void transformChangeModel_FULLVIEW() {
-		CameraPinholeRadial param = new CameraPinholeRadial().
+		CameraPinholeBrown param = new CameraPinholeBrown().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1f, 0.05f);
 		CameraPinhole desired = new CameraPinhole(param);
 
@@ -87,7 +87,7 @@ public class TestLensDistortionOps_F32 {
 
 		checkBorderOutside(adjToDist,distToAdj);
 
-		param = new CameraPinholeRadial().
+		param = new CameraPinholeBrown().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1f,-0.05f);
 		desired = new CameraPinhole(param);
 		adjToDist = LensDistortionOps_F32.transformChangeModel(AdjustmentType.FULL_VIEW, param,desired, true, null);
@@ -103,7 +103,7 @@ public class TestLensDistortionOps_F32 {
 		// distorted pixel in original image
 		float pixelX = 12.5f ,pixelY = height-3;
 
-		CameraPinholeRadial orig = new CameraPinholeRadial().
+		CameraPinholeBrown orig = new CameraPinholeBrown().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1f, 0.05f);
 		CameraPinhole desired = new CameraPinhole(orig);
 
@@ -112,7 +112,7 @@ public class TestLensDistortionOps_F32 {
 		Point2D_F32 norm = new Point2D_F32();
 		distToNorm.compute(pixelX, pixelY, norm);
 
-		CameraPinholeRadial adjusted = new CameraPinholeRadial();
+		CameraPinholeBrown adjusted = new CameraPinholeBrown();
 		Point2Transform2_F32 distToAdj = LensDistortionOps_F32.
 				transformChangeModel(AdjustmentType.FULL_VIEW, orig, desired, false, adjusted);
 
@@ -133,8 +133,8 @@ public class TestLensDistortionOps_F32 {
 	 */
 	@Test
 	public void transformChangeModel_EXPAND() {
-		CameraPinholeRadial param;
-		param = new CameraPinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1f, 1e-4);
+		CameraPinholeBrown param;
+		param = new CameraPinholeBrown().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1f, 1e-4);
 		CameraPinhole desired = new CameraPinhole(param);
 
 		Point2Transform2_F32 adjToDist = LensDistortionOps_F32.transformChangeModel(AdjustmentType.EXPAND, param,desired, true, null);
@@ -142,7 +142,7 @@ public class TestLensDistortionOps_F32 {
 		checkInside(adjToDist, distToAdj);
 
 		// distort it in the other direction
-		param = new CameraPinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1f,-1e-4);
+		param = new CameraPinholeBrown().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(-0.1f,-1e-4);
 
 		adjToDist = LensDistortionOps_F32.transformChangeModel(AdjustmentType.EXPAND, param, desired, true, null);
 		distToAdj = LensDistortionOps_F32.transformChangeModel(AdjustmentType.EXPAND, param, desired, false, null);
@@ -160,7 +160,7 @@ public class TestLensDistortionOps_F32 {
 		// distorted pixel in original image
 		float pixelX = 12.5f,pixelY = height-3;
 
-		CameraPinholeRadial orig = new CameraPinholeRadial().
+		CameraPinholeBrown orig = new CameraPinholeBrown().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1f, 0.05f);
 		CameraPinhole desired = new CameraPinhole(orig);
 
@@ -169,7 +169,7 @@ public class TestLensDistortionOps_F32 {
 		Point2D_F32 norm = new Point2D_F32();
 		distToNorm.compute(pixelX, pixelY, norm);
 
-		CameraPinholeRadial adjusted = new CameraPinholeRadial();
+		CameraPinholeBrown adjusted = new CameraPinholeBrown();
 		Point2Transform2_F32 distToAdj = LensDistortionOps_F32.transformChangeModel(AdjustmentType.EXPAND, orig, desired, false, adjusted);
 
 		Point2D_F32 adjPixel = new Point2D_F32();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo.pose;
 
 import boofcv.alg.geo.GeoTestingOps;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.sfm.Stereo2D3D;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -63,8 +63,8 @@ public class CommonStereoMotionNPoint {
 		param = new StereoParameters();
 		param.rightToLeft = leftToRight.invert(null);
 
-		param.left = new CameraPinholeRadial(400,500,0.1,160,120,320,240).fsetRadial(0, 0);
-		param.right = new CameraPinholeRadial(380,505,0.05,165,115,320,240).fsetRadial(0,0);
+		param.left = new CameraPinholeBrown(400,500,0.1,160,120,320,240).fsetRadial(0, 0);
+		param.right = new CameraPinholeBrown(380,505,0.05,165,115,320,240).fsetRadial(0,0);
 
 		worldToLeft = new Se3_F64();
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.01, 0.04, -0.05, worldToLeft.getR());

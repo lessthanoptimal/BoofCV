@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.abst.geo.calibration;
 
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.Zhang99AllParam;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -120,8 +120,8 @@ public class CalibrateStereoPlanar {
 	public StereoParameters process() {
 
 		// calibrate left and right cameras
-		CameraPinholeRadial leftParam = calibrateMono(calibLeft,viewLeft);
-		CameraPinholeRadial rightParam = calibrateMono(calibRight,viewRight);
+		CameraPinholeBrown leftParam = calibrateMono(calibLeft,viewLeft);
+		CameraPinholeBrown rightParam = calibrateMono(calibRight,viewRight);
 
 		// fit motion from right to left
 		Se3_F64 rightToLeft = computeRightToLeft();
@@ -132,9 +132,9 @@ public class CalibrateStereoPlanar {
 	/**
 	 * Compute intrinsic calibration for one of the cameras
 	 */
-	private CameraPinholeRadial calibrateMono(CalibrateMonoPlanar calib , List<Se3_F64> location )
+	private CameraPinholeBrown calibrateMono(CalibrateMonoPlanar calib , List<Se3_F64> location )
 	{
-		CameraPinholeRadial intrinsic = calib.process();
+		CameraPinholeBrown intrinsic = calib.process();
 
 		Zhang99AllParam zhangParam = calib.getZhangParam();
 

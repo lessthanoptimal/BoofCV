@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 
 	public boolean print=false;
 
-	protected double test_X[][] = new double[][]{{0.2,0.6,2},{-0.2,0.6,2},{0.2,-0.6,2},{0.2,-0.6,-2}};
+	protected double test_X[][] = new double[][]{{0.2,0.6,2},{-0.2,0.6,2},{0.2,-0.6,2},{0.2,-0.6,-2},{1.2,-1.3,2}};
 
 	protected GenericChecksBundleAdjustmentCamera(BundleAdjustmentCamera model) {
 		this.model = model;
@@ -58,6 +58,11 @@ public abstract class GenericChecksBundleAdjustmentCamera {
 
 	public GenericChecksBundleAdjustmentCamera setParameters(double[][] parameters) {
 		this.parameters = parameters;
+		return this;
+	}
+
+	public GenericChecksBundleAdjustmentCamera setPrint( boolean value ) {
+		this.print = value;
 		return this;
 	}
 

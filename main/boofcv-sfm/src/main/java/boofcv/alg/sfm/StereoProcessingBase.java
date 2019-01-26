@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -93,8 +93,8 @@ public class StereoProcessingBase<T extends ImageGray<T>> {
 	 * @param stereoParam stereo parameters
 	 */
 	public void setCalibration(StereoParameters stereoParam) {
-		CameraPinholeRadial left = stereoParam.getLeft();
-		CameraPinholeRadial right = stereoParam.getRight();
+		CameraPinholeBrown left = stereoParam.getLeft();
+		CameraPinholeBrown right = stereoParam.getRight();
 
 		// adjust image size
 		imageLeftRect.reshape(left.getWidth(), left.getHeight());

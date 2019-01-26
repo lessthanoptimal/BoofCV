@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.Point2Transform3_F64;
@@ -38,7 +38,7 @@ import georegression.struct.point.Point3D_F64;
 public class CameraToEquirectangular_F64
 		extends EquirectangularDistortBase_F64
 {
-	public void setCameraModel( CameraPinholeRadial camera ) {
+	public void setCameraModel( CameraPinholeBrown camera ) {
 		Point2Transform2_F64 pixelToNormalized =
 				new LensDistortionRadialTangential(camera).undistort_F64(true,false);
 		setCameraModel(camera.width,camera.height,pixelToNormalized);

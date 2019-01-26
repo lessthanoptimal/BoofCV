@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 
 import javax.swing.*;
@@ -123,7 +123,7 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 
 		SwingUtilities.invokeLater(() -> monitor.setMessage(1,"Estimating Parameters"));
 
-		final CameraPinholeRadial param = calibrator.process();
+		final CameraPinholeBrown param = calibrator.process();
 		SwingUtilities.invokeLater(() -> {
 			gui.setResults(calibrator.getErrors());
 			gui.setCalibration(calibrator.getZhangParam());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.alg.geo.pose.PnPStereoDistanceReprojectionSq;
 import boofcv.alg.geo.pose.PnPStereoEstimator;
 import boofcv.alg.geo.pose.RefinePnPStereo;
 import boofcv.alg.sfm.d3.VisOdomDualTrackPnP;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageGray;
@@ -117,7 +117,7 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 			refine.setLeftToRight(leftToRight);
 		alg.setCalibration(parameters);
 
-		CameraPinholeRadial left = parameters.left;
+		CameraPinholeBrown left = parameters.left;
 		distanceMono.setIntrinsic(0,left);
 		distanceStereo.setLeftToRight(parameters.rightToLeft.invert(null));
 		distanceStereo.setIntrinsic(0,parameters.left);

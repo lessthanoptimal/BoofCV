@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.distort.PointTransformHomography_F32;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
@@ -55,8 +55,8 @@ public class TestRectifyImageOps {
 	@Test
 	public void fullViewLeft_calibrated() {
 
-		CameraPinholeRadial param =
-				new CameraPinholeRadial().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
+		CameraPinholeBrown param =
+				new CameraPinholeBrown().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// do nothing rectification
 		FMatrixRMaj rect1 = CommonOps_FDRM.identity(3);
@@ -118,7 +118,7 @@ public class TestRectifyImageOps {
 	@Test
 	public void allInsideLeft_calibrated_F32() {
 
-		CameraPinholeRadial param = new CameraPinholeRadial().
+		CameraPinholeBrown param = new CameraPinholeBrown().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// do nothing rectification
@@ -137,7 +137,7 @@ public class TestRectifyImageOps {
 	@Test
 	public void allInsideLeft_calibrated_F64() {
 
-		CameraPinholeRadial param = new CameraPinholeRadial().
+		CameraPinholeBrown param = new CameraPinholeBrown().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		// do nothing rectification
@@ -189,7 +189,7 @@ public class TestRectifyImageOps {
 	@Test
 	public void transform_PixelToRect_and_RectToPixel_F32() {
 
-		CameraPinholeRadial param = new CameraPinholeRadial().
+		CameraPinholeBrown param = new CameraPinholeBrown().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		FMatrixRMaj rect = new FMatrixRMaj(3,3,true,1.1f,0,0,0,2,0,0.1f,0,3);
@@ -215,7 +215,7 @@ public class TestRectifyImageOps {
 	@Test
 	public void transform_PixelToRect_and_RectToPixel_F64() {
 
-		CameraPinholeRadial param = new CameraPinholeRadial().
+		CameraPinholeBrown param = new CameraPinholeBrown().
 				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		DMatrixRMaj rect = new DMatrixRMaj(3,3,true,1.1,0,0,0,2,0,0.1,0,3);
@@ -243,7 +243,7 @@ public class TestRectifyImageOps {
 	 */
 	@Test
 	public void transformPixelToRectNorm_F64() {
-		CameraPinholeRadial param = new CameraPinholeRadial().
+		CameraPinholeBrown param = new CameraPinholeBrown().
 						fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
 
 		DMatrixRMaj rect = new DMatrixRMaj(3,3,true,1.1,0,0,0,2,0,0.1,0,3);

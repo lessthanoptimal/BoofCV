@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
@@ -86,7 +86,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 
 	private FiducialDetector detector;
 
-	private CameraPinholeRadial intrinsic;
+	private CameraPinholeBrown intrinsic;
 
 	private final List<FiducialInfo> fiducialInfo = new ArrayList<>();
 	private FiducialStability stabilityMax = new FiducialStability();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.UtilImageIO;
 import boofcv.openkinect.UtilOpenKinect;
 import boofcv.struct.FastQueueArray_I32;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
@@ -47,7 +47,7 @@ public class CreateRgbPointCloudFileApp {
 		String nameDepth = baseDir+"depth0000000.depth";
 		String nameCalib = baseDir+"intrinsic.yaml";
 
-		CameraPinholeRadial param = CalibrationIO.load(nameCalib);
+		CameraPinholeBrown param = CalibrationIO.load(nameCalib);
 
 		GrayU16 depth = new GrayU16(1,1);
 		Planar<GrayU8> rgb = new Planar<>(GrayU8.class,1,1,3);

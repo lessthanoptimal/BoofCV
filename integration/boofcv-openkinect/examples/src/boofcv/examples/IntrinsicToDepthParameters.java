@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2016, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.examples;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.openkinect.UtilOpenKinect;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.VisualDepthParameters;
 
 import java.io.File;
@@ -37,7 +37,7 @@ public class IntrinsicToDepthParameters {
 	public static void main( String args[] ) {
 		String baseDir = UtilIO.pathExample("kinect/basket");
 
-		CameraPinholeRadial intrinsic = CalibrationIO.load(new File(baseDir,"intrinsic.yaml"));
+		CameraPinholeBrown intrinsic = CalibrationIO.load(new File(baseDir,"intrinsic.yaml"));
 
 		VisualDepthParameters depth = new VisualDepthParameters();
 

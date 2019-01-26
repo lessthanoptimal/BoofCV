@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,15 +25,15 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestCameraPinholeRadial {
+public class TestCameraPinholeBrown {
 
 	@Test
 	public void set_radial() {
-		CameraPinholeRadial p = new CameraPinholeRadial(200,210,1,320,240,640,380);
+		CameraPinholeBrown p = new CameraPinholeBrown(200,210,1,320,240,640,380);
 		p.fsetRadial(1,2);
 		p.fsetTangental(2,3);
 
-		CameraPinholeRadial f = new CameraPinholeRadial();
+		CameraPinholeBrown f = new CameraPinholeBrown();
 		f.set(p);
 
 		equalsR(p,f);
@@ -43,7 +43,7 @@ public class TestCameraPinholeRadial {
 	public void set_pinhole() {
 		CameraPinhole p = new CameraPinhole(2020,2210,2,2,56,5,234);
 
-		CameraPinholeRadial f = new CameraPinholeRadial(200,210,1,320,240,640,380);
+		CameraPinholeBrown f = new CameraPinholeBrown(200,210,1,320,240,640,380);
 		f.fsetRadial(1,2);
 		f.fsetTangental(2,3);
 
@@ -64,7 +64,7 @@ public class TestCameraPinholeRadial {
 		assertEquals(expected.skew, found.skew, 1e-8);
 	}
 
-	private void equalsR( CameraPinholeRadial expected, CameraPinholeRadial found ) {
+	private void equalsR(CameraPinholeBrown expected, CameraPinholeBrown found ) {
 		equalsP((CameraPinhole)expected, (CameraPinhole)found );
 
 		assertEquals(expected.t1, found.t1, 1e-8);
@@ -79,7 +79,7 @@ public class TestCameraPinholeRadial {
 
 	@Test
 	public void fsetRadial() {
-		CameraPinholeRadial p = new CameraPinholeRadial(200,210,1,320,240,640,380);
+		CameraPinholeBrown p = new CameraPinholeBrown(200,210,1,320,240,640,380);
 
 		assertTrue(p == p.fsetRadial(1.1,2.2,3.3));
 
@@ -101,7 +101,7 @@ public class TestCameraPinholeRadial {
 
 	@Test
 	public void fsetTangental() {
-		CameraPinholeRadial p = new CameraPinholeRadial(200,210,1,320,240,640,380);
+		CameraPinholeBrown p = new CameraPinholeBrown(200,210,1,320,240,640,380);
 
 		assertTrue(p == p.fsetTangental(1.1, 2.2));
 
@@ -120,7 +120,7 @@ public class TestCameraPinholeRadial {
 
 	@Test
 	public void isDistorted() {
-		CameraPinholeRadial p = new CameraPinholeRadial(200,210,0,320,240,640,380);
+		CameraPinholeBrown p = new CameraPinholeBrown(200,210,0,320,240,640,380);
 
 		assertFalse(p.isDistorted());
 		assertFalse(p.fsetRadial(0,0).isDistorted());

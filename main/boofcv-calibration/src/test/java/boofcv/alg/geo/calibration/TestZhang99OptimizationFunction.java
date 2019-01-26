@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo.calibration;
 
 import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
 import boofcv.alg.geo.calibration.pinhole.TestPinholeCalibrationZhang99;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -88,7 +88,7 @@ public class TestZhang99OptimizationFunction {
 		ConvertRotation3D_F64.rodriguesToMatrix(v.rotation, se.getR());
 		se.T = v.T;
 
-		CameraPinholeRadial intrinsic = param.getIntrinsic().getCameraModel();
+		CameraPinholeBrown intrinsic = param.getIntrinsic().getCameraModel();
 
 		for( int i = 0; i < grid.size(); i++ ) {
 			Point2D_F64 gridPt = grid.get(i);

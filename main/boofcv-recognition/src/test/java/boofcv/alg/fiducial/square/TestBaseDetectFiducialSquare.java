@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.simulation.SimulatePlanarWorld;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.se.Se3_F64;
@@ -50,19 +50,19 @@ public class TestBaseDetectFiducialSquare {
 	@Test
 	public void heavyLensRemoval() {
 		int width = 640,height=640;
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(500,500,0,width/2,height/2,width,height).fsetRadial(-0.01,-0.15);
+		CameraPinholeBrown intrinsic = new CameraPinholeBrown(500,500,0,width/2,height/2,width,height).fsetRadial(-0.01,-0.15);
 		checkDetectRender(width, height, intrinsic,true);
 	}
 
 	@Test
 	public void noLensSpecified() {
 		int width = 640,height=640;
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(500,500,0,width/2,height/2,width,height);
+		CameraPinholeBrown intrinsic = new CameraPinholeBrown(500,500,0,width/2,height/2,width,height);
 		checkDetectRender(width, height, intrinsic,false);
 	}
 
 
-	private void checkDetectRender(int width, int height, CameraPinholeRadial intrinsic, boolean applyLens ) {
+	private void checkDetectRender(int width, int height, CameraPinholeBrown intrinsic, boolean applyLens ) {
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(intrinsic);
 

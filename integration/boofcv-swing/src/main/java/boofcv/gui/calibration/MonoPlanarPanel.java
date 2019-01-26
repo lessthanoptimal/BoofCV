@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.Zhang99AllParam;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -41,7 +41,7 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-public class MonoPlanarPanel extends CalibratedPlanarPanel<CameraPinholeRadial>
+public class MonoPlanarPanel extends CalibratedPlanarPanel<CameraPinholeBrown>
 		implements ItemListener , ChangeListener
 {
 	JTextArea paramCenterX;
@@ -97,7 +97,7 @@ public class MonoPlanarPanel extends CalibratedPlanarPanel<CameraPinholeRadial>
 
 	@Override
 	public void setCalibration(Zhang99AllParam found) {
-		CameraPinholeRadial intrinsic = (CameraPinholeRadial)found.getIntrinsic().getCameraModel();
+		CameraPinholeBrown intrinsic = (CameraPinholeBrown)found.getIntrinsic().getCameraModel();
 		String textX = String.format("%5.1f",intrinsic.cx);
 		String textY = String.format("%5.1f", intrinsic.cy);
 		paramCenterX.setText(textX);
@@ -132,7 +132,7 @@ public class MonoPlanarPanel extends CalibratedPlanarPanel<CameraPinholeRadial>
 	}
 
 	@Override
-	public void setCorrection( CameraPinholeRadial param )
+	public void setCorrection( CameraPinholeBrown param )
 	{
 		checkUndistorted.setEnabled(true);
 		mainView.setCalibration(param);

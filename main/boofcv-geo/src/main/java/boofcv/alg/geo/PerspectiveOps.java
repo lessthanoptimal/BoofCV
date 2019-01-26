@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.alg.geo.impl.ImplPerspectiveOps_F32;
 import boofcv.alg.geo.impl.ImplPerspectiveOps_F64;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
@@ -114,8 +114,8 @@ public class PerspectiveOps {
 	 * @param hfov Horizontal FOV in degrees
 	 * @return guess camera parameters
 	 */
-	public static CameraPinholeRadial createIntrinsic(int width, int height, double hfov) {
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial();
+	public static CameraPinholeBrown createIntrinsic(int width, int height, double hfov) {
+		CameraPinholeBrown intrinsic = new CameraPinholeBrown();
 		intrinsic.width = width;
 		intrinsic.height = height;
 		intrinsic.cx = width / 2;
@@ -145,13 +145,13 @@ public class PerspectiveOps {
 
 	/**
 	 *
-	 * <p>Recomputes the {@link CameraPinholeRadial} given an adjustment matrix.</p>
+	 * <p>Recomputes the {@link CameraPinholeBrown} given an adjustment matrix.</p>
 	 * K<sub>A</sub> = A*K<br>
 	 * Where K<sub>A</sub> is the returned adjusted intrinsic matrix, A is the adjustment matrix and K is the
 	 * original intrinsic calibration matrix.
 	 *
 	 * <p>
-	 * NOTE: Distortion parameters are ignored in the provided {@link CameraPinholeRadial} class.
+	 * NOTE: Distortion parameters are ignored in the provided {@link CameraPinholeBrown} class.
 	 * </p>
 	 *
 	 * @param parameters (Input) Original intrinsic parameters. Not modified.
@@ -168,13 +168,13 @@ public class PerspectiveOps {
 
 	/**
 	 *
-	 * <p>Recomputes the {@link CameraPinholeRadial} given an adjustment matrix.</p>
+	 * <p>Recomputes the {@link CameraPinholeBrown} given an adjustment matrix.</p>
 	 * K<sub>A</sub> = A*K<br>
 	 * Where K<sub>A</sub> is the returned adjusted intrinsic matrix, A is the adjustment matrix and K is the
 	 * original intrinsic calibration matrix.
 	 *
 	 * <p>
-	 * NOTE: Distortion parameters are ignored in the provided {@link CameraPinholeRadial} class.
+	 * NOTE: Distortion parameters are ignored in the provided {@link CameraPinholeBrown} class.
 	 * </p>
 	 *
 	 * @param parameters (Input) Original intrinsic parameters. Not modified.
@@ -683,7 +683,7 @@ public class PerspectiveOps {
 	/**
 	 * Creates a transform from world coordinates into pixel coordinates.  can handle lens distortion
 	 */
-	public static WorldToCameraToPixel createWorldToPixel(CameraPinholeRadial intrinsic , Se3_F64 worldToCamera )
+	public static WorldToCameraToPixel createWorldToPixel(CameraPinholeBrown intrinsic , Se3_F64 worldToCamera )
 	{
 		WorldToCameraToPixel alg = new WorldToCameraToPixel();
 		alg.configure(intrinsic,worldToCamera);

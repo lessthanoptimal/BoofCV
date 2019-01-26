@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
-	CameraPinholeRadial intrinsic = new CameraPinholeRadial(300,300,0,250,200,500,400);
+	CameraPinholeBrown intrinsic = new CameraPinholeBrown(300,300,0,250,200,500,400);
 
 	@Test
 	public void fullyConnected_calibrated() {

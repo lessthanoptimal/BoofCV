@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.sfm.d3;
 
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
@@ -47,7 +47,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 	public void setCalibration() {
 		param = null;
 
-		CameraPinholeRadial intrinsic = createIntrinsic();
+		CameraPinholeBrown intrinsic = createIntrinsic();
 		Se3_F64 extrinsic = new Se3_F64();
 		extrinsic.T.x=8;
 		Dummy dummy = new Dummy();
@@ -65,7 +65,7 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 	public void process() {
 		image = null;
 
-		CameraPinholeRadial intrinsic = createIntrinsic();
+		CameraPinholeBrown intrinsic = createIntrinsic();
 		Dummy dummy = new Dummy();
 
 		MonocularPlaneVisualOdometry<GrayF32> alg = new MonocularPlaneVisualOdometryScaleInput<>(dummy,0.5);
@@ -91,8 +91,8 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 		assertTrue(type == alg.getImageType());
 	}
 
-	public CameraPinholeRadial createIntrinsic() {
-		return new CameraPinholeRadial(200,201,0,width/2,height/2,width,height).fsetRadial(0, 0);
+	public CameraPinholeBrown createIntrinsic() {
+		return new CameraPinholeBrown(200,201,0,width/2,height/2,width,height).fsetRadial(0, 0);
 	}
 
 	protected class Dummy implements MonocularPlaneVisualOdometry<GrayF32> {

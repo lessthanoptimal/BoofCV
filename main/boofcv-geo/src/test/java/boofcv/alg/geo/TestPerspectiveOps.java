@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo;
 
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
@@ -89,7 +89,7 @@ class TestPerspectiveOps {
 
 		double hfov = 30;
 
-		CameraPinholeRadial found = PerspectiveOps.createIntrinsic(640, 480, hfov);
+		CameraPinholeBrown found = PerspectiveOps.createIntrinsic(640, 480, hfov);
 
 		assertEquals(UtilAngle.degreeToRadian(hfov),2.0*Math.atan(found.cx/found.fx),1e-6);
 		assertEquals(found.fx,found.fy,1e-6);
@@ -99,7 +99,7 @@ class TestPerspectiveOps {
 	void scaleIntrinsic() {
 		Point3D_F64 X = new Point3D_F64(0.1,0.3,2);
 
-		CameraPinholeRadial param = new CameraPinholeRadial(200,300,2,250,260,200,300);
+		CameraPinholeBrown param = new CameraPinholeBrown(200,300,2,250,260,200,300);
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(param, (DMatrixRMaj)null);
 
 		// find the pixel location in the unscaled image
@@ -120,8 +120,8 @@ class TestPerspectiveOps {
 
 		DMatrixRMaj B = new DMatrixRMaj(3,3,true,2,0,1,0,3,2,0,0,1);
 
-		CameraPinholeRadial param = new CameraPinholeRadial(200,300,2,250,260,200,300).fsetRadial(0.1,0.3);
-		CameraPinholeRadial found = PerspectiveOps.adjustIntrinsic(param, B, null);
+		CameraPinholeBrown param = new CameraPinholeBrown(200,300,2,250,260,200,300).fsetRadial(0.1,0.3);
+		CameraPinholeBrown found = PerspectiveOps.adjustIntrinsic(param, B, null);
 
 		DMatrixRMaj A = PerspectiveOps.pinholeToMatrix(param, (DMatrixRMaj)null);
 
@@ -243,7 +243,7 @@ class TestPerspectiveOps {
 
 	@Test
 	void convertNormToPixel_intrinsic_F64() {
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(100,150,0.1,120,209,500,600);
+		CameraPinholeBrown intrinsic = new CameraPinholeBrown(100,150,0.1,120,209,500,600);
 
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
 
@@ -275,7 +275,7 @@ class TestPerspectiveOps {
 
 	@Test
 	void convertPixelToNorm_intrinsic_F64() {
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(100,150,0.1,120,209,500,600);
+		CameraPinholeBrown intrinsic = new CameraPinholeBrown(100,150,0.1,120,209,500,600);
 
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
 		DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
@@ -342,7 +342,7 @@ class TestPerspectiveOps {
 	void renderPixel_intrinsic() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,3);
 
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(100,150,0.1,120,209,500,600);
+		CameraPinholeBrown intrinsic = new CameraPinholeBrown(100,150,0.1,120,209,500,600);
 
 		double normX = X.x/X.z;
 		double normY = X.y/X.z;

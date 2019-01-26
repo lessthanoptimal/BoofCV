@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ import boofcv.io.webcamcapture.UtilWebcamCapture;
 import boofcv.javacv.UtilOpenCV;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.calib.CameraModel;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.image.GrayF32;
 import com.github.sarxos.webcam.Webcam;
@@ -484,7 +484,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 			switch( modeType ) {
 				case PINHOLE: {
-					CameraPinholeRadial m = (CameraPinholeRadial)intrinsic;
+					CameraPinholeBrown m = (CameraPinholeBrown)intrinsic;
 					switch (formatType) {
 						case BOOFCV: CalibrationIO.save(m, outputFileName); break;
 						case OPENCV: UtilOpenCV.save(m, outputFileName); break;

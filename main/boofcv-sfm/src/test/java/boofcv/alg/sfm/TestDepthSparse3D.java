@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.sfm;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.distort.LensDistortionFactory;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.PixelTransform2_F32;
 import boofcv.struct.image.GrayU16;
 import georegression.struct.point.Point2D_F64;
@@ -43,7 +43,7 @@ public class TestDepthSparse3D {
 		GrayU16 depth = new GrayU16(w,h);
 		depth.set(5,6,1000);
 
-		CameraPinholeRadial param = new CameraPinholeRadial(1,1,0,5,10,w,h).fsetRadial(0,0);
+		CameraPinholeBrown param = new CameraPinholeBrown(1,1,0,5,10,w,h).fsetRadial(0,0);
 
 		PixelTransform2_F32 v2d = new PixelTransform2_F32() {
 

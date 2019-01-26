@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.geo.calibration.pinhole;
 
 import boofcv.alg.geo.calibration.GenericCalibrationZhang99;
 import boofcv.alg.geo.calibration.Zhang99IntrinsicParam;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 // TODO estimate cameras VFOV and HFOV
 	// TODO create observation across the entire FOV
-public class TestPinholeCalibrationZhang99 extends GenericCalibrationZhang99<CameraPinholeRadial> {
+public class TestPinholeCalibrationZhang99 extends GenericCalibrationZhang99<CameraPinholeBrown> {
 
 	@Override
 	public List<Zhang99IntrinsicParam> createParameters(Random rand) {
@@ -93,7 +93,7 @@ public class TestPinholeCalibrationZhang99 extends GenericCalibrationZhang99<Cam
 	}
 
 	@Override
-	public void addNoise(CameraPinholeRadial param, double magnitude) {
+	public void addNoise(CameraPinholeBrown param, double magnitude) {
 		param.fx += rand.nextDouble()*magnitude*Math.abs(param.fx);
 		param.fy += rand.nextDouble()*magnitude*Math.abs(param.fy);
 		param.skew += rand.nextDouble()*magnitude*Math.abs(param.skew);
@@ -109,7 +109,7 @@ public class TestPinholeCalibrationZhang99 extends GenericCalibrationZhang99<Cam
 	}
 
 	@Override
-	protected void checkIntrinsicOnly(CameraPinholeRadial expected, CameraPinholeRadial found,
+	protected void checkIntrinsicOnly(CameraPinholeBrown expected, CameraPinholeBrown found,
 									  double tolK, double tolD, double tolT) {
 		assertEquals(expected.fx,found.fx,Math.abs(expected.fx)*tolK + EPS);
 		assertEquals(expected.fy,found.fy,Math.abs(expected.fy)*tolK + EPS);
@@ -125,9 +125,9 @@ public class TestPinholeCalibrationZhang99 extends GenericCalibrationZhang99<Cam
 	}
 
 	@Override
-	public void checkEquals(CameraPinholeRadial expected,
-							CameraPinholeRadial found,
-							CameraPinholeRadial initial, double tol)
+	public void checkEquals(CameraPinholeBrown expected,
+							CameraPinholeBrown found,
+							CameraPinholeBrown initial, double tol)
 	{
 		// see if it improved the estimate
 		assertTrue(Math.abs(expected.fx-initial.fx)*tol >= Math.abs(expected.fx-found.fx));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort.spherical;
 
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point3D_F64;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ public class TestCameraToEquirectangular_F64 {
 	 */
 	@Test
 	public void canonicalIsPointedPositiveZ() {
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(400,400,0,imgWidth/2,imgHeight/2,imgWidth,imgHeight);
+		CameraPinholeBrown intrinsic = new CameraPinholeBrown(400,400,0,imgWidth/2,imgHeight/2,imgWidth,imgHeight);
 		intrinsic.setRadial(0.1,0.2);
 
 		CameraToEquirectangular_F64 alg = new CameraToEquirectangular_F64();
@@ -57,7 +57,7 @@ public class TestCameraToEquirectangular_F64 {
 	 */
 	@Test
 	public void setDirection() {
-		CameraPinholeRadial intrinsic = new CameraPinholeRadial(400,400,0,imgWidth/2,imgHeight/2,imgWidth,imgHeight);
+		CameraPinholeBrown intrinsic = new CameraPinholeBrown(400,400,0,imgWidth/2,imgHeight/2,imgWidth,imgHeight);
 		intrinsic.setRadial(0.1,0.2);
 
 		CameraToEquirectangular_F64 alg = new CameraToEquirectangular_F64();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.depth;
 import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.FastQueueArray_I32;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
@@ -42,7 +42,7 @@ public class VisualDepthOps {
 	 * @param depth depth image.  each value is in millimeters.
 	 * @param cloud Output point cloud
 	 */
-	public static void depthTo3D(CameraPinholeRadial param , GrayU16 depth , FastQueue<Point3D_F64> cloud ) {
+	public static void depthTo3D(CameraPinholeBrown param , GrayU16 depth , FastQueue<Point3D_F64> cloud ) {
 		cloud.reset();
 
 		Point2Transform2_F64 p2n = LensDistortionFactory.narrow(param).undistort_F64(true,false);
@@ -78,7 +78,7 @@ public class VisualDepthOps {
 	 * @param cloud Output point cloud
 	 * @param cloudColor Output color for each point in the cloud
 	 */
-	public static void depthTo3D(CameraPinholeRadial param , Planar<GrayU8> rgb , GrayU16 depth ,
+	public static void depthTo3D(CameraPinholeBrown param , Planar<GrayU8> rgb , GrayU16 depth ,
 								 FastQueue<Point3D_F64> cloud , FastQueueArray_I32 cloudColor ) {
 		cloud.reset();
 		cloudColor.reset();

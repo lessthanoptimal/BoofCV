@@ -19,9 +19,9 @@
 package boofcv.abst.geo.bundle;
 
 import boofcv.alg.geo.bundle.cameras.BundlePinhole;
-import boofcv.alg.geo.bundle.cameras.BundlePinholeRadial;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
@@ -141,8 +141,8 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		setCamera(which,fixed,new BundlePinhole(intrinsic));
 	}
 
-	public void setCamera( int which , boolean fixed , CameraPinholeRadial intrinsic ) {
-		setCamera(which,fixed,new BundlePinholeRadial(intrinsic));
+	public void setCamera( int which , boolean fixed , CameraPinholeBrown intrinsic ) {
+		setCamera(which,fixed,new BundlePinholeBrown(intrinsic));
 	}
 
 	/**

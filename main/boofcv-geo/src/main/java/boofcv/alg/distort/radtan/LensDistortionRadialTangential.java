@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.distort.Transform2ThenPixel_F32;
 import boofcv.alg.distort.Transform2ThenPixel_F64;
 import boofcv.alg.distort.pinhole.PinholePtoN_F32;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
 
@@ -34,9 +34,9 @@ import boofcv.struct.distort.Point2Transform2_F64;
  */
 public class LensDistortionRadialTangential implements LensDistortionNarrowFOV {
 
-	CameraPinholeRadial p;
+	CameraPinholeBrown p;
 
-	public LensDistortionRadialTangential(CameraPinholeRadial p) {
+	public LensDistortionRadialTangential(CameraPinholeBrown p) {
 		this.p = p;
 	}
 
@@ -130,7 +130,7 @@ public class LensDistortionRadialTangential implements LensDistortionNarrowFOV {
 		return p2n;
 	}
 
-	public CameraPinholeRadial getIntrinsic() {
+	public CameraPinholeBrown getIntrinsic() {
 		return p;
 	}
 }

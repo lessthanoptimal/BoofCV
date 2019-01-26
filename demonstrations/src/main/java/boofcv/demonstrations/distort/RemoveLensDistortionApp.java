@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -57,7 +57,7 @@ public class RemoveLensDistortionApp<T extends ImageBase<T>> extends Demonstrati
 
 	ListDisplayPanel gui = new ListDisplayPanel();
 
-	CameraPinholeRadial param;
+	CameraPinholeBrown param;
 
 	// distorted input
 	T dist;
@@ -78,7 +78,7 @@ public class RemoveLensDistortionApp<T extends ImageBase<T>> extends Demonstrati
 				new File(file.getParent(),"intrinsicLeft.yaml"), // this is a bit of a hack...
 				new File(file.getParent(),file.getName()+".yaml")};
 
-		CameraPinholeRadial model = null;
+		CameraPinholeBrown model = null;
 		for( File c : candidates ) {
 			try {
 				model = CalibrationIO.load(UtilIO.ensureURL(c.getPath()));

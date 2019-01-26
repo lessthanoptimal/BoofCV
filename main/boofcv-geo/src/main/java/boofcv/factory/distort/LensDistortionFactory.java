@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.CameraUniversalOmni;
 
 /**
@@ -38,8 +38,8 @@ public class LensDistortionFactory {
 	 * </p>
 	 */
 	public static LensDistortionNarrowFOV narrow(CameraModel param) {
-		if( param instanceof CameraPinholeRadial) {
-			CameraPinholeRadial c = (CameraPinholeRadial)param;
+		if( param instanceof CameraPinholeBrown) {
+			CameraPinholeBrown c = (CameraPinholeBrown)param;
 
 			if (c.isDistorted())
 				return new LensDistortionRadialTangential(c);

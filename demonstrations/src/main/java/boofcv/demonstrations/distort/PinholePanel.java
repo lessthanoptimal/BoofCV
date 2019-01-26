@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.demonstrations.distort;
 
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -45,12 +45,12 @@ public class PinholePanel extends StandardAlgConfigPanel
 	JSpinner selectR1;
 	JSpinner selectR2;
 
-	CameraPinholeRadial original;
-	CameraPinholeRadial adjusted = new CameraPinholeRadial();
+	CameraPinholeBrown original;
+	CameraPinholeBrown adjusted = new CameraPinholeBrown();
 
 	Listener listener;
 
-	public PinholePanel(CameraPinholeRadial original ,
+	public PinholePanel(CameraPinholeBrown original ,
 						Listener listener ) {
 		this.original = original;
 		this.adjusted.set(original);
@@ -86,7 +86,7 @@ public class PinholePanel extends StandardAlgConfigPanel
 
 	}
 
-	public void setCameraModel( CameraPinholeRadial original ) {
+	public void setCameraModel( CameraPinholeBrown original ) {
 		this.original = original;
 		this.adjusted.set(original);
 
@@ -156,11 +156,11 @@ public class PinholePanel extends StandardAlgConfigPanel
 		listener.updatedPinholeModel(adjusted);
 	}
 
-	public CameraPinholeRadial getDesired() {
+	public CameraPinholeBrown getDesired() {
 		return adjusted;
 	}
 
 	public interface Listener {
-		void updatedPinholeModel(CameraPinholeRadial model );
+		void updatedPinholeModel(CameraPinholeBrown model );
 	}
 }

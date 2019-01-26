@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.distort.LensDistortionOps_F32;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.distort.PointTransformHomography_F32;
 import boofcv.alg.distort.pinhole.PinholePtoN_F32;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.SequencePoint2Transform2_F32;
 import georegression.struct.shapes.RectangleLength2D_F32;
@@ -42,12 +42,12 @@ import static boofcv.factory.distort.LensDistortionFactory.narrow;
  */
 public class ImplRectifyImageOps_F32 {
 
-	public static void fullViewLeft(CameraPinholeRadial paramLeft,
+	public static void fullViewLeft(CameraPinholeBrown paramLeft,
 									FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
 									FMatrixRMaj rectifyK)
 	{
 		// need to take in account the order in which image distort will remove rectification later on
-		paramLeft = new CameraPinholeRadial(paramLeft);
+		paramLeft = new CameraPinholeBrown(paramLeft);
 
 		Point2Transform2_F32 tranLeft = transformPixelToRect(paramLeft, rectifyLeft);
 
@@ -78,12 +78,12 @@ public class ImplRectifyImageOps_F32 {
 		adjustUncalibrated(rectifyLeft, rectifyRight, bound, scale);
 	}
 
-	public static void allInsideLeft(CameraPinholeRadial paramLeft,
+	public static void allInsideLeft(CameraPinholeBrown paramLeft,
 									 FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
 									 FMatrixRMaj rectifyK)
 	{
 		// need to take in account the order in which image distort will remove rectification later on
-		paramLeft = new CameraPinholeRadial(paramLeft);
+		paramLeft = new CameraPinholeBrown(paramLeft);
 
 		Point2Transform2_F32 tranLeft = transformPixelToRect(paramLeft, rectifyLeft);
 
@@ -163,7 +163,7 @@ public class ImplRectifyImageOps_F32 {
 		rectifyRight.set(A.mult(rR).getFDRM());
 	}
 
-	public static Point2Transform2_F32 transformRectToPixel(CameraPinholeRadial param,
+	public static Point2Transform2_F32 transformRectToPixel(CameraPinholeBrown param,
 															FMatrixRMaj rectify)
 	{
 		Point2Transform2_F32 add_p_to_p = narrow(param).distort_F32(true, true);
@@ -175,7 +175,7 @@ public class ImplRectifyImageOps_F32 {
 		return new SequencePoint2Transform2_F32(removeRect,add_p_to_p);
 	}
 
-	public static Point2Transform2_F32 transformPixelToRect(CameraPinholeRadial param,
+	public static Point2Transform2_F32 transformPixelToRect(CameraPinholeBrown param,
 															FMatrixRMaj rectify)
 	{
 		Point2Transform2_F32 remove_p_to_p = narrow(param).undistort_F32(true, true);
@@ -185,7 +185,7 @@ public class ImplRectifyImageOps_F32 {
 		return new SequencePoint2Transform2_F32(remove_p_to_p,rectifyDistort);
 	}
 
-	public static Point2Transform2_F32 transformPixelToRectNorm(CameraPinholeRadial param,
+	public static Point2Transform2_F32 transformPixelToRectNorm(CameraPinholeBrown param,
 																FMatrixRMaj rectify,
 																FMatrixRMaj rectifyK) {
 		if (rectifyK.get(0, 1) != 0)

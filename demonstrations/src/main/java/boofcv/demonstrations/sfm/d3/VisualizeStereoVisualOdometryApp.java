@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
@@ -264,7 +264,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 
 		handleRunningStatus(2);
 
-		CameraPinholeRadial right = config.right;
+		CameraPinholeBrown right = config.right;
 		guiCam3D.init();
 		guiCam3D.setFocalLength(300);
 		guiCam3D.setStepSize(config.getBaseline());

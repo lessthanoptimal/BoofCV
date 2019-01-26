@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.sfm.d3;
 
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
@@ -100,8 +100,8 @@ public class TestStereoVisualOdometryScaleInput {
 		ret.getRightToLeft().getT().set(-0.2,0.001,-0.012);
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.001, -0.01, 0.0023, ret.getRightToLeft().getR());
 
-		ret.left = new CameraPinholeRadial(200,201,0,width/2,height/2,width,height).fsetRadial(0,0);
-		ret.right = new CameraPinholeRadial(199,200,0,width/2+2,height/2-6,width,height).fsetRadial(0,0);
+		ret.left = new CameraPinholeBrown(200,201,0,width/2,height/2,width,height).fsetRadial(0,0);
+		ret.right = new CameraPinholeBrown(199,200,0,width/2+2,height/2-6,width,height).fsetRadial(0,0);
 
 		return ret;
 	}

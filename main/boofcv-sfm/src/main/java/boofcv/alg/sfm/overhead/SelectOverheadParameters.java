@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.sfm.overhead;
 
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
@@ -78,7 +78,7 @@ public class SelectOverheadParameters {
 	 * @param planeToCamera Extrinsic camera parameters which specify the plane
 	 * @return true if successful or false if it failed
 	 */
-	public boolean process(CameraPinholeRadial intrinsic , Se3_F64 planeToCamera )
+	public boolean process(CameraPinholeBrown intrinsic , Se3_F64 planeToCamera )
 	{
 		proj.setPlaneToCamera(planeToCamera,true);
 		proj.setIntrinsic(intrinsic);

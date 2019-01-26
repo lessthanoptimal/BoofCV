@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
@@ -99,7 +99,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 	public void setCalibration( StereoParameters parameters ) {
 		stereo.setCalibration(parameters);
 
-		CameraPinholeRadial l = parameters.left;
+		CameraPinholeBrown l = parameters.left;
 
 		Point2Transform2_F64 leftPixelToNorm = narrow(l).undistort_F64(true, false);
 		Point2Transform2_F64 leftNormToPixel = narrow(l).distort_F64(false, true);

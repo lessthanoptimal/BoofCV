@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
@@ -53,7 +53,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<CameraPinholeRadial> {
+public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<CameraPinholeBrown> {
 
 	// which image is being displayed
 	int selectedImage;
@@ -244,7 +244,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 	}
 
 	@Override
-	public void setCalibration (CameraPinholeRadial param  ) {
+	public void setCalibration (CameraPinholeBrown param  ) {
 		CameraPinhole undistorted = new CameraPinhole(param);
 		this.undoRadial = LensDistortionOps.changeCameraModel(
 				AdjustmentType.FULL_VIEW, BorderType.ZERO, param, undistorted,null, ImageType.single(GrayF32.class));
@@ -253,7 +253,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 		undoRadialDistortion(distorted);
 	}
 
-	public void setCalibration (CameraPinholeRadial param , DMatrixRMaj rect ) {
+	public void setCalibration (CameraPinholeBrown param , DMatrixRMaj rect ) {
 		FMatrixRMaj rect_f32 = new FMatrixRMaj(3,3);
 		ConvertMatrixData.convert(rect,rect_f32);
 

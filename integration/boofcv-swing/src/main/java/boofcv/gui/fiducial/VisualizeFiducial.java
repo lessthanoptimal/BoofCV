@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.gui.fiducial;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -40,7 +40,7 @@ public class VisualizeFiducial {
 	 * Draws a flat cube to show where the square fiducial is on the image
 	 *
 	 */
-	public static void drawLabelCenter(Se3_F64 targetToCamera, CameraPinholeRadial intrinsic, String label,
+	public static void drawLabelCenter(Se3_F64 targetToCamera, CameraPinholeBrown intrinsic, String label,
 									   Graphics2D g2 , double scale)
 	{
 		// Computer the center of the fiducial in pixel coordinates
@@ -52,7 +52,7 @@ public class VisualizeFiducial {
 		drawLabel(p,label,g2,scale);
 	}
 
-	public static void drawLabelCenter(Se3_F64 targetToCamera, CameraPinholeRadial intrinsic, String label,
+	public static void drawLabelCenter(Se3_F64 targetToCamera, CameraPinholeBrown intrinsic, String label,
 									   Graphics2D g2 )
 	{
 		drawLabelCenter(targetToCamera, intrinsic, label, g2, 1);
@@ -73,7 +73,7 @@ public class VisualizeFiducial {
 		g2.drawString(label,(float)(scale*locationPixel.x-r.getWidth()/2),(float)(scale*locationPixel.y+r.getHeight()/2));
 	}
 
-	public static void drawCube(Se3_F64 targetToCamera, CameraPinholeRadial intrinsic, double width,
+	public static void drawCube(Se3_F64 targetToCamera, CameraPinholeBrown intrinsic, double width,
 								int lineThickness, Graphics2D g2)
 	{
 		drawCube(targetToCamera, intrinsic, width, 0.5, lineThickness, g2,1);
@@ -83,7 +83,7 @@ public class VisualizeFiducial {
 	 * Draws a flat cube to show where the square fiducial is on the image
 	 *
 	 */
-	public static void drawCube(Se3_F64 targetToCamera, CameraPinholeRadial intrinsic, double width,
+	public static void drawCube(Se3_F64 targetToCamera, CameraPinholeBrown intrinsic, double width,
 								double heightScale, int lineThickness, Graphics2D g2, double scale)
 	{
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);

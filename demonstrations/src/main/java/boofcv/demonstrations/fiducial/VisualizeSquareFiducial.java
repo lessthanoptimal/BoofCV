@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
@@ -66,14 +66,14 @@ public class VisualizeSquareFiducial {
 
 	public void process( String nameImage , String nameIntrinsic ) {
 
-		CameraPinholeRadial intrinsic = nameIntrinsic == null ? null : (CameraPinholeRadial) CalibrationIO.load(nameIntrinsic);
+		CameraPinholeBrown intrinsic = nameIntrinsic == null ? null : (CameraPinholeBrown) CalibrationIO.load(nameIntrinsic);
 		GrayF32 input = UtilImageIO.loadImage(nameImage, GrayF32.class);
 		GrayF32 undistorted = new GrayF32(input.width,input.height);
 
 		Detector detector = new Detector();
 
 		if( intrinsic != null ) {
-			CameraPinholeRadial paramUndist = new CameraPinholeRadial();
+			CameraPinholeBrown paramUndist = new CameraPinholeBrown();
 			ImageDistort<GrayF32, GrayF32> undistorter = LensDistortionOps.changeCameraModel(
 					AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, new CameraPinhole(intrinsic), paramUndist,
 					ImageType.single(GrayF32.class));

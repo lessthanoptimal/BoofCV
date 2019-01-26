@@ -13,6 +13,7 @@ Version : 0.33
   * TODO Added support for quaternions
 - Fixed Rodrigues Jacobian for zero rotation
 - Camera Calibration
+  * Renamed radial-tangential model to Brown for consistency and brevity
   * TODO switch optimization over to bundle adjustment
 - Self Calibration
   * TODO Weighted iterated DIAC
