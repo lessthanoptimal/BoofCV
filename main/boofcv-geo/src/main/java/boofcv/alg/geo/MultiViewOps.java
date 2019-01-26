@@ -21,7 +21,7 @@ package boofcv.alg.geo;
 import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
+import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
 import boofcv.alg.geo.bundle.cameras.BundlePinhole;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
@@ -1665,9 +1665,9 @@ public class MultiViewOps {
 		TriangulateNViewsMetric triangulation = FactoryMultiView.
 				triangulateNViewCalibrated(ConfigTriangulation.GEOMETRIC);
 
-		List<RemoveRadialPtoN_F64> list_p_to_n = new ArrayList<>();
+		List<RemoveBrownPtoN_F64> list_p_to_n = new ArrayList<>();
 		for (int i = 0; i < structure.cameras.length; i++) {
-			RemoveRadialPtoN_F64 p2n = new RemoveRadialPtoN_F64();
+			RemoveBrownPtoN_F64 p2n = new RemoveBrownPtoN_F64();
 			if( structure.cameras[i].model instanceof BundlePinholeSimplified ) {
 				BundlePinholeSimplified cam = (BundlePinholeSimplified) structure.cameras[i].model;
 				p2n.setK(cam.f, cam.f, 0, 0, 0).setDistortion(new double[]{cam.k1, cam.k2}, 0, 0);

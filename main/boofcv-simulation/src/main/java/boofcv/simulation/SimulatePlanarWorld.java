@@ -22,8 +22,8 @@ import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.LensDistortionWideFOV;
 import boofcv.alg.distort.NarrowPixelToSphere_F64;
 import boofcv.alg.distort.SphereToNarrowPixel_F64;
+import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
-import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
@@ -93,7 +93,7 @@ public class SimulatePlanarWorld {
 	}
 
 	public void setCamera( CameraPinholeBrown model ) {
-		LensDistortionNarrowFOV factory = new LensDistortionRadialTangential(model);
+		LensDistortionNarrowFOV factory = new LensDistortionBrown(model);
 		setCamera( factory, model.width, model.height );
 	}
 

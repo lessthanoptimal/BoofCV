@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort.universal;
 
-import boofcv.alg.distort.radtan.RadialTangential_F64;
+import boofcv.alg.distort.brown.RadialTangential_F64;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.Point3Transform2_F64;
 import georegression.struct.point.Point2D_F64;
@@ -83,11 +83,11 @@ public class UniOmniStoP_F64 implements Point3Transform2_F64 {
 		}
 
 		// compute distorted normalized image coordinates
-		x = x*( 1.0 + sum) + 2.0*t1*x*y + t2*(r2 + 2.0*x*x);
-		y = y*( 1.0 + sum) + t1*(r2 + 2.0*y*y) + 2.0*t2*x*y;
+		double dx = x*(1.0 + sum) + 2.0*t1*x*y + t2*(r2 + 2.0*x*x);
+		double dy = y*(1.0 + sum) + t1*(r2 + 2.0*y*y) + 2.0*t2*x*y;
 
 		// project into pixels
-		out.x = fx * x + skew * y + cx;
-		out.y = fy * y + cy;
+		out.x = fx*dx + skew*dy + cx;
+		out.y = fy*dy + cy;
 	}
 }

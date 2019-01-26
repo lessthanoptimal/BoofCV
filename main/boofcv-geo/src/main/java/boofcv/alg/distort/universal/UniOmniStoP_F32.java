@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort.universal;
 
-import boofcv.alg.distort.radtan.RadialTangential_F32;
+import boofcv.alg.distort.brown.RadialTangential_F32;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.Point3Transform2_F32;
 import georegression.struct.point.Point2D_F32;
@@ -83,14 +83,11 @@ public class UniOmniStoP_F32 implements Point3Transform2_F32 {
 		}
 
 		// compute distorted normalized image coordinates
-		x = x*( 1.0f + sum);
-		y = y*( 1.0f + sum);
-
-		x += 2.0f*t1*x*y + t2*(r2 + 2.0f*x*x);
-		y += t1*(r2 + 2.0f*y*y) + 2.0f*t2*x*y;
+		float dx = x*(1.0f + sum) + 2.0f*t1*x*y + t2*(r2 + 2.0f*x*x);
+		float dy = y*(1.0f + sum) + t1*(r2 + 2.0f*y*y) + 2.0f*t2*x*y;
 
 		// project into pixels
-		out.x = fx * x + skew * y + cx;
-		out.y = fy * y + cy;
+		out.x = fx*dx + skew*dy + cx;
+		out.y = fy*dy + cy;
 	}
 }

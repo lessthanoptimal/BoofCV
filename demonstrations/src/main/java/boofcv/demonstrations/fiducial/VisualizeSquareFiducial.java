@@ -22,7 +22,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
 import boofcv.alg.fiducial.square.FoundFiducial;
 import boofcv.core.image.border.BorderType;
@@ -78,7 +78,7 @@ public class VisualizeSquareFiducial {
 					AdjustmentType.EXPAND, BorderType.EXTENDED, intrinsic, new CameraPinhole(intrinsic), paramUndist,
 					ImageType.single(GrayF32.class));
 
-			detector.configure(new LensDistortionRadialTangential(paramUndist),
+			detector.configure(new LensDistortionBrown(paramUndist),
 					paramUndist.width, paramUndist.height, false);
 			undistorter.apply(input,undistorted);
 		} else {

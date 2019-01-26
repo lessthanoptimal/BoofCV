@@ -21,7 +21,7 @@ package boofcv.alg.geo.bundle;
 import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.alg.geo.bundle.jacobians.JacobianSo3Rodrigues_F64;
+import boofcv.alg.geo.bundle.jacobians.JacobianSo3Rodrigues;
 import boofcv.alg.geo.bundle.jacobians.JacobianSo3_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
@@ -57,7 +57,7 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 	private int lengthPoint;
 
 	// used to compute the Jacobian of a rotation matrix
-	private JacobianSo3_F64 jacSO3 = new JacobianSo3Rodrigues_F64();
+	private JacobianSo3_F64 jacSO3 = new JacobianSo3Rodrigues();
 	private Se3_F64 worldToView = new Se3_F64();
 
 	// jacobians for rigid objects
@@ -131,7 +131,7 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 		rigidParameterIndexes = new int[ jacRigidS03.length ];
 		for (int i = 0, index = 0; i < jacRigidS03.length; i++) {
 			rigidParameterIndexes[i] = index;
-			jacRigidS03[i] = new JacobianSo3Rodrigues_F64();
+			jacRigidS03[i] = new JacobianSo3Rodrigues();
 			if(!structure.rigids[i].known ) {
 				index += lengthSE3;
 			}

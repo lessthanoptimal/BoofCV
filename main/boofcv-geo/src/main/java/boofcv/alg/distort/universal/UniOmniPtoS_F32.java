@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort.universal;
 
-import boofcv.alg.distort.radtan.RadialTangential_F32;
+import boofcv.alg.distort.brown.RadialTangential_F32;
 import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.distort.Point2Transform3_F32;
 import georegression.geometry.GeometryMath_F32;
@@ -28,7 +28,7 @@ import georegression.struct.point.Point3D_F32;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_FDRM;
 
-import static boofcv.alg.distort.radtan.RemoveRadialNtoN_F32.removeRadial;
+import static boofcv.alg.distort.brown.RemoveBrownNtoN_F32.removeRadial;
 
 /**
  * Backwards project from a distorted 2D pixel to 3D unit sphere coordinate using the {@link CameraUniversalOmni} model.

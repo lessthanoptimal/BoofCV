@@ -21,7 +21,7 @@ package boofcv.examples.fiducial;
 import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.MousePauseHelper;
@@ -70,7 +70,7 @@ public class ExamplePoseOfCalibrationTarget {
 		// Load camera calibration
 		CameraPinholeBrown intrinsic =
 				CalibrationIO.load(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/intrinsic.yaml"));
-		LensDistortionNarrowFOV lensDistortion = new LensDistortionRadialTangential(intrinsic);
+		LensDistortionNarrowFOV lensDistortion = new LensDistortionBrown(intrinsic);
 
 		// load the video file
 		String fileName = UtilIO.pathExample("tracking/chessboard_SonyDSC_01.mjpeg");

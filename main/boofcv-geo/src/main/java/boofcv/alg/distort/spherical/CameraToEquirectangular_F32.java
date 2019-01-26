@@ -18,8 +18,8 @@
 
 package boofcv.alg.distort.spherical;
 
+import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
-import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -40,7 +40,7 @@ public class CameraToEquirectangular_F32
 {
 	public void setCameraModel( CameraPinholeBrown camera ) {
 		Point2Transform2_F32 pixelToNormalized =
-				new LensDistortionRadialTangential(camera).undistort_F32(true,false);
+				new LensDistortionBrown(camera).undistort_F32(true,false);
 		setCameraModel(camera.width,camera.height,pixelToNormalized);
 	}
 

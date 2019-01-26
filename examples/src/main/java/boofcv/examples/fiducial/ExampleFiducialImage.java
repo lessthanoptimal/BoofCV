@@ -20,7 +20,7 @@ package boofcv.examples.fiducial;
 
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
@@ -63,7 +63,7 @@ public class ExampleFiducialImage {
 
 		// load the lens distortion parameters and the input image
 		CameraPinholeBrown param = CalibrationIO.load(new File(imagePath, "intrinsic.yaml"));
-		LensDistortionNarrowFOV lensDistortion = new LensDistortionRadialTangential(param);
+		LensDistortionNarrowFOV lensDistortion = new LensDistortionBrown(param);
 		BufferedImage input = UtilImageIO.loadImage(imagePath, imageName);
 		GrayF32 original = ConvertBufferedImage.convertFrom(input, true, ImageType.single(GrayF32.class));
 

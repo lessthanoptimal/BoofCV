@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericChecksJacobianSo3_F64 {
+public abstract class GenericChecksJacobianSo3 {
 
 	abstract JacobianSo3_F64 createAlgorithm();
 
@@ -68,7 +68,7 @@ public abstract class GenericChecksJacobianSo3_F64 {
 			// the first time it will be no rotation. test this edgecase
 			if( i > 0 )
 				ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
-						rand.nextGaussian(),rand.nextGaussian(),rand.nextGaussian(),R);
+						(double)rand.nextGaussian(), (double)rand.nextGaussian(), (double)rand.nextGaussian(), R);
 			alg.getParameters(R,p,0);
 
 //			for (int j = 0; j < 3; j++) {
@@ -100,7 +100,7 @@ public abstract class GenericChecksJacobianSo3_F64 {
 		}
 
 		@Override
-		public void process(double[] input, double[] output) {
+		public void process( /**/double[] input, /**/double[] output) {
 			alg.setParameters(input,0);
 			DMatrixRMaj M = DMatrixRMaj.wrap(3,3,output);
 			M.set(alg.getRotationMatrix());
@@ -126,7 +126,7 @@ public abstract class GenericChecksJacobianSo3_F64 {
 		}
 
 		@Override
-		public void process(double[] input, DMatrixRMaj J) {
+		public void process( /**/double[] input, DMatrixRMaj J) {
 			alg.setParameters(input,0);
 
 			double output[] = J.data;
@@ -142,7 +142,7 @@ public abstract class GenericChecksJacobianSo3_F64 {
 		}
 
 		@Override
-		public DMatrixRMaj declareMatrixMxN() {
+		public /**/DMatrixRMaj declareMatrixMxN() {
 			return new DMatrixRMaj(getNumOfOutputsM(),getNumOfInputsN());
 		}
 	}

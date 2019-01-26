@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.radtan;
+package boofcv.alg.distort.brown;
 
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.point.Point2D_F64;
@@ -26,11 +26,11 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class AddRadialNtoN_F64 implements Point2Transform2_F64 {
+public class AddBrownNtoN_F64 implements Point2Transform2_F64 {
 
 	private RadialTangential_F64 params;
 
-	public AddRadialNtoN_F64() {
+	public AddBrownNtoN_F64() {
 	}
 
 	/**
@@ -38,7 +38,7 @@ public class AddRadialNtoN_F64 implements Point2Transform2_F64 {
 	 *
 	 * @param radial Radial distortion parameters
 	 */
-	public AddRadialNtoN_F64 setDistortion( /**/double[] radial, /**/double t1, /**/double t2) {
+	public AddBrownNtoN_F64 setDistortion( /**/double[] radial, /**/double t1, /**/double t2) {
 		params = new RadialTangential_F64(radial,t1,t2);
 		return this;
 	}
@@ -66,10 +66,7 @@ public class AddRadialNtoN_F64 implements Point2Transform2_F64 {
 			ri2 *= r2;
 		}
 
-		out.x = x*( 1 + sum);
-		out.y = y*( 1 + sum);
-
-		out.x += 2*t1*x*y + t2*(r2 + 2*x*x);
-		out.y += t1*(r2 + 2*y*y) + 2*t2*x*y;
+		out.x = x*(1 + sum) + 2*t1*x*y + t2*(r2 + 2*x*x);
+		out.y = y*(1 + sum) + t1*(r2 + 2*y*y) + 2*t2*x*y;
 	}
 }

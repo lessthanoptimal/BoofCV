@@ -22,7 +22,7 @@ import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
-import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.ConfigFiducialImage;
@@ -555,7 +555,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		ImagePanel gui = new ImagePanel();
 		gui.setPreferredSize(new Dimension(intrinsic.width,intrinsic.height));
 		ShowImages.showWindow(gui,"Fiducial Detector",true);
-		detector.setLensDistortion(new LensDistortionRadialTangential(intrinsic),intrinsic.width,intrinsic.height);
+		detector.setLensDistortion(new LensDistortionBrown(intrinsic),intrinsic.width,intrinsic.height);
 
 		if( sequence != null ) {
 			processStream(intrinsic,sequence,gui,pause);

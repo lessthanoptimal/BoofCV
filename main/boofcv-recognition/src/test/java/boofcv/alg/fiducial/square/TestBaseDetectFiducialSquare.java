@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.square;
 
-import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertImage;
@@ -86,7 +86,7 @@ public class TestBaseDetectFiducialSquare {
 
 		DetectCorner detector = new DetectCorner();
 		if( applyLens )
-			detector.configure(new LensDistortionRadialTangential(intrinsic),width,height,false);
+			detector.configure(new LensDistortionBrown(intrinsic),width,height,false);
 		detector.process(grayU8);
 		assertEquals(1,detector.getFound().size);
 	}

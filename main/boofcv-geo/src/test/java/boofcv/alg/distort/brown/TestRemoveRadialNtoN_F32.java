@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.radtan;
+package boofcv.alg.distort.brown;
 
 import georegression.misc.GrlConstants;
-import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,36 +27,36 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestRemoveRadialNtoN_F64 {
+public class TestRemoveRadialNtoN_F32 {
 
 	@Test
 	public void checkManual() {
 		checkManual(0, 0);
-		checkManual(0.1, -0.05);
+		checkManual(0.1f, -0.05f);
 	}
 
-	public void checkManual(double t1, double t2) {
+	public void checkManual(float t1, float t2) {
 
 		/**/double radial[]= new /**/double[]{0.12,-0.13};
 
 		// undisorted normalized image coordinate
-		Point2D_F64 undistorted = new Point2D_F64(0.1,-0.2);
+		Point2D_F32 undistorted = new Point2D_F32(0.1f,-0.2f);
 
 		// manually compute the distortion
-		double x = undistorted.x, y = undistorted.y;
-		double r2 = x*x + y*y;
-		double mag = (double)radial[0]*r2 + (double)radial[1]*r2*r2;
+		float x = undistorted.x, y = undistorted.y;
+		float r2 = x*x + y*y;
+		float mag = (float)radial[0]*r2 + (float)radial[1]*r2*r2;
 
 		// distorted normalized image coordinate
-		double distX = undistorted.x*(1+mag) + 2*t1*x*y + t2*(r2 + 2*x*x);
-		double distY = undistorted.y*(1+mag) + t1*(r2 + 2*y*y) + 2*t2*x*y;
+		float distX = undistorted.x*(1+mag) + 2*t1*x*y + t2*(r2 + 2*x*x);
+		float distY = undistorted.y*(1+mag) + t1*(r2 + 2*y*y) + 2*t2*x*y;
 
-		RemoveRadialNtoN_F64 alg = new RemoveRadialNtoN_F64().setDistortion(radial,t1,t2);
+		RemoveBrownNtoN_F32 alg = new RemoveBrownNtoN_F32().setDistortion(radial,t1,t2);
 
-		Point2D_F64 found = new Point2D_F64();
+		Point2D_F32 found = new Point2D_F32();
 		alg.compute(distX, distY, found);
 
-		assertEquals(undistorted.x,found.x, GrlConstants.TEST_SQ_F64);
-		assertEquals(undistorted.y,found.y, GrlConstants.TEST_SQ_F64);
+		assertEquals(undistorted.x,found.x, GrlConstants.TEST_SQ_F32);
+		assertEquals(undistorted.y,found.y, GrlConstants.TEST_SQ_F32);
 	}
 }

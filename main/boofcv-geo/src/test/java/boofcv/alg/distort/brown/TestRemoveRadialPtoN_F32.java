@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.radtan;
+package boofcv.alg.distort.brown;
 
 import boofcv.alg.distort.Transform2ThenPixel_F32;
 import boofcv.alg.geo.PerspectiveOps;
@@ -53,13 +53,13 @@ public class TestRemoveRadialPtoN_F32 {
 		float undistX = 19.5f;
 		float undistY = 200.1f;
 
-		AddRadialPtoN_F32 p_to_n = new AddRadialPtoN_F32().setK(fx, fy, skew, xc, yc).setDistortion(radial,t1,t2);
+		AddBrownPtoN_F32 p_to_n = new AddBrownPtoN_F32().setK(fx, fy, skew, xc, yc).setDistortion(radial,t1,t2);
 		new Transform2ThenPixel_F32(p_to_n).set(fx, fy, skew, xc, yc).compute(undistX, undistY, point);
 
 		float distX = point.x;
 		float distY = point.y;
 
-		RemoveRadialPtoN_F32 alg = new RemoveRadialPtoN_F32().setK(fx,fy,skew,xc,yc).setDistortion(radial,t1,t2);
+		RemoveBrownPtoN_F32 alg = new RemoveBrownPtoN_F32().setK(fx,fy,skew,xc,yc).setDistortion(radial,t1,t2);
 
 		alg.compute(distX, distY, point);
 

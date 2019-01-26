@@ -19,7 +19,6 @@
 package boofcv.alg.geo.bundle.cameras;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
-import boofcv.alg.distort.universal.UniOmniStoP_F64;
 import boofcv.struct.calib.CameraUniversalOmni;
 import georegression.struct.point.Point2D_F64;
 
@@ -32,23 +31,33 @@ import javax.annotation.Nullable;
  * @author Peter Abeles
  */
 public class BundleUniversalOmni implements BundleAdjustmentCamera {
-	public CameraUniversalOmni intrinsic;
+
+	/** focal length along x and y axis (units: pixels) */
+	public double fx,fy;
+	/** skew parameter, typically 0 (units: pixels)*/
+	public double skew;
+	/** image center (units: pixels) */
+	public double cx,cy;
+	/** Mirror offset distance. &xi; */
+	public double mirrorOffset;
+	/** radial distortion parameters: k<sub>1</sub>,...,k<sub>n</sub> */
+	public double radial[];
+	/** tangential distortion parameters */
+	public double t1, t2;
 
 	// forces skew to be zero
 	public boolean assumeZeroSkew;
 	// should it estimate the tangential terms?
-	public boolean includeTangential;
+	public boolean tangential;
 	// the mirror parameter will not be changed during optimization
 	public boolean fixedMirror;
-
-	UniOmniStoP_F64 sphereToPixel = new UniOmniStoP_F64();
 
 	public BundleUniversalOmni(boolean assumeZeroSkew,
 							   int numRadial, boolean includeTangential, boolean fixedMirror)
 	{
-		this.intrinsic = new CameraUniversalOmni(numRadial);
+		this.radial = new double[numRadial];
 		this.assumeZeroSkew = assumeZeroSkew;
-		this.includeTangential = includeTangential;
+		this.tangential = includeTangential;
 		this.fixedMirror = fixedMirror;
 	}
 
@@ -56,62 +65,78 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 							   int numRadial, boolean includeTangential, double mirrorOffset)
 	{
 		this(assumeZeroSkew,numRadial,includeTangential,true);
-		this.intrinsic.mirrorOffset = mirrorOffset;
+		this.mirrorOffset = mirrorOffset;
+	}
+
+	public BundleUniversalOmni(CameraUniversalOmni intrinsic ) {
+		if( intrinsic.radial == null )
+			radial = new double[0];
+		else
+			radial = intrinsic.radial.clone();
+
+		assumeZeroSkew = intrinsic.skew == 0;
+		fx = intrinsic.fx;
+		fy = intrinsic.fy;
+		cx = intrinsic.cx;
+		cy = intrinsic.cy;
+		if( intrinsic.t1 != 0 || intrinsic.t2 != 0 ) {
+			t1 = intrinsic.t1;
+			t2 = intrinsic.t2;
+		} else {
+			tangential = false;
+		}
+		skew = intrinsic.skew;
+		mirrorOffset = intrinsic.mirrorOffset;
 	}
 
 	@Override
 	public void setIntrinsic(double[] parameters, int offset) {
-		intrinsic.fx = parameters[offset++];
-		intrinsic.fy = parameters[offset++];
-		if( !assumeZeroSkew )
-			intrinsic.skew = parameters[offset++];
-		else
-			intrinsic.skew = 0;
-		intrinsic.cx = parameters[offset++];
-		intrinsic.cy = parameters[offset++];
-		for (int i = 0; i < intrinsic.radial.length; i++) {
-			intrinsic.radial[i]=parameters[offset++];
+		fx = parameters[offset++];
+		fy = parameters[offset++];
+		cx = parameters[offset++];
+		cy = parameters[offset++];
+		for (int i = 0; i < radial.length; i++) {
+			radial[i]=parameters[offset++];
 		}
-		if( includeTangential ) {
-			intrinsic.t1 = parameters[offset++];
-			intrinsic.t2 = parameters[offset++];
+		if(tangential) {
+			t1 = parameters[offset++];
+			t2 = parameters[offset++];
 		} else {
-			intrinsic.t1 = 0;
-			intrinsic.t2 = 0;
+			t1 = 0;
+			t2 = 0;
 		}
+		if( !assumeZeroSkew )
+			skew = parameters[offset++];
+		else
+			skew = 0;
 		if( !fixedMirror )
-			intrinsic.mirrorOffset = parameters[offset++];
-
-		sphereToPixel.setModel(intrinsic);
+			mirrorOffset = parameters[offset];
 	}
 
 	@Override
 	public void getIntrinsic(double[] parameters, int offset) {
-		parameters[offset++] = intrinsic.fx;
-		parameters[offset++] = intrinsic.fy;
+		parameters[offset++] = fx;
+		parameters[offset++] = fy;
+		parameters[offset++] = cx;
+		parameters[offset++] = cy;
+		for (int i = 0; i < radial.length; i++) {
+			parameters[offset++] = radial[i];
+		}
+		if(tangential) {
+			parameters[offset++] = t1;
+			parameters[offset++] = t2;
+		}
 		if( !assumeZeroSkew )
-			parameters[offset++] = intrinsic.skew;
-		parameters[offset++] = intrinsic.cx;
-		parameters[offset++] = intrinsic.cy;
-		for (int i = 0; i < intrinsic.radial.length; i++) {
-			parameters[offset++] = intrinsic.radial[i];
-		}
-		if( includeTangential ) {
-			parameters[offset++] = intrinsic.t1;
-			parameters[offset++] = intrinsic.t2;
-		}
+			parameters[offset++] = skew;
 		if( !fixedMirror )
-			parameters[offset++] = intrinsic.mirrorOffset;
+			parameters[offset] = mirrorOffset;
 	}
 
 	@Override
 	public void project(double x, double y, double z, Point2D_F64 output) {
-		double[] radial = intrinsic.radial;
-		double t1 = intrinsic.t1;
-		double t2 = intrinsic.t2;
 
 		// apply mirror offset
-		z += intrinsic.mirrorOffset;
+		z += mirrorOffset;
 
 		// compute normalized image coordinates
 		x /= z;
@@ -127,27 +152,160 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 		}
 
 		// compute distorted normalized image coordinates
-		x = x*( 1.0 + sum) + 2.0*t1*x*y + t2*(r2 + 2.0*x*x);
-		y = y*( 1.0 + sum) + t1*(r2 + 2.0*y*y) + 2.0*t2*x*y;
+		double dx = x*( 1.0 + sum) + 2.0*t1*x*y + t2*(r2 + 2.0*x*x);
+		double dy = y*( 1.0 + sum) + t1*(r2 + 2.0*y*y) + 2.0*t2*x*y;
 
 		// project into pixels
-		output.x = intrinsic.fx * x + intrinsic.skew * y + intrinsic.cx;
-		output.y = intrinsic.fy * y + intrinsic.cy;
+		output.x = fx * dx + skew * dy + cx;
+		output.y = fy * dy + cy;
 	}
 
 	@Override
 	public void jacobian(double camX, double camY, double camZ,
-						 @Nonnull double[] pointX, @Nonnull double[] pointY,
+						 @Nonnull double[] inputX, @Nonnull double[] inputY,
 						 boolean computeIntrinsic,
 						 @Nullable double[] calibX, @Nullable double[] calibY)
 	{
+		double Z = camZ + mirrorOffset;
 
+		double nx = camX/Z;
+		double ny = camY/Z;
+
+		// Apply radial distortion
+		double sum = 0;
+		double sumdot = 0;
+
+		double r2 = nx*nx + ny*ny;
+		double r2i = r2;
+		double rdev = 1;
+
+		for( int i = 0; i < radial.length; i++ ) {
+			sum += radial[i]*r2i;
+			sumdot += radial[i]*(i+1)*rdev;
+
+			r2i *= r2;
+			rdev *= r2;
+		}
+
+		// X
+		double xdot = sumdot*2*nx*nx/Z + (1+sum)/Z;
+		double ydot = sumdot*2*nx*ny/Z;
+		if( tangential ) {
+			xdot += (2*t1*ny + t2*6*nx) / Z;
+			ydot += (2*t1*nx + 2*ny*t2) / Z;
+		}
+		inputX[0] = fx*xdot + skew*ydot;
+		inputY[0] = fy*ydot;
+
+		// Y
+		xdot = sumdot*2*ny*nx/Z;
+		ydot = sumdot*2*ny*ny/Z + (1 + sum)/Z;
+		if( tangential ) {
+			xdot += (2*t1*nx + t2*2*ny) / Z;
+			ydot += (6*t1*ny + 2*nx*t2) / Z;
+		}
+		inputX[1] = fx*xdot + skew*ydot;
+		inputY[1] = fy*ydot;
+
+		// Z
+		xdot = -sumdot*2*r2*nx/Z;
+		ydot = -sumdot*2*r2*ny/Z;
+
+		xdot += -(1 + sum)*nx/Z;
+		ydot += -(1 + sum)*ny/Z;
+
+		if( tangential ) {
+			xdot += -(4*t1*nx*ny + 6*t2*nx*nx + 2*t2*ny*ny)/Z;
+			ydot += -(2*t1*nx*nx + 6*t1*ny*ny + 4*nx*ny*t2)/Z;
+		}
+		inputX[2] = fx*xdot + skew*ydot;
+		inputY[2] = fy*ydot;
+
+		if( !computeIntrinsic )
+			return;
+
+		// compute distorted normalized image coordinates
+		double dx = nx + nx*sum + (tangential? 2*t1*nx*ny + t2*(r2 + 2*nx*nx) : 0);
+		double dy = ny + ny*sum + (tangential? t1*(r2 + 2*ny*ny) + 2*t2*ny*ny : 0);
+
+		jacobianIntrinsic(calibX,calibY,Z,nx,ny,dx,dy);
+	}
+
+	/**
+	 *
+	 * @param calibX storage for calibration jacobian
+	 * @param calibY storage for calibration jacobian
+	 * @param nx undistorted normalized image coordinates
+	 * @param ny undistorted normalized image coordinates
+	 * @param dnx distorted normalized image coordinates
+	 * @param dny distorted normalized image coordinates
+	 */
+	private void jacobianIntrinsic(double[] calibX, double[] calibY,
+								   double Z ,
+								   double nx, double ny,
+								   double dnx, double dny) {
+		// Intrinsic parameters
+		int index = 0;
+		calibX[index  ] = dnx; calibY[index++] = 0;   // fx
+		calibX[index  ] = 0;   calibY[index++] = dny; // fy
+		calibX[index  ] = 1;   calibY[index++] = 0;   // cx
+		calibX[index  ] = 0;   calibY[index++] = 1;   // cy
+
+		// Radial
+		double r2 = nx*nx + ny*ny;
+		double r2i = r2;
+		for( int i = 0; i < radial.length; i++ ) {
+			double xdot = nx*r2i;
+			double ydot = ny*r2i;
+
+			calibX[index  ] = fx*xdot + skew*ydot;
+			calibY[index++] = fy*ydot;
+			r2i *= r2;
+		}
+
+		// Tangential
+		if( tangential ) {
+			double xy2 = 2.0*nx*ny;
+			double r2yy = r2 + 2*ny*ny;
+			double r2xx = r2 + 2*nx*nx;
+
+			calibX[index  ] = fx*xy2  + skew*r2yy;
+			calibY[index++] = fy*r2yy;
+
+			calibX[index  ] = fx*r2xx + skew*xy2;
+			calibY[index++] = fy*xy2;
+		}
+
+		if( !assumeZeroSkew ) {
+			calibX[index] = dny; calibY[index++] = 0;
+		}
+
+		if( !fixedMirror ) {
+			double ri2 = -2.0*r2/Z;
+
+			double sum = 0;
+			for( int i = 0; i < radial.length; i++ ) {
+				sum += radial[i]*ri2;
+				ri2 *= 2.0*r2;
+			}
+
+			double dx = -nx/Z + nx*sum;
+			double dy = -ny/Z + ny*sum;
+
+			if( tangential ) {
+				dx += -2*(2.0*t1*nx*ny + t2*(r2 + 2.0*nx*nx))/Z;
+				dy += -2*(t1*(r2 + 2.0*ny*ny) + 2.0*t2*nx*ny)/Z;
+			}
+
+			calibX[index] = fx * dx + skew * dy;
+			calibY[index] = fy * dy;
+		}
 	}
 
 	@Override
 	public int getIntrinsicCount() {
-		int totalIntrinsic = 5 + intrinsic.radial.length;
-		if( includeTangential )
+		int totalIntrinsic = 5 + radial.length;
+		if(tangential)
 			totalIntrinsic += 2;
 		if( !assumeZeroSkew )
 			totalIntrinsic += 1;

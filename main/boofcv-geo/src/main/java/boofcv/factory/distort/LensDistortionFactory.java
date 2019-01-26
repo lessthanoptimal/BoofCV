@@ -20,8 +20,8 @@ package boofcv.factory.distort;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.LensDistortionWideFOV;
+import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
-import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.struct.calib.CameraModel;
 import boofcv.struct.calib.CameraPinhole;
@@ -42,7 +42,7 @@ public class LensDistortionFactory {
 			CameraPinholeBrown c = (CameraPinholeBrown)param;
 
 			if (c.isDistorted())
-				return new LensDistortionRadialTangential(c);
+				return new LensDistortionBrown(c);
 			else
 				return new LensDistortionPinhole(c);
 		} else if( param instanceof CameraPinhole) {

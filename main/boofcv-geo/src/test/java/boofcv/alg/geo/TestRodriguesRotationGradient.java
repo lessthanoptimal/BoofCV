@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -109,7 +109,7 @@ public class TestRodriguesRotationGradient {
 
 		@Override
 		public void process(double[] input, DMatrixRMaj J) {
-			RodriguesRotationJacobian g = new RodriguesRotationJacobian();
+			RodriguesRotationJacobian_F64 g = new RodriguesRotationJacobian_F64();
 			
 			g.process(input[0],input[1],input[2]);
 

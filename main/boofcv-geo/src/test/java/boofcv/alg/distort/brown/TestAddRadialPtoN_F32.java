@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.radtan;
+package boofcv.alg.distort.brown;
 
-import georegression.geometry.GeometryMath_F64;
-import georegression.struct.point.Point2D_F64;
-import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
+import georegression.geometry.GeometryMath_F32;
+import georegression.struct.point.Point2D_F32;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.dense.row.CommonOps_FDRM;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,55 +29,55 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestAddRadialPtoN_F64 {
+public class TestAddRadialPtoN_F32 {
 	/**
 	 * Manually compute the distorted coordinate for a point and see if it matches
 	 */
 	@Test
 	public void againstManual() {
 		againstManual(0,0);
-		againstManual(-0.5,0.03);
+		againstManual(-0.5f,0.03f);
 	}
 
-	public void againstManual( double t1, double t2 ) {
-		double fx = 600;
-		double fy = 500;
-		double skew = 2;
-		double xc = 300;
-		double yc = 350;
+	public void againstManual( float t1, float t2 ) {
+		float fx = 600;
+		float fy = 500;
+		float skew = 2;
+		float xc = 300;
+		float yc = 350;
 
 		/**/double radial[]= new /**/double[]{0.01,-0.03};
 
-		Point2D_F64 orig = new Point2D_F64(19.5,400.1); // undistorted pixel coordinates
+		Point2D_F32 orig = new Point2D_F32(19.5f,400.1f); // undistorted pixel coordinates
 
-		Point2D_F64 normPt = new Point2D_F64();
+		Point2D_F32 normPt = new Point2D_F32();
 
-		DMatrixRMaj K = new DMatrixRMaj(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
-		DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.invert(K, K_inv);
+		FMatrixRMaj K = new FMatrixRMaj(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
+		FMatrixRMaj K_inv = new FMatrixRMaj(3,3);
+		CommonOps_FDRM.invert(K, K_inv);
 
 		// compute normalized image coordinate
-		GeometryMath_F64.mult(K_inv, orig, normPt);
+		GeometryMath_F32.mult(K_inv, orig, normPt);
 
-		double nx = normPt.x; // undistorted normalized image coordinates
-		double ny = normPt.y;
+		float nx = normPt.x; // undistorted normalized image coordinates
+		float ny = normPt.y;
 
-		double r2 = nx*nx + ny*ny;
-		double ri2 = 1;
-		double sum = 0;
+		float r2 = nx*nx + ny*ny;
+		float ri2 = 1;
+		float sum = 0;
 		for( int i = 0; i < radial.length; i++ ) {
 			ri2 *= r2;
 			sum += radial[i]*ri2;
 		}
 
 		// distorted normalized image coordinates
-		double dnx = nx + nx*sum + 2*t1*nx*ny + t2*(r2 + 2*nx*nx);
-		double dny = ny + ny*sum + t1*(r2 + 2*ny*ny) + 2*t2*nx*ny;
+		float dnx = nx + nx*sum + 2*t1*nx*ny + t2*(r2 + 2*nx*nx);
+		float dny = ny + ny*sum + t1*(r2 + 2*ny*ny) + 2*t2*nx*ny;
 
-		AddRadialPtoN_F64 alg = new AddRadialPtoN_F64().setK(fx, fy, skew, xc, yc).
+		AddBrownPtoN_F32 alg = new AddBrownPtoN_F32().setK(fx, fy, skew, xc, yc).
 				setDistortion(radial, t1, t2);
 
-		Point2D_F64 found = new Point2D_F64();
+		Point2D_F32 found = new Point2D_F32();
 
 		alg.compute(orig.x,orig.y,found);
 

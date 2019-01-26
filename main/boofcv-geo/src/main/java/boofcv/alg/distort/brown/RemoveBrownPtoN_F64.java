@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,20 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.radtan;
+package boofcv.alg.distort.brown;
 
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.misc.GrlConstants;
 import georegression.struct.point.Point2D_F64;
 
-import static boofcv.alg.distort.radtan.RemoveRadialNtoN_F64.removeRadial;
+import static boofcv.alg.distort.brown.RemoveBrownNtoN_F64.removeRadial;
 
 /**
  * Converts the observed distorted pixels into normalized image coordinates.
  *
  * @author Peter Abeles
  */
-public class RemoveRadialPtoN_F64 implements Point2Transform2_F64 {
+public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 
 	// principle point / image center
 	protected double cx, cy;
@@ -45,10 +45,10 @@ public class RemoveRadialPtoN_F64 implements Point2Transform2_F64 {
 
 	private double tol = GrlConstants.DCONV_TOL_A;
 
-	public RemoveRadialPtoN_F64() {
+	public RemoveBrownPtoN_F64() {
 	}
 
-	public RemoveRadialPtoN_F64( double tol ) {
+	public RemoveBrownPtoN_F64(double tol ) {
 		this.tol = tol;
 	}
 
@@ -65,7 +65,7 @@ public class RemoveRadialPtoN_F64 implements Point2Transform2_F64 {
 	 * @param cx camera center x-axis in pixels
 	 * @param cy center center y-axis in pixels
 	 */
-	public RemoveRadialPtoN_F64 setK( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
+	public RemoveBrownPtoN_F64 setK( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
 
 		this.fx = (double)fx;
 		this.fy = (double)fy;
@@ -83,7 +83,7 @@ public class RemoveRadialPtoN_F64 implements Point2Transform2_F64 {
 		return this;
 	}
 
-	public RemoveRadialPtoN_F64 setDistortion( /**/double[] radial, /**/double t1, /**/double t2 ) {
+	public RemoveBrownPtoN_F64 setDistortion( /**/double[] radial, /**/double t1, /**/double t2 ) {
 		params = new RadialTangential_F64(radial,t1,t2);
 		return this;
 	}

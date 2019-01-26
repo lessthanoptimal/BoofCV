@@ -19,8 +19,8 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
-import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -52,7 +52,7 @@ public class WorldToCameraToPixel {
 	 * @param worldToCamera transform from world to camera
 	 */
 	public void configure(CameraPinholeBrown intrinsic , Se3_F64 worldToCamera ) {
-		configure( new LensDistortionRadialTangential(intrinsic), worldToCamera);
+		configure( new LensDistortionBrown(intrinsic), worldToCamera);
 	}
 
 	public void configure(CameraPinhole intrinsic , Se3_F64 worldToCamera ) {

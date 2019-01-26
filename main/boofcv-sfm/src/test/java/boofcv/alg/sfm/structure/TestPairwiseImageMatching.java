@@ -21,7 +21,7 @@ package boofcv.alg.sfm.structure;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.factory.feature.associate.FactoryAssociation;
@@ -82,7 +82,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 	private PairwiseImageGraph computeGraphScenario0(MockDetector detector, PairwiseImageMatching alg) {
 		String cameraName = "camera";
 
-		Point2Transform2_F64 p2n = new LensDistortionRadialTangential(intrinsic).undistort_F64(true,false);
+		Point2Transform2_F64 p2n = new LensDistortionBrown(intrinsic).undistort_F64(true,false);
 		alg.addCamera( cameraName , p2n , intrinsic );
 
 		for (int i = 0; i < 5; i++) {
@@ -152,7 +152,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 
 		Map<String, Point2Transform2_F64> camerasPixelToNorm = new HashMap<>();
 
-		camerasPixelToNorm.put(cameraName, new LensDistortionRadialTangential(intrinsic).undistort_F64(true,false));
+		camerasPixelToNorm.put(cameraName, new LensDistortionBrown(intrinsic).undistort_F64(true,false));
 		alg.addCamera(cameraName,camerasPixelToNorm.get(cameraName),intrinsic);
 
 		// there will be two independent set of views in the graph

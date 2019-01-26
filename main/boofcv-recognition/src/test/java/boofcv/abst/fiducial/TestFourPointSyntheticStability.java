@@ -18,7 +18,7 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.struct.se.Se3_F64;
@@ -40,8 +40,8 @@ public class TestFourPointSyntheticStability {
 	 */
 	@Test
 	void basic() {
-		Point2Transform2_F64 p2n = new LensDistortionRadialTangential(intrinsic).undistort_F64(true,false);
-		Point2Transform2_F64 n2p = new LensDistortionRadialTangential(intrinsic).distort_F64(false,true);
+		Point2Transform2_F64 p2n = new LensDistortionBrown(intrinsic).undistort_F64(true,false);
+		Point2Transform2_F64 n2p = new LensDistortionBrown(intrinsic).distort_F64(false,true);
 
 		FourPointSyntheticStability alg = new FourPointSyntheticStability();
 

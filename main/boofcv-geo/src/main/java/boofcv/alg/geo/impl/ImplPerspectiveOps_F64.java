@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,7 +84,7 @@ public class ImplPerspectiveOps_F64 {
 	}
 
 	public static DMatrixRMaj pinholeToMatrix(CameraPinhole param , DMatrixRMaj K ) {
-		return pinholeToMatrix(param.fx,param.fy,param.skew,param.cx,param.cy,K);
+		return pinholeToMatrix( (double)param.fx, (double)param.fy, (double)param.skew, (double)param.cx, (double)param.cy,K);
 	}
 
 	public static DMatrix3x3 pinholeToMatrix(CameraPinhole param , DMatrix3x3 K ) {

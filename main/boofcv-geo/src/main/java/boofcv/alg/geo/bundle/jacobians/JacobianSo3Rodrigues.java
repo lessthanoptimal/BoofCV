@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.bundle.jacobians;
 
-import boofcv.alg.geo.RodriguesRotationJacobian;
+import boofcv.alg.geo.RodriguesRotationJacobian_F64;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.so.Rodrigues_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -27,12 +27,12 @@ import org.ejml.data.DMatrixRMaj;
  * Jacobian for 3-tuple encoded Rodrigues. The rotation magnitude is the F-norm of (X,Y,Z) and the axis of
  * rotation is the normalized X,Y,Z.
  *
- * @see RodriguesRotationJacobian
+ * @see RodriguesRotationJacobian_F64
  *
  * @author Peter Abeles
  */
-public class JacobianSo3Rodrigues_F64 implements JacobianSo3_F64 {
-	private RodriguesRotationJacobian jac = new RodriguesRotationJacobian();
+public class JacobianSo3Rodrigues implements JacobianSo3_F64 {
+	private RodriguesRotationJacobian_F64 jac = new RodriguesRotationJacobian_F64();
 
 	private Rodrigues_F64 rodrigues = new Rodrigues_F64();
 	private DMatrixRMaj R = new DMatrixRMaj(3,3);

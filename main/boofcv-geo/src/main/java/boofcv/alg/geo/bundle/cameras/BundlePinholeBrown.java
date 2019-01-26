@@ -122,16 +122,17 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 		}
 
 		// Apply distortion
+		double x,y;
 		if( tangential ) {
-			nx += nx * a + 2 * t1 * nx * ny + t2 * (r2 + 2 * nx * nx);
-			ny += ny * a + t1 * (r2 + 2 * ny * ny) + 2 * t2 * nx * ny;
+			x = nx*(1 + a) + 2*t1*nx*ny + t2*(r2 + 2*nx*nx);
+			y = ny*(1 + a) + t1*(r2 + 2*ny*ny) + 2*t2*nx*ny;
 		} else {
-			nx += nx * a;
-			ny += ny * a;
+			x = nx*(1 + a);
+			y = ny*(1 + a);
 		}
 		// Convert to pixels
-		output.x = fx*nx + skew*ny + cx;
-		output.y = fy*ny + cy;
+		output.x = fx*x + skew*y + cx;
+		output.y = fy*y + cy;
 	}
 
 	@Override

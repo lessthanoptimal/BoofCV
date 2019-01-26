@@ -18,7 +18,7 @@
 
 package boofcv.alg.depth;
 
-import boofcv.alg.distort.radtan.RemoveRadialPtoN_F64;
+import boofcv.alg.distort.brown.RemoveBrownPtoN_F64;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.FastQueueArray_I32;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -97,7 +97,7 @@ public class TestVisualDepthOps {
 	private Point3D_F64 compute( int x , int y , int distance ) {
 		Point2D_F64 n = new Point2D_F64();
 
-		RemoveRadialPtoN_F64 p2n = new RemoveRadialPtoN_F64();
+		RemoveBrownPtoN_F64 p2n = new RemoveBrownPtoN_F64();
 		p2n.setK(param.fx,param.fy,param.skew,param.cx,param.cy).setDistortion(param.radial,param.t1,param.t2);
 
 		p2n.compute(x,y,n);

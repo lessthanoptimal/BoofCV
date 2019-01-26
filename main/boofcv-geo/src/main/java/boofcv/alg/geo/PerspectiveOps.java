@@ -245,7 +245,7 @@ public class PerspectiveOps {
 	 */
 	public static FMatrixRMaj pinholeToMatrix(float fx, float fy, float skew,
 											  float xc, float yc) {
-		return ImplPerspectiveOps_F32.pinholeToMatrix(fx, fy, skew, xc, yc);
+		return ImplPerspectiveOps_F32.pinholeToMatrix(fx, fy, skew, xc, yc, null);
 	}
 
 	/**

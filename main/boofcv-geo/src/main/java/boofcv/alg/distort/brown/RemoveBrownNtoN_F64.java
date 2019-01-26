@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.radtan;
+package boofcv.alg.distort.brown;
 
 import boofcv.struct.distort.Point2Transform2_F64;
 import georegression.misc.GrlConstants;
@@ -27,17 +27,17 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class RemoveRadialNtoN_F64 implements Point2Transform2_F64 {
+public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
 
 	// distortion parameters
 	protected RadialTangential_F64 params;
 
 	private double tol = GrlConstants.DCONV_TOL_A;
 
-	public RemoveRadialNtoN_F64() {
+	public RemoveBrownNtoN_F64() {
 	}
 
-	public RemoveRadialNtoN_F64(double tol) {
+	public RemoveBrownNtoN_F64(double tol) {
 		this.tol = tol;
 	}
 
@@ -45,7 +45,7 @@ public class RemoveRadialNtoN_F64 implements Point2Transform2_F64 {
 		this.tol = tol;
 	}
 
-	public RemoveRadialNtoN_F64 setDistortion( /**/double[] radial, /**/double t1, /**/double t2 ) {
+	public RemoveBrownNtoN_F64 setDistortion( /**/double[] radial, /**/double t1, /**/double t2 ) {
 		params = new RadialTangential_F64(radial,t1,t2);
 		return this;
 	}

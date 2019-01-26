@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.pose;
 
-import boofcv.alg.geo.RodriguesRotationJacobian;
+import boofcv.alg.geo.RodriguesRotationJacobian_F64;
 import boofcv.struct.geo.Point2D3D;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -44,7 +44,7 @@ public class PnPJacobianRodrigues implements FunctionNtoMxN<DMatrixRMaj> {
 	private List<Point2D3D> observations;
 
 	// used to compute the Jacobian from Rodrigues coordinates
-	private RodriguesRotationJacobian rodJacobian = new RodriguesRotationJacobian();
+	private RodriguesRotationJacobian_F64 rodJacobian = new RodriguesRotationJacobian_F64();
 
 	// local variable which stores the predicted location of the feature in the camera frame
 	private Rodrigues_F64 rodrigues = new Rodrigues_F64();

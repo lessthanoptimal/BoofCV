@@ -16,22 +16,15 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.radtan;
-
-import boofcv.alg.distort.GeneralLensDistortionNarrowFOVChecks;
-import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.struct.calib.CameraPinholeBrown;
+package boofcv.alg.geo.bundle.jacobians;
 
 /**
  * @author Peter Abeles
  */
-public class TestLensDistortionRadialTangential extends GeneralLensDistortionNarrowFOVChecks
-{
-	@Override
-	public LensDistortionNarrowFOV create() {
-		CameraPinholeBrown param = new CameraPinholeBrown(500,550,0.001,400,450,1000,800).
-				fsetRadial(0.02, 0.005);
+public class TestJacobianSo3Rodrigues extends GenericChecksJacobianSo3 {
 
-		return new LensDistortionRadialTangential(param);
+	@Override
+	JacobianSo3_F64 createAlgorithm() {
+		return new JacobianSo3Rodrigues();
 	}
 }

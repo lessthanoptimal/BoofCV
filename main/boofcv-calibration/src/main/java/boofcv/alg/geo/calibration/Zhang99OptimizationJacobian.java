@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo.calibration;
 
-import boofcv.alg.geo.RodriguesRotationJacobian;
+import boofcv.alg.geo.RodriguesRotationJacobian_F64;
 import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
 import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -51,7 +51,7 @@ import java.util.List;
 public class Zhang99OptimizationJacobian implements FunctionNtoMxN<DMatrixRMaj> {
 
 	// used to compute the Jacobian from Rodrigues coordinates
-	RodriguesRotationJacobian rodJacobian = new RodriguesRotationJacobian();
+	RodriguesRotationJacobian_F64 rodJacobian = new RodriguesRotationJacobian_F64();
 
 	// local variable which stores the predicted location of the feature in the camera frame
 	Rodrigues_F64 rodrigues = new Rodrigues_F64();

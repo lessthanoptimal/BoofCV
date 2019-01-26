@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,26 +63,28 @@ public class ImplPerspectiveOps_F32 {
 		return adjustedParam;
 	}
 
-	public static FMatrixRMaj pinholeToMatrix(float fx, float fy, float skew,
-											  float xc, float yc) {
-		return new FMatrixRMaj(3,3,true,fx,skew,xc,0,fy,yc,0,0,1);
-	}
-
-	public static FMatrixRMaj pinholeToMatrix(CameraPinhole param , FMatrixRMaj K ) {
-
+	public static FMatrixRMaj pinholeToMatrix( float fx, float fy, float skew,
+											   float cx, float cy , FMatrixRMaj K ) {
 		if( K == null ) {
 			K = new FMatrixRMaj(3,3);
+		} else {
+			K.reshape(3,3);
 		}
+
 		CommonOps_FDRM.fill(K, 0);
 
-		K.data[0] = (float) param.fx;
-		K.data[1] = (float) param.skew;
-		K.data[2] = (float) param.cx;
-		K.data[4] = (float) param.fy;
-		K.data[5] = (float) param.cy;
+		K.data[0] = fx;
+		K.data[1] = skew;
+		K.data[2] = cx;
+		K.data[4] = fy;
+		K.data[5] = cy;
 		K.data[8] = 1;
 
 		return K;
+	}
+
+	public static FMatrixRMaj pinholeToMatrix(CameraPinhole param , FMatrixRMaj K ) {
+		return pinholeToMatrix( (float)param.fx, (float)param.fy, (float)param.skew, (float)param.cx, (float)param.cy,K);
 	}
 
 	public static FMatrix3x3 pinholeToMatrix(CameraPinhole param , FMatrix3x3 K ) {

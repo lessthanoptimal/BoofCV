@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial.square;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.distort.radtan.LensDistortionRadialTangential;
+import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -45,7 +45,7 @@ public class TestQuadPoseEstimator {
 	private static LensDistortionNarrowFOV createDistortion() {
 		CameraPinholeBrown intrinsic = new CameraPinholeBrown(500,550,0,400,300,800,600).fsetRadial(0.15,0.05);
 
-		return new LensDistortionRadialTangential(intrinsic);
+		return new LensDistortionBrown(intrinsic);
 	}
 
 	@Test

@@ -18,7 +18,7 @@
 
 package boofcv.alg.geo;
 
-import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
 
 /**
  * Computes the rotation matrix derivative for Rodrigues coordinates
@@ -27,13 +27,13 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
-public class RodriguesRotationJacobian {
+public class RodriguesRotationJacobian_F32 {
 	// partial for vector x component
-	public DMatrixRMaj Rx = new DMatrixRMaj(3,3);
+	public FMatrixRMaj Rx = new FMatrixRMaj(3,3);
 	// partial for vector x component
-	public DMatrixRMaj Ry = new DMatrixRMaj(3,3);
+	public FMatrixRMaj Ry = new FMatrixRMaj(3,3);
 	// partial for vector y component
-	public DMatrixRMaj Rz = new DMatrixRMaj(3,3);
+	public FMatrixRMaj Rz = new FMatrixRMaj(3,3);
 
 	/**
 	 * Computes the Rodrigues coordinate Jacobian
@@ -42,12 +42,12 @@ public class RodriguesRotationJacobian {
 	 * @param y y-component of Rodrigues parametrization.
 	 * @param z z-component of Rodrigues parametrization.
 	 */
-	public void process( double x , double y , double z ) {
+	public void process( float x , float y , float z ) {
 
-		double theta2 = x*x + y*y + z*z;
-		double theta = Math.sqrt(theta2);
-		double theta4 = theta2*theta2;
-		double theta3 = theta2*theta;
+		float theta2 = x*x + y*y + z*z;
+		float theta = (float)Math.sqrt(theta2);
+		float theta4 = theta2*theta2;
+		float theta3 = theta2*theta;
 
 		if( theta4 == 0 ) {
 			Rx.zero();Ry.zero();Rz.zero();
@@ -66,20 +66,20 @@ public class RodriguesRotationJacobian {
 			// theta = sqrt(x*x + y*y + z*z)
 			// Then the equations were further simplified by hand
 
-			double s = Math.sin(theta);
-			double c = Math.cos(theta);
-			double cm = c-1;
+			float s = (float)Math.sin(theta);
+			float c = (float)Math.cos(theta);
+			float cm = c-1;
 
-			double xxx = x*x*x*s/theta3 + 2*cm*x*x*x/theta4;
-			double xxy = x*x*y*s/theta3 + 2*cm*x*x*y/theta4;
-			double xxz = x*x*z*s/theta3 + 2*cm*x*x*z/theta4;
-			double xyy = x*y*y*s/theta3 + 2*cm*x*y*y/theta4;
-			double xyz = x*y*z*s/theta3 + 2*cm*x*y*z/theta4;
-			double xzz = x*z*z*s/theta3 + 2*cm*x*z*z/theta4;
-			double yyy = y*y*y*s/theta3 + 2*cm*y*y*y/theta4;
-			double yyz = y*y*z*s/theta3 + 2*cm*y*y*z/theta4;
-			double yzz = y*z*z*s/theta3 + 2*cm*y*z*z/theta4;
-			double zzz = z*z*z*s/theta3 + 2*cm*z*z*z/theta4;
+			float xxx = x*x*x*s/theta3 + 2*cm*x*x*x/theta4;
+			float xxy = x*x*y*s/theta3 + 2*cm*x*x*y/theta4;
+			float xxz = x*x*z*s/theta3 + 2*cm*x*x*z/theta4;
+			float xyy = x*y*y*s/theta3 + 2*cm*x*y*y/theta4;
+			float xyz = x*y*z*s/theta3 + 2*cm*x*y*z/theta4;
+			float xzz = x*z*z*s/theta3 + 2*cm*x*z*z/theta4;
+			float yyy = y*y*y*s/theta3 + 2*cm*y*y*y/theta4;
+			float yyz = y*y*z*s/theta3 + 2*cm*y*y*z/theta4;
+			float yzz = y*z*z*s/theta3 + 2*cm*y*z*z/theta4;
+			float zzz = z*z*z*s/theta3 + 2*cm*z*z*z/theta4;
 
 			Rx.data[0] = xxx - x*s/theta - 2*cm*x/theta2;
 			Rx.data[1] = xxy - x*z*c/theta2 + x*z*s/theta3 - cm*y/theta2;

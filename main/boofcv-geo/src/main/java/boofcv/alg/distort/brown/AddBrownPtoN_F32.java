@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,26 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.radtan;
+package boofcv.alg.distort.brown;
 
-import boofcv.struct.distort.Point2Transform2_F64;
-import georegression.struct.point.Point2D_F64;
+import boofcv.struct.distort.Point2Transform2_F32;
+import georegression.struct.point.Point2D_F32;
 
 /**
  * Given an undistorted pixel coordinate, compute the distorted normalized image coordinate.
  *
  * @author Peter Abeles
  */
-public class AddRadialPtoN_F64 implements Point2Transform2_F64 {
+public class AddBrownPtoN_F32 implements Point2Transform2_F32 {
 
 	// distortion parameters
-	protected RadialTangential_F64 params;
+	protected RadialTangential_F32 params;
 
 	// inverse of camera calibration matrix
 	// These are the upper triangular elements in a 3x3 matrix
-	private double a11,a12,a13,a22,a23;
+	private float a11,a12,a13,a22,a23;
 
-	public AddRadialPtoN_F64() {
+	public AddBrownPtoN_F32() {
 	}
 
 	/**
@@ -47,14 +47,14 @@ public class AddRadialPtoN_F64 implements Point2Transform2_F64 {
 	 * @param cx   camera center x-axis in pixels
 	 * @param cy   center center y-axis in pixels
 	 */
-	public AddRadialPtoN_F64 setK( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy) {
+	public AddBrownPtoN_F32 setK( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy) {
 
 		// analytic solution to matrix inverse
-		a11 = (double)(1.0/fx);
-		a12 = (double)(-skew/(fx*fy));
-		a13 = (double)((skew*cy - cx*fy)/(fx*fy));
-		a22 = (double)(1.0/fy);
-		a23 = (double)(-cy/fy);
+		a11 = (float)(1.0f/fx);
+		a12 = (float)(-skew/(fx*fy));
+		a13 = (float)((skew*cy - cx*fy)/(fx*fy));
+		a22 = (float)(1.0f/fy);
+		a23 = (float)(-cy/fy);
 
 		return this;
 	}
@@ -64,8 +64,8 @@ public class AddRadialPtoN_F64 implements Point2Transform2_F64 {
 	 *
 	 * @param radial Radial distortion parameters
 	 */
-	public AddRadialPtoN_F64 setDistortion( /**/double[] radial, /**/double t1, /**/double t2) {
-		params = new RadialTangential_F64(radial, t1, t2);
+	public AddBrownPtoN_F32 setDistortion( /**/double[] radial, /**/double t1, /**/double t2) {
+		params = new RadialTangential_F32(radial, t1, t2);
 		return this;
 	}
 
@@ -77,26 +77,26 @@ public class AddRadialPtoN_F64 implements Point2Transform2_F64 {
 	 * @param out Distorted pixel coordinate.
 	 */
 	@Override
-	public void compute(double x, double y, Point2D_F64 out) {
-		double sum = 0;
+	public void compute(float x, float y, Point2D_F32 out) {
+		float sum = 0;
 
-		double radial[] = params.radial;
-		double t1 = params.t1, t2 = params.t2;
+		float radial[] = params.radial;
+		float t1 = params.t1, t2 = params.t2;
 
 		// out is undistorted normalized image coordinate
 		out.x = a11*x + a12*y + a13;
 		out.y = a22*y + a23;
 
-		double r2 = out.x * out.x + out.y * out.y;
-		double ri2 = r2;
+		float r2 = out.x * out.x + out.y * out.y;
+		float ri2 = r2;
 
 		for (int i = 0; i < radial.length; i++) {
 			sum += radial[i] * ri2;
 			ri2 *= r2;
 		}
 
-		double tx = 2 * t1 * out.x * out.y + t2 * (r2 + 2 * out.x * out.x);
-		double ty = t1 * (r2 + 2 * out.y * out.y) + 2 * t2 * out.x * out.y;
+		float tx = 2 * t1 * out.x * out.y + t2 * (r2 + 2 * out.x * out.x);
+		float ty = t1 * (r2 + 2 * out.y * out.y) + 2 * t2 * out.x * out.y;
 
 		// now compute the distorted normalized image coordinate
 		out.x = out.x*(1 + sum) + tx;
