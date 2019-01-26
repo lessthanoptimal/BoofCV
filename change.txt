@@ -14,6 +14,7 @@ Version : 0.33
 - Fixed Rodrigues Jacobian for zero rotation
 - Camera Calibration
   * Renamed radial-tangential model to Brown for consistency and brevity
+  * Fixed type-o in Omni Universal math. Appears to have minimal affect and results.
   * TODO switch optimization over to bundle adjustment
 - Self Calibration
   * TODO Weighted iterated DIAC

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,11 +83,8 @@ public class UniOmniStoP_F64 implements Point3Transform2_F64 {
 		}
 
 		// compute distorted normalized image coordinates
-		x = x*( 1.0 + sum);
-		y = y*( 1.0 + sum);
-
-		x += 2.0*t1*x*y + t2*(r2 + 2.0*x*x);
-		y += t1*(r2 + 2.0*y*y) + 2.0*t2*x*y;
+		x = x*( 1.0 + sum) + 2.0*t1*x*y + t2*(r2 + 2.0*x*x);
+		y = y*( 1.0 + sum) + t1*(r2 + 2.0*y*y) + 2.0*t2*x*y;
 
 		// project into pixels
 		out.x = fx * x + skew * y + cx;

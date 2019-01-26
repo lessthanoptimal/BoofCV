@@ -127,11 +127,8 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 		}
 
 		// compute distorted normalized image coordinates
-		x = x*( 1.0 + sum );
-		y = y*( 1.0 + sum );
-
-		x += 2.0*t1*x*y + t2*(r2 + 2.0*x*x);
-		y += t1*(r2 + 2.0*y*y) + 2.0*t2*x*y;
+		x = x*( 1.0 + sum) + 2.0*t1*x*y + t2*(r2 + 2.0*x*x);
+		y = y*( 1.0 + sum) + t1*(r2 + 2.0*y*y) + 2.0*t2*x*y;
 
 		// project into pixels
 		output.x = intrinsic.fx * x + intrinsic.skew * y + intrinsic.cx;
