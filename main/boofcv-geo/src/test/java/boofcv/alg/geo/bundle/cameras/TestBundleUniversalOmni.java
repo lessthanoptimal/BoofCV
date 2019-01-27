@@ -34,10 +34,11 @@ public class TestBundleUniversalOmni {
 
 	@Test
 	void compareForward() {
-		CameraUniversalOmni cam = new CameraUniversalOmni(1);
+		CameraUniversalOmni cam = new CameraUniversalOmni(2);
 		cam.fx = 300;cam.fy = 200;
 		cam.cx = cam.cy = 400;
 		cam.radial[0] = 0.01;
+		cam.radial[1] = -0.02;
 		cam.skew = 0.001;
 		cam.t1 = 0.01;
 		cam.t2 = -0.01;
@@ -52,14 +53,16 @@ public class TestBundleUniversalOmni {
 		alg.project(X,Y,Z,found);
 
 		Point2D_F64 expected = new Point2D_F64();
-		n2p.compute(X,Y,Z, expected);
+		// convert to unit sphere
+		double n = Math.sqrt(X*X + Y*Y + Z*Z);
+		n2p.compute(X/n,Y/n,Z/n, expected);
 
 		assertTrue(found.distance(expected) < UtilEjml.TEST_F64 );
 	}
 
 	@Test
 	void withAllParameters() {
-		double[][]parameters = new double[][]{{300,200,400,400,0.01,0.02,-0.001,0.002,0.1,0.9},{400,600,1000,1000,0.01,0.02,-0.001,0.002,2,0.9}};
+		double[][]parameters = new double[][]{{300,200,400,400,0.01,0.015,-0.001,0.002,0.1,0.9},{400,600,1000,1000,0.01,0.015,-0.001,0.002,2,0.9}};
 		new GenericChecksBundleAdjustmentCamera(new BundleUniversalOmni(false,2,true,false),0.02){}
 				.setParameters(parameters)
 //				.setPrint(true)
@@ -68,7 +71,7 @@ public class TestBundleUniversalOmni {
 
 	@Test
 	void withFixedMirror() {
-		double[][]parameters = new double[][]{{300,200,400,400,0.01,0.02,-0.001,0.002,0.1},{400,600,1000,1000,0.01,0.02,-0.001,0.002,2}};
+		double[][]parameters = new double[][]{{300,200,400,400,0.01,0.015,-0.001,0.002,0.1},{400,600,1000,1000,0.01,0.015,-0.001,0.002,2}};
 		new GenericChecksBundleAdjustmentCamera(new BundleUniversalOmni(false,2,true,0.9),0.02){}
 				.setParameters(parameters)
 //				.setPrint(true)

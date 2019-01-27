@@ -52,9 +52,13 @@ public class Zhang99CameraUniversalOmni implements Zhang99Camera {
 	@Override
 	public BundleAdjustmentCamera initalizeCamera(DMatrixRMaj K, double[] radial) {
 		BundleUniversalOmni cam = new BundleUniversalOmni(assumeZeroSkew,numRadial,includeTangential,fixedMirror);
-		cam.mirrorOffset = mirror;
 		System.arraycopy(radial,0,cam.radial,0,radial.length);
 		cam.setK(K);
+		if( fixedMirror )
+			cam.mirrorOffset = mirror;
+		else
+			cam.mirrorOffset = 0; // paper recommends 1. Doesn't seem to make a difference
+		cam.t1 = cam.t2 = 0;
 		return cam;
 	}
 

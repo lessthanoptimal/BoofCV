@@ -21,6 +21,7 @@ package boofcv.alg.geo.bundle.cameras;
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.struct.calib.CameraUniversalOmni;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
 
 import javax.annotation.Nonnull;
@@ -52,6 +53,9 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 	public boolean tangential;
 	// the mirror parameter will not be changed during optimization
 	public boolean fixedMirror;
+
+	// Storage for unit spherical Jacobian
+	DMatrix3x3 jacSp = new DMatrix3x3();
 
 	public BundleUniversalOmni(boolean zeroSkew,
 							   int numRadial, boolean includeTangential, boolean fixedMirror)
@@ -166,12 +170,15 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 	@Override
 	public void project(double x, double y, double z, Point2D_F64 output) {
 
+		// requires spherical coordinates
+		double n = Math.sqrt(x*x + y*y + z*z);
+		x /= n; y /= n; z /= n;
+
 		// apply mirror offset
 		z += mirrorOffset;
 
 		// compute normalized image coordinates
-		x /= z;
-		y /= z;
+		x /= z; y /= z;
 
 		double r2 = x*x + y*y;
 		double ri2 = r2;
@@ -197,10 +204,27 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 						 boolean computeIntrinsic,
 						 @Nullable double[] calibX, @Nullable double[] calibY)
 	{
-		double Z = camZ + mirrorOffset;
+		// requires unit spherical coordinates
+		double n2 = camX*camX + camY*camY + camZ*camZ;
+		double n = Math.sqrt(n2);
+		double X = camX/n, Y = camY/n, Z = camZ/n;
 
-		double nx = camX/Z;
-		double ny = camY/Z;
+		// Compute unit spherical Jacobian
+		jacSp.a11 = -camX*X/n2 + 1.0/n;
+		jacSp.a12 = -camY*X/n2;
+		jacSp.a13 = -camZ*X/n2;
+		jacSp.a21 = -camX*Y/n2;
+		jacSp.a22 = -camY*Y/n2 + 1.0/n;
+		jacSp.a23 = -camZ*Y/n2;
+		jacSp.a31 = -camX*Z/n2;
+		jacSp.a32 = -camY*Z/n2;
+		jacSp.a33 = -camZ*Z/n2 + 1.0/n;
+
+		// compute Jacobian for the camera model given the unit spherical coordinates
+		Z += mirrorOffset;
+
+		double nx = X/Z;
+		double ny = Y/Z;
 
 		// Apply radial distortion
 		double sum = 0;
@@ -219,38 +243,46 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 		}
 
 		// X
-		double xdot = sumdot*2*nx*nx/Z + (1+sum)/Z;
-		double ydot = sumdot*2*nx*ny/Z;
+		double xdot_X = sumdot*2*nx*nx/Z + (1+sum)/Z;
+		double ydot_X = sumdot*2*nx*ny/Z;
 		if( tangential ) {
-			xdot += (2*t1*ny + t2*6*nx) / Z;
-			ydot += (2*t1*nx + 2*ny*t2) / Z;
+			xdot_X += (2*t1*ny + t2*6*nx) / Z;
+			ydot_X += (2*t1*nx + 2*ny*t2) / Z;
 		}
-		inputX[0] = fx*xdot + skew*ydot;
-		inputY[0] = fy*ydot;
 
 		// Y
-		xdot = sumdot*2*ny*nx/Z;
-		ydot = sumdot*2*ny*ny/Z + (1 + sum)/Z;
+		double xdot_Y = sumdot*2*ny*nx/Z;
+		double ydot_Y = sumdot*2*ny*ny/Z + (1+sum)/Z;
 		if( tangential ) {
-			xdot += (2*t1*nx + t2*2*ny) / Z;
-			ydot += (6*t1*ny + 2*nx*t2) / Z;
+			xdot_Y += (2*t1*nx + t2*2*ny) / Z;
+			ydot_Y += (6*t1*ny + 2*nx*t2) / Z;
 		}
-		inputX[1] = fx*xdot + skew*ydot;
-		inputY[1] = fy*ydot;
 
 		// Z
-		xdot = -sumdot*2*r2*nx/Z;
-		ydot = -sumdot*2*r2*ny/Z;
-
-		xdot += -(1 + sum)*nx/Z;
-		ydot += -(1 + sum)*ny/Z;
-
+		double xdot_Z = -sumdot*2*r2*nx/Z;
+		double ydot_Z = -sumdot*2*r2*ny/Z;
+		xdot_Z += -(1 + sum)*nx/Z;
+		ydot_Z += -(1 + sum)*ny/Z;
 		if( tangential ) {
-			xdot += -(4*t1*nx*ny + 6*t2*nx*nx + 2*t2*ny*ny)/Z;
-			ydot += -(2*t1*nx*nx + 6*t1*ny*ny + 4*nx*ny*t2)/Z;
+			xdot_Z += -(4*t1*nx*ny + 6*t2*nx*nx + 2*t2*ny*ny)/Z;
+			ydot_Z += -(2*t1*nx*nx + 6*t1*ny*ny + 4*nx*ny*t2)/Z;
 		}
-		inputX[2] = fx*xdot + skew*ydot;
-		inputY[2] = fy*ydot;
+
+		// Apply chain rule to compute final output
+		double fooX = xdot_X*jacSp.a11 + xdot_Y*jacSp.a12 + xdot_Z*jacSp.a13;
+		double fooY = ydot_X*jacSp.a11 + ydot_Y*jacSp.a12 + ydot_Z*jacSp.a13;
+		inputX[0] = fx*fooX + skew*fooY;
+		inputY[0] = fy*fooY;
+
+		fooX = xdot_X*jacSp.a21 + xdot_Y*jacSp.a22 + xdot_Z*jacSp.a23;
+		fooY = ydot_X*jacSp.a21 + ydot_Y*jacSp.a22 + ydot_Z*jacSp.a23;
+		inputX[1] = fx*fooX + skew*fooY;
+		inputY[1] = fy*fooY;
+
+		fooX = xdot_X*jacSp.a31 + xdot_Y*jacSp.a32 + xdot_Z*jacSp.a33;
+		fooY = ydot_X*jacSp.a31 + ydot_Y*jacSp.a32 + ydot_Z*jacSp.a33;
+		inputX[2] = fx*fooX + skew*fooY;
+		inputY[2] = fy*fooY;
 
 		if( !computeIntrinsic )
 			return;
@@ -312,16 +344,20 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 		}
 
 		if( !fixedMirror ) {
-			double ri2 = -2.0*r2/Z;
 
+			double dri2 = -2.0*r2/Z;
+			double dsum = 0;
+			double ri2 = r2;
 			double sum = 0;
 			for( int i = 0; i < radial.length; i++ ) {
-				sum += radial[i]*ri2;
-				ri2 *= 2.0*r2;
+				sum  += radial[i]*ri2;
+				dsum += (i+1)*radial[i]*dri2;
+				dri2 *= r2;
+				ri2  *= r2;
 			}
 
-			double dx = -nx/Z + nx*sum;
-			double dy = -ny/Z + ny*sum;
+			double dx = (-nx/Z)*(1+sum) + nx*dsum;
+			double dy = (-ny/Z)*(1+sum) + ny*dsum;
 
 			if( tangential ) {
 				dx += -2*(2.0*t1*nx*ny + t2*(r2 + 2.0*nx*nx))/Z;

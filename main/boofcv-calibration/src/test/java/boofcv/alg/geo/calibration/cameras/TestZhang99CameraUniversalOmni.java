@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestUniversalOmniCalibrationZhang99
+public class TestZhang99CameraUniversalOmni
 		extends GenericCalibrationZhang99<CameraUniversalOmni>
 {
 

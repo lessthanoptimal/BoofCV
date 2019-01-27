@@ -178,15 +178,14 @@ public class CalibrationPlanarGridZhang99 {
 	{
 		// Configure the sparse Levenberg-Marquardt solver
 		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
-//		configLM.dampeningInitial = 1;
-		configLM.mixture = 0;
+//		configLM.mixture = 0;
 		configLM.hessianScaling = false;
 
 		ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
 		configSBA.configOptimizer = configLM;
 
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleAdjustmentMetric(configSBA);
-		bundleAdjustment.setVerbose(System.out,0);
+//		bundleAdjustment.setVerbose(System.out,0);
 		// Specifies convergence criteria
 		bundleAdjustment.configure(1e-8, 1e-12, 200);
 
