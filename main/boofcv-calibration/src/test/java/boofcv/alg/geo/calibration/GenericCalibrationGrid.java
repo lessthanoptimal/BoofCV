@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -157,101 +156,5 @@ public class GenericCalibrationGrid {
 		}
 
 		return homographies;
-	}
-
-	public static Zhang99AllParam createStandardParam( Zhang99IntrinsicParam param,
-													  int numView, Random rand) {
-		Zhang99AllParam ret = new Zhang99AllParam(param,numView);
-
-		for(Zhang99AllParam.View v : ret.views ) {
-			double rotX = (rand.nextDouble()-0.5)*UtilAngle.radian(30);
-			double rotY = (rand.nextDouble()-0.5)*UtilAngle.radian(30);
-			double rotZ = (rand.nextDouble()-0.5)* UtilAngle.radian(180);
-			DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.ZXY,rotZ,rotX,rotY,null);
-			ConvertRotation3D_F64.matrixToRodrigues(R,v.rotation);
-
-			double x = rand.nextGaussian()*5;
-			double y = rand.nextGaussian()*5;
-			double z = rand.nextGaussian()*5-300;
-
-			v.T.set(x,y,z);
-		}
-		return ret;
-	}
-
-	/**
-	 * Creates a set of observed points in pixel coordinates given zhang parameters and a calibration
-	 * grid.
-	 */
-	public static List<CalibrationObservation> createObservations( Zhang99AllParam config,
-																   List<Point2D_F64> grid)
-	{
-		List<CalibrationObservation> ret = new ArrayList<>();
-
-		Point3D_F64 cameraPt = new Point3D_F64();
-		Point2D_F64 pixelPt = new Point2D_F64();
-
-		Zhang99IntrinsicParam intrinsic = config.getIntrinsic();
-
-		for( Zhang99AllParam.View v : config.views ) {
-			CalibrationObservation set = new CalibrationObservation();
-			Se3_F64 se = new Se3_F64();
-			ConvertRotation3D_F64.rodriguesToMatrix(v.rotation,se.getR());
-			se.T = v.T;
-
-			for( int i = 0; i < grid.size(); i++ ) {
-				Point2D_F64 grid2D = grid.get(i);
-				Point3D_F64 grid3D = new Point3D_F64(grid2D.x,grid2D.y,0);
-
-				// Put the point in the camera's reference frame
-				SePointOps_F64.transform(se,grid3D, cameraPt);
-
-				// project and distort the point
-				intrinsic.project(cameraPt,pixelPt);
-
-				set.add(pixelPt,i);
-			}
-			ret.add(set);
-		}
-		return ret;
-	}
-
-	public static double computeErrors( Zhang99AllParam truth, List<Point2D_F64> grid , Zhang99AllParam found )
-	{
-		Point3D_F64 cameraPt = new Point3D_F64();
-		Point2D_F64 pixelTruth = new Point2D_F64();
-		Point2D_F64 pixelFound = new Point2D_F64();
-
-		Zhang99IntrinsicParam intrinsicTruth = truth.getIntrinsic();
-		Zhang99IntrinsicParam intrinsicFound = found.getIntrinsic();
-
-		double error = 0;
-		int total = 0;
-
-		for(  int viewIndex = 0; viewIndex < truth.views.length; viewIndex++ ) {
-			Se3_F64 truthSE = new Se3_F64();
-			ConvertRotation3D_F64.rodriguesToMatrix(truth.views[viewIndex].rotation,truthSE.getR());
-			truthSE.T.set(truth.views[viewIndex].T);
-
-			Se3_F64 foundSE = new Se3_F64();
-			ConvertRotation3D_F64.rodriguesToMatrix(found.views[viewIndex].rotation,foundSE.getR());
-			foundSE.T.set(found.views[viewIndex].T);
-
-			for( int i = 0; i < grid.size(); i++ ) {
-				Point2D_F64 grid2D = grid.get(i);
-				Point3D_F64 grid3D = new Point3D_F64(grid2D.x,grid2D.y,0);
-
-				// Put the point in the camera's reference frame
-				SePointOps_F64.transform(truthSE,grid3D, cameraPt);
-				intrinsicTruth.project(cameraPt,pixelTruth);
-
-				SePointOps_F64.transform(foundSE,grid3D, cameraPt);
-				intrinsicFound.project(cameraPt,pixelFound);
-
-				error += pixelFound.distance(pixelTruth);
-				total++;
-			}
-		}
-		return error/total;
 	}
 }

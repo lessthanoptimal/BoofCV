@@ -464,16 +464,14 @@ public class CameraCalibration extends BaseStandardInputApp {
 					JOptionPane.showMessageDialog(gui,"Failed to detect in "+imagesFailed.size()+" images");
 				}
 
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						gui.setImages(imagesSuccess);
-						gui.setImagesFailed(imagesFailed);
-						gui.setObservations(calibrationAlg.getObservations());
-						gui.setResults(calibrationAlg.getErrors());
-						gui.setCalibration(calibrationAlg.getZhangParam());
-						gui.setCorrection(intrinsic);
-						gui.repaint();
-					}
+				SwingUtilities.invokeLater(() -> {
+					gui.setImages(imagesSuccess);
+					gui.setImagesFailed(imagesFailed);
+					gui.setObservations(calibrationAlg.getObservations());
+					gui.setResults(calibrationAlg.getErrors());
+					gui.setCalibration(calibrationAlg.getIntrinsic(),calibrationAlg.getStructure());
+					gui.setCorrection(intrinsic);
+					gui.repaint();
 				});
 			}
 

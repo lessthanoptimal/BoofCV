@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -118,7 +118,7 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				gui.setResults(calibrator.getErrors());
-				gui.setCalibration(calibrator.getZhangParam());
+				gui.setCalibration(calibrator.getIntrinsic(),calibrator.getStructure());
 			}});
 		monitor.stopThread();
 

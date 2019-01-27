@@ -21,6 +21,7 @@ package boofcv.alg.geo.bundle.cameras;
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.data.DMatrixRMaj;
 
 /**
  * Formulas for {@link CameraPinholeBrown}.
@@ -64,7 +65,35 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 			tangential = false;
 		}
 		skew = intrinsic.skew;
+	}
 
+	public void convert( CameraPinholeBrown out ) {
+		out.fx = fx;
+		out.fy = fy;
+		out.cx = cx;
+		out.cy = cy;
+		if( zeroSkew )
+			out.skew = 0;
+		else
+			out.skew = skew;
+		out.radial = radial.clone();
+		if( tangential ) {
+			out.t1 = t1;
+			out.t2 = t2;
+		} else {
+			out.t1 = out.t2 = 0;
+		}
+	}
+
+	public void setK(DMatrixRMaj K ) {
+		fx = K.get(0,0);
+		fy = K.get(1,1);
+		cx = K.get(0,2);
+		cy = K.get(1,2);
+		if( zeroSkew )
+			skew = 0;
+		else
+			skew = K.get(0,1);
 	}
 
 	@Override

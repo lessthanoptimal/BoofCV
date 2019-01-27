@@ -21,6 +21,7 @@ package boofcv.alg.geo.bundle.cameras;
 import boofcv.abst.geo.bundle.BundleAdjustmentCamera;
 import boofcv.struct.calib.CameraUniversalOmni;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.data.DMatrixRMaj;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -46,25 +47,25 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 	public double t1, t2;
 
 	// forces skew to be zero
-	public boolean assumeZeroSkew;
+	public boolean zeroSkew;
 	// should it estimate the tangential terms?
 	public boolean tangential;
 	// the mirror parameter will not be changed during optimization
 	public boolean fixedMirror;
 
-	public BundleUniversalOmni(boolean assumeZeroSkew,
+	public BundleUniversalOmni(boolean zeroSkew,
 							   int numRadial, boolean includeTangential, boolean fixedMirror)
 	{
 		this.radial = new double[numRadial];
-		this.assumeZeroSkew = assumeZeroSkew;
+		this.zeroSkew = zeroSkew;
 		this.tangential = includeTangential;
 		this.fixedMirror = fixedMirror;
 	}
 
-	public BundleUniversalOmni(boolean assumeZeroSkew,
+	public BundleUniversalOmni(boolean zeroSkew,
 							   int numRadial, boolean includeTangential, double mirrorOffset)
 	{
-		this(assumeZeroSkew,numRadial,includeTangential,true);
+		this(zeroSkew,numRadial,includeTangential,true);
 		this.mirrorOffset = mirrorOffset;
 	}
 
@@ -74,7 +75,7 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 		else
 			radial = intrinsic.radial.clone();
 
-		assumeZeroSkew = intrinsic.skew == 0;
+		zeroSkew = intrinsic.skew == 0;
 		fx = intrinsic.fx;
 		fy = intrinsic.fy;
 		cx = intrinsic.cx;
@@ -87,6 +88,36 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 		}
 		skew = intrinsic.skew;
 		mirrorOffset = intrinsic.mirrorOffset;
+	}
+
+	public void convert( CameraUniversalOmni out ) {
+		out.fx = fx;
+		out.fy = fy;
+		out.cx = cx;
+		out.cy = cy;
+		if( zeroSkew )
+			out.skew = 0;
+		else
+			out.skew = skew;
+		out.radial = radial.clone();
+		if( tangential ) {
+			out.t1 = t1;
+			out.t2 = t2;
+		} else {
+			out.t1 = out.t2 = 0;
+		}
+		out.mirrorOffset = mirrorOffset;
+	}
+
+	public void setK(DMatrixRMaj K ) {
+		fx = K.get(0,0);
+		fy = K.get(1,1);
+		cx = K.get(0,2);
+		cy = K.get(1,2);
+		if( zeroSkew )
+			skew = 0;
+		else
+			skew = K.get(0,1);
 	}
 
 	@Override
@@ -105,7 +136,7 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 			t1 = 0;
 			t2 = 0;
 		}
-		if( !assumeZeroSkew )
+		if( !zeroSkew)
 			skew = parameters[offset++];
 		else
 			skew = 0;
@@ -126,7 +157,7 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 			parameters[offset++] = t1;
 			parameters[offset++] = t2;
 		}
-		if( !assumeZeroSkew )
+		if( !zeroSkew)
 			parameters[offset++] = skew;
 		if( !fixedMirror )
 			parameters[offset] = mirrorOffset;
@@ -276,7 +307,7 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 			calibY[index++] = fy*xy2;
 		}
 
-		if( !assumeZeroSkew ) {
+		if( !zeroSkew) {
 			calibX[index] = dny; calibY[index++] = 0;
 		}
 
@@ -304,13 +335,13 @@ public class BundleUniversalOmni implements BundleAdjustmentCamera {
 
 	@Override
 	public int getIntrinsicCount() {
-		int totalIntrinsic = 5 + radial.length;
-		if(tangential)
+		int totalIntrinsic = 4 + radial.length;
+		if( tangential )
 			totalIntrinsic += 2;
-		if( !assumeZeroSkew )
+		if( !zeroSkew )
 			totalIntrinsic += 1;
-		if( fixedMirror )
-			totalIntrinsic -= 1;
+		if( !fixedMirror )
+			totalIntrinsic += 1;
 
 		return totalIntrinsic;
 	}

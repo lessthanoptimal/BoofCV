@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.gui.calibration;
 
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.alg.geo.calibration.Zhang99AllParam;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.ViewedImageInfoPanel;
@@ -173,7 +173,7 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 
 	protected abstract void updateResultsGUI();
 
-	public abstract void setCalibration(Zhang99AllParam found);
+	public abstract void setCalibration( CM intrinsic, SceneStructureMetric scene );
 
 	public abstract void setCorrection( CM param );
 

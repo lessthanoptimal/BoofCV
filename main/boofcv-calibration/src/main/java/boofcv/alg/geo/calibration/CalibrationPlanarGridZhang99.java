@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,19 @@
 
 package boofcv.alg.geo.calibration;
 
-import georegression.geometry.ConvertRotation3D_F64;
+import boofcv.abst.geo.bundle.BundleAdjustment;
+import boofcv.abst.geo.bundle.SceneObservations;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.abst.geo.calibration.ImageResults;
+import boofcv.alg.geo.bundle.BundleAdjustmentMetricResidualFunction;
+import boofcv.alg.geo.bundle.CodecSceneStructureMetric;
+import boofcv.alg.geo.calibration.cameras.Zhang99Camera;
+import boofcv.factory.geo.ConfigBundleAdjustment;
+import boofcv.factory.geo.FactoryMultiView;
+import boofcv.struct.calib.CameraModel;
+import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ddogleg.optimization.FactoryOptimization;
-import org.ddogleg.optimization.UnconstrainedLeastSquares;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ejml.data.DMatrixRMaj;
 
@@ -57,6 +65,8 @@ import java.util.List;
  */
 public class CalibrationPlanarGridZhang99 {
 
+	Zhang99Camera cameraGenerator;
+
 	// estimation algorithms
 	private Zhang99ComputeTargetHomography computeHomography;
 	private Zhang99CalibrationMatrixFromHomographies computeK;
@@ -64,11 +74,8 @@ public class CalibrationPlanarGridZhang99 {
 	private Zhang99DecomposeHomography decomposeH = new Zhang99DecomposeHomography();
 
 	// contains found parameters
-	private Zhang99AllParam initial;
-	private Zhang99AllParam optimized;
-
-	// optimization algorithm
-	private UnconstrainedLeastSquares optimizer;
+	public SceneStructureMetric structure;
+	public SceneObservations observations;
 
 	// provides information on calibration status
 	private Listener listener;
@@ -80,16 +87,14 @@ public class CalibrationPlanarGridZhang99 {
 	 * Configures calibration process.
 	 *
 	 * @param layout Layout of calibration points on the target
-	 * @param intrinsicParam
 	 */
-	public CalibrationPlanarGridZhang99(List<Point2D_F64> layout, Zhang99IntrinsicParam intrinsicParam)
+	public CalibrationPlanarGridZhang99(List<Point2D_F64> layout, Zhang99Camera cameraGenerator)
 	{
+		this.cameraGenerator = cameraGenerator;
 		this.layout = layout;
 		computeHomography = new Zhang99ComputeTargetHomography(layout);
-		computeK = new Zhang99CalibrationMatrixFromHomographies(intrinsicParam.assumeZeroSkew);
-		computeRadial = new RadialDistortionEstimateLinear(layout,intrinsicParam.getNumberOfRadial());
-		optimized = new Zhang99AllParam(intrinsicParam,0);
-		initial = optimized.createLike();
+		computeK = new Zhang99CalibrationMatrixFromHomographies(cameraGenerator.isZeroSkew());
+		computeRadial = new RadialDistortionEstimateLinear(layout,cameraGenerator.numRadial());
 	}
 
 	/**
@@ -111,13 +116,12 @@ public class CalibrationPlanarGridZhang99 {
 	public boolean process( List<CalibrationObservation> observations ) {
 
 		// compute initial parameter estimates using linear algebra
-		if( !linearEstimate(observations,initial) )
+		if( !linearEstimate(observations) )
 			return false;
 
 		status("Non-linear refinement");
 		// perform non-linear optimization to improve results
-		optimized.setNumberOfViews(observations.size());
-		if( !optimizedParam(observations,layout,initial,optimized,optimizer))
+		if( !performBundleAdjustment())
 			return false;
 
 		return true;
@@ -126,7 +130,7 @@ public class CalibrationPlanarGridZhang99 {
 	/**
 	 * Find an initial estimate for calibration parameters using linear techniques.
 	 */
-	protected boolean linearEstimate(List<CalibrationObservation> observations , Zhang99AllParam param )
+	protected boolean linearEstimate(List<CalibrationObservation> observations  )
 	{
 		status("Estimating Homographies");
 		List<DMatrixRMaj> homographies = new ArrayList<>();
@@ -156,7 +160,7 @@ public class CalibrationPlanarGridZhang99 {
 
 		double distort[] = computeRadial.getParameters();
 
-		convertIntoZhangParam(motions, K,distort, param);
+		convertIntoBundleStructure(motions, K,distort,observations);
 		return true;
 	}
 
@@ -169,76 +173,112 @@ public class CalibrationPlanarGridZhang99 {
 
 	/**
 	 * Use non-linear optimization to improve the parameter estimates
-	 *
-	 * @param observations Observations of calibration points in each image
-	 * @param grid Location of calibration points on calibration target
-	 * @param initial Initial estimate of calibration parameters.
-	 * @param found The refined calibration parameters.
-	 * @param optimizer Algorithm used to optimize parameters
 	 */
-	public boolean optimizedParam( List<CalibrationObservation> observations ,
-								   List<Point2D_F64> grid ,
-								   Zhang99AllParam initial ,
-								   Zhang99AllParam found ,
-								   UnconstrainedLeastSquares optimizer )
+	public boolean performBundleAdjustment()
 	{
-		if( optimizer == null ) {
-			ConfigLevenbergMarquardt config = new ConfigLevenbergMarquardt();
-			config.mixture = 0;
-			optimizer = FactoryOptimization.levenbergMarquardt(config,true);
-		}
+		// Configure the sparse Levenberg-Marquardt solver
+		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
+//		configLM.dampeningInitial = 1;
+		configLM.mixture = 0;
+		configLM.hessianScaling = false;
 
-		double model[] = new double[ initial.numParameters() ];
-		initial.convertToParam(model);
+		ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
+		configSBA.configOptimizer = configLM;
 
-		Zhang99OptimizationFunction func = new Zhang99OptimizationFunction(
-				initial.createLike(), grid,observations);
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleAdjustmentMetric(configSBA);
+		bundleAdjustment.setVerbose(System.out,0);
+		// Specifies convergence criteria
+		bundleAdjustment.configure(1e-8, 1e-12, 200);
 
-		Zhang99OptimizationJacobian jacobian = initial.getIntrinsic().createJacobian(observations,grid);
-
-		optimizer.setFunction(func,jacobian);
-		optimizer.initialize(model,1e-10,1e-25*observations.size());
-
-//		System.out.println("Error before = "+optimizer.getFunctionValue());
-
-		for( int i = 0; i < 200; i++ ) {
-//			System.out.println("i = "+i);
-			if( optimizer.iterate() ) {
-				break;
-//			} else {
-//				if( i % 25 == 0 )
-//					status("Progress "+(100*i/500.0)+"%");
-			}
-		}
-
-		double param[] = optimizer.getParameters();
-		found.setFromParam(param);
-
-//		System.out.println("Error after = "+optimizer.getFunctionValue());
-
-		return true;
+		bundleAdjustment.setParameters(structure,observations);
+		return bundleAdjustment.optimize(structure);
 	}
 
 	/**
-	 * Converts results fond in the linear algorithms into {@link Zhang99AllParam}
+	 * Convert it into a data structure understood by {@link BundleAdjustment}
 	 */
-	public void convertIntoZhangParam(List<Se3_F64> motions,
-									  DMatrixRMaj K,
-									  double[] distort ,
-									  Zhang99AllParam param ) {
-		param.getIntrinsic().initialize(K,distort);
+	public void convertIntoBundleStructure(List<Se3_F64> motions,
+										   DMatrixRMaj K,
+										   double[] distort,
+										   List<CalibrationObservation> obs ) {
 
-		param.setNumberOfViews(motions.size());
+		structure = new SceneStructureMetric(false);
+		observations = new SceneObservations(motions.size(),true);
 
-		for( int i = 0; i < param.views.length; i++ ) {
-			Se3_F64 m = motions.get(i);
+		structure.initialize(1,motions.size(),layout.size(),1);
 
-			Zhang99AllParam.View v = new Zhang99AllParam.View();
-			v.T = m.getT();
-			ConvertRotation3D_F64.matrixToRodrigues(m.getR(), v.rotation);
-
-			param.views[i] = v;
+		// A single camera is assumed, that's what is being calibrated!
+		structure.setCamera(0,false,cameraGenerator.initalizeCamera(K,distort));
+		// A single rigid planar target is being viewed. It is assumed to be centered at the origin
+		structure.setRigid(0,true,new Se3_F64(),layout.size());
+		// Where the points are on the calibration target
+		SceneStructureMetric.Rigid rigid = structure.rigids[0];
+		for (int i = 0; i < layout.size(); i++) {
+			rigid.setPoint(i,layout.get(i).x,layout.get(i).y,0);
 		}
+
+		// Add the initial estimate of each view's location and the points observed
+		for (int viewIdx = 0; viewIdx < motions.size(); viewIdx++) {
+			structure.setView(viewIdx,false,motions.get(viewIdx));
+			SceneObservations.View v = observations.getViewRigid(viewIdx);
+			structure.connectViewToCamera(viewIdx,0);
+			CalibrationObservation ca = obs.get(viewIdx);
+			for (int j = 0; j < ca.size(); j++) {
+				PointIndex2D_F64 p = ca.get(j);
+				v.add(p.index, (float)p.x, (float)p.y);
+				structure.connectPointToView(p.index,viewIdx);
+			}
+		}
+	}
+
+	public List<ImageResults> computeErrors() {
+		List<ImageResults> errors = new ArrayList<>();
+
+		double[] parameters = new double[structure.getParameterCount()];
+		double[] residuals = new double[observations.getObservationCount()*2];
+		CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
+		codec.encode(structure,parameters);
+
+		BundleAdjustmentMetricResidualFunction function = new BundleAdjustmentMetricResidualFunction();
+		function.configure(structure,observations);
+		function.process(parameters,residuals);
+
+		int idx = 0;
+		for (int i = 0; i < observations.viewsRigid.length; i++) {
+			SceneObservations.View v = observations.viewsRigid[i];
+			ImageResults r = new ImageResults(v.size());
+
+			double sumX = 0;
+			double sumY = 0;
+			double meanErrorMag = 0;
+			double maxError = 0;
+
+			for (int j = 0; j < v.size(); j++) {
+				double x = residuals[idx++];
+				double y = residuals[idx++];
+				double nerr = r.pointError[j] = Math.sqrt(x*x + y*y);
+
+				meanErrorMag += nerr;
+				maxError = Math.max(maxError,nerr);
+
+				sumX += x;
+				sumY += y;
+			}
+
+			r.biasX = sumX / v.size();
+			r.biasY = sumY / v.size();
+			r.meanError = meanErrorMag / v.size();
+			r.maxError = maxError;
+
+			errors.add(r);
+		}
+
+		return errors;
+
+	}
+
+	public CameraModel getCameraModel() {
+		return cameraGenerator.getCameraModel(structure.cameras[0].model);
 	}
 
 	/**
@@ -266,15 +306,8 @@ public class CalibrationPlanarGridZhang99 {
 		normPt.y = y + y*a + t1*(r2 + 2*y*y) + 2*t2*x*y;
 	}
 
-	/**
-	 * Specify which optimization algorithm to use
-	 */
-	public void setOptimizer(UnconstrainedLeastSquares optimizer) {
-		this.optimizer = optimizer;
-	}
-
-	public Zhang99AllParam getOptimized() {
-		return optimized;
+	public SceneStructureMetric getStructure() {
+		return structure;
 	}
 
 	public static int totalPoints( List<CalibrationObservation> observations ) {
@@ -293,6 +326,6 @@ public class CalibrationPlanarGridZhang99 {
 		 * @param taskName Name of the task being performed
 		 * @return true to continue and false to request a stop
 		 */
-		public boolean zhangUpdate( String taskName );
+		boolean zhangUpdate( String taskName );
 	}
 }

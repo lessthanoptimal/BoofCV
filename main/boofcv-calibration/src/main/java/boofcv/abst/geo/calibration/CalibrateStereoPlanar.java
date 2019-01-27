@@ -18,12 +18,11 @@
 
 package boofcv.abst.geo.calibration;
 
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.alg.geo.calibration.Zhang99AllParam;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import georegression.fitting.se.FitSpecialEuclideanOps_F64;
-import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -136,13 +135,10 @@ public class CalibrateStereoPlanar {
 	{
 		CameraPinholeBrown intrinsic = calib.process();
 
-		Zhang99AllParam zhangParam = calib.getZhangParam();
+		SceneStructureMetric structure = calib.getStructure();
 
-		for( Zhang99AllParam.View v : zhangParam.views ) {
-			Se3_F64 pose = new Se3_F64();
-			ConvertRotation3D_F64.rodriguesToMatrix(v.rotation,pose.getR());
-			pose.getT().set(v.T);
-			location.add(pose);
+		for (int i = 0; i < structure.getViews().length; i++) {
+			location.add( structure.getViews()[i].worldToView );
 		}
 
 		return intrinsic;

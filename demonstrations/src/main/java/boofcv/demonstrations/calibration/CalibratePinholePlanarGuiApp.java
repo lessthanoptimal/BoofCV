@@ -126,7 +126,7 @@ public class CalibratePinholePlanarGuiApp extends JPanel
 		final CameraPinholeBrown param = calibrator.process();
 		SwingUtilities.invokeLater(() -> {
 			gui.setResults(calibrator.getErrors());
-			gui.setCalibration(calibrator.getZhangParam());
+			gui.setCalibration(calibrator.getIntrinsic(),calibrator.getStructure());
 		});
 		monitor.stopThread();
 

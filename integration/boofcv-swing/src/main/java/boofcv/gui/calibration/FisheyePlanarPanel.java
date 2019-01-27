@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.gui.calibration;
 
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.alg.geo.calibration.Zhang99AllParam;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.ViewedImageInfoPanel;
 import boofcv.struct.calib.CameraUniversalOmni;
@@ -98,8 +98,7 @@ public class FisheyePlanarPanel extends CalibratedPlanarPanel<CameraUniversalOmn
 	}
 
 	@Override
-	public void setCalibration(Zhang99AllParam found) {
-		CameraUniversalOmni intrinsic = (CameraUniversalOmni)found.getIntrinsic().getCameraModel();
+	public void setCalibration(CameraUniversalOmni intrinsic , SceneStructureMetric scene) {
 		String textX = String.format("%5.1f",intrinsic.cx);
 		String textY = String.format("%5.1f", intrinsic.cy);
 		paramCenterX.setText(textX);

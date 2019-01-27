@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,12 @@
 
 package boofcv.abst.geo.calibration;
 
-import boofcv.alg.geo.calibration.*;
-import boofcv.alg.geo.calibration.omni.CalibParamUniversalOmni;
-import boofcv.alg.geo.calibration.pinhole.CalibParamPinholeRadial;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
+import boofcv.alg.geo.calibration.cameras.Zhang99Camera;
+import boofcv.alg.geo.calibration.cameras.Zhang99CameraBrown;
+import boofcv.alg.geo.calibration.cameras.Zhang99CameraUniversalOmni;
 import boofcv.struct.calib.CameraModel;
 import georegression.struct.point.Point2D_F64;
 
@@ -67,7 +70,7 @@ public class CalibrateMonoPlanar {
 	protected CalibrationPlanarGridZhang99 zhang99;
 
 	// computed parameters
-	protected Zhang99AllParam foundZhang;
+	protected SceneStructureMetric structure;
 	protected CameraModel foundIntrinsic;
 
 	// Information on calibration targets and results
@@ -88,17 +91,18 @@ public class CalibrateMonoPlanar {
 	/**
 	 * Specifies the calibration model.
 	 */
-	public void configure(Zhang99IntrinsicParam param )
+	public void configure( Zhang99Camera camera )
 	{
-		zhang99 = new CalibrationPlanarGridZhang99(layout,param);
+		zhang99 = new CalibrationPlanarGridZhang99(layout,camera);
 	}
 
 	public void configurePinhole(boolean assumeZeroSkew ,
 								 int numRadialParam ,
 								 boolean includeTangential )
 	{
-		zhang99 = new CalibrationPlanarGridZhang99(layout,
-				new CalibParamPinholeRadial(assumeZeroSkew,numRadialParam,includeTangential));
+		Zhang99CameraBrown camera =
+				new Zhang99CameraBrown(assumeZeroSkew,includeTangential,numRadialParam);
+		zhang99 = new CalibrationPlanarGridZhang99(layout,camera);
 	}
 
 	public void configureUniversalOmni(boolean assumeZeroSkew ,
@@ -106,7 +110,7 @@ public class CalibrateMonoPlanar {
 									   boolean includeTangential )
 	{
 		zhang99 = new CalibrationPlanarGridZhang99(layout,
-				new CalibParamUniversalOmni(assumeZeroSkew,numRadialParam,includeTangential,false));
+				new Zhang99CameraUniversalOmni(assumeZeroSkew,includeTangential,numRadialParam));
 	}
 
 	public void configureUniversalOmni(boolean assumeZeroSkew ,
@@ -115,9 +119,8 @@ public class CalibrateMonoPlanar {
 									   double mirrorOffset )
 	{
 		zhang99 = new CalibrationPlanarGridZhang99(layout,
-				new CalibParamUniversalOmni(assumeZeroSkew,numRadialParam,includeTangential,mirrorOffset));
+				new Zhang99CameraUniversalOmni(assumeZeroSkew,includeTangential,numRadialParam,mirrorOffset));
 	}
-
 
 	/**
 	 * Resets internal data structures.  Must call before adding images
@@ -160,11 +163,11 @@ public class CalibrateMonoPlanar {
 			throw new RuntimeException("Zhang99 algorithm failed!");
 		}
 
-		foundZhang = zhang99.getOptimized();
+		structure = zhang99.getStructure();
 
-		errors = computeErrors(observations, foundZhang,layout);
+		errors = zhang99.computeErrors();
 
-		foundIntrinsic = foundZhang.getIntrinsic().getCameraModel();
+		foundIntrinsic = zhang99.getCameraModel();
 		foundIntrinsic.width = imageWidth;
 		foundIntrinsic.height = imageHeight;
 
@@ -175,61 +178,6 @@ public class CalibrateMonoPlanar {
 		printErrors(errors);
 	}
 
-	/**
-	 * After the parameters have been estimated this computes the error for each calibration point in
-	 * each image and summary error statistics.
-	 *
-	 * @param observation Observed control point location
-	 * @param param Found calibration parameters
-	 * @return List of error statistics
-	 */
-	public static List<ImageResults> computeErrors( List<CalibrationObservation> observation ,
-													Zhang99AllParam param ,
-													List<Point2D_F64> grid )
-	{
-		Zhang99OptimizationFunction function =
-				new Zhang99OptimizationFunction(param,grid,observation);
-
-		double residuals[] = new double[grid.size()*observation.size()*2];
-		function.process(param,residuals);
-
-		List<ImageResults> ret = new ArrayList<>();
-
-		int N = grid.size();
-		int index = 0;
-		for( int indexObs = 0; indexObs < observation.size(); indexObs++ ) {
-			ImageResults r = new ImageResults(N);
-
-			double meanX = 0;
-			double meanY = 0;
-			double meanErrorMag = 0;
-			double maxError = 0;
-
-			for( int i = 0; i < N; i++ ) {
-				double errorX = residuals[index++];
-				double errorY = residuals[index++];
-				double errorMag = Math.sqrt(errorX*errorX + errorY*errorY);
-
-				r.pointError[i] = errorMag;
-
-				meanX += errorX;
-				meanY += errorY;
-				meanErrorMag += errorMag;
-
-				if( maxError < errorMag ) {
-					maxError = errorMag;
-				}
-			}
-
-			r.biasX = meanX /= N;
-			r.biasY = meanY /= N;
-			r.meanError = meanErrorMag /= N;
-			r.maxError = maxError;
-			ret.add(r);
-		}
-
-		return ret;
-	}
 
 	/**
 	 * Prints out error information to standard out
@@ -245,16 +193,16 @@ public class CalibrateMonoPlanar {
 		System.out.println("Average Mean Error = "+(totalError/results.size()));
 	}
 
+	public SceneStructureMetric getStructure() {
+		return structure;
+	}
+
 	public List<CalibrationObservation> getObservations() {
 		return observations;
 	}
 
 	public List<ImageResults> getErrors() {
 		return errors;
-	}
-
-	public Zhang99AllParam getZhangParam() {
-		return foundZhang;
 	}
 
 	public <T extends CameraModel>T getIntrinsic() {

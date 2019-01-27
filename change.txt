@@ -7,9 +7,13 @@ Date    : 2019
 Version : 0.33
 
 - Fixed JavaDoc issue. Was not copying over doc-files
+- Renamed PinholeRadialTangent camera model to PinholeBrown
+  * More concise name which resulted in class names being more consistent without abbreviations
 - Sparse Bundle Adjustment
   * Added calibrated homogenous coordinates
   * Added support for rigid objects
+  * Added universal omni camera model (fisheye)
+  * Made Brown camera model complete (e.g. N radial, tangential, force params to zero)
   * TODO Added support for quaternions
 - Fixed Rodrigues Jacobian for zero rotation
 - Camera Calibration

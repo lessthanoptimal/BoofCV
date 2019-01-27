@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,9 +93,9 @@ public class Zhang99CalibrationMatrixFromHomographies {
 	public void process( List<DMatrixRMaj> homographies ) {
 		if( assumeZeroSkew ) {
 			if( homographies.size() < 2 )
-				throw new IllegalArgumentException("At least two homographies are required");
+				throw new IllegalArgumentException("At least two homographies are required. Found "+homographies.size());
 		} else if( homographies.size() < 3 ) {
-			throw new IllegalArgumentException("At least three homographies are required");
+			throw new IllegalArgumentException("At least three homographies are required. Found "+homographies.size());
 		}
 
 		if( assumeZeroSkew ) {
