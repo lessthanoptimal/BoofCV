@@ -38,11 +38,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public abstract class GenericChecksJacobianSo3 {
 
-	abstract JacobianSo3_F64 createAlgorithm();
+	abstract JacobianSo3 createAlgorithm();
 
 	@Test
 	void encode_then_decode() {
-		JacobianSo3_F64 alg = createAlgorithm();
+		JacobianSo3 alg = createAlgorithm();
 
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,0.2,-0.3,null);
 		double p[] = new double[alg.getParameterLength()];
@@ -56,7 +56,7 @@ public abstract class GenericChecksJacobianSo3 {
 	@Test
 	void compareToNumeric() {
 		Random rand = new Random(234);
-		JacobianSo3_F64 alg = createAlgorithm();
+		JacobianSo3 alg = createAlgorithm();
 		double p[] = new double[alg.getParameterLength()];
 
 		RodToMatrix f = new RodToMatrix(alg);
@@ -76,16 +76,16 @@ public abstract class GenericChecksJacobianSo3 {
 //			}
 //			System.out.println();
 
-//			DerivativeChecker.jacobianPrint(f, g, p, UtilEjml.TEST_F64_SQ);
+			DerivativeChecker.jacobianPrint(f, g, p, UtilEjml.TEST_F64_SQ);
 			assertTrue(DerivativeChecker.jacobian(f, g, p, UtilEjml.TEST_F64_SQ));
 		}
 	}
 
 	public static class RodToMatrix implements FunctionNtoM
 	{
-		JacobianSo3_F64 alg;
+		JacobianSo3 alg;
 
-		public RodToMatrix(JacobianSo3_F64 alg) {
+		public RodToMatrix(JacobianSo3 alg) {
 			this.alg = alg;
 		}
 
@@ -109,9 +109,9 @@ public abstract class GenericChecksJacobianSo3 {
 
 	public static class RodToGradient implements FunctionNtoMxN<DMatrixRMaj>
 	{
-		JacobianSo3_F64 alg;
+		JacobianSo3 alg;
 
-		public RodToGradient(JacobianSo3_F64 alg) {
+		public RodToGradient(JacobianSo3 alg) {
 			this.alg = alg;
 		}
 

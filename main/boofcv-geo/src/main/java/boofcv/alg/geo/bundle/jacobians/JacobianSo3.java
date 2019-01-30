@@ -18,13 +18,29 @@
 
 package boofcv.alg.geo.bundle.jacobians;
 
+import org.ejml.data.DMatrixRMaj;
+
 /**
+ * Generalized computation for jacobian of 3D rotation matrix
+ *
  * @author Peter Abeles
  */
-public class TestJacobianSo3Rodrigues extends GenericChecksJacobianSo3 {
+public interface JacobianSo3 {
 
-	@Override
-	JacobianSo3 createAlgorithm() {
-		return new JacobianSo3Rodrigues();
-	}
+	/**
+	 * Converts the 3x3 rotation matrix into encoded parameters
+	 * @param R 3x3 (Input) rotation matrix
+	 * @param parameters (Output) storage for encoded rotation matrix
+	 * @param offset index in parameters array
+	 */
+	void getParameters( DMatrixRMaj R , double parameters[] , int offset );
+
+	void setParameters( double parameters[] , int offset );
+
+	int getParameterLength();
+
+	DMatrixRMaj getRotationMatrix();
+
+	DMatrixRMaj getPartial( int param );
+
 }

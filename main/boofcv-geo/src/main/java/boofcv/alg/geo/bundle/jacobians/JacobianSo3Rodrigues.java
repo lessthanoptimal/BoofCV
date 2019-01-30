@@ -31,7 +31,7 @@ import org.ejml.data.DMatrixRMaj;
  *
  * @author Peter Abeles
  */
-public class JacobianSo3Rodrigues implements JacobianSo3_F64 {
+public class JacobianSo3Rodrigues implements JacobianSo3 {
 	private RodriguesRotationJacobian_F64 jac = new RodriguesRotationJacobian_F64();
 
 	private Rodrigues_F64 rodrigues = new Rodrigues_F64();

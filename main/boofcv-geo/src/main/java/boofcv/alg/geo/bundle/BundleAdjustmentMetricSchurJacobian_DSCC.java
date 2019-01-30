@@ -21,8 +21,8 @@ package boofcv.alg.geo.bundle;
 import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.geo.bundle.jacobians.JacobianSo3;
 import boofcv.alg.geo.bundle.jacobians.JacobianSo3Rodrigues;
-import boofcv.alg.geo.bundle.jacobians.JacobianSo3_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -57,11 +57,11 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 	private int lengthPoint;
 
 	// used to compute the Jacobian of a rotation matrix
-	private JacobianSo3_F64 jacSO3 = new JacobianSo3Rodrigues();
+	private JacobianSo3 jacSO3 = new JacobianSo3Rodrigues();
 	private Se3_F64 worldToView = new Se3_F64();
 
 	// jacobians for rigid objects
-	private JacobianSo3_F64[] jacRigidS03;
+	private JacobianSo3[] jacRigidS03;
 
 	// feature location in world coordinates
 	private Point3D_F64 worldPt3 = new Point3D_F64();
@@ -127,7 +127,7 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 		numParameters = indexLastView + numCameraParameters;
 
 		// pre-compute index of first parameter in each unknown rigid object. Left side
-		jacRigidS03 = new JacobianSo3_F64[structure.rigids.length];
+		jacRigidS03 = new JacobianSo3[structure.rigids.length];
 		rigidParameterIndexes = new int[ jacRigidS03.length ];
 		for (int i = 0, index = 0; i < jacRigidS03.length; i++) {
 			rigidParameterIndexes[i] = index;
@@ -390,7 +390,7 @@ public class BundleAdjustmentMetricSchurJacobian_DSCC
 								double X, double Y, double Z , double W) {
 		int col = rigidParameterIndexes[rigidIndex]+indexFirstRigid;
 
-		JacobianSo3_F64 jac = jacRigidS03[rigidIndex];
+		JacobianSo3 jac = jacRigidS03[rigidIndex];
 
 		//============== Partial of view rotation parameters
 		final int N = jac.getParameterLength();

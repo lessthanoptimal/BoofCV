@@ -18,13 +18,16 @@
 
 package boofcv.alg.geo.bundle.jacobians;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * @author Peter Abeles
  */
-public class TestJacobianSo3Rodrigues extends GenericChecksJacobianSo3 {
-
-	@Override
-	JacobianSo3 createAlgorithm() {
-		return new JacobianSo3Rodrigues();
+public class TestJacobianSo3Numerical {
+	@Test
+	public void stuff() {
+		fail("Implement");
 	}
 }

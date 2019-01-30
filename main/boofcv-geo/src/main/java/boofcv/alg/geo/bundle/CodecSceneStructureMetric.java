@@ -20,8 +20,8 @@ package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.geo.bundle.jacobians.JacobianSo3;
 import boofcv.alg.geo.bundle.jacobians.JacobianSo3Rodrigues;
-import boofcv.alg.geo.bundle.jacobians.JacobianSo3_F64;
 
 /**
  * Encodes and decodes the values in a {@link SceneStructureMetric} using the following
@@ -41,12 +41,12 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 	/**
 	 * Specifies encoding/decoding of rotation for bundle adjustment. Default is {@link JacobianSo3Rodrigues}
 	 */
-	public JacobianSo3_F64 rotation = new JacobianSo3Rodrigues();
+	public JacobianSo3 rotation = new JacobianSo3Rodrigues();
 
 	public CodecSceneStructureMetric() {
 	}
 
-	public CodecSceneStructureMetric(JacobianSo3_F64 rotation) {
+	public CodecSceneStructureMetric(JacobianSo3 rotation) {
 		this.rotation = rotation;
 	}
 
