@@ -91,9 +91,9 @@ public class BundleCameraNumericJacobian {
 		jacobian.reshape(2,3);
 		numericalPoint.process(X,jacobian);
 
-		for (int i = 0; i < numIntrinsic; i++) {
+		for (int i = 0; i < 3; i++) {
 			pointX[i] = jacobian.data[i];
-			pointY[i] = jacobian.data[i+numIntrinsic];
+			pointY[i] = jacobian.data[i+3];
 		}
 	}
 

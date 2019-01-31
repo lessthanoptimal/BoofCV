@@ -38,6 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public abstract class GenericChecksJacobianSo3 {
 
+	boolean skipJacobianAtIdentity = false;
+
 	abstract JacobianSo3 createAlgorithm();
 
 	@Test
@@ -45,9 +47,9 @@ public abstract class GenericChecksJacobianSo3 {
 		JacobianSo3 alg = createAlgorithm();
 
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,0.2,-0.3,null);
-		double p[] = new double[alg.getParameterLength()];
-		alg.getParameters(R,p,0);
-		alg.setParameters(p,0);
+		double p[] = new double[alg.getParameterLength()+1];
+		alg.getParameters(R,p,1); // offset to ensure it isn't hard coded at 0
+		alg.setParameters(p,1);
 
 		DMatrixRMaj found = alg.getRotationMatrix();
 		assertTrue(MatrixFeatures_DDRM.isIdentical(R,found, UtilEjml.TEST_F64));
@@ -66,7 +68,7 @@ public abstract class GenericChecksJacobianSo3 {
 		for( int i = 0; i < 100; i++ ) {
 //			System.out.println("I = "+i);
 			// the first time it will be no rotation. test this edgecase
-			if( i > 0 )
+			if( skipJacobianAtIdentity || i > 0 )
 				ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
 						(double)rand.nextGaussian(), (double)rand.nextGaussian(), (double)rand.nextGaussian(), R);
 			alg.getParameters(R,p,0);
@@ -76,7 +78,7 @@ public abstract class GenericChecksJacobianSo3 {
 //			}
 //			System.out.println();
 
-			DerivativeChecker.jacobianPrint(f, g, p, UtilEjml.TEST_F64_SQ);
+//			DerivativeChecker.jacobianPrint(f, g, p, UtilEjml.TEST_F64_SQ);
 			assertTrue(DerivativeChecker.jacobian(f, g, p, UtilEjml.TEST_F64_SQ));
 		}
 	}

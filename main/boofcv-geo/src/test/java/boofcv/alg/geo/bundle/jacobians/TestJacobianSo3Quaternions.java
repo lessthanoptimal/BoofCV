@@ -22,6 +22,11 @@ package boofcv.alg.geo.bundle.jacobians;
  * @author Peter Abeles
  */
 public class TestJacobianSo3Quaternions extends GenericChecksJacobianSo3 {
+
+	public TestJacobianSo3Quaternions() {
+		skipJacobianAtIdentity = true;
+	}
+
 	@Override
 	JacobianSo3 createAlgorithm() {
 		return new JacobianSo3Quaternions();

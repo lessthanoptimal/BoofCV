@@ -18,8 +18,8 @@ Version : 0.33
 - Fixed Rodrigues Jacobian for zero rotation
 - Camera Calibration
   * Renamed radial-tangential model to Brown for consistency and brevity
-  * Fixed type-o in Omni Universal math. Appears to have minimal affect and results.
-  * TODO switch optimization over to bundle adjustment
+  * Fixed type-o in Omni Universal math. Recalibration does not appear to be necessary
+  * Non-linear optimization is now performed using sparse bundle adjustment
 - Self Calibration
   * TODO Weighted iterated DIAC
 - Improved Support for U16 images
@@ -39,7 +39,12 @@ Version : 0.33
   * Modernized FFT Demo
   * Modernized Blur Demo
   * Modernized Image Derivative Demo
-  * Three View Stereo: Using AverageDownSampleOps to avoid aliasing and drastically improves performance
+  * TODO Binary Thresholding - Improved handling of 16-bit images
+  * Three View Stereo
+    - Using AverageDownSampleOps to avoid aliasing and drastically improves performance
+    - TODO Select best pair automatically for stereo processing
+- Tracking
+  * TODO fix tracking slow down
 - Swing
   * Touch pad "wheel" controls are less spastic in OS X
 - Gradle

@@ -72,7 +72,7 @@ public abstract class JacobianSo3Numerical implements JacobianSo3 {
 
 		numericalJac.process(paramInternal,jacobian);
 		for (int i = 0,idx=0; i < 9; i++) {
-			for (int j = 0; j < 4; j++,idx++) {
+			for (int j = 0; j < N; j++,idx++) {
 				jacR[j].data[i] = jacobian.data[idx];
 			}
 		}

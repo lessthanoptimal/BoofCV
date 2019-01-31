@@ -49,6 +49,8 @@ public class JacobianSo3Quaternions extends JacobianSo3Numerical {
 		quat.y = parameters[offset+2];
 		quat.z = parameters[offset+3];
 
+		// has to be the unit quaternion and there is nothing restricting the values of each parameter
+		quat.normalize();
 		ConvertRotation3D_F64.quaternionToMatrix(quat,R);
 	}
 
