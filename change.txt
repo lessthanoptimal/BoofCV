@@ -20,6 +20,7 @@ Version : 0.33
   * Renamed radial-tangential model to Brown for consistency and brevity
   * Fixed type-o in Omni Universal math. Recalibration does not appear to be necessary
   * Non-linear optimization is now performed using sparse bundle adjustment
+    - This appears to be slightly worse than dense methods in nearly degenerate geometry which could use SVD
 - Self Calibration
   * TODO Weighted iterated DIAC
 - Improved Support for U16 images

@@ -24,12 +24,10 @@ import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
-import georegression.geometry.ConvertRotation3D_F64;
-import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
-import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.junit.jupiter.api.Test;
@@ -58,11 +56,12 @@ public class TestCalibrateStereoPlanar {
 		double z = 250;
 		double w = 40;
 
-		targetToLeft.add(new Se3_F64(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0, 0, 0, null), new Vector3D_F64(0, 0, z)));
-		targetToLeft.add(new Se3_F64(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1, 0, 0, null), new Vector3D_F64(w, 0, z)));
-		targetToLeft.add(new Se3_F64(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0, 0.1, 0, null), new Vector3D_F64(w, w, z)));
-		targetToLeft.add(new Se3_F64(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0, 0, 0.1, null), new Vector3D_F64(0, -w, z)));
-		targetToLeft.add(new Se3_F64(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.05, 0, 0.1, null), new Vector3D_F64(0, -w, z)));
+		targetToLeft.add(SpecialEuclideanOps_F64.eulerXyz(0,0,z,0,0,0,null));
+		targetToLeft.add(SpecialEuclideanOps_F64.eulerXyz(0,0,z*0.7,0.01,-0.05,0,null));
+		targetToLeft.add(SpecialEuclideanOps_F64.eulerXyz(w,0,z,0.15,0,0,null));
+		targetToLeft.add(SpecialEuclideanOps_F64.eulerXyz(w,w,z,0,0.1,0,null));
+		targetToLeft.add(SpecialEuclideanOps_F64.eulerXyz(0,-w,z,0,0,0.15,null));
+		targetToLeft.add(SpecialEuclideanOps_F64.eulerXyz(0,-w,z,0,-0.1,0.1,null));
 
 		leftToRight.getT().set(100,0,0);
 	}
@@ -88,16 +87,16 @@ public class TestCalibrateStereoPlanar {
 		Se3_F64 rightToLeft = found.getRightToLeft();
 		Se3_F64 expected = leftToRight.invert(null);
 
-		assertEquals(0,expected.getT().distance(rightToLeft.T),1.01e-3);
-		assertTrue(MatrixFeatures_DDRM.isIdentity(rightToLeft.getR(), 1e-3));
+		assertEquals(0,expected.getT().distance(rightToLeft.T),2e-3);
+		assertTrue(MatrixFeatures_DDRM.isIdentity(rightToLeft.getR(), 2e-3));
 	}
 
 	private void checkIntrinsic(CameraPinholeBrown found) {
-		assertEquals(intrinsic.fx,found.fx,1e-3);
-		assertEquals(intrinsic.fy,found.fy,1e-3);
-		assertEquals(intrinsic.cx,found.cx,1e-3);
-		assertEquals(intrinsic.cy,found.cy,1e-3);
-		assertEquals(intrinsic.skew,found.skew,1e-3);
+		assertEquals(intrinsic.fx,found.fx,intrinsic.width*1e-3);
+		assertEquals(intrinsic.fy,found.fy,intrinsic.width*1e-3);
+		assertEquals(intrinsic.cx,found.cx,intrinsic.width*1e-3);
+		assertEquals(intrinsic.cy,found.cy,intrinsic.width*1e-3);
+		assertEquals(intrinsic.skew,found.skew,intrinsic.width*1e-3);
 
 		assertEquals(intrinsic.radial[0],found.radial[0],1e-5);
 		assertEquals(intrinsic.radial[1],found.radial[1],1e-5);

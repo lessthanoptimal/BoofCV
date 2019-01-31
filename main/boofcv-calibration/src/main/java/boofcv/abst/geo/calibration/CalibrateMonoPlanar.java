@@ -27,6 +27,7 @@ import boofcv.alg.geo.calibration.cameras.Zhang99CameraUniversalOmni;
 import boofcv.struct.calib.CameraModel;
 import georegression.struct.point.Point2D_F64;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class CalibrateMonoPlanar {
 	protected List<CalibrationObservation> observations = new ArrayList<>();
 	protected List<ImageResults> errors;
 
-	public boolean verbose = false;
+	public PrintStream verbose = null;
 
 	// shape of the image
 	private int imageWidth;
@@ -159,6 +160,7 @@ public class CalibrateMonoPlanar {
 	public <T extends CameraModel>T process() {
 		if( zhang99 == null )
 			throw new IllegalArgumentException("Please call configure first.");
+		zhang99.setVerbose(verbose,0);
 		if( !zhang99.process(observations) ) {
 			throw new RuntimeException("Zhang99 algorithm failed!");
 		}
@@ -178,7 +180,9 @@ public class CalibrateMonoPlanar {
 		printErrors(errors);
 	}
 
-
+	public void setVerbose( PrintStream out , int level ) {
+		this.verbose = out;
+	}
 	/**
 	 * Prints out error information to standard out
 	 */

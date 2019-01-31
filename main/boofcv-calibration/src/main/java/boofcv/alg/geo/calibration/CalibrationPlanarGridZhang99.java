@@ -34,6 +34,7 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ejml.data.DMatrixRMaj;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,6 +83,8 @@ public class CalibrationPlanarGridZhang99 {
 
 	// where calibration points are layout on the target.
 	private List<Point2D_F64> layout;
+
+	private PrintStream verbose = null;
 
 	/**
 	 * Configures calibration process.
@@ -185,9 +188,9 @@ public class CalibrationPlanarGridZhang99 {
 		configSBA.configOptimizer = configLM;
 
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleAdjustmentMetric(configSBA);
-//		bundleAdjustment.setVerbose(System.out,0);
+		bundleAdjustment.setVerbose(verbose,0);
 		// Specifies convergence criteria
-		bundleAdjustment.configure(1e-8, 1e-12, 200);
+		bundleAdjustment.configure(1e-20, 1e-20, 200);
 
 		bundleAdjustment.setParameters(structure,observations);
 		return bundleAdjustment.optimize(structure);
@@ -307,6 +310,10 @@ public class CalibrationPlanarGridZhang99 {
 
 	public SceneStructureMetric getStructure() {
 		return structure;
+	}
+
+	public void setVerbose( PrintStream out , int level ) {
+		this.verbose = out;
 	}
 
 	public static int totalPoints( List<CalibrationObservation> observations ) {
