@@ -43,8 +43,9 @@ Less High Priority Next Release
 
 - Sparse Bundle Adjustment
   * Improve LM implementation so that it doesn't have to take a full gradient step if that's too big
-  * quaternion support
   * sparse block math
+  * parameterize rotation. Rotation +x unit vector  around Z then local Y. Use vector for axis-angle
+    - 3 parameters, no normalization I think
 - Chessboard Detector
   * Split shapes with contour that barely touch. This is more of a problem in large images.
   * Handle case where squares touch border in large images better. Block region size had to be increased.

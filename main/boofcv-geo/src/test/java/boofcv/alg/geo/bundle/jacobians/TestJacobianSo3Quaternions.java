@@ -24,7 +24,7 @@ package boofcv.alg.geo.bundle.jacobians;
 public class TestJacobianSo3Quaternions extends GenericChecksJacobianSo3 {
 
 	public TestJacobianSo3Quaternions() {
-		skipJacobianAtIdentity = true;
+//		skipJacobianAtIdentity = true;
 	}
 
 	@Override

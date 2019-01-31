@@ -14,7 +14,7 @@ Version : 0.33
   * Added support for rigid objects
   * Added universal omni camera model (fisheye)
   * Made Brown camera model complete (e.g. N radial, tangential, force params to zero)
-  * TODO Added support for quaternions
+  * Added support for quaternions
 - Fixed Rodrigues Jacobian for zero rotation
 - Camera Calibration
   * Renamed radial-tangential model to Brown for consistency and brevity

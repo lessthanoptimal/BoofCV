@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public abstract class GenericChecksJacobianSo3 {
 
 	boolean skipJacobianAtIdentity = false;
+	boolean printJacobian=false;
 
 	abstract JacobianSo3 createAlgorithm();
 
@@ -78,7 +79,8 @@ public abstract class GenericChecksJacobianSo3 {
 //			}
 //			System.out.println();
 
-//			DerivativeChecker.jacobianPrint(f, g, p, UtilEjml.TEST_F64_SQ);
+			if( printJacobian )
+				DerivativeChecker.jacobianPrint(f, g, p, UtilEjml.TEST_F64_SQ);
 			assertTrue(DerivativeChecker.jacobian(f, g, p, UtilEjml.TEST_F64_SQ));
 		}
 	}
