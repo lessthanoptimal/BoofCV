@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestCalibrateStereoPlanar {
-	CameraPinholeBrown intrinsic = new CameraPinholeBrown(200,210,0,320,240,640,480).
+	CameraPinholeBrown intrinsic = new CameraPinholeBrown(250,260,0,320,240,640,480).
 			fsetRadial(0.01, -0.02).fsetTangental(0.03,0.03);
 	Point2Transform2_F64 normToPixel = LensDistortionFactory.narrow(intrinsic).distort_F64(false, true);
 
@@ -60,6 +60,7 @@ public class TestCalibrateStereoPlanar {
 		targetToLeft.add(SpecialEuclideanOps_F64.eulerXyz(0,0,z*0.7,0.01,-0.05,0,null));
 		targetToLeft.add(SpecialEuclideanOps_F64.eulerXyz(w,0,z,0.15,0,0,null));
 		targetToLeft.add(SpecialEuclideanOps_F64.eulerXyz(w,w,z,0,0.1,0,null));
+		targetToLeft.add(SpecialEuclideanOps_F64.eulerXyz(w,w,z*0.8,-0.1,0,0.05,null));
 		targetToLeft.add(SpecialEuclideanOps_F64.eulerXyz(0,-w,z,0,0,0.15,null));
 		targetToLeft.add(SpecialEuclideanOps_F64.eulerXyz(0,-w,z,0,-0.1,0.1,null));
 
@@ -87,7 +88,7 @@ public class TestCalibrateStereoPlanar {
 		Se3_F64 rightToLeft = found.getRightToLeft();
 		Se3_F64 expected = leftToRight.invert(null);
 
-		assertEquals(0,expected.getT().distance(rightToLeft.T),2e-3);
+		assertEquals(0,expected.getT().distance(rightToLeft.T),Math.abs(rightToLeft.T.x)*0.01);
 		assertTrue(MatrixFeatures_DDRM.isIdentity(rightToLeft.getR(), 2e-3));
 	}
 
@@ -98,11 +99,11 @@ public class TestCalibrateStereoPlanar {
 		assertEquals(intrinsic.cy,found.cy,intrinsic.width*1e-3);
 		assertEquals(intrinsic.skew,found.skew,intrinsic.width*1e-3);
 
-		assertEquals(intrinsic.radial[0],found.radial[0],1e-5);
-		assertEquals(intrinsic.radial[1],found.radial[1],1e-5);
+		assertEquals(intrinsic.radial[0],found.radial[0],1e-3);
+		assertEquals(intrinsic.radial[1],found.radial[1],1e-3);
 
-		assertEquals(intrinsic.t1,found.t1,1e-5);
-		assertEquals(intrinsic.t2,found.t2,1e-5);
+		assertEquals(intrinsic.t1,found.t1,1e-4);
+		assertEquals(intrinsic.t2,found.t2,1e-4);
 
 		assertEquals(intrinsic.width,found.width,1e-3);
 		assertEquals(intrinsic.height,found.height,1e-3);
