@@ -18,32 +18,16 @@
 
 package boofcv.alg.sfm.structure2;
 
-import georegression.struct.point.Point2D_F64;
+import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Given a set of views all of which view all the same features, estimate their structure up to a
- * projective transform
- *
  * @author Peter Abeles
  */
-public class InitializeProjectiveStructure {
-
-	public void reset( int totalViews , int totalFeatures ) {
-
-	}
-
-	public void setView( List<Point2D_F64> observations , int []identifiers ) {
-
-	}
-
-	public boolean process() {
-		// TODO find the 3 views with the most tracks
-		// TODO use trifocal tensor to prune tracks from that set
-		// TODO compute projective transform
-		// TODO add new views using trifocal and find common projective
-
-		return true;
+public class TestGeneratePairwiseImageGraph {
+	@Test
+	public void stuff() {
+		fail("implement");
 	}
 }
