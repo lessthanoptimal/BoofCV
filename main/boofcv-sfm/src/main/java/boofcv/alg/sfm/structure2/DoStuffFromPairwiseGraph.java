@@ -20,7 +20,9 @@ package boofcv.alg.sfm.structure2;
 
 import boofcv.alg.sfm.structure2.PairwiseImageGraph2.View;
 import boofcv.struct.ScoreIndex;
+import boofcv.struct.feature.AssociatedIndex;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.*;
 
@@ -31,25 +33,28 @@ import java.util.*;
  */
 public class DoStuffFromPairwiseGraph {
 
-	FastQueue<ScoreIndex> scoresNodes = new FastQueue<>(ScoreIndex.class,true);
+	List<SeedInfo> scoresNodes = new ArrayList<>();
 	FastQueue<ScoreIndex> scoresMotions = new FastQueue<>(ScoreIndex.class,true);
 
-	InitializeProjectiveStructure initProjective = new InitializeProjectiveStructure();
+	ProjectiveInitializeAllCommon initProjective = new ProjectiveInitializeAllCommon();
+	ProjectiveExpandStructure expandProjective = new ProjectiveExpandStructure();
 
 	public void process( PairwiseImageGraph2 graph ) {
 		// Score nodes for their ability to be seeds
-		Map<Integer, ScoreIndex> mapScores = scoreNodesAsSeeds(graph);
-		List<View> seeds = selectSeeds(graph, mapScores);
+		Map<Integer, SeedInfo> mapScores = scoreNodesAsSeeds(graph);
+		List<SeedInfo> seeds = selectSeeds(graph, mapScores);
 
 		for (int i = 0; i < seeds.size(); i++) {
-			// TODO create feature tracks from all common features
+			// Find the common features
+			GrowQueue_I32 common = findCommonTracks(seeds.get(i));
 
-			// TODO initialize projective scene
+			// initialize projective scene using common tracks
+			initProjective.process(seeds.get(i).seed,common,seeds.get(i).motions);
+
+			// TODO Grow the projective view to include all connected views that meet minimum conditions
 
 			// TODO Compute metric scenes from projective
 		}
-
-		// TODO score each view based on how well it will probably estimate the 3D structure
 
 		for (int i = 0; i < seeds.size(); i++) {
 			// TODO add new views to the closest cluster
@@ -62,45 +67,84 @@ public class DoStuffFromPairwiseGraph {
 		// 2) merge adjacent clusters together
 	}
 
-	private void findCommonTracks( View seed ) {
+	/**
+	 * Finds the indexes of tracks which are common to all views
+	 * @param target The seed view
+	 * @return indexes of common tracks
+	 */
+	private GrowQueue_I32 findCommonTracks( SeedInfo target ) {
+		// if true then it is visible in all tracks
+		boolean visibleAll[] = new boolean[target.seed.totalFeatures];
+		Arrays.fill(visibleAll,true);
+		// used to keep track of which features are visible in the current motion
+		boolean visibleMotion[] = new boolean[target.seed.totalFeatures];
 
+		// Only look at features in the motions that were used to compute the score
+		for (int idxMotion = 0; idxMotion < target.motions.size; idxMotion++) {
+			PairwiseImageGraph2.Motion m = target.seed.connections.get(target.motions.get(idxMotion));
+			boolean seedIsSrc = m.src==target.seed;
+			Arrays.fill(visibleMotion,false);
+			for (int i = 0; i < m.associated.size; i++) {
+				AssociatedIndex a = m.associated.get(i);
+				visibleMotion[seedIsSrc?a.src:a.dst] = true;
+			}
+			for (int i = 0; i < target.seed.totalFeatures; i++) {
+				visibleAll[i] &= visibleMotion[i];
+			}
+		}
+		GrowQueue_I32 common = new GrowQueue_I32(target.seed.totalFeatures/10+1);
+		for (int i = 0; i < target.seed.totalFeatures; i++) {
+			if( visibleAll[i] ) {
+				common.add(i);
+			}
+		}
+		return common;
 	}
 
 
-	private Map<Integer, ScoreIndex> scoreNodesAsSeeds(PairwiseImageGraph2 graph) {
-		scoresNodes.reset();
-		Map<Integer,ScoreIndex> mapScores = new HashMap<>();
+	private Map<Integer, SeedInfo> scoreNodesAsSeeds(PairwiseImageGraph2 graph) {
+		scoresNodes.clear();
+		Map<Integer,SeedInfo> mapScores = new HashMap<>();
 		for (int idxView = 0; idxView < graph.nodes.size; idxView++) {
 			View v = graph.nodes.get(idxView);
-			mapScores.put(idxView,scoresNodes.grow().set(score(v),idxView));
+			SeedInfo info = score(v);
+			scoresNodes.add(info);
+			mapScores.put(idxView,info);
 		}
 		return mapScores;
 	}
 
-	private List<View> selectSeeds(PairwiseImageGraph2 graph, Map<Integer, ScoreIndex> mapScores) {
+	private List<SeedInfo> selectSeeds(PairwiseImageGraph2 graph, Map<Integer, SeedInfo> mapScores) {
 		// Greedily assign nodes as seeds while making their neighbors as not seeds
 		int maxSeeds = Math.max(1,graph.nodes.size/5);
-		List<View> seeds = new ArrayList<>();
-		Collections.sort(scoresNodes.toList());
-		double minScore = scoresNodes.getTail(0).score*0.2;
+		List<SeedInfo> seeds = new ArrayList<>();
+		Collections.sort(scoresNodes);
 
-		for (int i = scoresNodes.size-1; i >= 0 && seeds.size()<maxSeeds; i--) {
-			ScoreIndex s = scoresNodes.get(i);
+		// ignore nodes with too low of a score
+		double minScore = scoresNodes.get(scoresNodes.size()-1).score*0.2;
+
+		// grab nodes with the highest scores first
+		for (int i = scoresNodes.size()-1; i >= 0 && seeds.size()<maxSeeds; i--) {
+			SeedInfo s = scoresNodes.get(i);
 			if( s.score <= minScore )
 				continue;
 
-			View v = graph.nodes.get(s.index);
-			seeds.add(v);
+			seeds.add(s);
 
 			// zero the score of children so that they can't be a seed
-			for (int j = 0; j < v.connections.size; j++) {
-				mapScores.get(v.connections.get(j).index).score = 0;
+			for (int j = 0; j < s.seed.connections.size; j++) {
+				mapScores.get(s.seed.connections.get(j).index).score = 0;
 			}
 		}
 		return seeds;
 	}
 
-	private double score( View target ) {
+	/**
+	 * Score a view for how well it could be a seed based on the the 3 best 3D motions associated with it
+	 */
+	private SeedInfo score( View target ) {
+		SeedInfo output = new SeedInfo();
+		output.seed = target;
 		scoresMotions.reset();
 
 		// score all edges
@@ -115,12 +159,12 @@ public class DoStuffFromPairwiseGraph {
 		// only score the 3 best. This is to avoid biasing it for
 		Collections.sort(scoresMotions.toList());
 
-		double total = 0;
 		for (int i = Math.min(2, scoresMotions.size); i >= 0; i--) {
-			total += scoresMotions.get(i).score;
+			output.motions.add(scoresMotions.get(i).index);
+			output.score += scoresMotions.get(i).score;
 		}
 
-		return total;
+		return output;
 	}
 
 	/**
@@ -137,5 +181,16 @@ public class DoStuffFromPairwiseGraph {
 		score *= m.countF;
 
 		return score;
+	}
+
+	private static class SeedInfo implements Comparable<SeedInfo> {
+		View seed;
+		double score;
+		GrowQueue_I32 motions = new GrowQueue_I32();
+
+		@Override
+		public int compareTo(SeedInfo o) {
+			return Double.compare(score, o.score);
+		}
 	}
 }
