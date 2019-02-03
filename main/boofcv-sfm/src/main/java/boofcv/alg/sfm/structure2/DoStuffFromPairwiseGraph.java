@@ -39,7 +39,7 @@ public class DoStuffFromPairwiseGraph {
 	ProjectiveInitializeAllCommon initProjective = new ProjectiveInitializeAllCommon();
 	ProjectiveExpandStructure expandProjective = new ProjectiveExpandStructure();
 
-	public void process( PairwiseImageGraph2 graph ) {
+	public void process( LookupSimilarImages db , PairwiseImageGraph2 graph ) {
 		// Score nodes for their ability to be seeds
 		Map<Integer, SeedInfo> mapScores = scoreNodesAsSeeds(graph);
 		List<SeedInfo> seeds = selectSeeds(graph, mapScores);
@@ -49,7 +49,7 @@ public class DoStuffFromPairwiseGraph {
 			GrowQueue_I32 common = findCommonTracks(seeds.get(i));
 
 			// initialize projective scene using common tracks
-			initProjective.process(seeds.get(i).seed,common,seeds.get(i).motions);
+			initProjective.process(db,seeds.get(i).seed,common,null); // TODO get just the motions used in scoring
 
 			// TODO Grow the projective view to include all connected views that meet minimum conditions
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -464,7 +464,7 @@ public class FactoryMultiView {
 	 *
 	 * @return PoseFromPairLinear6
 	 */
-	public static PoseFromPairLinear6 triangulatePoseFromPair() {
+	public static PoseFromPairLinear6 poseFromPair() {
 		return new PoseFromPairLinear6();
 	}
 

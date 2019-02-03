@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,14 @@
 package boofcv.alg.sfm.structure2;
 
 import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 
 /**
- * Interface for finding images with a similar apperance by some metric.
+ * Interface for finding images with a similar appearance by some metric.
  *
  * @author Peter Abeles
  */
@@ -43,4 +44,11 @@ public interface LookupSimilarImages {
 	void lookupFeatures( String target , FastQueue<Point2D_F64> features );
 
 	void lookupMatches(String src, String dst , FastQueue<AssociatedIndex> pairs );
+
+	/**
+	 * Looks up the original images width and height
+	 * @param target (Input) the image to retrieve from
+	 * @param shape (Output) storage for width and height
+	 */
+	void lookupShape(String target , ImageDimension shape );
 }
