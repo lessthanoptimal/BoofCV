@@ -170,13 +170,13 @@ public class DoStuffFromPairwiseGraph {
 	/**
 	 * Scores the motion for its ability to capture 3D structure
 	 */
-	private double score( PairwiseImageGraph2.Motion m ) {
+	public static double score( PairwiseImageGraph2.Motion m ) {
 		// countF and countF will be <= totalFeatures
 
 		// Prefer a scene more features from a fundamental matrix than a homography.
 		// This can be sign that the scene has a rich 3D structure and is poorly represented by
 		// a plane or rotational motion
-		double score = Math.min(5,m.countF/(double)m.countH);
+		double score = Math.min(5,m.countF/(double)(m.countH+1));
 		// Also prefer more features from the original image to be matched
 		score *= m.countF;
 

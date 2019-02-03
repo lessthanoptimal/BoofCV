@@ -67,6 +67,16 @@ public class PairwiseImageGraph2 {
 			this.id = id;
 			this.connections.reset();
 		}
+
+		public Motion findMotion( View target ) {
+			for (int i = 0; i < connections.size; i++) {
+				Motion m = connections.get(i);
+				if( m.src == target || m.dst == target ) {
+					return m;
+				}
+			}
+			return null;
+		}
 	}
 
 	public static class Motion {
