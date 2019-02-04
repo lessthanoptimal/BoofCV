@@ -27,7 +27,57 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class TestProjectiveInitializeAllCommon {
 	@Test
-	public void stuff() {
+	public void process_2() {
+		fail("implement");
+	}
+
+	@Test
+	public void process_3() {
+		fail("implement");
+	}
+
+	@Test
+	public void process_3_to_5() {
+		fail("implement");
+	}
+
+	@Test
+	public void selectInitialTriplet() {
+		fail("implement");
+	}
+
+	@Test
+	public void scoreTripleView() {
+		fail("implement");
+	}
+
+	@Test
+	public void findTripleMatches() {
+		fail("implement");
+	}
+
+	@Test
+	public void createFeatureLookup() {
+		fail("implement");
+	}
+
+	@Test
+	public void triangulateFeatures() {
+		fail("implement");
+	}
+
+	@Test
+	public void convertAssociatedTriple() {
+		fail("implement");
+	}
+
+	@Test
+	public void initializeProjective3() {
+		fail("implement");
+	}
+
+	@Test
+	public void findRemainingCameraMatrices() {
 		fail("implement");
 	}
 }

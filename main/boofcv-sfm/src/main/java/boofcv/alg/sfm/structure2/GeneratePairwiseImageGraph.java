@@ -31,7 +31,9 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.ops.ConvertDMatrixStruct;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Given a {@link LookupSimilarImages graph of images} with similar appearance, create a graph in which
@@ -99,8 +101,12 @@ public class GeneratePairwiseImageGraph {
 		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class,true);
 		FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class,true);
 
+		// map to quickly look up the ID of a view
+		Map<String,Integer> imageToindex = new HashMap<>();
+
 		// Create a node in the graph for each image
 		for (int idxTgt = 0; idxTgt < imageIds.size(); idxTgt++) {
+			imageToindex.put(imageIds.get(idxTgt),idxTgt);
 			graph.createNode(imageIds.get(idxTgt));
 		}
 
@@ -116,8 +122,14 @@ public class GeneratePairwiseImageGraph {
 
 			for (int idxSimilar = 0; idxSimilar < similar.size(); idxSimilar++) {
 				String dst = similar.get(idxSimilar);
-				similarImages.lookupFeatures(dst,dstFeats);
 
+				// make sure it isn't considering the same motion twice
+				int dstIdx = imageToindex.get(dst);
+				if( dstIdx <= idxTgt )
+					continue;
+
+				// get information on the features and association
+				similarImages.lookupFeatures(dst,dstFeats);
 				similarImages.lookupMatches(src,dst,matches);
 
 				pairs.reset();
