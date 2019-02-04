@@ -18,31 +18,77 @@
 
 package boofcv.alg.sfm.structure2;
 
+import boofcv.factory.geo.ConfigFundamental;
+import boofcv.factory.geo.ConfigRansac;
+import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedPair;
+import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.ops.ConvertDMatrixStruct;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Given a {@link LookupSimilarImages graph of images} with similar appearance, create a graph in which
- * images with
+ * images with a geometric relationship are connected to each other. Determine if that relationship has 3D geometry
+ * or is composed of a homography.
+ *
+ * If there is a geometric relationship or not is determined by the number of inliers. The minimum number is specified
+ * by {@link #minimumInliers}. A threshold is used for classifying an edge as 3D or not {@link #ratio3D} len(F)/len(H)
+ * a value of 1 just requires equality, greater than one means there must be more features from F (fundamental) than
+ * H (homography).
  *
  * @author Peter Abeles
  */
 public class GeneratePairwiseImageGraph {
-	PairwiseImageGraph2 graph = new PairwiseImageGraph2();
-	List<String> imageIds;
+	public PairwiseImageGraph2 graph = new PairwiseImageGraph2();
+	private List<String> imageIds;
 
-	protected ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D;
-	protected ModelMatcher<DMatrixRMaj, AssociatedPair> ransacH;
+	// concensus matching algorithms
+	ModelMatcher<DMatrixRMaj, AssociatedPair> ransac3D;
+	ModelMatcher<Homography2D_F64,AssociatedPair> ransacH;
 
-	int minimumInliers = 50;
+	/**
+	 * The minimum number of inliers for an edge to be accepted
+	 */
+	public int minimumInliers = 30;
+	/**
+	 * If number of matches from fundamental divided by homography is more than this then it is considered a 3D scene
+	 */
+	public double ratio3D = 1.5;
 
+	/**
+	 * Configures and declares concensum matching algorithms
+	 */
+	public GeneratePairwiseImageGraph() {
+		ConfigRansac configRansacF = new ConfigRansac();
+		configRansacF.maxIterations = 500;
+		configRansacF.inlierThreshold = 1;
+
+		// F computes epipolar error, which isn't as strict as reprojection error for H, so give H a larger error tol
+		ConfigRansac configRansacH = new ConfigRansac();
+		configRansacH.maxIterations = 500;
+		configRansacH.inlierThreshold = 2.0;
+
+		ConfigFundamental configF = new ConfigFundamental();
+		configF.errorModel = ConfigFundamental.ErrorModel.GEOMETRIC;
+		configF.numResolve = 1;
+
+		ransac3D = FactoryMultiViewRobust.fundamentalRansac(configF,configRansacF);
+		ransacH = FactoryMultiViewRobust.homographyRansac(null,configRansacH);
+	}
+
+	/**
+	 * Connects images by testing features for a geometric relationship. Retrieve the results using
+	 * {@link #getGraph()}
+	 *
+	 * @param similarImages Images with feature associations
+	 */
 	public void process( LookupSimilarImages similarImages ) {
 		this.imageIds = similarImages.getImageIDs();
 		this.graph.reset();
@@ -53,10 +99,13 @@ public class GeneratePairwiseImageGraph {
 		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class,true);
 		FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class,true);
 
+		// Create a node in the graph for each image
 		for (int idxTgt = 0; idxTgt < imageIds.size(); idxTgt++) {
 			graph.createNode(imageIds.get(idxTgt));
 		}
 
+		// For each image examine all related images for a true geometric relationship
+		// if one exists then add an edge to the graph describing their relationship
 		for (int idxTgt = 0; idxTgt < imageIds.size(); idxTgt++) {
 			String src = imageIds.get(idxTgt);
 
@@ -82,10 +131,18 @@ public class GeneratePairwiseImageGraph {
 		}
 	}
 
+	/**
+	 * Connects two views together if they meet a minimal set of geometric requirements. Determines if there
+	 * is strong evidence that there is 3D information present and not just a homography
+	 *
+	 * @param src ID of src image
+	 * @param dst ID of dst image
+	 * @param pairs Associated features pixels
+	 * @param matches Associated features feature indexes
+	 */
 	protected void createEdge( String src , String dst ,
 							   FastQueue<AssociatedPair> pairs , FastQueue<AssociatedIndex> matches ) {
 		// Fitting Essential/Fundamental works when the scene is not planar and not pure rotation
-		// TODO double check that it doesn't work if those conditions are not meet
 		int countF = 0;
 		if( ransac3D.process(pairs.toList()) ) {
 			countF = ransac3D.getMatchSet().size();
@@ -101,7 +158,9 @@ public class GeneratePairwiseImageGraph {
 		if( Math.max(countF,countH) < minimumInliers )
 			return;
 
-		boolean is3D = countF > countH*1.2;
+		// The idea here is that if the number features for F is greater than H then it's a 3D scene.
+		// If they are similar then it might be a plane
+		boolean is3D = countF > countH*ratio3D;
 
 		PairwiseImageGraph2.Motion edge = graph.edges.grow();
 		edge.is3D = is3D;
@@ -118,11 +177,18 @@ public class GeneratePairwiseImageGraph {
 			edge.F.set(ransac3D.getModelParameters());
 		} else {
 			saveInlierMatches(ransacH, matches,edge);
-			edge.F.set(ransacH.getModelParameters());
+			Homography2D_F64 H = ransacH.getModelParameters();
+			ConvertDMatrixStruct.convert(H,edge.F);
 		}
 	}
 
-	private void saveInlierMatches(ModelMatcher<DMatrixRMaj, AssociatedPair> ransac,
+	/**
+	 * Puts the inliers from RANSAC into the edge's list of associated features
+	 * @param ransac RANSAC
+	 * @param matches List of matches from feature association
+	 * @param edge The edge that the inliers are to be saved to
+	 */
+	private void saveInlierMatches(ModelMatcher<?, ?> ransac,
 								   FastQueue<AssociatedIndex> matches, PairwiseImageGraph2.Motion edge) {
 
 		int N = ransac.getMatchSet().size();
@@ -131,5 +197,25 @@ public class GeneratePairwiseImageGraph {
 			int idx = ransac.getInputIndex(i);
 			edge.associated.grow().set(matches.get(idx));
 		}
+	}
+
+	public PairwiseImageGraph2 getGraph() {
+		return graph;
+	}
+
+	public int getMinimumInliers() {
+		return minimumInliers;
+	}
+
+	public void setMinimumInliers(int minimumInliers) {
+		this.minimumInliers = minimumInliers;
+	}
+
+	public double getRatio3D() {
+		return ratio3D;
+	}
+
+	public void setRatio3D(double ratio3D) {
+		this.ratio3D = ratio3D;
 	}
 }
