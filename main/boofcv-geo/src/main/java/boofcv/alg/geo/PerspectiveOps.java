@@ -20,6 +20,7 @@ package boofcv.alg.geo;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.pinhole.PinholeNtoP_F64;
+import boofcv.alg.distort.pinhole.PinholePtoN_F32;
 import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.alg.geo.impl.ImplPerspectiveOps_F32;
 import boofcv.alg.geo.impl.ImplPerspectiveOps_F64;
@@ -430,8 +431,8 @@ public class PerspectiveOps {
 
 	/**
 	 * <p>
-	 * Convenient function for converting from original image pixel coordinate to normalized< image coordinates.
-	 * If speed is a concern then {@link PinholePtoN_F64} should be used instead.
+	 * Convenient function for converting from distorted image pixel coordinate to undistorted normalized
+	 * image coordinates. If speed is a concern then {@link PinholePtoN_F64} should be used instead.
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.
@@ -447,8 +448,8 @@ public class PerspectiveOps {
 
 	/**
 	 * <p>
-	 * Convenient function for converting from original image pixel coordinate to normalized< image coordinates.
-	 * If speed is a concern then {@link PinholePtoN_F64} should be used instead.
+	 * Convenient function for converting from distorted image pixel coordinate to undistorted normalized
+	 * image coordinates. If speed is a concern then {@link PinholePtoN_F32} should be used instead.
 	 * </p>
 	 *
 	 * NOTE: norm and pixel can be the same instance.

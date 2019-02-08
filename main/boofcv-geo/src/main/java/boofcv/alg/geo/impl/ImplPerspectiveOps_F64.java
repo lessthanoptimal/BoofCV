@@ -150,7 +150,7 @@ public class ImplPerspectiveOps_F64 {
 		if( norm == null )
 			norm = new Point2D_F64();
 
-		Point2Transform2_F64 pixelToNorm = LensDistortionFactory.narrow(param).distort_F64(true, false);
+		Point2Transform2_F64 pixelToNorm = LensDistortionFactory.narrow(param).undistort_F64(true, false);
 
 		pixelToNorm.compute(pixel.x,pixel.y,norm);
 

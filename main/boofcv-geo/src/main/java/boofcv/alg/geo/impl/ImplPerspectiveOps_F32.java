@@ -150,7 +150,7 @@ public class ImplPerspectiveOps_F32 {
 		if( norm == null )
 			norm = new Point2D_F32();
 
-		Point2Transform2_F32 pixelToNorm = LensDistortionFactory.narrow(param).distort_F32(true, false);
+		Point2Transform2_F32 pixelToNorm = LensDistortionFactory.narrow(param).undistort_F32(true, false);
 
 		pixelToNorm.compute(pixel.x,pixel.y,norm);
 

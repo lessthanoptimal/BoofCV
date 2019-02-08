@@ -19,8 +19,10 @@
 package boofcv.alg.geo;
 
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
@@ -28,6 +30,7 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -275,21 +278,38 @@ class TestPerspectiveOps {
 
 	@Test
 	void convertPixelToNorm_intrinsic_F64() {
-		CameraPinholeBrown intrinsic = new CameraPinholeBrown(100,150,0.1,120,209,500,600);
+		CameraPinholeBrown intrinsic = new CameraPinholeBrown
+				(100,150,0.1,120,209,500,600).fsetRadial(0.1,-0.05);
 
-		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
-		DMatrixRMaj K_inv = new DMatrixRMaj(3,3);
-		CommonOps_DDRM.invert(K,K_inv);
+		Point2Transform2_F64 p2n = LensDistortionFactory.narrow(intrinsic).undistort_F64(true,false);
 
 		Point2D_F64 pixel = new Point2D_F64(100,120);
 		Point2D_F64 expected = new Point2D_F64();
 
-		GeometryMath_F64.mult(K_inv,pixel,expected);
+		p2n.compute(pixel.x,pixel.y,expected);
 
 		Point2D_F64 found = PerspectiveOps.convertPixelToNorm(intrinsic, pixel, null);
 
-		assertEquals(expected.x, found.x, 1e-8);
-		assertEquals(expected.y, found.y, 1e-8);
+		assertEquals(expected.x, found.x, UtilEjml.TEST_F64);
+		assertEquals(expected.y, found.y, UtilEjml.TEST_F64);
+	}
+
+	@Test
+	void convertPixelToNorm_intrinsic_F32() {
+		CameraPinholeBrown intrinsic = new CameraPinholeBrown
+				(100,150,0.1,120,209,500,600).fsetRadial(0.1,-0.05);
+
+		Point2Transform2_F32 p2n = LensDistortionFactory.narrow(intrinsic).undistort_F32(true,false);
+
+		Point2D_F32 pixel = new Point2D_F32(100,120);
+		Point2D_F32 expected = new Point2D_F32();
+
+		p2n.compute(pixel.x,pixel.y,expected);
+
+		Point2D_F32 found = PerspectiveOps.convertPixelToNorm(intrinsic, pixel, null);
+
+		assertEquals(expected.x, found.x, UtilEjml.TEST_F32);
+		assertEquals(expected.y, found.y, UtilEjml.TEST_F32);
 	}
 
 	@Test

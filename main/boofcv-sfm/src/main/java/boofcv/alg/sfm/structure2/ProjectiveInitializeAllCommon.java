@@ -50,8 +50,18 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Given a set of views all of which view all the same features, estimate their structure up to a
- * projective transform
+ * Given a set of views and a set of features which are visible in all views, estimate their structure up to a
+ * projective transform. Summary of processing steps:
+ *
+ * <ol>
+ *     <li>Select initial set of 3 views</li>
+ *     <li>Association between all 3 views</li>
+ *     <li>RANSAC to find Trifocal Tensor</li>
+ *     <li>3 Projective from trifocal</li>
+ *     <li>Triangulate features</li>
+ *     <li>Find remaining projective camera matrices</li>
+ *     <li>Refine with bundle adjustment</li>
+ * </ol>
  *
  * @author Peter Abeles
  */
@@ -369,10 +379,7 @@ public class ProjectiveInitializeAllCommon {
 	/**
 	 * Uses the triangulated points and observations in the root view to estimate the camera matrix for
 	 * all the views which are remaining
-	 * @param db
-	 * @param seed
-	 * @param motions
-	 * @return
+	 * @return true if successful or false if not
 	 */
 	private boolean findRemainingCameraMatrices(LookupSimilarImages db, View seed, GrowQueue_I32 motions) {
 		points3D.reset(); // points in 3D
@@ -419,8 +426,17 @@ public class ProjectiveInitializeAllCommon {
 		return true;
 	}
 
+	/**
+	 * Convert observations into a format which bundle adjustment will understand
+	 * @param seed The first view which all other views are connected to
+	 * @param motions Which edges in seed
+	 * @return observations for SBA
+	 */
 	private SceneObservations createObservationsForBundleAdjustment(LookupSimilarImages db, View seed, GrowQueue_I32 motions) {
-		SceneObservations observations = new SceneObservations(motions.size);
+		// seed view + the motions
+		SceneObservations observations = new SceneObservations(motions.size+1);
+
+		// Observations for the seed view are a special case
 		SceneObservations.View obsView = observations.getView(0);
 		for (int i = 0; i < inlierToSeed.size; i++) {
 			int id = inlierToSeed.data[i];
@@ -429,6 +445,8 @@ public class ProjectiveInitializeAllCommon {
 			id = seedToStructure.data[id];
 			obsView.add(id,(float)o.x,(float)o.y);
 		}
+
+		// Now add observations for edges connected to the seed
 		for (int i = 0; i < motions.size(); i++) {
 			obsView = observations.getView(i+1);
 			Motion m = seed.connections.get(motions.get(i));

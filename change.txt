@@ -35,6 +35,8 @@ Version : 0.33
   * Changed default BYTE mode encoding to default to UTF-8, but attempts to see if it could be another encoding
   * ISO 18004:2015 says it should be 8859-1 but most encoders and decoders use UTF-8 instead
   * TODO Add perspective data set to regression. head on and skewed
+- PerspectiveOps
+  * Fixed bug in convertPixelToNorm() where it called distort instead of undistort. Thanks Tianyi
 - Demonstration
   * Modernized VideoTrackerPointFeaturesApp
   * Modernized FFT Demo
