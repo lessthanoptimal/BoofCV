@@ -97,8 +97,10 @@ public class PairwiseImageGraph2 {
 		 */
 		public int countH;
 
-		// Which features are associated with each other and in the inlier set
-		public FastQueue<AssociatedIndex> associated = new FastQueue<>(AssociatedIndex.class,true);
+		/**
+		 * indexes of features in the match list that are inliers to the found F and H matrix
+		 */
+		public FastQueue<AssociatedIndex> inliers = new FastQueue<>(AssociatedIndex.class,true);
 
 		public View src;
 		public View dst;

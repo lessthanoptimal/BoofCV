@@ -89,10 +89,10 @@ public class GeneratePairwiseImageGraph {
 	 * Connects images by testing features for a geometric relationship. Retrieve the results using
 	 * {@link #getGraph()}
 	 *
-	 * @param similarImages Images with feature associations
+	 * @param db Images with feature associations
 	 */
-	public void process( LookupSimilarImages similarImages ) {
-		this.imageIds = similarImages.getImageIDs();
+	public void process( LookupSimilarImages db ) {
+		this.imageIds = db.getImageIDs();
 		this.graph.reset();
 
 		List<String> similar = new ArrayList<>();
@@ -115,8 +115,8 @@ public class GeneratePairwiseImageGraph {
 		for (int idxTgt = 0; idxTgt < imageIds.size(); idxTgt++) {
 			String src = imageIds.get(idxTgt);
 
-			similarImages.findSimilar(src,similar);
-			similarImages.lookupFeatures(src,srcFeats);
+			db.findSimilar(src,similar);
+			db.lookupPixelFeats(src,srcFeats);
 
 			graph.nodes.get(idxTgt).totalFeatures = srcFeats.size;
 
@@ -129,8 +129,8 @@ public class GeneratePairwiseImageGraph {
 					continue;
 
 				// get information on the features and association
-				similarImages.lookupFeatures(dst,dstFeats);
-				similarImages.lookupMatches(src,dst,matches);
+				db.lookupPixelFeats(dst,dstFeats);
+				db.lookupMatches(src,dst,matches);
 
 				pairs.reset();
 				for (int i = 0; i < matches.size; i++) {
@@ -204,10 +204,10 @@ public class GeneratePairwiseImageGraph {
 								   FastQueue<AssociatedIndex> matches, PairwiseImageGraph2.Motion edge) {
 
 		int N = ransac.getMatchSet().size();
-		edge.associated.reset();
+		edge.inliers.reset();
 		for (int i = 0; i < N; i++) {
 			int idx = ransac.getInputIndex(i);
-			edge.associated.grow().set(matches.get(idx));
+			edge.inliers.grow().set(matches.get(idx));
 		}
 	}
 

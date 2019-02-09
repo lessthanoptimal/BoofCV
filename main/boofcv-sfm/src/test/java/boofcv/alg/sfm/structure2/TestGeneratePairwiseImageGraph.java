@@ -114,7 +114,7 @@ public class TestGeneratePairwiseImageGraph {
 		PairwiseImageGraph2.Motion found = alg.graph.edges.get(0);
 
 		assertTrue(found.is3D);
-		assertTrue(found.associated.size>85);
+		assertTrue(found.inliers.size>85);
 		assertTrue(found.countF>85);
 		assertTrue(found.countH<20);
 		assertEquals("moo",found.src.id);
@@ -139,7 +139,7 @@ public class TestGeneratePairwiseImageGraph {
 		PairwiseImageGraph2.Motion found = alg.graph.edges.get(0);
 
 		assertFalse(found.is3D);
-		assertTrue(found.associated.size>85);
+		assertTrue(found.inliers.size>85);
 //		assertTrue(found.countF>85);
 		assertTrue(found.countH>85);
 		assertEquals("moo",found.src.id);
@@ -164,7 +164,7 @@ public class TestGeneratePairwiseImageGraph {
 		PairwiseImageGraph2.Motion found = alg.graph.edges.get(0);
 
 		assertFalse(found.is3D);
-		assertTrue(found.associated.size>85);
+		assertTrue(found.inliers.size>85);
 		// both models should match it well
 //		assertTrue(found.countF>85);
 		assertTrue(found.countH>85);

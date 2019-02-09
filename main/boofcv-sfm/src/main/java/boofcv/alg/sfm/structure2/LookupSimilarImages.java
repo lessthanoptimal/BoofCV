@@ -41,9 +41,22 @@ public interface LookupSimilarImages {
 	 */
 	void findSimilar( String target , List<String> similar );
 
-	void lookupFeatures( String target , FastQueue<Point2D_F64> features );
+	/**
+	 * Looks up pixel observations of features in the specified view.
+	 *
+	 * @param target ID of target image
+	 * @param features Storage for pixel observations. Cleared upon each call
+	 */
+	void lookupPixelFeats(String target , FastQueue<Point2D_F64> features );
 
-	void lookupMatches(String src, String dst , FastQueue<AssociatedIndex> pairs );
+	/**
+	 * Looks up associated features between the two views. Which view
+	 * @param viewA name of view A
+	 * @param viewB name of view B
+	 * @param pairs Storage for associated features. Cleared upon each call
+	 * @return true if views are similar and have known associations. False if not and results should be ignored
+	 */
+	boolean lookupMatches(String viewA, String viewB , FastQueue<AssociatedIndex> pairs );
 
 	/**
 	 * Looks up the original images width and height

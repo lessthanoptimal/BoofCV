@@ -217,8 +217,8 @@ public class ProjectiveInitializeAllCommon {
 	}
 
 	void findTripleMatches(View seedA, Motion edgeAB , Motion edgeAC ,
-						   FastQueue<AssociatedTripleIndex> matches ) {
-		matches.reset();
+						   FastQueue<AssociatedTripleIndex> matchesTri ) {
+		matchesTri.reset();
 
 		boolean srcAB = edgeAB.src == seedA;
 		boolean srcAC = edgeAC.src == seedA;
@@ -237,17 +237,17 @@ public class ProjectiveInitializeAllCommon {
 
 		// Go through all the matches from B to C and see if the path is consistent between all the views
 		boolean srcIsB = edgeBC.src == viewB;
-		for (int i = 0; i < edgeBC.associated.size; i++) {
-			AssociatedIndex assoc = edgeBC.associated.get(i);
+		for (int i = 0; i < edgeBC.inliers.size; i++) {
+			AssociatedIndex assoc = edgeBC.inliers.get(i);
 			if( srcIsB ) {
 				if( table_B_to_A[assoc.src] != -1 ) {
-					AssociatedTripleIndex tri = matches.grow();
+					AssociatedTripleIndex tri = matchesTri.grow();
 					tri.a = table_B_to_A[assoc.src];
 					if( table_C_to_A[assoc.dst] == tri.a ) {
 						tri.b = assoc.src;
 						tri.c = assoc.dst;
 					} else {
-						matches.removeTail();
+						matchesTri.removeTail();
 					}
 				}
 			}
@@ -257,8 +257,8 @@ public class ProjectiveInitializeAllCommon {
 	private int[] createFeatureLookup(Motion edgeAC, boolean srcAC, View viewC) {
 		int[] table_C_to_A = new int[viewC.totalFeatures];
 		Arrays.fill(table_C_to_A, 0, viewC.totalFeatures, -1);
-		for (int i = 0; i < edgeAC.associated.size; i++) {
-			AssociatedIndex assoc = edgeAC.associated.get(i);
+		for (int i = 0; i < edgeAC.inliers.size; i++) {
+			AssociatedIndex assoc = edgeAC.inliers.get(i);
 			if (srcAC) {
 				table_C_to_A[assoc.dst] = assoc.src;
 			} else {
@@ -304,9 +304,9 @@ public class ProjectiveInitializeAllCommon {
 	}
 
 	private void convertAssociatedTriple(LookupSimilarImages db, View seed, View viewB, View viewC) {
-		db.lookupFeatures(seed.id,featsA);
-		db.lookupFeatures(viewB.id,featsB);
-		db.lookupFeatures(viewC.id,featsC);
+		db.lookupPixelFeats(seed.id,featsA);
+		db.lookupPixelFeats(viewB.id,featsB);
+		db.lookupPixelFeats(viewC.id,featsC);
 		matchesTriple.reset(); // reset and declare memory
 		matchesTriple.growArray(matchesTripleIdx.size);
 		for (int i = 0; i < matchesTripleIdx.size; i++) {
@@ -381,12 +381,14 @@ public class ProjectiveInitializeAllCommon {
 	 * all the views which are remaining
 	 * @return true if successful or false if not
 	 */
-	private boolean findRemainingCameraMatrices(LookupSimilarImages db, View seed, GrowQueue_I32 motions) {
+	boolean findRemainingCameraMatrices(LookupSimilarImages db, View seed, GrowQueue_I32 motions) {
 		points3D.reset(); // points in 3D
 		for (int i = 0; i < structure.points.length; i++) {
 			structure.points[i].get(points3D.grow());
 		}
-		assocPixel.reset(); // contains associated pairs of pixel observations
+		// contains associated pairs of pixel observations
+		// save a call to db by using the previously loaded points
+		assocPixel.reset();
 		for (int i = 0; i < inlierToSeed.size; i++) {
 			assocPixel.grow().p1.set(matchesTriple.get(i).p1);
 		}
@@ -398,21 +400,24 @@ public class ProjectiveInitializeAllCommon {
 			Motion edge = seed.connections.get(motions.get(motionIdx));
 			View viewI = edge.other(seed);
 
-			db.lookupFeatures(viewI.id,featsB);
+			// Lookup pixel locations of features in the connected view
+			db.lookupPixelFeats(viewI.id,featsB);
 			boolean seedSrc = edge.src == seed;
 
 			int matched = 0;
-			for (int i = 0; i < edge.associated.size; i++) {
-				AssociatedIndex a = edge.associated.get(i);
+			for (int i = 0; i < edge.inliers.size; i++) {
+				AssociatedIndex a = edge.inliers.get(i);
 				int featId = seedToStructure.data[seedSrc ? a.src : a.dst];
 				if( featId == -1 )
 					continue;
 				assocPixel.get(featId).p2.set( featsB.get(seedSrc?a.dst:a.src) );
 				matched++;
 			}
+			// All views should have matches for all features, simple sanity check
 			if( matched != assocPixel.size)
 				throw new RuntimeException("BUG! Didn't find all features in the view");
 
+			// Estimate the camera matrix given homogenous pixel observations
 			if( poseEstimator.processHomogenous(assocPixel.toList(),points3D.toList()) ) {
 				db.lookupShape(viewI.id,shape);
 				structure.setView(motionIdx,false,poseEstimator.getProjective(),shape.width,shape.height);
@@ -452,9 +457,9 @@ public class ProjectiveInitializeAllCommon {
 			Motion m = seed.connections.get(motions.get(i));
 			View v = m.other(seed);
 			boolean seedIsSrc = m.src == seed;
-			db.lookupFeatures(v.id,featsB);
-			for (int j = 0; j < m.associated.size; j++) {
-				AssociatedIndex a = m.associated.get(j);
+			db.lookupPixelFeats(v.id,featsB);
+			for (int j = 0; j < m.inliers.size; j++) {
+				AssociatedIndex a = m.inliers.get(j);
 				int id = seedToStructure.data[seedIsSrc?a.src:a.dst];
 				if( id < 0 )
 					continue;

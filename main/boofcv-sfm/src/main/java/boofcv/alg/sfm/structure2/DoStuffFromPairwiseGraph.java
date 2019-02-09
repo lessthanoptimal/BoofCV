@@ -84,8 +84,8 @@ public class DoStuffFromPairwiseGraph {
 			PairwiseImageGraph2.Motion m = target.seed.connections.get(target.motions.get(idxMotion));
 			boolean seedIsSrc = m.src==target.seed;
 			Arrays.fill(visibleMotion,false);
-			for (int i = 0; i < m.associated.size; i++) {
-				AssociatedIndex a = m.associated.get(i);
+			for (int i = 0; i < m.inliers.size; i++) {
+				AssociatedIndex a = m.inliers.get(i);
 				visibleMotion[seedIsSrc?a.src:a.dst] = true;
 			}
 			for (int i = 0; i < target.seed.totalFeatures; i++) {

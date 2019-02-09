@@ -28,6 +28,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.util.PrimitiveArrays;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,13 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 
 	Random rand;
 	List<String> viewIds = new ArrayList<>();
-	List<List<Point2D_F64>> viewFeats = new ArrayList<>();
+	List<List<Point2D_F64>> viewObs = new ArrayList<>();
+	// look up table from view index to feature index
+	List<int[]> viewToFeat = new ArrayList<>();
+	List<int[]> featToView = new ArrayList<>();
+	public List<Point3D_F64> feats3D;
+
+	public PairwiseImageGraph2 graph = new PairwiseImageGraph2();
 
 	public MockLookupSimilarImages( int numViews , long seed) {
 		this.rand = new Random(seed);
@@ -54,7 +61,7 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 		}
 
 		// 3D location of points in view 0 reference frame
-		List<Point3D_F64> feats3D = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 1), -0.5, 0.5, numFeaturse, rand);
+		feats3D = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 1), -0.5, 0.5, numFeaturse, rand);
 
 		// render pixel coordinates of all points
 		for (int i = 0; i < numViews; i++) {
@@ -67,11 +74,65 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 				view0_to_viewi.reset();
 
 			List<Point2D_F64> feats2D = new ArrayList<>();
-			viewFeats.add(feats2D);
+			viewObs.add(feats2D);
 
-			for (int featId = 0; featId < feats3D.size(); featId++) {
-				Point3D_F64 X = feats3D.get(featId);
+			// create look up table from view to feature
+			// we don't want features to have same index because that's not realistic and would hide bugs
+			int[] v2f = PrimitiveArrays.fillCounting(numFeaturse);
+			if( i > 0 )
+				PrimitiveArrays.shuffle(v2f,0,numFeaturse,rand);
+			viewToFeat.add(v2f);
+
+			// save reverse table for fast lookup later
+			int[] f2v = new int[ numFeaturse ];
+			for (int j = 0; j < numFeaturse; j++) {
+				f2v[v2f[j]] = j;
+			}
+			featToView.add(f2v);
+
+			for (int obsID = 0; obsID < feats3D.size(); obsID++) {
+				Point3D_F64 X = feats3D.get(v2f[obsID]);
 				feats2D.add(PerspectiveOps.renderPixel(view0_to_viewi,intrinsic,X));
+			}
+		}
+
+		constructGraph(numViews);
+	}
+
+	private void constructGraph(int numViews) {
+		for (int i = 0; i < numViews; i++) {
+			PairwiseImageGraph2.View v = graph.createNode(viewIds.get(i));
+			v.totalFeatures = numFeaturse;
+		}
+		// connect all views to each other
+		for (int i = 0; i < numViews; i++) {
+			String nameI = viewIds.get(i);
+			for (int j = i+1; j < numViews; j++) {
+				String nameJ = viewIds.get(j);
+
+				PairwiseImageGraph2.Motion edge = new PairwiseImageGraph2.Motion();
+				edge.is3D = true;
+				// swap src and dst to exercise more edge cases
+				if( j%2 == 0 ) {
+					edge.src = graph.mapNodes.get(nameI);
+					edge.dst = graph.mapNodes.get(nameJ);
+				} else {
+					edge.src = graph.mapNodes.get(nameJ);
+					edge.dst = graph.mapNodes.get(nameI);
+				}
+				edge.countH = 10;
+				edge.countF = numFeaturse;
+
+				int[] tableI = featToView.get(i);
+				int[] tableJ = featToView.get(j);
+
+				for (int k = 0; k < numFeaturse; k++) {
+					edge.inliers.grow().setAssociation(tableI[k],tableJ[k],0.0);
+				}
+
+				edge.src.connections.add(edge);
+				edge.dst.connections.add(edge);
+
 			}
 		}
 	}
@@ -92,9 +153,9 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 	}
 
 	@Override
-	public void lookupFeatures(String target, FastQueue<Point2D_F64> features) {
+	public void lookupPixelFeats(String target, FastQueue<Point2D_F64> features) {
 		int index = viewIds.indexOf(target);
-		List<Point2D_F64> l = viewFeats.get(index);
+		List<Point2D_F64> l = viewObs.get(index);
 		features.reset();
 		for (int i = 0; i < l.size(); i++) {
 			features.grow().set(l.get(i));
@@ -102,16 +163,30 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 	}
 
 	@Override
-	public void lookupMatches(String src, String dst, FastQueue<AssociatedIndex> pairs)
+	public boolean lookupMatches(String viewA, String viewB, FastQueue<AssociatedIndex> pairs)
 	{
+		int[] tableA = featToView.get(indexOfView(viewA));
+		int[] tableB = featToView.get(indexOfView(viewB));
+
 		pairs.reset();
 		for (int i = 0; i < numFeaturse; i++) {
-			pairs.grow().setAssociation(i,i,0);
+			pairs.grow().setAssociation(tableA[i],tableB[i],0);
 		}
+
+		return true;
 	}
 
 	@Override
 	public void lookupShape(String target, ImageDimension shape) {
 		shape.set(intrinsic.width,intrinsic.height);
 	}
+
+	public int indexOfView( String name ) {
+		for (int i = 0; i < viewIds.size(); i++) {
+			if( name.equals(viewIds.get(i)))
+				return i;
+		}
+		return -1;
+	}
+
 }
