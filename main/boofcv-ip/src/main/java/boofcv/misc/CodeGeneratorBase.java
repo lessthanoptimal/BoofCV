@@ -65,13 +65,13 @@ public abstract class CodeGeneratorBase {
 		out.println();
 		if( concurrent ) {
 //			body = body.replace("\n\t","\n\t\t");
-			out.printf("\t\tIntStream.range(%s, %s).parallel().forEach( %s -> {\n",lower,upper,var);
+			out.printf("\t\tBoofConcurrency.range(%s, %s, %s -> {\n",lower,upper,var);
 			out.print(body);
-			out.println("\t\t});\n");
+			out.print("\t\t});\n");
 		} else {
 			out.printf("\t\tfor( int %s = %s; %s < %s; %s++ ) {\n",var,lower,var,upper,var);
 			out.print(body);
-			out.println("\t\t}\n");
+			out.print("\t\t}\n");
 		}
 	}
 

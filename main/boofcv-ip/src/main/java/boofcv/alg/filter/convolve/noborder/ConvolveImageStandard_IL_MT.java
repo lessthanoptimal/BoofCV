@@ -18,10 +18,9 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
-
-import java.util.stream.IntStream;
 
 
 /**
@@ -50,7 +49,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		IntStream.range(0, src.height).parallel().forEach( i -> {
+		BoofConcurrency.range(0, src.height, i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -83,7 +82,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		IntStream.range(offset, yEnd).parallel().forEach( y -> {
+		BoofConcurrency.range(offset, yEnd, y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -117,7 +116,7 @@ public class ConvolveImageStandard_IL_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
+		BoofConcurrency.range(offsetL, height-offsetR, y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -151,7 +150,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		IntStream.range(0, src.height).parallel().forEach( i -> {
+		BoofConcurrency.range(0, src.height, i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -184,7 +183,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		IntStream.range(offset, yEnd).parallel().forEach( y -> {
+		BoofConcurrency.range(offset, yEnd, y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -218,7 +217,7 @@ public class ConvolveImageStandard_IL_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
+		BoofConcurrency.range(offsetL, height-offsetR, y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -252,7 +251,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		IntStream.range(0, src.height).parallel().forEach( i -> {
+		BoofConcurrency.range(0, src.height, i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -285,7 +284,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		IntStream.range(offset, yEnd).parallel().forEach( y -> {
+		BoofConcurrency.range(offset, yEnd, y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -319,7 +318,7 @@ public class ConvolveImageStandard_IL_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
+		BoofConcurrency.range(offsetL, height-offsetR, y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -353,7 +352,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		IntStream.range(0, src.height).parallel().forEach( i -> {
+		BoofConcurrency.range(0, src.height, i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -386,7 +385,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		IntStream.range(offset, yEnd).parallel().forEach( y -> {
+		BoofConcurrency.range(offset, yEnd, y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -420,7 +419,7 @@ public class ConvolveImageStandard_IL_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
+		BoofConcurrency.range(offsetL, height-offsetR, y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -459,7 +458,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		IntStream.range(offset, yEnd).parallel().forEach( y -> {
+		BoofConcurrency.range(offset, yEnd, y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -492,7 +491,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		IntStream.range(0, src.height).parallel().forEach( i -> {
+		BoofConcurrency.range(0, src.height, i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -525,7 +524,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		IntStream.range(offset, yEnd).parallel().forEach( y -> {
+		BoofConcurrency.range(offset, yEnd, y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -559,7 +558,7 @@ public class ConvolveImageStandard_IL_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
+		BoofConcurrency.range(offsetL, height-offsetR, y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -594,7 +593,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		IntStream.range(0, src.height).parallel().forEach( i -> {
+		BoofConcurrency.range(0, src.height, i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -628,7 +627,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		IntStream.range(offset, yEnd).parallel().forEach( y -> {
+		BoofConcurrency.range(offset, yEnd, y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -663,7 +662,7 @@ public class ConvolveImageStandard_IL_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
+		BoofConcurrency.range(offsetL, height-offsetR, y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -698,7 +697,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		IntStream.range(0, src.height).parallel().forEach( i -> {
+		BoofConcurrency.range(0, src.height, i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -732,7 +731,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		IntStream.range(offset, yEnd).parallel().forEach( y -> {
+		BoofConcurrency.range(offset, yEnd, y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -767,7 +766,7 @@ public class ConvolveImageStandard_IL_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
+		BoofConcurrency.range(offsetL, height-offsetR, y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -801,7 +800,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		IntStream.range(0, src.height).parallel().forEach( i -> {
+		BoofConcurrency.range(0, src.height, i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -834,7 +833,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		IntStream.range(offset, yEnd).parallel().forEach( y -> {
+		BoofConcurrency.range(offset, yEnd, y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -868,7 +867,7 @@ public class ConvolveImageStandard_IL_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
+		BoofConcurrency.range(offsetL, height-offsetR, y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -903,7 +902,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		IntStream.range(0, src.height).parallel().forEach( i -> {
+		BoofConcurrency.range(0, src.height, i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -937,7 +936,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		IntStream.range(offset, yEnd).parallel().forEach( y -> {
+		BoofConcurrency.range(offset, yEnd, y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -972,7 +971,7 @@ public class ConvolveImageStandard_IL_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
+		BoofConcurrency.range(offsetL, height-offsetR, y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -1011,7 +1010,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		IntStream.range(offset, yEnd).parallel().forEach( y -> {
+		BoofConcurrency.range(offset, yEnd, y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -1044,7 +1043,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		IntStream.range(0, src.height).parallel().forEach( i -> {
+		BoofConcurrency.range(0, src.height, i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -1077,7 +1076,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		IntStream.range(offset, yEnd).parallel().forEach( y -> {
+		BoofConcurrency.range(offset, yEnd, y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -1111,7 +1110,7 @@ public class ConvolveImageStandard_IL_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
+		BoofConcurrency.range(offsetL, height-offsetR, y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -1146,7 +1145,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		IntStream.range(0, src.height).parallel().forEach( i -> {
+		BoofConcurrency.range(0, src.height, i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -1180,7 +1179,7 @@ public class ConvolveImageStandard_IL_MT {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		IntStream.range(offset, yEnd).parallel().forEach( y -> {
+		BoofConcurrency.range(offset, yEnd, y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -1215,7 +1214,7 @@ public class ConvolveImageStandard_IL_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
+		BoofConcurrency.range(offsetL, height-offsetR, y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;

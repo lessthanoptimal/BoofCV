@@ -33,19 +33,22 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 
 	@Override
 	public void generate() throws FileNotFoundException {
-		printPreamble();
-		addFunctions(AutoTypeImage.U8, AutoTypeImage.I16);
-		addFunctions(AutoTypeImage.U8, AutoTypeImage.S32);
-		addFunctions(AutoTypeImage.S16, AutoTypeImage.I16);
-		addFunctions(AutoTypeImage.U16, AutoTypeImage.I16);
-		addFunctions(AutoTypeImage.S32, AutoTypeImage.S32);
-		addFunctions(AutoTypeImage.F32, AutoTypeImage.F32);
-		addFunctions(AutoTypeImage.F64, AutoTypeImage.F64);
-		out.println("}");
+		for (int i = 0; i < 2; i++) {
+			concurrent = i == 0;
+			printPreamble();
+			addFunctions(AutoTypeImage.U8, AutoTypeImage.I16);
+			addFunctions(AutoTypeImage.U8, AutoTypeImage.S32);
+			addFunctions(AutoTypeImage.S16, AutoTypeImage.I16);
+			addFunctions(AutoTypeImage.U16, AutoTypeImage.I16);
+			addFunctions(AutoTypeImage.S32, AutoTypeImage.S32);
+			addFunctions(AutoTypeImage.F32, AutoTypeImage.F32);
+			addFunctions(AutoTypeImage.F64, AutoTypeImage.F64);
+			out.println("}");
+		}
 	}
 
-	public void addFunctions( AutoTypeImage imageIn , AutoTypeImage imageOut ) throws FileNotFoundException {
-
+	public void addFunctions( AutoTypeImage imageIn , AutoTypeImage imageOut ) throws FileNotFoundException
+	{
 		this.imageIn = imageIn;
 		this.imageOut = imageOut;
 		printHorizontal();
@@ -53,8 +56,12 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 	}
 
 	public void printPreamble() {
-		out.print("import boofcv.struct.image.*;\n" +
-				"\n" +
+		autoSelectName();
+		out.print("import boofcv.struct.image.*;\n");
+		if( concurrent )
+			out.print("import boofcv.concurrency.BoofConcurrency;\n");
+
+		out.print("\n" +
 				"/**\n" +
 				" * <p>\n" +
 				" * Convolves a box filter across an image.  A box filter is equivalent to convolving a kernel with all 1's.\n" +
@@ -75,10 +82,10 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 		String bitWise = imageIn.getBitWise();
 
 		out.print("\tpublic static void horizontal( " + imageIn.getSingleBandName() + " input , " + imageOut.getSingleBandName() + " output , int radius ) {\n" +
-				"\t\tfinal int kernelWidth = radius*2 + 1;\n" +
-				"\n" +
-				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
-				"\t\t\tint indexIn = input.startIndex + input.stride*y;\n" +
+				"\t\tfinal int kernelWidth = radius*2 + 1;\n");
+
+		String body = "";
+		body += "\t\t\tint indexIn = input.startIndex + input.stride*y;\n" +
 				"\t\t\tint indexOut = output.startIndex + output.stride*y + radius;\n" +
 				"\n" +
 				"\t\t\t" + sumType + " total = 0;\n" +
@@ -96,9 +103,10 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 				"\t\t\t\ttotal += input.data[ indexIn ] " + bitWise + ";\n" +
 				"\n" +
 				"\t\t\t\toutput.data[indexOut++] = " + typeCast + "total;\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
+				"\t\t\t}\n";
+
+		printParallel("y","0","input.height",body);
+		out.print("\t}\n\n");
 	}
 
 	public void printVertical() {
@@ -125,9 +133,10 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 				"\t\t\toutput.data[indexOut] = " + typeCast + "total;\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\t// change the order it is processed in to reduce cache misses\n" +
-				"\t\tfor( int y = radius+1; y < output.height-radius; y++ ) {\n" +
-				"\t\t\tint indexIn = input.startIndex + (y+radius)*input.stride;\n" +
+				"\t\t// change the order it is processed in to reduce cache misses\n");
+
+		String body = "";
+		body += "\t\t\tint indexIn = input.startIndex + (y+radius)*input.stride;\n" +
 				"\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
 				"\n" +
 				"\t\t\tfor( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {\n" +
@@ -135,9 +144,9 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 				"\t\t\t\ttotal += input.data[ indexIn ]" + bitWise + ";\n" +
 				"\n" +
 				"\t\t\t\toutput.data[indexOut] = " + typeCast + "total;\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
+				"\t\t\t}\n";
+		printParallel("y","radius+1","output.height-radius",body);
+		out.print("\t}\n\n");
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {

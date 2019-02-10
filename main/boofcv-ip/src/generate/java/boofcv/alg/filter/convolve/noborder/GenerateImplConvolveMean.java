@@ -19,7 +19,7 @@
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.misc.AutoTypeImage;
-import boofcv.misc.CodeGeneratorUtil;
+import boofcv.misc.CodeGeneratorBase;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -28,10 +28,8 @@ import java.io.PrintStream;
 /**
  * @author Peter Abeles
  */
-public class GenerateImplConvolveMean {
+public class GenerateImplConvolveMean extends CodeGeneratorBase {
 
-	String className = "ImplConvolveMean";
-	PrintStream out;
 
 	AutoTypeImage imageIn;
 	AutoTypeImage imageOut;
@@ -40,18 +38,21 @@ public class GenerateImplConvolveMean {
 		out = new PrintStream(new FileOutputStream(className + ".java"));
 	}
 
-	public void createAll() throws FileNotFoundException {
-		printPreamble();
-		addFunctions(AutoTypeImage.U8, AutoTypeImage.I8);
-		addFunctions(AutoTypeImage.S16, AutoTypeImage.I16);
-		addFunctions(AutoTypeImage.U16, AutoTypeImage.I16);
-		addFunctions(AutoTypeImage.F32, AutoTypeImage.F32);
-		addFunctions(AutoTypeImage.F64, AutoTypeImage.F64);
-		out.println("}");
+	@Override
+	public void generate() throws FileNotFoundException {
+		for (int i = 0; i < 2; i++) {
+			concurrent = i == 0;
+			printPreamble();
+			addFunctions(AutoTypeImage.U8, AutoTypeImage.I8);
+			addFunctions(AutoTypeImage.S16, AutoTypeImage.I16);
+			addFunctions(AutoTypeImage.U16, AutoTypeImage.I16);
+			addFunctions(AutoTypeImage.F32, AutoTypeImage.F32);
+			addFunctions(AutoTypeImage.F64, AutoTypeImage.F64);
+			out.println("}");
+		}
 	}
 
 	public void addFunctions( AutoTypeImage imageIn , AutoTypeImage imageOut ) throws FileNotFoundException {
-
 		this.imageIn = imageIn;
 		this.imageOut = imageOut;
 		printHorizontal();
@@ -59,11 +60,15 @@ public class GenerateImplConvolveMean {
 	}
 
 	public void printPreamble() {
-		out.print(CodeGeneratorUtil.copyright);
-		out.print("package boofcv.alg.filter.convolve.noborder;\n" +
-				"\n" +
+		autoSelectName();
+		out.print(
 				"import boofcv.struct.image.*;\n" +
-				"import javax.annotation.Generated;\n" +
+				"import javax.annotation.Generated;\n");
+
+		if( concurrent )
+			out.print("import boofcv.concurrency.BoofConcurrency;\n");
+
+		out.print(
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -93,9 +98,10 @@ public class GenerateImplConvolveMean {
 				"\n" +
 				"\t\tfinal " + sumType + " divisor = kernelWidth;\n" +
 				declareHalf +
-				"\n" +
-				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
-				"\t\t\tint indexIn = input.startIndex + input.stride*y;\n" +
+				"\n");
+		String body = "";
+
+		body += "\t\t\tint indexIn = input.startIndex + input.stride*y;\n" +
 				"\t\t\tint indexOut = output.startIndex + output.stride*y + radius;\n" +
 				"\n" +
 				"\t\t\t" + sumType + " total = 0;\n" +
@@ -113,9 +119,9 @@ public class GenerateImplConvolveMean {
 				"\t\t\t\ttotal += input.data[ indexIn ] " + bitWise + ";\n" +
 				"\n" +
 				"\t\t\t\toutput.data[indexOut++] = " + typeCast + "("+divide+");\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
+				"\t\t\t}\n";
+		printParallel("y","0","input.height",body);
+		out.print("\t}\n\n");
 	}
 
 	public void printVertical() {
@@ -149,9 +155,10 @@ public class GenerateImplConvolveMean {
 				"\t\t\toutput.data[indexOut] = "+typeCast+"("+divide+");\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\t// change the order it is processed in to reduce cache misses\n" +
-				"\t\tfor( int y = radius+1; y < output.height-radius; y++ ) {\n" +
-				"\t\t\tint indexIn = input.startIndex + (y+radius)*input.stride;\n" +
+				"\t\t// change the order it is processed in to reduce cache misses\n");
+
+		String body = "";
+		body += "\t\t\tint indexIn = input.startIndex + (y+radius)*input.stride;\n" +
 				"\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
 				"\n" +
 				"\t\t\tfor( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {\n" +
@@ -159,14 +166,15 @@ public class GenerateImplConvolveMean {
 				"\t\t\t\ttotals[ x ] = total += input.data[ indexIn ]"+bitWise+";\n" +
 				"\n" +
 				"\t\t\t\toutput.data[indexOut] = "+typeCast+"("+divide+");\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
+				"\t\t\t}\n";
+
+		printParallel("y","radius+1","output.height-radius",body);
+		out.print("\t}\n\n");
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {
 		GenerateImplConvolveMean generator = new GenerateImplConvolveMean();
 
-		generator.createAll();
+		generator.generate();
 	}
 }

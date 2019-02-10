@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.struct.image.*;
@@ -39,6 +40,7 @@ public class ImplConvolveMean {
 
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
+
 
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
@@ -86,6 +88,7 @@ public class ImplConvolveMean {
 		}
 
 		// change the order it is processed in to reduce cache misses
+
 		for( int y = radius+1; y < output.height-radius; y++ ) {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
@@ -104,6 +107,7 @@ public class ImplConvolveMean {
 
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
+
 
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
@@ -151,6 +155,7 @@ public class ImplConvolveMean {
 		}
 
 		// change the order it is processed in to reduce cache misses
+
 		for( int y = radius+1; y < output.height-radius; y++ ) {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
@@ -169,6 +174,7 @@ public class ImplConvolveMean {
 
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
+
 
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
@@ -216,6 +222,7 @@ public class ImplConvolveMean {
 		}
 
 		// change the order it is processed in to reduce cache misses
+
 		for( int y = radius+1; y < output.height-radius; y++ ) {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
@@ -233,6 +240,7 @@ public class ImplConvolveMean {
 		final int kernelWidth = radius*2 + 1;
 
 		final float divisor = kernelWidth;
+
 
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
@@ -279,6 +287,7 @@ public class ImplConvolveMean {
 		}
 
 		// change the order it is processed in to reduce cache misses
+
 		for( int y = radius+1; y < output.height-radius; y++ ) {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
@@ -296,6 +305,7 @@ public class ImplConvolveMean {
 		final int kernelWidth = radius*2 + 1;
 
 		final double divisor = kernelWidth;
+
 
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
@@ -342,6 +352,7 @@ public class ImplConvolveMean {
 		}
 
 		// change the order it is processed in to reduce cache misses
+
 		for( int y = radius+1; y < output.height-radius; y++ ) {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;

@@ -54,8 +54,8 @@ Version : 0.33
   * Fixed how dependencies are referenced and Jars built. Thanks H1Gdev for pointing out this problem!
 - Concurrency
   * Added support for concurrency. Can be turned on using BoofConcurrency.USE_CONCURRENT = true
-  * Supported Convolution: general, TODO sum, TODO mean, TODO gradient,
-  * Supported: TODO threshold block, TODO image distort, TODO KLT, TODO stereo disparity
+  * Convolution: general, sum, mean, TODO gradient
+  * TODO image distort
 
 
 TODO This Release

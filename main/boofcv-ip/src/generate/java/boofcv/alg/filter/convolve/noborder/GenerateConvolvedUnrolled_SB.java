@@ -119,7 +119,7 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 		out.print("import boofcv.struct.image." + typeInput + ";\n"+
 				"import javax.annotation.Generated;\n");
 		if( concurrent )
-			out.print("import java.util.stream.IntStream;\n");
+			out.print("import boofcv.concurrency.BoofConcurrency;\n");
 
 		if (typeInput.compareTo(typeOutput) != 0)
 			out.print("import boofcv.struct.image." + typeOutput + ";\n");

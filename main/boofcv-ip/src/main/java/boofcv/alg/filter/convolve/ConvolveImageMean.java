@@ -20,7 +20,9 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
+import boofcv.alg.filter.convolve.noborder.ImplConvolveMean_MT;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder_SB;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
@@ -56,7 +58,11 @@ public class ConvolveImageMean {
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
-				ImplConvolveMean.horizontal(input, output, radius);
+				if(BoofConcurrency.USE_CONCURRENT) {
+					ImplConvolveMean_MT.horizontal(input, output, radius);
+				} else {
+					ImplConvolveMean.horizontal(input, output, radius);
+				}
 			}
 		}
 	}
@@ -80,7 +86,11 @@ public class ConvolveImageMean {
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
-				ImplConvolveMean.vertical(input, output, radius);
+				if(BoofConcurrency.USE_CONCURRENT) {
+					ImplConvolveMean_MT.vertical(input, output, radius);
+				} else {
+					ImplConvolveMean.vertical(input, output, radius);
+				}
 			}
 		}
 	}
@@ -104,7 +114,11 @@ public class ConvolveImageMean {
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
-				ImplConvolveMean.horizontal(input, output, radius);
+				if(BoofConcurrency.USE_CONCURRENT) {
+					ImplConvolveMean_MT.horizontal(input, output, radius);
+				} else {
+					ImplConvolveMean.horizontal(input, output, radius);
+				}
 			}
 		}
 	}
@@ -128,7 +142,11 @@ public class ConvolveImageMean {
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
-				ImplConvolveMean.vertical(input, output, radius);
+				if(BoofConcurrency.USE_CONCURRENT) {
+					ImplConvolveMean_MT.vertical(input, output, radius);
+				} else {
+					ImplConvolveMean.vertical(input, output, radius);
+				}
 			}
 		}
 	}
@@ -152,7 +170,11 @@ public class ConvolveImageMean {
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
-				ImplConvolveMean.horizontal(input, output, radius);
+				if(BoofConcurrency.USE_CONCURRENT) {
+					ImplConvolveMean_MT.horizontal(input, output, radius);
+				} else {
+					ImplConvolveMean.horizontal(input, output, radius);
+				}
 			}
 		}
 	}
@@ -176,7 +198,11 @@ public class ConvolveImageMean {
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
-				ImplConvolveMean.vertical(input, output, radius);
+				if(BoofConcurrency.USE_CONCURRENT) {
+					ImplConvolveMean_MT.vertical(input, output, radius);
+				} else {
+					ImplConvolveMean.vertical(input, output, radius);
+				}
 			}
 		}
 	}
@@ -200,7 +226,11 @@ public class ConvolveImageMean {
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
-				ImplConvolveMean.horizontal(input, output, radius);
+				if(BoofConcurrency.USE_CONCURRENT) {
+					ImplConvolveMean_MT.horizontal(input, output, radius);
+				} else {
+					ImplConvolveMean.horizontal(input, output, radius);
+				}
 			}
 		}
 	}
@@ -224,7 +254,11 @@ public class ConvolveImageMean {
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
-				ImplConvolveMean.horizontal(input, output, radius);
+				if(BoofConcurrency.USE_CONCURRENT) {
+					ImplConvolveMean_MT.horizontal(input, output, radius);
+				} else {
+					ImplConvolveMean.horizontal(input, output, radius);
+				}
 			}
 		}
 	}
@@ -248,7 +282,11 @@ public class ConvolveImageMean {
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
-				ImplConvolveMean.vertical(input, output, radius);
+				if(BoofConcurrency.USE_CONCURRENT) {
+					ImplConvolveMean_MT.vertical(input, output, radius);
+				} else {
+					ImplConvolveMean.vertical(input, output, radius);
+				}
 			}
 		}
 	}
@@ -272,7 +310,11 @@ public class ConvolveImageMean {
 			} else {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
-				ImplConvolveMean.vertical(input, output, radius);
+				if(BoofConcurrency.USE_CONCURRENT) {
+					ImplConvolveMean_MT.vertical(input, output, radius);
+				} else {
+					ImplConvolveMean.vertical(input, output, radius);
+				}
 			}
 		}
 	}

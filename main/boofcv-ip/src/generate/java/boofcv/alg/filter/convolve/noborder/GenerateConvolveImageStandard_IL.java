@@ -72,7 +72,8 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 		out.print("import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n");
 		if( concurrent )
-			out.print("import java.util.stream.IntStream;\n");
+			out.print("import boofcv.concurrency.BoofConcurrency;\n");
+
 		out.println();
 		out.println();
 		out.print("/**\n" +

@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 
 /**
@@ -30,12 +31,12 @@ import boofcv.struct.image.*;
  * 
  * @author Peter Abeles
  */
-public class ImplConvolveBox {
+public class ImplConvolveBox_MT {
 
 	public static void horizontal( GrayU8 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.range(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -55,7 +56,7 @@ public class ImplConvolveBox {
 
 				output.data[indexOut++] = (short)total;
 			}
-		}
+		});
 	}
 
 	public static void vertical( GrayU8 input , GrayI16 output , int radius ) {
@@ -78,7 +79,7 @@ public class ImplConvolveBox {
 
 		// change the order it is processed in to reduce cache misses
 
-		for( int y = radius+1; y < output.height-radius; y++ ) {
+		BoofConcurrency.range(radius+1, output.height-radius, y -> {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
@@ -88,13 +89,13 @@ public class ImplConvolveBox {
 
 				output.data[indexOut] = (short)total;
 			}
-		}
+		});
 	}
 
 	public static void horizontal( GrayU8 input , GrayS32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.range(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -114,7 +115,7 @@ public class ImplConvolveBox {
 
 				output.data[indexOut++] = total;
 			}
-		}
+		});
 	}
 
 	public static void vertical( GrayU8 input , GrayS32 output , int radius ) {
@@ -137,7 +138,7 @@ public class ImplConvolveBox {
 
 		// change the order it is processed in to reduce cache misses
 
-		for( int y = radius+1; y < output.height-radius; y++ ) {
+		BoofConcurrency.range(radius+1, output.height-radius, y -> {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
@@ -147,13 +148,13 @@ public class ImplConvolveBox {
 
 				output.data[indexOut] = total;
 			}
-		}
+		});
 	}
 
 	public static void horizontal( GrayS16 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.range(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -173,7 +174,7 @@ public class ImplConvolveBox {
 
 				output.data[indexOut++] = (short)total;
 			}
-		}
+		});
 	}
 
 	public static void vertical( GrayS16 input , GrayI16 output , int radius ) {
@@ -196,7 +197,7 @@ public class ImplConvolveBox {
 
 		// change the order it is processed in to reduce cache misses
 
-		for( int y = radius+1; y < output.height-radius; y++ ) {
+		BoofConcurrency.range(radius+1, output.height-radius, y -> {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
@@ -206,13 +207,13 @@ public class ImplConvolveBox {
 
 				output.data[indexOut] = (short)total;
 			}
-		}
+		});
 	}
 
 	public static void horizontal( GrayU16 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.range(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -232,7 +233,7 @@ public class ImplConvolveBox {
 
 				output.data[indexOut++] = (short)total;
 			}
-		}
+		});
 	}
 
 	public static void vertical( GrayU16 input , GrayI16 output , int radius ) {
@@ -255,7 +256,7 @@ public class ImplConvolveBox {
 
 		// change the order it is processed in to reduce cache misses
 
-		for( int y = radius+1; y < output.height-radius; y++ ) {
+		BoofConcurrency.range(radius+1, output.height-radius, y -> {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
@@ -265,13 +266,13 @@ public class ImplConvolveBox {
 
 				output.data[indexOut] = (short)total;
 			}
-		}
+		});
 	}
 
 	public static void horizontal( GrayS32 input , GrayS32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.range(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -291,7 +292,7 @@ public class ImplConvolveBox {
 
 				output.data[indexOut++] = total;
 			}
-		}
+		});
 	}
 
 	public static void vertical( GrayS32 input , GrayS32 output , int radius ) {
@@ -314,7 +315,7 @@ public class ImplConvolveBox {
 
 		// change the order it is processed in to reduce cache misses
 
-		for( int y = radius+1; y < output.height-radius; y++ ) {
+		BoofConcurrency.range(radius+1, output.height-radius, y -> {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
@@ -324,13 +325,13 @@ public class ImplConvolveBox {
 
 				output.data[indexOut] = total;
 			}
-		}
+		});
 	}
 
 	public static void horizontal( GrayF32 input , GrayF32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.range(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -350,7 +351,7 @@ public class ImplConvolveBox {
 
 				output.data[indexOut++] = total;
 			}
-		}
+		});
 	}
 
 	public static void vertical( GrayF32 input , GrayF32 output , int radius ) {
@@ -373,7 +374,7 @@ public class ImplConvolveBox {
 
 		// change the order it is processed in to reduce cache misses
 
-		for( int y = radius+1; y < output.height-radius; y++ ) {
+		BoofConcurrency.range(radius+1, output.height-radius, y -> {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
@@ -383,13 +384,13 @@ public class ImplConvolveBox {
 
 				output.data[indexOut] = total;
 			}
-		}
+		});
 	}
 
 	public static void horizontal( GrayF64 input , GrayF64 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.range(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -409,7 +410,7 @@ public class ImplConvolveBox {
 
 				output.data[indexOut++] = total;
 			}
-		}
+		});
 	}
 
 	public static void vertical( GrayF64 input , GrayF64 output , int radius ) {
@@ -432,7 +433,7 @@ public class ImplConvolveBox {
 
 		// change the order it is processed in to reduce cache misses
 
-		for( int y = radius+1; y < output.height-radius; y++ ) {
+		BoofConcurrency.range(radius+1, output.height-radius, y -> {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
@@ -442,7 +443,7 @@ public class ImplConvolveBox {
 
 				output.data[indexOut] = total;
 			}
-		}
+		});
 	}
 
 }

@@ -56,7 +56,7 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(
-				"import boofcv.BoofConcurrency;\n" +
+				"import boofcv.concurrency.BoofConcurrency;\n" +
 				"import boofcv.alg.InputSanityCheck;\n" +
 				"import boofcv.alg.filter.convolve.noborder.*;\n" +
 				"import boofcv.struct.convolve.*;\n" +

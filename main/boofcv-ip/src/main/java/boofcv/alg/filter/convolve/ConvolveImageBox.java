@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.alg.filter.convolve;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveBox;
+import boofcv.alg.filter.convolve.noborder.ImplConvolveBox_MT;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.border.ImageBorderValue;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -47,7 +49,11 @@ public class ConvolveImageBox {
 
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,false);
 		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
-		ImplConvolveBox.horizontal(input, output, radius);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvolveBox_MT.horizontal(input, output, radius);
+		} else {
+			ImplConvolveBox.horizontal(input, output, radius);
+		}
 	}
 
 	/**
@@ -62,7 +68,11 @@ public class ConvolveImageBox {
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
-		ImplConvolveBox.horizontal(input, output, radius);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvolveBox_MT.horizontal(input, output, radius);
+		} else {
+			ImplConvolveBox.horizontal(input, output, radius);
+		}
 	}
 
 	/**
@@ -77,7 +87,11 @@ public class ConvolveImageBox {
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
-		ImplConvolveBox.horizontal(input, output, radius);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvolveBox_MT.horizontal(input, output, radius);
+		} else {
+			ImplConvolveBox.horizontal(input, output, radius);
+		}
 	}
 
 	/**
@@ -92,7 +106,11 @@ public class ConvolveImageBox {
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
-		ImplConvolveBox.horizontal(input, output, radius);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvolveBox_MT.horizontal(input, output, radius);
+		} else {
+			ImplConvolveBox.horizontal(input, output, radius);
+		}
 	}
 
 	/**
@@ -107,7 +125,11 @@ public class ConvolveImageBox {
 
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,false);
 		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
-		ImplConvolveBox.vertical(input, output, radius);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvolveBox_MT.vertical(input, output, radius);
+		} else {
+			ImplConvolveBox.vertical(input, output, radius);
+		}
 	}
 
 	/**
@@ -122,7 +144,11 @@ public class ConvolveImageBox {
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
-		ImplConvolveBox.vertical(input, output, radius);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvolveBox_MT.vertical(input, output, radius);
+		} else {
+			ImplConvolveBox.vertical(input, output, radius);
+		}
 	}
 
 	/**
@@ -137,7 +163,11 @@ public class ConvolveImageBox {
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
-		ImplConvolveBox.vertical(input, output, radius);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvolveBox_MT.vertical(input, output, radius);
+		} else {
+			ImplConvolveBox.vertical(input, output, radius);
+		}
 	}
 
 	/**
@@ -152,6 +182,10 @@ public class ConvolveImageBox {
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
-		ImplConvolveBox.vertical(input, output, radius);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvolveBox_MT.vertical(input, output, radius);
+		} else {
+			ImplConvolveBox.vertical(input, output, radius);
+		}
 	}
 }

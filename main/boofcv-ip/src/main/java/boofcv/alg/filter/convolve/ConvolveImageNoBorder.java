@@ -18,9 +18,9 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.BoofConcurrency;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.noborder.*;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
 

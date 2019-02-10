@@ -16,16 +16,19 @@
  * limitations under the License.
  */
 
-package boofcv;
+package boofcv.alg.filter.convolve.noborder;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Location of controls for turning on and off concurrent (i.e. threaded) algorithms.
- *
  * @author Peter Abeles
  */
-public class BoofConcurrency {
-	/**
-	 * If set to true it will use a concurrent algorithm
-	 */
-	public static boolean USE_CONCURRENT = false;
+class TestConvolveImageStandard_IL_MT {
+	// TODO Autogenerate all of these classes
+	@Test
+	public void implement() {
+		fail("implement");
+	}
 }

@@ -45,7 +45,6 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 	public void generate() throws FileNotFoundException {
 		for (int i = 0; i < 2; i++) {
 			concurrent = i==0;
-
 			printPreamble();
 			printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false);
 //		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false, true);
@@ -72,7 +71,7 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 		out.print("import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n");
 		if( concurrent )
-			out.print("import java.util.stream.IntStream;\n");
+			out.print("import boofcv.concurrency.BoofConcurrency;\n");
 
 		out.println();
 		out.println();
