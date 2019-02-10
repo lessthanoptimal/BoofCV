@@ -850,9 +850,11 @@ public class ProjectionMath {
     * @param startBand First band to be included in the projection
     * @param lastBand Last band to be included in the projection
     */
-   public static void stdDevBand(Planar<GrayU8> input, GrayU8 output, GrayU8 avg, 
-           int startBand, int lastBand ) {
+   public static void stdDevBand(Planar<GrayU8> input, GrayU8 output, GrayU8 avg, int startBand, int lastBand ) {
       checkInput(input, startBand, lastBand);
+      if (startBand >= lastBand) {
+         throw new IllegalArgumentException("startBand should < lastBand");
+      } 
       final int h = input.getHeight();
       final int w = input.getWidth();
       
@@ -895,6 +897,9 @@ public class ProjectionMath {
     */
 	public static void stdDevBand(Planar<GrayS8> input , GrayS8 output, GrayS8 avg, int startBand, int lastBand ) {
       checkInput(input, startBand, lastBand);
+      if (startBand >= lastBand) {
+         throw new IllegalArgumentException("startBand should < lastBand");
+      } 
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
@@ -936,6 +941,9 @@ public class ProjectionMath {
     */
 	public static void stdDevBand(Planar<GrayU16> input , GrayU16 output, GrayU16 avg, int startBand, int lastBand ) {
       checkInput(input, startBand, lastBand);
+      if (startBand >= lastBand) {
+         throw new IllegalArgumentException("startBand should < lastBand");
+      } 
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
@@ -979,6 +987,9 @@ public class ProjectionMath {
     */
 	public static void stdDevBand(Planar<GrayS16> input , GrayS16 output, GrayS16 avg, int startBand, int lastBand ) {
       checkInput(input, startBand, lastBand);
+      if (startBand >= lastBand) {
+         throw new IllegalArgumentException("startBand should < lastBand");
+      } 
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
@@ -1020,6 +1031,9 @@ public class ProjectionMath {
     */
 	public static void stdDevBand(Planar<GrayS32> input , GrayS32 output, GrayS32 avg, int startBand, int lastBand ) {
       checkInput(input, startBand, lastBand);
+      if (startBand >= lastBand) {
+         throw new IllegalArgumentException("startBand should < lastBand");
+      } 
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
@@ -1062,6 +1076,9 @@ public class ProjectionMath {
     */
 	public static void stdDevBand(Planar<GrayS64> input , GrayS64 output, GrayS64 avg, int startBand, int lastBand ) {
       checkInput(input, startBand, lastBand);
+      if (startBand >= lastBand) {
+         throw new IllegalArgumentException("startBand should < lastBand");
+      } 
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
@@ -1104,6 +1121,9 @@ public class ProjectionMath {
     */
 	public static void stdDevBand(Planar<GrayF32> input , GrayF32 output, GrayF32 avg, int startBand, int lastBand ) {
       checkInput(input, startBand, lastBand);
+      if (startBand >= lastBand) {
+         throw new IllegalArgumentException("startBand should < lastBand");
+      } 
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
@@ -1146,6 +1166,9 @@ public class ProjectionMath {
     */
 	public static void stdDevBand(Planar<GrayF64> input , GrayF64 output, GrayF64 avg, int startBand, int lastBand ) {
       checkInput(input, startBand, lastBand);
+      if (startBand >= lastBand) {
+         throw new IllegalArgumentException("startBand should < lastBand");
+      } 
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 

@@ -17,6 +17,7 @@ package boofcv.alg.misc;
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
@@ -46,7 +47,7 @@ public class TestProjectionMath {
    
    @Test
 	public void checkAll() {
-		int numExpected = 234;
+		int numExpected = 41;
 		Method methods[] = ProjectionMath.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -66,15 +67,18 @@ public class TestProjectionMath {
                TestMedianBand(m);
 				} else if ( m.getName().compareTo("stdDevBand") == 0 ) {
                TestStdDevBand(m);
+            } else if ( m.getName().compareTo("checkInput") == 0 ) {
+               Planar input = new Planar(GrayU8.class, width, height, numBands);
+               m.invoke(null, input, firstBand, lastBand);
 				} else {
-					// throw new RuntimeException("Unknown function: "+m.getName());
+					throw new RuntimeException("Unknown function: "+m.getName());
 				}
             numFound++;
 			} catch (InvocationTargetException | IllegalAccessException e) {
 				throw new RuntimeException(e);
          }	
       }
-      System.out.println("NumFound: " + numFound);
+      assertEquals(numExpected, numFound);
    }
    
             
@@ -337,27 +341,12 @@ public class TestProjectionMath {
          testImages[i] = FactoryGImageGray.wrap(input.getBand(i));
       }
 
-      // check that a single band gives the expected output
-		m.invoke(null, input, output, av, firstBand, firstBand);
-      GImageGray r = FactoryGImageGray.wrap(output);
-      GImageGray avg = FactoryGImageGray.wrap(av);
 		boolean isInteger = output.getDataType().isInteger();
-      
-      for( int i = 0; i < height; i++ ) {
-			for( int j = 0; j < width; j++ ) {
-            double expected = testImages[firstBand].get(j,i).doubleValue();
-            double found = r.get(j,i).doubleValue();
-
-				if( isInteger ) {
-					expected = (int)expected;
-            }
-				assertEquals(expected,found,1e-4);
-         }
-      }
-      
-      // now check all bands
-      m.invoke(null, input, output, avg, firstBand, lastBand);
-      r = FactoryGImageGray.wrap(output);
+          
+      //  check all bands (a single band will give an exception)
+      GImageGray avg = FactoryGImageGray.wrap(av);
+      m.invoke(null, input, output, av, firstBand, lastBand);
+      GImageGray r = FactoryGImageGray.wrap(output);
 
       double diff;
       double expected;
