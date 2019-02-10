@@ -172,6 +172,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				dataDst[indexDst++] = total;
 			}
 		}
+
 	}
 
 	public static void horizontal5( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
@@ -205,6 +206,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				dataDst[indexDst++] = total;
 			}
 		}
+
 	}
 
 	public static void horizontal7( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
@@ -242,6 +244,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				dataDst[indexDst++] = total;
 			}
 		}
+
 	}
 
 	public static void horizontal9( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
@@ -283,6 +286,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				dataDst[indexDst++] = total;
 			}
 		}
+
 	}
 
 	public static void horizontal11( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
@@ -328,6 +332,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				dataDst[indexDst++] = total;
 			}
 		}
+
 	}
 
 	public static void vertical3( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
@@ -363,6 +368,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				dataDst[indexDst++] = total;
 			}
 		}
+
 	}
 
 	public static void vertical5( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
@@ -404,6 +410,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				dataDst[indexDst++] = total;
 			}
 		}
+
 	}
 
 	public static void vertical7( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
@@ -451,6 +458,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				dataDst[indexDst++] = total;
 			}
 		}
+
 	}
 
 	public static void vertical9( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
@@ -504,6 +512,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				dataDst[indexDst++] = total;
 			}
 		}
+
 	}
 
 	public static void vertical11( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
@@ -563,6 +572,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				dataDst[indexDst++] = total;
 			}
 		}
+
 	}
 
 	public static void convolve3( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
@@ -616,6 +626,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				}
 			}
 		}
+
 	}
 
 	public static void convolve5( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
@@ -677,6 +688,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				}
 			}
 		}
+
 	}
 
 	public static void convolve7( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
@@ -746,6 +758,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				}
 			}
 		}
+
 	}
 
 	public static void convolve9( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
@@ -823,6 +836,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				}
 			}
 		}
+
 	}
 
 	public static void convolve11( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
@@ -908,6 +922,7 @@ public class ConvolveImageUnrolled_SB_F64_F64 {
 				}
 			}
 		}
+
 	}
 
 }

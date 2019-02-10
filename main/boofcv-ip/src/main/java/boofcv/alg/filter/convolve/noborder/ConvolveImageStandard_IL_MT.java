@@ -21,6 +21,8 @@ package boofcv.alg.filter.convolve.noborder;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
 
+import java.util.stream.IntStream;
+
 
 /**
  * <p>
@@ -34,7 +36,7 @@ import boofcv.struct.image.*;
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class ConvolveImageStandard_IL {
+public class ConvolveImageStandard_IL_MT {
 
 	public static void horizontal( Kernel1D_F32 kernel ,
 								   InterleavedF32 src, InterleavedF32 dst ) {
@@ -48,7 +50,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		for( int i = 0; i < src.height; i++ ) {
+		IntStream.range(0, src.height).parallel().forEach( i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -61,7 +63,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = total;
 				}
 			}
-		}
+		});
 
 	}
 
@@ -81,7 +83,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		for( int y = offset; y < yEnd; y++ ) {
+		IntStream.range(offset, yEnd).parallel().forEach( y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -98,7 +100,7 @@ public class ConvolveImageStandard_IL {
 				}
 				indexSrcStart += numBands;
 			}
-		}
+		});
 
 	}
 
@@ -115,7 +117,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = offsetL; y < height-offsetR; y++ ) {
+		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -133,7 +135,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = total;
 				}
 			}
-		}
+		});
 
 	}
 
@@ -149,7 +151,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		for( int i = 0; i < src.height; i++ ) {
+		IntStream.range(0, src.height).parallel().forEach( i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -162,7 +164,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = total;
 				}
 			}
-		}
+		});
 
 	}
 
@@ -182,7 +184,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		for( int y = offset; y < yEnd; y++ ) {
+		IntStream.range(offset, yEnd).parallel().forEach( y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -199,7 +201,7 @@ public class ConvolveImageStandard_IL {
 				}
 				indexSrcStart += numBands;
 			}
-		}
+		});
 
 	}
 
@@ -216,7 +218,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = offsetL; y < height-offsetR; y++ ) {
+		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -234,7 +236,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = total;
 				}
 			}
-		}
+		});
 
 	}
 
@@ -250,7 +252,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		for( int i = 0; i < src.height; i++ ) {
+		IntStream.range(0, src.height).parallel().forEach( i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -263,7 +265,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = (short)total;
 				}
 			}
-		}
+		});
 
 	}
 
@@ -283,7 +285,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		for( int y = offset; y < yEnd; y++ ) {
+		IntStream.range(offset, yEnd).parallel().forEach( y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -300,7 +302,7 @@ public class ConvolveImageStandard_IL {
 				}
 				indexSrcStart += numBands;
 			}
-		}
+		});
 
 	}
 
@@ -317,7 +319,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = offsetL; y < height-offsetR; y++ ) {
+		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -335,7 +337,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = (short)total;
 				}
 			}
-		}
+		});
 
 	}
 
@@ -351,7 +353,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		for( int i = 0; i < src.height; i++ ) {
+		IntStream.range(0, src.height).parallel().forEach( i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -364,7 +366,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = total;
 				}
 			}
-		}
+		});
 
 	}
 
@@ -384,7 +386,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		for( int y = offset; y < yEnd; y++ ) {
+		IntStream.range(offset, yEnd).parallel().forEach( y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -401,7 +403,7 @@ public class ConvolveImageStandard_IL {
 				}
 				indexSrcStart += numBands;
 			}
-		}
+		});
 
 	}
 
@@ -418,7 +420,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = offsetL; y < height-offsetR; y++ ) {
+		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -436,7 +438,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = total;
 				}
 			}
-		}
+		});
 
 	}
 
@@ -457,7 +459,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		for( int y = offset; y < yEnd; y++ ) {
+		IntStream.range(offset, yEnd).parallel().forEach( y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -474,7 +476,7 @@ public class ConvolveImageStandard_IL {
 				}
 				indexSrcStart += numBands;
 			}
-		}
+		});
 
 	}
 
@@ -490,7 +492,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		for( int i = 0; i < src.height; i++ ) {
+		IntStream.range(0, src.height).parallel().forEach( i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -503,7 +505,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = (short)total;
 				}
 			}
-		}
+		});
 
 	}
 
@@ -523,7 +525,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		for( int y = offset; y < yEnd; y++ ) {
+		IntStream.range(offset, yEnd).parallel().forEach( y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -540,7 +542,7 @@ public class ConvolveImageStandard_IL {
 				}
 				indexSrcStart += numBands;
 			}
-		}
+		});
 
 	}
 
@@ -557,7 +559,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = offsetL; y < height-offsetR; y++ ) {
+		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -575,7 +577,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = (short)total;
 				}
 			}
-		}
+		});
 
 	}
 
@@ -592,7 +594,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		for( int i = 0; i < src.height; i++ ) {
+		IntStream.range(0, src.height).parallel().forEach( i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -605,7 +607,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
 				}
 			}
-		}
+		});
 
 	}
 
@@ -626,7 +628,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		for( int y = offset; y < yEnd; y++ ) {
+		IntStream.range(offset, yEnd).parallel().forEach( y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -643,7 +645,7 @@ public class ConvolveImageStandard_IL {
 				}
 				indexSrcStart += numBands;
 			}
-		}
+		});
 
 	}
 
@@ -661,7 +663,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = offsetL; y < height-offsetR; y++ ) {
+		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -679,7 +681,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
 				}
 			}
-		}
+		});
 
 	}
 
@@ -696,7 +698,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		for( int i = 0; i < src.height; i++ ) {
+		IntStream.range(0, src.height).parallel().forEach( i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -709,7 +711,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 				}
 			}
-		}
+		});
 
 	}
 
@@ -730,7 +732,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		for( int y = offset; y < yEnd; y++ ) {
+		IntStream.range(offset, yEnd).parallel().forEach( y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -747,7 +749,7 @@ public class ConvolveImageStandard_IL {
 				}
 				indexSrcStart += numBands;
 			}
-		}
+		});
 
 	}
 
@@ -765,7 +767,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = offsetL; y < height-offsetR; y++ ) {
+		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -783,7 +785,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 				}
 			}
-		}
+		});
 
 	}
 
@@ -799,7 +801,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		for( int i = 0; i < src.height; i++ ) {
+		IntStream.range(0, src.height).parallel().forEach( i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -812,7 +814,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = (short)total;
 				}
 			}
-		}
+		});
 
 	}
 
@@ -832,7 +834,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		for( int y = offset; y < yEnd; y++ ) {
+		IntStream.range(offset, yEnd).parallel().forEach( y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -849,7 +851,7 @@ public class ConvolveImageStandard_IL {
 				}
 				indexSrcStart += numBands;
 			}
-		}
+		});
 
 	}
 
@@ -866,7 +868,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = offsetL; y < height-offsetR; y++ ) {
+		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -884,7 +886,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = (short)total;
 				}
 			}
-		}
+		});
 
 	}
 
@@ -901,7 +903,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		for( int i = 0; i < src.height; i++ ) {
+		IntStream.range(0, src.height).parallel().forEach( i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -914,7 +916,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 				}
 			}
-		}
+		});
 
 	}
 
@@ -935,7 +937,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		for( int y = offset; y < yEnd; y++ ) {
+		IntStream.range(offset, yEnd).parallel().forEach( y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -952,7 +954,7 @@ public class ConvolveImageStandard_IL {
 				}
 				indexSrcStart += numBands;
 			}
-		}
+		});
 
 	}
 
@@ -970,7 +972,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = offsetL; y < height-offsetR; y++ ) {
+		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -988,7 +990,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 				}
 			}
-		}
+		});
 
 	}
 
@@ -1009,7 +1011,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		for( int y = offset; y < yEnd; y++ ) {
+		IntStream.range(offset, yEnd).parallel().forEach( y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -1026,7 +1028,7 @@ public class ConvolveImageStandard_IL {
 				}
 				indexSrcStart += numBands;
 			}
-		}
+		});
 
 	}
 
@@ -1042,7 +1044,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		for( int i = 0; i < src.height; i++ ) {
+		IntStream.range(0, src.height).parallel().forEach( i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -1055,7 +1057,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = total;
 				}
 			}
-		}
+		});
 
 	}
 
@@ -1075,7 +1077,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		for( int y = offset; y < yEnd; y++ ) {
+		IntStream.range(offset, yEnd).parallel().forEach( y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -1092,7 +1094,7 @@ public class ConvolveImageStandard_IL {
 				}
 				indexSrcStart += numBands;
 			}
-		}
+		});
 
 	}
 
@@ -1109,7 +1111,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = offsetL; y < height-offsetR; y++ ) {
+		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -1127,7 +1129,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = total;
 				}
 			}
-		}
+		});
 
 	}
 
@@ -1144,7 +1146,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
-		for( int i = 0; i < src.height; i++ ) {
+		IntStream.range(0, src.height).parallel().forEach( i -> {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
 				int indexSrcStart = src.startIndex + i*src.stride + j*numBands;
@@ -1157,7 +1159,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 				}
 			}
-		}
+		});
 
 	}
 
@@ -1178,7 +1180,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		for( int y = offset; y < yEnd; y++ ) {
+		IntStream.range(offset, yEnd).parallel().forEach( y -> {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
 
@@ -1195,7 +1197,7 @@ public class ConvolveImageStandard_IL {
 				}
 				indexSrcStart += numBands;
 			}
-		}
+		});
 
 	}
 
@@ -1213,7 +1215,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		for( int y = offsetL; y < height-offsetR; y++ ) {
+		IntStream.range(offsetL, height-offsetR).parallel().forEach( y -> {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int indexSrcStart = src.startIndex + (y-offsetL)*src.stride + (x-offsetL)*numBands;
@@ -1231,7 +1233,7 @@ public class ConvolveImageStandard_IL {
 					dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 				}
 			}
-		}
+		});
 
 	}
 

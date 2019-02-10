@@ -39,57 +39,57 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestProjectiveInitializeAllCommon {
 	@Test
-	public void process_2() {
+	void process_2() {
 		fail("implement");
 	}
 
 	@Test
-	public void process_3() {
+	void process_3() {
 		fail("implement");
 	}
 
 	@Test
-	public void process_3_to_5() {
+	void process_3_to_5() {
 		fail("implement");
 	}
 
 	@Test
-	public void selectInitialTriplet() {
+	void selectInitialTriplet() {
 		fail("implement");
 	}
 
 	@Test
-	public void scoreTripleView() {
+	void scoreTripleView() {
 		fail("implement");
 	}
 
 	@Test
-	public void findTripleMatches() {
+	void findTripleMatches() {
 		fail("implement");
 	}
 
 	@Test
-	public void createFeatureLookup() {
+	void createFeatureLookup() {
 		fail("implement");
 	}
 
 	@Test
-	public void triangulateFeatures() {
+	void triangulateFeatures() {
 		fail("implement");
 	}
 
 	@Test
-	public void convertAssociatedTriple() {
+	void convertAssociatedTriple() {
 		fail("implement");
 	}
 
 	@Test
-	public void initializeProjective3() {
+	void initializeProjective3() {
 		fail("implement");
 	}
 
 	@Test
-	public void findRemainingCameraMatrices() {
+	void findRemainingCameraMatrices() {
 		MockLookupSimilarImages db = new MockLookupSimilarImages(5,0xDEADBEEF);
 
 		int numViews = db.viewIds.size();

@@ -52,6 +52,11 @@ Version : 0.33
   * Touch pad "wheel" controls are less spastic in OS X
 - Gradle
   * Fixed how dependencies are referenced and Jars built. Thanks H1Gdev for pointing out this problem!
+- Concurrency
+  * Added support for concurrency. Can be turned on using BoofConcurrency.USE_CONCURRENT = true
+  * Supported Convolution: general, TODO sum, TODO mean, TODO gradient,
+  * Supported: TODO threshold block, TODO image distort, TODO KLT, TODO stereo disparity
+
 
 TODO This Release
   - Examples

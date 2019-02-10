@@ -43,29 +43,37 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 
 	@Override
 	public void generate() throws FileNotFoundException {
-		printPreamble();
-		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false);
-//		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false, true);
-		printAllOps(AutoTypeImage.F64, AutoTypeImage.F64, false);
-		printAllOps(AutoTypeImage.U8, AutoTypeImage.I16, false);
-		printAllOps(AutoTypeImage.U8, AutoTypeImage.S32, false);
-		printAllOps(AutoTypeImage.U16,AutoTypeImage.I8, true,true);
-		printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,false);
-		printAllOps(AutoTypeImage.U8,AutoTypeImage.I8,true);
-//		printAllOps(AutoTypeImage.U8,AutoTypeImage.I8,false, true);
-		printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,true);
-		printAllOps(AutoTypeImage.U16,AutoTypeImage.I16,false);
-		printAllOps(AutoTypeImage.U16,AutoTypeImage.I16,true);
-		printAllOps(AutoTypeImage.S32,AutoTypeImage.I16,true,true);
-		printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,false);
-		printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,true);
+		for (int i = 0; i < 2; i++) {
+			concurrent = i==0;
 
-		out.println("}");
+			printPreamble();
+			printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false);
+//		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false, true);
+			printAllOps(AutoTypeImage.F64, AutoTypeImage.F64, false);
+			printAllOps(AutoTypeImage.U8, AutoTypeImage.I16, false);
+			printAllOps(AutoTypeImage.U8, AutoTypeImage.S32, false);
+			printAllOps(AutoTypeImage.U16,AutoTypeImage.I8, true,true);
+			printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,false);
+			printAllOps(AutoTypeImage.U8,AutoTypeImage.I8,true);
+//		printAllOps(AutoTypeImage.U8,AutoTypeImage.I8,false, true);
+			printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,true);
+			printAllOps(AutoTypeImage.U16,AutoTypeImage.I16,false);
+			printAllOps(AutoTypeImage.U16,AutoTypeImage.I16,true);
+			printAllOps(AutoTypeImage.S32,AutoTypeImage.I16,true,true);
+			printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,false);
+			printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,true);
+
+			out.println("}");
+		}
 	}
 
 	private void printPreamble() {
+		autoSelectName();
 		out.print("import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n");
+		if( concurrent )
+			out.print("import java.util.stream.IntStream;\n");
+
 		out.println();
 		out.println();
 		out.print("/**\n" +
@@ -126,10 +134,9 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 		if( hasDivide )
 			out.print("\t\tfinal int halfDivisor = divisor/2;\n");
 		out.print("\n" +
-				"\t\tfinal int width = image.getWidth();\n" +
-				"\n" +
-				"\t\tfor( int i = 0; i < image.height; i++ ) {\n" +
-				"\t\t\tint indexDst = dest.startIndex + i*dest.stride+offset;\n" +
+				"\t\tfinal int width = image.getWidth();\n");
+
+		String body = "\t\t\tint indexDst = dest.startIndex + i*dest.stride+offset;\n" +
 				"\t\t\tint j = image.startIndex + i*image.stride;\n" +
 				"\t\t\tfinal int jEnd = j+width-(kernelWidth-1);\n" +
 				"\n" +
@@ -140,9 +147,11 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 				"\t\t\t\t\ttotal += (dataSrc[indexSrc++] " + bitWise + ") * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDst++] = " + typeCast + totalDiv + ";\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
+				"\t\t\t}\n";
+
+		printParallel("i","0","image.height",body);
+
+		out.print("\t}\n\n");
 	}
 
 	private void printVertical() {
@@ -163,11 +172,10 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 		out.print("\n" +
 				"\t\tfinal int imgWidth = dest.getWidth();\n" +
 				"\t\tfinal int imgHeight = dest.getHeight();\n" +
-				"\n" +
-				"\t\tfinal int yEnd = imgHeight-(kernelWidth-offset-1);\n" +
-				"\n" +
-				"\t\tfor( int y = offset; y < yEnd; y++ ) {\n" +
-				"\t\t\tint indexDst = dest.startIndex+y*dest.stride;\n" +
+				"\t\tfinal int yEnd = imgHeight-(kernelWidth-offset-1);\n");
+
+		String body = "";
+		body += "\t\t\tint indexDst = dest.startIndex+y*dest.stride;\n" +
 				"\t\t\tint i = image.startIndex + (y-offset)*image.stride;\n" +
 				"\t\t\tfinal int iEnd = i+imgWidth;\n" +
 				"\n" +
@@ -179,9 +187,11 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 				"\t\t\t\t\tindexSrc += image.stride;\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tdataDst[indexDst++] = " + typeCast + totalDiv + ";\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
+				"\t\t\t}\n";
+
+		printParallel("y","offset","yEnd",body);
+
+		out.print("\t}\n\n");
 	}
 
 	private void printConvolve2D() {
@@ -200,12 +210,13 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 				"\t\tfinal int height = src.getHeight();\n");
 		if( hasDivide )
 			out.print("\t\tfinal int halfDivisor = divisor/2;\n");
+
 		out.print("\n" +
 				"\t\tint offsetL = kernel.offset;\n" +
-				"\t\tint offsetR = kernel.width-kernel.offset-1;\n" +
-				"\n" +
-				"\t\tfor( int y = offsetL; y < height-offsetR; y++ ) {\n" +
-				"\t\t\tint indexDst = dest.startIndex + y*dest.stride+offsetL;\n" +
+				"\t\tint offsetR = kernel.width-kernel.offset-1;\n");
+
+		String body = "";
+		body += "\t\t\tint indexDst = dest.startIndex + y*dest.stride+offsetL;\n" +
 				"\t\t\tfor( int x = offsetL; x < width-offsetR; x++ ) {\n" +
 				"\t\t\t\t" + sumType + " total = 0;\n" +
 				"\t\t\t\tint indexKer = 0;\n" +
@@ -217,9 +228,11 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 				"\t\t\t\t}\n" +
 				performBound +
 				"\t\t\t\tdataDst[indexDst++] = " + typeCast + totalDiv + ";\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
+				"\t\t\t}\n";
+
+		printParallel("y","offsetL","height-offsetR",body);
+
+		out.print("\t}\n\n");
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {

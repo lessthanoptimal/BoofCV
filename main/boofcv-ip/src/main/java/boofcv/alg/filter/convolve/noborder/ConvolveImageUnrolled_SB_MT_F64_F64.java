@@ -18,11 +18,12 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
-import boofcv.struct.convolve.Kernel1D_S32;
-import boofcv.struct.convolve.Kernel2D_S32;
-import boofcv.struct.image.GrayS32;
+import boofcv.struct.convolve.Kernel1D_F64;
+import boofcv.struct.convolve.Kernel2D_F64;
+import boofcv.struct.image.GrayF64;
 
 import javax.annotation.Generated;
+import java.util.stream.IntStream;
 
 /**
  * <p>
@@ -42,9 +43,9 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated({"boofcv.alg.filter.convolve.noborder.GenerateConvolvedUnrolled_SB"})
-public class ConvolveImageUnrolled_SB_S32_S32_Div {
-	public static boolean horizontal( Kernel1D_S32 kernel ,
-								   GrayS32 image, GrayS32 dest, int divisor ) {
+public class ConvolveImageUnrolled_SB_MT_F64_F64 {
+	public static boolean horizontal( Kernel1D_F64 kernel ,
+								   GrayF64 image, GrayF64 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -52,23 +53,23 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 
 		switch( kernel.width ) {
 			case 3:
-				horizontal3(kernel,image,dest,divisor);
+				horizontal3(kernel,image,dest);
 				break;
 
 			case 5:
-				horizontal5(kernel,image,dest,divisor);
+				horizontal5(kernel,image,dest);
 				break;
 
 			case 7:
-				horizontal7(kernel,image,dest,divisor);
+				horizontal7(kernel,image,dest);
 				break;
 
 			case 9:
-				horizontal9(kernel,image,dest,divisor);
+				horizontal9(kernel,image,dest);
 				break;
 
 			case 11:
-				horizontal11(kernel,image,dest,divisor);
+				horizontal11(kernel,image,dest);
 				break;
 
 			default:
@@ -77,8 +78,8 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		return true;
 	}
 
-	public static boolean vertical( Kernel1D_S32 kernel ,
-								   GrayS32 image, GrayS32 dest, int divisor ) {
+	public static boolean vertical( Kernel1D_F64 kernel ,
+								   GrayF64 image, GrayF64 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -86,23 +87,23 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 
 		switch( kernel.width ) {
 			case 3:
-				vertical3(kernel,image,dest,divisor);
+				vertical3(kernel,image,dest);
 				break;
 
 			case 5:
-				vertical5(kernel,image,dest,divisor);
+				vertical5(kernel,image,dest);
 				break;
 
 			case 7:
-				vertical7(kernel,image,dest,divisor);
+				vertical7(kernel,image,dest);
 				break;
 
 			case 9:
-				vertical9(kernel,image,dest,divisor);
+				vertical9(kernel,image,dest);
 				break;
 
 			case 11:
-				vertical11(kernel,image,dest,divisor);
+				vertical11(kernel,image,dest);
 				break;
 
 			default:
@@ -111,8 +112,8 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		return true;
 	}
 
-	public static boolean convolve( Kernel2D_S32 kernel ,
-								   GrayS32 image, GrayS32 dest, int divisor ) {
+	public static boolean convolve( Kernel2D_F64 kernel ,
+								   GrayF64 image, GrayF64 dest) {
 
 		// Unrolled functions only exist for symmetric kernels with an odd width
 		if( kernel.offset != kernel.width/2 || kernel.width%2 == 0 )
@@ -120,23 +121,23 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 
 		switch( kernel.width ) {
 			case 3:
-				convolve3(kernel,image,dest,divisor);
+				convolve3(kernel,image,dest);
 				break;
 
 			case 5:
-				convolve5(kernel,image,dest,divisor);
+				convolve5(kernel,image,dest);
 				break;
 
 			case 7:
-				convolve7(kernel,image,dest,divisor);
+				convolve7(kernel,image,dest);
 				break;
 
 			case 9:
-				convolve9(kernel,image,dest,divisor);
+				convolve9(kernel,image,dest);
 				break;
 
 			case 11:
-				convolve11(kernel,image,dest,divisor);
+				convolve11(kernel,image,dest);
 				break;
 
 			default:
@@ -145,98 +146,95 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 		return true;
 	}
 
-	public static void horizontal3( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void horizontal3( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final int[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final int k1 = kernel.data[0];
-		final int k2 = kernel.data[1];
-		final int k3 = kernel.data[2];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
 
 		final int radius = kernel.getRadius();
 
 		final int width = image.getWidth();
-		final int halfDivisor = divisor/2;
 
-		for( int i = 0; i < image.height; i++ ) {
+		IntStream.range(0, image.height).parallel().forEach( i -> {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				int total = (dataSrc[indexSrc++])*k1;
+				double total = (dataSrc[indexSrc++])*k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc])*k3;
 
-				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
+				dataDst[indexDst++] = total;
 			}
-		}
+		});
 
 	}
 
-	public static void horizontal5( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void horizontal5( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final int[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final int k1 = kernel.data[0];
-		final int k2 = kernel.data[1];
-		final int k3 = kernel.data[2];
-		final int k4 = kernel.data[3];
-		final int k5 = kernel.data[4];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
 
 		final int radius = kernel.getRadius();
 
 		final int width = image.getWidth();
-		final int halfDivisor = divisor/2;
 
-		for( int i = 0; i < image.height; i++ ) {
+		IntStream.range(0, image.height).parallel().forEach( i -> {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				int total = (dataSrc[indexSrc++])*k1;
+				double total = (dataSrc[indexSrc++])*k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc++])*k3;
 				total += (dataSrc[indexSrc++])*k4;
 				total += (dataSrc[indexSrc])*k5;
 
-				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
+				dataDst[indexDst++] = total;
 			}
-		}
+		});
 
 	}
 
-	public static void horizontal7( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void horizontal7( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final int[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final int k1 = kernel.data[0];
-		final int k2 = kernel.data[1];
-		final int k3 = kernel.data[2];
-		final int k4 = kernel.data[3];
-		final int k5 = kernel.data[4];
-		final int k6 = kernel.data[5];
-		final int k7 = kernel.data[6];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
+		final double k6 = kernel.data[5];
+		final double k7 = kernel.data[6];
 
 		final int radius = kernel.getRadius();
 
 		final int width = image.getWidth();
-		final int halfDivisor = divisor/2;
 
-		for( int i = 0; i < image.height; i++ ) {
+		IntStream.range(0, image.height).parallel().forEach( i -> {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				int total = (dataSrc[indexSrc++])*k1;
+				double total = (dataSrc[indexSrc++])*k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc++])*k3;
 				total += (dataSrc[indexSrc++])*k4;
@@ -244,40 +242,39 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				total += (dataSrc[indexSrc++])*k6;
 				total += (dataSrc[indexSrc])*k7;
 
-				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
+				dataDst[indexDst++] = total;
 			}
-		}
+		});
 
 	}
 
-	public static void horizontal9( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void horizontal9( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final int[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final int k1 = kernel.data[0];
-		final int k2 = kernel.data[1];
-		final int k3 = kernel.data[2];
-		final int k4 = kernel.data[3];
-		final int k5 = kernel.data[4];
-		final int k6 = kernel.data[5];
-		final int k7 = kernel.data[6];
-		final int k8 = kernel.data[7];
-		final int k9 = kernel.data[8];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
+		final double k6 = kernel.data[5];
+		final double k7 = kernel.data[6];
+		final double k8 = kernel.data[7];
+		final double k9 = kernel.data[8];
 
 		final int radius = kernel.getRadius();
 
 		final int width = image.getWidth();
-		final int halfDivisor = divisor/2;
 
-		for( int i = 0; i < image.height; i++ ) {
+		IntStream.range(0, image.height).parallel().forEach( i -> {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				int total = (dataSrc[indexSrc++])*k1;
+				double total = (dataSrc[indexSrc++])*k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc++])*k3;
 				total += (dataSrc[indexSrc++])*k4;
@@ -287,42 +284,41 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				total += (dataSrc[indexSrc++])*k8;
 				total += (dataSrc[indexSrc])*k9;
 
-				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
+				dataDst[indexDst++] = total;
 			}
-		}
+		});
 
 	}
 
-	public static void horizontal11( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void horizontal11( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final int[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final int k1 = kernel.data[0];
-		final int k2 = kernel.data[1];
-		final int k3 = kernel.data[2];
-		final int k4 = kernel.data[3];
-		final int k5 = kernel.data[4];
-		final int k6 = kernel.data[5];
-		final int k7 = kernel.data[6];
-		final int k8 = kernel.data[7];
-		final int k9 = kernel.data[8];
-		final int k10 = kernel.data[9];
-		final int k11 = kernel.data[10];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
+		final double k6 = kernel.data[5];
+		final double k7 = kernel.data[6];
+		final double k8 = kernel.data[7];
+		final double k9 = kernel.data[8];
+		final double k10 = kernel.data[9];
+		final double k11 = kernel.data[10];
 
 		final int radius = kernel.getRadius();
 
 		final int width = image.getWidth();
-		final int halfDivisor = divisor/2;
 
-		for( int i = 0; i < image.height; i++ ) {
+		IntStream.range(0, image.height).parallel().forEach( i -> {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
 
 			for( j += radius; j < jEnd; j++ ) {
 				int indexSrc = j;
-				int total = (dataSrc[indexSrc++])*k1;
+				double total = (dataSrc[indexSrc++])*k1;
 				total += (dataSrc[indexSrc++])*k2;
 				total += (dataSrc[indexSrc++])*k3;
 				total += (dataSrc[indexSrc++])*k4;
@@ -334,30 +330,29 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				total += (dataSrc[indexSrc++])*k10;
 				total += (dataSrc[indexSrc])*k11;
 
-				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
+				dataDst[indexDst++] = total;
 			}
-		}
+		});
 
 	}
 
-	public static void vertical3( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void vertical3( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final int[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final int k1 = kernel.data[0];
-		final int k2 = kernel.data[1];
-		final int k3 = kernel.data[2];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
 
 		final int radius = kernel.getRadius();
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
-		final int halfDivisor = divisor/2;
 
 		final int yEnd = imgHeight-radius;
 
-		for( int y = radius; y < yEnd; y++ ) {
+		IntStream.range(radius, yEnd).parallel().forEach( y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -365,38 +360,37 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				int total = (dataSrc[indexSrc]) * k1;
+				double total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k3;
 
-				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
+				dataDst[indexDst++] = total;
 			}
-		}
+		});
 
 	}
 
-	public static void vertical5( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void vertical5( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final int[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final int k1 = kernel.data[0];
-		final int k2 = kernel.data[1];
-		final int k3 = kernel.data[2];
-		final int k4 = kernel.data[3];
-		final int k5 = kernel.data[4];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
 
 		final int radius = kernel.getRadius();
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
-		final int halfDivisor = divisor/2;
 
 		final int yEnd = imgHeight-radius;
 
-		for( int y = radius; y < yEnd; y++ ) {
+		IntStream.range(radius, yEnd).parallel().forEach( y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -404,7 +398,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				int total = (dataSrc[indexSrc]) * k1;
+				double total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;
@@ -414,34 +408,33 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k5;
 
-				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
+				dataDst[indexDst++] = total;
 			}
-		}
+		});
 
 	}
 
-	public static void vertical7( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void vertical7( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final int[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final int k1 = kernel.data[0];
-		final int k2 = kernel.data[1];
-		final int k3 = kernel.data[2];
-		final int k4 = kernel.data[3];
-		final int k5 = kernel.data[4];
-		final int k6 = kernel.data[5];
-		final int k7 = kernel.data[6];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
+		final double k6 = kernel.data[5];
+		final double k7 = kernel.data[6];
 
 		final int radius = kernel.getRadius();
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
-		final int halfDivisor = divisor/2;
 
 		final int yEnd = imgHeight-radius;
 
-		for( int y = radius; y < yEnd; y++ ) {
+		IntStream.range(radius, yEnd).parallel().forEach( y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -449,7 +442,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				int total = (dataSrc[indexSrc]) * k1;
+				double total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;
@@ -463,36 +456,35 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k7;
 
-				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
+				dataDst[indexDst++] = total;
 			}
-		}
+		});
 
 	}
 
-	public static void vertical9( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void vertical9( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final int[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final int k1 = kernel.data[0];
-		final int k2 = kernel.data[1];
-		final int k3 = kernel.data[2];
-		final int k4 = kernel.data[3];
-		final int k5 = kernel.data[4];
-		final int k6 = kernel.data[5];
-		final int k7 = kernel.data[6];
-		final int k8 = kernel.data[7];
-		final int k9 = kernel.data[8];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
+		final double k6 = kernel.data[5];
+		final double k7 = kernel.data[6];
+		final double k8 = kernel.data[7];
+		final double k9 = kernel.data[8];
 
 		final int radius = kernel.getRadius();
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
-		final int halfDivisor = divisor/2;
 
 		final int yEnd = imgHeight-radius;
 
-		for( int y = radius; y < yEnd; y++ ) {
+		IntStream.range(radius, yEnd).parallel().forEach( y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -500,7 +492,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				int total = (dataSrc[indexSrc]) * k1;
+				double total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;
@@ -518,38 +510,37 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k9;
 
-				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
+				dataDst[indexDst++] = total;
 			}
-		}
+		});
 
 	}
 
-	public static void vertical11( Kernel1D_S32 kernel , GrayS32 image, GrayS32 dest , int divisor )
+	public static void vertical11( Kernel1D_F64 kernel , GrayF64 image, GrayF64 dest )
 	{
-		final int[] dataSrc = image.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = image.data;
+		final double[] dataDst = dest.data;
 
-		final int k1 = kernel.data[0];
-		final int k2 = kernel.data[1];
-		final int k3 = kernel.data[2];
-		final int k4 = kernel.data[3];
-		final int k5 = kernel.data[4];
-		final int k6 = kernel.data[5];
-		final int k7 = kernel.data[6];
-		final int k8 = kernel.data[7];
-		final int k9 = kernel.data[8];
-		final int k10 = kernel.data[9];
-		final int k11 = kernel.data[10];
+		final double k1 = kernel.data[0];
+		final double k2 = kernel.data[1];
+		final double k3 = kernel.data[2];
+		final double k4 = kernel.data[3];
+		final double k5 = kernel.data[4];
+		final double k6 = kernel.data[5];
+		final double k7 = kernel.data[6];
+		final double k8 = kernel.data[7];
+		final double k9 = kernel.data[8];
+		final double k10 = kernel.data[9];
+		final double k11 = kernel.data[10];
 
 		final int radius = kernel.getRadius();
 
 		final int imgWidth = dest.getWidth();
 		final int imgHeight = dest.getHeight();
-		final int halfDivisor = divisor/2;
 
 		final int yEnd = imgHeight-radius;
 
-		for( int y = radius; y < yEnd; y++ ) {
+		IntStream.range(radius, yEnd).parallel().forEach( y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -557,7 +548,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 			for( ; i < iEnd; i++ ) {
 				int indexSrc = i;
 
-				int total = (dataSrc[indexSrc]) * k1;
+				double total = (dataSrc[indexSrc]) * k1;
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k2;
 				indexSrc += image.stride;
@@ -579,44 +570,45 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				indexSrc += image.stride;
 				total += (dataSrc[indexSrc])*k11;
 
-				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
+				dataDst[indexDst++] = total;
 			}
-		}
+		});
 
 	}
 
-	public static void convolve3( Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest , int divisor )
+	public static void convolve3( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
 	{
-		final int[] dataSrc = src.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = src.data;
+		final double[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
-		final int halfDivisor = divisor/2;
 
 		final int kernelRadius = kernel.getRadius();
-		final int totalRow[] = new int[ width ];
 
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+		IntStream.range(kernelRadius, height-kernelRadius).parallel().forEach( y -> {
+
 			// first time through the value needs to be set
-			int k1 = kernel.data[0];
-			int k2 = kernel.data[1];
-			int k3 = kernel.data[2];
+			double k1 = kernel.data[0];
+			double k2 = kernel.data[1];
+			double k3 = kernel.data[2];
 
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
-				int total = 0;
+				double total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc] )* k3;
 
-				totalRow[x] = total;
+				dataDst[indexDst++] = total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 3; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
 				
 				k1 = kernel.data[i*3 + 0];
@@ -626,58 +618,55 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 					int indexSrc = indexSrcRow+x;
 
-					int total = 0;
+					double total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc] )* k3;
 
-					totalRow[x] += total;
+					dataDst[indexDst++] += total;
 				}
 			}
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ((totalRow[x]+halfDivisor)/ divisor);
-			}
-		}
+		});
 
 	}
 
-	public static void convolve5( Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest , int divisor )
+	public static void convolve5( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
 	{
-		final int[] dataSrc = src.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = src.data;
+		final double[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
-		final int halfDivisor = divisor/2;
 
 		final int kernelRadius = kernel.getRadius();
-		final int totalRow[] = new int[ width ];
 
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+		IntStream.range(kernelRadius, height-kernelRadius).parallel().forEach( y -> {
+
 			// first time through the value needs to be set
-			int k1 = kernel.data[0];
-			int k2 = kernel.data[1];
-			int k3 = kernel.data[2];
-			int k4 = kernel.data[3];
-			int k5 = kernel.data[4];
+			double k1 = kernel.data[0];
+			double k2 = kernel.data[1];
+			double k3 = kernel.data[2];
+			double k4 = kernel.data[3];
+			double k5 = kernel.data[4];
 
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
-				int total = 0;
+				double total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc++] )* k3;
 				total += (dataSrc[indexSrc++] )* k4;
 				total += (dataSrc[indexSrc] )* k5;
 
-				totalRow[x] = total;
+				dataDst[indexDst++] = total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 5; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
 				
 				k1 = kernel.data[i*5 + 0];
@@ -689,51 +678,47 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 					int indexSrc = indexSrcRow+x;
 
-					int total = 0;
+					double total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc++] )* k3;
 					total += (dataSrc[indexSrc++] )* k4;
 					total += (dataSrc[indexSrc] )* k5;
 
-					totalRow[x] += total;
+					dataDst[indexDst++] += total;
 				}
 			}
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ((totalRow[x]+halfDivisor)/ divisor);
-			}
-		}
+		});
 
 	}
 
-	public static void convolve7( Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest , int divisor )
+	public static void convolve7( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
 	{
-		final int[] dataSrc = src.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = src.data;
+		final double[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
-		final int halfDivisor = divisor/2;
 
 		final int kernelRadius = kernel.getRadius();
-		final int totalRow[] = new int[ width ];
 
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+		IntStream.range(kernelRadius, height-kernelRadius).parallel().forEach( y -> {
+
 			// first time through the value needs to be set
-			int k1 = kernel.data[0];
-			int k2 = kernel.data[1];
-			int k3 = kernel.data[2];
-			int k4 = kernel.data[3];
-			int k5 = kernel.data[4];
-			int k6 = kernel.data[5];
-			int k7 = kernel.data[6];
+			double k1 = kernel.data[0];
+			double k2 = kernel.data[1];
+			double k3 = kernel.data[2];
+			double k4 = kernel.data[3];
+			double k5 = kernel.data[4];
+			double k6 = kernel.data[5];
+			double k7 = kernel.data[6];
 
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
-				int total = 0;
+				double total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc++] )* k3;
@@ -742,11 +727,12 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				total += (dataSrc[indexSrc++] )* k6;
 				total += (dataSrc[indexSrc] )* k7;
 
-				totalRow[x] = total;
+				dataDst[indexDst++] = total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 7; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
 				
 				k1 = kernel.data[i*7 + 0];
@@ -760,7 +746,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 					int indexSrc = indexSrcRow+x;
 
-					int total = 0;
+					double total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc++] )* k3;
@@ -769,46 +755,42 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 					total += (dataSrc[indexSrc++] )* k6;
 					total += (dataSrc[indexSrc] )* k7;
 
-					totalRow[x] += total;
+					dataDst[indexDst++] += total;
 				}
 			}
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ((totalRow[x]+halfDivisor)/ divisor);
-			}
-		}
+		});
 
 	}
 
-	public static void convolve9( Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest , int divisor )
+	public static void convolve9( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
 	{
-		final int[] dataSrc = src.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = src.data;
+		final double[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
-		final int halfDivisor = divisor/2;
 
 		final int kernelRadius = kernel.getRadius();
-		final int totalRow[] = new int[ width ];
 
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+		IntStream.range(kernelRadius, height-kernelRadius).parallel().forEach( y -> {
+
 			// first time through the value needs to be set
-			int k1 = kernel.data[0];
-			int k2 = kernel.data[1];
-			int k3 = kernel.data[2];
-			int k4 = kernel.data[3];
-			int k5 = kernel.data[4];
-			int k6 = kernel.data[5];
-			int k7 = kernel.data[6];
-			int k8 = kernel.data[7];
-			int k9 = kernel.data[8];
+			double k1 = kernel.data[0];
+			double k2 = kernel.data[1];
+			double k3 = kernel.data[2];
+			double k4 = kernel.data[3];
+			double k5 = kernel.data[4];
+			double k6 = kernel.data[5];
+			double k7 = kernel.data[6];
+			double k8 = kernel.data[7];
+			double k9 = kernel.data[8];
 
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
-				int total = 0;
+				double total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc++] )* k3;
@@ -819,11 +801,12 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				total += (dataSrc[indexSrc++] )* k8;
 				total += (dataSrc[indexSrc] )* k9;
 
-				totalRow[x] = total;
+				dataDst[indexDst++] = total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 9; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
 				
 				k1 = kernel.data[i*9 + 0];
@@ -839,7 +822,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 					int indexSrc = indexSrcRow+x;
 
-					int total = 0;
+					double total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc++] )* k3;
@@ -850,48 +833,44 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 					total += (dataSrc[indexSrc++] )* k8;
 					total += (dataSrc[indexSrc] )* k9;
 
-					totalRow[x] += total;
+					dataDst[indexDst++] += total;
 				}
 			}
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ((totalRow[x]+halfDivisor)/ divisor);
-			}
-		}
+		});
 
 	}
 
-	public static void convolve11( Kernel2D_S32 kernel, GrayS32 src, GrayS32 dest , int divisor )
+	public static void convolve11( Kernel2D_F64 kernel, GrayF64 src, GrayF64 dest)
 	{
-		final int[] dataSrc = src.data;
-		final int[] dataDst = dest.data;
+		final double[] dataSrc = src.data;
+		final double[] dataDst = dest.data;
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
-		final int halfDivisor = divisor/2;
 
 		final int kernelRadius = kernel.getRadius();
-		final int totalRow[] = new int[ width ];
 
-		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
+		IntStream.range(kernelRadius, height-kernelRadius).parallel().forEach( y -> {
+
 			// first time through the value needs to be set
-			int k1 = kernel.data[0];
-			int k2 = kernel.data[1];
-			int k3 = kernel.data[2];
-			int k4 = kernel.data[3];
-			int k5 = kernel.data[4];
-			int k6 = kernel.data[5];
-			int k7 = kernel.data[6];
-			int k8 = kernel.data[7];
-			int k9 = kernel.data[8];
-			int k10 = kernel.data[9];
-			int k11 = kernel.data[10];
+			double k1 = kernel.data[0];
+			double k2 = kernel.data[1];
+			double k3 = kernel.data[2];
+			double k4 = kernel.data[3];
+			double k5 = kernel.data[4];
+			double k6 = kernel.data[5];
+			double k7 = kernel.data[6];
+			double k8 = kernel.data[7];
+			double k9 = kernel.data[8];
+			double k10 = kernel.data[9];
+			double k11 = kernel.data[10];
 
+			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 			int indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;
 			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 				int indexSrc = indexSrcRow + x;
 
-				int total = 0;
+				double total = 0;
 				total += (dataSrc[indexSrc++] )* k1;
 				total += (dataSrc[indexSrc++] )* k2;
 				total += (dataSrc[indexSrc++] )* k3;
@@ -904,11 +883,12 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				total += (dataSrc[indexSrc++] )* k10;
 				total += (dataSrc[indexSrc] )* k11;
 
-				totalRow[x] = total;
+				dataDst[indexDst++] = total;
 			}
 
 			// rest of the convolution rows are an addition
 			for( int i = 1; i < 11; i++ ) {
+				indexDst = dest.startIndex + y*dest.stride+kernelRadius;
 				indexSrcRow = src.startIndex+(y+i-kernelRadius)*src.stride-kernelRadius;
 				
 				k1 = kernel.data[i*11 + 0];
@@ -926,7 +906,7 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 				for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
 					int indexSrc = indexSrcRow+x;
 
-					int total = 0;
+					double total = 0;
 					total += (dataSrc[indexSrc++] )* k1;
 					total += (dataSrc[indexSrc++] )* k2;
 					total += (dataSrc[indexSrc++] )* k3;
@@ -939,14 +919,10 @@ public class ConvolveImageUnrolled_SB_S32_S32_Div {
 					total += (dataSrc[indexSrc++] )* k10;
 					total += (dataSrc[indexSrc] )* k11;
 
-					totalRow[x] += total;
+					dataDst[indexDst++] += total;
 				}
 			}
-			int indexDst = dest.startIndex + y*dest.stride+kernelRadius;
-			for( int x = kernelRadius; x < width-kernelRadius; x++ ) {
-				dataDst[indexDst++] = ((totalRow[x]+halfDivisor)/ divisor);
-			}
-		}
+		});
 
 	}
 

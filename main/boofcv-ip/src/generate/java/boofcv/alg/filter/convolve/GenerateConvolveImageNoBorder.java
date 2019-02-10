@@ -56,6 +56,7 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(
+				"import boofcv.BoofConcurrency;\n" +
 				"import boofcv.alg.InputSanityCheck;\n" +
 				"import boofcv.alg.filter.convolve.noborder.*;\n" +
 				"import boofcv.struct.convolve.*;\n" +
@@ -140,12 +141,22 @@ public class GenerateConvolveImageNoBorder extends CodeGeneratorBase {
 				"\t\t\t\t\t\t\t\t  "+inputName+" input, "+outputName+" output"+divideArg+") {\n" +
 				"\t\tInputSanityCheck.checkSameShape(input, output);\n" +
 				"\n");
+		out.print("\t\tif(BoofConcurrency.USE_CONCURRENT) {\n");
 		if( singleBand ) {
-			out.print("\t\tif (!ConvolveImageUnrolled_SB_"+typeIn+"_"+typeOut+divideSuf+"."+name+"(kernel, input, output"+divideInput+"))\n" +
-					"\t\t\tConvolveImageStandard_SB."+name+"(kernel, input, output"+divideInput+");\n");
+			out.print("\t\t\tif (!ConvolveImageUnrolled_SB_MT_"+typeIn+"_"+typeOut+divideSuf+"."+name+"(kernel, input, output"+divideInput+"))\n" +
+					"\t\t\t\tConvolveImageStandard_SB_MT."+name+"(kernel, input, output"+divideInput+");\n");
 		} else {
-			out.print("\t\tConvolveImageStandard_IL."+name+"(kernel, input, output"+divideInput+");\n");
+			out.print("\t\t\tConvolveImageStandard_IL_MT."+name+"(kernel, input, output"+divideInput+");\n");
 		}
+		out.print("\t\t} else {\n");
+		if( singleBand ) {
+			out.print("\t\t\tif (!ConvolveImageUnrolled_SB_"+typeIn+"_"+typeOut+divideSuf+"."+name+"(kernel, input, output"+divideInput+"))\n" +
+					"\t\t\t\tConvolveImageStandard_SB."+name+"(kernel, input, output"+divideInput+");\n");
+		} else {
+			out.print("\t\t\tConvolveImageStandard_IL."+name+"(kernel, input, output"+divideInput+");\n");
+		}
+		out.print("\t\t}\n");
+
 		out.print("\t}\n\n");
 	}
 

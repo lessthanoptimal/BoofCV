@@ -174,6 +174,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
+
 	}
 
 	public static void horizontal5( Kernel1D_S32 kernel , GrayU8 image, GrayI8 dest , int divisor )
@@ -208,6 +209,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
+
 	}
 
 	public static void horizontal7( Kernel1D_S32 kernel , GrayU8 image, GrayI8 dest , int divisor )
@@ -246,6 +248,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
+
 	}
 
 	public static void horizontal9( Kernel1D_S32 kernel , GrayU8 image, GrayI8 dest , int divisor )
@@ -288,6 +291,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
+
 	}
 
 	public static void horizontal11( Kernel1D_S32 kernel , GrayU8 image, GrayI8 dest , int divisor )
@@ -334,6 +338,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
+
 	}
 
 	public static void vertical3( Kernel1D_S32 kernel , GrayU8 image, GrayI8 dest , int divisor )
@@ -370,6 +375,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
+
 	}
 
 	public static void vertical5( Kernel1D_S32 kernel , GrayU8 image, GrayI8 dest , int divisor )
@@ -412,6 +418,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
+
 	}
 
 	public static void vertical7( Kernel1D_S32 kernel , GrayU8 image, GrayI8 dest , int divisor )
@@ -460,6 +467,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
+
 	}
 
 	public static void vertical9( Kernel1D_S32 kernel , GrayU8 image, GrayI8 dest , int divisor )
@@ -514,6 +522,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
+
 	}
 
 	public static void vertical11( Kernel1D_S32 kernel , GrayU8 image, GrayI8 dest , int divisor )
@@ -574,6 +583,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((total+halfDivisor)/divisor);
 			}
 		}
+
 	}
 
 	public static void convolve3( Kernel2D_S32 kernel, GrayU8 src, GrayI8 dest , int divisor )
@@ -589,7 +599,6 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int totalRow[] = new int[ width ];
 
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-
 			// first time through the value needs to be set
 			int k1 = kernel.data[0];
 			int k2 = kernel.data[1];
@@ -631,6 +640,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((totalRow[x]+halfDivisor)/ divisor);
 			}
 		}
+
 	}
 
 	public static void convolve5( Kernel2D_S32 kernel, GrayU8 src, GrayI8 dest , int divisor )
@@ -646,7 +656,6 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int totalRow[] = new int[ width ];
 
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-
 			// first time through the value needs to be set
 			int k1 = kernel.data[0];
 			int k2 = kernel.data[1];
@@ -696,6 +705,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((totalRow[x]+halfDivisor)/ divisor);
 			}
 		}
+
 	}
 
 	public static void convolve7( Kernel2D_S32 kernel, GrayU8 src, GrayI8 dest , int divisor )
@@ -711,7 +721,6 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int totalRow[] = new int[ width ];
 
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-
 			// first time through the value needs to be set
 			int k1 = kernel.data[0];
 			int k2 = kernel.data[1];
@@ -769,6 +778,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((totalRow[x]+halfDivisor)/ divisor);
 			}
 		}
+
 	}
 
 	public static void convolve9( Kernel2D_S32 kernel, GrayU8 src, GrayI8 dest , int divisor )
@@ -784,7 +794,6 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int totalRow[] = new int[ width ];
 
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-
 			// first time through the value needs to be set
 			int k1 = kernel.data[0];
 			int k2 = kernel.data[1];
@@ -850,6 +859,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((totalRow[x]+halfDivisor)/ divisor);
 			}
 		}
+
 	}
 
 	public static void convolve11( Kernel2D_S32 kernel, GrayU8 src, GrayI8 dest , int divisor )
@@ -865,7 +875,6 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int totalRow[] = new int[ width ];
 
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
-
 			// first time through the value needs to be set
 			int k1 = kernel.data[0];
 			int k2 = kernel.data[1];
@@ -939,6 +948,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 				dataDst[indexDst++] = ( byte )((totalRow[x]+halfDivisor)/ divisor);
 			}
 		}
+
 	}
 
 }

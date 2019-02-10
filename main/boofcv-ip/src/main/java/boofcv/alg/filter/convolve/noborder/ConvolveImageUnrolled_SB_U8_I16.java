@@ -173,6 +173,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
+
 	}
 
 	public static void horizontal5( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -206,6 +207,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
+
 	}
 
 	public static void horizontal7( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -243,6 +245,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
+
 	}
 
 	public static void horizontal9( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -284,6 +287,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
+
 	}
 
 	public static void horizontal11( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -329,6 +333,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
+
 	}
 
 	public static void vertical3( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -364,6 +369,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
+
 	}
 
 	public static void vertical5( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -405,6 +411,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
+
 	}
 
 	public static void vertical7( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -452,6 +459,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
+
 	}
 
 	public static void vertical9( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -505,6 +513,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
+
 	}
 
 	public static void vertical11( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -564,6 +573,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
+
 	}
 
 	public static void convolve3( Kernel2D_S32 kernel, GrayU8 src, GrayI16 dest)
@@ -617,6 +627,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				}
 			}
 		}
+
 	}
 
 	public static void convolve5( Kernel2D_S32 kernel, GrayU8 src, GrayI16 dest)
@@ -678,6 +689,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				}
 			}
 		}
+
 	}
 
 	public static void convolve7( Kernel2D_S32 kernel, GrayU8 src, GrayI16 dest)
@@ -747,6 +759,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				}
 			}
 		}
+
 	}
 
 	public static void convolve9( Kernel2D_S32 kernel, GrayU8 src, GrayI16 dest)
@@ -824,6 +837,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				}
 			}
 		}
+
 	}
 
 	public static void convolve11( Kernel2D_S32 kernel, GrayU8 src, GrayI16 dest)
@@ -909,6 +923,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				}
 			}
 		}
+
 	}
 
 }

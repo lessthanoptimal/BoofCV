@@ -390,45 +390,69 @@ public class ProjectiveInitializeAllCommon {
 		// save a call to db by using the previously loaded points
 		assocPixel.reset();
 		for (int i = 0; i < inlierToSeed.size; i++) {
+			// inliers from triple RANSAC
+			// each of these inliers was declared a feature in the world reference frame
 			assocPixel.grow().p1.set(matchesTriple.get(i).p1);
 		}
 
+		DMatrixRMaj cameraMatrix = new DMatrixRMaj(3,4);
 		for (int motionIdx = 0; motionIdx < motions.size; motionIdx++) {
 			// skip views already in the scene's structure
 			if( motionIdx == selectedTriple[0] || motionIdx == selectedTriple[1])
 				continue;
-			Motion edge = seed.connections.get(motions.get(motionIdx));
+			int connectionIdx = motions.get(motionIdx);
+			Motion edge = seed.connections.get(connectionIdx);
 			View viewI = edge.other(seed);
 
 			// Lookup pixel locations of features in the connected view
 			db.lookupPixelFeats(viewI.id,featsB);
-			boolean seedSrc = edge.src == seed;
 
-			int matched = 0;
-			for (int i = 0; i < edge.inliers.size; i++) {
-				AssociatedIndex a = edge.inliers.get(i);
-				int featId = seedToStructure.data[seedSrc ? a.src : a.dst];
-				if( featId == -1 )
-					continue;
-				assocPixel.get(featId).p2.set( featsB.get(seedSrc?a.dst:a.src) );
-				matched++;
-			}
-			// All views should have matches for all features, simple sanity check
-			if( matched != assocPixel.size)
-				throw new RuntimeException("BUG! Didn't find all features in the view");
-
-			// Estimate the camera matrix given homogenous pixel observations
-			if( poseEstimator.processHomogenous(assocPixel.toList(),points3D.toList()) ) {
-				db.lookupShape(viewI.id,shape);
-				structure.setView(motionIdx,false,poseEstimator.getProjective(),shape.width,shape.height);
-			} else {
+			if ( !computeCameraMatrix(seed, edge,featsB,cameraMatrix) ) {
 				if( verbose != null ) {
 					verbose.println("Pose estimator failed! motionIdx="+motionIdx);
 				}
 				return false;
 			}
+			db.lookupShape(edge.other(seed).id,shape);
+			structure.setView(motionIdx,false,cameraMatrix,shape.width,shape.height);
+
 		}
 		return true;
+	}
+
+	/**
+	 * Computes camera matrix between the seed view and a connected view
+	 * @param seed This will be the source view. It's observations have already been added to assocPixel
+	 * @param edge The edge which connects them
+	 * @param featsB The dst view
+	 * @param cameraMatrix (Output) resulting camera matrix
+	 * @return true if successful
+	 */
+	private boolean computeCameraMatrix(View seed, Motion edge, FastQueue<Point2D_F64> featsB, DMatrixRMaj cameraMatrix ) {
+		boolean seedSrc = edge.src == seed;
+
+		int matched = 0;
+		for (int i = 0; i < edge.inliers.size; i++) {
+			// need to go from i to index of detected features in view 'seed' to index index of feature in
+			// the reconstruction
+			AssociatedIndex a = edge.inliers.get(i);
+			int featId = seedToStructure.data[seedSrc ? a.src : a.dst];
+			if( featId == -1 )
+				continue;
+			assocPixel.get(featId).p2.set( featsB.get(seedSrc?a.dst:a.src) );
+			matched++;
+		}
+		// All views should have matches for all features, simple sanity check
+		if( matched != assocPixel.size)
+			throw new RuntimeException("BUG! Didn't find all features in the view");
+
+		// Estimate the camera matrix given homogenous pixel observations
+		if( poseEstimator.processHomogenous(assocPixel.toList(),points3D.toList()) ) {
+			cameraMatrix.set(poseEstimator.getProjective());
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
