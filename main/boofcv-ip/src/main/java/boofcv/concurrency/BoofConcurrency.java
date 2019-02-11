@@ -51,4 +51,47 @@ public class BoofConcurrency {
 		}
 	}
 
+	/**
+	 * Automatically breaks the problem up into blocks based on the number of threads available.
+	 *
+	 * Examples:
+	 * <ul>
+	 *     <li>Given a range of 0 to 100, and minBlock is 5, and 10 threads. Blocks will be size 10.</li>
+	 *     <li>Given a range of 0 to 100, and minBlock is 20, and 10 threads. Blocks will be size 20.</li>
+	 *     <li>Given a range of 0 to 100, and minBlock is 15, and 10 threads. Blocks will be size 16 and 20.</li>
+	 *     <li>Given a range of 0 to 100, and minBlock is 80, and 10 threads. Blocks will be size 100.</li>
+	 * </ul>
+	 *
+	 * @param start First index, inclusive
+	 * @param endExclusive Last index, exclusive
+	 * @param minBlock Minimum size of a block
+	 * @param consumer The consumer
+	 */
+	public static void blocks(int start , int endExclusive , int minBlock,
+							  IntRangeConsumer consumer ) {
+		final ForkJoinPool pool = BoofConcurrency.pool;
+		int numThreads = pool.getParallelism();
+
+		int range = endExclusive-start;
+		if( range <= 0 )
+			throw new IllegalArgumentException("end must be more than start");
+
+		int block = selectBlockSize(range,minBlock,numThreads);
+
+		try {
+			pool.submit(new IntRangeTask(0,start,endExclusive,block,consumer)).get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+	}
+
+	static int selectBlockSize( int range , int minBlock , int numThreads ) {
+		// attempt to split the load between each thread equally
+		int block = Math.max(minBlock,range/numThreads);
+		// now attempt to make each block the same size
+		int N = Math.max(1,range/block);
+		return range/N;
+	}
+
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ public class TestLocalMeanBinaryFilter {
 			LocalMeanBinaryFilter alg = new LocalMeanBinaryFilter(ConfigLength.fixed(9),0.95,true, ImageType.single(type));
 
 			alg.process(input,found);
-			GThresholdImageOps.localMean(input, expected, ConfigLength.fixed(9), 0.95, true, null, null);
+			GThresholdImageOps.localMean(input, expected, ConfigLength.fixed(9), 0.95, true, null, null, null);
 
 			BoofTesting.assertEquals(found, expected, 0);
 		}

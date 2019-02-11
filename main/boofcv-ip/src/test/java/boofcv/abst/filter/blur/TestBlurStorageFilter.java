@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,7 @@ public class TestBlurStorageFilter {
 
 			BlurStorageFilter alg = new BlurStorageFilter<>("mean",c,2);
 
-			GBlurImageOps.mean(input,found,2,storage);
+			GBlurImageOps.mean(input,found,2,storage,null);
 
 			alg.process(input,expected);
 

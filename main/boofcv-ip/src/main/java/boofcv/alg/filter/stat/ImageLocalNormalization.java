@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.filter.convolve.GConvolveImageOps;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.GPixelMath;
+import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
@@ -137,9 +138,10 @@ public class ImageLocalNormalization<T extends GrayF<T>> {
 
 		// take advantage of 2D gaussian kernels being separable
 		if( border == null ) {
-			GBlurImageOps.mean(adjusted, localMean, radius, output);
+			WorkArrays work = GeneralizedImageOps.createWorkArray(input.getImageType());
+			GBlurImageOps.mean(adjusted, localMean, radius, output, work);
 			GPixelMath.pow2(adjusted, pow2);
-			GBlurImageOps.mean(pow2, localPow2, radius, output);
+			GBlurImageOps.mean(pow2, localPow2, radius, output, work);
 		} else {
 			throw new IllegalArgumentException("Only renormalize border supported here so far.  This can be changed...");
 		}

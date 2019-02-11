@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.core.image;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.concurrency.*;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 
@@ -292,5 +293,19 @@ public class GeneralizedImageOps {
 			return 64;
 		}
 		throw new RuntimeException("Unknown type: "+type.getSimpleName());
+	}
+
+	public static WorkArrays createWorkArray(ImageType<?> type) {
+		if( type.getDataType().isInteger() ) {
+			if( type.getDataType().getNumBits() < 64 ) {
+				return new IWorkArrays();
+			} else {
+				return new LWorkArrays();
+			}
+		} else if( type.getDataType().getNumBits() < 64 ) {
+			return new FWorkArrays();
+		} else {
+			return new DWorkArrays();
+		}
 	}
 }

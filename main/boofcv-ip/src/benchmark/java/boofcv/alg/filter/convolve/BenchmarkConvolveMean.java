@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,8 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.concurrency.FWorkArrays;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -47,10 +49,12 @@ public class BenchmarkConvolveMean {
 	static private GrayF32 input_F32 = new GrayF32(width,height);
 	static private GrayF32 out_F32 = new GrayF32(width,height);
 	static private GrayF32 storageF32 = new GrayF32(width,height);
+	static private FWorkArrays workF32 = new FWorkArrays();
 	static private Kernel1D_S32 kernelI32;
 	static private GrayU8 input_I8 = new GrayU8(width,height);
 	static private GrayS16 input_I16 = new GrayS16(width,height);
 	static private GrayU8 out_I8 = new GrayU8(width,height);
+	static private IWorkArrays workI32 = new IWorkArrays();
 
 	static private BlurFilter<GrayF32> filter;
 
@@ -84,13 +88,13 @@ public class BenchmarkConvolveMean {
 
 	public int timeMean_U8_I8_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveMean.vertical(input_I8, out_I8, radius);
+			ImplConvolveMean.vertical(input_I8, out_I8, radius,workI32);
 		return 0;
 	}
 
 	public int timeMean_F32_F32_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveMean.vertical(input_F32,out_F32,radius);
+			ImplConvolveMean.vertical(input_F32,out_F32,radius,workF32);
 		return 0;
 	}
 
@@ -102,7 +106,7 @@ public class BenchmarkConvolveMean {
 
 	public int timeMean_F32_F32_Blur(int reps) {
 		for( int i = 0; i < reps; i++ )
-			BlurImageOps.mean(input_F32, out_F32, radius, storageF32);
+			BlurImageOps.mean(input_F32, out_F32, radius, storageF32, workF32);
 		return 0;
 	}
 

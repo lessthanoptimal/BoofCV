@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.filter.binary;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.PixelMath;
+import boofcv.concurrency.FWorkArrays;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -55,6 +56,7 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 	GrayF32 meanI2 = new GrayF32(1,1);
 
 	GrayF32 tmp = new GrayF32(1,1); // work space
+	FWorkArrays work = new FWorkArrays();
 
 	/**
 	 * Configures the algorithm.
@@ -86,13 +88,13 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 		float NP = (radius*2+1)*(radius*2+1);
 
 		// mean of input image = E[X]
-		BlurImageOps.mean(input, meanImage, radius, tmp);
+		BlurImageOps.mean(input, meanImage, radius, tmp, work);
 
 		// Compute I^2
 		PixelMath.pow2(input, imageI2);
 
 		// Compute local mean of I^2
-		BlurImageOps.mean(imageI2, meanI2, radius, tmp);
+		BlurImageOps.mean(imageI2, meanI2, radius, tmp, work);
 
 		if( down ) {
 			for (int y = 0; y < input.height; y++) {

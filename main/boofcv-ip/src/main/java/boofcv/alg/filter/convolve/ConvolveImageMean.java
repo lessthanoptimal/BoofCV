@@ -23,11 +23,16 @@ import boofcv.alg.filter.convolve.noborder.ImplConvolveMean;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveMean_MT;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder_SB;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.DWorkArrays;
+import boofcv.concurrency.FWorkArrays;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
+
+import javax.annotation.Nullable;
 
 
 /**
@@ -70,12 +75,12 @@ public class ConvolveImageMean {
 	/**
 	 * Performs a vertical 1D convolution which computes the mean value of elements
 	 * inside the kernel.
-	 *
-	 * @param input The original image. Not modified.
+	 *  @param input The original image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
+	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayF32 input, GrayF32 output, int radius) {
+	public static void vertical(GrayF32 input, GrayF32 output, int radius, @Nullable FWorkArrays work) {
 
 		boolean processed = BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius);
 
@@ -87,9 +92,9 @@ public class ConvolveImageMean {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 				if(BoofConcurrency.USE_CONCURRENT) {
-					ImplConvolveMean_MT.vertical(input, output, radius);
+					ImplConvolveMean_MT.vertical(input, output, radius,work);
 				} else {
-					ImplConvolveMean.vertical(input, output, radius);
+					ImplConvolveMean.vertical(input, output, radius,work);
 				}
 			}
 		}
@@ -130,8 +135,9 @@ public class ConvolveImageMean {
 	 * @param input The original image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
+	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayF64 input, GrayF64 output, int radius) {
+	public static void vertical(GrayF64 input, GrayF64 output, int radius, @Nullable DWorkArrays work) {
 
 		boolean processed = BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius);
 
@@ -143,9 +149,9 @@ public class ConvolveImageMean {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 				if(BoofConcurrency.USE_CONCURRENT) {
-					ImplConvolveMean_MT.vertical(input, output, radius);
+					ImplConvolveMean_MT.vertical(input, output, radius,work);
 				} else {
-					ImplConvolveMean.vertical(input, output, radius);
+					ImplConvolveMean.vertical(input, output, radius,work);
 				}
 			}
 		}
@@ -186,8 +192,9 @@ public class ConvolveImageMean {
 	 * @param input The original image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
+	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayU8 input, GrayI8 output, int radius) {
+	public static void vertical(GrayU8 input, GrayI8 output, int radius, @Nullable IWorkArrays work) {
 
 		boolean processed = BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius);
 
@@ -199,9 +206,9 @@ public class ConvolveImageMean {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 				if(BoofConcurrency.USE_CONCURRENT) {
-					ImplConvolveMean_MT.vertical(input, output, radius);
+					ImplConvolveMean_MT.vertical(input, output, radius,work);
 				} else {
-					ImplConvolveMean.vertical(input, output, radius);
+					ImplConvolveMean.vertical(input, output, radius,work);
 				}
 			}
 		}
@@ -270,8 +277,9 @@ public class ConvolveImageMean {
 	 * @param input The original image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
+	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayS16 input, GrayI16 output, int radius ) {
+	public static void vertical(GrayS16 input, GrayI16 output, int radius , @Nullable IWorkArrays work) {
 
 		boolean processed = BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius);
 
@@ -283,9 +291,9 @@ public class ConvolveImageMean {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 				if(BoofConcurrency.USE_CONCURRENT) {
-					ImplConvolveMean_MT.vertical(input, output, radius);
+					ImplConvolveMean_MT.vertical(input, output, radius,work);
 				} else {
-					ImplConvolveMean.vertical(input, output, radius);
+					ImplConvolveMean.vertical(input, output, radius,work);
 				}
 			}
 		}
@@ -298,8 +306,9 @@ public class ConvolveImageMean {
 	 * @param input The original image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
+	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayU16 input, GrayI16 output, int radius ) {
+	public static void vertical(GrayU16 input, GrayI16 output, int radius , @Nullable IWorkArrays work) {
 
 		boolean processed = BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius);
 
@@ -311,9 +320,9 @@ public class ConvolveImageMean {
 				InputSanityCheck.checkSameShape(input, output);
 				ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 				if(BoofConcurrency.USE_CONCURRENT) {
-					ImplConvolveMean_MT.vertical(input, output, radius);
+					ImplConvolveMean_MT.vertical(input, output, radius,work);
 				} else {
-					ImplConvolveMean.vertical(input, output, radius);
+					ImplConvolveMean.vertical(input, output, radius,work);
 				}
 			}
 		}

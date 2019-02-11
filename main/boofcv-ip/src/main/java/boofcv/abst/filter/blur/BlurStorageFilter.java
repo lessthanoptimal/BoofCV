@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.filter.blur;
 
 import boofcv.alg.filter.blur.GBlurImageOps;
+import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -43,6 +44,7 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 
 	// type of image it processes
 	ImageType<T> inputType;
+	WorkArrays workArray;
 
 	public BlurStorageFilter( String functionName , ImageType<T> inputType, int radius) {
 		this(functionName,inputType,-1,radius);
@@ -64,6 +66,8 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 		} else {
 			throw new IllegalArgumentException("Unknown function "+functionName);
 		}
+
+		workArray = GeneralizedImageOps.createWorkArray( inputType );
 	}
 
 	private void createStorage() {
@@ -123,7 +127,7 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	private class MeanOperation implements BlurOperation {
 		@Override
 		public void process(ImageBase input, ImageBase output) {
-			GBlurImageOps.mean(input,output,radius,storage);
+			GBlurImageOps.mean(input,output,radius,storage,workArray);
 		}
 	}
 

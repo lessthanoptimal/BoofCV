@@ -20,8 +20,13 @@ package boofcv.alg.filter.blur;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.struct.image.GrayU8;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -42,12 +47,13 @@ public class BenchmarkBlurImageOps {
 	@Param({"true","false"})
 	public boolean concurrent;
 
-	@Param({"100", "500", "1000", "5000", "10000"})
+	@Param({"10000"})
 	public int width;
 
 	GrayU8 input = new GrayU8(width,width);
 	GrayU8 output = new GrayU8(width,width);
 	GrayU8 storage = new GrayU8(width,width);
+	IWorkArrays work = new IWorkArrays();
 
 	@Setup
 	public void setup() {
@@ -66,20 +72,20 @@ public class BenchmarkBlurImageOps {
 
 	@Benchmark
 	public void mean() {
-		BlurImageOps.mean(input,output,radius,storage);
+		BlurImageOps.mean(input,output,radius,storage,work);
 	}
 
-	@Benchmark
-	public void gaussian() {
-		BlurImageOps.gaussian(input,output,-1,radius,storage);
-	}
-
-
-//	public static void main(String[] args) throws RunnerException {
-//		Options opt = new OptionsBuilder()
-//				.include(BenchmarkBlurImageOps.class.getSimpleName())
-//				.build();
-//
-//		new Runner(opt).run();
+//	@Benchmark
+//	public void gaussian() {
+//		BlurImageOps.gaussian(input,output,-1,radius,storage);
 //	}
+
+
+	public static void main(String[] args) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkBlurImageOps.class.getSimpleName())
+				.build();
+
+		new Runner(opt).run();
+	}
 }

@@ -63,10 +63,8 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 		autoSelectName();
 		out.print(
 				"import boofcv.struct.image.*;\n" +
-				"import javax.annotation.Generated;\n");
-
-		if( concurrent )
-			out.print("import boofcv.concurrency.BoofConcurrency;\n");
+				"import javax.annotation.Generated;\n" +
+				"import boofcv.concurrency.*;\n");
 
 		out.print(
 				"\n" +
@@ -97,8 +95,7 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 				"\t\tfinal int kernelWidth = radius*2 + 1;\n" +
 				"\n" +
 				"\t\tfinal " + sumType + " divisor = kernelWidth;\n" +
-				declareHalf +
-				"\n");
+				declareHalf);
 		String body = "";
 
 		body += "\t\t\tint indexIn = input.startIndex + input.stride*y;\n" +
@@ -133,20 +130,34 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 		String declareHalf = imageIn.isInteger() ? "\t\tfinal " + sumType + " halfDivisor = divisor/2;\n" : "";
 		String divide = imageIn.isInteger() ? "(total+halfDivisor)/divisor" : "total/divisor";
 
-		out.print("\tpublic static void vertical( " + imageIn.getSingleBandName() + " input , " + imageOut.getSingleBandName() + " output , int radius ) {\n" +
+		String workType = imageIn.getLetterSum()+"WorkArrays";
+
+		out.print("\tpublic static void vertical("+imageIn.getSingleBandName()+" input , "+
+				imageOut.getSingleBandName()+" output , int radius, "+workType+" work ) {\n" +
+				"\t\tif( work == null ) {\n" +
+				"\t\t\twork = new "+workType+"(input.width);\n" +
+				"\t\t} else {\n" +
+				"\t\t\twork.reset(input.width);\n" +
+				"\t\t}\n" +
+				"\t\tfinal "+workType+" _work = work;\n" +
 				"\t\tfinal int kernelWidth = radius*2 + 1;\n" +
-				"\n" +
 				"\t\tfinal int backStep = kernelWidth*input.stride;\n" +
 				"\n" +
 				"\t\t"+sumType+" divisor = kernelWidth;\n" +
 				declareHalf +
-				"\t\t"+sumType+" totals[] = new "+sumType+"[ input.width ];\n" +
 				"\n" +
+				"\t\t// To reduce cache misses it is processed along rows instead of going down columns, which is\n" +
+				"\t\t// more natural for a vertical convolution. For parallel processes this requires building\n" +
+				"\t\t// a book keeping array for each thread.\n");
+
+		String body = "";
+
+		body += "\t\t"+sumType+" totals[] = _work.pop();\n" +
 				"\t\tfor( int x = 0; x < input.width; x++ ) {\n" +
-				"\t\t\tint indexIn = input.startIndex + x;\n" +
-				"\t\t\tint indexOut = output.startIndex + output.stride*radius + x;\n" +
+				"\t\t\tint indexIn = input.startIndex + (y0-radius)*input.stride + x;\n" +
+				"\t\t\tint indexOut = output.startIndex + output.stride*y0 + x;\n" +
 				"\n" +
-				"\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\tint total = 0;\n" +
 				"\t\t\tint indexEnd = indexIn + input.stride*kernelWidth;\n" +
 				"\t\t\tfor( ; indexIn < indexEnd; indexIn += input.stride) {\n" +
 				"\t\t\t\ttotal += input.data[indexIn] "+bitWise+";\n" +
@@ -155,10 +166,9 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 				"\t\t\toutput.data[indexOut] = "+typeCast+"("+divide+");\n" +
 				"\t\t}\n" +
 				"\n" +
-				"\t\t// change the order it is processed in to reduce cache misses\n");
-
-		String body = "";
-		body += "\t\t\tint indexIn = input.startIndex + (y+radius)*input.stride;\n" +
+				"\t\t// change the order it is processed in to reduce cache misses\n" +
+				"\t\tfor( int y = y0+1; y < y1; y++ ) {\n" +
+				"\t\t\tint indexIn = input.startIndex + (y+radius)*input.stride;\n" +
 				"\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
 				"\n" +
 				"\t\t\tfor( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {\n" +
@@ -166,10 +176,13 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 				"\t\t\t\ttotals[ x ] = total += input.data[ indexIn ]"+bitWise+";\n" +
 				"\n" +
 				"\t\t\t\toutput.data[indexOut] = "+typeCast+"("+divide+");\n" +
-				"\t\t\t}\n";
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t\t_work.recycle(totals);\n";
 
-		printParallel("y","radius+1","output.height-radius",body);
-		out.print("\t}\n\n");
+		printParallelBlock("y0","y1","radius","output.height-radius","kernelWidth",body);
+
+		out.print("\t}\n");
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {

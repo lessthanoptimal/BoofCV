@@ -74,6 +74,23 @@ public abstract class CodeGeneratorBase {
 			out.print("\t\t}\n");
 		}
 	}
+	protected void printParallelBlock(String var0 , String var1, String lower, String upper , String minBlock , String body ) {
+		out.println();
+		if( concurrent ) {
+			out.printf("\t\tBoofConcurrency.blocks(%s, %s, %s,(%s,%s)->{\n",lower,upper,minBlock,var0,var1);
+			String[] lines = body.split("\n");
+			for( String s : lines ) {
+				if( !s.isEmpty() ) {
+					s = "\t"+s;
+				}
+				out.print(s+"\n");
+			}
+			out.print("\t\t});\n");
+		} else {
+			out.printf("\t\tfinal int %s = %s, %s = %s;\n",var0,lower,var1,upper);
+			out.print(body);
+		}
+	}
 
 	/**
 	 * Creates 

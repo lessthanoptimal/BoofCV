@@ -18,6 +18,10 @@
 
 package boofcv.alg.filter.blur;
 
+import boofcv.concurrency.DWorkArrays;
+import boofcv.concurrency.FWorkArrays;
+import boofcv.concurrency.IWorkArrays;
+import boofcv.concurrency.WorkArrays;
 import boofcv.struct.image.*;
 
 import javax.annotation.Nullable;
@@ -43,17 +47,17 @@ public class GBlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
-	T mean(T input, @Nullable T output, int radius, @Nullable ImageBase storage ) {
+	T mean(T input, @Nullable T output, int radius, @Nullable ImageBase storage , @Nullable WorkArrays workVert ) {
 		if( input instanceof GrayU8) {
-			return (T) BlurImageOps.mean((GrayU8) input, (GrayU8) output, radius, (GrayU8) storage);
+			return (T) BlurImageOps.mean((GrayU8) input, (GrayU8) output, radius, (GrayU8) storage, (IWorkArrays)workVert);
 		} else if( input instanceof GrayU16) {
-			return (T)BlurImageOps.mean((GrayU16)input,(GrayU16)output,radius,(GrayU16)storage);
+			return (T)BlurImageOps.mean((GrayU16)input,(GrayU16)output,radius,(GrayU16)storage, (IWorkArrays)workVert);
 		} else if( input instanceof GrayF32) {
-			return (T)BlurImageOps.mean((GrayF32)input,(GrayF32)output,radius,(GrayF32)storage);
+			return (T)BlurImageOps.mean((GrayF32)input,(GrayF32)output,radius,(GrayF32)storage, (FWorkArrays)workVert);
 		} else if( input instanceof GrayF64) {
-			return (T)BlurImageOps.mean((GrayF64)input,(GrayF64)output,radius,(GrayF64)storage);
+			return (T)BlurImageOps.mean((GrayF64)input,(GrayF64)output,radius,(GrayF64)storage, (DWorkArrays)workVert);
 		} else if( input instanceof Planar) {
-			return (T)BlurImageOps.mean((Planar)input,(Planar)output,radius,(ImageGray)storage);
+			return (T)BlurImageOps.mean((Planar)input,(Planar)output,radius,(ImageGray)storage, workVert);
 		} else  {
 			throw new IllegalArgumentException("Unsupported image type");
 		}

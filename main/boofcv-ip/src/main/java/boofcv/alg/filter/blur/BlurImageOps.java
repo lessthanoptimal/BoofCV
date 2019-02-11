@@ -24,6 +24,10 @@ import boofcv.alg.filter.blur.impl.ImplMedianSortEdgeNaive;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.filter.convolve.ConvolveImageMean;
 import boofcv.alg.filter.convolve.ConvolveImageNormalized;
+import boofcv.concurrency.DWorkArrays;
+import boofcv.concurrency.FWorkArrays;
+import boofcv.concurrency.IWorkArrays;
+import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -50,7 +54,8 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayU8 mean(GrayU8 input, @Nullable GrayU8 output, int radius, @Nullable GrayU8 storage) {
+	public static GrayU8 mean(GrayU8 input, @Nullable GrayU8 output, int radius,
+							  @Nullable GrayU8 storage, @Nullable IWorkArrays workVert ) {
 
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
@@ -62,7 +67,7 @@ public class BlurImageOps {
 
 		if( !processed ){
 			ConvolveImageMean.horizontal(input, storage, radius);
-			ConvolveImageMean.vertical(storage, output, radius);
+			ConvolveImageMean.vertical(storage, output, radius, workVert);
 		}
 
 		return output;
@@ -77,7 +82,8 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayU16 mean(GrayU16 input, @Nullable GrayU16 output, int radius, @Nullable GrayU16 storage) {
+	public static GrayU16 mean(GrayU16 input, @Nullable GrayU16 output, int radius,
+							   @Nullable GrayU16 storage, @Nullable IWorkArrays workVert) {
 
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
@@ -89,7 +95,7 @@ public class BlurImageOps {
 
 		if( !processed ){
 			ConvolveImageMean.horizontal(input, storage, radius);
-			ConvolveImageMean.vertical(storage, output, radius);
+			ConvolveImageMean.vertical(storage, output, radius, workVert);
 		}
 
 		return output;
@@ -104,7 +110,8 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayF32 mean(GrayF32 input, @Nullable GrayF32 output, int radius, @Nullable GrayF32 storage) {
+	public static GrayF32 mean(GrayF32 input, @Nullable GrayF32 output, int radius,
+							   @Nullable GrayF32 storage, @Nullable FWorkArrays workVert) {
 
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
@@ -116,7 +123,7 @@ public class BlurImageOps {
 
 		if( !processed ){
 			ConvolveImageMean.horizontal(input, storage, radius);
-			ConvolveImageMean.vertical(storage, output, radius);
+			ConvolveImageMean.vertical(storage, output, radius, workVert);
 		}
 
 		return output;
@@ -131,7 +138,8 @@ public class BlurImageOps {
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @return Output blurred image.
 	 */
-	public static GrayF64 mean(GrayF64 input, @Nullable GrayF64 output, int radius, @Nullable GrayF64 storage) {
+	public static GrayF64 mean(GrayF64 input, @Nullable GrayF64 output, int radius,
+							   @Nullable GrayF64 storage, @Nullable DWorkArrays workVert) {
 
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
@@ -143,7 +151,7 @@ public class BlurImageOps {
 
 		if( !processed ){
 			ConvolveImageMean.horizontal(input, storage, radius);
-			ConvolveImageMean.vertical(storage, output, radius);
+			ConvolveImageMean.vertical(storage, output, radius, workVert);
 		}
 
 		return output;
@@ -160,7 +168,8 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageGray<T>>
-	Planar<T> mean(Planar<T> input, @Nullable Planar<T> output, int radius , @Nullable T storage ) {
+	Planar<T> mean(Planar<T> input, @Nullable Planar<T> output, int radius ,
+				   @Nullable T storage , @Nullable WorkArrays workVert ) {
 
 		if( storage == null )
 			storage = GeneralizedImageOps.createSingleBand(input.getBandType(),input.width,input.height);
@@ -168,7 +177,7 @@ public class BlurImageOps {
 			output = input.createNew(input.width,input.height);
 
 		for( int band = 0; band < input.getNumBands(); band++ ) {
-			GBlurImageOps.mean(input.getBand(band),output.getBand(band),radius, storage);
+			GBlurImageOps.mean(input.getBand(band),output.getBand(band),radius, storage, workVert);
 		}
 		return output;
 	}

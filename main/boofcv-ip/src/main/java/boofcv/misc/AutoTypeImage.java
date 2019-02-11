@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -166,6 +166,40 @@ public enum AutoTypeImage {
 
 	public String getInterleavedName() {
 		return "Interleaved"+toString();
+	}
+
+	public String getLetter() {
+		if( isInteger ) {
+			switch( getNumBits() ) {
+				case 64: return "L";
+				case 32: return "I";
+				case 16: return "S";
+				case 8: return "B";
+			}
+		} else {
+			switch( getNumBits() ) {
+				case 64: return "D";
+				case 32: return "F";
+			}
+		}
+		throw new RuntimeException("Unknown type");
+	}
+
+	public String getLetterSum() {
+		if( isInteger ) {
+			switch( getNumBits() ) {
+				case 64: return "L";
+				case 32:
+				case 16:
+				case 8: return "I";
+			}
+		} else {
+			switch( getNumBits() ) {
+				case 64: return "D";
+				case 32: return "F";
+			}
+		}
+		throw new RuntimeException("Unknown type");
 	}
 
 	public String getSingleBandName() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,12 @@ package boofcv.alg.filter.binary;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.blur.BlurImageOps;
+import boofcv.concurrency.FWorkArrays;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.*;
+
+import javax.annotation.Nullable;
 
 /**
  * <p>
@@ -286,7 +290,8 @@ public class ThresholdImageOps {
 	 */
 	public static GrayU8 localMean(GrayU8 input , GrayU8 output ,
 								   ConfigLength width , float scale , boolean down ,
-								   GrayU8 storage1 , GrayU8 storage2 ) {
+								   @Nullable GrayU8 storage1 , @Nullable GrayU8 storage2 ,
+								   @Nullable IWorkArrays storage3 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU8.class);
@@ -296,7 +301,7 @@ public class ThresholdImageOps {
 
 		GrayU8 mean = storage1;
 
-		BlurImageOps.mean(input,mean,radius,storage2);
+		BlurImageOps.mean(input,mean,radius,storage2,storage3);
 
 		if( down ) {
 			for( int y = 0; y < input.height; y++ ) {
@@ -414,7 +419,8 @@ public class ThresholdImageOps {
 	 */
 	public static GrayU8 localMean(GrayF32 input , GrayU8 output ,
 								   ConfigLength width , float scale , boolean down ,
-								   GrayF32 storage1 , GrayF32 storage2 ) {
+								   @Nullable GrayF32 storage1 , @Nullable GrayF32 storage2 ,
+								   @Nullable FWorkArrays storage3 ) {
 
 		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayF32.class);
@@ -424,7 +430,7 @@ public class ThresholdImageOps {
 
 		GrayF32 mean = storage1;
 
-		BlurImageOps.mean(input,mean,radius,storage2);
+		BlurImageOps.mean(input,mean,radius,storage2,storage3);
 
 		if( down ) {
 			for( int y = 0; y < input.height; y++ ) {

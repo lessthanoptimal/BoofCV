@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -104,10 +104,10 @@ public class TestThresholdImageOps {
 		boolean isInt;
 		if( input instanceof GrayU8) {
 			isInt = true;
-			blur = BlurImageOps.mean((GrayU8)input,null,radius,null);
+			blur = BlurImageOps.mean((GrayU8)input,null,radius,null, null);
 		} else {
 			isInt = false;
-			blur = BlurImageOps.mean((GrayF32)input,null,radius,null);
+			blur = BlurImageOps.mean((GrayF32)input,null,radius,null,null);
 		}
 
 		float fscale = (float)scale;

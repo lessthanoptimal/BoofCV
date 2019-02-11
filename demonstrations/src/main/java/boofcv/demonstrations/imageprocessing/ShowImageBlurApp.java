@@ -19,6 +19,8 @@
 package boofcv.demonstrations.imageprocessing;
 
 import boofcv.alg.filter.blur.GBlurImageOps;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -55,12 +57,14 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 	Planar<T> output;
 	T storage;
 	BufferedImage renderedImage;
+	WorkArrays work;
 
 	public ShowImageBlurApp( java.util.List<PathLabel> examples , Class<T> imageType ) {
 		super(examples, ImageType.pl(3,imageType));
 
 		output = new Planar<>(imageType, 1, 1, 3);
 		storage = GeneralizedImageOps.createSingleBand(imageType,1,1);
+		work = GeneralizedImageOps.createWorkArray(storage.getImageType());
 
 		add(gui,BorderLayout.CENTER);
 		add(controls,BorderLayout.WEST);
@@ -100,7 +104,7 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 				break;
 
 			case 1:
-				GBlurImageOps.mean(image, output, radius, storage);
+				GBlurImageOps.mean(image, output, radius, storage, work);
 				break;
 
 			case 2:
@@ -171,6 +175,7 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 
 
 	public static void main(String args[]) {
+		BoofConcurrency.USE_CONCURRENT = true;
 
 		java.util.List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("Horses", UtilIO.pathExample("segment/berkeley_horses.jpg")));

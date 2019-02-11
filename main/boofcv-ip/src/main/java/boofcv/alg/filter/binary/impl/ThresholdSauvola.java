@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.blur.BlurImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
+import boofcv.concurrency.FWorkArrays;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -60,6 +61,7 @@ public class ThresholdSauvola implements InputToBinary<GrayF32> {
 	GrayF32 stdev = new GrayF32(1,1); // computed standard deviation
 
 	GrayF32 tmp = new GrayF32(1,1); // work space
+	FWorkArrays work = new FWorkArrays();
 
 	/**
 	 * Configures the algorithm.
@@ -91,11 +93,11 @@ public class ThresholdSauvola implements InputToBinary<GrayF32> {
 		int radius = width.computeI(Math.min(input.width,input.height))/2;
 
 		// mean of input image = E[X]
-		BlurImageOps.mean(input, inputMean, radius, tmp);
+		BlurImageOps.mean(input, inputMean, radius, tmp, work);
 
 		// standard deviation = sqrt( E[X^2] + E[X]^2)
 		PixelMath.pow2(input, inputPow2);
-		BlurImageOps.mean(inputPow2,inputPow2Mean,radius,tmp);
+		BlurImageOps.mean(inputPow2,inputPow2Mean,radius,tmp, work);
 		PixelMath.pow2(inputMean,inputMeanPow2);
 		PixelMath.subtract(inputPow2Mean, inputMeanPow2, stdev);
 		PixelMath.sqrt(stdev, stdev);

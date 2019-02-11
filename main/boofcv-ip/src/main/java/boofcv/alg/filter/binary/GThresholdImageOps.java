@@ -22,11 +22,16 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.impl.ThresholdSauvola;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.HistogramStatistics;
+import boofcv.concurrency.FWorkArrays;
+import boofcv.concurrency.IWorkArrays;
+import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GConvertImage;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.*;
 import org.ejml.UtilEjml;
+
+import javax.annotation.Nullable;
 
 
 /**
@@ -551,14 +556,15 @@ public class GThresholdImageOps {
 	 */
 	public static <T extends ImageGray<T>>
 	GrayU8 localMean(T input, GrayU8 output,
-					 ConfigLength width, double scale, boolean down, T work1, T work2)
+					 ConfigLength width, double scale, boolean down,
+					 @Nullable T work1, @Nullable T work2, @Nullable WorkArrays work3 )
 	{
 		if( input instanceof GrayF32) {
 			return ThresholdImageOps.localMean((GrayF32) input, output, width, (float) scale, down,
-					(GrayF32) work1, (GrayF32) work2);
+					(GrayF32) work1, (GrayF32) work2, (FWorkArrays)work3);
 		} else if( input instanceof GrayU8) {
 			return ThresholdImageOps.localMean((GrayU8) input, output, width, (float) scale, down,
-					(GrayU8) work1, (GrayU8) work2);
+					(GrayU8) work1, (GrayU8) work2, (IWorkArrays)work3);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}

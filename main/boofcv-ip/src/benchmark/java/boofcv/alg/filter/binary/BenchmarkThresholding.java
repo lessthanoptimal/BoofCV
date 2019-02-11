@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.filter.binary.impl.ThresholdBlockMinMax_F32;
 import boofcv.alg.filter.binary.impl.ThresholdBlockMinMax_U8;
 import boofcv.alg.filter.binary.impl.ThresholdSauvola;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.core.image.ConvertImage;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
@@ -48,6 +49,7 @@ public class BenchmarkThresholding {
 	static GrayU8 output_U8 = new GrayU8(imgWidth, imgHeight);
 	static GrayU8 work = new GrayU8(imgWidth, imgHeight);
 	static GrayU8 work2 = new GrayU8(imgWidth, imgHeight);
+	static IWorkArrays work3 = new IWorkArrays();
 
 	static int threshLower = 20;
 	static int threshUpper = 30;
@@ -70,7 +72,7 @@ public class BenchmarkThresholding {
 	public static class LocalMean extends PerformerBase {
 		@Override
 		public void process() {
-			ThresholdImageOps.localMean(input, output_U8, adaptiveWidth, 0, true, work, work2);
+			ThresholdImageOps.localMean(input, output_U8, adaptiveWidth, 0, true, work, work2,work3);
 		}
 	}
 

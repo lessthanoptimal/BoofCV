@@ -19,6 +19,9 @@
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.DWorkArrays;
+import boofcv.concurrency.FWorkArrays;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
@@ -41,7 +44,6 @@ public class ImplConvolveMean_MT {
 
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
-
 
 		BoofConcurrency.range(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
@@ -66,49 +68,58 @@ public class ImplConvolveMean_MT {
 		});
 	}
 
-	public static void vertical( GrayU8 input , GrayI8 output , int radius ) {
+	public static void vertical(GrayU8 input , GrayI8 output , int radius, IWorkArrays work ) {
+		if( work == null ) {
+			work = new IWorkArrays(input.width);
+		} else {
+			work.reset(input.width);
+		}
+		final IWorkArrays _work = work;
 		final int kernelWidth = radius*2 + 1;
-
 		final int backStep = kernelWidth*input.stride;
 
 		int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
-		int totals[] = new int[ input.width ];
 
-		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + x;
-			int indexOut = output.startIndex + output.stride*radius + x;
+		// To reduce cache misses it is processed along rows instead of going down columns, which is
+		// more natural for a vertical convolution. For parallel processes this requires building
+		// a book keeping array for each thread.
 
-			int total = 0;
-			int indexEnd = indexIn + input.stride*kernelWidth;
-			for( ; indexIn < indexEnd; indexIn += input.stride) {
-				total += input.data[indexIn] & 0xFF;
-			}
-			totals[x] = total;
-			output.data[indexOut] = (byte)((total+halfDivisor)/divisor);
-		}
+		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+			int totals[] = _work.pop();
+			for( int x = 0; x < input.width; x++ ) {
+				int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+				int indexOut = output.startIndex + output.stride*y0 + x;
 
-		// change the order it is processed in to reduce cache misses
-
-		BoofConcurrency.range(radius+1, output.height-radius, y -> {
-			int indexIn = input.startIndex + (y+radius)*input.stride;
-			int indexOut = output.startIndex + y*output.stride;
-
-			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-				int total = totals[ x ]  - (input.data[ indexIn - backStep ]& 0xFF);
-				totals[ x ] = total += input.data[ indexIn ]& 0xFF;
-
+				int total = 0;
+				int indexEnd = indexIn + input.stride*kernelWidth;
+				for( ; indexIn < indexEnd; indexIn += input.stride) {
+					total += input.data[indexIn] & 0xFF;
+				}
+				totals[x] = total;
 				output.data[indexOut] = (byte)((total+halfDivisor)/divisor);
 			}
+
+			// change the order it is processed in to reduce cache misses
+			for( int y = y0+1; y < y1; y++ ) {
+				int indexIn = input.startIndex + (y+radius)*input.stride;
+				int indexOut = output.startIndex + y*output.stride;
+
+				for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
+					int total = totals[ x ]  - (input.data[ indexIn - backStep ]& 0xFF);
+					totals[ x ] = total += input.data[ indexIn ]& 0xFF;
+
+					output.data[indexOut] = (byte)((total+halfDivisor)/divisor);
+				}
+			}
+			_work.recycle(totals);
 		});
 	}
-
 	public static void horizontal( GrayS16 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
-
 
 		BoofConcurrency.range(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
@@ -133,49 +144,58 @@ public class ImplConvolveMean_MT {
 		});
 	}
 
-	public static void vertical( GrayS16 input , GrayI16 output , int radius ) {
+	public static void vertical(GrayS16 input , GrayI16 output , int radius, IWorkArrays work ) {
+		if( work == null ) {
+			work = new IWorkArrays(input.width);
+		} else {
+			work.reset(input.width);
+		}
+		final IWorkArrays _work = work;
 		final int kernelWidth = radius*2 + 1;
-
 		final int backStep = kernelWidth*input.stride;
 
 		int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
-		int totals[] = new int[ input.width ];
 
-		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + x;
-			int indexOut = output.startIndex + output.stride*radius + x;
+		// To reduce cache misses it is processed along rows instead of going down columns, which is
+		// more natural for a vertical convolution. For parallel processes this requires building
+		// a book keeping array for each thread.
 
-			int total = 0;
-			int indexEnd = indexIn + input.stride*kernelWidth;
-			for( ; indexIn < indexEnd; indexIn += input.stride) {
-				total += input.data[indexIn] ;
-			}
-			totals[x] = total;
-			output.data[indexOut] = (short)((total+halfDivisor)/divisor);
-		}
+		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+			int totals[] = _work.pop();
+			for( int x = 0; x < input.width; x++ ) {
+				int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+				int indexOut = output.startIndex + output.stride*y0 + x;
 
-		// change the order it is processed in to reduce cache misses
-
-		BoofConcurrency.range(radius+1, output.height-radius, y -> {
-			int indexIn = input.startIndex + (y+radius)*input.stride;
-			int indexOut = output.startIndex + y*output.stride;
-
-			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-				int total = totals[ x ]  - (input.data[ indexIn - backStep ]);
-				totals[ x ] = total += input.data[ indexIn ];
-
+				int total = 0;
+				int indexEnd = indexIn + input.stride*kernelWidth;
+				for( ; indexIn < indexEnd; indexIn += input.stride) {
+					total += input.data[indexIn] ;
+				}
+				totals[x] = total;
 				output.data[indexOut] = (short)((total+halfDivisor)/divisor);
 			}
+
+			// change the order it is processed in to reduce cache misses
+			for( int y = y0+1; y < y1; y++ ) {
+				int indexIn = input.startIndex + (y+radius)*input.stride;
+				int indexOut = output.startIndex + y*output.stride;
+
+				for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
+					int total = totals[ x ]  - (input.data[ indexIn - backStep ]);
+					totals[ x ] = total += input.data[ indexIn ];
+
+					output.data[indexOut] = (short)((total+halfDivisor)/divisor);
+				}
+			}
+			_work.recycle(totals);
 		});
 	}
-
 	public static void horizontal( GrayU16 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
-
 
 		BoofConcurrency.range(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
@@ -200,49 +220,58 @@ public class ImplConvolveMean_MT {
 		});
 	}
 
-	public static void vertical( GrayU16 input , GrayI16 output , int radius ) {
+	public static void vertical(GrayU16 input , GrayI16 output , int radius, IWorkArrays work ) {
+		if( work == null ) {
+			work = new IWorkArrays(input.width);
+		} else {
+			work.reset(input.width);
+		}
+		final IWorkArrays _work = work;
 		final int kernelWidth = radius*2 + 1;
-
 		final int backStep = kernelWidth*input.stride;
 
 		int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
-		int totals[] = new int[ input.width ];
 
-		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + x;
-			int indexOut = output.startIndex + output.stride*radius + x;
+		// To reduce cache misses it is processed along rows instead of going down columns, which is
+		// more natural for a vertical convolution. For parallel processes this requires building
+		// a book keeping array for each thread.
 
-			int total = 0;
-			int indexEnd = indexIn + input.stride*kernelWidth;
-			for( ; indexIn < indexEnd; indexIn += input.stride) {
-				total += input.data[indexIn] & 0xFFFF;
-			}
-			totals[x] = total;
-			output.data[indexOut] = (short)((total+halfDivisor)/divisor);
-		}
+		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+			int totals[] = _work.pop();
+			for( int x = 0; x < input.width; x++ ) {
+				int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+				int indexOut = output.startIndex + output.stride*y0 + x;
 
-		// change the order it is processed in to reduce cache misses
-
-		BoofConcurrency.range(radius+1, output.height-radius, y -> {
-			int indexIn = input.startIndex + (y+radius)*input.stride;
-			int indexOut = output.startIndex + y*output.stride;
-
-			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-				int total = totals[ x ]  - (input.data[ indexIn - backStep ]& 0xFFFF);
-				totals[ x ] = total += input.data[ indexIn ]& 0xFFFF;
-
+				int total = 0;
+				int indexEnd = indexIn + input.stride*kernelWidth;
+				for( ; indexIn < indexEnd; indexIn += input.stride) {
+					total += input.data[indexIn] & 0xFFFF;
+				}
+				totals[x] = total;
 				output.data[indexOut] = (short)((total+halfDivisor)/divisor);
 			}
+
+			// change the order it is processed in to reduce cache misses
+			for( int y = y0+1; y < y1; y++ ) {
+				int indexIn = input.startIndex + (y+radius)*input.stride;
+				int indexOut = output.startIndex + y*output.stride;
+
+				for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
+					int total = totals[ x ]  - (input.data[ indexIn - backStep ]& 0xFFFF);
+					totals[ x ] = total += input.data[ indexIn ]& 0xFFFF;
+
+					output.data[indexOut] = (short)((total+halfDivisor)/divisor);
+				}
+			}
+			_work.recycle(totals);
 		});
 	}
-
 	public static void horizontal( GrayF32 input , GrayF32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final float divisor = kernelWidth;
 
-
 		BoofConcurrency.range(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
@@ -266,48 +295,57 @@ public class ImplConvolveMean_MT {
 		});
 	}
 
-	public static void vertical( GrayF32 input , GrayF32 output , int radius ) {
+	public static void vertical(GrayF32 input , GrayF32 output , int radius, FWorkArrays work ) {
+		if( work == null ) {
+			work = new FWorkArrays(input.width);
+		} else {
+			work.reset(input.width);
+		}
+		final FWorkArrays _work = work;
 		final int kernelWidth = radius*2 + 1;
-
 		final int backStep = kernelWidth*input.stride;
 
 		float divisor = kernelWidth;
-		float totals[] = new float[ input.width ];
 
-		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + x;
-			int indexOut = output.startIndex + output.stride*radius + x;
+		// To reduce cache misses it is processed along rows instead of going down columns, which is
+		// more natural for a vertical convolution. For parallel processes this requires building
+		// a book keeping array for each thread.
 
-			float total = 0;
-			int indexEnd = indexIn + input.stride*kernelWidth;
-			for( ; indexIn < indexEnd; indexIn += input.stride) {
-				total += input.data[indexIn] ;
-			}
-			totals[x] = total;
-			output.data[indexOut] = (total/divisor);
-		}
+		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+			float totals[] = _work.pop();
+			for( int x = 0; x < input.width; x++ ) {
+				int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+				int indexOut = output.startIndex + output.stride*y0 + x;
 
-		// change the order it is processed in to reduce cache misses
-
-		BoofConcurrency.range(radius+1, output.height-radius, y -> {
-			int indexIn = input.startIndex + (y+radius)*input.stride;
-			int indexOut = output.startIndex + y*output.stride;
-
-			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-				float total = totals[ x ]  - (input.data[ indexIn - backStep ]);
-				totals[ x ] = total += input.data[ indexIn ];
-
+				int total = 0;
+				int indexEnd = indexIn + input.stride*kernelWidth;
+				for( ; indexIn < indexEnd; indexIn += input.stride) {
+					total += input.data[indexIn] ;
+				}
+				totals[x] = total;
 				output.data[indexOut] = (total/divisor);
 			}
+
+			// change the order it is processed in to reduce cache misses
+			for( int y = y0+1; y < y1; y++ ) {
+				int indexIn = input.startIndex + (y+radius)*input.stride;
+				int indexOut = output.startIndex + y*output.stride;
+
+				for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
+					float total = totals[ x ]  - (input.data[ indexIn - backStep ]);
+					totals[ x ] = total += input.data[ indexIn ];
+
+					output.data[indexOut] = (total/divisor);
+				}
+			}
+			_work.recycle(totals);
 		});
 	}
-
 	public static void horizontal( GrayF64 input , GrayF64 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final double divisor = kernelWidth;
 
-
 		BoofConcurrency.range(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
@@ -331,40 +369,50 @@ public class ImplConvolveMean_MT {
 		});
 	}
 
-	public static void vertical( GrayF64 input , GrayF64 output , int radius ) {
+	public static void vertical(GrayF64 input , GrayF64 output , int radius, DWorkArrays work ) {
+		if( work == null ) {
+			work = new DWorkArrays(input.width);
+		} else {
+			work.reset(input.width);
+		}
+		final DWorkArrays _work = work;
 		final int kernelWidth = radius*2 + 1;
-
 		final int backStep = kernelWidth*input.stride;
 
 		double divisor = kernelWidth;
-		double totals[] = new double[ input.width ];
 
-		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + x;
-			int indexOut = output.startIndex + output.stride*radius + x;
+		// To reduce cache misses it is processed along rows instead of going down columns, which is
+		// more natural for a vertical convolution. For parallel processes this requires building
+		// a book keeping array for each thread.
 
-			double total = 0;
-			int indexEnd = indexIn + input.stride*kernelWidth;
-			for( ; indexIn < indexEnd; indexIn += input.stride) {
-				total += input.data[indexIn] ;
-			}
-			totals[x] = total;
-			output.data[indexOut] = (total/divisor);
-		}
+		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+			double totals[] = _work.pop();
+			for( int x = 0; x < input.width; x++ ) {
+				int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+				int indexOut = output.startIndex + output.stride*y0 + x;
 
-		// change the order it is processed in to reduce cache misses
-
-		BoofConcurrency.range(radius+1, output.height-radius, y -> {
-			int indexIn = input.startIndex + (y+radius)*input.stride;
-			int indexOut = output.startIndex + y*output.stride;
-
-			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-				double total = totals[ x ]  - (input.data[ indexIn - backStep ]);
-				totals[ x ] = total += input.data[ indexIn ];
-
+				int total = 0;
+				int indexEnd = indexIn + input.stride*kernelWidth;
+				for( ; indexIn < indexEnd; indexIn += input.stride) {
+					total += input.data[indexIn] ;
+				}
+				totals[x] = total;
 				output.data[indexOut] = (total/divisor);
 			}
+
+			// change the order it is processed in to reduce cache misses
+			for( int y = y0+1; y < y1; y++ ) {
+				int indexIn = input.startIndex + (y+radius)*input.stride;
+				int indexOut = output.startIndex + y*output.stride;
+
+				for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
+					double total = totals[ x ]  - (input.data[ indexIn - backStep ]);
+					totals[ x ] = total += input.data[ indexIn ];
+
+					output.data[indexOut] = (total/divisor);
+				}
+			}
+			_work.recycle(totals);
 		});
 	}
-
 }
