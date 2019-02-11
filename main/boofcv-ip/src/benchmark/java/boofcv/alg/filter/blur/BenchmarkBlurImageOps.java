@@ -47,7 +47,7 @@ public class BenchmarkBlurImageOps {
 	@Param({"true","false"})
 	public boolean concurrent;
 
-	@Param({"10000"})
+	@Param({"100", "500", "1000", "5000", "10000"})
 	public int width;
 
 	GrayU8 input = new GrayU8(width,width);
@@ -75,10 +75,10 @@ public class BenchmarkBlurImageOps {
 		BlurImageOps.mean(input,output,radius,storage,work);
 	}
 
-//	@Benchmark
-//	public void gaussian() {
-//		BlurImageOps.gaussian(input,output,-1,radius,storage);
-//	}
+	@Benchmark
+	public void gaussian() {
+		BlurImageOps.gaussian(input,output,-1,radius,storage);
+	}
 
 
 	public static void main(String[] args) throws RunnerException {
