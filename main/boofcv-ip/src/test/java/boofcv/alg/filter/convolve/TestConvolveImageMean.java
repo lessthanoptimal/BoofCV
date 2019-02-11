@@ -57,7 +57,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 	protected boolean isTestMethod(Method m) {
 		Class<?> params[] = m.getParameterTypes();
 
-		if( params.length != 3)
+		if( params.length != 3 && params.length != 4)
 			return false;
 
 		return ImageGray.class.isAssignableFrom(params[0]);
@@ -72,7 +72,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		if( !candidate.getName().equals(validation.getName()))
 			return false;
 
-		if (v.length != 3)
+		if (v.length != 3 && v.length != 4)
 			return false;
 		return v[1].isAssignableFrom(c[0]) && v[2].isAssignableFrom(c[1]);
 	}
@@ -88,8 +88,13 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		Object[][] ret = new Object[2][];
-		ret[0] = new Object[]{input,output,kernelRadius};
-		ret[1] = new Object[]{input,output,kernelRadius2};
+		if( c.length == 3 ) {
+			ret[0] = new Object[]{input, output, kernelRadius};
+			ret[1] = new Object[]{input, output, kernelRadius2};
+		} else {
+			ret[0] = new Object[]{input, output, kernelRadius, null};
+			ret[1] = new Object[]{input, output, kernelRadius2, null};
+		}
 
 		return ret;
 	}

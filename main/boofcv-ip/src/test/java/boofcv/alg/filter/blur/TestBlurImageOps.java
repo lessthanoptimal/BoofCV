@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.alg.filter.blur;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.filter.convolve.GConvolveImageOps;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.concurrency.WorkArrays;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D;
@@ -69,11 +71,14 @@ public class TestBlurImageOps {
 				try {
 					Class storage = type.getFamily() == ImageType.Family.PLANAR ?
 							ImageGray.class : input.getClass();
+					Class work = GeneralizedImageOps.createWorkArray(type).getClass();
+					if( type.getFamily() == ImageType.Family.PLANAR )
+						work = WorkArrays.class;
 
 					Method m = BlurImageOps.class.getMethod(
-							"mean",input.getClass(), found.getClass(), int.class, storage);
+							"mean",input.getClass(), found.getClass(), int.class, storage,work);
 
-					m.invoke(null,input,found, radius, null);
+					m.invoke(null,input,found, radius, null, null);
 					BoofTesting.assertEquals(expected,found,2);
 				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 					throw new RuntimeException(e);

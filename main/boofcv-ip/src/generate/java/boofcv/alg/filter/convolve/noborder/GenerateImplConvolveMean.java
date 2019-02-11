@@ -157,7 +157,7 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 				"\t\t\tint indexIn = input.startIndex + (y0-radius)*input.stride + x;\n" +
 				"\t\t\tint indexOut = output.startIndex + output.stride*y0 + x;\n" +
 				"\n" +
-				"\t\t\tint total = 0;\n" +
+				"\t\t\t"+sumType+" total = 0;\n" +
 				"\t\t\tint indexEnd = indexIn + input.stride*kernelWidth;\n" +
 				"\t\t\tfor( ; indexIn < indexEnd; indexIn += input.stride) {\n" +
 				"\t\t\t\ttotal += input.data[indexIn] "+bitWise+";\n" +

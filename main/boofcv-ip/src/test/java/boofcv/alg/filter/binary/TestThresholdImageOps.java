@@ -82,14 +82,14 @@ public class TestThresholdImageOps {
 				float scale = (float)(0.8+0.4*(indexScale/3.0));
 				ImageMiscOps.fillUniform(output,rand,0,200);
 				ImageMiscOps.fillUniform(expected,rand,0,200);
-				m.invoke(null,input,output,width,scale,true,null,null);
+				m.invoke(null,input,output,width,scale,true,null,null,null);
 				naiveLocalSquare(input, expected, radius, scale, true);
 
 				BoofTesting.assertEquals(expected,output,0);
 
 				ImageMiscOps.fillUniform(output,rand,0,200);
 				ImageMiscOps.fillUniform(expected,rand,0,200);
-				m.invoke(null,input,output,width,scale,false,null,null);
+				m.invoke(null,input,output,width,scale,false,null,null,null);
 				naiveLocalSquare(input, expected, radius, scale, false);
 
 				BoofTesting.assertEquals(expected,output,0);

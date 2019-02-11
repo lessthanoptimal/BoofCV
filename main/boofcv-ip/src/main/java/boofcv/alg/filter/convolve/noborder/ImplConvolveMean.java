@@ -313,7 +313,7 @@ public class ImplConvolveMean {
 			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
 			int indexOut = output.startIndex + output.stride*y0 + x;
 
-			int total = 0;
+			float total = 0;
 			int indexEnd = indexIn + input.stride*kernelWidth;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
 				total += input.data[indexIn] ;
@@ -386,7 +386,7 @@ public class ImplConvolveMean {
 			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
 			int indexOut = output.startIndex + output.stride*y0 + x;
 
-			int total = 0;
+			double total = 0;
 			int indexEnd = indexIn + input.stride*kernelWidth;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
 				total += input.data[indexIn] ;
