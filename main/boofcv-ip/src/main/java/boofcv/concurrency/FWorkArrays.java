@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Thread safe way to recycle work arrays
+ * Thread safe way to recycle work arrays and maximize memory reuse
  *
  * @author Peter Abeles
  */

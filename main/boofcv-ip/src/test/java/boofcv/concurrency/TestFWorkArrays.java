@@ -25,14 +25,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestDWorkArrays {
+class TestFWorkArrays {
 	@Test
 	void reset() {
-		DWorkArrays alg = new DWorkArrays();
+		FWorkArrays alg = new FWorkArrays();
 		alg.reset(20);
 		assertEquals(20,alg.length);
-		alg.recycle(new double[20]);
-		alg.recycle(new double[20]);
+		alg.recycle(new float[20]);
+		alg.recycle(new float[20]);
 		assertEquals(2,alg.storage.size());
 		alg.reset(21);
 		assertEquals(0,alg.storage.size());
@@ -41,11 +41,11 @@ class TestDWorkArrays {
 
 	@Test
 	void pop_recycle() {
-		DWorkArrays alg = new DWorkArrays();
+		FWorkArrays alg = new FWorkArrays();
 		alg.reset(20);
 		assertEquals(20,alg.length);
-		alg.recycle(new double[20]);
-		alg.recycle(new double[20]);
+		alg.recycle(new float[20]);
+		alg.recycle(new float[20]);
 		assertEquals(20,alg.pop().length);
 		assertEquals(1,alg.storage.size());
 		assertEquals(20,alg.pop().length);
@@ -56,7 +56,7 @@ class TestDWorkArrays {
 
 	@Test
 	void length() {
-		DWorkArrays alg = new DWorkArrays();
+		FWorkArrays alg = new FWorkArrays();
 		assertEquals(0,alg.length());
 		alg.reset(20);
 		assertEquals(20,alg.length());

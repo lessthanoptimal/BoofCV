@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Thread safe way to recycle work arrays
+ * Thread safe way to recycle work arrays and maximize memory reuse
  *
  * @author Peter Abeles
  */
@@ -42,7 +42,6 @@ public class DWorkArrays implements WorkArrays {
 	 * arrays are purged
 	 * @param length Desired array length
 	 */
-	@Override
 	public synchronized void reset( int length ) {
 		if( this.length != length ) {
 			this.length = length;
@@ -75,7 +74,6 @@ public class DWorkArrays implements WorkArrays {
 	/**
 	 * Length of arrays returned
 	 */
-	@Override
 	public int length() {
 		return length;
 	}

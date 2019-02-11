@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Thread safe way to recycle work arrays
+ * Thread safe way to recycle work arrays and maximize memory reuse
  *
  * @author Peter Abeles
  */
@@ -54,7 +54,6 @@ public class IWorkArrays implements WorkArrays {
 	 */
 	public synchronized int[] pop() {
 		if( storage.isEmpty() ) {
-			System.out.println("Created new array "+length);
 			return new int[length];
 		} else {
 			return storage.remove(storage.size()-1);
