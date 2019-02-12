@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ public class TestBundleAdjustmentSchur_DSCC_Metric extends GenericBundleAdjustme
 
 	@Override
 	public BundleAdjustment<SceneStructureMetric> createAlg() {
-		BundleAdjustment<SceneStructureMetric> ret = FactoryMultiView.bundleAdjustmentMetric(null);
+		BundleAdjustment<SceneStructureMetric> ret = FactoryMultiView.bundleSparseMetric(null);
 //		ret.setVerbose(System.out,0);
 		ret.configure(1e-5,1e-5,20);
 		return ret;

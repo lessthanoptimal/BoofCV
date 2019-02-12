@@ -197,6 +197,10 @@ public class CalibrateMonoPlanar {
 		System.out.println("Average Mean Error = "+(totalError/results.size()));
 	}
 
+	public void setRobust( boolean robust ) {
+		this.zhang99.setRobust(robust);
+	}
+
 	public SceneStructureMetric getStructure() {
 		return structure;
 	}

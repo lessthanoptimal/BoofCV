@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,7 +81,7 @@ public class RefineThreeViewProjectiveGeometric {
 		ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
 		configSBA.configOptimizer = configLM;
 
-		sba = FactoryMultiView.bundleAdjustmentProjective(configSBA);
+		sba = FactoryMultiView.bundleSparseProjective(configSBA);
 	}
 
 	public RefineThreeViewProjectiveGeometric(TriangulateNViewsProjective triangulator,

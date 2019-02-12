@@ -15,6 +15,9 @@ Version : 0.33
   * Added universal omni camera model (fisheye)
   * Made Brown camera model complete (e.g. N radial, tangential, force params to zero)
   * Added support for quaternions
+- Dense Bundle Adjustment
+  * Added for degenerate systems which are small enough to be solved with a dense method
+  * Note: This statement seems to be a bit hit or miss. Not sure why, but it doesn't always converge when sparse does.
 - Fixed Rodrigues Jacobian for zero rotation
 - Camera Calibration
   * Renamed radial-tangential model to Brown for consistency and brevity

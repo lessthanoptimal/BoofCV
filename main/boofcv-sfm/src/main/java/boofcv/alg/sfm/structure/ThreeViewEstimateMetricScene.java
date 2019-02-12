@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -171,7 +171,7 @@ public class ThreeViewEstimateMetricScene {
 		// Run bundle adjustment while make sure a valid solution is found
 		setupMetricBundleAdjustment(inliers);
 
-		bundleAdjustment = FactoryMultiView.bundleAdjustmentMetric(configSBA);
+		bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);
 		findBestValidSolution(bundleAdjustment);
 
 		// Prune outliers and run bundle adjustment one last time

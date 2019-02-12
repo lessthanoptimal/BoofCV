@@ -18,18 +18,22 @@
 
 package boofcv.abst.geo.bundle;
 
-import boofcv.factory.geo.FactoryMultiView;
+import org.ddogleg.optimization.UnconstrainedLeastSquaresSchur;
+import org.ejml.data.DMatrixRMaj;
 
 /**
+ * Implementation of {@link BundleAdjustmentSchur} for dense matrices
+ *
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentSchur_DSCC_Projective extends GenericBundleAdjustmentProjectiveChecks {
-
-	@Override
-	public BundleAdjustment<SceneStructureProjective> createAlg() {
-		BundleAdjustment<SceneStructureProjective> ret = FactoryMultiView.bundleSparseProjective(null);
-//		ret.setVerbose(System.out,0);
-		ret.configure(1e-5,1e-5,20);
-		return ret;
+public class BundleAdjustmentSchur_DDRM<Structure extends SceneStructure>
+		extends BundleAdjustmentSchur<Structure, DMatrixRMaj>
+{
+	public BundleAdjustmentSchur_DDRM(UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer,
+									  FunctionResiduals<Structure> function,
+									  Jacobian<Structure, DMatrixRMaj> jacobian,
+									  Codec<Structure> codec)
+	{
+		super(minimizer, function, jacobian, codec);
 	}
 }

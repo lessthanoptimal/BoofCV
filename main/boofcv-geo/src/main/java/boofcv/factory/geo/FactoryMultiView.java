@@ -19,10 +19,7 @@
 package boofcv.factory.geo;
 
 import boofcv.abst.geo.*;
-import boofcv.abst.geo.bundle.BundleAdjustment;
-import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.abst.geo.bundle.SceneStructureProjective;
+import boofcv.abst.geo.bundle.*;
 import boofcv.abst.geo.f.*;
 import boofcv.abst.geo.h.HomographyDLT_to_Epipolar;
 import boofcv.abst.geo.h.HomographyTLS_to_Epipolar;
@@ -61,6 +58,7 @@ import org.ddogleg.optimization.trustregion.ConfigTrustRegion;
 import org.ddogleg.solver.PolynomialOps;
 import org.ddogleg.solver.RootFinderType;
 import org.ddogleg.struct.FastQueue;
+import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.DMatrixSparseCSC;
 
 import javax.annotation.Nullable;
@@ -72,7 +70,14 @@ import javax.annotation.Nullable;
  */
 public class FactoryMultiView {
 
-	public static BundleAdjustment<SceneStructureMetric> bundleAdjustmentMetric( @Nullable ConfigBundleAdjustment config ) {
+	/**
+	 * Returns bundle adjustment with a sparse implementation for metric reconstruction. In most situations this is
+	 * what you want to use, however dense bundle adjustment is available if the problem is small and degenerate.
+	 *
+	 * @param config (Optional) configuration
+	 * @return bundle adjustment
+	 */
+	public static BundleAdjustment<SceneStructureMetric> bundleSparseMetric(@Nullable ConfigBundleAdjustment config ) {
 		if( config == null )
 			config = new ConfigBundleAdjustment();
 
@@ -89,7 +94,14 @@ public class FactoryMultiView {
 				new CodecSceneStructureMetric());
 	}
 
-	public static BundleAdjustment<SceneStructureProjective> bundleAdjustmentProjective( @Nullable ConfigBundleAdjustment config ) {
+	/**
+	 * Returns bundle adjustment with a sparse implementation for projective reconstruction. In most situations this is
+	 * what you want to use, however dense bundle adjustment is available if the problem is small and degenerate.
+	 *
+	 * @param config (Optional) configuration
+	 * @return bundle adjustment
+	 */
+	public static BundleAdjustment<SceneStructureProjective> bundleSparseProjective(@Nullable ConfigBundleAdjustment config ) {
 		if( config == null )
 			config = new ConfigBundleAdjustment();
 
@@ -100,12 +112,65 @@ public class FactoryMultiView {
 		else
 			minimizer = FactoryOptimizationSparse.levenbergMarquardtSchur((ConfigLevenbergMarquardt)config.configOptimizer);
 
-
 		return new BundleAdjustmentSchur_DSCC<>(minimizer,
 				new BundleAdjustmentProjectiveResidualFunction(),
 				new BundleAdjustmentProjectiveSchurJacobian_DSCC(),
 				new CodecSceneStructureProjective());
 	}
+
+	/**
+	 * Returns bundle adjustment with a dense implementation for metric reconstruction. While much slower than a
+	 * sparse solver, a dense solver can handle systems which are degenerate.
+	 *
+	 * @param robust If true a smaller but robust solver will be used.
+	 * @param config (Optional) configuration
+	 * @return bundle adjustment
+	 */
+	public static BundleAdjustment<SceneStructureMetric> bundleDenseMetric(boolean robust,
+																		   @Nullable ConfigBundleAdjustment config ) {
+		if( config == null )
+			config = new ConfigBundleAdjustment();
+
+		UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer;
+
+		if( config.configOptimizer instanceof ConfigTrustRegion )
+			minimizer = FactoryOptimization.doglegSchur(robust,(ConfigTrustRegion)config.configOptimizer);
+		else
+			minimizer = FactoryOptimization.levenbergMarquardtSchur(robust,(ConfigLevenbergMarquardt)config.configOptimizer);
+
+		return new BundleAdjustmentSchur_DDRM<>(minimizer,
+				new BundleAdjustmentMetricResidualFunction(),
+				new BundleAdjustmentMetricSchurJacobian_DDRM(),
+				new CodecSceneStructureMetric());
+	}
+
+	/**
+	 * Returns bundle adjustment with a sparse implementation for projective reconstruction. In most stiuations this is
+	 * what you want to use, however dense bundle adjustment is available if the problem is small and degenerate.
+	 *
+	 * @param robust If true a smaller but robust solver will be used.
+	 * @param config (Optional) configuration
+	 * @return bundle adjustment
+	 */
+	public static BundleAdjustment<SceneStructureProjective> bundleDenseProjective(boolean robust,
+																				   @Nullable ConfigBundleAdjustment config ) {
+		if( config == null )
+			config = new ConfigBundleAdjustment();
+
+		UnconstrainedLeastSquaresSchur<DMatrixRMaj> minimizer;
+
+		if( config.configOptimizer instanceof ConfigTrustRegion )
+			minimizer = FactoryOptimization.doglegSchur(robust,(ConfigTrustRegion)config.configOptimizer);
+		else
+			minimizer = FactoryOptimization.levenbergMarquardtSchur(robust,(ConfigLevenbergMarquardt)config.configOptimizer);
+
+
+		return new BundleAdjustmentSchur_DDRM<>(minimizer,
+				new BundleAdjustmentProjectiveResidualFunction(),
+				new BundleAdjustmentProjectiveSchurJacobian_DDRM(),
+				new CodecSceneStructureProjective());
+	}
+
 
 	/**
 	 * Returns an algorithm for estimating a homography matrix given a set of {@link AssociatedPair}.

@@ -192,7 +192,7 @@ public class ExampleStereoUncalibrated {
 		configSBA.configOptimizer = configLM;
 
 		// Create and configure the bundle adjustment solver
-		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleAdjustmentMetric(configSBA);
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);
 		// prints out useful debugging information that lets you know how well it's converging
 		bundleAdjustment.setVerbose(System.out,0);
 		// Specifies convergence criteria

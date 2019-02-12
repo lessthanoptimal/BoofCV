@@ -84,6 +84,9 @@ public class CalibrationPlanarGridZhang99 {
 	// where calibration points are layout on the target.
 	private List<Point2D_F64> layout;
 
+	// Use a robust non-linear solver. This can run significantly slower
+	private boolean robust=false;
+
 	private PrintStream verbose = null;
 
 	/**
@@ -181,13 +184,19 @@ public class CalibrationPlanarGridZhang99 {
 	{
 		// Configure the sparse Levenberg-Marquardt solver
 		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
-//		configLM.mixture = 0;
 		configLM.hessianScaling = false;
 
 		ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
 		configSBA.configOptimizer = configLM;
 
-		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleAdjustmentMetric(configSBA);
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment;
+		if( robust ) {
+			configLM.mixture = 0;
+			bundleAdjustment = FactoryMultiView.bundleDenseMetric(true,configSBA);
+		} else {
+			bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);
+		}
+
 		bundleAdjustment.setVerbose(verbose,0);
 		// Specifies convergence criteria
 		bundleAdjustment.configure(1e-20, 1e-20, 200);
@@ -314,6 +323,10 @@ public class CalibrationPlanarGridZhang99 {
 
 	public void setVerbose( PrintStream out , int level ) {
 		this.verbose = out;
+	}
+
+	public void setRobust( boolean robust ) {
+		this.robust = robust;
 	}
 
 	public static int totalPoints( List<CalibrationObservation> observations ) {

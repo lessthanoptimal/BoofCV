@@ -107,7 +107,7 @@ public class ExampleMultiviewSceneReconstruction {
 		ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
 		configSBA.configOptimizer = configLM;
 
-		BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleAdjustmentMetric(configSBA);
+		BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleSparseMetric(configSBA);
 		sba.configure(1e-10,1e-10,100);
 		sba.setVerbose(System.out,0);
 

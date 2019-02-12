@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public class EstimateSceneUncalibrated
 {
 
 	BundleAdjustment<SceneStructureProjective> sba =
-			FactoryMultiView.bundleAdjustmentProjective(null);
+			FactoryMultiView.bundleSparseProjective(null);
 
 	FastQueue<ProjectiveView> views = new FastQueue<>(ProjectiveView.class,true);
 	FastQueue<Feature3D> features = new FastQueue<>(Feature3D.class,true);

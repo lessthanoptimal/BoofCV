@@ -127,7 +127,7 @@ public class ProjectiveInitializeAllCommon {
 	 */
 	public void fixate() {
 		ransac = FactoryMultiViewRobust.trifocalRansac(configTriRansac,configError,configRansac);
-		sba = FactoryMultiView.bundleAdjustmentProjective(configSBA);
+		sba = FactoryMultiView.bundleSparseProjective(configSBA);
 	}
 
 	/**

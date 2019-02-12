@@ -16,20 +16,27 @@
  * limitations under the License.
  */
 
-package boofcv.abst.geo.bundle;
+package boofcv.alg.geo.bundle;
 
-import boofcv.factory.geo.FactoryMultiView;
+import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
+import org.ejml.data.DMatrix;
+import org.ejml.data.DMatrixRMaj;
 
 /**
+ * Computes the Jacobian for {@link BundleAdjustmentSchur_DSCC} using sparse matrices
+ * in EJML. Parameterization is done using the format in {@link CodecSceneStructureProjective}.
+ *
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentSchur_DSCC_Projective extends GenericBundleAdjustmentProjectiveChecks {
+public class BundleAdjustmentProjectiveSchurJacobian_DDRM
+		extends BundleAdjustmentProjectiveSchurJacobian<DMatrixRMaj>
+{
+	public void process(double[] input, DMatrixRMaj left, DMatrixRMaj right) {
+		processInternal(input,left,right);
+	}
 
 	@Override
-	public BundleAdjustment<SceneStructureProjective> createAlg() {
-		BundleAdjustment<SceneStructureProjective> ret = FactoryMultiView.bundleSparseProjective(null);
-//		ret.setVerbose(System.out,0);
-		ret.configure(1e-5,1e-5,20);
-		return ret;
+	protected void set(DMatrix matrix, int row, int col, double value) {
+		matrix.unsafe_set(row,col,value);
 	}
 }
