@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import java.lang.reflect.Method;
 /**
  * @author Peter Abeles
  */
-public class TestConvolveImageUnrolled_S16_I16_Div {
+public class TestConvolveImageUnrolled_SB_S16_I16_Div {
 	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_SB_S16_I16_Div.class);
 
 	@Test

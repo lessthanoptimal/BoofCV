@@ -22,7 +22,7 @@ import boofcv.alg.filter.convolve.CompareToStandardConvolution;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayI16;
-import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayS16;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -30,14 +30,14 @@ import java.lang.reflect.Method;
 /**
  * @author Peter Abeles
  */
-public class TestConvolveImageUnrolled_U16_I16 {
-	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_SB_U16_I16.class);
+public class TestConvolveImageUnrolled_SB_S16_I16 {
+	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_SB_S16_I16.class);
 
 	@Test
 	public void convolve() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_SB_U16_I16.class.getMethod("convolve",
-					Kernel2D_S32.class, GrayU16.class, GrayI16.class );
+			Method m = ConvolveImageUnrolled_SB_S16_I16.class.getMethod("convolve",
+					Kernel2D_S32.class, GrayS16.class, GrayI16.class );
 
 			compareToStandard.compareMethod(m, "convolve", i + 1);
 		}
@@ -47,8 +47,8 @@ public class TestConvolveImageUnrolled_U16_I16 {
 	public void horizontal() throws NoSuchMethodException {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_SB_U16_I16.class.getMethod("horizontal",
-					Kernel1D_S32.class, GrayU16.class, GrayI16.class);
+			Method m = ConvolveImageUnrolled_SB_S16_I16.class.getMethod("horizontal",
+					Kernel1D_S32.class, GrayS16.class, GrayI16.class);
 
 			compareToStandard.compareMethod(m, "horizontal", i + 1);
 		}
@@ -58,8 +58,8 @@ public class TestConvolveImageUnrolled_U16_I16 {
 	public void vertical() throws NoSuchMethodException {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_SB_U16_I16.class.getMethod("vertical",
-					Kernel1D_S32.class, GrayU16.class, GrayI16.class);
+			Method m = ConvolveImageUnrolled_SB_S16_I16.class.getMethod("vertical",
+					Kernel1D_S32.class, GrayS16.class, GrayI16.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);
 		}

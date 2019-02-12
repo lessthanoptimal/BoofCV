@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,8 @@ package boofcv.alg.filter.convolve.noborder;
 import boofcv.alg.filter.convolve.CompareToStandardConvolution;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_S32;
-import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayI16;
+import boofcv.struct.image.GrayU8;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -29,14 +30,14 @@ import java.lang.reflect.Method;
 /**
  * @author Peter Abeles
  */
-public class TestConvolveImageUnrolled_S32_S32 {
-	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_SB_S32_S32.class);
+public class TestConvolveImageUnrolled_SB_U8_I16 {
+	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_SB_U8_I16.class);
 
 	@Test
 	public void convolve() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_SB_S32_S32.class.getMethod("convolve",
-					Kernel2D_S32.class, GrayS32.class, GrayS32.class );
+			Method m = ConvolveImageUnrolled_SB_U8_I16.class.getMethod("convolve",
+					Kernel2D_S32.class, GrayU8.class, GrayI16.class );
 
 			compareToStandard.compareMethod(m, "convolve", i + 1);
 		}
@@ -46,8 +47,8 @@ public class TestConvolveImageUnrolled_S32_S32 {
 	public void horizontal() throws NoSuchMethodException {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_SB_S32_S32.class.getMethod("horizontal",
-					Kernel1D_S32.class, GrayS32.class, GrayS32.class);
+			Method m = ConvolveImageUnrolled_SB_U8_I16.class.getMethod("horizontal",
+					Kernel1D_S32.class, GrayU8.class, GrayI16.class);
 
 			compareToStandard.compareMethod(m, "horizontal", i + 1);
 		}
@@ -57,8 +58,8 @@ public class TestConvolveImageUnrolled_S32_S32 {
 	public void vertical() throws NoSuchMethodException {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_SB_S32_S32.class.getMethod("vertical",
-					Kernel1D_S32.class, GrayS32.class, GrayS32.class);
+			Method m = ConvolveImageUnrolled_SB_U8_I16.class.getMethod("vertical",
+					Kernel1D_S32.class, GrayU8.class, GrayI16.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);
 		}

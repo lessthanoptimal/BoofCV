@@ -21,8 +21,7 @@ package boofcv.alg.filter.convolve.noborder;
 import boofcv.alg.filter.convolve.CompareToStandardConvolution;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_S32;
-import boofcv.struct.image.GrayI16;
-import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayS32;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -30,14 +29,14 @@ import java.lang.reflect.Method;
 /**
  * @author Peter Abeles
  */
-public class TestConvolveImageUnrolled_U16_I16_Div {
-	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_SB_U16_I16.class);
+public class TestConvolveImageUnrolled_SB_S32_S32_Div {
+	CompareToStandardConvolution compareToStandard = new CompareToStandardConvolution(ConvolveImageUnrolled_SB_S32_S32_Div.class);
 
 	@Test
 	public void convolve() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_SB_U16_I16_Div.class.getMethod("convolve",
-					Kernel2D_S32.class, GrayU16.class, GrayI16.class , int.class);
+			Method m = ConvolveImageUnrolled_SB_S32_S32_Div.class.getMethod("convolve",
+					Kernel2D_S32.class, GrayS32.class, GrayS32.class , int.class);
 
 			compareToStandard.compareMethod(m, "convolve", i + 1);
 		}
@@ -47,8 +46,8 @@ public class TestConvolveImageUnrolled_U16_I16_Div {
 	public void horizontal() throws NoSuchMethodException {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_SB_U16_I16_Div.class.getMethod("horizontal",
-					Kernel1D_S32.class, GrayU16.class, GrayI16.class, int.class);
+			Method m = ConvolveImageUnrolled_SB_S32_S32_Div.class.getMethod("horizontal",
+					Kernel1D_S32.class, GrayS32.class, GrayS32.class, int.class);
 
 			compareToStandard.compareMethod(m, "horizontal", i + 1);
 		}
@@ -58,8 +57,8 @@ public class TestConvolveImageUnrolled_U16_I16_Div {
 	public void vertical() throws NoSuchMethodException {
 
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
-			Method m = ConvolveImageUnrolled_SB_U16_I16_Div.class.getMethod("vertical",
-					Kernel1D_S32.class, GrayU16.class, GrayI16.class, int.class);
+			Method m = ConvolveImageUnrolled_SB_S32_S32_Div.class.getMethod("vertical",
+					Kernel1D_S32.class, GrayS32.class, GrayS32.class, int.class);
 
 			compareToStandard.compareMethod(m, "vertical", i + 1);
 		}
