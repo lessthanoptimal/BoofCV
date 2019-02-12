@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,12 +36,11 @@ import static boofcv.misc.AutoTypeImage.*;
  */
 public class GeneratePixelMath extends CodeGeneratorBase {
 
-	String className = "PixelMath";
-
 	private AutoTypeImage input;
 
 	ImageType.Family families[] = new ImageType.Family[]{ImageType.Family.GRAY,ImageType.Family.INTERLEAVED};
 
+	@Override
 	public void generate() throws FileNotFoundException {
 		printPreamble();
 
@@ -64,8 +63,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		out.println("}");
 	}
 
-	private void printPreamble() throws FileNotFoundException {
-		setOutputFile(className);
+	private void printPreamble() {
 		out.print("import boofcv.struct.image.*;\n" +
 				"\n" +
 				"import boofcv.alg.InputSanityCheck;\n" +
@@ -128,7 +126,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				out.println(javadoc + "\n" +
 						"\tpublic static void " + funcName + "( " + inputName + " input , " + inputName + " output ) {\n" +
 						"\n" +
-						"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
+						"\t\toutput.reshape(input.width,input.height);\n" +
 						"\n" +
 						"\t\tint columns = " + columns + ";\n" +
 						"\t\t" + funcName + "(input.data,input.startIndex,input.stride,\n" +
@@ -202,15 +200,15 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 			funcArrayName += template.isImageFirst() ? "_A" : "_B";
 
 			for (ImageType.Family family : families) {
-				String inputName, columns, banded;
+				String inputName, columns, reshape;
 				if (family == ImageType.Family.INTERLEAVED) {
 					inputName = input.getInterleavedName();
 					columns = "input.width*input.numBands";
-					banded = "B";
+					reshape = "output.reshape(input.width,input.height,input.numBands);";
 				} else {
 					inputName = input.getSingleBandName();
 					columns = "input.width";
-					banded = "";
+					reshape = "output.reshape(input.width,input.height);";
 				}
 
 				if( bounded ) {
@@ -222,13 +220,13 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 								" , " + sumType +" lower , " +sumType+ " upper , " + inputName + " output )";
 					} else {
 						prototype = "( " + variableType + " " + varName + " , " + inputName + " input , " +
-								sumType +" lower , " +sumType+ " upper , " + inputName + " output )";;
+								sumType +" lower , " +sumType+ " upper , " + inputName + " output )";
 					}
 
 					out.println(template.getJavaDoc());
 					out.println("\tpublic static void " + funcName + prototype + " {\n" +
 							"\n" +
-							"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
+							"\t\t" + reshape+ "\n" +
 							"\n" +
 							"\t\tint columns = " + columns + ";\n" +
 							"\t\t" + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + ", lower, upper ,\n" +
@@ -246,7 +244,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 					out.println(template.getJavaDoc());
 					out.println("\tpublic static void " + funcName + prototype + " {\n" +
 							"\n" +
-							"\t\tInputSanityCheck.checkSameShape"+banded+"(input,output);\n" +
+							"\t\t" + reshape+ "\n" +
 							"\n" +
 							"\t\tint columns = " + columns + ";\n" +
 							"\t\t" + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + " , \n" +
@@ -358,23 +356,24 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * </p>\n" +
 				"\t * @param imgA Input image. Not modified.\n" +
 				"\t * @param imgB Input image. Not modified.\n" +
-				"\t * @param diff Absolute value of difference image. Can be either input. Modified.\n" +
+				"\t * @param output Absolute value of difference image. Can be either input. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void diffAbs( "+input.getSingleBandName()+" imgA , "+input.getSingleBandName()+" imgB , "+input.getSingleBandName()+" diff ) {\n" +
-				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,diff);\n" +
-				"\t\t\n" +
+				"\tpublic static void diffAbs( "+input.getSingleBandName()+" imgA , "+input.getSingleBandName()+" imgB , "+input.getSingleBandName()+" output ) {\n" +
+				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
+				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
+				"\n" +
 				"\t\tfinal int h = imgA.getHeight();\n" +
 				"\t\tfinal int w = imgA.getWidth();\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < h; y++) {\n" +
 				"\t\t\tint indexA = imgA.getStartIndex() + y * imgA.getStride();\n" +
 				"\t\t\tint indexB = imgB.getStartIndex() + y * imgB.getStride();\n" +
-				"\t\t\tint indexDiff = diff.getStartIndex() + y * diff.getStride();\n" +
+				"\t\t\tint indexDiff = output.getStartIndex() + y * output.getStride();\n" +
 				"\t\t\t\n" +
 				"\t\t\tint indexEnd = indexA+w;\n" +
 				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
 				"\t\t\tfor (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {\n" +
-				"\t\t\t\tdiff.data[indexDiff] = "+typeCast+"Math.abs((imgA.data[indexA] "+bitWise+") - (imgB.data[indexB] "+bitWise+"));\n" +
+				"\t\t\t\toutput.data[indexDiff] = "+typeCast+"Math.abs((imgA.data[indexA] "+bitWise+") - (imgB.data[indexB] "+bitWise+"));\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -395,8 +394,9 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param output Output image. Can be either input. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void add( "+typeIn.getSingleBandName()+" imgA , "+typeIn.getSingleBandName()+" imgB , "+typeOut.getSingleBandName()+" output ) {\n" +
-				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,output);\n" +
-				"\t\t\n" +
+				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
+				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
+				"\n" +
 				"\t\tfinal int h = imgA.getHeight();\n" +
 				"\t\tfinal int w = imgA.getWidth();\n" +
 				"\n" +
@@ -430,8 +430,9 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tpublic static void subtract( "+typeIn.getSingleBandName()+" imgA , "+typeIn.getSingleBandName()+" imgB , "
 				+typeOut.getSingleBandName()+" output ) {\n" +
-				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,output);\n" +
-				"\t\t\n" +
+				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
+				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
+				"\n" +
 				"\t\tfinal int h = imgA.getHeight();\n" +
 				"\t\tfinal int w = imgA.getWidth();\n" +
 				"\n" +
@@ -464,8 +465,9 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param output Output image. Can be either input. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void multiply( "+typeIn.getSingleBandName()+" imgA , "+typeIn.getSingleBandName()+" imgB , "+typeOut.getSingleBandName()+" output ) {\n" +
-				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,output);\n" +
-				"\t\t\n" +
+				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
+				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
+				"\n" +
 				"\t\tfinal int h = imgA.getHeight();\n" +
 				"\t\tfinal int w = imgA.getWidth();\n" +
 				"\n" +
@@ -496,7 +498,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tpublic static void log( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\n" +
-				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
+				"\t\toutput.reshape(input.width,input.height);\n" +
 				"\n" +
 				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
@@ -522,7 +524,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tpublic static void pow2( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\n" +
-				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
+				"\t\toutput.reshape(input.width,input.height);\n" +
 				"\n" +
 				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
@@ -550,7 +552,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tpublic static void sqrt( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\n" +
-				"\t\tInputSanityCheck.checkSameShape(input,output);\n" +
+				"\t\toutput.reshape(input.width,input.height);\n" +
 				"\n" +
 				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
@@ -579,8 +581,9 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param output Output image. Can be either input. Modified.\n" +
 				"\t */\n" +
 				"\tpublic static void divide( "+typeIn.getSingleBandName()+" imgA , "+typeIn.getSingleBandName()+" imgB , "+typeOut.getSingleBandName()+" output ) {\n" +
-				"\t\tInputSanityCheck.checkSameShape(imgA,imgB,output);\n" +
-				"\t\t\n" +
+				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
+				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
+				"\n" +
 				"\t\tfinal int h = imgA.getHeight();\n" +
 				"\t\tfinal int w = imgA.getWidth();\n" +
 				"\n" +
@@ -801,8 +804,9 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		AutoTypeImage[] getTypes();
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GeneratePixelMath gen = new GeneratePixelMath();
+		gen.parseArguments(args);
 		gen.generate();
 	}
 }
