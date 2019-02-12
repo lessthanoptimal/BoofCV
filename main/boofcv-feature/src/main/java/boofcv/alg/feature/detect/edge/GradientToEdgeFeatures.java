@@ -19,10 +19,7 @@
 package boofcv.alg.feature.detect.edge;
 
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.feature.detect.edge.impl.ImplEdgeNonMaxSuppression;
-import boofcv.alg.feature.detect.edge.impl.ImplEdgeNonMaxSuppressionCrude;
-import boofcv.alg.feature.detect.edge.impl.ImplGradientToEdgeFeatures;
-import boofcv.alg.feature.detect.edge.impl.ImplGradientToEdgeFeatures_MT;
+import boofcv.alg.feature.detect.edge.impl.*;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
@@ -51,6 +48,7 @@ import boofcv.struct.image.GrayS8;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class GradientToEdgeFeatures {
 
 	/**
@@ -147,8 +145,13 @@ public class GradientToEdgeFeatures {
 		InputSanityCheck.checkSameShape(intensity,derivX,derivY);
 		output = InputSanityCheck.checkDeclare(intensity,output);
 
-		ImplEdgeNonMaxSuppressionCrude.inner4(intensity, derivX,derivY, output);
-		ImplEdgeNonMaxSuppressionCrude.border4(intensity,derivX,derivY, output);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplEdgeNonMaxSuppressionCrude_MT.inner4(intensity, derivX, derivY, output);
+			ImplEdgeNonMaxSuppressionCrude_MT.border4(intensity, derivX, derivY, output);
+		} else {
+			ImplEdgeNonMaxSuppressionCrude.inner4(intensity, derivX, derivY, output);
+			ImplEdgeNonMaxSuppressionCrude.border4(intensity, derivX, derivY, output);
+		}
 
 		return output;
 	}
@@ -247,8 +250,13 @@ public class GradientToEdgeFeatures {
 		InputSanityCheck.checkSameShape(intensity,derivX,derivY);
 		output = InputSanityCheck.checkDeclare(intensity,output);
 
-		ImplEdgeNonMaxSuppressionCrude.inner4(intensity, derivX,derivY, output);
-		ImplEdgeNonMaxSuppressionCrude.border4(intensity,derivX,derivY, output);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplEdgeNonMaxSuppressionCrude_MT.inner4(intensity, derivX, derivY, output);
+			ImplEdgeNonMaxSuppressionCrude_MT.border4(intensity, derivX, derivY, output);
+		} else {
+			ImplEdgeNonMaxSuppressionCrude.inner4(intensity, derivX, derivY, output);
+			ImplEdgeNonMaxSuppressionCrude.border4(intensity, derivX, derivY, output);
+		}
 
 		return output;
 	}
@@ -347,8 +355,13 @@ public class GradientToEdgeFeatures {
 		InputSanityCheck.checkSameShape(intensity,derivX,derivY);
 		output = InputSanityCheck.checkDeclare(intensity,output);
 
-		ImplEdgeNonMaxSuppressionCrude.inner4(intensity, derivX,derivY, output);
-		ImplEdgeNonMaxSuppressionCrude.border4(intensity,derivX,derivY, output);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplEdgeNonMaxSuppressionCrude_MT.inner4(intensity, derivX, derivY, output);
+			ImplEdgeNonMaxSuppressionCrude_MT.border4(intensity, derivX, derivY, output);
+		} else {
+			ImplEdgeNonMaxSuppressionCrude.inner4(intensity, derivX, derivY, output);
+			ImplEdgeNonMaxSuppressionCrude.border4(intensity, derivX, derivY, output);
+		}
 
 		return output;
 	}
@@ -456,8 +469,13 @@ public class GradientToEdgeFeatures {
 		InputSanityCheck.checkSameShape(intensity,direction);
 		output = InputSanityCheck.checkDeclare(intensity,output);
 
-		ImplEdgeNonMaxSuppression.inner4(intensity,direction,output);
-		ImplEdgeNonMaxSuppression.border4(intensity,direction,output);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplEdgeNonMaxSuppression_MT.inner4(intensity, direction, output);
+			ImplEdgeNonMaxSuppression_MT.border4(intensity, direction, output);
+		} else {
+			ImplEdgeNonMaxSuppression.inner4(intensity, direction, output);
+			ImplEdgeNonMaxSuppression.border4(intensity, direction, output);
+		}
 
 		return output;
 	}
@@ -478,8 +496,13 @@ public class GradientToEdgeFeatures {
 		InputSanityCheck.checkSameShape(intensity,direction);
 		output = InputSanityCheck.checkDeclare(intensity,output);
 
-		ImplEdgeNonMaxSuppression.inner8(intensity,direction,output);
-		ImplEdgeNonMaxSuppression.border8(intensity,direction,output);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplEdgeNonMaxSuppression_MT.inner8(intensity, direction, output);
+			ImplEdgeNonMaxSuppression_MT.border8(intensity, direction, output);
+		} else {
+			ImplEdgeNonMaxSuppression.inner8(intensity, direction, output);
+			ImplEdgeNonMaxSuppression.border8(intensity, direction, output);
+		}
 
 		return output;
 	}

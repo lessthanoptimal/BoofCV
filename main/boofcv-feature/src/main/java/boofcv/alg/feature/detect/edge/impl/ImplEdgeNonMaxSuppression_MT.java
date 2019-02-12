@@ -18,8 +18,7 @@
 
 package boofcv.alg.feature.detect.edge.impl;
 
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
-
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.struct.image.GrayF32;
@@ -36,7 +35,7 @@ import boofcv.struct.image.GrayS8;
  * @author Peter Abeles
  */
 @SuppressWarnings("Duplicates")
-public class ImplEdgeNonMaxSuppression {
+public class ImplEdgeNonMaxSuppression_MT {
 
 	/**
 	 * Only processes the inner image.  Ignoring the border.
@@ -46,8 +45,7 @@ public class ImplEdgeNonMaxSuppression {
 		final int w = intensity.width;
 		final int h = intensity.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{
-		for( int y = 1; y < h; y++ ) {
+		BoofConcurrency.range(1,h,y->{
 			int indexI = intensity.startIndex + y*intensity.stride+1;
 			int indexD = direction.startIndex + y*direction.stride+1;
 			int indexO = output.startIndex + y*output.stride+1;
@@ -76,8 +74,7 @@ public class ImplEdgeNonMaxSuppression {
 					output.data[indexO] = middle;
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -90,8 +87,7 @@ public class ImplEdgeNonMaxSuppression {
 
 		ImageBorder_F32 intensity = (ImageBorder_F32)FactoryImageBorderAlgs.value(_intensity, 0);
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			for( int x = 0; x < w; x++ ) {
 				int dir = direction.get(x,y);
 				int dx,dy;
@@ -117,8 +113,7 @@ public class ImplEdgeNonMaxSuppression {
 					output.set(x,y,middle);
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 	}
 
@@ -133,8 +128,7 @@ public class ImplEdgeNonMaxSuppression {
 		ImageBorder_F32 intensity = (ImageBorder_F32)FactoryImageBorderAlgs.value(_intensity, 0);
 
 		// top border
-		//CONCURRENT_BELOW BoofConcurrency.range(0,w,x->{
-		for( int x = 0; x < w; x++ ) {
+		BoofConcurrency.range(0,w,x->{
 			int dir = direction.get(x,0);
 			int dx,dy;
 
@@ -157,12 +151,10 @@ public class ImplEdgeNonMaxSuppression {
 			} else {
 				output.set(x,0,middle);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		// bottom border
-		//CONCURRENT_BELOW BoofConcurrency.range(0,w,x->{
-		for( int x = 0; x < w; x++ ) {
+		BoofConcurrency.range(0,w,x->{
 			int dir = direction.get(x,h);
 			int dx,dy;
 
@@ -185,12 +177,10 @@ public class ImplEdgeNonMaxSuppression {
 			} else {
 				output.set(x,h,middle);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		// left border
-		//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{
-		for( int y = 1; y < h; y++ ) {
+		BoofConcurrency.range(1,h,y->{
 			int dir = direction.get(0,y);
 			int dx,dy;
 
@@ -213,13 +203,11 @@ public class ImplEdgeNonMaxSuppression {
 			} else {
 				output.set(0,y,middle);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		// right border
 		int _w = w - 1;
-		//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{
-		for( int y = 1; y < h; y++ ) {
+		BoofConcurrency.range(1,h,y->{
 			int dir = direction.get(_w,y);
 			int dx,dy;
 
@@ -242,8 +230,7 @@ public class ImplEdgeNonMaxSuppression {
 			} else {
 				output.set(_w,y,middle);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -254,8 +241,7 @@ public class ImplEdgeNonMaxSuppression {
 		final int w = intensity.width;
 		final int h = intensity.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{
-		for( int y = 1; y < h; y++ ) {
+		BoofConcurrency.range(1,h,y->{
 			int indexI = intensity.startIndex + y*intensity.stride+1;
 			int indexD = direction.startIndex + y*direction.stride+1;
 			int indexO = output.startIndex + y*output.stride+1;
@@ -284,8 +270,7 @@ public class ImplEdgeNonMaxSuppression {
 					output.data[indexO] = middle;
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -298,8 +283,7 @@ public class ImplEdgeNonMaxSuppression {
 
 		ImageBorder_F32 intensity = (ImageBorder_F32)FactoryImageBorderAlgs.value(_intensity, 0);
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			for( int x = 0; x < w; x++ ) {
 				int dir = direction.get(x,y);
 				int dx,dy;
@@ -325,8 +309,7 @@ public class ImplEdgeNonMaxSuppression {
 					output.set(x,y,middle);
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 	}
 
@@ -341,8 +324,7 @@ public class ImplEdgeNonMaxSuppression {
 		ImageBorder_F32 intensity = (ImageBorder_F32)FactoryImageBorderAlgs.value(_intensity, 0);
 
 		// top border
-		//CONCURRENT_BELOW BoofConcurrency.range(0,w,x->{
-		for( int x = 0; x < w; x++ ) {
+		BoofConcurrency.range(0,w,x->{
 			int dir = direction.get(x,0);
 			int dx,dy;
 
@@ -365,12 +347,10 @@ public class ImplEdgeNonMaxSuppression {
 			} else {
 				output.set(x,0,middle);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		// bottom border
-		//CONCURRENT_BELOW BoofConcurrency.range(0,w,x->{
-		for( int x = 0; x < w; x++ ) {
+		BoofConcurrency.range(0,w,x->{
 			int dir = direction.get(x,h);
 			int dx,dy;
 
@@ -393,12 +373,10 @@ public class ImplEdgeNonMaxSuppression {
 			} else {
 				output.set(x,h,middle);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		// left border
-		//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{
-		for( int y = 1; y < h; y++ ) {
+		BoofConcurrency.range(1,h,y->{
 			int dir = direction.get(0,y);
 			int dx,dy;
 
@@ -421,13 +399,11 @@ public class ImplEdgeNonMaxSuppression {
 			} else {
 				output.set(0,y,middle);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		// right border
 		int _w = w - 1;
-		//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{
-		for( int y = 1; y < h; y++ ) {
+		BoofConcurrency.range(1,h,y->{
 			int dir = direction.get(_w,y);
 			int dx,dy;
 
@@ -450,8 +426,7 @@ public class ImplEdgeNonMaxSuppression {
 			} else {
 				output.set(_w,y,middle);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 }

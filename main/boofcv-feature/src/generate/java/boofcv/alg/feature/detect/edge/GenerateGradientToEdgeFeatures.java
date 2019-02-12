@@ -45,10 +45,7 @@ public class GenerateGradientToEdgeFeatures extends CodeGeneratorBase {
 	private void printPreamble() {
 		out.print(
 				"import boofcv.alg.InputSanityCheck;\n" +
-				"import boofcv.alg.feature.detect.edge.impl.ImplEdgeNonMaxSuppression;\n" +
-				"import boofcv.alg.feature.detect.edge.impl.ImplEdgeNonMaxSuppressionCrude;\n" +
-				"import boofcv.alg.feature.detect.edge.impl.ImplGradientToEdgeFeatures;\n" +
-				"import boofcv.alg.feature.detect.edge.impl.ImplGradientToEdgeFeatures_MT;\n" +
+				"import boofcv.alg.feature.detect.edge.impl.*;\n" +
 				"import boofcv.concurrency.BoofConcurrency;\n" +
 				"import boofcv.struct.image.GrayF32;\n" +
 				"import boofcv.struct.image.GrayS16;\n" +
@@ -77,6 +74,7 @@ public class GenerateGradientToEdgeFeatures extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
+				"@SuppressWarnings(\"Duplicates\")\n" +
 				"public class "+className+" {\n\n");
 	}
 
@@ -177,8 +175,13 @@ public class GenerateGradientToEdgeFeatures extends CodeGeneratorBase {
 				"\t\tInputSanityCheck.checkSameShape(intensity,derivX,derivY);\n" +
 				"\t\toutput = InputSanityCheck.checkDeclare(intensity,output);\n" +
 				"\n" +
-				"\t\tImplEdgeNonMaxSuppressionCrude.inner4(intensity, derivX,derivY, output);\n" +
-				"\t\tImplEdgeNonMaxSuppressionCrude.border4(intensity,derivX,derivY, output);\n" +
+				"\t\tif(BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplEdgeNonMaxSuppressionCrude_MT.inner4(intensity, derivX, derivY, output);\n" +
+				"\t\t\tImplEdgeNonMaxSuppressionCrude_MT.border4(intensity, derivX, derivY, output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplEdgeNonMaxSuppressionCrude.inner4(intensity, derivX, derivY, output);\n" +
+				"\t\t\tImplEdgeNonMaxSuppressionCrude.border4(intensity, derivX, derivY, output);\n" +
+				"\t\t}\n" +
 				"\n" +
 				"\t\treturn output;\n" +
 				"\t}\n\n");
@@ -288,8 +291,13 @@ public class GenerateGradientToEdgeFeatures extends CodeGeneratorBase {
 				"\t\tInputSanityCheck.checkSameShape(intensity,direction);\n" +
 				"\t\toutput = InputSanityCheck.checkDeclare(intensity,output);\n" +
 				"\n" +
-				"\t\tImplEdgeNonMaxSuppression.inner4(intensity,direction,output);\n" +
-				"\t\tImplEdgeNonMaxSuppression.border4(intensity,direction,output);\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplEdgeNonMaxSuppression_MT.inner4(intensity, direction, output);\n" +
+				"\t\t\tImplEdgeNonMaxSuppression_MT.border4(intensity, direction, output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplEdgeNonMaxSuppression.inner4(intensity, direction, output);\n" +
+				"\t\t\tImplEdgeNonMaxSuppression.border4(intensity, direction, output);\n" +
+				"\t\t}\n" +
 				"\n" +
 				"\t\treturn output;\n" +
 				"\t}\n" +
@@ -310,8 +318,13 @@ public class GenerateGradientToEdgeFeatures extends CodeGeneratorBase {
 				"\t\tInputSanityCheck.checkSameShape(intensity,direction);\n" +
 				"\t\toutput = InputSanityCheck.checkDeclare(intensity,output);\n" +
 				"\n" +
-				"\t\tImplEdgeNonMaxSuppression.inner8(intensity,direction,output);\n" +
-				"\t\tImplEdgeNonMaxSuppression.border8(intensity,direction,output);\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplEdgeNonMaxSuppression_MT.inner8(intensity, direction, output);\n" +
+				"\t\t\tImplEdgeNonMaxSuppression_MT.border8(intensity, direction, output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplEdgeNonMaxSuppression.inner8(intensity, direction, output);\n" +
+				"\t\t\tImplEdgeNonMaxSuppression.border8(intensity, direction, output);\n" +
+				"\t\t}\n" +
 				"\n" +
 				"\t\treturn output;\n" +
 				"\t}\n" +
