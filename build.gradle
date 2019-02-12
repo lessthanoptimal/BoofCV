@@ -130,7 +130,7 @@ subprojects {
         benchmarkImplementation project.sourceSets.main.compileClasspath
 
         ['core','generator-annprocess'].each { String a->
-            benchmarkCompile('org.openjdk.jmh:jmh-'+a+':1.21')
+            benchmarkCompile('org.openjdk.jmh:jmh-'+a+':1.19')
         }
 
     }

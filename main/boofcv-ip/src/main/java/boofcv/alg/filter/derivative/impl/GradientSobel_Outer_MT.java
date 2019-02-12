@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -38,7 +38,7 @@ import boofcv.struct.image.GrayU8;
  * @author Peter Abeles
  * @see boofcv.alg.filter.derivative.GradientSobel
  */
-public class GradientSobel_Outer {
+public class GradientSobel_Outer_MT {
 
 	/**
 	 * Computes derivative of GrayU8.  None of the images can be sub-images.
@@ -53,8 +53,7 @@ public class GradientSobel_Outer {
 		final int width = orig.getWidth();
 		final int height = orig.getHeight() - 1;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int endX = width * y + width - 1;
 
 			for (int index = width * y + 1; index < endX; index++) {
@@ -65,8 +64,7 @@ public class GradientSobel_Outer {
 
 				imgX[index] = (short) (((data[index + 1] & 0xFF) - (data[index - 1] & 0xFF)) * 2 + v - w);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -83,8 +81,7 @@ public class GradientSobel_Outer {
 		final int height = orig.getHeight() - 1;
 		final int strideSrc = orig.getStride();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int indexSrc = orig.startIndex + orig.stride * y + 1;
 			final int endX = indexSrc + width - 2;
 
@@ -99,8 +96,7 @@ public class GradientSobel_Outer {
 
 				imgX[indexX++] = (short) (((data[indexSrc + 1] & 0xFF) - (data[indexSrc - 1] & 0xFF)) * 2 + v - w);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void process_I8_sub(GrayS16 orig,
@@ -114,8 +110,7 @@ public class GradientSobel_Outer {
 		final int height = orig.getHeight() - 1;
 		final int strideSrc = orig.getStride();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int indexSrc = orig.startIndex + orig.stride * y + 1;
 			final int endX = indexSrc + width - 2;
 
@@ -130,8 +125,7 @@ public class GradientSobel_Outer {
 
 				imgX[indexX++] = (short) (((data[indexSrc + 1] ) - (data[indexSrc - 1] )) * 2 + v - w);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -147,8 +141,7 @@ public class GradientSobel_Outer {
 		final int width = orig.getWidth();
 		final int height = orig.getHeight() - 1;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int endX = width * y + width - 1;
 
 			for (int index = width * y + 1; index < endX; index++) {
@@ -158,7 +151,6 @@ public class GradientSobel_Outer {
 				imgY[index] = (data[index + width] - data[index - width]) * 0.5F + v + w;
 				imgX[index] = (data[index + 1] - data[index - 1]) * 0.5F + v - w;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 }

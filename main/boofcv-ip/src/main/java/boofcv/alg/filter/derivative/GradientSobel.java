@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,10 @@ package boofcv.alg.filter.derivative;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.derivative.impl.GradientSobel_Outer;
+import boofcv.alg.filter.derivative.impl.GradientSobel_Outer_MT;
 import boofcv.alg.filter.derivative.impl.GradientSobel_UnrolledOuter;
+import boofcv.alg.filter.derivative.impl.GradientSobel_UnrolledOuter_MT;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel2D;
@@ -30,6 +33,8 @@ import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+
+import javax.annotation.Nullable;
 
 /**
  * <p>
@@ -88,9 +93,14 @@ public class GradientSobel {
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(GrayU8 orig, GrayS16 derivX, GrayS16 derivY, ImageBorder_S32<GrayU8> border ) {
+	public static void process(GrayU8 orig, GrayS16 derivX, GrayS16 derivY, @Nullable ImageBorder_S32<GrayU8> border ) {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
-		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			GradientSobel_Outer_MT.process_I8_sub(orig, derivX, derivY);
+		} else {
+			GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
+		}
 
 		if( border != null ) {
 			border.setImage(orig);
@@ -107,9 +117,14 @@ public class GradientSobel {
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(GrayS16 orig, GrayS16 derivX, GrayS16 derivY, ImageBorder_S32<GrayS16> border ) {
+	public static void process(GrayS16 orig, GrayS16 derivX, GrayS16 derivY, @Nullable ImageBorder_S32<GrayS16> border ) {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
-		GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			GradientSobel_Outer_MT.process_I8_sub(orig, derivX, derivY);
+		} else {
+			GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
+		}
 
 		if( border != null ) {
 			border.setImage(orig);
@@ -126,11 +141,15 @@ public class GradientSobel {
 	 * @param derivY Storage for image derivative along the y-axis. Modified.
 	 * @param border Specifies how the image border is handled. If null the border is not processed.
 	 */
-	public static void process(GrayF32 orig, GrayF32 derivX, GrayF32 derivY, ImageBorder_F32 border) {
+	public static void process(GrayF32 orig, GrayF32 derivX, GrayF32 derivY, @Nullable ImageBorder_F32 border) {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 
 //		GradientSobel_Outer.process_F32(orig, derivX, derivY);
-		GradientSobel_UnrolledOuter.process_F32_sub(orig, derivX, derivY);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			GradientSobel_UnrolledOuter_MT.process_F32_sub(orig, derivX, derivY);
+		} else {
+			GradientSobel_UnrolledOuter.process_F32_sub(orig, derivX, derivY);
+		}
 
 		if( border != null ) {
 			border.setImage(orig);

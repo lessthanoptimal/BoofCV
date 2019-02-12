@@ -20,7 +20,7 @@ package boofcv.examples.stereo;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.filter.derivative.LaplacianEdge;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
@@ -121,8 +121,8 @@ public class ExampleStereoTwoViewsOneCamera {
 		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
 		GrayS16 derivLeft = new GrayS16(rectifiedLeft.width,rectifiedLeft.height);
 		GrayS16 derivRight = new GrayS16(rectifiedLeft.width,rectifiedLeft.height);
-		LaplacianEdge.process(rectifiedLeft, derivLeft);
-		LaplacianEdge.process(rectifiedRight,derivRight);
+		GImageDerivativeOps.laplace(rectifiedLeft, derivLeft,BorderType.EXTENDED);
+		GImageDerivativeOps.laplace(rectifiedRight,derivRight,BorderType.EXTENDED);
 
 		// process and return the results
 		disparityAlg.process(derivLeft, derivRight);

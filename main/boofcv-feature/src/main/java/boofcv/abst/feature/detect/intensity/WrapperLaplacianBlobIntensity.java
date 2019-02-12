@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,9 @@
 
 package boofcv.abst.feature.detect.intensity;
 
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.filter.derivative.LaplacianEdge;
+import boofcv.core.image.border.BorderType;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -38,7 +40,7 @@ public class WrapperLaplacianBlobIntensity<I extends ImageGray<I>,D extends Imag
 		if( image instanceof GrayU8) {
 			LaplacianEdge.process((GrayU8)image,intensity);
 		} else if( image instanceof GrayF32) {
-			LaplacianEdge.process((GrayF32)image,intensity);
+			GImageDerivativeOps.laplace(image,intensity, BorderType.EXTENDED);
 		} else {
 			throw new IllegalArgumentException("Unsupported input image type");
 		}

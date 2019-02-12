@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -34,7 +34,7 @@ import boofcv.struct.image.GrayU8;
  * @author Peter Abeles
  * @see boofcv.alg.filter.derivative.GradientSobel
  */
-public class GradientSobel_UnrolledOuter {
+public class GradientSobel_UnrolledOuter_MT {
 
 	/**
 	 * Can only process images which are NOT sub-images.
@@ -51,8 +51,7 @@ public class GradientSobel_UnrolledOuter {
 
 		final int adjWidth = width - 2;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int endX_alt = width * y + (width - adjWidth % 3) - 1;
 			int endX = endX_alt + adjWidth % 3;
 
@@ -115,8 +114,7 @@ public class GradientSobel_UnrolledOuter {
 
 				imgX[index] = (short) (((data[index + 1] & 0xFF) - (data[index - 1] & 0xFF)) * 2 + v - w);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -134,8 +132,7 @@ public class GradientSobel_UnrolledOuter {
 
 		final int adjWidth = width - 2;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int endX_alt = width * y + (width - adjWidth % 3) - 1;
 			int endX = endX_alt + adjWidth % 3;
 
@@ -200,8 +197,7 @@ public class GradientSobel_UnrolledOuter {
 				imgY[index] = (data[index + width] - data[index - width]) * 0.5F + v + w;
 				imgX[index] = (data[index + 1] - data[index - 1]) * 0.5F + v - w;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -220,8 +216,7 @@ public class GradientSobel_UnrolledOuter {
 
 		final int adjWidth = width - 2;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int index = orig.startIndex + strideSrc * y + 1;
 			int indexX = derivX.startIndex + derivX.stride * y + 1;
 			int indexY = derivY.startIndex + derivY.stride * y + 1;
@@ -291,7 +286,6 @@ public class GradientSobel_UnrolledOuter {
 				imgY[indexY++] = (data[index + strideSrc] - data[index - strideSrc]) * 0.5F + v + w;
 				imgX[indexX++] = (data[index + 1] - data[index - 1]) * 0.5F + v - w;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 }

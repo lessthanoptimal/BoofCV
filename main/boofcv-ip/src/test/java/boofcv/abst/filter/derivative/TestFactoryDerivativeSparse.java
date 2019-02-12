@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ public class TestFactoryDerivativeSparse {
 		GrayF32 expected = new GrayF32(width,height);
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
-		LaplacianEdge.process(input,expected);
+		LaplacianEdge.process(input,expected, null);
 
 		ImageFunctionSparse<GrayF32> func = FactoryDerivativeSparse.createLaplacian(GrayF32.class,null);
 
@@ -63,7 +63,7 @@ public class TestFactoryDerivativeSparse {
 		GrayS16 expected = new GrayS16(width,height);
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
-		LaplacianEdge.process(input,expected);
+		LaplacianEdge.process(input,expected, null);
 
 		ImageFunctionSparse<GrayU8> func = FactoryDerivativeSparse.createLaplacian(GrayU8.class,null);
 

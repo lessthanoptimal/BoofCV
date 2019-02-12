@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,7 +54,7 @@ public class TestLaplacianEdge {
 	}
 
 	public void process_U8_S16(GrayU8 img, GrayS16 deriv) {
-		LaplacianEdge.process(img, deriv);
+		LaplacianEdge.process(img, deriv, null);
 
 		int expected = -4 * img.get(1, 1) + img.get(0, 1) + img.get(1, 0)
 				+ img.get(2, 1) + img.get(1, 2);
@@ -90,7 +90,7 @@ public class TestLaplacianEdge {
 	}
 
 	public void process_F32(GrayF32 img, GrayF32 deriv) {
-		LaplacianEdge.process(img, deriv);
+		LaplacianEdge.process(img, deriv, null);
 
 		float expected = -4*img.get(1, 1) + img.get(0, 1) + img.get(1, 0)
 				+ img.get(2, 1) + img.get(1, 2);

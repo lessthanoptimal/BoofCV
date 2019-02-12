@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.denoise.FactoryDenoiseWaveletAlg;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.transform.wavelet.FactoryWaveletCoiflet;
@@ -152,7 +153,7 @@ public class DenoiseVisualizeApp<T extends ImageGray<T>,D extends ImageGray<D>,W
 		GImageMiscOps.addGaussian(noisy, rand, noiseSigma, 0, 255);
 		GPixelMath.boundImage(noisy,0,255);
 		// compute edge image for weighted error
-		GImageDerivativeOps.laplace(input,deriv);
+		GImageDerivativeOps.laplace(input,deriv, BorderType.EXTENDED);
 		GPixelMath.abs(deriv,deriv);
 
 		SwingUtilities.invokeLater(new Runnable() {

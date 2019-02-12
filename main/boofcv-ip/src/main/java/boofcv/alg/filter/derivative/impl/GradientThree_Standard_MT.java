@@ -18,21 +18,21 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
-import boofcv.alg.filter.derivative.GradientTwo1;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 
 
 /**
  * <p>
- * Basic implementation of {@link GradientTwo1} with nothing fancy is done to improve its performance.
+ * Basic implementation of {@link boofcv.alg.filter.derivative.GradientThree} with nothing fancy is done to improve its performance.
  * </p>
  *
  * @author Peter Abeles
  */
-public class GradientTwo1_Standard {
+public class GradientThree_Standard_MT {
 
 	/**
 	 * Computes the derivative along the x and y axes
@@ -43,23 +43,20 @@ public class GradientTwo1_Standard {
 		final float[] imgY = derivY.data;
 
 		final int width = orig.getWidth();
-		final int height = orig.getHeight();
+		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
-			int indexX = derivX.startIndex + derivX.stride*y + 1;
-			int indexY = derivY.startIndex + derivY.stride*y + 1;
-			int indexSrc = orig.startIndex + orig.stride*y + 1;
-			final int endX = indexSrc + width - 1;
+		BoofConcurrency.range(1,height,y->{
+			int indexX = derivX.startIndex + derivX.stride * y + 1;
+			int indexY = derivY.startIndex + derivY.stride * y + 1;
+			int indexSrc = orig.startIndex + stride * y + 1;
+			final int endX = indexSrc + width - 2;
 
 			for (; indexSrc < endX; indexSrc++) {
-				float val = data[indexSrc];
-				imgX[indexX++] = (val - data[indexSrc - 1]);
-				imgY[indexY++] = (val - data[indexSrc - stride]);
+				imgX[indexX++] = (data[indexSrc + 1] - data[indexSrc - 1]) * 0.5f;
+				imgY[indexY++] = (data[indexSrc + stride] - data[indexSrc - stride]) * 0.5f;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -71,23 +68,45 @@ public class GradientTwo1_Standard {
 		final short[] imgY = derivY.data;
 
 		final int width = orig.getWidth();
-		final int height = orig.getHeight();
+		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int indexX = derivX.startIndex + derivX.stride * y + 1;
 			int indexY = derivY.startIndex + derivY.stride * y + 1;
 			int indexSrc = orig.startIndex + stride * y + 1;
-			final int endX = indexSrc + width - 1;
+			final int endX = indexSrc + width - 2;
 
 			for (; indexSrc < endX; indexSrc++) {
-				int val = data[indexSrc] & 0xFF;
-				imgX[indexX++] = (short) (val - (data[indexSrc - 1] & 0xFF));
-				imgY[indexY++] = (short) (val - (data[indexSrc - stride] & 0xFF));
+				imgX[indexX++] = (short) ((data[indexSrc + 1] & 0xFF) - (data[indexSrc - 1] & 0xFF));
+				imgY[indexY++] = (short) ((data[indexSrc + stride] & 0xFF) - (data[indexSrc - stride] & 0xFF));
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
+	}
+
+	/**
+	 * Computes the derivative along the x and y axes
+	 */
+	public static void process(GrayU8 orig, GrayS32 derivX, GrayS32 derivY) {
+		final byte[] data = orig.data;
+		final int[] imgX = derivX.data;
+		final int[] imgY = derivY.data;
+
+		final int width = orig.getWidth();
+		final int height = orig.getHeight() - 1;
+		final int stride = orig.stride;
+
+		BoofConcurrency.range(1,height,y->{
+			int indexX = derivX.startIndex + derivX.stride * y + 1;
+			int indexY = derivY.startIndex + derivY.stride * y + 1;
+			int indexSrc = orig.startIndex + stride * y + 1;
+			final int endX = indexSrc + width - 2;
+
+			for (; indexSrc < endX; indexSrc++) {
+				imgX[indexX++] = ((data[indexSrc + 1] & 0xFF) - (data[indexSrc - 1] & 0xFF));
+				imgY[indexY++] = ((data[indexSrc + stride] & 0xFF) - (data[indexSrc - stride] & 0xFF));
+			}
+		});
 	}
 
 	public static void process(GrayS16 orig, GrayS16 derivX, GrayS16 derivY) {
@@ -96,23 +115,20 @@ public class GradientTwo1_Standard {
 		final short[] imgY = derivY.data;
 
 		final int width = orig.getWidth();
-		final int height = orig.getHeight();
+		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int indexX = derivX.startIndex + derivX.stride * y + 1;
 			int indexY = derivY.startIndex + derivY.stride * y + 1;
 			int indexSrc = orig.startIndex + stride * y + 1;
-			final int endX = indexSrc + width - 1;
+			final int endX = indexSrc + width - 2;
 
 			for (; indexSrc < endX; indexSrc++) {
-				int val = data[indexSrc];
-				imgX[indexX++] = (short) (val - data[indexSrc - 1]);
-				imgY[indexY++] = (short) (val - data[indexSrc - stride]);
+				imgX[indexX++] = (short) (data[indexSrc + 1] - data[indexSrc - 1]);
+				imgY[indexY++] = (short) (data[indexSrc + stride] - data[indexSrc - stride]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 }

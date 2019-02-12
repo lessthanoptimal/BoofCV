@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,8 @@ package boofcv.alg.filter.derivative;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.derivative.impl.GradientThree_Standard;
+import boofcv.alg.filter.derivative.impl.GradientThree_Standard_MT;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.border.ImageBorder_F32;
 import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel1D;
@@ -29,6 +31,8 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
+
+import javax.annotation.Nullable;
 
 
 /**
@@ -71,9 +75,14 @@ public class GradientThree {
 	 */
 	public static void process(GrayU8 orig,
 							   GrayS16 derivX,
-							   GrayS16 derivY, ImageBorder_S32 border ) {
+							   GrayS16 derivY, @Nullable ImageBorder_S32 border ) {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
-		GradientThree_Standard.process(orig, derivX, derivY);
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			GradientThree_Standard_MT.process(orig, derivX, derivY);
+		} else {
+			GradientThree_Standard.process(orig, derivX, derivY);
+		}
 
 		if( border != null ) {
 			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, border);
@@ -91,9 +100,14 @@ public class GradientThree {
 	 */
 	public static void process(GrayU8 orig,
 							   GrayS32 derivX,
-							   GrayS32 derivY, ImageBorder_S32 border ) {
+							   GrayS32 derivY, @Nullable ImageBorder_S32 border ) {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
-		GradientThree_Standard.process(orig, derivX, derivY);
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			GradientThree_Standard_MT.process(orig, derivX, derivY);
+		} else {
+			GradientThree_Standard.process(orig, derivX, derivY);
+		}
 
 		if( border != null ) {
 			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, border);
@@ -111,9 +125,14 @@ public class GradientThree {
 	 */
 	public static void process(GrayS16 orig,
 							   GrayS16 derivX,
-							   GrayS16 derivY, ImageBorder_S32 border) {
+							   GrayS16 derivY, @Nullable ImageBorder_S32 border) {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
-		GradientThree_Standard.process(orig, derivX, derivY);
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			GradientThree_Standard_MT.process(orig, derivX, derivY);
+		} else {
+			GradientThree_Standard.process(orig, derivX, derivY);
+		}
 
 		if( border != null ) {
 			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_I32, border);
@@ -131,10 +150,14 @@ public class GradientThree {
 	 */
 	public static void process(GrayF32 orig,
 							   GrayF32 derivX,
-							   GrayF32 derivY, ImageBorder_F32 border) {
+							   GrayF32 derivY, @Nullable ImageBorder_F32 border) {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
-		GradientThree_Standard.process(orig, derivX, derivY);
 
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			GradientThree_Standard_MT.process(orig, derivX, derivY);
+		} else {
+			GradientThree_Standard.process(orig, derivX, derivY);
+		}
 		if( border != null ) {
 			DerivativeHelperFunctions.processBorderHorizontal(orig, derivX , kernelDeriv_F32, border);
 			DerivativeHelperFunctions.processBorderVertical(orig, derivY , kernelDeriv_F32, border);

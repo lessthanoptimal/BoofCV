@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.derivative.impl;
 
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 import boofcv.alg.filter.derivative.GradientTwo0;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
@@ -45,6 +46,7 @@ public class GradientTwo0_Standard {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0,height,y->{
 		for (int y = 0; y < height; y++) {
 			int indexX = derivX.startIndex + derivX.stride * y;
 			int indexY = derivY.startIndex + derivY.stride * y;
@@ -57,6 +59,7 @@ public class GradientTwo0_Standard {
 				imgY[indexY++] = (data[indexSrc + stride] - val);
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	/**
@@ -71,6 +74,7 @@ public class GradientTwo0_Standard {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0,height,y->{
 		for (int y = 0; y < height; y++) {
 			int indexX = derivX.startIndex + derivX.stride * y;
 			int indexY = derivY.startIndex + derivY.stride * y;
@@ -83,6 +87,7 @@ public class GradientTwo0_Standard {
 				imgY[indexY++] = (short) ((data[indexSrc + stride] & 0xFF) - val);
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void process(GrayS16 orig, GrayS16 derivX, GrayS16 derivY) {
@@ -94,6 +99,7 @@ public class GradientTwo0_Standard {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0,height,y->{
 		for (int y = 0; y < height; y++) {
 			int indexX = derivX.startIndex + derivX.stride * y;
 			int indexY = derivY.startIndex + derivY.stride * y;
@@ -106,6 +112,7 @@ public class GradientTwo0_Standard {
 				imgY[indexY++] = (short) (data[indexSrc + stride] - val);
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 }
