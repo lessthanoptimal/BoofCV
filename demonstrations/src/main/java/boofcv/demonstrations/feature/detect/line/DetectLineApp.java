@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ package boofcv.demonstrations.feature.detect.line;
 import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.filter.blur.GBlurImageOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.line.ConfigHoughFoot;
 import boofcv.factory.feature.detect.line.ConfigHoughFootSubimage;
@@ -214,6 +215,8 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 	}
 
 	public static void main(String args[]) {
+		BoofConcurrency.USE_CONCURRENT = true;
+
 		Class imageType = GrayF32.class;
 		Class derivType = GrayF32.class;
 

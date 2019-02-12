@@ -243,7 +243,8 @@ public class AutocodeConcurrentApp {
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientThree_Standard.java",
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientTwo0_Standard.java",
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientTwo1_Standard.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/LaplacianStandard.java"
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/LaplacianStandard.java",
+				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplGradientToEdgeFeatures.java"
 		};
 
 		for( String f : files ) {
