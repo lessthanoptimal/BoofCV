@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,19 @@
 
 package boofcv.alg.filter.derivative;
 
+import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
+import boofcv.alg.filter.derivative.impl.LaplacianStandard;
+import boofcv.alg.filter.derivative.impl.LaplacianStandard_MT;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.core.image.border.ImageBorder_F32;
+import boofcv.core.image.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+
+import javax.annotation.Nullable;
 
 /**
  * <p>
@@ -53,8 +61,6 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-// TODO process image borders
-// TODO create a generator for these functions
 public class LaplacianEdge {
 	public static Kernel2D_S32 kernel_I32 = new Kernel2D_S32(3, new int[]{0,1,0,1,-4,1,0,1,0});
 	public static Kernel2D_F32 kernel_F32 = new Kernel2D_F32(3, new float[]{0,1,0,1,-4,1,0,1,0});
@@ -65,60 +71,38 @@ public class LaplacianEdge {
 	 * @param orig  Input image.  Not modified.
 	 * @param deriv Where the Laplacian is written to. Modified.
 	 */
-	public static void process(GrayU8 orig, GrayS16 deriv) {
+	public static void process(GrayU8 orig, GrayS16 deriv, @Nullable ImageBorder_S32<GrayU8> border ) {
 		deriv.reshape(orig.width,orig.height);
 
-		final byte[] data = orig.data;
-		final short[] out = deriv.data;
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			LaplacianStandard_MT.process(orig,deriv);
+		} else {
+			LaplacianStandard.process(orig,deriv);
+		}
 
-		final int width = orig.getWidth();
-		final int height = orig.getHeight() - 1;
-		final int stride = orig.stride;
-
-		for (int y = 1; y < height; y++) {
-			int index = orig.startIndex + stride * y + 1;
-			int indexOut = deriv.startIndex + deriv.stride * y + 1;
-			int endX = index + width - 2;
-
-			for (; index < endX; index++) {
-
-				int v = data[index - stride] & 0xFF;
-				v += data[index - 1] & 0xFF;
-				v += -4 * (data[index] & 0xFF);
-				v += data[index + 1] & 0xFF;
-				v += data[index + stride] & 0xFF;
-
-				out[indexOut++] = (short) v;
-			}
+		if( border != null ) {
+			border.setImage(orig);
+			ConvolveJustBorder_General_SB.convolve(kernel_I32, border,deriv);
 		}
 	}
 
+	/**
+	 * Computes Laplacian on an U8 image but outputs derivative in a F32 image. Removes a step when processing
+	 * images for feature detection
+	 */
 	public static void process(GrayU8 orig, GrayF32 deriv) {
 		deriv.reshape(orig.width,orig.height);
 
-		final byte[] data = orig.data;
-		final float[] out = deriv.data;
-
-		final int width = orig.getWidth();
-		final int height = orig.getHeight() - 1;
-		final int stride = orig.stride;
-
-		for (int y = 1; y < height; y++) {
-			int index = orig.startIndex + stride * y + 1;
-			int indexOut = deriv.startIndex + deriv.stride * y + 1;
-			int endX = index + width - 2;
-
-			for (; index < endX; index++) {
-
-				int v = data[index - stride] & 0xFF;
-				v += data[index - 1] & 0xFF;
-				v += -4 * (data[index] & 0xFF);
-				v += data[index + 1] & 0xFF;
-				v += data[index + stride] & 0xFF;
-
-				out[indexOut++] = v;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			LaplacianStandard_MT.process(orig,deriv);
+		} else {
+			LaplacianStandard.process(orig,deriv);
 		}
+
+//		if( border != null ) {
+//			border.setImage(orig);
+//			ConvolveJustBorder_General_SB.convolve(kernel_I32, border,deriv);
+//		}
 	}
 
 	/**
@@ -127,29 +111,18 @@ public class LaplacianEdge {
 	 * @param orig  Input image.  Not modified.
 	 * @param deriv Where the Laplacian is written to. Modified.
 	 */
-	public static void process(GrayF32 orig, GrayF32 deriv) {
+	public static void process(GrayF32 orig, GrayF32 deriv, @Nullable ImageBorder_F32 border) {
 		deriv.reshape(orig.width,orig.height);
 
-		final float[] data = orig.data;
-		final float[] out = deriv.data;
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			LaplacianStandard_MT.process(orig,deriv);
+		} else {
+			LaplacianStandard.process(orig,deriv);
+		}
 
-		final int width = orig.getWidth();
-		final int height = orig.getHeight() - 1;
-		final int stride = orig.stride;
-
-		for (int y = 1; y < height; y++) {
-			int index = orig.startIndex + stride * y + 1;
-			int indexOut = deriv.startIndex + deriv.stride * y + 1;
-			int endX = index + width - 2;
-
-			for (; index < endX; index++) {
-
-				float v = data[index - stride] + data[index - 1];
-				v += data[index + 1];
-				v += data[index + stride];
-
-				out[indexOut++] = v - 4.0f * data[index];
-			}
+		if( border != null ) {
+			border.setImage(orig);
+			ConvolveJustBorder_General_SB.convolve(kernel_F32, border,deriv);
 		}
 	}
 }

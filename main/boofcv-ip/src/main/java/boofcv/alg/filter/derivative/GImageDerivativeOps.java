@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,11 +35,12 @@ import boofcv.struct.image.*;
 public class GImageDerivativeOps {
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	void laplace( I input , D output ) {
+	void laplace( I input , D output , BorderType borderType ) {
+		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.wrap(borderType, input);
 		if( input instanceof GrayF32) {
-			LaplacianEdge.process((GrayF32)input,(GrayF32)output);
+			LaplacianEdge.process((GrayF32)input,(GrayF32)output,(ImageBorder_F32)border);
 		} else if( input instanceof GrayU8) {
-			LaplacianEdge.process((GrayU8)input,(GrayS16)output);
+			LaplacianEdge.process((GrayU8)input,(GrayS16)output,(ImageBorder_S32<GrayU8>)border);
 		} else {
 			throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 

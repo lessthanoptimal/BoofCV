@@ -553,8 +553,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
 		GrayS16 derivLeft = new GrayS16(rectColor1.width,rectColor1.height);
 		GrayS16 derivRight = new GrayS16(rectColor2.width,rectColor2.height);
-		LaplacianEdge.process(rectifiedLeft, derivLeft);
-		LaplacianEdge.process(rectifiedRight,derivRight);
+		LaplacianEdge.process(rectifiedLeft, derivLeft,null);
+		LaplacianEdge.process(rectifiedRight,derivRight,null);
 
 		// process and return the results
 		disparityAlg.process(derivLeft, derivRight);

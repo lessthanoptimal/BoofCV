@@ -18,8 +18,7 @@
 
 package boofcv.alg.feature.detect.edge.impl;
 
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
-
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
@@ -35,15 +34,14 @@ import boofcv.struct.image.GrayS32;
  * 
  * @author Peter Abeles
  */
-public class ImplGradientToEdgeFeatures {
+public class ImplGradientToEdgeFeatures_MT {
 
 	static public void intensityE( GrayF32 derivX , GrayF32 derivY , GrayF32 intensity )
 	{
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexI = intensity.startIndex + y*intensity.stride;
@@ -55,8 +53,7 @@ public class ImplGradientToEdgeFeatures {
 
 				intensity.data[indexI] = (float)Math.sqrt(dx*dx + dy*dy);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	static public void intensityAbs( GrayF32 derivX , GrayF32 derivY , GrayF32 intensity )
@@ -64,8 +61,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexI = intensity.startIndex + y*intensity.stride;
@@ -75,8 +71,7 @@ public class ImplGradientToEdgeFeatures {
 
 				intensity.data[indexI] = Math.abs(derivX.data[indexX]) +  Math.abs(derivY.data[indexY]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	static public void direction( GrayF32 derivX , GrayF32 derivY , GrayF32 angle )
@@ -84,8 +79,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexA = angle.startIndex + y*angle.stride;
@@ -98,8 +92,7 @@ public class ImplGradientToEdgeFeatures {
 				// compute the angle while avoiding divided by zero errors
 				angle.data[indexA] = Math.abs(dx) < 1e-10f ? (float)(Math.PI/2.0) : (float)Math.atan(dy/dx);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	static public void direction2( GrayF32 derivX , GrayF32 derivY , GrayF32 angle )
@@ -107,8 +100,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexA = angle.startIndex + y*angle.stride;
@@ -121,8 +113,7 @@ public class ImplGradientToEdgeFeatures {
 				// compute the angle while avoiding divided by zero errors
 				angle.data[indexA] = (float)Math.atan2(dy,dx);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	static public void intensityE( GrayS16 derivX , GrayS16 derivY , GrayF32 intensity )
@@ -130,8 +121,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexI = intensity.startIndex + y*intensity.stride;
@@ -143,8 +133,7 @@ public class ImplGradientToEdgeFeatures {
 
 				intensity.data[indexI] = (float)Math.sqrt(dx*dx + dy*dy);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	static public void intensityAbs( GrayS16 derivX , GrayS16 derivY , GrayF32 intensity )
@@ -152,8 +141,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexI = intensity.startIndex + y*intensity.stride;
@@ -163,8 +151,7 @@ public class ImplGradientToEdgeFeatures {
 
 				intensity.data[indexI] = Math.abs(derivX.data[indexX]) +  Math.abs(derivY.data[indexY]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	static public void direction( GrayS16 derivX , GrayS16 derivY , GrayF32 angle )
@@ -172,8 +159,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexA = angle.startIndex + y*angle.stride;
@@ -186,8 +172,7 @@ public class ImplGradientToEdgeFeatures {
 				// compute the angle while avoiding divided by zero errors
 				angle.data[indexA] = dx == 0 ? (float)(Math.PI/2.0) : (float)Math.atan((double)dy/(double)dx);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	static public void direction2( GrayS16 derivX , GrayS16 derivY , GrayF32 angle )
@@ -195,8 +180,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexA = angle.startIndex + y*angle.stride;
@@ -209,8 +193,7 @@ public class ImplGradientToEdgeFeatures {
 				// compute the angle while avoiding divided by zero errors
 				angle.data[indexA] = (float)Math.atan2(dy,dx);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	static public void intensityE( GrayS32 derivX , GrayS32 derivY , GrayF32 intensity )
@@ -218,8 +201,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexI = intensity.startIndex + y*intensity.stride;
@@ -231,8 +213,7 @@ public class ImplGradientToEdgeFeatures {
 
 				intensity.data[indexI] = (float)Math.sqrt(dx*dx + dy*dy);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	static public void intensityAbs( GrayS32 derivX , GrayS32 derivY , GrayF32 intensity )
@@ -240,8 +221,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexI = intensity.startIndex + y*intensity.stride;
@@ -251,8 +231,7 @@ public class ImplGradientToEdgeFeatures {
 
 				intensity.data[indexI] = Math.abs(derivX.data[indexX]) +  Math.abs(derivY.data[indexY]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	static public void direction( GrayS32 derivX , GrayS32 derivY , GrayF32 angle )
@@ -260,8 +239,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexA = angle.startIndex + y*angle.stride;
@@ -274,8 +252,7 @@ public class ImplGradientToEdgeFeatures {
 				// compute the angle while avoiding divided by zero errors
 				angle.data[indexA] = dx == 0 ? (float)(Math.PI/2.0) : (float)Math.atan((double)dy/(double)dx);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	static public void direction2( GrayS32 derivX , GrayS32 derivY , GrayF32 angle )
@@ -283,8 +260,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexA = angle.startIndex + y*angle.stride;
@@ -297,8 +273,7 @@ public class ImplGradientToEdgeFeatures {
 				// compute the angle while avoiding divided by zero errors
 				angle.data[indexA] = (float)Math.atan2(dy,dx);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 

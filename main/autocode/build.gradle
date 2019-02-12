@@ -1,4 +1,5 @@
 dependencies {
     compile group: 'com.peterabeles', name: 'auto64fto32f', version: '1.4'
+    api group: 'commons-io', name: 'commons-io', version: COMMONS_IO_VERSION
 }
 

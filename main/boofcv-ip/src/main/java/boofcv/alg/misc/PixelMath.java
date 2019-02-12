@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,9 +40,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void abs(GrayS8 input , GrayS8 output ) {
+	public static void abs( GrayS8 input , GrayS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		abs(input.data,input.startIndex,input.stride,
@@ -59,7 +59,7 @@ public class PixelMath {
 	 */
 	public static void abs( InterleavedS8 input , InterleavedS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
 		abs(input.data,input.startIndex,input.stride,
@@ -89,9 +89,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void abs(GrayS16 input , GrayS16 output ) {
+	public static void abs( GrayS16 input , GrayS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		abs(input.data,input.startIndex,input.stride,
@@ -108,7 +108,7 @@ public class PixelMath {
 	 */
 	public static void abs( InterleavedS16 input , InterleavedS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
 		abs(input.data,input.startIndex,input.stride,
@@ -138,9 +138,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void abs(GrayS32 input , GrayS32 output ) {
+	public static void abs( GrayS32 input , GrayS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		abs(input.data,input.startIndex,input.stride,
@@ -157,7 +157,7 @@ public class PixelMath {
 	 */
 	public static void abs( InterleavedS32 input , InterleavedS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
 		abs(input.data,input.startIndex,input.stride,
@@ -187,9 +187,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void abs(GrayS64 input , GrayS64 output ) {
+	public static void abs( GrayS64 input , GrayS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		abs(input.data,input.startIndex,input.stride,
@@ -206,7 +206,7 @@ public class PixelMath {
 	 */
 	public static void abs( InterleavedS64 input , InterleavedS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
 		abs(input.data,input.startIndex,input.stride,
@@ -236,9 +236,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void abs(GrayF32 input , GrayF32 output ) {
+	public static void abs( GrayF32 input , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		abs(input.data,input.startIndex,input.stride,
@@ -255,7 +255,7 @@ public class PixelMath {
 	 */
 	public static void abs( InterleavedF32 input , InterleavedF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
 		abs(input.data,input.startIndex,input.stride,
@@ -285,9 +285,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the absolute value image is written to. Modified.
 	 */
-	public static void abs(GrayF64 input , GrayF64 output ) {
+	public static void abs( GrayF64 input , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		abs(input.data,input.startIndex,input.stride,
@@ -304,7 +304,7 @@ public class PixelMath {
 	 */
 	public static void abs( InterleavedF64 input , InterleavedF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
 		abs(input.data,input.startIndex,input.stride,
@@ -333,9 +333,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the inverted image is written to. Modified.
 	 */
-	public static void invert(GrayS8 input , GrayS8 output ) {
+	public static void invert( GrayS8 input , GrayS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		invert(input.data,input.startIndex,input.stride,
@@ -351,7 +351,7 @@ public class PixelMath {
 	 */
 	public static void invert( InterleavedS8 input , InterleavedS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
 		invert(input.data,input.startIndex,input.stride,
@@ -380,9 +380,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the inverted image is written to. Modified.
 	 */
-	public static void invert(GrayS16 input , GrayS16 output ) {
+	public static void invert( GrayS16 input , GrayS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		invert(input.data,input.startIndex,input.stride,
@@ -398,7 +398,7 @@ public class PixelMath {
 	 */
 	public static void invert( InterleavedS16 input , InterleavedS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
 		invert(input.data,input.startIndex,input.stride,
@@ -427,9 +427,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the inverted image is written to. Modified.
 	 */
-	public static void invert(GrayS32 input , GrayS32 output ) {
+	public static void invert( GrayS32 input , GrayS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		invert(input.data,input.startIndex,input.stride,
@@ -445,7 +445,7 @@ public class PixelMath {
 	 */
 	public static void invert( InterleavedS32 input , InterleavedS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
 		invert(input.data,input.startIndex,input.stride,
@@ -474,9 +474,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the inverted image is written to. Modified.
 	 */
-	public static void invert(GrayS64 input , GrayS64 output ) {
+	public static void invert( GrayS64 input , GrayS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		invert(input.data,input.startIndex,input.stride,
@@ -492,7 +492,7 @@ public class PixelMath {
 	 */
 	public static void invert( InterleavedS64 input , InterleavedS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
 		invert(input.data,input.startIndex,input.stride,
@@ -521,9 +521,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the inverted image is written to. Modified.
 	 */
-	public static void invert(GrayF32 input , GrayF32 output ) {
+	public static void invert( GrayF32 input , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		invert(input.data,input.startIndex,input.stride,
@@ -539,7 +539,7 @@ public class PixelMath {
 	 */
 	public static void invert( InterleavedF32 input , InterleavedF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
 		invert(input.data,input.startIndex,input.stride,
@@ -568,9 +568,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the inverted image is written to. Modified.
 	 */
-	public static void invert(GrayF64 input , GrayF64 output ) {
+	public static void invert( GrayF64 input , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		invert(input.data,input.startIndex,input.stride,
@@ -586,7 +586,7 @@ public class PixelMath {
 	 */
 	public static void invert( InterleavedF64 input , InterleavedF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
 		invert(input.data,input.startIndex,input.stride,
@@ -617,9 +617,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayU8 input , double value , GrayU8 output ) {
+	public static void multiply( GrayU8 input , double value , GrayU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiplyU_A(input.data,input.startIndex,input.stride,value , 
@@ -637,7 +637,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedU8 input , double value , InterleavedU8 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiplyU_A(input.data,input.startIndex,input.stride,value , 
@@ -669,9 +669,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayS8 input , double value , GrayS8 output ) {
+	public static void multiply( GrayS8 input , double value , GrayS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiply_A(input.data,input.startIndex,input.stride,value , 
@@ -689,7 +689,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedS8 input , double value , InterleavedS8 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiply_A(input.data,input.startIndex,input.stride,value , 
@@ -721,9 +721,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayU16 input , double value , GrayU16 output ) {
+	public static void multiply( GrayU16 input , double value , GrayU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiplyU_A(input.data,input.startIndex,input.stride,value , 
@@ -741,7 +741,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedU16 input , double value , InterleavedU16 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiplyU_A(input.data,input.startIndex,input.stride,value , 
@@ -773,9 +773,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayS16 input , double value , GrayS16 output ) {
+	public static void multiply( GrayS16 input , double value , GrayS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiply_A(input.data,input.startIndex,input.stride,value , 
@@ -793,7 +793,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedS16 input , double value , InterleavedS16 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiply_A(input.data,input.startIndex,input.stride,value , 
@@ -825,9 +825,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayS32 input , double value , GrayS32 output ) {
+	public static void multiply( GrayS32 input , double value , GrayS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiply_A(input.data,input.startIndex,input.stride,value , 
@@ -845,7 +845,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedS32 input , double value , InterleavedS32 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiply_A(input.data,input.startIndex,input.stride,value , 
@@ -877,9 +877,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayS64 input , double value , GrayS64 output ) {
+	public static void multiply( GrayS64 input , double value , GrayS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiply_A(input.data,input.startIndex,input.stride,value , 
@@ -897,7 +897,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedS64 input , double value , InterleavedS64 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiply_A(input.data,input.startIndex,input.stride,value , 
@@ -929,9 +929,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayF32 input , float value , GrayF32 output ) {
+	public static void multiply( GrayF32 input , float value , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiply_A(input.data,input.startIndex,input.stride,value , 
@@ -949,7 +949,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedF32 input , float value , InterleavedF32 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiply_A(input.data,input.startIndex,input.stride,value , 
@@ -981,9 +981,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayF64 input , double value , GrayF64 output ) {
+	public static void multiply( GrayF64 input , double value , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiply_A(input.data,input.startIndex,input.stride,value , 
@@ -1001,7 +1001,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedF64 input , double value , InterleavedF64 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiply_A(input.data,input.startIndex,input.stride,value , 
@@ -1033,9 +1033,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayU8 input , double value , int lower , int upper , GrayU8 output ) {
+	public static void multiply( GrayU8 input , double value , int lower , int upper , GrayU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1053,7 +1053,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedU8 input , double value , int lower , int upper , InterleavedU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1088,9 +1088,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayS8 input , double value , int lower , int upper , GrayS8 output ) {
+	public static void multiply( GrayS8 input , double value , int lower , int upper , GrayS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1108,7 +1108,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedS8 input , double value , int lower , int upper , InterleavedS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1143,9 +1143,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayU16 input , double value , int lower , int upper , GrayU16 output ) {
+	public static void multiply( GrayU16 input , double value , int lower , int upper , GrayU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1163,7 +1163,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedU16 input , double value , int lower , int upper , InterleavedU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1198,9 +1198,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayS16 input , double value , int lower , int upper , GrayS16 output ) {
+	public static void multiply( GrayS16 input , double value , int lower , int upper , GrayS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1218,7 +1218,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedS16 input , double value , int lower , int upper , InterleavedS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1253,9 +1253,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayS32 input , double value , int lower , int upper , GrayS32 output ) {
+	public static void multiply( GrayS32 input , double value , int lower , int upper , GrayS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1273,7 +1273,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedS32 input , double value , int lower , int upper , InterleavedS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1308,9 +1308,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayS64 input , double value , long lower , long upper , GrayS64 output ) {
+	public static void multiply( GrayS64 input , double value , long lower , long upper , GrayS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1328,7 +1328,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedS64 input , double value , long lower , long upper , InterleavedS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1363,9 +1363,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayF32 input , float value , float lower , float upper , GrayF32 output ) {
+	public static void multiply( GrayF32 input , float value , float lower , float upper , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1383,7 +1383,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedF32 input , float value , float lower , float upper , InterleavedF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1418,9 +1418,9 @@ public class PixelMath {
 	 * @param value What each element is multiplied by.
 	 * @param output The output image. Modified.
 	 */
-	public static void multiply(GrayF64 input , double value , double lower , double upper , GrayF64 output ) {
+	public static void multiply( GrayF64 input , double value , double lower , double upper , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1438,7 +1438,7 @@ public class PixelMath {
 	 */
 	public static void multiply( InterleavedF64 input , double value , double lower , double upper , InterleavedF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -1472,9 +1472,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayU8 input , double denominator , GrayU8 output ) {
+	public static void divide( GrayU8 input , double denominator , GrayU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divideU_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1491,7 +1491,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedU8 input , double denominator , InterleavedU8 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divideU_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1522,9 +1522,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayS8 input , double denominator , GrayS8 output ) {
+	public static void divide( GrayS8 input , double denominator , GrayS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divide_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1541,7 +1541,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedS8 input , double denominator , InterleavedS8 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divide_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1572,9 +1572,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayU16 input , double denominator , GrayU16 output ) {
+	public static void divide( GrayU16 input , double denominator , GrayU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divideU_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1591,7 +1591,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedU16 input , double denominator , InterleavedU16 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divideU_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1622,9 +1622,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayS16 input , double denominator , GrayS16 output ) {
+	public static void divide( GrayS16 input , double denominator , GrayS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divide_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1641,7 +1641,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedS16 input , double denominator , InterleavedS16 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divide_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1672,9 +1672,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayS32 input , double denominator , GrayS32 output ) {
+	public static void divide( GrayS32 input , double denominator , GrayS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divide_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1691,7 +1691,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedS32 input , double denominator , InterleavedS32 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divide_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1722,9 +1722,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayS64 input , double denominator , GrayS64 output ) {
+	public static void divide( GrayS64 input , double denominator , GrayS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divide_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1741,7 +1741,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedS64 input , double denominator , InterleavedS64 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divide_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1772,9 +1772,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayF32 input , float denominator , GrayF32 output ) {
+	public static void divide( GrayF32 input , float denominator , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divide_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1791,7 +1791,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedF32 input , float denominator , InterleavedF32 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divide_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1822,9 +1822,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayF64 input , double denominator , GrayF64 output ) {
+	public static void divide( GrayF64 input , double denominator , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divide_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1841,7 +1841,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedF64 input , double denominator , InterleavedF64 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divide_A(input.data,input.startIndex,input.stride,denominator , 
@@ -1872,9 +1872,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayU8 input , double denominator , int lower , int upper , GrayU8 output ) {
+	public static void divide( GrayU8 input , double denominator , int lower , int upper , GrayU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -1891,7 +1891,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedU8 input , double denominator , int lower , int upper , InterleavedU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -1925,9 +1925,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayS8 input , double denominator , int lower , int upper , GrayS8 output ) {
+	public static void divide( GrayS8 input , double denominator , int lower , int upper , GrayS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -1944,7 +1944,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedS8 input , double denominator , int lower , int upper , InterleavedS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -1978,9 +1978,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayU16 input , double denominator , int lower , int upper , GrayU16 output ) {
+	public static void divide( GrayU16 input , double denominator , int lower , int upper , GrayU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -1997,7 +1997,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedU16 input , double denominator , int lower , int upper , InterleavedU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -2031,9 +2031,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayS16 input , double denominator , int lower , int upper , GrayS16 output ) {
+	public static void divide( GrayS16 input , double denominator , int lower , int upper , GrayS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -2050,7 +2050,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedS16 input , double denominator , int lower , int upper , InterleavedS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -2084,9 +2084,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayS32 input , double denominator , int lower , int upper , GrayS32 output ) {
+	public static void divide( GrayS32 input , double denominator , int lower , int upper , GrayS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -2103,7 +2103,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedS32 input , double denominator , int lower , int upper , InterleavedS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -2137,9 +2137,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayS64 input , double denominator , long lower , long upper , GrayS64 output ) {
+	public static void divide( GrayS64 input , double denominator , long lower , long upper , GrayS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -2156,7 +2156,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedS64 input , double denominator , long lower , long upper , InterleavedS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -2190,9 +2190,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayF32 input , float denominator , float lower , float upper , GrayF32 output ) {
+	public static void divide( GrayF32 input , float denominator , float lower , float upper , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -2209,7 +2209,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedF32 input , float denominator , float lower , float upper , InterleavedF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -2243,9 +2243,9 @@ public class PixelMath {
 	 * @param denominator What each element is divided by.
 	 * @param output The output image. Modified.
 	 */
-	public static void divide(GrayF64 input , double denominator , double lower , double upper , GrayF64 output ) {
+	public static void divide( GrayF64 input , double denominator , double lower , double upper , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -2262,7 +2262,7 @@ public class PixelMath {
 	 */
 	public static void divide( InterleavedF64 input , double denominator , double lower , double upper , InterleavedF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
@@ -2296,9 +2296,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayU8 input , int value , GrayU8 output ) {
+	public static void plus( GrayU8 input , int value , GrayU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plusU_A(input.data,input.startIndex,input.stride,value , 
@@ -2315,7 +2315,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedU8 input , int value , InterleavedU8 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plusU_A(input.data,input.startIndex,input.stride,value , 
@@ -2346,9 +2346,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayS8 input , int value , GrayS8 output ) {
+	public static void plus( GrayS8 input , int value , GrayS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plus_A(input.data,input.startIndex,input.stride,value , 
@@ -2365,7 +2365,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedS8 input , int value , InterleavedS8 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plus_A(input.data,input.startIndex,input.stride,value , 
@@ -2396,9 +2396,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayU16 input , int value , GrayU16 output ) {
+	public static void plus( GrayU16 input , int value , GrayU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plusU_A(input.data,input.startIndex,input.stride,value , 
@@ -2415,7 +2415,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedU16 input , int value , InterleavedU16 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plusU_A(input.data,input.startIndex,input.stride,value , 
@@ -2446,9 +2446,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayS16 input , int value , GrayS16 output ) {
+	public static void plus( GrayS16 input , int value , GrayS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plus_A(input.data,input.startIndex,input.stride,value , 
@@ -2465,7 +2465,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedS16 input , int value , InterleavedS16 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plus_A(input.data,input.startIndex,input.stride,value , 
@@ -2496,9 +2496,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayS32 input , int value , GrayS32 output ) {
+	public static void plus( GrayS32 input , int value , GrayS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plus_A(input.data,input.startIndex,input.stride,value , 
@@ -2515,7 +2515,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedS32 input , int value , InterleavedS32 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plus_A(input.data,input.startIndex,input.stride,value , 
@@ -2546,9 +2546,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayS64 input , long value , GrayS64 output ) {
+	public static void plus( GrayS64 input , long value , GrayS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plus_A(input.data,input.startIndex,input.stride,value , 
@@ -2565,7 +2565,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedS64 input , long value , InterleavedS64 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plus_A(input.data,input.startIndex,input.stride,value , 
@@ -2596,9 +2596,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayF32 input , float value , GrayF32 output ) {
+	public static void plus( GrayF32 input , float value , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plus_A(input.data,input.startIndex,input.stride,value , 
@@ -2615,7 +2615,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedF32 input , float value , InterleavedF32 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plus_A(input.data,input.startIndex,input.stride,value , 
@@ -2646,9 +2646,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayF64 input , double value , GrayF64 output ) {
+	public static void plus( GrayF64 input , double value , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plus_A(input.data,input.startIndex,input.stride,value , 
@@ -2665,7 +2665,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedF64 input , double value , InterleavedF64 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plus_A(input.data,input.startIndex,input.stride,value , 
@@ -2696,9 +2696,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayU8 input , int value , int lower , int upper , GrayU8 output ) {
+	public static void plus( GrayU8 input , int value , int lower , int upper , GrayU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -2715,7 +2715,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedU8 input , int value , int lower , int upper , InterleavedU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -2749,9 +2749,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayS8 input , int value , int lower , int upper , GrayS8 output ) {
+	public static void plus( GrayS8 input , int value , int lower , int upper , GrayS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -2768,7 +2768,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedS8 input , int value , int lower , int upper , InterleavedS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -2802,9 +2802,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayU16 input , int value , int lower , int upper , GrayU16 output ) {
+	public static void plus( GrayU16 input , int value , int lower , int upper , GrayU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -2821,7 +2821,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedU16 input , int value , int lower , int upper , InterleavedU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -2855,9 +2855,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayS16 input , int value , int lower , int upper , GrayS16 output ) {
+	public static void plus( GrayS16 input , int value , int lower , int upper , GrayS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -2874,7 +2874,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedS16 input , int value , int lower , int upper , InterleavedS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -2908,9 +2908,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayS32 input , int value , int lower , int upper , GrayS32 output ) {
+	public static void plus( GrayS32 input , int value , int lower , int upper , GrayS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -2927,7 +2927,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedS32 input , int value , int lower , int upper , InterleavedS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -2961,9 +2961,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayS64 input , long value , long lower , long upper , GrayS64 output ) {
+	public static void plus( GrayS64 input , long value , long lower , long upper , GrayS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -2980,7 +2980,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedS64 input , long value , long lower , long upper , InterleavedS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3014,9 +3014,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayF32 input , float value , float lower , float upper , GrayF32 output ) {
+	public static void plus( GrayF32 input , float value , float lower , float upper , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3033,7 +3033,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedF32 input , float value , float lower , float upper , InterleavedF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3067,9 +3067,9 @@ public class PixelMath {
 	 * @param value What is added to each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void plus(GrayF64 input , double value , double lower , double upper , GrayF64 output ) {
+	public static void plus( GrayF64 input , double value , double lower , double upper , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3086,7 +3086,7 @@ public class PixelMath {
 	 */
 	public static void plus( InterleavedF64 input , double value , double lower , double upper , InterleavedF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3120,9 +3120,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayU8 input , int value , GrayU8 output ) {
+	public static void minus( GrayU8 input , int value , GrayU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minusU_A(input.data,input.startIndex,input.stride,value , 
@@ -3139,7 +3139,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedU8 input , int value , InterleavedU8 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minusU_A(input.data,input.startIndex,input.stride,value , 
@@ -3170,9 +3170,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayS8 input , int value , GrayS8 output ) {
+	public static void minus( GrayS8 input , int value , GrayS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_A(input.data,input.startIndex,input.stride,value , 
@@ -3189,7 +3189,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedS8 input , int value , InterleavedS8 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_A(input.data,input.startIndex,input.stride,value , 
@@ -3220,9 +3220,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayU16 input , int value , GrayU16 output ) {
+	public static void minus( GrayU16 input , int value , GrayU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minusU_A(input.data,input.startIndex,input.stride,value , 
@@ -3239,7 +3239,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedU16 input , int value , InterleavedU16 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minusU_A(input.data,input.startIndex,input.stride,value , 
@@ -3270,9 +3270,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayS16 input , int value , GrayS16 output ) {
+	public static void minus( GrayS16 input , int value , GrayS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_A(input.data,input.startIndex,input.stride,value , 
@@ -3289,7 +3289,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedS16 input , int value , InterleavedS16 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_A(input.data,input.startIndex,input.stride,value , 
@@ -3320,9 +3320,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayS32 input , int value , GrayS32 output ) {
+	public static void minus( GrayS32 input , int value , GrayS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_A(input.data,input.startIndex,input.stride,value , 
@@ -3339,7 +3339,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedS32 input , int value , InterleavedS32 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_A(input.data,input.startIndex,input.stride,value , 
@@ -3370,9 +3370,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayS64 input , long value , GrayS64 output ) {
+	public static void minus( GrayS64 input , long value , GrayS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_A(input.data,input.startIndex,input.stride,value , 
@@ -3389,7 +3389,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedS64 input , long value , InterleavedS64 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_A(input.data,input.startIndex,input.stride,value , 
@@ -3420,9 +3420,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayF32 input , float value , GrayF32 output ) {
+	public static void minus( GrayF32 input , float value , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_A(input.data,input.startIndex,input.stride,value , 
@@ -3439,7 +3439,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedF32 input , float value , InterleavedF32 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_A(input.data,input.startIndex,input.stride,value , 
@@ -3470,9 +3470,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayF64 input , double value , GrayF64 output ) {
+	public static void minus( GrayF64 input , double value , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_A(input.data,input.startIndex,input.stride,value , 
@@ -3489,7 +3489,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedF64 input , double value , InterleavedF64 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_A(input.data,input.startIndex,input.stride,value , 
@@ -3520,9 +3520,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayU8 input , int value , int lower , int upper , GrayU8 output ) {
+	public static void minus( GrayU8 input , int value , int lower , int upper , GrayU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3539,7 +3539,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedU8 input , int value , int lower , int upper , InterleavedU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3573,9 +3573,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayS8 input , int value , int lower , int upper , GrayS8 output ) {
+	public static void minus( GrayS8 input , int value , int lower , int upper , GrayS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3592,7 +3592,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedS8 input , int value , int lower , int upper , InterleavedS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3626,9 +3626,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayU16 input , int value , int lower , int upper , GrayU16 output ) {
+	public static void minus( GrayU16 input , int value , int lower , int upper , GrayU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3645,7 +3645,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedU16 input , int value , int lower , int upper , InterleavedU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3679,9 +3679,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayS16 input , int value , int lower , int upper , GrayS16 output ) {
+	public static void minus( GrayS16 input , int value , int lower , int upper , GrayS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3698,7 +3698,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedS16 input , int value , int lower , int upper , InterleavedS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3732,9 +3732,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayS32 input , int value , int lower , int upper , GrayS32 output ) {
+	public static void minus( GrayS32 input , int value , int lower , int upper , GrayS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3751,7 +3751,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedS32 input , int value , int lower , int upper , InterleavedS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3785,9 +3785,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayS64 input , long value , long lower , long upper , GrayS64 output ) {
+	public static void minus( GrayS64 input , long value , long lower , long upper , GrayS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3804,7 +3804,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedS64 input , long value , long lower , long upper , InterleavedS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3838,9 +3838,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayF32 input , float value , float lower , float upper , GrayF32 output ) {
+	public static void minus( GrayF32 input , float value , float lower , float upper , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3857,7 +3857,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedF32 input , float value , float lower , float upper , InterleavedF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3891,9 +3891,9 @@ public class PixelMath {
 	 * @param value What is subtracted from each element.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(GrayF64 input , double value , double lower , double upper , GrayF64 output ) {
+	public static void minus( GrayF64 input , double value , double lower , double upper , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3910,7 +3910,7 @@ public class PixelMath {
 	 */
 	public static void minus( InterleavedF64 input , double value , double lower , double upper , InterleavedF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -3944,9 +3944,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(int value , GrayU8 input , GrayU8 output ) {
+	public static void minus( int value , GrayU8 input , GrayU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minusU_B(input.data,input.startIndex,input.stride,value , 
@@ -3963,7 +3963,7 @@ public class PixelMath {
 	 */
 	public static void minus( int value , InterleavedU8 input , InterleavedU8 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minusU_B(input.data,input.startIndex,input.stride,value , 
@@ -3994,9 +3994,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(int value , GrayS8 input , GrayS8 output ) {
+	public static void minus( int value , GrayS8 input , GrayS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_B(input.data,input.startIndex,input.stride,value , 
@@ -4013,7 +4013,7 @@ public class PixelMath {
 	 */
 	public static void minus( int value , InterleavedS8 input , InterleavedS8 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_B(input.data,input.startIndex,input.stride,value , 
@@ -4044,9 +4044,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(int value , GrayU16 input , GrayU16 output ) {
+	public static void minus( int value , GrayU16 input , GrayU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minusU_B(input.data,input.startIndex,input.stride,value , 
@@ -4063,7 +4063,7 @@ public class PixelMath {
 	 */
 	public static void minus( int value , InterleavedU16 input , InterleavedU16 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minusU_B(input.data,input.startIndex,input.stride,value , 
@@ -4094,9 +4094,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(int value , GrayS16 input , GrayS16 output ) {
+	public static void minus( int value , GrayS16 input , GrayS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_B(input.data,input.startIndex,input.stride,value , 
@@ -4113,7 +4113,7 @@ public class PixelMath {
 	 */
 	public static void minus( int value , InterleavedS16 input , InterleavedS16 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_B(input.data,input.startIndex,input.stride,value , 
@@ -4144,9 +4144,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(int value , GrayS32 input , GrayS32 output ) {
+	public static void minus( int value , GrayS32 input , GrayS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_B(input.data,input.startIndex,input.stride,value , 
@@ -4163,7 +4163,7 @@ public class PixelMath {
 	 */
 	public static void minus( int value , InterleavedS32 input , InterleavedS32 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_B(input.data,input.startIndex,input.stride,value , 
@@ -4194,9 +4194,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(long value , GrayS64 input , GrayS64 output ) {
+	public static void minus( long value , GrayS64 input , GrayS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_B(input.data,input.startIndex,input.stride,value , 
@@ -4213,7 +4213,7 @@ public class PixelMath {
 	 */
 	public static void minus( long value , InterleavedS64 input , InterleavedS64 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_B(input.data,input.startIndex,input.stride,value , 
@@ -4244,9 +4244,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(float value , GrayF32 input , GrayF32 output ) {
+	public static void minus( float value , GrayF32 input , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_B(input.data,input.startIndex,input.stride,value , 
@@ -4263,7 +4263,7 @@ public class PixelMath {
 	 */
 	public static void minus( float value , InterleavedF32 input , InterleavedF32 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_B(input.data,input.startIndex,input.stride,value , 
@@ -4294,9 +4294,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(double value , GrayF64 input , GrayF64 output ) {
+	public static void minus( double value , GrayF64 input , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_B(input.data,input.startIndex,input.stride,value , 
@@ -4313,7 +4313,7 @@ public class PixelMath {
 	 */
 	public static void minus( double value , InterleavedF64 input , InterleavedF64 output ) {
 
-		InputSanityCheck.checkSameShapeB(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_B(input.data,input.startIndex,input.stride,value , 
@@ -4344,9 +4344,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(int value , GrayU8 input , int lower , int upper , GrayU8 output ) {
+	public static void minus( int value , GrayU8 input , int lower , int upper , GrayU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4363,7 +4363,7 @@ public class PixelMath {
 	 */
 	public static void minus( int value , InterleavedU8 input , int lower , int upper , InterleavedU8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4397,9 +4397,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(int value , GrayS8 input , int lower , int upper , GrayS8 output ) {
+	public static void minus( int value , GrayS8 input , int lower , int upper , GrayS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4416,7 +4416,7 @@ public class PixelMath {
 	 */
 	public static void minus( int value , InterleavedS8 input , int lower , int upper , InterleavedS8 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4450,9 +4450,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(int value , GrayU16 input , int lower , int upper , GrayU16 output ) {
+	public static void minus( int value , GrayU16 input , int lower , int upper , GrayU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4469,7 +4469,7 @@ public class PixelMath {
 	 */
 	public static void minus( int value , InterleavedU16 input , int lower , int upper , InterleavedU16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4503,9 +4503,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(int value , GrayS16 input , int lower , int upper , GrayS16 output ) {
+	public static void minus( int value , GrayS16 input , int lower , int upper , GrayS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4522,7 +4522,7 @@ public class PixelMath {
 	 */
 	public static void minus( int value , InterleavedS16 input , int lower , int upper , InterleavedS16 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4556,9 +4556,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(int value , GrayS32 input , int lower , int upper , GrayS32 output ) {
+	public static void minus( int value , GrayS32 input , int lower , int upper , GrayS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4575,7 +4575,7 @@ public class PixelMath {
 	 */
 	public static void minus( int value , InterleavedS32 input , int lower , int upper , InterleavedS32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4609,9 +4609,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(long value , GrayS64 input , long lower , long upper , GrayS64 output ) {
+	public static void minus( long value , GrayS64 input , long lower , long upper , GrayS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4628,7 +4628,7 @@ public class PixelMath {
 	 */
 	public static void minus( long value , InterleavedS64 input , long lower , long upper , InterleavedS64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4662,9 +4662,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(float value , GrayF32 input , float lower , float upper , GrayF32 output ) {
+	public static void minus( float value , GrayF32 input , float lower , float upper , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4681,7 +4681,7 @@ public class PixelMath {
 	 */
 	public static void minus( float value , InterleavedF32 input , float lower , float upper , InterleavedF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4715,9 +4715,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output The output image. Modified.
 	 */
-	public static void minus(double value , GrayF64 input , double lower , double upper , GrayF64 output ) {
+	public static void minus( double value , GrayF64 input , double lower , double upper , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int columns = input.width;
 		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4734,7 +4734,7 @@ public class PixelMath {
 	 */
 	public static void minus( double value , InterleavedF64 input , double lower , double upper , InterleavedF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
 		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
@@ -4768,7 +4768,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage(GrayU8 img , int min , int max ) {
+	public static void boundImage( GrayU8 img , int min , int max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -4795,23 +4795,24 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param diff Absolute value of difference image. Modified.
+	 * @param output Absolute value of difference image. Can be either input. Modified.
 	 */
-	public static void diffAbs(GrayU8 imgA , GrayU8 imgB , GrayU8 diff ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,diff);
-		
+	public static void diffAbs( GrayU8 imgA , GrayU8 imgB , GrayU8 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			int indexDiff = output.getStartIndex() + y * output.getStride();
 			
 			int indexEnd = indexA+w;
 			// for(int x = 0; x < w; x++ ) {
 			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				diff.data[indexDiff] = (byte)Math.abs((imgA.data[indexA] & 0xFF) - (imgB.data[indexB] & 0xFF));
+				output.data[indexDiff] = (byte)Math.abs((imgA.data[indexA] & 0xFF) - (imgB.data[indexB] & 0xFF));
 			}
 		}
 	}
@@ -4822,7 +4823,7 @@ public class PixelMath {
 	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand(Planar<GrayU8> input , GrayU8 output ) {
+	public static void averageBand( Planar<GrayU8> input , GrayU8 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
@@ -4851,7 +4852,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage(GrayS8 img , int min , int max ) {
+	public static void boundImage( GrayS8 img , int min , int max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -4878,23 +4879,24 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param diff Absolute value of difference image. Modified.
+	 * @param output Absolute value of difference image. Can be either input. Modified.
 	 */
-	public static void diffAbs(GrayS8 imgA , GrayS8 imgB , GrayS8 diff ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,diff);
-		
+	public static void diffAbs( GrayS8 imgA , GrayS8 imgB , GrayS8 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			int indexDiff = output.getStartIndex() + y * output.getStride();
 			
 			int indexEnd = indexA+w;
 			// for(int x = 0; x < w; x++ ) {
 			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				diff.data[indexDiff] = (byte)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
+				output.data[indexDiff] = (byte)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
 	}
@@ -4905,7 +4907,7 @@ public class PixelMath {
 	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand(Planar<GrayS8> input , GrayS8 output ) {
+	public static void averageBand( Planar<GrayS8> input , GrayS8 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
@@ -4934,7 +4936,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage(GrayU16 img , int min , int max ) {
+	public static void boundImage( GrayU16 img , int min , int max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -4961,23 +4963,24 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param diff Absolute value of difference image. Modified.
+	 * @param output Absolute value of difference image. Can be either input. Modified.
 	 */
-	public static void diffAbs(GrayU16 imgA , GrayU16 imgB , GrayU16 diff ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,diff);
-		
+	public static void diffAbs( GrayU16 imgA , GrayU16 imgB , GrayU16 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			int indexDiff = output.getStartIndex() + y * output.getStride();
 			
 			int indexEnd = indexA+w;
 			// for(int x = 0; x < w; x++ ) {
 			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				diff.data[indexDiff] = (short)Math.abs((imgA.data[indexA] & 0xFFFF) - (imgB.data[indexB] & 0xFFFF));
+				output.data[indexDiff] = (short)Math.abs((imgA.data[indexA] & 0xFFFF) - (imgB.data[indexB] & 0xFFFF));
 			}
 		}
 	}
@@ -4988,7 +4991,7 @@ public class PixelMath {
 	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand(Planar<GrayU16> input , GrayU16 output ) {
+	public static void averageBand( Planar<GrayU16> input , GrayU16 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
@@ -5017,7 +5020,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage(GrayS16 img , int min , int max ) {
+	public static void boundImage( GrayS16 img , int min , int max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -5044,23 +5047,24 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param diff Absolute value of difference image. Modified.
+	 * @param output Absolute value of difference image. Can be either input. Modified.
 	 */
-	public static void diffAbs(GrayS16 imgA , GrayS16 imgB , GrayS16 diff ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,diff);
-		
+	public static void diffAbs( GrayS16 imgA , GrayS16 imgB , GrayS16 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			int indexDiff = output.getStartIndex() + y * output.getStride();
 			
 			int indexEnd = indexA+w;
 			// for(int x = 0; x < w; x++ ) {
 			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				diff.data[indexDiff] = (short)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
+				output.data[indexDiff] = (short)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
 	}
@@ -5071,7 +5075,7 @@ public class PixelMath {
 	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand(Planar<GrayS16> input , GrayS16 output ) {
+	public static void averageBand( Planar<GrayS16> input , GrayS16 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
@@ -5100,7 +5104,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage(GrayS32 img , int min , int max ) {
+	public static void boundImage( GrayS32 img , int min , int max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -5127,23 +5131,24 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param diff Absolute value of difference image. Modified.
+	 * @param output Absolute value of difference image. Can be either input. Modified.
 	 */
-	public static void diffAbs(GrayS32 imgA , GrayS32 imgB , GrayS32 diff ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,diff);
-		
+	public static void diffAbs( GrayS32 imgA , GrayS32 imgB , GrayS32 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			int indexDiff = output.getStartIndex() + y * output.getStride();
 			
 			int indexEnd = indexA+w;
 			// for(int x = 0; x < w; x++ ) {
 			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				diff.data[indexDiff] = (int)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
+				output.data[indexDiff] = (int)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
 	}
@@ -5154,7 +5159,7 @@ public class PixelMath {
 	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand(Planar<GrayS32> input , GrayS32 output ) {
+	public static void averageBand( Planar<GrayS32> input , GrayS32 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
@@ -5183,7 +5188,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage(GrayS64 img , long min , long max ) {
+	public static void boundImage( GrayS64 img , long min , long max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -5210,23 +5215,24 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param diff Absolute value of difference image. Modified.
+	 * @param output Absolute value of difference image. Can be either input. Modified.
 	 */
-	public static void diffAbs(GrayS64 imgA , GrayS64 imgB , GrayS64 diff ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,diff);
-		
+	public static void diffAbs( GrayS64 imgA , GrayS64 imgB , GrayS64 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			int indexDiff = output.getStartIndex() + y * output.getStride();
 			
 			int indexEnd = indexA+w;
 			// for(int x = 0; x < w; x++ ) {
 			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				diff.data[indexDiff] = (long)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
+				output.data[indexDiff] = (long)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
 	}
@@ -5237,7 +5243,7 @@ public class PixelMath {
 	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand(Planar<GrayS64> input , GrayS64 output ) {
+	public static void averageBand( Planar<GrayS64> input , GrayS64 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
@@ -5266,7 +5272,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage(GrayF32 img , float min , float max ) {
+	public static void boundImage( GrayF32 img , float min , float max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -5293,23 +5299,24 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param diff Absolute value of difference image. Modified.
+	 * @param output Absolute value of difference image. Can be either input. Modified.
 	 */
-	public static void diffAbs(GrayF32 imgA , GrayF32 imgB , GrayF32 diff ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,diff);
-		
+	public static void diffAbs( GrayF32 imgA , GrayF32 imgB , GrayF32 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			int indexDiff = output.getStartIndex() + y * output.getStride();
 			
 			int indexEnd = indexA+w;
 			// for(int x = 0; x < w; x++ ) {
 			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				diff.data[indexDiff] = Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
+				output.data[indexDiff] = Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
 	}
@@ -5320,7 +5327,7 @@ public class PixelMath {
 	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand(Planar<GrayF32> input , GrayF32 output ) {
+	public static void averageBand( Planar<GrayF32> input , GrayF32 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
@@ -5349,7 +5356,7 @@ public class PixelMath {
 	 * @param min minimum value.
 	 * @param max maximum value.
 	 */
-	public static void boundImage(GrayF64 img , double min , double max ) {
+	public static void boundImage( GrayF64 img , double min , double max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
 
@@ -5376,23 +5383,24 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param diff Absolute value of difference image. Modified.
+	 * @param output Absolute value of difference image. Can be either input. Modified.
 	 */
-	public static void diffAbs(GrayF64 imgA , GrayF64 imgB , GrayF64 diff ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,diff);
-		
+	public static void diffAbs( GrayF64 imgA , GrayF64 imgB , GrayF64 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = diff.getStartIndex() + y * diff.getStride();
+			int indexDiff = output.getStartIndex() + y * output.getStride();
 			
 			int indexEnd = indexA+w;
 			// for(int x = 0; x < w; x++ ) {
 			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				diff.data[indexDiff] = Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
+				output.data[indexDiff] = Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
 			}
 		}
 	}
@@ -5403,7 +5411,7 @@ public class PixelMath {
 	 * @param input Planar image
 	 * @param output Gray scale image containing average pixel values
 	 */
-	public static void averageBand(Planar<GrayF64> input , GrayF64 output ) {
+	public static void averageBand( Planar<GrayF64> input , GrayF64 output ) {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
@@ -5432,11 +5440,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void add(GrayU8 imgA , GrayU8 imgB , GrayU16 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void add( GrayU8 imgA , GrayU8 imgB , GrayU16 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5460,11 +5469,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void subtract(GrayU8 imgA , GrayU8 imgB , GrayI16 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void subtract( GrayU8 imgA , GrayU8 imgB , GrayI16 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5488,11 +5498,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void add(GrayS8 imgA , GrayS8 imgB , GrayS16 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void add( GrayS8 imgA , GrayS8 imgB , GrayS16 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5516,11 +5527,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void subtract(GrayS8 imgA , GrayS8 imgB , GrayS16 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void subtract( GrayS8 imgA , GrayS8 imgB , GrayS16 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5544,11 +5556,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void add(GrayU16 imgA , GrayU16 imgB , GrayS32 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void add( GrayU16 imgA , GrayU16 imgB , GrayS32 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5572,11 +5585,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void subtract(GrayU16 imgA , GrayU16 imgB , GrayS32 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void subtract( GrayU16 imgA , GrayU16 imgB , GrayS32 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5600,11 +5614,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void add(GrayS16 imgA , GrayS16 imgB , GrayS32 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void add( GrayS16 imgA , GrayS16 imgB , GrayS32 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5628,11 +5643,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void subtract(GrayS16 imgA , GrayS16 imgB , GrayS32 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void subtract( GrayS16 imgA , GrayS16 imgB , GrayS32 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5656,11 +5672,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void add(GrayS32 imgA , GrayS32 imgB , GrayS32 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void add( GrayS32 imgA , GrayS32 imgB , GrayS32 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5684,11 +5701,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void subtract(GrayS32 imgA , GrayS32 imgB , GrayS32 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void subtract( GrayS32 imgA , GrayS32 imgB , GrayS32 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5712,11 +5730,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void add(GrayS64 imgA , GrayS64 imgB , GrayS64 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void add( GrayS64 imgA , GrayS64 imgB , GrayS64 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5740,11 +5759,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void subtract(GrayS64 imgA , GrayS64 imgB , GrayS64 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void subtract( GrayS64 imgA , GrayS64 imgB , GrayS64 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5768,11 +5788,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void add(GrayF32 imgA , GrayF32 imgB , GrayF32 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void add( GrayF32 imgA , GrayF32 imgB , GrayF32 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5796,11 +5817,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void subtract(GrayF32 imgA , GrayF32 imgB , GrayF32 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void subtract( GrayF32 imgA , GrayF32 imgB , GrayF32 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5824,11 +5846,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void multiply(GrayF32 imgA , GrayF32 imgB , GrayF32 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void multiply( GrayF32 imgA , GrayF32 imgB , GrayF32 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5852,11 +5875,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void divide(GrayF32 imgA , GrayF32 imgB , GrayF32 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void divide( GrayF32 imgA , GrayF32 imgB , GrayF32 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5880,9 +5904,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the log image is written to. Modified.
 	 */
-	public static void log(GrayF32 input , GrayF32 output ) {
+	public static void log( GrayF32 input , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
@@ -5899,11 +5923,11 @@ public class PixelMath {
 	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the 
 	 * same instance.	 *
 	 * @param input The input image. Not modified.
-	 * @param output Where the pow2 image is written to. Modified.
+	 * @param output Where the pow2 image is written to. Can be same as input. Modified.
 	 */
-	public static void pow2(GrayF32 input , GrayF32 output ) {
+	public static void pow2( GrayF32 input , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
@@ -5922,11 +5946,11 @@ public class PixelMath {
 	 * same instance.
 	 *
 	 * @param input The input image. Not modified.
-	 * @param output Where the sqrt() image is written to. Modified.
+	 * @param output Where the sqrt() image is written to. Can be same as input. Modified.
 	 */
-	public static void sqrt(GrayF32 input , GrayF32 output ) {
+	public static void sqrt( GrayF32 input , GrayF32 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
@@ -5946,11 +5970,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void add(GrayF64 imgA , GrayF64 imgB , GrayF64 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void add( GrayF64 imgA , GrayF64 imgB , GrayF64 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -5974,11 +5999,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void subtract(GrayF64 imgA , GrayF64 imgB , GrayF64 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void subtract( GrayF64 imgA , GrayF64 imgB , GrayF64 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -6002,11 +6028,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void multiply(GrayF64 imgA , GrayF64 imgB , GrayF64 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void multiply( GrayF64 imgA , GrayF64 imgB , GrayF64 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -6030,11 +6057,12 @@ public class PixelMath {
 	 * </p>
 	 * @param imgA Input image. Not modified.
 	 * @param imgB Input image. Not modified.
-	 * @param output Output image. Modified.
+	 * @param output Output image. Can be either input. Modified.
 	 */
-	public static void divide(GrayF64 imgA , GrayF64 imgB , GrayF64 output ) {
-		InputSanityCheck.checkSameShape(imgA,imgB,output);
-		
+	public static void divide( GrayF64 imgA , GrayF64 imgB , GrayF64 output ) {
+		InputSanityCheck.checkSameShape(imgA,imgB);
+		output.reshape(imgA.width,imgA.height);
+
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
@@ -6058,9 +6086,9 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the log image is written to. Modified.
 	 */
-	public static void log(GrayF64 input , GrayF64 output ) {
+	public static void log( GrayF64 input , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
@@ -6077,11 +6105,11 @@ public class PixelMath {
 	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the 
 	 * same instance.	 *
 	 * @param input The input image. Not modified.
-	 * @param output Where the pow2 image is written to. Modified.
+	 * @param output Where the pow2 image is written to. Can be same as input. Modified.
 	 */
-	public static void pow2(GrayF64 input , GrayF64 output ) {
+	public static void pow2( GrayF64 input , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
@@ -6100,11 +6128,11 @@ public class PixelMath {
 	 * same instance.
 	 *
 	 * @param input The input image. Not modified.
-	 * @param output Where the sqrt() image is written to. Modified.
+	 * @param output Where the sqrt() image is written to. Can be same as input. Modified.
 	 */
-	public static void sqrt(GrayF64 input , GrayF64 output ) {
+	public static void sqrt( GrayF64 input , GrayF64 output ) {
 
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;

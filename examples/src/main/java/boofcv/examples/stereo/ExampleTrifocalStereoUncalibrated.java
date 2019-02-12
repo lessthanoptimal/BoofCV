@@ -31,7 +31,7 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.feature.associate.AssociateThreeByPairs;
-import boofcv.alg.filter.derivative.LaplacianEdge;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -40,6 +40,7 @@ import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic;
 import boofcv.alg.geo.selfcalib.SelfCalibrationLinearDualQuadratic.Intrinsic;
 import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
 import boofcv.core.image.ConvertImage;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
@@ -463,8 +464,8 @@ public class ExampleTrifocalStereoUncalibrated {
 		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
 		GrayS16 derivLeft = new GrayS16(width,height);
 		GrayS16 derivRight = new GrayS16(width,height);
-		LaplacianEdge.process(rectifiedLeft, derivLeft);
-		LaplacianEdge.process(rectifiedRight,derivRight);
+		GImageDerivativeOps.laplace(rectifiedLeft, derivLeft, BorderType.EXTENDED);
+		GImageDerivativeOps.laplace(rectifiedRight,derivRight, BorderType.EXTENDED);
 
 		// process and return the results
 		disparityAlg.process(derivLeft, derivRight);

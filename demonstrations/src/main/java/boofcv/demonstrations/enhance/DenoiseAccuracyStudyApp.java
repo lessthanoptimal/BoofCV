@@ -160,7 +160,7 @@ public class DenoiseAccuracyStudyApp {
 
 	private double computeEdgeMSE(GrayF32 imageInv) {
 		GrayF32 edge = new GrayF32(imageInv.width,imageInv.height);
-		LaplacianEdge.process(image,edge);
+		LaplacianEdge.process(image,edge,null);
 		PixelMath.abs(edge,edge);
 		float max = ImageStatistics.maxAbs(edge);
 		PixelMath.divide(edge,max,edge);
@@ -181,7 +181,6 @@ public class DenoiseAccuracyStudyApp {
 		BufferedImage in = UtilImageIO.loadImage(imagePath);
 		image = ConvertBufferedImage.convertFrom(in,(GrayF32)null);
 	}
-
 
 	private void addNoiseToImage() {
 		imageNoisy = image.clone();

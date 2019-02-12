@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -29,7 +29,7 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class GradientPrewitt_Shared {
+public class GradientPrewitt_Shared_MT {
 	public static void process(GrayU8 orig,
 							   GrayS16 derivX,
 							   GrayS16 derivY) {
@@ -41,8 +41,7 @@ public class GradientPrewitt_Shared {
 		final int height = orig.getHeight() - 1;
 		final int strideSrc = orig.getStride();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int indexSrc = orig.startIndex + orig.stride * y + 1;
 			final int endX = indexSrc + width - 2;
 
@@ -61,8 +60,7 @@ public class GradientPrewitt_Shared {
 				//a23 + w - v - a21
 				imgX[indexX++] = (short) ((data[indexSrc + 1] & 0xFF)+w-v-(data[indexSrc - 1] & 0xFF));
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void process(GrayS16 orig,
@@ -76,8 +74,7 @@ public class GradientPrewitt_Shared {
 		final int height = orig.getHeight() - 1;
 		final int strideSrc = orig.getStride();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int indexSrc = orig.startIndex + orig.stride * y + 1;
 			final int endX = indexSrc + width - 2;
 
@@ -96,8 +93,7 @@ public class GradientPrewitt_Shared {
 				//a23 + w - v - a21
 				imgX[indexX++] = (short) ((data[indexSrc + 1] )+w-v-(data[indexSrc - 1] ));
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void process(GrayF32 orig,
@@ -111,8 +107,7 @@ public class GradientPrewitt_Shared {
 		final int height = orig.getHeight() - 1;
 		final int strideSrc = orig.getStride();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int indexSrc = orig.startIndex + orig.stride * y + 1;
 			final int endX = indexSrc + width - 2;
 
@@ -131,7 +126,6 @@ public class GradientPrewitt_Shared {
 				//a23 + w - v - a21
 				imgX[indexX++] = data[indexSrc + 1]+w-v-data[indexSrc - 1];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 }

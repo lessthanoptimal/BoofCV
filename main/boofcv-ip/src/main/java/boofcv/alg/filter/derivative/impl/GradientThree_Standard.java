@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.derivative.impl;
 
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
@@ -45,6 +46,7 @@ public class GradientThree_Standard {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
 		for (int y = 1; y < height; y++) {
 			int indexX = derivX.startIndex + derivX.stride * y + 1;
 			int indexY = derivY.startIndex + derivY.stride * y + 1;
@@ -56,6 +58,7 @@ public class GradientThree_Standard {
 				imgY[indexY++] = (data[indexSrc + stride] - data[indexSrc - stride]) * 0.5f;
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	/**
@@ -70,6 +73,7 @@ public class GradientThree_Standard {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
 		for (int y = 1; y < height; y++) {
 			int indexX = derivX.startIndex + derivX.stride * y + 1;
 			int indexY = derivY.startIndex + derivY.stride * y + 1;
@@ -81,6 +85,7 @@ public class GradientThree_Standard {
 				imgY[indexY++] = (short) ((data[indexSrc + stride] & 0xFF) - (data[indexSrc - stride] & 0xFF));
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	/**
@@ -95,6 +100,7 @@ public class GradientThree_Standard {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
 		for (int y = 1; y < height; y++) {
 			int indexX = derivX.startIndex + derivX.stride * y + 1;
 			int indexY = derivY.startIndex + derivY.stride * y + 1;
@@ -106,6 +112,7 @@ public class GradientThree_Standard {
 				imgY[indexY++] = ((data[indexSrc + stride] & 0xFF) - (data[indexSrc - stride] & 0xFF));
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void process(GrayS16 orig, GrayS16 derivX, GrayS16 derivY) {
@@ -117,6 +124,7 @@ public class GradientThree_Standard {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
 		for (int y = 1; y < height; y++) {
 			int indexX = derivX.startIndex + derivX.stride * y + 1;
 			int indexY = derivY.startIndex + derivY.stride * y + 1;
@@ -128,6 +136,7 @@ public class GradientThree_Standard {
 				imgY[indexY++] = (short) (data[indexSrc + stride] - data[indexSrc - stride]);
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 }

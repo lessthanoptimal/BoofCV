@@ -44,6 +44,10 @@ public abstract class CodeGeneratorBase {
 		autoSelectName();
 	}
 
+	public void parseArguments( String []args ) {
+		// todo fill this in later
+	}
+
 	public void autoSelectName() {
 		String concurrentName = concurrent? "_MT" : "";
 
