@@ -102,6 +102,11 @@ public class TestInterpolatePixelDistortS {
 		public int getFastBorderY() {return 0;}
 
 		@Override
+		public boolean isThreadSafe() {
+			return false;
+		}
+
+		@Override
 		public ImageType getImageType() {return ImageType.single(GrayU8.class);}
 	}
 }

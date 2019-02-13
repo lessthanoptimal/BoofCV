@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,6 +79,11 @@ public class InterpolatePixel_S_to_MB<T extends ImageGray<T>> implements Interpo
 	@Override
 	public int getFastBorderY() {
 		return interp.getFastBorderY();
+	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return interp.isThreadSafe();
 	}
 
 	@Override

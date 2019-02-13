@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -200,6 +200,10 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<Gr
 	@Override
 	public int getFastBorderY() {
 		return kernel.getRadius();
+	}
+	@Override
+	public boolean isThreadSafe() {
+		return true;
 	}
 	@Override
 	public ImageBorder<GrayS16> getBorder() {

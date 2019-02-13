@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,6 +90,11 @@ public class InterpolatePixelDistortS<T extends ImageGray<T>>
 	@Override
 	public int getFastBorderY() {
 		return interpolate.getFastBorderY();
+	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return distorter.isThreadSafe() && interpolate.isThreadSafe();
 	}
 
 	@Override
