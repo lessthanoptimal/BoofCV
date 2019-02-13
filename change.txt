@@ -64,7 +64,10 @@ Version : 0.33
   * Created AutocodeConcurrentApp for generating threaded code from single thread algorithms
   * Created IntRangeConsumer for parallel code that processes a range of numbers in a block
   * Convolution: general, sum, mean, gradient
-  * TODO image distort
+  * Threshold: TODO Block Algorithms, Local Algorithms
+  * TODO PixelMath, ImageStatistics
+- Examples
+  * TODO Swap out Lena as default image
 
 
 TODO This Release

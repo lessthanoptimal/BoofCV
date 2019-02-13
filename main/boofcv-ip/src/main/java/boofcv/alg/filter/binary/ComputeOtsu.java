@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,12 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.struct.image.ImageGray;
-
 /**
  * Computes different variants of Otsu. Can be configured to compute the standard version. This allows the user
  * to better handle textureless regions and can further tune it by scaling the threshold up and down.
  *
- * @see GThresholdImageOps#computeOtsu(ImageGray, int, int)
- * @see GThresholdImageOps#computeOtsu2(ImageGray, int, int)
+ * @see GThresholdImageOps#computeOtsu(int[], int, int)
+ * @see GThresholdImageOps#computeOtsu2(int[], int, int)
  *
  * @author Peter Abeles
  */

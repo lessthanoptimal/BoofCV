@@ -73,13 +73,13 @@ public class GBlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
-	T median(T input, @Nullable T output, int radius ) {
+	T median(T input, @Nullable T output, int radius , @Nullable WorkArrays work) {
 		if( input instanceof GrayU8) {
-			return (T)BlurImageOps.median((GrayU8) input, (GrayU8) output, radius);
+			return (T)BlurImageOps.median((GrayU8) input, (GrayU8) output, radius, (IWorkArrays)work);
 		} else if( input instanceof GrayF32) {
 			return (T)BlurImageOps.median((GrayF32) input, (GrayF32) output, radius);
 		} else if( input instanceof Planar) {
-			return (T)BlurImageOps.median((Planar)input,(Planar)output,radius);
+			return (T)BlurImageOps.median((Planar)input,(Planar)output,radius, work);
 		} else  {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
