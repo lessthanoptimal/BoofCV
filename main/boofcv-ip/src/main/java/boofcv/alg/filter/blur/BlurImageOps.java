@@ -202,10 +202,11 @@ public class BlurImageOps {
 			int offset[] = new int[w * w];
 
 			if( BoofConcurrency.USE_CONCURRENT ) {
-				ImplMedianHistogramInner_MT.process(input, output, radius, offset, work);
+				ImplMedianHistogramInner_MT.process(input, output, radius, work);
 			} else {
-				ImplMedianHistogramInner.process(input, output, radius, offset, work);
+				ImplMedianHistogramInner.process(input, output, radius, work);
 			}
+			// TODO Optimize this algorithm. It is taking up a large percentage of the CPU time
 			ImplMedianSortEdgeNaive.process(input, output, radius, offset);
 		}
 

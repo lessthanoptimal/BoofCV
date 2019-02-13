@@ -40,6 +40,7 @@ import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef_F32;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -191,7 +192,7 @@ public class DenoiseAccuracyStudyApp {
 	public static void main( String args[] ) {
 		DenoiseAccuracyStudyApp app = new DenoiseAccuracyStudyApp();
 
-		String path = UtilIO.pathExample("standard/");
+		String path = UtilIO.pathExample("standard")+ File.separator;
 
 		List<String> fileNames = new ArrayList<>();
 		fileNames.add(path+"barbara.jpg");

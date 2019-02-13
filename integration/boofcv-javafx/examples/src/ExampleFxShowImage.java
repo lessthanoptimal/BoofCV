@@ -15,7 +15,7 @@ public class ExampleFxShowImage extends Application  {
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		Image image = new Image("file://"+UtilIO.pathExample("standard/lena512.jpg"));
+		Image image = new Image("file://"+UtilIO.pathExample("standard/kodim17.jpg"));
 		ImageView imageView = new ImageView();
 		imageView.setImage(image);
 

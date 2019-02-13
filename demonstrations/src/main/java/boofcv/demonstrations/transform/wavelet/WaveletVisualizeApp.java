@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -139,12 +139,12 @@ public class WaveletVisualizeApp
 	}
 
 	public static void main( String args[] ) {
-		BufferedImage in = UtilImageIO.loadImage("data/standard/lena512.bmp");
+		BufferedImage in = UtilImageIO.loadImage("data/standard/kodim17.bmp");
 		WaveletVisualizeApp app = new WaveletVisualizeApp(GrayF32.class);
 //		WaveletVisualizeApp app = new WaveletVisualizeApp(GrayU8.class);
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("lena", UtilIO.pathExample("standard/lena512.jpg")));
+		inputs.add(new PathLabel("lena", UtilIO.pathExample("standard/kodim17.jpg")));
 		inputs.add(new PathLabel("boat",UtilIO.pathExample("standard/boat.jpg")));
 		inputs.add(new PathLabel("fingerprint",UtilIO.pathExample("standard/fingerprint.jpg")));
 		inputs.add(new PathLabel("shapes",UtilIO.pathExample("shapes/shapes01.png")));

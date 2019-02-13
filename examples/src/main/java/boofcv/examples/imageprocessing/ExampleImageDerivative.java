@@ -39,6 +39,9 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleImageDerivative {
 	public static void main(String[] args) {
+		// Uncomment to turn on concurrent code. For each physical core/cpu the code runs about 1x faster
+		//BoofConcurrency.USE_CONCURRENT = true;
+
 		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
 
 		// We will use floating point images here, but GrayU8 with GrayS16 for derivatives also works

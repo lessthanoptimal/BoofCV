@@ -323,7 +323,7 @@ public class DenoiseVisualizeApp<T extends ImageGray<T>,D extends ImageGray<D>,W
 		DenoiseVisualizeApp app = new DenoiseVisualizeApp(GrayF32.class);
 
 		List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("lena", UtilIO.pathExample("standard/lena512.jpg")));
+		inputs.add(new PathLabel("Kodak17", UtilIO.pathExample("standard/kodim17.jpg")));
 		inputs.add(new PathLabel("barbara",UtilIO.pathExample("standard/barbara.jpg")));
 		inputs.add(new PathLabel("boat",UtilIO.pathExample("standard/boat.jpg")));
 		inputs.add(new PathLabel("fingerprint",UtilIO.pathExample("standard/fingerprint.jpg")));

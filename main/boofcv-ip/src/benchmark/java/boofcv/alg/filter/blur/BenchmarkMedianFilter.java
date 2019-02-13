@@ -75,7 +75,7 @@ public class BenchmarkMedianFilter  {
 
 	public int timeHistogram_I8(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplMedianHistogramInner.process(imgInt8,out_I8,radius,null,null);
+			ImplMedianHistogramInner.process(imgInt8,out_I8,radius,null);
 		return 0;
 	}
 

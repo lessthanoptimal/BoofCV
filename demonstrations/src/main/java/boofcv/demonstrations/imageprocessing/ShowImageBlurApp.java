@@ -77,7 +77,10 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 
 		renderedImage = ConvertBufferedImage.checkDeclare(width,height,renderedImage,BufferedImage.TYPE_INT_RGB);
 
-		gui.setPreferredSize(new Dimension(width,height));
+		SwingUtilities.invokeLater(()->{
+			gui.setPreferredSize(new Dimension(width,height));
+			controls.setImageSize(width,height);
+		});
 	}
 
 
@@ -140,6 +143,7 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 
 	class BlurControls extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
 		JLabel labelTime = new JLabel();
+		JLabel labelSize = new JLabel();
 		JSpinner spinnerRadius;
 		JComboBox<String> comboAlg;
 
@@ -147,13 +151,21 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 			spinnerRadius = spinner(radius,1,100,2);
 			comboAlg=combo(0,"Gaussian","Mean","Median");
 
+			labelTime.setPreferredSize(new Dimension(70,26));
+			labelTime.setHorizontalAlignment(SwingConstants.RIGHT);
+
 			addLabeled(labelTime,"Time (ms)");
-			addAlignCenter(comboAlg);
+			add(labelSize);
+			addAlignLeft(comboAlg);
 			addLabeled(spinnerRadius,"Radius");
 		}
 
 		public void setTime( double milliseconds ) {
 			labelTime.setText(String.format("%.1f",milliseconds));
+		}
+
+		public void setImageSize( int width , int height ) {
+			labelSize.setText(width+" x "+height);
 		}
 
 		@Override
@@ -173,16 +185,17 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 		}
 	}
 
-
 	public static void main(String args[]) {
 		BoofConcurrency.USE_CONCURRENT = true;
 
 		java.util.List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("Horses", UtilIO.pathExample("segment/berkeley_horses.jpg")));
+		examples.add(new PathLabel("Human Statue", UtilIO.pathExample("standard/kodim17.jpg")));
 		examples.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
 		examples.add(new PathLabel("Kangaroo", UtilIO.pathExample("segment/berkeley_kangaroo.jpg")));
 		examples.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		examples.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
+		examples.add(new PathLabel("Face Paint", UtilIO.pathExample("standard/kodim15.jpg")));
 
 		SwingUtilities.invokeLater(()->{
 			ShowImageBlurApp app = new ShowImageBlurApp(examples,GrayU8.class);

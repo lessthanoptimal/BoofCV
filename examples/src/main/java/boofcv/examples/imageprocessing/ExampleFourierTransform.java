@@ -142,7 +142,7 @@ public class ExampleFourierTransform {
 
 	public static void main( String args[] ) {
 
-		GrayF32 input = UtilImageIO.loadImage(UtilIO.pathExample("standard/lena512.jpg"), GrayF32.class);
+		GrayF32 input = UtilImageIO.loadImage(UtilIO.pathExample("standard/kodim17.jpg"), GrayF32.class);
 
 		applyBoxFilter(input.clone());
 	}

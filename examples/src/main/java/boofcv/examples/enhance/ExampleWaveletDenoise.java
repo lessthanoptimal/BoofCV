@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class ExampleWaveletDenoise {
 
 		// load the input image, declare data structures, create a noisy image
 		Random rand = new Random(234);
-		GrayF32 input = UtilImageIO.loadImage(UtilIO.pathExample("standard/lena512.jpg"),GrayF32.class);
+		GrayF32 input = UtilImageIO.loadImage(UtilIO.pathExample("standard/kodim17.jpg"),GrayF32.class);
 
 		GrayF32 noisy = input.clone();
 		GImageMiscOps.addGaussian(noisy, rand, 20, 0, 255);

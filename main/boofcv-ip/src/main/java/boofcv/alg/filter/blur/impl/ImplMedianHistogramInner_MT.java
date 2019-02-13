@@ -28,12 +28,13 @@ import java.util.Arrays;
 /**
  * <p>
  * A faster version of the histogram median filter that only processes the inner portion of the image.  Instead of
- * rebuilding the histogram from scratch for each pixel the histogram is updated using results from the previous pixel.  
+ * rebuilding the histogram from scratch for each pixel the histogram is updated using results from the previous pixel.
+ * When computing the histogram the previous median is used as a hint to the new median. The original implementation
+ * is similar to the algorithm proposed in [1]. If you need to cite something cite this library and mention that paper.
  * </p>
  *
  * <p>
- * Based on the description in some papers I believe this algorithm is similar to the one proposed in:<br>
- * Huang, T.S., Yang, G.J. and Tang, G.Y. (1979) A fast two-dimensional median filtering algorithm. IEEE Trans.
+ * [1] Huang, T.S., Yang, G.J. and Tang, G.Y. (1979) A fast two-dimensional median filtering algorithm. IEEE Trans.
  * Acoust. Speech Signal Process. 27, 13-18
  * </p>
  * @author Peter Abeles
@@ -46,11 +47,10 @@ public class ImplMedianHistogramInner_MT {
 	 * @param input Input image. Not modified.
 	 * @param output Filtered output image. Modified.
 	 * @param radius Size of the filter region.
-	 * @param offset Array used to store relative pixel offsets.
 	 * @param work (Optional) used to create local workspace
 	 */
 	public static void process(GrayU8 input, GrayU8 output , int radius,
-							   @Nullable int[] offset, @Nullable IWorkArrays work )
+							   @Nullable IWorkArrays work )
 	{
 		if( work == null )
 			work = new IWorkArrays();
@@ -58,77 +58,82 @@ public class ImplMedianHistogramInner_MT {
 		final IWorkArrays _work = work;
 
 		int w = 2*radius+1;
-		if( offset == null ) {
-			offset = new int[ w*w ];
-		} else if( offset.length < w*w ) {
-			throw new IllegalArgumentException("'offset' must be at least of length "+(w*w));
-		}
-		final int[] _offset = offset;
-
 		int threshold = (w*w)/2+1;
-
-		// compute image offsets
-		int index = 0;
-		for( int i = -radius; i <= radius; i++ ) {
-			for( int j = -radius; j <= radius; j++ ) {
-				offset[index++] = i*input.stride + j;
-			}
-		}
-
-		int boxWidth = radius*2+1;
 
 		BoofConcurrency.blocks(radius, output.height-radius, w,(y0,y1)->{
 		int[] histogram = _work.pop();
 		for( int y = y0; y < y1; y++ ) {
-			int seed = input.startIndex + y*input.stride+radius;
+			int seed = input.startIndex + (y-radius)*input.stride;
 			Arrays.fill(histogram,0);
 
 			// compute the median value for the first x component and initialize the system
-			for( int i = 0; i < _offset.length; i++ ) {
-				int val = input.data[seed+_offset[i]] & 0xFF;
-//					System.out.println(val);
-				histogram[val]++;
+			for( int i = 0; i < w; i++ ) {
+				addSide(input.data,input.stride, w, histogram, seed+i,256);
 			}
 
 			int count = 0;
 			int median;
-			for( median = 0; median < 256; median++ ) {
+			for( median = 0; count < threshold; median++ ) {
 				count += histogram[median];
-				if( count >= threshold )
-					break;
 			}
 			output.data[ output.startIndex+y*output.stride+radius] = (byte)median;
 
 			// remove the left most pixel from the histogram
-			for( int i = 0; i < _offset.length; i += boxWidth ) {
-				int val = input.data[seed+_offset[i]] & 0xFF;
-				histogram[val]--;
-			}
+			count += removeSide(input.data,input.stride, w, histogram, seed, median);
 
 			for( int x = radius+1; x < input.width-radius; x++ ) {
-				seed = input.startIndex + y*input.stride+x;
+				seed = input.startIndex + (y-radius)*input.stride+(x-radius);
 
 				// add the right most pixels to the histogram
-				for( int i = boxWidth-1; i < _offset.length; i += boxWidth ) {
-					int val = input.data[seed+_offset[i]] & 0xFF;
-					histogram[val]++;
-				}
+				count += addSide(input.data,input.stride, w, histogram, seed+w-1, median);
 
-				// find the median
-				count = 0;
-				for( median = 0; median < 256; median++ ) {
+				// find the median, using the previous solution as a starting point
+				if( count >= threshold ) {
+					while( count >= threshold ) {
+						count -= histogram[median--];
+					}
+					median += 1;
 					count += histogram[median];
-					if( count >= threshold )
-						break;
+				} else {
+					while( count < threshold ) {
+						median += 1;
+						count += histogram[median];
+					}
 				}
 				output.data[ output.startIndex+y*output.stride+x] = (byte)median;
 
 				// remove the left most pixels from the histogram
-				for( int i = 0; i < _offset.length; i += boxWidth ) {
-					int val = input.data[seed+_offset[i]] & 0xFF;
-					histogram[val]--;
-				}
+				count += removeSide(input.data,input.stride, w, histogram, seed, median);
 			}
 		}});
 	}
+
+	private static int removeSide(final byte[] data, final int stride, final int width, int[] histogram,
+								   int seedIdx, int oldMedian)
+	{
+		int count = 0;
+		for( int i = 0; i < width; i++, seedIdx += stride ) {
+			int value = data[seedIdx]&0xFF;
+			histogram[value]--;
+			if( value <= oldMedian ) {
+				count--;
+			}
+		}
+		return count;
+	}
+
+	private static int addSide(final byte[] data, final int stride, final int width, int[] histogram,
+								   int seedIdx, int oldValue)
+	{
+		int count = 0;
+		for( int i = 0; i < width; i++, seedIdx += stride ) {
+			int value = data[seedIdx]&0xFF;
+			histogram[value]++;
+			if( value <= oldValue ) {
+				count++;
+			}
+		}
+		return count;
+	}
+
 }

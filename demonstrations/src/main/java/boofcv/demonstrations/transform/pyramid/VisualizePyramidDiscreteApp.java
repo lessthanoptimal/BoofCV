@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,7 +100,7 @@ public class VisualizePyramidDiscreteApp <T extends ImageGray<T>>
 		VisualizePyramidDiscreteApp<GrayF32> app = new VisualizePyramidDiscreteApp<>(GrayF32.class);
 
 		List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("lena", UtilIO.pathExample("standard/lena512.jpg")));
+		inputs.add(new PathLabel("lena", UtilIO.pathExample("standard/kodim17.jpg")));
 		inputs.add(new PathLabel("boat",UtilIO.pathExample("standard/boat.jpg")));
 		inputs.add(new PathLabel("fingerprint",UtilIO.pathExample("standard/fingerprint.jpg")));
 
