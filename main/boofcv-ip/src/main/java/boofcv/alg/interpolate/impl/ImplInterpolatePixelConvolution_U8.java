@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -201,6 +201,12 @@ public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixelS<Gra
 	public int getFastBorderY() {
 		return kernel.getRadius();
 	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return true;
+	}
+
 	@Override
 	public ImageBorder<GrayU8> getBorder() {
 		return border;

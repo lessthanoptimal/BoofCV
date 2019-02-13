@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.distort.spherical;
 
-import boofcv.struct.distort.PixelTransform2_F32;
 import georegression.misc.GrlConstants;
+import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,32 +37,33 @@ public class TestEquirectangularRotate_F32 {
 
 		EquirectangularRotate_F32 alg = new EquirectangularRotate_F32();
 		alg.setEquirectangularShape(300,251);
+		Point2D_F32 p = new Point2D_F32();
 
 		// this is the standard configuration and there should be no change
 		alg.setDirection(0,0,0);
-		alg.compute((int)(300.0f*0.5f), 250/2);
-		assertMatch( alg, 300.0f*0.5f, 250/2);
+		alg.compute((int)(300.0f*0.5f), 250/2, p);
+		assertMatch( p, 300.0f*0.5f, 250/2);
 
 		alg.setDirection( (float)Math.PI/2.0f,0,0);
-		alg.compute((int)(300.0f*0.5f), 250/2);
-		assertMatch( alg, 300.0f*0.75f, 250/2);
+		alg.compute((int)(300.0f*0.5f), 250/2, p);
+		assertMatch( p, 300.0f*0.75f, 250/2);
 
 		alg.setDirection(0, (float)Math.PI/2,0);
-		alg.compute((int)(300.0f*0.5f), 250/2);
-		assertEquals( 0 , alg.distY, GrlConstants.TEST_F32); //pathological.  only check y
+		alg.compute((int)(300.0f*0.5f), 250/2, p);
+		assertEquals( 0 , p.y, GrlConstants.TEST_F32); //pathological.  only check y
 
 		alg.setDirection(0, (float)-Math.PI/2,0);
-		alg.compute((int)(300.0f*0.5f), 250/2);
-		assertEquals( 250 , alg.distY, GrlConstants.TEST_F32); //pathological.  only check y
+		alg.compute((int)(300.0f*0.5f), 250/2, p);
+		assertEquals( 250 , p.y, GrlConstants.TEST_F32); //pathological.  only check y
 
 		alg.setDirection(0, (float)Math.PI/4.0f,0);
-		alg.compute((int)(300.0f*0.5f), 250/2);
-		assertMatch( alg, 300.0f*0.5f, 250/4+0.5f);
+		alg.compute((int)(300.0f*0.5f), 250/2, p);
+		assertMatch( p, 300.0f*0.5f, 250/4+0.5f);
 		// 0.5f is fudge to make the test pass.  I *think* it's just discretation error
 	}
 
-	private void assertMatch(PixelTransform2_F32 tran , float x , float y ) {
-		assertEquals( x , tran.distX, GrlConstants.TEST_F32);
-		assertEquals( y , tran.distY, GrlConstants.TEST_F32);
+	private void assertMatch(Point2D_F32 tran , float x , float y ) {
+		assertEquals( x , tran.x, GrlConstants.TEST_F32);
+		assertEquals( y , tran.y, GrlConstants.TEST_F32);
 	}
 }

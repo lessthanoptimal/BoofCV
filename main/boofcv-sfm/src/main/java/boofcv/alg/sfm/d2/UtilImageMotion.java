@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.sfm.d2;
 
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.PixelTransformHomography_F32;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import georegression.struct.ConvertFloatType;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.affine.Affine2D_F32;
@@ -28,6 +28,7 @@ import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.affine.UtilAffine;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.homography.Homography2D_F64;
+import georegression.struct.point.Point2D_F32;
 
 /**
  * @author Peter Abeles
@@ -40,8 +41,8 @@ public class UtilImageMotion {
 	 * @param transform Motion transform
 	 * @return PixelTransform_F32 used to distort the image
 	 */
-	public static PixelTransform2_F32 createPixelTransform(InvertibleTransform transform) {
-		PixelTransform2_F32 pixelTran;
+	public static PixelTransform<Point2D_F32> createPixelTransform(InvertibleTransform transform) {
+		PixelTransform<Point2D_F32> pixelTran;
 		if( transform instanceof Homography2D_F64) {
 			Homography2D_F32 t = ConvertFloatType.convert((Homography2D_F64) transform, null);
 			pixelTran = new PixelTransformHomography_F32(t);

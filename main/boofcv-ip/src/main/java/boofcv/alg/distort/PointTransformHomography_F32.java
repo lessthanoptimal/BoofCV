@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,5 +69,10 @@ public class PointTransformHomography_F32 implements Point2Transform2Model_F32<H
 	@Override
 	public Homography2D_F32 newInstanceModel() {
 		return new Homography2D_F32();
+	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return true;
 	}
 }

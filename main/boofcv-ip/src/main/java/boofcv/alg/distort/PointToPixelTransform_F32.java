@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,19 +18,17 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F32;
 import georegression.struct.point.Point2D_F32;
 
 /**
- * Allows a {@link PointToPixelTransform_F32} to be invoked as a {@link PixelTransform2_F32}.
+ * Allows a {@link PointToPixelTransform_F32} to be invoked as a {@link PixelTransform}.
  *
  * @author Peter Abeles
  */
-public class PointToPixelTransform_F32 extends PixelTransform2_F32 {
+public class PointToPixelTransform_F32 implements PixelTransform<Point2D_F32> {
 	Point2Transform2_F32 alg;
-
-	Point2D_F32 point = new Point2D_F32();
 
 	public PointToPixelTransform_F32(Point2Transform2_F32 alg) {
 		this.alg = alg;
@@ -44,9 +42,12 @@ public class PointToPixelTransform_F32 extends PixelTransform2_F32 {
 	}
 
 	@Override
-	public void compute(int x, int y) {
-		alg.compute(x,y,point);
-		distX = point.x;
-		distY = point.y;
+	public void compute(int x, int y, Point2D_F32 output ) {
+		alg.compute(x,y,output);
+	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return alg.isThreadSafe();
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,6 +43,11 @@ public class PointDeform_MLS implements PointDeformKeyPoints
 	@Override
 	public void compute(float x, float y, Point2D_F32 out) {
 		alg.compute(x,y, out);
+	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return alg.isThreadSafe();
 	}
 
 	@Override

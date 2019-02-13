@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -282,6 +282,7 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 		int pointsPerEdge = 12;
 		Point2D_F32 corners[] = new Point2D_F32[pointsPerEdge*4];
 		Line2D.Double line0 = new Line2D.Double();
+		Point2D_F32 distored = new Point2D_F32();
 
 		public EquiViewPanel() {
 			for (int i = 0; i < corners.length; i++) {
@@ -338,14 +339,13 @@ public class EquirectangularPinholeApp<T extends ImageBase<T>> extends Demonstra
 			}
 		}
 
-
 		private void renderLine( int x0 , int y0 , int x1 , int y1 , int segments , int offset ) {
 			for (int i = 0; i < segments; i++) {
 				int x = (x1-x0)*i/segments + x0;
 				int y = (y1-y0)*i/segments + y0;
 
-				distorter.compute(x,y);
-				corners[i+offset].set(distorter.distX,distorter.distY);
+				distorter.compute(x,y,distored);
+				corners[i+offset].set(distored.x,distored.y);
 			}
 		}
 	}

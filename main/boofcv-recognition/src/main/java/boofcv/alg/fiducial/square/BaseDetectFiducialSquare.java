@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -185,8 +185,8 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 			Point2Transform2_F32 pointSquareToInput;
 			Point2Transform2_F32 pointDistToUndist = distortion.undistort_F32(true, true);
 			Point2Transform2_F32 pointUndistToDist = distortion.distort_F32(true, true);
-			PixelTransform2_F32 distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
-			PixelTransform2_F32 undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
+			PixelTransform<Point2D_F32> distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
+			PixelTransform<Point2D_F32> undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
 
 			// Sanity check to see if the camera model has no lens distortion. If there is no lens distortion then
 			// there's no need to do distort/undistort the image and everything will run faster
@@ -205,7 +205,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 				pointSquareToInput = new SequencePoint2Transform2_F32(transformHomography, pointUndistToDist);
 
 				// provide intrinsic camera parameters
-				PixelTransform2_F32 squareToInput = new PointToPixelTransform_F32(pointSquareToInput);
+				PixelTransform<Point2D_F32> squareToInput = new PointToPixelTransform_F32(pointSquareToInput);
 				removePerspective.setModel(squareToInput);
 
 				this.undistToDist = distortion.distort_F64(true, true);

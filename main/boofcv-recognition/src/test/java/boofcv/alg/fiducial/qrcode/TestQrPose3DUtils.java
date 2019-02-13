@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,10 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.PointIndex2D_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
@@ -127,10 +129,16 @@ public class TestQrPose3DUtils {
 
 	private QrPose3DUtils createAlg() {
 		QrPose3DUtils alg = new QrPose3DUtils();
-		alg.setLensDistortion((x, y, out) -> {
-			// just change the point's scale to make it easy to see if it was applied
-			out.x = x*0.1;
-			out.y = y*0.1;
+		alg.setLensDistortion(new Point2Transform2_F64() {
+			@Override
+			public void compute(double x, double y, Point2D_F64 out) {
+				// just change the point's scale to make it easy to see if it was applied
+				out.x = x*0.1;
+				out.y = y*0.1;
+			}
+
+			@Override
+			public boolean isThreadSafe() {return true;}
 		},null);
 		return alg;
 	}

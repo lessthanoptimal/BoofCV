@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,11 @@
 package boofcv.alg.shapes.ellipse;
 
 import boofcv.alg.filter.binary.ContourPacked;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.curve.EllipseRotated_F64;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
@@ -83,7 +84,7 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 	 * @param distToUndist Transform from distorted to undistorted image.
 	 * @param undistToDist Transform from undistorted to distorted image.
 	 */
-	public void setLensDistortion(PixelTransform2_F32 distToUndist , PixelTransform2_F32 undistToDist ) {
+	public void setLensDistortion(PixelTransform<Point2D_F32> distToUndist , PixelTransform<Point2D_F32> undistToDist ) {
 		this.ellipseDetector.setLensDistortion(distToUndist);
 		if( this.ellipseRefiner != null )
 			this.ellipseRefiner.setTransform(undistToDist);

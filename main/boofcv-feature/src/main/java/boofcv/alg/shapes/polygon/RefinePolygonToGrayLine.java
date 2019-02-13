@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,11 +19,12 @@
 package boofcv.alg.shapes.polygon;
 
 import boofcv.alg.shapes.edge.SnapToLineEdge;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilLine2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.line.LineGeneral2D_F64;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
@@ -46,7 +47,7 @@ import georegression.struct.shapes.Polygon2D_F64;
  * </p>
  *
  * <p>For input polygons which are in undistorted coordinates by with a distorted image call {@link #getSnapToEdge()}
- * and invoke {@link SnapToLineEdge#setTransform(PixelTransform2_F32)}.</p>
+ * and invoke {@link SnapToLineEdge#setTransform(PixelTransform<Point2D_F32>)}.</p>
  *
  * @author Peter Abeles
  */
@@ -125,7 +126,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 	}
 
 	@Override
-	public void setLensDistortion(int width, int height, PixelTransform2_F32 distToUndist, PixelTransform2_F32 undistToDist) {
+	public void setLensDistortion(int width, int height, PixelTransform<Point2D_F32> distToUndist, PixelTransform<Point2D_F32> undistToDist) {
 		this.snapToEdge.setTransform(undistToDist);
 	}
 
@@ -282,7 +283,7 @@ public class RefinePolygonToGrayLine<T extends ImageGray<T>> implements RefinePo
 	 *
 	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image..
 	 */
-	public void setTransform( PixelTransform2_F32 undistToDist ) {
+	public void setTransform( PixelTransform<Point2D_F32> undistToDist ) {
 		snapToEdge.setTransform(undistToDist);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,10 @@ import boofcv.alg.fiducial.calib.DetectFiducialSquareGrid;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.factory.fiducial.FactoryFiducial;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayF32;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.List;
@@ -121,8 +122,8 @@ public class CalibrationDetectorSquareFiducialGrid implements DetectorFiducialCa
 		else {
 			Point2Transform2_F32 pointDistToUndist = distortion.undistort_F32(true, true);
 			Point2Transform2_F32 pointUndistToDist = distortion.distort_F32(true, true);
-			PixelTransform2_F32 distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
-			PixelTransform2_F32 undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
+			PixelTransform<Point2D_F32> distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
+			PixelTransform<Point2D_F32> undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
 
 			detector.getDetector().getSquareDetector().setLensDistortion(width,height,distToUndist,undistToDist);
 		}

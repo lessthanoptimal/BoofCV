@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,13 +40,14 @@ public class TestPixelTransformHomography_F32 {
 		PixelTransformHomography_F32 alg = new PixelTransformHomography_F32();
 		alg.set(a);
 
-		alg.compute(2,3);
+		Point2D_F32 distorted = new Point2D_F32();
+		alg.compute(2,3, distorted);
 		Point2D_F32 p = new Point2D_F32(2,3);
 		Point2D_F32 expected = new Point2D_F32();
 		HomographyPointOps_F32.transform(a, p, expected);
 
-		assertEquals(expected.x,alg.distX,1e-4);
-		assertEquals(expected.y,alg.distY,1e-4);
+		assertEquals(expected.x,distorted.x,1e-4);
+		assertEquals(expected.y,distorted.y,1e-4);
 	}
 
 	@Test
@@ -56,12 +57,13 @@ public class TestPixelTransformHomography_F32 {
 		PixelTransformHomography_F32 alg = new PixelTransformHomography_F32();
 		alg.set(a);
 
-		alg.compute(2,3);
+		Point2D_F32 distorted = new Point2D_F32();
+		alg.compute(2,3, distorted);
 		Point2D_F64 p = new Point2D_F64(2,3);
 		Point2D_F64 expected = new Point2D_F64();
 		HomographyPointOps_F64.transform(a, p, expected);
 
-		assertEquals(expected.x,alg.distX,1e-4);
-		assertEquals(expected.y,alg.distY,1e-4);
+		assertEquals(expected.x,distorted.x,1e-4);
+		assertEquals(expected.y,distorted.y,1e-4);
 	}
 }

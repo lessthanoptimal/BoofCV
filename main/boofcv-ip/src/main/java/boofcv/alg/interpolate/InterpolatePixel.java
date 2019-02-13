@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,14 +48,14 @@ public interface InterpolatePixel<T extends ImageBase<T>> {
 	 *
 	 * @param image An image.
 	 */
-	public void setImage(T image);
+	void setImage(T image);
 
 	/**
 	 * Returns the image which is being interpolated.
 	 *
 	 * @return A reference to the image being interpolated.
 	 */
-	public T getImage();
+	T getImage();
 
 	/**
 	 * Is the requested pixel inside the image boundary for which fast unsafe interpolation can be performed.
@@ -64,25 +64,31 @@ public interface InterpolatePixel<T extends ImageBase<T>> {
 	 * @param y Point's y-coordinate.
 	 * @return  true if get_fast() can be called.
 	 */
-	public boolean isInFastBounds(float x, float y);
+	boolean isInFastBounds(float x, float y);
 
 	/**
 	 * Border around the image that fast interpolation cannot be called.
 	 *
 	 * @return Border size in pixels
 	 */
-	public int getFastBorderX();
+	int getFastBorderX();
 
 	/**
 	 * Border around the image that fast interpolation cannot be called.
 	 *
 	 * @return Border size in pixels
 	 */
-	public int getFastBorderY();
+	int getFastBorderY();
+
+	/**
+	 * If it returns true it is threadsafe and can be used inside of concurrent code
+	 * @return true for thread safe and false for not
+	 */
+	boolean isThreadSafe();
 
 	/**
 	 * Type of image it can process
 	 */
-	public ImageType<T> getImageType();
+	ImageType<T> getImageType();
 
 }

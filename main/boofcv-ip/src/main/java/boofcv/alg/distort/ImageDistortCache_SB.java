@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
@@ -41,7 +41,7 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 	private InterpolatePixelS<Input> interp;
 
 	// transform
-	private PixelTransform2_F32 dstToSrc;
+	private PixelTransform<Point2D_F32> dstToSrc;
 
 	// crop boundary
 	private int x0,y0,x1,y1;
@@ -63,7 +63,7 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 	}
 
 	@Override
-	public void setModel(PixelTransform2_F32 dstToSrc) {
+	public void setModel(PixelTransform<Point2D_F32> dstToSrc) {
 		this.dirty = true;
 		this.dstToSrc = dstToSrc;
 	}
@@ -116,8 +116,7 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 			int index = 0;
 			for( int y = 0; y < height; y++ ) {
 				for( int x = 0; x < width; x++ ) {
-					dstToSrc.compute(x,y);
-					map[index++].set(dstToSrc.distX,dstToSrc.distY);
+					dstToSrc.compute(x,y,map[index++]);
 				}
 			}
 			dirty = false;
@@ -211,7 +210,7 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 		return interp;
 	}
 
-	public PixelTransform2_F32 getDstToSrc() {
+	public PixelTransform<Point2D_F32> getDstToSrc() {
 		return dstToSrc;
 	}
 
@@ -226,7 +225,7 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 	}
 
 	@Override
-	public PixelTransform2_F32 getModel() {
+	public PixelTransform<Point2D_F32> getModel() {
 		return dstToSrc;
 	}
 }

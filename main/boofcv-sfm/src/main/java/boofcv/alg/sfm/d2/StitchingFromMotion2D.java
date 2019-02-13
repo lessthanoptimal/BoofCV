@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,11 +22,12 @@ import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageBase;
 import georegression.metric.Area2D_F64;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.homography.Homography2D_F64;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.RectangleLength2D_I32;
 
@@ -76,8 +77,9 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 	// storage for the transform from current frame to the initial frame
 	private IT worldToCurr;
 
-	private PixelTransform2_F32 tranWorldToCurr;
-	private PixelTransform2_F32 tranCurrToWorld;
+	private PixelTransform<Point2D_F32> tranWorldToCurr;
+	private PixelTransform<Point2D_F32> tranCurrToWorld;
+	private Point2D_F32 work = new Point2D_F32();
 
 	// storage for the stitched image
 	private I stitchedImage;
@@ -200,7 +202,7 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 
 		// only process a cropped portion to speed up processing
 		RectangleLength2D_I32 box = DistortImageOps.boundBox(image.width, image.height,
-				stitchedImage.width, stitchedImage.height, tranCurrToWorld);
+				stitchedImage.width, stitchedImage.height,work, tranCurrToWorld);
 
 		int x0 = box.x0;
 		int y0 = box.y0;
@@ -231,7 +233,7 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 		IT currToWorld = (IT)worldToCurr.invert(null);
 		IT oldWorldToNewWorld = (IT) worldToInit.concat(currToWorld,null);
 
-		PixelTransform2_F32 newToOld = converter.convertPixel(oldWorldToNewWorld,null);
+		PixelTransform<Point2D_F32> newToOld = converter.convertPixel(oldWorldToNewWorld,null);
 
 		// fill in the background color
 		GImageMiscOps.fill(workImage, 0);
@@ -265,7 +267,7 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 		workImage.reshape(widthStitch,heightStitch);
 		GImageMiscOps.fill(workImage, 0);
 		if( newToOldStitch != null ) {
-			PixelTransform2_F32 newToOld = converter.convertPixel(newToOldStitch,null);
+			PixelTransform<Point2D_F32> newToOld = converter.convertPixel(newToOldStitch,null);
 			distorter.setModel(newToOld);
 			distorter.apply(stitchedImage, workImage);
 
@@ -302,10 +304,10 @@ public class StitchingFromMotion2D<I extends ImageBase<I>, IT extends Invertible
 		int w = width;
 		int h = height;
 
-		tranCurrToWorld.compute(0,0); corners.p0.set(tranCurrToWorld.distX, tranCurrToWorld.distY);
-		tranCurrToWorld.compute(w,0); corners.p1.set(tranCurrToWorld.distX, tranCurrToWorld.distY);
-		tranCurrToWorld.compute(w,h); corners.p2.set(tranCurrToWorld.distX, tranCurrToWorld.distY);
-		tranCurrToWorld.compute(0,h); corners.p3.set(tranCurrToWorld.distX, tranCurrToWorld.distY);
+		tranCurrToWorld.compute(0,0,work); corners.p0.set(work.x, work.y);
+		tranCurrToWorld.compute(w,0,work);    corners.p1.set(work.x, work.y);
+		tranCurrToWorld.compute(w,h,work);       corners.p2.set(work.x, work.y);
+		tranCurrToWorld.compute(0,h,work);    corners.p3.set(work.x, work.y);
 
 		return corners;
 	}

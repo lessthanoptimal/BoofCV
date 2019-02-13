@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,4 +78,10 @@ public abstract class NearestNeighborPixelMB<T extends ImageMultiBand<T>> implem
 	public ImageType<T> getImageType() {
 		return orig.getImageType();
 	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return true;
+	}
+
 }

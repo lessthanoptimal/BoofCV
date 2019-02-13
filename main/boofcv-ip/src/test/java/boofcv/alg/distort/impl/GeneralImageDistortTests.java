@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,9 +25,10 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -58,7 +59,7 @@ public abstract class GeneralImageDistortTests<T extends ImageBase<T>> {
 
 	}
 
-	public abstract ImageDistort<T,T> createDistort(PixelTransform2_F32 dstToSrc, InterpolatePixel<T> interp );
+	public abstract ImageDistort<T,T> createDistort(PixelTransform<Point2D_F32> dstToSrc, InterpolatePixel<T> interp );
 
 
 	/**
@@ -222,13 +223,17 @@ public abstract class GeneralImageDistortTests<T extends ImageBase<T>> {
 		}
 	}
 
-	public class BasicTransform extends PixelTransform2_F32 {
-
+	public class BasicTransform implements PixelTransform<Point2D_F32> {
 
 		@Override
-		public void compute(int x, int y) {
-			this.distX = x+offX;
-			this.distY = y+offY;
+		public void compute(int x, int y, Point2D_F32 distorted ) {
+			distorted.x = x+offX;
+			distorted.y = y+offY;
+		}
+
+		@Override
+		public boolean isThreadSafe() {
+			return true;
 		}
 	}
 }

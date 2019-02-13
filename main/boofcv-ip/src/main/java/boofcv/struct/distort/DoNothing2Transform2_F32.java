@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,5 +30,10 @@ public class DoNothing2Transform2_F32 implements Point2Transform2_F32 {
 	public void compute( float x, float y, Point2D_F32 out) {
 		out.x = x;
 		out.y = y;
+	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return true;
 	}
 }

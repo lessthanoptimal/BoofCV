@@ -21,8 +21,9 @@ package boofcv.alg.sfm;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeBrown;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU16;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import org.junit.jupiter.api.Test;
@@ -45,12 +46,17 @@ public class TestDepthSparse3D {
 
 		CameraPinholeBrown param = new CameraPinholeBrown(1,1,0,5,10,w,h).fsetRadial(0,0);
 
-		PixelTransform2_F32 v2d = new PixelTransform2_F32() {
+		PixelTransform<Point2D_F32> v2d = new PixelTransform<Point2D_F32>() {
 
 			@Override
-			public void compute(int x, int y) {
-				distX = x + 1;
-				distY = y + 2;
+			public void compute(int x, int y, Point2D_F32 output ) {
+				output.x = x + 1;
+				output.y = y + 2;
+			}
+
+			@Override
+			public boolean isThreadSafe() {
+				return true;
 			}
 		};
 

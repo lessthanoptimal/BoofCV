@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,12 +20,13 @@ package boofcv.alg.sfm.d2;
 
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.PixelTransformHomography_F32;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import georegression.struct.ConvertFloatType;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.homography.Homography2D_F64;
+import georegression.struct.point.Point2D_F32;
 
 /**
  * Factory for creating {@link StitchingTransform} of different motion models.
@@ -40,7 +41,7 @@ public class FactoryStitchingTransform {
 			Affine2D_F32 input_F32 = new Affine2D_F32();
 
 			@Override
-			public PixelTransform2_F32 convertPixel(Affine2D_F64 input, PixelTransform2_F32 output) {
+			public PixelTransform<Point2D_F32> convertPixel(Affine2D_F64 input, PixelTransform<Point2D_F32> output) {
 
 				ConvertFloatType.convert(input,input_F32);
 
@@ -73,7 +74,7 @@ public class FactoryStitchingTransform {
 
 		return new StitchingTransform<Affine2D_F32>() {
 			@Override
-			public PixelTransform2_F32 convertPixel(Affine2D_F32 input, PixelTransform2_F32 output) {
+			public PixelTransform<Point2D_F32> convertPixel(Affine2D_F32 input, PixelTransform<Point2D_F32> output) {
 				if( output != null ) {
 					((PixelTransformAffine_F32)output).set(input);
 				} else {
@@ -99,7 +100,7 @@ public class FactoryStitchingTransform {
 	public static StitchingTransform<Homography2D_F32> createHomography_F32() {
 		return new StitchingTransform<Homography2D_F32>() {
 			@Override
-			public PixelTransform2_F32 convertPixel(Homography2D_F32 input, PixelTransform2_F32 output) {
+			public PixelTransform<Point2D_F32> convertPixel(Homography2D_F32 input, PixelTransform<Point2D_F32> output) {
 				if( output != null ) {
 					((PixelTransformHomography_F32)output).set(input);
 				} else {
@@ -125,7 +126,7 @@ public class FactoryStitchingTransform {
 	public static StitchingTransform<Homography2D_F64> createHomography_F64() {
 		return new StitchingTransform<Homography2D_F64>() {
 			@Override
-			public PixelTransform2_F32 convertPixel(Homography2D_F64 input, PixelTransform2_F32 output) {
+			public PixelTransform<Point2D_F32> convertPixel(Homography2D_F64 input, PixelTransform<Point2D_F32> output) {
 				if( output != null ) {
 					((PixelTransformHomography_F32)output).set(input);
 				} else {

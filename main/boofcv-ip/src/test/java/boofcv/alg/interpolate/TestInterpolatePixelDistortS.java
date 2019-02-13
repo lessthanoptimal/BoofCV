@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,6 +61,11 @@ public class TestInterpolatePixelDistortS {
 			out.x = x + tx;
 			out.y = y + ty;
 		}
+
+		@Override
+		public boolean isThreadSafe() {
+			return true;
+		}
 	}
 
 	public class MockInterp implements InterpolatePixelS {
@@ -95,6 +100,11 @@ public class TestInterpolatePixelDistortS {
 
 		@Override
 		public int getFastBorderY() {return 0;}
+
+		@Override
+		public boolean isThreadSafe() {
+			return false;
+		}
 
 		@Override
 		public ImageType getImageType() {return ImageType.single(GrayU8.class);}

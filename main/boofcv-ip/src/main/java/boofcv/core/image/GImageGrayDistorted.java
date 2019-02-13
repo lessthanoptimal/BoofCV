@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,20 +19,22 @@
 package boofcv.core.image;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.point.Point2D_F32;
 
 /**
  * @author Peter Abeles
  */
 public class GImageGrayDistorted<T extends ImageGray<T>> implements GImageGray {
 
-	PixelTransform2_F32 transform;
+	PixelTransform<Point2D_F32> transform;
 	InterpolatePixelS<T> interpolate;
 
+	Point2D_F32 distorted = new Point2D_F32();
 	int inputWidth,inputHeight;
 
-	public GImageGrayDistorted(PixelTransform2_F32 transform,
+	public GImageGrayDistorted(PixelTransform<Point2D_F32> transform,
 							   InterpolatePixelS<T> interpolate) {
 		this.transform = transform;
 		this.interpolate = interpolate;
@@ -63,8 +65,8 @@ public class GImageGrayDistorted<T extends ImageGray<T>> implements GImageGray {
 
 	@Override
 	public Number get(int x, int y) {
-		transform.compute(x,y);
-		return interpolate.get(transform.distX, transform.distY);
+		transform.compute(x,y,distorted);
+		return interpolate.get(distorted.x, distorted.y);
 	}
 
 	@Override
@@ -74,14 +76,14 @@ public class GImageGrayDistorted<T extends ImageGray<T>> implements GImageGray {
 
 	@Override
 	public double unsafe_getD(int x, int y) {
-		transform.compute(x,y);
-		return interpolate.get(transform.distX, transform.distY);
+		transform.compute(x,y,distorted);
+		return interpolate.get(distorted.x, distorted.y);
 	}
 
 	@Override
 	public float unsafe_getF(int x, int y) {
-		transform.compute(x,y);
-		return interpolate.get(transform.distX, transform.distY);
+		transform.compute(x,y,distorted);
+		return interpolate.get(distorted.x, distorted.y);
 	}
 
 	@Override

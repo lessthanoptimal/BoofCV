@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,10 @@ package boofcv.alg.distort.impl;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_F32;
 
 
 /**
@@ -36,7 +37,7 @@ public class TestImplImageDistort_S32 extends GeneralImageDistortTests<GrayS32>{
 	}
 
 	@Override
-	public ImageDistort<GrayS32,GrayS32> createDistort(PixelTransform2_F32 dstToSrc,
+	public ImageDistort<GrayS32,GrayS32> createDistort(PixelTransform<Point2D_F32> dstToSrc,
 													   InterpolatePixel<GrayS32> interp) {
 		ImageDistort<GrayS32,GrayS32> ret = new ImplImageDistort_S32<>((InterpolatePixelS) interp);
 		ret.setModel(dstToSrc);

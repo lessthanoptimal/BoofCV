@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.alg.misc.PixelMath;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform3_F32;
 import boofcv.struct.distort.Point3Transform2_F32;
@@ -113,7 +113,7 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 
 		GrayF32 equiMask = new GrayF32(equiWidth, equHeight);
 
-		PixelTransform2_F32 transformEquiToCam = new PixelTransformCached_F32(equiWidth, equHeight,
+		PixelTransform<Point2D_F32> transformEquiToCam = new PixelTransformCached_F32(equiWidth, equHeight,
 				new PointToPixelTransform_F32(equiToCamera));
 
 		Point3D_F32 p3b = new Point3D_F32();
@@ -273,9 +273,9 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 		// weighted pixel mask in equi image.  0 = ignore pixel.  1 = 100% contribution
 		GrayF32 mask;
 
-		PixelTransform2_F32 equiToCamera;
+		PixelTransform<Point2D_F32> equiToCamera;
 
-		public Camera(GrayF32 mask, PixelTransform2_F32 equiToCamera) {
+		public Camera(GrayF32 mask, PixelTransform<Point2D_F32> equiToCamera) {
 			this.mask = mask;
 			this.equiToCamera = equiToCamera;
 		}
@@ -307,6 +307,11 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 
 			// input camera image pixels
 			s2p.compute(unitCam.x, unitCam.y, unitCam.z , out);
+		}
+
+		@Override
+		public boolean isThreadSafe() {
+			return false;
 		}
 	}
 }

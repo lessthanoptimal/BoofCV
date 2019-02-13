@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,11 @@
 package boofcv.alg.distort.impl;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
+import georegression.struct.point.Point2D_F32;
 
 /**
  * Implementation of {@link ImageDistort} for {@link Planar} images.
@@ -39,7 +40,7 @@ public class ImplImageDistort_PL<Input extends ImageGray<Input>,Output extends I
 	}
 
 	@Override
-	public void setModel(PixelTransform2_F32 dstToSrc) {
+	public void setModel(PixelTransform<Point2D_F32> dstToSrc) {
 		layerDistort.setModel(dstToSrc);
 	}
 
@@ -92,7 +93,7 @@ public class ImplImageDistort_PL<Input extends ImageGray<Input>,Output extends I
 	}
 
 	@Override
-	public PixelTransform2_F32 getModel() {
+	public PixelTransform<Point2D_F32> getModel() {
 		return layerDistort.getModel();
 	}
 }

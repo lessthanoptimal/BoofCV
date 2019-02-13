@@ -57,6 +57,8 @@ Version : 0.33
   * Touch pad "wheel" controls are less spastic in OS X
 - Gradle
   * Fixed how dependencies are referenced and Jars built. Thanks H1Gdev for pointing out this problem!
+- Image Distortion
+  * Changed interface for PixelTransform and PointTransform to support concurrency
 - Concurrency
   * Added support for concurrency. Can be turned on using BoofConcurrency.USE_CONCURRENT = true
   * Created AutocodeConcurrentApp for generating threaded code from single thread algorithms

@@ -20,6 +20,7 @@ package boofcv.alg.distort.spherical;
 
 import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.misc.GrlConstants;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
 import org.junit.jupiter.api.Test;
 
@@ -77,8 +78,9 @@ public class TestCameraToEquirectangular_F32 {
 
 		Point3D_F32 n = new Point3D_F32();
 
-		alg.compute(x,y);
-		tools.equiToNormFV(alg.distX,alg.distY,n);
+		Point2D_F32 p = new Point2D_F32();
+		alg.compute(x,y,p);
+		tools.equiToNormFV(p.x,p.y,n);
 
 		assertEquals( nx, n.x, GrlConstants.TEST_F32);
 		assertEquals( ny, n.y, GrlConstants.TEST_F32);

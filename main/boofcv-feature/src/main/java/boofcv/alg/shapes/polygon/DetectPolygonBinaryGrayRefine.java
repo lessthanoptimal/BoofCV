@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,10 @@ package boofcv.alg.shapes.polygon;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.shapes.edge.EdgeIntensityPolygon;
 import boofcv.misc.MovingAverage;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -116,8 +117,8 @@ public class DetectPolygonBinaryGrayRefine<T extends ImageGray<T>> {
 	 * @param undistToDist Transform from undistorted to distorted image.
 	 */
 	public void setLensDistortion(int width , int height ,
-								  @Nullable PixelTransform2_F32 distToUndist ,
-								  @Nullable PixelTransform2_F32 undistToDist )
+								  @Nullable PixelTransform<Point2D_F32> distToUndist ,
+								  @Nullable PixelTransform<Point2D_F32> undistToDist )
 	{
 		detector.setLensDistortion(width, height, distToUndist, undistToDist);
 		if( refineGray != null )

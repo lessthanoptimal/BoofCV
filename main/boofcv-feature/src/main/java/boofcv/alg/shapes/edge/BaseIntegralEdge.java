@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,8 +25,9 @@ import boofcv.core.image.GImageGray;
 import boofcv.core.image.GImageGrayDistorted;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.point.Point2D_F32;
 
 /**
  * Base class for computing line integrals along lines/edges.
@@ -54,7 +55,7 @@ public class BaseIntegralEdge<T extends ImageGray<T>> {
 	 *
 	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image..
 	 */
-	public void setTransform( PixelTransform2_F32 undistToDist ) {
+	public void setTransform( PixelTransform<Point2D_F32> undistToDist ) {
 		if( undistToDist != null ) {
 			InterpolatePixelS<T> interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 			integralImage = new GImageGrayDistorted<>(undistToDist, interpolate);

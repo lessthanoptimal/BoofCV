@@ -310,10 +310,11 @@ public class TestLensDistortionOps_F32 {
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32(affine);
 		RectangleLength2D_F32 found;
 
+		Point2D_F32 work = new Point2D_F32();
 		if( bound ) {
-			found = LensDistortionOps_F32.boundBoxInside(width, height, transform);
+			found = LensDistortionOps_F32.boundBoxInside(width, height, transform, work);
 		} else {
-			found = LensDistortionOps_F32.centerBoxInside(width, height, transform);
+			found = LensDistortionOps_F32.centerBoxInside(width, height, transform, work);
 		}
 
 		// fudge factor
@@ -324,30 +325,30 @@ public class TestLensDistortionOps_F32 {
 
 		// see if it contains the boundary points in the source image
 		for (int i = 0; i < width; i++) {
-			transform.compute(i,0);
-			assertTrue(Intersection2D_F32.contains(found,transform.distX,transform.distY));
-			transform.compute(i,height-1);
-			assertTrue(Intersection2D_F32.contains(found,transform.distX,transform.distY));
+			transform.compute(i,0, work);
+			assertTrue(Intersection2D_F32.contains(found,work.x,work.y));
+			transform.compute(i,height-1, work);
+			assertTrue(Intersection2D_F32.contains(found,work.x,work.y));
 		}
 		for (int i = 0; i < height; i++) {
-			transform.compute(0,i);
-			assertTrue(Intersection2D_F32.contains(found,transform.distX,transform.distY));
-			transform.compute(width-1,i);
-			assertTrue(Intersection2D_F32.contains(found,transform.distX,transform.distY));
+			transform.compute(0,i, work);
+			assertTrue(Intersection2D_F32.contains(found,work.x,work.y));
+			transform.compute(width-1,i, work);
+			assertTrue(Intersection2D_F32.contains(found,work.x,work.y));
 		}
 
 		// see if points outside are outside
 		for (int i = 0; i < width; i++) {
-			transform.compute(i,-1);
-			assertFalse(Intersection2D_F32.contains(found,transform.distX,transform.distY));
-			transform.compute(i,height+1);
-			assertFalse(Intersection2D_F32.contains(found,transform.distX,transform.distY));
+			transform.compute(i,-1, work);
+			assertFalse(Intersection2D_F32.contains(found,work.x,work.y));
+			transform.compute(i,height+1, work);
+			assertFalse(Intersection2D_F32.contains(found,work.x,work.y));
 		}
 		for (int i = 1; i < height; i++) {
-			transform.compute(-1,i);
-			assertFalse(Intersection2D_F32.contains(found,transform.distX,transform.distY));
-			transform.compute(width+1,i);
-			assertFalse(Intersection2D_F32.contains(found,transform.distX,transform.distY));
+			transform.compute(-1,i, work);
+			assertFalse(Intersection2D_F32.contains(found,work.x,work.y));
+			transform.compute(width+1,i, work);
+			assertFalse(Intersection2D_F32.contains(found,work.x,work.y));
 		}
 	}
 }

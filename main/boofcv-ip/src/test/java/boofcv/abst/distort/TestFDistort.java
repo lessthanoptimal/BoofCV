@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,10 +27,11 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import georegression.struct.affine.Affine2D_F32;
+import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -106,26 +107,27 @@ public class TestFDistort {
 		ImageMiscOps.fillUniform(input, rand, 0, 200);
 
 		Affine2D_F32 affine = new Affine2D_F32(2,0.1f,-0.2f,1.1f,3,4.5f);
-		PixelTransform2_F32 transform = new PixelTransformAffine_F32(affine.invert(null));
+		PixelTransform<Point2D_F32> transform = new PixelTransformAffine_F32(affine.invert(null));
 		new FDistort(input,output).affine(2,0.1f,-0.2f,1.1f,3,4.5f).borderExt().apply();
 
 		InterpolatePixelS<GrayU8> interp = FactoryInterpolation.bilinearPixelS(input,null);
 		interp.setBorder(FactoryImageBorderAlgs.extend(input));
 		interp.setImage(input);
 
+		Point2D_F32 distorted = new Point2D_F32();
 		if( input.getDataType().isInteger() ) {
 			for( int y = 0; y < output.height; y++ ) {
 				for( int x = 0; x < output.width; x++ ) {
-					transform.compute(x,y);
-					float val = interp.get(transform.distX, transform.distY);
+					transform.compute(x,y,distorted);
+					float val = interp.get(distorted.x, distorted.y);
 					assertEquals((int)val,output.get(x,y),1e-4);
 				}
 			}
 		} else {
 			for( int y = 0; y < output.height; y++ ) {
 				for( int x = 0; x < output.width; x++ ) {
-					transform.compute(x, y);
-					float val = interp.get(transform.distX, transform.distY);
+					transform.compute(x, y,distorted);
+					float val = interp.get(distorted.x, distorted.y);
 					assertEquals(val,output.get(x,y),1e-4);
 				}
 			}
@@ -143,7 +145,7 @@ public class TestFDistort {
 
 		ImageDistort distorter = alg.distorter;
 		InterpolatePixel interp = alg.interp;;
-		PixelTransform2_F32 outputToInput = alg.outputToInput;
+		PixelTransform<Point2D_F32> outputToInput = alg.outputToInput;
 
 		// a new image shouldn't cause new memory to be declared bad stuff to happen
 		GrayU8 found = new GrayU8(width/2,height/2);
@@ -174,7 +176,7 @@ public class TestFDistort {
 
 		ImageDistort distorter = alg.distorter;
 		InterpolatePixel interp = alg.interp;;
-		PixelTransform2_F32 outputToInput = alg.outputToInput;
+		PixelTransform<Point2D_F32> outputToInput = alg.outputToInput;
 
 		// Set it to the default border, nothing should change
 		expected.setTo(found);

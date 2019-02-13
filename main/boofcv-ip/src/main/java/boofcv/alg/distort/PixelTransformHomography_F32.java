@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F32;
@@ -30,16 +30,15 @@ import georegression.transform.homography.HomographyPointOps_F32;
  *
  * @author Peter Abeles
  */
-public class PixelTransformHomography_F32 extends PixelTransform2_F32 {
+public class PixelTransformHomography_F32 implements PixelTransform<Point2D_F32> {
 
-	Homography2D_F32 homo = new Homography2D_F32();
-	Point2D_F32 tran = new Point2D_F32();
+	final Homography2D_F32 homo = new Homography2D_F32();
 
 	public PixelTransformHomography_F32() {
 	}
 
 	public PixelTransformHomography_F32(Homography2D_F32 homo) {
-		this.homo = homo;
+		this.homo.set(homo);
 	}
 	public PixelTransformHomography_F32(Homography2D_F64 homo) {
 		set(homo);
@@ -61,14 +60,17 @@ public class PixelTransformHomography_F32 extends PixelTransform2_F32 {
 		this.homo.a33 = (float)transform.a33;
 	}
 
-	@Override
-	public void compute(int x, int y) {
-		HomographyPointOps_F32.transform(homo, x, y, tran);
-		distX = tran.x;
-		distY = tran.y;
-	}
-
 	public Homography2D_F32 getModel() {
 		return homo;
+	}
+
+	@Override
+	public void compute(int x, int y, Point2D_F32 output) {
+		HomographyPointOps_F32.transform(homo, x, y, output);
+	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return true;
 	}
 }

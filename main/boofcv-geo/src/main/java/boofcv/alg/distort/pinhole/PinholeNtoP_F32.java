@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,10 +40,14 @@ public class PinholeNtoP_F32 implements Point2Transform2_F32 {
 		return this;
 	}
 
-
 	@Override
 	public void compute(float x, float y, Point2D_F32 out) {
 		out.x = fx * x + skew * y + cx;
 		out.y = fy * y + cy;
+	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return true;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import georegression.fitting.curves.ClosestPointEllipseAngle_F64;
@@ -30,6 +30,7 @@ import georegression.fitting.curves.FitEllipseAlgebraic_F64;
 import georegression.geometry.UtilEllipse_F64;
 import georegression.struct.curve.EllipseQuadratic_F64;
 import georegression.struct.curve.EllipseRotated_F64;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
@@ -88,7 +89,8 @@ public class BinaryEllipseDetectorPixel {
 	private ClosestPointEllipseAngle_F64 closestPoint = new ClosestPointEllipseAngle_F64(1e-4f,15);
 
 	// transforms which can be used to handle lens distortion
-	protected PixelTransform2_F32 distToUndist;
+	protected PixelTransform<Point2D_F32> distToUndist;
+	protected Point2D_F32 distortedPoint = new Point2D_F32();
 
 	private boolean verbose = false;
 
@@ -119,7 +121,7 @@ public class BinaryEllipseDetectorPixel {
 	 *
 	 * @param distToUndist Transform from distorted to undistorted image.
 	 */
-	public void setLensDistortion( PixelTransform2_F32 distToUndist ) {
+	public void setLensDistortion( PixelTransform<Point2D_F32> distToUndist ) {
 		this.distToUndist = distToUndist;
 	}
 
@@ -239,8 +241,8 @@ public class BinaryEllipseDetectorPixel {
 			Point2D_I32 p = external.get(j);
 
 			if( distToUndist != null ) {
-				distToUndist.compute(p.x,p.y);
-				pointsF.grow().set( distToUndist.distX , distToUndist.distY );
+				distToUndist.compute(p.x,p.y,distortedPoint);
+				pointsF.grow().set( distortedPoint.x , distortedPoint.y );
 			} else {
 				pointsF.grow().set(p.x, p.y);
 			}

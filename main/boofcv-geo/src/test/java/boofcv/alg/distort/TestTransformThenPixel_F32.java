@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,5 +68,8 @@ public class TestTransformThenPixel_F32 {
 			out.x = 0.1f;
 			out.y = 0.2f;
 		}
+
+		@Override
+		public boolean isThreadSafe() {return true;}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,11 @@ package boofcv.alg.shapes.ellipse;
 
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.curve.EllipseRotated_F64;
+import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -105,8 +106,8 @@ public class TestBinaryEllipseDetector {
 		ThresholdImageOps.threshold(image,binary,30,true);
 
 		BinaryEllipseDetector<GrayU8> alg = create();
-		PixelTransform2_F32 distToUndist = new PixelTransformAffine_F32(new Affine2D_F32(1,0,0,1,5,8));
-		PixelTransform2_F32 undistToDist = new PixelTransformAffine_F32(new Affine2D_F32(1,0,0,1,-5,-8));
+		PixelTransform<Point2D_F32> distToUndist = new PixelTransformAffine_F32(new Affine2D_F32(1,0,0,1,5,8));
+		PixelTransform<Point2D_F32> undistToDist = new PixelTransformAffine_F32(new Affine2D_F32(1,0,0,1,-5,-8));
 		alg.setLensDistortion(distToUndist, undistToDist);
 		alg.process(image, binary);
 

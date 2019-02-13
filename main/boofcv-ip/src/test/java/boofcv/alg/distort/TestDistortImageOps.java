@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,8 @@ import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import georegression.struct.shapes.RectangleLength2D_F64;
 import georegression.struct.shapes.RectangleLength2D_I32;
@@ -114,10 +116,12 @@ public class TestDistortImageOps {
 	@Test
 	public void boundBox_check() {
 
+		Point2D_F32 work = new Point2D_F32();
+
 		// basic sanity check
 		Affine2D_F32 affine = new Affine2D_F32(1,0,0,1,2,3);
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32(affine);
-		RectangleLength2D_I32 found = DistortImageOps.boundBox(10,20,30,40,transform);
+		RectangleLength2D_I32 found = DistortImageOps.boundBox(10,20,30,40,work,transform);
 		
 		assertEquals(2,found.x0);
 		assertEquals(3,found.y0);
@@ -125,7 +129,7 @@ public class TestDistortImageOps {
 		assertEquals(20,found.height);
 		
 		// bottom right border
-		found = DistortImageOps.boundBox(10,20,8,18,transform);
+		found = DistortImageOps.boundBox(10,20,8,18,work,transform);
 		assertEquals(2,found.x0);
 		assertEquals(3,found.y0);
 		assertEquals(6,found.width);
@@ -133,7 +137,7 @@ public class TestDistortImageOps {
 		
 		// top right border
 		affine.set(new Affine2D_F32(1,0,0,1,-2,-3));
-		found = DistortImageOps.boundBox(10,20,8,18,transform);
+		found = DistortImageOps.boundBox(10,20,8,18,work,transform);
 		assertEquals(0,found.x0);
 		assertEquals(0,found.y0);
 		assertEquals(8,found.width);
@@ -142,11 +146,12 @@ public class TestDistortImageOps {
 
 	@Test
 	public void boundBox() {
+		Point2D_F32 work = new Point2D_F32();
 
 		// basic sanity check
 		Affine2D_F32 affine = new Affine2D_F32(1,0,0,1,2,3);
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32(affine);
-		RectangleLength2D_I32 found = DistortImageOps.boundBox(10,20,transform);
+		RectangleLength2D_I32 found = DistortImageOps.boundBox(10,20,work,transform);
 
 		assertEquals(2,found.x0);
 		assertEquals(3,found.y0);
@@ -156,11 +161,12 @@ public class TestDistortImageOps {
 
 	@Test
 	public void boundBox_F32() {
+		Point2D_F32 transformed = new Point2D_F32();
 
 		// basic sanity check
 		Affine2D_F32 affine = new Affine2D_F32(1,0,0,1,2,3);
 		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32(affine);
-		RectangleLength2D_F32 found = DistortImageOps.boundBox_F32(10,20,transform);
+		RectangleLength2D_F32 found = DistortImageOps.boundBox_F32(10,20,transform,transformed);
 
 		assertEquals(2,found.x0,1e-4);
 		assertEquals(3,found.y0,1e-4);
@@ -170,10 +176,12 @@ public class TestDistortImageOps {
 
 	@Test
 	public void boundBox_F64() {
+		Point2D_F64 transformed = new Point2D_F64();
+
 		// basic sanity check
 		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,2,3);
 		PixelTransformAffine_F64 transform = new PixelTransformAffine_F64(affine);
-		RectangleLength2D_F64 found = DistortImageOps.boundBox_F64(10, 20, transform);
+		RectangleLength2D_F64 found = DistortImageOps.boundBox_F64(10, 20,transform,transformed);
 
 		assertEquals(2,found.x0,1e-8);
 		assertEquals(3,found.y0,1e-8);
