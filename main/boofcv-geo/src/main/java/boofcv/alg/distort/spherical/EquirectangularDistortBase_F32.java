@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort.spherical;
 
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import georegression.geometry.ConvertRotation3D_F32;
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.EulerType;
@@ -35,7 +35,7 @@ import org.ejml.dense.row.CommonOps_FDRM;
  *
  * @author Peter Abeles
  */
-public abstract class EquirectangularDistortBase_F32 extends PixelTransform2_F32 {
+public abstract class EquirectangularDistortBase_F32 implements PixelTransform<Point2D_F32> {
 	// function for doing match on equirectangular images
 	EquirectangularTools_F32 tools = new EquirectangularTools_F32();
 
@@ -46,7 +46,6 @@ public abstract class EquirectangularDistortBase_F32 extends PixelTransform2_F32
 
 	// storage for intermediate variables
 	Vector3D_F32 n = new Vector3D_F32();
-	Point2D_F32 out = new Point2D_F32();
 
 	// storage for precomputed pointing vectors for each pixel in pinhole camera
 	Point3D_F32[] vectors = new Point3D_F32[0];
@@ -106,7 +105,7 @@ public abstract class EquirectangularDistortBase_F32 extends PixelTransform2_F32
 	 * @param y Pixel y-coordinate in rendered pinhole camera
 	 */
 	@Override
-	public void compute(int x, int y) {
+	public void compute(int x, int y, Point2D_F32 out ) {
 		// grab precomputed normalized image coordinate at canonical location
 		Point3D_F32 v = vectors[y*outWidth+x];
 		// move to requested orientation
@@ -114,9 +113,6 @@ public abstract class EquirectangularDistortBase_F32 extends PixelTransform2_F32
 
 		// compute pixel coordinate
 		tools.normToEquiFV(n.x,n.y,n.z,out);
-
-		distX = out.x;
-		distY = out.y;
 	}
 
 	public EquirectangularTools_F32 getTools() {
@@ -125,5 +121,10 @@ public abstract class EquirectangularDistortBase_F32 extends PixelTransform2_F32
 
 	public FMatrixRMaj getRotation() {
 		return R;
+	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return false; // internal book keeping variables are recycled
 	}
 }

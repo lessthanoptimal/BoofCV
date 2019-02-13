@@ -26,6 +26,7 @@ import boofcv.alg.distort.pinhole.PinholePtoN_F32;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.SequencePoint2Transform2_F32;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.shapes.RectangleLength2D_F32;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_FDRM;
@@ -51,8 +52,9 @@ public class ImplRectifyImageOps_F32 {
 
 		Point2Transform2_F32 tranLeft = transformPixelToRect(paramLeft, rectifyLeft);
 
+		Point2D_F32 work = new Point2D_F32();
 		RectangleLength2D_F32 bound = DistortImageOps.boundBox_F32(paramLeft.width, paramLeft.height,
-				new PointToPixelTransform_F32(tranLeft));
+				new PointToPixelTransform_F32(tranLeft),work);
 
 		float scaleX = paramLeft.width/bound.width;
 		float scaleY = paramLeft.height/bound.height;
@@ -67,8 +69,9 @@ public class ImplRectifyImageOps_F32 {
 	{
 		Point2Transform2_F32 tranLeft = new PointTransformHomography_F32(rectifyLeft);
 
+		Point2D_F32 work = new Point2D_F32();
 		RectangleLength2D_F32 bound = DistortImageOps.boundBox_F32(imageWidth, imageHeight,
-				new PointToPixelTransform_F32(tranLeft));
+				new PointToPixelTransform_F32(tranLeft),work);
 
 		float scaleX = imageWidth/bound.width;
 		float scaleY = imageHeight/bound.height;
@@ -87,8 +90,9 @@ public class ImplRectifyImageOps_F32 {
 
 		Point2Transform2_F32 tranLeft = transformPixelToRect(paramLeft, rectifyLeft);
 
+		Point2D_F32 work = new Point2D_F32();
 		RectangleLength2D_F32 bound = LensDistortionOps_F32.boundBoxInside(paramLeft.width, paramLeft.height,
-				new PointToPixelTransform_F32(tranLeft));
+				new PointToPixelTransform_F32(tranLeft),work);
 
 		LensDistortionOps_F32.roundInside(bound);
 
@@ -105,8 +109,9 @@ public class ImplRectifyImageOps_F32 {
 	{
 		PointTransformHomography_F32 tranLeft = new PointTransformHomography_F32(rectifyLeft);
 
+		Point2D_F32 work = new Point2D_F32();
 		RectangleLength2D_F32 bound = LensDistortionOps_F32.boundBoxInside(imageWidth, imageHeight,
-				new PointToPixelTransform_F32(tranLeft));
+				new PointToPixelTransform_F32(tranLeft), work);
 
 		float scaleX = imageWidth/(float)bound.width;
 		float scaleY = imageHeight/(float)bound.height;

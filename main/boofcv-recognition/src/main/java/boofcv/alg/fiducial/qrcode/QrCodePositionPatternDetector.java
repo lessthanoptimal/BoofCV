@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.alg.shapes.polygon.DetectPolygonFromContour;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.MovingAverage;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -38,6 +38,7 @@ import georegression.geometry.UtilLine2D_F64;
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.line.LineParametric2D_F64;
 import georegression.struct.line.LineSegment2D_F64;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
@@ -161,8 +162,8 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 				squareDetector.getInputType(), BorderType.EXTENDED);
 
 		if( model != null ) {
-			PixelTransform2_F32 distToUndist = new PointToPixelTransform_F32(model.undistort_F32(true,true));
-			PixelTransform2_F32 undistToDist = new PointToPixelTransform_F32(model.distort_F32(true,true));
+			PixelTransform<Point2D_F32> distToUndist = new PointToPixelTransform_F32(model.undistort_F32(true,true));
+			PixelTransform<Point2D_F32> undistToDist = new PointToPixelTransform_F32(model.distort_F32(true,true));
 
 			squareDetector.setLensDistortion(width, height, distToUndist, undistToDist);
 

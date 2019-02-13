@@ -21,7 +21,7 @@ package boofcv.alg.distort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.SequencePoint2Transform2_F32;
 import georegression.geometry.UtilPoint2D_F32;
@@ -69,15 +69,19 @@ public class LensDistortionOps_F32 {
 
 		Point2Transform2_F32 ori_to_des = new SequencePoint2Transform2_F32(ori_p_to_n,des_n_to_p);
 
+		Point2D_F32 work = new Point2D_F32();
 		RectangleLength2D_F32 bound;
 		if( type == AdjustmentType.FULL_VIEW ) {
-			bound = DistortImageOps.boundBox_F32(paramOriginal.width, paramOriginal.height, new PointToPixelTransform_F32(ori_to_des));
+			bound = DistortImageOps.boundBox_F32(paramOriginal.width, paramOriginal.height,
+					new PointToPixelTransform_F32(ori_to_des),work);
 		} else if( type == AdjustmentType.EXPAND) {
-			bound = LensDistortionOps_F32.boundBoxInside(paramOriginal.width, paramOriginal.height, new PointToPixelTransform_F32(ori_to_des));
+			bound = LensDistortionOps_F32.boundBoxInside(paramOriginal.width, paramOriginal.height,
+					new PointToPixelTransform_F32(ori_to_des),work);
 			// ensure there are no strips of black
 			LensDistortionOps_F32.roundInside(bound);
 		} else if( type == AdjustmentType.CENTER) {
-			bound = LensDistortionOps_F32.centerBoxInside(paramOriginal.width, paramOriginal.height, new PointToPixelTransform_F32(ori_to_des));
+			bound = LensDistortionOps_F32.centerBoxInside(paramOriginal.width, paramOriginal.height,
+					new PointToPixelTransform_F32(ori_to_des),work);
 		} else if( type == AdjustmentType.NONE ) {
 			bound = new RectangleLength2D_F32(0,0,paramDesired.width, paramDesired.height);
 		} else {
@@ -133,9 +137,10 @@ public class LensDistortionOps_F32 {
 	 * @return Bounding box
 	 */
 	public static RectangleLength2D_F32 boundBoxInside(int srcWidth, int srcHeight,
-													   PixelTransform2_F32 transform)
+													   PixelTransform<Point2D_F32> transform,
+													   Point2D_F32 work )
 	{
-		List<Point2D_F32> points = computeBoundingPoints(srcWidth, srcHeight, transform);
+		List<Point2D_F32> points = computeBoundingPoints(srcWidth, srcHeight, transform, work);
 		Point2D_F32 center = new Point2D_F32();
 		UtilPoint2D_F32.mean(points,center);
 
@@ -203,9 +208,10 @@ public class LensDistortionOps_F32 {
 	 * @return Bounding box
 	 */
 	public static RectangleLength2D_F32 centerBoxInside(int srcWidth, int srcHeight,
-														PixelTransform2_F32 transform) {
+														PixelTransform<Point2D_F32> transform ,
+														Point2D_F32 work ) {
 
-		List<Point2D_F32> points = computeBoundingPoints(srcWidth, srcHeight, transform);
+		List<Point2D_F32> points = computeBoundingPoints(srcWidth, srcHeight, transform, work);
 
 		Point2D_F32 center = new Point2D_F32();
 		UtilPoint2D_F32.mean(points,center);
@@ -253,21 +259,23 @@ public class LensDistortionOps_F32 {
 		return new RectangleLength2D_F32(x0+center.x,y0+center.y,x1-x0,y1-y0);
 	}
 
-	private static List<Point2D_F32> computeBoundingPoints(int srcWidth, int srcHeight, PixelTransform2_F32 transform) {
+	private static List<Point2D_F32> computeBoundingPoints(int srcWidth, int srcHeight,
+														   PixelTransform<Point2D_F32> transform,
+														   Point2D_F32 work ) {
 		List<Point2D_F32> points = new ArrayList<>();
 
 		for (int x = 0; x < srcWidth; x++) {
-			transform.compute(x, 0);
-			points.add(new Point2D_F32(transform.distX, transform.distY));
-			transform.compute(x, srcHeight);
-			points.add(new Point2D_F32(transform.distX, transform.distY));
+			transform.compute(x, 0, work);
+			points.add(new Point2D_F32(work.x, work.y));
+			transform.compute(x, srcHeight, work);
+			points.add(new Point2D_F32(work.x, work.y));
 		}
 
 		for (int y = 0; y < srcHeight; y++) {
-			transform.compute(0, y);
-			points.add(new Point2D_F32(transform.distX, transform.distY));
-			transform.compute(srcWidth, y);
-			points.add(new Point2D_F32(transform.distX, transform.distY));
+			transform.compute(0, y, work);
+			points.add(new Point2D_F32(work.x, work.y));
+			transform.compute(srcWidth, y, work);
+			points.add(new Point2D_F32(work.x, work.y));
 		}
 		return points;
 	}

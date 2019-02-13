@@ -103,4 +103,9 @@ public class RemoveBrownPtoN_F32 implements Point2Transform2_F32 {
 
 		removeRadial(out.x, out.y, params.radial, params.t1, params.t2, out, tol );
 	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return true;
+	}
 }

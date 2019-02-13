@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,10 @@
 
 package boofcv.alg.sfm.d2;
 
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.homography.Homography2D_F64;
+import georegression.struct.point.Point2D_F32;
 
 /**
  * TODO Comment
@@ -29,7 +30,7 @@ import georegression.struct.homography.Homography2D_F64;
  */
 public interface StitchingTransform<IT extends InvertibleTransform> {
 
-	PixelTransform2_F32 convertPixel(IT input , PixelTransform2_F32 output );
+	PixelTransform<Point2D_F32> convertPixel(IT input , PixelTransform<Point2D_F32> output );
 
 	Homography2D_F64 convertH( IT input , Homography2D_F64 output );
 }

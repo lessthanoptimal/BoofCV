@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,11 +25,12 @@ import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonFromContour;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.UtilAffine;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_I32;
@@ -83,8 +84,8 @@ public class TestDetectPolygonFromContour extends CommonFitPolygonChecks {
 
 		Affine2D_F32 a = new Affine2D_F32();
 		UtilAffine.convert(transform,a);
-		PixelTransform2_F32 tranFrom = new PixelTransformAffine_F32(a);
-		PixelTransform2_F32 tranTo = new PixelTransformAffine_F32(a.invert(null));
+		PixelTransform<Point2D_F32> tranFrom = new PixelTransformAffine_F32(a);
+		PixelTransform<Point2D_F32> tranTo = new PixelTransformAffine_F32(a.invert(null));
 
 		int numberOfSides = 4;
 		DetectPolygonFromContour alg = createDetector(imageType, numberOfSides,numberOfSides);

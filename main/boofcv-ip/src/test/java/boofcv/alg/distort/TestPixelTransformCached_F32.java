@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.distort;
 
 import georegression.struct.affine.Affine2D_F32;
+import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,13 +39,16 @@ public class TestPixelTransformCached_F32 {
 
 		PixelTransformCached_F32 alg = new PixelTransformCached_F32(width,height,orig);
 
+		Point2D_F32 expected = new Point2D_F32();
+		Point2D_F32 found = new Point2D_F32();
+
 		// it goes outside the border by one since some times the outside bound is used
 		for (int y = 0; y < height + 1; y++) {
 			for (int x = 0; x < width + 1; x++) {
-				alg.compute(x,y);
-				orig.compute(x,y);
-				assertEquals(orig.distX,alg.distX,1e-8);
-				assertEquals(orig.distY,alg.distY,1e-8);
+				alg.compute(x,y,found);
+				orig.compute(x,y,expected);
+				assertEquals(expected.x,found.x,1e-8);
+				assertEquals(expected.y,found.y,1e-8);
 			}
 		}
 	}

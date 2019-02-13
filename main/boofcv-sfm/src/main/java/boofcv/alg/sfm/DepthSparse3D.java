@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,11 +19,12 @@
 package boofcv.alg.sfm;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 
@@ -54,7 +55,8 @@ public abstract class DepthSparse3D<T extends ImageGray<T>> {
 	private Point2D_F64 norm = new Point2D_F64();
 
 	// transform from visual image coordinate system to depth image coordinate system
-	private PixelTransform2_F32 visualToDepth;
+	private PixelTransform<Point2D_F32> visualToDepth;
+	private Point2D_F32 distorted = new Point2D_F32();
 
 	// scales the values from the depth image
 	private double depthScale;
@@ -74,7 +76,7 @@ public abstract class DepthSparse3D<T extends ImageGray<T>> {
 	 * @param model Model for narrow FOV cameras
 	 * @param visualToDepth Transform from visual to depth camera pixel coordinate systems.
 	 */
-	public void configure(LensDistortionNarrowFOV model , PixelTransform2_F32 visualToDepth ) {
+	public void configure(LensDistortionNarrowFOV model , PixelTransform<Point2D_F32> visualToDepth ) {
 		this.visualToDepth = visualToDepth;
 		this.p2n = model.undistort_F64(true,false);
 	}
@@ -97,10 +99,10 @@ public abstract class DepthSparse3D<T extends ImageGray<T>> {
 	 * @return true if a 3D point could be computed and false if not
 	 */
 	public boolean process( int x , int y ) {
-		visualToDepth.compute(x, y);
+		visualToDepth.compute(x, y,distorted);
 
-		int depthX = (int)visualToDepth.distX;
-		int depthY = (int)visualToDepth.distY;
+		int depthX = (int)distorted.x;
+		int depthY = (int)distorted.y;
 
 		if( depthImage.isInBounds(depthX,depthY) ) {
 			// get the depth at the specified location

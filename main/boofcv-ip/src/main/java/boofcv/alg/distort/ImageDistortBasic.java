@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,10 @@
 package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
+import georegression.struct.point.Point2D_F32;
 
 /**
  * Most basic implementation of {@link ImageDistort}. Computes the distortion from the dst to src image
@@ -34,7 +35,7 @@ public abstract class ImageDistortBasic
 		implements ImageDistort<Input,Output> {
 
 	// distortion model from the dst to src image
-	protected PixelTransform2_F32 dstToSrc;
+	protected PixelTransform<Point2D_F32> dstToSrc;
 	// sub pixel interpolation
 	protected Interpolate interp;
 
@@ -56,7 +57,7 @@ public abstract class ImageDistortBasic
 	}
 
 	@Override
-	public void setModel(PixelTransform2_F32 dstToSrc) {
+	public void setModel(PixelTransform<Point2D_F32> dstToSrc) {
 		this.dstToSrc = dstToSrc;
 	}
 
@@ -121,7 +122,7 @@ public abstract class ImageDistortBasic
 	}
 
 	@Override
-	public PixelTransform2_F32 getModel() {
+	public PixelTransform<Point2D_F32> getModel() {
 		return dstToSrc;
 	}
 }

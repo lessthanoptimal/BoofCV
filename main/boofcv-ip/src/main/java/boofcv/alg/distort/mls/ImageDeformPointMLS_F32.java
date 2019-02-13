@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -281,6 +281,11 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	@Override
 	public void compute(float x, float y, Point2D_F32 out) {
 		interpolateDeformedPoint(x/scaleX, y/scaleY, out);
+	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return true;
 	}
 
 	/**

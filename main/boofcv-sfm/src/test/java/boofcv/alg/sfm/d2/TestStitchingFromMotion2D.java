@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,11 +26,11 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
 import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -308,26 +308,26 @@ public class TestStitchingFromMotion2D {
 		}
 	}
 
-	private class HelperDistort implements ImageDistort {
+	private class HelperDistort implements ImageDistort<GrayF32,GrayF32> {
 
 		int numSetModel = 0;
 		int numApply = 0;
 
 		@Override
-		public void setModel(PixelTransform2_F32 dstToSrc) {
+		public void setModel(PixelTransform<Point2D_F32> dstToSrc) {
 			numSetModel++;
 		}
 
 		@Override
-		public void apply(ImageBase srcImg, ImageBase dstImg) {
+		public void apply(GrayF32 srcImg, GrayF32 dstImg) {
 			numApply++;
 		}
 
 		@Override
-		public void apply(ImageBase srcImg, ImageBase dstImg, GrayU8 mask) {numApply++;}
+		public void apply(GrayF32 srcImg, GrayF32 dstImg, GrayU8 mask) {numApply++;}
 
 		@Override
-		public void apply(ImageBase srcImg, ImageBase dstImg, int dstX0, int dstY0, int dstX1, int dstY1) {
+		public void apply(GrayF32 srcImg, GrayF32 dstImg, int dstX0, int dstY0, int dstX1, int dstY1) {
 			numApply++;
 		}
 
@@ -338,6 +338,6 @@ public class TestStitchingFromMotion2D {
 		public boolean getRenderAll() {return false;}
 
 		@Override
-		public PixelTransform2_F32 getModel() {return null;}
+		public PixelTransform<Point2D_F32> getModel() {return null;}
 	}
 }

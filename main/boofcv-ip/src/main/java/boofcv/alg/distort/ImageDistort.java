@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,10 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
+import georegression.struct.point.Point2D_F32;
 
 
 /**
@@ -39,7 +40,7 @@ public interface ImageDistort<Input extends ImageBase,Output extends ImageBase> 
 	 *
 	 * @param dstToSrc Pixel coordinate transformation.
 	 */
-	void setModel( PixelTransform2_F32 dstToSrc );
+	void setModel( PixelTransform<Point2D_F32> dstToSrc );
 
 	/**
 	 * Applies the transform to the entire destination image.
@@ -89,6 +90,6 @@ public interface ImageDistort<Input extends ImageBase,Output extends ImageBase> 
 	 * Returns the distortion model.
 	 * @return model dst to src
 	 */
-	PixelTransform2_F32 getModel();
+	PixelTransform<Point2D_F32> getModel();
 
 }

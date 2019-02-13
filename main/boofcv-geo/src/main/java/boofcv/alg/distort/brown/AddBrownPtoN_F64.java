@@ -102,4 +102,9 @@ public class AddBrownPtoN_F64 implements Point2Transform2_F64 {
 		out.x = out.x*(1 + sum) + tx;
 		out.y = out.y*(1 + sum) + ty;
 	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return true;
+	}
 }

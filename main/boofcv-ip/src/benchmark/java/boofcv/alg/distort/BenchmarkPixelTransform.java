@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,10 @@ package boofcv.alg.distort;
 
 import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.homography.Homography2D_F32;
+import georegression.struct.point.Point2D_F32;
 
 import java.util.Random;
 
@@ -38,10 +39,11 @@ public class BenchmarkPixelTransform {
 	public static final int TEST_TIME = 1000;
 
 	public static class TestPixelTransform_F32 implements Performer {
-		PixelTransform2_F32 alg;
+		PixelTransform<Point2D_F32> alg;
 		String name;
+		Point2D_F32 distorted = new Point2D_F32();
 
-		public TestPixelTransform_F32(PixelTransform2_F32 alg, String name ) {
+		public TestPixelTransform_F32(PixelTransform<Point2D_F32> alg, String name ) {
 			this.alg = alg;
 			this.name = name;
 		}
@@ -50,7 +52,7 @@ public class BenchmarkPixelTransform {
 		public void process() {
 			for (int y = 0; y < imgHeight; y++ )
 				for (int x = 0; x < imgWidth; x++)
-					alg.compute(x, y);
+					alg.compute(x, y, distorted);
 		}
 
 		@Override
@@ -60,7 +62,7 @@ public class BenchmarkPixelTransform {
 	}
 
 	
-	private static void benchmark(PixelTransform2_F32 alg , String name ) {
+	private static void benchmark(PixelTransform<Point2D_F32> alg , String name ) {
 		ProfileOperation.printOpsPerSec(new TestPixelTransform_F32(alg,name), TEST_TIME);
 	}
 	

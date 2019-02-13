@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,11 +25,12 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.ConfigLength;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPolygons2D_I32;
 import georegression.metric.Area2D_F64;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Polygon2D_F64;
@@ -101,7 +102,8 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private boolean outputClockwise;
 
 	// transforms which can be used to handle lens distortion
-	protected PixelTransform2_F32 distToUndist, undistToDist;
+	protected PixelTransform<Point2D_F32> distToUndist, undistToDist;
+	protected Point2D_F32 distortedPoint = new Point2D_F32();
 
 	private boolean verbose = false;
 
@@ -183,7 +185,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	 * @param undistToDist Transform from undistorted to distorted image.
 	 */
 	public void setLensDistortion(int width , int height ,
-								  PixelTransform2_F32 distToUndist , PixelTransform2_F32 undistToDist ) {
+								  PixelTransform<Point2D_F32> distToUndist , PixelTransform<Point2D_F32> undistToDist ) {
 
 		this.distToUndist = distToUndist;
 		this.undistToDist = undistToDist;
@@ -502,11 +504,11 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 			Point2D_I32 p = distorted.get(j);
 			Point2D_I32 q = undistorted.grow();
 
-			distToUndist.compute(p.x,p.y);
+			distToUndist.compute(p.x,p.y,distortedPoint);
 
 			// round to minimize error
-			q.x = Math.round(distToUndist.distX);
-			q.y = Math.round(distToUndist.distY);
+			q.x = Math.round(distortedPoint.x);
+			q.y = Math.round(distortedPoint.y);
 		}
 	}
 
@@ -584,11 +586,11 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 		this.contourEdgeThreshold = contourEdgeThreshold;
 	}
 
-	public PixelTransform2_F32 getDistToUndist() {
+	public PixelTransform<Point2D_F32> getDistToUndist() {
 		return distToUndist;
 	}
 
-	public PixelTransform2_F32 getUndistToDist() {
+	public PixelTransform<Point2D_F32> getUndistToDist() {
 		return undistToDist;
 	}
 

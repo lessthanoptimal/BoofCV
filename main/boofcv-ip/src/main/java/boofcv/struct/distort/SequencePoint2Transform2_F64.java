@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,5 +43,14 @@ public class SequencePoint2Transform2_F64 implements Point2Transform2_F64 {
 		for( int i = 1; i < sequence.length; i++ ) {
 			sequence[i].compute(out.x,out.y,out);
 		}
+	}
+
+	@Override
+	public boolean isThreadSafe() {
+		for (int i = 0; i < sequence.length; i++) {
+			if( !sequence[i].isThreadSafe() )
+				return false;
+		}
+		return true;
 	}
 }

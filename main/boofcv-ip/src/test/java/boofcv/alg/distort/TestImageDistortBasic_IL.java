@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,11 @@ import boofcv.alg.interpolate.impl.ImplBilinearPixel_IL_F32;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.InterleavedF32;
 import boofcv.testing.BoofTesting;
+import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -45,12 +46,15 @@ public class TestImageDistortBasic_IL {
 
 	float offX=0,offY=0;
 
-	PixelTransform2_F32 tran = new PixelTransform2_F32() {
+	PixelTransform<Point2D_F32> tran = new PixelTransform<Point2D_F32>() {
 		@Override
-		public void compute(int x, int y) {
-			distX = x+offX;
-			distY = y+offY;
+		public void compute(int x, int y, Point2D_F32 output ) {
+			output.x = x+offX;
+			output.y = y+offY;
 		}
+
+		@Override
+		public boolean isThreadSafe() {return true;}
 	};
 
 	@Test

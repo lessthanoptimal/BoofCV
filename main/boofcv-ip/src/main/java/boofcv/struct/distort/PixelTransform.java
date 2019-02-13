@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,12 +23,19 @@ package boofcv.struct.distort;
  *
  * @author Peter Abeles
  */
-public interface PixelTransform {
+public interface PixelTransform<T> {
 	/**
 	 * applies a transform to a pixel coordinate
 	 *
 	 * @param x Pixel x-coordinate
 	 * @param y Pixel y-coordinate
+	 * @param output The transformed pixel
 	 */
-	void compute( int x , int y );
+	void compute( int x , int y , T output );
+
+	/**
+	 * If it returns true it is threadsafe and can be used inside of concurrent code
+	 * @return true for thread safe and false for not
+	 */
+	boolean isThreadSafe();
 }

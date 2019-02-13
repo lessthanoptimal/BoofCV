@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.distort;
 
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F32;
 import georegression.struct.point.Point2D_F32;
 import org.ejml.UtilEjml;
@@ -29,7 +29,7 @@ import org.ejml.UtilEjml;
  *
  * @author Peter Abeles
  */
-public class PixelTransformCached_F32 extends PixelTransform2_F32 {
+public class PixelTransformCached_F32 implements PixelTransform<Point2D_F32> {
 
 	Point2D_F32 map[];
 	int width,height;
@@ -40,7 +40,7 @@ public class PixelTransformCached_F32 extends PixelTransform2_F32 {
 		this(width,height, new PointToPixelTransform_F32(transform));
 	}
 
-	public PixelTransformCached_F32(int width, int height, PixelTransform2_F32 transform ) {
+	public PixelTransformCached_F32(int width, int height, PixelTransform<Point2D_F32> transform ) {
 		this.width = width+1; // add one to the width since some stuff checks the outside border
 		this.height = height+1;
 
@@ -48,16 +48,16 @@ public class PixelTransformCached_F32 extends PixelTransform2_F32 {
 		int index = 0;
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
-				transform.compute(x,y);
+				Point2D_F32 p = new Point2D_F32();
+				transform.compute(x,y,p);
 
 				// It's not obvious what to do if the pixel is invalid
 				// If left as uncountable it can mess up the processing completely later on.
 				// Figured a pixel out of the image at -1,-1 might get someone's attention that something is up
-				if( !ignoreNaN && (UtilEjml.isUncountable(transform.distX) || UtilEjml.isUncountable(transform.distY)) ) {
-					map[index++] = new Point2D_F32(-1,-1);
-				} else {
-					map[index++] = new Point2D_F32(transform.distX, transform.distY);
+				if( !ignoreNaN && (UtilEjml.isUncountable(p.x) || UtilEjml.isUncountable(p.y)) ) {
+					p.set(-1,-1);
 				}
+				map[index++] = p;
 			}
 		}
 	}
@@ -75,12 +75,15 @@ public class PixelTransformCached_F32 extends PixelTransform2_F32 {
 	}
 
 	@Override
-	public void compute(int x, int y) {
+	public void compute(int x, int y, Point2D_F32 output) {
 //		if( x < 0 || y < 0 || x >= width || y >= height )
 //			throw new IllegalArgumentException("Out of bounds");
 
-		Point2D_F32 p = map[y*width+x];
-		distX = p.x;
-		distY = p.y;
+		output.set(map[y*width+x]);
+	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return true;
 	}
 }

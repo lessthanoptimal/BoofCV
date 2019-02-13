@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,4 +35,10 @@ public interface Point2Transform2_F64 {
 	 * @param out Transformed point location.
 	 */
 	void compute( double x, double y, Point2D_F64 out);
+
+	/**
+	 * If it returns true it is threadsafe and can be used inside of concurrent code
+	 * @return true for thread safe and false for not
+	 */
+	boolean isThreadSafe();
 }

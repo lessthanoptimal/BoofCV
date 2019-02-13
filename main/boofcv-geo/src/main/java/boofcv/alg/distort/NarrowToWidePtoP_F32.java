@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,6 +86,11 @@ public class NarrowToWidePtoP_F32 implements Point2Transform2_F32 {
 		unit.z /= n;
 
 		unitToWide.compute(unit.x,unit.y,unit.z,out);
+	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return false;
 	}
 
 }

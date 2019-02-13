@@ -63,6 +63,11 @@ public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
 		removeRadial(x, y, params.radial, params.t1, params.t2, out, tol );
 	}
 
+	@Override
+	public boolean isThreadSafe() {
+		return true;
+	}
+
 	/**
 	 * Static function for removing radial and tangential distortion
 	 *

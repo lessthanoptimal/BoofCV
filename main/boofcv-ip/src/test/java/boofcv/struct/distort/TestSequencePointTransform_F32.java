@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,6 +36,11 @@ public class TestSequencePointTransform_F32 {
 			public void compute(float x, float y, Point2D_F32 out) {
 				out.x = x+1;
 				out.y = y+2;
+			}
+
+			@Override
+			public boolean isThreadSafe() {
+				return true;
 			}
 		};
 

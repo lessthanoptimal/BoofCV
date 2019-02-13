@@ -26,6 +26,7 @@ import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.SequencePoint2Transform2_F64;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.RectangleLength2D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -51,8 +52,9 @@ public class ImplRectifyImageOps_F64 {
 
 		Point2Transform2_F64 tranLeft = transformPixelToRect(paramLeft, rectifyLeft);
 
+		Point2D_F64 work = new Point2D_F64();
 		RectangleLength2D_F64 bound = DistortImageOps.boundBox_F64(paramLeft.width, paramLeft.height,
-				new PointToPixelTransform_F64(tranLeft));
+				new PointToPixelTransform_F64(tranLeft),work);
 
 		double scaleX = paramLeft.width/bound.width;
 		double scaleY = paramLeft.height/bound.height;
@@ -67,8 +69,9 @@ public class ImplRectifyImageOps_F64 {
 	{
 		Point2Transform2_F64 tranLeft = new PointTransformHomography_F64(rectifyLeft);
 
+		Point2D_F64 work = new Point2D_F64();
 		RectangleLength2D_F64 bound = DistortImageOps.boundBox_F64(imageWidth, imageHeight,
-				new PointToPixelTransform_F64(tranLeft));
+				new PointToPixelTransform_F64(tranLeft),work);
 
 		double scaleX = imageWidth/bound.width;
 		double scaleY = imageHeight/bound.height;
@@ -87,8 +90,9 @@ public class ImplRectifyImageOps_F64 {
 
 		Point2Transform2_F64 tranLeft = transformPixelToRect(paramLeft, rectifyLeft);
 
+		Point2D_F64 work = new Point2D_F64();
 		RectangleLength2D_F64 bound = LensDistortionOps_F64.boundBoxInside(paramLeft.width, paramLeft.height,
-				new PointToPixelTransform_F64(tranLeft));
+				new PointToPixelTransform_F64(tranLeft),work);
 
 		LensDistortionOps_F64.roundInside(bound);
 
@@ -105,8 +109,9 @@ public class ImplRectifyImageOps_F64 {
 	{
 		PointTransformHomography_F64 tranLeft = new PointTransformHomography_F64(rectifyLeft);
 
+		Point2D_F64 work = new Point2D_F64();
 		RectangleLength2D_F64 bound = LensDistortionOps_F64.boundBoxInside(imageWidth, imageHeight,
-				new PointToPixelTransform_F64(tranLeft));
+				new PointToPixelTransform_F64(tranLeft), work);
 
 		double scaleX = imageWidth/(double)bound.width;
 		double scaleY = imageHeight/(double)bound.height;

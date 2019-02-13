@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,7 @@ import boofcv.struct.image.ImageType;
 import georegression.geometry.ConvertRotation3D_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
+import georegression.struct.point.Point2D_F32;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -97,9 +98,10 @@ public class EquirectangularRotatingApp<T extends ImageBase<T>> extends Demonstr
 				synchronized (distorter) {
 					EquirectangularTools_F32 tools = distorter.getTools();
 
+					Point2D_F32 distorted = new Point2D_F32();
 					double scale = panelImage.scale;
-					distorter.compute((int) (e.getX() / scale), (int) (e.getY() / scale));
-					tools.equiToLatLonFV(distorter.distX, distorter.distY, geo);
+					distorter.compute((int) (e.getX() / scale), (int) (e.getY() / scale),distorted);
+					tools.equiToLatLonFV(distorted.x, distorted.y, geo);
 					panelRotate.setOrientation(UtilAngle.radianToDegree(geo.lat), UtilAngle.radianToDegree(geo.lon),0);
 					distorter.setDirection(geo.lon, geo.lat, 0);
 					distortImage.setModel(distorter); // let it know the transform has changed

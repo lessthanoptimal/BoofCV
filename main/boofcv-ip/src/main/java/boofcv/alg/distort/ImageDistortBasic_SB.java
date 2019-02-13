@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.distort;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.point.Point2D_F32;
 
 /**
  * Most basic implementation of {@link ImageDistort} for {@link ImageGray}. Computes the distortion from the
@@ -30,6 +31,8 @@ import boofcv.struct.image.ImageGray;
  */
 public abstract class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output extends ImageGray<Output>>
 		extends ImageDistortBasic<Input,Output,InterpolatePixelS<Input>> {
+
+	Point2D_F32 distorted = new Point2D_F32();
 
 	/**
 	 * Specifies configuration parameters
@@ -48,9 +51,8 @@ public abstract class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output
 		for( int y = y0; y < y1; y++ ) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			for( int x = x0; x < x1; x++ , indexDst++ ) {
-				dstToSrc.compute(x,y);
-
-				assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
+				dstToSrc.compute(x,y,distorted);
+				assign(indexDst,interp.get(distorted.x,distorted.y));
 			}
 		}
 	}
@@ -67,11 +69,10 @@ public abstract class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output
 			int indexMsk = mask.startIndex + mask.stride*y + x0;
 
 			for( int x = x0; x < x1; x++ , indexDst++, indexMsk++ ) {
-				dstToSrc.compute(x,y);
-
-				assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
-				if( dstToSrc.distX >= 0 && dstToSrc.distX <= maxWidth &&
-						dstToSrc.distY >= 0 && dstToSrc.distY <= maxHeight ) {
+				dstToSrc.compute(x,y,distorted);
+				assign(indexDst,interp.get(distorted.x,distorted.y));
+				if( distorted.x >= 0 && distorted.x <= maxWidth &&
+						distorted.y >= 0 && distorted.y <= maxHeight ) {
 					mask.data[indexMsk] = 1;
 				} else {
 					mask.data[indexMsk] = 0;
@@ -89,11 +90,11 @@ public abstract class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output
 		for( int y = y0; y < y1; y++ ) {
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			for( int x = x0; x < x1; x++ , indexDst++ ) {
-				dstToSrc.compute(x,y);
+				dstToSrc.compute(x,y,distorted);
 
-				if( dstToSrc.distX >= 0 && dstToSrc.distX <= maxWidth &&
-						dstToSrc.distY >= 0 && dstToSrc.distY <= maxHeight ) {
-					assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
+				if( distorted.x >= 0 && distorted.x <= maxWidth &&
+						distorted.y >= 0 && distorted.y <= maxHeight ) {
+					assign(indexDst,interp.get(distorted.x, distorted.y));
 				}
 			}
 		}
@@ -110,11 +111,11 @@ public abstract class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output
 			int indexMsk = mask.startIndex + mask.stride*y + x0;
 
 			for( int x = x0; x < x1; x++ , indexDst++ , indexMsk++ ) {
-				dstToSrc.compute(x,y);
+				dstToSrc.compute(x,y,distorted);
 
-				if( dstToSrc.distX >= 0 && dstToSrc.distX <= maxWidth &&
-						dstToSrc.distY >= 0 && dstToSrc.distY <= maxHeight ) {
-					assign(indexDst,interp.get(dstToSrc.distX, dstToSrc.distY));
+				if( distorted.x >= 0 && distorted.x <= maxWidth &&
+						distorted.y >= 0 && distorted.y <= maxHeight ) {
+					assign(indexDst,interp.get(distorted.x, distorted.y));
 					mask.data[indexMsk] = 1;
 				} else {
 					mask.data[indexMsk] = 0;

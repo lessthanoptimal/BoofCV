@@ -27,7 +27,7 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.SequencePoint2Transform2_F32;
 import boofcv.struct.image.ImageBase;
@@ -35,6 +35,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import georegression.struct.ConvertFloatType;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.se.Se3_F32;
 import georegression.struct.se.Se3_F64;
 
@@ -128,7 +129,7 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageBase<
 		Point2Transform2_F32 adjustedToDepth = new SequencePoint2Transform2_F32(desiredToOriginal,visToDepth);
 
 		// Create a lookup table to make the math much faster
-		PixelTransform2_F32 pixelAdjToDepth = new PixelTransformCached_F32(
+		PixelTransform<Point2D_F32> pixelAdjToDepth = new PixelTransformCached_F32(
 				paramAdjusted.width, paramAdjusted.height,adjustedToDepth);
 
 		// adjusted pixels to normalized image coordinates in RGB frame

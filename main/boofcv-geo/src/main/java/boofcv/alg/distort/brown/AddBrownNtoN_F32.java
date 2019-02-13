@@ -69,4 +69,9 @@ public class AddBrownNtoN_F32 implements Point2Transform2_F32 {
 		out.x = x*(1 + sum) + 2*t1*x*y + t2*(r2 + 2*x*x);
 		out.y = y*(1 + sum) + t1*(r2 + 2*y*y) + 2*t2*x*y;
 	}
+
+	@Override
+	public boolean isThreadSafe() {
+		return true;
+	}
 }

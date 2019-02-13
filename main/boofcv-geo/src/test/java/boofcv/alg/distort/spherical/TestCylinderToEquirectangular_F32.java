@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.distort.spherical;
 import boofcv.struct.geo.GeoLL_F32;
 import georegression.metric.UtilAngle;
 import georegression.misc.GrlConstants;
+import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,11 +45,12 @@ public class TestCylinderToEquirectangular_F32 {
 		alg.configure(200,301, UtilAngle.radian(100));
 
 		// center of rendered image
-		alg.compute(100,150);
+		Point2D_F32 p = new Point2D_F32();
+		alg.compute(100,150, p);
 
 		// center of output image with y-axis inverted
-		assertEquals(200,alg.distX, GrlConstants.TEST_F32);
-		assertEquals(501-250-1,alg.distY, GrlConstants.TEST_F32);
+		assertEquals(200,p.x, GrlConstants.TEST_F32);
+		assertEquals(501-250-1,p.y, GrlConstants.TEST_F32);
 	}
 
 	/**
@@ -62,12 +64,13 @@ public class TestCylinderToEquirectangular_F32 {
 		alg.configure(200,300, UtilAngle.radian(100));
 
 		GeoLL_F32 ll = new GeoLL_F32();
+		Point2D_F32 p = new Point2D_F32();
 
-		alg.compute(100,0);
-		alg.getTools().equiToLatLon(alg.distX,alg.distY,ll);
+		alg.compute(100,0, p);
+		alg.getTools().equiToLatLon(p.x,p.y,ll);
 		float lat0 = ll.lat;
-		alg.compute(100,299);
-		alg.getTools().equiToLatLon(alg.distX,alg.distY,ll);
+		alg.compute(100,299, p);
+		alg.getTools().equiToLatLon(p.x,p.y,ll);
 		float lat1 = ll.lat;
 
 		assertEquals(UtilAngle.radian(100),lat1-lat0, GrlConstants.TEST_F32);

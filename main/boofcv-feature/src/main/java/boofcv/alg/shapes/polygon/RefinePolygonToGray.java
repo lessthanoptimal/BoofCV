@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,9 @@
 
 package boofcv.alg.shapes.polygon;
 
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.shapes.Polygon2D_F64;
 
 /**
@@ -39,7 +40,7 @@ public interface RefinePolygonToGray<T extends ImageGray<T>> {
 	 * Specifies lens distortion
 	 */
 	void setLensDistortion(int width , int height ,
-						   PixelTransform2_F32 distToUndist , PixelTransform2_F32 undistToDist );
+						   PixelTransform<Point2D_F32> distToUndist , PixelTransform<Point2D_F32> undistToDist );
 
 
 	/**

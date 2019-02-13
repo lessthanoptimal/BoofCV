@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,11 +22,12 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.factory.distort.FactoryDistort;
-import boofcv.struct.distort.PixelTransform2_F32;
+import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
 import georegression.struct.affine.Affine2D_F32;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.se.Se2_F32;
 import georegression.transform.ConvertTransform_F32;
 import georegression.transform.InvertibleTransformSequence;
@@ -99,7 +100,7 @@ public class DistortSupport {
 	 */
 	public static <Input extends ImageGray<Input>,Output extends ImageGray<Output>>
 	ImageDistort<Planar<Input>,Planar<Output>>
-	createDistortPL(Class<Output> outputType, PixelTransform2_F32 dstToSrc,
+	createDistortPL(Class<Output> outputType, PixelTransform<Point2D_F32> dstToSrc,
 					InterpolatePixelS<Input> interp, boolean cached )
 	{
 		ImageDistort<Input,Output> bandDistort = FactoryDistort.distortSB(cached, interp, outputType);
