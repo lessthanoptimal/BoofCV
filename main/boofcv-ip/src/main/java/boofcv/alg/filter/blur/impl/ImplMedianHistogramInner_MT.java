@@ -39,6 +39,7 @@ import java.util.Arrays;
  * </p>
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class ImplMedianHistogramInner_MT {
 
 	/**
@@ -58,6 +59,11 @@ public class ImplMedianHistogramInner_MT {
 		final IWorkArrays _work = work;
 
 		int w = 2*radius+1;
+
+		// sanity check to make sure the image isn't too small to be processed by this algorithm
+		if( input.width < w || input.height < w )
+			return;
+
 		int threshold = (w*w)/2+1;
 
 		BoofConcurrency.blocks(radius, output.height-radius, w,(y0,y1)->{
@@ -68,7 +74,11 @@ public class ImplMedianHistogramInner_MT {
 
 			// compute the median value for the first x component and initialize the system
 			for( int i = 0; i < w; i++ ) {
-				addSide(input.data,input.stride, w, histogram, seed+i,256);
+				int idx = seed + i*input.stride;
+				int end = idx + w;
+				while( idx < end ) {
+					histogram[(input.data[idx++]&0xFF)]++;
+				}
 			}
 
 			int count = 0;

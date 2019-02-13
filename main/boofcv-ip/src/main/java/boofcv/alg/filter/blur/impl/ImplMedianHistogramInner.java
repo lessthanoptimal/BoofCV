@@ -39,6 +39,7 @@ import java.util.Arrays;
  * </p>
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class ImplMedianHistogramInner {
 
 	/**
@@ -57,6 +58,11 @@ public class ImplMedianHistogramInner {
 		final IWorkArrays _work = work;
 
 		int w = 2*radius+1;
+
+		// sanity check to make sure the image isn't too small to be processed by this algorithm
+		if( input.width < w || input.height < w )
+			return;
+
 		// defines what the median is. technically this is an approximation because if even it's the ave
 		// of the two elements in the middle. I'm not aware of libraries which actually do this.
 		int threshold = (w*w)/2+1;
@@ -70,7 +76,11 @@ public class ImplMedianHistogramInner {
 
 			// compute the median value for the first x component and initialize the system
 			for( int i = 0; i < w; i++ ) {
-				addSide(input.data,input.stride, w, histogram, seed+i,256);
+				int idx = seed + i*input.stride;
+				int end = idx + w;
+				while( idx < end ) {
+					histogram[(input.data[idx++]&0xFF)]++;
+				}
 			}
 
 			int count = 0;

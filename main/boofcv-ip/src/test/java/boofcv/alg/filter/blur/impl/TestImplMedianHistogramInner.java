@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,10 +44,10 @@ public class TestImplMedianHistogramInner {
 	public void compareToSort(GrayU8 image, GrayU8 found, GrayU8 expected) {
 		for( int radius = 1; radius <= 3; radius++ ) {
 
-			ImplMedianSortNaive.process(image,found,radius,null);
+			ImplMedianHistogramInner.process(image,found,radius,null);
 			ImplMedianSortNaive.process(image,expected,radius,null);
 
-			BoofTesting.assertEquals(expected,found,radius);
+			BoofTesting.assertEqualsInner(expected,found,0,radius,radius,false);
 		}
 	}
 }

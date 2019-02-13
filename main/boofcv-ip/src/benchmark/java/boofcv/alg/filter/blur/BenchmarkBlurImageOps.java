@@ -79,6 +79,10 @@ public class BenchmarkBlurImageOps {
 		BlurImageOps.gaussian(input,output,-1,radius,storage);
 	}
 
+	@Benchmark
+	public void median() {
+		BlurImageOps.median(input,output,radius,work);
+	}
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()

@@ -150,7 +150,7 @@ public class AutocodeConcurrentApp {
 					"\n" +
 					"class " + className + " {\n" +
 					"\t@Test\n" +
-					"\tpublic void implement() {\n" +
+					"\tvoid implement() {\n" +
 					"\t\tfail(\"implement\");\n" +
 					"\t}\n" +
 					"}\n");

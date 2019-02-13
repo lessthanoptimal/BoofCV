@@ -18,14 +18,29 @@
 
 package boofcv.alg.filter.blur.impl;
 
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.Random;
 
 class TestImplMedianHistogramInner_MT {
+	Random rand = new Random(234);
+
 	@Test
-	public void implement() {
-		fail("implement");
+	public void compareToSingle() {
+		GrayU8 input = new GrayU8(200,210);
+		GrayU8 expected = input.createSameShape();
+		GrayU8 found = input.createSameShape();
+		int radius = 5;
+
+		ImageMiscOps.fillUniform(input,rand,0,200);
+
+		ImplMedianHistogramInner.process(input,expected,radius,null);
+		ImplMedianHistogramInner_MT.process(input,found,radius,null);
+
+		BoofTesting.assertEquals(expected,found,0);
 	}
 }
 
