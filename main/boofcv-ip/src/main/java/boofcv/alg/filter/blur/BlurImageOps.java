@@ -20,14 +20,12 @@ package boofcv.alg.filter.blur;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.blur.impl.ImplMedianHistogramInner;
+import boofcv.alg.filter.blur.impl.ImplMedianHistogramInner_MT;
 import boofcv.alg.filter.blur.impl.ImplMedianSortEdgeNaive;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.filter.convolve.ConvolveImageMean;
 import boofcv.alg.filter.convolve.ConvolveImageNormalized;
-import boofcv.concurrency.DWorkArrays;
-import boofcv.concurrency.FWorkArrays;
-import boofcv.concurrency.IWorkArrays;
-import boofcv.concurrency.WorkArrays;
+import boofcv.concurrency.*;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -190,7 +188,8 @@ public class BlurImageOps {
 	 * @param radius Radius of the median blur function.
 	 * @return Output blurred image.
 	 */
-	public static GrayU8 median(GrayU8 input, @Nullable GrayU8 output, int radius) {
+	public static GrayU8 median(GrayU8 input, @Nullable GrayU8 output, int radius,
+								@Nullable IWorkArrays work) {
 		if( radius <= 0 )
 			throw new IllegalArgumentException("Radius must be > 0");
 
@@ -201,9 +200,12 @@ public class BlurImageOps {
 		if( !processed ) {
 			int w = radius * 2 + 1;
 			int offset[] = new int[w * w];
-			int histogram[] = new int[256];
 
-			ImplMedianHistogramInner.process(input, output, radius, offset, histogram);
+			if( BoofConcurrency.USE_CONCURRENT ) {
+				ImplMedianHistogramInner_MT.process(input, output, radius, offset, work);
+			} else {
+				ImplMedianHistogramInner.process(input, output, radius, offset, work);
+			}
 			ImplMedianSortEdgeNaive.process(input, output, radius, offset);
 		}
 
@@ -243,13 +245,14 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageGray<T>>
-	Planar<T> median(Planar<T> input, @Nullable Planar<T> output, int radius ) {
+	Planar<T> median(Planar<T> input, @Nullable Planar<T> output, int radius ,
+					 @Nullable WorkArrays work) {
 
 		if( output == null )
 			output = input.createNew(input.width,input.height);
 
 		for( int band = 0; band < input.getNumBands(); band++ ) {
-			GBlurImageOps.median(input.getBand(band),output.getBand(band),radius);
+			GBlurImageOps.median(input.getBand(band),output.getBand(band),radius,work);
 		}
 		return output;
 	}

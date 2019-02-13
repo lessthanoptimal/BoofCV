@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ public class BenchmarkMedianFilter  {
 
 	public int timeBlurImageOps_I8(int reps) {
 		for( int i = 0; i < reps; i++ )
-			BlurImageOps.median(imgInt8, out_I8, radius);
+			BlurImageOps.median(imgInt8, out_I8, radius, null);
 		return 0;
 	}
 

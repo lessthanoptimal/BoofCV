@@ -49,6 +49,9 @@ Less High Priority Next Release
   * Stereo disparity
   * Dense Features
 
+- Filters
+  * Median Filter: When even do average of two median terms
+
 - Sparse Bundle Adjustment
   * Improve LM implementation so that it doesn't have to take a full gradient step if that's too big
   * sparse block math

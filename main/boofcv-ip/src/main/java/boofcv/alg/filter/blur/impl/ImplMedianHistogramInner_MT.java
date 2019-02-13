@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.blur.impl;
 
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.IWorkArrays;
 import boofcv.struct.image.GrayU8;
 
@@ -38,7 +38,7 @@ import java.util.Arrays;
  * </p>
  * @author Peter Abeles
  */
-public class ImplMedianHistogramInner {
+public class ImplMedianHistogramInner_MT {
 
 	/**
 	 * Applies a median image filter.
@@ -77,8 +77,7 @@ public class ImplMedianHistogramInner {
 
 		int boxWidth = radius*2+1;
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(radius, output.height-radius, w,(y0,y1)->{
-		final int y0 = radius, y1 = input.height-radius;
+		BoofConcurrency.blocks(radius, output.height-radius, w,(y0,y1)->{
 		int[] histogram = _work.pop();
 		for( int y = y0; y < y1; y++ ) {
 			int seed = input.startIndex + y*input.stride+radius;
@@ -130,7 +129,6 @@ public class ImplMedianHistogramInner {
 					histogram[val]--;
 				}
 			}
-		}
-		//CONCURRENT_ABOVE }});
+		}});
 	}
 }

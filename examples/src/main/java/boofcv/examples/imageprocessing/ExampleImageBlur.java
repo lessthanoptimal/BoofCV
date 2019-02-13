@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public class ExampleImageBlur {
 
 		// Apply a median filter using image type specific procedural interface.  Won't work if the type
 		// isn't known at compile time
-		BlurImageOps.median(input,blurred,radius);
+		BlurImageOps.median(input,blurred,radius, null);
 		panel.addImage(ConvertBufferedImage.convertTo(blurred, null, true),"Median");
 
 		ShowImages.showWindow(panel,"Image Blur Examples",true);

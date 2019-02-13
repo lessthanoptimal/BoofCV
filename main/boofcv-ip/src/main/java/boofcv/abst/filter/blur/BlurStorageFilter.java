@@ -141,7 +141,7 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	private class MedianOperator implements BlurOperation {
 		@Override
 		public void process(ImageBase input, ImageBase output) {
-			GBlurImageOps.median(input,output,radius);
+			GBlurImageOps.median(input,output,radius,workArray);
 		}
 	}
 }

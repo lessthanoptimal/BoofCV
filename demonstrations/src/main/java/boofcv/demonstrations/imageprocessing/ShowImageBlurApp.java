@@ -108,7 +108,7 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 				break;
 
 			case 2:
-				GBlurImageOps.median(image, output, radius);
+				GBlurImageOps.median(image, output, radius, work);
 				break;
 		}
 		long time1 = System.nanoTime();

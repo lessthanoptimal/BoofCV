@@ -18,16 +18,60 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageBase;
+import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Method;
+import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
 public class TestImplConvolveBox_MT {
+	Random random = new Random(234);
+	int width = 100,height=90;
+
+	/**
+	 * Compares results to single threaded
+	 */
 	@Test
-	void stuff() {
-		fail("Implement");
+	void compareToSingle() {
+		int count = 0;
+		Method[] methods = ImplConvolveBox_MT.class.getMethods();
+		for( Method m : methods ) {
+			String name = m.getName();
+			if( !(name.equals("horizontal") || name.equals("vertical")) )
+				continue;
+
+			// look up the test method
+			Class[] params = m.getParameterTypes();
+			Method testM = BoofTesting.findMethod(ImplConvolveBox.class,name,params);
+
+			ImageBase input = GeneralizedImageOps.createImage(params[0],width,height,2);
+			ImageBase expected = GeneralizedImageOps.createImage(params[1],width,height,2);
+			ImageBase found = GeneralizedImageOps.createImage(params[1],width,height,2);
+
+			System.out.println("Method "+name+" "+input.getImageType());
+
+			GImageMiscOps.fillUniform(input,random,0,200);
+
+			try {
+				testM.invoke(null, input, expected, 8);
+				m.invoke(null, input, found, 8);
+			} catch( Exception e ) {
+				e.printStackTrace();
+				fail("Exception");
+			}
+
+			BoofTesting.assertEquals(expected,found,1);
+			count++;
+		}
+		assertEquals(14,count);
 	}
 }
