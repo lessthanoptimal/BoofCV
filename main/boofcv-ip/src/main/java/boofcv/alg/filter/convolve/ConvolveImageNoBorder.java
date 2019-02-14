@@ -21,8 +21,11 @@ package boofcv.alg.filter.convolve;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.noborder.*;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
+
+import javax.annotation.Nullable;
 
 /**
  * <p>
@@ -458,15 +461,15 @@ public class ConvolveImageNoBorder {
 	}
 
 	public static void convolve(Kernel2D_S32 kernel,
-								  GrayU8 input, GrayI8 output, int divisor) {
+								GrayU8 input, GrayI8 output, int divisor, @Nullable IWorkArrays work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if(BoofConcurrency.USE_CONCURRENT) {
-			if (!ConvolveImageUnrolled_SB_MT_U8_I8_Div.convolve(kernel, input, output, divisor))
-				ConvolveImageStandard_SB_MT.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_MT_U8_I8_Div.convolve(kernel, input, output, divisor,work))
+				ConvolveImageStandard_SB_MT.convolve(kernel, input, output, divisor,work);
 		} else {
-			if (!ConvolveImageUnrolled_SB_U8_I8_Div.convolve(kernel, input, output, divisor))
-				ConvolveImageStandard_SB.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_U8_I8_Div.convolve(kernel, input, output, divisor,work))
+				ConvolveImageStandard_SB.convolve(kernel, input, output, divisor,work);
 		}
 	}
 
@@ -530,15 +533,15 @@ public class ConvolveImageNoBorder {
 	}
 
 	public static void convolve(Kernel2D_S32 kernel,
-								  GrayS16 input, GrayI16 output, int divisor) {
+								  GrayS16 input, GrayI16 output, int divisor, @Nullable IWorkArrays work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if(BoofConcurrency.USE_CONCURRENT) {
-			if (!ConvolveImageUnrolled_SB_MT_S16_I16_Div.convolve(kernel, input, output, divisor))
-				ConvolveImageStandard_SB_MT.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_MT_S16_I16_Div.convolve(kernel, input, output, divisor,work))
+				ConvolveImageStandard_SB_MT.convolve(kernel, input, output, divisor, work);
 		} else {
-			if (!ConvolveImageUnrolled_SB_S16_I16_Div.convolve(kernel, input, output, divisor))
-				ConvolveImageStandard_SB.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_S16_I16_Div.convolve(kernel, input, output, divisor,work))
+				ConvolveImageStandard_SB.convolve(kernel, input, output, divisor,work);
 		}
 	}
 
@@ -602,15 +605,16 @@ public class ConvolveImageNoBorder {
 	}
 
 	public static void convolve(Kernel2D_S32 kernel,
-								  GrayU16 input, GrayI16 output, int divisor) {
+								GrayU16 input, GrayI16 output, int divisor,
+								@Nullable IWorkArrays work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if(BoofConcurrency.USE_CONCURRENT) {
-			if (!ConvolveImageUnrolled_SB_MT_U16_I16_Div.convolve(kernel, input, output, divisor))
-				ConvolveImageStandard_SB_MT.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_MT_U16_I16_Div.convolve(kernel, input, output, divisor,work))
+				ConvolveImageStandard_SB_MT.convolve(kernel, input, output, divisor, work);
 		} else {
-			if (!ConvolveImageUnrolled_SB_U16_I16_Div.convolve(kernel, input, output, divisor))
-				ConvolveImageStandard_SB.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_U16_I16_Div.convolve(kernel, input, output, divisor,work))
+				ConvolveImageStandard_SB.convolve(kernel, input, output, divisor,work);
 		}
 	}
 
@@ -770,15 +774,16 @@ public class ConvolveImageNoBorder {
 	}
 
 	public static void convolve(Kernel2D_S32 kernel,
-								  GrayS32 input, GrayS32 output, int divisor) {
+								GrayS32 input, GrayS32 output, int divisor,
+								@Nullable IWorkArrays work ) {
 		InputSanityCheck.checkSameShape(input, output);
 
 		if(BoofConcurrency.USE_CONCURRENT) {
-			if (!ConvolveImageUnrolled_SB_MT_S32_S32_Div.convolve(kernel, input, output, divisor))
-				ConvolveImageStandard_SB_MT.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_MT_S32_S32_Div.convolve(kernel, input, output, divisor,work))
+				ConvolveImageStandard_SB_MT.convolve(kernel, input, output, divisor, work);
 		} else {
-			if (!ConvolveImageUnrolled_SB_S32_S32_Div.convolve(kernel, input, output, divisor))
-				ConvolveImageStandard_SB.convolve(kernel, input, output, divisor);
+			if (!ConvolveImageUnrolled_SB_S32_S32_Div.convolve(kernel, input, output, divisor,work))
+				ConvolveImageStandard_SB.convolve(kernel, input, output, divisor,work);
 		}
 	}
 

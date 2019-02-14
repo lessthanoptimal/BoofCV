@@ -29,6 +29,7 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class GradientPrewitt_Shared {
 	public static void process(GrayU8 orig,
 							   GrayS16 derivX,

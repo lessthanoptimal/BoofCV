@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -219,7 +219,7 @@ public abstract class GenericNonMaxAlgorithmTests {
 					findLocalPeaks(inten, 0.6f, radius, 0);
 					naiveMin.reset();naiveMax.reset();
 					reg.process(inten, naiveMax);
-					PixelMath.invert(inten, inten);
+					PixelMath.negative(inten, inten);
 					reg.process(inten, naiveMin);
 
 					// check the number of corners

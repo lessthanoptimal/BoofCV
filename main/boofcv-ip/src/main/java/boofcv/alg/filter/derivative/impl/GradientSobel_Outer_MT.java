@@ -38,14 +38,15 @@ import boofcv.struct.image.GrayU8;
  * @author Peter Abeles
  * @see boofcv.alg.filter.derivative.GradientSobel
  */
+@SuppressWarnings("Duplicates")
 public class GradientSobel_Outer_MT {
 
 	/**
 	 * Computes derivative of GrayU8.  None of the images can be sub-images.
 	 */
-	public static void process_I8(GrayU8 orig,
-								  GrayS16 derivX,
-								  GrayS16 derivY) {
+	public static void process(GrayU8 orig,
+							   GrayS16 derivX,
+							   GrayS16 derivY) {
 		final byte[] data = orig.data;
 		final short[] imgX = derivX.data;
 		final short[] imgY = derivY.data;
@@ -70,9 +71,9 @@ public class GradientSobel_Outer_MT {
 	/**
 	 * Computes derivative of GrayU8.  Inputs can be sub-images.
 	 */
-	public static void process_I8_sub(GrayU8 orig,
-									  GrayS16 derivX,
-									  GrayS16 derivY) {
+	public static void process_sub(GrayU8 orig,
+								   GrayS16 derivX,
+								   GrayS16 derivY) {
 		final byte[] data = orig.data;
 		final short[] imgX = derivX.data;
 		final short[] imgY = derivY.data;
@@ -99,9 +100,9 @@ public class GradientSobel_Outer_MT {
 		});
 	}
 
-	public static void process_I8_sub(GrayS16 orig,
-									  GrayS16 derivX,
-									  GrayS16 derivY) {
+	public static void process_sub(GrayS16 orig,
+								   GrayS16 derivX,
+								   GrayS16 derivY) {
 		final short[] data = orig.data;
 		final short[] imgX = derivX.data;
 		final short[] imgY = derivY.data;
@@ -131,9 +132,9 @@ public class GradientSobel_Outer_MT {
 	/**
 	 * Computes derivative of GrayF32.  None of the images can be sub-images.
 	 */
-	public static void process_F32(GrayF32 orig,
-								   GrayF32 derivX,
-								   GrayF32 derivY) {
+	public static void process(GrayF32 orig,
+							   GrayF32 derivX,
+							   GrayF32 derivY) {
 		final float[] data = orig.data;
 		final float[] imgX = derivX.data;
 		final float[] imgY = derivY.data;

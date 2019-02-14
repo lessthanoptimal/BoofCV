@@ -43,36 +43,31 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 
 	@Override
 	public void generate() {
-		for (int i = 0; i < 2; i++) {
-			concurrent = i == 0;
-			printPreamble();
-			printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false);
+		printPreamble();
+		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false);
 //		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false, true);
-			printAllOps(AutoTypeImage.F64, AutoTypeImage.F64, false);
-			printAllOps(AutoTypeImage.U8, AutoTypeImage.I16, false);
-			printAllOps(AutoTypeImage.U8, AutoTypeImage.S32, false);
-			printAllOps(AutoTypeImage.U16, AutoTypeImage.I8, true, true);
-			printAllOps(AutoTypeImage.S16, AutoTypeImage.I16, false);
-			printAllOps(AutoTypeImage.U8, AutoTypeImage.I8, true);
+		printAllOps(AutoTypeImage.F64, AutoTypeImage.F64, false);
+		printAllOps(AutoTypeImage.U8, AutoTypeImage.I16, false);
+		printAllOps(AutoTypeImage.U8, AutoTypeImage.S32, false);
+		printAllOps(AutoTypeImage.U16, AutoTypeImage.I8, true, true);
+		printAllOps(AutoTypeImage.S16, AutoTypeImage.I16, false);
+		printAllOps(AutoTypeImage.U8, AutoTypeImage.I8, true);
 //		printAllOps(AutoTypeImage.U8,AutoTypeImage.I8,false, true);
-			printAllOps(AutoTypeImage.S16, AutoTypeImage.I16, true);
-			printAllOps(AutoTypeImage.U16, AutoTypeImage.I16, false);
-			printAllOps(AutoTypeImage.U16, AutoTypeImage.I16, true);
-			printAllOps(AutoTypeImage.S32, AutoTypeImage.I16, true, true);
-			printAllOps(AutoTypeImage.S32, AutoTypeImage.S32, false);
-			printAllOps(AutoTypeImage.S32, AutoTypeImage.S32, true);
-			out.println("}");
-		}
-
-
+		printAllOps(AutoTypeImage.S16, AutoTypeImage.I16, true);
+		printAllOps(AutoTypeImage.U16, AutoTypeImage.I16, false);
+		printAllOps(AutoTypeImage.U16, AutoTypeImage.I16, true);
+		printAllOps(AutoTypeImage.S32, AutoTypeImage.I16, true, true);
+		printAllOps(AutoTypeImage.S32, AutoTypeImage.S32, false);
+		printAllOps(AutoTypeImage.S32, AutoTypeImage.S32, true);
+		out.println("}");
 	}
 
 	private void printPreamble() {
 		autoSelectName();
 		out.print("import boofcv.struct.convolve.*;\n" +
-				"import boofcv.struct.image.*;\n");
-		if( concurrent )
-			out.print("import boofcv.concurrency.BoofConcurrency;\n");
+				"import boofcv.struct.image.*;\n" +
+				"import javax.annotation.Generated;\n");
+		out.print("//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n");
 
 		out.println();
 		out.println();
@@ -87,7 +82,8 @@ public class GenerateConvolveImageStandard_IL extends CodeGeneratorBase {
 				" * \n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"@SuppressWarnings({\"ForLoopReplaceableByForEach\"})\n" +
+				"@Generated({\""+getClass().getCanonicalName()+"\"})\n" +
+				"@SuppressWarnings({\"ForLoopReplaceableByForEach\",\"Duplicates\"})\n" +
 				"public class " + className + " {\n\n");
 	}
 

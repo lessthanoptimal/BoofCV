@@ -25,22 +25,33 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-class TestImplMedianHistogramInner_MT {
+/**
+ * @author Peter Abeles
+ */
+public class TestImplMedianHistogramInner_MT {
 	Random rand = new Random(234);
 
 	@Test
-	public void compareToSingle() {
+	void compareToSingle() {
 		GrayU8 input = new GrayU8(200,210);
 		GrayU8 expected = input.createSameShape();
 		GrayU8 found = input.createSameShape();
-		int radius = 5;
 
 		ImageMiscOps.fillUniform(input,rand,0,200);
 
-		ImplMedianHistogramInner.process(input,expected,radius,null);
-		ImplMedianHistogramInner_MT.process(input,found,radius,null);
+		BoofTesting.checkSubImage(this, "compareToSingle", true, input, found, expected);
+	}
 
-		BoofTesting.assertEquals(expected,found,0);
+	public void compareToSingle(GrayU8 image, GrayU8 found, GrayU8 expected) {
+		for( int radius = 1; radius <= 5; radius += 2 ) {
+			ImageMiscOps.fill(found,0);
+			ImageMiscOps.fill(expected,0);
+
+			ImplMedianHistogramInner.process(image,expected,radius,null);
+			ImplMedianHistogramInner_MT.process(image,found,radius,null);
+
+			BoofTesting.assertEquals(expected,found,0);
+		}
 	}
 }
 

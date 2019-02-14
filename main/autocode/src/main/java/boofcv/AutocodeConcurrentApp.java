@@ -137,6 +137,11 @@ public class AutocodeConcurrentApp {
 
 	private static void createTestFile( File path ) {
 
+		if( !path.getParentFile().exists() ) {
+			if( !path.getParentFile().mkdirs() )
+				throw new RuntimeException("Failed to create directories. "+path.getAbsolutePath());
+		}
+
 		try {
 			String className = className(path);
 			String packagePath = derivePackagePath(path);
@@ -197,7 +202,7 @@ public class AutocodeConcurrentApp {
 		}
 
 		String name = readUntilEndOfLine(text,where+pattern.length());
-		return new File(original.getPath(),name+".java");
+		return new File(original.getParent(),name+".java");
 	}
 
 	private static String readType( String line , int location ) {
@@ -245,6 +250,21 @@ public class AutocodeConcurrentApp {
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientTwo1_Standard.java",
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/LaplacianStandard.java",
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/blur/impl/ImplMedianHistogramInner.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/misc/impl/ImplPixelMath.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageStandard_IL.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageStandard_SB.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_F32_F32.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_F64_F64.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S16_I16.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S16_I16_Div.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S32_S32.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S32_S32_Div.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U8_I8_Div.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U8_I16.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U16_I16.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U16_I16_Div.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ImplConvolveBox.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ImplConvolveMean.java",
 				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplEdgeNonMaxSuppression.java",
 				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplEdgeNonMaxSuppressionCrude.java",
 				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplGradientToEdgeFeatures.java",

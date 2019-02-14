@@ -21,6 +21,7 @@ package boofcv.alg.filter.blur;
 import boofcv.alg.filter.blur.impl.ImplMedianSortNaive;
 import boofcv.alg.filter.convolve.GConvolveImageOps;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
@@ -130,12 +131,22 @@ public class TestBlurImageOps {
 
 			for( int radius = 1; radius <= 4; radius++ ) {
 				try {
-					Method m = BlurImageOps.class.getMethod("median",input.getClass(), found.getClass(), int.class);
-					m.invoke(null,input,found, radius);
-
+					if( type.getFamily() == ImageType.Family.PLANAR ) {
+						Method m = BlurImageOps.class.getMethod("median", input.getClass(),
+								found.getClass(), int.class, WorkArrays.class);
+						m.invoke(null, input, found, radius, null);
+					} else if( type.getDataType().isInteger() ) {
+						Method m = BlurImageOps.class.getMethod("median", input.getClass(),
+								found.getClass(), int.class, IWorkArrays.class);
+						m.invoke(null, input, found, radius, null);
+					} else {
+						Method m = BlurImageOps.class.getMethod("median", input.getClass(),
+								found.getClass(), int.class);
+						m.invoke(null, input, found, radius);
+					}
 					Class image = type.getFamily() == ImageType.Family.PLANAR ? Planar.class : ImageGray.class;
 
-					m = ImplMedianSortNaive.class.getMethod("process",image,image, int.class);
+					Method m = ImplMedianSortNaive.class.getMethod("process",image,image, int.class);
 					m.invoke(null,input,expected, radius);
 
 					BoofTesting.assertEquals(expected,found,2);

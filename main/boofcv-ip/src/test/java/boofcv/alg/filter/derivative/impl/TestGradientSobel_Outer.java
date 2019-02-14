@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class TestGradientSobel_Outer {
 				GrayS16 derivY2 = new GrayS16(w, h);
 
 				GradientSobel_Naive.process(img, derivX2, derivY2);
-				GradientSobel_Outer.process_I8(img, derivX, derivY);
+				GradientSobel_Outer.process(img, derivX, derivY);
 
 				BoofTesting.assertEquals(derivX2, derivX, 0);
 				BoofTesting.assertEquals(derivY2, derivY, 0);
@@ -85,7 +85,7 @@ public class TestGradientSobel_Outer {
 		GrayS16 derivY2 = new GrayS16(derivX.width, derivX.height);
 
 		GradientSobel_Naive.process(img, derivX2, derivY2);
-		GradientSobel_Outer.process_I8_sub(img, derivX, derivY);
+		GradientSobel_Outer.process_sub(img, derivX, derivY);
 
 		BoofTesting.assertEquals(derivX2, derivX, 0);
 		BoofTesting.assertEquals(derivY2, derivY, 0);
@@ -109,7 +109,7 @@ public class TestGradientSobel_Outer {
 				GrayF32 derivY2 = new GrayF32(w, h);
 
 				GradientSobel_Naive.process(img, derivX2, derivY2);
-				GradientSobel_Outer.process_F32(img, derivX, derivY);
+				GradientSobel_Outer.process(img, derivX, derivY);
 
 				BoofTesting.assertEquals(derivX2, derivX, 1e-4f);
 				BoofTesting.assertEquals(derivY2, derivY, 1e-4f);

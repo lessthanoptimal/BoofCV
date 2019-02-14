@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,42 +82,42 @@ public class GPixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the inverted image is written to. Modified.
 	 */
-	public static <T extends ImageBase<T>> void invert( T input , T output )
+	public static <T extends ImageBase<T>> void negative(T input , T output )
 	{
 		if( input instanceof ImageGray) {
 			if (GrayS8.class == input.getClass()) {
-				PixelMath.invert((GrayS8) input, (GrayS8) output);
+				PixelMath.negative((GrayS8) input, (GrayS8) output);
 			} else if (GrayS16.class == input.getClass()) {
-				PixelMath.invert((GrayS16) input, (GrayS16) output);
+				PixelMath.negative((GrayS16) input, (GrayS16) output);
 			} else if (GrayS32.class == input.getClass()) {
-				PixelMath.invert((GrayS32) input, (GrayS32) output);
+				PixelMath.negative((GrayS32) input, (GrayS32) output);
 			} else if (GrayS64.class == input.getClass()) {
-				PixelMath.invert((GrayS64) input, (GrayS64) output);
+				PixelMath.negative((GrayS64) input, (GrayS64) output);
 			} else if (GrayF32.class == input.getClass()) {
-				PixelMath.invert((GrayF32) input, (GrayF32) output);
+				PixelMath.negative((GrayF32) input, (GrayF32) output);
 			} else if (GrayF64.class == input.getClass()) {
-				PixelMath.invert((GrayF64) input, (GrayF64) output);
+				PixelMath.negative((GrayF64) input, (GrayF64) output);
 			}
 		} else if( input instanceof ImageInterleaved ) {
 			if (InterleavedS8.class == input.getClass()) {
-				PixelMath.invert((InterleavedS8) input, (InterleavedS8) output);
+				PixelMath.negative((InterleavedS8) input, (InterleavedS8) output);
 			} else if (InterleavedS16.class == input.getClass()) {
-				PixelMath.invert((InterleavedS16) input, (InterleavedS16) output);
+				PixelMath.negative((InterleavedS16) input, (InterleavedS16) output);
 			} else if (InterleavedS32.class == input.getClass()) {
-				PixelMath.invert((InterleavedS32) input, (InterleavedS32) output);
+				PixelMath.negative((InterleavedS32) input, (InterleavedS32) output);
 			} else if (InterleavedS64.class == input.getClass()) {
-				PixelMath.invert((InterleavedS64) input, (InterleavedS64) output);
+				PixelMath.negative((InterleavedS64) input, (InterleavedS64) output);
 			} else if (InterleavedF32.class == input.getClass()) {
-				PixelMath.invert((InterleavedF32) input, (InterleavedF32) output);
+				PixelMath.negative((InterleavedF32) input, (InterleavedF32) output);
 			} else if (InterleavedF64.class == input.getClass()) {
-				PixelMath.invert((InterleavedF64) input, (InterleavedF64) output);
+				PixelMath.negative((InterleavedF64) input, (InterleavedF64) output);
 			}
 		} else {
 			Planar in = (Planar)input;
 			Planar out = (Planar)output;
 
 			for (int i = 0; i < in.getNumBands(); i++) {
-				invert(in.getBand(i),out.getBand(i));
+				negative(in.getBand(i),out.getBand(i));
 			}
 		}
 	}

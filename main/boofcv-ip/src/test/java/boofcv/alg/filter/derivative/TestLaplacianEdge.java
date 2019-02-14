@@ -40,11 +40,6 @@ public class TestLaplacianEdge {
 	private final int height = 5;
 
 	@Test
-	public void checkInputShape() {
-		BoofTesting.checkImageDimensionReshape(new LaplacianEdge(), 3);
-	}
-
-	@Test
 	public void process_U8_S16() {
 		GrayU8 img = new GrayU8(width, height);
 		ImageMiscOps.fillUniform(img, rand, 0, 100);

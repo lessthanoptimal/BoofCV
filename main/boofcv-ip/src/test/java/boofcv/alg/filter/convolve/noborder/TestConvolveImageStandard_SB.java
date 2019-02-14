@@ -20,6 +20,7 @@ package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GImageStatistics;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D;
@@ -432,7 +433,7 @@ public class TestConvolveImageStandard_SB {
 		GImageMiscOps.fill(dest,0);
 		int divisor = kernelWidth*kernelWidth;
 
-		invokeMethod("convolve", kernel, img, dest,divisor);
+		invokeMethod("convolve", kernel, img, dest,divisor, new IWorkArrays());
 
 		assertTrue(GImageStatistics.sum(dest) != 0); // making sure it's a good test and not trivial
 

@@ -33,18 +33,15 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 
 	@Override
 	public void generate() throws FileNotFoundException {
-		for (int i = 0; i < 2; i++) {
-			concurrent = i == 0;
-			printPreamble();
-			addFunctions(AutoTypeImage.U8, AutoTypeImage.I16);
-			addFunctions(AutoTypeImage.U8, AutoTypeImage.S32);
-			addFunctions(AutoTypeImage.S16, AutoTypeImage.I16);
-			addFunctions(AutoTypeImage.U16, AutoTypeImage.I16);
-			addFunctions(AutoTypeImage.S32, AutoTypeImage.S32);
-			addFunctions(AutoTypeImage.F32, AutoTypeImage.F32);
-			addFunctions(AutoTypeImage.F64, AutoTypeImage.F64);
-			out.println("}");
-		}
+		printPreamble();
+		addFunctions(AutoTypeImage.U8, AutoTypeImage.I16);
+		addFunctions(AutoTypeImage.U8, AutoTypeImage.S32);
+		addFunctions(AutoTypeImage.S16, AutoTypeImage.I16);
+		addFunctions(AutoTypeImage.U16, AutoTypeImage.I16);
+		addFunctions(AutoTypeImage.S32, AutoTypeImage.S32);
+		addFunctions(AutoTypeImage.F32, AutoTypeImage.F32);
+		addFunctions(AutoTypeImage.F64, AutoTypeImage.F64);
+		out.println("}");
 	}
 
 	public void addFunctions( AutoTypeImage imageIn , AutoTypeImage imageOut ) throws FileNotFoundException
@@ -57,9 +54,9 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 
 	public void printPreamble() {
 		autoSelectName();
-		out.print("import boofcv.struct.image.*;\n");
-		if( concurrent )
-			out.print("import boofcv.concurrency.BoofConcurrency;\n");
+		out.print("import boofcv.struct.image.*;\n" +
+				  "import javax.annotation.Generated;\n");
+		out.print("import boofcv.concurrency.*;\n");
 
 		out.print("\n" +
 				"/**\n" +
@@ -72,6 +69,8 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 				" * \n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
+				"@Generated({\""+getClass().getCanonicalName()+"\"})\n" +
+				"@SuppressWarnings({\"ForLoopReplaceableByForEach\",\"Duplicates\"})\n" +
 				"public class " + className + " {\n\n");
 	}
 
@@ -115,37 +114,51 @@ public class GenerateImplConvolveBox extends CodeGeneratorBase {
 		String sumType = imageIn.getSumType();
 		String bitWise = imageIn.getBitWise();
 
-		out.print("\tpublic static void vertical( " + imageIn.getSingleBandName() + " input , " + imageOut.getSingleBandName() + " output , int radius ) {\n" +
+		String workType = imageIn.getLetterSum()+"WorkArrays";
+
+		out.print("\tpublic static void vertical( " + imageIn.getSingleBandName() + " input , "
+				+ imageOut.getSingleBandName() + " output , int radius , "+workType+" work ) {\n" +
+				"\t\tif( work == null ) {\n" +
+				"\t\t\twork = new "+workType+"(input.width);\n" +
+				"\t\t} else {\n" +
+				"\t\t\twork.reset(input.width);\n" +
+				"\t\t}\n" +
+				"\t\tfinal "+workType+" _work = work;\n" +
 				"\t\tfinal int kernelWidth = radius*2 + 1;\n" +
 				"\n" +
-				"\t\tfinal int backStep = kernelWidth*input.stride;\n" +
-				"\n" +
-				"\t\tfor( int x = 0; x < input.width; x++ ) {\n" +
-				"\t\t\tint indexIn = input.startIndex + x;\n" +
-				"\t\t\tint indexOut = output.startIndex + output.stride*radius + x;\n" +
-				"\n" +
-				"\t\t\t" + sumType + " total = 0;\n" +
-				"\t\t\tint indexEnd = indexIn + input.stride*kernelWidth;\n" +
-				"\t\t\tfor( ; indexIn < indexEnd; indexIn += input.stride) {\n" +
-				"\t\t\t\ttotal += input.data[indexIn] " + bitWise + ";\n" +
-				"\t\t\t}\n" +
-				"\n" +
-				"\t\t\toutput.data[indexOut] = " + typeCast + "total;\n" +
-				"\t\t}\n" +
-				"\n" +
-				"\t\t// change the order it is processed in to reduce cache misses\n");
+				"\t\tfinal int backStep = kernelWidth*input.stride;\n");
 
 		String body = "";
-		body += "\t\t\tint indexIn = input.startIndex + (y+radius)*input.stride;\n" +
+
+		body += "\t\t"+sumType+" totals[] = _work.pop();\n" +
+				"\t\tfor( int x = 0; x < input.width; x++ ) {\n" +
+				"\t\t\tint indexIn = input.startIndex + (y0-radius)*input.stride + x;\n" +
+				"\t\t\tint indexOut = output.startIndex + output.stride*y0 + x;\n" +
+				"\n" +
+				"\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\tint indexEnd = indexIn + input.stride*kernelWidth;\n" +
+				"\t\t\tfor( ; indexIn < indexEnd; indexIn += input.stride) {\n" +
+				"\t\t\t\ttotal += input.data[indexIn] "+bitWise+";\n" +
+				"\t\t\t}\n" +
+				"\t\t\ttotals[x] = total;\n" +
+				"\t\t\toutput.data[indexOut] = "+typeCast+"total;\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\t// change the order it is processed in to reduce cache misses\n" +
+				"\t\tfor( int y = y0+1; y < y1; y++ ) {\n" +
+				"\t\t\tint indexIn = input.startIndex + (y+radius)*input.stride;\n" +
 				"\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
 				"\n" +
 				"\t\t\tfor( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {\n" +
-				"\t\t\t\t" + sumType + " total = output.data[ indexOut - output.stride]  - (input.data[ indexIn - backStep ]" + bitWise + ");\n" +
-				"\t\t\t\ttotal += input.data[ indexIn ]" + bitWise + ";\n" +
+				"\t\t\t\t"+sumType+" total = totals[ x ]  - (input.data[ indexIn - backStep ]"+bitWise+");\n" +
+				"\t\t\t\ttotals[ x ] = total += input.data[ indexIn ]"+bitWise+";\n" +
 				"\n" +
-				"\t\t\t\toutput.data[indexOut] = " + typeCast + "total;\n" +
-				"\t\t\t}\n";
-		printParallel("y","radius+1","output.height-radius",body);
+				"\t\t\t\toutput.data[indexOut] = "+typeCast+"total;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t\t_work.recycle(totals);\n";
+
+		printParallelBlock("y0","y1","radius","output.height-radius","kernelWidth",body);
 		out.print("\t}\n\n");
 	}
 

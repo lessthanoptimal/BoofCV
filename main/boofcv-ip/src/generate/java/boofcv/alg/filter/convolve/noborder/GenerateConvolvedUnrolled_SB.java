@@ -38,6 +38,7 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 	String dataOutput;
 	String bitWise;
 	String sumType;
+	String workType;
 	boolean hasDivisor;
 	boolean isInteger;
 
@@ -50,30 +51,28 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 
 	@Override
 	public void generate() throws FileNotFoundException {
-		for (int i = 0; i < 2; i++) {
-			concurrent = i==0;
-			create(AutoTypeImage.F32,AutoTypeImage.F32,false);
-			create(AutoTypeImage.F64,AutoTypeImage.F64,false);
-			create(AutoTypeImage.U8,AutoTypeImage.I8,true);
-			create(AutoTypeImage.U8,AutoTypeImage.I16,false);
-			create(AutoTypeImage.S16,AutoTypeImage.I16,false);
-			create(AutoTypeImage.S16,AutoTypeImage.I16,true);
-			create(AutoTypeImage.U16,AutoTypeImage.I16,false);
-			create(AutoTypeImage.U16,AutoTypeImage.I16,true);
-			create(AutoTypeImage.S32,AutoTypeImage.S32,false);
-			create(AutoTypeImage.S32,AutoTypeImage.S32,true);
-		}
+		create(AutoTypeImage.F32,AutoTypeImage.F32,false);
+		create(AutoTypeImage.F64,AutoTypeImage.F64,false);
+		create(AutoTypeImage.U8,AutoTypeImage.I8,true);
+		create(AutoTypeImage.U8,AutoTypeImage.I16,false);
+		create(AutoTypeImage.S16,AutoTypeImage.I16,false);
+		create(AutoTypeImage.S16,AutoTypeImage.I16,true);
+		create(AutoTypeImage.U16,AutoTypeImage.I16,false);
+		create(AutoTypeImage.U16,AutoTypeImage.I16,true);
+		create(AutoTypeImage.S32,AutoTypeImage.S32,false);
+		create(AutoTypeImage.S32,AutoTypeImage.S32,true);
 	}
 
 	protected void create( AutoTypeImage inputImg , AutoTypeImage outputImg , boolean divided ) throws FileNotFoundException {
 		super.className = null; // need to do this to avoid sanity check
 		isInteger = inputImg.isInteger();
 
-		String concurrentName = concurrent? "MT_" : "";
-
-		String name = "ConvolveImageUnrolled_SB_"+concurrentName+inputImg.getAbbreviatedType()+"_"+outputImg.getAbbreviatedType();
-		if( divided )
+		String name = "ConvolveImageUnrolled_SB_"+inputImg.getAbbreviatedType()+"_"+outputImg.getAbbreviatedType();
+		String nameConcurrent = "ConvolveImageUnrolled_SB_MT_"+inputImg.getAbbreviatedType()+"_"+outputImg.getAbbreviatedType();
+		if( divided ) {
 			name += "_Div";
+			nameConcurrent += "_Div";
+		}
 
 		typeKernel = isInteger ? "S32" : "F"+inputImg.getNumBits();
 		typeInput = inputImg.getSingleBandName();
@@ -84,16 +83,17 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 		sumType = inputImg.getSumType();
 		bitWise = inputImg.getBitWise();
 		hasDivisor = divided;
+		workType = inputImg.getLetterSum()+"WorkArrays";
 
 		declareHalf = isInteger ? "\t\tfinal " + sumType + " halfDivisor = divisor/2;\n" : "";
 		divide = isInteger ? "(total+halfDivisor)/divisor" : "total/divisor";
 
-		createFile(name);
+		createFile(name,nameConcurrent);
 	}
 
-	public void createFile( String fileName ) throws FileNotFoundException {
+	public void createFile( String fileName , String nameConcurrent ) throws FileNotFoundException {
 		setOutputFile(fileName);
-		printPreamble();
+		printPreamble(nameConcurrent);
 		createMaster("horizontal",1,hasDivisor);
 		createMaster("vertical",1,hasDivisor);
 		createMaster("convolve",2,hasDivisor);
@@ -114,15 +114,16 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 		out.println("}");
 	}
 
-	public void printPreamble() {
+	public void printPreamble( String nameConcurrent ) {
 		out.print("import boofcv.struct.convolve.*;\n");
-		out.print("import boofcv.struct.image." + typeInput + ";\n"+
-				"import javax.annotation.Generated;\n");
-		if( concurrent )
-			out.print("import boofcv.concurrency.BoofConcurrency;\n");
-
 		if (typeInput.compareTo(typeOutput) != 0)
 			out.print("import boofcv.struct.image." + typeOutput + ";\n");
+		out.print("import boofcv.struct.image." + typeInput + ";\n"+
+				"import javax.annotation.Generated;\n" +
+				"import boofcv.concurrency.*;\n");
+
+		out.println("\n//CONCURRENT_CLASS_NAME "+nameConcurrent);
+
 		out.print("\n" +
 				"/**\n" +
 				" * <p>\n" +
@@ -142,18 +143,22 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 				" * @author Peter Abeles\n" +
 				" */\n" +
 				"@Generated({\""+getClass().getCanonicalName()+"\"})\n" +
+				"@SuppressWarnings({\"ForLoopReplaceableByForEach\",\"Duplicates\"})\n" +
 				"public class " + className + " {\n");
 	}
 
 	void createMaster(String opName, int kernelDOF , boolean hasDivisor ) {
 		String kernel = "Kernel"+kernelDOF+"D_"+typeKernel;
 
+		String workParam = hasDivisor && opName.equals("convolve") ? ", "+workType+" work" : "";
+		String workVar = hasDivisor && opName.equals("convolve") ? ",work" : "";
+
 		out.print("\tpublic static boolean " + opName + "( " + kernel + " kernel ,\n" +
 				"\t\t\t\t\t\t\t\t   " + typeInput + " image, " + typeOutput + " dest");
 
 
 		if( hasDivisor ) {
-			out.print(", int divisor ) {\n");
+			out.print(", int divisor "+workParam+") {\n");
 		} else {
 			out.print(") {\n");
 		}
@@ -170,7 +175,7 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 			int num = 3 + i * 2;
 			out.print("\t\t\tcase " + num + ":\n");
 			if( hasDivisor )
-				out.print("\t\t\t\t" + opName + num + "(kernel,image,dest,divisor);\n");
+				out.print("\t\t\t\t" + opName + num + "(kernel,image,dest,divisor"+workVar+");\n");
 			else
 				out.print("\t\t\t\t" + opName + num + "(kernel,image,dest);\n");
 			out.print("\t\t\t\tbreak;\n" +
@@ -350,9 +355,16 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 	void addConvolveDiv(int num ) {
 		String typeCast = generateTypeCast();
 
-		out.print("\tpublic static void convolve" + num + "( Kernel2D_" + typeKernel + " kernel, " + typeInput + " src, " + typeOutput + " dest , int divisor )\n");
+		out.print("\tpublic static void convolve" + num + "( Kernel2D_" + typeKernel
+				+ " kernel, " + typeInput + " src, " + typeOutput + " dest , int divisor , "+workType+" work )\n");
 
 		out.print("\t{\n" +
+				"\t\tif( work == null ) {\n" +
+				"\t\t\twork = new "+workType+"(src.width);\n" +
+				"\t\t} else {\n" +
+				"\t\t\twork.reset(src.width);\n" +
+				"\t\t}\n" +
+				"\t\tfinal " + workType + " _work = work;\n" +
 				"\t\tfinal " + dataInput + "[] dataSrc = src.data;\n" +
 				"\t\tfinal " + dataOutput + "[] dataDst = dest.data;\n" +
 				"\n");
@@ -360,20 +372,21 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 				"\t\tfinal int height = src.getHeight();\n" +
 				declareHalf +
 				"\n" +
-				"\t\tfinal int kernelRadius = kernel.getRadius();\n");
-		out.print("\t\tfinal "+sumType+" totalRow[] = new int[ width ];\n");
-
-		String body = "\t\t\t// first time through the value needs to be set\n";
-
-		for( int i = 0; i < num; i++ ) {
-			body += String.format("\t\t\t"+sumType+" k"+(i+1)+" = kernel.data["+i+"];\n");
-		}
+				"\t\tfinal int kernelRadius = kernel.getRadius();\n" +
+				"\t\tfinal int kernelWidth = 2*kernelRadius+1;\n");
+		String body = "";
+		body += "\t\t"+sumType+" totalRow[] = _work.pop();\n";
+		body += "\t\tfor( int y = y0; y < y1; y++ ) {\n";
 		body += String.format("\n" +
-				"\t\t\tint indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;\n" +
+				"\t\t\t// first time through the value needs to be set\n");
+		for( int i = 0; i < num; i++ ) {
+			body += "\t\t\t"+sumType+" k"+(i+1)+" = kernel.data["+i+"];\n";
+		}
+		body += "\t\t\tint indexSrcRow = src.startIndex+(y-kernelRadius)*src.stride-kernelRadius;\n" +
 				"\t\t\tfor( int x = kernelRadius; x < width-kernelRadius; x++ ) {\n" +
 				"\t\t\t\tint indexSrc = indexSrcRow + x;\n" +
 				"\n" +
-				"\t\t\t\t"+sumType+" total = 0;\n");
+				"\t\t\t\t"+sumType+" total = 0;\n";
 		for( int i = 0; i < num-1; i++ ) {
 			body += String.format("\t\t\t\ttotal += (dataSrc[indexSrc++] "+bitWise+")* k"+(i+1)+";\n");
 		}
@@ -405,9 +418,11 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 				"\t\t\tint indexDst = dest.startIndex + y*dest.stride+kernelRadius;\n" +
 				"\t\t\tfor( int x = kernelRadius; x < width-kernelRadius; x++ ) {\n" +
 				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"((totalRow[x]+halfDivisor)/ divisor);\n" +
-				"\t\t\t}\n");
+				"\t\t\t}\n"+
+				"\t\t}\n"+
+				"\t\t_work.recycle(totalRow);\n");
 
-		printParallel("y","kernelRadius","height-kernelRadius", body);
+		printParallelBlock("y0","y1","kernelRadius","height-kernelRadius","kernelWidth", body);
 
 		out.print("\t}\n\n");
 	}

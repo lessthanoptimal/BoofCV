@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,8 +93,8 @@ public class TestPixelMath {
 					testPow2(m);
 				} else if( m.getName().compareTo("sqrt") == 0 ) {
 					testSqrt(m);
-				} else if( m.getName().compareTo("invert") == 0 ) {
-					testInvert(m);
+				} else if( m.getName().compareTo("negative") == 0 ) {
+					testNegative(m);
 				} else if( m.getName().compareTo("subtract") == 0 ) {
 					testSubtract(m);
 				} else if( m.getName().compareTo("boundImage") == 0 ) {
@@ -564,7 +564,7 @@ public class TestPixelMath {
 		}
 	}
 
-	private void testInvert(Method m) throws InvocationTargetException, IllegalAccessException {
+	private void testNegative(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageBase inputA = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
 		ImageBase inputB = GeneralizedImageOps.createImage(paramTypes[1], width, height, numBands);

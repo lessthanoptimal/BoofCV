@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,7 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 			output = createImage(param[1],null);
 			ret[0][0] = inputA;
 			ret[0][1] = output;
-		} else if( name.equals("invert")) {
+		} else if( name.equals("negative")) {
 			output = createImage(param[1],null);
 			ret[0][0] = inputA;
 			ret[0][1] = output;

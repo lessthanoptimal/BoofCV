@@ -45,7 +45,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		printPreamble();
 
 		printAbs();
-		printInvert();
+		printNegative();
 
 		List<TwoTemplate> listTwo = new ArrayList<>();
 		listTwo.add( new Multiple());
@@ -66,6 +66,9 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 	private void printPreamble() {
 		out.print("import boofcv.struct.image.*;\n" +
 				"\n" +
+				"import boofcv.alg.misc.impl.ImplPixelMath_MT;\n" +
+				"import boofcv.alg.misc.impl.ImplPixelMath;\n" +
+				"import boofcv.concurrency.BoofConcurrency;\n" +
 				"import boofcv.alg.InputSanityCheck;\n" +
 				"import javax.annotation.Generated;\n" +
 				"\n" +
@@ -129,33 +132,18 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 						"\t\toutput.reshape(input.width,input.height);\n" +
 						"\n" +
 						"\t\tint columns = " + columns + ";\n" +
-						"\t\t" + funcName + "(input.data,input.startIndex,input.stride,\n" +
-						"\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
-						"\t\t\t\tinput.height,columns);\n" +
+						"\t\tif(BoofConcurrency.USE_CONCURRENT ) {\n" +
+						"\t\t\tImplPixelMath_MT."+funcName+"(input.data, input.startIndex, input.stride,\n" +
+						"\t\t\t\t\toutput.data, output.startIndex, output.stride,\n" +
+						"\t\t\t\t\tinput.height, columns);\n" +
+						"\t\t} else {\n" +
+						"\t\t\tImplPixelMath."+funcName+"(input.data, input.startIndex, input.stride,\n" +
+						"\t\t\t\t\toutput.data, output.startIndex, output.stride,\n" +
+						"\t\t\t\t\tinput.height, columns);\n" +
+						"\t\t}\n" +
 						"\t}\n");
 			}
-			printArray(funcName,operation);
 		}
-	}
-
-	public void printArray( String funcName , String operation )
-	{
-		String arrayType = input.getDataType();
-
-		out.println("\tprivate static void "+funcName+"( "+arrayType+"[] input , int inputStart , int inputStride ,\n" +
-				"\t\t\t\t\t\t\t   "+arrayType+"[] output , int outputStart , int outputStride ,\n" +
-				"\t\t\t\t\t\t\t   int rows , int cols )\n" +
-				"\t{\n" +
-				"\t\tfor( int y = 0; y < rows; y++ ) {\n" +
-				"\t\t\tint indexSrc = inputStart + y*inputStride;\n" +
-				"\t\t\tint indexDst = outputStart + y*outputStride;\n" +
-				"\t\t\tint end = indexSrc + cols;\n" +
-				"\n" +
-				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
-				"\t\t\t\toutput[indexDst] = "+input.getTypeCastFromSum()+operation +";\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t}\n");
 	}
 
 	public void printAbs()
@@ -171,16 +159,16 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		print("abs",javaDoc,"Math.abs(input[indexSrc])",AutoTypeImage.getSigned());
 	}
 
-	public void printInvert()
+	public void printNegative()
 	{
 		String javaDoc = "\t/**\n" +
 				"\t * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]\n" +
 				"\t *\n" +
 				"\t * @param input The input image. Not modified.\n" +
-				"\t * @param output Where the inverted image is written to. Modified.\n" +
+				"\t * @param output Where the negated image is written to. Modified.\n" +
 				"\t */";
 
-		print("invert",javaDoc,"-input[indexSrc]",AutoTypeImage.getSigned());
+		print("negative",javaDoc,"-input[indexSrc]",AutoTypeImage.getSigned());
 	}
 
 	private void print_img_scalar( TwoTemplate template , boolean bounded ) {
@@ -229,9 +217,15 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 							"\t\t" + reshape+ "\n" +
 							"\n" +
 							"\t\tint columns = " + columns + ";\n" +
-							"\t\t" + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + ", lower, upper ,\n" +
-							"\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
-							"\t\t\t\tinput.height,columns);\n" +
+							"\t\tif(BoofConcurrency.USE_CONCURRENT ) {\n" +
+							"\t\t\tImplPixelMath_MT." + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + ", lower, upper ,\n" +
+							"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
+							"\t\t\t\t\tinput.height,columns);\n" +
+							"\t\t} else {\n" +
+							"\t\t\tImplPixelMath." + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + ", lower, upper ,\n" +
+							"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
+							"\t\t\t\t\tinput.height,columns);\n" +
+							"\t\t}\n" +
 							"\t}\n");
 				} else {
 					String prototype;
@@ -247,73 +241,23 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 							"\t\t" + reshape+ "\n" +
 							"\n" +
 							"\t\tint columns = " + columns + ";\n" +
-							"\t\t" + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + " , \n" +
-							"\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
-							"\t\t\t\tinput.height,columns);\n" +
+							"\t\tif(BoofConcurrency.USE_CONCURRENT ) {\n" +
+							"\t\t\tImplPixelMath_MT." + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + " , \n" +
+							"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
+							"\t\t\t\t\tinput.height,columns);\n" +
+							"\t\t} else {\n" +
+							"\t\t\tImplPixelMath." + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + " , \n" +
+							"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
+							"\t\t\t\t\tinput.height,columns);\n" +
+							"\t\t}\n" +
 							"\t}\n");
 				}
-			}
-			if( bounded ) {
-				print_array_scalar_bounded(funcArrayName, variableType, varName, template.getOperation());
-			} else {
-				print_array_scalar(funcArrayName, variableType, varName, template.getOperation());
 			}
 		}
 	}
 
-	public void print_array_scalar(String funcName , String varType , String varName , String operation  )
-	{
-		String arrayType = input.getDataType();
-
-		String typeCast = varType.equals(input.getDataType()) ? "" : "("+input.getDataType()+")";
-
-		out.println("\tprivate static void "+funcName+"( "+arrayType+"[] input , int inputStart , int inputStride , \n" +
-				"\t\t\t\t\t\t\t   "+varType+" "+varName+" ,\n" +
-				"\t\t\t\t\t\t\t   "+arrayType+"[] output , int outputStart , int outputStride ,\n" +
-				"\t\t\t\t\t\t\t   int rows , int cols )\n" +
-				"\t{\n" +
-				"\t\tfor( int y = 0; y < rows; y++ ) {\n" +
-				"\t\t\tint indexSrc = inputStart + y*inputStride;\n" +
-				"\t\t\tint indexDst = outputStart + y*outputStride;\n" +
-				"\t\t\tint end = indexSrc + cols;\n" +
-				"\n" +
-				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
-				"\t\t\t\toutput[indexDst] = "+typeCast+operation +";\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t}\n");
-	}
-
-	public void print_array_scalar_bounded(String funcName , String varType , String varName , String operation  )
-	{
-		String arrayType = input.getDataType();
-
-		String sumType = input.getSumType();
-		String typeCast = varType.equals(sumType) ? "" : "("+sumType+")";
-
-		out.println("\tprivate static void "+funcName+"( "+arrayType+"[] input , int inputStart , int inputStride , \n" +
-				"\t\t\t\t\t\t\t   "+varType+" "+varName+" , "+sumType+" lower , "+sumType+" upper ,\n" +
-				"\t\t\t\t\t\t\t   "+arrayType+"[] output , int outputStart , int outputStride ,\n" +
-				"\t\t\t\t\t\t\t   int rows , int cols )\n" +
-				"\t{\n" +
-				"\t\tfor( int y = 0; y < rows; y++ ) {\n" +
-				"\t\t\tint indexSrc = inputStart + y*inputStride;\n" +
-				"\t\t\tint indexDst = outputStart + y*outputStride;\n" +
-				"\t\t\tint end = indexSrc + cols;\n" +
-				"\n" +
-				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
-				"\t\t\t\t"+sumType+" val = "+typeCast+operation+";\n" +
-				"\t\t\t\tif( val < lower ) val = lower;\n" +
-				"\t\t\t\tif( val > upper ) val = upper;\n" +
-				"\t\t\t\toutput[indexDst] = "+input.getTypeCastFromSum()+"val;\n"+
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t}\n");
-	}
-
 	public void printBoundImage() {
 
-		String bitWise = input.getBitWise();
 		String sumType = input.getSumType();
 
 		out.print("\t/**\n" +
@@ -324,31 +268,11 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param max maximum value.\n" +
 				"\t */\n" +
 				"\tpublic static void boundImage( "+input.getSingleBandName()+" img , "+sumType+" min , "+sumType+" max ) {\n" +
-				"\t\tfinal int h = img.getHeight();\n" +
-				"\t\tfinal int w = img.getWidth();\n" +
-				"\n" +
-				"\t\t"+input.getDataType()+"[] data = img.data;\n" +
-				"\n" +
-				"\t\tfor (int y = 0; y < h; y++) {\n" +
-				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
-				"\t\t\tint indexEnd = index+w;\n" +
-				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
-				"\t\t\tfor (; index < indexEnd; index++) {\n" +
-				"\t\t\t\t"+sumType+" value = data[index]"+bitWise+";\n" +
-				"\t\t\t\tif( value < min )\n" +
-				"\t\t\t\t\tdata[index] = "+input.getTypeCastFromSum()+"min;\n" +
-				"\t\t\t\telse if( value > max )\n" +
-				"\t\t\t\t\tdata[index] = "+input.getTypeCastFromSum()+"max;\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
+				"\t\tImplPixelMath.boundImage(img,min,max);\n" +
 				"\t}\n\n");
 	}
 
 	public void printDiffAbs() {
-
-		String bitWise = input.getBitWise();
-		String typeCast = input.isInteger() ? "("+input.getDataType()+")" : "";
-
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
 				"\t * Computes the absolute value of the difference between each pixel in the two images.<br>\n" +
@@ -362,28 +286,15 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
 				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
 				"\n" +
-				"\t\tfinal int h = imgA.getHeight();\n" +
-				"\t\tfinal int w = imgA.getWidth();\n" +
-				"\n" +
-				"\t\tfor (int y = 0; y < h; y++) {\n" +
-				"\t\t\tint indexA = imgA.getStartIndex() + y * imgA.getStride();\n" +
-				"\t\t\tint indexB = imgB.getStartIndex() + y * imgB.getStride();\n" +
-				"\t\t\tint indexDiff = output.getStartIndex() + y * output.getStride();\n" +
-				"\t\t\t\n" +
-				"\t\t\tint indexEnd = indexA+w;\n" +
-				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
-				"\t\t\tfor (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {\n" +
-				"\t\t\t\toutput.data[indexDiff] = "+typeCast+"Math.abs((imgA.data[indexA] "+bitWise+") - (imgB.data[indexB] "+bitWise+"));\n" +
-				"\t\t\t}\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplPixelMath_MT.diffAbs(imgA, imgB, output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplPixelMath.diffAbs(imgA, imgB, output);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
 	public void printAddTwoImages( AutoTypeImage typeIn , AutoTypeImage typeOut  ) {
-
-		String bitWise = typeIn.getBitWise();
-		String typeCast = typeOut.isInteger() ? "("+typeOut.getDataType()+")" : "";
-
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
 				"\t * Performs pixel-wise addition<br>\n" +
@@ -397,28 +308,15 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
 				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
 				"\n" +
-				"\t\tfinal int h = imgA.getHeight();\n" +
-				"\t\tfinal int w = imgA.getWidth();\n" +
-				"\n" +
-				"\t\tfor (int y = 0; y < h; y++) {\n" +
-				"\t\t\tint indexA = imgA.getStartIndex() + y * imgA.getStride();\n" +
-				"\t\t\tint indexB = imgB.getStartIndex() + y * imgB.getStride();\n" +
-				"\t\t\tint indexOut = output.getStartIndex() + y * output.getStride();\n" +
-				"\t\t\t\n" +
-				"\t\t\tint indexEnd = indexA+w;\n" +
-				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
-				"\t\t\tfor (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {\n" +
-				"\t\t\t\toutput.data[indexOut] = "+typeCast+"((imgA.data[indexA] "+bitWise+") + (imgB.data[indexB] "+bitWise+"));\n" +
-				"\t\t\t}\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplPixelMath_MT.add(imgA, imgB, output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplPixelMath.add(imgA, imgB, output);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
 	public void printSubtractTwoImages( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
-
-		String bitWise = typeIn.getBitWise();
-		String typeCast = typeOut.isInteger() ? "("+typeOut.getDataType()+")" : "";
-
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
 				"\t * Performs pixel-wise subtraction.<br>\n" +
@@ -433,28 +331,15 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
 				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
 				"\n" +
-				"\t\tfinal int h = imgA.getHeight();\n" +
-				"\t\tfinal int w = imgA.getWidth();\n" +
-				"\n" +
-				"\t\tfor (int y = 0; y < h; y++) {\n" +
-				"\t\t\tint indexA = imgA.getStartIndex() + y * imgA.getStride();\n" +
-				"\t\t\tint indexB = imgB.getStartIndex() + y * imgB.getStride();\n" +
-				"\t\t\tint indexOut = output.getStartIndex() + y * output.getStride();\n" +
-				"\t\t\t\n" +
-				"\t\t\tint indexEnd = indexA+w;\n" +
-				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
-				"\t\t\tfor (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {\n" +
-				"\t\t\t\toutput.data[indexOut] = "+typeCast+"((imgA.data[indexA] "+bitWise+") - (imgB.data[indexB] "+bitWise+"));\n" +
-				"\t\t\t}\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplPixelMath_MT.subtract(imgA, imgB, output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplPixelMath.subtract(imgA, imgB, output);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
 	public void printMultTwoImages( AutoTypeImage typeIn , AutoTypeImage typeOut  ) {
-
-		String bitWise = typeIn.getBitWise();
-		String typeCast = typeOut.isInteger() ? "("+typeOut.getDataType()+")" : "";
-
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
 				"\t * Performs pixel-wise multiplication<br>\n" +
@@ -468,108 +353,15 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
 				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
 				"\n" +
-				"\t\tfinal int h = imgA.getHeight();\n" +
-				"\t\tfinal int w = imgA.getWidth();\n" +
-				"\n" +
-				"\t\tfor (int y = 0; y < h; y++) {\n" +
-				"\t\t\tint indexA = imgA.getStartIndex() + y * imgA.getStride();\n" +
-				"\t\t\tint indexB = imgB.getStartIndex() + y * imgB.getStride();\n" +
-				"\t\t\tint indexOut = output.getStartIndex() + y * output.getStride();\n" +
-				"\t\t\t\n" +
-				"\t\t\tint indexEnd = indexA+w;\n" +
-				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
-				"\t\t\tfor (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {\n" +
-				"\t\t\t\toutput.data[indexOut] = "+typeCast+"((imgA.data[indexA] "+bitWise+") * (imgB.data[indexB] "+bitWise+"));\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
-	}
-
-	public void printLog( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
-		String bitWise = typeIn.getBitWise();
-		String typeCast = typeOut != AutoTypeImage.F64 ? "("+typeOut.getDataType()+")" : "";
-
-		out.print("\t/**\n" +
-				"\t * Sets each pixel in the output image to log( 1 + input(x,y)) of the input image.\n" +
-				"\t * Both the input and output image can be the same instance.\n" +
-				"\t *\n" +
-				"\t * @param input The input image. Not modified.\n" +
-				"\t * @param output Where the log image is written to. Modified.\n" +
-				"\t */\n" +
-				"\tpublic static void log( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
-				"\n" +
-				"\t\toutput.reshape(input.width,input.height);\n" +
-				"\n" +
-				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
-				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
-				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
-				"\t\t\tint end = indexSrc + input.width;\n" +
-				"\n" +
-				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
-				"\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.log(1 + input.data[indexSrc]"+bitWise+");\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
-	}
-
-	public void printPow2( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
-		String bitWise = typeIn.getBitWise();
-
-		out.print("\t/**\n" +
-				"\t * Raises each pixel in the input image to the power of two. Both the input and output image can be the \n" +
-				"\t * same instance." +
-				"\t *\n" +
-				"\t * @param input The input image. Not modified.\n" +
-				"\t * @param output Where the pow2 image is written to. Can be same as input. Modified.\n" +
-				"\t */\n" +
-				"\tpublic static void pow2( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
-				"\n" +
-				"\t\toutput.reshape(input.width,input.height);\n" +
-				"\n" +
-				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
-				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
-				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
-				"\t\t\tint end = indexSrc + input.width;\n" +
-				"\n" +
-				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
-				"\t\t\t\t"+typeOut.getDataType()+" v = input.data[indexSrc]"+bitWise+";\n" +
-				"\t\t\t\toutput.data[indexDst] = v*v;\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
-	}
-
-	public void printSqrt( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
-		String bitWise = typeIn.getBitWise();
-		String typeCast = typeOut != AutoTypeImage.F64 ? "("+typeOut.getDataType()+")" : "";
-
-		out.print("\t/**\n" +
-				"\t * Computes the square root of each pixel in the input image. Both the input and output image can be the\n" +
-				"\t * same instance.\n" +
-				"\t *\n" +
-				"\t * @param input The input image. Not modified.\n" +
-				"\t * @param output Where the sqrt() image is written to. Can be same as input. Modified.\n" +
-				"\t */\n" +
-				"\tpublic static void sqrt( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
-				"\n" +
-				"\t\toutput.reshape(input.width,input.height);\n" +
-				"\n" +
-				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
-				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
-				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
-				"\t\t\tint end = indexSrc + input.width;\n" +
-				"\n" +
-				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
-				"\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.sqrt(input.data[indexSrc]"+bitWise+");\n" +
-				"\t\t\t}\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplPixelMath_MT.multiply(imgA, imgB, output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplPixelMath.multiply(imgA, imgB, output);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
 	public void printDivTwoImages( AutoTypeImage typeIn , AutoTypeImage typeOut  ) {
-
-		String bitWise = typeIn.getBitWise();
-		String typeCast = typeOut.isInteger() ? "("+typeOut.getDataType()+")" : "";
 
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
@@ -584,30 +376,79 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
 				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
 				"\n" +
-				"\t\tfinal int h = imgA.getHeight();\n" +
-				"\t\tfinal int w = imgA.getWidth();\n" +
-				"\n" +
-				"\t\tfor (int y = 0; y < h; y++) {\n" +
-				"\t\t\tint indexA = imgA.getStartIndex() + y * imgA.getStride();\n" +
-				"\t\t\tint indexB = imgB.getStartIndex() + y * imgB.getStride();\n" +
-				"\t\t\tint indexOut = output.getStartIndex() + y * output.getStride();\n" +
-				"\t\t\t\n" +
-				"\t\t\tint indexEnd = indexA+w;\n" +
-				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
-				"\t\t\tfor (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {\n" +
-				"\t\t\t\toutput.data[indexOut] = "+typeCast+"((imgA.data[indexA] "+bitWise+") / (imgB.data[indexB] "+bitWise+"));\n" +
-				"\t\t\t}\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplPixelMath_MT.divide(imgA,imgB,output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplPixelMath.divide(imgA,imgB,output);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
+	public void printLog( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+		out.print("\t/**\n" +
+				"\t * Sets each pixel in the output image to log( 1 + input(x,y)) of the input image.\n" +
+				"\t * Both the input and output image can be the same instance.\n" +
+				"\t *\n" +
+				"\t * @param input The input image. Not modified.\n" +
+				"\t * @param output Where the log image is written to. Modified.\n" +
+				"\t */\n" +
+				"\tpublic static void log( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
+				"\n" +
+				"\t\toutput.reshape(input.width,input.height);\n" +
+				"\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplPixelMath_MT.log(input,output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplPixelMath.log(input,output);\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printPow2( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+
+		out.print("\t/**\n" +
+				"\t * Raises each pixel in the input image to the power of two. Both the input and output image can be the \n" +
+				"\t * same instance." +
+				"\t *\n" +
+				"\t * @param input The input image. Not modified.\n" +
+				"\t * @param output Where the pow2 image is written to. Can be same as input. Modified.\n" +
+				"\t */\n" +
+				"\tpublic static void pow2( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
+				"\n" +
+				"\t\toutput.reshape(input.width,input.height);\n" +
+				"\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplPixelMath_MT.pow2(input,output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplPixelMath.pow2(input,output);\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printSqrt( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+
+		out.print("\t/**\n" +
+				"\t * Computes the square root of each pixel in the input image. Both the input and output image can be the\n" +
+				"\t * same instance.\n" +
+				"\t *\n" +
+				"\t * @param input The input image. Not modified.\n" +
+				"\t * @param output Where the sqrt() image is written to. Can be same as input. Modified.\n" +
+				"\t */\n" +
+				"\tpublic static void sqrt( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
+				"\n" +
+				"\t\toutput.reshape(input.width,input.height);\n" +
+				"\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplPixelMath_MT.sqrt(input,output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplPixelMath.sqrt(input,output);\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
 
 	public void printAverageBand() {
 		
 		String imageName = input.getSingleBandName();
-		String sumType = input.getSumType();
-		String typecast = input.getTypeCastFromSum();
-		String bitwise = input.getBitWise();
 		
 		out.print("\t/**\n" +
 				"\t * Computes the average for each pixel across all bands in the {@link Planar} image.\n" +
@@ -616,28 +457,14 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param output Gray scale image containing average pixel values\n" +
 				"\t */\n" +
 				"\tpublic static void averageBand( Planar<"+imageName+"> input , "+imageName+" output ) {\n" +
-				"\t\tfinal int h = input.getHeight();\n" +
-				"\t\tfinal int w = input.getWidth();\n" +
 				"\n" +
-				"\t\t"+imageName+"[] bands = input.bands;\n" +
-				"\t\t\n" +
-				"\t\tfor (int y = 0; y < h; y++) {\n" +
-				"\t\t\tint indexInput = input.getStartIndex() + y * input.getStride();\n" +
-				"\t\t\tint indexOutput = output.getStartIndex() + y * output.getStride();\n" +
-				"\n" +
-				"\t\t\tint indexEnd = indexInput+w;\n" +
-				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
-				"\t\t\tfor (; indexInput < indexEnd; indexInput++, indexOutput++ ) {\n" +
-				"\t\t\t\t"+sumType+" total = 0;\n" +
-				"\t\t\t\tfor( int i = 0; i < bands.length; i++ ) {\n" +
-				"\t\t\t\t\ttotal += bands[i].data[ indexInput ]"+bitwise+";\n" +
-				"\t\t\t\t}\n" +
-				"\t\t\t\toutput.data[indexOutput] = "+typecast+"(total / bands.length);\n" +
-				"\t\t\t}\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplPixelMath_MT.averageBand(input,output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplPixelMath.averageBand(input,output);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
-
 
 	class Multiple implements TwoTemplate {
 

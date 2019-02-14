@@ -39,39 +39,38 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 	String sumType;
 	String typeCast;
 	String bitWise;
+	String workType;
 	boolean hasDivide;
 
 	@Override
 	public void generate() throws FileNotFoundException {
-		for (int i = 0; i < 2; i++) {
-			concurrent = i==0;
-			printPreamble();
-			printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false);
+		printPreamble();
+		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false);
 //		printAllOps(AutoTypeImage.F32, AutoTypeImage.F32, false, true);
-			printAllOps(AutoTypeImage.F64, AutoTypeImage.F64, false);
-			printAllOps(AutoTypeImage.U8, AutoTypeImage.I16, false);
-			printAllOps(AutoTypeImage.U8, AutoTypeImage.S32, false);
-			printAllOps(AutoTypeImage.U16,AutoTypeImage.I8, true,true);
-			printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,false);
-			printAllOps(AutoTypeImage.U8,AutoTypeImage.I8,true);
+		printAllOps(AutoTypeImage.F64, AutoTypeImage.F64, false);
+		printAllOps(AutoTypeImage.U8, AutoTypeImage.I16, false);
+		printAllOps(AutoTypeImage.U8, AutoTypeImage.S32, false);
+		printAllOps(AutoTypeImage.U16,AutoTypeImage.I8, true,true);
+		printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,false);
+		printAllOps(AutoTypeImage.U8,AutoTypeImage.I8,true);
 //		printAllOps(AutoTypeImage.U8,AutoTypeImage.I8,false, true);
-			printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,true);
-			printAllOps(AutoTypeImage.U16,AutoTypeImage.I16,false);
-			printAllOps(AutoTypeImage.U16,AutoTypeImage.I16,true);
-			printAllOps(AutoTypeImage.S32,AutoTypeImage.I16,true,true);
-			printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,false);
-			printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,true);
-
-			out.println("}");
-		}
+		printAllOps(AutoTypeImage.S16,AutoTypeImage.I16,true);
+		printAllOps(AutoTypeImage.U16,AutoTypeImage.I16,false);
+		printAllOps(AutoTypeImage.U16,AutoTypeImage.I16,true);
+		printAllOps(AutoTypeImage.S32,AutoTypeImage.I16,true,true);
+		printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,false);
+		printAllOps(AutoTypeImage.S32,AutoTypeImage.S32,true);
+		out.println("}");
 	}
 
 	private void printPreamble() {
 		autoSelectName();
-		out.print("import boofcv.struct.convolve.*;\n" +
-				"import boofcv.struct.image.*;\n");
-		if( concurrent )
-			out.print("import boofcv.concurrency.BoofConcurrency;\n");
+		out.print(
+				"import boofcv.concurrency.IWorkArrays;\n" +
+				"import boofcv.struct.convolve.*;\n" +
+				"import boofcv.struct.image.*;\n" +
+				"import javax.annotation.Generated;\n");
+		out.print("//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n");
 
 		out.println();
 		out.println();
@@ -86,7 +85,8 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 				" * \n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"@SuppressWarnings({\"ForLoopReplaceableByForEach\"})\n" +
+				"@Generated({\""+getClass().getCanonicalName()+"\"})\n" +
+				"@SuppressWarnings({\"ForLoopReplaceableByForEach\",\"Duplicates\"})\n" +
 				"public class " + className + " {\n\n");
 	}
 
@@ -107,6 +107,7 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 		outputData = output.getDataType();
 		sumType = input.getSumType();
 		bitWise = input.getBitWise();
+		workType = input.getLetterSum()+"WorkArrays";
 		this.hasDivide = hasDivide;
 
 		if( justVertical ) {
@@ -114,7 +115,10 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 		} else {
 			printHorizontal();
 			printVertical();
-			printConvolve2D();
+			if( hasDivide )
+				printConvolve2D_div();
+			else
+				printConvolve2D();
 		}
 	}
 
@@ -232,6 +236,69 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 		printParallel("y","offsetL","height-offsetR",body);
 
 		out.print("\t}\n\n");
+	}
+
+	private void printConvolve2D_div() {
+
+		out.print("\tpublic static void convolve( Kernel2D_"+kernelType+" kernel , "+inputType+" src , "+
+				outputType+" dest , int divisor , "+workType+" work)\n" +
+				"\t{\n" +
+				"\t\tif( work == null ) {\n" +
+				"\t\t\twork = new "+workType+"(src.width);\n" +
+				"\t\t} else {\n" +
+				"\t\t\twork.reset(src.width);\n" +
+				"\t\t}\n" +
+				"\t\tfinal "+workType+" _work = work;\n" +
+				"\t\tfinal " + kernelData + "[] dataKernel = kernel.data;\n" +
+				"\t\tfinal " + inputData + "[] dataSrc = src.data;\n" +
+				"\t\tfinal " + outputData + "[] dataDst = dest.data;\n" +
+				"\n" +
+				"\t\tfinal int width = src.getWidth();\n" +
+				"\t\tfinal int height = src.getHeight();\n" +
+				"\t\tfinal int halfDivisor = divisor/2;\n" +
+				"\n" +
+				"\t\tint offsetL = kernel.offset;\n" +
+				"\t\tint offsetR = kernel.width-kernel.offset-1;\n" +
+				"\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.blocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {\n" +
+				"\t\tfinal int y0 = offsetL, y1 = height-offsetR;\n" +
+				"\t\t"+sumType+" totalRow[] = _work.pop();\n" +
+				"\t\tfor( int y = y0; y < y1; y++ ) {\n" +
+				"\t\t\tint indexSrcRow = src.startIndex+(y-offsetL)*src.stride-offsetL;\n" +
+				"\t\t\tfor( int x = offsetL; x < width-offsetR; x++ ) {\n" +
+				"\t\t\t\tint indexSrc = indexSrcRow + x;\n" +
+				"\n" +
+				"\t\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\t\tfor (int k = 0; k < kernel.width; k++) {\n" +
+				"\t\t\t\t\ttotal += (dataSrc[indexSrc++] "+bitWise+")* dataKernel[k];\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t\ttotalRow[x] = total;\n" +
+				"\t\t\t}\n" +
+				"\n" +
+				"\t\t\t// rest of the convolution rows are an addition\n" +
+				"\t\t\tfor( int i = 1; i < kernel.width; i++ ) {\n" +
+				"\t\t\t\tindexSrcRow = src.startIndex+(y+i-offsetL)*src.stride-offsetL;\n" +
+				"\t\t\t\tint indexKer = i*kernel.width;\n" +
+				"\n" +
+				"\t\t\t\tfor( int x = offsetL; x < width-offsetR; x++ ) {\n" +
+				"\t\t\t\t\tint indexSrc = indexSrcRow+x;\n" +
+				"\n" +
+				"\t\t\t\t\t"+sumType+" total = 0;\n" +
+				"\t\t\t\t\tfor (int k = 0; k < kernel.width; k++) {\n" +
+				"\t\t\t\t\t\ttotal += (dataSrc[indexSrc++] "+bitWise+")* dataKernel[indexKer+k];\n" +
+				"\t\t\t\t\t}\n" +
+				"\n" +
+				"\t\t\t\t\ttotalRow[x] += total;\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t}\n" +
+				"\t\t\tint indexDst = dest.startIndex + y*dest.stride+offsetL;\n" +
+				"\t\t\tfor( int x = offsetL; x < width-offsetR; x++ ) {\n" +
+				"\t\t\t\tdataDst[indexDst++] = "+typeCast+"((totalRow[x]+halfDivisor)/ divisor);\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t\t_work.recycle(totalRow);\n" +
+				"\t\t//CONCURRENT_INLINE });\n" +
+				"\t}\n");
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {

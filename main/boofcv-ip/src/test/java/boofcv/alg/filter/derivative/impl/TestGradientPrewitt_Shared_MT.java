@@ -18,14 +18,9 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
-
-class TestGradientPrewitt_Shared_MT {
-	@Test
-	public void implement() {
-		fail("implement");
+class TestGradientPrewitt_Shared_MT extends CommonGradientMultiThreadToSingle {
+	TestGradientPrewitt_Shared_MT() {
+		super(GradientPrewitt_Shared_MT.class, GradientPrewitt_Shared.class, 3);
 	}
 }
 

@@ -25,6 +25,7 @@ import boofcv.struct.image.GrayF32;
 
 import javax.annotation.Generated;
 
+
 /**
  * <p>
  * Unrolls the convolution kernel to reduce array accessing and save often used variables to the stack.
@@ -43,6 +44,7 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated({"boofcv.alg.filter.convolve.noborder.GenerateConvolvedUnrolled_SB"})
+@SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
 public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 	public static boolean horizontal( Kernel1D_F32 kernel ,
 								   GrayF32 image, GrayF32 dest) {
@@ -173,7 +175,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void horizontal5( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
@@ -207,7 +208,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void horizontal7( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
@@ -245,7 +245,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void horizontal9( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
@@ -287,7 +286,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void horizontal11( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
@@ -333,7 +331,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void vertical3( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
@@ -369,7 +366,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void vertical5( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
@@ -411,7 +407,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void vertical7( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
@@ -459,7 +454,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void vertical9( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
@@ -513,7 +507,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void vertical11( Kernel1D_F32 kernel , GrayF32 image, GrayF32 dest )
@@ -573,7 +566,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void convolve3( Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
@@ -627,7 +619,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				}
 			}
 		});
-
 	}
 
 	public static void convolve5( Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
@@ -689,7 +680,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				}
 			}
 		});
-
 	}
 
 	public static void convolve7( Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
@@ -759,7 +749,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				}
 			}
 		});
-
 	}
 
 	public static void convolve9( Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
@@ -837,7 +826,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				}
 			}
 		});
-
 	}
 
 	public static void convolve11( Kernel2D_F32 kernel, GrayF32 src, GrayF32 dest)
@@ -923,7 +911,6 @@ public class ConvolveImageUnrolled_SB_MT_F32_F32 {
 				}
 			}
 		});
-
 	}
 
 }

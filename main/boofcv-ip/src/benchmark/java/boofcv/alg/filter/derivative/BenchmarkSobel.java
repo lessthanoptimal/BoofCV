@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,7 @@ public class BenchmarkSobel extends BenchmarkDerivativeBase{
 	{
 		@Override
 		public void process() {
-			GradientSobel_Outer.process_I8(imgInt8,derivX_I16,derivY_I16);
+			GradientSobel_Outer.process(imgInt8,derivX_I16,derivY_I16);
 		}
 	}
 
@@ -75,7 +75,7 @@ public class BenchmarkSobel extends BenchmarkDerivativeBase{
 	{
 		@Override
 		public void process() {
-			GradientSobel_Outer.process_I8_sub(imgInt8,derivX_I16,derivY_I16);
+			GradientSobel_Outer.process_sub(imgInt8,derivX_I16,derivY_I16);
 		}
 	}
 
@@ -83,7 +83,7 @@ public class BenchmarkSobel extends BenchmarkDerivativeBase{
 	{
 		@Override
 		public void process() {
-			GradientSobel_Outer.process_F32(imgFloat32,derivX_F32,derivY_F32);
+			GradientSobel_Outer.process(imgFloat32,derivX_F32,derivY_F32);
 		}
 	}
 

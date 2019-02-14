@@ -19,6 +19,7 @@
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.alg.filter.convolve.CompareToStandardConvolution;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayI8;
@@ -37,7 +38,7 @@ public class TestConvolveImageUnrolled_SB_U8_I8_Div {
 	public void convolve() throws NoSuchMethodException {
 		for (int i = 0; i < GenerateConvolvedUnrolled_SB.numUnrolled; i++) {
 			Method m = ConvolveImageUnrolled_SB_U8_I8_Div.class.getMethod("convolve",
-					Kernel2D_S32.class, GrayU8.class, GrayI8.class , int.class);
+					Kernel2D_S32.class, GrayU8.class, GrayI8.class , int.class, IWorkArrays.class);
 
 			compareToStandard.compareMethod(m, "convolve", i + 1);
 		}

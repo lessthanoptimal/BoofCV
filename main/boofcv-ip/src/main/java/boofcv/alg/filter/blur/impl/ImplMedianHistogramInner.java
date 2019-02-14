@@ -83,10 +83,13 @@ public class ImplMedianHistogramInner {
 				}
 			}
 
-			int count = 0;
-			int median;
-			for( median = 0; count < threshold; median++ ) {
+			// Compute the median value
+			int count = 0, median = 0;
+			while( true ) {
 				count += histogram[median];
+				if( count >= threshold )
+					break;
+				median++;
 			}
 			output.data[ output.startIndex+y*output.stride+radius] = (byte)median;
 

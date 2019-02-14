@@ -37,6 +37,7 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated({"boofcv.alg.filter.convolve.noborder.GenerateImplConvolveMean"})
+@SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
 public class ImplConvolveMean_MT {
 
 	public static void horizontal( GrayU8 input , GrayI8 output , int radius ) {
@@ -86,33 +87,33 @@ public class ImplConvolveMean_MT {
 		// a book keeping array for each thread.
 
 		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
-			int totals[] = _work.pop();
-			for( int x = 0; x < input.width; x++ ) {
-				int indexIn = input.startIndex + (y0-radius)*input.stride + x;
-				int indexOut = output.startIndex + output.stride*y0 + x;
+		int totals[] = _work.pop();
+		for( int x = 0; x < input.width; x++ ) {
+			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexOut = output.startIndex + output.stride*y0 + x;
 
-				int total = 0;
-				int indexEnd = indexIn + input.stride*kernelWidth;
-				for( ; indexIn < indexEnd; indexIn += input.stride) {
-					total += input.data[indexIn] & 0xFF;
-				}
-				totals[x] = total;
+			int total = 0;
+			int indexEnd = indexIn + input.stride*kernelWidth;
+			for( ; indexIn < indexEnd; indexIn += input.stride) {
+				total += input.data[indexIn] & 0xFF;
+			}
+			totals[x] = total;
+			output.data[indexOut] = (byte)((total+halfDivisor)/divisor);
+		}
+
+		// change the order it is processed in to reduce cache misses
+		for( int y = y0+1; y < y1; y++ ) {
+			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexOut = output.startIndex + y*output.stride;
+
+			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
+				int total = totals[ x ]  - (input.data[ indexIn - backStep ]& 0xFF);
+				totals[ x ] = total += input.data[ indexIn ]& 0xFF;
+
 				output.data[indexOut] = (byte)((total+halfDivisor)/divisor);
 			}
-
-			// change the order it is processed in to reduce cache misses
-			for( int y = y0+1; y < y1; y++ ) {
-				int indexIn = input.startIndex + (y+radius)*input.stride;
-				int indexOut = output.startIndex + y*output.stride;
-
-				for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-					int total = totals[ x ]  - (input.data[ indexIn - backStep ]& 0xFF);
-					totals[ x ] = total += input.data[ indexIn ]& 0xFF;
-
-					output.data[indexOut] = (byte)((total+halfDivisor)/divisor);
-				}
-			}
-			_work.recycle(totals);
+		}
+		_work.recycle(totals);
 		});
 	}
 	public static void horizontal( GrayS16 input , GrayI16 output , int radius ) {
@@ -162,33 +163,33 @@ public class ImplConvolveMean_MT {
 		// a book keeping array for each thread.
 
 		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
-			int totals[] = _work.pop();
-			for( int x = 0; x < input.width; x++ ) {
-				int indexIn = input.startIndex + (y0-radius)*input.stride + x;
-				int indexOut = output.startIndex + output.stride*y0 + x;
+		int totals[] = _work.pop();
+		for( int x = 0; x < input.width; x++ ) {
+			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexOut = output.startIndex + output.stride*y0 + x;
 
-				int total = 0;
-				int indexEnd = indexIn + input.stride*kernelWidth;
-				for( ; indexIn < indexEnd; indexIn += input.stride) {
-					total += input.data[indexIn] ;
-				}
-				totals[x] = total;
+			int total = 0;
+			int indexEnd = indexIn + input.stride*kernelWidth;
+			for( ; indexIn < indexEnd; indexIn += input.stride) {
+				total += input.data[indexIn] ;
+			}
+			totals[x] = total;
+			output.data[indexOut] = (short)((total+halfDivisor)/divisor);
+		}
+
+		// change the order it is processed in to reduce cache misses
+		for( int y = y0+1; y < y1; y++ ) {
+			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexOut = output.startIndex + y*output.stride;
+
+			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
+				int total = totals[ x ]  - (input.data[ indexIn - backStep ]);
+				totals[ x ] = total += input.data[ indexIn ];
+
 				output.data[indexOut] = (short)((total+halfDivisor)/divisor);
 			}
-
-			// change the order it is processed in to reduce cache misses
-			for( int y = y0+1; y < y1; y++ ) {
-				int indexIn = input.startIndex + (y+radius)*input.stride;
-				int indexOut = output.startIndex + y*output.stride;
-
-				for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-					int total = totals[ x ]  - (input.data[ indexIn - backStep ]);
-					totals[ x ] = total += input.data[ indexIn ];
-
-					output.data[indexOut] = (short)((total+halfDivisor)/divisor);
-				}
-			}
-			_work.recycle(totals);
+		}
+		_work.recycle(totals);
 		});
 	}
 	public static void horizontal( GrayU16 input , GrayI16 output , int radius ) {
@@ -238,33 +239,33 @@ public class ImplConvolveMean_MT {
 		// a book keeping array for each thread.
 
 		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
-			int totals[] = _work.pop();
-			for( int x = 0; x < input.width; x++ ) {
-				int indexIn = input.startIndex + (y0-radius)*input.stride + x;
-				int indexOut = output.startIndex + output.stride*y0 + x;
+		int totals[] = _work.pop();
+		for( int x = 0; x < input.width; x++ ) {
+			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexOut = output.startIndex + output.stride*y0 + x;
 
-				int total = 0;
-				int indexEnd = indexIn + input.stride*kernelWidth;
-				for( ; indexIn < indexEnd; indexIn += input.stride) {
-					total += input.data[indexIn] & 0xFFFF;
-				}
-				totals[x] = total;
+			int total = 0;
+			int indexEnd = indexIn + input.stride*kernelWidth;
+			for( ; indexIn < indexEnd; indexIn += input.stride) {
+				total += input.data[indexIn] & 0xFFFF;
+			}
+			totals[x] = total;
+			output.data[indexOut] = (short)((total+halfDivisor)/divisor);
+		}
+
+		// change the order it is processed in to reduce cache misses
+		for( int y = y0+1; y < y1; y++ ) {
+			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexOut = output.startIndex + y*output.stride;
+
+			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
+				int total = totals[ x ]  - (input.data[ indexIn - backStep ]& 0xFFFF);
+				totals[ x ] = total += input.data[ indexIn ]& 0xFFFF;
+
 				output.data[indexOut] = (short)((total+halfDivisor)/divisor);
 			}
-
-			// change the order it is processed in to reduce cache misses
-			for( int y = y0+1; y < y1; y++ ) {
-				int indexIn = input.startIndex + (y+radius)*input.stride;
-				int indexOut = output.startIndex + y*output.stride;
-
-				for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-					int total = totals[ x ]  - (input.data[ indexIn - backStep ]& 0xFFFF);
-					totals[ x ] = total += input.data[ indexIn ]& 0xFFFF;
-
-					output.data[indexOut] = (short)((total+halfDivisor)/divisor);
-				}
-			}
-			_work.recycle(totals);
+		}
+		_work.recycle(totals);
 		});
 	}
 	public static void horizontal( GrayF32 input , GrayF32 output , int radius ) {
@@ -312,33 +313,33 @@ public class ImplConvolveMean_MT {
 		// a book keeping array for each thread.
 
 		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
-			float totals[] = _work.pop();
-			for( int x = 0; x < input.width; x++ ) {
-				int indexIn = input.startIndex + (y0-radius)*input.stride + x;
-				int indexOut = output.startIndex + output.stride*y0 + x;
+		float totals[] = _work.pop();
+		for( int x = 0; x < input.width; x++ ) {
+			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexOut = output.startIndex + output.stride*y0 + x;
 
-				float total = 0;
-				int indexEnd = indexIn + input.stride*kernelWidth;
-				for( ; indexIn < indexEnd; indexIn += input.stride) {
-					total += input.data[indexIn] ;
-				}
-				totals[x] = total;
+			float total = 0;
+			int indexEnd = indexIn + input.stride*kernelWidth;
+			for( ; indexIn < indexEnd; indexIn += input.stride) {
+				total += input.data[indexIn] ;
+			}
+			totals[x] = total;
+			output.data[indexOut] = (total/divisor);
+		}
+
+		// change the order it is processed in to reduce cache misses
+		for( int y = y0+1; y < y1; y++ ) {
+			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexOut = output.startIndex + y*output.stride;
+
+			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
+				float total = totals[ x ]  - (input.data[ indexIn - backStep ]);
+				totals[ x ] = total += input.data[ indexIn ];
+
 				output.data[indexOut] = (total/divisor);
 			}
-
-			// change the order it is processed in to reduce cache misses
-			for( int y = y0+1; y < y1; y++ ) {
-				int indexIn = input.startIndex + (y+radius)*input.stride;
-				int indexOut = output.startIndex + y*output.stride;
-
-				for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-					float total = totals[ x ]  - (input.data[ indexIn - backStep ]);
-					totals[ x ] = total += input.data[ indexIn ];
-
-					output.data[indexOut] = (total/divisor);
-				}
-			}
-			_work.recycle(totals);
+		}
+		_work.recycle(totals);
 		});
 	}
 	public static void horizontal( GrayF64 input , GrayF64 output , int radius ) {
@@ -386,33 +387,33 @@ public class ImplConvolveMean_MT {
 		// a book keeping array for each thread.
 
 		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
-			double totals[] = _work.pop();
-			for( int x = 0; x < input.width; x++ ) {
-				int indexIn = input.startIndex + (y0-radius)*input.stride + x;
-				int indexOut = output.startIndex + output.stride*y0 + x;
+		double totals[] = _work.pop();
+		for( int x = 0; x < input.width; x++ ) {
+			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexOut = output.startIndex + output.stride*y0 + x;
 
-				double total = 0;
-				int indexEnd = indexIn + input.stride*kernelWidth;
-				for( ; indexIn < indexEnd; indexIn += input.stride) {
-					total += input.data[indexIn] ;
-				}
-				totals[x] = total;
+			double total = 0;
+			int indexEnd = indexIn + input.stride*kernelWidth;
+			for( ; indexIn < indexEnd; indexIn += input.stride) {
+				total += input.data[indexIn] ;
+			}
+			totals[x] = total;
+			output.data[indexOut] = (total/divisor);
+		}
+
+		// change the order it is processed in to reduce cache misses
+		for( int y = y0+1; y < y1; y++ ) {
+			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexOut = output.startIndex + y*output.stride;
+
+			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
+				double total = totals[ x ]  - (input.data[ indexIn - backStep ]);
+				totals[ x ] = total += input.data[ indexIn ];
+
 				output.data[indexOut] = (total/divisor);
 			}
-
-			// change the order it is processed in to reduce cache misses
-			for( int y = y0+1; y < y1; y++ ) {
-				int indexIn = input.startIndex + (y+radius)*input.stride;
-				int indexOut = output.startIndex + y*output.stride;
-
-				for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-					double total = totals[ x ]  - (input.data[ indexIn - backStep ]);
-					totals[ x ] = total += input.data[ indexIn ];
-
-					output.data[indexOut] = (total/divisor);
-				}
-			}
-			_work.recycle(totals);
+		}
+		_work.recycle(totals);
 		});
 	}
 }

@@ -21,6 +21,9 @@ package boofcv.alg.filter.convolve.noborder;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
 
+import javax.annotation.Generated;
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+
 
 /**
  * <p>
@@ -33,7 +36,8 @@ import boofcv.struct.image.*;
  * 
  * @author Peter Abeles
  */
-@SuppressWarnings({"ForLoopReplaceableByForEach"})
+@Generated({"boofcv.alg.filter.convolve.noborder.GenerateConvolveImageStandard_IL"})
+@SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
 public class ConvolveImageStandard_IL {
 
 	public static void horizontal( Kernel1D_F32 kernel ,
@@ -48,6 +52,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, src.height, i -> {
 		for( int i = 0; i < src.height; i++ ) {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
@@ -62,7 +67,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical( Kernel1D_F32 kernel,
@@ -81,6 +86,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offset, yEnd, y -> {
 		for( int y = offset; y < yEnd; y++ ) {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
@@ -99,7 +105,7 @@ public class ConvolveImageStandard_IL {
 				indexSrcStart += numBands;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve( Kernel2D_F32 kernel , InterleavedF32 src , InterleavedF32 dst )
@@ -115,6 +121,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offsetL, height-offsetR, y -> {
 		for( int y = offsetL; y < height-offsetR; y++ ) {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
@@ -134,7 +141,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void horizontal( Kernel1D_F64 kernel ,
@@ -149,6 +156,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, src.height, i -> {
 		for( int i = 0; i < src.height; i++ ) {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
@@ -163,7 +171,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical( Kernel1D_F64 kernel,
@@ -182,6 +190,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offset, yEnd, y -> {
 		for( int y = offset; y < yEnd; y++ ) {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
@@ -200,7 +209,7 @@ public class ConvolveImageStandard_IL {
 				indexSrcStart += numBands;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve( Kernel2D_F64 kernel , InterleavedF64 src , InterleavedF64 dst )
@@ -216,6 +225,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offsetL, height-offsetR, y -> {
 		for( int y = offsetL; y < height-offsetR; y++ ) {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
@@ -235,7 +245,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -250,6 +260,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, src.height, i -> {
 		for( int i = 0; i < src.height; i++ ) {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
@@ -264,7 +275,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -283,6 +294,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offset, yEnd, y -> {
 		for( int y = offset; y < yEnd; y++ ) {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
@@ -301,7 +313,7 @@ public class ConvolveImageStandard_IL {
 				indexSrcStart += numBands;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedU8 src , InterleavedI16 dst )
@@ -317,6 +329,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offsetL, height-offsetR, y -> {
 		for( int y = offsetL; y < height-offsetR; y++ ) {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
@@ -336,7 +349,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -351,6 +364,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, src.height, i -> {
 		for( int i = 0; i < src.height; i++ ) {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
@@ -365,7 +379,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -384,6 +398,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offset, yEnd, y -> {
 		for( int y = offset; y < yEnd; y++ ) {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
@@ -402,7 +417,7 @@ public class ConvolveImageStandard_IL {
 				indexSrcStart += numBands;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedU8 src , InterleavedS32 dst )
@@ -418,6 +433,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offsetL, height-offsetR, y -> {
 		for( int y = offsetL; y < height-offsetR; y++ ) {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
@@ -437,7 +453,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -457,6 +473,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offset, yEnd, y -> {
 		for( int y = offset; y < yEnd; y++ ) {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
@@ -475,7 +492,7 @@ public class ConvolveImageStandard_IL {
 				indexSrcStart += numBands;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -490,6 +507,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, src.height, i -> {
 		for( int i = 0; i < src.height; i++ ) {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
@@ -504,7 +522,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -523,6 +541,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offset, yEnd, y -> {
 		for( int y = offset; y < yEnd; y++ ) {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
@@ -541,7 +560,7 @@ public class ConvolveImageStandard_IL {
 				indexSrcStart += numBands;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedS16 src , InterleavedI16 dst )
@@ -557,6 +576,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offsetL, height-offsetR, y -> {
 		for( int y = offsetL; y < height-offsetR; y++ ) {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
@@ -576,7 +596,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -592,6 +612,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, src.height, i -> {
 		for( int i = 0; i < src.height; i++ ) {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
@@ -606,7 +627,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -626,6 +647,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offset, yEnd, y -> {
 		for( int y = offset; y < yEnd; y++ ) {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
@@ -644,7 +666,7 @@ public class ConvolveImageStandard_IL {
 				indexSrcStart += numBands;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedU8 src , InterleavedI8 dst , int divisor )
@@ -661,6 +683,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offsetL, height-offsetR, y -> {
 		for( int y = offsetL; y < height-offsetR; y++ ) {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
@@ -680,7 +703,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -696,6 +719,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, src.height, i -> {
 		for( int i = 0; i < src.height; i++ ) {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
@@ -710,7 +734,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -730,6 +754,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offset, yEnd, y -> {
 		for( int y = offset; y < yEnd; y++ ) {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
@@ -748,7 +773,7 @@ public class ConvolveImageStandard_IL {
 				indexSrcStart += numBands;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedS16 src , InterleavedI16 dst , int divisor )
@@ -765,6 +790,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offsetL, height-offsetR, y -> {
 		for( int y = offsetL; y < height-offsetR; y++ ) {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
@@ -784,7 +810,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -799,6 +825,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, src.height, i -> {
 		for( int i = 0; i < src.height; i++ ) {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
@@ -813,7 +840,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -832,6 +859,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offset, yEnd, y -> {
 		for( int y = offset; y < yEnd; y++ ) {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
@@ -850,7 +878,7 @@ public class ConvolveImageStandard_IL {
 				indexSrcStart += numBands;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedU16 src , InterleavedI16 dst )
@@ -866,6 +894,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offsetL, height-offsetR, y -> {
 		for( int y = offsetL; y < height-offsetR; y++ ) {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
@@ -885,7 +914,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -901,6 +930,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, src.height, i -> {
 		for( int i = 0; i < src.height; i++ ) {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
@@ -915,7 +945,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -935,6 +965,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offset, yEnd, y -> {
 		for( int y = offset; y < yEnd; y++ ) {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
@@ -953,7 +984,7 @@ public class ConvolveImageStandard_IL {
 				indexSrcStart += numBands;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedU16 src , InterleavedI16 dst , int divisor )
@@ -970,6 +1001,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offsetL, height-offsetR, y -> {
 		for( int y = offsetL; y < height-offsetR; y++ ) {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
@@ -989,7 +1021,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -1009,6 +1041,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offset, yEnd, y -> {
 		for( int y = offset; y < yEnd; y++ ) {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
@@ -1027,7 +1060,7 @@ public class ConvolveImageStandard_IL {
 				indexSrcStart += numBands;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -1042,6 +1075,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, src.height, i -> {
 		for( int i = 0; i < src.height; i++ ) {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
@@ -1056,7 +1090,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -1075,6 +1109,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offset, yEnd, y -> {
 		for( int y = offset; y < yEnd; y++ ) {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
@@ -1093,7 +1128,7 @@ public class ConvolveImageStandard_IL {
 				indexSrcStart += numBands;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedS32 src , InterleavedS32 dst )
@@ -1109,6 +1144,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offsetL, height-offsetR, y -> {
 		for( int y = offsetL; y < height-offsetR; y++ ) {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
@@ -1128,7 +1164,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -1144,6 +1180,7 @@ public class ConvolveImageStandard_IL {
 
 		final int endJ = src.width - (kernelWidth - 1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, src.height, i -> {
 		for( int i = 0; i < src.height; i++ ) {
 			int indexDst = dst.startIndex + i*dst.stride+offset*numBands;
 			for (int j = 0; j < endJ; j++) {
@@ -1158,7 +1195,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -1178,6 +1215,7 @@ public class ConvolveImageStandard_IL {
 
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offset, yEnd, y -> {
 		for( int y = offset; y < yEnd; y++ ) {
 			int indexDst = dst.startIndex+y*dst.stride;
 			int indexSrcStart = src.startIndex+(y-offset)*src.stride;
@@ -1196,7 +1234,7 @@ public class ConvolveImageStandard_IL {
 				indexSrcStart += numBands;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedS32 src , InterleavedS32 dst , int divisor )
@@ -1213,6 +1251,7 @@ public class ConvolveImageStandard_IL {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(offsetL, height-offsetR, y -> {
 		for( int y = offsetL; y < height-offsetR; y++ ) {
 			int indexDst = dst.startIndex + y*dst.stride+offsetL*numBands;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
@@ -1232,7 +1271,7 @@ public class ConvolveImageStandard_IL {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 }

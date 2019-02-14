@@ -32,7 +32,6 @@ public abstract class CodeGeneratorBase {
 
 	protected PrintStream out;
 	protected String className;
-	protected boolean concurrent = false;
 
 	public CodeGeneratorBase(boolean useDefaultName) {
 		if( useDefaultName ) {
@@ -49,9 +48,7 @@ public abstract class CodeGeneratorBase {
 	}
 
 	public void autoSelectName() {
-		String concurrentName = concurrent? "_MT" : "";
-
-		className = getClass().getSimpleName()+concurrentName;
+		className = getClass().getSimpleName();
 		if( className.startsWith("Generate") ) {
 			int l = "Generate".length();
 			className = className.substring(l);
@@ -67,33 +64,20 @@ public abstract class CodeGeneratorBase {
 
 	protected void printParallel(String var, String lower, String upper , String body ) {
 		out.println();
-		if( concurrent ) {
-//			body = body.replace("\n\t","\n\t\t");
-			out.printf("\t\tBoofConcurrency.range(%s, %s, %s -> {\n",lower,upper,var);
-			out.print(body);
-			out.print("\t\t});\n");
-		} else {
-			out.printf("\t\tfor( int %s = %s; %s < %s; %s++ ) {\n",var,lower,var,upper,var);
-			out.print(body);
-			out.print("\t\t}\n");
-		}
+		out.printf("\t\t//CONCURRENT_BELOW BoofConcurrency.range(%s, %s, %s -> {\n",lower,upper,var);
+		out.printf("\t\tfor( int %s = %s; %s < %s; %s++ ) {\n",var,lower,var,upper,var);
+		out.print(body);
+		out.print("\t\t}\n");
+		out.print("\t\t//CONCURRENT_ABOVE });\n");
+
 	}
 	protected void printParallelBlock(String var0 , String var1, String lower, String upper , String minBlock , String body ) {
 		out.println();
-		if( concurrent ) {
-			out.printf("\t\tBoofConcurrency.blocks(%s, %s, %s,(%s,%s)->{\n",lower,upper,minBlock,var0,var1);
-			String[] lines = body.split("\n");
-			for( String s : lines ) {
-				if( !s.isEmpty() ) {
-					s = "\t"+s;
-				}
-				out.print(s+"\n");
-			}
-			out.print("\t\t});\n");
-		} else {
-			out.printf("\t\tfinal int %s = %s, %s = %s;\n",var0,lower,var1,upper);
-			out.print(body);
-		}
+
+		out.printf("\t\t//CONCURRENT_BELOW BoofConcurrency.blocks(%s, %s, %s,(%s,%s)->{\n",lower,upper,minBlock,var0,var1);
+		out.printf("\t\tfinal int %s = %s, %s = %s;\n",var0,lower,var1,upper);
+		out.print(body);
+		out.print("\t\t//CONCURRENT_INLINE });\n");
 	}
 
 	/**

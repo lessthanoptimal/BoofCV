@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,7 +75,6 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 				ret[0][3] = 11;
 			}
 
-
 			return ret;
 		} else {
 			Object[][] ret = new Object[1][paramTypes.length];
@@ -84,7 +83,7 @@ public class CompareToStandardConvolution extends CompareIdenticalFunctions
 			ret[0][1] = src;
 			ret[0][2] = dst;
 
-			if( paramTypes.length == 4 ) {
+			if( paramTypes.length == 4 || paramTypes.length == 5) {
 				ret[0][3] = 11;
 			}
 

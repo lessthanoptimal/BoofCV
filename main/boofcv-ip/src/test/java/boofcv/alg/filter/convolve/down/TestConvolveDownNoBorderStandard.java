@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -128,8 +128,7 @@ public class TestConvolveDownNoBorderStandard {
 			Class<?> c[] = candidate.getParameterTypes();
 
 			if( evaluation.getName().compareTo("convolve") == 0) {
-				if( e.length != c.length+1 )
-					return false;
+				// no checks. too many permutations
 			} else  {
 				if( e.length != c.length+1 )
 					return false;
@@ -165,7 +164,7 @@ public class TestConvolveDownNoBorderStandard {
 			ret[1] = input.clone();
 			ret[2] = output.createNew(input.width,input.height);
 
-			if( ret.length == 4 ) {
+			if( ret.length == 4 || ret.length == 5) {
 				ret[3] = DIV;
 			}
 
@@ -212,7 +211,10 @@ public class TestConvolveDownNoBorderStandard {
 					if( sum > 0 ) {
 						// normalizing the magnitude is needed for floating point numbers
 						double diff = Math.abs(valV-valT)/sum;
-						assertTrue(diff<=1e-4);
+						if( t.isFloatingPoint() )
+							assertTrue(diff<=1e-3);
+						else
+							assertTrue(diff<=1);
 					}
 				}
 			}

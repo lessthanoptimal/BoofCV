@@ -25,6 +25,8 @@ import boofcv.struct.image.GrayU8;
 
 import javax.annotation.Generated;
 
+//CONCURRENT_CLASS_NAME ConvolveImageUnrolled_SB_MT_U8_I16
+
 /**
  * <p>
  * Unrolls the convolution kernel to reduce array accessing and save often used variables to the stack.
@@ -43,6 +45,7 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated({"boofcv.alg.filter.convolve.noborder.GenerateConvolvedUnrolled_SB"})
+@SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
 public class ConvolveImageUnrolled_SB_U8_I16 {
 	public static boolean horizontal( Kernel1D_S32 kernel ,
 								   GrayU8 image, GrayI16 dest) {
@@ -159,6 +162,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int width = image.getWidth();
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, image.height, i -> {
 		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
@@ -173,7 +177,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void horizontal5( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -191,6 +195,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int width = image.getWidth();
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, image.height, i -> {
 		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
@@ -207,7 +212,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void horizontal7( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -227,6 +232,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int width = image.getWidth();
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, image.height, i -> {
 		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
@@ -245,7 +251,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void horizontal9( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -267,6 +273,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int width = image.getWidth();
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, image.height, i -> {
 		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
@@ -287,7 +294,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void horizontal11( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -311,6 +318,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int width = image.getWidth();
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, image.height, i -> {
 		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
@@ -333,7 +341,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical3( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -352,6 +360,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int yEnd = imgHeight-radius;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(radius, yEnd, y -> {
 		for( int y = radius; y < yEnd; y++ ) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
@@ -369,7 +378,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical5( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -390,6 +399,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int yEnd = imgHeight-radius;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(radius, yEnd, y -> {
 		for( int y = radius; y < yEnd; y++ ) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
@@ -411,7 +421,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical7( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -434,6 +444,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int yEnd = imgHeight-radius;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(radius, yEnd, y -> {
 		for( int y = radius; y < yEnd; y++ ) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
@@ -459,7 +470,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical9( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -484,6 +495,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int yEnd = imgHeight-radius;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(radius, yEnd, y -> {
 		for( int y = radius; y < yEnd; y++ ) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
@@ -513,7 +525,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical11( Kernel1D_S32 kernel , GrayU8 image, GrayI16 dest )
@@ -540,6 +552,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int yEnd = imgHeight-radius;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(radius, yEnd, y -> {
 		for( int y = radius; y < yEnd; y++ ) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
@@ -573,7 +586,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				dataDst[indexDst++] = ( short )total;
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve3( Kernel2D_S32 kernel, GrayU8 src, GrayI16 dest)
@@ -586,6 +599,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int kernelRadius = kernel.getRadius();
 
+		//CONCURRENT_BELOW BoofConcurrency.range(kernelRadius, height-kernelRadius, y -> {
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
 			// first time through the value needs to be set
@@ -627,7 +641,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve5( Kernel2D_S32 kernel, GrayU8 src, GrayI16 dest)
@@ -640,6 +654,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int kernelRadius = kernel.getRadius();
 
+		//CONCURRENT_BELOW BoofConcurrency.range(kernelRadius, height-kernelRadius, y -> {
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
 			// first time through the value needs to be set
@@ -689,7 +704,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve7( Kernel2D_S32 kernel, GrayU8 src, GrayI16 dest)
@@ -702,6 +717,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int kernelRadius = kernel.getRadius();
 
+		//CONCURRENT_BELOW BoofConcurrency.range(kernelRadius, height-kernelRadius, y -> {
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
 			// first time through the value needs to be set
@@ -759,7 +775,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve9( Kernel2D_S32 kernel, GrayU8 src, GrayI16 dest)
@@ -772,6 +788,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int kernelRadius = kernel.getRadius();
 
+		//CONCURRENT_BELOW BoofConcurrency.range(kernelRadius, height-kernelRadius, y -> {
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
 			// first time through the value needs to be set
@@ -837,7 +854,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void convolve11( Kernel2D_S32 kernel, GrayU8 src, GrayI16 dest)
@@ -850,6 +867,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 
 		final int kernelRadius = kernel.getRadius();
 
+		//CONCURRENT_BELOW BoofConcurrency.range(kernelRadius, height-kernelRadius, y -> {
 		for( int y = kernelRadius; y < height-kernelRadius; y++ ) {
 
 			// first time through the value needs to be set
@@ -923,7 +941,7 @@ public class ConvolveImageUnrolled_SB_U8_I16 {
 				}
 			}
 		}
-
+		//CONCURRENT_ABOVE });
 	}
 
 }

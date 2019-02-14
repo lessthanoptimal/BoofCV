@@ -423,7 +423,7 @@ public class ConvolveImageNormalized {
 			if( kernel.width >= src.width || kernel.width >= src.height ) {
 				ConvolveNormalizedNaive_SB.convolve(kernel, src, dst);
 			} else {
-				ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum());
+				ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
 				ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
 			}
 		}
@@ -555,7 +555,7 @@ public class ConvolveImageNormalized {
 			if( kernel.width >= src.width || kernel.width >= src.height ) {
 				ConvolveNormalizedNaive_SB.convolve(kernel, src, dst);
 			} else {
-				ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum());
+				ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
 				ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
 			}
 		}
@@ -687,7 +687,7 @@ public class ConvolveImageNormalized {
 			if( kernel.width >= src.width || kernel.width >= src.height ) {
 				ConvolveNormalizedNaive_SB.convolve(kernel, src, dst);
 			} else {
-				ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum());
+				ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
 				ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
 			}
 		}
@@ -819,7 +819,7 @@ public class ConvolveImageNormalized {
 			if( kernel.width >= src.width || kernel.width >= src.height ) {
 				ConvolveNormalizedNaive_SB.convolve(kernel, src, dst);
 			} else {
-				ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum());
+				ConvolveImageNoBorder.convolve(kernel, src, dst, kernel.computeSum(), null);
 				ConvolveNormalized_JustBorder_SB.convolve(kernel, src, dst);
 			}
 		}

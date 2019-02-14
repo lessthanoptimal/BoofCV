@@ -57,13 +57,18 @@ public class TestImplConvolveBox_MT {
 			ImageBase expected = GeneralizedImageOps.createImage(params[1],width,height,2);
 			ImageBase found = GeneralizedImageOps.createImage(params[1],width,height,2);
 
-			System.out.println("Method "+name+" "+input.getImageType());
+//			System.out.println("Method "+name+" "+input.getImageType());
 
 			GImageMiscOps.fillUniform(input,random,0,200);
 
 			try {
-				testM.invoke(null, input, expected, 8);
-				m.invoke(null, input, found, 8);
+				if( name.equals("horizontal") ) {
+					testM.invoke(null, input, expected, 8);
+					m.invoke(null, input, found, 8);
+				} else {
+					testM.invoke(null, input, expected, 8, null);
+					m.invoke(null, input, found, 8, null);
+				}
 			} catch( Exception e ) {
 				e.printStackTrace();
 				fail("Exception");

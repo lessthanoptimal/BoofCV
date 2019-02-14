@@ -50,8 +50,7 @@ public class ImplMedianHistogramInner_MT {
 	 * @param radius Size of the filter region.
 	 * @param work (Optional) used to create local workspace
 	 */
-	public static void process(GrayU8 input, GrayU8 output , int radius,
-							   @Nullable IWorkArrays work )
+	public static void process(GrayU8 input, GrayU8 output , int radius, @Nullable IWorkArrays work )
 	{
 		if( work == null )
 			work = new IWorkArrays();
@@ -64,6 +63,8 @@ public class ImplMedianHistogramInner_MT {
 		if( input.width < w || input.height < w )
 			return;
 
+		// defines what the median is. technically this is an approximation because if even it's the ave
+		// of the two elements in the middle. I'm not aware of libraries which actually do this.
 		int threshold = (w*w)/2+1;
 
 		BoofConcurrency.blocks(radius, output.height-radius, w,(y0,y1)->{
@@ -81,10 +82,13 @@ public class ImplMedianHistogramInner_MT {
 				}
 			}
 
-			int count = 0;
-			int median;
-			for( median = 0; count < threshold; median++ ) {
+			// Compute the median value
+			int count = 0, median = 0;
+			while( true ) {
 				count += histogram[median];
+				if( count >= threshold )
+					break;
+				median++;
 			}
 			output.data[ output.startIndex+y*output.stride+radius] = (byte)median;
 
@@ -92,34 +96,34 @@ public class ImplMedianHistogramInner_MT {
 			count += removeSide(input.data,input.stride, w, histogram, seed, median);
 
 			for( int x = radius+1; x < input.width-radius; x++ ) {
-				seed = input.startIndex + (y-radius)*input.stride+(x-radius);
+				seed = input.startIndex + (y - radius) * input.stride + (x - radius);
 
 				// add the right most pixels to the histogram
-				count += addSide(input.data,input.stride, w, histogram, seed+w-1, median);
+				count += addSide(input.data, input.stride, w, histogram, seed + w - 1, median);
 
 				// find the median, using the previous solution as a starting point
-				if( count >= threshold ) {
-					while( count >= threshold ) {
+				if (count >= threshold) {
+					while (count >= threshold) {
 						count -= histogram[median--];
 					}
 					median += 1;
 					count += histogram[median];
 				} else {
-					while( count < threshold ) {
+					while (count < threshold) {
 						median += 1;
 						count += histogram[median];
 					}
 				}
-				output.data[ output.startIndex+y*output.stride+x] = (byte)median;
+				output.data[output.startIndex + y * output.stride + x] = (byte) median;
 
 				// remove the left most pixels from the histogram
-				count += removeSide(input.data,input.stride, w, histogram, seed, median);
+				count += removeSide(input.data, input.stride, w, histogram, seed, median);
 			}
 		}});
 	}
 
 	private static int removeSide(final byte[] data, final int stride, final int width, int[] histogram,
-								   int seedIdx, int oldMedian)
+								  int seedIdx, int oldMedian)
 	{
 		int count = 0;
 		for( int i = 0; i < width; i++, seedIdx += stride ) {
@@ -133,7 +137,7 @@ public class ImplMedianHistogramInner_MT {
 	}
 
 	private static int addSide(final byte[] data, final int stride, final int width, int[] histogram,
-								   int seedIdx, int oldValue)
+							   int seedIdx, int oldValue)
 	{
 		int count = 0;
 		for( int i = 0; i < width; i++, seedIdx += stride ) {

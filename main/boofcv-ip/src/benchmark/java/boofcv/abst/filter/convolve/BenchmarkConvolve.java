@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -171,19 +171,19 @@ public class BenchmarkConvolve  {
 
 	public int timeConvolve2D_Std_I8_I8_DIV(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageStandard_SB.convolve(kernel2D_I32, input_U8, out_U8,10);
+			ConvolveImageStandard_SB.convolve(kernel2D_I32, input_U8, out_U8,10,null);
 		return 0;
 	}
 
 	public int timeConvolve2D_I8_I8_DIV(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageNoBorder.convolve(kernel2D_I32, input_U8, out_U8,10);
+			ConvolveImageNoBorder.convolve(kernel2D_I32, input_U8, out_U8,10, null);
 		return 0;
 	}
 
 	public int timeConvolve2D_Std_I8_I16(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImageNoBorder.convolve(kernel2D_I32, input_U8, out_U8,10);
+			ConvolveImageNoBorder.convolve(kernel2D_I32, input_U8, out_U8,10, null);
 		return 0;
 	}
 
@@ -231,7 +231,7 @@ public class BenchmarkConvolve  {
 
 	public int timeBox_U8_S32_Vertical6(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveBox.vertical(input_U8, out_S32,radius);
+			ImplConvolveBox.vertical(input_U8, out_S32,radius, null);
 		return 0;
 	}
 

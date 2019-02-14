@@ -40,16 +40,13 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 
 	@Override
 	public void generate() throws FileNotFoundException {
-		for (int i = 0; i < 2; i++) {
-			concurrent = i == 0;
-			printPreamble();
-			addFunctions(AutoTypeImage.U8, AutoTypeImage.I8);
-			addFunctions(AutoTypeImage.S16, AutoTypeImage.I16);
-			addFunctions(AutoTypeImage.U16, AutoTypeImage.I16);
-			addFunctions(AutoTypeImage.F32, AutoTypeImage.F32);
-			addFunctions(AutoTypeImage.F64, AutoTypeImage.F64);
-			out.println("}");
-		}
+		printPreamble();
+		addFunctions(AutoTypeImage.U8, AutoTypeImage.I8);
+		addFunctions(AutoTypeImage.S16, AutoTypeImage.I16);
+		addFunctions(AutoTypeImage.U16, AutoTypeImage.I16);
+		addFunctions(AutoTypeImage.F32, AutoTypeImage.F32);
+		addFunctions(AutoTypeImage.F64, AutoTypeImage.F64);
+		out.println("}");
 	}
 
 	public void addFunctions( AutoTypeImage imageIn , AutoTypeImage imageOut ) throws FileNotFoundException {
@@ -79,6 +76,7 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 				" * @author Peter Abeles\n" +
 				" */\n" +
 				"@Generated({\""+getClass().getCanonicalName()+"\"})\n" +
+				"@SuppressWarnings({\"ForLoopReplaceableByForEach\",\"Duplicates\"})\n" +
 				"public class " + className + " {\n\n");
 	}
 

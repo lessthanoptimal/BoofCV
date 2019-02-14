@@ -19,6 +19,9 @@
 package boofcv.alg.misc;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.misc.impl.ImplPixelMath;
+import boofcv.alg.misc.impl.ImplPixelMath_MT;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
@@ -45,9 +48,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		abs(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		}
 	}
 
 	/**
@@ -62,23 +71,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		abs(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void abs( byte[] input , int inputStart , int inputStride ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (byte)Math.abs(input[indexSrc]);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
 		}
 	}
 
@@ -94,9 +94,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		abs(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		}
 	}
 
 	/**
@@ -111,23 +117,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		abs(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void abs( short[] input , int inputStart , int inputStride ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (short)Math.abs(input[indexSrc]);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
 		}
 	}
 
@@ -143,9 +140,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		abs(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		}
 	}
 
 	/**
@@ -160,23 +163,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		abs(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void abs( int[] input , int inputStart , int inputStride ,
-							   int[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.abs(input[indexSrc]);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
 		}
 	}
 
@@ -192,9 +186,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		abs(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		}
 	}
 
 	/**
@@ -209,23 +209,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		abs(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void abs( long[] input , int inputStart , int inputStride ,
-							   long[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.abs(input[indexSrc]);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
 		}
 	}
 
@@ -241,9 +232,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		abs(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		}
 	}
 
 	/**
@@ -258,23 +255,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		abs(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void abs( float[] input , int inputStart , int inputStride ,
-							   float[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.abs(input[indexSrc]);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
 		}
 	}
 
@@ -290,9 +278,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		abs(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		}
 	}
 
 	/**
@@ -307,23 +301,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		abs(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void abs( double[] input , int inputStart , int inputStride ,
-							   double[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.abs(input[indexSrc]);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.abs(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
 		}
 	}
 
@@ -331,46 +316,21 @@ public class PixelMath {
 	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
 	 *
 	 * @param input The input image. Not modified.
-	 * @param output Where the inverted image is written to. Modified.
+	 * @param output Where the negated image is written to. Modified.
 	 */
-	public static void invert( GrayS8 input , GrayS8 output ) {
+	public static void negative( GrayS8 input , GrayS8 output ) {
 
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		invert(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	/**
-	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the inverted image is written to. Modified.
-	 */
-	public static void invert( InterleavedS8 input , InterleavedS8 output ) {
-
-		output.reshape(input.width,input.height);
-
-		int columns = input.width*input.numBands;
-		invert(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void invert( byte[] input , int inputStart , int inputStride ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (byte)-input[indexSrc];
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
 		}
 	}
 
@@ -378,46 +338,21 @@ public class PixelMath {
 	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
 	 *
 	 * @param input The input image. Not modified.
-	 * @param output Where the inverted image is written to. Modified.
+	 * @param output Where the negated image is written to. Modified.
 	 */
-	public static void invert( GrayS16 input , GrayS16 output ) {
-
-		output.reshape(input.width,input.height);
-
-		int columns = input.width;
-		invert(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	/**
-	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the inverted image is written to. Modified.
-	 */
-	public static void invert( InterleavedS16 input , InterleavedS16 output ) {
+	public static void negative( InterleavedS8 input , InterleavedS8 output ) {
 
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		invert(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void invert( short[] input , int inputStart , int inputStride ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (short)-input[indexSrc];
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
 		}
 	}
 
@@ -425,46 +360,21 @@ public class PixelMath {
 	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
 	 *
 	 * @param input The input image. Not modified.
-	 * @param output Where the inverted image is written to. Modified.
+	 * @param output Where the negated image is written to. Modified.
 	 */
-	public static void invert( GrayS32 input , GrayS32 output ) {
+	public static void negative( GrayS16 input , GrayS16 output ) {
 
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		invert(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	/**
-	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the inverted image is written to. Modified.
-	 */
-	public static void invert( InterleavedS32 input , InterleavedS32 output ) {
-
-		output.reshape(input.width,input.height);
-
-		int columns = input.width*input.numBands;
-		invert(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void invert( int[] input , int inputStart , int inputStride ,
-							   int[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = -input[indexSrc];
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
 		}
 	}
 
@@ -472,46 +382,21 @@ public class PixelMath {
 	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
 	 *
 	 * @param input The input image. Not modified.
-	 * @param output Where the inverted image is written to. Modified.
+	 * @param output Where the negated image is written to. Modified.
 	 */
-	public static void invert( GrayS64 input , GrayS64 output ) {
-
-		output.reshape(input.width,input.height);
-
-		int columns = input.width;
-		invert(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	/**
-	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the inverted image is written to. Modified.
-	 */
-	public static void invert( InterleavedS64 input , InterleavedS64 output ) {
+	public static void negative( InterleavedS16 input , InterleavedS16 output ) {
 
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		invert(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void invert( long[] input , int inputStart , int inputStride ,
-							   long[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = -input[indexSrc];
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
 		}
 	}
 
@@ -519,46 +404,21 @@ public class PixelMath {
 	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
 	 *
 	 * @param input The input image. Not modified.
-	 * @param output Where the inverted image is written to. Modified.
+	 * @param output Where the negated image is written to. Modified.
 	 */
-	public static void invert( GrayF32 input , GrayF32 output ) {
+	public static void negative( GrayS32 input , GrayS32 output ) {
 
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		invert(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	/**
-	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
-	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the inverted image is written to. Modified.
-	 */
-	public static void invert( InterleavedF32 input , InterleavedF32 output ) {
-
-		output.reshape(input.width,input.height);
-
-		int columns = input.width*input.numBands;
-		invert(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void invert( float[] input , int inputStart , int inputStride ,
-							   float[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = -input[indexSrc];
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
 		}
 	}
 
@@ -566,46 +426,153 @@ public class PixelMath {
 	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
 	 *
 	 * @param input The input image. Not modified.
-	 * @param output Where the inverted image is written to. Modified.
+	 * @param output Where the negated image is written to. Modified.
 	 */
-	public static void invert( GrayF64 input , GrayF64 output ) {
+	public static void negative( InterleavedS32 input , InterleavedS32 output ) {
 
 		output.reshape(input.width,input.height);
 
-		int columns = input.width;
-		invert(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		int columns = input.width*input.numBands;
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		}
 	}
 
 	/**
 	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
 	 *
 	 * @param input The input image. Not modified.
-	 * @param output Where the inverted image is written to. Modified.
+	 * @param output Where the negated image is written to. Modified.
 	 */
-	public static void invert( InterleavedF64 input , InterleavedF64 output ) {
+	public static void negative( GrayS64 input , GrayS64 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		}
+	}
+
+	/**
+	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the negated image is written to. Modified.
+	 */
+	public static void negative( InterleavedS64 input , InterleavedS64 output ) {
 
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		invert(input.data,input.startIndex,input.stride,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		}
 	}
 
-	private static void invert( double[] input , int inputStart , int inputStride ,
-							   double[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
+	/**
+	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the negated image is written to. Modified.
+	 */
+	public static void negative( GrayF32 input , GrayF32 output ) {
 
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = -input[indexSrc];
-			}
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		}
+	}
+
+	/**
+	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the negated image is written to. Modified.
+	 */
+	public static void negative( InterleavedF32 input , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width*input.numBands;
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		}
+	}
+
+	/**
+	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the negated image is written to. Modified.
+	 */
+	public static void negative( GrayF64 input , GrayF64 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		}
+	}
+
+	/**
+	 * Changes the sign of every pixel in the image: output[x,y] = -input[x,y]
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the negated image is written to. Modified.
+	 */
+	public static void negative( InterleavedF64 input , InterleavedF64 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width*input.numBands;
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
+		} else {
+			ImplPixelMath.negative(input.data, input.startIndex, input.stride,
+					output.data, output.startIndex, output.stride,
+					input.height, columns);
 		}
 	}
 
@@ -622,9 +589,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiplyU_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -640,24 +613,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiplyU_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiplyU_A( byte[] input , int inputStart , int inputStride , 
-							   double value ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (byte)Math.round((input[indexSrc] & 0xFF) * value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -674,9 +637,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiply_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -692,24 +661,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiply_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiply_A( byte[] input , int inputStart , int inputStride , 
-							   double value ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (byte)Math.round((input[indexSrc] ) * value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -726,9 +685,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiplyU_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -744,24 +709,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiplyU_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiplyU_A( short[] input , int inputStart , int inputStride , 
-							   double value ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (short)Math.round((input[indexSrc] & 0xFFFF) * value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -778,9 +733,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiply_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -796,24 +757,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiply_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiply_A( short[] input , int inputStart , int inputStride , 
-							   double value ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (short)Math.round((input[indexSrc] ) * value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -830,9 +781,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiply_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -848,24 +805,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiply_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiply_A( int[] input , int inputStart , int inputStride , 
-							   double value ,
-							   int[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (int)Math.round((input[indexSrc] ) * value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -882,9 +829,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiply_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -900,24 +853,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiply_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiply_A( long[] input , int inputStart , int inputStride , 
-							   double value ,
-							   long[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (long)Math.round((input[indexSrc] ) * value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -934,9 +877,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiply_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -952,24 +901,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiply_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiply_A( float[] input , int inputStart , int inputStride , 
-							   float value ,
-							   float[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = ((input[indexSrc] ) * value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -986,9 +925,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiply_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1004,24 +949,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiply_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiply_A( double[] input , int inputStart , int inputStride , 
-							   double value ,
-							   double[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = ((input[indexSrc] ) * value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1038,9 +973,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1056,27 +997,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiplyU_A( byte[] input , int inputStart , int inputStride , 
-							   double value , int lower , int upper ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (int)Math.round((input[indexSrc] & 0xFF) * value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (byte)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1093,9 +1021,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1111,27 +1045,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiply_A( byte[] input , int inputStart , int inputStride , 
-							   double value , int lower , int upper ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (int)Math.round((input[indexSrc] ) * value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (byte)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1148,9 +1069,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1166,27 +1093,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiplyU_A( short[] input , int inputStart , int inputStride , 
-							   double value , int lower , int upper ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (int)Math.round((input[indexSrc] & 0xFFFF) * value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (short)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1203,9 +1117,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1221,27 +1141,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiply_A( short[] input , int inputStart , int inputStride , 
-							   double value , int lower , int upper ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (int)Math.round((input[indexSrc] ) * value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (short)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1258,9 +1165,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1276,27 +1189,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiply_A( int[] input , int inputStart , int inputStride , 
-							   double value , int lower , int upper ,
-							   int[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (int)Math.round((input[indexSrc] ) * value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1313,9 +1213,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1331,27 +1237,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiply_A( long[] input , int inputStart , int inputStride , 
-							   double value , long lower , long upper ,
-							   long[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				long val = (long)Math.round((input[indexSrc] ) * value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1368,9 +1261,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1386,27 +1285,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiply_A( float[] input , int inputStart , int inputStride , 
-							   float value , float lower , float upper ,
-							   float[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				float val = ((input[indexSrc] ) * value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1423,9 +1309,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1441,27 +1333,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void multiply_A( double[] input , int inputStart , int inputStride , 
-							   double value , double lower , double upper ,
-							   double[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				double val = ((input[indexSrc] ) * value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1477,9 +1356,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divideU_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1494,24 +1379,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divideU_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divideU_A( byte[] input , int inputStart , int inputStride , 
-							   double denominator ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (byte)Math.round((input[indexSrc] & 0xFF) / denominator);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1527,9 +1402,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divide_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1544,24 +1425,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divide_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divide_A( byte[] input , int inputStart , int inputStride , 
-							   double denominator ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (byte)Math.round((input[indexSrc] ) / denominator);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1577,9 +1448,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divideU_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1594,24 +1471,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divideU_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divideU_A( short[] input , int inputStart , int inputStride , 
-							   double denominator ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (short)Math.round((input[indexSrc] & 0xFFFF) / denominator);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1627,9 +1494,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divide_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1644,24 +1517,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divide_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divide_A( short[] input , int inputStart , int inputStride , 
-							   double denominator ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (short)Math.round((input[indexSrc] ) / denominator);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1677,9 +1540,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divide_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1694,24 +1563,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divide_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divide_A( int[] input , int inputStart , int inputStride , 
-							   double denominator ,
-							   int[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (int)Math.round((input[indexSrc] ) / denominator);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1727,9 +1586,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divide_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1744,24 +1609,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divide_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divide_A( long[] input , int inputStart , int inputStride , 
-							   double denominator ,
-							   long[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (long)Math.round((input[indexSrc] ) / denominator);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1777,9 +1632,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divide_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1794,24 +1655,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divide_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divide_A( float[] input , int inputStart , int inputStride , 
-							   float denominator ,
-							   float[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = ((input[indexSrc] ) / denominator);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1827,9 +1678,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divide_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1844,24 +1701,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divide_A(input.data,input.startIndex,input.stride,denominator , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divide_A( double[] input , int inputStart , int inputStride , 
-							   double denominator ,
-							   double[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = ((input[indexSrc] ) / denominator);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1877,9 +1724,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1894,27 +1747,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divideU_A( byte[] input , int inputStart , int inputStride , 
-							   double denominator , int lower , int upper ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (int)Math.round((input[indexSrc] & 0xFF) / denominator);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (byte)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1930,9 +1770,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -1947,27 +1793,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divide_A( byte[] input , int inputStart , int inputStride , 
-							   double denominator , int lower , int upper ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (int)Math.round((input[indexSrc] ) / denominator);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (byte)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -1983,9 +1816,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2000,27 +1839,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divideU_A( short[] input , int inputStart , int inputStride , 
-							   double denominator , int lower , int upper ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (int)Math.round((input[indexSrc] & 0xFFFF) / denominator);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (short)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2036,9 +1862,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2053,27 +1885,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divide_A( short[] input , int inputStart , int inputStride , 
-							   double denominator , int lower , int upper ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (int)Math.round((input[indexSrc] ) / denominator);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (short)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2089,9 +1908,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2106,27 +1931,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divide_A( int[] input , int inputStart , int inputStride , 
-							   double denominator , int lower , int upper ,
-							   int[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (int)Math.round((input[indexSrc] ) / denominator);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2142,9 +1954,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2159,27 +1977,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divide_A( long[] input , int inputStart , int inputStride , 
-							   double denominator , long lower , long upper ,
-							   long[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				long val = (long)Math.round((input[indexSrc] ) / denominator);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2195,9 +2000,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2212,27 +2023,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divide_A( float[] input , int inputStart , int inputStride , 
-							   float denominator , float lower , float upper ,
-							   float[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				float val = ((input[indexSrc] ) / denominator);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2248,9 +2046,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2265,27 +2069,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void divide_A( double[] input , int inputStart , int inputStride , 
-							   double denominator , double lower , double upper ,
-							   double[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				double val = ((input[indexSrc] ) / denominator);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2301,9 +2092,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plusU_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2318,24 +2115,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plusU_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plusU_A( byte[] input , int inputStart , int inputStride , 
-							   int value ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (byte)((input[indexSrc] & 0xFF) + value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2351,9 +2138,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2368,24 +2161,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plus_A( byte[] input , int inputStart , int inputStride , 
-							   int value ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (byte)((input[indexSrc] ) + value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2401,9 +2184,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plusU_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2418,24 +2207,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plusU_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plusU_A( short[] input , int inputStart , int inputStride , 
-							   int value ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (short)((input[indexSrc] & 0xFFFF) + value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2451,9 +2230,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2468,24 +2253,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plus_A( short[] input , int inputStart , int inputStride , 
-							   int value ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (short)((input[indexSrc] ) + value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2501,9 +2276,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2518,24 +2299,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plus_A( int[] input , int inputStart , int inputStride , 
-							   int value ,
-							   int[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = ((input[indexSrc] ) + value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2551,9 +2322,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2568,24 +2345,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plus_A( long[] input , int inputStart , int inputStride , 
-							   long value ,
-							   long[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = ((input[indexSrc] ) + value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2601,9 +2368,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2618,24 +2391,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plus_A( float[] input , int inputStart , int inputStride , 
-							   float value ,
-							   float[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = ((input[indexSrc] ) + value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2651,9 +2414,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2668,24 +2437,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plus_A( double[] input , int inputStart , int inputStride , 
-							   double value ,
-							   double[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = ((input[indexSrc] ) + value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2701,9 +2460,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2718,27 +2483,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plusU_A( byte[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = ((input[indexSrc] & 0xFF) + value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (byte)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2754,9 +2506,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2771,27 +2529,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plus_A( byte[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = ((input[indexSrc] ) + value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (byte)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2807,9 +2552,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2824,27 +2575,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plusU_A( short[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = ((input[indexSrc] & 0xFFFF) + value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (short)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2860,9 +2598,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2877,27 +2621,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plus_A( short[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = ((input[indexSrc] ) + value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (short)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2913,9 +2644,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2930,27 +2667,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plus_A( int[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   int[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = ((input[indexSrc] ) + value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -2966,9 +2690,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -2983,27 +2713,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plus_A( long[] input , int inputStart , int inputStride , 
-							   long value , long lower , long upper ,
-							   long[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				long val = ((input[indexSrc] ) + value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3019,9 +2736,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3036,27 +2759,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plus_A( float[] input , int inputStart , int inputStride , 
-							   float value , float lower , float upper ,
-							   float[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				float val = ((input[indexSrc] ) + value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3072,9 +2782,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3089,27 +2805,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void plus_A( double[] input , int inputStart , int inputStride , 
-							   double value , double lower , double upper ,
-							   double[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				double val = ((input[indexSrc] ) + value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3125,9 +2828,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minusU_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3142,24 +2851,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minusU_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minusU_A( byte[] input , int inputStart , int inputStride , 
-							   int value ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (byte)((input[indexSrc] & 0xFF) - value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3175,9 +2874,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3192,24 +2897,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_A( byte[] input , int inputStart , int inputStride , 
-							   int value ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (byte)((input[indexSrc] ) - value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3225,9 +2920,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minusU_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3242,24 +2943,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minusU_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minusU_A( short[] input , int inputStart , int inputStride , 
-							   int value ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (short)((input[indexSrc] & 0xFFFF) - value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3275,9 +2966,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3292,24 +2989,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_A( short[] input , int inputStart , int inputStride , 
-							   int value ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (short)((input[indexSrc] ) - value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3325,9 +3012,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3342,24 +3035,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_A( int[] input , int inputStart , int inputStride , 
-							   int value ,
-							   int[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = ((input[indexSrc] ) - value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3375,9 +3058,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3392,24 +3081,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_A( long[] input , int inputStart , int inputStride , 
-							   long value ,
-							   long[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = ((input[indexSrc] ) - value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3425,9 +3104,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3442,24 +3127,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_A( float[] input , int inputStart , int inputStride , 
-							   float value ,
-							   float[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = ((input[indexSrc] ) - value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3475,9 +3150,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3492,24 +3173,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_A(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_A( double[] input , int inputStart , int inputStride , 
-							   double value ,
-							   double[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = ((input[indexSrc] ) - value);
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3525,9 +3196,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3542,27 +3219,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minusU_A( byte[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = ((input[indexSrc] & 0xFF) - value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (byte)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3578,9 +3242,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3595,27 +3265,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_A( byte[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = ((input[indexSrc] ) - value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (byte)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3631,9 +3288,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3648,27 +3311,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minusU_A( short[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = ((input[indexSrc] & 0xFFFF) - value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (short)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3684,9 +3334,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3701,27 +3357,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_A( short[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = ((input[indexSrc] ) - value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (short)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3737,9 +3380,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3754,27 +3403,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_A( int[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   int[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = ((input[indexSrc] ) - value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3790,9 +3426,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3807,27 +3449,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_A( long[] input , int inputStart , int inputStride , 
-							   long value , long lower , long upper ,
-							   long[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				long val = ((input[indexSrc] ) - value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3843,9 +3472,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3860,27 +3495,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_A( float[] input , int inputStart , int inputStride , 
-							   float value , float lower , float upper ,
-							   float[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				float val = ((input[indexSrc] ) - value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3896,9 +3518,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3913,27 +3541,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_A( double[] input , int inputStart , int inputStride , 
-							   double value , double lower , double upper ,
-							   double[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				double val = ((input[indexSrc] ) - value);
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3949,9 +3564,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minusU_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -3966,24 +3587,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minusU_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minusU_B( byte[] input , int inputStart , int inputStride , 
-							   int value ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (byte)(value - (input[indexSrc] & 0xFF));
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -3999,9 +3610,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4016,24 +3633,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_B( byte[] input , int inputStart , int inputStride , 
-							   int value ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (byte)(value - (input[indexSrc] ));
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4049,9 +3656,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minusU_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4066,24 +3679,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minusU_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minusU_B( short[] input , int inputStart , int inputStride , 
-							   int value ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (short)(value - (input[indexSrc] & 0xFFFF));
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4099,9 +3702,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4116,24 +3725,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_B( short[] input , int inputStart , int inputStride , 
-							   int value ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (short)(value - (input[indexSrc] ));
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4149,9 +3748,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4166,24 +3771,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_B( int[] input , int inputStart , int inputStride , 
-							   int value ,
-							   int[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (value - (input[indexSrc] ));
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4199,9 +3794,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4216,24 +3817,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_B( long[] input , int inputStart , int inputStride , 
-							   long value ,
-							   long[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (value - (input[indexSrc] ));
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4249,9 +3840,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4266,24 +3863,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_B( float[] input , int inputStart , int inputStride , 
-							   float value ,
-							   float[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (value - (input[indexSrc] ));
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4299,9 +3886,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4316,24 +3909,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_B(input.data,input.startIndex,input.stride,value , 
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_B( double[] input , int inputStart , int inputStride , 
-							   double value ,
-							   double[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = (value - (input[indexSrc] ));
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4349,9 +3932,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4366,27 +3955,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minusU_B( byte[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (value - (input[indexSrc] & 0xFF));
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (byte)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4402,9 +3978,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4419,27 +4001,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_B( byte[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   byte[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (value - (input[indexSrc] ));
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (byte)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4455,9 +4024,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4472,27 +4047,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minusU_B( short[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (value - (input[indexSrc] & 0xFFFF));
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (short)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4508,9 +4070,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4525,27 +4093,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_B( short[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   short[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (value - (input[indexSrc] ));
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = (short)val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4561,9 +4116,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4578,27 +4139,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_B( int[] input , int inputStart , int inputStride , 
-							   int value , int lower , int upper ,
-							   int[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int val = (value - (input[indexSrc] ));
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4614,9 +4162,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4631,27 +4185,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_B( long[] input , int inputStart , int inputStride , 
-							   long value , long lower , long upper ,
-							   long[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				long val = (value - (input[indexSrc] ));
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4667,9 +4208,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4684,27 +4231,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_B( float[] input , int inputStart , int inputStride , 
-							   float value , float lower , float upper ,
-							   float[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				float val = (value - (input[indexSrc] ));
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4720,9 +4254,15 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
 	}
 
 	/**
@@ -4737,27 +4277,14 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
-				output.data,output.startIndex,output.stride,
-				input.height,columns);
-	}
-
-	private static void minus_B( double[] input , int inputStart , int inputStride , 
-							   double value , double lower , double upper ,
-							   double[] output , int outputStart , int outputStride ,
-							   int rows , int cols )
-	{
-		for( int y = 0; y < rows; y++ ) {
-			int indexSrc = inputStart + y*inputStride;
-			int indexDst = outputStart + y*outputStride;
-			int end = indexSrc + cols;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				double val = (value - (input[indexSrc] ));
-				if( val < lower ) val = lower;
-				if( val > upper ) val = upper;
-				output[indexDst] = val;
-			}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -4769,23 +4296,7 @@ public class PixelMath {
 	 * @param max maximum value.
 	 */
 	public static void boundImage( GrayU8 img , int min , int max ) {
-		final int h = img.getHeight();
-		final int w = img.getWidth();
-
-		byte[] data = img.data;
-
-		for (int y = 0; y < h; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			int indexEnd = index+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; index < indexEnd; index++) {
-				int value = data[index]& 0xFF;
-				if( value < min )
-					data[index] = (byte)min;
-				else if( value > max )
-					data[index] = (byte)max;
-			}
-		}
+		ImplPixelMath.boundImage(img,min,max);
 	}
 
 	/**
@@ -4801,19 +4312,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				output.data[indexDiff] = (byte)Math.abs((imgA.data[indexA] & 0xFF) - (imgB.data[indexB] & 0xFF));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
+		} else {
+			ImplPixelMath.diffAbs(imgA, imgB, output);
 		}
 	}
 
@@ -4824,24 +4326,11 @@ public class PixelMath {
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand( Planar<GrayU8> input , GrayU8 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
 
-		GrayU8[] bands = input.bands;
-		
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				int total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ]& 0xFF;
-				}
-				output.data[indexOutput] = (byte)(total / bands.length);
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.averageBand(input,output);
+		} else {
+			ImplPixelMath.averageBand(input,output);
 		}
 	}
 
@@ -4853,23 +4342,7 @@ public class PixelMath {
 	 * @param max maximum value.
 	 */
 	public static void boundImage( GrayS8 img , int min , int max ) {
-		final int h = img.getHeight();
-		final int w = img.getWidth();
-
-		byte[] data = img.data;
-
-		for (int y = 0; y < h; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			int indexEnd = index+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; index < indexEnd; index++) {
-				int value = data[index];
-				if( value < min )
-					data[index] = (byte)min;
-				else if( value > max )
-					data[index] = (byte)max;
-			}
-		}
+		ImplPixelMath.boundImage(img,min,max);
 	}
 
 	/**
@@ -4885,19 +4358,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				output.data[indexDiff] = (byte)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
+		} else {
+			ImplPixelMath.diffAbs(imgA, imgB, output);
 		}
 	}
 
@@ -4908,24 +4372,11 @@ public class PixelMath {
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand( Planar<GrayS8> input , GrayS8 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
 
-		GrayS8[] bands = input.bands;
-		
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				int total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ];
-				}
-				output.data[indexOutput] = (byte)(total / bands.length);
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.averageBand(input,output);
+		} else {
+			ImplPixelMath.averageBand(input,output);
 		}
 	}
 
@@ -4937,23 +4388,7 @@ public class PixelMath {
 	 * @param max maximum value.
 	 */
 	public static void boundImage( GrayU16 img , int min , int max ) {
-		final int h = img.getHeight();
-		final int w = img.getWidth();
-
-		short[] data = img.data;
-
-		for (int y = 0; y < h; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			int indexEnd = index+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; index < indexEnd; index++) {
-				int value = data[index]& 0xFFFF;
-				if( value < min )
-					data[index] = (short)min;
-				else if( value > max )
-					data[index] = (short)max;
-			}
-		}
+		ImplPixelMath.boundImage(img,min,max);
 	}
 
 	/**
@@ -4969,19 +4404,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				output.data[indexDiff] = (short)Math.abs((imgA.data[indexA] & 0xFFFF) - (imgB.data[indexB] & 0xFFFF));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
+		} else {
+			ImplPixelMath.diffAbs(imgA, imgB, output);
 		}
 	}
 
@@ -4992,24 +4418,11 @@ public class PixelMath {
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand( Planar<GrayU16> input , GrayU16 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
 
-		GrayU16[] bands = input.bands;
-		
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				int total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ]& 0xFFFF;
-				}
-				output.data[indexOutput] = (short)(total / bands.length);
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.averageBand(input,output);
+		} else {
+			ImplPixelMath.averageBand(input,output);
 		}
 	}
 
@@ -5021,23 +4434,7 @@ public class PixelMath {
 	 * @param max maximum value.
 	 */
 	public static void boundImage( GrayS16 img , int min , int max ) {
-		final int h = img.getHeight();
-		final int w = img.getWidth();
-
-		short[] data = img.data;
-
-		for (int y = 0; y < h; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			int indexEnd = index+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; index < indexEnd; index++) {
-				int value = data[index];
-				if( value < min )
-					data[index] = (short)min;
-				else if( value > max )
-					data[index] = (short)max;
-			}
-		}
+		ImplPixelMath.boundImage(img,min,max);
 	}
 
 	/**
@@ -5053,19 +4450,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				output.data[indexDiff] = (short)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
+		} else {
+			ImplPixelMath.diffAbs(imgA, imgB, output);
 		}
 	}
 
@@ -5076,24 +4464,11 @@ public class PixelMath {
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand( Planar<GrayS16> input , GrayS16 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
 
-		GrayS16[] bands = input.bands;
-		
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				int total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ];
-				}
-				output.data[indexOutput] = (short)(total / bands.length);
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.averageBand(input,output);
+		} else {
+			ImplPixelMath.averageBand(input,output);
 		}
 	}
 
@@ -5105,23 +4480,7 @@ public class PixelMath {
 	 * @param max maximum value.
 	 */
 	public static void boundImage( GrayS32 img , int min , int max ) {
-		final int h = img.getHeight();
-		final int w = img.getWidth();
-
-		int[] data = img.data;
-
-		for (int y = 0; y < h; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			int indexEnd = index+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; index < indexEnd; index++) {
-				int value = data[index];
-				if( value < min )
-					data[index] = min;
-				else if( value > max )
-					data[index] = max;
-			}
-		}
+		ImplPixelMath.boundImage(img,min,max);
 	}
 
 	/**
@@ -5137,19 +4496,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				output.data[indexDiff] = (int)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
+		} else {
+			ImplPixelMath.diffAbs(imgA, imgB, output);
 		}
 	}
 
@@ -5160,24 +4510,11 @@ public class PixelMath {
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand( Planar<GrayS32> input , GrayS32 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
 
-		GrayS32[] bands = input.bands;
-		
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				int total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ];
-				}
-				output.data[indexOutput] = (total / bands.length);
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.averageBand(input,output);
+		} else {
+			ImplPixelMath.averageBand(input,output);
 		}
 	}
 
@@ -5189,23 +4526,7 @@ public class PixelMath {
 	 * @param max maximum value.
 	 */
 	public static void boundImage( GrayS64 img , long min , long max ) {
-		final int h = img.getHeight();
-		final int w = img.getWidth();
-
-		long[] data = img.data;
-
-		for (int y = 0; y < h; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			int indexEnd = index+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; index < indexEnd; index++) {
-				long value = data[index];
-				if( value < min )
-					data[index] = min;
-				else if( value > max )
-					data[index] = max;
-			}
-		}
+		ImplPixelMath.boundImage(img,min,max);
 	}
 
 	/**
@@ -5221,19 +4542,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				output.data[indexDiff] = (long)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
+		} else {
+			ImplPixelMath.diffAbs(imgA, imgB, output);
 		}
 	}
 
@@ -5244,24 +4556,11 @@ public class PixelMath {
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand( Planar<GrayS64> input , GrayS64 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
 
-		GrayS64[] bands = input.bands;
-		
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				long total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ];
-				}
-				output.data[indexOutput] = (total / bands.length);
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.averageBand(input,output);
+		} else {
+			ImplPixelMath.averageBand(input,output);
 		}
 	}
 
@@ -5273,23 +4572,7 @@ public class PixelMath {
 	 * @param max maximum value.
 	 */
 	public static void boundImage( GrayF32 img , float min , float max ) {
-		final int h = img.getHeight();
-		final int w = img.getWidth();
-
-		float[] data = img.data;
-
-		for (int y = 0; y < h; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			int indexEnd = index+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; index < indexEnd; index++) {
-				float value = data[index];
-				if( value < min )
-					data[index] = min;
-				else if( value > max )
-					data[index] = max;
-			}
-		}
+		ImplPixelMath.boundImage(img,min,max);
 	}
 
 	/**
@@ -5305,19 +4588,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				output.data[indexDiff] = Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
+		} else {
+			ImplPixelMath.diffAbs(imgA, imgB, output);
 		}
 	}
 
@@ -5328,24 +4602,11 @@ public class PixelMath {
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand( Planar<GrayF32> input , GrayF32 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
 
-		GrayF32[] bands = input.bands;
-		
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				float total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ];
-				}
-				output.data[indexOutput] = (total / bands.length);
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.averageBand(input,output);
+		} else {
+			ImplPixelMath.averageBand(input,output);
 		}
 	}
 
@@ -5357,23 +4618,7 @@ public class PixelMath {
 	 * @param max maximum value.
 	 */
 	public static void boundImage( GrayF64 img , double min , double max ) {
-		final int h = img.getHeight();
-		final int w = img.getWidth();
-
-		double[] data = img.data;
-
-		for (int y = 0; y < h; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			int indexEnd = index+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; index < indexEnd; index++) {
-				double value = data[index];
-				if( value < min )
-					data[index] = min;
-				else if( value > max )
-					data[index] = max;
-			}
-		}
+		ImplPixelMath.boundImage(img,min,max);
 	}
 
 	/**
@@ -5389,19 +4634,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexDiff = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
-				output.data[indexDiff] = Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
+		} else {
+			ImplPixelMath.diffAbs(imgA, imgB, output);
 		}
 	}
 
@@ -5412,24 +4648,11 @@ public class PixelMath {
 	 * @param output Gray scale image containing average pixel values
 	 */
 	public static void averageBand( Planar<GrayF64> input , GrayF64 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
 
-		GrayF64[] bands = input.bands;
-		
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				double total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ];
-				}
-				output.data[indexOutput] = (total / bands.length);
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.averageBand(input,output);
+		} else {
+			ImplPixelMath.averageBand(input,output);
 		}
 	}
 
@@ -5446,19 +4669,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = (short)((imgA.data[indexA] & 0xFF) + (imgB.data[indexB] & 0xFF));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.add(imgA, imgB, output);
+		} else {
+			ImplPixelMath.add(imgA, imgB, output);
 		}
 	}
 
@@ -5475,19 +4689,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = (short)((imgA.data[indexA] & 0xFF) - (imgB.data[indexB] & 0xFF));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.subtract(imgA, imgB, output);
+		} else {
+			ImplPixelMath.subtract(imgA, imgB, output);
 		}
 	}
 
@@ -5504,19 +4709,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = (short)((imgA.data[indexA] ) + (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.add(imgA, imgB, output);
+		} else {
+			ImplPixelMath.add(imgA, imgB, output);
 		}
 	}
 
@@ -5533,19 +4729,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = (short)((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.subtract(imgA, imgB, output);
+		} else {
+			ImplPixelMath.subtract(imgA, imgB, output);
 		}
 	}
 
@@ -5562,19 +4749,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = (int)((imgA.data[indexA] & 0xFFFF) + (imgB.data[indexB] & 0xFFFF));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.add(imgA, imgB, output);
+		} else {
+			ImplPixelMath.add(imgA, imgB, output);
 		}
 	}
 
@@ -5591,19 +4769,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = (int)((imgA.data[indexA] & 0xFFFF) - (imgB.data[indexB] & 0xFFFF));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.subtract(imgA, imgB, output);
+		} else {
+			ImplPixelMath.subtract(imgA, imgB, output);
 		}
 	}
 
@@ -5620,19 +4789,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = (int)((imgA.data[indexA] ) + (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.add(imgA, imgB, output);
+		} else {
+			ImplPixelMath.add(imgA, imgB, output);
 		}
 	}
 
@@ -5649,19 +4809,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = (int)((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.subtract(imgA, imgB, output);
+		} else {
+			ImplPixelMath.subtract(imgA, imgB, output);
 		}
 	}
 
@@ -5678,19 +4829,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = (int)((imgA.data[indexA] ) + (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.add(imgA, imgB, output);
+		} else {
+			ImplPixelMath.add(imgA, imgB, output);
 		}
 	}
 
@@ -5707,19 +4849,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = (int)((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.subtract(imgA, imgB, output);
+		} else {
+			ImplPixelMath.subtract(imgA, imgB, output);
 		}
 	}
 
@@ -5736,19 +4869,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = (long)((imgA.data[indexA] ) + (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.add(imgA, imgB, output);
+		} else {
+			ImplPixelMath.add(imgA, imgB, output);
 		}
 	}
 
@@ -5765,19 +4889,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = (long)((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.subtract(imgA, imgB, output);
+		} else {
+			ImplPixelMath.subtract(imgA, imgB, output);
 		}
 	}
 
@@ -5794,19 +4909,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = ((imgA.data[indexA] ) + (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.add(imgA, imgB, output);
+		} else {
+			ImplPixelMath.add(imgA, imgB, output);
 		}
 	}
 
@@ -5823,19 +4929,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = ((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.subtract(imgA, imgB, output);
+		} else {
+			ImplPixelMath.subtract(imgA, imgB, output);
 		}
 	}
 
@@ -5852,19 +4949,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = ((imgA.data[indexA] ) * (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply(imgA, imgB, output);
+		} else {
+			ImplPixelMath.multiply(imgA, imgB, output);
 		}
 	}
 
@@ -5881,19 +4969,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = ((imgA.data[indexA] ) / (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide(imgA,imgB,output);
+		} else {
+			ImplPixelMath.divide(imgA,imgB,output);
 		}
 	}
 
@@ -5908,14 +4987,10 @@ public class PixelMath {
 
 		output.reshape(input.width,input.height);
 
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output.data[indexDst] = (float)Math.log(1 + input.data[indexSrc]);
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.log(input,output);
+		} else {
+			ImplPixelMath.log(input,output);
 		}
 	}
 
@@ -5929,15 +5004,10 @@ public class PixelMath {
 
 		output.reshape(input.width,input.height);
 
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				float v = input.data[indexSrc];
-				output.data[indexDst] = v*v;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.pow2(input,output);
+		} else {
+			ImplPixelMath.pow2(input,output);
 		}
 	}
 
@@ -5952,14 +5022,10 @@ public class PixelMath {
 
 		output.reshape(input.width,input.height);
 
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output.data[indexDst] = (float)Math.sqrt(input.data[indexSrc]);
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.sqrt(input,output);
+		} else {
+			ImplPixelMath.sqrt(input,output);
 		}
 	}
 
@@ -5976,19 +5042,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = ((imgA.data[indexA] ) + (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.add(imgA, imgB, output);
+		} else {
+			ImplPixelMath.add(imgA, imgB, output);
 		}
 	}
 
@@ -6005,19 +5062,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = ((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.subtract(imgA, imgB, output);
+		} else {
+			ImplPixelMath.subtract(imgA, imgB, output);
 		}
 	}
 
@@ -6034,19 +5082,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = ((imgA.data[indexA] ) * (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.multiply(imgA, imgB, output);
+		} else {
+			ImplPixelMath.multiply(imgA, imgB, output);
 		}
 	}
 
@@ -6063,19 +5102,10 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		final int h = imgA.getHeight();
-		final int w = imgA.getWidth();
-
-		for (int y = 0; y < h; y++) {
-			int indexA = imgA.getStartIndex() + y * imgA.getStride();
-			int indexB = imgB.getStartIndex() + y * imgB.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			
-			int indexEnd = indexA+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexA < indexEnd; indexA++, indexB++, indexOut++ ) {
-				output.data[indexOut] = ((imgA.data[indexA] ) / (imgB.data[indexB] ));
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.divide(imgA,imgB,output);
+		} else {
+			ImplPixelMath.divide(imgA,imgB,output);
 		}
 	}
 
@@ -6090,14 +5120,10 @@ public class PixelMath {
 
 		output.reshape(input.width,input.height);
 
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output.data[indexDst] = Math.log(1 + input.data[indexSrc]);
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.log(input,output);
+		} else {
+			ImplPixelMath.log(input,output);
 		}
 	}
 
@@ -6111,15 +5137,10 @@ public class PixelMath {
 
 		output.reshape(input.width,input.height);
 
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				double v = input.data[indexSrc];
-				output.data[indexDst] = v*v;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.pow2(input,output);
+		} else {
+			ImplPixelMath.pow2(input,output);
 		}
 	}
 
@@ -6134,14 +5155,10 @@ public class PixelMath {
 
 		output.reshape(input.width,input.height);
 
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output.data[indexDst] = Math.sqrt(input.data[indexSrc]);
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.sqrt(input,output);
+		} else {
+			ImplPixelMath.sqrt(input,output);
 		}
 	}
 

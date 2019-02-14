@@ -31,18 +31,20 @@ import java.util.Random;
 public class TestImplMedianHistogramInner {
 
 	@Test
-	public void compareToSort() {
-		GrayU8 image = new GrayU8(20,30);
-		ImageMiscOps.fillUniform(image,new Random(234), 0, 100);
+	void compareToSort() {
+		GrayU8 input = new GrayU8(20,30);
+		ImageMiscOps.fillUniform(input,new Random(234), 0, 100);
 
-		GrayU8 found = new GrayU8( image.width , image.height );
-		GrayU8 expected = new GrayU8( image.width , image.height );
+		GrayU8 found = input.createSameShape();
+		GrayU8 expected = input.createSameShape();
 
-		BoofTesting.checkSubImage(this, "compareToSort", true, image, found, expected);
+		BoofTesting.checkSubImage(this, "compareToSort", true, input, found, expected);
 	}
 
 	public void compareToSort(GrayU8 image, GrayU8 found, GrayU8 expected) {
 		for( int radius = 1; radius <= 3; radius++ ) {
+			ImageMiscOps.fill(found,0);
+			ImageMiscOps.fill(expected,0);
 
 			ImplMedianHistogramInner.process(image,found,radius,null);
 			ImplMedianSortNaive.process(image,expected,radius,null);

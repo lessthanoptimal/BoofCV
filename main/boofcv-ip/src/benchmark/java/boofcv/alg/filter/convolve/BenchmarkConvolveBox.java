@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,25 +82,25 @@ public class BenchmarkConvolveBox {
 
 	public int timeBox_U8_I16_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveBox.vertical(input_I8,out_I16,radius);
+			ImplConvolveBox.vertical(input_I8,out_I16,radius,null);
 		return 0;
 	}
 
 	public int timeBox_U8_I32_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveBox.vertical(input_I8,out_I32,radius);
+			ImplConvolveBox.vertical(input_I8,out_I32,radius,null);
 		return 0;
 	}
 
 	public int timeBox_S16_I16_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveBox.vertical(input_I16,out_I16,radius);
+			ImplConvolveBox.vertical(input_I16,out_I16,radius,null);
 		return 0;
 	}
 
 	public int timeBox_F32_F32_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveBox.vertical(input_F32,out_F32,radius);
+			ImplConvolveBox.vertical(input_F32,out_F32,radius,null);
 		return 0;
 	}
 

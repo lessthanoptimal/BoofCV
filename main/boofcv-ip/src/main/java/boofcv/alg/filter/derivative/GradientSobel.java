@@ -97,9 +97,9 @@ public class GradientSobel {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
-			GradientSobel_Outer_MT.process_I8_sub(orig, derivX, derivY);
+			GradientSobel_Outer_MT.process_sub(orig, derivX, derivY);
 		} else {
-			GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
+			GradientSobel_Outer.process_sub(orig, derivX, derivY);
 		}
 
 		if( border != null ) {
@@ -121,9 +121,9 @@ public class GradientSobel {
 		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
-			GradientSobel_Outer_MT.process_I8_sub(orig, derivX, derivY);
+			GradientSobel_Outer_MT.process_sub(orig, derivX, derivY);
 		} else {
-			GradientSobel_Outer.process_I8_sub(orig, derivX, derivY);
+			GradientSobel_Outer.process_sub(orig, derivX, derivY);
 		}
 
 		if( border != null ) {

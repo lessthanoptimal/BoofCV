@@ -19,7 +19,12 @@
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.DWorkArrays;
+import boofcv.concurrency.FWorkArrays;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.struct.image.*;
+
+import javax.annotation.Generated;
 
 /**
  * <p>
@@ -31,6 +36,8 @@ import boofcv.struct.image.*;
  * 
  * @author Peter Abeles
  */
+@Generated({"boofcv.alg.filter.convolve.noborder.GenerateImplConvolveBox"})
+@SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
 public class ImplConvolveBox_MT {
 
 	public static void horizontal( GrayU8 input , GrayI16 output , int radius ) {
@@ -59,36 +66,44 @@ public class ImplConvolveBox_MT {
 		});
 	}
 
-	public static void vertical( GrayU8 input , GrayI16 output , int radius ) {
+	public static void vertical( GrayU8 input , GrayI16 output , int radius , IWorkArrays work ) {
+		if( work == null ) {
+			work = new IWorkArrays(input.width);
+		} else {
+			work.reset(input.width);
+		}
+		final IWorkArrays _work = work;
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
 
+		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + x;
-			int indexOut = output.startIndex + output.stride*radius + x;
+			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexOut = output.startIndex + output.stride*y0 + x;
 
 			int total = 0;
 			int indexEnd = indexIn + input.stride*kernelWidth;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
 				total += input.data[indexIn] & 0xFF;
 			}
-
+			totals[x] = total;
 			output.data[indexOut] = (short)total;
 		}
 
 		// change the order it is processed in to reduce cache misses
-
-		BoofConcurrency.range(radius+1, output.height-radius, y -> {
+		for( int y = y0+1; y < y1; y++ ) {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-				int total = output.data[ indexOut - output.stride]  - (input.data[ indexIn - backStep ]& 0xFF);
-				total += input.data[ indexIn ]& 0xFF;
+				int total = totals[ x ]  - (input.data[ indexIn - backStep ]& 0xFF);
+				totals[ x ] = total += input.data[ indexIn ]& 0xFF;
 
 				output.data[indexOut] = (short)total;
 			}
+		}
 		});
 	}
 
@@ -118,36 +133,44 @@ public class ImplConvolveBox_MT {
 		});
 	}
 
-	public static void vertical( GrayU8 input , GrayS32 output , int radius ) {
+	public static void vertical( GrayU8 input , GrayS32 output , int radius , IWorkArrays work ) {
+		if( work == null ) {
+			work = new IWorkArrays(input.width);
+		} else {
+			work.reset(input.width);
+		}
+		final IWorkArrays _work = work;
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
 
+		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + x;
-			int indexOut = output.startIndex + output.stride*radius + x;
+			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexOut = output.startIndex + output.stride*y0 + x;
 
 			int total = 0;
 			int indexEnd = indexIn + input.stride*kernelWidth;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
 				total += input.data[indexIn] & 0xFF;
 			}
-
+			totals[x] = total;
 			output.data[indexOut] = total;
 		}
 
 		// change the order it is processed in to reduce cache misses
-
-		BoofConcurrency.range(radius+1, output.height-radius, y -> {
+		for( int y = y0+1; y < y1; y++ ) {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-				int total = output.data[ indexOut - output.stride]  - (input.data[ indexIn - backStep ]& 0xFF);
-				total += input.data[ indexIn ]& 0xFF;
+				int total = totals[ x ]  - (input.data[ indexIn - backStep ]& 0xFF);
+				totals[ x ] = total += input.data[ indexIn ]& 0xFF;
 
 				output.data[indexOut] = total;
 			}
+		}
 		});
 	}
 
@@ -177,36 +200,44 @@ public class ImplConvolveBox_MT {
 		});
 	}
 
-	public static void vertical( GrayS16 input , GrayI16 output , int radius ) {
+	public static void vertical( GrayS16 input , GrayI16 output , int radius , IWorkArrays work ) {
+		if( work == null ) {
+			work = new IWorkArrays(input.width);
+		} else {
+			work.reset(input.width);
+		}
+		final IWorkArrays _work = work;
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
 
+		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + x;
-			int indexOut = output.startIndex + output.stride*radius + x;
+			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexOut = output.startIndex + output.stride*y0 + x;
 
 			int total = 0;
 			int indexEnd = indexIn + input.stride*kernelWidth;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
 				total += input.data[indexIn] ;
 			}
-
+			totals[x] = total;
 			output.data[indexOut] = (short)total;
 		}
 
 		// change the order it is processed in to reduce cache misses
-
-		BoofConcurrency.range(radius+1, output.height-radius, y -> {
+		for( int y = y0+1; y < y1; y++ ) {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-				int total = output.data[ indexOut - output.stride]  - (input.data[ indexIn - backStep ]);
-				total += input.data[ indexIn ];
+				int total = totals[ x ]  - (input.data[ indexIn - backStep ]);
+				totals[ x ] = total += input.data[ indexIn ];
 
 				output.data[indexOut] = (short)total;
 			}
+		}
 		});
 	}
 
@@ -236,36 +267,44 @@ public class ImplConvolveBox_MT {
 		});
 	}
 
-	public static void vertical( GrayU16 input , GrayI16 output , int radius ) {
+	public static void vertical( GrayU16 input , GrayI16 output , int radius , IWorkArrays work ) {
+		if( work == null ) {
+			work = new IWorkArrays(input.width);
+		} else {
+			work.reset(input.width);
+		}
+		final IWorkArrays _work = work;
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
 
+		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + x;
-			int indexOut = output.startIndex + output.stride*radius + x;
+			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexOut = output.startIndex + output.stride*y0 + x;
 
 			int total = 0;
 			int indexEnd = indexIn + input.stride*kernelWidth;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
 				total += input.data[indexIn] & 0xFFFF;
 			}
-
+			totals[x] = total;
 			output.data[indexOut] = (short)total;
 		}
 
 		// change the order it is processed in to reduce cache misses
-
-		BoofConcurrency.range(radius+1, output.height-radius, y -> {
+		for( int y = y0+1; y < y1; y++ ) {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-				int total = output.data[ indexOut - output.stride]  - (input.data[ indexIn - backStep ]& 0xFFFF);
-				total += input.data[ indexIn ]& 0xFFFF;
+				int total = totals[ x ]  - (input.data[ indexIn - backStep ]& 0xFFFF);
+				totals[ x ] = total += input.data[ indexIn ]& 0xFFFF;
 
 				output.data[indexOut] = (short)total;
 			}
+		}
 		});
 	}
 
@@ -295,36 +334,44 @@ public class ImplConvolveBox_MT {
 		});
 	}
 
-	public static void vertical( GrayS32 input , GrayS32 output , int radius ) {
+	public static void vertical( GrayS32 input , GrayS32 output , int radius , IWorkArrays work ) {
+		if( work == null ) {
+			work = new IWorkArrays(input.width);
+		} else {
+			work.reset(input.width);
+		}
+		final IWorkArrays _work = work;
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
 
+		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + x;
-			int indexOut = output.startIndex + output.stride*radius + x;
+			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexOut = output.startIndex + output.stride*y0 + x;
 
 			int total = 0;
 			int indexEnd = indexIn + input.stride*kernelWidth;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
 				total += input.data[indexIn] ;
 			}
-
+			totals[x] = total;
 			output.data[indexOut] = total;
 		}
 
 		// change the order it is processed in to reduce cache misses
-
-		BoofConcurrency.range(radius+1, output.height-radius, y -> {
+		for( int y = y0+1; y < y1; y++ ) {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-				int total = output.data[ indexOut - output.stride]  - (input.data[ indexIn - backStep ]);
-				total += input.data[ indexIn ];
+				int total = totals[ x ]  - (input.data[ indexIn - backStep ]);
+				totals[ x ] = total += input.data[ indexIn ];
 
 				output.data[indexOut] = total;
 			}
+		}
 		});
 	}
 
@@ -354,36 +401,44 @@ public class ImplConvolveBox_MT {
 		});
 	}
 
-	public static void vertical( GrayF32 input , GrayF32 output , int radius ) {
+	public static void vertical( GrayF32 input , GrayF32 output , int radius , FWorkArrays work ) {
+		if( work == null ) {
+			work = new FWorkArrays(input.width);
+		} else {
+			work.reset(input.width);
+		}
+		final FWorkArrays _work = work;
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
 
+		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		float totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + x;
-			int indexOut = output.startIndex + output.stride*radius + x;
+			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexOut = output.startIndex + output.stride*y0 + x;
 
 			float total = 0;
 			int indexEnd = indexIn + input.stride*kernelWidth;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
 				total += input.data[indexIn] ;
 			}
-
+			totals[x] = total;
 			output.data[indexOut] = total;
 		}
 
 		// change the order it is processed in to reduce cache misses
-
-		BoofConcurrency.range(radius+1, output.height-radius, y -> {
+		for( int y = y0+1; y < y1; y++ ) {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-				float total = output.data[ indexOut - output.stride]  - (input.data[ indexIn - backStep ]);
-				total += input.data[ indexIn ];
+				float total = totals[ x ]  - (input.data[ indexIn - backStep ]);
+				totals[ x ] = total += input.data[ indexIn ];
 
 				output.data[indexOut] = total;
 			}
+		}
 		});
 	}
 
@@ -413,36 +468,44 @@ public class ImplConvolveBox_MT {
 		});
 	}
 
-	public static void vertical( GrayF64 input , GrayF64 output , int radius ) {
+	public static void vertical( GrayF64 input , GrayF64 output , int radius , DWorkArrays work ) {
+		if( work == null ) {
+			work = new DWorkArrays(input.width);
+		} else {
+			work.reset(input.width);
+		}
+		final DWorkArrays _work = work;
 		final int kernelWidth = radius*2 + 1;
 
 		final int backStep = kernelWidth*input.stride;
 
+		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		double totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + x;
-			int indexOut = output.startIndex + output.stride*radius + x;
+			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexOut = output.startIndex + output.stride*y0 + x;
 
 			double total = 0;
 			int indexEnd = indexIn + input.stride*kernelWidth;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
 				total += input.data[indexIn] ;
 			}
-
+			totals[x] = total;
 			output.data[indexOut] = total;
 		}
 
 		// change the order it is processed in to reduce cache misses
-
-		BoofConcurrency.range(radius+1, output.height-radius, y -> {
+		for( int y = y0+1; y < y1; y++ ) {
 			int indexIn = input.startIndex + (y+radius)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
-				double total = output.data[ indexOut - output.stride]  - (input.data[ indexIn - backStep ]);
-				total += input.data[ indexIn ];
+				double total = totals[ x ]  - (input.data[ indexIn - backStep ]);
+				totals[ x ] = total += input.data[ indexIn ];
 
 				output.data[indexOut] = total;
 			}
+		}
 		});
 	}
 

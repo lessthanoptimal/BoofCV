@@ -23,11 +23,15 @@ import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveBox;
 import boofcv.alg.filter.convolve.noborder.ImplConvolveBox_MT;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.FWorkArrays;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.core.image.border.ImageBorderValue;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.*;
+
+import javax.annotation.Nullable;
 
 /**
  * Convolves a kernel which is composed entirely of 1's across an image.  This special kernel can be highly optimized
@@ -120,15 +124,15 @@ public class ConvolveImageBox {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(GrayF32 input, GrayF32 output, int radius) {
+	public static void vertical(GrayF32 input, GrayF32 output, int radius, @Nullable FWorkArrays work) {
 		InputSanityCheck.checkSameShape(input , output );
 
 		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius,false);
 		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
 		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplConvolveBox_MT.vertical(input, output, radius);
+			ImplConvolveBox_MT.vertical(input, output, radius, work);
 		} else {
-			ImplConvolveBox.vertical(input, output, radius);
+			ImplConvolveBox.vertical(input, output, radius,work);
 		}
 	}
 
@@ -139,15 +143,15 @@ public class ConvolveImageBox {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(GrayU8 input, GrayI16 output, int radius) {
+	public static void vertical(GrayU8 input, GrayI16 output, int radius, @Nullable IWorkArrays work) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
 		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplConvolveBox_MT.vertical(input, output, radius);
+			ImplConvolveBox_MT.vertical(input, output, radius, work);
 		} else {
-			ImplConvolveBox.vertical(input, output, radius);
+			ImplConvolveBox.vertical(input, output, radius, work);
 		}
 	}
 
@@ -158,15 +162,15 @@ public class ConvolveImageBox {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(GrayU8 input, GrayS32 output, int radius) {
+	public static void vertical(GrayU8 input, GrayS32 output, int radius, @Nullable IWorkArrays work) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
 		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplConvolveBox_MT.vertical(input, output, radius);
+			ImplConvolveBox_MT.vertical(input, output, radius, work);
 		} else {
-			ImplConvolveBox.vertical(input, output, radius);
+			ImplConvolveBox.vertical(input, output, radius, work);
 		}
 	}
 
@@ -177,15 +181,15 @@ public class ConvolveImageBox {
 	 * @param output	 Where the resulting image is written to. Modified.
 	 * @param radius Kernel size.
 	 */
-	public static void vertical(GrayS16 input, GrayI16 output, int radius) {
+	public static void vertical(GrayS16 input, GrayI16 output, int radius, @Nullable IWorkArrays work) {
 		InputSanityCheck.checkSameShape(input , output);
 
 		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
 		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
 		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplConvolveBox_MT.vertical(input, output, radius);
+			ImplConvolveBox_MT.vertical(input, output, radius, work);
 		} else {
-			ImplConvolveBox.vertical(input, output, radius);
+			ImplConvolveBox.vertical(input, output, radius, work);
 		}
 	}
 }

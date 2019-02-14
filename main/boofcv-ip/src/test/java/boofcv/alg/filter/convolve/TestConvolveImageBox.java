@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 	protected boolean isTestMethod(Method m) {
 		Class<?> params[] = m.getParameterTypes();
 
-		if( params.length != 3)
+		if( params.length != 3 && params.length != 4 )
 			return false;
 
 		return ImageGray.class.isAssignableFrom(params[0]);
@@ -91,8 +91,10 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
 		Object[][] ret = new Object[1][];
-		ret[0] = new Object[]{input,output,kernelRadius};
-
+		if( c.length == 3 )
+			ret[0] = new Object[]{input,output,kernelRadius};
+		else
+			ret[0] = new Object[]{input,output,kernelRadius,null};
 		return ret;
 	}
 

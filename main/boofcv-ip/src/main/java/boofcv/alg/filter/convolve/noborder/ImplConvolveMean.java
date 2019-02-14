@@ -36,6 +36,7 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated({"boofcv.alg.filter.convolve.noborder.GenerateImplConvolveMean"})
+@SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
 public class ImplConvolveMean {
 
 	public static void horizontal( GrayU8 input , GrayI8 output , int radius ) {
@@ -44,6 +45,7 @@ public class ImplConvolveMean {
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
@@ -65,6 +67,7 @@ public class ImplConvolveMean {
 				output.data[indexOut++] = (byte)((total+halfDivisor)/divisor);
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical(GrayU8 input , GrayI8 output , int radius, IWorkArrays work ) {
@@ -84,6 +87,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
+		//CONCURRENT_BELOW BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		final int y0 = radius, y1 = output.height-radius;
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
@@ -112,6 +116,7 @@ public class ImplConvolveMean {
 			}
 		}
 		_work.recycle(totals);
+		//CONCURRENT_INLINE });
 	}
 	public static void horizontal( GrayS16 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
@@ -119,6 +124,7 @@ public class ImplConvolveMean {
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
@@ -140,6 +146,7 @@ public class ImplConvolveMean {
 				output.data[indexOut++] = (short)((total+halfDivisor)/divisor);
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical(GrayS16 input , GrayI16 output , int radius, IWorkArrays work ) {
@@ -159,6 +166,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
+		//CONCURRENT_BELOW BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		final int y0 = radius, y1 = output.height-radius;
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
@@ -187,6 +195,7 @@ public class ImplConvolveMean {
 			}
 		}
 		_work.recycle(totals);
+		//CONCURRENT_INLINE });
 	}
 	public static void horizontal( GrayU16 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
@@ -194,6 +203,7 @@ public class ImplConvolveMean {
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
@@ -215,6 +225,7 @@ public class ImplConvolveMean {
 				output.data[indexOut++] = (short)((total+halfDivisor)/divisor);
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical(GrayU16 input , GrayI16 output , int radius, IWorkArrays work ) {
@@ -234,6 +245,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
+		//CONCURRENT_BELOW BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		final int y0 = radius, y1 = output.height-radius;
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
@@ -262,12 +274,14 @@ public class ImplConvolveMean {
 			}
 		}
 		_work.recycle(totals);
+		//CONCURRENT_INLINE });
 	}
 	public static void horizontal( GrayF32 input , GrayF32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final float divisor = kernelWidth;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
@@ -289,6 +303,7 @@ public class ImplConvolveMean {
 				output.data[indexOut++] = (total/divisor);
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical(GrayF32 input , GrayF32 output , int radius, FWorkArrays work ) {
@@ -307,6 +322,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
+		//CONCURRENT_BELOW BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		final int y0 = radius, y1 = output.height-radius;
 		float totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
@@ -335,12 +351,14 @@ public class ImplConvolveMean {
 			}
 		}
 		_work.recycle(totals);
+		//CONCURRENT_INLINE });
 	}
 	public static void horizontal( GrayF64 input , GrayF64 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
 		final double divisor = kernelWidth;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
@@ -362,6 +380,7 @@ public class ImplConvolveMean {
 				output.data[indexOut++] = (total/divisor);
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	public static void vertical(GrayF64 input , GrayF64 output , int radius, DWorkArrays work ) {
@@ -380,6 +399,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
+		//CONCURRENT_BELOW BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		final int y0 = radius, y1 = output.height-radius;
 		double totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
@@ -408,5 +428,6 @@ public class ImplConvolveMean {
 			}
 		}
 		_work.recycle(totals);
+		//CONCURRENT_INLINE });
 	}
 }

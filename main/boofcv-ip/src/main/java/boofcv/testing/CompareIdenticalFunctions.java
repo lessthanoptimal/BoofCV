@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,6 +74,8 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 		Object[] ret = new Object[ targetParam.length ];
 
 		for( int i = 0; i < targetParam.length; i++ ) {
+			if( targetParam[i] == null )
+				continue;
 			if( ImageBase.class.isAssignableFrom(targetParam[i].getClass()) ) {
 				ret[i] = ((ImageBase)targetParam[i]).clone();
 			} else {
@@ -88,6 +90,9 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 
 		for( int i = 0; i < targetParam.length; i++ ) {
+			if( targetParam[i] == null ) {
+				continue;
+			}
 			if( !ImageBase.class.isAssignableFrom(targetParam[i].getClass()) )
 				continue;
 

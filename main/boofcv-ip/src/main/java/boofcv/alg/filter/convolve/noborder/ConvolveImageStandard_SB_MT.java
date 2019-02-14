@@ -19,8 +19,11 @@
 package boofcv.alg.filter.convolve.noborder;
 
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
+
+import javax.annotation.Generated;
 
 
 /**
@@ -34,7 +37,8 @@ import boofcv.struct.image.*;
  * 
  * @author Peter Abeles
  */
-@SuppressWarnings({"ForLoopReplaceableByForEach"})
+@Generated({"boofcv.alg.filter.convolve.noborder.GenerateConvolveImageStandard_SB"})
+@SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
 public class ConvolveImageStandard_SB_MT {
 
 	public static void horizontal( Kernel1D_F32 kernel ,
@@ -62,7 +66,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_F32 kernel,
@@ -94,7 +97,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_F32 kernel , GrayF32 src , GrayF32 dest )
@@ -123,7 +125,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_F64 kernel ,
@@ -151,7 +152,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_F64 kernel,
@@ -183,7 +183,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_F64 kernel , GrayF64 src , GrayF64 dest )
@@ -212,7 +211,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -240,7 +238,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (short)total;
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -272,7 +269,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (short)total;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , GrayU8 src , GrayI16 dest )
@@ -301,7 +297,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (short)total;
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -329,7 +324,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -361,7 +355,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , GrayU8 src , GrayS32 dest )
@@ -390,7 +383,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -423,7 +415,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -451,7 +442,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (short)total;
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -483,7 +473,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (short)total;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , GrayS16 src , GrayI16 dest )
@@ -512,7 +501,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (short)total;
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -541,7 +529,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -574,11 +561,16 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
 			}
 		});
-
 	}
 
-	public static void convolve( Kernel2D_S32 kernel , GrayU8 src , GrayI8 dest , int divisor )
+	public static void convolve( Kernel2D_S32 kernel , GrayU8 src , GrayI8 dest , int divisor , IWorkArrays work)
 	{
+		if( work == null ) {
+			work = new IWorkArrays(src.width);
+		} else {
+			work.reset(src.width);
+		}
+		final IWorkArrays _work = work;
 		final int[] dataKernel = kernel.data;
 		final byte[] dataSrc = src.data;
 		final byte[] dataDst = dest.data;
@@ -590,23 +582,44 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.range(offsetL, height-offsetR, y -> {
+		BoofConcurrency.blocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {
+		int totalRow[] = _work.pop();
+		for( int y = y0; y < y1; y++ ) {
+			int indexSrcRow = src.startIndex+(y-offsetL)*src.stride-offsetL;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
+				int indexSrc = indexSrcRow + x;
+
+				int total = 0;
+				for (int k = 0; k < kernel.width; k++) {
+					total += (dataSrc[indexSrc++] & 0xFF)* dataKernel[k];
+				}
+				totalRow[x] = total;
+			}
+
+			// rest of the convolution rows are an addition
+			for( int i = 1; i < kernel.width; i++ ) {
+				indexSrcRow = src.startIndex+(y+i-offsetL)*src.stride-offsetL;
+				int indexKer = i*kernel.width;
+
+				for( int x = offsetL; x < width-offsetR; x++ ) {
+					int indexSrc = indexSrcRow+x;
+
+					int total = 0;
+					for (int k = 0; k < kernel.width; k++) {
+						total += (dataSrc[indexSrc++] & 0xFF)* dataKernel[indexKer+k];
+					}
+
+					totalRow[x] += total;
+				}
+			}
 			int indexDst = dest.startIndex + y*dest.stride+offsetL;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
-				int total = 0;
-				int indexKer = 0;
-				for( int ki = 0; ki < kernel.width; ki++ ) {
-					int indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;
-					for( int kj = 0; kj <  kernel.width; kj++ ) {
-						total += (dataSrc[indexSrc+kj] & 0xFF )* dataKernel[indexKer++];
-					}
-				}
-				dataDst[indexDst++] = (byte)((total+halfDivisor)/divisor);
+				dataDst[indexDst++] = (byte)((totalRow[x]+halfDivisor)/ divisor);
 			}
+		}
+		_work.recycle(totalRow);
 		});
-
 	}
-
 	public static void horizontal( Kernel1D_S32 kernel ,
 								  GrayS16 image, GrayI16 dest , int divisor ) {
 		final short[] dataSrc = image.data;
@@ -633,7 +646,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -666,11 +678,16 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 			}
 		});
-
 	}
 
-	public static void convolve( Kernel2D_S32 kernel , GrayS16 src , GrayI16 dest , int divisor )
+	public static void convolve( Kernel2D_S32 kernel , GrayS16 src , GrayI16 dest , int divisor , IWorkArrays work)
 	{
+		if( work == null ) {
+			work = new IWorkArrays(src.width);
+		} else {
+			work.reset(src.width);
+		}
+		final IWorkArrays _work = work;
 		final int[] dataKernel = kernel.data;
 		final short[] dataSrc = src.data;
 		final short[] dataDst = dest.data;
@@ -682,23 +699,44 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.range(offsetL, height-offsetR, y -> {
+		BoofConcurrency.blocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {
+		int totalRow[] = _work.pop();
+		for( int y = y0; y < y1; y++ ) {
+			int indexSrcRow = src.startIndex+(y-offsetL)*src.stride-offsetL;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
+				int indexSrc = indexSrcRow + x;
+
+				int total = 0;
+				for (int k = 0; k < kernel.width; k++) {
+					total += (dataSrc[indexSrc++] )* dataKernel[k];
+				}
+				totalRow[x] = total;
+			}
+
+			// rest of the convolution rows are an addition
+			for( int i = 1; i < kernel.width; i++ ) {
+				indexSrcRow = src.startIndex+(y+i-offsetL)*src.stride-offsetL;
+				int indexKer = i*kernel.width;
+
+				for( int x = offsetL; x < width-offsetR; x++ ) {
+					int indexSrc = indexSrcRow+x;
+
+					int total = 0;
+					for (int k = 0; k < kernel.width; k++) {
+						total += (dataSrc[indexSrc++] )* dataKernel[indexKer+k];
+					}
+
+					totalRow[x] += total;
+				}
+			}
 			int indexDst = dest.startIndex + y*dest.stride+offsetL;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
-				int total = 0;
-				int indexKer = 0;
-				for( int ki = 0; ki < kernel.width; ki++ ) {
-					int indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;
-					for( int kj = 0; kj <  kernel.width; kj++ ) {
-						total += (dataSrc[indexSrc+kj]  )* dataKernel[indexKer++];
-					}
-				}
-				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
+				dataDst[indexDst++] = (short)((totalRow[x]+halfDivisor)/ divisor);
 			}
+		}
+		_work.recycle(totalRow);
 		});
-
 	}
-
 	public static void horizontal( Kernel1D_S32 kernel ,
 								  GrayU16 image, GrayI16 dest ) {
 		final short[] dataSrc = image.data;
@@ -724,7 +762,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (short)total;
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -756,7 +793,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (short)total;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , GrayU16 src , GrayI16 dest )
@@ -785,7 +821,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (short)total;
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -814,7 +849,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -847,11 +881,16 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 			}
 		});
-
 	}
 
-	public static void convolve( Kernel2D_S32 kernel , GrayU16 src , GrayI16 dest , int divisor )
+	public static void convolve( Kernel2D_S32 kernel , GrayU16 src , GrayI16 dest , int divisor , IWorkArrays work)
 	{
+		if( work == null ) {
+			work = new IWorkArrays(src.width);
+		} else {
+			work.reset(src.width);
+		}
+		final IWorkArrays _work = work;
 		final int[] dataKernel = kernel.data;
 		final short[] dataSrc = src.data;
 		final short[] dataDst = dest.data;
@@ -863,23 +902,44 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.range(offsetL, height-offsetR, y -> {
+		BoofConcurrency.blocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {
+		int totalRow[] = _work.pop();
+		for( int y = y0; y < y1; y++ ) {
+			int indexSrcRow = src.startIndex+(y-offsetL)*src.stride-offsetL;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
+				int indexSrc = indexSrcRow + x;
+
+				int total = 0;
+				for (int k = 0; k < kernel.width; k++) {
+					total += (dataSrc[indexSrc++] & 0xFFFF)* dataKernel[k];
+				}
+				totalRow[x] = total;
+			}
+
+			// rest of the convolution rows are an addition
+			for( int i = 1; i < kernel.width; i++ ) {
+				indexSrcRow = src.startIndex+(y+i-offsetL)*src.stride-offsetL;
+				int indexKer = i*kernel.width;
+
+				for( int x = offsetL; x < width-offsetR; x++ ) {
+					int indexSrc = indexSrcRow+x;
+
+					int total = 0;
+					for (int k = 0; k < kernel.width; k++) {
+						total += (dataSrc[indexSrc++] & 0xFFFF)* dataKernel[indexKer+k];
+					}
+
+					totalRow[x] += total;
+				}
+			}
 			int indexDst = dest.startIndex + y*dest.stride+offsetL;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
-				int total = 0;
-				int indexKer = 0;
-				for( int ki = 0; ki < kernel.width; ki++ ) {
-					int indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;
-					for( int kj = 0; kj <  kernel.width; kj++ ) {
-						total += (dataSrc[indexSrc+kj] & 0xFFFF )* dataKernel[indexKer++];
-					}
-				}
-				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
+				dataDst[indexDst++] = (short)((totalRow[x]+halfDivisor)/ divisor);
 			}
+		}
+		_work.recycle(totalRow);
 		});
-
 	}
-
 	public static void vertical( Kernel1D_S32 kernel,
 								 GrayS32 image, GrayI16 dest , int divisor )
 	{
@@ -910,7 +970,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = (short)((total+halfDivisor)/divisor);
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -938,7 +997,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -970,7 +1028,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , GrayS32 src , GrayS32 dest )
@@ -999,7 +1056,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = total;
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -1028,7 +1084,6 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -1061,11 +1116,16 @@ public class ConvolveImageStandard_SB_MT {
 				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
 			}
 		});
-
 	}
 
-	public static void convolve( Kernel2D_S32 kernel , GrayS32 src , GrayS32 dest , int divisor )
+	public static void convolve( Kernel2D_S32 kernel , GrayS32 src , GrayS32 dest , int divisor , IWorkArrays work)
 	{
+		if( work == null ) {
+			work = new IWorkArrays(src.width);
+		} else {
+			work.reset(src.width);
+		}
+		final IWorkArrays _work = work;
 		final int[] dataKernel = kernel.data;
 		final int[] dataSrc = src.data;
 		final int[] dataDst = dest.data;
@@ -1077,21 +1137,42 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.range(offsetL, height-offsetR, y -> {
+		BoofConcurrency.blocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {
+		int totalRow[] = _work.pop();
+		for( int y = y0; y < y1; y++ ) {
+			int indexSrcRow = src.startIndex+(y-offsetL)*src.stride-offsetL;
+			for( int x = offsetL; x < width-offsetR; x++ ) {
+				int indexSrc = indexSrcRow + x;
+
+				int total = 0;
+				for (int k = 0; k < kernel.width; k++) {
+					total += (dataSrc[indexSrc++] )* dataKernel[k];
+				}
+				totalRow[x] = total;
+			}
+
+			// rest of the convolution rows are an addition
+			for( int i = 1; i < kernel.width; i++ ) {
+				indexSrcRow = src.startIndex+(y+i-offsetL)*src.stride-offsetL;
+				int indexKer = i*kernel.width;
+
+				for( int x = offsetL; x < width-offsetR; x++ ) {
+					int indexSrc = indexSrcRow+x;
+
+					int total = 0;
+					for (int k = 0; k < kernel.width; k++) {
+						total += (dataSrc[indexSrc++] )* dataKernel[indexKer+k];
+					}
+
+					totalRow[x] += total;
+				}
+			}
 			int indexDst = dest.startIndex + y*dest.stride+offsetL;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
-				int total = 0;
-				int indexKer = 0;
-				for( int ki = 0; ki < kernel.width; ki++ ) {
-					int indexSrc = src.startIndex + (y+ki-offsetL)*src.stride + x-offsetL;
-					for( int kj = 0; kj <  kernel.width; kj++ ) {
-						total += (dataSrc[indexSrc+kj]  )* dataKernel[indexKer++];
-					}
-				}
-				dataDst[indexDst++] = ((total+halfDivisor)/divisor);
+				dataDst[indexDst++] = ((totalRow[x]+halfDivisor)/ divisor);
 			}
+		}
+		_work.recycle(totalRow);
 		});
-
 	}
-
 }

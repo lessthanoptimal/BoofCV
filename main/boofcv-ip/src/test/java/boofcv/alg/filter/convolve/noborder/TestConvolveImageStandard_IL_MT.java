@@ -18,17 +18,11 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
-
 /**
  * @author Peter Abeles
  */
-class TestConvolveImageStandard_IL_MT {
-	// TODO Autogenerate all of these classes
-	@Test
-	public void implement() {
-		fail("implement");
+class TestConvolveImageStandard_IL_MT extends CommonConvolveMultiThreadToSingle {
+	TestConvolveImageStandard_IL_MT() {
+		super(ConvolveImageStandard_IL_MT.class,ConvolveImageStandard_IL.class,35);
 	}
 }

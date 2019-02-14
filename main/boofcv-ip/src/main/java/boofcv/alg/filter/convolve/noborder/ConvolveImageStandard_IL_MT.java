@@ -22,6 +22,8 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
 
+import javax.annotation.Generated;
+
 
 /**
  * <p>
@@ -34,7 +36,8 @@ import boofcv.struct.image.*;
  * 
  * @author Peter Abeles
  */
-@SuppressWarnings({"ForLoopReplaceableByForEach"})
+@Generated({"boofcv.alg.filter.convolve.noborder.GenerateConvolveImageStandard_IL"})
+@SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
 public class ConvolveImageStandard_IL_MT {
 
 	public static void horizontal( Kernel1D_F32 kernel ,
@@ -63,7 +66,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_F32 kernel,
@@ -100,7 +102,6 @@ public class ConvolveImageStandard_IL_MT {
 				indexSrcStart += numBands;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_F32 kernel , InterleavedF32 src , InterleavedF32 dst )
@@ -135,7 +136,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_F64 kernel ,
@@ -164,7 +164,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_F64 kernel,
@@ -201,7 +200,6 @@ public class ConvolveImageStandard_IL_MT {
 				indexSrcStart += numBands;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_F64 kernel , InterleavedF64 src , InterleavedF64 dst )
@@ -236,7 +234,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -265,7 +262,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -302,7 +298,6 @@ public class ConvolveImageStandard_IL_MT {
 				indexSrcStart += numBands;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedU8 src , InterleavedI16 dst )
@@ -337,7 +332,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -366,7 +360,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -403,7 +396,6 @@ public class ConvolveImageStandard_IL_MT {
 				indexSrcStart += numBands;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedU8 src , InterleavedS32 dst )
@@ -438,7 +430,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -476,7 +467,6 @@ public class ConvolveImageStandard_IL_MT {
 				indexSrcStart += numBands;
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -505,7 +495,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -542,7 +531,6 @@ public class ConvolveImageStandard_IL_MT {
 				indexSrcStart += numBands;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedS16 src , InterleavedI16 dst )
@@ -577,7 +565,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -607,7 +594,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -645,7 +631,6 @@ public class ConvolveImageStandard_IL_MT {
 				indexSrcStart += numBands;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedU8 src , InterleavedI8 dst , int divisor )
@@ -681,7 +666,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -711,7 +695,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -749,7 +732,6 @@ public class ConvolveImageStandard_IL_MT {
 				indexSrcStart += numBands;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedS16 src , InterleavedI16 dst , int divisor )
@@ -785,7 +767,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -814,7 +795,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -851,7 +831,6 @@ public class ConvolveImageStandard_IL_MT {
 				indexSrcStart += numBands;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedU16 src , InterleavedI16 dst )
@@ -886,7 +865,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -916,7 +894,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -954,7 +931,6 @@ public class ConvolveImageStandard_IL_MT {
 				indexSrcStart += numBands;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedU16 src , InterleavedI16 dst , int divisor )
@@ -990,7 +966,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -1028,7 +1003,6 @@ public class ConvolveImageStandard_IL_MT {
 				indexSrcStart += numBands;
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -1057,7 +1031,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -1094,7 +1067,6 @@ public class ConvolveImageStandard_IL_MT {
 				indexSrcStart += numBands;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedS32 src , InterleavedS32 dst )
@@ -1129,7 +1101,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void horizontal( Kernel1D_S32 kernel ,
@@ -1159,7 +1130,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 	public static void vertical( Kernel1D_S32 kernel,
@@ -1197,7 +1167,6 @@ public class ConvolveImageStandard_IL_MT {
 				indexSrcStart += numBands;
 			}
 		});
-
 	}
 
 	public static void convolve( Kernel2D_S32 kernel , InterleavedS32 src , InterleavedS32 dst , int divisor )
@@ -1233,7 +1202,6 @@ public class ConvolveImageStandard_IL_MT {
 				}
 			}
 		});
-
 	}
 
 }

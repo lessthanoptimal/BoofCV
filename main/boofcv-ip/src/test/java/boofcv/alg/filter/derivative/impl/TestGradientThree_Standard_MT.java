@@ -18,14 +18,9 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
-
-class TestGradientThree_Standard_MT {
-	@Test
-	public void implement() {
-		fail("implement");
+class TestGradientThree_Standard_MT extends CommonGradientMultiThreadToSingle {
+	TestGradientThree_Standard_MT() {
+		super(GradientThree_Standard_MT.class, GradientThree_Standard.class, 4);
 	}
 }
 

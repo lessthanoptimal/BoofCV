@@ -18,14 +18,9 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
-
-public class TestGradientSobel_Outer_MT {
-	@Test
-	void implement() {
-		fail("implement");
+class TestGradientSobel_Outer_MT extends CommonGradientMultiThreadToSingle {
+	TestGradientSobel_Outer_MT() {
+		super(GradientSobel_Outer_MT.class, GradientSobel_Outer.class, 4);
 	}
 }
 

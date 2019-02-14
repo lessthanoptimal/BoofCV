@@ -18,16 +18,13 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
-
 /**
  * @author Peter Abeles
  */
-public class TestConvolveImageUnrolled_SB_MT_F32_F32 {
-	@Test
-	void stuff() {
-		fail("Implement");
+public class TestConvolveImageUnrolled_SB_MT_F32_F32  extends CommonConvolveMultiThreadToSingle {
+	TestConvolveImageUnrolled_SB_MT_F32_F32() {
+		super(ConvolveImageUnrolled_SB_MT_F32_F32.class,ConvolveImageUnrolled_SB_F32_F32.class,3);
+		// test all the hard coded unrolled
+		radiuses = new int[]{1,2,3,4,5};
 	}
 }
