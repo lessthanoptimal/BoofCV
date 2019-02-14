@@ -1,4 +1,6 @@
  /*
+ * Copyright (c) 2019, Peter Abeles. All Rights Reserved.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +34,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Nico
  */
-public class TestProjectionMath {
+public class TestImageBandMath {
    int width = 10;
 	int height = 15;
 	int numBands = 11;
@@ -48,7 +50,7 @@ public class TestProjectionMath {
    @Test
 	public void checkAll() {
 		int numExpected = 41;
-		Method methods[] = ProjectionMath.class.getMethods();
+		Method methods[] = ImageBandMath.class.getMethods();
 
 		// sanity check to make sure the functions are being found
 		int numFound = 0;
@@ -329,7 +331,7 @@ public class TestProjectionMath {
 		Planar input = new Planar(paramTypes[1], width, height,numBands);
 		ImageGray output = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
       ImageGray av = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
-      GProjectionMath.averageBand(input, av, firstBand, lastBand);
+      GImageBandMath.averageBand(input, av, firstBand, lastBand);
 
 		if( output.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(input, rand, -20,20);

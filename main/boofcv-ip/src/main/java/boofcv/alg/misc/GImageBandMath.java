@@ -1,4 +1,6 @@
 /* 
+ * Copyright (c) 2019, Peter Abeles. All Rights Reserved.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +34,7 @@ import boofcv.struct.image.Planar;
  * 
  * @author Nico
  */
-public class GProjectionMath {
+public class GImageBandMath {
    
    /** Computes the minimum for each pixel across all bands in the {@link Planar} image.
 	 *
@@ -58,21 +60,21 @@ public class GProjectionMath {
 	public static <T extends ImageGray<T>> void minimumBand(Planar<T> input, T output, int startBand, int lastBand) {
 
 		if( GrayU8.class == input.getBandType() ) {
-			ProjectionMath.minimumBand((Planar<GrayU8>) input, (GrayU8) output, startBand, lastBand);
+			ImageBandMath.minimumBand((Planar<GrayU8>) input, (GrayU8) output, startBand, lastBand);
 		} else if( GrayS8.class == input.getBandType() ) {
-			ProjectionMath.minimumBand((Planar<GrayS8>) input, (GrayS8) output, startBand, lastBand);
+			ImageBandMath.minimumBand((Planar<GrayS8>) input, (GrayS8) output, startBand, lastBand);
 		} else if( GrayU16.class == input.getBandType() ) {
-			ProjectionMath.minimumBand((Planar<GrayU16>) input, (GrayU16) output, startBand, lastBand);
+			ImageBandMath.minimumBand((Planar<GrayU16>) input, (GrayU16) output, startBand, lastBand);
 		} else if( GrayS16.class == input.getBandType() ) {
-			ProjectionMath.minimumBand((Planar<GrayS16>) input, (GrayS16) output, startBand, lastBand);
+			ImageBandMath.minimumBand((Planar<GrayS16>) input, (GrayS16) output, startBand, lastBand);
 		} else if( GrayS32.class == input.getBandType() ) {
-			ProjectionMath.minimumBand((Planar<GrayS32>) input, (GrayS32) output, startBand, lastBand);
+			ImageBandMath.minimumBand((Planar<GrayS32>) input, (GrayS32) output, startBand, lastBand);
 		} else if( GrayS64.class == input.getBandType() ) {
-			ProjectionMath.minimumBand((Planar<GrayS64>) input, (GrayS64) output, startBand, lastBand);
+			ImageBandMath.minimumBand((Planar<GrayS64>) input, (GrayS64) output, startBand, lastBand);
 		} else if( GrayF32.class == input.getBandType() ) {
-			ProjectionMath.minimumBand((Planar<GrayF32>) input, (GrayF32) output, startBand, lastBand);
+			ImageBandMath.minimumBand((Planar<GrayF32>) input, (GrayF32) output, startBand, lastBand);
 		} else if( GrayF64.class == input.getBandType() ) {
-			ProjectionMath.minimumBand((Planar<GrayF64>) input, (GrayF64) output, startBand, lastBand);
+			ImageBandMath.minimumBand((Planar<GrayF64>) input, (GrayF64) output, startBand, lastBand);
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+input.getBandType().getSimpleName());
 		}
@@ -101,21 +103,21 @@ public class GProjectionMath {
 	public static <T extends ImageGray<T>> void maximumBand(Planar<T> input, T output, int startBand, int lastBand) {
 
 		if( GrayU8.class == input.getBandType() ) {
-			ProjectionMath.maximumBand((Planar<GrayU8>) input, (GrayU8) output, startBand, lastBand);
+			ImageBandMath.maximumBand((Planar<GrayU8>) input, (GrayU8) output, startBand, lastBand);
 		} else if( GrayS8.class == input.getBandType() ) {
-			ProjectionMath.maximumBand((Planar<GrayS8>) input, (GrayS8) output, startBand, lastBand);
+			ImageBandMath.maximumBand((Planar<GrayS8>) input, (GrayS8) output, startBand, lastBand);
 		} else if( GrayU16.class == input.getBandType() ) {
-			ProjectionMath.maximumBand((Planar<GrayU16>) input, (GrayU16) output, startBand, lastBand);
+			ImageBandMath.maximumBand((Planar<GrayU16>) input, (GrayU16) output, startBand, lastBand);
 		} else if( GrayS16.class == input.getBandType() ) {
-			ProjectionMath.maximumBand((Planar<GrayS16>) input, (GrayS16) output, startBand, lastBand);
+			ImageBandMath.maximumBand((Planar<GrayS16>) input, (GrayS16) output, startBand, lastBand);
 		} else if( GrayS32.class == input.getBandType() ) {
-			ProjectionMath.maximumBand((Planar<GrayS32>) input, (GrayS32) output, startBand, lastBand);
+			ImageBandMath.maximumBand((Planar<GrayS32>) input, (GrayS32) output, startBand, lastBand);
 		} else if( GrayS64.class == input.getBandType() ) {
-			ProjectionMath.maximumBand((Planar<GrayS64>) input, (GrayS64) output, startBand, lastBand);
+			ImageBandMath.maximumBand((Planar<GrayS64>) input, (GrayS64) output, startBand, lastBand);
 		} else if( GrayF32.class == input.getBandType() ) {
-			ProjectionMath.maximumBand((Planar<GrayF32>) input, (GrayF32) output, startBand, lastBand);
+			ImageBandMath.maximumBand((Planar<GrayF32>) input, (GrayF32) output, startBand, lastBand);
 		} else if( GrayF64.class == input.getBandType() ) {
-			ProjectionMath.maximumBand((Planar<GrayF64>) input, (GrayF64) output, startBand, lastBand);
+			ImageBandMath.maximumBand((Planar<GrayF64>) input, (GrayF64) output, startBand, lastBand);
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+input.getBandType().getSimpleName());
 		}
@@ -144,21 +146,21 @@ public class GProjectionMath {
 	public static <T extends ImageGray<T>> void averageBand(Planar<T> input, T output, int startBand, int lastBand) {
 
 		if( GrayU8.class == input.getBandType() ) {
-			ProjectionMath.averageBand((Planar<GrayU8>) input, (GrayU8) output, startBand, lastBand);
+			ImageBandMath.averageBand((Planar<GrayU8>) input, (GrayU8) output, startBand, lastBand);
 		} else if( GrayS8.class == input.getBandType() ) {
-			ProjectionMath.averageBand((Planar<GrayS8>) input, (GrayS8) output, startBand, lastBand);
+			ImageBandMath.averageBand((Planar<GrayS8>) input, (GrayS8) output, startBand, lastBand);
 		} else if( GrayU16.class == input.getBandType() ) {
-			ProjectionMath.averageBand((Planar<GrayU16>) input, (GrayU16) output, startBand, lastBand);
+			ImageBandMath.averageBand((Planar<GrayU16>) input, (GrayU16) output, startBand, lastBand);
 		} else if( GrayS16.class == input.getBandType() ) {
-			ProjectionMath.averageBand((Planar<GrayS16>) input, (GrayS16) output, startBand, lastBand);
+			ImageBandMath.averageBand((Planar<GrayS16>) input, (GrayS16) output, startBand, lastBand);
 		} else if( GrayS32.class == input.getBandType() ) {
-			ProjectionMath.averageBand((Planar<GrayS32>) input, (GrayS32) output, startBand, lastBand);
+			ImageBandMath.averageBand((Planar<GrayS32>) input, (GrayS32) output, startBand, lastBand);
 		} else if( GrayS64.class == input.getBandType() ) {
-			ProjectionMath.averageBand((Planar<GrayS64>) input, (GrayS64) output, startBand, lastBand);
+			ImageBandMath.averageBand((Planar<GrayS64>) input, (GrayS64) output, startBand, lastBand);
 		} else if( GrayF32.class == input.getBandType() ) {
-			ProjectionMath.averageBand((Planar<GrayF32>) input, (GrayF32) output, startBand, lastBand);
+			ImageBandMath.averageBand((Planar<GrayF32>) input, (GrayF32) output, startBand, lastBand);
 		} else if( GrayF64.class == input.getBandType() ) {
-			ProjectionMath.averageBand((Planar<GrayF64>) input, (GrayF64) output, startBand, lastBand);
+			ImageBandMath.averageBand((Planar<GrayF64>) input, (GrayF64) output, startBand, lastBand);
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+input.getBandType().getSimpleName());
 		}
@@ -188,21 +190,21 @@ public class GProjectionMath {
 	public static <T extends ImageGray<T>> void medianBand(Planar<T> input, T output, int startBand, int lastBand) {
 
 		if( GrayU8.class == input.getBandType() ) {
-			ProjectionMath.medianBand((Planar<GrayU8>) input, (GrayU8) output, startBand, lastBand);
+			ImageBandMath.medianBand((Planar<GrayU8>) input, (GrayU8) output, startBand, lastBand);
 		} else if( GrayS8.class == input.getBandType() ) {
-			ProjectionMath.medianBand((Planar<GrayS8>) input, (GrayS8) output, startBand, lastBand);
+			ImageBandMath.medianBand((Planar<GrayS8>) input, (GrayS8) output, startBand, lastBand);
 		} else if( GrayU16.class == input.getBandType() ) {
-			ProjectionMath.medianBand((Planar<GrayU16>) input, (GrayU16) output, startBand, lastBand);
+			ImageBandMath.medianBand((Planar<GrayU16>) input, (GrayU16) output, startBand, lastBand);
 		} else if( GrayS16.class == input.getBandType() ) {
-			ProjectionMath.medianBand((Planar<GrayS16>) input, (GrayS16) output, startBand, lastBand);
+			ImageBandMath.medianBand((Planar<GrayS16>) input, (GrayS16) output, startBand, lastBand);
 		} else if( GrayS32.class == input.getBandType() ) {
-			ProjectionMath.medianBand((Planar<GrayS32>) input, (GrayS32) output, startBand, lastBand);
+			ImageBandMath.medianBand((Planar<GrayS32>) input, (GrayS32) output, startBand, lastBand);
 		} else if( GrayS64.class == input.getBandType() ) {
-			ProjectionMath.medianBand((Planar<GrayS64>) input, (GrayS64) output, startBand, lastBand);
+			ImageBandMath.medianBand((Planar<GrayS64>) input, (GrayS64) output, startBand, lastBand);
 		} else if( GrayF32.class == input.getBandType() ) {
-			ProjectionMath.medianBand((Planar<GrayF32>) input, (GrayF32) output, startBand, lastBand);
+			ImageBandMath.medianBand((Planar<GrayF32>) input, (GrayF32) output, startBand, lastBand);
 		} else if( GrayF64.class == input.getBandType() ) {
-			ProjectionMath.medianBand((Planar<GrayF64>) input, (GrayF64) output, startBand, lastBand);
+			ImageBandMath.medianBand((Planar<GrayF64>) input, (GrayF64) output, startBand, lastBand);
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+input.getBandType().getSimpleName());
 		}
@@ -234,21 +236,21 @@ public class GProjectionMath {
 	public static <T extends ImageGray<T>> void stdDevBand(Planar<T> input, T output, T avg, int startBand, int lastBand) {
 
 		if( GrayU8.class == input.getBandType() ) {
-			ProjectionMath.stdDevBand((Planar<GrayU8>) input, (GrayU8) output, (GrayU8) avg, startBand, lastBand);
+			ImageBandMath.stdDevBand((Planar<GrayU8>) input, (GrayU8) output, (GrayU8) avg, startBand, lastBand);
 		} else if( GrayS8.class == input.getBandType() ) {
-			ProjectionMath.stdDevBand((Planar<GrayS8>) input, (GrayS8) output, (GrayS8) avg, startBand, lastBand);
+			ImageBandMath.stdDevBand((Planar<GrayS8>) input, (GrayS8) output, (GrayS8) avg, startBand, lastBand);
 		} else if( GrayU16.class == input.getBandType() ) {
-			ProjectionMath.stdDevBand((Planar<GrayU16>) input, (GrayU16) output, (GrayU16) avg, startBand, lastBand);
+			ImageBandMath.stdDevBand((Planar<GrayU16>) input, (GrayU16) output, (GrayU16) avg, startBand, lastBand);
 		} else if( GrayS16.class == input.getBandType() ) {
-			ProjectionMath.stdDevBand((Planar<GrayS16>) input, (GrayS16) output, (GrayS16) avg, startBand, lastBand);
+			ImageBandMath.stdDevBand((Planar<GrayS16>) input, (GrayS16) output, (GrayS16) avg, startBand, lastBand);
 		} else if( GrayS32.class == input.getBandType() ) {
-			ProjectionMath.stdDevBand((Planar<GrayS32>) input, (GrayS32) output, (GrayS32) avg, startBand, lastBand);
+			ImageBandMath.stdDevBand((Planar<GrayS32>) input, (GrayS32) output, (GrayS32) avg, startBand, lastBand);
 		} else if( GrayS64.class == input.getBandType() ) {
-			ProjectionMath.stdDevBand((Planar<GrayS64>) input, (GrayS64) output, (GrayS64) avg, startBand, lastBand);
+			ImageBandMath.stdDevBand((Planar<GrayS64>) input, (GrayS64) output, (GrayS64) avg, startBand, lastBand);
 		} else if( GrayF32.class == input.getBandType() ) {
-			ProjectionMath.stdDevBand((Planar<GrayF32>) input, (GrayF32) output, (GrayF32) avg, startBand, lastBand);
+			ImageBandMath.stdDevBand((Planar<GrayF32>) input, (GrayF32) output, (GrayF32) avg, startBand, lastBand);
 		} else if( GrayF64.class == input.getBandType() ) {
-			ProjectionMath.stdDevBand((Planar<GrayF64>) input, (GrayF64) output, (GrayF64) avg, startBand, lastBand);
+			ImageBandMath.stdDevBand((Planar<GrayF64>) input, (GrayF64) output, (GrayF64) avg, startBand, lastBand);
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+input.getBandType().getSimpleName());
 		}

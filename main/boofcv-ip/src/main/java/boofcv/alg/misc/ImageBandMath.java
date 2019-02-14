@@ -1,5 +1,7 @@
-/**
-* Licensed under the Apache License, Version 2.0 (the "License");
+/*
+ * Copyright (c) 2019, Peter Abeles. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -34,7 +36,7 @@ import org.ddogleg.sorting.QuickSelect;
  * 
  * @author Nico
  */
-public class ProjectionMath {
+public class ImageBandMath {
    
    public static <T extends ImageGray<T>> void checkInput (Planar<T> input, int startBand, int lastBand) {
       if (startBand < 0 || lastBand < 0) {
