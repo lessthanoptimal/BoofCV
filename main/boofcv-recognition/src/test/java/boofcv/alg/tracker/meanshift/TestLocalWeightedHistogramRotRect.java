@@ -20,10 +20,10 @@ package boofcv.alg.tracker.meanshift;
 
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.border.BorderType;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.RectangleRotate_F32;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_F32;
 import org.junit.jupiter.api.Test;

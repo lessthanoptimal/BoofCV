@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.app.fiducials;
 import boofcv.alg.fiducial.square.FiducialSquareGenerator;
 import boofcv.app.PaperSize;
 import boofcv.app.drawing.PdfFiducialEngine;
-import boofcv.misc.Unit;
+import boofcv.generate.Unit;
 import boofcv.struct.image.GrayU8;
 import org.ddogleg.struct.GrowQueue_I64;
 

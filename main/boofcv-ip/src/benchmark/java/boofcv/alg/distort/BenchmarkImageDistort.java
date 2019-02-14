@@ -20,11 +20,11 @@ package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;

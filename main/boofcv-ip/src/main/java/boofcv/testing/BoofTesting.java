@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,22 +56,6 @@ public class BoofTesting {
 		}
 
 		return type;
-	}
-
-	/**
-	 * If an image is to be created then the generic type can't be used a specific one needs to be.  An arbitrary
-	 * specific image type is returned here.
-	 */
-	public static <T> T convertGenericToSpecificType(Class<?> type) {
-		if (type == GrayI8.class)
-			return (T) GrayU8.class;
-		if (type == GrayI16.class)
-			return (T) GrayS16.class;
-		if (type == InterleavedI8.class)
-			return (T) InterleavedU8.class;
-		if (type == InterleavedI16.class)
-			return (T) InterleavedS16.class;
-		return (T) type;
 	}
 
 	/**

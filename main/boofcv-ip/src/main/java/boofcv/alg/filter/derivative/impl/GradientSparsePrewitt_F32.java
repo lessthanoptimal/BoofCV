@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-import boofcv.core.image.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.sparse.GradientValue_F32;
 import boofcv.struct.sparse.SparseImageGradient;

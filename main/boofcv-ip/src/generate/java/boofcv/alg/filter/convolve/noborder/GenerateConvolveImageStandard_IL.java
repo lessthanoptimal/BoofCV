@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.convolve.noborder;
 
-import boofcv.misc.AutoTypeImage;
-import boofcv.misc.CodeGeneratorBase;
+import boofcv.generate.AutoTypeImage;
+import boofcv.generate.CodeGeneratorBase;
 
 import java.io.FileNotFoundException;
 

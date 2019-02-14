@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.core.image.border;
 
+import boofcv.struct.border.*;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayF64;
 import boofcv.struct.image.GrayI;
@@ -27,7 +28,7 @@ import boofcv.struct.image.GrayI;
  */
 public class FactoryImageBorderAlgs {
 
-	public static ImageBorder1D_F64 extend( GrayF64 image ) {
+	public static ImageBorder1D_F64 extend(GrayF64 image ) {
 		ImageBorder1D_F64 ret = new ImageBorder1D_F64(BorderIndex1D_Extend.class);
 		ret.setImage(image);
 		return ret;
@@ -49,7 +50,7 @@ public class FactoryImageBorderAlgs {
 		return ImageBorderValue.wrap(image,value);
 	}
 
-	public static ImageBorder1D_F32 extend( GrayF32 image ) {
+	public static ImageBorder1D_F32 extend(GrayF32 image ) {
 		ImageBorder1D_F32 ret = new ImageBorder1D_F32(BorderIndex1D_Extend.class);
 		ret.setImage(image);
 		return ret;

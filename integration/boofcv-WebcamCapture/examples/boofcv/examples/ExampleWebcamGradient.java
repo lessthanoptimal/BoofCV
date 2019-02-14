@@ -20,12 +20,12 @@ package boofcv.examples;
 
 import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.core.image.border.BorderType;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import com.github.sarxos.webcam.Webcam;
 

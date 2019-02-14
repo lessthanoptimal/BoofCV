@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,10 @@
 package boofcv.factory.transform.wavelet;
 
 import boofcv.alg.transform.wavelet.UtilWavelet;
-import boofcv.core.image.border.BorderIndex1D;
 import boofcv.core.image.border.BorderIndex1D_Reflect;
 import boofcv.core.image.border.BorderIndex1D_Wrap;
-import boofcv.core.image.border.BorderType;
+import boofcv.struct.border.BorderIndex1D;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.wavelet.*;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.factory.LinearSolverFactory_DDRM;

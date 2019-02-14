@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.filter.derivative;
 
 import boofcv.alg.filter.derivative.HessianSobel;
-import boofcv.core.image.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 

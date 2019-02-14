@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.abst.filter.interpolate.InterpolatePixel_PL_using_SB;
 import boofcv.alg.interpolate.*;
 import boofcv.alg.interpolate.impl.*;
 import boofcv.alg.interpolate.kernel.BicubicKernel_F32;
-import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.*;
 
 /**

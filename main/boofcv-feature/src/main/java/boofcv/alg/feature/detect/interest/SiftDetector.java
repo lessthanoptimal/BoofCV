@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,10 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.extract.NonMaxLimiter;
 import boofcv.abst.filter.convolve.ImageConvolveSparse;
 import boofcv.alg.filter.kernel.KernelMath;
-import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.filter.convolve.FactoryConvolveSparse;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel2D_F32;
 import boofcv.struct.feature.ScalePoint;

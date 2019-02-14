@@ -21,7 +21,7 @@ package boofcv.alg.feature.detect.edge.impl;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 import boofcv.core.image.border.FactoryImageBorderAlgs;
-import boofcv.core.image.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS8;
 

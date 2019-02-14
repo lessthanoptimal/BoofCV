@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,8 @@ import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadView;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewPL;
 import boofcv.alg.sfm.overhead.CreateSyntheticOverheadViewS;
-import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 

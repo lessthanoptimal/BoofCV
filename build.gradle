@@ -28,7 +28,7 @@ if( project.hasProperty("native_arch")) {
 }
 
 gversion {
-    srcDir = "main/boofcv-ip/src/main/java"
+    srcDir = "main/boofcv-types/src/main/java"
     classPackage = "boofcv"
     className = "BoofVersion"
 }
@@ -118,7 +118,7 @@ subprojects {
         experimentalImplementation project.sourceSets.main.compileClasspath
         experimentalImplementation project.sourceSets.main.runtimeClasspath
 
-        generateImplementation project(':main:boofcv-ip')
+        generateImplementation project(':main:boofcv-types')
 
         testImplementation project.sourceSets.benchmark.output
         testImplementation project.sourceSets.benchmark.compileClasspath
@@ -217,6 +217,7 @@ subprojects {
 
 // list of projects for creating javadoc and jars
 def mainProjects = [
+        ':main:boofcv-types',
         ':main:boofcv-ip',
         ':main:boofcv-io',
         ':main:boofcv-feature',

@@ -20,7 +20,7 @@ package boofcv.alg.interpolate;
 
 
 import boofcv.alg.interpolate.array.PolynomialNevilleFixed_F32;
-import boofcv.core.image.border.ImageBorder;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageGray;
 
 /**

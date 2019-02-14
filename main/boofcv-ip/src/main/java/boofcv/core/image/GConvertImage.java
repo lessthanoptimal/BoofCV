@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.core.image;
 
+import boofcv.alg.InputSanityCheck;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.*;
 
@@ -284,5 +285,26 @@ public class GConvertImage {
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + type);
 		}
+	}
+
+	/**
+	 * Converts an image from one type to another type.  Creates a new image instance if
+	 * an output is not provided.
+	 *
+	 * @param src Input image. Not modified.
+	 * @param dst Converted output image. If null a new one will be declared. Modified.
+	 * @param typeDst The type of output image.
+	 * @return Converted image.
+	 */
+	public static <T extends ImageGray<T>> T convert(ImageGray<?> src , T dst , Class<T> typeDst  )
+	{
+		if (dst == null) {
+			dst =(T) GeneralizedImageOps.createSingleBand(typeDst, src.width, src.height);
+		} else {
+			InputSanityCheck.checkSameShape(src, dst);
+		}
+		convert(src,dst);
+
+		return dst;
 	}
 }

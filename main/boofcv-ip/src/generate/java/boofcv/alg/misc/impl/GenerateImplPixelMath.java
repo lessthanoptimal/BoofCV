@@ -18,19 +18,18 @@
 
 package boofcv.alg.misc.impl;
 
-import boofcv.alg.misc.PixelMath;
-import boofcv.misc.AutoTypeImage;
-import boofcv.misc.CodeGeneratorBase;
+import boofcv.generate.AutoTypeImage;
+import boofcv.generate.CodeGeneratorBase;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.misc.AutoTypeImage.*;
+import static boofcv.generate.AutoTypeImage.*;
 
 
 /**
- * Generates functions inside of {@link PixelMath}.
+ * Generates functions for ImplPixelMath.
  *
  * @author Peter Abeles
  */

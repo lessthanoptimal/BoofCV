@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.alg.fiducial.qrcode;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.interpolate.InterpolatePixelDistortS;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.border.BorderType;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;

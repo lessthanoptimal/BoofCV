@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.factory.filter.convolve;
 import boofcv.abst.filter.convolve.ImageConvolveSparse;
 import boofcv.alg.filter.convolve.ConvolveImageSparse;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_S32;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;

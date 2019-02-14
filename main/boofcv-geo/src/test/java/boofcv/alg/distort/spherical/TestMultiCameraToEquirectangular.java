@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,8 +22,8 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionWideFOV;
 import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.distort.Point2Transform3_F32;
 import boofcv.struct.distort.Point2Transform3_F64;
 import boofcv.struct.distort.Point3Transform2_F32;

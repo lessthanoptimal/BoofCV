@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,10 @@ package boofcv.abst.denoise;
 
 import boofcv.abst.transform.wavelet.WaveletTransform;
 import boofcv.alg.denoise.DenoiseWavelet;
-import boofcv.core.image.border.BorderType;
 import boofcv.factory.denoise.FactoryDenoiseWaveletAlg;
 import boofcv.factory.transform.wavelet.FactoryWaveletDaub;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;

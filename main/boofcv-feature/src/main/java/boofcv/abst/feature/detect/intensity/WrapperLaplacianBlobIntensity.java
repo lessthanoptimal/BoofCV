@@ -20,8 +20,8 @@ package boofcv.abst.feature.detect.intensity;
 
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.filter.derivative.LaplacianEdge;
-import boofcv.core.image.border.BorderType;
 import boofcv.struct.QueueCorner;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;

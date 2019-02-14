@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.filter.convolve.noborder;
 import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertImage;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.GConvertImage;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_S32;
@@ -103,7 +103,7 @@ public class TestConvolveImageStandardSparse {
 
 		expectedOutput = computeExpected(seedImage,!isFloatingKernel,isDivisor);
 
-		ImageGray inputImage = GeneralizedImageOps.convert(floatImage,null,(Class)method.getParameterTypes()[2]);
+		ImageGray inputImage = GConvertImage.convert(floatImage,null,(Class)method.getParameterTypes()[2]);
 		Object inputKernel = isFloatingKernel ? kernelF32 : kernelI32;
 		Object inputStorage = isFloatingKernel ? new float[kernelI32.width] : new int[ kernelI32.width];
 

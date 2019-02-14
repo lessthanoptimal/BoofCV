@@ -18,8 +18,8 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.misc.AutoTypeImage;
-import boofcv.misc.CodeGeneratorBase;
+import boofcv.generate.AutoTypeImage;
+import boofcv.generate.CodeGeneratorBase;
 
 /**
  * NOTE: There is a tinny bit of manual work required.  need to comment out a few lines to unroll

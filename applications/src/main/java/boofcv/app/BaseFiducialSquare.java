@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,8 @@ package boofcv.app;
 
 import boofcv.app.fiducials.CreateSquareFiducialDocumentImage;
 import boofcv.app.fiducials.CreateSquareFiducialDocumentPDF;
-import boofcv.misc.LengthUnit;
-import boofcv.misc.Unit;
+import boofcv.generate.LengthUnit;
+import boofcv.generate.Unit;
 import org.apache.commons.io.FilenameUtils;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;

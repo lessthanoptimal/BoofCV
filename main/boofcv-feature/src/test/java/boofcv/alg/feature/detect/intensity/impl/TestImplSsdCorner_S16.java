@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.filter.derivative.GradientSobel;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
@@ -59,7 +59,7 @@ public class TestImplSsdCorner_S16 {
 	public void compareToManual() {
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		GradientSobel.process(input,derivX,derivY, BoofDefaults.borderDerivative_I32());
+		GradientSobel.process(input,derivX,derivY, GImageDerivativeOps.borderDerivative_I32());
 
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {

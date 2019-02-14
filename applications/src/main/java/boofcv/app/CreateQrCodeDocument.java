@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,9 @@ import boofcv.alg.fiducial.qrcode.QrCodeMaskPattern;
 import boofcv.app.qrcode.CreateQrCodeDocumentImage;
 import boofcv.app.qrcode.CreateQrCodeDocumentPDF;
 import boofcv.app.qrcode.CreateQrCodeGui;
+import boofcv.generate.LengthUnit;
+import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
-import boofcv.misc.LengthUnit;
-import boofcv.misc.Unit;
 import org.apache.commons.io.FilenameUtils;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;

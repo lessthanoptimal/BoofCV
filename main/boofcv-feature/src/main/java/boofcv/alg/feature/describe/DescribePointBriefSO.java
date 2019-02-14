@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,12 @@
 
 package boofcv.alg.feature.describe;
 
+import boofcv.BoofDefaults;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.describe.brief.BinaryCompareDefinition_I32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;

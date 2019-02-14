@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,9 +28,9 @@ import boofcv.alg.segmentation.fh04.impl.*;
 import boofcv.alg.segmentation.ms.*;
 import boofcv.alg.segmentation.slic.*;
 import boofcv.alg.segmentation.watershed.WatershedVincentSoille1991;
-import boofcv.core.image.border.BorderType;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 

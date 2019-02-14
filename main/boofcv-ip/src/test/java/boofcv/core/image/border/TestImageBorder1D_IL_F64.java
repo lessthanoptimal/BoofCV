@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.core.image.border;
 
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder1D_IL_F64;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedF64;
 

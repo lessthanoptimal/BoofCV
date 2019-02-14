@@ -18,7 +18,7 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.core.image.border.ImageBorder;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,10 @@ package boofcv.alg.tracker.tld;
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.border.BorderType;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ImageRectangle;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.feature.NccFeature;
 import boofcv.struct.image.GrayU8;
 import org.junit.jupiter.api.Test;

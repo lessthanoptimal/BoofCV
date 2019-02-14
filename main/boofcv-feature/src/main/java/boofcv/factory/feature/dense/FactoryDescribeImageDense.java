@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.factory.feature.dense;
 
+import boofcv.BoofDefaults;
 import boofcv.abst.feature.dense.*;
 import boofcv.abst.feature.describe.ConfigSiftDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
@@ -28,7 +29,6 @@ import boofcv.alg.feature.dense.DescribeDenseSiftAlg;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;

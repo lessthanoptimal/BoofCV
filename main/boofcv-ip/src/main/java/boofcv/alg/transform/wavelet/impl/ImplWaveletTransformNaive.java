@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.transform.wavelet.impl;
 
 import boofcv.alg.transform.wavelet.UtilWavelet;
-import boofcv.core.image.border.BorderIndex1D;
+import boofcv.struct.border.BorderIndex1D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.wavelet.WlBorderCoef;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.fiducial.qrcode.QrCodeGenerator;
 import boofcv.app.PaperSize;
 import boofcv.app.drawing.PdfFiducialEngine;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
-import boofcv.misc.Unit;
+import boofcv.generate.Unit;
 
 import java.io.IOException;
 import java.util.ArrayList;

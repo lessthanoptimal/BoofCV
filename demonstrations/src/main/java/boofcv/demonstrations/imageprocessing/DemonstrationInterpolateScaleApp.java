@@ -20,12 +20,12 @@ package boofcv.demonstrations.imageprocessing;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.interpolate.InterpolationType;
-import boofcv.core.image.border.BorderType;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;

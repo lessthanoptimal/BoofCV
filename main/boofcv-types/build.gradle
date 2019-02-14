@@ -1,0 +1,7 @@
+
+// Auto generate version file when told to compile
+project.compileJava.dependsOn(project(":").createVersionFile)
+
+dependencies {
+
+}

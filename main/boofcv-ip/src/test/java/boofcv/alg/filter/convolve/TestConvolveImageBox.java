@@ -20,9 +20,9 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.border.ImageBorder;
-import boofcv.core.image.border.ImageBorderValue;
 import boofcv.factory.filter.kernel.FactoryKernel;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorderValue;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.convolve.Kernel1D_S32;

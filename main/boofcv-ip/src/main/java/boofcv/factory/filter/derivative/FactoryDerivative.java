@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,8 @@ package boofcv.factory.filter.derivative;
 import boofcv.abst.filter.derivative.*;
 import boofcv.alg.filter.derivative.*;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_S32;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
 
 import java.lang.reflect.Method;

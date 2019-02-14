@@ -20,7 +20,6 @@ package boofcv.demonstrations.transform.wavelet;
 
 import boofcv.abst.transform.wavelet.WaveletTransform;
 import boofcv.alg.transform.wavelet.UtilWavelet;
-import boofcv.core.image.border.BorderType;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
 import boofcv.factory.transform.wavelet.GFactoryWavelet;
 import boofcv.gui.ListDisplayPanel;
@@ -31,6 +30,7 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.wavelet.WaveletDescription;

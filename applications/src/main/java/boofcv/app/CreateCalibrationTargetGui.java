@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,12 +23,12 @@ import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.ConfigCircleRegularGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.app.calib.CalibrationTargetPanel;
+import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
-import boofcv.misc.Unit;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;

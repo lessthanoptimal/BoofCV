@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.core.image.border;
 
+import boofcv.struct.border.*;
 import boofcv.struct.image.*;
 
 
@@ -37,9 +38,9 @@ public class FactoryImageBorder {
 	 */
 	public static Class<ImageBorder> lookupBorderClassType( Class<ImageGray> imageType ) {
 		if( (Class)imageType == GrayF32.class )
-			return (Class)ImageBorder1D_F32.class;
+			return (Class) ImageBorder1D_F32.class;
 		if( (Class)imageType == GrayF64.class )
-			return (Class)ImageBorder1D_F64.class;
+			return (Class) ImageBorder1D_F64.class;
 		else if( GrayI.class.isAssignableFrom(imageType) )
 			return (Class)ImageBorder1D_S32.class;
 		else if( (Class)imageType == GrayS64.class )

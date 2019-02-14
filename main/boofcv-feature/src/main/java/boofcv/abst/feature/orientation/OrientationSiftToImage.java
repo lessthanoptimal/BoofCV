@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,11 @@
 
 package boofcv.abst.feature.orientation;
 
+import boofcv.BoofDefaults;
 import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.feature.detect.interest.UnrollSiftScaleSpaceGradient;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.core.image.GConvertImage;
-import boofcv.struct.BoofDefaults;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 

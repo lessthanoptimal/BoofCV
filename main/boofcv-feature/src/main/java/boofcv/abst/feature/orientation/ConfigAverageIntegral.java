@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.orientation;
 
-import boofcv.struct.BoofDefaults;
+import boofcv.BoofDefaults;
 
 /**
  * Configuration for {@link boofcv.alg.feature.orientation.impl.ImplOrientationAverageGradientIntegral}.

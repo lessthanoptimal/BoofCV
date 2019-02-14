@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.misc;
 
-import boofcv.misc.AutoTypeImage;
-import boofcv.misc.CodeGeneratorBase;
+import boofcv.generate.AutoTypeImage;
+import boofcv.generate.CodeGeneratorBase;
 import boofcv.struct.image.ImageType;
 
 import java.io.FileNotFoundException;
@@ -28,7 +28,7 @@ import java.util.List;
 
 
 /**
- * Generates functions inside of {@link ImageMiscOps}.
+ * Generates functions inside of ImageStatistics.
  *
  * @author Peter Abeles
  */

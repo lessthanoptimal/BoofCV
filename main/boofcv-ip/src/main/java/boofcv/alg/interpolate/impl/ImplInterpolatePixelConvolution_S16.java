@@ -18,8 +18,8 @@
 package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.core.image.border.ImageBorder;
-import boofcv.core.image.border.ImageBorder_S32;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.convolve.KernelContinuous1D_F32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.ImageType;

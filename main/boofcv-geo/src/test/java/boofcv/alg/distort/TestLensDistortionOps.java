@@ -20,7 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.alg.distort.impl.ImplImageDistortCache_I8;
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_U8;
-import boofcv.core.image.border.BorderType;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU8;

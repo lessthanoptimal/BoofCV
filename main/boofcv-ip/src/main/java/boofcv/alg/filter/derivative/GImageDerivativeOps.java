@@ -20,7 +20,9 @@ package boofcv.alg.filter.derivative;
 
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.border.*;
+import boofcv.core.image.border.BorderIndex1D_Extend;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.struct.border.*;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.convolve.KernelBase;
@@ -326,4 +328,17 @@ public class GImageDerivativeOps {
 		return createAnyDerivatives(DerivativeType.THREE,inputType,derivType);
 	}
 
+	/**
+	 * Creates a new instance of the default border for derivatives of integer images
+	 */
+	public static ImageBorder_S32 borderDerivative_I32() {
+		return new ImageBorder1D_S32((Class)BorderIndex1D_Extend.class);
+	}
+
+	/**
+	 * Creates a new instance of the default border for derivatives of GrayF32
+	 */
+	public static ImageBorder_F32 borderDerivative_F32() {
+		return new ImageBorder1D_F32((Class)BorderIndex1D_Extend.class);
+	}
 }

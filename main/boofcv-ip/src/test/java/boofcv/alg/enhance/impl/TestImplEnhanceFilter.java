@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,12 +20,12 @@ package boofcv.alg.enhance.impl;
 
 import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard_SB;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_S32;
-import boofcv.struct.BoofDefaults;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -131,7 +131,7 @@ public class TestImplEnhanceFilter {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenBorder4",input,output,0,255);
 
 			expected = new GrayS16(input.width,input.height);
-			ImageBorder_S32 border = BoofDefaults.borderDerivative_I32();
+			ImageBorder_S32 border = GImageDerivativeOps.borderDerivative_I32();
 			border.setImage(input);
 			ConvolveJustBorder_General_SB.convolve(ImplEnhanceFilter.kernelEnhance4_I32,border,(GrayS16)expected);
 			GPixelMath.boundImage(expected, 0, 255);
@@ -139,7 +139,7 @@ public class TestImplEnhanceFilter {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenBorder4",input,output,0f,255f);
 
 			expected = new GrayF32(input.width,input.height);
-			ImageBorder_F32 border = BoofDefaults.borderDerivative_F32();
+			ImageBorder_F32 border = GImageDerivativeOps.borderDerivative_F32();
 			border.setImage((GrayF32)input);
 			ConvolveJustBorder_General_SB.convolve(ImplEnhanceFilter.kernelEnhance4_F32, border, (GrayF32) expected);
 			GPixelMath.boundImage(expected, 0, 255);
@@ -232,7 +232,7 @@ public class TestImplEnhanceFilter {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenBorder8",input,output,0,255);
 
 			expected = new GrayS16(input.width,input.height);
-			ImageBorder_S32 border = BoofDefaults.borderDerivative_I32();
+			ImageBorder_S32 border = GImageDerivativeOps.borderDerivative_I32();
 			border.setImage(input);
 			ConvolveJustBorder_General_SB.convolve(ImplEnhanceFilter.kernelEnhance8_I32,border,(GrayS16)expected);
 			GPixelMath.boundImage(expected, 0, 255);
@@ -240,7 +240,7 @@ public class TestImplEnhanceFilter {
 			BoofTesting.callStaticMethod(ImplEnhanceFilter.class,"sharpenBorder8",input,output,0f,255f);
 
 			expected = new GrayF32(input.width,input.height);
-			ImageBorder_F32 border = BoofDefaults.borderDerivative_F32();
+			ImageBorder_F32 border = GImageDerivativeOps.borderDerivative_F32();
 			border.setImage((GrayF32)input);
 			ConvolveJustBorder_General_SB.convolve(ImplEnhanceFilter.kernelEnhance8_F32, border, (GrayF32) expected);
 			GPixelMath.boundImage(expected, 0, 255);

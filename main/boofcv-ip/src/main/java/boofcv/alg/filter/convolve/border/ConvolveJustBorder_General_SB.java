@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,9 @@
 
 package boofcv.alg.filter.convolve.border;
 
-import boofcv.core.image.border.ImageBorder_F32;
-import boofcv.core.image.border.ImageBorder_S32;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
@@ -30,7 +31,7 @@ import boofcv.struct.image.GrayS32;
 
 /**
  * <p>
- * Convolves just the image's border.  How the border condition is handled is specified by the {@link boofcv.core.image.border.ImageBorder}
+ * Convolves just the image's border.  How the border condition is handled is specified by the {@link ImageBorder}
  * passed in.  For 1D kernels only the horizontal or vertical borders are processed.
  * </p>
  * 
