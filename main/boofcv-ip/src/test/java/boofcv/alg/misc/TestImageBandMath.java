@@ -1,5 +1,7 @@
  /*
- * Copyright (c) 2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +18,21 @@
 
 package boofcv.alg.misc;
 
-import boofcv.core.image.FactoryGImageGray;
-import boofcv.core.image.GImageGray;
-import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.Planar;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Random;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Test;
+ import boofcv.core.image.FactoryGImageGray;
+ import boofcv.core.image.GImageGray;
+ import boofcv.core.image.GeneralizedImageOps;
+ import boofcv.struct.image.GrayU8;
+ import boofcv.struct.image.ImageBase;
+ import boofcv.struct.image.ImageGray;
+ import boofcv.struct.image.Planar;
+ import org.junit.jupiter.api.Test;
+
+ import java.lang.reflect.InvocationTargetException;
+ import java.lang.reflect.Method;
+ import java.util.Arrays;
+ import java.util.Random;
+
+ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
@@ -331,7 +335,7 @@ public class TestImageBandMath {
 		Planar input = new Planar(paramTypes[1], width, height,numBands);
 		ImageGray output = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
       ImageGray av = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
-      GImageBandMath.averageBand(input, av, firstBand, lastBand);
+      GImageBandMath.average(input, av, firstBand, lastBand);
 
 		if( output.getDataType().isSigned() ) {
 			GImageMiscOps.fillUniform(input, rand, -20,20);

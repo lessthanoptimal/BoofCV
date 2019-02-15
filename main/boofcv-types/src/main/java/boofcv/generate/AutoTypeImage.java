@@ -218,6 +218,16 @@ public enum AutoTypeImage {
 		return sumType;
 	}
 
+	public String getMaxForSumType() {
+		switch( sumType ) {
+			case "int": return "Integer.MAX_VALUE";
+			case "long": return "Long.MAX_VALUE";
+			case "float": return "Float.MAX_VALUE";
+			case "double": return "Double.MAX_VALUE";
+		}
+		throw new RuntimeException("Unknown sum type");
+	}
+
 	public String getLargeSumType() {
 		return largeSumType;
 	}
