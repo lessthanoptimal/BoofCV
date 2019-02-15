@@ -18,7 +18,8 @@
 
 package boofcv.alg.filter.derivative.impl;
 
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+import boofcv.alg.filter.derivative.DerivativeLaplacian;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -26,11 +27,11 @@ import boofcv.struct.image.GrayU8;
 /**
  * Straight forward implementation of Laplacian with unrolled kernel
  *
- * @see boofcv.alg.filter.derivative.LaplacianEdge
+ * @see DerivativeLaplacian
  *
  * @author Peter Abeles
  */
-public class LaplacianStandard {
+public class DerivativeLaplacian_Inner_MT {
 	/**
 	 * Computes the Laplacian of input image.
 	 *
@@ -45,8 +46,7 @@ public class LaplacianStandard {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int index = orig.startIndex + stride * y + 1;
 			int indexOut = deriv.startIndex + deriv.stride * y + 1;
 			int endX = index + width - 2;
@@ -61,8 +61,7 @@ public class LaplacianStandard {
 
 				out[indexOut++] = (short) v;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void process(GrayU8 orig, GrayF32 deriv) {
@@ -73,8 +72,7 @@ public class LaplacianStandard {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int index = orig.startIndex + stride * y + 1;
 			int indexOut = deriv.startIndex + deriv.stride * y + 1;
 			int endX = index + width - 2;
@@ -89,8 +87,7 @@ public class LaplacianStandard {
 
 				out[indexOut++] = v;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -107,8 +104,7 @@ public class LaplacianStandard {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
-		for (int y = 1; y < height; y++) {
+		BoofConcurrency.range(1,height,y->{
 			int index = orig.startIndex + stride * y + 1;
 			int indexOut = deriv.startIndex + deriv.stride * y + 1;
 			int endX = index + width - 2;
@@ -121,7 +117,6 @@ public class LaplacianStandard {
 
 				out[indexOut++] = v - 4.0f * data[index];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 }

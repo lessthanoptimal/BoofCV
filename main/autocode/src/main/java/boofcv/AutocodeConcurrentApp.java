@@ -248,7 +248,7 @@ public class AutocodeConcurrentApp {
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientThree_Standard.java",
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientTwo0_Standard.java",
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientTwo1_Standard.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/LaplacianStandard.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/DerivativeLaplacian_Inner.java",
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/blur/impl/ImplMedianHistogramInner.java",
 				"main/boofcv-ip/src/main/java/boofcv/alg/misc/impl/ImplPixelMath.java",
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageStandard_IL.java",

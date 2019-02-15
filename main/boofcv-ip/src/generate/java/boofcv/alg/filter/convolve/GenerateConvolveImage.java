@@ -26,12 +26,13 @@ import boofcv.generate.CodeGeneratorBase;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class GenerateConvolveImage extends CodeGeneratorBase {
 
 	String kernelType;
 	String borderName;
 	String inputName, outputName, typeIn, typeOut, sumType;
-
+	AutoTypeImage inputType;
 	int totalFunctions = 0;
 
 	@Override
@@ -42,7 +43,7 @@ public class GenerateConvolveImage extends CodeGeneratorBase {
 		printAllOps(AutoTypeImage.U8,  AutoTypeImage.I16, false);
 		printAllOps(AutoTypeImage.U8,  AutoTypeImage.S32, false);
 		printAllOps(AutoTypeImage.S16, AutoTypeImage.I16, false);
-		printAllOps(AutoTypeImage.U16, AutoTypeImage.I16, false);
+//		printAllOps(AutoTypeImage.U16, AutoTypeImage.I16, false);
 		printAllOps(AutoTypeImage.S32, AutoTypeImage.S32, false);
 
 		out.println("}");
@@ -53,10 +54,17 @@ public class GenerateConvolveImage extends CodeGeneratorBase {
 	private void printPreamble() {
 		out.print(
 				"import boofcv.alg.InputSanityCheck;\n" +
-				"import boofcv.core.image.border.*;\n" +
-				"import boofcv.alg.filter.convolve.border.*;\n" +
-				"import boofcv.struct.convolve.*;\n" +
-				"import boofcv.struct.image.*;\n");
+						"import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_IL;\n" +
+						"import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;\n" +
+						"import boofcv.struct.border.ImageBorder_F32;\n" +
+						"import boofcv.struct.border.ImageBorder_IL_F32;\n" +
+						"import boofcv.struct.border.ImageBorder_IL_S32;\n" +
+						"import boofcv.struct.border.ImageBorder_S32;\n" +
+						"import boofcv.struct.convolve.Kernel1D_F32;\n" +
+						"import boofcv.struct.convolve.Kernel1D_S32;\n" +
+						"import boofcv.struct.convolve.Kernel2D_F32;\n" +
+						"import boofcv.struct.convolve.Kernel2D_S32;\n" +
+						"import boofcv.struct.image.*;\n");
 		out.println();
 		out.print("/**\n" +
 				" * <p>\n" +
@@ -66,13 +74,14 @@ public class GenerateConvolveImage extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"@SuppressWarnings({\"ForLoopReplaceableByForEach\", \"unchecked\"})\n" +
+				"@SuppressWarnings({\"ForLoopReplaceableByForEach\", \"Duplicates\"})\n" +
 				"public class "+className+" {\n\n");
 	}
 
 	private void printAllOps(AutoTypeImage input, AutoTypeImage output,
 							 boolean justVertical )
 	{
+		inputType = input;
 		kernelType = input.getKernelType();
 		typeIn = input.name();
 		typeOut = output.name();
@@ -124,11 +133,14 @@ public class GenerateConvolveImage extends CodeGeneratorBase {
 				"\t * @param border How the image borders are handled.\n" +
 				"\t */\n" );
 
+		String kernelName = borderName+kernelType+ (inputType.isInteger() ? "<"+inputName+">" : "");
+
 		out.print("\tpublic static void "+name+"(Kernel"+dimen+"_"+kernelType+" kernel,\n" +
-				"\t\t\t\t\t\t\t\t  "+inputName+" input, "+outputName+" output , "+borderName+kernelType+" border ) {\n" +
+				"\t\t\t\t\t\t\t\t  "+inputName+" input, "
+				+outputName+" output , "+kernelName+" border ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape"+suffice2+"(input, output);\n" +
 				"\n" +
-				"\t\tboolean processed = BOverrideConvolveWidthBorder.invokeNative"+nativeName+"(kernel,input,output,border);\n" +
+				"\t\tboolean processed = BOverrideConvolveImage.invokeNative"+nativeName+"(kernel,input,output,border);\n" +
 				"\n" +
 				"\t\tif( !processed ) {\n" +
 				"\t\t\tborder.setImage(input);\n" +

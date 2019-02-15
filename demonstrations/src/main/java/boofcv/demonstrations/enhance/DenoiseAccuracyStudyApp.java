@@ -21,7 +21,7 @@ package boofcv.demonstrations.enhance;
 import boofcv.abst.denoise.WaveletDenoiseFilter;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.transform.wavelet.WaveletTransform;
-import boofcv.alg.filter.derivative.LaplacianEdge;
+import boofcv.alg.filter.derivative.DerivativeLaplacian;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
@@ -161,7 +161,7 @@ public class DenoiseAccuracyStudyApp {
 
 	private double computeEdgeMSE(GrayF32 imageInv) {
 		GrayF32 edge = new GrayF32(imageInv.width,imageInv.height);
-		LaplacianEdge.process(image,edge,null);
+		DerivativeLaplacian.process(image,edge,null);
 		PixelMath.abs(edge,edge);
 		float max = ImageStatistics.maxAbs(edge);
 		PixelMath.divide(edge,max,edge);

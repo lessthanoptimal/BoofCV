@@ -72,7 +72,7 @@ public class BenchmarkImageDerivatives {
 
 	@Benchmark
 	public void laplacian() {
-		LaplacianEdge.process(input,derivX,borderI32);
+		DerivativeLaplacian.process(input,derivX,borderI32);
 	}
 
 	@Benchmark

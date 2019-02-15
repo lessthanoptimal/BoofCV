@@ -18,8 +18,8 @@
 
 package boofcv.abst.feature.detect.intensity;
 
+import boofcv.alg.filter.derivative.DerivativeLaplacian;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
@@ -38,7 +38,7 @@ public class WrapperLaplacianBlobIntensity<I extends ImageGray<I>,D extends Imag
 	public void process(I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY) {
 		init(image.width,image.height);
 		if( image instanceof GrayU8) {
-			LaplacianEdge.process((GrayU8)image,intensity);
+			DerivativeLaplacian.process((GrayU8)image,intensity);
 		} else if( image instanceof GrayF32) {
 			GImageDerivativeOps.laplace(image,intensity, BorderType.EXTENDED);
 		} else {

@@ -27,7 +27,7 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.feature.associate.AssociateThreeByPairs;
-import boofcv.alg.filter.derivative.LaplacianEdge;
+import boofcv.alg.filter.derivative.DerivativeLaplacian;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -553,8 +553,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
 		GrayS16 derivLeft = new GrayS16(rectColor1.width,rectColor1.height);
 		GrayS16 derivRight = new GrayS16(rectColor2.width,rectColor2.height);
-		LaplacianEdge.process(rectifiedLeft, derivLeft,null);
-		LaplacianEdge.process(rectifiedRight,derivRight,null);
+		DerivativeLaplacian.process(rectifiedLeft, derivLeft,null);
+		DerivativeLaplacian.process(rectifiedRight,derivRight,null);
 
 		// process and return the results
 		disparityAlg.process(derivLeft, derivRight);

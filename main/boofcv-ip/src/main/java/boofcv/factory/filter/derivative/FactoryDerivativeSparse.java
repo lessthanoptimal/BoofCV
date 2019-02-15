@@ -20,8 +20,8 @@ package boofcv.factory.filter.derivative;
 
 import boofcv.abst.filter.ImageFunctionSparse;
 import boofcv.abst.filter.convolve.ImageConvolveSparse;
+import boofcv.alg.filter.derivative.DerivativeLaplacian;
 import boofcv.alg.filter.derivative.GradientSobel;
-import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.filter.derivative.impl.*;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
@@ -49,7 +49,7 @@ public class FactoryDerivativeSparse {
 	/**
 	 * Creates a sparse Laplacian filter.
 	 *
-	 * @see boofcv.alg.filter.derivative.LaplacianEdge
+	 * @see DerivativeLaplacian
 	 *
 	 * @param imageType The type of image which is to be processed.
 	 * @param border How the border should be handled.  If null {@link BorderType#EXTENDED} will be used.
@@ -63,13 +63,13 @@ public class FactoryDerivativeSparse {
 		}
 
 		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
-			ImageConvolveSparse<GrayF32, Kernel2D_F32> r = FactoryConvolveSparse.convolve2D(GrayF32.class, LaplacianEdge.kernel_F32);
+			ImageConvolveSparse<GrayF32, Kernel2D_F32> r = FactoryConvolveSparse.convolve2D(GrayF32.class, DerivativeLaplacian.kernel_F32);
 
 			r.setImageBorder((ImageBorder_F32)border);
 
 			return (ImageFunctionSparse<T>)r;
 		} else {
-			ImageConvolveSparse r = FactoryConvolveSparse.convolve2D(GrayI.class, LaplacianEdge.kernel_I32);
+			ImageConvolveSparse r = FactoryConvolveSparse.convolve2D(GrayI.class, DerivativeLaplacian.kernel_I32);
 
 			r.setImageBorder(border);
 

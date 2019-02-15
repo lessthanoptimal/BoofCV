@@ -19,7 +19,7 @@
 package boofcv.abst.filter.derivative;
 
 import boofcv.abst.filter.ImageFunctionSparse;
-import boofcv.alg.filter.derivative.LaplacianEdge;
+import boofcv.alg.filter.derivative.DerivativeLaplacian;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.derivative.FactoryDerivativeSparse;
 import boofcv.struct.image.GrayF32;
@@ -47,7 +47,7 @@ public class TestFactoryDerivativeSparse {
 		GrayF32 expected = new GrayF32(width,height);
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
-		LaplacianEdge.process(input,expected, null);
+		DerivativeLaplacian.process(input,expected, null);
 
 		ImageFunctionSparse<GrayF32> func = FactoryDerivativeSparse.createLaplacian(GrayF32.class,null);
 
@@ -63,7 +63,7 @@ public class TestFactoryDerivativeSparse {
 		GrayS16 expected = new GrayS16(width,height);
 		GImageMiscOps.fillUniform(input, rand, 0, 20);
 
-		LaplacianEdge.process(input,expected, null);
+		DerivativeLaplacian.process(input,expected, null);
 
 		ImageFunctionSparse<GrayU8> func = FactoryDerivativeSparse.createLaplacian(GrayU8.class,null);
 

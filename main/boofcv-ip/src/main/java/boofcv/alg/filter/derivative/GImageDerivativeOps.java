@@ -40,9 +40,9 @@ public class GImageDerivativeOps {
 	void laplace( I input , D output , BorderType borderType ) {
 		ImageBorder<I> border = BorderType.SKIP == borderType ? null : FactoryImageBorder.wrap(borderType, input);
 		if( input instanceof GrayF32) {
-			LaplacianEdge.process((GrayF32)input,(GrayF32)output,(ImageBorder_F32)border);
+			DerivativeLaplacian.process((GrayF32)input,(GrayF32)output,(ImageBorder_F32)border);
 		} else if( input instanceof GrayU8) {
-			LaplacianEdge.process((GrayU8)input,(GrayS16)output,(ImageBorder_S32<GrayU8>)border);
+			DerivativeLaplacian.process((GrayU8)input,(GrayS16)output,(ImageBorder_S32<GrayU8>)border);
 		} else {
 			throw new IllegalArgumentException("Unknown input image type: "+input.getClass().getSimpleName());
 

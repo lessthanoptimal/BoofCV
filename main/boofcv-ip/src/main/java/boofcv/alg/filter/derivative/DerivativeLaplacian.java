@@ -19,8 +19,8 @@
 package boofcv.alg.filter.derivative;
 
 import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
-import boofcv.alg.filter.derivative.impl.LaplacianStandard;
-import boofcv.alg.filter.derivative.impl.LaplacianStandard_MT;
+import boofcv.alg.filter.derivative.impl.DerivativeLaplacian_Inner;
+import boofcv.alg.filter.derivative.impl.DerivativeLaplacian_Inner_MT;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
@@ -61,7 +61,7 @@ import javax.annotation.Nullable;
  *
  * @author Peter Abeles
  */
-public class LaplacianEdge {
+public class DerivativeLaplacian {
 	public static Kernel2D_S32 kernel_I32 = new Kernel2D_S32(3, new int[]{0,1,0,1,-4,1,0,1,0});
 	public static Kernel2D_F32 kernel_F32 = new Kernel2D_F32(3, new float[]{0,1,0,1,-4,1,0,1,0});
 
@@ -75,9 +75,9 @@ public class LaplacianEdge {
 		deriv.reshape(orig.width,orig.height);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
-			LaplacianStandard_MT.process(orig,deriv);
+			DerivativeLaplacian_Inner_MT.process(orig,deriv);
 		} else {
-			LaplacianStandard.process(orig,deriv);
+			DerivativeLaplacian_Inner.process(orig,deriv);
 		}
 
 		if( border != null ) {
@@ -94,9 +94,9 @@ public class LaplacianEdge {
 		deriv.reshape(orig.width,orig.height);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
-			LaplacianStandard_MT.process(orig,deriv);
+			DerivativeLaplacian_Inner_MT.process(orig,deriv);
 		} else {
-			LaplacianStandard.process(orig,deriv);
+			DerivativeLaplacian_Inner.process(orig,deriv);
 		}
 
 //		if( border != null ) {
@@ -115,9 +115,9 @@ public class LaplacianEdge {
 		deriv.reshape(orig.width,orig.height);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
-			LaplacianStandard_MT.process(orig,deriv);
+			DerivativeLaplacian_Inner_MT.process(orig,deriv);
 		} else {
-			LaplacianStandard.process(orig,deriv);
+			DerivativeLaplacian_Inner.process(orig,deriv);
 		}
 
 		if( border != null ) {

@@ -16,24 +16,27 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.derivative;
+package boofcv.alg.filter.derivative.impl;
 
+import boofcv.alg.filter.convolve.ConvolveImage;
+import boofcv.alg.filter.derivative.DerivativeLaplacian;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Peter Abeles
- */
-public class TestLaplacianEdge {
-
+public class TestDerivativeLaplacian_Inner {
 	Random rand = new Random(0xfeed);
 
 	private final int width = 4;
@@ -49,12 +52,13 @@ public class TestLaplacianEdge {
 	}
 
 	public void process_U8_S16(GrayU8 img, GrayS16 deriv) {
-		LaplacianEdge.process(img, deriv, null);
+		DerivativeLaplacian_Inner.process(img, deriv);
 
-		int expected = -4 * img.get(1, 1) + img.get(0, 1) + img.get(1, 0)
-				+ img.get(2, 1) + img.get(1, 2);
+		ImageBorder_S32<GrayU8> border = (ImageBorder_S32) FactoryImageBorder.single(GrayU8.class, BorderType.EXTENDED);
+		GrayS16 expected = deriv.createSameShape();
+		ConvolveImage.convolve(DerivativeLaplacian.kernel_I32,img,expected,border);
 
-		assertEquals(expected, deriv.get(1, 1));
+		BoofTesting.assertEqualsInner(expected,deriv,0,1,1,false);
 	}
 
 	@Test
@@ -67,7 +71,7 @@ public class TestLaplacianEdge {
 	}
 
 	public void process_U8_F32(GrayU8 img, GrayF32 deriv) {
-		LaplacianEdge.process(img, deriv);
+		DerivativeLaplacian_Inner.process(img, deriv);
 
 		int expected = -4 * img.get(1, 1) + img.get(0, 1) + img.get(1, 0)
 				+ img.get(2, 1) + img.get(1, 2);
@@ -85,11 +89,13 @@ public class TestLaplacianEdge {
 	}
 
 	public void process_F32(GrayF32 img, GrayF32 deriv) {
-		LaplacianEdge.process(img, deriv, null);
+		DerivativeLaplacian_Inner.process(img, deriv);
 
-		float expected = -4*img.get(1, 1) + img.get(0, 1) + img.get(1, 0)
-				+ img.get(2, 1) + img.get(1, 2);
+		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorder.single(GrayF32.class, BorderType.EXTENDED);
+		GrayF32 expected = deriv.createSameShape();
+		ConvolveImage.convolve(DerivativeLaplacian.kernel_F32,img,expected,border);
 
-		assertEquals(expected, deriv.get(1, 1), 1e-5);
+		BoofTesting.assertEqualsInner(expected,deriv, UtilEjml.TEST_F32,1,1,false);
 	}
 }
+
