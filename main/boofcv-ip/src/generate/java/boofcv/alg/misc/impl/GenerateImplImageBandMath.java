@@ -240,7 +240,7 @@ public class GenerateImplImageBandMath extends CodeGeneratorBase {
 				"\t\t\tint indexEnd = indexInput+w;\n" +
 				"\t\t\tfor (; indexInput < indexEnd; indexInput++, indexOutput++ ) {\n" +
 				"\t\t\t\tfor( int i = startBand; i <= lastBand; i++ ) {\n" +
-				"\t\t\t\t\tvalueArray[i] = bands[i].data[indexInput]"+bitwise+";\n" +
+				"\t\t\t\t\tvalueArray[i-startBand] = bands[i].data[indexInput]"+bitwise+";\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tif (isEven) {\n" +
 				"\t\t\t\t\t// Would a single quick sort be faster?\n" +

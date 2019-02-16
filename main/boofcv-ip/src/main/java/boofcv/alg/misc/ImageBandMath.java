@@ -330,17 +330,16 @@ public class ImageBandMath {
 		ImplImageBandMath.average(input,output,startBand,lastBand);
 	}
 
-
 	/**
 	 * Computes the standard deviation for each pixel across all bands in the {@link Planar}
 	 * image.
 	 * @param input     Planar image - not modified
 	 * @param avg       Input Gray scale image containing average image.  Can be null
+	 * @param output    Gray scale image containing average pixel values - modified
 	 * @param startBand First band to be included in the projection
 	 * @param lastBand  Last band to be included in the projection
-	 * @param output    Gray scale image containing average pixel values - modified
 	 */
-	public static void stdDev(Planar<GrayU8> input, GrayU8 avg, int startBand, int lastBand, GrayU8 output) {
+	public static void stdDev(Planar<GrayU8> input, GrayU8 avg, GrayU8 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		if( avg == null ) {
 			avg = new GrayU8(input.width,input.height);
@@ -352,13 +351,13 @@ public class ImageBandMath {
 	/**
 	 * Computes the standard deviation for each pixel across all bands in the {@link Planar}
 	 * image.
-	 *  @param input     Planar image - not modified
+	 * @param input     Planar image - not modified
 	 * @param avg       Input Gray scale image containing average image.  Can be null
+	 * @param output    Gray scale image containing average pixel values - modified
 	 * @param startBand First band to be included in the projection
 	 * @param lastBand  Last band to be included in the projection
-	 * @param output    Gray scale image containing average pixel values - modified
 	 */
-	public static void stdDev(Planar<GrayU16> input, GrayU16 avg, int startBand, int lastBand, GrayU16 output) {
+	public static void stdDev(Planar<GrayU16> input, GrayU16 avg, GrayU16 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		if( avg == null ) {
 			avg = new GrayU16(input.width,input.height);
@@ -373,11 +372,11 @@ public class ImageBandMath {
 	 * image.
 	 * @param input     Planar image - not modified
 	 * @param avg       Input Gray scale image containing average image.  Can be null
+	 * @param output    Gray scale image containing average pixel values - modified
 	 * @param startBand First band to be included in the projection
 	 * @param lastBand  Last band to be included in the projection
-	 * @param output    Gray scale image containing average pixel values - modified
 	 */
-	public static void stdDev(Planar<GrayS16> input, GrayS16 avg, int startBand, int lastBand, GrayS16 output) {
+	public static void stdDev(Planar<GrayS16> input, GrayS16 avg, GrayS16 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		if( avg == null ) {
 			avg = new GrayS16(input.width,input.height);
@@ -391,11 +390,11 @@ public class ImageBandMath {
 	 * image.
 	 * @param input     Planar image - not modified
 	 * @param avg       Input Gray scale image containing average image.  Can be null
+	 * @param output    Gray scale image containing average pixel values - modified
 	 * @param startBand First band to be included in the projection
 	 * @param lastBand  Last band to be included in the projection
-	 * @param output    Gray scale image containing average pixel values - modified
 	 */
-	public static void stdDev(Planar<GrayS32> input, GrayS32 avg, int startBand, int lastBand, GrayS32 output) {
+	public static void stdDev(Planar<GrayS32> input, GrayS32 avg, GrayS32 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		if( avg == null ) {
 			avg = new GrayS32(input.width,input.height);
@@ -409,11 +408,11 @@ public class ImageBandMath {
 	 * image.
 	 * @param input     Planar image - not modified
 	 * @param avg       Input Gray scale image containing average image.  Can be null
+	 * @param output    Gray scale image containing average pixel values - modified
 	 * @param startBand First band to be included in the projection
 	 * @param lastBand  Last band to be included in the projection
-	 * @param output    Gray scale image containing average pixel values - modified
 	 */
-	public static void stdDev(Planar<GrayS64> input, GrayS64 avg, int startBand, int lastBand, GrayS64 output) {
+	public static void stdDev(Planar<GrayS64> input, GrayS64 avg, GrayS64 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		if( avg == null ) {
 			avg = new GrayS64(input.width,input.height);
@@ -427,11 +426,11 @@ public class ImageBandMath {
 	 * image.
 	 * @param input     Planar image - not modified
 	 * @param avg       Input Gray scale image containing average image.  Can be null
+	 * @param output    Gray scale image containing average pixel values - modified
 	 * @param startBand First band to be included in the projection
 	 * @param lastBand  Last band to be included in the projection
-	 * @param output    Gray scale image containing average pixel values - modified
 	 */
-	public static void stdDev(Planar<GrayF32> input, GrayF32 avg, int startBand, int lastBand, GrayF32 output) {
+	public static void stdDev(Planar<GrayF32> input, GrayF32 avg, GrayF32 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		if( avg == null ) {
 			avg = new GrayF32(input.width,input.height);
@@ -445,11 +444,11 @@ public class ImageBandMath {
 	 * image.
 	 * @param input     Planar image - not modified
 	 * @param avg       Input Gray scale image containing average image.  Can be null
+	 * @param output    Gray scale image containing average pixel values - modified
 	 * @param startBand First band to be included in the projection
 	 * @param lastBand  Last band to be included in the projection
-	 * @param output    Gray scale image containing average pixel values - modified
 	 */
-	public static void stdDev(Planar<GrayF64> input, GrayF64 avg, int startBand, int lastBand, GrayF64 output) {
+	public static void stdDev(Planar<GrayF64> input, GrayF64 avg, GrayF64 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		if( avg == null ) {
 			avg = new GrayF64(input.width,input.height);

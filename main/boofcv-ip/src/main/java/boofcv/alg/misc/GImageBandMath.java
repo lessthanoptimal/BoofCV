@@ -207,19 +207,19 @@ public class GImageBandMath {
 	public static <T extends ImageGray<T>> void stdDev(Planar<T> input, T output, T avg, int startBand, int lastBand) {
 
 		if( GrayU8.class == input.getBandType() ) {
-			ImageBandMath.stdDev((Planar<GrayU8>) input, (GrayU8) avg, startBand, lastBand, (GrayU8) output);
+			ImageBandMath.stdDev((Planar<GrayU8>) input, (GrayU8) avg, (GrayU8) output, startBand, lastBand);
 		} else if( GrayU16.class == input.getBandType() ) {
-			ImageBandMath.stdDev((Planar<GrayU16>) input, (GrayU16) avg, startBand, lastBand, (GrayU16) output);
+			ImageBandMath.stdDev((Planar<GrayU16>) input, (GrayU16) avg, (GrayU16) output, startBand, lastBand);
 		} else if( GrayS16.class == input.getBandType() ) {
-			ImageBandMath.stdDev((Planar<GrayS16>) input, (GrayS16) avg, startBand, lastBand, (GrayS16) output);
+			ImageBandMath.stdDev((Planar<GrayS16>) input, (GrayS16) avg, (GrayS16) output, startBand, lastBand);
 		} else if( GrayS32.class == input.getBandType() ) {
-			ImageBandMath.stdDev((Planar<GrayS32>) input, (GrayS32) avg, startBand, lastBand, (GrayS32) output);
+			ImageBandMath.stdDev((Planar<GrayS32>) input, (GrayS32) avg, (GrayS32) output, startBand, lastBand);
 		} else if( GrayS64.class == input.getBandType() ) {
-			ImageBandMath.stdDev((Planar<GrayS64>) input, (GrayS64) avg, startBand, lastBand, (GrayS64) output);
+			ImageBandMath.stdDev((Planar<GrayS64>) input, (GrayS64) avg, (GrayS64) output, startBand, lastBand);
 		} else if( GrayF32.class == input.getBandType() ) {
-			ImageBandMath.stdDev((Planar<GrayF32>) input, (GrayF32) avg, startBand, lastBand, (GrayF32) output);
+			ImageBandMath.stdDev((Planar<GrayF32>) input, (GrayF32) avg, (GrayF32) output, startBand, lastBand);
 		} else if( GrayF64.class == input.getBandType() ) {
-			ImageBandMath.stdDev((Planar<GrayF64>) input, (GrayF64) avg, startBand, lastBand, (GrayF64) output);
+			ImageBandMath.stdDev((Planar<GrayF64>) input, (GrayF64) avg, (GrayF64) output, startBand, lastBand);
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+input.getBandType().getSimpleName());
 		}

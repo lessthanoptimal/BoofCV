@@ -109,7 +109,7 @@ public class ImplImageBandMath {
 			int indexEnd = indexInput+w;
 			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
 				for( int i = startBand; i <= lastBand; i++ ) {
-					valueArray[i] = bands[i].data[indexInput]& 0xFF;
+					valueArray[i-startBand] = bands[i].data[indexInput]& 0xFF;
 				}
 				if (isEven) {
 					// Would a single quick sort be faster?
@@ -242,7 +242,7 @@ public class ImplImageBandMath {
 			int indexEnd = indexInput+w;
 			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
 				for( int i = startBand; i <= lastBand; i++ ) {
-					valueArray[i] = bands[i].data[indexInput];
+					valueArray[i-startBand] = bands[i].data[indexInput];
 				}
 				if (isEven) {
 					// Would a single quick sort be faster?
@@ -375,7 +375,7 @@ public class ImplImageBandMath {
 			int indexEnd = indexInput+w;
 			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
 				for( int i = startBand; i <= lastBand; i++ ) {
-					valueArray[i] = bands[i].data[indexInput]& 0xFFFF;
+					valueArray[i-startBand] = bands[i].data[indexInput]& 0xFFFF;
 				}
 				if (isEven) {
 					// Would a single quick sort be faster?
@@ -508,7 +508,7 @@ public class ImplImageBandMath {
 			int indexEnd = indexInput+w;
 			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
 				for( int i = startBand; i <= lastBand; i++ ) {
-					valueArray[i] = bands[i].data[indexInput];
+					valueArray[i-startBand] = bands[i].data[indexInput];
 				}
 				if (isEven) {
 					// Would a single quick sort be faster?
@@ -641,7 +641,7 @@ public class ImplImageBandMath {
 			int indexEnd = indexInput+w;
 			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
 				for( int i = startBand; i <= lastBand; i++ ) {
-					valueArray[i] = bands[i].data[indexInput];
+					valueArray[i-startBand] = bands[i].data[indexInput];
 				}
 				if (isEven) {
 					// Would a single quick sort be faster?
@@ -774,7 +774,7 @@ public class ImplImageBandMath {
 			int indexEnd = indexInput+w;
 			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
 				for( int i = startBand; i <= lastBand; i++ ) {
-					valueArray[i] = bands[i].data[indexInput];
+					valueArray[i-startBand] = bands[i].data[indexInput];
 				}
 				if (isEven) {
 					// Would a single quick sort be faster?
@@ -907,7 +907,7 @@ public class ImplImageBandMath {
 			int indexEnd = indexInput+w;
 			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
 				for( int i = startBand; i <= lastBand; i++ ) {
-					valueArray[i] = bands[i].data[indexInput];
+					valueArray[i-startBand] = bands[i].data[indexInput];
 				}
 				if (isEven) {
 					// Would a single quick sort be faster?
