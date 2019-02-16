@@ -27,25 +27,25 @@ public class TestNonMaxBlockSearchRelaxed {
 
 	@Test
 	void checkMax() {
-		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(false,new NonMaxBlockSearchRelaxed.Max());
+		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(false,new NonMaxBlockSearchRelaxed.Max()){};
 		checks.allStandard();
 	}
 
 	@Test
 	void checkMin() {
-		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(false,new NonMaxBlockSearchRelaxed.Min());
+		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(false,new NonMaxBlockSearchRelaxed.Min()){};
 		checks.allStandard();
 	}
 
 	@Test
 	void checkMinMax() {
-		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(false,new NonMaxBlockSearchRelaxed.MinMax());
+		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(false,new NonMaxBlockSearchRelaxed.MinMax()){};
 		checks.allStandard();
 	}
 
 	@Test
 	void checkMax_MT() {
-		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(false,new NonMaxBlockSearchRelaxed.Max(),true);
+		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(false,new NonMaxBlockSearchRelaxed.Max(),true){};
 		// increase image size to stress threads more and make it more likely to be processed out of order
 		checks.setImageShape(100,120);
 		checks.allStandard();
@@ -53,7 +53,7 @@ public class TestNonMaxBlockSearchRelaxed {
 
 	@Test
 	void checkMin_MT() {
-		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(false,new NonMaxBlockSearchRelaxed.Min(),true);
+		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(false,new NonMaxBlockSearchRelaxed.Min(),true){};
 		// increase image size to stress threads more and make it more likely to be processed out of order
 		checks.setImageShape(100,120);
 		checks.allStandard();
@@ -61,7 +61,7 @@ public class TestNonMaxBlockSearchRelaxed {
 
 	@Test
 	void checkMinMax_MT() {
-		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(false,new NonMaxBlockSearchRelaxed.MinMax(),true);
+		GenericNonMaxBlockTests checks = new GenericNonMaxBlockTests(false,new NonMaxBlockSearchRelaxed.MinMax(),true){};
 		// increase image size to stress threads more and make it more likely to be processed out of order
 		checks.setImageShape(100,120);
 		checks.allStandard();
