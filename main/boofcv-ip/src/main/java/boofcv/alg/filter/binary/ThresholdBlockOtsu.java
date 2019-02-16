@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.InterleavedS32;
@@ -26,7 +25,7 @@ import boofcv.struct.image.InterleavedS32;
 import java.util.Arrays;
 
 /**
- * Block Otsu threshold implementation based on {@link ThresholdBlockCommon}. Computes a histogram in non-overlapping
+ * Block Otsu threshold implementation based on {@link ThresholdBlock}. Computes a histogram in non-overlapping
  * square regions. Then thresholds a single region by combining histograms from its neighbors to make it less blocky.
  *
  * This implementation includes a modification from the traditional Otsu algorithm. The threshold can optionally
@@ -39,34 +38,42 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS32> {
-
+public class ThresholdBlockOtsu
+		implements ThresholdBlock.BlockProcessor<GrayU8,InterleavedS32>
+{
 	int histogram[] = new int[256];
 
 	ComputeOtsu otsu;
 
+	protected int blockWidth,blockHeight;
+	protected boolean thresholdFromLocalBlocks;
+
 	/**
 	 * Configures the detector
 	 *
-	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 * @param tuning Tuning parameter. 0 = standard Otsu. Greater than 0 will penalize zero texture.
 	 */
-	public ThresholdBlockOtsu(boolean otsu2, ConfigLength requestedBlockWidth, double tuning, double scale, boolean down,
-							  boolean thresholdFromLocalBlocks ) {
-		super(requestedBlockWidth,thresholdFromLocalBlocks,GrayU8.class);
+	public ThresholdBlockOtsu(boolean otsu2, double tuning, double scale, boolean down ) {
 		this.otsu = new ComputeOtsu(otsu2,tuning,down,scale);
-		stats = new InterleavedS32(1,1,256);
 	}
 
 	@Override
-	protected void computeStatistics(GrayU8 input, int innerWidth, int innerHeight) {
-		Arrays.fill(stats.data,0,stats.width*stats.height*256,0);
-		super.computeStatistics(input, innerWidth, innerHeight);
+	public InterleavedS32 createStats() {
+		return new InterleavedS32(1,1,256);
 	}
 
 	@Override
-	protected void computeBlockStatistics(int x0, int y0, int width, int height, int indexStats, GrayU8 input) {
+	public void init(int blockWidth, int blockHeight, boolean thresholdFromLocalBlocks) {
+//		Arrays.fill(stats.data,0,stats.width*stats.height*256,0);
+		this.blockWidth = blockWidth;
+		this.blockHeight = blockHeight;
+		this.thresholdFromLocalBlocks = thresholdFromLocalBlocks;
+	}
 
+	@Override
+	public void computeBlockStatistics(int x0, int y0, int width, int height, int indexStats,
+										  GrayU8 input, InterleavedS32 stats ) {
+		Arrays.fill(stats.data,indexStats,indexStats+256,0);
 		for (int y = 0; y < height; y++) {
 			int indexInput = input.startIndex + (y0+y)*input.stride + x0;
 			int end = indexInput + width;
@@ -77,7 +84,8 @@ public class ThresholdBlockOtsu extends ThresholdBlockCommon<GrayU8,InterleavedS
 	}
 
 	@Override
-	protected void thresholdBlock(int blockX0, int blockY0, GrayU8 input, GrayU8 output) {
+	public void thresholdBlock(int blockX0, int blockY0, GrayU8 input, InterleavedS32 stats,
+								  GrayU8 output) {
 
 		int x0 = blockX0*blockWidth;
 		int y0 = blockY0*blockHeight;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,11 +18,14 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import boofcv.alg.filter.binary.ThresholdBlockCommon;
+import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.filter.binary.ThresholdBlock;
+import boofcv.alg.filter.binary.ThresholdBlock.BlockProcessor;
 import boofcv.alg.filter.binary.ThresholdBlockMinMax;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import org.junit.jupiter.api.Test;
@@ -40,12 +43,20 @@ public abstract class GenericThresholdBlockMinMaxChecks
 		super(imageType);
 	}
 
-	public abstract ThresholdBlockMinMax<T,?> createAlg(double textureThreshold, int requestedBlockWidth,
-														double scale , boolean down );
+	public abstract ThresholdBlockMinMax<T,?> createProcessor(double textureThreshold, int requestedBlockWidth,
+															  double scale , boolean down );
+
+	public InputToBinary<T> createThresholder(double textureThreshold, int requestedBlockWidth,
+											  double scale , boolean down) {
+		return new ThresholdBlock(createProcessor(textureThreshold, requestedBlockWidth, scale, down),
+				ConfigLength.fixed(requestedBlockWidth),true,imageType);
+	}
 
 	@Override
-	public ThresholdBlockCommon<T, ?> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return createAlg(1.0,requestedBlockWidth, scale, down);
+	public InputToBinary<T> createAlg(int requestedBlockWidth, double scale, boolean down) {
+		BlockProcessor processor = createProcessor(1.0,requestedBlockWidth, scale, down);
+		return new ThresholdBlock(processor,
+				ConfigLength.fixed(requestedBlockWidth),true,imageType);
 	}
 
 	@Test
@@ -55,7 +66,7 @@ public abstract class GenericThresholdBlockMinMaxChecks
 		GImageMiscOps.fill(input,200);
 		GImageMiscOps.fillRectangle(input,20,40,45,30,32);
 
-		ThresholdBlockMinMax<T,?> alg = createAlg(10,6,1.0,true);
+		InputToBinary<T> alg = createThresholder(10,6,1.0,true);
 
 		GrayU8 output = new GrayU8(input.width,input.height);
 

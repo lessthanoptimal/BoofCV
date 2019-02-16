@@ -167,7 +167,7 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 	}
 
 	class ApplyHelper {
-		int histogram[] = new int[256];
+		int[] histogram = new int[256];
 
 		private void applyToBlock( int x0 , int y0 , int x1 , int y1 , GrayU8 input , GrayU8 output ) {
 

@@ -18,24 +18,14 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.filter.binary.ThresholdBlock.BlockProcessor;
-import boofcv.alg.filter.binary.impl.GenericThresholdCommon;
-import boofcv.struct.ConfigLength;
-import boofcv.struct.image.GrayU8;
+import org.junit.jupiter.api.Test;
 
-/**
- * @author Peter Abeles
- */
-public class TestThresholdBlockOtsu extends GenericThresholdCommon<GrayU8> {
-	public TestThresholdBlockOtsu() {
-		super(GrayU8.class);
-	}
+import static org.junit.jupiter.api.Assertions.fail;
 
-	@Override
-	public InputToBinary<GrayU8> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		BlockProcessor processor = new ThresholdBlockOtsu(true,0.0,scale, down);
-		return new ThresholdBlock(processor,
-				ConfigLength.fixed(requestedBlockWidth),true,GrayU8.class);
+class TestThresholdBlock_MT {
+	@Test
+	void implement() {
+		fail("implement");
 	}
 }
+

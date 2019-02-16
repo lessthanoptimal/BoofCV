@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.filter.binary;
 
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import org.junit.jupiter.api.Test;
 
@@ -28,13 +29,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestThresholdBlockCommon {
+public class TestThresholdBlock {
 	@Test
 	public void selectBlockSize() {
 
 		int width = 30;
 
-		ThresholdBlockCommon alg = new Dummy(width);
+		ThresholdBlock alg = new ThresholdBlock(new Dummy(),
+				ConfigLength.fixed(width),true,GrayU8.class);
 
 		alg.selectBlockSize(300,330,width);
 		assertEquals(30,alg.blockWidth);
@@ -49,19 +51,25 @@ public class TestThresholdBlockCommon {
 		assertEquals(32,alg.blockHeight);
 	}
 
-	private class Dummy extends ThresholdBlockCommon {
+	private class Dummy implements ThresholdBlock.BlockProcessor {
 
-		public Dummy(int requestedBlockWidth) {
-			super(ConfigLength.fixed(requestedBlockWidth),true,GrayU8.class);
+		@Override
+		public ImageBase createStats() {
+			return new GrayU8(1,1);
 		}
 
 		@Override
-		protected void computeBlockStatistics(int x0, int y0, int width, int height, int indexStats, ImageGray input) {
+		public void init(int blockWidth, int blockHeight, boolean thresholdFromLocalBlocks) {
 
 		}
 
 		@Override
-		protected void thresholdBlock(int blockX0, int blockY0, ImageGray input, GrayU8 output) {
+		public void computeBlockStatistics(int x0, int y0, int width, int height, int indexStats, ImageGray input, ImageBase stats) {
+
+		}
+
+		@Override
+		public void thresholdBlock(int blockX0, int blockY0, ImageGray input, ImageBase stats, GrayU8 output) {
 
 		}
 	}

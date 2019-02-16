@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.struct.ConfigLength;
 import boofcv.struct.image.ImageGray;
 
 /**
@@ -32,16 +31,26 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class ThresholdBlockMean
-		<T extends ImageGray<T>> extends ThresholdBlockCommon<T,T>
+public abstract class ThresholdBlockMean<T extends ImageGray<T>>
+		implements ThresholdBlock.BlockProcessor<T,T>
 {
-	/**
-	 * Configures the detector
-	 *
-	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
-	 */
-	public ThresholdBlockMean(ConfigLength requestedBlockWidth, boolean thresholdFromLocalBlocks, Class<T> imageType) {
-		super(requestedBlockWidth,thresholdFromLocalBlocks,imageType);
+	protected int blockWidth,blockHeight;
+	protected boolean thresholdFromLocalBlocks;
+	// defines 0 or 1 when thresholding
+	protected byte a,b;
+
+	public ThresholdBlockMean( boolean down ) {
+		if( down ) {
+			a = 1; b = 0;
+		} else {
+			a = 0; b = 1;
+		}
 	}
 
+	@Override
+	public void init(int blockWidth, int blockHeight, boolean thresholdFromLocalBlocks) {
+		this.blockWidth = blockWidth;
+		this.blockHeight = blockHeight;
+		this.thresholdFromLocalBlocks = thresholdFromLocalBlocks;
+	}
 }

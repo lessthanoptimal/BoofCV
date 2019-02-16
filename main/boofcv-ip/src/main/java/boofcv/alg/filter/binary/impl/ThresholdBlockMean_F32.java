@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdBlockMean;
-import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 
@@ -28,21 +27,19 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class ThresholdBlockMean_F32
 	extends ThresholdBlockMean<GrayF32>
 {
 	float scale;
-	boolean down;
 
-	public ThresholdBlockMean_F32(ConfigLength requestedBlockWidth, double scale , boolean down, boolean thresholdFromLocalBlocks ) {
-		super(requestedBlockWidth,thresholdFromLocalBlocks,GrayF32.class);
-		this.stats = new GrayF32(1,1);
+	public ThresholdBlockMean_F32(double scale , boolean down) {
+		super(down);
 		this.scale = (float)scale;
-		this.down = down;
 	}
 
 	@Override
-	protected void thresholdBlock(int blockX0 , int blockY0 , GrayF32 input, GrayU8 output ) {
+	public void thresholdBlock(int blockX0 , int blockY0 , GrayF32 input, GrayF32 stats, GrayU8 output ) {
 
 		int x0 = blockX0*blockWidth;
 		int y0 = blockY0*blockHeight;
@@ -73,15 +70,7 @@ public class ThresholdBlockMean_F32
 		}
 		mean /= (blockY1-blockY0+1)*(blockX1-blockX0+1);
 
-
 		// apply threshold
-		final byte a,b;
-		if( down ) {
-			a = 1; b = 0;
-		} else {
-			a = 0; b = 1;
-		}
-
 		for (int y = y0; y < y1; y++) {
 			int indexInput = input.startIndex + y * input.stride + x0;
 			int indexOutput = output.startIndex + y * output.stride + x0;
@@ -93,7 +82,13 @@ public class ThresholdBlockMean_F32
 	}
 
 	@Override
-	protected void computeBlockStatistics(int x0, int y0, int width, int height, int indexStats, GrayF32 input) {
+	public GrayF32 createStats() {
+		return new GrayF32(1,1);
+	}
+
+	@Override
+	public void computeBlockStatistics(int x0, int y0, int width, int height, int indexStats,
+										  GrayF32 input, GrayF32 stats ) {
 
 		float sum = 0;
 
@@ -105,6 +100,6 @@ public class ThresholdBlockMean_F32
 		}
 		sum = scale*sum/(width*height);
 
-		stats.data[indexStats]   = sum;
+		stats.data[indexStats] = sum;
 	}
 }

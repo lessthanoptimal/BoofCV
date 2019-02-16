@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdBlockMean;
-import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 
 /**
@@ -27,22 +26,19 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class ThresholdBlockMean_U8
 	extends ThresholdBlockMean<GrayU8>
 {
 	double scale;
-	boolean down;
 
-	public ThresholdBlockMean_U8(ConfigLength requestedBlockWidth, double scale , boolean down,
-								 boolean thresholdFromLocalBlocks ) {
-		super(requestedBlockWidth,thresholdFromLocalBlocks,GrayU8.class);
-		this.stats = new GrayU8(1,1);
+	public ThresholdBlockMean_U8(double scale , boolean down) {
+		super(down);
 		this.scale = scale;
-		this.down = down;
 	}
 
 	@Override
-	protected void thresholdBlock(int blockX0 , int blockY0 , GrayU8 input, GrayU8 output ) {
+	public void thresholdBlock(int blockX0 , int blockY0 , GrayU8 input, GrayU8 stats, GrayU8 output ) {
 
 		int x0 = blockX0*blockWidth;
 		int y0 = blockY0*blockHeight;
@@ -73,14 +69,6 @@ public class ThresholdBlockMean_U8
 		}
 		mean /= (blockY1-blockY0+1)*(blockX1-blockX0+1);
 
-
-		// apply threshold
-		final byte a,b;
-		if( down ) {
-			a = 1; b = 0;
-		} else {
-			a = 0; b = 1;
-		}
 		for (int y = y0; y < y1; y++) {
 			int indexInput = input.startIndex + y * input.stride + x0;
 			int indexOutput = output.startIndex + y * output.stride + x0;
@@ -92,8 +80,14 @@ public class ThresholdBlockMean_U8
 	}
 
 	@Override
-	protected void computeBlockStatistics(int x0, int y0, int width, int height, int indexStats, GrayU8 input) {
+	public GrayU8 createStats() {
+		return new GrayU8(1,1);
+	}
 
+	@Override
+	public void computeBlockStatistics(int x0, int y0, int width, int height, int indexStats,
+										  GrayU8 input, GrayU8 stats)
+	{
 		int sum = 0;
 
 		for (int y = 0; y < height; y++) {
@@ -105,6 +99,6 @@ public class ThresholdBlockMean_U8
 		sum = (int)(scale*sum/(width*height)+0.5);
 
 
-		stats.data[indexStats]   = (byte)sum;
+		stats.data[indexStats] = (byte)sum;
 	}
 }

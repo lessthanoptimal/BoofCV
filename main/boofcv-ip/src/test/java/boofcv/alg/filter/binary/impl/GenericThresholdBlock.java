@@ -16,26 +16,32 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.binary;
+package boofcv.alg.filter.binary.impl;
 
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.filter.binary.ThresholdBlock;
 import boofcv.alg.filter.binary.ThresholdBlock.BlockProcessor;
-import boofcv.alg.filter.binary.impl.GenericThresholdCommon;
 import boofcv.struct.ConfigLength;
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 /**
  * @author Peter Abeles
  */
-public class TestThresholdBlockOtsu extends GenericThresholdCommon<GrayU8> {
-	public TestThresholdBlockOtsu() {
-		super(GrayU8.class);
+public abstract class GenericThresholdBlock<T extends ImageGray<T>>
+	extends GenericThresholdCommon<T>
+{
+
+	public GenericThresholdBlock(Class<T> imageType) {
+		super(imageType);
 	}
 
+	public abstract BlockProcessor<T,?>
+	createBlockProcessor( double scale , boolean down );
+
 	@Override
-	public InputToBinary<GrayU8> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		BlockProcessor processor = new ThresholdBlockOtsu(true,0.0,scale, down);
-		return new ThresholdBlock(processor,
-				ConfigLength.fixed(requestedBlockWidth),true,GrayU8.class);
+	public InputToBinary<T> createAlg(int requestedBlockWidth, double scale, boolean down) {
+		BlockProcessor<T,?> processor = createBlockProcessor(scale,down);
+		return new ThresholdBlock<>(processor,
+				ConfigLength.fixed(requestedBlockWidth),true,imageType);
 	}
 }

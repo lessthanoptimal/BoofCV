@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,17 +19,17 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.InputSanityCheck;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
- * <p> Computes image statistics in regularly spaced blocks across the image. Then computes an average
- *     of the statistics in a block within a local 3x3 grid region. The average statistics in a local 3x3 grid
- *     region is used to reduce the adverse affects of using a grid.
+ * <p>Computes image statistics in regularly spaced blocks across the image. Then computes an average
+ * of the statistics in a block within a local 3x3 grid region. The average statistics in a local 3x3 grid
+ * region is used to reduce the adverse affects of using a grid.
  * Ideally a local region around each pixel would be used, but this is expensive to compute.  Since a grid is
  * used instead of a pixel local region boundary conditions can be an issue.  For example, consider a black square
  * in the image, if the grid just happens to lie on this black square perfectly then if you look at only a single
@@ -43,7 +43,8 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends ImageBase<S>>
+@SuppressWarnings("Duplicates")
+public class ThresholdBlock<T extends ImageGray<T>,S extends ImageBase<S>>
 	implements InputToBinary<T>
 {
 	ImageType<T> imageType;
@@ -60,14 +61,21 @@ public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends Ima
 	// Should it use the local 3x3 block region
 	protected boolean thresholdFromLocalBlocks;
 
+	protected BlockProcessor<T,S> processor;
+
 	/**
 	 * Configures the detector
 	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 */
-	public ThresholdBlockCommon(ConfigLength requestedBlockWidth, boolean thresholdFromLocalBlocks, Class<T> imageClass  ) {
+	public ThresholdBlock(BlockProcessor<T,S> processor,
+						  ConfigLength requestedBlockWidth, boolean thresholdFromLocalBlocks,
+						  Class<T> imageClass  )
+	{
+		this.processor = processor;
 		this.requestedBlockWidth = requestedBlockWidth;
 		this.imageType = ImageType.single(imageClass);
 		this.thresholdFromLocalBlocks = thresholdFromLocalBlocks;
+		this.stats = processor.createStats();
 	}
 
 	/**
@@ -76,7 +84,7 @@ public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends Ima
 	 * @param output Output binary image
 	 */
 	public void process(T input , GrayU8 output ) {
-		InputSanityCheck.checkSameShape(input,output);
+		output.reshape(input.width,input.height);
 
 		int requestedBlockWidth = this.requestedBlockWidth.computeI(Math.min(input.width,input.height));
 		if( input.width < requestedBlockWidth || input.height < requestedBlockWidth ) {
@@ -86,6 +94,7 @@ public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends Ima
 		selectBlockSize(input.width,input.height,requestedBlockWidth);
 
 		stats.reshape(input.width/blockWidth,input.height/blockHeight);
+		processor.init(blockWidth,blockHeight,thresholdFromLocalBlocks);
 
 		int innerWidth = input.width%blockWidth == 0 ?
 				input.width : input.width-blockWidth-input.width%blockWidth;
@@ -114,7 +123,7 @@ public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends Ima
 	private void applyThreshold( T input, GrayU8 output ) {
 		for (int blockY = 0; blockY < stats.height; blockY++) {
 			for (int blockX = 0; blockX < stats.width; blockX++) {
-				thresholdBlock(blockX,blockY,input,output);
+				processor.thresholdBlock(blockX,blockY,input,stats,output);
 			}
 		}
 	}
@@ -128,12 +137,11 @@ public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends Ima
 		int indexStats = 0;
 		for (int y = 0; y < innerHeight; y += blockHeight) {
 			for (int x = 0; x < innerWidth; x += blockWidth, indexStats += statPixelStride) {
-				computeBlockStatistics(x,y,blockWidth,blockHeight,indexStats,input);
+				processor.computeBlockStatistics(x,y,blockWidth,blockHeight,indexStats,input,stats);
 			}
 			// handle the case where the image's width isn't evenly divisible by the block's width
 			if( innerWidth != input.width ) {
-				computeBlockStatistics(innerWidth,y,input.width-innerWidth,blockHeight,indexStats,input);
-				indexStats += statPixelStride;
+				processor.computeBlockStatistics(innerWidth,y,input.width-innerWidth,blockHeight,indexStats,input,stats);
 			}
 		}
 		// handle the case where the image's height isn't evenly divisible by the block's height
@@ -141,34 +149,13 @@ public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends Ima
 			int y = innerHeight;
 			int blockHeight = input.height-innerHeight;
 			for (int x = 0; x < innerWidth; x += blockWidth, indexStats += statPixelStride) {
-				computeBlockStatistics(x,y,blockWidth,blockHeight,indexStats,input);
+				processor.computeBlockStatistics(x,y,blockWidth,blockHeight,indexStats,input,stats);
 			}
 			if( innerWidth != input.width ) {
-				computeBlockStatistics(innerWidth,y,input.width-innerWidth,blockHeight,indexStats,input);
+				processor.computeBlockStatistics(innerWidth,y,input.width-innerWidth,blockHeight,indexStats,input,stats);
 			}
 		}
 	}
-
-	/**
-	 * Computes the min-max value inside a block
-	 * @param x0 lower bound pixel value of block, x-axis
-	 * @param y0 upper bound pixel value of block, y-axis
-	 * @param width Block's width
-	 * @param height Block's height
-	 * @param indexStats array index of statistics image pixel
-	 * @param input Input image
-	 */
-	protected abstract void computeBlockStatistics(int x0 , int y0 , int width , int height ,
-												   int indexStats , T input);
-
-	/**
-	 * Thresholds all the pixels inside the specified block
-	 * @param blockX0 Block x-coordinate
-	 * @param blockY0 Block y-coordinate
-	 * @param input Input image
-	 * @param output Output image
-	 */
-	protected abstract void thresholdBlock(int blockX0 , int blockY0 , T input, GrayU8 output );
 
 	public boolean isThresholdFromLocalBlocks() {
 		return thresholdFromLocalBlocks;
@@ -181,5 +168,33 @@ public abstract class ThresholdBlockCommon <T extends ImageGray<T>,S extends Ima
 	@Override
 	public ImageType<T> getInputType() {
 		return imageType;
+	}
+
+	public interface BlockProcessor<T extends ImageGray<T>,S extends ImageBase<S>> {
+
+		S createStats();
+
+		void init( int blockWidth, int blockHeight , boolean thresholdFromLocalBlocks );
+
+		/**
+		 * Computes the min-max value inside a block
+		 * @param x0 lower bound pixel value of block, x-axis
+		 * @param y0 upper bound pixel value of block, y-axis
+		 * @param width Block's width
+		 * @param height Block's height
+		 * @param indexStats array index of statistics image pixel
+		 * @param input Input image
+		 */
+		void computeBlockStatistics(int x0 , int y0 , int width , int height ,
+													   int indexStats , T input, S stats);
+
+		/**
+		 * Thresholds all the pixels inside the specified block
+		 * @param blockX0 Block x-coordinate
+		 * @param blockY0 Block y-coordinate
+		 * @param input Input image
+		 * @param output Output image
+		 */
+		void thresholdBlock(int blockX0 , int blockY0 , T input, S stats, GrayU8 output );
 	}
 }

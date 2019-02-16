@@ -611,12 +611,12 @@ public class GThresholdImageOps {
 
 	/**
 	 *
-	 * @see FactoryThresholdBinary#localOtsu(boolean, ConfigLength, double, double, boolean, Class)
+	 * @see FactoryThresholdBinary#localOtsu(ConfigLength, double, boolean, boolean, double, Class)
 	 */
 	public static <T extends ImageGray<T>>
 	GrayU8 localOtsu(T input, GrayU8 output, boolean otsu2, ConfigLength width, double tuning , double scale, boolean down)
 	{
-		InputToBinary<T> alg = FactoryThresholdBinary.localOtsu(otsu2,width,tuning,scale,down,input.getImageType().getImageClass());
+		InputToBinary<T> alg = FactoryThresholdBinary.localOtsu(width, scale, down, otsu2, tuning, input.getImageType().getImageClass());
 
 		if( output == null )
 			output = new GrayU8(input.width,input.height);
@@ -714,7 +714,7 @@ public class GThresholdImageOps {
 	GrayU8 blockMinMax(T input, GrayU8 output, ConfigLength width, double scale , boolean down, double textureThreshold)
 	{
 		InputToBinary<T> alg = FactoryThresholdBinary.blockMinMax(
-				width,scale,down,textureThreshold,true,(Class)input.getClass());
+				width,scale,down, true, textureThreshold, (Class)input.getClass());
 
 		if( output == null )
 			output = new GrayU8(input.width,input.height);
@@ -763,8 +763,8 @@ public class GThresholdImageOps {
 	public static <T extends ImageGray<T>>
 	GrayU8 blockOtsu(T input, GrayU8 output, boolean otsu2, ConfigLength width, double tuning , double scale, boolean down)
 	{
-		InputToBinary<T> alg = FactoryThresholdBinary.blockOtsu(otsu2,width, tuning,
-				scale,down,true, (Class)input.getClass());
+		InputToBinary<T> alg = FactoryThresholdBinary.blockOtsu(width, scale, down, true, otsu2, tuning,
+				(Class)input.getClass());
 
 		if( output == null )
 			output = new GrayU8(input.width,input.height);
