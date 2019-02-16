@@ -20,33 +20,35 @@ package boofcv.alg.filter.binary;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.blur.BlurImageOps;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.FWorkArrays;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>
- *     Based off the NICK algorithm described in [1] this is a thresholding algorithm intended for use on
- *     low quality ancient documents. A sliding windows approach is employed and is inspired by Niblack. It's
- *     designed to better handled "white" and ligh page images by shifting the threshold down.
+ * Intended for use as a preprocessing step in OCR it computes a binary image from an input gray image.  It's
+ * an adaptive algorithm and uses the local mean and standard deviation, as is shown in the equation below:<br>
+ * T(x,y) = m(x,y) * [ 1 + k * (s(x,y)/R - 1)]<br>
+ * where T(x,y) is the pixel's threshold, m(x,y) is the local mean, s(x,y) is the local deviation,
+ * R is dynamic range of standard deviation, and k is a user specified threshold.
  * </p>
  *
  * <p>
- *     [1] Khurshid, Khurram, et al. "Comparison of Niblack inspired Binarization methods for ancient documents."
- *      Document Recognition and Retrieval XVI. Vol. 7247. International Society for Optics and Photonics, 2009.
+ * There are two tuning parameters 'k' a positive number and the the 'radius' of the local region.  Recommended
+ * values are k=0.3 and radius=15.  These were found by tuning against a set of text.
  * </p>
  *
  * @author Peter Abeles
  */
 @SuppressWarnings("Duplicates")
-public class ThresholdNick implements InputToBinary<GrayF32> {
+public class ThresholdSauvola_MT implements InputToBinary<GrayF32> {
 
-	// user specified threshold. Niblack factor
-	// [1] recommends -0.1 to -0.2
+	// user specified threshold
 	float k;
 	// size of local region
 	ConfigLength width;
@@ -54,9 +56,11 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 	boolean down;
 
 	// storage for intermediate results
-	GrayF32 imageI2 = new GrayF32(1,1); // I^2
-	GrayF32 meanImage = new GrayF32(1,1); // local mean of I
-	GrayF32 meanI2 = new GrayF32(1,1);
+	GrayF32 inputPow2 = new GrayF32(1,1); // I^2
+	GrayF32 inputMean = new GrayF32(1,1); // local mean of I
+	GrayF32 inputMeanPow2 = new GrayF32(1,1); // pow2 of local mean of I
+	GrayF32 inputPow2Mean = new GrayF32(1,1); // local mean of I^2
+	GrayF32 stdev = new GrayF32(1,1); // computed standard deviation
 
 	GrayF32 tmp = new GrayF32(1,1); // work space
 	FWorkArrays work = new FWorkArrays();
@@ -64,10 +68,10 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 	/**
 	 * Configures the algorithm.
 	 * @param width size of local region.  Try 31
-	 * @param k The Niblack factor. Recommend -0.1 to -0.2
+	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
 	 * @param down Threshold down or up
 	 */
-	public ThresholdNick(ConfigLength width, float k, boolean down) {
+	public ThresholdSauvola_MT(ConfigLength width, float k, boolean down) {
 		this.k = k;
 		this.width = width;
 		this.down = down;
@@ -81,59 +85,52 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 	 */
 	@Override
 	public void process(GrayF32 input , GrayU8 output ) {
-		imageI2.reshape(input.width,input.height);
-		meanImage.reshape(input.width,input.height);
-		meanI2.reshape(input.width,input.height);
+		inputPow2.reshape(input.width,input.height);
+		inputMean.reshape(input.width,input.height);
+		inputMeanPow2.reshape(input.width,input.height);
+		inputPow2Mean.reshape(input.width,input.height);
+		stdev.reshape(input.width,input.height);
 		tmp.reshape(input.width,input.height);
-		imageI2.reshape(input.width,input.height);
+		inputPow2.reshape(input.width,input.height);
 
 		int radius = width.computeI(Math.min(input.width,input.height))/2;
 
-		float NP = (radius*2+1)*(radius*2+1);
-
 		// mean of input image = E[X]
-		BlurImageOps.mean(input, meanImage, radius, tmp, work);
+		BlurImageOps.mean(input, inputMean, radius, tmp, work);
 
-		// Compute I^2
-		PixelMath.pow2(input, imageI2);
+		// standard deviation = sqrt( E[X^2] + E[X]^2)
+		PixelMath.pow2(input, inputPow2);
+		BlurImageOps.mean(inputPow2,inputPow2Mean,radius,tmp, work);
+		PixelMath.pow2(inputMean,inputMeanPow2);
+		PixelMath.subtract(inputPow2Mean, inputMeanPow2, stdev);
+		PixelMath.sqrt(stdev, stdev);
 
-		// Compute local mean of I^2
-		BlurImageOps.mean(imageI2, meanI2, radius, tmp, work);
+		float R = ImageStatistics.max(stdev);
 
 		if( down ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
-				int i = y * meanI2.width;
+			BoofConcurrency.range(0, input.height, y -> {
+				int i = y * stdev.width;
 				int indexIn = input.startIndex + y * input.stride;
 				int indexOut = output.startIndex + y * output.stride;
 
 				for (int x = 0; x < input.width; x++, i++) {
-					float mean = meanImage.data[i];
-					float A = meanI2.data[i] - (mean*mean/NP);
-
-					// threshold = mean + k*sqrt( A )
-					float threshold = mean + k*(float)Math.sqrt(A);
+					// threshold = mean.*(1 + k * ((deviation/R)-1));
+					float threshold = inputMean.data[i] * (1.0f + k * (stdev.data[i] / R - 1.0f));
 					output.data[indexOut++] = (byte) (input.data[indexIn++] <= threshold ? 1 : 0);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
-				int i = y * meanI2.width;
+			BoofConcurrency.range(0, input.height, y -> {
+				int i = y * stdev.width;
 				int indexIn = input.startIndex + y * input.stride;
 				int indexOut = output.startIndex + y * output.stride;
 
 				for (int x = 0; x < input.width; x++, i++) {
-					float mean = meanImage.data[i];
-					float A = meanI2.data[i] - (mean*mean/NP);
-
-					// threshold = mean + k*sqrt( A )
-					float threshold = mean + k*(float)Math.sqrt(A);
+					// threshold = mean.*(1 + k * ((deviation/R)-1));
+					float threshold = inputMean.data[i] * (1.0f + k * (stdev.data[i] / R - 1.0f));
 					output.data[indexOut++] = (byte) (input.data[indexIn++] >= threshold ? 1 : 0);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 

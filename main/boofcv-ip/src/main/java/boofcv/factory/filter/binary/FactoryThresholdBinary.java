@@ -20,8 +20,13 @@ package boofcv.factory.filter.binary;
 
 import boofcv.abst.filter.binary.*;
 import boofcv.alg.filter.binary.*;
-import boofcv.alg.filter.binary.impl.*;
+import boofcv.alg.filter.binary.impl.ThresholdBlockMean_F32;
+import boofcv.alg.filter.binary.impl.ThresholdBlockMean_U8;
+import boofcv.alg.filter.binary.impl.ThresholdBlockMinMax_F32;
+import boofcv.alg.filter.binary.impl.ThresholdBlockMinMax_U8;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.ConfigLength;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -34,7 +39,7 @@ import boofcv.struct.image.ImageType;
 public class FactoryThresholdBinary {
 
 	/**
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localGaussian
+	 * @see LocalGaussianBinaryFilter
 	 *
 	 * @param regionWidth Width of square region.
 	 * @param scale Threshold scale adjustment
@@ -50,7 +55,7 @@ public class FactoryThresholdBinary {
 	}
 
 	/**
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localSauvola(ImageGray, GrayU8, ConfigLength, float, boolean)
+	 * @see ThresholdSauvola
 	 *
 	 * @param width Width of square region.
 	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
@@ -63,14 +68,21 @@ public class FactoryThresholdBinary {
 	{
 		if( BOverrideFactoryThresholdBinary.localSauvola != null )
 			return BOverrideFactoryThresholdBinary.localSauvola.handle(width, k, down, inputType);
-		return new InputToBinarySwitch<T>(new ThresholdSauvola(width, k, down),inputType);
+
+		InputToBinary<GrayF32> sauvola;
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			sauvola = new ThresholdSauvola_MT(width, k, down);
+		} else {
+			sauvola = new ThresholdSauvola(width, k, down);
+		}
+		return new InputToBinarySwitch<>(sauvola,inputType);
 	}
 
 	/**
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localSauvola(ImageGray, GrayU8, ConfigLength, float, boolean)
+	 * @see ThresholdNick
 	 *
-	 * @param width Width of square region.
-	 * @param k User specified threshold adjustment factor.  Must be positive. Try -0.2
+	 * @param width size of local region.  Try 31
+	 * @param k The Niblack factor. Recommend -0.1 to -0.2
 	 * @param down Should it threshold up or down.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
@@ -80,11 +92,11 @@ public class FactoryThresholdBinary {
 	{
 //		if( BOverrideFactoryThresholdBinary.localNick != null )
 //			return BOverrideFactoryThresholdBinary.localNick.handle(width, k, down, inputType);
-		return new InputToBinarySwitch<T>(new ThresholdNick(width, k, down),inputType);
+		return new InputToBinarySwitch<>(new ThresholdNick(width, k, down),inputType);
 	}
 
 	/**
-	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localMean(ImageGray, GrayU8, ConfigLength, double, boolean, ImageGray, ImageGray)
+	 * @see boofcv.alg.filter.binary.GThresholdImageOps#localMean
 	 *
 	 * @param width Width of square region.
 	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
@@ -107,6 +119,7 @@ public class FactoryThresholdBinary {
 	 * @param scale Scale factor adjust for threshold.  1.0 means no change.
 	 * @param down Should it threshold up or down.
 	 * @param regionWidth About how wide and tall you wish a block to be in pixels.
+	 * @param tuning Tuning parameter. 0 = standard Otsu. Greater than 0 will penalize zero texture.
 	 * @param inputType Type of input image
 	 * @return Filter to binary
 	 */
@@ -114,7 +127,14 @@ public class FactoryThresholdBinary {
 	InputToBinary<T> localOtsu(boolean otsu2, ConfigLength regionWidth , double tuning, double scale, boolean down, Class<T> inputType) {
 		if( BOverrideFactoryThresholdBinary.localOtsu != null )
 			return BOverrideFactoryThresholdBinary.localOtsu.handle(otsu2,regionWidth, tuning, scale, down, inputType);
-		return new InputToBinarySwitch<>(new ThresholdLocalOtsu(otsu2,regionWidth,tuning,scale,down),inputType);
+
+		ThresholdLocalOtsu otsu;
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			otsu = new ThresholdLocalOtsu_MT(otsu2, regionWidth, tuning, scale, down);
+		} else {
+			otsu = new ThresholdLocalOtsu(otsu2, regionWidth, tuning, scale, down);
+		}
+		return new InputToBinarySwitch<>(otsu, inputType);
 	}
 
 	/**

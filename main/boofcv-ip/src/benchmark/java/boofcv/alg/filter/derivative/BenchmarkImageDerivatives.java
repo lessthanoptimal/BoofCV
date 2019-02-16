@@ -46,11 +46,11 @@ public class BenchmarkImageDerivatives {
 
 //	@Param({"100", "500", "1000", "5000", "10000"})
 	@Param({"10000"})
-	public int width;
+	public int size;
 
-	GrayU8 input = new GrayU8(width,width);
-	GrayS16 derivX = new GrayS16(width,width);
-	GrayS16 derivY = new GrayS16(width,width);
+	GrayU8 input = new GrayU8(size, size);
+	GrayS16 derivX = new GrayS16(size, size);
+	GrayS16 derivY = new GrayS16(size, size);
 	ImageBorder_S32<GrayU8> borderI32 = new ImageBorder1D_S32(BorderIndex1D_Extend.class);
 
 	@Setup
@@ -58,9 +58,9 @@ public class BenchmarkImageDerivatives {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
 
-		input.reshape(width,width);
-		derivX.reshape(width,width);
-		derivY.reshape(width,width);
+		input.reshape(size, size);
+		derivX.reshape(size, size);
+		derivY.reshape(size, size);
 
 		ImageMiscOps.fillUniform(input,rand,0,200);
 	}

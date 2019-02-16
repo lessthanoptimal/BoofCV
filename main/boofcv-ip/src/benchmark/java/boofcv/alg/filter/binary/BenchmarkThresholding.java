@@ -18,123 +18,113 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.alg.filter.binary.impl.ThresholdBlockMinMax_F32;
-import boofcv.alg.filter.binary.impl.ThresholdBlockMinMax_U8;
-import boofcv.alg.filter.binary.impl.ThresholdSauvola;
+import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.concurrency.IWorkArrays;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.ConvertImage;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
+import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Benchmark for different convolution operations.
  *
  * @author Peter Abeles
  */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value=2)
 public class BenchmarkThresholding {
-	static int imgWidth = 640;
-	static int imgHeight = 480;
-	static long TEST_TIME = 1000;
+	@Param({"true","false"})
+	public boolean concurrent;
 
-	static GrayU8 input = new GrayU8(imgWidth, imgHeight);
-	static GrayF32 inputF32 = new GrayF32(imgWidth, imgHeight);
-	static GrayS32 output_S32 = new GrayS32(imgWidth, imgHeight);
-	static GrayU8 output_U8 = new GrayU8(imgWidth, imgHeight);
-	static GrayU8 work = new GrayU8(imgWidth, imgHeight);
-	static GrayU8 work2 = new GrayU8(imgWidth, imgHeight);
-	static IWorkArrays work3 = new IWorkArrays();
+//	@Param({"5","50"})
+	@Param("50")
+	public int region;
 
-	static int threshLower = 20;
-	static int threshUpper = 30;
+	//	@Param({"100", "500", "1000", "5000", "10000"})
+	@Param({"5000"})
+	public int size;
 
-	static ConfigLength adaptiveWidth = ConfigLength.fixed(13);
+	GrayU8 inputU8 = new GrayU8(size, size);
+	GrayF32 inputF32 = new GrayF32(size, size);
+	GrayU8 output = new GrayU8(size, size);
 
-	public BenchmarkThresholding() {
+	// declare algorithms here so that they can recycle memory
+	InputToBinary<GrayU8> localOtsuU8;
+	InputToBinary<GrayU8> localMeanU8;
+	InputToBinary<GrayU8> localGaussianU8;
+	InputToBinary<GrayF32> localSauvolaF32;
+	InputToBinary<GrayF32> localNickF32;
+
+	@Setup
+	public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
-		ImageMiscOps.fillUniform(input, rand, 0, 100);
-		ConvertImage.convert(input,inputF32);
+
+		inputU8.reshape(size, size);
+		inputF32.reshape(size,size);
+		output.reshape(size, size);
+
+		ImageMiscOps.fillUniform(inputU8,rand,0,200);
+		ConvertImage.convert(inputU8,inputF32);
+
+		ConfigLength configLength = ConfigLength.fixed(region);
+
+		localOtsuU8 = FactoryThresholdBinary.localOtsu(true,configLength,0.1,1.0,true,GrayU8.class);
+		localMeanU8 = FactoryThresholdBinary.localMean(configLength,1.0,true,GrayU8.class);
+		localGaussianU8 = FactoryThresholdBinary.localGaussian(configLength,1.0,true,GrayU8.class);
+		localSauvolaF32 = FactoryThresholdBinary.localSauvola(configLength,0.3f,true,GrayF32.class);
+		localNickF32 = FactoryThresholdBinary.localNick(configLength,-0.15f,true,GrayF32.class);
 	}
 
-	public static class Threshold extends PerformerBase {
-		@Override
-		public void process() {
-			ThresholdImageOps.threshold(input, output_U8, threshLower, true);
-		}
+	@Benchmark
+	public void globalThreshold() {
+		ThresholdImageOps.threshold(inputU8,output,100,true);
 	}
 
-	public static class LocalMean extends PerformerBase {
-		@Override
-		public void process() {
-			ThresholdImageOps.localMean(input, output_U8, adaptiveWidth, 0, true, work, work2,work3);
-		}
+	@Benchmark
+	public void localOtsu() {
+		localOtsuU8.process(inputU8,output);
 	}
 
-	public static class LocalGaussian extends PerformerBase {
-		@Override
-		public void process() {
-			ThresholdImageOps.localGaussian(input, output_U8, adaptiveWidth, 0, true, work, work2);
-		}
+	@Benchmark
+	public void localMean() {
+		localMeanU8.process(inputU8,output);
 	}
 
-	public static class LocalSauvola extends PerformerBase {
-		@Override
-		public void process() {
-			GThresholdImageOps.localSauvola(input, output_U8, adaptiveWidth, 0.3f, true);
-		}
+	@Benchmark
+	public void localGaussian() {
+		localGaussianU8.process(inputU8,output);
 	}
 
-	public static class LocalSauvola2 extends PerformerBase {
-		ThresholdSauvola alg = new ThresholdSauvola(adaptiveWidth,0.3f, true);
-		@Override
-		public void process() {
-			alg.process(inputF32,output_U8);
-		}
+	@Benchmark
+	public void localSauvola() {
+		localSauvolaF32.process(inputF32,output);
 	}
 
-	public static class LocalNick extends PerformerBase {
-		@Override
-		public void process() {
-			GThresholdImageOps.localNick(input, output_U8, adaptiveWidth, -0.2f, true);
-		}
+	@Benchmark
+	public void localNick() {
+		localNickF32.process(inputF32,output);
 	}
 
-	public static class SquareBlockMinMax_F32 extends PerformerBase {
-		ThresholdBlockMinMax_F32 alg = new ThresholdBlockMinMax_F32(20,adaptiveWidth,0.95f,true, true);
-		@Override
-		public void process() {
-			alg.process(inputF32,output_U8);
-		}
-	}
+	public static void main(String[] args) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkThresholding.class.getSimpleName())
+				.build();
 
-	public static class SquareBlockMinMax_U8 extends PerformerBase {
-		ThresholdBlockMinMax_U8 alg = new ThresholdBlockMinMax_U8(20,adaptiveWidth,0.95,true, true);
-		@Override
-		public void process() {
-			alg.process(input,output_U8);
-		}
-	}
-
-
-	public static void main(String args[]) {
-
-		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
-		System.out.println();
-
-		ProfileOperation.printOpsPerSec(new Threshold(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new LocalMean(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new LocalGaussian(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new LocalSauvola(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new LocalSauvola2(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new LocalNick(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new SquareBlockMinMax_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new SquareBlockMinMax_U8(), TEST_TIME);
-
+		new Runner(opt).run();
 	}
 }

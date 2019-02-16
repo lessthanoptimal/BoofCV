@@ -19,9 +19,9 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.filter.binary.impl.ThresholdSauvola;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.HistogramStatistics;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.FWorkArrays;
 import boofcv.concurrency.IWorkArrays;
 import boofcv.concurrency.WorkArrays;
@@ -39,6 +39,7 @@ import javax.annotation.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class GThresholdImageOps {
 
 	/**
@@ -626,10 +627,10 @@ public class GThresholdImageOps {
 	}
 
 	/**
-	 * Applies {@link boofcv.alg.filter.binary.impl.ThresholdSauvola Sauvola} thresholding to the input image.
+	 * Applies {@link ThresholdSauvola Sauvola} thresholding to the input image.
 	 * Intended for use with text image.
 	 *
-	 * @see boofcv.alg.filter.binary.impl.ThresholdSauvola
+	 * @see ThresholdSauvola
 	 *
 	 * @param input Input image.
 	 * @param output (optional) Output binary image.  If null it will be declared internally.
@@ -641,7 +642,13 @@ public class GThresholdImageOps {
 	public static <T extends ImageGray<T>>
 	GrayU8 localSauvola(T input, GrayU8 output, ConfigLength width, float k, boolean down)
 	{
-		ThresholdSauvola alg = new ThresholdSauvola(width,k, down);
+		InputToBinary<GrayF32> alg;
+
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			alg = new ThresholdSauvola_MT(width, k, down);
+		} else {
+			alg = new ThresholdSauvola(width, k, down);
+		}
 
 		if( output == null )
 			output = new GrayU8(input.width,input.height);
@@ -673,7 +680,9 @@ public class GThresholdImageOps {
 	public static <T extends ImageGray<T>>
 	GrayU8 localNick(T input, GrayU8 output, ConfigLength width, float k, boolean down)
 	{
-		ThresholdNick alg = new ThresholdNick(width,k, down);
+		InputToBinary<GrayF32> alg =
+				BoofConcurrency.USE_CONCURRENT ?
+				new ThresholdNick_MT(width,k, down) : new ThresholdNick(width, k, down);
 
 		if( output == null )
 			output = new GrayU8(input.width,input.height);

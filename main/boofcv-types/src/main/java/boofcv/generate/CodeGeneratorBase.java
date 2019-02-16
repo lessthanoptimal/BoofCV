@@ -18,6 +18,7 @@
 
 package boofcv.generate;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -32,6 +33,10 @@ public abstract class CodeGeneratorBase {
 
 	protected PrintStream out;
 	protected String className;
+	/**
+	 * If true the output will be in the source directory, overwriting existing code
+	 */
+	protected boolean overwrite = true;
 
 	public CodeGeneratorBase(boolean useDefaultName) {
 		if( useDefaultName ) {
@@ -88,11 +93,31 @@ public abstract class CodeGeneratorBase {
 	public abstract void generate() throws FileNotFoundException;
 
 	public void initFile() throws FileNotFoundException {
-		out = new PrintStream(new FileOutputStream(className + ".java"));
+		File file = new File(className + ".java");
+		if( overwrite ) {
+			file = new File(packageToPath(getClass()),file.getName());
+			if( !file.getParentFile().exists() ) {
+				if( !file.getParentFile().mkdirs() ) {
+					throw new RuntimeException("Failed to create path "+file.getParentFile().getPath());
+				}
+			}
+		}
+		out = new PrintStream(new FileOutputStream(file));
 		out.print(CodeGeneratorUtil.copyright);
 		out.println();
 		out.println("package " + getPackage() + ";");
 		out.println();
+	}
+
+	public File packageToPath( Class c ) {
+		String name = c.getCanonicalName();
+
+		String words[] = name.split("\\.");
+		String path = "src/main/java/";
+		for (int i = 0; i < words.length-1; i++) {
+			path += words[i] + "/";
+		}
+		return new File(path);
 	}
 
 	public void setOutputFile( String className ) throws FileNotFoundException {
@@ -100,6 +125,10 @@ public abstract class CodeGeneratorBase {
 			throw new IllegalArgumentException("ClassName already set.  Out of date code?");
 		this.className = className;
 		initFile();
+	}
+
+	public void setOverwrite(boolean overwrite) {
+		this.overwrite = overwrite;
 	}
 
 	public String generateDocString() {
