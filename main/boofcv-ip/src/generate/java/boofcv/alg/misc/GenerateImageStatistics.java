@@ -55,7 +55,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				" *\n"+
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				generatedString() +
+				generatedAnnotation() +
 				"public class "+className+" {\n\n");
 	}
 

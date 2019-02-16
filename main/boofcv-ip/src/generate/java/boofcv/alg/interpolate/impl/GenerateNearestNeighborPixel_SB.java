@@ -80,7 +80,7 @@ public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 				" * Performs nearest neighbor interpolation to extract values between pixels in an image.\n" +
 				" * </p>\n" +
 				" *\n" +
-				generatedDocString() +
+				generateDocString() +
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +

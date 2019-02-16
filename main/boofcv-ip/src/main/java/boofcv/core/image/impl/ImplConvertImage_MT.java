@@ -18,10 +18,10 @@
 
 package boofcv.core.image.impl;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>
@@ -37,22 +37,20 @@ import javax.annotation.Generated;
  */
 @Generated("boofcv.core.image.impl.GenerateImplConvertImage")
 @SuppressWarnings("Duplicates")
-public class ImplConvertImage {
+public class ImplConvertImage_MT {
 
 	public static void convert( GrayU8 input, GrayI8 output ) {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( byte )( input.data[indexSrc++] & 0xFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
@@ -66,16 +64,14 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( byte )( input.data[indexSrc++] & 0xFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
@@ -88,26 +84,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( short )( input.data[indexSrc++] & 0xFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] & 0xFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -116,26 +109,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( short )( input.data[indexSrc++] & 0xFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] & 0xFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -143,26 +133,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] & 0xFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -171,26 +158,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] & 0xFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -198,26 +182,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] & 0xFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -226,26 +207,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] & 0xFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -253,26 +231,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( float )( input.data[indexSrc++] & 0xFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] & 0xFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -281,26 +256,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( float )( input.data[indexSrc++] & 0xFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] & 0xFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -308,26 +280,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( double )( input.data[indexSrc++] & 0xFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] & 0xFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -336,26 +305,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( double )( input.data[indexSrc++] & 0xFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] & 0xFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -366,8 +332,7 @@ public class ImplConvertImage {
 			GrayU8 band = output.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -375,8 +340,7 @@ public class ImplConvertImage {
 					band.data[indexDst++] = input.data[indexSrc];
 					indexSrc += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -387,8 +351,7 @@ public class ImplConvertImage {
 			GrayU8 band = input.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -397,8 +360,7 @@ public class ImplConvertImage {
 					output.data[indexDst] = band.data[indexSrc++];
 					indexDst += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -406,16 +368,14 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
@@ -429,16 +389,14 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
@@ -451,26 +409,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( short )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -479,26 +434,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( short )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -506,26 +458,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -534,26 +483,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -561,26 +507,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -589,26 +532,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -616,26 +556,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( float )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -644,26 +581,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( float )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -671,26 +605,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( double )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -699,26 +630,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( double )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -729,8 +657,7 @@ public class ImplConvertImage {
 			GrayS8 band = output.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -738,8 +665,7 @@ public class ImplConvertImage {
 					band.data[indexDst++] = input.data[indexSrc];
 					indexSrc += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -750,8 +676,7 @@ public class ImplConvertImage {
 			GrayS8 band = input.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -760,8 +685,7 @@ public class ImplConvertImage {
 					output.data[indexDst] = band.data[indexSrc++];
 					indexDst += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -769,26 +693,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( byte )( input.data[indexSrc++] & 0xFFFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] & 0xFFFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -797,26 +718,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( byte )( input.data[indexSrc++] & 0xFFFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] & 0xFFFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -824,16 +742,14 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( short )( input.data[indexSrc++] & 0xFFFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
@@ -847,16 +763,14 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( short )( input.data[indexSrc++] & 0xFFFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
@@ -869,26 +783,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] & 0xFFFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFFFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -897,26 +808,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] & 0xFFFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFFFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -924,26 +832,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] & 0xFFFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFFFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -952,26 +857,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] & 0xFFFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFFFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -979,26 +881,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( float )( input.data[indexSrc++] & 0xFFFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] & 0xFFFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1007,26 +906,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( float )( input.data[indexSrc++] & 0xFFFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] & 0xFFFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1034,26 +930,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( double )( input.data[indexSrc++] & 0xFFFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] & 0xFFFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1062,26 +955,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( double )( input.data[indexSrc++] & 0xFFFF);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] & 0xFFFF);
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1092,8 +982,7 @@ public class ImplConvertImage {
 			GrayU16 band = output.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -1101,8 +990,7 @@ public class ImplConvertImage {
 					band.data[indexDst++] = input.data[indexSrc];
 					indexSrc += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -1113,8 +1001,7 @@ public class ImplConvertImage {
 			GrayU16 band = input.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -1123,8 +1010,7 @@ public class ImplConvertImage {
 					output.data[indexDst] = band.data[indexSrc++];
 					indexDst += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -1132,26 +1018,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( byte )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1160,26 +1043,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( byte )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1187,16 +1067,14 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
@@ -1210,16 +1088,14 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
@@ -1232,26 +1108,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1260,26 +1133,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1287,26 +1157,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1315,26 +1182,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1342,26 +1206,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( float )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1370,26 +1231,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( float )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1397,26 +1255,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( double )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1425,26 +1280,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( double )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1455,8 +1307,7 @@ public class ImplConvertImage {
 			GrayS16 band = output.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -1464,8 +1315,7 @@ public class ImplConvertImage {
 					band.data[indexDst++] = input.data[indexSrc];
 					indexSrc += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -1476,8 +1326,7 @@ public class ImplConvertImage {
 			GrayS16 band = input.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -1486,8 +1335,7 @@ public class ImplConvertImage {
 					output.data[indexDst] = band.data[indexSrc++];
 					indexDst += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -1495,26 +1343,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( byte )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1523,26 +1368,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( byte )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1550,26 +1392,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( short )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1578,26 +1417,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( short )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1605,26 +1441,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1633,26 +1466,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1660,26 +1490,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( float )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1688,26 +1515,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( float )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1715,26 +1539,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( double )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1743,26 +1564,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( double )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1773,8 +1591,7 @@ public class ImplConvertImage {
 			GrayS32 band = output.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -1782,8 +1599,7 @@ public class ImplConvertImage {
 					band.data[indexDst++] = input.data[indexSrc];
 					indexSrc += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -1794,8 +1610,7 @@ public class ImplConvertImage {
 			GrayS32 band = input.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -1804,8 +1619,7 @@ public class ImplConvertImage {
 					output.data[indexDst] = band.data[indexSrc++];
 					indexDst += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -1813,26 +1627,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( byte )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1841,26 +1652,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( byte )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1868,26 +1676,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( short )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1896,26 +1701,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( short )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1923,26 +1725,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( int )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( int )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1951,26 +1750,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( int )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( int )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -1978,26 +1774,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( float )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2006,26 +1799,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( float )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2033,26 +1823,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( double )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2061,26 +1848,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( double )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2091,8 +1875,7 @@ public class ImplConvertImage {
 			GrayS64 band = output.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -2100,8 +1883,7 @@ public class ImplConvertImage {
 					band.data[indexDst++] = input.data[indexSrc];
 					indexSrc += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -2112,8 +1894,7 @@ public class ImplConvertImage {
 			GrayS64 band = input.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -2122,8 +1903,7 @@ public class ImplConvertImage {
 					output.data[indexDst] = band.data[indexSrc++];
 					indexDst += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -2131,26 +1911,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( byte )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2159,26 +1936,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( byte )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2186,26 +1960,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( short )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2214,26 +1985,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( short )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2241,26 +2009,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( int )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( int )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2269,26 +2034,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( int )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( int )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2296,26 +2058,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( long )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( long )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2324,26 +2083,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( long )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( long )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2351,26 +2107,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( double )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2379,26 +2132,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( double )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2409,8 +2159,7 @@ public class ImplConvertImage {
 			GrayF32 band = output.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -2418,8 +2167,7 @@ public class ImplConvertImage {
 					band.data[indexDst++] = input.data[indexSrc];
 					indexSrc += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -2430,8 +2178,7 @@ public class ImplConvertImage {
 			GrayF32 band = input.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -2440,8 +2187,7 @@ public class ImplConvertImage {
 					output.data[indexDst] = band.data[indexSrc++];
 					indexDst += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -2449,26 +2195,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( byte )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2477,26 +2220,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( byte )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2504,26 +2244,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( short )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2532,26 +2269,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( short )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2559,26 +2293,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( int )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( int )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2587,26 +2318,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( int )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( int )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2614,26 +2342,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( long )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( long )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2642,26 +2367,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( long )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( long )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2669,26 +2391,23 @@ public class ImplConvertImage {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < input.width; x++) {
 					output.data[indexDst++] = ( float )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height;
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2697,26 +2416,23 @@ public class ImplConvertImage {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
 				for (int x = 0; x < N; x++) {
 					output.data[indexDst++] = ( float )( input.data[indexSrc++] );
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{
-			int i0 = 0, i1 = N;
+			BoofConcurrency.blocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
-			//CONCURRENT_INLINE });
+			});
 		}
 	}
 
@@ -2727,8 +2443,7 @@ public class ImplConvertImage {
 			GrayF64 band = output.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -2736,8 +2451,7 @@ public class ImplConvertImage {
 					band.data[indexDst++] = input.data[indexSrc];
 					indexSrc += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -2748,8 +2462,7 @@ public class ImplConvertImage {
 			GrayF64 band = input.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -2758,8 +2471,7 @@ public class ImplConvertImage {
 					output.data[indexDst] = band.data[indexSrc++];
 					indexDst += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -2770,8 +2482,7 @@ public class ImplConvertImage {
 			GrayF32 band = output.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -2779,8 +2490,7 @@ public class ImplConvertImage {
 					band.data[indexDst++] = (input.data[indexSrc]& 0xFF);
 					indexSrc += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -2791,8 +2501,7 @@ public class ImplConvertImage {
 			GrayU8 band = output.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -2800,8 +2509,7 @@ public class ImplConvertImage {
 					band.data[indexDst++] = (byte)(input.data[indexSrc]);
 					indexSrc += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -2812,8 +2520,7 @@ public class ImplConvertImage {
 			GrayU8 band = input.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -2822,8 +2529,7 @@ public class ImplConvertImage {
 					output.data[indexDst] = (band.data[indexSrc++]& 0xFF);
 					indexDst += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -2834,8 +2540,7 @@ public class ImplConvertImage {
 			GrayF32 band = input.bands[i];
 			final int offset = i;
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
-			for (int y = 0; y < input.height; y++) {
+			BoofConcurrency.range(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -2844,8 +2549,7 @@ public class ImplConvertImage {
 					output.data[indexDst] = (byte)(band.data[indexSrc++]);
 					indexDst += numBands;
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 

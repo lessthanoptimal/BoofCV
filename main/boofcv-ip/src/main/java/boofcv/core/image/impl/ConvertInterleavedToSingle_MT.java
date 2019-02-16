@@ -18,10 +18,10 @@
 
 package boofcv.core.image.impl;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * Low level implementations of different methods for converting {@link boofcv.struct.image.ImageInterleaved} into
@@ -39,7 +39,7 @@ import javax.annotation.Generated;
  */
 @Generated("boofcv.core.image.impl.GenerateConvertInterleavedToSingle")
 @SuppressWarnings("Duplicates")
-public class ConvertInterleavedToSingle {
+public class ConvertInterleavedToSingle_MT {
 
 	public static void average( InterleavedU8 from , GrayU8 to ) {
 		final int numBands = from.getNumBands();
@@ -51,8 +51,7 @@ public class ConvertInterleavedToSingle {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -63,11 +62,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++]& 0xFF;
 					to.data[indexTo++] = (byte)(sum/2);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else if( numBands == 3 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -79,11 +76,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++]& 0xFF;
 					to.data[indexTo++] = (byte)(sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -95,8 +90,7 @@ public class ConvertInterleavedToSingle {
 					}
 					to.data[indexTo++] = (byte)(sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -110,8 +104,7 @@ public class ConvertInterleavedToSingle {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -122,11 +115,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++];
 					to.data[indexTo++] = (byte)(sum/2);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else if( numBands == 3 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -138,11 +129,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++];
 					to.data[indexTo++] = (byte)(sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -154,8 +143,7 @@ public class ConvertInterleavedToSingle {
 					}
 					to.data[indexTo++] = (byte)(sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -169,8 +157,7 @@ public class ConvertInterleavedToSingle {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -181,11 +168,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++]& 0xFFFF;
 					to.data[indexTo++] = (short)(sum/2);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else if( numBands == 3 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -197,11 +182,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++]& 0xFFFF;
 					to.data[indexTo++] = (short)(sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -213,8 +196,7 @@ public class ConvertInterleavedToSingle {
 					}
 					to.data[indexTo++] = (short)(sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -228,8 +210,7 @@ public class ConvertInterleavedToSingle {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -240,11 +221,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++];
 					to.data[indexTo++] = (short)(sum/2);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else if( numBands == 3 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -256,11 +235,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++];
 					to.data[indexTo++] = (short)(sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -272,8 +249,7 @@ public class ConvertInterleavedToSingle {
 					}
 					to.data[indexTo++] = (short)(sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -287,8 +263,7 @@ public class ConvertInterleavedToSingle {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -299,11 +274,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++];
 					to.data[indexTo++] = (sum/2);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else if( numBands == 3 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -315,11 +288,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++];
 					to.data[indexTo++] = (sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -331,8 +302,7 @@ public class ConvertInterleavedToSingle {
 					}
 					to.data[indexTo++] = (sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -346,8 +316,7 @@ public class ConvertInterleavedToSingle {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -358,11 +327,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++];
 					to.data[indexTo++] = (sum/2);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else if( numBands == 3 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -374,11 +341,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++];
 					to.data[indexTo++] = (sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -390,8 +355,7 @@ public class ConvertInterleavedToSingle {
 					}
 					to.data[indexTo++] = (sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -405,8 +369,7 @@ public class ConvertInterleavedToSingle {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -417,11 +380,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++];
 					to.data[indexTo++] = (sum/2);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else if( numBands == 3 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -433,11 +394,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++];
 					to.data[indexTo++] = (sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -449,8 +408,7 @@ public class ConvertInterleavedToSingle {
 					}
 					to.data[indexTo++] = (sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -464,8 +422,7 @@ public class ConvertInterleavedToSingle {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -476,11 +433,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++];
 					to.data[indexTo++] = (sum/2);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else if( numBands == 3 ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -492,11 +447,9 @@ public class ConvertInterleavedToSingle {
 					sum += from.data[indexFrom++];
 					to.data[indexTo++] = (sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -508,8 +461,7 @@ public class ConvertInterleavedToSingle {
 					}
 					to.data[indexTo++] = (sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 

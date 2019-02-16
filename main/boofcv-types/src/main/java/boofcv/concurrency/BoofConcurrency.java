@@ -116,9 +116,9 @@ public class BoofConcurrency {
 		if( range <= 0 )
 			throw new IllegalArgumentException("end must be more than start");
 
-		// Process more blocks than an even split would do. This avoids an unlucky process from getting
-		// stuck with a hard task and taking too long
-		int blockSize = Math.max(1,range/(4*numThreads));
+		// Did some experimentation here. Gave it more threads than were needed or exactly what was needed
+		// exactly seemed to do better in the test cases
+		int blockSize = Math.max(1,range/numThreads);
 
 		try {
 			pool.submit(new IntRangeTask(0,start,endExclusive,blockSize,consumer)).get();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,126 +19,123 @@
 package boofcv.core.image;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.InterleavedU8;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.core.image.impl.ImplConvertImage;
+import boofcv.core.image.impl.ImplConvertImage_MT;
+import boofcv.struct.image.*;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Benchmarks related to functions inside of ConvertImage
  * 
  * @author Peter Abeles
  */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value=2)
 public class BenchmarkConvertImage {
-	static int imgWidth = 4000;
-	static int imgHeight = 2000;
+	@Param({"true","false"})
+	public boolean concurrent;
 
-	static GrayF32 imgFloat32;
-	static GrayU8 imgUInt8;
-	static GrayS16 imgUInt16;
-	static GrayU8 imgSInt8;
-	static GrayS16 imgSInt16;
-	static InterleavedU8 interU8;
+	//	@Param({"100", "500", "1000", "5000", "10000"})
+	@Param({"10000"})
+	public int size;
 
-	public static class IU8_to_U8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvertImage.average(interU8,imgUInt8);
-		}
-	}
+	private final int numBands = 3;
 
-	public static class F32_to_U8 extends PerformerBase
-	{
-		@Override
-		public void process() {
-			ConvertImage.convert(imgFloat32,imgUInt8);
-		}
-	}
+	GrayU8 grayU8 = new GrayU8(size, size);
+	GrayF32 grayF32 = new GrayF32(size, size);
+	InterleavedU8 interU8 = new InterleavedU8(size, size,numBands);
+	InterleavedF32 interF32 = new InterleavedF32(size, size,numBands);
+	Planar<GrayU8> planarU8 = new Planar<>(GrayU8.class,size,size,numBands);
+	Planar<GrayF32> planarF32 = new Planar<>(GrayF32.class,size,size,numBands);
 
-	public static class U8_to_F32 extends PerformerBase
-	{
-		GrayU8 img;
-
-		public U8_to_F32(GrayU8 img) {
-			this.img = img;
-		}
-
-		@Override
-		public void process() {
-			ConvertImage.convert(img,imgFloat32);
-		}
-	}
-
-	public static class S16_to_F32 extends PerformerBase
-	{
-		GrayS16 img;
-
-		public S16_to_F32(GrayS16 img) {
-			this.img = img;
-		}
-
-		@Override
-		public void process() {
-			ConvertImage.convert(img,imgFloat32);
-		}
-	}
-
-	public static class S16_to_S8 extends PerformerBase
-	{
-		GrayS16 img;
-
-		public S16_to_S8(GrayS16 img) {
-			this.img = img;
-		}
-
-		@Override
-		public void process() {
-			ConvertImage.convert(img,imgSInt8);
-		}
-	}
-
-	public static void main( String args[] ) {
+	@Setup
+	public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
 
-		imgSInt8 = new GrayU8(imgWidth,imgHeight);
-		imgSInt16 = new GrayS16(imgWidth,imgHeight);
-		imgUInt8 = new GrayU8(imgWidth,imgHeight);
-		imgUInt16 = new GrayS16(imgWidth,imgHeight);
-		imgFloat32 = new GrayF32(imgWidth,imgHeight);
-		interU8 = new InterleavedU8(imgWidth,imgHeight,3);
+		grayU8.reshape(size,size);
+		grayF32.reshape(size,size);
+		interU8.reshape(size,size);
+		interF32.reshape(size,size);
+		planarU8.reshape(size,size);
+		planarF32.reshape(size,size);
 
-		// randomize images so that they aren't all zeros, which can skew results
-		GImageMiscOps.fillUniform(imgSInt8,rand,0,10);
-		GImageMiscOps.fillUniform(imgSInt16,rand,0,10);
-		GImageMiscOps.fillUniform(imgUInt8,rand,0,10);
-		GImageMiscOps.fillUniform(imgUInt16,rand,0,10);
-		GImageMiscOps.fillUniform(imgFloat32,rand,0,10);
-		GImageMiscOps.fillUniform(interU8,rand,0,10);
+//		grayU8 = BoofTesting.createSubImageOf(grayU8);
 
-		System.out.println("=========  Profile Image Size "+imgWidth+" x "+imgHeight+" ==========");
-		System.out.println();
+		// convert is faster than more random numbers
+		GImageMiscOps.fillUniform(grayU8,rand,0,200);
+		ConvertImage.convert(grayU8,grayF32);
+		GImageMiscOps.fillUniform(interU8,rand,0,200);
+		ConvertImage.convert(interU8,interF32);
+		GImageMiscOps.fillUniform(planarU8,rand,0,200);
+		GConvertImage.convert(planarU8,planarF32);
+	}
 
-		System.out.printf("InterleavedU8 to GrayU8      %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new IU8_to_U8(),1000, false));
-		System.out.printf("Float32 to Int8              %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new F32_to_U8(),1000, false));
-		System.out.printf("Int8 to Float32 signed       %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new U8_to_F32(imgSInt8),1000, false));
-		System.out.printf("Int8 to Float32 unsigned     %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new U8_to_F32(imgUInt8),1000, false));
-		System.out.printf("Int16 to Float32 signed       %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new S16_to_F32(imgSInt16),1000, false));
-		System.out.printf("Int16 to Float32 unsigned     %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new S16_to_F32(imgUInt16),1000, false));
-		System.out.printf("Int16 to Int8 signed          %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new S16_to_S8(imgSInt16),1000, false));
-		System.out.printf("Int16 to Int8 unsigned        %10.2f ops/sec\n",
-				ProfileOperation.profileOpsPerSec(new S16_to_S8(imgUInt16),1000, false));
+	@Benchmark
+	public void GRU8_to_GRF32() {
+		// manually turn on and off threading to show it doesn't do much
+		if( concurrent ) {
+			ImplConvertImage_MT.convert(grayU8, grayF32);
+		} else {
+			ImplConvertImage.convert(grayU8, grayF32);
+		}
+	}
 
+	@Benchmark
+	public void GRF32_to_GRU8() {
+		if( concurrent ) {
+			ImplConvertImage_MT.convert(grayF32, grayU8);
+		} else {
+			ImplConvertImage.convert(grayF32, grayU8);
+		}
+	}
+
+	@Benchmark
+	public void ITU8_to_ITF32() {
+		if( concurrent ) {
+			ImplConvertImage_MT.convert(interU8, interF32);
+		} else {
+			ImplConvertImage.convert(interU8, interF32);
+		}
+	}
+
+	@Benchmark
+	public void ITU8_to_PL32() {
+		ConvertImage.convert(interU8,planarU8);
+	}
+
+	@Benchmark
+	public void PL32_to_ITU8() {
+		ConvertImage.convert(interU8,planarU8);
+	}
+
+	@Benchmark
+	public void ITU8_to_GRU8() {
+		ConvertImage.average(interU8,grayU8);
+	}
+
+	@Benchmark
+	public void PLU8_to_GRU8() {
+		ConvertImage.average(planarU8,grayU8);
+	}
+
+	public static void main(String[] args) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkConvertImage.class.getSimpleName())
+				.build();
+
+		new Runner(opt).run();
 	}
 }

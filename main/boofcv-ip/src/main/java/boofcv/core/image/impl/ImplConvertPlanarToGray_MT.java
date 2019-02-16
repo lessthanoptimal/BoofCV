@@ -18,10 +18,10 @@
 
 package boofcv.core.image.impl;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * Low level implementations of different methods for converting {@link Planar} into
@@ -39,7 +39,7 @@ import javax.annotation.Generated;
  */
 @Generated("boofcv.core.image.impl.GenerateImplConvertPlanarToGray")
 @SuppressWarnings("Duplicates")
-public class ImplConvertPlanarToGray {
+public class ImplConvertPlanarToGray_MT {
 
 	public static void average( Planar<GrayU8> from , GrayU8 to ) {
 		int numBands = from.getNumBands();
@@ -51,8 +51,7 @@ public class ImplConvertPlanarToGray {
 			GrayU8 band1 = from.getBand(1);
 			GrayU8 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -63,11 +62,9 @@ public class ImplConvertPlanarToGray {
 
 					to.data[indexTo++] = (byte)(sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -78,8 +75,7 @@ public class ImplConvertPlanarToGray {
 					}
 					to.data[indexTo++] = (byte)(sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -93,8 +89,7 @@ public class ImplConvertPlanarToGray {
 			GrayS8 band1 = from.getBand(1);
 			GrayS8 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -105,11 +100,9 @@ public class ImplConvertPlanarToGray {
 
 					to.data[indexTo++] = (byte)(sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -120,8 +113,7 @@ public class ImplConvertPlanarToGray {
 					}
 					to.data[indexTo++] = (byte)(sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -135,8 +127,7 @@ public class ImplConvertPlanarToGray {
 			GrayU16 band1 = from.getBand(1);
 			GrayU16 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -147,11 +138,9 @@ public class ImplConvertPlanarToGray {
 
 					to.data[indexTo++] = (short)(sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -162,8 +151,7 @@ public class ImplConvertPlanarToGray {
 					}
 					to.data[indexTo++] = (short)(sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -177,8 +165,7 @@ public class ImplConvertPlanarToGray {
 			GrayS16 band1 = from.getBand(1);
 			GrayS16 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -189,11 +176,9 @@ public class ImplConvertPlanarToGray {
 
 					to.data[indexTo++] = (short)(sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -204,8 +189,7 @@ public class ImplConvertPlanarToGray {
 					}
 					to.data[indexTo++] = (short)(sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -219,8 +203,7 @@ public class ImplConvertPlanarToGray {
 			GrayS32 band1 = from.getBand(1);
 			GrayS32 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -231,11 +214,9 @@ public class ImplConvertPlanarToGray {
 
 					to.data[indexTo++] = (sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -246,8 +227,7 @@ public class ImplConvertPlanarToGray {
 					}
 					to.data[indexTo++] = (sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -261,8 +241,7 @@ public class ImplConvertPlanarToGray {
 			GrayS64 band1 = from.getBand(1);
 			GrayS64 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -273,11 +252,9 @@ public class ImplConvertPlanarToGray {
 
 					to.data[indexTo++] = (sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -288,8 +265,7 @@ public class ImplConvertPlanarToGray {
 					}
 					to.data[indexTo++] = (sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -303,8 +279,7 @@ public class ImplConvertPlanarToGray {
 			GrayF32 band1 = from.getBand(1);
 			GrayF32 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -315,11 +290,9 @@ public class ImplConvertPlanarToGray {
 
 					to.data[indexTo++] = (sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -330,8 +303,7 @@ public class ImplConvertPlanarToGray {
 					}
 					to.data[indexTo++] = (sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -345,8 +317,7 @@ public class ImplConvertPlanarToGray {
 			GrayF64 band1 = from.getBand(1);
 			GrayF64 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -357,11 +328,9 @@ public class ImplConvertPlanarToGray {
 
 					to.data[indexTo++] = (sum/3);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
-			for (int y = 0; y < from.height; y++) {
+			BoofConcurrency.range(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -372,8 +341,7 @@ public class ImplConvertPlanarToGray {
 					}
 					to.data[indexTo++] = (sum/numBands);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 

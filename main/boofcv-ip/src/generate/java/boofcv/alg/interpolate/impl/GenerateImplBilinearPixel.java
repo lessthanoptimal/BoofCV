@@ -78,7 +78,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				" * Implementation of {@link BilinearPixelS} for a specific image type.\n" +
 				" * </p>\n" +
 				" *\n" +
-				generatedDocString() +
+				generateDocString() +
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +

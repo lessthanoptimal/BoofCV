@@ -73,7 +73,7 @@ public class GenerateImplInterpolatePixelConvolution extends CodeGeneratorBase {
 				" * important for the unsafe_get() function which does not re-normalize.\n" +
 				" * </p>\n" +
 				" *\n" +
-				generatedDocString() +
+				generateDocString() +
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +

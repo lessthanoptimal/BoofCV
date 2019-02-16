@@ -58,7 +58,7 @@ public class GenerateImplImageBandMath extends CodeGeneratorBase {
 				" * @author Nico\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				generatedString() +
+				generatedAnnotation() +
 				"@SuppressWarnings(\"Duplicates\")\n" +
 				"public class " + className + " {\n\n");
 	}

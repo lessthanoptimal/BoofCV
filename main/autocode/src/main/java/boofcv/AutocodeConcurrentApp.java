@@ -268,6 +268,9 @@ public class AutocodeConcurrentApp {
 				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplEdgeNonMaxSuppression.java",
 				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplEdgeNonMaxSuppressionCrude.java",
 				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplGradientToEdgeFeatures.java",
+				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ImplConvertImage.java",
+				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ConvertInterleavedToSingle.java",
+				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ImplConvertPlanarToGray.java",
 		};
 
 		for( String f : files ) {
