@@ -45,12 +45,15 @@ public class SequencePoint2Transform2_F32 implements Point2Transform2_F32 {
 		}
 	}
 
+	/**
+	 * Creates a copy
+	 */
 	@Override
-	public boolean isThreadSafe() {
+	public SequencePoint2Transform2_F32 copy() {
+		Point2Transform2_F32[] s = new Point2Transform2_F32[ sequence.length ];
 		for (int i = 0; i < sequence.length; i++) {
-			if( !sequence[i].isThreadSafe() )
-				return false;
+			s[i] = sequence[i].copy();
 		}
-		return true;
+		return new SequencePoint2Transform2_F32(s);
 	}
 }

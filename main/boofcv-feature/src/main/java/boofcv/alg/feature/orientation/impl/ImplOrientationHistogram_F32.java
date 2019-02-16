@@ -91,7 +91,7 @@ public class ImplOrientationHistogram_F32 extends OrientationHistogram<GrayF32> 
 	}
 
 	@Override
-	public RegionOrientation newInstance() {
+	public RegionOrientation copy() {
 		return new ImplOrientationHistogram_F32(objectToSample,numAngles,isWeighted);
 	}
 }

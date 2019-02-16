@@ -52,5 +52,5 @@ public interface InterpolatePixelS<T extends ImageGray<T>> extends InterpolatePi
 	/**
 	 * Creates a new instance of this interpolation method
 	 */
-	InterpolatePixelS<T> newInstance();
+	InterpolatePixelS<T> copy();
 }

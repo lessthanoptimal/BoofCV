@@ -91,7 +91,7 @@ public class ImplOrientationHistogram_S16 extends OrientationHistogram<GrayS16> 
 	}
 
 	@Override
-	public RegionOrientation newInstance() {
+	public RegionOrientation copy() {
 		return new ImplOrientationHistogram_S16(objectToSample,numAngles,isWeighted);
 	}
 }

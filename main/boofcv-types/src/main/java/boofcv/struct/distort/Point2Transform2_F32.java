@@ -37,8 +37,7 @@ public interface Point2Transform2_F32 {
 	void compute( float x, float y, Point2D_F32 out);
 
 	/**
-	 * If it returns true it is threadsafe and can be used inside of concurrent code
-	 * @return true for thread safe and false for not
+	 * Creates a copy
 	 */
-	boolean isThreadSafe();
+	Point2Transform2_F32 copy();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,6 +43,10 @@ public class EquirectangularRotate_F32 extends EquirectangularDistortBase_F32 {
 				tools.equiToNormFV(x,y,vectors[y*width+x]);
 			}
 		}
+	}
 
+	@Override
+	public EquirectangularRotate_F32 copy() {
+		throw new RuntimeException("Implement");
 	}
 }

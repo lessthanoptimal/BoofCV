@@ -34,7 +34,8 @@ public class DoNothingPixelTransform_F32 implements PixelTransform<Point2D_F32> 
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return true;
+	public DoNothingPixelTransform_F32 copy() {
+		return new DoNothingPixelTransform_F32();
 	}
+
 }

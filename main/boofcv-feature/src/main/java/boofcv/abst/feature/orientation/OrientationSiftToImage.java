@@ -88,7 +88,7 @@ public class OrientationSiftToImage<T extends ImageGray<T>>
 	}
 
 	@Override
-	public RegionOrientation newInstance() {
+	public RegionOrientation copy() {
 		throw new RuntimeException("IMplement");
 	}
 }

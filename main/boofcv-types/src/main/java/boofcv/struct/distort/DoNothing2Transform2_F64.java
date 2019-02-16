@@ -33,7 +33,7 @@ public class DoNothing2Transform2_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return true;
+	public DoNothing2Transform2_F64 copy() {
+		return new DoNothing2Transform2_F64();
 	}
 }

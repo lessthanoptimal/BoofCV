@@ -54,6 +54,6 @@ public interface InterpolatePixelMB<T extends ImageBase<T>> extends InterpolateP
 	/**
 	 * Creates a new instance of this interpolation method
 	 */
-	InterpolatePixelMB<T> newInstance();
+	InterpolatePixelMB<T> copy();
 
 }

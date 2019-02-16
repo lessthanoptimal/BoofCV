@@ -127,7 +127,7 @@ public class ImplOrientationAverageGradientIntegral<T extends ImageGray<T>,G ext
 	}
 
 	@Override
-	public RegionOrientation newInstance() {
+	public RegionOrientation copy() {
 		return new ImplOrientationAverageGradientIntegral<>(
 				objectRadiusToScale,sampleRadius,period,sampleWidth,weightSigma,getImageType());
 	}

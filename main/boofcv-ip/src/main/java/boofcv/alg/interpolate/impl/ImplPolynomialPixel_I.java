@@ -143,7 +143,7 @@ public class ImplPolynomialPixel_I<T extends GrayI<T>> extends PolynomialPixel<T
 	}
 
 	@Override
-	public InterpolatePixelS<T> newInstance() {
+	public InterpolatePixelS<T> copy() {
 		return new ImplPolynomialPixel_I<T>(M,min,max);
 	}
 

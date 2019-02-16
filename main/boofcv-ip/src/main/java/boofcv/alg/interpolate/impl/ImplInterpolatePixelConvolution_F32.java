@@ -208,7 +208,7 @@ public class ImplInterpolatePixelConvolution_F32 implements InterpolatePixelS<Gr
 		return border;
 	}
 	@Override
-	public InterpolatePixelS<GrayF32> newInstance() {
+	public InterpolatePixelS<GrayF32> copy() {
 		return new ImplInterpolatePixelConvolution_F32(kernel,min,max);
 	}
 

@@ -63,7 +63,7 @@ public class NearestNeighborPixel_IL_F32 extends NearestNeighborPixelMB<Interlea
 	}
 
 	@Override
-	public InterpolatePixelMB<InterleavedF32> newInstance() {
+	public InterpolatePixelMB<InterleavedF32> copy() {
 		return new NearestNeighborPixel_IL_F32();
 	}
 

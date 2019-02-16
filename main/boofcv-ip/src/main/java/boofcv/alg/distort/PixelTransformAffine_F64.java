@@ -55,7 +55,7 @@ public class PixelTransformAffine_F64 implements PixelTransform<Point2D_F64> {
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return true;
+	public PixelTransformAffine_F64 copy() {
+		return new PixelTransformAffine_F64(affine.copy());
 	}
 }

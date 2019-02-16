@@ -122,9 +122,4 @@ public abstract class EquirectangularDistortBase_F32 implements PixelTransform<P
 	public FMatrixRMaj getRotation() {
 		return R;
 	}
-
-	@Override
-	public boolean isThreadSafe() {
-		return false; // internal book keeping variables are recycled
-	}
 }

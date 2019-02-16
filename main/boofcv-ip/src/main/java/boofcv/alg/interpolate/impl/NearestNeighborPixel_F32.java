@@ -72,7 +72,7 @@ public class NearestNeighborPixel_F32 extends NearestNeighborPixelS<GrayF32> {
 	}
 
 	@Override
-	public InterpolatePixelS<GrayF32> newInstance() {
+	public InterpolatePixelS<GrayF32> copy() {
 		return new NearestNeighborPixel_F32();
 	}
 

@@ -104,7 +104,14 @@ public class AddBrownPtoN_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return true;
+	public AddBrownPtoN_F64 copy() {
+		AddBrownPtoN_F64 ret = new AddBrownPtoN_F64();
+		ret.a11 = a11;
+		ret.a12 = a12;
+		ret.a13 = a13;
+		ret.a22 = a22;
+		ret.a23 = a23;
+		ret.params = new RadialTangential_F64(params);
+		return ret;
 	}
 }

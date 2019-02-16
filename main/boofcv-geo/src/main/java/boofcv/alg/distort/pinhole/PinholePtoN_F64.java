@@ -33,6 +33,16 @@ public class PinholePtoN_F64 implements Point2Transform2_F64 {
 	// These are the upper triangular elements in a 3x3 matrix
 	private double a11,a12,a13,a22,a23;
 
+	public PinholePtoN_F64( PinholePtoN_F64 original ) {
+		this.a11 = original.a11;
+		this.a12 = original.a12;
+		this.a13 = original.a13;
+		this.a22 = original.a22;
+		this.a23 = original.a23;
+	}
+
+	public PinholePtoN_F64() {}
+
 	public void set(/**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
 
 		// analytic solution to matrix inverse
@@ -51,7 +61,7 @@ public class PinholePtoN_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return true;
+	public PinholePtoN_F64 copy() {
+		return new PinholePtoN_F64(this);
 	}
 }

@@ -54,7 +54,10 @@ public class TestImageDistortBasic_IL {
 		}
 
 		@Override
-		public boolean isThreadSafe() {return true;}
+		public PixelTransform<Point2D_F32> copy() {
+			return null;
+		}
+
 	};
 
 	@Test

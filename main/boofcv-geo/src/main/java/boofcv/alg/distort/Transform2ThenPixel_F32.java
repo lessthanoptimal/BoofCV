@@ -27,6 +27,7 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class Transform2ThenPixel_F32 implements Point2Transform2_F32 {
 
 	float fx, fy, skew, cx, cy;
@@ -35,6 +36,8 @@ public class Transform2ThenPixel_F32 implements Point2Transform2_F32 {
 	public Transform2ThenPixel_F32(Point2Transform2_F32 first) {
 		this.first = first;
 	}
+
+	Transform2ThenPixel_F32(){}
 
 	public Point2Transform2_F32 set( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
 		this.fx = (float)fx;
@@ -55,7 +58,14 @@ public class Transform2ThenPixel_F32 implements Point2Transform2_F32 {
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return false;
+	public Transform2ThenPixel_F32 copy() {
+		Transform2ThenPixel_F32 ret = new Transform2ThenPixel_F32();
+		ret.first = this.first.copy();
+		ret.fx = fx;
+		ret.fy = fy;
+		ret.skew = skew;
+		ret.cx = cx;
+		ret.cy = cy;
+		return ret;
 	}
 }

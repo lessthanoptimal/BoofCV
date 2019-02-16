@@ -232,8 +232,8 @@ public abstract class GeneralImageDistortTests<T extends ImageBase<T>> {
 		}
 
 		@Override
-		public boolean isThreadSafe() {
-			return true;
+		public PixelTransform<Point2D_F32> copy() {
+			return null;
 		}
 	}
 }

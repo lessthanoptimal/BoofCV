@@ -61,8 +61,8 @@ public class InterpolatePixel_PL_using_SB<T extends ImageGray<T>>
 	}
 
 	@Override
-	public InterpolatePixelMB<Planar<T>> newInstance() {
-		return new InterpolatePixel_PL_using_SB<>(alg.newInstance());
+	public InterpolatePixelMB<Planar<T>> copy() {
+		return new InterpolatePixel_PL_using_SB<>(alg.copy());
 	}
 
 	@Override

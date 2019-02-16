@@ -58,7 +58,7 @@ public class InterpolatePixelDistortS<T extends ImageGray<T>>
 	}
 
 	@Override
-	public InterpolatePixelS<T> newInstance() {
+	public InterpolatePixelS<T> copy() {
 		throw new RuntimeException("Implement");
 	}
 

@@ -77,7 +77,7 @@ public class OrientationGradientToImage<T extends ImageGray<T>, D extends ImageG
 	}
 
 	@Override
-	public RegionOrientation newInstance() {
+	public RegionOrientation copy() {
 		throw new RuntimeException("IMplement");
 	}
 

@@ -81,9 +81,9 @@ public interface InterpolatePixel<T extends ImageBase<T>> {
 	int getFastBorderY();
 
 	/**
-	 * Creates a new instance of this interpolation method
+	 * Creates a copy
 	 */
-	InterpolatePixel<T> newInstance();
+	InterpolatePixel<T> copy();
 
 	/**
 	 * Type of image it can process

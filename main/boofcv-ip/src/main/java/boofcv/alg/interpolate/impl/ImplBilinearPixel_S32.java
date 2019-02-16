@@ -90,7 +90,7 @@ public class ImplBilinearPixel_S32 extends BilinearPixelS<GrayS32> {
 	}
 
 	@Override
-	public InterpolatePixelS<GrayS32> newInstance() {
+	public InterpolatePixelS<GrayS32> copy() {
 		return new ImplBilinearPixel_S32();
 	}
 

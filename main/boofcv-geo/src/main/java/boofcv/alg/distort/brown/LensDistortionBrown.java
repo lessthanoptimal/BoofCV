@@ -40,6 +40,8 @@ public class LensDistortionBrown implements LensDistortionNarrowFOV {
 		this.p = p;
 	}
 
+
+
 	@Override
 	public Point2Transform2_F64 distort_F64(boolean pixelIn, boolean pixelOut) {
 		if( pixelIn ) {

@@ -84,7 +84,7 @@ public class ImplOrientationAverage_S16 extends OrientationAverage<GrayS16> {
 	}
 
 	@Override
-	public RegionOrientation newInstance() {
+	public RegionOrientation copy() {
 		ImplOrientationAverage_S16 r = new ImplOrientationAverage_S16(objectToSample,isWeighted);
 		r.setSampleRadius(sampleRadius);
 		return r;

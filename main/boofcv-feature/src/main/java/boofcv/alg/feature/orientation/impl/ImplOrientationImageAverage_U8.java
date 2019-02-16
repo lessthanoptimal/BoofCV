@@ -65,7 +65,7 @@ public class ImplOrientationImageAverage_U8 extends OrientationImageAverage<Gray
 	}
 
 	@Override
-	public RegionOrientation newInstance() {
+	public RegionOrientation copy() {
 		return new ImplOrientationImageAverage_U8(objectToSample,sampleRadius);
 	}
 

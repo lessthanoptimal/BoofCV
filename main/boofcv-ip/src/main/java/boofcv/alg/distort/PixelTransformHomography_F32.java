@@ -70,7 +70,7 @@ public class PixelTransformHomography_F32 implements PixelTransform<Point2D_F32>
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return true;
+	public PixelTransformHomography_F32 copy() {
+		return new PixelTransformHomography_F32(homo.copy());
 	}
 }

@@ -129,7 +129,7 @@ public class ImplOrientationSlidingWindow_S16 extends OrientationSlidingWindow<G
 	}
 
 	@Override
-	public RegionOrientation newInstance() {
+	public RegionOrientation copy() {
 		return new ImplOrientationSlidingWindow_S16(objectRadiusToScale, numAngles, windowSize, isWeighted);
 	}
 }

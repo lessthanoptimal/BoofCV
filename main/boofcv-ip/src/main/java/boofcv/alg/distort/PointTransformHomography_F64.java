@@ -72,7 +72,7 @@ public class PointTransformHomography_F64 implements Point2Transform2Model_F64<H
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return true;
+	public PointTransformHomography_F64 copy() {
+		return new PointTransformHomography_F64(homo.copy());
 	}
 }

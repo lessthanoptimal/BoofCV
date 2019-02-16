@@ -70,6 +70,8 @@ public class TestTransformThenPixel_F32 {
 		}
 
 		@Override
-		public boolean isThreadSafe() {return true;}
+		public Point2Transform2_F32 copy() {
+			return null;
+		}
 	}
 }

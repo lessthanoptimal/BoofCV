@@ -125,7 +125,7 @@ public class ImplBilinearPixel_IL_S16 extends BilinearPixelMB<InterleavedS16> {
 	}
 
 	@Override
-	public InterpolatePixelMB<InterleavedS16> newInstance() {
+	public InterpolatePixelMB<InterleavedS16> copy() {
 		return new ImplBilinearPixel_IL_S16(temp0.length);
 	}
 	@Override

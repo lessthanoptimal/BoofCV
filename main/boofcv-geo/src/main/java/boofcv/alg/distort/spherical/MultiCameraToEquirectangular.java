@@ -310,8 +310,8 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 		}
 
 		@Override
-		public boolean isThreadSafe() {
-			return false;
+		public EquiToCamera copy() {
+			throw new RuntimeException("Implement");
 		}
 	}
 }

@@ -71,7 +71,9 @@ public class AddBrownNtoN_F32 implements Point2Transform2_F32 {
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return true;
+	public AddBrownNtoN_F32 copy() {
+		AddBrownNtoN_F32 ret = new AddBrownNtoN_F32();
+		ret.params = new RadialTangential_F32(this.params);
+		return ret;
 	}
 }

@@ -130,7 +130,7 @@ public class ImplOrientationSlidingWindow_F32 extends OrientationSlidingWindow<G
 	}
 
 	@Override
-	public RegionOrientation newInstance() {
+	public RegionOrientation copy() {
 		return new ImplOrientationSlidingWindow_F32(objectRadiusToScale, numAngles, windowSize, isWeighted);
 	}
 }

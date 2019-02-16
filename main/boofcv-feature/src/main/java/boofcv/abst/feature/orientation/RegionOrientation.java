@@ -44,7 +44,7 @@ public interface RegionOrientation {
 	double compute( double c_x , double c_y );
 
 	/**
-	 * Creates a new instance with identical configuration
+	 * Creates a copy which is functionally identical
 	 */
-	RegionOrientation newInstance();
+	RegionOrientation copy();
 }

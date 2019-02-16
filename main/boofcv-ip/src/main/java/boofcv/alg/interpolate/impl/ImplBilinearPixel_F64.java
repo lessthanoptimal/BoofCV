@@ -90,7 +90,7 @@ public class ImplBilinearPixel_F64 extends BilinearPixelS<GrayF64> {
 	}
 
 	@Override
-	public InterpolatePixelS<GrayF64> newInstance() {
+	public InterpolatePixelS<GrayF64> copy() {
 		return new ImplBilinearPixel_F64();
 	}
 

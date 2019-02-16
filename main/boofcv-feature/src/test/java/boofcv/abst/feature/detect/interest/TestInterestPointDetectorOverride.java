@@ -142,7 +142,7 @@ public class TestInterestPointDetectorOverride {
 		public double compute(double c_x, double c_y) {return 3;}
 
 		@Override
-		public RegionOrientation newInstance() {
+		public RegionOrientation copy() {
 			return null;
 		}
 	}

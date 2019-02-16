@@ -44,7 +44,7 @@ public class FlipVertical_F32 implements Point2Transform2_F32 {
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return true;
+	public FlipVertical_F32 copy() {
+		return new FlipVertical_F32(height);
 	}
 }

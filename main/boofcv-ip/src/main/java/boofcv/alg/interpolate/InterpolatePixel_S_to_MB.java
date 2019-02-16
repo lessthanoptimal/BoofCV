@@ -47,8 +47,8 @@ public class InterpolatePixel_S_to_MB<T extends ImageGray<T>> implements Interpo
 	}
 
 	@Override
-	public InterpolatePixelMB<T> newInstance() {
-		return new InterpolatePixel_S_to_MB<>(interp.newInstance());
+	public InterpolatePixelMB<T> copy() {
+		return new InterpolatePixel_S_to_MB<>(interp.copy());
 	}
 
 	@Override

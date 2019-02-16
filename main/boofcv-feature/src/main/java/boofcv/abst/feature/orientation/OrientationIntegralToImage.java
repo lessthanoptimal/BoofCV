@@ -70,7 +70,7 @@ public class OrientationIntegralToImage<T extends ImageGray<T>, II extends Image
 	}
 
 	@Override
-	public RegionOrientation newInstance() {
+	public RegionOrientation copy() {
 		throw new RuntimeException("IMplement");
 	}
 }

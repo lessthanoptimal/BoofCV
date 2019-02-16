@@ -308,7 +308,7 @@ public class TestLocalWeightedHistogramRotRect {
 		public void get_fast(float x, float y, float[] values) {}
 
 		@Override
-		public InterpolatePixelMB newInstance() {
+		public InterpolatePixelMB copy() {
 			return null;
 		}
 	}

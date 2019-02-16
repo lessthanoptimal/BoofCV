@@ -65,7 +65,7 @@ public class ImplOrientationImageAverage_F32 extends OrientationImageAverage<Gra
 	}
 
 	@Override
-	public RegionOrientation newInstance() {
+	public RegionOrientation copy() {
 		return new ImplOrientationImageAverage_F32(objectToSample,sampleRadius);
 	}
 }

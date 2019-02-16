@@ -70,7 +70,7 @@ public class TestInterpolatePixel_S_to_MB {
 		}
 
 		@Override
-		public InterpolatePixelS newInstance() {
+		public InterpolatePixelS copy() {
 			return null;
 		}
 

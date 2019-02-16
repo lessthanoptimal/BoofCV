@@ -72,7 +72,7 @@ public class NearestNeighborPixel_U8 extends NearestNeighborPixelS<GrayU8> {
 	}
 
 	@Override
-	public InterpolatePixelS<GrayU8> newInstance() {
+	public InterpolatePixelS<GrayU8> copy() {
 		return new NearestNeighborPixel_U8();
 	}
 

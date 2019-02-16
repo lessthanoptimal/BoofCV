@@ -64,8 +64,11 @@ public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return true;
+	public RemoveBrownNtoN_F64 copy() {
+		RemoveBrownNtoN_F64 ret = new RemoveBrownNtoN_F64();
+		ret.tol = tol;
+		ret.params = new RadialTangential_F64(this.params);
+		return ret;
 	}
 
 	/**

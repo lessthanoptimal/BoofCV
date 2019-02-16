@@ -284,8 +284,8 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return true;
+	public ImageDeformPointMLS_F32 copy() {
+		throw new RuntimeException("Implement");
 	}
 
 	/**

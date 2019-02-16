@@ -90,7 +90,7 @@ public class ImplBilinearPixel_U8 extends BilinearPixelS<GrayU8> {
 	}
 
 	@Override
-	public InterpolatePixelS<GrayU8> newInstance() {
+	public InterpolatePixelS<GrayU8> copy() {
 		return new ImplBilinearPixel_U8();
 	}
 

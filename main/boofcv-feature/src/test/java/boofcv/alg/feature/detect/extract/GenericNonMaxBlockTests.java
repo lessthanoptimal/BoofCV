@@ -24,7 +24,7 @@ import boofcv.struct.image.GrayF32;
 /**
  * @author Peter Abeles
  */
-public class GenericNonMaxBlockTests extends GenericNonMaxTests {
+public abstract class GenericNonMaxBlockTests extends GenericNonMaxTests {
 	NonMaxBlock nonmax;
 
 	protected GenericNonMaxBlockTests(boolean strict, NonMaxBlock.Search search ) {

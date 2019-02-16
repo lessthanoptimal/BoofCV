@@ -208,7 +208,7 @@ public class ImplInterpolatePixelConvolution_S16 implements InterpolatePixelS<Gr
 		return border;
 	}
 	@Override
-	public InterpolatePixelS<GrayS16> newInstance() {
+	public InterpolatePixelS<GrayS16> copy() {
 		return new ImplInterpolatePixelConvolution_S16(kernel,min,max);
 	}
 

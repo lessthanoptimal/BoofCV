@@ -27,6 +27,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class Transform2ThenPixel_F64 implements Point2Transform2_F64 {
 
 	double fx, fy, skew, cx, cy;
@@ -35,6 +36,8 @@ public class Transform2ThenPixel_F64 implements Point2Transform2_F64 {
 	public Transform2ThenPixel_F64(Point2Transform2_F64 first) {
 		this.first = first;
 	}
+
+	Transform2ThenPixel_F64(){}
 
 	public Point2Transform2_F64 set( /**/double fx, /**/double fy, /**/double skew, /**/double cx, /**/double cy ) {
 		this.fx = (double)fx;
@@ -55,7 +58,14 @@ public class Transform2ThenPixel_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return false;
+	public Transform2ThenPixel_F64 copy() {
+		Transform2ThenPixel_F64 ret = new Transform2ThenPixel_F64();
+		ret.first = this.first.copy();
+		ret.fx = fx;
+		ret.fy = fy;
+		ret.skew = skew;
+		ret.cx = cx;
+		ret.cy = cy;
+		return ret;
 	}
 }
