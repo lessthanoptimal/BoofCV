@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.extract;
 
+import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 
 /**
@@ -27,18 +28,32 @@ import boofcv.struct.image.GrayF32;
  *
  * @author Peter Abeles
  */
-public abstract class NonMaxBlockStrict extends NonMaxBlock {
+public abstract class NonMaxBlockSearchStrict implements NonMaxBlock.Search {
 
+	// threshold for intensity values when detecting minimums and maximums
+	float thresholdMin;
+	float thresholdMax;
+	int radius;
 
-	protected NonMaxBlockStrict(boolean detectsMinimum, boolean detectsMaximum) {
-		super(detectsMinimum, detectsMaximum);
+	private QueueCorner localMin,localMax;
+	GrayF32 img;
+
+	@Override
+	public void initialize( NonMaxBlock.Configuration configuration,
+							GrayF32 image, QueueCorner localMin, QueueCorner localMax) {
+
+		this.thresholdMin = configuration.thresholdMin;
+		this.thresholdMax = configuration.thresholdMax;
+		this.radius = configuration.radius;
+		this.img = image;
+		this.localMin = localMin;
+		this.localMax = localMax;
 	}
 
-	public static class Max extends NonMaxBlockStrict {
-		public Max() { super(false, true); }
+	public static class Max extends NonMaxBlockSearchStrict {
 
 		@Override
-		protected void searchBlock(int x0, int y0, int x1, int y1, GrayF32 img) {
+		public void searchBlock(int x0, int y0, int x1, int y1 ) {
 
 			int peakX = 0;
 			int peakY = 0;
@@ -62,13 +77,27 @@ public abstract class NonMaxBlockStrict extends NonMaxBlock {
 				checkLocalMax(peakX, peakY, peakVal, img);
 			}
 		}
-	}
-
-	public static class Min extends NonMaxBlockStrict {
-		public Min() { super(true, false); }
 
 		@Override
-		protected void searchBlock(int x0, int y0, int x1, int y1, GrayF32 img) {
+		public boolean isDetectMinimums() {
+			return false;
+		}
+
+		@Override
+		public boolean isDetectMaximums() {
+			return true;
+		}
+
+		@Override
+		public NonMaxBlock.Search newInstance() {
+			return new Max();
+		}
+	}
+
+	public static class Min extends NonMaxBlockSearchStrict {
+
+		@Override
+		public void searchBlock(int x0, int y0, int x1, int y1 ) {
 
 			int peakX = 0;
 			int peakY = 0;
@@ -92,13 +121,27 @@ public abstract class NonMaxBlockStrict extends NonMaxBlock {
 				checkLocalMin(peakX, peakY, peakVal, img);
 			}
 		}
-	}
-
-	public static class MinMax extends NonMaxBlockStrict {
-		public MinMax() { super(true, true); }
 
 		@Override
-		protected void searchBlock(int x0, int y0, int x1, int y1, GrayF32 img) {
+		public boolean isDetectMinimums() {
+			return true;
+		}
+
+		@Override
+		public boolean isDetectMaximums() {
+			return false;
+		}
+
+		@Override
+		public NonMaxBlock.Search newInstance() {
+			return new Min();
+		}
+	}
+
+	public static class MinMax extends NonMaxBlockSearchStrict {
+
+		@Override
+		public void searchBlock(int x0, int y0, int x1, int y1 ) {
 
 			int maxX = 0;
 			int maxY = 0;
@@ -132,6 +175,21 @@ public abstract class NonMaxBlockStrict extends NonMaxBlock {
 			if (minVal <= thresholdMin && minVal != -Float.MAX_VALUE) {
 				checkLocalMin(minX, minY, minVal, img);
 			}
+		}
+
+		@Override
+		public boolean isDetectMinimums() {
+			return true;
+		}
+
+		@Override
+		public boolean isDetectMaximums() {
+			return true;
+		}
+
+		@Override
+		public NonMaxBlock.Search newInstance() {
+			return new MinMax();
 		}
 	}
 

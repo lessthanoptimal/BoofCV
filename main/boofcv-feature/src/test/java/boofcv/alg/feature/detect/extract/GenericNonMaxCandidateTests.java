@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,26 +27,44 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericNonMaxCandidateTests extends GenericNonMaxAlgorithmTests {
+public abstract class GenericNonMaxCandidateTests extends GenericNonMaxTests {
 
 	QueueCorner candidatesMin = new QueueCorner();
 	QueueCorner candidatesMax  = new QueueCorner();
 
-	protected GenericNonMaxCandidateTests(boolean strict, boolean canDetectMin, boolean canDetectMax) {
+	NonMaxCandidate nonmax;
+
+	protected GenericNonMaxCandidateTests(boolean strict, boolean canDetectMin, boolean canDetectMax,
+										  NonMaxCandidate.Search search) {
 		super(strict, canDetectMin, canDetectMax);
+		this.nonmax = new NonMaxCandidate(search);
+	}
+
+	protected GenericNonMaxCandidateTests(boolean strict, boolean canDetectMin, boolean canDetectMax,
+										  NonMaxCandidate.Search search , boolean concurrent ) {
+		super(strict, canDetectMin, canDetectMax);
+		this.nonmax = concurrent ? new NonMaxCandidate_MT(search) : new NonMaxCandidate(search);
 	}
 
 	@Override
-	public void findMaximums(GrayF32 intensity, float threshold, int radius, int border,
-							 QueueCorner foundMinimum, QueueCorner foundMaximum) {
+	public void findPeaks(GrayF32 intensity, float threshold, int radius, int border,
+						  QueueCorner foundMinimum, QueueCorner foundMaximum) {
 		allCandidates(intensity.width,intensity.height);
 
 		findMaximums(intensity,threshold,radius,border,candidatesMin,candidatesMax,foundMinimum,foundMaximum);
 	}
 
-	public abstract void findMaximums(GrayF32 intensity, float threshold, int radius, int border,
+	public void findMaximums(GrayF32 intensity, float threshold, int radius, int border,
 									  QueueCorner candidatesMin , QueueCorner candidatesMax,
-									  QueueCorner foundMinimum, QueueCorner foundMaximum);
+									  QueueCorner foundMinimum, QueueCorner foundMaximum)
+	{
+		nonmax.radius = radius;
+		nonmax.ignoreBorder = border;
+		nonmax.thresholdMin = -threshold;
+		nonmax.thresholdMax = threshold;
+
+		nonmax.process(intensity, candidatesMin, candidatesMax, foundMinimum, foundMaximum);
+	}
 
 	public void allCandidates( int w,  int h ) {
 		candidatesMin.reset();

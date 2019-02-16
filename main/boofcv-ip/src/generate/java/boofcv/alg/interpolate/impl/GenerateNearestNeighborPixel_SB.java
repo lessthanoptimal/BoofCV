@@ -34,6 +34,10 @@ public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 	String f;
 	String borderType;
 
+	public GenerateNearestNeighborPixel_SB() {
+		super(false);
+	}
+
 	@Override
 	public void generate() throws FileNotFoundException {
 		createType(AutoTypeImage.F32);
@@ -44,7 +48,6 @@ public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 	}
 
 	private void createType( AutoTypeImage type ) throws FileNotFoundException {
-		className = "NearestNeighborPixel_"+type.name();
 		image = type;
 
 		createFile();
@@ -52,7 +55,7 @@ public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 
 	private void createFile() throws FileNotFoundException {
 
-		borderType = image.isInteger() ? "I32" : image.getAbbreviatedType();
+		borderType = image.isInteger() ? "S32" : image.getAbbreviatedType();
 		floatType = !image.isInteger() && image.getNumBits()==64 ? "double" : "float";
 		f = !image.isInteger() && image.getNumBits()==64 ? "" : "f";
 
@@ -62,11 +65,14 @@ public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() throws FileNotFoundException {
-		setOutputFile(className);
-		out.print("import boofcv.alg.interpolate.NearestNeighborPixel;\n" +
+		className = null;
+		setOutputFile("NearestNeighborPixel_"+image.name());
+		out.print(
+				"import boofcv.alg.interpolate.NearestNeighborPixelS;\n" +
+				"import boofcv.alg.interpolate.InterpolatePixelS;\n" +
 				"import boofcv.struct.image.ImageType;\n" +
 				"import boofcv.struct.image." + image.getSingleBandName() + ";\n" +
-				"import boofcv.core.image.border.ImageBorder_"+borderType+";\n");
+				"import boofcv.struct.border.ImageBorder_"+borderType+";\n");
 		out.println();
 		out.println();
 		out.print("/**\n" +
@@ -74,13 +80,11 @@ public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 				" * Performs nearest neighbor interpolation to extract values between pixels in an image.\n" +
 				" * </p>\n" +
 				" *\n" +
-				" * <p>\n" +
-				" * NOTE: This code was automatically generated using {@link "+getClass().getSimpleName()+"}.\n" +
-				" * </p>\n" +
+				generatedDocString() +
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"public class "+className+" extends NearestNeighborPixel<"+image.getSingleBandName()+"> {\n" +
+				"public class "+className+" extends NearestNeighborPixelS<"+image.getSingleBandName()+"> {\n" +
 				"\n" +
 				"\tprivate "+image.getDataType()+" data[];" +
 				"\n" +
@@ -123,6 +127,11 @@ public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
+				"\tpublic InterpolatePixelS<"+image.getSingleBandName()+"> newInstance() {\n" +
+				"\t\treturn new "+className+"();\n" +
+				"\t}\n" +
+				"\n" +
+				"\t@Override\n" +
 				"\tpublic ImageType<"+image.getSingleBandName()+"> getImageType() {\n" +
 				"\t\treturn ImageType.single("+image.getSingleBandName()+".class);\n" +
 				"\t}\n\n");
@@ -130,6 +139,7 @@ public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateNearestNeighborPixel_SB gen = new GenerateNearestNeighborPixel_SB();
+		gen.parseArguments(args);
 		gen.generate();
 	}
 }

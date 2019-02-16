@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.abst.feature.orientation.OrientationImage;
+import boofcv.abst.feature.orientation.RegionOrientation;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
@@ -139,5 +140,10 @@ public class TestInterestPointDetectorOverride {
 
 		@Override
 		public double compute(double c_x, double c_y) {return 3;}
+
+		@Override
+		public RegionOrientation newInstance() {
+			return null;
+		}
 	}
 }

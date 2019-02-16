@@ -81,6 +81,11 @@ public class TestInterpolatePixelDistortS {
 		}
 
 		@Override
+		public InterpolatePixelS newInstance() {
+			return null;
+		}
+
+		@Override
 		public void setBorder(ImageBorder border) {}
 
 		@Override
@@ -100,11 +105,6 @@ public class TestInterpolatePixelDistortS {
 
 		@Override
 		public int getFastBorderY() {return 0;}
-
-		@Override
-		public boolean isThreadSafe() {
-			return false;
-		}
 
 		@Override
 		public ImageType getImageType() {return ImageType.single(GrayU8.class);}

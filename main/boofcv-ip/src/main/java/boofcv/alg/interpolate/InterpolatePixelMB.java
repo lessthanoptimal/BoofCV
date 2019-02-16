@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,5 +50,10 @@ public interface InterpolatePixelMB<T extends ImageBase<T>> extends InterpolateP
 	 * @param values Interpolated value across all bands.
 	 */
 	void get_fast(float x, float y, float []values );
+
+	/**
+	 * Creates a new instance of this interpolation method
+	 */
+	InterpolatePixelMB<T> newInstance();
 
 }

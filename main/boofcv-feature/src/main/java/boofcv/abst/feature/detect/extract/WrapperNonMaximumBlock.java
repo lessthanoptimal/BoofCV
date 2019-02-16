@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,11 +91,11 @@ public class WrapperNonMaximumBlock implements NonMaxSuppression {
 
 	@Override
 	public boolean canDetectMaximums() {
-		return alg.detectsMaximum;
+		return alg.getSearch().isDetectMaximums();
 	}
 
 	@Override
 	public boolean canDetectMinimums() {
-		return alg.detectsMinimum;
+		return alg.getSearch().isDetectMinimums();
 	}
 }

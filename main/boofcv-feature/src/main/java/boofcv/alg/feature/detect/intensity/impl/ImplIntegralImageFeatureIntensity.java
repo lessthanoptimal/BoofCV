@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,7 +111,7 @@ public class ImplIntegralImageFeatureIntensity {
 		}
 	}
 
-	private static void computeHessian(GrayF32 integral, GrayF32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx) {
+	public static void computeHessian(GrayF32 integral, GrayF32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx) {
 		float Dxx = IntegralImageOps.convolveSparse(integral,kerXX,xx,yy);
 		float Dyy = IntegralImageOps.convolveSparse(integral,kerYY,xx,yy);
 		float Dxy = IntegralImageOps.convolveSparse(integral,kerXY,xx,yy);
@@ -284,7 +284,7 @@ public class ImplIntegralImageFeatureIntensity {
 		}
 	}
 
-	private static void computeHessian(GrayS32 integral, GrayF32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx) {
+	public static void computeHessian(GrayS32 integral, GrayF32 intensity, IntegralKernel kerXX, IntegralKernel kerYY, IntegralKernel kerXY, float norm, int y, int yy, int x, int xx) {
 		float Dxx = IntegralImageOps.convolveSparse(integral,kerXX,xx,yy);
 		float Dyy = IntegralImageOps.convolveSparse(integral,kerYY,xx,yy);
 		float Dxy = IntegralImageOps.convolveSparse(integral,kerXY,xx,yy);

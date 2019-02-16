@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.orientation.impl;
 
+import boofcv.abst.feature.orientation.RegionOrientation;
 import boofcv.alg.feature.orientation.OrientationIntegralBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.sparse.GradientValue;
@@ -184,5 +185,11 @@ public class ImplOrientationSlidingWindowIntegral
 		}
 
 		return Math.atan2(bestY,bestX);
+	}
+
+	@Override
+	public RegionOrientation newInstance() {
+		return new ImplOrientationSlidingWindowIntegral(
+				objectRadiusToScale,period,windowSize,sampleRadius,weightSigma,sampleWidth,getImageType());
 	}
 }

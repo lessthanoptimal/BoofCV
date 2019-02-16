@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.orientation.impl;
 
+import boofcv.abst.feature.orientation.RegionOrientation;
 import boofcv.alg.feature.orientation.OrientationAverage;
 import boofcv.struct.image.GrayS32;
 
@@ -82,4 +83,10 @@ public class ImplOrientationAverage_S32 extends OrientationAverage<GrayS32> {
 		return Math.atan2(sumY,sumX);
 	}
 
+	@Override
+	public RegionOrientation newInstance() {
+		ImplOrientationAverage_S32 r = new ImplOrientationAverage_S32(objectToSample,isWeighted);
+		r.setSampleRadius(sampleRadius);
+		return r;
+	}
 }

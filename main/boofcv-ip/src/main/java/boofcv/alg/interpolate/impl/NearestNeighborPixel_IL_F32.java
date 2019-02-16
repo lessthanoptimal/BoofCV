@@ -18,6 +18,7 @@
 
 package boofcv.alg.interpolate.impl;
 
+import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.NearestNeighborPixelMB;
 import boofcv.struct.border.ImageBorder_IL_F32;
 import boofcv.struct.image.InterleavedF32;
@@ -59,6 +60,11 @@ public class NearestNeighborPixel_IL_F32 extends NearestNeighborPixelMB<Interlea
 		int yy = (int)y;
 
 		orig.unsafe_get(xx,yy,values);
+	}
+
+	@Override
+	public InterpolatePixelMB<InterleavedF32> newInstance() {
+		return new NearestNeighborPixel_IL_F32();
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-public class GenericOrientationIntegralTests<T extends ImageGray<T>> {
+public class GenericOrientationIntegralTests<T extends ImageGray<T>> extends GenericOrientationTests {
 
 	int width = 30;
 	int height = 40;

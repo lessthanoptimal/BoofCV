@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,9 @@
 
 package boofcv.abst.feature.detect.extract;
 
-import boofcv.alg.feature.detect.extract.NonMaxBlockRelaxed;
-import boofcv.alg.feature.detect.extract.NonMaxBlockStrict;
+import boofcv.alg.feature.detect.extract.NonMaxBlock;
+import boofcv.alg.feature.detect.extract.NonMaxBlockSearchRelaxed;
+import boofcv.alg.feature.detect.extract.NonMaxBlockSearchStrict;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,7 +34,8 @@ public class TestWrapperNonMaximumBlock {
 
 			@Override
 			public NonMaxSuppression createAlg() {
-				return new WrapperNonMaximumBlock(new NonMaxBlockStrict.Max());
+				NonMaxBlock alg = new NonMaxBlock(new NonMaxBlockSearchStrict.Max());
+				return new WrapperNonMaximumBlock(alg);
 			}
 		};
 		checks.testAll();
@@ -45,7 +47,8 @@ public class TestWrapperNonMaximumBlock {
 
 			@Override
 			public NonMaxSuppression createAlg() {
-				return new WrapperNonMaximumBlock(new NonMaxBlockStrict.Min());
+				NonMaxBlock alg = new NonMaxBlock(new NonMaxBlockSearchStrict.Min());
+				return new WrapperNonMaximumBlock(alg);
 			}
 		};
 		checks.testAll();
@@ -57,7 +60,8 @@ public class TestWrapperNonMaximumBlock {
 
 			@Override
 			public NonMaxSuppression createAlg() {
-				return new WrapperNonMaximumBlock(new NonMaxBlockStrict.MinMax());
+				NonMaxBlock alg = new NonMaxBlock(new NonMaxBlockSearchStrict.MinMax());
+				return new WrapperNonMaximumBlock(alg);
 			}
 		};
 		checks.testAll();
@@ -69,7 +73,8 @@ public class TestWrapperNonMaximumBlock {
 
 			@Override
 			public NonMaxSuppression createAlg() {
-				return new WrapperNonMaximumBlock(new NonMaxBlockRelaxed.Max());
+				NonMaxBlock alg = new NonMaxBlock(new NonMaxBlockSearchRelaxed.Max());
+				return new WrapperNonMaximumBlock(alg);
 			}
 		};
 		checks.testAll();
@@ -81,7 +86,8 @@ public class TestWrapperNonMaximumBlock {
 
 			@Override
 			public NonMaxSuppression createAlg() {
-				return new WrapperNonMaximumBlock(new NonMaxBlockRelaxed.Min());
+				NonMaxBlock alg = new NonMaxBlock(new NonMaxBlockSearchRelaxed.Min());
+				return new WrapperNonMaximumBlock(alg);
 			}
 		};
 		checks.testAll();
@@ -93,7 +99,8 @@ public class TestWrapperNonMaximumBlock {
 
 			@Override
 			public NonMaxSuppression createAlg() {
-				return new WrapperNonMaximumBlock(new NonMaxBlockRelaxed.MinMax());
+				NonMaxBlock alg = new NonMaxBlock(new NonMaxBlockSearchRelaxed.MinMax());
+				return new WrapperNonMaximumBlock(alg);
 			}
 		};
 		checks.testAll();

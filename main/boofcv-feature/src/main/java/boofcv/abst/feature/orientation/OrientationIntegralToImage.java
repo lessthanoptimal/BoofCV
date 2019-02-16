@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,5 +67,10 @@ public class OrientationIntegralToImage<T extends ImageGray<T>, II extends Image
 	@Override
 	public double compute(double c_x, double c_y) {
 		return alg.compute(c_x,c_y);
+	}
+
+	@Override
+	public RegionOrientation newInstance() {
+		throw new RuntimeException("IMplement");
 	}
 }

@@ -34,6 +34,10 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 	String f;
 	String borderType;
 
+	public GenerateImplBilinearPixel() {
+		super(false);
+	}
+
 	@Override
 	public void generate() throws FileNotFoundException {
 		createType(AutoTypeImage.F64);
@@ -44,7 +48,6 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 	}
 
 	private void createType( AutoTypeImage type ) throws FileNotFoundException {
-		className = "ImplBilinearPixel_"+type.name();
 		image = type;
 
 		createFile();
@@ -62,21 +65,20 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() throws FileNotFoundException {
-		setOutputFile(className);
+		this.className = null;
+		setOutputFile("ImplBilinearPixel_"+image.name());
 		out.print("import boofcv.alg.interpolate.BilinearPixelS;\n" +
+				"import boofcv.alg.interpolate.InterpolatePixelS;\n" +
+				"import boofcv.struct.border.ImageBorder_"+borderType+";\n" +
 				"import boofcv.struct.image.ImageType;\n" +
-				"import boofcv.struct.image." + image.getSingleBandName() + ";\n" +
-				"import boofcv.core.image.border.ImageBorder_"+borderType+";\n");
-		out.println();
+				"import boofcv.struct.image." + image.getSingleBandName() + ";\n");
 		out.println();
 		out.print("/**\n" +
 				" * <p>\n" +
 				" * Implementation of {@link BilinearPixelS} for a specific image type.\n" +
 				" * </p>\n" +
 				" *\n" +
-				" * <p>\n" +
-				" * NOTE: This code was automatically generated using {@link GenerateImplBilinearPixel}.\n" +
-				" * </p>\n" +
+				generatedDocString() +
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
@@ -141,13 +143,19 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\t}\n"+
 				"\n" +
 				"\t@Override\n" +
+				"\tpublic InterpolatePixelS<"+image.getSingleBandName()+"> newInstance() {\n" +
+				"\t\treturn new "+className+"();\n" +
+				"\t}\n" +
+				"\n" +
+				"\t@Override\n" +
 				"\tpublic ImageType<"+image.getSingleBandName()+"> getImageType() {\n" +
 				"\t\treturn ImageType.single("+image.getSingleBandName()+".class);\n" +
 				"\t}\n\n");
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
-		GenerateImplBilinearPixel gen = new GenerateImplBilinearPixel();
-		gen.generate();
+		GenerateImplBilinearPixel app = new GenerateImplBilinearPixel();
+		app.parseArguments(args);
+		app.generate();
 	}
 }

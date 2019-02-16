@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,11 +34,11 @@ public class TestNonMaxExtractorNaive {
 	}
 
 	private void standardTests( boolean strict ) {
-		new GenericNonMaxAlgorithmTests(strict,false,true) {
+		new GenericNonMaxTests(strict,false,true) {
 
 			@Override
-			public void findMaximums(GrayF32 intensity, float threshold, int radius, int border,
-									 QueueCorner foundMinimum, QueueCorner foundMaximum) {
+			public void findPeaks(GrayF32 intensity, float threshold, int radius, int border,
+								  QueueCorner foundMinimum, QueueCorner foundMaximum) {
 				NonMaxExtractorNaive alg = new NonMaxExtractorNaive(strict);
 				alg.setSearchRadius(radius);
 				alg.setThreshold(threshold);

@@ -77,8 +77,4 @@ public abstract class BilinearPixelMB<T extends ImageInterleaved<T>> implements 
 		return border;
 	}
 
-	@Override
-	public boolean isThreadSafe() {
-		return false;
-	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.alg.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureIntensity;
+import boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureIntensity_MT;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 
@@ -44,8 +46,13 @@ public class IntegralImageFeatureIntensity {
 		// todo check size with skip
 //		InputSanityCheck.checkSameShape(integral,intensity);
 
-		ImplIntegralImageFeatureIntensity.hessianBorder(integral,skip,size,intensity);
-		ImplIntegralImageFeatureIntensity.hessianInner(integral,skip,size,intensity);
+		if( BoofConcurrency.USE_CONCURRENT) {
+			ImplIntegralImageFeatureIntensity_MT.hessianBorder(integral, skip, size, intensity);
+			ImplIntegralImageFeatureIntensity_MT.hessianInner(integral, skip, size, intensity);
+		} else {
+			ImplIntegralImageFeatureIntensity.hessianBorder(integral, skip, size, intensity);
+			ImplIntegralImageFeatureIntensity.hessianInner(integral, skip, size, intensity);
+		}
 	}
 
 	/**
@@ -62,7 +69,12 @@ public class IntegralImageFeatureIntensity {
 		// todo check size with skip
 //		InputSanityCheck.checkSameShape(integral,intensity);
 
-		ImplIntegralImageFeatureIntensity.hessianBorder(integral,skip,size,intensity);
-		ImplIntegralImageFeatureIntensity.hessianInner(integral,skip,size,intensity);
+		if( BoofConcurrency.USE_CONCURRENT) {
+			ImplIntegralImageFeatureIntensity_MT.hessianBorder(integral, skip, size, intensity);
+			ImplIntegralImageFeatureIntensity_MT.hessianInner(integral, skip, size, intensity);
+		} else {
+			ImplIntegralImageFeatureIntensity.hessianBorder(integral, skip, size, intensity);
+			ImplIntegralImageFeatureIntensity.hessianInner(integral, skip, size, intensity);
+		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.orientation.impl;
 
+import boofcv.abst.feature.orientation.RegionOrientation;
 import boofcv.alg.feature.orientation.OrientationIntegralBase;
 import boofcv.factory.transform.ii.FactorySparseIntegralFilters;
 import boofcv.struct.convolve.Kernel2D_F64;
@@ -157,5 +158,11 @@ public class ImplOrientationImageAverageIntegral<T extends ImageGray<T>,G extend
 		}
 
 		return Math.atan2(Dy,Dx);
+	}
+
+	@Override
+	public RegionOrientation newInstance() {
+		return new ImplOrientationImageAverageIntegral<>(
+				objectRadiusToScale,sampleRadius,period,sampleWidth,weightSigma,getImageType());
 	}
 }

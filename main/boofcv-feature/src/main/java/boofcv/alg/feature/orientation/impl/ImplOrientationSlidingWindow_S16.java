@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.orientation.impl;
 
+import boofcv.abst.feature.orientation.RegionOrientation;
 import boofcv.alg.feature.orientation.OrientationSlidingWindow;
 import boofcv.struct.image.GrayS16;
 import georegression.metric.UtilAngle;
@@ -127,4 +128,8 @@ public class ImplOrientationSlidingWindow_S16 extends OrientationSlidingWindow<G
 		return bestAngle;
 	}
 
+	@Override
+	public RegionOrientation newInstance() {
+		return new ImplOrientationSlidingWindow_S16(objectRadiusToScale, numAngles, windowSize, isWeighted);
+	}
 }

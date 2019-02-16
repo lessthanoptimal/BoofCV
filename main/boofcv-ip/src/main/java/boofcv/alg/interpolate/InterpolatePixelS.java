@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public interface InterpolatePixelS<T extends ImageGray<T>> extends InterpolatePi
 	 * @param y Point's y-coordinate. y &ge; 0 && y < image.height or all values if border specified
 	 * @return Interpolated intensity value or NaN if it can't be interpolated.
 	 */
-	public float get(float x, float y);
+	float get(float x, float y);
 
 	/**
 	 * Returns the interpolated pixel value at the specified location while assuming it is inside
@@ -47,5 +47,10 @@ public interface InterpolatePixelS<T extends ImageGray<T>> extends InterpolatePi
 	 * @param y Point's y-coordinate.
 	 * @return Interpolated intensity value.
 	 */
-	public float get_fast(float x, float y);
+	float get_fast(float x, float y);
+
+	/**
+	 * Creates a new instance of this interpolation method
+	 */
+	InterpolatePixelS<T> newInstance();
 }

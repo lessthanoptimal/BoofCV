@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.extract;
 
+import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I32;
 
@@ -28,21 +29,47 @@ import georegression.struct.point.Point2D_I32;
  *
  * @author Peter Abeles
  */
-public abstract class NonMaxBlockRelaxed extends NonMaxBlock {
+public abstract class NonMaxBlockSearchRelaxed implements NonMaxBlock.Search {
 
 	// storage for local maximums
 	Point2D_I32 foundMax[];
 	Point2D_I32 foundMin[];
 
-	protected NonMaxBlockRelaxed(boolean detectsMinimum, boolean detectsMaximum) {
-		super(detectsMinimum, detectsMaximum);
+	// threshold for intensity values when detecting minimums and maximums
+	float thresholdMin;
+	float thresholdMax;
+	int radius;
+
+	private QueueCorner localMin,localMax;
+	GrayF32 img;
+
+	@Override
+	public void initialize(NonMaxBlock.Configuration configuration, GrayF32 image,
+						   QueueCorner localMin, QueueCorner localMax) {
+		this.thresholdMin = configuration.thresholdMin;
+		this.thresholdMax = configuration.thresholdMax;
+		this.radius = configuration.radius;
+		this.img = image;
+		this.localMin = localMin;
+		this.localMax = localMax;
+
+		int w = 2* radius +1;
+
+		// only declare this work space if needed
+		if( foundMax == null || foundMax.length != w*w ) {
+			foundMax = new Point2D_I32[w * w];
+			for (int i = 0; i < foundMax.length; i++)
+				foundMax[i] = new Point2D_I32();
+			foundMin = new Point2D_I32[w * w];
+			for (int i = 0; i < foundMin.length; i++)
+				foundMin[i] = new Point2D_I32();
+		}
 	}
 
-	public static class Max extends NonMaxBlockRelaxed {
-		public Max() { super(false, true); }
+	public static class Max extends NonMaxBlockSearchRelaxed {
 
 		@Override
-		protected void searchBlock( int x0 , int y0 , int x1 , int y1 , GrayF32 img ) {
+		public void searchBlock( int x0 , int y0 , int x1 , int y1 ) {
 
 			int numPeaks = 0;
 			float peakVal = thresholdMax;
@@ -69,13 +96,27 @@ public abstract class NonMaxBlockRelaxed extends NonMaxBlock {
 				}
 			}
 		}
-	}
-
-	public static class Min extends NonMaxBlockRelaxed {
-		public Min() { super(true, false); }
 
 		@Override
-		protected void searchBlock( int x0 , int y0 , int x1 , int y1 , GrayF32 img ) {
+		public boolean isDetectMinimums() {
+			return false;
+		}
+
+		@Override
+		public boolean isDetectMaximums() {
+			return true;
+		}
+
+		@Override
+		public NonMaxBlock.Search newInstance() {
+			return new Max();
+		}
+	}
+
+	public static class Min extends NonMaxBlockSearchRelaxed {
+
+		@Override
+		public void searchBlock( int x0 , int y0 , int x1 , int y1 ) {
 
 			int numPeaks = 0;
 			float peakVal = thresholdMin;
@@ -102,13 +143,27 @@ public abstract class NonMaxBlockRelaxed extends NonMaxBlock {
 				}
 			}
 		}
-	}
-
-	public static class MinMax extends NonMaxBlockRelaxed {
-		public MinMax() { super(true, true); }
 
 		@Override
-		protected void searchBlock( int x0 , int y0 , int x1 , int y1 , GrayF32 img ) {
+		public boolean isDetectMinimums() {
+			return true;
+		}
+
+		@Override
+		public boolean isDetectMaximums() {
+			return false;
+		}
+
+		@Override
+		public NonMaxBlock.Search newInstance() {
+			return new Min();
+		}
+	}
+
+	public static class MinMax extends NonMaxBlockSearchRelaxed {
+
+		@Override
+		public void searchBlock( int x0 , int y0 , int x1 , int y1 ) {
 
 			int numMinPeaks = 0;
 			float peakMinVal = thresholdMin;
@@ -151,6 +206,21 @@ public abstract class NonMaxBlockRelaxed extends NonMaxBlock {
 					checkLocalMax(p.x,p.y,peakMaxVal,img);
 				}
 			}
+		}
+
+		@Override
+		public boolean isDetectMinimums() {
+			return true;
+		}
+
+		@Override
+		public boolean isDetectMaximums() {
+			return true;
+		}
+
+		@Override
+		public NonMaxBlock.Search newInstance() {
+			return new MinMax();
 		}
 	}
 
@@ -205,19 +275,4 @@ public abstract class NonMaxBlockRelaxed extends NonMaxBlock {
 
 		localMin.add(x_c,y_c);
 	}
-
-	@Override
-	public void setSearchRadius(int radius) {
-		super.setSearchRadius(radius);
-
-		int w = 2* radius +1;
-
-		foundMax = new Point2D_I32[w*w];
-		for( int i = 0; i < foundMax.length; i++ )
-			foundMax[i] = new Point2D_I32();
-		foundMin = new Point2D_I32[w*w];
-		for( int i = 0; i < foundMin.length; i++ )
-			foundMin[i] = new Point2D_I32();
-	}
-
 }

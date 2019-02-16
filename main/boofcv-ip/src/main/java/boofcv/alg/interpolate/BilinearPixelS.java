@@ -76,9 +76,4 @@ public abstract class BilinearPixelS<T extends ImageGray<T>> implements Interpol
 	public ImageBorder<T> getBorder() {
 		return border;
 	}
-
-	@Override
-	public boolean isThreadSafe() {
-		return true;
-	}
 }

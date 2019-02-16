@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,8 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
 
+import javax.annotation.Nullable;
+
 /**
  * <p/>
  * Performs a sparse search for local minimums/maximums by only examine around candidates.
@@ -29,24 +31,25 @@ import georegression.struct.point.Point2D_I16;
  *
  * @author Peter Abeles
  */
-public abstract class NonMaxCandidate {
+public class NonMaxCandidate {
 	// size of the search area
-	int radius;
+	protected int radius;
 	// threshold for intensity values when detecting minimums and maximums
 	protected float thresholdMin;
 	protected float thresholdMax;
 	// does not process pixels this close to the image border
-	int ignoreBorder;
+	protected int ignoreBorder;
 
 	protected GrayF32 input;
 
+	// local search algorithm
+	protected Search search;
+
 	// upper bound on detectable extremes in the image
-	int endBorderX, endBorderY;
+	protected int endBorderX, endBorderY;
 
-	// local area that's examined and cropped for the image border
-	int x0,y0,x1,y1;
-
-	public NonMaxCandidate() {
+	public NonMaxCandidate( Search search ) {
+		this.search = search;
 	}
 
 	/**
@@ -54,7 +57,7 @@ public abstract class NonMaxCandidate {
 	 * null then that test is skipped.
 	 */
 	public void process(GrayF32 intensityImage,
-						QueueCorner candidatesMin, QueueCorner candidatesMax,
+						@Nullable QueueCorner candidatesMin, @Nullable QueueCorner candidatesMax,
 						QueueCorner foundMin , QueueCorner foundMax ) {
 
 		this.input = intensityImage;
@@ -63,10 +66,16 @@ public abstract class NonMaxCandidate {
 		endBorderX = intensityImage.width-ignoreBorder;
 		endBorderY = intensityImage.height-ignoreBorder;
 
-		if( candidatesMin != null )
-			examineMinimum(intensityImage,candidatesMin,foundMin);
-		if( candidatesMax != null )
-			examineMaximum(intensityImage,candidatesMax,foundMax);
+		search.initialize(intensityImage);
+
+		if( candidatesMin != null ) {
+			foundMin.reset();
+			examineMinimum(intensityImage, candidatesMin, foundMin);
+		}
+		if( candidatesMax != null ) {
+			foundMax.reset();
+			examineMaximum(intensityImage, candidatesMax, foundMax);
+		}
 
 	}
 
@@ -85,12 +94,12 @@ public abstract class NonMaxCandidate {
 			float val = inten[center];
 			if (val > thresholdMin || val == -Float.MAX_VALUE ) continue;
 
-			x0 = Math.max(0,pt.x - radius);
-			y0 = Math.max(0,pt.y - radius);
-			x1 = Math.min(intensityImage.width, pt.x + radius + 1);
-			y1 = Math.min(intensityImage.height, pt.y + radius + 1);
+			int x0 = Math.max(0,pt.x - radius);
+			int y0 = Math.max(0,pt.y - radius);
+			int x1 = Math.min(intensityImage.width, pt.x + radius + 1);
+			int y1 = Math.min(intensityImage.height, pt.y + radius + 1);
 
-			if( searchMin(center,val) )
+			if( search.searchMin(x0,y0,x1,y1,center,val) )
 				found.add(pt.x,pt.y);
 		}
 	}
@@ -110,18 +119,15 @@ public abstract class NonMaxCandidate {
 			float val = inten[center];
 			if (val < thresholdMax || val == Float.MAX_VALUE ) continue;
 
-			x0 = Math.max(0,pt.x - radius);
-			y0 = Math.max(0,pt.y - radius);
-			x1 = Math.min(intensityImage.width, pt.x + radius + 1);
-			y1 = Math.min(intensityImage.height, pt.y + radius + 1);
+			int x0 = Math.max(0,pt.x - radius);
+			int y0 = Math.max(0,pt.y - radius);
+			int x1 = Math.min(intensityImage.width, pt.x + radius + 1);
+			int y1 = Math.min(intensityImage.height, pt.y + radius + 1);
 
-			if( searchMax(center,val) )
+			if( search.searchMax(x0,y0,x1,y1,center,val) )
 				found.add(pt.x,pt.y);
 		}
 	}
-
-	protected abstract boolean searchMin( int center , float val );
-	protected abstract boolean searchMax( int center , float val );
 
 	public void setSearchRadius(int radius) {
 		this.radius = radius;
@@ -154,5 +160,125 @@ public abstract class NonMaxCandidate {
 
 	public int getBorder() {
 		return ignoreBorder;
+	}
+
+	/**
+	 * Interface for local search algorithm around the candidates
+	 */
+	public interface Search {
+		void initialize( GrayF32 intensity );
+
+		/**
+		 * Verifies that the candidate is a local minimum
+		 *
+		 * @param x0 lower extent X. Inclusive
+		 * @param y0 lower extent Y. Inclusive
+		 * @param x1 upper extent X. Exclusive
+		 * @param y1 upper extent Y. Exclusive
+		 * @param centerIdx index of candidate pixel in the image
+		 * @param val value at the candidate pixel
+		 * @return true if it's a local min
+		 */
+		boolean searchMin( int x0 , int y0 , int x1 , int y1, int centerIdx , float val );
+		boolean searchMax( int x0 , int y0 , int x1 , int y1, int centerIdx , float val );
+
+		/**
+		 * Create a new instance of this search algorithm. Useful for concurrent implementations
+		 */
+		Search newInstance();
+	}
+
+	/**
+	 * Search with a relaxes rule. &le;
+	 */
+	public static class Relaxed implements NonMaxCandidate.Search {
+		GrayF32 intensity;
+
+		@Override
+		public void initialize(GrayF32 intensity) {
+			this.intensity = intensity;
+		}
+
+		@Override
+		public boolean searchMin(int x0, int y0, int x1, int y1, int centerIdx, float val) {
+			for( int i = y0; i < y1; i++ ) {
+				int index = intensity.startIndex + i * intensity.stride + x0;
+				for( int j = x0; j < x1; j++ , index++ ) {
+					if (val > intensity.data[index]) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
+		@Override
+		public boolean searchMax(int x0, int y0, int x1, int y1, int centerIdx, float val) {
+			for( int i = y0; i < y1; i++ ) {
+				int index = intensity.startIndex + i * intensity.stride + x0;
+				for( int j = x0; j < x1; j++ , index++ ) {
+					if (val < intensity.data[index]) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
+		@Override
+		public Search newInstance() {
+			return new Relaxed();
+		}
+	}
+
+	/**
+	 * Search with a strict rule &lt;
+	 */
+	public static class Strict implements NonMaxCandidate.Search {
+		GrayF32 intensity;
+
+		@Override
+		public void initialize(GrayF32 intensity) {
+			this.intensity = intensity;
+		}
+
+		@Override
+		public boolean searchMin(int x0, int y0, int x1, int y1, int centerIdx, float val) {
+			for( int i = y0; i < y1; i++ ) {
+				int index = intensity.startIndex + i * intensity.stride + x0;
+				for( int j = x0; j < x1; j++ , index++ ) {
+					// don't compare the center point against itself
+					if ( centerIdx == index )
+						continue;
+
+					if (val >= intensity.data[index]) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
+		@Override
+		public boolean searchMax(int x0, int y0, int x1, int y1, int centerIdx, float val) {
+			for( int i = y0; i < y1; i++ ) {
+				int index = intensity.startIndex + i * intensity.stride + x0;
+				for( int j = x0; j < x1; j++ , index++ ) {
+					// don't compare the center point against itself
+					if ( centerIdx == index )
+						continue;
+
+					if (val <= intensity.data[index]) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
+		@Override
+		public Search newInstance() {
+			return new Strict();
+		}
 	}
 }

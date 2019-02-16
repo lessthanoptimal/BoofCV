@@ -19,15 +19,15 @@
 package boofcv.demonstrations.feature.detect;
 
 import boofcv.BoofDefaults;
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.abst.feature.detect.extract.WrapperNonMaximumBlock;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
-import boofcv.alg.feature.detect.extract.NonMaxBlockStrict;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ProcessImageSequence;
@@ -136,7 +136,8 @@ public class VideoDetectCorners<T extends ImageGray<T>, D extends ImageGray<D>>
 //		GeneralFeatureIntensity<T, D> intensity =
 //				new WrapperFastCornerIntensity<T, D>(FactoryIntensityPointAlg.createFast12(defaultType, 8 , 12));
 
-		NonMaxSuppression extractor = new WrapperNonMaximumBlock(new NonMaxBlockStrict.Max());
+		ConfigExtract config = new ConfigExtract();
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(config);
 //		FeatureExtractor extractor = new WrapperNonMaximumBlock( new NonMaxExtractorNaive(radius+10,10f));
 //		FeatureExtractor extractor = new WrapperNonMaxCandidate(new NonMaxCandidateStrict(radius+10, 10f));
 		extractor.setIgnoreBorder(radius + 10);

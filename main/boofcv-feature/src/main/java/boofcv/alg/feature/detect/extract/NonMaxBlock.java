@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,8 @@ package boofcv.alg.feature.detect.extract;
 
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
+
+import javax.annotation.Nullable;
 
 /**
  * <p>
@@ -44,32 +46,17 @@ import boofcv.struct.image.GrayF32;
  *
  * @author Peter Abeles
  */
-public abstract class NonMaxBlock {
+public class NonMaxBlock {
 
-	// search region
-	protected int radius;
-	// threshold for intensity values when detecting minimums and maximums
-	protected float thresholdMin;
-	protected float thresholdMax;
+	protected final Configuration configuration = new Configuration();
 	// should it ignore border pixels?
 	protected int border;
 
-	// the defines the region that can be processed
-	int endX,endY;
+	// Used to search individual blocks
+	protected Search search;
 
-	// found minimums
-	protected QueueCorner localMin;
-	// found maximums
-	protected QueueCorner localMax;
-
-	// indicates the algorithm's behavior
-	public boolean detectsMinimum;
-	public boolean detectsMaximum;
-
-
-	protected NonMaxBlock(boolean detectsMinimum, boolean detectsMaximum) {
-		this.detectsMinimum = detectsMinimum;
-		this.detectsMaximum = detectsMaximum;
+	public NonMaxBlock( Search search ) {
+		this.search = search;
 	}
 
 	/**
@@ -79,32 +66,39 @@ public abstract class NonMaxBlock {
 	 * @param localMin (Output) storage for found local minimums.
 	 * @param localMax (Output) storage for found local maximums.
 	 */
-	public void process(GrayF32 intensityImage, QueueCorner localMin, QueueCorner localMax) {
+	public void process(GrayF32 intensityImage, @Nullable QueueCorner localMin, @Nullable QueueCorner localMax) {
 
-		this.localMin = localMin;
-		this.localMax = localMax;
+		if( localMin != null )
+			localMin.reset();
+		if( localMax != null )
+			localMax.reset();
 
-		endX = intensityImage.width-border;
-		endY = intensityImage.height-border;
+		// the defines the region that can be processed
+		int endX = intensityImage.width - border;
+		int endY = intensityImage.height - border;
 
-		int step = radius+1;
+		int step = configuration.radius+1;
 
-		for( int y = border; y < endY; y += step ) {
+		search.initialize(configuration,intensityImage,localMin,localMax);
+
+		for(int y = border; y < endY; y += step ) {
 			int y1 = y + step;
-			if( y1 > endY ) y1 = endY;
+			if( y1 > endY) y1 = endY;
 
-			for( int x = border; x < endX; x += step ) {
+			for(int x = border; x < endX; x += step ) {
 				int x1 = x + step;
-				if( x1 > endX ) x1 = endX;
-				searchBlock(x,y,x1,y1,intensityImage);
+				if( x1 > endX) x1 = endX;
+				search.searchBlock(x,y,x1,y1);
 			}
 		}
 	}
 
-	protected abstract void searchBlock( int x0 , int y0 , int x1 , int y1 , GrayF32 img );
+	public Search getSearch() {
+		return search;
+	}
 
 	public void setSearchRadius(int radius) {
-		this.radius = radius;
+		configuration.radius = radius;
 	}
 
 	public int getBorder() {
@@ -116,22 +110,62 @@ public abstract class NonMaxBlock {
 	}
 
 	public int getSearchRadius() {
-		return radius;
+		return configuration.radius;
 	}
 
 	public float getThresholdMin() {
-		return thresholdMin;
+		return configuration.thresholdMin;
 	}
 
 	public void setThresholdMin(float thresholdMin) {
-		this.thresholdMin = thresholdMin;
+		configuration.thresholdMin = thresholdMin;
 	}
 
 	public float getThresholdMax() {
-		return thresholdMax;
+		return configuration.thresholdMax;
 	}
 
 	public void setThresholdMax(float thresholdMax) {
-		this.thresholdMax = thresholdMax;
+		configuration.thresholdMax = thresholdMax;
+	}
+
+	public interface Search {
+		/**
+		 * Call before each time a search is started on a new image
+		 *
+		 * @param configuration Describes how it should search
+		 * @param image The image that is being searched
+		 * @param localMin Storage for local minimums
+		 * @param localMax Storage for local maximums
+		 */
+		void initialize( Configuration configuration,
+						 GrayF32 image , QueueCorner localMin , QueueCorner localMax );
+
+		/**
+		 * Search the image for local max/min inside the specified region
+		 * @param x0 lower extent X (inclusive)
+		 * @param y0 lower extent Y (inclusive)
+		 * @param x1 upper extent X (exclusive)
+		 * @param y1 upper extent Y (exclusive)
+		 */
+		void searchBlock( int x0 , int y0 , int x1 , int y1 );
+
+		boolean isDetectMinimums();
+
+		boolean isDetectMaximums();
+
+		/**
+		 * Create a new instance of this search algorithm. Useful for concurrent implementations
+		 */
+		Search newInstance();
+	}
+
+	class Configuration {
+		// threshold for intensity values when detecting minimums and maximums
+		public float thresholdMin;
+		public float thresholdMax;
+
+		// the search radius
+		public int radius;
 	}
 }

@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class GenericNonMaxAlgorithmTests {
+public abstract class GenericNonMaxTests {
 
 	Random rand = new Random(2134);
 
@@ -54,21 +54,26 @@ public abstract class GenericNonMaxAlgorithmTests {
 
 	boolean strict;
 
-	protected GenericNonMaxAlgorithmTests(boolean strict, boolean canDetectMin, boolean canDetectMax ) {
+	protected GenericNonMaxTests(boolean strict, boolean canDetectMin, boolean canDetectMax ) {
 		this.strict = strict;
 		this.canDetectMin = canDetectMin;
 		this.canDetectMax = canDetectMax;
+	}
+
+	public void setImageShape( int width , int height ) {
+		this.width = width;
+		this.height = height;
 	}
 
 
 	private void findLocalPeaks(GrayF32 intensity, float threshold, int radius, int border) {
 		foundMinimum.reset();
 		foundMaximum.reset();
-		findMaximums(intensity, threshold, radius, border, foundMinimum, foundMaximum);
+		findPeaks(intensity, threshold, radius, border, foundMinimum, foundMaximum);
 	}
 
-	public abstract void findMaximums(GrayF32 intensity, float threshold, int radius, int border,
-									  QueueCorner foundMinimum, QueueCorner foundMaximum );
+	public abstract void findPeaks(GrayF32 intensity, float threshold, int radius, int border,
+								   QueueCorner foundMinimum, QueueCorner foundMaximum );
 
 
 	public void reset() {
@@ -193,7 +198,7 @@ public abstract class GenericNonMaxAlgorithmTests {
 	 */
 	@Test
 	public void compareToNaive() {
-		GrayF32 inten = new GrayF32(30, 40);
+		GrayF32 inten = new GrayF32(width, height);
 
 		QueueCorner naiveMin = new QueueCorner(inten.getWidth() * inten.getHeight());
 		QueueCorner naiveMax = new QueueCorner(inten.getWidth() * inten.getHeight());

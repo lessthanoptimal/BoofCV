@@ -43,6 +43,13 @@ public class BoofConcurrency {
 		pool = new ForkJoinPool(maxThreads);
 	}
 
+	/**
+	 * Returns the maximum number of threads which can be run at once in this pool
+	 */
+	public static int getMaxThreads() {
+		return pool.getParallelism();
+	}
+
 	public static void range(int start , int endExclusive , IntConsumer consumer ) {
 		try {
 			pool.submit(() ->IntStream.range(start, endExclusive).parallel().forEach(consumer)).get();
@@ -52,7 +59,8 @@ public class BoofConcurrency {
 	}
 
 	/**
-	 * Automatically breaks the problem up into blocks based on the number of threads available.
+	 * Automatically breaks the problem up into blocks based on the number of threads available. It is assumed
+	 * that there is some cost associated with processing a block and the number of blocks is minimized.
 	 *
 	 * Examples:
 	 * <ul>
@@ -91,6 +99,32 @@ public class BoofConcurrency {
 		// now attempt to make each block the same size
 		int N = Math.max(1,range/block);
 		return range/N;
+	}
+
+	/**
+	 * Splits the range of values up into blocks. It's assumed the cost to process a block is small so
+	 * more can be created.
+	 * @param start First index, inclusive
+	 * @param endExclusive Last index, exclusive
+	 * @param consumer The consumer
+	 */
+	public static void blocks(int start , int endExclusive , IntRangeConsumer consumer ) {
+		final ForkJoinPool pool = BoofConcurrency.pool;
+		int numThreads = pool.getParallelism();
+
+		int range = endExclusive-start;
+		if( range <= 0 )
+			throw new IllegalArgumentException("end must be more than start");
+
+		// Process more blocks than an even split would do. This avoids an unlucky process from getting
+		// stuck with a hard task and taking too long
+		int blockSize = Math.max(1,range/(4*numThreads));
+
+		try {
+			pool.submit(new IntRangeTask(0,start,endExclusive,blockSize,consumer)).get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
 

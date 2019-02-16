@@ -86,4 +86,9 @@ public class OrientationSiftToImage<T extends ImageGray<T>>
 
 		return alg.getPeakOrientation();
 	}
+
+	@Override
+	public RegionOrientation newInstance() {
+		throw new RuntimeException("IMplement");
+	}
 }
