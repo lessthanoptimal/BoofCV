@@ -55,7 +55,7 @@ public class BenchmarkThresholding {
 	public int region;
 
 	//	@Param({"100", "500", "1000", "5000", "10000"})
-	@Param({"5000"})
+	@Param({"2000"})
 	public int size;
 
 	GrayU8 inputU8 = new GrayU8(size, size);
@@ -63,11 +63,15 @@ public class BenchmarkThresholding {
 	GrayU8 output = new GrayU8(size, size);
 
 	// declare algorithms here so that they can recycle memory
+	InputToBinary<GrayU8> globalOtsuU8;
+	InputToBinary<GrayU8> globalEntropyU8;
+
 	InputToBinary<GrayU8> localOtsuU8;
 	InputToBinary<GrayU8> localMeanU8;
 	InputToBinary<GrayU8> localGaussianU8;
 	InputToBinary<GrayF32> localSauvolaF32;
 	InputToBinary<GrayF32> localNickF32;
+
 	InputToBinary<GrayU8> blockMeanU8;
 	InputToBinary<GrayU8> blockMinMaxU8;
 	InputToBinary<GrayU8> blockOtsuU8;
@@ -86,6 +90,9 @@ public class BenchmarkThresholding {
 
 		ConfigLength configLength = ConfigLength.fixed(region);
 
+		globalOtsuU8 = FactoryThresholdBinary.globalOtsu(0,255,true,GrayU8.class);
+		globalEntropyU8 = FactoryThresholdBinary.globalEntropy(0,255,true,GrayU8.class);
+
 		localOtsuU8 = FactoryThresholdBinary.localOtsu(configLength, 1.0, true, true, 0.1, GrayU8.class);
 		localMeanU8 = FactoryThresholdBinary.localMean(configLength,1.0,true,GrayU8.class);
 		localGaussianU8 = FactoryThresholdBinary.localGaussian(configLength,1.0,true,GrayU8.class);
@@ -97,35 +104,45 @@ public class BenchmarkThresholding {
 		blockOtsuU8 = FactoryThresholdBinary.blockOtsu(configLength,1.0,true,true,true,0.1,GrayU8.class);
 	}
 
-//	@Benchmark
-//	public void globalThreshold() {
-//		ThresholdImageOps.threshold(inputU8,output,100,true);
-//	}
-//
-//	@Benchmark
-//	public void localOtsu() {
-//		localOtsuU8.process(inputU8,output);
-//	}
-//
-//	@Benchmark
-//	public void localMean() {
-//		localMeanU8.process(inputU8,output);
-//	}
-//
-//	@Benchmark
-//	public void localGaussian() {
-//		localGaussianU8.process(inputU8,output);
-//	}
-//
-//	@Benchmark
-//	public void localSauvola() {
-//		localSauvolaF32.process(inputF32,output);
-//	}
-//
-//	@Benchmark
-//	public void localNick() {
-//		localNickF32.process(inputF32,output);
-//	}
+	@Benchmark
+	public void globalThreshold() {
+		ThresholdImageOps.threshold(inputU8,output,100,true);
+	}
+
+	@Benchmark
+	public void globalOtsu() {
+		globalOtsuU8.process(inputU8,output);
+	}
+
+	@Benchmark
+	public void globalEntropy() {
+		globalEntropyU8.process(inputU8,output);
+	}
+
+	@Benchmark
+	public void localOtsu() {
+		localOtsuU8.process(inputU8,output);
+	}
+
+	@Benchmark
+	public void localMean() {
+		localMeanU8.process(inputU8,output);
+	}
+
+	@Benchmark
+	public void localGaussian() {
+		localGaussianU8.process(inputU8,output);
+	}
+
+	@Benchmark
+	public void localSauvola() {
+		localSauvolaF32.process(inputF32,output);
+	}
+
+	@Benchmark
+	public void localNick() {
+		localNickF32.process(inputF32,output);
+	}
 
 	@Benchmark
 	public void blockMean() {

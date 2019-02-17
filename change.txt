@@ -64,7 +64,7 @@ Version : 0.33
   * Created AutocodeConcurrentApp for generating threaded code from single thread algorithms
   * Created IntRangeConsumer for parallel code that processes a range of numbers in a block
   * Convolution: general, sum, mean, gradient
-  * Threshold: Local Algorithms, TODO Block Algorithms, TODO Global Algorithms
+  * Threshold: Local, Block
   * Misc: PixelMath, Non-Max, Non-Max Candidate, ConvertImage
   * Feature Intensity: SURF, TODO SSD Corner
 - Examples
