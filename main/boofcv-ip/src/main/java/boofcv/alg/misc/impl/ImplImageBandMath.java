@@ -18,7 +18,6 @@
 
 package boofcv.alg.misc.impl;
 
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.*;
 import org.ddogleg.sorting.QuickSelect;
 
@@ -92,12 +91,6 @@ public class ImplImageBandMath {
 
 		final GrayU8[] bands = input.bands;
 		final int numBands = lastBand - startBand + 1;
-
-		// handle edge case
-		if( numBands == 1 ) {
-			ImageMiscOps.fill(output,0);
-			return;
-		}
 
 		final int middle = numBands/2;
 		int[] valueArray = new int[numBands];
@@ -226,12 +219,6 @@ public class ImplImageBandMath {
 		final GrayS16[] bands = input.bands;
 		final int numBands = lastBand - startBand + 1;
 
-		// handle edge case
-		if( numBands == 1 ) {
-			ImageMiscOps.fill(output,0);
-			return;
-		}
-
 		final int middle = numBands/2;
 		int[] valueArray = new int[numBands];
 		boolean isEven = numBands % 2 == 0;
@@ -358,12 +345,6 @@ public class ImplImageBandMath {
 
 		final GrayU16[] bands = input.bands;
 		final int numBands = lastBand - startBand + 1;
-
-		// handle edge case
-		if( numBands == 1 ) {
-			ImageMiscOps.fill(output,0);
-			return;
-		}
 
 		final int middle = numBands/2;
 		int[] valueArray = new int[numBands];
@@ -492,12 +473,6 @@ public class ImplImageBandMath {
 		final GrayS32[] bands = input.bands;
 		final int numBands = lastBand - startBand + 1;
 
-		// handle edge case
-		if( numBands == 1 ) {
-			ImageMiscOps.fill(output,0);
-			return;
-		}
-
 		final int middle = numBands/2;
 		int[] valueArray = new int[numBands];
 		boolean isEven = numBands % 2 == 0;
@@ -624,12 +599,6 @@ public class ImplImageBandMath {
 
 		final GrayS64[] bands = input.bands;
 		final int numBands = lastBand - startBand + 1;
-
-		// handle edge case
-		if( numBands == 1 ) {
-			ImageMiscOps.fill(output,0);
-			return;
-		}
 
 		final int middle = numBands/2;
 		long[] valueArray = new long[numBands];
@@ -758,12 +727,6 @@ public class ImplImageBandMath {
 		final GrayF32[] bands = input.bands;
 		final int numBands = lastBand - startBand + 1;
 
-		// handle edge case
-		if( numBands == 1 ) {
-			ImageMiscOps.fill(output,0);
-			return;
-		}
-
 		final int middle = numBands/2;
 		float[] valueArray = new float[numBands];
 		boolean isEven = numBands % 2 == 0;
@@ -890,12 +853,6 @@ public class ImplImageBandMath {
 
 		final GrayF64[] bands = input.bands;
 		final int numBands = lastBand - startBand + 1;
-
-		// handle edge case
-		if( numBands == 1 ) {
-			ImageMiscOps.fill(output,0);
-			return;
-		}
 
 		final int middle = numBands/2;
 		double[] valueArray = new double[numBands];

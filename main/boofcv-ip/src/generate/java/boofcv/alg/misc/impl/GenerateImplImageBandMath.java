@@ -224,12 +224,6 @@ public class GenerateImplImageBandMath extends CodeGeneratorBase {
 				"\t\tfinal "+band+"[] bands = input.bands;\n" +
 				"\t\tfinal int numBands = lastBand - startBand + 1;\n" +
 				"\n" +
-				"\t\t// handle edge case\n" +
-				"\t\tif( numBands == 1 ) {\n" +
-				"\t\t\tImageMiscOps.fill(output,0);\n" +
-				"\t\t\treturn;\n" +
-				"\t\t}\n" +
-				"\n" +
 				"\t\tfinal int middle = numBands/2;\n" +
 				"\t\t"+sumType+"[] valueArray = new "+sumType+"[numBands];\n" +
 				"\t\tboolean isEven = numBands % 2 == 0;\n" +

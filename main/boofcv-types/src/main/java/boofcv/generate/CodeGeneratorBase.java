@@ -95,10 +95,21 @@ public abstract class CodeGeneratorBase {
 	public void initFile() throws FileNotFoundException {
 		File file = new File(className + ".java");
 		if( overwrite ) {
-			file = new File(packageToPath(getClass()),file.getName());
-			if( !file.getParentFile().exists() ) {
-				if( !file.getParentFile().mkdirs() ) {
-					throw new RuntimeException("Failed to create path "+file.getParentFile().getPath());
+			boolean skip = false;
+			// test to see if it's inside a module or not
+			if( new File("change.txt").exists() ) {
+				skip = true;
+				System.out.println("Can't overwrite. Current directory is project root. Needs to the module.");
+			} else if( !new File("src").exists() ) {
+				skip = true;
+				System.out.println("Can't overwrite. src not in current directory");
+			}
+			if( !skip ) {
+				file = new File(packageToPath(getClass()), file.getName());
+				if (!file.getParentFile().exists()) {
+					if (!file.getParentFile().mkdirs()) {
+						throw new RuntimeException("Failed to create path " + file.getParentFile().getPath());
+					}
 				}
 			}
 		}
