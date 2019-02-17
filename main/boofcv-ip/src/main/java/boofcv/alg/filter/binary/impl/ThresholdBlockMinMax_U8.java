@@ -32,12 +32,10 @@ public class ThresholdBlockMinMax_U8
 	extends ThresholdBlockMinMax<GrayU8,InterleavedU8>
 {
 	double scale;
-	boolean down;
 
 	public ThresholdBlockMinMax_U8(double minimumSpread, double scale , boolean down) {
 		super(minimumSpread,down);
 		this.scale = scale;
-		this.down = down;
 	}
 
 	@Override

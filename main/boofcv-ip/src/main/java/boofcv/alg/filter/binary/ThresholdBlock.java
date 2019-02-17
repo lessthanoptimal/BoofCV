@@ -142,6 +142,7 @@ public class ThresholdBlock<T extends ImageGray<T>,S extends ImageBase<S>>
 			// handle the case where the image's width isn't evenly divisible by the block's width
 			if( innerWidth != input.width ) {
 				processor.computeBlockStatistics(innerWidth,y,input.width-innerWidth,blockHeight,indexStats,input,stats);
+				indexStats += statPixelStride;
 			}
 		}
 		// handle the case where the image's height isn't evenly divisible by the block's height
