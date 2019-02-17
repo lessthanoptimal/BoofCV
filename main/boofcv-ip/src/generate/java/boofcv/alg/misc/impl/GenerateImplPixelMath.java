@@ -88,7 +88,6 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 
 			printBoundImage();
 			printDiffAbs();
-			printAverageBand();
 		}
 
 		AutoTypeImage outputsAdd[] = new AutoTypeImage[]{U16,S16,S32,S32,S32,S64,F32,F64};
@@ -380,40 +379,6 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\t}\n\n");
 	}
-
-	public void printAverageBand() {
-		
-		String imageName = input.getSingleBandName();
-		String sumType = input.getSumType();
-		String typecast = input.getTypeCastFromSum();
-		String bitwise = input.getBitWise();
-		
-		out.print(
-				"\tpublic static void averageBand( Planar<"+imageName+"> input , "+imageName+" output ) {\n" +
-				"\t\tfinal int h = input.getHeight();\n" +
-				"\t\tfinal int w = input.getWidth();\n" +
-				"\n" +
-				"\t\t"+imageName+"[] bands = input.bands;\n" +
-				"\t\t\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{\n" +
-				"\t\tfor (int y = 0; y < h; y++) {\n" +
-				"\t\t\tint indexInput = input.getStartIndex() + y * input.getStride();\n" +
-				"\t\t\tint indexOutput = output.getStartIndex() + y * output.getStride();\n" +
-				"\n" +
-				"\t\t\tint indexEnd = indexInput+w;\n" +
-				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
-				"\t\t\tfor (; indexInput < indexEnd; indexInput++, indexOutput++ ) {\n" +
-				"\t\t\t\t"+sumType+" total = 0;\n" +
-				"\t\t\t\tfor( int i = 0; i < bands.length; i++ ) {\n" +
-				"\t\t\t\t\ttotal += bands[i].data[ indexInput ]"+bitwise+";\n" +
-				"\t\t\t\t}\n" +
-				"\t\t\t\toutput.data[indexOutput] = "+typecast+"(total / bands.length);\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t\t//CONCURRENT_ABOVE });\n" +
-				"\t}\n\n");
-	}
-
 
 	class Multiple implements TwoTemplate {
 

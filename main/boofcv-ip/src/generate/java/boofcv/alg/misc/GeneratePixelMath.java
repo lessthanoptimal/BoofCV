@@ -93,7 +93,6 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 
 			printBoundImage();
 			printDiffAbs();
-			printAverageBand();
 		}
 
 		AutoTypeImage outputsAdd[] = new AutoTypeImage[]{U16,S16,S32,S32,S32,S64,F32,F64};
@@ -442,26 +441,6 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t\t\tImplPixelMath_MT.sqrt(input,output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplPixelMath.sqrt(input,output);\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
-	}
-
-	public void printAverageBand() {
-		
-		String imageName = input.getSingleBandName();
-		
-		out.print("\t/**\n" +
-				"\t * Computes the average for each pixel across all bands in the {@link Planar} image.\n" +
-				"\t * \n" +
-				"\t * @param input Planar image\n" +
-				"\t * @param output Gray scale image containing average pixel values\n" +
-				"\t */\n" +
-				"\tpublic static void averageBand( Planar<"+imageName+"> input , "+imageName+" output ) {\n" +
-				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
-				"\t\t\tImplPixelMath_MT.averageBand(input,output);\n" +
-				"\t\t} else {\n" +
-				"\t\t\tImplPixelMath.averageBand(input,output);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}

@@ -1841,30 +1841,6 @@ public class ImplPixelMath {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void averageBand( Planar<GrayU8> input , GrayU8 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
-
-		GrayU8[] bands = input.bands;
-		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				int total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ]& 0xFF;
-				}
-				output.data[indexOutput] = (byte)(total / bands.length);
-			}
-		}
-		//CONCURRENT_ABOVE });
-	}
-
 	public static void boundImage( GrayS8 img , int min , int max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
@@ -1902,30 +1878,6 @@ public class ImplPixelMath {
 			// for(int x = 0; x < w; x++ ) {
 			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
 				output.data[indexDiff] = (byte)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
-		}
-		//CONCURRENT_ABOVE });
-	}
-
-	public static void averageBand( Planar<GrayS8> input , GrayS8 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
-
-		GrayS8[] bands = input.bands;
-		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				int total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ];
-				}
-				output.data[indexOutput] = (byte)(total / bands.length);
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -1973,30 +1925,6 @@ public class ImplPixelMath {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void averageBand( Planar<GrayU16> input , GrayU16 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
-
-		GrayU16[] bands = input.bands;
-		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				int total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ]& 0xFFFF;
-				}
-				output.data[indexOutput] = (short)(total / bands.length);
-			}
-		}
-		//CONCURRENT_ABOVE });
-	}
-
 	public static void boundImage( GrayS16 img , int min , int max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
@@ -2034,30 +1962,6 @@ public class ImplPixelMath {
 			// for(int x = 0; x < w; x++ ) {
 			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
 				output.data[indexDiff] = (short)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
-		}
-		//CONCURRENT_ABOVE });
-	}
-
-	public static void averageBand( Planar<GrayS16> input , GrayS16 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
-
-		GrayS16[] bands = input.bands;
-		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				int total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ];
-				}
-				output.data[indexOutput] = (short)(total / bands.length);
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -2105,30 +2009,6 @@ public class ImplPixelMath {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void averageBand( Planar<GrayS32> input , GrayS32 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
-
-		GrayS32[] bands = input.bands;
-		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				int total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ];
-				}
-				output.data[indexOutput] = (total / bands.length);
-			}
-		}
-		//CONCURRENT_ABOVE });
-	}
-
 	public static void boundImage( GrayS64 img , long min , long max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
@@ -2166,30 +2046,6 @@ public class ImplPixelMath {
 			// for(int x = 0; x < w; x++ ) {
 			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
 				output.data[indexDiff] = (long)Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
-		}
-		//CONCURRENT_ABOVE });
-	}
-
-	public static void averageBand( Planar<GrayS64> input , GrayS64 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
-
-		GrayS64[] bands = input.bands;
-		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				long total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ];
-				}
-				output.data[indexOutput] = (total / bands.length);
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -2237,30 +2093,6 @@ public class ImplPixelMath {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void averageBand( Planar<GrayF32> input , GrayF32 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
-
-		GrayF32[] bands = input.bands;
-		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				float total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ];
-				}
-				output.data[indexOutput] = (total / bands.length);
-			}
-		}
-		//CONCURRENT_ABOVE });
-	}
-
 	public static void boundImage( GrayF64 img , double min , double max ) {
 		final int h = img.getHeight();
 		final int w = img.getWidth();
@@ -2298,30 +2130,6 @@ public class ImplPixelMath {
 			// for(int x = 0; x < w; x++ ) {
 			for (; indexA < indexEnd; indexA++, indexB++, indexDiff++ ) {
 				output.data[indexDiff] = Math.abs((imgA.data[indexA] ) - (imgB.data[indexB] ));
-			}
-		}
-		//CONCURRENT_ABOVE });
-	}
-
-	public static void averageBand( Planar<GrayF64> input , GrayF64 output ) {
-		final int h = input.getHeight();
-		final int w = input.getWidth();
-
-		GrayF64[] bands = input.bands;
-		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
-			int indexInput = input.getStartIndex() + y * input.getStride();
-			int indexOutput = output.getStartIndex() + y * output.getStride();
-
-			int indexEnd = indexInput+w;
-			// for(int x = 0; x < w; x++ ) {
-			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
-				double total = 0;
-				for( int i = 0; i < bands.length; i++ ) {
-					total += bands[i].data[ indexInput ];
-				}
-				output.data[indexOutput] = (total / bands.length);
 			}
 		}
 		//CONCURRENT_ABOVE });

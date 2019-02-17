@@ -16,32 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.edge.impl;
+package boofcv.alg.misc.impl;
 
-import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
-import java.util.Random;
-
-class TestImplGradientToEdgeFeatures_MT extends CompareIdenticalFunctions {
-
-	private Random rand = new Random(234);
-	private int width = 105;
-	private int height = 100;
-
-	TestImplGradientToEdgeFeatures_MT() {
-		super(ImplGradientToEdgeFeatures_MT.class, ImplGradientToEdgeFeatures.class);
-	}
-
+/**
+ * @author Peter Abeles
+ */
+public class TestImplPixelMath {
 	@Test
-	void performTests() {
-		performTests(108);
-	}
-
-	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
-		return new Object[][]{{1}};
+	void stuff() {
+		// intentionally empty. Handled by PixelMath
 	}
 }
-

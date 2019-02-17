@@ -64,7 +64,7 @@ public class ThresholdNick_MT implements InputToBinary<GrayF32> {
 	/**
 	 * Configures the algorithm.
 	 * @param width size of local region.  Try 31
-	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
+	 * @param k The Niblack factor. Recommend -0.1 to -0.2
 	 * @param down Threshold down or up
 	 */
 	public ThresholdNick_MT(ConfigLength width, float k, boolean down) {

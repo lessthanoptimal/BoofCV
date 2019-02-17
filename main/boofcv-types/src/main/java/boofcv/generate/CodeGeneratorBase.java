@@ -102,6 +102,9 @@ public abstract class CodeGeneratorBase {
 				}
 			}
 		}
+
+		System.out.println(file.getAbsolutePath());
+
 		out = new PrintStream(new FileOutputStream(file));
 		out.print(CodeGeneratorUtil.copyright);
 		out.println();
