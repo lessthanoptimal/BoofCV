@@ -27,7 +27,6 @@ import boofcv.struct.image.GrayS16;
 
 import javax.annotation.Generated;
 
-
 /**
  * <p>
  * Unrolls the convolution kernel to reduce array accessing and save often used variables to the stack.

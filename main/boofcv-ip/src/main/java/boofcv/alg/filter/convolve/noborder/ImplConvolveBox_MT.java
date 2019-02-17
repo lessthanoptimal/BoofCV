@@ -26,6 +26,7 @@ import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
 
+
 /**
  * <p>
  * Convolves a box filter across an image.  A box filter is equivalent to convolving a kernel with all 1's.
