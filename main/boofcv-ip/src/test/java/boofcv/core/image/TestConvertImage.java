@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,7 +76,8 @@ public class TestConvertImage {
 			count++;
 		}
 
-		assertEquals(8*7 + 8*7 +8+8+8+8+8+4,count);
+		// to get the count search for 'public static'
+		assertEquals(152,count);
 	}
 
 	private void checkConvert( Method m , Class inputType , Class outputType ) {

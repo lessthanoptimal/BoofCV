@@ -18,14 +18,51 @@
 
 package boofcv.core.image.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.Planar;
+import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.lang.reflect.Method;
+import java.util.Random;
 
-class TestImplConvertPlanarToGray_MT {
+class TestImplConvertPlanarToGray_MT extends CompareIdenticalFunctions {
+	private Random rand = new Random(234);
+	private int width = 105;
+	private int height = 100;
+
+
+	TestImplConvertPlanarToGray_MT() {
+		super(ImplConvertPlanarToGray_MT.class, ImplConvertPlanarToGray.class);
+	}
+
 	@Test
-	void implement() {
-		fail("implement");
+	void performTests() {
+		performTests(8);
+	}
+
+	@Override
+	protected Object[][] createInputParam(Method candidate, Method validation) {
+		Class[] type = candidate.getParameterTypes();
+		Class grayType = type[1];
+
+		return new Object[][] {
+				createTest(grayType,1),
+						createTest(grayType,2),
+						createTest(grayType,3),
+						createTest(grayType,4)};
+	}
+
+	private Object[] createTest( Class type , int numBands ) {
+		Object[] params = new Object[2];
+
+		params[0] = new Planar(type,width,height,numBands);
+		params[1] = GeneralizedImageOps.createSingleBand(type,width,height);
+
+		GImageMiscOps.fillUniform((Planar)params[0],rand,0,200);
+
+		return params;
 	}
 }
 

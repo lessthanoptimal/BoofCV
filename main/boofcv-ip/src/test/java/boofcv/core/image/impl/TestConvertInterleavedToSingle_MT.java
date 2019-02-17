@@ -18,14 +18,55 @@
 
 package boofcv.core.image.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageInterleaved;
+import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.lang.reflect.Method;
+import java.util.Random;
 
-class TestConvertInterleavedToSingle_MT {
+class TestConvertInterleavedToSingle_MT extends CompareIdenticalFunctions {
+	private Random rand = new Random(234);
+	private int width = 105;
+	private int height = 100;
+
+
+	TestConvertInterleavedToSingle_MT() {
+		super(ConvertInterleavedToSingle_MT.class, ConvertInterleavedToSingle.class);
+	}
+
 	@Test
-	void implement() {
-		fail("implement");
+	void performTests() {
+		performTests(8);
+	}
+
+	@Override
+	protected Object[][] createInputParam(Method candidate, Method validation) {
+		Class[] type = candidate.getParameterTypes();
+		Class grayType = type[1];
+
+		return new Object[][] {
+				createTest(grayType,1),
+				createTest(grayType,2),
+				createTest(grayType,3),
+				createTest(grayType,4)};
+	}
+
+	private Object[] createTest( Class type , int numBands ) {
+		Object[] params = new Object[2];
+
+		params[1] = GeneralizedImageOps.createSingleBand(type,width,height);
+		ImageDataType dt = ((ImageBase)params[1]).getImageType().getDataType();
+		params[0] = GeneralizedImageOps.createInterleaved(dt,width,height,numBands);
+
+		GImageMiscOps.fillUniform((ImageInterleaved)params[0],rand,0,200);
+
+
+		return params;
 	}
 }
 
