@@ -325,9 +325,6 @@ public class TestImplImageBandMath {
 		}
 	}
 
-	private void checkMedianResults( ) {
-
-	}
 
 	private void TestStdDevBand(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
