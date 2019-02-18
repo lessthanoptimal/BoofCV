@@ -240,10 +240,10 @@ public class GenerateImplImageBandMath extends CodeGeneratorBase {
 				"\t\t}\n" +
 				"\n" +
 				"\t\tfinal int middle = numBands/2;\n" +
-				"\t\t"+sumType+"[] valueArray = new "+sumType+"[numBands];\n" +
 				"\t\tboolean isEven = numBands % 2 == 0;\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{\n" +
 				"\t\tfor (int y = 0; y < h; y++) {\n" +
+				"\t\t\tfinal "+sumType+"[] valueArray = new "+sumType+"[numBands];\n" +
 				"\t\t\tint indexInput = input.getStartIndex() + y * input.getStride();\n" +
 				"\t\t\tint indexOutput = output.getStartIndex() + y * output.getStride();\n" +
 				"\n" +
