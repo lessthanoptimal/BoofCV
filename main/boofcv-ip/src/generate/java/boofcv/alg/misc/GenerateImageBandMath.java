@@ -50,6 +50,8 @@ public class GenerateImageBandMath extends CodeGeneratorBase {
 	private void printPreamble() {
 		out.print("import boofcv.struct.image.*;\n" +
 				"import boofcv.alg.misc.impl.ImplImageBandMath;\n" +
+				"import boofcv.alg.misc.impl.ImplImageBandMath_MT;\n" +
+				"import boofcv.concurrency.BoofConcurrency;\n" +
 				"\n" +
 				"import javax.annotation.Generated;\n" +
 				"import javax.annotation.Nullable;\n" +
@@ -105,7 +107,11 @@ public class GenerateImageBandMath extends CodeGeneratorBase {
 			"\t */\n" +
 			"\tpublic static void "+action+"(Planar<"+band+"> input, "+band+" output) {\n" +
 			"\t\toutput.reshape(input.width,input.height);\n" +
-			"\t\tImplImageBandMath."+action+"(input, output, 0, input.getNumBands() - 1);\n" +
+			"\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
+			"\t\t\tImplImageBandMath_MT."+action+"(input, output, 0, input.getNumBands() - 1);\n" +
+			"\t\t} else {\n" +
+			"\t\t\tImplImageBandMath."+action+"(input, output, 0, input.getNumBands() - 1);\n" +
+			"\t\t}\n" +
 			"\t}\n\n" +
 
 			"\t/**\n" +
@@ -119,7 +125,11 @@ public class GenerateImageBandMath extends CodeGeneratorBase {
 			"\tpublic static void "+action+"(Planar<"+band+"> input, "+band+" output, int startBand, int lastBand) {\n" +
 			"\t\tcheckInput(input, startBand, lastBand);\n" +
 			"\t\toutput.reshape(input.width,input.height);\n" +
-			"\t\tImplImageBandMath."+action+"(input, output, startBand, lastBand);\n" +
+			"\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
+			"\t\t\tImplImageBandMath_MT."+action+"(input, output, startBand, lastBand);\n" +
+			"\t\t} else {\n" +
+			"\t\t\tImplImageBandMath."+action+"(input, output, startBand, lastBand);\n" +
+			"\t\t}\n" +
 			"\t}\n\n"
 		);
 	}
@@ -154,7 +164,11 @@ public class GenerateImageBandMath extends CodeGeneratorBase {
 			"\t\t\tavg = new "+band+"(input.width,input.height);\n" +
 			"\t\t\taverage(input,avg,startBand,lastBand);\n" +
 			"\t\t}\n" +
-			"\t\tImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);\n" +
+			"\t\tif (BoofConcurrency.USE_CONCURRENT) {\n" +
+			"\t\t\tImplImageBandMath_MT.stdDev(input,output,avg,startBand,lastBand);\n" +
+			"\t\t} else {\n" +
+			"\t\t\tImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);\n" +
+			"\t\t}\n" +
 			"\t}\n\n"
 		);
 	}

@@ -20,6 +20,8 @@ package boofcv.alg.misc;
 
 import boofcv.struct.image.*;
 import boofcv.alg.misc.impl.ImplImageBandMath;
+import boofcv.alg.misc.impl.ImplImageBandMath_MT;
+import boofcv.concurrency.BoofConcurrency;
 
 import javax.annotation.Generated;
 import javax.annotation.Nullable;
@@ -59,7 +61,11 @@ public class ImageBandMath {
 	 */
 	public static void minimum(Planar<GrayU8> input, GrayU8 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.minimum(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.minimum(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.minimum(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -73,7 +79,11 @@ public class ImageBandMath {
 	public static void minimum(Planar<GrayU8> input, GrayU8 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.minimum(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.minimum(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.minimum(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -84,7 +94,11 @@ public class ImageBandMath {
 	 */
 	public static void maximum(Planar<GrayU8> input, GrayU8 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.maximum(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.maximum(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.maximum(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -98,7 +112,11 @@ public class ImageBandMath {
 	public static void maximum(Planar<GrayU8> input, GrayU8 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.maximum(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.maximum(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.maximum(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -109,7 +127,11 @@ public class ImageBandMath {
 	 */
 	public static void average(Planar<GrayU8> input, GrayU8 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.average(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.average(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.average(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -123,7 +145,11 @@ public class ImageBandMath {
 	public static void average(Planar<GrayU8> input, GrayU8 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.average(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.average(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.average(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -134,7 +160,11 @@ public class ImageBandMath {
 	 */
 	public static void median(Planar<GrayU8> input, GrayU8 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.median(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.median(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.median(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -148,7 +178,11 @@ public class ImageBandMath {
 	public static void median(Planar<GrayU8> input, GrayU8 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.median(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.median(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.median(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -178,7 +212,11 @@ public class ImageBandMath {
 			avg = new GrayU8(input.width,input.height);
 			average(input,avg,startBand,lastBand);
 		}
-		ImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.stdDev(input,output,avg,startBand,lastBand);
+		} else {
+			ImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);
+		}
 	}
 
 	/**
@@ -189,7 +227,11 @@ public class ImageBandMath {
 	 */
 	public static void minimum(Planar<GrayS16> input, GrayS16 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.minimum(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.minimum(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.minimum(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -203,7 +245,11 @@ public class ImageBandMath {
 	public static void minimum(Planar<GrayS16> input, GrayS16 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.minimum(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.minimum(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.minimum(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -214,7 +260,11 @@ public class ImageBandMath {
 	 */
 	public static void maximum(Planar<GrayS16> input, GrayS16 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.maximum(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.maximum(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.maximum(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -228,7 +278,11 @@ public class ImageBandMath {
 	public static void maximum(Planar<GrayS16> input, GrayS16 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.maximum(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.maximum(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.maximum(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -239,7 +293,11 @@ public class ImageBandMath {
 	 */
 	public static void average(Planar<GrayS16> input, GrayS16 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.average(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.average(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.average(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -253,7 +311,11 @@ public class ImageBandMath {
 	public static void average(Planar<GrayS16> input, GrayS16 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.average(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.average(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.average(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -264,7 +326,11 @@ public class ImageBandMath {
 	 */
 	public static void median(Planar<GrayS16> input, GrayS16 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.median(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.median(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.median(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -278,7 +344,11 @@ public class ImageBandMath {
 	public static void median(Planar<GrayS16> input, GrayS16 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.median(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.median(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.median(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -308,7 +378,11 @@ public class ImageBandMath {
 			avg = new GrayS16(input.width,input.height);
 			average(input,avg,startBand,lastBand);
 		}
-		ImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.stdDev(input,output,avg,startBand,lastBand);
+		} else {
+			ImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);
+		}
 	}
 
 	/**
@@ -319,7 +393,11 @@ public class ImageBandMath {
 	 */
 	public static void minimum(Planar<GrayU16> input, GrayU16 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.minimum(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.minimum(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.minimum(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -333,7 +411,11 @@ public class ImageBandMath {
 	public static void minimum(Planar<GrayU16> input, GrayU16 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.minimum(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.minimum(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.minimum(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -344,7 +426,11 @@ public class ImageBandMath {
 	 */
 	public static void maximum(Planar<GrayU16> input, GrayU16 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.maximum(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.maximum(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.maximum(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -358,7 +444,11 @@ public class ImageBandMath {
 	public static void maximum(Planar<GrayU16> input, GrayU16 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.maximum(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.maximum(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.maximum(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -369,7 +459,11 @@ public class ImageBandMath {
 	 */
 	public static void average(Planar<GrayU16> input, GrayU16 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.average(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.average(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.average(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -383,7 +477,11 @@ public class ImageBandMath {
 	public static void average(Planar<GrayU16> input, GrayU16 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.average(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.average(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.average(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -394,7 +492,11 @@ public class ImageBandMath {
 	 */
 	public static void median(Planar<GrayU16> input, GrayU16 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.median(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.median(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.median(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -408,7 +510,11 @@ public class ImageBandMath {
 	public static void median(Planar<GrayU16> input, GrayU16 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.median(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.median(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.median(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -438,7 +544,11 @@ public class ImageBandMath {
 			avg = new GrayU16(input.width,input.height);
 			average(input,avg,startBand,lastBand);
 		}
-		ImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.stdDev(input,output,avg,startBand,lastBand);
+		} else {
+			ImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);
+		}
 	}
 
 	/**
@@ -449,7 +559,11 @@ public class ImageBandMath {
 	 */
 	public static void minimum(Planar<GrayS32> input, GrayS32 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.minimum(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.minimum(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.minimum(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -463,7 +577,11 @@ public class ImageBandMath {
 	public static void minimum(Planar<GrayS32> input, GrayS32 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.minimum(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.minimum(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.minimum(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -474,7 +592,11 @@ public class ImageBandMath {
 	 */
 	public static void maximum(Planar<GrayS32> input, GrayS32 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.maximum(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.maximum(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.maximum(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -488,7 +610,11 @@ public class ImageBandMath {
 	public static void maximum(Planar<GrayS32> input, GrayS32 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.maximum(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.maximum(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.maximum(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -499,7 +625,11 @@ public class ImageBandMath {
 	 */
 	public static void average(Planar<GrayS32> input, GrayS32 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.average(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.average(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.average(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -513,7 +643,11 @@ public class ImageBandMath {
 	public static void average(Planar<GrayS32> input, GrayS32 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.average(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.average(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.average(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -524,7 +658,11 @@ public class ImageBandMath {
 	 */
 	public static void median(Planar<GrayS32> input, GrayS32 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.median(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.median(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.median(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -538,7 +676,11 @@ public class ImageBandMath {
 	public static void median(Planar<GrayS32> input, GrayS32 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.median(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.median(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.median(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -568,7 +710,11 @@ public class ImageBandMath {
 			avg = new GrayS32(input.width,input.height);
 			average(input,avg,startBand,lastBand);
 		}
-		ImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.stdDev(input,output,avg,startBand,lastBand);
+		} else {
+			ImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);
+		}
 	}
 
 	/**
@@ -579,7 +725,11 @@ public class ImageBandMath {
 	 */
 	public static void minimum(Planar<GrayS64> input, GrayS64 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.minimum(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.minimum(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.minimum(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -593,7 +743,11 @@ public class ImageBandMath {
 	public static void minimum(Planar<GrayS64> input, GrayS64 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.minimum(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.minimum(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.minimum(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -604,7 +758,11 @@ public class ImageBandMath {
 	 */
 	public static void maximum(Planar<GrayS64> input, GrayS64 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.maximum(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.maximum(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.maximum(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -618,7 +776,11 @@ public class ImageBandMath {
 	public static void maximum(Planar<GrayS64> input, GrayS64 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.maximum(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.maximum(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.maximum(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -629,7 +791,11 @@ public class ImageBandMath {
 	 */
 	public static void average(Planar<GrayS64> input, GrayS64 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.average(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.average(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.average(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -643,7 +809,11 @@ public class ImageBandMath {
 	public static void average(Planar<GrayS64> input, GrayS64 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.average(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.average(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.average(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -654,7 +824,11 @@ public class ImageBandMath {
 	 */
 	public static void median(Planar<GrayS64> input, GrayS64 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.median(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.median(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.median(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -668,7 +842,11 @@ public class ImageBandMath {
 	public static void median(Planar<GrayS64> input, GrayS64 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.median(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.median(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.median(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -698,7 +876,11 @@ public class ImageBandMath {
 			avg = new GrayS64(input.width,input.height);
 			average(input,avg,startBand,lastBand);
 		}
-		ImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.stdDev(input,output,avg,startBand,lastBand);
+		} else {
+			ImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);
+		}
 	}
 
 	/**
@@ -709,7 +891,11 @@ public class ImageBandMath {
 	 */
 	public static void minimum(Planar<GrayF32> input, GrayF32 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.minimum(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.minimum(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.minimum(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -723,7 +909,11 @@ public class ImageBandMath {
 	public static void minimum(Planar<GrayF32> input, GrayF32 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.minimum(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.minimum(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.minimum(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -734,7 +924,11 @@ public class ImageBandMath {
 	 */
 	public static void maximum(Planar<GrayF32> input, GrayF32 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.maximum(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.maximum(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.maximum(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -748,7 +942,11 @@ public class ImageBandMath {
 	public static void maximum(Planar<GrayF32> input, GrayF32 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.maximum(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.maximum(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.maximum(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -759,7 +957,11 @@ public class ImageBandMath {
 	 */
 	public static void average(Planar<GrayF32> input, GrayF32 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.average(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.average(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.average(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -773,7 +975,11 @@ public class ImageBandMath {
 	public static void average(Planar<GrayF32> input, GrayF32 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.average(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.average(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.average(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -784,7 +990,11 @@ public class ImageBandMath {
 	 */
 	public static void median(Planar<GrayF32> input, GrayF32 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.median(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.median(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.median(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -798,7 +1008,11 @@ public class ImageBandMath {
 	public static void median(Planar<GrayF32> input, GrayF32 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.median(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.median(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.median(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -828,7 +1042,11 @@ public class ImageBandMath {
 			avg = new GrayF32(input.width,input.height);
 			average(input,avg,startBand,lastBand);
 		}
-		ImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.stdDev(input,output,avg,startBand,lastBand);
+		} else {
+			ImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);
+		}
 	}
 
 	/**
@@ -839,7 +1057,11 @@ public class ImageBandMath {
 	 */
 	public static void minimum(Planar<GrayF64> input, GrayF64 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.minimum(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.minimum(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.minimum(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -853,7 +1075,11 @@ public class ImageBandMath {
 	public static void minimum(Planar<GrayF64> input, GrayF64 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.minimum(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.minimum(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.minimum(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -864,7 +1090,11 @@ public class ImageBandMath {
 	 */
 	public static void maximum(Planar<GrayF64> input, GrayF64 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.maximum(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.maximum(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.maximum(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -878,7 +1108,11 @@ public class ImageBandMath {
 	public static void maximum(Planar<GrayF64> input, GrayF64 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.maximum(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.maximum(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.maximum(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -889,7 +1123,11 @@ public class ImageBandMath {
 	 */
 	public static void average(Planar<GrayF64> input, GrayF64 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.average(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.average(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.average(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -903,7 +1141,11 @@ public class ImageBandMath {
 	public static void average(Planar<GrayF64> input, GrayF64 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.average(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.average(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.average(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -914,7 +1156,11 @@ public class ImageBandMath {
 	 */
 	public static void median(Planar<GrayF64> input, GrayF64 output) {
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.median(input, output, 0, input.getNumBands() - 1);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.median(input, output, 0, input.getNumBands() - 1);
+		} else {
+			ImplImageBandMath.median(input, output, 0, input.getNumBands() - 1);
+		}
 	}
 
 	/**
@@ -928,7 +1174,11 @@ public class ImageBandMath {
 	public static void median(Planar<GrayF64> input, GrayF64 output, int startBand, int lastBand) {
 		checkInput(input, startBand, lastBand);
 		output.reshape(input.width,input.height);
-		ImplImageBandMath.median(input, output, startBand, lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.median(input, output, startBand, lastBand);
+		} else {
+			ImplImageBandMath.median(input, output, startBand, lastBand);
+		}
 	}
 
 	/**
@@ -958,7 +1208,11 @@ public class ImageBandMath {
 			avg = new GrayF64(input.width,input.height);
 			average(input,avg,startBand,lastBand);
 		}
-		ImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);
+		if (BoofConcurrency.USE_CONCURRENT) {
+			ImplImageBandMath_MT.stdDev(input,output,avg,startBand,lastBand);
+		} else {
+			ImplImageBandMath.stdDev(input,output,avg,startBand,lastBand);
+		}
 	}
 
 }
