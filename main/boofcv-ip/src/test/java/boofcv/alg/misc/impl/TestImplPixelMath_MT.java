@@ -42,7 +42,7 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 
 	@Test
 	void performTests() {
-		performTests(108);
+		performTests(128);
 	}
 
 	@Override
@@ -58,72 +58,58 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class[] types = candidate.getParameterTypes();
 
-		System.out.println(candidate.getName());
+//		System.out.println(candidate.getName());
 
-		switch( candidate.getName() ) {
-			case "abs": return inputs_abs(types);
-			case "add": return inputs_add(types);
-			case "bound": return inputs_bound(types);
-			case "diffAbs": return inputs_diffAbs(types);
-			case "divide": return inputs_divide(types);
-			case "divide_A": return inputs_divide_A(types);
-			case "log": return inputs_log(types);
-			case "minus_A": return inputs_minus_A(types);
-			case "minus_B": return inputs_minus_B(types);
-			case "minusU_A": return minusU_A(types);
-			case "multiply": return minusU_A(types);
-			case "multiply_A": return minusU_A(types);
+		Object[][] inputs = defaultInputs(types,candidate.getName());
+
+		if( inputs == null ) {
+			switch( candidate.getName() ) {
+				case "boundImage": return boundImage(types);
+				case "negative":
+				case "abs": return abs(types);
+				default:
+					throw new RuntimeException("Unknown function "+candidate.getName());
+			}
+		} else {
+			return inputs;
 		}
-
-		throw new RuntimeException("Unknown function: "+candidate.getName());
 	}
 
-	private Object[][] inputs_abs( Class[] inputTypes ) {
-		Object[] inputs = new Object[8];
-		inputs[0] = randomArray(inputTypes[0],200,rand);
-		inputs[1] = 1;
-		inputs[2] = 10;
-		inputs[3] = randomArray(inputTypes[3],200,rand);
-		inputs[4] = 0;
-		inputs[5] = 11;
-		inputs[6] = 12;
-		inputs[7] = 9;
+	private Object[][] boundImage( Class[] inputTypes ) {
+		ImageBase a = GeneralizedImageOps.createImage(inputTypes[0],width,height,2);
+		GImageMiscOps.fillUniform(a,rand,0,200);
+
+		Object[] inputs = new Object[3];
+		inputs[0] = a;
+		inputs[1] = primitive(10 , inputTypes[1]);
+		inputs[2] = primitive(80 , inputTypes[2]);
 
 		return new Object[][]{inputs};
 	}
 
-	private Object[][] inputs_add( Class[] inputTypes ) {
-		return null;
+	private Object[][] abs( Class[] inputTypes ) {
+		Object[] inputs = new Object[8];
+		inputs[0] = randomArray(inputTypes[0], 200, rand);
+		inputs[1] = 1;
+		inputs[2] = 10;
+		inputs[3] = randomArray(inputTypes[3], 200, rand);
+		inputs[4] = 0;
+		inputs[5] = 11;
+		inputs[6] = 12;
+		inputs[7] = 9;
+		return new Object[][]{inputs};
 	}
 
-	private Object[][] inputs_bound( Class[] inputTypes ) {
-		return null;
-	}
-
-
-	private Object[][] inputs_diffAbs( Class[] inputTypes ) {
-		ImageBase a = GeneralizedImageOps.createImage(inputTypes[0],width,height,2);
-		ImageBase b = GeneralizedImageOps.createImage(inputTypes[1],width,height,2);
-		ImageBase c = GeneralizedImageOps.createImage(inputTypes[2],width,height,2);
-
-		GImageMiscOps.fillUniform(a,rand,0,200);
-		GImageMiscOps.fillUniform(b,rand,0,200);
-		GImageMiscOps.fillUniform(c,rand,0,200);
-
-		return new Object[][]{{a,b,c}};
-	}
-
-	private Object[][] inputs_divide( Class[] inputTypes ) {
-		return null;
-	}
-
-	private Object[][] inputs_divide_A( Class[] inputTypes ) {
+	/**
+	 * Several element-wise operation use the same argument pattern
+	 */
+	private Object[][] elementWiseInputs(Class[] inputTypes , double value ) {
 		if( inputTypes.length == 9 ) {
 			Object[] inputs = new Object[9];
 			inputs[0] = randomArray(inputTypes[0], 200, rand);
 			inputs[1] = 1;
 			inputs[2] = 10;
-			inputs[3] = primitive(1.5 , inputTypes[3]);
+			inputs[3] = primitive(value , inputTypes[3]);
 			inputs[4] = randomArray(inputTypes[4], 200, rand);
 			inputs[5] = 0;
 			inputs[6] = 11;
@@ -135,7 +121,7 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 			inputs[0] = randomArray(inputTypes[0], 200, rand);
 			inputs[1] = 1;
 			inputs[2] = 10;
-			inputs[3] = primitive(1.5 , inputTypes[3]);
+			inputs[3] = primitive(value , inputTypes[3]);
 			inputs[4] = primitive(1 ,   inputTypes[4]);
 			inputs[5] = primitive(30,   inputTypes[5]);
 			inputs[6] = randomArray(inputTypes[6], 200, rand);
@@ -147,32 +133,35 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 		}
 	}
 
-	private Object[][] inputs_log( Class[] inputTypes ) {
+	private Object[][] defaultInputs( Class[] inputTypes , String name ) {
+		if( inputTypes.length == 3 ) {
+			boolean allImages = true;
+			for (int i = 0; i < 3; i++) {
+				if( !ImageBase.class.isAssignableFrom(inputTypes[i])) {
+					allImages = false;
+					break;
+				}
+			}
+			if( allImages ) {
+				return threeImages(inputTypes);
+			}
+		} else if( inputTypes.length == 9 || inputTypes.length == 11 ) {
+			double value = name.startsWith("divide") ? 1.5 : 20;
+			return elementWiseInputs(inputTypes,value);
+		}
 		return null;
 	}
 
-	private Object[][] inputs_minus_A(Class[] inputTypes ) {
-		return null;
+	private Object[][] threeImages( Class[] inputTypes ) {
+		ImageBase a = GeneralizedImageOps.createImage(inputTypes[0],width,height,2);
+		ImageBase b = GeneralizedImageOps.createImage(inputTypes[1],width,height,2);
+		ImageBase c = GeneralizedImageOps.createImage(inputTypes[2],width,height,2);
+
+		GImageMiscOps.fillUniform(a,rand,0,200);
+		GImageMiscOps.fillUniform(b,rand,0,200);
+		GImageMiscOps.fillUniform(c,rand,0,200);
+
+		return new Object[][]{{a,b,c}};
 	}
-
-	private Object[][] inputs_minus_B(Class[] inputTypes ) {
-		return null;
-	}
-
-	private Object[][] minusU_A(Class[] inputTypes ) {
-		return null;
-	}
-
-
-	private Object[][] multiply(Class[] inputTypes ) {
-		return null;
-	}
-
-
-	private Object[][] multiply_A(Class[] inputTypes ) {
-		return null;
-	}
-
-
 }
 
