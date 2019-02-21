@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.orientation.impl;
 
+import boofcv.abst.feature.orientation.RegionOrientation;
 import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.struct.image.GrayF32;
 
@@ -63,4 +64,8 @@ public class ImplOrientationImageAverage_F32 extends OrientationImageAverage<Gra
 		return GrayF32.class;
 	}
 
+	@Override
+	public RegionOrientation copy() {
+		return new ImplOrientationImageAverage_F32(objectToSample,sampleRadius);
+	}
 }

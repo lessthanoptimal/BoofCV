@@ -4320,21 +4320,6 @@ public class PixelMath {
 	}
 
 	/**
-	 * Computes the average for each pixel across all bands in the {@link Planar} image.
-	 * 
-	 * @param input Planar image
-	 * @param output Gray scale image containing average pixel values
-	 */
-	public static void averageBand( Planar<GrayU8> input , GrayU8 output ) {
-
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplPixelMath_MT.averageBand(input,output);
-		} else {
-			ImplPixelMath.averageBand(input,output);
-		}
-	}
-
-	/**
 	 * Bounds image pixels to be between these two values
 	 * 
 	 * @param img Image
@@ -4362,21 +4347,6 @@ public class PixelMath {
 			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
 		} else {
 			ImplPixelMath.diffAbs(imgA, imgB, output);
-		}
-	}
-
-	/**
-	 * Computes the average for each pixel across all bands in the {@link Planar} image.
-	 * 
-	 * @param input Planar image
-	 * @param output Gray scale image containing average pixel values
-	 */
-	public static void averageBand( Planar<GrayS8> input , GrayS8 output ) {
-
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplPixelMath_MT.averageBand(input,output);
-		} else {
-			ImplPixelMath.averageBand(input,output);
 		}
 	}
 
@@ -4412,21 +4382,6 @@ public class PixelMath {
 	}
 
 	/**
-	 * Computes the average for each pixel across all bands in the {@link Planar} image.
-	 * 
-	 * @param input Planar image
-	 * @param output Gray scale image containing average pixel values
-	 */
-	public static void averageBand( Planar<GrayU16> input , GrayU16 output ) {
-
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplPixelMath_MT.averageBand(input,output);
-		} else {
-			ImplPixelMath.averageBand(input,output);
-		}
-	}
-
-	/**
 	 * Bounds image pixels to be between these two values
 	 * 
 	 * @param img Image
@@ -4454,21 +4409,6 @@ public class PixelMath {
 			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
 		} else {
 			ImplPixelMath.diffAbs(imgA, imgB, output);
-		}
-	}
-
-	/**
-	 * Computes the average for each pixel across all bands in the {@link Planar} image.
-	 * 
-	 * @param input Planar image
-	 * @param output Gray scale image containing average pixel values
-	 */
-	public static void averageBand( Planar<GrayS16> input , GrayS16 output ) {
-
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplPixelMath_MT.averageBand(input,output);
-		} else {
-			ImplPixelMath.averageBand(input,output);
 		}
 	}
 
@@ -4504,21 +4444,6 @@ public class PixelMath {
 	}
 
 	/**
-	 * Computes the average for each pixel across all bands in the {@link Planar} image.
-	 * 
-	 * @param input Planar image
-	 * @param output Gray scale image containing average pixel values
-	 */
-	public static void averageBand( Planar<GrayS32> input , GrayS32 output ) {
-
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplPixelMath_MT.averageBand(input,output);
-		} else {
-			ImplPixelMath.averageBand(input,output);
-		}
-	}
-
-	/**
 	 * Bounds image pixels to be between these two values
 	 * 
 	 * @param img Image
@@ -4546,21 +4471,6 @@ public class PixelMath {
 			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
 		} else {
 			ImplPixelMath.diffAbs(imgA, imgB, output);
-		}
-	}
-
-	/**
-	 * Computes the average for each pixel across all bands in the {@link Planar} image.
-	 * 
-	 * @param input Planar image
-	 * @param output Gray scale image containing average pixel values
-	 */
-	public static void averageBand( Planar<GrayS64> input , GrayS64 output ) {
-
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplPixelMath_MT.averageBand(input,output);
-		} else {
-			ImplPixelMath.averageBand(input,output);
 		}
 	}
 
@@ -4596,21 +4506,6 @@ public class PixelMath {
 	}
 
 	/**
-	 * Computes the average for each pixel across all bands in the {@link Planar} image.
-	 * 
-	 * @param input Planar image
-	 * @param output Gray scale image containing average pixel values
-	 */
-	public static void averageBand( Planar<GrayF32> input , GrayF32 output ) {
-
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplPixelMath_MT.averageBand(input,output);
-		} else {
-			ImplPixelMath.averageBand(input,output);
-		}
-	}
-
-	/**
 	 * Bounds image pixels to be between these two values
 	 * 
 	 * @param img Image
@@ -4638,21 +4533,6 @@ public class PixelMath {
 			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
 		} else {
 			ImplPixelMath.diffAbs(imgA, imgB, output);
-		}
-	}
-
-	/**
-	 * Computes the average for each pixel across all bands in the {@link Planar} image.
-	 * 
-	 * @param input Planar image
-	 * @param output Gray scale image containing average pixel values
-	 */
-	public static void averageBand( Planar<GrayF64> input , GrayF64 output ) {
-
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplPixelMath_MT.averageBand(input,output);
-		} else {
-			ImplPixelMath.averageBand(input,output);
 		}
 	}
 

@@ -47,6 +47,11 @@ public class InterpolatePixel_S_to_MB<T extends ImageGray<T>> implements Interpo
 	}
 
 	@Override
+	public InterpolatePixelMB<T> copy() {
+		return new InterpolatePixel_S_to_MB<>(interp.copy());
+	}
+
+	@Override
 	public void setBorder(ImageBorder<T> border) {
 		interp.setBorder(border);
 	}
@@ -79,11 +84,6 @@ public class InterpolatePixel_S_to_MB<T extends ImageGray<T>> implements Interpo
 	@Override
 	public int getFastBorderY() {
 		return interp.getFastBorderY();
-	}
-
-	@Override
-	public boolean isThreadSafe() {
-		return interp.isThreadSafe();
 	}
 
 	@Override

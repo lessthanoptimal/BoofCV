@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,6 +49,7 @@ public abstract class OrientationIntegralBase<II extends ImageGray<II>,G extends
 
 	// optional weights
 	protected Kernel2D_F64 weights;
+	protected double weightSigma;
 
 	// size of sample kernels
 	protected int kernelWidth;
@@ -80,6 +81,7 @@ public abstract class OrientationIntegralBase<II extends ImageGray<II>,G extends
 		this.kernelWidth = kernelWidth;
 		this.sampleWidth = sampleRadius *2+1;
 		this.integralType = integralType;
+		this.weightSigma = weightSigma;
 		if( weightSigma != 0 )
 			this.weights = FactoryKernelGaussian.gaussian(2,true, 64, weightSigma, sampleRadius);
 

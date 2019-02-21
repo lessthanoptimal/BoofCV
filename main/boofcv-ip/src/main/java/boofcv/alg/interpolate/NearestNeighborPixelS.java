@@ -72,9 +72,4 @@ public abstract class NearestNeighborPixelS<T extends ImageGray<T>> implements I
 	public ImageBorder<T> getBorder() {
 		return border;
 	}
-
-	@Override
-	public boolean isThreadSafe() {
-		return true;
-	}
 }

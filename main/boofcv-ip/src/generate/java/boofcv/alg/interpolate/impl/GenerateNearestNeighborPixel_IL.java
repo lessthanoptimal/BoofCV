@@ -34,6 +34,10 @@ public class GenerateNearestNeighborPixel_IL extends CodeGeneratorBase {
 	String f;
 	String borderType;
 
+	public GenerateNearestNeighborPixel_IL() {
+		super(false);
+	}
+
 	@Override
 	public void generate() throws FileNotFoundException {
 //		createType(AutoTypeImage.F32); This is a special case
@@ -44,7 +48,6 @@ public class GenerateNearestNeighborPixel_IL extends CodeGeneratorBase {
 	}
 
 	private void createType( AutoTypeImage type ) throws FileNotFoundException {
-		className = "NearestNeighborPixel_IL_"+type.name();
 		image = type;
 
 		createFile();
@@ -62,11 +65,13 @@ public class GenerateNearestNeighborPixel_IL extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() throws FileNotFoundException {
-		setOutputFile(className);
-		out.print("import boofcv.alg.interpolate.NearestNeighborPixelMB;\n" +
-				"import boofcv.struct.image.ImageType;\n" +
+		this.className = null;
+		setOutputFile("NearestNeighborPixel_IL_"+image.name());
+		out.print(
+				"import boofcv.alg.interpolate.InterpolatePixelMB;\n" +
+				"import boofcv.alg.interpolate.NearestNeighborPixelMB;\n" +
 				"import boofcv.struct.image." + image.getInterleavedName() + ";\n" +
-				"import boofcv.core.image.border.ImageBorder_" + borderType + ";\n");
+				"import boofcv.struct.border.ImageBorder_" + borderType + ";\n");
 		out.println();
 		out.println();
 		out.print("/**\n" +
@@ -74,9 +79,7 @@ public class GenerateNearestNeighborPixel_IL extends CodeGeneratorBase {
 				" * Performs nearest neighbor interpolation to extract values between pixels in an image.\n" +
 				" * </p>\n" +
 				" *\n" +
-				" * <p>\n" +
-				" * NOTE: This code was automatically generated using {@link "+getClass().getSimpleName()+"}.\n" +
-				" * </p>\n" +
+				generateDocString() +
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
@@ -127,11 +130,17 @@ public class GenerateNearestNeighborPixel_IL extends CodeGeneratorBase {
 				"\t\tfor (int i = 0; i < pixel.length; i++) {\n" +
 				"\t\t\tvalues[i] = "+sumToFloat+"pixel[i];\n" +
 				"\t\t}\n" +
+				"\t}\n" +
+				"\n" +
+				"\t@Override\n" +
+				"\tpublic InterpolatePixelMB<"+image.getInterleavedName()+"> newInstance() {\n" +
+				"\t\treturn new "+className+"();\n" +
 				"\t}\n\n");
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateNearestNeighborPixel_IL gen = new GenerateNearestNeighborPixel_IL();
+		gen.parseArguments(args);
 		gen.generate();
 	}
 }

@@ -62,6 +62,9 @@ public class PixelTransformCached_F32 implements PixelTransform<Point2D_F32> {
 		}
 	}
 
+	PixelTransformCached_F32() {
+	}
+
 	public Point2D_F32 getPixel( int x, int y ) {
 		return map[width*y + x];
 	}
@@ -83,7 +86,17 @@ public class PixelTransformCached_F32 implements PixelTransform<Point2D_F32> {
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return true;
+	public PixelTransform<Point2D_F32> copy() {
+		PixelTransformCached_F32 ret = new PixelTransformCached_F32();
+		ret.map = new Point2D_F32[this.map.length];
+		for (int i = 0; i < ret.map.length; i++) {
+			ret.map[i] = this.map[i].copy();
+		}
+
+		ret.width = this.width;
+		ret.height = this.height;
+		ret.ignoreNaN = this.ignoreNaN;
+
+		return ret;
 	}
 }

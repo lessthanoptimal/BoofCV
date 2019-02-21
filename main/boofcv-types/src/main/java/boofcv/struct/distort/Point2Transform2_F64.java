@@ -37,8 +37,7 @@ public interface Point2Transform2_F64 {
 	void compute( double x, double y, Point2D_F64 out);
 
 	/**
-	 * If it returns true it is threadsafe and can be used inside of concurrent code
-	 * @return true for thread safe and false for not
+	 * Creates a copy
 	 */
-	boolean isThreadSafe();
+	Point2Transform2_F64 copy();
 }

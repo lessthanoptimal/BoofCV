@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,13 +23,19 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 
 /**
- * Wrapper around the {@link boofcv.alg.feature.detect.extract.NonMaxCandidateStrict} class.
+ * Wrapper around the {@link boofcv.alg.feature.detect.extract.NonMaxCandidate} class.
  *
  * @author Peter Abeles
  */
 public class WrapperNonMaxCandidate implements NonMaxSuppression {
 	NonMaxCandidate extractor;
 	boolean minimums,maximums;
+
+	public WrapperNonMaxCandidate(NonMaxCandidate.Search search, boolean minimums, boolean maximums ) {
+		this.extractor = new NonMaxCandidate(search);
+		this.minimums = minimums;
+		this.maximums = maximums;
+	}
 
 	public WrapperNonMaxCandidate(NonMaxCandidate extractor, boolean minimums, boolean maximums ) {
 		this.extractor = extractor;

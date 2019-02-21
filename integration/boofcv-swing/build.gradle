@@ -1,5 +1,5 @@
 dependencies {
-    api project(':main:boofcv-ip')
+    api project(':main:boofcv-types')
     api project(':main:boofcv-io')
     api project(':main:boofcv-feature')
     api project(':main:boofcv-calibration')

@@ -55,8 +55,8 @@ public class TestDepthSparse3D {
 			}
 
 			@Override
-			public boolean isThreadSafe() {
-				return true;
+			public PixelTransform<Point2D_F32> copy() {
+				return null;
 			}
 		};
 

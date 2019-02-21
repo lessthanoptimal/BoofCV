@@ -306,21 +306,21 @@ public class TestImplImageBandMath {
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double found = r.get(j,i).doubleValue();
-					for (int b = firstBand; b <= lastBand; b++) {
-						values[b - firstBand] = testImages[b].get(j, i).doubleValue();
-					}
-					Arrays.sort(values);
-					double expected;
-					if (values.length % 2 == 0) {
-						expected = (values[values.length / 2] + values[values.length / 2 + 1]) / 2;
-					} else {
-						expected = values[values.length / 2];
-					}
+				for (int b = firstBand; b <= lastBand; b++) {
+					values[b - firstBand] = testImages[b].get(j, i).doubleValue();
+				}
+				Arrays.sort(values);
+				double expected;
+				if (values.length % 2 == 0) {
+					expected = (values[values.length / 2] + values[values.length / 2 + 1]) / 2;
+				} else {
+					expected = values[values.length / 2];
+				}
 
-					if (isInteger) {
-						expected = (int) expected;
-					}
-					assertEquals(expected, found, 1e-4);
+				if (isInteger) {
+					expected = (int) expected;
+				}
+				assertEquals(expected, found, 1e-4);
 			}
 		}
 	}

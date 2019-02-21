@@ -18,14 +18,150 @@
 
 package boofcv.alg.misc.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageBase;
+import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.lang.reflect.Method;
+import java.util.Random;
 
-class TestImplPixelMath_MT {
+import static boofcv.testing.BoofTesting.primitive;
+import static boofcv.testing.BoofTesting.randomArray;
+
+class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
+
+	private Random rand = new Random(234);
+	private int width = 105;
+	private int height = 100;
+
+	TestImplPixelMath_MT() {
+		super(ImplPixelMath_MT.class, ImplPixelMath.class);
+	}
+
 	@Test
-	void implement() {
-		fail("implement");
+	void performTests() {
+		performTests(128);
+	}
+
+	@Override
+	protected boolean isTestMethod(Method m) {
+		Class param[] = m.getParameterTypes();
+
+		if( param.length < 3 )
+			return false;
+		return true;
+	}
+
+	@Override
+	protected Object[][] createInputParam(Method candidate, Method validation) {
+		Class[] types = candidate.getParameterTypes();
+
+//		System.out.println(candidate.getName());
+
+		Object[][] inputs = defaultInputs(types,candidate.getName());
+
+		if( inputs == null ) {
+			switch( candidate.getName() ) {
+				case "boundImage": return boundImage(types);
+				case "negative":
+				case "abs": return abs(types);
+				default:
+					throw new RuntimeException("Unknown function "+candidate.getName());
+			}
+		} else {
+			return inputs;
+		}
+	}
+
+	private Object[][] boundImage( Class[] inputTypes ) {
+		ImageBase a = GeneralizedImageOps.createImage(inputTypes[0],width,height,2);
+		GImageMiscOps.fillUniform(a,rand,0,200);
+
+		Object[] inputs = new Object[3];
+		inputs[0] = a;
+		inputs[1] = primitive(10 , inputTypes[1]);
+		inputs[2] = primitive(80 , inputTypes[2]);
+
+		return new Object[][]{inputs};
+	}
+
+	private Object[][] abs( Class[] inputTypes ) {
+		Object[] inputs = new Object[8];
+		inputs[0] = randomArray(inputTypes[0], 200, rand);
+		inputs[1] = 1;
+		inputs[2] = 10;
+		inputs[3] = randomArray(inputTypes[3], 200, rand);
+		inputs[4] = 0;
+		inputs[5] = 11;
+		inputs[6] = 12;
+		inputs[7] = 9;
+		return new Object[][]{inputs};
+	}
+
+	/**
+	 * Several element-wise operation use the same argument pattern
+	 */
+	private Object[][] elementWiseInputs(Class[] inputTypes , double value ) {
+		if( inputTypes.length == 9 ) {
+			Object[] inputs = new Object[9];
+			inputs[0] = randomArray(inputTypes[0], 200, rand);
+			inputs[1] = 1;
+			inputs[2] = 10;
+			inputs[3] = primitive(value , inputTypes[3]);
+			inputs[4] = randomArray(inputTypes[4], 200, rand);
+			inputs[5] = 0;
+			inputs[6] = 11;
+			inputs[7] = 12;
+			inputs[8] = 9;
+			return new Object[][]{inputs};
+		} else {
+			Object[] inputs = new Object[11];
+			inputs[0] = randomArray(inputTypes[0], 200, rand);
+			inputs[1] = 1;
+			inputs[2] = 10;
+			inputs[3] = primitive(value , inputTypes[3]);
+			inputs[4] = primitive(1 ,   inputTypes[4]);
+			inputs[5] = primitive(30,   inputTypes[5]);
+			inputs[6] = randomArray(inputTypes[6], 200, rand);
+			inputs[7] = 0;
+			inputs[8] = 11;
+			inputs[9] = 12;
+			inputs[10] = 9;
+			return new Object[][]{inputs};
+		}
+	}
+
+	private Object[][] defaultInputs( Class[] inputTypes , String name ) {
+		if( inputTypes.length == 3 ) {
+			boolean allImages = true;
+			for (int i = 0; i < 3; i++) {
+				if( !ImageBase.class.isAssignableFrom(inputTypes[i])) {
+					allImages = false;
+					break;
+				}
+			}
+			if( allImages ) {
+				return threeImages(inputTypes);
+			}
+		} else if( inputTypes.length == 9 || inputTypes.length == 11 ) {
+			double value = name.startsWith("divide") ? 1.5 : 20;
+			return elementWiseInputs(inputTypes,value);
+		}
+		return null;
+	}
+
+	private Object[][] threeImages( Class[] inputTypes ) {
+		ImageBase a = GeneralizedImageOps.createImage(inputTypes[0],width,height,2);
+		ImageBase b = GeneralizedImageOps.createImage(inputTypes[1],width,height,2);
+		ImageBase c = GeneralizedImageOps.createImage(inputTypes[2],width,height,2);
+
+		GImageMiscOps.fillUniform(a,rand,0,200);
+		GImageMiscOps.fillUniform(b,rand,0,200);
+		GImageMiscOps.fillUniform(c,rand,0,200);
+
+		return new Object[][]{{a,b,c}};
 	}
 }
 

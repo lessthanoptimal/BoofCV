@@ -25,6 +25,7 @@ import boofcv.struct.image.GrayS32;
 import javax.annotation.Generated;
 
 //CONCURRENT_CLASS_NAME ConvolveImageUnrolled_SB_MT_S32_S32
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>

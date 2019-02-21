@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.struct.ConfigLength;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
 
@@ -50,23 +49,31 @@ import boofcv.struct.image.ImageInterleaved;
  *
  * @author Peter Abeles
  */
-public abstract class ThresholdBlockMinMax
-		<T extends ImageGray<T>, I extends ImageInterleaved<I>> extends ThresholdBlockCommon<T,I>
+public abstract class ThresholdBlockMinMax <T extends ImageGray<T>, I extends ImageInterleaved<I>>
+		implements ThresholdBlock.BlockProcessor<T,I>
 {
+	protected int blockWidth,blockHeight;
+	protected boolean thresholdFromLocalBlocks;
 	// if the min and max value's difference is <= to this value then it is considered
 	// to be textureless and a default value is used
 	protected double minimumSpread;
+
+	protected boolean down;
 
 	/**
 	 * Configures the detector
 	 * @param minimumSpread If the difference between min max is less than or equal to this
 	 *                         value then it is considered textureless.  Set to &le; -1 to disable.
-	 * @param requestedBlockWidth About how wide and tall you wish a block to be in pixels.
 	 */
-	public ThresholdBlockMinMax(double minimumSpread, ConfigLength requestedBlockWidth,
-								boolean thresholdFromLocalBlocks, Class<T> imageType ) {
-		super(requestedBlockWidth,thresholdFromLocalBlocks,imageType);
+	public ThresholdBlockMinMax(double minimumSpread , boolean down ) {
 		this.minimumSpread = minimumSpread;
+		this.down = down;
 	}
 
+	@Override
+	public void init(int blockWidth, int blockHeight, boolean thresholdFromLocalBlocks) {
+		this.blockWidth = blockWidth;
+		this.blockHeight = blockHeight;
+		this.thresholdFromLocalBlocks = thresholdFromLocalBlocks;
+	}
 }

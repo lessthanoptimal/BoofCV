@@ -18,6 +18,7 @@
 
 package boofcv.alg.interpolate.impl;
 
+import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.PolynomialPixel;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayI;
@@ -140,6 +141,12 @@ public class ImplPolynomialPixel_I<T extends GrayI<T>> extends PolynomialPixel<T
 		}
 		return ret;
 	}
+
+	@Override
+	public InterpolatePixelS<T> copy() {
+		return new ImplPolynomialPixel_I<T>(M,min,max);
+	}
+
 	@Override
 	public ImageType<T> getImageType() {
 		return ImageType.<T>single((Class)GrayI.class);

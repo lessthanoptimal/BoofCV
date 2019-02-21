@@ -26,6 +26,7 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>
@@ -38,8 +39,10 @@ import boofcv.struct.image.ImageType;
  *     [1] Khurshid, Khurram, et al. "Comparison of Niblack inspired Binarization methods for ancient documents."
  *      Document Recognition and Retrieval XVI. Vol. 7247. International Society for Optics and Photonics, 2009.
  * </p>
+ *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class ThresholdNick implements InputToBinary<GrayF32> {
 
 	// user specified threshold. Niblack factor
@@ -61,7 +64,7 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 	/**
 	 * Configures the algorithm.
 	 * @param width size of local region.  Try 31
-	 * @param k User specified threshold adjustment factor.  Must be positive. Try 0.3
+	 * @param k The Niblack factor. Recommend -0.1 to -0.2
 	 * @param down Threshold down or up
 	 */
 	public ThresholdNick(ConfigLength width, float k, boolean down) {
@@ -76,6 +79,7 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 	 * @param input Input image.  Not modified.
 	 * @param output Output binary image.  Modified.
 	 */
+	@Override
 	public void process(GrayF32 input , GrayU8 output ) {
 		imageI2.reshape(input.width,input.height);
 		meanImage.reshape(input.width,input.height);
@@ -97,6 +101,7 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 		BlurImageOps.mean(imageI2, meanI2, radius, tmp, work);
 
 		if( down ) {
+			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
 			for (int y = 0; y < input.height; y++) {
 				int i = y * meanI2.width;
 				int indexIn = input.startIndex + y * input.stride;
@@ -111,7 +116,9 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 					output.data[indexOut++] = (byte) (input.data[indexIn++] <= threshold ? 1 : 0);
 				}
 			}
+			//CONCURRENT_ABOVE });
 		} else {
+			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
 			for (int y = 0; y < input.height; y++) {
 				int i = y * meanI2.width;
 				int indexIn = input.startIndex + y * input.stride;
@@ -126,6 +133,7 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 					output.data[indexOut++] = (byte) (input.data[indexIn++] >= threshold ? 1 : 0);
 				}
 			}
+			//CONCURRENT_ABOVE });
 		}
 	}
 

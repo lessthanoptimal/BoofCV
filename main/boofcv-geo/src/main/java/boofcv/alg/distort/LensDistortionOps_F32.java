@@ -23,6 +23,7 @@ import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.SequencePoint2Transform2_F32;
 import georegression.geometry.UtilPoint2D_F32;
 import georegression.struct.point.Point2D_F32;

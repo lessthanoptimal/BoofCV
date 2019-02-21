@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.filter.binary.ThresholdBlock.BlockProcessor;
 import boofcv.alg.filter.binary.impl.GenericThresholdCommon;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
@@ -31,7 +33,9 @@ public class TestThresholdBlockOtsu extends GenericThresholdCommon<GrayU8> {
 	}
 
 	@Override
-	public ThresholdBlockCommon<GrayU8, ?> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdBlockOtsu(true,ConfigLength.fixed(requestedBlockWidth), 0,1.0, down, true);
+	public InputToBinary<GrayU8> createAlg(int requestedBlockWidth, double scale, boolean down) {
+		BlockProcessor processor = new ThresholdBlockOtsu(true,0.0,scale, down);
+		return new ThresholdBlock(processor,
+				ConfigLength.fixed(requestedBlockWidth),true,GrayU8.class);
 	}
 }

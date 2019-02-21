@@ -61,6 +61,11 @@ public class InterpolatePixel_PL_using_SB<T extends ImageGray<T>>
 	}
 
 	@Override
+	public InterpolatePixelMB<Planar<T>> copy() {
+		return new InterpolatePixel_PL_using_SB<>(alg.copy());
+	}
+
+	@Override
 	public void setBorder(ImageBorder<Planar<T>> border) {
 		this.alg.setBorder((ImageBorder)border);
 	}
@@ -95,11 +100,6 @@ public class InterpolatePixel_PL_using_SB<T extends ImageGray<T>>
 	@Override
 	public int getFastBorderY() {
 		return alg.getFastBorderY();
-	}
-
-	@Override
-	public boolean isThreadSafe() {
-		return false;
 	}
 
 	@Override

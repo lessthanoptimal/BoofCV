@@ -70,6 +70,8 @@ public class AutocodeConcurrentApp {
 				if( !foundClassDef && line.contains("class "+classNameOld)) {
 					foundClassDef = true;
 					line = line.replaceFirst("class "+classNameOld,"class "+classNameNew);
+				} else {
+					line = line.replace(classNameOld+"(",classNameNew+"(");
 				}
 				outputLines.add(line);
 				continue;
@@ -266,9 +268,15 @@ public class AutocodeConcurrentApp {
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U16_I16_Div.java",
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ImplConvolveBox.java",
 				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ImplConvolveMean.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/impl/ImplThresholdImageOps.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/ThresholdSauvola.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/ThresholdNick.java",
 				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplEdgeNonMaxSuppression.java",
 				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplEdgeNonMaxSuppressionCrude.java",
 				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplGradientToEdgeFeatures.java",
+				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ImplConvertImage.java",
+				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ConvertInterleavedToSingle.java",
+				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ImplConvertPlanarToGray.java",
 		};
 
 		for( String f : files ) {

@@ -114,9 +114,4 @@ public abstract class PolynomialPixel<T extends ImageGray<T>> implements Interpo
 	public ImageBorder<T> getBorder() {
 		return border;
 	}
-
-	@Override
-	public boolean isThreadSafe() {
-		return false;
-	}
 }

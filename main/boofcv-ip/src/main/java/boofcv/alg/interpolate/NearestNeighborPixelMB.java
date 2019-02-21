@@ -79,9 +79,4 @@ public abstract class NearestNeighborPixelMB<T extends ImageMultiBand<T>> implem
 		return orig.getImageType();
 	}
 
-	@Override
-	public boolean isThreadSafe() {
-		return true;
-	}
-
 }

@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Functions to aid in unit testing code for correctly handling sub-images
@@ -765,6 +766,71 @@ public class BoofTesting {
 					System.out.print(" .");
 			}
 			System.out.println();
+		}
+	}
+
+	public static Object randomArray( Class type , int length , Random rand ) {
+		Object ret;
+
+		if( type == byte[].class ) {
+			byte[] data = new byte[length];
+			for (int i = 0; i < length; i++) {
+				data[i] = (byte)(rand.nextInt(Byte.MAX_VALUE-Byte.MIN_VALUE)+Byte.MIN_VALUE);
+			}
+			ret = data;
+		} else if( type == short[].class ) {
+			short[] data = new short[length];
+			for (int i = 0; i < length; i++) {
+				data[i] = (short)(rand.nextInt(Short.MAX_VALUE-Short.MIN_VALUE)+Short.MIN_VALUE);
+			}
+			ret = data;
+		} else if( type == int[].class ) {
+			int[] data = new int[length];
+			for (int i = 0; i < length; i++) {
+				data[i] = rand.nextInt(1000)-500;
+			}
+			ret = data;
+		} else if( type == long[].class ) {
+			long[] data = new long[length];
+			for (int i = 0; i < length; i++) {
+				data[i] = rand.nextLong();
+			}
+			ret = data;
+		} else if( type == float[].class ) {
+			float[] data = new float[length];
+			for (int i = 0; i < length; i++) {
+				data[i] = rand.nextFloat()-0.5f;
+			}
+			ret = data;
+		} else if( type == double[].class ) {
+			double[] data = new double[length];
+			for (int i = 0; i < length; i++) {
+				data[i] = rand.nextDouble()-0.5;
+			}
+			ret = data;
+		} else {
+			throw new RuntimeException("Unknown. "+type.getSimpleName());
+		}
+
+		return ret;
+	}
+
+	public static Object primitive( Object v , Class type ) {
+		Number value = (Number)v;
+		if( type == byte.class ) {
+			return value.byteValue();
+		} else if( type == short.class ) {
+			return value.shortValue();
+		} else if( type ==int.class ) {
+			return value.intValue();
+		} else if( type == long.class ) {
+			return value.longValue();
+		} else if( type == float.class ) {
+			return value.floatValue();
+		} else if( type == double.class ) {
+			return value.doubleValue();
+		} else {
+			throw new RuntimeException("Unknown. "+type.getSimpleName());
 		}
 	}
 }

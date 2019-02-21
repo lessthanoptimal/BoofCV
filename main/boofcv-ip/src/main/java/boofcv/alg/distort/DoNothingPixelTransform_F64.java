@@ -34,7 +34,8 @@ public class DoNothingPixelTransform_F64 implements PixelTransform<Point2D_F64> 
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return true;
+	public DoNothingPixelTransform_F64 copy() {
+		return new DoNothingPixelTransform_F64();
 	}
+
 }

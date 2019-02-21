@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,4 +88,10 @@ public interface DescribeRegionPoint<T extends ImageBase<T>, Desc extends TupleD
 	 * @return width of descriptor at a scale of one
 	 */
 	double getCanonicalWidth();
+
+	// TODO implement this later for threads
+//	/**
+//	 * Creates a new instance with identical configuration
+//	 */
+//	DescribeRegionPoint<T,Desc> newInstance();
 }

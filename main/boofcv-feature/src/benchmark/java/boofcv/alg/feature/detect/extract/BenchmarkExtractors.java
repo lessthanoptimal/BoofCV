@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,94 +18,119 @@
 
 package boofcv.alg.feature.detect.extract;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.abst.feature.detect.extract.WrapperNonMaximumBlock;
-import boofcv.abst.feature.detect.extract.WrapperNonMaximumNaive;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.misc.Performer;
-import boofcv.misc.ProfileOperation;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-/**
- * @author Peter Abeles
- */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value=2)
 public class BenchmarkExtractors {
 
-	static int imgWidth = 640;
-	static int imgHeight = 480;
-	static int windowRadius = 2;
-	static float threshold = 1.0f;
-	static long TEST_TIME = 1000;
+	private static float threshold = 1.0f;
 
 
-	static GrayF32 intensity;
-	static QueueCorner corners;
+	@Param({"true","false"})
+	public boolean concurrent;
 
-	static Random rand = new Random(33456);
+	@Param({"500","5000"})
+	public int width;
+
+	@Param({"2","5","20"})
+	public int radius;
+
+	GrayF32 intensity = new GrayF32(1,1);
+	QueueCorner corners;
 
 
-	public static class NM implements Performer {
-		NonMaxSuppression alg;
-		String name;
+	NonMaxSuppression blockStrictMax;
 
-		public NM(String name , NonMaxSuppression alg) {
-			this.alg = alg;
-			this.name = name;
-			alg.setThresholdMaximum(threshold);
-			alg.setSearchRadius(windowRadius);
-		}
+	@Setup
+	public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
 
-		@Override
-		public void process() {
-			corners.reset();
-			alg.process(intensity, null,null,corners,corners);
-		}
+		intensity.reshape(width,width);
+		corners = new QueueCorner();
 
-		@Override
-		public String getName() {
-			return name;
-		}
+		Random rand = new Random(234);
+		ImageMiscOps.fillUniform(intensity,rand,0,200);
+
+		ConfigExtract config = new ConfigExtract();
+		config.radius = radius;
+		config.detectMaximums = true;
+		config.detectMinimums = false;
+		config.threshold = threshold;
+		config.useStrictRule = true;
+		blockStrictMax = FactoryFeatureExtractor.nonmax(config);
 	}
 
-	public static void main(String args[]) {
-		intensity = new GrayF32(imgWidth, imgHeight);
-		corners = new QueueCorner(imgWidth * imgHeight);
+	@Benchmark
+	public void blockStrictMax() {
+		blockStrictMax.process(intensity,null,null,corners,corners);
+	}
 
-		// have about 1/20 the image below threshold
-		ImageMiscOps.fillUniform(intensity, rand, 0, threshold * 20.0f);
+	@Benchmark
+	public void blockStrictMinMax() {
+		ConfigExtract config = new ConfigExtract();
+		config.radius = radius;
+		config.detectMaximums = true;
+		config.detectMinimums = true;
+		config.threshold = threshold;
+		config.useStrictRule = true;
+		NonMaxSuppression alg = FactoryFeatureExtractor.nonmax(config);
+		alg.process(intensity,null,null,corners,corners);
+	}
 
-		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
-		System.out.println();
+	@Benchmark
+	public void blockRelaxedMax() {
+		ConfigExtract config = new ConfigExtract();
+		config.radius = radius;
+		config.detectMaximums = true;
+		config.detectMinimums = false;
+		config.threshold = threshold;
+		config.useStrictRule = false;
+		NonMaxSuppression alg = FactoryFeatureExtractor.nonmax(config);
+		alg.process(intensity,null,null,corners,corners);
+	}
 
-		ThresholdCornerExtractor algThresh = new ThresholdCornerExtractor();
-		NonMaxBlockStrict algBlockStrict = new NonMaxBlockStrict.Max();
-		NonMaxBlockStrict algBlockStrictMinMax = new NonMaxBlockStrict.MinMax();
-		NonMaxExtractorNaive algNaiveStrict = new NonMaxExtractorNaive(true);
-		NonMaxBlockRelaxed algBlockRelaxed = new NonMaxBlockRelaxed.Max();
-		NonMaxExtractorNaive algNaiveRelaxed = new NonMaxExtractorNaive(true);
+	@Benchmark
+	public void blockRelaxedMinMax() {
+		ConfigExtract config = new ConfigExtract();
+		config.radius = radius;
+		config.detectMaximums = true;
+		config.detectMinimums = true;
+		config.threshold = threshold;
+		config.useStrictRule = false;
+		NonMaxSuppression alg = FactoryFeatureExtractor.nonmax(config);
+		alg.process(intensity,null,null,corners,corners);
+	}
 
+	@Benchmark
+	public void naiveStrictMax() {
+		NonMaxExtractorNaive alg = new NonMaxExtractorNaive(true);
+		alg.process(intensity,corners);
+	}
 
-		for ( int radius = 1; radius < 20; radius += 1) {
-			System.out.println("Radius: " + radius);
-			System.out.println();
-			windowRadius = radius;
+	public static void main(String[] args) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkExtractors.class.getSimpleName())
+				.build();
 
-			NM alg2 = new NM("Block Strict",new WrapperNonMaximumBlock(algBlockStrict));
-			NM alg3 = new NM("Block Strict MinMax",new WrapperNonMaximumBlock(algBlockStrictMinMax));
-			NM alg4 = new NM("Naive Strict",new WrapperNonMaximumNaive(algNaiveStrict));
-			NM alg5 = new NM("Block Relaxed",new WrapperNonMaximumBlock(algBlockRelaxed));
-			NM alg6 = new NM("Naive Relaxed",new WrapperNonMaximumNaive(algNaiveRelaxed));
-
-			ProfileOperation.printOpsPerSec(alg2, TEST_TIME);
-			ProfileOperation.printOpsPerSec(alg3, TEST_TIME);
-//			ProfileOperation.printOpsPerSec(alg4, TEST_TIME);
-//			ProfileOperation.printOpsPerSec(alg5, TEST_TIME);
-//			ProfileOperation.printOpsPerSec(alg6, TEST_TIME);
-//			ProfileOperation.printOpsPerSec(alg1, TEST_TIME);
-		}
-
+		new Runner(opt).run();
 	}
 }

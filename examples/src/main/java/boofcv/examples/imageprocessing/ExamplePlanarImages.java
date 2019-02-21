@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.examples.imageprocessing;
 
 import boofcv.alg.color.ColorRgb;
 import boofcv.alg.filter.blur.BlurImageOps;
-import boofcv.alg.misc.GPixelMath;
+import boofcv.core.image.ConvertImage;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
@@ -114,7 +114,7 @@ public class ExamplePlanarImages {
 		GrayU8 gray = new GrayU8( image.width,image.height);
 
 		// creates a gray scale image by averaging intensity value across pixels
-		GPixelMath.averageBand(image, gray);
+		ConvertImage.average(image, gray);
 		BufferedImage outputAve = ConvertBufferedImage.convertTo(gray,null);
 
 		// convert to gray scale but weigh each color band based on how human vision works

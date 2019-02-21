@@ -34,8 +34,7 @@ public interface PixelTransform<T> {
 	void compute( int x , int y , T output );
 
 	/**
-	 * If it returns true it is threadsafe and can be used inside of concurrent code
-	 * @return true for thread safe and false for not
+	 * Creates a copy
 	 */
-	boolean isThreadSafe();
+	PixelTransform<T> copy();
 }

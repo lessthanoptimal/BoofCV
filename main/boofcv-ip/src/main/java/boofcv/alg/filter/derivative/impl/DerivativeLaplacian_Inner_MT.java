@@ -25,7 +25,7 @@ import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 
 /**
- * Straight forward implementation of Laplacian with unrolled kernel
+ * Laplacian thich processes the inner image only
  *
  * @see DerivativeLaplacian
  *

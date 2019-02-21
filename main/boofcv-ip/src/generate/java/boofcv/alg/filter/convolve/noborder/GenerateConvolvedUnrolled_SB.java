@@ -123,6 +123,7 @@ public class GenerateConvolvedUnrolled_SB extends CodeGeneratorBase {
 				"import boofcv.concurrency.*;\n");
 
 		out.println("\n//CONCURRENT_CLASS_NAME "+nameConcurrent);
+		out.println("//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;");
 
 		out.print("\n" +
 				"/**\n" +

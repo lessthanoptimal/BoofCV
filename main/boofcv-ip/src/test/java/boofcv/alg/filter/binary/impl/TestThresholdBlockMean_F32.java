@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,23 +18,21 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import boofcv.alg.filter.binary.ThresholdBlockMean;
-import boofcv.struct.ConfigLength;
+import boofcv.alg.filter.binary.ThresholdBlock;
 import boofcv.struct.image.GrayF32;
 
 /**
  * @author Peter Abeles
  */
 public class TestThresholdBlockMean_F32
-		extends GenericThresholdCommon<GrayF32> {
+		extends GenericThresholdBlock<GrayF32> {
 
-	public TestThresholdBlockMean_F32() {
+	TestThresholdBlockMean_F32() {
 		super(GrayF32.class);
 	}
 
 	@Override
-	public ThresholdBlockMean<GrayF32>
-	createAlg(int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdBlockMean_F32(ConfigLength.fixed(requestedBlockWidth),scale,down,true);
+	public ThresholdBlock.BlockProcessor<GrayF32, ?> createBlockProcessor(double scale, boolean down) {
+		return new ThresholdBlockMean_F32(scale,down);
 	}
 }

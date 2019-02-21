@@ -63,8 +63,8 @@ public class TestInterpolatePixelDistortS {
 		}
 
 		@Override
-		public boolean isThreadSafe() {
-			return true;
+		public Point2Transform2_F32 copy() {
+			return null;
 		}
 	}
 
@@ -78,6 +78,11 @@ public class TestInterpolatePixelDistortS {
 		@Override
 		public float get_fast(float x, float y) {
 			return get(x,y)+1;
+		}
+
+		@Override
+		public InterpolatePixelS copy() {
+			return null;
 		}
 
 		@Override
@@ -100,11 +105,6 @@ public class TestInterpolatePixelDistortS {
 
 		@Override
 		public int getFastBorderY() {return 0;}
-
-		@Override
-		public boolean isThreadSafe() {
-			return false;
-		}
 
 		@Override
 		public ImageType getImageType() {return ImageType.single(GrayU8.class);}

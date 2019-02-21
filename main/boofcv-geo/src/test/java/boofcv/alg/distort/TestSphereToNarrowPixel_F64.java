@@ -49,6 +49,8 @@ public class TestSphereToNarrowPixel_F64 {
 		}
 
 		@Override
-		public boolean isThreadSafe() { return true; }
+		public Point2Transform2_F64 copy() {
+			return null;
+		}
 	}
 }

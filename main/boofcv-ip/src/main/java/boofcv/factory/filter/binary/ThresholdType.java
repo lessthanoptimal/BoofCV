@@ -97,7 +97,7 @@ public enum ThresholdType {
 	/**
 	 * Locally adaptive computed using Savola's method
 	 *
-	 * @see boofcv.alg.filter.binary.impl.ThresholdSauvola
+	 * @see ThresholdSauvola
 	 */
 	LOCAL_SAVOLA(true,false),
 

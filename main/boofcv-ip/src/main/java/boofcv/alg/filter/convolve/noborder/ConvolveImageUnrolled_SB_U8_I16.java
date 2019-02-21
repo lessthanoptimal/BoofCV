@@ -26,6 +26,7 @@ import boofcv.struct.image.GrayU8;
 import javax.annotation.Generated;
 
 //CONCURRENT_CLASS_NAME ConvolveImageUnrolled_SB_MT_U8_I16
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>

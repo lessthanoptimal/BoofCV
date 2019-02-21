@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdBlockMinMax;
-import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.InterleavedF32;
@@ -29,22 +28,19 @@ import boofcv.struct.image.InterleavedF32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class ThresholdBlockMinMax_F32
 	extends ThresholdBlockMinMax<GrayF32,InterleavedF32>
 {
 	float scale;
-	boolean down;
 
-	public ThresholdBlockMinMax_F32(float minimumSpread, ConfigLength requestedBlockWidth, float scale , boolean down ,
-									boolean thresholdFromLocalBlocks) {
-		super(minimumSpread,requestedBlockWidth,thresholdFromLocalBlocks,GrayF32.class);
-		stats = new InterleavedF32(1,1,2);
+	public ThresholdBlockMinMax_F32(float minimumSpread, float scale , boolean down) {
+		super(minimumSpread,down);
 		this.scale = scale;
-		this.down = down;
 	}
 
 	@Override
-	protected void thresholdBlock(int blockX0 , int blockY0 , GrayF32 input, GrayU8 output ) {
+	public void thresholdBlock(int blockX0 , int blockY0 , GrayF32 input, InterleavedF32 stats, GrayU8 output ) {
 
 		int x0 = blockX0*blockWidth;
 		int y0 = blockY0*blockHeight;
@@ -64,7 +60,6 @@ public class ThresholdBlockMinMax_F32
 			blockX1 = blockX0;
 			blockY1 = blockY0;
 		}
-
 
 		// find the min and max pixel values inside this block region
 		float min = Float.MAX_VALUE;
@@ -116,7 +111,13 @@ public class ThresholdBlockMinMax_F32
 	}
 
 	@Override
-	protected void computeBlockStatistics(int x0 , int y0 , int width , int height , int indexMinMax , GrayF32 input) {
+	public InterleavedF32 createStats() {
+		return new InterleavedF32(1,1,2);
+	}
+
+	@Override
+	public void computeBlockStatistics(int x0 , int y0 , int width , int height , int indexMinMax ,
+									   GrayF32 input, InterleavedF32 stats ) {
 
 		float min,max;
 		min = max = input.unsafe_get(x0,y0);

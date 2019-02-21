@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.orientation.impl;
 
+import boofcv.abst.feature.orientation.RegionOrientation;
 import boofcv.alg.feature.orientation.OrientationHistogram;
 import boofcv.struct.image.GrayS32;
 
@@ -87,6 +88,11 @@ public class ImplOrientationHistogram_S32 extends OrientationHistogram<GrayS32> 
 				sumDerivY[discreteAngle] += w*dy;
 			}
 		}
+	}
+
+	@Override
+	public RegionOrientation copy() {
+		return new ImplOrientationHistogram_S32(objectToSample,numAngles,isWeighted);
 	}
 
 }

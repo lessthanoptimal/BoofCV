@@ -24,7 +24,7 @@ import boofcv.generate.CodeGeneratorBase;
 import java.io.FileNotFoundException;
 
 /**
- * Code generator for {@link ConvolveImageStandard_SB}.
+ * Code generator for ConvolveImageStandard_SB.
  *
  * @author Peter Abeles
  */

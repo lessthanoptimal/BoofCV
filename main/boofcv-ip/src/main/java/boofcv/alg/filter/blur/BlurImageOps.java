@@ -41,6 +41,7 @@ import javax.annotation.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class BlurImageOps {
 
 	/**

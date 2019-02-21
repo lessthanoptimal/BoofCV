@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,7 @@
 
 package boofcv.abst.feature.detect.extract;
 
-import boofcv.alg.feature.detect.extract.NonMaxCandidateRelaxed;
-import boofcv.alg.feature.detect.extract.NonMaxCandidateStrict;
+import boofcv.alg.feature.detect.extract.NonMaxCandidate;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,7 +32,7 @@ public class TestWrapperNonMaxCandidate {
 
 			@Override
 			public NonMaxSuppression createAlg() {
-				return new WrapperNonMaxCandidate(new NonMaxCandidateStrict(),true,true);
+				return new WrapperNonMaxCandidate(new NonMaxCandidate.Strict(),true,true);
 			}
 		};
 		checks.testAll();
@@ -45,7 +44,7 @@ public class TestWrapperNonMaxCandidate {
 
 			@Override
 			public NonMaxSuppression createAlg() {
-				return new WrapperNonMaxCandidate(new NonMaxCandidateRelaxed(),true,true);
+				return new WrapperNonMaxCandidate(new NonMaxCandidate.Relaxed(),true,true);
 			}
 		};
 		checks.testAll();

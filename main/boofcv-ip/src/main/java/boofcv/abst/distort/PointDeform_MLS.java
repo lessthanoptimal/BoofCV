@@ -19,6 +19,7 @@
 package boofcv.abst.distort;
 
 import boofcv.alg.distort.mls.ImageDeformPointMLS_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import georegression.struct.point.Point2D_F32;
 
 import java.util.List;
@@ -46,8 +47,8 @@ public class PointDeform_MLS implements PointDeformKeyPoints
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return alg.isThreadSafe();
+	public PointDeform_MLS copy() {
+		return new PointDeform_MLS(alg.copy(),rows,cols);
 	}
 
 	@Override

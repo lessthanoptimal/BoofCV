@@ -81,10 +81,9 @@ public interface InterpolatePixel<T extends ImageBase<T>> {
 	int getFastBorderY();
 
 	/**
-	 * If it returns true it is threadsafe and can be used inside of concurrent code
-	 * @return true for thread safe and false for not
+	 * Creates a copy
 	 */
-	boolean isThreadSafe();
+	InterpolatePixel<T> copy();
 
 	/**
 	 * Type of image it can process

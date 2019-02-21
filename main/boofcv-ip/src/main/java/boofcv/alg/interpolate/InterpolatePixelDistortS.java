@@ -58,6 +58,11 @@ public class InterpolatePixelDistortS<T extends ImageGray<T>>
 	}
 
 	@Override
+	public InterpolatePixelS<T> copy() {
+		throw new RuntimeException("Implement");
+	}
+
+	@Override
 	public void setBorder(ImageBorder<T> border) {
 		interpolate.setBorder(border);
 	}
@@ -90,11 +95,6 @@ public class InterpolatePixelDistortS<T extends ImageGray<T>>
 	@Override
 	public int getFastBorderY() {
 		return interpolate.getFastBorderY();
-	}
-
-	@Override
-	public boolean isThreadSafe() {
-		return distorter.isThreadSafe() && interpolate.isThreadSafe();
 	}
 
 	@Override

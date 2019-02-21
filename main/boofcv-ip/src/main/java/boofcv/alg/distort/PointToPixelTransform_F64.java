@@ -47,7 +47,7 @@ public class PointToPixelTransform_F64 implements PixelTransform<Point2D_F64> {
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return alg.isThreadSafe();
+	public PointToPixelTransform_F64 copy() {
+		return new PointToPixelTransform_F64(alg.copy());
 	}
 }

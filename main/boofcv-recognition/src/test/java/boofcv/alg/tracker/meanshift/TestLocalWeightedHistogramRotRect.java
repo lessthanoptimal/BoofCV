@@ -297,11 +297,6 @@ public class TestLocalWeightedHistogramRotRect {
 		}
 
 		@Override
-		public boolean isThreadSafe() {
-			return false;
-		}
-
-		@Override
 		public ImageType getImageType() {
 			return null;
 		}
@@ -311,6 +306,11 @@ public class TestLocalWeightedHistogramRotRect {
 
 		@Override
 		public void get_fast(float x, float y, float[] values) {}
+
+		@Override
+		public InterpolatePixelMB copy() {
+			return null;
+		}
 	}
 
 }

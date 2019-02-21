@@ -33,6 +33,12 @@ public class RadialTangential_F64 {
 	 */
 	public double t1,t2;
 
+	public RadialTangential_F64( RadialTangential_F64 original ) {
+		this.radial = original.radial.clone();
+		this.t1 = original.t1;
+		this.t2 = original.t2;
+	}
+
 	public RadialTangential_F64(int numRadial) {
 		radial = new double[numRadial];
 	}

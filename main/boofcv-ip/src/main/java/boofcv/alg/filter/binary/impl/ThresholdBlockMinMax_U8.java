@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdBlockMinMax;
-import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.InterleavedU8;
 
@@ -28,22 +27,19 @@ import boofcv.struct.image.InterleavedU8;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class ThresholdBlockMinMax_U8
 	extends ThresholdBlockMinMax<GrayU8,InterleavedU8>
 {
 	double scale;
-	boolean down;
 
-	public ThresholdBlockMinMax_U8(double minimumSpread, ConfigLength requestedBlockWidth, double scale , boolean down,
-								   boolean thresholdFromLocalBlocks) {
-		super(minimumSpread,requestedBlockWidth,thresholdFromLocalBlocks,GrayU8.class);
-		stats = new InterleavedU8(1,1,2);
+	public ThresholdBlockMinMax_U8(double minimumSpread, double scale , boolean down) {
+		super(minimumSpread,down);
 		this.scale = scale;
-		this.down = down;
 	}
 
 	@Override
-	protected void thresholdBlock(int blockX0 , int blockY0 , GrayU8 input, GrayU8 output ) {
+	public void thresholdBlock(int blockX0 , int blockY0 , GrayU8 input, InterleavedU8 stats, GrayU8 output ) {
 
 		int x0 = blockX0*blockWidth;
 		int y0 = blockY0*blockHeight;
@@ -114,7 +110,13 @@ public class ThresholdBlockMinMax_U8
 	}
 
 	@Override
-	protected void computeBlockStatistics(int x0 , int y0 , int width , int height , int indexMinMax , GrayU8 input) {
+	public InterleavedU8 createStats() {
+		return new InterleavedU8(1,1,2);
+	}
+
+	@Override
+	public void computeBlockStatistics(int x0 , int y0 , int width , int height , int indexMinMax ,
+									   GrayU8 input, InterleavedU8 stats) {
 
 		int min,max;
 		min = max = input.unsafe_get(x0,y0);

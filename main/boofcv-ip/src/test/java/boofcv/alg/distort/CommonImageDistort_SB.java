@@ -51,7 +51,9 @@ public abstract class CommonImageDistort_SB {
 		}
 
 		@Override
-		public boolean isThreadSafe() {return true;}
+		public PixelTransform<Point2D_F32> copy() {
+			return null;
+		}
 	};
 
 	@Test

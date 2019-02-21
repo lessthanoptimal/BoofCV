@@ -36,6 +36,10 @@ public class GenerateImplBilinearPixel_IL extends CodeGeneratorBase {
 	String borderType;
 	String imageName;
 
+	public GenerateImplBilinearPixel_IL() {
+		super(false);
+	}
+
 	@Override
 	public void generate() throws FileNotFoundException {
 		createType(AutoTypeImage.F64);
@@ -46,7 +50,6 @@ public class GenerateImplBilinearPixel_IL extends CodeGeneratorBase {
 	}
 
 	private void createType( AutoTypeImage type ) throws FileNotFoundException {
-		className = "ImplBilinearPixel_IL_"+type.name();
 		image = type;
 
 		imageName = type.getInterleavedName();
@@ -73,14 +76,16 @@ public class GenerateImplBilinearPixel_IL extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() throws FileNotFoundException {
-		setOutputFile(className);
+		this.className = null;
+		setOutputFile("ImplBilinearPixel_IL_"+image.name());
 
 		String sumType = image.getSumType();
 
 		out.print("import boofcv.alg.interpolate.BilinearPixelMB;\n" +
+				"import boofcv.alg.interpolate.InterpolatePixelMB;\n" +
 				"import boofcv.struct.image.ImageType;\n" +
 				"import boofcv.struct.image." + image.getInterleavedName() + ";\n" +
-				"import boofcv.core.image.border.ImageBorder_IL_" + borderType + ";\n");
+				"import boofcv.struct.border.ImageBorder_IL_" + borderType + ";\n");
 		out.println();
 		out.println();
 		out.print("/**\n" +
@@ -88,9 +93,7 @@ public class GenerateImplBilinearPixel_IL extends CodeGeneratorBase {
 				" * Implementation of {@link BilinearPixelMB} for a specific image type.\n" +
 				" * </p>\n" +
 				" *\n" +
-				" * <p>\n" +
-				" * NOTE: This code was automatically generated using " + getClass().getSimpleName() + ".\n" +
-				" * </p>\n" +
+				generateDocString() +
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
@@ -197,13 +200,18 @@ public class GenerateImplBilinearPixel_IL extends CodeGeneratorBase {
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
+				"\tpublic InterpolatePixelMB<"+imageName+"> newInstance() {\n" +
+				"\t\treturn new "+className+"(temp0.length);\n" +
+				"\t}\n" +
+				"\t@Override\n" +
 				"\tpublic ImageType<"+imageName+"> getImageType() {\n" +
 				"\t\treturn orig.getImageType();\n" +
 				"\t}\n\n");
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {
-		GenerateImplBilinearPixel_IL gen = new GenerateImplBilinearPixel_IL();
-		gen.generate();
+		GenerateImplBilinearPixel_IL app = new GenerateImplBilinearPixel_IL();
+		app.parseArguments(args);
+		app.generate();
 	}
 }

@@ -45,7 +45,8 @@ public class FlipVerticalNorm2_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public boolean isThreadSafe() {
-		return pixelToNormalized.isThreadSafe();
+	public FlipVerticalNorm2_F64 copy() {
+		return new FlipVerticalNorm2_F64(pixelToNormalized.copy(),height);
 	}
+
 }

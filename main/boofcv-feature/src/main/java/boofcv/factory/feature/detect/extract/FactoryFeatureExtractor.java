@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.feature.detect.extract.*;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.extract.*;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.ImageGray;
 
 import javax.annotation.Nullable;
@@ -69,31 +70,35 @@ public class FactoryFeatureExtractor {
 			return BOverrideFactoryFeatureExtractor.nonmax.process(config);
 		}
 
-		NonMaxBlock ret;
+		NonMaxBlock.Search search;
 		if (config.useStrictRule) {
 			if( config.detectMaximums)
 				if( config.detectMinimums )
-					ret = new NonMaxBlockStrict.MinMax();
+					search = new NonMaxBlockSearchStrict.MinMax();
 				else
-					ret = new NonMaxBlockStrict.Max();
+					search = new NonMaxBlockSearchStrict.Max();
 			else
-				ret = new NonMaxBlockStrict.Min();
+				search = new NonMaxBlockSearchStrict.Min();
 		} else {
 			if( config.detectMaximums)
 				if( config.detectMinimums )
-					ret = new NonMaxBlockRelaxed.MinMax();
+					search = new NonMaxBlockSearchRelaxed.MinMax();
 				else
-					ret = new NonMaxBlockRelaxed.Max();
+					search = new NonMaxBlockSearchRelaxed.Max();
 			else
-				ret = new NonMaxBlockRelaxed.Min();
+				search = new NonMaxBlockSearchRelaxed.Min();
 		}
 
-		ret.setSearchRadius(config.radius);
-		ret.setThresholdMax(config.threshold);
-		ret.setThresholdMin(-config.threshold);
-		ret.setBorder(config.ignoreBorder);
+		// See if the user wants to use threaded code or not
+		NonMaxBlock alg = BoofConcurrency.USE_CONCURRENT ?
+				new NonMaxBlock_MT(search) : new NonMaxBlock(search);
 
-		return new WrapperNonMaximumBlock(ret);
+		alg.setSearchRadius(config.radius);
+		alg.setThresholdMax(config.threshold);
+		alg.setThresholdMin(-config.threshold);
+		alg.setBorder(config.ignoreBorder);
+
+		return new WrapperNonMaximumBlock(alg);
 	}
 
 	/**
@@ -112,16 +117,20 @@ public class FactoryFeatureExtractor {
 			return BOverrideFactoryFeatureExtractor.nonmaxCandidate.process(config);
 		}
 
-		NonMaxCandidate alg;
+		NonMaxCandidate.Search search;
 
 		// no need to check the detection max/min since these algorithms can handle both
 		if (config.useStrictRule) {
-			alg = new NonMaxCandidateStrict();
+			search = new NonMaxCandidate.Strict();
 		} else {
-			alg = new NonMaxCandidateRelaxed();
+			search = new NonMaxCandidate.Relaxed();
 		}
 
-		WrapperNonMaxCandidate ret = new WrapperNonMaxCandidate(alg,false,true);
+		// See if the user wants to use threaded code or not
+		NonMaxCandidate extractor = BoofConcurrency.USE_CONCURRENT?
+				new NonMaxCandidate_MT(search):new NonMaxCandidate(search);
+
+		WrapperNonMaxCandidate ret = new WrapperNonMaxCandidate(extractor,false,true);
 
 		ret.setSearchRadius(config.radius);
 		ret.setIgnoreBorder(config.ignoreBorder);

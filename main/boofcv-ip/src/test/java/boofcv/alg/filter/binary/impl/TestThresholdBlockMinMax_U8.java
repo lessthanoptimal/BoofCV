@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.filter.binary.ThresholdBlockMinMax;
-import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 
 /**
@@ -34,9 +33,8 @@ public class TestThresholdBlockMinMax_U8
 	}
 
 	@Override
-	public ThresholdBlockMinMax<GrayU8, ?>
-	createAlg(double textureThreshold, int requestedBlockWidth, double scale, boolean down) {
-		return new ThresholdBlockMinMax_U8(textureThreshold, ConfigLength.fixed(requestedBlockWidth),
-				scale,down,true);
+	public ThresholdBlockMinMax<GrayU8, ?> createProcessor(
+			double textureThreshold, int requestedBlockWidth, double scale, boolean down) {
+		return new ThresholdBlockMinMax_U8((float)textureThreshold, (float)scale,down);
 	}
 }

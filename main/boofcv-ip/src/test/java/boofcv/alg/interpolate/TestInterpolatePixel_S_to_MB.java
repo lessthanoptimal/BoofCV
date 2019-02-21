@@ -70,6 +70,11 @@ public class TestInterpolatePixel_S_to_MB {
 		}
 
 		@Override
+		public InterpolatePixelS copy() {
+			return null;
+		}
+
+		@Override
 		public void setBorder(ImageBorder border) {
 			this.border = border;
 		}
@@ -102,11 +107,6 @@ public class TestInterpolatePixel_S_to_MB {
 		@Override
 		public int getFastBorderY() {
 			return 11;
-		}
-
-		@Override
-		public boolean isThreadSafe() {
-			return false;
 		}
 
 		@Override

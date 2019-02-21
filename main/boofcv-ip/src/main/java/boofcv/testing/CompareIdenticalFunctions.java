@@ -21,6 +21,7 @@ package boofcv.testing;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
+import boofcv.struct.image.Planar;
 
 import java.lang.reflect.Method;
 
@@ -44,6 +45,8 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 			if( ImageGray.class.isAssignableFrom(c))
 				return true;
 			if( ImageInterleaved.class.isAssignableFrom(c))
+				return true;
+			if( Planar.class.isAssignableFrom(c))
 				return true;
 		}
 		return false;

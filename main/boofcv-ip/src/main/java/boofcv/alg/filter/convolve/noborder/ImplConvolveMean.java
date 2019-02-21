@@ -25,6 +25,8 @@ import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
 
+//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+
 /**
  * <p>
  * Convolves a mean filter across the image.  The mean value of all the pixels are computed inside the kernel.

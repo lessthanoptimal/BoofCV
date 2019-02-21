@@ -66,7 +66,7 @@ public class GenerateImageBandMath extends CodeGeneratorBase {
 				" * @author Nico Stuurman\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				generatedString() +
+				generatedAnnotation() +
 				"@SuppressWarnings(\"Duplicates\")\n" +
 				"public class " + className + " {\n\n");
 	}

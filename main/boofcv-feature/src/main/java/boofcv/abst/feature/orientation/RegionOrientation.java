@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,4 +42,9 @@ public interface RegionOrientation {
 	 * @return Orientation in radians.  Angle zero points along x-axis and pi/2 along y-axis.
 	 */
 	double compute( double c_x , double c_y );
+
+	/**
+	 * Creates a copy which is functionally identical
+	 */
+	RegionOrientation copy();
 }

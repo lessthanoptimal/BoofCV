@@ -33,6 +33,12 @@ public class RadialTangential_F32 {
 	 */
 	public float t1,t2;
 
+	public RadialTangential_F32( RadialTangential_F32 original ) {
+		this.radial = original.radial.clone();
+		this.t1 = original.t1;
+		this.t2 = original.t2;
+	}
+
 	public RadialTangential_F32(int numRadial) {
 		radial = new float[numRadial];
 	}
