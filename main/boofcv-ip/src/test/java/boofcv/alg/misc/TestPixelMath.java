@@ -46,7 +46,7 @@ public class TestPixelMath {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 234;
+		int numExpected = 226;
 		Method methods[] = PixelMath.class.getMethods();
 
 		// sanity check to make sure the functions are being found

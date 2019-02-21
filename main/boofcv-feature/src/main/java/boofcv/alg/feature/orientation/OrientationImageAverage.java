@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,6 +45,8 @@ public abstract class OrientationImageAverage<T extends ImageGray<T>> implements
 
 	// Radius of the region it will sample
 	protected int sampleRadius;
+	// the original requested object radius
+	protected double objectRadius;
 
 	// cosine values for each pixel
 	protected Kernel2D_F32 kerCosine;
@@ -63,6 +65,7 @@ public abstract class OrientationImageAverage<T extends ImageGray<T>> implements
 
 	@Override
 	public void setObjectRadius(double objectRadius) {
+		this.objectRadius = objectRadius;
 		sampleRadius = (int)Math.ceil(objectRadius* objectToSample);
 
 		int w = sampleRadius*2+1;

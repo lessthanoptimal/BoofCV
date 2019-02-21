@@ -19,10 +19,12 @@
 package boofcv.alg.feature.orientation;
 
 import boofcv.abst.feature.orientation.OrientationIntegral;
+import boofcv.abst.feature.orientation.RegionOrientation;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
 import georegression.metric.UtilAngle;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -32,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-public class GenericOrientationIntegralTests<T extends ImageGray<T>> extends GenericOrientationTests {
+public abstract class GenericOrientationIntegralTests<T extends ImageGray<T>> extends GenericOrientationTests {
 
 	int width = 30;
 	int height = 40;
@@ -48,29 +50,27 @@ public class GenericOrientationIntegralTests<T extends ImageGray<T>> extends Gen
 	// integral image
 	T ii;
 
-	public void setup(double angleTolerance, int regionSize ,
-					  OrientationIntegral<T> alg , Class<T> imageType ) {
+	public GenericOrientationIntegralTests(double angleTolerance, int regionSize, Class imageType) {
+		super(imageType);
+
+		Class<T> integralType = GIntegralImageOps.getIntegralType(imageType);
+
 		this.angleTolerance = angleTolerance;
 		this.regionSize = regionSize;
-		this.alg = alg;
-
-		ii = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		ii = GeneralizedImageOps.createSingleBand(integralType, width, height);
 	}
 
-	/**
-	 * Performs all the tests, but the weighted test.
-	 */
-	public void performAll() {
-		performEasyTests();
-		setScale();
-		checkSubImages();
-		checkBorderExplode();
+	@Override
+	protected void setRegionOrientation(RegionOrientation alg) {
+		super.setRegionOrientation(alg);
+		this.alg = (OrientationIntegral<T>)alg;
 	}
 
 	/**
 	 * Tests involving the image border
 	 */
-	public void checkBorderExplode() {
+	@Test
+	void checkBorderExplode() {
 		alg.setObjectRadius(10);
 
 		createOrientedImage(0);
@@ -91,7 +91,8 @@ public class GenericOrientationIntegralTests<T extends ImageGray<T>> extends Gen
 	 * Points all pixels in the surrounding region in same direction.  Then sees if the found
 	 * direction for the region is in the expected direction.
 	 */
-	public void performEasyTests() {
+	@Test
+	void performEasyTests() {
 
 		alg.setObjectRadius(10);
 
@@ -114,7 +115,8 @@ public class GenericOrientationIntegralTests<T extends ImageGray<T>> extends Gen
 	/**
 	 * Estimate the direction at a couple of different scales and see if it produces the expected results.
 	 */
-	public void setScale() {
+	@Test
+	void setScale() {
 		int x = width/2;
 		int y = height/2;
 
@@ -141,7 +143,8 @@ public class GenericOrientationIntegralTests<T extends ImageGray<T>> extends Gen
 	/**
 	 * See if it can handle sub-images correctly
 	 */
-	public void checkSubImages() {
+	@Test
+	void checkSubImages() {
 		double angle = 0.5;
 		createOrientedImage(angle);
 		// set the border of the image to zeros to screw up orientation estimation
@@ -180,5 +183,12 @@ public class GenericOrientationIntegralTests<T extends ImageGray<T>> extends Gen
 		}
 
 		GIntegralImageOps.transform(input,ii);
+	}
+
+	@Override
+	protected void setImage(RegionOrientation alg, ImageGray image) {
+		T input = (T)ii.createNew(width,height);
+		GIntegralImageOps.transform(input,ii);
+		((OrientationIntegral<T>)alg).setImage(ii);
 	}
 }

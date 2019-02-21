@@ -19,10 +19,12 @@
 package boofcv.alg.feature.orientation;
 
 import boofcv.abst.feature.orientation.OrientationGradient;
+import boofcv.abst.feature.orientation.RegionOrientation;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
 import georegression.metric.UtilAngle;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -32,7 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-public class GenericOrientationGradientTests<D extends ImageGray<D>> extends GenericOrientationTests {
+public abstract class GenericOrientationGradientTests<D extends ImageGray<D>> extends GenericOrientationTests {
+
+	protected static final int r = 3;
 
 	int width = 30;
 	int height = 40;
@@ -48,31 +52,27 @@ public class GenericOrientationGradientTests<D extends ImageGray<D>> extends Gen
 	// data used to store image derivatives
 	D derivX,derivY;
 
-	public void setup(double angleTolerance, int regionSize , OrientationGradient<D> alg) {
+	public GenericOrientationGradientTests(double angleTolerance, int regionSize, Class imageType) {
+		super(imageType);
 		this.angleTolerance = angleTolerance;
-		this.alg = alg;
 		this.regionSize = regionSize;
-
-		Class<D> imageType = alg.getImageType();
-
-		derivX = GeneralizedImageOps.createSingleBand(imageType, width, height);
-		derivY = GeneralizedImageOps.createSingleBand(imageType, width, height);
 	}
 
-	/**
-	 * Performs all the tests, but the weighted test.
-	 */
-	public void performAll() {
-		performEasyTests();
-		setScale();
-		checkSubImages();
+	@Override
+	protected void setRegionOrientation(RegionOrientation alg) {
+		super.setRegionOrientation(alg);
+		this.alg = (OrientationGradient<D>)alg;
+		Class<D> derivType = this.alg.getImageType();
+		derivX = GeneralizedImageOps.createSingleBand(derivType, width, height);
+		derivY = GeneralizedImageOps.createSingleBand(derivType, width, height);
 	}
 
 	/**
 	 * Points all pixels in the surrounding region in same direction.  Then sees if the found
 	 * direction for the region is in the expected direction.
 	 */
-	public void performEasyTests() {
+	@Test
+	void performEasyTests() {
 
 		alg.setObjectRadius(1);
 
@@ -103,6 +103,7 @@ public class GenericOrientationGradientTests<D extends ImageGray<D>> extends Gen
 	/**
 	 * See if it can handle sub-images correctly
 	 */
+	@Test
 	public void checkSubImages() {
 		double angle = 0.5;
 		double c = Math.cos(angle);
@@ -125,6 +126,7 @@ public class GenericOrientationGradientTests<D extends ImageGray<D>> extends Gen
 	/**
 	 * Estimate the direction at a couple of different scales and see if it produces the expected results.
 	 */
+	@Test
 	public void setScale() {
 		int x = width/2;
 		int y = height/2;
@@ -152,4 +154,16 @@ public class GenericOrientationGradientTests<D extends ImageGray<D>> extends Gen
 		assertTrue( UtilAngle.dist(angle,found) < angleTolerance );
 	}
 
+	@Override
+	protected void setImage(RegionOrientation alg, ImageGray image) {
+
+		// The code below is a hack. S16 to S32 doesn't current exist in the code (making this test of dubious value)
+		// the exact values don't matter
+		GImageMiscOps.fillUniform(derivX,rand,0,100);
+		GImageMiscOps.fillUniform(derivY,rand,0,100);
+
+//		GImageDerivativeOps.gradient(DerivativeType.SOBEL,image,derivX,derivY, BorderType.EXTENDED);
+
+		((OrientationGradient<D>)alg).setImage(derivX,derivY);
+	}
 }

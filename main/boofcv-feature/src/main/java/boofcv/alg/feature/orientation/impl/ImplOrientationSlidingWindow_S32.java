@@ -130,6 +130,9 @@ public class ImplOrientationSlidingWindow_S32 extends OrientationSlidingWindow<G
 
 	@Override
 	public RegionOrientation copy() {
-		return new ImplOrientationSlidingWindow_S32(objectRadiusToScale, numAngles, windowSize, isWeighted);
+		ImplOrientationSlidingWindow_S32 alg =
+				new ImplOrientationSlidingWindow_S32(objectRadiusToScale, numAngles, windowSize, isWeighted);
+		alg.setObjectRadius(objRadius);
+		return alg;
 	}
 }

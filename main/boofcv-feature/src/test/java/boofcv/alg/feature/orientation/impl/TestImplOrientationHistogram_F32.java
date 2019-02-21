@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationGradientTests;
 import boofcv.struct.image.GrayF32;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
 
 
 /**
@@ -28,30 +28,29 @@ import org.junit.jupiter.api.Test;
  */
 public class TestImplOrientationHistogram_F32 {
 
-	int N = 10;
-	int r = 3;
+	protected static final int N = 10;
 
-	@Test
-	public void standardUnweighted() {
-		GenericOrientationGradientTests<GrayF32> tests = new GenericOrientationGradientTests<>();
-
-		ImplOrientationHistogram_F32 alg = new ImplOrientationHistogram_F32(1.0/2.0,N,false);
-		alg.setObjectToSample(r);
-
-		tests.setup(2.0*Math.PI/N, r*2+1 , alg);
-		tests.performAll();
+	class Base extends GenericOrientationGradientTests {
+		Base( boolean weighted ) {
+			super(2.0*Math.PI/N,r*2+1,GrayF32.class);
+			ImplOrientationHistogram_F32 alg = new ImplOrientationHistogram_F32(1.0/2.0,N,weighted);
+			alg.setObjectToSample(r);
+			setRegionOrientation(alg);
+		}
 	}
 
-	@Test
-	public void standardWeighted() {
-		GenericOrientationGradientTests<GrayF32> tests = new GenericOrientationGradientTests<>();
+	@Nested
+	class Unweighted extends Base {
+		Unweighted() {
+			super(false);
+		}
+	}
 
-		ImplOrientationHistogram_F32 alg = new ImplOrientationHistogram_F32(1.0/2.0,N,true);
-		alg.setObjectToSample(r);
-
-		tests.setup(2.0*Math.PI/N, r*2+1 ,alg);
-		tests.performAll();
-
+	@Nested
+	class Weighted extends Base {
+		Weighted() {
+			super(true);
+		}
 	}
 
 }
