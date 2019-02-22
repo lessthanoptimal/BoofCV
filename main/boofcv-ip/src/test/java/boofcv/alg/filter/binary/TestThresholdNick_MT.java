@@ -18,14 +18,16 @@
 
 package boofcv.alg.filter.binary;
 
-import org.junit.jupiter.api.Test;
+import boofcv.struct.ConfigLength;
+import boofcv.struct.image.GrayF32;
 
-import static org.junit.jupiter.api.Assertions.fail;
+class TestThresholdNick_MT extends GenericInputToBinaryCompare<GrayF32> {
 
-class TestThresholdNick_MT {
-	@Test
-	void implement() {
-		fail("implement");
+	TestThresholdNick_MT() {
+		ThresholdNick_MT target = new ThresholdNick_MT(ConfigLength.fixed(12), -0.2f,true);
+		ThresholdNick reference = new ThresholdNick(ConfigLength.fixed(12), -0.2f,true);
+
+		initialize(target,reference);
 	}
 }
 

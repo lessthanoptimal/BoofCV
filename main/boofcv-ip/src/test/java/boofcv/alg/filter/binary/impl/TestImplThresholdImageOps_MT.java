@@ -18,14 +18,9 @@
 
 package boofcv.alg.filter.binary.impl;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
-
-class TestImplThresholdImageOps_MT {
-	@Test
-	void implement() {
-		fail("implement");
+class TestImplThresholdImageOps_MT extends CompareToImplThresholdImageOps {
+	TestImplThresholdImageOps_MT() {
+		super(ImplThresholdImageOps_MT.class);
 	}
 }
 

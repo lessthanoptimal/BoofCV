@@ -35,6 +35,7 @@ import javax.annotation.Nullable;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class ThresholdImageOps {
 
 	/**
@@ -242,6 +243,71 @@ public class ThresholdImageOps {
 		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
 		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU8.class);
 		storage2 = InputSanityCheck.checkDeclare(input,storage2,GrayU8.class);
+
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplThresholdImageOps_MT.localGaussian(input, output, width, scale, down, storage1, storage2);
+		} else {
+			ImplThresholdImageOps.localGaussian(input, output, width, scale, down, storage1, storage2);
+		}
+
+		return output;
+	}
+
+	/**
+	 * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered
+	 * on each pixel.  The threshold is equal to the average value of the surrounding pixels times the scale.
+	 * If down is true then b(x,y) = I(x,y) &le; T(x,y) * scale ? 1 : 0.  Otherwise
+	 * b(x,y) = I(x,y) * scale &gt; T(x,y) ? 0 : 1
+	 *
+	 * @param input Input image.
+	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param width Width of square region.
+	 * @param scale Scale factor used to adjust threshold.  Try 0.95
+	 * @param down Should it threshold up or down.
+	 * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.
+	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
+	 * @return Thresholded image.
+	 */
+	public static GrayU8 localMean(GrayU16 input , GrayU8 output ,
+								   ConfigLength width , float scale , boolean down ,
+								   @Nullable GrayU16 storage1 , @Nullable GrayU16 storage2 ,
+								   @Nullable IWorkArrays storage3 ) {
+
+		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
+		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU16.class);
+		storage2 = InputSanityCheck.checkDeclare(input,storage2,GrayU16.class);
+
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplThresholdImageOps_MT.localMean(input, output, width, scale, down, storage1, storage2, storage3);
+		} else {
+			ImplThresholdImageOps.localMean(input, output, width, scale, down, storage1, storage2, storage3);
+		}
+
+		return output;
+	}
+
+	/**
+	 * Thresholds the image using a locally adaptive threshold that is computed using a local square region centered
+	 * on each pixel.  The threshold is equal to the gaussian weighted sum of the surrounding pixels times the scale.
+	 * If down is true then b(x,y) = I(x,y) &le; T(x,y) * scale ? 1 : 0.  Otherwise
+	 * b(x,y) = I(x,y) * scale &gt; T(x,y) ? 0 : 1
+	 *
+	 * @param input Input image.
+	 * @param output (optional) Output binary image.  If null it will be declared internally.
+	 * @param width Width of square region.
+	 * @param scale Scale factor used to adjust threshold.  Try 0.95
+	 * @param down Should it threshold up or down.
+	 * @param storage1 (Optional) Storage for intermediate step. If null will be declared internally.
+	 * @param storage2 (Optional) Storage for intermediate step. If null will be declared internally.
+	 * @return Thresholded image.
+	 */
+	public static GrayU8 localGaussian( GrayU16 input , GrayU8 output ,
+										ConfigLength width , float scale , boolean down ,
+										GrayU16 storage1 , GrayU16 storage2 ) {
+
+		output = InputSanityCheck.checkDeclare(input,output,GrayU8.class);
+		storage1 = InputSanityCheck.checkDeclare(input,storage1,GrayU16.class);
+		storage2 = InputSanityCheck.checkDeclare(input,storage2,GrayU16.class);
 
 		if(BoofConcurrency.USE_CONCURRENT ) {
 			ImplThresholdImageOps_MT.localGaussian(input, output, width, scale, down, storage1, storage2);
