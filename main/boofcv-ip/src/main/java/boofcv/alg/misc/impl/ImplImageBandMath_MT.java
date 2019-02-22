@@ -18,12 +18,12 @@
 
 package boofcv.alg.misc.impl;
 
-import boofcv.struct.image.*;
-
-import boofcv.concurrency.BoofConcurrency;
-import org.ddogleg.sorting.QuickSelect;
-import javax.annotation.Generated;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.struct.image.*;
+import org.ddogleg.sorting.QuickSelect;
+
+import javax.annotation.Generated;
 
 /**
  * Implementation of algorithms in ImageBandMath
@@ -110,7 +110,7 @@ public class ImplImageBandMath_MT {
 			int indexEnd = indexInput+w;
 			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
 				for( int i = startBand; i <= lastBand; i++ ) {
-					valueArray[i] = bands[i].data[indexInput]& 0xFF;
+					valueArray[i-startBand] = bands[i].data[indexInput]& 0xFF;
 				}
 				if (isEven) {
 					// Would a single quick sort be faster?
@@ -243,7 +243,7 @@ public class ImplImageBandMath_MT {
 			int indexEnd = indexInput+w;
 			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
 				for( int i = startBand; i <= lastBand; i++ ) {
-					valueArray[i] = bands[i].data[indexInput];
+					valueArray[i-startBand] = bands[i].data[indexInput];
 				}
 				if (isEven) {
 					// Would a single quick sort be faster?
@@ -376,7 +376,7 @@ public class ImplImageBandMath_MT {
 			int indexEnd = indexInput+w;
 			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
 				for( int i = startBand; i <= lastBand; i++ ) {
-					valueArray[i] = bands[i].data[indexInput]& 0xFFFF;
+					valueArray[i-startBand] = bands[i].data[indexInput]& 0xFFFF;
 				}
 				if (isEven) {
 					// Would a single quick sort be faster?
@@ -509,7 +509,7 @@ public class ImplImageBandMath_MT {
 			int indexEnd = indexInput+w;
 			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
 				for( int i = startBand; i <= lastBand; i++ ) {
-					valueArray[i] = bands[i].data[indexInput];
+					valueArray[i-startBand] = bands[i].data[indexInput];
 				}
 				if (isEven) {
 					// Would a single quick sort be faster?
@@ -642,7 +642,7 @@ public class ImplImageBandMath_MT {
 			int indexEnd = indexInput+w;
 			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
 				for( int i = startBand; i <= lastBand; i++ ) {
-					valueArray[i] = bands[i].data[indexInput];
+					valueArray[i-startBand] = bands[i].data[indexInput];
 				}
 				if (isEven) {
 					// Would a single quick sort be faster?
@@ -775,7 +775,7 @@ public class ImplImageBandMath_MT {
 			int indexEnd = indexInput+w;
 			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
 				for( int i = startBand; i <= lastBand; i++ ) {
-					valueArray[i] = bands[i].data[indexInput];
+					valueArray[i-startBand] = bands[i].data[indexInput];
 				}
 				if (isEven) {
 					// Would a single quick sort be faster?
@@ -908,7 +908,7 @@ public class ImplImageBandMath_MT {
 			int indexEnd = indexInput+w;
 			for (; indexInput < indexEnd; indexInput++, indexOutput++ ) {
 				for( int i = startBand; i <= lastBand; i++ ) {
-					valueArray[i] = bands[i].data[indexInput];
+					valueArray[i-startBand] = bands[i].data[indexInput];
 				}
 				if (isEven) {
 					// Would a single quick sort be faster?
