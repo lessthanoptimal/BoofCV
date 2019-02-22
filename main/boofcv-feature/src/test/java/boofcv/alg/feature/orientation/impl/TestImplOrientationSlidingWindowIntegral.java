@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,8 @@
 package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationIntegralTests;
-import boofcv.alg.feature.orientation.OrientationIntegralBase;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.sparse.GradientValue_F32;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
 
 
 /**
@@ -32,26 +30,29 @@ public class TestImplOrientationSlidingWindowIntegral {
 	double angleTol = Math.PI/9;
 	int r = 3;
 
-	@Test
-	public void standardUnweighted() {
-		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<>();
+	class Base extends GenericOrientationIntegralTests {
+		Base( boolean weighted ) {
+			super(angleTol,r*2+3, GrayF32.class);
 
-		OrientationIntegralBase<GrayF32,GradientValue_F32> alg =
-				new ImplOrientationSlidingWindowIntegral(0.3, 1, Math.PI/3,r,0, 4,GrayF32.class);
+			double weight = weighted ? -1 : 2;
 
-		// region samples is r*2 +1 + sampleRadius
-		tests.setup(angleTol, r*2+3 , alg,GrayF32.class);
-		tests.performAll();
+			ImplOrientationSlidingWindowIntegral alg =
+					new ImplOrientationSlidingWindowIntegral(0.3, 1, Math.PI/3,r,weight, 4,GrayF32.class);
+			setRegionOrientation(alg);
+		}
 	}
 
-	@Test
-	public void standardWeighted() {
-		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<>();
+	@Nested
+	class Unweighted extends Base {
+		Unweighted() {
+			super(false);
+		}
+	}
 
-		OrientationIntegralBase<GrayF32,GradientValue_F32> alg =
-				new ImplOrientationSlidingWindowIntegral(0.3, 1, Math.PI/3,r,2, 4,GrayF32.class);
-
-		tests.setup(angleTol, r*2+3 ,alg,GrayF32.class);
-		tests.performAll();
+	@Nested
+	class Weighted extends Base {
+		Weighted() {
+			super(true);
+		}
 	}
 }

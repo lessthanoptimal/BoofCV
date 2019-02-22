@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationGradientTests;
-import boofcv.struct.image.GrayS16;
-import org.junit.jupiter.api.Test;
+import boofcv.struct.image.GrayU8;
+import org.junit.jupiter.api.Nested;
 
 
 /**
@@ -28,28 +28,28 @@ import org.junit.jupiter.api.Test;
  */
 public class TestImplOrientationSlidingWindow_S16 {
 	int N = 10;
-	int r = 3;
 	double window = Math.PI/3.0;
 
-	@Test
-	public void standardUnweighted() {
-		GenericOrientationGradientTests<GrayS16> tests = new GenericOrientationGradientTests<>();
-
-		ImplOrientationSlidingWindow_S16 alg = new ImplOrientationSlidingWindow_S16(r,N,window,false);
-		alg.setObjectRadius(r);
-
-		tests.setup(2.0*Math.PI/N, r*2+1 , alg);
-		tests.performAll();
+	class Base extends GenericOrientationGradientTests {
+		Base( boolean weighted ) {
+			super(2.0*Math.PI/N,r*2+1, GrayU8.class);
+			ImplOrientationSlidingWindow_S16 alg = new ImplOrientationSlidingWindow_S16(r,N,window,weighted);
+			alg.setObjectRadius(r);
+			setRegionOrientation(alg);
+		}
 	}
 
-	@Test
-	public void standardWeighted() {
-		GenericOrientationGradientTests<GrayS16> tests = new GenericOrientationGradientTests<>();
+	@Nested
+	class Unweighted extends Base {
+		Unweighted() {
+			super(false);
+		}
+	}
 
-		ImplOrientationSlidingWindow_S16 alg = new ImplOrientationSlidingWindow_S16(r,N,window,true);
-		alg.setObjectRadius(r);
-
-		tests.setup(2.0*Math.PI/N, r*2+1 ,alg);
-		tests.performAll();
+	@Nested
+	class Weighted extends Base {
+		Weighted() {
+			super(true);
+		}
 	}
 }

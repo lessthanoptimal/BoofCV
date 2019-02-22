@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestOrientationHistogramSift extends GenericOrientationTests {
+public class TestOrientationHistogramSift {
 
 	Random rand = new Random(234324);
 

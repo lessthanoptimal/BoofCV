@@ -271,7 +271,6 @@ public class BoofTesting {
 					// extract a sub-image and make it equivalent to the original image.
 					subImg[i] = larger[i].subimage(5, 6, 5 + img.getWidth(), 6 + img.getHeight(), null);
 					subImg[i].setTo(img);
-
 				}
 
 				// the first time it is called use the original inputs

@@ -43,7 +43,7 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(22);
+		performTests(21);
 	}
 
 	@Override

@@ -18,17 +18,58 @@
 
 package boofcv.alg.feature.orientation;
 
+import boofcv.abst.feature.orientation.RegionOrientation;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageGray;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class GenericOrientationTests {
+abstract class GenericOrientationTests<T extends ImageGray<T>> {
+
+	protected Random rand = new Random(234);
+	protected Class<T> imageType;
+	private RegionOrientation alg;
+
+	public GenericOrientationTests(Class<T> imageType ) {
+		this.imageType = imageType;
+	}
+
+	protected void setRegionOrientation( RegionOrientation alg ) {
+		this.alg = alg;
+	}
+
+	protected abstract void setImage( RegionOrientation alg , T image );
 
 	@Test
-	void newInstance() {
-		fail("IMplement");
+	protected void copy() {
+		T input = GeneralizedImageOps.createSingleBand(imageType,50,60);
+		int min = input.getImageType().getDataType().isSigned() ? -50 : 0;
+		int max = 50;
+		GImageMiscOps.fillUniform(input,rand,min,max);
+
+		RegionOrientation copy = alg.copy();
+
+		setImage(alg,input);
+		setImage(copy,input);
+
+		for (int i = 0; i < 4; i++) {
+			int x = 15 + i * 5;
+			for (int j = 0; j < 4; j++) {
+				int y = 17 + i * 5;
+
+				double expected = alg.compute(x,y);
+				double found = copy.compute(x,y);
+
+				assertEquals(expected, found, UtilEjml.TEST_F64);
+			}
+		}
 	}
 }

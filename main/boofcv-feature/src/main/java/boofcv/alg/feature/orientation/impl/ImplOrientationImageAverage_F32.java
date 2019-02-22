@@ -66,6 +66,8 @@ public class ImplOrientationImageAverage_F32 extends OrientationImageAverage<Gra
 
 	@Override
 	public RegionOrientation copy() {
-		return new ImplOrientationImageAverage_F32(objectToSample,sampleRadius);
+		ImplOrientationImageAverage_F32 alg = new ImplOrientationImageAverage_F32(objectToSample,sampleRadius);
+		alg.setObjectRadius(objectRadius);
+		return alg;
 	}
 }

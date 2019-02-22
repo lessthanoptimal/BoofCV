@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,6 +46,8 @@ public abstract class OrientationSlidingWindow<D extends ImageGray<D>>
 {
 	// The actual radius being sampled in pixels
 	protected int pixelRadius;
+	// The requested object radius
+	protected double objRadius;
 
 	// used to adjust the size of the sample region
 	protected double objectRadiusToScale;
@@ -91,6 +93,7 @@ public abstract class OrientationSlidingWindow<D extends ImageGray<D>>
 
 	@Override
 	public void setObjectRadius(double objRadius) {
+		this.objRadius = objRadius;
 		pixelRadius = (int)Math.ceil(objRadius*objectRadiusToScale);
 		if( isWeighted ) {
 			weights = FactoryKernelGaussian.gaussian(2,true, 32, -1, pixelRadius);

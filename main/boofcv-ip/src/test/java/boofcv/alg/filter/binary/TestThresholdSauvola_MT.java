@@ -18,14 +18,16 @@
 
 package boofcv.alg.filter.binary;
 
-import org.junit.jupiter.api.Test;
+import boofcv.struct.ConfigLength;
+import boofcv.struct.image.GrayF32;
 
-import static org.junit.jupiter.api.Assertions.fail;
+class TestThresholdSauvola_MT extends GenericInputToBinaryCompare<GrayF32> {
 
-class TestThresholdSauvola_MT {
-	@Test
-	void implement() {
-		fail("implement");
+	TestThresholdSauvola_MT() {
+		ThresholdSauvola_MT target = new ThresholdSauvola_MT(ConfigLength.fixed(12), 0.5f,true);
+		ThresholdSauvola reference = new ThresholdSauvola(ConfigLength.fixed(12), 0.5f,true);
+
+		initialize(target,reference);
 	}
 }
 

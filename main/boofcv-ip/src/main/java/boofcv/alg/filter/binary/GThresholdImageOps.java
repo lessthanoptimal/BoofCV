@@ -566,6 +566,9 @@ public class GThresholdImageOps {
 		} else if( input instanceof GrayU8) {
 			return ThresholdImageOps.localMean((GrayU8) input, output, width, (float) scale, down,
 					(GrayU8) work1, (GrayU8) work2, (IWorkArrays)work3);
+		} else if( input instanceof GrayU16) {
+			return ThresholdImageOps.localMean((GrayU16) input, output, width, (float) scale, down,
+					(GrayU16) work1, (GrayU16) work2, (IWorkArrays)work3);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}
@@ -604,6 +607,9 @@ public class GThresholdImageOps {
 		} else if( input instanceof GrayU8) {
 			return ThresholdImageOps.localGaussian((GrayU8) input, output, width, (float) scale, down,
 					(GrayU8) work1, (GrayU8) work2);
+		} else if( input instanceof GrayU16) {
+			return ThresholdImageOps.localGaussian((GrayU16) input, output, width, (float) scale, down,
+					(GrayU16) work1, (GrayU16) work2);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: "+input.getClass().getSimpleName());
 		}

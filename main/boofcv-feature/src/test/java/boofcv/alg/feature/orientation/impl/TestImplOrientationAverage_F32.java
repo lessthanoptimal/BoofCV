@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationGradientTests;
 import boofcv.struct.image.GrayF32;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
 
 
 /**
@@ -28,28 +28,26 @@ import org.junit.jupiter.api.Test;
  */
 public class TestImplOrientationAverage_F32 {
 
-	double angleTol = 0.01;
-	int r = 3;
-
-	@Test
-	public void standardUnweighted() {
-		GenericOrientationGradientTests<GrayF32> tests = new GenericOrientationGradientTests<>();
-
-		ImplOrientationAverage_F32 alg = new ImplOrientationAverage_F32(1.0/2.0,false);
-		alg.setSampleRadius(r);
-
-		tests.setup(angleTol, r*2+1 , alg);
-		tests.performAll();
+	class Base extends GenericOrientationGradientTests {
+		Base( boolean weighted ) {
+			super(0.01,r*2+1,GrayF32.class);
+			ImplOrientationAverage_F32 alg = new ImplOrientationAverage_F32(1.0/2.0,weighted);
+			alg.setSampleRadius(r);
+			setRegionOrientation(alg);
+		}
 	}
 
-	@Test
-	public void standardWeighted() {
-		GenericOrientationGradientTests<GrayF32> tests = new GenericOrientationGradientTests<>();
+	@Nested
+	class Unweighted extends Base {
+		Unweighted() {
+			super(false);
+		}
+	}
 
-		ImplOrientationAverage_F32 alg = new ImplOrientationAverage_F32(1.0/2.0,true);
-		alg.setSampleRadius(r);
-
-		tests.setup(angleTol, r*2+1 ,alg);
-		tests.performAll();
+	@Nested
+	class Weighted extends Base {
+		Weighted() {
+			super(true);
+		}
 	}
 }

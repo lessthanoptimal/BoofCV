@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,8 @@
 package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationImageTests;
-import boofcv.alg.feature.orientation.OrientationImageAverage;
 import boofcv.struct.image.GrayU8;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
 
 
 /**
@@ -31,13 +30,12 @@ public class TestImplOrientationImageAverage_U8 {
 	double angleTol = 0.1;// had to up tolerance for limited resolution of UInt8 images
 	int r = 3;
 
-	@Test
-	public void standardUnweighted() {
-		GenericOrientationImageTests<GrayU8> tests = new GenericOrientationImageTests<>();
-
-		OrientationImageAverage<GrayU8> alg = new ImplOrientationImageAverage_U8(1.0/2.0,r);
-
-		tests.setup(angleTol, r*2+1 , alg,GrayU8.class);
-		tests.performAll();
+	@Nested
+	class Unweighted extends GenericOrientationImageTests {
+		Unweighted() {
+			super(angleTol,r*2+1,GrayU8.class);
+			ImplOrientationImageAverage_U8 alg = new ImplOrientationImageAverage_U8(1.0/2.0,r);
+			setRegionOrientation(alg);
+		}
 	}
 }

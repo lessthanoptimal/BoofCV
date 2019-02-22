@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,21 +23,17 @@ import boofcv.alg.feature.orientation.GenericOrientationImageTests;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayF32;
-import org.junit.jupiter.api.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestOrientationGradientToImage {
+public class TestOrientationGradientToImage extends GenericOrientationImageTests {
 
-	double angleTol = 0.01;
-	int r = 3;
+	static final double angleTol = 0.01;
 
-	/**
-	 * Tests using generic tests for image orientation
-	 */
-	@Test
-	public void generic() {
+	public TestOrientationGradientToImage() {
+		super(angleTol, r*2+1, GrayF32.class);
+
 		OrientationGradient<GrayF32> orig = FactoryOrientationAlgs.average(1.0/2.0,r,false, GrayF32.class);
 
 		ImageGradient<GrayF32,GrayF32> gradient =
@@ -47,8 +43,11 @@ public class TestOrientationGradientToImage {
 				alg = new OrientationGradientToImage<>(orig, gradient,
 				GrayF32.class, GrayF32.class);
 
-		GenericOrientationImageTests tests = new GenericOrientationImageTests();
-		tests.setup(angleTol,r*2+1,alg,GrayF32.class);
-		tests.performAll();
+		setRegionOrientation(alg);
+	}
+
+	@Override
+	protected void copy() {
+		// skipped because it's known not to be implemented and will take a bit of work to do so
 	}
 }

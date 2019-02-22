@@ -24,22 +24,17 @@ import boofcv.alg.feature.orientation.GenericOrientationImageTests;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.struct.image.GrayF32;
-import org.junit.jupiter.api.Test;
 
 /**
  * @author Peter Abeles
  */
-public class TestOrientationSiftToImage {
-	double angleTol = 0.1;
+public class TestOrientationSiftToImage extends GenericOrientationImageTests {
+	final static double angleTol = 0.1;
+	final static ConfigSiftOrientation config = new ConfigSiftOrientation();
+	final static double pixelRadiusAtRadius1 = config.sigmaEnlarge/BoofDefaults.SIFT_SCALE_TO_RADIUS;
 
-	/**
-	 * Tests using generic tests for image orientation
-	 */
-	@Test
-	public void generic() {
-
-		ConfigSiftOrientation config = new ConfigSiftOrientation();
-		double pixelRadiusAtRadius1 = config.sigmaEnlarge/BoofDefaults.SIFT_SCALE_TO_RADIUS;
+	public TestOrientationSiftToImage() {
+		super(angleTol, (int)(pixelRadiusAtRadius1+0.5), GrayF32.class);
 
 		SiftScaleSpace ss = new SiftScaleSpace(-1,5,3,1.6);
 		OrientationHistogramSift<GrayF32> orig = FactoryOrientationAlgs.sift(null,GrayF32.class);
@@ -47,8 +42,11 @@ public class TestOrientationSiftToImage {
 		OrientationSiftToImage<GrayF32> alg =
 				new OrientationSiftToImage<>(orig,ss,GrayF32.class);
 
-		GenericOrientationImageTests tests = new GenericOrientationImageTests();
-		tests.setup(angleTol, (int)(pixelRadiusAtRadius1+0.5), alg, GrayF32.class);
-		tests.performAll();
+		setRegionOrientation(alg);
+	}
+
+	@Override
+	protected void copy() {
+		// skipped because it's known not to be implemented and will take a bit of work to do so
 	}
 }

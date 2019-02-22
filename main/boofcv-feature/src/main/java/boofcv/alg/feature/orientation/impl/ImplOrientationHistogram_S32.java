@@ -92,7 +92,8 @@ public class ImplOrientationHistogram_S32 extends OrientationHistogram<GrayS32> 
 
 	@Override
 	public RegionOrientation copy() {
-		return new ImplOrientationHistogram_S32(objectToSample,numAngles,isWeighted);
+		ImplOrientationHistogram_S32 copy = new ImplOrientationHistogram_S32(objectToSample,numAngles,isWeighted);
+		copy.setObjectToSample(objectToSample);
+		return copy;
 	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.alg.feature.orientation.GenericOrientationIntegralTests;
 import boofcv.alg.feature.orientation.OrientationIntegralBase;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.sparse.GradientValue_F32;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
 
 
 /**
@@ -34,31 +34,31 @@ public class TestImplOrientationImageAverageIntegral {
 
 	double radiusToScale = 0.25;
 	double period = 1.0;
+	double scale = 1.0/radiusToScale;
 
-	@Test
-	public void standardUnweighted() {
-		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<>();
+	class Base extends GenericOrientationIntegralTests {
+		Base( boolean weighted ) {
+			super(angleTol,(int)Math.round(scale*period+r), GrayF32.class);
 
-		double scale = 1.0/radiusToScale;
+			double weight = weighted ? -1 : 0;
 
-		OrientationIntegralBase<GrayF32,GradientValue_F32> alg =
-				new ImplOrientationImageAverageIntegral(radiusToScale,r,period,2,-1,GrayF32.class);
-
-		tests.setup(angleTol, (int)Math.round(scale*period+r) , alg,GrayF32.class);
-		tests.checkSubImages();
-		tests.performAll();
+			OrientationIntegralBase<GrayF32,GradientValue_F32> alg =
+					new ImplOrientationImageAverageIntegral(radiusToScale,r,period,2,weight,GrayF32.class);
+			setRegionOrientation(alg);
+		}
 	}
 
-	@Test
-	public void standardWeighted() {
-		GenericOrientationIntegralTests<GrayF32> tests = new GenericOrientationIntegralTests<>();
+	@Nested
+	class Unweighted extends Base {
+		Unweighted() {
+			super(false);
+		}
+	}
 
-		double scale = 1.0/radiusToScale;
-
-		OrientationIntegralBase<GrayF32,GradientValue_F32> alg =
-				new ImplOrientationImageAverageIntegral(radiusToScale,r,period,2,-1,GrayF32.class);
-
-		tests.setup(angleTol, (int)Math.round(scale*period+r) ,alg,GrayF32.class);
-		tests.performAll();
+	@Nested
+	class Weighted extends Base {
+		Weighted() {
+			super(true);
+		}
 	}
 }

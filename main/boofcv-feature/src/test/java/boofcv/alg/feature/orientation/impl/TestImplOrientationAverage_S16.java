@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,8 +19,8 @@
 package boofcv.alg.feature.orientation.impl;
 
 import boofcv.alg.feature.orientation.GenericOrientationGradientTests;
-import boofcv.struct.image.GrayS16;
-import org.junit.jupiter.api.Test;
+import boofcv.struct.image.GrayU8;
+import org.junit.jupiter.api.Nested;
 
 
 /**
@@ -29,27 +29,27 @@ import org.junit.jupiter.api.Test;
 public class TestImplOrientationAverage_S16 {
 
 	double angleTol = 0.1;
-	int r = 3;
 
-	@Test
-	public void standardUnweighted() {
-		GenericOrientationGradientTests<GrayS16> tests = new GenericOrientationGradientTests<>();
-
-		ImplOrientationAverage_S16 alg = new ImplOrientationAverage_S16(1.0/2.0,false);
-		alg.setSampleRadius(r);
-
-		tests.setup(angleTol, r*2+1 , alg);
-		tests.performAll();
+	class Base extends GenericOrientationGradientTests {
+		Base( boolean weighted ) {
+			super(angleTol,r*2+1, GrayU8.class);
+			ImplOrientationAverage_S16 alg = new ImplOrientationAverage_S16(1.0/2.0,weighted);
+			alg.setSampleRadius(r);
+			setRegionOrientation(alg);
+		}
 	}
 
-	@Test
-	public void standardWeighted() {
-		GenericOrientationGradientTests<GrayS16> tests = new GenericOrientationGradientTests<>();
+	@Nested
+	class Unweighted extends Base {
+		Unweighted() {
+			super(false);
+		}
+	}
 
-		ImplOrientationAverage_S16 alg = new ImplOrientationAverage_S16(1.0/2.0,true);
-		alg.setSampleRadius(r);
-
-		tests.setup(angleTol, r*2+1 ,alg);
-		tests.performAll();
+	@Nested
+	class Weighted extends Base {
+		Weighted() {
+			super(true);
+		}
 	}
 }
