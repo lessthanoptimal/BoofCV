@@ -78,14 +78,15 @@ public abstract class CompareToImplImageBandMath extends CompareIdenticalFunctio
 			Object[] param = output[i];
 
 			param[0] = new Planar(types[1],width,height,numBands);
+			GImageMiscOps.fillUniform((Planar)param[0],rand,0,100);
 			param[1] = GeneralizedImageOps.createSingleBand(types[1], width, height);
-			if( lastImage == 2 ) {
-				param[2] = GeneralizedImageOps.createSingleBand(types[2], width, height);
-				GImageMiscOps.fillUniform((ImageGray)param[2],rand,0,100);
-			}
 			param[lastImage+1] = 1;
 			param[lastImage+2] = numBands-2+i; // test even and off bands. this is inclusive
-			GImageMiscOps.fillUniform((Planar)param[0],rand,0,100);
+			if( lastImage == 2 ) {
+				param[2] = GeneralizedImageOps.createSingleBand(types[2], width, height);
+				GImageBandMath.average((Planar) param[0], (ImageGray) param[2], (int) param[lastImage+1], (int) param[lastImage+2]);
+				GImageMiscOps.fillUniform((ImageGray)param[2],rand,0,100);
+			}
 			GImageMiscOps.fillUniform((ImageGray)param[1],rand,0,100);
 		}
 
