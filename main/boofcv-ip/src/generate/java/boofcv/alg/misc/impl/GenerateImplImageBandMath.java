@@ -195,6 +195,12 @@ public class GenerateImplImageBandMath extends CodeGeneratorBase {
 				"\t\tfinal int h = input.getHeight();\n" +
 				"\t\tfinal int w = input.getWidth();\n" +
 				"\n" +
+				"\t\tif (avg == null) {\n" +
+				"\t\t\tavg = new " + band + "(input.width,input.height);\n" +
+				"\t\t\taverage(input,avg,startBand,lastBand);\n" +
+				"\t\t}\n" + "\n" +
+				"\t\tfinal " + band + " finalAvg = avg;\n" +
+				"\n" +
 				"\t\tfinal "+band+"[] bands = input.bands;\n" +
 				"\t\t"+sumType+" divisor = lastBand - startBand;\n" +
 				"\n" +
@@ -208,7 +214,7 @@ public class GenerateImplImageBandMath extends CodeGeneratorBase {
 				"\t\t\tfor (; indexInput < indexEnd; indexInput++, indexOutput++) {\n" +
 				"\t\t\t\t"+sumType+" sum = 0;\n" +
 				"\t\t\t\tfor (int i = startBand; i <= lastBand; i++) {\n" +
-				"\t\t\t\t\t"+sumType+" diff = (bands[i].data[indexInput] "+bitwise+") - (avg.data[indexInput] "+bitwise+");\n" +
+				"\t\t\t\t\t"+sumType+" diff = (bands[i].data[indexInput] "+bitwise+") - (finalAvg.data[indexInput] "+bitwise+");\n" +
 				"\t\t\t\t\tsum += diff * diff;\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\toutput.data[indexOutput] = ("+dataType+") Math.sqrt(sum/divisor);\n" +

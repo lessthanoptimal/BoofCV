@@ -158,6 +158,13 @@ public class ImplImageBandMath {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
+		if (avg == null) {
+			avg = new GrayU8(input.width,input.height);
+			average(input,avg,startBand,lastBand);
+		}
+
+		final GrayU8 finalAvg = avg;
+
 		final GrayU8[] bands = input.bands;
 		int divisor = lastBand - startBand;
 
@@ -171,7 +178,7 @@ public class ImplImageBandMath {
 			for (; indexInput < indexEnd; indexInput++, indexOutput++) {
 				int sum = 0;
 				for (int i = startBand; i <= lastBand; i++) {
-					int diff = (bands[i].data[indexInput] & 0xFF) - (avg.data[indexInput] & 0xFF);
+					int diff = (bands[i].data[indexInput] & 0xFF) - (finalAvg.data[indexInput] & 0xFF);
 					sum += diff * diff;
 				}
 				output.data[indexOutput] = (byte) Math.sqrt(sum/divisor);
@@ -301,6 +308,13 @@ public class ImplImageBandMath {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
+		if (avg == null) {
+			avg = new GrayS16(input.width,input.height);
+			average(input,avg,startBand,lastBand);
+		}
+
+		final GrayS16 finalAvg = avg;
+
 		final GrayS16[] bands = input.bands;
 		int divisor = lastBand - startBand;
 
@@ -314,7 +328,7 @@ public class ImplImageBandMath {
 			for (; indexInput < indexEnd; indexInput++, indexOutput++) {
 				int sum = 0;
 				for (int i = startBand; i <= lastBand; i++) {
-					int diff = (bands[i].data[indexInput] ) - (avg.data[indexInput] );
+					int diff = (bands[i].data[indexInput] ) - (finalAvg.data[indexInput] );
 					sum += diff * diff;
 				}
 				output.data[indexOutput] = (short) Math.sqrt(sum/divisor);
@@ -444,6 +458,13 @@ public class ImplImageBandMath {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
+		if (avg == null) {
+			avg = new GrayU16(input.width,input.height);
+			average(input,avg,startBand,lastBand);
+		}
+
+		final GrayU16 finalAvg = avg;
+
 		final GrayU16[] bands = input.bands;
 		int divisor = lastBand - startBand;
 
@@ -457,7 +478,7 @@ public class ImplImageBandMath {
 			for (; indexInput < indexEnd; indexInput++, indexOutput++) {
 				int sum = 0;
 				for (int i = startBand; i <= lastBand; i++) {
-					int diff = (bands[i].data[indexInput] & 0xFFFF) - (avg.data[indexInput] & 0xFFFF);
+					int diff = (bands[i].data[indexInput] & 0xFFFF) - (finalAvg.data[indexInput] & 0xFFFF);
 					sum += diff * diff;
 				}
 				output.data[indexOutput] = (short) Math.sqrt(sum/divisor);
@@ -587,6 +608,13 @@ public class ImplImageBandMath {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
+		if (avg == null) {
+			avg = new GrayS32(input.width,input.height);
+			average(input,avg,startBand,lastBand);
+		}
+
+		final GrayS32 finalAvg = avg;
+
 		final GrayS32[] bands = input.bands;
 		int divisor = lastBand - startBand;
 
@@ -600,7 +628,7 @@ public class ImplImageBandMath {
 			for (; indexInput < indexEnd; indexInput++, indexOutput++) {
 				int sum = 0;
 				for (int i = startBand; i <= lastBand; i++) {
-					int diff = (bands[i].data[indexInput] ) - (avg.data[indexInput] );
+					int diff = (bands[i].data[indexInput] ) - (finalAvg.data[indexInput] );
 					sum += diff * diff;
 				}
 				output.data[indexOutput] = (int) Math.sqrt(sum/divisor);
@@ -730,6 +758,13 @@ public class ImplImageBandMath {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
+		if (avg == null) {
+			avg = new GrayS64(input.width,input.height);
+			average(input,avg,startBand,lastBand);
+		}
+
+		final GrayS64 finalAvg = avg;
+
 		final GrayS64[] bands = input.bands;
 		long divisor = lastBand - startBand;
 
@@ -743,7 +778,7 @@ public class ImplImageBandMath {
 			for (; indexInput < indexEnd; indexInput++, indexOutput++) {
 				long sum = 0;
 				for (int i = startBand; i <= lastBand; i++) {
-					long diff = (bands[i].data[indexInput] ) - (avg.data[indexInput] );
+					long diff = (bands[i].data[indexInput] ) - (finalAvg.data[indexInput] );
 					sum += diff * diff;
 				}
 				output.data[indexOutput] = (long) Math.sqrt(sum/divisor);
@@ -873,6 +908,13 @@ public class ImplImageBandMath {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
+		if (avg == null) {
+			avg = new GrayF32(input.width,input.height);
+			average(input,avg,startBand,lastBand);
+		}
+
+		final GrayF32 finalAvg = avg;
+
 		final GrayF32[] bands = input.bands;
 		float divisor = lastBand - startBand;
 
@@ -886,7 +928,7 @@ public class ImplImageBandMath {
 			for (; indexInput < indexEnd; indexInput++, indexOutput++) {
 				float sum = 0;
 				for (int i = startBand; i <= lastBand; i++) {
-					float diff = (bands[i].data[indexInput] ) - (avg.data[indexInput] );
+					float diff = (bands[i].data[indexInput] ) - (finalAvg.data[indexInput] );
 					sum += diff * diff;
 				}
 				output.data[indexOutput] = (float) Math.sqrt(sum/divisor);
@@ -1016,6 +1058,13 @@ public class ImplImageBandMath {
 		final int h = input.getHeight();
 		final int w = input.getWidth();
 
+		if (avg == null) {
+			avg = new GrayF64(input.width,input.height);
+			average(input,avg,startBand,lastBand);
+		}
+
+		final GrayF64 finalAvg = avg;
+
 		final GrayF64[] bands = input.bands;
 		double divisor = lastBand - startBand;
 
@@ -1029,7 +1078,7 @@ public class ImplImageBandMath {
 			for (; indexInput < indexEnd; indexInput++, indexOutput++) {
 				double sum = 0;
 				for (int i = startBand; i <= lastBand; i++) {
-					double diff = (bands[i].data[indexInput] ) - (avg.data[indexInput] );
+					double diff = (bands[i].data[indexInput] ) - (finalAvg.data[indexInput] );
 					sum += diff * diff;
 				}
 				output.data[indexOutput] = (double) Math.sqrt(sum/divisor);

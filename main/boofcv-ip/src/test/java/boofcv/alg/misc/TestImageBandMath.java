@@ -29,354 +29,49 @@ import java.lang.reflect.Method;
 import java.util.Random;
 
 /**
-  * @author Nico
+ * @author Peter Abeles
  */
-public class TestImageBandMath {
-	int width = 10;
-	int height = 15;
-	int numBands = 11;
-	int firstBand = 0;
-	int lastBand = numBands - 1;
+public class TestImageBandMath extends CompareIdenticalFunctions {
 
-	Random rand = new Random(234);
+	private Random rand = new Random(234);
 
-	float pixelA[] = new float[numBands];
-	float pixelB[] = new float[numBands];
+	private int width = 15,height=20;
+	private int numBands = 12;
 
+	protected TestImageBandMath() {
+		super(ImageBandMath.class, ImplImageBandMath.class);
+	}
 
 	@Test
-	public void checkAll() {
-		int numExpected = 71;
-		Method methods[] = ImageBandMath.class.getMethods();
+	public void compareFunctions() {
+		super.performTests(5*7);
+	}
 
-		// sanity check to make sure the functions are being found
-		int numFound = 0;
-		for (Method m : methods) {
-			if (!isTestMethod(m)) {
-				continue;
+	@Override
+	protected Object[][] createInputParam(Method candidate, Method validation) {
+
+		Class[] types = candidate.getParameterTypes();
+		int outputIdx = 1;
+
+		Object[][] output = new Object[2][types.length];
+
+		for (int i = 0; i < output.length; i++) {
+			Object[] param = output[i];
+			int paramNr = 0;
+
+			param[paramNr++] = new Planar(types[outputIdx],width,height,numBands);
+			param[paramNr++] = GeneralizedImageOps.createSingleBand(types[outputIdx],width,height);
+			if (candidate.getName().equals("stdDev")) {
+				param[paramNr++] = null;
 			}
-			try {
-			 	// currently only testing variants with startBand and lastBand
-				if (m.getName().compareTo("average") == 0) {
-				 	if ( m.getParameterCount() == 4) {
-						TestAverageBand(m);
-					}
-				 } else if (m.getName().compareTo("minimum") == 0) {
-					 if ( m.getParameterCount() == 4) {
-						 TestMinimumBand(m);
-					 }
-				 } else if (m.getName().compareTo("maximum") == 0) {
-					 if ( m.getParameterCount() == 4) {
-						 TestMaximumBand(m);
-					 }
-				 } else if (m.getName().compareTo("median") == 0) {
-					 if ( m.getParameterCount() == 4) {
-						 TestMedianBand(m);
-					 }
-				 } else if (m.getName().compareTo("stdDev") == 0) {
-					 if ( m.getParameterCount() == 5) {
-						 TestStdDevBand(m);
-					 }
-				 } else if (m.getName().compareTo("checkInput") == 0) {
-					 Planar input = new Planar(GrayU8.class, width, height, numBands);
-					 m.invoke(null, input, firstBand, lastBand);
-				 } else {
-					 throw new RuntimeException("Unknown function: " + m.getName());
-				 }
-				 numFound++;
-			 } catch (InvocationTargetException | IllegalAccessException e) {
-				 throw new RuntimeException(e);
-			 }
-		 }
-		 assertEquals(numExpected, numFound);
-	 }
+			if (candidate.getParameterCount() > 3) {
+				param[paramNr++] = 1;
+				param[paramNr++] = numBands - 2 + i; // test even and off bands. this is inclusive
+			}
+			GImageMiscOps.fillUniform((Planar)param[0],rand,0,100);
+			GImageMiscOps.fillUniform((ImageGray)param[1],rand,0,100);
+		}
 
-
-	 private boolean isTestMethod(Method m) {
-		 Class param[] = m.getParameterTypes();
-
-		 if (param.length < 1) {
-			 return false;
-		 }
-
-		 for (int i = 0; i < param.length; i++) {
-			 if (ImageBase.class.isAssignableFrom(param[i])) {
-				 return true;
-			 }
-		 }
-		 return false;
-	 }
-
-	 private void TestAverageBand(Method m) throws InvocationTargetException, IllegalAccessException {
-		 Class paramTypes[] = m.getParameterTypes();
-		 Planar input = new Planar(paramTypes[1], width, height, numBands);
-		 ImageGray output = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
-
-		 if (output.getDataType().isSigned()) {
-			 GImageMiscOps.fillUniform(input, rand, -20, 20);
-		 } else {
-			 GImageMiscOps.fillUniform(input, rand, 0, 20);
-		 }
-		 GImageGray[] testImages = new GImageGray[lastBand - firstBand + 1];
-		 for (int i = firstBand; i <= lastBand; i++) {
-			 testImages[i] = FactoryGImageGray.wrap(input.getBand(i));
-		 }
-
-		 // check that a single band gives the expected output
-		 m.invoke(null, input, output, firstBand, firstBand);
-		 GImageGray r = FactoryGImageGray.wrap(output);
-		 boolean isInteger = output.getDataType().isInteger();
-
-		 for (int i = 0; i < height; i++) {
-			 for (int j = 0; j < width; j++) {
-				 double expected = testImages[firstBand].get(j, i).doubleValue();
-				 double found = r.get(j, i).doubleValue();
-
-				 if (isInteger) {
-					 expected = (int) expected;
-				 }
-				 assertEquals(expected, found, 1e-4);
-			 }
-		 }
-
-		 // now check all bands
-		 m.invoke(null, input, output, firstBand, lastBand);
-		 r = FactoryGImageGray.wrap(output);
-
-		 for (int i = 0; i < height; i++) {
-			 for (int j = 0; j < width; j++) {
-				 double expected = 0;
-				 for (int b = firstBand; b <= lastBand; b++) {
-					 expected += testImages[b].get(j, i).doubleValue();
-				 }
-				 expected /= (lastBand - firstBand + 1);
-
-				 double found = r.get(j, i).doubleValue();
-
-				 if (isInteger) {
-					 expected = (int) expected;
-				 }
-				 assertEquals(expected, found, 1e-4);
-			 }
-		 }
-	 }
-
-	 private void TestMinimumBand(Method m) throws InvocationTargetException, IllegalAccessException {
-		 Class paramTypes[] = m.getParameterTypes();
-		 Planar input = new Planar(paramTypes[1], width, height, numBands);
-		 ImageGray output = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
-
-		 if (output.getDataType().isSigned()) {
-			 GImageMiscOps.fillUniform(input, rand, -20, 20);
-		 } else {
-			 GImageMiscOps.fillUniform(input, rand, 0, 20);
-		 }
-		 GImageGray[] testImages = new GImageGray[lastBand - firstBand + 1];
-		 for (int i = firstBand; i <= lastBand; i++) {
-			 testImages[i] = FactoryGImageGray.wrap(input.getBand(i));
-		 }
-
-		 // check that a single band gives the expected output
-		 m.invoke(null, input, output, firstBand, firstBand);
-		 GImageGray r = FactoryGImageGray.wrap(output);
-		 boolean isInteger = output.getDataType().isInteger();
-
-		 for (int i = 0; i < height; i++) {
-			 for (int j = 0; j < width; j++) {
-				 double expected = testImages[firstBand].get(j, i).doubleValue();
-				 double found = r.get(j, i).doubleValue();
-
-				 if (isInteger) {
-					 expected = (int) expected;
-				 }
-				 assertEquals(expected, found, 1e-4);
-			 }
-		 }
-
-		 // now check all bands
-		 m.invoke(null, input, output, firstBand, lastBand);
-		 r = FactoryGImageGray.wrap(output);
-
-		 for (int i = 0; i < height; i++) {
-			 for (int j = 0; j < width; j++) {
-				 double expected = Double.MAX_VALUE;
-				 for (int b = firstBand; b <= lastBand; b++) {
-					 if (testImages[b].get(j, i).doubleValue() < expected) {
-						 expected = testImages[b].get(j, i).doubleValue();
-					 }
-				 }
-
-				 double found = r.get(j, i).doubleValue();
-
-				 if (isInteger) {
-					 expected = (int) expected;
-				 }
-				 assertEquals(expected, found, 1e-4);
-			 }
-		 }
-	 }
-
-	 private void TestMaximumBand(Method m) throws InvocationTargetException, IllegalAccessException {
-		 Class paramTypes[] = m.getParameterTypes();
-		 Planar input = new Planar(paramTypes[1], width, height, numBands);
-		 ImageGray output = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
-
-		 if (output.getDataType().isSigned()) {
-			 GImageMiscOps.fillUniform(input, rand, -20, 20);
-		 } else {
-			 GImageMiscOps.fillUniform(input, rand, 0, 20);
-		 }
-		 GImageGray[] testImages = new GImageGray[lastBand - firstBand + 1];
-		 for (int i = firstBand; i <= lastBand; i++) {
-			 testImages[i] = FactoryGImageGray.wrap(input.getBand(i));
-		 }
-
-		 // check that a single band gives the expected output
-		 m.invoke(null, input, output, firstBand, firstBand);
-		 GImageGray r = FactoryGImageGray.wrap(output);
-		 boolean isInteger = output.getDataType().isInteger();
-
-		 for (int i = 0; i < height; i++) {
-			 for (int j = 0; j < width; j++) {
-				 double expected = testImages[firstBand].get(j, i).doubleValue();
-				 double found = r.get(j, i).doubleValue();
-
-				 if (isInteger) {
-					 expected = (int) expected;
-				 }
-				 assertEquals(expected, found, 1e-4);
-			 }
-		 }
-
-		 // now check all bands
-		 m.invoke(null, input, output, firstBand, lastBand);
-		 r = FactoryGImageGray.wrap(output);
-
-		 for (int i = 0; i < height; i++) {
-			 for (int j = 0; j < width; j++) {
-				 double expected = -Double.MAX_VALUE;
-				 for (int b = firstBand; b <= lastBand; b++) {
-					 if (testImages[b].get(j, i).doubleValue() > expected) {
-						 expected = testImages[b].get(j, i).doubleValue();
-					 }
-				 }
-
-				 double found = r.get(j, i).doubleValue();
-
-				 if (isInteger) {
-					 expected = (int) expected;
-				 }
-				 if (expected != found) {
-					 System.out.println("Expected: " + expected + ", Found: " + found);
-				 }
-				 assertEquals(expected, found, 1e-4);
-			 }
-		 }
-	 }
-
-	 private void TestMedianBand(Method m) throws InvocationTargetException, IllegalAccessException {
-		 Class paramTypes[] = m.getParameterTypes();
-		 Planar input = new Planar(paramTypes[1], width, height, numBands);
-		 ImageGray output = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
-
-		 if (output.getDataType().isSigned()) {
-			 GImageMiscOps.fillUniform(input, rand, -20, 20);
-		 } else {
-			 GImageMiscOps.fillUniform(input, rand, 0, 20);
-		 }
-		 GImageGray[] testImages = new GImageGray[lastBand - firstBand + 1];
-		 for (int i = firstBand; i <= lastBand; i++) {
-			 testImages[i] = FactoryGImageGray.wrap(input.getBand(i));
-		 }
-
-		 // check that a single band gives the expected output
-		 m.invoke(null, input, output, firstBand, firstBand);
-		 GImageGray r = FactoryGImageGray.wrap(output);
-		 boolean isInteger = output.getDataType().isInteger();
-
-		 for (int i = 0; i < height; i++) {
-			 for (int j = 0; j < width; j++) {
-				 double expected = testImages[firstBand].get(j, i).doubleValue();
-				 double found = r.get(j, i).doubleValue();
-
-				 if (isInteger) {
-					 expected = (int) expected;
-				 }
-				 assertEquals(expected, found, 1e-4);
-			 }
-		 }
-
-		 // now check all bands
-		 m.invoke(null, input, output, firstBand, lastBand);
-		 r = FactoryGImageGray.wrap(output);
-
-		 double[] values = new double[lastBand - firstBand + 1];
-		 for (int i = 0; i < height; i++) {
-			 for (int j = 0; j < width; j++) {
-				 for (int b = firstBand; b <= lastBand; b++) {
-					 values[b - firstBand] = testImages[b].get(j, i).doubleValue();
-				 }
-				 Arrays.sort(values);
-				 double expected;
-				 if (values.length % 2 == 0) {
-					 expected = (values[values.length / 2] + values[values.length / 2 - 1]) / 2;
-				 } else {
-					 expected = values[values.length / 2];
-				 }
-
-				 double found = r.get(j, i).doubleValue();
-
-				 if (isInteger) {
-					 expected = (int) expected;
-				 }
-				 assertEquals(expected, found, 1e-4);
-			 }
-		 }
-	 }
-
-	 private void TestStdDevBand(Method m) throws InvocationTargetException, IllegalAccessException {
-		 Class paramTypes[] = m.getParameterTypes();
-		 Planar input = new Planar(paramTypes[1], width, height, numBands);
-		 ImageGray output = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
-		 ImageGray av = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
-
-		 if (output.getDataType().isSigned()) {
-			 GImageMiscOps.fillUniform(input, rand, -20, 20);
-		 } else {
-			 GImageMiscOps.fillUniform(input, rand, 0, 40);
-		 }
-		 GImageGray[] testImages = new GImageGray[lastBand - firstBand + 1];
-		 for (int i = firstBand; i <= lastBand; i++) {
-			 testImages[i] = FactoryGImageGray.wrap(input.getBand(i));
-		 }
-		 GImageBandMath.average(input, av, firstBand, lastBand);
-
-		 boolean isInteger = output.getDataType().isInteger();
-
-		 //  check all bands (a single band will give an exception)
-		 GImageGray avg = FactoryGImageGray.wrap(av);
-		 m.invoke(null, input, output, av, firstBand, lastBand);
-		 GImageGray r = FactoryGImageGray.wrap(output);
-
-		 double diff;
-		 double expected;
-		 for (int i = 0; i < height; i++) {
-			 for (int j = 0; j < width; j++) {
-				 double sum = 0;
-				 for (int b = firstBand; b <= lastBand; b++) {
-					 diff = testImages[b].get(j, i).doubleValue() - avg.get(j, i).doubleValue();
-					 sum += diff * diff;
-				 }
-				 expected = Math.sqrt(sum / (numBands - 1));
-
-				 double found = r.get(j, i).doubleValue();
-
-				 if (isInteger) {
-					 expected = (int) expected;
-				 }
-				 assertEquals(expected, found, 1e-4);
-			 }
-		 }
-	 }
-
- }
+		return output;
+	}
+}
