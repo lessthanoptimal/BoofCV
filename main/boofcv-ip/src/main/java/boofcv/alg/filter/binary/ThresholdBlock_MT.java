@@ -20,6 +20,7 @@ package boofcv.alg.filter.binary;
 
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.ConfigLength;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 
@@ -43,6 +44,7 @@ public class ThresholdBlock_MT<T extends ImageGray<T>,S extends ImageBase<S>>
 	/**
 	 * Computes the min-max value for each block in the image
 	 */
+	@Override
 	protected void computeStatistics(T input, int innerWidth, int innerHeight) {
 		final int statPixelStride = stats.getImageType().getNumBands();
 		final int statStride = stats.stride;
@@ -78,5 +80,14 @@ public class ThresholdBlock_MT<T extends ImageGray<T>,S extends ImageBase<S>>
 				processor.computeBlockStatistics(innerWidth,y,input.width-innerWidth,blockHeight,indexStats,input,stats);
 			}
 		}
+	}
+
+	@Override
+	protected void applyThreshold( T input, GrayU8 output ) {
+		BoofConcurrency.range(0, stats.height, blockY -> {
+			for (int blockX = 0; blockX < stats.width; blockX++) {
+				processor.thresholdBlock(blockX,blockY,input,stats,output);
+			}
+		});
 	}
 }

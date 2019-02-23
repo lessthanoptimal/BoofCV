@@ -120,7 +120,7 @@ public class ThresholdBlock<T extends ImageGray<T>,S extends ImageBase<S>>
 	/**
 	 * Applies the dynamically computed threshold to each pixel in the image, one block at a time
 	 */
-	private void applyThreshold( T input, GrayU8 output ) {
+	protected void applyThreshold( T input, GrayU8 output ) {
 		for (int blockY = 0; blockY < stats.height; blockY++) {
 			for (int blockX = 0; blockX < stats.width; blockX++) {
 				processor.thresholdBlock(blockX,blockY,input,stats,output);
