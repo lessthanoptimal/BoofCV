@@ -47,13 +47,13 @@ public class BenchmarkSsdCornerIntensity {
 	@Param({"true","false"})
 	public boolean concurrent=false;
 
-//	@Param({"false","true"})
+	@Param({"false","true"})
 	public boolean weighted=true;
 
 //	@Param({"500","5000"})
 	public int size=2000;
 
-//	@Param({"2","5","20"})
+	@Param({"2","5","20"})
 	public int radius=5;
 
 	GrayF32 derivX_F32 = new GrayF32(1,1);
@@ -102,15 +102,15 @@ public class BenchmarkSsdCornerIntensity {
 		shitomasi_F32.process(derivX_F32,derivY_F32,intensity);
 	}
 
-//	@Benchmark
-//	public void Harris_S16() {
-//		harris_S16.process(derivX_S16,derivY_S16,intensity);
-//	}
-//
-//	@Benchmark
-//	public void Harris_F32() {
-//		harris_F32.process(derivX_F32,derivY_F32,intensity);
-//	}
+	@Benchmark
+	public void Harris_S16() {
+		harris_S16.process(derivX_S16,derivY_S16,intensity);
+	}
+
+	@Benchmark
+	public void Harris_F32() {
+		harris_F32.process(derivX_F32,derivY_F32,intensity);
+	}
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()

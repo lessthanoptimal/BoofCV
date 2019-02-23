@@ -25,9 +25,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestRecycleStack {
+class TestRecycleStack {
 	@Test
-	public void foo() {
+	void foo() {
 		fail("Implement");
 	}
 }
