@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.binary.impl;
 
+import boofcv.alg.filter.binary.ThresholdBlock;
 import boofcv.alg.filter.binary.ThresholdBlockMean;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -79,6 +80,11 @@ public class ThresholdBlockMean_F32
 				output.data[indexOutput] = input.data[indexInput] <= mean ? a : b;
 			}
 		}
+	}
+
+	@Override
+	public ThresholdBlock.BlockProcessor<GrayF32, GrayF32> copy() {
+		return new ThresholdBlockMean_F32(scale,isDown());
 	}
 
 	@Override

@@ -21,27 +21,49 @@ package boofcv.alg.filter.binary.impl;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.filter.binary.ThresholdBlock;
 import boofcv.alg.filter.binary.ThresholdBlock.BlockProcessor;
+import boofcv.alg.filter.binary.ThresholdBlock_MT;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.ImageGray;
+import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
 public abstract class GenericThresholdBlock<T extends ImageGray<T>>
-	extends GenericThresholdCommon<T>
 {
+	Class<T> imageType;
 
 	public GenericThresholdBlock(Class<T> imageType) {
-		super(imageType);
+		this.imageType = imageType;
 	}
 
-	public abstract BlockProcessor<T,?>
-	createBlockProcessor( double scale , boolean down );
+	public abstract BlockProcessor<T,?> createBlockProcessor( double scale , boolean down );
 
-	@Override
-	public InputToBinary<T> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		BlockProcessor<T,?> processor = createBlockProcessor(scale,down);
-		return new ThresholdBlock<>(processor,
-				ConfigLength.fixed(requestedBlockWidth),true,imageType);
+	@Nested
+	class Regular extends GenericThresholdCommon<T> {
+		public Regular() {
+			super(GenericThresholdBlock.this.imageType);
+		}
+
+		@Override
+		public InputToBinary<T> createAlg(int requestedBlockWidth, double scale, boolean down) {
+			BlockProcessor<T,?> processor = createBlockProcessor(scale,down);
+			return new ThresholdBlock<>(processor,
+					ConfigLength.fixed(requestedBlockWidth),true,imageType);
+		}
+	}
+
+	@Nested
+	class Parallel extends GenericThresholdCommon<T> {
+		public Parallel() {
+			super(GenericThresholdBlock.this.imageType);
+		}
+
+		@Override
+		public InputToBinary<T> createAlg(int requestedBlockWidth, double scale, boolean down) {
+			BlockProcessor<T,?> processor = createBlockProcessor(scale,down);
+			return new ThresholdBlock_MT<>(processor,
+					ConfigLength.fixed(requestedBlockWidth),true,imageType);
+		}
 	}
 }

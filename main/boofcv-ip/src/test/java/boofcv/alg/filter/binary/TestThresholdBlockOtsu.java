@@ -18,24 +18,19 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.filter.binary.ThresholdBlock.BlockProcessor;
-import boofcv.alg.filter.binary.impl.GenericThresholdCommon;
-import boofcv.struct.ConfigLength;
+import boofcv.alg.filter.binary.impl.GenericThresholdBlock;
 import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
-public class TestThresholdBlockOtsu extends GenericThresholdCommon<GrayU8> {
+public class TestThresholdBlockOtsu extends GenericThresholdBlock<GrayU8> {
 	public TestThresholdBlockOtsu() {
 		super(GrayU8.class);
 	}
 
 	@Override
-	public InputToBinary<GrayU8> createAlg(int requestedBlockWidth, double scale, boolean down) {
-		BlockProcessor processor = new ThresholdBlockOtsu(true,0.0,scale, down);
-		return new ThresholdBlock(processor,
-				ConfigLength.fixed(requestedBlockWidth),true,GrayU8.class);
+	public ThresholdBlock.BlockProcessor<GrayU8, ?> createBlockProcessor(double scale, boolean down) {
+		return new ThresholdBlockOtsu(true,0.0,scale, down);
 	}
 }

@@ -24,6 +24,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.lists.RecycleStack;
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
@@ -61,7 +62,9 @@ public class ThresholdBlock<T extends ImageGray<T>,S extends ImageBase<S>>
 	// Should it use the local 3x3 block region
 	protected boolean thresholdFromLocalBlocks;
 
-	protected BlockProcessor<T,S> processor;
+	// Original processor which will be copied
+	protected BlockProcessor<T,S> original;
+	protected RecycleStack<BlockProcessor<T,S>> processors;
 
 	/**
 	 * Configures the detector
@@ -71,11 +74,13 @@ public class ThresholdBlock<T extends ImageGray<T>,S extends ImageBase<S>>
 						  ConfigLength requestedBlockWidth, boolean thresholdFromLocalBlocks,
 						  Class<T> imageClass  )
 	{
-		this.processor = processor;
 		this.requestedBlockWidth = requestedBlockWidth;
 		this.imageType = ImageType.single(imageClass);
 		this.thresholdFromLocalBlocks = thresholdFromLocalBlocks;
 		this.stats = processor.createStats();
+
+		this.original = processor;
+		processors = new RecycleStack<>(() -> processor.copy());
 	}
 
 	/**
@@ -94,7 +99,7 @@ public class ThresholdBlock<T extends ImageGray<T>,S extends ImageBase<S>>
 		selectBlockSize(input.width,input.height,requestedBlockWidth);
 
 		stats.reshape(input.width/blockWidth,input.height/blockHeight);
-		processor.init(blockWidth,blockHeight,thresholdFromLocalBlocks);
+
 
 		int innerWidth = input.width%blockWidth == 0 ?
 				input.width : input.width-blockWidth-input.width%blockWidth;
@@ -123,7 +128,7 @@ public class ThresholdBlock<T extends ImageGray<T>,S extends ImageBase<S>>
 	protected void applyThreshold( T input, GrayU8 output ) {
 		for (int blockY = 0; blockY < stats.height; blockY++) {
 			for (int blockX = 0; blockX < stats.width; blockX++) {
-				processor.thresholdBlock(blockX,blockY,input,stats,output);
+				original.thresholdBlock(blockX,blockY,input,stats,output);
 			}
 		}
 	}
@@ -132,16 +137,18 @@ public class ThresholdBlock<T extends ImageGray<T>,S extends ImageBase<S>>
 	 * Computes the min-max value for each block in the image
 	 */
 	protected void computeStatistics(T input, int innerWidth, int innerHeight) {
+		original.init(blockWidth,blockHeight,thresholdFromLocalBlocks);
+
 		int statPixelStride = stats.getImageType().getNumBands();
 
 		int indexStats = 0;
 		for (int y = 0; y < innerHeight; y += blockHeight) {
 			for (int x = 0; x < innerWidth; x += blockWidth, indexStats += statPixelStride) {
-				processor.computeBlockStatistics(x,y,blockWidth,blockHeight,indexStats,input,stats);
+				original.computeBlockStatistics(x,y,blockWidth,blockHeight,indexStats,input,stats);
 			}
 			// handle the case where the image's width isn't evenly divisible by the block's width
 			if( innerWidth != input.width ) {
-				processor.computeBlockStatistics(innerWidth,y,input.width-innerWidth,blockHeight,indexStats,input,stats);
+				original.computeBlockStatistics(innerWidth,y,input.width-innerWidth,blockHeight,indexStats,input,stats);
 				indexStats += statPixelStride;
 			}
 		}
@@ -150,10 +157,10 @@ public class ThresholdBlock<T extends ImageGray<T>,S extends ImageBase<S>>
 			int y = innerHeight;
 			int blockHeight = input.height-innerHeight;
 			for (int x = 0; x < innerWidth; x += blockWidth, indexStats += statPixelStride) {
-				processor.computeBlockStatistics(x,y,blockWidth,blockHeight,indexStats,input,stats);
+				original.computeBlockStatistics(x,y,blockWidth,blockHeight,indexStats,input,stats);
 			}
 			if( innerWidth != input.width ) {
-				processor.computeBlockStatistics(innerWidth,y,input.width-innerWidth,blockHeight,indexStats,input,stats);
+				original.computeBlockStatistics(innerWidth,y,input.width-innerWidth,blockHeight,indexStats,input,stats);
 			}
 		}
 	}
@@ -187,7 +194,7 @@ public class ThresholdBlock<T extends ImageGray<T>,S extends ImageBase<S>>
 		 * @param input Input image
 		 */
 		void computeBlockStatistics(int x0 , int y0 , int width , int height ,
-													   int indexStats , T input, S stats);
+									int indexStats , T input, S stats);
 
 		/**
 		 * Thresholds all the pixels inside the specified block
@@ -197,5 +204,10 @@ public class ThresholdBlock<T extends ImageGray<T>,S extends ImageBase<S>>
 		 * @param output Output image
 		 */
 		void thresholdBlock(int blockX0 , int blockY0 , T input, S stats, GrayU8 output );
+
+		/**
+		 * Creates a copy. For concurrent code
+		 */
+		BlockProcessor<T,S> copy();
 	}
 }

@@ -143,4 +143,9 @@ public class ThresholdBlockOtsu
 			}
 		}
 	}
+
+	@Override
+	public ThresholdBlock.BlockProcessor<GrayU8, InterleavedS32> copy() {
+		return new ThresholdBlockOtsu(otsu.isUseOtsu2(),otsu.getTuning(),otsu.getScale(),otsu.down);
+	}
 }

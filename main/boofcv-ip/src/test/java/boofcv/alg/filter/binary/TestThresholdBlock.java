@@ -72,5 +72,10 @@ public class TestThresholdBlock {
 		public void thresholdBlock(int blockX0, int blockY0, ImageGray input, ImageBase stats, GrayU8 output) {
 
 		}
+
+		@Override
+		public ThresholdBlock.BlockProcessor copy() {
+			return null;
+		}
 	}
 }

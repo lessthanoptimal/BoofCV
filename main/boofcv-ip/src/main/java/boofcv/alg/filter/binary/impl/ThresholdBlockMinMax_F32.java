@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.binary.impl;
 
+import boofcv.alg.filter.binary.ThresholdBlock;
 import boofcv.alg.filter.binary.ThresholdBlockMinMax;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -108,6 +109,11 @@ public class ThresholdBlockMinMax_F32
 				}
 			}
 		}
+	}
+
+	@Override
+	public ThresholdBlock.BlockProcessor<GrayF32, InterleavedF32> copy() {
+		return new ThresholdBlockMinMax_F32((float)minimumSpread,scale,down);
 	}
 
 	@Override

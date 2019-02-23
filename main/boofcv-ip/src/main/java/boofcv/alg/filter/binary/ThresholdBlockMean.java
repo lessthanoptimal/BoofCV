@@ -53,4 +53,8 @@ public abstract class ThresholdBlockMean<T extends ImageGray<T>>
 		this.blockHeight = blockHeight;
 		this.thresholdFromLocalBlocks = thresholdFromLocalBlocks;
 	}
+
+	public boolean isDown() {
+		return a == 1;
+	}
 }

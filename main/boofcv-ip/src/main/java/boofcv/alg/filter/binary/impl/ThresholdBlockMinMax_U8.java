@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.binary.impl;
 
+import boofcv.alg.filter.binary.ThresholdBlock;
 import boofcv.alg.filter.binary.ThresholdBlockMinMax;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.InterleavedU8;
@@ -134,5 +135,10 @@ public class ThresholdBlockMinMax_U8
 
 		stats.data[indexMinMax]   = (byte)min;
 		stats.data[indexMinMax+1] = (byte)max;
+	}
+
+	@Override
+	public ThresholdBlock.BlockProcessor<GrayU8, InterleavedU8> copy() {
+		return new ThresholdBlockMinMax_U8((float)minimumSpread,scale,down);
 	}
 }
