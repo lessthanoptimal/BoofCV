@@ -1,6 +1,5 @@
 plugins {
     id "com.peterabeles.gversion" version "1.3.0" apply false
-    id "me.champeau.gradle.jmh" version "0.4.7"
 }
 
 ext.libpath = file('./').absolutePath
@@ -9,7 +8,6 @@ allprojects {
     apply plugin: 'idea'
     apply plugin: 'eclipse'
     apply plugin: 'com.peterabeles.gversion'
-    apply plugin: 'me.champeau.gradle.jmh'
 
     group = 'org.boofcv'
     version = '0.33-SNAPSHOT'
@@ -130,7 +128,7 @@ subprojects {
         benchmarkImplementation project.sourceSets.main.compileClasspath
 
         ['core','generator-annprocess'].each { String a->
-            benchmarkCompile('org.openjdk.jmh:jmh-'+a+':1.19')
+            benchmarkCompile('org.openjdk.jmh:jmh-'+a+':1.19') // don't upgrade to 1.21! much slower
         }
 
     }

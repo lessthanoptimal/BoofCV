@@ -253,9 +253,9 @@ public class GenerateImplImageBandMath extends CodeGeneratorBase {
 				"\t\t\t\t\tvalueArray[i-startBand] = bands[i].data[indexInput]"+bitwise+";\n" +
 				"\t\t\t\t}\n" +
 				"\t\t\t\tif (isEven) {\n" +
-				"\t\t\t\t\t// Would a single quick sort be faster?\n" +
-				"\t\t\t\t\t"+sumType+" val0 = QuickSelect.select(valueArray, middle, numBands);\n" +
-				"\t\t\t\t\t"+sumType+" val1 = QuickSelect.select(valueArray, middle+1, numBands);\n" +
+				"\t\t\t\t\t// Quick select ensures that the N-1 elements less than N are in the lower part of the array\n" +
+				"\t\t\t\t\t"+sumType+" val0 = QuickSelect.select(valueArray, middle+1, numBands);\n" +
+				"\t\t\t\t\t"+sumType+" val1 = PrimitiveArrays.max(valueArray, 0,middle+1);\n" +
 				"\t\t\t\t\toutput.data[indexOutput] = "+typecast+" ((val0+val1)/2);\n" +
 				"\t\t\t\t} else {\n" +
 				"\t\t\t\t\toutput.data[indexOutput] = "+typecast+"QuickSelect.select(valueArray, middle, numBands);\n" +

@@ -22,6 +22,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 import org.ddogleg.sorting.QuickSelect;
+import org.ddogleg.util.PrimitiveArrays;
 
 import javax.annotation.Generated;
 
@@ -113,9 +114,9 @@ public class ImplImageBandMath_MT {
 					valueArray[i-startBand] = bands[i].data[indexInput]& 0xFF;
 				}
 				if (isEven) {
-					// Would a single quick sort be faster?
-					int val0 = QuickSelect.select(valueArray, middle, numBands);
-					int val1 = QuickSelect.select(valueArray, middle+1, numBands);
+					// Quick select ensures that the N-1 elements less than N are in the lower part of the array
+					int val0 = QuickSelect.select(valueArray, middle+1, numBands);
+					int val1 = PrimitiveArrays.max(valueArray, 0,middle+1);
 					output.data[indexOutput] = (byte) ((val0+val1)/2);
 				} else {
 					output.data[indexOutput] = (byte)QuickSelect.select(valueArray, middle, numBands);

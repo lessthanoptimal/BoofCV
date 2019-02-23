@@ -35,6 +35,8 @@ Version : 0.33
   * Added Li
   * Added Huang
   * Ported from ImageJ by Nico Stuurman
+- ImageBandMath
+  * Added by Nico Stuurman
 - QR Code
   * Added support for ECI, i.e. more character sets
   * Changed default BYTE mode encoding to default to UTF-8, but attempts to see if it could be another encoding
