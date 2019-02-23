@@ -36,6 +36,7 @@ import boofcv.struct.image.GrayS32;
  * 
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class ImplIntegralImageFeatureIntensity {
 
 	/**

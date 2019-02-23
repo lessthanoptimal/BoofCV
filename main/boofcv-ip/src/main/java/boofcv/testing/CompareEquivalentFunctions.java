@@ -129,7 +129,8 @@ public abstract class CompareEquivalentFunctions {
 			validationResult = validation.invoke(null,validationParamSub);
 
 			compareResults(targetResult,targetParamSub,validationResult,validationParamSub);
-		} catch (IllegalAccessException | InvocationTargetException e) {
+		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+			System.err.println("Method: "+target.getName()+" param.length = "+targetParam.length);
 			throw new RuntimeException(e);
 		}
 	}

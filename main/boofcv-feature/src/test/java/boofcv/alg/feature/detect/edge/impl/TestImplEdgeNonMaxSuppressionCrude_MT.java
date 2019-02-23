@@ -18,14 +18,48 @@
 
 package boofcv.alg.feature.detect.edge.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageGray;
+import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.lang.reflect.Method;
+import java.util.Random;
 
-class TestImplEdgeNonMaxSuppressionCrude_MT {
+class TestImplEdgeNonMaxSuppressionCrude_MT extends CompareIdenticalFunctions {
+	private Random rand = new Random(234);
+	private int width = 60,height=70;
+
+	TestImplEdgeNonMaxSuppressionCrude_MT() {
+		super(ImplEdgeNonMaxSuppressionCrude_MT.class, ImplEdgeNonMaxSuppressionCrude.class);
+	}
+
 	@Test
-	public void implement() {
-		fail("implement");
+	void performTests() {
+		super.performTests(5);
+	}
+
+	@Override
+	protected Object[][] createInputParam(Method candidate, Method validation) {
+		Class[] inputTypes = candidate.getParameterTypes();
+		ImageGray intensity = GeneralizedImageOps.createSingleBand(inputTypes[0],width,height);
+		ImageGray derivX = GeneralizedImageOps.createSingleBand(inputTypes[1],width,height);
+		ImageGray derivY = GeneralizedImageOps.createSingleBand(inputTypes[2],width,height);
+		ImageGray output = GeneralizedImageOps.createSingleBand(inputTypes[3],width,height);
+
+		GImageMiscOps.fillUniform(intensity,rand,0,100);
+		GImageMiscOps.fillUniform(derivX,rand,-100,100);
+		GImageMiscOps.fillUniform(derivY,rand,-100,100);
+
+		Object[] inputs = new Object[4];
+
+		inputs[0] = intensity;
+		inputs[1] = derivX;
+		inputs[2] = derivY;
+		inputs[3] = output;
+
+		return new Object[][]{inputs};
 	}
 }
 

@@ -18,16 +18,47 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageGray;
+import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.lang.reflect.Method;
+import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplIntegralImageFeatureIntensity_MT {
+class TestImplIntegralImageFeatureIntensity_MT extends CompareIdenticalFunctions {
+
+	private Random rand = new Random(234);
+	private int width = 60,height=70;
+
+	TestImplIntegralImageFeatureIntensity_MT() {
+		super(ImplIntegralImageFeatureIntensity_MT.class, ImplIntegralImageFeatureIntensity.class);
+	}
+
 	@Test
-	void stuff() {
-		fail("Implement");
+	void performTests() {
+		super.performTests(4);
+	}
+
+	@Override
+	protected Object[][] createInputParam(Method candidate, Method validation) {
+		int skip = 2;
+		Class[] inputTypes = candidate.getParameterTypes();
+		ImageGray integral = GeneralizedImageOps.createSingleBand(inputTypes[0],width,height);
+		ImageGray intensity = GeneralizedImageOps.createSingleBand(inputTypes[3],width/skip,height/skip);
+
+		GImageMiscOps.fillUniform(integral,rand,0,100);
+		Object[] inputs = new Object[4];
+
+		inputs[0] = integral;
+		inputs[1] = skip;
+		inputs[2] = 5;
+		inputs[3] = intensity;
+
+		return new Object[][]{inputs};
 	}
 }

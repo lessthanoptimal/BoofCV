@@ -34,34 +34,8 @@ import static boofcv.alg.feature.detect.intensity.impl.ImplIntegralImageFeatureI
  * 
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class ImplIntegralImageFeatureIntensity_MT {
-
-	/**
-	 * Brute force approach which is easy to validate through visual inspection.
-	 */
-	public static void hessianNaive(GrayF32 integral, int skip , int size ,
-									GrayF32 intensity)
-	{
-		final int w = intensity.width;
-		final int h = intensity.height;
-
-		// get convolution kernels for the second order derivatives
-		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(size,null);
-		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(size,null);
-		IntegralKernel kerXY = DerivativeIntegralImage.kernelDerivXY(size,null);
-
-		float norm = 1.0f/(size*size);
-
-		BoofConcurrency.range(0, h, y -> {
-			for( int x = 0; x < w; x++ ) {
-
-				int xx = x*skip;
-				int yy = y*skip;
-
-				computeHessian(integral, intensity, kerXX, kerYY, kerXY, norm, y, yy, x, xx);
-			}
-		});
-	}
 
 	/**
 	 * Only computes the fast hessian along the border using a brute force approach
@@ -192,33 +166,6 @@ public class ImplIntegralImageFeatureIntensity_MT {
 				indexY2 += skip;
 				indexY3 += skip;
 				indexY4 += skip;
-			}
-		});
-	}
-
-	/**
-	 * Brute force approach which is easy to validate through visual inspection.
-	 */
-	public static void hessianNaive(GrayS32 integral, int skip , int size ,
-									GrayF32 intensity)
-	{
-		final int w = intensity.width;
-		final int h = intensity.height;
-
-		// get convolution kernels for the second order derivatives
-		IntegralKernel kerXX = DerivativeIntegralImage.kernelDerivXX(size,null);
-		IntegralKernel kerYY = DerivativeIntegralImage.kernelDerivYY(size,null);
-		IntegralKernel kerXY = DerivativeIntegralImage.kernelDerivXY(size,null);
-
-		float norm = 1.0f/(size*size);
-
-		BoofConcurrency.range(0, h, y -> {
-			for( int x = 0; x < w; x++ ) {
-
-				int xx = x*skip;
-				int yy = y*skip;
-
-				computeHessian(integral, intensity, kerXX, kerYY, kerXY, norm, y, yy, x, xx);
 			}
 		});
 	}

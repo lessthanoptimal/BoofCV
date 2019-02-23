@@ -40,7 +40,9 @@ public class WrapperLaplacianBlobIntensity<I extends ImageGray<I>,D extends Imag
 		if( image instanceof GrayU8) {
 			DerivativeLaplacian.process((GrayU8)image,intensity);
 		} else if( image instanceof GrayF32) {
-			GImageDerivativeOps.laplace(image,intensity, BorderType.EXTENDED);
+			GImageDerivativeOps.laplace(image,intensity, BorderType.SKIP);
+			// border would ideally be EXTENDED but the special code for U8 doesn't support borders yet
+			// when this is fixed change ignoreBorder to 0 below
 		} else {
 			throw new IllegalArgumentException("Unsupported input image type");
 		}

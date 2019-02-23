@@ -35,6 +35,7 @@ import boofcv.struct.image.GrayS32;
  * 
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class ImplGradientToEdgeFeatures {
 
 	static public void intensityE( GrayF32 derivX , GrayF32 derivY , GrayF32 intensity )

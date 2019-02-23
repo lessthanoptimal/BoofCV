@@ -18,6 +18,9 @@
 
 package boofcv.alg.feature.detect.edge.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageGray;
 import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
@@ -36,12 +39,26 @@ class TestImplGradientToEdgeFeatures_MT extends CompareIdenticalFunctions {
 
 	@Test
 	void performTests() {
-		performTests(108);
+		performTests(12);
 	}
 
 	@Override
 	protected Object[][] createInputParam(Method candidate, Method validation) {
-		return new Object[][]{{1}};
+		Class[] inputTypes = candidate.getParameterTypes();
+		ImageGray derivX = GeneralizedImageOps.createSingleBand(inputTypes[0],width,height);
+		ImageGray derivY = GeneralizedImageOps.createSingleBand(inputTypes[1],width,height);
+		ImageGray output = GeneralizedImageOps.createSingleBand(inputTypes[2],width,height);
+
+		GImageMiscOps.fillUniform(derivX,rand,-100,100);
+		GImageMiscOps.fillUniform(derivY,rand,-100,100);
+
+		Object[] inputs = new Object[3];
+
+		inputs[0] = derivX;
+		inputs[1] = derivY;
+		inputs[2] = output;
+
+		return new Object[][]{inputs};
 	}
 }
 

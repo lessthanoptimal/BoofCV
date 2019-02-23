@@ -57,6 +57,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 				" * \n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
+				"@SuppressWarnings(\"Duplicates\")\n" +
 				"public class "+className+" {\n\n");
 	}
 

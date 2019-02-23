@@ -46,17 +46,20 @@ public class ThresholdLocalOtsu_MT extends ThresholdLocalOtsu {
 				int indexOutput = output.startIndex + y*output.stride + x0;
 
 				h.computeHistogram(0,y-y0,input);
-				output.data[indexOutput++] = (input.data[indexInput++]&0xFF) <= otsu.threshold ? a : b;
+				output.data[indexOutput++] = (input.data[indexInput++]&0xFF) <= h.otsu.threshold ? a : b;
 
 				for (int x = x0+1; x < x1; x++) {
 					h.updateHistogramX(x-x0,y-y0,input);
-					output.data[indexOutput++] = (input.data[indexInput++]&0xFF) <= otsu.threshold ? a : b;
+					output.data[indexOutput++] = (input.data[indexInput++]&0xFF) <= h.otsu.threshold ? a : b;
 				}
 			}
 
 			// Now update the border
-			applyToBorder(input, output, y0, y1, x0, x1, h);
+//			applyToBorder(input, output, y0, y1, x0, x1, h);
 			helpers.recycle(h);
 		});
+		ApplyHelper h = helpers.pop();
+		applyToBorder(input, output, y0, y1, x0, x1, h);
+		helpers.recycle(h);
 	}
 }

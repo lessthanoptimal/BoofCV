@@ -18,14 +18,51 @@
 
 package boofcv.alg.feature.detect.edge.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.GrayS8;
+import boofcv.struct.image.ImageGray;
+import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.lang.reflect.Method;
+import java.util.Random;
 
-class TestImplEdgeNonMaxSuppression_MT {
+class TestImplEdgeNonMaxSuppression_MT extends CompareIdenticalFunctions  {
+	private Random rand = new Random(234);
+	private int width = 60,height=70;
+
+	TestImplEdgeNonMaxSuppression_MT() {
+		super(ImplEdgeNonMaxSuppression_MT.class, ImplEdgeNonMaxSuppression.class);
+	}
+
 	@Test
-	public void implement() {
-		fail("implement");
+	void performTests() {
+		super.performTests(6);
+	}
+
+	@Override
+	protected Object[][] createInputParam(Method candidate, Method validation) {
+		String name = candidate.getName();
+		int numDirections = Integer.parseInt(name.substring(name.length()-1));
+
+		Class[] inputTypes = candidate.getParameterTypes();
+		ImageGray intensity = GeneralizedImageOps.createSingleBand(inputTypes[0],width,height);
+		GrayS8 direction = new GrayS8(width,height);
+		ImageGray output = GeneralizedImageOps.createSingleBand(inputTypes[2],width,height);
+
+		GImageMiscOps.fillUniform(intensity,rand,0,100);
+		if( numDirections == 8 )
+			GImageMiscOps.fillUniform(direction,rand,-3,5);
+		else
+			GImageMiscOps.fillUniform(direction,rand,0,4);
+
+		Object[] inputs = new Object[3];
+
+		inputs[0] = intensity;
+		inputs[1] = direction;
+		inputs[2] = output;
+
+		return new Object[][]{inputs};
 	}
 }
-
