@@ -18,12 +18,12 @@
 
 package boofcv.alg.misc.impl;
 
-import boofcv.struct.image.*;
-
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
-import org.ddogleg.sorting.QuickSelect;
-import javax.annotation.Generated;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.struct.image.*;
+import org.ddogleg.sorting.QuickSelect;
+
+import javax.annotation.Generated;
 
 /**
  * Implementation of algorithms in ImageBandMath
@@ -35,7 +35,7 @@ import boofcv.alg.misc.ImageMiscOps;
  */
 @Generated("boofcv.alg.misc.impl.GenerateImplImageBandMath")
 @SuppressWarnings("Duplicates")
-public class ImplImageBandMath {
+public class ImplImageBandMath_MT {
 
 	public static void minimum(Planar<GrayU8> input , GrayU8 output, int startBand, int lastBand ) {
 		final int h = input.getHeight();
@@ -43,8 +43,7 @@ public class ImplImageBandMath {
 
 		final GrayU8[] bands = input.bands;
 		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -60,8 +59,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (byte) minimum;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void maximum(Planar<GrayU8> input , GrayU8 output, int startBand, int lastBand ) {
@@ -70,8 +68,7 @@ public class ImplImageBandMath {
 
 		final GrayU8[] bands = input.bands;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for(int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.startIndex + y * input.stride;
 			int indexOutput = output.startIndex + y * output.stride;
 
@@ -87,8 +84,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (byte) maximum;
 			} 
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void median(Planar<GrayU8> input , GrayU8 output, int startBand, int lastBand ) {
@@ -106,8 +102,7 @@ public class ImplImageBandMath {
 
 		final int middle = numBands/2;
 		boolean isEven = numBands % 2 == 0;
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			final int[] valueArray = new int[numBands];
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
@@ -126,8 +121,7 @@ public class ImplImageBandMath {
 					output.data[indexOutput] = (byte)QuickSelect.select(valueArray, middle, numBands);
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void average(Planar<GrayU8> input , GrayU8 output, int startBand, int lastBand ) {
@@ -136,8 +130,7 @@ public class ImplImageBandMath {
 
 		final GrayU8[] bands = input.bands;
 		int divisor = lastBand - startBand+1;
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -149,8 +142,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (byte) (sum/divisor);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void stdDev(Planar<GrayU8> input , GrayU8 output , GrayU8 avg, int startBand, int lastBand ) {
@@ -161,8 +153,7 @@ public class ImplImageBandMath {
 		final GrayU8[] bands = input.bands;
 		int divisor = lastBand - startBand;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -176,8 +167,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (byte) Math.sqrt(sum/divisor);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void minimum(Planar<GrayS16> input , GrayS16 output, int startBand, int lastBand ) {
@@ -186,8 +176,7 @@ public class ImplImageBandMath {
 
 		final GrayS16[] bands = input.bands;
 		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -203,8 +192,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (short) minimum;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void maximum(Planar<GrayS16> input , GrayS16 output, int startBand, int lastBand ) {
@@ -213,8 +201,7 @@ public class ImplImageBandMath {
 
 		final GrayS16[] bands = input.bands;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for(int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.startIndex + y * input.stride;
 			int indexOutput = output.startIndex + y * output.stride;
 
@@ -230,8 +217,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (short) maximum;
 			} 
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void median(Planar<GrayS16> input , GrayS16 output, int startBand, int lastBand ) {
@@ -249,8 +235,7 @@ public class ImplImageBandMath {
 
 		final int middle = numBands/2;
 		boolean isEven = numBands % 2 == 0;
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			final int[] valueArray = new int[numBands];
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
@@ -269,8 +254,7 @@ public class ImplImageBandMath {
 					output.data[indexOutput] = (short)QuickSelect.select(valueArray, middle, numBands);
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void average(Planar<GrayS16> input , GrayS16 output, int startBand, int lastBand ) {
@@ -279,8 +263,7 @@ public class ImplImageBandMath {
 
 		final GrayS16[] bands = input.bands;
 		int divisor = lastBand - startBand+1;
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -292,8 +275,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (short) (sum/divisor);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void stdDev(Planar<GrayS16> input , GrayS16 output , GrayS16 avg, int startBand, int lastBand ) {
@@ -304,8 +286,7 @@ public class ImplImageBandMath {
 		final GrayS16[] bands = input.bands;
 		int divisor = lastBand - startBand;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -319,8 +300,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (short) Math.sqrt(sum/divisor);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void minimum(Planar<GrayU16> input , GrayU16 output, int startBand, int lastBand ) {
@@ -329,8 +309,7 @@ public class ImplImageBandMath {
 
 		final GrayU16[] bands = input.bands;
 		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -346,8 +325,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (short) minimum;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void maximum(Planar<GrayU16> input , GrayU16 output, int startBand, int lastBand ) {
@@ -356,8 +334,7 @@ public class ImplImageBandMath {
 
 		final GrayU16[] bands = input.bands;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for(int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.startIndex + y * input.stride;
 			int indexOutput = output.startIndex + y * output.stride;
 
@@ -373,8 +350,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (short) maximum;
 			} 
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void median(Planar<GrayU16> input , GrayU16 output, int startBand, int lastBand ) {
@@ -392,8 +368,7 @@ public class ImplImageBandMath {
 
 		final int middle = numBands/2;
 		boolean isEven = numBands % 2 == 0;
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			final int[] valueArray = new int[numBands];
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
@@ -412,8 +387,7 @@ public class ImplImageBandMath {
 					output.data[indexOutput] = (short)QuickSelect.select(valueArray, middle, numBands);
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void average(Planar<GrayU16> input , GrayU16 output, int startBand, int lastBand ) {
@@ -422,8 +396,7 @@ public class ImplImageBandMath {
 
 		final GrayU16[] bands = input.bands;
 		int divisor = lastBand - startBand+1;
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -435,8 +408,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (short) (sum/divisor);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void stdDev(Planar<GrayU16> input , GrayU16 output , GrayU16 avg, int startBand, int lastBand ) {
@@ -447,8 +419,7 @@ public class ImplImageBandMath {
 		final GrayU16[] bands = input.bands;
 		int divisor = lastBand - startBand;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -462,8 +433,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (short) Math.sqrt(sum/divisor);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void minimum(Planar<GrayS32> input , GrayS32 output, int startBand, int lastBand ) {
@@ -472,8 +442,7 @@ public class ImplImageBandMath {
 
 		final GrayS32[] bands = input.bands;
 		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -489,8 +458,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] =  minimum;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void maximum(Planar<GrayS32> input , GrayS32 output, int startBand, int lastBand ) {
@@ -499,8 +467,7 @@ public class ImplImageBandMath {
 
 		final GrayS32[] bands = input.bands;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for(int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.startIndex + y * input.stride;
 			int indexOutput = output.startIndex + y * output.stride;
 
@@ -516,8 +483,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] =  maximum;
 			} 
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void median(Planar<GrayS32> input , GrayS32 output, int startBand, int lastBand ) {
@@ -535,8 +501,7 @@ public class ImplImageBandMath {
 
 		final int middle = numBands/2;
 		boolean isEven = numBands % 2 == 0;
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			final int[] valueArray = new int[numBands];
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
@@ -555,8 +520,7 @@ public class ImplImageBandMath {
 					output.data[indexOutput] = QuickSelect.select(valueArray, middle, numBands);
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void average(Planar<GrayS32> input , GrayS32 output, int startBand, int lastBand ) {
@@ -565,8 +529,7 @@ public class ImplImageBandMath {
 
 		final GrayS32[] bands = input.bands;
 		int divisor = lastBand - startBand+1;
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -578,8 +541,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] =  (sum/divisor);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void stdDev(Planar<GrayS32> input , GrayS32 output , GrayS32 avg, int startBand, int lastBand ) {
@@ -590,8 +552,7 @@ public class ImplImageBandMath {
 		final GrayS32[] bands = input.bands;
 		int divisor = lastBand - startBand;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -605,8 +566,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (int) Math.sqrt(sum/divisor);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void minimum(Planar<GrayS64> input , GrayS64 output, int startBand, int lastBand ) {
@@ -615,8 +575,7 @@ public class ImplImageBandMath {
 
 		final GrayS64[] bands = input.bands;
 		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -632,8 +591,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] =  minimum;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void maximum(Planar<GrayS64> input , GrayS64 output, int startBand, int lastBand ) {
@@ -642,8 +600,7 @@ public class ImplImageBandMath {
 
 		final GrayS64[] bands = input.bands;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for(int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.startIndex + y * input.stride;
 			int indexOutput = output.startIndex + y * output.stride;
 
@@ -659,8 +616,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] =  maximum;
 			} 
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void median(Planar<GrayS64> input , GrayS64 output, int startBand, int lastBand ) {
@@ -678,8 +634,7 @@ public class ImplImageBandMath {
 
 		final int middle = numBands/2;
 		boolean isEven = numBands % 2 == 0;
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			final long[] valueArray = new long[numBands];
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
@@ -698,8 +653,7 @@ public class ImplImageBandMath {
 					output.data[indexOutput] = QuickSelect.select(valueArray, middle, numBands);
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void average(Planar<GrayS64> input , GrayS64 output, int startBand, int lastBand ) {
@@ -708,8 +662,7 @@ public class ImplImageBandMath {
 
 		final GrayS64[] bands = input.bands;
 		long divisor = lastBand - startBand+1;
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -721,8 +674,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] =  (sum/divisor);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void stdDev(Planar<GrayS64> input , GrayS64 output , GrayS64 avg, int startBand, int lastBand ) {
@@ -733,8 +685,7 @@ public class ImplImageBandMath {
 		final GrayS64[] bands = input.bands;
 		long divisor = lastBand - startBand;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -748,8 +699,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (long) Math.sqrt(sum/divisor);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void minimum(Planar<GrayF32> input , GrayF32 output, int startBand, int lastBand ) {
@@ -758,8 +708,7 @@ public class ImplImageBandMath {
 
 		final GrayF32[] bands = input.bands;
 		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -775,8 +724,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] =  minimum;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void maximum(Planar<GrayF32> input , GrayF32 output, int startBand, int lastBand ) {
@@ -785,8 +733,7 @@ public class ImplImageBandMath {
 
 		final GrayF32[] bands = input.bands;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for(int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.startIndex + y * input.stride;
 			int indexOutput = output.startIndex + y * output.stride;
 
@@ -802,8 +749,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] =  maximum;
 			} 
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void median(Planar<GrayF32> input , GrayF32 output, int startBand, int lastBand ) {
@@ -821,8 +767,7 @@ public class ImplImageBandMath {
 
 		final int middle = numBands/2;
 		boolean isEven = numBands % 2 == 0;
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			final float[] valueArray = new float[numBands];
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
@@ -841,8 +786,7 @@ public class ImplImageBandMath {
 					output.data[indexOutput] = QuickSelect.select(valueArray, middle, numBands);
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void average(Planar<GrayF32> input , GrayF32 output, int startBand, int lastBand ) {
@@ -851,8 +795,7 @@ public class ImplImageBandMath {
 
 		final GrayF32[] bands = input.bands;
 		float divisor = lastBand - startBand+1;
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -864,8 +807,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] =  (sum/divisor);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void stdDev(Planar<GrayF32> input , GrayF32 output , GrayF32 avg, int startBand, int lastBand ) {
@@ -876,8 +818,7 @@ public class ImplImageBandMath {
 		final GrayF32[] bands = input.bands;
 		float divisor = lastBand - startBand;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -891,8 +832,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (float) Math.sqrt(sum/divisor);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void minimum(Planar<GrayF64> input , GrayF64 output, int startBand, int lastBand ) {
@@ -901,8 +841,7 @@ public class ImplImageBandMath {
 
 		final GrayF64[] bands = input.bands;
 		
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -918,8 +857,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] =  minimum;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void maximum(Planar<GrayF64> input , GrayF64 output, int startBand, int lastBand ) {
@@ -928,8 +866,7 @@ public class ImplImageBandMath {
 
 		final GrayF64[] bands = input.bands;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for(int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.startIndex + y * input.stride;
 			int indexOutput = output.startIndex + y * output.stride;
 
@@ -945,8 +882,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] =  maximum;
 			} 
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void median(Planar<GrayF64> input , GrayF64 output, int startBand, int lastBand ) {
@@ -964,8 +900,7 @@ public class ImplImageBandMath {
 
 		final int middle = numBands/2;
 		boolean isEven = numBands % 2 == 0;
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			final double[] valueArray = new double[numBands];
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
@@ -984,8 +919,7 @@ public class ImplImageBandMath {
 					output.data[indexOutput] = QuickSelect.select(valueArray, middle, numBands);
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void average(Planar<GrayF64> input , GrayF64 output, int startBand, int lastBand ) {
@@ -994,8 +928,7 @@ public class ImplImageBandMath {
 
 		final GrayF64[] bands = input.bands;
 		double divisor = lastBand - startBand+1;
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -1007,8 +940,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] =  (sum/divisor);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void stdDev(Planar<GrayF64> input , GrayF64 output , GrayF64 avg, int startBand, int lastBand ) {
@@ -1019,8 +951,7 @@ public class ImplImageBandMath {
 		final GrayF64[] bands = input.bands;
 		double divisor = lastBand - startBand;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for (int y = 0; y < h; y++) {
+		BoofConcurrency.range(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -1034,8 +965,7 @@ public class ImplImageBandMath {
 				}
 				output.data[indexOutput] = (double) Math.sqrt(sum/divisor);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 }

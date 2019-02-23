@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.alg.misc;
+package boofcv.alg.misc.impl;
 
-/**
- * @author Peter Abeles
- */
-public class TestImageBandMath extends CompareToImplImageBandMath {
+import boofcv.alg.misc.CompareToImplImageBandMath;
 
-	TestImageBandMath() {
-		super(ImageBandMath.class, 20, 30);
+class TestImplImageBandMath_MT  extends CompareToImplImageBandMath {
+
+	TestImplImageBandMath_MT() {
+		super(ImplImageBandMath_MT.class, 40, 50);
 	}
 }
+

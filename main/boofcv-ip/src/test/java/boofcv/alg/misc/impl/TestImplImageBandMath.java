@@ -38,7 +38,7 @@ package boofcv.alg.misc.impl;
 
 /**
  *
- * @author Nico
+ * @author Nico Stuurman
  */
 public class TestImplImageBandMath {
 	int width = 10;
@@ -279,7 +279,7 @@ public class TestImplImageBandMath {
 			GImageMiscOps.fillUniform(input, rand, 0,20);
 		}
 
-		// change the last band to ensure even and add are tested
+		// change the last band to ensure even and odd are tested
 		for (int adj = 0; adj < 2; adj++) {
 			int lastBand = this.lastBand-adj;
 
@@ -306,7 +306,6 @@ public class TestImplImageBandMath {
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double found = r.get(j,i).doubleValue();
-
 				for (int b = firstBand; b <= lastBand; b++) {
 					values[b - firstBand] = testImages[b].get(j, i).doubleValue();
 				}
@@ -332,9 +331,8 @@ public class TestImplImageBandMath {
 		Planar input = new Planar(paramTypes[1], width, height,numBands);
 		ImageGray output = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
 		ImageGray av = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
-		GImageBandMath.average(input, av, firstBand, lastBand);
 
-		if( output.getDataType().isSigned() ) {
+		if( output.getDataType().isSigned()) {
 			GImageMiscOps.fillUniform(input, rand, -20,20);
 		} else {
 			GImageMiscOps.fillUniform(input, rand, 0,40);
@@ -347,8 +345,9 @@ public class TestImplImageBandMath {
 		boolean isInteger = output.getDataType().isInteger();
 
 		//  check all bands (a single band will give an exception)
+		GImageBandMath.average(input, av, firstBand, lastBand);
 		GImageGray avg = FactoryGImageGray.wrap(av);
-		m.invoke(null, input, av, output, firstBand, lastBand);
+		m.invoke(null, input, output, av, firstBand, lastBand);
 		GImageGray r = FactoryGImageGray.wrap(output);
 
 		double diff;

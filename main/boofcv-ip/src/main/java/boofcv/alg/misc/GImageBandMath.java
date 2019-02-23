@@ -19,12 +19,14 @@ package boofcv.alg.misc;
 
 import boofcv.struct.image.*;
 
+import javax.annotation.Nullable;
+
 /**
  * Collection of functions that project Bands of Planar images onto 
  * a single image. Can be used to perform projections such as 
  * minimum, maximum, average, median, standard Deviation.
- * 
- * @author Nico
+ *
+ * @author Nico Stuurman
  */
 @SuppressWarnings("unchecked")
 public class GImageBandMath {
@@ -32,7 +34,7 @@ public class GImageBandMath {
 	/** Computes the minimum for each pixel across all bands in the {@link Planar} image.
 	 *
 	 * @param input Planar image
-	 * @param output Gray scale image containing average pixel values
+	 * @param output Gray scale image containing minimum pixel values
 	 */
 	public static <T extends ImageGray<T>> void minimum(Planar<T> input, T output) {
 		minimum(input, output, 0, input.getNumBands() - 1);
@@ -42,7 +44,7 @@ public class GImageBandMath {
 	 * Computes the minimum for each pixel across specified bands in the {@link Planar} image.
 	 *
 	 * @param input Planar image
-	 * @param output Gray scale image containing average pixel values
+	 * @param output Gray scale image containing minimum pixel values
 	 * @param startBand First band to be considered
 	 * @param lastBand Last band (inclusive) to be considered
 	 */
@@ -191,35 +193,36 @@ public class GImageBandMath {
 	 * @param output Gray scale image containing average pixel values
 	 * @param avg Gray scale image containing average projection of input
 	 */
-	public static <T extends ImageGray<T>> void stdDev(Planar<T> input, T output, T avg) {
+	public static <T extends ImageGray<T>> void stdDev(Planar<T> input, T output, @Nullable T avg) {
 		stdDev(input, output, avg, 0, input.getNumBands() - 1);
 	}
-   
+
+
 	/**
 	 * Computes the standard deviation for each pixel across the specified bands in the {@link Planar} image.
 	 *
 	 * @param input Planar image - unchanged
-	 * @param output Gray scale image containing average pixel values
-	 * @param avg Gray scali
+	 * @param output Output Gray scale Image - changed
+	 * @param avg Optional gray scale image containing average pixel values - should be same size as a plane in input
 	 * @param startBand First band to be considered
 	 * @param lastBand Last band (inclusive) to be considered
 	 */
-	public static <T extends ImageGray<T>> void stdDev(Planar<T> input, T output, T avg, int startBand, int lastBand) {
+	public static <T extends ImageGray<T>> void stdDev(Planar<T> input, T output, @Nullable T avg, int startBand, int lastBand) {
 
 		if( GrayU8.class == input.getBandType() ) {
-			ImageBandMath.stdDev((Planar<GrayU8>) input, (GrayU8) avg, (GrayU8) output, startBand, lastBand);
+			ImageBandMath.stdDev((Planar<GrayU8>) input, (GrayU8) output, (GrayU8) avg, startBand, lastBand);
 		} else if( GrayU16.class == input.getBandType() ) {
-			ImageBandMath.stdDev((Planar<GrayU16>) input, (GrayU16) avg, (GrayU16) output, startBand, lastBand);
+			ImageBandMath.stdDev((Planar<GrayU16>) input, (GrayU16) output, (GrayU16) avg, startBand, lastBand);
 		} else if( GrayS16.class == input.getBandType() ) {
-			ImageBandMath.stdDev((Planar<GrayS16>) input, (GrayS16) avg, (GrayS16) output, startBand, lastBand);
+			ImageBandMath.stdDev((Planar<GrayS16>) input, (GrayS16) output, (GrayS16) avg, startBand, lastBand);
 		} else if( GrayS32.class == input.getBandType() ) {
-			ImageBandMath.stdDev((Planar<GrayS32>) input, (GrayS32) avg, (GrayS32) output, startBand, lastBand);
+			ImageBandMath.stdDev((Planar<GrayS32>) input, (GrayS32) output, (GrayS32) avg, startBand, lastBand);
 		} else if( GrayS64.class == input.getBandType() ) {
-			ImageBandMath.stdDev((Planar<GrayS64>) input, (GrayS64) avg, (GrayS64) output, startBand, lastBand);
+			ImageBandMath.stdDev((Planar<GrayS64>) input, (GrayS64) output, (GrayS64) avg, startBand, lastBand);
 		} else if( GrayF32.class == input.getBandType() ) {
-			ImageBandMath.stdDev((Planar<GrayF32>) input, (GrayF32) avg, (GrayF32) output, startBand, lastBand);
+			ImageBandMath.stdDev((Planar<GrayF32>) input, (GrayF32) output, (GrayF32) avg, startBand, lastBand);
 		} else if( GrayF64.class == input.getBandType() ) {
-			ImageBandMath.stdDev((Planar<GrayF64>) input, (GrayF64) avg, (GrayF64) output, startBand, lastBand);
+			ImageBandMath.stdDev((Planar<GrayF64>) input, (GrayF64) output, (GrayF64) avg, startBand, lastBand);
 		} else {
 			throw new IllegalArgumentException("Unknown image Type: "+input.getBandType().getSimpleName());
 		}
