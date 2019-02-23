@@ -69,30 +69,30 @@ public class BenchmarkImageBandMath {
 		GImageMiscOps.fillUniform(input,rand,0,200);
 	}
 
-//	@Benchmark
-//	public void minimum() {
-//		GImageBandMath.minimum(input,output);
-//	}
-//
-//	@Benchmark
-//	public void maximum() {
-//		GImageBandMath.maximum(input,output);
-//	}
+	@Benchmark
+	public void minimum() {
+		GImageBandMath.minimum(input,output);
+	}
+
+	@Benchmark
+	public void maximum() {
+		GImageBandMath.maximum(input,output);
+	}
 
 	@Benchmark
 	public void median() {
 		GImageBandMath.median(input,output);
 	}
 
-//	@Benchmark
-//	public void average() {
-//		GImageBandMath.average(input,output);
-//	}
-//
-//	@Benchmark
-//	public void stdDev() {
-//		GImageBandMath.stdDev(input,output,tmp);
-//	}
+	@Benchmark
+	public void average() {
+		GImageBandMath.average(input,output);
+	}
+
+	@Benchmark
+	public void stdDev() {
+		GImageBandMath.stdDev(input,output,tmp);
+	}
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()
