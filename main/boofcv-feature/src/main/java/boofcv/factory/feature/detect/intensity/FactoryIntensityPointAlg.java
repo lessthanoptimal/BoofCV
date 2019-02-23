@@ -95,7 +95,7 @@ public class FactoryIntensityPointAlg {
 		if( BoofConcurrency.USE_CONCURRENT ) {
 			if( derivType == GrayF32.class ) {
 				if( weighted )
-					return (GradientCornerIntensity)new ImplSsdCornerWeighted_S16_MT(windowRadius,new HarrisCorner_S32(kappa));
+					return (GradientCornerIntensity)new ImplSsdCornerWeighted_F32_MT(windowRadius,new HarrisCorner_F32(kappa));
 				else
 					return (GradientCornerIntensity)new ImplSsdCorner_F32_MT(windowRadius,new HarrisCorner_F32(kappa));
 			} else if( derivType == GrayS16.class ) {

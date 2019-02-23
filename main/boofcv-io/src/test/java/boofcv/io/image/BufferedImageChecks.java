@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class BufferedImageChecks {
 
 		WritableRaster raster = imgA.getRaster();
 		if (raster.getDataBuffer().getDataType() == DataBuffer.TYPE_BYTE &&
-				ConvertBufferedImage.isKnownByteFormat(imgA) ) {
+				ConvertRaster.isKnownByteFormat(imgA) ) {
 
 			if (raster.getNumBands() == 1) {
 
@@ -122,7 +122,7 @@ public class BufferedImageChecks {
 
 		WritableRaster raster = imgA.getRaster();
 		if (raster.getDataBuffer().getDataType() == DataBuffer.TYPE_BYTE &&
-				ConvertBufferedImage.isKnownByteFormat(imgA) ) {
+				ConvertRaster.isKnownByteFormat(imgA) ) {
 
 			if (raster.getNumBands() == 1) {
 				byte []data = ((DataBufferByte)raster.getDataBuffer()).getData();
@@ -191,7 +191,7 @@ public class BufferedImageChecks {
 
 		WritableRaster raster = imgA.getRaster();
 		if (raster.getDataBuffer().getDataType() == DataBuffer.TYPE_BYTE &&
-				ConvertBufferedImage.isKnownByteFormat(imgA)  ) {
+				ConvertRaster.isKnownByteFormat(imgA)  ) {
 
 			if (raster.getNumBands() == 1) {
 				byte []data = ((DataBufferByte)raster.getDataBuffer()).getData();
@@ -312,7 +312,7 @@ public class BufferedImageChecks {
 
 		WritableRaster raster = imgA.getRaster();
 		if (raster.getDataBuffer().getDataType() == DataBuffer.TYPE_BYTE &&
-				ConvertBufferedImage.isKnownByteFormat(imgA)) {
+				ConvertRaster.isKnownByteFormat(imgA)) {
 
 			if (raster.getNumBands() == 1) {
 				byte []dataA = ((DataBufferByte)raster.getDataBuffer()).getData();

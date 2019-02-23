@@ -281,6 +281,7 @@ public class AutocodeConcurrentApp {
 				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ImplConvertImage.java",
 				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ConvertInterleavedToSingle.java",
 				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ImplConvertPlanarToGray.java",
+				"main/boofcv-io/src/main/java/boofcv/io/image/impl/ImplConvertRaster.java"
 		};
 
 		for( String f : files ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -606,61 +606,6 @@ public class TestConvertBufferedImage {
 		ConvertBufferedImage.convertTo(label, found);
 
 		// could check to see that the pixels are not all uniform....
-	}
-
-	@Test
-	public void orderBandsIntoRGB() {
-		Planar<GrayU8> input = new Planar<>(GrayU8.class, 10, 10, 3);
-
-		GrayU8 band0 = input.getBand(0);
-		GrayU8 band1 = input.getBand(1);
-		GrayU8 band2 = input.getBand(2);
-
-		// test no swap first
-		BufferedImage orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
-		ConvertBufferedImage.orderBandsIntoRGB(input, orig);
-		assertTrue(band0 == input.getBand(0));
-		assertTrue(band1 == input.getBand(1));
-		assertTrue(band2 == input.getBand(2));
-
-		// check swaps now
-		orig = new BufferedImage(10, 10, BufferedImage.TYPE_3BYTE_BGR);
-		ConvertBufferedImage.orderBandsIntoRGB(input, orig);
-		assertTrue(band2 == input.getBand(0));
-		assertTrue(band1 == input.getBand(1));
-		assertTrue(band0 == input.getBand(2));
-
-		orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_BGR);
-		ConvertBufferedImage.orderBandsIntoRGB(input, orig);
-		assertTrue(band0 == input.getBand(0));
-		assertTrue(band1 == input.getBand(1));
-		assertTrue(band2 == input.getBand(2));
-
-		// 4-band images
-		input = new Planar<>(GrayU8.class, 10, 10, 4);
-
-		band0 = input.getBand(0);
-		band1 = input.getBand(1);
-		band2 = input.getBand(2);
-		GrayU8 band3 = input.getBand(3);
-
-		orig = new BufferedImage(10, 10, BufferedImage.TYPE_4BYTE_ABGR);
-		ConvertBufferedImage.orderBandsIntoRGB(input, orig);
-		assertTrue(band3 == input.getBand(0));
-		assertTrue(band2 == input.getBand(1));
-		assertTrue(band1 == input.getBand(2));
-		assertTrue(band0 == input.getBand(3));
-
-		band0 = input.getBand(0);
-		band1 = input.getBand(1);
-		band2 = input.getBand(2);
-		band3 = input.getBand(3);
-		orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
-		ConvertBufferedImage.orderBandsIntoRGB(input, orig);
-		assertTrue(band1 == input.getBand(0));
-		assertTrue(band2 == input.getBand(1));
-		assertTrue(band3 == input.getBand(2));
-		assertTrue(band0 == input.getBand(3));
 	}
 
 	@Test

@@ -25,7 +25,6 @@ import boofcv.abst.feature.detect.interest.PointDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.gui.BoofSwingUtil;
@@ -35,6 +34,7 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.misc.MovingAverage;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
@@ -79,6 +79,9 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	List<QueueCorner> sets = new ArrayList<>();
 	// END OWNED BY LOCK
 
+	// filter the speed to make the numbers less erratic
+	MovingAverage period = new MovingAverage();
+
 	public DemoDetectPointFeaturesApp(List<?> exampleInputs, Class<T> imageClass ) {
 		super(true,true,exampleInputs, ImageType.single(imageClass));
 		this.imageClass = imageClass;
@@ -113,6 +116,7 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		super.handleInputChange(source, method, width, height);
 
 		BoofSwingUtil.invokeNowOrLater(() -> {
+			period.reset();
 			double zoom = BoofSwingUtil.selectZoomToShowAll(imagePanel,width,height);
 			controls.setZoom(zoom);
 			imagePanel.getVerticalScrollBar().setValue(0);
@@ -144,7 +148,8 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		}
 
 		BoofSwingUtil.invokeNowOrLater(() -> {
-			controls.setProcessingTime(seconds);
+
+			controls.setProcessingTime(period.update(seconds));
 			imagePanel.setBufferedImage(buffered);
 			imagePanel.repaint();
 		});
@@ -369,7 +374,7 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 
 	public static void main(String[] args) {
-		BoofConcurrency.USE_CONCURRENT = true;
+//		BoofConcurrency.USE_CONCURRENT = true;
 
 		List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("Chessboard", UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame06.jpg")));

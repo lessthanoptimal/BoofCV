@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.io.image;
 
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.io.image.impl.ImplConvertRaster;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.GrayU8;
@@ -65,7 +66,7 @@ public class BenchmarkConvertBufferedImage {
 	{
 		@Override
 		public void process() {
-			ConvertRaster.grayToBuffered(imgInt8,imgBuff);
+			ImplConvertRaster.grayToBuffered(imgInt8,imgBuff);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.io.image;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.io.image.impl.ImplConvertRaster;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
@@ -94,11 +95,11 @@ public class TestConvertRaster {
 
 		// test several image types
 		GrayU8 out = new GrayU8(5, 5);
-		ConvertRaster.bufferedToGray(img, out);
+		ConvertRaster.bufferedToGray((DataBufferByte)img.getRaster().getDataBuffer(),img.getRaster(), out);
 		assertEquals(101, out.get(0, 0));
 
 		GrayF32 outF = new GrayF32(5, 5);
-		ConvertRaster.bufferedToGray(img, outF);
+		ConvertRaster.bufferedToGray((DataBufferByte)img.getRaster().getDataBuffer(),img.getRaster(), outF);
 		assertEquals(101, outF.get(0, 0), 1e-4);
 	}
 
@@ -113,7 +114,7 @@ public class TestConvertRaster {
 		img.getRaster().getDataBuffer().setElem(0, 2005);
 
 		GrayU16 out = new GrayU16(5, 5);
-		ConvertRaster.bufferedToGray(img, out);
+		ImplConvertRaster.bufferedToGray(img, out);
 		assertEquals(2005, out.get(0, 0));
 	}
 
@@ -347,5 +348,61 @@ public class TestConvertRaster {
 				}
 			}
 		}
+	}
+
+
+	@Test
+	public void orderBandsIntoRGB() {
+		Planar<GrayU8> input = new Planar<>(GrayU8.class, 10, 10, 3);
+
+		GrayU8 band0 = input.getBand(0);
+		GrayU8 band1 = input.getBand(1);
+		GrayU8 band2 = input.getBand(2);
+
+		// test no swap first
+		BufferedImage orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+		ConvertRaster.orderBandsIntoRGB(input, orig);
+		assertTrue(band0 == input.getBand(0));
+		assertTrue(band1 == input.getBand(1));
+		assertTrue(band2 == input.getBand(2));
+
+		// check swaps now
+		orig = new BufferedImage(10, 10, BufferedImage.TYPE_3BYTE_BGR);
+		ConvertRaster.orderBandsIntoRGB(input, orig);
+		assertTrue(band2 == input.getBand(0));
+		assertTrue(band1 == input.getBand(1));
+		assertTrue(band0 == input.getBand(2));
+
+		orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_BGR);
+		ConvertRaster.orderBandsIntoRGB(input, orig);
+		assertTrue(band0 == input.getBand(0));
+		assertTrue(band1 == input.getBand(1));
+		assertTrue(band2 == input.getBand(2));
+
+		// 4-band images
+		input = new Planar<>(GrayU8.class, 10, 10, 4);
+
+		band0 = input.getBand(0);
+		band1 = input.getBand(1);
+		band2 = input.getBand(2);
+		GrayU8 band3 = input.getBand(3);
+
+		orig = new BufferedImage(10, 10, BufferedImage.TYPE_4BYTE_ABGR);
+		ConvertRaster.orderBandsIntoRGB(input, orig);
+		assertTrue(band3 == input.getBand(0));
+		assertTrue(band2 == input.getBand(1));
+		assertTrue(band1 == input.getBand(2));
+		assertTrue(band0 == input.getBand(3));
+
+		band0 = input.getBand(0);
+		band1 = input.getBand(1);
+		band2 = input.getBand(2);
+		band3 = input.getBand(3);
+		orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
+		ConvertRaster.orderBandsIntoRGB(input, orig);
+		assertTrue(band1 == input.getBand(0));
+		assertTrue(band2 == input.getBand(1));
+		assertTrue(band3 == input.getBand(2));
+		assertTrue(band0 == input.getBand(3));
 	}
 }
