@@ -18,7 +18,6 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.alg.feature.detect.intensity.impl.*;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
@@ -46,7 +45,10 @@ import java.util.concurrent.TimeUnit;
 @Fork(value=2)
 public class BenchmarkSsdCornerIntensity {
 	@Param({"true","false"})
-	public boolean concurrent;
+	public boolean concurrent=false;
+
+//	@Param({"false","true"})
+	public boolean weighted=true;
 
 //	@Param({"500","5000"})
 	public int size=2000;
@@ -83,19 +85,17 @@ public class BenchmarkSsdCornerIntensity {
 		ImageMiscOps.fillUniform(derivX_S16,rand,0,200);
 		ImageMiscOps.fillUniform(derivY_S16,rand,0,200);
 
-		shitomasi_S16 = new ImplSsdCorner_S16(radius,new ShiTomasiCorner_S32());
-		shitomasi_F32 = FactoryIntensityPointAlg.shiTomasi(radius,false,GrayF32.class);
+		shitomasi_S16 = FactoryIntensityPointAlg.shiTomasi(radius,weighted,GrayS16.class);
+		shitomasi_F32 = FactoryIntensityPointAlg.shiTomasi(radius,weighted,GrayF32.class);
 
-		harris_S16 = new ImplSsdCorner_S16(radius,new HarrisCorner_S32(0.04f));
-		harris_F32 = new ImplSsdCorner_F32(radius,new HarrisCorner_F32(0.04f));
-
-		// TODO add weighted
+		harris_S16 = FactoryIntensityPointAlg.harris(radius,0.04f,weighted,GrayS16.class);
+		harris_F32 = FactoryIntensityPointAlg.harris(radius,0.04f,weighted,GrayF32.class);
 	}
 
-//	@Benchmark
-//	public void ShiTomasi_S16() {
-//		shitomasi_S16.process(derivX_S16,derivY_S16,intensity);
-//	}
+	@Benchmark
+	public void ShiTomasi_S16() {
+		shitomasi_S16.process(derivX_S16,derivY_S16,intensity);
+	}
 
 	@Benchmark
 	public void ShiTomasi_F32() {

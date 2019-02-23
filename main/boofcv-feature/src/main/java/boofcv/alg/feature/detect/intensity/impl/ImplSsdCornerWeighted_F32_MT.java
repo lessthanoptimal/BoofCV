@@ -20,23 +20,22 @@ package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.ConvolveImageNormalized;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
 
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
-
 /**
  * @author Peter Abeles
  */
-public class ImplSsdCornerWeighted_F32 extends ImplSsdCornerBase<GrayF32,GrayF32>
+public class ImplSsdCornerWeighted_F32_MT extends ImplSsdCornerBase<GrayF32,GrayF32>
 {
 	CornerIntensity_F32 intensity;
 
 	Kernel1D_F32 kernel;
 	GrayF32 temp = new GrayF32(1,1);
 
-	public ImplSsdCornerWeighted_F32(int radius, CornerIntensity_F32 intensity) {
+	public ImplSsdCornerWeighted_F32_MT(int radius, CornerIntensity_F32 intensity) {
 		super(radius,GrayF32.class);
 		this.intensity = intensity;
 		kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, -1, radius);
@@ -56,8 +55,7 @@ public class ImplSsdCornerWeighted_F32 extends ImplSsdCornerBase<GrayF32,GrayF32
 		temp.reshape(w,h);
 		intensity.reshape(w,h);
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			int indexX = derivX.startIndex + derivX.stride*y;
 			int indexY = derivY.startIndex + derivY.stride*y;
 
@@ -70,16 +68,14 @@ public class ImplSsdCornerWeighted_F32 extends ImplSsdCornerBase<GrayF32,GrayF32
 				horizXY.data[index] = dx*dy;
 				horizYY.data[index] = dy*dy;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		// apply the the Gaussian weights
 		blur(horizXX,temp);
 		blur(horizXY,temp);
 		blur(horizYY,temp);
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
-		for( int y = 0; y < h; y++ ) {
+		BoofConcurrency.range(0,h,y->{
 			int index = horizXX.stride*y;
 			for( int x = 0; x < w; x++ , index++ ) {
 				float totalXX = horizXX.data[index];
@@ -88,8 +84,7 @@ public class ImplSsdCornerWeighted_F32 extends ImplSsdCornerBase<GrayF32,GrayF32
 
 				intensity.data[index] = this.intensity.compute(totalXX,totalXY,totalYY);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	private void blur(GrayF32 image , GrayF32 temp ) {

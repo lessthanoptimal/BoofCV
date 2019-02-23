@@ -18,11 +18,8 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 
 /**
@@ -55,9 +52,6 @@ public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends Image
 	protected D2 horizXY;
 	protected D2 horizYY;
 
-	// used to keep track of where it is in the image
-//	protected int x, y;
-
 	protected ImplSsdCornerBase( int windowRadius , Class<D2> secondDerivType ) {
 		this.radius = windowRadius;
 
@@ -82,26 +76,6 @@ public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends Image
 		return radius;
 	}
 
-	@Override
-	public void process(D derivX, D derivY, GrayF32 intensity ) {
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		intensity.reshape(derivX.width,derivY.height);
-
-		setImageShape(derivX.getWidth(),derivX.getHeight());
-		this.derivX = derivX;
-		this.derivY = derivY;
-
-		// there is no intensity computed along the border. Make sure it's always zero
-		// In the future it might be better to fill it with meaningful data, even if it's
-		// from a partial region
-		ImageMiscOps.fillBorder(intensity,0,radius);
-		horizontal();
-		vertical(intensity);
-	}
-
-	protected abstract void horizontal();
-
-	protected abstract void vertical(GrayF32 intensity);
 
 	public interface CornerIntensity_S32 {
 		/**

@@ -27,7 +27,6 @@ import java.io.FileNotFoundException;
  * @author Peter Abeles
  */
 public class GenerateImplSsdCorner extends CodeGeneratorBase  {
-	String className;
 	String typeInput;
 	String typeOutput;
 	String dataInput;
@@ -35,6 +34,10 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 	String sumType;
 	String workArrays;
 	String cornerInten;
+
+	public GenerateImplSsdCorner() {
+		super(false);
+	}
 
 	@Override
 	public void generate() throws FileNotFoundException {
@@ -51,7 +54,7 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 		dataInput = input.getDataType();
 		dataOutput = output.getDataType();
 		sumType = input.getSumType();
-		workArrays = input.getLetterSum()+"WorkArray";
+		workArrays = input.getLetterSum()+"WorkArrays";
 		cornerInten = "CornerIntensity_"+input.getKernelType();
 
 		printPreamble();
@@ -83,7 +86,7 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				" * @author Peter Abeles\n" +
 				" */\n" +
 				generatedAnnotation() +
-				"public abstract class "+className+" extends ImplSsdCornerBase<"+typeInput+","+typeOutput+"> {\n" +
+				"public class "+className+" extends ImplSsdCornerBox<"+typeInput+","+typeOutput+"> {\n" +
 				"\n" +
 				"\tprivate "+workArrays+" work = new "+workArrays+"();\n" +
 				"\tprivate "+cornerInten+" intensity;\n" +
@@ -108,7 +111,7 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 	}
 
 	protected void printHorizontal() {
-		out.print("/**\n" +
+		out.print("\t/**\n" +
 				"\t * Compute the derivative sum along the x-axis while taking advantage of duplicate\n" +
 				"\t * calculations for each window.\n" +
 				"\t */\n" +
@@ -213,7 +216,7 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\t\t\t// defines the A matrix, from which the eigenvalues are computed\n" +
 				"\t\t\tint srcIndex = x;\n" +
 				"\t\t\tint destIndex = imgWidth * y0 + x;\n" +
-				"\t\t\tfloat totalXX = 0, totalXY = 0, totalYY = 0;" +
+				"\t\t\t"+sumType+" totalXX = 0, totalXY = 0, totalYY = 0;\n" +
 				"\n" +
 				"\t\t\tint indexEnd = srcIndex + imgWidth * kernelWidth;\n" +
 				"\t\t\tfor (; srcIndex < indexEnd; srcIndex += imgWidth) {\n" +
@@ -237,11 +240,11 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\t\t\tint destIndex = y * imgWidth + startX;\n" +
 				"\n" +
 				"\t\t\tfor (int x = startX; x < endX; x++, srcIndex++, destIndex++) {\n" +
-				"\t\t\t\tfloat totalXX = tempXX[x] - hXX[srcIndex - backStep];\n" +
+				"\t\t\t\t"+sumType+" totalXX = tempXX[x] - hXX[srcIndex - backStep];\n" +
 				"\t\t\t\ttempXX[x] = totalXX += hXX[srcIndex];\n" +
-				"\t\t\t\tfloat totalXY = tempXY[x] - hXY[srcIndex - backStep];\n" +
+				"\t\t\t\t"+sumType+" totalXY = tempXY[x] - hXY[srcIndex - backStep];\n" +
 				"\t\t\t\ttempXY[x] = totalXY += hXY[srcIndex];\n" +
-				"\t\t\t\tfloat totalYY = tempYY[x] - hYY[srcIndex - backStep];\n" +
+				"\t\t\t\t"+sumType+" totalYY = tempYY[x] - hYY[srcIndex - backStep];\n" +
 				"\t\t\t\ttempYY[x] = totalYY += hYY[srcIndex];\n" +
 				"\n" +
 				"\t\t\t\tinten[destIndex] = this.intensity.compute(totalXX,totalXY,totalYY);\n" +

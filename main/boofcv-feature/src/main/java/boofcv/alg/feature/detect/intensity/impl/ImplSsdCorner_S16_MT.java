@@ -18,14 +18,13 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.IWorkArrays;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
 
 import javax.annotation.Generated;
-
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>
@@ -39,7 +38,7 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.feature.detect.intensity.impl.GenerateImplSsdCorner")
-public class ImplSsdCorner_S16 extends ImplSsdCornerBox<GrayS16,GrayS32> {
+public class ImplSsdCorner_S16_MT extends ImplSsdCornerBox<GrayS16,GrayS32> {
 
 	private IWorkArrays work = new IWorkArrays();
 	private CornerIntensity_S32 intensity;
@@ -51,7 +50,7 @@ public class ImplSsdCorner_S16 extends ImplSsdCornerBox<GrayS16,GrayS32> {
 	// defines the A matrix, from which the eigenvalues are computed
 	protected int totalXX, totalYY, totalXY;
 
-	public ImplSsdCorner_S16( int windowRadius, CornerIntensity_S32 intensity) {
+	public ImplSsdCorner_S16_MT( int windowRadius, CornerIntensity_S32 intensity) {
 		super(windowRadius,GrayS32.class);
 		this.intensity = intensity;
 	}
@@ -82,8 +81,7 @@ public class ImplSsdCorner_S16 extends ImplSsdCornerBox<GrayS16,GrayS32> {
 
 		int radp1 = radius + 1;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,imgHeight,row->{
-		for (int row = 0; row < imgHeight; row++) {
+		BoofConcurrency.range(0,imgHeight,row->{
 
 			int pix = row * imgWidth;
 			int end = pix + windowWidth;
@@ -131,8 +129,7 @@ public class ImplSsdCorner_S16 extends ImplSsdCornerBox<GrayS16,GrayS32> {
 				hXY[pix - radius] = totalXY;
 				hYY[pix - radius] = totalYY;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -156,8 +153,7 @@ public class ImplSsdCorner_S16 extends ImplSsdCornerBox<GrayS16,GrayS32> {
 
 		final int backStep = kernelWidth * imgWidth;
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(radius,imgHeight-radius,(y0,y1)->{
-		int y0 = radius, y1 = imgHeight-radius;
+		BoofConcurrency.blocks(radius,imgHeight-radius,(y0,y1)->{
 		final int[] tempXX = work.pop();
 		final int[] tempXY = work.pop();
 		final int[] tempYY = work.pop();
@@ -201,7 +197,6 @@ public class ImplSsdCorner_S16 extends ImplSsdCornerBox<GrayS16,GrayS32> {
 		}
 		work.recycle(tempXX);
 		work.recycle(tempXY);
-		work.recycle(tempYY);
-		//CONCURRENT_ABOVE });
+		});
 	}
 }

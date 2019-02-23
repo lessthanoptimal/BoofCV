@@ -91,20 +91,33 @@ public class FactoryIntensityPointAlg {
 	public static <D extends ImageGray<D>>
 	GradientCornerIntensity<D> harris(int windowRadius, float kappa, boolean weighted, Class<D> derivType)
 	{
-		if( derivType == GrayF32.class ) {
-			if( weighted )
-				return (GradientCornerIntensity)new ImplHarrisCornerWeighted_F32(windowRadius,kappa);
-			else
-				return (GradientCornerIntensity)new ImplSsdCorner_F32(windowRadius,new HarrisCorner_F32(kappa));
 
-		} else if( derivType == GrayS16.class ) {
-			if( weighted )
-				return (GradientCornerIntensity)new ImplHarrisCornerWeighted_S16(windowRadius,kappa);
-			else
-				return (GradientCornerIntensity)new ImplSsdCorner_S16(windowRadius,new HarrisCorner_S32(kappa));
-
-		}else
-			throw new IllegalArgumentException("Unknown image type "+derivType);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			if( derivType == GrayF32.class ) {
+				if( weighted )
+					return (GradientCornerIntensity)new ImplSsdCornerWeighted_S16_MT(windowRadius,new HarrisCorner_S32(kappa));
+				else
+					return (GradientCornerIntensity)new ImplSsdCorner_F32_MT(windowRadius,new HarrisCorner_F32(kappa));
+			} else if( derivType == GrayS16.class ) {
+				if( weighted )
+					return (GradientCornerIntensity)new ImplSsdCornerWeighted_S16_MT(windowRadius,new HarrisCorner_S32(kappa));
+				else
+					return (GradientCornerIntensity)new ImplSsdCorner_S16_MT(windowRadius,new HarrisCorner_S32(kappa));
+			}
+		} else {
+			if (derivType == GrayF32.class) {
+				if (weighted)
+					return (GradientCornerIntensity) new ImplSsdCornerWeighted_F32(windowRadius, new HarrisCorner_F32(kappa));
+				else
+					return (GradientCornerIntensity) new ImplSsdCorner_F32(windowRadius, new HarrisCorner_F32(kappa));
+			} else if (derivType == GrayS16.class) {
+				if (weighted)
+					return (GradientCornerIntensity) new ImplSsdCornerWeighted_S16(windowRadius,new HarrisCorner_S32(kappa));
+				else
+					return (GradientCornerIntensity) new ImplSsdCorner_S16(windowRadius, new HarrisCorner_S32(kappa));
+			}
+		}
+		throw new IllegalArgumentException("Unknown image type "+derivType);
 	}
 
 	/**
@@ -123,26 +136,26 @@ public class FactoryIntensityPointAlg {
 		if(BoofConcurrency.USE_CONCURRENT ) {
 			if (derivType == GrayF32.class) {
 				if (weighted)
-					return (GradientCornerIntensity) new ImplShiTomasiCornerWeighted_F32(windowRadius);
+					return (GradientCornerIntensity) new ImplSsdCornerWeighted_F32_MT(windowRadius, new ShiTomasiCorner_F32());
 				else {
 					return (GradientCornerIntensity) new ImplSsdCorner_F32_MT(windowRadius, new ShiTomasiCorner_F32());
 				}
 			} else if (derivType == GrayS16.class) {
 				if (weighted)
-					return (GradientCornerIntensity) new ImplShiTomasiCornerWeighted_S16(windowRadius);
+					return (GradientCornerIntensity) new ImplSsdCornerWeighted_S16_MT(windowRadius, new ShiTomasiCorner_S32());
 				else
-					return (GradientCornerIntensity) new ImplSsdCorner_S16(windowRadius, new ShiTomasiCorner_S32());
+					return (GradientCornerIntensity) new ImplSsdCorner_S16_MT(windowRadius, new ShiTomasiCorner_S32());
 			}
 		} else {
 			if (derivType == GrayF32.class) {
 				if (weighted)
-					return (GradientCornerIntensity) new ImplShiTomasiCornerWeighted_F32(windowRadius);
+					return (GradientCornerIntensity) new ImplSsdCornerWeighted_F32(windowRadius, new ShiTomasiCorner_F32());
 				else {
 					return (GradientCornerIntensity) new ImplSsdCorner_F32(windowRadius, new ShiTomasiCorner_F32());
 				}
 			} else if (derivType == GrayS16.class) {
 				if (weighted)
-					return (GradientCornerIntensity) new ImplShiTomasiCornerWeighted_S16(windowRadius);
+					return (GradientCornerIntensity) new ImplSsdCornerWeighted_S16(windowRadius, new ShiTomasiCorner_S32());
 				else
 					return (GradientCornerIntensity) new ImplSsdCorner_S16(windowRadius, new ShiTomasiCorner_S32());
 			}
