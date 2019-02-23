@@ -18,12 +18,11 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.FWorkArrays;
 import boofcv.struct.image.GrayF32;
 
 import javax.annotation.Generated;
-
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>
@@ -37,12 +36,12 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.feature.detect.intensity.impl.GenerateImplSsdCorner")
-public class ImplSsdCorner_F32 extends ImplSsdCornerBase<GrayF32,GrayF32> {
+public class ImplSsdCorner_F32_MT extends ImplSsdCornerBase<GrayF32,GrayF32> {
 
 	private FWorkArrays work = new FWorkArrays();
 	private CornerIntensity_F32 intensity;
 
-	public ImplSsdCorner_F32( int windowRadius, CornerIntensity_F32 intensity) {
+	public ImplSsdCorner_F32_MT( int windowRadius, CornerIntensity_F32 intensity) {
 		super(windowRadius,GrayF32.class);
 		this.intensity = intensity;
 	}
@@ -73,8 +72,7 @@ public class ImplSsdCorner_F32 extends ImplSsdCornerBase<GrayF32,GrayF32> {
 
 		int radp1 = radius + 1;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,imgHeight,row->{
-		for (int row = 0; row < imgHeight; row++) {
+		BoofConcurrency.range(0,imgHeight,row->{
 
 			int pix = row * imgWidth;
 			int end = pix + windowWidth;
@@ -122,8 +120,7 @@ public class ImplSsdCorner_F32 extends ImplSsdCornerBase<GrayF32,GrayF32> {
 				hXY[pix - radius] = totalXY;
 				hYY[pix - radius] = totalYY;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -147,13 +144,13 @@ public class ImplSsdCorner_F32 extends ImplSsdCornerBase<GrayF32,GrayF32> {
 
 		final int backStep = kernelWidth * imgWidth;
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(radius,imgHeight-radius,(y0,y1)->{
-		int y0 = radius, y1 = imgHeight-radius;
+		// defines the A matrix, from which the eigenvalues are computed
+
+		BoofConcurrency.blocks(radius,imgHeight-radius,(y0,y1)->{
 		final float[] tempXX = work.pop();
 		final float[] tempXY = work.pop();
 		final float[] tempYY = work.pop();
 		for (int x = startX; x < endX; x++) {
-			// defines the A matrix, from which the eigenvalues are computed
 			int srcIndex = x;
 			int destIndex = imgWidth * y0 + x;
 			float totalXX = 0, totalXY = 0, totalYY = 0;
@@ -192,7 +189,6 @@ public class ImplSsdCorner_F32 extends ImplSsdCornerBase<GrayF32,GrayF32> {
 		}
 		work.recycle(tempXX);
 		work.recycle(tempXY);
-		work.recycle(tempYY);
-		//CONCURRENT_ABOVE });
+		});
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,152 +20,103 @@ package boofcv.alg.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.impl.*;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Benchmark for different convolution operations.
  *
  * @author Peter Abeles
  */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value=2)
 public class BenchmarkSsdCornerIntensity {
-	static int imgWidth = 640;
-	static int imgHeight = 480;
-	static int windowRadius = 2;
-	static long TEST_TIME = 1000;
+	@Param({"true","false"})
+	public boolean concurrent;
 
-	static GrayF32 intensity = new GrayF32(imgWidth,imgHeight);
+//	@Param({"500","5000"})
+	public int size=2000;
 
-	static GrayF32 derivX_F32;
-	static GrayF32 derivY_F32;
-	static GrayF32 derivXX_F32;
-	static GrayF32 derivYY_F32;
-	static GrayF32 derivXY_F32;
-	static GrayS16 derivX_I16;
-	static GrayS16 derivY_I16;
-	static GrayS16 derivXX_I16;
-	static GrayS16 derivYY_I16;
-	static GrayS16 derivXY_I16;
+//	@Param({"2","5","20"})
+	public int radius=5;
+
+	GrayF32 derivX_F32 = new GrayF32(1,1);
+	GrayF32 derivY_F32 = new GrayF32(1,1);
+	GrayS16 derivX_S16 = new GrayS16(1,1);
+	GrayS16 derivY_S16 = new GrayS16(1,1);
+
+	GrayF32 intensity = new GrayF32(1,1);
 
 	static Random rand = new Random(234);
 
-	public static class KLT_F32 extends PerformerBase {
-		ImplShiTomasiCorner_F32 corner = new ImplShiTomasiCorner_F32(windowRadius);
+	GradientCornerIntensity<GrayS16> shitomasi_S16;
+	GradientCornerIntensity<GrayF32> shitomasi_F32;
+	GradientCornerIntensity<GrayS16> harris_S16;
+	GradientCornerIntensity<GrayF32> harris_F32;
 
-		@Override
-		public void process() {
-			corner.process(derivX_F32, derivY_F32,intensity);
-		}
+	@Setup
+	public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
+
+		derivX_F32.reshape(size, size);
+		derivY_F32.reshape(size, size);
+		derivX_S16.reshape(size, size);
+		derivY_S16.reshape(size, size);
+		intensity.reshape(size, size);
+
+		ImageMiscOps.fillUniform(derivX_F32,rand,0,200);
+		ImageMiscOps.fillUniform(derivY_F32,rand,0,200);
+		ImageMiscOps.fillUniform(derivX_S16,rand,0,200);
+		ImageMiscOps.fillUniform(derivY_S16,rand,0,200);
+
+		shitomasi_S16 = new ImplSsdCorner_S16(radius,new ShiTomasiCorner_S32());
+		shitomasi_F32 = FactoryIntensityPointAlg.shiTomasi(radius,false,GrayF32.class);
+
+		harris_S16 = new ImplSsdCorner_S16(radius,new HarrisCorner_S32(0.04f));
+		harris_F32 = new ImplSsdCorner_F32(radius,new HarrisCorner_F32(0.04f));
+
+		// TODO add weighted
 	}
 
-	public static class KLT_WEIGHT_F32 extends PerformerBase {
-		ImplShiTomasiCornerWeighted_F32 corner = new ImplShiTomasiCornerWeighted_F32(windowRadius);
+//	@Benchmark
+//	public void ShiTomasi_S16() {
+//		shitomasi_S16.process(derivX_S16,derivY_S16,intensity);
+//	}
 
-		@Override
-		public void process() {
-			corner.process(derivX_F32, derivY_F32,intensity);
-		}
+	@Benchmark
+	public void ShiTomasi_F32() {
+		shitomasi_F32.process(derivX_F32,derivY_F32,intensity);
 	}
 
-	public static class KLT_I16 extends PerformerBase {
-		ImplShiTomasiCorner_S16 corner = new ImplShiTomasiCorner_S16(windowRadius);
+//	@Benchmark
+//	public void Harris_S16() {
+//		harris_S16.process(derivX_S16,derivY_S16,intensity);
+//	}
+//
+//	@Benchmark
+//	public void Harris_F32() {
+//		harris_F32.process(derivX_F32,derivY_F32,intensity);
+//	}
 
-		@Override
-		public void process() {
-			corner.process(derivX_I16, derivY_I16,intensity);
-		}
-	}
-	public static class KLT_WEIGHT_I16 extends PerformerBase {
-		ImplShiTomasiCornerWeighted_S16 corner = new ImplShiTomasiCornerWeighted_S16(windowRadius);
+	public static void main(String[] args) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkSsdCornerIntensity.class.getSimpleName())
+				.build();
 
-		@Override
-		public void process() {
-			corner.process(derivX_I16, derivY_I16,intensity);
-		}
-	}
-
-	public static class KLT_Naive_I16 extends PerformerBase {
-		ImplSsdCornerNaive corner = new ImplSsdCornerNaive(imgWidth, imgHeight, windowRadius,false);
-
-		@Override
-		public void process() {
-			corner.process(derivX_I16, derivY_I16,intensity);
-		}
-	}
-
-	public static class Harris_F32 extends PerformerBase {
-		ImplHarrisCorner_F32 corner = new ImplHarrisCorner_F32(windowRadius, 0.04f);
-
-		@Override
-		public void process() {
-			corner.process(derivX_F32, derivY_F32,intensity);
-		}
-	}
-
-	public static class Harris_I16 extends PerformerBase {
-		ImplHarrisCorner_S16 corner = new ImplHarrisCorner_S16( windowRadius, 0.04f);
-
-		@Override
-		public void process() {
-			corner.process(derivX_I16, derivY_I16,intensity);
-		}
-	}
-
-	public static class KitRos_F32 extends PerformerBase {
-
-		@Override
-		public void process() {
-			KitRosCornerIntensity.process(intensity,derivX_F32, derivY_F32,derivXX_F32,derivYY_F32,derivXY_F32);
-		}
-	}
-
-	public static class KitRos_I16 extends PerformerBase {
-		@Override
-		public void process() {
-			KitRosCornerIntensity.process(intensity,derivX_I16, derivY_I16, derivXX_I16,derivYY_I16, derivXY_I16);
-		}
-	}
-
-
-	public static void main(String args[]) {
-		derivX_F32 = new GrayF32(imgWidth, imgHeight);
-		derivY_F32 = new GrayF32(imgWidth, imgHeight);
-		derivXX_F32 = new GrayF32(imgWidth, imgHeight);
-		derivYY_F32 = new GrayF32(imgWidth, imgHeight);
-		derivXY_F32 = new GrayF32(imgWidth, imgHeight);
-		derivX_I16 = new GrayS16(imgWidth, imgHeight);
-		derivY_I16 = new GrayS16(imgWidth, imgHeight);
-		derivXX_I16 = new GrayS16(imgWidth, imgHeight);
-		derivYY_I16 = new GrayS16(imgWidth, imgHeight);
-		derivXY_I16 = new GrayS16(imgWidth, imgHeight);
-
-		ImageMiscOps.fillUniform(derivX_F32, rand, 0, 255);
-		ImageMiscOps.fillUniform(derivY_F32, rand, 0, 255);
-		ImageMiscOps.fillUniform(derivXX_F32, rand, 0, 255);
-		ImageMiscOps.fillUniform(derivYY_F32, rand, 0, 255);
-		ImageMiscOps.fillUniform(derivXY_F32, rand, 0, 255);
-		ImageMiscOps.fillUniform(derivX_I16, rand, 0, 255);
-		ImageMiscOps.fillUniform(derivY_I16, rand, 0, 255);
-		ImageMiscOps.fillUniform(derivXX_I16, rand, 0, 255);
-		ImageMiscOps.fillUniform(derivYY_I16, rand, 0, 255);
-		ImageMiscOps.fillUniform(derivXY_I16, rand, 0, 255);
-
-		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
-		System.out.println();
-
-		ProfileOperation.printOpsPerSec(new KLT_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new KLT_WEIGHT_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Harris_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new KitRos_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new KLT_I16(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new KLT_WEIGHT_I16(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Harris_I16(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new KitRos_I16(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new KLT_Naive_I16(), TEST_TIME);
-
+		new Runner(opt).run();
 	}
 }

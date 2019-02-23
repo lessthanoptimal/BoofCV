@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
+import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel2D_S32;
@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach"})
-public class ImplSsdCornerNaive<T extends ImageGray<T>> implements ShiTomasiCornerIntensity<T> {
+public class ImplSsdCornerNaive<T extends ImageGray<T>> implements GradientCornerIntensity<T> {
 
 	// feature's radius
 	private int radius;

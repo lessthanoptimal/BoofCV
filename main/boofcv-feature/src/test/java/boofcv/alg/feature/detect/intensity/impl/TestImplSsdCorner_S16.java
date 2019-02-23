@@ -56,25 +56,36 @@ public class TestImplSsdCorner_S16 {
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
-	public void compareToManual() {
+	void compareToManual() {
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		GradientSobel.process(input,derivX,derivY, GImageDerivativeOps.borderDerivative_I32());
+		GradientSobel.process(input, derivX, derivY, GImageDerivativeOps.borderDerivative_I32());
 
-		for( int i = 0; i < height; i++ ) {
-			for( int j = 0; j < width; j++ ) {
-				int x = derivX.get(j,i);
-				int y = derivY.get(j,i);
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				int x = derivX.get(j, i);
+				int y = derivY.get(j, i);
 
-				derivXX.set(j,i,x*x);
-				derivXY.set(j,i,x*y);
-				derivYY.set(j,i,y*y);
+				derivXX.set(j, i, x * x);
+				derivXY.set(j, i, x * y);
+				derivYY.set(j, i, y * y);
 			}
 		}
 
-		Sdd alg = new Sdd(radius);
+		GrayF32 output = new GrayF32(width, height);
 
-		alg.process(derivX,derivY, new GrayF32(width,height));
+		ImplSsdCorner_S16 alg = new ImplSsdCorner_S16(radius, new MockSum());
+		alg.process(derivX, derivY, output);
+
+		for (int y = radius; y < height - radius; y++) {
+			for (int x = radius; x < width - radius; x++) {
+				float xx = sum(x, y, derivXX);
+				float xy = sum(x, y, derivXY);
+				float yy = sum(x, y, derivYY);
+
+				assertEquals(xx + xy + yy, output.get(x, y), 1);
+			}
+		}
 	}
 	
 	public int sum( int x , int y , GrayS32 img ) {
@@ -90,28 +101,12 @@ public class TestImplSsdCorner_S16 {
 		
 		return ret;
 	}
-	
-	private class Sdd extends ImplSsdCorner_S16 {
 
-		int count = 0;
-		
-		public Sdd(int radius) {
-			super(radius);
-		}
-
+	private class MockSum implements ImplSsdCornerBase.CornerIntensity_S32
+	{
 		@Override
-		protected float computeIntensity() {
-
-			int xx = sum(x,y,derivXX);
-			int xy = sum(x,y,derivXY);
-			int yy = sum(x,y,derivYY);
-
-			assertEquals(xx, totalXX);
-			assertEquals(xy, totalXY);
-			assertEquals(yy, totalYY);
-
-			count++;
-			return 0;
+		public float compute(int totalXX, int totalXY, int totalYY) {
+			return totalXX + totalXY + totalYY;
 		}
 	}
 }

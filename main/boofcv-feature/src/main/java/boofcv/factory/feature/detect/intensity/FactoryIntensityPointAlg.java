@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.factory.feature.detect.intensity;
 
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
-import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
-import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
+import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.impl.*;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -89,19 +89,19 @@ public class FactoryIntensityPointAlg {
 	 * @param derivType Image derivative type it is computed from.  @return Harris corner
 	 */
 	public static <D extends ImageGray<D>>
-	HarrisCornerIntensity<D> harris(int windowRadius, float kappa, boolean weighted, Class<D> derivType)
+	GradientCornerIntensity<D> harris(int windowRadius, float kappa, boolean weighted, Class<D> derivType)
 	{
 		if( derivType == GrayF32.class ) {
 			if( weighted )
-				return (HarrisCornerIntensity<D>)new ImplHarrisCornerWeighted_F32(windowRadius,kappa);
+				return (GradientCornerIntensity)new ImplHarrisCornerWeighted_F32(windowRadius,kappa);
 			else
-				return (HarrisCornerIntensity<D>)new ImplHarrisCorner_F32(windowRadius,kappa);
+				return (GradientCornerIntensity)new ImplSsdCorner_F32(windowRadius,new HarrisCorner_F32(kappa));
 
 		} else if( derivType == GrayS16.class ) {
 			if( weighted )
-				return (HarrisCornerIntensity<D>)new ImplHarrisCornerWeighted_S16(windowRadius,kappa);
+				return (GradientCornerIntensity)new ImplHarrisCornerWeighted_S16(windowRadius,kappa);
 			else
-				return (HarrisCornerIntensity<D>)new ImplHarrisCorner_S16(windowRadius,kappa);
+				return (GradientCornerIntensity)new ImplSsdCorner_S16(windowRadius,new HarrisCorner_S32(kappa));
 
 		}else
 			throw new IllegalArgumentException("Unknown image type "+derivType);
@@ -117,19 +117,36 @@ public class FactoryIntensityPointAlg {
 	 * @return KLT corner
 	 */
 	public static <D extends ImageGray<D>>
-	ShiTomasiCornerIntensity<D> shiTomasi(int windowRadius, boolean weighted, Class<D> derivType)
+	GradientCornerIntensity<D> shiTomasi(int windowRadius, boolean weighted, Class<D> derivType)
 	{
-		if( derivType == GrayF32.class ) {
-			if( weighted )
-				return (ShiTomasiCornerIntensity<D>)new ImplShiTomasiCornerWeighted_F32(windowRadius);
-			else
-				return (ShiTomasiCornerIntensity<D>)new ImplShiTomasiCorner_F32(windowRadius);
-		} else if( derivType == GrayS16.class ) {
-			if( weighted )
-				return (ShiTomasiCornerIntensity<D>)new ImplShiTomasiCornerWeighted_S16(windowRadius);
-			else
-				return (ShiTomasiCornerIntensity<D>)new ImplShiTomasiCorner_S16(windowRadius);
-		} else
-			throw new IllegalArgumentException("Unknown image type "+derivType);
+
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			if (derivType == GrayF32.class) {
+				if (weighted)
+					return (GradientCornerIntensity) new ImplShiTomasiCornerWeighted_F32(windowRadius);
+				else {
+					return (GradientCornerIntensity) new ImplSsdCorner_F32_MT(windowRadius, new ShiTomasiCorner_F32());
+				}
+			} else if (derivType == GrayS16.class) {
+				if (weighted)
+					return (GradientCornerIntensity) new ImplShiTomasiCornerWeighted_S16(windowRadius);
+				else
+					return (GradientCornerIntensity) new ImplSsdCorner_S16(windowRadius, new ShiTomasiCorner_S32());
+			}
+		} else {
+			if (derivType == GrayF32.class) {
+				if (weighted)
+					return (GradientCornerIntensity) new ImplShiTomasiCornerWeighted_F32(windowRadius);
+				else {
+					return (GradientCornerIntensity) new ImplSsdCorner_F32(windowRadius, new ShiTomasiCorner_F32());
+				}
+			} else if (derivType == GrayS16.class) {
+				if (weighted)
+					return (GradientCornerIntensity) new ImplShiTomasiCornerWeighted_S16(windowRadius);
+				else
+					return (GradientCornerIntensity) new ImplSsdCorner_S16(windowRadius, new ShiTomasiCorner_S32());
+			}
+		}
+		throw new IllegalArgumentException("Unknown image type " + derivType);
 	}
 }

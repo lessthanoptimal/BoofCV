@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,9 +21,9 @@ package boofcv.factory.feature.detect.intensity;
 import boofcv.abst.feature.detect.intensity.*;
 import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
+import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
-import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -69,7 +69,7 @@ public class FactoryIntensityPoint {
 	GeneralFeatureIntensity<I,D>  harris(int windowRadius, float kappa,
 										 boolean weighted, Class<D> derivType)
 	{
-		HarrisCornerIntensity<D> alg =  FactoryIntensityPointAlg.harris(windowRadius, kappa, weighted, derivType);
+		GradientCornerIntensity<D> alg =  FactoryIntensityPointAlg.harris(windowRadius, kappa, weighted, derivType);
 		return new WrapperGradientCornerIntensity<>(alg);
 	}
 
@@ -85,7 +85,7 @@ public class FactoryIntensityPoint {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureIntensity<I,D> shiTomasi(int windowRadius, boolean weighted, Class<D> derivType) {
-		ShiTomasiCornerIntensity<D> alg =  FactoryIntensityPointAlg.shiTomasi(windowRadius, weighted, derivType);
+		GradientCornerIntensity<D> alg =  FactoryIntensityPointAlg.shiTomasi(windowRadius, weighted, derivType);
 		return new WrapperGradientCornerIntensity<>(alg);
 	}
 

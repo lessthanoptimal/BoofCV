@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,13 +22,12 @@ import boofcv.alg.feature.detect.intensity.GenericCornerIntensityGradientTests;
 import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 /**
  * @author Peter Abeles
  */
-public class TestImplHarrisCorner_S16 extends GenericCornerIntensityGradientTests {
-	ImplHarrisCorner_S16 detector = new ImplHarrisCorner_S16(1,0.04f);
+public class TestHarrisCorner_F32 extends GenericCornerIntensityGradientTests {
+
+//	ImplHarrisCorner_F32 detector = new ImplHarrisCorner_F32(1,0.04f);
 
 	@Test
 	public void genericTests() {
@@ -37,23 +36,6 @@ public class TestImplHarrisCorner_S16 extends GenericCornerIntensityGradientTest
 
 	@Override
 	public void computeIntensity( GrayF32 intensity ) {
-		detector.process(derivX_I16,derivY_I16,intensity);
-	}
-
-	@Test
-	public void checkOverflow() {
-		detector.totalXX = (1<<18)+10;
-		detector.totalYY = (1<<20)+50;
-		detector.totalXY = (1<<16)+5;
-
-		long totalXX = detector.totalXX;
-		long totalYY = detector.totalYY;
-		long totalXY = detector.totalXY;
-
-		float trace = totalXX + totalYY;
-		float expected = (totalXX * totalYY - totalXY * totalXY) - detector.kappa * trace*trace;
-
-		float found = detector.computeIntensity();
-		assertEquals(expected,found,1e-4);
+//		detector.process(derivX_F32,derivY_F32,intensity);
 	}
 }

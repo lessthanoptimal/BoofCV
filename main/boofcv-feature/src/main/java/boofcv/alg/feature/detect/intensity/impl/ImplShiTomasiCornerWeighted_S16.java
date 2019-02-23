@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,6 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity;
-import boofcv.struct.image.GrayS16;
 
 /**
  * <p>
@@ -30,7 +29,7 @@ import boofcv.struct.image.GrayS16;
  * @author Peter Abeles
  */
 public class ImplShiTomasiCornerWeighted_S16 extends ImplSsdCornerWeighted_S16
-		implements ShiTomasiCornerIntensity<GrayS16>
+		implements ShiTomasiCornerIntensity
 {
 	public ImplShiTomasiCornerWeighted_S16(int radius) {
 		super(radius);

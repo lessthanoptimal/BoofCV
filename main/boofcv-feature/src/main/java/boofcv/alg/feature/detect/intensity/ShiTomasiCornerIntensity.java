@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,8 +17,6 @@
  */
 
 package boofcv.alg.feature.detect.intensity;
-
-import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
@@ -44,6 +42,6 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface ShiTomasiCornerIntensity<T extends ImageGray<T>> extends GradientCornerIntensity<T> {
+public interface ShiTomasiCornerIntensity {
 
 }

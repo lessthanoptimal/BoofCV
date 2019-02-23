@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,9 +56,9 @@ public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends Image
 	protected D2 horizYY;
 
 	// used to keep track of where it is in the image
-	protected int x, y;
+//	protected int x, y;
 
-	public ImplSsdCornerBase( int windowRadius , Class<D2> secondDerivType ) {
+	protected ImplSsdCornerBase( int windowRadius , Class<D2> secondDerivType ) {
 		this.radius = windowRadius;
 
 		horizXX = GeneralizedImageOps.createSingleBand(secondDerivType,1,1);
@@ -66,7 +66,7 @@ public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends Image
 		horizYY = GeneralizedImageOps.createSingleBand(secondDerivType,1,1);
 	}
 
-	public void setImageShape( int imageWidth, int imageHeight ) {
+	protected void setImageShape( int imageWidth, int imageHeight ) {
 		horizXX.reshape(imageWidth,imageHeight);
 		horizYY.reshape(imageWidth,imageHeight);
 		horizXY.reshape(imageWidth,imageHeight);
@@ -77,12 +77,6 @@ public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends Image
 		return radius;
 	}
 
-	/**
-	 * Computes the pixel's corner intensity.
-	 * @return corner intensity.
-	 */
-	protected abstract float computeIntensity();
-
 	@Override
 	public int getIgnoreBorder() {
 		return radius;
@@ -90,7 +84,8 @@ public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends Image
 
 	@Override
 	public void process(D derivX, D derivY, GrayF32 intensity ) {
-		InputSanityCheck.checkSameShape(derivX,derivY,intensity);
+		InputSanityCheck.checkSameShape(derivX,derivY);
+		intensity.reshape(derivX.width,derivY.height);
 
 		setImageShape(derivX.getWidth(),derivX.getHeight());
 		this.derivX = derivX;
@@ -107,5 +102,21 @@ public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends Image
 	protected abstract void horizontal();
 
 	protected abstract void vertical(GrayF32 intensity);
+
+	public interface CornerIntensity_S32 {
+		/**
+		 * Computes the pixel's corner intensity.
+		 * @return corner intensity.
+		 */
+		float compute(int totalXX, int totalXY , int totalYY );
+	}
+
+	public interface CornerIntensity_F32 {
+		/**
+		 * Computes the pixel's corner intensity.
+		 * @return corner intensity.
+		 */
+		float compute(float totalXX, float totalXY , float totalYY );
+	}
 
 }

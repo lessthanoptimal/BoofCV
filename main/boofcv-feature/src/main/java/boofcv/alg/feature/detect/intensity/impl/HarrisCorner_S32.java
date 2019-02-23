@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,22 +19,20 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
-import boofcv.struct.image.GrayS16;
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.detect.intensity.HarrisCornerIntensity} based off of {@link ImplSsdCorner_S16}.
+ * Implementation of {@link boofcv.alg.feature.detect.intensity.HarrisCornerIntensity}.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImplHarrisCorner_S16 extends ImplSsdCorner_S16 implements HarrisCornerIntensity<GrayS16> {
+public class HarrisCorner_S32 implements ImplSsdCornerBase.CornerIntensity_S32 , HarrisCornerIntensity {
 
 	// tuning parameter
 	float kappa;
 
-	public ImplHarrisCorner_S16(int windowRadius, float kappa) {
-		super(windowRadius);
+	public HarrisCorner_S32(float kappa) {
 		this.kappa = kappa;
 	}
 
@@ -44,9 +42,9 @@ public class ImplHarrisCorner_S16 extends ImplSsdCorner_S16 implements HarrisCor
 	}
 
 	@Override
-	protected float computeIntensity() {
+	public float compute( int _totalXX, int _totalXY, int _totalYY ) {
 		// det(A) -+ kappa*trace(A)^2
-		float totalXX = this.totalXX, totalYY = this.totalYY, totalXY = this.totalXY;
+		float totalXX = _totalXX, totalYY = _totalYY, totalXY = _totalXY;
 		float trace = totalXX + totalYY;
 
 		return (totalXX * totalYY - totalXY * totalXY) - kappa * trace*trace;

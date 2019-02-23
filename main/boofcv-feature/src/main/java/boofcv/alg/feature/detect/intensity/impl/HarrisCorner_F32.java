@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,21 +19,19 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
-import boofcv.struct.image.GrayF32;
 
 /**
  * <p>
- * Implementation of {@link boofcv.alg.feature.detect.intensity.HarrisCornerIntensity} based off of {@link ImplSsdCorner_F32}.
+ * Implementation of {@link boofcv.alg.feature.detect.intensity.HarrisCornerIntensity}.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImplHarrisCorner_F32 extends ImplSsdCorner_F32 implements HarrisCornerIntensity<GrayF32> {
+public class HarrisCorner_F32 implements ImplSsdCornerBase.CornerIntensity_F32, HarrisCornerIntensity {
 
 	float kappa;
 
-	public ImplHarrisCorner_F32(int windowRadius, float kappa) {
-		super(windowRadius);
+	public HarrisCorner_F32(float kappa) {
 		this.kappa = kappa;
 	}
 
@@ -43,7 +41,7 @@ public class ImplHarrisCorner_F32 extends ImplSsdCorner_F32 implements HarrisCor
 	}
 
 	@Override
-	protected float computeIntensity() {
+	public float compute( float totalXX, float totalXY, float totalYY ) {
 		// det(A) - kappa*trace(A)^2
 		float trace = totalXX + totalYY;
 		return (totalXX * totalYY - totalXY * totalXY) - kappa * trace*trace;

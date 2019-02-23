@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestImplSsdCorner_F32 {
+class TestImplSsdCorner_F32 {
 
 	Random rand = new Random(234);
 	int width = 40;
@@ -52,7 +52,7 @@ public class TestImplSsdCorner_F32 {
 	 * Manually compute intensity values and see if they are the same
 	 */
 	@Test
-	public void compareToManual() {
+	void compareToManual() {
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		GradientSobel.process(input,derivX,derivY, GImageDerivativeOps.borderDerivative_F32());
@@ -68,9 +68,21 @@ public class TestImplSsdCorner_F32 {
 			}
 		}
 
-		Sdd alg = new Sdd(radius);
+		GrayF32 output = new GrayF32(width,height);
 
-		alg.process(derivX,derivY, new GrayF32(width,height));
+		ImplSsdCorner_F32 alg = new ImplSsdCorner_F32(radius,new MockSum());
+		alg.process(derivX,derivY, output);
+
+		for( int y = radius; y < height-radius; y++ ) {
+			for (int x = radius; x < width-radius; x++) {
+				float xx = sum(x,y,derivXX);
+				float xy = sum(x,y,derivXY);
+				float yy = sum(x,y,derivYY);
+
+				assertEquals(xx+xy+yy, output.get(x,y), 1);
+			}
+		}
+
 	}
 	
 	public float sum( int x , int y , GrayF32 img ) {
@@ -86,29 +98,12 @@ public class TestImplSsdCorner_F32 {
 		
 		return ret;
 	}
-	
-	private class Sdd extends ImplSsdCorner_F32 {
 
-		int count = 0;
-		
-		public Sdd(int radius) {
-			super(radius);
-		}
-
+	private class MockSum implements ImplSsdCornerBase.CornerIntensity_F32
+	{
 		@Override
-		protected float computeIntensity() {
-
-			float xx = sum(x,y,derivXX);
-			float xy = sum(x,y,derivXY);
-			float yy = sum(x,y,derivYY);
-
-			// take in account rounding error
-			assertEquals(xx, totalXX, 1);
-			assertEquals(xy, totalXY, 1);
-			assertEquals(yy, totalYY, 1);
-
-			count++;
-			return 0;
+		public float compute(float totalXX, float totalXY, float totalYY) {
+			return totalXX + totalXY + totalYY;
 		}
 	}
 }

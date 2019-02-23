@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
+import boofcv.concurrency.IWorkArrays;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayS32;
@@ -36,29 +37,20 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.feature.detect.intensity.impl.GenerateImplSsdCorner")
-public abstract class ImplSsdCorner_S16 extends ImplSsdCornerBase<GrayS16,GrayS32> {
+public class ImplSsdCorner_S16 extends ImplSsdCornerBase<GrayS16,GrayS32> {
 
-	// temporary storage for convolution along in the vertical axis.
-	private int tempXX[] = new int[1];
-	private int tempXY[] = new int[1];
-	private int tempYY[] = new int[1];
+	private IWorkArrays work = new IWorkArrays();
+	private CornerIntensity_S32 intensity;
 
-	// defines the A matrix, from which the eigenvalues are computed
-	protected int totalXX, totalYY, totalXY;
-
-	public ImplSsdCorner_S16( int windowRadius) {
+	public ImplSsdCorner_S16( int windowRadius, CornerIntensity_S32 intensity) {
 		super(windowRadius,GrayS32.class);
+		this.intensity = intensity;
 	}
 
 	@Override
-	public void setImageShape( int imageWidth, int imageHeight ) {
+	protected void setImageShape( int imageWidth, int imageHeight ) {
 		super.setImageShape(imageWidth,imageHeight);
-
-		if( tempXX.length < imageWidth ) {
-			tempXX = new int[imageWidth];
-			tempXY = new int[imageWidth];
-			tempYY = new int[imageWidth];
-		}
+		work.reset(imageWidth);
 	}
 
 /**
@@ -81,6 +73,7 @@ public abstract class ImplSsdCorner_S16 extends ImplSsdCornerBase<GrayS16,GrayS3
 
 		int radp1 = radius + 1;
 
+		//CONCURRENT_BELOW BoofConcurrency.range(0,imgHeight,row->{
 		for (int row = 0; row < imgHeight; row++) {
 
 			int pix = row * imgWidth;
@@ -130,6 +123,7 @@ public abstract class ImplSsdCorner_S16 extends ImplSsdCornerBase<GrayS16,GrayS3
 				hYY[pix - radius] = totalYY;
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	/**
@@ -153,10 +147,15 @@ public abstract class ImplSsdCorner_S16 extends ImplSsdCornerBase<GrayS16,GrayS3
 
 		final int backStep = kernelWidth * imgWidth;
 
-		for (x = startX; x < endX; x++) {
+		// temporary storage for convolution along in the vertical axis.
+		int y0 = radius, y1 = imgHeight-radius;
+		final int[] tempXX = work.pop();
+		final int[] tempXY = work.pop();
+		final int[] tempYY = work.pop();
+		for (int x = startX; x < endX; x++) {
 			int srcIndex = x;
-			int destIndex = imgWidth * radius + x;
-			totalXX = totalXY = totalYY = 0;
+			int destIndex = imgWidth * y0 + x;
+			int totalXX = 0, totalXY = 0, totalYY = 0;
 
 			int indexEnd = srcIndex + imgWidth * kernelWidth;
 			for (; srcIndex < indexEnd; srcIndex += imgWidth) {
@@ -169,28 +168,29 @@ public abstract class ImplSsdCorner_S16 extends ImplSsdCornerBase<GrayS16,GrayS3
 			tempXY[x] = totalXY;
 			tempYY[x] = totalYY;
 
-			y = radius;
 			// compute the eigen values
-			inten[destIndex] = computeIntensity();
+			inten[destIndex] = this.intensity.compute(totalXX,totalXY,totalYY);
 			destIndex += imgWidth;
-			y++;
 		}
 
 		// change the order it is processed in to reduce cache misses
-		for (y = radius + 1; y < imgHeight - radius; y++) {
+		for (int y = y0 + 1; y < y1; y++) {
 			int srcIndex = (y + radius) * imgWidth + startX;
 			int destIndex = y * imgWidth + startX;
 
-			for (x = startX; x < endX; x++, srcIndex++, destIndex++) {
-				totalXX = tempXX[x] - hXX[srcIndex - backStep];
+			for (int x = startX; x < endX; x++, srcIndex++, destIndex++) {
+				int totalXX = tempXX[x] - hXX[srcIndex - backStep];
 				tempXX[x] = totalXX += hXX[srcIndex];
-				totalXY = tempXY[x] - hXY[srcIndex - backStep];
+				int totalXY = tempXY[x] - hXY[srcIndex - backStep];
 				tempXY[x] = totalXY += hXY[srcIndex];
-				totalYY = tempYY[x] - hYY[srcIndex - backStep];
+				int totalYY = tempYY[x] - hYY[srcIndex - backStep];
 				tempYY[x] = totalYY += hYY[srcIndex];
 
-				inten[destIndex] = computeIntensity();
+				inten[destIndex] = this.intensity.compute(totalXX,totalXY,totalYY);
 			}
 		}
+		work.recycle(tempXX);
+		work.recycle(tempXY);
+		work.recycle(tempYY);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,6 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.struct.image.ImageGray;
-
 /**
  * <p>
  * The Harris corner detector [1] is similar to the {@link ShiTomasiCornerIntensity} but avoids computing the eigenvalues
@@ -37,19 +35,19 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public interface HarrisCornerIntensity<T extends ImageGray<T>> extends GradientCornerIntensity<T> {
+public interface HarrisCornerIntensity {
 
 	/**
 	 * Returns the value of the tuning parameter.
 	 *
 	 * @return tuning parameter
 	 */
-	public float getKappa();
+	float getKappa();
 
 	/**
 	 * Sets the tuning parameter.
 	 *
 	 * @param kappa parameter
 	 */
-	public void setKappa(float kappa);
+	void setKappa(float kappa);
 }
