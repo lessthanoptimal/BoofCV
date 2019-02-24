@@ -39,7 +39,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -56,7 +56,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -73,7 +73,7 @@ public class ImplPixelMath {
 							   int[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -90,7 +90,7 @@ public class ImplPixelMath {
 							   long[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -107,7 +107,7 @@ public class ImplPixelMath {
 							   float[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -124,7 +124,7 @@ public class ImplPixelMath {
 							   double[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -141,7 +141,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -158,7 +158,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -175,7 +175,7 @@ public class ImplPixelMath {
 							   int[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -192,7 +192,7 @@ public class ImplPixelMath {
 							   long[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -209,7 +209,7 @@ public class ImplPixelMath {
 							   float[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -226,7 +226,7 @@ public class ImplPixelMath {
 							   double[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -244,7 +244,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -262,7 +262,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -280,7 +280,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -298,7 +298,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -316,7 +316,7 @@ public class ImplPixelMath {
 							   int[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -334,7 +334,7 @@ public class ImplPixelMath {
 							   long[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -352,7 +352,7 @@ public class ImplPixelMath {
 							   float[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -370,7 +370,7 @@ public class ImplPixelMath {
 							   double[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -388,7 +388,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -409,7 +409,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -430,7 +430,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -451,7 +451,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -472,7 +472,7 @@ public class ImplPixelMath {
 							   int[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -493,7 +493,7 @@ public class ImplPixelMath {
 							   long[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -514,7 +514,7 @@ public class ImplPixelMath {
 							   float[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -535,7 +535,7 @@ public class ImplPixelMath {
 							   double[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -556,7 +556,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -574,7 +574,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -592,7 +592,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -610,7 +610,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -628,7 +628,7 @@ public class ImplPixelMath {
 							   int[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -646,7 +646,7 @@ public class ImplPixelMath {
 							   long[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -664,7 +664,7 @@ public class ImplPixelMath {
 							   float[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -682,7 +682,7 @@ public class ImplPixelMath {
 							   double[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -700,7 +700,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -721,7 +721,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -742,7 +742,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -763,7 +763,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -784,7 +784,7 @@ public class ImplPixelMath {
 							   int[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -805,7 +805,7 @@ public class ImplPixelMath {
 							   long[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -826,7 +826,7 @@ public class ImplPixelMath {
 							   float[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -847,7 +847,7 @@ public class ImplPixelMath {
 							   double[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -868,7 +868,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -886,7 +886,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -904,7 +904,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -922,7 +922,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -940,7 +940,7 @@ public class ImplPixelMath {
 							   int[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -958,7 +958,7 @@ public class ImplPixelMath {
 							   long[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -976,7 +976,7 @@ public class ImplPixelMath {
 							   float[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -994,7 +994,7 @@ public class ImplPixelMath {
 							   double[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1012,7 +1012,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1033,7 +1033,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1054,7 +1054,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1075,7 +1075,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1096,7 +1096,7 @@ public class ImplPixelMath {
 							   int[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1117,7 +1117,7 @@ public class ImplPixelMath {
 							   long[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1138,7 +1138,7 @@ public class ImplPixelMath {
 							   float[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1159,7 +1159,7 @@ public class ImplPixelMath {
 							   double[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1180,7 +1180,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1198,7 +1198,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1216,7 +1216,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1234,7 +1234,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1252,7 +1252,7 @@ public class ImplPixelMath {
 							   int[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1270,7 +1270,7 @@ public class ImplPixelMath {
 							   long[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1288,7 +1288,7 @@ public class ImplPixelMath {
 							   float[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1306,7 +1306,7 @@ public class ImplPixelMath {
 							   double[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1324,7 +1324,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1345,7 +1345,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1366,7 +1366,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1387,7 +1387,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1408,7 +1408,7 @@ public class ImplPixelMath {
 							   int[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1429,7 +1429,7 @@ public class ImplPixelMath {
 							   long[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1450,7 +1450,7 @@ public class ImplPixelMath {
 							   float[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1471,7 +1471,7 @@ public class ImplPixelMath {
 							   double[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1492,7 +1492,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1510,7 +1510,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1528,7 +1528,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1546,7 +1546,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1564,7 +1564,7 @@ public class ImplPixelMath {
 							   int[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1582,7 +1582,7 @@ public class ImplPixelMath {
 							   long[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1600,7 +1600,7 @@ public class ImplPixelMath {
 							   float[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1618,7 +1618,7 @@ public class ImplPixelMath {
 							   double[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1636,7 +1636,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1657,7 +1657,7 @@ public class ImplPixelMath {
 							   byte[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1678,7 +1678,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1699,7 +1699,7 @@ public class ImplPixelMath {
 							   short[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1720,7 +1720,7 @@ public class ImplPixelMath {
 							   int[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1741,7 +1741,7 @@ public class ImplPixelMath {
 							   long[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1762,7 +1762,7 @@ public class ImplPixelMath {
 							   float[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1783,7 +1783,7 @@ public class ImplPixelMath {
 							   double[] output , int outputStart , int outputStride ,
 							   int rows , int cols )
 	{
-		//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{
 		for( int y = 0; y < rows; y++ ) {
 			int indexSrc = inputStart + y*inputStride;
 			int indexDst = outputStart + y*outputStride;
@@ -1805,7 +1805,7 @@ public class ImplPixelMath {
 
 		byte[] data = img.data;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
 			int indexEnd = index+w;
@@ -1826,7 +1826,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -1847,7 +1847,7 @@ public class ImplPixelMath {
 
 		byte[] data = img.data;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
 			int indexEnd = index+w;
@@ -1868,7 +1868,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -1889,7 +1889,7 @@ public class ImplPixelMath {
 
 		short[] data = img.data;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
 			int indexEnd = index+w;
@@ -1910,7 +1910,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -1931,7 +1931,7 @@ public class ImplPixelMath {
 
 		short[] data = img.data;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
 			int indexEnd = index+w;
@@ -1952,7 +1952,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -1973,7 +1973,7 @@ public class ImplPixelMath {
 
 		int[] data = img.data;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
 			int indexEnd = index+w;
@@ -1994,7 +1994,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2015,7 +2015,7 @@ public class ImplPixelMath {
 
 		long[] data = img.data;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
 			int indexEnd = index+w;
@@ -2036,7 +2036,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2057,7 +2057,7 @@ public class ImplPixelMath {
 
 		float[] data = img.data;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
 			int indexEnd = index+w;
@@ -2078,7 +2078,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2099,7 +2099,7 @@ public class ImplPixelMath {
 
 		double[] data = img.data;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
 			int indexEnd = index+w;
@@ -2120,7 +2120,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2140,7 +2140,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2160,7 +2160,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2180,7 +2180,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2200,7 +2200,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2220,7 +2220,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2240,7 +2240,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2260,7 +2260,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2280,7 +2280,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2300,7 +2300,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2320,7 +2320,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2340,7 +2340,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2360,7 +2360,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2380,7 +2380,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2400,7 +2400,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2420,7 +2420,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2440,7 +2440,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2456,7 +2456,7 @@ public class ImplPixelMath {
 	}
 
 	public static void log( GrayF32 input , GrayF32 output ) {
-		//CONCURRENT_BELOW BoofConcurrency.range(0,input.height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
 			int indexDst = output.startIndex + y* output.stride;
@@ -2471,7 +2471,7 @@ public class ImplPixelMath {
 
 	public static void pow2( GrayF32 input , GrayF32 output ) {
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,input.height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
 			int indexDst = output.startIndex + y* output.stride;
@@ -2487,7 +2487,7 @@ public class ImplPixelMath {
 
 	public static void sqrt( GrayF32 input , GrayF32 output ) {
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,input.height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
 			int indexDst = output.startIndex + y* output.stride;
@@ -2505,7 +2505,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2525,7 +2525,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2545,7 +2545,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2565,7 +2565,7 @@ public class ImplPixelMath {
 		final int h = imgA.getHeight();
 		final int w = imgA.getWidth();
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for (int y = 0; y < h; y++) {
 			int indexA = imgA.getStartIndex() + y * imgA.getStride();
 			int indexB = imgB.getStartIndex() + y * imgB.getStride();
@@ -2581,7 +2581,7 @@ public class ImplPixelMath {
 	}
 
 	public static void log( GrayF64 input , GrayF64 output ) {
-		//CONCURRENT_BELOW BoofConcurrency.range(0,input.height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
 			int indexDst = output.startIndex + y* output.stride;
@@ -2596,7 +2596,7 @@ public class ImplPixelMath {
 
 	public static void pow2( GrayF64 input , GrayF64 output ) {
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,input.height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
 			int indexDst = output.startIndex + y* output.stride;
@@ -2612,7 +2612,7 @@ public class ImplPixelMath {
 
 	public static void sqrt( GrayF64 input , GrayF64 output ) {
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,input.height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
 			int indexDst = output.startIndex + y* output.stride;

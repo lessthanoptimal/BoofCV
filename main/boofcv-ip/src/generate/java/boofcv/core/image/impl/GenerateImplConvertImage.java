@@ -94,7 +94,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				"\n" +
 				"\t\tif (input.isSubimage() || output.isSubimage()) {\n" +
 				"\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {\n" +
 				"\t\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\t\tint indexSrc = input.getIndex(0, y);\n" +
 				"\t\t\t\tint indexDst = output.getIndex(0, y);\n" +
@@ -113,7 +113,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 			out.print("\t\t\tSystem.arraycopy(input.data, 0, output.data, 0, N);\n");
 		} else {
 			out.print(
-					"\t\t\t//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{\n" +
+					"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0,N,(i0,i1)->{\n" +
 					"\t\t\tint i0 = 0, i1 = N;\n" +
 					"\t\t\tfor (int i = i0; i < i1; i++) {\n" +
 					"\t\t\t\toutput.data[i] = "+typeCast+"( input.data[i] "+bitWise+");\n" +
@@ -144,7 +144,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				"\t\tif (input.isSubimage() || output.isSubimage()) {\n" +
 				"\t\t\tfinal int N = input.width * input.getNumBands();\n" +
 				"\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {\n" +
 				"\t\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\t\tint indexSrc = input.getIndex(0, y);\n" +
 				"\t\t\t\tint indexDst = output.getIndex(0, y);\n" +
@@ -163,7 +163,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 			out.print("\t\t\tSystem.arraycopy(input.data, 0, output.data, 0, N);\n");
 		} else {
 			out.print(
-					"\t\t\t//CONCURRENT_BELOW BoofConcurrency.blocks(0,N,(i0,i1)->{\n" +
+					"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0,N,(i0,i1)->{\n" +
 					"\t\t\tint i0 = 0, i1 = N;\n" +
 					"\t\t\tfor (int i = i0; i < i1; i++) {\n" +
 					"\t\t\t\toutput.data[i] = "+typeCast+"( input.data[i] "+bitWise+");\n" +
@@ -186,7 +186,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				"\t\t\t"+bandName+" band = output.bands[i];\n" +
 				"\t\t\tfinal int offset = i;\n" +
 				"\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {\n" +
 				"\t\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\t\tint indexSrc = y*input.stride + input.startIndex + offset;\n" +
 				"\t\t\t\tint indexDst = y*output.stride + output.startIndex;\n" +
@@ -218,7 +218,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 						"\t\t\t"+bandName+" band = output.bands[i];\n" +
 						"\t\t\tfinal int offset = i;\n" +
 						"\n" +
-						"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {\n" +
+						"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {\n" +
 						"\t\t\tfor (int y = 0; y < input.height; y++) {\n" +
 						"\t\t\t\tint indexSrc = y*input.stride + input.startIndex + offset;\n" +
 						"\t\t\t\tint indexDst = y*output.stride + output.startIndex;\n" +
@@ -245,7 +245,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 				"\t\t\t"+bandName+" band = input.bands[i];\n" +
 				"\t\t\tfinal int offset = i;\n" +
 				"\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {\n" +
 				"\t\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\t\tint indexSrc = y * input.stride + input.startIndex;\n" +
 				"\t\t\t\tint indexDst = y * output.stride + output.startIndex + offset;\n" +
@@ -280,7 +280,7 @@ public class GenerateImplConvertImage extends CodeGeneratorBase {
 						"\t\t\t"+bandName+" band = input.bands[i];\n" +
 						"\t\t\tfinal int offset = i;\n" +
 						"\n" +
-						"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {\n" +
+						"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {\n" +
 						"\t\t\tfor (int y = 0; y < input.height; y++) {\n" +
 						"\t\t\t\tint indexSrc = y * input.stride + input.startIndex;\n" +
 						"\t\t\t\tint indexDst = y * output.stride + output.startIndex + offset;\n" +

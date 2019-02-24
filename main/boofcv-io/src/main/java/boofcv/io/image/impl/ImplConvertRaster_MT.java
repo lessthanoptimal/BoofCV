@@ -53,7 +53,7 @@ public class ImplConvertRaster_MT {
 			if (dst.startIndex == 0 && dst.width == dst.stride && srcStrideDiff == 0 && srcOffset == 0 )
 				System.arraycopy(srcData, 0, dst.data, 0, size);
 			else {
-				BoofConcurrency.range(0, dst.height, y -> {
+				BoofConcurrency.loopFor(0, dst.height, y -> {
 					int indexDst = dst.startIndex + dst.stride * y;
 					int indexSrc = srcOffset + srcStride * y;
 
@@ -66,7 +66,7 @@ public class ImplConvertRaster_MT {
 	}
 
 	public static void from_4BU8_to_U8(byte[] srcData, int srcStride, int srcOffset, GrayU8 dst) {
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexSrc = srcOffset + y*srcStride;
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
@@ -87,7 +87,7 @@ public class ImplConvertRaster_MT {
 		if (dst.startIndex == 0 && dst.width == dst.stride && srcStrideDiff == 0 && srcOffset == 0 )
 			System.arraycopy(srcData, 0, dst.data, 0, size);
 		else {
-			BoofConcurrency.range(0, dst.height, y -> {
+			BoofConcurrency.loopFor(0, dst.height, y -> {
 				int indexDst = dst.startIndex + dst.stride * y;
 				int indexSrc = srcOffset + srcStride * y;
 
@@ -98,7 +98,7 @@ public class ImplConvertRaster_MT {
 
 	public static void from_3BU8_to_U8(byte[] srcData, int srcStride, int srcOffset, GrayU8 dst) {
 
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexSrc = srcOffset + y*srcStride;
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
@@ -115,7 +115,7 @@ public class ImplConvertRaster_MT {
 	}
 
 	public static void from_4BU8_to_F32(byte[] srcData, int srcStride, int srcOffset, GrayF32 dst) {
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexSrc = srcOffset + y*srcStride;
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
@@ -133,7 +133,7 @@ public class ImplConvertRaster_MT {
 	}
 
 	public static void from_1BU8_to_F32(byte[] srcData, int srcStride, int srcOffset, GrayF32 dst) {
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
 			int indexSrc = srcOffset + srcStride * y;
@@ -145,7 +145,7 @@ public class ImplConvertRaster_MT {
 	}
 
 	public static void from_3BU8_to_F32(byte[] srcData, int srcStride, int srcOffset, GrayF32 dst) {
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexSrc = srcOffset + y*srcStride;
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
@@ -172,7 +172,7 @@ public class ImplConvertRaster_MT {
 
 		int length = dst.width*dst.numBands;
 
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexSrc = srcOffset + y*srcStride;
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + length;
@@ -190,7 +190,7 @@ public class ImplConvertRaster_MT {
 
 		int length = dst.width*dst.numBands;
 
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexDst = dst.startIndex + y*dst.stride;
 			int indexSrc = srcOffset + y*srcStride;
 
@@ -204,7 +204,7 @@ public class ImplConvertRaster_MT {
 		float[] band3 = dst.getBand(2).data;
 		float[] band4 = dst.getBand(3).data;
 
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexSrc = srcOffset + y*srcStride;
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
@@ -220,7 +220,7 @@ public class ImplConvertRaster_MT {
 	public static void from_1BU8_to_PLF32(byte[] srcData, int srcStride, int srcOffset, Planar<GrayF32> dst) {
 		float[] data = dst.getBand(0).data;
 
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexSrc = srcOffset + y*srcStride;
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
@@ -237,7 +237,7 @@ public class ImplConvertRaster_MT {
 		float[] band3 = dst.getBand(2).data;
 
 
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexSrc = srcOffset + y*srcStride;
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
@@ -256,7 +256,7 @@ public class ImplConvertRaster_MT {
 		byte[] band4 = dst.getBand(3).data;
 
 
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexSrc = srcOffset + y*srcStride;
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
@@ -272,7 +272,7 @@ public class ImplConvertRaster_MT {
 	public static void from_1BU8_to_PLU8(byte[] srcData, int srcStride, int srcOffset, Planar<GrayU8> dst) {
 		byte dstData[] = dst.getBand(0).data;
 
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexSrc = srcOffset + y*srcStride;
 			int indexDst = dst.startIndex + dst.stride * y;
 
@@ -285,7 +285,7 @@ public class ImplConvertRaster_MT {
 		byte[] band2 = dst.getBand(1).data;
 		byte[] band3 = dst.getBand(2).data;
 
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexSrc = srcOffset + y*srcStride;
 			int indexDst = dst.startIndex + dst.stride * y;
 			int indexDstEnd = indexDst + dst.width;
@@ -309,7 +309,7 @@ public class ImplConvertRaster_MT {
 		int srcOffset = getOffset(src);
 
 
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexSrc = srcOffset + y*srcStride;
 			int indexDst = dst.startIndex + y * dst.stride;
 			for (int x = 0; x < dst.width; x++) {
@@ -338,7 +338,7 @@ public class ImplConvertRaster_MT {
 		int srcStride = stride(src);
 		int srcOffset = getOffset(src);
 
-		BoofConcurrency.range(0, dst.height, y -> {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexSrc = srcOffset + y*srcStride;
 			int indexDst = dst.startIndex + y * dst.stride;
 			for (int x = 0; x < dst.width; x++) {
@@ -371,7 +371,7 @@ public class ImplConvertRaster_MT {
 		byte[] data3 = dst.getBand(2).data;
 
 		if( numBands == 3 ) {
-			BoofConcurrency.range(0, dst.height, y -> {
+			BoofConcurrency.loopFor(0, dst.height, y -> {
 				int indexSrc = srcOffset + y*srcStride;
 				int indexDst = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < dst.width; x++, indexDst++) {
@@ -386,7 +386,7 @@ public class ImplConvertRaster_MT {
 		} else if( numBands == 4 ) {
 			byte[] data4 = dst.getBand(3).data;
 
-			BoofConcurrency.range(0, dst.height, y -> {
+			BoofConcurrency.loopFor(0, dst.height, y -> {
 				int indexSrc = srcOffset + y*srcStride;
 				int indexDst = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < dst.width; x++, indexDst++) {
@@ -418,7 +418,7 @@ public class ImplConvertRaster_MT {
 		int numBands = src.getNumBands();
 
 		if( numBands == 3 ) {
-			BoofConcurrency.range(0, dst.height, y -> {
+			BoofConcurrency.loopFor(0, dst.height, y -> {
 				int indexSrc = srcOffset + y*srcStride;
 				int indexDst = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < dst.width; x++, indexDst++) {
@@ -433,7 +433,7 @@ public class ImplConvertRaster_MT {
 		} else if( numBands == 4 ) {
 			float[] data4 = dst.getBand(3).data;
 
-			BoofConcurrency.range(0, dst.height, y -> {
+			BoofConcurrency.loopFor(0, dst.height, y -> {
 				int indexSrc = srcOffset + y*srcStride;
 				int indexDst = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < dst.width; x++, indexDst++) {
@@ -460,7 +460,7 @@ public class ImplConvertRaster_MT {
 
 		int numBands = src.getNumBands();
 		if( numBands == 3 ) {
-			BoofConcurrency.range(0, dst.height, y -> {
+			BoofConcurrency.loopFor(0, dst.height, y -> {
 				int indexSrc = srcOffset + y*srcStride;
 				int indexDst = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < dst.width; x++) {
@@ -474,7 +474,7 @@ public class ImplConvertRaster_MT {
 			});
 		} else if( numBands == 4 ) {
 
-			BoofConcurrency.range(0, dst.height, y -> {
+			BoofConcurrency.loopFor(0, dst.height, y -> {
 				int indexSrc = srcOffset + y*srcStride;
 				int indexDst = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < dst.width; x++) {
@@ -499,7 +499,7 @@ public class ImplConvertRaster_MT {
 		int numBands = src.getNumBands();
 
 		if( numBands == 3 ) {
-			BoofConcurrency.range(0, dst.height, y -> {
+			BoofConcurrency.loopFor(0, dst.height, y -> {
 				int indexSrc = srcOffset + y*srcStride;
 				int indexDst = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < dst.width; x++) {
@@ -512,7 +512,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else if( numBands == 4 ) {
-			BoofConcurrency.range(0, dst.height, y -> {
+			BoofConcurrency.loopFor(0, dst.height, y -> {
 				int indexSrc = srcOffset + y*srcStride;
 				int indexDst = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < dst.width; x++) {
@@ -539,7 +539,7 @@ public class ImplConvertRaster_MT {
 			WritableRaster raster = src.getRaster();
 			int hack[] = new int[1];
 
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int index = dstStartIndex + y * dstStride;
 				for (int x = 0; x < width; x++) {
 					raster.getPixel(x, y, hack);
@@ -548,7 +548,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int index = dstStartIndex + y * dstStride;
 				for (int x = 0; x < width; x++) {
 					int argb = src.getRGB(x, y);
@@ -585,7 +585,7 @@ public class ImplConvertRaster_MT {
 			WritableRaster raster = src.getRaster();
 			int hack[] = new int[1];
 
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int index = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < width; x++) {
 					raster.getPixel(x, y, hack);
@@ -596,7 +596,7 @@ public class ImplConvertRaster_MT {
 		} else {
 			// this will be totally garbage.  just here so that some unit test will pass
 
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int index = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < width; x++) {
 					int argb = src.getRGB(x, y);
@@ -617,7 +617,7 @@ public class ImplConvertRaster_MT {
 			WritableRaster raster = src.getRaster();
 			float hack[] = new float[1];
 
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int index = dstStartIndex + y * dstStride;
 				for (int x = 0; x < width; x++) {
 					raster.getPixel(x, y, hack);
@@ -626,7 +626,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int index = dstStartIndex + y * dstStride;
 				for (int x = 0; x < width; x++) {
 					int argb = src.getRGB(x, y);
@@ -665,7 +665,7 @@ public class ImplConvertRaster_MT {
 			byte[] band2 = dst.getBand(1).data;
 			byte[] band3 = dst.getBand(2).data;
 
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int index = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < width; x++, index++) {
 					int argb = src.getRGB(x, y);
@@ -705,7 +705,7 @@ public class ImplConvertRaster_MT {
 			final float[] band2 = dst.getBand(1).data;
 			final float[] band3 = dst.getBand(2).data;
 
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int index = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < width; x++, index++) {
 					int argb = src.getRGB(x, y);
@@ -721,7 +721,7 @@ public class ImplConvertRaster_MT {
 			final float[] band3 = dst.getBand(2).data;
 			final float[] band4 = dst.getBand(3).data;
 
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int index = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < width; x++, index++) {
 					int argb = src.getRGB(x, y);
@@ -744,7 +744,7 @@ public class ImplConvertRaster_MT {
 		final int height = src.getHeight();
 
 		if (dst.getNumBands() == 3) {
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int indexDst = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < width; x++) {
 					int argb = src.getRGB(x, y);
@@ -755,7 +755,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else if (dst.getNumBands() == 4) {
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int indexDst = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < width; x++) {
 					int argb = src.getRGB(x, y);
@@ -792,7 +792,7 @@ public class ImplConvertRaster_MT {
 
 		if (dst.getNumBands() == 3) {
 
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int indexDst = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < width; x++) {
 					int argb = src.getRGB(x, y);
@@ -819,7 +819,7 @@ public class ImplConvertRaster_MT {
 		final int size = src.getWidth() * src.getHeight();
 
 		if (numBands == 3) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -836,7 +836,7 @@ public class ImplConvertRaster_MT {
 			if (src.startIndex == 0 && src.width == src.stride) {
 				System.arraycopy(srcData, 0, dstData, 0, size);
 			} else {
-				BoofConcurrency.range(0, src.height, y -> {
+				BoofConcurrency.loopFor(0, src.height, y -> {
 					int indexSrc = src.startIndex + src.stride * y;
 					int indexDst = src.width * y;
 
@@ -844,7 +844,7 @@ public class ImplConvertRaster_MT {
 				});
 			}
 		} else if (numBands == 4) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -871,7 +871,7 @@ public class ImplConvertRaster_MT {
 		final int numBands = dst.getNumBands();
 
 		if (numBands == 3) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -885,7 +885,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else if (numBands == 1) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -895,7 +895,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else if (numBands == 4) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -922,7 +922,7 @@ public class ImplConvertRaster_MT {
 		final int numBands = dst.getNumBands();
 
 		if (numBands == 3) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -936,7 +936,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else if (numBands == 1) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -946,7 +946,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else if (numBands == 4) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -973,7 +973,7 @@ public class ImplConvertRaster_MT {
 		final int numBands = dst.getNumBands();
 
 		if (numBands == 3) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -987,7 +987,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else if (numBands == 1) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -997,7 +997,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else if (numBands == 4) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -1030,7 +1030,7 @@ public class ImplConvertRaster_MT {
 			final byte[] band2 = src.getBand(1).data;
 			final byte[] band3 = src.getBand(2).data;
 
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -1047,7 +1047,7 @@ public class ImplConvertRaster_MT {
 			final byte[] band3 = src.getBand(2).data;
 			final byte[] band4 = src.getBand(3).data;
 
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -1065,7 +1065,7 @@ public class ImplConvertRaster_MT {
 				bands[i] = src.getBand(i).data;
 			}
 
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -1092,7 +1092,7 @@ public class ImplConvertRaster_MT {
 			final float[] band2 = src.getBand(1).data;
 			final float[] band3 = src.getBand(2).data;
 
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -1109,7 +1109,7 @@ public class ImplConvertRaster_MT {
 			final float[] band3 = src.getBand(2).data;
 			final float[] band4 = src.getBand(3).data;
 
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -1127,7 +1127,7 @@ public class ImplConvertRaster_MT {
 				bands[i] = src.getBand(i).data;
 			}
 
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + src.stride * y;
 				int indexSrcEnd = indexSrc + src.width;
 				int indexDst = y*src.width*numBands;
@@ -1148,7 +1148,7 @@ public class ImplConvertRaster_MT {
 		final int numBands = dst.getNumBands();
 
 		if (numBands == 3) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + y * src.stride;
 				int indexDst = y*src.width;
 
@@ -1159,7 +1159,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else if (numBands == 4) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + y * src.stride;
 				int indexDst = y*src.width;
 
@@ -1181,7 +1181,7 @@ public class ImplConvertRaster_MT {
 		final int numBands = dst.getNumBands();
 
 		if (numBands == 3) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + y * src.stride;
 				int indexDst = y*src.width;
 
@@ -1192,7 +1192,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else if (numBands == 4) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + y * src.stride;
 				int indexDst = y*src.width;
 
@@ -1214,7 +1214,7 @@ public class ImplConvertRaster_MT {
 		final int numBands = dst.getNumBands();
 
 		if (numBands == 3) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + y * src.stride;
 				int indexDst = y*src.width;
 
@@ -1225,7 +1225,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else if (numBands == 4) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + y * src.stride;
 				int indexDst = y*src.width;
 
@@ -1254,7 +1254,7 @@ public class ImplConvertRaster_MT {
 		final byte[] band3 = src.getBand(2).data;
 
 		if (numBands == 3) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + y * src.stride;
 				int indexDst = y*src.width;
 
@@ -1269,7 +1269,7 @@ public class ImplConvertRaster_MT {
 		} else if (numBands == 4) {
 			final byte[] band4 = src.getBand(3).data;
 
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + y * src.stride;
 				int indexDst = y*src.width;
 
@@ -1301,7 +1301,7 @@ public class ImplConvertRaster_MT {
 		final float[] band3 = src.getBand(2).data;
 
 		if (numBands == 3) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + y * src.stride;
 				int indexDst = y*src.width;
 
@@ -1316,7 +1316,7 @@ public class ImplConvertRaster_MT {
 		} else if (numBands == 4) {
 			final float[] band4 = src.getBand(3).data;
 
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + y * src.stride;
 				int indexDst = y*src.width;
 
@@ -1340,7 +1340,7 @@ public class ImplConvertRaster_MT {
 		final int height = dst.getHeight();
 
 		byte[] data = src.data;
-		BoofConcurrency.range(0, height, y -> {
+		BoofConcurrency.loopFor(0, height, y -> {
 			int indexSrc = src.startIndex + src.stride * y;
 
 			for (int x = 0; x < width; x++) {
@@ -1360,7 +1360,7 @@ public class ImplConvertRaster_MT {
 		final int height = dst.getHeight();
 
 		short[] data = src.data;
-		BoofConcurrency.range(0, height, y -> {
+		BoofConcurrency.loopFor(0, height, y -> {
 			int indexSrc = src.startIndex + src.stride * y;
 
 			for (int x = 0; x < width; x++) {
@@ -1378,7 +1378,7 @@ public class ImplConvertRaster_MT {
 		final int height = dst.getHeight();
 
 		float[] data = src.data;
-		BoofConcurrency.range(0, height, y -> {
+		BoofConcurrency.loopFor(0, height, y -> {
 			int indexSrc = src.startIndex + src.stride * y;
 
 			for (int x = 0; x < width; x++) {
@@ -1403,7 +1403,7 @@ public class ImplConvertRaster_MT {
 		byte[] band2 = src.getBand(1).data;
 		byte[] band3 = src.getBand(2).data;
 
-		BoofConcurrency.range(0, height, y -> {
+		BoofConcurrency.loopFor(0, height, y -> {
 			int indexSrc = src.startIndex + src.stride * y;
 
 			for (int x = 0; x < width; x++, indexSrc++) {
@@ -1430,7 +1430,7 @@ public class ImplConvertRaster_MT {
 		float[] band2 = src.getBand(1).data;
 		float[] band3 = src.getBand(2).data;
 
-		BoofConcurrency.range(0, height, y -> {
+		BoofConcurrency.loopFor(0, height, y -> {
 			int indexSrc = src.startIndex + src.stride * y;
 
 			for (int x = 0; x < width; x++, indexSrc++) {
@@ -1458,7 +1458,7 @@ public class ImplConvertRaster_MT {
 
 		if (numBands == 3) {
 
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + y * src.stride;
 				int indexDst = dstOffset + y*dstStride;
 
@@ -1472,7 +1472,7 @@ public class ImplConvertRaster_MT {
 			});
 		} else if (numBands == 4) {
 
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + y * src.stride;
 				int indexDst = dstOffset + y*dstStride;
 
@@ -1503,7 +1503,7 @@ public class ImplConvertRaster_MT {
 		int dstStride = stride(dst);
 		int dstOffset = getOffset(dst);
 
-		BoofConcurrency.range(0, src.height, y -> {
+		BoofConcurrency.loopFor(0, src.height, y -> {
 			int indexSrc = src.startIndex + src.stride * y;
 			int indexDst = dstOffset + dstStride*y;
 
@@ -1519,7 +1519,7 @@ public class ImplConvertRaster_MT {
 		final int width = dst.getWidth();
 		final int height = dst.getHeight();
 
-		BoofConcurrency.range(0, height, y -> {
+		BoofConcurrency.loopFor(0, height, y -> {
 			int indexSrc = src.startIndex + src.stride * y;
 
 			for (int x = 0; x < width; x++ ) {
@@ -1546,7 +1546,7 @@ public class ImplConvertRaster_MT {
 		int dstOffset = getOffset(dst);
 
 		if (numBands == 3) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + y * src.stride;
 				int indexDst = dstOffset + y*dstStride;
 
@@ -1559,7 +1559,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else if (numBands == 4) {
-			BoofConcurrency.range(0, src.height, y -> {
+			BoofConcurrency.loopFor(0, src.height, y -> {
 				int indexSrc = src.startIndex + y * src.stride;
 				int indexDst = dstOffset + y*dstStride;
 
@@ -1590,7 +1590,7 @@ public class ImplConvertRaster_MT {
 		int dstStride = stride(dst);
 		int dstOffset = getOffset(dst);
 
-		BoofConcurrency.range(0, src.height, y -> {
+		BoofConcurrency.loopFor(0, src.height, y -> {
 			int indexSrc = src.startIndex + src.stride * y;
 			int indexDst = dstOffset + dstStride*y;
 			int indexSrcEnd = indexSrc+length;
@@ -1609,7 +1609,7 @@ public class ImplConvertRaster_MT {
 		final int width = dst.getWidth();
 		final int height = dst.getHeight();
 
-		BoofConcurrency.range(0, height, y -> {
+		BoofConcurrency.loopFor(0, height, y -> {
 			int indexSrc = src.startIndex + src.stride * y;
 
 			for (int x = 0; x < width; x++ ) {
@@ -1631,7 +1631,7 @@ public class ImplConvertRaster_MT {
 
 		if( swap ) {
 			if( image.getNumBands() == 3 ) {
-				BoofConcurrency.range(0, image.height, y -> {
+				BoofConcurrency.loopFor(0, image.height, y -> {
 					int index = image.startIndex + y*image.stride;
 					int indexEnd = index + image.width*3;
 
@@ -1648,7 +1648,7 @@ public class ImplConvertRaster_MT {
 				int bufferedImageType = input.getType();
 				if( bufferedImageType == BufferedImage.TYPE_INT_ARGB ) {
 
-					BoofConcurrency.range(0, image.height, y -> {
+					BoofConcurrency.loopFor(0, image.height, y -> {
 						int index = image.startIndex + y*image.stride;
 						int indexEnd = index + image.width*3;
 
@@ -1664,7 +1664,7 @@ public class ImplConvertRaster_MT {
 					});
 				} else if( bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR ) {
 
-					BoofConcurrency.range(0, image.height, y -> {
+					BoofConcurrency.loopFor(0, image.height, y -> {
 						int index = image.startIndex + y*image.stride;
 						int indexEnd = index + image.width*3;
 
@@ -1692,7 +1692,7 @@ public class ImplConvertRaster_MT {
 		if( swap ) {
 			if( image.getNumBands() == 3 ) {
 
-				BoofConcurrency.range(0, image.height, y -> {
+				BoofConcurrency.loopFor(0, image.height, y -> {
 					int index = image.startIndex + y*image.stride;
 					int indexEnd = index + image.width*3;
 
@@ -1709,7 +1709,7 @@ public class ImplConvertRaster_MT {
 				int bufferedImageType = input.getType();
 				if( bufferedImageType == BufferedImage.TYPE_INT_ARGB ) {
 
-					BoofConcurrency.range(0, image.height, y -> {
+					BoofConcurrency.loopFor(0, image.height, y -> {
 						int index = image.startIndex + y*image.stride;
 						int indexEnd = index + image.width*3;
 
@@ -1725,7 +1725,7 @@ public class ImplConvertRaster_MT {
 					});
 				} else if( bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR ) {
 
-					BoofConcurrency.range(0, image.height, y -> {
+					BoofConcurrency.loopFor(0, image.height, y -> {
 						int index = image.startIndex + y*image.stride;
 						int indexEnd = index + image.width*3;
 
@@ -1757,7 +1757,7 @@ public class ImplConvertRaster_MT {
 		byte data[] = buffer.getData();
 
 		if( BufferedImage.TYPE_3BYTE_BGR == type ) {
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int index = offset + y*stride;
 				for (int x = 0; x < width; x++) {
 					byte tmp = data[index];
@@ -1767,7 +1767,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else if( BufferedImage.TYPE_4BYTE_ABGR == type ) {
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int index = offset + y*stride;
 				for (int x = 0; x < width; x++) {
 					byte tmp0 = data[index];
@@ -1799,7 +1799,7 @@ public class ImplConvertRaster_MT {
 		int data[] = buffer.getData();
 
 		if( BufferedImage.TYPE_INT_BGR == type ) {
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int index = offset + y*stride;
 				for (int x = 0; x < width; x++, index++) {
 					int tmp = data[index];
@@ -1811,7 +1811,7 @@ public class ImplConvertRaster_MT {
 				}
 			});
 		} else if( BufferedImage.TYPE_INT_ARGB == type ) {
-			BoofConcurrency.range(0, height, y -> {
+			BoofConcurrency.loopFor(0, height, y -> {
 				int index = offset + y*stride;
 				for (int x = 0; x < width; x++, index++) {
 					int tmp = data[index];

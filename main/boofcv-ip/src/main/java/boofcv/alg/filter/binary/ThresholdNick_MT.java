@@ -101,7 +101,7 @@ public class ThresholdNick_MT implements InputToBinary<GrayF32> {
 		BlurImageOps.mean(imageI2, meanI2, radius, tmp, work);
 
 		if( down ) {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int i = y * meanI2.width;
 				int indexIn = input.startIndex + y * input.stride;
 				int indexOut = output.startIndex + y * output.stride;
@@ -116,7 +116,7 @@ public class ThresholdNick_MT implements InputToBinary<GrayF32> {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int i = y * meanI2.width;
 				int indexIn = input.startIndex + y * input.stride;
 				int indexOut = output.startIndex + y * output.stride;

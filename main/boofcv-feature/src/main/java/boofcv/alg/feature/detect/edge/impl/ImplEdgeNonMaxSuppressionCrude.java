@@ -52,7 +52,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 		final int w = intensity.width;
 		final int h = intensity.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{
 		for( int y = 1; y < h; y++ ) {
 			int indexI = intensity.startIndex + y*intensity.stride+1;
 			int indexX = derivX.startIndex + y*derivX.stride+1;
@@ -87,7 +87,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 		final int w = intensity.width;
 		final int h = intensity.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{
 		for( int y = 1; y < h; y++ ) {
 			int indexI = intensity.startIndex + y*intensity.stride+1;
 			int indexX = derivX.startIndex + y*derivX.stride+1;
@@ -122,7 +122,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 		final int w = intensity.width;
 		final int h = intensity.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{
 		for( int y = 1; y < h; y++ ) {
 			int indexI = intensity.startIndex + y*intensity.stride+1;
 			int indexX = derivX.startIndex + y*derivX.stride+1;
@@ -160,7 +160,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 		ImageBorder_F32 intensity = FactoryImageBorderAlgs.value(_intensity, 0);
 
 		// top border
-		//CONCURRENT_BELOW BoofConcurrency.range(0,w,x->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,w,x->{
 		for( int x = 0; x < w; x++ ) {
 			int dx,dy;
 
@@ -180,7 +180,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 		//CONCURRENT_ABOVE });
 
 		// bottom border
-		//CONCURRENT_BELOW BoofConcurrency.range(0,w,x->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,w,x->{
 		for( int x = 0; x < w; x++ ) {
 			int dx,dy;
 
@@ -200,7 +200,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 		//CONCURRENT_ABOVE });
 
 		// left border
-		//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{
 		for( int y = 1; y < h; y++ ) {
 			int dx,dy;
 
@@ -221,7 +221,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 
 		// right border
 		int ww = w - 1;
-		//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{
 		for( int y = 1; y < h; y++ ) {
 			int dx,dy;
 
@@ -250,7 +250,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 		ImageBorder_F32 intensity = FactoryImageBorderAlgs.value(_intensity, 0);
 
 		// top border
-		//CONCURRENT_BELOW BoofConcurrency.range(0,w,x->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,w,x->{
 		for( int x = 0; x < w; x++ ) {
 			int dx,dy;
 
@@ -270,7 +270,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 		//CONCURRENT_ABOVE });
 
 		// bottom border
-		//CONCURRENT_BELOW BoofConcurrency.range(0,w,x->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,w,x->{
 		for( int x = 0; x < w; x++ ) {
 			int dx,dy;
 
@@ -290,7 +290,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 		//CONCURRENT_ABOVE });
 
 		// left border
-		//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{
 		for( int y = 1; y < h; y++ ) {
 			int dx,dy;
 
@@ -311,7 +311,7 @@ public class ImplEdgeNonMaxSuppressionCrude {
 
 		// right border
 		int ww = w - 1;
-		//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{
 		for( int y = 1; y < h; y++ ) {
 			int dx,dy;
 

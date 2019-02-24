@@ -43,7 +43,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for( int y = 0; y < h; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
@@ -65,7 +65,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for( int y = 0; y < h; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
@@ -85,7 +85,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for( int y = 0; y < h; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
@@ -108,7 +108,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for( int y = 0; y < h; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
@@ -131,7 +131,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for( int y = 0; y < h; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
@@ -153,7 +153,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for( int y = 0; y < h; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
@@ -173,7 +173,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for( int y = 0; y < h; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
@@ -196,7 +196,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for( int y = 0; y < h; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
@@ -219,7 +219,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for( int y = 0; y < h; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
@@ -241,7 +241,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for( int y = 0; y < h; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
@@ -261,7 +261,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for( int y = 0; y < h; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
@@ -284,7 +284,7 @@ public class ImplGradientToEdgeFeatures {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for( int y = 0; y < h; y++ ) {
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;

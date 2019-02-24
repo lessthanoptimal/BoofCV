@@ -52,7 +52,7 @@ public class ConvolveImageStandard_SB_MT {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+offset;
 			int j = image.startIndex + i*image.stride;
 			final int jEnd = j+width-(kernelWidth-1);
@@ -82,7 +82,7 @@ public class ConvolveImageStandard_SB_MT {
 		final int imgHeight = dest.getHeight();
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		BoofConcurrency.range(offset, yEnd, y -> {
+		BoofConcurrency.loopFor(offset, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-offset)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -111,7 +111,7 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.range(offsetL, height-offsetR, y -> {
+		BoofConcurrency.loopFor(offsetL, height-offsetR, y -> {
 			int indexDst = dest.startIndex + y*dest.stride+offsetL;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				float total = 0;
@@ -138,7 +138,7 @@ public class ConvolveImageStandard_SB_MT {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+offset;
 			int j = image.startIndex + i*image.stride;
 			final int jEnd = j+width-(kernelWidth-1);
@@ -168,7 +168,7 @@ public class ConvolveImageStandard_SB_MT {
 		final int imgHeight = dest.getHeight();
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		BoofConcurrency.range(offset, yEnd, y -> {
+		BoofConcurrency.loopFor(offset, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-offset)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -197,7 +197,7 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.range(offsetL, height-offsetR, y -> {
+		BoofConcurrency.loopFor(offsetL, height-offsetR, y -> {
 			int indexDst = dest.startIndex + y*dest.stride+offsetL;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				double total = 0;
@@ -224,7 +224,7 @@ public class ConvolveImageStandard_SB_MT {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+offset;
 			int j = image.startIndex + i*image.stride;
 			final int jEnd = j+width-(kernelWidth-1);
@@ -254,7 +254,7 @@ public class ConvolveImageStandard_SB_MT {
 		final int imgHeight = dest.getHeight();
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		BoofConcurrency.range(offset, yEnd, y -> {
+		BoofConcurrency.loopFor(offset, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-offset)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -283,7 +283,7 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.range(offsetL, height-offsetR, y -> {
+		BoofConcurrency.loopFor(offsetL, height-offsetR, y -> {
 			int indexDst = dest.startIndex + y*dest.stride+offsetL;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int total = 0;
@@ -310,7 +310,7 @@ public class ConvolveImageStandard_SB_MT {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+offset;
 			int j = image.startIndex + i*image.stride;
 			final int jEnd = j+width-(kernelWidth-1);
@@ -340,7 +340,7 @@ public class ConvolveImageStandard_SB_MT {
 		final int imgHeight = dest.getHeight();
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		BoofConcurrency.range(offset, yEnd, y -> {
+		BoofConcurrency.loopFor(offset, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-offset)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -369,7 +369,7 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.range(offsetL, height-offsetR, y -> {
+		BoofConcurrency.loopFor(offsetL, height-offsetR, y -> {
 			int indexDst = dest.startIndex + y*dest.stride+offsetL;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int total = 0;
@@ -400,7 +400,7 @@ public class ConvolveImageStandard_SB_MT {
 		final int imgHeight = dest.getHeight();
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		BoofConcurrency.range(offset, yEnd, y -> {
+		BoofConcurrency.loopFor(offset, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-offset)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -428,7 +428,7 @@ public class ConvolveImageStandard_SB_MT {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+offset;
 			int j = image.startIndex + i*image.stride;
 			final int jEnd = j+width-(kernelWidth-1);
@@ -458,7 +458,7 @@ public class ConvolveImageStandard_SB_MT {
 		final int imgHeight = dest.getHeight();
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		BoofConcurrency.range(offset, yEnd, y -> {
+		BoofConcurrency.loopFor(offset, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-offset)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -487,7 +487,7 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.range(offsetL, height-offsetR, y -> {
+		BoofConcurrency.loopFor(offsetL, height-offsetR, y -> {
 			int indexDst = dest.startIndex + y*dest.stride+offsetL;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int total = 0;
@@ -515,7 +515,7 @@ public class ConvolveImageStandard_SB_MT {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+offset;
 			int j = image.startIndex + i*image.stride;
 			final int jEnd = j+width-(kernelWidth-1);
@@ -546,7 +546,7 @@ public class ConvolveImageStandard_SB_MT {
 		final int imgHeight = dest.getHeight();
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		BoofConcurrency.range(offset, yEnd, y -> {
+		BoofConcurrency.loopFor(offset, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-offset)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -582,7 +582,7 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.blocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {
+		BoofConcurrency.loopBlocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {
 		int totalRow[] = _work.pop();
 		for( int y = y0; y < y1; y++ ) {
 			int indexSrcRow = src.startIndex+(y-offsetL)*src.stride-offsetL;
@@ -632,7 +632,7 @@ public class ConvolveImageStandard_SB_MT {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+offset;
 			int j = image.startIndex + i*image.stride;
 			final int jEnd = j+width-(kernelWidth-1);
@@ -663,7 +663,7 @@ public class ConvolveImageStandard_SB_MT {
 		final int imgHeight = dest.getHeight();
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		BoofConcurrency.range(offset, yEnd, y -> {
+		BoofConcurrency.loopFor(offset, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-offset)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -699,7 +699,7 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.blocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {
+		BoofConcurrency.loopBlocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {
 		int totalRow[] = _work.pop();
 		for( int y = y0; y < y1; y++ ) {
 			int indexSrcRow = src.startIndex+(y-offsetL)*src.stride-offsetL;
@@ -748,7 +748,7 @@ public class ConvolveImageStandard_SB_MT {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+offset;
 			int j = image.startIndex + i*image.stride;
 			final int jEnd = j+width-(kernelWidth-1);
@@ -778,7 +778,7 @@ public class ConvolveImageStandard_SB_MT {
 		final int imgHeight = dest.getHeight();
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		BoofConcurrency.range(offset, yEnd, y -> {
+		BoofConcurrency.loopFor(offset, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-offset)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -807,7 +807,7 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.range(offsetL, height-offsetR, y -> {
+		BoofConcurrency.loopFor(offsetL, height-offsetR, y -> {
 			int indexDst = dest.startIndex + y*dest.stride+offsetL;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int total = 0;
@@ -835,7 +835,7 @@ public class ConvolveImageStandard_SB_MT {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+offset;
 			int j = image.startIndex + i*image.stride;
 			final int jEnd = j+width-(kernelWidth-1);
@@ -866,7 +866,7 @@ public class ConvolveImageStandard_SB_MT {
 		final int imgHeight = dest.getHeight();
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		BoofConcurrency.range(offset, yEnd, y -> {
+		BoofConcurrency.loopFor(offset, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-offset)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -902,7 +902,7 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.blocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {
+		BoofConcurrency.loopBlocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {
 		int totalRow[] = _work.pop();
 		for( int y = y0; y < y1; y++ ) {
 			int indexSrcRow = src.startIndex+(y-offsetL)*src.stride-offsetL;
@@ -955,7 +955,7 @@ public class ConvolveImageStandard_SB_MT {
 		final int imgHeight = dest.getHeight();
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		BoofConcurrency.range(offset, yEnd, y -> {
+		BoofConcurrency.loopFor(offset, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-offset)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -983,7 +983,7 @@ public class ConvolveImageStandard_SB_MT {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+offset;
 			int j = image.startIndex + i*image.stride;
 			final int jEnd = j+width-(kernelWidth-1);
@@ -1013,7 +1013,7 @@ public class ConvolveImageStandard_SB_MT {
 		final int imgHeight = dest.getHeight();
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		BoofConcurrency.range(offset, yEnd, y -> {
+		BoofConcurrency.loopFor(offset, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-offset)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -1042,7 +1042,7 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.range(offsetL, height-offsetR, y -> {
+		BoofConcurrency.loopFor(offsetL, height-offsetR, y -> {
 			int indexDst = dest.startIndex + y*dest.stride+offsetL;
 			for( int x = offsetL; x < width-offsetR; x++ ) {
 				int total = 0;
@@ -1070,7 +1070,7 @@ public class ConvolveImageStandard_SB_MT {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+offset;
 			int j = image.startIndex + i*image.stride;
 			final int jEnd = j+width-(kernelWidth-1);
@@ -1101,7 +1101,7 @@ public class ConvolveImageStandard_SB_MT {
 		final int imgHeight = dest.getHeight();
 		final int yEnd = imgHeight-(kernelWidth-offset-1);
 
-		BoofConcurrency.range(offset, yEnd, y -> {
+		BoofConcurrency.loopFor(offset, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-offset)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -1137,7 +1137,7 @@ public class ConvolveImageStandard_SB_MT {
 		int offsetL = kernel.offset;
 		int offsetR = kernel.width-kernel.offset-1;
 
-		BoofConcurrency.blocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {
+		BoofConcurrency.loopBlocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {
 		int totalRow[] = _work.pop();
 		for( int y = y0; y < y1; y++ ) {
 			int indexSrcRow = src.startIndex+(y-offsetL)*src.stride-offsetL;

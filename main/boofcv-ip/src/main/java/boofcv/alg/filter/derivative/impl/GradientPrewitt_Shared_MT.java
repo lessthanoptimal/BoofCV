@@ -42,7 +42,7 @@ public class GradientPrewitt_Shared_MT {
 		final int height = orig.getHeight() - 1;
 		final int strideSrc = orig.getStride();
 
-		BoofConcurrency.range(1,height,y->{
+		BoofConcurrency.loopFor(1,height,y->{
 			int indexSrc = orig.startIndex + orig.stride * y + 1;
 			final int endX = indexSrc + width - 2;
 
@@ -75,7 +75,7 @@ public class GradientPrewitt_Shared_MT {
 		final int height = orig.getHeight() - 1;
 		final int strideSrc = orig.getStride();
 
-		BoofConcurrency.range(1,height,y->{
+		BoofConcurrency.loopFor(1,height,y->{
 			int indexSrc = orig.startIndex + orig.stride * y + 1;
 			final int endX = indexSrc + width - 2;
 
@@ -108,7 +108,7 @@ public class GradientPrewitt_Shared_MT {
 		final int height = orig.getHeight() - 1;
 		final int strideSrc = orig.getStride();
 
-		BoofConcurrency.range(1,height,y->{
+		BoofConcurrency.loopFor(1,height,y->{
 			int indexSrc = orig.startIndex + orig.stride * y + 1;
 			final int endX = indexSrc + width - 2;
 

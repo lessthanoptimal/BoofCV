@@ -124,7 +124,7 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\n" +
 				"\t\tint radp1 = radius + 1;\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,imgHeight,row->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,imgHeight,row->{\n" +
 				"\t\tfor (int row = 0; row < imgHeight; row++) {\n" +
 				"\n" +
 				"\t\t\tint pix = row * imgWidth;\n" +
@@ -200,7 +200,7 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\n" +
 				"\t\tfinal int backStep = kernelWidth * imgWidth;\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.blocks(radius,imgHeight-radius,(y0,y1)->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(radius,imgHeight-radius,(y0,y1)->{\n" +
 				"\t\tint y0 = radius, y1 = imgHeight-radius;\n" +
 				"\t\tfinal "+dataOutput+"[] tempXX = work.pop();\n" +
 				"\t\tfinal "+dataOutput+"[] tempXY = work.pop();\n" +

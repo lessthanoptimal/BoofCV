@@ -34,6 +34,7 @@ import boofcv.struct.image.GrayS32;
  * 
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class ImplGradientToEdgeFeatures_MT {
 
 	static public void intensityE( GrayF32 derivX , GrayF32 derivY , GrayF32 intensity )
@@ -41,7 +42,7 @@ public class ImplGradientToEdgeFeatures_MT {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexI = intensity.startIndex + y*intensity.stride;
@@ -61,7 +62,7 @@ public class ImplGradientToEdgeFeatures_MT {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexI = intensity.startIndex + y*intensity.stride;
@@ -79,7 +80,7 @@ public class ImplGradientToEdgeFeatures_MT {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexA = angle.startIndex + y*angle.stride;
@@ -100,7 +101,7 @@ public class ImplGradientToEdgeFeatures_MT {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexA = angle.startIndex + y*angle.stride;
@@ -121,7 +122,7 @@ public class ImplGradientToEdgeFeatures_MT {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexI = intensity.startIndex + y*intensity.stride;
@@ -141,7 +142,7 @@ public class ImplGradientToEdgeFeatures_MT {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexI = intensity.startIndex + y*intensity.stride;
@@ -159,7 +160,7 @@ public class ImplGradientToEdgeFeatures_MT {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexA = angle.startIndex + y*angle.stride;
@@ -180,7 +181,7 @@ public class ImplGradientToEdgeFeatures_MT {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexA = angle.startIndex + y*angle.stride;
@@ -201,7 +202,7 @@ public class ImplGradientToEdgeFeatures_MT {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexI = intensity.startIndex + y*intensity.stride;
@@ -221,7 +222,7 @@ public class ImplGradientToEdgeFeatures_MT {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexI = intensity.startIndex + y*intensity.stride;
@@ -239,7 +240,7 @@ public class ImplGradientToEdgeFeatures_MT {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexA = angle.startIndex + y*angle.stride;
@@ -260,7 +261,7 @@ public class ImplGradientToEdgeFeatures_MT {
 		final int w = derivX.width;
 		final int h = derivY.height;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexX = derivX.startIndex + y*derivX.stride;
 			int indexY = derivY.startIndex + y*derivY.stride;
 			int indexA = angle.startIndex + y*angle.stride;

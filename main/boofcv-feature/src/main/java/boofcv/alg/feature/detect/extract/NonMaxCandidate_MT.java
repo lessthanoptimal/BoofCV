@@ -48,7 +48,7 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 		final float inten[] = intensityImage.data;
 
 		// little cost to creating a thread so let it select the minimum block size
-		BoofConcurrency.blocks(0,candidates.size,(idx0,idx1)->{
+		BoofConcurrency.loopBlocks(0,candidates.size,(idx0,idx1)->{
 			NonMaxCandidate.Search search;
 			QueueCorner threadCorners;
 			synchronized ( lock ) {
@@ -92,7 +92,7 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 		final float inten[] = intensityImage.data;
 
 		// little cost to creating a thread so let it select the minimum block size
-		BoofConcurrency.blocks(0,candidates.size,(idx0,idx1)-> {
+		BoofConcurrency.loopBlocks(0,candidates.size,(idx0,idx1)-> {
 			NonMaxCandidate.Search search;
 			QueueCorner threadCorners;
 			synchronized ( lock ) {

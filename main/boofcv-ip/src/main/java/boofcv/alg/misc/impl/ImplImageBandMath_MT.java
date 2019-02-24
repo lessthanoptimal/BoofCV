@@ -44,7 +44,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayU8[] bands = input.bands;
 		
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -69,7 +69,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayU8[] bands = input.bands;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.startIndex + y * input.stride;
 			int indexOutput = output.startIndex + y * output.stride;
 
@@ -103,7 +103,7 @@ public class ImplImageBandMath_MT {
 
 		final int middle = numBands/2;
 		boolean isEven = numBands % 2 == 0;
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			final int[] valueArray = new int[numBands];
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
@@ -131,7 +131,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayU8[] bands = input.bands;
 		int divisor = lastBand - startBand+1;
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -154,7 +154,7 @@ public class ImplImageBandMath_MT {
 		final GrayU8[] bands = input.bands;
 		int divisor = lastBand - startBand;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -177,7 +177,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayS16[] bands = input.bands;
 		
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -202,7 +202,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayS16[] bands = input.bands;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.startIndex + y * input.stride;
 			int indexOutput = output.startIndex + y * output.stride;
 
@@ -236,7 +236,7 @@ public class ImplImageBandMath_MT {
 
 		final int middle = numBands/2;
 		boolean isEven = numBands % 2 == 0;
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			final int[] valueArray = new int[numBands];
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
@@ -264,7 +264,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayS16[] bands = input.bands;
 		int divisor = lastBand - startBand+1;
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -287,7 +287,7 @@ public class ImplImageBandMath_MT {
 		final GrayS16[] bands = input.bands;
 		int divisor = lastBand - startBand;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -310,7 +310,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayU16[] bands = input.bands;
 		
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -335,7 +335,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayU16[] bands = input.bands;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.startIndex + y * input.stride;
 			int indexOutput = output.startIndex + y * output.stride;
 
@@ -369,7 +369,7 @@ public class ImplImageBandMath_MT {
 
 		final int middle = numBands/2;
 		boolean isEven = numBands % 2 == 0;
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			final int[] valueArray = new int[numBands];
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
@@ -397,7 +397,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayU16[] bands = input.bands;
 		int divisor = lastBand - startBand+1;
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -420,7 +420,7 @@ public class ImplImageBandMath_MT {
 		final GrayU16[] bands = input.bands;
 		int divisor = lastBand - startBand;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -443,7 +443,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayS32[] bands = input.bands;
 		
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -468,7 +468,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayS32[] bands = input.bands;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.startIndex + y * input.stride;
 			int indexOutput = output.startIndex + y * output.stride;
 
@@ -502,7 +502,7 @@ public class ImplImageBandMath_MT {
 
 		final int middle = numBands/2;
 		boolean isEven = numBands % 2 == 0;
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			final int[] valueArray = new int[numBands];
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
@@ -530,7 +530,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayS32[] bands = input.bands;
 		int divisor = lastBand - startBand+1;
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -553,7 +553,7 @@ public class ImplImageBandMath_MT {
 		final GrayS32[] bands = input.bands;
 		int divisor = lastBand - startBand;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -576,7 +576,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayS64[] bands = input.bands;
 		
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -601,7 +601,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayS64[] bands = input.bands;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.startIndex + y * input.stride;
 			int indexOutput = output.startIndex + y * output.stride;
 
@@ -635,7 +635,7 @@ public class ImplImageBandMath_MT {
 
 		final int middle = numBands/2;
 		boolean isEven = numBands % 2 == 0;
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			final long[] valueArray = new long[numBands];
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
@@ -663,7 +663,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayS64[] bands = input.bands;
 		long divisor = lastBand - startBand+1;
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -686,7 +686,7 @@ public class ImplImageBandMath_MT {
 		final GrayS64[] bands = input.bands;
 		long divisor = lastBand - startBand;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -709,7 +709,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayF32[] bands = input.bands;
 		
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -734,7 +734,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayF32[] bands = input.bands;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.startIndex + y * input.stride;
 			int indexOutput = output.startIndex + y * output.stride;
 
@@ -768,7 +768,7 @@ public class ImplImageBandMath_MT {
 
 		final int middle = numBands/2;
 		boolean isEven = numBands % 2 == 0;
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			final float[] valueArray = new float[numBands];
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
@@ -796,7 +796,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayF32[] bands = input.bands;
 		float divisor = lastBand - startBand+1;
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -819,7 +819,7 @@ public class ImplImageBandMath_MT {
 		final GrayF32[] bands = input.bands;
 		float divisor = lastBand - startBand;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -842,7 +842,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayF64[] bands = input.bands;
 		
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -867,7 +867,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayF64[] bands = input.bands;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.startIndex + y * input.stride;
 			int indexOutput = output.startIndex + y * output.stride;
 
@@ -901,7 +901,7 @@ public class ImplImageBandMath_MT {
 
 		final int middle = numBands/2;
 		boolean isEven = numBands % 2 == 0;
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			final double[] valueArray = new double[numBands];
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
@@ -929,7 +929,7 @@ public class ImplImageBandMath_MT {
 
 		final GrayF64[] bands = input.bands;
 		double divisor = lastBand - startBand+1;
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 
@@ -952,7 +952,7 @@ public class ImplImageBandMath_MT {
 		final GrayF64[] bands = input.bands;
 		double divisor = lastBand - startBand;
 
-		BoofConcurrency.range(0,h,y->{
+		BoofConcurrency.loopFor(0,h,y->{
 			int indexInput = input.getStartIndex() + y * input.getStride();
 			int indexOutput = output.getStartIndex() + y * output.getStride();
 

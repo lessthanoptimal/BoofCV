@@ -73,7 +73,7 @@ public class ImplSsdCorner_F32 extends ImplSsdCornerBox<GrayF32,GrayF32> {
 
 		int radp1 = radius + 1;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,imgHeight,row->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,imgHeight,row->{
 		for (int row = 0; row < imgHeight; row++) {
 
 			int pix = row * imgWidth;
@@ -147,7 +147,7 @@ public class ImplSsdCorner_F32 extends ImplSsdCornerBox<GrayF32,GrayF32> {
 
 		final int backStep = kernelWidth * imgWidth;
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(radius,imgHeight-radius,(y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(radius,imgHeight-radius,(y0,y1)->{
 		int y0 = radius, y1 = imgHeight-radius;
 		final float[] tempXX = work.pop();
 		final float[] tempXY = work.pop();

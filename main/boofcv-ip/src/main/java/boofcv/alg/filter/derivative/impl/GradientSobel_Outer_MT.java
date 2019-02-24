@@ -54,7 +54,7 @@ public class GradientSobel_Outer_MT {
 		final int width = orig.getWidth();
 		final int height = orig.getHeight() - 1;
 
-		BoofConcurrency.range(1,height,y->{
+		BoofConcurrency.loopFor(1,height,y->{
 			int endX = width * y + width - 1;
 
 			for (int index = width * y + 1; index < endX; index++) {
@@ -82,7 +82,7 @@ public class GradientSobel_Outer_MT {
 		final int height = orig.getHeight() - 1;
 		final int strideSrc = orig.getStride();
 
-		BoofConcurrency.range(1,height,y->{
+		BoofConcurrency.loopFor(1,height,y->{
 			int indexSrc = orig.startIndex + orig.stride * y + 1;
 			final int endX = indexSrc + width - 2;
 
@@ -111,7 +111,7 @@ public class GradientSobel_Outer_MT {
 		final int height = orig.getHeight() - 1;
 		final int strideSrc = orig.getStride();
 
-		BoofConcurrency.range(1,height,y->{
+		BoofConcurrency.loopFor(1,height,y->{
 			int indexSrc = orig.startIndex + orig.stride * y + 1;
 			final int endX = indexSrc + width - 2;
 
@@ -142,7 +142,7 @@ public class GradientSobel_Outer_MT {
 		final int width = orig.getWidth();
 		final int height = orig.getHeight() - 1;
 
-		BoofConcurrency.range(1,height,y->{
+		BoofConcurrency.loopFor(1,height,y->{
 			int endX = width * y + width - 1;
 
 			for (int index = width * y + 1; index < endX; index++) {

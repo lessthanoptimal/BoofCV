@@ -44,7 +44,7 @@ public class ImplConvolveBox_MT {
 	public static void horizontal( GrayU8 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		BoofConcurrency.range(0, input.height, y -> {
+		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -78,7 +78,7 @@ public class ImplConvolveBox_MT {
 
 		final int backStep = kernelWidth*input.stride;
 
-		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
@@ -111,7 +111,7 @@ public class ImplConvolveBox_MT {
 	public static void horizontal( GrayU8 input , GrayS32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		BoofConcurrency.range(0, input.height, y -> {
+		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -145,7 +145,7 @@ public class ImplConvolveBox_MT {
 
 		final int backStep = kernelWidth*input.stride;
 
-		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
@@ -178,7 +178,7 @@ public class ImplConvolveBox_MT {
 	public static void horizontal( GrayS16 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		BoofConcurrency.range(0, input.height, y -> {
+		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -212,7 +212,7 @@ public class ImplConvolveBox_MT {
 
 		final int backStep = kernelWidth*input.stride;
 
-		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
@@ -245,7 +245,7 @@ public class ImplConvolveBox_MT {
 	public static void horizontal( GrayU16 input , GrayI16 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		BoofConcurrency.range(0, input.height, y -> {
+		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -279,7 +279,7 @@ public class ImplConvolveBox_MT {
 
 		final int backStep = kernelWidth*input.stride;
 
-		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
@@ -312,7 +312,7 @@ public class ImplConvolveBox_MT {
 	public static void horizontal( GrayS32 input , GrayS32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		BoofConcurrency.range(0, input.height, y -> {
+		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -346,7 +346,7 @@ public class ImplConvolveBox_MT {
 
 		final int backStep = kernelWidth*input.stride;
 
-		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
@@ -379,7 +379,7 @@ public class ImplConvolveBox_MT {
 	public static void horizontal( GrayF32 input , GrayF32 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		BoofConcurrency.range(0, input.height, y -> {
+		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -413,7 +413,7 @@ public class ImplConvolveBox_MT {
 
 		final int backStep = kernelWidth*input.stride;
 
-		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		float totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
@@ -446,7 +446,7 @@ public class ImplConvolveBox_MT {
 	public static void horizontal( GrayF64 input , GrayF64 output , int radius ) {
 		final int kernelWidth = radius*2 + 1;
 
-		BoofConcurrency.range(0, input.height, y -> {
+		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -480,7 +480,7 @@ public class ImplConvolveBox_MT {
 
 		final int backStep = kernelWidth*input.stride;
 
-		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		double totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + (y0-radius)*input.stride + x;

@@ -47,7 +47,7 @@ public class ImplConvolveMean {
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
@@ -89,7 +89,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		final int y0 = radius, y1 = output.height-radius;
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
@@ -126,7 +126,7 @@ public class ImplConvolveMean {
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
@@ -168,7 +168,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		final int y0 = radius, y1 = output.height-radius;
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
@@ -205,7 +205,7 @@ public class ImplConvolveMean {
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
@@ -247,7 +247,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		final int y0 = radius, y1 = output.height-radius;
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
@@ -283,7 +283,7 @@ public class ImplConvolveMean {
 
 		final float divisor = kernelWidth;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
@@ -324,7 +324,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		final int y0 = radius, y1 = output.height-radius;
 		float totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
@@ -360,7 +360,7 @@ public class ImplConvolveMean {
 
 		final double divisor = kernelWidth;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 		for( int y = 0; y < input.height; y++ ) {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
@@ -401,7 +401,7 @@ public class ImplConvolveMean {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		final int y0 = radius, y1 = output.height-radius;
 		double totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {

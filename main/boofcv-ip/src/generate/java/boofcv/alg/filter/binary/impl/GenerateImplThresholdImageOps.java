@@ -88,7 +88,7 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 				"\t\t\t\t\t\t\t\t\t\t"+imageIn.getSumType()+" threshold , boolean down )\n" +
 				"\t{\n" +
 				"\t\tif( down ) {\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {\n" +
 				"\t\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
 				"\t\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
@@ -99,7 +99,7 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 				"\t\t\t}\n" +
 				"\t\t\t//CONCURRENT_ABOVE });\n" +
 				"\t\t} else {\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {\n" +
 				"\t\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
 				"\t\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
@@ -136,7 +136,7 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 				"\t\tBlurImageOps.mean(input,mean,radius,storage2,storage3);\n" +
 				"\n" +
 				"\t\tif( down ) {\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {\n" +
 				"\t\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
 				"\t\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
@@ -151,7 +151,7 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 				"\t\t\t}\n" +
 				"\t\t\t//CONCURRENT_ABOVE });\n" +
 				"\t\t} else {\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {\n" +
 				"\t\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
 				"\t\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
@@ -189,7 +189,7 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 				"\t\tBlurImageOps.gaussian(input,blur,-1,radius,storage2);\n" +
 				"\n" +
 				"\t\tif( down ) {\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {\n" +
 				"\t\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
 				"\t\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
@@ -208,7 +208,7 @@ public class GenerateImplThresholdImageOps extends CodeGeneratorBase {
 				"\t\t\t}\n" +
 				"\t\t\t//CONCURRENT_ABOVE });\n" +
 				"\t\t} else {\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {\n" +
 				"\t\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\t\tint indexIn = input.startIndex + y*input.stride;\n" +
 				"\t\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +

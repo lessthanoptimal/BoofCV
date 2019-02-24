@@ -51,7 +51,7 @@ public class ConvertInterleavedToSingle_MT {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -64,7 +64,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else if( numBands == 3 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -78,7 +78,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -104,7 +104,7 @@ public class ConvertInterleavedToSingle_MT {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -117,7 +117,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else if( numBands == 3 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -131,7 +131,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -157,7 +157,7 @@ public class ConvertInterleavedToSingle_MT {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -170,7 +170,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else if( numBands == 3 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -184,7 +184,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -210,7 +210,7 @@ public class ConvertInterleavedToSingle_MT {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -223,7 +223,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else if( numBands == 3 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -237,7 +237,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -263,7 +263,7 @@ public class ConvertInterleavedToSingle_MT {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -276,7 +276,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else if( numBands == 3 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -290,7 +290,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -316,7 +316,7 @@ public class ConvertInterleavedToSingle_MT {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -329,7 +329,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else if( numBands == 3 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -343,7 +343,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -369,7 +369,7 @@ public class ConvertInterleavedToSingle_MT {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -382,7 +382,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else if( numBands == 3 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -396,7 +396,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 
@@ -422,7 +422,7 @@ public class ConvertInterleavedToSingle_MT {
 				System.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);
 			}
 		} else if( numBands == 2 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -435,7 +435,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else if( numBands == 3 ) {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 				int indexEndTo = indexTo + from.width;
@@ -449,7 +449,7 @@ public class ConvertInterleavedToSingle_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, from.height, y -> {
+			BoofConcurrency.loopFor(0, from.height, y -> {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
 

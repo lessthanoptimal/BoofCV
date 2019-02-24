@@ -51,7 +51,7 @@ public class GradientSobel_UnrolledOuter {
 
 		final int adjWidth = width - 2;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
 			int endX_alt = width * y + (width - adjWidth % 3) - 1;
 			int endX = endX_alt + adjWidth % 3;
@@ -134,7 +134,7 @@ public class GradientSobel_UnrolledOuter {
 
 		final int adjWidth = width - 2;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
 			int endX_alt = width * y + (width - adjWidth % 3) - 1;
 			int endX = endX_alt + adjWidth % 3;
@@ -220,7 +220,7 @@ public class GradientSobel_UnrolledOuter {
 
 		final int adjWidth = width - 2;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
 			int index = orig.startIndex + strideSrc * y + 1;
 			int indexX = derivX.startIndex + derivX.stride * y + 1;

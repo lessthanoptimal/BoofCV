@@ -47,7 +47,7 @@ public class ImplThresholdImageOps_MT {
 										float threshold , boolean down )
 	{
 		if( down ) {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
@@ -56,7 +56,7 @@ public class ImplThresholdImageOps_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
@@ -73,7 +73,7 @@ public class ImplThresholdImageOps_MT {
 										double threshold , boolean down )
 	{
 		if( down ) {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
@@ -82,7 +82,7 @@ public class ImplThresholdImageOps_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
@@ -99,7 +99,7 @@ public class ImplThresholdImageOps_MT {
 										int threshold , boolean down )
 	{
 		if( down ) {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
@@ -108,7 +108,7 @@ public class ImplThresholdImageOps_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
@@ -125,7 +125,7 @@ public class ImplThresholdImageOps_MT {
 										int threshold , boolean down )
 	{
 		if( down ) {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
@@ -134,7 +134,7 @@ public class ImplThresholdImageOps_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
@@ -151,7 +151,7 @@ public class ImplThresholdImageOps_MT {
 										int threshold , boolean down )
 	{
 		if( down ) {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
@@ -160,7 +160,7 @@ public class ImplThresholdImageOps_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
@@ -177,7 +177,7 @@ public class ImplThresholdImageOps_MT {
 										int threshold , boolean down )
 	{
 		if( down ) {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
@@ -186,7 +186,7 @@ public class ImplThresholdImageOps_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 
@@ -211,7 +211,7 @@ public class ImplThresholdImageOps_MT {
 		BlurImageOps.mean(input,mean,radius,storage2,storage3);
 
 		if( down ) {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 				int indexMean = mean.startIndex + y*mean.stride;
@@ -224,7 +224,7 @@ public class ImplThresholdImageOps_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 				int indexMean = mean.startIndex + y*mean.stride;
@@ -252,7 +252,7 @@ public class ImplThresholdImageOps_MT {
 		BlurImageOps.gaussian(input,blur,-1,radius,storage2);
 
 		if( down ) {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 				int indexMean = blur.startIndex + y*blur.stride;
@@ -269,7 +269,7 @@ public class ImplThresholdImageOps_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 				int indexMean = blur.startIndex + y*blur.stride;
@@ -302,7 +302,7 @@ public class ImplThresholdImageOps_MT {
 		BlurImageOps.mean(input,mean,radius,storage2,storage3);
 
 		if( down ) {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 				int indexMean = mean.startIndex + y*mean.stride;
@@ -315,7 +315,7 @@ public class ImplThresholdImageOps_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 				int indexMean = mean.startIndex + y*mean.stride;
@@ -343,7 +343,7 @@ public class ImplThresholdImageOps_MT {
 		BlurImageOps.gaussian(input,blur,-1,radius,storage2);
 
 		if( down ) {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 				int indexMean = blur.startIndex + y*blur.stride;
@@ -360,7 +360,7 @@ public class ImplThresholdImageOps_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 				int indexMean = blur.startIndex + y*blur.stride;
@@ -393,7 +393,7 @@ public class ImplThresholdImageOps_MT {
 		BlurImageOps.mean(input,mean,radius,storage2,storage3);
 
 		if( down ) {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 				int indexMean = mean.startIndex + y*mean.stride;
@@ -406,7 +406,7 @@ public class ImplThresholdImageOps_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 				int indexMean = mean.startIndex + y*mean.stride;
@@ -434,7 +434,7 @@ public class ImplThresholdImageOps_MT {
 		BlurImageOps.gaussian(input,blur,-1,radius,storage2);
 
 		if( down ) {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 				int indexMean = blur.startIndex + y*blur.stride;
@@ -451,7 +451,7 @@ public class ImplThresholdImageOps_MT {
 				}
 			});
 		} else {
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
 				int indexMean = blur.startIndex + y*blur.stride;

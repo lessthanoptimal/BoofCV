@@ -115,7 +115,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 							"\t\t\t\t\t\t\t   "+arrayType+"[] output , int outputStart , int outputStride ,\n" +
 							"\t\t\t\t\t\t\t   int rows , int cols )\n" +
 							"\t{\n" +
-							"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{\n" +
+							"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
 							"\t\tfor( int y = 0; y < rows; y++ ) {\n" +
 							"\t\t\tint indexSrc = inputStart + y*inputStride;\n" +
 							"\t\t\tint indexDst = outputStart + y*outputStride;\n" +
@@ -176,7 +176,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\t\t\t\t\t\t\t   "+arrayType+"[] output , int outputStart , int outputStride ,\n" +
 				"\t\t\t\t\t\t\t   int rows , int cols )\n" +
 				"\t{\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
 				"\t\tfor( int y = 0; y < rows; y++ ) {\n" +
 				"\t\t\tint indexSrc = inputStart + y*inputStride;\n" +
 				"\t\t\tint indexDst = outputStart + y*outputStride;\n" +
@@ -203,7 +203,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\t\t\t\t\t\t\t   "+arrayType+"[] output , int outputStart , int outputStride ,\n" +
 				"\t\t\t\t\t\t\t   int rows , int cols )\n" +
 				"\t{\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,rows,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
 				"\t\tfor( int y = 0; y < rows; y++ ) {\n" +
 				"\t\t\tint indexSrc = inputStart + y*inputStride;\n" +
 				"\t\t\tint indexDst = outputStart + y*outputStride;\n" +
@@ -232,7 +232,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\n" +
 				"\t\t"+input.getDataType()+"[] data = img.data;\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
 				"\t\tfor (int y = 0; y < h; y++) {\n" +
 				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
 				"\t\t\tint indexEnd = index+w;\n" +
@@ -259,7 +259,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\t\tfinal int h = imgA.getHeight();\n" +
 				"\t\tfinal int w = imgA.getWidth();\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
 				"\t\tfor (int y = 0; y < h; y++) {\n" +
 				"\t\t\tint indexA = imgA.getStartIndex() + y * imgA.getStride();\n" +
 				"\t\t\tint indexB = imgB.getStartIndex() + y * imgB.getStride();\n" +
@@ -302,7 +302,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 						"\t\tfinal int h = imgA.getHeight();\n" +
 						"\t\tfinal int w = imgA.getWidth();\n" +
 						"\n" +
-						"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{\n" +
+						"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
 						"\t\tfor (int y = 0; y < h; y++) {\n" +
 						"\t\t\tint indexA = imgA.getStartIndex() + y * imgA.getStride();\n" +
 						"\t\t\tint indexB = imgB.getStartIndex() + y * imgB.getStride();\n" +
@@ -324,7 +324,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 
 		out.print(
 				"\tpublic static void log( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,input.height,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
 				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
 				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
@@ -344,7 +344,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		out.print(
 				"\tpublic static void pow2( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,input.height,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
 				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
 				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
@@ -366,7 +366,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		out.print(
 				"\tpublic static void sqrt( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,input.height,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
 				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
 				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +

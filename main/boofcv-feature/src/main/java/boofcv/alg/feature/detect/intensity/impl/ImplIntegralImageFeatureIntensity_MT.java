@@ -57,7 +57,7 @@ public class ImplIntegralImageFeatureIntensity_MT {
 
 		float norm = 1.0f/(size*size);
 
-		BoofConcurrency.range(0, h, y -> {
+		BoofConcurrency.loopFor(0, h, y -> {
 			int yy = y * skip;
 			for (int x = 0; x < border; x++) {
 				int xx = x * skip;
@@ -69,7 +69,7 @@ public class ImplIntegralImageFeatureIntensity_MT {
 			}
 		});
 
-		BoofConcurrency.range(border, w-border, x -> {
+		BoofConcurrency.loopFor(border, w-border, x -> {
 			int xx = x*skip;
 
 			for( int y = 0; y < border; y++ ) {
@@ -115,7 +115,7 @@ public class ImplIntegralImageFeatureIntensity_MT {
 		final int endY = h - border;
 		final int endX = w - border;
 
-		BoofConcurrency.range(border, endY, y -> {
+		BoofConcurrency.loopFor(border, endY, y -> {
 
 			// pixel location in original input image
 			int yy = y*skip;
@@ -190,7 +190,7 @@ public class ImplIntegralImageFeatureIntensity_MT {
 
 		float norm = 1.0f/(size*size);
 
-		BoofConcurrency.range(0, h, y -> {
+		BoofConcurrency.loopFor(0, h, y -> {
 			int yy = y*skip;
 			for( int x = 0; x < border; x++ ) {
 				int xx = x*skip;
@@ -202,7 +202,7 @@ public class ImplIntegralImageFeatureIntensity_MT {
 			}
 		});
 
-		BoofConcurrency.range(border, w-border, x -> {
+		BoofConcurrency.loopFor(border, w-border, x -> {
 			int xx = x*skip;
 
 			for( int y = 0; y < border; y++ ) {
@@ -247,7 +247,7 @@ public class ImplIntegralImageFeatureIntensity_MT {
 		final int endY = h - border;
 		final int endX = w - border;
 
-		BoofConcurrency.range(border, endY, y -> {
+		BoofConcurrency.loopFor(border, endY, y -> {
 
 			// pixel location in original input image
 			int yy = y*skip;

@@ -54,7 +54,7 @@ public class ThresholdBlock_MT<T extends ImageGray<T>,S extends ImageBase<S>>
 			vblocks++;
 
 		//		for (int y = 0; y < innerHeight; y += blockHeight) {
-		BoofConcurrency.range(0, vblocks, vblock -> {
+		BoofConcurrency.loopFor(0, vblocks, vblock -> {
 			BlockProcessor<T,S> processor = processors.pop();
 			processor.init(blockWidth,blockHeight,thresholdFromLocalBlocks);
 			int y = vblock*blockHeight;
@@ -90,7 +90,7 @@ public class ThresholdBlock_MT<T extends ImageGray<T>,S extends ImageBase<S>>
 
 	@Override
 	protected void applyThreshold( T input, GrayU8 output ) {
-		BoofConcurrency.range(0, stats.height, blockY -> {
+		BoofConcurrency.loopFor(0, stats.height, blockY -> {
 			BlockProcessor<T,S> processor = processors.pop();
 			processor.init(blockWidth,blockHeight,thresholdFromLocalBlocks);
 

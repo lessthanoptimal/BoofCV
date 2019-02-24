@@ -47,7 +47,7 @@ public class ImplThresholdImageOps {
 										float threshold , boolean down )
 	{
 		if( down ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -58,7 +58,7 @@ public class ImplThresholdImageOps {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -77,7 +77,7 @@ public class ImplThresholdImageOps {
 										double threshold , boolean down )
 	{
 		if( down ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -88,7 +88,7 @@ public class ImplThresholdImageOps {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -107,7 +107,7 @@ public class ImplThresholdImageOps {
 										int threshold , boolean down )
 	{
 		if( down ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -118,7 +118,7 @@ public class ImplThresholdImageOps {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -137,7 +137,7 @@ public class ImplThresholdImageOps {
 										int threshold , boolean down )
 	{
 		if( down ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -148,7 +148,7 @@ public class ImplThresholdImageOps {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -167,7 +167,7 @@ public class ImplThresholdImageOps {
 										int threshold , boolean down )
 	{
 		if( down ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -178,7 +178,7 @@ public class ImplThresholdImageOps {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -197,7 +197,7 @@ public class ImplThresholdImageOps {
 										int threshold , boolean down )
 	{
 		if( down ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -208,7 +208,7 @@ public class ImplThresholdImageOps {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -235,7 +235,7 @@ public class ImplThresholdImageOps {
 		BlurImageOps.mean(input,mean,radius,storage2,storage3);
 
 		if( down ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -250,7 +250,7 @@ public class ImplThresholdImageOps {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -280,7 +280,7 @@ public class ImplThresholdImageOps {
 		BlurImageOps.gaussian(input,blur,-1,radius,storage2);
 
 		if( down ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -299,7 +299,7 @@ public class ImplThresholdImageOps {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -334,7 +334,7 @@ public class ImplThresholdImageOps {
 		BlurImageOps.mean(input,mean,radius,storage2,storage3);
 
 		if( down ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -349,7 +349,7 @@ public class ImplThresholdImageOps {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -379,7 +379,7 @@ public class ImplThresholdImageOps {
 		BlurImageOps.gaussian(input,blur,-1,radius,storage2);
 
 		if( down ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -398,7 +398,7 @@ public class ImplThresholdImageOps {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -433,7 +433,7 @@ public class ImplThresholdImageOps {
 		BlurImageOps.mean(input,mean,radius,storage2,storage3);
 
 		if( down ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -448,7 +448,7 @@ public class ImplThresholdImageOps {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -478,7 +478,7 @@ public class ImplThresholdImageOps {
 		BlurImageOps.gaussian(input,blur,-1,radius,storage2);
 
 		if( down ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;
@@ -497,7 +497,7 @@ public class ImplThresholdImageOps {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for( int y = 0; y < input.height; y++ ) {
 				int indexIn = input.startIndex + y*input.stride;
 				int indexOut = output.startIndex + y*output.stride;

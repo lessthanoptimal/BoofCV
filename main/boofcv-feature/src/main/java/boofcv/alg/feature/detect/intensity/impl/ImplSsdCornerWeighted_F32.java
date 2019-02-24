@@ -56,7 +56,7 @@ public class ImplSsdCornerWeighted_F32 extends ImplSsdCornerBase<GrayF32,GrayF32
 		temp.reshape(w,h);
 		intensity.reshape(w,h);
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for( int y = 0; y < h; y++ ) {
 			int indexX = derivX.startIndex + derivX.stride*y;
 			int indexY = derivY.startIndex + derivY.stride*y;
@@ -78,7 +78,7 @@ public class ImplSsdCornerWeighted_F32 extends ImplSsdCornerBase<GrayF32,GrayF32
 		blur(horizXY,temp);
 		blur(horizYY,temp);
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{
 		for( int y = 0; y < h; y++ ) {
 			int index = horizXX.stride*y;
 			for( int x = 0; x < w; x++ , index++ ) {

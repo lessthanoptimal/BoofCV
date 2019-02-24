@@ -46,7 +46,7 @@ public class GradientTwo0_Standard {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
 		for (int y = 0; y < height; y++) {
 			int indexX = derivX.startIndex + derivX.stride * y;
 			int indexY = derivY.startIndex + derivY.stride * y;
@@ -74,7 +74,7 @@ public class GradientTwo0_Standard {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
 		for (int y = 0; y < height; y++) {
 			int indexX = derivX.startIndex + derivX.stride * y;
 			int indexY = derivY.startIndex + derivY.stride * y;
@@ -99,7 +99,7 @@ public class GradientTwo0_Standard {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0,height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
 		for (int y = 0; y < height; y++) {
 			int indexX = derivX.startIndex + derivX.stride * y;
 			int indexY = derivY.startIndex + derivY.stride * y;

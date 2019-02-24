@@ -73,7 +73,7 @@ public class NonMaxBlock_MT extends NonMaxBlock {
 		if( (endY-border) - N*step > 0 )
 			N += 1;
 
-		BoofConcurrency.range(0,N,iterY -> {
+		BoofConcurrency.loopFor(0,N, iterY -> {
 
 			NonMaxBlock.Search search;
 			QueueCorner threadMin=null,threadMax=null;

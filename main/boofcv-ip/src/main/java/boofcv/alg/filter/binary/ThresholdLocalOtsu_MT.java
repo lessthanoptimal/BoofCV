@@ -38,7 +38,7 @@ public class ThresholdLocalOtsu_MT extends ThresholdLocalOtsu {
 	@Override
 	protected void process(GrayU8 input, GrayU8 output, int x0, int y0, int x1, int y1, byte a, byte b) {
 
-		BoofConcurrency.blocks(y0,y1,(block0,block1)->{
+		BoofConcurrency.loopBlocks(y0,y1,(block0,block1)->{
 			// handle the inner portion first
 			ApplyHelper h = helpers.pop();
 			for (int y = block0; y < block1; y++) {

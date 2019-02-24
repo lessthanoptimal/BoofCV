@@ -43,7 +43,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -64,7 +64,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -84,7 +84,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -96,7 +96,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] & 0xFF);
 			}
@@ -109,7 +109,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -121,7 +121,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] & 0xFF);
 			}
@@ -133,7 +133,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -145,7 +145,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFF);
 			}
@@ -158,7 +158,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -170,7 +170,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFF);
 			}
@@ -182,7 +182,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -194,7 +194,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFF);
 			}
@@ -207,7 +207,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -219,7 +219,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFF);
 			}
@@ -231,7 +231,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -243,7 +243,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] & 0xFF);
 			}
@@ -256,7 +256,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -268,7 +268,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] & 0xFF);
 			}
@@ -280,7 +280,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -292,7 +292,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] & 0xFF);
 			}
@@ -305,7 +305,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -317,7 +317,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] & 0xFF);
 			}
@@ -332,7 +332,7 @@ public class ImplConvertImage_MT {
 			GrayU8 band = output.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -351,7 +351,7 @@ public class ImplConvertImage_MT {
 			GrayU8 band = input.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -368,7 +368,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -389,7 +389,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -409,7 +409,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -421,7 +421,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
@@ -434,7 +434,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -446,7 +446,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
@@ -458,7 +458,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -470,7 +470,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
@@ -483,7 +483,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -495,7 +495,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
@@ -507,7 +507,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -519,7 +519,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
@@ -532,7 +532,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -544,7 +544,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
@@ -556,7 +556,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -568,7 +568,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
@@ -581,7 +581,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -593,7 +593,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
@@ -605,7 +605,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -617,7 +617,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
@@ -630,7 +630,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -642,7 +642,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
@@ -657,7 +657,7 @@ public class ImplConvertImage_MT {
 			GrayS8 band = output.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -676,7 +676,7 @@ public class ImplConvertImage_MT {
 			GrayS8 band = input.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -693,7 +693,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -705,7 +705,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] & 0xFFFF);
 			}
@@ -718,7 +718,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -730,7 +730,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] & 0xFFFF);
 			}
@@ -742,7 +742,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -763,7 +763,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -783,7 +783,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -795,7 +795,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFFFF);
 			}
@@ -808,7 +808,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -820,7 +820,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFFFF);
 			}
@@ -832,7 +832,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -844,7 +844,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFFFF);
 			}
@@ -857,7 +857,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -869,7 +869,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] & 0xFFFF);
 			}
@@ -881,7 +881,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -893,7 +893,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] & 0xFFFF);
 			}
@@ -906,7 +906,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -918,7 +918,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] & 0xFFFF);
 			}
@@ -930,7 +930,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -942,7 +942,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] & 0xFFFF);
 			}
@@ -955,7 +955,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -967,7 +967,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] & 0xFFFF);
 			}
@@ -982,7 +982,7 @@ public class ImplConvertImage_MT {
 			GrayU16 band = output.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -1001,7 +1001,7 @@ public class ImplConvertImage_MT {
 			GrayU16 band = input.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -1018,7 +1018,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1030,7 +1030,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
@@ -1043,7 +1043,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1055,7 +1055,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
@@ -1067,7 +1067,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1088,7 +1088,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1108,7 +1108,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1120,7 +1120,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
@@ -1133,7 +1133,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1145,7 +1145,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
@@ -1157,7 +1157,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1169,7 +1169,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
@@ -1182,7 +1182,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1194,7 +1194,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
@@ -1206,7 +1206,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1218,7 +1218,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
@@ -1231,7 +1231,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1243,7 +1243,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
@@ -1255,7 +1255,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1267,7 +1267,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
@@ -1280,7 +1280,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1292,7 +1292,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
@@ -1307,7 +1307,7 @@ public class ImplConvertImage_MT {
 			GrayS16 band = output.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -1326,7 +1326,7 @@ public class ImplConvertImage_MT {
 			GrayS16 band = input.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -1343,7 +1343,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1355,7 +1355,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
@@ -1368,7 +1368,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1380,7 +1380,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
@@ -1392,7 +1392,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1404,7 +1404,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
@@ -1417,7 +1417,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1429,7 +1429,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
@@ -1441,7 +1441,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1453,7 +1453,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
@@ -1466,7 +1466,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1478,7 +1478,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( input.data[i] );
 			}
@@ -1490,7 +1490,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1502,7 +1502,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
@@ -1515,7 +1515,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1527,7 +1527,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
@@ -1539,7 +1539,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1551,7 +1551,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
@@ -1564,7 +1564,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1576,7 +1576,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
@@ -1591,7 +1591,7 @@ public class ImplConvertImage_MT {
 			GrayS32 band = output.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -1610,7 +1610,7 @@ public class ImplConvertImage_MT {
 			GrayS32 band = input.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -1627,7 +1627,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1639,7 +1639,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
@@ -1652,7 +1652,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1664,7 +1664,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
@@ -1676,7 +1676,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1688,7 +1688,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
@@ -1701,7 +1701,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1713,7 +1713,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
@@ -1725,7 +1725,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1737,7 +1737,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( int )( input.data[i] );
 			}
@@ -1750,7 +1750,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1762,7 +1762,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( int )( input.data[i] );
 			}
@@ -1774,7 +1774,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1786,7 +1786,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
@@ -1799,7 +1799,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1811,7 +1811,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
@@ -1823,7 +1823,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1835,7 +1835,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
@@ -1848,7 +1848,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1860,7 +1860,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
@@ -1875,7 +1875,7 @@ public class ImplConvertImage_MT {
 			GrayS64 band = output.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -1894,7 +1894,7 @@ public class ImplConvertImage_MT {
 			GrayS64 band = input.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -1911,7 +1911,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1923,7 +1923,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
@@ -1936,7 +1936,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1948,7 +1948,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
@@ -1960,7 +1960,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1972,7 +1972,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
@@ -1985,7 +1985,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -1997,7 +1997,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
@@ -2009,7 +2009,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2021,7 +2021,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( int )( input.data[i] );
 			}
@@ -2034,7 +2034,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2046,7 +2046,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( int )( input.data[i] );
 			}
@@ -2058,7 +2058,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2070,7 +2070,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( long )( input.data[i] );
 			}
@@ -2083,7 +2083,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2095,7 +2095,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( long )( input.data[i] );
 			}
@@ -2107,7 +2107,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2119,7 +2119,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
@@ -2132,7 +2132,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2144,7 +2144,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( double )( input.data[i] );
 			}
@@ -2159,7 +2159,7 @@ public class ImplConvertImage_MT {
 			GrayF32 band = output.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -2178,7 +2178,7 @@ public class ImplConvertImage_MT {
 			GrayF32 band = input.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -2195,7 +2195,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2207,7 +2207,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
@@ -2220,7 +2220,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2232,7 +2232,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( byte )( input.data[i] );
 			}
@@ -2244,7 +2244,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2256,7 +2256,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
@@ -2269,7 +2269,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2281,7 +2281,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( short )( input.data[i] );
 			}
@@ -2293,7 +2293,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2305,7 +2305,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( int )( input.data[i] );
 			}
@@ -2318,7 +2318,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2330,7 +2330,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( int )( input.data[i] );
 			}
@@ -2342,7 +2342,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2354,7 +2354,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( long )( input.data[i] );
 			}
@@ -2367,7 +2367,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2379,7 +2379,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( long )( input.data[i] );
 			}
@@ -2391,7 +2391,7 @@ public class ImplConvertImage_MT {
 
 		if (input.isSubimage() || output.isSubimage()) {
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2403,7 +2403,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height;
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
@@ -2416,7 +2416,7 @@ public class ImplConvertImage_MT {
 		if (input.isSubimage() || output.isSubimage()) {
 			final int N = input.width * input.getNumBands();
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = input.getIndex(0, y);
 				int indexDst = output.getIndex(0, y);
 
@@ -2428,7 +2428,7 @@ public class ImplConvertImage_MT {
 		} else {
 			final int N = input.width * input.height * input.getNumBands();
 
-			BoofConcurrency.blocks(0,N,(i0,i1)->{
+			BoofConcurrency.loopBlocks(0,N,(i0,i1)->{
 			for (int i = i0; i < i1; i++) {
 				output.data[i] = ( float )( input.data[i] );
 			}
@@ -2443,7 +2443,7 @@ public class ImplConvertImage_MT {
 			GrayF64 band = output.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -2462,7 +2462,7 @@ public class ImplConvertImage_MT {
 			GrayF64 band = input.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -2482,7 +2482,7 @@ public class ImplConvertImage_MT {
 			GrayF32 band = output.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -2501,7 +2501,7 @@ public class ImplConvertImage_MT {
 			GrayU8 band = output.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y*input.stride + input.startIndex + offset;
 				int indexDst = y*output.stride + output.startIndex;
 				int end = indexDst + input.width;
@@ -2520,7 +2520,7 @@ public class ImplConvertImage_MT {
 			GrayU8 band = input.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;
@@ -2540,7 +2540,7 @@ public class ImplConvertImage_MT {
 			GrayF32 band = input.bands[i];
 			final int offset = i;
 
-			BoofConcurrency.range(0, input.height, y -> {
+			BoofConcurrency.loopFor(0, input.height, y -> {
 				int indexSrc = y * input.stride + input.startIndex;
 				int indexDst = y * output.stride + output.startIndex + offset;
 				int end = indexSrc + input.width;

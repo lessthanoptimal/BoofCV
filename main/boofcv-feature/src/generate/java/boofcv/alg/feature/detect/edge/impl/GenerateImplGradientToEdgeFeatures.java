@@ -79,7 +79,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 				"\t\tfinal int w = derivX.width;\n" +
 				"\t\tfinal int h = derivY.height;\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
 				"\t\tfor( int y = 0; y < h; y++ ) {\n" +
 				"\t\t\tint indexX = derivX.startIndex + y*derivX.stride;\n" +
 				"\t\t\tint indexY = derivY.startIndex + y*derivY.stride;\n" +
@@ -106,7 +106,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 				"\t\tfinal int w = derivX.width;\n" +
 				"\t\tfinal int h = derivY.height;\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
 				"\t\tfor( int y = 0; y < h; y++ ) {\n" +
 				"\t\t\tint indexX = derivX.startIndex + y*derivX.stride;\n" +
 				"\t\t\tint indexY = derivY.startIndex + y*derivY.stride;\n" +
@@ -132,7 +132,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 				"\t\tfinal int w = derivX.width;\n" +
 				"\t\tfinal int h = derivY.height;\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
 				"\t\tfor( int y = 0; y < h; y++ ) {\n" +
 				"\t\t\tint indexX = derivX.startIndex + y*derivX.stride;\n" +
 				"\t\t\tint indexY = derivY.startIndex + y*derivY.stride;\n" +
@@ -166,7 +166,7 @@ public class GenerateImplGradientToEdgeFeatures extends CodeGeneratorBase {
 				"\t\tfinal int w = derivX.width;\n" +
 				"\t\tfinal int h = derivY.height;\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
 				"\t\tfor( int y = 0; y < h; y++ ) {\n" +
 				"\t\t\tint indexX = derivX.startIndex + y*derivX.stride;\n" +
 				"\t\t\tint indexY = derivY.startIndex + y*derivY.stride;\n" +

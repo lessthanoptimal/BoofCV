@@ -46,7 +46,7 @@ public class DerivativeLaplacian_Inner {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
 			int index = orig.startIndex + stride * y + 1;
 			int indexOut = deriv.startIndex + deriv.stride * y + 1;
@@ -74,7 +74,7 @@ public class DerivativeLaplacian_Inner {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
 			int index = orig.startIndex + stride * y + 1;
 			int indexOut = deriv.startIndex + deriv.stride * y + 1;
@@ -108,7 +108,7 @@ public class DerivativeLaplacian_Inner {
 		final int height = orig.getHeight() - 1;
 		final int stride = orig.stride;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(1,height,y->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,height,y->{
 		for (int y = 1; y < height; y++) {
 			int index = orig.startIndex + stride * y + 1;
 			int indexOut = deriv.startIndex + deriv.stride * y + 1;

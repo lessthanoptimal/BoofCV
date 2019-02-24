@@ -51,7 +51,7 @@ public class ImplConvertPlanarToGray {
 			GrayU8 band1 = from.getBand(1);
 			GrayU8 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -66,7 +66,7 @@ public class ImplConvertPlanarToGray {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -93,7 +93,7 @@ public class ImplConvertPlanarToGray {
 			GrayS8 band1 = from.getBand(1);
 			GrayS8 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -108,7 +108,7 @@ public class ImplConvertPlanarToGray {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -135,7 +135,7 @@ public class ImplConvertPlanarToGray {
 			GrayU16 band1 = from.getBand(1);
 			GrayU16 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -150,7 +150,7 @@ public class ImplConvertPlanarToGray {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -177,7 +177,7 @@ public class ImplConvertPlanarToGray {
 			GrayS16 band1 = from.getBand(1);
 			GrayS16 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -192,7 +192,7 @@ public class ImplConvertPlanarToGray {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -219,7 +219,7 @@ public class ImplConvertPlanarToGray {
 			GrayS32 band1 = from.getBand(1);
 			GrayS32 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -234,7 +234,7 @@ public class ImplConvertPlanarToGray {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -261,7 +261,7 @@ public class ImplConvertPlanarToGray {
 			GrayS64 band1 = from.getBand(1);
 			GrayS64 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -276,7 +276,7 @@ public class ImplConvertPlanarToGray {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -303,7 +303,7 @@ public class ImplConvertPlanarToGray {
 			GrayF32 band1 = from.getBand(1);
 			GrayF32 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -318,7 +318,7 @@ public class ImplConvertPlanarToGray {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -345,7 +345,7 @@ public class ImplConvertPlanarToGray {
 			GrayF64 band1 = from.getBand(1);
 			GrayF64 band2 = from.getBand(2);
 
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);
@@ -360,7 +360,7 @@ public class ImplConvertPlanarToGray {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {
 			for (int y = 0; y < from.height; y++) {
 				int indexFrom = from.getIndex(0, y);
 				int indexTo = to.getIndex(0, y);

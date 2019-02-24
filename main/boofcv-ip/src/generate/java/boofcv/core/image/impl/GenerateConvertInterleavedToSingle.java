@@ -81,7 +81,7 @@ public class GenerateConvertInterleavedToSingle extends CodeGeneratorBase {
 				"\t\t\t\tSystem.arraycopy(from.data,indexFrom,to.data,indexTo,from.width);\n" +
 				"\t\t\t}\n" +
 				"\t\t} else if( numBands == 2 ) {\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {\n" +
 				"\t\t\tfor (int y = 0; y < from.height; y++) {\n" +
 				"\t\t\t\tint indexFrom = from.getIndex(0, y);\n" +
 				"\t\t\t\tint indexTo = to.getIndex(0, y);\n" +
@@ -96,7 +96,7 @@ public class GenerateConvertInterleavedToSingle extends CodeGeneratorBase {
 				"\t\t\t}\n" +
 				"\t\t\t//CONCURRENT_ABOVE });\n" +
 				"\t\t} else if( numBands == 3 ) {\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {\n" +
 				"\t\t\tfor (int y = 0; y < from.height; y++) {\n" +
 				"\t\t\t\tint indexFrom = from.getIndex(0, y);\n" +
 				"\t\t\t\tint indexTo = to.getIndex(0, y);\n" +
@@ -112,7 +112,7 @@ public class GenerateConvertInterleavedToSingle extends CodeGeneratorBase {
 				"\t\t\t}\n" +
 				"\t\t\t//CONCURRENT_ABOVE });\n" +
 				"\t\t} else {\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {\n" +
 				"\t\t\tfor (int y = 0; y < from.height; y++) {\n" +
 				"\t\t\t\tint indexFrom = from.getIndex(0, y);\n" +
 				"\t\t\t\tint indexTo = to.getIndex(0, y);\n" +

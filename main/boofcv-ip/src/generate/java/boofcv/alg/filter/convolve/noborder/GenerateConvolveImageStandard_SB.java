@@ -260,7 +260,7 @@ public class GenerateConvolveImageStandard_SB extends CodeGeneratorBase {
 				"\t\tint offsetL = kernel.offset;\n" +
 				"\t\tint offsetR = kernel.width-kernel.offset-1;\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.blocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopBlocks(offsetL, height-offsetR,kernel.width, (y0,y1) -> {\n" +
 				"\t\tfinal int y0 = offsetL, y1 = height-offsetR;\n" +
 				"\t\t"+sumType+" totalRow[] = _work.pop();\n" +
 				"\t\tfor( int y = y0; y < y1; y++ ) {\n" +

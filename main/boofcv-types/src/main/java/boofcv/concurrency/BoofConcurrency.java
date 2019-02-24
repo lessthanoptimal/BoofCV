@@ -50,7 +50,14 @@ public class BoofConcurrency {
 		return pool.getParallelism();
 	}
 
-	public static void range(int start , int endExclusive , IntConsumer consumer ) {
+	/**
+	 * Concurrent for loop. Each loop with spawn as a thread up to the maximum number of threads.
+	 *
+	 * @param start starting value, inclusive
+	 * @param endExclusive ending value, exclusive
+	 * @param consumer The consumer
+	 */
+	public static void loopFor(int start , int endExclusive , IntConsumer consumer ) {
 		try {
 			pool.submit(() ->IntStream.range(start, endExclusive).parallel().forEach(consumer)).get();
 		} catch (InterruptedException | ExecutionException e) {
@@ -75,8 +82,8 @@ public class BoofConcurrency {
 	 * @param minBlock Minimum size of a block
 	 * @param consumer The consumer
 	 */
-	public static void blocks(int start , int endExclusive , int minBlock,
-							  IntRangeConsumer consumer ) {
+	public static void loopBlocks(int start , int endExclusive , int minBlock,
+								  IntRangeConsumer consumer ) {
 		final ForkJoinPool pool = BoofConcurrency.pool;
 		int numThreads = pool.getParallelism();
 
@@ -108,7 +115,7 @@ public class BoofConcurrency {
 	 * @param endExclusive Last index, exclusive
 	 * @param consumer The consumer
 	 */
-	public static void blocks(int start , int endExclusive , IntRangeConsumer consumer ) {
+	public static void loopBlocks(int start , int endExclusive , IntRangeConsumer consumer ) {
 		final ForkJoinPool pool = BoofConcurrency.pool;
 		int numThreads = pool.getParallelism();
 

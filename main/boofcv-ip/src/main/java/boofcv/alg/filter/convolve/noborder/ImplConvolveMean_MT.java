@@ -46,7 +46,7 @@ public class ImplConvolveMean_MT {
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
 
-		BoofConcurrency.range(0, input.height, y -> {
+		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -86,7 +86,7 @@ public class ImplConvolveMean_MT {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
@@ -122,7 +122,7 @@ public class ImplConvolveMean_MT {
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
 
-		BoofConcurrency.range(0, input.height, y -> {
+		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -162,7 +162,7 @@ public class ImplConvolveMean_MT {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
@@ -198,7 +198,7 @@ public class ImplConvolveMean_MT {
 		final int divisor = kernelWidth;
 		final int halfDivisor = divisor/2;
 
-		BoofConcurrency.range(0, input.height, y -> {
+		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -238,7 +238,7 @@ public class ImplConvolveMean_MT {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
@@ -273,7 +273,7 @@ public class ImplConvolveMean_MT {
 
 		final float divisor = kernelWidth;
 
-		BoofConcurrency.range(0, input.height, y -> {
+		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -312,7 +312,7 @@ public class ImplConvolveMean_MT {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		float totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
@@ -347,7 +347,7 @@ public class ImplConvolveMean_MT {
 
 		final double divisor = kernelWidth;
 
-		BoofConcurrency.range(0, input.height, y -> {
+		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
 			int indexOut = output.startIndex + output.stride*y + radius;
 
@@ -386,7 +386,7 @@ public class ImplConvolveMean_MT {
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		BoofConcurrency.blocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
 		double totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
 			int indexIn = input.startIndex + (y0-radius)*input.stride + x;

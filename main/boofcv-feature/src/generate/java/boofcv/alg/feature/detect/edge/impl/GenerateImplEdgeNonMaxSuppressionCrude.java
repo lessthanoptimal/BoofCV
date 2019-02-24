@@ -82,7 +82,7 @@ public class GenerateImplEdgeNonMaxSuppressionCrude extends CodeGeneratorBase {
 				"\t\tfinal int w = intensity.width;\n" +
 				"\t\tfinal int h = intensity.height-1;\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{\n" +
 				"\t\tfor( int y = 1; y < h; y++ ) {\n" +
 				"\t\t\tint indexI = intensity.startIndex + y*intensity.stride+1;\n" +
 				"\t\t\tint indexX = derivX.startIndex + y*derivX.stride+1;\n" +
@@ -122,7 +122,7 @@ public class GenerateImplEdgeNonMaxSuppressionCrude extends CodeGeneratorBase {
 				"\t\tImageBorder_F32 intensity = FactoryImageBorderAlgs.value(_intensity, 0);\n" +
 				"\n" +
 				"\t\t// top border\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,w,x->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,w,x->{\n" +
 				"\t\tfor( int x = 0; x < w; x++ ) {\n" +
 				"\t\t\tint dx,dy;\n" +
 				"\n" +
@@ -142,7 +142,7 @@ public class GenerateImplEdgeNonMaxSuppressionCrude extends CodeGeneratorBase {
 				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\n" +
 				"\t\t// bottom border\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,w,x->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,w,x->{\n" +
 				"\t\tfor( int x = 0; x < w; x++ ) {\n" +
 				"\t\t\tint dx,dy;\n" +
 				"\n" +
@@ -162,7 +162,7 @@ public class GenerateImplEdgeNonMaxSuppressionCrude extends CodeGeneratorBase {
 				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\n" +
 				"\t\t// left border\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{\n" +
 				"\t\tfor( int y = 1; y < h; y++ ) {\n" +
 				"\t\t\tint dx,dy;\n" +
 				"\n" +
@@ -183,7 +183,7 @@ public class GenerateImplEdgeNonMaxSuppressionCrude extends CodeGeneratorBase {
 				"\n" +
 				"\t\t// right border\n" +
 				"\t\tint ww = w - 1;\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(1,h,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(1,h,y->{\n" +
 				"\t\tfor( int y = 1; y < h; y++ ) {\n" +
 				"\t\t\tint dx,dy;\n" +
 				"\n" +

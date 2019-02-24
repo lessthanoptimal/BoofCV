@@ -108,7 +108,7 @@ public class ThresholdSauvola implements InputToBinary<GrayF32> {
 		float R = ImageStatistics.max(stdev);
 
 		if( down ) {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for (int y = 0; y < input.height; y++) {
 				int i = y * stdev.width;
 				int indexIn = input.startIndex + y * input.stride;
@@ -122,7 +122,7 @@ public class ThresholdSauvola implements InputToBinary<GrayF32> {
 			}
 			//CONCURRENT_ABOVE });
 		} else {
-			//CONCURRENT_BELOW BoofConcurrency.range(0, input.height, y -> {
+			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, input.height, y -> {
 			for (int y = 0; y < input.height; y++) {
 				int i = y * stdev.width;
 				int indexIn = input.startIndex + y * input.stride;

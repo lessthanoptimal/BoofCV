@@ -165,7 +165,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int width = image.getWidth();
 		final int halfDivisor = divisor/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0, image.height, i -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
 		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
@@ -199,7 +199,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int width = image.getWidth();
 		final int halfDivisor = divisor/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0, image.height, i -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
 		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
@@ -237,7 +237,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int width = image.getWidth();
 		final int halfDivisor = divisor/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0, image.height, i -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
 		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
@@ -279,7 +279,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int width = image.getWidth();
 		final int halfDivisor = divisor/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0, image.height, i -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
 		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
@@ -325,7 +325,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int width = image.getWidth();
 		final int halfDivisor = divisor/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(0, image.height, i -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, image.height, i -> {
 		for( int i = 0; i < image.height; i++ ) {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
@@ -368,7 +368,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 
 		final int yEnd = imgHeight-radius;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(radius, yEnd, y -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
 		for( int y = radius; y < yEnd; y++ ) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
@@ -408,7 +408,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 
 		final int yEnd = imgHeight-radius;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(radius, yEnd, y -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
 		for( int y = radius; y < yEnd; y++ ) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
@@ -454,7 +454,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 
 		final int yEnd = imgHeight-radius;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(radius, yEnd, y -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
 		for( int y = radius; y < yEnd; y++ ) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
@@ -506,7 +506,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 
 		final int yEnd = imgHeight-radius;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(radius, yEnd, y -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
 		for( int y = radius; y < yEnd; y++ ) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
@@ -564,7 +564,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 
 		final int yEnd = imgHeight-radius;
 
-		//CONCURRENT_BELOW BoofConcurrency.range(radius, yEnd, y -> {
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(radius, yEnd, y -> {
 		for( int y = radius; y < yEnd; y++ ) {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
@@ -619,7 +619,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int kernelRadius = kernel.getRadius();
 		final int kernelWidth = 2*kernelRadius+1;
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(kernelRadius, height-kernelRadius, kernelWidth,(y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth,(y0,y1)->{
 		final int y0 = kernelRadius, y1 = height-kernelRadius;
 		int totalRow[] = _work.pop();
 		for( int y = y0; y < y1; y++ ) {
@@ -686,7 +686,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int kernelRadius = kernel.getRadius();
 		final int kernelWidth = 2*kernelRadius+1;
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(kernelRadius, height-kernelRadius, kernelWidth,(y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth,(y0,y1)->{
 		final int y0 = kernelRadius, y1 = height-kernelRadius;
 		int totalRow[] = _work.pop();
 		for( int y = y0; y < y1; y++ ) {
@@ -761,7 +761,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int kernelRadius = kernel.getRadius();
 		final int kernelWidth = 2*kernelRadius+1;
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(kernelRadius, height-kernelRadius, kernelWidth,(y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth,(y0,y1)->{
 		final int y0 = kernelRadius, y1 = height-kernelRadius;
 		int totalRow[] = _work.pop();
 		for( int y = y0; y < y1; y++ ) {
@@ -844,7 +844,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int kernelRadius = kernel.getRadius();
 		final int kernelWidth = 2*kernelRadius+1;
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(kernelRadius, height-kernelRadius, kernelWidth,(y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth,(y0,y1)->{
 		final int y0 = kernelRadius, y1 = height-kernelRadius;
 		int totalRow[] = _work.pop();
 		for( int y = y0; y < y1; y++ ) {
@@ -935,7 +935,7 @@ public class ConvolveImageUnrolled_SB_U8_I8_Div {
 		final int kernelRadius = kernel.getRadius();
 		final int kernelWidth = 2*kernelRadius+1;
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(kernelRadius, height-kernelRadius, kernelWidth,(y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(kernelRadius, height-kernelRadius, kernelWidth,(y0,y1)->{
 		final int y0 = kernelRadius, y1 = height-kernelRadius;
 		int totalRow[] = _work.pop();
 		for( int y = y0; y < y1; y++ ) {

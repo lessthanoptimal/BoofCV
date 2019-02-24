@@ -40,7 +40,7 @@ class TestBoofConcurrency {
 	void blocks() {
 		GrowQueue_I32 found = new GrowQueue_I32();
 
-		BoofConcurrency.blocks(10,100,12,new BlockTask(found));
+		BoofConcurrency.loopBlocks(10,100,12,new BlockTask(found));
 
 		assertEquals(8,found.size);
 		// the timing was set up so that they should be approximately in reverse order, if run in parallel

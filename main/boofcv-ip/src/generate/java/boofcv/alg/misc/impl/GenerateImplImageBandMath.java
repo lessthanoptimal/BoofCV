@@ -88,7 +88,7 @@ public class GenerateImplImageBandMath extends CodeGeneratorBase {
 				"\n" +
 				"\t\tfinal "+band+"[] bands = input.bands;\n" +
 				"\t\t\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
 				"\t\tfor (int y = 0; y < h; y++) {\n" +
 				"\t\t\tint indexInput = input.getStartIndex() + y * input.getStride();\n" +
 				"\t\t\tint indexOutput = output.getStartIndex() + y * output.getStride();\n" +
@@ -126,7 +126,7 @@ public class GenerateImplImageBandMath extends CodeGeneratorBase {
 				"\n" +
 				"\t\tfinal "+band+"[] bands = input.bands;\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
 				"\t\tfor(int y = 0; y < h; y++) {\n" +
 				"\t\t\tint indexInput = input.startIndex + y * input.stride;\n" +
 				"\t\t\tint indexOutput = output.startIndex + y * output.stride;\n" +
@@ -163,7 +163,7 @@ public class GenerateImplImageBandMath extends CodeGeneratorBase {
 				"\n" +
 				"\t\tfinal "+band+"[] bands = input.bands;\n" +
 				"\t\t"+sumType+" divisor = lastBand - startBand+1;\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
 				"\t\tfor (int y = 0; y < h; y++) {\n" +
 				"\t\t\tint indexInput = input.getStartIndex() + y * input.getStride();\n" +
 				"\t\t\tint indexOutput = output.getStartIndex() + y * output.getStride();\n" +
@@ -198,7 +198,7 @@ public class GenerateImplImageBandMath extends CodeGeneratorBase {
 				"\t\tfinal "+band+"[] bands = input.bands;\n" +
 				"\t\t"+sumType+" divisor = lastBand - startBand;\n" +
 				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
 				"\t\tfor (int y = 0; y < h; y++) {\n" +
 				"\t\t\tint indexInput = input.getStartIndex() + y * input.getStride();\n" +
 				"\t\t\tint indexOutput = output.getStartIndex() + y * output.getStride();\n" +
@@ -241,7 +241,7 @@ public class GenerateImplImageBandMath extends CodeGeneratorBase {
 				"\n" +
 				"\t\tfinal int middle = numBands/2;\n" +
 				"\t\tboolean isEven = numBands % 2 == 0;\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.range(0,h,y->{\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
 				"\t\tfor (int y = 0; y < h; y++) {\n" +
 				"\t\t\tfinal "+sumType+"[] valueArray = new "+sumType+"[numBands];\n" +
 				"\t\t\tint indexInput = input.getStartIndex() + y * input.getStride();\n" +

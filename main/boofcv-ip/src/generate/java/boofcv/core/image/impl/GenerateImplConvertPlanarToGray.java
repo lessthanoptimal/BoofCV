@@ -80,7 +80,7 @@ public class GenerateImplConvertPlanarToGray extends CodeGeneratorBase {
 				"\t\t\t"+imageType+" band1 = from.getBand(1);\n" +
 				"\t\t\t"+imageType+" band2 = from.getBand(2);\n" +
 				"\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {\n" +
 				"\t\t\tfor (int y = 0; y < from.height; y++) {\n" +
 				"\t\t\t\tint indexFrom = from.getIndex(0, y);\n" +
 				"\t\t\t\tint indexTo = to.getIndex(0, y);\n" +
@@ -95,7 +95,7 @@ public class GenerateImplConvertPlanarToGray extends CodeGeneratorBase {
 				"\t\t\t}\n" +
 				"\t\t\t//CONCURRENT_ABOVE });\n" +
 				"\t\t} else {\n" +
-				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.range(0, from.height, y -> {\n" +
+				"\t\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0, from.height, y -> {\n" +
 				"\t\t\tfor (int y = 0; y < from.height; y++) {\n" +
 				"\t\t\t\tint indexFrom = from.getIndex(0, y);\n" +
 				"\t\t\t\tint indexTo = to.getIndex(0, y);\n" +

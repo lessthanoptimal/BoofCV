@@ -67,7 +67,7 @@ public class ImplMedianHistogramInner {
 		// of the two elements in the middle. I'm not aware of libraries which actually do this.
 		int threshold = (w*w)/2+1;
 
-		//CONCURRENT_BELOW BoofConcurrency.blocks(radius, output.height-radius, w,(y0,y1)->{
+		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(radius, output.height-radius, w,(y0,y1)->{
 		final int y0 = radius, y1 = input.height-radius;
 		int[] histogram = _work.pop();
 		for( int y = y0; y < y1; y++ ) {

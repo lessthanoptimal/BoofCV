@@ -160,7 +160,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -191,7 +191,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -226,7 +226,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -265,7 +265,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -308,7 +308,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int width = image.getWidth();
 
-		BoofConcurrency.range(0, image.height, i -> {
+		BoofConcurrency.loopFor(0, image.height, i -> {
 			int indexDst = dest.startIndex + i*dest.stride+radius;
 			int j = image.startIndex + i*image.stride - radius;
 			final int jEnd = j+width-radius;
@@ -348,7 +348,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int yEnd = imgHeight-radius;
 
-		BoofConcurrency.range(radius, yEnd, y -> {
+		BoofConcurrency.loopFor(radius, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -385,7 +385,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int yEnd = imgHeight-radius;
 
-		BoofConcurrency.range(radius, yEnd, y -> {
+		BoofConcurrency.loopFor(radius, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -428,7 +428,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int yEnd = imgHeight-radius;
 
-		BoofConcurrency.range(radius, yEnd, y -> {
+		BoofConcurrency.loopFor(radius, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -477,7 +477,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int yEnd = imgHeight-radius;
 
-		BoofConcurrency.range(radius, yEnd, y -> {
+		BoofConcurrency.loopFor(radius, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -532,7 +532,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int yEnd = imgHeight-radius;
 
-		BoofConcurrency.range(radius, yEnd, y -> {
+		BoofConcurrency.loopFor(radius, yEnd, y -> {
 			int indexDst = dest.startIndex+y*dest.stride;
 			int i = image.startIndex + (y-radius)*image.stride;
 			final int iEnd = i+imgWidth;
@@ -577,7 +577,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int kernelRadius = kernel.getRadius();
 
-		BoofConcurrency.range(kernelRadius, height-kernelRadius, y -> {
+		BoofConcurrency.loopFor(kernelRadius, height-kernelRadius, y -> {
 
 			// first time through the value needs to be set
 			int k1 = kernel.data[0];
@@ -630,7 +630,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int kernelRadius = kernel.getRadius();
 
-		BoofConcurrency.range(kernelRadius, height-kernelRadius, y -> {
+		BoofConcurrency.loopFor(kernelRadius, height-kernelRadius, y -> {
 
 			// first time through the value needs to be set
 			int k1 = kernel.data[0];
@@ -691,7 +691,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int kernelRadius = kernel.getRadius();
 
-		BoofConcurrency.range(kernelRadius, height-kernelRadius, y -> {
+		BoofConcurrency.loopFor(kernelRadius, height-kernelRadius, y -> {
 
 			// first time through the value needs to be set
 			int k1 = kernel.data[0];
@@ -760,7 +760,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int kernelRadius = kernel.getRadius();
 
-		BoofConcurrency.range(kernelRadius, height-kernelRadius, y -> {
+		BoofConcurrency.loopFor(kernelRadius, height-kernelRadius, y -> {
 
 			// first time through the value needs to be set
 			int k1 = kernel.data[0];
@@ -837,7 +837,7 @@ public class ConvolveImageUnrolled_SB_MT_S32_S32 {
 
 		final int kernelRadius = kernel.getRadius();
 
-		BoofConcurrency.range(kernelRadius, height-kernelRadius, y -> {
+		BoofConcurrency.loopFor(kernelRadius, height-kernelRadius, y -> {
 
 			// first time through the value needs to be set
 			int k1 = kernel.data[0];
