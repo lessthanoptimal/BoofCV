@@ -78,21 +78,21 @@ public class ConvertRaster {
 
 		if(BoofConcurrency.USE_CONCURRENT ) {
 			if (numBands == 3) {
-				ImplConvertRaster_MT.from_3BU8_to_U8(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster_MT.from_3BU8_to_U8(srcData, srcStride, srcOffset, dst);
 			} else if (numBands == 1) {
-				ImplConvertRaster_MT.from_1BU8_to_U8(dst, srcData, size, srcStride, srcOffset, srcStrideDiff);
+				ImplConvertRaster_MT.from_1BU8_to_U8(srcData, size, srcStride, srcOffset, srcStrideDiff, dst);
 			} else if (numBands == 4) {
-				ImplConvertRaster_MT.from_4BU8_to_U8(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster_MT.from_4BU8_to_U8(srcData, srcStride, srcOffset, dst);
 			} else {
 				throw new RuntimeException("Unexpected number of bands found. Bands = " + numBands);
 			}
 		} else {
 			if (numBands == 3) {
-				ImplConvertRaster.from_3BU8_to_U8(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster.from_3BU8_to_U8(srcData, srcStride, srcOffset, dst);
 			} else if (numBands == 1) {
-				ImplConvertRaster.from_1BU8_to_U8(dst, srcData, size, srcStride, srcOffset, srcStrideDiff);
+				ImplConvertRaster.from_1BU8_to_U8(srcData, size, srcStride, srcOffset, srcStrideDiff, dst);
 			} else if (numBands == 4) {
-				ImplConvertRaster.from_4BU8_to_U8(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster.from_4BU8_to_U8(srcData, srcStride, srcOffset, dst);
 			} else {
 				throw new RuntimeException("Unexpected number of bands found. Bands = " + numBands);
 			}
@@ -112,21 +112,21 @@ public class ConvertRaster {
 
 		if(BoofConcurrency.USE_CONCURRENT ) {
 			if (numBands == 3) {
-				ImplConvertRaster_MT.from_3BU8_to_F32(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster_MT.from_3BU8_to_F32(srcData, srcStride, srcOffset, dst);
 			} else if (numBands == 1) {
-				ImplConvertRaster_MT.from_1BU8_to_F32(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster_MT.from_1BU8_to_F32(srcData, srcStride, srcOffset, dst);
 			} else if (numBands == 4) {
-				ImplConvertRaster_MT.from_4BU8_to_F32(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster_MT.from_4BU8_to_F32(srcData, srcStride, srcOffset, dst);
 			} else {
 				throw new RuntimeException("Write more code here.");
 			}
 		} else {
 			if (numBands == 3) {
-				ImplConvertRaster.from_3BU8_to_F32(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster.from_3BU8_to_F32(srcData, srcStride, srcOffset, dst);
 			} else if (numBands == 1) {
-				ImplConvertRaster.from_1BU8_to_F32(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster.from_1BU8_to_F32(srcData, srcStride, srcOffset, dst);
 			} else if (numBands == 4) {
-				ImplConvertRaster.from_4BU8_to_F32(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster.from_4BU8_to_F32(srcData, srcStride, srcOffset, dst);
 			} else {
 				throw new RuntimeException("Write more code here.");
 			}
@@ -143,7 +143,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	static void bufferedToMulti_U8(DataBufferByte buffer , WritableRaster src, Planar<GrayU8> dst) {
+	static void bufferedToPlanar_U8(DataBufferByte buffer , WritableRaster src, Planar<GrayU8> dst) {
 		byte[] srcData = buffer.getData();
 
 		int numBands = src.getNumBands();
@@ -153,21 +153,21 @@ public class ConvertRaster {
 
 		if(BoofConcurrency.USE_CONCURRENT ) {
 			if (numBands == 3) {
-				ImplConvertRaster_MT.from_3BU8_to_PLU8(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster_MT.from_3BU8_to_PLU8(srcData, srcStride, srcOffset, dst);
 			} else if (numBands == 1) {
-				ImplConvertRaster_MT.from_1BU8_to_PLU8(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster_MT.from_1BU8_to_PLU8(srcData, srcStride, srcOffset, dst);
 			} else if (numBands == 4) {
-				ImplConvertRaster_MT.from_4BU8_to_PLU8(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster_MT.from_4BU8_to_PLU8(srcData, srcStride, srcOffset, dst);
 			} else {
 				throw new RuntimeException("Write more code here.");
 			}
 		} else {
 			if (numBands == 3) {
-				ImplConvertRaster.from_3BU8_to_PLU8(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster.from_3BU8_to_PLU8(srcData, srcStride, srcOffset, dst);
 			} else if (numBands == 1) {
-				ImplConvertRaster.from_1BU8_to_PLU8(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster.from_1BU8_to_PLU8(srcData, srcStride, srcOffset, dst);
 			} else if (numBands == 4) {
-				ImplConvertRaster.from_4BU8_to_PLU8(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster.from_4BU8_to_PLU8(srcData, srcStride, srcOffset, dst);
 			} else {
 				throw new RuntimeException("Write more code here.");
 			}
@@ -177,7 +177,7 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	static void bufferedToMulti_F32(DataBufferByte buffer, WritableRaster src, Planar<GrayF32> dst) {
+	static void bufferedToPlanar_F32(DataBufferByte buffer, WritableRaster src, Planar<GrayF32> dst) {
 		byte[] srcData = buffer.getData();
 
 		int numBands = src.getNumBands();
@@ -187,21 +187,21 @@ public class ConvertRaster {
 
 		if(BoofConcurrency.USE_CONCURRENT ) {
 			if (numBands == 3) {
-				ImplConvertRaster_MT.from_3BU8_to_PLF32(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster_MT.from_3BU8_to_PLF32(srcData, srcStride, srcOffset, dst);
 			} else if (numBands == 1) {
-				ImplConvertRaster_MT.from_1BU8_to_PLF32(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster_MT.from_1BU8_to_PLF32(srcData, srcStride, srcOffset, dst);
 			} else if (numBands == 4) {
-				ImplConvertRaster_MT.from_4BU8_to_PLF32(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster_MT.from_4BU8_to_PLF32(srcData, srcStride, srcOffset, dst);
 			} else {
 				throw new RuntimeException("Write more code here.");
 			}
 		} else {
 			if (numBands == 3) {
-				ImplConvertRaster.from_3BU8_to_PLF32(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster.from_3BU8_to_PLF32(srcData, srcStride, srcOffset, dst);
 			} else if (numBands == 1) {
-				ImplConvertRaster.from_1BU8_to_PLF32(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster.from_1BU8_to_PLF32(srcData, srcStride, srcOffset, dst);
 			} else if (numBands == 4) {
-				ImplConvertRaster.from_4BU8_to_PLF32(dst, srcData, srcStride, srcOffset);
+				ImplConvertRaster.from_4BU8_to_PLF32(srcData, srcStride, srcOffset, dst);
 			} else {
 				throw new RuntimeException("Write more code here.");
 			}
@@ -211,34 +211,34 @@ public class ConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void multToBuffered_F32(Planar<GrayF32> src, DataBuffer buffer, BufferedImage dst) {
+	public static void planarToBuffered_F32(Planar<GrayF32> src, DataBuffer buffer, BufferedImage dst) {
 		if(BoofConcurrency.USE_CONCURRENT ) {
 			try {
 				if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
-					ImplConvertRaster_MT.multToBuffered_F32(src, (DataBufferByte) buffer, dst.getRaster());
+					ImplConvertRaster_MT.planarToBuffered_F32(src, (DataBufferByte) buffer, dst.getRaster());
 				} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-					ImplConvertRaster_MT.multToBuffered_F32(src, (DataBufferInt) buffer, dst.getRaster());
+					ImplConvertRaster_MT.planarToBuffered_F32(src, (DataBufferInt) buffer, dst.getRaster());
 				} else {
-					ImplConvertRaster_MT.multToBuffered_F32(src, dst);
+					ImplConvertRaster_MT.planarToBuffered_F32(src, dst);
 				}
 				// hack so that it knows the buffer has been modified
 				dst.setRGB(0, 0, dst.getRGB(0, 0));
 			} catch (java.security.AccessControlException e) {
-				ImplConvertRaster_MT.multToBuffered_F32(src, dst);
+				ImplConvertRaster_MT.planarToBuffered_F32(src, dst);
 			}
 		} else {
 			try {
 				if (buffer.getDataType() == DataBuffer.TYPE_BYTE && isKnownByteFormat(dst)) {
-					ImplConvertRaster.multToBuffered_F32(src, (DataBufferByte) buffer, dst.getRaster());
+					ImplConvertRaster.planarToBuffered_F32(src, (DataBufferByte) buffer, dst.getRaster());
 				} else if (buffer.getDataType() == DataBuffer.TYPE_INT) {
-					ImplConvertRaster.multToBuffered_F32(src, (DataBufferInt) buffer, dst.getRaster());
+					ImplConvertRaster.planarToBuffered_F32(src, (DataBufferInt) buffer, dst.getRaster());
 				} else {
-					ImplConvertRaster.multToBuffered_F32(src, dst);
+					ImplConvertRaster.planarToBuffered_F32(src, dst);
 				}
 				// hack so that it knows the buffer has been modified
 				dst.setRGB(0, 0, dst.getRGB(0, 0));
 			} catch (java.security.AccessControlException e) {
-				ImplConvertRaster.multToBuffered_F32(src, dst);
+				ImplConvertRaster.planarToBuffered_F32(src, dst);
 			}
 		}
 	}
@@ -506,27 +506,27 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void multToBuffered_U8(Planar<GrayU8> src, DataBufferByte buffer , WritableRaster dst) {
+	public static void planarToBuffered_U8(Planar<GrayU8> src, DataBufferByte buffer , WritableRaster dst) {
 		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplConvertRaster_MT.multToBuffered_U8(src,buffer,dst);
+			ImplConvertRaster_MT.planarToBuffered_U8(src,buffer,dst);
 		} else {
-			ImplConvertRaster.multToBuffered_U8(src,buffer,dst);
+			ImplConvertRaster.planarToBuffered_U8(src,buffer,dst);
 		}
 	}
 
-	public static void multToBuffered_U8(Planar<GrayU8> src, DataBufferInt buffer, WritableRaster dst) {
+	public static void planarToBuffered_U8(Planar<GrayU8> src, DataBufferInt buffer, WritableRaster dst) {
 		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplConvertRaster_MT.multToBuffered_U8(src,buffer,dst);
+			ImplConvertRaster_MT.planarToBuffered_U8(src,buffer,dst);
 		} else {
-			ImplConvertRaster.multToBuffered_U8(src,buffer,dst);
+			ImplConvertRaster.planarToBuffered_U8(src,buffer,dst);
 		}
 	}
 
-	public static void multToBuffered_U8(Planar<GrayU8> src, BufferedImage dst) {
+	public static void planarToBuffered_U8(Planar<GrayU8> src, BufferedImage dst) {
 		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplConvertRaster_MT.multToBuffered_U8(src,dst);
+			ImplConvertRaster_MT.planarToBuffered_U8(src,dst);
 		} else {
-			ImplConvertRaster.multToBuffered_U8(src,dst);
+			ImplConvertRaster.planarToBuffered_U8(src,dst);
 		}
 	}
 
@@ -554,35 +554,35 @@ public class ConvertRaster {
 		}
 	}
 
-	public static void bufferedToMulti_U8(DataBufferInt buffer, WritableRaster src, Planar<GrayU8> dst) {
+	public static void bufferedToPlanar_U8(DataBufferInt buffer, WritableRaster src, Planar<GrayU8> dst) {
 		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplConvertRaster_MT.bufferedToMulti_U8(buffer,src,dst);
+			ImplConvertRaster_MT.bufferedToPlanar_U8(buffer,src,dst);
 		} else {
-			ImplConvertRaster.bufferedToMulti_U8(buffer,src,dst);
+			ImplConvertRaster.bufferedToPlanar_U8(buffer,src,dst);
 		}
 	}
 
-	public static void bufferedToMulti_U8(BufferedImage src, Planar<GrayU8> dst) {
+	public static void bufferedToPlanar_U8(BufferedImage src, Planar<GrayU8> dst) {
 		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplConvertRaster_MT.bufferedToMulti_U8(src,dst);
+			ImplConvertRaster_MT.bufferedToPlanar_U8(src,dst);
 		} else {
-			ImplConvertRaster.bufferedToMulti_U8(src,dst);
+			ImplConvertRaster.bufferedToPlanar_U8(src,dst);
 		}
 	}
 
-	public static void bufferedToMulti_F32(DataBufferInt buffer, WritableRaster src, Planar<GrayF32> dst) {
+	public static void bufferedToPlanar_F32(DataBufferInt buffer, WritableRaster src, Planar<GrayF32> dst) {
 		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplConvertRaster_MT.bufferedToMulti_F32(buffer,src,dst);
+			ImplConvertRaster_MT.bufferedToPlanar_F32(buffer,src,dst);
 		} else {
-			ImplConvertRaster.bufferedToMulti_F32(buffer,src,dst);
+			ImplConvertRaster.bufferedToPlanar_F32(buffer,src,dst);
 		}
 	}
 
-	public static void bufferedToMulti_F32(BufferedImage src, Planar<GrayF32> dst) {
+	public static void bufferedToPlanar_F32(BufferedImage src, Planar<GrayF32> dst) {
 		if(BoofConcurrency.USE_CONCURRENT ) {
-			ImplConvertRaster_MT.bufferedToMulti_F32(src,dst);
+			ImplConvertRaster_MT.bufferedToPlanar_F32(src,dst);
 		} else {
-			ImplConvertRaster.bufferedToMulti_F32(src,dst);
+			ImplConvertRaster.bufferedToPlanar_F32(src,dst);
 		}
 	}
 

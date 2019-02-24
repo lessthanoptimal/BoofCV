@@ -25,6 +25,7 @@ import boofcv.abst.feature.detect.interest.PointDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.gui.BoofSwingUtil;
@@ -374,7 +375,7 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 
 
 	public static void main(String[] args) {
-//		BoofConcurrency.USE_CONCURRENT = true;
+		BoofConcurrency.USE_CONCURRENT = true;
 
 		List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("Chessboard", UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame06.jpg")));

@@ -20,14 +20,45 @@ package boofcv.struct.lists;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
 class TestRecycleStack {
 	@Test
-	void foo() {
-		fail("Implement");
+	void pop() {
+		RecycleStack<Moo> alg = new RecycleStack<>(Moo::new);
+
+		Moo m = alg.pop();
+		assertNotNull(m);
+		assertEquals(0,alg.list.size());
+
+		alg.list.add( new Moo());
+		m = alg.pop();
+		assertNotNull(m);
+		assertEquals(0,alg.list.size());
+	}
+
+	@Test
+	void recycle() {
+		RecycleStack<Moo> alg = new RecycleStack<>(Moo::new);
+
+		alg.recycle(new Moo());
+		assertEquals(1,alg.list.size());
+	}
+
+	@Test
+	void purge() {
+		RecycleStack<Moo> alg = new RecycleStack<>(Moo::new);
+
+		List<Moo> original = alg.list;
+		alg.purge();
+		assertNotSame(original, alg.list);
+	}
+
+	static class Moo {
 	}
 }

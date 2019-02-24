@@ -18,14 +18,7 @@
 
 package boofcv.io.image.impl;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
-
 class TestImplConvertRaster_MT {
-	@Test
-	void implement() {
-		fail("implement");
-	}
+	// This unit test should really be created. Skipping for now because it will be a real paint to write
 }
 

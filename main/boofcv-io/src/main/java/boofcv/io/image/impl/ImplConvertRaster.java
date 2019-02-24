@@ -68,7 +68,7 @@ public class ImplConvertRaster {
 		}
 	}
 
-	public static void from_4BU8_to_U8(GrayU8 dst, byte[] srcData, int srcStride, int srcOffset) {
+	public static void from_4BU8_to_U8(byte[] srcData, int srcStride, int srcOffset, GrayU8 dst) {
 		//CONCURRENT_BELOW BoofConcurrency.range(0, dst.height, y -> {
 		for (int y = 0; y < dst.height; y++) {
 			int indexSrc = srcOffset + y*srcStride;
@@ -88,7 +88,7 @@ public class ImplConvertRaster {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void from_1BU8_to_U8(GrayU8 dst, byte[] srcData, int size, int srcStride, int srcOffset, int srcStrideDiff) {
+	public static void from_1BU8_to_U8(byte[] srcData, int size, int srcStride, int srcOffset, int srcStrideDiff, GrayU8 dst) {
 		if (dst.startIndex == 0 && dst.width == dst.stride && srcStrideDiff == 0 && srcOffset == 0 )
 			System.arraycopy(srcData, 0, dst.data, 0, size);
 		else {
@@ -103,7 +103,7 @@ public class ImplConvertRaster {
 		}
 	}
 
-	public static void from_3BU8_to_U8(GrayU8 dst, byte[] srcData, int srcStride, int srcOffset) {
+	public static void from_3BU8_to_U8(byte[] srcData, int srcStride, int srcOffset, GrayU8 dst) {
 
 		//CONCURRENT_BELOW BoofConcurrency.range(0, dst.height, y -> {
 		for (int y = 0; y < dst.height; y++) {
@@ -123,7 +123,7 @@ public class ImplConvertRaster {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void from_4BU8_to_F32(GrayF32 dst, byte[] srcData, int srcStride, int srcOffset) {
+	public static void from_4BU8_to_F32(byte[] srcData, int srcStride, int srcOffset, GrayF32 dst) {
 		//CONCURRENT_BELOW BoofConcurrency.range(0, dst.height, y -> {
 		for (int y = 0; y < dst.height; y++) {
 			int indexSrc = srcOffset + y*srcStride;
@@ -143,7 +143,7 @@ public class ImplConvertRaster {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void from_1BU8_to_F32(GrayF32 dst, byte[] srcData, int srcStride, int srcOffset) {
+	public static void from_1BU8_to_F32(byte[] srcData, int srcStride, int srcOffset, GrayF32 dst) {
 		//CONCURRENT_BELOW BoofConcurrency.range(0, dst.height, y -> {
 		for (int y = 0; y < dst.height; y++) {
 			int indexDst = dst.startIndex + dst.stride * y;
@@ -157,7 +157,7 @@ public class ImplConvertRaster {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void from_3BU8_to_F32(GrayF32 dst, byte[] srcData, int srcStride, int srcOffset) {
+	public static void from_3BU8_to_F32(byte[] srcData, int srcStride, int srcOffset, GrayF32 dst) {
 		//CONCURRENT_BELOW BoofConcurrency.range(0, dst.height, y -> {
 		for (int y = 0; y < dst.height; y++) {
 			int indexSrc = srcOffset + y*srcStride;
@@ -217,7 +217,7 @@ public class ImplConvertRaster {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void from_4BU8_to_PLF32(Planar<GrayF32> dst, byte[] srcData, int srcStride, int srcOffset) {
+	public static void from_4BU8_to_PLF32(byte[] srcData, int srcStride, int srcOffset, Planar<GrayF32> dst) {
 		float[] band1 = dst.getBand(0).data;
 		float[] band2 = dst.getBand(1).data;
 		float[] band3 = dst.getBand(2).data;
@@ -238,7 +238,7 @@ public class ImplConvertRaster {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void from_1BU8_to_PLF32(Planar<GrayF32> dst, byte[] srcData, int srcStride, int srcOffset) {
+	public static void from_1BU8_to_PLF32(byte[] srcData, int srcStride, int srcOffset, Planar<GrayF32> dst) {
 		float[] data = dst.getBand(0).data;
 
 		//CONCURRENT_BELOW BoofConcurrency.range(0, dst.height, y -> {
@@ -254,7 +254,7 @@ public class ImplConvertRaster {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void from_3BU8_to_PLF32(Planar<GrayF32> dst, byte[] srcData, int srcStride, int srcOffset) {
+	public static void from_3BU8_to_PLF32(byte[] srcData, int srcStride, int srcOffset, Planar<GrayF32> dst) {
 		float[] band1 = dst.getBand(0).data;
 		float[] band2 = dst.getBand(1).data;
 		float[] band3 = dst.getBand(2).data;
@@ -274,7 +274,7 @@ public class ImplConvertRaster {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void from_4BU8_to_PLU8(Planar<GrayU8> dst, byte[] srcData, int srcStride, int srcOffset) {
+	public static void from_4BU8_to_PLU8(byte[] srcData, int srcStride, int srcOffset, Planar<GrayU8> dst) {
 		byte[] band1 = dst.getBand(0).data;
 		byte[] band2 = dst.getBand(1).data;
 		byte[] band3 = dst.getBand(2).data;
@@ -296,7 +296,7 @@ public class ImplConvertRaster {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void from_1BU8_to_PLU8(Planar<GrayU8> dst, byte[] srcData, int srcStride, int srcOffset) {
+	public static void from_1BU8_to_PLU8(byte[] srcData, int srcStride, int srcOffset, Planar<GrayU8> dst) {
 		byte dstData[] = dst.getBand(0).data;
 
 		//CONCURRENT_BELOW BoofConcurrency.range(0, dst.height, y -> {
@@ -309,7 +309,7 @@ public class ImplConvertRaster {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void from_3BU8_to_PLU8(Planar<GrayU8> dst, byte[] srcData, int srcStride, int srcOffset) {
+	public static void from_3BU8_to_PLU8(byte[] srcData, int srcStride, int srcOffset, Planar<GrayU8> dst) {
 		byte[] band1 = dst.getBand(0).data;
 		byte[] band2 = dst.getBand(1).data;
 		byte[] band3 = dst.getBand(2).data;
@@ -394,7 +394,7 @@ public class ImplConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToMulti_U8(DataBufferInt buffer, WritableRaster src, Planar<GrayU8> dst) {
+	public static void bufferedToPlanar_U8(DataBufferInt buffer, WritableRaster src, Planar<GrayU8> dst) {
 		int[] srcData = buffer.getData();
 
 		int srcStride = stride(src);
@@ -444,7 +444,7 @@ public class ImplConvertRaster {
 	/**
 	 * A faster convert that works directly with a specific raster
 	 */
-	public static void bufferedToMulti_F32(DataBufferInt buffer, WritableRaster src, Planar<GrayF32> dst) {
+	public static void bufferedToPlanar_F32(DataBufferInt buffer, WritableRaster src, Planar<GrayF32> dst) {
 		int[] srcData = buffer.getData();
 
 		int srcStride = stride(src);
@@ -718,7 +718,7 @@ public class ImplConvertRaster {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public static void bufferedToMulti_U8(BufferedImage src, Planar<GrayU8> dst) {
+	public static void bufferedToPlanar_U8(BufferedImage src, Planar<GrayU8> dst) {
 
 		final int width = src.getWidth();
 		final int height = src.getHeight();
@@ -761,7 +761,7 @@ public class ImplConvertRaster {
 	 * @param src Input image.
 	 * @param dst Output image.
 	 */
-	public static void bufferedToMulti_F32(BufferedImage src, Planar<GrayF32> dst) {
+	public static void bufferedToPlanar_F32(BufferedImage src, Planar<GrayF32> dst) {
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 
@@ -1115,7 +1115,7 @@ public class ImplConvertRaster {
 		}
 	}
 
-	public static void multToBuffered_U8(Planar<GrayU8> src, DataBufferByte buffer , WritableRaster dst) {
+	public static void planarToBuffered_U8(Planar<GrayU8> src, DataBufferByte buffer , WritableRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
@@ -1183,7 +1183,7 @@ public class ImplConvertRaster {
 		}
 	}
 
-	public static void multToBuffered_F32(Planar<GrayF32> src, DataBufferByte buffer , WritableRaster dst) {
+	public static void planarToBuffered_F32(Planar<GrayF32> src, DataBufferByte buffer , WritableRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
@@ -1363,7 +1363,7 @@ public class ImplConvertRaster {
 		}
 	}
 
-	public static void multToBuffered_U8(Planar<GrayU8> src, DataBufferInt buffer, WritableRaster dst) {
+	public static void planarToBuffered_U8(Planar<GrayU8> src, DataBufferInt buffer, WritableRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
@@ -1414,7 +1414,7 @@ public class ImplConvertRaster {
 		}
 	}
 
-	public static void multToBuffered_F32(Planar<GrayF32> src, DataBufferInt buffer, WritableRaster dst) {
+	public static void planarToBuffered_F32(Planar<GrayF32> src, DataBufferInt buffer, WritableRaster dst) {
 
 		if (src.getNumBands() != dst.getNumBands())
 			throw new IllegalArgumentException("Unequal number of bands src = " + src.getNumBands() + " dst = " + dst.getNumBands());
@@ -1528,7 +1528,7 @@ public class ImplConvertRaster {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void multToBuffered_U8(Planar<GrayU8> src, BufferedImage dst) {
+	public static void planarToBuffered_U8(Planar<GrayU8> src, BufferedImage dst) {
 
 		if (src.getNumBands() != 3)
 			throw new IllegalArgumentException("src must have three bands");
@@ -1557,7 +1557,7 @@ public class ImplConvertRaster {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void multToBuffered_F32(Planar<GrayF32> src, BufferedImage dst) {
+	public static void planarToBuffered_F32(Planar<GrayF32> src, BufferedImage dst) {
 
 		if (src.getNumBands() != 3)
 			throw new IllegalArgumentException("src must have three bands");

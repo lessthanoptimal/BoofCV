@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.shapes;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.ConfigRefinePolygonLineToImage;
@@ -49,6 +50,7 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 	JSpinner spinnerMinEdgeD; // threshold for detect
 	JSpinner spinnerMinEdgeR; // threshold for refine
 	JCheckBox setBorder;
+	JCheckBox setConcurrent; // use threading or not
 
 	public PolylineControlPanel polylinePanel;
 
@@ -94,6 +96,8 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		setBorder.addActionListener(this);
 		setBorder.setSelected(configPolygon.detector.canTouchBorder);
 
+		setConcurrent = checkbox("Concurrent", BoofConcurrency.USE_CONCURRENT);
+
 		setRefineContour = checkbox("Refine Contour",configPolygon.refineContour);
 		setRefineGray = checkbox("Refine Gray",configPolygon.refineGray != null);
 		setRemoveBias = checkbox("Remove Bias",configPolygon.adjustForThresholdBias);
@@ -125,7 +129,9 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		addLabeled(spinnerMinEdgeD, "Edge Intensity D: ");
 		addLabeled(spinnerMinEdgeR, "Edge Intensity R: ");
 
-		addAlignLeft(setBorder, this);
+		addAlignLeft(setBorder);
+		addAlignLeft(setConcurrent);
+
 		add(tabbedPane);
 
 		addVerticalGlue(this);
@@ -143,6 +149,9 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 	public void actionPerformed(ActionEvent e) {
 		if( e.getSource() == setBorder ) {
 			config.detector.canTouchBorder = setBorder.isSelected();
+			owner.configUpdate();
+		} else if( e.getSource() == setConcurrent ) {
+			BoofConcurrency.USE_CONCURRENT = setConcurrent.isSelected();
 			owner.configUpdate();
 		} else if( e.getSource() == setRefineContour ) {
 			config.refineContour = setRefineContour.isSelected();

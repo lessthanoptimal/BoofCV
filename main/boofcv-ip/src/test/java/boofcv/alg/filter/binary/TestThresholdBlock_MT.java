@@ -103,7 +103,7 @@ class TestThresholdBlock_MT {
 
 		@Override
 		public ThresholdBlock.BlockProcessor<GrayF32, GrayF32> copy() {
-			return null;
+			return new Dummy();
 		}
 	}
 }

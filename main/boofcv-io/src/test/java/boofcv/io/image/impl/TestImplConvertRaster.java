@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-package boofcv.io.image;
+package boofcv.io.image.impl;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.io.image.impl.ImplConvertRaster;
+import boofcv.io.image.BufferedImageChecks;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
-import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
 import java.awt.image.*;
@@ -32,70 +31,85 @@ import java.lang.reflect.Method;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests select functions in ConvertRaster.
  *
  * @author Peter Abeles
  */
-public class TestConvertRaster extends CompareIdenticalFunctions {
+public class TestImplConvertRaster {
 
 	Random rand = new Random(234);
 
 	int imgWidth = 10;
 	int imgHeight = 20;
 
-	int numMethods = 44;
+	// number of functions with BufferedTo or ToBuffered in their name
+	int numBuffered = 36;
 
-	TestConvertRaster() {
-		super(ConvertRaster.class, ImplConvertRaster.class);
-	}
+	/**
+	 * Use reflections to test all the functions.
+	 */
+	@Test
+	void checkerBuffered() {
+		Method methods[] = ImplConvertRaster.class.getDeclaredMethods();
 
-	@Override
-	protected Object[][] createInputParam(Method candidate, Method validation) {
-		Class[] types = candidate.getParameterTypes();
-		Object[] params = new Object[types.length];
+		// sanity check to make sure the functions are being found
+		int numFound = 0;
+		for (Method m : methods) {
+			if (!isTestMethod(m))
+				continue;
 
-		for (int i = 0; i < types.length; i++) {
-			Class c = types[i];
+//			System.out.println("Examining: " + m.getName()+" "+m.getParameterTypes()[0].getSimpleName()+" "+m.getParameterTypes()[1].getSimpleName());
+			if (m.getName().contains("bufferedTo"))
+				testBufferedTo(m);
+			else if (m.getName().contains("ToBuffered"))
+				testImageTo(m);
+			else if( m.getName().startsWith("orderBands"))
+				continue; // this is checked elsewhere
+			else
+				throw new RuntimeException("Unknown convert type. "+m.getName());
 
-			if( c.isAssignableFrom(ImageBase.class)) {
-				params[i] = GeneralizedImageOps.createImage(c,imgWidth,imgHeight,3);
-				GImageMiscOps.fillUniform((ImageBase)params[i],rand,0,200);
-			}
+			numFound++;
 		}
 
-		return new Object[][]{params};
+		// update this as needed when new functions are added
+		if (numBuffered != numFound)
+			throw new RuntimeException("Unexpected number of methods: Found " + numFound + "  expected " + numBuffered);
 	}
 
 	/**
-	 * There is a bug where gray scale images are mangled by getRGB().  There is a work around in
-	 * the code.
-	 * <p/>
-	 * Java Bug ID: 5051418
+	 * There isn't an RGB bug check here since RGB values make no sense with 16bit bands,  Just
+	 * checks to see if the unsigned short value is preserved
 	 */
 	@Test
-	void checkGrayBug_To() {
-		BufferedImage img = new BufferedImage(5, 5, BufferedImage.TYPE_BYTE_GRAY);
+	void checkGray_To_U16() {
+		BufferedImage img = new BufferedImage(5, 5, BufferedImage.TYPE_USHORT_GRAY);
 
-		img.getRaster().getDataBuffer().setElem(0, 101);
+		img.getRaster().getDataBuffer().setElem(0, 2005);
 
-		int RGB = img.getRGB(0, 0);
-		int r = RGB & 0xFF;
+		GrayU16 out = new GrayU16(5, 5);
+		ImplConvertRaster.bufferedToGray(img, out);
+		assertEquals(2005, out.get(0, 0));
+	}
 
-		// this is the bug in Java, if this ever is false then a miracle has happened
-		// and this line should be commented out
-		assertTrue(r != 101);
+	private boolean isTestMethod(Method m) {
+		Class<?> types[] = m.getParameterTypes();
 
-		// test several image types
-		GrayU8 out = new GrayU8(5, 5);
-		ConvertRaster.bufferedToGray((DataBufferByte)img.getRaster().getDataBuffer(),img.getRaster(), out);
-		assertEquals(101, out.get(0, 0));
+		if( types.length == 2 ) { // TODO for old methods before conversion for JDK 9 limitations. Remove later
+			if (ImageBase.class.isAssignableFrom(types[0]) ||
+					ImageBase.class.isAssignableFrom(types[1]))
+				return true;
+		} else if( types.length == 3 ) {
+			if (ImageBase.class.isAssignableFrom(types[0]) ||
+					ImageBase.class.isAssignableFrom(types[2]))
+				return true;
+		}
 
-		GrayF32 outF = new GrayF32(5, 5);
-		ConvertRaster.bufferedToGray((DataBufferByte)img.getRaster().getDataBuffer(),img.getRaster(), outF);
-		assertEquals(101, outF.get(0, 0), 1e-4);
+//		if( m.getName().contains("bufferedTo") || m.getName().contains("ToBuffered"))
+//			throw new RuntimeException("Egads");
+
+		return false;
 	}
 
 	private void testBufferedTo(Method m) {
@@ -122,7 +136,7 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 		}
 	}
 
-	private ImageBase createImage(Method m, Class imageType, BufferedImage inputBuff) {
+	static ImageBase createImage(Method m, Class imageType, BufferedImage inputBuff) {
 
 		int numBands = inputBuff.getRaster().getNumBands();
 
@@ -309,61 +323,5 @@ public class TestConvertRaster extends CompareIdenticalFunctions {
 				}
 			}
 		}
-	}
-
-
-	@Test
-	public void orderBandsIntoRGB() {
-		Planar<GrayU8> input = new Planar<>(GrayU8.class, 10, 10, 3);
-
-		GrayU8 band0 = input.getBand(0);
-		GrayU8 band1 = input.getBand(1);
-		GrayU8 band2 = input.getBand(2);
-
-		// test no swap first
-		BufferedImage orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
-		ConvertRaster.orderBandsIntoRGB(input, orig);
-		assertTrue(band0 == input.getBand(0));
-		assertTrue(band1 == input.getBand(1));
-		assertTrue(band2 == input.getBand(2));
-
-		// check swaps now
-		orig = new BufferedImage(10, 10, BufferedImage.TYPE_3BYTE_BGR);
-		ConvertRaster.orderBandsIntoRGB(input, orig);
-		assertTrue(band2 == input.getBand(0));
-		assertTrue(band1 == input.getBand(1));
-		assertTrue(band0 == input.getBand(2));
-
-		orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_BGR);
-		ConvertRaster.orderBandsIntoRGB(input, orig);
-		assertTrue(band0 == input.getBand(0));
-		assertTrue(band1 == input.getBand(1));
-		assertTrue(band2 == input.getBand(2));
-
-		// 4-band images
-		input = new Planar<>(GrayU8.class, 10, 10, 4);
-
-		band0 = input.getBand(0);
-		band1 = input.getBand(1);
-		band2 = input.getBand(2);
-		GrayU8 band3 = input.getBand(3);
-
-		orig = new BufferedImage(10, 10, BufferedImage.TYPE_4BYTE_ABGR);
-		ConvertRaster.orderBandsIntoRGB(input, orig);
-		assertTrue(band3 == input.getBand(0));
-		assertTrue(band2 == input.getBand(1));
-		assertTrue(band1 == input.getBand(2));
-		assertTrue(band0 == input.getBand(3));
-
-		band0 = input.getBand(0);
-		band1 = input.getBand(1);
-		band2 = input.getBand(2);
-		band3 = input.getBand(3);
-		orig = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
-		ConvertRaster.orderBandsIntoRGB(input, orig);
-		assertTrue(band1 == input.getBand(0));
-		assertTrue(band2 == input.getBand(1));
-		assertTrue(band3 == input.getBand(2));
-		assertTrue(band0 == input.getBand(3));
 	}
 }
