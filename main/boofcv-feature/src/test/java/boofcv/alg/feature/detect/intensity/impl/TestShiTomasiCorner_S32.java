@@ -21,6 +21,9 @@ package boofcv.alg.feature.detect.intensity.impl;
 import boofcv.alg.feature.detect.intensity.GenericCornerIntensityGradientTests;
 import boofcv.struct.image.GrayF32;
 import org.ejml.UtilEjml;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+import org.ejml.interfaces.decomposition.EigenDecomposition_F64;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -29,24 +32,33 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestHarrisCorner_F32 {
-
+class TestShiTomasiCorner_S32 {
+	/**
+	 * Compare against the definition
+	 */
 	@Test
 	void checkScore() {
-		float kappa = 0.04f;
-		HarrisCorner_F32 alg = new HarrisCorner_F32(kappa);
+		ShiTomasiCorner_S32 alg = new ShiTomasiCorner_S32();
 
-		float XX = 1.5f;
-		float XY = 2.5f;
-		float YY = 3.5f;
+		int XX = 50;
+		int XY = 70;
+		int YY = 80;
 
-		float expected = XX*YY-XY*XY - kappa*(float)Math.pow(XX+YY,2.0);
+		DMatrixRMaj A = new DMatrixRMaj(2,2,true,new double[]{XX,XY,XY,YY});
+
+		// find the smallest eigenvalue
+		EigenDecomposition_F64<DMatrixRMaj> evd = DecompositionFactory_DDRM.eig(true,true);
+		evd.decompose(A);
+		double ev1 = evd.getEigenvalue(0).real;
+		double ev2 = evd.getEigenvalue(1).real;
+
+		float expected = (float)Math.min(ev1,ev2);
 		assertEquals(expected,alg.compute(XX,XY,YY), UtilEjml.TEST_F32);
 	}
 
 	@Nested
 	public class SingleThread extends GenericCornerIntensityGradientTests {
-		ImplSsdCorner_F32 detector = new ImplSsdCorner_F32(1,new HarrisCorner_F32(0.04f));
+		ImplSsdCorner_S16 detector = new ImplSsdCorner_S16(1,new ShiTomasiCorner_S32());
 
 		@Test
 		void genericTests() {
@@ -55,13 +67,13 @@ class TestHarrisCorner_F32 {
 
 		@Override
 		public void computeIntensity( GrayF32 intensity ) {
-			detector.process(derivX_F32,derivY_F32,intensity);
+			detector.process(derivX_I16,derivY_I16,intensity);
 		}
 	}
 
 	@Nested
 	public class MultiThread extends GenericCornerIntensityGradientTests {
-		ImplSsdCorner_F32_MT detector = new ImplSsdCorner_F32_MT(1,new HarrisCorner_F32(0.04f));
+		ImplSsdCorner_S16_MT detector = new ImplSsdCorner_S16_MT(1,new ShiTomasiCorner_S32());
 
 		@Test
 		void genericTests() {
@@ -70,7 +82,7 @@ class TestHarrisCorner_F32 {
 
 		@Override
 		public void computeIntensity( GrayF32 intensity ) {
-			detector.process(derivX_F32,derivY_F32,intensity);
+			detector.process(derivX_I16,derivY_I16,intensity);
 		}
 	}
 }

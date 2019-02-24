@@ -43,13 +43,6 @@ public class ImplSsdCorner_S16 extends ImplSsdCornerBox<GrayS16,GrayS32> {
 
 	private IWorkArrays work = new IWorkArrays();
 	private CornerIntensity_S32 intensity;
-	// temporary storage for convolution along in the vertical axis.
-	private int tempXX[] = new int[1];
-	private int tempXY[] = new int[1];
-	private int tempYY[] = new int[1];
-
-	// defines the A matrix, from which the eigenvalues are computed
-	protected int totalXX, totalYY, totalXY;
 
 	public ImplSsdCorner_S16( int windowRadius, CornerIntensity_S32 intensity) {
 		super(windowRadius,GrayS32.class);
@@ -163,7 +156,7 @@ public class ImplSsdCorner_S16 extends ImplSsdCornerBox<GrayS16,GrayS32> {
 		final int[] tempYY = work.pop();
 		for (int x = startX; x < endX; x++) {
 			// defines the A matrix, from which the eigenvalues are computed
-			int srcIndex = x;
+			int srcIndex = x + (y0-radius)*imgWidth;
 			int destIndex = imgWidth * y0 + x;
 			int totalXX = 0, totalXY = 0, totalYY = 0;
 

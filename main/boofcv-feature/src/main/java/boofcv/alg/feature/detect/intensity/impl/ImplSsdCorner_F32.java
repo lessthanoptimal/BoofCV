@@ -41,13 +41,6 @@ public class ImplSsdCorner_F32 extends ImplSsdCornerBox<GrayF32,GrayF32> {
 
 	private FWorkArrays work = new FWorkArrays();
 	private CornerIntensity_F32 intensity;
-	// temporary storage for convolution along in the vertical axis.
-	private float tempXX[] = new float[1];
-	private float tempXY[] = new float[1];
-	private float tempYY[] = new float[1];
-
-	// defines the A matrix, from which the eigenvalues are computed
-	protected float totalXX, totalYY, totalXY;
 
 	public ImplSsdCorner_F32( int windowRadius, CornerIntensity_F32 intensity) {
 		super(windowRadius,GrayF32.class);
@@ -161,7 +154,7 @@ public class ImplSsdCorner_F32 extends ImplSsdCornerBox<GrayF32,GrayF32> {
 		final float[] tempYY = work.pop();
 		for (int x = startX; x < endX; x++) {
 			// defines the A matrix, from which the eigenvalues are computed
-			int srcIndex = x;
+			int srcIndex = x + (y0-radius)*imgWidth;
 			int destIndex = imgWidth * y0 + x;
 			float totalXX = 0, totalXY = 0, totalYY = 0;
 

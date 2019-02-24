@@ -18,14 +18,16 @@
 
 package boofcv.alg.feature.detect.intensity.impl;
 
-import org.junit.jupiter.api.Test;
+import boofcv.struct.image.GrayS16;
 
-import static org.junit.jupiter.api.Assertions.fail;
+class TestImplSsdCornerWeighted_S16_MT extends CompareCornerIntensity<GrayS16> {
+	TestImplSsdCornerWeighted_S16_MT() {
+		super(GrayS16.class);
 
-class TestImplSsdCornerWeighted_S16_MT {
-	@Test
-	void implement() {
-		fail("implement");
+		ImplSsdCornerWeighted_S16    algA = new ImplSsdCornerWeighted_S16(2,new ShiTomasiCorner_S32());
+		ImplSsdCornerWeighted_S16_MT algB = new ImplSsdCornerWeighted_S16_MT(2,new ShiTomasiCorner_S32());
+
+		initialize(algA,algB);
 	}
 }
 

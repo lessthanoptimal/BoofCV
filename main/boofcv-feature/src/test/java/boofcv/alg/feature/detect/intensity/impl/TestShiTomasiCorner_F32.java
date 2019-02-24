@@ -19,19 +19,15 @@
 package boofcv.alg.feature.detect.intensity.impl;
 
 import boofcv.alg.feature.detect.intensity.GenericCornerIntensityGradientTests;
-import boofcv.alg.feature.detect.intensity.GenericCornerIntensityTests;
-import boofcv.alg.filter.derivative.GradientSobel;
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.ConvertImage;
-import boofcv.core.image.border.BorderIndex1D_Extend;
-import boofcv.struct.border.ImageBorder1D_S32;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayU8;
-import boofcv.testing.BoofTesting;
+import org.ejml.UtilEjml;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+import org.ejml.interfaces.decomposition.EigenDecomposition_F64;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -39,55 +35,56 @@ import java.util.Random;
  */
 public class TestShiTomasiCorner_F32 {
 
-	int width = 15;
-	int height = 15;
-
-	@Test
-	void genericTests() {
-		GenericCornerIntensityTests generic = new GenericCornerIntensityGradientTests(){
-
-			@Override
-			public void computeIntensity( GrayF32 intensity ) {
-//				ImplShiTomasiCorner_F32 alg = new ImplShiTomasiCorner_F32(1);
-//				alg.process(derivX_F32,derivY_F32,intensity);
-			}
-		};
-
-		generic.performAllTests();
-	}
-
 	/**
-	 * Sees if the integer version and this version produce the same results.
-	 * <p/>
-	 * Creates a random image and looks for corners in it.  Sees if the naive
-	 * and fast algorithm produce exactly the same results.
+	 * Compare against the definition
 	 */
 	@Test
-	void compareToNaive() {
-		GrayU8 img = new GrayU8(width, height);
-		ImageMiscOps.fillUniform(img, new Random(0xfeed), 0, 100);
+	void checkScore() {
+		ShiTomasiCorner_F32 alg = new ShiTomasiCorner_F32();
 
-		GrayS16 derivX_I = new GrayS16(img.getWidth(), img.getHeight());
-		GrayS16 derivY_I = new GrayS16(img.getWidth(), img.getHeight());
+		int XX = 50;
+		int XY = 70;
+		int YY = 80;
 
-		GradientSobel.process(img, derivX_I, derivY_I, new ImageBorder1D_S32(BorderIndex1D_Extend.class));
+		DMatrixRMaj A = new DMatrixRMaj(2,2,true,new double[]{XX,XY,XY,YY});
 
-		GrayF32 derivX_F = ConvertImage.convert(derivX_I, (GrayF32)null);
-		GrayF32 derivY_F = ConvertImage.convert(derivY_I, (GrayF32)null);
+		// find the smallest eigenvalue
+		EigenDecomposition_F64<DMatrixRMaj> evd = DecompositionFactory_DDRM.eig(true,true);
+		evd.decompose(A);
+		double ev1 = evd.getEigenvalue(0).real;
+		double ev2 = evd.getEigenvalue(1).real;
 
-		BoofTesting.checkSubImage(this, "compareToNaive", true, derivX_F, derivY_F);
+		float expected = (float)Math.min(ev1,ev2);
+		assertEquals(expected,alg.compute(XX,XY,YY), UtilEjml.TEST_F32);
 	}
 
-	public void compareToNaive(GrayF32 derivX_F, GrayF32 derivY_F) {
-		GrayF32 expected = new GrayF32(derivX_F.width,derivX_F.height);
-		GrayF32 found = new GrayF32(derivX_F.width,derivX_F.height);
+	@Nested
+	public class SingleThread extends GenericCornerIntensityGradientTests {
+		ImplSsdCorner_F32 detector = new ImplSsdCorner_F32(1,new ShiTomasiCorner_F32());
 
-		ImplSsdCornerNaive<GrayF32> ssd_I = new ImplSsdCornerNaive<>(width, height, 3, false);
-		ssd_I.process(derivX_F, derivY_F,expected);
+		@Test
+		void genericTests() {
+			performAllTests();
+		}
 
-//		ImplShiTomasiCorner_F32 ssd_F = new ImplShiTomasiCorner_F32( 3);
-//		ssd_F.process(derivX_F, derivY_F,found);
+		@Override
+		public void computeIntensity( GrayF32 intensity ) {
+			detector.process(derivX_F32,derivY_F32,intensity);
+		}
+	}
 
-		BoofTesting.assertEquals(expected, found, 1f);
+	@Nested
+	public class MultiThread extends GenericCornerIntensityGradientTests {
+		ImplSsdCorner_F32 detector = new ImplSsdCorner_F32(1,new ShiTomasiCorner_F32());
+
+		@Test
+		void genericTests() {
+			performAllTests();
+		}
+
+		@Override
+		public void computeIntensity( GrayF32 intensity ) {
+			detector.process(derivX_F32,derivY_F32,intensity);
+		}
 	}
 }

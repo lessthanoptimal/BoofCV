@@ -24,7 +24,6 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -38,7 +37,7 @@ class TestImplSsdCornerWeighted_F32 {
 
 	int radius=4;
 
-	Kernel1D_F32 weights = FactoryKernelGaussian.gaussian1D(GrayS16.class,-1,radius);
+	Kernel1D_F32 weights = FactoryKernelGaussian.gaussian1D(GrayF32.class,-1,radius);
 
 	GrayF32 input = new GrayF32(width,height);
 

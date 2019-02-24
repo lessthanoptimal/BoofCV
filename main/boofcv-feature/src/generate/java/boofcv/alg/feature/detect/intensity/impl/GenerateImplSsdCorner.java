@@ -90,13 +90,6 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\n" +
 				"\tprivate "+workArrays+" work = new "+workArrays+"();\n" +
 				"\tprivate "+cornerInten+" intensity;\n" +
-				"\t// temporary storage for convolution along in the vertical axis.\n" +
-				"\tprivate "+dataOutput+" tempXX[] = new "+dataOutput+"[1];\n" +
-				"\tprivate "+dataOutput+" tempXY[] = new "+dataOutput+"[1];\n" +
-				"\tprivate "+dataOutput+" tempYY[] = new "+dataOutput+"[1];\n" +
-				"\n" +
-				"\t// defines the A matrix, from which the eigenvalues are computed\n" +
-				"\tprotected "+sumType+" totalXX, totalYY, totalXY;\n" +
 				"\n" +
 				"\tpublic "+className+"( int windowRadius, "+cornerInten+" intensity) {\n" +
 				"\t\tsuper(windowRadius,"+typeOutput+".class);\n" +
@@ -214,7 +207,7 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\t\tfinal "+dataOutput+"[] tempYY = work.pop();\n" +
 				"\t\tfor (int x = startX; x < endX; x++) {\n" +
 				"\t\t\t// defines the A matrix, from which the eigenvalues are computed\n" +
-				"\t\t\tint srcIndex = x;\n" +
+				"\t\t\tint srcIndex = x + (y0-radius)*imgWidth;\n" +
 				"\t\t\tint destIndex = imgWidth * y0 + x;\n" +
 				"\t\t\t"+sumType+" totalXX = 0, totalXY = 0, totalYY = 0;\n" +
 				"\n" +
