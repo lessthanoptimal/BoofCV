@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=2)
+@Fork(value=1)
 public class BenchmarkExtractors {
 
 	private static float threshold = 1.0f;
@@ -123,6 +123,8 @@ public class BenchmarkExtractors {
 	@Benchmark
 	public void naiveStrictMax() {
 		NonMaxExtractorNaive alg = new NonMaxExtractorNaive(true);
+		alg.radius = radius;
+		alg.thresh = threshold;
 		alg.process(intensity,corners);
 	}
 
