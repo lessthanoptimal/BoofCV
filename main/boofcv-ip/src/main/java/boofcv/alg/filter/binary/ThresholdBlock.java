@@ -25,7 +25,6 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.lists.RecycleStack;
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>Computes image statistics in regularly spaced blocks across the image. Then computes an average

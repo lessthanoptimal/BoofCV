@@ -38,7 +38,17 @@ class TestBoofConcurrency {
 	}
 
 	@Test
-	void blocks() {
+	void loopFor() {
+		Counter counter = new Counter();
+		BoofConcurrency.loopFor(10,100,i->{
+			counter.increment();
+		});
+
+		assertEquals(90,counter.value);
+	}
+
+	@Test
+	void loopBlocks() {
 		GrowQueue_I32 found = new GrowQueue_I32();
 
 		BoofConcurrency.loopBlocks(10,100,12,new BlockTask(found));
@@ -116,5 +126,12 @@ class TestBoofConcurrency {
 
 		double foundD = BoofConcurrency.min(5,10,double.class,i->i+2.5).doubleValue();
 		assertEquals(5.0+2.5,foundD, UtilEjml.TEST_F64);
+	}
+
+	private static class Counter {
+		int value = 0;
+		public synchronized void increment() {
+			value++;
+		}
 	}
 }

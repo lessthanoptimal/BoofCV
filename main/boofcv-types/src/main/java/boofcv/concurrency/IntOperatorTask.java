@@ -29,8 +29,11 @@ public abstract class IntOperatorTask extends ForkJoinTask<Number> {
 	final int max;
 	final IntProducerNumber consumer;
 
+	boolean master = true;
 	Number result;
 	Class primitiveType;
+
+	IntOperatorTask next = null;
 
 	public IntOperatorTask(int value , int max ,
 						   Class primitiveType,
@@ -51,16 +54,40 @@ public abstract class IntOperatorTask extends ForkJoinTask<Number> {
 
 	@Override
 	protected boolean exec() {
-		IntOperatorTask nextTask = null;
-		if( value < max-1 ) {
-			nextTask = newInstance(value+1,max, primitiveType,consumer);
-			nextTask.fork();
-		}
-		result = consumer.accept(value);
-		if( nextTask != null ) {
-			nextTask.join();
+		IntOperatorTask root = null;
+		IntOperatorTask previous = null;
 
-			operator(nextTask);
+		// spawn children until there's no more to spawn
+		if( master ) {
+			// process all but the last value
+			int value = this.value;
+			while( value+1 < max ) {
+				IntOperatorTask child = newInstance(value, max, primitiveType, consumer);
+				child.master = false;
+				if( root == null ) {
+					root = child;
+					previous = child;
+				} else {
+					previous.next = child;
+					previous = child;
+				}
+				child.fork();
+				value += 1;
+			}
+			// process the last value in this thread
+			result = consumer.accept(value);
+		} else {
+			result = consumer.accept(value);
+		}
+
+
+		while( root != null ) {
+			// perform the operation on the current result and the result from this thread
+			root.join();
+			operator(root.result);
+			IntOperatorTask next = root.next;
+			root.next = null; // free memory.
+			root = next;
 		}
 
 		return true;
@@ -70,7 +97,7 @@ public abstract class IntOperatorTask extends ForkJoinTask<Number> {
 													Class primitiveType,
 													IntProducerNumber consumer );
 
-	protected abstract void operator(IntOperatorTask nextTask);
+	protected abstract void operator(Number next);
 
 	public static class Sum extends IntOperatorTask {
 
@@ -84,19 +111,19 @@ public abstract class IntOperatorTask extends ForkJoinTask<Number> {
 		}
 
 		@Override
-		protected void operator(IntOperatorTask nextTask) {
+		protected void operator(Number next) {
 			if( primitiveType == byte.class ) {
-				result = result.byteValue()+nextTask.getRawResult().byteValue();
+				result = result.byteValue()+next.byteValue();
 			} else if( primitiveType == short.class ) {
-				result = result.shortValue() + nextTask.getRawResult().shortValue();
+				result = result.shortValue() + next.shortValue();
 			} else if( primitiveType == int.class ) {
-				result = result.intValue() + nextTask.getRawResult().intValue();
+				result = result.intValue() + next.intValue();
 			} else if( primitiveType == long.class ) {
-				result = result.longValue() + nextTask.getRawResult().longValue();
+				result = result.longValue() + next.longValue();
 			} else if( primitiveType == float.class ) {
-				result = result.floatValue() + nextTask.getRawResult().floatValue();
+				result = result.floatValue() + next.floatValue();
 			} else if( primitiveType == double.class ) {
-				result = result.doubleValue() + nextTask.getRawResult().doubleValue();
+				result = result.doubleValue() + next.doubleValue();
 			} else {
 				throw new RuntimeException("Unknown primitive type "+ primitiveType);
 			}
@@ -115,19 +142,19 @@ public abstract class IntOperatorTask extends ForkJoinTask<Number> {
 		}
 
 		@Override
-		protected void operator(IntOperatorTask nextTask) {
+		protected void operator(Number next) {
 			if( primitiveType == byte.class ) {
-				result = Math.max(result.byteValue(),nextTask.getRawResult().byteValue());
+				result = Math.max(result.byteValue(),next.byteValue());
 			} else if( primitiveType == short.class ) {
-				result = Math.max(result.shortValue(),nextTask.getRawResult().shortValue());
+				result = Math.max(result.shortValue(),next.shortValue());
 			} else if( primitiveType == int.class ) {
-				result = Math.max(result.intValue(),nextTask.getRawResult().intValue());
+				result = Math.max(result.intValue(),next.intValue());
 			} else if( primitiveType == long.class ) {
-				result = Math.max(result.longValue(),nextTask.getRawResult().longValue());
+				result = Math.max(result.longValue(),next.longValue());
 			} else if( primitiveType == float.class ) {
-				result = Math.max(result.floatValue(),nextTask.getRawResult().floatValue());
+				result = Math.max(result.floatValue(),next.floatValue());
 			} else if( primitiveType == double.class ) {
-				result = Math.max(result.doubleValue(),nextTask.getRawResult().doubleValue());
+				result = Math.max(result.doubleValue(),next.doubleValue());
 			} else {
 				throw new RuntimeException("Unknown primitive type "+ primitiveType);
 			}
@@ -146,19 +173,19 @@ public abstract class IntOperatorTask extends ForkJoinTask<Number> {
 		}
 
 		@Override
-		protected void operator(IntOperatorTask nextTask) {
+		protected void operator(Number next) {
 			if( primitiveType == byte.class ) {
-				result = Math.min(result.byteValue(),nextTask.getRawResult().byteValue());
+				result = Math.min(result.byteValue(),next.byteValue());
 			} else if( primitiveType == short.class ) {
-				result = Math.min(result.shortValue(),nextTask.getRawResult().shortValue());
+				result = Math.min(result.shortValue(),next.shortValue());
 			} else if( primitiveType == int.class ) {
-				result = Math.min(result.intValue(),nextTask.getRawResult().intValue());
+				result = Math.min(result.intValue(),next.intValue());
 			} else if( primitiveType == long.class ) {
-				result = Math.min(result.longValue(),nextTask.getRawResult().longValue());
+				result = Math.min(result.longValue(),next.longValue());
 			} else if( primitiveType == float.class ) {
-				result = Math.min(result.floatValue(),nextTask.getRawResult().floatValue());
+				result = Math.min(result.floatValue(),next.floatValue());
 			} else if( primitiveType == double.class ) {
-				result = Math.min(result.doubleValue(),nextTask.getRawResult().doubleValue());
+				result = Math.min(result.doubleValue(),next.doubleValue());
 			} else {
 				throw new RuntimeException("Unknown primitive type "+ primitiveType);
 			}

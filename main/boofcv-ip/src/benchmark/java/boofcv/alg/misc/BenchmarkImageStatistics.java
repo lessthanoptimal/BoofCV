@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.filter.blur;
+package boofcv.alg.misc;
 
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.concurrency.IWorkArrays;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
@@ -39,54 +38,88 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
-@Fork(value=2)
-public class BenchmarkBlurImageOps {
-
-	public static final int radius = 5;
+@Fork(value=1)
+public class BenchmarkImageStatistics {
 
 	@Param({"true","false"})
 	public boolean concurrent;
 
-	@Param({"100", "500", "1000", "5000", "10000"})
+//	@Param({"100", "500", "1000", "5000", "10000"})
+	@Param({"5000"})
 	public int size;
 
-	GrayU8 input = new GrayU8(size, size);
-	GrayU8 output = new GrayU8(size, size);
-	GrayU8 storage = new GrayU8(size, size);
-	IWorkArrays work = new IWorkArrays();
+	GrayU8 imgA_U8 = new GrayU8(size, size);
+	GrayU8 imgB_U8 = new GrayU8(size, size);
+
+	GrayF32 imgA_F32 = new GrayF32(size, size);
+	GrayF32 imgB_F32 = new GrayF32(size, size);
+
+	int[] histogram = new int[256];
 
 	@Setup
 	public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
 
-		input.reshape(size, size);
-		output.reshape(size, size);
-		storage.reshape(size, size);
+		imgA_U8.reshape(size, size);
+		imgB_U8.reshape(size, size);
+		imgA_F32.reshape(size, size);
+		imgB_F32.reshape(size, size);
 
-		ImageMiscOps.fillUniform(input,rand,0,200);
-		ImageMiscOps.fillUniform(output,rand,0,200);
-		ImageMiscOps.fillUniform(storage,rand,0,200);
+		GImageMiscOps.fillUniform(imgA_U8,rand,0,200);
+		GImageMiscOps.fillUniform(imgB_U8,rand,0,200);
+		GImageMiscOps.fillUniform(imgA_F32,rand,-100,100);
+		GImageMiscOps.fillUniform(imgB_F32,rand,-100,100);
+	}
+
+	@Benchmark
+	public void maxAbs() {
+		GImageStatistics.maxAbs(imgA_U8);
+	}
+
+	@Benchmark
+	public void histogram() {
+		GImageStatistics.histogram(imgA_U8,0,histogram);
+	}
+
+	@Benchmark
+	public void max() {
+		GImageStatistics.max(imgA_U8);
+	}
+
+	@Benchmark
+	public void min() {
+		GImageStatistics.min(imgA_U8);
 	}
 
 	@Benchmark
 	public void mean() {
-		BlurImageOps.mean(input,output,radius,storage,work);
+		GImageStatistics.mean(imgA_U8);
 	}
 
 	@Benchmark
-	public void gaussian() {
-		BlurImageOps.gaussian(input,output,-1,radius,storage);
+	public void meanDiffAbs() {
+		GImageStatistics.meanDiffAbs(imgA_F32,imgB_F32);
 	}
 
 	@Benchmark
-	public void median() {
-		BlurImageOps.median(input,output,radius,work);
+	public void meanDiffSq() {
+		GImageStatistics.meanDiffSq(imgA_U8,imgB_U8);
+	}
+
+	@Benchmark
+	public void sum() {
+		GImageStatistics.sum(imgA_U8);
+	}
+
+	@Benchmark
+	public void variance() {
+		GImageStatistics.variance(imgA_U8,120);
 	}
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()
-				.include(BenchmarkBlurImageOps.class.getSimpleName())
+				.include(BenchmarkImageStatistics.class.getSimpleName())
 				.build();
 
 		new Runner(opt).run();

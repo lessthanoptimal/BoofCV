@@ -94,7 +94,7 @@ public class BoofConcurrency {
 		int block = selectBlockSize(range,minBlock,numThreads);
 
 		try {
-			pool.submit(new IntRangeTask(0,start,endExclusive,block,consumer)).get();
+			pool.submit(new IntRangeTask(start,endExclusive,block,consumer)).get();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
@@ -128,7 +128,7 @@ public class BoofConcurrency {
 		int blockSize = Math.max(1,range/numThreads);
 
 		try {
-			pool.submit(new IntRangeTask(0,start,endExclusive,blockSize,consumer)).get();
+			pool.submit(new IntRangeTask(start,endExclusive,blockSize,consumer)).get();
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}

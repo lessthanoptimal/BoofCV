@@ -30,13 +30,26 @@ public class IntRangeTask extends ForkJoinTask<Void> {
 	final int stepLength;
 	final int step;
 	final IntRangeConsumer consumer;
+	IntRangeTask next;
 
+	/**
+	 *
+	 * @param step which step is to be processed. the master task should have this set to -1
+	 * @param min
+	 * @param max
+	 * @param stepLength
+	 * @param consumer
+	 */
 	public IntRangeTask(int step, int min , int max , int stepLength , IntRangeConsumer consumer ) {
 		this.step = step;
 		this.min = min;
 		this.max = max;
 		this.stepLength = stepLength;
 		this.consumer = consumer;
+	}
+
+	public IntRangeTask( int min , int max , int stepLength , IntRangeConsumer consumer ) {
+		this(-1,min,max,stepLength,consumer);
 	}
 
 	@Override
@@ -48,19 +61,36 @@ public class IntRangeTask extends ForkJoinTask<Void> {
 	@Override
 	protected boolean exec() {
 		int N = (max-min)/stepLength;
-		int index0 = step*stepLength + min;
-		int index1 = step==(N-1) ? max : index0 + stepLength;
 
-		IntRangeTask nextTask = null;
-		if( index1 != max ) {
-			nextTask = new IntRangeTask(step+1,min,max,stepLength, consumer);
-			nextTask.fork();
+		if( step == -1 ) {
+			// this is the first task, spawn all the others
+			IntRangeTask root=null;
+			IntRangeTask previous=null;
+			int step;
+			for ( step = 0; step < N - 1; step++) {
+				IntRangeTask task = new IntRangeTask(step,min,max,stepLength, consumer);
+				if( root == null ) {
+					root = previous = task;
+				} else {
+					previous.next = task;
+					previous = task;
+				}
+				task.fork();
+			}
+			// process the last segment in this thread
+			int index0 = step*stepLength + min;
+			consumer.accept(index0,max);
+
+			// wait until all the other threads are done
+			while( root != null ) {
+				root.join();
+				root = root.next;
+			}
+		} else {
+			int index0 = step*stepLength + min;
+			int index1 = index0 + stepLength;
+			consumer.accept(index0,index1);
 		}
-//		System.out.println("Working "+index0+" "+index1);
-		consumer.accept(index0,index1);
-//		System.out.println("Done    "+index0+" "+index1);
-		if( nextTask != null )
-			nextTask.join();
 		return true;
 	}
 }

@@ -68,7 +68,8 @@ Version : 0.33
   * Convolution: general, sum, mean, gradient
   * Threshold: Local, Block
   * Color: TODO NV21, YV12, Yuv420
-  * Misc: PixelMath, Non-Max, Non-Max Candidate, ConvertImage, ConvertBufferedImage
+  * Misc: PixelMath, ImageStatistics, Non-Max, Non-Max Candidate, ConvertImage, ConvertBufferedImage
+  * TODO image histogram in ImageStatistics
   * Feature Intensity: SURF, SSD Corner
 - Examples
   * Removed Lena as default image since image is no longer considered appropriate by some journals.

@@ -1,6 +1,14 @@
+createVersionFile.enabled = true
+
+gversion {
+    srcDir = "src/main/java"
+    classPackage = "boofcv"
+    className = "BoofVersion"
+    debug = true
+}
 
 // Auto generate version file when told to compile
-project.compileJava.dependsOn(project(":").createVersionFile)
+project.compileJava.dependsOn(project.createVersionFile)
 
 dependencies {
 
