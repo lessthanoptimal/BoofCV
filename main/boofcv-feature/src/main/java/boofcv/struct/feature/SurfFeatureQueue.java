@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,16 +27,7 @@ import org.ddogleg.struct.FastQueue;
  * @author Peter Abeles
  */
 public class SurfFeatureQueue extends FastQueue<BrightFeature> {
-
-	int numFeatures;
-
 	public SurfFeatureQueue( int descriptionLength ) {
-		this.numFeatures = descriptionLength;
-		init(10,BrightFeature.class,true);
-	}
-
-	@Override
-	protected BrightFeature createInstance() {
-		return new BrightFeature(numFeatures);
+		super(BrightFeature.class,()->new BrightFeature(descriptionLength));
 	}
 }

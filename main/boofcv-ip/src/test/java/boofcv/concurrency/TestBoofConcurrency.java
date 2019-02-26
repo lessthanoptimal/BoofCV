@@ -20,6 +20,7 @@ package boofcv.concurrency;
 
 import boofcv.misc.BoofMiscOps;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -88,5 +89,32 @@ class TestBoofConcurrency {
 			}
 
 		}
+	}
+
+	@Test
+	void sum() {
+		int foundI = BoofConcurrency.sum(5,10,int.class,i->i+2).intValue();
+		assertEquals(45,foundI);
+
+		double foundD = BoofConcurrency.sum(5,10,double.class,i->i+2.5).doubleValue();
+		assertEquals(47.5,foundD, UtilEjml.TEST_F64);
+	}
+
+	@Test
+	void max() {
+		int foundI = BoofConcurrency.max(5,10,int.class,i->i+2).intValue();
+		assertEquals(9+2,foundI);
+
+		double foundD = BoofConcurrency.max(5,10,double.class,i->i+2.5).doubleValue();
+		assertEquals(9.0+2.5,foundD, UtilEjml.TEST_F64);
+	}
+
+	@Test
+	void min() {
+		int foundI = BoofConcurrency.min(5,10,int.class,i->i+2).intValue();
+		assertEquals(5+2,foundI);
+
+		double foundD = BoofConcurrency.min(5,10,double.class,i->i+2.5).doubleValue();
+		assertEquals(5.0+2.5,foundD, UtilEjml.TEST_F64);
 	}
 }

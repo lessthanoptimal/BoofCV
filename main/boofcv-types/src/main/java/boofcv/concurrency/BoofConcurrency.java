@@ -130,9 +130,59 @@ public class BoofConcurrency {
 		try {
 			pool.submit(new IntRangeTask(0,start,endExclusive,blockSize,consumer)).get();
 		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
+	/**
+	 * Computes sums up the results using the specified primitive type
+	 *
+	 * @param start First index, inclusive
+	 * @param endExclusive Last index, exclusive
+	 * @param type Primtive data type, e.g. int.class, float.class, double.class
+	 * @param producer Given an integer input produce a Number output
+	 * @return The sum
+	 */
+	public static Number sum(int start , int endExclusive , Class type, IntProducerNumber producer ) {
+		try {
+			return pool.submit(new IntOperatorTask.Sum(start,endExclusive,type,producer)).get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Computes the maximum value
+	 *
+	 * @param start First index, inclusive
+	 * @param endExclusive Last index, exclusive
+	 * @param type Primtive data type, e.g. int.class, float.class, double.class
+	 * @param producer Given an integer input produce a Number output
+	 * @return The sum
+	 */
+	public static Number max(int start , int endExclusive , Class type, IntProducerNumber producer ) {
+		try {
+			return pool.submit(new IntOperatorTask.Max(start,endExclusive,type,producer)).get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Computes the maximum value
+	 *
+	 * @param start First index, inclusive
+	 * @param endExclusive Last index, exclusive
+	 * @param type Primtive data type, e.g. int.class, float.class, double.class
+	 * @param producer Given an integer input produce a Number output
+	 * @return The sum
+	 */
+	public static Number min(int start , int endExclusive , Class type, IntProducerNumber producer ) {
+		try {
+			return pool.submit(new IntOperatorTask.Min(start,endExclusive,type,producer)).get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 }

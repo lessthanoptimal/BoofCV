@@ -228,6 +228,16 @@ public enum AutoTypeImage {
 		throw new RuntimeException("Unknown sum type");
 	}
 
+	public String getSumNumberToType() {
+		switch( sumType ) {
+			case "int": return "intValue()";
+			case "long": return "longValue()";
+			case "float": return "floatValue()";
+			case "double": return "doubleValue()";
+		}
+		throw new RuntimeException("Unknown sum type");
+	}
+
 	public String getLargeSumType() {
 		return largeSumType;
 	}

@@ -16,28 +16,16 @@
  * limitations under the License.
  */
 
-package boofcv.struct.geo;
+package boofcv.alg.misc.impl;
 
-import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
-/**
- * @author Peter Abeles
- */
-public class TestQueueMatrix {
-
+class TestImplImageStatistics_MT {
 	@Test
-	public void constructor_regular() {
-		QueueMatrix alg = new QueueMatrix(3,4);
-
-		assertEquals(0,alg.size);
-
-		DMatrixRMaj M = alg.grow();
-
-		assertEquals(3,M.numRows);
-		assertEquals(4, M.numCols);
+	void implement() {
+		fail("implement");
 	}
-
 }
+

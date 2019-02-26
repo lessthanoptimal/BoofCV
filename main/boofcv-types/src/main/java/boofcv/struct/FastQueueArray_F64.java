@@ -24,15 +24,8 @@ import org.ddogleg.struct.FastQueue;
  * @author Peter Abeles
  */
 public class FastQueueArray_F64 extends FastQueue<double[]> {
-	int length;
 
 	public FastQueueArray_F64(int arrayLength) {
-		this.length = arrayLength;
-		init(10,double[].class,true);
-	}
-
-	@Override
-	protected double[] createInstance() {
-		return new double[length];
+		init(10,double[].class,()->new double[arrayLength]);
 	}
 }

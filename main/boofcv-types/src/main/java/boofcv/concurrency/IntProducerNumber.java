@@ -16,28 +16,13 @@
  * limitations under the License.
  */
 
-package boofcv.struct.geo;
-
-import org.ejml.data.DMatrixRMaj;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+package boofcv.concurrency;
 
 /**
+ * Processes an integer and returns a number
+ *
  * @author Peter Abeles
  */
-public class TestQueueMatrix {
-
-	@Test
-	public void constructor_regular() {
-		QueueMatrix alg = new QueueMatrix(3,4);
-
-		assertEquals(0,alg.size);
-
-		DMatrixRMaj M = alg.grow();
-
-		assertEquals(3,M.numRows);
-		assertEquals(4, M.numCols);
-	}
-
+public interface IntProducerNumber {
+	Number accept(int value );
 }

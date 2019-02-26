@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,16 +27,7 @@ import org.ddogleg.struct.FastQueue;
  */
 public class ColorQueue_F32 extends FastQueue<float[]> {
 
-	int numBands;
-
 	public ColorQueue_F32(int numBands) {
-		this.numBands = numBands;
-		init(10, float[].class, true);
+		super(float[].class,()->new float[numBands]);
 	}
-
-	@Override
-	protected float[] createInstance() {
-		return new float[ numBands ];
-	}
-
 }

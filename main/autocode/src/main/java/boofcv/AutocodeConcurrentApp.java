@@ -78,7 +78,8 @@ public class AutocodeConcurrentApp {
 			}
 			String type = readType(line,where+prefix.length());
 			String whitespaces = line.substring(0,where);
-			String message = line.substring(where+prefix.length()+type.length()+1);
+			int frontLength =where+prefix.length()+type.length();
+			String message = line.length()>frontLength ? line.substring(frontLength+1) : "";
 			switch(type) {
 				case "CLASS_NAME":continue; // ignore. already processed
 				case "INLINE":
@@ -93,8 +94,16 @@ public class AutocodeConcurrentApp {
 					outputLines.add(whitespaces+message);
 					i += 1; // skip next line
 					break;
+				case "REMOVE_ABOVE":
+					outputLines.remove(outputLines.size()-1);
+					break;
+				case "REMOVE_BELOW":
+					i += 1; // skip next line
+					break;
 				case "MACRO":
 					throw new RuntimeException("MACRO not handled yet");
+				default:
+					throw new RuntimeException("Unknown: "+type);
 			}
 		}
 
@@ -244,44 +253,45 @@ public class AutocodeConcurrentApp {
 
 	public static void main(String[] args) throws IOException {
 		String files[] = new String[]{
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientPrewitt_Shared.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientSobel_Outer.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientSobel_UnrolledOuter.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientThree_Standard.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientTwo0_Standard.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientTwo1_Standard.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/DerivativeLaplacian_Inner.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/blur/impl/ImplMedianHistogramInner.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/misc/impl/ImplPixelMath.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/misc/impl/ImplImageBandMath.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageStandard_IL.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageStandard_SB.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_F32_F32.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_F64_F64.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S16_I16.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S16_I16_Div.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S32_S32.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S32_S32_Div.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U8_I8_Div.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U8_I16.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U16_I16.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U16_I16_Div.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ImplConvolveBox.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ImplConvolveMean.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/impl/ImplThresholdImageOps.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/ThresholdSauvola.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/ThresholdNick.java",
-				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplEdgeNonMaxSuppression.java",
-				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplEdgeNonMaxSuppressionCrude.java",
-				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplGradientToEdgeFeatures.java",
-				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl/ImplSsdCorner_F32.java",
-				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl/ImplSsdCorner_S16.java",
-				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl/ImplSsdCornerWeighted_S16.java",
-				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl/ImplSsdCornerWeighted_F32.java",
-				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ImplConvertImage.java",
-				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ConvertInterleavedToSingle.java",
-				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ImplConvertPlanarToGray.java",
-				"main/boofcv-io/src/main/java/boofcv/io/image/impl/ImplConvertRaster.java"
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientPrewitt_Shared.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientSobel_Outer.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientSobel_UnrolledOuter.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientThree_Standard.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientTwo0_Standard.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientTwo1_Standard.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/DerivativeLaplacian_Inner.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/blur/impl/ImplMedianHistogramInner.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/misc/impl/ImplPixelMath.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/misc/impl/ImplImageBandMath.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageStandard_IL.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageStandard_SB.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_F32_F32.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_F64_F64.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S16_I16.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S16_I16_Div.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S32_S32.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S32_S32_Div.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U8_I8_Div.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U8_I16.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U16_I16.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U16_I16_Div.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ImplConvolveBox.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ImplConvolveMean.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/impl/ImplThresholdImageOps.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/ThresholdSauvola.java",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/ThresholdNick.java",
+//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplEdgeNonMaxSuppression.java",
+//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplEdgeNonMaxSuppressionCrude.java",
+//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplGradientToEdgeFeatures.java",
+//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl/ImplSsdCorner_F32.java",
+//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl/ImplSsdCorner_S16.java",
+//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl/ImplSsdCornerWeighted_S16.java",
+//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl/ImplSsdCornerWeighted_F32.java",
+//				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ImplConvertImage.java",
+//				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ConvertInterleavedToSingle.java",
+//				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ImplConvertPlanarToGray.java",
+//				"main/boofcv-io/src/main/java/boofcv/io/image/impl/ImplConvertRaster.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/misc/impl/ImplImageStatistics.java"
 		};
 
 		for( String f : files ) {

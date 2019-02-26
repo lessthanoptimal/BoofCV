@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,23 +28,6 @@ import org.ejml.data.DMatrixRMaj;
  */
 public class QueueMatrix extends FastQueue<DMatrixRMaj> {
 
-	// matrix shape
-	private int numRows,numCols;
-
-	/**
-	 * Specifies the matrix shape and the number of elements in the internal array initially.
-	 *
-	 * @param numRows Number of rows in each matrix.
-	 * @param numCols Number of columns in each matrix.
-	 * @param initialMaxSize Initial number of matrices in storage.
-	 */
-	public QueueMatrix(int numRows, int numCols, int initialMaxSize) {
-		this.numRows = numRows;
-		this.numCols = numCols;
-
-		init(initialMaxSize,DMatrixRMaj.class,true);
-	}
-
 	/**
 	 * Specifies the matrix shape.
 	 *
@@ -52,14 +35,6 @@ public class QueueMatrix extends FastQueue<DMatrixRMaj> {
 	 * @param numCols Number of columns in each matrix.
 	 */
 	public QueueMatrix( int numRows , int numCols ) {
-		this.numRows = numRows;
-		this.numCols = numCols;
-
-		init(10,DMatrixRMaj.class,true);
-	}
-
-	@Override
-	protected DMatrixRMaj createInstance() {
-		return new DMatrixRMaj(numRows,numCols);
+		super(DMatrixRMaj.class,()->new DMatrixRMaj(numRows,numCols));
 	}
 }
