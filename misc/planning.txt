@@ -42,15 +42,17 @@ TOP ITEMS
 Less High Priority Next Release
 
 - Concurrency
-  * Non-maximum suppression
-  * Thresholding
   * KLT
   * Association
   * Stereo disparity
   * Dense Features
+  * Feature Descriptions
 
 - Filters
   * Median Filter: When even do average of two median terms
+
+- 16-bit images
+  * Binary Thresholding - Improved handling of 16-bit images
 
 - Sparse Bundle Adjustment
   * Improve LM implementation so that it doesn't have to take a full gradient step if that's too big

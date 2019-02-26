@@ -49,10 +49,9 @@ Version : 0.33
   * Modernized FFT Demo
   * Modernized Blur Demo
   * Modernized Image Derivative Demo
-  * TODO Binary Thresholding - Improved handling of 16-bit images
   * Three View Stereo
     - Using AverageDownSampleOps to avoid aliasing and drastically improves performance
-    - TODO Select best pair automatically for stereo processing
+    - Selects best pair automatically for stereo processing. Before it was always image 0 and 1.
 - Tracking
   * TODO fix tracking slow down
 - Swing

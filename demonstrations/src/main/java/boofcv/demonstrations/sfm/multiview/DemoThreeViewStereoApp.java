@@ -34,6 +34,7 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -420,25 +421,42 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			});
 		}
 
-		System.out.println("Computing rectification");
+		// Pick the two best views to compute stereo from
+		int[]selected = selectBestPair(structureEstimator.structure);
+
+		if (computeStereoCloud(selected[0],selected[1], cx, cy))
+			return;
+
+		long time1 = System.currentTimeMillis();
+		SwingUtilities.invokeLater(()->{
+			controls.addText(String.format("ET %d (ms)",time1-time0));
+		});
+		System.out.println("Success!");
+	}
+
+	private boolean computeStereoCloud( int view0 , int view1, double cx, double cy) {
+		System.out.println("Computing rectification: views "+view0+" "+view1);
 		SceneStructureMetric structure = structureEstimator.getStructure();
 
-		BundlePinholeSimplified cp = structure.getCameras()[0].getModel();
+		BundlePinholeSimplified cp = structure.getCameras()[view0].getModel();
 		intrinsic01 = new CameraPinholeBrown();
-		intrinsic01.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[0].width, dimensions[0].height);
+		intrinsic01.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[view0].width, dimensions[view0].height);
 		intrinsic01.fsetRadial(cp.k1, cp.k2);
 
-		cp = structure.getCameras()[1].getModel();
+		cp = structure.getCameras()[view1].getModel();
 		intrinsic02 = new CameraPinholeBrown();
-		intrinsic02.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[1].width, dimensions[1].height);
+		intrinsic02.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[view1].width, dimensions[view1].height);
 		intrinsic02.fsetRadial(cp.k1, cp.k2);
 
-		leftToRight = structure.views[1].worldToView;
+		Se3_F64 w_to_0 = structure.views[view0].worldToView;
+		Se3_F64 w_to_1 = structure.views[view1].worldToView;
 
-		Planar<GrayU8> color1 = new Planar<>(GrayU8.class, dimensions[0].width, dimensions[0].height, 3);
-		Planar<GrayU8> color2 = new Planar<>(GrayU8.class, dimensions[1].width, dimensions[1].height, 3);
-		ConvertBufferedImage.convertFrom(buff[0], color1, true);
-		ConvertBufferedImage.convertFrom(buff[1], color2, true);
+		leftToRight = w_to_0.invert(null).concat(w_to_1,null);
+
+		Planar<GrayU8> color1 = new Planar<>(GrayU8.class, dimensions[view0].width, dimensions[view0].height, 3);
+		Planar<GrayU8> color2 = new Planar<>(GrayU8.class, dimensions[view1].width, dimensions[view1].height, 3);
+		ConvertBufferedImage.convertFrom(buff[view0], color1, true);
+		ConvertBufferedImage.convertFrom(buff[view1], color2, true);
 
 		// rectify a colored image
 		Planar<GrayU8> rectColor1 = new Planar<>(GrayU8.class, color1.width, color1.height, 3);
@@ -461,7 +479,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		if (rectifiedK.get(0, 0) < 0) {
 			SwingUtilities.invokeLater(()-> controls.addText("Rectification Failed!\n"));
-			return;
+			return false;
 		}
 
 		System.out.println("Computing disparity. min="+controls.minDisparity+" max="+controls.maxDisparity);
@@ -483,13 +501,62 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		System.out.println("Computing Point Cloud");
 		showPointCloud(disparity,visualRect1,leftToRight,rectifiedK,rectifiedR);
 
-		long time1 = System.currentTimeMillis();
-		SwingUtilities.invokeLater(()->{
-			controls.addText(String.format("ET %d (ms)",time1-time0));
-		});
-
-		System.out.println("Success!");
+		return true;
 	}
+
+	/**
+	 * Select two views which are the closest to an idea stereo pair. Little rotation and little translation along
+	 * z-axis
+	 */
+	private int[] selectBestPair( SceneStructureMetric structure ) {
+		Se3_F64 w_to_0 = structure.views[0].worldToView;
+		Se3_F64 w_to_1 = structure.views[1].worldToView;
+		Se3_F64 w_to_2 = structure.views[2].worldToView;
+
+		Se3_F64 view0_to_1 = w_to_0.invert(null).concat(w_to_1,null);
+		Se3_F64 view0_to_2 = w_to_0.invert(null).concat(w_to_2,null);
+		Se3_F64 view1_to_2 = w_to_1.invert(null).concat(w_to_2,null);
+
+		Se3_F64 candidates[] = new Se3_F64[]{view0_to_1,view0_to_2,view1_to_2};
+
+		int best = -1;
+		double bestScore = Double.MAX_VALUE;
+		for (int i = 0; i < candidates.length; i++) {
+			double s = score(candidates[i]);
+			System.out.println("stereo score["+i+"] = "+s);
+			if( s < bestScore ) {
+				bestScore = s;
+				best = i;
+			}
+		}
+
+		switch (best) {
+			case 0: return new int[]{0,1};
+			case 1: return new int[]{0,2};
+			case 2: return new int[]{1,2};
+		}
+		throw new RuntimeException("BUG!");
+	}
+
+	/**
+	 * Give lower scores to transforms with no rotation and translations along x or y axis.
+	 */
+	private double score( Se3_F64 se ) {
+//		Rodrigues_F64 rod = new Rodrigues_F64();
+//		ConvertRotation3D_F64.matrixToRodrigues(se.R,rod);
+
+		double x = Math.abs(se.T.x);
+		double y = Math.abs(se.T.y);
+		double z = Math.abs(se.T.z)+1e-8;
+
+		double r = Math.max(x/(y+z),y/(x+z));
+
+//		System.out.println(se.T+"  angle="+rod.theta);
+
+//		return (Math.abs(rod.theta)+1e-3)/r;
+		return 1.0/r; // ignoring rotation seems to work better <shrug>
+	}
+
 
 	public <C extends ImageBase<C> >
 	void rectifyImages(C distorted1,
@@ -600,6 +667,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	}
 
 	public static void main(String[] args) {
+		BoofConcurrency.USE_CONCURRENT = true;
+
 		List<PathLabel> examples = new ArrayList<>();
 
 		examples.add(createExample("rock_leaves"));
