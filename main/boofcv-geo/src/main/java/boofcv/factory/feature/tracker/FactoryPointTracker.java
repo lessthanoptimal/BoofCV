@@ -176,7 +176,7 @@ public class FactoryPointTracker {
 
 		DdaManagerDetectDescribePoint<I,BrightFeature> manager = new DdaManagerDetectDescribePoint<>(fused);
 
-		return new DetectDescribeAssociate<>(manager, generalAssoc, false);
+		return new DetectDescribeAssociate<>(manager, generalAssoc, new ConfigTrackerDda());
 	}
 
 	/**
@@ -211,7 +211,7 @@ public class FactoryPointTracker {
 
 		DdaManagerDetectDescribePoint<I,BrightFeature> manager = new DdaManagerDetectDescribePoint<>(fused);
 
-		return new DetectDescribeAssociate<>(manager, generalAssoc, false);
+		return new DetectDescribeAssociate<>(manager, generalAssoc, new ConfigTrackerDda());
 	}
 
 	/**
@@ -248,7 +248,7 @@ public class FactoryPointTracker {
 		DdaManagerGeneralPoint<I,D,TupleDesc_B> manager =
 				new DdaManagerGeneralPoint<>(easy, new WrapDescribeBrief<>(brief, imageType), 1.0);
 
-		return new DetectDescribeAssociate<>(manager, association, false);
+		return new DetectDescribeAssociate<>(manager, association, new ConfigTrackerDda());
 	}
 
 	/**
@@ -284,7 +284,7 @@ public class FactoryPointTracker {
 		DdaManagerGeneralPoint<I,D,TupleDesc_B> manager =
 				new DdaManagerGeneralPoint<>(easy, new WrapDescribeBrief<>(brief, imageType), 1.0);
 
-		return new DetectDescribeAssociate<>(manager, association, false);
+		return new DetectDescribeAssociate<>(manager, association, new ConfigTrackerDda());
 	}
 
 	/**
@@ -321,7 +321,7 @@ public class FactoryPointTracker {
 		DdaManagerGeneralPoint<I,D,NccFeature> manager =
 				new DdaManagerGeneralPoint<>(easy, new WrapDescribePixelRegionNCC<>(alg, imageType), 1.0);
 
-		return new DetectDescribeAssociate<>(manager, association, false);
+		return new DetectDescribeAssociate<>(manager, association, new ConfigTrackerDda());
 	}
 
 	/**
@@ -331,7 +331,7 @@ public class FactoryPointTracker {
 	 * @param orientation Optional orientation estimation algorithm. Can be null.
 	 * @param describe Region description.
 	 * @param associate Description association.
-	 * @param updateDescription After a track has been associated should the description be changed?  Try false.
+	 * @param config Configuration
 	 * @param <I> Type of input image.
 	 * @param <Desc> Type of region description
 	 * @return tracker
@@ -341,7 +341,7 @@ public class FactoryPointTracker {
 										OrientationImage<I> orientation ,
 										DescribeRegionPoint<I, Desc> describe,
 										AssociateDescription2D<Desc> associate ,
-										boolean updateDescription ) {
+										ConfigTrackerDda config ) {
 
 		DetectDescribeFusion<I,Desc> fused =
 				new DetectDescribeFusion<>(detector, orientation, describe);
@@ -350,7 +350,7 @@ public class FactoryPointTracker {
 				new DdaManagerDetectDescribePoint<>(fused);
 
 		DetectDescribeAssociate<I,Desc> dat =
-				new DetectDescribeAssociate<>(manager, associate, updateDescription);
+				new DetectDescribeAssociate<>(manager, associate, config);
 
 		return dat;
 	}
@@ -358,13 +358,13 @@ public class FactoryPointTracker {
 	public static <I extends ImageGray<I>, Desc extends TupleDesc>
 	DetectDescribeAssociate<I,Desc> dda( DetectDescribePoint<I, Desc> detDesc,
 										AssociateDescription2D<Desc> associate ,
-										boolean updateDescription ) {
+										 ConfigTrackerDda config) {
 
 		DdaManagerDetectDescribePoint<I,Desc> manager =
 				new DdaManagerDetectDescribePoint<>(detDesc);
 
 		DetectDescribeAssociate<I,Desc> dat =
-				new DetectDescribeAssociate<>(manager, associate, updateDescription);
+				new DetectDescribeAssociate<>(manager, associate, config);
 
 		return dat;
 	}
@@ -523,7 +523,7 @@ public class FactoryPointTracker {
 		DdaManagerGeneralPoint<I,D,Desc> manager =
 				new DdaManagerGeneralPoint<>(easy, describe, scale);
 
-		return new DetectDescribeAssociate<>(manager, associate, false);
+		return new DetectDescribeAssociate<>(manager, associate, new ConfigTrackerDda());
 	}
 
 	/**

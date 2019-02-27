@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,7 +71,7 @@ public class TestDdaManagerGeneralPoint extends StandardPointTracker<GrayF32> {
 		manager = new DdaManagerGeneralPoint<>(easy, describe, 2);
 
 		DetectDescribeAssociate<GrayF32,TupleDesc_B> tracker =
-				new DetectDescribeAssociate<>(manager, association, false);
+				new DetectDescribeAssociate<>(manager, association, new ConfigTrackerDda());
 		return tracker;
 	}
 }

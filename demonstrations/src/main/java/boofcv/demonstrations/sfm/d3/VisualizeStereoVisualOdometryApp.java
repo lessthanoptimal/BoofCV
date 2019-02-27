@@ -31,6 +31,7 @@ import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.DetectorInterestPointMulti;
 import boofcv.abst.feature.detect.interest.GeneralToInterestMulti;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
+import boofcv.abst.feature.tracker.ConfigTrackerDda;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.feature.tracker.PointTrackerToTwoPass;
 import boofcv.abst.feature.tracker.PointTrackerTwoPass;
@@ -303,7 +304,8 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 			AssociateDescription2D<TupleDesc_B> associate =
 					new AssociateDescTo2D<>(FactoryAssociation.greedy(score, 150, true));
 
-			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.dda(detector, describe, associate, null, 1, imageType);
+			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.dda(detector, describe, associate, null, 1,
+					new ConfigTrackerDda(), imageType);
 
 			return FactoryVisualOdometry.stereoDepth(1.5,80,3,200,50, false, disparity, tracker, imageType);
 		} else if( whichAlg == 2 ) {

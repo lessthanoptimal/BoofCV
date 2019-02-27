@@ -79,6 +79,8 @@ TODO This Release
   - Examples
     * Planar World Simulator
     * Point Cloud Viewer
+  - Circle Target Detection
+    * Ability to select ellipse center instead of tangent points
   - Demonstrations
     * Associate with Fundamental - Select different algs + inliers
     * Associate with Trifocal Tensor

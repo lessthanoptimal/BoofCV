@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,14 +47,14 @@ public class DetectDescribeAssociateTwoPass<I extends ImageGray<I>, Desc extends
 	 * @param manager Feature manager
 	 * @param associate Association algorithm for the first pass
 	 * @param associate2 Association algorithm for the second pass
-	 * @param updateDescription Should descriptions be updated? Typically false
+	 * @param config Configures behavior
 	 */
 	public DetectDescribeAssociateTwoPass(DdaFeatureManager<I, Desc> manager,
 										  AssociateDescription2D<Desc> associate,
 										  AssociateDescription2D<Desc> associate2,
-										  boolean updateDescription)
+										  ConfigTrackerDda config )
 	{
-		super(manager, associate, updateDescription);
+		super(manager, associate, config);
 		this.associate2 = associate2;
 	}
 

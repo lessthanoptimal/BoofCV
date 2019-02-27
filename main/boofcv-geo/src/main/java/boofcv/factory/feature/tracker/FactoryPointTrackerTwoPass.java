@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,6 +74,7 @@ public class FactoryPointTrackerTwoPass {
 							   AssociateDescription2D<Desc> associate1,
 							   AssociateDescription2D<Desc> associate2,
 							   double scale,
+							   ConfigTrackerDda config ,
 							   Class<I> imageType) {
 
 		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(detector, imageType, null);
@@ -83,14 +84,14 @@ public class FactoryPointTrackerTwoPass {
 		if( associate2 == null )
 			associate2 = associate1;
 
-		return new DetectDescribeAssociateTwoPass<>(manager, associate1, associate2, false);
+		return new DetectDescribeAssociateTwoPass<>(manager, associate1, associate2, config);
 	}
 
 	public static <I extends ImageGray<I>, Desc extends TupleDesc>
 	PointTrackerTwoPass<I> dda(DetectDescribePoint<I,Desc> detectDescribe,
 							   AssociateDescription2D<Desc> associate1 ,
 							   AssociateDescription2D<Desc> associate2 ,
-							   boolean updateDescription ) {
+							   ConfigTrackerDda config ) {
 
 
 		DdaManagerDetectDescribePoint<I,Desc> manager = new DdaManagerDetectDescribePoint<>(detectDescribe);
@@ -98,6 +99,6 @@ public class FactoryPointTrackerTwoPass {
 		if( associate2 == null )
 			associate2 = associate1;
 
-		return new DetectDescribeAssociateTwoPass<>(manager, associate1, associate2, updateDescription);
+		return new DetectDescribeAssociateTwoPass<>(manager, associate1, associate2, config);
 	}
 }

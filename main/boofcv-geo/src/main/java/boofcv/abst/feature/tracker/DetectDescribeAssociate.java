@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,11 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 /**
@@ -68,19 +70,27 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	// should it update the feature description after each association?
 	boolean updateDescription;
 
+	// maximum number of tracks it will keep track of that were not associated before it starts discarding
+	protected int maxInactiveTracks;
+	protected GrowQueue_I32 unassociatedIdx = new GrowQueue_I32();
+
+	// Random number generator
+	protected Random rand;
+
 	/**
 	 * Configures tracker
 	 *
 	 * @param associate Association
-	 * @param updateDescription If true then the feature description will be updated after each image.
-	 *                          Typically this should be false.
+	 * @param config Configures behavior.
 	 */
 	public DetectDescribeAssociate(DdaFeatureManager<I, Desc> manager,
 								   final AssociateDescription2D<Desc> associate,
-								   final boolean updateDescription ) {
+								   ConfigTrackerDda config ) {
 		this.manager = manager;
 		this.associate = associate;
-		this.updateDescription = updateDescription;
+		this.updateDescription = config.updateDescription;
+		this.maxInactiveTracks = config.maxUnusedTracks;
+		this.rand = new Random(config.seed);
 
 		sets = new SetTrackInfo[manager.getNumberOfSets()];
 
@@ -139,10 +149,15 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 				performTracking(info);
 
 				// add unassociated to the list
+				unassociatedIdx.reset();
 				for( int j = 0; j < info.tracks.size(); j++ ) {
-					if( !info.isAssociated[j] )
+					if( !info.isAssociated[j] ) {
+						unassociatedIdx.add(j);
 						tracksInactive.add(info.tracks.get(j));
+					}
 				}
+
+				pruneTracks(info, unassociatedIdx);
 
 				// clean up
 				for (int j = 0; j < sets.length; j++) {
@@ -151,9 +166,29 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 				}
 			}
 		}
+	}
 
-
-
+	/**
+	 * If there are too many unassociated tracks, randomly select some of those tracks and drop them
+	 */
+	private void pruneTracks(SetTrackInfo<Desc> info, GrowQueue_I32 unassociated) {
+		if( unassociated.size > maxInactiveTracks ) {
+			// make the first N elements the ones which will be dropped
+			int numDrop = unassociated.size-maxInactiveTracks;
+			for (int i = 0; i < numDrop; i++) {
+				int selected = rand.nextInt(unassociated.size-i)+i;
+				int a = unassociated.get(i);
+				unassociated.data[i] = unassociated.data[selected];
+				unassociated.data[selected] = a;
+			}
+			List<PointTrack> dropList = new ArrayList<>();
+			for (int i = 0; i < numDrop; i++) {
+				dropList.add( info.tracks.get(unassociated.get(i)) );
+			}
+			for (int i = 0; i < dropList.size(); i++) {
+				dropTrack(dropList.get(i));
+			}
+		}
 	}
 
 	protected void performTracking( SetTrackInfo<Desc> info ) {

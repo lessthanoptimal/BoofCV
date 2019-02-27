@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.tracker.ConfigTrackerDda;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.feature.tracker.PointTrackerToTwoPass;
 import boofcv.abst.feature.tracker.PointTrackerTwoPass;
@@ -434,7 +435,8 @@ public class VisualizeDepthVisualOdometryApp
 			AssociateDescription2D<TupleDesc_B> associate =
 					new AssociateDescTo2D<>(FactoryAssociation.greedy(score, 150, true));
 
-			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.dda(detector, describe, associate, null, 1, imageType);
+			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.dda(detector, describe, associate, null, 1,
+					new ConfigTrackerDda(), imageType);
 
 			alg = FactoryVisualOdometry.
 					depthDepthPnP(1.5, 80, 3, 200, 50, false, sparseDepth, tracker, imageType, GrayU16.class);

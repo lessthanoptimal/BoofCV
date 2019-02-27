@@ -57,12 +57,7 @@ public class PackedSetsPoint2D_I32 {
 			throw new IllegalArgumentException("Block length must be more than 2");
 		// ensure that the block length is divisible by two
 		this.blockLength = blockLength + (blockLength%2);
-		blocks = new FastQueue(int[].class,true) {
-			@Override
-			protected Object createInstance() {
-				return new int[ blockLength ];
-			}
-		};
+		blocks = new FastQueue<>(int[].class,()->new int[ this.blockLength ]);
 		blocks.grow();
 	}
 

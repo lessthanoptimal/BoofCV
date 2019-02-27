@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,7 @@ public class TestDetectDescribeAssociateTwoPass extends StandardPointTrackerTwoP
 		manager = new DdaManagerGeneralPoint<>(easy, describe, 2);
 
 		DetectDescribeAssociateTwoPass<GrayF32,TupleDesc_B> tracker =
-				new DetectDescribeAssociateTwoPass<>(manager, association, association, false);
+				new DetectDescribeAssociateTwoPass<>(manager, association, association, new ConfigTrackerDda());
 		return tracker;
 	}
 }
