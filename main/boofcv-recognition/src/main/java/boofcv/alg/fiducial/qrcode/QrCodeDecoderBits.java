@@ -20,6 +20,7 @@ package boofcv.alg.fiducial.qrcode;
 
 import org.ddogleg.struct.GrowQueue_I8;
 
+import javax.annotation.Nullable;
 import java.io.UnsupportedEncodingException;
 
 import static boofcv.alg.fiducial.qrcode.EciEncoding.getEciCharacterSet;
@@ -46,6 +47,19 @@ public class QrCodeDecoderBits {
 
 	// Currently specified ECI encoding
 	String encodingEci;
+
+	// If null the encoding of byte messages will attempt to be automatically determined, with a default
+	// of UTF-8. Otherwise this is the encoding used.
+	String forceEncoding;
+
+	/**
+	 *
+	 * @param forceEncoding If null then the default byte encoding is used. If not null then the specified
+	 *                      encoding is used.
+	 */
+	public QrCodeDecoderBits(@Nullable String forceEncoding) {
+		this.forceEncoding = forceEncoding;
+	}
 
 	/**
 	 * Reconstruct the data while applying error correction.
@@ -338,7 +352,10 @@ public class QrCodeDecoderBits {
 			bitLocation += 8;
 		}
 
-		String encoding = encodingEci == null ? guessEncoding(rawdata) : encodingEci;
+		// If ECI encoding is not specified use the default encoding. Unfortunately the specification is ignored
+		// by most people here and UTF-8 is used. If an encoding is specified then that is used.
+		String encoding = encodingEci == null ? (forceEncoding!=null?forceEncoding:guessEncoding(rawdata))
+				: encodingEci;
 
 		try {
 			workString.append( new String(rawdata, encoding) );

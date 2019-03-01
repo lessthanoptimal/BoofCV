@@ -31,7 +31,7 @@ public class TestQrCodeDecoderBits {
 	public void applyErrorCorrection() {
 		QrCode qr = new QrCodeEncoder().addNumeric("923492348985").fixate();
 
-		QrCodeDecoderBits alg = new QrCodeDecoderBits();
+		QrCodeDecoderBits alg = new QrCodeDecoderBits(EciEncoding.UTF8);
 
 		byte original[] = new byte[qr.rawbits.length];
 		System.arraycopy(qr.rawbits,0,original,0,original.length);
@@ -75,7 +75,7 @@ public class TestQrCodeDecoderBits {
 	public void checkPaddingBytes() {
 		QrCode qr = new QrCodeEncoder().addNumeric("923492348985").fixate();
 
-		QrCodeDecoderBits alg = new QrCodeDecoderBits();
+		QrCodeDecoderBits alg = new QrCodeDecoderBits(EciEncoding.UTF8);
 
 		qr.corrected = new byte[50];
 
@@ -107,7 +107,7 @@ public class TestQrCodeDecoderBits {
 		// ECI Assignment number
 		bits.append(0b00001001,8,false);
 
-		QrCodeDecoderBits alg = new QrCodeDecoderBits();
+		QrCodeDecoderBits alg = new QrCodeDecoderBits(EciEncoding.UTF8);
 
 		int newBit = alg.decodeEci(bits,0);
 		assertEquals("ISO8859_7",alg.encodingEci);

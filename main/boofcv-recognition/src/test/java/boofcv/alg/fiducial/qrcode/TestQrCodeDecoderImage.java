@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class TestQrCodeDecoderImage {
 		connect(pps.get(0),pps.get(1),0,2);
 
 		// Should fail when run on distorted image
-		QrCodeDecoderImage<GrayF32> decoder = new QrCodeDecoderImage<>(GrayF32.class);
+		QrCodeDecoderImage<GrayF32> decoder = new QrCodeDecoderImage<>(null,GrayF32.class);
 		decoder.process(pps,helper.image);
 
 		assertTrue(decoder.successes.size()==0);
@@ -92,7 +92,7 @@ public class TestQrCodeDecoderImage {
 //		ShowImages.showWindow(generator.gray,"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-			QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
+			QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null,GrayU8.class);
 			decoder.process(pps,generator.getGray());
 
 			assertEquals(1,decoder.successes.size());
@@ -123,7 +123,7 @@ public class TestQrCodeDecoderImage {
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-			QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
+			QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null,GrayU8.class);
 			decoder.process(pps, generator.getGray());
 
 			assertEquals(1, decoder.successes.size());
@@ -150,7 +150,7 @@ public class TestQrCodeDecoderImage {
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
+		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null,GrayU8.class);
 		decoder.process(pps,generator.getGray());
 
 		assertEquals(1,decoder.successes.size());
@@ -176,7 +176,7 @@ public class TestQrCodeDecoderImage {
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
+		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null,GrayU8.class);
 		decoder.process(pps,generator.getGray());
 
 		assertEquals(1,decoder.successes.size());
@@ -203,7 +203,7 @@ public class TestQrCodeDecoderImage {
 //		ShowImages.showWindow(generator.getGray(),"QR Code", true);
 //		BoofMiscOps.sleep(100000);
 
-		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
+		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null,GrayU8.class);
 		decoder.process(pps,generator.getGray());
 
 		assertEquals(1,decoder.successes.size());
@@ -246,7 +246,7 @@ public class TestQrCodeDecoderImage {
 
 		FastQueue<PositionPatternNode> pps = createPositionPatterns(generator);
 
-		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(GrayU8.class);
+		QrCodeDecoderImage<GrayU8> decoder = new QrCodeDecoderImage<>(null,GrayU8.class);
 
 //		ShowImages.showWindow(generator.getGray(),"QR Code");
 //		BoofMiscOps.sleep(100000);
@@ -368,7 +368,7 @@ public class TestQrCodeDecoderImage {
 	 */
 	@Test
 	public void extractVersionInfo_version0() {
-		QrCodeDecoderImage<GrayU8> mock = new QrCodeDecoderImage(GrayU8.class){
+		QrCodeDecoderImage<GrayU8> mock = new QrCodeDecoderImage(EciEncoding.UTF8,GrayU8.class){
 			@Override
 			int estimateVersionBySize(QrCode qr) {
 				return 0;

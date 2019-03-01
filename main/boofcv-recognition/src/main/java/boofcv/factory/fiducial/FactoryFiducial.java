@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -172,7 +172,7 @@ public class FactoryFiducial {
 		QrCodePositionPatternDetector<T> detectPositionPatterns =
 				new QrCodePositionPatternDetector<>(squareDetector,config.versionMaximum);
 
-		return new QrCodePreciseDetector<>(inputToBinary,detectPositionPatterns, false, imageType);
+		return new QrCodePreciseDetector<>(inputToBinary,detectPositionPatterns, config.forceEncoding,false, imageType);
 	}
 
 	/**

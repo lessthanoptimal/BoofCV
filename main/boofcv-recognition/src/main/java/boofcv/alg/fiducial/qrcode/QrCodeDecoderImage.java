@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,16 +32,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO document
+ * Uses position pattern graph to find candidate QR Codes. From those it attempts to decode each QR Code.
  *
  * @author Peter Abeles
  */
-	// TODO change QrCode to use GrowQueue's so that data can be recycled
-	// TODO better support for damaged qr codes with missing finder patterns.
 public class QrCodeDecoderImage<T extends ImageGray<T>> {
+	// TODO better support for damaged qr codes with missing finder patterns.
 
 	// used to compute error correction
-	QrCodeDecoderBits decoder = new QrCodeDecoderBits();
+	QrCodeDecoderBits decoder;
 
 	FastQueue<QrCode> storageQR = new FastQueue<>(QrCode.class,true);
 	List<QrCode> successes = new ArrayList<>();
@@ -56,15 +55,22 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	QrCodeAlignmentPatternLocator<T> alignmentLocator;
 	QrCodeBinaryGridReader<T> gridReader;
 
-	public QrCodeDecoderImage(Class<T> imageType ) {
+	/**
+	 *
+	 * @param forceEncoding Force the default encoding to be this. Null for default
+	 * @param imageType
+	 */
+	public QrCodeDecoderImage( String forceEncoding, Class<T> imageType ) {
+		decoder = new QrCodeDecoderBits(forceEncoding);
 		gridReader = new QrCodeBinaryGridReader<>(imageType);
 		alignmentLocator = new QrCodeAlignmentPatternLocator<>(imageType);
 	}
 
 	/**
+	 * Detects QR Codes inside image using position pattern graph
 	 *
-	 * @param pps
-	 * @param gray
+	 * @param pps position pattern graph
+	 * @param gray Gray input image
 	 */
 	public void process(FastQueue<PositionPatternNode> pps , T gray ) {
 		gridReader.setImage(gray);

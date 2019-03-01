@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -122,7 +122,7 @@ public class TestQrCodeEncoder {
 	@Test
 	public void automatic() {
 		QrCodeEncoder encoder = new QrCodeEncoder();
-		QrCodeDecoderBits decoder = new QrCodeDecoderBits(); // used to validate the message
+		QrCodeDecoderBits decoder = new QrCodeDecoderBits(EciEncoding.UTF8); // used to validate the message
 		QrCode qr = encoder.addAutomatic("123ASDdf阿ん鞠ぷへ≦Ｋ").fixate();
 		assertTrue("123ASDdf阿ん鞠ぷへ≦Ｋ".equals(qr.message));
 
@@ -185,7 +185,7 @@ public class TestQrCodeEncoder {
 		QrCode qr = new QrCodeEncoder().setMask(QrCodeMaskPattern.M011).addBytes(message).fixate();
 
 		qr.message = null;
-		QrCodeDecoderBits decoder = new QrCodeDecoderBits();
+		QrCodeDecoderBits decoder = new QrCodeDecoderBits(EciEncoding.UTF8);
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 

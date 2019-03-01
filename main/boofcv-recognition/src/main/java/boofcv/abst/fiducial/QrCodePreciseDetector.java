@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,10 +53,11 @@ public class QrCodePreciseDetector<T extends ImageGray<T>> implements QrCodeDete
 
 	public QrCodePreciseDetector(InputToBinary<T> inputToBinary,
 								 QrCodePositionPatternDetector<T> detectPositionPatterns,
+								 String defaultEncoding,
 								 boolean copyBinary, Class<T> imageType) {
 		this.inputToBinary = inputToBinary;
 		this.detectPositionPatterns = detectPositionPatterns;
-		this.decoder = new QrCodeDecoderImage<>(imageType);
+		this.decoder = new QrCodeDecoderImage<>(defaultEncoding,imageType);
 		this.imageType = imageType;
 		this.contourHelper = new BinaryContourHelper(detectPositionPatterns.getSquareDetector().getDetector().getContourFinder(),copyBinary);
 	}

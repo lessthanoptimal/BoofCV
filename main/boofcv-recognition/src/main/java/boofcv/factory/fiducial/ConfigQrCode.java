@@ -41,6 +41,14 @@ public class ConfigQrCode implements Configuration {
 	public int versionMinimum = 1;
 	public int versionMaximum = 40;
 
+	/**
+	 * This forces the encoding in byte mode to use the specified encoding, unless one is specified by the ECI
+	 * mode. If null an attempt to automatically determine the encoding is done, but will default to UTF-8 if
+	 * there is any ambiguity. ISO 18004:2015 says it should be 8859-1 but
+	 * most encoders and decoders use UTF-8 instead
+	 */
+	public String forceEncoding = null;
+
 	{
 
 		// 40% slower but better at detecting fiducials by a few percentage points
