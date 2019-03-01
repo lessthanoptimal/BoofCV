@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,6 +38,7 @@ import java.util.regex.PatternSyntaxException;
 public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.Listener {
 	public static final String KEY_WIDTH = "width";
 	public static final String KEY_HEIGHT = "height";
+	public static final String KEY_MAX_LENGTH = "max_length";
 
 	Preferences prefs = Preferences.userRoot().node(BatchDownsizeImageGui.class.getSimpleName());
 
@@ -77,19 +78,23 @@ public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.
 	private class ControlPanel extends BatchControlPanel implements ChangeListener {
 		JSpinner spinnerWidth;
 		JSpinner spinnerHeight;
+		JCheckBox checkMaxLength = new JCheckBox("Max Length");
 
 		public ControlPanel() {
 			int width = Integer.parseInt(prefs.get(KEY_WIDTH,"640"));
 			int height = Integer.parseInt(prefs.get(KEY_HEIGHT,"480"));
+			boolean maxLength = Boolean.parseBoolean(prefs.get(KEY_MAX_LENGTH,"false"));
 
 			if( width < 0 ) width = 640;
 			if( height < 0 ) height = 480;
 
 			spinnerWidth = spinner(width,0,10000,20);
 			spinnerHeight = spinner(height,0,10000,20);
+			checkMaxLength.setSelected(maxLength);
 
 			addLabeled(spinnerWidth,"Width");
 			addLabeled(spinnerHeight,"Height");
+			addAlignLeft(checkMaxLength);
 
 			addStandardControls(prefs);
 		}
@@ -101,6 +106,7 @@ public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.
 			} else {
 				downsizer.width = ((Number)spinnerWidth.getValue()).intValue();
 				downsizer.height = ((Number)spinnerHeight.getValue()).intValue();
+				downsizer.maxLength = checkMaxLength.isSelected();
 				downsizer.pathInput = textInputDirectory.getText();
 				downsizer.pathOutput = textOutputDirectory.getText();
 
@@ -124,6 +130,7 @@ public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.
 				prefs.put(KEY_OUTPUT,downsizer.pathOutput);
 				prefs.put(KEY_WIDTH,downsizer.width+"");
 				prefs.put(KEY_HEIGHT,downsizer.height+"");
+				prefs.put(KEY_MAX_LENGTH,downsizer.maxLength+"");
 
 				bAction.setText("Cancel");
 				processing = true;

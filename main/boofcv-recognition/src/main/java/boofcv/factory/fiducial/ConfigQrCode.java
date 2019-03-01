@@ -28,16 +28,25 @@ import boofcv.struct.Configuration;
 import boofcv.struct.ConnectRule;
 
 /**
- * TODO Comment
+ * Configuration for {@link boofcv.abst.fiducial.QrCodePreciseDetector}
  *
  * @author Peter Abeles
  */
 public class ConfigQrCode implements Configuration {
 
+	/**
+	 * Specifies how images are thresholded and converted into a binary format
+	 */
 	public ConfigThreshold threshold;
 
+	/**
+	 * Configuration for polygon detector that's used to find position patterns
+	 */
 	public ConfigPolygonDetector polygon = new ConfigPolygonDetector();
 
+	/**
+	 * Minimum and maximum assumed version of QR Codes. Can be used to reduce false positives, slightly.
+	 */
 	public int versionMinimum = 1;
 	public int versionMaximum = 40;
 

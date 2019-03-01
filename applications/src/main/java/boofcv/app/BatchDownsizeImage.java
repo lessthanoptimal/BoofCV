@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,6 +59,8 @@ public class BatchDownsizeImage {
 	int width=0;
 	@Option(name = "-h", aliases = {"--Height"}, usage="Sets output width. If zero then aspect is matched with height")
 	int height=0;
+	@Option(name = "--MaxLength", usage="Indicates that if only one dimension is set then that's the size of the largest side")
+	boolean maxLength=false;
 
 	Listener listener;
 	boolean cancel;
@@ -81,6 +83,7 @@ public class BatchDownsizeImage {
 
 		System.out.println("width          = "+ width);
 		System.out.println("height         = "+ height);
+		System.out.println("max length     = "+ maxLength);
 		System.out.println("rename         = "+ rename);
 		System.out.println("input path     = "+ pathInput);
 		System.out.println("name regex     = "+ regex);
@@ -107,15 +110,24 @@ public class BatchDownsizeImage {
 			}
 
 			int smallWidth,smallHeight;
-			if( width == 0 ) {
-				smallWidth = orig.getWidth()*height/orig.getHeight();
+
+			if( maxLength && (width == 0 || height == 0)) {
+				int largestSide = Math.max(orig.getWidth(),orig.getHeight());
+				int desired = Math.max(width,height);
+
+				smallWidth = orig.getWidth() * desired / largestSide;
+				smallHeight = orig.getHeight() * desired / largestSide;
 			} else {
-				smallWidth = width;
-			}
-			if( height == 0 ) {
-				smallHeight = orig.getHeight()*width/orig.getWidth();
-			} else {
-				smallHeight = height;
+				if (width == 0) {
+					smallWidth = orig.getWidth() * height / orig.getHeight();
+				} else {
+					smallWidth = width;
+				}
+				if (height == 0) {
+					smallHeight = orig.getHeight() * width / orig.getWidth();
+				} else {
+					smallHeight = height;
+				}
 			}
 			System.out.println("   "+smallWidth+" x "+smallHeight);
 
@@ -138,7 +150,11 @@ public class BatchDownsizeImage {
 
 			small.reshape(smallWidth,smallHeight,planar.getNumBands());
 
-			AverageDownSampleOps.down(planar,small);
+			if( small.width < planar.width && small.height < planar.height ) {
+				AverageDownSampleOps.down(planar, small);
+			} else {
+				small.setTo(planar);
+			}
 
 			BufferedImage output = ConvertBufferedImage.convertTo(small,null,true);
 
