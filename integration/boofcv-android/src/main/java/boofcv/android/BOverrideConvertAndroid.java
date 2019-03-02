@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class BOverrideConvertAndroid extends BOverrideClass {
 	public static BoofToBitmap boofToBitmap;
 
 	public interface YuvToBoof_420888<T extends ImageBase<T>> {
-		void yuvToBoof420(Image input, ColorFormat color, ImageBase output, byte[] work );
+		void yuvToBoof420(Image input, ColorFormat color, ImageBase output);
 	}
 
 	public interface BitmapToBoof<T extends ImageBase<T>> {
@@ -53,11 +53,11 @@ public class BOverrideConvertAndroid extends BOverrideClass {
 		void boofToBitmap(ColorFormat color, ImageBase input, Bitmap output, byte[] work );
 	}
 
-	public static boolean invokeYuv420ToBoof(Image input, ColorFormat color, ImageBase output, byte[] work) {
+	public static boolean invokeYuv420ToBoof(Image input, ColorFormat color, ImageBase output) {
 		boolean processed = false;
 		if( BOverrideConvertAndroid.yuv420ToBoof != null ) {
 			try {
-				BOverrideConvertAndroid.yuv420ToBoof.yuvToBoof420(input,color,output,work);
+				BOverrideConvertAndroid.yuv420ToBoof.yuvToBoof420(input,color,output);
 				processed = true;
 			} catch( RuntimeException ignore ) {}
 		}

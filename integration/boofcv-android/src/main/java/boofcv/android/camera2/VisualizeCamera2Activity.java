@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,7 @@ import android.view.*;
 import boofcv.alg.color.ColorFormat;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.ConvertCameraImage;
+import boofcv.concurrency.BWorkArrays;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -356,7 +357,6 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		// We are now safe to modify the image. I don't believe this function can be invoked multiple times at once
 		// so the convert work space should be safe from modifications
 		long before = System.nanoTime();
-		boofImage.convertWork = ConvertCameraImage.declareWork(image, boofImage.convertWork);
 		ConvertCameraImage.imageToBoof(image, boofImage.colorFormat, converted, boofImage.convertWork);
 		long after = System.nanoTime();
 //			Log.i(TAG,"processFrame() image="+image.getWidth()+"x"+image.getHeight()+
@@ -528,7 +528,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 		 * When removed they are owned by the thread in which they were removed.
 		 */
 		protected Stack<ImageBase> stackImages = new Stack<>();
-		protected byte[] convertWork = new byte[1]; // work space for converting images
+		protected BWorkArrays convertWork = new BWorkArrays();
 	}
 
 	/**

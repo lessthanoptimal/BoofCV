@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,16 +19,12 @@
 package boofcv.core.encoding;
 
 import boofcv.alg.color.ColorFormat;
+import boofcv.concurrency.BWorkArrays;
+import boofcv.core.encoding.impl.ImplConvertYuv420_888;
 import boofcv.struct.image.*;
 
+import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
-
-// TODO comment out current conversion code and unroll it. Runs significantly faster, see below.
-// maybe autogenerate the code some how so that fixes are propagated throughout the code base
-//		Benchmark                              Mode  Cnt  Score   Error  Units
-//		BenchmarkYuv420_888.yuvToPlanarRgbU8   avgt   10  4.023 ± 0.323  ms/op
-//		BenchmarkYuv420_888.yuvToPlanarRgbU8A  avgt   10  3.460 ± 0.141  ms/op
-// A = original code that was unrolled.
 
 /**
  * Functions for converting YUV 420 888 into BoofCV imgae types.
@@ -49,23 +45,23 @@ public class ConvertYuv420_888
 
 	public static void yuvToBoof(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 								 int width, int height, int strideY , int strideUV , int stridePixelUV,
-								 ColorFormat colorOutput, ImageBase output, byte[] work)
+								 ColorFormat colorOutput, ImageBase output, BWorkArrays workArrays)
 	{
 		if( output instanceof GrayU8 ) {
 			yuvToGray(bufferY,width,height,strideY,(GrayU8)output);
 			return;
 		} else if( output instanceof  GrayF32 ) {
-			yuvToGray(bufferY,width,height,strideY,(GrayF32)output, work);
+			yuvToGray(bufferY,width,height,strideY,(GrayF32)output, workArrays);
 			return;
 		} else if( output.getImageType().getFamily() == ImageType.Family.PLANAR ) {
 			switch (colorOutput) {
 				case RGB:{
 					switch( output.getImageType().getDataType()) {
 						case U8:
-							yuvToPlanarRgbU8(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,(Planar<GrayU8>)output,work);
+							yuvToPlanarRgbU8(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,(Planar<GrayU8>)output,workArrays);
 							return;
 						case F32:
-							yuvToPlanarRgbF32(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,(Planar<GrayF32>)output,work);
+							yuvToPlanarRgbF32(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,(Planar<GrayF32>)output,workArrays);
 							return;
 					}
 				}break;
@@ -73,7 +69,7 @@ public class ConvertYuv420_888
 				case YUV:{
 					switch( output.getImageType().getDataType()) {
 						case U8:
-							yuvToPlanarYuvU8(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,(Planar<GrayU8>)output,work);
+							yuvToPlanarYuvU8(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,(Planar<GrayU8>)output,workArrays);
 							return;
 					}
 				}break;
@@ -83,10 +79,10 @@ public class ConvertYuv420_888
 				case RGB:{
 					switch( output.getImageType().getDataType()) {
 						case U8:
-							yuvToInterleavedRgbU8(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV, (InterleavedU8) output, work);
+							yuvToInterleavedRgbU8(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV, (InterleavedU8) output, workArrays);
 							return;
 						case F32:
-							yuvToInterleavedRgbF32(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV, (InterleavedF32) output, work);
+							yuvToInterleavedRgbF32(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV, (InterleavedF32) output, workArrays);
 							return;
 					}
 				}break;
@@ -94,7 +90,7 @@ public class ConvertYuv420_888
 				case YUV:{
 					switch( output.getImageType().getDataType()) {
 						case U8:
-							yuvToInterleavedYuvU8(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,(InterleavedU8)output,work);
+							yuvToInterleavedYuvU8(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,(InterleavedU8)output,workArrays);
 							return;
 					}
 				}break;
@@ -113,12 +109,12 @@ public class ConvertYuv420_888
 	 * @return Gray scale image
 	 */
 	public static <T extends ImageGray<T>>
-	T yuvToGray(ByteBuffer bufferY , int width , int height, int strideRow , T output , byte work[], Class<T> outputType )
+	T yuvToGray(ByteBuffer bufferY , int width , int height, int strideRow , T output , BWorkArrays workArrays, Class<T> outputType )
 	{
 		if( outputType == GrayU8.class ) {
 			return (T) yuvToGray(bufferY,width,height,strideRow,(GrayU8)output);
 		} else if( outputType == GrayF32.class ) {
-			return (T) yuvToGray(bufferY,width,height,strideRow,(GrayF32)output,work);
+			return (T) yuvToGray(bufferY,width,height,strideRow,(GrayF32)output,workArrays);
 		} else {
 			throw new IllegalArgumentException("Unsupported BoofCV Image Type "+outputType.getSimpleName());
 		}
@@ -130,15 +126,16 @@ public class ConvertYuv420_888
 	 * @param output Output: Optional storage for output image.  Can be null.
 	 * @return Gray scale image
 	 */
-	public static GrayF32 yuvToGray( ByteBuffer bufferY , int width , int height, int strideRow, GrayF32 output, byte work[] ) {
+	public static GrayF32 yuvToGray( ByteBuffer bufferY , int width , int height, int strideRow, GrayF32 output, BWorkArrays workArrays ) {
 		if( output != null ) {
 			output.reshape(width,height);
 		} else {
 			output = new GrayF32(width,height);
 		}
-		if( work.length < width )
-			throw new IllegalArgumentException("work array must be at least width long");
-
+		if( workArrays == null )
+			workArrays = new BWorkArrays();
+		workArrays.reset(width);
+		byte[] work = workArrays.pop();
 
 		int indexDst = 0;
 		for (int y = 0, indexRow=0; y < height; y++,indexRow += strideRow) {
@@ -148,6 +145,8 @@ public class ConvertYuv420_888
 				output.data[indexDst++] = work[x]&0xFF;
 			}
 		}
+
+		workArrays.recycle(work);
 
 		return output;
 	}
@@ -168,7 +167,7 @@ public class ConvertYuv420_888
 		return output;
 	}
 
-	interface ProcessorYuv
+	public interface ProcessorYuv
 	{
 		void processYUV(final int y , final int u ,final int v );
 	}
@@ -207,84 +206,19 @@ public class ConvertYuv420_888
 			processRGB(r,g,b);
 		}
 
-		public abstract void processRGB( final int r ,final int g , final int b );
-	}
-
-	public static void processYuv(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
-								  int width, int height, int strideY , int strideUV , int stridePixelUV,
-								  byte work[], ProcessorYuv processor )
-	{
-		// U and V stride are the same by 420_888 specification
-
-		// not sure the best way to compute this. The width of a plane should be used here and not the stride
-		// but the plane's width isn't specified.
-		int periodUV = (int)Math.round(width/(strideUV/(double)stridePixelUV));
-
-		int workLength = strideY + strideUV + strideUV;
-		if( work.length < workLength )
-			throw new IllegalArgumentException("Work must be at least "+workLength);
-
-		// Index of the start of the row in the buffer
-		int positionY=0,positionUV=0;
-		int rowBytesUV = ((width/periodUV)-1)*stridePixelUV+1;
-
-		// start of each band in the work buffer
-		int offsetU = strideY;
-		int offsetV = strideY + strideUV;
-
-		// save for debugging purposes
-		int totalBytesY = bufferY.limit();
-		int totalBytesU = bufferU.limit();
-		int totalBytesV = bufferV.limit();
-
-		int x=-1,y=-1,indexY=-1,indexU=-1,indexV=-1;
-		try {
-			for (y = 0; y < height; y++) {
-				// Read all the data for this row from each plane
-				bufferY.position(positionY);
-				bufferY.get(work, 0, width);
-				positionY += strideY;
-
-				if (y % periodUV == 0) {
-					bufferU.position(positionUV);
-					bufferU.get(work, offsetU, rowBytesUV);
-					bufferV.position(positionUV);
-					bufferV.get(work, offsetV, rowBytesUV);
-					positionUV += strideUV;
-				}
-
-				indexY = 0;
-				indexU = offsetU;
-				indexV = offsetV;
-
-				for (x = 0; x < width; x++, indexY++) {
-					processor.processYUV(work[indexY] & 0xFF, work[indexU] & 0xFF, work[indexV] & 0xFF);
-
-					// this is intended to be a fast way to do if a == 0 ? 1 : 0
-					int stepUV = stridePixelUV * ((x + 1) % periodUV == 0 ? 1 : 0);
-					indexU += stepUV;
-					indexV += stepUV;
-				}
-			}
-		} catch( RuntimeException e ) {
-			e.printStackTrace();
-
-			String message = "Crashed in YUV. "+e.getMessage()+" bytes Y="+totalBytesY+" U="+totalBytesU+
-					" V="+totalBytesV+" width="+width+" height="+height+" work.length="+work.length+
-					" strideY="+strideY+" strideUV="+strideUV+" stridePixelUV="+stridePixelUV+" periodUV="+periodUV+
-					" x="+x+" y="+y+" indexY="+indexY+" indexU="+indexU+" indexV="+indexV;
-			throw new RuntimeException(message);
-		}
+		public abstract void processRGB(final int r ,final int g , final int b );
 	}
 
 	public static Planar<GrayU8> yuvToPlanarRgbU8(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 												  int width, int height, int strideY , int strideUV , int stridePixelUV,
-												  Planar<GrayU8> output , byte work[] ) {
+												  @Nullable Planar<GrayU8> output , @Nullable BWorkArrays workArrays ) {
 		if( output != null ) {
 			output.reshape(width,height,3);
 		} else {
 			output = new  Planar<>(GrayU8.class,width,height,3);
 		}
+		if( workArrays == null )
+			workArrays = new BWorkArrays();
 		final byte[] red = output.getBand(0).data;
 		final byte[] green = output.getBand(1).data;
 		final byte[] blue = output.getBand(2).data;
@@ -300,20 +234,23 @@ public class ConvertYuv420_888
 			}
 		};
 
-		processYuv(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,work,processor);
+		ImplConvertYuv420_888.processYuv(bufferY, bufferU, bufferV, width, height, strideY, strideUV, stridePixelUV, workArrays, processor);
 
 		return output;
 	}
 
 	public static Planar<GrayF32> yuvToPlanarRgbF32(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 													int width, int height, int strideY , int strideUV , int stridePixelUV,
-													Planar<GrayF32> output , byte work[] )
+													@Nullable Planar<GrayF32> output , @Nullable BWorkArrays workArrays )
 	{
 		if( output != null ) {
 			output.reshape(width,height,3);
 		} else {
 			output = new  Planar<>(GrayF32.class,width,height,3);
 		}
+		if( workArrays == null )
+			workArrays = new BWorkArrays();
+
 		final float[] red = output.getBand(0).data;
 		final float[] green = output.getBand(1).data;
 		final float[] blue = output.getBand(2).data;
@@ -329,20 +266,28 @@ public class ConvertYuv420_888
 			}
 		};
 
-		processYuv(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,work,processor);
+//		if(BoofConcurrency.USE_CONCURRENT) {
+//			ImplConvertYuv420_888_MT.processYuv(bufferY, bufferU, bufferV, width, height, strideY, strideUV, stridePixelUV, workArrays, processor);
+//		} else {
+			ImplConvertYuv420_888.processYuv(bufferY, bufferU, bufferV, width, height, strideY, strideUV, stridePixelUV, workArrays, processor);
+//		}
+
 
 		return output;
 	}
 
 	public static InterleavedU8 yuvToInterleavedRgbU8(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 													  int width, int height, int strideY , int strideUV , int stridePixelUV,
-													  InterleavedU8 output , byte work[] )
+													  @Nullable InterleavedU8 output , @Nullable BWorkArrays workArrays )
 	{
 		if( output != null ) {
 			output.reshape(width,height,3);
 		} else {
 			output = new InterleavedU8(width,height,3);
 		}
+		if( workArrays == null )
+			workArrays = new BWorkArrays();
+
 		InterleavedU8 _output = output;
 
 		ProcessorYuv processor = new ProcessorYuvRgb() {
@@ -356,20 +301,23 @@ public class ConvertYuv420_888
 			}
 		};
 
-		processYuv(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,work,processor);
+		ImplConvertYuv420_888.processYuv(bufferY, bufferU, bufferV, width, height, strideY, strideUV, stridePixelUV, workArrays, processor);
 
 		return output;
 	}
 
 	public static InterleavedF32 yuvToInterleavedRgbF32(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 														int width, int height, int strideY , int strideUV , int stridePixelUV,
-														InterleavedF32 output , byte work[] )
+														@Nullable InterleavedF32 output , @Nullable BWorkArrays workArrays )
 	{
 		if( output != null ) {
 			output.reshape(width,height,3);
 		} else {
 			output = new InterleavedF32(width,height,3);
 		}
+		if( workArrays == null )
+			workArrays = new BWorkArrays();
+
 		InterleavedF32 _output = output;
 
 		ProcessorYuv processor = new ProcessorYuvRgb() {
@@ -383,20 +331,22 @@ public class ConvertYuv420_888
 			}
 		};
 
-		processYuv(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,work,processor);
+		ImplConvertYuv420_888.processYuv(bufferY, bufferU, bufferV, width, height, strideY, strideUV, stridePixelUV, workArrays, processor);
 
 		return output;
 	}
 
 	public static Planar<GrayU8> yuvToPlanarYuvU8(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 												  int width, int height, int strideY , int strideUV , int stridePixelUV,
-												  Planar<GrayU8> output , byte work[] )
+												  @Nullable Planar<GrayU8> output , @Nullable BWorkArrays workArrays )
 	{
 		if( output != null ) {
 			output.reshape(width,height,3);
 		} else {
 			output = new Planar(GrayU8.class,width,height,3);
 		}
+		if( workArrays == null )
+			workArrays = new BWorkArrays();
 
 		final byte[] dataY = output.getBand(0).data;
 		final byte[] dataU = output.getBand(1).data;
@@ -412,20 +362,22 @@ public class ConvertYuv420_888
 			}
 		};
 
-		processYuv(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,work,processor);
+		ImplConvertYuv420_888.processYuv(bufferY, bufferU, bufferV, width, height, strideY, strideUV, stridePixelUV, workArrays, processor);
 
 		return output;
 	}
 
 	public static InterleavedU8 yuvToInterleavedYuvU8(ByteBuffer bufferY, ByteBuffer bufferU , ByteBuffer bufferV  ,
 													  int width, int height, int strideY , int strideUV , int stridePixelUV,
-													  InterleavedU8 output , byte work[] )
+													  @Nullable InterleavedU8 output , @Nullable BWorkArrays workArrays )
 	{
 		if( output != null ) {
 			output.reshape(width,height,3);
 		} else {
 			output = new InterleavedU8(width,height,3);
 		}
+		if( workArrays == null )
+			workArrays = new BWorkArrays();
 
 		final byte[] data = output.data;
 
@@ -439,8 +391,7 @@ public class ConvertYuv420_888
 			}
 		};
 
-		processYuv(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,work,processor);
-
+		ImplConvertYuv420_888.processYuv(bufferY, bufferU, bufferV, width, height, strideY, strideUV, stridePixelUV, workArrays, processor);
 		return output;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,9 +105,8 @@ public class TestConvertYuv420_888 {
 
 		for (int i = 0; i < inputs.length; i++) {
 			init(inputs[i]);
-			byte[] work = ConvertYuv420_888.declareWork(strideY,strideUV,null);
 			ConvertYuv420_888.yuvToBoof(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,
-					ColorFormat.RGB,output,work);
+					ColorFormat.RGB,output,null);
 		}
 	}
 
@@ -117,9 +116,8 @@ public class TestConvertYuv420_888 {
 
 		for (int i = 0; i < inputs.length; i++) {
 			init(inputs[i]);
-			byte[] work = ConvertYuv420_888.declareWork(strideY,strideUV,null);
 			ConvertYuv420_888.yuvToBoof(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,
-					ColorFormat.RGB,output,work);
+					ColorFormat.RGB,output,null);
 		}
 	}
 
@@ -130,9 +128,8 @@ public class TestConvertYuv420_888 {
 
 		for (int i = 0; i < inputs.length; i++) {
 			init(inputs[i]);
-			byte[] work = ConvertYuv420_888.declareWork(strideY,strideUV,null);
 			ConvertYuv420_888.yuvToBoof(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,
-					ColorFormat.RGB,output,work);
+					ColorFormat.RGB,output,null);
 		}
 	}
 
@@ -142,9 +139,8 @@ public class TestConvertYuv420_888 {
 
 		for (int i = 0; i < inputs.length; i++) {
 			init(inputs[i]);
-			byte[] work = ConvertYuv420_888.declareWork(strideY,strideUV,null);
 			ConvertYuv420_888.yuvToBoof(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,
-					ColorFormat.RGB,output,work);
+					ColorFormat.RGB,output,null);
 		}
 	}
 
@@ -154,9 +150,8 @@ public class TestConvertYuv420_888 {
 
 		for (int i = 0; i < inputs.length; i++) {
 			init(inputs[i]);
-			byte[] work = ConvertYuv420_888.declareWork(strideY,strideUV,null);
 			ConvertYuv420_888.yuvToBoof(bufferY,bufferU,bufferV,width,height,strideY,strideUV,stridePixelUV,
-					ColorFormat.RGB,output,work);
+					ColorFormat.RGB,output,null);
 		}
 	}
 }

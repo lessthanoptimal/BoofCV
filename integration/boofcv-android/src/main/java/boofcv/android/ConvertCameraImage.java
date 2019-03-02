@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.android;
 import android.graphics.ImageFormat;
 import android.media.Image;
 import boofcv.alg.color.ColorFormat;
+import boofcv.concurrency.BWorkArrays;
 import boofcv.core.encoding.ConvertYuv420_888;
 import boofcv.struct.image.ImageBase;
 
@@ -34,8 +35,8 @@ public class ConvertCameraImage {
 		return ConvertYuv420_888.declareWork(yuv.getPlanes()[0].getRowStride(),yuv.getPlanes()[1].getRowStride(), work);
 	}
 
-	public static void imageToBoof(Image yuv, ColorFormat colorOutput, ImageBase output, byte[] work) {
-		if( BOverrideConvertAndroid.invokeYuv420ToBoof(yuv,colorOutput,output,work))
+	public static void imageToBoof(Image yuv, ColorFormat colorOutput, ImageBase output, BWorkArrays work) {
+		if( BOverrideConvertAndroid.invokeYuv420ToBoof(yuv,colorOutput,output))
 			return;
 
 		if(ImageFormat.YUV_420_888 != yuv.getFormat() )
