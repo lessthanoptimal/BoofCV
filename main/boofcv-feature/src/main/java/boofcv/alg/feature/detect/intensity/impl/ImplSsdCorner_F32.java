@@ -193,6 +193,6 @@ public class ImplSsdCorner_F32 extends ImplSsdCornerBox<GrayF32,GrayF32> {
 		work.recycle(tempXX);
 		work.recycle(tempXY);
 		work.recycle(tempYY);
-		//CONCURRENT_ABOVE });
+		//CONCURRENT_INLINE });
 	}
 }

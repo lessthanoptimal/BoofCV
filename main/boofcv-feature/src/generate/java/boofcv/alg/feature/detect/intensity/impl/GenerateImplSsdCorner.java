@@ -246,7 +246,7 @@ public class GenerateImplSsdCorner extends CodeGeneratorBase  {
 				"\t\twork.recycle(tempXX);\n" +
 				"\t\twork.recycle(tempXY);\n" +
 				"\t\twork.recycle(tempYY);\n" +
-				"\t\t//CONCURRENT_ABOVE });\n" +
+				"\t\t//CONCURRENT_INLINE });\n" +
 				"\t}\n");
 	}
 

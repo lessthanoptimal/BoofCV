@@ -195,6 +195,6 @@ public class ImplSsdCorner_S16 extends ImplSsdCornerBox<GrayS16,GrayS32> {
 		work.recycle(tempXX);
 		work.recycle(tempXY);
 		work.recycle(tempYY);
-		//CONCURRENT_ABOVE });
+		//CONCURRENT_INLINE });
 	}
 }
