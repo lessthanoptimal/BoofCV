@@ -18,14 +18,50 @@
 
 package boofcv.alg.color.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.Planar;
+import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.lang.reflect.Method;
+import java.util.Random;
 
-class TestImplColorYuv_MT {
+class TestImplColorYuv_MT extends CompareIdenticalFunctions {
+	int width = 70,height=80;
+	Random rand = new Random(234);
+
+	TestImplColorYuv_MT() {
+		super(ImplColorYuv_MT.class,ImplColorYuv.class);
+	}
+
 	@Test
-	void implement() {
-		fail("implement");
+	void performTests() {
+		performTests(3);
+	}
+
+	@Override
+	protected Object[][] createInputParam(Method candidate, Method validation) {
+		Class[] types = candidate.getParameterTypes();
+		Object[] parameters = new Object[types.length];
+
+		switch( candidate.getName() ) {
+			case "yuvToRgb_F32":
+			case "rgbToYuv_F32":
+				parameters[0] = new Planar<>(GrayF32.class,width,height,3);
+				parameters[1] = new Planar<>(GrayF32.class,width,height,3);
+				break;
+			case "ycbcrToRgb_U8":
+				parameters[0] = new Planar<>(GrayU8.class ,width,height,3);
+				parameters[1] = new Planar<>(GrayU8.class,width,height,3);
+				break;
+		}
+
+		GImageMiscOps.fillUniform((ImageBase)parameters[0],rand,0,100);
+
+		return new Object[][]{parameters};
 	}
 }
 

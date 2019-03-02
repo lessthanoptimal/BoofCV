@@ -18,14 +18,43 @@
 
 package boofcv.alg.color.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.Planar;
+import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.lang.reflect.Method;
+import java.util.Random;
 
-class TestImplColorRgb_MT {
+class TestImplColorRgb_MT extends CompareIdenticalFunctions {
+	int width = 70,height=80;
+	Random rand = new Random(234);
+
+	TestImplColorRgb_MT() {
+		super(ImplColorRgb_MT.class,ImplColorRgb.class);
+	}
+
 	@Test
-	void implement() {
-		fail("implement");
+	void performTests() {
+		performTests(6);
+	}
+
+	@Override
+	protected Object[][] createInputParam(Method candidate, Method validation) {
+		Class[] types = candidate.getParameterTypes();
+		Object[] parameters = new Object[types.length];
+
+		if( types[0] == Planar.class ) {
+			parameters[0] = new Planar<>(types[1],width,height,3);
+		} else {
+			parameters[0] = GeneralizedImageOps.createImage(types[0],width,height,3);
+		}
+		GImageMiscOps.fillUniform((ImageBase)parameters[0],rand,0,100);
+		parameters[1] = GeneralizedImageOps.createSingleBand(types[1],width,height);
+
+		return new Object[][]{parameters};
 	}
 }
 
