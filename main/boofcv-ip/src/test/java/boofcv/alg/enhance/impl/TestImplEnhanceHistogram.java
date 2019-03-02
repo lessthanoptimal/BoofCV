@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.enhance.GEnhanceImageOps;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.GImageStatistics;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.ImageGray;
@@ -122,13 +123,12 @@ public class TestImplEnhanceHistogram {
 	public void equalizeLocalNaive(GrayI input , GrayI output ) {
 
 		GrayI tmp = (GrayI)GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
-		int transform[] = new int[10];
-		int histogram[] = new int[10];
+		IWorkArrays workArrays = new IWorkArrays(10);
 
 		GImageMiscOps.fillUniform(input,rand,0,9);
 
 		for( int radius = 1; radius < 11; radius++ ) {
-			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalNaive", input, radius, output, histogram);
+			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalNaive", input, radius, output, workArrays);
 
 			int width = 2*radius+1;
 
@@ -154,6 +154,8 @@ public class TestImplEnhanceHistogram {
 					}
 
 					// use the full image algorithm
+					int[] histogram = new int[10];
+					int[] transform = new int[10];
 					GrayI subIn = (GrayI)input.subimage(x0,y0,x1,y1, null);
 					GrayI subOut = (GrayI)tmp.subimage(x0,y0,x1,y1, null);
 					GImageStatistics.histogram(subIn,0, histogram);
@@ -193,7 +195,7 @@ public class TestImplEnhanceHistogram {
 
 	public void equalizeLocalInner(GrayI input , GrayI found ) {
 		GrayI expected = (GrayI)GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
-		int histogram[] = new int[10];
+		IWorkArrays workArrays = new IWorkArrays(10);
 
 		GImageMiscOps.fillUniform(input,rand,0,9);
 
@@ -201,8 +203,8 @@ public class TestImplEnhanceHistogram {
 			// fill with zeros so it can be tested using checkBorderZero
 			GImageMiscOps.fill(found,0);
 
-			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalNaive", input, radius, expected, histogram);
-			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalInner", input, radius, found, histogram);
+			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalNaive", input, radius, expected, workArrays);
+			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalInner", input, radius, found, workArrays);
 
 			BoofTesting.assertEqualsInner(expected,found,1e-10,radius,radius,false);
 			BoofTesting.checkBorderZero(found,radius);
@@ -233,8 +235,7 @@ public class TestImplEnhanceHistogram {
 
 	public void equalizeLocalRow(GrayI input , GrayI found ) {
 		GrayI expected = (GrayI) GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
-		int histogram[] = new int[10];
-		int transform[] = new int[10];
+		IWorkArrays workArrays = new IWorkArrays(10);
 
 		GImageMiscOps.fillUniform(input,rand,0,9);
 
@@ -244,9 +245,9 @@ public class TestImplEnhanceHistogram {
 			GImageMiscOps.fill(found,0);
 
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalNaive", input, radius, expected, histogram);
+					"equalizeLocalNaive", input, radius, expected, workArrays);
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalRow", input, radius, 0, found, histogram,transform);
+					"equalizeLocalRow", input, radius, 0, found, workArrays);
 
 			GrayI subExpected = (GrayI)expected.subimage(0,0,width,radius, null);
 			GrayI subFound = (GrayI)found.subimage(0,0,width,radius, null);
@@ -264,9 +265,9 @@ public class TestImplEnhanceHistogram {
 			int start = input.height-radius;
 
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalNaive", input, radius, expected, histogram);
+					"equalizeLocalNaive", input, radius, expected, workArrays);
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalRow", input, radius, start, found, histogram,transform);
+					"equalizeLocalRow", input, radius, start, found, workArrays);
 
 			GrayI subExpected = (GrayI)expected.subimage(0,start,width,height, null);
 			GrayI subFound = (GrayI)found.subimage(0,start,width,height, null);
@@ -311,8 +312,7 @@ public class TestImplEnhanceHistogram {
 
 	public void equalizeLocalCol(GrayI input , GrayI found ) {
 		GrayI expected = (GrayI) GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
-		int histogram[] = new int[10];
-		int transform[] = new int[10];
+		IWorkArrays workArrays = new IWorkArrays(10);
 
 		GImageMiscOps.fillUniform(input,rand,1,9);
 
@@ -322,9 +322,9 @@ public class TestImplEnhanceHistogram {
 			GImageMiscOps.fill(found,0);
 
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalNaive", input, radius, expected, histogram);
+					"equalizeLocalNaive", input, radius, expected, workArrays);
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalCol", input, radius, 0, found, histogram, transform);
+					"equalizeLocalCol", input, radius, 0, found, workArrays);
 
 			GrayI subExpected = (GrayI)expected.subimage(0,radius,radius,height-radius-1, null);
 			GrayI subFound = (GrayI)found.subimage(0,radius,radius,height-radius-1, null);
@@ -342,9 +342,9 @@ public class TestImplEnhanceHistogram {
 			int start = input.width-radius;
 
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalNaive", input, radius, expected, histogram);
+					"equalizeLocalNaive", input, radius, expected, workArrays);
 			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class,
-					"equalizeLocalCol", input, radius, start, found, histogram, transform);
+					"equalizeLocalCol", input, radius, start, found, workArrays);
 
 			GrayI subExpected = (GrayI)expected.subimage(start,radius,width,height-radius-1, null);
 			GrayI subFound = (GrayI)found.subimage(start,radius,width,height-radius-1, null);

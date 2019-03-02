@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.demonstrations.enhance;
 import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.enhance.GEnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.core.image.ConvertImage;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -69,6 +71,7 @@ public class ImageEnhanceApp extends DemonstrationBase {
 	// storage for histogram
 	int histogram[] = new int[256];
 	int transform[] = new int[256];
+	IWorkArrays workArrays = new IWorkArrays();
 
 	GrayU8 gray = new GrayU8(1,1);
 	GrayU8 enhancedGray = new GrayU8(1,1);
@@ -142,9 +145,9 @@ public class ImageEnhanceApp extends DemonstrationBase {
 				}
 			} else if( controls.activeAlgorithm.equals(HISTOGRAM_LOCAL)) {
 				if( controls.color ){
-					GEnhanceImageOps.equalizeLocal(color, controls.radius, enhancedColor, histogram, transform);
+					GEnhanceImageOps.equalizeLocal(color, controls.radius, enhancedColor, 256, workArrays);
 				} else {
-					EnhanceImageOps.equalizeLocal(gray, controls.radius, enhancedGray, histogram, transform);
+					EnhanceImageOps.equalizeLocal(gray, controls.radius, enhancedGray, 256, workArrays);
 				}
 			} else if( controls.activeAlgorithm.equals(SHARPEN_4)) {
 				if( controls.color ){
@@ -299,6 +302,8 @@ public class ImageEnhanceApp extends DemonstrationBase {
 	}
 
 	public static void main(String[] args) {
+		BoofConcurrency.USE_CONCURRENT = true;
+
 		List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("dark",UtilIO.pathExample("enhance/dark.jpg")));
 		examples.add(new PathLabel("dull",UtilIO.pathExample("enhance/dull.jpg")));

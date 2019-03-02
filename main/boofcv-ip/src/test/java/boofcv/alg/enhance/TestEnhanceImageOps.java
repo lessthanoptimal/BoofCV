@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.enhance;
 
 import boofcv.alg.enhance.impl.ImplEnhanceHistogram;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayI;
 import boofcv.testing.BoofTesting;
@@ -82,12 +83,11 @@ public class TestEnhanceImageOps {
 		GrayI expected = (GrayI) GeneralizedImageOps.createSingleBand(input.getClass(),input.width, input.height);
 		GImageMiscOps.fillUniform(input, rand, 0, 9);
 
-		int transform[] = new int[10];
-		int histogram[] = new int[10];
+		IWorkArrays workArrays = new IWorkArrays(10);
 
 		for( int radius = 1; radius < 11; radius++ ) {
-			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalNaive", input, radius, expected, histogram);
-			BoofTesting.callStaticMethod(EnhanceImageOps.class, "equalizeLocal", input, radius, found, histogram,transform);
+			BoofTesting.callStaticMethod(ImplEnhanceHistogram.class, "equalizeLocalNaive", input, radius, expected, workArrays);
+			BoofTesting.callStaticMethod(EnhanceImageOps.class, "equalizeLocal", input, radius, found, 10,workArrays);
 
 			BoofTesting.assertEquals(expected, found, 1e-10);
 		}

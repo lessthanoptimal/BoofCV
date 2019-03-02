@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class ExampleImageEnhancement {
 		EnhanceImageOps.applyTransform(gray, transform, adjusted);
 		panel.addImage(ConvertBufferedImage.convertTo(adjusted, null), "Global");
 
-		EnhanceImageOps.equalizeLocal(gray, 50, adjusted, histogram, transform);
+		EnhanceImageOps.equalizeLocal(gray, 50, adjusted, 256, null);
 		panel.addImage(ConvertBufferedImage.convertTo(adjusted,null),"Local");
 
 		panel.addImage(ConvertBufferedImage.convertTo(gray, null), "Original");
@@ -96,6 +96,9 @@ public class ExampleImageEnhancement {
 
 	public static void main( String args[] )
 	{
+		// Uncomment to use multi-threaded code. Not all algorithms are threaded
+//		BoofConcurrency.USE_CONCURRENT = true;
+
 		histogram();
 		sharpen();
 		ShowImages.showWindow(mainPanel,"Enhancement",true);

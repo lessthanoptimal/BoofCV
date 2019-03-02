@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.enhance;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.struct.image.*;
 
 /**
@@ -60,23 +61,23 @@ public class GEnhanceImageOps {
 	 * @param input Input image.
 	 * @param radius Radius of square local histogram.
 	 * @param output Output image.
-	 * @param histogram Storage for image histogram.  Must be large enough to contain all possible values.
-	 * @param transform Storage for transformation table.  Must be large enough to contain all possible values.
+	 * @param histogramLength Number of elements in the histogram. 256 for 8-bit images
+	 * @param workArrays Used to create work arrays. can be null
 	 */
 	public static <T extends ImageBase<T>>
 	void equalizeLocal( T input , int radius , T output ,
-						int histogram[] , int transform[] ) {
+						int histogramLength , IWorkArrays workArrays ) {
 		if( input instanceof Planar ) {
 			Planar pi = (Planar)input;
 			Planar po = (Planar)output;
 			for (int i = 0; i < pi.getNumBands(); i++) {
-				equalizeLocal(pi.getBand(i),radius,po.getBand(i),histogram, transform);
+				equalizeLocal(pi.getBand(i),radius,po.getBand(i),histogramLength, workArrays);
 			}
 		} else {
 			if (input instanceof GrayU8) {
-				EnhanceImageOps.equalizeLocal((GrayU8) input, radius, (GrayU8) output, histogram, transform);
+				EnhanceImageOps.equalizeLocal((GrayU8) input, radius, (GrayU8) output, histogramLength, workArrays);
 			} else if (input instanceof GrayU16) {
-				EnhanceImageOps.equalizeLocal((GrayU16) input, radius, (GrayU16) output, histogram, transform);
+				EnhanceImageOps.equalizeLocal((GrayU16) input, radius, (GrayU16) output, histogramLength, workArrays);
 			} else {
 				throw new IllegalArgumentException("Unsupported image type " + input.getClass().getSimpleName());
 			}

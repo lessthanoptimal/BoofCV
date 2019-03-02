@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,10 @@ package boofcv.alg.enhance;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.enhance.impl.ImplEnhanceFilter;
 import boofcv.alg.enhance.impl.ImplEnhanceHistogram;
+import boofcv.alg.enhance.impl.ImplEnhanceHistogram_MT;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.struct.image.*;
 
 /**
@@ -71,9 +74,13 @@ public class EnhanceImageOps {
 	 * @param output Output image.
 	 */
 	public static void applyTransform(GrayU8 input , int transform[] , GrayU8 output ) {
-		InputSanityCheck.checkSameShape(input, output);
+		output.reshape(input.width,input.height);
 
-		ImplEnhanceHistogram.applyTransform(input,transform,output);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplEnhanceHistogram_MT.applyTransform(input, transform, output);
+		} else {
+			ImplEnhanceHistogram.applyTransform(input, transform, output);
+		}
 	}
 
 	/**
@@ -84,9 +91,13 @@ public class EnhanceImageOps {
 	 * @param output Output image.
 	 */
 	public static void applyTransform(GrayU16 input , int transform[] , GrayU16 output ) {
-		InputSanityCheck.checkSameShape(input, output);
+		output.reshape(input.width,input.height);
 
-		ImplEnhanceHistogram.applyTransform(input,transform,output);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplEnhanceHistogram_MT.applyTransform(input, transform, output);
+		} else {
+			ImplEnhanceHistogram.applyTransform(input, transform, output);
+		}
 	}
 
 	/**
@@ -98,9 +109,13 @@ public class EnhanceImageOps {
 	 * @param output Output image.
 	 */
 	public static void applyTransform(GrayS8 input , int transform[] , int minValue, GrayS8 output ) {
-		InputSanityCheck.checkSameShape(input, output);
+		output.reshape(input.width,input.height);
 
-		ImplEnhanceHistogram.applyTransform(input,transform,minValue,output);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplEnhanceHistogram_MT.applyTransform(input, transform, minValue, output);
+		} else {
+			ImplEnhanceHistogram.applyTransform(input, transform, minValue, output);
+		}
 	}
 
 	/**
@@ -112,9 +127,13 @@ public class EnhanceImageOps {
 	 * @param output Output image.
 	 */
 	public static void applyTransform(GrayS16 input , int transform[] , int minValue, GrayS16 output ) {
-		InputSanityCheck.checkSameShape(input, output);
+		output.reshape(input.width,input.height);
 
-		ImplEnhanceHistogram.applyTransform(input,transform,minValue,output);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplEnhanceHistogram_MT.applyTransform(input, transform, minValue, output);
+		} else {
+			ImplEnhanceHistogram.applyTransform(input, transform, minValue, output);
+		}
 	}
 
 	/**
@@ -126,48 +145,12 @@ public class EnhanceImageOps {
 	 * @param output Output image.
 	 */
 	public static void applyTransform(GrayS32 input , int transform[] , int minValue, GrayS32 output ) {
-		InputSanityCheck.checkSameShape(input, output);
+		output.reshape(input.width,input.height);
 
-		ImplEnhanceHistogram.applyTransform(input,transform,minValue,output);
-	}
-
-	/**
-	 * Equalizes the local image histogram on a per pixel basis.
-	 *
-	 * @param input Input image.
-	 * @param radius Radius of square local histogram.
-	 * @param output Output image.
-	 * @param histogram Storage for image histogram.  Must be large enough to contain all possible values.
-	 * @param transform Storage for transformation table.  Must be large enough to contain all possible values.
-	 */
-	public static void equalizeLocal(GrayU8 input , int radius , GrayU8 output ,
-									 int histogram[] , int transform[] ) {
-
-		InputSanityCheck.checkSameShape(input, output);
-
-		int width = radius*2+1;
-
-		// use more efficient algorithms if possible
-		if( input.width >= width && input.height >= width ) {
-			ImplEnhanceHistogram.equalizeLocalInner(input,radius,output,histogram);
-
-			// top border
-			ImplEnhanceHistogram.equalizeLocalRow(input,radius,0,output,histogram,transform);
-			// bottom border
-			ImplEnhanceHistogram.equalizeLocalRow(input,radius,input.height-radius,output,histogram,transform);
-
-			// left border
-			ImplEnhanceHistogram.equalizeLocalCol(input,radius,0,output,histogram,transform);
-			// right border
-			ImplEnhanceHistogram.equalizeLocalCol(input,radius,input.width-radius,output,histogram,transform);
-
-		} else if( input.width < width && input.height < width ) {
-			// the local region is larger than the image.  just use the full image algorithm
-			ImageStatistics.histogram(input,0,histogram);
-			equalize(histogram,transform);
-			applyTransform(input,transform,output);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplEnhanceHistogram_MT.applyTransform(input, transform, minValue, output);
 		} else {
-			ImplEnhanceHistogram.equalizeLocalNaive(input,radius,output,transform);
+			ImplEnhanceHistogram.applyTransform(input, transform, minValue, output);
 		}
 	}
 
@@ -177,37 +160,131 @@ public class EnhanceImageOps {
 	 * @param input Input image.
 	 * @param radius Radius of square local histogram.
 	 * @param output Output image.
-	 * @param histogram Storage for image histogram.  Must be large enough to contain all possible values.
-	 * @param transform Storage for transformation table.  Must be large enough to contain all possible values.
+	 * @param histogramLength Number of elements in the histogram. 256 for 8-bit images
+	 * @param workArrays Used to create work arrays. can be null
 	 */
-	public static void equalizeLocal(GrayU16 input , int radius , GrayU16 output ,
-									 int histogram[] , int transform[] ) {
+	public static void equalizeLocal(GrayU8 input , int radius , GrayU8 output ,
+									 int histogramLength , IWorkArrays workArrays ) {
 
-		InputSanityCheck.checkSameShape(input, output);
+		output.reshape(input.width,input.height);
+		if( workArrays == null )
+			workArrays = new IWorkArrays();
+
+		workArrays.reset(histogramLength);
 
 		int width = radius*2+1;
 
 		// use more efficient algorithms if possible
 		if( input.width >= width && input.height >= width ) {
-			ImplEnhanceHistogram.equalizeLocalInner(input,radius,output,histogram);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplEnhanceHistogram_MT.equalizeLocalInner(input, radius, output, workArrays);
 
-			// top border
-			ImplEnhanceHistogram.equalizeLocalRow(input,radius,0,output,histogram,transform);
-			// bottom border
-			ImplEnhanceHistogram.equalizeLocalRow(input,radius,input.height-radius,output,histogram,transform);
+				// top border
+				ImplEnhanceHistogram_MT.equalizeLocalRow(input, radius, 0, output, workArrays);
+				// bottom border
+				ImplEnhanceHistogram_MT.equalizeLocalRow(input, radius, input.height - radius, output, workArrays);
 
-			// left border
-			ImplEnhanceHistogram.equalizeLocalCol(input,radius,0,output,histogram,transform);
-			// right border
-			ImplEnhanceHistogram.equalizeLocalCol(input,radius,input.width-radius,output,histogram,transform);
+				// left border
+				ImplEnhanceHistogram_MT.equalizeLocalCol(input, radius, 0, output, workArrays);
+				// right border
+				ImplEnhanceHistogram_MT.equalizeLocalCol(input, radius, input.width - radius, output, workArrays);
+			} else {
+				ImplEnhanceHistogram.equalizeLocalInner(input, radius, output, workArrays);
 
+				// top border
+				ImplEnhanceHistogram.equalizeLocalRow(input, radius, 0, output, workArrays);
+				// bottom border
+				ImplEnhanceHistogram.equalizeLocalRow(input, radius, input.height - radius, output, workArrays);
+
+				// left border
+				ImplEnhanceHistogram.equalizeLocalCol(input, radius, 0, output, workArrays);
+				// right border
+				ImplEnhanceHistogram.equalizeLocalCol(input, radius, input.width - radius, output, workArrays);
+			}
 		} else if( input.width < width && input.height < width ) {
 			// the local region is larger than the image.  just use the full image algorithm
+			int[] histogram = workArrays.pop();
+			int[] transform = workArrays.pop();
+
 			ImageStatistics.histogram(input,0,histogram);
 			equalize(histogram,transform);
 			applyTransform(input,transform,output);
+
+			workArrays.recycle(histogram);
+			workArrays.recycle(transform);
 		} else {
-			ImplEnhanceHistogram.equalizeLocalNaive(input,radius,output,transform);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplEnhanceHistogram_MT.equalizeLocalNaive(input, radius, output, workArrays);
+			} else {
+				ImplEnhanceHistogram.equalizeLocalNaive(input, radius, output, workArrays);
+			}
+		}
+	}
+
+	/**
+	 * Equalizes the local image histogram on a per pixel basis.
+	 *
+	 * @param input Input image.
+	 * @param radius Radius of square local histogram.
+	 * @param output Output image.
+	 * @param histogramLength Number of elements in the histogram. 256 for 8-bit images
+	 * @param workArrays Used to create work arrays. can be null
+	 */
+	public static void equalizeLocal(GrayU16 input , int radius , GrayU16 output ,
+									 int histogramLength , IWorkArrays workArrays ) {
+
+		InputSanityCheck.checkSameShape(input, output);
+		if( workArrays == null )
+			workArrays = new IWorkArrays();
+
+		workArrays.reset(histogramLength);
+
+		int width = radius*2+1;
+
+		// use more efficient algorithms if possible
+		if( input.width >= width && input.height >= width ) {
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplEnhanceHistogram_MT.equalizeLocalInner(input, radius, output, workArrays);
+
+				// top border
+				ImplEnhanceHistogram_MT.equalizeLocalRow(input, radius, 0, output, workArrays);
+				// bottom border
+				ImplEnhanceHistogram_MT.equalizeLocalRow(input, radius, input.height - radius, output, workArrays);
+
+				// left border
+				ImplEnhanceHistogram_MT.equalizeLocalCol(input, radius, 0, output, workArrays);
+				// right border
+				ImplEnhanceHistogram_MT.equalizeLocalCol(input, radius, input.width - radius, output, workArrays);
+			} else {
+				ImplEnhanceHistogram.equalizeLocalInner(input, radius, output, workArrays);
+
+				// top border
+				ImplEnhanceHistogram.equalizeLocalRow(input, radius, 0, output, workArrays);
+				// bottom border
+				ImplEnhanceHistogram.equalizeLocalRow(input, radius, input.height - radius, output, workArrays);
+
+				// left border
+				ImplEnhanceHistogram.equalizeLocalCol(input, radius, 0, output, workArrays);
+				// right border
+				ImplEnhanceHistogram.equalizeLocalCol(input, radius, input.width - radius, output, workArrays);
+			}
+		} else if( input.width < width && input.height < width ) {
+			// the local region is larger than the image.  just use the full image algorithm
+			int[] histogram = workArrays.pop();
+			int[] transform = workArrays.pop();
+
+			ImageStatistics.histogram(input,0,histogram);
+			equalize(histogram,transform);
+			applyTransform(input,transform,output);
+
+			workArrays.recycle(histogram);
+			workArrays.recycle(transform);
+		} else {
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplEnhanceHistogram_MT.equalizeLocalNaive(input, radius, output, workArrays);
+			} else {
+				ImplEnhanceHistogram.equalizeLocalNaive(input, radius, output, workArrays);
+			}
 		}
 	}
 

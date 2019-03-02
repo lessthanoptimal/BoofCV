@@ -289,7 +289,7 @@ public class AutocodeConcurrentApp {
 		};
 
 		String files[] = new String[]{
-//				"main/boofcv-io/src/main/java/boofcv/io/image/impl/ImplConvertRaster.java",
+				"main/boofcv-ip/src/main/java/boofcv/alg/enhance/impl/ImplEnhanceHistogram.java"
 		};
 
 		for( String f : directories ) {

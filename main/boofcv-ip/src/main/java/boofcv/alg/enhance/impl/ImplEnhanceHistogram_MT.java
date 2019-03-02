@@ -18,12 +18,11 @@
 
 package boofcv.alg.enhance.impl;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.IWorkArrays;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
-
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>
@@ -37,71 +36,61 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.enhance.impl.GenerateImplEnhanceHistogram")
-public class ImplEnhanceHistogram {
+public class ImplEnhanceHistogram_MT {
 
 	public static void applyTransform( GrayU8 input , int transform[] , GrayU8 output ) {
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,i->{
-		for( int i = 0; i < input.height; i++ ) {
+		BoofConcurrency.loopFor(0,input.height,i->{
 			int indexInput = input.startIndex + i*input.stride;
 			int indexOutput = output.startIndex + i*output.stride;
 
 			for( int j = 0; j < input.width; j++ ) {
 				output.data[indexOutput++] = (byte)transform[input.data[indexInput++] & 0xFF];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void applyTransform( GrayU16 input , int transform[] , GrayU16 output ) {
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,i->{
-		for( int i = 0; i < input.height; i++ ) {
+		BoofConcurrency.loopFor(0,input.height,i->{
 			int indexInput = input.startIndex + i*input.stride;
 			int indexOutput = output.startIndex + i*output.stride;
 
 			for( int j = 0; j < input.width; j++ ) {
 				output.data[indexOutput++] = (short)transform[input.data[indexInput++] & 0xFFFF];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void applyTransform( GrayS8 input , int transform[] , int minValue , GrayS8 output ) {
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,i->{
-		for( int i = 0; i < input.height; i++ ) {
+		BoofConcurrency.loopFor(0,input.height,i->{
 			int indexInput = input.startIndex + i*input.stride;
 			int indexOutput = output.startIndex + i*output.stride;
 
 			for( int j = 0; j < input.width; j++ ) {
 				output.data[indexOutput++] = (byte)transform[input.data[indexInput++]- minValue];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void applyTransform( GrayS16 input , int transform[] , int minValue , GrayS16 output ) {
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,i->{
-		for( int i = 0; i < input.height; i++ ) {
+		BoofConcurrency.loopFor(0,input.height,i->{
 			int indexInput = input.startIndex + i*input.stride;
 			int indexOutput = output.startIndex + i*output.stride;
 
 			for( int j = 0; j < input.width; j++ ) {
 				output.data[indexOutput++] = (short)transform[input.data[indexInput++]- minValue];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void applyTransform( GrayS32 input , int transform[] , int minValue , GrayS32 output ) {
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,i->{
-		for( int i = 0; i < input.height; i++ ) {
+		BoofConcurrency.loopFor(0,input.height,i->{
 			int indexInput = input.startIndex + i*input.stride;
 			int indexOutput = output.startIndex + i*output.stride;
 
 			for( int j = 0; j < input.width; j++ ) {
 				output.data[indexOutput++] = transform[input.data[indexInput++]- minValue];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -114,8 +103,7 @@ public class ImplEnhanceHistogram {
 		int width = 2*radius+1;
 		int maxValue = workArrays.length()-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0,input.height,(idx0,idx1)->{
-		int idx0 = 0, idx1 = input.height;
+		BoofConcurrency.loopBlocks(0,input.height,(idx0,idx1)->{
 		int[] histogram = workArrays.pop();
 		for( int y = idx0; y < idx1; y++ ) {
 			// make sure it's inside the image bounds
@@ -165,8 +153,7 @@ public class ImplEnhanceHistogram {
 				output.data[indexOut++] = (byte)((sum*maxValue)/area);
 			}
 		}
-		workArrays.recycle(histogram);
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -179,8 +166,7 @@ public class ImplEnhanceHistogram {
 		int area = width*width;
 		int maxValue = workArrays.length()-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(radius,input.height-radius,(y0,y1)->{
-		int y0 = radius, y1 = input.height-radius;
+		BoofConcurrency.loopBlocks(radius,input.height-radius,(y0,y1)->{
 		int[] histogram = workArrays.pop();
 		for( int y = y0; y < y1; y++ ) {
 			localHistogram(input,0,y-radius,width,y+radius+1,histogram);
@@ -227,8 +213,7 @@ public class ImplEnhanceHistogram {
 				indexNew++;
 			}
 		}
-		workArrays.recycle(histogram);
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -426,8 +411,7 @@ public class ImplEnhanceHistogram {
 		int width = 2*radius+1;
 		int maxValue = workArrays.length()-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(0,input.height,(idx0,idx1)->{
-		int idx0 = 0, idx1 = input.height;
+		BoofConcurrency.loopBlocks(0,input.height,(idx0,idx1)->{
 		int[] histogram = workArrays.pop();
 		for( int y = idx0; y < idx1; y++ ) {
 			// make sure it's inside the image bounds
@@ -477,8 +461,7 @@ public class ImplEnhanceHistogram {
 				output.data[indexOut++] = (short)((sum*maxValue)/area);
 			}
 		}
-		workArrays.recycle(histogram);
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -491,8 +474,7 @@ public class ImplEnhanceHistogram {
 		int area = width*width;
 		int maxValue = workArrays.length()-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopBlocks(radius,input.height-radius,(y0,y1)->{
-		int y0 = radius, y1 = input.height-radius;
+		BoofConcurrency.loopBlocks(radius,input.height-radius,(y0,y1)->{
 		int[] histogram = workArrays.pop();
 		for( int y = y0; y < y1; y++ ) {
 			localHistogram(input,0,y-radius,width,y+radius+1,histogram);
@@ -539,8 +521,7 @@ public class ImplEnhanceHistogram {
 				indexNew++;
 			}
 		}
-		workArrays.recycle(histogram);
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
