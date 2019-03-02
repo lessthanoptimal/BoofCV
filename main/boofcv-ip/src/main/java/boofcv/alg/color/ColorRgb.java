@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.alg.color;
 
+import boofcv.alg.color.impl.ImplColorRgb;
+import boofcv.alg.color.impl.ImplColorRgb_MT;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 
 /**
@@ -45,127 +48,57 @@ public class ColorRgb {
 
 	public static void rgbToGray_Weighted( ImageMultiBand rgb , ImageGray gray ) {
 		gray.reshape(rgb.width,rgb.height);
-		if( rgb instanceof Planar ) {
-			Planar p = (Planar)rgb;
-			if( p.getBandType() == GrayU8.class ) {
-				rgbToGray_Weighted_U8(p,(GrayU8)gray);return;
-			} else if( p.getBandType() == GrayF32.class ) {
-				rgbToGray_Weighted_F32(p,(GrayF32)gray);return;
-			} else if( p.getBandType() == GrayF64.class ) {
-				rgbToGray_Weighted_F64(p,(GrayF64)gray);return;
-			}
-		} else if( rgb instanceof ImageInterleaved ) {
-			if( rgb instanceof InterleavedU8 ) {
-				rgbToGray_Weighted((InterleavedU8)rgb,(GrayU8)gray);return;
-			} else if( rgb instanceof InterleavedF32 ) {
-				rgbToGray_Weighted((InterleavedF32)rgb,(GrayF32)gray);return;
-			} else if( rgb instanceof InterleavedF64 ) {
-				rgbToGray_Weighted((InterleavedF64)rgb,(GrayF64)gray);return;
-			}
-		}
-		throw new IllegalArgumentException("Unknown image type");
-	}
+		switch( rgb.getImageType().getFamily() ) {
+			case PLANAR:
+				if( gray instanceof GrayU8 ) {
+					if(BoofConcurrency.USE_CONCURRENT ) {
+						ImplColorRgb_MT.rgbToGray_Weighted_U8((Planar<GrayU8>)rgb,(GrayU8)gray);
+					} else {
+						ImplColorRgb.rgbToGray_Weighted_U8((Planar<GrayU8>)rgb,(GrayU8)gray);
+					}
+				} else if( gray instanceof GrayF32 ) {
+					if(BoofConcurrency.USE_CONCURRENT ) {
+						ImplColorRgb_MT.rgbToGray_Weighted_F32((Planar<GrayF32>)rgb,(GrayF32)gray);
+					} else {
+						ImplColorRgb.rgbToGray_Weighted_F32((Planar<GrayF32>)rgb,(GrayF32)gray);
+					}
+				} else if( gray instanceof GrayF64 ) {
+					if(BoofConcurrency.USE_CONCURRENT ) {
+						ImplColorRgb_MT.rgbToGray_Weighted_F64((Planar<GrayF64>)rgb,(GrayF64)gray);
+					} else {
+						ImplColorRgb.rgbToGray_Weighted_F64((Planar<GrayF64>)rgb,(GrayF64)gray);
+					}
+				} else {
+					throw new IllegalArgumentException("Unsupported type "+gray.getClass().getSimpleName());
+				}
+				break;
 
-	public static void rgbToGray_Weighted_U8(Planar<GrayU8> rgb , GrayU8 gray ) {
-		GrayU8 R = rgb.getBand(0);
-		GrayU8 G = rgb.getBand(1);
-		GrayU8 B = rgb.getBand(2);
+			case INTERLEAVED:
+				if( gray instanceof GrayU8 ) {
+					if(BoofConcurrency.USE_CONCURRENT ) {
+						ImplColorRgb_MT.rgbToGray_Weighted((InterleavedU8)rgb,(GrayU8)gray);
+					} else {
+						ImplColorRgb.rgbToGray_Weighted((InterleavedU8)rgb,(GrayU8)gray);
+					}
+				} else if( gray instanceof GrayF32 ) {
+					if(BoofConcurrency.USE_CONCURRENT ) {
+						ImplColorRgb_MT.rgbToGray_Weighted((InterleavedF32)rgb,(GrayF32)gray);
+					} else {
+						ImplColorRgb.rgbToGray_Weighted((InterleavedF32)rgb,(GrayF32)gray);
+					}
+				} else if( gray instanceof GrayF64 ) {
+					if(BoofConcurrency.USE_CONCURRENT ) {
+						ImplColorRgb_MT.rgbToGray_Weighted((InterleavedF64)rgb,(GrayF64)gray);
+					} else {
+						ImplColorRgb.rgbToGray_Weighted((InterleavedF64)rgb,(GrayF64)gray);
+					}
+				} else {
+					throw new IllegalArgumentException("Unsupported type "+gray.getClass().getSimpleName());
+				}
+				break;
 
-		for( int row = 0; row < rgb.height; row++ ) {
-			int indexRgb = rgb.startIndex + row*rgb.stride;
-			int indedGra = gray.startIndex + row*gray.stride;
-
-			for( int col = 0; col < rgb.width; col++ , indedGra++ , indexRgb++) {
-				double r = R.data[indexRgb]&0xFF;
-				double g = G.data[indexRgb]&0xFF;
-				double b = B.data[indexRgb]&0xFF;
-
-				gray.data[indedGra] = (byte)(0.299*r + 0.587*g + 0.114*b);
-			}
-		}
-	}
-
-	public static void rgbToGray_Weighted_F32(Planar<GrayF32> rgb , GrayF32 gray ) {
-		GrayF32 R = rgb.getBand(0);
-		GrayF32 G = rgb.getBand(1);
-		GrayF32 B = rgb.getBand(2);
-
-		for( int row = 0; row < rgb.height; row++ ) {
-			int indexRgb = rgb.startIndex + row*rgb.stride;
-			int indedGra = gray.startIndex + row*gray.stride;
-
-			for( int col = 0; col < rgb.width; col++ , indedGra++ , indexRgb++) {
-				float r = R.data[indexRgb];
-				float g = G.data[indexRgb];
-				float b = B.data[indexRgb];
-
-				gray.data[indedGra] = 0.299f*r + 0.587f*g + 0.114f*b;
-			}
+			default:
+				throw new IllegalArgumentException("rgb must be planar or interleaved");
 		}
 	}
-
-	public static void rgbToGray_Weighted_F64(Planar<GrayF64> rgb , GrayF64 gray ) {
-		GrayF64 R = rgb.getBand(0);
-		GrayF64 G = rgb.getBand(1);
-		GrayF64 B = rgb.getBand(2);
-
-		for( int row = 0; row < rgb.height; row++ ) {
-			int indexRgb = rgb.startIndex + row*rgb.stride;
-			int indedGra = gray.startIndex + row*gray.stride;
-
-			for( int col = 0; col < rgb.width; col++ , indedGra++ , indexRgb++) {
-				double r = R.data[indexRgb];
-				double g = G.data[indexRgb];
-				double b = B.data[indexRgb];
-
-				gray.data[indedGra] = 0.299*r + 0.587*g + 0.114*b;
-			}
-		}
-	}
-
-	public static void rgbToGray_Weighted(InterleavedU8 rgb , GrayU8 gray ) {
-		for( int row = 0; row < rgb.height; row++ ) {
-			int indexRgb = rgb.startIndex + row*rgb.stride;
-			int indedGra = gray.startIndex + row*gray.stride;
-
-			for( int col = 0; col < rgb.width; col++ , indedGra++ ) {
-				double r = rgb.data[indexRgb++]&0xFF;
-				double g = rgb.data[indexRgb++]&0xFF;
-				double b = rgb.data[indexRgb++]&0xFF;
-
-				gray.data[indedGra] = (byte)(0.299*r + 0.587*g + 0.114*b);
-			}
-		}
-	}
-
-	public static void rgbToGray_Weighted(InterleavedF32 rgb , GrayF32 gray ) {
-		for( int row = 0; row < rgb.height; row++ ) {
-			int indexRgb = rgb.startIndex + row*rgb.stride;
-			int indedGra = gray.startIndex + row*gray.stride;
-
-			for( int col = 0; col < rgb.width; col++ , indedGra++ ) {
-				float r = rgb.data[indexRgb++];
-				float g = rgb.data[indexRgb++];
-				float b = rgb.data[indexRgb++];
-
-				gray.data[indedGra] = 0.299f*r + 0.587f*g + 0.114f*b;
-			}
-		}
-	}
-
-	public static void rgbToGray_Weighted(InterleavedF64 rgb , GrayF64 gray ) {
-		for( int row = 0; row < rgb.height; row++ ) {
-			int indexRgb = rgb.startIndex + row*rgb.stride;
-			int indedGra = gray.startIndex + row*gray.stride;
-
-			for( int col = 0; col < rgb.width; col++ , indedGra++ ) {
-				double r = rgb.data[indexRgb++];
-				double g = rgb.data[indexRgb++];
-				double b = rgb.data[indexRgb++];
-
-				gray.data[indedGra] = 0.299*r + 0.587*g + 0.114*b;
-			}
-		}
-	}
-
 }

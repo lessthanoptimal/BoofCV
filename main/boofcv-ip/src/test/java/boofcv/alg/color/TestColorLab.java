@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class TestColorLab {
 		Planar<GrayF32> output = new Planar<>(GrayF32.class,20,25,3);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
-		ColorLab.rgbToLab_U8(input, output);
+		ColorLab.rgbToLab(input, output);
 
 		float expected[] = new float[3];
 
@@ -73,7 +73,7 @@ public class TestColorLab {
 		Planar<GrayF32> output = new Planar<>(GrayF32.class,20,25,3);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
-		ColorLab.rgbToLab_F32(input,output);
+		ColorLab.rgbToLab(input,output);
 
 		float expected[] = new float[3];
 

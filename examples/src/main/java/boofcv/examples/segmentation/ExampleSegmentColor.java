@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class ExampleSegmentColor {
 		Planar<GrayF32> hsv = input.createSameShape();
 
 		// Convert into HSV
-		ColorHsv.rgbToHsv_F32(input,hsv);
+		ColorHsv.rgbToHsv(input,hsv);
 
 		// Euclidean distance squared threshold for deciding which pixels are members of the selected set
 		float maxDist2 = 0.4f*0.4f;

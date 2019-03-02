@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -140,7 +140,7 @@ public class ShowColorModelApp
 				names[0] = "Hue";
 				names[1] = "Saturation";
 				names[2] = "Value";
-				ColorHsv.rgbToHsv_F32(input, output);
+				ColorHsv.rgbToHsv(input, output);
 				setNaN(output.getBand(0));
 				PixelMath.multiply(output.getBand(0), (float) (255.0 / (2 * Math.PI)), output.getBand(0));
 				PixelMath.multiply(output.getBand(1), 255.0f, output.getBand(1));
@@ -153,7 +153,7 @@ public class ShowColorModelApp
 				names[0] = "Y";
 				names[1] = "U";
 				names[2] = "V";
-				ColorYuv.rgbToYuv_F32(input, output);
+				ColorYuv.rgbToYuv(input, output);
 				ConvertBufferedImage.convertTo(output.getBand(0),out[0]);
 				VisualizeImageData.colorizeSign(output.getBand(1), out[1], -1);
 				VisualizeImageData.colorizeSign(output.getBand(2), out[2], -1);
@@ -163,7 +163,7 @@ public class ShowColorModelApp
 				names[0] = "X";
 				names[1] = "Y";
 				names[2] = "Z";
-				ColorXyz.rgbToXyz_F32(input, output);
+				ColorXyz.rgbToXyz(input, output);
 				PixelMath.multiply(output.getBand(1),255,output.getBand(1));
 				VisualizeImageData.colorizeSign(output.getBand(0), out[0], -1);
 				ConvertBufferedImage.convertTo(output.getBand(1), out[1]);
@@ -174,7 +174,7 @@ public class ShowColorModelApp
 				names[0] = "L";
 				names[1] = "A";
 				names[2] = "B";
-				ColorLab.rgbToLab_F32(input, output);
+				ColorLab.rgbToLab(input, output);
 				VisualizeImageData.grayMagnitude(output.getBand(0), out[0], -1);
 				VisualizeImageData.colorizeSign(output.getBand(1), out[1], -1);
 				VisualizeImageData.colorizeSign(output.getBand(2), out[2], -1);

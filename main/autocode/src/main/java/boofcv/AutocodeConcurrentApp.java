@@ -152,6 +152,7 @@ public class AutocodeConcurrentApp {
 			if( !path.getParentFile().mkdirs() )
 				throw new RuntimeException("Failed to create directories. "+path.getAbsolutePath());
 		}
+		System.out.println("Creating "+path);
 
 		try {
 			String className = className(path);
@@ -205,6 +206,9 @@ public class AutocodeConcurrentApp {
 	private static File determineClassName( File original ) throws IOException {
 		String text = FileUtils.readFileToString(original, "UTF-8");
 
+		if(!text.contains("//CONCURRENT"))
+			throw new IOException("Not a concurrent file");
+
 		String pattern = "//CONCURRENT_CLASS_NAME ";
 		int where = text.indexOf(pattern);
 		if( where < 0 ) {
@@ -251,51 +255,50 @@ public class AutocodeConcurrentApp {
 		String text;
 	}
 
+	public static void convertDir( File directory , String include , String exclude ) {
+		if( !directory.isDirectory() )
+			throw new IllegalArgumentException("Must be a directory");
+		File[] files = directory.listFiles();
+		if( files == null )
+			throw new IllegalArgumentException("No files");
+		for( File f : files ) {
+			String name = f.getName();
+			if( !name.matches(include) || name.matches(exclude))
+				continue;
+			try {
+				convertFile(f);
+			} catch( IOException ignore ) {
+//				System.out.println(name+" "+e.getMessage());
+			}
+		}
+
+	}
+
 	public static void main(String[] args) throws IOException {
-		String files[] = new String[]{
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientPrewitt_Shared.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientSobel_Outer.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientSobel_UnrolledOuter.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientThree_Standard.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientTwo0_Standard.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/GradientTwo1_Standard.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/DerivativeLaplacian_Inner.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/blur/impl/ImplMedianHistogramInner.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/misc/impl/ImplPixelMath.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/misc/impl/ImplImageBandMath.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageStandard_IL.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageStandard_SB.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_F32_F32.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_F64_F64.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S16_I16.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S16_I16_Div.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S32_S32.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_S32_S32_Div.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U8_I8_Div.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U8_I16.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U16_I16.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ConvolveImageUnrolled_SB_U16_I16_Div.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ImplConvolveBox.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/ImplConvolveMean.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/impl/ImplThresholdImageOps.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/ThresholdSauvola.java",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/ThresholdNick.java",
-//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplEdgeNonMaxSuppression.java",
-//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplEdgeNonMaxSuppressionCrude.java",
-//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl/ImplGradientToEdgeFeatures.java",
-//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl/ImplSsdCorner_F32.java",
-//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl/ImplSsdCorner_S16.java",
-//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl/ImplSsdCornerWeighted_S16.java",
-//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl/ImplSsdCornerWeighted_F32.java",
-//				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ImplConvertImage.java",
-//				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ConvertInterleavedToSingle.java",
-//				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/ImplConvertPlanarToGray.java",
-//				"main/boofcv-io/src/main/java/boofcv/io/image/impl/ImplConvertRaster.java",
-				"main/boofcv-ip/src/main/java/boofcv/alg/misc/impl/ImplImageStatistics.java"
+		String directories[] = new String[]{
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/blur/impl/",
+				"main/boofcv-ip/src/main/java/boofcv/alg/misc/impl/",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/impl",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary",
+				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl",
+				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl",
+				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/",
+				"main/boofcv-ip/src/main/java/boofcv/alg/color/impl",
 		};
 
+		String files[] = new String[]{
+//				"main/boofcv-io/src/main/java/boofcv/io/image/impl/ImplConvertRaster.java",
+		};
+
+		for( String f : directories ) {
+			System.out.println("directory "+f);
+			convertDir(new File(f),"\\S+\\.java","\\S+MT\\S+");
+		}
+
 		for( String f : files ) {
-			System.out.println(f);
+			System.out.println("File "+f);
 			convertFile(new File(f));
 		}
 	}

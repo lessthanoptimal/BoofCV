@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,12 @@
 
 package boofcv.alg.color;
 
-import boofcv.alg.InputSanityCheck;
+import boofcv.alg.color.impl.ImplColorLab;
+import boofcv.alg.color.impl.ImplColorLab_MT;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
 
 /**
@@ -120,100 +123,24 @@ public class ColorLab {
 	 * @param rgb (Input) RGB encoded image
 	 * @param lab (Output) LAB encoded image. L = channel 0, A = channel 1, B = channel 2
 	 */
-	public static void rgbToLab_U8(Planar<GrayU8> rgb , Planar<GrayF32> lab ) {
+	public static <T extends ImageGray<T>>
+	void rgbToLab(Planar<T> rgb , Planar<GrayF32> lab ) {
+		lab.reshape(rgb.width,rgb.height,3);
 
-		InputSanityCheck.checkSameShape(lab, rgb);
-
-		GrayU8 R = rgb.getBand(0);
-		GrayU8 G = rgb.getBand(1);
-		GrayU8 B = rgb.getBand(2);
-
-		GrayF32 L_ = lab.getBand(0);
-		GrayF32 A_ = lab.getBand(1);
-		GrayF32 B_ = lab.getBand(2);
-
-		for( int row = 0; row < lab.height; row++ ) {
-			int indexLab = lab.startIndex + row*lab.stride;
-			int indexRgb = rgb.startIndex + row*rgb.stride;
-
-			for( int col = 0; col < lab.width; col++ , indexLab++ , indexRgb++) {
-				float r = (R.data[indexRgb]&0xFF)/255f;
-				float g = (G.data[indexRgb]&0xFF)/255f;
-				float b = (B.data[indexRgb]&0xFF)/255f;
-
-				float X = 0.412453f*r + 0.35758f*g + 0.180423f*b;
-				float Y = 0.212671f*r + 0.71516f*g + 0.072169f*b;
-				float Z = 0.019334f*r + 0.119193f*g + 0.950227f*b;
-
-				float xr = X/Xr_f;
-				float yr = Y/Yr_f;
-				float zr = Z/Zr_f;
-
-				float fx, fy, fz;
-				if(xr > epsilon_f)	fx = (float)Math.pow(xr, 1.0f/3.0f);
-				else				fx = (kappa_f*xr + 16.0f)/116.0f;
-				if(yr > epsilon_f)	fy = (float)Math.pow(yr, 1.0/3.0f);
-				else				fy = (kappa_f*yr + 16.0f)/116.0f;
-				if(zr > epsilon_f)	fz = (float)Math.pow(zr, 1.0/3.0f);
-				else				fz = (kappa_f*zr + 16.0f)/116.0f;
-
-				L_.data[indexLab] = 116.0f*fy-16.0f;
-				A_.data[indexLab] = 500.0f*(fx-fy);
-				B_.data[indexLab] = 200.0f*(fy-fz);
+		if( rgb.getBandType() == GrayU8.class ) {
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplColorLab_MT.rgbToLab_U8((Planar<GrayU8>) rgb, lab);
+			} else {
+				ImplColorLab.rgbToLab_U8((Planar<GrayU8>) rgb, lab);
 			}
-		}
-	}
-
-	/**
-	 * <p>Convert a 3-channel {@link Planar} image from RGB into LAB.  RGB is assumed
-	 * to have a range from 0:255</p>
-	 *
-	 * NOTE: Input and output image can be the same instance.
-	 *
-	 * @param rgb (Input) RGB encoded image
-	 * @param lab (Output) LAB encoded image.  L = channel 0, A = channel 1, B = channel 2
-	 */
-	public static void rgbToLab_F32(Planar<GrayF32> rgb , Planar<GrayF32> lab ) {
-
-		InputSanityCheck.checkSameShape(lab, rgb);
-
-		GrayF32 R = rgb.getBand(0);
-		GrayF32 G = rgb.getBand(1);
-		GrayF32 B = rgb.getBand(2);
-
-		GrayF32 L_ = lab.getBand(0);
-		GrayF32 A_ = lab.getBand(1);
-		GrayF32 B_ = lab.getBand(2);
-
-		for( int row = 0; row < lab.height; row++ ) {
-			int indexLab = lab.startIndex + row*lab.stride;
-			int indexRgb = rgb.startIndex + row*rgb.stride;
-
-			for( int col = 0; col < lab.width; col++ , indexLab++ , indexRgb++) {
-				float r = R.data[indexRgb]/255f;
-				float g = G.data[indexRgb]/255f;
-				float b = B.data[indexRgb]/255f;
-
-				float X = 0.412453f*r + 0.35758f*g + 0.180423f*b;
-				float Y = 0.212671f*r + 0.71516f*g + 0.072169f*b;
-				float Z = 0.019334f*r + 0.119193f*g + 0.950227f*b;
-
-				float xr = X/Xr_f;
-				float yr = Y/Yr_f;
-				float zr = Z/Zr_f;
-
-				float fx, fy, fz;
-				if(xr > epsilon_f)	fx = (float)Math.pow(xr, 1.0f/3.0f);
-				else				fx = (kappa_f*xr + 16.0f)/116.0f;
-				if(yr > epsilon_f)	fy = (float)Math.pow(yr, 1.0/3.0f);
-				else				fy = (kappa_f*yr + 16.0f)/116.0f;
-				if(zr > epsilon_f)	fz = (float)Math.pow(zr, 1.0/3.0f);
-				else				fz = (kappa_f*zr + 16.0f)/116.0f;
-
-				L_.data[indexLab] = 116.0f*fy-16.0f;
-				A_.data[indexLab] = 500.0f*(fx-fy);
-				B_.data[indexLab] = 200.0f*(fy-fz);
+		} else if( rgb.getBandType() == GrayF32.class ) {
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplColorLab_MT.rgbToLab_F32((Planar<GrayF32>)rgb,lab);
+			} else {
+				ImplColorLab.rgbToLab_F32((Planar<GrayF32>)rgb,lab);
 			}
+		} else {
+			throw new IllegalArgumentException("Unsupported band type "+rgb.getBandType().getSimpleName());
 		}
 	}
 }

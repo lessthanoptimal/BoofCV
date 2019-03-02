@@ -88,7 +88,7 @@ public class ImageClassifierVggCifar10 extends BaseImageClassifier {
 	protected Planar<GrayF32> preprocess(Planar<GrayF32> image) {
 		super.preprocess(image);
 
-		ColorYuv.rgbToYuv_F32(imageRgb, imageYuv);
+		ColorYuv.yuvToRgb(imageRgb, imageYuv);
 
 		// Normalize the image
 		localNorm.zeroMeanStdOne(kernel, imageYuv.getBand(0),255.0,1e-4, imageYuv.getBand(0));

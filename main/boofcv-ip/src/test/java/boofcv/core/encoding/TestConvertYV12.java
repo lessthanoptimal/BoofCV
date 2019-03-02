@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,12 +67,11 @@ public class TestConvertYV12 {
 		Planar<GrayU8> rgb = new Planar<>(GrayU8.class,width,height,3);
 
 		yv12ToMulti(data, width, height, yuv);
-		ColorYuv.ycbcrToRgb_U8(yuv,rgb);
+		ColorYuv.yuvToRgb(yuv,rgb);
 
 		for( ImageType type : types ) {
 			ImageMultiBand image = (ImageMultiBand)type.createImage(width,height);
 			ConvertYV12.yu12ToBoof(data,width,height,image);
-
 
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {

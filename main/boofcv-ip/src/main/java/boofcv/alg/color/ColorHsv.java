@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,11 @@
 
 package boofcv.alg.color;
 
-import boofcv.alg.InputSanityCheck;
+import boofcv.alg.color.impl.ImplColorHsv;
+import boofcv.alg.color.impl.ImplColorHsv_MT;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
 
 /**
@@ -279,66 +282,18 @@ public class ColorHsv {
 	 * @param hsv (Input) Image in HSV format
 	 * @param rgb (Output) Image in RGB format
 	 */
-	public static void hsvToRgb_F32(Planar<GrayF32> hsv , Planar<GrayF32> rgb ) {
+	public static <T extends ImageGray<T>>
+	void hsvToRgb(Planar<T> hsv , Planar<T> rgb ) {
+		rgb.reshape(hsv.width,hsv.height,3);
 
-		InputSanityCheck.checkSameShape(hsv, rgb);
-
-		GrayF32 H = hsv.getBand(0);
-		GrayF32 S = hsv.getBand(1);
-		GrayF32 V = hsv.getBand(2);
-
-		GrayF32 R = rgb.getBand(0);
-		GrayF32 G = rgb.getBand(1);
-		GrayF32 B = rgb.getBand(2);
-
-		for( int row = 0; row < hsv.height; row++ ) {
-			int indexHsv = hsv.startIndex + row*hsv.stride;
-			int indexRgb = rgb.startIndex + row*rgb.stride;
-
-			for( int col = 0; col < hsv.width; col++ , indexHsv++ , indexRgb++) {
-				float h = H.data[indexHsv];
-				float s = S.data[indexHsv];
-				float v = V.data[indexHsv];
-
-				if( s == 0 ) {
-					R.data[indexRgb] = v;
-					G.data[indexRgb] = v;
-					B.data[indexRgb] = v;
-					continue;
-				}
-				h /= d60_F32;
-				int h_int = (int)h;
-				float remainder = h - h_int;
-				float p = v * ( 1 - s );
-				float q = v * ( 1 - s * remainder );
-				float t = v * ( 1 - s * ( 1 - remainder ) );
-
-				if( h_int < 1 ) {
-					R.data[indexRgb] = v;
-					G.data[indexRgb] = t;
-					B.data[indexRgb] = p;
-				} else if( h_int < 2 ) {
-					R.data[indexRgb] = q;
-					G.data[indexRgb] = v;
-					B.data[indexRgb] = p;
-				} else if( h_int < 3 ) {
-					R.data[indexRgb] = p;
-					G.data[indexRgb] = v;
-					B.data[indexRgb] = t;
-				} else if( h_int < 4 ) {
-					R.data[indexRgb] = p;
-					G.data[indexRgb] = q;
-					B.data[indexRgb] = v;
-				} else if( h_int < 5 ) {
-					R.data[indexRgb] = t;
-					G.data[indexRgb] = p;
-					B.data[indexRgb] = v;
-				} else {
-					R.data[indexRgb] = v;
-					G.data[indexRgb] = p;
-					B.data[indexRgb] = q;
-				}
+		if( hsv.getBandType() == GrayF32.class ) {
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplColorHsv_MT.hsvToRgb_F32((Planar<GrayF32>)hsv,(Planar<GrayF32>)rgb);
+			} else {
+				ImplColorHsv.hsvToRgb_F32((Planar<GrayF32>)hsv,(Planar<GrayF32>)rgb);
 			}
+		} else {
+			throw new IllegalArgumentException("Unsupported band type "+hsv.getBandType().getSimpleName());
 		}
 	}
 
@@ -348,57 +303,18 @@ public class ColorHsv {
 	 * @param rgb (Input) Image in RGB format
 	 * @param hsv (Output) Image in HSV format
 	 */
-	public static void rgbToHsv_F32(Planar<GrayF32> rgb , Planar<GrayF32> hsv ) {
+	public static <T extends ImageGray<T>>
+	void rgbToHsv(Planar<T> rgb , Planar<T> hsv ) {
+		hsv.reshape(rgb.width,rgb.height,3);
 
-		InputSanityCheck.checkSameShape(rgb, hsv);
-
-		GrayF32 R = rgb.getBand(0);
-		GrayF32 G = rgb.getBand(1);
-		GrayF32 B = rgb.getBand(2);
-
-		GrayF32 H = hsv.getBand(0);
-		GrayF32 S = hsv.getBand(1);
-		GrayF32 V = hsv.getBand(2);
-
-		for( int row = 0; row < hsv.height; row++ ) {
-			int indexRgb = rgb.startIndex + row*rgb.stride;
-			int indexHsv = hsv.startIndex + row*hsv.stride;
-
-			for( int col = 0; col < hsv.width; col++ , indexHsv++ , indexRgb++) {
-
-				float r = R.data[indexRgb];
-				float g = G.data[indexRgb];
-				float b = B.data[indexRgb];
-
-				float max = r > g ? ( r > b ? r : b) : ( g > b ? g : b );
-				float min = r < g ? ( r < b ? r : b) : ( g < b ? g : b );
-
-				float delta = max - min;
-
-				V.data[indexHsv] = max;
-
-				if( max != 0 )
-					S.data[indexHsv] = delta / max;
-				else {
-					H.data[indexHsv] = Float.NaN;
-					S.data[indexHsv] = 0;
-					continue;
-				}
-
-				float h;
-				if( r == max )
-					h = ( g - b ) / delta;
-				else if( g == max )
-					h = 2 + ( b - r ) / delta;
-				else
-					h = 4 + ( r - g ) / delta;
-
-				h *= d60_F32;
-				if( h < 0 )
-					h += PI2_F32;
-
-				H.data[indexHsv] = h;
+		if( hsv.getBandType() == GrayF32.class ) {
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplColorHsv_MT.rgbToHsv_F32((Planar<GrayF32>)rgb,(Planar<GrayF32>)hsv);
+			} else {
+				ImplColorHsv.rgbToHsv_F32((Planar<GrayF32>)rgb,(Planar<GrayF32>)hsv);
 			}
+		} else {
+			throw new IllegalArgumentException("Unsupported band type "+hsv.getBandType().getSimpleName());
 		}
 	}
 }

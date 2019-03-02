@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public class TestConvertNV21 {
 		Planar<GrayU8> rgb = new Planar<>(GrayU8.class,width,height,3);
 
 		nv21ToMulti(data, width, height, yuv);
-		ColorYuv.ycbcrToRgb_U8(yuv, rgb);
+		ColorYuv.yuvToRgb(yuv, rgb);
 
 		for( ImageType type : types ) {
 			ImageMultiBand image = (ImageMultiBand)type.createImage(width,height);

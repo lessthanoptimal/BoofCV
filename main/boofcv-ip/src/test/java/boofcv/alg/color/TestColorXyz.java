@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -136,7 +136,7 @@ public class TestColorXyz {
 		Planar<GrayF32> output = new Planar<>(GrayF32.class,20,25,3);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
-		ColorXyz.rgbToXyz_F32(input,output);
+		ColorXyz.rgbToXyz(input,output);
 
 		float expected[] = new float[3];
 
@@ -165,7 +165,7 @@ public class TestColorXyz {
 		Planar<GrayF32> output = new Planar<>(GrayF32.class,20,25,3);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
-		ColorXyz.rgbToXyz_U8(input, output);
+		ColorXyz.rgbToXyz(input, output);
 
 		float expected[] = new float[3];
 

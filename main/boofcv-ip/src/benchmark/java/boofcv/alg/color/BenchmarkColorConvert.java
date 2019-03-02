@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,11 +19,13 @@
 package boofcv.alg.color;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.Planar;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.struct.image.*;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -38,43 +40,109 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Fork(value=1)
 public class BenchmarkColorConvert {
-	public static final int imgWidth = 640;
-	public static final int imgHeight = 480;
+
+	@Param({"true","false"})
+	public boolean concurrent;
+
+//	@Param({"500", "5000"})
+	@Param({"5000"})
+	public int size;
+
 	public static final Random rand = new Random(234);
 
 	public static final int TEST_TIME = 1000;
 
-	public static Planar<GrayF32> src_F32;
-	public static Planar<GrayF32> dst_F32;
+	public Planar<GrayF32> src_F32;
+	public Planar<GrayF32> dst_F32;
 
-	{
-//		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
-//		System.out.println();
+	public Planar<GrayU8> src_U8;
+	public Planar<GrayU8> dst_U8;
 
-		src_F32 = new Planar<>(GrayF32.class,imgWidth,imgHeight,3);
-		dst_F32 = new Planar<>(GrayF32.class,imgWidth,imgHeight,3);
+	InterleavedF32 isrc_F32;
+	InterleavedF32 idst_F32;
+	InterleavedU8 isrc_U8;
+	InterleavedU8 idst_U8;
 
-		GImageMiscOps.addUniform(src_F32,rand,0,255);
+	GrayF32 gdst_F32;
+	GrayU8 gdst_U8;
+
+	@Setup
+	public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
+
+		src_F32 = new Planar<>(GrayF32.class,size,size,3);
+		dst_F32 = new Planar<>(GrayF32.class,size,size,3);
+		src_U8 = new Planar<>(GrayU8.class,size,size,3);
+		dst_U8 = new Planar<>(GrayU8.class,size,size,3);
+		gdst_F32 = new GrayF32(size,size);
+		gdst_U8 = new GrayU8(size,size);
+
+		isrc_F32 = new InterleavedF32(size,size,3);
+		idst_F32 = new InterleavedF32(size,size,3);
+		isrc_U8 = new InterleavedU8(size,size,3);
+		idst_U8 = new InterleavedU8(size,size,3);
+
+		GImageMiscOps.fillUniform(src_F32,rand,0,255);
+		GImageMiscOps.fillUniform(src_U8,rand,0,255);
+		GImageMiscOps.fillUniform(isrc_F32,rand,0,255);
+		GImageMiscOps.fillUniform(isrc_U8,rand,0,255);
 	}
 
 	@Benchmark
 	public void RGB_to_HSV_F32() {
-		ColorHsv.rgbToHsv_F32(src_F32,dst_F32);
+		ColorHsv.rgbToHsv(src_F32,dst_F32);
 	}
 
 	@Benchmark
 	public void HSV_to_RGB_F32() {
-		ColorHsv.hsvToRgb_F32(src_F32,dst_F32);
+		ColorHsv.hsvToRgb(src_F32,dst_F32);
 	}
 
 	@Benchmark
 	public void RGB_to_YUV_F32() {
-		ColorYuv.rgbToYuv_F32(src_F32,dst_F32);
+		ColorYuv.rgbToYuv(src_F32,dst_F32);
 	}
 
 	@Benchmark
 	public void YUV_to_RGB_F32() {
-		ColorYuv.yuvToRgb_F32(src_F32,dst_F32);
+		ColorYuv.yuvToRgb(src_F32,dst_F32);
 	}
 
+	@Benchmark
+	public void YUV_to_RGB_U8() {
+		ColorYuv.yuvToRgb(src_U8,dst_U8);
+	}
+
+	@Benchmark
+	public void RGB_to_GRAY_IF32() {
+		ColorRgb.rgbToGray_Weighted(isrc_F32,gdst_F32);
+	}
+
+	@Benchmark
+	public void RGB_to_GRAY_IU8() {
+		ColorRgb.rgbToGray_Weighted(isrc_U8,gdst_U8);
+	}
+
+	@Benchmark
+	public void RGB_to_GRAY_F32() {
+		ColorRgb.rgbToGray_Weighted(src_F32,gdst_F32);
+	}
+
+	@Benchmark
+	public void RGB_to_GRAY_U8() {
+		ColorRgb.rgbToGray_Weighted(src_U8,gdst_U8);
+	}
+
+	@Benchmark
+	public void RGB_to_XYZ_F32() {
+		ColorXyz.rgbToXyz(src_F32,dst_F32);
+	}
+
+	public static void main(String[] args) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkColorConvert.class.getSimpleName())
+				.build();
+
+		new Runner(opt).run();
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,8 +103,8 @@ public class TestColorHsv {
 			rgb.getBand(i).set(0,0,151);
 		}
 
-		ColorHsv.rgbToHsv_F32(rgb, hsv);
-		ColorHsv.hsvToRgb_F32(hsv, found);
+		ColorHsv.rgbToHsv(rgb, hsv);
+		ColorHsv.hsvToRgb(hsv, found);
 
 		float tmp[] = new float[3];
 

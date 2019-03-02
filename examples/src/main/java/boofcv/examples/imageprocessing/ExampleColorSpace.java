@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,9 @@ import java.awt.image.BufferedImage;
 public class ExampleColorSpace {
 
 	public static void main( String args[] ) {
+		// Uncomment to turn on threaded code for faster conversion
+		//BoofConcurrency.USE_CONCURRENT = true;
+
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
 
 		// Convert input image into a BoofCV RGB image
@@ -44,10 +47,10 @@ public class ExampleColorSpace {
 
 		//---- convert RGB image into different color formats
 		Planar<GrayF32> hsv = rgb.createSameShape();
-		ColorHsv.rgbToHsv_F32(rgb, hsv);
+		ColorHsv.rgbToHsv(rgb, hsv);
 
 		Planar<GrayF32> yuv = rgb.createSameShape();
-		ColorYuv.yuvToRgb_F32(rgb, yuv);
+		ColorYuv.yuvToRgb(rgb, yuv);
 
 		//---- Convert individual pixels into different formats
 		float[] pixelHsv = new float[3];

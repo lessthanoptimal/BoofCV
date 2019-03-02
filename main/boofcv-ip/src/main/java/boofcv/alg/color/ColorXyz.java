@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,12 @@
 
 package boofcv.alg.color;
 
-import boofcv.alg.InputSanityCheck;
+import boofcv.alg.color.impl.ImplColorXyz;
+import boofcv.alg.color.impl.ImplColorXyz_MT;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
 
 /**
@@ -106,68 +109,24 @@ public class ColorXyz {
 	 * @param rgb (Input) RGB encoded image
 	 * @param xyz (Output) XYZ encoded image
 	 */
-	public static void rgbToXyz_F32(Planar<GrayF32> rgb , Planar<GrayF32> xyz ) {
+	public static  <T extends ImageGray<T>>
+	void rgbToXyz(Planar<T> rgb , Planar<GrayF32> xyz ) {
+		xyz.reshape(rgb.width,rgb.height,3);
 
-		InputSanityCheck.checkSameShape(xyz, rgb);
-
-		GrayF32 R = rgb.getBand(0);
-		GrayF32 G = rgb.getBand(1);
-		GrayF32 B = rgb.getBand(2);
-
-		GrayF32 X = xyz.getBand(0);
-		GrayF32 Y = xyz.getBand(1);
-		GrayF32 Z = xyz.getBand(2);
-
-		for( int row = 0; row < xyz.height; row++ ) {
-			int indexXyz = xyz.startIndex + row*xyz.stride;
-			int indexRgb = rgb.startIndex + row*rgb.stride;
-
-			for( int col = 0; col < xyz.width; col++ , indexXyz++ , indexRgb++) {
-				float r = R.data[indexRgb]/255f;
-				float g = G.data[indexRgb]/255f;
-				float b = B.data[indexRgb]/255f;
-
-				X.data[indexXyz] = 0.412453f*r + 0.35758f*g + 0.180423f*b;
-				Y.data[indexXyz] = 0.212671f*r + 0.71516f*g + 0.072169f*b;
-				Z.data[indexXyz] = 0.019334f*r + 0.119193f*g + 0.950227f*b;
+		if( rgb.getBandType() == GrayU8.class ) {
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplColorXyz_MT.rgbToXyz_U8((Planar<GrayU8>) rgb, xyz);
+			} else {
+				ImplColorXyz.rgbToXyz_U8((Planar<GrayU8>) rgb, xyz);
 			}
-		}
-	}
-
-	/**
-	 * Convert a 3-channel {@link Planar} image from RGB into XYZ.  RGB is assumed
-	 * to have a range from 0:255
-	 *
-	 * NOTE: Input and output image can be the same instance.
-	 *
-	 * @param rgb (Input) RGB encoded image
-	 * @param xyz (Output) XYZ encoded image
-	 */
-	public static void rgbToXyz_U8(Planar<GrayU8> rgb , Planar<GrayF32> xyz ) {
-
-		InputSanityCheck.checkSameShape(xyz, rgb);
-
-		GrayU8 R = rgb.getBand(0);
-		GrayU8 G = rgb.getBand(1);
-		GrayU8 B = rgb.getBand(2);
-
-		GrayF32 X = xyz.getBand(0);
-		GrayF32 Y = xyz.getBand(1);
-		GrayF32 Z = xyz.getBand(2);
-
-		for( int row = 0; row < xyz.height; row++ ) {
-			int indexXyz = xyz.startIndex + row*xyz.stride;
-			int indexRgb = rgb.startIndex + row*rgb.stride;
-
-			for( int col = 0; col < xyz.width; col++ , indexXyz++ , indexRgb++) {
-				float r = (R.data[indexRgb]&0xFF)/255f;
-				float g = (G.data[indexRgb]&0xFF)/255f;
-				float b = (B.data[indexRgb]&0xFF)/255f;
-
-				X.data[indexXyz] = 0.412453f*r + 0.35758f*g + 0.180423f*b;
-				Y.data[indexXyz] = 0.212671f*r + 0.71516f*g + 0.072169f*b;
-				Z.data[indexXyz] = 0.019334f*r + 0.119193f*g + 0.950227f*b;
+		} else if( rgb.getBandType() == GrayF32.class ) {
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplColorXyz_MT.rgbToXyz_F32((Planar<GrayF32>)rgb,xyz);
+			} else {
+				ImplColorXyz.rgbToXyz_F32((Planar<GrayF32>)rgb,xyz);
 			}
+		} else {
+			throw new IllegalArgumentException("Unsupported band type "+rgb.getBandType().getSimpleName());
 		}
 	}
 }

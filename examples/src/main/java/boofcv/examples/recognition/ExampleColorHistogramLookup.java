@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,7 +81,7 @@ public class ExampleColorHistogramLookup {
 			hsv.reshape(buffered.getWidth(), buffered.getHeight());
 
 			ConvertBufferedImage.convertFrom(buffered, rgb, true);
-			ColorHsv.rgbToHsv_F32(rgb, hsv);
+			ColorHsv.rgbToHsv(rgb, hsv);
 
 			Planar<GrayF32> hs = hsv.partialSpectrum(0,1);
 
@@ -125,7 +125,7 @@ public class ExampleColorHistogramLookup {
 			rgb.reshape(buffered.getWidth(), buffered.getHeight());
 			hsv.reshape(buffered.getWidth(), buffered.getHeight());
 			ConvertBufferedImage.convertFrom(buffered, rgb, true);
-			ColorHsv.rgbToHsv_F32(rgb, hsv);
+			ColorHsv.rgbToHsv(rgb, hsv);
 
 			GHistogramFeatureOps.histogram(hsv.getBand(0), 0, 2*Math.PI,histogramHue);
 			GHistogramFeatureOps.histogram(hsv.getBand(1), 0, 1, histogramValue);

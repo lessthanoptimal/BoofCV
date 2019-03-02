@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,8 +114,8 @@ public class TestColorYuv {
 
 		GImageMiscOps.fillUniform(yuv, rand, 0, 1);
 
-		ColorYuv.yuvToRgb_F32(yuv, rgb);
-		ColorYuv.rgbToYuv_F32(rgb, found);
+		ColorYuv.yuvToRgb(yuv, rgb);
+		ColorYuv.rgbToYuv(rgb, found);
 
 		for( int y = 0; y < yuv.height; y++ ) {
 			for( int x = 0; x < yuv.width; x++ ) {
@@ -136,7 +136,7 @@ public class TestColorYuv {
 
 		GImageMiscOps.fillUniform(yuv, rand, 0, 255);
 
-		ColorYuv.ycbcrToRgb_U8(yuv, rgb);
+		ColorYuv.yuvToRgb(yuv, rgb);
 
 		byte []expected = new byte[3];
 
