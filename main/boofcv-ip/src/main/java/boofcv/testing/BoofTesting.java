@@ -18,6 +18,7 @@
 
 package boofcv.testing;
 
+import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.*;
 import boofcv.struct.image.*;
 
@@ -831,5 +832,19 @@ public class BoofTesting {
 		} else {
 			throw new RuntimeException("Unknown. "+type.getSimpleName());
 		}
+	}
+
+	public static Object createInstance(Class type) {
+		try {
+			return type.newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static WorkArrays createWorkArray(Class type, int length ) {
+		WorkArrays w = (WorkArrays)createInstance(type);
+		w.reset(length);
+		return w;
 	}
 }

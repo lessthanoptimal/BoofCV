@@ -89,6 +89,11 @@ public class BenchmarkEnhanceImageOps {
 		EnhanceImageOps.sharpen4(inputU8,outputU8);
 	}
 
+	@Benchmark
+	public void sharpen8() {
+		EnhanceImageOps.sharpen8(inputU8,outputU8);
+	}
+
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				.include(BenchmarkEnhanceImageOps.class.getSimpleName())

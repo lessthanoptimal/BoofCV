@@ -20,11 +20,14 @@ package boofcv.alg.enhance;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.enhance.impl.ImplEnhanceFilter;
+import boofcv.alg.enhance.impl.ImplEnhanceFilter_MT;
 import boofcv.alg.enhance.impl.ImplEnhanceHistogram;
 import boofcv.alg.enhance.impl.ImplEnhanceHistogram_MT;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.IWorkArrays;
+import boofcv.struct.convolve.Kernel2D_F32;
+import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.*;
 
 /**
@@ -43,7 +46,14 @@ import boofcv.struct.image.*;
  * @author Peter Abeles
  */
 // TODO Add laplacian enhancement?
+@SuppressWarnings("Duplicates")
 public class EnhanceImageOps {
+
+	// used in unit tests, here for documentation
+	public static Kernel2D_S32 kernelEnhance4_I32 = new Kernel2D_S32(3, new int[]{0,-1,0,-1,5,-1,0,-1,0});
+	public static Kernel2D_F32 kernelEnhance4_F32 = new Kernel2D_F32(3, new float[]{0,-1,0,-1,5,-1,0,-1,0});
+	public static Kernel2D_S32 kernelEnhance8_I32 = new Kernel2D_S32(3, new int[]{-1,-1,-1,-1,9,-1,-1,-1,-1});
+	public static Kernel2D_F32 kernelEnhance8_F32 = new Kernel2D_F32(3, new float[]{-1,-1,-1,-1,9,-1,-1,-1,-1});
 
 	/**
 	 * Computes a transformation table which will equalize the provided histogram.  An equalized histogram spreads
@@ -297,8 +307,13 @@ public class EnhanceImageOps {
 	public static void sharpen4(GrayU8 input , GrayU8 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		ImplEnhanceFilter.sharpenInner4(input,output,0,255);
-		ImplEnhanceFilter.sharpenBorder4(input,output,0,255);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplEnhanceFilter_MT.sharpenInner4(input,output,0,255);
+			ImplEnhanceFilter_MT.sharpenBorder4(input,output,0,255);
+		} else {
+			ImplEnhanceFilter.sharpenInner4(input,output,0,255);
+			ImplEnhanceFilter.sharpenBorder4(input,output,0,255);
+		}
 	}
 
 	/**
@@ -310,8 +325,13 @@ public class EnhanceImageOps {
 	public static void sharpen4(GrayF32 input , GrayF32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		ImplEnhanceFilter.sharpenInner4(input,output,0,255);
-		ImplEnhanceFilter.sharpenBorder4(input, output, 0, 255);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplEnhanceFilter_MT.sharpenInner4(input,output,0,255);
+			ImplEnhanceFilter_MT.sharpenBorder4(input,output,0,255);
+		} else {
+			ImplEnhanceFilter.sharpenInner4(input,output,0,255);
+			ImplEnhanceFilter.sharpenBorder4(input,output,0,255);
+		}
 	}
 
 	/**
@@ -323,8 +343,13 @@ public class EnhanceImageOps {
 	public static void sharpen8(GrayU8 input , GrayU8 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		ImplEnhanceFilter.sharpenInner8(input,output,0,255);
-		ImplEnhanceFilter.sharpenBorder8(input, output, 0, 255);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplEnhanceFilter_MT.sharpenInner8(input,output,0,255);
+			ImplEnhanceFilter_MT.sharpenBorder8(input,output,0,255);
+		} else {
+			ImplEnhanceFilter.sharpenInner8(input,output,0,255);
+			ImplEnhanceFilter.sharpenBorder8(input,output,0,255);
+		}
 	}
 
 	/**
@@ -336,7 +361,12 @@ public class EnhanceImageOps {
 	public static void sharpen8(GrayF32 input , GrayF32 output ) {
 		InputSanityCheck.checkSameShape(input, output);
 
-		ImplEnhanceFilter.sharpenInner8(input,output,0,255);
-		ImplEnhanceFilter.sharpenBorder8(input, output, 0, 255);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplEnhanceFilter_MT.sharpenInner8(input,output,0,255);
+			ImplEnhanceFilter_MT.sharpenBorder8(input,output,0,255);
+		} else {
+			ImplEnhanceFilter.sharpenInner8(input,output,0,255);
+			ImplEnhanceFilter.sharpenBorder8(input,output,0,255);
+		}
 	}
 }

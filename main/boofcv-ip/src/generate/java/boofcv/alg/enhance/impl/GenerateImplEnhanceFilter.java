@@ -48,10 +48,12 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() {
-		out.print("import boofcv.struct.convolve.Kernel2D_F32;\n" +
-				"import boofcv.struct.convolve.Kernel2D_S32;\n" +
+		out.print(
 				"import boofcv.struct.image.*;\n" +
+				"import javax.annotation.Generated;\n" +
 				"\n" +
+				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
+				"\n"+
 				"/**\n" +
 				" * <p>\n" +
 				" * Filter based functions for image enhancement.\n" +
@@ -63,11 +65,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				" */\n" +
 				generatedAnnotation() +
 				"public class ImplEnhanceFilter {\n" +
-				"\n" +
-				"\tpublic static Kernel2D_S32 kernelEnhance4_I32 = new Kernel2D_S32(3, new int[]{0,-1,0,-1,5,-1,0,-1,0});\n" +
-				"\tpublic static Kernel2D_F32 kernelEnhance4_F32 = new Kernel2D_F32(3, new float[]{0,-1,0,-1,5,-1,0,-1,0});\n" +
-				"\tpublic static Kernel2D_S32 kernelEnhance8_I32 = new Kernel2D_S32(3, new int[]{-1,-1,-1,-1,9,-1,-1,-1,-1});\n" +
-				"\tpublic static Kernel2D_F32 kernelEnhance8_F32 = new Kernel2D_F32(3, new float[]{-1,-1,-1,-1,9,-1,-1,-1,-1});\n\n");
+				"\n");
 	}
 
 	private void sharpen4(AutoTypeImage image) {
@@ -77,6 +75,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 		String sumtype = image.getSumType();
 
 		out.print("\tpublic static void sharpenInner4( "+name+" input , "+name+" output , "+sumtype+" minValue , "+sumtype+" maxValue ) {\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(1,input.height-1,y->{\n" +
 				"\t\tfor( int y = 1; y < input.height-1; y++ ) {\n" +
 				"\t\t\tint indexIn = input.startIndex + y*input.stride + 1;\n" +
 				"\t\t\tint indexOut = output.startIndex + y*output.stride + 1;\n" +
@@ -95,6 +94,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				"\t\t\t\toutput.data[indexOut] = "+cast+"a;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\t}\n\n");
 	}
 
@@ -105,12 +105,14 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 		String sumtype = image.getSumType();
 
 		out.print("\tpublic static void sharpenBorder4( "+name+" input , "+name+" output , "+sumtype+" minValue , "+sumtype+" maxValue ) {\n" +
-				"\t\tint b = input.height-1;\n" +
 				"\n" +
-				"\t\tint indexTop = input.startIndex;\n" +
-				"\t\tint indexBottom = input.startIndex + b*input.stride;\n" +
-				"\t\t\n" +
+				"\t\tint b = input.height-1;\n" +
+				"\t\tint c = input.width-1;\n" +
+				"\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.width,x->{\n" +
 				"\t\tfor( int x = 0; x < input.width; x++ ) {\n" +
+				"\t\t\tint indexTop = input.startIndex + x;\n" +
+				"\t\t\tint indexBottom = input.startIndex + b*input.stride + x;\n" +
 				"\t\t\t"+sumtype+" value = 4*safeGet(input,x,0) - (safeGet(input,x-1,0) + safeGet(input,x+1,0) + safeGet(input,x,1));\n" +
 				"\n" +
 				"\t\t\tif( value > maxValue )\n" +
@@ -129,12 +131,12 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\toutput.data[indexBottom++] = "+cast+"value;\n" +
 				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\n" +
-				"\t\tb = input.width-1;\n" +
-				"\t\tint indexLeft = input.startIndex + input.stride;\n" +
-				"\t\tint indexRight = input.startIndex + input.stride + b;\n" +
-				"\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(1,input.height-1,y->{\n" +
 				"\t\tfor( int y = 1; y < input.height-1; y++ ) {\n" +
+				"\t\t\tint indexLeft = input.startIndex + input.stride*y;\n" +
+				"\t\t\tint indexRight = input.startIndex + input.stride*y + c;\n" +
 				"\t\t\t"+sumtype+" value = 4*safeGet(input,0,y) - (safeGet(input,1,y) + safeGet(input,0,y-1) + safeGet(input,0,y+1));\n" +
 				"\n" +
 				"\t\t\tif( value > maxValue )\n" +
@@ -144,7 +146,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\toutput.data[indexLeft] = "+cast+"value;\n" +
 				"\n" +
-				"\t\t\tvalue = 4*safeGet(input,b,y) - (safeGet(input,b-1,y) + safeGet(input,b,y-1) + safeGet(input,b,y+1));\n" +
+				"\t\t\tvalue = 4*safeGet(input,c,y) - (safeGet(input,c-1,y) + safeGet(input,c,y-1) + safeGet(input,c,y+1));\n" +
 				"\n" +
 				"\t\t\tif( value > maxValue )\n" +
 				"\t\t\t\tvalue = maxValue;\n" +
@@ -152,10 +154,8 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				"\t\t\t\tvalue = minValue;\n" +
 				"\n" +
 				"\t\t\toutput.data[indexRight] = "+cast+"value;\n" +
-				"\t\t\t\n" +
-				"\t\t\tindexLeft += input.stride;\n" +
-				"\t\t\tindexRight += input.stride;\n" +
 				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\t}\n\n");
 	}
 
@@ -166,6 +166,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 		String sumtype = image.getSumType();
 
 		out.print("\tpublic static void sharpenInner8( "+name+" input , "+name+" output , "+sumtype+" minValue , "+sumtype+" maxValue ) {\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(1,input.height-1,y->{\n" +
 				"\t\tfor( int y = 1; y < input.height-1; y++ ) {\n" +
 				"\t\t\tint indexIn = input.startIndex + y*input.stride + 1;\n" +
 				"\t\t\tint indexOut = output.startIndex + y*output.stride + 1;\n" +
@@ -192,6 +193,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				"\t\t\t\toutput.data[indexOut] = "+cast+"result;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\t}\n\n");
 	}
 
@@ -202,22 +204,21 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 
 		out.print("\tpublic static void sharpenBorder8( "+name+" input , "+name+" output , "+sumtype+" minValue , "+sumtype+" maxValue ) {\n" +
 				"\t\tint b = input.height-1;\n" +
-				"\t\t"+sumtype+" a11,a12,a13,a21,a22,a23,a31,a32,a33;\n" +
-				"\n" +
-				"\t\tint indexTop = input.startIndex;\n" +
-				"\t\tint indexBottom = input.startIndex + b*input.stride;\n" +
-				"\n" +
+				"\t\tint c = input.width-1;\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.width,x->{\n" +
 				"\t\tfor( int x = 0; x < input.width; x++ ) {\n" +
+				"\t\t\tint indexTop = input.startIndex + x;\n" +
+				"\t\t\tint indexBottom = input.startIndex + x + b*input.stride;\n" +
 				"\n" +
-				"\t\t\ta11 = safeGet(input,x-1,-1);\n" +
-				"\t\t\ta12 = safeGet(input,x  ,-1);\n" +
-				"\t\t\ta13 = safeGet(input,x+1,-1);\n" +
-				"\t\t\ta21 = safeGet(input,x-1, 0);\n" +
-				"\t\t\ta22 = safeGet(input,x  , 0);\n" +
-				"\t\t\ta23 = safeGet(input,x+1, 0);\n" +
-				"\t\t\ta31 = safeGet(input,x-1, 1);\n" +
-				"\t\t\ta32 = safeGet(input,x  , 1);\n" +
-				"\t\t\ta33 = safeGet(input,x+1, 1);\n" +
+				"\t\t\t"+sumtype+" a11 = safeGet(input,x-1,-1);\n" +
+				"\t\t\t"+sumtype+" a12 = safeGet(input,x  ,-1);\n" +
+				"\t\t\t"+sumtype+" a13 = safeGet(input,x+1,-1);\n" +
+				"\t\t\t"+sumtype+" a21 = safeGet(input,x-1, 0);\n" +
+				"\t\t\t"+sumtype+" a22 = safeGet(input,x  , 0);\n" +
+				"\t\t\t"+sumtype+" a23 = safeGet(input,x+1, 0);\n" +
+				"\t\t\t"+sumtype+" a31 = safeGet(input,x-1, 1);\n" +
+				"\t\t\t"+sumtype+" a32 = safeGet(input,x  , 1);\n" +
+				"\t\t\t"+sumtype+" a33 = safeGet(input,x+1, 1);\n" +
 				"\n" +
 				"\t\t\t"+sumtype+" value = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);\n" +
 				"\n" +
@@ -247,21 +248,21 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\toutput.data[indexBottom++] = "+cast+"value;\n" +
 				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\n" +
-				"\t\tb = input.width-1;\n" +
-				"\t\tint indexLeft = input.startIndex + input.stride;\n" +
-				"\t\tint indexRight = input.startIndex + input.stride + b;\n" +
-				"\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(1,input.height-1,y->{\n" +
 				"\t\tfor( int y = 1; y < input.height-1; y++ ) {\n" +
-				"\t\t\ta11 = safeGet(input,-1,y-1);\n" +
-				"\t\t\ta12 = safeGet(input, 0,y-1);\n" +
-				"\t\t\ta13 = safeGet(input,+1,y-1);\n" +
-				"\t\t\ta21 = safeGet(input,-1, y );\n" +
-				"\t\t\ta22 = safeGet(input, 0, y );\n" +
-				"\t\t\ta23 = safeGet(input,+1, y );\n" +
-				"\t\t\ta31 = safeGet(input,-1,y+1);\n" +
-				"\t\t\ta32 = safeGet(input, 0,y+1);\n" +
-				"\t\t\ta33 = safeGet(input,+1,y+1);\n" +
+				"\t\t\tint indexLeft = input.startIndex + input.stride*y;\n" +
+				"\t\t\tint indexRight = input.startIndex + input.stride*y + c;\n" +
+				"\t\t\t"+sumtype+" a11 = safeGet(input,-1,y-1);\n" +
+				"\t\t\t"+sumtype+" a12 = safeGet(input, 0,y-1);\n" +
+				"\t\t\t"+sumtype+" a13 = safeGet(input,+1,y-1);\n" +
+				"\t\t\t"+sumtype+" a21 = safeGet(input,-1, y );\n" +
+				"\t\t\t"+sumtype+" a22 = safeGet(input, 0, y );\n" +
+				"\t\t\t"+sumtype+" a23 = safeGet(input,+1, y );\n" +
+				"\t\t\t"+sumtype+" a31 = safeGet(input,-1,y+1);\n" +
+				"\t\t\t"+sumtype+" a32 = safeGet(input, 0,y+1);\n" +
+				"\t\t\t"+sumtype+" a33 = safeGet(input,+1,y+1);\n" +
 				"\n" +
 				"\t\t\t"+sumtype+" value = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);\n" +
 				"\n" +
@@ -272,15 +273,15 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\toutput.data[indexLeft] = "+cast+"value;\n" +
 				"\n" +
-				"\t\t\ta11 = safeGet(input,b-1,y-1);\n" +
-				"\t\t\ta12 = safeGet(input, b ,y-1);\n" +
-				"\t\t\ta13 = safeGet(input,b+1,y-1);\n" +
-				"\t\t\ta21 = safeGet(input,b-1, y );\n" +
-				"\t\t\ta22 = safeGet(input, b , y );\n" +
-				"\t\t\ta23 = safeGet(input,b+1, y );\n" +
-				"\t\t\ta31 = safeGet(input,b-1,y+1);\n" +
-				"\t\t\ta32 = safeGet(input, b ,y+1);\n" +
-				"\t\t\ta33 = safeGet(input,b+1,y+1);\n" +
+				"\t\t\ta11 = safeGet(input,c-1,y-1);\n" +
+				"\t\t\ta12 = safeGet(input, c ,y-1);\n" +
+				"\t\t\ta13 = safeGet(input,c+1,y-1);\n" +
+				"\t\t\ta21 = safeGet(input,c-1, y );\n" +
+				"\t\t\ta22 = safeGet(input, c , y );\n" +
+				"\t\t\ta23 = safeGet(input,c+1, y );\n" +
+				"\t\t\ta31 = safeGet(input,c-1,y+1);\n" +
+				"\t\t\ta32 = safeGet(input, c ,y+1);\n" +
+				"\t\t\ta33 = safeGet(input,c+1,y+1);\n" +
 				"\n" +
 				"\t\t\tvalue = 9*a22 - (a11+a12+a13+a21+a23+a31+a32+a33);\n" +
 				"\n" +
@@ -290,10 +291,8 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				"\t\t\t\tvalue = minValue;\n" +
 				"\n" +
 				"\t\t\toutput.data[indexRight] = "+cast+"value;\n" +
-				"\n" +
-				"\t\t\tindexLeft += input.stride;\n" +
-				"\t\t\tindexRight += input.stride;\n" +
 				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
 				"\t}\n\n");
 	}
 
@@ -328,7 +327,7 @@ public class GenerateImplEnhanceFilter extends CodeGeneratorBase {
 				"\t\t\ty = input.height-1;\n" +
 				"\n" +
 				"\t\treturn input.unsafe_get(x,y);\n" +
-				"\t}\n\n");
+				"\t}\n");
 	}
 
 	public static void main( String args[] ) throws FileNotFoundException {

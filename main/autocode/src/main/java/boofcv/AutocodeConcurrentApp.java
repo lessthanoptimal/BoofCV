@@ -35,6 +35,8 @@ import java.util.List;
  *     <li>//CONCURRENT_INLINE TEXT  will remove the comment in insert the text</li>
  *     <li>//CONCURRENT_ABOVE TEXT  will replace the line above with the text</li>
  *     <li>//CONCURRENT_BELOW TEXT  will replace the line below with the text</li>
+ *     <li>//CONCURRENT_REMOVE_BELOW will remove the line below</li>
+ *     <li>//CONCURRENT_REMOVE_ABOVE will remove the line above</li>
  *     <li>//CONCURRENT_MACRO NAME TEXT creates a macro that can be used instead of text</li>
  * </ul>
  *
@@ -275,21 +277,22 @@ public class AutocodeConcurrentApp {
 	}
 
 	public static void main(String[] args) throws IOException {
-		String directories[] = new String[]{
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/blur/impl/",
-				"main/boofcv-ip/src/main/java/boofcv/alg/misc/impl/",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/impl",
-				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary",
-				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl",
-				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl",
-				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/",
-				"main/boofcv-ip/src/main/java/boofcv/alg/color/impl",
+		String[] directories = new String[]{
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/blur/impl/",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/misc/impl/",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/impl",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary",
+//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl",
+//				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl",
+//				"main/boofcv-ip/src/main/java/boofcv/core/image/impl/",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/color/impl",
+				"main/boofcv-ip/src/main/java/boofcv/alg/enhance/impl/"
 		};
 
-		String files[] = new String[]{
-				"main/boofcv-ip/src/main/java/boofcv/alg/enhance/impl/ImplEnhanceHistogram.java"
+		String[] files = new String[]{
+//				"main/boofcv-ip/src/main/java/boofcv/alg/enhance/impl/ImplEnhanceHistogram.java"
 		};
 
 		for( String f : directories ) {

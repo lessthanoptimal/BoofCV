@@ -18,13 +18,12 @@
 
 package boofcv.alg.enhance.impl;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.GrayU8;
 
 import javax.annotation.Generated;
-
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>
@@ -38,11 +37,10 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.enhance.impl.GenerateImplEnhanceFilter")
-public class ImplEnhanceFilter {
+public class ImplEnhanceFilter_MT {
 
 	public static void sharpenInner4( GrayU8 input , GrayU8 output , int minValue , int maxValue ) {
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,input.height-1,y->{
-		for( int y = 1; y < input.height-1; y++ ) {
+		BoofConcurrency.loopFor(1,input.height-1,y->{
 			int indexIn = input.startIndex + y*input.stride + 1;
 			int indexOut = output.startIndex + y*output.stride + 1;
 
@@ -59,8 +57,7 @@ public class ImplEnhanceFilter {
 
 				output.data[indexOut] = (byte)a;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void sharpenBorder4( GrayU8 input , GrayU8 output , int minValue , int maxValue ) {
@@ -68,8 +65,7 @@ public class ImplEnhanceFilter {
 		int b = input.height-1;
 		int c = input.width-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.width,x->{
-		for( int x = 0; x < input.width; x++ ) {
+		BoofConcurrency.loopFor(0,input.width,x->{
 			int indexTop = input.startIndex + x;
 			int indexBottom = input.startIndex + b*input.stride + x;
 			int value = 4*safeGet(input,x,0) - (safeGet(input,x-1,0) + safeGet(input,x+1,0) + safeGet(input,x,1));
@@ -89,11 +85,9 @@ public class ImplEnhanceFilter {
 				value = minValue;
 
 			output.data[indexBottom++] = (byte)value;
-		}
-		//CONCURRENT_ABOVE });
+		});
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,input.height-1,y->{
-		for( int y = 1; y < input.height-1; y++ ) {
+		BoofConcurrency.loopFor(1,input.height-1,y->{
 			int indexLeft = input.startIndex + input.stride*y;
 			int indexRight = input.startIndex + input.stride*y + c;
 			int value = 4*safeGet(input,0,y) - (safeGet(input,1,y) + safeGet(input,0,y-1) + safeGet(input,0,y+1));
@@ -113,13 +107,11 @@ public class ImplEnhanceFilter {
 				value = minValue;
 
 			output.data[indexRight] = (byte)value;
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void sharpenInner4( GrayF32 input , GrayF32 output , float minValue , float maxValue ) {
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,input.height-1,y->{
-		for( int y = 1; y < input.height-1; y++ ) {
+		BoofConcurrency.loopFor(1,input.height-1,y->{
 			int indexIn = input.startIndex + y*input.stride + 1;
 			int indexOut = output.startIndex + y*output.stride + 1;
 
@@ -136,8 +128,7 @@ public class ImplEnhanceFilter {
 
 				output.data[indexOut] = a;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void sharpenBorder4( GrayF32 input , GrayF32 output , float minValue , float maxValue ) {
@@ -145,8 +136,7 @@ public class ImplEnhanceFilter {
 		int b = input.height-1;
 		int c = input.width-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.width,x->{
-		for( int x = 0; x < input.width; x++ ) {
+		BoofConcurrency.loopFor(0,input.width,x->{
 			int indexTop = input.startIndex + x;
 			int indexBottom = input.startIndex + b*input.stride + x;
 			float value = 4*safeGet(input,x,0) - (safeGet(input,x-1,0) + safeGet(input,x+1,0) + safeGet(input,x,1));
@@ -166,11 +156,9 @@ public class ImplEnhanceFilter {
 				value = minValue;
 
 			output.data[indexBottom++] = value;
-		}
-		//CONCURRENT_ABOVE });
+		});
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,input.height-1,y->{
-		for( int y = 1; y < input.height-1; y++ ) {
+		BoofConcurrency.loopFor(1,input.height-1,y->{
 			int indexLeft = input.startIndex + input.stride*y;
 			int indexRight = input.startIndex + input.stride*y + c;
 			float value = 4*safeGet(input,0,y) - (safeGet(input,1,y) + safeGet(input,0,y-1) + safeGet(input,0,y+1));
@@ -190,13 +178,11 @@ public class ImplEnhanceFilter {
 				value = minValue;
 
 			output.data[indexRight] = value;
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void sharpenInner8( GrayU8 input , GrayU8 output , int minValue , int maxValue ) {
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,input.height-1,y->{
-		for( int y = 1; y < input.height-1; y++ ) {
+		BoofConcurrency.loopFor(1,input.height-1,y->{
 			int indexIn = input.startIndex + y*input.stride + 1;
 			int indexOut = output.startIndex + y*output.stride + 1;
 
@@ -221,15 +207,13 @@ public class ImplEnhanceFilter {
 
 				output.data[indexOut] = (byte)result;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void sharpenBorder8( GrayU8 input , GrayU8 output , int minValue , int maxValue ) {
 		int b = input.height-1;
 		int c = input.width-1;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.width,x->{
-		for( int x = 0; x < input.width; x++ ) {
+		BoofConcurrency.loopFor(0,input.width,x->{
 			int indexTop = input.startIndex + x;
 			int indexBottom = input.startIndex + x + b*input.stride;
 
@@ -270,11 +254,9 @@ public class ImplEnhanceFilter {
 				value = minValue;
 
 			output.data[indexBottom++] = (byte)value;
-		}
-		//CONCURRENT_ABOVE });
+		});
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,input.height-1,y->{
-		for( int y = 1; y < input.height-1; y++ ) {
+		BoofConcurrency.loopFor(1,input.height-1,y->{
 			int indexLeft = input.startIndex + input.stride*y;
 			int indexRight = input.startIndex + input.stride*y + c;
 			int a11 = safeGet(input,-1,y-1);
@@ -314,13 +296,11 @@ public class ImplEnhanceFilter {
 				value = minValue;
 
 			output.data[indexRight] = (byte)value;
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void sharpenInner8( GrayF32 input , GrayF32 output , float minValue , float maxValue ) {
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,input.height-1,y->{
-		for( int y = 1; y < input.height-1; y++ ) {
+		BoofConcurrency.loopFor(1,input.height-1,y->{
 			int indexIn = input.startIndex + y*input.stride + 1;
 			int indexOut = output.startIndex + y*output.stride + 1;
 
@@ -345,15 +325,13 @@ public class ImplEnhanceFilter {
 
 				output.data[indexOut] = result;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void sharpenBorder8( GrayF32 input , GrayF32 output , float minValue , float maxValue ) {
 		int b = input.height-1;
 		int c = input.width-1;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.width,x->{
-		for( int x = 0; x < input.width; x++ ) {
+		BoofConcurrency.loopFor(0,input.width,x->{
 			int indexTop = input.startIndex + x;
 			int indexBottom = input.startIndex + x + b*input.stride;
 
@@ -394,11 +372,9 @@ public class ImplEnhanceFilter {
 				value = minValue;
 
 			output.data[indexBottom++] = value;
-		}
-		//CONCURRENT_ABOVE });
+		});
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(1,input.height-1,y->{
-		for( int y = 1; y < input.height-1; y++ ) {
+		BoofConcurrency.loopFor(1,input.height-1,y->{
 			int indexLeft = input.startIndex + input.stride*y;
 			int indexRight = input.startIndex + input.stride*y + c;
 			float a11 = safeGet(input,-1,y-1);
@@ -438,8 +414,7 @@ public class ImplEnhanceFilter {
 				value = minValue;
 
 			output.data[indexRight] = value;
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**

@@ -69,7 +69,7 @@ Version : 0.33
   * Threshold: Local, Block
   * Color: HSV, LAB, RGB, XYZ, YUV, TODO NV21, YV12
   * Misc: PixelMath, ImageStatistics, Non-Max, Non-Max Candidate, ConvertImage, ConvertBufferedImage,
-          Histogram Enhancement
+          EhanceImageOps
   * TODO image histogram in ImageStatistics
   * Feature Intensity: SURF, SSD Corner
 - Examples
