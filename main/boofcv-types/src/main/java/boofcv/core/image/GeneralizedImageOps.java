@@ -301,4 +301,21 @@ public class GeneralizedImageOps {
 			return (T) InterleavedS16.class;
 		return (T) type;
 	}
+
+	public static Object getArray(ImageGray input) {
+		if( input instanceof GrayI8)
+			return ((GrayI8)input).data;
+		else if( input instanceof GrayI16 )
+			return ((GrayI16)input).data;
+		else if( input instanceof GrayS32 )
+			return ((GrayS32)input).data;
+		else if( input instanceof GrayS64 )
+			return ((GrayS64)input).data;
+		else if( input instanceof GrayF32 )
+			return ((GrayF32)input).data;
+		else if( input instanceof GrayF64 )
+			return ((GrayF64)input).data;
+		else
+			throw new RuntimeException("Unknown");
+	}
 }

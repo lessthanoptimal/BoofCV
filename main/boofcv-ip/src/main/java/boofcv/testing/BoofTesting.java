@@ -466,6 +466,38 @@ public class BoofTesting {
 		}
 	}
 
+	public static void assertEquals(byte a[], byte b[]) {
+		for (int i = 0; i < a.length; i++) {
+			int diff = Math.abs(a[i] - b[i]);
+			if (diff != 0)
+				throw new RuntimeException("Element " + i + " not equals. " + a[i] + " " + b[i]);
+		}
+	}
+
+	public static void assertEquals(short a[], short b[]) {
+		for (int i = 0; i < a.length; i++) {
+			int diff = Math.abs(a[i] - b[i]);
+			if (diff != 0)
+				throw new RuntimeException("Element " + i + " not equals. " + a[i] + " " + b[i]);
+		}
+	}
+
+	public static void assertEquals(int a[], int b[]) {
+		for (int i = 0; i < a.length; i++) {
+			int diff = Math.abs(a[i] - b[i]);
+			if (diff != 0)
+				throw new RuntimeException("Element " + i + " not equals. " + a[i] + " " + b[i]);
+		}
+	}
+
+	public static void assertEquals(long a[], long b[]) {
+		for (int i = 0; i < a.length; i++) {
+			long diff = Math.abs(a[i] - b[i]);
+			if (diff != 0)
+				throw new RuntimeException("Element " + i + " not equals. " + a[i] + " " + b[i]);
+		}
+	}
+
 	public static void assertEquals(float a[], float b[], float tol) {
 		for (int i = 0; i < a.length; i++) {
 			double diff = Math.abs(a[i] - b[i]);

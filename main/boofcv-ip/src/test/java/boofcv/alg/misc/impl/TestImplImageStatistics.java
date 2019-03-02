@@ -18,14 +18,7 @@
 
 package boofcv.alg.misc.impl;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
-
 class TestImplImageStatistics {
-	@Test
-	void implement() {
-		fail("implement");
-	}
+	// intentionally empty. This is tested by ImageStatistics
 }
 

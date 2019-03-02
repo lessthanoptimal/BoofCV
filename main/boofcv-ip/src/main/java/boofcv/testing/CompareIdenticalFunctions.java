@@ -22,6 +22,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.Planar;
+import org.ejml.UtilEjml;
 
 import java.lang.reflect.Method;
 
@@ -96,6 +97,20 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 			if( targetParam[i] == null ) {
 				continue;
 			}
+			if( targetParam[i].getClass() == byte[].class ) {
+				BoofTesting.assertEquals((byte[])validationParam[i],(byte[])targetParam[i]);
+			} else if( targetParam[i].getClass() == short[].class ) {
+				BoofTesting.assertEquals((short[])validationParam[i],(short[])targetParam[i]);
+			} else if( targetParam[i].getClass() == int[].class ) {
+				BoofTesting.assertEquals((int[])validationParam[i],(int[])targetParam[i]);
+			} else if( targetParam[i].getClass() == long[].class ) {
+				BoofTesting.assertEquals((long[])validationParam[i],(long[])targetParam[i]);
+			} else if( targetParam[i].getClass() == float[].class ) {
+				BoofTesting.assertEquals((float[]) validationParam[i], (float[]) targetParam[i], UtilEjml.TEST_F32);
+			} else if( targetParam[i].getClass() == double[].class ) {
+				BoofTesting.assertEquals((double[]) validationParam[i], (double[]) targetParam[i], UtilEjml.TEST_F64);
+			}
+
 			if( !ImageBase.class.isAssignableFrom(targetParam[i].getClass()) )
 				continue;
 
@@ -103,6 +118,15 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 			ImageBase v = (ImageBase)validationParam[i];
 
 			BoofTesting.assertEqualsRelative(v, t, 1e-4);// todo is this tolerance too big?  some operations with a slightly different ordering seem to require it
+		}
+
+		if( targetResult != null ) {
+			try {
+				double error = ((Number)targetResult).doubleValue() - ((Number)validationResult).doubleValue();
+				if( Math.abs(error) > 1e-3 ) {
+					throw new RuntimeException("Failed");
+				}
+			} catch( RuntimeException ignore ){}
 		}
 	}
 }
