@@ -25,7 +25,6 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
-import java.util.Arrays;
 
 /**
  * Computes statistical properties of pixels inside an image.
@@ -263,15 +262,10 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayU8 input , int minValue , int histogram[] ) {
-		Arrays.fill(histogram,0);
-
-		for( int y = 0; y < input.height; y++ ) {
-			int index = input.startIndex + y*input.stride;
-			int end = index + input.width;
-
-			while( index < end ) {
-				histogram[(input.data[index++]& 0xFF) - minValue ]++;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplImageStatistics_MT.histogram(input,minValue,histogram);
+		} else {
+			ImplImageStatistics.histogram(input,minValue,histogram);
 		}
 	}
 
@@ -499,15 +493,10 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayS8 input , int minValue , int histogram[] ) {
-		Arrays.fill(histogram,0);
-
-		for( int y = 0; y < input.height; y++ ) {
-			int index = input.startIndex + y*input.stride;
-			int end = index + input.width;
-
-			while( index < end ) {
-				histogram[(input.data[index++]) - minValue ]++;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplImageStatistics_MT.histogram(input,minValue,histogram);
+		} else {
+			ImplImageStatistics.histogram(input,minValue,histogram);
 		}
 	}
 
@@ -735,15 +724,10 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayU16 input , int minValue , int histogram[] ) {
-		Arrays.fill(histogram,0);
-
-		for( int y = 0; y < input.height; y++ ) {
-			int index = input.startIndex + y*input.stride;
-			int end = index + input.width;
-
-			while( index < end ) {
-				histogram[(input.data[index++]& 0xFFFF) - minValue ]++;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplImageStatistics_MT.histogram(input,minValue,histogram);
+		} else {
+			ImplImageStatistics.histogram(input,minValue,histogram);
 		}
 	}
 
@@ -971,15 +955,10 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayS16 input , int minValue , int histogram[] ) {
-		Arrays.fill(histogram,0);
-
-		for( int y = 0; y < input.height; y++ ) {
-			int index = input.startIndex + y*input.stride;
-			int end = index + input.width;
-
-			while( index < end ) {
-				histogram[(input.data[index++]) - minValue ]++;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplImageStatistics_MT.histogram(input,minValue,histogram);
+		} else {
+			ImplImageStatistics.histogram(input,minValue,histogram);
 		}
 	}
 
@@ -1207,15 +1186,10 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayS32 input , int minValue , int histogram[] ) {
-		Arrays.fill(histogram,0);
-
-		for( int y = 0; y < input.height; y++ ) {
-			int index = input.startIndex + y*input.stride;
-			int end = index + input.width;
-
-			while( index < end ) {
-				histogram[(input.data[index++]) - minValue ]++;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplImageStatistics_MT.histogram(input,minValue,histogram);
+		} else {
+			ImplImageStatistics.histogram(input,minValue,histogram);
 		}
 	}
 
@@ -1443,15 +1417,10 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayS64 input , long minValue , int histogram[] ) {
-		Arrays.fill(histogram,0);
-
-		for( int y = 0; y < input.height; y++ ) {
-			int index = input.startIndex + y*input.stride;
-			int end = index + input.width;
-
-			while( index < end ) {
-				histogram[(int)(input.data[index++] - minValue)]++;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplImageStatistics_MT.histogram(input,minValue,histogram);
+		} else {
+			ImplImageStatistics.histogram(input,minValue,histogram);
 		}
 	}
 
@@ -1679,15 +1648,10 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayF32 input , float minValue , int histogram[] ) {
-		Arrays.fill(histogram,0);
-
-		for( int y = 0; y < input.height; y++ ) {
-			int index = input.startIndex + y*input.stride;
-			int end = index + input.width;
-
-			while( index < end ) {
-				histogram[(int)(input.data[index++] - minValue)]++;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplImageStatistics_MT.histogram(input,minValue,histogram);
+		} else {
+			ImplImageStatistics.histogram(input,minValue,histogram);
 		}
 	}
 
@@ -1915,15 +1879,10 @@ public class ImageStatistics {
 	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
 	 */
 	public static void histogram( GrayF64 input , double minValue , int histogram[] ) {
-		Arrays.fill(histogram,0);
-
-		for( int y = 0; y < input.height; y++ ) {
-			int index = input.startIndex + y*input.stride;
-			int end = index + input.width;
-
-			while( index < end ) {
-				histogram[(int)(input.data[index++] - minValue)]++;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplImageStatistics_MT.histogram(input,minValue,histogram);
+		} else {
+			ImplImageStatistics.histogram(input,minValue,histogram);
 		}
 	}
 

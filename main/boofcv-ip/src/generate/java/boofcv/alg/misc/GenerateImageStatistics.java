@@ -103,22 +103,10 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
 				"\t */\n" +
 				"\tpublic static void histogram( "+input.getSingleBandName()+" input , "+sumType+" minValue , int histogram[] ) {\n" +
-				"\t\tArrays.fill(histogram,0);\n" +
-				"\n" +
-				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
-				"\t\t\tint index = input.startIndex + y*input.stride;\n" +
-				"\t\t\tint end = index + input.width;\n" +
-				"\n" +
-				"\t\t\twhile( index < end ) {\n");
-		if( input.isInteger()) {
-			if( input.getNumBits() == 64 )
-				out.print("\t\t\t\thistogram[(int)(input.data[index++] - minValue)]++;\n");
-			else
-				out.print("\t\t\t\thistogram[(input.data[index++]"+input.getBitWise()+") - minValue ]++;\n");
-		} else {
-			out.print("\t\t\t\thistogram[(int)(input.data[index++] - minValue)]++;\n");
-		}
-		out.print("\t\t\t}\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplImageStatistics_MT.histogram(input,minValue,histogram);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplImageStatistics.histogram(input,minValue,histogram);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}

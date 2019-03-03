@@ -22,7 +22,9 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Computes statistical properties of pixels inside an image.
@@ -173,15 +175,25 @@ public class ImplImageStatistics_MT {
 		return total;}).intValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayU8 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayU8 input , int minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
-		for( int y = 0; y < input.height; y++ ) {
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(input.data[index++]& 0xFF) - minValue ]++;
+				h[(input.data[index++]& 0xFF) - minValue ]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
 			}
 		}
 	}
@@ -323,15 +335,25 @@ public class ImplImageStatistics_MT {
 		return total;}).intValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayS8 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayS8 input , int minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
-		for( int y = 0; y < input.height; y++ ) {
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(input.data[index++]) - minValue ]++;
+				h[(input.data[index++]) - minValue ]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
 			}
 		}
 	}
@@ -473,15 +495,25 @@ public class ImplImageStatistics_MT {
 		return total;}).intValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayU16 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayU16 input , int minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
-		for( int y = 0; y < input.height; y++ ) {
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(input.data[index++]& 0xFFFF) - minValue ]++;
+				h[(input.data[index++]& 0xFFFF) - minValue ]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
 			}
 		}
 	}
@@ -623,15 +655,25 @@ public class ImplImageStatistics_MT {
 		return total;}).intValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayS16 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayS16 input , int minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
-		for( int y = 0; y < input.height; y++ ) {
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(input.data[index++]) - minValue ]++;
+				h[(input.data[index++]) - minValue ]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
 			}
 		}
 	}
@@ -773,15 +815,25 @@ public class ImplImageStatistics_MT {
 		return total;}).intValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayS32 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayS32 input , int minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
-		for( int y = 0; y < input.height; y++ ) {
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(input.data[index++]) - minValue ]++;
+				h[(input.data[index++]) - minValue ]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
 			}
 		}
 	}
@@ -923,15 +975,25 @@ public class ImplImageStatistics_MT {
 		return total;}).longValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayS64 input , long minValue , int histogram[] ) {
+	public static void histogram( GrayS64 input , long minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
-		for( int y = 0; y < input.height; y++ ) {
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(int)(input.data[index++] - minValue)]++;
+				h[(int)(input.data[index++] - minValue)]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
 			}
 		}
 	}
@@ -1073,15 +1135,25 @@ public class ImplImageStatistics_MT {
 		return total;}).floatValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayF32 input , float minValue , int histogram[] ) {
+	public static void histogram( GrayF32 input , float minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
-		for( int y = 0; y < input.height; y++ ) {
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(int)(input.data[index++] - minValue)]++;
+				h[(int)(input.data[index++] - minValue)]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
 			}
 		}
 	}
@@ -1223,15 +1295,25 @@ public class ImplImageStatistics_MT {
 		return total;}).doubleValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayF64 input , double minValue , int histogram[] ) {
+	public static void histogram( GrayF64 input , double minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
-		for( int y = 0; y < input.height; y++ ) {
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(int)(input.data[index++] - minValue)]++;
+				h[(int)(input.data[index++] - minValue)]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
 			}
 		}
 	}

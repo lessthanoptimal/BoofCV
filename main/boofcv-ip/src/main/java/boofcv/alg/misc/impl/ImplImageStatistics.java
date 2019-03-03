@@ -22,6 +22,7 @@ import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
 import java.util.Arrays;
+
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
@@ -202,17 +203,29 @@ public class ImplImageStatistics {
 		//CONCURRENT_ABOVE return total;}).intValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayU8 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayU8 input , int minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
+		//CONCURRENT_INLINE final List<int[]> list = new ArrayList<>();
+		//CONCURRENT_INLINE BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		//CONCURRENT_BELOW final int[] h = new int[histogram.length];
+		final int[] h = histogram;
+		//CONCURRENT_BELOW for( int y = y0; y < y1; y++ ) {
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(input.data[index++]& 0xFF) - minValue ]++;
+				h[(input.data[index++]& 0xFF) - minValue ]++;
 			}
 		}
+		//CONCURRENT_INLINE synchronized(list){list.add(h);}});
+		//CONCURRENT_INLINE for (int i = 0; i < list.size(); i++) {
+		//CONCURRENT_INLINE 	int[] h = list.get(i);
+		//CONCURRENT_INLINE 	for (int j = 0; j < histogram.length; j++) {
+		//CONCURRENT_INLINE 		histogram[j] += h[j];
+		//CONCURRENT_INLINE 	}
+		//CONCURRENT_INLINE }
 	}
 
 	public static int min( byte[] array , int startIndex , int rows , int columns , int stride ) {
@@ -381,17 +394,29 @@ public class ImplImageStatistics {
 		//CONCURRENT_ABOVE return total;}).intValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayS8 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayS8 input , int minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
+		//CONCURRENT_INLINE final List<int[]> list = new ArrayList<>();
+		//CONCURRENT_INLINE BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		//CONCURRENT_BELOW final int[] h = new int[histogram.length];
+		final int[] h = histogram;
+		//CONCURRENT_BELOW for( int y = y0; y < y1; y++ ) {
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(input.data[index++]) - minValue ]++;
+				h[(input.data[index++]) - minValue ]++;
 			}
 		}
+		//CONCURRENT_INLINE synchronized(list){list.add(h);}});
+		//CONCURRENT_INLINE for (int i = 0; i < list.size(); i++) {
+		//CONCURRENT_INLINE 	int[] h = list.get(i);
+		//CONCURRENT_INLINE 	for (int j = 0; j < histogram.length; j++) {
+		//CONCURRENT_INLINE 		histogram[j] += h[j];
+		//CONCURRENT_INLINE 	}
+		//CONCURRENT_INLINE }
 	}
 
 	public static int minU( short[] array , int startIndex , int rows , int columns , int stride ) {
@@ -560,17 +585,29 @@ public class ImplImageStatistics {
 		//CONCURRENT_ABOVE return total;}).intValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayU16 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayU16 input , int minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
+		//CONCURRENT_INLINE final List<int[]> list = new ArrayList<>();
+		//CONCURRENT_INLINE BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		//CONCURRENT_BELOW final int[] h = new int[histogram.length];
+		final int[] h = histogram;
+		//CONCURRENT_BELOW for( int y = y0; y < y1; y++ ) {
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(input.data[index++]& 0xFFFF) - minValue ]++;
+				h[(input.data[index++]& 0xFFFF) - minValue ]++;
 			}
 		}
+		//CONCURRENT_INLINE synchronized(list){list.add(h);}});
+		//CONCURRENT_INLINE for (int i = 0; i < list.size(); i++) {
+		//CONCURRENT_INLINE 	int[] h = list.get(i);
+		//CONCURRENT_INLINE 	for (int j = 0; j < histogram.length; j++) {
+		//CONCURRENT_INLINE 		histogram[j] += h[j];
+		//CONCURRENT_INLINE 	}
+		//CONCURRENT_INLINE }
 	}
 
 	public static int min( short[] array , int startIndex , int rows , int columns , int stride ) {
@@ -739,17 +776,29 @@ public class ImplImageStatistics {
 		//CONCURRENT_ABOVE return total;}).intValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayS16 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayS16 input , int minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
+		//CONCURRENT_INLINE final List<int[]> list = new ArrayList<>();
+		//CONCURRENT_INLINE BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		//CONCURRENT_BELOW final int[] h = new int[histogram.length];
+		final int[] h = histogram;
+		//CONCURRENT_BELOW for( int y = y0; y < y1; y++ ) {
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(input.data[index++]) - minValue ]++;
+				h[(input.data[index++]) - minValue ]++;
 			}
 		}
+		//CONCURRENT_INLINE synchronized(list){list.add(h);}});
+		//CONCURRENT_INLINE for (int i = 0; i < list.size(); i++) {
+		//CONCURRENT_INLINE 	int[] h = list.get(i);
+		//CONCURRENT_INLINE 	for (int j = 0; j < histogram.length; j++) {
+		//CONCURRENT_INLINE 		histogram[j] += h[j];
+		//CONCURRENT_INLINE 	}
+		//CONCURRENT_INLINE }
 	}
 
 	public static int min( int[] array , int startIndex , int rows , int columns , int stride ) {
@@ -918,17 +967,29 @@ public class ImplImageStatistics {
 		//CONCURRENT_ABOVE return total;}).intValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayS32 input , int minValue , int histogram[] ) {
+	public static void histogram( GrayS32 input , int minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
+		//CONCURRENT_INLINE final List<int[]> list = new ArrayList<>();
+		//CONCURRENT_INLINE BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		//CONCURRENT_BELOW final int[] h = new int[histogram.length];
+		final int[] h = histogram;
+		//CONCURRENT_BELOW for( int y = y0; y < y1; y++ ) {
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(input.data[index++]) - minValue ]++;
+				h[(input.data[index++]) - minValue ]++;
 			}
 		}
+		//CONCURRENT_INLINE synchronized(list){list.add(h);}});
+		//CONCURRENT_INLINE for (int i = 0; i < list.size(); i++) {
+		//CONCURRENT_INLINE 	int[] h = list.get(i);
+		//CONCURRENT_INLINE 	for (int j = 0; j < histogram.length; j++) {
+		//CONCURRENT_INLINE 		histogram[j] += h[j];
+		//CONCURRENT_INLINE 	}
+		//CONCURRENT_INLINE }
 	}
 
 	public static long min( long[] array , int startIndex , int rows , int columns , int stride ) {
@@ -1097,17 +1158,29 @@ public class ImplImageStatistics {
 		//CONCURRENT_ABOVE return total;}).longValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayS64 input , long minValue , int histogram[] ) {
+	public static void histogram( GrayS64 input , long minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
+		//CONCURRENT_INLINE final List<int[]> list = new ArrayList<>();
+		//CONCURRENT_INLINE BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		//CONCURRENT_BELOW final int[] h = new int[histogram.length];
+		final int[] h = histogram;
+		//CONCURRENT_BELOW for( int y = y0; y < y1; y++ ) {
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(int)(input.data[index++] - minValue)]++;
+				h[(int)(input.data[index++] - minValue)]++;
 			}
 		}
+		//CONCURRENT_INLINE synchronized(list){list.add(h);}});
+		//CONCURRENT_INLINE for (int i = 0; i < list.size(); i++) {
+		//CONCURRENT_INLINE 	int[] h = list.get(i);
+		//CONCURRENT_INLINE 	for (int j = 0; j < histogram.length; j++) {
+		//CONCURRENT_INLINE 		histogram[j] += h[j];
+		//CONCURRENT_INLINE 	}
+		//CONCURRENT_INLINE }
 	}
 
 	public static float min( float[] array , int startIndex , int rows , int columns , int stride ) {
@@ -1276,17 +1349,29 @@ public class ImplImageStatistics {
 		//CONCURRENT_ABOVE return total;}).floatValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayF32 input , float minValue , int histogram[] ) {
+	public static void histogram( GrayF32 input , float minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
+		//CONCURRENT_INLINE final List<int[]> list = new ArrayList<>();
+		//CONCURRENT_INLINE BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		//CONCURRENT_BELOW final int[] h = new int[histogram.length];
+		final int[] h = histogram;
+		//CONCURRENT_BELOW for( int y = y0; y < y1; y++ ) {
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(int)(input.data[index++] - minValue)]++;
+				h[(int)(input.data[index++] - minValue)]++;
 			}
 		}
+		//CONCURRENT_INLINE synchronized(list){list.add(h);}});
+		//CONCURRENT_INLINE for (int i = 0; i < list.size(); i++) {
+		//CONCURRENT_INLINE 	int[] h = list.get(i);
+		//CONCURRENT_INLINE 	for (int j = 0; j < histogram.length; j++) {
+		//CONCURRENT_INLINE 		histogram[j] += h[j];
+		//CONCURRENT_INLINE 	}
+		//CONCURRENT_INLINE }
 	}
 
 	public static double min( double[] array , int startIndex , int rows , int columns , int stride ) {
@@ -1455,17 +1540,29 @@ public class ImplImageStatistics {
 		//CONCURRENT_ABOVE return total;}).doubleValue()/(img.width*img.height);
 	}
 
-	public static void histogram( GrayF64 input , double minValue , int histogram[] ) {
+	public static void histogram( GrayF64 input , double minValue , int[] histogram ) {
 		Arrays.fill(histogram,0);
 
+		//CONCURRENT_INLINE final List<int[]> list = new ArrayList<>();
+		//CONCURRENT_INLINE BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		//CONCURRENT_BELOW final int[] h = new int[histogram.length];
+		final int[] h = histogram;
+		//CONCURRENT_BELOW for( int y = y0; y < y1; y++ ) {
 		for( int y = 0; y < input.height; y++ ) {
 			int index = input.startIndex + y*input.stride;
 			int end = index + input.width;
 
 			while( index < end ) {
-				histogram[(int)(input.data[index++] - minValue)]++;
+				h[(int)(input.data[index++] - minValue)]++;
 			}
 		}
+		//CONCURRENT_INLINE synchronized(list){list.add(h);}});
+		//CONCURRENT_INLINE for (int i = 0; i < list.size(); i++) {
+		//CONCURRENT_INLINE 	int[] h = list.get(i);
+		//CONCURRENT_INLINE 	for (int j = 0; j < histogram.length; j++) {
+		//CONCURRENT_INLINE 		histogram[j] += h[j];
+		//CONCURRENT_INLINE 	}
+		//CONCURRENT_INLINE }
 	}
 
 }

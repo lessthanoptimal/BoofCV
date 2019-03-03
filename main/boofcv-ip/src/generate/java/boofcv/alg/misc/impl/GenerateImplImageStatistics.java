@@ -45,8 +45,10 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 	private void printPreamble() throws FileNotFoundException {
 		out.print("import boofcv.struct.image.*;\n" +
 				"import javax.annotation.Generated;\n" +
-				"import boofcv.alg.InputSanityCheck;\n" +
+				"import java.util.ArrayList;\n" +
 				"import java.util.Arrays;\n" +
+				"import java.util.List;\n" +
+				"\n" +
 				"//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;\n" +
 				"\n" +
 				"/**\n" +
@@ -87,14 +89,18 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 		}
 	}
 
-	// TODO Collect local histograms and then combine them together. Need to create a new model for this
 	public void printHistogram() {
 		String sumType = input.getSumType();
 
 		out.print(
-				"\tpublic static void histogram( "+input.getSingleBandName()+" input , "+sumType+" minValue , int histogram[] ) {\n" +
+				"\tpublic static void histogram( "+input.getSingleBandName()+" input , "+sumType+" minValue , int[] histogram ) {\n" +
 				"\t\tArrays.fill(histogram,0);\n" +
 				"\n" +
+				"\t\t//CONCURRENT_INLINE final List<int[]> list = new ArrayList<>();\n" +
+				"\t\t//CONCURRENT_INLINE BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{\n" +
+				"\t\t//CONCURRENT_BELOW final int[] h = new int[histogram.length];\n" +
+				"\t\tfinal int[] h = histogram;\n" +
+				"\t\t//CONCURRENT_BELOW for( int y = y0; y < y1; y++ ) {\n" +
 				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\tint index = input.startIndex + y*input.stride;\n" +
 				"\t\t\tint end = index + input.width;\n" +
@@ -102,14 +108,21 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 				"\t\t\twhile( index < end ) {\n");
 		if( input.isInteger()) {
 			if( input.getNumBits() == 64 )
-				out.print("\t\t\t\thistogram[(int)(input.data[index++] - minValue)]++;\n");
+				out.print("\t\t\t\th[(int)(input.data[index++] - minValue)]++;\n");
 			else
-				out.print("\t\t\t\thistogram[(input.data[index++]"+input.getBitWise()+") - minValue ]++;\n");
+				out.print("\t\t\t\th[(input.data[index++]"+input.getBitWise()+") - minValue ]++;\n");
 		} else {
-			out.print("\t\t\t\thistogram[(int)(input.data[index++] - minValue)]++;\n");
+			out.print("\t\t\t\th[(int)(input.data[index++] - minValue)]++;\n");
 		}
 		out.print("\t\t\t}\n" +
 				"\t\t}\n" +
+				"\t\t//CONCURRENT_INLINE synchronized(list){list.add(h);}});\n" +
+				"\t\t//CONCURRENT_INLINE for (int i = 0; i < list.size(); i++) {\n" +
+				"\t\t//CONCURRENT_INLINE \tint[] h = list.get(i);\n" +
+				"\t\t//CONCURRENT_INLINE \tfor (int j = 0; j < histogram.length; j++) {\n" +
+				"\t\t//CONCURRENT_INLINE \t\thistogram[j] += h[j];\n" +
+				"\t\t//CONCURRENT_INLINE \t}\n" +
+				"\t\t//CONCURRENT_INLINE }\n" +
 				"\t}\n\n");
 	}
 

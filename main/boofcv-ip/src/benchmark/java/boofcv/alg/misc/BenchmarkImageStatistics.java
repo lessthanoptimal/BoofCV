@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 2)
+@Warmup(iterations = 3)
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
 @Fork(value=1)
