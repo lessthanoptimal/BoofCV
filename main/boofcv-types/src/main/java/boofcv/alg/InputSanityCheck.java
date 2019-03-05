@@ -58,8 +58,9 @@ public class InputSanityCheck {
 	public static <T extends ImageBase<T>> T checkDeclare(T input, T output) {
 		if (output == null) {
 			output = (T) input.createNew(input.width, input.height);
-		} else if (output.width != input.width || output.height != input.height)
-			throw new IllegalArgumentException("Width and/or height of input and output do not match. "+input.width+"x"+input.height+" "+output.width+"x"+output.height);
+		} else {
+			output.reshape(input.width, input.height);
+		}
 		return output;
 	}
 
@@ -70,9 +71,10 @@ public class InputSanityCheck {
 	public static <In extends ImageGray,Out extends ImageGray>
 	Out checkDeclare(In input, Out output , Class<Out> typeOut) {
 		if (output == null) {
-			output = (Out) GeneralizedImageOps.createSingleBand(typeOut,input.width, input.height);
-		} else if (output.width != input.width || output.height != input.height)
-			throw new IllegalArgumentException("Width and/or height of input and output do not match. "+input.width+"x"+input.height+" "+output.width+"x"+output.height);
+			output = (Out) GeneralizedImageOps.createSingleBand(typeOut, input.width, input.height);
+		} else {
+			output.reshape(input.width, input.height);
+		}
 		return output;
 	}
 
