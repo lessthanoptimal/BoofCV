@@ -37,12 +37,14 @@ import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.UtilEjml;
+import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.RandomMatrices_DDRM;
 import org.ejml.equation.Equation;
+import org.ejml.ops.MatrixFeatures_D;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 
@@ -503,7 +505,7 @@ class TestPerspectiveOps {
 	}
 
 	@Test
-	void multTranA_triple() {
+	void multTranA_triple_dense() {
 		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(3,3,rand);
 		DMatrixRMaj B = RandomMatrices_DDRM.rectangle(3,3,rand);
 		DMatrixRMaj C = RandomMatrices_DDRM.rectangle(3,3,rand);
@@ -519,7 +521,7 @@ class TestPerspectiveOps {
 	}
 
 	@Test
-	void multTranC_triple() {
+	void multTranC_triple_dense() {
 		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(3,3,rand);
 		DMatrixRMaj B = RandomMatrices_DDRM.rectangle(3,3,rand);
 		DMatrixRMaj C = RandomMatrices_DDRM.rectangle(3,3,rand);
@@ -532,6 +534,45 @@ class TestPerspectiveOps {
 		PerspectiveOps.multTranC(A,B,C,D);
 
 		assertTrue(MatrixFeatures_DDRM.isEquals(expected,D,UtilEjml.TEST_F64));
+	}
+
+	DMatrix3x3 random3x3() {
+		DMatrixRMaj A = RandomMatrices_DDRM.rectangle(3,3,rand);
+		DMatrix3x3 f = new DMatrix3x3();
+		f.set(A);
+		return f;
+	}
+
+	@Test
+	void multTranA_triple_fixed() {
+		DMatrix3x3 A = random3x3();
+		DMatrix3x3 B = random3x3();
+		DMatrix3x3 C = random3x3();
+		DMatrix3x3 D = random3x3();
+
+		Equation eq = new Equation(A,"A",B,"B",C,"C");
+		eq.process("D=A'*B*C");
+		DMatrixRMaj expected = eq.lookupDDRM("D");
+
+		PerspectiveOps.multTranA(A,B,C,D);
+
+		assertTrue(MatrixFeatures_D.isEquals(expected,D));
+	}
+
+	@Test
+	void multTranC_triple_fixed() {
+		DMatrix3x3 A = random3x3();
+		DMatrix3x3 B = random3x3();
+		DMatrix3x3 C = random3x3();
+		DMatrix3x3 D = random3x3();
+
+		Equation eq = new Equation(A,"A",B,"B",C,"C");
+		eq.process("D=A*B*C'");
+		DMatrixRMaj expected = eq.lookupDDRM("D");
+
+		PerspectiveOps.multTranC(A,B,C,D);
+
+		assertTrue(MatrixFeatures_D.isEquals(expected,D));
 	}
 
 	@Test

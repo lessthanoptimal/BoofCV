@@ -75,13 +75,16 @@ Version : 0.33
   * Removed Lena as default image since that image is no longer considered appropriate by some journals.
      - https://en.wikipedia.org/wiki/Lenna
 
+TODO Regression
+  - homography estimation
+  - QR Code fiducial 3D pose regression
 
 TODO This Release
   - Examples
     * Planar World Simulator
     * Point Cloud Viewer
   - Circle Target Detection
-    * Ability to select ellipse center instead of tangent points
+    * three choices; center point, tangent points, or conics.
   - Demonstrations
     * Modernize stabilization and mosaic
     * Associate with Fundamental - Select different algs + inliers
@@ -89,10 +92,6 @@ TODO This Release
   - Cheirality
     * Will also require a linear programming solution, e.g. simplex
   - Remove dependency on OpenCV in Applications to reduce file size
-
-TODO Regression
-  - homography estimation
-  - QR Code fiducial 3D pose regression
 
 ---------------------------------------------
 Date    : 2018/12/26

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks{
 		createScene(N,true);
 
 		// compute essential
-		assertTrue(alg.process(pairs,solution));
+		assertTrue(alg.process(pairs2D,solution));
 
 		// validate by testing essential properties
 
@@ -70,7 +70,7 @@ public class TestHomographyTotalLeastSquares extends CommonHomographyChecks{
 		assertTrue(NormOps_DDRM.normF(solution) > 0.001 );
 
 		// see if it follows the epipolar constraint
-		for( AssociatedPair p : pairs ) {
+		for( AssociatedPair p : pairs2D) {
 			Point2D_F64 a = GeometryMath_F64.mult(solution,p.p1,new Point2D_F64());
 
 			double diff = a.distance(p.p2);

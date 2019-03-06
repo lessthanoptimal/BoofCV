@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,18 +22,26 @@ package boofcv.alg.geo.h;
 import boofcv.alg.geo.LowLevelMultiViewOps;
 import boofcv.alg.geo.NormalizationPoint2D;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedPair3D;
+import boofcv.struct.geo.AssociatedPairConic;
+import georegression.geometry.UtilCurves_F64;
+import georegression.struct.curve.ConicGeneral_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
+import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
+import org.ejml.dense.fixed.CommonOps_DDF3;
 import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
 import org.ejml.interfaces.SolveNullSpace;
 import org.ejml.simple.SimpleMatrix;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
  * <p>
- * Using linear algebra it computes a planar homography matrix using for or more points. Typically used
- * as an initial estimate for a non-linear optimization.
+ * Using linear algebra it computes a planar homography matrix using 2D points, 3D points, or conics. Typically used
+ * as an initial estimate for a non-linear optimization. See [1] for 2D and 3D points, and [2] for conics.
  * </p>
  *
  * <p>
@@ -44,8 +52,10 @@ import java.util.List;
  * </p>
  *
  * <p>
- * Primarily based on chapter 4 in, "Multiple View Geometry in Computer Vision"  2nd Ed. but uses normalization
- * from "An Invitation to 3-D Vision" 2004.
+ * [1] Chapter 4, "Multiple View Geometry in Computer Vision"  2nd Ed. but uses normalization
+ * from "An Invitation to 3-D Vision" 2004.<br>
+ * [2] Kannala, Juho, Mikko Salo, and Janne Heikkilä.  "Algorithms for Computing a Planar Homography from
+ * Conics in Correspondence." BMVC. 2006.
  * </p>
  *
  * @author Peter Abeles
@@ -65,6 +75,8 @@ public class HomographyDirectLinearTransform {
 
 	// normalize image coordinates to avoid numerical errors?
 	boolean normalize;
+	// if it's actually normalizing points
+	private boolean shouldNormalize;
 
 	/**
 	 * Configure homography calculation
@@ -85,29 +97,63 @@ public class HomographyDirectLinearTransform {
 	 *
 	 * @param points A set of observed image points that are generated from a planar object.  Minimum of 4 pairs required.
 	 * @param foundH Output: Storage for the found solution. 3x3 matrix.
-	 * @return true if the calculation was a success.
+	 * @return True if successful. False if it failed.
 	 */
 	public boolean process( List<AssociatedPair> points , DMatrixRMaj foundH ) {
-		if( points.size() < 4 )
-			throw new IllegalArgumentException("Must be at least 4 points.");
+		return process(points,null,null,foundH);
+	}
 
-		if( normalize ) {
-			LowLevelMultiViewOps.computeNormalization(points, N1, N2);
+	/**
+	 * More versatile process function. Lets any of the supporting data structures be passed in.
+	 *
+	 * @param points2D List of 2D point associations. Can be null.
+	 * @param points3D List of 3D point or 2D line associations. Can be null.
+	 * @param conics List of conics. Can be null
+	 * @param foundH (Output) The estimated homography
+	 * @return True if successful. False if it failed.
+	 */
+	public boolean process( @Nullable List<AssociatedPair> points2D ,
+							@Nullable List<AssociatedPair3D> points3D ,
+							@Nullable List<AssociatedPairConic> conics ,
+							DMatrixRMaj foundH ) {
+		int num2D = points2D != null ? points2D.size() : 0;
+		int num3D = points3D != null ? points3D.size() : 0;
+		int numConic = conics != null ? conics.size() : 0;
 
-			createANormalized(points, A);
-		} else {
-			createA(points,A);
+		int numRows = computeTotalRows(num2D,num3D,numConic);
+
+		if( numRows < 8 )
+			throw new IllegalArgumentException("Must be at least 8 constraints. Found "+numRows);
+
+		// only 2D points need to be normalzied because of the implicit z=1
+		// 3D points are homogenous or lines and the vector can be normalized to 1
+		// same goes for the conic equation
+		shouldNormalize = normalize && points2D != null;
+
+		if( shouldNormalize ) {
+			LowLevelMultiViewOps.computeNormalization(points2D, N1, N2);
 		}
+		A.reshape(numRows,9);
+		A.zero();
+
+		int rows = 0;
+		if( points2D != null )
+			rows = addPoints2D(points2D,A,rows);
+		if( points3D != null )
+			rows = addPoints3D(points3D,A,rows);
+		if( conics != null )
+			addConics(conics,A,rows);
 
 		// compute the homograph matrix up to a scale factor
 		if (computeH(A,foundH))
 			return false;
 
-		if( normalize )
+		if( shouldNormalize )
 			undoNormalizationH(foundH,N1,N2);
 
 		// pick a good scale and sign for H
-		adjust.adjust(foundH,points.get(0));
+		if( points2D != null )
+			adjust.adjust(foundH,points2D.get(0));
 
 		return true;
 	}
@@ -140,72 +186,122 @@ public class HomographyDirectLinearTransform {
 		M.set(result.getDDRM());
 	}
 
-	/**
-	 * Compute the 'A' matrix used to solve for H from normalized points.
-	 */
-	protected void createANormalized(List<AssociatedPair> points, DMatrixRMaj A) {
-		A.reshape(points.size()*2,9, false);
-		A.zero();
-
-		Point2D_F64 f_norm = new Point2D_F64();
-		Point2D_F64 s_norm = new Point2D_F64();
-
-		final int size = points.size();
-		for( int i = 0; i < size; i++ ) {
-			AssociatedPair p = points.get(i);
-
-			// the first image
-			Point2D_F64 f = p.p1;
-			// the second image
-			Point2D_F64 s = p.p2;
-
-			// normalize the points
-			N1.apply(f, f_norm);
-			N2.apply(s, s_norm);
-
-			A.set(i*2   , 3 , -f_norm.x);
-			A.set(i*2   , 4 , -f_norm.y);
-			A.set(i*2   , 5 , -1);
-			A.set(i*2   , 6 , s_norm.y*f_norm.x);
-			A.set(i*2   , 7 , s_norm.y*f_norm.y);
-			A.set(i*2   , 8 , s_norm.y);
-			A.set(i*2+1 , 0 , f_norm.x);
-			A.set(i*2+1 , 1 , f_norm.y);
-			A.set(i*2+1 , 2 , 1);
-			A.set(i*2+1 , 6 , -s_norm.x*f_norm.x);
-			A.set(i*2+1 , 7 , -s_norm.x*f_norm.y);
-			A.set(i*2+1 , 8 , -s_norm.x);
+	private void adjustPoint( AssociatedPair pair , Point2D_F64 a1 , Point2D_F64 a2 ) {
+		if( shouldNormalize ) {
+			N1.apply(pair.p1, a1);
+			N2.apply(pair.p2, a2);
+		} else {
+			a1.set(pair.p1);
+			a2.set(pair.p2);
 		}
 	}
 
-/**
-	 * Compute the 'A' matrix used to solve for H from un-normalized points.
-	 */
-	protected void createA(List<AssociatedPair> points, DMatrixRMaj A) {
-		A.reshape(points.size()*2,9, false);
-		A.zero();
+	int computeTotalRows( int num2D , int num3D , int numConic ) {
+		return 2*num2D + 2*num3D + 3*numConic;
+	}
 
-		final int size = points.size();
-		for( int i = 0; i < size; i++ ) {
+	private void adjustPoint(AssociatedPair3D pair , Point3D_F64 a1 , Point3D_F64 a2 ) {
+		if( shouldNormalize ) {
+			N1.apply(pair.p1, a1);
+			N2.apply(pair.p2, a2);
+		} else {
+			a1.set(pair.p1);
+			a2.set(pair.p2);
+		}
+	}
+
+	private void adjustConic(AssociatedPairConic pair , ConicGeneral_F64 a1 , ConicGeneral_F64 a2 ) {
+		if( shouldNormalize ) {
+			N1.apply(pair.p1, a1);
+			N2.apply(pair.p2, a2);
+		} else {
+			a1.set(pair.p1);
+			a2.set(pair.p2);
+		}
+	}
+
+	protected int addPoints2D( List<AssociatedPair> points , DMatrixRMaj A, int rows ) {
+		Point2D_F64 f = new Point2D_F64();
+		Point2D_F64 s = new Point2D_F64();
+
+		for( int i = 0; i < points.size(); i++ ) {
 			AssociatedPair p = points.get(i);
 
-			// the first image
-			Point2D_F64 f = p.p1;
-			// the second image
-			Point2D_F64 s = p.p2;
+			adjustPoint(p,f,s);
 
-			A.set(i*2   , 3 , -f.x);
-			A.set(i*2   , 4 , -f.y);
-			A.set(i*2   , 5 , -1);
-			A.set(i*2   , 6 , s.y*f.x);
-			A.set(i*2   , 7 , s.y*f.y);
-			A.set(i*2   , 8 , s.y);
-			A.set(i*2+1 , 0 , f.x);
-			A.set(i*2+1 , 1 , f.y);
-			A.set(i*2+1 , 2 , 1);
-			A.set(i*2+1 , 6 , -s.x*f.x);
-			A.set(i*2+1 , 7 , -s.x*f.y);
-			A.set(i*2+1 , 8 , -s.x);
+			A.set(rows , 3 , -f.x);
+			A.set(rows , 4 , -f.y);
+			A.set(rows , 5 , -1);
+			A.set(rows , 6 , s.y*f.x);
+			A.set(rows , 7 , s.y*f.y);
+			A.set(rows , 8 , s.y);
+			rows++;
+			A.set(rows , 0 , f.x);
+			A.set(rows , 1 , f.y);
+			A.set(rows , 2 , 1);
+			A.set(rows , 6 , -s.x*f.x);
+			A.set(rows , 7 , -s.x*f.y);
+			A.set(rows , 8 , -s.x);
+			rows++;
 		}
+		return rows;
+	}
+
+	protected int addPoints3D(List<AssociatedPair3D> points , DMatrixRMaj A, int rows ) {
+		Point3D_F64 f = new Point3D_F64();
+		Point3D_F64 s = new Point3D_F64();
+
+		for( int i = 0; i < points.size(); i++ ) {
+			AssociatedPair3D p = points.get(i);
+
+			adjustPoint(p,f,s);
+
+			A.set(rows , 3 , -s.z*f.x);
+			A.set(rows , 4 , -s.z*f.y);
+			A.set(rows , 5 , -s.z*f.z);
+			A.set(rows , 6 , s.y*f.x);
+			A.set(rows , 7 , s.y*f.y);
+			A.set(rows , 8 , s.y*f.z);
+			rows++;
+			A.set(rows , 0 , s.z*f.x);
+			A.set(rows , 1 , s.z*f.y);
+			A.set(rows , 2 , s.z*f.z);
+			A.set(rows , 6 , -s.x*f.x);
+			A.set(rows , 7 , -s.x*f.y);
+			A.set(rows , 8 , -s.x*f.z);
+			rows++;
+		}
+		return rows;
+	}
+
+	/**
+	 * inv(C[1]')*(C[2]')*H - H*invC[1]*C[2] == 0
+	 */
+	protected int addConics(List<AssociatedPairConic> points , DMatrixRMaj A, int rows ) {
+
+		DMatrix3x3 C1 = new DMatrix3x3();
+		DMatrix3x3 C2 = new DMatrix3x3();
+		DMatrix3x3 C1_inv = new DMatrix3x3();
+		DMatrix3x3 C2_inv = new DMatrix3x3();
+
+		DMatrix3x3 L = new DMatrix3x3();
+		DMatrix3x3 R = new DMatrix3x3();
+
+		for( int i = 0; i < points.size(); i++ ) {
+			AssociatedPairConic p = points.get(i);
+			UtilCurves_F64.convert(p.p1, C1);
+			UtilCurves_F64.convert(p.p2, C2);
+
+			CommonOps_DDF3.invert(C1,C1_inv);
+			CommonOps_DDF3.invert(C2,C2_inv);
+
+			CommonOps_DDF3.mult(C1_inv,C2,L);
+			CommonOps_DDF3.mult(C2_inv,C1,R);
+
+
+
+		}
+
+		return rows;
 	}
 }

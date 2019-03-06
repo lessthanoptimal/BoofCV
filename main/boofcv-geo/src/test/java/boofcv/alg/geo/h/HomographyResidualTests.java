@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public abstract class HomographyResidualTests extends CommonHomographyChecks {
 
 		// use the linear algorithm to compute the homography
 		HomographyDirectLinearTransform estimator = new HomographyDirectLinearTransform(true);
-		estimator.process(pairs,solution);
+		estimator.process(pairs2D,solution);
 
 		ModelObservationResidualN<DMatrixRMaj,AssociatedPair> alg = createAlg();
 
@@ -47,7 +47,7 @@ public abstract class HomographyResidualTests extends CommonHomographyChecks {
 		
 		// no noise
 		alg.setModel(solution);
-		for( AssociatedPair p : pairs ) {
+		for( AssociatedPair p : pairs2D) {
 			int index = alg.computeResiduals(p,residuals,0);
 			for( int i = 0; i < alg.getN(); i++ ) {
 				assertEquals(0,residuals[i],1e-8);
@@ -60,7 +60,7 @@ public abstract class HomographyResidualTests extends CommonHomographyChecks {
 		solution.data[0] += 0.6;
 		solution.data[4] += 0.6;
 		alg.setModel(solution);
-		for( AssociatedPair p : pairs ) {
+		for( AssociatedPair p : pairs2D) {
 			int index = alg.computeResiduals(p,residuals,0);
 			for( int i = 0; i < alg.getN(); i++ ) {
 				assertTrue(Math.abs(residuals[i])>1e-8);

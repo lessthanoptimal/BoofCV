@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,12 +45,12 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 
 		// use the linear algorithm to compute the homography
 		HomographyDirectLinearTransform estimator = new HomographyDirectLinearTransform(true);
-		estimator.process(pairs,H);
+		estimator.process(pairs2D,H);
 
 		ModelFitter<DMatrixRMaj,AssociatedPair> alg = createAlgorithm();
 
 		//give it the perfect matrix and see if it screwed it up
-		assertTrue(alg.fitModel(pairs, H, found));
+		assertTrue(alg.fitModel(pairs2D, H, found));
 
 		// normalize so that they are the same
 		CommonOps_DDRM.divide(H,H.get(2, 2));
@@ -65,7 +65,7 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 
 		// use the linear algorithm to compute the homography
 		HomographyDirectLinearTransform estimator = new HomographyDirectLinearTransform(true);
-		estimator.process(pairs,H);
+		estimator.process(pairs2D,H);
 
 		ModelFitter<DMatrixRMaj,AssociatedPair> alg = createAlgorithm();
 
@@ -73,7 +73,7 @@ public abstract class CheckRefineHomography extends CommonHomographyChecks {
 		DMatrixRMaj Hmod = H.copy();
 		Hmod.data[0] += 0.1;
 		Hmod.data[5] += 0.1;
-		assertTrue(alg.fitModel(pairs, Hmod, found));
+		assertTrue(alg.fitModel(pairs2D, Hmod, found));
 
 		// normalize to allow comparison
 		CommonOps_DDRM.divide(H,H.get(2,2));

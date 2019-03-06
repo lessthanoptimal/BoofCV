@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.alg.geo.h;
 
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedPair3D;
+import boofcv.struct.geo.AssociatedPairConic;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.EulerType;
@@ -46,7 +48,9 @@ public class CommonHomographyChecks {
 
 	protected Se3_F64 motion;
 	protected List<Point3D_F64> pts;
-	protected List<AssociatedPair> pairs;
+	protected List<AssociatedPair> pairs2D;
+	protected List<AssociatedPair3D> pairs3D;
+	protected List<AssociatedPairConic> pairsConics;
 	protected double d=3; // distance plane is from camera
 
 	protected DMatrixRMaj solution = new DMatrixRMaj(3,3);
@@ -61,19 +65,32 @@ public class CommonHomographyChecks {
 		pts = createRandomPlane(rand,d,numPoints);
 
 		// transform points into second camera's reference frame
-		pairs = new ArrayList<>();
+		pairs2D = new ArrayList<>();
 		for(Point3D_F64 p1 : pts ) {
 			Point3D_F64 p2 = SePointOps_F64.transform(motion, p1, null);
 
 			AssociatedPair pair = new AssociatedPair();
 			pair.p1.set(p1.x/p1.z,p1.y/p1.z);
 			pair.p2.set(p2.x/p2.z,p2.y/p2.z);
-			pairs.add(pair);
+			pairs2D.add(pair);
 
 			if( isPixels ) {
 				GeometryMath_F64.mult(K, pair.p1, pair.p1);
 				GeometryMath_F64.mult(K, pair.p2,pair.p2);
 			}
+		}
+
+		pairs3D = new ArrayList<>();
+		for (int i = 0; i < pairs2D.size(); i++) {
+			AssociatedPair p2 = pairs2D.get(i);
+			AssociatedPair3D p3 = new AssociatedPair3D();
+
+			// same point but in homogenous coordinates and Z isn't always 1
+			double z = 1.0+rand.nextGaussian()*0.1;
+			p3.p1.set(p2.p1.x*z,p2.p1.y*z,z);
+			p3.p2.set(p2.p2.x*z,p2.p2.y*z,z);
+
+			pairs3D.add(p3);
 		}
 	}
 

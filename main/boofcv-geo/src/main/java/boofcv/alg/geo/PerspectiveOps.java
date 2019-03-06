@@ -849,6 +849,77 @@ public class PerspectiveOps {
 	}
 
 	/**
+	 * Computes: D = A<sup>T</sup>*B*C
+	 *
+	 * @param A (Input) 3x3 matrix
+	 * @param B (Input) 3x3 matrix
+	 * @param C (Input) 3x3 matrix
+	 * @param output (Output) 3x3 matrix. Can be same instance A or B.
+	 */
+	public static void multTranA( DMatrix3x3 A , DMatrix3x3 B , DMatrix3x3 C , DMatrix3x3 output )
+	{
+		double t11 = A.a11*B.a11 + A.a21*B.a21 + A.a31*B.a31;
+		double t12 = A.a11*B.a12 + A.a21*B.a22 + A.a31*B.a32;
+		double t13 = A.a11*B.a13 + A.a21*B.a23 + A.a31*B.a33;
+
+		double t21 = A.a12*B.a11 + A.a22*B.a21 + A.a32*B.a31;
+		double t22 = A.a12*B.a12 + A.a22*B.a22 + A.a32*B.a32;
+		double t23 = A.a12*B.a13 + A.a22*B.a23 + A.a32*B.a33;
+
+		double t31 = A.a13*B.a11 + A.a23*B.a21 + A.a33*B.a31;
+		double t32 = A.a13*B.a12 + A.a23*B.a22 + A.a33*B.a32;
+		double t33 = A.a13*B.a13 + A.a23*B.a23 + A.a33*B.a33;
+
+		output.a11 = t11*C.a11 + t12*C.a21 + t13*C.a31;
+		output.a12 = t11*C.a12 + t12*C.a22 + t13*C.a32;
+		output.a13 = t11*C.a13 + t12*C.a23 + t13*C.a33;
+
+		output.a21 = t21*C.a11 + t22*C.a21 + t23*C.a31;
+		output.a22 = t21*C.a12 + t22*C.a22 + t23*C.a32;
+		output.a23 = t21*C.a13 + t22*C.a23 + t23*C.a33;
+
+		output.a31 = t31*C.a11 + t32*C.a21 + t33*C.a31;
+		output.a32 = t31*C.a12 + t32*C.a22 + t33*C.a32;
+		output.a33 = t31*C.a13 + t32*C.a23 + t33*C.a33;
+	}
+
+	/**
+	 * Computes: D = A*B*C<sup>T</sup>
+	 *
+	 * @param A (Input) 3x3 matrix
+	 * @param B (Input) 3x3 matrix
+	 * @param C (Input) 3x3 matrix
+	 * @param output (Output) 3x3 matrix. Can be same instance A or B.
+	 */
+	public static void multTranC( DMatrix3x3 A , DMatrix3x3 B , DMatrix3x3 C , DMatrix3x3 output )
+	{
+		double t11 = A.a11*B.a11 + A.a12*B.a21 + A.a13*B.a31;
+		double t12 = A.a11*B.a12 + A.a12*B.a22 + A.a13*B.a32;
+		double t13 = A.a11*B.a13 + A.a12*B.a23 + A.a13*B.a33;
+
+		double t21 = A.a21*B.a11 + A.a22*B.a21 + A.a23*B.a31;
+		double t22 = A.a21*B.a12 + A.a22*B.a22 + A.a23*B.a32;
+		double t23 = A.a21*B.a13 + A.a22*B.a23 + A.a23*B.a33;
+
+		double t31 = A.a31*B.a11 + A.a32*B.a21 + A.a33*B.a31;
+		double t32 = A.a31*B.a12 + A.a32*B.a22 + A.a33*B.a32;
+		double t33 = A.a31*B.a13 + A.a32*B.a23 + A.a33*B.a33;
+
+		output.a11 = t11*C.a11 + t12*C.a12 + t13*C.a13;
+		output.a12 = t11*C.a21 + t12*C.a22 + t13*C.a23;
+		output.a13 = t11*C.a31 + t12*C.a32 + t13*C.a33;
+
+		output.a21 = t21*C.a11 + t22*C.a12 + t23*C.a13;
+		output.a22 = t21*C.a21 + t22*C.a22 + t23*C.a23;
+		output.a23 = t21*C.a31 + t22*C.a32 + t23*C.a33;
+
+		output.a31 = t31*C.a11 + t32*C.a12 + t33*C.a13;
+		output.a32 = t31*C.a21 + t32*C.a22 + t33*C.a23;
+		output.a33 = t31*C.a31 + t32*C.a32 + t33*C.a33;
+	}
+
+
+	/**
 	 * Multiplies A*P, where A = [sx 0 tx; 0 sy ty; 0 0 1]
 	 */
 	public static void inplaceAdjustCameraMatrix( double sx , double sy , double tx , double ty , DMatrixRMaj P ) {

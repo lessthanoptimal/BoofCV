@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,11 @@
 
 package boofcv.alg.geo;
 
+import georegression.geometry.UtilCurves_F64;
+import georegression.struct.curve.ConicGeneral_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
 
 /**
@@ -43,6 +46,9 @@ public class NormalizationPoint2D {
 	// default value is do nothing
 	public double meanX=0,stdX=1;
 	public double meanY=0,stdY=1;
+
+	// internal workspace
+	private DMatrix3x3 work = new DMatrix3x3();
 
 	public NormalizationPoint2D() {
 	}
@@ -99,35 +105,56 @@ public class NormalizationPoint2D {
 		}
 	}
 
-	public void apply(Point2D_F64 p) {
-		p.x = (p.x - meanX)/ stdX;
-		p.y = (p.y - meanY)/ stdY;
+	public void apply(Point2D_F64 p, Point2D_F64 output) {
+		output.x = (p.x - meanX)/ stdX;
+		output.y = (p.y - meanY)/ stdY;
 	}
 
-	public void apply(Point3D_F64 p) {
-		p.x = (p.x - p.z*meanX)/ stdX;
-		p.y = (p.y - p.z*meanY)/ stdY;
+	public void apply(Point3D_F64 p, Point3D_F64 output) {
+		output.x = (p.x - p.z*meanX)/ stdX;
+		output.y = (p.y - p.z*meanY)/ stdY;
 	}
 
-	public void apply(Point2D_F64 input, Point2D_F64 output) {
-		output.x = (input.x - meanX)/ stdX;
-		output.y = (input.y - meanY)/ stdY;
+	/**
+	 * C* = H'*C*H
+	 */
+	public void apply(ConicGeneral_F64 p, ConicGeneral_F64 output) {
+		DMatrixRMaj C = UtilCurves_F64.convert(p, (DMatrixRMaj)null);
+		DMatrixRMaj Hinv = matrixInv();
+		DMatrixRMaj CP = new DMatrixRMaj(3,3);
+		PerspectiveOps.multTranA(Hinv,C,Hinv,CP);
+		UtilCurves_F64.convert(CP,output);
 	}
 
-	public void remove(Point2D_F64 p) {
-		p.x = p.x*stdX + meanX;
-		p.y = p.y*stdY + meanY;
+	/**
+	 * Apply transform to conic in 3x3 matrix format.
+	 */
+	public void apply(DMatrix3x3 C, DMatrix3x3 output) {
+		DMatrix3x3 Hinv = matrixInv3(work);
+		PerspectiveOps.multTranA(Hinv,C,Hinv,output);
 	}
 
-	public void remove(Point2D_F64 input, Point2D_F64 output ) {
-		output.x = input.x*stdX + meanX;
-		output.y = input.y*stdY + meanY;
+	public void remove(Point2D_F64 p, Point2D_F64 output ) {
+		output.x = p.x*stdX + meanX;
+		output.y = p.y*stdY + meanY;
 	}
 
-	public void remove(Point3D_F64 p) {
-		p.x = p.x*stdX + p.z*meanX;
-		p.y = p.y*stdY + p.z*meanY;
-//		p.z = p.z;
+	public void remove(Point3D_F64 p, Point3D_F64 output) {
+		output.x = p.x*stdX + p.z*meanX;
+		output.y = p.y*stdY + p.z*meanY;
+	}
+
+	public void remove(ConicGeneral_F64 p, ConicGeneral_F64 output) {
+		DMatrixRMaj C = UtilCurves_F64.convert(p, (DMatrixRMaj)null);
+		DMatrixRMaj H = matrix();
+		DMatrixRMaj CP = new DMatrixRMaj(3,3);
+		PerspectiveOps.multTranA(H,C,H,CP);
+		UtilCurves_F64.convert(CP,output);
+	}
+
+	public void remove(DMatrix3x3 C, DMatrix3x3 output) {
+		DMatrix3x3 H = matrix3(work);
+		PerspectiveOps.multTranA(H,C,H,output);
 	}
 
 	public DMatrixRMaj matrix() {
@@ -147,6 +174,30 @@ public class NormalizationPoint2D {
 		M.set(0,2,meanX);
 		M.set(1,2,meanY);
 		M.set(2,2,1);
+		return M;
+	}
+
+	public DMatrix3x3 matrix3( DMatrix3x3 M ) {
+		if( M == null )
+			M = new DMatrix3x3();
+		else {
+			M.a21 = 0;M.a31 = 0;M.a31 = 0;
+		}
+		M.a11 = 1.0/stdX; M.a12 = 1.0/stdY;
+		M.a13 = -meanX/stdX; M.a23 = -meanY/stdY;
+		M.a22 = 1;
+		return M;
+	}
+
+	public DMatrix3x3 matrixInv3( DMatrix3x3 M ) {
+		if( M == null )
+			M = new DMatrix3x3();
+		else {
+			M.a21 = 0;M.a31 = 0;M.a31 = 0;
+		}
+		M.a11 = stdX; M.a12 = stdY;
+		M.a13 = meanX; M.a23 = meanY;
+		M.a22 = 1;
 		return M;
 	}
 

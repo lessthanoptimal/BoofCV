@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,17 +24,16 @@ import georegression.struct.point.Point2D_F64;
 import org.ejml.dense.row.NormOps_DDRM;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestHomographyDirectLinearTransform extends CommonHomographyChecks
+class TestHomographyDirectLinearTransform extends CommonHomographyChecks
 {
 	@Test
-	public void perfectCalibrated() {
+	void perfect2D_calibrated() {
 		// test the minimum number of points
 		checkHomography(4, false, new HomographyDirectLinearTransform(false));
 		// test with extra points
@@ -42,7 +41,7 @@ public class TestHomographyDirectLinearTransform extends CommonHomographyChecks
 	}
 
 	@Test
-	public void perfectPixels() {
+	void perfect2D_pixels() {
 		checkHomography(4, true, new HomographyDirectLinearTransform(true));
 		checkHomography(10, true, new HomographyDirectLinearTransform(true));
 	}
@@ -58,19 +57,63 @@ public class TestHomographyDirectLinearTransform extends CommonHomographyChecks
 		createScene(N,isPixels);
 
 		// compute essential
-		assertTrue(alg.process(pairs,solution));
+		assertTrue(alg.process(pairs2D,solution));
 
-		// validate by testing essential properties
+		checkSolution();
+	}
 
-		// sanity check, F is not zero
-		assertTrue(NormOps_DDRM.normF(solution) > 0.001 );
+	@Test
+	void perfect_3D() {
+		HomographyDirectLinearTransform alg = new HomographyDirectLinearTransform(false);
+		check3D(4,alg);
+		check3D(10,alg);
+		alg = new HomographyDirectLinearTransform(true);
+		check3D(4,alg);
+		check3D(10,alg);
+	}
+
+	/**
+	 * Create a set of points perfectly on a plane and provide perfect observations of them
+	 *
+	 * @param N Number of observed points.
+	 * @param alg Algorithm being evaluated
+	 */
+	private void check3D(int N, HomographyDirectLinearTransform alg) {
+		createScene(N,true);
+		assertTrue(alg.process(null,pairs3D,null,solution));
+		checkSolution();
+
+	}
+
+	private void checkSolution() {
+		// validate by homography transfer
+		// sanity check, H is not zero
+		assertTrue(NormOps_DDRM.normF(solution) > 0.001);
 
 		// see if it follows the epipolar constraint
-		for( AssociatedPair p : pairs ) {
-			Point2D_F64 a = GeometryMath_F64.mult(solution,p.p1,new Point2D_F64());
-
+		for (AssociatedPair p : pairs2D) {
+			Point2D_F64 a = GeometryMath_F64.mult(solution, p.p1, new Point2D_F64());
 			double diff = a.distance(p.p2);
-			assertEquals(0,diff,1e-8);
+			assertEquals(0, diff, 1e-8);
 		}
+	}
+
+	@Test
+	void perfect_Conic() {
+		HomographyDirectLinearTransform alg = new HomographyDirectLinearTransform(false);
+		checkConics(3,alg);
+		checkConics(10,alg);
+		alg = new HomographyDirectLinearTransform(true);
+		checkConics(3,alg);
+		checkConics(10,alg);
+	}
+
+	private void checkConics(int N, HomographyDirectLinearTransform alg) {
+		fail("implement");
+	}
+
+	@Test
+	void perfect_AllToGether() {
+		fail("implement");
 	}
 }

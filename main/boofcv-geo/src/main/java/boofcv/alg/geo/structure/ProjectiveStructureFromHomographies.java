@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -247,7 +247,7 @@ public class ProjectiveStructureFromHomographies {
 		tmp.y = B.unsafe_get(row+1,0);
 		tmp.z = B.unsafe_get(row+2,0);
 
-		N.remove(tmp);
+		N.remove(tmp,tmp);
 
 		CommonOps_DDRM.insert(H,P,0,0);
 		P.set(0,3, tmp.x);
