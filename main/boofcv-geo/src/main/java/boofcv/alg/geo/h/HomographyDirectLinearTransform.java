@@ -52,6 +52,13 @@ import java.util.List;
  * </p>
  *
  * <p>
+ *     The conic algorithm specifies a constraint using a pair of conics. A minimum of 3 conics are required for a
+ *     unique solution using this linear method [2]. If all possible pairs are used then the growth is O(N^2) instead
+ *     linear set of pairs are added which has O(N) growth by adding adjacent conics as pairs. This behavior
+ *     can be toggled.
+ * </p>
+ *
+ * <p>
  * [1] Chapter 4, "Multiple View Geometry in Computer Vision"  2nd Ed. but uses normalization
  * from "An Invitation to 3-D Vision" 2004.<br>
  * [2] Kannala, Juho, Mikko Salo, and Janne Heikkilä.  "Algorithms for Computing a Planar Homography from
@@ -60,6 +67,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class HomographyDirectLinearTransform {
 
 	// contains the set of equations that are solved
@@ -77,6 +85,21 @@ public class HomographyDirectLinearTransform {
 	boolean normalize;
 	// if it's actually normalizing points
 	private boolean shouldNormalize;
+
+	// should it go through all combination of conics or a linear set
+	private boolean exhaustiveConics = false;
+
+	// workspace variables for conics
+	private final DMatrix3x3 C1 = new DMatrix3x3();
+	private final DMatrix3x3 V1 = new DMatrix3x3();
+	private final DMatrix3x3 C1_inv = new DMatrix3x3();
+	private final DMatrix3x3 V1_inv = new DMatrix3x3();
+	private final DMatrix3x3 C2 = new DMatrix3x3();
+	private final DMatrix3x3 V2 = new DMatrix3x3();
+	private final DMatrix3x3 C2_inv = new DMatrix3x3();
+	private final DMatrix3x3 V2_inv = new DMatrix3x3();
+	private final DMatrix3x3 L = new DMatrix3x3();
+	private final DMatrix3x3 R = new DMatrix3x3();
 
 	/**
 	 * Configure homography calculation
@@ -115,20 +138,21 @@ public class HomographyDirectLinearTransform {
 	public boolean process( @Nullable List<AssociatedPair> points2D ,
 							@Nullable List<AssociatedPair3D> points3D ,
 							@Nullable List<AssociatedPairConic> conics ,
-							DMatrixRMaj foundH ) {
+							DMatrixRMaj foundH )
+	{
+		// no sanity check is done to see if the minimum number of points and conics has been provided because
+		// that is actually really complex to determine. Especially for conics
+
 		int num2D = points2D != null ? points2D.size() : 0;
 		int num3D = points3D != null ? points3D.size() : 0;
 		int numConic = conics != null ? conics.size() : 0;
 
 		int numRows = computeTotalRows(num2D,num3D,numConic);
 
-		if( numRows < 8 )
-			throw new IllegalArgumentException("Must be at least 8 constraints. Found "+numRows);
-
 		// only 2D points need to be normalzied because of the implicit z=1
 		// 3D points are homogenous or lines and the vector can be normalized to 1
 		// same goes for the conic equation
-		shouldNormalize = normalize && points2D != null;
+		shouldNormalize = false;//normalize && points2D != null;
 
 		if( shouldNormalize ) {
 			LowLevelMultiViewOps.computeNormalization(points2D, N1, N2);
@@ -197,7 +221,7 @@ public class HomographyDirectLinearTransform {
 	}
 
 	int computeTotalRows( int num2D , int num3D , int numConic ) {
-		return 2*num2D + 2*num3D + 3*numConic;
+		return 2*num2D + 2*num3D + 9*numConic;
 	}
 
 	private void adjustPoint(AssociatedPair3D pair , Point3D_F64 a1 , Point3D_F64 a2 ) {
@@ -275,33 +299,86 @@ public class HomographyDirectLinearTransform {
 	}
 
 	/**
+	 * <p>Adds the 9x9 matrix constraint for each pair of conics.  To avoid O(N^2) growth the default option only
+	 * adds O(N) pairs.</p>
+	 *
 	 * inv(C[1]')*(C[2]')*H - H*invC[1]*C[2] == 0
+	 *
+	 * Note: x' = H*x. C' is conic from the same view as x' and C from x. It can be shown that C = H^T*C'*H
+	 *
 	 */
 	protected int addConics(List<AssociatedPairConic> points , DMatrixRMaj A, int rows ) {
 
-		DMatrix3x3 C1 = new DMatrix3x3();
-		DMatrix3x3 C2 = new DMatrix3x3();
-		DMatrix3x3 C1_inv = new DMatrix3x3();
-		DMatrix3x3 C2_inv = new DMatrix3x3();
-
-		DMatrix3x3 L = new DMatrix3x3();
-		DMatrix3x3 R = new DMatrix3x3();
-
-		for( int i = 0; i < points.size(); i++ ) {
-			AssociatedPairConic p = points.get(i);
-			UtilCurves_F64.convert(p.p1, C1);
-			UtilCurves_F64.convert(p.p2, C2);
-
-			CommonOps_DDF3.invert(C1,C1_inv);
-			CommonOps_DDF3.invert(C2,C2_inv);
-
-			CommonOps_DDF3.mult(C1_inv,C2,L);
-			CommonOps_DDF3.mult(C2_inv,C1,R);
-
-
-
+		if( exhaustiveConics ) {
+			// adds an exhaustive set of linear conics
+			for (int i = 0; i < points.size(); i++) {
+				for (int j = i+1; j < points.size(); j++) {
+					rows = addConicPairConstraints(points.get(i),points.get(j),A,rows);
+				}
+			}
+		} else {
+			// adds pairs and has linear time complexity
+			for (int i = 1; i < points.size(); i++) {
+				rows = addConicPairConstraints(points.get(i-1),points.get(i),A,rows);
+			}
+			int N = points.size();
+			rows = addConicPairConstraints(points.get(0),points.get(N-1),A,rows);
 		}
 
 		return rows;
+	}
+
+	/**
+	 * Add constraint for a pair of conics
+	 */
+	protected int addConicPairConstraints( AssociatedPairConic a , AssociatedPairConic b , DMatrixRMaj A , int rowA ) {
+		// s*C[i] = H^T*V[i]*H
+		// C[i] = a, C[j] = b
+		// Conic in view 1 is C and view 2 is V, e.g. x' = H*x.  x' is in view 2 and x in view 1
+		UtilCurves_F64.convert(a.p1, C1);
+		UtilCurves_F64.convert(a.p2, V1);
+		CommonOps_DDF3.invert(C1, C1_inv);
+		CommonOps_DDF3.invert(V1, V1_inv);
+
+		UtilCurves_F64.convert(b.p1, C2);
+		UtilCurves_F64.convert(b.p2, V2);
+		CommonOps_DDF3.invert(C2, C2_inv);
+		CommonOps_DDF3.invert(V2, V2_inv);
+
+		// L = inv(V[i])*V[j]
+		CommonOps_DDF3.mult(V1_inv, V2,L);
+		// R = C[i]*inv(C[j])
+		CommonOps_DDF3.mult(C1_inv, C2,R);
+
+		// clear this row
+		int idxA = rowA*9;
+//		Arrays.fill(A.data,idxA,9*9,0); <-- has already been zeroed
+
+		// NOTE: adding all 9 rows is redundant. The source paper doesn't attempt to reduce the number of rows
+		//       maybe this can be made to run faster if the rows can be intelligently pruned
+
+		// inv(V[i])*V[j]*H - H*C[i]*inv(C[j]) == 0
+		for (int row = 0; row < 3; row++) {
+			for (int col = 0; col < 3; col++) {
+				for (int i = 0; i < 3; i++) {
+					A.data[idxA + 3*i + col] += L.get(row,i);
+					A.data[idxA + 3*row + i] -= R.get(i,col);
+				}
+				idxA += 9;
+			}
+		}
+		return rowA+9;
+	}
+
+	public boolean isNormalize() {
+		return normalize;
+	}
+
+	public boolean isExhaustiveConics() {
+		return exhaustiveConics;
+	}
+
+	public void setExhaustiveConics(boolean exhaustiveConics) {
+		this.exhaustiveConics = exhaustiveConics;
 	}
 }

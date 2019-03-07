@@ -18,15 +18,15 @@
 
 package boofcv.alg.geo.h;
 
+import boofcv.alg.geo.MultiViewOps;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedPair3D;
-import boofcv.struct.geo.AssociatedPairConic;
-import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
-import georegression.struct.EulerType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
+import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.data.DMatrixRMaj;
 
@@ -44,22 +44,17 @@ public class CommonHomographyChecks {
 	protected Random rand = new Random(234234);
 
 	// create a reasonable calibration matrix
-	protected DMatrixRMaj K = new DMatrixRMaj(3,3,true,60,0.01,-200,0,80,-150,0,0,1);
+	protected DMatrixRMaj K = new DMatrixRMaj(3,3,true,60,0.01,200,0,80,150,0,0,1);
 
-	protected Se3_F64 motion;
+	protected Se3_F64 motion = SpecialEuclideanOps_F64.eulerXyz(0.1,-0.1,0.01,0.05, -0.03, 0.02,null);
 	protected List<Point3D_F64> pts;
 	protected List<AssociatedPair> pairs2D;
 	protected List<AssociatedPair3D> pairs3D;
-	protected List<AssociatedPairConic> pairsConics;
 	protected double d=3; // distance plane is from camera
 
 	protected DMatrixRMaj solution = new DMatrixRMaj(3,3);
 
 	public void createScene( int numPoints , boolean isPixels ) {
-		// define the camera's motion
-		motion = new Se3_F64();
-		motion.getR().set(ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ, 0.05, -0.03, 0.02,null));
-		motion.getT().set(0.1,-0.1,0.01);
 
 		// randomly generate points in space
 		pts = createRandomPlane(rand,d,numPoints);
@@ -92,6 +87,13 @@ public class CommonHomographyChecks {
 
 			pairs3D.add(p3);
 		}
+	}
+
+	protected DMatrixRMaj computeH( boolean isPixel ) {
+		if( isPixel )
+			return MultiViewOps.createHomography(motion.R,motion.T,1,new Vector3D_F64(0,0,-1),K);
+		else
+			return MultiViewOps.createHomography(motion.R,motion.T,1,new Vector3D_F64(0,0,-1));
 	}
 
 	/**

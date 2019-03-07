@@ -18,6 +18,8 @@ Version : 0.33
 - Dense Bundle Adjustment
   * Added for degenerate systems which are small enough to be solved with a dense method
   * Note: This statement seems to be a bit hit or miss. Not sure why, but it doesn't always converge when sparse does.
+- Geometry
+  * HomographyDirectLinearTransform has been updated to take 2D points, 3D points, and conics as inputs.
 - Fixed Rodrigues Jacobian for zero rotation
 - Camera Calibration
   * Renamed radial-tangential model to Brown for consistency and brevity
