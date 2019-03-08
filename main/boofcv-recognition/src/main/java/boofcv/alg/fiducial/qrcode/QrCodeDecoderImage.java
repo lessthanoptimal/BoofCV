@@ -422,20 +422,20 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 
 		// see if pp is miss aligned. Probably not a flat surface
 		// or they don't belong to the same qr code
-		if( Math.abs(grid.y) >= 1 )
+		if( Math.abs(grid.y/grid.x) >= 0.3 )
 			return -1;
 
 		double versionX = ((grid.x+7)-17)/4;
 
 		gridReader.imageToGrid(qr.ppDown.get(0),grid);
 
-		if( Math.abs(grid.x) >= 1 )
+		if( Math.abs(grid.x/grid.y) >= 0.3 )
 			return -1;
 
 		double versionY = ((grid.y+7)-17)/4;
 
 		// see if they are in agreement
-		if( Math.abs(versionX-versionY) > 1.5 )
+		if( Math.abs(versionX-versionY)/Math.max(versionX,versionY) > 0.4 )
 			return -1;
 
 		return (int)((versionX+versionY)/2.0 + 0.5);

@@ -81,6 +81,8 @@ TODO Regression
   - QR Code fiducial 3D pose regression
 
 TODO This Release
+  - QR Code
+    * Target 100% in rotation and not degrading anything else
   - Self Calibration
     * TODO Weighted iterated DIAC
   - Examples

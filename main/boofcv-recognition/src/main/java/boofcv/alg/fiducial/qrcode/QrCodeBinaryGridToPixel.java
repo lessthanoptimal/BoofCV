@@ -85,8 +85,8 @@ public class QrCodeBinaryGridToPixel {
 		storagePairs2D.reset();
 		storagePairs3D.reset();
 
-		// use the 4 corners to set the coordinate system
-		set(0, 0, qr.ppCorner,0);
+		// use 3 of the corners to set the coordinate system
+//		set(0, 0, qr.ppCorner,0); <-- prone to damage. Significantly degrades results if used
 		set(0, 7, qr.ppCorner,1);
 		set(7, 7, qr.ppCorner,2);
 		set(7, 0, qr.ppCorner,3);
@@ -204,7 +204,7 @@ public class QrCodeBinaryGridToPixel {
 		Point2D_F64 c0 = polygon0.get(corner0);
 		Point2D_F64 c1 = polygon1.get(corner1);
 
-		p.set(c1.x-c0.x,c1.y-c0.y,0,col1-col0,row1-col0,0);
+		p.set(c1.x-c0.x,c1.y-c0.y,0,col1-col0,row1-row0,0);
 		// normalize for numerical reasons. Scale of line parameters doesn't matter
 		p.p1.divideIP(p.p1.norm());
 		p.p2.divideIP(p.p2.norm());
