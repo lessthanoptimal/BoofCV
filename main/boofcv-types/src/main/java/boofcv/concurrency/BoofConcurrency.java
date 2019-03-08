@@ -88,8 +88,10 @@ public class BoofConcurrency {
 		int numThreads = pool.getParallelism();
 
 		int range = endExclusive-start;
-		if( range <= 0 )
-			throw new IllegalArgumentException("end must be more than start");
+		if( range == 0 ) // nothing to do here!
+			return;
+		if( range < 0 )
+			throw new IllegalArgumentException("end must be more than start. "+start+" -> "+endExclusive);
 
 		int block = selectBlockSize(range,minBlock,numThreads);
 
@@ -120,8 +122,10 @@ public class BoofConcurrency {
 		int numThreads = pool.getParallelism();
 
 		int range = endExclusive-start;
-		if( range <= 0 )
-			throw new IllegalArgumentException("end must be more than start");
+		if( range == 0 ) // nothing to do here!
+			return;
+		if( range < 0 )
+			throw new IllegalArgumentException("end must be more than start. "+start+" -> "+endExclusive);
 
 		// Did some experimentation here. Gave it more threads than were needed or exactly what was needed
 		// exactly seemed to do better in the test cases

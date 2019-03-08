@@ -59,7 +59,7 @@ public class TestQrCodeDecoderImage {
 		QrCodeDecoderImage<GrayF32> decoder = new QrCodeDecoderImage<>(null,GrayF32.class);
 		decoder.process(pps,helper.image);
 
-		assertTrue(decoder.successes.size()==0);
+		assertEquals(0, decoder.successes.size());
 
 		// now tell it how to undistort the image
 		decoder.setLensDistortion(helper.image.width,helper.image.height,helper.distortion);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.struct.image.ImageMultiBand;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -184,17 +185,24 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 
 		for( int i = 0; i < N; i++ ) {
 			Point2D_F64 p1 = alg1.getLocation(i);
-			Point2D_F64 p2 = alg2.getLocation(i);
+			int matched = -1;
 
-			assertTrue(p1.isIdentical(p2,1e-16));
-			assertTrue(alg1.getRadius(i) == alg2.getRadius(i));
-			assertTrue(alg1.getOrientation(i) == alg2.getOrientation(i));
+			for (int j = 0; j < N; j++) {
+				if( p1.isIdentical(alg2.getLocation(j), UtilEjml.EPS) &&
+						alg1.getRadius(i) == alg2.getRadius(j) &&
+						alg1.getOrientation(i) == alg2.getOrientation(j)) {
+					matched = j;
+					break;
+				}
+			}
+
+			assertTrue(matched != -1 );
 
 			D desc1 = alg1.getDescription(i);
-			D desc2 = alg2.getDescription(i);
+			D desc2 = alg2.getDescription(matched);
 
 			for( int j = 0; j < desc1.size(); j++ ) {
-				assertTrue(desc1.getDouble(j) == desc2.getDouble(j));
+				assertEquals(desc1.getDouble(j), desc2.getDouble(j));
 			}
 		}
 	}

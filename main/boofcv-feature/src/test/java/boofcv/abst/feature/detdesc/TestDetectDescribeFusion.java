@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,15 +66,14 @@ public class TestDetectDescribeFusion {
 
 	@Test
 	public void checkWithOrientation() {
-		final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null);
-		final OrientationImage ori = FactoryOrientationAlgs.nogradient(1.0/2.0,5,GrayF32.class);
-		final DescribeRegionPoint<GrayF32,BrightFeature> desc =
-				FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
-
 		new GenericTestsDetectDescribePoint(true,true, ImageType.single(GrayF32.class),BrightFeature.class) {
 
 			@Override
 			public DetectDescribePoint createDetDesc() {
+				final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null);
+				final OrientationImage ori = FactoryOrientationAlgs.nogradient(1.0/2.0,5,GrayF32.class);
+				final DescribeRegionPoint<GrayF32,BrightFeature> desc =
+						FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
 				return new DetectDescribeFusion(detector,ori,desc);
 			}
 		}.allTests();
@@ -82,14 +81,13 @@ public class TestDetectDescribeFusion {
 
 	@Test
 	public void checkWithoutOrientation() {
-		final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null);
-		final DescribeRegionPoint<GrayF32,BrightFeature> desc =
-				FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
 
 		new GenericTestsDetectDescribePoint(true,false, ImageType.single(GrayF32.class),BrightFeature.class) {
-
 			@Override
 			public DetectDescribePoint createDetDesc() {
+				final InterestPointDetector<GrayF32> detector = FactoryInterestPoint.fastHessian(null);
+				final DescribeRegionPoint<GrayF32,BrightFeature> desc =
+						FactoryDescribeRegionPoint.surfStable(null, GrayF32.class);
 				return new DetectDescribeFusion(detector,null,desc);
 			}
 		}.allTests();

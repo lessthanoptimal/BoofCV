@@ -62,7 +62,7 @@ public class RecycleStack<T> {
 		list.add(object);
 	}
 
-	public interface Factory<T> {
-		T newInstance();
+	public static interface Factory<T> {
+		public T newInstance();
 	}
 }

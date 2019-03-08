@@ -18,6 +18,7 @@
 
 package boofcv.alg.sfm.structure2;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -25,9 +26,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestDoStuffFromPairwiseGraph {
+@Disabled
+class TestDoStuffFromPairwiseGraph {
 	@Test
-	public void stuff() {
+	void stuff() {
 		fail("implement");
 	}
 }

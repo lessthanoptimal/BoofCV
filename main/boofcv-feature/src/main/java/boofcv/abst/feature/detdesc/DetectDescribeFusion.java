@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,11 +73,7 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc>
 
 		final DescribeRegionPoint<T, TD> locaDescribe = describe;
 
-		descs = new FastQueue<TD>(100,describe.getDescriptionType(),true) {
-			protected TD createInstance() {
-				return locaDescribe.createDescription();
-			}
-		};
+		descs = new FastQueue<TD>(100,describe.getDescriptionType(),()->locaDescribe.createDescription());
 	}
 
 	@Override

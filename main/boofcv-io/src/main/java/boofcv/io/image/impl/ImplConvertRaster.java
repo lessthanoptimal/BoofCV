@@ -588,10 +588,13 @@ public class ImplConvertRaster {
 			// If the buffered image is a gray scale image there is a bug where getRGB distorts
 			// the image.  See Bug ID: 5051418 , it has been around since 2004. Fuckers...
 			WritableRaster raster = src.getRaster();
+
+			//CONCURRENT_REMOVE_BELOW
 			int hack[] = new int[1];
 
 			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, height, y -> {
 			for (int y = 0; y < height; y++) {
+				//CONCURRENT_INLINE int hack[] = new int[1];
 				int index = dstStartIndex + y * dstStride;
 				for (int x = 0; x < width; x++) {
 					raster.getPixel(x, y, hack);
@@ -638,10 +641,12 @@ public class ImplConvertRaster {
 			// If the buffered image is a gray scale image there is a bug where getRGB distorts
 			// the image.  See Bug ID: 5051418 , it has been around since 2004. Fuckers...
 			WritableRaster raster = src.getRaster();
+			//CONCURRENT_REMOVE_BELOW
 			int hack[] = new int[1];
 
 			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, height, y -> {
 			for (int y = 0; y < height; y++) {
+				//CONCURRENT_INLINE int hack[] = new int[1];
 				int index = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < width; x++) {
 					raster.getPixel(x, y, hack);
@@ -674,10 +679,12 @@ public class ImplConvertRaster {
 			// If the buffered image is a gray scale image there is a bug where getRGB distorts
 			// the image.  See Bug ID: 5051418 , it has been around since 2004. Fuckers...
 			WritableRaster raster = src.getRaster();
+			//CONCURRENT_REMOVE_BELOW
 			float hack[] = new float[1];
 
 			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, height, y -> {
 			for (int y = 0; y < height; y++) {
+				//CONCURRENT_INLINE int hack[] = new int[1];
 				int index = dstStartIndex + y * dstStride;
 				for (int x = 0; x < width; x++) {
 					raster.getPixel(x, y, hack);

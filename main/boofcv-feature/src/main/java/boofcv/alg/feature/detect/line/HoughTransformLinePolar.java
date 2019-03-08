@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -160,7 +160,7 @@ public class HoughTransformLinePolar {
 			l.p.set(x0,y0);
 			l.slope.set(-s,c);
 
-			Point2D_F64 p2 = new Point2D_F64();
+			Point2D_F64 p2 = new Point2D_F64(); // todo is this even used?!
 			lineToCoordinate(l,p2);
 		}
 

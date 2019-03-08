@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,5 +82,15 @@ public class ScalePoint extends Point2D_F64 {
 		this.x = p.x;
 		this.y = p.y;
 		this.white = p.white;
+	}
+
+	@Override
+	public String toString() {
+		return "ScalePoint{" +
+				"scale=" + scale +
+				", white=" + white +
+				", x=" + x +
+				", y=" + y +
+				'}';
 	}
 }

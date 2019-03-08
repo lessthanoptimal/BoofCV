@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -118,12 +118,20 @@ public abstract class GeneralDetectLineTests {
 
 		for( int i = 0; i < foundA.size(); i++ ) {
 			LineParametric2D_F32 a = foundA.get(i);
-			LineParametric2D_F32 b = foundB.get(i);
 
-			assertTrue(a.slope.x == b.slope.x);
-			assertTrue(a.slope.y == b.slope.y);
-			assertTrue(a.p.x == b.p.x);
-			assertTrue(a.p.y == b.p.y);
+			// When run in concurrent mode the order might be different
+			boolean matched = false;
+			for (int j = 0; j < foundB.size(); j++) {
+				LineParametric2D_F32 b = foundB.get(j);
+
+				if( a.slope.x == b.slope.x && a.slope.y == b.slope.y && a.p.x == b.p.x && a.p.y == b.p.y ) {
+					matched = true;
+					break;
+				}
+			}
+			if( !matched )
+				throw new RuntimeException();
+			assertTrue(matched);
 		}
 	}
 }

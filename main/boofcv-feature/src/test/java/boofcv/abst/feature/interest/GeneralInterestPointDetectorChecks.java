@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -156,10 +156,14 @@ public abstract class GeneralInterestPointDetectorChecks<T extends ImageGray<T>>
 		assertEquals(original.size(),found.size());
 		for( int i = 0; i < original.size(); i++ ) {
 			Point2D_F64 o = original.get(i);
-			Point2D_F64 f = found.get(i);
-
-			assertTrue(o.x == f.x);
-			assertTrue(o.y == f.y);
+			boolean matched = false;
+			for (int j = 0; j < original.size(); j++) {
+				Point2D_F64 f = found.get(j);
+				if( f.isIdentical(o.x,o.y)) {
+					matched = true;
+				}
+			}
+			assertTrue(matched);
 		}
 	}
 

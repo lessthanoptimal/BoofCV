@@ -537,9 +537,10 @@ public class ImplConvertRaster_MT {
 			// If the buffered image is a gray scale image there is a bug where getRGB distorts
 			// the image.  See Bug ID: 5051418 , it has been around since 2004. Fuckers...
 			WritableRaster raster = src.getRaster();
-			int hack[] = new int[1];
+
 
 			BoofConcurrency.loopFor(0, height, y -> {
+				int hack[] = new int[1];
 				int index = dstStartIndex + y * dstStride;
 				for (int x = 0; x < width; x++) {
 					raster.getPixel(x, y, hack);
@@ -583,9 +584,9 @@ public class ImplConvertRaster_MT {
 			// If the buffered image is a gray scale image there is a bug where getRGB distorts
 			// the image.  See Bug ID: 5051418 , it has been around since 2004. Fuckers...
 			WritableRaster raster = src.getRaster();
-			int hack[] = new int[1];
 
 			BoofConcurrency.loopFor(0, height, y -> {
+				int hack[] = new int[1];
 				int index = dst.startIndex + y * dst.stride;
 				for (int x = 0; x < width; x++) {
 					raster.getPixel(x, y, hack);
@@ -615,9 +616,9 @@ public class ImplConvertRaster_MT {
 			// If the buffered image is a gray scale image there is a bug where getRGB distorts
 			// the image.  See Bug ID: 5051418 , it has been around since 2004. Fuckers...
 			WritableRaster raster = src.getRaster();
-			float hack[] = new float[1];
 
 			BoofConcurrency.loopFor(0, height, y -> {
+				int hack[] = new int[1];
 				int index = dstStartIndex + y * dstStride;
 				for (int x = 0; x < width; x++) {
 					raster.getPixel(x, y, hack);

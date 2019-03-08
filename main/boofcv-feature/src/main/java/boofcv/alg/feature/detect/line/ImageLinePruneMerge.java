@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,6 @@ import georegression.struct.point.Point2D_F32;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -77,15 +76,19 @@ public class ImageLinePruneMerge {
 	}
 
 	private void sortByIntensity() {
-		Collections.sort(lines, new Comparator<Data>() {
-			@Override
-			public int compare(Data o1, Data o2) {
-				if (o1.intensity < o2.intensity)
-					return 1;
-				else if (o1.intensity > o2.intensity)
-					return -1;
-				else
-					return 0;
+		Collections.sort(lines, (o1, o2) -> {
+			// need to sort by location to make results repeatable even if input order has been shuffled
+			// that happens if concurrency is turned on
+			if (o1.intensity < o2.intensity)
+				return 1;
+			else if (o1.intensity > o2.intensity)
+				return -1;
+			else if( o1.line.p.x < o2.line.p.x ) {
+				return -1;
+			} else if( o1.line.p.x > o2.line.p.x ) {
+				return 1;
+			} else {
+				return Float.compare(o1.line.p.y,o2.line.p.y);
 			}
 		});
 	}

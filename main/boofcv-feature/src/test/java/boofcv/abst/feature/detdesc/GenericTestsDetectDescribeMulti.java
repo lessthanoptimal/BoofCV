@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_F64;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -142,15 +143,22 @@ public abstract class GenericTestsDetectDescribeMulti<T extends ImageGray<T>, TD
 
 			for( int i = 0; i < N; i++ ) {
 				Point2D_F64 p1 = set1.getLocation(i);
-				Point2D_F64 p2 = set2.getLocation(i);
+				int matched = -1;
+				for (int j = 0; j < N; j++) {
+					Point2D_F64 p2 = set2.getLocation(j);
+					if( p1.isIdentical(p2, UtilEjml.EPS) ) {
+						matched = j;
+						break;
+					}
+				}
 
-				assertTrue(p1.isIdentical(p2,1e-16));
+				assertTrue(matched!=-1);
 
 				TD desc1 = set1.getDescription(i);
-				TD desc2 = set2.getDescription(i);
+				TD desc2 = set2.getDescription(matched);
 
 				for( int j = 0; j < desc1.size(); j++ ) {
-					assertTrue(desc1.getDouble(j) == desc2.getDouble(j));
+					assertEquals(desc1.getDouble(j), desc2.getDouble(j));
 				}
 			}
 		}

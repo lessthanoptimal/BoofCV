@@ -28,6 +28,7 @@ import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.util.PrimitiveArrays;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -37,7 +38,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestProjectiveInitializeAllCommon {
+@Disabled
+class TestProjectiveInitializeAllCommon {
 	@Test
 	void process_2() {
 		fail("implement");

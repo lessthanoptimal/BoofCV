@@ -33,7 +33,7 @@ import static georegression.struct.se.SpecialEuclideanOps_F64.eulerXyz;
 
 public class QrCodeDistortedChecks {
 	CameraPinholeBrown intrinsic = new CameraPinholeBrown(250,250,0,250,250,500,500).
-			fsetRadial(-0.1,-0.0005);
+			fsetRadial(-0.1,-0.01);
 //	CameraPinholeRadial intrinsic = new CameraPinholeRadial(250,250,0,250,250,500,500); // undistoretd parameters
 	LensDistortionBrown distortion = new LensDistortionBrown(intrinsic);
 	Point2Transform2_F64 p2p = distortion.undistort_F64(true,true);

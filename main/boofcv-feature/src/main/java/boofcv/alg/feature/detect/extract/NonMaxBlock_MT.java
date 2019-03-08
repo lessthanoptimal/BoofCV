@@ -69,8 +69,9 @@ public class NonMaxBlock_MT extends NonMaxBlock {
 		search.initialize(configuration,intensityImage,localMin,localMax);
 
 		// Compute number of y iterations
-		int N = (endY-border)/step;
-		if( (endY-border) - N*step > 0 )
+		int range = endY-border;
+		int N = range/step;
+		if( range > N*step )
 			N += 1;
 
 		BoofConcurrency.loopFor(0,N, iterY -> {
