@@ -63,15 +63,16 @@ Version : 0.33
 - Image Distortion
   * Changed interface for PixelTransform and PointTransform to support concurrency
 - Concurrency
-  * Added support for concurrency. Can be turned on using BoofConcurrency.USE_CONCURRENT = true
+  * Added support for concurrency. On by default. Can be turned OFF using BoofConcurrency.USE_CONCURRENT = false
   * Created AutocodeConcurrentApp for generating threaded code from single thread algorithms
   * Created IntRangeConsumer for parallel code that processes a range of numbers in a block
   * Convolution: general, sum, mean, gradient
   * Threshold: Local, Block
-  * Color: HSV, LAB, RGB, XYZ, YUV, TODO NV21, YV12
+  * Color: HSV, LAB, RGB, XYZ, YUV, NV21, YV12
   * Misc: PixelMath, ImageStatistics, Non-Max, Non-Max Candidate, ConvertImage, ConvertBufferedImage,
           EhanceImageOps
   * Feature Intensity: SURF, SSD Corner
+  * TODO Add code example for turning on and off and setting number of threads
 - Examples
   * Removed Lena as default image since that image is no longer considered appropriate by some journals.
      - https://en.wikipedia.org/wiki/Lenna

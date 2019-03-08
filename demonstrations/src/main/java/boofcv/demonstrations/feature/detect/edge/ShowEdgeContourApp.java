@@ -25,7 +25,6 @@ import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.misc.GImageStatistics;
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.demonstrations.binary.SelectHistogramThresholdPanel;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
@@ -216,8 +215,6 @@ public class ShowEdgeContourApp<T extends ImageGray<T>, D extends ImageGray<D>>
 	}
 
 	public static void main( String args[] ) {
-		BoofConcurrency.USE_CONCURRENT = true;
-
 		ShowEdgeContourApp<GrayF32,GrayF32> app =
 				new ShowEdgeContourApp<>(GrayF32.class, GrayF32.class);
 //		ShowFeatureOrientationApp<GrayU8, GrayS16> app =

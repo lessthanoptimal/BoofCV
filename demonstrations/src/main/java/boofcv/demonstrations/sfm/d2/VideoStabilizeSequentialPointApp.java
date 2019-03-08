@@ -22,7 +22,6 @@ import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
 import boofcv.alg.tracker.klt.PkltConfig;
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
@@ -102,8 +101,6 @@ public class VideoStabilizeSequentialPointApp<I extends ImageGray<I>, D extends 
 	}
 
 	public static void main( String args[] ) {
-		BoofConcurrency.USE_CONCURRENT = true;
-
 		VideoStabilizeSequentialPointApp app = new VideoStabilizeSequentialPointApp(GrayF32.class, GrayF32.class);
 
 		List<PathLabel> inputs = new ArrayList<>();

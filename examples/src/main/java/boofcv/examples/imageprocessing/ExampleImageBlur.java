@@ -43,9 +43,6 @@ import java.awt.image.BufferedImage;
 public class ExampleImageBlur {
 
 	public static void main(String[] args) {
-		// Uncomment to turn on concurrent code. For each physical core/cpu the code runs about 1x faster
-		//BoofConcurrency.USE_CONCURRENT = true;
-
 		ListDisplayPanel panel = new ListDisplayPanel();
 		BufferedImage buffered = UtilImageIO.loadImage(UtilIO.pathExample("standard/kodim17.jpg"));
 

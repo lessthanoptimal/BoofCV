@@ -28,7 +28,6 @@ import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.alg.fiducial.qrcode.QrCodeBinaryGridToPixel;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.demonstrations.shapes.DetectBlackShapeAppBase;
 import boofcv.demonstrations.shapes.ShapeGuiListener;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
@@ -497,8 +496,6 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	}
 
 	public static void main(String[] args) {
-		BoofConcurrency.USE_CONCURRENT = true;
-
 		List<String> examples = new ArrayList<>();
 		examples.add(UtilIO.pathExample("fiducial/qrcode/image01.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/qrcode/image02.jpg"));

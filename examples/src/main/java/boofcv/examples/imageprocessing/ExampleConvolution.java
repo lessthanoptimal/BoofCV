@@ -46,9 +46,6 @@ public class ExampleConvolution {
 	private static ListDisplayPanel panel = new ListDisplayPanel();
 
 	public static void main(String[] args) {
-		// Uncomment to turn on concurrent code. For each physical core/cpu the code runs about 1x faster
-		//BoofConcurrency.USE_CONCURRENT = true;
-
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
 
 		GrayU8 gray = ConvertBufferedImage.convertFromSingle(image, null, GrayU8.class);

@@ -22,7 +22,6 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GImageStatistics;
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -186,8 +185,6 @@ public class ShowImageDerivativeApp<T extends ImageGray<T>, D extends ImageGray<
 	}
 
 	public static void main(String args[]) {
-		BoofConcurrency.USE_CONCURRENT = true;
-
 		List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("Horses", UtilIO.pathExample("segment/berkeley_horses.jpg")));
 		examples.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));

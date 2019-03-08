@@ -96,9 +96,6 @@ public class ExampleImageEnhancement {
 
 	public static void main( String args[] )
 	{
-		// Uncomment to use multi-threaded code. Not all algorithms are threaded
-//		BoofConcurrency.USE_CONCURRENT = true;
-
 		histogram();
 		sharpen();
 		ShowImages.showWindow(mainPanel,"Enhancement",true);

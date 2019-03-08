@@ -19,7 +19,6 @@
 package boofcv.demonstrations.imageprocessing;
 
 import boofcv.alg.filter.blur.GBlurImageOps;
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.gui.DemonstrationBase;
@@ -186,8 +185,6 @@ public class ShowImageBlurApp<T extends ImageGray<T>>
 	}
 
 	public static void main(String args[]) {
-		BoofConcurrency.USE_CONCURRENT = true;
-
 		java.util.List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("Horses", UtilIO.pathExample("segment/berkeley_horses.jpg")));
 		examples.add(new PathLabel("Human Statue", UtilIO.pathExample("standard/kodim17.jpg")));

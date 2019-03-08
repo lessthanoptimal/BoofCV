@@ -21,7 +21,6 @@ package boofcv.demonstrations.enhance;
 import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.enhance.GEnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.IWorkArrays;
 import boofcv.core.image.ConvertImage;
 import boofcv.gui.BoofSwingUtil;
@@ -302,8 +301,6 @@ public class ImageEnhanceApp extends DemonstrationBase {
 	}
 
 	public static void main(String[] args) {
-		BoofConcurrency.USE_CONCURRENT = true;
-
 		List<PathLabel> examples = new ArrayList<>();
 		examples.add(new PathLabel("dark",UtilIO.pathExample("enhance/dark.jpg")));
 		examples.add(new PathLabel("dull",UtilIO.pathExample("enhance/dull.jpg")));

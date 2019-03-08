@@ -34,7 +34,7 @@ public class BoofConcurrency {
 	/**
 	 * If set to true it will use a concurrent algorithm
 	 */
-	public static boolean USE_CONCURRENT = false;
+	public static boolean USE_CONCURRENT = true;
 
 	// Custom thread pool for streams so that the number of threads can be controlled
 	private static ForkJoinPool pool = new ForkJoinPool();

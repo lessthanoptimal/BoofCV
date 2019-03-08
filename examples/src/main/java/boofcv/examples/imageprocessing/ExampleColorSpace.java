@@ -37,9 +37,6 @@ import java.awt.image.BufferedImage;
 public class ExampleColorSpace {
 
 	public static void main( String args[] ) {
-		// Uncomment to turn on threaded code for faster conversion
-		//BoofConcurrency.USE_CONCURRENT = true;
-
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("sunflowers.jpg"));
 
 		// Convert input image into a BoofCV RGB image

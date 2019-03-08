@@ -23,7 +23,6 @@ import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.alg.tracker.klt.PkltConfig;
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -261,8 +260,6 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 	}
 
 	public static void main(String args[]) {
-		BoofConcurrency.USE_CONCURRENT = true;
-
 		//		Class type = GrayF32.class;
 		Class type = GrayU8.class;
 

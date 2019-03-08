@@ -34,7 +34,6 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -667,8 +666,6 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	}
 
 	public static void main(String[] args) {
-		BoofConcurrency.USE_CONCURRENT = true;
-
 		List<PathLabel> examples = new ArrayList<>();
 
 		examples.add(createExample("rock_leaves"));
