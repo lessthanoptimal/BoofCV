@@ -300,7 +300,7 @@ public class HomographyDirectLinearTransform {
 
 	/**
 	 * <p>Adds the 9x9 matrix constraint for each pair of conics.  To avoid O(N^2) growth the default option only
-	 * adds O(N) pairs.</p>
+	 * adds O(N) pairs. if only conics are used then a minimum of 3 is required. See [2].</p>
 	 *
 	 * inv(C[1]')*(C[2]')*H - H*invC[1]*C[2] == 0
 	 *

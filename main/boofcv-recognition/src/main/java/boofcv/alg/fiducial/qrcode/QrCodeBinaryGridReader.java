@@ -85,6 +85,12 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 		this.threshold = threshold;
 	}
 
+	public void setMarkerUnknownVersion(QrCode qr , float threshold ) {
+		this.qr = null;
+		transformGrid.setTransformFromLinesSquare(qr);
+		this.threshold = threshold;
+	}
+
 	public void imageToGrid( float x , float y , Point2D_F32 grid ) {
 		transformGrid.imageToGrid(x, y, grid);
 	}

@@ -415,7 +415,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	 */
 	int estimateVersionBySize( QrCode qr ) {
 		// Just need the homography for this corner square square
-		gridReader.setSquare(qr.ppCorner,0);
+		gridReader.setMarkerUnknownVersion(qr,0);
 
 		// Compute location of position patterns relative to corner PP
 		gridReader.imageToGrid(qr.ppRight.get(0),grid);

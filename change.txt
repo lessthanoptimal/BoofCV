@@ -26,8 +26,6 @@ Version : 0.33
   * Fixed type-o in Omni Universal math. Recalibration does not appear to be necessary
   * Non-linear optimization is now performed using sparse bundle adjustment
     - This appears to be slightly worse than the original dense method in nearly degenerate geometry
-- Self Calibration
-  * TODO Weighted iterated DIAC
 - Improved Support for U16 images
   * Convolution, blur, ... etc
   * Requested by Nico Stuurman
@@ -42,8 +40,9 @@ Version : 0.33
 - QR Code
   * Added support for ECI, i.e. more character sets
   * Changed default BYTE mode encoding to default to UTF-8, but attempts to see if it could be another encoding
-  * Abuility to change byte encoding. UTF-8 is the default now
+  * Ability to change byte encoding. UTF-8 is the default now
   * Add perspective data set to regression.
+  * Improved handling of high version QR Codes
 - PerspectiveOps
   * Fixed bug in convertPixelToNorm() where it called distort instead of undistort. Thanks Tianyi
 - Demonstration
@@ -82,11 +81,14 @@ TODO Regression
   - QR Code fiducial 3D pose regression
 
 TODO This Release
+  - Self Calibration
+    * TODO Weighted iterated DIAC
   - Examples
     * Planar World Simulator
     * Point Cloud Viewer
   - Circle Target Detection
     * three choices; center point, tangent points, or conics.
+    * center = "Detection of Concentric Circles for Camera Calibration" or use ellipse center like most?
   - Demonstrations
     * Modernize stabilization and mosaic
     * Associate with Fundamental - Select different algs + inliers

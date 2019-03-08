@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,10 @@
 
 package boofcv.alg.fiducial.qrcode;
 
+import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.alg.geo.robust.GenerateHomographyLinear;
 import boofcv.struct.geo.AssociatedPair;
+import boofcv.struct.geo.AssociatedPair3D;
 import georegression.struct.ConvertFloatType;
 import georegression.struct.homography.Homography2D_F32;
 import georegression.struct.homography.Homography2D_F64;
@@ -30,6 +32,7 @@ import georegression.transform.homography.HomographyPointOps_F32;
 import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.struct.FastQueue;
+import org.ejml.data.DMatrixRMaj;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,10 +44,13 @@ import java.util.List;
  */
 public class QrCodeBinaryGridToPixel {
 	ModelGenerator<Homography2D_F64,AssociatedPair> generator = new GenerateHomographyLinear(true);
+	HomographyDirectLinearTransform dlt = new HomographyDirectLinearTransform(true);
 
-	FastQueue<AssociatedPair> storagePairs = new FastQueue<>(AssociatedPair.class,true);
+	FastQueue<AssociatedPair> storagePairs2D = new FastQueue<>(AssociatedPair.class,true);
+	FastQueue<AssociatedPair3D> storagePairs3D = new FastQueue<>(AssociatedPair3D.class,true);
 
-	List<AssociatedPair> pairs = new ArrayList<>();
+	List<AssociatedPair> pairs2D = new ArrayList<>();
+
 	FastQueue<Point2D_F64> adjustments = new FastQueue<>(Point2D_F64.class,true);
 
 	Homography2D_F64 H = new Homography2D_F64();
@@ -58,8 +64,8 @@ public class QrCodeBinaryGridToPixel {
 
 	public void setTransformFromSquare( Polygon2D_F64 square ) {
 		adjustWithFeatures = false;
-		storagePairs.reset();
-		pairs.clear();
+		storagePairs2D.reset();
+		pairs2D.clear();
 
 		set(0, 0, square,0);
 		set(0, 7, square,1);
@@ -69,10 +75,41 @@ public class QrCodeBinaryGridToPixel {
 		computeTransform();
 	}
 
+	/**
+	 * Used to estimate the image to grid coordinate system before the version is known. The top left square is
+	 * used to fix the coordinate system. Then 4 lines between corners  going to other QR codes is used to
+	 * make it less suspectable to errors in the first 4 corners
+	 */
+	public void setTransformFromLinesSquare( QrCode qr ) {
+		// clear old points
+		storagePairs2D.reset();
+		storagePairs3D.reset();
+
+		// use the 4 corners to set the coordinate system
+		set(0, 0, qr.ppCorner,0);
+		set(0, 7, qr.ppCorner,1);
+		set(7, 7, qr.ppCorner,2);
+		set(7, 0, qr.ppCorner,3);
+
+		// Use 4 lines to make it more robust errors in these corners
+		// We just need to get the direction right for the lines. the exact grid to image doesn't matter
+		setLine(0,7,0,14,qr.ppCorner,1,qr.ppRight,0);
+		setLine(7,7,7,14,qr.ppCorner,2,qr.ppRight,3);
+		setLine(7,7,14,7,qr.ppCorner,2,qr.ppDown,1);
+		setLine(7,0,14,0,qr.ppCorner,3,qr.ppDown,0);
+
+		DMatrixRMaj HH = new DMatrixRMaj(3,3);
+		dlt.process(storagePairs2D.toList(),storagePairs3D.toList(),null,HH);
+		H.set(HH);
+		H.invert(Hinv);
+		ConvertFloatType.convert(Hinv, Hinv32);
+		ConvertFloatType.convert(H, H32);
+	}
+
 	public void addAllFeatures( QrCode qr ) {
 		adjustWithFeatures = false;
-		storagePairs.reset();
-		pairs.clear();
+		storagePairs2D.reset();
+		pairs2D.clear();
 
 		int N = qr.getNumberOfModules();
 
@@ -93,9 +130,9 @@ public class QrCodeBinaryGridToPixel {
 
 		for (int i = 0; i < qr.alignment.size; i++) {
 			QrCode.Alignment a = qr.alignment.get(i);
-			AssociatedPair p = storagePairs.grow();
+			AssociatedPair p = storagePairs2D.grow();
 			p.set(a.pixel.x,a.pixel.y,a.moduleX+0.5f,a.moduleY+0.5f);
-			pairs.add(p);
+			pairs2D.add(p);
 		}
 	}
 
@@ -103,20 +140,20 @@ public class QrCodeBinaryGridToPixel {
 	 * Outside corners on position patterns are more likely to be damaged, so remove them
 	 */
 	public void removeOutsideCornerFeatures() {
-		if( pairs.size() != storagePairs.size )
+		if( pairs2D.size() != storagePairs2D.size )
 			throw new RuntimeException("This can only be called when all the features have been added");
 
-		pairs.remove(11);
-		pairs.remove(5);
-		pairs.remove(0);
+		pairs2D.remove(11);
+		pairs2D.remove(5);
+		pairs2D.remove(0);
 	}
 
 	public boolean removeFeatureWithLargestError() {
 		int selected = -1;
 		double largestError = 0;
 
-		for (int i = 0; i < pairs.size(); i++) {
-			AssociatedPair p = pairs.get(i);
+		for (int i = 0; i < pairs2D.size(); i++) {
+			AssociatedPair p = pairs2D.get(i);
 			HomographyPointOps_F64.transform(Hinv,p.p2.x,p.p2.y,tmp64);
 			double dx = tmp64.x - p.p1.x;
 			double dy = tmp64.y - p.p1.y;
@@ -128,7 +165,7 @@ public class QrCodeBinaryGridToPixel {
 			}
 		}
 		if( selected != -1 && largestError > 2*2 ) {
-			pairs.remove(selected);
+			pairs2D.remove(selected);
 			return true;
 		} else {
 			return false;
@@ -136,15 +173,15 @@ public class QrCodeBinaryGridToPixel {
 	}
 
 	public void computeTransform() {
-		generator.generate(pairs,H);
+		generator.generate(pairs2D,H);
 		H.invert(Hinv);
 		ConvertFloatType.convert(Hinv, Hinv32);
 		ConvertFloatType.convert(H, H32);
 
 		adjustments.reset();
 		if( adjustWithFeatures ) {
-			for (int i = 0; i < pairs.size(); i++) {
-				AssociatedPair p = pairs.get(i);
+			for (int i = 0; i < pairs2D.size(); i++) {
+				AssociatedPair p = pairs2D.get(i);
 				Point2D_F64 a = adjustments.grow();
 
 				HomographyPointOps_F64.transform(Hinv, p.p2.x, p.p2.y, tmp64);
@@ -155,10 +192,22 @@ public class QrCodeBinaryGridToPixel {
 	}
 
 	private void set(float row, float col, Polygon2D_F64 polygon, int corner) {
-		AssociatedPair p = storagePairs.grow();
+		AssociatedPair p = storagePairs2D.grow();
 		Point2D_F64 c = polygon.get(corner);
 		p.set(c.x,c.y,col,row);
-		pairs.add(p);
+		pairs2D.add(p);
+	}
+
+	private void setLine(float row0, float col0, float row1, float col1,
+						 Polygon2D_F64 polygon0, int corner0, Polygon2D_F64 polygon1, int corner1) {
+		AssociatedPair3D p = storagePairs3D.grow();
+		Point2D_F64 c0 = polygon0.get(corner0);
+		Point2D_F64 c1 = polygon1.get(corner1);
+
+		p.set(c1.x-c0.x,c1.y-c0.y,0,col1-col0,row1-col0,0);
+		// normalize for numerical reasons. Scale of line parameters doesn't matter
+		p.p1.divideIP(p.p1.norm());
+		p.p2.divideIP(p.p2.norm());
 	}
 
 	public final void imageToGrid(float x, float y, Point2D_F32 grid) {
@@ -177,8 +226,8 @@ public class QrCodeBinaryGridToPixel {
 		if (adjustWithFeatures) {
 			int closest = -1;
 			double best = Double.MAX_VALUE;
-			for (int i = 0; i < pairs.size(); i++) {
-				double d = pairs.get(i).p2.distance2(col, row);
+			for (int i = 0; i < pairs2D.size(); i++) {
+				double d = pairs2D.get(i).p2.distance2(col, row);
 				if (d < best) {
 					best = d;
 					closest = i;
