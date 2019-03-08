@@ -18,14 +18,67 @@
 
 package boofcv.core.encoding.impl;
 
+import boofcv.struct.image.*;
+import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.lang.reflect.Method;
+import java.util.Random;
 
-class TestImplConvertNV21_MT {
+class TestImplConvertNV21_MT extends CompareIdenticalFunctions {
+
+	private Random rand = new Random(234);
+	private int width = 105;
+	private int height = 100;
+
+
+	TestImplConvertNV21_MT() {
+		super(ImplConvertNV21_MT.class, ImplConvertNV21.class);
+	}
+
 	@Test
-	void implement() {
-		fail("implement");
+	void performTests() {
+		performTests(8);
+	}
+
+	@Override
+	protected Object[][] createInputParam(Method candidate, Method validation) {
+
+		byte[] nv21 = new byte[width*height*2];
+		rand.nextBytes(nv21);
+
+		Class[] type = candidate.getParameterTypes();
+
+		ImageBase output ;
+
+		String name = candidate.getName();
+		if( name.startsWith("nv21ToGray") ) {
+			if(type[1] == GrayU8.class ) {
+				output = new GrayU8(width,height);
+			} else {
+				output = new GrayF32(width,height);
+			}
+		} else if( name.startsWith("nv21ToPlanarRgb")) {
+			if( name.endsWith("U8")) {
+				output = new Planar<>(GrayU8.class,width,height,3);
+			} else {
+				output = new Planar<>(GrayF32.class,width,height,3);
+			}
+		} else if( name.startsWith("nv21ToPlanarYuv")) {
+			if( name.endsWith("U8")) {
+				output = new Planar<>(GrayU8.class,width,height,3);
+			} else {
+				output = new Planar<>(GrayF32.class,width,height,3);
+			}
+		} else {
+			if( type[1] == InterleavedU8.class ) {
+				output = new InterleavedU8(width,height,3);
+			} else {
+				output = new InterleavedF32(width,height,3);
+			}
+		}
+
+		return new Object[][]{{nv21, output}};
 	}
 }
 

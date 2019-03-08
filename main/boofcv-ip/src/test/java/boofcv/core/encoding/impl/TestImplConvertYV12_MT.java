@@ -18,7 +18,7 @@
 
 package boofcv.core.encoding.impl;
 
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.*;
 import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
@@ -44,52 +44,29 @@ class TestImplConvertYV12_MT extends CompareIdenticalFunctions {
 	@Override
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 
+		byte[] yv12 = new byte[width*height*2];
+		rand.nextBytes(yv12);
+
 		Class[] type = candidate.getParameterTypes();
 
-		ImageBase input = null;
-		ImageBase output = null;
+		ImageBase output ;
 
-//		String name = candidate.getName();
-//		if (name.length() == "convertU8F32".length()) {
-//			boolean firstU8 = name.indexOf("U8") == 7;
-//
-//			ImageDataType typeA = firstU8 ? ImageDataType.U8 : ImageDataType.F32;
-//			ImageDataType typeB = firstU8 ? ImageDataType.F32 : ImageDataType.U8;
-//
-//			if (!type[0].isAssignableFrom(Planar.class)) {
-//				input = GeneralizedImageOps.createImage(type[0], width, height, 2);
-//			}
-//			if (!type[1].isAssignableFrom(Planar.class)) {
-//				output = GeneralizedImageOps.createImage(type[1], width, height, 2);
-//			}
-//
-//			if (input == null) {
-//				input = new Planar(ImageDataType.typeToSingleClass(typeA), width, height, 2);
-//			} else if (output == null) {
-//				output = new Planar(ImageDataType.typeToSingleClass(typeB), width, height, 2);
-//			}
-//
-//		} else {
-//			if (!type[0].isAssignableFrom(Planar.class)) {
-//				input = GeneralizedImageOps.createImage(type[0], width, height, 2);
-//			}
-//			if (!type[1].isAssignableFrom(Planar.class)) {
-//				output = GeneralizedImageOps.createImage(type[1], width, height, 2);
-//			}
-//
-//			if (input == null) {
-//				ImageDataType dataType = output.imageType.getDataType();
-//				input = new Planar(ImageDataType.typeToSingleClass(dataType), width, height, 2);
-//			} else if (output == null) {
-//				ImageDataType dataType = input.imageType.getDataType();
-//				output = new Planar(ImageDataType.typeToSingleClass(dataType), width, height, 2);
-//			}
-//
-//		}
-//
-//		GImageMiscOps.fillUniform(input, rand, 0, 200);
+		String name = candidate.getName();
+		if( name.startsWith("yv12ToPlanar")) {
+			if( name.endsWith("U8")) {
+				output = new Planar<>(GrayU8.class,width,height,3);
+			} else {
+				output = new Planar<>(GrayF32.class,width,height,3);
+			}
+		} else {
+			if( type[1] == InterleavedU8.class ) {
+				output = new InterleavedU8(width,height,3);
+			} else {
+				output = new InterleavedF32(width,height,3);
+			}
+		}
 
-		return new Object[][]{{input, output}};
+		return new Object[][]{{yv12, output}};
 	}
 }
 

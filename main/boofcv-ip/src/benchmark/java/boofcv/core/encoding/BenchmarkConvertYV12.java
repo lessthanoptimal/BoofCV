@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 5)
 @State(Scope.Benchmark)
 @Fork(value=1)
-public class BenchmarkConvertNV21 {
+public class BenchmarkConvertYV12 {
 
 	@Param({"true","false"})
 	public boolean concurrent;
@@ -46,7 +46,7 @@ public class BenchmarkConvertNV21 {
 	@Param({"2000"})
 	public int size;
 
-	byte[] nv21;
+	byte[] yv12;
 
 	GrayU8 grayU8 = new GrayU8(1, 1);
 	GrayF32 grayF32 = new GrayF32(1, 1);
@@ -60,8 +60,8 @@ public class BenchmarkConvertNV21 {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
 
-		nv21 = new byte[size*size * 2];
-		rand.nextBytes(nv21);
+		yv12 = new byte[size*size * 2];
+		rand.nextBytes(yv12);
 
 		grayU8.reshape(size,size);
 		grayF32.reshape(size,size);
@@ -81,32 +81,32 @@ public class BenchmarkConvertNV21 {
 
 	@Benchmark
 	public void nv21ToGray_U8() {
-		ConvertNV21.nv21ToGray(nv21, size, size, grayU8);
+		ConvertYV12.yu12ToBoof(yv12, size, size, grayU8);
 	}
 
 	@Benchmark
 	public void nv21ToGray_F32() {
-		ConvertNV21.nv21ToGray(nv21, size, size, grayF32);
+		ConvertYV12.yu12ToBoof(yv12, size, size, grayF32);
 	}
 
 	@Benchmark
 	public void nv21TPlanarRgb_U8() {
-		ConvertNV21.nv21TPlanarRgb_U8(nv21, size, size, planarU8);
+		ConvertYV12.yu12ToBoof(yv12, size, size, planarU8);
 	}
 
 	@Benchmark
 	public void nv21ToPlanarRgb_F32() {
-		ConvertNV21.nv21ToPlanarRgb_F32(nv21, size, size, planarF32);
+		ConvertYV12.yu12ToBoof(yv12, size, size, planarF32);
 	}
 
 	@Benchmark
 	public void nv21ToInterleaved_U8() {
-		ConvertNV21.nv21ToInterleaved(nv21, size, size, interU8);
+		ConvertYV12.yu12ToBoof(yv12, size, size, interU8);
 	}
 
 	@Benchmark
 	public void nv21ToInterleaved_F32() {
-		ConvertNV21.nv21ToInterleaved(nv21, size, size, interF32);
+		ConvertYV12.yu12ToBoof(yv12, size, size, interF32);
 	}
 }
 
