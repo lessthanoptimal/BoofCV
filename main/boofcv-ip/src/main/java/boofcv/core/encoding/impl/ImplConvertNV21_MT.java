@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.core.encoding;
+package boofcv.core.encoding.impl;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 
 /**
@@ -26,7 +27,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class ImplConvertNV21 {
+public class ImplConvertNV21_MT {
 
 	/**
 	 * First block contains gray-scale information and UV data can be ignored.
@@ -39,12 +40,11 @@ public class ImplConvertNV21 {
 		if( yStride == output.width && !output.isSubimage() ) {
 			System.arraycopy(dataNV,0,output.data,0,output.width*output.height);
 		} else {
-			// copy one row at a time
-			for( int y = 0; y < output.height; y++ ) {
+			BoofConcurrency.loopFor(0, output.height, y -> {
 				int indexOut = output.startIndex + y*output.stride;
 
 				System.arraycopy(dataNV,y*yStride,output.data,indexOut,output.width);
-			}
+			});
 		}
 	}
 
@@ -53,14 +53,14 @@ public class ImplConvertNV21 {
 	 */
 	public static void nv21ToGray(byte[] dataNV, GrayF32 output) {
 
-		for( int y = 0; y < output.height; y++ ) {
+		BoofConcurrency.loopFor(0, output.height, y -> {
 			int indexIn = y*output.width;
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < output.width; x++ ) {
 				output.data[ indexOut++ ] = dataNV[ indexIn++ ] & 0xFF;
 			}
-		}
+		});
 	}
 
 	public static void nv21ToPlanarYuv_U8(byte[] dataNV, Planar<GrayU8> output) {
@@ -75,7 +75,7 @@ public class ImplConvertNV21 {
 
 		int startUV = output.width*output.height;
 
-		for( int row = 0; row < output.height; row++ ) {
+		BoofConcurrency.loopFor(0, output.height, row -> {
 			int indexUV = startUV + (row/2)*(2*uvStride);
 			int indexOut = output.startIndex + row*output.stride;
 
@@ -85,7 +85,7 @@ public class ImplConvertNV21 {
 
 				indexUV += 2*(col&0x1);
 			}
-		}
+		});
 	}
 
 	public static void nv21ToPlanarYuv_F32(byte[] dataNV, Planar<GrayF32> output) {
@@ -100,7 +100,7 @@ public class ImplConvertNV21 {
 
 		final int startUV = output.width*output.height;
 
-		for( int row = 0; row < output.height; row++ ) {
+		BoofConcurrency.loopFor(0, output.height, row -> {
 			int indexUV = startUV + (row/2)*(2*uvStride);
 			int indexOut = output.startIndex + row*output.stride;
 
@@ -110,7 +110,7 @@ public class ImplConvertNV21 {
 
 				indexUV += 2*(col&0x1);
 			}
-		}
+		});
 	}
 
 	public static void nv21ToPlanarRgb_U8(byte[] dataNV, Planar<GrayU8> output) {
@@ -124,7 +124,7 @@ public class ImplConvertNV21 {
 
 		final int startUV = yStride*output.height;
 
-		for( int row = 0; row < output.height; row++ ) {
+		BoofConcurrency.loopFor(0, output.height, row -> {
 			int indexY = row*yStride;
 			int indexUV = startUV + (row/2)*(2*uvStride);
 			int indexOut = output.startIndex + row*output.stride;
@@ -164,7 +164,7 @@ public class ImplConvertNV21 {
 
 				indexUV += 2*(col&0x1);
 			}
-		}
+		});
 	}
 
 	public static void nv21ToInterleaved_U8(byte[] dataNV, InterleavedU8 output) {
@@ -174,7 +174,7 @@ public class ImplConvertNV21 {
 
 		final int startUV = yStride*output.height;
 
-		for( int row = 0; row < output.height; row++ ) {
+		BoofConcurrency.loopFor(0, output.height, row -> {
 			int indexY = row*yStride;
 			int indexUV = startUV + (row/2)*(2*uvStride);
 			int indexOut = output.startIndex + row*output.stride;
@@ -214,7 +214,7 @@ public class ImplConvertNV21 {
 
 				indexUV += 2*(col&0x1);
 			}
-		}
+		});
 	}
 
 	public static void nv21ToPlanarRgb_F32(byte[] dataNV, Planar<GrayF32> output) {
@@ -228,7 +228,7 @@ public class ImplConvertNV21 {
 
 		final int startUV = yStride*output.height;
 
-		for( int row = 0; row < output.height; row++ ) {
+		BoofConcurrency.loopFor(0, output.height, row -> {
 			int indexY = row*yStride;
 			int indexUV = startUV + (row/2)*(2*uvStride);
 			int indexOut = output.startIndex + row*output.stride;
@@ -268,7 +268,7 @@ public class ImplConvertNV21 {
 
 				indexUV += 2*(col&0x1);
 			}
-		}
+		});
 	}
 
 	public static void nv21ToInterleaved_F32(byte[] dataNV, InterleavedF32 output) {
@@ -278,7 +278,7 @@ public class ImplConvertNV21 {
 
 		final int startUV = yStride*output.height;
 
-		for( int row = 0; row < output.height; row++ ) {
+		BoofConcurrency.loopFor(0, output.height, row -> {
 			int indexY = row*yStride;
 			int indexUV = startUV + (row/2)*(2*uvStride);
 			int indexOut = output.startIndex + row*output.stride;
@@ -318,6 +318,6 @@ public class ImplConvertNV21 {
 
 				indexUV += 2*(col&0x1);
 			}
-		}
+		});
 	}
 }

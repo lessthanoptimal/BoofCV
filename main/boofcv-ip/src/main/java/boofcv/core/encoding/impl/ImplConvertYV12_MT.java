@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-package boofcv.core.encoding;
+package boofcv.core.encoding.impl;
 
 
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.core.encoding.ConvertYV12;
 import boofcv.struct.image.*;
 
 /**
@@ -26,7 +28,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class ImplConvertYV12 {
+public class ImplConvertYV12_MT {
 
 	public static void yv12ToPlanarRgb_U8(byte[] dataYV, Planar<GrayU8> output) {
 
@@ -40,7 +42,7 @@ public class ImplConvertYV12 {
 		final int startU = yStride*output.height;
 		final int offsetV = uvStride*(output.height/2);
 
-		for( int row = 0; row < output.height; row++ ) {
+		BoofConcurrency.loopFor(0, output.height, row -> {
 			int indexY = row*yStride;
 			int indexU = startU + (row/2)*uvStride;
 			int indexOut = output.startIndex + row*output.stride;
@@ -80,7 +82,7 @@ public class ImplConvertYV12 {
 
 				indexU += col&0x1;
 			}
-		}
+		});
 	}
 
 	public static void yv12ToInterleaved(byte[] dataYV, InterleavedU8 output) {
@@ -91,7 +93,7 @@ public class ImplConvertYV12 {
 		final int startU = yStride*output.height;
 		final int offsetV = uvStride*(output.height/2);
 
-		for( int row = 0; row < output.height; row++ ) {
+		BoofConcurrency.loopFor(0, output.height, row -> {
 			int indexY = row*yStride;
 			int indexU = startU + (row/2)*uvStride;
 			int indexOut = output.startIndex + row*output.stride;
@@ -131,7 +133,7 @@ public class ImplConvertYV12 {
 
 				indexU += col&0x1;
 			}
-		}
+		});
 	}
 
 	public static void yv12ToPlanarRgb_F32(byte[] dataYV, Planar<GrayF32> output) {
@@ -146,7 +148,7 @@ public class ImplConvertYV12 {
 		final int startU = yStride*output.height;
 		final int offsetV = uvStride*(output.height/2);
 
-		for( int row = 0; row < output.height; row++ ) {
+		BoofConcurrency.loopFor(0, output.height, row -> {
 			int indexY = row*yStride;
 			int indexU = startU + (row/2)*uvStride;
 			int indexOut = output.startIndex + row*output.stride;
@@ -186,7 +188,7 @@ public class ImplConvertYV12 {
 
 				indexU += col&0x1;
 			}
-		}
+		});
 	}
 
 	public static void yv12ToInterleaved(byte[] dataYV, InterleavedF32 output) {
@@ -197,7 +199,7 @@ public class ImplConvertYV12 {
 		final int startU = yStride*output.height;
 		final int offsetV = uvStride*(output.height/2);
 
-		for( int row = 0; row < output.height; row++ ) {
+		BoofConcurrency.loopFor(0, output.height, row -> {
 			int indexY = row*yStride;
 			int indexU = startU + (row/2)*uvStride;
 			int indexOut = output.startIndex + row*output.stride;
@@ -237,6 +239,6 @@ public class ImplConvertYV12 {
 
 				indexU += col&0x1;
 			}
-		}
+		});
 	}
 }

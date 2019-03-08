@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,11 @@
 package boofcv.core.encoding;
 
 
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.core.encoding.impl.ImplConvertNV21;
+import boofcv.core.encoding.impl.ImplConvertNV21_MT;
+import boofcv.core.encoding.impl.ImplConvertYV12;
+import boofcv.core.encoding.impl.ImplConvertYV12_MT;
 import boofcv.struct.image.*;
 
 /**
@@ -41,13 +46,24 @@ public class ConvertYV12 {
 
         if( output instanceof Planar) {
             Planar ms = (Planar) output;
+            ms.reshape(width,height,3);
 
-            if (ms.getBandType() == GrayU8.class) {
-                ImplConvertYV12.yv12ToPlanarRgb_U8(data, ms);
-            } else if (ms.getBandType() == GrayF32.class) {
-                ImplConvertYV12.yv12ToPlanarRgb_F32(data, ms);
+            if( BoofConcurrency.USE_CONCURRENT ) {
+                if (ms.getBandType() == GrayU8.class) {
+                    ImplConvertYV12_MT.yv12ToPlanarRgb_U8(data, ms);
+                } else if (ms.getBandType() == GrayF32.class) {
+                    ImplConvertYV12_MT.yv12ToPlanarRgb_F32(data, ms);
+                } else {
+                    throw new IllegalArgumentException("Unsupported output band format");
+                }
             } else {
-                throw new IllegalArgumentException("Unsupported output band format");
+                if (ms.getBandType() == GrayU8.class) {
+                    ImplConvertYV12.yv12ToPlanarRgb_U8(data, ms);
+                } else if (ms.getBandType() == GrayF32.class) {
+                    ImplConvertYV12.yv12ToPlanarRgb_F32(data, ms);
+                } else {
+                    throw new IllegalArgumentException("Unsupported output band format");
+                }
             }
         } else if( output instanceof ImageGray) {
             if (output.getClass() == GrayU8.class) {
@@ -58,12 +74,24 @@ public class ConvertYV12 {
                 throw new IllegalArgumentException("Unsupported output type");
             }
         } else if( output instanceof ImageInterleaved ) {
-            if( output.getClass() == InterleavedU8.class ) {
-                ImplConvertYV12.yv12ToInterleaved(data, (InterleavedU8) output);
-            } else if( output.getClass() == InterleavedF32.class ) {
-                ImplConvertYV12.yv12ToInterleaved(data, (InterleavedF32) output);
+            ((ImageMultiBand)output).reshape(width,height,3);
+
+            if( BoofConcurrency.USE_CONCURRENT ) {
+                if (output.getClass() == InterleavedU8.class) {
+                    ImplConvertYV12_MT.yv12ToInterleaved(data, (InterleavedU8) output);
+                } else if (output.getClass() == InterleavedF32.class) {
+                    ImplConvertYV12_MT.yv12ToInterleaved(data, (InterleavedF32) output);
+                } else {
+                    throw new IllegalArgumentException("Unsupported output type");
+                }
             } else {
-                throw new IllegalArgumentException("Unsupported output type");
+                if (output.getClass() == InterleavedU8.class) {
+                    ImplConvertYV12.yv12ToInterleaved(data, (InterleavedU8) output);
+                } else if (output.getClass() == InterleavedF32.class) {
+                    ImplConvertYV12.yv12ToInterleaved(data, (InterleavedF32) output);
+                } else {
+                    throw new IllegalArgumentException("Unsupported output type");
+                }
             }
         } else {
             throw new IllegalArgumentException("Boofcv image type not yet supported");
@@ -87,7 +115,11 @@ public class ConvertYV12 {
             output = new GrayU8(width,height);
         }
 
-        ImplConvertNV21.nv21ToGray(data, output);
+        if(BoofConcurrency.USE_CONCURRENT ) {
+            ImplConvertNV21_MT.nv21ToGray(data, output);
+        } else {
+            ImplConvertNV21.nv21ToGray(data, output);
+        }
 
         return output;
     }
@@ -109,7 +141,11 @@ public class ConvertYV12 {
             output = new GrayF32(width,height);
         }
 
-        ImplConvertNV21.nv21ToGray(data, output);
+        if(BoofConcurrency.USE_CONCURRENT ) {
+            ImplConvertNV21_MT.nv21ToGray(data, output);
+        } else {
+            ImplConvertNV21.nv21ToGray(data, output);
+        }
 
         return output;
     }

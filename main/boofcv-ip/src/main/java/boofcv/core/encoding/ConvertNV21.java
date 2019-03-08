@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.core.encoding;
 
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.core.encoding.impl.ImplConvertNV21;
+import boofcv.core.encoding.impl.ImplConvertNV21_MT;
 import boofcv.struct.image.*;
 
 /**
@@ -106,13 +109,16 @@ public class ConvertNV21 {
 	 */
 	public static GrayU8 nv21ToGray(byte[] data , int width , int height , GrayU8 output ) {
 		if( output != null ) {
-			if( output.width != width || output.height != height )
-				throw new IllegalArgumentException("output width and height must be "+width+" "+height);
+			output.reshape(width,height);
 		} else {
 			output = new GrayU8(width,height);
 		}
 
-		ImplConvertNV21.nv21ToGray(data, output);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvertNV21_MT.nv21ToGray(data, output);
+		} else {
+			ImplConvertNV21.nv21ToGray(data, output);
+		}
 
 		return output;
 	}
@@ -128,13 +134,16 @@ public class ConvertNV21 {
 	 */
 	public static GrayF32 nv21ToGray(byte[] data , int width , int height , GrayF32 output ) {
 		if( output != null ) {
-			if( output.width != width || output.height != height )
-				throw new IllegalArgumentException("output width and height must be "+width+" "+height);
+			output.reshape(width,height);
 		} else {
 			output = new GrayF32(width,height);
 		}
 
-		ImplConvertNV21.nv21ToGray(data, output);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvertNV21_MT.nv21ToGray(data, output);
+		} else {
+			ImplConvertNV21.nv21ToGray(data, output);
+		}
 
 		return output;
 	}
@@ -174,13 +183,15 @@ public class ConvertNV21 {
 													Planar<GrayU8> output ) {
 		if( output == null ) {
 			output = new Planar<>(GrayU8.class,width,height,3);
-		} else if( output.width != width || output.height != height )
-			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
-		else if( output.getNumBands() != 3 )
-			throw new IllegalArgumentException("three bands expected");
+		} else {
+			output.reshape(width, height, 3);
+		}
 
-		ImplConvertNV21.nv21ToPlanarYuv_U8(data,output);
-
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvertNV21_MT.nv21ToPlanarYuv_U8(data, output);
+		} else {
+			ImplConvertNV21.nv21ToPlanarYuv_U8(data, output);
+		}
 		return output;
 	}
 
@@ -195,13 +206,16 @@ public class ConvertNV21 {
 	public static Planar<GrayU8> nv21TPlanarRgb_U8(byte[] data , int width , int height ,
 												   Planar<GrayU8> output ) {
 		if( output == null ) {
-			output = new Planar<>(GrayU8.class,width,height,3);
-		} else if( output.width != width || output.height != height )
-			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
-		else if( output.getNumBands() != 3 )
-			throw new IllegalArgumentException("three bands expected");
+			output = new Planar<>(GrayU8.class, width, height, 3);
+		} else {
+			output.reshape(width, height, 3);
+		}
 
-		ImplConvertNV21.nv21ToPlanarRgb_U8(data, output);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvertNV21_MT.nv21ToPlanarRgb_U8(data, output);
+		} else {
+			ImplConvertNV21.nv21ToPlanarRgb_U8(data, output);
+		}
 
 		return output;
 	}
@@ -218,12 +232,14 @@ public class ConvertNV21 {
 												   InterleavedU8 output ) {
 		if( output == null ) {
 			output = new InterleavedU8(width,height,3);
-		} else if( output.width != width || output.height != height )
-			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
-		else if( output.getNumBands() != 3 )
-			throw new IllegalArgumentException("three bands expected");
-
-		ImplConvertNV21.nv21ToInterleaved_U8(data, output);
+		} else {
+			output.reshape(width, height, 3);
+		}
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvertNV21_MT.nv21ToInterleaved_U8(data, output);
+		} else {
+			ImplConvertNV21.nv21ToInterleaved_U8(data, output);
+		}
 
 		return output;
 	}
@@ -240,12 +256,15 @@ public class ConvertNV21 {
 													 Planar<GrayF32> output ) {
 		if( output == null ) {
 			output = new Planar<>(GrayF32.class,width,height,3);
-		} else if( output.width != width || output.height != height )
-			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
-		else if( output.getNumBands() != 3 )
-			throw new IllegalArgumentException("three bands expected");
+		} else {
+			output.reshape(width, height, 3);
+		}
 
-		ImplConvertNV21.nv21ToPlanarYuv_F32(data, output);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvertNV21_MT.nv21ToPlanarYuv_F32(data, output);
+		} else {
+			ImplConvertNV21.nv21ToPlanarYuv_F32(data, output);
+		}
 
 		return output;
 	}
@@ -262,12 +281,15 @@ public class ConvertNV21 {
 													  Planar<GrayF32> output ) {
 		if( output == null ) {
 			output = new Planar<>(GrayF32.class,width,height,3);
-		} else if( output.width != width || output.height != height )
-			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
-		else if( output.getNumBands() != 3 )
-			throw new IllegalArgumentException("three bands expected");
+		} else {
+			output.reshape(width, height, 3);
+		}
 
-		ImplConvertNV21.nv21ToPlanarRgb_F32(data, output);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvertNV21_MT.nv21ToPlanarRgb_F32(data, output);
+		} else {
+			ImplConvertNV21.nv21ToPlanarRgb_F32(data, output);
+		}
 
 		return output;
 	}
@@ -284,12 +306,15 @@ public class ConvertNV21 {
 															   InterleavedF32 output ) {
 		if( output == null ) {
 			output = new InterleavedF32(width,height,3);
-		} else if( output.width != width || output.height != height )
-			throw new IllegalArgumentException("output width and height must be "+width+" "+height);
-		else if( output.getNumBands() != 3 )
-			throw new IllegalArgumentException("three bands expected");
+		} else {
+			output.reshape(width, height, 3);
+		}
 
-		ImplConvertNV21.nv21ToInterleaved_F32(data, output);
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvertNV21_MT.nv21ToInterleaved_F32(data, output);
+		} else {
+			ImplConvertNV21.nv21ToInterleaved_F32(data, output);
+		}
 
 		return output;
 	}
