@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,7 +86,8 @@ implements ListSelectionListener
 		this.failures.clear();
 		for (int i = 0; i < failures.size(); i++) {
 			QrCode qr = failures.get(i);
-			model.addElement(String.format("v%2d Mode %.6s FAILED",qr.version,qr.mode.toString()));
+			model.addElement(String.format("v%2d Mode %.7s",qr.version,qr.mode.toString()));
+			model.addElement(String.format("Cause: %s",qr.failureCause.toString()));
 			this.failures.add( qr.clone() );
 		}
 		listDetected.invalidate();
