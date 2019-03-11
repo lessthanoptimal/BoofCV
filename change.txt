@@ -43,6 +43,7 @@ Version : 0.33
   * Ability to change byte encoding. UTF-8 is the default now
   * Add perspective data set to regression.
   * Improved handling of high version QR Codes
+  * Fixed location of alignment patterns along the y-axis. This mostly affected higher version QR
 - PerspectiveOps
   * Fixed bug in convertPixelToNorm() where it called distort instead of undistort. Thanks Tianyi
 - Demonstration
