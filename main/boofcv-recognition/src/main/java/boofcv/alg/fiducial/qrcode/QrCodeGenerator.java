@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,11 +91,11 @@ public class QrCodeGenerator {
 					continue;
 				if( i == alignment.length-1 & j == 0)
 					continue;
-				if( i == alignment.length-1 & j == alignment.length-1)
+				if( i == 0 & j == alignment.length-1)
 					continue;
 
 				int col = alignment[j];
-				alignmentPattern(col,numModules-row-1);
+				alignmentPattern(col,row);
 			}
 		}
 

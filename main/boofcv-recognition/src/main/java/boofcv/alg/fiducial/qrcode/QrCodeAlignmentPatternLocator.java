@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,7 +81,6 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 	 * Creates a list of alignment patterns to look for and their grid coordinates
 	 */
 	void initializePatterns(QrCode qr) {
-		int N = qr.getNumberOfModules();
 		int where[] = QrCode.VERSION_INFO[qr.version].alignment;
 		qr.alignment.reset();
 		lookup.reset();
@@ -90,7 +89,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 				boolean skip = false;
 				if( row == 0 && col == 0 )
 					skip = true;
-				else if( row ==  where.length-1 && col == where.length-1 )
+				else if( row == 0 && col == where.length-1 )
 					skip = true;
 				else if( row == where.length-1 && col == 0)
 					skip = true;
@@ -100,7 +99,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 				} else {
 					QrCode.Alignment a = qr.alignment.grow();
 					a.moduleX = where[col];
-					a.moduleY = N-where[row]-1;
+					a.moduleY = where[row];
 					lookup.add(a);
 				}
 			}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,11 +76,11 @@ public class QrCodeCodeWordLocations extends BMatrixRMaj {
 					continue;
 				if( i == alignment.length-1 & j == 0)
 					continue;
-				if( i == alignment.length-1 & j == alignment.length-1)
+				if( i == 0 & j == alignment.length-1)
 					continue;
 
 				int col = alignment[j];
-				markSquare(numModules-row-3,col-2,5);
+				markSquare(row-2,col-2,5);
 			}
 		}
 	}
