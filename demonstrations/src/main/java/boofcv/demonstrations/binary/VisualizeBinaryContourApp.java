@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -179,7 +179,7 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 				List<Contour> contours = BinaryImageOps.convertContours(contourAlg);
 
 				g2.setStroke(new BasicStroke(1));
-				VisualizeBinaryData.render(contours,Color.BLUE, Color.RED, scale, g2);
+				VisualizeBinaryData.render(contours,Color.BLUE, Color.RED, 1.0,scale, g2);
 			}
 		}
 	}

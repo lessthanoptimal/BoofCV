@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -227,7 +227,7 @@ public class DetectFiducialSquareBinaryApp
 					BinaryContourFinder contour = detector.getSquareDetector().getDetector().getContourFinder();
 					List<Contour> contours = BinaryImageOps.convertContours(contour);
 					g2.setStroke(new BasicStroke(1));
-					VisualizeBinaryData.render(contours, null,Color.CYAN, scale, g2);
+					VisualizeBinaryData.render(contours, null,Color.CYAN, 1.0,scale, g2);
 				}
 
 				FastQueue<FoundFiducial> detected = detector.getFound();
