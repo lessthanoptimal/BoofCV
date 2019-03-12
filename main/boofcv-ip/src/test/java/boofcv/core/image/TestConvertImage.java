@@ -77,7 +77,7 @@ public class TestConvertImage {
 		}
 
 		// to get the count search for 'public static'
-		assertEquals(152,count);
+		assertEquals(156,count);
 	}
 
 	private void checkConvert( Method m , Class inputType , Class outputType ) {

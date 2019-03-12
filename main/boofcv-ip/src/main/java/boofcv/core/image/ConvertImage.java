@@ -3525,5 +3525,97 @@ public class ConvertImage {
 	return output;
 	}
 
+	/**
+	 * Converts a {@link InterleavedU8} into the equivalent {@link Planar}
+	 * 
+	 * @param input (Input) ImageInterleaved that is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static Planar<GrayF32> convertU8F32( InterleavedU8 input , Planar<GrayF32> output ) {
+		if (output == null) {
+			output = new Planar<>(GrayF32.class,input.width, input.height,input.numBands);
+		} else {
+			output.reshape(input.width,input.height,input.numBands);
+		}
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvertImage_MT.convertU8F32(input,output);
+		} else {
+			ImplConvertImage.convertU8F32(input,output);
+		}
+
+		return output;
+	}
+
+	/**
+	 * Converts a {@link InterleavedF32} into the equivalent {@link Planar}
+	 * 
+	 * @param input (Input) ImageInterleaved that is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static Planar<GrayU8> convertF32U8( InterleavedF32 input , Planar<GrayU8> output ) {
+		if (output == null) {
+			output = new Planar<>(GrayU8.class,input.width, input.height,input.numBands);
+		} else {
+			output.reshape(input.width,input.height,input.numBands);
+		}
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvertImage_MT.convertF32U8(input,output);
+		} else {
+			ImplConvertImage.convertF32U8(input,output);
+		}
+
+		return output;
+	}
+
+	/**
+	 * Converts a {@link Planar} into the equivalent {@link InterleavedF32}
+	 *
+	 * @param input (Input) Planar image that is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedF32 convertU8F32( Planar<GrayU8> input , InterleavedF32 output ) {
+		if (output == null) {
+			output = new InterleavedF32(input.width, input.height,input.getNumBands());
+		} else {
+			output.reshape(input.width,input.height,input.getNumBands());
+		}
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvertImage_MT.convertU8F32(input,output);
+		} else {
+			ImplConvertImage.convertU8F32(input,output);
+		}
+
+		return output;
+	}
+
+	/**
+	 * Converts a {@link Planar} into the equivalent {@link InterleavedU8}
+	 *
+	 * @param input (Input) Planar image that is being converted. Not modified.
+	 * @param output (Optional) The output image.  If null a new image is created. Modified.
+	 * @return Converted image.
+	 */
+	public static InterleavedU8 convertF32U8( Planar<GrayF32> input , InterleavedU8 output ) {
+		if (output == null) {
+			output = new InterleavedU8(input.width, input.height,input.getNumBands());
+		} else {
+			output.reshape(input.width,input.height,input.getNumBands());
+		}
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplConvertImage_MT.convertF32U8(input,output);
+		} else {
+			ImplConvertImage.convertF32U8(input,output);
+		}
+
+		return output;
+	}
+
 
 }

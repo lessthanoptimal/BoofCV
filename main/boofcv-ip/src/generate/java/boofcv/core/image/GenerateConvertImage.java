@@ -41,12 +41,17 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				printConvertSingle(in, out);
 				printConvertInterleaved(in, out);
 			}
-			printMultiAverage(in);
-			printMultiToInterleaved(in);
+			printPlanarAverage(in);
+			printPlanarToInterleaved(in);
 			printInterleaveAverage(in);
-			printInterleaveToMulti(in);
+			printInterleaveToPlanar(in);
 			printIntegerRange(in);
 		}
+
+		printInterleaveToPlanar(AutoTypeImage.U8,AutoTypeImage.F32);
+		printInterleaveToPlanar(AutoTypeImage.F32,AutoTypeImage.U8);
+		printPlanarToInterleaved(AutoTypeImage.U8,AutoTypeImage.F32);
+		printPlanarToInterleaved(AutoTypeImage.F32,AutoTypeImage.U8);
 
 		out.print("\n" +
 				"}\n");
@@ -127,7 +132,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printMultiAverage(AutoTypeImage imageIn) {
+	private void printPlanarAverage(AutoTypeImage imageIn) {
 
 		String imageName = imageIn.getSingleBandName();
 
@@ -186,7 +191,7 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printInterleaveToMulti(AutoTypeImage imageIn) {
+	private void printInterleaveToPlanar(AutoTypeImage imageIn) {
 		String inputName = imageIn.getInterleavedName();
 		String bandName = imageIn.getSingleBandName();
 
@@ -214,7 +219,37 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	private void printMultiToInterleaved(AutoTypeImage imageIn) {
+	private void printInterleaveToPlanar(AutoTypeImage imageIn, AutoTypeImage imageOut) {
+		String inputName = imageIn.getInterleavedName();
+		String bandName = imageOut.getSingleBandName();
+
+		String type=imageIn.getAbbreviatedType()+""+imageOut.getAbbreviatedType();
+
+		out.print("\t/**\n" +
+				"\t * Converts a {@link "+inputName+"} into the equivalent {@link Planar}\n" +
+				"\t * \n" +
+				"\t * @param input (Input) ImageInterleaved that is being converted. Not modified.\n" +
+				"\t * @param output (Optional) The output image.  If null a new image is created. Modified.\n" +
+				"\t * @return Converted image.\n" +
+				"\t */\n" +
+				"\tpublic static Planar<"+bandName+"> convert"+type+"( "+inputName+" input , Planar<"+bandName+"> output ) {\n" +
+				"\t\tif (output == null) {\n" +
+				"\t\t\toutput = new Planar<>("+bandName+".class,input.width, input.height,input.numBands);\n" +
+				"\t\t} else {\n" +
+				"\t\t\toutput.reshape(input.width,input.height,input.numBands);\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplConvertImage_MT.convert"+type+"(input,output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplConvertImage.convert"+type+"(input,output);\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\treturn output;\n" +
+				"\t}\n\n");
+	}
+
+	private void printPlanarToInterleaved(AutoTypeImage imageIn) {
 		String outputName = imageIn.getInterleavedName();
 		String bandName = imageIn.getSingleBandName();
 
@@ -236,6 +271,36 @@ public class GenerateConvertImage extends CodeGeneratorBase {
 				"\t\t\tImplConvertImage_MT.convert(input,output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplConvertImage.convert(input,output);\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\treturn output;\n" +
+				"\t}\n\n");
+	}
+
+	private void printPlanarToInterleaved(AutoTypeImage imageIn, AutoTypeImage imageOut) {
+		String outputName = imageOut.getInterleavedName();
+		String bandName = imageIn.getSingleBandName();
+
+		String type=imageIn.getAbbreviatedType()+""+imageOut.getAbbreviatedType();
+
+		out.print("\t/**\n" +
+				"\t * Converts a {@link Planar} into the equivalent {@link "+outputName+"}\n" +
+				"\t *\n" +
+				"\t * @param input (Input) Planar image that is being converted. Not modified.\n" +
+				"\t * @param output (Optional) The output image.  If null a new image is created. Modified.\n" +
+				"\t * @return Converted image.\n" +
+				"\t */\n" +
+				"\tpublic static "+outputName+" convert"+type+"( Planar<"+bandName+"> input , "+outputName+" output ) {\n" +
+				"\t\tif (output == null) {\n" +
+				"\t\t\toutput = new "+outputName+"(input.width, input.height,input.getNumBands());\n" +
+				"\t\t} else {\n" +
+				"\t\t\toutput.reshape(input.width,input.height,input.getNumBands());\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\t\tImplConvertImage_MT.convert"+type+"(input,output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplConvertImage.convert"+type+"(input,output);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\treturn output;\n" +
