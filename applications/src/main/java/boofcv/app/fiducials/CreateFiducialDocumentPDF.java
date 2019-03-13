@@ -96,6 +96,10 @@ public abstract class CreateFiducialDocumentPDF {
 		int numRows = (int)Math.floor(pageHeight/sizeBox);
 		int numCols = (int)Math.floor(pageWidth/sizeBox);
 
+		if( numRows == 0 || numCols == 0) {
+			throw new IOException("Marker too big to fit on a single page.");
+		}
+
 		// center the marker better if it doesn't fill the entire page
 		if( !gridFill && totalMarkers < numCols*numRows) {
 			int minRows = totalMarkers/numCols;
