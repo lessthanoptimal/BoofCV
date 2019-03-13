@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,6 +36,7 @@ public abstract class DetectBlackShapePanel extends StandardAlgConfigPanel {
 
 	public double zoom = 1;
 
+
 	public void setZoom( double _zoom ) {
 		_zoom = Math.max(MIN_ZOOM,_zoom);
 		_zoom = Math.min(MAX_ZOOM,_zoom);
@@ -43,24 +44,20 @@ public abstract class DetectBlackShapePanel extends StandardAlgConfigPanel {
 			return;
 		zoom = _zoom;
 
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				selectZoom.setValue(zoom);
-			}
-		});
+		BoofSwingUtil.invokeNowOrLater(() -> selectZoom.setValue(zoom));
 	}
 
 	public void setImageSize( final int width , final int height ) {
-		BoofSwingUtil.invokeNowOrLater(new Runnable() {
-			@Override
-			public void run() {
-				imageSizeLabel.setText(width+" x "+height);
-			}
-		});
+		BoofSwingUtil.invokeNowOrLater(() -> imageSizeLabel.setText(width+" x "+height));
 	}
 
-	public void setProcessingTime( double seconds ) {
+	public void setProcessingTimeS( double seconds ) {
 		processingTimeLabel.setText(String.format("%7.1f",(seconds*1000)));
 	}
+
+	public void setProcessingTimeMS(double ms ) {
+		BoofSwingUtil.checkGuiThread();
+		processingTimeLabel.setText(String.format("%7.1f",ms));
+	}
+
 }

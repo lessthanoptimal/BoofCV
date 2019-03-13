@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,13 +19,13 @@
 package boofcv.demonstrations.binary;
 
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.demonstrations.shapes.DetectBlackShapePanel;
+import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
-import boofcv.gui.image.ImagePanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -33,12 +33,19 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.*;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+
+import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
+import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 
 /**
  * Demonstrates different ways to threshold an image
@@ -53,19 +60,32 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 	BufferedImage visualizedBinary;
 	BufferedImage inputCopy;
 
-	ImagePanel gui = new ImagePanel();
+	ShapeVisualizePanel gui = new ShapeVisualizePanel();
 	ControlPanel controlPanel = new ControlPanel();
 
 	public DemoImageThresholdingApp(List<String> examples, Class<T> imageType) {
 		super(examples, ImageType.single(imageType));
 
 		gui.setPreferredSize(new Dimension(800,600));
-		gui.setCentering(true);
+//		gui.setCentering(true);
 
 		add(controlPanel,BorderLayout.WEST);
 		add(gui,BorderLayout.CENTER);
 
+		gui.getImagePanel().addMouseWheelListener(new MouseAdapter() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
 
+				double curr = controlPanel.zoom;
+
+				if( e.getWheelRotation() > 0 )
+					curr *= 1.1;
+				else
+					curr /= 1.1;
+
+				controlPanel.setZoom(curr);
+			}
+		});
 	}
 
 	@Override
@@ -79,6 +99,8 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 	{
 		imageBinary.reshape(width, height);
 		visualizedBinary = ConvertBufferedImage.checkDeclare(width, height, visualizedBinary,BufferedImage.TYPE_INT_BGR);
+
+		controlPanel.setImageSize(width,height);
 	}
 
 	@Override
@@ -88,10 +110,15 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 		ConfigThreshold config = controlPanel.threshold.createConfig();
 		InputToBinary inputToBinary = FactoryThresholdBinary.threshold(config,input.imageType.getImageClass());
 
+		long time0 = System.nanoTime();
 		inputToBinary.process(input,imageBinary);
+		long time1 = System.nanoTime();
+		double processingTimeMS = (time1-time0)*1e-6;
+
 		VisualizeBinaryData.renderBinary(imageBinary, false, visualizedBinary);
 
 		SwingUtilities.invokeLater(() -> {
+			controlPanel.setProcessingTimeMS(processingTimeMS);
 			controlPanel.threshold.updateHistogram((ImageGray)input);
 			changeView();
 		});
@@ -99,8 +126,8 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 
 	public void changeView() {
 		switch( controlPanel.view ) {
-			case 0: gui.setImage(inputCopy); break;
-			case 1: gui.setImage(visualizedBinary); break;
+			case 0: gui.setBufferedImage(inputCopy); break;
+			case 1: gui.setBufferedImage(visualizedBinary); break;
 		}
 		gui.repaint();
 	}
@@ -110,7 +137,7 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 		reprocessInput();
 	}
 
-	class ControlPanel extends StandardAlgConfigPanel implements ActionListener {
+	class ControlPanel extends DetectBlackShapePanel implements ActionListener, ChangeListener {
 		// selects which image to view
 		JComboBox imageView;
 		ThresholdControlPanel threshold = new ThresholdControlPanel(DemoImageThresholdingApp.this);
@@ -118,12 +145,16 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 		int view = 1;
 
 		public ControlPanel() {
+			selectZoom = spinner(1,MIN_ZOOM,MAX_ZOOM,1);
 			imageView = combo(view,"Input","Binary");
 
 			threshold.setBorder(BorderFactory.createEmptyBorder());
 			threshold.addHistogramGraph();
 
+			addLabeled(processingTimeLabel,"Time (ms)");
+			addLabeled(imageSizeLabel,"Image Size");
 			addLabeled(imageView,"View");
+			addLabeled(selectZoom,"Zoom");
 			add(threshold);
 		}
 
@@ -131,6 +162,14 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 		public void actionPerformed(ActionEvent e) {
 			view = imageView.getSelectedIndex();
 			changeView();
+		}
+
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			if (e.getSource() == selectZoom) {
+				zoom = ((Number) selectZoom.getValue()).doubleValue();
+				gui.setScale(zoom);
+			}
 		}
 	}
 

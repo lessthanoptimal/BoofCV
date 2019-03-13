@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -169,7 +169,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 		}
 
 		SwingUtilities.invokeLater(() -> {
-			controls.setProcessingTime(timeInSeconds);
+			controls.setProcessingTimeS(timeInSeconds);
 			viewUpdated();
 		});
 	}

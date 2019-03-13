@@ -232,7 +232,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 
 
 		SwingUtilities.invokeLater(() -> {
-			controls.setProcessingTime(timeInSeconds);
+			controls.setProcessingTimeS(timeInSeconds);
 			viewUpdated();
 			synchronized (detected) {
 				controlPanel.messagePanel.updateList(detected.toList(),failures.toList());

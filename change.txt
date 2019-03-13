@@ -78,6 +78,8 @@ Version : 0.33
   * Removed Lena as default image since that image is no longer considered appropriate by some journals.
      - https://en.wikipedia.org/wiki/Lenna
 
+TODO Add zoom to thresholding app
+
 TODO Regression
   - homography estimation
   - QR Code fiducial 3D pose regression
