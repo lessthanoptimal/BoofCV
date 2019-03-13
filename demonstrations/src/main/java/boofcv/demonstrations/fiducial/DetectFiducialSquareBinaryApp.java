@@ -180,7 +180,7 @@ public class DetectFiducialSquareBinaryApp
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				controls.setProcessingTime(timeInSeconds);
+				controls.setProcessingTimeS(timeInSeconds);
 				viewUpdated();
 			}
 		});
