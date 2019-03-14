@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,6 +50,7 @@ public class CreateFiducialSquareImageGui extends CreateSquareFiducialGui {
 		c.sendToPrinter = sendToPrinter;
 		c.unit = controls.documentUnits;
 		c.paperSize = controls.paperSize;
+		c.blackBorderFractionalWidth = (float)controls.borderFraction;
 		c.markerWidth = (float)controls.markerWidth;
 		c.spaceBetween = c.markerWidth/4;
 		c.gridFill = controls.fillGrid;

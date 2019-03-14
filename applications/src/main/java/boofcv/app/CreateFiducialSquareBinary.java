@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 	public int gridWidth = 4;
 
 	@Override
-	protected void callRenderPdf(CreateSquareFiducialDocumentPDF renderer) {
+	protected void callRenderPdf(CreateSquareFiducialDocumentPDF renderer) throws IOException {
 		List<String> names = new ArrayList<>();
 		GrowQueue_I64 numbers = new GrowQueue_I64();
 
@@ -53,11 +53,7 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 			numbers.add( this.numbers[i]);
 		}
 
-		try {
-			renderer.render(names, numbers, gridWidth);
-		} catch( IOException e ) {
-			e.printStackTrace();
-		}
+		renderer.render(names, numbers, gridWidth);
 	}
 
 	@Override

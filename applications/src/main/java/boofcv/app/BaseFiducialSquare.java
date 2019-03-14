@@ -133,15 +133,16 @@ public abstract class BaseFiducialSquare {
 				renderer.gridFill = gridFill;
 				renderer.drawGrid = drawGrid;
 				renderer.showInfo = !hideInfo;
-				callRenderPdf(renderer);
-				if (sendToPrinter) {
-					try {
+				try {
+					callRenderPdf(renderer);
+					if (sendToPrinter) {
 						renderer.sendToPrinter();
-					} catch (PrinterException e) {
-						throw new RuntimeException(e);
+					} else {
+						renderer.saveToDisk();
 					}
-				} else
-					renderer.saveToDisk();
+				} catch (PrinterException e) {
+					throw new IOException(e);
+				}
 			}
 			break;
 
@@ -156,7 +157,7 @@ public abstract class BaseFiducialSquare {
 		}
 	}
 
-	protected abstract void callRenderPdf(CreateSquareFiducialDocumentPDF renderer);
+	protected abstract void callRenderPdf(CreateSquareFiducialDocumentPDF renderer) throws IOException;
 
 	protected abstract void callRenderImage(CreateSquareFiducialDocumentImage renderer);
 

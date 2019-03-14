@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,6 +48,7 @@ public class CreateFiducialSquareBinaryGui extends CreateSquareFiducialGui {
 		c.unit = controls.documentUnits;
 		c.paperSize = controls.paperSize;
 		c.markerWidth = (float)controls.markerWidth;
+		c.blackBorderFractionalWidth = (float)controls.borderFraction;
 		c.spaceBetween = c.markerWidth/4;
 		c.gridWidth = controls.gridWidth;
 		c.gridFill = controls.fillGrid;
