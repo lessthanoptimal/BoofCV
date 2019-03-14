@@ -18,6 +18,7 @@
 
 package boofcv.abst.sfm.d3;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.MonoPlaneParameters;
@@ -56,6 +57,9 @@ public abstract class CheckVisualOdometryMonoPlaneSim<I extends ImageGray<I>>
 
 	public CheckVisualOdometryMonoPlaneSim(Class<I> inputType) {
 		super(320, 240, inputType);
+
+		// Turn off threads to make results repeatable
+		BoofConcurrency.USE_CONCURRENT = false;
 
 		left = GeneralizedImageOps.createSingleBand(inputType,width,height);
 

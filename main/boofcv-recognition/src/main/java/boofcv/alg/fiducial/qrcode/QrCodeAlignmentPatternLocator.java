@@ -84,7 +84,7 @@ public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 		int where[] = QrCode.VERSION_INFO[qr.version].alignment;
 		qr.alignment.reset();
 		lookup.reset();
-		for (int row =  where.length-1; row >= 0; row--) {
+		for (int row = 0; row < where.length; row++ ) {
 			for (int col = 0; col < where.length; col++) {
 				boolean skip = false;
 				if( row == 0 && col == 0 )

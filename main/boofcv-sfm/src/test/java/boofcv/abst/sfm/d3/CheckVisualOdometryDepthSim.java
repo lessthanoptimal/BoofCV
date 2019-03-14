@@ -18,6 +18,7 @@
 
 package boofcv.abst.sfm.d3;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.DoNothing2Transform2_F32;
@@ -49,6 +50,9 @@ public abstract class CheckVisualOdometryDepthSim<I extends ImageGray<I>,Depth e
 
 	public CheckVisualOdometryDepthSim(Class<I> inputType, Class<Depth> depthType) {
 		super(320, 240, inputType);
+
+		// Turn off threads to make results repeatable
+		BoofConcurrency.USE_CONCURRENT = false;
 
 		left = GeneralizedImageOps.createSingleBand(inputType,width,height);
 		depth = GeneralizedImageOps.createSingleBand(depthType,width,height);
