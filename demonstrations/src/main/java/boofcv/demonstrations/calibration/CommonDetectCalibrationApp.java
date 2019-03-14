@@ -287,7 +287,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 					List<Contour> contour = getContours();
 
 					g2.setStroke(new BasicStroke(1));
-					VisualizeBinaryData.render(contour,null,Color.RED,scale,g2);
+					VisualizeBinaryData.render(contour,null,Color.RED,1.0,scale,g2);
 				}
 
 				if( controlPanel.isShowGraph() ) {

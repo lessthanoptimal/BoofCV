@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -181,24 +181,55 @@ public class VisualizeBinaryData {
 		return out;
 	}
 
-	public static void render(List<Contour> contours , Color internal , Color external , double scale , Graphics2D g2 ) {
+	public static void render(List<List<Point2D_I32>> contours , boolean loops, Color color , double stroke, double scale , Graphics2D g2 ) {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		Line2D.Double l = new Line2D.Double();
 
-		g2.setStroke(new BasicStroke(Math.max(1, (float) scale)));
+		g2.setStroke(new BasicStroke(Math.max(1, (float) (stroke*scale))));
+		g2.setColor(color);
+		for( List<Point2D_I32> c : contours ) {
+			if( loops )
+				renderLoop(scale, g2, l, c);
+			else
+				renderLine(scale, g2, l, c);
+		}
+
+		if( scale > 4 ) {
+			Color before = g2.getColor();
+			g2.setStroke(new BasicStroke(1));
+			g2.setColor(Color.LIGHT_GRAY);
+
+			for( List<Point2D_I32> c : contours ) {
+				if( loops )
+					renderLoop(scale, g2, l, c);
+				else
+					renderLine(scale, g2, l, c);
+			}
+
+			g2.setColor(before);
+		}
+	}
+
+	public static void render(List<Contour> contours , Color internal , Color external , double stroke, double scale , Graphics2D g2 ) {
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		Line2D.Double l = new Line2D.Double();
+
+		g2.setStroke(new BasicStroke(Math.max(1, (float) (stroke*scale))));
 		for( Contour c : contours ) {
 
 			if( external != null) {
 				g2.setColor(external);
-				renderContour(scale, g2, l, c.external);
+				renderLoop(scale, g2, l, c.external);
 			}
 
 			if( internal != null) {
 				g2.setColor(internal);
 				for (List<Point2D_I32> inner : c.internal) {
-					renderContour(scale, g2, l, inner);
+					renderLoop(scale, g2, l, inner);
 				}
 			}
 		}
@@ -210,12 +241,12 @@ public class VisualizeBinaryData {
 
 			for( Contour c : contours ) {
 				if( external != null ) {
-					renderContour(scale, g2, l, c.external);
+					renderLoop(scale, g2, l, c.external);
 				}
 
 				if( internal != null) {
 					for (List<Point2D_I32> inner : c.internal) {
-						renderContour(scale, g2, l, inner);
+						renderLoop(scale, g2, l, inner);
 					}
 				}
 			}
@@ -223,8 +254,19 @@ public class VisualizeBinaryData {
 		}
 	}
 
-	private static void renderContour(double scale, Graphics2D g2, Line2D.Double l, List<Point2D_I32> list) {
+	private static void renderLoop(double scale, Graphics2D g2, Line2D.Double l, List<Point2D_I32> list) {
 		for (int i = 0, j = list.size()-1; i < list.size(); j=i, i++) {
+			Point2D_I32 p0 = list.get(i);
+			Point2D_I32 p1 = list.get(j);
+
+			// draw it in the middle
+			l.setLine((p0.x+0.5)*scale,(p0.y+0.5)*scale,(p1.x+0.5)*scale,(p1.y+0.5)*scale);
+			g2.draw(l);
+		}
+	}
+
+	private static void renderLine(double scale, Graphics2D g2, Line2D.Double l, List<Point2D_I32> list) {
+		for (int i = 1, j = 0; i < list.size(); j=i, i++) {
 			Point2D_I32 p0 = list.get(i);
 			Point2D_I32 p1 = list.get(j);
 

@@ -227,7 +227,7 @@ public class DetectFiducialSquareBinaryApp
 					BinaryContourFinder contour = detector.getSquareDetector().getDetector().getContourFinder();
 					List<Contour> contours = BinaryImageOps.convertContours(contour);
 					g2.setStroke(new BasicStroke(1));
-					VisualizeBinaryData.render(contours, null,Color.CYAN, scale, g2);
+					VisualizeBinaryData.render(contours, null,Color.CYAN, 1.0,scale, g2);
 				}
 
 				FastQueue<FoundFiducial> detected = detector.getFound();
