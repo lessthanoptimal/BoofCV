@@ -73,35 +73,9 @@ Version : 0.33
   * Misc: PixelMath, ImageStatistics, Non-Max, Non-Max Candidate, ConvertImage, ConvertBufferedImage,
           EhanceImageOps
   * Feature Intensity: SURF, SSD Corner
-  * TODO Add code example for turning on and off and setting number of threads
 - Examples
   * Removed Lena as default image since that image is no longer considered appropriate by some journals.
      - https://en.wikipedia.org/wiki/Lenna
-
-TODO Add zoom to thresholding app
-
-TODO Regression
-  - homography estimation
-  - QR Code fiducial 3D pose regression
-
-TODO This Release
-  - QR Code
-    * Target 100% in rotation and not degrading anything else
-  - Self Calibration
-    * TODO Weighted iterated DIAC
-  - Examples
-    * Planar World Simulator
-    * Point Cloud Viewer
-  - Circle Target Detection
-    * three choices; center point, tangent points, or conics.
-    * center = "Detection of Concentric Circles for Camera Calibration" or use ellipse center like most?
-  - Demonstrations
-    * Modernize stabilization and mosaic
-    * Associate with Fundamental - Select different algs + inliers
-    * Associate with Trifocal Tensor
-  - Cheirality
-    * Will also require a linear programming solution, e.g. simplex
-  - Remove dependency on OpenCV in Applications to reduce file size
 
 ---------------------------------------------
 Date    : 2018/12/26
