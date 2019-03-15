@@ -86,8 +86,7 @@ implements ListSelectionListener
 		this.failures.clear();
 		for (int i = 0; i < failures.size(); i++) {
 			QrCode qr = failures.get(i);
-			model.addElement(String.format("v%2d Mode %.7s",qr.version,qr.mode.toString()));
-			model.addElement(String.format("Cause: %s",qr.failureCause.toString()));
+			model.addElement(String.format("v%2d Cause: %s",qr.version,qr.failureCause.toString()));
 			this.failures.add( qr.clone() );
 		}
 		listDetected.invalidate();

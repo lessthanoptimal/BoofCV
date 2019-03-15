@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '0.33'
+    version = '0.33.1-SNAPSHOT'
 
     ext.COMMONS_IO_VERSION = '2.6'
 
