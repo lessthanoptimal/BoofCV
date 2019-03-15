@@ -23,6 +23,7 @@ import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.selfcalib.EstimatePlaneAtInfinityGivenK;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
@@ -82,6 +83,9 @@ import static boofcv.examples.stereo.ExampleTrifocalStereoUncalibrated.computeSt
 public class ExampleStereoUncalibrated {
 
 	public static void main( String args[] ) {
+		// Solution below is unstable. Turning concurrency off so that it always produces a valid solution
+		// The two view case is very challenging and I've not seen a stable algorithm yet
+		BoofConcurrency.USE_CONCURRENT = false;
 
 		// Successful
 		String name = "mono_wall_";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,6 +43,7 @@ public class ImageClassificationPanel extends JPanel
 
 	JScrollPane listScroll;
 	private JList listPanel;
+	JLayeredPane centerPanel;
 	private ImagePanel centerImage = new ImagePanel();
 	DefaultListModel listModel = new DefaultListModel();
 
@@ -61,22 +62,14 @@ public class ImageClassificationPanel extends JPanel
 		listScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		listScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-		final JPanel centerPanel = new JPanel();
-		SpringLayout spring = new SpringLayout();
-		centerPanel.setLayout(spring);
-		centerPanel.add( textArea );
-		centerPanel.add( centerImage );
+		centerPanel = new JLayeredPane();
 		centerPanel.setPreferredSize(new Dimension(600,600));
+		centerPanel.add( textArea , 0);
+		centerPanel.add( centerImage , 1);
 
-
-		// add a constraint to make this image be the same size as the window
-		Spring pw = spring.getConstraint(SpringLayout.WIDTH,  centerPanel);
-		Spring ph = spring.getConstraint(SpringLayout.HEIGHT,  centerPanel);
-		SpringLayout.Constraints c = spring.getConstraints(centerImage);
-		c.setWidth(Spring.scale(pw,  1.0f));
-		c.setHeight(Spring.scale(ph,  1.0f));
 		centerImage.setScaling(ScaleOptions.DOWN);
 		centerImage.setOpaque(true);
+
 
 		textArea.setFont(new Font("Courier New", Font.BOLD, 16));
 		textArea.setLineWrap(false);
@@ -99,17 +92,15 @@ public class ImageClassificationPanel extends JPanel
 			}
 			results.add( a );
 
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					listModel.addElement(a.name);
-					if (listModel.size() == 1) {
-						listPanel.setSelectedIndex(0);
-					}
-					// update the list's size
-					Dimension d = listPanel.getMinimumSize();
-					listPanel.setPreferredSize(new Dimension(d.width + listScroll.getVerticalScrollBar().getWidth(), d.height));
-					validate();
+			SwingUtilities.invokeLater(() -> {
+				listModel.addElement(a.name);
+				if (listModel.size() == 1) {
+					listPanel.setSelectedIndex(0);
 				}
+				// update the list's size
+				Dimension d = listPanel.getMinimumSize();
+				listPanel.setPreferredSize(new Dimension(d.width + listScroll.getVerticalScrollBar().getWidth(), d.height));
+				validate();
 			});
 		}
 		repaint();
@@ -127,24 +118,23 @@ public class ImageClassificationPanel extends JPanel
 				selected = results.get(index);
 			}
 
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					centerImage.setImage(selected.image);
-					centerImage.setPreferredSize(new Dimension(selected.image.getWidth(), selected.image.getHeight()));
-					centerImage.validate();
-					centerImage.repaint();
+			SwingUtilities.invokeLater(() -> {
+				String text = "";
+				int N = Math.min(5, selected.results.size());
+				for (String s : selected.results.subList(0, N)) {
+					text += s+"\n";
+				}
+				textArea.setText(text);
 
-					String text = "";
-					int N = Math.min(5, selected.results.size());
-					for (String s : selected.results.subList(0, N)) {
-						text += s+"\n";
-					}
-					textArea.setText(text);
-//					if( N > 0 ) {
-//						Dimension d = textArea.getPreferredSize();
-//						textArea.setPreferredSize(new Dimension(d.width + 8, d.height * (N - 1) / N + 8));
-//					}
-				}});
+				Dimension tp = textArea.getPreferredSize();
+				textArea.setBounds(0,0,tp.width,tp.height);
+
+				int w = Math.min(selected.image.getWidth(),centerPanel.getWidth());
+				int h = Math.min(selected.image.getHeight(),centerPanel.getHeight());
+
+				centerImage.setBounds(0,0,w,h);
+				centerImage.setImageRepaint(selected.image);
+			});
 		}
 	}
 

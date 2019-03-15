@@ -27,6 +27,7 @@ import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -123,7 +124,11 @@ public class ExampleFeatureSurf {
 	}
 
 	public static void main( String args[] ) {
-		
+
+		// Need to turn off concurrency since the order in which feature are returned
+		// is not determininistic if turned on
+		BoofConcurrency.USE_CONCURRENT = false;
+
 		GrayF32 image = UtilImageIO.loadImage(UtilIO.pathExample("particles01.jpg"), GrayF32.class);
 		
 		// run each example
