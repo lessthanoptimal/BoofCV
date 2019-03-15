@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -163,7 +163,10 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 		if( alg == null )
 			return;
 
-		if( !alg.process(frame) ) {
+		if( infoPanel.resetRequested() ) {
+			totalResets = 0;
+			alg.reset();
+		} else if( !alg.process(frame) ) {
 			alg.reset();
 			totalResets++;
 		}
