@@ -7,6 +7,7 @@ Date    : 2019/
 Version : 0.33.1
 
 - Fixed QR panel list in demo app
+- FileBrowser now lists directories first
 
 ---------------------------------------------
 Date    : 2019/03/14

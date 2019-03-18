@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,10 +32,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.*;
 
 import static javax.swing.text.DefaultCaret.ALWAYS_UPDATE;
 
@@ -55,6 +53,7 @@ public class FileBrowser extends JSpringPanel {
 
 	// directory path
 	List<File> directories = new ArrayList<>();
+	SortDirectoryFirst sorter = new SortDirectoryFirst();
 
 	ActionListener directoryListener;
 
@@ -228,7 +227,7 @@ public class FileBrowser extends JSpringPanel {
 		listModel.clear();
 		File[] fileArray = file.listFiles();
 		List<File> files = fileArray == null ? new ArrayList<>() : Arrays.asList(fileArray);
-		Collections.sort(files);
+		Collections.sort(files,sorter);
 		for (File f : files) {
 			if( f.isHidden() )
 				continue;
@@ -350,6 +349,24 @@ public class FileBrowser extends JSpringPanel {
 				listener.handleSelectedFile(f);
 			} else {
 				listener.handleSelectedFile(null);
+			}
+		}
+	}
+
+	private class SortDirectoryFirst implements Comparator<File> {
+
+		@Override
+		public int compare(File a, File b) {
+			if( a.isDirectory() ) {
+				if( b.isDirectory() ) {
+					return a.getName().compareTo(b.getName());
+				} else {
+					return -1;
+				}
+			} else if( b.isDirectory() ) {
+				return 1;
+			} else {
+				return a.getName().compareTo(b.getName());
 			}
 		}
 	}
