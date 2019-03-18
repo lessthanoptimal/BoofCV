@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -309,6 +309,13 @@ public abstract class DemonstrationBase extends JPanel {
 	 */
 	protected void handleInputChange( int source , InputMethod method , int width , int height ) {
 
+	}
+
+	/**
+	 * Couldn't read an input source. This reports the failure
+	 */
+	protected void handleInputFailure( int source , String error ) {
+		System.err.println(error);
 	}
 
 	/**
@@ -706,7 +713,7 @@ public abstract class DemonstrationBase extends JPanel {
 
 				BufferedImage buffered = UtilImageIO.loadImage(path);
 				if( buffered == null ) {
-					System.err.println("Couldn't open "+path);
+					handleInputFailure(i,"Couldn't open "+path);
 					continue;
 				}
 				if( first ) {

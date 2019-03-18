@@ -243,6 +243,12 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	}
 
 	@Override
+	protected void handleInputFailure(int source, String error) {
+		JOptionPane.showMessageDialog(this, error);
+		System.err.println(error);
+	}
+
+	@Override
 	public void processImage(int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input) {
 		synchronized (lockProcessing) {
 			hasAllImages = false;

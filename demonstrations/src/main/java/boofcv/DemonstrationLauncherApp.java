@@ -26,7 +26,6 @@ import boofcv.demonstrations.color.ShowColorModelApp;
 import boofcv.demonstrations.distort.*;
 import boofcv.demonstrations.enhance.DenoiseVisualizeApp;
 import boofcv.demonstrations.enhance.ImageEnhanceApp;
-import boofcv.demonstrations.feature.associate.VisualizeAssociationAlgorithmsApp;
 import boofcv.demonstrations.feature.associate.VisualizeAssociationMatchesApp;
 import boofcv.demonstrations.feature.associate.VisualizeAssociationScoreApp;
 import boofcv.demonstrations.feature.describe.VisualizeHogDescriptorApp;
@@ -120,7 +119,6 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				DenoiseVisualizeApp.class);
 
 		createNodes(root,"Feature Association",
-				VisualizeAssociationAlgorithmsApp.class,
 				VisualizeAssociationMatchesApp.class,
 				VisualizeAssociationScoreApp.class);
 

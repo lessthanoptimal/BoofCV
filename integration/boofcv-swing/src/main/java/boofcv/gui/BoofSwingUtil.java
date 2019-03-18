@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.gui;
 
 import boofcv.gui.dialogs.OpenImageSetDialog;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -220,8 +221,10 @@ public class BoofSwingUtil {
 		NumberFormat format = NumberFormat.getInstance();
 		NumberFormatter formatter = new NumberFormatter(format);
 		formatter.setValueClass(Integer.class);
-		formatter.setMinimum(min);
-		formatter.setMaximum(max);
+		if( Integer.MIN_VALUE != min )
+			formatter.setMinimum(min);
+		if( Integer.MAX_VALUE != max )
+			formatter.setMaximum(max);
 		formatter.setAllowsInvalid(true);
 //		formatter.setCommitsOnValidEdit(true);
 		JFormattedTextField field = new JFormattedTextField(formatter);
@@ -338,17 +341,25 @@ public class BoofSwingUtil {
 	}
 
 	/**
-	 * Uses mime type to determine if it's an image or not
+	 * Uses mime type to determine if it's an image or not. If mime fails it will look at the suffix. This
+	 * isn't 100% correct.
 	 */
 	public static boolean isImage( File file ){
 		try {
 			String mimeType = Files.probeContentType(file.toPath());
-			if( mimeType == null )
-				return false;
+			if( mimeType == null ) {
+				// In some OS there is a bug where it always returns null/
+				String extension = FilenameUtils.getExtension(file.getName()).toLowerCase();
+				String[] suffixes = ImageIO.getReaderFileSuffixes();
+				for( String s : suffixes ) {
+					if( s.equals(extension)) {
+						return true;
+					}
+				}
+			}
 			return mimeType.startsWith("image");
-		} catch (IOException e) {
-			return false;
-		}
+		} catch (IOException ignore) {}
+		return false;
 	}
 
 	private static double computeButtonScale( int width , int height,

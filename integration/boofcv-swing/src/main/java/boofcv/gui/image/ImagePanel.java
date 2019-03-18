@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -174,7 +174,11 @@ public class ImagePanel extends JPanel {
 		}
 		repaintJustImage(img,workspace);
 		this.img = image;
-		repaintJustImage(img,workspace);
+		if( image != null ) {
+			repaintJustImage(img, workspace);
+		} else {
+			repaint();
+		}
 	}
 
 	/**

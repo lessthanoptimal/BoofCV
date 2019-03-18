@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.*;
 import java.io.*;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -89,8 +90,9 @@ public class UtilImageIO {
 			if( buffered != null )
 				return buffered;
 			if( url.getProtocol().equals("file")) {
-				if( !new File(url.getPath()).exists() ) {
-					System.err.println("File does not exist: "+url.getPath());
+				String path = URLDecoder.decode(url.getPath(), "UTF-8");
+				if( !new File(path).exists() ) {
+					System.err.println("File does not exist: "+path);
 					return null;
 				}
 			}

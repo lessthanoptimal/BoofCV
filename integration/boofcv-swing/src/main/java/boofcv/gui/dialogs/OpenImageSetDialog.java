@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -120,12 +120,14 @@ public class OpenImageSetDialog extends JPanel {
                 Collections.sort(files);
                 for (int j = 0; j < files.size(); j++) {
                     File p = new File(files.get(j));
-                    if(  BoofSwingUtil.isImage(p)) {
+                    // Note: Can't use mimetype to determine if it's an image or not since it isn't 100% reliable
+                    if( p.isFile() ) {
                         selected.addPath(p);
                     }
                 }
-            } else if( BoofSwingUtil.isImage(f))
+            } else {
                 selected.addPath(f);
+            }
         }
     }
 
@@ -164,8 +166,8 @@ public class OpenImageSetDialog extends JPanel {
                 showPreview("");
             } else {
                 if (file.isFile()) {
-                    if( !BoofSwingUtil.isImage(file))
-                        return;
+//                    if( !BoofSwingUtil.isImage(file))
+//                        return;
                     showPreview(file.getPath());
                 } else
                     showPreview("");
@@ -174,7 +176,7 @@ public class OpenImageSetDialog extends JPanel {
 
         @Override
         public void handleClickedFile(File file) {
-            if( BoofSwingUtil.isImage(file))
+//            if( BoofSwingUtil.isImage(file) )
                 selected.addPath(file);
         }
     }
@@ -297,6 +299,7 @@ public class OpenImageSetDialog extends JPanel {
                 }
 
                 BufferedImage full = UtilImageIO.loadImage(path);
+                System.out.println("Full is null " +(full==null));
                 if( full == null ) {
                     preview.setImageRepaint(null);
                 } else {
