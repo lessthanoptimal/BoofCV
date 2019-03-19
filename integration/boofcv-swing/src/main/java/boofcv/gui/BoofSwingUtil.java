@@ -97,8 +97,29 @@ public class BoofSwingUtil {
 
 		boolean selectDirectories = false;
 		escape:for( FileTypes t : filters ) {
-			FileNameExtensionFilter ff;
+			javax.swing.filechooser.FileFilter ff;
 			switch( t ) {
+				case FILES:
+					ff = new javax.swing.filechooser.FileFilter() {
+						@Override
+						public boolean accept(File pathname) {
+							return true;
+						}
+						@Override
+						public String getDescription() {
+							return "All";
+						}
+					};
+					break;
+
+				case YAML:
+					ff = new FileNameExtensionFilter("yaml", "yaml","yml");
+					break;
+
+				case XML:
+					ff = new FileNameExtensionFilter("xml", "xml");
+					break;
+
 				case IMAGES:
 					ff = new FileNameExtensionFilter("Images", ImageIO.getReaderFileSuffixes());
 					break;
@@ -115,12 +136,13 @@ public class BoofSwingUtil {
 			chooser.addChoosableFileFilter(ff);
 		}
 
-		if( selectDirectories && filters.length > 1 ) {
-			throw new IllegalArgumentException("specified directories and other filters. Can only just do directories");
-		}
 		if( selectDirectories ) {
-			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		} else if( filters.length > 0 ) {
+			if( filters.length == 1 )
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			else
+				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		}
+		if( chooser.getChoosableFileFilters().length > 1 ) {
 			chooser.setFileFilter(chooser.getChoosableFileFilters()[1]);
 		}
 
@@ -356,8 +378,9 @@ public class BoofSwingUtil {
 						return true;
 					}
 				}
+			} else {
+				return mimeType.startsWith("image");
 			}
-			return mimeType.startsWith("image");
 		} catch (IOException ignore) {}
 		return false;
 	}
@@ -400,6 +423,6 @@ public class BoofSwingUtil {
 
 	public enum FileTypes
 	{
-		IMAGES,VIDEOS,DIRECTORIES
+		FILES,YAML,XML,IMAGES,VIDEOS,DIRECTORIES
 	}
 }
