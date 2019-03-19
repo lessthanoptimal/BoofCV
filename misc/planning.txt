@@ -1,18 +1,6 @@
-TODO Regression
-  - homography estimation
-  - QR Code fiducial 3D pose regression
-
-TODO This Release
-  - QR Code
-    * Target 100% in rotation and not degrading anything else
-  - Self Calibration
-    * TODO Weighted iterated DIAC
   - Examples
     * Planar World Simulator
     * Point Cloud Viewer
-  - Circle Target Detection
-    * three choices; center point, tangent points, or conics.
-    * center = "Detection of Concentric Circles for Camera Calibration" or use ellipse center like most?
   - Demonstrations
     * Associate with Fundamental - Select different algs + inliers
     * Associate with Trifocal Tensor

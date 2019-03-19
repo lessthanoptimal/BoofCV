@@ -13,6 +13,7 @@
 - Make sure external dependencies are meet and everything builds
   * Android
   * OpenKinect
+
 --- Fresh Checkout ---
 
 VERSION=v0.XX

@@ -3,6 +3,31 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2019
+Version : 0.34
+
+TODO Scene Reconstruction from arbitrary number of photos
+
+TODO Perspective-n-conic
+
+TODO
+  - Circle Target Detection
+    * three choices; center point, tangent points, or conics.
+    * center = "Detection of Concentric Circles for Camera Calibration" or use ellipse center like most?
+
+TODO modernize mosaic and stabilize
+
+TODO Regression
+  - homography estimation
+  - QR Code fiducial 3D pose regression
+
+TODO
+  - QR Code
+    * Target 100% in rotation and not degrading anything else
+  - Self Calibration
+    * TODO Weighted iterated DIAC
+
+---------------------------------------------
 Date    : 2019/03/18
 Version : 0.33.1
 
