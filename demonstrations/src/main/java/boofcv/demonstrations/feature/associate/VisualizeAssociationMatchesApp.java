@@ -109,7 +109,6 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, panel);
 
-		panel.setPreferredSize(new Dimension(1000,500));
 	}
 
 	@Override
@@ -127,7 +126,10 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 //				grayRight.reshape(width,height);
 //				break;
 		}
-		controls.setImageSize(width,height);
+		SwingUtilities.invokeLater(()->{
+			panel.setPreferredSize(width,height,width,height);
+			controls.setImageSize(width,height);
+		});
 	}
 
 	@Override
@@ -395,7 +397,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 
 			// Processing time takes a bit so don't open right away
 			app.openExample(examples.get(0));
-			app.displayImmediate("Associated Matches");
+			app.display("Associated Matches");
 		});
 	}
 }

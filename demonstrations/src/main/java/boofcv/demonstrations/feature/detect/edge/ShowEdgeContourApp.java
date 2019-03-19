@@ -24,25 +24,25 @@ import boofcv.alg.feature.detect.edge.EdgeContour;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.alg.misc.GImageStatistics;
-import boofcv.demonstrations.binary.SelectHistogramThresholdPanel;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.demonstrations.binary.SelectHistogramThresholdPanelV;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
-import boofcv.gui.SelectAlgorithmAndInputPanel;
+import boofcv.gui.BoofSwingUtil;
+import boofcv.gui.DemonstrationBase;
+import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
-import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.ConnectRule;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS32;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,188 +53,180 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ShowEdgeContourApp<T extends ImageGray<T>, D extends ImageGray<D>>
-		extends SelectAlgorithmAndInputPanel implements CannyControlBar.Listener , SelectHistogramThresholdPanel.Listener
+		extends DemonstrationBase implements CannyControlBar.Listener , SelectHistogramThresholdPanelV.Listener
 {
 	// shows panel for displaying input image
-	ImagePanel panel = new ImagePanel();
+	ImagePanel imagePanel = new ImagePanel();
+	ContourControls controls = new ContourControls();
 
-	BufferedImage input;
 	T workImage;
 	Class<T> imageType;
 	Class<D> derivType;
-	boolean processedImage = false;
 
 	GrayU8 binary = new GrayU8(1,1);
 	GrayS32 labeled = new GrayS32(1,1);
-
-	CannyControlBar barCanny;
-	SelectHistogramThresholdPanel barBinary;
-	JPanel bodyPanel = new JPanel();
-	int activeAlg;
 
 	int previousBlur;
 	CannyEdge<T,D> canny;
 	BinaryLabelContourFinder contour = FactoryBinaryContourFinder.linearChang2004();
 
-	public ShowEdgeContourApp(Class<T> imageType, Class<D> derivType) {
-		super(1);
+	public ShowEdgeContourApp(java.util.List<PathLabel> examples, Class<T> imageType) {
+		super(examples, ImageType.single(imageType));
 		this.imageType = imageType;
-		this.derivType = derivType;
+		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		addAlgorithm(0, "Canny", 0);
-		addAlgorithm(0, "Threshold Contour", 1);
+		workImage = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
-		barCanny = new CannyControlBar(1,15);
-		barCanny.setListener(this);
-
-		barBinary = new SelectHistogramThresholdPanel(50,true);
-		barBinary.setListener(this);
-
-		bodyPanel.setLayout(new BorderLayout());
-		bodyPanel.add(panel,BorderLayout.CENTER);
-		bodyPanel.add(barCanny,BorderLayout.NORTH);
-
-		setMainGUI(bodyPanel);
-
-		previousBlur = barCanny.getBlurRadius();
+		previousBlur = controls.barCanny.getBlurRadius();
 		canny =  FactoryEdgeDetectors.canny(previousBlur, true, true, imageType, derivType);
 		contour.setConnectRule(ConnectRule.EIGHT);
-	}
 
-	public void process( BufferedImage input ) {
-		setInputImage(input);
-		this.input = input;
-		workImage = ConvertBufferedImage.convertFromSingle(input, null, imageType);
+		add(BorderLayout.WEST, controls);
+		add(BorderLayout.CENTER, imagePanel);
 
-		// update the binary histogram threshold for this image
-		final double threshold = GImageStatistics.mean(workImage);
-
-		binary.reshape(workImage.width,workImage.height);
-		labeled.reshape(workImage.width,workImage.height);
-
-		final int width = input.getWidth();
-		final int height = input.getHeight();
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				barBinary.setThreshold((int)threshold);
-				barBinary.getHistogramPanel().update(workImage);
-				panel.setPreferredSize(new Dimension(width,height));
-				processedImage = true;
-				doRefreshAll();
-			}});
+//		panel.setPreferredSize(new Dimension(1000,500));
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {}
-
-	@Override
-	public void refreshAll(Object[] cookies) {
-		setActiveAlgorithm(0,null,cookies[0]);
+	protected void handleInputChange( int source , InputMethod method , final int width , final int height ) {
+		binary.reshape(width,height);
+		labeled.reshape(width,height);
+		BoofSwingUtil.invokeNowOrLater(()->{
+			controls.setImageSize(width,height);
+			imagePanel.setPreferredSize(new Dimension(width,height));
+		});
 	}
-
 	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
+	public void processImage(int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input) {
 
-		activeAlg = (Integer) cookie;
+		workImage.setTo((T)input);
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				// swap control bar on top
-				if( activeAlg == 0 ){
-					bodyPanel.remove(barBinary);
-					bodyPanel.add(barCanny,BorderLayout.NORTH);
-					barCanny.repaint();
-				} else {
-					bodyPanel.remove(barCanny);
-					bodyPanel.add(barBinary,BorderLayout.NORTH);
-					barBinary.repaint();
-				}
-				validate();
-			}});
-
-		doProcess();
-	}
-
-	private void doProcess() {
-		if( input == null )
-			return;
-
+		long time0,time1;
 		final BufferedImage temp;
-
-		if( activeAlg == 0 ) {
-			if( previousBlur != barCanny.getBlurRadius() ) {
-				previousBlur = barCanny.getBlurRadius();
+		if( controls.selectedAlg == 0 ) {
+			if( previousBlur != controls.barCanny.getBlurRadius() ) {
+				previousBlur = controls.barCanny.getBlurRadius();
 				canny =  FactoryEdgeDetectors.canny(previousBlur,true, true, imageType, derivType);
 			}
 
-			double thresh = barCanny.getThreshold()/100.0;
+			time0 = System.nanoTime();
+			double thresh = controls.barCanny.getThreshold()/100.0;
 			canny.process(workImage,(float)thresh*0.1f,(float)thresh,null);
+			time1 = System.nanoTime();
+
 			List<EdgeContour> contours = canny.getContours();
 
 			temp = VisualizeBinaryData.renderContours(contours,null,workImage.width,workImage.height,null);
 		} else {
 			// create a binary image by thresholding
-			GThresholdImageOps.threshold(workImage, binary, barBinary.getThreshold(), barBinary.isDown());
-
+			time0 = System.nanoTime();
+			GThresholdImageOps.threshold(workImage, binary, controls.barBinary.getThreshold(), controls.barBinary.isDown());
 			contour.process(binary,labeled);
+			time1 = System.nanoTime();
+
 			List<Contour> contours = BinaryImageOps.convertContours(contour);
 			temp = VisualizeBinaryData.renderContours(contours,null,0xFF1010,
 					workImage.width,workImage.height,null);
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				panel.setImage(temp);
-				panel.repaint();
-			}});
-	}
-
-
-	@Override
-	public void changeInput(String name, int index) {
-		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
-
-		if( image != null ) {
-			process(image);
-		}
-	}
-
-	@Override
-	public boolean getHasProcessedImage() {
-		return processedImage;
+		SwingUtilities.invokeLater(() -> {
+			controls.setTime((time1-time0)*1e-6);
+			controls.barBinary.getHistogramPanel().update(workImage);
+			controls.barBinary.getHistogramPanel().repaint();
+			if( controls.selectedView == 0 )
+				imagePanel.setImageRepaint(temp);
+			else
+				imagePanel.setImageRepaint(bufferedIn);
+		});
 	}
 
 	@Override
 	public void changeCanny() {
-		doProcess();
+		reprocessImageOnly();
 	}
 
 	@Override
 	public void histogramThresholdChange() {
-		doProcess();
+		reprocessImageOnly();
+	}
+
+	class ContourControls extends StandardAlgConfigPanel implements ActionListener {
+		JLabel labelTime = new JLabel();
+		JLabel labelSize = new JLabel();
+		JComboBox<String> comboView;
+		JComboBox<String> comboAlgs;
+
+		CannyControlBar barCanny;
+		SelectHistogramThresholdPanelV barBinary;
+		JPanel algPanel = new JPanel();
+
+		int selectedView = 0;
+		int selectedAlg = 0;
+
+		public ContourControls() {
+			comboView = combo(selectedView,"Contour","Input");
+			comboAlgs = combo(selectedAlg,"Canny","Binary Contour");
+
+			barCanny = new CannyControlBar(1,15);
+			barCanny.setListener(ShowEdgeContourApp.this);
+
+			barBinary = new SelectHistogramThresholdPanelV(125,true);
+			barBinary.setListener(ShowEdgeContourApp.this);
+
+			algPanel.setLayout(new BorderLayout());
+			algPanel.add(barCanny,BorderLayout.CENTER);
+
+			addLabeled(labelTime,"Time (ms)");
+			add(labelSize);
+			addLabeled(comboView,"View");
+			addLabeled(comboAlgs,"Algorithm");
+			addAlignLeft(algPanel);
+		}
+
+		public void setTime( double milliseconds ) {
+			labelTime.setText(String.format("%.1f",milliseconds));
+		}
+
+		public void setImageSize( int width , int height ) {
+			labelSize.setText(width+" x "+height);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if( comboView == e.getSource() ) {
+				selectedView = comboView.getSelectedIndex();
+			} else if( comboAlgs == e.getSource() ){
+				selectedAlg = comboAlgs.getSelectedIndex();
+
+				if( selectedAlg == 0 ){
+					algPanel.remove(barBinary);
+					algPanel.add(barCanny,BorderLayout.NORTH);
+					barCanny.repaint();
+				} else {
+					algPanel.remove(barCanny);
+					algPanel.add(barBinary,BorderLayout.NORTH);
+					barBinary.repaint();
+				}
+			}
+			reprocessInput();
+		}
 	}
 
 	public static void main( String args[] ) {
-		ShowEdgeContourApp<GrayF32,GrayF32> app =
-				new ShowEdgeContourApp<>(GrayF32.class, GrayF32.class);
-//		ShowFeatureOrientationApp<GrayU8, GrayS16> app =
-//				new ShowFeatureOrientationApp<GrayU8,GrayS16>(input,GrayU8.class, GrayS16.class);
 
-		List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
-		inputs.add(new PathLabel("Room",UtilIO.pathExample("indoors01.jpg")));
-		inputs.add(new PathLabel("Objects",UtilIO.pathExample("simple_objects.jpg")));
-		inputs.add(new PathLabel("Indoors",UtilIO.pathExample("lines_indoors.jpg")));
+		List<PathLabel> examples = new ArrayList<>();
+		examples.add(new PathLabel("Objects",UtilIO.pathExample("simple_objects.jpg")));
+		examples.add(new PathLabel("Room",UtilIO.pathExample("indoors01.jpg")));
+		examples.add(new PathLabel("Indoors",UtilIO.pathExample("lines_indoors.jpg")));
+		examples.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
+		examples.add(new PathLabel("Human Statue", UtilIO.pathExample("standard/kodim17.jpg")));
 
-		app.setInputList(inputs);
+		SwingUtilities.invokeLater(()->{
+			ShowEdgeContourApp<GrayF32,GrayF32> app = new ShowEdgeContourApp<>(examples,GrayF32.class);
 
-		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
-		}
-
-		ShowImages.showWindow(app,"Contours", true);
-
-		System.out.println("Done");
+			// Processing time takes a bit so don't open right away
+			app.openExample(examples.get(0));
+			app.display("Edge Contours");
+		});
 	}
 }

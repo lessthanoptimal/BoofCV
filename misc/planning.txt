@@ -14,7 +14,6 @@ TODO This Release
     * three choices; center point, tangent points, or conics.
     * center = "Detection of Concentric Circles for Camera Calibration" or use ellipse center like most?
   - Demonstrations
-    * Modernize stabilization and mosaic
     * Associate with Fundamental - Select different algs + inliers
     * Associate with Trifocal Tensor
   - Cheirality
@@ -26,7 +25,6 @@ TODO This Release
    - TODO Create generic image feature matching for ordered sequences of images
    - TODO homogeneous coordinates
 - TODO Sparse Bundle Adjustment
-   - Future: quaternion implementation
    - Future: sparse block math
 
 - TODO Compare BoofCV's IPPE against original

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,6 +78,12 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 		selected.clear();
 	}
 
+	public void setPreferredSize( int widthLeft , int heightLeft , int widthRight , int heightRight ) {
+		int width = widthLeft + widthRight+borderSize;
+		int height = Math.max(heightLeft,heightRight);
+		setPreferredSize(new Dimension(width,height));
+	}
+
 	/**
 	 * Sets the internal images.  Not thread safe.
 	 *
@@ -88,9 +94,7 @@ public abstract class CompareTwoImagePanel extends JPanel implements MouseListen
 		this.leftImage = leftImage;
 		this.rightImage = rightImage;
 
-		int width = leftImage.getWidth() + rightImage.getWidth()+borderSize;
-		int height = Math.max(leftImage.getHeight(),rightImage.getHeight());
-		setPreferredSize(new Dimension(width,height));
+		setPreferredSize(leftImage.getWidth(),leftImage.getHeight(),rightImage.getWidth(),rightImage.getHeight());
 	}
 
 

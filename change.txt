@@ -13,6 +13,7 @@ Version : 0.33.1
   * Updated association so that you can select your own pair of images
   * Worked around a bug in mimetype in JDK 1.8 in OS X
   * Error reporting if image failed to load
+  * Modernize contour edge
 
 ---------------------------------------------
 Date    : 2019/03/14
