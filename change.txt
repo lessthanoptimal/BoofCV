@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2019/
+Date    : 2019/03/18
 Version : 0.33.1
 
 - Fixed QR panel list in demo app
