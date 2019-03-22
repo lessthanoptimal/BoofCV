@@ -34,6 +34,7 @@ import boofcv.demonstrations.feature.describe.VisualizeRegionDescriptionApp;
 import boofcv.demonstrations.feature.detect.edge.ShowEdgeContourApp;
 import boofcv.demonstrations.feature.detect.extract.CompareFeatureExtractorApp;
 import boofcv.demonstrations.feature.detect.intensity.IntensityFeaturePyramidApp;
+import boofcv.demonstrations.feature.detect.intensity.IntensityPointFeatureApp;
 import boofcv.demonstrations.feature.detect.interest.DemoDetectPointFeaturesApp;
 import boofcv.demonstrations.feature.detect.interest.DetectPointScaleOriWithNoiseApp;
 import boofcv.demonstrations.feature.detect.interest.DetectPointsInsidePyramidApp;
@@ -129,6 +130,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				ShowEdgeContourApp.class,
 				CompareFeatureExtractorApp.class,
 				IntensityFeaturePyramidApp.class,
+				IntensityPointFeatureApp.class,
 				DemoDetectPointFeaturesApp.class,
 //				DetectPointsWithNoiseApp.class,
 				DetectPointScaleOriWithNoiseApp.class,

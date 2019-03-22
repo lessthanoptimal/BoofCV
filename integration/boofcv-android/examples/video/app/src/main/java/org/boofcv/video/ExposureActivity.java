@@ -43,6 +43,9 @@ public class ExposureActivity extends SimpleCamera2Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Java 1.8 issues with older SDK versions
+        BoofConcurrency.USE_CONCURRENT = android.os.Build.VERSION.SDK_INT >= 24;
+
         // This will steam the feed to a texture view. No image
         // processing or bitmaps required
         setContentView(R.layout.exposure);

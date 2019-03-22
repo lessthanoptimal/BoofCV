@@ -95,6 +95,9 @@ public class QrCodeActivity extends VisualizeCamera2Activity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		// Java 1.8 issues with older SDK versions
+		BoofConcurrency.USE_CONCURRENT = android.os.Build.VERSION.SDK_INT >= 24;
+
 		setContentView(R.layout.qrcode);
 		FrameLayout surface = findViewById(R.id.camera_frame);
 		textMessageView = findViewById(R.id.qrmessage);

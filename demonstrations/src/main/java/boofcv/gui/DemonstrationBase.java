@@ -448,7 +448,7 @@ public abstract class DemonstrationBase extends JPanel {
 			}
 		}
 
-		if( closest != null ) {
+		if( closest != null && closest.isFile() ) {
 			openFile(closest);
 		}
 	}

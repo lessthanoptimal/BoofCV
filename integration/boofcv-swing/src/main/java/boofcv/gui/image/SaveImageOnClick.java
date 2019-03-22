@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * Renders what's currently visible in the component and saves to disk.  Opens a dialog to let the user know what's going
@@ -52,7 +53,7 @@ public class SaveImageOnClick extends MouseAdapter {
 
 		if( clicked ) {
 			String fileName = String.format("saved_image%03d.png",saveCounter++);
-			System.out.println("Image saved to "+fileName);
+			System.out.println("Image saved to "+new File(fileName).getAbsolutePath());
 			BufferedImage output = getBufferedImage();
 			UtilImageIO.saveImage(output, fileName);
 			if( hideSaveDialog )

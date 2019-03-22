@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,11 +26,11 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.filter.derivative.GradientThree;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
@@ -54,6 +54,9 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+
+import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
+import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 
 /**
  * Displays the intensity of detected features inside an image
@@ -105,13 +108,13 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
 
-				double curr =imagePanel.getScale();
+				double curr =controlPanel.zoom;
 
 				if( e.getWheelRotation() > 0 )
 					curr *= 1.1;
 				else
 					curr /= 1.1;
-				imagePanel.setScale(curr);
+				controlPanel.setZoom(curr);
 			}
 		});
 	}
@@ -124,10 +127,16 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 	@Override
 	protected void handleInputChange(int source, InputMethod method, int width, int height) {
 		visualized = ConvertBufferedImage.checkDeclare(width,height, visualized,BufferedImage.TYPE_INT_RGB);
-		imagePanel.setPreferredSize(new Dimension(width,height));
 
-		double scale = BoofSwingUtil.selectZoomToShowAll(imagePanel,width,height);
-		imagePanel.setScaleAndCenter(scale,width/2,height/2);
+		SwingUtilities.invokeLater(()->{
+			imagePanel.setPreferredSize(new Dimension(width,height));
+
+			double scale = BoofSwingUtil.selectZoomToShowAll(imagePanel,width,height);
+			controlPanel.zoom = scale; // prevent it from broadcasting an event
+			controlPanel.setZoom(scale);
+			imagePanel.setScaleAndCenter(scale,width/2,height/2);
+			controlPanel.setImageSize(width,height);
+		});
 	}
 
 	@Override
@@ -158,7 +167,6 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 				maximums.addAll(detector.getMaximums());
 			}
 		}
-
 
 		SwingUtilities.invokeLater(() -> {
 			changeViewImage();
@@ -194,15 +202,20 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 				g2.setComposite(beforeAC);
 			}
 
-			if( controlPanel.showPeaks ) {
+			if( controlPanel.showMinimums) {
 				synchronized (lockCorners) {
 					g2.setStroke(new BasicStroke(3));
-					g2.setColor(Color.ORANGE);
+					g2.setColor(Color.BLUE);
 					for (int i = 0; i < minimums.size; i++) {
 						Point2D_I16 c = minimums.get(i);
 						VisualizeFeatures.drawCircle(g2, (c.x + 0.5) * scale, (c.y + 0.5) * scale, 5, circle);
 					}
-					g2.setColor(Color.BLUE);
+				}
+			}
+			if( controlPanel.showMaximums) {
+				synchronized (lockCorners) {
+					g2.setStroke(new BasicStroke(3));
+					g2.setColor(Color.ORANGE);
 					for (int i = 0; i < maximums.size; i++) {
 						Point2D_I16 c = maximums.get(i);
 						VisualizeFeatures.drawCircle(g2, (c.x + 0.5) * scale, (c.y + 0.5) * scale, 5, circle);
@@ -215,7 +228,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 	private void handleAlgorithmChanged() {
 		ConfigGeneralDetector config = new ConfigGeneralDetector();
 		config.radius = controlPanel.radius;
-		config.maxFeatures = 200;
+		config.maxFeatures = controlPanel.maxFeatures;
 
 		synchronized (lockAlgorithm) {
 			switch (controlPanel.selected) {
@@ -253,26 +266,33 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		reprocessImageOnly();
 	}
 
-	class ControlPanel extends StandardAlgConfigPanel implements ActionListener , ChangeListener {
+	class ControlPanel extends DetectBlackShapePanel implements ActionListener , ChangeListener {
 		JComboBox<String> comboView;
 		JComboBox<String> comboAlgorithm;
 		JSpinner spinnerRadius;
 		JCheckBox checkWeighted;
 		JCheckBox checkShowLocalMax;
+		JCheckBox checkShowLocalMin;
+		JSpinner spinnerMaxFeatures;
 
 		String selected = null;
 		int radius = 2;
 		boolean weighted=false;
-		boolean showPeaks =false;
+		boolean showMaximums =false;
+		boolean showMinimums =false;
 		int view = 0;
+		int maxFeatures = 200;
 
 		public ControlPanel() {
 			comboAlgorithm = new JComboBox<>();
 
+			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			comboView = combo(view,"Intensity","Image","Both");
 			spinnerRadius = spinner(radius, 1, 100, 1);
 			checkWeighted = checkbox("weighted", weighted);
-			checkShowLocalMax = checkbox("Show Maximums", showPeaks);
+			checkShowLocalMax = checkbox("Show Maximums", showMaximums);
+			checkShowLocalMin = checkbox("Show Minimums", showMinimums);
+			spinnerMaxFeatures = spinner(maxFeatures,1,100_000,10);
 
 			for (String name : names) {
 				comboAlgorithm.addItem(name);
@@ -282,11 +302,15 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 			comboView.setMaximumSize(comboAlgorithm.getPreferredSize());
 			comboAlgorithm.setMaximumSize(comboAlgorithm.getPreferredSize());
 
+			addLabeled(imageSizeLabel,"Image Size");
 			addLabeled(comboView,"View");
+			addLabeled(selectZoom,"Zoom");
 			addLabeled(comboAlgorithm,"Detector");
 			addAlignLeft(checkShowLocalMax);
+			addAlignLeft(checkShowLocalMin);
 			addAlignLeft(checkWeighted);
 			addLabeled(spinnerRadius,"Radius");
+			addLabeled(spinnerMaxFeatures,"Max Features");
 		}
 
 		@Override
@@ -303,7 +327,10 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 				changeViewImage();
 				imagePanel.repaint();
 			} else if( e.getSource() == checkShowLocalMax ) {
-				showPeaks = checkShowLocalMax.isSelected();
+				showMaximums = checkShowLocalMax.isSelected();
+				imagePanel.repaint();
+			} else if( e.getSource() == checkShowLocalMin ) {
+				showMinimums = checkShowLocalMin.isSelected();
 				imagePanel.repaint();
 			}
 		}
@@ -313,6 +340,12 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 			if( e.getSource() == spinnerRadius ) {
 				radius = ((Number)spinnerRadius.getValue()).intValue();
 				handleAlgorithmChanged();
+			} else if( e.getSource() == spinnerMaxFeatures ) {
+				maxFeatures = ((Number)spinnerMaxFeatures.getValue()).intValue();
+				handleAlgorithmChanged();
+			} else if( e.getSource() == selectZoom ) {
+				zoom = ((Number)selectZoom.getValue()).doubleValue();
+				imagePanel.setScale(zoom);
 			}
 		}
 
@@ -347,10 +380,12 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		examples.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
 		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 
-		IntensityPointFeatureApp<GrayU8, GrayS16> app = new IntensityPointFeatureApp(examples,GrayU8.class);
+		SwingUtilities.invokeLater(()->{
+			IntensityPointFeatureApp<GrayU8, GrayS16> app = new IntensityPointFeatureApp(examples,GrayU8.class);
 
-		app.openExample(examples.get(0));
-		app.waitUntilInputSizeIsKnown();
-		app.display("Feature Intensity");
+			app.openExample(examples.get(0));
+			app.waitUntilInputSizeIsKnown();
+			app.display("Feature Intensity");
+		});
 	}
 }

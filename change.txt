@@ -6,6 +6,13 @@ Date Format: year/month/day
 Date    : 2019
 Version : 0.34
 
+- Examples
+  * Added corner detector
+- Demonstrations
+  * TODO modernize mosaic and stabilize
+- Examples
+  * Android example disables threads if SDK is prior to 24 due to lack of Java 1.8 support
+
 TODO Scene Reconstruction from arbitrary number of photos
 
 TODO Perspective-n-conic
@@ -14,8 +21,6 @@ TODO
   - Circle Target Detection
     * three choices; center point, tangent points, or conics.
     * center = "Detection of Concentric Circles for Camera Calibration" or use ellipse center like most?
-
-TODO modernize mosaic and stabilize
 
 TODO Regression
   - homography estimation

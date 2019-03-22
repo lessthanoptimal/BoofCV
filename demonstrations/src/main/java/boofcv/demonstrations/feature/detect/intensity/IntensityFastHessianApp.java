@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,44 +18,65 @@
 
 package boofcv.demonstrations.feature.detect.intensity;
 
-import boofcv.alg.feature.detect.intensity.IntegralImageFeatureIntensity;
+import boofcv.alg.feature.detect.intensity.GIntegralImageFeatureIntensity;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.alg.transform.ii.IntegralImageOps;
+import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.ListDisplayPanel;
-import boofcv.gui.image.ShowImages;
+import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
-import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * Displays intensity of features in the SURF feature detector
  * @author Peter Abeles
  */
-public class IntensityFastHessianApp {
-//	static String fileName = "data/outdoors01.jpg";
-	static String fileName = UtilIO.pathExample("sunflowers.jpg");
-//	static String fileName = "data/particles01.jpg";
-//	static String fileName = "data/scale/beach02.jpg";
-//	static String fileName = "data/scale/mountain_7p1mm.jpg";
-//	static String fileName = "data/indoors01.jpg";
-//	static String fileName = "data/shapes01.png";
+public class IntensityFastHessianApp<T extends ImageGray<T>>
+		extends DemonstrationBase
+{
 
-	public static void main( String args[] ) {
+	ImageGray integral;
+	GrayF32 intensity = new GrayF32(1,1);
 
-		BufferedImage input = UtilImageIO.loadImage(fileName);
-		GrayF32 inputF32 = ConvertBufferedImage.convertFrom(input,(GrayF32)null);
+	ListDisplayPanel guiIntensity = new ListDisplayPanel();
 
-		GrayF32 integral = IntegralImageOps.transform(inputF32,null);
-		GrayF32 intensity = new GrayF32(integral.width,integral.height);
+	public IntensityFastHessianApp(List<?> exampleInputs, Class<T> imageType ) {
+		super(exampleInputs, ImageType.single(imageType));
 
-		ListDisplayPanel guiIntensity = new ListDisplayPanel();
-		guiIntensity.addImage(input,"Original");
-		guiIntensity.addImage(VisualizeImageData.grayMagnitude(inputF32,null,255),"Gray");
+		Class integralType = GIntegralImageOps.getIntegralType(imageType);
+		integral = GeneralizedImageOps.createSingleBand(integralType,1,1);
+		add(guiIntensity, BorderLayout.CENTER);
+	}
+
+	@Override
+	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+		super.handleInputChange(source, method, width, height);
+
+		SwingUtilities.invokeLater(()-> {
+			guiIntensity.setPreferredSize(new Dimension(width, height));
+		});
+	}
+
+	@Override
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
+		GIntegralImageOps.transform((T)input,integral);
+		intensity.reshape(integral.width,input.height);
+
+		List<BufferedImage> layers = new ArrayList<>();
+		List<String> labels = new ArrayList<>();
 
 		int skip = 0;
 		for( int octave = 0; octave < 4; octave++ ) {
@@ -67,13 +88,42 @@ public class IntensityFastHessianApp {
 				int block = 1+skip*2*(sizeIndex+1);
 				int size = 3*block;
 
-				IntegralImageFeatureIntensity.hessian(integral, 1, size, intensity);
+				GIntegralImageFeatureIntensity.hessian(integral, 1, size, intensity);
 				float maxAbs = ImageStatistics.maxAbs(intensity);
 				BufferedImage b = VisualizeImageData.colorizeSign(intensity,null,maxAbs);
-				guiIntensity.addImage(b,String.format("Oct = %2d size %3d",octave+1,size));
+				labels.add(String.format("Oct = %2d size %3d",octave+1,size));
+				layers.add(b);
 			}
 		}
 
-		ShowImages.showWindow(guiIntensity,"Feature Intensity",true);
+		SwingUtilities.invokeLater(()->{
+			guiIntensity.reset();
+			guiIntensity.addImage(buffered,"Original");
+			guiIntensity.addImage(input,"Gray");
+			for (int i = 0; i < layers.size(); i++) {
+				guiIntensity.addImage(layers.get(i),labels.get(i), ScaleOptions.DOWN);
+			}
+		});
 	}
+
+	public static void main( String args[] ) {
+
+		java.util.List<PathLabel> examples = new ArrayList<>();
+
+		examples.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
+		examples.add(new PathLabel("outdoors01",UtilIO.pathExample("outdoors01.jpg")));
+		examples.add(new PathLabel("particles01", UtilIO.pathExample("particles01.jpg")));
+		examples.add(new PathLabel("beach02",UtilIO.pathExample("scale/beach02.jpg")));
+		examples.add(new PathLabel("mountain",UtilIO.pathExample("data/scale/mountain_7p1mm.jpg")));
+		examples.add(new PathLabel("shapes01",UtilIO.pathExample("fiducial/shapes01.png")));
+
+		SwingUtilities.invokeLater(()->{
+			IntensityFastHessianApp<GrayF32> app = new IntensityFastHessianApp(examples,GrayF32.class);
+
+			app.openExample(examples.get(0));
+			app.waitUntilInputSizeIsKnown();
+			app.display("Feature Intensity");
+		});
+	}
+
 }
