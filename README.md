@@ -101,7 +101,7 @@ If you wish to have jars instead, the following commands are provided.
 ```bash
 ./gradlew oneJarBin               # Builds a single jar with all of BoofCV in it
 ./gradlew createLibraryDirectory  # Puts all jars and dependencies into boofcv/library
-./gradlew alljavadoc              # Combines all JavaDoc from all sub-porjects into a single set
+./gradlew alljavadoc              # Combines all JavaDoc from all sub-projects into a single set
 ```
 
 
