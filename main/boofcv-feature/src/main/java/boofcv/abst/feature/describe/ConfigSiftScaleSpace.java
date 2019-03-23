@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,8 @@ import boofcv.struct.Configuration;
 public class ConfigSiftScaleSpace implements Configuration {
 
 	/**
-	 * Amount of blur at the first level in the image pyramid.  Recommend 1.6
+	 * Amount of blur at the first level in the image pyramid.  Paper recommends 1.6, but 2.75 was
+	 * found to yield better results in a larger test set.
 	 */
 	public float sigma0 = 2.75f;
 
@@ -43,9 +44,11 @@ public class ConfigSiftScaleSpace implements Configuration {
 
 	/**
 	 * Specified the first and last octaves.  Each octave is a factor of 2 smaller or larger
-	 * than the input image.  The overall size of an octave relative to the input image is pow(2,-octave)
+	 * than the input image.  The overall size of an octave relative to the input image is pow(2,-octave).
+	 *
+	 * For best results sets first octave to -1, but this is very slow so 0 is used instead
 	 */
-	public int firstOctave = -1, lastOctave = 5;
+	public int firstOctave = 0, lastOctave = 5;
 
 	/**
 	 * Creates a configuration similar to how it was originally described in the paper
