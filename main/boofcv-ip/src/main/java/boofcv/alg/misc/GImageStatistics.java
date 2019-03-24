@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,8 +73,18 @@ public class GImageStatistics {
 			} else {
 				throw new IllegalArgumentException("Unknown Image Type: " + input.getClass().getSimpleName());
 			}
+		} else if( input instanceof Planar ){
+			Planar pl = (Planar)input;
+			int N = pl.getNumBands();
+			if( N == 0 )
+				throw new IllegalArgumentException("Must have at least one band");
+			double result = maxAbs(pl.bands[0]);
+			for (int i = 1; i < N; i++) {
+				result = Math.max(result,maxAbs(pl.bands[i]));
+			}
+			return result;
 		} else {
-			throw new IllegalArgumentException("Planar image support needs to be added");
+			throw new IllegalArgumentException("Image type not yet supported "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -125,8 +135,18 @@ public class GImageStatistics {
 			} else {
 				throw new IllegalArgumentException("Unknown Image Type");
 			}
+		} else if( input instanceof Planar ){
+			Planar pl = (Planar)input;
+			int N = pl.getNumBands();
+			if( N == 0 )
+				throw new IllegalArgumentException("Must have at least one band");
+			double result = max(pl.bands[0]);
+			for (int i = 1; i < N; i++) {
+				result = Math.max(result,max(pl.bands[i]));
+			}
+			return result;
 		} else {
-			throw new IllegalArgumentException("Planar image support needs to be added");
+			throw new IllegalArgumentException("Image type not yet supported "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -177,8 +197,18 @@ public class GImageStatistics {
 			} else {
 				throw new IllegalArgumentException("Unknown Image Type: " + input.getClass().getSimpleName());
 			}
+		} else if( input instanceof Planar ){
+			Planar pl = (Planar)input;
+			int N = pl.getNumBands();
+			if( N == 0 )
+				throw new IllegalArgumentException("Must have at least one band");
+			double result = min(pl.bands[0]);
+			for (int i = 1; i < N; i++) {
+				result = Math.min(result,min(pl.bands[i]));
+			}
+			return result;
 		} else {
-			throw new IllegalArgumentException("Planar image support needs to be added");
+			throw new IllegalArgumentException("Image type not yet supported "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -240,7 +270,7 @@ public class GImageStatistics {
 			}
 			return sum;
 		} else {
-			throw new IllegalArgumentException("Planar image support needs to be added");
+			throw new IllegalArgumentException("Image type not yet supported "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -292,8 +322,15 @@ public class GImageStatistics {
 			} else {
 				throw new IllegalArgumentException("Unknown image Type");
 			}
+		} else if( input instanceof Planar ) {
+			double mean = 0;
+			Planar in = (Planar) input;
+			for (int i = 0; i < in.getNumBands(); i++) {
+				mean += mean( in.getBand(i));
+			}
+			return mean/in.getNumBands();
 		} else {
-			throw new IllegalArgumentException("Planar image support needs to be added");
+			throw new IllegalArgumentException("Image type not yet supported "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -376,8 +413,16 @@ public class GImageStatistics {
 			} else {
 				throw new IllegalArgumentException("Unknown image Type");
 			}
+		} else if( inputA instanceof Planar ) {
+			double mean = 0;
+			Planar inA = (Planar) inputA;
+			Planar inB = (Planar) inputB;
+			for (int i = 0; i < inA.getNumBands(); i++) {
+				mean += meanDiffSq( inA.getBand(i), inB.getBand(i));
+			}
+			return mean/inA.getNumBands();
 		} else {
-			throw new IllegalArgumentException("Planar images needs to be added");
+			throw new IllegalArgumentException("Image type not yet supported "+inputA.getClass().getSimpleName());
 		}
 	}
 
@@ -430,8 +475,16 @@ public class GImageStatistics {
 			} else {
 				throw new IllegalArgumentException("Unknown image Type");
 			}
+		} else if( inputA instanceof Planar ) {
+			double mean = 0;
+			Planar inA = (Planar) inputA;
+			Planar inB = (Planar) inputB;
+			for (int i = 0; i < inA.getNumBands(); i++) {
+				mean += meanDiffAbs( inA.getBand(i), inB.getBand(i));
+			}
+			return mean/inA.getNumBands();
 		} else {
-			throw new IllegalArgumentException("Planar images needs to be added");
+			throw new IllegalArgumentException("Image type not yet supported "+inputA.getClass().getSimpleName());
 		}
 	}
 

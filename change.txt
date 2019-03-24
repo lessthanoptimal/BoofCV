@@ -12,6 +12,8 @@ Version : 0.34
   * TODO modernize mosaic and stabilize
 - Examples
   * Android example disables threads if SDK is prior to 24 due to lack of Java 1.8 support
+- ImageStatistics
+  * Added support for Planar images. Thanks thhart for the suggestion
 
 TODO Scene Reconstruction from arbitrary number of photos
 

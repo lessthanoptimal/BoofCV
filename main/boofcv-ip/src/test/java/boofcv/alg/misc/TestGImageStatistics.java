@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -95,5 +96,45 @@ public class TestGImageStatistics extends BaseGClassChecksInMisc {
 
 			assertTrue(valueT == valueV);
 		}
+	}
+
+	@Test
+	void maxAbs_planar() {
+		fail("Implement");
+	}
+
+	@Test
+	void max_planar() {
+		fail("Implement");
+	}
+
+	@Test
+	void min_planar() {
+		fail("Implement");
+	}
+
+	@Test
+	void sum_planar() {
+		fail("Implement");
+	}
+
+	@Test
+	void mean_planar() {
+		fail("Implement");
+	}
+
+	@Test
+	void variance_planar() {
+		fail("Implement");
+	}
+
+	@Test
+	void meanDiffSq_planar() {
+		fail("Implement");
+	}
+
+	@Test
+	void meanDiffAbs_planar() {
+		fail("Implement");
 	}
 }
