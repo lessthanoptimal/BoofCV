@@ -20,10 +20,7 @@ package boofcv.factory.feature.associate;
 
 import boofcv.abst.feature.associate.*;
 import boofcv.alg.descriptor.KdTreeTuple_F64;
-import boofcv.alg.feature.associate.AssociateGreedy;
-import boofcv.alg.feature.associate.AssociateGreedyBase;
-import boofcv.alg.feature.associate.AssociateGreedy_MT;
-import boofcv.alg.feature.associate.AssociateNearestNeighbor;
+import boofcv.alg.feature.associate.*;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.feature.*;
 import org.ddogleg.nn.FactoryNearestNeighbor;
@@ -72,7 +69,7 @@ public class FactoryAssociation {
 	 * Approximate association using a K-D tree degree of moderate size (10-15) that uses a best-bin-first search
 	 * order.
 	 *
-	 * @see AssociateNearestNeighbor
+	 * @see AssociateNearestNeighbor_ST
 	 * @see org.ddogleg.nn.alg.searches.KdTreeSearch1Bbf
 	 *
 	 * @param dimension Number of elements in the feature vector
@@ -90,7 +87,7 @@ public class FactoryAssociation {
 	 * Approximate association using multiple random K-D trees (random forest) for descriptors with a high degree of
 	 * freedom, e.g. &gt; 20
 	 *
-	 * @see AssociateNearestNeighbor
+	 * @see AssociateNearestNeighbor_ST
 	 * @see org.ddogleg.nn.wrap.KdForestBbfSearch
 	 *
 	 * @param dimension Number of elements in the feature vector
@@ -123,7 +120,12 @@ public class FactoryAssociation {
 
 		config.checkValidity();
 
-		AssociateNearestNeighbor<TupleDesc_F64> assoc = new AssociateNearestNeighbor<>(nn);
+		AssociateNearestNeighbor<TupleDesc_F64> assoc;
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			assoc = new AssociateNearestNeighbor_MT<>(nn);
+		} else {
+			assoc = new AssociateNearestNeighbor_ST<>(nn);
+		}
 		assoc.setRatioUsesSqrt(config.distanceIsSquared);
 		assoc.setMaxScoreThreshold(config.maxErrorThreshold);
 		assoc.setScoreRatioThreshold(config.scoreRatioThreshold);

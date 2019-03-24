@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,11 @@
 
 package boofcv.factory.feature.associate;
 
+import boofcv.alg.feature.associate.AssociateNearestNeighbor_ST;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for {@link boofcv.alg.feature.associate.AssociateNearestNeighbor}.
+ * Configuration for {@link AssociateNearestNeighbor_ST}.
  *
  * @author Peter Abeles
  */

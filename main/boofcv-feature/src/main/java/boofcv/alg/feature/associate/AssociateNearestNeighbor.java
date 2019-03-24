@@ -30,8 +30,8 @@ import java.util.List;
 
 /**
  * <p>Matches features using a {@link NearestNeighbor} search from DDogleg.  The source features are processed
- * as a lump using {@link NearestNeighbor#setPoints(java.util.List, boolean)} while destination features
- * are matched one at time using {@link NearestNeighbor#findNearest(Object, double, org.ddogleg.nn.NnData)}.
+ * as a lump using {@link NearestNeighbor#setPoints(List, boolean)} while destination features
+ * are matched one at time using {@link NearestNeighbor.Search#findNearest(Object, double, NnData)}.
  * Typically the processing of source features is more expensive and should be minimized while looking up
  * destination features is fast.  Multiple matches for source features are possible while there will only
  * be a unique match for each destination feature.</p>
@@ -45,17 +45,14 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class AssociateNearestNeighbor<D>
+public abstract class AssociateNearestNeighbor<D>
 		implements AssociateDescription<D>
 {
 	// Nearest Neighbor algorithm and storage for the results
-	private NearestNeighbor<D> alg;
-	private NearestNeighbor.Search<D> search;
-	private NnData<D> result = new NnData<>();
-	private FastQueue<NnData<D>> result2 = new FastQueue(NnData.class,true);
+	NearestNeighbor<D> alg;
 
 	// list of features in destination set that are to be searched for in the source list
-	private FastQueue<D> listDst;
+	FastQueue<D> listDst;
 
 	int sizeSrc;
 
@@ -66,24 +63,22 @@ public class AssociateNearestNeighbor<D>
 	double scoreRatioThreshold =1.0;
 
 	// List of final associated points
-	private FastQueue<AssociatedIndex> matches = new FastQueue<>(100, AssociatedIndex.class, true);
+	protected final FastQueue<AssociatedIndex> matchesAll = new FastQueue<>(100, AssociatedIndex.class, true);
 
 	// creates a list of unassociated features from the list of matches
 	private FindUnassociated unassociated = new FindUnassociated();
 
 	// maximum distance away two points can be
-	private double maxDistance = -1;
+	double maxDistance = -1;
 
 	public AssociateNearestNeighbor(NearestNeighbor<D> alg) {
 		this.alg = alg;
-		this.search = alg.createSearch();
 	}
 
 	@Override
 	public void setSource(FastQueue<D> listSrc) {
 		this.sizeSrc = listSrc.size;
 		alg.setPoints((List)listSrc.toList(),true);
-		search.initialize();
 	}
 
 	@Override
@@ -92,60 +87,18 @@ public class AssociateNearestNeighbor<D>
 	}
 
 	@Override
-	public void associate() {
-
-		matches.resize(listDst.size);
-		matches.reset();
-		if( scoreRatioThreshold >= 1.0 ) {
-			// if score ratio is not turned on then just use the best match
-			for (int i = 0; i < listDst.size; i++) {
-				if (!search.findNearest(listDst.data[i], maxDistance, result))
-					continue;
-				matches.grow().setAssociation(result.index, i, result.distance);
-			}
-		} else {
-			for (int i = 0; i < listDst.size; i++) {
-				search.findNearest(listDst.data[i], maxDistance,2, result2);
-
-				if( result2.size == 1 ) {
-					NnData<D> r = result2.getTail();
-					matches.grow().setAssociation(r.index, i, r.distance);
-				} else if( result2.size == 2 ) {
-					NnData<D> r0 = result2.get(0);
-					NnData<D> r1 = result2.get(1);
-
-					// ensure that r0 is the closest
-					if( r0.distance > r1.distance ) {
-						NnData<D> tmp = r0;
-						r0 = r1;
-						r1 = tmp;
-					}
-
-					double foundRatio = ratioUsesSqrt ?Math.sqrt(r0.distance)/Math.sqrt(r1.distance) :r0.distance/r1.distance;
-					if( foundRatio <= scoreRatioThreshold) {
-						matches.grow().setAssociation(r0.index, i, r0.distance);
-					}
-				} else if( result2.size != 0 ){
-					throw new RuntimeException("BUG! 0,1,2 are acceptable not "+result2.size);
-				}
-			}
-		}
-
-	}
-
-	@Override
 	public FastQueue<AssociatedIndex> getMatches() {
-		return matches;
+		return matchesAll;
 	}
 
 	@Override
 	public GrowQueue_I32 getUnassociatedSource() {
-		return unassociated.checkSource(matches,sizeSrc);
+		return unassociated.checkSource(matchesAll,sizeSrc);
 	}
 
 	@Override
 	public GrowQueue_I32 getUnassociatedDestination() {
-		return unassociated.checkDestination(matches,listDst.size());
+		return unassociated.checkDestination(matchesAll,listDst.size());
 	}
 
 	@Override

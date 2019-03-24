@@ -16,8 +16,8 @@ Version : 0.34
   * Added support for Planar images. Thanks thhart for the suggestion
 - Feature Association
   * Concurrent version of Greedy Association
-  * TODO Concurrent version of Nearest Neighbor Association
-  * TODO Concurrent version of Random Forest Association
+  * Concurrent version of Nearest Neighbor Association
+  * Concurrent version of Random Forest Association
   * TODO Remove SURF specific association. Replace with discrete sets
 - Feature Descriptors
   * TODO Concurrent version of describe

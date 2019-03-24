@@ -37,9 +37,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionChecks<TupleDesc_F64> {
+public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptionChecks<TupleDesc_F64> {
 
-	public TestAssociateNearestNeighbor() {
+	public TestAssociateNearestNeighbor_ST() {
 		super(TupleDesc_F64.class);
 	}
 
@@ -47,7 +47,7 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 	public AssociateDescription<TupleDesc_F64> createAlg() {
 		// exhaustive algorithm will produce perfect results
 		NearestNeighbor<TupleDesc_F64> exhaustive = FactoryNearestNeighbor.exhaustive(new KdTreeTuple_F64(1));
-		return new AssociateNearestNeighbor<>(exhaustive);
+		return new AssociateNearestNeighbor_ST<>(exhaustive);
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 		nn.assoc = new int[]{2,0,1,-1,4,-1,-1,2,2,1};
 		nn.distanceScale = 2.0;
 
-		AssociateNearestNeighbor<TupleDesc_F64> alg = new AssociateNearestNeighbor<>(nn);
+		AssociateNearestNeighbor_ST<TupleDesc_F64> alg = new AssociateNearestNeighbor_ST<>(nn);
 
 		FastQueue<TupleDesc_F64> src = new FastQueue<>(10, TupleDesc_F64.class, false);
 		FastQueue<TupleDesc_F64> dst = new FastQueue<>(10, TupleDesc_F64.class, false);
@@ -113,7 +113,7 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 		// src = assoc[i] where src is the index of the source feature and i is the index of the dst feature
 		nn.assoc = new int[]{2,0,1,-1,4,-1,-1,2,2,1};
 
-		AssociateNearestNeighbor<TupleDesc_F64> alg = new AssociateNearestNeighbor<>(nn);
+		AssociateNearestNeighbor_ST<TupleDesc_F64> alg = new AssociateNearestNeighbor_ST<>(nn);
 
 		FastQueue<TupleDesc_F64> src = new FastQueue<>(10, TupleDesc_F64.class, false);
 		FastQueue<TupleDesc_F64> dst = new FastQueue<>(10, TupleDesc_F64.class, false);
