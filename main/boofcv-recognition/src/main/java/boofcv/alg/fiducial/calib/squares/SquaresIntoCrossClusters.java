@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,8 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	double tooFarFraction = 0.3;
 
 	// used to search for neighbors that which are candidates for connecting
-	private NearestNeighbor<Point2D_F64> search = FactoryNearestNeighbor.kdtree(new KdTreePoint2D_F64());
+	private NearestNeighbor<Point2D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint2D_F64());
+	private NearestNeighbor.Search<Point2D_F64> search = nn.createSearch();
 	private List<Point2D_F64> searchPoints = new ArrayList<>();
 	private List<SquareNode> searchSquareList = new ArrayList<>();
 	private FastQueue<NnData<Point2D_F64>> searchResults = new FastQueue(NnData.class,true);
@@ -198,7 +199,8 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 				searchSquareList.add(n);
 			}
 		}
-		search.setPoints(searchPoints,true);
+		nn.setPoints(searchPoints,true);
+		search.initialize();
 	}
 
 	/**

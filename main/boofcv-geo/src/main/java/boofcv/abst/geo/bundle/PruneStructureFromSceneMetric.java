@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -244,7 +244,9 @@ public class PruneStructureFromSceneMetric {
 		}
 
 		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64());
+		NearestNeighbor.Search<Point3D_F64> search = nn.createSearch();
 		nn.setPoints(cloud,false);
+		search.initialize();
 		FastQueue<NnData<Point3D_F64>> resultsNN = new FastQueue(NnData.class,true);
 
 		// Create a look up table containing from old to new indexes for each point
@@ -259,7 +261,7 @@ public class PruneStructureFromSceneMetric {
 			structureP.get(worldX);
 
 			// distance is squared
-			nn.findNearest(cloud.get(pointId),distance*distance,neighbors+1,resultsNN);
+			search.findNearest(cloud.get(pointId),distance*distance,neighbors+1,resultsNN);
 
 			// Don't prune if it has enough neighbors. Remember that it will always find itself.
 			if( resultsNN.size() > neighbors ) {

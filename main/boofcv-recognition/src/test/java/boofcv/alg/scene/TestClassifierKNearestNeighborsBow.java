@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -87,19 +87,32 @@ public class TestClassifierKNearestNeighborsBow {
 		}
 
 		@Override
-		public boolean findNearest(HistogramScene point, double maxDistance, NnData<HistogramScene> result) {
-			throw new RuntimeException("Wasn't expecting this to be called!");
+		public Search<HistogramScene> createSearch() {
+			return new InternalSearch();
 		}
 
-		@Override
-		public void findNearest(HistogramScene point, double maxDistance, int numNeighbors,
-								FastQueue<NnData<HistogramScene>> result) {
-			assertTrue(result.size() == 0);
+		public class InternalSearch implements NearestNeighbor.Search<HistogramScene> {
 
-			for (int i = 0; i < numNeighbors; i++) {
-				NnData<HistogramScene> d = result.grow();
-				d.point = new HistogramScene(NUM_WORDS);
-				d.point.type = 2;
+			@Override
+			public void initialize() {
+
+			}
+
+			@Override
+			public boolean findNearest(HistogramScene point, double maxDistance, NnData<HistogramScene> result) {
+				throw new RuntimeException("Wasn't expecting this to be called!");
+			}
+
+			@Override
+			public void findNearest(HistogramScene point, double maxDistance, int numNeighbors,
+									FastQueue<NnData<HistogramScene>> result) {
+				assertTrue(result.size() == 0);
+
+				for (int i = 0; i < numNeighbors; i++) {
+					NnData<HistogramScene> d = result.grow();
+					d.point = new HistogramScene(NUM_WORDS);
+					d.point.type = 2;
+				}
 			}
 		}
 	}

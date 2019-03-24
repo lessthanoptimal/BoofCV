@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,8 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	private Point2D_F64 intersection = new Point2D_F64();
 
 	// used to search for neighbors that which are candidates for connecting
-	private NearestNeighbor<SquareNode> search = FactoryNearestNeighbor.kdtree(new SquareNode.KdTreeSquareNode());
+	private NearestNeighbor<SquareNode> nn = FactoryNearestNeighbor.kdtree(new SquareNode.KdTreeSquareNode());
+	private NearestNeighbor.Search<SquareNode> search = nn.createSearch();
 	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData.class,true);
 
 	/**
@@ -194,7 +195,8 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	 * Sets up data structures for nearest-neighbor search used in {@link #connectNodes()}
 	 */
 	private void setupSearch() {
-		search.setPoints(nodes.toList(),false);
+		nn.setPoints(nodes.toList(),false);
+		search.initialize();
 	}
 
 	/**

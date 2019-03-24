@@ -223,10 +223,13 @@ public class ExampleColorHistogramLookup {
 
 		// Use a generic NN search algorithm.  This uses Euclidean distance as a distance metric.
 		NearestNeighbor<double[]> nn = FactoryNearestNeighbor.exhaustive(new KdTreeEuclideanSq_F64(targetPoint.length));
+		NearestNeighbor.Search<double[]> search = nn.createSearch();
 		FastQueue<NnData<double[]>> results = new FastQueue(NnData.class,true);
 
 		nn.setPoints(points, true);
-		nn.findNearest(targetPoint, -1, 10, results);
+		search.initialize(); // The search API is a little verbose and initialize() must be called after setPoints
+		                     // but this allows searches to be run in parallel across multiple threads
+		search.findNearest(targetPoint, -1, 10, results);
 
 		ListDisplayPanel gui = new ListDisplayPanel();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,8 +97,10 @@ public class PointCloudUtils {
 		if( minNeighbors < 0 )
 			throw new IllegalArgumentException("minNeighbors must be >= 0");
 		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64() );
+		NearestNeighbor.Search<Point3D_F64> search = nn.createSearch();
 
 		nn.setPoints(cloud,false);
+		search.initialize();
 		FastQueue<NnData<Point3D_F64>> results = new FastQueue(NnData.class,true);
 
 		// It will always find itself
@@ -108,7 +110,7 @@ public class PointCloudUtils {
 		radius *= radius;
 
 		for( int i = cloud.size()-1; i >= 0; i-- ) {
-			nn.findNearest(cloud.get(i),radius,minNeighbors,results);
+			search.findNearest(cloud.get(i),radius,minNeighbors,results);
 
 			if( results.size < minNeighbors ) {
 				cloud.remove(i);
@@ -128,8 +130,10 @@ public class PointCloudUtils {
 		if( minNeighbors < 0 )
 			throw new IllegalArgumentException("minNeighbors must be >= 0");
 		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64());
+		NearestNeighbor.Search<Point3D_F64> search = nn.createSearch();
 
 		nn.setPoints(cloud,false);
+		search.initialize();
 		FastQueue<NnData<Point3D_F64>> results = new FastQueue(NnData.class,true);
 
 		// It will always find itself
@@ -139,7 +143,7 @@ public class PointCloudUtils {
 		radius *= radius;
 
 		for( int i = cloud.size()-1; i >= 0; i-- ) {
-			nn.findNearest(cloud.get(i),radius,minNeighbors,results);
+			search.findNearest(cloud.get(i),radius,minNeighbors,results);
 
 			if( results.size < minNeighbors ) {
 				cloud.remove(i);

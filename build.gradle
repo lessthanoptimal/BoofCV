@@ -95,7 +95,7 @@ subprojects {
     }
 
     dependencies {
-        api (group: 'org.georegression', name: 'georegression', version: '0.19')
+        api (group: 'org.georegression', name: 'georegression', version: '0.20-SNAPSHOT')
         
         implementation 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
         implementation 'javax.annotation:jsr250-api:1.0'       // @Generated

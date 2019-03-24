@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,6 +50,7 @@ public class AssociateNearestNeighbor<D>
 {
 	// Nearest Neighbor algorithm and storage for the results
 	private NearestNeighbor<D> alg;
+	private NearestNeighbor.Search<D> search;
 	private NnData<D> result = new NnData<>();
 	private FastQueue<NnData<D>> result2 = new FastQueue(NnData.class,true);
 
@@ -75,12 +76,14 @@ public class AssociateNearestNeighbor<D>
 
 	public AssociateNearestNeighbor(NearestNeighbor<D> alg) {
 		this.alg = alg;
+		this.search = alg.createSearch();
 	}
 
 	@Override
 	public void setSource(FastQueue<D> listSrc) {
 		this.sizeSrc = listSrc.size;
 		alg.setPoints((List)listSrc.toList(),true);
+		search.initialize();
 	}
 
 	@Override
@@ -96,13 +99,13 @@ public class AssociateNearestNeighbor<D>
 		if( scoreRatioThreshold >= 1.0 ) {
 			// if score ratio is not turned on then just use the best match
 			for (int i = 0; i < listDst.size; i++) {
-				if (!alg.findNearest(listDst.data[i], maxDistance, result))
+				if (!search.findNearest(listDst.data[i], maxDistance, result))
 					continue;
 				matches.grow().setAssociation(result.index, i, result.distance);
 			}
 		} else {
 			for (int i = 0; i < listDst.size; i++) {
-				alg.findNearest(listDst.data[i], maxDistance,2, result2);
+				search.findNearest(listDst.data[i], maxDistance,2, result2);
 
 				if( result2.size == 1 ) {
 					NnData<D> r = result2.getTail();

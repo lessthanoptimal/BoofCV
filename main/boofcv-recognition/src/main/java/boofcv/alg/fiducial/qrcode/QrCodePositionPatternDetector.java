@@ -72,7 +72,8 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	SquareGraph graph = new SquareGraph();
 
 	// Nearst Neighbor Search related variables
-	private NearestNeighbor<SquareNode> search = FactoryNearestNeighbor.kdtree(new SquareNode.KdTreeSquareNode());
+	private NearestNeighbor<SquareNode> nn = FactoryNearestNeighbor.kdtree(new SquareNode.KdTreeSquareNode());
+	private NearestNeighbor.Search<SquareNode> search = nn.createSearch();
 	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData.class,true);
 
 	// Workspace for checking to see if two squares should be connected
@@ -240,7 +241,8 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	private void createPositionPatternGraph() {
 		// Add items to NN search
 
-		search.setPoints((List)positionPatterns.toList(),false);
+		nn.setPoints((List)positionPatterns.toList(),false);
+		search.initialize();
 
 		for (int i = 0; i < positionPatterns.size(); i++) {
 			PositionPatternNode f = positionPatterns.get(i);

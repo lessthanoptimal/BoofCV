@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -168,33 +168,46 @@ public class TestAssociateNearestNeighbor extends StandardAssociateDescriptionCh
 		}
 
 		@Override
-		public boolean findNearest(D point, double maxDistance, NnData<D> result) {
-
-			int w = assoc[numCalls++];
-
-			if( w >= 0 ) {
-				result.index = w;
-				result.point = points.get(w);
-				return true;
-			}
-
-			return false;
+		public Search<D> createSearch() {
+			return new InternalSearch();
 		}
 
-		@Override
-		public void findNearest(D point, double maxDistance, int numNeighbors, FastQueue<NnData<D>> result) {
-			result.reset();
-			int w = assoc[numCalls];
+		private class InternalSearch implements NearestNeighbor.Search<D> {
 
-			if( w >= 0 ) {
-				NnData r1 = result.grow();
-				r1.index = w;
-				r1.point = points.get(w);
-				r1.distance = 2.0;
-				NnData r2 = result.grow();
-				r2.index = w;
-				r2.point = points.get(w);
-				r2.distance = 2.0*distanceScale;
+			@Override
+			public void initialize() {
+
+			}
+
+			@Override
+			public boolean findNearest(D point, double maxDistance, NnData<D> result) {
+
+				int w = assoc[numCalls++];
+
+				if( w >= 0 ) {
+					result.index = w;
+					result.point = points.get(w);
+					return true;
+				}
+
+				return false;
+			}
+
+			@Override
+			public void findNearest(D point, double maxDistance, int numNeighbors, FastQueue<NnData<D>> result) {
+				result.reset();
+				int w = assoc[numCalls];
+
+				if( w >= 0 ) {
+					NnData r1 = result.grow();
+					r1.index = w;
+					r1.point = points.get(w);
+					r1.distance = 2.0;
+					NnData r2 = result.grow();
+					r2.index = w;
+					r2.point = points.get(w);
+					r2.distance = 2.0*distanceScale;
+				}
 			}
 		}
 	}

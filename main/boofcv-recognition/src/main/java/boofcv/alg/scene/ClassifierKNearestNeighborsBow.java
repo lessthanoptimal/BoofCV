@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,6 +49,7 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 
 	// Used to look up the histograms in memory which are the most similar
 	private NearestNeighbor<HistogramScene> nn;
+	private NearestNeighbor.Search<HistogramScene> search;
 	// Computes all the features in the image
 	private DescribeImageDense<T,Desc> describe;
 	// Converts the set of image features into visual words into a histogram which describes the frequency
@@ -79,6 +80,8 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 		this.nn = nn;
 		this.describe = describe;
 		this.featureToHistogram = featureToHistogram;
+
+		this.search = nn.createSearch();
 	}
 
 	/**
@@ -95,6 +98,7 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 	public void setClassificationData(List<HistogramScene> memory , int numScenes ) {
 
 		nn.setPoints(memory, false);
+		search.initialize();
 
 		scenes = new double[ numScenes ];
 	}
@@ -123,7 +127,7 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 
 		// Find the N most similar image histograms
 		resultsNN.reset();
-		nn.findNearest(temp,-1,numNeighbors,resultsNN);
+		search.findNearest(temp,-1,numNeighbors,resultsNN);
 
 		// Find the most common scene among those neighbors
 		Arrays.fill(scenes,0);

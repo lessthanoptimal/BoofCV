@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,8 @@ public class EllipsesIntoClusters {
 	// minimum number of elements in a cluster
 	private int minimumClusterSize = 3;
 
-	private NearestNeighbor<EllipseInfo> search = FactoryNearestNeighbor.kdtree(new KdTreeEllipseInfo());
+	private NearestNeighbor<EllipseInfo> nn = FactoryNearestNeighbor.kdtree(new KdTreeEllipseInfo());
+	private NearestNeighbor.Search<EllipseInfo> search = nn.createSearch();
 	private FastQueue<NnData<EllipseInfo>> searchResults = new FastQueue(NnData.class,true);
 
 	FastQueue<Node> nodes = new FastQueue<>(Node.class,true);
@@ -297,7 +298,8 @@ public class EllipsesIntoClusters {
 			n.cluster = -1;
 		}
 
-		search.setPoints(ellipses,true);
+		nn.setPoints(ellipses,true);
+		search.initialize();
 	}
 
 	/**
