@@ -21,8 +21,8 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.struct.FastQueue;
-
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
+import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * <p>
@@ -42,17 +42,31 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
-public class AssociateGreedy<D> extends AssociateGreedyBase<D> {
+public abstract class AssociateGreedyBase<D> {
+
+	// computes association score
+	ScoreAssociation<D> score;
+	// worst allowed fit score to associate
+	double maxFitError = Double.MAX_VALUE;
+	// stores the quality of fit score
+	GrowQueue_F64 fitQuality = new GrowQueue_F64(100);
+	// stores indexes of associated
+	GrowQueue_I32 pairs = new GrowQueue_I32(100);
+	// various
+	GrowQueue_F64 workBuffer = new GrowQueue_F64(100);
+	// if true backwardsValidation is done
+	boolean backwardsValidation;
+
 	/**
 	 * Configure association
 	 *
 	 * @param score Computes the association score.
 	 * @param backwardsValidation If true then backwards validation is performed.
 	 */
-	public AssociateGreedy(ScoreAssociation<D> score,
-						   boolean backwardsValidation) {
-		super(score,backwardsValidation);
+	AssociateGreedyBase(ScoreAssociation<D> score,
+							   boolean backwardsValidation) {
+		this.score = score;
+		this.backwardsValidation = backwardsValidation;
 	}
 
 	/**
@@ -61,59 +75,38 @@ public class AssociateGreedy<D> extends AssociateGreedyBase<D> {
 	 * @param src Source list.
 	 * @param dst Destination list.
 	 */
-	@Override
-	public void associate( FastQueue<D> src , FastQueue<D> dst )
-	{
-		fitQuality.reset();
-		pairs.reset();
-		workBuffer.reset();
+	public abstract void associate( FastQueue<D> src , FastQueue<D> dst );
 
-		pairs.resize(src.size);
-		fitQuality.resize(src.size);
-		workBuffer.resize(src.size*dst.size);
+	/**
+	 * Returns a list of association pairs.  Each element in the returned list corresponds
+	 * to an element in the src list.  The value contained in the index indicate which element
+	 * in the dst list that object was associated with.  If a value of -1 is stored then
+	 * no association was found.
+	 *
+	 * @return Array containing associations by src index.
+	 */
+	public int[] getPairs() {
+		return pairs.data;
+	}
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.size, i -> {
-		for( int i = 0; i < src.size; i++ ) {
-			D a = src.data[i];
-			double bestScore = maxFitError;
-			int bestIndex = -1;
+	/**
+	 * Quality of fit scores for each association.  Lower fit scores are better.
+	 *
+	 * @return Array of fit sources by src index.
+	 */
+	public double[] getFitQuality() {
+		return fitQuality.data;
+	}
 
-			int workIdx = i*dst.size;
-			for( int j = 0; j < dst.size; j++ ) {
-				D b = dst.data[j];
+	public void setMaxFitError(double maxFitError) {
+		this.maxFitError = maxFitError;
+	}
 
-				double fit = score.score(a,b);
-				workBuffer.set(workIdx+j,fit);
+	public ScoreAssociation<D> getScore() {
+		return score;
+	}
 
-				if( fit <= bestScore ) {
-					bestIndex = j;
-					bestScore = fit;
-				}
-			}
-			pairs.set(i,bestIndex);
-			fitQuality.set(i,bestScore);
-		}
-		//CONCURRENT_ABOVE });
-
-		if( backwardsValidation ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.size, i -> {
-			for( int i = 0; i < src.size; i++ ) {
-				int match = pairs.data[i];
-				if( match == -1 )
-					//CONCURRENT_BELOW return;
-					continue;
-
-				double scoreToBeat = workBuffer.data[i*dst.size+match];
-
-				for( int j = 0; j < src.size; j++ , match += dst.size ) {
-					if( workBuffer.data[match] <= scoreToBeat && j != i) {
-						pairs.data[i] = -1;
-						fitQuality.data[i] = Double.MAX_VALUE;
-						break;
-					}
-				}
-			}
-			//CONCURRENT_ABOVE });
-		}
+	public boolean isBackwardsValidation() {
+		return backwardsValidation;
 	}
 }

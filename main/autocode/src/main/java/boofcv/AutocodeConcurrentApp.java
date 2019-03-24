@@ -290,7 +290,8 @@ public class AutocodeConcurrentApp {
 //				"main/boofcv-ip/src/main/java/boofcv/core/encoding/impl",
 //				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl",
 //				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl",
-				"main/boofcv-io/src/main/java/boofcv/io/image/impl",
+				"main/boofcv-feature/src/main/java/boofcv/alg/feature/associate",
+//				"main/boofcv-io/src/main/java/boofcv/io/image/impl",
 		};
 
 		String[] files = new String[]{

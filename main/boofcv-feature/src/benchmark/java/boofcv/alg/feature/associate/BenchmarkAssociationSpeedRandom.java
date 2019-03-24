@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,58 +20,75 @@ package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.misc.Performer;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.struct.FastQueue;
+import org.openjdk.jmh.annotations.*;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 
 /**
  * @author Peter Abeles
  */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value=1)
 public class BenchmarkAssociationSpeedRandom {
 
-	static final long TEST_TIME = 1000;
-	static final Random rand = new Random(234234);
-	static final int DOF = 50;
-	static final int NUM_FEATURES = 1000;
+	@Param({"true","false"})
+	public boolean concurrent;
 
-	static final FastQueue<TupleDesc_F64> listA = createSet();
-	static final FastQueue<TupleDesc_F64> listB = createSet();
+	int DOF = 50;
+	int NUM_FEATURES = 1000;
 
-	public static class General implements Performer {
+	Random rand = new Random(234234);
+	FastQueue<TupleDesc_F64> listA = createSet(rand);
+	FastQueue<TupleDesc_F64> listB = createSet(rand);
 
-		AssociateDescription<TupleDesc_F64> alg;
-		String name;
+	ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
 
-		public General(String name, AssociateDescription<TupleDesc_F64> alg) {
-			this.alg = alg;
-			this.name = name;
-		}
+	AssociateDescription<TupleDesc_F64> greedy;
+	AssociateDescription<TupleDesc_F64> greedyBackwards;
+	AssociateDescription<TupleDesc_F64> forest;
 
-		@Override
-		public void process() {
-			alg.setSource(listA);
-			alg.setDestination(listB);
-			alg.associate();
-		}
+	@Setup
+	public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
 
-		@Override
-		public String getName() {
-			return name;
-		}
+		greedy = FactoryAssociation.greedy(score, Double.MAX_VALUE, false);
+		greedyBackwards = FactoryAssociation.greedy(score, Double.MAX_VALUE, true);
+		forest = FactoryAssociation.kdRandomForest(null,DOF,500,15,5,1233445565);
 	}
 
-	private static FastQueue<TupleDesc_F64> createSet() {
-		FastQueue<TupleDesc_F64> ret = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class, true) {
-				@Override
-				protected TupleDesc_F64 createInstance() {
-					return new TupleDesc_F64(DOF);
-				}
-		};
+	@Benchmark
+	public void greedy() {
+		greedy.setSource(listA);
+		greedy.setDestination(listB);
+		greedy.associate();
+	}
+
+	@Benchmark
+	public void greedyBackwards() {
+		greedyBackwards.setSource(listA);
+		greedyBackwards.setDestination(listB);
+		greedyBackwards.associate();
+	}
+
+	@Benchmark
+	public void forest() {
+		forest.setSource(listA);
+		forest.setDestination(listB);
+		forest.associate();
+	}
+
+	private FastQueue<TupleDesc_F64> createSet( Random rand ) {
+		FastQueue<TupleDesc_F64> ret = new FastQueue<>(10, TupleDesc_F64.class, () -> new TupleDesc_F64(DOF));
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
 			TupleDesc_F64 t = ret.grow();
@@ -82,15 +99,4 @@ public class BenchmarkAssociationSpeedRandom {
 		return ret;
 	}
 
-	public static void main( String argsp[ ] ) {
-		System.out.println("=========  Profile Description Length "+DOF+" ========== Num Features "+NUM_FEATURES);
-		System.out.println();
-
-		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class,true);
-
-		ProfileOperation.printOpsPerSec(new General("Greedy", FactoryAssociation.greedy(score, Double.MAX_VALUE, false)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General("Greedy Backwards", FactoryAssociation.greedy(score, Double.MAX_VALUE, true)),TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General("Random Forest", FactoryAssociation.kdRandomForest(null,DOF,500,15,5,1233445565)),TEST_TIME);
-		
-	}
 }

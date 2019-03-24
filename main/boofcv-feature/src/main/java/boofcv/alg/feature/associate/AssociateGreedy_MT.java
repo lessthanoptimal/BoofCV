@@ -19,10 +19,9 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.ScoreAssociation;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.struct.FastQueue;
-
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>
@@ -43,14 +42,14 @@ import org.ddogleg.struct.FastQueue;
  * @author Peter Abeles
  */
 @SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
-public class AssociateGreedy<D> extends AssociateGreedyBase<D> {
+public class AssociateGreedy_MT<D> extends AssociateGreedyBase<D> {
 	/**
 	 * Configure association
 	 *
 	 * @param score Computes the association score.
 	 * @param backwardsValidation If true then backwards validation is performed.
 	 */
-	public AssociateGreedy(ScoreAssociation<D> score,
+	public AssociateGreedy_MT(ScoreAssociation<D> score,
 						   boolean backwardsValidation) {
 		super(score,backwardsValidation);
 	}
@@ -72,8 +71,7 @@ public class AssociateGreedy<D> extends AssociateGreedyBase<D> {
 		fitQuality.resize(src.size);
 		workBuffer.resize(src.size*dst.size);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.size, i -> {
-		for( int i = 0; i < src.size; i++ ) {
+		BoofConcurrency.loopFor(0, src.size, i -> {
 			D a = src.data[i];
 			double bestScore = maxFitError;
 			int bestIndex = -1;
@@ -92,16 +90,13 @@ public class AssociateGreedy<D> extends AssociateGreedyBase<D> {
 			}
 			pairs.set(i,bestIndex);
 			fitQuality.set(i,bestScore);
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		if( backwardsValidation ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.size, i -> {
-			for( int i = 0; i < src.size; i++ ) {
+			BoofConcurrency.loopFor(0, src.size, i -> {
 				int match = pairs.data[i];
 				if( match == -1 )
-					//CONCURRENT_BELOW return;
-					continue;
+					return;
 
 				double scoreToBeat = workBuffer.data[i*dst.size+match];
 
@@ -112,8 +107,7 @@ public class AssociateGreedy<D> extends AssociateGreedyBase<D> {
 						break;
 					}
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 }

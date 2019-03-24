@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,10 @@ package boofcv.factory.feature.associate;
 import boofcv.abst.feature.associate.*;
 import boofcv.alg.descriptor.KdTreeTuple_F64;
 import boofcv.alg.feature.associate.AssociateGreedy;
+import boofcv.alg.feature.associate.AssociateGreedyBase;
+import boofcv.alg.feature.associate.AssociateGreedy_MT;
 import boofcv.alg.feature.associate.AssociateNearestNeighbor;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.feature.*;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
@@ -53,10 +56,15 @@ public class FactoryAssociation {
 			double maxError ,
 			boolean backwardsValidation )
 	{
-		AssociateGreedy<D> alg = new AssociateGreedy<>(score, backwardsValidation);
+		AssociateGreedyBase<D> alg;
+
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			alg = new AssociateGreedy_MT<>(score, backwardsValidation);
+		} else {
+			alg = new AssociateGreedy<>(score, backwardsValidation);
+		}
 		alg.setMaxFitError(maxError);
-		WrapAssociateGreedy<D> ret = new WrapAssociateGreedy<>(alg);
-		return ret;
+		return new WrapAssociateGreedy<>(alg);
 	}
 
 

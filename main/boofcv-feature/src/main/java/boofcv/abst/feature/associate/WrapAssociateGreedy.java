@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.associate;
 
-import boofcv.alg.feature.associate.AssociateGreedy;
+import boofcv.alg.feature.associate.AssociateGreedyBase;
 import boofcv.alg.feature.associate.FindUnassociated;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
@@ -33,7 +33,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  */
 public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 
-	AssociateGreedy<T> alg;
+	AssociateGreedyBase<T> alg;
 
 	FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex.class, true);
 
@@ -50,7 +50,7 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 	 *
 	 * @param alg
 	 */
-	public WrapAssociateGreedy( AssociateGreedy<T> alg ) {
+	public WrapAssociateGreedy( AssociateGreedyBase<T> alg ) {
 		this.alg = alg;
 	}
 
