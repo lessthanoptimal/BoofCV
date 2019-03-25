@@ -42,9 +42,11 @@ import java.util.concurrent.TimeUnit;
 public class BenchmarkAssociationSpeedRandom {
 
 	@Param({"true","false"})
-	public boolean concurrent;
+	boolean concurrent;
 
+	@Param({"5","100"})
 	int DOF = 50;
+
 	int NUM_FEATURES = 1000;
 
 	Random rand = new Random(234234);
@@ -55,6 +57,7 @@ public class BenchmarkAssociationSpeedRandom {
 
 	AssociateDescription<TupleDesc_F64> greedy;
 	AssociateDescription<TupleDesc_F64> greedyBackwards;
+	AssociateDescription<TupleDesc_F64> kdtree;
 	AssociateDescription<TupleDesc_F64> forest;
 
 	@Setup
@@ -63,7 +66,10 @@ public class BenchmarkAssociationSpeedRandom {
 
 		greedy = FactoryAssociation.greedy(score, Double.MAX_VALUE, false);
 		greedyBackwards = FactoryAssociation.greedy(score, Double.MAX_VALUE, true);
+		kdtree = FactoryAssociation.kdtree(null,DOF,500);
 		forest = FactoryAssociation.kdRandomForest(null,DOF,500,15,5,1233445565);
+
+//		kdtree.setSource(listA);
 	}
 
 	@Benchmark
@@ -86,6 +92,13 @@ public class BenchmarkAssociationSpeedRandom {
 		forest.setDestination(listB);
 		forest.associate();
 	}
+
+//	@Benchmark
+//	public void kdtree_fixed_src() {
+////		kdtree.setSource(listA);
+//		kdtree.setDestination(listB);
+//		kdtree.associate();
+//	}
 
 	private FastQueue<TupleDesc_F64> createSet( Random rand ) {
 		FastQueue<TupleDesc_F64> ret = new FastQueue<>(10, TupleDesc_F64.class, () -> new TupleDesc_F64(DOF));

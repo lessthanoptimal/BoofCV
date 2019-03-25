@@ -108,14 +108,18 @@ public class WrapDetectDescribeSurf
 		// describe the found interest points
 		foundPoints = detector.getFoundPoints();
 
+		// pre-declare memory
+		features.resize(foundPoints.size());
+		featureAngles.resize(foundPoints.size());
+
 		for( int i = 0; i < foundPoints.size(); i++ ) {
 			ScalePoint p = foundPoints.get(i);
 			double radius = p.scale* BoofDefaults.SURF_SCALE_TO_RADIUS;
 
 			orientation.setObjectRadius(radius);
 			double angle = orientation.compute(p.x,p.y);
-			describe.describe(p.x,p.y, angle, p.scale, features.grow());
-			featureAngles.push(angle);
+			describe.describe(p.x,p.y, angle, p.scale, features.get(i));
+			featureAngles.set(i,angle);
 		}
 	}
 

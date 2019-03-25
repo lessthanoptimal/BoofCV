@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,6 +73,10 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	// Size of a sample point
 	protected int widthSample;
 
+	protected double weightSigma;
+	protected boolean useHaar;
+	protected Class<II> inputType;
+
 	// DOF of feature
 	protected int featureDOF;
 
@@ -111,6 +115,9 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 		this.widthLargeGrid = widthLargeGrid;
 		this.widthSubRegion = widthSubRegion;
 		this.widthSample = widthSample;
+		this.useHaar = useHaar;
+		this.weightSigma = weightSigma;
+		this.inputType = inputType;
 
 		int radius = (widthLargeGrid*widthSubRegion)/2;
 		weight = FactoryKernelGaussian.gaussianWidth(weightSigma, radius * 2);
@@ -309,6 +316,10 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 		return featureDOF;
 	}
 
+	public Class<II> getInputType() {
+		return inputType;
+	}
+
 	/**
 	 * Width of sampled region when sampling is aligned with image pixels
 	 * @return width of descriptor sample
@@ -316,5 +327,12 @@ public class DescribePointSurf<II extends ImageGray<II>> {
 	public int getCanonicalWidth() {
 		//
 		return widthLargeGrid*widthSubRegion+widthSample-(widthSample%2);
+	}
+
+	/**
+	 * Creates a new instance with the same configuration
+	 */
+	public DescribePointSurf<II> copy() {
+		return new DescribePointSurf<>(widthLargeGrid,widthSubRegion,widthSample,weightSigma,useHaar,inputType);
 	}
 }

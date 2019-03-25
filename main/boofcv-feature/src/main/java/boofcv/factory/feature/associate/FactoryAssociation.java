@@ -76,7 +76,7 @@ public class FactoryAssociation {
 	 * @param maxNodesSearched  Maximum number of nodes it will search.  Controls speed and accuracy.
 	 * @return Association using approximate nearest neighbor
 	 */
-	public static AssociateDescription<TupleDesc_F64> kdtree( ConfigAssociateNearestNeighbor configNN ,
+	public static AssociateDescription<TupleDesc_F64> kdtree( @Nullable ConfigAssociateNearestNeighbor configNN ,
 															  int dimension, int maxNodesSearched ) {
 		NearestNeighbor nn = FactoryNearestNeighbor.kdtree(new KdTreeTuple_F64(dimension),maxNodesSearched);
 

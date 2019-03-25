@@ -21,6 +21,7 @@ Version : 0.34
   * TODO Remove SURF specific association. Replace with discrete sets
 - Feature Descriptors
   * TODO Concurrent version of describe
+  * TODO WrapDetectDescribeSurf, DetectDescribeFusion
 
 TODO Scene Reconstruction from arbitrary number of photos
 

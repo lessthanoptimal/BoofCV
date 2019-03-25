@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,11 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 	// how many sample points sub-regions overlap.
 	private int overLap;
 
+	// easy to save these settings than to copy the kernel due to complex constructor
+	// only used by copy function
+	double sigmaLargeGrid;
+	double sigmaSubRegion;
+
 	// used to weigh feature computation
 	private Kernel2D_F64 weightGrid;
 	private Kernel2D_F64 weightSub;
@@ -69,6 +74,8 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 								boolean useHaar, Class<II> imageType ) {
 		super(widthLargeGrid, widthSubRegion, widthSample, 1, useHaar,imageType);
 
+		this.sigmaLargeGrid = sigmaLargeGrid;
+		this.sigmaSubRegion = sigmaSubRegion;
 		this.overLap = overLap;
 
 		weightGrid = FactoryKernelGaussian.gaussianWidth(sigmaLargeGrid, widthLargeGrid);
@@ -187,5 +194,13 @@ public class DescribePointSurfMod<II extends ImageGray<II>> extends DescribePoin
 	@Override
 	public int getCanonicalWidth() {
 		return super.getCanonicalWidth() + 2*overLap;
+	}
+
+	/**
+	 * Creates a new instance with the same configuration
+	 */
+	public DescribePointSurf<II> copy() {
+		return new DescribePointSurfMod<>(widthLargeGrid,widthSubRegion,widthSample,
+				overLap,sigmaLargeGrid,sigmaSubRegion,useHaar,inputType);
 	}
 }
