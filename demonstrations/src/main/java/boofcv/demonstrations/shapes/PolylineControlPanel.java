@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,10 +83,10 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 		selectAlgorithm.addActionListener(this);
 		selectAlgorithm.setMaximumSize(selectAlgorithm.getPreferredSize());
 
-		spinnerMinSides = new JSpinner(new SpinnerNumberModel(minSides, 3, 20, 1));
+		spinnerMinSides = new JSpinner(new SpinnerNumberModel(minSides, 3, 100, 1));
 		spinnerMinSides.setMaximumSize(spinnerMinSides.getPreferredSize());
 		spinnerMinSides.addChangeListener(this);
-		spinnerMaxSides = new JSpinner(new SpinnerNumberModel(maxSides, 3, 20, 1));
+		spinnerMaxSides = new JSpinner(new SpinnerNumberModel(maxSides, 3, 100, 1));
 		spinnerMaxSides.setMaximumSize(spinnerMaxSides.getPreferredSize());
 		spinnerMaxSides.addChangeListener(this);
 		sideCountPanel.setLayout(new BoxLayout(sideCountPanel,BoxLayout.X_AXIS));

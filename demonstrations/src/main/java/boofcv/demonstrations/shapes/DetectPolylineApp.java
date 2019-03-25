@@ -55,6 +55,8 @@ import java.util.List;
 public class DetectPolylineApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase implements ShapeGuiListener
 {
+	PolylineAppControlPanel controlPanel = new PolylineAppControlPanel(this);
+
 	BinaryLabelContourFinder binaryToContour = FactoryBinaryContourFinder.linearChang2004();
 	PointsToPolyline contourToPolyline;
 
@@ -66,7 +68,8 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 	public DetectPolylineApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);
 
-		setupGui(new VisualizePanel(),new PolylineAppControlPanel(this));
+		controlPanel.threshold.addHistogramGraph();
+		setupGui(new VisualizePanel(), controlPanel);
 	}
 
 	@Override
@@ -145,6 +148,9 @@ public class DetectPolylineApp<T extends ImageGray<T>>
 				polylines.add(l);
 			}
 		}
+
+		// this is thread safe
+		controlPanel.threshold.updateHistogram(input);
 	}
 
 	class VisualizePanel extends ShapeVisualizePanel {
