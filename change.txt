@@ -10,6 +10,7 @@ Version : 0.34
   * Added corner detector
 - Demonstrations
   * TODO modernize mosaic and stabilize
+  * TODO modernize ShowFeatureOrientationApp
 - Examples
   * Android example disables threads if SDK is prior to 24 due to lack of Java 1.8 support
 - ImageStatistics
@@ -31,6 +32,17 @@ TODO
   - Circle Target Detection
     * three choices; center point, tangent points, or conics.
     * center = "Detection of Concentric Circles for Camera Calibration" or use ellipse center like most?
+
+TODO
+  - chessboard corner detector
+    * must be a maximum in weighted and unweighted intensity
+      - This is similar to having it detect the same corner at different scales
+      - The center of the blob should be the corner, but the feature intensity will not be exact
+      - Could that the peak isn't unique be used to see if this a chessboard?. square with a width of 2x radius
+    * Pyramid approach
+    * Histogram should have two peaks
+    * run binary threshold first, find contours?
+    * Descriptor: Angle from gradient
 
 TODO Regression
   - homography estimation

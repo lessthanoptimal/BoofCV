@@ -45,10 +45,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseWheelEvent;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
@@ -88,7 +85,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 	QueueCorner minimums = new QueueCorner();
 	QueueCorner maximums = new QueueCorner();
 
-	String[] names = new String[]{"Harris","Shi Tomasi","FAST","KitRos","Median","Laplacian","Hessian Det"};
+	String[] names = new String[]{"Harris","Shi Tomasi","FAST","KitRos","Median","Laplacian","Hessian Det","Chessboard"};
 
 	public IntensityPointFeatureApp( List<String> examples , Class<T> imageType ) {
 		super(true,true,examples,ImageType.single(imageType));
@@ -103,6 +100,15 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		controlPanel.comboAlgorithm.setSelectedIndex(0);
 		add(BorderLayout.WEST,controlPanel);
 		add(BorderLayout.CENTER,imagePanel);
+
+		imagePanel.getImagePanel().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if( e.getKeyCode()==KeyEvent.VK_SPACE) {
+					streamPaused = !streamPaused;
+				}
+			}
+		});
 
 		imagePanel.addMouseWheelListener(new MouseAdapter() {
 			@Override
@@ -132,7 +138,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 			imagePanel.setPreferredSize(new Dimension(width,height));
 
 			double scale = BoofSwingUtil.selectZoomToShowAll(imagePanel,width,height);
-			controlPanel.zoom = scale; // prevent it from broadcasting an event
+//			controlPanel.zoom = scale; // prevent it from broadcasting an event
 			controlPanel.setZoom(scale);
 			imagePanel.setScaleAndCenter(scale,width/2,height/2);
 			controlPanel.setImageSize(width,height);

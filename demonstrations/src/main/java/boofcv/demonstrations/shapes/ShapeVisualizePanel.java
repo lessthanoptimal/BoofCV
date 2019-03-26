@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,6 +30,7 @@ public class ShapeVisualizePanel extends ImageZoomPanel {
 		panel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
+				panel.requestFocus();
 				if( SwingUtilities.isLeftMouseButton(e)) {
 					Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
 					centerView(p.x,p.y);

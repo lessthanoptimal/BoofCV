@@ -865,6 +865,8 @@ public abstract class DemonstrationBase extends JPanel {
 
 	/**
 	 * Invokes {@link #reprocessInput()} only if the input is an IMAGE
+	 *
+	 * TODO expand this to work with paused streams. Right now it re-opens the stream and starts again.
 	 */
 	public void reprocessImageOnly() {
 		if( inputMethod == InputMethod.IMAGE ) {
