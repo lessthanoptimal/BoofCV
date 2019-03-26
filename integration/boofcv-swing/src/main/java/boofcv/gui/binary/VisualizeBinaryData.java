@@ -381,7 +381,7 @@ public class VisualizeBinaryData {
 	 */
 	public static BufferedImage renderBinary(GrayU8 binaryImage, boolean invert, BufferedImage out) {
 
-		if( out == null ) {
+		if( out == null || ( out.getWidth() != binaryImage.width || out.getHeight() != binaryImage.height) ) {
 			out = new BufferedImage(binaryImage.getWidth(),binaryImage.getHeight(),BufferedImage.TYPE_BYTE_GRAY);
 		}
 
