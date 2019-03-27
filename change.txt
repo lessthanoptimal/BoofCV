@@ -23,6 +23,7 @@ Version : 0.34
 - Feature Descriptors
   * TODO Concurrent version of describe
   * TODO WrapDetectDescribeSurf, DetectDescribeFusion
+- Average Down Sample has concurrent versions
 
 TODO Scene Reconstruction from arbitrary number of photos
 

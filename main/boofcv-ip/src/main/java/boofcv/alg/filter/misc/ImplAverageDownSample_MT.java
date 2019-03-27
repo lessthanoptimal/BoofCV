@@ -18,11 +18,10 @@
 
 package boofcv.alg.filter.misc;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
-
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p> * Overlays a rectangular grid on top of the src image and computes the average value within each cell
@@ -37,7 +36,7 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.filter.misc.GenerateImplAverageDownSample")
-public class ImplAverageDownSample {
+public class ImplAverageDownSample_MT {
 	/**
 	 * Down samples the image along the x-axis only.  Image height's must be the same.
 	 * @param src Input image.  Not modified.
@@ -52,8 +51,7 @@ public class ImplAverageDownSample {
 
 		float scale = src.width/(float)dst.width;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.height, y -> {
-		for (int y = 0; y < dst.height; y++) {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexDst = dst.startIndex + y*dst.stride;
 			for (int x = 0; x < dst.width-1; x++, indexDst++ ) {
 				float srcX0 = x*scale;
@@ -98,8 +96,7 @@ public class ImplAverageDownSample {
 
 			int end = isrcX1 != isrcX0 ? src.data[index]& 0xFF : 0;
 			dst.data[indexDst] = (start*startWeight + middle + end)/scale;
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -116,8 +113,7 @@ public class ImplAverageDownSample {
 
 		float scale = src.height/(float)dst.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.width, x -> {
-		for (int x = 0; x < dst.width; x++) {
+		BoofConcurrency.loopFor(0, dst.width, x -> {
 			int indexDst = dst.startIndex + x;
 			for (int y = 0; y < dst.height-1; y++) {
 
@@ -168,8 +164,7 @@ public class ImplAverageDownSample {
 
 			float end = isrcY1 != isrcY0 ? src.data[index]: 0;
 			dst.data[indexDst] = (byte)((start*startWeight + middle + end)/scale + 0.5f);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -186,8 +181,7 @@ public class ImplAverageDownSample {
 
 		float scale = src.width/(float)dst.width;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.height, y -> {
-		for (int y = 0; y < dst.height; y++) {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexDst = dst.startIndex + y*dst.stride;
 			for (int x = 0; x < dst.width-1; x++, indexDst++ ) {
 				float srcX0 = x*scale;
@@ -232,8 +226,7 @@ public class ImplAverageDownSample {
 
 			int end = isrcX1 != isrcX0 ? src.data[index]& 0xFFFF : 0;
 			dst.data[indexDst] = (start*startWeight + middle + end)/scale;
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -250,8 +243,7 @@ public class ImplAverageDownSample {
 
 		float scale = src.height/(float)dst.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.width, x -> {
-		for (int x = 0; x < dst.width; x++) {
+		BoofConcurrency.loopFor(0, dst.width, x -> {
 			int indexDst = dst.startIndex + x;
 			for (int y = 0; y < dst.height-1; y++) {
 
@@ -302,8 +294,7 @@ public class ImplAverageDownSample {
 
 			float end = isrcY1 != isrcY0 ? src.data[index]: 0;
 			dst.data[indexDst] = (short)((start*startWeight + middle + end)/scale + 0.5f);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -320,8 +311,7 @@ public class ImplAverageDownSample {
 
 		float scale = src.width/(float)dst.width;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.height, y -> {
-		for (int y = 0; y < dst.height; y++) {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexDst = dst.startIndex + y*dst.stride;
 			for (int x = 0; x < dst.width-1; x++, indexDst++ ) {
 				float srcX0 = x*scale;
@@ -366,8 +356,7 @@ public class ImplAverageDownSample {
 
 			float end = isrcX1 != isrcX0 ? src.data[index] : 0;
 			dst.data[indexDst] = (start*startWeight + middle + end)/scale;
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -384,8 +373,7 @@ public class ImplAverageDownSample {
 
 		float scale = src.height/(float)dst.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.width, x -> {
-		for (int x = 0; x < dst.width; x++) {
+		BoofConcurrency.loopFor(0, dst.width, x -> {
 			int indexDst = dst.startIndex + x;
 			for (int y = 0; y < dst.height-1; y++) {
 
@@ -436,8 +424,7 @@ public class ImplAverageDownSample {
 
 			float end = isrcY1 != isrcY0 ? src.data[index]: 0;
 			dst.data[indexDst] = (float)((start*startWeight + middle + end)/scale );
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -454,8 +441,7 @@ public class ImplAverageDownSample {
 
 		float scale = src.width/(float)dst.width;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.height, y -> {
-		for (int y = 0; y < dst.height; y++) {
+		BoofConcurrency.loopFor(0, dst.height, y -> {
 			int indexDst = dst.startIndex + y*dst.stride;
 			for (int x = 0; x < dst.width-1; x++, indexDst++ ) {
 				float srcX0 = x*scale;
@@ -500,8 +486,7 @@ public class ImplAverageDownSample {
 
 			double end = isrcX1 != isrcX0 ? src.data[index] : 0;
 			dst.data[indexDst] = (start*startWeight + middle + end)/scale;
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -518,8 +503,7 @@ public class ImplAverageDownSample {
 
 		float scale = src.height/(float)dst.height;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, dst.width, x -> {
-		for (int x = 0; x < dst.width; x++) {
+		BoofConcurrency.loopFor(0, dst.width, x -> {
 			int indexDst = dst.startIndex + x;
 			for (int y = 0; y < dst.height-1; y++) {
 
@@ -570,8 +554,7 @@ public class ImplAverageDownSample {
 
 			double end = isrcY1 != isrcY0 ? src.data[index]: 0;
 			dst.data[indexDst] = (double)((start*startWeight + middle + end)/scale );
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 }
