@@ -19,9 +19,10 @@
 package boofcv.demonstrations.feature.detect;
 
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.demonstrations.feature.detect.DetectChessboardCorners.Corner;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -34,8 +35,9 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
-import boofcv.struct.image.*;
-import georegression.struct.point.Point2D_F64;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
@@ -45,6 +47,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +60,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DetectChessboardVisualizeApp<T extends ImageGray<T>, D extends ImageGray<D>>
+public class DetectChessboardCornersVisualizeApp
 		extends DemonstrationBase
 {
 	// displays intensity image
@@ -69,32 +72,27 @@ public class DetectChessboardVisualizeApp<T extends ImageGray<T>, D extends Imag
 	BufferedImage binary;
 	BufferedImage original;
 
-	Class<D> derivType;
-	// type of image the input image is
-	Class<T> imageType;
-	// computes image derivative
+	ImageGradient<GrayF32,GrayF32> gradient;
+	GrayF32 derivX,derivY;
 
-	ImageGradient<T,D> gradient;
-	D derivX,derivY;
+	GrayF32 logIntensity = new GrayF32(1,1);
 
 	// used to compute feature intensity
-	DetectChessboardCorners<T,D> detector;
+	DetectChessboardCorners detector;
 	final Object lockAlgorithm = new Object();
 
 	final Object lockCorners = new Object();
-	FastQueue<Point2D_F64> foundCorners = new FastQueue<>(Point2D_F64.class,true);
+	FastQueue<Corner> foundCorners = new FastQueue<>(Corner.class,true);
 
-	public DetectChessboardVisualizeApp(List<String> examples , Class<T> imageType ) {
-		super(true,true,examples,ImageType.single(imageType));
-		this.imageType = imageType;
+	public DetectChessboardCornersVisualizeApp(List<PathLabel> examples ) {
+		super(true,true,examples,ImageType.single(GrayF32.class));
 
-		derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		gradient = FactoryDerivative.sobel(imageType,derivType);
-		derivX = GeneralizedImageOps.createSingleBand(derivType,1,1);
-		derivY = GeneralizedImageOps.createSingleBand(derivType,1,1);
+		gradient = FactoryDerivative.three(GrayF32.class,GrayF32.class);
+		derivX = GeneralizedImageOps.createSingleBand(GrayF32.class,1,1);
+		derivY = GeneralizedImageOps.createSingleBand(GrayF32.class,1,1);
 
-		detector = new DetectChessboardCorners<>(imageType,derivType);
+		detector = new DetectChessboardCorners();
 
 		controlPanel = new ControlPanel();
 		add(BorderLayout.WEST,controlPanel);
@@ -149,19 +147,29 @@ public class DetectChessboardVisualizeApp<T extends ImageGray<T>, D extends Imag
 
 		original = ConvertBufferedImage.checkCopy(buffered, original);
 
-		T gray = (T) input;
-		gradient.process(gray,derivX,derivY);
+		GrayF32 gray = (GrayF32) input;
 
 		GrayF32 featureImg;
 		synchronized (lockAlgorithm) {
+			long time0 = System.nanoTime();
+			gradient.process(gray,derivX,derivY);
 			detector.process(gray,derivX,derivY);
 			featureImg = detector.getIntensity();
-			VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
+			long time1 = System.nanoTime();
+
+			System.out.printf("time %7.3f\n",(time1-time0)*1e-6);
+
+			if( controlPanel.logItensity ) {
+				PixelMath.log(featureImg,logIntensity);
+				VisualizeImageData.colorizeSign(logIntensity, visualized, ImageStatistics.maxAbs(logIntensity));
+			} else {
+				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
+			}
 
 			binary=VisualizeBinaryData.renderBinary(detector.getBinary(),false,binary);
 
 			synchronized (lockCorners) {
-				FastQueue<Point2D_F64> orig = detector.getCorners();
+				FastQueue<Corner> orig = detector.getCorners();
 				foundCorners.reset();
 				for (int i = 0; i < orig.size; i++) {
 					foundCorners.grow().set( orig.get(i) );
@@ -206,12 +214,21 @@ public class DetectChessboardVisualizeApp<T extends ImageGray<T>, D extends Imag
 			}
 
 			if( controlPanel.showCorners) {
+				Line2D.Double line = new Line2D.Double();
+
 				synchronized (lockCorners) {
 					g2.setStroke(new BasicStroke(3));
-					g2.setColor(Color.ORANGE);
 					for (int i = 0; i < foundCorners.size; i++) {
-						Point2D_F64 c = foundCorners.get(i);
-						VisualizeFeatures.drawCircle(g2, (c.x + 0.5) * scale, (c.y + 0.5) * scale, 5, circle);
+						Corner c = foundCorners.get(i);
+						g2.setColor(Color.ORANGE);
+						VisualizeFeatures.drawCircle(g2, c.x * scale, c.y * scale, 5, circle);
+
+						double dx = 4*Math.cos(c.angle);
+						double dy = 4*Math.sin(c.angle);
+
+						g2.setColor(Color.CYAN);
+						line.setLine(c.x*scale,c.y*scale,(c.x+dx)*scale,(c.y+dy)*scale);
+						g2.draw(line);
 					}
 				}
 			}
@@ -220,18 +237,21 @@ public class DetectChessboardVisualizeApp<T extends ImageGray<T>, D extends Imag
 
 	class ControlPanel extends DetectBlackShapePanel implements ActionListener , ChangeListener {
 		JComboBox<String> comboView;
+		JCheckBox checkLogIntensity;
 		JSpinner spinnerRadius;
 		JCheckBox checkShowCorners;
 		JSpinner spinnerMaxFeatures;
 
 		int radius = 2;
 		boolean showCorners =true;
+		boolean logItensity =false;
 		int view = 1;
 		int maxFeatures = 200;
 
 		public ControlPanel() {
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
+			checkLogIntensity = checkbox("Log Intensity", logItensity);
 			comboView = combo(view,"Intensity","Image","Both","Binary");
 			spinnerRadius = spinner(radius, 1, 100, 1);
 			checkShowCorners = checkbox("Show Corners", showCorners);
@@ -240,6 +260,7 @@ public class DetectChessboardVisualizeApp<T extends ImageGray<T>, D extends Imag
 			addLabeled(imageSizeLabel,"Image Size");
 			addLabeled(comboView,"View");
 			addLabeled(selectZoom,"Zoom");
+			addAlignLeft(checkLogIntensity);
 			addAlignLeft(checkShowCorners);
 			addLabeled(spinnerRadius,"Radius");
 			addLabeled(spinnerMaxFeatures,"Max Features");
@@ -254,6 +275,9 @@ public class DetectChessboardVisualizeApp<T extends ImageGray<T>, D extends Imag
 			} else if( e.getSource() == checkShowCorners) {
 				showCorners = checkShowCorners.isSelected();
 				imagePanel.repaint();
+			} else if( e.getSource() == checkLogIntensity) {
+				logItensity = checkLogIntensity.isSelected();
+				reprocessImageOnly();
 			}
 		}
 
@@ -276,6 +300,7 @@ public class DetectChessboardVisualizeApp<T extends ImageGray<T>, D extends Imag
 	// TODO visualize contours
 
 	public static void main( String args[] ) {
+//		BoofConcurrency.USE_CONCURRENT = false;
 		List<PathLabel> examples = new ArrayList<>();
 
 		examples.add(new PathLabel("Square Grid",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
@@ -286,7 +311,7 @@ public class DetectChessboardVisualizeApp<T extends ImageGray<T>, D extends Imag
 		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 
 		SwingUtilities.invokeLater(()->{
-			DetectChessboardVisualizeApp<GrayU8, GrayS16> app = new DetectChessboardVisualizeApp(examples,GrayU8.class);
+			DetectChessboardCornersVisualizeApp app = new DetectChessboardCornersVisualizeApp(examples);
 
 			app.openExample(examples.get(0));
 			app.waitUntilInputSizeIsKnown();
