@@ -18,14 +18,11 @@
 
 package boofcv.demonstrations.feature.detect;
 
-import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.demonstrations.feature.detect.DetectChessboardCorners.Corner;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
-import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
@@ -72,8 +69,6 @@ public class DetectChessboardCornersVisualizeApp
 	BufferedImage binary;
 	BufferedImage original;
 
-	ImageGradient<GrayF32,GrayF32> gradient;
-	GrayF32 derivX,derivY;
 
 	GrayF32 logIntensity = new GrayF32(1,1);
 
@@ -87,16 +82,11 @@ public class DetectChessboardCornersVisualizeApp
 	public DetectChessboardCornersVisualizeApp(List<PathLabel> examples ) {
 		super(true,true,examples,ImageType.single(GrayF32.class));
 
-
-		gradient = FactoryDerivative.three(GrayF32.class,GrayF32.class);
-		derivX = GeneralizedImageOps.createSingleBand(GrayF32.class,1,1);
-		derivY = GeneralizedImageOps.createSingleBand(GrayF32.class,1,1);
-
-		detector = new DetectChessboardCorners();
-
 		controlPanel = new ControlPanel();
 		add(BorderLayout.WEST,controlPanel);
 		add(BorderLayout.CENTER,imagePanel);
+
+		createAlgorithm();
 
 		imagePanel.getImagePanel().addKeyListener(new KeyAdapter() {
 			@Override
@@ -122,6 +112,12 @@ public class DetectChessboardCornersVisualizeApp
 		});
 	}
 
+	private void createAlgorithm() {
+		synchronized (lockAlgorithm) {
+			detector = new DetectChessboardCorners(controlPanel.radius);
+		}
+	}
+
 	@Override
 	protected void configureVideo(int which, SimpleImageSequence sequence) {
 		sequence.setLoop(true);
@@ -132,13 +128,18 @@ public class DetectChessboardCornersVisualizeApp
 		visualized = ConvertBufferedImage.checkDeclare(width,height, visualized,BufferedImage.TYPE_INT_RGB);
 
 		SwingUtilities.invokeLater(()->{
-			imagePanel.setPreferredSize(new Dimension(width,height));
+			Dimension preferred = imagePanel.getPreferredSize();
 
-			double scale = BoofSwingUtil.selectZoomToShowAll(imagePanel,width,height);
+			boolean sizeChange = preferred.width != width || preferred.height != height;
+			if( sizeChange ) {
+				imagePanel.setPreferredSize(new Dimension(width, height));
+
+				double scale = BoofSwingUtil.selectZoomToShowAll(imagePanel, width, height);
 //			controlPanel.zoom = scale; // prevent it from broadcasting an event
-			controlPanel.setZoom(scale);
-			imagePanel.setScaleAndCenter(scale,width/2,height/2);
-			controlPanel.setImageSize(width,height);
+				controlPanel.setZoom(scale);
+				imagePanel.setScaleAndCenter(scale, width / 2, height / 2);
+				controlPanel.setImageSize(width, height);
+			}
 		});
 	}
 
@@ -152,8 +153,7 @@ public class DetectChessboardCornersVisualizeApp
 		GrayF32 featureImg;
 		synchronized (lockAlgorithm) {
 			long time0 = System.nanoTime();
-			gradient.process(gray,derivX,derivY);
-			detector.process(gray,derivX,derivY);
+			detector.process(gray);
 			featureImg = detector.getIntensity();
 			long time1 = System.nanoTime();
 
@@ -242,7 +242,7 @@ public class DetectChessboardCornersVisualizeApp
 		JCheckBox checkShowCorners;
 		JSpinner spinnerMaxFeatures;
 
-		int radius = 2;
+		int radius = 1;
 		boolean showCorners =true;
 		boolean logItensity =false;
 		int view = 1;
@@ -286,6 +286,10 @@ public class DetectChessboardCornersVisualizeApp
 			if( e.getSource() == selectZoom ) {
 				zoom = ((Number)selectZoom.getValue()).doubleValue();
 				imagePanel.setScale(zoom);
+			} else if( e.getSource() == spinnerRadius ) {
+				radius = ((Number)spinnerRadius.getValue()).intValue();
+				createAlgorithm();
+				reprocessImageOnly();
 			}
 		}
 	}
