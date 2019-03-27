@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.filter.misc;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 
 /**
@@ -36,6 +37,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class AverageDownSampleOps {
 	/**
 	 * Computes the length of a down sampled image based on the original length and the square width
@@ -85,42 +87,22 @@ public class AverageDownSampleOps {
 	 * @param output Output image. Modified.
 	 */
 	public static void down(ImageGray input , int sampleWidth , ImageGray output ) {
-		if( sampleWidth == 2 ) {
-			if( input instanceof GrayU8) {
-				ImplAverageDownSample2.down((GrayU8) input, (GrayI8) output);
-			} else if( input instanceof GrayS8) {
-				ImplAverageDownSample2.down((GrayS8) input, (GrayI8) output);
-			} else if( input instanceof GrayU16) {
-				ImplAverageDownSample2.down((GrayU16) input, (GrayI16) output);
-			} else if( input instanceof GrayS16) {
-				ImplAverageDownSample2.down((GrayS16) input, (GrayI16) output);
-			} else if( input instanceof GrayS32) {
-				ImplAverageDownSample2.down((GrayS32) input, (GrayS32) output);
-			} else if( input instanceof GrayF32) {
-				ImplAverageDownSample2.down((GrayF32) input, (GrayF32) output);
-			} else if( input instanceof GrayF64) {
-				ImplAverageDownSample2.down((GrayF64) input, (GrayF64) output);
-			} else {
-				throw new IllegalArgumentException("Unknown image type");
-			}
+		if( input instanceof GrayU8) {
+			down((GrayU8) input, sampleWidth, (GrayI8) output);
+		} else if( input instanceof GrayS8) {
+			down((GrayS8) input, sampleWidth, (GrayI8) output);
+		} else if( input instanceof GrayU16) {
+			down((GrayU16) input, sampleWidth, (GrayI16) output);
+		} else if( input instanceof GrayS16) {
+			down((GrayS16) input, sampleWidth, (GrayI16) output);
+		} else if( input instanceof GrayS32) {
+			down((GrayS32) input, sampleWidth, (GrayS32) output);
+		} else if( input instanceof GrayF32) {
+			down((GrayF32) input, sampleWidth, (GrayF32) output);
+		} else if( input instanceof GrayF64) {
+			down((GrayF64) input, sampleWidth, (GrayF64) output);
 		} else {
-			if( input instanceof GrayU8) {
-				ImplAverageDownSampleN.down((GrayU8) input, sampleWidth , (GrayI8) output);
-			} else if( input instanceof GrayS8) {
-				ImplAverageDownSampleN.down((GrayS8) input, sampleWidth , (GrayI8) output);
-			} else if( input instanceof GrayU16) {
-				ImplAverageDownSampleN.down((GrayU16) input, sampleWidth , (GrayI16) output);
-			} else if( input instanceof GrayS16) {
-				ImplAverageDownSampleN.down((GrayS16) input, sampleWidth , (GrayI16) output);
-			} else if( input instanceof GrayS32) {
-				ImplAverageDownSampleN.down((GrayS32) input, sampleWidth , (GrayS32) output);
-			} else if( input instanceof GrayF32) {
-				ImplAverageDownSampleN.down((GrayF32) input, sampleWidth , (GrayF32) output);
-			} else if( input instanceof GrayF64) {
-				ImplAverageDownSampleN.down((GrayF64) input, sampleWidth , (GrayF64) output);
-			} else {
-				throw new IllegalArgumentException("Unknown image type");
-			}
+			throw new IllegalArgumentException("Unknown image type");
 		}
 	}
 
@@ -133,24 +115,46 @@ public class AverageDownSampleOps {
 	public static <T extends ImageBase<T>>
 	void down( T input , T output ) {
 		if( ImageGray.class.isAssignableFrom(input.getClass())  ) {
-			if (input instanceof GrayU8) {
-				GrayF32 middle = new GrayF32(output.width, input.height);
-				ImplAverageDownSample.horizontal((GrayU8) input, middle);
-				ImplAverageDownSample.vertical(middle, (GrayI8) output);
-			} else if (input instanceof GrayU16) {
-				GrayF32 middle = new GrayF32(output.width, input.height);
-				ImplAverageDownSample.horizontal((GrayU16) input, middle);
-				ImplAverageDownSample.vertical(middle, (GrayU16) output);
-			} else if (input instanceof GrayF32) {
-				GrayF32 middle = new GrayF32(output.width, input.height);
-				ImplAverageDownSample.horizontal((GrayF32) input, middle);
-				ImplAverageDownSample.vertical(middle, (GrayF32) output);
-			} else if (input instanceof GrayF64) {
-				GrayF64 middle = new GrayF64(output.width, input.height);
-				ImplAverageDownSample.horizontal((GrayF64) input, middle);
-				ImplAverageDownSample.vertical(middle, (GrayF64) output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				if (input instanceof GrayU8) {
+					GrayF32 middle = new GrayF32(output.width, input.height);
+					ImplAverageDownSample_MT.horizontal((GrayU8) input, middle);
+					ImplAverageDownSample_MT.vertical(middle, (GrayI8) output);
+				} else if (input instanceof GrayU16) {
+					GrayF32 middle = new GrayF32(output.width, input.height);
+					ImplAverageDownSample_MT.horizontal((GrayU16) input, middle);
+					ImplAverageDownSample_MT.vertical(middle, (GrayU16) output);
+				} else if (input instanceof GrayF32) {
+					GrayF32 middle = new GrayF32(output.width, input.height);
+					ImplAverageDownSample_MT.horizontal((GrayF32) input, middle);
+					ImplAverageDownSample_MT.vertical(middle, (GrayF32) output);
+				} else if (input instanceof GrayF64) {
+					GrayF64 middle = new GrayF64(output.width, input.height);
+					ImplAverageDownSample_MT.horizontal((GrayF64) input, middle);
+					ImplAverageDownSample_MT.vertical(middle, (GrayF64) output);
+				} else {
+					throw new IllegalArgumentException("Unknown image type");
+				}
 			} else {
-				throw new IllegalArgumentException("Unknown image type");
+				if (input instanceof GrayU8) {
+					GrayF32 middle = new GrayF32(output.width, input.height);
+					ImplAverageDownSample.horizontal((GrayU8) input, middle);
+					ImplAverageDownSample.vertical(middle, (GrayI8) output);
+				} else if (input instanceof GrayU16) {
+					GrayF32 middle = new GrayF32(output.width, input.height);
+					ImplAverageDownSample.horizontal((GrayU16) input, middle);
+					ImplAverageDownSample.vertical(middle, (GrayU16) output);
+				} else if (input instanceof GrayF32) {
+					GrayF32 middle = new GrayF32(output.width, input.height);
+					ImplAverageDownSample.horizontal((GrayF32) input, middle);
+					ImplAverageDownSample.vertical(middle, (GrayF32) output);
+				} else if (input instanceof GrayF64) {
+					GrayF64 middle = new GrayF64(output.width, input.height);
+					ImplAverageDownSample.horizontal((GrayF64) input, middle);
+					ImplAverageDownSample.vertical(middle, (GrayF64) output);
+				} else {
+					throw new IllegalArgumentException("Unknown image type");
+				}
 			}
 		} else if( Planar.class.isAssignableFrom(input.getClass())  ) {
 			Planar in = (Planar)input;
@@ -201,7 +205,11 @@ public class AverageDownSampleOps {
 	 */
 	public static void down(GrayU8 input , int sampleWidth , GrayI8 output ) {
 		if( sampleWidth == 2 ) {
-			ImplAverageDownSample2.down( input, output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplAverageDownSample2_MT.down(input, output);
+			} else {
+				ImplAverageDownSample2.down(input, output);
+			}
 		} else {
 			ImplAverageDownSampleN.down (input, sampleWidth , output);
 		}
@@ -216,7 +224,11 @@ public class AverageDownSampleOps {
 	 */
 	public static void down(GrayS8 input , int sampleWidth , GrayI8 output ) {
 		if( sampleWidth == 2 ) {
-			ImplAverageDownSample2.down( input, output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplAverageDownSample2_MT.down(input, output);
+			} else {
+				ImplAverageDownSample2.down(input, output);
+			}
 		} else {
 			ImplAverageDownSampleN.down( input, sampleWidth , output);
 		}
@@ -231,7 +243,11 @@ public class AverageDownSampleOps {
 	 */
 	public static void down(GrayU16 input , int sampleWidth , GrayI16 output ) {
 		if( sampleWidth == 2 ) {
-			ImplAverageDownSample2.down( input, output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplAverageDownSample2_MT.down(input, output);
+			} else {
+				ImplAverageDownSample2.down(input, output);
+			}
 		} else {
 			ImplAverageDownSampleN.down( input, sampleWidth , output);
 		}
@@ -246,7 +262,11 @@ public class AverageDownSampleOps {
 	 */
 	public static void down(GrayS16 input , int sampleWidth , GrayI16 output ) {
 		if( sampleWidth == 2 ) {
-			ImplAverageDownSample2.down( input, output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplAverageDownSample2_MT.down(input, output);
+			} else {
+				ImplAverageDownSample2.down(input, output);
+			}
 		} else {
 			ImplAverageDownSampleN.down( input, sampleWidth , output);
 		}
@@ -261,7 +281,11 @@ public class AverageDownSampleOps {
 	 */
 	public static void down(GrayS32 input , int sampleWidth , GrayS32 output ) {
 		if( sampleWidth == 2 ) {
-			ImplAverageDownSample2.down( input, output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplAverageDownSample2_MT.down(input, output);
+			} else {
+				ImplAverageDownSample2.down(input, output);
+			}
 		} else {
 			ImplAverageDownSampleN.down( input, sampleWidth , output);
 		}
@@ -276,7 +300,11 @@ public class AverageDownSampleOps {
 	 */
 	public static void down(GrayF32 input , int sampleWidth , GrayF32 output ) {
 		if( sampleWidth == 2 ) {
-			ImplAverageDownSample2.down( input, output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplAverageDownSample2_MT.down(input, output);
+			} else {
+				ImplAverageDownSample2.down(input, output);
+			}
 		} else {
 			ImplAverageDownSampleN.down( input, sampleWidth , output);
 		}
@@ -291,7 +319,11 @@ public class AverageDownSampleOps {
 	 */
 	public static void down(GrayF64 input , int sampleWidth , GrayF64 output ) {
 		if( sampleWidth == 2 ) {
-			ImplAverageDownSample2.down( input, output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplAverageDownSample2_MT.down(input, output);
+			} else {
+				ImplAverageDownSample2.down(input, output);
+			}
 		} else {
 			ImplAverageDownSampleN.down( input, sampleWidth , output);
 		}

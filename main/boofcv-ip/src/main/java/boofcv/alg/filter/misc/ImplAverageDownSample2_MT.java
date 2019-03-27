@@ -18,11 +18,10 @@
 
 package boofcv.alg.filter.misc;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
-
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>Implementation of {@link AverageDownSampleOps} specialized for square regions of width 2.</p>
@@ -34,13 +33,12 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.filter.misc.GenerateImplAverageDownSample2")
-public class ImplAverageDownSample2 {
+public class ImplAverageDownSample2_MT {
 	public static void down( GrayU8 input , GrayI8 output ) {
 		int maxY = input.height - input.height%2;
 		int maxX = input.width - input.width%2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, 2, y -> {
-		for( int y = 0; y < maxY; y += 2 ) {
+		BoofConcurrency.loopFor(0, maxY, 2, y -> {
 			int indexOut = output.startIndex + (y/2)*output.stride;
 
 			int indexIn0 = input.startIndex + y*input.stride;
@@ -54,12 +52,10 @@ public class ImplAverageDownSample2 {
 
 				output.data[ indexOut++ ] = (byte)((total+2)/4);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		if( maxX != input.width ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, 2, y -> {
-			for( int y = 0; y < maxY; y += 2 ) {
+			BoofConcurrency.loopFor(0, maxY, 2, y -> {
 				int indexOut = output.startIndex + (y/2)*output.stride + output.width-1;
 
 				int indexIn0 = input.startIndex + y*input.stride + maxX;
@@ -69,21 +65,18 @@ public class ImplAverageDownSample2 {
 				total += input.data[ indexIn1 ]& 0xFF;
 
 				output.data[ indexOut ] = (byte)((total+1)/2);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		if( maxY != input.height ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxX, 2, x -> {
-			for( int x = 0; x < maxX; x += 2 ) {
+			BoofConcurrency.loopFor(0, maxX, 2, x -> {
 				int indexOut = output.startIndex + (output.height-1)*output.stride+x/2;
 				int indexIn0 = input.startIndex + (input.height-1)*input.stride+x;
 				int total = input.data[ indexIn0++ ]& 0xFF;
 				total += input.data[ indexIn0++ ]& 0xFF;
 
 				output.data[ indexOut++ ] = (byte)((total+1)/2);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		if( maxX != input.width && maxY != input.height ) {
@@ -98,8 +91,7 @@ public class ImplAverageDownSample2 {
 		int maxY = input.height - input.height%2;
 		int maxX = input.width - input.width%2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, 2, y -> {
-		for( int y = 0; y < maxY; y += 2 ) {
+		BoofConcurrency.loopFor(0, maxY, 2, y -> {
 			int indexOut = output.startIndex + (y/2)*output.stride;
 
 			int indexIn0 = input.startIndex + y*input.stride;
@@ -113,12 +105,10 @@ public class ImplAverageDownSample2 {
 
 				output.data[ indexOut++ ] = (byte)((total+2)/4);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		if( maxX != input.width ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, 2, y -> {
-			for( int y = 0; y < maxY; y += 2 ) {
+			BoofConcurrency.loopFor(0, maxY, 2, y -> {
 				int indexOut = output.startIndex + (y/2)*output.stride + output.width-1;
 
 				int indexIn0 = input.startIndex + y*input.stride + maxX;
@@ -128,21 +118,18 @@ public class ImplAverageDownSample2 {
 				total += input.data[ indexIn1 ];
 
 				output.data[ indexOut ] = (byte)((total+1)/2);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		if( maxY != input.height ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxX, 2, x -> {
-			for( int x = 0; x < maxX; x += 2 ) {
+			BoofConcurrency.loopFor(0, maxX, 2, x -> {
 				int indexOut = output.startIndex + (output.height-1)*output.stride+x/2;
 				int indexIn0 = input.startIndex + (input.height-1)*input.stride+x;
 				int total = input.data[ indexIn0++ ];
 				total += input.data[ indexIn0++ ];
 
 				output.data[ indexOut++ ] = (byte)((total+1)/2);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		if( maxX != input.width && maxY != input.height ) {
@@ -157,8 +144,7 @@ public class ImplAverageDownSample2 {
 		int maxY = input.height - input.height%2;
 		int maxX = input.width - input.width%2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, 2, y -> {
-		for( int y = 0; y < maxY; y += 2 ) {
+		BoofConcurrency.loopFor(0, maxY, 2, y -> {
 			int indexOut = output.startIndex + (y/2)*output.stride;
 
 			int indexIn0 = input.startIndex + y*input.stride;
@@ -172,12 +158,10 @@ public class ImplAverageDownSample2 {
 
 				output.data[ indexOut++ ] = (short)((total+2)/4);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		if( maxX != input.width ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, 2, y -> {
-			for( int y = 0; y < maxY; y += 2 ) {
+			BoofConcurrency.loopFor(0, maxY, 2, y -> {
 				int indexOut = output.startIndex + (y/2)*output.stride + output.width-1;
 
 				int indexIn0 = input.startIndex + y*input.stride + maxX;
@@ -187,21 +171,18 @@ public class ImplAverageDownSample2 {
 				total += input.data[ indexIn1 ]& 0xFFFF;
 
 				output.data[ indexOut ] = (short)((total+1)/2);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		if( maxY != input.height ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxX, 2, x -> {
-			for( int x = 0; x < maxX; x += 2 ) {
+			BoofConcurrency.loopFor(0, maxX, 2, x -> {
 				int indexOut = output.startIndex + (output.height-1)*output.stride+x/2;
 				int indexIn0 = input.startIndex + (input.height-1)*input.stride+x;
 				int total = input.data[ indexIn0++ ]& 0xFFFF;
 				total += input.data[ indexIn0++ ]& 0xFFFF;
 
 				output.data[ indexOut++ ] = (short)((total+1)/2);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		if( maxX != input.width && maxY != input.height ) {
@@ -216,8 +197,7 @@ public class ImplAverageDownSample2 {
 		int maxY = input.height - input.height%2;
 		int maxX = input.width - input.width%2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, 2, y -> {
-		for( int y = 0; y < maxY; y += 2 ) {
+		BoofConcurrency.loopFor(0, maxY, 2, y -> {
 			int indexOut = output.startIndex + (y/2)*output.stride;
 
 			int indexIn0 = input.startIndex + y*input.stride;
@@ -231,12 +211,10 @@ public class ImplAverageDownSample2 {
 
 				output.data[ indexOut++ ] = (short)((total+2)/4);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		if( maxX != input.width ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, 2, y -> {
-			for( int y = 0; y < maxY; y += 2 ) {
+			BoofConcurrency.loopFor(0, maxY, 2, y -> {
 				int indexOut = output.startIndex + (y/2)*output.stride + output.width-1;
 
 				int indexIn0 = input.startIndex + y*input.stride + maxX;
@@ -246,21 +224,18 @@ public class ImplAverageDownSample2 {
 				total += input.data[ indexIn1 ];
 
 				output.data[ indexOut ] = (short)((total+1)/2);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		if( maxY != input.height ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxX, 2, x -> {
-			for( int x = 0; x < maxX; x += 2 ) {
+			BoofConcurrency.loopFor(0, maxX, 2, x -> {
 				int indexOut = output.startIndex + (output.height-1)*output.stride+x/2;
 				int indexIn0 = input.startIndex + (input.height-1)*input.stride+x;
 				int total = input.data[ indexIn0++ ];
 				total += input.data[ indexIn0++ ];
 
 				output.data[ indexOut++ ] = (short)((total+1)/2);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		if( maxX != input.width && maxY != input.height ) {
@@ -275,8 +250,7 @@ public class ImplAverageDownSample2 {
 		int maxY = input.height - input.height%2;
 		int maxX = input.width - input.width%2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, 2, y -> {
-		for( int y = 0; y < maxY; y += 2 ) {
+		BoofConcurrency.loopFor(0, maxY, 2, y -> {
 			int indexOut = output.startIndex + (y/2)*output.stride;
 
 			int indexIn0 = input.startIndex + y*input.stride;
@@ -290,12 +264,10 @@ public class ImplAverageDownSample2 {
 
 				output.data[ indexOut++ ] = ((total+2)/4);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		if( maxX != input.width ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, 2, y -> {
-			for( int y = 0; y < maxY; y += 2 ) {
+			BoofConcurrency.loopFor(0, maxY, 2, y -> {
 				int indexOut = output.startIndex + (y/2)*output.stride + output.width-1;
 
 				int indexIn0 = input.startIndex + y*input.stride + maxX;
@@ -305,21 +277,18 @@ public class ImplAverageDownSample2 {
 				total += input.data[ indexIn1 ];
 
 				output.data[ indexOut ] = ((total+1)/2);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		if( maxY != input.height ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxX, 2, x -> {
-			for( int x = 0; x < maxX; x += 2 ) {
+			BoofConcurrency.loopFor(0, maxX, 2, x -> {
 				int indexOut = output.startIndex + (output.height-1)*output.stride+x/2;
 				int indexIn0 = input.startIndex + (input.height-1)*input.stride+x;
 				int total = input.data[ indexIn0++ ];
 				total += input.data[ indexIn0++ ];
 
 				output.data[ indexOut++ ] = ((total+1)/2);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		if( maxX != input.width && maxY != input.height ) {
@@ -334,8 +303,7 @@ public class ImplAverageDownSample2 {
 		int maxY = input.height - input.height%2;
 		int maxX = input.width - input.width%2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, 2, y -> {
-		for( int y = 0; y < maxY; y += 2 ) {
+		BoofConcurrency.loopFor(0, maxY, 2, y -> {
 			int indexOut = output.startIndex + (y/2)*output.stride;
 
 			int indexIn0 = input.startIndex + y*input.stride;
@@ -349,12 +317,10 @@ public class ImplAverageDownSample2 {
 
 				output.data[ indexOut++ ] = (total/4);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		if( maxX != input.width ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, 2, y -> {
-			for( int y = 0; y < maxY; y += 2 ) {
+			BoofConcurrency.loopFor(0, maxY, 2, y -> {
 				int indexOut = output.startIndex + (y/2)*output.stride + output.width-1;
 
 				int indexIn0 = input.startIndex + y*input.stride + maxX;
@@ -364,21 +330,18 @@ public class ImplAverageDownSample2 {
 				total += input.data[ indexIn1 ];
 
 				output.data[ indexOut ] = (total/2);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		if( maxY != input.height ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxX, 2, x -> {
-			for( int x = 0; x < maxX; x += 2 ) {
+			BoofConcurrency.loopFor(0, maxX, 2, x -> {
 				int indexOut = output.startIndex + (output.height-1)*output.stride+x/2;
 				int indexIn0 = input.startIndex + (input.height-1)*input.stride+x;
 				float total = input.data[ indexIn0++ ];
 				total += input.data[ indexIn0++ ];
 
 				output.data[ indexOut++ ] = (total/2);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		if( maxX != input.width && maxY != input.height ) {
@@ -393,8 +356,7 @@ public class ImplAverageDownSample2 {
 		int maxY = input.height - input.height%2;
 		int maxX = input.width - input.width%2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, 2, y -> {
-		for( int y = 0; y < maxY; y += 2 ) {
+		BoofConcurrency.loopFor(0, maxY, 2, y -> {
 			int indexOut = output.startIndex + (y/2)*output.stride;
 
 			int indexIn0 = input.startIndex + y*input.stride;
@@ -408,12 +370,10 @@ public class ImplAverageDownSample2 {
 
 				output.data[ indexOut++ ] = (total/4);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		if( maxX != input.width ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, 2, y -> {
-			for( int y = 0; y < maxY; y += 2 ) {
+			BoofConcurrency.loopFor(0, maxY, 2, y -> {
 				int indexOut = output.startIndex + (y/2)*output.stride + output.width-1;
 
 				int indexIn0 = input.startIndex + y*input.stride + maxX;
@@ -423,21 +383,18 @@ public class ImplAverageDownSample2 {
 				total += input.data[ indexIn1 ];
 
 				output.data[ indexOut ] = (total/2);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		if( maxY != input.height ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxX, 2, x -> {
-			for( int x = 0; x < maxX; x += 2 ) {
+			BoofConcurrency.loopFor(0, maxX, 2, x -> {
 				int indexOut = output.startIndex + (output.height-1)*output.stride+x/2;
 				int indexIn0 = input.startIndex + (input.height-1)*input.stride+x;
 				double total = input.data[ indexIn0++ ];
 				total += input.data[ indexIn0++ ];
 
 				output.data[ indexOut++ ] = (total/2);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		if( maxX != input.width && maxY != input.height ) {

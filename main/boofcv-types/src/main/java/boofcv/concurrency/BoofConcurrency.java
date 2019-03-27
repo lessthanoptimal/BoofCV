@@ -66,6 +66,22 @@ public class BoofConcurrency {
 	}
 
 	/**
+	 * Concurrent for loop. Each loop with spawn as a thread up to the maximum number of threads.
+	 *
+	 * @param start starting value, inclusive
+	 * @param endExclusive ending value, exclusive
+	 * @param consumer The consumer
+	 */
+	public static void loopFor(int start , int endExclusive , int step , IntConsumer consumer ) {
+		try {
+			int range = endExclusive-start;
+			pool.submit(() ->IntStream.range(0, range/step).parallel().forEach(i-> consumer.accept(start+i*step))).get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * Automatically breaks the problem up into blocks based on the number of threads available. It is assumed
 	 * that there is some cost associated with processing a block and the number of blocks is minimized.
 	 *
