@@ -18,11 +18,10 @@
 
 package boofcv.alg.filter.misc;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
-
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>Implementation of {@link AverageDownSampleOps} specialized for square regions of width N.</p>
@@ -34,7 +33,7 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.filter.misc.GenerateImplAverageDownSampleN")
-public class ImplAverageDownSampleN {
+public class ImplAverageDownSampleN_MT {
 	public static void down( GrayU8 input , int sampleWidth , GrayI8 output ) {
 		int maxY = input.height - input.height%sampleWidth;
 		int maxX = input.width - input.width%sampleWidth;
@@ -43,8 +42,7 @@ public class ImplAverageDownSampleN {
 			int N = sampleWidth*sampleWidth;
 			int N_half = N/2;
 
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
-			for( int y = 0; y < maxY; y += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
 				int outY = y/sampleWidth;
 				int indexOut = output.startIndex + outY*output.stride;
 				int endBoxY = y + sampleWidth;
@@ -61,16 +59,14 @@ public class ImplAverageDownSampleN {
 
 					output.data[ indexOut++ ] = (byte)((total+N_half)/N);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the right side
 		if( maxX != input.width ) {
 			int N = sampleWidth*(input.width-maxX);
 			int N_half = N/2;
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
-			for( int y = 0; y < maxY; y += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
 				int outY = y/sampleWidth;
 				int indexOut = output.startIndex + outY*output.stride + output.width-1;
 				int endBoxY = y + sampleWidth;
@@ -84,8 +80,7 @@ public class ImplAverageDownSampleN {
 				}
 
 				output.data[ indexOut ] = (byte)((total+N_half)/N);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the bottom
@@ -94,8 +89,7 @@ public class ImplAverageDownSampleN {
 			int N_half = N/2;
 			int indexOut0 = output.startIndex + (output.height-1)*output.stride;
 
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxX, sampleWidth, x -> {
-			for( int x = 0; x < maxX; x += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxX, sampleWidth, x -> {
 				int indexOut = indexOut0 + x/sampleWidth;
 				int endBoxX = x + sampleWidth;
 
@@ -108,8 +102,7 @@ public class ImplAverageDownSampleN {
 				}
 
 				output.data[ indexOut ] = (byte)((total+N_half)/N);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the bottom right
@@ -138,8 +131,7 @@ public class ImplAverageDownSampleN {
 			int N = sampleWidth*sampleWidth;
 			int N_half = N/2;
 
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
-			for( int y = 0; y < maxY; y += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
 				int outY = y/sampleWidth;
 				int indexOut = output.startIndex + outY*output.stride;
 				int endBoxY = y + sampleWidth;
@@ -156,16 +148,14 @@ public class ImplAverageDownSampleN {
 
 					output.data[ indexOut++ ] = total >= 0 ? (byte)((total+N_half)/N) : (byte)((total-N_half)/N);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the right side
 		if( maxX != input.width ) {
 			int N = sampleWidth*(input.width-maxX);
 			int N_half = N/2;
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
-			for( int y = 0; y < maxY; y += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
 				int outY = y/sampleWidth;
 				int indexOut = output.startIndex + outY*output.stride + output.width-1;
 				int endBoxY = y + sampleWidth;
@@ -179,8 +169,7 @@ public class ImplAverageDownSampleN {
 				}
 
 				output.data[ indexOut ] = total >= 0 ? (byte)((total+N_half)/N) : (byte)((total-N_half)/N);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the bottom
@@ -189,8 +178,7 @@ public class ImplAverageDownSampleN {
 			int N_half = N/2;
 			int indexOut0 = output.startIndex + (output.height-1)*output.stride;
 
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxX, sampleWidth, x -> {
-			for( int x = 0; x < maxX; x += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxX, sampleWidth, x -> {
 				int indexOut = indexOut0 + x/sampleWidth;
 				int endBoxX = x + sampleWidth;
 
@@ -203,8 +191,7 @@ public class ImplAverageDownSampleN {
 				}
 
 				output.data[ indexOut ] = total >= 0 ? (byte)((total+N_half)/N) : (byte)((total-N_half)/N);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the bottom right
@@ -233,8 +220,7 @@ public class ImplAverageDownSampleN {
 			int N = sampleWidth*sampleWidth;
 			int N_half = N/2;
 
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
-			for( int y = 0; y < maxY; y += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
 				int outY = y/sampleWidth;
 				int indexOut = output.startIndex + outY*output.stride;
 				int endBoxY = y + sampleWidth;
@@ -251,16 +237,14 @@ public class ImplAverageDownSampleN {
 
 					output.data[ indexOut++ ] = (short)((total+N_half)/N);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the right side
 		if( maxX != input.width ) {
 			int N = sampleWidth*(input.width-maxX);
 			int N_half = N/2;
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
-			for( int y = 0; y < maxY; y += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
 				int outY = y/sampleWidth;
 				int indexOut = output.startIndex + outY*output.stride + output.width-1;
 				int endBoxY = y + sampleWidth;
@@ -274,8 +258,7 @@ public class ImplAverageDownSampleN {
 				}
 
 				output.data[ indexOut ] = (short)((total+N_half)/N);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the bottom
@@ -284,8 +267,7 @@ public class ImplAverageDownSampleN {
 			int N_half = N/2;
 			int indexOut0 = output.startIndex + (output.height-1)*output.stride;
 
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxX, sampleWidth, x -> {
-			for( int x = 0; x < maxX; x += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxX, sampleWidth, x -> {
 				int indexOut = indexOut0 + x/sampleWidth;
 				int endBoxX = x + sampleWidth;
 
@@ -298,8 +280,7 @@ public class ImplAverageDownSampleN {
 				}
 
 				output.data[ indexOut ] = (short)((total+N_half)/N);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the bottom right
@@ -328,8 +309,7 @@ public class ImplAverageDownSampleN {
 			int N = sampleWidth*sampleWidth;
 			int N_half = N/2;
 
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
-			for( int y = 0; y < maxY; y += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
 				int outY = y/sampleWidth;
 				int indexOut = output.startIndex + outY*output.stride;
 				int endBoxY = y + sampleWidth;
@@ -346,16 +326,14 @@ public class ImplAverageDownSampleN {
 
 					output.data[ indexOut++ ] = total >= 0 ? (short)((total+N_half)/N) : (short)((total-N_half)/N);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the right side
 		if( maxX != input.width ) {
 			int N = sampleWidth*(input.width-maxX);
 			int N_half = N/2;
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
-			for( int y = 0; y < maxY; y += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
 				int outY = y/sampleWidth;
 				int indexOut = output.startIndex + outY*output.stride + output.width-1;
 				int endBoxY = y + sampleWidth;
@@ -369,8 +347,7 @@ public class ImplAverageDownSampleN {
 				}
 
 				output.data[ indexOut ] = total >= 0 ? (short)((total+N_half)/N) : (short)((total-N_half)/N);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the bottom
@@ -379,8 +356,7 @@ public class ImplAverageDownSampleN {
 			int N_half = N/2;
 			int indexOut0 = output.startIndex + (output.height-1)*output.stride;
 
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxX, sampleWidth, x -> {
-			for( int x = 0; x < maxX; x += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxX, sampleWidth, x -> {
 				int indexOut = indexOut0 + x/sampleWidth;
 				int endBoxX = x + sampleWidth;
 
@@ -393,8 +369,7 @@ public class ImplAverageDownSampleN {
 				}
 
 				output.data[ indexOut ] = total >= 0 ? (short)((total+N_half)/N) : (short)((total-N_half)/N);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the bottom right
@@ -423,8 +398,7 @@ public class ImplAverageDownSampleN {
 			int N = sampleWidth*sampleWidth;
 			int N_half = N/2;
 
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
-			for( int y = 0; y < maxY; y += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
 				int outY = y/sampleWidth;
 				int indexOut = output.startIndex + outY*output.stride;
 				int endBoxY = y + sampleWidth;
@@ -441,16 +415,14 @@ public class ImplAverageDownSampleN {
 
 					output.data[ indexOut++ ] = total >= 0 ? ((total+N_half)/N) : ((total-N_half)/N);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the right side
 		if( maxX != input.width ) {
 			int N = sampleWidth*(input.width-maxX);
 			int N_half = N/2;
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
-			for( int y = 0; y < maxY; y += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
 				int outY = y/sampleWidth;
 				int indexOut = output.startIndex + outY*output.stride + output.width-1;
 				int endBoxY = y + sampleWidth;
@@ -464,8 +436,7 @@ public class ImplAverageDownSampleN {
 				}
 
 				output.data[ indexOut ] = total >= 0 ? ((total+N_half)/N) : ((total-N_half)/N);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the bottom
@@ -474,8 +445,7 @@ public class ImplAverageDownSampleN {
 			int N_half = N/2;
 			int indexOut0 = output.startIndex + (output.height-1)*output.stride;
 
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxX, sampleWidth, x -> {
-			for( int x = 0; x < maxX; x += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxX, sampleWidth, x -> {
 				int indexOut = indexOut0 + x/sampleWidth;
 				int endBoxX = x + sampleWidth;
 
@@ -488,8 +458,7 @@ public class ImplAverageDownSampleN {
 				}
 
 				output.data[ indexOut ] = total >= 0 ? ((total+N_half)/N) : ((total-N_half)/N);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the bottom right
@@ -517,8 +486,7 @@ public class ImplAverageDownSampleN {
 		{
 			float N = sampleWidth*sampleWidth;
 
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
-			for( int y = 0; y < maxY; y += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
 				int outY = y/sampleWidth;
 				int indexOut = output.startIndex + outY*output.stride;
 				int endBoxY = y + sampleWidth;
@@ -535,15 +503,13 @@ public class ImplAverageDownSampleN {
 
 					output.data[ indexOut++ ] = (total/N);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the right side
 		if( maxX != input.width ) {
 			int N = sampleWidth*(input.width-maxX);
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
-			for( int y = 0; y < maxY; y += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
 				int outY = y/sampleWidth;
 				int indexOut = output.startIndex + outY*output.stride + output.width-1;
 				int endBoxY = y + sampleWidth;
@@ -557,8 +523,7 @@ public class ImplAverageDownSampleN {
 				}
 
 				output.data[ indexOut ] = (total/N);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the bottom
@@ -566,8 +531,7 @@ public class ImplAverageDownSampleN {
 			float N = (input.height-maxY)*sampleWidth;
 			int indexOut0 = output.startIndex + (output.height-1)*output.stride;
 
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxX, sampleWidth, x -> {
-			for( int x = 0; x < maxX; x += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxX, sampleWidth, x -> {
 				int indexOut = indexOut0 + x/sampleWidth;
 				int endBoxX = x + sampleWidth;
 
@@ -580,8 +544,7 @@ public class ImplAverageDownSampleN {
 				}
 
 				output.data[ indexOut ] = (total/N);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the bottom right
@@ -608,8 +571,7 @@ public class ImplAverageDownSampleN {
 		{
 			double N = sampleWidth*sampleWidth;
 
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
-			for( int y = 0; y < maxY; y += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
 				int outY = y/sampleWidth;
 				int indexOut = output.startIndex + outY*output.stride;
 				int endBoxY = y + sampleWidth;
@@ -626,15 +588,13 @@ public class ImplAverageDownSampleN {
 
 					output.data[ indexOut++ ] = (total/N);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the right side
 		if( maxX != input.width ) {
 			int N = sampleWidth*(input.width-maxX);
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
-			for( int y = 0; y < maxY; y += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxY, sampleWidth, y -> {
 				int outY = y/sampleWidth;
 				int indexOut = output.startIndex + outY*output.stride + output.width-1;
 				int endBoxY = y + sampleWidth;
@@ -648,8 +608,7 @@ public class ImplAverageDownSampleN {
 				}
 
 				output.data[ indexOut ] = (total/N);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the bottom
@@ -657,8 +616,7 @@ public class ImplAverageDownSampleN {
 			double N = (input.height-maxY)*sampleWidth;
 			int indexOut0 = output.startIndex + (output.height-1)*output.stride;
 
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0, maxX, sampleWidth, x -> {
-			for( int x = 0; x < maxX; x += sampleWidth ) {
+			BoofConcurrency.loopFor(0, maxX, sampleWidth, x -> {
 				int indexOut = indexOut0 + x/sampleWidth;
 				int endBoxX = x + sampleWidth;
 
@@ -671,8 +629,7 @@ public class ImplAverageDownSampleN {
 				}
 
 				output.data[ indexOut ] = (total/N);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 
 		// handle the bottom right

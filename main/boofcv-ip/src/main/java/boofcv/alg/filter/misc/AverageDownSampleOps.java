@@ -211,7 +211,11 @@ public class AverageDownSampleOps {
 				ImplAverageDownSample2.down(input, output);
 			}
 		} else {
-			ImplAverageDownSampleN.down (input, sampleWidth , output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplAverageDownSampleN_MT.down(input, sampleWidth, output);
+			} else {
+				ImplAverageDownSampleN.down(input, sampleWidth, output);
+			}
 		}
 	}
 
@@ -230,7 +234,11 @@ public class AverageDownSampleOps {
 				ImplAverageDownSample2.down(input, output);
 			}
 		} else {
-			ImplAverageDownSampleN.down( input, sampleWidth , output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplAverageDownSampleN_MT.down(input, sampleWidth, output);
+			} else {
+				ImplAverageDownSampleN.down(input, sampleWidth, output);
+			}
 		}
 	}
 
@@ -249,7 +257,11 @@ public class AverageDownSampleOps {
 				ImplAverageDownSample2.down(input, output);
 			}
 		} else {
-			ImplAverageDownSampleN.down( input, sampleWidth , output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplAverageDownSampleN_MT.down(input, sampleWidth, output);
+			} else {
+				ImplAverageDownSampleN.down(input, sampleWidth, output);
+			}
 		}
 	}
 
@@ -268,7 +280,11 @@ public class AverageDownSampleOps {
 				ImplAverageDownSample2.down(input, output);
 			}
 		} else {
-			ImplAverageDownSampleN.down( input, sampleWidth , output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplAverageDownSampleN_MT.down(input, sampleWidth, output);
+			} else {
+				ImplAverageDownSampleN.down(input, sampleWidth, output);
+			}
 		}
 	}
 
@@ -287,7 +303,11 @@ public class AverageDownSampleOps {
 				ImplAverageDownSample2.down(input, output);
 			}
 		} else {
-			ImplAverageDownSampleN.down( input, sampleWidth , output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplAverageDownSampleN_MT.down(input, sampleWidth, output);
+			} else {
+				ImplAverageDownSampleN.down(input, sampleWidth, output);
+			}
 		}
 	}
 
@@ -306,7 +326,11 @@ public class AverageDownSampleOps {
 				ImplAverageDownSample2.down(input, output);
 			}
 		} else {
-			ImplAverageDownSampleN.down( input, sampleWidth , output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplAverageDownSampleN_MT.down(input, sampleWidth, output);
+			} else {
+				ImplAverageDownSampleN.down(input, sampleWidth, output);
+			}
 		}
 	}
 
@@ -325,7 +349,11 @@ public class AverageDownSampleOps {
 				ImplAverageDownSample2.down(input, output);
 			}
 		} else {
-			ImplAverageDownSampleN.down( input, sampleWidth , output);
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplAverageDownSampleN_MT.down(input, sampleWidth, output);
+			} else {
+				ImplAverageDownSampleN.down(input, sampleWidth, output);
+			}
 		}
 	}
 }
