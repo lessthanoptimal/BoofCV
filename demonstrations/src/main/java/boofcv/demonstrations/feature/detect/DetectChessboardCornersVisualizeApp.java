@@ -72,8 +72,9 @@ public class DetectChessboardCornersVisualizeApp
 
 	GrayF32 logIntensity = new GrayF32(1,1);
 
+	DetectChessboardCornersPyramid detector = new DetectChessboardCornersPyramid();
+
 	// used to compute feature intensity
-	DetectChessboardCorners detector;
 	final Object lockAlgorithm = new Object();
 
 	final Object lockCorners = new Object();
@@ -100,7 +101,6 @@ public class DetectChessboardCornersVisualizeApp
 		imagePanel.addMouseWheelListener(new MouseAdapter() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-
 				double curr =controlPanel.zoom;
 
 				if( e.getWheelRotation() > 0 )
@@ -114,7 +114,7 @@ public class DetectChessboardCornersVisualizeApp
 
 	private void createAlgorithm() {
 		synchronized (lockAlgorithm) {
-			detector = new DetectChessboardCorners(controlPanel.radius);
+			detector = new DetectChessboardCornersPyramid(new DetectChessboardCorners(controlPanel.radius));
 		}
 	}
 
@@ -154,9 +154,9 @@ public class DetectChessboardCornersVisualizeApp
 		synchronized (lockAlgorithm) {
 			long time0 = System.nanoTime();
 			detector.process(gray);
-			featureImg = detector.getIntensity();
 			long time1 = System.nanoTime();
 
+			featureImg = detector.getDetector().getIntensity();
 			System.out.printf("time %7.3f\n",(time1-time0)*1e-6);
 
 			if( controlPanel.logItensity ) {
@@ -166,7 +166,7 @@ public class DetectChessboardCornersVisualizeApp
 				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
 			}
 
-			binary=VisualizeBinaryData.renderBinary(detector.getBinary(),false,binary);
+			binary=VisualizeBinaryData.renderBinary(detector.getDetector().getBinary(),false,binary);
 
 			synchronized (lockCorners) {
 				FastQueue<Corner> orig = detector.getCorners();

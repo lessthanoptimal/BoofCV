@@ -20,6 +20,7 @@ package boofcv.alg.interpolate;
 
 import boofcv.core.image.GImageGray;
 import boofcv.struct.border.ImageBorder;
+import org.ejml.UtilEjml;
 
 /**
  * <p>
@@ -137,6 +138,11 @@ public class ImageLineIntegral {
 				deltaTY = (ny-y)/slopeY;
 
 				double deltaT = Math.min(deltaTX,deltaTY);
+
+				// see if it already hit the destination
+				if( deltaT <= UtilEjml.TEST_F64 ) {
+					deltaT = Math.max(deltaTX,deltaTY);
+				}
 				double nextT = t + deltaT;
 				if( nextT > 1 ) {
 					deltaT = 1-t;

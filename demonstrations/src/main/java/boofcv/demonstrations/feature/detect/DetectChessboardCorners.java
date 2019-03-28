@@ -99,11 +99,13 @@ public class DetectChessboardCorners {
 	public void process( GrayF32 input ) {
 		borderImg.setImage(input);
 
+		System.out.println("  * gradient");
 		gradient.process(input,derivX,derivY);
 
 		interpX.setImage(derivX);
 		interpY.setImage(derivY);
 
+		System.out.println("  * corner intensity");
 		cornerIntensity.process(derivX,derivY,intensity);
 
 		// adjust intensity value so that its between 0 and levels for OTSU thresholding
@@ -118,12 +120,16 @@ public class DetectChessboardCorners {
 //			}
 //		}
 
+		System.out.println("  * binarization");
 		inputToBinary.process(intensity,binary);
+
+		System.out.println("  * contour");
 		contourFinder.process(binary);
 
 		int dropped = 0;
 		corners.reset();
 		List<ContourPacked> packed = contourFinder.getContours();
+		System.out.println("  * features.size = "+packed.size());
 		for (int i = 0; i < packed.size(); i++) {
 			contourFinder.loadContour(i,contour);
 
@@ -223,6 +229,12 @@ public class DetectChessboardCorners {
 
 		public void set( Corner c ) {
 			super.set(c);
+			this.angle = c.angle;
+			this.intensity = c.intensity;
+		}
+
+		public void set( Corner c , double scale ) {
+			super.set(c.x*scale,c.y*scale);
 			this.angle = c.angle;
 			this.intensity = c.intensity;
 		}

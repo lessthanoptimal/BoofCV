@@ -18,6 +18,14 @@
 
 package boofcv.demonstrations.feature.detect;
 
+import boofcv.alg.filter.misc.AverageDownSampleOps;
+import boofcv.demonstrations.feature.detect.DetectChessboardCorners.Corner;
+import boofcv.struct.image.GrayF32;
+import org.ddogleg.struct.FastQueue;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Detects chessboard corners at multiple scales. This adds robustness against out of focus images and motion blur.
  * There's also the option to prune corners which are not detected at multiple scales. This is a good way
@@ -29,4 +37,99 @@ public class DetectChessboardCornersPyramid {
 	// TODO create pyramid by 2x2 averaging
 	// TODO see if same feature has been detected at multiple levels
 	// TODO have flag that prunes corners which haven't been detected at multiple levels
+
+	int topLength = 100;
+	List<GrayF32> pyramid = new ArrayList<>();
+
+	DetectChessboardCorners detector;
+
+	FastQueue<PyramidLevel> featureLevels = new FastQueue<>(PyramidLevel.class, PyramidLevel::new);
+
+	FastQueue<Corner> corners = new FastQueue<>(Corner.class,true);
+
+	public DetectChessboardCornersPyramid(DetectChessboardCorners detector) {
+		this.detector = detector;
+	}
+
+	public DetectChessboardCornersPyramid() {
+		this( new DetectChessboardCorners(1));
+	}
+
+	public void process(GrayF32 input ) {
+		System.out.println("ENTER pyramid process");
+		constructPyramid(input);
+
+		corners.reset();
+
+		// top to bottom
+		double scale = Math.pow(2.0,pyramid.size()-1);
+
+		for (int level = pyramid.size()-1; level >= 0; level--) {
+			System.out.println("  detect level "+level);
+			detector.process(pyramid.get(level));
+			PyramidLevel feats = featureLevels.get(level);
+			System.out.println("  adding features");
+
+			FastQueue<Corner> corners = detector.getCorners();
+			feats.corners.reset();
+			for (int i = 0; i < corners.size; i++) {
+				Corner c = corners.get(i);
+
+				feats.corners.grow().set(corners.get(i));
+				this.corners.grow().set(c,scale);
+			}
+
+			scale /= 2.0;
+		}
+
+		// TODO remove identical features
+		// match using orientation.
+
+		System.out.println("EXIT pyramid process");
+
+	}
+
+	private void constructPyramid(GrayF32 input) {
+		if( pyramid.size() == 0 ){
+			pyramid.add(input);
+		} else {
+			pyramid.set(0,input);
+		}
+		int levelIndex = 1;
+		int divisor = 2;
+		while( true ) {
+			int width = input.width/divisor;
+			int height = input.height/divisor;
+			if( width < topLength || height < topLength)
+				break;
+			GrayF32 level;
+			if( pyramid.size() <= levelIndex ) {
+				level = new GrayF32(width,height);
+				pyramid.add(level);
+			} else {
+				level = pyramid.get(levelIndex);
+				level.reshape(width,height);
+			}
+			AverageDownSampleOps.down(pyramid.get(levelIndex-1),2,level);
+			divisor *= 2;
+			levelIndex += 1;
+		}
+		while( pyramid.size() > levelIndex) {
+			pyramid.remove( pyramid.size()-1 );
+		}
+
+		featureLevels.resize(pyramid.size());
+	}
+
+	private static class PyramidLevel {
+		FastQueue<Corner> corners = new FastQueue<>(Corner.class,true);
+	}
+
+	public DetectChessboardCorners getDetector() {
+		return detector;
+	}
+
+	public FastQueue<Corner> getCorners() {
+		return corners;
+	}
 }
