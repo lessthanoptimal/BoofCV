@@ -22,6 +22,7 @@ import boofcv.abst.filter.binary.BinaryContourFinderLinearExternal;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
+import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.interpolate.ImageLineIntegral;
 import boofcv.alg.interpolate.InterpolatePixelS;
@@ -33,7 +34,6 @@ import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.misc.CircularIndex;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
@@ -46,49 +46,84 @@ import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 
+import static boofcv.misc.CircularIndex.addOffset;
+
 /**
+ * Detects corners found in chessboard patterns. The first step is to compute corner intensity using a Shi-Tomasi
+ * corner detector. For a perfect chessboard pattern, the peak will be centered on the corner and have a flat
+ * square pattern. The width of the square will be the kernel's radius * 2. It's flat because you can move the kernel
+ * around the corner and get the exact same response from the corner detector. Because it has a flat response of known
+ * size this can then be used to filter out other objects which cause a response. For example, a corner on a square
+ * will have a single pixel peak, in the absence of noise. Random noise from trees and other complex patterns tends
+ * to be much larger than a few pixels. Thus a binary image is created from the corner intensity image and blobs
+ * with contours of a known size are found. The orientation of each feature is found and a more expensive corner
+ * intensity computation is performed to futher remove false positives.
+ *
+ * Corner orientation. The orientation of a corner is only unique up the 1/2 a circle or PI radians. The corner's
+ * direction is defined as the vector which points along a line that passes through the center of the dark region.
+ *
+ * Corner intensity. The second corner intensity that is computed (first was Shi-Tomasi) is found by computing the
+ * difference between radial lines around the circle and their adjacent. Basically a line which should be black
+ * is subtracted from a line which should be white with the result summed. A random point is unlikely to have
+ * this pattern.
+ *
+ * Sub-pixel or sub-bin accuracy is found for location using mean-shift and orientation by fitting a quadratic curve.
+ * See code comments for more detail.
+ *
  * @author Peter Abeles
  */
 public class DetectChessboardCorners {
 
 	// intensity image is forced to have this many integer levels for OTSU
-	int grayLevels = 300;
-	// feature radius and width
+	static final int grayLevels = 300;
+	// feature radius and width in Shi-Tomasi corner detector
 	int radius, width;
 
+	// computes corner intensity image
 	GradientCornerIntensity<GrayF32> cornerIntensity;
 
+	// storage for corner detector output
 	GrayF32 intensity = new GrayF32(1,1);
+	// Thresholded intensity image
 	GrayU8 binary = new GrayU8(1,1);
+	// Thresholding algorithm
 	InputToBinary<GrayF32> inputToBinary;
 
+	// Find the small blobs that might be corner features
 	BinaryContourFinderLinearExternal contourFinder = new BinaryContourFinderLinearExternal();
 
+	// Storage for found corners
 	FastQueue<Corner> corners = new FastQueue<>(Corner.class,true);
+	// Storage for points in one blob's contour
 	FastQueue<Point2D_I32> contour = new FastQueue<>(Point2D_I32.class,true);
 
+	// Computes the image gradient
 //	ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.three(GrayF32.class,GrayF32.class);
 	ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.prewitt(GrayF32.class,GrayF32.class);
 
+	// Storage for gradient of input image
 	GrayF32 derivX = new GrayF32(1,1), derivY= new GrayF32(1,1);
 
+	// used to sample derivative images at non-integer values
 	InterpolatePixelS<GrayF32> interpX = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.ZERO);
 	InterpolatePixelS<GrayF32> interpY = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.ZERO);
 
+	// Used to compute line integrals of spokes around a corner
 	ImageBorder<GrayF32> borderImg = FactoryImageBorder.single(GrayF32.class,BorderType.ZERO);
 	ImageLineIntegral integral = new ImageLineIntegral();
 
-	public DetectChessboardCorners( int radius ) {
-		this.radius = radius;
-		this.width = radius*2+1;
-		cornerIntensity =  FactoryIntensityPointAlg.shiTomasi(radius, false, GrayF32.class);
-//		cornerIntensity =  FactoryIntensityPointAlg.harris(radius, 0.04f,false, derivType);
+	// predeclare memory for compute a feature's orientation
+	private final int numLines = 16;
+	private final double lines[] = new double[numLines];
+	private final double smoothed[] = new double[numLines];
 
-		inputToBinary = FactoryThresholdBinary.globalOtsu(0, grayLevels,false,GrayF32.class);
-//		inputToBinary = FactoryThresholdBinary.blockOtsu(ConfigLength.fixed(50),0.5,false,true,false,0.5,GrayF32.class);
+	/**
+	 * Declares internal data structures
+	 */
+	public DetectChessboardCorners() {
+		setKernelRadius(1);
 
-		contourFinder.setMaxContour((width+1)*4+4);
-		contourFinder.setMinContour(width*4-4);
+		setThresholding(FactoryThresholdBinary.globalOtsu(0, grayLevels,false,GrayF32.class));
 		contourFinder.setConnectRule(ConnectRule.EIGHT);
 
 		// just give it something. this will be changed later
@@ -96,16 +131,18 @@ public class DetectChessboardCorners {
 		integral.setImage(FactoryGImageGray.wrap(borderImg));
 	}
 
+	/**
+	 * Computes chessboard corners inside the image
+	 * @param input Gray image. Not modified.
+	 */
 	public void process( GrayF32 input ) {
 		borderImg.setImage(input);
 
-		System.out.println("  * gradient");
 		gradient.process(input,derivX,derivY);
 
 		interpX.setImage(derivX);
 		interpY.setImage(derivY);
 
-		System.out.println("  * corner intensity");
 		cornerIntensity.process(derivX,derivY,intensity);
 
 		// adjust intensity value so that its between 0 and levels for OTSU thresholding
@@ -120,10 +157,9 @@ public class DetectChessboardCorners {
 //			}
 //		}
 
-		System.out.println("  * binarization");
+		// convert into a binary image with high feature intensity regions being 1
 		inputToBinary.process(intensity,binary);
-
-		System.out.println("  * contour");
+		// find the small regions. Th se might be where corners are
 		contourFinder.process(binary);
 
 		int dropped = 0;
@@ -137,11 +173,12 @@ public class DetectChessboardCorners {
 
 			UtilPoint2D_I32.mean(contour.toList(),c);
 
-			// remove bias
+			// If the flat region in intensity has an even width then the center found by the contour will be
+			// off by 1/2 a pixel. If it's odd then no adjustment is needed
 			c.x += 0.5;
 			c.y += 0.5;
 
-			computefeaturesLines(c.x,c.y,c);
+			computefeatures(c.x,c.y,c);
 
 //			System.out.println("radius = "+radius+" angle = "+c.angle);
 //			System.out.println("intensity "+c.intensity);
@@ -151,20 +188,27 @@ public class DetectChessboardCorners {
 			}
 
 			// TODO remaining features estimate corner to subpixel
+			meanShiftLocation(c);
 		}
 
 		System.out.println("Dropped "+dropped+" / "+packed.size());
 	}
 
-	private void computefeaturesLines( double cx , double cy , Corner corner ) {
-
-		int N = 16;
-		double lines[] = new double[N];
-
+	/**
+	 * Computes features for the corner (angle and intensity) using line integrals in a spokes pattern.
+	 *
+	 * The feature's angle has a value from -pi/2 to pi/2 radians. It is found by finding the line/spoke with the
+	 * minimum value that maximizes distance from the bright lines.
+	 *
+	 * Intensity is found by subtracting bright lines from the dark line on the other side. dark/light lines are
+	 * offset by 90 degrees.
+	 */
+	private void computefeatures(double cx , double cy , Corner corner ) {
 		double r = radius+2;
 
-		for (int i = 0; i < N; i++) {
-			double angle = Math.PI*i/N-Math.PI/2.0;
+		for (int i = 0; i < numLines; i++) {
+			// TODO precompute sines and cosines
+			double angle = Math.PI*i/ numLines -Math.PI/2.0;
 			double c = Math.cos(angle);
 			double s = Math.sin(angle);
 
@@ -176,39 +220,57 @@ public class DetectChessboardCorners {
 			lines[i] = integral.compute(x0,y0,x1,y1);
 		}
 
-		double smoothed[] = new double[N];
-		for (int i = 0; i < N; i++) {
-			int start = CircularIndex.addOffset(i,-2,N);
+		// smooth by applying a block filter. This will ensure it doesn't point towards an edge which just happens
+		// to be slightly darker than the center
+		int r_smooth = numLines /8; //  when viewed head on the black region will be 1/4 of a circle
+		int w_smooth = r_smooth*2+1;
+		for (int i = 0; i < numLines; i++) {
+			int start = addOffset(i,-r_smooth, numLines);
 
 			double sum = 0;
-			for (int j = 0; j < 5; j++) {
-				int index = CircularIndex.addOffset(start,j,N);
+			for (int j = 0; j < w_smooth; j++) {
+				int index = addOffset(start,j, numLines);
 				sum += lines[index];
 			}
-			smoothed[i] = sum / 5;
+			smoothed[i] = sum / w_smooth;
 		}
 
-		// TODO Gaussian smoothing?
 		int indexMin = 0;
 		double valueMin = Double.MAX_VALUE;
-		for (int i = 0; i < N; i++) {
+		for (int i = 0; i < numLines; i++) {
 			if( smoothed[i] < valueMin ) {
 				valueMin = smoothed[i];
 				indexMin = i;
 			}
 		}
 
-		// TODO fit quadratic for extra precision
-		corner.angle = Math.PI*indexMin/N-Math.PI/2.0;
+		// Use a quadratic to estimate the peak's location to a sub-bin accuracy
+		double value0 = smoothed[ addOffset(indexMin,-1, numLines)];
+		double value2 = smoothed[ addOffset(indexMin, 1, numLines)];
 
-		// compute intensity.  offset by 90
+		double adjustedIndex = indexMin + FastHessianFeatureDetector.polyPeak(value0,valueMin,value2);
+		corner.angle = Math.PI*adjustedIndex/ numLines -Math.PI/2.0;
+
+		// Score the corner's fit quality using the fact that the function would be osccilate (sin/cosine)
+		// and values 90 degrees offset are at the other side
 		double intensity = 0;
-		for (int i = 0; i < N/2; i++) {
-			int idx0 = CircularIndex.addOffset(indexMin,i-N/4,N);
-			int idx1 = CircularIndex.addOffset(idx0,N/2,N);
+		for (int i = 0; i < numLines /2; i++) {
+			int idx0 = addOffset(indexMin,i- numLines /4, numLines);
+			int idx1 = addOffset(idx0, numLines /2, numLines);
 			intensity += smoothed[idx1] - smoothed[idx0];
 		}
-		corner.intensity = intensity/(r*2+1+N/2);
+		corner.intensity = intensity/(r*2+1+ numLines/2);
+	}
+
+	/**
+	 * Use mean shift to improve the accuracy of the corner's location. A kernel is selected which is slightly larger
+	 * than the "flat" intensity of the corner should be when over a chess pattern.
+	 */
+	public void meanShiftLocation( Corner c ) {
+		for (int iteration = 0; iteration < 5; iteration++) {
+
+		}
+		// TODO implement
 	}
 
 	public GrayF32 getIntensity() {
@@ -221,6 +283,42 @@ public class DetectChessboardCorners {
 
 	public FastQueue<Corner> getCorners() {
 		return corners;
+	}
+
+	/**
+	 * @param inputToBinary Thresholding algorithm. If using a histogram based approach keep in mind
+	 *                      that the number of values is specified by grayLevels. OTSU is recommended
+	 */
+	public void setThresholding( InputToBinary<GrayF32> inputToBinary ) {
+		this.inputToBinary = inputToBinary;
+	}
+
+	public void setKernelRadius( int radius ) {
+		this.radius = radius;
+		this.width = radius*2+1;
+		cornerIntensity =  FactoryIntensityPointAlg.shiTomasi(radius, false, GrayF32.class);
+
+		// Tell it to ignore all contours which are smaller or larger than the flat region should be in the
+		// shi-tomasi corner intensity image. See clas description for a definition of the flat region
+		// Flat region is a square with width of (radius*2+1) where radius is the radius of the kernel.
+		if( radius == 1 ) {
+			contourFinder.setMaxContour((width + 1) * 4 + 4);
+			contourFinder.setMinContour(width * 4 - 4);
+		} else {
+			contourFinder.setMaxContour((width + 1) * 4 + 4);
+			contourFinder.setMinContour((width - 1) * 4 - 4);
+		}
+	}
+
+	public int getKernelRadius() {
+		return radius;
+	}
+
+	/**
+	 * Values in corner intensity image will be from 0 to this number
+	 */
+	public int getGrayLevels() {
+		return grayLevels;
 	}
 
 	public static class Corner extends Point2D_F64 {

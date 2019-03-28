@@ -20,6 +20,7 @@ package boofcv.demonstrations.feature.detect;
 
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.demonstrations.feature.detect.DetectChessboardCorners.Corner;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
@@ -114,7 +115,9 @@ public class DetectChessboardCornersVisualizeApp
 
 	private void createAlgorithm() {
 		synchronized (lockAlgorithm) {
-			detector = new DetectChessboardCornersPyramid(new DetectChessboardCorners(controlPanel.radius));
+			DetectChessboardCorners corners = new DetectChessboardCorners();
+			corners.setKernelRadius(controlPanel.radius);
+			detector = new DetectChessboardCornersPyramid(corners);
 		}
 	}
 
@@ -302,9 +305,10 @@ public class DetectChessboardCornersVisualizeApp
 
 	// TODO add binary controls
 	// TODO visualize contours
+	// TODO show each layer in the pyramid
 
 	public static void main( String args[] ) {
-//		BoofConcurrency.USE_CONCURRENT = false;
+		BoofConcurrency.USE_CONCURRENT = false;
 		List<PathLabel> examples = new ArrayList<>();
 
 		examples.add(new PathLabel("Square Grid",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));

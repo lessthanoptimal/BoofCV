@@ -52,11 +52,10 @@ public class DetectChessboardCornersPyramid {
 	}
 
 	public DetectChessboardCornersPyramid() {
-		this( new DetectChessboardCorners(1));
+		this( new DetectChessboardCorners());
 	}
 
 	public void process(GrayF32 input ) {
-		System.out.println("ENTER pyramid process");
 		constructPyramid(input);
 
 		corners.reset();
@@ -65,10 +64,8 @@ public class DetectChessboardCornersPyramid {
 		double scale = Math.pow(2.0,pyramid.size()-1);
 
 		for (int level = pyramid.size()-1; level >= 0; level--) {
-			System.out.println("  detect level "+level);
 			detector.process(pyramid.get(level));
 			PyramidLevel feats = featureLevels.get(level);
-			System.out.println("  adding features");
 
 			FastQueue<Corner> corners = detector.getCorners();
 			feats.corners.reset();
@@ -84,8 +81,6 @@ public class DetectChessboardCornersPyramid {
 
 		// TODO remove identical features
 		// match using orientation.
-
-		System.out.println("EXIT pyramid process");
 
 	}
 
