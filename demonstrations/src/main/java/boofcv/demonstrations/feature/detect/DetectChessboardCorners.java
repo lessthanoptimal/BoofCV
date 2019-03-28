@@ -75,7 +75,7 @@ import static boofcv.misc.CircularIndex.addOffset;
 public class DetectChessboardCorners {
 
 	// intensity image is forced to have this many integer levels for OTSU
-	static final int grayLevels = 300;
+	public static final int GRAY_LEVELS = 300;
 	// feature radius and width in Shi-Tomasi corner detector
 	int radius, width;
 
@@ -123,7 +123,7 @@ public class DetectChessboardCorners {
 	public DetectChessboardCorners() {
 		setKernelRadius(1);
 
-		setThresholding(FactoryThresholdBinary.globalOtsu(0, grayLevels,false,GrayF32.class));
+		setThresholding(FactoryThresholdBinary.globalOtsu(0, GRAY_LEVELS,false,GrayF32.class));
 		contourFinder.setConnectRule(ConnectRule.EIGHT);
 
 		// just give it something. this will be changed later
@@ -143,12 +143,16 @@ public class DetectChessboardCorners {
 		interpX.setImage(derivX);
 		interpY.setImage(derivY);
 
+		long time0 = System.nanoTime();
 		cornerIntensity.process(derivX,derivY,intensity);
+		long time1 = System.nanoTime();
+
+		System.out.println("Corner time "+(time1-time0)*1e-6);
 
 		// adjust intensity value so that its between 0 and levels for OTSU thresholding
 		float featmax = ImageStatistics.max(intensity);
 //		System.out.println("MAx = "+featmax);
-		PixelMath.multiply(intensity, grayLevels /featmax,intensity);
+		PixelMath.multiply(intensity, GRAY_LEVELS /featmax,intensity);
 
 //		int N = intensity.width*input.height;
 //		for (int i = 0; i < N; i++) {
@@ -312,13 +316,6 @@ public class DetectChessboardCorners {
 
 	public int getKernelRadius() {
 		return radius;
-	}
-
-	/**
-	 * Values in corner intensity image will be from 0 to this number
-	 */
-	public int getGrayLevels() {
-		return grayLevels;
 	}
 
 	public static class Corner extends Point2D_F64 {

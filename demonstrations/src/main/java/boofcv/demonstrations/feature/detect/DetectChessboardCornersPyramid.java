@@ -34,7 +34,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectChessboardCornersPyramid {
-	// TODO create pyramid by 2x2 averaging
 	// TODO see if same feature has been detected at multiple levels
 	// TODO have flag that prunes corners which haven't been detected at multiple levels
 
@@ -84,6 +83,11 @@ public class DetectChessboardCornersPyramid {
 
 	}
 
+	/**
+	 * Creates an image pyrmaid by 2x2 average down sampling the input image. The original input image is at layer
+	 * 0 with each layer after that 1/2 the resolution of the previous. 2x2 down sampling is used because it doesn't
+	 * add blur or aliasing.
+	 */
 	private void constructPyramid(GrayF32 input) {
 		if( pyramid.size() == 0 ){
 			pyramid.add(input);

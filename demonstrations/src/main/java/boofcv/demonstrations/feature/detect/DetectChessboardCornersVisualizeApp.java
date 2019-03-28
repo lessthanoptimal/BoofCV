@@ -20,10 +20,13 @@ package boofcv.demonstrations.feature.detect;
 
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
-import boofcv.concurrency.BoofConcurrency;
 import boofcv.demonstrations.feature.detect.DetectChessboardCorners.Corner;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
+import boofcv.demonstrations.shapes.ThresholdControlPanel;
+import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
@@ -115,9 +118,13 @@ public class DetectChessboardCornersVisualizeApp
 
 	private void createAlgorithm() {
 		synchronized (lockAlgorithm) {
+			ConfigThreshold threshold = controlPanel.thresholdPanel.createConfig();
+			threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
+
 			DetectChessboardCorners corners = new DetectChessboardCorners();
 			corners.setKernelRadius(controlPanel.radius);
 			detector = new DetectChessboardCornersPyramid(corners);
+			detector.getDetector().setThresholding(FactoryThresholdBinary.threshold(threshold,GrayF32.class));
 		}
 	}
 
@@ -153,14 +160,17 @@ public class DetectChessboardCornersVisualizeApp
 
 		GrayF32 gray = (GrayF32) input;
 
+		controlPanel.thresholdPanel.updateHistogram(gray);
+
 		GrayF32 featureImg;
+		double processingTime;
 		synchronized (lockAlgorithm) {
 			long time0 = System.nanoTime();
 			detector.process(gray);
 			long time1 = System.nanoTime();
+			processingTime = (time1-time0)*1e-6; // milliseconds
 
 			featureImg = detector.getDetector().getIntensity();
-			System.out.printf("time %7.3f\n",(time1-time0)*1e-6);
 
 			if( controlPanel.logItensity ) {
 				PixelMath.log(featureImg,logIntensity);
@@ -181,6 +191,7 @@ public class DetectChessboardCornersVisualizeApp
 		}
 
 		SwingUtilities.invokeLater(() -> {
+			controlPanel.setProcessingTimeMS(processingTime);
 			changeViewImage();
 			imagePanel.repaint();
 		});
@@ -230,7 +241,7 @@ public class DetectChessboardCornersVisualizeApp
 						double dy = 4*Math.sin(c.angle);
 
 						g2.setColor(Color.CYAN);
-						line.setLine(c.x*scale,c.y*scale,(c.x+dx)*scale,(c.y+dy)*scale);
+						line.setLine((c.x-dx)*scale,(c.y-dy)*scale,(c.x+dx)*scale,(c.y+dy)*scale);
 						g2.draw(line);
 					}
 				}
@@ -238,35 +249,42 @@ public class DetectChessboardCornersVisualizeApp
 		}
 	}
 
-	class ControlPanel extends DetectBlackShapePanel implements ActionListener , ChangeListener {
+	class ControlPanel extends DetectBlackShapePanel
+			implements ActionListener , ChangeListener , ThresholdControlPanel.Listener
+	{
 		JComboBox<String> comboView;
 		JCheckBox checkLogIntensity;
 		JSpinner spinnerRadius;
 		JCheckBox checkShowCorners;
-		JSpinner spinnerMaxFeatures;
+		public ThresholdControlPanel thresholdPanel;
 
 		int radius = 1;
 		boolean showCorners =true;
 		boolean logItensity =false;
 		int view = 1;
-		int maxFeatures = 200;
 
 		public ControlPanel() {
+			{
+				ConfigThreshold config = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
+				config.down = false;
+				thresholdPanel = new ThresholdControlPanel(this,config);
+				thresholdPanel.addHistogramGraph();
+			}
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
 			comboView = combo(view,"Intensity","Image","Both","Binary");
 			spinnerRadius = spinner(radius, 1, 100, 1);
 			checkShowCorners = checkbox("Show Corners", showCorners);
-			spinnerMaxFeatures = spinner(maxFeatures,1,100_000,10);
 
+			addLabeled(processingTimeLabel, "Time (ms)");
 			addLabeled(imageSizeLabel,"Image Size");
 			addLabeled(comboView,"View");
 			addLabeled(selectZoom,"Zoom");
 			addAlignLeft(checkLogIntensity);
 			addAlignLeft(checkShowCorners);
-			addLabeled(spinnerRadius,"Radius");
-			addLabeled(spinnerMaxFeatures,"Max Features");
+			addLabeled(spinnerRadius,"Corner Radius");
+			addAlignCenter(thresholdPanel);
 		}
 
 		@Override
@@ -295,24 +313,24 @@ public class DetectChessboardCornersVisualizeApp
 				reprocessImageOnly();
 			}
 		}
+
+		@Override
+		public void imageThresholdUpdated() {
+			createAlgorithm();
+			reprocessImageOnly();
+		}
 	}
 
-	// consider finding local maximums? how to remove all the false positives
-	//    blobs are expected to be a specific size too
-
-
-	// TODO why are there large blocks in binary image?
-
-	// TODO add binary controls
 	// TODO visualize contours
 	// TODO show each layer in the pyramid
+	// TODO control corner intensity threshold
+	// TODO top of pyramid size
 
 	public static void main( String args[] ) {
-		BoofConcurrency.USE_CONCURRENT = false;
 		List<PathLabel> examples = new ArrayList<>();
 
-		examples.add(new PathLabel("Square Grid",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
 		examples.add(new PathLabel("Chessboard",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame06.jpg")));
+		examples.add(new PathLabel("Square Grid",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Square/frame06.jpg")));
 		examples.add(new PathLabel("shapes", UtilIO.pathExample("shapes/shapes01.png")));
 		examples.add(new PathLabel("sunflowers",UtilIO.pathExample("sunflowers.jpg")));
 		examples.add(new PathLabel("beach",UtilIO.pathExample("scale/beach02.jpg")));
