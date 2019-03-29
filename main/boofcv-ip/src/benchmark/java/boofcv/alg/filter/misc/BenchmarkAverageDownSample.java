@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,78 +19,96 @@
 package boofcv.alg.filter.misc;
 
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS8;
 import boofcv.struct.image.GrayU8;
+import org.openjdk.jmh.annotations.*;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Peter Abeles
  */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value=1)
 public class BenchmarkAverageDownSample {
-	static final long TEST_TIME = 1000;
-	static final Random rand = new Random(234234);
-	static final int width = 640;
-	static final int height = 480;
+	@Param({"true","false"})
+	public boolean concurrent;
 
-	static GrayU8 inputU8 = new GrayU8(width,height);
-	static GrayS8 inputS8 = new GrayS8(width,height);
-	static GrayU8 out8 = new GrayU8(1,1);
+	@Param({"5000"})
+	public int size;
 
-	static int square = 4;
+	GrayU8 inputU8 = new GrayU8(1,1);
+	GrayS8 inputS8 = new GrayS8(1,1);
+	GrayU8 out8 = new GrayU8(1,1);
+	GrayF32 outF32 = new GrayF32(1,1);
 
-	public static class General2 extends PerformerBase {
+	@Setup
+	public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
+		Random rand = new Random(234);
 
-		@Override
-		public void process() {
+		inputU8.reshape(size, size);
+		inputS8.reshape(size, size);
+		out8.reshape(size, size);
+		outF32.reshape(size/2, size/2);
+
+		ImageMiscOps.fillUniform(inputU8,rand,0,200);
+		ImageMiscOps.fillUniform(inputS8,rand,0,200);
+	}
+
+	@Benchmark
+	public void general_8_U8() {
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplAverageDownSampleN_MT.down(inputU8, 8, out8);
+		} else {
+			ImplAverageDownSampleN.down(inputU8, 8, out8);
+		}
+	}
+
+	@Benchmark
+	public void general_2_U8() {
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplAverageDownSampleN_MT.down(inputU8, 2, out8);
+		} else {
 			ImplAverageDownSampleN.down(inputU8, 2, out8);
 		}
 	}
 
-	public static class General2S extends PerformerBase {
-
-		@Override
-		public void process() {
+	@Benchmark
+	public void general_2_S8() {
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplAverageDownSampleN_MT.down(inputS8, 2, out8);
+		} else {
 			ImplAverageDownSampleN.down(inputS8, 2, out8);
 		}
 	}
 
-	public static class GeneralN extends PerformerBase {
-
-		@Override
-		public void process() {
-			ImplAverageDownSampleN.down(inputU8, square, out8);
-		}
-	}
-
-
-
-	public static class Special2 extends PerformerBase {
-
-		@Override
-		public void process() {
+	@Benchmark
+	public void special2x2_U8() {
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplAverageDownSample2_MT.down(inputU8, out8);
+		} else {
 			ImplAverageDownSample2.down(inputU8, out8);
 		}
 	}
 
-
-	public static void main( String argsp[ ] ) {
-		System.out.println("=========  "+width+"  "+height);
-		System.out.println();
-
-		ImageMiscOps.fillUniform(inputU8,rand,0,100);
-		ImageMiscOps.fillUniform(inputS8,rand,-50,50);
-
-		AverageDownSampleOps.reshapeDown(out8,width,height,2);
-
-		ProfileOperation.printOpsPerSec(new General2(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Special2(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new General2S(), TEST_TIME);
-
-		AverageDownSampleOps.reshapeDown(out8,width,height,square);
-		ProfileOperation.printOpsPerSec(new GeneralN(), TEST_TIME);
-
+	@Benchmark
+	public void general_HV_U8() {
+		outF32.reshape(size/2, size);
+		out8.reshape(size/2, size/2);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplAverageDownSample_MT.horizontal(inputU8, outF32);
+			ImplAverageDownSample_MT.vertical(outF32, out8);
+		} else {
+			ImplAverageDownSample.horizontal(inputU8, outF32);
+			ImplAverageDownSample.vertical(outF32, out8);
+		}
 	}
 }
