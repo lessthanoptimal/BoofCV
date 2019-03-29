@@ -77,7 +77,7 @@ public class DetectChessboardCorners {
 	// intensity image is forced to have this many integer levels for OTSU
 	public static final int GRAY_LEVELS = 300;
 	// feature radius and width in Shi-Tomasi corner detector
-	int radius, width;
+	int shiRadius, shiWidth;
 
 	// computes corner intensity image
 	GradientCornerIntensity<GrayF32> cornerIntensity;
@@ -112,6 +112,10 @@ public class DetectChessboardCorners {
 	ImageBorder<GrayF32> borderImg = FactoryImageBorder.single(GrayF32.class,BorderType.ZERO);
 	ImageLineIntegral integral = new ImageLineIntegral();
 
+	// for mean-shift
+	InterpolatePixelS<GrayF32> intensityInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class,BorderType.ZERO);
+	public boolean useMeanShift = true;
+
 	// predeclare memory for compute a feature's orientation
 	private final int numLines = 16;
 	private final double lines[] = new double[numLines];
@@ -136,22 +140,18 @@ public class DetectChessboardCorners {
 	 * @param input Gray image. Not modified.
 	 */
 	public void process( GrayF32 input ) {
+//		System.out.println("ENTER CHESSBOARD CORNER "+input.width+" x "+input.height);
 		borderImg.setImage(input);
-
 		gradient.process(input,derivX,derivY);
 
 		interpX.setImage(derivX);
 		interpY.setImage(derivY);
 
-		long time0 = System.nanoTime();
 		cornerIntensity.process(derivX,derivY,intensity);
-		long time1 = System.nanoTime();
-
-		System.out.println("Corner time "+(time1-time0)*1e-6);
+		intensityInterp.setImage(intensity);
 
 		// adjust intensity value so that its between 0 and levels for OTSU thresholding
 		float featmax = ImageStatistics.max(intensity);
-//		System.out.println("MAx = "+featmax);
 		PixelMath.multiply(intensity, GRAY_LEVELS /featmax,intensity);
 
 //		int N = intensity.width*input.height;
@@ -177,11 +177,6 @@ public class DetectChessboardCorners {
 
 			UtilPoint2D_I32.mean(contour.toList(),c);
 
-			// If the flat region in intensity has an even width then the center found by the contour will be
-			// off by 1/2 a pixel. If it's odd then no adjustment is needed
-			c.x += 0.5;
-			c.y += 0.5;
-
 			computefeatures(c.x,c.y,c);
 
 //			System.out.println("radius = "+radius+" angle = "+c.angle);
@@ -191,11 +186,11 @@ public class DetectChessboardCorners {
 				corners.removeTail();
 			}
 
-			// TODO remaining features estimate corner to subpixel
-			meanShiftLocation(c);
+			if( useMeanShift )
+				meanShiftLocation(c);
 		}
 
-		System.out.println("Dropped "+dropped+" / "+packed.size());
+//		System.out.println("Dropped "+dropped+" / "+packed.size());
 	}
 
 	/**
@@ -208,7 +203,7 @@ public class DetectChessboardCorners {
 	 * offset by 90 degrees.
 	 */
 	private void computefeatures(double cx , double cy , Corner corner ) {
-		double r = radius+2;
+		double r = shiRadius +2;
 
 		for (int i = 0; i < numLines; i++) {
 			// TODO precompute sines and cosines
@@ -271,10 +266,32 @@ public class DetectChessboardCorners {
 	 * than the "flat" intensity of the corner should be when over a chess pattern.
 	 */
 	public void meanShiftLocation( Corner c ) {
-		for (int iteration = 0; iteration < 5; iteration++) {
+		float meanX = (float)c.x;
+		float meanY = (float)c.y;
 
+		int radius = this.shiRadius *2;
+		for (int iteration = 0; iteration < 5; iteration++) {
+			float adjX = 0;
+			float adjY = 0;
+			float total = 0;
+
+			for (int y = -radius; y < radius; y++) {
+				float yy = y + 0.5f;
+				for (int x = -radius; x < radius; x++) {
+					float xx = x + 0.5f;
+					float v = intensityInterp.get(meanX+xx,meanY+yy);
+					adjX += xx*v;
+					adjY += yy*v;
+					total += v;
+				}
+			}
+
+			meanX += adjX/total;
+			meanY += adjY/total;
 		}
-		// TODO implement
+
+		c.x = meanX;
+		c.y = meanY;
 	}
 
 	public GrayF32 getIntensity() {
@@ -298,29 +315,31 @@ public class DetectChessboardCorners {
 	}
 
 	public void setKernelRadius( int radius ) {
-		this.radius = radius;
-		this.width = radius*2+1;
+		this.shiRadius = radius;
+		this.shiWidth = radius*2+1;
 		cornerIntensity =  FactoryIntensityPointAlg.shiTomasi(radius, false, GrayF32.class);
 
 		// Tell it to ignore all contours which are smaller or larger than the flat region should be in the
 		// shi-tomasi corner intensity image. See clas description for a definition of the flat region
 		// Flat region is a square with width of (radius*2+1) where radius is the radius of the kernel.
 		if( radius == 1 ) {
-			contourFinder.setMaxContour((width + 1) * 4 + 4);
-			contourFinder.setMinContour(width * 4 - 4);
+			contourFinder.setMaxContour((shiWidth + 1) * 4 + 4);
+			contourFinder.setMinContour(shiWidth * 4 - 4);
 		} else {
-			contourFinder.setMaxContour((width + 1) * 4 + 4);
-			contourFinder.setMinContour((width - 1) * 4 - 4);
+			contourFinder.setMaxContour((shiWidth + 1) * 4 + 4);
+			contourFinder.setMinContour((shiWidth - 1) * 4 - 4);
 		}
 	}
 
 	public int getKernelRadius() {
-		return radius;
+		return shiRadius;
 	}
 
 	public static class Corner extends Point2D_F64 {
 		double angle;
 		double intensity;
+		// if true then this indicates that this is the first corner seen in this level
+		boolean first;
 
 		public void set( Corner c ) {
 			super.set(c);
@@ -328,10 +347,11 @@ public class DetectChessboardCorners {
 			this.intensity = c.intensity;
 		}
 
-		public void set( Corner c , double scale ) {
-			super.set(c.x*scale,c.y*scale);
-			this.angle = c.angle;
-			this.intensity = c.intensity;
+		public void set(double x , double y , double angle , double intensity ) {
+			this.x = x;
+			this.y = y;
+			this.angle = angle;
+			this.intensity = intensity;
 		}
 	}
 }

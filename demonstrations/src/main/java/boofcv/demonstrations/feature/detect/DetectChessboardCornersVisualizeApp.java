@@ -123,7 +123,9 @@ public class DetectChessboardCornersVisualizeApp
 
 			DetectChessboardCorners corners = new DetectChessboardCorners();
 			corners.setKernelRadius(controlPanel.radius);
+			corners.useMeanShift = controlPanel.debug;
 			detector = new DetectChessboardCornersPyramid(corners);
+			detector.setPyramidTopSize(controlPanel.pyramidTop);
 			detector.getDetector().setThresholding(FactoryThresholdBinary.threshold(threshold,GrayF32.class));
 		}
 	}
@@ -234,14 +236,19 @@ public class DetectChessboardCornersVisualizeApp
 					g2.setStroke(new BasicStroke(3));
 					for (int i = 0; i < foundCorners.size; i++) {
 						Corner c = foundCorners.get(i);
+						// shift the corner over 1/2 a pixel so that it appears inside the pixels' center
+						// this visually looks better
+						double x = c.x + 0.5;
+						double y = c.y + 0.5;
+
 						g2.setColor(Color.ORANGE);
-						VisualizeFeatures.drawCircle(g2, c.x * scale, c.y * scale, 5, circle);
+						VisualizeFeatures.drawCircle(g2, x * scale, y * scale, 5, circle);
 
 						double dx = 4*Math.cos(c.angle);
 						double dy = 4*Math.sin(c.angle);
 
 						g2.setColor(Color.CYAN);
-						line.setLine((c.x-dx)*scale,(c.y-dy)*scale,(c.x+dx)*scale,(c.y+dy)*scale);
+						line.setLine((x-dx)*scale,(y-dy)*scale,(x+dx)*scale,(y+dy)*scale);
 						g2.draw(line);
 					}
 				}
@@ -255,13 +262,17 @@ public class DetectChessboardCornersVisualizeApp
 		JComboBox<String> comboView;
 		JCheckBox checkLogIntensity;
 		JSpinner spinnerRadius;
+		JSpinner spinnerTop;
 		JCheckBox checkShowCorners;
+		JCheckBox checkDebug;
 		public ThresholdControlPanel thresholdPanel;
 
+		int pyramidTop = 100;
 		int radius = 1;
 		boolean showCorners =true;
 		boolean logItensity =false;
 		int view = 1;
+		boolean debug = true;
 
 		public ControlPanel() {
 			{
@@ -275,7 +286,9 @@ public class DetectChessboardCornersVisualizeApp
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
 			comboView = combo(view,"Intensity","Image","Both","Binary");
 			spinnerRadius = spinner(radius, 1, 100, 1);
+			spinnerTop = spinner(pyramidTop, 50, 10000, 50);
 			checkShowCorners = checkbox("Show Corners", showCorners);
+			checkDebug = checkbox("Debug",debug);
 
 			addLabeled(processingTimeLabel, "Time (ms)");
 			addLabeled(imageSizeLabel,"Image Size");
@@ -283,7 +296,9 @@ public class DetectChessboardCornersVisualizeApp
 			addLabeled(selectZoom,"Zoom");
 			addAlignLeft(checkLogIntensity);
 			addAlignLeft(checkShowCorners);
+			addAlignLeft(checkDebug);
 			addLabeled(spinnerRadius,"Corner Radius");
+			addLabeled(spinnerTop,"Pyramid Top");
 			addAlignCenter(thresholdPanel);
 		}
 
@@ -299,6 +314,10 @@ public class DetectChessboardCornersVisualizeApp
 			} else if( e.getSource() == checkLogIntensity) {
 				logItensity = checkLogIntensity.isSelected();
 				reprocessImageOnly();
+			} else if( e.getSource() == checkDebug) {
+				debug = checkDebug.isSelected();
+				createAlgorithm();
+				reprocessImageOnly();
 			}
 		}
 
@@ -309,6 +328,10 @@ public class DetectChessboardCornersVisualizeApp
 				imagePanel.setScale(zoom);
 			} else if( e.getSource() == spinnerRadius ) {
 				radius = ((Number)spinnerRadius.getValue()).intValue();
+				createAlgorithm();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerTop ) {
+				pyramidTop = ((Number)spinnerTop.getValue()).intValue();
 				createAlgorithm();
 				reprocessImageOnly();
 			}
@@ -324,7 +347,6 @@ public class DetectChessboardCornersVisualizeApp
 	// TODO visualize contours
 	// TODO show each layer in the pyramid
 	// TODO control corner intensity threshold
-	// TODO top of pyramid size
 
 	public static void main( String args[] ) {
 		List<PathLabel> examples = new ArrayList<>();
