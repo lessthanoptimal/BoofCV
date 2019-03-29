@@ -18,9 +18,11 @@
 
 package boofcv.demonstrations.feature.detect;
 
+import boofcv.alg.feature.detect.interest.DetectChessboardCorners;
+import boofcv.alg.feature.detect.interest.DetectChessboardCorners.Corner;
+import boofcv.alg.feature.detect.interest.DetectChessboardCornersPyramid;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
-import boofcv.demonstrations.feature.detect.DetectChessboardCorners.Corner;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;

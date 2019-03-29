@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.demonstrations.feature.detect;
+package boofcv.alg.feature.detect.interest;
 
+import boofcv.alg.feature.detect.interest.DetectChessboardCorners.Corner;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
-import boofcv.demonstrations.feature.detect.DetectChessboardCorners.Corner;
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
@@ -86,6 +86,9 @@ public class DetectChessboardCornersPyramid {
 		this( new DetectChessboardCorners());
 	}
 
+	/**
+	 * Detects corner features inside the input gray scale image.
+	 */
 	public void process(GrayF32 input ) {
 		constructPyramid(input);
 
@@ -147,7 +150,9 @@ public class DetectChessboardCornersPyramid {
 	}
 
 	/**
-	 * Finds corners in list 1 which match corners in list 0 as mark them as seen
+	 * Finds corners in list 1 which match corners in list 0. If the feature in list 0 has already been
+	 * seen then the feature in list 1 will be marked as seen. Otherwise the feature which is the most intense
+	 * is marked as first.
 	 */
 	void markSeenAsFalse( FastQueue<Corner> corners0 , FastQueue<Corner> corners1 ) {
 		nn.setPoints(corners1.toList(),false);
@@ -157,6 +162,7 @@ public class DetectChessboardCornersPyramid {
 		for (int i = 0; i < corners0.size; i++) {
 			Corner c0 = corners0.get(i);
 			nnSearch.findNearest(c0,radius,5,nnResults);
+			// TODO does it ever find multiple matches?
 
 			// Could make this smarter by looking at the orientation too
 			for (int j = 0; j < nnResults.size; j++) {

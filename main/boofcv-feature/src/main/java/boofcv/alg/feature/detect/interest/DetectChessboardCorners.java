@@ -16,13 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.demonstrations.feature.detect;
+package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.filter.binary.BinaryContourFinderLinearExternal;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
-import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.interpolate.ImageLineIntegral;
 import boofcv.alg.interpolate.InterpolatePixelS;
