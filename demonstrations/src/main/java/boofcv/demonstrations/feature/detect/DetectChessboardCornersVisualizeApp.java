@@ -18,9 +18,9 @@
 
 package boofcv.demonstrations.feature.detect;
 
-import boofcv.alg.feature.detect.interest.DetectChessboardCorners;
-import boofcv.alg.feature.detect.interest.DetectChessboardCorners.Corner;
-import boofcv.alg.feature.detect.interest.DetectChessboardCornersPyramid;
+import boofcv.alg.feature.detect.chess.ChessboardCorner;
+import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
+import boofcv.alg.feature.detect.chess.DetectChessboardCornersPyramid;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
@@ -84,7 +84,7 @@ public class DetectChessboardCornersVisualizeApp
 	final Object lockAlgorithm = new Object();
 
 	final Object lockCorners = new Object();
-	FastQueue<Corner> foundCorners = new FastQueue<>(Corner.class,true);
+	FastQueue<ChessboardCorner> foundCorners = new FastQueue<>(ChessboardCorner.class,true);
 
 	public DetectChessboardCornersVisualizeApp(List<PathLabel> examples ) {
 		super(true,true,examples,ImageType.single(GrayF32.class));
@@ -186,7 +186,7 @@ public class DetectChessboardCornersVisualizeApp
 			binary=VisualizeBinaryData.renderBinary(detector.getDetector().getBinary(),false,binary);
 
 			synchronized (lockCorners) {
-				FastQueue<Corner> orig = detector.getCorners();
+				FastQueue<ChessboardCorner> orig = detector.getCorners();
 				foundCorners.reset();
 				for (int i = 0; i < orig.size; i++) {
 					foundCorners.grow().set( orig.get(i) );
@@ -237,7 +237,7 @@ public class DetectChessboardCornersVisualizeApp
 				synchronized (lockCorners) {
 					g2.setStroke(new BasicStroke(3));
 					for (int i = 0; i < foundCorners.size; i++) {
-						Corner c = foundCorners.get(i);
+						ChessboardCorner c = foundCorners.get(i);
 						// shift the corner over 1/2 a pixel so that it appears inside the pixels' center
 						// this visually looks better
 						double x = c.x + 0.5;
@@ -246,8 +246,8 @@ public class DetectChessboardCornersVisualizeApp
 						g2.setColor(Color.ORANGE);
 						VisualizeFeatures.drawCircle(g2, x * scale, y * scale, 5, circle);
 
-						double dx = 4*Math.cos(c.angle);
-						double dy = 4*Math.sin(c.angle);
+						double dx = 4*Math.cos(c.orientation);
+						double dy = 4*Math.sin(c.orientation);
 
 						g2.setColor(Color.CYAN);
 						line.setLine((x-dx)*scale,(y-dy)*scale,(x+dx)*scale,(y+dy)*scale);

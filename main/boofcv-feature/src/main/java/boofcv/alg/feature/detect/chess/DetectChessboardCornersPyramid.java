@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.interest;
+package boofcv.alg.feature.detect.chess;
 
-import boofcv.alg.feature.detect.interest.DetectChessboardCorners.Corner;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.nn.FactoryNearestNeighbor;
@@ -52,17 +51,17 @@ public class DetectChessboardCornersPyramid {
 	FastQueue<PyramidLevel> featureLevels = new FastQueue<>(PyramidLevel.class, PyramidLevel::new);
 
 	// Storage for final output corners
-	FastQueue<Corner> corners = new FastQueue<>(Corner.class,true);
+	FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner.class,true);
 
 	// Nearest-Neighbor search data structures
-	NearestNeighbor<Corner> nn = FactoryNearestNeighbor.kdtree(new KdTreeDistance<Corner>() {
+	NearestNeighbor<ChessboardCorner> nn = FactoryNearestNeighbor.kdtree(new KdTreeDistance<ChessboardCorner>() {
 		@Override
-		public double distance(Corner a, Corner b) {
+		public double distance(ChessboardCorner a, ChessboardCorner b) {
 			return a.distance(b);
 		}
 
 		@Override
-		public double valueAt(Corner point, int index) {
+		public double valueAt(ChessboardCorner point, int index) {
 			switch (index) {
 				case 0: return point.x;
 				case 1: return point.y;
@@ -75,8 +74,8 @@ public class DetectChessboardCornersPyramid {
 			return 2;
 		}
 	});
-	NearestNeighbor.Search<Corner> nnSearch = nn.createSearch();
-	FastQueue<NnData<Corner>> nnResults = new FastQueue(NnData.class,true);
+	NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
+	FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData.class,true);
 
 	public DetectChessboardCornersPyramid(DetectChessboardCorners detector) {
 		this.detector = detector;
@@ -104,10 +103,10 @@ public class DetectChessboardCornersPyramid {
 			// Add found corners to this level's list
 			PyramidLevel featsLevel = featureLevels.get(level);
 
-			FastQueue<Corner> corners = detector.getCorners();
+			FastQueue<ChessboardCorner> corners = detector.getCorners();
 			featsLevel.corners.reset();
 			for (int i = 0; i < corners.size; i++) {
-				Corner cf = corners.get(i);
+				ChessboardCorner cf = corners.get(i);
 
 				// convert the coordinate into input image coordinates
 				double x = cf.x*scale;
@@ -119,9 +118,9 @@ public class DetectChessboardCornersPyramid {
 					y += 0.5*scale;
 				}
 
-				Corner cl = featsLevel.corners.grow();
+				ChessboardCorner cl = featsLevel.corners.grow();
 				cl.first = true;
-				cl.set(x,y,cf.angle,cf.intensity);
+				cl.set(x,y,cf.orientation,cf.intensity);
 			}
 			scale /= 2.0;
 		}
@@ -142,7 +141,7 @@ public class DetectChessboardCornersPyramid {
 			PyramidLevel level = featureLevels.get(levelIdx);
 			// only add corners if they were first seen in this level
 			for (int i = 0; i < level.corners.size; i++) {
-				Corner c = level.corners.get(i);
+				ChessboardCorner c = level.corners.get(i);
 				if( c.first )
 					corners.grow().set(c);
 			}
@@ -154,19 +153,19 @@ public class DetectChessboardCornersPyramid {
 	 * seen then the feature in list 1 will be marked as seen. Otherwise the feature which is the most intense
 	 * is marked as first.
 	 */
-	void markSeenAsFalse( FastQueue<Corner> corners0 , FastQueue<Corner> corners1 ) {
+	void markSeenAsFalse(FastQueue<ChessboardCorner> corners0 , FastQueue<ChessboardCorner> corners1 ) {
 		nn.setPoints(corners1.toList(),false);
 		nnSearch.initialize();
 		// radius of the blob in the intensity image is 2*kernelRadius
 		int radius = detector.shiRadius *2+1;
 		for (int i = 0; i < corners0.size; i++) {
-			Corner c0 = corners0.get(i);
+			ChessboardCorner c0 = corners0.get(i);
 			nnSearch.findNearest(c0,radius,5,nnResults);
 			// TODO does it ever find multiple matches?
 
 			// Could make this smarter by looking at the orientation too
 			for (int j = 0; j < nnResults.size; j++) {
-				Corner c1 = nnResults.get(j).point;
+				ChessboardCorner c1 = nnResults.get(j).point;
 
 				// if the current one wasn't first then none of its children can be first
 				if( !c0.first ) {
@@ -219,14 +218,14 @@ public class DetectChessboardCornersPyramid {
 	}
 
 	private static class PyramidLevel {
-		FastQueue<Corner> corners = new FastQueue<>(Corner.class,true);
+		FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner.class,true);
 	}
 
 	public DetectChessboardCorners getDetector() {
 		return detector;
 	}
 
-	public FastQueue<Corner> getCorners() {
+	public FastQueue<ChessboardCorner> getCorners() {
 		return corners;
 	}
 

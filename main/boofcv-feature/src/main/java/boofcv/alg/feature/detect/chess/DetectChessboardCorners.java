@@ -16,12 +16,13 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.interest;
+package boofcv.alg.feature.detect.chess;
 
 import boofcv.abst.filter.binary.BinaryContourFinderLinearExternal;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
+import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.alg.interpolate.ImageLineIntegral;
 import boofcv.alg.interpolate.InterpolatePixelS;
@@ -39,7 +40,6 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.geometry.UtilPoint2D_I32;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
@@ -92,7 +92,7 @@ public class DetectChessboardCorners {
 	BinaryContourFinderLinearExternal contourFinder = new BinaryContourFinderLinearExternal();
 
 	// Storage for found corners
-	FastQueue<Corner> corners = new FastQueue<>(Corner.class,true);
+	FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner.class,true);
 	// Storage for points in one blob's contour
 	FastQueue<Point2D_I32> contour = new FastQueue<>(Point2D_I32.class,true);
 
@@ -172,7 +172,7 @@ public class DetectChessboardCorners {
 		for (int i = 0; i < packed.size(); i++) {
 			contourFinder.loadContour(i,contour);
 
-			Corner c = corners.grow();
+			ChessboardCorner c = corners.grow();
 
 			UtilPoint2D_I32.mean(contour.toList(),c);
 
@@ -201,7 +201,7 @@ public class DetectChessboardCorners {
 	 * Intensity is found by subtracting bright lines from the dark line on the other side. dark/light lines are
 	 * offset by 90 degrees.
 	 */
-	private void computefeatures(double cx , double cy , Corner corner ) {
+	private void computefeatures(double cx , double cy , ChessboardCorner corner ) {
 		double r = shiRadius +2;
 
 		for (int i = 0; i < numLines; i++) {
@@ -247,7 +247,7 @@ public class DetectChessboardCorners {
 		double value2 = smoothed[ addOffset(indexMin, 1, numLines)];
 
 		double adjustedIndex = indexMin + FastHessianFeatureDetector.polyPeak(value0,valueMin,value2);
-		corner.angle = Math.PI*adjustedIndex/ numLines -Math.PI/2.0;
+		corner.orientation = Math.PI*adjustedIndex/ numLines -Math.PI/2.0;
 
 		// Score the corner's fit quality using the fact that the function would be osccilate (sin/cosine)
 		// and values 90 degrees offset are at the other side
@@ -264,7 +264,7 @@ public class DetectChessboardCorners {
 	 * Use mean shift to improve the accuracy of the corner's location. A kernel is selected which is slightly larger
 	 * than the "flat" intensity of the corner should be when over a chess pattern.
 	 */
-	public void meanShiftLocation( Corner c ) {
+	public void meanShiftLocation( ChessboardCorner c ) {
 		float meanX = (float)c.x;
 		float meanY = (float)c.y;
 
@@ -301,7 +301,7 @@ public class DetectChessboardCorners {
 		return binary;
 	}
 
-	public FastQueue<Corner> getCorners() {
+	public FastQueue<ChessboardCorner> getCorners() {
 		return corners;
 	}
 
@@ -334,23 +334,4 @@ public class DetectChessboardCorners {
 		return shiRadius;
 	}
 
-	public static class Corner extends Point2D_F64 {
-		public double angle;
-		public double intensity;
-		// if true then this indicates that this is the first corner seen in this level
-		public boolean first;
-
-		public void set( Corner c ) {
-			super.set(c);
-			this.angle = c.angle;
-			this.intensity = c.intensity;
-		}
-
-		public void set(double x , double y , double angle , double intensity ) {
-			this.x = x;
-			this.y = y;
-			this.angle = angle;
-			this.intensity = intensity;
-		}
-	}
 }

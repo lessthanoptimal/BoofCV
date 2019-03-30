@@ -16,42 +16,36 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.detect.interest;
+package boofcv.alg.feature.detect.chess;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-/**
- *
- * @author Peter Abeles
- */
-class TestDetectChessboardCorners {
-
+class TestDetectChessboardCornersPyramid {
 	/**
-	 * Rotate a chessboard pattern and see if all the corners are detected
+	 * Test everything together with perfect input
 	 */
 	@Test
-	void process_rotate() {
+	void process_perfectInput() {
 		fail("implement");
 	}
 
 	/**
-	 * Give it a small chessboard and see if it detects it
+	 * Apply heavy blurring to the input image so that the bottom most layer won't reliably detect corners
 	 */
 	@Test
-	void process_small() {
-		// go through features of different radius settings
+	void process_blurredInput() {
 		fail("implement");
 	}
 
 	@Test
-	void computefeatures() {
+	void markSeenAsFalse() {
 		fail("implement");
 	}
 
 	@Test
-	void meanShiftLocation() {
+	void constructPyramid() {
 		fail("implement");
 	}
 }
