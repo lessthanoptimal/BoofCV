@@ -24,7 +24,7 @@ import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.filter.derivative.GradientThree;
-import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
@@ -163,7 +163,13 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		synchronized (lockAlgorithm) {
 			detector.process(gray, derivX, derivY, derivXX, derivYY, derivXY);
 			featureImg = detector.getIntensity();
-			VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
+
+			if( controlPanel.logIntensity ) {
+				PixelMath.logSign(featureImg,featureImg);
+				VisualizeImageData.colorizeSign(featureImg, visualized, -1);
+			} else {
+				VisualizeImageData.colorizeSign(featureImg, visualized, -1);
+			}
 
 			synchronized (lockCorners) {
 				minimums.reset();
@@ -314,12 +320,15 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 			addLabeled(imageSizeLabel,"Image Size");
 			addLabeled(comboView,"View");
 			addLabeled(selectZoom,"Zoom");
-			addLabeled(comboAlgorithm,"Detector");
+			addAlignLeft(checkLogIntensity);
 			addAlignLeft(checkShowLocalMax);
 			addAlignLeft(checkShowLocalMin);
+			addSeparator(200);
+			addLabeled(comboAlgorithm,"Detector");
 			addAlignLeft(checkWeighted);
 			addLabeled(spinnerRadius,"Radius");
 			addLabeled(spinnerMaxFeatures,"Max Features");
+			addVerticalGlue();
 		}
 
 		@Override
@@ -335,6 +344,9 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 				view = comboView.getSelectedIndex();
 				changeViewImage();
 				imagePanel.repaint();
+			} else if( e.getSource() == checkLogIntensity ) {
+				logIntensity = checkLogIntensity.isSelected();
+				reprocessImageOnly();
 			} else if( e.getSource() == checkShowLocalMax ) {
 				showMaximums = checkShowLocalMax.isSelected();
 				imagePanel.repaint();

@@ -4875,6 +4875,25 @@ public class PixelMath {
 	}
 
 	/**
+	 * Sets each pixel in the output image to sgn*log( 1 + sgn*input(x,y)) of the input image.
+	 * where sng is the sign of input(x,y). 
+	 * Both the input and output image can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the log image is written to. Modified.
+	 */
+	public static void logSign( GrayF32 input , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.logSign(input,output);
+		} else {
+			ImplPixelMath.logSign(input,output);
+		}
+	}
+
+	/**
 	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the 
 	 * same instance.	 *
 	 * @param input The input image. Not modified.
@@ -5004,6 +5023,25 @@ public class PixelMath {
 			ImplPixelMath_MT.log(input,output);
 		} else {
 			ImplPixelMath.log(input,output);
+		}
+	}
+
+	/**
+	 * Sets each pixel in the output image to sgn*log( 1 + sgn*input(x,y)) of the input image.
+	 * where sng is the sign of input(x,y). 
+	 * Both the input and output image can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the log image is written to. Modified.
+	 */
+	public static void logSign( GrayF64 input , GrayF64 output ) {
+
+		output.reshape(input.width,input.height);
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplPixelMath_MT.logSign(input,output);
+		} else {
+			ImplPixelMath.logSign(input,output);
 		}
 	}
 

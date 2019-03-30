@@ -2218,6 +2218,23 @@ public class ImplPixelMath_MT {
 		});
 	}
 
+	public static void logSign( GrayF32 input , GrayF32 output ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				float value = input.data[indexSrc];
+				if( value < 0 ) {
+					output.data[indexDst] = (float)-Math.log(1 - value);
+				} else {
+					output.data[indexDst] = (float)Math.log(1 + value);
+				}
+			}
+		});
+	}
+
 	public static void pow2( GrayF32 input , GrayF32 output ) {
 
 		BoofConcurrency.loopFor(0,input.height,y->{
@@ -2325,6 +2342,23 @@ public class ImplPixelMath_MT {
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
 				output.data[indexDst] = Math.log(1 + input.data[indexSrc]);
+			}
+		});
+	}
+
+	public static void logSign( GrayF64 input , GrayF64 output ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				double value = input.data[indexSrc];
+				if( value < 0 ) {
+					output.data[indexDst] = -Math.log(1 - value);
+				} else {
+					output.data[indexDst] = Math.log(1 + value);
+				}
 			}
 		});
 	}

@@ -24,6 +24,7 @@ Version : 0.34
   * TODO Concurrent version of describe
   * TODO WrapDetectDescribeSurf, DetectDescribeFusion
 - Average Down Sample has concurrent versions
+- PixelMath added logSign to handle images with positive and negative values
 
 TODO Scene Reconstruction from arbitrary number of photos
 

@@ -46,7 +46,7 @@ public class TestPixelMath {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 226;
+		int numExpected = 228;
 		Method methods[] = PixelMath.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -89,6 +89,8 @@ public class TestPixelMath {
 					testAdd(m);
 				} else if( m.getName().compareTo("log") == 0 ) {
 					testLog(m);
+				} else if( m.getName().compareTo("logSign") == 0 ) {
+					testLogSign(m);
 				} else if( m.getName().compareTo("pow2") == 0 ) {
 					testPow2(m);
 				} else if( m.getName().compareTo("sqrt") == 0 ) {
@@ -691,6 +693,28 @@ public class TestPixelMath {
 				double b = GeneralizedImageOps.get(inputB,j,i);
 
 				assertEquals(Math.log(1+a),b,1e-4);
+			}
+		}
+	}
+
+	private void testLogSign(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageGray inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageGray inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
+
+		GImageMiscOps.fillUniform(inputA, rand, -20,20);
+		GImageMiscOps.fillUniform(inputB, rand, -20,20);
+
+		m.invoke(null,inputA,inputB);
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double a = GeneralizedImageOps.get(inputA,j,i);
+				double b = GeneralizedImageOps.get(inputB,j,i);
+
+				double expected = a<0?-Math.log(1-a):Math.log(1+a);
+
+				assertEquals(expected,b,1e-4);
 			}
 		}
 	}

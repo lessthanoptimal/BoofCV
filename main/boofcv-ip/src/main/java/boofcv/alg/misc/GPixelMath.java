@@ -490,6 +490,32 @@ public class GPixelMath {
 	}
 
 	/**
+	 * Sets each pixel in the output image to sgn*log( 1 + sgn*input(x,y)) of the input image.
+	 * where sng is the sign of input(x,y).
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the log image is written to. Modified.
+	 */
+	public static <T extends ImageBase<T>> void logSign(T input , T output ) {
+		if( input instanceof ImageGray ) {
+			if (GrayF32.class == input.getClass()) {
+				PixelMath.logSign((GrayF32) input, (GrayF32) output);
+			} else if (GrayF64.class == input.getClass()) {
+				PixelMath.logSign((GrayF64) input, (GrayF64) output);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
+			}
+		} else if( input instanceof Planar ) {
+			Planar in = (Planar)input;
+			Planar out = (Planar)output;
+
+			for (int i = 0; i < in.getNumBands(); i++) {
+				logSign( in.getBand(i), out.getBand(i));
+			}
+		}
+	}
+
+	/**
 	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the same
 	 * instance.
 	 *

@@ -43,7 +43,7 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(21);
+		performTests(22);
 	}
 
 	@Override
@@ -129,6 +129,10 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 			ret[0][3] = 12;
 			ret[0][4] = output;
 		} else if( name.equals("log") ) {
+			inputB = createImage(param[1],null);
+			ret[0][0] = inputA;
+			ret[0][1] = inputB;
+		} else if( name.equals("logSign") ) {
 			inputB = createImage(param[1],null);
 			ret[0][0] = inputA;
 			ret[0][1] = inputB;
@@ -289,7 +293,7 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 				throw new RuntimeException(e);
 			}
 		}
-		assertEquals(21,total);
+		assertEquals(22,total);
 	}
 
 	private Object[] copy( Object inputs[] ) {
