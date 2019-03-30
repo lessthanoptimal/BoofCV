@@ -335,10 +335,10 @@ public class DetectChessboardCorners {
 	}
 
 	public static class Corner extends Point2D_F64 {
-		double angle;
-		double intensity;
+		public double angle;
+		public double intensity;
 		// if true then this indicates that this is the first corner seen in this level
-		boolean first;
+		public boolean first;
 
 		public void set( Corner c ) {
 			super.set(c);

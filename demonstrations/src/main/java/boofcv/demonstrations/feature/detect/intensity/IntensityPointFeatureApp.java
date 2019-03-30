@@ -276,6 +276,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		JComboBox<String> comboView;
 		JComboBox<String> comboAlgorithm;
 		JSpinner spinnerRadius;
+		JCheckBox checkLogIntensity;
 		JCheckBox checkWeighted;
 		JCheckBox checkShowLocalMax;
 		JCheckBox checkShowLocalMin;
@@ -283,6 +284,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 
 		String selected = null;
 		int radius = 2;
+		boolean logIntensity=false;
 		boolean weighted=false;
 		boolean showMaximums =false;
 		boolean showMinimums =false;
@@ -295,6 +297,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			comboView = combo(view,"Intensity","Image","Both");
 			spinnerRadius = spinner(radius, 1, 100, 1);
+			checkLogIntensity = checkbox("log intensity", logIntensity);
 			checkWeighted = checkbox("weighted", weighted);
 			checkShowLocalMax = checkbox("Show Maximums", showMaximums);
 			checkShowLocalMin = checkbox("Show Minimums", showMinimums);
