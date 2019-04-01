@@ -38,8 +38,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -424,7 +426,15 @@ public abstract class DemonstrationBase extends JPanel {
 		if( inputFilePath == null || inputMethod != InputMethod.IMAGE )
 			return;
 
-		File current = new File(UtilIO.ensureURL(inputFilePath).getFile());
+		String path;
+		try {
+			// need to remove annoying %20 from the path is there is whitespace
+			path = URLDecoder.decode(inputFilePath, "utf-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return;
+		}
+		File current = new File(UtilIO.ensureURL(path).getFile());
 		File parent = current.getParentFile();
 		if( parent == null )
 			return;
@@ -450,6 +460,12 @@ public abstract class DemonstrationBase extends JPanel {
 
 		if( closest != null && closest.isFile() ) {
 			openFile(closest);
+		} else {
+			if( closest != null ) {
+				System.err.println("Next file isn't a file. name="+closest.getName());
+			} else {
+				System.err.println("No valid closest file found.");
+			}
 		}
 	}
 
