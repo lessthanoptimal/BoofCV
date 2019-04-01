@@ -96,7 +96,7 @@ public class ImplConvertYuv420_888 {
 					" V="+totalBytesV+" width="+width+" height="+height+" work.length="+work.length+
 					" strideY="+strideY+" strideUV="+strideUV+" stridePixelUV="+stridePixelUV+" periodUV="+periodUV+
 					" x="+x+" y="+y+" indexY="+indexY+" indexU="+indexU+" indexV="+indexV;
-			throw new RuntimeException(message);
+			throw new RuntimeException(message,e);
 		} finally {
 			workArrays.recycle(work);
 		}
