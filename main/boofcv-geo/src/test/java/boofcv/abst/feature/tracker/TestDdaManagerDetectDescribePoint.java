@@ -55,7 +55,7 @@ public class TestDdaManagerDetectDescribePoint extends StandardPointTracker<Gray
 				FactoryBlurFilter.gaussian(ImageType.single(GrayF32.class), 0, 4));
 
 		GeneralFeatureDetector<GrayF32,GrayF32> corner =
-				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(100,2,0,0,true), false, GrayF32.class);
+				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(100,2,0,0,true), null, GrayF32.class);
 
 		InterestPointDetector<GrayF32> detector =
 				FactoryInterestPoint.wrapPoint(corner, 1,GrayF32.class, GrayF32.class);

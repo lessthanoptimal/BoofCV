@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,7 @@ package boofcv.factory.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.*;
-import boofcv.abst.feature.detect.interest.ConfigFastCorner;
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.detect.interest.PointDetector;
-import boofcv.abst.feature.detect.interest.WrapFastToPointDetector;
+import boofcv.abst.feature.detect.interest.*;
 import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
@@ -58,37 +55,48 @@ public class FactoryDetectPoint {
 	 * Detects Harris corners.
 	 *
 	 * @param configDetector Configuration for feature detector.
-	 * @param weighted        Is a Gaussian weight applied to the sample region?  False is much faster.
+	 * @param configCorner   Configuration for corner intensity computation. If null radius will match detector radius
 	 * @param derivType       Type of derivative image.
 	 * @see boofcv.alg.feature.detect.intensity.HarrisCornerIntensity
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createHarris( @Nullable ConfigGeneralDetector configDetector,
-											   boolean weighted, Class<D> derivType) {
+											   @Nullable ConfigHarrisCorner configCorner, Class<D> derivType) {
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
+		if( configCorner == null) {
+			configCorner = new ConfigHarrisCorner();
+			configCorner.radius = configDetector.radius;
+		}
 
 		GradientCornerIntensity<D> cornerIntensity =
-				FactoryIntensityPointAlg.harris(configDetector.radius, 0.04f, weighted, derivType);
+				FactoryIntensityPointAlg.harris(
+						configCorner.radius,(float)configCorner.kappa,configCorner.weighted, derivType);
 		return createGeneral(cornerIntensity, configDetector);
 	}
 
 	/**
 	 * Detects Shi-Tomasi corners.
 	 *
-	 * @param configDetector Configuration for feature detector.
-	 * @param weighted        Is a Gaussian weight applied to the sample region?  False is much faster.
+	 * @param configDetector Configuration for feature extractor.
+	 * @param configCorner   Configuration for corner intensity computation. If null radius will match detector radius
 	 * @param derivType       Type of derivative image.
 	 * @see boofcv.alg.feature.detect.intensity.ShiTomasiCornerIntensity
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createShiTomasi( @Nullable ConfigGeneralDetector configDetector,
-												  boolean weighted, Class<D> derivType) {
+												  @Nullable ConfigShiTomasi configCorner,
+												  Class<D> derivType) {
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
+		if( configCorner == null ) {
+			configCorner = new ConfigShiTomasi();
+			configCorner.radius = configDetector.radius;
+		}
+
 		GradientCornerIntensity<D> cornerIntensity =
-				FactoryIntensityPointAlg.shiTomasi(configDetector.radius, weighted, derivType);
+				FactoryIntensityPointAlg.shiTomasi(configCorner.radius, configCorner.weighted, derivType);
 		return createGeneral(cornerIntensity, configDetector);
 	}
 

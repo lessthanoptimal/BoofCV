@@ -18,10 +18,7 @@
 
 package boofcv.demonstrations.feature.detect.interest;
 
-import boofcv.abst.feature.detect.interest.ConfigFastCorner;
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.detect.interest.GeneralToPointDetector;
-import boofcv.abst.feature.detect.interest.PointDetector;
+import boofcv.abst.feature.detect.interest.*;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
@@ -312,12 +309,14 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	private void createHarris() {
 		controls.configExtract.detectMinimums = false;
 		controls.adjustControls(true,false);
-		changeDetector(FactoryDetectPoint.createHarris(controls.configExtract, controls.weighted, derivClass));
+		changeDetector(FactoryDetectPoint.createHarris(controls.configExtract,
+				new ConfigHarrisCorner(controls.weighted,controls.configExtract.radius), derivClass));
 	}
 	private void createShiTomasi() {
 		controls.configExtract.detectMinimums = false;
 		controls.adjustControls(true,false);
-		changeDetector(FactoryDetectPoint.createShiTomasi(controls.configExtract, controls.weighted, derivClass));
+		changeDetector(FactoryDetectPoint.createShiTomasi(controls.configExtract,
+				new ConfigShiTomasi(controls.weighted,controls.configExtract.radius), derivClass));
 	}
 	private void createFastIntensity() {
 		controls.configExtract.detectMinimums = true;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,8 @@ package boofcv.demonstrations.feature.detect.interest;
 
 import boofcv.abst.feature.detect.interest.ConfigFastCorner;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigHarrisCorner;
+import boofcv.abst.feature.detect.interest.ConfigShiTomasi;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
@@ -77,15 +79,14 @@ public class DetectPointsWithNoiseApp<T extends ImageGray<T>, D extends ImageGra
 		GeneralFeatureDetector<T, D> alg;
 		ConfigGeneralDetector configExtract = new ConfigGeneralDetector(maxFeatures,radius,thresh);
 
-		alg = FactoryDetectPoint.createHarris(configExtract, false, derivType);
 
-
+		alg = FactoryDetectPoint.createHarris(configExtract, null, derivType);
 		addAlgorithm(0, "Harris", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
-		alg = FactoryDetectPoint.createHarris(configExtract, true, derivType);
+		alg = FactoryDetectPoint.createHarris(configExtract, new ConfigHarrisCorner(true,radius), derivType);
 		addAlgorithm(0, "Harris Weighted", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
-		alg = FactoryDetectPoint.createShiTomasi(configExtract, false, derivType);
+		alg = FactoryDetectPoint.createShiTomasi(configExtract, null, derivType);
 		addAlgorithm(0, "Shi-Tomasi", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
-		alg = FactoryDetectPoint.createShiTomasi(configExtract, true, derivType);
+		alg = FactoryDetectPoint.createShiTomasi(configExtract, new ConfigShiTomasi(true,radius), derivType);
 		addAlgorithm(0, "Shi-Tomasi Weighted", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		configExtract.detectMinimums = true;
 		configExtract.threshold = 10;

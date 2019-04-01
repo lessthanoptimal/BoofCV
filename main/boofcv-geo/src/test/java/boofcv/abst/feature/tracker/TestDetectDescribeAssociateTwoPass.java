@@ -22,6 +22,7 @@ import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigShiTomasi;
 import boofcv.alg.feature.associate.AssociateMaxDistanceNaive;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
@@ -52,7 +53,8 @@ public class TestDetectDescribeAssociateTwoPass extends StandardPointTrackerTwoP
 						FactoryBlurFilter.gaussian(ImageType.single(GrayF32.class), 0, 4));
 
 		GeneralFeatureDetector<GrayF32,GrayF32> corner =
-				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(-1, 2, 0), false, GrayF32.class);
+				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(-1, 2, 0),
+						new ConfigShiTomasi(), GrayF32.class);
 
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 

@@ -19,6 +19,9 @@
 package boofcv.demonstrations.feature.detect.intensity;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigHarrisCorner;
+import boofcv.abst.feature.detect.interest.ConfigShiTomasi;
+import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.abst.filter.derivative.AnyImageDerivative;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
@@ -29,6 +32,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -77,6 +81,10 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 	// computes image derivative
 	AnyImageDerivative<T,D> deriv;
 
+	// For the optional image blur
+	BlurStorageFilter<T> blurFilter;
+	T blurred;
+
 	// used to compute feature intensity
 	GeneralFeatureDetector<T,D> detector;
 	final Object lockAlgorithm = new Object();
@@ -93,6 +101,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 
 		boolean isInteger = !GeneralizedImageOps.isFloatingPoint(imageType);
 
+		blurred = GeneralizedImageOps.createSingleBand(imageType,1,1);
 		derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		deriv = new AnyImageDerivative<>(GradientThree.getKernelX(isInteger), imageType, derivType);
 
@@ -151,6 +160,12 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		original = ConvertBufferedImage.checkCopy(buffered, original);
 
 		T gray = (T) input;
+
+		if( blurFilter != null ){
+			blurFilter.process(gray,blurred);
+			gray = blurred;
+		}
+
 		deriv.setInput(gray);
 
 		D derivX = deriv.getDerivative(true);
@@ -239,7 +254,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 
 	private void handleAlgorithmChanged() {
 		ConfigGeneralDetector config = new ConfigGeneralDetector();
-		config.radius = controlPanel.radius;
+		config.radius = controlPanel.radiusNonMax;
 		config.maxFeatures = controlPanel.maxFeatures;
 
 		synchronized (lockAlgorithm) {
@@ -253,11 +268,12 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 					break;
 
 				case "Harris":
-					detector = FactoryDetectPoint.createHarris(config,controlPanel.weighted,derivType);
+					detector = FactoryDetectPoint.createHarris(config,
+							new ConfigHarrisCorner(controlPanel.weighted,controlPanel.radiusCorner),derivType);
 					break;
-
 				case "Shi Tomasi":
-					detector = FactoryDetectPoint.createShiTomasi(config,controlPanel.weighted,derivType);
+					detector = FactoryDetectPoint.createShiTomasi(config,
+							new ConfigShiTomasi(controlPanel.weighted,controlPanel.radiusCorner),derivType);
 					break;
 				case "FAST":
 					config.detectMinimums = true;
@@ -275,39 +291,52 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 			}
 		}
 
+		if( controlPanel.blurSigma > 0 ) {
+			blurFilter = FactoryBlurFilter.gaussian(imageType,controlPanel.blurSigma,-1);
+		} else {
+			blurFilter = null;
+		}
+
 		reprocessImageOnly();
 	}
 
 	class ControlPanel extends DetectBlackShapePanel implements ActionListener , ChangeListener {
 		JComboBox<String> comboView;
 		JComboBox<String> comboAlgorithm;
-		JSpinner spinnerRadius;
+		JSpinner spinnerRadiusCorner;
 		JCheckBox checkLogIntensity;
 		JCheckBox checkWeighted;
 		JCheckBox checkShowLocalMax;
 		JCheckBox checkShowLocalMin;
 		JSpinner spinnerMaxFeatures;
+		JSpinner spinnerRadiusNonMax;
+		JSpinner spinnerBlurSigma;
+
 
 		String selected = null;
-		int radius = 2;
+		int radiusCorner = 2;
 		boolean logIntensity=false;
 		boolean weighted=false;
 		boolean showMaximums =false;
 		boolean showMinimums =false;
 		int view = 0;
-		int maxFeatures = 200;
+		int maxFeatures = 1000;
+		int radiusNonMax = 20;
+		double blurSigma=0.0;
 
 		public ControlPanel() {
 			comboAlgorithm = new JComboBox<>();
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			comboView = combo(view,"Intensity","Image","Both");
-			spinnerRadius = spinner(radius, 1, 100, 1);
+			spinnerRadiusCorner = spinner(radiusCorner, 1, 100, 1);
 			checkLogIntensity = checkbox("log intensity", logIntensity);
 			checkWeighted = checkbox("weighted", weighted);
 			checkShowLocalMax = checkbox("Show Maximums", showMaximums);
 			checkShowLocalMin = checkbox("Show Minimums", showMinimums);
 			spinnerMaxFeatures = spinner(maxFeatures,1,100_000,10);
+			spinnerRadiusNonMax = spinner(radiusNonMax,1,500,1);
+			spinnerBlurSigma = spinner(blurSigma,0,30,0.5);
 
 			for (String name : names) {
 				comboAlgorithm.addItem(name);
@@ -326,8 +355,11 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 			addSeparator(200);
 			addLabeled(comboAlgorithm,"Detector");
 			addAlignLeft(checkWeighted);
-			addLabeled(spinnerRadius,"Radius");
+			addLabeled(spinnerRadiusCorner,"Radius");
+			addSeparator(200);
 			addLabeled(spinnerMaxFeatures,"Max Features");
+			addLabeled(spinnerRadiusNonMax,"Det. Radius");
+			addLabeled(spinnerBlurSigma,"Blur Sigma");
 			addVerticalGlue();
 		}
 
@@ -358,11 +390,17 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			if( e.getSource() == spinnerRadius ) {
-				radius = ((Number)spinnerRadius.getValue()).intValue();
+			if( e.getSource() == spinnerRadiusCorner) {
+				radiusCorner = ((Number) spinnerRadiusCorner.getValue()).intValue();
 				handleAlgorithmChanged();
 			} else if( e.getSource() == spinnerMaxFeatures ) {
 				maxFeatures = ((Number)spinnerMaxFeatures.getValue()).intValue();
+				handleAlgorithmChanged();
+			} else if( e.getSource() == spinnerRadiusNonMax ) {
+				radiusNonMax = ((Number)spinnerRadiusNonMax.getValue()).intValue();
+				handleAlgorithmChanged();
+			} else if( e.getSource() == spinnerBlurSigma ) {
+				blurSigma = ((Number)spinnerBlurSigma.getValue()).intValue();
 				handleAlgorithmChanged();
 			} else if( e.getSource() == selectZoom ) {
 				zoom = ((Number)selectZoom.getValue()).doubleValue();
@@ -386,7 +424,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 					break;
 			}
 
-			spinnerRadius.setEnabled(activeRadius);
+			spinnerRadiusCorner.setEnabled(activeRadius);
 			checkWeighted.setEnabled(activeWeighted);
 		}
 	}
@@ -402,7 +440,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 
 		SwingUtilities.invokeLater(()->{
-			IntensityPointFeatureApp<GrayU8, GrayS16> app = new IntensityPointFeatureApp(examples,GrayU8.class);
+			IntensityPointFeatureApp<GrayU8, GrayS16> app = new IntensityPointFeatureApp(examples,GrayF32.class);
 
 			app.openExample(examples.get(0));
 			app.waitUntilInputSizeIsKnown();

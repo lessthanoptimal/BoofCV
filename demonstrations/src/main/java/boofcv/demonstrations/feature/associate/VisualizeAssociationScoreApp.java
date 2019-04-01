@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -91,7 +91,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 
 		addAlgorithm(0, "Fast Hessian", FactoryInterestPoint.fastHessian(new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4)));
 		addAlgorithm(0, "SIFT", FactoryInterestPoint.sift(null,new ConfigSiftDetector(500),imageType));
-		alg = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(500,2,1), false, derivType);
+		alg = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(500,2,1), null, derivType);
 		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
 
 		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surfStable(null, imageType));

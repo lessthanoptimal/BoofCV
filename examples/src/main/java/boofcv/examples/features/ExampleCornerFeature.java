@@ -19,6 +19,7 @@
 package boofcv.examples.features;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigShiTomasi;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
@@ -44,14 +45,17 @@ import java.awt.image.BufferedImage;
  */
 public class ExampleCornerFeature {
 	public static void main(String[] args) {
-		ConfigGeneralDetector config = new ConfigGeneralDetector();
+		ConfigGeneralDetector configNonMax = new ConfigGeneralDetector();
 		// a large radius is used to exaggerate weighted/unweighted affects. Try 1 or 2 for a typical value
-		config.radius = 10;
-		config.threshold = 100;
-		config.maxFeatures = 100;
+		configNonMax.radius = 10;
+		configNonMax.threshold = 100;
+		configNonMax.maxFeatures = 100;
+		ConfigShiTomasi configCorner = new ConfigShiTomasi();
+		configCorner.radius = configNonMax.radius; // in general you should use the same radius here
+		configCorner.weighted = true;              // weighted corners will appear at the corners on a chessboard
 
 		// set weighted to false and see what happens to the feature's locations. unweighted is much faster
-		GeneralFeatureDetector<GrayU8,GrayS16> detector = FactoryDetectPoint.createShiTomasi(config,true, GrayS16.class);
+		GeneralFeatureDetector<GrayU8,GrayS16> detector = FactoryDetectPoint.createShiTomasi(configNonMax,configCorner, GrayS16.class);
 		ImageGradient<GrayU8, GrayS16> sobel = FactoryDerivative.sobel(GrayU8.class,GrayS16.class);
 
 		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame05.jpg"));

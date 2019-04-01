@@ -54,7 +54,7 @@ public class TestDdaManagerGeneralPoint extends StandardPointTracker<GrayF32> {
 						FactoryBlurFilter.gaussian(ImageType.single(GrayF32.class), 0, 4));
 
 		GeneralFeatureDetector<GrayF32,GrayF32> corner =
-				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(-1,2, 0), false, GrayF32.class);
+				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(-1,2, 0), null, GrayF32.class);
 
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 

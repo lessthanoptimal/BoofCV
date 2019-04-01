@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -126,7 +126,7 @@ public class ShowFeatureOrientationApp<T extends ImageGray<T>, D extends ImageGr
 
 		int r = 2;
 		GeneralFeatureDetector<T, D> detector = FactoryDetectPoint.
-				createHarris(new ConfigGeneralDetector(NUM_FEATURES,r, 1), false, derivType);
+				createHarris(new ConfigGeneralDetector(NUM_FEATURES,r, 1), null, derivType);
 
 		D derivX = null, derivY = null, derivXX = null, derivYY = null, derivXY = null;
 

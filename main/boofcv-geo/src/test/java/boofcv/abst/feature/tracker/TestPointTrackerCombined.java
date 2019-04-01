@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public class TestPointTrackerCombined extends StandardPointTracker<GrayF32> {
 				FactoryBlurFilter.gaussian(ImageType.single(GrayF32.class), 0, 4));
 
 		GeneralFeatureDetector<GrayF32,GrayF32> corner =
-				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(100,2,0), false, GrayF32.class);
+				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(100,2,0), null, GrayF32.class);
 
 		InterestPointDetector<GrayF32> detector =
 				FactoryInterestPoint.wrapPoint(corner, 1,GrayF32.class, GrayF32.class);

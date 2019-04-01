@@ -185,7 +185,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 			case 1: detector = FactoryInterestPoint.sift(null,new ConfigSiftDetector(400),imageType); break;
 			case 2: {
 				Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-				GeneralFeatureDetector<T, D> alg = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(500,2,1), false, derivType);
+				GeneralFeatureDetector<T, D> alg = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(500,2,1), null, derivType);
 				detector = FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType);
 			} break;
 
