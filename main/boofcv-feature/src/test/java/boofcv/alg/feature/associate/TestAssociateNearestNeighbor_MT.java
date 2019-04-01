@@ -18,16 +18,54 @@
 
 package boofcv.alg.feature.associate;
 
+import boofcv.alg.descriptor.KdTreeTuple_F64;
+import boofcv.struct.feature.AssociatedIndex;
+import boofcv.struct.feature.TupleDesc_F64;
+import org.ddogleg.nn.FactoryNearestNeighbor;
+import org.ddogleg.nn.NearestNeighbor;
+import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 class TestAssociateNearestNeighbor_MT {
 	@Test
-	void implement() {
-		fail("implement");
+	void compare() {
+		FastQueue<TupleDesc_F64> dataSrc = TestAssociateGreedy_MT.createData(200);
+		FastQueue<TupleDesc_F64> dataDst = TestAssociateGreedy_MT.createData(200);
+
+		NearestNeighbor<TupleDesc_F64> exhaustive = FactoryNearestNeighbor.exhaustive(new KdTreeTuple_F64(1));
+
+		AssociateNearestNeighbor<TupleDesc_F64> sequentialAlg = new AssociateNearestNeighbor_ST<>( exhaustive);
+		AssociateNearestNeighbor<TupleDesc_F64> parallelAlg = new AssociateNearestNeighbor_MT<>( exhaustive);
+
+		sequentialAlg.setSource(dataSrc); sequentialAlg.setDestination(dataDst);
+		parallelAlg.setSource(dataSrc); parallelAlg.setDestination(dataDst);
+
+		sequentialAlg.associate();
+		parallelAlg.associate();
+
+		FastQueue<AssociatedIndex> matches0 = sequentialAlg.getMatches();
+		FastQueue<AssociatedIndex> matches1 = parallelAlg.getMatches();
+
+		assertEquals(matches0.size,matches1.size);
+
+		for (int i = 0; i < matches0.size; i++) {
+			AssociatedIndex a = matches0.get(i);
+			boolean matched = false;
+			for (int j = 0; j < matches1.size; j++) {
+				AssociatedIndex b = matches1.get(j);
+
+				if( a.src == b.src && a.dst == b.dst && a.fitScore == b.fitScore ) {
+					matched = true;
+				}
+			}
+			assertTrue(matched);
+		}
+
 	}
 }
