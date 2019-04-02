@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,162 +18,108 @@
 
 package boofcv.alg.filter.binary;
 
-import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
-import boofcv.alg.filter.binary.impl.ImplBinaryNaiveOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayU8;
+import org.openjdk.jmh.annotations.*;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Benchmark for different convolution operations.
  *
  * @author Peter Abeles
  */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value=1)
 public class BenchmarkBinaryOps  {
-	static int imgWidth = 640;
-	static int imgHeight = 480;
+	@Param({"true","false"})
+	public boolean concurrent;
 
-	static GrayU8 input = new GrayU8(imgWidth, imgHeight);
-	static GrayU8 output = new GrayU8(imgWidth, imgHeight);
+	//	@Param({"100", "500", "1000", "5000", "10000"})
+	@Param({"2000"})
+	public int size;
 
-	public BenchmarkBinaryOps() {
+	private GrayU8 inputA = new GrayU8(size, size);
+	private GrayU8 inputB = new GrayU8(size, size);
+	private GrayU8 output = new GrayU8(size, size);
+
+	@Setup
+	public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
-		// test structures and unstructured images
-		// naive is some times faster in unstructured because it can escape earlier
-		ImageMiscOps.fillUniform(input, rand, 0, 1);
-//		ImageMiscOps.fillRectangle(input,1,100,200,150,100);
+
+		inputA.reshape(size, size);
+		inputB.reshape(size, size);
+		output.reshape(size, size);
+
+		ImageMiscOps.fillUniform(inputA, rand, 0, 1);
+		ImageMiscOps.fillUniform(inputB, rand, 0, 1);
 	}
 
-	public int timeNaiveErode4(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplBinaryNaiveOps.erode4(input, output);
-		return 0;
+	@Benchmark
+	public void erode4() {
+		BinaryImageOps.erode4(inputA,1,output);
 	}
 
-	public int timeNaiveErode8(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplBinaryNaiveOps.erode8(input, output);
-		return 0;
+	@Benchmark
+	public void erode8() {
+		BinaryImageOps.erode8(inputA,1,output);
 	}
 
-	public int timeNaiveDilate4(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplBinaryNaiveOps.dilate4(input, output);
-		return 0;
+	@Benchmark
+	public void dilate4() {
+		BinaryImageOps.dilate4(inputA,1,output);
 	}
 
-	public int timeNaiveDilate8(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplBinaryNaiveOps.dilate8(input, output);
-		return 0;
+	@Benchmark
+	public void dilate8() {
+		BinaryImageOps.dilate8(inputA,1,output);
 	}
 
-	public int timeNaiveEdge4(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplBinaryNaiveOps.edge4(input, output);
-		return 0;
+	@Benchmark
+	public void removePointNoise() {
+		BinaryImageOps.removePointNoise(inputA,output);
 	}
 
-	public int timeNaiveEdge8(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplBinaryNaiveOps.edge8(input, output);
-		return 0;
+	@Benchmark
+	public void edge4() {
+		BinaryImageOps.edge4(inputA,output);
 	}
 
-	public int timeNaiveRemovePointNoise(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplBinaryNaiveOps.removePointNoise(input, output);
-		return 0;
+	@Benchmark
+	public void edge8() {
+		BinaryImageOps.edge8(inputA,output);
 	}
 
-	public int timeInnerErode4(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplBinaryInnerOps.erode4(input, output);
-		return 0;
+	@Benchmark
+	public void logicAnd() {
+		BinaryImageOps.logicAnd(inputA,inputB,output);
 	}
 
-	public int timeInnerErode8(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplBinaryInnerOps.erode8(input, output);
-		return 0;
+	@Benchmark
+	public void logicOr() {
+		BinaryImageOps.logicOr(inputA,inputB,output);
 	}
 
-	public int timeInnerDilate4(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplBinaryInnerOps.dilate4(input, output);
-		return 0;
+	@Benchmark
+	public void logicXor() {
+		BinaryImageOps.logicXor(inputA,inputB,output);
 	}
 
-	public int timeInnerDilate8(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplBinaryInnerOps.dilate8(input, output);
-		return 0;
+	@Benchmark
+	public void invert() {
+		BinaryImageOps.invert(inputA,output);
 	}
 
-	public int timeInnerEdge4(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplBinaryInnerOps.edge4(input, output);
-		return 0;
+	@Benchmark
+	public void thin() {
+		BinaryImageOps.thin(inputA,5,output);
 	}
 
-	public int timeInnerEdge8(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplBinaryInnerOps.edge8(input, output);
-		return 0;
-	}
-
-	public int timeInnerRemovePointNoise(int reps) {
-		for( int i = 0; i < reps; i++ )
-			ImplBinaryInnerOps.removePointNoise(input, output);
-		return 0;
-	}
-
-	public int timeErode4(int reps) {
-		for( int i = 0; i < reps; i++ )
-			BinaryImageOps.erode4(input, 1, output);
-		return 0;
-	}
-
-	public int timeErode8(int reps) {
-		for( int i = 0; i < reps; i++ )
-			BinaryImageOps.erode8(input, 1, output);
-		return 0;
-	}
-
-	public int timeDilate4(int reps) {
-		for( int i = 0; i < reps; i++ )
-			BinaryImageOps.dilate4(input, 1, output);
-		return 0;
-	}
-
-	public int timeDilate8(int reps) {
-		for( int i = 0; i < reps; i++ )
-			BinaryImageOps.dilate8(input, 1, output);
-		return 0;
-	}
-
-	public int timeEdge4(int reps) {
-		for( int i = 0; i < reps; i++ )
-			BinaryImageOps.edge4(input, output);
-		return 0;
-	}
-
-	public int timeEdge8(int reps) {
-		for( int i = 0; i < reps; i++ )
-			BinaryImageOps.edge8(input, output);
-		return 0;
-	}
-
-	public int timeRemovePointNoise(int reps) {
-		for( int i = 0; i < reps; i++ )
-			BinaryImageOps.removePointNoise(input, output);
-		return 0;
-	}
-
-	public static void main(String args[]) {
-		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
-
-//		Runner.main(BenchmarkBinaryOps.class, args);
-	}
 }
