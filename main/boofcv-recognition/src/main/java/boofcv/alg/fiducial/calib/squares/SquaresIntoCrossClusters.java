@@ -200,7 +200,6 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 			}
 		}
 		nn.setPoints(searchPoints,true);
-		search.initialize();
 	}
 
 	/**

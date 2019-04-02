@@ -246,7 +246,6 @@ public class PruneStructureFromSceneMetric {
 		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64());
 		NearestNeighbor.Search<Point3D_F64> search = nn.createSearch();
 		nn.setPoints(cloud,false);
-		search.initialize();
 		FastQueue<NnData<Point3D_F64>> resultsNN = new FastQueue(NnData.class,true);
 
 		// Create a look up table containing from old to new indexes for each point

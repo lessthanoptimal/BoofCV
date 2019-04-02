@@ -242,7 +242,6 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 		// Add items to NN search
 
 		nn.setPoints((List)positionPatterns.toList(),false);
-		search.initialize();
 
 		for (int i = 0; i < positionPatterns.size(); i++) {
 			PositionPatternNode f = positionPatterns.get(i);

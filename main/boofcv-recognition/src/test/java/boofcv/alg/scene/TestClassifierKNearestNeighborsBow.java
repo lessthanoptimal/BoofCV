@@ -94,11 +94,6 @@ public class TestClassifierKNearestNeighborsBow {
 		public class InternalSearch implements NearestNeighbor.Search<HistogramScene> {
 
 			@Override
-			public void initialize() {
-
-			}
-
-			@Override
 			public boolean findNearest(HistogramScene point, double maxDistance, NnData<HistogramScene> result) {
 				throw new RuntimeException("Wasn't expecting this to be called!");
 			}
