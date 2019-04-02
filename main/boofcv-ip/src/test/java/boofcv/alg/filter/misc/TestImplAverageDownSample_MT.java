@@ -18,14 +18,44 @@
 
 package boofcv.alg.filter.misc;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageBase;
+import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.lang.reflect.Method;
+import java.util.Random;
 
-class TestImplAverageDownSample_MT {
+class TestImplAverageDownSample_MT extends CompareIdenticalFunctions
+{
+	Random rand = new Random(234);
+	int width = 640,height=480;
+
+	protected TestImplAverageDownSample_MT() {
+		super(ImplAverageDownSample_MT.class, ImplAverageDownSample.class);
+	}
+
 	@Test
-	void implement() {
-		fail("implement");
+	void performTests() {
+		super.performTests(8);
+	}
+
+	@Override
+	protected Object[][] createInputParam(Method candidate, Method validation) {
+		Class[] inputTypes = candidate.getParameterTypes();
+
+		ImageBase input = GeneralizedImageOps.createImage(inputTypes[0],width,height,1);
+		ImageBase output;
+
+		if( candidate.getName().contains("horizontal"))
+			output = GeneralizedImageOps.createImage(inputTypes[1],width/3,height,1);
+		else
+			output = GeneralizedImageOps.createImage(inputTypes[1],width,height/2,1);
+
+		GImageMiscOps.fillUniform(input,rand,0,255);
+		GImageMiscOps.fillUniform(output,rand,0,100);
+
+		return new Object[][]{{input, output}};
 	}
 }
-

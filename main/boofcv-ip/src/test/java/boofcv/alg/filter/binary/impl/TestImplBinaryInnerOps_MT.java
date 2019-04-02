@@ -18,14 +18,38 @@
 
 package boofcv.alg.filter.binary.impl;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.image.GrayU8;
+import boofcv.testing.CompareIdenticalFunctions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.lang.reflect.Method;
+import java.util.Random;
 
-class TestImplBinaryInnerOps_MT {
+class TestImplBinaryInnerOps_MT extends CompareIdenticalFunctions
+{
+
+	Random rand = new Random(234);
+	int width = 640,height=480;
+
+	protected TestImplBinaryInnerOps_MT() {
+		super(ImplBinaryInnerOps_MT.class, ImplBinaryInnerOps.class);
+	}
+
 	@Test
-	void implement() {
-		fail("implement");
+	void performTests() {
+		super.performTests(7);
+	}
+
+	@Override
+	protected Object[][] createInputParam(Method candidate, Method validation) {
+		GrayU8 input = new GrayU8(width,height);
+		GrayU8 output = new GrayU8(width,height);
+
+		GImageMiscOps.fillUniform(input,rand,0,1);
+		GImageMiscOps.fillUniform(output,rand,0,1);
+
+		return new Object[][]{{input, output}};
 	}
 }
 
