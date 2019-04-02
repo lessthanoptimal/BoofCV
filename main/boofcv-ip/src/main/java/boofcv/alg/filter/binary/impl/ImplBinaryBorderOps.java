@@ -38,29 +38,29 @@ public class ImplBinaryBorderOps {
 		for (int x = 0; x < input.width; x++) {
 			// check top edge
 			if ((in.get( x, 0) + in.get( x - 1, 0) + in.get( x + 1, 0) + in.get( x, 1)) == 4)
-				output.set(x, 0, 1);
+				output.unsafe_set(x, 0, 1);
 			else
-				output.set(x, 0, 0);
+				output.unsafe_set(x, 0, 0);
 
 			// check bottom edge
 			if ((in.get( x, h) + in.get( x - 1, h) + in.get( x + 1, h) + in.get( x, h - 1)) == 4)
-				output.set(x, h, 1);
+				output.unsafe_set(x, h, 1);
 			else
-				output.set(x, h, 0);
+				output.unsafe_set(x, h, 0);
 		}
 
 		for (int y = 0; y < input.height; y++) {
 			// check left edge
 			if ((in.get( 0, y) + in.get( 1, y) + in.get( 0, y - 1) + in.get( 0, y + 1)) == 4)
-				output.set(0, y, 1);
+				output.unsafe_set(0, y, 1);
 			else
-				output.set(0, y, 0);
+				output.unsafe_set(0, y, 0);
 
 			// check right edge
 			if ((in.get( w, y) + in.get( w - 1, y) + in.get( w, y - 1) + in.get( w, y + 1)) == 4)
-				output.set(w, y, 1);
+				output.unsafe_set(w, y, 1);
 			else
-				output.set(w, y, 0);
+				output.unsafe_set(w, y, 0);
 		}
 	}
 
@@ -74,29 +74,29 @@ public class ImplBinaryBorderOps {
 		for (int x = 0; x < input.width; x++) {
 			// check top edge
 			if ((in.get( x, 0) + in.get( x - 1, 0) + in.get( x + 1, 0) + in.get( x, 1)) > 0)
-				output.set(x, 0, 1);
+				output.unsafe_set(x, 0, 1);
 			else
-				output.set(x, 0, 0);
+				output.unsafe_set(x, 0, 0);
 
 			// check bottom edge
 			if ((in.get( x, h) + in.get( x - 1, h) + in.get( x + 1, h) + in.get( x, h - 1)) > 0)
-				output.set(x, h, 1);
+				output.unsafe_set(x, h, 1);
 			else
-				output.set(x, h, 0);
+				output.unsafe_set(x, h, 0);
 		}
 
 		for (int y = 0; y < input.height; y++) {
 			// check left edge
 			if ((in.get( 0, y) + in.get( 1, y) + in.get( 0, y - 1) + in.get( 0, y + 1)) > 0)
-				output.set(0, y, 1);
+				output.unsafe_set(0, y, 1);
 			else
-				output.set(0, y, 0);
+				output.unsafe_set(0, y, 0);
 
 			// check right edge
 			if ((in.get( w, y) + in.get( w - 1, y) + in.get( w, y - 1) + in.get( w, y + 1)) > 0)
-				output.set(w, y, 1);
+				output.unsafe_set(w, y, 1);
 			else
-				output.set(w, y, 0);
+				output.unsafe_set(w, y, 0);
 		}
 	}
 
@@ -110,29 +110,29 @@ public class ImplBinaryBorderOps {
 		for (int x = 0; x < input.width; x++) {
 			// check top edge
 			if ((in.get( x - 1, 0) + in.get( x + 1, 0) + in.get( x, 1)) == 3)
-				output.set(x, 0, 0);
+				output.unsafe_set(x, 0, 0);
 			else
-				output.set(x, 0, input.get(x, 0));
+				output.unsafe_set(x, 0, input.get(x, 0));
 
 			// check bottom edge
 			if ((in.get( x - 1, h) + in.get( x + 1, h) + in.get( x, h - 1)) == 3)
-				output.set(x, h, 0);
+				output.unsafe_set(x, h, 0);
 			else
-				output.set(x, h, input.get(x, h));
+				output.unsafe_set(x, h, input.get(x, h));
 		}
 
 		for (int y = 0; y < input.height; y++) {
 			// check left edge
 			if ((in.get( 1, y) + in.get( 0, y - 1) + in.get( 0, y + 1)) == 3)
-				output.set(0, y, 0);
+				output.unsafe_set(0, y, 0);
 			else
-				output.set(0, y, input.get(0, y));
+				output.unsafe_set(0, y, input.get(0, y));
 
 			// check right edge
 			if ((in.get( w - 1, y) + in.get( w, y - 1) + in.get( w, y + 1)) == 3)
-				output.set(w, y, 0);
+				output.unsafe_set(w, y, 0);
 			else
-				output.set(w, y, input.get(w, y));
+				output.unsafe_set(w, y, input.get(w, y));
 		}
 
 		return output;
@@ -149,32 +149,32 @@ public class ImplBinaryBorderOps {
 			// check top edge
 			if ((in.get( x, 0) + in.get( x - 1, 0) + in.get( x + 1, 0) +
 					in.get( x - 1, 1) + in.get( x, 1) + in.get( x + 1, 1)) == 6)
-				output.set(x, 0, 1);
+				output.unsafe_set(x, 0, 1);
 			else
-				output.set(x, 0, 0);
+				output.unsafe_set(x, 0, 0);
 
 			// check bottom edge
 			if ((in.get( x, h) + in.get( x - 1, h) + in.get( x + 1, h) +
 					in.get( x - 1, h - 1) + in.get( x, h - 1) + in.get( x + 1, h - 1)) == 6)
-				output.set(x, h, 1);
+				output.unsafe_set(x, h, 1);
 			else
-				output.set(x, h, 0);
+				output.unsafe_set(x, h, 0);
 		}
 
 		for (int y = 0; y < input.height; y++) {
 			// check left edge
 			if ((in.get( 0, y) + in.get( 1, y) + in.get( 0, y - 1) +
 					in.get( 1, y - 1) + in.get( 0, y + 1) + in.get( 1, y + 1)) == 6)
-				output.set(0, y, 1);
+				output.unsafe_set(0, y, 1);
 			else
-				output.set(0, y, 0);
+				output.unsafe_set(0, y, 0);
 
 			// check right edge
 			if ((in.get( w - 1, y) + in.get( w, y) + in.get( w - 1, y - 1) +
 					in.get( w, y - 1) + in.get( w - 1, y + 1) + in.get( w, y + 1)) == 6)
-				output.set(w, y, 1);
+				output.unsafe_set(w, y, 1);
 			else
-				output.set(w, y, 0);
+				output.unsafe_set(w, y, 0);
 		}
 	}
 
@@ -189,32 +189,32 @@ public class ImplBinaryBorderOps {
 			// check top edge
 			if ((in.get( x, 0) + in.get( x - 1, 0) + in.get( x + 1, 0) +
 					in.get( x - 1, 1) + in.get( x, 1) + in.get( x + 1, 1)) > 0)
-				output.set(x, 0, 1);
+				output.unsafe_set(x, 0, 1);
 			else
-				output.set(x, 0, 0);
+				output.unsafe_set(x, 0, 0);
 
 			// check bottom edge
 			if ((in.get( x, h) + in.get( x - 1, h) + in.get( x + 1, h) +
 					in.get( x - 1, h - 1) + in.get( x, h - 1) + in.get( x + 1, h - 1)) > 0)
-				output.set(x, h, 1);
+				output.unsafe_set(x, h, 1);
 			else
-				output.set(x, h, 0);
+				output.unsafe_set(x, h, 0);
 		}
 
 		for (int y = 0; y < input.height; y++) {
 			// check left edge
 			if ((in.get( 0, y) + in.get( 1, y) + in.get( 0, y - 1) +
 					in.get( 1, y - 1) + in.get( 0, y + 1) + in.get( 1, y + 1)) > 0)
-				output.set(0, y, 1);
+				output.unsafe_set(0, y, 1);
 			else
-				output.set(0, y, 0);
+				output.unsafe_set(0, y, 0);
 
 			// check right edge
 			if ((in.get( w - 1, y) + in.get( w, y) + in.get( w - 1, y - 1) +
 					in.get( w, y - 1) + in.get( w - 1, y + 1) + in.get( w, y + 1)) > 0)
-				output.set(w, y, 1);
+				output.unsafe_set(w, y, 1);
 			else
-				output.set(w, y, 0);
+				output.unsafe_set(w, y, 0);
 		}
 	}
 
@@ -229,32 +229,32 @@ public class ImplBinaryBorderOps {
 			// check top edge
 			if ((in.get( x - 1, 0) + in.get( x + 1, 0) +
 					in.get( x - 1, 1) + in.get( x, 1) + in.get( x + 1, 1)) == 5)
-				output.set(x, 0, 0);
+				output.unsafe_set(x, 0, 0);
 			else
-				output.set(x, 0, input.get(x, 0));
+				output.unsafe_set(x, 0, input.get(x, 0));
 
 			// check bottom edge
 			if ((in.get( x - 1, h) + in.get( x + 1, h) +
 					in.get( x - 1, h - 1) + in.get( x, h - 1) + in.get( x + 1, h - 1)) == 5)
-				output.set(x, h, 0);
+				output.unsafe_set(x, h, 0);
 			else
-				output.set(x, h, input.get(x, h));
+				output.unsafe_set(x, h, input.get(x, h));
 		}
 
 		for (int y = 0; y < input.height; y++) {
 			// check left edge
 			if ((in.get( 1, y) + in.get( 0, y - 1) +
 					in.get( 1, y - 1) + in.get( 0, y + 1) + in.get( 1, y + 1)) == 5)
-				output.set(0, y, 0);
+				output.unsafe_set(0, y, 0);
 			else
-				output.set(0, y, input.get(0, y));
+				output.unsafe_set(0, y, input.get(0, y));
 
 			// check right edge
 			if ((in.get( w - 1, y) + in.get( w - 1, y - 1) +
 					in.get( w, y - 1) + in.get( w - 1, y + 1) + in.get( w, y + 1)) == 5)
-				output.set(w, y, 0);
+				output.unsafe_set(w, y, 0);
 			else
-				output.set(w, y, input.get(w, y));
+				output.unsafe_set(w, y, input.get(w, y));
 		}
 	}
 
@@ -270,17 +270,17 @@ public class ImplBinaryBorderOps {
 			int total = in.get( x - 1, 0) + in.get( x + 1, 0) +
 					in.get( x - 1, 1) + in.get( x, 1) + in.get( x + 1, 1);
 			if (total < 2)
-				output.set(x, 0, 0);
+				output.unsafe_set(x, 0, 0);
 			else
-				output.set(x, 0, input.get(x, 0));
+				output.unsafe_set(x, 0, input.get(x, 0));
 
 			// check bottom edge
 			total = in.get( x - 1, h) + in.get( x + 1, h) +
 					in.get( x - 1, h - 1) + in.get( x, h - 1) + in.get( x + 1, h - 1);
 			if (total < 2)
-				output.set(x, h, 0);
+				output.unsafe_set(x, h, 0);
 			else
-				output.set(x, h, input.get(x, h));
+				output.unsafe_set(x, h, input.get(x, h));
 		}
 
 		for (int y = 0; y < input.height; y++) {
@@ -288,17 +288,17 @@ public class ImplBinaryBorderOps {
 			int total = in.get( 1, y) + in.get( 0, y - 1) +
 					in.get( 1, y - 1) + in.get( 0, y + 1) + in.get( 1, y + 1);
 			if (total < 2)
-				output.set(0, y, 0);
+				output.unsafe_set(0, y, 0);
 			else
-				output.set(0, y, input.get(0, y));
+				output.unsafe_set(0, y, input.get(0, y));
 
 			// check right edge
 			total = in.get( w - 1, y) + in.get( w - 1, y - 1) +
 					in.get( w, y - 1) + in.get( w - 1, y + 1) + in.get( w, y + 1);
 			if (total < 2)
-				output.set(w, y, 0);
+				output.unsafe_set(w, y, 0);
 			else
-				output.set(w, y, input.get(w, y));
+				output.unsafe_set(w, y, input.get(w, y));
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,9 @@ import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.filter.binary.BinaryContourInterface;
 import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.InputSanityCheck;
-import boofcv.alg.filter.binary.impl.BinaryThinning;
-import boofcv.alg.filter.binary.impl.ImplBinaryBorderOps;
-import boofcv.alg.filter.binary.impl.ImplBinaryInnerOps;
+import boofcv.alg.filter.binary.impl.*;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
@@ -72,16 +71,10 @@ public class BinaryImageOps {
 		InputSanityCheck.checkSameShape(inputA,inputB);
 		output = InputSanityCheck.checkDeclare(inputA, output);
 
-		for( int y = 0; y < inputA.height; y++ ) {
-			int indexA = inputA.startIndex + y*inputA.stride;
-			int indexB = inputB.startIndex + y*inputB.stride;
-			int indexOut = output.startIndex + y*output.stride;
-
-			int end = indexA + inputA.width;
-			for( ; indexA < end; indexA++,indexB++,indexOut++) {
-				int valA = inputA.data[indexA];
-				output.data[indexOut] = valA == 1 && valA == inputB.data[indexB] ? (byte)1 : (byte)0;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplBinaryImageOps_MT.logicAnd(inputA, inputB, output);
+		} else {
+			ImplBinaryImageOps.logicAnd(inputA, inputB, output);
 		}
 
 		return output;
@@ -100,16 +93,10 @@ public class BinaryImageOps {
 		InputSanityCheck.checkSameShape(inputA,inputB);
 		output = InputSanityCheck.checkDeclare(inputA, output);
 
-		for( int y = 0; y < inputA.height; y++ ) {
-			int indexA = inputA.startIndex + y*inputA.stride;
-			int indexB = inputB.startIndex + y*inputB.stride;
-			int indexOut = output.startIndex + y*output.stride;
-
-			int end = indexA + inputA.width;
-			for( ; indexA < end; indexA++,indexB++,indexOut++) {
-				output.data[indexOut] =
-						inputA.data[indexA] == 1 ||  1 == inputB.data[indexB] ? (byte)1 : (byte)0;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplBinaryImageOps_MT.logicOr(inputA, inputB, output);
+		} else {
+			ImplBinaryImageOps.logicOr(inputA, inputB, output);
 		}
 
 		return output;
@@ -128,15 +115,10 @@ public class BinaryImageOps {
 		InputSanityCheck.checkSameShape(inputA,inputB);
 		output = InputSanityCheck.checkDeclare(inputA, output);
 
-		for( int y = 0; y < inputA.height; y++ ) {
-			int indexA = inputA.startIndex + y*inputA.stride;
-			int indexB = inputB.startIndex + y*inputB.stride;
-			int indexOut = output.startIndex + y*output.stride;
-
-			int end = indexA + inputA.width;
-			for( ; indexA < end; indexA++,indexB++,indexOut++) {
-				output.data[indexOut] = inputA.data[indexA] != inputB.data[indexB] ? (byte)1 : (byte)0;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplBinaryImageOps_MT.logicXor(inputA, inputB, output);
+		} else {
+			ImplBinaryImageOps.logicXor(inputA, inputB, output);
 		}
 
 		return output;
@@ -153,14 +135,10 @@ public class BinaryImageOps {
 	{
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		for( int y = 0; y < input.height; y++ ) {
-			int index = input.startIndex + y*input.stride;
-			int indexOut = output.startIndex + y*output.stride;
-
-			int end = index + input.width;
-			for( ; index < end; index++,indexOut++) {
-				output.data[indexOut] = input.data[index] == 0 ? (byte)1 : (byte)0;
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplBinaryImageOps_MT.invert(input, output);
+		} else {
+			ImplBinaryImageOps.invert(input, output);
 		}
 
 		return output;
@@ -183,15 +161,24 @@ public class BinaryImageOps {
 		if( numTimes <= 0 )
 			throw new IllegalArgumentException("numTimes must be >= 1");
 
-		ImplBinaryInnerOps.erode4(input, output);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplBinaryInnerOps_MT.erode4(input, output);
+		} else {
+			ImplBinaryInnerOps.erode4(input, output);
+		}
 		ImplBinaryBorderOps.erode4(input, output);
+
 
 		if( numTimes > 1 ) {
 			GrayU8 tmp1 = new GrayU8(input.width,input.height);
 			GrayU8 tmp2 = output;
 
 			for( int i = 1; i < numTimes; i++ ) {
-				ImplBinaryInnerOps.erode4(tmp2, tmp1);
+				if( BoofConcurrency.USE_CONCURRENT ) {
+					ImplBinaryInnerOps_MT.erode4(tmp2, tmp1);
+				} else {
+					ImplBinaryInnerOps.erode4(tmp2, tmp1);
+				}
 				ImplBinaryBorderOps.erode4(tmp2, tmp1);
 
 				GrayU8 a = tmp1;
@@ -221,7 +208,11 @@ public class BinaryImageOps {
 	public static GrayU8 dilate4(GrayU8 input, int numTimes, GrayU8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		ImplBinaryInnerOps.dilate4(input, output);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplBinaryInnerOps_MT.dilate4(input, output);
+		} else {
+			ImplBinaryInnerOps.dilate4(input, output);
+		}
 		ImplBinaryBorderOps.dilate4(input, output);
 
 		if( numTimes > 1 ) {
@@ -229,7 +220,11 @@ public class BinaryImageOps {
 			GrayU8 tmp2 = output;
 
 			for( int i = 1; i < numTimes; i++ ) {
-				ImplBinaryInnerOps.dilate4(tmp2, tmp1);
+				if( BoofConcurrency.USE_CONCURRENT ) {
+					ImplBinaryInnerOps_MT.dilate4(tmp2, tmp1);
+				} else {
+					ImplBinaryInnerOps.dilate4(tmp2, tmp1);
+				}
 				ImplBinaryBorderOps.dilate4(tmp2, tmp1);
 
 				GrayU8 a = tmp1;
@@ -262,7 +257,11 @@ public class BinaryImageOps {
 	public static GrayU8 edge4(GrayU8 input, GrayU8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		ImplBinaryInnerOps.edge4(input, output);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplBinaryInnerOps_MT.edge4(input, output);
+		} else {
+			ImplBinaryInnerOps.edge4(input, output);
+		}
 		ImplBinaryBorderOps.edge4(input, output);
 
 		return output;
@@ -282,7 +281,11 @@ public class BinaryImageOps {
 	public static GrayU8 erode8(GrayU8 input, int numTimes, GrayU8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		ImplBinaryInnerOps.erode8(input, output);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplBinaryInnerOps_MT.erode8(input, output);
+		} else {
+			ImplBinaryInnerOps.erode8(input, output);
+		}
 		ImplBinaryBorderOps.erode8(input, output);
 
 		if( numTimes > 1 ) {
@@ -290,7 +293,11 @@ public class BinaryImageOps {
 			GrayU8 tmp2 = output;
 
 			for( int i = 1; i < numTimes; i++ ) {
-				ImplBinaryInnerOps.erode8(tmp2, tmp1);
+				if( BoofConcurrency.USE_CONCURRENT ) {
+					ImplBinaryInnerOps_MT.erode8(tmp2, tmp1);
+				} else {
+					ImplBinaryInnerOps.erode8(tmp2, tmp1);
+				}
 				ImplBinaryBorderOps.erode8(tmp2, tmp1);
 
 				GrayU8 a = tmp1;
@@ -320,7 +327,11 @@ public class BinaryImageOps {
 	public static GrayU8 dilate8(GrayU8 input, int numTimes, GrayU8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		ImplBinaryInnerOps.dilate8(input, output);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplBinaryInnerOps_MT.dilate8(input, output);
+		} else {
+			ImplBinaryInnerOps.dilate8(input, output);
+		}
 		ImplBinaryBorderOps.dilate8(input, output);
 
 		if( numTimes > 1 ) {
@@ -328,7 +339,11 @@ public class BinaryImageOps {
 			GrayU8 tmp2 = output;
 
 			for( int i = 1; i < numTimes; i++ ) {
-				ImplBinaryInnerOps.dilate8(tmp2, tmp1);
+				if( BoofConcurrency.USE_CONCURRENT ) {
+					ImplBinaryInnerOps_MT.dilate8(tmp2, tmp1);
+				} else {
+					ImplBinaryInnerOps.dilate8(tmp2, tmp1);
+				}
 				ImplBinaryBorderOps.dilate8(tmp2, tmp1);
 
 				GrayU8 a = tmp1;
@@ -361,7 +376,11 @@ public class BinaryImageOps {
 	public static GrayU8 edge8(GrayU8 input, GrayU8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		ImplBinaryInnerOps.edge8(input, output);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplBinaryInnerOps_MT.edge8(input, output);
+		} else {
+			ImplBinaryInnerOps.edge8(input, output);
+		}
 		ImplBinaryBorderOps.edge8(input, output);
 
 		return output;
@@ -379,7 +398,11 @@ public class BinaryImageOps {
 	public static GrayU8 removePointNoise(GrayU8 input, GrayU8 output) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
-		ImplBinaryInnerOps.removePointNoise(input, output);
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplBinaryInnerOps_MT.removePointNoise(input, output);
+		} else {
+			ImplBinaryInnerOps.removePointNoise(input, output);
+		}
 		ImplBinaryBorderOps.removePointNoise(input, output);
 
 		return output;
@@ -482,14 +505,10 @@ public class BinaryImageOps {
 	 * @param labels Look up table where the indexes are the current label and the value are its new value.
 	 */
 	public static void relabel(GrayS32 input , int labels[] ) {
-		for( int y = 0; y < input.height; y++ ) {
-			int index = input.startIndex + y*input.stride;
-			int end = index+input.width;
-
-			for( ; index < end; index++ ) {
-				int val = input.data[index];
-				input.data[index] = labels[val];
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplBinaryImageOps_MT.relabel(input, labels);
+		} else {
+			ImplBinaryImageOps.relabel(input, labels);
 		}
 	}
 
@@ -503,20 +522,10 @@ public class BinaryImageOps {
 	public static GrayU8 labelToBinary(GrayS32 labelImage , GrayU8 binaryImage ) {
 		binaryImage = InputSanityCheck.checkDeclare(labelImage, binaryImage, GrayU8.class);
 
-		for( int y = 0; y < labelImage.height; y++ ) {
-
-			int indexIn = labelImage.startIndex + y*labelImage.stride;
-			int indexOut = binaryImage.startIndex + y*binaryImage.stride;
-
-			int end = indexIn + labelImage.width;
-
-			for( ; indexIn < end; indexIn++, indexOut++ ) {
-				if( 0 == labelImage.data[indexIn] ) {
-					binaryImage.data[indexOut] = 0;
-				} else {
-					binaryImage.data[indexOut] = 1;
-				}
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplBinaryImageOps_MT.labelToBinary(labelImage, binaryImage);
+		} else {
+			ImplBinaryImageOps.labelToBinary(labelImage, binaryImage);
 		}
 
 		return binaryImage;
@@ -536,26 +545,14 @@ public class BinaryImageOps {
 	{
 		binaryImage = InputSanityCheck.checkDeclare(labelImage, binaryImage, GrayU8.class);
 
-		for( int y = 0; y < labelImage.height; y++ ) {
-
-			int indexIn = labelImage.startIndex + y*labelImage.stride;
-			int indexOut = binaryImage.startIndex + y*binaryImage.stride;
-
-			int end = indexIn + labelImage.width;
-
-			for( ; indexIn < end; indexIn++, indexOut++ ) {
-				int val = labelImage.data[indexIn];
-				if( selectedBlobs[val] ) {
-					binaryImage.data[indexOut] = 1;
-				} else {
-					binaryImage.data[indexOut] = 0;
-				}
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplBinaryImageOps_MT.labelToBinary(labelImage, binaryImage,selectedBlobs);
+		} else {
+			ImplBinaryImageOps.labelToBinary(labelImage, binaryImage,selectedBlobs);
 		}
 
 		return binaryImage;
 	}
-
 
 	/**
 	 * Only converts the specified blobs over into the binary image.  Easier to use version of
