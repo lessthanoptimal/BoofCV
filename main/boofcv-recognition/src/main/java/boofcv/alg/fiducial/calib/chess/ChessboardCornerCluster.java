@@ -19,7 +19,9 @@
 package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
+import org.ddogleg.struct.GrowQueue_I32;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,10 +32,35 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class ChessboardCornerCluster {
+
+	double orientationTol = 0.1;
+	double acuteTol = 0.1;
+	double distanceTol = 0.2;
+
 	public void process(List<ChessboardCorner> corners ) {
 		// TODO for each corner find either the two or for adjacent corners which are about the same distance
 		//      from this corner and 90 degrees offset
 
 		// TODO Connect these local graphs into a proper grid
+	}
+
+	private void foo( int target , List<ChessboardCorner> corners ) {
+		// TODO find the
+	}
+
+	public static class Node {
+		public int index;
+
+		/**
+		 * List of connections to other nodes. There will be 2,3 or 4 edges.
+		 */
+		public List<Edge> edges = new ArrayList<>();
+	}
+
+	public static class Edge {
+		/**
+		 * Index's of nodes it could be connected to
+		 */
+		public GrowQueue_I32 dst = new GrowQueue_I32();
 	}
 }

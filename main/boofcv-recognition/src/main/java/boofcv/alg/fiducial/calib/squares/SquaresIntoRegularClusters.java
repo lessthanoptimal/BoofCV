@@ -196,7 +196,6 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	 */
 	private void setupSearch() {
 		nn.setPoints(nodes.toList(),false);
-		search.initialize();
 	}
 
 	/**

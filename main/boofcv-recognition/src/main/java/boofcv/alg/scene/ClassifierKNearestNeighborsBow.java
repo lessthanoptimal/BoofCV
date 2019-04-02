@@ -98,7 +98,6 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 	public void setClassificationData(List<HistogramScene> memory , int numScenes ) {
 
 		nn.setPoints(memory, false);
-		search.initialize();
 
 		scenes = new double[ numScenes ];
 	}

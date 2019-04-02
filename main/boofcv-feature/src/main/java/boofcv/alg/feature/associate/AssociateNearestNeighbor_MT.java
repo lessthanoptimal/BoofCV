@@ -153,11 +153,9 @@ public class AssociateNearestNeighbor_MT<D>
 
 		Helper() {
 			search = alg.createSearch();
-			search.initialize();
 		}
 
 		public void initialize() {
-			search.initialize();
 			matches.reset();
 			result2.reset();
 		}

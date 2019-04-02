@@ -155,7 +155,6 @@ public class DetectChessboardCornersPyramid {
 	 */
 	void markSeenAsFalse(FastQueue<ChessboardCorner> corners0 , FastQueue<ChessboardCorner> corners1 ) {
 		nn.setPoints(corners1.toList(),false);
-		nnSearch.initialize();
 		// radius of the blob in the intensity image is 2*kernelRadius
 		int radius = detector.shiRadius *2+1;
 		for (int i = 0; i < corners0.size; i++) {
