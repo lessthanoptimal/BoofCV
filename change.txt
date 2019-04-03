@@ -8,6 +8,8 @@ Version : 0.34
 
 - Examples
   * Added corner detector
+- BinaryImageOps
+  * Added concurrent implementations
 - Demonstrations
   * TODO modernize mosaic and stabilize
   * TODO modernize ShowFeatureOrientationApp

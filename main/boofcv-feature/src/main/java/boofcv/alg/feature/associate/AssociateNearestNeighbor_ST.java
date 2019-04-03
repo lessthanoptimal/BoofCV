@@ -55,7 +55,6 @@ public class AssociateNearestNeighbor_ST<D>
 	@Override
 	public void setSource(FastQueue<D> listSrc) {
 		super.setSource(listSrc);
-		search.initialize();
 	}
 
 	@Override

@@ -175,11 +175,6 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 		private class InternalSearch implements NearestNeighbor.Search<D> {
 
 			@Override
-			public void initialize() {
-
-			}
-
-			@Override
 			public boolean findNearest(D point, double maxDistance, NnData<D> result) {
 
 				int w = assoc[numCalls++];

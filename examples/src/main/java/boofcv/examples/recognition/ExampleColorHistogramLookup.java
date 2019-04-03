@@ -227,8 +227,6 @@ public class ExampleColorHistogramLookup {
 		FastQueue<NnData<double[]>> results = new FastQueue(NnData.class,true);
 
 		nn.setPoints(points, true);
-		search.initialize(); // The search API is a little verbose and initialize() must be called after setPoints
-		                     // but this allows searches to be run in parallel across multiple threads
 		search.findNearest(targetPoint, -1, 10, results);
 
 		ListDisplayPanel gui = new ListDisplayPanel();

@@ -299,7 +299,6 @@ public class EllipsesIntoClusters {
 		}
 
 		nn.setPoints(ellipses,true);
-		search.initialize();
 	}
 
 	/**

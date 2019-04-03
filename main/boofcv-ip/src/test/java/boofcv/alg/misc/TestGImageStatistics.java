@@ -19,19 +19,21 @@
 package boofcv.alg.misc;
 
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.*;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
-// TODO add unit tests for Planar images
 public class TestGImageStatistics extends BaseGClassChecksInMisc {
+
+	Class[] bandTypes = new Class[]{GrayU8.class, GrayS8.class, GrayU16.class, GrayF32.class};
 
 	public TestGImageStatistics() {
 		super(GImageStatistics.class, ImageStatistics.class);
@@ -100,41 +102,195 @@ public class TestGImageStatistics extends BaseGClassChecksInMisc {
 
 	@Test
 	void maxAbs_planar() {
-		fail("Implement");
+		for( Class type : bandTypes ) {
+			Planar image = new Planar(type,200,180,3);
+			if( image.getImageType().getDataType().isSigned() )
+				GImageMiscOps.fillUniform(image,rand,-100,100);
+			else
+				GImageMiscOps.fillUniform(image,rand,0,200);
+
+			double found = GImageStatistics.maxAbs(image);
+
+			double expected = -1;
+			for (int y = 0; y < image.height; y++) {
+				for (int x = 0; x < image.width; x++) {
+					for (int k = 0; k < image.getNumBands(); k++) {
+						double v = Math.abs(GeneralizedImageOps.get(image,x,y,k));
+						if( v > expected ) {
+							expected = v;
+						}
+					}
+				}
+			}
+			assertEquals(expected,found, UtilEjml.TEST_F64);
+		}
 	}
 
 	@Test
 	void max_planar() {
-		fail("Implement");
+		for( Class type : bandTypes ) {
+			Planar image = new Planar(type,200,180,3);
+			if( image.getImageType().getDataType().isSigned() )
+				GImageMiscOps.fillUniform(image,rand,-100,100);
+			else
+				GImageMiscOps.fillUniform(image,rand,0,200);
+
+			double found = GImageStatistics.max(image);
+
+			double expected = -Double.MAX_VALUE;
+			for (int y = 0; y < image.height; y++) {
+				for (int x = 0; x < image.width; x++) {
+					for (int k = 0; k < image.getNumBands(); k++) {
+						double v = GeneralizedImageOps.get(image,x,y,k);
+						if( v > expected ) {
+							expected = v;
+						}
+					}
+				}
+			}
+			assertEquals(expected,found, UtilEjml.TEST_F64);
+		}
 	}
 
 	@Test
 	void min_planar() {
-		fail("Implement");
+		for( Class type : bandTypes ) {
+			Planar image = new Planar(type,200,180,3);
+			if( image.getImageType().getDataType().isSigned() )
+				GImageMiscOps.fillUniform(image,rand,-100,100);
+			else
+				GImageMiscOps.fillUniform(image,rand,0,200);
+
+			double found = GImageStatistics.min(image);
+
+			double expected = Double.MAX_VALUE;
+			for (int y = 0; y < image.height; y++) {
+				for (int x = 0; x < image.width; x++) {
+					for (int k = 0; k < image.getNumBands(); k++) {
+						double v = GeneralizedImageOps.get(image,x,y,k);
+						if( v < expected ) {
+							expected = v;
+						}
+					}
+				}
+			}
+			assertEquals(expected,found, UtilEjml.TEST_F64);
+		}
 	}
 
 	@Test
 	void sum_planar() {
-		fail("Implement");
+		for( Class type : bandTypes ) {
+			Planar image = new Planar(type,200,180,3);
+			if( image.getImageType().getDataType().isSigned() )
+				GImageMiscOps.fillUniform(image,rand,-100,100);
+			else
+				GImageMiscOps.fillUniform(image,rand,0,200);
+
+			double found = GImageStatistics.sum(image);
+
+			double expected = 0;
+			for (int y = 0; y < image.height; y++) {
+				for (int x = 0; x < image.width; x++) {
+					for (int k = 0; k < image.getNumBands(); k++) {
+						expected += GeneralizedImageOps.get(image,x,y,k);
+					}
+				}
+			}
+			assertEquals(expected,found, 10*Math.abs(found)*UtilEjml.TEST_F64);
+		}
 	}
 
 	@Test
 	void mean_planar() {
-		fail("Implement");
-	}
+		for( Class type : bandTypes ) {
+			Planar image = new Planar(type,200,180,3);
+			if( image.getImageType().getDataType().isSigned() )
+				GImageMiscOps.fillUniform(image,rand,-100,100);
+			else
+				GImageMiscOps.fillUniform(image,rand,0,200);
 
-	@Test
-	void variance_planar() {
-		fail("Implement");
+			double found = GImageStatistics.mean(image);
+
+			double expected = 0;
+			for (int y = 0; y < image.height; y++) {
+				for (int x = 0; x < image.width; x++) {
+					for (int k = 0; k < image.getNumBands(); k++) {
+						expected += GeneralizedImageOps.get(image,x,y,k);
+					}
+				}
+			}
+			expected /= (image.width*image.height*image.getNumBands());
+
+			assertEquals(expected,found, 10*UtilEjml.TEST_F64);
+		}
 	}
 
 	@Test
 	void meanDiffSq_planar() {
-		fail("Implement");
+		for( Class type : bandTypes ) {
+
+			Planar imageA = new Planar(type,200,180,3);
+			Planar imageB = new Planar(type,200,180,3);
+
+			if( imageA.getImageType().getDataType().isSigned() ) {
+				GImageMiscOps.fillUniform(imageA, rand, -100, 100);
+				GImageMiscOps.fillUniform(imageB, rand, -100, 100);
+			} else {
+				GImageMiscOps.fillUniform(imageA, rand, 0, 200);
+				GImageMiscOps.fillUniform(imageB, rand, 0, 200);
+			}
+
+			double found = GImageStatistics.meanDiffSq(imageA,imageB);
+
+			double expected = 0;
+			for (int y = 0; y < imageA.height; y++) {
+				for (int x = 0; x < imageA.width; x++) {
+					for (int k = 0; k < imageA.getNumBands(); k++) {
+						double va = GeneralizedImageOps.get(imageA,x,y,k);
+						double vb = GeneralizedImageOps.get(imageB,x,y,k);
+
+						expected += (va-vb)*(va-vb);
+					}
+				}
+			}
+			expected /= (imageA.width*imageA.height*imageA.getNumBands());
+
+			assertEquals(expected,found, Math.abs(found)*UtilEjml.TEST_F64_SQ);
+		}
 	}
 
 	@Test
 	void meanDiffAbs_planar() {
-		fail("Implement");
+		for( Class type : bandTypes ) {
+
+			Planar imageA = new Planar(type,200,180,3);
+			Planar imageB = new Planar(type,200,180,3);
+
+			if( imageA.getImageType().getDataType().isSigned() ) {
+				GImageMiscOps.fillUniform(imageA, rand, -100, 100);
+				GImageMiscOps.fillUniform(imageB, rand, -100, 100);
+			} else {
+				GImageMiscOps.fillUniform(imageA, rand, 0, 200);
+				GImageMiscOps.fillUniform(imageB, rand, 0, 200);
+			}
+
+			double found = GImageStatistics.meanDiffAbs(imageA,imageB);
+
+			double expected = 0;
+			for (int y = 0; y < imageA.height; y++) {
+				for (int x = 0; x < imageA.width; x++) {
+					for (int k = 0; k < imageA.getNumBands(); k++) {
+						double va = GeneralizedImageOps.get(imageA,x,y,k);
+						double vb = GeneralizedImageOps.get(imageB,x,y,k);
+
+						expected += Math.abs(va-vb);
+					}
+				}
+			}
+			expected /= (imageA.width*imageA.height*imageA.getNumBands());
+
+			assertEquals(expected,found, Math.abs(found)*UtilEjml.TEST_F64_SQ);
+		}
 	}
 }

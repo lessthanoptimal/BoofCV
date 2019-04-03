@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -172,21 +172,37 @@ public class ShapeFittingOps {
 	 * @return Converted points
 	 */
 	public static List<Point2D_F64> convert_I32_F64(List<Point2D_I32> points) {
-		List<Point2D_F64> pointsF = new ArrayList<>();
-		for( int i = 0; i < points.size(); i++ ) {
-			Point2D_I32 p = points.get(i);
-			pointsF.add( new Point2D_F64(p.x,p.y));
+		return convert_I32_F64(points,null).toList();
+	}
+
+	public static FastQueue<Point2D_F64> convert_I32_F64(List<Point2D_I32> input, FastQueue<Point2D_F64> output ) {
+		if( output == null )
+			output = new FastQueue<>(input.size(),Point2D_F64.class,true);
+		else
+			output.reset();
+
+		for( int i = 0; i < input.size(); i++ ) {
+			Point2D_I32 p = input.get(i);
+			output.grow().set( p.x,p.y );
 		}
-		return pointsF;
+		return output;
 	}
 
 	public static List<Point2D_F32> convert_I32_F32(List<Point2D_I32> points) {
-		List<Point2D_F32> pointsF = new ArrayList<>();
-		for( int i = 0; i < points.size(); i++ ) {
-			Point2D_I32 p = points.get(i);
-			pointsF.add( new Point2D_F32(p.x,p.y));
+		return convert_I32_F32(points,null).toList();
+	}
+
+	public static FastQueue<Point2D_F32> convert_I32_F32(List<Point2D_I32> input, FastQueue<Point2D_F32> output ) {
+		if( output == null )
+			output = new FastQueue<>(input.size(),Point2D_F32.class,true);
+		else
+			output.reset();
+
+		for( int i = 0; i < input.size(); i++ ) {
+			Point2D_I32 p = input.get(i);
+			output.grow().set( p.x,p.y );
 		}
-		return pointsF;
+		return output;
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,12 +103,7 @@ public class TestAssociateGreedy {
 
 	private FastQueue<TupleDesc_F64> createData( double ...values )
 	{
-		FastQueue<TupleDesc_F64> ret = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class, true) {
-			@Override
-			protected TupleDesc_F64 createInstance() {
-				return new TupleDesc_F64(1);
-			}
-		};
+		FastQueue<TupleDesc_F64> ret = new FastQueue<>(10,TupleDesc_F64.class, ()-> new TupleDesc_F64(1));
 
 		for( int i = 0; i < values.length; i++ ) {
 			ret.grow().set(values[i]);
