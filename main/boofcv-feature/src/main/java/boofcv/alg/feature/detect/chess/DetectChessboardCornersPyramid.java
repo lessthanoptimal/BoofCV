@@ -113,10 +113,10 @@ public class DetectChessboardCornersPyramid {
 				double y = cf.y*scale;
 				// Compensate for how the pyramid was computed using an average down sample. It shifts
 				// the coordinate system.
-				if( scale > 1 ) {
-					x += 0.5*scale;
-					y += 0.5*scale;
-				}
+//				if( scale > 1 ) {
+//					x += 0.5*scale;
+//					y += 0.5*scale;
+//				}
 
 				ChessboardCorner cl = featsLevel.corners.grow();
 				cl.first = true;

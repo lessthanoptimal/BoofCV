@@ -175,8 +175,12 @@ public class DetectChessboardCorners {
 			ChessboardCorner c = corners.grow();
 
 			UtilPoint2D_I32.mean(contour.toList(),c);
+			// compensate for the bias caused by how pixels are counted.
+			// Example: a 4x4 region is expected. Center should be at (2,2) but will instead be (1.5,1.5)
+			c.x += 0.5;
+			c.y += 0.5;
 
-			computefeatures(c.x,c.y,c);
+			computeFeatures(c.x,c.y,c);
 
 //			System.out.println("radius = "+radius+" angle = "+c.angle);
 //			System.out.println("intensity "+c.intensity);
@@ -201,7 +205,7 @@ public class DetectChessboardCorners {
 	 * Intensity is found by subtracting bright lines from the dark line on the other side. dark/light lines are
 	 * offset by 90 degrees.
 	 */
-	private void computefeatures(double cx , double cy , ChessboardCorner corner ) {
+	private void computeFeatures(double cx , double cy , ChessboardCorner corner ) {
 		double r = shiRadius +2;
 
 		for (int i = 0; i < numLines; i++) {
@@ -268,19 +272,21 @@ public class DetectChessboardCorners {
 		float meanX = (float)c.x;
 		float meanY = (float)c.y;
 
-		int radius = this.shiRadius *2;
+		// The peak in intensity will be in -r to r region, but smaller values will be -2*r to 2*r
+		int radius = this.shiRadius*2;
 		for (int iteration = 0; iteration < 5; iteration++) {
 			float adjX = 0;
 			float adjY = 0;
 			float total = 0;
 
 			for (int y = -radius; y < radius; y++) {
-				float yy = y + 0.5f;
+				float yy = y;
 				for (int x = -radius; x < radius; x++) {
-					float xx = x + 0.5f;
+					float xx = x;
 					float v = intensityInterp.get(meanX+xx,meanY+yy);
-					adjX += xx*v;
-					adjY += yy*v;
+					// Again, this adjustment to account for how pixels are counted. See center from contour computation
+					adjX += (xx+0.5)*v;
+					adjY += (yy+0.5)*v;
 					total += v;
 				}
 			}

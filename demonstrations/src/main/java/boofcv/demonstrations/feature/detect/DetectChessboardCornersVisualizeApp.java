@@ -125,7 +125,7 @@ public class DetectChessboardCornersVisualizeApp
 
 			DetectChessboardCorners corners = new DetectChessboardCorners();
 			corners.setKernelRadius(controlPanel.radius);
-			corners.useMeanShift = controlPanel.debug;
+			corners.useMeanShift = controlPanel.meanShift;
 			detector = new DetectChessboardCornersPyramid(corners);
 			detector.setPyramidTopSize(controlPanel.pyramidTop);
 			detector.getDetector().setThresholding(FactoryThresholdBinary.threshold(threshold,GrayF32.class));
@@ -238,10 +238,8 @@ public class DetectChessboardCornersVisualizeApp
 					g2.setStroke(new BasicStroke(3));
 					for (int i = 0; i < foundCorners.size; i++) {
 						ChessboardCorner c = foundCorners.get(i);
-						// shift the corner over 1/2 a pixel so that it appears inside the pixels' center
-						// this visually looks better
-						double x = c.x + 0.5;
-						double y = c.y + 0.5;
+						double x = c.x;
+						double y = c.y;
 
 						g2.setColor(Color.ORANGE);
 						VisualizeFeatures.drawCircle(g2, x * scale, y * scale, 5, circle);
@@ -274,7 +272,7 @@ public class DetectChessboardCornersVisualizeApp
 		boolean showCorners =true;
 		boolean logItensity =false;
 		int view = 1;
-		boolean debug = true;
+		boolean meanShift = true;
 
 		public ControlPanel() {
 			{
@@ -290,7 +288,7 @@ public class DetectChessboardCornersVisualizeApp
 			spinnerRadius = spinner(radius, 1, 100, 1);
 			spinnerTop = spinner(pyramidTop, 50, 10000, 50);
 			checkShowCorners = checkbox("Show Corners", showCorners);
-			checkDebug = checkbox("Debug",debug);
+			checkDebug = checkbox("Mean Shift", meanShift);
 
 			addLabeled(processingTimeLabel, "Time (ms)");
 			addLabeled(imageSizeLabel,"Image Size");
@@ -317,7 +315,7 @@ public class DetectChessboardCornersVisualizeApp
 				logItensity = checkLogIntensity.isSelected();
 				reprocessImageOnly();
 			} else if( e.getSource() == checkDebug) {
-				debug = checkDebug.isSelected();
+				meanShift = checkDebug.isSelected();
 				createAlgorithm();
 				reprocessImageOnly();
 			}
@@ -365,7 +363,7 @@ public class DetectChessboardCornersVisualizeApp
 
 			app.openExample(examples.get(0));
 			app.waitUntilInputSizeIsKnown();
-			app.display("Feature Intensity");
+			app.display("Chessboard Corner Detector");
 		});
 	}
 }
