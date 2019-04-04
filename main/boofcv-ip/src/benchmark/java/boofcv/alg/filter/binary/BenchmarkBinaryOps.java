@@ -89,12 +89,12 @@ public class BenchmarkBinaryOps  {
 
 	@Benchmark
 	public void edge4() {
-		BinaryImageOps.edge4(inputA,output);
+		BinaryImageOps.edge4(inputA,output,true);
 	}
 
 	@Benchmark
 	public void edge8() {
-		BinaryImageOps.edge8(inputA,output);
+		BinaryImageOps.edge8(inputA,output,true);
 	}
 
 	@Benchmark
