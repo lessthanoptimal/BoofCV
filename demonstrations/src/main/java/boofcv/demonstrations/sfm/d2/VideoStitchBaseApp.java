@@ -41,6 +41,8 @@ import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +77,6 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	int totalResets;
 
 	private final static int maxIterations = 100;
-	private final static int pruneThreshold = 10;
 
 	protected Motion2DPanel gui;
 	protected ImageMotionInfoPanel infoPanel = new ImageMotionInfoPanel(this);
@@ -89,6 +90,8 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 
 	private static int maxFeatures = 350;
 
+	private boolean algorithmChanged = false;
+
 	// TODO Specify tracker and motion model in info panel
 
 	public VideoStitchBaseApp(List<?> exampleInputs , Motion2DPanel gui, boolean color , Class imageType ) {
@@ -96,7 +99,12 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 				color ? ImageType.pl(3, imageType) : ImageType.single(imageType));
 
 		this.gui = gui;
-//		gui.addMouseListener(this);
+		gui.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				streamPaused = !streamPaused;
+			}
+		});
 
 		infoPanel.setMaximumSize(infoPanel.getPreferredSize());
 		add(infoPanel, BorderLayout.WEST);
@@ -189,6 +197,11 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 
 	@Override
 	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
+		if( algorithmChanged ) {
+			algorithmChanged = false;
+			handleAlgorithmChange();
+		}
+
 		if( alg == null )
 			return;
 
@@ -263,8 +276,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	@Override
 	public void handleUserChangeAlgorithm() {
 		// start processing the input again and change the tracker
-		stopAllInputProcessing();
-		handleAlgorithmChange();
+		algorithmChanged = true;
 		reprocessInput();
 	}
 

@@ -41,8 +41,6 @@ import java.util.List;
  * @param <I> Input image type
  * @param <D> Image derivative type
  */
-// TODO add support for color again
-// TODO comment and clean up code
 public class VideoMosaicSequentialPointApp<I extends ImageGray<I>, D extends ImageGray<D>,
 		IT extends InvertibleTransform>
 		extends VideoStitchBaseApp<I,IT>
