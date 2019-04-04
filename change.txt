@@ -11,8 +11,7 @@ Version : 0.34
 - BinaryImageOps
   * Added concurrent implementations
 - Demonstrations
-  * TODO modernize mosaic and stabilize
-  * TODO modernize ShowFeatureOrientationApp
+  * modernize mosaic and stabilize
 - Examples
   * Android example disables threads if SDK is prior to 24 due to lack of Java 1.8 support
 - ImageStatistics
@@ -32,7 +31,8 @@ Version : 0.34
   * Rewritten from scratch using a new type of corner detector (TODo write tech report)
   * Much better handling of blurred and fisheye images
 
-TODO reconsider NN API design. make it simple again
+TODO Applications. Make standalone jar have access to commandline mode
+TODO               Create a commandline QR Code scanner
 
 TODO Scene Reconstruction from arbitrary number of photos
 

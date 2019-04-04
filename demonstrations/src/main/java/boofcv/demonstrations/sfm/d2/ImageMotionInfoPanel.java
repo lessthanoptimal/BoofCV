@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,23 +33,32 @@ import java.awt.event.ItemListener;
  *
  * @author Peter Abeles
  */
-public class ImageMotionInfoPanel extends StandardAlgConfigPanel implements ItemListener, ActionListener {
+public class ImageMotionInfoPanel extends StandardAlgConfigPanel
+		implements ItemListener, ActionListener {
 
 	JButton resetButton;
 	JCheckBox showView;
+	JComboBox spinnerTracker = combo(0,FeatureTrackerTypes.getTrackerNames().toArray(new String[0]));
+	JComboBox spinnerModels = combo(0,"Affine","Homography");
 	JCheckBox showInliers;
 	JCheckBox showAll;
-	JTextArea displayFPS;
+	JTextArea displayPeriodMS;
 	JTextArea displayNumKeyFrames;
 	JTextArea displayNumTracks;
 	JTextArea displayNumInliers;
+
+	int tracker = 0;
+	int motionModels = 0;
 
 	boolean setShowView = true;
 	boolean setShowInliers = false;
 	boolean setShowAll = false;
 	boolean shouldReset = false;
 
-	public ImageMotionInfoPanel() {
+	ImageMotionInfoPanel.Listener listener;
+
+	public ImageMotionInfoPanel( ImageMotionInfoPanel.Listener listener ) {
+		this.listener = listener;
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
@@ -66,22 +75,24 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel implements Item
 		showInliers.addItemListener(this);
 		showInliers.setSelected(setShowInliers);
 
-		displayFPS = createTextInfo();
+		displayPeriodMS = createTextInfo();
 		displayNumKeyFrames = createTextInfo();
 		displayNumTracks = createTextInfo();
 		displayNumInliers = createTextInfo();
 
-		addAlignLeft(resetButton, this);
+		addLabeled(displayPeriodMS,"Period (ms)",this);
 		addAlignLeft(showView, this);
+		addLabeled(spinnerTracker,"Trackers");
+		addLabeled(spinnerModels,"Models");
 		addAlignLeft(showAll, this);
 		addAlignLeft(showInliers, this);
 		addSeparator(200);
-		addLabeled(displayFPS,"Algorithm FPS:",this);
 		addLabeled(displayNumKeyFrames,"Resets:",this);
 		addLabeled(displayNumTracks,"Tracks:",this);
 		addLabeled(displayNumInliers,"Inliers:",this);
+		addAlignLeft(resetButton, this);
 
-		setPreferredSize(new Dimension(175,300));
+		setPreferredSize(new Dimension(200,300));
 	}
 
 	private JTextArea createTextInfo() {
@@ -95,6 +106,12 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel implements Item
 	public void actionPerformed(ActionEvent e) {
 		if( e.getSource() == resetButton ) {
 			shouldReset = true;
+		} else if( e.getSource() == spinnerTracker ) {
+			tracker = spinnerTracker.getSelectedIndex();
+			listener.handleUserChangeAlgorithm();
+		} else if( e.getSource() == spinnerModels ) {
+			motionModels = spinnerModels.getSelectedIndex();
+			listener.handleUserChangeAlgorithm();
 		}
 	}
 
@@ -109,8 +126,8 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel implements Item
 		}
 	}
 
-	public void setFPS( double fps ) {
-		displayFPS.setText(String.format("%5.1f", fps));
+	public void setPeriodMS(double period ) {
+		displayPeriodMS.setText(String.format("%5.1f", period));
 	}
 
 	public void setKeyFrames(int totalFaults) {
@@ -143,5 +160,9 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel implements Item
 			return true;
 		}
 		return false;
+	}
+
+	public interface Listener {
+		void handleUserChangeAlgorithm();
 	}
 }

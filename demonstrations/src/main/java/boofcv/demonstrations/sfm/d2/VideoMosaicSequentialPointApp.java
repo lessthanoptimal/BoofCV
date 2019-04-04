@@ -18,12 +18,7 @@
 
 package boofcv.demonstrations.sfm.d2;
 
-import boofcv.abst.feature.detect.interest.ConfigFastHessian;
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
-import boofcv.alg.tracker.klt.PkltConfig;
-import boofcv.factory.feature.tracker.FactoryPointTracker;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.struct.image.GrayF32;
@@ -33,6 +28,7 @@ import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,35 +47,9 @@ public class VideoMosaicSequentialPointApp<I extends ImageGray<I>, D extends Ima
 		IT extends InvertibleTransform>
 		extends VideoStitchBaseApp<I,IT>
 {
-	private static int maxFeatures = 250;
 
-	public VideoMosaicSequentialPointApp(Class<I> imageType, Class<D> derivType) {
-		super(2,imageType,true,new Mosaic2DPanel());
-
-		PkltConfig config = new PkltConfig();
-		config.templateRadius = 3;
-		config.pyramidScaling = new int[]{1,2,4,8};
-
-		ConfigFastHessian configFH = new ConfigFastHessian();
-		configFH.initialSampleSize = 2;
-		configFH.maxFeaturesPerScale = 200;
-
-		addAlgorithm(0, "KLT", FactoryPointTracker.klt(config, new ConfigGeneralDetector(maxFeatures, 3, 1),
-				imageType, derivType));
-		addAlgorithm(0, "ST-BRIEF", FactoryPointTracker.
-				dda_ST_BRIEF(150, new ConfigGeneralDetector(400, 1, 10), imageType, null));
-		// size of the description region has been increased to improve quality.
-		addAlgorithm(0, "ST-NCC", FactoryPointTracker.
-				dda_ST_NCC(new ConfigGeneralDetector(500, 3, 9), 10, imageType, derivType));
-		addAlgorithm(0, "FH-SURF", FactoryPointTracker.dda_FH_SURF_Fast(configFH, null, null, imageType));
-		addAlgorithm(0, "ST-SURF-KLT", FactoryPointTracker.
-				combined_ST_SURF_KLT(new ConfigGeneralDetector(400, 3, 1),
-						config, 75, null, null, imageType, derivType));
-		addAlgorithm(0, "FH-SURF-KLT", FactoryPointTracker.combined_FH_SURF_KLT(
-				config, 75, configFH, null, null, imageType));
-
-		addAlgorithm(1,"Affine", new Affine2D_F64());
-		addAlgorithm(1,"Homography", new Homography2D_F64());
+	public VideoMosaicSequentialPointApp(List<?> exampleInputs , Class<I> imageType) {
+		super(exampleInputs,new Mosaic2DPanel(),true,imageType);
 
 		absoluteMinimumTracks = 40;
 		respawnTrackFraction = 0.3;
@@ -90,6 +60,8 @@ public class VideoMosaicSequentialPointApp<I extends ImageGray<I>, D extends Ima
 
 	private IT createInitialTransform() {
 		float scale = 0.8f;
+
+		IT fitModel = createFitModelStructure();
 
 		if( fitModel instanceof Affine2D_F64 ) {
 			Affine2D_F64 H = new Affine2D_F64(scale,0,0,scale, stitchWidth /4, stitchHeight /4);
@@ -103,7 +75,13 @@ public class VideoMosaicSequentialPointApp<I extends ImageGray<I>, D extends Ima
 	}
 
 	@Override
-	protected void init(int inputWidth, int inputHeight) {
+	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+		handleAlgorithmChange();
+	}
+
+	@Override
+	protected void handleAlgorithmChange() {
+		super.handleAlgorithmChange();
 		setStitchImageSize(1000, 600);
 		((Mosaic2DPanel)gui).setMosaicSize(stitchWidth, stitchHeight);
 		alg.configure(stitchWidth, stitchHeight,createInitialTransform());
@@ -131,28 +109,18 @@ public class VideoMosaicSequentialPointApp<I extends ImageGray<I>, D extends Ima
 
 	public static void main( String args[] ) {
 		Class type = GrayF32.class;
-		Class derivType = type;
 
-//		Class type = GrayU8.class;
-//		Class derivType = GrayS16.class;
+		List<PathLabel> examples = new ArrayList<>();
+		examples.add(new PathLabel("Plane 1", UtilIO.pathExample("mosaic/airplane01.mjpeg")));
+		examples.add(new PathLabel("Plane 2", UtilIO.pathExample("mosaic/airplane02.mjpeg")));
+		examples.add(new PathLabel("Shake", UtilIO.pathExample("shake.mjpeg")));
 
-		VideoMosaicSequentialPointApp app = new VideoMosaicSequentialPointApp(type,derivType);
+		SwingUtilities.invokeLater(()->{
 
-		List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("Plane 1", UtilIO.pathExample("mosaic/airplane01.mjpeg")));
-		inputs.add(new PathLabel("Plane 2", UtilIO.pathExample("mosaic/airplane02.mjpeg")));
-		inputs.add(new PathLabel("Shake", UtilIO.pathExample("shake.mjpeg")));
+			VideoMosaicSequentialPointApp app = new VideoMosaicSequentialPointApp(examples,type);
 
-		app.setInputList(inputs);
-
-		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
-		}
-
-		ShowImages.showWindow(app, "Video Image Mosaic", true);
+			app.openExample(examples.get(0));
+			app.display("Video Image Mosaic");
+		});
 	}
-
-	@Override
-	protected void handleRunningStatus(int status) {}
 }

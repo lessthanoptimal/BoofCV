@@ -18,19 +18,24 @@
 
 package boofcv.demonstrations.sfm.d2;
 
+import boofcv.abst.feature.detect.interest.ConfigFastHessian;
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d2.PlToGrayMotion2D;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
+import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryMotion2D;
-import boofcv.gui.VideoProcessAppBase;
-import boofcv.gui.VisualizeApp;
+import boofcv.gui.DemonstrationBase;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.InvertibleTransform;
+import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 
@@ -47,11 +52,8 @@ import java.util.List;
  * @author Peter Abeles
  */
 public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends InvertibleTransform>
-		extends VideoProcessAppBase<I> implements VisualizeApp
+		extends DemonstrationBase implements ImageMotionInfoPanel.Listener
 {
-	// size of input image
-	int inputWidth,inputHeight;
-
 	// size of the image being stitched into
 	int stitchWidth;
 	int stitchHeight;
@@ -61,16 +63,12 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 
 	int borderTolerance = 30;
 
-	// data type which is being fit
-	IT fitModel;
-
 	// tracks feature in the video stream
 	protected PointTracker<I> tracker;
 
 	BufferedImage stitchOut;
 
 	StitchingFromMotion2D alg;
-
 	StitchingFromMotion2D.Corners corners;
 
 	// number of times stitching has failed and it was reset
@@ -79,10 +77,8 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	private final static int maxIterations = 100;
 	private final static int pruneThreshold = 10;
 
-	boolean hasProcessedImage = false;
-
 	protected Motion2DPanel gui;
-	protected ImageMotionInfoPanel infoPanel = new ImageMotionInfoPanel();
+	protected ImageMotionInfoPanel infoPanel = new ImageMotionInfoPanel(this);
 
 	// stabilization parameters
 	protected int absoluteMinimumTracks;
@@ -91,18 +87,20 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	protected double maxJumpFraction;
 	protected double inlierThreshold;
 
-	public VideoStitchBaseApp(int numAlgFamilies,
-							  Class imageType,
-							  boolean color ,
-							  Motion2DPanel gui) {
-		super(numAlgFamilies, color ? ImageType.pl(3, imageType) : ImageType.single(imageType));
+	private static int maxFeatures = 350;
+
+	// TODO Specify tracker and motion model in info panel
+
+	public VideoStitchBaseApp(List<?> exampleInputs , Motion2DPanel gui, boolean color , Class imageType ) {
+		super(true,true,exampleInputs,
+				color ? ImageType.pl(3, imageType) : ImageType.single(imageType));
 
 		this.gui = gui;
-		gui.addMouseListener(this);
-		setMainGUI(gui);
+//		gui.addMouseListener(this);
 
 		infoPanel.setMaximumSize(infoPanel.getPreferredSize());
 		add(infoPanel, BorderLayout.WEST);
+		add(gui,BorderLayout.CENTER);
 	}
 
 	protected void setStitchImageSize( int width , int height ) {
@@ -112,10 +110,57 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 		stitchOut = new BufferedImage(stitchWidth, stitchHeight,BufferedImage.TYPE_INT_RGB);
 	}
 
+	@Override
+	protected void configureVideo(int which, SimpleImageSequence sequence) {
+		super.configureVideo(which, sequence);
+		sequence.setLoop(true);
+	}
+
+	protected void handleAlgorithmChange() {
+		tracker = createTracker();
+		alg = createAlgorithm(tracker);
+	}
+
+	protected PointTracker<I> createTracker() {
+		PkltConfig config = new PkltConfig();
+		config.templateRadius = 3;
+		config.pyramidScaling = new int[]{1,2,4,8};
+
+		ConfigFastHessian configFH = new ConfigFastHessian();
+		configFH.initialSampleSize = 2;
+		configFH.maxFeaturesPerScale = 250;
+
+		ImageType imageType = super.getImageType(0);
+		Class imageClass = imageType.getImageClass();
+		Class derivClass = GImageDerivativeOps.getDerivativeType(imageClass);
+
+		FeatureTrackerTypes type = FeatureTrackerTypes.values()[infoPanel.tracker];
+		switch( type ) {
+			case KLT:
+				return FactoryPointTracker.klt(config, new ConfigGeneralDetector(maxFeatures, 3, 1),
+						imageClass, derivClass);
+			case ST_BRIEF:
+				return FactoryPointTracker. dda_ST_BRIEF(150,
+						new ConfigGeneralDetector(400, 1, 10), imageClass, null);
+			case FH_SURF:
+				return FactoryPointTracker.dda_FH_SURF_Fast(configFH, null, null, imageClass);
+			case ST_SURF_KLT:
+				return FactoryPointTracker.combined_FH_SURF_KLT(
+						config, 100, configFH, null, null, imageClass);
+
+			default:
+				throw new RuntimeException("Unknown tracker: "+type);
+		}
+	}
+
 	protected StitchingFromMotion2D createAlgorithm( PointTracker<I> tracker ) {
 
+		ImageType imageType = super.getImageType(0);
+
+		IT fitModel = createFitModelStructure();
+
 		if( imageType.getFamily() == ImageType.Family.PLANAR) {
-			Class imageClass = this.imageType.getImageClass();
+			Class imageClass = imageType.getImageClass();
 
 			ImageMotion2D<I,IT> motion = FactoryMotion2D.createMotion2D(maxIterations,inlierThreshold,2,absoluteMinimumTracks,
 					respawnTrackFraction,respawnCoverageFraction,false,tracker,fitModel);
@@ -131,53 +176,36 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 		}
 	}
 
-	@Override
-	public void loadConfigurationFile(String fileName) {}
-
-	@Override
-	public boolean getHasProcessedImage() {
-		return alg != null;
+	protected IT createFitModelStructure() {
+		IT fitModel;
+		switch( infoPanel.motionModels ) {
+			case 0: fitModel = (IT)new Affine2D_F64();break;
+			case 1: fitModel = (IT)new Homography2D_F64();break;
+			default:
+				throw new IllegalArgumentException("Unknown motion model");
+		}
+		return fitModel;
 	}
 
 	@Override
-	protected void process(SimpleImageSequence<I> sequence) {
-		if( !sequence.hasNext() )
-			return;
-		// stop the image processing code
-		stopWorker();
-
-		this.sequence = sequence;
-		sequence.setLoop(true);
-
-		// save the input image dimension
-		I input = sequence.next();
-		inputWidth = input.width;
-		inputHeight = input.height;
-
-		// start everything up and resume processing
-		doRefreshAll();
-	}
-
-	@Override
-	protected void updateAlg(I frame, BufferedImage buffImage) {
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
 		if( alg == null )
 			return;
 
+		long time0 = System.nanoTime();
 		if( infoPanel.resetRequested() ) {
 			totalResets = 0;
 			alg.reset();
-		} else if( !alg.process(frame) ) {
+		} else if( !alg.process((I)input) ) {
 			alg.reset();
 			totalResets++;
 		}
+		long time1 = System.nanoTime();
 
-		hasProcessedImage = true;
+		updateGUI((I)input, buffered, (time1-time0)*1e-6 );
 	}
 
-	@Override
-	protected void updateAlgGUI(I frame, BufferedImage imageGUI, final double fps) {
-		if( !hasProcessedImage )
-			return;
+	void updateGUI(I frame, BufferedImage imageGUI, final double timeMS) {
 
 		corners = alg.getImageCorners(frame.width,frame.height,null);
 		ConvertBufferedImage.convertTo(alg.getStitchedImage(), stitchOut,true);
@@ -220,64 +248,25 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 		gui.setCurrToWorld(H);
 
 		// update GUI
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				// update GUI
-				infoPanel.setFPS(fps);
-				infoPanel.setNumInliers(numInliers);
-				infoPanel.setNumTracks(numFeatures);
-				infoPanel.setKeyFrames(totalResets);
-				infoPanel.repaint();
+		SwingUtilities.invokeLater(() -> {
+			// update GUI
+			infoPanel.setPeriodMS(timeMS);
+			infoPanel.setNumInliers(numInliers);
+			infoPanel.setNumTracks(numFeatures);
+			infoPanel.setKeyFrames(totalResets);
+			infoPanel.repaint();
 
-				gui.repaint();
-			}
+			gui.repaint();
 		});
 	}
 
 	@Override
-	public void refreshAll(Object[] cookies) {
-		stopWorker();
-
-		tracker = (PointTracker<I>)cookies[0];
-		fitModel = (IT)cookies[1];
-
-		startEverything();
+	public void handleUserChangeAlgorithm() {
+		// start processing the input again and change the tracker
+		stopAllInputProcessing();
+		handleAlgorithmChange();
+		reprocessInput();
 	}
-
-	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if( sequence == null )
-			return;
-
-		stopWorker();
-
-		switch( indexFamily ) {
-			case 0:
-				tracker = (PointTracker<I>)cookie;
-				break;
-
-			case 1:
-				fitModel = (IT)cookie;
-				break;
-		}
-
-		// restart the video
-		sequence.reset();
-
-		startEverything();
-	}
-
-	protected void startEverything() {
-		// make sure there is nothing left over from before
-		tracker.dropAllTracks();
-		alg = createAlgorithm(tracker);
-		init(inputWidth,inputHeight);
-		totalResets = 0;
-
-		startWorkerThread();
-	}
-
-	protected abstract void init( int inputWidth , int inputHeight );
 
 	/**
 	 * Checks the location of the stitched region and decides if its location should be reset

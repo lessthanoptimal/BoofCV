@@ -23,7 +23,6 @@ import boofcv.struct.image.GrayF32;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
-import org.ddogleg.nn.alg.KdTreeDistance;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -54,26 +53,7 @@ public class DetectChessboardCornersPyramid {
 	FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner.class,true);
 
 	// Nearest-Neighbor search data structures
-	NearestNeighbor<ChessboardCorner> nn = FactoryNearestNeighbor.kdtree(new KdTreeDistance<ChessboardCorner>() {
-		@Override
-		public double distance(ChessboardCorner a, ChessboardCorner b) {
-			return a.distance(b);
-		}
-
-		@Override
-		public double valueAt(ChessboardCorner point, int index) {
-			switch (index) {
-				case 0: return point.x;
-				case 1: return point.y;
-			}
-			throw new RuntimeException("Out of bounds");
-		}
-
-		@Override
-		public int length() {
-			return 2;
-		}
-	});
+	NearestNeighbor<ChessboardCorner> nn = FactoryNearestNeighbor.kdtree(new ChessboardCornerDistance());
 	NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
 	FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData.class,true);
 
