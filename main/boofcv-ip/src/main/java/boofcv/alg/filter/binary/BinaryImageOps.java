@@ -252,9 +252,10 @@ public class BinaryImageOps {
 	 *
 	 * @param input  Input image. Not modified.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @param outsideZero if true then pixels outside the image are treated as zero, otherwise one
 	 * @return Output image.
 	 */
-	public static GrayU8 edge4(GrayU8 input, GrayU8 output) {
+	public static GrayU8 edge4(GrayU8 input, GrayU8 output, boolean outsideZero ) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
@@ -262,7 +263,7 @@ public class BinaryImageOps {
 		} else {
 			ImplBinaryInnerOps.edge4(input, output);
 		}
-		ImplBinaryBorderOps.edge4(input, output);
+		ImplBinaryBorderOps.edge4(input, output, outsideZero);
 
 		return output;
 	}
@@ -371,9 +372,10 @@ public class BinaryImageOps {
 	 *
 	 * @param input  Input image. Not modified.
 	 * @param output If not null, the output image.  If null a new image is declared and returned.  Modified.
+	 * @param outsideZero if true then pixels outside the image are treated as zero, otherwise one
 	 * @return Output image.
 	 */
-	public static GrayU8 edge8(GrayU8 input, GrayU8 output) {
+	public static GrayU8 edge8(GrayU8 input, GrayU8 output, boolean outsideZero ) {
 		output = InputSanityCheck.checkDeclare(input, output);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
@@ -381,7 +383,7 @@ public class BinaryImageOps {
 		} else {
 			ImplBinaryInnerOps.edge8(input, output);
 		}
-		ImplBinaryBorderOps.edge8(input, output);
+		ImplBinaryBorderOps.edge8(input, output, outsideZero);
 
 		return output;
 	}

@@ -10,6 +10,7 @@ Version : 0.34
   * Added corner detector
 - BinaryImageOps
   * Added concurrent implementations
+  * Modified edge so that outside pixels can be treated as 0 or 1
 - Demonstrations
   * modernize mosaic and stabilize
 - Examples

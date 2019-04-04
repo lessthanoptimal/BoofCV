@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.filter.binary.impl;
 
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 import boofcv.testing.CompareIdenticalFunctions;
 
 import java.lang.reflect.Method;
@@ -44,7 +45,7 @@ public class CompareToBinaryNaive extends CompareIdenticalFunctions {
 
 	@Override
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
-		if( targetParam.length == 3 ) {
+		if( targetParam.length == 3 && !m.getName().startsWith("edge")) {
 			Object[] ret = new Object[2];
 			ret[0] = targetParam[0];
 			ret[1] = targetParam[2];
@@ -76,14 +77,18 @@ public class CompareToBinaryNaive extends CompareIdenticalFunctions {
 		if(isSpecialFunction(candidate)) {
 			return new Object[][]{{input,1, output}};
 		} else {
-			return new Object[][]{{input, output}};
+			if( candidate.getName().startsWith("edge") && candidate.getParameterTypes().length == 3 ) {
+				return new Object[][]{{input, output, true},{input, output, false}};
+			} else {
+				return new Object[][]{{input, output}};
+			}
 		}
 	}
 
 	@Override
 	protected void compareResults(Object targetResult, Object[] targetParam, Object validationResult, Object[] validationParam) {
 
-		if( targetParam.length == 3 ) {
+		if( targetParam.length == 3 &&  !(targetParam[1] instanceof ImageBase) ) {
 			Object []tmp = new Object[2];
 			tmp[0] = targetParam[0];
 			tmp[1] = targetParam[2];
