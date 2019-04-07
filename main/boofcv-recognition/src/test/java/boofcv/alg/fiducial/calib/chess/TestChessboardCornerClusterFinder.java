@@ -27,7 +27,39 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class TestChessboardCornerClusterFinder {
 	@Test
-	void stuff() {
+	void perfect_2x2() {
+		fail("Implement");
+	}
+
+	@Test
+	void perfect_4x2() {
+		fail("Implement");
+	}
+
+	@Test
+	void perfect_3x3() {
+		fail("Implement");
+	}
+
+	/**
+	 * This contains an ambiguous corner and the algorithm needs to select the correct one
+	 */
+	@Test
+	void perfect_3x3_ambiguous() {
+		fail("Implement");
+	}
+
+	/**
+	 * There are two completely separate grids
+	 */
+	@Test
+	void perfect_2x2_2x2() {
+		fail("Implement");
+	}
+
+	// Reminder to test inner functions
+	@Test
+	void innerFunctions() {
 		fail("Implement");
 	}
 }
