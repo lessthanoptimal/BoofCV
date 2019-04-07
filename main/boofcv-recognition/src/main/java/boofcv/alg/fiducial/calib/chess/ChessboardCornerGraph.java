@@ -39,6 +39,21 @@ public class ChessboardCornerGraph {
 		return n;
 	}
 
+	public Node findClosest( double x , double y ) {
+		double distance = Double.MAX_VALUE;
+		Node closest = null;
+		for (int i = 0; i < corners.size; i++) {
+			Node n = corners.get(i);
+			double d = n.distance2(x,y);
+			if( d < distance ) {
+				distance = d;
+				closest = n;
+			}
+		}
+
+		return closest;
+	}
+
 	public void reset() {
 		corners.reset();
 	}

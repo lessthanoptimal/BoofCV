@@ -28,7 +28,7 @@ import org.ddogleg.nn.alg.KdTreeDistance;
 public class ChessboardCornerDistance implements KdTreeDistance<ChessboardCorner> {
 	@Override
 	public double distance(ChessboardCorner a, ChessboardCorner b) {
-		return a.distance(b);
+		return a.distance2(b);
 	}
 
 	@Override
