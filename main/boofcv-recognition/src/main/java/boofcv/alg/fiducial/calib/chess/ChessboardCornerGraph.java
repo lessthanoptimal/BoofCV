@@ -36,6 +36,7 @@ public class ChessboardCornerGraph {
 	public Node growCorner() {
 		Node n = corners.grow();
 		n.reset();
+		n.index = corners.size-1;
 		return n;
 	}
 
@@ -59,12 +60,33 @@ public class ChessboardCornerGraph {
 	}
 
 	public static class Node extends Point2D_F64 {
+		/**
+		 * Index in the node list
+		 */
+		public int index;
+		/**
+		 * Orientation of the corner feature as defined by the corner detector
+		 */
 		public double orientation;
-		public Node[] edges = new Node[4];
+		/**
+		 * References to other corners. Can only be connected to 4 corners in directions approximated 90 degrees apart.
+		 */
+		public final Node[] edges = new Node[4];
 
 		public void set(ChessboardCorner c) {
 			super.set(c);
 			this.orientation = c.orientation;
+		}
+
+		/**
+		 * Rotate edges down in the array.
+		 */
+		public void rotateEdgesDown() {
+			Node tmp = edges[0];
+			for (int i = 1; i < 4; i++) {
+				edges[i-1] = edges[i];
+			}
+			edges[3] = tmp;
 		}
 
 		public void reset() {

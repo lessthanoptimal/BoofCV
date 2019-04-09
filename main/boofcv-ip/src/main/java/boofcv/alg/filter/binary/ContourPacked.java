@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,10 +37,11 @@ public class ContourPacked {
 	 * Index in the packed list of the external contour
 	 */
 	public int externalIndex;
+
 	/**
-	 * Number of internal contours. Their ID = external + 1 + internal index
+	 * Index for each internal contour
 	 */
-	public GrowQueue_I32 internalIndexes = new GrowQueue_I32();
+	public GrowQueue_I32 internalIndexes = new GrowQueue_I32(0);
 
 	public void reset() {
 		id = -1;
