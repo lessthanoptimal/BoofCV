@@ -25,9 +25,50 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestChessboardCornerClusterToGrid {
+public class TestChessboardCornerClusterToGrid
+{
 	@Test
-	void stuff() {
+	void convert_nochange() {
+		fail("Implement");
+	}
+
+	@Test
+	void convert_randomized() {
+		fail("Implement");
+	}
+
+	@Test
+	void selectCorner() {
+		fail("Implement");
+	}
+
+	@Test
+	void isCornerValidOrigin() {
+		fail("Implement");
+	}
+
+	@Test
+	void orderNodes() {
+		fail("Implement");
+	}
+
+	@Test
+	void isRightHanded() {
+		fail("Implement");
+	}
+
+	@Test
+	void alignEdges() {
+		fail("Implement");
+	}
+
+	@Test
+	void sortEdgesCCW() {
+		fail("Implement");
+	}
+
+	@Test
+	void rotateCCW() {
 		fail("Implement");
 	}
 }

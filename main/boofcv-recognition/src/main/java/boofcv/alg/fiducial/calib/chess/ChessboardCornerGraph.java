@@ -22,6 +22,8 @@ import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 
+import java.util.List;
+
 /**
  * A graph describing the inner corners in a chessboard patterns.
  *
@@ -76,6 +78,18 @@ public class ChessboardCornerGraph {
 		public void set(ChessboardCorner c) {
 			super.set(c);
 			this.orientation = c.orientation;
+		}
+
+		/**
+		 * Iterates through edges until it encounters edge 'count'
+		 */
+		public void putEdgesIntoList(List<Node> found) {
+			found.clear();
+			for (int i = 0; i < 4; i++) {
+				if( edges[i] != null ) {
+					found.add( edges[i] );
+				}
+			}
 		}
 
 		/**
