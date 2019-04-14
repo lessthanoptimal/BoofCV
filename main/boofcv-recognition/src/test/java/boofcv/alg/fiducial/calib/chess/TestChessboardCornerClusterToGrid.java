@@ -22,9 +22,9 @@ import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph.Node;
 import georegression.metric.UtilAngle;
 import org.ddogleg.struct.FastQueue;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,40 +32,140 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestChessboardCornerClusterToGrid
+class TestChessboardCornerClusterToGrid
 {
-	Random rand = new Random(234);
+	private Random rand = new Random(234);
 
 	@Test
 	void convert_nochange() {
-		fail("Implement");
+		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
+		alg.setVerbose(System.out);
+
+		convert(alg,2,2,false);
+		convert(alg,2,3,false);
+		convert(alg,3,2,false);
+		convert(alg,3,3,false);
 	}
 
+	/**
+	 * Node order has been randomized
+	 */
 	@Test
 	void convert_randomized() {
-		fail("Implement");
+		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
+		alg.setVerbose(System.out);
+
+		// do a few loops to test more random cases
+		for (int i = 0; i < 10; i++) {
+			convert(alg,2,2,true);
+			convert(alg,2,3,true);
+			convert(alg,3,2,true);
+			convert(alg,3,3,true);
+			convert(alg,3,4,true);
+			convert(alg,4,4,true);
+		}
+	}
+
+	void convert(ChessboardCornerClusterToGrid alg, int rows , int cols , boolean randomized ) {
+		ChessboardCornerGraph graph = new ChessboardCornerGraph();
+		graph.corners = createGrid(rows,cols);
+
+		if( randomized ) {
+			for (int i = 0; i < graph.corners.size; i++) {
+				shuffle(graph.corners.get(i).edges);
+			}
+			graph.corners.shuffle(rand);
+		}
+
+		GridInfo info = new GridInfo();
+		assertTrue(alg.convert(graph,info));
+
+		// test shape
+		if( rows == info.rows ) {
+			assertEquals(cols, info.cols);
+		} else {
+			assertEquals(rows, info.cols);
+			assertEquals(cols, info.rows);
+		}
+		assertEquals(rows*cols,info.nodes.size());
+
+		// first should be a corner
+		Node n0 = info.get(0,0);
+		assertEquals(2,n0.countEdges());
+
+		// it should also have coordinate (0,0)
+		assertEquals(0,n0.x, UtilEjml.TEST_F64);
+		assertEquals(0,n0.y, UtilEjml.TEST_F64);
+
+		// test right handled
+		for (int i = 0; i < 4; i++) {
+			int j = (i+1)%4;
+			if( n0.edges[i] != null && n0.edges[j] != null ) {
+				double angle0 = direction(n0,n0.edges[i]);
+				double angle1 = direction(n0,n0.edges[j]);
+				assertEquals(Math.PI/2.0,UtilAngle.distanceCCW(angle0,angle1), 0.001);
+				break;
+			}
+		}
+	}
+
+	static double direction( Node a , Node b ) {
+		return Math.atan2(b.y-a.y,b.x-a.x);
 	}
 
 	@Test
 	void selectCorner() {
-		fail("Implement");
+		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
+		assertEquals(0,alg.selectCorner(createGridInfo(2,2)));
+		assertEquals(0,alg.selectCorner(createGridInfo(2,3)));
+		assertEquals(0,alg.selectCorner(createGridInfo(3,3)));
+	}
+
+
+	@Test
+	void isCornerValidOrigin_2x2() {
+		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
+		FastQueue<Node> nodes = createGrid(2,2);
+
+//		assertTrue(alg.isCornerValidOrigin(nodes.get(0)));
+		assertTrue(alg.isCornerValidOrigin(nodes.get(1)));
+		assertTrue(alg.isCornerValidOrigin(nodes.get(2)));
+		assertTrue(alg.isCornerValidOrigin(nodes.get(3)));
 	}
 
 	@Test
-	void isCornerValidOrigin() {
-		fail("Implement");
+	void isCornerValidOrigin_2x3() {
+		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
+		FastQueue<Node> nodes = createGrid(2,3);
+
+		assertTrue(alg.isCornerValidOrigin(nodes.get(0)));
+		assertFalse(alg.isCornerValidOrigin(nodes.get(2)));
+		assertTrue(alg.isCornerValidOrigin(nodes.get(3)));
+		assertFalse(alg.isCornerValidOrigin(nodes.get(5)));
+	}
+
+	@Test
+	void isCornerValidOrigin_3x3() {
+		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
+		FastQueue<Node> nodes = createGrid(3,3);
+
+		assertTrue(alg.isCornerValidOrigin(nodes.get(0)));
+		assertFalse(alg.isCornerValidOrigin(nodes.get(2*3)));
+		assertFalse(alg.isCornerValidOrigin(nodes.get(2)));
+		assertTrue(alg.isCornerValidOrigin(nodes.get(2*3+2)));
 	}
 
 	@Test
 	void orderNodes() {
 		for (int rows = 2; rows <= 4; rows++) {
 			for (int cols = 2; cols <= 4; cols++) {
-				FastQueue<Node> corners = createGrid(rows, cols);
+				for (int i = 0; i < 10; i++) {
+					FastQueue<Node> corners = createGrid(rows, cols);
 
-				// randomize the order so that it needs to do something interesting
-				Collections.shuffle(corners.toList(),rand);
-
-				orderNodes(corners,rows,cols);
+					// randomize the order so that it needs to do something interesting
+					corners.shuffle(rand);
+					orderNodes(corners,rows,cols);
+				}
 			}
 		}
 	}
@@ -141,6 +241,13 @@ public class TestChessboardCornerClusterToGrid
 		}
 	}
 
+	private GridInfo createGridInfo(int rows, int cols) {
+		GridInfo output = new GridInfo();
+		output.rows = rows;
+		output.cols = cols;
+		output.nodes.addAll(createGrid(rows, cols).toList());
+		return output;
+	}
 	private FastQueue<Node> createGrid(int rows, int cols) {
 		FastQueue<Node> corners = new FastQueue<>(Node.class,true);
 
@@ -151,6 +258,10 @@ public class TestChessboardCornerClusterToGrid
 				n.index = row*cols+col;
 				n.x = col*30;
 				n.y = row*30;
+				n.orientation = Math.PI/4;
+				if( (row%2 + col%2)==1)
+					n.orientation -= Math.PI/2;
+
 				if( row > 0 ) {
 					Node p = corners.get((row-1)*cols+col);
 					p.edges[1] = n;
@@ -175,8 +286,9 @@ public class TestChessboardCornerClusterToGrid
 			target.x = 10;
 			target.y = 12;
 
+			// always 3 edges 90 degrees apart
 			for (int i = 0; i < 3; i++) {
-				double theta = -(i+nodeIdx)*0.5+nodeIdx;
+				double theta = -(i+nodeIdx)*Math.PI/2.0+nodeIdx;
 				double c = Math.cos(theta);
 				double s = Math.sin(theta);
 
@@ -186,6 +298,7 @@ public class TestChessboardCornerClusterToGrid
 				n.y = target.y + r*s;
 				target.edges[i+1] = n;
 			}
+			shuffle(target.edges);
 		}
 
 		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
@@ -193,17 +306,22 @@ public class TestChessboardCornerClusterToGrid
 		alg.sortEdgesCCW(corners);
 
 		for( Node n : corners.toList() ) {
-			for (int i = 1; i < 3; i++) {
-				Node m0 = n.edges[i-1];
-				Node m1 = n.edges[i];
+			int tested = 0;
+			for (int i = 0; i < 4; i++) {
+				int j = (i+1)%4;
+				if( n.edges[i] == null || n.edges[j] == null )
+					continue;
+				Node m0 = n.edges[i];
+				Node m1 = n.edges[j];
 
 				double theta0 = Math.atan2(m0.y-n.y,m0.x-n.x);
 				double theta1 = Math.atan2(m1.y-n.y,m1.x-n.x);
 
-				double diff = UtilAngle.minus(theta1,theta0);
-				assertTrue(diff>0.1);
+				double diff = UtilAngle.distanceCCW(theta0,theta1);
+				assertTrue(UtilAngle.dist(diff,Math.PI/2.0)< 0.01);
+				tested++;
 			}
-			assertNull(n.edges[3]);
+			assertEquals(2,tested);
 		}
 	}
 
@@ -213,6 +331,8 @@ public class TestChessboardCornerClusterToGrid
 	@Test
 	void sortEdgesCCW_shift() {
 		FastQueue<Node> corners = new FastQueue<>(Node.class,true);
+
+		// Add nodes with 3 edges
 		for (int jump = 0; jump < 3; jump++) {
 			Node target = corners.grow();
 			target.x = 10;
@@ -231,6 +351,29 @@ public class TestChessboardCornerClusterToGrid
 				n.y = target.y + r*s;
 				target.edges[i] = n;
 			}
+			// shuffle to make it a better test
+			shuffle(target.edges);
+		}
+
+		// add Nodes with two edges
+		for (int count = 0; count < 10; count++) {
+			Node target = corners.grow();
+			target.x = 10;
+			target.y = 12;
+
+			for (int i = 0; i < 2; i++) {
+				double theta = i*Math.PI/2;
+				double c = Math.cos(theta);
+				double s = Math.sin(theta);
+
+				double r = 4;
+				Node n = new Node();
+				n.x = target.x + r*c;
+				n.y = target.y + r*s;
+				target.edges[i] = n;
+			}
+			// shuffle to make it a better test
+			shuffle(target.edges);
 		}
 
 		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
@@ -238,7 +381,6 @@ public class TestChessboardCornerClusterToGrid
 		alg.sortEdgesCCW(corners);
 
 		for( Node n : corners.toList() ) {
-			System.out.println();
 			Node m0 = n.edges[0];
 			double theta0 = Math.atan2(m0.y-n.y,m0.x-n.x);
 
@@ -254,8 +396,13 @@ public class TestChessboardCornerClusterToGrid
 		}
 	}
 
-	@Test
-	void rotateCCW() {
-		fail("Implement");
+	private void shuffle( Node[] edges ) {
+		for (int i = 0; i < 4; i++) {
+			int src = rand.nextInt(4-i);
+			Node a = edges[src];
+			Node b = edges[4-i-1];
+			edges[4-i-1] = a;
+			edges[src] = b;
+		}
 	}
 }

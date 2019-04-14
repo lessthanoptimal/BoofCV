@@ -77,6 +77,10 @@ public class ChessboardCornerClusterToGrid {
 
 		// select a valid corner to be (0,0). If there are multiple options select the one which is
 		int corner = selectCorner(info);
+		if( corner == -1 ) {
+			if( verbose != null) verbose.println("Failed to find valid corner.");
+			return false;
+		}
 		// rotate the grid until the select corner is at (0,0)
 		for (int i = 0; i < corner; i++) {
 			rotateCCW(info);
@@ -128,7 +132,7 @@ public class ChessboardCornerClusterToGrid {
 		double dirA = Math.atan2(a.y-candidate.y, a.x-candidate.x);
 		double dirB = Math.atan2(b.y-candidate.y, b.x-candidate.x);
 
-		double dirAB = UtilAngle.boundHalf(dirA+UtilAngle.distanceCW(dirA,dirB)/2.0);
+		double dirAB = UtilAngle.boundHalf(dirA+UtilAngle.distanceCCW(dirA,dirB)/2.0);
 
 		// Find the acute angle between the corner's orientation and the vector
 		double acute = UtilAngle.distHalf(dirAB,candidate.orientation);
@@ -254,6 +258,7 @@ public class ChessboardCornerClusterToGrid {
 					continue;
 				}
 
+
 				// Rotate edges
 				boolean failed = true;
 				for (int attempt = 0; attempt < 4; attempt++) {
@@ -282,6 +287,8 @@ public class ChessboardCornerClusterToGrid {
 		for (int nodeIdx = 0; nodeIdx < corners.size; nodeIdx++) {
 			Node na = corners.get(nodeIdx);
 
+			// reference node to do angles relative to.
+			double ref = Double.NaN;
 			int count = 0;
 			for (int i = 0; i < 4; i++) {
 				order[i] = i;
@@ -289,9 +296,15 @@ public class ChessboardCornerClusterToGrid {
 				if( na.edges[i] == null ) {
 					directions[i] = Double.MAX_VALUE;
 				} else {
-					count++;
 					Node nb = na.edges[i];
-					directions[i] = Math.atan2(nb.y-na.y,nb.x-na.x);
+					double angleB = Math.atan2(nb.y-na.y,nb.x-na.x);
+					if( Double.isNaN(ref) ) {
+						ref = angleB;
+						directions[i] = 0;
+					} else {
+						directions[i] = UtilAngle.distanceCCW(ref,angleB);
+					}
+					count++;
 				}
 			}
 
@@ -299,9 +312,19 @@ public class ChessboardCornerClusterToGrid {
 			for (int i = 0; i < 4; i++) {
 				na.edges[i] = tmpEdges[ order[i] ];
 			}
-			// Edges need to point along the 4 possible directions, in the case of 3 edges, there might
-			// need to be a gap at a different location than at the end
-			if( count == 3 ) {
+			if( count == 2 ) {
+				// If there are only two then we define the order to be defined by the one which minimizes
+				// CCW direction
+				if( directions[order[1]] > Math.PI) {
+					na.edges[0] = tmpEdges[ order[1] ];
+					na.edges[1] = tmpEdges[ order[0] ];
+				} else {
+					na.edges[0] = tmpEdges[ order[0] ];
+					na.edges[1] = tmpEdges[ order[1] ];
+				}
+			} else if( count == 3 ) {
+				// Edges need to point along the 4 possible directions, in the case of 3 edges, there might
+				// need to be a gap at a different location than at the end
 				double tail = UtilAngle.distanceCCW(directions[order[2]],directions[order[0]]);
 				for (int i = 1; i <3; i++) {
 					double ccw = UtilAngle.distanceCCW(directions[order[i-1]],directions[order[i]]);
@@ -314,6 +337,10 @@ public class ChessboardCornerClusterToGrid {
 					}
 				}
 			}
+			for (int i = 0; i < 4; i++) {
+				if( na.edges[i] == null )
+					continue;
+			}
 		}
 	}
 
@@ -322,11 +349,15 @@ public class ChessboardCornerClusterToGrid {
 	 */
 	void rotateCCW(GridInfo grid ) {
 		cornerList.clear();
-		for (int row = 0; row < grid.rows; row++) {
-			for (int col = 0; col < grid.cols; col++) {
-				cornerList.add(grid.get(col, grid.cols - row - 1));
+		for (int col = 0; col < grid.cols; col++) {
+			for (int row = 0; row < grid.rows; row++) {
+				cornerList.add(grid.get(row,grid.cols - col - 1));
 			}
 		}
+		int tmp = grid.rows;
+		grid.rows = grid.cols;
+		grid.cols = tmp;
+
 		grid.nodes.clear();
 		grid.nodes.addAll(cornerList);
 	}
@@ -353,7 +384,7 @@ public class ChessboardCornerClusterToGrid {
 			corners.add( this.nodes.get(0) );
 			corners.add( this.nodes.get(cols-1) );
 			corners.add( this.nodes.get(rows*cols-1) );
-			corners.add( this.nodes.get(rows*(cols-1)) );
+			corners.add( this.nodes.get((rows-1)*cols) );
 		}
 	}
 }
