@@ -144,7 +144,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\t}\n"+
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic InterpolatePixelS<"+image.getSingleBandName()+"> newInstance() {\n" +
+				"\tpublic InterpolatePixelS<"+image.getSingleBandName()+"> copy() {\n" +
 				"\t\treturn new "+className+"();\n" +
 				"\t}\n" +
 				"\n" +
