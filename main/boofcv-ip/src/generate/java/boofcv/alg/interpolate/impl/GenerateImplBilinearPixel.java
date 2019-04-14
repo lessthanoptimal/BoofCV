@@ -43,6 +43,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 		createType(AutoTypeImage.F64);
 		createType(AutoTypeImage.F32);
 		createType(AutoTypeImage.U8);
+		createType(AutoTypeImage.U16);
 		createType(AutoTypeImage.S16);
 		createType(AutoTypeImage.S32);
 	}
@@ -143,7 +144,7 @@ public class GenerateImplBilinearPixel extends CodeGeneratorBase {
 				"\t}\n"+
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic InterpolatePixelS<"+image.getSingleBandName()+"> newInstance() {\n" +
+				"\tpublic InterpolatePixelS<"+image.getSingleBandName()+"> copy() {\n" +
 				"\t\treturn new "+className+"();\n" +
 				"\t}\n" +
 				"\n" +

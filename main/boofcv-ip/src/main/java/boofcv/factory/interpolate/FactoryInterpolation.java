@@ -176,6 +176,8 @@ public class FactoryInterpolation {
 			alg = (InterpolatePixelS<T>)new ImplBilinearPixel_F64();
 		else if( imageType == GrayU8.class )
 			alg = (InterpolatePixelS<T>)new ImplBilinearPixel_U8();
+		else if( imageType == GrayU16.class )
+			alg = (InterpolatePixelS<T>)new ImplBilinearPixel_U16();
 		else if( imageType == GrayS16.class )
 			alg = (InterpolatePixelS<T>)new ImplBilinearPixel_S16();
 		else if( imageType == GrayS32.class )
@@ -205,6 +207,10 @@ public class FactoryInterpolation {
 			switch( imageType.getDataType()) {
 				case U8:
 					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_IL_U8(numBands);
+					break;
+
+				case U16:
+					alg = (InterpolatePixelMB<T>)new ImplBilinearPixel_IL_U16(numBands);
 					break;
 
 				case S16:
