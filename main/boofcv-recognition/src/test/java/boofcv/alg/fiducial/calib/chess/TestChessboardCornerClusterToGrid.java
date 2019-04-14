@@ -18,10 +18,14 @@
 
 package boofcv.alg.fiducial.calib.chess;
 
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph.Node;
 import georegression.metric.UtilAngle;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestChessboardCornerClusterToGrid
 {
+	Random rand = new Random(234);
+
 	@Test
 	void convert_nochange() {
 		fail("Implement");
@@ -52,18 +58,112 @@ public class TestChessboardCornerClusterToGrid
 
 	@Test
 	void orderNodes() {
-		fail("Implement");
+		for (int rows = 2; rows <= 4; rows++) {
+			for (int cols = 2; cols <= 4; cols++) {
+				FastQueue<Node> corners = createGrid(rows, cols);
+
+				// randomize the order so that it needs to do something interesting
+				Collections.shuffle(corners.toList(),rand);
+
+				orderNodes(corners,rows,cols);
+			}
+		}
+	}
+
+	void orderNodes(FastQueue<Node> corners , int rows, int cols ) {
+		GridInfo info = new GridInfo();
+		info.reset();
+
+		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
+		assertTrue(alg.orderNodes(corners,info));
+
+		// rows and cols could be swapped arbitrarily
+		if( rows == info.rows ) {
+			assertEquals(cols, info.cols);
+		} else {
+			assertEquals(rows, info.cols);
+			assertEquals(cols, info.rows);
+		}
 	}
 
 	@Test
 	void isRightHanded() {
-		fail("Implement");
+		Node n = new Node();
+		n.x = 10;
+		n.y = 20;
+
+		Node a = new Node();
+		Node b = new Node();
+
+		a.x = n.x + 10; // this will be the column
+		a.y = n.y;
+
+		b.x = n.x;
+		b.y = n.y + 10; // row
+
+		n.edges[0] = a;
+		n.edges[1] = b;
+
+		assertFalse(ChessboardCornerClusterToGrid.isRightHanded(n,0,1));
+		assertTrue(ChessboardCornerClusterToGrid.isRightHanded(n,1,0));
 	}
 
 	@Test
 	void alignEdges() {
-		// TODO write next.
-		fail("Implement");
+		for (int rows = 2; rows <= 4; rows++) {
+			for (int cols = 2; cols <= 4; cols++) {
+				FastQueue<Node> corners = createGrid(rows, cols);
+
+				// Shift the edges so that they won't be aligned
+				// They are already in order
+				Node[] tmp = new Node[4];
+				for( Node n : corners.toList() ) {
+					int amount = rand.nextInt(3);
+
+					System.arraycopy(n.edges,0,tmp,0,4);
+					for (int i = 0; i < 4; i++) {
+						n.edges[(i+amount)%4] = tmp[i];
+					}
+				}
+
+				ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
+				assertTrue(alg.alignEdges(corners));
+
+				// Check using (i+2)%4 rule
+				for( Node n : corners.toList() ) {
+					for (int i = 0; i < 4; i++) {
+						if( n.edges[i] == null )
+							continue;
+						assertSame(n, n.edges[i].edges[(i + 2) % 4]);
+					}
+				}
+			}
+		}
+	}
+
+	private FastQueue<Node> createGrid(int rows, int cols) {
+		FastQueue<Node> corners = new FastQueue<>(Node.class,true);
+
+		// declare the grid
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				Node n = corners.grow();
+				n.index = row*cols+col;
+				n.x = col*30;
+				n.y = row*30;
+				if( row > 0 ) {
+					Node p = corners.get((row-1)*cols+col);
+					p.edges[1] = n;
+					n.edges[3] = p;
+				}
+				if( col > 0 ) {
+					Node p = corners.get(row*cols+col-1);
+					p.edges[0] = n;
+					n.edges[2] = p;
+				}
+			}
+		}
+		return corners;
 	}
 
 	@Test
@@ -108,7 +208,7 @@ public class TestChessboardCornerClusterToGrid
 	}
 
 	/**
-	 * Need to shift elements after sorting to ensure cardinal directions.
+	 * Need to shift elements after sorting to ensure edges are every 90 degrees
 	 */
 	@Test
 	void sortEdgesCCW_shift() {

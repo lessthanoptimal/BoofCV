@@ -165,10 +165,9 @@ public class DetectChessboardCorners {
 		// find the small regions. Th se might be where corners are
 		contourFinder.process(binary);
 
-		int dropped = 0;
 		corners.reset();
 		List<ContourPacked> packed = contourFinder.getContours();
-		System.out.println("  * features.size = "+packed.size());
+//		System.out.println("  * features.size = "+packed.size());
 		for (int i = 0; i < packed.size(); i++) {
 			contourFinder.loadContour(i,contour);
 
@@ -185,7 +184,6 @@ public class DetectChessboardCorners {
 //			System.out.println("radius = "+radius+" angle = "+c.angle);
 //			System.out.println("intensity "+c.intensity);
 			if( c.intensity < 50 ) { // TODO make configurable
-				dropped++;
 				corners.removeTail();
 			}
 

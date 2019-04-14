@@ -65,15 +65,14 @@ public class ChessboardCornerClusterToGrid {
 	 */
 	public boolean convert( ChessboardCornerGraph cluster , GridInfo info ) {
 		// default to an invalid value to ensure a failure doesn't go unnoticed.
-		info.cols = info.rows = -1;
-		info.nodes.clear();
+		info.reset();
 
 		// Get the edges in a consistent order
 		if( !orderEdges(cluster) )
 			return false;
 
 		// Now we need to order the nodes into a proper grid which follows right hand rule
-		if( !orderNodes(cluster,info) )
+		if( !orderNodes(cluster.corners,info) )
 			return false;
 
 		// select a valid corner to be (0,0). If there are multiple options select the one which is
@@ -141,12 +140,12 @@ public class ChessboardCornerClusterToGrid {
 	 * Put corners into a proper grid. Make sure its a rectangular grid or else return false. Rows and columns
 	 * are selected to ensure right hand rule.
 	 */
-	boolean orderNodes( ChessboardCornerGraph cluster , GridInfo info ) {
+	boolean orderNodes( FastQueue<Node> corners , GridInfo info ) {
 
 		// Find a node with just two edges. This is a corner and will be the arbitrary origin in our graph
 		Node seed = null;
-		for (int i = 0; i < cluster.corners.size; i++) {
-			Node n = cluster.corners.get(i);
+		for (int i = 0; i < corners.size; i++) {
+			Node n = corners.get(i);
 			if( n.countEdges() == 2 ) {
 				seed = n;
 				break;
@@ -160,10 +159,10 @@ public class ChessboardCornerClusterToGrid {
 		// find one edge and mark that as the row direction
 		int rowEdge = 0;
 		while( seed.edges[rowEdge] == null )
-			rowEdge++;
-		int colEdge = rowEdge+1;
+			rowEdge = (rowEdge+1)%4;
+		int colEdge = (rowEdge+1)%4;
 		while( seed.edges[colEdge] == null )
-			colEdge++;
+			colEdge = (colEdge+2)%4;
 
 		// if it's left handed swap the row and column direction
 		if( !isRightHanded(seed,rowEdge,colEdge)) {
@@ -173,15 +172,15 @@ public class ChessboardCornerClusterToGrid {
 		}
 
 		// add the corns to list in a row major order
-		while( seed.edges[colEdge] != null ) {
+		while( seed != null ) {
 			int before = info.nodes.size();
-			info.nodes.add(seed);
 			Node n = seed;
-			while( n != null ) {
-				n = n.edges[rowEdge];
+			do {
 				info.nodes.add(n);
-			}
-			seed = seed.edges[colEdge];
+				n = n.edges[colEdge];
+			} while( n != null );
+
+			seed = seed.edges[rowEdge];
 
 			if( info.cols == -1 ) {
 				info.cols = info.nodes.size();
@@ -198,7 +197,10 @@ public class ChessboardCornerClusterToGrid {
 	}
 
 	/**
-	 * Checks to see if the rows and columns for a coordinate system which si right handed
+	 * Checks to see if the rows and columns for a coordinate system which is right handed
+	 *
+	 * @param idxRow Index for moving up a row
+	 * @param idxCol index for moving up a column
 	 */
 	static boolean isRightHanded( Node seed , int idxRow , int idxCol ) {
 		Node r = seed.edges[idxRow];
@@ -242,6 +244,8 @@ public class ChessboardCornerClusterToGrid {
 				int j = (i+2)%4;
 
 				Node nb = na.edges[i];
+
+				// Sanity check. If it has been marked it should be correctly aligned
 				if( marked.get(nb.index) ) {
 					if( nb.edges[j] != na ) {
 						if( verbose != null ) verbose.println("BUG! node has been processed and its edges do not align.");
@@ -265,6 +269,7 @@ public class ChessboardCornerClusterToGrid {
 					return false;
 				}
 				marked.set(nb.index,true);
+				open.add(nb);
 			}
 		}
 		return true;
@@ -333,6 +338,11 @@ public class ChessboardCornerClusterToGrid {
 	public static class GridInfo {
 		public List<Node> nodes = new ArrayList<>();
 		public int rows,cols;
+
+		public void reset() {
+			rows = cols = -1;
+			nodes.clear();
+		}
 
 		public Node get( int row , int col ) {
 			return nodes.get( row*cols + col);
