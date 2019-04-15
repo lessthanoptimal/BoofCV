@@ -47,7 +47,7 @@ public class ChessboardCornerClusterFinder {
 	// how close to the expected orientation a corner needs to be. radians
 	double orientationTol = 0.5;
 	// angle tolerance for edge direction. radians
-	double directionTol = 0.2;
+	double directionTol = 0.3;
 	// maximum fractional error allowed between two distances
 	double distanceTol = 0.2;
 
@@ -334,8 +334,8 @@ public class ChessboardCornerClusterFinder {
 		double bestScore = Double.MAX_VALUE;
 		int bestIndexNhb = -1;
 
-		for (int i = 0; i < ntarget.neighbors.size(); i++) {
-			LocalInfo n = ntarget.neighbors.get(i);
+		for (int idxNhb = 0; idxNhb < ntarget.neighbors.size(); idxNhb++) {
+			LocalInfo n = ntarget.neighbors.get(idxNhb);
 
 			// see if the orientation error is within tolerance
 			double errorDir = UtilAngle.dist(direction,n.direction);
@@ -350,7 +350,7 @@ public class ChessboardCornerClusterFinder {
 
 			if( score < bestScore ) {
 				bestScore = score;
-				bestIndexNhb = i;
+				bestIndexNhb = idxNhb;
 			}
 		}
 
@@ -381,8 +381,8 @@ public class ChessboardCornerClusterFinder {
 			LocalInfo target = node.neighbors.get( connections.dst.get(0) );
 
 			boolean ambiguous = false;
-			for (int i = 0; i < node.neighbors.size; i++) {
-				LocalInfo a = node.neighbors.get(i);
+			for (int idxNhbA = 0; idxNhbA < node.neighbors.size; idxNhbA++) {
+				LocalInfo a = node.neighbors.get(idxNhbA);
 				if( a == target )
 					continue;
 				double angleDiff = UtilAngle.dist(target.direction,a.direction);
@@ -393,7 +393,7 @@ public class ChessboardCornerClusterFinder {
 				double distErr = Math.abs(target.distance-a.distance)/Math.max(target.distance,a.distance);
 				if( distErr <= distanceTol ) {
 					ambiguous = true;
-					connections.dst.add( a.index );
+					connections.dst.add( idxNhbA );
 				}
 			}
 
@@ -581,7 +581,7 @@ public class ChessboardCornerClusterFinder {
 			if( connections == null )
 				continue;
 			for (int idxC = 0; idxC < connections.dst.size; idxC++) {
-				LNode dst = nodes.get(connections.dst.get(idxC));
+				LNode dst = nodes.get(target.neighbors.get(connections.dst.get(idxC)).index);
 				if (!dst.removeConnection(target.index)) {
 					throw new RuntimeException("BUG!");
 				}
@@ -669,14 +669,14 @@ public class ChessboardCornerClusterFinder {
 		 * Removes all edges which connect
 		 * @return true if a connection was removed and false if it.
 		 */
-		public boolean removeConnection( int index ) {
+		public boolean removeConnection( int indexNhb ) {
 			boolean found = false;
 			for (int i = 3; i >= 0 ; i--) {
 				LConnections c = edges[i];
 				if( c == null )
 					continue;
 				for (int j = c.dst.size-1; j >= 0; j--) {
-					if( neighbors.get(c.dst.data[j]).index == index ) {
+					if( neighbors.get(c.dst.data[j]).index == indexNhb ) {
 						if( found )
 							throw new RuntimeException("BUG!");
 						found = true;

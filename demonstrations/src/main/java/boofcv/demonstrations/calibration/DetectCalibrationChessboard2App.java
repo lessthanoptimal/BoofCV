@@ -22,9 +22,11 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard2;
 import boofcv.abst.fiducial.calib.ConfigChessboard2;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
+import boofcv.core.graph.FeatureGraph2D;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
@@ -87,10 +89,13 @@ public class DetectCalibrationChessboard2App
 	// used to compute feature intensity
 	final Object lockAlgorithm = new Object();
 
+	//-----------------
 	final Object lockCorners = new Object();
 	FastQueue<ChessboardCorner> foundCorners = new FastQueue<>(ChessboardCorner.class,true);
 	FastQueue<Point2D_F64> foundChessboard = new FastQueue<>(Point2D_F64.class,true);
+	FastQueue<FeatureGraph2D> foundClusters = new FastQueue<>(FeatureGraph2D.class,true);
 	boolean success;
+	//-----------------
 
 	public DetectCalibrationChessboard2App(List<PathLabel> examples ) {
 		super(true,true,examples,ImageType.single(GrayF32.class));
@@ -207,6 +212,12 @@ public class DetectCalibrationChessboard2App
 						foundChessboard.grow().set(detected.get(i));
 					}
 				}
+
+				foundClusters.reset();
+				FastQueue<ChessboardCornerGraph> clusters = detector.getClusterFinder().getOutputClusters();
+				for (int i = 0; i < clusters.size; i++) {
+					clusters.get(i).convert(foundClusters.grow());
+				}
 			}
 		}
 
@@ -247,9 +258,8 @@ public class DetectCalibrationChessboard2App
 				g2.setComposite(beforeAC);
 			}
 
+			Line2D.Double line = new Line2D.Double();
 			if( controlPanel.showCorners) {
-				Line2D.Double line = new Line2D.Double();
-
 				synchronized (lockCorners) {
 					g2.setStroke(new BasicStroke(3));
 					for (int i = 0; i < foundCorners.size; i++) {
@@ -272,7 +282,25 @@ public class DetectCalibrationChessboard2App
 
 			if( controlPanel.showClusters ) {
 				synchronized (lockCorners) {
+					int width = img.getWidth();
+					int height = img.getHeight();
 
+
+					for (int i = 0; i < foundClusters.size; i++) {
+						FeatureGraph2D graph = foundClusters.get(i);
+
+						// draw black outline
+						g2.setStroke(new BasicStroke(5));
+						g2.setColor(Color.black);
+						renderGraph(g2, line, graph);
+
+						// make each graph a different color depending on position
+						FeatureGraph2D.Node n0 = graph.nodes.get(0);
+						int color = (int)((n0.x/width)*255) << 16 | (int)((n0.y/height)*255) << 8 | 180;
+						g2.setColor(new Color(color));
+						g2.setStroke(new BasicStroke(3));
+						renderGraph(g2, line, graph);
+					}
 				}
 			}
 
@@ -280,6 +308,17 @@ public class DetectCalibrationChessboard2App
 				synchronized (lockCorners) {
 					DisplayPinholeCalibrationPanel.renderOrder(g2, scale, foundChessboard.toList());
 				}
+			}
+		}
+
+		private void renderGraph(Graphics2D g2, Line2D.Double line, FeatureGraph2D graph) {
+			for (int j = 0; j < graph.edges.size; j++) {
+				FeatureGraph2D.Edge e = graph.edges.get(j);
+				Point2D_F64 a = graph.nodes.get(e.src);
+				Point2D_F64 b = graph.nodes.get(e.dst);
+
+				line.setLine(a.x * scale, a.y * scale, b.x * scale, b.y * scale);
+				g2.draw(line);
 			}
 		}
 	}

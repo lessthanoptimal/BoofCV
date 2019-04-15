@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
+import boofcv.core.graph.FeatureGraph2D;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -34,6 +35,30 @@ import java.util.List;
 public class ChessboardCornerGraph {
 
 	public FastQueue<Node> corners = new FastQueue<>(Node.class,true);
+
+	/**
+	 * Convert into a generic graph.
+	 */
+	public void convert( FeatureGraph2D graph ) {
+		graph.nodes.resize(corners.size);
+		graph.reset();
+		for (int i = 0; i < corners.size; i++) {
+			Node c = corners.get(i);
+			FeatureGraph2D.Node n = graph.nodes.grow();
+			n.reset();
+			n.set(c.x,c.y);
+			n.index = c.index;
+		}
+
+		for (int i = 0; i < corners.size; i++) {
+			Node c = corners.get(i);
+			for (int j = 0; j < 4; j++) {
+				if( c.edges[j] == null )
+					continue;
+				graph.connect(c.index,c.edges[j].index);
+			}
+		}
+	}
 
 	public Node growCorner() {
 		Node n = corners.grow();
