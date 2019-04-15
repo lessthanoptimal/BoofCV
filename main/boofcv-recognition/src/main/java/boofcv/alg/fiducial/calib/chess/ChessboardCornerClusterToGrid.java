@@ -258,7 +258,6 @@ public class ChessboardCornerClusterToGrid {
 					continue;
 				}
 
-
 				// Rotate edges
 				boolean failed = true;
 				for (int attempt = 0; attempt < 4; attempt++) {
@@ -315,7 +314,7 @@ public class ChessboardCornerClusterToGrid {
 			if( count == 2 ) {
 				// If there are only two then we define the order to be defined by the one which minimizes
 				// CCW direction
-				if( directions[order[1]] > Math.PI) {
+				if( directions[order[1]] > Math.PI*3.0/4.0) {
 					na.edges[0] = tmpEdges[ order[1] ];
 					na.edges[1] = tmpEdges[ order[0] ];
 				} else {

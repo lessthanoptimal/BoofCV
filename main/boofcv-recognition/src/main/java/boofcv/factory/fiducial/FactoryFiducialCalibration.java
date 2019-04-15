@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,6 +56,21 @@ public class FactoryFiducialCalibration {
 		config.checkValidity();
 
 		return new CalibrationDetectorChessboard(config);
+	}
+
+	/**
+	 * Detector for chessboard targets.  Squares can be partially outside, but inside corners must be entirely
+	 * inside the image.
+	 *
+	 * @see DetectChessboardFiducial
+	 *
+	 * @param config Configuration for chessboard detector
+	 * @return Square grid target detector.
+	 */
+	public static CalibrationDetectorChessboard2 chessboard(ConfigChessboard2 config ) {
+		config.checkValidity();
+
+		return new CalibrationDetectorChessboard2(config);
 	}
 
 	/**

@@ -309,6 +309,10 @@ public class DetectChessboardCorners {
 		return corners;
 	}
 
+	public BinaryContourFinderLinearExternal getContourFinder() {
+		return contourFinder;
+	}
+
 	/**
 	 * @param inputToBinary Thresholding algorithm. If using a histogram based approach keep in mind
 	 *                      that the number of values is specified by grayLevels. OTSU is recommended

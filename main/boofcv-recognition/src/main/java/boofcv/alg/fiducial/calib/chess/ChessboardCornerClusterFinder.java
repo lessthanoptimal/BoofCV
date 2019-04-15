@@ -45,9 +45,9 @@ public class ChessboardCornerClusterFinder {
 	int maxNeighbors=16; // 8 is minimum number given perfect data.
 
 	// how close to the expected orientation a corner needs to be. radians
-	double orientationTol = 0.1;
+	double orientationTol = 0.5;
 	// angle tolerance for edge direction. radians
-	double directionTol = 0.1;
+	double directionTol = 0.2;
 	// maximum fractional error allowed between two distances
 	double distanceTol = 0.2;
 
@@ -447,11 +447,11 @@ public class ChessboardCornerClusterFinder {
 				LNode n = nodes.get(idxNode);
 
 				// to be part of a grid it needs to have two edges 90 degrees apart
-				if( n.edges[0] == null && n.edges[1] == null ||
-						n.edges[1] == null && n.edges[3] == null )
+				if( (n.edges[0] == null && n.edges[1] == null) ||
+						(n.edges[1] == null && n.edges[3] == null) )
 				{
 					// remove all of this nodes connections. Effectively removing it from the graph
-					changed = true;
+
 					for (int j = 0; j < 4; j++) {
 						LConnections connections = n.edges[j];
 						if (connections == null)
@@ -459,9 +459,11 @@ public class ChessboardCornerClusterFinder {
 						for (int idxC = 0; idxC < connections.dst.size; idxC++) {
 							LNode dst = nodes.get(n.neighbors.get(connections.dst.get(idxC)).index);
 							if (!dst.removeConnection(idxNode)) {
-								throw new RuntimeException("BUG!");
+								throw new RuntimeException(dst.index+" not connected to "+n.index);
 							}
 						}
+						n.edges[j] = null;
+						changed = true;
 					}
 				}
 
@@ -638,6 +640,7 @@ public class ChessboardCornerClusterFinder {
 		public boolean insideCluster = false;
 
 		public void reset() {
+			neighbors.reset();
 			index = -1;
 			insideCluster = false;
 			for (int i = 0; i < 4; i++) {
