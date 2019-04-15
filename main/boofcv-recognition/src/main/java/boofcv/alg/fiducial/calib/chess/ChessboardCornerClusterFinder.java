@@ -479,16 +479,16 @@ public class ChessboardCornerClusterFinder {
 	private void findAndResolveAllAmbiguity() {
 		List<LNode> candidates = new ArrayList<>();
 
-		for (int i = 0; i < ambiguousEdges.size(); i++) {
-			LConnections conn = ambiguousEdges.get(i);
+		for (int idxEdge = 0; idxEdge < ambiguousEdges.size(); idxEdge++) {
+			LConnections conn = ambiguousEdges.get(idxEdge);
 			// see if the ambiguity was already resolved
 			if( conn.dst.size <= 1 )
 				continue;
 
 			// Create a list of the nodes which are being considered
 			candidates.clear();
-			for (int j = 0; j < conn.dst.size; j++) {
-				LocalInfo info = conn.src.neighbors.get( conn.dst.get(j) );
+			for (int idxDst = 0; idxDst < conn.dst.size; idxDst++) {
+				LocalInfo info = conn.src.neighbors.get( conn.dst.get(idxDst) );
 				candidates.add( nodes.get(info.index) );
 			}
 
@@ -518,7 +518,7 @@ public class ChessboardCornerClusterFinder {
 	private int selectNodeToKeep( List<LNode> candidates ) {
 		int bestIndex = -1;
 		int bestEdges = 0;
-		double bestScore = 0;
+		double bestError = 0;
 
 		for (int i = 0; i < candidates.size(); i++) {
 			LNode n = candidates.get(i);
@@ -527,12 +527,12 @@ public class ChessboardCornerClusterFinder {
 
 			if( numEdges > bestEdges ) {
 				bestEdges = numEdges;
-				bestScore = ambiguityScore(n);
+				bestError = ambiguityError(n);
 				bestIndex = i;
 			} else if( numEdges == bestEdges ) {
-				double score = ambiguityScore(n);
-				if( score > bestScore ) {
-					bestScore = score;
+				double error = ambiguityError(n);
+				if( error < bestError ) {
+					bestError = error;
 					bestIndex = i;
 				}
 			}
@@ -544,7 +544,7 @@ public class ChessboardCornerClusterFinder {
 	 * Computes an error for edges pointing towards this node. The farther they are from ideal the larger
 	 * the error will be.
 	 */
-	private double ambiguityScore( LNode n ) {
+	private double ambiguityError(LNode n ) {
 		double error = 0;
 
 		// NOTE: It might be better here to compute the error relative to the best fit corner at each edge
@@ -575,6 +575,9 @@ public class ChessboardCornerClusterFinder {
 		return error;
 	}
 
+	/**
+	 * Removes all connection to the targeted node
+	 */
 	private void disconnectNode( LNode target ) {
 		for (int j = 0; j < 4; j++) {
 			LConnections connections = target.edges[j];
@@ -586,6 +589,7 @@ public class ChessboardCornerClusterFinder {
 					throw new RuntimeException("BUG!");
 				}
 			}
+			target.edges[j] = null;
 		}
 	}
 

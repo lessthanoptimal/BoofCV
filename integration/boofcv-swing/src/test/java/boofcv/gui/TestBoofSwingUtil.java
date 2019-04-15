@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,10 +33,16 @@ class TestBoofSwingUtil {
 
 	@Test
 	void isImage() throws IOException {
-		// this file should be around no matter what the module root is
-		File f = new File("build.gradle");
-		assertTrue(f.exists());
+		// create a non image file
+		File f = File.createTempFile("booftest",".txt");
+		PrintStream out = new PrintStream(f);
+		out.print("not an empty file");
+		out.flush();
+		out.close();
 		assertFalse(BoofSwingUtil.isImage(f));
+		// clean up
+		assertTrue(f.delete());
+
 
 		// create an image to test the positive case
 		f = File.createTempFile("booftest",".jpg");

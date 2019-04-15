@@ -24,11 +24,11 @@ import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -73,6 +73,8 @@ public class TestChessboardCornerClusterFinder {
 
 		perfect_ambiguous(5,5,1);
 		perfect_ambiguous(5,5,3);
+
+		perfect_ambiguous(10,8,3);
 	}
 
 	void perfect_ambiguous( int rows , int cols , int numAmbiguous) {
@@ -95,8 +97,20 @@ public class TestChessboardCornerClusterFinder {
 		alg.process(input);
 
 		FastQueue<ChessboardCornerGraph> found = alg.getOutputClusters();
-		assertEquals(1,found.size);
-		checkCluster(found.get(0), rows,cols);
+		if( numAmbiguous == 0 ) {
+			assertEquals(1, found.size);
+			checkCluster(found.get(0), rows, cols);
+		} else {
+			assertTrue(found.size>0);
+			boolean matched = false;
+			for (int i = 0; i < found.size; i++) {
+				if( found.get(i).corners.size == rows*cols ) {
+					checkCluster(found.get(i), rows, cols);
+					matched = true;
+				}
+			}
+			assertTrue(matched);
+		}
 	}
 
 	/**
@@ -140,7 +154,7 @@ public class TestChessboardCornerClusterFinder {
 		}
 
 		// randomize the list
-//		Collections.shuffle(corners, new Random(345));
+		Collections.shuffle(corners, rand);
 
 		return corners;
 	}
