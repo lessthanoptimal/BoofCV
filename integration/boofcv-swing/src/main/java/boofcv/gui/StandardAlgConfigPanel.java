@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,7 +97,7 @@ public class StandardAlgConfigPanel extends JPanel {
 		format.setMinimumIntegerDigits(integerDigits);
 		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
 		Dimension d = spinner.getPreferredSize();
-		d.width = (integerDigits+1+fractionDigits)*9;
+		d.width = (integerDigits+1+fractionDigits)*12;
 		spinner.setPreferredSize(d);
 		spinner.setMaximumSize(d);
 		// force it to render using the format specified above. A bit of a hack. Got a better idea?

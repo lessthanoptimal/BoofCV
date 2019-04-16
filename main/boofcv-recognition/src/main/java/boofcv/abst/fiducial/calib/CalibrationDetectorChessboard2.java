@@ -69,6 +69,7 @@ public class CalibrationDetectorChessboard2 implements DetectorFiducialCalibrati
 
 		layoutPoints = gridChess(config.numRows, config.numCols, config.squareWidth);
 
+		clusterToGrid.setCheckShape((r,c)->r==cornerRows&&c==cornerCols);
 		clusterToGrid.setVerbose(System.out);
 	}
 
@@ -91,12 +92,14 @@ public class CalibrationDetectorChessboard2 implements DetectorFiducialCalibrati
 		for (int clusterIdx = 0; clusterIdx < clusters.size; clusterIdx++) {
 			ChessboardCornerGraph c = clusters.get(clusterIdx);
 
-			System.out.println(" ["+clusterIdx+"] corners.size = "+c.corners.size+"  vs "+(cornerCols*cornerRows));
+			if( c.corners.size > 1 )
+				System.out.println(" ["+clusterIdx+"] corners.size = "+c.corners.size+"  vs "+(cornerCols*cornerRows));
 			if (c.corners.size != cornerCols * cornerRows)
 				continue;
 
 			if (clusterToGrid.convert(c, info)) {
 				if (info.cols == cornerRows && info.rows == cornerCols) {
+					System.out.println("Should transpose");
 					// TODO transpose
 				}
 				if (info.cols != cornerCols || info.rows != cornerRows)

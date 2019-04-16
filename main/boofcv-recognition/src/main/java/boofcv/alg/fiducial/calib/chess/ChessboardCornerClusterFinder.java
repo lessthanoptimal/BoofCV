@@ -31,6 +31,11 @@ import org.ddogleg.struct.GrowQueue_I32;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO disconnect edges with very different lengths from others
+// TODO control for orientation tol
+// TODO control to set grid shape
+// TODO Get working rotated image01
+// TODO then work on fisheye
 /**
  * Clusters detected chessboard corners together into a grids that are 2x2 or larger.
  *
@@ -47,7 +52,7 @@ public class ChessboardCornerClusterFinder {
 	// how close to the expected orientation a corner needs to be. radians
 	double orientationTol = 0.5;
 	// angle tolerance for edge direction. radians
-	double directionTol = 0.3;
+	double directionTol = 0.4;
 	// maximum fractional error allowed between two distances
 	double distanceTol = 0.2;
 
@@ -518,7 +523,7 @@ public class ChessboardCornerClusterFinder {
 	private int selectNodeToKeep( List<LNode> candidates ) {
 		int bestIndex = -1;
 		int bestEdges = 0;
-		double bestError = 0;
+		double bestError = Double.MAX_VALUE;
 
 		for (int i = 0; i < candidates.size(); i++) {
 			LNode n = candidates.get(i);
@@ -569,7 +574,7 @@ public class ChessboardCornerClusterFinder {
 			double dirJ = n.getInfoForEdge(j).direction;
 
 			double d = UtilAngle.dist(dirI,dirJ);
-			error += Math.abs(d-Math.PI);
+			error += Math.abs(d-Math.PI)*3.0; // this is more important. straight line should be straight
 		}
 
 		return error;
@@ -598,6 +603,30 @@ public class ChessboardCornerClusterFinder {
 	 */
 	public FastQueue<ChessboardCornerGraph> getOutputClusters() {
 		return clusters;
+	}
+
+	public double getOrientationTol() {
+		return orientationTol;
+	}
+
+	public void setOrientationTol(double orientationTol) {
+		this.orientationTol = orientationTol;
+	}
+
+	public double getDirectionTol() {
+		return directionTol;
+	}
+
+	public void setDirectionTol(double directionTol) {
+		this.directionTol = directionTol;
+	}
+
+	public double getDistanceTol() {
+		return distanceTol;
+	}
+
+	public void setDistanceTol(double distanceTol) {
+		this.distanceTol = distanceTol;
 	}
 
 	// TODO remove (x,y) COORDINATES FROM LOCAL INFO?

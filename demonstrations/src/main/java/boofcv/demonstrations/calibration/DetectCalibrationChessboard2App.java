@@ -22,6 +22,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard2;
 import boofcv.abst.fiducial.calib.ConfigChessboard2;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageStatistics;
@@ -139,7 +140,14 @@ public class DetectCalibrationChessboard2App
 			corners.setKernelRadius(controlPanel.radius);
 			corners.useMeanShift = controlPanel.meanShift;
 			detector = new CalibrationDetectorChessboard2(config);
-//			detector.setPyramidTopSize(controlPanel.pyramidTop);
+			detector.getClusterFinder().setDirectionTol(controlPanel.directionTol);
+			detector.getClusterFinder().setDistanceTol(controlPanel.distanceTol);
+
+			if( controlPanel.anyGrid ) {
+				detector.getClusterToGrid().setCheckShape(null);
+			}
+
+			//			detector.setPyramidTopSize(controlPanel.pyramidTop);
 //			detector.getDetector().setThresholding(FactoryThresholdBinary.threshold(threshold,GrayF32.class));
 		}
 	}
@@ -335,15 +343,20 @@ public class DetectCalibrationChessboard2App
 		JCheckBox checkLogIntensity;
 		JSpinner spinnerRadius;
 		JSpinner spinnerTop;
+		JSpinner spinnerDistanceTol;
+		JSpinner spinnerDirectionTol;
 		JCheckBox checkShowTargets;
 		JCheckBox checkShowNumbers;
 		JCheckBox checkShowClusters;
 		JCheckBox checkShowCorners;
 		JCheckBox checkMeanShift;
+		JCheckBox checkAnyGrid;
 		public ThresholdControlPanel thresholdPanel;
 
 		int pyramidTop = 100;
 		int radius = 1;
+		double distanceTol;
+		double directionTol;
 		boolean showChessboards = true;
 		boolean showNumbers = true;
 		boolean showClusters = false;
@@ -351,6 +364,7 @@ public class DetectCalibrationChessboard2App
 		boolean logItensity =false;
 		int view = 1;
 		boolean meanShift = true;
+		boolean anyGrid = false;
 
 		public ControlPanel() {
 			{
@@ -360,16 +374,23 @@ public class DetectCalibrationChessboard2App
 				thresholdPanel.addHistogramGraph();
 			}
 
+			ChessboardCornerClusterFinder finder = new ChessboardCornerClusterFinder();
+			distanceTol = finder.getDistanceTol();
+			directionTol = finder.getDirectionTol();
+
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
 			comboView = combo(view,"Intensity","Image","Both","Binary");
 			spinnerRadius = spinner(radius, 1, 100, 1);
 			spinnerTop = spinner(pyramidTop, 50, 10000, 50);
+			spinnerDirectionTol = spinner(directionTol,0,3.0,0.05,1,3);
+			spinnerDistanceTol = spinner(distanceTol,0,1.0,0.05,1,3);
 			checkShowTargets = checkbox("Show Chessboard", showChessboards);
 			checkShowNumbers = checkbox("Show Numbers", showNumbers);
 			checkShowClusters = checkbox("Show Clusters", showClusters);
 			checkShowCorners = checkbox("Show Corners", showCorners);
 			checkMeanShift = checkbox("Mean Shift", meanShift);
+			checkAnyGrid = checkbox("Any Grid",anyGrid);
 
 			addLabeled(processingTimeLabel, "Time (ms)");
 			addLabeled(imageSizeLabel,"Image Size");
@@ -381,8 +402,11 @@ public class DetectCalibrationChessboard2App
 			addAlignLeft(checkShowCorners);
 			addAlignLeft(checkLogIntensity);
 			addAlignLeft(checkMeanShift);
+			addAlignLeft(checkAnyGrid);
 			addLabeled(spinnerRadius,"Corner Radius");
 			addLabeled(spinnerTop,"Pyramid Top");
+			addLabeled(spinnerDirectionTol,"Direction Tol");
+			addLabeled(spinnerDistanceTol,"Dist Tol");
 			addAlignCenter(thresholdPanel);
 		}
 
@@ -411,6 +435,10 @@ public class DetectCalibrationChessboard2App
 				meanShift = checkMeanShift.isSelected();
 				createAlgorithm();
 				reprocessImageOnly();
+			} else if( e.getSource() == checkAnyGrid) {
+				anyGrid = checkAnyGrid.isSelected();
+				createAlgorithm();
+				reprocessImageOnly();
 			}
 		}
 
@@ -419,6 +447,14 @@ public class DetectCalibrationChessboard2App
 			if( e.getSource() == selectZoom ) {
 				zoom = ((Number)selectZoom.getValue()).doubleValue();
 				imagePanel.setScale(zoom);
+			} else if( e.getSource() == spinnerDirectionTol ) {
+				directionTol = ((Number)spinnerDirectionTol.getValue()).doubleValue();
+				createAlgorithm();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerDistanceTol ) {
+				distanceTol = ((Number)spinnerDistanceTol.getValue()).doubleValue();
+				createAlgorithm();
+				reprocessImageOnly();
 			} else if( e.getSource() == spinnerRadius ) {
 				radius = ((Number)spinnerRadius.getValue()).intValue();
 				createAlgorithm();

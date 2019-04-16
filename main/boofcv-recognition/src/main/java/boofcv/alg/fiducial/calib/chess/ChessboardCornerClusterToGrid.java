@@ -55,6 +55,9 @@ public class ChessboardCornerClusterToGrid {
 	// Used to optionally print extra debugging information
 	PrintStream verbose;
 
+	// optional check on the shape
+	CheckShape checkShape;
+
 	ChessboardCornerGraph hack;
 
 	/**
@@ -107,6 +110,19 @@ public class ChessboardCornerClusterToGrid {
 		for (int i = 0; i < cornerList.size(); i++) {
 			Node n = cornerList.get(i);
 			if( isCornerValidOrigin(n) ) {
+				// sanity check the shape
+				if( checkShape != null ) {
+					if( i%2==0 ) {
+						if( !checkShape.isValidShape(info.rows,info.cols)) {
+							continue;
+						}
+					} else {
+						if( !checkShape.isValidShape(info.cols,info.rows)) {
+							continue;
+						}
+					}
+				}
+
 				double distance = n.normSq();
 				if( distance < bestScore ) {
 					bestScore = distance;
@@ -350,7 +366,7 @@ public class ChessboardCornerClusterToGrid {
 	/**
 	 * Rotates the grid in the CCW direction
 	 */
-	void rotateCCW(GridInfo grid ) {
+	public void rotateCCW(GridInfo grid ) {
 		cornerList.clear();
 		for (int col = 0; col < grid.cols; col++) {
 			for (int row = 0; row < grid.rows; row++) {
@@ -367,6 +383,10 @@ public class ChessboardCornerClusterToGrid {
 
 	public void setVerbose(PrintStream verbose) {
 		this.verbose = verbose;
+	}
+
+	public void setCheckShape(CheckShape checkShape) {
+		this.checkShape = checkShape;
 	}
 
 	public static class GridInfo {
@@ -388,6 +408,16 @@ public class ChessboardCornerClusterToGrid {
 			corners.add( this.nodes.get(cols-1) );
 			corners.add( this.nodes.get(rows*cols-1) );
 			corners.add( this.nodes.get((rows-1)*cols) );
+
+			for (int i = 3; i >= 0; i-- ) {
+				if( corners.get(i).countEdges() != 2 )
+					corners.remove(i);
+			}
 		}
+	}
+
+	public interface CheckShape
+	{
+		boolean isValidShape( int rows , int cols );
 	}
 }
