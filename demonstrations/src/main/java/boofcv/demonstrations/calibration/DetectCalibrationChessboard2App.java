@@ -42,6 +42,7 @@ import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -92,7 +93,7 @@ public class DetectCalibrationChessboard2App
 	//-----------------
 	final Object lockCorners = new Object();
 	FastQueue<ChessboardCorner> foundCorners = new FastQueue<>(ChessboardCorner.class,true);
-	FastQueue<Point2D_F64> foundChessboard = new FastQueue<>(Point2D_F64.class,true);
+	FastQueue<PointIndex2D_F64> foundChessboard = new FastQueue<>(PointIndex2D_F64.class,true);
 	FastQueue<FeatureGraph2D> foundClusters = new FastQueue<>(FeatureGraph2D.class,true);
 	boolean success;
 	//-----------------
@@ -304,9 +305,13 @@ public class DetectCalibrationChessboard2App
 				}
 			}
 
-			if( controlPanel.showChessboards ) {
+			if( success && controlPanel.showChessboards ) {
 				synchronized (lockCorners) {
-					DisplayPinholeCalibrationPanel.renderOrder(g2, scale, foundChessboard.toList());
+					DisplayPinholeCalibrationPanel.renderOrder(g2, scale, (List)foundChessboard.toList());
+
+					if( controlPanel.showNumbers ) {
+						DisplayPinholeCalibrationPanel.drawNumbers(g2, foundChessboard.toList(), null, scale);
+					}
 				}
 			}
 		}
@@ -331,6 +336,7 @@ public class DetectCalibrationChessboard2App
 		JSpinner spinnerRadius;
 		JSpinner spinnerTop;
 		JCheckBox checkShowTargets;
+		JCheckBox checkShowNumbers;
 		JCheckBox checkShowClusters;
 		JCheckBox checkShowCorners;
 		JCheckBox checkMeanShift;
@@ -339,6 +345,7 @@ public class DetectCalibrationChessboard2App
 		int pyramidTop = 100;
 		int radius = 1;
 		boolean showChessboards = true;
+		boolean showNumbers = true;
 		boolean showClusters = false;
 		boolean showCorners = false;
 		boolean logItensity =false;
@@ -359,6 +366,7 @@ public class DetectCalibrationChessboard2App
 			spinnerRadius = spinner(radius, 1, 100, 1);
 			spinnerTop = spinner(pyramidTop, 50, 10000, 50);
 			checkShowTargets = checkbox("Show Chessboard", showChessboards);
+			checkShowNumbers = checkbox("Show Numbers", showNumbers);
 			checkShowClusters = checkbox("Show Clusters", showClusters);
 			checkShowCorners = checkbox("Show Corners", showCorners);
 			checkMeanShift = checkbox("Mean Shift", meanShift);
@@ -368,6 +376,7 @@ public class DetectCalibrationChessboard2App
 			addLabeled(comboView,"View");
 			addLabeled(selectZoom,"Zoom");
 			addAlignLeft(checkShowTargets);
+			addAlignLeft(checkShowNumbers);
 			addAlignLeft(checkShowClusters);
 			addAlignLeft(checkShowCorners);
 			addAlignLeft(checkLogIntensity);
@@ -391,6 +400,9 @@ public class DetectCalibrationChessboard2App
 				reprocessImageOnly();
 			} else if( e.getSource() == checkShowTargets) {
 				showChessboards = checkShowTargets.isSelected();
+				imagePanel.repaint();
+			} else if( e.getSource() == checkShowNumbers) {
+				showNumbers = checkShowNumbers.isSelected();
 				imagePanel.repaint();
 			} else if( e.getSource() == checkShowClusters) {
 				showClusters = checkShowClusters.isSelected();

@@ -82,6 +82,20 @@ public class ChessboardCornerGraph {
 		return closest;
 	}
 
+	public void print() {
+		for( Node n : corners.toList() ) {
+			System.out.printf("[%3d] {%3.0f, %3.0f} -> ",n.index,n.x,n.y);
+			for (int i = 0; i < 4; i++) {
+				if( n.edges[i] == null ) {
+					System.out.print("[    ] ");
+				} else {
+					System.out.printf("[ %2d ] ",n.edges[i].index);
+				}
+			}
+			System.out.println();
+		}
+	}
+
 	public void reset() {
 		corners.reset();
 	}

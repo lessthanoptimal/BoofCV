@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,12 @@ public class PointIndex2D_F64 extends Point2D_F64 {
 		this.x = p.x;
 		this.y = p.y;
 		this.index = index;
+	}
+
+	public void set( PointIndex2D_F64 src ) {
+		this.x = src.x;
+		this.y = src.y;
+		this.index = src.index;
 	}
 
 	public int getIndex() {

@@ -55,6 +55,8 @@ public class ChessboardCornerClusterToGrid {
 	// Used to optionally print extra debugging information
 	PrintStream verbose;
 
+	ChessboardCornerGraph hack;
+
 	/**
 	 * Puts cluster nodes into grid order and computes the number of rows and columns. If the cluster is not
 	 * a complete grid this function will fail and return false
@@ -64,6 +66,7 @@ public class ChessboardCornerClusterToGrid {
 	 * @return true if successful or false if it failed
 	 */
 	public boolean convert( ChessboardCornerGraph cluster , GridInfo info ) {
+		hack = cluster;
 		// default to an invalid value to ensure a failure doesn't go unnoticed.
 		info.reset();
 
@@ -252,7 +255,8 @@ public class ChessboardCornerClusterToGrid {
 				// Sanity check. If it has been marked it should be correctly aligned
 				if( marked.get(nb.index) ) {
 					if( nb.edges[j] != na ) {
-						if( verbose != null ) verbose.println("BUG! node has been processed and its edges do not align.");
+						hack.print();
+						if( verbose != null ) verbose.println("BUG! node "+nb.index+" has been processed and edge "+j+" doesn't point to node "+na.index);
 						return false;
 					}
 					continue;
@@ -314,7 +318,7 @@ public class ChessboardCornerClusterToGrid {
 			if( count == 2 ) {
 				// If there are only two then we define the order to be defined by the one which minimizes
 				// CCW direction
-				if( directions[order[1]] > Math.PI*3.0/4.0) {
+				if( directions[order[1]] > Math.PI ) {
 					na.edges[0] = tmpEdges[ order[1] ];
 					na.edges[1] = tmpEdges[ order[0] ];
 				} else {
@@ -324,17 +328,21 @@ public class ChessboardCornerClusterToGrid {
 			} else if( count == 3 ) {
 				// Edges need to point along the 4 possible directions, in the case of 3 edges, there might
 				// need to be a gap at a different location than at the end
-				double tail = UtilAngle.distanceCCW(directions[order[2]],directions[order[0]]);
-				for (int i = 1; i <3; i++) {
-					double ccw = UtilAngle.distanceCCW(directions[order[i-1]],directions[order[i]]);
-					if( tail < ccw ) {
-						for (int j = 3; j >= i+1; j--) {
-							na.edges[j] = na.edges[j-1];
-						}
-						na.edges[i] = null;
-						break;
+				int selected = -1;
+				double largestAngle = 0;
+				for (int i = 0,j=2; i < 3; j=i,i++) {
+					double ccw = UtilAngle.distanceCCW(directions[order[j]],directions[order[i]]);
+					if( ccw > largestAngle ) {
+						largestAngle = ccw;
+						selected = j;
 					}
 				}
+
+				for (int i = 2; i > selected; i--) {
+					na.edges[i+1] = na.edges[i];
+				}
+				na.edges[selected+1]=null;
+
 			}
 		}
 	}

@@ -186,9 +186,9 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 
 		if( showNumbers ) {
 			if( showUndistorted )
-				drawNumbers(g2, set,remove_p_to_p,scale);
+				drawNumbers(g2, set.points,remove_p_to_p,scale);
 			else
-				drawNumbers(g2, set,null,scale);
+				drawNumbers(g2, set.points,null,scale);
 		}
 
 		if( showErrors && results != null ) {
@@ -266,7 +266,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 		this.lineY = y;
 	}
 
-	public static void drawNumbers( Graphics2D g2 , CalibrationObservation foundTarget ,
+	public static void drawNumbers( Graphics2D g2 , List<PointIndex2D_F64> points ,
 									Point2Transform2_F32 transform ,
 									double scale ) {
 
@@ -276,9 +276,9 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 		Point2D_F32 adj = new Point2D_F32();
 
 		AffineTransform origTran = g2.getTransform();
-		for( int i = 0; i < foundTarget.size(); i++ ) {
-			Point2D_F64 p = foundTarget.get(i);
-			int gridIndex = foundTarget.get(i).index;
+		for( int i = 0; i < points.size(); i++ ) {
+			Point2D_F64 p = points.get(i);
+			int gridIndex = points.get(i).index;
 
 			if( transform != null ) {
 				transform.compute((float)p.x,(float)p.y,adj);

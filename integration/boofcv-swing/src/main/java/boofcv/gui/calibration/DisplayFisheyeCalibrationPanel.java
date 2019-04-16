@@ -225,7 +225,7 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel<Came
 		}
 
 		if( showNumbers ) {
-			drawNumbers(g2, set,null,scale);
+			drawNumbers(g2, set.points,null,scale);
 		}
 
 		if( showErrors ) {
