@@ -98,10 +98,6 @@ public class CalibrationDetectorChessboard2 implements DetectorFiducialCalibrati
 				continue;
 
 			if (clusterToGrid.convert(c, info)) {
-				if (info.cols == cornerRows && info.rows == cornerCols) {
-					System.out.println("Should transpose");
-					// TODO transpose
-				}
 				if (info.cols != cornerCols || info.rows != cornerRows)
 					continue;
 

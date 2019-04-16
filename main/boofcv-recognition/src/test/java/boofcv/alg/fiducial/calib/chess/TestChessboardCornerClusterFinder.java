@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.calib.chess;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -36,6 +37,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestChessboardCornerClusterFinder {
 	Random rand = new Random(2334);
 	final double sideLength = 40; // pixel distance between corners
+	double offsetX;
+	double offsetY;
+
+	@BeforeEach
+	void setup() {
+		offsetX = 0;
+		offsetY = 0;
+	}
 
 	/**
 	 * Perfect grids with only the exact number of expected
@@ -114,11 +123,33 @@ public class TestChessboardCornerClusterFinder {
 	}
 
 	/**
-	 * There are two completely separate grids
+	 * There are two completely separate grids which are parallel to each other.
 	 */
 	@Test
-	void perfect_2x2_2x2() {
-		fail("Implement");
+	void perfect_2x2_3x2() {
+		List<ChessboardCorner> input = createCorners(2,2);
+		offsetX = 500;
+		input.addAll(createCorners(3,2));
+
+		ChessboardCornerClusterFinder alg = new ChessboardCornerClusterFinder();
+		alg.process(input);
+		FastQueue<ChessboardCornerGraph> found = alg.getOutputClusters();
+
+		assertEquals(2,found.size);
+
+		boolean found2x2=false;
+		boolean found3x2=false;
+
+		for (int i = 0; i < found.size; i++) {
+			ChessboardCornerGraph g = found.get(i);
+			if( g.corners.size == 4 )
+				found2x2=true;
+			else if( g.corners.size == 6 )
+				found3x2=true;
+		}
+
+		assertTrue(found2x2);
+		assertTrue(found3x2);
 	}
 
 	/**
@@ -126,12 +157,29 @@ public class TestChessboardCornerClusterFinder {
 	 */
 	@Test
 	void lines() {
+		ChessboardCornerClusterFinder alg = new ChessboardCornerClusterFinder();
+		alg.process(createCorners(2,1));
+		assertEquals(0,alg.getOutputClusters().size);
+		alg.process(createCorners(3,1));
+		assertEquals(0,alg.getOutputClusters().size);
+		alg.process(createCorners(1,2));
+		assertEquals(0,alg.getOutputClusters().size);
+		alg.process(createCorners(1,3));
+		assertEquals(0,alg.getOutputClusters().size);
+	}
+
+	@Test
+	void findClosestToParallel() {
 		fail("Implement");
 	}
 
-	// Reminder to test inner functions
 	@Test
-	void innerFunctions() {
+	void addSimilarNodesToConnections() {
+		fail("Implement");
+	}
+
+	@Test
+	void ambiguityError() {
 		fail("Implement");
 	}
 
@@ -139,9 +187,9 @@ public class TestChessboardCornerClusterFinder {
 		List<ChessboardCorner> corners = new ArrayList<>();
 
 		for (int row = 0; row < rows; row++) {
-			double y = sideLength*row;
+			double y = offsetY + sideLength*row;
 			for (int col = 0; col < cols; col++) {
-				double x = sideLength*col;
+				double x = offsetX + sideLength*col;
 
 				ChessboardCorner c = new ChessboardCorner();
 				c.intensity = 20;

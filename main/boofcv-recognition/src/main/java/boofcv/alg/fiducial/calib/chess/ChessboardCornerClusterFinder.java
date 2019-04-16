@@ -26,6 +26,7 @@ import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_B;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
@@ -74,17 +75,21 @@ public class ChessboardCornerClusterFinder {
 
 	// Keeps a list of edges with multiple solutions
 	List<LConnections> ambiguousEdges = new ArrayList<>();
+	GrowQueue_B connected = new GrowQueue_B();
 
 	// Used to convert the internal graph into the output clusters
 	GrowQueue_I32 c2n = new GrowQueue_I32(); // corner index to output node index
 	GrowQueue_I32 n2c = new GrowQueue_I32(); // output node index to corner index
 	GrowQueue_I32 open = new GrowQueue_I32(); // list of corner index's which still need ot be processed
 
+	int HACK_interesting=-1;
+
 	/**
 	 * Given the unordered set of corners, for a set of clusters which represent sets of chessboard corners/
 	 * @param corners Found corners inside of image
 	 */
 	public void process(List<ChessboardCorner> corners ) {
+		HACK_interesting = -1;
 		this.corners = corners;
 
 		// reset internal data structures
@@ -107,9 +112,21 @@ public class ChessboardCornerClusterFinder {
 		pruneNonMutualConnections();
 		disconnectInvalidNodes();
 
+		if(HACK_interesting!=-1 ) {
+			System.out.println("Prune Non: Interesting: edges = "+nodes.get(HACK_interesting).countEdges());
+		}
+
 		// Clean up the graph and remove uncertainty
 		findAndResolveAllAmbiguity();
 		disconnectInvalidNodes();
+
+		if(HACK_interesting!=-1 ) {
+			System.out.println("Resolve: Interesting: edges = "+nodes.get(HACK_interesting).countEdges());
+		}
+
+
+		// Disconnect edges which are much shorter or longer than all the others.
+		// TODO do it
 
 		// create the output
 		convertToOutput(corners);
@@ -146,6 +163,8 @@ public class ChessboardCornerClusterFinder {
 		c2n.resize(corners.size());
 		n2c.resize(corners.size());
 		open.reset();
+		n2c.fill(-1);
+		c2n.fill(-1);
 
 		for (int seedIdx = 0; seedIdx < nodes.size; seedIdx++) {
 			LNode seedN = nodes.get(seedIdx);
@@ -157,7 +176,7 @@ public class ChessboardCornerClusterFinder {
 			// traverse the graph and add all the nodes in this cluster
 			growCluster(corners, seedIdx, graph);
 
-			// Connect the nodes together in the output grpah
+			// Connect the nodes together in the output graph
 			for (int i = 0; i < graph.corners.size; i++) {
 				ChessboardCornerGraph.Node gn = graph.corners.get(i);
 				LNode n = nodes.get( n2c.get(i) );
@@ -166,9 +185,23 @@ public class ChessboardCornerClusterFinder {
 					if( n.edges[j] == null )
 						continue;
 					int outputIdx = c2n.get( n.getInfoForEdge(j).index );
+					if( outputIdx == -1 ) {
+						throw new IllegalArgumentException("Edge to node not in the graph");
+					}
 					gn.edges[j] = graph.corners.get(outputIdx);
 				}
 			}
+
+			// ensure arrays are all -1 again for sanity checks
+			for (int i = 0; i < graph.corners.size; i++) {
+				ChessboardCornerGraph.Node gn = graph.corners.get(i);
+				int indexCorner = n2c.get(gn.index);
+				c2n.data[indexCorner] = -1;
+				n2c.data[gn.index] = -1;
+			}
+
+			if( graph.corners.size <= 1 )
+				clusters.removeTail();
 		}
 	}
 
@@ -177,6 +210,7 @@ public class ChessboardCornerClusterFinder {
 	 * convert one node index into another one, between the two graphs
 	 */
 	private void growCluster(List<ChessboardCorner> corners, int seedIdx, ChessboardCornerGraph graph) {
+		// open contains corner list indexes
 		open.add(seedIdx);
 		while( open.size > 0 ) {
 			int target = open.pop();
@@ -187,9 +221,9 @@ public class ChessboardCornerClusterFinder {
 			nodes.get(target).insideCluster = true;
 
 			// Create the node in the output cluster for this corner
-			c2n.data[target] = graph.corners.size;
-			n2c.data[graph.corners.size] = target;
 			ChessboardCornerGraph.Node gn = graph.growCorner();
+			c2n.data[target] = gn.index;
+			n2c.data[gn.index] = target;
 			gn.set(corners.get(target));
 
 			// Add to the open list all the edges which haven't been processed yet
@@ -209,11 +243,16 @@ public class ChessboardCornerClusterFinder {
 		LNode ntarget = nodes.grow();
 		ntarget.reset();
 		ntarget.index = target;
-		nnSearch.findNearest(corners.get(target),Double.MAX_VALUE,maxNeighbors,nnResults);
+		nnSearch.findNearest(corners.get(target),100*100,maxNeighbors,nnResults);
 
 		// remove neighbors which are at the wrong angle
 		if ( !filterNeighbors(corners.get(target),ntarget))
 			return;
+
+		// use these flags to see which neighbor has already been connected to and avoid having multiple edges
+		// connect to the same neighbor
+		connected.resize(ntarget.neighbors.size);
+		connected.fill(false);
 
 		// find the initial seed for the local connections
 		if( !findBestPair(corners.get(target),ntarget)) {
@@ -225,7 +264,12 @@ public class ChessboardCornerClusterFinder {
 		findClosestToParallel(ntarget,1);
 
 		// Edges can have multiple solutions if its ambiguous. Add alternatives to the edges here
-		addSimilarNodesToConnections(ntarget);
+//		addSimilarNodesToConnections(ntarget);
+
+		if( corners.get(target).distance(2432.78,1487.83) < 3 ) {
+			HACK_interesting = target;
+			System.out.println("Interesting: connections = "+ntarget.countEdges());
+		}
 	}
 
 	/**
@@ -283,6 +327,9 @@ public class ChessboardCornerClusterFinder {
 		}
 
 		if( seedA != -1 ) {
+			// make them as used already
+			connected.data[seedA] = true;
+			connected.data[seedB] = true;
 			tnode.edges[0] = connectionsStorage.grow();
 			tnode.edges[0].reset();
 			tnode.edges[0].src = tnode;
@@ -340,6 +387,9 @@ public class ChessboardCornerClusterFinder {
 		int bestIndexNhb = -1;
 
 		for (int idxNhb = 0; idxNhb < ntarget.neighbors.size(); idxNhb++) {
+			if( connected.get(idxNhb) )
+				continue;
+
 			LocalInfo n = ntarget.neighbors.get(idxNhb);
 
 			// see if the orientation error is within tolerance
@@ -361,6 +411,7 @@ public class ChessboardCornerClusterFinder {
 
 		// If it found a match add a new edge for it
 		if( bestIndexNhb != -1 ) {
+			connected.set(bestIndexNhb,true);
 			LConnections c = connectionsStorage.grow();
 			c.reset();
 			c.src = ntarget;
@@ -387,6 +438,9 @@ public class ChessboardCornerClusterFinder {
 
 			boolean ambiguous = false;
 			for (int idxNhbA = 0; idxNhbA < node.neighbors.size; idxNhbA++) {
+				if( connected.get(idxNhbA))
+					continue;
+
 				LocalInfo a = node.neighbors.get(idxNhbA);
 				if( a == target )
 					continue;
@@ -395,10 +449,11 @@ public class ChessboardCornerClusterFinder {
 					continue;
 				}
 
-				double distErr = Math.abs(target.distance-a.distance)/Math.max(target.distance,a.distance);
+				double distErr = Math.abs(target.distance-a.distance)/target.distance;
 				if( distErr <= distanceTol ) {
 					ambiguous = true;
 					connections.dst.add( idxNhbA );
+					connected.set(idxNhbA,true);
 				}
 			}
 
@@ -464,7 +519,7 @@ public class ChessboardCornerClusterFinder {
 						for (int idxC = 0; idxC < connections.dst.size; idxC++) {
 							LNode dst = nodes.get(n.neighbors.get(connections.dst.get(idxC)).index);
 							if (!dst.removeConnection(idxNode)) {
-								throw new RuntimeException(dst.index+" not connected to "+n.index);
+								throw new RuntimeException("disconnect invalid: "+dst.index+" not connected to "+n.index);
 							}
 						}
 						n.edges[j] = null;
@@ -591,7 +646,8 @@ public class ChessboardCornerClusterFinder {
 			for (int idxC = 0; idxC < connections.dst.size; idxC++) {
 				LNode dst = nodes.get(target.neighbors.get(connections.dst.get(idxC)).index);
 				if (!dst.removeConnection(target.index)) {
-					throw new RuntimeException("BUG!");
+					throw new RuntimeException("disconnect node: "+dst.index+" not connected to "+target.index+". " +
+							"Probably more than one edge connected to target");
 				}
 			}
 			target.edges[j] = null;
@@ -702,14 +758,14 @@ public class ChessboardCornerClusterFinder {
 		 * Removes all edges which connect
 		 * @return true if a connection was removed and false if it.
 		 */
-		public boolean removeConnection( int indexNhb ) {
+		public boolean removeConnection( int indexNode ) {
 			boolean found = false;
 			for (int i = 3; i >= 0 ; i--) {
 				LConnections c = edges[i];
 				if( c == null )
 					continue;
 				for (int j = c.dst.size-1; j >= 0; j--) {
-					if( neighbors.get(c.dst.data[j]).index == indexNhb ) {
+					if( neighbors.get(c.dst.data[j]).index == indexNode ) {
 						if( found )
 							throw new RuntimeException("BUG!");
 						found = true;

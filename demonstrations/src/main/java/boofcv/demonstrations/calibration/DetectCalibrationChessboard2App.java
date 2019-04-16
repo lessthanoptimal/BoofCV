@@ -129,17 +129,27 @@ public class DetectCalibrationChessboard2App
 				controlPanel.setZoom(curr);
 			}
 		});
+
+		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if( SwingUtilities.isLeftMouseButton(e)) {
+					Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
+					System.out.printf("Clicked at %.2f , %.2f\n",p.x,p.y);
+				}
+			}
+		});
 	}
 
 	private void createAlgorithm() {
 		synchronized (lockAlgorithm) {
 			ConfigThreshold threshold = controlPanel.thresholdPanel.createConfig();
 			threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
+			config.threshold = threshold;
 
-			DetectChessboardCorners corners = new DetectChessboardCorners();
-			corners.setKernelRadius(controlPanel.radius);
-			corners.useMeanShift = controlPanel.meanShift;
 			detector = new CalibrationDetectorChessboard2(config);
+			detector.getDetector().getDetector().setKernelRadius(controlPanel.radius);
+			detector.getDetector().getDetector().useMeanShift = controlPanel.meanShift;
 			detector.getClusterFinder().setDirectionTol(controlPanel.directionTol);
 			detector.getClusterFinder().setDistanceTol(controlPanel.distanceTol);
 
