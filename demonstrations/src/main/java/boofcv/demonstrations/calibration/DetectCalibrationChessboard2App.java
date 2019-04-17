@@ -315,7 +315,7 @@ public class DetectCalibrationChessboard2App
 
 						// make each graph a different color depending on position
 						FeatureGraph2D.Node n0 = graph.nodes.get(0);
-						int color = (int)((n0.x/width)*255) << 16 | (int)((n0.y/height)*255) << 8 | 180;
+						int color = (int)((n0.x/width)*255) << 16 | ((int)((n0.y/height)*200)+55) << 8 | 255;
 						g2.setColor(new Color(color));
 						g2.setStroke(new BasicStroke(3));
 						renderGraph(g2, line, graph);

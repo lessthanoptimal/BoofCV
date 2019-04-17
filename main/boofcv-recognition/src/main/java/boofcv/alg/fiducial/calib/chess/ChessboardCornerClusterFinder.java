@@ -110,9 +110,14 @@ public class ChessboardCornerClusterFinder {
 
 		// remove connections which are not mutual and ensure graph assumptions are still meet
 		pruneNonMutualConnections();
+		if(HACK_interesting!=-1 ) {
+			System.out.println("Prune Non: 264:         edges = "+nodes.get(264).countEdges());
+			System.out.println("Prune Non: Interesting: edges = "+nodes.get(HACK_interesting).countEdges());
+		}
 		disconnectInvalidNodes();
 
 		if(HACK_interesting!=-1 ) {
+			System.out.println("Prune Non: 264:         edges = "+nodes.get(264).countEdges());
 			System.out.println("Prune Non: Interesting: edges = "+nodes.get(HACK_interesting).countEdges());
 		}
 
@@ -245,9 +250,17 @@ public class ChessboardCornerClusterFinder {
 		ntarget.index = target;
 		nnSearch.findNearest(corners.get(target),100*100,maxNeighbors,nnResults);
 
+		boolean interesting = target==238||target==264||target==239;
+
+		if( interesting )
+			System.out.print("");
+
 		// remove neighbors which are at the wrong angle
-		if ( !filterNeighbors(corners.get(target),ntarget))
+		if ( !filterNeighbors(corners.get(target),ntarget)) {
+			if( interesting )
+				System.out.println("filterNeighbors failed for "+target);
 			return;
+		}
 
 		// use these flags to see which neighbor has already been connected to and avoid having multiple edges
 		// connect to the same neighbor
@@ -256,6 +269,8 @@ public class ChessboardCornerClusterFinder {
 
 		// find the initial seed for the local connections
 		if( !findBestPair(corners.get(target),ntarget)) {
+			if( interesting )
+				System.out.println("findBestPair failed for "+target);
 			return;
 		}
 
@@ -264,11 +279,13 @@ public class ChessboardCornerClusterFinder {
 		findClosestToParallel(ntarget,1);
 
 		// Edges can have multiple solutions if its ambiguous. Add alternatives to the edges here
-//		addSimilarNodesToConnections(ntarget);
+		addSimilarNodesToConnections(ntarget);
 
 		if( corners.get(target).distance(2432.78,1487.83) < 3 ) {
 			HACK_interesting = target;
 			System.out.println("Interesting: connections = "+ntarget.countEdges());
+		} else if( interesting) {
+			System.out.println("Corner "+target+": connections = "+ntarget.countEdges());
 		}
 	}
 
@@ -312,8 +329,8 @@ public class ChessboardCornerClusterFinder {
 					// score is a weighted average of angle error and fractional difference in distance
 					double aveDist = (distanceA+distanceB)/2.0;
 
-					double score = 0.1*angleError/Math.PI; // max value of 0.1
-					score += Math.abs(distanceA-distanceB)/Math.max(distanceA,distanceB); // max value of 1
+					double score = angleError/Math.PI; // max value of 0.1
+					score += Math.abs(distanceA-distanceB)/Math.min(distanceA,distanceB); // A good value will be less than 1
 					// score now is an error metric with 0 being perfect
 					score = (1.0+score)*aveDist;
 
@@ -352,8 +369,12 @@ public class ChessboardCornerClusterFinder {
 
 		double expectedOri = UtilAngle.boundHalf(target.orientation+Math.PI/2.0);
 
+		// first one will always be the target
 		for (int i = 0; i < nnResults.size; i++) {
 			NnData<ChessboardCorner> r = nnResults.get(i);
+			// if it found itself skip. it should always find itself
+			if( r.point == target )
+				continue;
 			double angle = UtilAngle.distHalf(r.point.orientation,expectedOri);
 			if( angle <= orientationTol ) {
 				ChessboardCorner c_i = r.point;
@@ -471,6 +492,13 @@ public class ChessboardCornerClusterFinder {
 		for (int idxSrc = 0; idxSrc < nodes.size; idxSrc++) {
 			LNode src = nodes.get(idxSrc);
 
+			if( src.index == 264 ) {
+				System.out.println("ASd");
+			}
+			if( src.index == HACK_interesting ) {
+				System.out.println("interesting in prune");
+			}
+
 			for (int j = 0; j < 4; j++) {
 				LConnections connections = src.edges[j];
 				if( connections == null )
@@ -483,6 +511,9 @@ public class ChessboardCornerClusterFinder {
 
 					// If dst has no connection to 'src' then remove the connection in src to dst
 					if( dst.findEdgeIdx(src.index) == -1 ) {
+						if( isInteresting(dst.index) ) {
+							System.out.println("  non-mut disconnecting "+src.index+"  from "+dst.index);
+						}
 						connections.dst.remove(idxSrcConn);
 					}
 				}
@@ -493,6 +524,10 @@ public class ChessboardCornerClusterFinder {
 				}
 			}
 		}
+	}
+
+	private boolean isInteresting( int target ) {
+		return target==238||target==264||target==239;
 	}
 
 	/**
@@ -506,9 +541,20 @@ public class ChessboardCornerClusterFinder {
 			for (int idxNode = 0; idxNode < nodes.size; idxNode++) {
 				LNode n = nodes.get(idxNode);
 
+				if( isInteresting(n.index)) {
+					System.out.println(" inside disconnect invalid. "+n.index+"  has "+n.countEdges());
+				}
+
 				// to be part of a grid it needs to have two edges 90 degrees apart
-				if( (n.edges[0] == null && n.edges[1] == null) ||
-						(n.edges[1] == null && n.edges[3] == null) )
+				boolean hasPairAt90 = false;
+				for (int i = 0, j = 3; i < 4; j=i,i++) {
+					if( n.edges[i] != null & n.edges[j] != null ) {
+						hasPairAt90 = true;
+						break;
+					}
+				}
+
+				if( !hasPairAt90 )
 				{
 					// remove all of this nodes connections. Effectively removing it from the graph
 
@@ -518,6 +564,10 @@ public class ChessboardCornerClusterFinder {
 							continue;
 						for (int idxC = 0; idxC < connections.dst.size; idxC++) {
 							LNode dst = nodes.get(n.neighbors.get(connections.dst.get(idxC)).index);
+							if( isInteresting(dst.index) || isInteresting(n.index) ) {
+								System.out.println("  invalid disconnecting "+dst.index+"  from "+n.index);
+							}
+
 							if (!dst.removeConnection(idxNode)) {
 								throw new RuntimeException("disconnect invalid: "+dst.index+" not connected to "+n.index);
 							}
@@ -611,25 +661,26 @@ public class ChessboardCornerClusterFinder {
 		//       if there are multiple options
 
 		// compute errors for edges which should be 90 degrees off
-		for (int i = 0,j=3; i < 4; j=i,i++) {
-			if( n.edges[i] == null || n.edges[j] == null )
-				continue;
-			double dirI = n.getInfoForEdge(i).direction;
-			double dirJ = n.getInfoForEdge(j).direction;
-
-			double d = UtilAngle.dist(dirI,dirJ);
-			error += Math.abs(d-Math.PI/2.0);
-		}
+//		for (int i = 0,j=3; i < 4; j=i,i++) {
+//			if( n.edges[i] == null || n.edges[j] == null )
+//				continue;
+//			double dirI = n.getInfoForEdge(i).direction;
+//			double dirJ = n.getInfoForEdge(j).direction;
+//
+//			double d = UtilAngle.dist(dirI,dirJ);
+//			error += Math.abs(d-Math.PI/2.0);
+//		}
 
 		// These should be 180 degrees off
 		for (int i = 0,j=2; i < 2; i++,j++) {
 			if( n.edges[i] == null || n.edges[j] == null )
 				continue;
-			double dirI = n.getInfoForEdge(i).direction;
-			double dirJ = n.getInfoForEdge(j).direction;
 
-			double d = UtilAngle.dist(dirI,dirJ);
-			error += Math.abs(d-Math.PI)*3.0; // this is more important. straight line should be straight
+			LocalInfo infoI = n.getInfoForEdge(i);
+			LocalInfo infoJ = n.getInfoForEdge(j);
+			double d = UtilAngle.dist(infoI.direction,infoJ.direction);
+
+			error += (Math.abs(d-Math.PI)+0.01)*(Math.abs(infoI.distance-infoJ.direction)+2.0);
 		}
 
 		return error;
