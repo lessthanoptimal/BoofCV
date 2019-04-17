@@ -110,16 +110,7 @@ public class ChessboardCornerClusterFinder {
 
 		// remove connections which are not mutual and ensure graph assumptions are still meet
 		pruneNonMutualConnections();
-		if(HACK_interesting!=-1 ) {
-			System.out.println("Prune Non: 264:         edges = "+nodes.get(264).countEdges());
-			System.out.println("Prune Non: Interesting: edges = "+nodes.get(HACK_interesting).countEdges());
-		}
 		disconnectInvalidNodes();
-
-		if(HACK_interesting!=-1 ) {
-			System.out.println("Prune Non: 264:         edges = "+nodes.get(264).countEdges());
-			System.out.println("Prune Non: Interesting: edges = "+nodes.get(HACK_interesting).countEdges());
-		}
 
 		// Clean up the graph and remove uncertainty
 		findAndResolveAllAmbiguity();

@@ -183,12 +183,15 @@ public class DetectChessboardCorners {
 
 //			System.out.println("radius = "+radius+" angle = "+c.angle);
 //			System.out.println("intensity "+c.intensity);
-			if( c.intensity < 50 ) { // TODO make configurable
+			if( c.intensity < 1.0 ) { // TODO make configurable
 				corners.removeTail();
-			}
-
-			if( useMeanShift )
+			} else if( useMeanShift ) {
 				meanShiftLocation(c);
+				// TODO does it make sense to use mean shift first?
+				if( c.distance(2357.20 , 1994.25) < 1 )
+					System.out.println("~~~~ Foo ~~~~");
+				computeFeatures(c.x,c.y,c);
+			}
 		}
 
 //		System.out.println("Dropped "+dropped+" / "+packed.size());
@@ -206,6 +209,10 @@ public class DetectChessboardCorners {
 	private void computeFeatures(double cx , double cy , ChessboardCorner corner ) {
 		double r = shiRadius +2;
 
+		// magnitude of the difference is used remove false chessboard corners caused by the corners on black
+		// squares. In that situation there will be a large difference between the left and right values
+		// in the integral below for 1/2 the lines
+		double sumDifference = 0;
 		for (int i = 0; i < numLines; i++) {
 			// TODO precompute sines and cosines
 			double angle = Math.PI*i/ numLines -Math.PI/2.0;
@@ -217,7 +224,12 @@ public class DetectChessboardCorners {
 			double x1 = cx+r*c;
 			double y1 = cy+r*s;
 
-			lines[i] = integral.compute(x0,y0,x1,y1);
+			double left = integral.compute(cx,cy,x0,y0);
+			double right = integral.compute(cx,cy,x1,y1);
+
+			sumDifference += Math.abs(left-right);
+
+			lines[i] = left+right;
 		}
 
 		// smooth by applying a block filter. This will ensure it doesn't point towards an edge which just happens
@@ -251,7 +263,7 @@ public class DetectChessboardCorners {
 		double adjustedIndex = indexMin + FastHessianFeatureDetector.polyPeak(value0,valueMin,value2);
 		corner.orientation = Math.PI*adjustedIndex/ numLines -Math.PI/2.0;
 
-		// Score the corner's fit quality using the fact that the function would be osccilate (sin/cosine)
+		// Score the corner's fit quality using the fact that the function would be oscilate (sin/cosine)
 		// and values 90 degrees offset are at the other side
 		double intensity = 0;
 		for (int i = 0; i < numLines /2; i++) {
@@ -260,6 +272,7 @@ public class DetectChessboardCorners {
 			intensity += smoothed[idx1] - smoothed[idx0];
 		}
 		corner.intensity = intensity/(r*2+1+ numLines/2);
+		corner.intensity /= (sumDifference/numLines);
 	}
 
 	/**
