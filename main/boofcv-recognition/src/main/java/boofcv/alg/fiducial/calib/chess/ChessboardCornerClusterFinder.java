@@ -248,9 +248,9 @@ public class ChessboardCornerClusterFinder {
 		LNode ntarget = nodes.grow();
 		ntarget.reset();
 		ntarget.index = target;
-		nnSearch.findNearest(corners.get(target),100*100,maxNeighbors,nnResults);
+		nnSearch.findNearest(corners.get(target),Double.MAX_VALUE,maxNeighbors,nnResults);
 
-		boolean interesting = target==238||target==264||target==239;
+		boolean interesting = isInteresting(target);
 
 		if( interesting )
 			System.out.print("");
@@ -305,32 +305,27 @@ public class ChessboardCornerClusterFinder {
 		for (int idxa = 0; idxa < tnode.neighbors.size(); idxa++) {
 			LocalInfo a = tnode.neighbors.get(idxa);
 
-			double dx = a.x - target.x;
-			double dy = a.y - target.y;
-
-			double angleA = Math.atan2(dy,dx);
-			double distanceA = Math.sqrt(dx*dx + dy*dy);
+			double oriA = corners.get(a.index).orientation;
 
 			for (int idxb = idxa+1; idxb < tnode.neighbors.size(); idxb++) {
 				LocalInfo b = tnode.neighbors.get(idxb);
 
-				dx = b.x - target.x;
-				dy = b.y - target.y;
+				double oriB = corners.get(b.index).orientation;
 
-				double angleB = Math.atan2(dy,dx);
-				double distanceB = Math.sqrt(dx*dx + dy*dy);
+				// orientation should be the same
+				double oriDistance = UtilAngle.dist(oriA,oriB);
 
 				// Angle should be 90 degrees apart
-				double angleDistance = UtilAngle.dist(angleA,angleB);
+				double angleDistance = UtilAngle.dist(a.direction,b.direction);
 
 				double angleError = UtilAngle.dist(angleDistance,Math.PI/2);
 
 				if( angleError <= directionTol) {
 					// score is a weighted average of angle error and fractional difference in distance
-					double aveDist = (distanceA+distanceB)/2.0;
+					double aveDist = (a.distance+b.distance)/2.0;
 
-					double score = angleError/Math.PI; // max value of 0.1
-					score += Math.abs(distanceA-distanceB)/Math.min(distanceA,distanceB); // A good value will be less than 1
+					double score = 0.5*(angleError+oriDistance)/Math.PI; // max value of 0.1
+					score += Math.abs(a.distance-b.distance)/Math.min(a.distance,b.distance); // A good value will be less than 1
 					// score now is an error metric with 0 being perfect
 					score = (1.0+score)*aveDist;
 
@@ -384,6 +379,8 @@ public class ChessboardCornerClusterFinder {
 				info.direction = Math.atan2(c_i.y-target.y,c_i.x-target.x);
 				info.distance = Math.sqrt(r.distance); // NN distance function returns Euclidean distance squared
 				info.set(r.point.x,r.point.y);
+
+				// TODO use direction and orientation to reject nodes
 			}
 		}
 
@@ -527,7 +524,7 @@ public class ChessboardCornerClusterFinder {
 	}
 
 	private boolean isInteresting( int target ) {
-		return target==238||target==264||target==239;
+		return target==23||target==5||target==8;
 	}
 
 	/**

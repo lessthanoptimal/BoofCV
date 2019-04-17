@@ -75,6 +75,7 @@ public class CalibrationDetectorChessboard2 implements DetectorFiducialCalibrati
 
 	@Override
 	public boolean process(GrayF32 input) {
+		System.out.println("===========================================================");
 		detected = new CalibrationObservation(input.width, input.height);
 		try {
 			detector.process(input);
