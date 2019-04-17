@@ -65,6 +65,7 @@ public class CalibrationDetectorChessboard2 implements DetectorFiducialCalibrati
 
 		detector.getDetector().setThresholding(thresholder);
 		detector.getDetector().setKernelRadius(config.cornerRadius);
+		detector.getDetector().setCornerIntensityThreshold(config.cornerThreshold);
 		detector.setPyramidTopSize(config.pyramidTopSize);
 
 		layoutPoints = gridChess(config.numRows, config.numCols, config.squareWidth);

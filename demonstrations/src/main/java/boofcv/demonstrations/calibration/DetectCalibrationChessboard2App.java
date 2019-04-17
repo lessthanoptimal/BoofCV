@@ -148,6 +148,7 @@ public class DetectCalibrationChessboard2App
 			config.threshold = threshold;
 			config.pyramidTopSize = controlPanel.pyramidTop;
 			config.cornerRadius = controlPanel.radius;
+			config.cornerThreshold = controlPanel.cornerThreshold;
 
 			detector = new CalibrationDetectorChessboard2(config);
 			detector.getDetector().getDetector().useMeanShift = controlPanel.meanShift;
@@ -355,6 +356,7 @@ public class DetectCalibrationChessboard2App
 		JComboBox<String> comboView;
 		JCheckBox checkLogIntensity;
 		JSpinner spinnerRadius;
+		JSpinner spinnerCornerThreshold;
 		JSpinner spinnerTop;
 		JSpinner spinnerDistanceTol;
 		JSpinner spinnerDirectionTol;
@@ -369,6 +371,7 @@ public class DetectCalibrationChessboard2App
 
 		int pyramidTop = 100;
 		int radius = 1;
+		double cornerThreshold;
 		double distanceTol;
 		double directionTol;
 		double orientationTol;
@@ -388,6 +391,8 @@ public class DetectCalibrationChessboard2App
 				thresholdPanel.addHistogramGraph();
 				// use the actual image histogram. Peaks are rare and the approximate one will be very inaccurate
 				thresholdPanel.histogramPanel.setApproximateHistogram(false);
+
+				cornerThreshold = config.cornerThreshold;
 			}
 
 			ChessboardCornerClusterFinder finder = new ChessboardCornerClusterFinder();
@@ -398,6 +403,7 @@ public class DetectCalibrationChessboard2App
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
 			comboView = combo(view,"Intensity","Image","Both","Binary");
+			spinnerCornerThreshold = spinner(cornerThreshold, 0, 100, 0.2);
 			spinnerRadius = spinner(radius, 1, 100, 1);
 			spinnerTop = spinner(pyramidTop, 50, 10000, 50);
 			spinnerOrientationTol = spinner(orientationTol,0,3.0,0.05,1,3);
@@ -418,6 +424,7 @@ public class DetectCalibrationChessboard2App
 			addAlignLeft(checkMeanShift);
 			addAlignLeft(checkAnyGrid);
 			addLabeled(spinnerRadius,"Corner Radius");
+			addLabeled(spinnerCornerThreshold,"Corner Threshold");
 			addLabeled(spinnerTop,"Pyramid Top");
 			addLabeled(spinnerOrientationTol,"Orientation Tol");
 			addLabeled(spinnerDirectionTol,"Direction Tol");
@@ -436,6 +443,9 @@ public class DetectCalibrationChessboard2App
 
 			panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
 					"Visualize",TitledBorder.CENTER, TitledBorder.TOP));
+
+			panel.setPreferredSize(panel.getMinimumSize());
+			panel.setMaximumSize(panel.getMinimumSize());
 
 			return panel;
 		}
@@ -487,6 +497,10 @@ public class DetectCalibrationChessboard2App
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerDistanceTol ) {
 				distanceTol = ((Number)spinnerDistanceTol.getValue()).doubleValue();
+				createAlgorithm();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerCornerThreshold ) {
+				cornerThreshold = ((Number)spinnerCornerThreshold.getValue()).doubleValue();
 				createAlgorithm();
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerRadius ) {

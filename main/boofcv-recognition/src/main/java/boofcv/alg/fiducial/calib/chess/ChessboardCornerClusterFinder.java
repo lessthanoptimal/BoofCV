@@ -313,7 +313,7 @@ public class ChessboardCornerClusterFinder {
 					double aveDist = (a.distance+b.distance)/2.0;
 
 					double score = 0.5*(angleError+oriDistance)/Math.PI; // max value of 0.1
-					score += Math.abs(a.distance-b.distance)/Math.min(a.distance,b.distance); // A good value will be less than 1
+					score += 0.2*Math.abs(a.distance-b.distance)/Math.min(a.distance,b.distance); // A good value will be less than 1
 					// score now is an error metric with 0 being perfect
 					score = (1.0+score)*aveDist;
 
@@ -368,7 +368,13 @@ public class ChessboardCornerClusterFinder {
 				info.distance = Math.sqrt(r.distance); // NN distance function returns Euclidean distance squared
 				info.set(r.point.x,r.point.y);
 
-				// TODO use direction and orientation to reject nodes
+				// Use direction and orientation to reject nodes
+				// In a perfect grid, the direction and orientation should be off by 45 degrees
+				double directionHalf = UtilAngle.boundHalf(info.direction);
+				double directionError = UtilAngle.distHalf(directionHalf,r.point.orientation);
+				if( directionError < 1*Math.PI/8 || directionError > 3*Math.PI/8 ) {
+					node.neighbors.removeTail();
+				}
 			}
 		}
 

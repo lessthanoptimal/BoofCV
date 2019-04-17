@@ -78,6 +78,9 @@ public class DetectChessboardCorners {
 	// feature radius and width in Shi-Tomasi corner detector
 	int shiRadius, shiWidth;
 
+	// Threshold used to filter out corners
+	double cornerIntensityThreshold = 1.0;
+
 	// computes corner intensity image
 	GradientCornerIntensity<GrayF32> cornerIntensity;
 
@@ -183,13 +186,11 @@ public class DetectChessboardCorners {
 
 //			System.out.println("radius = "+radius+" angle = "+c.angle);
 //			System.out.println("intensity "+c.intensity);
-			if( c.intensity < 1.0 ) { // TODO make configurable
+			if( c.intensity < cornerIntensityThreshold ) {
 				corners.removeTail();
 			} else if( useMeanShift ) {
 				meanShiftLocation(c);
 				// TODO does it make sense to use mean shift first?
-				if( c.distance(2357.20 , 1994.25) < 1 )
-					System.out.println("~~~~ Foo ~~~~");
 				computeFeatures(c.x,c.y,c);
 			}
 		}
@@ -355,4 +356,11 @@ public class DetectChessboardCorners {
 		return shiRadius;
 	}
 
+	public double getCornerIntensityThreshold() {
+		return cornerIntensityThreshold;
+	}
+
+	public void setCornerIntensityThreshold(double cornerIntensityThreshold) {
+		this.cornerIntensityThreshold = cornerIntensityThreshold;
+	}
 }

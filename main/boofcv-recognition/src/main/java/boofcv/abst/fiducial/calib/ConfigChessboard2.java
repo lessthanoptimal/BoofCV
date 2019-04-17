@@ -46,6 +46,11 @@ public class ConfigChessboard2 implements Configuration {
 
 	public int cornerRadius = 1;
 
+	/**
+	 * Threshold on corner intensity
+	 */
+	public double cornerThreshold = 1.0;
+
 	public int pyramidTopSize = 100;
 
 	public ConfigThreshold threshold = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
