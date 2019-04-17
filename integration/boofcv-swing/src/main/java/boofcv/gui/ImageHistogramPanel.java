@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.gui;
 
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.ImageGray;
@@ -35,6 +36,7 @@ public class ImageHistogramPanel extends JPanel {
 	protected int bins[];
 
 	public int marker = -1;
+	public boolean approximateHistogram=true;
 
 	public ImageHistogramPanel(int totalBins, double maxValue) {
 		this.totalBins = totalBins;
@@ -56,16 +58,19 @@ public class ImageHistogramPanel extends JPanel {
 	 * Update's the histogram. Must only be called in UI thread
 	 */
 	public void update( ImageGray image ) {
+		if( approximateHistogram ) {
+			for (int i = 0; i < bins.length; i++)
+				bins[i] = 0;
 
-		for( int i = 0; i < bins.length; i++ )
-			bins[i] = 0;
-
-		if( image instanceof GrayF32)
-			update( (GrayF32)image );
-		else if( GrayI.class.isAssignableFrom(image.getClass()) )
-			update( (GrayI)image );
-		else
-			throw new IllegalArgumentException("Image type not yet supported");
+			if (image instanceof GrayF32)
+				update((GrayF32) image);
+			else if (GrayI.class.isAssignableFrom(image.getClass()))
+				update((GrayI) image);
+			else
+				throw new IllegalArgumentException("Image type not yet supported");
+		} else {
+			GImageStatistics.histogram(image,0,bins);
+		}
 	}
 
 	private void update( GrayF32 image ) {
@@ -124,13 +129,20 @@ public class ImageHistogramPanel extends JPanel {
 
 		synchronized (lock) {
 			int maxCount = 0;
+			int histSum = 0;
 			for (int i = 0; i < totalBins; i++) {
+				histSum += bins[i];
 				if (bins[i] > maxCount)
 					maxCount = bins[i];
 			}
 
 			if (maxCount == 0)
 				return;
+
+			// one bin absolutely dominates. Set it to something more reasonable so the histogram can be seen
+			if( maxCount >= histSum/10 ) {
+				maxCount = (int)Math.sqrt(histSum)/5+2;
+			}
 
 			g2.setColor(Color.BLACK);
 
@@ -152,5 +164,13 @@ public class ImageHistogramPanel extends JPanel {
 
 	public void setMarker(int marker) {
 		this.marker = marker;
+	}
+
+	public boolean isApproximateHistogram() {
+		return approximateHistogram;
+	}
+
+	public void setApproximateHistogram(boolean approximateHistogram) {
+		this.approximateHistogram = approximateHistogram;
 	}
 }

@@ -272,10 +272,7 @@ public class ChessboardCornerClusterFinder {
 		// Edges can have multiple solutions if its ambiguous. Add alternatives to the edges here
 		addSimilarNodesToConnections(ntarget);
 
-		if( corners.get(target).distance(2432.78,1487.83) < 3 ) {
-			HACK_interesting = target;
-			System.out.println("Interesting: connections = "+ntarget.countEdges());
-		} else if( interesting) {
+		if( interesting) {
 			System.out.println("Corner "+target+": connections = "+ntarget.countEdges());
 		}
 	}
@@ -515,7 +512,7 @@ public class ChessboardCornerClusterFinder {
 	}
 
 	private boolean isInteresting( int target ) {
-		return target==23||target==5||target==8;
+		return target==639||target==330||target==325;
 	}
 
 	/**

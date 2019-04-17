@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 	public int otsuTuning = -1;
 	public boolean useOtsu2 = true;
 	public int minPixelValue = 0;
-	public int maxPixelValue = 255;
+	public int maxGrayLevels = 255;
 
 	// toggle value of threshold
 	public double minimumSpread = new ConfigThresholdBlockMinMax().minimumSpread;
@@ -94,7 +94,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		this.savolaK = configThreshold.savolaK;
 		this.nickK = configThreshold.nickK;
 		this.minPixelValue = configThreshold.minPixelValue;
-		this.maxPixelValue = configThreshold.maxPixelValue;
+		this.maxGrayLevels = configThreshold.maxPixelValue;
 		this.thresholdLocalBlocks = configThreshold.thresholdFromLocalBlocks;
 
 		if( configThreshold instanceof ConfigThresholdLocalOtsu ) {
@@ -162,7 +162,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		if( histogramPanel != null )
 			throw new IllegalArgumentException("Already called");
 
-		histogramPanel = new ImageHistogramPanel(255,256);
+		histogramPanel = new ImageHistogramPanel(maxGrayLevels +1, maxGrayLevels);
 		histogramHolder.add( BorderLayout.CENTER,histogramPanel );
 		histogramHolder.setPreferredSize(new Dimension(0,60));
 		histogramHolder.setMaximumSize(new Dimension(100000,60));
@@ -416,7 +416,7 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		config.savolaK = savolaK;
 		config.nickK = nickK;
 		config.minPixelValue = minPixelValue;
-		config.maxPixelValue = maxPixelValue;
+		config.maxPixelValue = maxGrayLevels;
 		config.thresholdFromLocalBlocks = thresholdLocalBlocks;
 
 		return config;

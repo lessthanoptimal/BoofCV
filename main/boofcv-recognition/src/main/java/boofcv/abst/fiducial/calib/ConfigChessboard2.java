@@ -18,6 +18,7 @@
 
 package boofcv.abst.fiducial.calib;
 
+import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
@@ -55,6 +56,7 @@ public class ConfigChessboard2 implements Configuration {
 	public double squareWidth;
 
 	{
+		threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
 		threshold.scale = 0.9;
 		threshold.down = false;
 	}
