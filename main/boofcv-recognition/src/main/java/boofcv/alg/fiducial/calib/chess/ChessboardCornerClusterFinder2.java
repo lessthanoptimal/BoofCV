@@ -35,6 +35,7 @@ import java.util.List;
 public class ChessboardCornerClusterFinder2 {
 
 	double angleTol;
+	double distanceTol=0.2;
 
 	// Number of nearest neighbors it will search. It's assumed that the feature detector does a very
 	// good job removing false positives, meaning that tons of features do not need to be considered
@@ -51,6 +52,9 @@ public class ChessboardCornerClusterFinder2 {
 
 	// Output. Contains a graph of connected corners
 	FastQueue<ChessboardCornerGraph> clusters = new FastQueue<>(ChessboardCornerGraph.class,true);
+
+	// predeclared storage for results
+	SearchResults results = new SearchResults();
 
 	public void process(List<ChessboardCorner> corners ) {
 		// reset internal data structures
@@ -80,12 +84,17 @@ public class ChessboardCornerClusterFinder2 {
 			v.pruneNonMutal(false);
 		}
 
-		// Identify situations where two vertexes are essentially identical and pick one and remove others
-
-
 		// Select the final 2 to 4 connections from perpendicular set
 		// each pair of adjacent perpendicular edge needs to have a matching parallel edge between them
 		// Use each perpendicular edge as a seed and select the best one
+		for (int idx = 0; idx < vertexes.size(); idx++) {
+			selectConnections(vertexes.get(idx));
+		}
+
+		// TODO Identify situations where two vertexes are essentially identical and pick one and remove others
+
+
+		// TODO compute outputs
 	}
 
 	void findVertexConnections( Vertex target  , List<ChessboardCorner> corners ) {
@@ -138,6 +147,79 @@ public class ChessboardCornerClusterFinder2 {
 		}
 	}
 
+	/**
+	 * Go through each node, and in their set of selected nodes identify ones which appear identicial to a selected one.
+	 * Out of those candidates, select the one which the highest selectedCount. Remove and change all references
+	 * to the one just removed.
+	 */
+	void pruneDuplicates() {
+
+	}
+
+	/**
+	 * Select the best 2,3, or 4 perpendicular vertexes to connect to.
+	 */
+	void selectConnections( Vertex target ) {
+		// There needs to be at least two corners
+		if( target.perpendicular.size() <= 1 )
+			return;
+
+		double bestError = Double.MAX_VALUE;
+		List<Edge> bestSolution = target.connections;
+		List<Edge> solution = new ArrayList<>();
+
+		for (int i = 0; i < target.perpendicular.size(); i++) {
+			Edge e = target.perpendicular.get(i);
+			solution.clear();
+			solution.add(e);
+
+			double error = 0;
+
+			// see if matches can be found in 90 degree increments
+			if( target.perpendicular.findBestMatch(e.direction,Math.PI/2.0,e.distance,
+					results,angleTol,distanceTol))  {
+				error += results.error;
+				solution.add(target.perpendicular.edges.get(results.index));
+
+				if( target.perpendicular.findBestMatch(e.direction,Math.PI,e.distance,results,angleTol,distanceTol)) {
+					error += results.error;
+					solution.add(target.perpendicular.edges.get(results.index));
+
+					// TODO require a parallel nodes to lie between them?
+
+					if( target.perpendicular.findBestMatch(e.direction,3*Math.PI/2.0,e.distance,
+							results,angleTol,distanceTol)) {
+						error += results.error;
+						solution.add(target.perpendicular.edges.get(results.index));
+					}
+				}
+			} else {
+				continue;
+			}
+
+			// favor more corners being added, but not too much
+			error /= (2+2*solution.size());
+
+			// favor a closer solution
+			error *= Math.sqrt(e.distance);
+
+			if( error < bestError ) {
+				bestSolution.clear();
+				bestSolution.addAll(solution);
+			}
+		}
+
+		// increment the number of times it has been selected
+		for (int i = 0; i < bestSolution.size(); i++) {
+			bestSolution.get(i).dst.selectedCount++;
+		}
+	}
+
+	public static class SearchResults {
+		public int index;
+		public double error;
+	}
+
 	public static class Vertex {
 		/**
 		 * Index of the corner that this node represents
@@ -153,10 +235,22 @@ public class ChessboardCornerClusterFinder2 {
 		 */
 		public EdgeSet perpendicular = new EdgeSet();
 
+		/**
+		 * Final set of edfes which it was decided that this vertex is connected to. Will have 2 to 4 elements.
+		 */
+		public List<Edge> connections = new ArrayList<>();
+
+		/**
+		 * Number of times it has been selected by another node to connect with it
+		 */
+		public int selectedCount;
+
 		public void reset() {
 			index = -1;
 			parallel.reset();
 			perpendicular.reset();
+			connections.clear();
+			selectedCount = 0;
 		}
 
 		public void pruneNonMutal( boolean isParallel ) {
@@ -178,6 +272,27 @@ public class ChessboardCornerClusterFinder2 {
 
 		public void reset() {
 			edges.clear();
+		}
+
+		public boolean findBestMatch(double reference, double targetCCW, double targetDist,
+									 SearchResults result , double maxErrorCCW, double maxErrorDist ) {
+			result.error = Double.MAX_VALUE;
+			result.index = -1;
+
+			for (int i = 0; i < edges.size(); i++) {
+				Edge e = edges.get(i);
+				double errorCCW = UtilAngle.dist(targetCCW,UtilAngle.distanceCCW(reference,e.direction));
+				double errorDist = Math.abs(targetDist-e.distance)/targetDist;
+
+				if( errorCCW > maxErrorCCW || errorDist > maxErrorDist )
+					continue;
+
+				// angle error should be minimized more than distance error
+				result.error = 2*errorCCW/maxErrorCCW + errorDist/maxErrorDist;
+				result.index = i;
+			}
+
+			return result.index != -1;
 		}
 
 		public void add( Edge e ) {
