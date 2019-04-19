@@ -22,7 +22,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard2;
 import boofcv.abst.fiducial.calib.ConfigChessboard2;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
-import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder2;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageStatistics;
@@ -152,8 +152,8 @@ public class DetectCalibrationChessboard2App
 
 			detector = new CalibrationDetectorChessboard2(config);
 			detector.getDetector().getDetector().useMeanShift = controlPanel.meanShift;
-			detector.getClusterFinder().setOrientationTol(controlPanel.orientationTol);
-			detector.getClusterFinder().setDirectionTol(controlPanel.directionTol);
+			detector.getClusterFinder().setAngleTol(controlPanel.orientationTol);
+//			detector.getClusterFinder().setDirectionTol(controlPanel.directionTol);
 			detector.getClusterFinder().setDistanceTol(controlPanel.distanceTol);
 
 			if( controlPanel.anyGrid ) {
@@ -395,10 +395,10 @@ public class DetectCalibrationChessboard2App
 				cornerThreshold = config.cornerThreshold;
 			}
 
-			ChessboardCornerClusterFinder finder = new ChessboardCornerClusterFinder();
+			ChessboardCornerClusterFinder2 finder = new ChessboardCornerClusterFinder2();
 			distanceTol = finder.getDistanceTol();
-			directionTol = finder.getDirectionTol();
-			orientationTol = finder.getOrientationTol();
+			directionTol = finder.getAngleTol();
+			orientationTol = finder.getAngleTol();
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
