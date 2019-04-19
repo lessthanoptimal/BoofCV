@@ -25,6 +25,7 @@ import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,12 @@ public class ChessboardCornerClusterFinder2 {
 
 	// predeclared storage for results
 	SearchResults results = new SearchResults();
+
+	// Used to convert the internal graph into the output clusters
+	GrowQueue_I32 c2v = new GrowQueue_I32(); // corner index to output node index
+	GrowQueue_I32 v2c = new GrowQueue_I32(); // output node index to corner index
+	GrowQueue_I32 open = new GrowQueue_I32(); // list of corner index's which still need ot be processed
+
 
 	public void process(List<ChessboardCorner> corners ) {
 		// reset internal data structures
@@ -91,8 +98,8 @@ public class ChessboardCornerClusterFinder2 {
 			selectConnections(vertexes.get(idx));
 		}
 
-		// TODO Identify situations where two vertexes are essentially identical and pick one and remove others
-
+		// Identify situations where two vertexes are essentially identical and pick one and remove others
+		pruneDuplicates();
 
 		// TODO compute outputs
 	}
@@ -153,7 +160,77 @@ public class ChessboardCornerClusterFinder2 {
 	 * to the one just removed.
 	 */
 	void pruneDuplicates() {
+		for (int idx = 0; idx < vertexes.size(); idx++) {
+			Vertex v = vertexes.get(idx);
 
+			for (int i = 0; i < v.connections.size(); i++) {
+				Edge c = v.connections.get(i);
+
+			}
+		}
+	}
+
+	void pruneDuplicates( Vertex src , Edge target ) {
+		List<Vertex> candidates = new ArrayList<>();
+
+		for (int i = 0; i < src.perpendicular.size(); i++) {
+			Edge e = src.perpendicular.get(i);
+			if( e == target )
+				continue;
+
+			double diffDirection = UtilAngle.dist(target.direction,e.direction);
+
+			if( diffDirection > angleTol )
+				continue;
+
+			double diffDistance = Math.abs(target.distance-e.distance)/target.distance;
+			if( diffDistance > distanceTol )
+				continue;
+
+			candidates.add(e.dst);
+		}
+
+		if( candidates.size() > 0 ) {
+			candidates.add(target.dst);
+
+			int bestIndex = -1;
+			double bestScore = 0;
+
+			for (int i = 0; i < candidates.size(); i++) {
+				Vertex v = candidates.get(i);
+				if( v.selectedCount > bestScore ) {
+					bestScore = v.selectedCount;
+					bestIndex = i;
+				}
+			}
+
+			for (int i = 0; i < candidates.size(); i++) {
+				if( i == bestIndex )
+					continue;
+				removeAndReplace(candidates.get(i),candidates.get(bestIndex));
+			}
+		}
+	}
+
+	void removeAndReplace( Vertex remove , Vertex replaceWith ) {
+		for (int i = 0; i < remove.perpendicular.size(); i++) {
+			Vertex v = remove.perpendicular.get(i).dst;
+
+			// get the index of the vertex that is to replace 'remove'
+			int ridx = v.perpendicular.find(replaceWith);
+			if( ridx == -1 ) // its not attached to this vertex, just move on
+				continue;
+
+			// remove reference to this vertex to avoid future confusion
+			v.perpendicular.edges.remove(v.perpendicular.find(remove));
+
+			// change the connection
+			for (int j = 0; j < v.connections.size(); j++) {
+				if( v.connections.get(i).dst == remove ) {
+					v.connections.set(i,v.perpendicular.get(ridx));
+				}
+			}
+		}
 	}
 
 	/**
@@ -198,7 +275,7 @@ public class ChessboardCornerClusterFinder2 {
 			}
 
 			// favor more corners being added, but not too much
-			error /= (2+2*solution.size());
+			error = (error + 1)/(2+2*solution.size());
 
 			// favor a closer solution
 			error *= Math.sqrt(e.distance);
@@ -213,6 +290,89 @@ public class ChessboardCornerClusterFinder2 {
 		for (int i = 0; i < bestSolution.size(); i++) {
 			bestSolution.get(i).dst.selectedCount++;
 		}
+	}
+
+	/**
+	 * Converts the internal graphs into unordered chessboard grids.
+	 */
+	void convertToOutput(List<ChessboardCorner> corners) {
+
+		c2v.resize(corners.size());
+		v2c.resize(vertexes.size());
+		open.reset();
+		v2c.fill(-1);
+		c2v.fill(-1);
+
+		for (int seedIdx = 0; seedIdx < vertexes.size; seedIdx++) {
+			Vertex seedN = vertexes.get(seedIdx);
+			if( v2c.get(seedN.index) != -1 )
+				continue;
+			ChessboardCornerGraph graph = clusters.grow();
+			graph.reset();
+
+			// traverse the graph and add all the nodes in this cluster
+			growCluster(corners, seedIdx, graph);
+
+			// Connect the nodes together in the output graph
+			for (int i = 0; i < graph.corners.size; i++) {
+				ChessboardCornerGraph.Node gn = graph.corners.get(i);
+				Vertex n = vertexes.get( v2c.get(i) );
+
+				for (int j = 0; j < n.connections.size(); j++) {
+					int outputIdx = c2v.get( n.connections.get(j).dst.index );
+					if( outputIdx == -1 ) {
+						throw new IllegalArgumentException("Edge to node not in the graph");
+					}
+					gn.edges[j] = graph.corners.get(outputIdx);
+				}
+			}
+
+			// ensure arrays are all -1 again for sanity checks
+			for (int i = 0; i < graph.corners.size; i++) {
+				ChessboardCornerGraph.Node gn = graph.corners.get(i);
+				int indexCorner = v2c.get(gn.index);
+				c2v.data[indexCorner] = -1;
+				v2c.data[gn.index] = -1;
+			}
+
+			if( graph.corners.size <= 1 )
+				clusters.removeTail();
+		}
+	}
+
+	/**
+	 * Given the initial seed, add all connected nodes to the output cluster while keeping track of how to
+	 * convert one node index into another one, between the two graphs
+	 */
+	private void growCluster(List<ChessboardCorner> corners, int seedIdx, ChessboardCornerGraph graph) {
+		// open contains corner list indexes
+		open.add(seedIdx);
+		while( open.size > 0 ) {
+			int target = open.pop();
+
+			// make sure it hasn't already been processed
+			if( v2c.get(target) != -1 )
+				continue;
+
+			// Create the node in the output cluster for this corner
+			ChessboardCornerGraph.Node gn = graph.growCorner();
+			c2v.data[target] = gn.index;
+			v2c.data[gn.index] = target;
+			gn.set(corners.get(target));
+
+			// Add to the open list all the edges which haven't been processed yet
+			Vertex v = vertexes.get(target);
+			for (int i = 0; i < v.connections.size(); i++) {
+				Vertex dst = v.connections.get(i).dst;
+				if( v2c.get(dst.index) != -1 )
+					continue;
+				open.add( dst.index );
+			}
+		}
+	}
+
+	public FastQueue<ChessboardCornerGraph> getOutputClusters() {
+		return clusters;
 	}
 
 	public static class SearchResults {
@@ -260,7 +420,7 @@ public class ChessboardCornerClusterFinder2 {
 				Vertex dst = set.edges.get(j).dst;
 				EdgeSet dstSet = isParallel ? dst.parallel : dst.perpendicular;
 
-				if( !dstSet.contains(this) ) {
+				if( -1 == dstSet.find(this) ) {
 					set.edges.remove(j);
 				}
 			}
@@ -307,12 +467,12 @@ public class ChessboardCornerClusterFinder2 {
 			return edges.size();
 		}
 
-		public boolean contains( Vertex v ) {
+		public int find( Vertex v ) {
 			for (int i = 0; i < edges.size(); i++) {
 				if( edges.get(i).dst == v )
-					return true;
+					return i;
 			}
-			return false;
+			return -1;
 		}
 	}
 
