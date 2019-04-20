@@ -400,7 +400,7 @@ public class DetectCalibrationChessboard2App
 			ChessboardCornerClusterFinder2 finder = new ChessboardCornerClusterFinder2();
 			ambiguousTol = finder.getAmbiguousTol();
 			directionTol = finder.getDirectionTol();
-			orientationTol = finder.getDirectionTol();
+			orientationTol = finder.getOrientationTol();
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);

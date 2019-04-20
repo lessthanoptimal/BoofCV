@@ -34,6 +34,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * From a set of {@link ChessboardCorner ChessboardCorners} find all the chessboard grids in view. Assumptions
+ * about the grids size are not made at this stage.
+ *
+ * Algorithmic Steps:
+ * <ol>
+ *     <li>Nearest neighbor search for each corners. For each corner, matches are put into parallel and perpendicular sets</li>
+ *     <li>Identify ambiguous corners that are close to each other and pick be most intense corner</li>
+ *     <li>Prune corners from each nodes parallel and perpendicular sets if they are not mutual</li>
+ *     <li>Select 2 to 4 connections for each corner using projective invariant properties</li>
+ *     <li>Find connected sets of vertexes and convert into output format</li>
+ * </ol>
+ *
+ * At a high level, a graph is formed where each vertex (a corner) can have at most 4 edges (connections) that
+ * describe the relationship between two vertexes. If there is no distortion then each edge will be 90 degrees
+ * apart radially. "Error" functions are use through out the code to decide which edge or vertex is best to select.
+ * Error functions are not always true errors and just means they are functions where the best value is a minimum.
+ * Whenever possible, errors are computed using projective invariant properties, which is how it can handle large
+ * amounts of distortion. Hard thresholds are used to reduce computational complexity and weird edge cases, thus
+ * are typically very generous. Lens distortion is not explicitly modeled. Instead fuzzy thresholds and error functions
+ * are used to account for it.
+ *
+ * Chessboard and geometric properties used:
+ * <ul>
+ *     <li>Orientation of corners alternates by 90 degrees</li>
+ *     <li>A corner can only be connected to a corner with an orientation perpendicular to it</li>
+ *     <lI>Between any two adjacent connections there must lie a corner with an orientation that is parallel.</lI>
+ *     <li>Without perspective distortion, corners are laid out in a grid pattern</li>
+ *     <li>Assume projective transform, with fuzzy parameters to account for lens distortion</li>
+ *     <li>Straight lines are straight</li>
+ *     <li>Order of vector angles from a point to another point does not change</li>
+ *     <li>Order of intersections along a line does not change</li>
+ * </ul>
+ *
  * @author Peter Abeles
  */
 public class ChessboardCornerClusterFinder2 {
@@ -375,11 +408,6 @@ public class ChessboardCornerClusterFinder2 {
 				bestSolution.addAll(solution);
 			}
 		}
-
-		// increment the number of times it has been selected
-		for (int i = 0; i < bestSolution.size(); i++) {
-			bestSolution.get(i).dst.selectedCount++;
-		}
 	}
 
 	boolean findNext( int firstIdx , EdgeSet splitterSet , EdgeSet candidateSet , double parallel,
@@ -650,10 +678,8 @@ public class ChessboardCornerClusterFinder2 {
 		public EdgeSet connections = new EdgeSet();
 
 		/**
-		 * Number of times it has been selected by another node to connect with it
+		 * Used when computing output. Indicates that the vertex has already been processed.
 		 */
-		public int selectedCount;
-
 		public boolean insideCluster;
 
 		/**
@@ -666,7 +692,6 @@ public class ChessboardCornerClusterFinder2 {
 			parallel.reset();
 			perpendicular.reset();
 			connections.reset();
-			selectedCount = 0;
 			insideCluster = false;
 		}
 
