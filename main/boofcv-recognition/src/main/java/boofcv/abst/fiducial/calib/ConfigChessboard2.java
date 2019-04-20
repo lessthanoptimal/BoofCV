@@ -44,7 +44,7 @@ public class ConfigChessboard2 implements Configuration {
 	public int numCols = -1;
 
 
-	public int cornerRadius = 1;
+	public int cornerRadius = 2;
 
 	/**
 	 * Threshold on corner intensity

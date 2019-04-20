@@ -38,15 +38,19 @@ import java.util.List;
  */
 public class ChessboardCornerClusterFinder2 {
 
-	double angleTol=0.7;
-	double distanceTol=1.0;
+	// Tolerance for deciding if two directions are the same.
+	double directionTol =0.60;
+	// Tolerance for deciding of two corner orientations are the same.
+	double orientationTol =0.45;
+	// Tolerance for how close two corners need to be to be considered ambiguous. Relative
+	double ambiguousTol = 0.25;
 
 	// automatically computed
-	double parallelTol; // angle tolerance for parallel lines
+	double parallelTol; // angle tolerance for parallel lines. smaller than direction
 
 	// Number of nearest neighbors it will search. It's assumed that the feature detector does a very
 	// good job removing false positives, meaning that tons of features do not need to be considered
-	int maxNeighbors=16; // 8 is minimum number given perfect data.
+	int maxNeighbors=20; // 8 is minimum number given perfect data.
 
 	// Data structures for the crude graph
 	FastQueue<Vertex> vertexes = new FastQueue<>(Vertex.class,true);
@@ -76,7 +80,7 @@ public class ChessboardCornerClusterFinder2 {
 	List<ChessboardCorner> corners;
 
 	public ChessboardCornerClusterFinder2() {
-		setAngleTol(angleTol);
+		setDirectionTol(directionTol);
 	}
 
 	public void process(List<ChessboardCorner> corners ) {
@@ -99,11 +103,12 @@ public class ChessboardCornerClusterFinder2 {
 
 		// Connect corners to each other based on relative distance on orientation
 		for (int i = 0; i < corners.size(); i++) {
-			findVertexConnections(vertexes.get(i),corners);
+			findVertexNeighbors(vertexes.get(i),corners);
 		}
 
-		handleAmbiguousChoices2(corners);
-//		printDualGraph();
+		// If more than one vertex's are near each other, remove
+		handleAmbiguousVertexes(corners);
+		printDualGraph();
 
 		// Prune connections which are not mutual
 		for (int i = 0; i < vertexes.size; i++) {
@@ -111,7 +116,7 @@ public class ChessboardCornerClusterFinder2 {
 			v.pruneNonMutal(EdgeType.PARALLEL);
 			v.pruneNonMutal(EdgeType.PERPENDICULAR);
 		}
-		printDualGraph();
+//		printDualGraph();
 
 		// Select the final 2 to 4 connections from perpendicular set
 		// each pair of adjacent perpendicular edge needs to have a matching parallel edge between them
@@ -120,9 +125,6 @@ public class ChessboardCornerClusterFinder2 {
 			selectConnections(vertexes.get(idx));
 		}
 		printConnectionGraph();
-
-		// Identify situations where two vertexes are essentially identical and pick one and remove others
-//		handleAmbiguousChoices(corners);
 
 		for (int i = 0; i < vertexes.size; i++) {
 			Vertex v = vertexes.get(i);
@@ -173,7 +175,11 @@ public class ChessboardCornerClusterFinder2 {
 		}
 	}
 
-	void findVertexConnections( Vertex target  , List<ChessboardCorner> corners ) {
+	void findVertexNeighbors(Vertex target  , List<ChessboardCorner> corners ) {
+		if( target.index == 18 ) {
+			System.out.println("Vertex Neighbors "+target.index);
+		}
+
 		ChessboardCorner targetCorner = corners.get(target.index);
 		nnSearch.findNearest(corners.get(target.index),Double.MAX_VALUE,maxNeighbors,nnResults);
 
@@ -190,9 +196,9 @@ public class ChessboardCornerClusterFinder2 {
 
 			Edge edge = edges.grow();
 			boolean parallel;
-			if( oriDiff <= parallelTol ) { // see if it's parallel
+			if( oriDiff <= orientationTol) { // see if it's parallel
 				parallel = true;
-			} else if( Math.abs(oriDiff-Math.PI/2.0) <= angleTol ) { // see if it's perpendicular
+			} else if( Math.abs(oriDiff-Math.PI/2.0) <= orientationTol) { // see if it's perpendicular
 				parallel = false;
 			} else {
 				edges.removeTail();
@@ -213,11 +219,11 @@ public class ChessboardCornerClusterFinder2 {
 			EdgeSet edgeSet;
 			if( parallel ) {
 				// test to see if direction and orientation are aligned or off by 90 degrees
-				remove = directionDiff > 2*angleTol && Math.abs(directionDiff-Math.PI/2.0) > 2*angleTol;
+				remove = directionDiff > 2* directionTol && Math.abs(directionDiff-Math.PI/2.0) > 2* directionTol;
 				edgeSet = target.parallel;
 			} else {
 				// should be at 45 degree angle
-				remove = Math.abs(directionDiff-Math.PI/4.0) > 2*angleTol;
+				remove = Math.abs(directionDiff-Math.PI/4.0) > 2* directionTol;
 				edgeSet = target.perpendicular;
 			}
 
@@ -226,29 +232,7 @@ public class ChessboardCornerClusterFinder2 {
 				continue;
 			}
 
-			// see if there's an existing edge pointing in the same direction. If so prefer the closer one
-//			int bestIndex = -1;
-//			double bestError = parallelTol;
-//
-//			for (int j = 0; j < edgeSet.size(); j++) {
-//				double error = UtilAngle.dist(edge.direction,edgeSet.get(j).direction);
-//				if( error <= bestError ) {
-//					bestError = error;
-//					bestIndex = j;
-//				}
-//			}
-//
-//			if( bestIndex != -1 ) {
-//				if( edgeSet.get(bestIndex).distance > edge.distance ) {
-//					// there's an edge pointing in the same direction that's farther away. Replace it with this one
-//					edgeSet.set(bestIndex,edge);
-//				} else {
-//					// keep the current edge
-//					edges.removeTail();
-//				}
-//			} else {
-				edgeSet.add(edge);
-//			}
+			edgeSet.add(edge);
 		}
 
 		// only want local neighbors. If it's a corner there should be at least 3 right next to the node. Unless
@@ -257,17 +241,17 @@ public class ChessboardCornerClusterFinder2 {
 			target.medianDistance = 0;
 		} else {
 			sorter.sort(distanceTmp.data, distanceTmp.size);
-			int idx = Math.min(2,distanceTmp.size-1);
+			int idx = Math.min(3,distanceTmp.size-1);
 			target.medianDistance = Math.sqrt(distanceTmp.data[idx]); // NN distance is Euclidean squared
 		}
 	}
 
-	void handleAmbiguousChoices2(List<ChessboardCorner> corners) {
+	void handleAmbiguousVertexes(List<ChessboardCorner> corners) {
 		List<Vertex> candidates = new ArrayList<>();
 		for (int idx = 0; idx < vertexes.size(); idx++) {
 			Vertex target = vertexes.get(idx);
 
-			double threshold = target.medianDistance*0.1;
+			double threshold = target.medianDistance*ambiguousTol;
 
 			candidates.clear();
 			// only need to search parallel since perpendicular nodes won't be confused for the target
@@ -332,7 +316,7 @@ public class ChessboardCornerClusterFinder2 {
 		if( target.perpendicular.size() <= 1 )
 			return;
 
-		if( target.index == 2 ) {
+		if( target.index == 16 ) {
 			System.out.println("ASDSAD");
 		}
 		System.out.println("======= Connecting "+target.index);
@@ -348,32 +332,40 @@ public class ChessboardCornerClusterFinder2 {
 
 			double error = 0;
 			double sumDistance = solution.get(0).distance;
+			double minDistance = sumDistance;
 
-			if( !findNext(i,target.parallel,target.perpendicular,results) ) {
+			if( !findNext(i,target.parallel,target.perpendicular,Double.NaN,results) ) {
 				continue;
 			}
 
 			error += results.error;
 			solution.add(target.perpendicular.get(results.index));
 			sumDistance += solution.get(1).distance;
+			minDistance = Math.min(minDistance,solution.get(1).distance);
 
-			if( findNext(results.index,target.parallel,target.perpendicular,results) ) {
+			// Use knowledge that solution[0] and solution[2] form a line.
+			// Lines are straight under projective distortion
+			if( findNext(results.index,target.parallel,target.perpendicular,solution.get(0).direction,results) ) {
 				error += results.error;
 				solution.add(target.perpendicular.get(results.index));
 				sumDistance += solution.get(2).distance;
+				minDistance = Math.min(minDistance,solution.get(2).distance);
 
-				if( findNext(results.index,target.parallel,target.perpendicular,results) ) {
+
+				// Use knowledge that solution[1] and solution[3] form a line.
+				if( findNext(results.index,target.parallel,target.perpendicular,solution.get(1).direction,results) ) {
 					error += results.error;
 					solution.add(target.perpendicular.get(results.index));
 					sumDistance += solution.get(3).distance;
+					minDistance = Math.min(minDistance,solution.get(3).distance);
 				}
 			}
 
 			// TODO some how make prefer larger if all things basically equal
 			// favor more corners being added, but not too much
-			error = (error + 3)/(1+2*solution.size());
+//			error = (error + 3)/(1+2*solution.size());
 
-			error *= (sumDistance/solution.size());
+			error = (sumDistance+minDistance)/(solution.size()*solution.size());
 
 			System.out.println("  first="+solution.get(0).dst.index+"  size="+solution.size()+" error="+error);
 
@@ -390,12 +382,13 @@ public class ChessboardCornerClusterFinder2 {
 		}
 	}
 
-	boolean findNext( int firstIdx , EdgeSet splitterSet , EdgeSet candidateSet , SearchResults results ) {
+	boolean findNext( int firstIdx , EdgeSet splitterSet , EdgeSet candidateSet , double parallel,
+					  SearchResults results ) {
 		Edge e0 = candidateSet.get(firstIdx);
 
 		results.index = -1;
 		results.error = Double.MAX_VALUE;
-
+		boolean checkParallel = !Double.isNaN(parallel);
 
 		for (int i = 0; i < candidateSet.size(); i++) {
 			if( i == firstIdx )
@@ -404,8 +397,18 @@ public class ChessboardCornerClusterFinder2 {
 			// stop considering edges when they are more than 180 degrees away
 			Edge eI = candidateSet.get(i);
 			double distanceCCW = UtilAngle.distanceCCW(e0.direction,eI.direction);
-			if( distanceCCW >= Math.PI )
-				continue;
+			if( distanceCCW >= Math.PI*0.9 ) // Multiplying by 0.9 helped remove a lot of bad matches
+				continue;                    // It was pairing up opposite corners under heavy perspective distortion
+
+			// It should be parallel to a previously found line
+			if( checkParallel ) {
+				double a = UtilAngle.boundHalf(eI.direction);
+				double b = UtilAngle.boundHalf(parallel);
+				double distanceParallel = UtilAngle.distHalf(a,b);
+				if( distanceParallel > parallelTol ) {
+					continue;
+				}
+			}
 
 			// find the perpendicular corner which splits these two edges and also find the index of
 			// the perpendicular sets which points towards the splitter.
@@ -417,7 +420,7 @@ public class ChessboardCornerClusterFinder2 {
 					e0.dst.perpendicular.get(tuple3.b).direction);
 			double error0 = UtilAngle.dist(acute0,Math.PI/2.0);
 
-			if( error0 > Math.PI/4 )
+			if( error0 > Math.PI*0.3 )
 				continue;
 
 			double acute1 = UtilAngle.dist(
@@ -425,12 +428,15 @@ public class ChessboardCornerClusterFinder2 {
 					eI.dst.perpendicular.get(tuple3.c).direction);
 			double error1 = UtilAngle.dist(acute1,Math.PI/2.0);
 
-			if( error1 > Math.PI/4 )
+			if( error1 > Math.PI*0.3 )
 				continue;
 
+			// The quadrilateral with the smallest area is most often the best solution. Area is more expensive
+			// so the perimeter is computed instead. one side is left off since all of them have that side
+			double error = e0.dst.perpendicular.get(tuple3.b).distance;
+			error += eI.dst.perpendicular.get(tuple3.c).distance;
+			error += eI.distance;
 
-			double error = error0+error1;
-//			error *= error;
 			if( error < results.error ) {
 				results.error = error;
 				results.index = i;
@@ -450,34 +456,50 @@ public class ChessboardCornerClusterFinder2 {
 			// select the splitter
 			Edge me = master.get(i);
 
+			// TODO decide if this is helpful or not
 			// check that it lies between these two angles
-			if( UtilAngle.distanceCCW(ccw0 , me.direction) > Math.PI ||
-					UtilAngle.distanceCW(ccw1,me.direction) > Math.PI )
+			if( UtilAngle.distanceCCW(ccw0 , me.direction) > Math.PI*0.9 ||
+					UtilAngle.distanceCW(ccw1,me.direction) > Math.PI*0.9 )
 				continue;
 
 			// Find indexes which point towards the splitter corner
 			int idxB = other1.find(me.dst);
 			if( idxB == -1 )
 				continue;
+
+			double thetaB = UtilAngle.distanceCCW(ccw0 , other1.get(idxB).direction);
+			if( thetaB < 0.05 )
+				continue;
+
 			int idxC = other2.find(me.dst);
 			if( idxC == -1 )
 				continue;
 
-			// has to be convex
-			double pointingB = other1.edges.get(idxB).direction;
-			double pointingC = UtilAngle.bound(other2.edges.get(idxC).direction+Math.PI);
-			if( UtilAngle.distanceCCW(pointingB,pointingC) >= Math.PI )
+			double thetaC = UtilAngle.distanceCW(ccw1 , other2.get(idxC).direction);
+			if( thetaC < 0.05 )
 				continue;
 
-			if( me.distance < bestDistance ) {
-				bestDistance = me.distance;
+			// want it to be closer and without parallel lines
+			double error = me.distance/(0.5+Math.min(thetaB,thetaC));
+
+			if( error < bestDistance ) {
+				bestDistance = error;
 				output.a = i;
 				output.b = idxB;
 				output.c = idxC;
 			}
 		}
 
-		return bestDistance < Double.MAX_VALUE;
+		// Reject the best solution if it doesn't form a convex quadrilateral
+		if( bestDistance < Double.MAX_VALUE ) {
+			// 2 is CCW of 1, and since both of them are pointing towards the splitter we know
+			// how to compute the angular distance
+			double pointingB = other1.edges.get(output.b).direction;
+			double pointingC = other2.edges.get(output.c).direction;
+			return UtilAngle.distanceCW(pointingB, pointingC) < Math.PI;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -565,21 +587,13 @@ public class ChessboardCornerClusterFinder2 {
 		return clusters;
 	}
 
-	public double getAngleTol() {
-		return angleTol;
+	public double getDirectionTol() {
+		return directionTol;
 	}
 
-	public void setAngleTol(double angleTol) {
-		this.angleTol = angleTol;
-		this.parallelTol = angleTol/2;
-	}
-
-	public double getDistanceTol() {
-		return distanceTol;
-	}
-
-	public void setDistanceTol(double distanceTol) {
-		this.distanceTol = distanceTol;
+	public void setDirectionTol(double directionTol) {
+		this.directionTol = directionTol;
+		this.parallelTol = directionTol /2;
 	}
 
 	public int getMaxNeighbors() {
@@ -588,6 +602,22 @@ public class ChessboardCornerClusterFinder2 {
 
 	public void setMaxNeighbors(int maxNeighbors) {
 		this.maxNeighbors = maxNeighbors;
+	}
+
+	public double getOrientationTol() {
+		return orientationTol;
+	}
+
+	public void setOrientationTol(double orientationTol) {
+		this.orientationTol = orientationTol;
+	}
+
+	public double getAmbiguousTol() {
+		return ambiguousTol;
+	}
+
+	public void setAmbiguousTol(double ambiguousTol) {
+		this.ambiguousTol = ambiguousTol;
 	}
 
 	public static class SearchResults {

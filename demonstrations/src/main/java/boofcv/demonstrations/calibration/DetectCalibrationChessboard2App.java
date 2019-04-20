@@ -152,9 +152,9 @@ public class DetectCalibrationChessboard2App
 
 			detector = new CalibrationDetectorChessboard2(config);
 			detector.getDetector().getDetector().useMeanShift = controlPanel.meanShift;
-			detector.getClusterFinder().setAngleTol(controlPanel.orientationTol);
-//			detector.getClusterFinder().setDirectionTol(controlPanel.directionTol);
-			detector.getClusterFinder().setDistanceTol(controlPanel.distanceTol);
+			detector.getClusterFinder().setOrientationTol(controlPanel.orientationTol);
+			detector.getClusterFinder().setDirectionTol(controlPanel.directionTol);
+			detector.getClusterFinder().setAmbiguousTol(controlPanel.ambiguousTol);
 
 			if( controlPanel.anyGrid ) {
 				detector.getClusterToGrid().setCheckShape(null);
@@ -358,7 +358,7 @@ public class DetectCalibrationChessboard2App
 		JSpinner spinnerRadius;
 		JSpinner spinnerCornerThreshold;
 		JSpinner spinnerTop;
-		JSpinner spinnerDistanceTol;
+		JSpinner spinnerAmbiguous;
 		JSpinner spinnerDirectionTol;
 		JSpinner spinnerOrientationTol;
 		JCheckBox checkShowTargets;
@@ -369,10 +369,10 @@ public class DetectCalibrationChessboard2App
 		JCheckBox checkAnyGrid;
 		public ThresholdControlPanel thresholdPanel;
 
-		int pyramidTop = 100;
-		int radius = 1;
+		int pyramidTop;
+		int radius;
 		double cornerThreshold;
-		double distanceTol;
+		double ambiguousTol;
 		double directionTol;
 		double orientationTol;
 		boolean showChessboards = true;
@@ -387,6 +387,8 @@ public class DetectCalibrationChessboard2App
 		public ControlPanel() {
 			{
 				ConfigChessboard2 config = new ConfigChessboard2(1,1,1);
+				pyramidTop = config.pyramidTopSize;
+				radius = config.cornerRadius;
 				thresholdPanel = new ThresholdControlPanel(this,config.threshold);
 				thresholdPanel.addHistogramGraph();
 				// use the actual image histogram. Peaks are rare and the approximate one will be very inaccurate
@@ -396,9 +398,9 @@ public class DetectCalibrationChessboard2App
 			}
 
 			ChessboardCornerClusterFinder2 finder = new ChessboardCornerClusterFinder2();
-			distanceTol = finder.getDistanceTol();
-			directionTol = finder.getAngleTol();
-			orientationTol = finder.getAngleTol();
+			ambiguousTol = finder.getAmbiguousTol();
+			directionTol = finder.getDirectionTol();
+			orientationTol = finder.getDirectionTol();
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
@@ -408,7 +410,7 @@ public class DetectCalibrationChessboard2App
 			spinnerTop = spinner(pyramidTop, 50, 10000, 50);
 			spinnerOrientationTol = spinner(orientationTol,0,3.0,0.05,1,3);
 			spinnerDirectionTol = spinner(directionTol,0,3.0,0.05,1,3);
-			spinnerDistanceTol = spinner(distanceTol,0,1.0,0.05,1,3);
+			spinnerAmbiguous = spinner(ambiguousTol,0,1.0,0.05,1,3);
 			checkShowTargets = checkbox("Chessboard", showChessboards);
 			checkShowNumbers = checkbox("Numbers", showNumbers);
 			checkShowClusters = checkbox("Clusters", showClusters);
@@ -428,7 +430,7 @@ public class DetectCalibrationChessboard2App
 			addLabeled(spinnerTop,"Pyramid Top");
 			addLabeled(spinnerOrientationTol,"Orientation Tol");
 			addLabeled(spinnerDirectionTol,"Direction Tol");
-			addLabeled(spinnerDistanceTol,"Distance Tol");
+			addLabeled(spinnerAmbiguous,"Ambiguous Tol");
 			addAlignCenter(thresholdPanel);
 		}
 
@@ -495,8 +497,8 @@ public class DetectCalibrationChessboard2App
 				directionTol = ((Number)spinnerDirectionTol.getValue()).doubleValue();
 				createAlgorithm();
 				reprocessImageOnly();
-			} else if( e.getSource() == spinnerDistanceTol ) {
-				distanceTol = ((Number)spinnerDistanceTol.getValue()).doubleValue();
+			} else if( e.getSource() == spinnerAmbiguous) {
+				ambiguousTol = ((Number) spinnerAmbiguous.getValue()).doubleValue();
 				createAlgorithm();
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerCornerThreshold ) {
