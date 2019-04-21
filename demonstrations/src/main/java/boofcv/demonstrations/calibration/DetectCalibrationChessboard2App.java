@@ -73,33 +73,35 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 public class DetectCalibrationChessboard2App
 		extends DemonstrationBase
 {
-	ConfigChessboard2 config = new ConfigChessboard2(5,7,1);
+	private ConfigChessboard2 config = new ConfigChessboard2(5,7,1);
 
-	// displays intensity image
-	DisplayPanel imagePanel = new DisplayPanel();
-	ControlPanel controlPanel;
+	// GUI Controls and visualization panels
+	private DisplayPanel imagePanel = new DisplayPanel();
+	private ControlPanel controlPanel;
 
-	// intensity image is rendered here
-	BufferedImage visualized;
-	BufferedImage binary;
-	BufferedImage original;
+	// Workspace for visualized image data
+	private BufferedImage visualized;
+	private BufferedImage binary;
+	private BufferedImage original;
 
+	// The chessboard corner detector
+	private CalibrationDetectorChessboard2 detector;
 
-	GrayF32 logIntensity = new GrayF32(1,1);
-
-	CalibrationDetectorChessboard2 detector;
+	//--------------------
 	// used to compute feature intensity
-	final Object lockAlgorithm = new Object();
+	private final Object lockAlgorithm = new Object();
+	// workspace to store computed log intensity image used for visualizing feature intensity
+	private GrayF32 logIntensity = new GrayF32(1,1);
 
 	//-----------------
-	final Object lockCorners = new Object();
-	FastQueue<ChessboardCorner> foundCorners = new FastQueue<>(ChessboardCorner.class,true);
-	FastQueue<PointIndex2D_F64> foundChessboard = new FastQueue<>(PointIndex2D_F64.class,true);
-	FastQueue<FeatureGraph2D> foundClusters = new FastQueue<>(FeatureGraph2D.class,true);
-	boolean success;
+	private final Object lockCorners = new Object();
+	private FastQueue<ChessboardCorner> foundCorners = new FastQueue<>(ChessboardCorner.class,true);
+	private FastQueue<PointIndex2D_F64> foundChessboard = new FastQueue<>(PointIndex2D_F64.class,true);
+	private FastQueue<FeatureGraph2D> foundClusters = new FastQueue<>(FeatureGraph2D.class,true);
+	private boolean success;
 	//-----------------
 
-	public DetectCalibrationChessboard2App(List<PathLabel> examples ) {
+	DetectCalibrationChessboard2App(List<PathLabel> examples ) {
 		super(true,true,examples,ImageType.single(GrayF32.class));
 
 		controlPanel = new ControlPanel();
@@ -149,6 +151,8 @@ public class DetectCalibrationChessboard2App
 			config.pyramidTopSize = controlPanel.pyramidTop;
 			config.cornerRadius = controlPanel.radius;
 			config.cornerThreshold = controlPanel.cornerThreshold;
+			config.numCols = controlPanel.gridCols;
+			config.numRows = controlPanel.gridRows;
 
 			detector = new CalibrationDetectorChessboard2(config);
 			detector.getDetector().getDetector().useMeanShift = controlPanel.meanShift;
@@ -259,6 +263,9 @@ public class DetectCalibrationChessboard2App
 
 	class DisplayPanel extends ShapeVisualizePanel {
 		Ellipse2D.Double circle = new Ellipse2D.Double();
+		BasicStroke stroke2 = new BasicStroke(2);
+		BasicStroke stroke5 = new BasicStroke(5);
+
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 			super.paintInPanel(tran, g2);
@@ -280,18 +287,22 @@ public class DetectCalibrationChessboard2App
 			Line2D.Double line = new Line2D.Double();
 			if( controlPanel.showCorners) {
 				synchronized (lockCorners) {
-					g2.setStroke(new BasicStroke(3));
 					for (int i = 0; i < foundCorners.size; i++) {
 						ChessboardCorner c = foundCorners.get(i);
 						double x = c.x;
 						double y = c.y;
 
+						g2.setStroke(stroke5);
+						g2.setColor(Color.BLACK);
+						VisualizeFeatures.drawCircle(g2, x * scale, y * scale, 5, circle);
+						g2.setStroke(stroke2);
 						g2.setColor(Color.ORANGE);
 						VisualizeFeatures.drawCircle(g2, x * scale, y * scale, 5, circle);
 
-						double dx = 4*Math.cos(c.orientation);
-						double dy = 4*Math.sin(c.orientation);
+						double dx = 6*Math.cos(c.orientation);
+						double dy = 6*Math.sin(c.orientation);
 
+						g2.setStroke(stroke2);
 						g2.setColor(Color.CYAN);
 						line.setLine((x-dx)*scale,(y-dy)*scale,(x+dx)*scale,(y+dy)*scale);
 						g2.draw(line);
@@ -361,16 +372,23 @@ public class DetectCalibrationChessboard2App
 		JSpinner spinnerAmbiguous;
 		JSpinner spinnerDirectionTol;
 		JSpinner spinnerOrientationTol;
+
+		// select the calibration grid's dimensions
+		JSpinner spinnerGridRows;
+		JSpinner spinnerGridCols;
+
 		JCheckBox checkShowTargets;
 		JCheckBox checkShowNumbers;
 		JCheckBox checkShowClusters;
 		JCheckBox checkShowCorners;
 		JCheckBox checkMeanShift;
 		JCheckBox checkAnyGrid;
-		public ThresholdControlPanel thresholdPanel;
+		ThresholdControlPanel thresholdPanel;
 
 		int pyramidTop;
 		int radius;
+		int gridRows = config.numRows;
+		int gridCols = config.numCols;
 		double cornerThreshold;
 		double ambiguousTol;
 		double directionTol;
@@ -384,7 +402,7 @@ public class DetectCalibrationChessboard2App
 		boolean meanShift = true;
 		boolean anyGrid = false;
 
-		public ControlPanel() {
+		ControlPanel() {
 			{
 				ConfigChessboard2 config = new ConfigChessboard2(1,1,1);
 				pyramidTop = config.pyramidTopSize;
@@ -411,6 +429,9 @@ public class DetectCalibrationChessboard2App
 			spinnerOrientationTol = spinner(orientationTol,0,3.0,0.05,1,3);
 			spinnerDirectionTol = spinner(directionTol,0,3.0,0.05,1,3);
 			spinnerAmbiguous = spinner(ambiguousTol,0,1.0,0.05,1,3);
+			spinnerGridRows = spinner(gridRows,3,200,1);
+			spinnerGridCols = spinner(gridCols,3,200,1);
+
 			checkShowTargets = checkbox("Chessboard", showChessboards);
 			checkShowNumbers = checkbox("Numbers", showNumbers);
 			checkShowClusters = checkbox("Clusters", showClusters);
@@ -423,6 +444,7 @@ public class DetectCalibrationChessboard2App
 			addLabeled(comboView,"View");
 			addLabeled(selectZoom,"Zoom");
 			add(createCheckPanel());
+			add(createGridShapePanel());
 			addAlignLeft(checkMeanShift);
 			addAlignLeft(checkAnyGrid);
 			addLabeled(spinnerRadius,"Corner Radius");
@@ -434,7 +456,7 @@ public class DetectCalibrationChessboard2App
 			addAlignCenter(thresholdPanel);
 		}
 
-		public JPanel createCheckPanel() {
+		JPanel createCheckPanel() {
 			JPanel panel = new JPanel(new GridLayout(0,2));
 
 			panel.add(checkShowTargets);
@@ -448,6 +470,21 @@ public class DetectCalibrationChessboard2App
 
 			panel.setPreferredSize(panel.getMinimumSize());
 			panel.setMaximumSize(panel.getMinimumSize());
+
+			return panel;
+		}
+
+		JPanel createGridShapePanel() {
+			JPanel panel = new JPanel();
+			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+
+			panel.add(new JLabel("Grid Shape"));
+			panel.add( Box.createHorizontalGlue());
+			panel.add(spinnerGridRows);
+			panel.add(spinnerGridCols);
+
+//			panel.setPreferredSize(panel.getMinimumSize());
+//			panel.setMaximumSize(panel.getMinimumSize());
 
 			return panel;
 		}
@@ -479,6 +516,8 @@ public class DetectCalibrationChessboard2App
 				reprocessImageOnly();
 			} else if( e.getSource() == checkAnyGrid) {
 				anyGrid = checkAnyGrid.isSelected();
+				spinnerGridCols.setEnabled(!anyGrid);
+				spinnerGridRows.setEnabled(!anyGrid);
 				createAlgorithm();
 				reprocessImageOnly();
 			}
@@ -513,6 +552,14 @@ public class DetectCalibrationChessboard2App
 				pyramidTop = ((Number)spinnerTop.getValue()).intValue();
 				createAlgorithm();
 				reprocessImageOnly();
+			} else if( e.getSource() == spinnerGridRows ) {
+				gridRows = ((Number)spinnerGridRows.getValue()).intValue();
+				createAlgorithm();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerGridCols ) {
+				gridCols = ((Number)spinnerGridCols.getValue()).intValue();
+				createAlgorithm();
+				reprocessImageOnly();
 			}
 		}
 
@@ -523,17 +570,12 @@ public class DetectCalibrationChessboard2App
 		}
 	}
 
-	// TODO render Option to render numbers
-	// TODO render multiple chessboards, not just ones of a specific size
-
-	// TODO option to tweak clustering magic numbers
-
 	public static void main( String args[] ) {
 		List<PathLabel> examples = new ArrayList<>();
 
-		examples.add(new PathLabel("Chessboard",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame06.jpg")));
+		examples.add(new PathLabel("Chessboard 1",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame06.jpg")));
+		examples.add(new PathLabel("Chessboard 2 ",UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/left03.jpg")));
 		examples.add(new PathLabel("Fisheye",UtilIO.pathExample("calibration/fisheye/chessboard/1.jpg")));
-		examples.add(new PathLabel("QR Movie",UtilIO.pathExample("fiducial/qrcode/movie.mp4")));
 		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 		examples.add(new PathLabel("TEMP 1","/home/pja/projects/ValidationBoof/data/fiducials/chessboard/standard/focus/image01.png"));
 		examples.add(new PathLabel("TEMP 2","/home/pja/projects/ValidationBoof/data/fiducials/chessboard/standard/rotation/image01.jpg"));
