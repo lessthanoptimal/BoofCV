@@ -34,7 +34,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestChessboardCornerClusterFinder {
+@SuppressWarnings("WeakerAccess")
+class TestChessboardCornerClusterFinder {
 	Random rand = new Random(2334);
 	final double sideLength = 40; // pixel distance between corners
 	double offsetX;
@@ -63,8 +64,8 @@ public class TestChessboardCornerClusterFinder {
 	void perfect( int rows , int cols ) {
 		List<ChessboardCorner> input = createCorners(rows,cols);
 		ChessboardCornerClusterFinder alg = new ChessboardCornerClusterFinder();
-		alg.maxNeighbors = 10; // this is perfect, 8 should be enough
-		                       // reduced the number so that having an non-exhaustive search is stressed more
+		alg.setMaxNeighbors(10); // this is perfect, 8 should be enough
+		// reduced the number so that having an non-exhaustive search is stressed more
 		alg.process(input);
 
 		FastQueue<ChessboardCornerGraph> found = alg.getOutputClusters();
@@ -101,7 +102,7 @@ public class TestChessboardCornerClusterFinder {
 		}
 
 		ChessboardCornerClusterFinder alg = new ChessboardCornerClusterFinder();
-		alg.maxNeighbors = 10; // this is perfect, 8 should be enough
+		alg.setMaxNeighbors(10); // this is perfect, 8 should be enough
 		// reduced the number so that having an non-exhaustive search is stressed more
 		alg.process(input);
 
@@ -150,32 +151,6 @@ public class TestChessboardCornerClusterFinder {
 
 		assertTrue(found2x2);
 		assertTrue(found3x2);
-	}
-
-	/**
-	 * Corners lie along a line and should be disregarded.
-	 */
-	@Test
-	void lines() {
-		ChessboardCornerClusterFinder alg = new ChessboardCornerClusterFinder();
-		alg.process(createCorners(2,1));
-		assertEquals(0,alg.getOutputClusters().size);
-		alg.process(createCorners(3,1));
-		assertEquals(0,alg.getOutputClusters().size);
-		alg.process(createCorners(1,2));
-		assertEquals(0,alg.getOutputClusters().size);
-		alg.process(createCorners(1,3));
-		assertEquals(0,alg.getOutputClusters().size);
-	}
-
-	@Test
-	void findClosestToParallel() {
-		fail("Implement");
-	}
-
-	@Test
-	void addSimilarNodesToConnections() {
-		fail("Implement");
 	}
 
 	@Test
@@ -247,6 +222,5 @@ public class TestChessboardCornerClusterFinder {
 			}
 		}
 	}
-
 
 }

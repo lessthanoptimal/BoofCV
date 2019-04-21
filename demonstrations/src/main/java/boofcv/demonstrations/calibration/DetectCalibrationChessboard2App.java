@@ -22,7 +22,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard2;
 import boofcv.abst.fiducial.calib.ConfigChessboard2;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
-import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder2;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageStatistics;
@@ -415,7 +415,7 @@ public class DetectCalibrationChessboard2App
 				cornerThreshold = config.cornerThreshold;
 			}
 
-			ChessboardCornerClusterFinder2 finder = new ChessboardCornerClusterFinder2();
+			ChessboardCornerClusterFinder finder = new ChessboardCornerClusterFinder();
 			ambiguousTol = finder.getAmbiguousTol();
 			directionTol = finder.getDirectionTol();
 			orientationTol = finder.getOrientationTol();

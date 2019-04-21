@@ -20,150 +20,609 @@ package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.feature.detect.chess.ChessboardCornerDistance;
+import boofcv.misc.BoofMiscOps;
 import georegression.metric.UtilAngle;
-import georegression.struct.point.Point2D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
+import org.ddogleg.sorting.QuickSort_F64;
 import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_B;
+import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO disconnect edges with very different lengths from others
-// TODO control for orientation tol
-// TODO control to set grid shape
-// TODO Get working rotated image01
-// TODO then work on fisheye
 /**
- * Clusters detected chessboard corners together into a grids that are 2x2 or larger.
+ * From a set of {@link ChessboardCorner ChessboardCorners} find all the chessboard grids in view. Assumptions
+ * about the grids size are not made at this stage.
  *
- * TODO describe steps
+ * Algorithmic Steps:
+ * <ol>
+ *     <li>Nearest neighbor search for each corners. For each corner, matches are put into parallel and perpendicular sets</li>
+ *     <li>Identify ambiguous corners that are close to each other and pick be most intense corner</li>
+ *     <li>Prune corners from each nodes parallel and perpendicular sets if they are not mutual</li>
+ *     <li>Select 2 to 4 connections for each corner using projective invariant properties</li>
+ *     <li>Find connected sets of vertexes and convert into output format</li>
+ * </ol>
+ *
+ * At a high level, a graph is formed where each vertex (a corner) can have at most 4 edges (connections) that
+ * describe the relationship between two vertexes. If there is no distortion then each edge will be 90 degrees
+ * apart radially. "Error" functions are use through out the code to decide which edge or vertex is best to select.
+ * Error functions are not always true errors and just means they are functions where the best value is a minimum.
+ * Whenever possible, errors are computed using projective invariant properties, which is how it can handle large
+ * amounts of distortion. Hard thresholds are used to reduce computational complexity and weird edge cases, thus
+ * are typically very generous. Lens distortion is not explicitly modeled. Instead fuzzy thresholds and error functions
+ * are used to account for it.
+ *
+ * Chessboard and geometric properties used:
+ * <ul>
+ *     <li>Orientation of corners alternates by 90 degrees</li>
+ *     <li>A corner can only be connected to a corner with an orientation perpendicular to it</li>
+ *     <lI>Between any two adjacent connections there must lie a corner with an orientation that is parallel.</lI>
+ *     <li>Without perspective distortion, corners are laid out in a grid pattern</li>
+ *     <li>Assume projective transform, with fuzzy parameters to account for lens distortion</li>
+ *     <li>Straight lines are straight</li>
+ *     <li>Order of vector angles from a point to another point does not change</li>
+ *     <li>Order of intersections along a line does not change</li>
+ * </ul>
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("WeakerAccess")
 public class ChessboardCornerClusterFinder {
+
+	// Tolerance for deciding if two directions are the same.
+	private double directionTol =0.60;
+	// Tolerance for deciding of two corner orientations are the same.
+	private double orientationTol =0.45;
+	// Tolerance for how close two corners need to be to be considered ambiguous. Relative
+	private double ambiguousTol = 0.25;
+
+	// automatically computed
+	private double parallelTol; // angle tolerance for parallel lines. smaller than direction
 
 	// Number of nearest neighbors it will search. It's assumed that the feature detector does a very
 	// good job removing false positives, meaning that tons of features do not need to be considered
-	int maxNeighbors=16; // 8 is minimum number given perfect data.
+	private int maxNeighbors=20; // 8 is minimum number given perfect data.
 
-	// how close to the expected orientation a corner needs to be. radians
-	double orientationTol = 0.5;
-	// angle tolerance for edge direction. radians
-	double directionTol = 0.4;
-	// maximum fractional error allowed between two distances
-	double distanceTol = 0.2;
-
-	// reference to input corners
-	List<ChessboardCorner> corners;
-
-	// Description of local graphs
-	FastQueue<LNode> nodes = new FastQueue<>(LNode.class, LNode::new);
-
-	// Output. Contains a graph of connected corners
-	FastQueue<ChessboardCornerGraph> clusters = new FastQueue<>(ChessboardCornerGraph.class,true);
+	// Data structures for the crude graph
+	private FastQueue<Vertex> vertexes = new FastQueue<>(Vertex.class,true);
+	private FastQueue<Edge> edges = new FastQueue<>(Edge.class,true);
 
 	// data structures for nearest neighbor search
-	NearestNeighbor<ChessboardCorner> nn = FactoryNearestNeighbor.kdtree(new ChessboardCornerDistance());
-	NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
-	FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData.class,true);
+	private NearestNeighbor<ChessboardCorner> nn = FactoryNearestNeighbor.kdtree(new ChessboardCornerDistance());
+	private NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
+	private FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData.class,true);
 
-	FastQueue<LConnections> connectionsStorage = new FastQueue<>(LConnections.class,LConnections::new);
+	// Output. Contains a graph of connected corners
+	private FastQueue<ChessboardCornerGraph> clusters = new FastQueue<>(ChessboardCornerGraph.class,true);
 
-	// Keeps a list of edges with multiple solutions
-	List<LConnections> ambiguousEdges = new ArrayList<>();
-	GrowQueue_B connected = new GrowQueue_B();
+	// predeclared storage for results
+	private SearchResults results = new SearchResults();
+	private TupleI32 tuple3 = new TupleI32();
 
 	// Used to convert the internal graph into the output clusters
-	GrowQueue_I32 c2n = new GrowQueue_I32(); // corner index to output node index
-	GrowQueue_I32 n2c = new GrowQueue_I32(); // output node index to corner index
-	GrowQueue_I32 open = new GrowQueue_I32(); // list of corner index's which still need ot be processed
+	private GrowQueue_I32 c2n = new GrowQueue_I32(); // corner index to output node index
+	private GrowQueue_I32 n2c = new GrowQueue_I32(); // output node index to corner index
+	private GrowQueue_I32 open = new GrowQueue_I32(); // list of corner index's which still need ot be processed
 
-	int HACK_interesting=-1;
+	// Work space to store distances from NN searched to find median distance
+	private GrowQueue_F64 distanceTmp = new GrowQueue_F64();
+	private QuickSort_F64 sorter = new QuickSort_F64(); // use this instead of build in to minimize memory allocation
+
+	// reference to input corners for debugging
+	private List<ChessboardCorner> corners;
+
+	// Workspace for pruning invalid
+	private List<Vertex> openVertexes = new ArrayList<>();
+	private List<Vertex> dirtyVertexes = new ArrayList<>();
+
+	public ChessboardCornerClusterFinder() {
+		setDirectionTol(directionTol);
+	}
 
 	/**
-	 * Given the unordered set of corners, for a set of clusters which represent sets of chessboard corners/
-	 * @param corners Found corners inside of image
+	 * Processes corners and finds clusters of chessboard patterns
+	 *
+	 * @param corners Detected chessboard patterns. Not modified.
 	 */
 	public void process(List<ChessboardCorner> corners ) {
-		HACK_interesting = -1;
 		this.corners = corners;
 
 		// reset internal data structures
-		nodes.reset();
-		connectionsStorage.reset();
+		vertexes.reset();
+		edges.reset();
 		clusters.reset();
-		ambiguousEdges.clear();
+
+		// Create a vertex for each corner
+		for (int idx = 0; idx < corners.size(); idx++) {
+			Vertex v = vertexes.grow();
+			v.reset();
+			v.index = idx;
+		}
 
 		// Initialize nearest-neighbor search.
 		nn.setPoints(corners,true);
 
-		// Find local graphs for each corner independently
+		// Connect corners to each other based on relative distance on orientation
 		for (int i = 0; i < corners.size(); i++) {
-			findLocalGraphForNode(i,corners);
+			findVertexNeighbors(vertexes.get(i),corners);
 		}
 
-//		printInternalGraph();
+		// If more than one vertex's are near each other, remove
+		handleAmbiguousVertexes(corners);
+//		printDualGraph();
 
-		// remove connections which are not mutual and ensure graph assumptions are still meet
-		pruneNonMutualConnections();
-		disconnectInvalidNodes();
+		// Prune connections which are not mutual
+		for (int i = 0; i < vertexes.size; i++) {
+			Vertex v = vertexes.get(i);
+			v.pruneNonMutal(EdgeType.PARALLEL);
+			v.pruneNonMutal(EdgeType.PERPENDICULAR);
+		}
+//		printDualGraph();
 
-		// Clean up the graph and remove uncertainty
-		findAndResolveAllAmbiguity();
-		disconnectInvalidNodes();
+		// Select the final 2 to 4 connections from perpendicular set
+		// each pair of adjacent perpendicular edge needs to have a matching parallel edge between them
+		// Use each perpendicular edge as a seed and select the best one
+		for (int idx = 0; idx < vertexes.size(); idx++) {
+			selectConnections(vertexes.get(idx));
+		}
+//		printConnectionGraph();
 
-		if(HACK_interesting!=-1 ) {
-			System.out.println("Resolve: Interesting: edges = "+nodes.get(HACK_interesting).countEdges());
+		for (int i = 0; i < vertexes.size; i++) {
+			Vertex v = vertexes.get(i);
+			v.pruneNonMutal(EdgeType.CONNECTION);
 		}
 
+		disconnectInvalidVertices();
 
-		// Disconnect edges which are much shorter or longer than all the others.
-		// TODO do it
-
-		// create the output
 		convertToOutput(corners);
 	}
 
 	/**
 	 * Prints the graph. Used for debugging the code.
 	 */
-	public void printInternalGraph() {
-		for( LNode n : nodes.toList() ) {
+	public void printDualGraph() {
+		System.out.println("============= Dual");
+		int l = BoofMiscOps.numDigits(vertexes.size);
+		String format = "%"+l+"d";
+
+		for( Vertex n : vertexes.toList() ) {
 			ChessboardCorner c = corners.get(n.index);
-			System.out.printf("[%3d] {%3.0f, %3.0f) -> ",n.index,c.x,c.y);
-			for (int i = 0; i < 4; i++) {
-				if( n.edges[i] == null ) {
-					System.out.print("[      ] ");
-				} else {
-					LConnections conn = n.edges[i];
-					System.out.print("[ ");
-					for (int j = 0; j < conn.dst.size; j++) {
-						System.out.printf("%3d ",n.neighbors.get(conn.dst.get(j)).index);
-					}
-					System.out.print(" ] ");
+			System.out.printf("["+format+"] {%3.0f, %3.0f} ->  90[ ",n.index,c.x,c.y);
+			for (int i = 0; i < n.perpendicular.size(); i++) {
+				Edge e = n.perpendicular.get(i);
+				System.out.printf(format+" ",e.dst.index);
+			}
+			System.out.println("]");
+			System.out.print("                -> 180[ ");
+			for (int i = 0; i < n.parallel.size(); i++) {
+				Edge e = n.parallel.get(i);
+				System.out.printf(format+" ",e.dst.index);
+			}
+			System.out.println("]");
+		}
+	}
+
+	public void printConnectionGraph() {
+		System.out.println("============= Connection");
+		int l = BoofMiscOps.numDigits(vertexes.size);
+		String format = "%"+l+"d";
+
+		for( Vertex n : vertexes.toList() ) {
+			ChessboardCorner c = corners.get(n.index);
+			System.out.printf("["+format+"] {%3.0f, %3.0f} -> [ ",n.index,c.x,c.y);
+			for (int i = 0; i < n.connections.size(); i++) {
+				Edge e = n.connections.get(i);
+				System.out.printf(format+" ",e.dst.index);
+			}
+			System.out.println("]");
+		}
+	}
+
+	/**
+	 * Use nearest neighbor search to find closest corners. Split those into two groups, parallel and
+	 * perpendicular.
+	 */
+	void findVertexNeighbors(Vertex target  , List<ChessboardCorner> corners ) {
+//		if( target.index == 18 ) {
+//			System.out.println("Vertex Neighbors "+target.index);
+//		}
+
+		ChessboardCorner targetCorner = corners.get(target.index);
+		nnSearch.findNearest(corners.get(target.index),Double.MAX_VALUE,maxNeighbors,nnResults);
+
+		// storage distances here to find median distance of closest neighbors
+		distanceTmp.reset();
+
+		for (int i = 0; i < nnResults.size; i++) {
+			NnData<ChessboardCorner> r = nnResults.get(i);
+			if( r.index == target.index) continue;
+
+			distanceTmp.add( r.distance );
+
+			double oriDiff = UtilAngle.distHalf( targetCorner.orientation , r.point.orientation );
+
+			Edge edge = edges.grow();
+			boolean parallel;
+			if( oriDiff <= orientationTol) { // see if it's parallel
+				parallel = true;
+			} else if( Math.abs(oriDiff-Math.PI/2.0) <= orientationTol) { // see if it's perpendicular
+				parallel = false;
+			} else {
+				edges.removeTail();
+				continue;
+			}
+
+			// Use the relative angles of orientation and direction to prune more obviously bad matches
+			double dx = r.point.x - targetCorner.x;
+			double dy = r.point.y - targetCorner.y;
+
+			edge.distance = Math.sqrt(r.distance);
+			edge.dst = vertexes.get(r.index);
+			edge.direction = Math.atan2(dy,dx);
+
+			double direction180 = UtilAngle.boundHalf(edge.direction);
+			double directionDiff = UtilAngle.distHalf(direction180,r.point.orientation);
+			boolean remove;
+			EdgeSet edgeSet;
+			if( parallel ) {
+				// test to see if direction and orientation are aligned or off by 90 degrees
+				remove = directionDiff > 2* directionTol && Math.abs(directionDiff-Math.PI/2.0) > 2* directionTol;
+				edgeSet = target.parallel;
+			} else {
+				// should be at 45 degree angle
+				remove = Math.abs(directionDiff-Math.PI/4.0) > 2* directionTol;
+				edgeSet = target.perpendicular;
+			}
+
+			if( remove ) {
+				edges.removeTail();
+				continue;
+			}
+
+			edgeSet.add(edge);
+		}
+
+		// Compute the distance of the closest neighbors. This is used later on to identify ambiguous corners.
+		// If it's a graph corner there should be at least 3 right next to the node.
+		if( distanceTmp.size == 0 ) {
+			target.neighborDistance = 0;
+		} else {
+			sorter.sort(distanceTmp.data, distanceTmp.size);
+			int idx = Math.min(3,distanceTmp.size-1);
+			target.neighborDistance = Math.sqrt(distanceTmp.data[idx]); // NN distance is Euclidean squared
+		}
+	}
+
+	/**
+	 * Identify ambiguous vertexes which are too close to each other. Select the corner with the highest intensity
+	 * score and remove the rest
+	 */
+	void handleAmbiguousVertexes(List<ChessboardCorner> corners) {
+		List<Vertex> candidates = new ArrayList<>();
+		for (int idx = 0; idx < vertexes.size(); idx++) {
+			Vertex target = vertexes.get(idx);
+
+			// median distance was previously found based on the closer neighbors. In an actual chessboard
+			// there are solid white and black squares with no features, in theory
+			double threshold = target.neighborDistance *ambiguousTol;
+
+			candidates.clear();
+			// only need to search parallel since perpendicular nodes won't be confused for the target
+			for (int i = 0; i < target.parallel.size(); i++) {
+				Edge c = target.parallel.get(i);
+				if( c.distance <= threshold ) {
+					candidates.add(c.dst);
 				}
 			}
-			System.out.println();
+
+			if( candidates.size() > 0 ) {
+				candidates.add(target);
+
+				int bestIndex = -1;
+				double bestScore = 0;
+
+//				System.out.println("==== Resolving ambiguity. src="+target.index);
+				for (int i = 0; i < candidates.size(); i++) {
+					Vertex v = candidates.get(i);
+//					System.out.println("   candidate = "+v.index);
+					double intensity = corners.get(v.index).intensity;
+					if( intensity > bestScore ) {
+						bestScore = intensity;
+						bestIndex = i;
+					}
+				}
+//				System.out.println("==== Resolved ambiguity. Selected "+candidates.get(bestIndex).index);
+
+				for (int i = 0; i < candidates.size(); i++) {
+					if( i == bestIndex )
+						continue;
+					removeReferences(candidates.get(i),EdgeType.PARALLEL);
+					removeReferences(candidates.get(i),EdgeType.PERPENDICULAR);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Disconnect the edges from invalid vertices. Invalid ones have only one edge or two edges which do
+	 * not connect to a common vertex, i.e. they are point 180 degrees away from each other.
+	 */
+	void disconnectInvalidVertices() {
+		// add elements with 1 or 2 edges
+		openVertexes.clear();
+		for (int idxVert = 0; idxVert < vertexes.size; idxVert++) {
+			Vertex n = vertexes.get(idxVert);
+			if( n.connections.size() == 1 || n.connections.size()==2) {
+				openVertexes.clear();
+			}
+		}
+
+		// continue until there are no changes
+		while( !openVertexes.isEmpty() ) {
+			dirtyVertexes.clear();
+			for (int idxVert = 0; idxVert < openVertexes.size(); idxVert++) {
+				boolean remove = false;
+				Vertex n = openVertexes.get(idxVert);
+				if( n.connections.size() == 1 ) {
+					remove = true;
+				} else if( n.connections.size() == 2 ) {
+					Edge ea = n.connections.get(0);
+					Edge eb = n.connections.get(1);
+
+					// Look for a common vertex that isn't 'n'
+					remove = true;
+					for (int i = 0; i < ea.dst.connections.size(); i++) {
+						Vertex va = ea.dst.connections.get(i).dst;
+						if( va == n )
+							continue;
+						for (int j = 0; j < eb.dst.connections.size(); j++) {
+							Vertex vb = ea.dst.connections.get(j).dst;
+							if( va == vb ) {
+								remove = false;
+								break;
+							}
+						}
+					}
+				}
+
+				if( remove ) {
+					// only go through the subset referenced the disconnected. Yes there could be duplicates
+					// not worth the time to fix that
+					for (int i = 0; i < n.connections.size(); i++) {
+						dirtyVertexes.add( n.connections.get(i).dst );
+					}
+					removeReferences(n,EdgeType.CONNECTION);
+				}
+			}
+			openVertexes.clear();
+			openVertexes.addAll(dirtyVertexes);
+		}
+
+	}
+
+	/**
+	 * Go through all the vertexes that 'remove' is connected to and remove that link. if it is
+	 * in the connected list swap it with 'replaceWith'.
+	 */
+	void removeReferences( Vertex remove , EdgeType type ) {
+		EdgeSet removeSet = remove.getEdgeSet(type);
+		for (int i = removeSet.size()-1; i >= 0; i--) {
+			Vertex v = removeSet.get(i).dst;
+			EdgeSet setV = v.getEdgeSet(type);
+			// remove the connection from v to 'remove'. Be careful since the connection isn't always mutual
+			// at this point
+			int ridx = setV.find(remove);
+			if( ridx != -1 )
+				setV.edges.remove(ridx);
+		}
+		removeSet.reset();
+	}
+
+	/**
+	 * Select the best 2,3, or 4 perpendicular vertexes to connect to. These are the output grid connections.
+	 */
+	void selectConnections( Vertex target ) {
+		// There needs to be at least two corners
+		if( target.perpendicular.size() <= 1 )
+			return;
+
+//		if( target.index == 16 ) {
+//			System.out.println("ASDSAD");
+//		}
+//		System.out.println("======= Connecting "+target.index);
+
+		double bestError = Double.MAX_VALUE;
+		List<Edge> bestSolution = target.connections.edges;
+		List<Edge> solution = new ArrayList<>();
+
+		// Greedily select one vertex at a time to connect to. findNext() looks at all possible
+		// vertexes it can connect too and minimizes an error function based on projectively invariant features
+		for (int i = 0; i < target.perpendicular.size(); i++) {
+			Edge e = target.perpendicular.get(i);
+			solution.clear();
+			solution.add(e);
+
+			double error = 0;
+			double sumDistance = solution.get(0).distance;
+			double minDistance = sumDistance;
+
+			if( !findNext(i,target.parallel,target.perpendicular,Double.NaN,results) ) {
+				continue;
+			}
+
+			error += results.error;
+			solution.add(target.perpendicular.get(results.index));
+			sumDistance += solution.get(1).distance;
+			minDistance = Math.min(minDistance,solution.get(1).distance);
+
+			// Use knowledge that solution[0] and solution[2] form a line.
+			// Lines are straight under projective distortion
+			if( findNext(results.index,target.parallel,target.perpendicular,solution.get(0).direction,results) ) {
+				error += results.error;
+				solution.add(target.perpendicular.get(results.index));
+				sumDistance += solution.get(2).distance;
+				minDistance = Math.min(minDistance,solution.get(2).distance);
+
+				// Use knowledge that solution[1] and solution[3] form a line.
+				if( findNext(results.index,target.parallel,target.perpendicular,solution.get(1).direction,results) ) {
+					error += results.error;
+					solution.add(target.perpendicular.get(results.index));
+					sumDistance += solution.get(3).distance;
+					minDistance = Math.min(minDistance,solution.get(3).distance);
+				}
+			}
+
+			// Prefer closer valid sets of edges and larger sets.
+			// the extra + minDistance was needed to bias it against smaller sets which would be more likely
+			// to have a smaller average error. Division by the square of set/solution size biases it towards larger sets
+			error = (sumDistance+minDistance)/(solution.size()*solution.size());
+
+//			System.out.println("  first="+solution.get(0).dst.index+"  size="+solution.size()+" error="+error);
+
+			if( error < bestError ) {
+				bestError = error;
+				bestSolution.clear();
+				bestSolution.addAll(solution);
+			}
+		}
+	}
+
+	boolean findNext( int firstIdx , EdgeSet splitterSet , EdgeSet candidateSet , double parallel,
+					  SearchResults results ) {
+		Edge e0 = candidateSet.get(firstIdx);
+
+		results.index = -1;
+		results.error = Double.MAX_VALUE;
+		boolean checkParallel = !Double.isNaN(parallel);
+
+		for (int i = 0; i < candidateSet.size(); i++) {
+			if( i == firstIdx )
+				continue;
+
+			// stop considering edges when they are more than 180 degrees away
+			Edge eI = candidateSet.get(i);
+			double distanceCCW = UtilAngle.distanceCCW(e0.direction,eI.direction);
+			if( distanceCCW >= Math.PI*0.9 ) // Multiplying by 0.9 helped remove a lot of bad matches
+				continue;                    // It was pairing up opposite corners under heavy perspective distortion
+
+			// It should be parallel to a previously found line
+			if( checkParallel ) {
+				double a = UtilAngle.boundHalf(eI.direction);
+				double b = UtilAngle.boundHalf(parallel);
+				double distanceParallel = UtilAngle.distHalf(a,b);
+				if( distanceParallel > parallelTol ) {
+					continue;
+				}
+			}
+
+			// find the perpendicular corner which splits these two edges and also find the index of
+			// the perpendicular sets which points towards the splitter.
+			if( !findSplitter(e0.direction,eI.direction,splitterSet,e0.dst.perpendicular,eI.dst.perpendicular,tuple3) )
+				continue;
+
+			double acute0 = UtilAngle.dist(
+					candidateSet.get(firstIdx).direction,
+					e0.dst.perpendicular.get(tuple3.b).direction);
+			double error0 = UtilAngle.dist(acute0,Math.PI/2.0);
+
+			if( error0 > Math.PI*0.3 )
+				continue;
+
+			double acute1 = UtilAngle.dist(
+					candidateSet.get(i).direction,
+					eI.dst.perpendicular.get(tuple3.c).direction);
+			double error1 = UtilAngle.dist(acute1,Math.PI/2.0);
+
+			if( error1 > Math.PI*0.3 )
+				continue;
+
+			// The quadrilateral with the smallest area is most often the best solution. Area is more expensive
+			// so the perimeter is computed instead. one side is left off since all of them have that side
+			double error = e0.dst.perpendicular.get(tuple3.b).distance;
+			error += eI.dst.perpendicular.get(tuple3.c).distance;
+			error += eI.distance;
+
+			if( error < results.error ) {
+				results.error = error;
+				results.index = i;
+			}
+		}
+
+		return results.index != -1;
+	}
+
+	boolean findSplitter(double ccw0 , double ccw1 ,
+						 EdgeSet master , EdgeSet other1 , EdgeSet other2 ,
+						 TupleI32 output ) {
+
+		double bestDistance = Double.MAX_VALUE;
+
+		for (int i = 0; i < master.size(); i++) {
+			// select the splitter
+			Edge me = master.get(i);
+
+			// TODO decide if this is helpful or not
+			// check that it lies between these two angles
+			if( UtilAngle.distanceCCW(ccw0 , me.direction) > Math.PI*0.9 ||
+					UtilAngle.distanceCW(ccw1,me.direction) > Math.PI*0.9 )
+				continue;
+
+			// Find indexes which point towards the splitter corner
+			int idxB = other1.find(me.dst);
+			if( idxB == -1 )
+				continue;
+
+			double thetaB = UtilAngle.distanceCCW(ccw0 , other1.get(idxB).direction);
+			if( thetaB < 0.05 )
+				continue;
+
+			int idxC = other2.find(me.dst);
+			if( idxC == -1 )
+				continue;
+
+			double thetaC = UtilAngle.distanceCW(ccw1 , other2.get(idxC).direction);
+			if( thetaC < 0.05 )
+				continue;
+
+			// want it to be closer and without parallel lines
+			double error = me.distance/(0.5+Math.min(thetaB,thetaC));
+
+			if( error < bestDistance ) {
+				bestDistance = error;
+				output.a = i;
+				output.b = idxB;
+				output.c = idxC;
+			}
+		}
+
+		// Reject the best solution if it doesn't form a convex quadrilateral
+		if( bestDistance < Double.MAX_VALUE ) {
+			// 2 is CCW of 1, and since both of them are pointing towards the splitter we know
+			// how to compute the angular distance
+			double pointingB = other1.edges.get(output.b).direction;
+			double pointingC = other2.edges.get(output.c).direction;
+			return UtilAngle.distanceCW(pointingB, pointingC) < Math.PI;
+		} else {
+			return false;
 		}
 	}
 
 	/**
 	 * Converts the internal graphs into unordered chessboard grids.
 	 */
-	void convertToOutput(List<ChessboardCorner> corners) {
+	private void convertToOutput(List<ChessboardCorner> corners) {
 
 		c2n.resize(corners.size());
-		n2c.resize(corners.size());
+		n2c.resize(vertexes.size());
 		open.reset();
 		n2c.fill(-1);
 		c2n.fill(-1);
 
-		for (int seedIdx = 0; seedIdx < nodes.size; seedIdx++) {
-			LNode seedN = nodes.get(seedIdx);
+		for (int seedIdx = 0; seedIdx < vertexes.size; seedIdx++) {
+			Vertex seedN = vertexes.get(seedIdx);
 			if( seedN.insideCluster )
 				continue;
 			ChessboardCornerGraph graph = clusters.grow();
@@ -175,14 +634,13 @@ public class ChessboardCornerClusterFinder {
 			// Connect the nodes together in the output graph
 			for (int i = 0; i < graph.corners.size; i++) {
 				ChessboardCornerGraph.Node gn = graph.corners.get(i);
-				LNode n = nodes.get( n2c.get(i) );
+				Vertex n = vertexes.get( n2c.get(i) );
 
-				for (int j = 0; j < 4; j++) {
-					if( n.edges[j] == null )
-						continue;
-					int outputIdx = c2n.get( n.getInfoForEdge(j).index );
+				for (int j = 0; j < n.connections.size(); j++) {
+					int edgeCornerIdx = n.connections.get(j).dst.index;
+					int outputIdx = c2n.get( edgeCornerIdx );
 					if( outputIdx == -1 ) {
-						throw new IllegalArgumentException("Edge to node not in the graph");
+						throw new IllegalArgumentException("Edge to node not in the graph. c="+edgeCornerIdx);
 					}
 					gn.edges[j] = graph.corners.get(outputIdx);
 				}
@@ -209,498 +667,49 @@ public class ChessboardCornerClusterFinder {
 		// open contains corner list indexes
 		open.add(seedIdx);
 		while( open.size > 0 ) {
-			int target = open.pop();
+			int cornerIdx = open.pop();
+			Vertex v = vertexes.get(cornerIdx);
 
 			// make sure it hasn't already been processed
-			if( nodes.get(target).insideCluster)
+			if( v.insideCluster )
 				continue;
-			nodes.get(target).insideCluster = true;
+			v.insideCluster = true;
 
 			// Create the node in the output cluster for this corner
 			ChessboardCornerGraph.Node gn = graph.growCorner();
-			c2n.data[target] = gn.index;
-			n2c.data[gn.index] = target;
-			gn.set(corners.get(target));
+			c2n.data[cornerIdx] = gn.index;
+			n2c.data[gn.index] = cornerIdx;
+			gn.set(corners.get(cornerIdx));
 
-			// Add to the open list all the edges which haven't been processed yet
-			LNode n = nodes.get(target);
-			for (int i = 0; i < 4; i++) {
-				if( n.edges[i] == null )
+			// Add to the open list all the edges which haven't been processed yet;
+			for (int i = 0; i < v.connections.size(); i++) {
+				Vertex dst = v.connections.get(i).dst;
+				if( dst.insideCluster )
 					continue;
-				LocalInfo info = n.getInfoForEdge(i);
-				if( nodes.get(info.index).insideCluster )
-					continue;
-				open.add( info.index );
+				open.add( dst.index );
 			}
 		}
 	}
 
-	private void findLocalGraphForNode( int target , List<ChessboardCorner> corners ) {
-		LNode ntarget = nodes.grow();
-		ntarget.reset();
-		ntarget.index = target;
-		nnSearch.findNearest(corners.get(target),Double.MAX_VALUE,maxNeighbors,nnResults);
-
-		boolean interesting = isInteresting(target);
-
-		if( interesting )
-			System.out.print("");
-
-		// remove neighbors which are at the wrong angle
-		if ( !filterNeighbors(corners.get(target),ntarget)) {
-			if( interesting )
-				System.out.println("filterNeighbors failed for "+target);
-			return;
-		}
-
-		// use these flags to see which neighbor has already been connected to and avoid having multiple edges
-		// connect to the same neighbor
-		connected.resize(ntarget.neighbors.size);
-		connected.fill(false);
-
-		// find the initial seed for the local connections
-		if( !findBestPair(corners.get(target),ntarget)) {
-			if( interesting )
-				System.out.println("findBestPair failed for "+target);
-			return;
-		}
-
-		// find the other two, if possible
-		findClosestToParallel(ntarget,0);
-		findClosestToParallel(ntarget,1);
-
-		// Edges can have multiple solutions if its ambiguous. Add alternatives to the edges here
-		addSimilarNodesToConnections(ntarget);
-
-		if( interesting) {
-			System.out.println("Corner "+target+": connections = "+ntarget.countEdges());
-		}
-	}
-
-	/**
-	 * Finds the two neighbors which have an acute angle which is closest to 90 degrees and their orientation
-	 * is close enough to a 90 degree offset. Their distance from the target also needs to be about the same.
-	 * Prefer pairs which are closer to the target.
-	 * @return true if a pair was found
-	 */
-	boolean findBestPair( ChessboardCorner target , LNode tnode ) {
-		double bestScore = Double.MAX_VALUE;
-
-		// index in neighborhood
-		int seedA = -1;
-		int seedB = -1;
-
-		for (int idxa = 0; idxa < tnode.neighbors.size(); idxa++) {
-			LocalInfo a = tnode.neighbors.get(idxa);
-
-			double oriA = corners.get(a.index).orientation;
-
-			for (int idxb = idxa+1; idxb < tnode.neighbors.size(); idxb++) {
-				LocalInfo b = tnode.neighbors.get(idxb);
-
-				double oriB = corners.get(b.index).orientation;
-
-				// orientation should be the same
-				double oriDistance = UtilAngle.dist(oriA,oriB);
-
-				// Angle should be 90 degrees apart
-				double angleDistance = UtilAngle.dist(a.direction,b.direction);
-
-				double angleError = UtilAngle.dist(angleDistance,Math.PI/2);
-
-				if( angleError <= directionTol) {
-					// score is a weighted average of angle error and fractional difference in distance
-					double aveDist = (a.distance+b.distance)/2.0;
-
-					double score = 0.5*(angleError+oriDistance)/Math.PI; // max value of 0.1
-					score += 0.2*Math.abs(a.distance-b.distance)/Math.min(a.distance,b.distance); // A good value will be less than 1
-					// score now is an error metric with 0 being perfect
-					score = (1.0+score)*aveDist;
-
-					if( score < bestScore ) {
-						bestScore = score;
-						seedA = idxa;
-						seedB = idxb;
-					}
-				}
-			}
-		}
-
-		if( seedA != -1 ) {
-			// make them as used already
-			connected.data[seedA] = true;
-			connected.data[seedB] = true;
-			tnode.edges[0] = connectionsStorage.grow();
-			tnode.edges[0].reset();
-			tnode.edges[0].src = tnode;
-			tnode.edges[0].dst.add(seedA);
-			tnode.edges[1] = connectionsStorage.grow();
-			tnode.edges[1].reset();
-			tnode.edges[1].src = tnode;
-			tnode.edges[1].dst.add(seedB);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * filter list to only results that have the expected orientation. The expected orientation
-	 * should be perpendicular to the target's orientation.
-	 */
-	private boolean filterNeighbors(ChessboardCorner target, LNode node ) {
-
-		double expectedOri = UtilAngle.boundHalf(target.orientation+Math.PI/2.0);
-
-		// first one will always be the target
-		for (int i = 0; i < nnResults.size; i++) {
-			NnData<ChessboardCorner> r = nnResults.get(i);
-			// if it found itself skip. it should always find itself
-			if( r.point == target )
-				continue;
-			double angle = UtilAngle.distHalf(r.point.orientation,expectedOri);
-			if( angle <= orientationTol ) {
-				ChessboardCorner c_i = r.point;
-				LocalInfo info = node.neighbors.grow();
-				info.reset();
-				info.index = r.index;
-				info.direction = Math.atan2(c_i.y-target.y,c_i.x-target.x);
-				info.distance = Math.sqrt(r.distance); // NN distance function returns Euclidean distance squared
-				info.set(r.point.x,r.point.y);
-
-				// Use direction and orientation to reject nodes
-				// In a perfect grid, the direction and orientation should be off by 45 degrees
-				double directionHalf = UtilAngle.boundHalf(info.direction);
-				double directionError = UtilAngle.distHalf(directionHalf,r.point.orientation);
-				if( directionError < 1*Math.PI/8 || directionError > 3*Math.PI/8 ) {
-					node.neighbors.removeTail();
-				}
-			}
-		}
-
-		return node.neighbors.size() >= 2;
-	}
-
-	/**
-	 * searches for the node which is closest to being parallel, in the opposite direction, and about the same
-	 * distance.
-	 *
-	 * @param edgeIdx Which edge is it looking at a match for
-	 */
-	private void findClosestToParallel( LNode ntarget, int edgeIdx ) {
-		// At this point in time there's only one connection per edge
-		LConnections connections = ntarget.edges[edgeIdx];
-		LocalInfo neighbor = ntarget.neighbors.get(connections.dst.get(0));
-		double distance = neighbor.distance;
-		// we are only concerned with nodes pointed in the opposite direction
-		double direction = UtilAngle.bound(neighbor.direction+Math.PI);
-
-		double bestScore = Double.MAX_VALUE;
-		int bestIndexNhb = -1;
-
-		for (int idxNhb = 0; idxNhb < ntarget.neighbors.size(); idxNhb++) {
-			if( connected.get(idxNhb) )
-				continue;
-
-			LocalInfo n = ntarget.neighbors.get(idxNhb);
-
-			// see if the orientation error is within tolerance
-			double errorDir = UtilAngle.dist(direction,n.direction);
-			if( errorDir > directionTol)
-				continue;
-
-			// distance error is a fractional error but dampened for close up points where a pixel can result
-			// in a large error
-			double errorDist = Math.abs(distance-n.distance)/(Math.max(distance,n.distance)+2.0);
-
-			double score = (errorDir + 0.1)*(errorDist+0.1);
-
-			if( score < bestScore ) {
-				bestScore = score;
-				bestIndexNhb = idxNhb;
-			}
-		}
-
-		// If it found a match add a new edge for it
-		if( bestIndexNhb != -1 ) {
-			connected.set(bestIndexNhb,true);
-			LConnections c = connectionsStorage.grow();
-			c.reset();
-			c.src = ntarget;
-			c.dst.add( bestIndexNhb );
-
-			int edgeIdx1 = (edgeIdx+2)%4;
-			ntarget.edges[edgeIdx1] = c;
-		}
-	}
-
-	/**
-	 * For each edge in the node see if there's another node in the filtered list which would be within tolerance
-	 * and a possible alternative to the one which was added.
-	 */
-	private void addSimilarNodesToConnections(LNode node) {
-		for (int edgeIdx = 0; edgeIdx < 4; edgeIdx++) {
-			LConnections connections = node.edges[edgeIdx];
-			if( connections == null )
-				continue;
-
-			if( connections.dst.size != 1 )
-				throw new IllegalArgumentException("BUG!");
-			LocalInfo target = node.neighbors.get( connections.dst.get(0) );
-
-			boolean ambiguous = false;
-			for (int idxNhbA = 0; idxNhbA < node.neighbors.size; idxNhbA++) {
-				if( connected.get(idxNhbA))
-					continue;
-
-				LocalInfo a = node.neighbors.get(idxNhbA);
-				if( a == target )
-					continue;
-				double angleDiff = UtilAngle.dist(target.direction,a.direction);
-				if( angleDiff > orientationTol ) {
-					continue;
-				}
-
-				double distErr = Math.abs(target.distance-a.distance)/target.distance;
-				if( distErr <= distanceTol ) {
-					ambiguous = true;
-					connections.dst.add( idxNhbA );
-					connected.set(idxNhbA,true);
-				}
-			}
-
-			// Note which edges are ambiguous so that this ambiguity can be resolved later
-			if( ambiguous ) {
-				ambiguousEdges.add( connections );
-			}
-		}
-	}
-
-	/**
-	 * If a connection between two nodes is only one direction remove it.
-	 */
-	private void pruneNonMutualConnections() {
-		for (int idxSrc = 0; idxSrc < nodes.size; idxSrc++) {
-			LNode src = nodes.get(idxSrc);
-
-			if( src.index == 264 ) {
-				System.out.println("ASd");
-			}
-			if( src.index == HACK_interesting ) {
-				System.out.println("interesting in prune");
-			}
-
-			for (int j = 0; j < 4; j++) {
-				LConnections connections = src.edges[j];
-				if( connections == null )
-					continue;
-
-				// iterate in reverse so items and be removed and not screw up the index
-				for (int idxSrcConn = connections.dst.size - 1; idxSrcConn >= 0; idxSrcConn--) {
-					LocalInfo dstInfo = src.neighbors.get( connections.dst.get(idxSrcConn));
-					LNode dst = nodes.get( dstInfo.index );
-
-					// If dst has no connection to 'src' then remove the connection in src to dst
-					if( dst.findEdgeIdx(src.index) == -1 ) {
-						if( isInteresting(dst.index) ) {
-							System.out.println("  non-mut disconnecting "+src.index+"  from "+dst.index);
-						}
-						connections.dst.remove(idxSrcConn);
-					}
-				}
-
-				// No more connections left so remove the edge.
-				if( connections.dst.size == 0 ) {
-					src.edges[j] = null;
-				}
-			}
-		}
-	}
-
-	private boolean isInteresting( int target ) {
-		return target==639||target==330||target==325;
-	}
-
-	/**
-	 * Disconnect nodes which are not valid. This includes nodes with only one connection.
-	 */
-	private void disconnectInvalidNodes() {
-		// Iterate until there are no more changes.
-		boolean changed = true;
-		while( changed ) {
-			changed = false;
-			for (int idxNode = 0; idxNode < nodes.size; idxNode++) {
-				LNode n = nodes.get(idxNode);
-
-				if( isInteresting(n.index)) {
-					System.out.println(" inside disconnect invalid. "+n.index+"  has "+n.countEdges());
-				}
-
-				// to be part of a grid it needs to have two edges 90 degrees apart
-				boolean hasPairAt90 = false;
-				for (int i = 0, j = 3; i < 4; j=i,i++) {
-					if( n.edges[i] != null & n.edges[j] != null ) {
-						hasPairAt90 = true;
-						break;
-					}
-				}
-
-				if( !hasPairAt90 )
-				{
-					// remove all of this nodes connections. Effectively removing it from the graph
-
-					for (int j = 0; j < 4; j++) {
-						LConnections connections = n.edges[j];
-						if (connections == null)
-							continue;
-						for (int idxC = 0; idxC < connections.dst.size; idxC++) {
-							LNode dst = nodes.get(n.neighbors.get(connections.dst.get(idxC)).index);
-							if( isInteresting(dst.index) || isInteresting(n.index) ) {
-								System.out.println("  invalid disconnecting "+dst.index+"  from "+n.index);
-							}
-
-							if (!dst.removeConnection(idxNode)) {
-								throw new RuntimeException("disconnect invalid: "+dst.index+" not connected to "+n.index);
-							}
-						}
-						n.edges[j] = null;
-						changed = true;
-					}
-				}
-
-			}
-		}
-	}
-
-	/**
-	 * It is possible from two corners to represent the same element in a local cluster. This situation is detected
-	 * by seeing if more than one node is within X distance of each other. If that is detected then one of them
-	 * is removed based on an energy minimization function.
-	 */
-	private void findAndResolveAllAmbiguity() {
-		List<LNode> candidates = new ArrayList<>();
-
-		for (int idxEdge = 0; idxEdge < ambiguousEdges.size(); idxEdge++) {
-			LConnections conn = ambiguousEdges.get(idxEdge);
-			// see if the ambiguity was already resolved
-			if( conn.dst.size <= 1 )
-				continue;
-
-			// Create a list of the nodes which are being considered
-			candidates.clear();
-			for (int idxDst = 0; idxDst < conn.dst.size; idxDst++) {
-				LocalInfo info = conn.src.neighbors.get( conn.dst.get(idxDst) );
-				candidates.add( nodes.get(info.index) );
-			}
-
-			resolveAmbiguity(candidates);
-		}
-	}
-
-	/**
-	 * Disconnect all but one of the nodes in the list. Keep the node with the most edges and if there is a tie
-	 * pick the one with the best score.
-	 *
-	 */
-	private void resolveAmbiguity( List<LNode> candidates) {
-		// out of all the choices, select just one to keep
-		int keepIndex = selectNodeToKeep(candidates);
-		if( keepIndex == -1 )
-			throw new RuntimeException("BUG");
-
-		// Disconnect the others from the graph
-		for (int i = 0; i < candidates.size(); i++) {
-			if( keepIndex == i )
-				continue;
-			disconnectNode(candidates.get(i));
-		}
-	}
-
-	private int selectNodeToKeep( List<LNode> candidates ) {
-		int bestIndex = -1;
-		int bestEdges = 0;
-		double bestError = Double.MAX_VALUE;
-
-		for (int i = 0; i < candidates.size(); i++) {
-			LNode n = candidates.get(i);
-
-			int numEdges = n.countEdges();
-
-			if( numEdges > bestEdges ) {
-				bestEdges = numEdges;
-				bestError = ambiguityError(n);
-				bestIndex = i;
-			} else if( numEdges == bestEdges ) {
-				double error = ambiguityError(n);
-				if( error < bestError ) {
-					bestError = error;
-					bestIndex = i;
-				}
-			}
-		}
-		return bestIndex;
-	}
-
-	/**
-	 * Computes an error for edges pointing towards this node. The farther they are from ideal the larger
-	 * the error will be.
-	 */
-	private double ambiguityError(LNode n ) {
-		double error = 0;
-
-		// NOTE: It might be better here to compute the error relative to the best fit corner at each edge
-		//       if there are multiple options
-
-		// compute errors for edges which should be 90 degrees off
-//		for (int i = 0,j=3; i < 4; j=i,i++) {
-//			if( n.edges[i] == null || n.edges[j] == null )
-//				continue;
-//			double dirI = n.getInfoForEdge(i).direction;
-//			double dirJ = n.getInfoForEdge(j).direction;
-//
-//			double d = UtilAngle.dist(dirI,dirJ);
-//			error += Math.abs(d-Math.PI/2.0);
-//		}
-
-		// These should be 180 degrees off
-		for (int i = 0,j=2; i < 2; i++,j++) {
-			if( n.edges[i] == null || n.edges[j] == null )
-				continue;
-
-			LocalInfo infoI = n.getInfoForEdge(i);
-			LocalInfo infoJ = n.getInfoForEdge(j);
-			double d = UtilAngle.dist(infoI.direction,infoJ.direction);
-
-			error += (Math.abs(d-Math.PI)+0.01)*(Math.abs(infoI.distance-infoJ.direction)+2.0);
-		}
-
-		return error;
-	}
-
-	/**
-	 * Removes all connection to the targeted node
-	 */
-	private void disconnectNode( LNode target ) {
-		for (int j = 0; j < 4; j++) {
-			LConnections connections = target.edges[j];
-			if( connections == null )
-				continue;
-			for (int idxC = 0; idxC < connections.dst.size; idxC++) {
-				LNode dst = nodes.get(target.neighbors.get(connections.dst.get(idxC)).index);
-				if (!dst.removeConnection(target.index)) {
-					throw new RuntimeException("disconnect node: "+dst.index+" not connected to "+target.index+". " +
-							"Probably more than one edge connected to target");
-				}
-			}
-			target.edges[j] = null;
-		}
-	}
-
-	/**
-	 * Found clusters of chessboard patterns
-	 */
 	public FastQueue<ChessboardCornerGraph> getOutputClusters() {
 		return clusters;
+	}
+
+	public double getDirectionTol() {
+		return directionTol;
+	}
+
+	public void setDirectionTol(double directionTol) {
+		this.directionTol = directionTol;
+		this.parallelTol = directionTol /2;
+	}
+
+	public int getMaxNeighbors() {
+		return maxNeighbors;
+	}
+
+	public void setMaxNeighbors(int maxNeighbors) {
+		this.maxNeighbors = maxNeighbors;
 	}
 
 	public double getOrientationTol() {
@@ -711,148 +720,161 @@ public class ChessboardCornerClusterFinder {
 		this.orientationTol = orientationTol;
 	}
 
-	public double getDirectionTol() {
-		return directionTol;
+	public double getAmbiguousTol() {
+		return ambiguousTol;
 	}
 
-	public void setDirectionTol(double directionTol) {
-		this.directionTol = directionTol;
+	public void setAmbiguousTol(double ambiguousTol) {
+		this.ambiguousTol = ambiguousTol;
 	}
 
-	public double getDistanceTol() {
-		return distanceTol;
-	}
-
-	public void setDistanceTol(double distanceTol) {
-		this.distanceTol = distanceTol;
-	}
-
-	// TODO remove (x,y) COORDINATES FROM LOCAL INFO?
-	public static class LocalInfo extends Point2D_F64 {
-		/**
-		 * Index of this corner the node list
-		 */
+	public static class SearchResults {
 		public int index;
-		/**
-		 * Relative direction of corner from target. -pi to pi
-		 */
-		public double direction;
-		/**
-		 * Euclidean distance from target corner
-		 */
-		public double distance;
-
-		public void reset() {
-			index = -1;
-			direction = Double.NaN;
-			distance = Double.NaN;
-		}
+		public double error;
 	}
 
-	private static class LNode {
+	public static class TupleI32 {
+		public int a,b,c;
+	}
+
+	/**
+	 * Graph vertex for a corner.
+	 */
+	@SuppressWarnings("WeakerAccess")
+	public static class Vertex {
 		/**
 		 * Index of the corner that this node represents
 		 */
 		public int index;
 
 		/**
-		 * List of connections to other nodes. There will be 2,3 or 4 edges.
+		 * Nodes which are close and have the same orientation
 		 */
-		public LConnections[] edges = new LConnections[4];
+		public EdgeSet parallel = new EdgeSet();
+		/**
+		 * Nodes which are close and have an orientation off by about 90 degrees
+		 */
+		public EdgeSet perpendicular = new EdgeSet();
 
 		/**
-		 * Information on its local neighborhood
+		 * Final set of edfes which it was decided that this vertex is connected to. Will have 2 to 4 elements.
 		 */
-		public FastQueue<LocalInfo> neighbors = new FastQueue<>(4,LocalInfo.class, LocalInfo::new);
+		public EdgeSet connections = new EdgeSet();
 
 		/**
-		 * Indicates if the node has been added to a cluster or not
+		 * Used when computing output. Indicates that the vertex has already been processed.
 		 */
-		public boolean insideCluster = false;
+		public boolean insideCluster;
+
+		/**
+		 * Used to determine if a point is ambiguous with this one
+		 */
+		public double neighborDistance;
 
 		public void reset() {
-			neighbors.reset();
 			index = -1;
+			parallel.reset();
+			perpendicular.reset();
+			connections.reset();
 			insideCluster = false;
-			for (int i = 0; i < 4; i++) {
-				edges[i] = null;
-			}
 		}
 
-		/**
-		 * Returns the index of the edge with a connection to the corner index
-		 */
-		public int findEdgeIdx(int index ) {
-			for (int i = 0; i < 4; i++) {
-				LConnections c = edges[i];
-				if( c == null )
-					continue;
-				for (int j = 0; j < c.dst.size; j++) {
-					if( neighbors.get(c.dst.data[j]).index == index )
-						return i;
+		public void pruneNonMutal( EdgeType which ) {
+			EdgeSet set = getEdgeSet(which);
+
+			for (int i = set.edges.size()-1; i >= 0; i-- ) {
+				Vertex dst = set.edges.get(i).dst;
+				EdgeSet dstSet = dst.getEdgeSet(which);
+
+				if( -1 == dstSet.find(this) ) {
+					set.edges.remove(i);
 				}
 			}
-
-			return -1;
 		}
 
-		/**
-		 * Removes all edges which connect
-		 * @return true if a connection was removed and false if it.
-		 */
-		public boolean removeConnection( int indexNode ) {
-			boolean found = false;
-			for (int i = 3; i >= 0 ; i--) {
-				LConnections c = edges[i];
-				if( c == null )
-					continue;
-				for (int j = c.dst.size-1; j >= 0; j--) {
-					if( neighbors.get(c.dst.data[j]).index == indexNode ) {
-						if( found )
-							throw new RuntimeException("BUG!");
-						found = true;
-						c.dst.remove(j);
-					}
-				}
-				// nothing is connected to this edge any more so remove it
-				if( c.dst.size==0) {
-					edges[i] = null;
-				}
+		public EdgeSet getEdgeSet( EdgeType which ) {
+			switch( which ) {
+				case PARALLEL: return parallel;
+				case PERPENDICULAR: return perpendicular;
+				case CONNECTION: return connections;
 			}
-
-			return found;
-		}
-
-		public int countEdges() {
-			int total = 0;
-			for (int i = 0; i < 4; i++) {
-				if( edges[i] != null )
-					total++;
-			}
-			return total;
-		}
-
-		public LocalInfo getInfoForEdge( int which ) {
-			return neighbors.get( edges[which].dst.get(0));
-		}
-
-		@Override
-		public int hashCode() {
-			return index;
+			throw new RuntimeException("BUG!");
 		}
 	}
 
-	private static class LConnections {
-		LNode src;
-
-		/**
-		 * The neighbor's index
-		 */
-		public GrowQueue_I32 dst = new GrowQueue_I32();
+	/**
+	 * Collection of edges that share the same relationship with the source vertex. See {@link EdgeType}.
+	 */
+	private static class EdgeSet {
+		public List<Edge> edges = new ArrayList<>();
 
 		public void reset() {
-			src = null;
-			dst.reset();
+			edges.clear();
 		}
+
+		public boolean findBestMatch(double reference, double targetCCW, double targetDist,
+									 SearchResults result , double maxErrorCCW, double maxErrorDist ) {
+			result.error = Double.MAX_VALUE;
+			result.index = -1;
+
+			for (int i = 0; i < edges.size(); i++) {
+				Edge e = edges.get(i);
+				double errorCCW = UtilAngle.dist(targetCCW,UtilAngle.distanceCCW(reference,e.direction));
+				double errorDist = Math.abs(targetDist-e.distance)/Math.max(targetDist,e.distance);
+
+				if( errorCCW > maxErrorCCW || errorDist > maxErrorDist )
+					continue;
+
+				// angle error should be minimized more than distance error
+				double error = 2*errorCCW/maxErrorCCW;
+				if( error < result.error ) {
+					result.error = error;
+					result.index = i;
+				}
+			}
+
+			return result.index != -1;
+		}
+
+		public void add( Edge e ) {
+			edges.add(e);
+		}
+
+		public Edge get( int i ) {
+			return edges.get(i);
+		}
+
+		public void set( int i , Edge e ) {
+			edges.set(i,e);
+		}
+
+		public int size() {
+			return edges.size();
+		}
+
+		public int find( Vertex v ) {
+			for (int i = 0; i < edges.size(); i++) {
+				if( edges.get(i).dst == v )
+					return i;
+			}
+			return -1;
+		}
+	}
+
+	/**
+	 * Describes the relationship between two vertexes in the graph. Features are from the
+	 * perspective of the src vertex.
+	 */
+	public static class Edge {
+		// Euclidean distance between the two vertexes
+		public double distance;
+		// pointing direction (-pi to pi) from src (x,y) to dst (x,y)
+		public double direction;
+		// Destination vertex
+		public Vertex dst;
+	}
+
+	private enum EdgeType {
+		PARALLEL,PERPENDICULAR,CONNECTION
 	}
 }

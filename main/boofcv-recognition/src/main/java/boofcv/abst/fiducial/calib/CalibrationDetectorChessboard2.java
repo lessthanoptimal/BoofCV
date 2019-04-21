@@ -23,7 +23,7 @@ import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
 import boofcv.alg.feature.detect.chess.DetectChessboardCornersPyramid;
-import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder2;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -44,7 +44,7 @@ import java.util.List;
 public class CalibrationDetectorChessboard2 implements DetectorFiducialCalibration {
 
 	DetectChessboardCornersPyramid detector = new DetectChessboardCornersPyramid();
-	ChessboardCornerClusterFinder2 clusterFinder = new ChessboardCornerClusterFinder2();
+	ChessboardCornerClusterFinder clusterFinder = new ChessboardCornerClusterFinder();
 	ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
 
 	int cornerRows,cornerCols;
@@ -133,7 +133,7 @@ public class CalibrationDetectorChessboard2 implements DetectorFiducialCalibrati
 		return detector;
 	}
 
-	public ChessboardCornerClusterFinder2 getClusterFinder() {
+	public ChessboardCornerClusterFinder getClusterFinder() {
 		return clusterFinder;
 	}
 
