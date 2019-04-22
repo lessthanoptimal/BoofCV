@@ -91,9 +91,6 @@ public class ThresholdBlock<T extends ImageGray<T>,S extends ImageBase<S>>
 		output.reshape(input.width,input.height);
 
 		int requestedBlockWidth = this.requestedBlockWidth.computeI(Math.min(input.width,input.height));
-		if( input.width < requestedBlockWidth || input.height < requestedBlockWidth ) {
-			throw new IllegalArgumentException("Image is smaller than block size");
-		}
 
 		selectBlockSize(input.width,input.height,requestedBlockWidth);
 
@@ -114,11 +111,19 @@ public class ThresholdBlock<T extends ImageGray<T>,S extends ImageBase<S>>
 	 */
 	void selectBlockSize( int width , int height , int requestedBlockWidth) {
 
-		int rows = height/requestedBlockWidth;
-		int cols = width/requestedBlockWidth;
+		if( height < requestedBlockWidth ) {
+			blockHeight = height;
+		} else {
+			int rows = height/requestedBlockWidth;
+			blockHeight = height/rows;
+		}
 
-		blockHeight = height/rows;
-		blockWidth = width/cols;
+		if( width < requestedBlockWidth ) {
+			blockWidth = width;
+		} else {
+			int cols = width/requestedBlockWidth;
+			blockWidth = width/cols;
+		}
 	}
 
 	/**
