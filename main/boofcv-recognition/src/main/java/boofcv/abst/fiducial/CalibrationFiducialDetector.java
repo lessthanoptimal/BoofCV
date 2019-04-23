@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,6 +80,20 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	 * Configure it to detect chessboard style targets
 	 */
 	public CalibrationFiducialDetector(ConfigChessboard config,
+									   Class<T> imageType) {
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboard(config);
+		sideWidth = config.numCols*config.squareWidth;
+		sideHeight = config.numRows*config.squareWidth;
+
+		width = (sideWidth+sideHeight)/2.0;
+
+		init(detector, width, imageType);
+	}
+
+	/**
+	 * Configure it to detect chessboard style targets
+	 */
+	public CalibrationFiducialDetector(ConfigChessboard2 config,
 									   Class<T> imageType) {
 		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboard(config);
 		sideWidth = config.numCols*config.squareWidth;

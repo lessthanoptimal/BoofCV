@@ -32,6 +32,7 @@ Version : 0.34
 - Chessboard Detector TODO finish
   * Rewritten from scratch using a new type of corner detector (TODo write tech report)
   * Much better handling of blurred and fisheye images
+- TODO concurrent version of template matching
 
 TODO Applications. Make standalone jar have access to commandline mode
 TODO               Create a commandline QR Code scanner

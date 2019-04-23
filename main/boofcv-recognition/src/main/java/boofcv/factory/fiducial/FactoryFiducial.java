@@ -124,6 +124,11 @@ public class FactoryFiducial {
 		return new CalibrationFiducialDetector<>(config, imageType);
 	}
 
+	public static <T extends ImageGray<T>>
+	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard2 config, Class<T> imageType) {
+		return new CalibrationFiducialDetector<>(config, imageType);
+	}
+
 	/**
 	 * Wrapper around square-grid calibration detector.  Refine with lines is set to true automatically.  This
 	 * isn't being used for calibration and its better to use the whole line.

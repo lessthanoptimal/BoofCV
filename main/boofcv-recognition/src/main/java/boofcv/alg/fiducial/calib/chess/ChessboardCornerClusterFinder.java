@@ -69,7 +69,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "ForLoopReplaceableByForEach"})
 public class ChessboardCornerClusterFinder {
 
 	// Tolerance for deciding if two directions are the same.
@@ -168,15 +168,32 @@ public class ChessboardCornerClusterFinder {
 		for (int idx = 0; idx < vertexes.size(); idx++) {
 			selectConnections(vertexes.get(idx));
 		}
-		printConnectionGraph();
+//		printConnectionGraph();
 
+		// Connects must be mutual to be accepted. Keep track of vertexes which were modified
+		dirtyVertexes.clear();
 		for (int i = 0; i < vertexes.size; i++) {
 			Vertex v = vertexes.get(i);
+			int before = v.connections.size();
 			v.pruneNonMutal(EdgeType.CONNECTION);
+			if( before != v.connections.size() ) {
+				dirtyVertexes.add(v);
+				v.marked = true;
+			}
 		}
 
+		// attempt to recover from poorly made decisions in the past from the greedy algorithm
+		repairVertexes();
+
+		for (int i = 0; i < dirtyVertexes.size(); i++) { //TODO I'm uneasy about this. Make sure all old connections are still valid
+			dirtyVertexes.get(i).pruneNonMutal(EdgeType.CONNECTION);
+			dirtyVertexes.get(i).marked = false;
+		}
+
+		// Final clean up to return just valid grids
 		disconnectInvalidVertices();
 
+		// Name says it all
 		convertToOutput(corners);
 	}
 
@@ -324,7 +341,7 @@ public class ChessboardCornerClusterFinder {
 				int bestIndex = -1;
 				double bestScore = 0;
 
-				System.out.println("==== Resolving ambiguity. src="+target.index);
+//				System.out.println("==== Resolving ambiguity. src="+target.index);
 				for (int i = 0; i < candidates.size(); i++) {
 					Vertex v = candidates.get(i);
 //					System.out.println("   candidate = "+v.index);
@@ -334,7 +351,7 @@ public class ChessboardCornerClusterFinder {
 						bestIndex = i;
 					}
 				}
-				System.out.println("==== Resolved ambiguity. Selected "+candidates.get(bestIndex).index);
+//				System.out.println("==== Resolved ambiguity. Selected "+candidates.get(bestIndex).index);
 
 				for (int i = 0; i < candidates.size(); i++) {
 					if( i == bestIndex )
@@ -429,16 +446,14 @@ public class ChessboardCornerClusterFinder {
 		if( target.perpendicular.size() <= 1 )
 			return;
 
-		if( target.index == 16 ) {
-			System.out.println("ASDSAD");
-		}
-		System.out.println("======= Connecting "+target.index);
+//		if( target.index == 16 ) {
+//			System.out.println("ASDSAD");
+//		}
+//		System.out.println("======= Connecting "+target.index);
 
 		double bestError = Double.MAX_VALUE;
 		List<Edge> bestSolution = target.connections.edges;
 		List<Edge> solution = new ArrayList<>();
-
-		double targetOri = corners.get(target.index).orientation;
 
 		// Greedily select one vertex at a time to connect to. findNext() looks at all possible
 		// vertexes it can connect too and minimizes an error function based on projectively invariant features
@@ -450,14 +465,7 @@ public class ChessboardCornerClusterFinder {
 			double sumDistance = solution.get(0).distance;
 			double minDistance = sumDistance;
 
-			double edgeOri = corners.get(e.dst.index).orientation;
-
-			// TODO comment
-			double phase = UtilAngle.distanceCCW(e.direction,edgeOri) >= Math.PI ?  Math.PI/2.0 : 0.0;
-
-			double errorFoo = UtilAngle.dist(Math.PI/4.0,UtilAngle.distHalf(UtilAngle.boundHalf(e.direction),targetOri));
-
-			if( !findNext(i,target.parallel,target.perpendicular,Double.NaN,phase,results) ) {
+			if( !findNext(i,target.parallel,target.perpendicular,Double.NaN,results) ) {
 				continue;
 			}
 
@@ -465,19 +473,15 @@ public class ChessboardCornerClusterFinder {
 			sumDistance += solution.get(1).distance;
 			minDistance = Math.min(minDistance,solution.get(1).distance);
 
-			phase = UtilAngle.boundHalf(phase+Math.PI/2.0);
-
 			// Use knowledge that solution[0] and solution[2] form a line.
 			// Lines are straight under projective distortion
-			if( findNext(results.index,target.parallel,target.perpendicular,solution.get(0).direction,phase,results) ) {
+			if( findNext(results.index,target.parallel,target.perpendicular,solution.get(0).direction,results) ) {
 				solution.add(target.perpendicular.get(results.index));
 				sumDistance += solution.get(2).distance;
 				minDistance = Math.min(minDistance,solution.get(2).distance);
 
-				phase = UtilAngle.boundHalf(phase+Math.PI/2.0);
-
 				// Use knowledge that solution[1] and solution[3] form a line.
-				if( findNext(results.index,target.parallel,target.perpendicular,solution.get(1).direction,phase,results) ) {
+				if( findNext(results.index,target.parallel,target.perpendicular,solution.get(1).direction,results) ) {
 					solution.add(target.perpendicular.get(results.index));
 					sumDistance += solution.get(3).distance;
 					minDistance = Math.min(minDistance,solution.get(3).distance);
@@ -499,16 +503,20 @@ public class ChessboardCornerClusterFinder {
 		}
 	}
 
+	/**
+	 * Greedily select the next edge that will belong to the final graph.
+	 *
+	 * @param firstIdx Index of the edge CW of the one being considered
+	 * @param splitterSet Set of edges that the splitter can belong to
+	 * @param candidateSet Set of edges that the next edge can belong to
+	 * @param parallel if NaN this is the angle the edge should be parallel to
+	 * @param results Output.
+	 * @return true if successful.
+	 */
 	boolean findNext( int firstIdx , EdgeSet splitterSet , EdgeSet candidateSet ,
-					  double parallel, double phaseOri,
+					  double parallel,
 					  SearchResults results ) {
 		Edge e0 = candidateSet.get(firstIdx);
-		double ori0 = corners.get(e0.dst.index).orientation;
-
-		// Adjust the orientation so that it's the angle we would expect
-		ori0 = UtilAngle.boundHalf(ori0+phaseOri);
-
-		double selectedPhaseError = -1;
 
 		results.index = -1;
 		results.error = Double.MAX_VALUE;
@@ -562,10 +570,6 @@ public class ChessboardCornerClusterFinder {
 			if( e0_to_eI < 0 )
 				continue;
 
-			double direction180 = UtilAngle.boundHalf(e0.dst.parallel.get(e0_to_eI).direction);
-			double phaseError = UtilAngle.distHalf(ori0,direction180);
-			if( phaseError >= Math.PI*0.5 )
-				continue;
 
 			// The quadrilateral with the smallest area is most often the best solution. Area is more expensive
 			// so the perimeter is computed instead. one side is left off since all of them have that side
@@ -576,17 +580,22 @@ public class ChessboardCornerClusterFinder {
 			if( error < results.error ) {
 				results.error = error;
 				results.index = i;
-				selectedPhaseError = phaseError;
 			}
 		}
-
-//		if( results.index != -1 ) {
-//			System.out.println("   phase = "+phaseOri+" phase error "+selectedPhaseError);
-//		}
 
 		return results.index != -1;
 	}
 
+	/**
+	 * Spitter is a vertex that has an angle between two edges being considered.
+	 * @param ccw0 angle of edge 0
+	 * @param ccw1 angle of edge 1
+	 * @param master Set of edges that contains all potential spitters
+	 * @param other1 set of perpendicular edges to vertex ccw0
+	 * @param other2 set of perpendicular edges to vertex ccw1
+	 * @param output index of indexes for edges in master, other1, other2
+	 * @return true if successful
+	 */
 	boolean findSplitter(double ccw0 , double ccw1 ,
 						 EdgeSet master , EdgeSet other1 , EdgeSet other2 ,
 						 TupleI32 output ) {
@@ -644,6 +653,100 @@ public class ChessboardCornerClusterFinder {
 	}
 
 	/**
+	 * Given the current graph, attempt to replace edges from vertexes which lost them in an apparent bad decision.
+	 *
+	 * 1) Can only connect to vertexes which lost edges
+	 * 2) Can't modify an existing edge
+	 * 3) Parallel lines must be parallel
+	 * 4) If current graph can't predict direction no decision is made
+	 *
+	 */
+	private void repairVertexes() {
+//		System.out.println("######## Repair");
+		List<Edge> bestSolution = new ArrayList<>();
+		List<Edge> solution = new ArrayList<>();
+
+		for (int idxV = 0; idxV < dirtyVertexes.size(); idxV++) {
+			Vertex v = dirtyVertexes.get(idxV);
+
+//			System.out.println(" dirty="+v.index);
+
+			bestSolution.clear();
+
+			for (int idxE = 0; idxE < v.perpendicular.size(); idxE++) {
+				// Assume this edge is in the solutions
+				Edge e = v.perpendicular.get(idxE);
+
+				// only can connect new modified vertexes or ones already connected too
+				if( !(e.dst.marked || -1 != v.connections.find(e.dst)) ) {
+					continue;
+				}
+
+//				System.out.println("  e[0].dst = "+e.dst.index);
+
+				solution.clear();
+				solution.add(e);
+
+				// search for connections until there's no more to be found
+				for (int count = 0; count < 3; count++) {
+					// Find the an edge which is about to 90 degrees CCW of the previous edge 'v'
+					Vertex va=null;
+					double dir90 = UtilAngle.bound(e.direction+Math.PI/2.0);
+					for (int i = 0; i < e.dst.connections.size(); i++) {
+						Edge ei = e.dst.connections.get(i);
+						if( UtilAngle.dist(ei.direction,dir90) < Math.PI/3 ) {
+							va = ei.dst;
+							break;
+						}
+					}
+
+					// Search for an edge in v which has a connection to 'va' and is ccw of 'e'
+					boolean matched = false;
+					for (int i = 0; i < v.perpendicular.size(); i++) {
+						Edge ei = v.perpendicular.get(i);
+
+						if( e == ei )
+							continue;
+
+						// angle test
+						double ccw = UtilAngle.distanceCCW(e.direction,ei.direction);
+						if( ccw > Math.PI*0.9 )
+							continue;
+
+						if( !(ei.dst.marked || -1 != v.connections.find(ei.dst)) ) {
+							continue;
+						}
+
+						// connection test
+						if( ei.dst.connections.find(va) != -1 ) {
+//							System.out.println("   e[i].dst = "+ei.dst.index+" va="+va.index);
+							e = ei;
+							solution.add(ei);
+							matched = true;
+							break;
+						}
+					}
+
+					if( !matched )
+						break;
+				}
+
+				if( solution.size() > bestSolution.size() ) {
+					bestSolution.clear();
+					bestSolution.addAll(solution);
+				}
+			}
+
+			if( bestSolution.size() > 1 ) {
+				System.out.println(" selected[0] = "+bestSolution.get(0).dst.index);
+				v.connections.edges.clear();
+				v.connections.edges.addAll(bestSolution);
+			}
+		}
+	}
+
+
+	/**
 	 * Converts the internal graphs into unordered chessboard grids.
 	 */
 	private void convertToOutput(List<ChessboardCorner> corners) {
@@ -656,7 +759,7 @@ public class ChessboardCornerClusterFinder {
 
 		for (int seedIdx = 0; seedIdx < vertexes.size; seedIdx++) {
 			Vertex seedN = vertexes.get(seedIdx);
-			if( seedN.insideCluster )
+			if( seedN.marked)
 				continue;
 			ChessboardCornerGraph graph = clusters.grow();
 			graph.reset();
@@ -704,9 +807,9 @@ public class ChessboardCornerClusterFinder {
 			Vertex v = vertexes.get(cornerIdx);
 
 			// make sure it hasn't already been processed
-			if( v.insideCluster )
+			if( v.marked)
 				continue;
-			v.insideCluster = true;
+			v.marked = true;
 
 			// Create the node in the output cluster for this corner
 			ChessboardCornerGraph.Node gn = graph.growCorner();
@@ -717,7 +820,7 @@ public class ChessboardCornerClusterFinder {
 			// Add to the open list all the edges which haven't been processed yet;
 			for (int i = 0; i < v.connections.size(); i++) {
 				Vertex dst = v.connections.get(i).dst;
-				if( dst.insideCluster )
+				if( dst.marked)
 					continue;
 				open.add( dst.index );
 			}
@@ -797,7 +900,7 @@ public class ChessboardCornerClusterFinder {
 		/**
 		 * Used when computing output. Indicates that the vertex has already been processed.
 		 */
-		public boolean insideCluster;
+		public boolean marked;
 
 		/**
 		 * Used to determine if a point is ambiguous with this one
@@ -809,7 +912,7 @@ public class ChessboardCornerClusterFinder {
 			parallel.reset();
 			perpendicular.reset();
 			connections.reset();
-			insideCluster = false;
+			marked = false;
 		}
 
 		public void pruneNonMutal( EdgeType which ) {
