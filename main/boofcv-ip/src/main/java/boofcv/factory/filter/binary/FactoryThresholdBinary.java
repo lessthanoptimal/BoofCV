@@ -243,10 +243,10 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> globalEntropy(int minValue, int maxValue, boolean down, Class<T> inputType) {
+	InputToBinary<T> globalEntropy(int minValue, int maxValue, double scale, boolean down, Class<T> inputType) {
 		if( BOverrideFactoryThresholdBinary.globalEntropy != null )
 			return BOverrideFactoryThresholdBinary.globalEntropy.handle(minValue, maxValue, down, inputType);
-		return new GlobalEntropyBinaryFilter<>(minValue, maxValue, down, ImageType.single(inputType));
+		return new GlobalBinaryFilter.Entropy<>(minValue, maxValue, scale, down, ImageType.single(inputType));
 	}
 
 	/**
@@ -274,10 +274,10 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> globalOtsu(double minValue, double maxValue, boolean down, Class<T> inputType) {
+	InputToBinary<T> globalOtsu(double minValue, double maxValue, double scale, boolean down, Class<T> inputType) {
 		if( BOverrideFactoryThresholdBinary.globalOtsu != null )
 			return BOverrideFactoryThresholdBinary.globalOtsu.handle(minValue, maxValue, down, inputType);
-		return new GlobalOtsuBinaryFilter<>(minValue, maxValue, down, ImageType.single(inputType));
+		return new GlobalBinaryFilter.Otsu<>(minValue, maxValue, scale, down, ImageType.single(inputType));
 	}
 
 	/**
@@ -290,8 +290,8 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> globalLi(double minValue, double maxValue, boolean down, Class<T> inputType) {
-		return new GlobalLiBinaryFilter<>(minValue, maxValue, down, ImageType.single(inputType));
+	InputToBinary<T> globalLi(double minValue, double maxValue, double scale,  boolean down, Class<T> inputType) {
+		return new GlobalBinaryFilter.Li<>(minValue, maxValue, scale, down, ImageType.single(inputType));
 	}
 
 	/**
@@ -304,8 +304,8 @@ public class FactoryThresholdBinary {
 	 * @return Filter to binary
 	 */
 	public static <T extends ImageGray<T>>
-	InputToBinary<T> globalHuang(double minValue, double maxValue, boolean down, Class<T> inputType) {
-		return new GlobalHuangBinaryFilter<>(minValue, maxValue, down, ImageType.single(inputType));
+	InputToBinary<T> globalHuang(double minValue, double maxValue, double scale,  boolean down, Class<T> inputType) {
+		return new GlobalBinaryFilter.Huang<>(minValue, maxValue, scale, down, ImageType.single(inputType));
 	}
 
 	/**
@@ -323,16 +323,16 @@ public class FactoryThresholdBinary {
 				return globalFixed(config.fixedThreshold, config.down, inputType);
 
 			case GLOBAL_OTSU:
-				return globalOtsu(config.minPixelValue, config.maxPixelValue, config.down, inputType);
+				return globalOtsu(config.minPixelValue, config.maxPixelValue, config.scale, config.down, inputType);
 
 			case GLOBAL_ENTROPY:
-				return globalEntropy(config.minPixelValue, config.maxPixelValue, config.down, inputType);
+				return globalEntropy(config.minPixelValue, config.maxPixelValue, config.scale, config.down, inputType);
 
 			case GLOBAL_LI:
-				return globalLi(config.minPixelValue, config.maxPixelValue, config.down, inputType);
+				return globalLi(config.minPixelValue, config.maxPixelValue, config.scale, config.down, inputType);
 
 			case GLOBAL_HUANG:
-				return globalHuang(config.minPixelValue, config.maxPixelValue, config.down, inputType);
+				return globalHuang(config.minPixelValue, config.maxPixelValue, config.scale, config.down, inputType);
 
 			case LOCAL_GAUSSIAN:
 				return localGaussian(config.width, config.scale, config.down, inputType);

@@ -43,6 +43,8 @@ import java.util.List;
  *     <li>Identify ambiguous corners that are close to each other and pick be most intense corner</li>
  *     <li>Prune corners from each nodes parallel and perpendicular sets if they are not mutual</li>
  *     <li>Select 2 to 4 connections for each corner using projective invariant properties</li>
+ *     <li>Prune non mutual connections and save a list of modified vertexes</li>
+ *     <li>Use known graph to find better edges for modified vertexes</li>
  *     <li>Find connected sets of vertexes and convert into output format</li>
  * </ol>
  *
@@ -85,6 +87,7 @@ public class ChessboardCornerClusterFinder {
 	// Number of nearest neighbors it will search. It's assumed that the feature detector does a very
 	// good job removing false positives, meaning that tons of features do not need to be considered
 	private int maxNeighbors=20; // 8 is minimum number given perfect data.
+	private double maxNeighborDistance=Double.MAX_VALUE; // maximum distance away (pixels Euclidean squared) a neighbor can be
 
 	// Data structures for the crude graph
 	private FastQueue<Vertex> vertexes = new FastQueue<>(Vertex.class,true);
@@ -150,9 +153,9 @@ public class ChessboardCornerClusterFinder {
 			findVertexNeighbors(vertexes.get(i),corners);
 		}
 
-		// If more than one vertex's are near each other, remove
+		// If more than one vertex's are near each other, pick one and remove the others
 		handleAmbiguousVertexes(corners);
-		printDualGraph();
+//		printDualGraph();
 
 		// Prune connections which are not mutual
 		for (int i = 0; i < vertexes.size; i++) {
@@ -185,7 +188,9 @@ public class ChessboardCornerClusterFinder {
 		// attempt to recover from poorly made decisions in the past from the greedy algorithm
 		repairVertexes();
 
-		for (int i = 0; i < dirtyVertexes.size(); i++) { //TODO I'm uneasy about this. Make sure all old connections are still valid
+		// Prune non-mutual edges again. Only need to consider dirty edges since it makes sure that the new
+		// set of connections is a super set of the old
+		for (int i = 0; i < dirtyVertexes.size(); i++) {
 			dirtyVertexes.get(i).pruneNonMutal(EdgeType.CONNECTION);
 			dirtyVertexes.get(i).marked = false;
 		}
@@ -248,7 +253,7 @@ public class ChessboardCornerClusterFinder {
 //		}
 
 		ChessboardCorner targetCorner = corners.get(target.index);
-		nnSearch.findNearest(corners.get(target.index),Double.MAX_VALUE,maxNeighbors,nnResults);
+		nnSearch.findNearest(corners.get(target.index),maxNeighborDistance,maxNeighbors,nnResults);
 
 		// storage distances here to find median distance of closest neighbors
 		distanceTmp.reset();
@@ -587,7 +592,8 @@ public class ChessboardCornerClusterFinder {
 	}
 
 	/**
-	 * Spitter is a vertex that has an angle between two edges being considered.
+	 * Splitter is a vertex that has an angle between two edges being considered.
+	 *
 	 * @param ccw0 angle of edge 0
 	 * @param ccw1 angle of edge 1
 	 * @param master Set of edges that contains all potential spitters
@@ -738,9 +744,19 @@ public class ChessboardCornerClusterFinder {
 			}
 
 			if( bestSolution.size() > 1 ) {
-				System.out.println(" selected[0] = "+bestSolution.get(0).dst.index);
-				v.connections.edges.clear();
-				v.connections.edges.addAll(bestSolution);
+				// make sure all the previous connections are still in the list. If not ignore the results
+				// This is important since it is assumed that previous edges are part of the graph.
+				boolean accepted = true;
+				for (int i = 0; i < v.connections.edges.size(); i++) {
+					if( !bestSolution.contains(v.connections.edges.get(i)) ){
+						accepted = false;
+						break;
+					}
+				}
+				if( accepted ) {
+					v.connections.edges.clear();
+					v.connections.edges.addAll(bestSolution);
+				}
 			}
 		}
 	}
@@ -864,6 +880,14 @@ public class ChessboardCornerClusterFinder {
 		this.ambiguousTol = ambiguousTol;
 	}
 
+	public double getMaxNeighborDistance() {
+		return maxNeighborDistance;
+	}
+
+	public void setMaxNeighborDistance(double maxNeighborDistance) {
+		this.maxNeighborDistance = maxNeighborDistance;
+	}
+
 	public static class SearchResults {
 		public int index;
 		public double error;
@@ -946,30 +970,6 @@ public class ChessboardCornerClusterFinder {
 
 		public void reset() {
 			edges.clear();
-		}
-
-		public boolean findBestMatch(double reference, double targetCCW, double targetDist,
-									 SearchResults result , double maxErrorCCW, double maxErrorDist ) {
-			result.error = Double.MAX_VALUE;
-			result.index = -1;
-
-			for (int i = 0; i < edges.size(); i++) {
-				Edge e = edges.get(i);
-				double errorCCW = UtilAngle.dist(targetCCW,UtilAngle.distanceCCW(reference,e.direction));
-				double errorDist = Math.abs(targetDist-e.distance)/Math.max(targetDist,e.distance);
-
-				if( errorCCW > maxErrorCCW || errorDist > maxErrorDist )
-					continue;
-
-				// angle error should be minimized more than distance error
-				double error = 2*errorCCW/maxErrorCCW;
-				if( error < result.error ) {
-					result.error = error;
-					result.index = i;
-				}
-			}
-
-			return result.index != -1;
 		}
 
 		public void add( Edge e ) {

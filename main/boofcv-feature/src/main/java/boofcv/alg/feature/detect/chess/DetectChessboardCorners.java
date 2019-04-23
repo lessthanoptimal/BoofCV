@@ -129,7 +129,7 @@ public class DetectChessboardCorners {
 	public DetectChessboardCorners() {
 		setKernelRadius(1);
 
-		setThresholding(FactoryThresholdBinary.globalOtsu(0, GRAY_LEVELS,false,GrayF32.class));
+		setThresholding(FactoryThresholdBinary.globalOtsu(0, GRAY_LEVELS,1.0,false,GrayF32.class));
 		contourFinder.setConnectRule(ConnectRule.EIGHT);
 
 		// just give it something. this will be changed later

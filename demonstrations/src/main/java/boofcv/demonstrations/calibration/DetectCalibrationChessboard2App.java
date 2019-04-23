@@ -22,7 +22,6 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard2;
 import boofcv.abst.fiducial.calib.ConfigChessboard2;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
-import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageStatistics;
@@ -153,12 +152,12 @@ public class DetectCalibrationChessboard2App
 			config.cornerThreshold = controlPanel.cornerThreshold;
 			config.numCols = controlPanel.gridCols;
 			config.numRows = controlPanel.gridRows;
+			config.orientaitonTol = controlPanel.orientationTol;
+			config.directionTol = controlPanel.directionTol;
+			config.ambiguousTol = controlPanel.ambiguousTol;
 
 			detector = new CalibrationDetectorChessboard2(config);
 			detector.getDetector().getDetector().useMeanShift = controlPanel.meanShift;
-			detector.getClusterFinder().setOrientationTol(controlPanel.orientationTol);
-			detector.getClusterFinder().setDirectionTol(controlPanel.directionTol);
-			detector.getClusterFinder().setAmbiguousTol(controlPanel.ambiguousTol);
 
 			if( controlPanel.anyGrid ) {
 				detector.getClusterToGrid().setCheckShape(null);
@@ -407,6 +406,9 @@ public class DetectCalibrationChessboard2App
 				ConfigChessboard2 config = new ConfigChessboard2(1,1,1);
 				pyramidTop = config.pyramidTopSize;
 				radius = config.cornerRadius;
+				ambiguousTol = config.ambiguousTol;
+				directionTol = config.directionTol;
+				orientationTol = config.orientaitonTol;
 				thresholdPanel = new ThresholdControlPanel(this,config.threshold);
 				thresholdPanel.addHistogramGraph();
 				// use the actual image histogram. Peaks are rare and the approximate one will be very inaccurate
@@ -414,11 +416,6 @@ public class DetectCalibrationChessboard2App
 
 				cornerThreshold = config.cornerThreshold;
 			}
-
-			ChessboardCornerClusterFinder finder = new ChessboardCornerClusterFinder();
-			ambiguousTol = finder.getAmbiguousTol();
-			directionTol = finder.getDirectionTol();
-			orientationTol = finder.getOrientationTol();
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);

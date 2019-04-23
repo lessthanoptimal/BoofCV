@@ -275,10 +275,8 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 			spinnerThreshold.setEnabled(false);
 			if(isThresholdGlobal) {
 				controlWidth.setEnabled(false);
-				spinnerScale.setEnabled(false);
 			} else {
 				controlWidth.setEnabled(true);
-				spinnerScale.setEnabled(true);
 			}
 		} else {
 			spinnerThreshold.setEnabled(true);

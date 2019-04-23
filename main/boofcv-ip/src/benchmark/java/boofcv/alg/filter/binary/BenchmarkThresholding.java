@@ -90,8 +90,8 @@ public class BenchmarkThresholding {
 
 		ConfigLength configLength = ConfigLength.fixed(region);
 
-		globalOtsuU8 = FactoryThresholdBinary.globalOtsu(0,255,true,GrayU8.class);
-		globalEntropyU8 = FactoryThresholdBinary.globalEntropy(0,255,true,GrayU8.class);
+		globalOtsuU8 = FactoryThresholdBinary.globalOtsu(0,255,1.0,true,GrayU8.class);
+		globalEntropyU8 = FactoryThresholdBinary.globalEntropy(0,255,1.0,true,GrayU8.class);
 
 		localOtsuU8 = FactoryThresholdBinary.localOtsu(configLength, 1.0, true, true, 0.1, GrayU8.class);
 		localMeanU8 = FactoryThresholdBinary.localMean(configLength,1.0,true,GrayU8.class);

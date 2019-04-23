@@ -43,16 +43,52 @@ public class ConfigChessboard2 implements Configuration {
 	 */
 	public int numCols = -1;
 
-
+	/**
+	 * Size of a corner in the corner detector. For very small targets 1 is required. Otherwise 2 provides
+	 * much more stable results.
+	 */
 	public int cornerRadius = 2;
 
 	/**
-	 * Threshold on corner intensity
+	 * Second threshold on corner intensity. This is applied after orientation has been estimated and is used
+	 * to remove false positives, like corners on a box.
 	 */
 	public double cornerThreshold = 1.0;
 
+	/**
+	 * The minimum allowed size for the top most layer in the pyramid. size = min(width,height)
+	 */
 	public int pyramidTopSize = 100;
 
+	/**
+	 * How similar the direction of two corners relative to each other need to be.
+	 */
+	public double directionTol = 0.6;
+
+	/**
+	 * How similar two corner orientations need to be
+	 */
+	public double orientaitonTol = 0.45;
+
+	/**
+	 * Ratio used to decide if two corners are spatially close enough to each other to be considered
+	 * as the same corner.
+	 */
+	public double ambiguousTol = 0.25;
+
+	/**
+	 * Maximum number of neighbors returned by nearest neighbor search
+	 */
+	public int maxNeighbors = 20;
+
+	/**
+	 * Maximum search distance for nearest neighbor search. Units = pixels.
+	 */
+	public double maxNeighborDistance = Double.MAX_VALUE;
+
+	/**
+	 * Selection of threshold for binary image. Intensity image is the input.
+	 */
 	public ConfigThreshold threshold = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
 
 	/**

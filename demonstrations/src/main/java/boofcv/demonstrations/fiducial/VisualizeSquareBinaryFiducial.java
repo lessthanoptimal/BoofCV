@@ -64,7 +64,7 @@ public class VisualizeSquareBinaryFiducial {
 		GrayF32 input = UtilImageIO.loadImage(nameImage, GrayF32.class);
 		GrayF32 undistorted = new GrayF32(input.width,input.height);
 
-		InputToBinary<GrayF32> inputToBinary = FactoryThresholdBinary.globalOtsu(0,255, true,GrayF32.class);
+		InputToBinary<GrayF32> inputToBinary = FactoryThresholdBinary.globalOtsu(0,255, 1.0,true,GrayF32.class);
 		Detector detector = new Detector(gridWidth,borderWidth,inputToBinary);
 		detector.setLengthSide(0.1);
 

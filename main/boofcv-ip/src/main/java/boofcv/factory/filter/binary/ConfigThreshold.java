@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class ConfigThreshold implements Configuration {
 	 * when tuning.  It will remove much of the noise in nearly uniform regions without degrading interesting features
 	 * by much.
 	 */
-	public double scale = 0.95;
+	public double scale = 1.0;
 
 	/**
 	 * If true then it thresholds down
@@ -124,6 +124,9 @@ public class ConfigThreshold implements Configuration {
 			config = new ConfigThreshold();
 		}
 
+		// scale is set here for legacy reasons. Default was change from 0.95 to 1.0 when global threshold was
+		// given scale. The default value (unfortunately) was tuned for marker detection use case.
+		config.scale = 0.95;
 		config.type = type;
 		config.width = width;
 		return (T)config;
