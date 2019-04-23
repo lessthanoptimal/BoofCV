@@ -98,7 +98,7 @@ public class ConfigChessboard2 implements Configuration {
 
 	{
 		threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
-		threshold.scale = 0.9;
+		threshold.scale = 1.0;
 		threshold.down = false;
 	}
 

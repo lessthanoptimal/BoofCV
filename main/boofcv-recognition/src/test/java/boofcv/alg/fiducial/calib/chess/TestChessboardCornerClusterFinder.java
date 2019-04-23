@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
+import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,7 +71,7 @@ class TestChessboardCornerClusterFinder {
 
 		FastQueue<ChessboardCornerGraph> found = alg.getOutputClusters();
 		assertEquals(1,found.size);
-		checkCluster(found.get(0), rows,cols);
+		checkClusterPerfect(found.get(0), rows,cols);
 	}
 
 	/**
@@ -78,13 +79,11 @@ class TestChessboardCornerClusterFinder {
 	 */
 	@Test
 	void perfect_ambiguous() {
-		perfect_ambiguous(2,2,1);
-		perfect_ambiguous(2,2,2);
-
-		perfect_ambiguous(5,5,1);
-		perfect_ambiguous(5,5,3);
-
-		perfect_ambiguous(10,8,3);
+		for (int i = 0; i < 10; i++) {
+			perfect_ambiguous(2,2,1);
+			perfect_ambiguous(5,5,1);
+			perfect_ambiguous(10,8,1);
+		}
 	}
 
 	void perfect_ambiguous( int rows , int cols , int numAmbiguous) {
@@ -109,17 +108,12 @@ class TestChessboardCornerClusterFinder {
 		FastQueue<ChessboardCornerGraph> found = alg.getOutputClusters();
 		if( numAmbiguous == 0 ) {
 			assertEquals(1, found.size);
-			checkCluster(found.get(0), rows, cols);
+			checkClusterPerfect(found.get(0), rows, cols);
 		} else {
 			assertTrue(found.size>0);
-			boolean matched = false;
 			for (int i = 0; i < found.size; i++) {
-				if( found.get(i).corners.size == rows*cols ) {
-					checkCluster(found.get(i), rows, cols);
-					matched = true;
-				}
+				checkClusterAmbiguous(found.get(i),rows,cols);
 			}
-			assertTrue(matched);
 		}
 	}
 
@@ -133,6 +127,7 @@ class TestChessboardCornerClusterFinder {
 		input.addAll(createCorners(3,2));
 
 		ChessboardCornerClusterFinder alg = new ChessboardCornerClusterFinder();
+		alg.setMaxNeighborDistance(200);
 		alg.process(input);
 		FastQueue<ChessboardCornerGraph> found = alg.getOutputClusters();
 
@@ -153,8 +148,19 @@ class TestChessboardCornerClusterFinder {
 		assertTrue(found3x2);
 	}
 
+	/**
+	 * Apply heavy perspective distortion to a grid and see if it's been detected
+	 */
 	@Test
-	void ambiguityError() {
+	void perspective() {
+		fail("Implement");
+	}
+
+	/**
+	 * Apply heavy perspective distortion to a grid and see if it's been detected
+	 */
+	@Test
+	void fisheye() {
 		fail("Implement");
 	}
 
@@ -182,7 +188,7 @@ class TestChessboardCornerClusterFinder {
 		return corners;
 	}
 
-	void checkCluster( ChessboardCornerGraph cluster , int rows , int cols ) {
+	void checkClusterPerfect(ChessboardCornerGraph cluster , int rows , int cols ) {
 		assertEquals(rows*cols,cluster.corners.size);
 
 		// Checks to see there is one and only one node at each expected location
@@ -200,6 +206,46 @@ class TestChessboardCornerClusterFinder {
 
 				assertEquals(1,numMatches);
 			}
+		}
+
+		// check the edges
+		for (int row = 0; row < rows; row++) {
+			double y = sideLength * row;
+			for (int col = 0; col < cols; col++) {
+				double x = sideLength * col;
+
+				int expected = 2;
+				if( row > 0 && row < rows-1 ) {
+					expected++;
+				}
+				if( col > 0 && col < cols-1 ) {
+					expected++;
+				}
+
+				ChessboardCornerGraph.Node n = cluster.findClosest(x,y);
+
+				assertEquals(expected,n.countEdges());
+			}
+		}
+	}
+
+	void checkClusterAmbiguous(ChessboardCornerGraph cluster , int rows , int cols ) {
+		assertEquals(rows*cols,cluster.corners.size);
+
+		// Checks to see there is one and only one node at each expected location
+		for (int i = 0; i < cluster.corners.size; i++) {
+			Point2D_F64 a = cluster.corners.get(i);
+
+			int matches = 0;
+			for (int j = i+1; j < cluster.corners.size; j++) {
+				Point2D_F64 b = cluster.corners.get(j);
+
+				if( a.distance(b) < 0.0001 ) {
+					matches++;
+				}
+			}
+
+			assertEquals(0,matches);
 		}
 
 		// check the edges

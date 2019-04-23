@@ -253,7 +253,9 @@ public class ChessboardCornerClusterFinder {
 //		}
 
 		ChessboardCorner targetCorner = corners.get(target.index);
-		nnSearch.findNearest(corners.get(target.index),maxNeighborDistance,maxNeighbors,nnResults);
+		// distance is Euclidean squared
+		double maxDist = Double.MAX_VALUE==maxNeighborDistance?maxNeighborDistance:maxNeighborDistance*maxNeighborDistance;
+		nnSearch.findNearest(corners.get(target.index),maxDist,maxNeighbors,nnResults);
 
 		// storage distances here to find median distance of closest neighbors
 		distanceTmp.reset();
@@ -660,6 +662,7 @@ public class ChessboardCornerClusterFinder {
 
 	/**
 	 * Given the current graph, attempt to replace edges from vertexes which lost them in an apparent bad decision.
+	 * This is a very simple algorithm and gives up if the graph around the current node is less than perfect.
 	 *
 	 * 1) Can only connect to vertexes which lost edges
 	 * 2) Can't modify an existing edge
