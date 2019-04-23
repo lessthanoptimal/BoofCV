@@ -84,7 +84,7 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 		regionWidth = regionWidthLength.computeI(Math.min(input.width,input.height));
 
 		if (input.width < regionWidth || input.height < regionWidth) {
-			throw new IllegalArgumentException("Image is smaller than region size");
+			regionWidth = Math.min(input.width,input.height);
 		}
 
 		numPixels = regionWidth*regionWidth;
@@ -209,6 +209,7 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 		}
 
 		void updateHistogramX(int x0, int y0, GrayU8 input) {
+			if( x0 <= 0 ) return;
 			int indexInput = input.startIndex + y0*input.stride + x0-1;
 			for (int y = 0; y < regionWidth; y++) {
 				histogram[input.data[indexInput] & 0xFF]--;
@@ -218,6 +219,7 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 			otsu.compute(histogram,histogram.length,numPixels);
 		}
 		void updateHistogramY(int x0, int y0, GrayU8 input) {
+			if( y0 <= 0 ) return;
 			int offset = regionWidth*input.stride;
 			for (int x = 0; x < regionWidth; x++) {
 				int indexInput = input.startIndex + (y0-1)*input.stride + x0+x;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -87,13 +86,19 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>>
 		}
 	}
 
+	/**
+	 * Should process the image just fine. If a local region the block/region is adjusted for the image
+	 */
 	@Test
 	public void widthLargerThanImage() {
 		T input = GeneralizedImageOps.createSingleBand(imageType,10,12);
+		GImageMiscOps.fillUniform(input,rand,0,255);
 		GrayU8 output = new GrayU8(10,12);
 
 		InputToBinary<T> alg = createAlg(20,1.0,true);
-		assertThrows(IllegalArgumentException.class,()->alg.process(input,output));
+		alg.process(input,output);
+
+		assertTrue(ImageStatistics.sum(output)>output.data.length/4);
 	}
 
 	@Test
