@@ -758,14 +758,18 @@ public abstract class DemonstrationBase extends JPanel {
 
 		@Override
 		public void run() {
-			for (int i = 0; i < inputStreams.size(); i++) {
-				CacheSequenceStream cache = inputStreams.get(i);
-				inputSizeKnown = true;
+			try {
+				for (int i = 0; i < inputStreams.size(); i++) {
+					CacheSequenceStream cache = inputStreams.get(i);
+					inputSizeKnown = true;
 
-				ImageBase boof = cache.getBoofImage();
-				BufferedImage buff = cache.getBufferedImage();
+					ImageBase boof = cache.getBoofImage();
+					BufferedImage buff = cache.getBufferedImage();
 
-				processImage(i,0, buff, boof);
+					processImage(i, 0, buff, boof);
+				}
+			} catch( RuntimeException e ) {
+				e.printStackTrace();
 			}
 
 			// Request spam prevention.  Must complete the request before it will accept the new one

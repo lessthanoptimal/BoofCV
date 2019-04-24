@@ -796,7 +796,7 @@ public class ChessboardCornerClusterFinder {
 					int edgeCornerIdx = n.connections.get(j).dst.index;
 					int outputIdx = c2n.get( edgeCornerIdx );
 					if( outputIdx == -1 ) {
-						throw new IllegalArgumentException("Edge to node not in the graph. c="+edgeCornerIdx);
+						throw new IllegalArgumentException("Edge to node not in the graph. n.idx="+n.index+" conn.idx="+edgeCornerIdx);
 					}
 					gn.edges[j] = graph.corners.get(outputIdx);
 				}
