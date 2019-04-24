@@ -121,6 +121,10 @@ public class ChessboardCornerClusterFinder {
 	private List<Vertex> openVertexes = new ArrayList<>();
 	private List<Vertex> dirtyVertexes = new ArrayList<>();
 
+	// Workspace for connecting vertices
+	private List<Edge> bestSolution = new ArrayList<>();
+	private List<Edge> solution = new ArrayList<>();
+
 	public ChessboardCornerClusterFinder() {
 		setDirectionTol(directionTol);
 	}
@@ -185,8 +189,10 @@ public class ChessboardCornerClusterFinder {
 			}
 		}
 
+		printConnectionGraph();
 		// attempt to recover from poorly made decisions in the past from the greedy algorithm
 		repairVertexes();
+		printConnectionGraph();
 
 		// Prune non-mutual edges again. Only need to consider dirty edges since it makes sure that the new
 		// set of connections is a super set of the old
@@ -460,7 +466,6 @@ public class ChessboardCornerClusterFinder {
 
 		double bestError = Double.MAX_VALUE;
 		List<Edge> bestSolution = target.connections.edges;
-		List<Edge> solution = new ArrayList<>();
 
 		// Greedily select one vertex at a time to connect to. findNext() looks at all possible
 		// vertexes it can connect too and minimizes an error function based on projectively invariant features
@@ -671,14 +676,11 @@ public class ChessboardCornerClusterFinder {
 	 *
 	 */
 	private void repairVertexes() {
-//		System.out.println("######## Repair");
-		List<Edge> bestSolution = new ArrayList<>();
-		List<Edge> solution = new ArrayList<>();
-
+		System.out.println("######## Repair");
 		for (int idxV = 0; idxV < dirtyVertexes.size(); idxV++) {
-			Vertex v = dirtyVertexes.get(idxV);
+			final Vertex v = dirtyVertexes.get(idxV);
 
-//			System.out.println(" dirty="+v.index);
+			System.out.println(" dirty="+v.index);
 
 			bestSolution.clear();
 
@@ -691,7 +693,7 @@ public class ChessboardCornerClusterFinder {
 					continue;
 				}
 
-//				System.out.println("  e[0].dst = "+e.dst.index);
+				System.out.println("  e[0].dst = "+e.dst.index);
 
 				solution.clear();
 				solution.add(e);
@@ -728,7 +730,7 @@ public class ChessboardCornerClusterFinder {
 
 						// connection test
 						if( ei.dst.connections.find(va) != -1 ) {
-//							System.out.println("   e[i].dst = "+ei.dst.index+" va="+va.index);
+							System.out.println("   e[i].dst = "+ei.dst.index+" va="+va.index);
 							e = ei;
 							solution.add(ei);
 							matched = true;
@@ -747,19 +749,18 @@ public class ChessboardCornerClusterFinder {
 			}
 
 			if( bestSolution.size() > 1 ) {
-				// make sure all the previous connections are still in the list. If not ignore the results
-				// This is important since it is assumed that previous edges are part of the graph.
-				boolean accepted = true;
+				// See if any connection that was there before is now gone. If that's the case the destination
+				// will need to be checked for mutual matches
 				for (int i = 0; i < v.connections.edges.size(); i++) {
 					if( !bestSolution.contains(v.connections.edges.get(i)) ){
-						accepted = false;
+						v.connections.edges.get(i).dst.marked = true;
 						break;
 					}
 				}
-				if( accepted ) {
-					v.connections.edges.clear();
-					v.connections.edges.addAll(bestSolution);
-				}
+
+				// Save the new connections
+				v.connections.edges.clear();
+				v.connections.edges.addAll(bestSolution);
 			}
 		}
 	}

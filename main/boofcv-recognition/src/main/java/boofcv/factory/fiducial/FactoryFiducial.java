@@ -125,8 +125,10 @@ public class FactoryFiducial {
 	}
 
 	public static <T extends ImageGray<T>>
-	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard2 config, Class<T> imageType) {
-		return new CalibrationFiducialDetector<>(config, imageType);
+	CalibrationFiducialDetector<T> calibChessboard( @Nullable ConfigChessboard2 config,
+													ConfigGridDimen dimen,
+													Class<T> imageType) {
+		return new CalibrationFiducialDetector<>(config, dimen, imageType);
 	}
 
 	/**

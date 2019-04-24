@@ -18,19 +18,17 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
 import boofcv.alg.feature.detect.chess.DetectChessboardCornersPyramid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid;
-import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
+import boofcv.alg.fiducial.calib.chess.DetectChessboardPatterns;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,75 +39,51 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
-public class CalibrationDetectorChessboard2 implements DetectorFiducialCalibration {
-
-	DetectChessboardCornersPyramid detector = new DetectChessboardCornersPyramid();
-	ChessboardCornerClusterFinder clusterFinder = new ChessboardCornerClusterFinder();
-	ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
+public class CalibrationDetectorChessboard2
+		extends DetectChessboardPatterns
+		implements DetectorFiducialCalibration {
 
 	int cornerRows,cornerCols;
-	ChessboardCornerClusterToGrid.GridInfo info = new ChessboardCornerClusterToGrid.GridInfo();
 
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
 
-	public CalibrationDetectorChessboard2(ConfigChessboard2 config) {
+	// transform from input pixels to undistorted pixels
+	Point2Transform2_F64 pixel2undist;
 
-		cornerRows = config.numRows-1;
-		cornerCols = config.numCols-1;
+	public CalibrationDetectorChessboard2(ConfigChessboard2 config, ConfigGridDimen shape ) {
+		super(config);
 
-		// the user is unlikely to set this value correctly
-		config.threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
+		cornerRows = shape.numRows-1;
+		cornerCols = shape.numCols-1;
 
-		InputToBinary<GrayF32> thresholder = FactoryThresholdBinary.threshold(config.threshold,GrayF32.class);
-
-		detector.getDetector().setThresholding(thresholder);
-		detector.getDetector().setKernelRadius(config.cornerRadius);
-		detector.getDetector().setCornerIntensityThreshold(config.cornerThreshold);
-		detector.setPyramidTopSize(config.pyramidTopSize);
-
-		layoutPoints = gridChess(config.numRows, config.numCols, config.squareWidth);
+		layoutPoints = gridChess(shape.numRows, shape.numCols, shape.squareWidth);
 
 		clusterToGrid.setCheckShape((r,c)->r==cornerRows&&c==cornerCols);
-		clusterToGrid.setVerbose(System.out);
 	}
 
 	@Override
 	public boolean process(GrayF32 input) {
-		System.out.println("===========================================================");
-		detected = new CalibrationObservation(input.width, input.height);
-		try {
-			detector.process(input);
-			clusterFinder.process(detector.getCorners().toList());
-		} catch( RuntimeException e ) {
-			e.printStackTrace();
-			return false;
-		}
+		super.findPatterns(input);
 
-		FastQueue<ChessboardCornerGraph> clusters = clusterFinder.getOutputClusters();
+		if( found.size >= 1 ) {
+			detected = new CalibrationObservation(input.width, input.height);
+			ChessboardCornerClusterToGrid.GridInfo info = found.get(0);
 
-		System.out.println("corners "+detector.getCorners().size);
-		System.out.println("total clusters "+clusters.size);
-
-		for (int clusterIdx = 0; clusterIdx < clusters.size; clusterIdx++) {
-			ChessboardCornerGraph c = clusters.get(clusterIdx);
-
-			if( c.corners.size > 1 )
-				System.out.println(" ["+clusterIdx+"] corners.size = "+c.corners.size+"  vs "+(cornerCols*cornerRows));
-			if (c.corners.size != cornerCols * cornerRows)
-				continue;
-
-			if (clusterToGrid.convert(c, info)) {
-				if (info.cols != cornerCols || info.rows != cornerRows)
-					continue;
-
-				for (int i = 0; i < info.nodes.size(); i++) {
-					detected.add(info.nodes.get(i), i);
-				}
-				return true;
+			for (int i = 0; i < info.nodes.size(); i++) {
+				detected.add(info.nodes.get(i), i);
 			}
-		}
 
+			// remove lens distortion
+			if( pixel2undist != null ) {
+				for (int i = 0; i < info.nodes.size(); i++) {
+					PointIndex2D_F64 p = detected.points.get(i);
+					pixel2undist.compute(p.x,p.y,p);
+				}
+			}
+
+			return true;
+		}
 		return false;
 	}
 
@@ -125,8 +99,11 @@ public class CalibrationDetectorChessboard2 implements DetectorFiducialCalibrati
 
 	@Override
 	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height) {
-		// TODO apply undistortion to found corners
-		throw new RuntimeException("SUPPORT!");
+		if( distortion == null )
+			pixel2undist = null;
+		else {
+			pixel2undist = distortion.undistort_F64(true, true);
+		}
 	}
 
 	public DetectChessboardCornersPyramid getDetector() {

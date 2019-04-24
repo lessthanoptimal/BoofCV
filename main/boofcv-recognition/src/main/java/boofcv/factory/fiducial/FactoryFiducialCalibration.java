@@ -21,6 +21,8 @@ package boofcv.factory.fiducial;
 import boofcv.abst.fiducial.calib.*;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 
+import javax.annotation.Nullable;
+
 /**
  * Creates detectors of calibration targets.  These detectors return found key points in the image and
  * their known 2D location on the fiducial.
@@ -67,10 +69,12 @@ public class FactoryFiducialCalibration {
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	public static CalibrationDetectorChessboard2 chessboard(ConfigChessboard2 config ) {
+	public static CalibrationDetectorChessboard2 chessboard(@Nullable ConfigChessboard2 config , ConfigGridDimen dimen ) {
+		if( config == null )
+			config = new ConfigChessboard2();
 		config.checkValidity();
 
-		return new CalibrationDetectorChessboard2(config);
+		return new CalibrationDetectorChessboard2(config,dimen);
 	}
 
 	/**

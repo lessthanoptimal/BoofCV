@@ -20,8 +20,10 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard2;
 import boofcv.abst.fiducial.calib.ConfigChessboard2;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.misc.ImageStatistics;
@@ -72,7 +74,8 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 public class DetectCalibrationChessboard2App
 		extends DemonstrationBase
 {
-	private ConfigChessboard2 config = new ConfigChessboard2(5,7,1);
+	private ConfigChessboard2 configDetector = new ConfigChessboard2();
+	private ConfigGridDimen configGridDimen = new ConfigGridDimen(5,7,1);
 
 	// GUI Controls and visualization panels
 	private DisplayPanel imagePanel = new DisplayPanel();
@@ -96,6 +99,7 @@ public class DetectCalibrationChessboard2App
 	private final Object lockCorners = new Object();
 	private FastQueue<ChessboardCorner> foundCorners = new FastQueue<>(ChessboardCorner.class,true);
 	private FastQueue<PointIndex2D_F64> foundChessboard = new FastQueue<>(PointIndex2D_F64.class,true);
+	private FastQueue<CalibrationObservation> foundGrids = new FastQueue<>(CalibrationObservation.class,true);
 	private FastQueue<FeatureGraph2D> foundClusters = new FastQueue<>(FeatureGraph2D.class,true);
 	private boolean success;
 	//-----------------
@@ -146,17 +150,18 @@ public class DetectCalibrationChessboard2App
 		synchronized (lockAlgorithm) {
 			ConfigThreshold threshold = controlPanel.thresholdPanel.createConfig();
 			threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
-			config.threshold = threshold;
-			config.pyramidTopSize = controlPanel.pyramidTop;
-			config.cornerRadius = controlPanel.radius;
-			config.cornerThreshold = controlPanel.cornerThreshold;
-			config.numCols = controlPanel.gridCols;
-			config.numRows = controlPanel.gridRows;
-			config.orientaitonTol = controlPanel.orientationTol;
-			config.directionTol = controlPanel.directionTol;
-			config.ambiguousTol = controlPanel.ambiguousTol;
+			configDetector.threshold = threshold;
+			configDetector.pyramidTopSize = controlPanel.pyramidTop;
+			configDetector.cornerRadius = controlPanel.radius;
+			configDetector.cornerThreshold = controlPanel.cornerThreshold;
+			configDetector.orientaitonTol = controlPanel.orientationTol;
+			configDetector.directionTol = controlPanel.directionTol;
+			configDetector.ambiguousTol = controlPanel.ambiguousTol;
 
-			detector = new CalibrationDetectorChessboard2(config);
+			configGridDimen.numCols = controlPanel.gridCols;
+			configGridDimen.numRows = controlPanel.gridRows;
+
+			detector = new CalibrationDetectorChessboard2(configDetector,configGridDimen);
 			detector.getDetector().getDetector().useMeanShift = controlPanel.meanShift;
 
 			if( controlPanel.anyGrid ) {
@@ -216,8 +221,6 @@ public class DetectCalibrationChessboard2App
 				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
 			}
 
-			System.out.println("success = "+success);
-
 			binary=VisualizeBinaryData.renderBinary(detector.getDetector().getDetector().getBinary(),false,binary);
 
 			synchronized (lockCorners) {
@@ -232,6 +235,20 @@ public class DetectCalibrationChessboard2App
 					foundChessboard.reset();
 					for (int i = 0; i < detected.size(); i++) {
 						foundChessboard.grow().set(detected.get(i));
+					}
+				}
+
+				{
+					FastQueue<GridInfo> found = detector.getFoundChessboard();
+					foundGrids.reset();
+					for (int i = 0; i < found.size; i++) {
+						GridInfo grid = found.get(i);
+						CalibrationObservation c = foundGrids.grow();
+						c.points.clear();
+
+						for (int j = 0; j < grid.nodes.size(); j++) {
+							c.points.add( new PointIndex2D_F64(grid.nodes.get(j),j) );
+						}
 					}
 				}
 
@@ -337,12 +354,27 @@ public class DetectCalibrationChessboard2App
 				}
 			}
 
-			if( success && controlPanel.showChessboards ) {
-				synchronized (lockCorners) {
-					DisplayPinholeCalibrationPanel.renderOrder(g2, scale, (List)foundChessboard.toList());
+			if( controlPanel.anyGrid ) {
+				if( controlPanel.showChessboards ) {
+					synchronized (lockCorners) {
+						for (int i = 0; i < foundGrids.size; i++) {
+							CalibrationObservation c = foundGrids.get(i);
+							DisplayPinholeCalibrationPanel.renderOrder(g2, scale, (List) c.points);
 
-					if( controlPanel.showNumbers ) {
-						DisplayPinholeCalibrationPanel.drawNumbers(g2, foundChessboard.toList(), null, scale);
+							if (controlPanel.showNumbers) {
+								DisplayPinholeCalibrationPanel.drawNumbers(g2, c.points, null, scale);
+							}
+						}
+					}
+				}
+			} else {
+				if (success && controlPanel.showChessboards) {
+					synchronized (lockCorners) {
+						DisplayPinholeCalibrationPanel.renderOrder(g2, scale, (List) foundChessboard.toList());
+
+						if (controlPanel.showNumbers) {
+							DisplayPinholeCalibrationPanel.drawNumbers(g2, foundChessboard.toList(), null, scale);
+						}
 					}
 				}
 			}
@@ -386,8 +418,8 @@ public class DetectCalibrationChessboard2App
 
 		int pyramidTop;
 		int radius;
-		int gridRows = config.numRows;
-		int gridCols = config.numCols;
+		int gridRows = configGridDimen.numRows;
+		int gridCols = configGridDimen.numCols;
 		double cornerThreshold;
 		double ambiguousTol;
 		double directionTol;
@@ -403,18 +435,17 @@ public class DetectCalibrationChessboard2App
 
 		ControlPanel() {
 			{
-				ConfigChessboard2 config = new ConfigChessboard2(1,1,1);
-				pyramidTop = config.pyramidTopSize;
-				radius = config.cornerRadius;
-				ambiguousTol = config.ambiguousTol;
-				directionTol = config.directionTol;
-				orientationTol = config.orientaitonTol;
-				thresholdPanel = new ThresholdControlPanel(this,config.threshold);
+				pyramidTop = configDetector.pyramidTopSize;
+				radius = configDetector.cornerRadius;
+				ambiguousTol = configDetector.ambiguousTol;
+				directionTol = configDetector.directionTol;
+				orientationTol = configDetector.orientaitonTol;
+				thresholdPanel = new ThresholdControlPanel(this,configDetector.threshold);
 				thresholdPanel.addHistogramGraph();
 				// use the actual image histogram. Peaks are rare and the approximate one will be very inaccurate
 				thresholdPanel.histogramPanel.setApproximateHistogram(false);
 
-				cornerThreshold = config.cornerThreshold;
+				cornerThreshold = configDetector.cornerThreshold;
 			}
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);

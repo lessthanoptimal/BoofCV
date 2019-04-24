@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import java.util.List;
 public class CalibrationObservation {
 
 	/**
-	 * Shape image image observations were created from. Use to configure intrinsics and sanity checks
+	 * Shape of the image in which observations were created from. Use to configure intrinsics and sanity checks
 	 */
 	int width,height;
 
@@ -48,7 +48,7 @@ public class CalibrationObservation {
 		this.height = height;
 	}
 
-	protected CalibrationObservation(){
+	public CalibrationObservation(){
 
 	}
 

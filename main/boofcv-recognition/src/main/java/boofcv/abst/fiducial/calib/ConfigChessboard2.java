@@ -34,16 +34,6 @@ import boofcv.struct.Configuration;
 public class ConfigChessboard2 implements Configuration {
 
 	/**
-	 * Number of squares tall the grid is. Target dependent.
-	 */
-	public int numRows = -1;
-
-	/**
-	 * Number of squares wide the grid is. Target dependent.
-	 */
-	public int numCols = -1;
-
-	/**
 	 * Size of a corner in the corner detector. For very small targets 1 is required. Otherwise 2 provides
 	 * much more stable results.
 	 */
@@ -91,26 +81,12 @@ public class ConfigChessboard2 implements Configuration {
 	 */
 	public ConfigThreshold threshold = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
 
-	/**
-	 * Physical width of each square on the calibration target
-	 */
-	public double squareWidth;
-
 	{
 		threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
 		threshold.scale = 1.0;
 		threshold.down = false;
 	}
 
-	public ConfigChessboard2(int numRows, int numCols, double squareWidth) {
-		this.numRows = numRows;
-		this.numCols = numCols;
-		this.squareWidth = squareWidth;
-	}
-
 	@Override
-	public void checkValidity() {
-		if( numCols <= 0 || numRows <= 0 )
-			throw new IllegalArgumentException("Must specify then number of rows and columns in the target");
-	}
+	public void checkValidity() {}
 }
