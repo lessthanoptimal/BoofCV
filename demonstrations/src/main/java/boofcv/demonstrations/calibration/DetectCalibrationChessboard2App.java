@@ -157,6 +157,10 @@ public class DetectCalibrationChessboard2App
 			configDetector.orientaitonTol = controlPanel.orientationTol;
 			configDetector.directionTol = controlPanel.directionTol;
 			configDetector.ambiguousTol = controlPanel.ambiguousTol;
+			if( controlPanel.maxDistance == 0 )
+				configDetector.maxNeighborDistance = Double.MAX_VALUE;
+			else
+				configDetector.maxNeighborDistance = controlPanel.maxDistance;
 
 			configGridDimen.numCols = controlPanel.gridCols;
 			configGridDimen.numRows = controlPanel.gridRows;
@@ -403,6 +407,7 @@ public class DetectCalibrationChessboard2App
 		JSpinner spinnerAmbiguous;
 		JSpinner spinnerDirectionTol;
 		JSpinner spinnerOrientationTol;
+		JSpinner spinnerMaxDistance;
 
 		// select the calibration grid's dimensions
 		JSpinner spinnerGridRows;
@@ -420,6 +425,7 @@ public class DetectCalibrationChessboard2App
 		int radius;
 		int gridRows = configGridDimen.numRows;
 		int gridCols = configGridDimen.numCols;
+		int maxDistance;
 		double cornerThreshold;
 		double ambiguousTol;
 		double directionTol;
@@ -459,6 +465,7 @@ public class DetectCalibrationChessboard2App
 			spinnerAmbiguous = spinner(ambiguousTol,0,1.0,0.05,1,3);
 			spinnerGridRows = spinner(gridRows,3,200,1);
 			spinnerGridCols = spinner(gridCols,3,200,1);
+			spinnerMaxDistance = spinner(maxDistance,0,50000,1);
 
 			checkShowTargets = checkbox("Chessboard", showChessboards);
 			checkShowNumbers = checkbox("Numbers", showNumbers);
@@ -478,6 +485,7 @@ public class DetectCalibrationChessboard2App
 			addLabeled(spinnerRadius,"Corner Radius");
 			addLabeled(spinnerCornerThreshold,"Corner Threshold");
 			addLabeled(spinnerTop,"Pyramid Top");
+			addLabeled(spinnerMaxDistance,"Max Dist.");
 			addLabeled(spinnerOrientationTol,"Orientation Tol");
 			addLabeled(spinnerDirectionTol,"Direction Tol");
 			addLabeled(spinnerAmbiguous,"Ambiguous Tol");
@@ -586,6 +594,10 @@ public class DetectCalibrationChessboard2App
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerGridCols ) {
 				gridCols = ((Number)spinnerGridCols.getValue()).intValue();
+				createAlgorithm();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerMaxDistance ) {
+				maxDistance = ((Number)spinnerMaxDistance.getValue()).intValue();
 				createAlgorithm();
 				reprocessImageOnly();
 			}

@@ -173,6 +173,10 @@ public abstract class DemonstrationBase extends JPanel {
 			menuItemNext.addActionListener(e -> openNextFile());
 			menuFile.add(menuItemNext);
 
+			JMenuItem menuItemReopen = new JMenuItem("Reprocess");
+			BoofSwingUtil.setMenuItemKeys(menuItemReopen,KeyEvent.VK_R,KeyEvent.VK_R);
+			menuItemReopen.addActionListener(e -> reprocessInput());
+			menuFile.add(menuItemReopen);
 
 			menuRecent = new JMenu("Open Recent");
 			menuFile.add(menuRecent);

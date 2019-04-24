@@ -189,10 +189,9 @@ public class ChessboardCornerClusterFinder {
 			}
 		}
 
-		printConnectionGraph();
+//		printConnectionGraph();
 		// attempt to recover from poorly made decisions in the past from the greedy algorithm
 		repairVertexes();
-		printConnectionGraph();
 
 		// Prune non-mutual edges again. Only need to consider dirty edges since it makes sure that the new
 		// set of connections is a super set of the old
@@ -676,11 +675,11 @@ public class ChessboardCornerClusterFinder {
 	 *
 	 */
 	private void repairVertexes() {
-		System.out.println("######## Repair");
+//		System.out.println("######## Repair");
 		for (int idxV = 0; idxV < dirtyVertexes.size(); idxV++) {
 			final Vertex v = dirtyVertexes.get(idxV);
 
-			System.out.println(" dirty="+v.index);
+//			System.out.println(" dirty="+v.index);
 
 			bestSolution.clear();
 
@@ -693,7 +692,7 @@ public class ChessboardCornerClusterFinder {
 					continue;
 				}
 
-				System.out.println("  e[0].dst = "+e.dst.index);
+//				System.out.println("  e[0].dst = "+e.dst.index);
 
 				solution.clear();
 				solution.add(e);
@@ -730,7 +729,7 @@ public class ChessboardCornerClusterFinder {
 
 						// connection test
 						if( ei.dst.connections.find(va) != -1 ) {
-							System.out.println("   e[i].dst = "+ei.dst.index+" va="+va.index);
+//							System.out.println("   e[i].dst = "+ei.dst.index+" va="+va.index);
 							e = ei;
 							solution.add(ei);
 							matched = true;
