@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,10 +35,12 @@ import boofcv.alg.feature.describe.DescribePointSurfMod;
 import boofcv.alg.feature.describe.DescribePointSurfPlanar;
 import boofcv.alg.feature.detdesc.CompleteSift;
 import boofcv.alg.feature.detdesc.DetectDescribeSurfPlanar;
+import boofcv.alg.feature.detdesc.DetectDescribeSurfPlanar_MT;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.feature.detect.interest.SiftScaleSpace;
 import boofcv.alg.feature.orientation.OrientationHistogramSift;
 import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
@@ -125,7 +127,11 @@ public class FactoryDetectDescribe {
 		DescribePointSurf<II> describe = FactoryDescribePointAlgs.surfSpeed(configDesc, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.average_ii(configOrientation, integralType);
 
-		return new WrapDetectDescribeSurf<>(detector, orientation, describe);
+		if(BoofConcurrency.USE_CONCURRENT) {
+			return new WrapDetectDescribeSurf_MT<>(detector, orientation, describe);
+		} else {
+			return new WrapDetectDescribeSurf<>(detector, orientation, describe);
+		}
 	}
 
 	/**
@@ -161,13 +167,22 @@ public class FactoryDetectDescribe {
 			DescribePointSurfPlanar<II> describeMulti =
 					new DescribePointSurfPlanar<>(describe, imageType.getNumBands());
 
-			DetectDescribeSurfPlanar<II> deteDesc =
-					new DetectDescribeSurfPlanar<>(detector, orientation, describeMulti);
+			DetectDescribeSurfPlanar<II> detectDesc = createDescribeSurfPlanar(detector, orientation, describeMulti);
 
-			return new SurfPlanar_to_DetectDescribePoint( deteDesc,bandType,integralType );
+			return new SurfPlanar_to_DetectDescribePoint( detectDesc,bandType,integralType );
 		} else {
 			throw new IllegalArgumentException("Image type not supported");
 		}
+	}
+
+	protected static <II extends ImageGray<II>> DetectDescribeSurfPlanar<II> createDescribeSurfPlanar(FastHessianFeatureDetector<II> detector, OrientationIntegral<II> orientation, DescribePointSurfPlanar<II> describeMulti) {
+		DetectDescribeSurfPlanar<II> detectDesc;
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			detectDesc = new DetectDescribeSurfPlanar_MT<>(detector, orientation, describeMulti);
+		} else {
+			detectDesc = new DetectDescribeSurfPlanar<>(detector, orientation, describeMulti);
+		}
+		return detectDesc;
 	}
 
 	/**
@@ -203,7 +218,11 @@ public class FactoryDetectDescribe {
 		DescribePointSurfMod<II> describe = FactoryDescribePointAlgs.surfStability(configDescribe, integralType);
 		OrientationIntegral<II> orientation = FactoryOrientationAlgs.sliding_ii(configOrientation, integralType);
 
-		return new WrapDetectDescribeSurf( detector, orientation, describe );
+		if(BoofConcurrency.USE_CONCURRENT) {
+			return new WrapDetectDescribeSurf_MT<>(detector, orientation, describe);
+		} else {
+			return new WrapDetectDescribeSurf<>(detector, orientation, describe);
+		}
 	}
 
 	/**
@@ -240,10 +259,9 @@ public class FactoryDetectDescribe {
 			DescribePointSurfPlanar<II> describeMulti =
 					new DescribePointSurfPlanar<>(describe, imageType.getNumBands());
 
-			DetectDescribeSurfPlanar<II> deteDesc =
-					new DetectDescribeSurfPlanar<>(detector, orientation, describeMulti);
+			DetectDescribeSurfPlanar<II> detectDesc = createDescribeSurfPlanar(detector, orientation, describeMulti);
 
-			return new SurfPlanar_to_DetectDescribePoint( deteDesc,bandType,integralType );
+			return new SurfPlanar_to_DetectDescribePoint( detectDesc,bandType,integralType );
 		} else {
 			throw new IllegalArgumentException("Image type not supported");
 		}

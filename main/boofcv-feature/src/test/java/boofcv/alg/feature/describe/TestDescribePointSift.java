@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,28 +84,28 @@ public class TestDescribePointSift {
 		ImageMiscOps.fillRectangle(derivX,5.0f,60,60,2*r,2*r);
 
 		alg.setImageGradient(derivX,derivY);
-		alg.descriptor = new TupleDesc_F64(128);
-		alg.computeRawDescriptor(60+r, 60+r, 1, 0);
+		TupleDesc_F64 descriptor = new TupleDesc_F64(128);
+		alg.computeRawDescriptor(60+r, 60+r, 1, 0, descriptor);
 
-		int numHit = computeInside(alg);
+		int numHit = computeInside(descriptor);
 		assertEquals(4*4,numHit);
 
-		alg.descriptor = new TupleDesc_F64(128);
-		alg.computeRawDescriptor(60+r, 60+r, 2, 0);
-		numHit = computeInside(alg);
+		descriptor = new TupleDesc_F64(128);
+		alg.computeRawDescriptor(60+r, 60+r, 2, 0, descriptor);
+		numHit = computeInside(descriptor);
 		// would be 2x2 if there was no interpolation
 		assertEquals(3*3,numHit);
 
 	}
 
-	private int computeInside(DescribePointSift alg) {
+	private int computeInside(TupleDesc_F64 descriptor) {
 		int numHit = 0;
 		for (int j = 0; j < 128; j++) {
 			if (j % 8 == 0) {
-				if(alg.descriptor.value[j] > 0)
+				if( descriptor.value[j] > 0)
 					numHit++;
 			} else {
-				assertEquals(0, alg.descriptor.value[j], 1e-4);
+				assertEquals(0, descriptor.value[j], 1e-4);
 			}
 		}
 		return numHit;
@@ -128,15 +128,15 @@ public class TestDescribePointSift {
 
 		for( int i = 0; i < 8; i++ ) {
 			double angle = UtilAngle.bound(i*Math.PI/4);
-			alg.descriptor = new TupleDesc_F64(128);
-			alg.computeRawDescriptor(20, 21, 1, angle);
+			TupleDesc_F64 descriptor = new TupleDesc_F64(128);
+			alg.computeRawDescriptor(20, 21, 1, angle, descriptor);
 
 			int bin = (int) (UtilAngle.domain2PI(-angle) * 8 / (2 * Math.PI));
 			for (int j = 0; j < 128; j++) {
 				if (j % 8 == bin) {
-					assertTrue(alg.descriptor.value[j] > 0);
+					assertTrue(descriptor.value[j] > 0);
 				} else {
-					assertEquals(0, alg.descriptor.value[j], 1e-4);
+					assertEquals(0, descriptor.value[j], 1e-4);
 				}
 			}
 		}

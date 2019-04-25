@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,17 +47,17 @@ import java.util.List;
 public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 {
 	// SURF algorithms
-	private FastHessianFeatureDetector<II> detector;
-	private OrientationIntegral<II> orientation;
-	private DescribePointSurfPlanar<II> describe;
+	protected FastHessianFeatureDetector<II> detector;
+	protected OrientationIntegral<II> orientation;
+	protected DescribePointSurfPlanar<II> describe;
 
 
 	// storage for computed features
-	private SurfFeatureQueue descriptions;
+	protected SurfFeatureQueue descriptions;
 	// detected scale points
-	private List<ScalePoint> foundPoints;
+	protected List<ScalePoint> foundPoints;
 	// orientation of features
-	private GrowQueue_F64 featureAngles = new GrowQueue_F64(10);
+	protected GrowQueue_F64 featureAngles = new GrowQueue_F64(10);
 
 	public DetectDescribeSurfPlanar(FastHessianFeatureDetector<II> detector,
 									OrientationIntegral<II> orientation,
@@ -86,9 +86,6 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 	 */
 	public void detect( II grayII , Planar<II> colorII ) {
 
-		orientation.setImage(grayII);
-		describe.setImage(grayII,colorII);
-
 		descriptions.reset();
 		featureAngles.reset();
 
@@ -98,14 +95,23 @@ public class DetectDescribeSurfPlanar<II extends ImageGray<II>>
 		// describe the found interest points
 		foundPoints = detector.getFoundPoints();
 
+		descriptions.resize(foundPoints.size());
+		featureAngles.resize(foundPoints.size());
+
+		describe(grayII, colorII);
+	}
+
+	protected void describe(II grayII, Planar<II> colorII) {
+		orientation.setImage(grayII);
+		describe.setImage(grayII,colorII);
 		for( int i = 0; i < foundPoints.size(); i++ ) {
 			ScalePoint p = foundPoints.get(i);
 			orientation.setObjectRadius(p.scale);
 			double angle = orientation.compute(p.x,p.y);
 
-			describe.describe(p.x, p.y, angle, p.scale, descriptions.grow());
+			describe.describe(p.x, p.y, angle, p.scale, descriptions.get(i));
 
-			featureAngles.push(angle);
+			featureAngles.set(i,angle);
 		}
 	}
 

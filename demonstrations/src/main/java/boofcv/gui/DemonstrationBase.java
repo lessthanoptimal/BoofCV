@@ -788,9 +788,6 @@ public abstract class DemonstrationBase extends JPanel {
 	class SynchronizedStreamsThread extends ProcessThread {
 		@Override
 		public void run() {
-			for (int i = 0; i < inputStreams.size() ; i++) {
-				CacheSequenceStream sequence = inputStreams.get(i);
-			}
 			inputSizeKnown = true;
 
 			boolean first = true;
@@ -830,7 +827,11 @@ public abstract class DemonstrationBase extends JPanel {
 					ImageBase boof = cache.getBoofImage();
 					BufferedImage buff = cache.getBufferedImage();
 
-					processImage(i,frameID, buff, boof);
+					try {
+						processImage(i, frameID, buff, boof);
+					} catch( RuntimeException e ) {
+						e.printStackTrace();
+					}
 				}
 
 				// Throttle speed if requested

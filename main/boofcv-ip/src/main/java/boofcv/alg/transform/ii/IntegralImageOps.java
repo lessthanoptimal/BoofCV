@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,10 @@
 package boofcv.alg.transform.ii;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.transform.ii.impl.ImplIntegralImageConvolve;
+import boofcv.alg.transform.ii.impl.ImplIntegralImageConvolve_MT;
 import boofcv.alg.transform.ii.impl.ImplIntegralImageOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
 
@@ -31,6 +34,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("Duplicates")
 public class IntegralImageOps {
 
 	/**
@@ -122,7 +126,11 @@ public class IntegralImageOps {
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
-		ImplIntegralImageOps.convolve(integral, kernel, output);
+		if(BoofConcurrency.USE_CONCURRENT) {
+			ImplIntegralImageConvolve_MT.convolve(integral, kernel, output);
+		} else {
+			ImplIntegralImageConvolve.convolve(integral, kernel, output);
+		}
 
 		return output;
 	}
@@ -141,7 +149,11 @@ public class IntegralImageOps {
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
-		ImplIntegralImageOps.convolve(integral,kernel,output);
+		if(BoofConcurrency.USE_CONCURRENT) {
+			ImplIntegralImageConvolve_MT.convolve(integral, kernel, output);
+		} else {
+			ImplIntegralImageConvolve.convolve(integral, kernel, output);
+		}
 
 		return output;
 	}
@@ -160,7 +172,11 @@ public class IntegralImageOps {
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
-		ImplIntegralImageOps.convolve(integral, kernel, output);
+		if(BoofConcurrency.USE_CONCURRENT) {
+			ImplIntegralImageConvolve_MT.convolve(integral, kernel, output);
+		} else {
+			ImplIntegralImageConvolve.convolve(integral, kernel, output);
+		}
 
 		return output;
 	}
@@ -179,7 +195,11 @@ public class IntegralImageOps {
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
-		ImplIntegralImageOps.convolve(integral,kernel,output);
+		if(BoofConcurrency.USE_CONCURRENT) {
+			ImplIntegralImageConvolve_MT.convolve(integral, kernel, output);
+		} else {
+			ImplIntegralImageConvolve.convolve(integral, kernel, output);
+		}
 
 		return output;
 	}
@@ -199,7 +219,11 @@ public class IntegralImageOps {
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
-		ImplIntegralImageOps.convolveBorder(integral,kernel,output,borderX,borderY);
+		if(BoofConcurrency.USE_CONCURRENT) {
+			ImplIntegralImageConvolve_MT.convolveBorder(integral, kernel, output, borderX, borderY);
+		} else {
+			ImplIntegralImageConvolve.convolveBorder(integral, kernel, output, borderX, borderY);
+		}
 
 		return output;
 	}
@@ -219,7 +243,11 @@ public class IntegralImageOps {
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
-		ImplIntegralImageOps.convolveBorder(integral,kernel,output,borderX,borderY);
+		if(BoofConcurrency.USE_CONCURRENT) {
+			ImplIntegralImageConvolve_MT.convolveBorder(integral, kernel, output, borderX, borderY);
+		} else {
+			ImplIntegralImageConvolve.convolveBorder(integral, kernel, output, borderX, borderY);
+		}
 
 		return output;
 	}
@@ -239,7 +267,11 @@ public class IntegralImageOps {
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
-		ImplIntegralImageOps.convolveBorder(integral,kernel,output,borderX,borderY);
+		if(BoofConcurrency.USE_CONCURRENT) {
+			ImplIntegralImageConvolve_MT.convolveBorder(integral, kernel, output, borderX, borderY);
+		} else {
+			ImplIntegralImageConvolve.convolveBorder(integral, kernel, output, borderX, borderY);
+		}
 
 		return output;
 	}
@@ -259,7 +291,11 @@ public class IntegralImageOps {
 	{
 		output = InputSanityCheck.checkDeclare(integral,output);
 
-		ImplIntegralImageOps.convolveBorder(integral,kernel,output,borderX,borderY);
+		if(BoofConcurrency.USE_CONCURRENT) {
+			ImplIntegralImageConvolve_MT.convolveBorder(integral, kernel, output, borderX, borderY);
+		} else {
+			ImplIntegralImageConvolve.convolveBorder(integral, kernel, output, borderX, borderY);
+		}
 
 		return output;
 	}

@@ -49,19 +49,19 @@ public class WrapDetectDescribeSurf
 	implements DetectDescribePoint<T,BrightFeature>
 {
 	// SURF algorithms
-	private FastHessianFeatureDetector<II> detector;
-	private OrientationIntegral<II> orientation;
-	private DescribePointSurf<II> describe;
+	protected FastHessianFeatureDetector<II> detector;
+	protected OrientationIntegral<II> orientation;
+	protected DescribePointSurf<II> describe;
 
 	// storage for integral image
-	private II ii;
+	protected II ii;
 
 	// storage for computed features
-	private SurfFeatureQueue features;
+	protected SurfFeatureQueue features;
 	// detected scale points
-	private List<ScalePoint> foundPoints;
+	protected List<ScalePoint> foundPoints;
 	// orientation of features
-	private GrowQueue_F64 featureAngles = new GrowQueue_F64(10);
+	protected GrowQueue_F64 featureAngles = new GrowQueue_F64(10);
 
 	public WrapDetectDescribeSurf(FastHessianFeatureDetector<II> detector,
 								  OrientationIntegral<II> orientation,
@@ -97,8 +97,6 @@ public class WrapDetectDescribeSurf
 
 		// compute integral image
 		ii = GIntegralImageOps.transform(input, ii);
-		orientation.setImage(ii);
-		describe.setImage(ii);
 		features.reset();
 		featureAngles.reset();
 
@@ -112,6 +110,12 @@ public class WrapDetectDescribeSurf
 		features.resize(foundPoints.size());
 		featureAngles.resize(foundPoints.size());
 
+		computeDescriptors();
+	}
+
+	protected void computeDescriptors() {
+		orientation.setImage(ii);
+		describe.setImage(ii);
 		for( int i = 0; i < foundPoints.size(); i++ ) {
 			ScalePoint p = foundPoints.get(i);
 			double radius = p.scale* BoofDefaults.SURF_SCALE_TO_RADIUS;

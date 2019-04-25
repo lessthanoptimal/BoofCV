@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,8 +60,6 @@ public class DescribePointSift<Deriv extends ImageGray> extends DescribeSiftComm
 	// conversion from scale-space sigma to image pixels
 	double sigmaToPixels;
 
-	// reference to user provided descriptor in which results are saved to
-	TupleDesc_F64 descriptor;
 
 	/**
 	 * Configures the descriptor.
@@ -106,10 +104,9 @@ public class DescribePointSift<Deriv extends ImageGray> extends DescribeSiftComm
 	 */
 	public void process( double c_x , double c_y , double sigma , double orientation , TupleDesc_F64 descriptor )
 	{
-		this.descriptor = descriptor;
 		descriptor.fill(0);
 
-		computeRawDescriptor(c_x, c_y, sigma, orientation);
+		computeRawDescriptor(c_x, c_y, sigma, orientation, descriptor);
 
 		normalizeDescriptor(descriptor,maxDescriptorElementValue);
 	}
@@ -118,7 +115,7 @@ public class DescribePointSift<Deriv extends ImageGray> extends DescribeSiftComm
 	 * Computes the descriptor by sampling the input image.  This is raw because the descriptor hasn't been massaged
 	 * yet.
 	 */
-	void computeRawDescriptor(double c_x, double c_y, double sigma, double orientation) {
+	void computeRawDescriptor(double c_x, double c_y, double sigma, double orientation, TupleDesc_F64 descriptor) {
 		double c = Math.cos(orientation);
 		double s = Math.sin(orientation);
 
