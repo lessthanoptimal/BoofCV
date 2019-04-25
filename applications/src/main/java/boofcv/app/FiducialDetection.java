@@ -20,8 +20,7 @@ package boofcv.app;
 
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
-import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
@@ -319,9 +318,9 @@ public class FiducialDetection extends BaseStandardInputApp {
 			throw new RuntimeException("Must specify number of rows and columns");
 
 		System.out.println("chessboard: rows = "+rows+" columns = "+cols+"  square width "+width);
-		ConfigChessboard config = new ConfigChessboard(rows, cols, width);
+		ConfigGridDimen config = new ConfigGridDimen(rows, cols, width);
 
-		detector = FactoryFiducial.calibChessboard(config, GrayU8.class);
+		detector = FactoryFiducial.calibChessboard2(null,config, GrayU8.class);
 	}
 	void parseSquareGrid( int index , String []args ) {
 		int rows=-1,cols=-1;
@@ -356,9 +355,9 @@ public class FiducialDetection extends BaseStandardInputApp {
 			space = width;
 
 		System.out.println("square grid: rows = "+rows+" columns = "+cols+"  square width "+width+"  space "+space);
-		ConfigSquareGrid config = new ConfigSquareGrid(rows, cols, width,space);
+		ConfigGridDimen config = new ConfigGridDimen(rows, cols, width,space);
 
-		detector = FactoryFiducial.calibSquareGrid(config, GrayU8.class);
+		detector = FactoryFiducial.calibSquareGrid(null,config, GrayU8.class);
 	}
 
 	private static CameraPinholeBrown handleIntrinsic(CameraPinholeBrown intrinsic, int width, int height) {

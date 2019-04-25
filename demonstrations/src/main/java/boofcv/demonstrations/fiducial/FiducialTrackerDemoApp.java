@@ -21,7 +21,8 @@ package boofcv.demonstrations.fiducial;
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.FiducialStability;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
-import boofcv.abst.fiducial.calib.*;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
+import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.ConfigFiducialImage;
@@ -222,9 +223,9 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		} else if( name.compareTo(QR_CODE) == 0 ) {
 			detector = FactoryFiducial.qrcode3D(null, imageClass);
 		} else if( name.compareTo(CALIB_CHESS) == 0 ) {
-			detector = FactoryFiducial.calibChessboard(new ConfigChessboard(7, 5, 0.03), imageClass);
+			detector = FactoryFiducial.calibChessboard2(null,new ConfigGridDimen(7, 5, 0.03), imageClass);
 		} else if( name.compareTo(CALIB_SQUARE_GRID) == 0 ) {
-			detector = FactoryFiducial.calibSquareGrid(new ConfigSquareGrid(4, 3, 0.03, 0.03), imageClass);
+			detector = FactoryFiducial.calibSquareGrid(null,new ConfigGridDimen(4, 3, 0.03, 0.03), imageClass);
 		} else if( name.compareTo(CALIB_SQUARE_BINARY_GRID) == 0 ) {
 			File configFile = new File(path,"description_4x3_3x3_4cm_2cm.txt");
 			try {
@@ -235,9 +236,9 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 				throw new RuntimeException(e);
 			}
 		} else if( name.compareTo(CALIB_CIRCLE_HEXAGONAL_GRID) == 0 ) {
-			detector = FactoryFiducial.calibCircleHexagonalGrid(new ConfigCircleHexagonalGrid(24, 28, 1, 1.2), imageClass);
+			detector = FactoryFiducial.calibCircleHexagonalGrid(null,new ConfigGridDimen(24, 28, 1, 1.2), imageClass);
 		} else if( name.compareTo(CALIB_CIRCLE_REGULAR_GRID) == 0 ) {
-			detector = FactoryFiducial.calibCircleRegularGrid(new ConfigCircleRegularGrid(10, 8, 1.5, 2.5), imageClass);
+			detector = FactoryFiducial.calibCircleRegularGrid(null,new ConfigGridDimen(10, 8, 1.5, 2.5), imageClass);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}

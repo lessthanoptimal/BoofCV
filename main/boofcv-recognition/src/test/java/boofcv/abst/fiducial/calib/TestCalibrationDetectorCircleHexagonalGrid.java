@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,9 +35,9 @@ public class TestCalibrationDetectorCircleHexagonalGrid extends GenericPlanarCal
 
 	public TestCalibrationDetectorCircleHexagonalGrid() {
 		// each configuration has a different ending that needs to be handled
-		targetConfigs.add( new ConfigCircleHexagonalGrid(5, 5, 20,24) );
-		targetConfigs.add( new ConfigCircleHexagonalGrid(5, 6, 20,24) );
-		targetConfigs.add( new ConfigCircleHexagonalGrid(6, 6, 20,24) );
+		targetConfigs.add( new ConfigGridDimen(5, 5, 20,24) );
+		targetConfigs.add( new ConfigGridDimen(5, 6, 20,24) );
+		targetConfigs.add( new ConfigGridDimen(6, 6, 20,24) );
 
 		// Does a good job detecting the ellipses, but a shit job determining with the tangent points
 		// The lens distortion moves them so that they aren't even close
@@ -46,14 +46,12 @@ public class TestCalibrationDetectorCircleHexagonalGrid extends GenericPlanarCal
 	}
 
 	@Override
-	public void renderTarget(Object layout, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
-		ConfigCircleHexagonalGrid config = (ConfigCircleHexagonalGrid)layout;
-
+	public void renderTarget(ConfigGridDimen config, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
 
 		RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(30,1);
 
 		double radiusPixels = 20;
-		double centerDistancePixels = 2*radiusPixels*config.centerDistance/config.circleDiameter;
+		double centerDistancePixels = 2*radiusPixels*config.shapeDistance/config.shapeSize;
 
 		renderer.circleHex(config.numRows,config.numCols,radiusPixels*2,centerDistancePixels);
 
@@ -68,8 +66,8 @@ public class TestCalibrationDetectorCircleHexagonalGrid extends GenericPlanarCal
 	}
 
 	@Override
-	public DetectorFiducialCalibration createDetector(Object layout) {
-		return FactoryFiducialCalibration.circleHexagonalGrid((ConfigCircleHexagonalGrid)layout);
+	public DetectorFiducialCalibration createDetector(ConfigGridDimen layout) {
+		return FactoryFiducialCalibration.circleHexagonalGrid(null,layout);
 	}
 
 }

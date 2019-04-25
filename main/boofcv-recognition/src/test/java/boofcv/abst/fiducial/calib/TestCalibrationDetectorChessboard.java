@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationD
 
 
 	public TestCalibrationDetectorChessboard() {
-		targetConfigs.add( new ConfigChessboard(5, 4, 30) );
+		targetConfigs.add( new ConfigGridDimen(5, 4, 30) );
 
 		// tuning made 1 fail. On real world data it does better. <shrug>
 		fisheyeAllowedFails = 1;
@@ -45,7 +45,7 @@ public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationD
 
 	@Test
 	public void createLayout() {
-		List<Point2D_F64> layout = createDetector(new ConfigChessboard(5, 4, 30) ).getLayout();
+		List<Point2D_F64> layout = createDetector(new ConfigGridDimen(5, 4, 30) ).getLayout();
 
 		// first control points should be the top left corner then work it's way down in a
 		// grid pattern
@@ -55,8 +55,7 @@ public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationD
 	}
 
 	@Override
-	public void renderTarget(Object layout, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
-		ConfigChessboard config = (ConfigChessboard)layout;
+	public void renderTarget(ConfigGridDimen config, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
 
 		RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(40,1);
 
@@ -74,7 +73,7 @@ public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationD
 	}
 
 	@Override
-	public DetectorFiducialCalibration createDetector(Object layout) {
-		return FactoryFiducialCalibration.chessboard((ConfigChessboard)layout);
+	public DetectorFiducialCalibration createDetector(ConfigGridDimen layout) {
+		return FactoryFiducialCalibration.chessboard((ConfigChessboard)null,layout);
 	}
 }

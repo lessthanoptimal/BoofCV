@@ -119,15 +119,17 @@ public class FactoryFiducial {
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
+	@Deprecated
 	public static <T extends ImageGray<T>>
-	CalibrationFiducialDetector<T> calibChessboard( ConfigChessboard config, Class<T> imageType) {
-		return new CalibrationFiducialDetector<>(config, imageType);
+	CalibrationFiducialDetector<T> calibChessboard( @Nullable ConfigChessboard config,
+													ConfigGridDimen dimen, Class<T> imageType) {
+		return new CalibrationFiducialDetector<>(config, dimen, imageType);
 	}
 
 	public static <T extends ImageGray<T>>
-	CalibrationFiducialDetector<T> calibChessboard( @Nullable ConfigChessboard2 config,
-													ConfigGridDimen dimen,
-													Class<T> imageType) {
+	CalibrationFiducialDetector<T> calibChessboard2( @Nullable ConfigChessboard2 config,
+													 ConfigGridDimen dimen,
+													 Class<T> imageType) {
 		return new CalibrationFiducialDetector<>(config, dimen, imageType);
 	}
 
@@ -140,8 +142,9 @@ public class FactoryFiducial {
 	 * @return FiducialDetector
 	 */
 	public static <T extends ImageGray<T>>
-	CalibrationFiducialDetector<T> calibSquareGrid( ConfigSquareGrid config, Class<T> imageType) {
-		return new CalibrationFiducialDetector<>(config, imageType);
+	CalibrationFiducialDetector<T> calibSquareGrid( @Nullable ConfigSquareGrid config,
+													ConfigGridDimen configDimen, Class<T> imageType) {
+		return new CalibrationFiducialDetector<>(config, configDimen, imageType);
 	}
 
 	public static <T extends ImageGray<T>>
@@ -150,13 +153,15 @@ public class FactoryFiducial {
 	}
 
 	public static <T extends ImageGray<T>>
-	CalibrationFiducialDetector<T> calibCircleHexagonalGrid(ConfigCircleHexagonalGrid config, Class<T> imageType) {
-		return new CalibrationFiducialDetector<>(config, imageType);
+	CalibrationFiducialDetector<T> calibCircleHexagonalGrid( @Nullable ConfigCircleHexagonalGrid config,
+															 ConfigGridDimen configDimen, Class<T> imageType) {
+		return new CalibrationFiducialDetector<>(config, configDimen, imageType);
 	}
 
 	public static <T extends ImageGray<T>>
-	CalibrationFiducialDetector<T> calibCircleRegularGrid(ConfigCircleRegularGrid config, Class<T> imageType) {
-		return new CalibrationFiducialDetector<>(config, imageType);
+	CalibrationFiducialDetector<T> calibCircleRegularGrid( @Nullable ConfigCircleRegularGrid config,
+														   ConfigGridDimen configDimen, Class<T> imageType) {
+		return new CalibrationFiducialDetector<>(config, configDimen, imageType);
 	}
 
 	/**

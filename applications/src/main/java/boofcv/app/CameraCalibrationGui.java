@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,7 @@
 
 package boofcv.app;
 
-import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
-import boofcv.abst.fiducial.calib.ConfigCircleRegularGrid;
-import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.app.calib.CalibrationModelPanel;
 import boofcv.app.calib.CalibrationTargetPanel;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
@@ -230,10 +227,10 @@ public class CameraCalibrationGui extends JPanel
 
 	private void createDetector() {
 		switch( controlsTarget.selected ) {
-			case CHESSBOARD: app.detector = FactoryFiducialCalibration.chessboard(controlsTarget.configChessboard);break;
-			case SQUARE_GRID: app.detector = FactoryFiducialCalibration.squareGrid(controlsTarget.configSquare);break;
-			case CIRCLE_GRID: app.detector = FactoryFiducialCalibration.circleRegularGrid(controlsTarget.configCircle);break;
-			case CIRCLE_HEX: app.detector = FactoryFiducialCalibration.circleHexagonalGrid(controlsTarget.configCircleHex);break;
+			case CHESSBOARD: app.detector = FactoryFiducialCalibration.chessboard2(null,controlsTarget.configChessboard);break;
+			case SQUARE_GRID: app.detector = FactoryFiducialCalibration.squareGrid(null,controlsTarget.configSquare);break;
+			case CIRCLE_GRID: app.detector = FactoryFiducialCalibration.circleRegularGrid(null,controlsTarget.configCircle);break;
+			case CIRCLE_HEX: app.detector = FactoryFiducialCalibration.circleHexagonalGrid(null,controlsTarget.configCircleHex);break;
 		}
 
 		app.modeType = controlsModel.selected;
@@ -252,23 +249,19 @@ public class CameraCalibrationGui extends JPanel
 	}
 
 	@Override
-	public void calibrationParametersChanged(CalibrationTargetPanel.TargetType type, Object _config) {
+	public void calibrationParametersChanged(CalibrationTargetPanel.TargetType type, ConfigGridDimen config) {
 		final RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(20,1);
 
 		if( type == CalibrationTargetPanel.TargetType.CHESSBOARD ) {
-			ConfigChessboard chess = (ConfigChessboard)_config;
-			renderer.chessboard(chess.numRows,chess.numCols,20);
+			renderer.chessboard(config.numRows,config.numCols,20);
 		} else if( type == CalibrationTargetPanel.TargetType.SQUARE_GRID ) {
-			ConfigSquareGrid config = (ConfigSquareGrid)_config;
-			double space = 20*config.spaceWidth/config.squareWidth;
+			double space = 20*config.shapeDistance/config.shapeSize;
 			renderer.squareGrid(config.numRows,config.numCols,20,space);
 		} else if( type == CalibrationTargetPanel.TargetType.CIRCLE_GRID ) {
-			ConfigCircleRegularGrid config = (ConfigCircleRegularGrid)_config;
-			double space = 10*config.centerDistance/config.circleDiameter;
+			double space = 10*config.shapeDistance/config.shapeSize;
 			renderer.circleRegular(config.numRows,config.numCols,10,space);
 		} else if( type == CalibrationTargetPanel.TargetType.CIRCLE_HEX ) {
-			ConfigCircleHexagonalGrid config = (ConfigCircleHexagonalGrid)_config;
-			double space = 10*config.centerDistance/config.circleDiameter;
+			double space = 10*config.shapeDistance/config.shapeSize;
 			renderer.circleHex(config.numRows,config.numCols,10,space);
 		}
 		renderingPanel.setImageUI(renderer.getBufferred());

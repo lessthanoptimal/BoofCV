@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationDetectorChecks {
 
 	public TestCalibrationDetectorSquareGrid() {
-		targetConfigs.add(  new ConfigSquareGrid(3, 2, 30,30) );
+		targetConfigs.add(  new ConfigGridDimen(3, 2, 30,30) );
 		fisheyeMatchTol = 5.0;
 		fisheyeAllowedFails = 1;
 	}
@@ -58,11 +58,10 @@ public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationD
 	}
 
 	@Override
-	public void renderTarget(Object layout, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
-		ConfigSquareGrid config = (ConfigSquareGrid)layout;
+	public void renderTarget(ConfigGridDimen config, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
 
 		double squareWidthPixels = 20;
-		double spacingPixels = squareWidthPixels*(config.spaceWidth/config.squareWidth);
+		double spacingPixels = squareWidthPixels*(config.shapeDistance/config.shapeSize);
 
 		RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(20,1);
 		renderer.squareGrid(config.numRows,config.numCols,squareWidthPixels,spacingPixels);
@@ -78,7 +77,7 @@ public class TestCalibrationDetectorSquareGrid extends GenericPlanarCalibrationD
 	}
 
 	@Override
-	public DetectorFiducialCalibration createDetector(Object layout) {
-		return FactoryFiducialCalibration.squareGrid((ConfigSquareGrid)layout);
+	public DetectorFiducialCalibration createDetector(ConfigGridDimen layout) {
+		return FactoryFiducialCalibration.squareGrid(null,layout);
 	}
 }

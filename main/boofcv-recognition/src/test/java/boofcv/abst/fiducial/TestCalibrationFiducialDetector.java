@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,7 @@
 package boofcv.abst.fiducial;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
-import boofcv.abst.fiducial.calib.ConfigCircleRegularGrid;
-import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.struct.image.GrayF32;
@@ -37,7 +35,7 @@ public class TestCalibrationFiducialDetector {
 
 	@Nested
 	public static class ChessboardChecks extends GenericFiducialDetectorChecks {
-		ConfigChessboard config = new ConfigChessboard(7, 5, 0.2);
+		ConfigGridDimen config = new ConfigGridDimen(7, 5, 0.2);
 
 		public ChessboardChecks() {
 			pixelAndProjectedTol = 10;
@@ -47,7 +45,7 @@ public class TestCalibrationFiducialDetector {
 
 		@Override
 		public FiducialDetector createDetector(ImageType imageType) {
-			return FactoryFiducial.calibChessboard(config, imageType.getImageClass());
+			return FactoryFiducial.calibChessboard((ConfigChessboard)null, config, imageType.getImageClass());
 		}
 
 		@Override
@@ -65,7 +63,7 @@ public class TestCalibrationFiducialDetector {
 
 	@Nested
 	public static class SquareGridChecks extends GenericFiducialDetectorChecks {
-		ConfigSquareGrid config = new ConfigSquareGrid(4, 3, 0.2,0.2);
+		ConfigGridDimen config = new ConfigGridDimen(4, 3, 0.2,0.2);
 
 		public SquareGridChecks() {
 			pixelAndProjectedTol = 10;
@@ -75,7 +73,7 @@ public class TestCalibrationFiducialDetector {
 
 		@Override
 		public FiducialDetector createDetector(ImageType imageType) {
-			return FactoryFiducial.calibSquareGrid(config, imageType.getImageClass());
+			return FactoryFiducial.calibSquareGrid(null,config, imageType.getImageClass());
 		}
 
 		@Override
@@ -93,7 +91,7 @@ public class TestCalibrationFiducialDetector {
 
 	@Nested
 	public static class HexagonalChecks extends GenericFiducialDetectorChecks {
-		ConfigCircleHexagonalGrid config = new ConfigCircleHexagonalGrid(5,6,0.1,0.15);
+		ConfigGridDimen config = new ConfigGridDimen(5,6,0.1,0.15);
 
 		public HexagonalChecks() {
 			pixelAndProjectedTol = 10;
@@ -103,7 +101,7 @@ public class TestCalibrationFiducialDetector {
 
 		@Override
 		public FiducialDetector createDetector(ImageType imageType) {
-			return FactoryFiducial.calibCircleHexagonalGrid(config, imageType.getImageClass());
+			return FactoryFiducial.calibCircleHexagonalGrid(null,config, imageType.getImageClass());
 		}
 
 		@Override
@@ -127,7 +125,7 @@ public class TestCalibrationFiducialDetector {
 
 	@Nested
 	public static class CircleRegularChecks extends GenericFiducialDetectorChecks {
-		ConfigCircleRegularGrid config = new ConfigCircleRegularGrid(7,5,0.1,0.15);
+		ConfigGridDimen config = new ConfigGridDimen(7,5,0.1,0.15);
 
 		public CircleRegularChecks() {
 			pixelAndProjectedTol = 10;
@@ -137,7 +135,7 @@ public class TestCalibrationFiducialDetector {
 
 		@Override
 		public FiducialDetector createDetector(ImageType imageType) {
-			return FactoryFiducial.calibCircleRegularGrid(config, imageType.getImageClass());
+			return FactoryFiducial.calibCircleRegularGrid(null,config, imageType.getImageClass());
 		}
 
 		@Override

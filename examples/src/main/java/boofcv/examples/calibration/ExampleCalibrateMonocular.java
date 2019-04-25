@@ -18,7 +18,7 @@
 
 package boofcv.examples.calibration;
 
-import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
@@ -56,19 +56,19 @@ public class ExampleCalibrateMonocular {
 		List<String> images;
 
 		// Regular Circle Example
-//		detector = FactoryFiducialCalibration.circleRegularGrid(new ConfigCircleRegularGrid(8, 10, 1.5, 2.5));
-//		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleRegular"),"image");
+//		detector = FactoryFiducialCalibration.circleRegularGrid(null, new ConfigGridDimen(8, 10, 1.5, 2.5));
+//		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleRegular"),"image", null);
 
 		// Hexagonal Circle Example
-//		detector = FactoryFiducialCalibration.circleHexagonalGrid(new ConfigCircleHexagonalGrid(24, 28, 1, 1.2));
-//		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleHexagonal"),"image");
+//		detector = FactoryFiducialCalibration.circleHexagonalGrid(null, new ConfigGridDimen(24, 28, 1, 1.2));
+//		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_CircleHexagonal"),"image", null);
 
 		// Square Grid example
-//		detector = FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(4, 3, 30, 30));
-//		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Square"),"left");
+//		detector = FactoryFiducialCalibration.squareGrid(null, new ConfigGridDimen(4, 3, 30, 30));
+//		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Square"),"left", null);
 
 		// Chessboard Example
-		detector = FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
+		detector = FactoryFiducialCalibration.chessboard2(null,new ConfigGridDimen(7, 5, 30));
 		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"),"left", null);
 
 		// Declare and setup the calibration algorithm

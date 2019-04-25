@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,16 +35,6 @@ import boofcv.struct.Configuration;
 public class ConfigSquareGrid implements Configuration {
 
 	/**
-	 * Number of black squares tall the grid is. Target dependent.
-	 */
-	public int numRows = -1;
-
-	/**
-	 * Number of black squares wide the grid is. Target dependent.
-	 */
-	public int numCols = -1;
-
-	/**
 	 * Configuration for thresholding the image
 	 */
 	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.BLOCK_MEAN,ConfigLength.relative(0.02,5));
@@ -56,16 +46,6 @@ public class ConfigSquareGrid implements Configuration {
 	 * specified here are ignored.
 	 */
 	public ConfigPolygonDetector square = new ConfigPolygonDetector();
-
-	/**
-	 * Physical width of the square.
-	 */
-	public double squareWidth;
-
-	/**
-	 * Physical width of the space between each square
-	 */
-	public double spaceWidth;
 
 	{
 		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
@@ -80,20 +60,7 @@ public class ConfigSquareGrid implements Configuration {
 		square.refineGray.maxIterations = 10;
 	}
 
-	public ConfigSquareGrid(int numRows, int numCols, double squareWidth, double spaceWidth) {
-		this.numRows = numRows;
-		this.numCols = numCols;
-		this.squareWidth = squareWidth;
-		this.spaceWidth = spaceWidth;
-	}
-
-	public double getSpacetoSquareRatio() {
-		return spaceWidth/squareWidth;
-	}
-
 	@Override
 	public void checkValidity() {
-		if( numCols <= 0 || numRows <= 0 )
-			throw new IllegalArgumentException("Must specify then number of rows and columns in the target");
 	}
 }

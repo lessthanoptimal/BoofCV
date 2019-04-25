@@ -49,20 +49,20 @@ public class CalibrationDetectorSquareGrid implements DetectorFiducialCalibratio
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
 
-	public CalibrationDetectorSquareGrid(ConfigSquareGrid config) {
+	public CalibrationDetectorSquareGrid(ConfigSquareGrid configDet, ConfigGridDimen configDimen) {
 
-		double spaceToSquareRatio = config.spaceWidth/config.squareWidth;
+		double spaceToSquareRatio = configDimen.shapeDistance/configDimen.shapeSize;
 
 		InputToBinary<GrayF32> inputToBinary =
-				FactoryThresholdBinary.threshold(config.thresholding,GrayF32.class);
+				FactoryThresholdBinary.threshold(configDet.thresholding,GrayF32.class);
 
 		DetectPolygonBinaryGrayRefine<GrayF32> detectorSquare =
-				FactoryShapeDetector.polygon(config.square,GrayF32.class);
+				FactoryShapeDetector.polygon(configDet.square,GrayF32.class);
 
-		detector = new DetectSquareGridFiducial<>(config.numRows,config.numCols,
+		detector = new DetectSquareGridFiducial<>(configDimen.numRows,configDimen.numCols,
 				spaceToSquareRatio,inputToBinary,detectorSquare);
 
-		layoutPoints = createLayout(config.numRows, config.numCols, config.squareWidth,config.spaceWidth);
+		layoutPoints = createLayout(configDimen.numRows, configDimen.numCols, configDimen.shapeSize,configDimen.shapeDistance);
 	}
 
 	@Override

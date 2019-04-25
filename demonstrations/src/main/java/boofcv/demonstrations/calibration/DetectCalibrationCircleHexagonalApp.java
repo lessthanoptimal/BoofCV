@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
@@ -53,7 +54,8 @@ import java.util.List;
 public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibrationApp
 {
 	CalibrationDetectorCircleHexagonalGrid detector;
-	ConfigCircleHexagonalGrid config;
+	ConfigCircleHexagonalGrid configDet = new ConfigCircleHexagonalGrid();
+	ConfigGridDimen configGrid;
 
 	Color colorId[];
 	Line2D.Double line = new Line2D.Double();
@@ -63,8 +65,8 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 											   List<String> exampleInputs) {
 		super(exampleInputs);
 		setUpGui(new DetectCalibrationCirclePanel(numRows,numColumns,circleDiameter,centerDistance,true));
-		config = new ConfigCircleHexagonalGrid(numRows, numColumns, circleDiameter, centerDistance);
-		controlPanel.threshold.setConfiguration(config.thresholding);
+		configGrid = new ConfigGridDimen(numRows, numColumns, circleDiameter, centerDistance);
+		controlPanel.threshold.setConfiguration(configDet.thresholding);
 
 		declareDetector();
 
@@ -73,14 +75,14 @@ public class DetectCalibrationCircleHexagonalApp extends CommonDetectCalibration
 
 	@Override
 	public void declareDetector() {
-		config.thresholding = controlPanel.threshold.createConfig();
+		configDet.thresholding = controlPanel.threshold.createConfig();
 
-		config.numRows = controlPanel.getGridRows();
-		config.numCols = controlPanel.getGridColumns();
-		config.circleDiameter = ((DetectCalibrationCirclePanel)controlPanel).getCircleDiameter();
-		config.centerDistance = ((DetectCalibrationCirclePanel)controlPanel).getCircleSpacing();
+		configGrid.numRows = controlPanel.getGridRows();
+		configGrid.numCols = controlPanel.getGridColumns();
+		configGrid.shapeSize = ((DetectCalibrationCirclePanel)controlPanel).getCircleDiameter();
+		configGrid.shapeDistance = ((DetectCalibrationCirclePanel)controlPanel).getCircleSpacing();
 
-		detector = FactoryFiducialCalibration.circleHexagonalGrid(config);
+		detector = FactoryFiducialCalibration.circleHexagonalGrid(configDet,configGrid);
 		reprocessImageOnly();
 	}
 

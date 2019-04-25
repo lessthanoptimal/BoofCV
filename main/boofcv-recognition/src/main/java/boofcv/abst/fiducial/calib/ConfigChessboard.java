@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,17 +34,6 @@ import boofcv.struct.Configuration;
  * @author Peter Abeles
  */
 public class ConfigChessboard implements Configuration {
-
-	/**
-	 * Number of squares tall the grid is. Target dependent.
-	 */
-	public int numRows = -1;
-
-	/**
-	 * Number of squares wide the grid is. Target dependent.
-	 */
-	public int numCols = -1;
-
 	/**
 	 * The maximum distance in pixels that two corners can be from each other.  In well focused image
 	 * this number can be only a few pixels.  The default value has been selected to handle blurred images.
@@ -66,11 +55,6 @@ public class ConfigChessboard implements Configuration {
 	 * specified here are ignored.
 	 */
 	public ConfigPolygonDetector square = new ConfigPolygonDetector();
-
-	/**
-	 * Physical width of each square on the calibration target
-	 */
-	public double squareWidth;
 
 	{
 		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
@@ -95,16 +79,8 @@ public class ConfigChessboard implements Configuration {
 		square.refineGray.maxIterations = 5;
 	}
 
-	public ConfigChessboard(int numRows, int numCols, double squareWidth) {
-		this.numRows = numRows;
-		this.numCols = numCols;
-		this.squareWidth = squareWidth;
-	}
-
 
 	@Override
 	public void checkValidity() {
-		if( numCols <= 0 || numRows <= 0 )
-			throw new IllegalArgumentException("Must specify then number of rows and columns in the target");
 	}
 }

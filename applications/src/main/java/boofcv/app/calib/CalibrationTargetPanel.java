@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,7 @@
 
 package boofcv.app.calib;
 
-import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
-import boofcv.abst.fiducial.calib.ConfigCircleRegularGrid;
-import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
@@ -45,10 +42,10 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 
 	public TargetType selected = TargetType.CHESSBOARD;
 
-	public ConfigChessboard configChessboard = new ConfigChessboard(7,5,1);
-	public ConfigSquareGrid configSquare = new ConfigSquareGrid(4,3,1,1);
-	public ConfigCircleRegularGrid configCircle = new ConfigCircleRegularGrid(15,10,1,1.5);
-	public ConfigCircleHexagonalGrid configCircleHex = new ConfigCircleHexagonalGrid(15,15,1,1.5);
+	public ConfigGridDimen configChessboard = new ConfigGridDimen(7,5,1);
+	public ConfigGridDimen configSquare = new ConfigGridDimen(4,3,1,1);
+	public ConfigGridDimen configCircle = new ConfigGridDimen(15,10,1,1.5);
+	public ConfigGridDimen configCircleHex = new ConfigGridDimen(15,15,1,1.5);
 
 	public CalibrationTargetPanel( Listener listener ) {
 		setBorder(BorderFactory.createEmptyBorder());
@@ -69,7 +66,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	}
 
 	public void updateParameters() {
-		Object c;
+		ConfigGridDimen c;
 		switch( selected ) {
 			case CHESSBOARD:c=configChessboard;break;
 			case SQUARE_GRID:c=configSquare;break;
@@ -115,7 +112,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 
 			sRows = spinner(configChessboard.numRows,1,1000,1);
 			sCols = spinner(configChessboard.numCols,1,1000,1);
-			sWidth = spinner(configChessboard.squareWidth,0,1000000.0,1);
+			sWidth = spinner(configChessboard.shapeSize,0,1000000.0,1);
 
 			addLabeled(sRows,"Rows");
 			addLabeled(sCols,"Cols");
@@ -129,7 +126,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 			} else if( e.getSource() == sCols ) {
 				configChessboard.numCols = ((Number)sCols.getValue()).intValue();
 			} else if( e.getSource() == sWidth ) {
-				configChessboard.squareWidth = ((Number)sWidth.getValue()).doubleValue();
+				configChessboard.shapeSize = ((Number)sWidth.getValue()).doubleValue();
 			}
 			updateParameters();
 		}
@@ -145,8 +142,8 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 
 			sRows = spinner(configSquare.numRows,1,1000,1);
 			sCols = spinner(configSquare.numCols,1,1000,1);
-			sWidth = spinner(configSquare.squareWidth,0,1000000.0,1);
-			sSpace = spinner(configSquare.spaceWidth,0,1000000.0,1);
+			sWidth = spinner(configSquare.shapeSize,0,1000000.0,1);
+			sSpace = spinner(configSquare.shapeDistance,0,1000000.0,1);
 
 			addLabeled(sRows,"Rows");
 			addLabeled(sCols,"Cols");
@@ -161,9 +158,9 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 			} else if( e.getSource() == sCols ) {
 				configSquare.numCols = ((Number)sCols.getValue()).intValue();
 			} else if( e.getSource() == sWidth ) {
-				configSquare.squareWidth = ((Number)sWidth.getValue()).doubleValue();
+				configSquare.shapeSize = ((Number)sWidth.getValue()).doubleValue();
 			} else if( e.getSource() == sSpace ) {
-				configSquare.spaceWidth = ((Number)sSpace.getValue()).doubleValue();
+				configSquare.shapeDistance = ((Number)sSpace.getValue()).doubleValue();
 			}
 			updateParameters();
 		}
@@ -179,8 +176,8 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 
 			sRows = spinner(configCircle.numRows,1,1000,1);
 			sCols = spinner(configCircle.numCols,1,1000,1);
-			sDiam = spinner(configCircle.circleDiameter,0,1000000.0,1);
-			sDist = spinner(configCircle.centerDistance,0,1000000.0,1);
+			sDiam = spinner(configCircle.shapeSize,0,1000000.0,1);
+			sDist = spinner(configCircle.shapeDistance,0,1000000.0,1);
 
 			addLabeled(sRows,"Rows");
 			addLabeled(sCols,"Cols");
@@ -195,9 +192,9 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 			} else if( e.getSource() == sCols ) {
 				configCircle.numCols = ((Number)sCols.getValue()).intValue();
 			} else if( e.getSource() == sDiam) {
-				configCircle.circleDiameter = ((Number) sDiam.getValue()).doubleValue();
+				configCircle.shapeSize = ((Number) sDiam.getValue()).doubleValue();
 			} else if( e.getSource() == sDist) {
-				configCircle.centerDistance = ((Number) sDist.getValue()).doubleValue();
+				configCircle.shapeDistance = ((Number) sDist.getValue()).doubleValue();
 			}
 			updateParameters();
 		}
@@ -213,8 +210,8 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 
 			sRows = spinner(configCircleHex.numRows,1,1000,1);
 			sCols = spinner(configCircleHex.numCols,1,1000,1);
-			sDiam = spinner(configCircleHex.circleDiameter,0,1000000.0,1);
-			sDist = spinner(configCircleHex.centerDistance,0,1000000.0,1);
+			sDiam = spinner(configCircleHex.shapeSize,0,1000000.0,1);
+			sDist = spinner(configCircleHex.shapeDistance,0,1000000.0,1);
 
 			addLabeled(sRows,"Rows");
 			addLabeled(sCols,"Cols");
@@ -229,9 +226,9 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 			} else if( e.getSource() == sCols ) {
 				configCircleHex.numCols = ((Number)sCols.getValue()).intValue();
 			} else if( e.getSource() == sDiam) {
-				configCircleHex.circleDiameter = ((Number) sDiam.getValue()).doubleValue();
+				configCircleHex.shapeSize = ((Number) sDiam.getValue()).doubleValue();
 			} else if( e.getSource() == sDist) {
-				configCircleHex.centerDistance = ((Number) sDist.getValue()).doubleValue();
+				configCircleHex.shapeDistance = ((Number) sDist.getValue()).doubleValue();
 			}
 			updateParameters();
 		}
@@ -245,7 +242,7 @@ public class CalibrationTargetPanel extends StandardAlgConfigPanel implements Ac
 	}
 
 	public interface Listener {
-		void calibrationParametersChanged( TargetType type , Object config );
+		void calibrationParametersChanged( TargetType type , ConfigGridDimen config );
 	}
 
 }

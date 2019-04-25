@@ -64,27 +64,27 @@ public class CalibrationDetectorCircleRegularGrid implements DetectorFiducialCal
 
 	/**
 	 * Configures the detector based on the pass in configuration class
-	 * @param config Configuration for detector and target description
+	 * @param configDet Configuration for detector and target description
 	 */
-	public CalibrationDetectorCircleRegularGrid(ConfigCircleRegularGrid config ) {
+	public CalibrationDetectorCircleRegularGrid(ConfigCircleRegularGrid configDet, ConfigGridDimen configGrid ) {
 
 		InputToBinary<GrayF32> inputToBinary =
-				FactoryThresholdBinary.threshold(config.thresholding,GrayF32.class);
+				FactoryThresholdBinary.threshold(configDet.thresholding,GrayF32.class);
 
 		BinaryEllipseDetector<GrayF32> ellipseDetector =
-				FactoryShapeDetector.ellipse(config.ellipse,GrayF32.class);
+				FactoryShapeDetector.ellipse(configDet.ellipse,GrayF32.class);
 
-		spaceToDiameter = (config.centerDistance/config.circleDiameter);
+		spaceToDiameter = (configGrid.shapeDistance/configGrid.shapeSize);
 		double spaceToRadius = 2.0*spaceToDiameter;
 
 		EllipsesIntoClusters e2c = new EllipsesIntoClusters(
-				spaceToRadius*1.5,config.ellipseSizeSimilarity,config.edgeIntensitySimilarityTolerance);
+				spaceToRadius*1.5,configDet.ellipseSizeSimilarity,configDet.edgeIntensitySimilarityTolerance);
 
-		detector = new DetectCircleRegularGrid<>(config.numRows,config.numCols,inputToBinary,
+		detector = new DetectCircleRegularGrid<>(configGrid.numRows,configGrid.numCols,inputToBinary,
 				ellipseDetector,e2c);
 
 
-		layout = createLayout(detector.getRows(),detector.getColumns(), config.centerDistance, config.circleDiameter);
+		layout = createLayout(detector.getRows(),detector.getColumns(), configGrid.shapeDistance, configGrid.shapeSize);
 	}
 
 	@Override

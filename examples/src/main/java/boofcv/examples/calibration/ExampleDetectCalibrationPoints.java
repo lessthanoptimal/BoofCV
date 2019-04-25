@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.examples.calibration;
 
-import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
@@ -56,8 +56,8 @@ public class ExampleDetectCalibrationPoints {
 		DetectorFiducialCalibration detector;
 
 		// For chessboard targets, tune RADIUS parameter for your images
-//		detector = FactoryCalibrationTarget.squareGrid(new ConfigSquareGrid(4, 3, 30, 30));
-		detector = FactoryFiducialCalibration.chessboard( new ConfigChessboard(7, 5, 30));
+//		detector = FactoryFiducialCalibration.squareGrid(null, new ConfigGridDimen(4, 3, 30, 30));
+		detector = FactoryFiducialCalibration.chessboard2(null, new ConfigGridDimen(7, 5, 30));
 
 		// process the image and check for failure condition
 		if( !detector.process(input) )

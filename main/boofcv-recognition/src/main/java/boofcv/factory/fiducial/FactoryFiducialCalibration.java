@@ -39,10 +39,31 @@ public class FactoryFiducialCalibration {
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	public static CalibrationDetectorSquareGrid squareGrid(ConfigSquareGrid config) {
+	public static CalibrationDetectorSquareGrid squareGrid(@Nullable ConfigSquareGrid config, ConfigGridDimen configDimen) {
+		if( config == null )
+			config = new ConfigSquareGrid();
 		config.checkValidity();
 
-		return new CalibrationDetectorSquareGrid(config);
+		return new CalibrationDetectorSquareGrid(config,configDimen);
+	}
+
+	/**
+	 * Detector for chessboard targets.  Squares can be partially outside, but inside corners must be entirely
+	 * inside the image.
+	 *
+	 * @see DetectChessboardFiducial
+	 *
+	 * @param configDet Configuration for chessboard detector
+	 * @return Square grid target detector.
+	 */
+	@Deprecated
+	public static CalibrationDetectorChessboard chessboard(@Nullable ConfigChessboard configDet ,
+														   ConfigGridDimen configGrid ) {
+		if( configDet == null )
+			configDet = new ConfigChessboard();
+		configDet.checkValidity();
+
+		return new CalibrationDetectorChessboard(configDet,configGrid);
 	}
 
 	/**
@@ -54,22 +75,7 @@ public class FactoryFiducialCalibration {
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	public static CalibrationDetectorChessboard chessboard(ConfigChessboard config ) {
-		config.checkValidity();
-
-		return new CalibrationDetectorChessboard(config);
-	}
-
-	/**
-	 * Detector for chessboard targets.  Squares can be partially outside, but inside corners must be entirely
-	 * inside the image.
-	 *
-	 * @see DetectChessboardFiducial
-	 *
-	 * @param config Configuration for chessboard detector
-	 * @return Square grid target detector.
-	 */
-	public static CalibrationDetectorChessboard2 chessboard(@Nullable ConfigChessboard2 config , ConfigGridDimen dimen ) {
+	public static CalibrationDetectorChessboard2 chessboard2(@Nullable ConfigChessboard2 config , ConfigGridDimen dimen ) {
 		if( config == null )
 			config = new ConfigChessboard2();
 		config.checkValidity();
@@ -98,10 +104,13 @@ public class FactoryFiducialCalibration {
 	 * @param config Configuration for target
 	 * @return The detector
 	 */
-	public static CalibrationDetectorCircleHexagonalGrid circleHexagonalGrid(ConfigCircleHexagonalGrid config ) {
+	public static CalibrationDetectorCircleHexagonalGrid circleHexagonalGrid( @Nullable ConfigCircleHexagonalGrid config ,
+																			 ConfigGridDimen configGrid ) {
+		if( config == null )
+			config = new ConfigCircleHexagonalGrid();
 		config.checkValidity();
 
-		return new CalibrationDetectorCircleHexagonalGrid(config);
+		return new CalibrationDetectorCircleHexagonalGrid(config,configGrid);
 	}
 
 	/**
@@ -110,9 +119,12 @@ public class FactoryFiducialCalibration {
 	 * @param config Configuration for target
 	 * @return The detector
 	 */
-	public static CalibrationDetectorCircleRegularGrid circleRegularGrid( ConfigCircleRegularGrid config ) {
+	public static CalibrationDetectorCircleRegularGrid circleRegularGrid( @Nullable ConfigCircleRegularGrid config ,
+																		  ConfigGridDimen configGrid ) {
+		if( config == null )
+			config = new ConfigCircleRegularGrid();
 		config.checkValidity();
 
-		return new CalibrationDetectorCircleRegularGrid(config);
+		return new CalibrationDetectorCircleRegularGrid(config,configGrid);
 	}
 }

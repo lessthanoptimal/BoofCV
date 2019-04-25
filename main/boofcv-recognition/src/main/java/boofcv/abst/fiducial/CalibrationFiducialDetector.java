@@ -79,11 +79,12 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	/**
 	 * Configure it to detect chessboard style targets
 	 */
-	public CalibrationFiducialDetector(ConfigChessboard config,
+	public CalibrationFiducialDetector( @Nullable ConfigChessboard configDet,
+										ConfigGridDimen configGrid,
 									   Class<T> imageType) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboard(config);
-		sideWidth = config.numCols*config.squareWidth;
-		sideHeight = config.numRows*config.squareWidth;
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboard(configDet,configGrid);
+		sideWidth = configGrid.numCols*configGrid.shapeSize;
+		sideHeight = configGrid.numRows*configGrid.shapeSize;
 
 		width = (sideWidth+sideHeight)/2.0;
 
@@ -93,12 +94,12 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	/**
 	 * Configure it to detect chessboard style targets
 	 */
-	public CalibrationFiducialDetector( @Nullable ConfigChessboard2 config,
-									   ConfigGridDimen shape,
+	public CalibrationFiducialDetector( @Nullable ConfigChessboard2 configDet,
+									   ConfigGridDimen configGrid,
 									   Class<T> imageType) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboard(config,shape);
-		sideWidth = shape.numCols*shape.squareWidth;
-		sideHeight = shape.numRows*shape.squareWidth;
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboard2(configDet,configGrid);
+		sideWidth = configGrid.numCols*configGrid.shapeSize;
+		sideHeight = configGrid.numRows*configGrid.shapeSize;
 
 		width = (sideWidth+sideHeight)/2.0;
 
@@ -108,13 +109,14 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	/**
 	 * Configure it to detect square-grid style targets
 	 */
-	public CalibrationFiducialDetector(ConfigSquareGrid config,
-									   Class<T> imageType) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.squareGrid(config);
-		int squareCols = config.numCols;
-		int squareRows = config.numRows;
-		sideWidth = squareCols* config.squareWidth + (squareCols-1)*config.spaceWidth;
-		sideHeight = squareRows*config.squareWidth + (squareRows-1)*config.spaceWidth;
+	public CalibrationFiducialDetector( @Nullable ConfigSquareGrid configDet,
+										ConfigGridDimen configGrid,
+										Class<T> imageType) {
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.squareGrid(configDet,configGrid);
+		int squareCols = configGrid.numCols;
+		int squareRows = configGrid.numRows;
+		sideWidth = squareCols* configGrid.shapeSize + (squareCols-1)*configGrid.shapeDistance;
+		sideHeight = squareRows*configGrid.shapeSize + (squareRows-1)*configGrid.shapeDistance;
 
 		double width = (sideWidth+sideHeight)/2.0;
 
@@ -137,24 +139,27 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 		init(detector, width, imageType);
 	}
 
-	public CalibrationFiducialDetector(ConfigCircleHexagonalGrid config,
+	public CalibrationFiducialDetector(@Nullable ConfigCircleHexagonalGrid configDet,
+									   ConfigGridDimen configGrid,
 									   Class<T> imageType) {
-		CalibrationDetectorCircleHexagonalGrid detector = FactoryFiducialCalibration.circleHexagonalGrid(config);
-		int squareCols = config.numCols;
-		int squareRows = config.numRows;
-		sideWidth = squareCols*config.centerDistance/2.0;
-		sideHeight = squareRows*config.centerDistance/2.0;
+		CalibrationDetectorCircleHexagonalGrid detector =
+				FactoryFiducialCalibration.circleHexagonalGrid(configDet,configGrid);
+		int squareCols = configGrid.numCols;
+		int squareRows = configGrid.numRows;
+		sideWidth = squareCols*configGrid.shapeDistance/2.0;
+		sideHeight = squareRows*configGrid.shapeDistance/2.0;
 
 		double width = (sideWidth+sideHeight)/2.0;
 
 		init(detector, width, imageType);
 	}
 
-	public CalibrationFiducialDetector(ConfigCircleRegularGrid config,
+	public CalibrationFiducialDetector( @Nullable ConfigCircleRegularGrid configDet,
+									   ConfigGridDimen configGrid,
 									   Class<T> imageType) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.circleRegularGrid(config);
-		sideWidth = (config.numCols-1)*config.centerDistance;
-		sideHeight = (config.numRows-1)*config.centerDistance;
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.circleRegularGrid(configDet,configGrid);
+		sideWidth = (configGrid.numCols-1)*configGrid.shapeDistance;
+		sideHeight = (configGrid.numRows-1)*configGrid.shapeDistance;
 
 		double width = (sideWidth+sideHeight)/2.0;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,10 @@
 
 package boofcv.app;
 
-import boofcv.abst.fiducial.calib.*;
+import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard2;
+import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
+import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.image.ConvertBufferedImage;
@@ -51,8 +54,8 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 		GrayF32 gray = new GrayF32(image.getWidth(),image.getHeight());
 		ConvertBufferedImage.convertFrom(image,gray);
 
-		CalibrationDetectorChessboard detector =
-				FactoryFiducialCalibration.chessboard(new ConfigChessboard(7,5,3));
+		CalibrationDetectorChessboard2 detector =
+				FactoryFiducialCalibration.chessboard2(null,new ConfigGridDimen(7,5,3));
 
 		assertTrue(detector.process(gray));
 	}
@@ -66,7 +69,7 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 		ConvertBufferedImage.convertFrom(image,gray);
 
 		CalibrationDetectorSquareGrid detector =
-				FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(4,3,3,3));
+				FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(4,3,3,3));
 
 		assertTrue(detector.process(gray));
 	}
@@ -80,7 +83,7 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 		ConvertBufferedImage.convertFrom(image,gray);
 
 		CalibrationDetectorCircleHexagonalGrid detector =
-				FactoryFiducialCalibration.circleHexagonalGrid(new ConfigCircleHexagonalGrid(8,7,2,3));
+				FactoryFiducialCalibration.circleHexagonalGrid(null,new ConfigGridDimen(8,7,2,3));
 
 		assertTrue(detector.process(gray));
 	}
@@ -94,7 +97,7 @@ public class TestCreateCalibrationTarget extends CommonFiducialPdfChecks {
 		ConvertBufferedImage.convertFrom(image,gray);
 
 		DetectorFiducialCalibration detector =
-				FactoryFiducialCalibration.circleRegularGrid(new ConfigCircleRegularGrid(8,6,2,3));
+				FactoryFiducialCalibration.circleRegularGrid(null,new ConfigGridDimen(8,6,2,3));
 
 		assertTrue(detector.process(gray));
 	}

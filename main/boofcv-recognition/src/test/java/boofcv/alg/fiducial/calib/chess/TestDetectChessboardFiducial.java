@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
@@ -91,17 +92,18 @@ public class TestDetectChessboardFiducial {
 //		ShowImages.showWindow(gray,"Rendered Image");
 //		try { Thread.sleep(1000); } catch (InterruptedException e) {}
 
-		ConfigChessboard configChess = new ConfigChessboard(5, 5, 1);
+		ConfigChessboard configDet = new ConfigChessboard();
+		ConfigGridDimen configChess = new ConfigGridDimen(5, 5, 1);
 
 		DetectPolygonBinaryGrayRefine<GrayF32> detectorSquare =
-				FactoryShapeDetector.polygon(configChess.square, GrayF32.class);
+				FactoryShapeDetector.polygon(configDet.square, GrayF32.class);
 //		detectorSquare.setVerbose(true);
 
 		InputToBinary<GrayF32> inputToBinary;
 		if( localThreshold ) {
-			if( !configChess.thresholding.type.isAdaptive() )
+			if( !configDet.thresholding.type.isAdaptive() )
 				throw new RuntimeException("This assumes that the default is local. Update unit test by specifying a local");
-			inputToBinary = FactoryThresholdBinary.threshold(configChess.thresholding, GrayF32.class);
+			inputToBinary = FactoryThresholdBinary.threshold(configDet.thresholding, GrayF32.class);
 		} else
 			inputToBinary = FactoryThresholdBinary.globalFixed(50,true,GrayF32.class);
 

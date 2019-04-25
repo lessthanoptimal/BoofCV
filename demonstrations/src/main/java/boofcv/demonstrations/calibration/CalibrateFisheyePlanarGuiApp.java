@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
@@ -165,9 +165,9 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 
 	public static void main( String args[] ) {
 		DetectorFiducialCalibration detector =
-//				FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(8, 8, 0.5, 7.0 / 18.0));
-//				FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(4,3,30,30));
-				FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
+//				FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(8, 8, 0.5, 7.0 / 18.0));
+//				FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(4,3,30,30));
+				FactoryFiducialCalibration.chessboard2(null,new ConfigGridDimen(7, 5, 30));
 //				FactoryFiducialCalibration.circleHexagonalGrid(new ConfigCircleHexagonalGrid(5, 8, 1, 6));
 
 		List<String> images;

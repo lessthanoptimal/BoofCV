@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public abstract class GenericPlanarCalibrationDetectorChecks {
 
 
-	List targetConfigs = new ArrayList();
+	List<ConfigGridDimen> targetConfigs = new ArrayList<>();
 
 	double fisheyeMatchTol = 3.0; // how close a pixel needs to come to be considered a match
 
@@ -104,12 +104,12 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 * @param config (Optional)
 	 * @param image Storage for rendered calibration target This should be just the calibration target
 	 */
-	public abstract void renderTarget( Object config ,
+	public abstract void renderTarget( ConfigGridDimen config ,
 									   double targetWidth ,
 									   GrayF32 image ,
 									   List<Point2D_F64> points2D );
 
-	public abstract DetectorFiducialCalibration createDetector(Object layout);
+	public abstract DetectorFiducialCalibration createDetector(ConfigGridDimen layout);
 
 	/**
 	 * See if it can detect targets distorted by fisheye lens. Entire target is always seen
@@ -281,7 +281,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 
 	}
 
-	protected GrayF32 renderEasy( Object layout , List<Point2D_F64> locations2D ) {
+	protected GrayF32 renderEasy( ConfigGridDimen layout , List<Point2D_F64> locations2D ) {
 		CameraPinholeBrown model = CalibrationIO.load(getClass().getResource("pinhole_radial.yaml"));
 
 		if( locations2D == null )
@@ -304,13 +304,13 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void checkDetectionsNonnull() {
-		for( Object layout : targetConfigs) {
+		for( ConfigGridDimen layout : targetConfigs) {
 			DetectorFiducialCalibration detector = createDetector(layout);
 
 			detector.process(new GrayF32(300,400));
 
-			assertTrue(detector.getDetectedPoints() != null);
-			assertTrue(detector.getDetectedPoints().size() == 0);
+			assertNotNull(detector.getDetectedPoints());
+			assertEquals(0, detector.getDetectedPoints().size());
 		}
 	}
 
@@ -366,7 +366,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void dataNotRecycled() {
-		for( Object layout : targetConfigs) {
+		for( ConfigGridDimen layout : targetConfigs) {
 			DetectorFiducialCalibration detector = createDetector(layout);
 
 			GrayF32 original = renderEasy(layout,null);
@@ -395,7 +395,7 @@ public abstract class GenericPlanarCalibrationDetectorChecks {
 	 */
 	@Test
 	public void checkPointIndexIncreasingOrder() {
-		for( Object layout : targetConfigs) {
+		for( ConfigGridDimen layout : targetConfigs) {
 			DetectorFiducialCalibration detector = createDetector(layout);
 
 			GrayF32 original = renderEasy(layout,null);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
@@ -48,25 +49,26 @@ public class DetectCalibrationChessboardApp
 
 {
 	DetectChessboardFiducial<GrayF32> alg;
-	ConfigChessboard config;
+	ConfigGridDimen configGrid;
+	ConfigChessboard configDet = new ConfigChessboard();
 
 	public DetectCalibrationChessboardApp( int numRows , int numColumns ,
 										   List<String> exampleInputs) {
 		super(exampleInputs);
-		config = new ConfigChessboard(numRows, numColumns, 1);
-		setUpGui(new DetectCalibrationPolygonPanel(numRows,numColumns,config.square,config.thresholding));
+		configGrid = new ConfigGridDimen(numRows, numColumns, 1);
+		setUpGui(new DetectCalibrationPolygonPanel(numRows,numColumns, configDet.square, configDet.thresholding));
 
 		declareDetector();
 	}
 
 	@Override
 	public void declareDetector() {
-		config.thresholding = ((DetectCalibrationPolygonPanel)controlPanel).polygonPanel.thresholdPanel.createConfig();
-		config.square = ((DetectCalibrationPolygonPanel)controlPanel).polygonPanel.getConfigPolygon();
-		config.numRows = controlPanel.getGridRows();
-		config.numCols = controlPanel.getGridColumns();
+		configDet.thresholding = ((DetectCalibrationPolygonPanel)controlPanel).polygonPanel.thresholdPanel.createConfig();
+		configDet.square = ((DetectCalibrationPolygonPanel)controlPanel).polygonPanel.getConfigPolygon();
+		configGrid.numRows = controlPanel.getGridRows();
+		configGrid.numCols = controlPanel.getGridColumns();
 
-		alg = FactoryFiducialCalibration.chessboard(config).getAlgorithm();
+		alg = FactoryFiducialCalibration.chessboard(configDet,configGrid).getAlgorithm();
 		reprocessImageOnly();
 	}
 
@@ -113,7 +115,7 @@ public class DetectCalibrationChessboardApp
 	}
 
 	public void configure(int numRows, int numCols ) {
-		config = new ConfigChessboard(numRows, numCols, 1);
+		configGrid = new ConfigGridDimen(numRows, numCols, 1);
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {

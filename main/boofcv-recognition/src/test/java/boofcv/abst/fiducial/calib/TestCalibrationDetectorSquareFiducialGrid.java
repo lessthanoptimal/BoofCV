@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCalibrationDetectorChecks {
 
 	public TestCalibrationDetectorSquareFiducialGrid() {
-		targetConfigs.add( new ConfigSquareGridBinary(3,2,30,30) );
+		targetConfigs.add( new ConfigGridDimen(3,2,30,30) );
 
 		// make it bigger so that the squares are easier to decode
 //		simulatedTargetWidth  *= 1.2;
@@ -88,7 +88,7 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 
 	@Test
 	public void createLayout() {
-		ConfigSquareGridBinary config = new ConfigSquareGridBinary(3,4,30,20);
+		ConfigGridDimen config = new ConfigGridDimen(3,4,30,20);
 
 		List<Point2D_F64> l = createDetector(config).getLayout();
 
@@ -109,8 +109,9 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 	}
 
 	@Override
-	public void renderTarget(Object layout, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
-		ConfigSquareGridBinary config = (ConfigSquareGridBinary)layout;
+	public void renderTarget(ConfigGridDimen layout, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
+		ConfigSquareGridBinary config =
+				new ConfigSquareGridBinary(layout.numRows,layout.numCols,layout.shapeSize,layout.shapeDistance);
 
 		RenderSquareBinaryGridFiducial renderer = new RenderSquareBinaryGridFiducial();
 		renderer.squareWidth = 50;
@@ -160,7 +161,9 @@ public class TestCalibrationDetectorSquareFiducialGrid extends GenericPlanarCali
 	}
 
 	@Override
-	public DetectorFiducialCalibration createDetector(Object layout) {
-		return FactoryFiducialCalibration.binaryGrid((ConfigSquareGridBinary)layout);
+	public DetectorFiducialCalibration createDetector(ConfigGridDimen layout) {
+		ConfigSquareGridBinary config =
+				new ConfigSquareGridBinary(layout.numRows,layout.numCols,layout.shapeSize,layout.shapeDistance);
+		return FactoryFiducialCalibration.binaryGrid(config);
 	}
 }

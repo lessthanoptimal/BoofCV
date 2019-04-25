@@ -41,6 +41,7 @@ import java.util.List;
  * 
  * @author Peter Abeles
  */
+@Deprecated
 public class CalibrationDetectorChessboard implements DetectorFiducialCalibration {
 
 	DetectChessboardFiducial<GrayF32> alg;
@@ -48,18 +49,18 @@ public class CalibrationDetectorChessboard implements DetectorFiducialCalibratio
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
 
-	public CalibrationDetectorChessboard(ConfigChessboard config) {
+	public CalibrationDetectorChessboard(ConfigChessboard configDet, ConfigGridDimen configGrid ) {
 
 		DetectPolygonBinaryGrayRefine<GrayF32> detectorSquare =
-				FactoryShapeDetector.polygon(config.square,GrayF32.class);
+				FactoryShapeDetector.polygon(configDet.square,GrayF32.class);
 
 		InputToBinary<GrayF32> inputToBinary =
-				FactoryThresholdBinary.threshold(config.thresholding,GrayF32.class);
+				FactoryThresholdBinary.threshold(configDet.thresholding,GrayF32.class);
 
 		alg = new DetectChessboardFiducial<>(
-				config.numRows, config.numCols, config.maximumCornerDistance,detectorSquare,inputToBinary);
+				configGrid.numRows, configGrid.numCols, configDet.maximumCornerDistance,detectorSquare,inputToBinary);
 
-		layoutPoints = gridChess(config.numRows, config.numCols, config.squareWidth);
+		layoutPoints = gridChess(configGrid.numRows, configGrid.numCols, configGrid.shapeSize);
 	}
 
 	@Override

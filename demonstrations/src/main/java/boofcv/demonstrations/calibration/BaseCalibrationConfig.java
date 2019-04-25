@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.demonstrations.calibration;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.io.MediaManager;
@@ -72,9 +72,11 @@ public class BaseCalibrationConfig {
 
 		if( type.compareToIgnoreCase("square") == 0 ) {
 			double space = reader.nextDouble();
-			detector = FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(numRows, numCols, width, space));
+			detector = FactoryFiducialCalibration.squareGrid(null,
+					new ConfigGridDimen(numRows, numCols, width, space));
 		} else if( type.compareToIgnoreCase("chess") == 0 ) {
-			detector = FactoryFiducialCalibration.chessboard(new ConfigChessboard(numRows, numCols, width));
+			detector = FactoryFiducialCalibration.chessboard((ConfigChessboard)null,
+					new ConfigGridDimen(numRows, numCols, width));
 		} else {
 			throw new RuntimeException("Unknown type: "+type);
 		}

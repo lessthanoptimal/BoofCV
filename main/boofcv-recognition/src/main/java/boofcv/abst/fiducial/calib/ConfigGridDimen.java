@@ -21,7 +21,8 @@ package boofcv.abst.fiducial.calib;
 import boofcv.struct.Configuration;
 
 /**
- * Generic class that specifies the physical dimensions of a grid
+ * Generic class that specifies the physical dimensions of a grid. Rows and columns count the number of shapes
+ * in a grid. If chessboard it's the number of squares, including the space between them.
  *
  * @author Peter Abeles
  */
@@ -37,17 +38,34 @@ public class ConfigGridDimen implements Configuration {
 	public int numCols = -1;
 
 	/**
-	 * Physical width of each square on the calibration target
+	 * Physical size of each shape. Side length for squares. Diameter for a circle.
 	 */
-	public double squareWidth;
+	public double shapeSize;
 
-	public ConfigGridDimen(int numRows, int numCols, double squareWidth) {
+	/**
+	 * Space between shapes. For squares this would be the distance between the sides. For circles is the distance
+	 * between the circle's center. Not used for chessboard.
+	 */
+	public double shapeDistance;
+
+	public ConfigGridDimen(int numRows, int numCols, double shapeSize) {
 		this.numRows = numRows;
 		this.numCols = numCols;
-		this.squareWidth = squareWidth;
+		this.shapeSize = shapeSize;
+	}
+
+	public ConfigGridDimen(int numRows, int numCols, double shapeSize, double shapeDistance) {
+		this.numRows = numRows;
+		this.numCols = numCols;
+		this.shapeSize = shapeSize;
+		this.shapeDistance = shapeDistance;
 	}
 
 	public ConfigGridDimen() {
+	}
+
+	public double getSpacetoSizeRatio() {
+		return shapeSize/ shapeDistance;
 	}
 
 	@Override

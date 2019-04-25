@@ -18,10 +18,7 @@
 
 package boofcv.app;
 
-import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
-import boofcv.abst.fiducial.calib.ConfigCircleRegularGrid;
-import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.app.calib.AssistedCalibration;
@@ -236,9 +233,9 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		System.out.println("chessboard: "+numRows+" x "+numColumns);
 
-		ConfigChessboard config = new ConfigChessboard(numRows, numColumns, 1);
+		ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, 1);
 
-		detector = FactoryFiducialCalibration.chessboard(config);
+		detector = FactoryFiducialCalibration.chessboard2(null,config);
 	}
 
 	protected void parseSquareGrid( int index , String []args ) {
@@ -277,9 +274,9 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		System.out.println("squaregrid: "+numRows+" x "+numColumns+" square/space = "+(square/space));
 
-		ConfigSquareGrid config = new ConfigSquareGrid(numRows, numColumns, square,space);
+		ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, square,space);
 
-		detector = FactoryFiducialCalibration.squareGrid(config);
+		detector = FactoryFiducialCalibration.squareGrid(null,config);
 	}
 
 	protected void parseCircle( int index , String []args , boolean hexagonal) {
@@ -317,14 +314,14 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		if( hexagonal ) {
 			System.out.println("circle hexagonal: "+numRows+" x "+numColumns+" diameter = "+diameter+" center distance = "+centerDistance);
-			ConfigCircleHexagonalGrid config = new ConfigCircleHexagonalGrid(numRows, numColumns, diameter, centerDistance);
+			ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, diameter, centerDistance);
 
-			detector = FactoryFiducialCalibration.circleHexagonalGrid(config);
+			detector = FactoryFiducialCalibration.circleHexagonalGrid(null,config);
 		} else {
 			System.out.println("circle regular: "+numRows+" x "+numColumns+" diameter = "+diameter+" center distance = "+centerDistance);
-			ConfigCircleRegularGrid config = new ConfigCircleRegularGrid(numRows, numColumns, diameter, centerDistance);
+			ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, diameter, centerDistance);
 
-			detector = FactoryFiducialCalibration.circleRegularGrid(config);
+			detector = FactoryFiducialCalibration.circleRegularGrid(null,config);
 		}
 	}
 

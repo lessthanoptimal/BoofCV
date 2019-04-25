@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import java.util.List;
 public class TestCalibrationDetectorCircleRegularGrid extends GenericPlanarCalibrationDetectorChecks {
 
 	public TestCalibrationDetectorCircleRegularGrid() {
-		targetConfigs.add( new ConfigCircleRegularGrid(4, 3, 30,50));
+		targetConfigs.add( new ConfigGridDimen(4, 3, 30,50));
 
 		// Does a good job detecting the ellipses, but a shit job determining with the tangent points
 		// The lens distortion moves them so that they aren't even close
@@ -77,15 +77,12 @@ public class TestCalibrationDetectorCircleRegularGrid extends GenericPlanarCalib
 	}
 
 	@Override
-	public void renderTarget(Object layout, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
-
-		ConfigCircleRegularGrid config = (ConfigCircleRegularGrid)layout;
-
+	public void renderTarget(ConfigGridDimen config, double length3D , GrayF32 image, List<Point2D_F64> points2D) {
 
 		RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(40,1);
 
 		double radiusPixels = 20;
-		double centerDistancePixels = 2*radiusPixels*config.centerDistance/config.circleDiameter;
+		double centerDistancePixels = 2*radiusPixels*config.shapeDistance/config.shapeSize;
 
 		renderer.circleRegular(config.numRows,config.numCols,radiusPixels*2,centerDistancePixels);
 
@@ -103,7 +100,7 @@ public class TestCalibrationDetectorCircleRegularGrid extends GenericPlanarCalib
 	}
 
 	@Override
-	public DetectorFiducialCalibration createDetector(Object layout) {
-		return FactoryFiducialCalibration.circleRegularGrid((ConfigCircleRegularGrid)layout);
+	public DetectorFiducialCalibration createDetector(ConfigGridDimen layout) {
+		return FactoryFiducialCalibration.circleRegularGrid(null,layout);
 	}
 }

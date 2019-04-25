@@ -57,7 +57,7 @@ public class CalibrationDetectorChessboard2
 		cornerRows = shape.numRows-1;
 		cornerCols = shape.numCols-1;
 
-		layoutPoints = gridChess(shape.numRows, shape.numCols, shape.squareWidth);
+		layoutPoints = gridChess(shape.numRows, shape.numCols, shape.shapeSize);
 
 		clusterToGrid.setCheckShape((r,c)->r==cornerRows&&c==cornerCols);
 	}

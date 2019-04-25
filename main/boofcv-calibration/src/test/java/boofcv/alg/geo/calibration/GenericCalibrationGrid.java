@@ -19,7 +19,7 @@
 package boofcv.alg.geo.calibration;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
-import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -47,7 +47,7 @@ public class GenericCalibrationGrid {
 	}
 
 	public static DetectorFiducialCalibration createStandardConfig() {
-		return FactoryFiducialCalibration.squareGrid(new ConfigSquareGrid(3, 2, 30, 30));
+		return FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(3, 2, 30, 30));
 	}
 
 	public static DMatrixRMaj createStandardCalibration() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,16 +35,6 @@ import boofcv.struct.Configuration;
 public class ConfigCircleHexagonalGrid implements Configuration {
 
 	/**
-	 * Number of black circles tall the grid is. Target dependent.
-	 */
-	public int numRows = -1;
-
-	/**
-	 * Number of black circles wide the grid is. Target dependent.
-	 */
-	public int numCols = -1;
-
-	/**
 	 * Configuration for thresholding the image
 	 */
 	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.BLOCK_MEAN,ConfigLength.relative(0.02,5));
@@ -52,16 +42,6 @@ public class ConfigCircleHexagonalGrid implements Configuration {
 	 * Configuration for the ellipse detector
 	 */
 	public ConfigEllipseDetector ellipse = new ConfigEllipseDetector();
-
-	/**
-	 * Euclidean distance between the center of a circle and each of its 5 neighbors.
-	 */
-	public double centerDistance;
-
-	/**
-	 * Diameter of each circle.
-	 */
-	public double circleDiameter;
 
 	/**
 	 * How similar two ellipses must be to be connected.  0 to 1.0.  1.0 = perfect match and 0.0 = infinite
@@ -79,18 +59,7 @@ public class ConfigCircleHexagonalGrid implements Configuration {
 		thresholding.scale = 0.85;
 	}
 
-	public ConfigCircleHexagonalGrid(int numRows, int numCols,
-									 double circleDiameter, double centerDistance )
-	{
-		this.numRows = numRows;
-		this.numCols = numCols;
-		this.circleDiameter = circleDiameter;
-		this.centerDistance = centerDistance;
-	}
-
 	@Override
 	public void checkValidity() {
-		if( numCols <= 0 || numRows <= 0 )
-			throw new IllegalArgumentException("Must specify then number of rows and columns in the target");
 	}
 }

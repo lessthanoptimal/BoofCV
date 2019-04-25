@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.calibration;
 
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
@@ -46,26 +47,27 @@ import java.util.List;
 public class DetectCalibrationSquareGridApp extends CommonDetectCalibrationApp
 {
 	DetectSquareGridFiducial<GrayF32> alg;
-	ConfigSquareGrid config;
+	ConfigSquareGrid configDet = new ConfigSquareGrid();
+	ConfigGridDimen configGrid;
 
 	public DetectCalibrationSquareGridApp(int numRows , int numColumns ,  double squareWidth, double spaceWidth,
 										  boolean forCalibration ,
 										  List<String> exampleInputs) {
 		super(exampleInputs);
-		config = new ConfigSquareGrid(numRows, numColumns, squareWidth,spaceWidth);
-		setUpGui(new DetectCalibrationPolygonPanel(numRows,numColumns,config.square,config.thresholding));
+		configGrid = new ConfigGridDimen(numRows, numColumns, squareWidth,spaceWidth);
+		setUpGui(new DetectCalibrationPolygonPanel(numRows,numColumns, configDet.square, configDet.thresholding));
 		declareDetector();
 	}
 
 	@Override
 	public void declareDetector() {
-		config.thresholding = ((DetectCalibrationPolygonPanel)controlPanel).polygonPanel.getThresholdPanel().createConfig();
-		config.square = ((DetectCalibrationPolygonPanel)controlPanel).polygonPanel.getConfigPolygon();
+		configDet.thresholding = ((DetectCalibrationPolygonPanel)controlPanel).polygonPanel.getThresholdPanel().createConfig();
+		configDet.square = ((DetectCalibrationPolygonPanel)controlPanel).polygonPanel.getConfigPolygon();
 
-		config.numRows = controlPanel.getGridRows();
-		config.numCols = controlPanel.getGridColumns();
+		configGrid.numRows = controlPanel.getGridRows();
+		configGrid.numCols = controlPanel.getGridColumns();
 
-		alg = FactoryFiducialCalibration.squareGrid(config).getAlgorithm();
+		alg = FactoryFiducialCalibration.squareGrid(configDet,configGrid).getAlgorithm();
 		reprocessImageOnly();
 	}
 

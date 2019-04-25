@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.CalibrateStereoPlanar;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.geo.PerspectiveOps;
@@ -220,8 +220,8 @@ public class CalibrateStereoPlanarGuiApp extends JPanel {
 
 	public static void main( String args[] ) {
 		DetectorFiducialCalibration detector =
-				FactoryFiducialCalibration.chessboard(new ConfigChessboard(7, 5, 30));
-//				FactoryCalibrationTarget.squareGrid(new ConfigSquareGrid(4, 3, 30, 30));
+				FactoryFiducialCalibration.chessboard2(null,new ConfigGridDimen(7, 5, 30));
+//				FactoryCalibrationTarget.squareGrid(null, new ConfigGridDimen(4, 3, 30, 30));
 
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
