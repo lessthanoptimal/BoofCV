@@ -46,7 +46,8 @@ public class ConfigChessboard2 implements Configuration {
 	public double cornerThreshold = 1.0;
 
 	/**
-	 * The minimum allowed size for the top most layer in the pyramid. size = min(width,height)
+	 * The minimum allowed size for the top most layer in the pyramid. size = min(width,height). To have
+	 * only one layer in the pyramid at the same resolution as the input set this to a value of &le; 0
 	 */
 	public int pyramidTopSize = 100;
 

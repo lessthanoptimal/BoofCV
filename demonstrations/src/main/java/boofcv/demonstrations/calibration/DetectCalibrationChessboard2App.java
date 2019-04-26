@@ -459,7 +459,7 @@ public class DetectCalibrationChessboard2App
 			comboView = combo(view,"Intensity","Image","Both","Binary");
 			spinnerCornerThreshold = spinner(cornerThreshold, 0, 100, 0.2);
 			spinnerRadius = spinner(radius, 1, 100, 1);
-			spinnerTop = spinner(pyramidTop, 50, 10000, 50);
+			spinnerTop = spinner(pyramidTop, 0, 10000, 50);
 			spinnerOrientationTol = spinner(orientationTol,0,3.0,0.05,1,3);
 			spinnerDirectionTol = spinner(directionTol,0,3.0,0.05,1,3);
 			spinnerAmbiguous = spinner(ambiguousTol,0,1.0,0.05,1,3);

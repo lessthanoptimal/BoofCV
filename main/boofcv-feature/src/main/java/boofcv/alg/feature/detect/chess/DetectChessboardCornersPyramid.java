@@ -36,11 +36,13 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectChessboardCornersPyramid {
-	// TODO have flag that prunes corners which haven't been detected at multiple levels
+	// TODO have flag that prunes corners which haven't been detected at multiple levels?
+	// TODO prefer corners selected at higher resolution when there's overap
 
 	// minimum number of pixels in the top most level in the pyramid
+	// If <= 0 then have a single layer at full resolution
 	int pyramidTopSize = 100;
-	// List of layers i nthe pyramid
+	// List of layers in the pyramid
 	List<GrayF32> pyramid = new ArrayList<>();
 
 	// Corner detector
@@ -170,12 +172,19 @@ public class DetectChessboardCornersPyramid {
 		} else {
 			pyramid.set(0,input);
 		}
+
+		// make sure the top most layer in the pyramid isn't too small
+		int pyramidTopSize = this.pyramidTopSize;
+		if( pyramidTopSize != 0 && pyramidTopSize < (1+2*detector.getKernelRadius())*5  ) {
+			pyramidTopSize = (1+2*detector.getKernelRadius())*5;
+		}
+
 		int levelIndex = 1;
 		int divisor = 2;
 		while( true ) {
 			int width = input.width/divisor;
 			int height = input.height/divisor;
-			if( width < pyramidTopSize || height < pyramidTopSize)
+			if( pyramidTopSize == 0 || width < pyramidTopSize || height < pyramidTopSize)
 				break;
 			GrayF32 level;
 			if( pyramid.size() <= levelIndex ) {
