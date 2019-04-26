@@ -38,8 +38,6 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,21 +69,6 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 
 		add(controlPanel,BorderLayout.WEST);
 		add(gui,BorderLayout.CENTER);
-
-		gui.getImagePanel().addMouseWheelListener(new MouseAdapter() {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-
-				double curr = controlPanel.zoom;
-
-				if( e.getWheelRotation() > 0 )
-					curr *= 1.1;
-				else
-					curr /= 1.1;
-
-				controlPanel.setZoom(curr);
-			}
-		});
 	}
 
 	@Override

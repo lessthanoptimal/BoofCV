@@ -35,7 +35,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -86,21 +85,9 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 
 		createDetector(true);
 
-		guiImage.getImagePanel().addMouseWheelListener(new MouseAdapter() {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-
-				double curr = DetectBlackShapeAppBase.this.controls.zoom;
-
-				if( e.getWheelRotation() > 0 )
-					curr *= 1.1;
-				else
-					curr /= 1.1;
-
-				DetectBlackShapeAppBase.this.controls.setZoom(curr);
-			}
+		guiImage.setListener(scale->{
+			DetectBlackShapeAppBase.this.controls.setZoom(scale);
 		});
-
 
 		guiImage.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override

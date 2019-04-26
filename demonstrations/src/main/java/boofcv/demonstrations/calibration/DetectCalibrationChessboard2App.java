@@ -122,19 +122,6 @@ public class DetectCalibrationChessboard2App
 			}
 		});
 
-		imagePanel.addMouseWheelListener(new MouseAdapter() {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-				double curr =controlPanel.zoom;
-
-				if( e.getWheelRotation() > 0 )
-					curr *= 1.1;
-				else
-					curr /= 1.1;
-				controlPanel.setZoom(curr);
-			}
-		});
-
 		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -382,6 +369,12 @@ public class DetectCalibrationChessboard2App
 					}
 				}
 			}
+		}
+
+		@Override
+		public synchronized void setScale(double scale) {
+			controlPanel.setZoom(scale);
+			super.setScale(controlPanel.zoom);
 		}
 
 		private void renderGraph(Graphics2D g2, Line2D.Double line, FeatureGraph2D graph) {

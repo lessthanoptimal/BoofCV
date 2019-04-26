@@ -45,8 +45,6 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
@@ -85,19 +83,6 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		this.derivClass = GImageDerivativeOps.getDerivativeType(imageClass);
 
 		imagePanel.setPreferredSize(new Dimension(800,800));
-		imagePanel.addMouseWheelListener(new MouseAdapter() {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-
-				double curr = DemoDetectPointFeaturesApp.this.controls.zoom;
-
-				if( e.getWheelRotation() > 0 )
-					curr *= 1.1;
-				else
-					curr /= 1.1;
-				controls.setZoom(curr);
-			}
-		});
 
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, imagePanel);
@@ -181,6 +166,12 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 					}
 				}
 			}
+		}
+
+		@Override
+		public synchronized void setScale(double scale) {
+			controls.setZoom(scale);
+			super.setScale(controls.zoom);
 		}
 	}
 

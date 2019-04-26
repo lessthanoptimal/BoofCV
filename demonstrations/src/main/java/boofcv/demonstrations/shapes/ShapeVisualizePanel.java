@@ -37,5 +37,18 @@ public class ShapeVisualizePanel extends ImageZoomPanel {
 				}
 			}
 		});
+
+		panel.addMouseWheelListener(e->{
+			double curr = scale;
+
+			if( e.getWheelRotation() > 0 )
+				curr *= 1.1;
+			else if( e.getWheelRotation() < 0 )
+				curr /= 1.1;
+			else
+				return;
+
+			setScale(curr);
+		});
 	}
 }

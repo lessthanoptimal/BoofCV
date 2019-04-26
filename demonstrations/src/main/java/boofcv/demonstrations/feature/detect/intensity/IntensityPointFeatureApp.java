@@ -49,7 +49,10 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
@@ -116,20 +119,6 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 				if( e.getKeyCode()==KeyEvent.VK_SPACE) {
 					streamPaused = !streamPaused;
 				}
-			}
-		});
-
-		imagePanel.addMouseWheelListener(new MouseAdapter() {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-
-				double curr =controlPanel.zoom;
-
-				if( e.getWheelRotation() > 0 )
-					curr *= 1.1;
-				else
-					curr /= 1.1;
-				controlPanel.setZoom(curr);
 			}
 		});
 	}
@@ -249,6 +238,12 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 					}
 				}
 			}
+		}
+
+		@Override
+		public synchronized void setScale(double scale) {
+			controlPanel.setZoom(scale);
+			super.setScale(controlPanel.zoom);
 		}
 	}
 

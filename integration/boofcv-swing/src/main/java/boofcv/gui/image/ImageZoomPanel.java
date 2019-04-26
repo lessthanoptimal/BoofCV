@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,6 +42,8 @@ public class ImageZoomPanel extends JScrollPane {
 
 	boolean checkEventDispatch = true;
 
+	protected ImageZoomListener listener;
+
 	public ImageZoomPanel(final BufferedImage img ) {
 		this.img = img;
 		setScale(1);
@@ -77,10 +79,21 @@ public class ImageZoomPanel extends JScrollPane {
 		getViewport().setView(panel);
 
 		centerView(centerX, centerY);
+
+		{
+			ImageZoomListener listener = this.listener;
+			if( listener != null ) {
+				listener.handleScalehange(this.scale);
+			}
+		}
 	}
 
 	public synchronized void setScaleAndCenter( double scale,  double cx , double cy) {
-		this.scale = scale;
+		boolean scaleChanged = false;
+		if( scale != this.scale ) {
+			scaleChanged = true;
+			this.scale = scale;
+		}
 		if( img != null ) {
 			int w = (int)Math.ceil(img.getWidth()*scale);
 			int h = (int)Math.ceil(img.getHeight()*scale);
@@ -88,6 +101,13 @@ public class ImageZoomPanel extends JScrollPane {
 		}
 		getViewport().setView(panel);
 		centerView(cx,cy);
+
+		if( scaleChanged ) {
+			ImageZoomListener listener = this.listener;
+			if( listener != null ) {
+				listener.handleScalehange(this.scale);
+			}
+		}
 	}
 
 	public synchronized void centerView( double cx , double cy ) {
@@ -218,5 +238,17 @@ public class ImageZoomPanel extends JScrollPane {
 
 	public ImagePanel getImagePanel() {
 		return panel;
+	}
+
+	public ImageZoomListener getListener() {
+		return listener;
+	}
+
+	public void setListener(ImageZoomListener listener) {
+		this.listener = listener;
+	}
+
+	public interface ImageZoomListener {
+		void handleScalehange( double scale );
 	}
 }

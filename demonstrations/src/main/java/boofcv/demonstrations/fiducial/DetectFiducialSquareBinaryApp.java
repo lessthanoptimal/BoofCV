@@ -51,7 +51,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -100,21 +99,6 @@ public class DetectFiducialSquareBinaryApp
 		add(BorderLayout.CENTER, guiImage);
 
 		createDetector(true);
-
-		guiImage.getImagePanel().addMouseWheelListener(new MouseAdapter() {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent e) {
-
-				double curr = controls.zoom;
-
-				if( e.getWheelRotation() > 0 )
-					curr *= 1.1;
-				else
-					curr /= 1.1;
-
-				controls.setZoom(curr);
-			}
-		});
 
 		guiImage.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
@@ -266,6 +250,12 @@ public class DetectFiducialSquareBinaryApp
 					}
 				}
 			}
+		}
+
+		@Override
+		public synchronized void setScale(double scale) {
+			controls.setZoom(scale);
+			super.setScale(controls.zoom);
 		}
 	}
 
