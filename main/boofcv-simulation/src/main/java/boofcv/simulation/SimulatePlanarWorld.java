@@ -27,6 +27,7 @@ import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
@@ -66,7 +67,6 @@ public class SimulatePlanarWorld {
 
 	Point2Transform3_F64 pixelTo3;
 	Point3Transform2_F64 sphereToPixel;
-	InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
 
 	Se3_F64 worldToCamera = new Se3_F64();
 
@@ -77,6 +77,8 @@ public class SimulatePlanarWorld {
 
 	// work space
 	Point2D_F64 pixel = new Point2D_F64();
+	LineParametric3D_F64 ray = new LineParametric3D_F64();
+	RenderPixel renderPixel = new RenderPixel();
 
 	public void setCamera( CameraUniversalOmni model ) {
 		LensDistortionWideFOV factory = new LensDistortionUniversalOmni(model);
@@ -174,76 +176,120 @@ public class SimulatePlanarWorld {
 	 */
 	public GrayF32 render()
 	{
-		LineParametric3D_F64 ray = new LineParametric3D_F64();
-
 		ImageMiscOps.fill(output,background);
 		ImageMiscOps.fill(depthMap,Float.MAX_VALUE);
 
 		for (int i = 0; i < scene.size(); i++) {
 			SurfaceRect r = scene.get(i);
 			r.rectInCamera();
+		}
 
-			if( !r.visible )
-				continue;
-
-			for (int y = r.pixelRect.y0; y < r.pixelRect.y1; y++) {
-				if( y < 0 || y >= output.height )
-					continue;
-				for (int x = r.pixelRect.x0; x < r.pixelRect.x1; x++) {
-					if( x < 0 || x >= output.width )
-						continue;
-
-					if( Float.isNaN(depthMap.unsafe_get(x,y)))
-						continue;
-					int index = (y*output.width + x)*3;
-					ray.slope.x = pointing[index  ];
-					ray.slope.y = pointing[index+1];
-					ray.slope.z = pointing[index+2];
-					renderPixel(ray,r,x,y);
-				}
-			}
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			renderMultiThread();
+		} else {
+			renderSingleThread();
 		}
 
 		return getOutput();
 	}
 
-	Vector3D_F64 _u = new Vector3D_F64();
-	Vector3D_F64 _v =new Vector3D_F64();
-	Vector3D_F64 _n = new Vector3D_F64();
-	Vector3D_F64 _w0 = new Vector3D_F64();
+	private void renderSingleThread() {
+		for (int y = 0; y < output.height; y++) {
+			for (int x = 0; x < output.width; x++) {
+				if( Float.isNaN(depthMap.unsafe_get(x,y)))
+					continue;
 
-	void renderPixel( LineParametric3D_F64 ray , SurfaceRect r, int x , int y ) {
-		// See if it intersects at a unique point and is positive in value
-		if( 1 == Intersection3D_F64.intersectConvex(r.rect3D,ray,p3,_u,_v,_n,_w0)) {
-
-			// only care about intersections in front of the camera and closer that what was previously seen
-			double depth = p3.z;
-			if( depth <= 0 || depth >= depthMap.unsafe_get(x,y) )
-				return;
-
-			// convert the point into rect coordinates
-			SePointOps_F64.transformReverse(r.rectToCamera, p3, p3);
-
-			if (Math.abs(p3.z) > 0.001)
-				throw new RuntimeException("BUG!");
-
-			// now into surface pixels.
-			// but we have some weirdness due to image coordinate being +y down but normal coordinates +y up
-			p3.x += r.width3D / 2;
-			p3.y += r.height3D / 2;
-
-			// pixel coordinate on the surface
-			double surfaceX = p3.x * r.texture.width / r.width3D;
-			double surfaceY = p3.y * r.texture.height / r.height3D;
-
-			if( surfaceX < r.texture.width && surfaceY < r.texture.height ) {
-				interp.setImage(r.texture);
-				float value = interp.get((float) surfaceX, (float) surfaceY);
-				output.unsafe_set(x, y, value);
-				depthMap.unsafe_set(x,y,(float)depth);
+				for (int i = 0; i < scene.size(); i++) {
+					SurfaceRect r = scene.get(i);
+					if( !r.visible )
+						continue;
+					if( x >= r.pixelRect.x0 && x < r.pixelRect.x1 && y >= r.pixelRect.y0 && y < r.pixelRect.y1 ) {
+						renderPixel.setTexture(r.texture);
+						int index = (y*output.width + x)*3;
+						ray.slope.x = pointing[index  ];
+						ray.slope.y = pointing[index+1];
+						ray.slope.z = pointing[index+2];
+						renderPixel.render(ray,r,x,y);
+					}
+				}
 			}
 		}
 	}
+
+	private void renderMultiThread() {
+		BoofConcurrency.loopBlocks(0,output.height,(y0,y1)->{
+			RenderPixel renderPixel = new RenderPixel();
+			LineParametric3D_F64 ray = new LineParametric3D_F64();
+
+			for (int y = y0; y < y1; y++) {
+				for (int x = 0; x < output.width; x++) {
+					if( Float.isNaN(depthMap.unsafe_get(x,y)))
+						continue;
+
+					for (int i = 0; i < scene.size(); i++) {
+						SurfaceRect r = scene.get(i);
+						if( !r.visible )
+							continue;
+						if( x >= r.pixelRect.x0 && x < r.pixelRect.x1 && y >= r.pixelRect.y0 && y < r.pixelRect.y1 ) {
+							renderPixel.setTexture(r.texture);
+							int index = (y*output.width + x)*3;
+							ray.slope.x = pointing[index  ];
+							ray.slope.y = pointing[index+1];
+							ray.slope.z = pointing[index+2];
+							renderPixel.render(ray,r,x,y);
+						}
+					}
+				}
+			}
+		});
+
+	}
+
+	private class RenderPixel {
+		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
+		Vector3D_F64 _u = new Vector3D_F64();
+		Vector3D_F64 _v =new Vector3D_F64();
+		Vector3D_F64 _n = new Vector3D_F64();
+		Vector3D_F64 _w0 = new Vector3D_F64();
+		Point3D_F64 p3 = new Point3D_F64();
+
+		void setTexture( GrayF32 texture ) {
+			interp.setImage(texture);
+		}
+
+		void render( LineParametric3D_F64 ray , SurfaceRect r, int x , int y ) {
+			// See if it intersects at a unique point and is positive in value
+			if( 1 == Intersection3D_F64.intersectConvex(r.rect3D,ray,p3,_u,_v,_n,_w0)) {
+
+				// only care about intersections in front of the camera and closer that what was previously seen
+				double depth = p3.z;
+				if( depth <= 0 || depth >= depthMap.unsafe_get(x,y) )
+					return;
+
+				// convert the point into rect coordinates
+				SePointOps_F64.transformReverse(r.rectToCamera, p3, p3);
+
+				if (Math.abs(p3.z) > 0.001)
+					throw new RuntimeException("BUG!");
+
+				// now into surface pixels.
+				// but we have some weirdness due to image coordinate being +y down but normal coordinates +y up
+				p3.x += r.width3D / 2;
+				p3.y += r.height3D / 2;
+
+				// pixel coordinate on the surface
+				double surfaceX = p3.x * r.texture.width / r.width3D;
+				double surfaceY = p3.y * r.texture.height / r.height3D;
+
+				if( surfaceX < r.texture.width && surfaceY < r.texture.height ) {
+					float value = interp.get((float) surfaceX, (float) surfaceY);
+					output.unsafe_set(x, y, value);
+					depthMap.unsafe_set(x,y,(float)depth);
+				}
+			}
+		}
+	}
+
 
 	public SurfaceRect getImageRect(int which ) {
 		return scene.get(which);
