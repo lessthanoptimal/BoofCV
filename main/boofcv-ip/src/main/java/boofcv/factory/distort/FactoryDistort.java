@@ -21,13 +21,14 @@ package boofcv.factory.distort;
 import boofcv.abst.distort.ConfigDeformPointMLS;
 import boofcv.abst.distort.PointDeformKeyPoints;
 import boofcv.abst.distort.PointDeform_MLS;
-import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.impl.*;
+import boofcv.alg.distort.*;
+import boofcv.alg.distort.impl.ImplImageDistort_PL;
 import boofcv.alg.distort.mls.ImageDeformPointMLS_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolationType;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.*;
@@ -94,30 +95,29 @@ public class FactoryDistort {
 	public static <Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 	ImageDistort<Input, Output> distortSB(boolean cached, InterpolatePixelS<Input> interp, Class<Output> outputType)
 	{
-		if( cached ) {
-			if( outputType == GrayF32.class ) {
-				return (ImageDistort<Input,Output>)new ImplImageDistortCache_F32(interp);
-			} else if( GrayS32.class.isAssignableFrom(outputType) ) {
-				return (ImageDistort<Input,Output>)new ImplImageDistortCache_S32(interp);
-			} else if( GrayI16.class.isAssignableFrom(outputType) ) {
-				return (ImageDistort<Input,Output>)new ImplImageDistortCache_I16(interp);
-			} else if( GrayI8.class.isAssignableFrom(outputType) ) {
-				return (ImageDistort<Input,Output>)new ImplImageDistortCache_I8(interp);
-			} else {
-				throw new IllegalArgumentException("Output type not supported: "+outputType.getSimpleName());
-			}
+		AssignPixelValue_SB<Output> assigner;
+		if( outputType == GrayF32.class ) {
+			assigner = (AssignPixelValue_SB)new AssignPixelValue_SB.F32();
+		} else if( GrayS32.class.isAssignableFrom(outputType) ) {
+			assigner = (AssignPixelValue_SB)new AssignPixelValue_SB.S32();
+		} else if( GrayI16.class.isAssignableFrom(outputType) ) {
+			assigner = (AssignPixelValue_SB)new AssignPixelValue_SB.I16();
+		} else if( GrayI8.class.isAssignableFrom(outputType) ) {
+			assigner = (AssignPixelValue_SB)new AssignPixelValue_SB.I8();
 		} else {
-			if (outputType == GrayF32.class) {
-				return (ImageDistort<Input, Output>) new ImplImageDistort_F32(interp);
-			} else if (GrayS32.class.isAssignableFrom(outputType)) {
-				return (ImageDistort<Input, Output>) new ImplImageDistort_S32(interp);
-			} else if (GrayI16.class.isAssignableFrom(outputType)) {
-				return (ImageDistort<Input, Output>) new ImplImageDistort_I16(interp);
-			} else if (GrayI8.class.isAssignableFrom(outputType)) {
-				return (ImageDistort<Input, Output>) new ImplImageDistort_I8(interp);
+			throw new IllegalArgumentException("Output type not supported: "+outputType.getSimpleName());
+		}
+
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			if( cached ) {
+				return new ImageDistortCache_SB_MT<>(assigner,interp);
 			} else {
-				throw new IllegalArgumentException("Output type not supported: " + outputType.getSimpleName());
+				return new ImageDistortBasic_SB_MT<>(assigner,interp);
 			}
+		} else if( cached ) {
+			return new ImageDistortCache_SB<>(assigner,interp);
+		} else {
+			return new ImageDistortBasic_SB<>(assigner,interp);
 		}
 	}
 
@@ -144,15 +144,24 @@ public class FactoryDistort {
 		if( cached ) {
 			throw new IllegalArgumentException("Cached not supported yet");
 		} else {
+			AssignPixelValue_MB<Output> assigner;
 			switch( outputType.getDataType() ) {
-				case F32:
-					return (ImageDistort<Input, Output>) new ImplImageDistort_IL_F32((InterpolatePixelMB)interp);
-
+				case F32: assigner = (AssignPixelValue_MB)new AssignPixelValue_MB.F32(); break;
+				case S32: assigner = (AssignPixelValue_MB)new AssignPixelValue_MB.S32(); break;
+				case U16:
+				case S16:
+				case I16: assigner = (AssignPixelValue_MB)new AssignPixelValue_MB.I16(); break;
 				case U8:
-					return (ImageDistort<Input, Output>) new ImplImageDistort_IL_U8((InterpolatePixelMB)interp);
-
+				case S8:
+				case I8: assigner = (AssignPixelValue_MB)new AssignPixelValue_MB.I8(); break;
 				default:
-					throw new IllegalArgumentException("Not supported yet");
+					throw new RuntimeException("Not yet supported "+outputType);
+			}
+
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				return new ImageDistortBasic_IL_MT<>(assigner,interp);
+			} else {
+				return new ImageDistortBasic_IL<>(assigner,interp);
 			}
 		}
 	}

@@ -127,8 +127,10 @@ public class GenerateNearestNeighborPixel_SB extends CodeGeneratorBase {
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic InterpolatePixelS<"+image.getSingleBandName()+"> newInstance() {\n" +
-				"\t\treturn new "+className+"();\n" +
+				"\tpublic InterpolatePixelS<"+image.getSingleBandName()+"> copy() {\n" +
+				"\t\t"+className+" out = new "+className+"();\n" +
+				"\t\tout.setBorder(border);\n" +
+				"\t\treturn out;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +

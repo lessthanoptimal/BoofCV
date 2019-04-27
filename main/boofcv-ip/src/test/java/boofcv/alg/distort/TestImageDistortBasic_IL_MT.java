@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,27 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.impl;
+package boofcv.alg.distort;
 
-import boofcv.alg.distort.ImageDistortCache_SB;
-import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.ImageGray;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Implementation of {@link ImageDistortCache_SB} for {@link GrayF32}.
- * 
  * @author Peter Abeles
  */
-public class ImplImageDistortCache_F32<Input extends ImageGray<Input>>
-		extends ImageDistortCache_SB<Input,GrayF32> {
-	public ImplImageDistortCache_F32(InterpolatePixelS<Input> interp)
-	{
-		super(interp);
-	}
-
-	@Override
-	protected void assign(int indexDst, float value) {
-		dstImg.data[indexDst] = value;
+public class TestImageDistortBasic_IL_MT {
+	@Test
+	void stuff() {
+		fail("Implement");
 	}
 }

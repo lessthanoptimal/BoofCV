@@ -20,9 +20,9 @@ package boofcv.alg.interpolate.impl;
 
 import boofcv.alg.interpolate.BilinearPixelMB;
 import boofcv.alg.interpolate.InterpolatePixelMB;
+import boofcv.struct.border.ImageBorder_IL_S32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedU16;
-import boofcv.struct.border.ImageBorder_IL_S32;
 
 
 /**
@@ -126,7 +126,9 @@ public class ImplBilinearPixel_IL_U16 extends BilinearPixelMB<InterleavedU16> {
 
 	@Override
 	public InterpolatePixelMB<InterleavedU16> copy() {
-		return new ImplBilinearPixel_IL_U16(temp0.length);
+		ImplBilinearPixel_IL_U16 out = new ImplBilinearPixel_IL_U16(temp0.length);
+		out.setBorder(border);
+		return out;
 	}
 	@Override
 	public ImageType<InterleavedU16> getImageType() {

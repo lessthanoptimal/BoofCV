@@ -112,4 +112,13 @@ public class UniOmniPtoS_F32 implements Point2Transform3_F32 {
 		out.y = v*t;
 		out.z = t - xi;
 	}
+
+	@Override
+	public Point2Transform3_F32 copy() {
+		UniOmniPtoS_F32 c = new UniOmniPtoS_F32();
+		c.distortion = new RadialTangential_F32(this.distortion);
+		c.mirrorOffset = this.mirrorOffset;
+		c.K_inv.set(this.K_inv);
+		return c;
+	}
 }

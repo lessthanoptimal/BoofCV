@@ -18,7 +18,9 @@
 
 package boofcv.alg.distort.impl;
 
+import boofcv.alg.distort.AssignPixelValue_MB;
 import boofcv.alg.distort.ImageDistort;
+import boofcv.alg.distort.ImageDistortBasic_IL;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelMB;
 import boofcv.struct.distort.PixelTransform;
@@ -38,7 +40,8 @@ public class TestImplImageDistort_IL_F32 extends GeneralImageDistortTests<Interl
 	@Override
 	public ImageDistort<InterleavedF32, InterleavedF32>
 	createDistort(PixelTransform<Point2D_F32> dstToSrc, InterpolatePixel<InterleavedF32> interp) {
-		ImageDistort<InterleavedF32,InterleavedF32> ret = new ImplImageDistort_IL_F32((InterpolatePixelMB)interp);
+		ImageDistort<InterleavedF32,InterleavedF32> ret =
+				new ImageDistortBasic_IL<>(new AssignPixelValue_MB.F32(),(InterpolatePixelMB)interp);
 		ret.setModel(dstToSrc);
 		return ret;
 	}

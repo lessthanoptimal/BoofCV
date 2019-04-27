@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,5 +43,10 @@ public class NarrowPixelToSphere_F64 implements Point2Transform3_F64 {
 
 		out.set(projected.x,projected.y,1);
 		out.scale( 1.0/out.norm() );
+	}
+
+	@Override
+	public Point2Transform3_F64 copy() {
+		return new NarrowPixelToSphere_F64(this.pixelToNorm.copy());
 	}
 }

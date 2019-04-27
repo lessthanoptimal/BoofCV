@@ -21,8 +21,8 @@ package boofcv.alg.interpolate.impl;
 import boofcv.alg.interpolate.BilinearPixelS;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.border.ImageBorder_S32;
-import boofcv.struct.image.ImageType;
 import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.ImageType;
 
 /**
  * <p>
@@ -91,7 +91,9 @@ public class ImplBilinearPixel_U16 extends BilinearPixelS<GrayU16> {
 
 	@Override
 	public InterpolatePixelS<GrayU16> copy() {
-		return new ImplBilinearPixel_U16();
+		ImplBilinearPixel_U16 out = new ImplBilinearPixel_U16();
+		out.setBorder(border);
+		return out;
 	}
 
 	@Override

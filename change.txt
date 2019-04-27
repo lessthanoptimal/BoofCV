@@ -13,6 +13,7 @@ Version : 0.34
   * Modified edge so that outside pixels can be treated as 0 or 1
   * Block threshold can now handle images smaller than the block size
   * Global threshold algorithm can now have the threshold scaled
+- Concurrent code for ImageDistort
 - Demonstrations
   * modernize mosaic and stabilize
 - Examples

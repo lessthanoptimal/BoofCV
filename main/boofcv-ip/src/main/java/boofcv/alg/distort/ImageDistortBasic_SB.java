@@ -29,9 +29,10 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output extends ImageGray<Output>>
+public class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output extends ImageGray<Output>>
 		extends ImageDistortBasic<Input,Output,InterpolatePixelS<Input>> {
 
+	protected AssignPixelValue_SB<Output> assigner;
 	Point2D_F32 distorted = new Point2D_F32();
 
 	/**
@@ -39,8 +40,17 @@ public abstract class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output
 	 *
 	 * @param interp Interpolation algorithm
 	 */
-	public ImageDistortBasic_SB(InterpolatePixelS<Input> interp) {
+	public ImageDistortBasic_SB(AssignPixelValue_SB<Output> assigner,
+								InterpolatePixelS<Input> interp) {
 		super(interp);
+
+		this.assigner = assigner;
+	}
+
+	@Override
+	protected void init(Input srcImg, Output dstImg) {
+		super.init(srcImg, dstImg);
+		assigner.setImage(dstImg);
 	}
 
 	@Override
@@ -52,7 +62,7 @@ public abstract class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output
 			int indexDst = dstImg.startIndex + dstImg.stride*y + x0;
 			for( int x = x0; x < x1; x++ , indexDst++ ) {
 				dstToSrc.compute(x,y,distorted);
-				assign(indexDst,interp.get(distorted.x,distorted.y));
+				assigner.assign(indexDst,interp.get(distorted.x,distorted.y));
 			}
 		}
 	}
@@ -70,7 +80,7 @@ public abstract class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output
 
 			for( int x = x0; x < x1; x++ , indexDst++, indexMsk++ ) {
 				dstToSrc.compute(x,y,distorted);
-				assign(indexDst,interp.get(distorted.x,distorted.y));
+				assigner.assign(indexDst,interp.get(distorted.x,distorted.y));
 				if( distorted.x >= 0 && distorted.x <= maxWidth &&
 						distorted.y >= 0 && distorted.y <= maxHeight ) {
 					mask.data[indexMsk] = 1;
@@ -94,7 +104,7 @@ public abstract class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output
 
 				if( distorted.x >= 0 && distorted.x <= maxWidth &&
 						distorted.y >= 0 && distorted.y <= maxHeight ) {
-					assign(indexDst,interp.get(distorted.x, distorted.y));
+					assigner.assign(indexDst,interp.get(distorted.x, distorted.y));
 				}
 			}
 		}
@@ -115,7 +125,7 @@ public abstract class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output
 
 				if( distorted.x >= 0 && distorted.x <= maxWidth &&
 						distorted.y >= 0 && distorted.y <= maxHeight ) {
-					assign(indexDst,interp.get(distorted.x, distorted.y));
+					assigner.assign(indexDst,interp.get(distorted.x, distorted.y));
 					mask.data[indexMsk] = 1;
 				} else {
 					mask.data[indexMsk] = 0;
@@ -123,6 +133,4 @@ public abstract class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output
 			}
 		}
 	}
-
-	protected abstract void assign( int indexDst , float value );
 }

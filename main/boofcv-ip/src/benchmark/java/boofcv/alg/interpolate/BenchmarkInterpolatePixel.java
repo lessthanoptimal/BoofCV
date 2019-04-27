@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,109 +18,71 @@
 
 package boofcv.alg.interpolate;
 
-import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
-import boofcv.alg.interpolate.impl.ImplInterpolatePixelConvolution_F32;
-import boofcv.alg.interpolate.impl.ImplPolynomialPixel_F32;
-import boofcv.alg.interpolate.impl.NearestNeighborPixel_F32;
-import boofcv.alg.interpolate.kernel.BicubicKernel_F32;
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.misc.PerformerBase;
-import boofcv.misc.ProfileOperation;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
+import org.openjdk.jmh.annotations.*;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Benchmark for interpolating on a per-pixel basis
  *
  * @author Peter Abeles
  */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value=1)
 public class BenchmarkInterpolatePixel {
-	static int imgWidth = 640;
-	static int imgHeight = 480;
-	static long TEST_TIME = 1000;
+	@Param({"true","false"})
+	public boolean concurrent;
 
-	static GrayF32 imgFloat32;
-	static GrayU8 imgInt8;
+	//	@Param({"100", "500", "1000", "5000", "10000"})
+	@Param({"5000"})
+	public int size;
+
+	GrayF32 inputF32 = new GrayF32(size, size);
+	GrayF32 outputF32 = new GrayF32(size, size);
 
 	// defines the region its interpolation
 	static float start = 10.1f;
 	static float end = 310.1f;
 	static float step = 1f;
 
-	public static class Bilinear_Safe_F32 extends PerformerBase {
-		ImplBilinearPixel_F32 alg = new ImplBilinearPixel_F32(imgFloat32);
+	InterpolatePixelS<GrayF32> bilinear_sb;
+	InterpolatePixelS<GrayF32> nearest_sb;
 
-		@Override
-		public void process() {
-			for (float x = start; x <= end; x += step)
-				for (float y = start; y <= end; y += step)
-					alg.get(x, y);
-		}
-	}
-
-	public static class Bilinear_UnSafe_F32 extends PerformerBase {
-		ImplBilinearPixel_F32 alg = new ImplBilinearPixel_F32(imgFloat32);
-
-		@Override
-		public void process() {
-			for (float x = start; x <= end; x += step)
-				for (float y = start; y <= end; y += step)
-					alg.get_fast(x, y);
-		}
-	}
-
-	public static class NearestNeighbor_Safe_F32 extends PerformerBase {
-		NearestNeighborPixel_F32 alg = new NearestNeighborPixel_F32(imgFloat32);
-
-		@Override
-		public void process() {
-			for (float x = start; x <= end; x += step)
-				for (float y = start; y <= end; y += step)
-					alg.get(x, y);
-		}
-	}
-
-	public static class BilinearConvolution_Safe_F32 extends PerformerBase {
-		ImplInterpolatePixelConvolution_F32 alg = new ImplInterpolatePixelConvolution_F32(new BicubicKernel_F32(-0.5f),0,255);
-
-		@Override
-		public void process() {
-			alg.setImage(imgFloat32);
-			for (float x = start; x <= end; x += step)
-				for (float y = start; y <= end; y += step)
-					alg.get(x, y);
-		}
-	}
-
-	public static class Polynomial_Safe_F32 extends PerformerBase {
-		ImplPolynomialPixel_F32 alg = new ImplPolynomialPixel_F32(5,0,255);
-
-		@Override
-		public void process() {
-			alg.setImage(imgFloat32);
-			for (float x = start; x <= end; x += step)
-				for (float y = start; y <= end; y += step)
-					alg.get(x, y);
-		}
-	}
-
-	public static void main(String args[]) {
-		imgInt8 = new GrayU8(imgWidth, imgHeight);
-		imgFloat32 = new GrayF32(imgWidth, imgHeight);
-
+	@Setup
+	public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
 		Random rand = new Random(234);
-		ImageMiscOps.fillUniform(imgInt8, rand, 0, 100);
-		ImageMiscOps.fillUniform(imgFloat32, rand, 0, 200);
 
-		System.out.println("=========  Profile Image Size " + imgWidth + " x " + imgHeight + " ==========");
-		System.out.println();
+		inputF32.reshape(size,size);
+		outputF32.reshape(size,size);
 
-		ProfileOperation.printOpsPerSec(new Bilinear_Safe_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Bilinear_UnSafe_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new NearestNeighbor_Safe_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new BilinearConvolution_Safe_F32(), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new Polynomial_Safe_F32(), TEST_TIME);
+		GImageMiscOps.fillUniform(inputF32,rand,0,200);
+
+		bilinear_sb = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
+		nearest_sb = FactoryInterpolation.nearestNeighborPixelS(GrayF32.class);
+	}
+
+	@Benchmark
+	public void bilinear_F32() {
+		for (float x = start; x <= end; x += step)
+			for (float y = start; y <= end; y += step)
+				bilinear_sb.get(x, y);
+	}
+
+	@Benchmark
+	public void nn_F32() {
+		for (float x = start; x <= end; x += step)
+			for (float y = start; y <= end; y += step)
+				nearest_sb.get(x, y);
 	}
 }

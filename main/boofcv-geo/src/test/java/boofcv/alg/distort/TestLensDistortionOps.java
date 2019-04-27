@@ -18,7 +18,6 @@
 
 package boofcv.alg.distort;
 
-import boofcv.alg.distort.impl.ImplImageDistortCache_I8;
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_U8;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
@@ -32,14 +31,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestLensDistortionOps {
+class TestLensDistortionOps {
 
 	/**
 	 * This is a bit hard to test accurately. That would require computing distorted image and seeing everything lines
 	 * up properly. For now we just check tos ee if things blow up.
 	 */
 	@Test
-	public void changeCameraModel() {
+	void changeCameraModel() {
 		CameraPinholeBrown original = new CameraPinholeBrown(200,200,0,200,200,400,400);
 		CameraPinhole desired = new CameraPinholeBrown(300,300,0,200,200,400,400);
 		CameraPinhole modified = new CameraPinhole();
@@ -53,9 +52,9 @@ public class TestLensDistortionOps {
 
 				// do a few more tests to see of dubious value. if the underlying implementation changes
 				// this test will need to be updated
-				assertTrue(alg instanceof ImplImageDistortCache_I8);
-				ImplImageDistortCache_I8 _alg = (ImplImageDistortCache_I8)alg;
-				assertTrue(_alg.getInterp() instanceof ImplBilinearPixel_U8);
+				assertTrue(alg instanceof ImageDistortCache_SB);
+				ImageDistortCache_SB _alg = (ImageDistortCache_SB)alg;
+				assertTrue(_alg.interp instanceof ImplBilinearPixel_U8);
 			}
 		}
 	}

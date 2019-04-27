@@ -38,4 +38,9 @@ public class SphereToNarrowPixel_F32 implements Point3Transform2_F32 {
 		// ignore the whole z <= 0 issue with it being behind the camera. No way to tell it that it failed
 		projToPixel.compute(x/z,y/z, out);
 	}
+
+	@Override
+	public Point3Transform2_F32 copy() {
+		return new SphereToNarrowPixel_F32(projToPixel.copy());
+	}
 }

@@ -144,7 +144,9 @@ public class ImplPolynomialPixel_I<T extends GrayI<T>> extends PolynomialPixel<T
 
 	@Override
 	public InterpolatePixelS<T> copy() {
-		return new ImplPolynomialPixel_I<T>(M,min,max);
+		ImplPolynomialPixel_I out = new ImplPolynomialPixel_I(M,min,max);
+		out.setBorder(border);
+		return  out;
 	}
 
 	@Override

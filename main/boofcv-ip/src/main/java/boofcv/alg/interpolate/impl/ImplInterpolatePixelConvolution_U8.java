@@ -209,7 +209,9 @@ public class ImplInterpolatePixelConvolution_U8 implements InterpolatePixelS<Gra
 	}
 	@Override
 	public InterpolatePixelS<GrayU8> copy() {
-		return new ImplInterpolatePixelConvolution_U8(kernel,min,max);
+		ImplInterpolatePixelConvolution_U8 out = new ImplInterpolatePixelConvolution_U8(kernel,min,max);
+		out.setBorder(border);
+		return out;
 	}
 
 	@Override

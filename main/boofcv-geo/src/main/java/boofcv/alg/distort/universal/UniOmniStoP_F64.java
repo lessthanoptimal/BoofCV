@@ -90,4 +90,17 @@ public class UniOmniStoP_F64 implements Point3Transform2_F64 {
 		out.x = fx*dx + skew*dy + cx;
 		out.y = fy*dy + cy;
 	}
+
+	@Override
+	public Point3Transform2_F64 copy() {
+		UniOmniStoP_F64 c = new UniOmniStoP_F64();
+		c.distortion = new RadialTangential_F64(this.distortion);
+		c.mirrorOffset = this.mirrorOffset;
+		c.cx = this.cx;
+		c.cy = this.cy;
+		c.fx = this.fx;
+		c.fy = this.fy;
+		c.skew = this.skew;
+		return c;
+	}
 }

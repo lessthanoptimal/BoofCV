@@ -73,7 +73,9 @@ public class NearestNeighborPixel_S16 extends NearestNeighborPixelS<GrayS16> {
 
 	@Override
 	public InterpolatePixelS<GrayS16> copy() {
-		return new NearestNeighborPixel_S16();
+		NearestNeighborPixel_S16 out = new NearestNeighborPixel_S16();
+		out.setBorder(border);
+		return out;
 	}
 
 	@Override

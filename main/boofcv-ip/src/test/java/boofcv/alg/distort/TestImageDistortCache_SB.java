@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,17 @@ public class TestImageDistortCache_SB extends CommonImageDistort_SB{
 		int total = 0;
 
 		public Helper(InterpolatePixelS interp) {
-			super(interp);
+			super(null,interp);
+			assigner = new AssignPixelValue_SB.F32() {
+				@Override
+				public void assign(int indexDst, float value) {
+					total++;
+					int x = (indexDst - dstImg.startIndex)%dstImg.stride;
+					int y = (indexDst - dstImg.startIndex)/dstImg.stride;
+					assertTrue(dstImg.isInBounds(x,y));
+					GeneralizedImageOps.set(dstImg,x,y,value);
+				}
+			};
 		}
 
 		public void reset() {
@@ -49,15 +59,6 @@ public class TestImageDistortCache_SB extends CommonImageDistort_SB{
 
 		public int getTotal() {
 			return total;
-		}
-
-		@Override
-		protected void assign(int indexDst, float value) {
-			total++;
-			int x = (indexDst - dstImg.startIndex)%dstImg.stride;
-			int y = (indexDst - dstImg.startIndex)/dstImg.stride;
-			assertTrue(dstImg.isInBounds(x,y));
-			GeneralizedImageOps.set(dstImg,x,y,value);
 		}
 	}
 

@@ -35,4 +35,9 @@ public interface Point2Transform3_F64 {
 	 * @param out Transformed point location.
 	 */
 	void compute(double x, double y, Point3D_F64 out);
+
+	/**
+	 * Creates a copy
+	 */
+	Point2Transform3_F64 copy();
 }

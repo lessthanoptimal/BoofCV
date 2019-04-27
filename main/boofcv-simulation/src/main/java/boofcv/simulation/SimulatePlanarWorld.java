@@ -195,8 +195,9 @@ public class SimulatePlanarWorld {
 
 	private void renderSingleThread() {
 		for (int y = 0; y < output.height; y++) {
+			int depthIdx = y*depthMap.stride;
 			for (int x = 0; x < output.width; x++) {
-				if( Float.isNaN(depthMap.unsafe_get(x,y)))
+				if( Float.isNaN(depthMap.data[depthIdx++]) )
 					continue;
 
 				for (int i = 0; i < scene.size(); i++) {
@@ -222,8 +223,9 @@ public class SimulatePlanarWorld {
 			LineParametric3D_F64 ray = new LineParametric3D_F64();
 
 			for (int y = y0; y < y1; y++) {
+				int depthIdx = y*depthMap.stride;
 				for (int x = 0; x < output.width; x++) {
-					if( Float.isNaN(depthMap.unsafe_get(x,y)))
+					if( Float.isNaN(depthMap.data[depthIdx++]) )
 						continue;
 
 					for (int i = 0; i < scene.size(); i++) {

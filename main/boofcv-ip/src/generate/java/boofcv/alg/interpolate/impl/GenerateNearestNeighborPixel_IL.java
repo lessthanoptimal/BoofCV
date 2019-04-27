@@ -133,8 +133,10 @@ public class GenerateNearestNeighborPixel_IL extends CodeGeneratorBase {
 				"\t}\n" +
 				"\n" +
 				"\t@Override\n" +
-				"\tpublic InterpolatePixelMB<"+image.getInterleavedName()+"> newInstance() {\n" +
-				"\t\treturn new "+className+"();\n" +
+				"\tpublic InterpolatePixelMB<"+image.getInterleavedName()+"> copy() {\n" +
+				"\t\t"+className+" out = new "+className+"();\n" +
+				"\t\tout.setBorder(border);\n" +
+				"\t\treturn out;\n" +
 				"\t}\n\n");
 	}
 

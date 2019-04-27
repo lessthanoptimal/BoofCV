@@ -31,20 +31,22 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends ImageGray<Output>>
+public class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends ImageGray<Output>>
 		implements ImageDistort<Input,Output> {
 
+	protected AssignPixelValue_SB<Output> assigner;
+
 	// size of output image
-	private int width=-1,height=-1;
-	private Point2D_F32 map[];
+	protected int width=-1,height=-1;
+	protected Point2D_F32 map[];
 	// sub pixel interpolation
-	private InterpolatePixelS<Input> interp;
+	protected InterpolatePixelS<Input> interp;
 
 	// transform
-	private PixelTransform<Point2D_F32> dstToSrc;
+	protected PixelTransform<Point2D_F32> dstToSrc;
 
 	// crop boundary
-	private int x0,y0,x1,y1;
+	protected int x0,y0,x1,y1;
 
 	// should it render all pixels in the destination, even ones outside the input image
 	protected boolean renderAll = true;
@@ -58,7 +60,9 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 	 *
 	 * @param interp Interpolation algorithm
 	 */
-	public ImageDistortCache_SB(InterpolatePixelS<Input> interp) {
+	public ImageDistortCache_SB(AssignPixelValue_SB<Output> assigner,
+								InterpolatePixelS<Input> interp) {
+		this.assigner = assigner;
 		this.interp = interp;
 	}
 
@@ -104,7 +108,7 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 			applyOnlyInside();
 	}
 
-	private void init(Input srcImg, Output dstImg) {
+	protected void init(Input srcImg, Output dstImg) {
 		if( dirty || width != dstImg.width || height != dstImg.height) {
 			width = dstImg.width;
 			height = dstImg.height;
@@ -126,6 +130,7 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 		this.srcImg = srcImg;
 		this.dstImg = dstImg;
 		interp.setImage(srcImg);
+		assigner.setImage(dstImg);
 	}
 
 	public void renderAll() {
@@ -137,7 +142,7 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 			for( int x = x0; x < x1; x++ , indexDst++ ) {
 				Point2D_F32 s = map[indexDst];
 
-				assign(indexDst,interp.get(s.x, s.y));
+				assigner.assign(indexDst,interp.get(s.x, s.y));
 			}
 		}
 	}
@@ -153,7 +158,7 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 			for( int x = x0; x < x1; x++ , indexDst++ , indexMsk++ ) {
 				Point2D_F32 s = map[indexDst];
 
-				assign(indexDst,interp.get(s.x, s.y));
+				assigner.assign(indexDst,interp.get(s.x, s.y));
 				if( s.x >= 0 && s.x <= maxWidth && s.y >= 0 && s.y <= maxHeight ) {
 					mask.data[indexMsk] = 1;
 				} else {
@@ -173,7 +178,7 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 				Point2D_F32 s = map[indexDst];
 
 				if( s.x >= 0 && s.x <= maxWidth && s.y >= 0 && s.y <= maxHeight ) {
-					assign(indexDst,interp.get(s.x, s.y));
+					assigner.assign(indexDst,interp.get(s.x, s.y));
 				}
 			}
 		}
@@ -191,7 +196,7 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 				Point2D_F32 s = map[indexDst];
 
 				if( s.x >= 0 && s.x <= maxWidth && s.y >= 0 && s.y <= maxHeight ) {
-					assign(indexDst,interp.get(s.x, s.y));
+					assigner.assign(indexDst,interp.get(s.x, s.y));
 					mask.data[indexMsk] = 1;
 				} else {
 					mask.data[indexMsk] = 0;
@@ -199,8 +204,6 @@ public abstract class ImageDistortCache_SB<Input extends ImageGray<Input>,Output
 			}
 		}
 	}
-
-	protected abstract void assign( int indexDst , float value );
 
 	public Point2D_F32[] getMap() {
 		return map;

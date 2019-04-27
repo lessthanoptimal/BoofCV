@@ -158,7 +158,18 @@ public class TestImageDistortBasic_IL {
 		int total = 0;
 
 		public Helper(InterpolatePixelMB<InterleavedF32> interp) {
-			super(interp);
+			super(null,interp);
+			assigner = new AssignPixelValue_MB.F32() {
+				@Override
+				public void assign(int indexDst, float[] value) {
+					total++;
+					int numBand = value.length;
+					int x = ((indexDst - dstImg.startIndex)%dstImg.stride)/numBand;
+					int y = (indexDst - dstImg.startIndex)/dstImg.stride;
+					assertTrue(dstImg.isInBounds(x,y));
+					GeneralizedImageOps.setB(dstImg,x,y,0,value[0]);
+				}
+			};
 		}
 
 		public void reset() {
@@ -167,16 +178,6 @@ public class TestImageDistortBasic_IL {
 
 		private int getTotal() {
 			return total;
-		}
-
-		@Override
-		protected void assign(int indexDst, float value[]) {
-			total++;
-			int numBand = value.length;
-			int x = ((indexDst - dstImg.startIndex)%dstImg.stride)/numBand;
-			int y = (indexDst - dstImg.startIndex)/dstImg.stride;
-			assertTrue(dstImg.isInBounds(x,y));
-			GeneralizedImageOps.setB(dstImg,x,y,0,value[0]);
 		}
 	}
 

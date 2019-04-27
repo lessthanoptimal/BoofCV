@@ -202,7 +202,9 @@ public class GenerateImplBilinearPixel_IL extends CodeGeneratorBase {
 				"\n" +
 				"\t@Override\n" +
 				"\tpublic InterpolatePixelMB<"+imageName+"> copy() {\n" +
-				"\t\treturn new "+className+"(temp0.length);\n" +
+				"\t\t"+className+" out = new "+className+"(temp0.length);\n" +
+				"\t\tout.setBorder(border);\n" +
+				"\t\treturn out;\n" +
 				"\t}\n" +
 				"\t@Override\n" +
 				"\tpublic ImageType<"+imageName+"> getImageType() {\n" +

@@ -52,7 +52,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 	 * an alternative approach.
 	 */
 	@Test
-	public void get() {
+	void get() {
 		T img = createImage(width, height);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 
@@ -72,7 +72,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 	 * See if accessing the image edge causes it to blow up.
 	 */
 	@Test
-	public void get_edges() {
+	void get_edges() {
 		T img = createImage(width, height);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 
@@ -111,7 +111,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 	 * Sees if get throws an exception if it is out of bounds
 	 */
 	@Test
-	public void get_outside_noborder() {
+	void get_outside_noborder() {
 		T img = createImage(width, height);
 
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
@@ -135,7 +135,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 	 * Compare get_fast against the value returned by get()
 	 */
 	@Test
-	public void get_fast() {
+	void get_fast() {
 		T img = createImage(width, height);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 
@@ -156,7 +156,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 	 * If a border is specified it should handle everything just fine
 	 */
 	@Test
-	public void get_outside_border() {
+	void get_outside_border() {
 		T img = createImage(width, height);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 
@@ -175,7 +175,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 	}
 
 	@Test
-	public void getImage() {
+	void getImage() {
 		T img = createImage(width, height);
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
 		assertTrue(img == interp.getImage());
@@ -186,7 +186,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 	 * value to the unsafe value.
 	 */
 	@Test
-	public void isInFastBounds() {
+	void isInFastBounds() {
 		T img = createImage(width, height);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
@@ -206,7 +206,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 	 * Pixels out of the image are clearly not in the fast bounds
 	 */
 	@Test
-	public void isInFastBounds_outOfBounds() {
+	void isInFastBounds_outOfBounds() {
 		T img = createImage(width, height);
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
 
@@ -217,7 +217,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 	}
 
 	@Test
-	public void getFastBorder() {
+	void getFastBorder() {
 		T img = createImage(width, height);
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
 
@@ -244,7 +244,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 	 * Interpolates the whole image and sees if the values returned are within the specified bounds
 	 */
 	@Test
-	public void checkPixelValueBoundsHonored() {
+	void checkPixelValueBoundsHonored() {
 		T img = createImage(20, 30);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
@@ -266,7 +266,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 	 * Should produce identical results when given a sub-image.
 	 */
 	@Test
-	public void checkSubImage() {
+	void checkSubImage() {
 		T imgA = createImage(30, 40);
 		GImageMiscOps.fillUniform(imgA, rand, 0, 100);
 
@@ -294,5 +294,19 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 				assertTrue(interpA.get(xx, yy) == interpB.get(xx,yy),"( " + x + " , " + y + " )");
 			}
 		}
+	}
+
+	@Test
+	void copy() {
+		T img = createImage(30, 40);
+		GImageMiscOps.fillUniform(img, rand, 0, 100);
+
+		ImageBorder<T> border = (ImageBorder)FactoryImageBorder.singleValue(img.getClass(), 5);
+		InterpolatePixelS<T> interpA = wrap(img, 0, 100);
+		interpA.setBorder(border);
+
+		InterpolatePixelS<T> interpB = interpA.copy();
+
+		assertSame(interpA.getBorder(), interpB.getBorder());
 	}
 }

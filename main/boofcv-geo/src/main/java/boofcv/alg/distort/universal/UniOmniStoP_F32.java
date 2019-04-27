@@ -90,4 +90,17 @@ public class UniOmniStoP_F32 implements Point3Transform2_F32 {
 		out.x = fx*dx + skew*dy + cx;
 		out.y = fy*dy + cy;
 	}
+
+	@Override
+	public Point3Transform2_F32 copy() {
+		UniOmniStoP_F32 c = new UniOmniStoP_F32();
+		c.distortion = new RadialTangential_F32(this.distortion);
+		c.mirrorOffset = this.mirrorOffset;
+		c.cx = this.cx;
+		c.cy = this.cy;
+		c.fx = this.fx;
+		c.fy = this.fy;
+		c.skew = this.skew;
+		return c;
+	}
 }

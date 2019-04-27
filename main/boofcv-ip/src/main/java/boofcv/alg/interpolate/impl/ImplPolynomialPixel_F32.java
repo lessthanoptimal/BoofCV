@@ -143,7 +143,9 @@ public class ImplPolynomialPixel_F32 extends PolynomialPixel<GrayF32> {
 
 	@Override
 	public InterpolatePixelS<GrayF32> copy() {
-		return new ImplPolynomialPixel_F32(M,min,max);
+		ImplPolynomialPixel_F32 out = new ImplPolynomialPixel_F32(M,min,max);
+		out.setBorder(border);
+		return  out;
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,27 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.alg.distort.impl;
+package boofcv.alg.distort;
 
-import boofcv.alg.distort.ImageDistortBasic_IL;
-import boofcv.alg.interpolate.InterpolatePixelMB;
-import boofcv.struct.image.InterleavedU8;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * <p>Implementation of {@link ImageDistortBasic_IL}.</p>
- *
  * @author Peter Abeles
  */
-public class ImplImageDistort_IL_U8 extends ImageDistortBasic_IL<InterleavedU8,InterleavedU8> {
-
-	public ImplImageDistort_IL_U8(InterpolatePixelMB<InterleavedU8> interp) {
-		super(interp);
-	}
-
-	@Override
-	protected void assign(int indexDst, float[] value) {
-		for( int i = 0; i < dstImg.numBands; i++ ) {
-			dstImg.data[indexDst+i] = (byte)value[i];
-		}
+public class TestImageDistortCache_SB_MT {
+	@Test
+	void stuff() {
+		fail("Implement");
 	}
 }

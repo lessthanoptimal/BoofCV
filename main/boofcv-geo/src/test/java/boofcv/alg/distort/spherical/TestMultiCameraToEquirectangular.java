@@ -185,18 +185,39 @@ public class TestMultiCameraToEquirectangular {
 
 		@Override
 		public Point2Transform3_F32 undistortPtoS_F32() {
-			return new HelperTransform();
+			return new HelperTransform2();
 		}
 	}
 
 	/**
 	 * Transform where multiple pixels in input image map to the same value
 	 */
-	private class HelperTransform implements Point3Transform2_F32, Point2Transform3_F32
+	private class HelperTransform implements Point3Transform2_F32
 	{
 		EquirectangularTools_F32 tools = new EquirectangularTools_F32();
 
 		public HelperTransform() {
+			this.tools.configure(inputWidth, inputHeight);
+		}
+
+		@Override
+		public void compute(float x, float y, float z, Point2D_F32 out) {
+			// multiple normal angles map to the same pixel.  This will effectively make the top and bottom
+			// half of the image map to the same pixels.  This should cause it to get masked out
+			tools.normToEquiFV(x,y,-Math.abs(z),out);
+		}
+
+		@Override
+		public Point3Transform2_F32 copy() {
+			return null;
+		}
+	}
+
+	private class HelperTransform2 implements Point2Transform3_F32
+	{
+		EquirectangularTools_F32 tools = new EquirectangularTools_F32();
+
+		public HelperTransform2() {
 			this.tools.configure(inputWidth, inputHeight);
 		}
 
@@ -206,10 +227,8 @@ public class TestMultiCameraToEquirectangular {
 		}
 
 		@Override
-		public void compute(float x, float y, float z, Point2D_F32 out) {
-			// multiple normal angles map to the same pixel.  This will effectively make the top and bottom
-			// half of the image map to the same pixels.  This should cause it to get masked out
-			tools.normToEquiFV(x,y,-Math.abs(z),out);
+		public Point2Transform3_F32 copy() {
+			return null;
 		}
 	}
 }

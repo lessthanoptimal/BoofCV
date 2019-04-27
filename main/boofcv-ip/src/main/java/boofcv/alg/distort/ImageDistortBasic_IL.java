@@ -29,9 +29,11 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
-public abstract class ImageDistortBasic_IL
+public class ImageDistortBasic_IL
 		<Input extends ImageInterleaved<Input>,Output extends ImageInterleaved<Output>>
 		extends ImageDistortBasic<Input,Output,InterpolatePixelMB<Input>> {
+
+	AssignPixelValue_MB<Output> assigner;
 
 	// storage for interpolated pixel values
 	float values[] = new float[0];
@@ -43,16 +45,19 @@ public abstract class ImageDistortBasic_IL
 	 *
 	 * @param interp Interpolation algorithm
 	 */
-	public ImageDistortBasic_IL(InterpolatePixelMB<Input> interp) {
+	public ImageDistortBasic_IL(AssignPixelValue_MB<Output> assigner,
+								InterpolatePixelMB<Input> interp) {
 		super(interp);
+		this.assigner = assigner;
 	}
 
 	@Override
 	protected void init(Input srcImg, Output dstImg) {
-		super.init(srcImg,dstImg);
-		if( values.length != srcImg.getNumBands() ) {
-			values = new float[ srcImg.getNumBands() ];
+		super.init(srcImg, dstImg);
+		if (values.length != srcImg.getNumBands()) {
+			values = new float[srcImg.getNumBands()];
 		}
+		assigner.setImage(dstImg);
 	}
 
 	@Override
@@ -60,34 +65,34 @@ public abstract class ImageDistortBasic_IL
 
 		// todo TO make this faster first apply inside the region which can process the fast border
 		// then do the slower border thingy
-		for( int y = y0; y < y1; y++ ) {
-			int indexDst = dstImg.startIndex + dstImg.stride*y + x0*dstImg.numBands;
-			for( int x = x0; x < x1; x++ , indexDst += dstImg.numBands ) {
-				dstToSrc.compute(x,y,distorted);
+		for (int y = y0; y < y1; y++) {
+			int indexDst = dstImg.startIndex + dstImg.stride * y + x0 * dstImg.numBands;
+			for (int x = x0; x < x1; x++, indexDst += dstImg.numBands) {
+				dstToSrc.compute(x, y, distorted);
 				interp.get(distorted.x, distorted.y, values);
-				assign(indexDst,values);
+				assigner.assign(indexDst, values);
 			}
 		}
 	}
 
 	@Override
-	public void applyAll( GrayU8 mask ) {
+	public void applyAll(GrayU8 mask) {
 
-		float maxWidth = srcImg.getWidth()-1;
-		float maxHeight = srcImg.getHeight()-1;
+		float maxWidth = srcImg.getWidth() - 1;
+		float maxHeight = srcImg.getHeight() - 1;
 
-		for( int y = y0; y < y1; y++ ) {
-			int indexDst = dstImg.startIndex + dstImg.stride*y + x0*dstImg.numBands;
-			int indexMsk = mask.startIndex + mask.stride*y + x0;
+		for (int y = y0; y < y1; y++) {
+			int indexDst = dstImg.startIndex + dstImg.stride * y + x0 * dstImg.numBands;
+			int indexMsk = mask.startIndex + mask.stride * y + x0;
 
-			for( int x = x0; x < x1; x++ , indexDst += dstImg.numBands , indexMsk++) {
-				dstToSrc.compute(x,y,distorted);
+			for (int x = x0; x < x1; x++, indexDst += dstImg.numBands, indexMsk++) {
+				dstToSrc.compute(x, y, distorted);
 				interp.get(distorted.x, distorted.y, values);
 
-				assign(indexDst,values);
+				assigner.assign(indexDst, values);
 
-				if( distorted.x >= 0 && distorted.x <= maxWidth &&
-						distorted.y >= 0 && distorted.y <= maxHeight ) {
+				if (distorted.x >= 0 && distorted.x <= maxWidth &&
+						distorted.y >= 0 && distorted.y <= maxHeight) {
 					mask.data[indexMsk] = 1;
 				} else {
 					mask.data[indexMsk] = 0;
@@ -99,40 +104,40 @@ public abstract class ImageDistortBasic_IL
 	@Override
 	public void applyOnlyInside() {
 
-		float maxWidth = srcImg.getWidth()-1;
-		float maxHeight = srcImg.getHeight()-1;
+		float maxWidth = srcImg.getWidth() - 1;
+		float maxHeight = srcImg.getHeight() - 1;
 
-		for( int y = y0; y < y1; y++ ) {
-			int indexDst = dstImg.startIndex + dstImg.stride*y + x0*dstImg.numBands;
-			for( int x = x0; x < x1; x++ , indexDst += dstImg.numBands ) {
-				dstToSrc.compute(x,y,distorted);
+		for (int y = y0; y < y1; y++) {
+			int indexDst = dstImg.startIndex + dstImg.stride * y + x0 * dstImg.numBands;
+			for (int x = x0; x < x1; x++, indexDst += dstImg.numBands) {
+				dstToSrc.compute(x, y, distorted);
 
-				if( distorted.x >= 0 && distorted.x <= maxWidth &&
-						distorted.y >= 0 && distorted.y <= maxHeight ) {
+				if (distorted.x >= 0 && distorted.x <= maxWidth &&
+						distorted.y >= 0 && distorted.y <= maxHeight) {
 					interp.get(distorted.x, distorted.y, values);
-					assign(indexDst,values);
+					assigner.assign(indexDst, values);
 				}
 			}
 		}
 	}
 
 	@Override
-	public void applyOnlyInside( GrayU8 mask ) {
+	public void applyOnlyInside(GrayU8 mask) {
 
-		float maxWidth = srcImg.getWidth()-1;
-		float maxHeight = srcImg.getHeight()-1;
+		float maxWidth = srcImg.getWidth() - 1;
+		float maxHeight = srcImg.getHeight() - 1;
 
-		for( int y = y0; y < y1; y++ ) {
-			int indexDst = dstImg.startIndex + dstImg.stride*y + x0*dstImg.numBands;
-			int indexMsk = mask.startIndex + mask.stride*y + x0;
+		for (int y = y0; y < y1; y++) {
+			int indexDst = dstImg.startIndex + dstImg.stride * y + x0 * dstImg.numBands;
+			int indexMsk = mask.startIndex + mask.stride * y + x0;
 
-			for( int x = x0; x < x1; x++ , indexDst += dstImg.numBands , indexMsk++) {
-				dstToSrc.compute(x,y,distorted);
+			for (int x = x0; x < x1; x++, indexDst += dstImg.numBands, indexMsk++) {
+				dstToSrc.compute(x, y, distorted);
 
-				if( distorted.x >= 0 && distorted.x <= maxWidth &&
-						distorted.y >= 0 && distorted.y <= maxHeight ) {
+				if (distorted.x >= 0 && distorted.x <= maxWidth &&
+						distorted.y >= 0 && distorted.y <= maxHeight) {
 					interp.get(distorted.x, distorted.y, values);
-					assign(indexDst,values);
+					assigner.assign(indexDst, values);
 					mask.data[indexMsk] = 1;
 				} else {
 					mask.data[indexMsk] = 0;
@@ -140,7 +145,4 @@ public abstract class ImageDistortBasic_IL
 			}
 		}
 	}
-
-
-	protected abstract void assign( int indexDst , float[] value );
 }

@@ -36,4 +36,9 @@ public interface Point3Transform2_F32 {
 	 * @param out Transformed point location.
 	 */
 	void compute(float x, float y, float z, Point2D_F32 out);
+
+	/**
+	 * Creates a copy
+	 */
+	Point3Transform2_F32 copy();
 }

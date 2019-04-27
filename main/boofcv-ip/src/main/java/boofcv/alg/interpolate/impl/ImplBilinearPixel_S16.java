@@ -91,7 +91,9 @@ public class ImplBilinearPixel_S16 extends BilinearPixelS<GrayS16> {
 
 	@Override
 	public InterpolatePixelS<GrayS16> copy() {
-		return new ImplBilinearPixel_S16();
+		ImplBilinearPixel_S16 out = new ImplBilinearPixel_S16();
+		out.setBorder(border);
+		return out;
 	}
 
 	@Override

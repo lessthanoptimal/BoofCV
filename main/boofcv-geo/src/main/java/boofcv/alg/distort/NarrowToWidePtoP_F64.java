@@ -91,8 +91,9 @@ public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 	@Override
 	public Point2Transform2_F64 copy() {
 		NarrowToWidePtoP_F64 ret = new NarrowToWidePtoP_F64();
+		ret.rotateWideToNarrow = this.rotateWideToNarrow.copy();
 		ret.narrowToNorm = this.narrowToNorm.copy();
-		this.unitToWide = null;
-		throw new RuntimeException("Implement unit to wide");
+		ret.unitToWide = this.unitToWide.copy();
+		return ret;
 	}
 }

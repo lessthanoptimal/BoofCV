@@ -44,4 +44,10 @@ public class NarrowPixelToSphere_F32 implements Point2Transform3_F32 {
 		out.set(projected.x,projected.y,1);
 		out.scale( 1.0f/out.norm() );
 	}
+
+	@Override
+	public Point2Transform3_F32 copy() {
+		return new NarrowPixelToSphere_F32(this.pixelToNorm.copy());
+	}
+
 }
