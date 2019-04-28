@@ -942,7 +942,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 				}
 			}
 			// 60 degrees seems reasonable for a random guess
-			PerspectiveOps.createIntrinsic(open.mCameraSize.getWidth(),open.mCameraSize.hashCode(),
+			PerspectiveOps.createIntrinsic(open.mCameraSize.getWidth(),open.mCameraSize.getHeight(),
 					UtilAngle.radian(60));
 		} finally {
 			open.mLock.unlock();
