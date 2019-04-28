@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.transform.ii;
 
+import boofcv.alg.transform.ii.impl.ImplIntegralImageConvolve;
 import boofcv.alg.transform.ii.impl.ImplIntegralImageOps;
 import boofcv.struct.ImageRectangle;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ public class TestIntegralImageOps {
 
 	@Test
 	public void convolve() {
-		int expected = countName("convolve",IntegralImageOps.class);
+		int expected = countName("convolve", ImplIntegralImageConvolve.class);
 		int found = countName("convolve",ImplIntegralImageOps.class);
 
 		assertTrue(found != 0 );
@@ -52,7 +53,7 @@ public class TestIntegralImageOps {
 
 	@Test
 	public void convolveBorder() {
-		int expected = countName("convolveBorder", IntegralImageOps.class);
+		int expected = countName("convolveBorder", ImplIntegralImageConvolve.class);
 		int found = countName("convolveBorder",ImplIntegralImageOps.class);
 
 		assertTrue(found != 0 );

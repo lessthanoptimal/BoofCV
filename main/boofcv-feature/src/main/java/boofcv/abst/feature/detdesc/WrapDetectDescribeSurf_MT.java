@@ -51,7 +51,7 @@ public class WrapDetectDescribeSurf_MT<T extends ImageGray<T>, II extends ImageG
 
 			for( int i = i0; i < i1; i++ ) {
 				ScalePoint p = foundPoints.get(i);
-				double radius = p.scale* BoofDefaults.SURF_SCALE_TO_RADIUS;
+				double radius = p.scale*BoofDefaults.SURF_SCALE_TO_RADIUS;
 
 				orientation.setObjectRadius(radius);
 				double angle = orientation.compute(p.x,p.y);

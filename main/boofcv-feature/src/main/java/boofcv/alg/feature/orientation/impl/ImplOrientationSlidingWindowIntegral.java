@@ -190,6 +190,6 @@ public class ImplOrientationSlidingWindowIntegral
 	@Override
 	public RegionOrientation copy() {
 		return new ImplOrientationSlidingWindowIntegral(
-				objectRadiusToScale,period,windowSize,sampleRadius,weightSigma,sampleWidth,getImageType());
+				objectRadiusToScale,period,windowSize,sampleRadius,weightSigma,kernelWidth,getImageType());
 	}
 }

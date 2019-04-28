@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.detdesc;
 
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.GrayF32;
@@ -29,7 +30,11 @@ import boofcv.struct.image.ImageType;
 public class TestWrapDetectDescribeSurf extends GenericTestsDetectDescribePoint<GrayF32,BrightFeature>
 {
 
-	public TestWrapDetectDescribeSurf() {
+	static {
+		BoofConcurrency.USE_CONCURRENT = false;
+	}
+
+	TestWrapDetectDescribeSurf() {
 		super(true, true, ImageType.single(GrayF32.class), BrightFeature.class);
 	}
 
