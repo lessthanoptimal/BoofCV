@@ -53,10 +53,8 @@ Less High Priority Next Release
 - Concurrency
   * KLT
   * Association
-  * Image Distort
   * Stereo disparity
   * Dense Features
-  * Feature Descriptions
 
 - Filters
   * Median Filter: When even do average of two median terms

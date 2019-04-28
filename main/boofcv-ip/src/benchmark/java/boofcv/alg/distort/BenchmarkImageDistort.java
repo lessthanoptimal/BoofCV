@@ -68,10 +68,10 @@ public class BenchmarkImageDistort {
 
 		GImageMiscOps.fillUniform(inputF32,rand,0,200);
 
-		Homography2D_F32 affine = new Homography2D_F32((float)rand.nextGaussian(),(float)rand.nextGaussian(),
-				(float)rand.nextGaussian(),(float)rand.nextGaussian(),(float)rand.nextGaussian(),
-				(float)rand.nextGaussian(),(float)rand.nextGaussian(),(float)rand.nextGaussian(),
-				(float)rand.nextGaussian());
+		Homography2D_F32 affine = new Homography2D_F32(
+				0.9f,0.1f,0.0f,
+				0.05f,1.1f,02f,
+				0.01f,-0.1f,1.05f);
 		PixelTransform<Point2D_F32> tran = new PixelTransformHomography_F32(affine);
 
 
