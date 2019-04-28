@@ -44,8 +44,8 @@ public class TestIntegralImageOps {
 
 	@Test
 	public void convolve() {
-		int expected = countName("convolve", ImplIntegralImageConvolve.class);
-		int found = countName("convolve",ImplIntegralImageOps.class);
+		int expected = countName("convolve", IntegralImageOps.class);
+		int found = countName("convolve",ImplIntegralImageConvolve.class);
 
 		assertTrue(found != 0 );
 		assertEquals(expected,found);
@@ -53,8 +53,8 @@ public class TestIntegralImageOps {
 
 	@Test
 	public void convolveBorder() {
-		int expected = countName("convolveBorder", ImplIntegralImageConvolve.class);
-		int found = countName("convolveBorder",ImplIntegralImageOps.class);
+		int expected = countName("convolveBorder", IntegralImageOps.class);
+		int found = countName("convolveBorder",ImplIntegralImageConvolve.class);
 
 		assertTrue(found != 0 );
 		assertEquals(expected,found);
