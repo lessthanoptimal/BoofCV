@@ -78,6 +78,12 @@ public class ConfigChessboard2 implements Configuration {
 	public double maxNeighborDistance = Double.MAX_VALUE;
 
 	/**
+	 * If true then a chessboard has to has to have at least one square which is connected to only one other
+	 * square. BoofCV calibration targets always have this requirements. Other projects might not.
+	 */
+	public boolean requireCornerSquares = true;
+
+	/**
 	 * Selection of threshold for binary image. Intensity image is the input.
 	 */
 	public ConfigThreshold threshold = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);

@@ -39,7 +39,7 @@ class TestChessboardCornerClusterToGrid
 	@Test
 	void convert_nochange() {
 		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
-		alg.setAllowNoCorner(false);
+		alg.setRequireCornerSquares(true);
 
 		convert(alg,2,2,false);
 		convert(alg,2,3,false);
@@ -53,7 +53,7 @@ class TestChessboardCornerClusterToGrid
 	@Test
 	void convert_randomized() {
 		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
-		alg.setAllowNoCorner(false);
+		alg.setRequireCornerSquares(true);
 
 		// do a few loops to test more random cases
 		for (int i = 0; i < 10; i++) {
@@ -117,7 +117,7 @@ class TestChessboardCornerClusterToGrid
 	@Test
 	void selectCorner() {
 		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
-		alg.setAllowNoCorner(false);
+		alg.setRequireCornerSquares(true);
 		assertEquals(0,alg.selectCorner(createGridInfo(2,2, true)));
 		assertEquals(0,alg.selectCorner(createGridInfo(2,3, true)));
 		assertEquals(0,alg.selectCorner(createGridInfo(3,3, true)));
@@ -137,7 +137,7 @@ class TestChessboardCornerClusterToGrid
 		assertEquals(2,alg.cornerList.get(idx).index); // 2 corner squares
 
 		// tell it to only consider only proper corners
-		alg.setAllowNoCorner(false);
+		alg.setRequireCornerSquares(true);
 		idx = alg.selectCorner(createGridInfo(2,2, false));  // 4 non corner squares
 		assertEquals(-1,idx);
 		idx = alg.selectCorner(createGridInfo(2,3, false));  // 2 corner squares

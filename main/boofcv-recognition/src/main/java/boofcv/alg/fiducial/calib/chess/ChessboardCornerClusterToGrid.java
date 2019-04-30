@@ -60,7 +60,7 @@ public class ChessboardCornerClusterToGrid {
 	List<Node> cornerList = new ArrayList<>();
 
 	// See documentation above. if true then the requirement that the (0,0) grid element be a corner is removed.
-	boolean allowNoCorner=true;
+	boolean requireCornerSquares =false;
 
 	// Used to optionally print extra debugging information
 	PrintStream verbose;
@@ -122,7 +122,7 @@ public class ChessboardCornerClusterToGrid {
 
 			// If there are no corner points which are valid corners, then any corner can be the origin if
 			// allowNoCorner is true
-			if( corner || (allowNoCorner && !bestIsCornerSquare) ) {
+			if( corner || ( !requireCornerSquares && !bestIsCornerSquare) ) {
 				// sanity check the shape
 				if( checkShape != null ) {
 					if( i%2==0 ) {
@@ -404,12 +404,12 @@ public class ChessboardCornerClusterToGrid {
 		this.checkShape = checkShape;
 	}
 
-	public boolean isAllowNoCorner() {
-		return allowNoCorner;
+	public boolean isRequireCornerSquares() {
+		return requireCornerSquares;
 	}
 
-	public void setAllowNoCorner(boolean allowNoCorner) {
-		this.allowNoCorner = allowNoCorner;
+	public void setRequireCornerSquares(boolean requireCornerSquares) {
+		this.requireCornerSquares = requireCornerSquares;
 	}
 
 	public static class GridInfo {

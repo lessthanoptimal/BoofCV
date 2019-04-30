@@ -58,6 +58,8 @@ public class DetectChessboardPatterns {
 		clusterFinder.setMaxNeighbors(config.maxNeighbors);
 		clusterFinder.setMaxNeighborDistance(config.maxNeighborDistance);
 
+		clusterToGrid.setRequireCornerSquares(config.requireCornerSquares);
+
 	}
 
 	/**
