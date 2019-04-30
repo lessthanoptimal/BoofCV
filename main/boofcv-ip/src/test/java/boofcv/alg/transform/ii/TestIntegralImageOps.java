@@ -31,10 +31,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestIntegralImageOps {
+class TestIntegralImageOps {
 
 	@Test
-	public void transform() {
+	void transform() {
 		int expected = countName("transform",IntegralImageOps.class);
 		int found = countName("transform",ImplIntegralImageOps.class);
 
@@ -43,7 +43,7 @@ public class TestIntegralImageOps {
 	}
 
 	@Test
-	public void convolve() {
+	void convolve() {
 		int expected = countName("convolve", IntegralImageOps.class);
 		int found = countName("convolve",ImplIntegralImageConvolve.class);
 
@@ -52,7 +52,7 @@ public class TestIntegralImageOps {
 	}
 
 	@Test
-	public void convolveBorder() {
+	void convolveBorder() {
 		int expected = countName("convolveBorder", IntegralImageOps.class);
 		int found = countName("convolveBorder",ImplIntegralImageConvolve.class);
 
@@ -61,7 +61,7 @@ public class TestIntegralImageOps {
 	}
 
 	@Test
-	public void convolveSparse() {
+	void convolveSparse() {
 		int expected = countName("convolveSparse", IntegralImageOps.class);
 		int found = countName("convolveSparse",ImplIntegralImageOps.class);
 
@@ -70,7 +70,7 @@ public class TestIntegralImageOps {
 	}
 
 	@Test
-	public void block_unsafe() {
+	void block_unsafe() {
 		int expected = countName("block_unsafe", IntegralImageOps.class);
 		int found = countName("block_unsafe",ImplIntegralImageOps.class);
 
@@ -79,7 +79,7 @@ public class TestIntegralImageOps {
 	}
 
 	@Test
-	public void block_zero() {
+	void block_zero() {
 		int expected = countName("block_zero", IntegralImageOps.class);
 		int found = countName("block_zero",ImplIntegralImageOps.class);
 
@@ -88,7 +88,7 @@ public class TestIntegralImageOps {
 	}
 	
 	@Test
-	public void isInBounds() {
+	void isInBounds() {
 		IntegralKernel kernel = new IntegralKernel(2);
 		kernel.blocks[0] = new ImageRectangle(-1,-2,1,2);
 		kernel.blocks[1] = new ImageRectangle(-3,-2,1,2);

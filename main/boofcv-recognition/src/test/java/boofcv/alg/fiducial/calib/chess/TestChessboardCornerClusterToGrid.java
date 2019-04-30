@@ -39,7 +39,7 @@ class TestChessboardCornerClusterToGrid
 	@Test
 	void convert_nochange() {
 		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
-		alg.setVerbose(System.out);
+		alg.setAllowNoCorner(false);
 
 		convert(alg,2,2,false);
 		convert(alg,2,3,false);
@@ -53,7 +53,7 @@ class TestChessboardCornerClusterToGrid
 	@Test
 	void convert_randomized() {
 		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
-		alg.setVerbose(System.out);
+		alg.setAllowNoCorner(false);
 
 		// do a few loops to test more random cases
 		for (int i = 0; i < 10; i++) {
@@ -68,7 +68,7 @@ class TestChessboardCornerClusterToGrid
 
 	void convert(ChessboardCornerClusterToGrid alg, int rows , int cols , boolean randomized ) {
 		ChessboardCornerGraph graph = new ChessboardCornerGraph();
-		graph.corners = createGrid(rows,cols);
+		graph.corners = createGrid(rows,cols, true);
 
 		if( randomized ) {
 			for (int i = 0; i < graph.corners.size; i++) {
@@ -79,6 +79,7 @@ class TestChessboardCornerClusterToGrid
 
 		GridInfo info = new GridInfo();
 		assertTrue(alg.convert(graph,info));
+		assertTrue(info.hasCornerSquare);
 
 		// test shape
 		if( rows == info.rows ) {
@@ -116,16 +117,37 @@ class TestChessboardCornerClusterToGrid
 	@Test
 	void selectCorner() {
 		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
-		assertEquals(0,alg.selectCorner(createGridInfo(2,2)));
-		assertEquals(0,alg.selectCorner(createGridInfo(2,3)));
-		assertEquals(0,alg.selectCorner(createGridInfo(3,3)));
+		alg.setAllowNoCorner(false);
+		assertEquals(0,alg.selectCorner(createGridInfo(2,2, true)));
+		assertEquals(0,alg.selectCorner(createGridInfo(2,3, true)));
+		assertEquals(0,alg.selectCorner(createGridInfo(3,3, true)));
 	}
 
+	/**
+	 * Feed it a cluster with and without corner squares
+	 */
+	@Test
+	void selectCorner_NoCornerSquare() {
+		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
+
+		// all corners are candidates
+		int idx = alg.selectCorner(createGridInfo(2,2, false));
+		assertEquals(0,alg.cornerList.get(idx).index); // 4 non corner squares
+		idx = alg.selectCorner(createGridInfo(2,3, false));
+		assertEquals(2,alg.cornerList.get(idx).index); // 2 corner squares
+
+		// tell it to only consider only proper corners
+		alg.setAllowNoCorner(false);
+		idx = alg.selectCorner(createGridInfo(2,2, false));  // 4 non corner squares
+		assertEquals(-1,idx);
+		idx = alg.selectCorner(createGridInfo(2,3, false));  // 2 corner squares
+		assertEquals(2,alg.cornerList.get(idx).index);
+	}
 
 	@Test
 	void isCornerValidOrigin_2x2() {
 		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
-		FastQueue<Node> nodes = createGrid(2,2);
+		FastQueue<Node> nodes = createGrid(2,2, true);
 
 //		assertTrue(alg.isCornerValidOrigin(nodes.get(0)));
 		assertTrue(alg.isCornerValidOrigin(nodes.get(1)));
@@ -136,7 +158,7 @@ class TestChessboardCornerClusterToGrid
 	@Test
 	void isCornerValidOrigin_2x3() {
 		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
-		FastQueue<Node> nodes = createGrid(2,3);
+		FastQueue<Node> nodes = createGrid(2,3, true);
 
 		assertTrue(alg.isCornerValidOrigin(nodes.get(0)));
 		assertFalse(alg.isCornerValidOrigin(nodes.get(2)));
@@ -147,7 +169,7 @@ class TestChessboardCornerClusterToGrid
 	@Test
 	void isCornerValidOrigin_3x3() {
 		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
-		FastQueue<Node> nodes = createGrid(3,3);
+		FastQueue<Node> nodes = createGrid(3,3, true);
 
 		assertTrue(alg.isCornerValidOrigin(nodes.get(0)));
 		assertFalse(alg.isCornerValidOrigin(nodes.get(2*3)));
@@ -160,7 +182,7 @@ class TestChessboardCornerClusterToGrid
 		for (int rows = 2; rows <= 4; rows++) {
 			for (int cols = 2; cols <= 4; cols++) {
 				for (int i = 0; i < 10; i++) {
-					FastQueue<Node> corners = createGrid(rows, cols);
+					FastQueue<Node> corners = createGrid(rows, cols, true);
 
 					// randomize the order so that it needs to do something interesting
 					corners.shuffle(rand);
@@ -212,7 +234,7 @@ class TestChessboardCornerClusterToGrid
 	void alignEdges() {
 		for (int rows = 2; rows <= 4; rows++) {
 			for (int cols = 2; cols <= 4; cols++) {
-				FastQueue<Node> corners = createGrid(rows, cols);
+				FastQueue<Node> corners = createGrid(rows, cols, true);
 
 				// Shift the edges so that they won't be aligned
 				// They are already in order
@@ -241,14 +263,15 @@ class TestChessboardCornerClusterToGrid
 		}
 	}
 
-	private GridInfo createGridInfo(int rows, int cols) {
+	private GridInfo createGridInfo(int rows, int cols, boolean cornerSquare) {
 		GridInfo output = new GridInfo();
 		output.rows = rows;
 		output.cols = cols;
-		output.nodes.addAll(createGrid(rows, cols).toList());
+		output.nodes.addAll(createGrid(rows, cols, cornerSquare).toList());
 		return output;
 	}
-	private FastQueue<Node> createGrid(int rows, int cols) {
+
+	private FastQueue<Node> createGrid(int rows, int cols, boolean cornerSquare) {
 		FastQueue<Node> corners = new FastQueue<>(Node.class,true);
 
 		// declare the grid
@@ -261,6 +284,8 @@ class TestChessboardCornerClusterToGrid
 				n.orientation = Math.PI/4;
 				if( (row%2 + col%2)==1)
 					n.orientation -= Math.PI/2;
+				if( !cornerSquare )
+					n.orientation *= -1;
 
 				if( row > 0 ) {
 					Node p = corners.get((row-1)*cols+col);

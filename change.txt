@@ -30,13 +30,16 @@ Version : 0.34
 - Added configuration for Harris and Shi-Tomasi corner detectors
 - Average Down Sample has concurrent versions
 - PixelMath added logSign to handle images with positive and negative values
-- Split apart calibration detector configuration and shape
-- Chessboard Detector TODO finish
+- Split apart calibration detector configuration and shape configuration
+- Chessboard Detector 2
   * Rewritten from scratch using a new type of corner detector (TODo write tech report)
-  * Much better handling of blurred and fisheye images
+  * Better handling of blurred and fisheye images
+  * TODO Improve detect fisheye (2 more images) , See if accuracy can be improved.
 - Simulation
   * Concurrent version of SimulatePlanarWorld
 - TODO concurrent version of template matching
+- Android
+  * Thanks sergiuchuckmisha for fixing a bug/type-o in FOV estimation
 
 TODO Applications. Make standalone jar have access to commandline mode
 TODO               Create a commandline QR Code scanner

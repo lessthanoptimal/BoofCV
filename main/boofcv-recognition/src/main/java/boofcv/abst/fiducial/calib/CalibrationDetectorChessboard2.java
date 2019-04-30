@@ -54,6 +54,10 @@ public class CalibrationDetectorChessboard2
 	public CalibrationDetectorChessboard2(ConfigChessboard2 config, ConfigGridDimen shape ) {
 		super(config);
 
+		// require a stricter set of chessboards for calibration. This means you can often estimate the orientation
+		// uniquely
+		getClusterToGrid().setAllowNoCorner(false);
+
 		cornerRows = shape.numRows-1;
 		cornerCols = shape.numCols-1;
 

@@ -33,11 +33,18 @@ import java.util.Queue;
 /**
  * Given a chessboard corner cluster find the grid which it matches. The grid will be in "standard order". Depending
  * on the chessboard pattern there might be multiple multiple configurations that are in standard order or a unique
- * ordering. The corner at (0,0) is a corner that has a black square on the chessboard corner attached to it and
- * has the other corner with the same properly along its positive row direction and follows a right hand rule. Edges
- * will be ordered in CCW direction and the index of an edge which connects two adjacent corners to each other follows
- * the (i+2)%4 relationship. If multiple corners can be (0,0) then the one closest to the top left corner will be
- * selected.
+ * ordering.
+ *
+ * On a grid a "Corner" is defined as a corner point which has a black square attached to it which is not attached
+ * to any more corner points. These are useful in that they allow orientation to be uniquely defined under certain
+ * conditions. If the "allowNoCorner" flag is true then grid with no corners are allowed.
+ *
+ * The corner point at grid(0,0) will be set to a valid corner point with a "corner" that's closest to the (0,0) pixel
+ * coordinate. If there are no corner points then the corner which is closest to (0,0) pixel is selected.
+ *
+ * Edges will be ordered in CCW direction and the index of an edge which connects two adjacent corners to
+ * each other follows the (i+2)%4 relationship. If multiple corners can be (0,0) then the one closest to
+ * the top left corner will be selected.
  *
  * @author Peter Abeles
  */
@@ -52,13 +59,14 @@ public class ChessboardCornerClusterToGrid {
 	List<Node> edgeList = new ArrayList<>();
 	List<Node> cornerList = new ArrayList<>();
 
+	// See documentation above. if true then the requirement that the (0,0) grid element be a corner is removed.
+	boolean allowNoCorner=true;
+
 	// Used to optionally print extra debugging information
 	PrintStream verbose;
 
 	// optional check on the shape
 	CheckShape checkShape;
-
-	ChessboardCornerGraph hack;
 
 	/**
 	 * Puts cluster nodes into grid order and computes the number of rows and columns. If the cluster is not
@@ -69,7 +77,6 @@ public class ChessboardCornerClusterToGrid {
 	 * @return true if successful or false if it failed
 	 */
 	public boolean convert( ChessboardCornerGraph cluster , GridInfo info ) {
-		hack = cluster;
 		// default to an invalid value to ensure a failure doesn't go unnoticed.
 		info.reset();
 
@@ -106,10 +113,16 @@ public class ChessboardCornerClusterToGrid {
 
 		int bestCorner = -1;
 		double bestScore = Double.MAX_VALUE;
+		boolean bestIsCornerSquare = false;
 
 		for (int i = 0; i < cornerList.size(); i++) {
 			Node n = cornerList.get(i);
-			if( isCornerValidOrigin(n) ) {
+
+			boolean corner = isCornerValidOrigin(n);
+
+			// If there are no corner points which are valid corners, then any corner can be the origin if
+			// allowNoCorner is true
+			if( corner || (allowNoCorner && !bestIsCornerSquare) ) {
 				// sanity check the shape
 				if( checkShape != null ) {
 					if( i%2==0 ) {
@@ -123,14 +136,17 @@ public class ChessboardCornerClusterToGrid {
 					}
 				}
 
+				// If the distance is to (0,0) pixel is smaller or this is a corner square and the other best
+				// is not a corner square
 				double distance = n.normSq();
-				if( distance < bestScore ) {
+				if( distance < bestScore || (!bestIsCornerSquare && corner )) {
+					bestIsCornerSquare |= corner;
 					bestScore = distance;
 					bestCorner = i;
 				}
 			}
 		}
-
+		info.hasCornerSquare = bestIsCornerSquare;
 		return bestCorner;
 	}
 
@@ -271,7 +287,6 @@ public class ChessboardCornerClusterToGrid {
 				// Sanity check. If it has been marked it should be correctly aligned
 				if( marked.get(nb.index) ) {
 					if( nb.edges[j] != na ) {
-						hack.print();
 						if( verbose != null ) verbose.println("BUG! node "+nb.index+" has been processed and edge "+j+" doesn't point to node "+na.index);
 						return false;
 					}
@@ -389,12 +404,25 @@ public class ChessboardCornerClusterToGrid {
 		this.checkShape = checkShape;
 	}
 
+	public boolean isAllowNoCorner() {
+		return allowNoCorner;
+	}
+
+	public void setAllowNoCorner(boolean allowNoCorner) {
+		this.allowNoCorner = allowNoCorner;
+	}
+
 	public static class GridInfo {
 		public List<Node> nodes = new ArrayList<>();
 		public int rows,cols;
+		/**
+		 * Indicates if there are no "corner" corner points. See class JavaDoc.
+		 */
+		public boolean hasCornerSquare;
 
 		public void reset() {
 			rows = cols = -1;
+			hasCornerSquare = true;
 			nodes.clear();
 		}
 
