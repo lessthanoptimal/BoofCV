@@ -676,7 +676,10 @@ public class ChessboardCornerClusterFinder {
 	 */
 	private void repairVertexes() {
 //		System.out.println("######## Repair");
-		for (int idxV = 0; idxV < dirtyVertexes.size(); idxV++) {
+
+		// the number of dirty can increase, but we don't want to check new additions
+		int totalDirty = dirtyVertexes.size();
+		for (int idxV = 0; idxV < totalDirty; idxV++) {
 			final Vertex v = dirtyVertexes.get(idxV);
 
 //			System.out.println(" dirty="+v.index);
@@ -752,8 +755,11 @@ public class ChessboardCornerClusterFinder {
 				// will need to be checked for mutual matches
 				for (int i = 0; i < v.connections.edges.size(); i++) {
 					if( !bestSolution.contains(v.connections.edges.get(i)) ){
-						v.connections.edges.get(i).dst.marked = true;
-						break;
+						Vertex ve = v.connections.edges.get(i).dst;
+						if( !ve.marked ) {
+							ve.marked = true;
+							dirtyVertexes.add(ve);
+						}
 					}
 				}
 
@@ -763,7 +769,6 @@ public class ChessboardCornerClusterFinder {
 			}
 		}
 	}
-
 
 	/**
 	 * Converts the internal graphs into unordered chessboard grids.
@@ -784,7 +789,7 @@ public class ChessboardCornerClusterFinder {
 			graph.reset();
 
 			// traverse the graph and add all the nodes in this cluster
-			growCluster(corners, seedIdx, graph);
+			growCluster(corners, seedN.index, graph);
 
 			// Connect the nodes together in the output graph
 			for (int i = 0; i < graph.corners.size; i++) {
@@ -821,14 +826,10 @@ public class ChessboardCornerClusterFinder {
 	private void growCluster(List<ChessboardCorner> corners, int seedIdx, ChessboardCornerGraph graph) {
 		// open contains corner list indexes
 		open.add(seedIdx);
+		vertexes.get(seedIdx).marked = true;
 		while( open.size > 0 ) {
 			int cornerIdx = open.pop();
 			Vertex v = vertexes.get(cornerIdx);
-
-			// make sure it hasn't already been processed
-			if( v.marked)
-				continue;
-			v.marked = true;
 
 			// Create the node in the output cluster for this corner
 			ChessboardCornerGraph.Node gn = graph.growCorner();
@@ -839,8 +840,9 @@ public class ChessboardCornerClusterFinder {
 			// Add to the open list all the edges which haven't been processed yet;
 			for (int i = 0; i < v.connections.size(); i++) {
 				Vertex dst = v.connections.get(i).dst;
-				if( dst.marked)
+				if( dst.marked )
 					continue;
+				dst.marked = true;
 				open.add( dst.index );
 			}
 		}
