@@ -54,7 +54,7 @@ public class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output extends 
 	}
 
 	@Override
-	public void applyAll() {
+	protected void applyAll() {
 
 		// todo TO make this faster first apply inside the region which can process the fast border
 		// then do the slower border thingy
@@ -68,7 +68,7 @@ public class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output extends 
 	}
 
 	@Override
-	public void applyAll( GrayU8 mask ) {
+	protected void applyAll( GrayU8 mask ) {
 		float maxWidth = srcImg.getWidth()-1;
 		float maxHeight = srcImg.getHeight()-1;
 
@@ -92,7 +92,7 @@ public class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output extends 
 	}
 
 	@Override
-	public void applyOnlyInside() {
+	protected void applyOnlyInside() {
 
 		float maxWidth = srcImg.getWidth()-1;
 		float maxHeight = srcImg.getHeight()-1;
@@ -111,7 +111,7 @@ public class ImageDistortBasic_SB<Input extends ImageGray<Input>,Output extends 
 	}
 
 	@Override
-	public void applyOnlyInside( GrayU8 mask ) {
+	protected void applyOnlyInside( GrayU8 mask ) {
 
 		float maxWidth = srcImg.getWidth()-1;
 		float maxHeight = srcImg.getHeight()-1;

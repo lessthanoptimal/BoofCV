@@ -72,6 +72,7 @@ public class ImageDistortBasic_IL_MT
 	@Override
 	protected void init(Input srcImg, Output dstImg) {
 		super.init(srcImg,dstImg);
+		assigner.setImage(dstImg);
 	}
 
 	@Override

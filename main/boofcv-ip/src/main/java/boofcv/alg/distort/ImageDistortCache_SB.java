@@ -133,7 +133,7 @@ public class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends 
 		assigner.setImage(dstImg);
 	}
 
-	public void renderAll() {
+	protected void renderAll() {
 
 		// todo TO make this faster first apply inside the region which can process the fast border
 		// then do the slower border thingy
@@ -147,7 +147,7 @@ public class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends 
 		}
 	}
 
-	public void renderAll( GrayU8 mask ) {
+	protected void renderAll( GrayU8 mask ) {
 		float maxWidth = srcImg.getWidth()-1;
 		float maxHeight = srcImg.getHeight()-1;
 
@@ -168,7 +168,7 @@ public class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends 
 		}
 	}
 
-	public void applyOnlyInside() {
+	protected void applyOnlyInside() {
 		float maxWidth = srcImg.getWidth()-1;
 		float maxHeight = srcImg.getHeight()-1;
 
@@ -184,7 +184,7 @@ public class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends 
 		}
 	}
 
-	public void applyOnlyInside( GrayU8 mask ) {
+	protected void applyOnlyInside( GrayU8 mask ) {
 		float maxWidth = srcImg.getWidth()-1;
 		float maxHeight = srcImg.getHeight()-1;
 

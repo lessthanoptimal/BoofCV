@@ -18,16 +18,71 @@
 
 package boofcv.alg.distort;
 
+import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.InterpolationType;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofTesting;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
 public class TestImageDistortBasic_SB_MT {
+	Random rand = new Random(234);
+	int width = 60,height=80;
+
 	@Test
-	void stuff() {
-		fail("Implement");
+	void compare_all() {
+		GrayF32 input = new GrayF32(width,height);
+		GrayF32 output_ST = new GrayF32(width,height);
+		GrayF32 output_MT = new GrayF32(width,height);
+		GImageMiscOps.fillUniform(input,rand,0,150);
+
+		InterpolatePixelS<GrayF32> interpolate = FactoryInterpolation.createPixelS(
+				0, 255, InterpolationType.BILINEAR, BorderType.EXTENDED, GrayF32.class);
+
+
+		ImageDistortBasic_SB alg_ST = new ImageDistortBasic_SB(new AssignPixelValue_SB.F32(),interpolate);
+		ImageDistortBasic_SB_MT alg_MT = new ImageDistortBasic_SB_MT(new AssignPixelValue_SB.F32(),interpolate);
+
+		alg_ST.setModel(new TestImageDistortBasic_IL_MT.Transform());
+		alg_ST.apply(input,output_ST);
+
+		alg_MT.setModel(new TestImageDistortBasic_IL_MT.Transform());
+		alg_MT.apply(input,output_MT);
+
+		BoofTesting.assertEquals(output_ST,output_MT, UtilEjml.TEST_F32);
+	}
+
+	@Test
+	void compare_mask() {
+		GrayF32 input = new GrayF32(width,height);
+		GrayF32 output_ST = new GrayF32(width,height);
+		GrayF32 output_MT = new GrayF32(width,height);
+		GImageMiscOps.fillUniform(input,rand,0,150);
+
+		GrayU8 mask = new GrayU8(width,height);
+		GImageMiscOps.fillUniform(input,rand,0,1);
+
+		InterpolatePixelS<GrayF32> interpolate = FactoryInterpolation.createPixelS(
+				0, 255, InterpolationType.BILINEAR, BorderType.EXTENDED, GrayF32.class);
+
+		ImageDistortBasic_SB alg_ST = new ImageDistortBasic_SB(new AssignPixelValue_SB.F32(),interpolate);
+		ImageDistortBasic_SB_MT alg_MT = new ImageDistortBasic_SB_MT(new AssignPixelValue_SB.F32(),interpolate);
+
+		alg_ST.setModel(new TestImageDistortBasic_IL_MT.Transform());
+		alg_ST.apply(input,output_ST,mask);
+
+		alg_MT.setModel(new TestImageDistortBasic_IL_MT.Transform());
+		alg_MT.apply(input,output_MT,mask);
+
+		BoofTesting.assertEquals(output_ST,output_MT, UtilEjml.TEST_F32);
 	}
 }

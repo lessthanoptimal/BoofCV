@@ -18,16 +18,88 @@
 
 package boofcv.alg.distort;
 
+import boofcv.alg.interpolate.InterpolatePixelMB;
+import boofcv.alg.interpolate.InterpolationType;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.distort.PixelTransform;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedF32;
+import boofcv.testing.BoofTesting;
+import georegression.struct.point.Point2D_F32;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
 public class TestImageDistortBasic_IL_MT {
+	Random rand = new Random(234);
+	int width = 60,height=80;
+	private static final int NUM_BANDS = 2;
+
 	@Test
-	void stuff() {
-		fail("Implement");
+	void compare_all() {
+		InterleavedF32 input = new InterleavedF32(width,height,NUM_BANDS);
+		InterleavedF32 output_ST = new InterleavedF32(width,height,NUM_BANDS);
+		InterleavedF32 output_MT = new InterleavedF32(width,height,NUM_BANDS);
+		GImageMiscOps.fillUniform(input,rand,0,150);
+
+		InterpolatePixelMB<InterleavedF32> interpolate = FactoryInterpolation.createPixelMB(
+				0, 255, InterpolationType.BILINEAR, BorderType.EXTENDED, ImageType.il(NUM_BANDS,InterleavedF32.class));
+
+		ImageDistortBasic_IL alg_ST = new ImageDistortBasic_IL(new AssignPixelValue_MB.F32(),interpolate);
+		ImageDistortBasic_IL_MT alg_MT = new ImageDistortBasic_IL_MT(new AssignPixelValue_MB.F32(),interpolate);
+
+		alg_ST.setModel(new Transform());
+		alg_ST.apply(input,output_ST);
+
+		alg_MT.setModel(new Transform());
+		alg_MT.apply(input,output_MT);
+
+		BoofTesting.assertEquals(output_ST,output_MT, UtilEjml.TEST_F32);
+	}
+
+	@Test
+	void compare_mask() {
+		InterleavedF32 input = new InterleavedF32(width,height,NUM_BANDS);
+		InterleavedF32 output_ST = new InterleavedF32(width,height,NUM_BANDS);
+		InterleavedF32 output_MT = new InterleavedF32(width,height,NUM_BANDS);
+		GImageMiscOps.fillUniform(input,rand,0,150);
+
+		GrayU8 mask = new GrayU8(width,height);
+		GImageMiscOps.fillUniform(input,rand,0,1);
+
+		InterpolatePixelMB<InterleavedF32> interpolate = FactoryInterpolation.createPixelMB(
+				0, 255, InterpolationType.BILINEAR, BorderType.EXTENDED, ImageType.il(NUM_BANDS,InterleavedF32.class));
+
+		ImageDistortBasic_IL alg_ST = new ImageDistortBasic_IL(new AssignPixelValue_MB.F32(),interpolate);
+		ImageDistortBasic_IL_MT alg_MT = new ImageDistortBasic_IL_MT(new AssignPixelValue_MB.F32(),interpolate);
+
+		alg_ST.setModel(new TestImageDistortBasic_IL_MT.Transform());
+		alg_ST.apply(input,output_ST,mask);
+
+		alg_MT.setModel(new TestImageDistortBasic_IL_MT.Transform());
+		alg_MT.apply(input,output_MT,mask);
+
+		BoofTesting.assertEquals(output_ST,output_MT, UtilEjml.TEST_F32);
+	}
+
+	public static class Transform implements PixelTransform<Point2D_F32> {
+
+		@Override
+		public void compute(int x, int y, Point2D_F32 output) {
+			output.x = x+y*0.0001f;
+			output.y = y*0.999f;
+		}
+
+		@Override
+		public PixelTransform<Point2D_F32> copy() {
+			return new Transform();
+		}
 	}
 }
