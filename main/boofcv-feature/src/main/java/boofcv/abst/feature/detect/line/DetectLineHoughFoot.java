@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,6 +79,10 @@ public class DetectLineHoughFoot <I extends ImageGray<I>, D extends ImageGray<D>
 	// post processing pruning
 	ImageLinePruneMerge post = new ImageLinePruneMerge();
 
+	// tuning parameters for merging
+	double mergeAngle = Math.PI*0.05;
+	double mergeDistance = 10;
+
 	/**
 	 * Specifies detection parameters.  The suggested parameters should be used as a starting point and will
 	 * likely need to be tuned significantly for each different scene.
@@ -140,8 +144,7 @@ public class DetectLineHoughFoot <I extends ImageGray<I>, D extends ImageGray<D>
 		// NOTE: angular accuracy is a function of range from sub image center.  This pruning
 		// function uses a constant value for range accuracy.  A custom algorithm should really
 		// be used here.
-		// NOTE: Thresholds should not be hardcoded...
-		post.pruneSimilar((float) (Math.PI * 0.04), 10, input.width, input.height);
+		post.pruneSimilar((float) mergeAngle, (float)mergeDistance, input.width, input.height);
 		post.pruneNBest(maxLines);
 
 		return post.createList();
@@ -165,5 +168,21 @@ public class DetectLineHoughFoot <I extends ImageGray<I>, D extends ImageGray<D>
 
 	public GrayU8 getBinary() {
 		return binary;
+	}
+
+	public double getMergeAngle() {
+		return mergeAngle;
+	}
+
+	public void setMergeAngle(double mergeAngle) {
+		this.mergeAngle = mergeAngle;
+	}
+
+	public double getMergeDistance() {
+		return mergeDistance;
+	}
+
+	public void setMergeDistance(double mergeDistance) {
+		this.mergeDistance = mergeDistance;
 	}
 }

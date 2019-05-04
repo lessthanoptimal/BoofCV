@@ -120,6 +120,9 @@ public class ImageLinePruneMerge {
 				if( UtilAngle.distHalf(theta[i],theta[j]) > toleranceAngle )
 					continue;
 
+				// NOTE: I don't like the way this distance metric looks. Seems arbitrary and will vary depending on
+				//       the image size.
+
 				Point2D_F32 p = Intersection2D_F32.intersection(a, b, null);
 
 				// see if it is nearly parallel and intersects inside the image

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -114,8 +114,13 @@ public class FactoryDetectLineAlgs {
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		return new DetectLineHoughFoot<>(config.localMaxRadius, config.minCounts, config.minDistanceFromOrigin,
+		DetectLineHoughFoot<I,D> alg = new DetectLineHoughFoot<>(config.localMaxRadius, config.minCounts, config.minDistanceFromOrigin,
 				config.thresholdEdge, config.maxLines, gradient);
+
+		alg.setMergeAngle(config.mergeAngle);
+		alg.setMergeDistance(config.mergeDistance);
+
+		return alg;
 	}
 
 	/**

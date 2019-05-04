@@ -19,8 +19,6 @@
 package boofcv.alg.shapes;
 
 import boofcv.alg.shapes.polyline.splitmerge.PolylineSplitMerge;
-import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitLoop;
-import boofcv.alg.shapes.polyline.splitmerge.SplitMergeLineFitSegment;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
@@ -58,8 +56,7 @@ public class ShapeFittingOps {
 	 * <p>Internally a split-and-merge algorithm is used.  See referenced classes for more information. Consider
 	 * using internal algorithms directly if this function is a performance bottleneck.</p>
 	 *
-	 * @see SplitMergeLineFitLoop
-	 * @see SplitMergeLineFitSegment
+	 * @see PolylineSplitMerge
 	 *
 	 * @param sequence Ordered and connected list of points.
 	 * @param loop If true the sequence is a connected at both ends, otherwise it is assumed to not be.

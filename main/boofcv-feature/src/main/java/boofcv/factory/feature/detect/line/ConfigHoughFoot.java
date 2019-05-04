@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,23 +29,33 @@ public class ConfigHoughFoot implements Configuration {
 	/**
 	 * Lines in transform space must be a local max in a region with this radius. Try 5;
 	 */
-	int localMaxRadius = 5;
+	public int localMaxRadius = 5;
 	/**
 	 * Minimum number of counts/votes inside the transformed image. Try 5.
 	 */
-	int minCounts = 5;
+	public int minCounts = 5;
 	/**
 	 * Lines which are this close to the origin of the transformed image are ignored.  Try 5.
 	 */
-	int minDistanceFromOrigin = 5;
+	public int minDistanceFromOrigin = 5;
 	/**
 	 * Threshold for classifying pixels as edge or not.  Try 30.
 	 */
-	float thresholdEdge = 30;
+	public float thresholdEdge = 30;
 	/**
 	 * Maximum number of lines to return. If &le; 0 it will return them all.
 	 */
-	int maxLines = 0;
+	public int maxLines = 0;
+
+	/**
+	 * If two lines have a slope within this tolerance (radians) then they can be merged.
+	 */
+	public double mergeAngle = Math.PI*0.05;
+
+	/**
+	 * If two lines are within this distance of each other then they can be merged. units = pixels.
+	 */
+	public double mergeDistance = 10;
 
 	public ConfigHoughFoot() {
 	}
