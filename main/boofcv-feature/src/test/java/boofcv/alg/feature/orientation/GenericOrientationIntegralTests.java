@@ -20,12 +20,15 @@ package boofcv.alg.feature.orientation;
 
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.abst.feature.orientation.RegionOrientation;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
 import georegression.metric.UtilAngle;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -163,6 +166,31 @@ public abstract class GenericOrientationIntegralTests<T extends ImageGray<T>> ex
 
 		double found = UtilAngle.bound(alg.compute(sub.width/2,sub.height/2));
 		assertTrue(UtilAngle.dist(angle,found) < angleTolerance );
+	}
+
+	@Test
+	void checkCopy() {
+		// random image
+		T input = (T)ii.createNew(width,height);
+		GImageMiscOps.fillUniform(input,rand,0,100);
+		GIntegralImageOps.transform(input,ii);
+
+		alg.setImage(input);
+		alg.setObjectRadius(regionSize/2);
+
+		OrientationIntegral<T> algCopy = (OrientationIntegral)alg.copy();
+		algCopy.setImage(input);
+		algCopy.setObjectRadius(regionSize/2);
+
+		for (int i = 0; i < 100; i++) {
+			int x = rand.nextInt(width);
+			int y = rand.nextInt(height);
+
+			double expected = alg.compute(x,y);
+			double found = algCopy.compute(x,y);
+
+			assertEquals(expected,found, UtilEjml.TEST_F64);
+		}
 	}
 
 	/**

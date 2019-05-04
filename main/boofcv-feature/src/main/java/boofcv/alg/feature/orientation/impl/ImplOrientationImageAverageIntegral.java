@@ -52,9 +52,9 @@ public class ImplOrientationImageAverageIntegral<T extends ImageGray<T>,G extend
 	 */
 	public ImplOrientationImageAverageIntegral(double radiusToScale,
 											   int sampleRadius, double period,
-											   int sampleWidth, double weightSigma,
+											   int kernelWidth, double weightSigma,
 											   Class<T> imageType) {
-		super(radiusToScale,sampleRadius,period,sampleWidth,weightSigma, false, imageType);
+		super(radiusToScale,sampleRadius,period,kernelWidth,weightSigma, false, imageType);
 
 		int w = sampleRadius*2+1;
 		kerCosine = new Kernel2D_F64(w);
@@ -163,6 +163,6 @@ public class ImplOrientationImageAverageIntegral<T extends ImageGray<T>,G extend
 	@Override
 	public RegionOrientation copy() {
 		return new ImplOrientationImageAverageIntegral<>(
-				objectRadiusToScale,sampleRadius,period,sampleWidth,weightSigma,getImageType());
+				objectRadiusToScale,sampleRadius,period,kernelWidth,weightSigma,getImageType());
 	}
 }

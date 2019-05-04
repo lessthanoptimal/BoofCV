@@ -45,9 +45,9 @@ public class ImplOrientationAverageGradientIntegral<T extends ImageGray<T>,G ext
 	 */
 	public ImplOrientationAverageGradientIntegral(double radiusToScale,
 												  int sampleRadius, double period,
-												  int sampleWidth, double weightSigma,
+												  int kernelWidth, double weightSigma,
 												  Class<T> imageType) {
-		super(radiusToScale,sampleRadius,period,sampleWidth,weightSigma, true, imageType);
+		super(radiusToScale,sampleRadius,period,kernelWidth,weightSigma, true, imageType);
 	}
 
 	@Override
@@ -129,6 +129,6 @@ public class ImplOrientationAverageGradientIntegral<T extends ImageGray<T>,G ext
 	@Override
 	public RegionOrientation copy() {
 		return new ImplOrientationAverageGradientIntegral<>(
-				objectRadiusToScale,sampleRadius,period,sampleWidth,weightSigma,getImageType());
+				objectRadiusToScale,sampleRadius,period,kernelWidth,weightSigma,getImageType());
 	}
 }
