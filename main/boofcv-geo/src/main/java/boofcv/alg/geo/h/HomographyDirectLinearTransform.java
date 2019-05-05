@@ -370,6 +370,10 @@ public class HomographyDirectLinearTransform {
 		return rowA+9;
 	}
 
+	public SolveNullSpace<DMatrixRMaj> getSolverNullspace() {
+		return solverNullspace;
+	}
+
 	public boolean isNormalize() {
 		return normalize;
 	}
