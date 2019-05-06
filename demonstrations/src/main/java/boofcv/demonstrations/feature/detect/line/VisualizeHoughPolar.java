@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,23 +21,31 @@ package boofcv.demonstrations.feature.detect.line;
 
 import boofcv.abst.feature.detect.line.DetectLineHoughPolar;
 import boofcv.alg.filter.blur.GBlurImageOps;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
+import boofcv.gui.BoofSwingUtil;
+import boofcv.gui.DemonstrationBase;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.ImageLinePanel;
-import boofcv.gui.image.ShowImages;
+import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.point.Point2D_F64;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,35 +53,68 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisualizeHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>> {
+public class VisualizeHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>>
+	extends DemonstrationBase
+{
 
 	Class<I> imageType;
 	Class<D> derivType;
 
-	public VisualizeHoughPolar(Class<I> imageType, Class<D> derivType) {
+	I blur;
+
+	ListDisplayPanel gui = new ListDisplayPanel("Lines","Edges","Parameter Space");
+	ImageLinePanel linePanel = new ImageLinePanel();
+
+	DetectLineHoughPolar<I,D> alg;
+
+	BufferedImage renderedTran;
+	BufferedImage renderedBinary;
+
+	public VisualizeHoughPolar( List<PathLabel> examples,Class<I> imageType) {
+		super(true,true,examples,ImageType.single(imageType));
 		this.imageType = imageType;
-		this.derivType = derivType;
+		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
+		alg =  FactoryDetectLineAlgs.houghPolar(
+				new ConfigHoughPolar(5, 10, 2, Math.PI / 180, 25, 10), imageType, derivType);
+
+		blur = GeneralizedImageOps.createSingleBand(imageType,1,1);
+
+		add(BorderLayout.CENTER,gui);
 	}
 
-	public void process( BufferedImage image ) {
-		I input = GeneralizedImageOps.createSingleBand(imageType, image.getWidth(), image.getHeight());
-		I blur = GeneralizedImageOps.createSingleBand(imageType, image.getWidth(), image.getHeight());
+	@Override
+	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+		blur.reshape(width,height);
 
-		ConvertBufferedImage.convertFromSingle(image, input, imageType);
+		alg.setInputSize(width,height);
+		GrayF32 transform = alg.getTransform().getTransform();
+		renderedTran = ConvertBufferedImage.checkDeclare(transform.width,transform.height,renderedTran,BufferedImage.TYPE_INT_RGB);
+		renderedBinary = ConvertBufferedImage.checkDeclare(width,height,renderedBinary,BufferedImage.TYPE_INT_RGB);
+
+		BoofSwingUtil.invokeNowOrLater(()->{
+			gui.getBodyPanel().setPreferredSize(new Dimension(width,height));
+			gui.setItem(0,linePanel);
+			gui.setItem(1,new ImagePanel(renderedBinary));
+			gui.setItem(2,new ImagePanel(renderedTran));
+		});
+	}
+
+	@Override
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase _input)
+	{
+		I input = (I)_input;
+
 		GBlurImageOps.gaussian(input, blur, -1, 2, null);
-
-		DetectLineHoughPolar<I,D> alg =  FactoryDetectLineAlgs.houghPolar(
-				new ConfigHoughPolar(5, 10, 2, Math.PI / 180, 25, 10), imageType, derivType);
 
 		List<LineParametric2D_F32> lines = alg.detect(blur);
 
-		ImageLinePanel gui = new ImageLinePanel();
-		gui.setImage(image);
-		gui.setLines(lines);
-		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
+		linePanel.setImage(buffered);
+		linePanel.setLines(lines);
+		linePanel.setPreferredSize(new Dimension(input.width,input.height));
 
-		BufferedImage renderedTran = VisualizeImageData.grayMagnitude(alg.getTransform().getTransform(),null,-1);
-		BufferedImage renderedBinary = VisualizeBinaryData.renderBinary(alg.getBinary(), false, null);
+		VisualizeImageData.grayMagnitude(alg.getTransform().getTransform(), renderedTran,-1);
+		VisualizeBinaryData.renderBinary(alg.getBinary(), false, renderedBinary);
 
 		// Draw the location of lines onto the magnitude image
 		Graphics2D g2 = renderedTran.createGraphics();
@@ -90,17 +131,23 @@ public class VisualizeHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>>
 			g2.drawOval(x-r,y-r,w,w);
 		}
 
-		ShowImages.showWindow(renderedBinary,"Detected Edges");
-		ShowImages.showWindow(renderedTran,"Parameter Space");
-		ShowImages.showWindow(gui,"Detected Lines");
+		gui.repaint();
 	}
 
 	public static void main( String args[] ) {
-		VisualizeHoughPolar<GrayF32,GrayF32> app =
-				new VisualizeHoughPolar<>(GrayF32.class, GrayF32.class);
+		java.util.List<PathLabel> examples = new ArrayList<>();
 
-		app.process(UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg")));
-//		app.process(UtilImageIO.loadImage(UtilIO.pathExample("lines_indoors.jpg"));
-//		app.process(UtilImageIO.loadImage(UtilIO.pathExample("outdoors01.jpg"));
+		examples.add(new PathLabel("Simple Objects",UtilIO.pathExample("simple_objects.jpg")));
+		examples.add(new PathLabel("Indoors",UtilIO.pathExample("lines_indoors.jpg")));
+		examples.add(new PathLabel("Outdoors", UtilIO.pathExample("outdoors01.jpg")));
+		examples.add(new PathLabel("Indoors Video",UtilIO.pathExample("lines_indoors.mjpeg")));
+
+		SwingUtilities.invokeLater(()->{
+			VisualizeHoughPolar<GrayF32, GrayF32> app = new VisualizeHoughPolar(examples,GrayF32.class);
+
+			app.openExample(examples.get(0));
+			app.waitUntilInputSizeIsKnown();
+			app.display("Hough Polar");
+		});
 	}
 }

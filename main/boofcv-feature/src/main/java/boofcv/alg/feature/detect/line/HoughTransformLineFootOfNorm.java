@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -176,6 +176,10 @@ public class HoughTransformLineFootOfNorm {
 	 */
 	public GrayF32 getTransform() {
 		return transform;
+	}
+
+	public FastQueue<LineParametric2D_F32> getLines() {
+		return lines;
 	}
 
 	/**
