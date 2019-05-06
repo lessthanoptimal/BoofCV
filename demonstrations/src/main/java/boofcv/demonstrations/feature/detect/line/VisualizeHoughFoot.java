@@ -76,7 +76,7 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		alg =  FactoryDetectLineAlgs.houghFoot(
-				new ConfigHoughFoot(6, 12, 5, 25, 10), imageType, derivType);
+				new ConfigHoughFoot(6, 6, 5, 15, 10), imageType, derivType);
 		blur = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
 		add(BorderLayout.CENTER,gui);

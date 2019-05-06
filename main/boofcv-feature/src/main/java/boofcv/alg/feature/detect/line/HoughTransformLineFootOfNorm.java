@@ -155,17 +155,32 @@ public class HoughTransformLineFootOfNorm {
 		y -= originY;
 
 		float v = (x*derivX + y*derivY)/(derivX*derivX + derivY*derivY);
+		float vx = v*derivX + originX;
+		float vy = v*derivY + originY;
 
-		// finds the foot a line normal equation and put the point into image coordinates
-		int x0 = (int)(v*derivX) + originX;
-		int y0 = (int)(v*derivY) + originY;
+		// finds the foot a line normal equation and put the point into image coordinate
+		int x0 = (int)vx;
+		int y0 = (int)vy;
 
-		if( transform.isInBounds(x0,y0)) {
-			int index = transform.startIndex+y0*transform.stride+x0;
+		// weights for bilinear interpolate type weightings
+		float wx = vx-x0;
+		float wy = vy-y0;
+
+		// make a soft decision and spread counts across neighbors
+		addParameters(x0,y0, (1f-wx)*(1f-wy));
+		addParameters(x0+1,y0, (wx)*(1f-wy));
+		addParameters(x0,y0+1, (1f-wx)*(wy));
+		addParameters(x0+1,y0+1, (wx)*(wy));
+	}
+
+	private void addParameters( int x , int y , float amount ) {
+		if( transform.isInBounds(x,y)) {
+			int index = transform.startIndex+y*transform.stride+x;
 			// keep track of candidate pixels so that a sparse search can be done
 			// to detect lines
-			if( transform.data[index]++ == 1 )
-				candidates.add(x0,y0);
+			if( transform.data[index] == 0 )
+				candidates.add(x,y);
+			transform.data[index] += amount;
 		}
 	}
 
