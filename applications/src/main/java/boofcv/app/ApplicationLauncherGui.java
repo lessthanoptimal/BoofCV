@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,6 +60,7 @@ public class ApplicationLauncherGui extends JPanel {
 		JButton bCreateFidImage = createButton("Square Image",CreateFiducialSquareImageGui::new);
 
 		JButton bUtilCalib = createButton("Calibration",CameraCalibrationGui::new);
+		JButton bUtilScanQrCode = createButton("Batch QR Code",BatchScanQrCodesGui::new);
 		JButton bUtilDown = createButton("Batch Downsize",BatchDownsizeImageGui::new);
 		JButton bUtilUndist = createButton("Batch Undistort",BatchRemoveLensDistortionGui::new);
 
@@ -88,7 +89,7 @@ public class ApplicationLauncherGui extends JPanel {
 		layout.putConstraint(SpringLayout.NORTH, logo, 0, SpringLayout.NORTH, this);
 
 		JPanel panelLeft = buttonPanel("Create / Print",bCreateQR,bCreateCalib,bCreateFidBin,bCreateFidImage);
-		JPanel panelRight = buttonPanel("Tools",bUtilCalib,bUtilDown,bUtilUndist);
+		JPanel panelRight = buttonPanel("Tools",bUtilCalib,bUtilScanQrCode,bUtilDown,bUtilUndist);
 
 		layout.putConstraint(SpringLayout.WEST, panelLeft, 60, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.NORTH, panelLeft, 0, SpringLayout.SOUTH, logo);

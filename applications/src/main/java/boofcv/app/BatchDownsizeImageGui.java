@@ -18,7 +18,7 @@
 
 package boofcv.app;
 
-import boofcv.app.batch.BatchControlPanel;
+import boofcv.app.batch.BatchConvertControlPanel;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
@@ -75,7 +75,7 @@ public class BatchDownsizeImageGui extends JPanel implements BatchDownsizeImage.
 		});
 	}
 
-	private class ControlPanel extends BatchControlPanel implements ChangeListener {
+	private class ControlPanel extends BatchConvertControlPanel implements ChangeListener {
 		JSpinner spinnerWidth;
 		JSpinner spinnerHeight;
 		JCheckBox checkMaxLength = new JCheckBox("Max Length");

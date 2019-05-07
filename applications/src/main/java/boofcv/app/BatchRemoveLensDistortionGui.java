@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.app;
 
 import boofcv.alg.distort.AdjustmentType;
-import boofcv.app.batch.BatchControlPanel;
+import boofcv.app.batch.BatchConvertControlPanel;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
@@ -35,8 +35,8 @@ import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import static boofcv.app.batch.BatchControlPanel.KEY_INPUT;
-import static boofcv.app.batch.BatchControlPanel.KEY_OUTPUT;
+import static boofcv.app.batch.BatchConvertControlPanel.KEY_INPUT;
+import static boofcv.app.batch.BatchConvertControlPanel.KEY_OUTPUT;
 
 /**
  * GUI For batch removal of lens distortion
@@ -139,7 +139,7 @@ public class BatchRemoveLensDistortionGui extends JPanel implements BatchRemoveL
 		});
 	}
 
-	private class ControlPanel extends BatchControlPanel {
+	private class ControlPanel extends BatchConvertControlPanel {
 		JTextField textIntrinsic = new JTextField();
 		JComboBox<String> comboResize = new JComboBox<>(new String[]{"None","Expand","Full View"});
 

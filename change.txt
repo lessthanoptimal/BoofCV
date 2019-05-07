@@ -6,6 +6,8 @@ Date Format: year/month/day
 Date    : 2019
 Version : 0.34
 
+- Applications
+  * Added batch QR Code scanner
 - Examples
   * Added corner detector
 - BinaryImageOps
@@ -40,9 +42,6 @@ Version : 0.34
 - TODO concurrent version of template matching
 - Android
   * Thanks sergiuchuckmisha for fixing a bug/type-o in FOV estimation
-
-TODO Applications. Make standalone jar have access to commandline mode
-TODO               Create a commandline QR Code scanner
 
 TODO Scene Reconstruction from arbitrary number of photos
 

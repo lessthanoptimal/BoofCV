@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,6 @@ import boofcv.gui.StandardAlgConfigPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.util.prefs.Preferences;
 
 /**
  * @author Peter Abeles
@@ -31,41 +30,15 @@ import java.util.prefs.Preferences;
 public abstract class BatchControlPanel extends StandardAlgConfigPanel {
 	public static final String KEY_INPUT = "input";
 	public static final String KEY_OUTPUT = "output";
+	public static final String KEY_RECURSIVE = "recursive";
 
 	protected JTextField textInputDirectory = new JTextField();
-	protected JTextField textOutputDirectory = new JTextField();
 	protected JTextField textRegex = new JTextField();
 	protected JCheckBox checkRecursive = new JCheckBox("Recursive");
-	protected JCheckBox checkRename = new JCheckBox("Rename");
 	public JButton bAction = new JButton("Start");
 
-	int textWidth = 200;
-	int textHeight = 30;
-
-	public void addStandardControls(Preferences prefs) {
-
-		textInputDirectory.setPreferredSize(new Dimension(textWidth,textHeight));
-		textInputDirectory.setMaximumSize(textInputDirectory.getPreferredSize());
-		textOutputDirectory.setPreferredSize(new Dimension(textWidth,textHeight));
-		textOutputDirectory.setMaximumSize(textOutputDirectory.getPreferredSize());
-		textRegex.setPreferredSize(new Dimension(textWidth+40,textHeight));
-		textRegex.setMaximumSize(textRegex.getPreferredSize());
-		textRegex.setText("([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)");
-		checkRecursive.setSelected(false);
-
-		textInputDirectory.setText(prefs.get(KEY_INPUT,""));
-		textOutputDirectory.setText(prefs.get(KEY_OUTPUT,""));
-
-		bAction.addActionListener(a-> handleStart());
-
-		addLabeled(createTextSelect(textInputDirectory,"Input Directory",true),"Input");
-		addLabeled(createTextSelect(textOutputDirectory,"Output Directory",true),"Output");
-		addAlignLeft(checkRecursive);
-		addAlignLeft(checkRename);
-		addLabeled(textRegex,"Regex");
-		addVerticalGlue();
-		addAlignCenter(bAction);
-	}
+	public int textWidth = 200;
+	public int textHeight = 30;
 
 	protected JPanel createTextSelect( final JTextField field , final String message , boolean directory ) {
 		JButton bOpen = new JButton(UIManager.getIcon("FileView.fileIcon"));
@@ -102,4 +75,9 @@ public abstract class BatchControlPanel extends StandardAlgConfigPanel {
 	}
 
 	protected abstract void handleStart();
+
+	public interface Listener {
+		void batchUpdate( String fileName );
+	}
+
 }

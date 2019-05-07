@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,6 +35,7 @@ public class Help {
 			BatchDownsizeImage.class,
 			FiducialDetection.class,
 			CameraCalibration.class,
+			BatchScanQrCodes.class,
 			CreateCalibrationTarget.class,
 			CreateQrCodeDocument.class
 	};
@@ -44,7 +45,7 @@ public class Help {
 		System.out.println();
 
 		for( Class c : options ) {
-			System.out.println("  "+c.getName());
+			System.out.println("  "+c.getSimpleName());
 		}
 		System.out.println("Example:");
 		System.out.println("java -jar applications.jar "+options[0].getSimpleName());
@@ -75,15 +76,7 @@ public class Help {
 				throw new RuntimeException(e);
 			}
 		} else {
-			System.out.println("Trying to run a command-line application?  Here are your options!");
-			System.out.println();
-
-			for (Class c : options) {
-				System.out.println("  " + c.getSimpleName());
-			}
-			System.out.println("Example:");
-			System.out.println("java -jar applications.jar " + options[0].getSimpleName());
-			System.out.println("java -jar applications.jar --GUI");
+			printHelp();
 		}
 	}
 }
