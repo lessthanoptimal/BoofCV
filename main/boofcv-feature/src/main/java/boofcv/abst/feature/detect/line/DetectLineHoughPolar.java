@@ -131,21 +131,7 @@ public class DetectLineHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>
 
 	@Override
 	public List<LineParametric2D_F32> detect(I input) {
-		// see if the input image shape has changed.
-		if( derivX.width != input.width || derivY.height != input.height ) {
-			double r = Math.sqrt(input.width*input.width + input.height*input.height);
-			int numBinsRange = (int)Math.ceil(r/resolutionRange);
-			int numBinsAngle = (int)Math.ceil(Math.PI/resolutionAngle);
-
-			alg = new HoughTransformLinePolar(extractor,numBinsRange,numBinsAngle);
-			derivX.reshape(input.width,input.height);
-			derivY.reshape(input.width,input.height);
-			intensity.reshape(input.width,input.height);
-			binary.reshape(input.width, input.height);
-//		angle.reshape(input.width, input.height);
-//		direction.reshape(input.width, input.height);
-			suppressed.reshape(input.width, input.height);
-		}
+		setInputSize(input.width,input.height);
 
 		gradient.process(input, derivX, derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
@@ -172,6 +158,23 @@ public class DetectLineHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>
 		ret = pruneLines(input, ret);
 
 		return ret;
+	}
+
+	public void setInputSize( int width , int height ) {
+		// see if the input image shape has changed.
+		if( derivX.width != width || derivY.height != height ) {
+			double r = Math.sqrt(width*width + height*height);
+			int numBinsRange = (int)Math.ceil(r/resolutionRange);
+			int numBinsAngle = (int)Math.ceil(Math.PI/resolutionAngle);
+			alg = new HoughTransformLinePolar(extractor,numBinsRange,numBinsAngle);
+			derivX.reshape(width,height);
+			derivY.reshape(width,height);
+			intensity.reshape(width,height);
+			binary.reshape(width, height);
+//			angle.reshape(width, height);
+//			direction.reshape(width, height);
+			suppressed.reshape(width, height);
+		}
 	}
 
 	private List<LineParametric2D_F32> pruneLines(I input, List<LineParametric2D_F32> ret) {

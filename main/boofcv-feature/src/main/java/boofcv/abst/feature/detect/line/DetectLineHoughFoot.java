@@ -112,10 +112,7 @@ public class DetectLineHoughFoot <I extends ImageGray<I>, D extends ImageGray<D>
 
 	@Override
 	public List<LineParametric2D_F32> detect(I input) {
-		derivX.reshape(input.width,input.height);
-		derivY.reshape(input.width,input.height);
-		intensity.reshape(input.width,input.height);
-		binary.reshape(input.width,input.height);
+		setInputSize(input.width, input.height);
 
 		gradient.process(input,derivX,derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
@@ -132,6 +129,13 @@ public class DetectLineHoughFoot <I extends ImageGray<I>, D extends ImageGray<D>
 		ret = pruneLines(input,ret);
 
 		return ret;
+	}
+
+	public void setInputSize( int width , int height ) {
+		derivX.reshape(width,height);
+		derivY.reshape(width,height);
+		intensity.reshape(width,height);
+		binary.reshape(width,height);
 	}
 
 	private List<LineParametric2D_F32> pruneLines(I input, List<LineParametric2D_F32> ret) {

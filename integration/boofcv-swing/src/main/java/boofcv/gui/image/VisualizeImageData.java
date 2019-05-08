@@ -41,8 +41,9 @@ public class VisualizeImageData {
 			GrayI srcInt = (GrayI) src;
 
 			if (src.getDataType().isSigned()) {
+				dst = checkInputs(src, dst);
 				double max = GImageStatistics.maxAbs(srcInt);
-				return colorizeSign(srcInt, dst, (int) max);
+				colorizeSign(srcInt, dst, (int) max);
 			} else {
 				if (src.getDataType().getNumBits() == 8) {
 					dst = ConvertBufferedImage.convertTo((GrayU8) src, dst);
@@ -66,9 +67,9 @@ public class VisualizeImageData {
 			}
 
 			if (hasNegative)
-				return colorizeSign(img, dst, (int) max);
+				colorizeSign(img, dst, (int) max);
 			else
-				return grayMagnitude((GrayF32) src, dst, max);
+				grayMagnitude((GrayF32) src, dst, max);
 		}
 
 		return dst;
@@ -99,15 +100,15 @@ public class VisualizeImageData {
 		}
 
 		if (src.getClass().isAssignableFrom(GrayF32.class)) {
-			return colorizeSign((GrayF32) src, dst, (float) normalize);
+			colorizeSign((GrayF32) src, dst, (float) normalize);
 		} else {
-			return colorizeSign((GrayI) src, dst, (int) normalize);
+			colorizeSign((GrayI) src, dst, (int) normalize);
 		}
+
+		return dst;
 	}
 
-	private static BufferedImage colorizeSign(GrayI src, BufferedImage dst, int normalize) {
-		dst = checkInputs(src, dst);
-
+	private static void colorizeSign(GrayI src, BufferedImage dst, int normalize) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				int v = src.get(x, y);
@@ -121,8 +122,6 @@ public class VisualizeImageData {
 				dst.setRGB(x, y, rgb);
 			}
 		}
-
-		return dst;
 	}
 
 	public static BufferedImage grayUnsigned(GrayI src, BufferedImage dst, int normalize) {
@@ -163,14 +162,16 @@ public class VisualizeImageData {
 		dst = checkInputs(src, dst);
 
 		if (src.getDataType().isInteger()) {
-			return grayMagnitude((GrayI) src, dst, (int) normalize);
+			grayMagnitude((GrayI) src, dst, (int) normalize);
 		} else if( src instanceof GrayF32){
-			return grayMagnitude((GrayF32) src, dst, (float) normalize);
+			grayMagnitude((GrayF32) src, dst, (float) normalize);
 		} else if( src instanceof GrayF64){
-			return grayMagnitude((GrayF64) src, dst, (float) normalize);
+			grayMagnitude((GrayF64) src, dst, (float) normalize);
 		} else {
 			throw new RuntimeException("Unsupported type");
 		}
+
+		return dst;
 	}
 
 	/**
@@ -183,20 +184,20 @@ public class VisualizeImageData {
 	 * @param normalize Used to normalize the input image.
 	 * @return Rendered image.
 	 */
-	public static BufferedImage grayMagnitudeTemp(ImageGray src, BufferedImage dst, double normalize) {
+	public static void grayMagnitudeTemp(ImageGray src, BufferedImage dst, double normalize) {
 		if (normalize < 0)
 			normalize = GImageStatistics.maxAbs(src);
 
 		dst = checkInputs(src, dst);
 
 		if (src.getDataType().isInteger()) {
-			return grayMagnitudeTemp((GrayI) src, dst, (int) normalize);
+			grayMagnitudeTemp((GrayI) src, dst, (int) normalize);
 		} else {
 			throw new RuntimeException("Add support");
 		}
 	}
 
-	private static BufferedImage grayMagnitude(GrayI src, BufferedImage dst, int maxValue) {
+	private static void grayMagnitude(GrayI src, BufferedImage dst, int maxValue) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				int v = Math.abs(src.get(x, y));
@@ -206,11 +207,9 @@ public class VisualizeImageData {
 				dst.setRGB(x, y, rgb << 16 | rgb << 8 | rgb);
 			}
 		}
-
-		return dst;
 	}
 
-	private static BufferedImage grayMagnitudeTemp(GrayI src, BufferedImage dst, int maxValue) {
+	private static void grayMagnitudeTemp(GrayI src, BufferedImage dst, int maxValue) {
 		int halfValue = maxValue / 2 + maxValue % 2;
 
 		for (int y = 0; y < src.height; y++) {
@@ -218,14 +217,6 @@ public class VisualizeImageData {
 				int v = Math.abs(src.get(x, y));
 
 				int r, b;
-
-				if (v >= halfValue) {
-					r = 255 * (v - halfValue) / halfValue;
-					b = 0;
-				} else {
-					r = 0;
-					b = 255 * v / halfValue;
-				}
 
 				if (v == 0) {
 					r = b = 0;
@@ -237,8 +228,6 @@ public class VisualizeImageData {
 				dst.setRGB(x, y, r << 16 | b);
 			}
 		}
-
-		return dst;
 	}
 
 	/**
@@ -323,7 +312,7 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	private static BufferedImage colorizeSign(GrayF32 src, BufferedImage dst, float maxAbsValue) {
+	private static void colorizeSign(GrayF32 src, BufferedImage dst, float maxAbsValue) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				float v = src.get(x, y);
@@ -337,8 +326,6 @@ public class VisualizeImageData {
 				dst.setRGB(x, y, rgb);
 			}
 		}
-
-		return dst;
 	}
 
 	public static BufferedImage graySign(GrayF32 src, BufferedImage dst, float maxAbsValue) {
@@ -360,7 +347,7 @@ public class VisualizeImageData {
 		return dst;
 	}
 
-	private static BufferedImage grayMagnitude(GrayF32 src, BufferedImage dst, float maxAbsValue) {
+	private static void grayMagnitude(GrayF32 src, BufferedImage dst, float maxAbsValue) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				float v = Math.abs(src.get(x, y));
@@ -370,11 +357,9 @@ public class VisualizeImageData {
 				dst.setRGB(x, y, rgb << 16 | rgb << 8 | rgb);
 			}
 		}
-
-		return dst;
 	}
 
-	private static BufferedImage grayMagnitude(GrayF64 src, BufferedImage dst, double maxAbsValue) {
+	private static void grayMagnitude(GrayF64 src, BufferedImage dst, double maxAbsValue) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				double v = Math.abs(src.get(x, y));
@@ -384,8 +369,6 @@ public class VisualizeImageData {
 				dst.setRGB(x, y, rgb << 16 | rgb << 8 | rgb);
 			}
 		}
-
-		return dst;
 	}
 
 	/**
@@ -396,8 +379,9 @@ public class VisualizeImageData {
 	private static BufferedImage checkInputs(ImageBase src, BufferedImage dst) {
 		if (dst != null) {
 			if (dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight()) {
-				throw new IllegalArgumentException("image dimension are different. src="
-						+src.width+"x"+src.height+"  dst="+dst.getWidth()+"x"+dst.getHeight());
+				dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+//				throw new IllegalArgumentException("image dimension are different. src="
+//						+src.width+"x"+src.height+"  dst="+dst.getWidth()+"x"+dst.getHeight());
 			}
 		} else {
 			dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);

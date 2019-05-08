@@ -15,9 +15,11 @@ Version : 0.34
   * Modified edge so that outside pixels can be treated as 0 or 1
   * Block threshold can now handle images smaller than the block size
   * Global threshold algorithm can now have the threshold scaled
+- Hough Line Foot now parameterizes using a soft rule
 - Concurrent code for ImageDistort
 - Demonstrations
   * modernize mosaic and stabilize
+  * modernized hough polar and foot
 - Examples
   * Android example disables threads if SDK is prior to 24 due to lack of Java 1.8 support
 - ImageStatistics

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,65 +21,126 @@ package boofcv.demonstrations.feature.detect.line;
 
 import boofcv.abst.feature.detect.line.DetectLineHoughFoot;
 import boofcv.alg.filter.blur.GBlurImageOps;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.line.ConfigHoughFoot;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
+import boofcv.gui.BoofSwingUtil;
+import boofcv.gui.DemonstrationBase;
+import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.ImageLinePanel;
-import boofcv.gui.image.ShowImages;
+import boofcv.gui.image.ImagePanel;
+import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.VisualizeImageData;
+import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
+import georegression.struct.line.LineParametric2D_F32;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Computes the Hough foot of norm transform and displays some of its steps and the detected lines
  *
  * @author Peter Abeles
  */
-public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>> {
+public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
+		extends DemonstrationBase
+{
 
 	Class<I> imageType;
 	Class<D> derivType;
 
-	public VisualizeHoughFoot(Class<I> imageType, Class<D> derivType) {
+	I blur;
+
+	ListDisplayPanel gui = new ListDisplayPanel("Lines","Edges","Parameter Space");
+	ImageLinePanel linePanel = new ImageLinePanel();
+
+	DetectLineHoughFoot<I,D> alg;
+
+	BufferedImage renderedTran;
+	BufferedImage renderedBinary;
+
+	public VisualizeHoughFoot(List<PathLabel> examples, Class<I> imageType) {
+		super(true,true,examples, ImageType.single(imageType));
 		this.imageType = imageType;
-		this.derivType = derivType;
+		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
+		alg =  FactoryDetectLineAlgs.houghFoot(
+				new ConfigHoughFoot(6, 6, 5, 15, 10), imageType, derivType);
+		blur = GeneralizedImageOps.createSingleBand(imageType,1,1);
+
+		add(BorderLayout.CENTER,gui);
 	}
 
-	public void process( BufferedImage image ) {
-		I input = GeneralizedImageOps.createSingleBand(imageType, image.getWidth(), image.getHeight());
-		I blur = GeneralizedImageOps.createSingleBand(imageType, image.getWidth(), image.getHeight());
+	@Override
+	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+		blur.reshape(width,height);
 
-		ConvertBufferedImage.convertFromSingle(image, input, imageType);
+		alg.setInputSize(width,height);
+		renderedTran = ConvertBufferedImage.checkDeclare(width,height,renderedTran,BufferedImage.TYPE_INT_RGB);
+		renderedBinary = ConvertBufferedImage.checkDeclare(width,height,renderedBinary,BufferedImage.TYPE_INT_RGB);
+
+		BoofSwingUtil.invokeNowOrLater(()->{
+			gui.getBodyPanel().setPreferredSize(new Dimension(width,height));
+			gui.setItem(0,linePanel);
+			gui.setItem(1,new ImagePanel(renderedBinary, ScaleOptions.DOWN));
+			gui.setItem(2,new ImagePanel(renderedTran, ScaleOptions.DOWN));
+		});
+	}
+
+	@Override
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase _input)
+	{
+		I input = (I)_input;
+
 		GBlurImageOps.gaussian(input, blur, -1, 2, null);
 
-		DetectLineHoughFoot<I,D> alg =  FactoryDetectLineAlgs.houghFoot(
-				new ConfigHoughFoot(6, 12, 5, 25, 10), imageType, derivType);
+		linePanel.setImage(buffered);
+		linePanel.setLines(alg.detect(blur));
 
-		ImageLinePanel gui = new ImageLinePanel();
-		gui.setImage(image);
-		gui.setLines(alg.detect(blur));
-		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
+		VisualizeImageData.grayMagnitude(alg.getTransform().getTransform(), renderedTran,-1);
+		VisualizeBinaryData.renderBinary(alg.getBinary(), false, renderedBinary);
 
-		BufferedImage renderedTran = VisualizeImageData.grayMagnitude(alg.getTransform().getTransform(),null,-1);
-		BufferedImage renderedBinary = VisualizeBinaryData.renderBinary(alg.getBinary(), false, null);
+		// Draw the location of lines onto the magnitude image
+		Graphics2D g2 = renderedTran.createGraphics();
+		g2.setColor(Color.RED);
+		for( LineParametric2D_F32 l : alg.getTransform().getLines().toList() ) {
+			int r = 6;
+			int w = r*2 + 1;
+			int x = (int)(l.p.x+0.5);
+			int y = (int)(l.p.y+0.5);
+//			System.out.println(x+" "+y+"  "+renderedTran.getWidth()+" "+renderedTran.getHeight());
 
-		ShowImages.showWindow(renderedBinary,"Detected Edges");
-		ShowImages.showWindow(renderedTran,"Parameter Space");
-		ShowImages.showWindow(gui,"Detected Lines");
+			g2.drawOval(x-r,y-r,w,w);
+		}
+
+		gui.repaint();
 	}
 
 	public static void main( String args[] ) {
-		VisualizeHoughFoot<GrayF32,GrayF32> app =
-				new VisualizeHoughFoot<>(GrayF32.class, GrayF32.class);
+		java.util.List<PathLabel> examples = new ArrayList<>();
 
-//		app.process(UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg")));
-		app.process(UtilImageIO.loadImage(UtilIO.pathExample("lines_indoors.jpg")));
+		examples.add(new PathLabel("Simple Objects",UtilIO.pathExample("simple_objects.jpg")));
+		examples.add(new PathLabel("Indoors",UtilIO.pathExample("lines_indoors.jpg")));
+		examples.add(new PathLabel("Outdoors", UtilIO.pathExample("outdoors01.jpg")));
+		examples.add(new PathLabel("Indoors Video",UtilIO.pathExample("lines_indoors.mjpeg")));
+
+		SwingUtilities.invokeLater(()->{
+			VisualizeHoughFoot<GrayF32, GrayF32> app = new VisualizeHoughFoot(examples,GrayF32.class);
+
+			app.openExample(examples.get(0));
+			app.waitUntilInputSizeIsKnown();
+			app.display("Hough Foot");
+		});
 	}
 }
