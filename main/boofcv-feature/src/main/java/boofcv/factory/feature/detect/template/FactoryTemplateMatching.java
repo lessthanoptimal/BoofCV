@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.factory.feature.detect.template;
 
 import boofcv.alg.feature.detect.template.*;
+import boofcv.alg.feature.detect.template.TemplateIntensityImage.EvaluatorMethod;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -41,33 +43,46 @@ public class FactoryTemplateMatching {
 	 */
 	public static <T extends ImageGray<T>>
 	TemplateMatchingIntensity<T> createIntensity(TemplateScoreType type, Class<T> imageType) {
+		if( type == TemplateScoreType.CORRELATION) {
+			if (imageType == GrayF32.class) {
+				return (TemplateMatchingIntensity<T>) new TemplateCorrelationFFT();
+			} else {
+				throw new IllegalArgumentException("Image type not supported. " + imageType.getSimpleName());
+			}
+		}
+
+		EvaluatorMethod<T> method;
+
 		switch (type) {
 			case SUM_DIFF_SQ:
 				if (imageType == GrayU8.class) {
-					return (TemplateMatchingIntensity<T>) new TemplateDiffSquared.U8();
+					method = (EvaluatorMethod<T>)new TemplateDiffSquared.U8();
 				} else if (imageType == GrayF32.class) {
-					return (TemplateMatchingIntensity<T>) new TemplateDiffSquared.F32();
+					method = (EvaluatorMethod<T>)new TemplateDiffSquared.F32();
 				} else {
 					throw new IllegalArgumentException("Image type not supported. " + imageType.getSimpleName());
 				}
+				break;
 
 			case NCC:
 				if (imageType == GrayU8.class) {
-					return (TemplateMatchingIntensity<T>) new TemplateNCC.U8();
+					method = (EvaluatorMethod<T>)new TemplateNCC.U8();
 				} else if (imageType == GrayF32.class) {
-					return (TemplateMatchingIntensity<T>) new TemplateNCC.F32();
+					method = (EvaluatorMethod<T>)new TemplateNCC.F32();
 				} else {
 					throw new IllegalArgumentException("Image type not supported. " + imageType.getSimpleName());
 				}
+				break;
 
-			case CORRELATION:
-				if (imageType == GrayF32.class) {
-					return (TemplateMatchingIntensity<T>) new TemplateCorrelationFFT();
-				} else {
-					throw new IllegalArgumentException("Image type not supported. " + imageType.getSimpleName());
-				}
+			default:
+				throw new IllegalArgumentException("Unknown");
 		}
-		throw new IllegalArgumentException("Type not found: " + type);
+
+		if(BoofConcurrency.USE_CONCURRENT) {
+			return new TemplateIntensityImage_MT<>(method);
+		} else {
+			return new TemplateIntensityImage<>(method);
+		}
 	}
 
 	/**

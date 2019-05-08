@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,21 +33,28 @@ import boofcv.struct.image.ImageBase;
  * @author Peter Abeles
  */
 public abstract class TemplateDiffSquared<T extends ImageBase<T>>
-		extends BaseTemplateIntensity<T> {
+		implements TemplateIntensityImage.EvaluatorMethod<T>
+{
+	TemplateIntensityImage<T> o;
+
+	@Override
+	public void initialize( TemplateIntensityImage<T> owner  ) {
+		this.o = owner;
+	}
 	// IF MORE IMAGE TYPES ARE ADDED CREATE A GENERATOR FOR THIS CLASS
 
 	public static class F32 extends TemplateDiffSquared<GrayF32> {
 		@Override
-		protected float evaluate(int tl_x, int tl_y) {
+		public float evaluate(int tl_x, int tl_y) {
 
 			float total = 0;
 
-			for (int y = 0; y < template.height; y++) {
-				int imageIndex = image.startIndex + (tl_y + y) * image.stride + tl_x;
-				int templateIndex = template.startIndex + y * template.stride;
+			for (int y = 0; y < o.template.height; y++) {
+				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
+				int templateIndex = o.template.startIndex + y * o.template.stride;
 
-				for (int x = 0; x < template.width; x++) {
-					float error = image.data[imageIndex++] - template.data[templateIndex++];
+				for (int x = 0; x < o.template.width; x++) {
+					float error = o.image.data[imageIndex++] - o.template.data[templateIndex++];
 					total += error * error;
 				}
 			}
@@ -56,17 +63,17 @@ public abstract class TemplateDiffSquared<T extends ImageBase<T>>
 		}
 
 		@Override
-		protected float evaluateMask(int tl_x, int tl_y) {
+		public float evaluateMask(int tl_x, int tl_y) {
 			float total = 0;
 
-			for (int y = 0; y < template.height; y++) {
-				int imageIndex = image.startIndex + (tl_y + y) * image.stride + tl_x;
-				int templateIndex = template.startIndex + y * template.stride;
-				int maskIndex = mask.startIndex + y * mask.stride;
+			for (int y = 0; y < o.template.height; y++) {
+				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
+				int templateIndex = o.template.startIndex + y * o.template.stride;
+				int maskIndex = o.mask.startIndex + y * o.mask.stride;
 
-				for (int x = 0; x < template.width; x++) {
-					float error = image.data[imageIndex++] - template.data[templateIndex++];
-					total += mask.data[maskIndex++] * error * error;
+				for (int x = 0; x < o.template.width; x++) {
+					float error = o.image.data[imageIndex++] - o.template.data[templateIndex++];
+					total += o.mask.data[maskIndex++] * error * error;
 				}
 			}
 
@@ -76,20 +83,20 @@ public abstract class TemplateDiffSquared<T extends ImageBase<T>>
 
 	public static class U8 extends TemplateDiffSquared<GrayU8> {
 		@Override
-		protected float evaluate(int tl_x, int tl_y) {
+		public float evaluate(int tl_x, int tl_y) {
 
 			float total = 0;
 
 			// Reduce change of numerical overflow and delay conversion to float
-			float div = 255.0f*255.0f;
+			float div = 255.0f * 255.0f;
 
-			for (int y = 0; y < template.height; y++) {
-				int imageIndex = image.startIndex + (tl_y + y) * image.stride + tl_x;
-				int templateIndex = template.startIndex + y * template.stride;
+			for (int y = 0; y < o.template.height; y++) {
+				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
+				int templateIndex = o.template.startIndex + y * o.template.stride;
 
 				int rowTotal = 0;
-				for (int x = 0; x < template.width; x++) {
-					int error = (image.data[imageIndex++] & 0xFF) - (template.data[templateIndex++] & 0xFF);
+				for (int x = 0; x < o.template.width; x++) {
+					int error = (o.image.data[imageIndex++] & 0xFF) - (o.template.data[templateIndex++] & 0xFF);
 					rowTotal += error * error;
 				}
 
@@ -100,23 +107,23 @@ public abstract class TemplateDiffSquared<T extends ImageBase<T>>
 		}
 
 		@Override
-		protected float evaluateMask(int tl_x, int tl_y) {
+		public float evaluateMask(int tl_x, int tl_y) {
 
 			float total = 0;
 
 			// Reduce change of numerical overflow and delay conversion to float
-			float div = 255.0f*255.0f*255.0f;
+			float div = 255.0f * 255.0f * 255.0f;
 
-			for (int y = 0; y < template.height; y++) {
-				int imageIndex = image.startIndex + (tl_y + y) * image.stride + tl_x;
-				int templateIndex = template.startIndex + y * template.stride;
-				int maskIndex = mask.startIndex + y * mask.stride;
+			for (int y = 0; y < o.template.height; y++) {
+				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
+				int templateIndex = o.template.startIndex + y * o.template.stride;
+				int maskIndex = o.mask.startIndex + y * o.mask.stride;
 
 				int rowTotal = 0;
-				for (int x = 0; x < template.width; x++) {
-					int m = mask.data[maskIndex++] & 0xFF;
-					int error = (image.data[imageIndex++] & 0xFF) - (template.data[templateIndex++] & 0xFF);
-					rowTotal += m*error * error;
+				for (int x = 0; x < o.template.width; x++) {
+					int m = o.mask.data[maskIndex++] & 0xFF;
+					int error = (o.image.data[imageIndex++] & 0xFF) - (o.template.data[templateIndex++] & 0xFF);
+					rowTotal += m * error * error;
 				}
 
 				total += rowTotal / div;

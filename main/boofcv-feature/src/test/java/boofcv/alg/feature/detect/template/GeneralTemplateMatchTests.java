@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,6 +64,10 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> {
 		mask = GeneralizedImageOps.createSingleBand(imageType, 5, 8);
 
 		GImageMiscOps.fillUniform(template, rand, 50, 60);
+	}
+
+	public GeneralTemplateMatchTests(TemplateIntensityImage.EvaluatorMethod<T> method, Class<T> imageType) {
+		this(new TemplateIntensityImage<>(method),imageType);
 	}
 
 	public void allTests() {

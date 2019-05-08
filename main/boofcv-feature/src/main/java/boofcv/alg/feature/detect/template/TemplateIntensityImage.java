@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,14 +22,14 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 
 /**
- * Base class which implements common elements
+ * Class which computes the templates intensity across the entire image
  *
  * @author Peter Abeles
  */
-public abstract class BaseTemplateIntensity<T extends ImageBase<T>>
+public class TemplateIntensityImage<T extends ImageBase<T>>
 		implements TemplateMatchingIntensity<T> {
 	// Match intensity image
-	private GrayF32 intensity = new GrayF32(1, 1);
+	protected GrayF32 intensity = new GrayF32(1, 1);
 
 	// references to the input
 	protected T image;
@@ -37,8 +37,14 @@ public abstract class BaseTemplateIntensity<T extends ImageBase<T>>
 	protected T mask;
 
 	// thickness of the border along the lower extents of the image
-	private int borderX0,borderY0;
-	private int borderX1,borderY1;
+	protected int borderX0,borderY0;
+	protected int borderX1,borderY1;
+
+	protected EvaluatorMethod<T> method;
+
+	public TemplateIntensityImage(EvaluatorMethod<T> method ) {
+		this.method = method;
+	}
 
 	@Override
 	public void setInputImage(T image) {
@@ -48,6 +54,7 @@ public abstract class BaseTemplateIntensity<T extends ImageBase<T>>
 	@Override
 	public void process(T template) {
 		this.template = template;
+		this.mask = null;
 		intensity.reshape(image.width, image.height);
 
 		int w = image.width - template.width;
@@ -58,16 +65,22 @@ public abstract class BaseTemplateIntensity<T extends ImageBase<T>>
 		borderX1 = template.width-borderX0;
 		borderY1 = template.height-borderY0;
 
-		for (int y = 0; y < h; y++) {
-			int index = intensity.startIndex + (y + borderY0) * intensity.stride + borderX0;
-			for (int x = 0; x < w; x++) {
-				intensity.data[index++] = evaluate(x, y);
-			}
-		}
+		method.initialize(this);
+
+		processInner(w, h);
 
 		// deference to avoid causing a memory leak
 		this.template = null;
 		this.mask = null;
+	}
+
+	protected void processInner(int w, int h) {
+		for (int y = 0; y < h; y++) {
+			int index = intensity.startIndex + (y + borderY0) * intensity.stride + borderX0;
+			for (int x = 0; x < w; x++) {
+				intensity.data[index++] = method.evaluate(x, y);
+			}
+		}
 	}
 
 	@Override
@@ -87,35 +100,23 @@ public abstract class BaseTemplateIntensity<T extends ImageBase<T>>
 		borderX0 = template.width / 2;
 		borderY0 = template.height / 2;
 
-		for (int y = 0; y < h; y++) {
-			int index = intensity.startIndex + (y + borderY0) * intensity.stride + borderX0;
-			for (int x = 0; x < w; x++) {
-				intensity.data[index++] = evaluateMask(x, y);
-			}
-		}
+		method.initialize(this);
+
+		processInnerMask(w, h);
 
 		// deference to avoid causing a memory leak
 		this.template = null;
 		this.mask = null;
 	}
 
-	/**
-	 * Evaluate the template at the specified location.
-	 *
-	 * @param tl_x Template's top left corner x-coordinate
-	 * @param tl_y Template's top left corner y-coordinate
-	 * @return match value with better matches having a more positive value
-	 */
-	protected abstract float evaluate(int tl_x, int tl_y);
-
-	/**
-	 * Evaluate the masked template at the specified location.
-	 *
-	 * @param tl_x Template's top left corner x-coordinate
-	 * @param tl_y Template's top left corner y-coordinate
-	 * @return match value with better matches having a more positive value
-	 */
-	protected abstract float evaluateMask(int tl_x, int tl_y);
+	protected void processInnerMask(int w, int h) {
+		for (int y = 0; y < h; y++) {
+			int index = intensity.startIndex + (y + borderY0) * intensity.stride + borderX0;
+			for (int x = 0; x < w; x++) {
+				intensity.data[index++] = method.evaluateMask(x, y);
+			}
+		}
+	}
 
 	@Override
 	public GrayF32 getIntensity() {
@@ -140,5 +141,34 @@ public abstract class BaseTemplateIntensity<T extends ImageBase<T>>
 	@Override
 	public int getBorderY1() {
 		return borderY1;
+	}
+
+	@Override
+	public boolean isBorderProcessed() {
+		return method.isBorderProcessed();
+	}
+
+	public interface EvaluatorMethod<T extends ImageBase<T>> {
+		void initialize( TemplateIntensityImage<T> owner  );
+
+		/**
+		 * Evaluate the template at the specified location.
+		 *
+		 * @param tl_x Template's top left corner x-coordinate
+		 * @param tl_y Template's top left corner y-coordinate
+		 * @return match value with better matches having a more positive value
+		 */
+		float evaluate(int tl_x, int tl_y);
+
+		/**
+		 * Evaluate the masked template at the specified location.
+		 *
+		 * @param tl_x Template's top left corner x-coordinate
+		 * @param tl_y Template's top left corner y-coordinate
+		 * @return match value with better matches having a more positive value
+		 */
+		float evaluateMask(int tl_x, int tl_y);
+
+		boolean isBorderProcessed();
 	}
 }

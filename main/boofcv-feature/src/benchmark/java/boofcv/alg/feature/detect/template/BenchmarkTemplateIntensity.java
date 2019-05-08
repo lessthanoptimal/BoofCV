@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,79 +19,98 @@
 package boofcv.alg.feature.detect.template;
 
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.detect.template.FactoryTemplateMatching;
 import boofcv.factory.feature.detect.template.TemplateScoreType;
-import boofcv.misc.Performer;
-import boofcv.misc.ProfileOperation;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
+import org.openjdk.jmh.annotations.*;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Peter Abeles
  */
-public class BenchmarkTemplateIntensity<T extends ImageGray<T>> {
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value=1)
+public class BenchmarkTemplateIntensity {
 
-	Random rand = new Random(234);
-	long TEST_TIME = 2000;
+	@Param({"true","false"})
+	public boolean concurrent=false;
 
-	int width = 320;
-	int height = 240;
+	//	@Param({"500","5000"})
+	public int size=1000;
 
-	Class<T> imageType;
-	T image;
-	T template;
+	GrayF32 image_F32 = new GrayF32(1,1);
+	GrayU8 image_U8 = new GrayU8(1,1);
 
-	public BenchmarkTemplateIntensity(Class<T> imageType) {
-		this.imageType = imageType;
-		image = GeneralizedImageOps.createSingleBand(imageType,width,height);
-		template = GeneralizedImageOps.createSingleBand(imageType,20,30);
+	GrayF32 template_F32 = new GrayF32(20,20);
+	GrayU8 template_U8 = new GrayU8(20,20);
 
-		GImageMiscOps.fillUniform(image, rand, 0, 200);
-		GImageMiscOps.fillUniform(template, rand, 0, 200);
+	TemplateMatchingIntensity<GrayF32> ssd_F32;
+	TemplateMatchingIntensity<GrayU8> ssd_U8;
+
+	TemplateMatchingIntensity<GrayF32> ncc_F32;
+	TemplateMatchingIntensity<GrayU8> ncc_U8;
+
+	TemplateMatchingIntensity<GrayF32> correlation_F32;
+
+	@Setup
+	public void setup() {
+		Random rand = new Random(234);
+
+		BoofConcurrency.USE_CONCURRENT = concurrent;
+
+		image_F32.reshape(size,size);
+		image_U8.reshape(size,size);
+
+		GImageMiscOps.fillUniform(image_F32, rand, 0, 200);
+		GImageMiscOps.fillUniform(image_U8, rand, 0, 200);
+
+		GImageMiscOps.fillUniform(template_F32, rand, 0, 200);
+		GImageMiscOps.fillUniform(template_U8, rand, 0, 200);
+
+		ssd_F32 = FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_DIFF_SQ,GrayF32.class);
+		ssd_U8 = FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_DIFF_SQ,GrayU8.class);
+
+		ncc_F32 = FactoryTemplateMatching.createIntensity(TemplateScoreType.NCC,GrayF32.class);
+		ncc_U8 = FactoryTemplateMatching.createIntensity(TemplateScoreType.NCC,GrayU8.class);
+
+		correlation_F32 = FactoryTemplateMatching.createIntensity(TemplateScoreType.CORRELATION,GrayF32.class);
 	}
 
-	public class TemplatePerformer implements Performer {
-
-		TemplateMatchingIntensity<T> alg;
-		String name;
-
-		public TemplatePerformer(TemplateScoreType type) {
-			this.alg = FactoryTemplateMatching.createIntensity(type,imageType);
-			this.name = type.toString();
-		}
-
-		@Override
-		public void process() {
-			alg.process(image,template);
-		}
-
-		@Override
-		public String getName() {
-			return name;
-		}
+	@Benchmark
+	public void ssd_F32() {
+		ssd_F32.setInputImage(image_F32);
+		ssd_F32.process(template_F32);
 	}
 
-	public void evaluateAll() {
-		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== "+imageType.getSimpleName());
-		System.out.println();
-
-		ProfileOperation.printOpsPerSec(new TemplatePerformer(TemplateScoreType.SUM_DIFF_SQ), TEST_TIME);
-		ProfileOperation.printOpsPerSec(new TemplatePerformer(TemplateScoreType.NCC), TEST_TIME);
+	@Benchmark
+	public void ssd_U8() {
+		ssd_U8.setInputImage(image_U8);
+		ssd_U8.process(template_U8);
 	}
 
-	public static void main( String args[] ) {
-		BenchmarkTemplateIntensity<GrayU8>
-				benchmark_U8 = new BenchmarkTemplateIntensity<>(GrayU8.class);
+	@Benchmark
+	public void ncc_F32() {
+		ncc_F32.setInputImage(image_F32);
+		ncc_F32.process(template_F32);
+	}
 
-		benchmark_U8.evaluateAll();
+	@Benchmark
+	public void ncc_U8() {
+		ncc_U8.setInputImage(image_U8);
+		ncc_U8.process(template_U8);
+	}
 
-		BenchmarkTemplateIntensity<GrayF32>
-				benchmark_F32 = new BenchmarkTemplateIntensity<>(GrayF32.class);
-
-		benchmark_F32.evaluateAll();
+	@Benchmark
+	public void correlation_F32() {
+		correlation_F32.setInputImage(image_F32);
+		correlation_F32.process(template_F32);
 	}
 }

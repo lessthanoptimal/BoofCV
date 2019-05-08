@@ -39,7 +39,7 @@ Version : 0.34
   * TODO Improve detect fisheye (2 more images) , See if accuracy can be improved.
 - Simulation
   * Concurrent version of SimulatePlanarWorld
-- TODO concurrent version of template matching
+- Concurrent version of template matching
 - Android
   * Thanks sergiuchuckmisha for fixing a bug/type-o in FOV estimation
 
