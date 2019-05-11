@@ -59,7 +59,7 @@ public class ConfigChessboard2 implements Configuration {
 	/**
 	 * How similar two corner orientations need to be
 	 */
-	public double orientaitonTol = 0.45;
+	public double orientaitonTol = 0.60;
 
 	/**
 	 * Ratio used to decide if two corners are spatially close enough to each other to be considered
@@ -81,7 +81,7 @@ public class ConfigChessboard2 implements Configuration {
 	 * If true then a chessboard has to has to have at least one square which is connected to only one other
 	 * square. BoofCV calibration targets always have this requirements. Other projects might not.
 	 */
-	public boolean requireCornerSquares = true;
+	public boolean requireCornerSquares = false;
 
 	/**
 	 * Selection of threshold for binary image. Intensity image is the input.

@@ -93,12 +93,6 @@ public class DetectChessboardCornersPyramid {
 				// convert the coordinate into input image coordinates
 				double x = cf.x*scale;
 				double y = cf.y*scale;
-				// Compensate for how the pyramid was computed using an average down sample. It shifts
-				// the coordinate system.
-//				if( scale > 1 ) {
-//					x += 0.5*scale;
-//					y += 0.5*scale;
-//				}
 
 				ChessboardCorner cl = featsLevel.corners.grow();
 				cl.first = true;
@@ -113,8 +107,8 @@ public class DetectChessboardCornersPyramid {
 			PyramidLevel level0 = featureLevels.get(levelIdx);
 
 			// mark features in the next level as seen if they match ones in this level
-			if( levelIdx+1< pyramid.size() ) {
-				PyramidLevel level1 = featureLevels.get(levelIdx+1);
+			for( int nextIdx = levelIdx+1; nextIdx < pyramid.size(); nextIdx++ ) {
+				PyramidLevel level1 = featureLevels.get(nextIdx);
 				markSeenAsFalse(level0.corners,level1.corners);
 			}
 		}
@@ -138,20 +132,18 @@ public class DetectChessboardCornersPyramid {
 	void markSeenAsFalse(FastQueue<ChessboardCorner> corners0 , FastQueue<ChessboardCorner> corners1 ) {
 		nn.setPoints(corners1.toList(),false);
 		// radius of the blob in the intensity image is 2*kernelRadius
-		int radius = detector.shiRadius *2+1;
+		// Add some buffer because things tend to shift a bit across scales
+		int radius = detector.shiRadius *2+2;
 		for (int i = 0; i < corners0.size; i++) {
 			ChessboardCorner c0 = corners0.get(i);
 			nnSearch.findNearest(c0,radius,5,nnResults);
-			// TODO does it ever find multiple matches?
 
-			// Could make this smarter by looking at the orientation too
+			// IDEA: Could make this smarter by looking at the orientation too?
 			for (int j = 0; j < nnResults.size; j++) {
 				ChessboardCorner c1 = nnResults.get(j).point;
 
 				// if the current one wasn't first then none of its children can be first
-				if( !c0.first ) {
-					c1.first = false;
-				} else if( c1.intensity < c0.intensity ) {
+				if( c1.intensity < c0.intensity ) {
 					// keeping the one with the best intensity score seems to help. Formally test this idea
 					c1.first = false;
 				} else {

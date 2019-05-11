@@ -77,7 +77,7 @@ public class ChessboardCornerClusterFinder {
 	// Tolerance for deciding if two directions are the same.
 	private double directionTol =0.60;
 	// Tolerance for deciding of two corner orientations are the same.
-	private double orientationTol =0.45;
+	private double orientationTol =0.50;
 	// Tolerance for how close two corners need to be to be considered ambiguous. Relative
 	private double ambiguousTol = 0.25;
 

@@ -28,7 +28,6 @@ Version : 0.34
   * Concurrent version of Greedy Association
   * Concurrent version of Nearest Neighbor Association
   * Concurrent version of Random Forest Association
-  * TODO Remove SURF specific association. Replace with discrete sets
 - Feature Descriptors
   * Concurrent SURF, SURF Color
 - Added configuration for Harris and Shi-Tomasi corner detectors
