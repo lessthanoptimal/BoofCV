@@ -22,16 +22,15 @@ package boofcv.demonstrations.feature.detect.line;
 import boofcv.abst.feature.detect.line.DetectLineHoughFoot;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.line.ConfigHoughFoot;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.ListDisplayPanel;
+import boofcv.gui.ViewedImageInfoPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
-import boofcv.gui.feature.ImageLinePanel;
-import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ScaleOptions;
+import boofcv.gui.feature.ImageLinePanelZoom;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
@@ -41,9 +40,17 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.line.LineParametric2D_F32;
+import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,10 +69,16 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 
 	I blur;
 
-	ListDisplayPanel gui = new ListDisplayPanel("Lines","Edges","Parameter Space");
-	ImageLinePanel linePanel = new ImageLinePanel();
+	Visualization imagePanel = new Visualization();
+	ControlPanel controlPanel;
 
 	DetectLineHoughFoot<I,D> alg;
+	ConfigHoughFoot config = new ConfigHoughFoot(6, 6, 5, 15, 10);
+	int blurRadius = 2;
+	int view = 0;
+	boolean logIntensity = false;
+
+	GrayF32 transformLog = new GrayF32(1,1);
 
 	BufferedImage renderedTran;
 	BufferedImage renderedBinary;
@@ -75,11 +88,34 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 		this.imageType = imageType;
 		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		alg =  FactoryDetectLineAlgs.houghFoot(
-				new ConfigHoughFoot(6, 6, 5, 15, 10), imageType, derivType);
+		// TODO add mouse zoom
+
+		controlPanel = new ControlPanel();
+		controlPanel.setListener((zoom)-> imagePanel.setScale(zoom));
+		imagePanel.addMouseWheelListener(controlPanel);
+		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
+				controlPanel.setCursor(p.x,p.y);
+
+				if( SwingUtilities.isLeftMouseButton(e)) {
+					imagePanel.centerView(p.x,p.y);
+				}
+			}
+		});
+
+		createAlg();
 		blur = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
-		add(BorderLayout.CENTER,gui);
+		add(BorderLayout.WEST,controlPanel);
+		add(BorderLayout.CENTER,imagePanel);
+	}
+
+	private void createAlg() {
+		synchronized (this) {
+			alg = FactoryDetectLineAlgs.houghFoot(config, imageType, derivType);
+		}
 	}
 
 	@Override
@@ -90,11 +126,9 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 		renderedTran = ConvertBufferedImage.checkDeclare(width,height,renderedTran,BufferedImage.TYPE_INT_RGB);
 		renderedBinary = ConvertBufferedImage.checkDeclare(width,height,renderedBinary,BufferedImage.TYPE_INT_RGB);
 
-		BoofSwingUtil.invokeNowOrLater(()->{
-			gui.getBodyPanel().setPreferredSize(new Dimension(width,height));
-			gui.setItem(0,linePanel);
-			gui.setItem(1,new ImagePanel(renderedBinary, ScaleOptions.DOWN));
-			gui.setItem(2,new ImagePanel(renderedTran, ScaleOptions.DOWN));
+		BoofSwingUtil.invokeNowOrLater(()-> {
+			imagePanel.setPreferredSize(new Dimension(width, height));
+			controlPanel.setImageSize(width,height);
 		});
 	}
 
@@ -103,12 +137,24 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 	{
 		I input = (I)_input;
 
-		GBlurImageOps.gaussian(input, blur, -1, 2, null);
+		long time0 = System.nanoTime();
+		if( blurRadius > 0 ) {
+			GBlurImageOps.gaussian(input, blur, -1, blurRadius, null);
+		} else {
+			blur.setTo(input);
+		}
+		imagePanel.setLines(alg.detect(blur),input.width,input.height);
+		long time1 = System.nanoTime();
 
-		linePanel.setImage(buffered);
-		linePanel.setLines(alg.detect(blur));
+		imagePanel.input = buffered;
 
-		VisualizeImageData.grayMagnitude(alg.getTransform().getTransform(), renderedTran,-1);
+		if( logIntensity ) {
+			PixelMath.log(alg.getTransform().getTransform(),transformLog);
+			VisualizeImageData.grayMagnitude(transformLog, renderedTran,-1);
+		} else {
+			VisualizeImageData.grayMagnitude(alg.getTransform().getTransform(), renderedTran,-1);
+		}
+
 		VisualizeBinaryData.renderBinary(alg.getBinary(), false, renderedBinary);
 
 		// Draw the location of lines onto the magnitude image
@@ -124,7 +170,93 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 			g2.drawOval(x-r,y-r,w,w);
 		}
 
-		gui.repaint();
+		BoofSwingUtil.invokeNowOrLater(()->{
+			imagePanel.handleViewChange();
+			controlPanel.setProcessingTimeMS((time1-time0)*1e-6);
+			imagePanel.repaint();
+		});
+	}
+
+	private class Visualization extends ImageLinePanelZoom {
+		BufferedImage input;
+		@Override
+		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+			if( view == 0 ) {
+				super.paintInPanel(tran,g2);
+			}
+		}
+
+		public void handleViewChange() {
+			switch(view) {
+				case 0:setBufferedImage(input);break;
+				case 1:setBufferedImage(renderedBinary);break;
+				case 2:setBufferedImage(renderedTran);break;
+			}
+		}
+	}
+
+	private class ControlPanel extends ViewedImageInfoPanel
+			implements ChangeListener, ActionListener
+	{
+		JComboBox<String> comboView = combo(0,"Lines","Edges","Parameter Space");
+		JCheckBox checkLog = checkbox("Log Intensity",logIntensity);
+		JSpinner spinnerMaxLines = spinner(config.maxLines,1,200,1);
+		JSpinner spinnerBlur = spinner(blurRadius,0,20,1);
+		JSpinner spinnerMinCount = spinner(config.minCounts,1,100,1);
+		JSpinner spinnerLocalMax = spinner(config.localMaxRadius,1,100,2);
+		JSpinner spinnerEdgeThresh = spinner(config.thresholdEdge,1,100,2);
+
+		public ControlPanel() {
+			super(BoofSwingUtil.MIN_ZOOM,BoofSwingUtil.MAX_ZOOM,0.5,false);
+			add(comboView);
+			addAlignLeft(checkLog);
+			addSeparator(120);
+			addLabeled(spinnerMaxLines,"Max Lines");
+			addLabeled(spinnerBlur,"Blur Radius");
+			addLabeled(spinnerMinCount,"Min. Count");
+			addLabeled(spinnerLocalMax,"Local Max");
+			addLabeled(spinnerEdgeThresh,"Edge Thresh");
+			addVerticalGlue();
+		}
+
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			if( e.getSource() == spinnerMaxLines ) {
+				config.maxLines = (Integer) spinnerMaxLines.getValue();
+				createAlg();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerBlur ) {
+				blurRadius = (Integer) spinnerBlur.getValue();
+				createAlg();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerMinCount ) {
+				config.minCounts = (Integer) spinnerMinCount.getValue();
+				createAlg();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerLocalMax ) {
+				config.localMaxRadius = (Integer) spinnerLocalMax.getValue();
+				createAlg();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerEdgeThresh ) {
+				config.thresholdEdge = ((Number) spinnerEdgeThresh.getValue()).floatValue();
+				createAlg();
+				reprocessImageOnly();
+			} else {
+				super.stateChanged(e);
+			}
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if( e.getSource() == comboView ) {
+				view = comboView.getSelectedIndex();
+				imagePanel.handleViewChange();
+				imagePanel.repaint();
+			} else if( e.getSource() == checkLog ) {
+				logIntensity = checkLog.isSelected();
+				reprocessImageOnly();
+			}
+		}
 	}
 
 	public static void main( String args[] ) {

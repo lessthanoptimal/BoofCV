@@ -33,8 +33,9 @@ import java.awt.event.MouseWheelListener;
 public class ViewedImageInfoPanel extends StandardAlgConfigPanel
 		implements ChangeListener, MouseWheelListener
 {
-
 	double zoomMin,zoomMax,zoomInc;
+
+	protected JLabel processingTimeLabel = new JLabel();
 
 	JTextField textImageSize = new JTextField(8);
 
@@ -49,16 +50,17 @@ public class ViewedImageInfoPanel extends StandardAlgConfigPanel
 	double zoom=1;
 
 	public ViewedImageInfoPanel() {
-		this(0.01,50,0.5);
+		this(BoofSwingUtil.MIN_ZOOM,BoofSwingUtil.MAX_ZOOM,0.5,true);
 	}
 
-	public ViewedImageInfoPanel(double zoomMin , double zoomMax, double zoomInc ) {
+	public ViewedImageInfoPanel(double zoomMin , double zoomMax, double zoomInc , boolean showClick ) {
 
 		this.zoomMin = zoomMin;
 		this.zoomMax = zoomMax;
 		this.zoomInc = zoomInc;
 
 		textImageSize.setEditable(false);
+		textImageSize.setHorizontalAlignment(SwingConstants.RIGHT);
 		textImageSize.setMaximumSize(textImageSize.getPreferredSize());
 
 		textCursorX.setEditable(false);
@@ -70,9 +72,12 @@ public class ViewedImageInfoPanel extends StandardAlgConfigPanel
 		selectZoom.addChangeListener(this);
 		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
-		addLabeled(textImageSize,"Img Shape",this);
-		addLabeled(textCursorX,"Click X",this);
-		addLabeled(textCursorY,"Click Y",this);
+		addLabeled(textImageSize,"Input Shape",this);
+		addLabeled(processingTimeLabel,"Time (ms)");
+		if( showClick ) {
+			addLabeled(textCursorX, "Click X", this);
+			addLabeled(textCursorY, "Click Y", this);
+		}
 		addLabeled(selectZoom,"Zoom", this);
 	}
 
@@ -116,7 +121,9 @@ public class ViewedImageInfoPanel extends StandardAlgConfigPanel
 
 		setScale(curr);
 	}
+
 	public void setScale(double scale) {
+		BoofSwingUtil.checkGuiThread();
 		if( ((Number)selectZoom.getValue()).doubleValue() == scale )
 			return;
 
@@ -126,6 +133,16 @@ public class ViewedImageInfoPanel extends StandardAlgConfigPanel
 		if( curr > zoomMax) curr = zoomMax;
 
 		selectZoom.setValue(curr);
+	}
+
+	public void setProcessingTimeS( double seconds ) {
+		BoofSwingUtil.checkGuiThread();
+		processingTimeLabel.setText(String.format("%7.1f",(seconds*1000)));
+	}
+
+	public void setProcessingTimeMS(double ms ) {
+		BoofSwingUtil.checkGuiThread();
+		processingTimeLabel.setText(String.format("%7.1f",ms));
 	}
 
 	public interface Listener {
