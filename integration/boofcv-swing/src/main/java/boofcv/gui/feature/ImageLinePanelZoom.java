@@ -55,7 +55,7 @@ public class ImageLinePanelZoom extends ImageZoomPanel {
 	}
 
 	@Override
-	protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+	protected synchronized void paintInPanel(AffineTransform tran, Graphics2D g2) {
 		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setStroke(new BasicStroke(3));

@@ -18,27 +18,18 @@
 
 package boofcv.abst.feature.detect.line;
 
-import boofcv.factory.feature.detect.line.ConfigHoughPolar;
-import boofcv.factory.feature.detect.line.FactoryDetectLine;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
+import georegression.struct.line.LineParametric2D_F32;
 
+import java.util.List;
 
 /**
+ * Detects lines using image gradient.
+ *
  * @author Peter Abeles
  */
-public class TestDetectLineHoughPolar extends GeneralDetectLineTests {
+public interface DetectEdgeLines<D extends ImageBase<D>> {
+	void detect(D derivX , D derivY );
 
-
-	public TestDetectLineHoughPolar() {
-		super(GrayU8.class,GrayF32.class);
-	}
-
-	@Override
-	public <T extends ImageGray<T>>
-	DetectLine<T> createAlg(Class<T> imageType)
-	{
-		return FactoryDetectLine.houghPolar(new ConfigHoughPolar(2, 3, 1.2, Math.PI / 180, 10, 20), imageType);
-	}
+	List<LineParametric2D_F32> getFoundLines();
 }

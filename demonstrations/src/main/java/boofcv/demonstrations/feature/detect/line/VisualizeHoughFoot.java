@@ -19,6 +19,7 @@
 package boofcv.demonstrations.feature.detect.line;
 
 
+import boofcv.abst.feature.detect.line.DetectEdgeLinesToLines;
 import boofcv.abst.feature.detect.line.DetectLineHoughFoot;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
@@ -67,12 +68,14 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 	Class<I> imageType;
 	Class<D> derivType;
 
+
 	I blur;
 
 	Visualization imagePanel = new Visualization();
 	ControlPanel controlPanel;
 
-	DetectLineHoughFoot<I,D> alg;
+	DetectLineHoughFoot<D> alg; // the algorithm being investigated
+	DetectEdgeLinesToLines<I,D> lineDetector; // use a high level line detector since it already has boilerplate code in it
 	ConfigHoughFoot config = new ConfigHoughFoot(6, 6, 5, 15, 10);
 	int blurRadius = 2;
 	int view = 0;
@@ -87,8 +90,6 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 		super(true,true,examples, ImageType.single(imageType));
 		this.imageType = imageType;
 		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
-
-		// TODO add mouse zoom
 
 		controlPanel = new ControlPanel();
 		controlPanel.setListener((zoom)-> imagePanel.setScale(zoom));
@@ -112,10 +113,9 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 		add(BorderLayout.CENTER,imagePanel);
 	}
 
-	private void createAlg() {
-		synchronized (this) {
-			alg = FactoryDetectLineAlgs.houghFoot(config, imageType, derivType);
-		}
+	private synchronized void createAlg() {
+		alg = FactoryDetectLineAlgs.houghFoot(config, derivType);
+		lineDetector = new DetectEdgeLinesToLines<>(alg,imageType,derivType);
 	}
 
 	@Override
@@ -133,7 +133,7 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase _input)
+	public synchronized void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase _input)
 	{
 		I input = (I)_input;
 
@@ -143,7 +143,7 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 		} else {
 			blur.setTo(input);
 		}
-		imagePanel.setLines(alg.detect(blur),input.width,input.height);
+		imagePanel.setLines(lineDetector.detect(blur),input.width,input.height);
 		long time1 = System.nanoTime();
 
 		imagePanel.input = buffered;

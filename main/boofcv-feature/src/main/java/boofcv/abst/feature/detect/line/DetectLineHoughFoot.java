@@ -21,7 +21,7 @@ package boofcv.abst.feature.detect.line;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.HoughTransformLineFootOfNorm;
 import boofcv.alg.feature.detect.line.ImageLinePruneMerge;
@@ -52,20 +52,13 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectLineHoughFoot <I extends ImageGray<I>, D extends ImageGray<D>> implements DetectLine<I> {
+public class DetectLineHoughFoot <D extends ImageGray<D>> implements DetectEdgeLines<D> {
 
 	// transform algorithm
 	HoughTransformLineFootOfNorm alg;
 
-	// computes image gradient
-	ImageGradient<I,D> gradient;
-
 	// used to create binary edge image
 	float thresholdEdge;
-
-	// image gradient
-	D derivX;
-	D derivY;
 
 	// edge intensity image
 	GrayF32 intensity = new GrayF32(1,1);
@@ -83,6 +76,8 @@ public class DetectLineHoughFoot <I extends ImageGray<I>, D extends ImageGray<D>
 	double mergeAngle = Math.PI*0.05;
 	double mergeDistance = 10;
 
+	List<LineParametric2D_F32> foundLines;
+
 	/**
 	 * Specifies detection parameters.  The suggested parameters should be used as a starting point and will
 	 * likely need to be tuned significantly for each different scene.
@@ -91,30 +86,26 @@ public class DetectLineHoughFoot <I extends ImageGray<I>, D extends ImageGray<D>
 	 * @param minCounts Minimum number of counts/votes inside the transformed image. Try 5.
 	 * @param minDistanceFromOrigin Lines which are this close to the origin of the transformed image are ignored.  Try 5.
 	 * @param thresholdEdge Threshold for classifying pixels as edge or not.  Try 30.
-	 * @param gradient Computes the image gradient.
 	 */
 	public DetectLineHoughFoot( int localMaxRadius,
 								int minCounts ,
 								int minDistanceFromOrigin ,
 								float thresholdEdge ,
-								int maxLines ,
-								ImageGradient<I,D> gradient )
+								int maxLines )
 	{
-		this.gradient = gradient;
 		this.thresholdEdge = thresholdEdge;
 		this.maxLines = maxLines;
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmaxCandidate(
 				new ConfigExtract(localMaxRadius, minCounts, 0, false));
 		alg = new HoughTransformLineFootOfNorm(extractor,minDistanceFromOrigin);
-		derivX = gradient.getDerivativeType().createImage(1,1);
-		derivY = gradient.getDerivativeType().createImage(1, 1);
 	}
 
 	@Override
-	public List<LineParametric2D_F32> detect(I input) {
-		setInputSize(input.width, input.height);
+	public void detect( D derivX , D derivY ) {
+		foundLines = null;
+		InputSanityCheck.checkSameShape(derivX,derivY);
+		setInputSize(derivX.width,derivX.height);
 
-		gradient.process(input,derivX,derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
 
 		ThresholdImageOps.threshold(intensity, binary, thresholdEdge, false);
@@ -122,23 +113,19 @@ public class DetectLineHoughFoot <I extends ImageGray<I>, D extends ImageGray<D>
 		alg.transform(derivX,derivY,binary);
 		FastQueue<LineParametric2D_F32> lines = alg.extractLines();
 
-		List<LineParametric2D_F32> ret = new ArrayList<>();
+		foundLines = new ArrayList<>();
 		for( int i = 0; i < lines.size; i++ )
-			ret.add(lines.get(i));
+			foundLines.add(lines.get(i));
 
-		ret = pruneLines(input,ret);
-
-		return ret;
+		foundLines = pruneLines(derivX,foundLines);
 	}
 
 	public void setInputSize( int width , int height ) {
-		derivX.reshape(width,height);
-		derivY.reshape(width,height);
 		intensity.reshape(width,height);
 		binary.reshape(width,height);
 	}
 
-	private List<LineParametric2D_F32> pruneLines(I input, List<LineParametric2D_F32> ret) {
+	private List<LineParametric2D_F32> pruneLines(D input, List<LineParametric2D_F32> ret) {
 		float intensity[] = alg.getFoundIntensity();
 		post.reset();
 		for( int i = 0; i < ret.size(); i++ ) {
@@ -156,14 +143,6 @@ public class DetectLineHoughFoot <I extends ImageGray<I>, D extends ImageGray<D>
 
 	public HoughTransformLineFootOfNorm getTransform() {
 		return alg;
-	}
-
-	public D getDerivX() {
-		return derivX;
-	}
-
-	public D getDerivY() {
-		return derivY;
 	}
 
 	public GrayF32 getEdgeIntensity() {
@@ -188,5 +167,10 @@ public class DetectLineHoughFoot <I extends ImageGray<I>, D extends ImageGray<D>
 
 	public void setMergeDistance(double mergeDistance) {
 		this.mergeDistance = mergeDistance;
+	}
+
+	@Override
+	public List<LineParametric2D_F32> getFoundLines() {
+		return foundLines;
 	}
 }

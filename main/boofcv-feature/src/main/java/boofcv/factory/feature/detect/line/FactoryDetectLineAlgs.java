@@ -50,45 +50,42 @@ public class FactoryDetectLineAlgs {
 	 *
 	 * @see DetectLineSegmentsGridRansac
 	 *
-	 * @param regionSize Size of the region considered.  Try 40 and tune.
-	 * @param thresholdEdge Threshold for determining which pixels belong to an edge or not. Try 30 and tune.
-	 * @param thresholdAngle Tolerance in angle for allowing two edgels to be paired up, in radians.  Try 2.36
-	 * @param connectLines Should lines be connected and optimized.
+	 * @param config Configuration for line detector
 	 * @param imageType Type of single band input image.
 	 * @param derivType Image derivative type.
 	 * @return Line segment detector
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	DetectLineSegmentsGridRansac<I,D> lineRansac(int regionSize ,
-												 double thresholdEdge ,
-												 double thresholdAngle ,
-												 boolean connectLines,
+	DetectLineSegmentsGridRansac<I,D> lineRansac( @Nullable ConfigLineRansac config,
 												 Class<I> imageType ,
 												 Class<D> derivType ) {
+
+		if( config == null )
+			config = new ConfigLineRansac();
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
 		ModelManagerLinePolar2D_F32 manager = new ModelManagerLinePolar2D_F32();
-		GridLineModelDistance distance = new GridLineModelDistance((float)thresholdAngle);
-		GridLineModelFitter fitter = new GridLineModelFitter((float)thresholdAngle);
+		GridLineModelDistance distance = new GridLineModelDistance((float)config.thresholdAngle);
+		GridLineModelFitter fitter = new GridLineModelFitter((float)config.thresholdAngle);
 
 		ModelMatcher<LinePolar2D_F32, Edgel> matcher =
 				new Ransac<>(123123, manager, fitter, distance, 25, 1);
 
 		GridRansacLineDetector<D> alg;
 		if( derivType == GrayF32.class )  {
-			alg = (GridRansacLineDetector)new ImplGridRansacLineDetector_F32(regionSize,10,matcher);
+			alg = (GridRansacLineDetector)new ImplGridRansacLineDetector_F32(config.regionSize,10,matcher);
 		} else if( derivType == GrayS16.class ) {
-			alg = (GridRansacLineDetector)new ImplGridRansacLineDetector_S16(regionSize,10,matcher);
+			alg = (GridRansacLineDetector)new ImplGridRansacLineDetector_S16(config.regionSize,10,matcher);
 		} else {
 			throw new IllegalArgumentException("Unsupported derivative type");
 		}
 
 		ConnectLinesGrid connect = null;
-		if( connectLines )
+		if( config.connectLines )
 			connect = new ConnectLinesGrid(Math.PI*0.01,1,8);
 
-		return new DetectLineSegmentsGridRansac<>(alg, connect, gradient, thresholdEdge, imageType, derivType);
+		return new DetectLineSegmentsGridRansac<>(alg, connect, gradient, config.thresholdEdge, imageType, derivType);
 	}
 
 	/**
@@ -98,24 +95,20 @@ public class FactoryDetectLineAlgs {
 	 * @see DetectLineHoughFoot
 	 *
 	 * @param config Configuration for line detector.  If null then default will be used.
-	 * @param imageType Type of single band input image.
-	 * @param derivType Image derivative type.                    
-	 * @param <I> Input image type.
+	 * @param derivType Image derivative type.
 	 * @param <D> Image derivative type.
 	 * @return Line detector.
 	 */
-	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	DetectLineHoughFoot<I,D> houghFoot(@Nullable ConfigHoughFoot config ,
-									   Class<I> imageType ,
+	public static <D extends ImageGray<D>>
+	DetectLineHoughFoot<D> houghFoot(@Nullable ConfigHoughFoot config ,
 									   Class<D> derivType ) {
 
 		if( config == null )
 			config = new ConfigHoughFoot();
 
-		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
-		DetectLineHoughFoot<I,D> alg = new DetectLineHoughFoot<>(config.localMaxRadius, config.minCounts, config.minDistanceFromOrigin,
-				config.thresholdEdge, config.maxLines, gradient);
+		DetectLineHoughFoot<D> alg = new DetectLineHoughFoot<>(config.localMaxRadius, config.minCounts,
+				config.minDistanceFromOrigin, config.thresholdEdge, config.maxLines);
 
 		alg.setMergeAngle(config.mergeAngle);
 		alg.setMergeDistance(config.mergeDistance);
@@ -130,25 +123,21 @@ public class FactoryDetectLineAlgs {
 	 * @see DetectLineHoughFootSubimage
 	 *
 	 * @param config Configuration for line detector.  If null then default will be used.
-	 * @param imageType Type of single band input image.
 	 * @param derivType Image derivative type.
-	 * @param <I> Input image type.
 	 * @param <D> Image derivative type.
 	 * @return Line detector.
 	 */
-	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	DetectLineHoughFootSubimage<I,D> houghFootSub(@Nullable ConfigHoughFootSubimage config ,
-												  Class<I> imageType ,
+	public static <D extends ImageGray<D>>
+	DetectLineHoughFootSubimage<D> houghFootSub(@Nullable ConfigHoughFootSubimage config ,
 												  Class<D> derivType ) {
 
 		if( config == null )
 			config = new ConfigHoughFootSubimage();
 
-		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
 
 		return new DetectLineHoughFootSubimage<>(config.localMaxRadius,
 				config.minCounts, config.minDistanceFromOrigin, config.thresholdEdge,
-				config.totalHorizontalDivisions, config.totalVerticalDivisions, config.maxLines, gradient);
+				config.totalHorizontalDivisions, config.totalVerticalDivisions, config.maxLines);
 	}
 
 	/**
@@ -157,24 +146,19 @@ public class FactoryDetectLineAlgs {
 	 * @see DetectLineHoughPolar
 	 *
 	 * @param config Configuration for line detector.  Can't be null.
-	 * @param imageType Type of single band input image.
-	 * @param derivType Image derivative type.                    
-	 * @param <I> Input image type.
+	 * @param derivType Image derivative type.
 	 * @param <D> Image derivative type.
 	 * @return Line detector.
 	 */
-	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	DetectLineHoughPolar<I,D> houghPolar(ConfigHoughPolar config ,
-										 Class<I> imageType ,
+	public static <D extends ImageGray<D>>
+	DetectLineHoughPolar<D> houghPolar(ConfigHoughPolar config ,
 										 Class<D> derivType ) {
 
 		if( config == null )
 			throw new IllegalArgumentException("This is no default since minCounts must be specified");
 
-		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType,derivType);
-
 		return new DetectLineHoughPolar<>(config.localMaxRadius, config.minCounts, config.resolutionRange,
-				config.resolutionAngle, config.thresholdEdge, config.maxLines, gradient);
+				config.resolutionAngle, config.thresholdEdge, config.maxLines);
 	}
 
 }

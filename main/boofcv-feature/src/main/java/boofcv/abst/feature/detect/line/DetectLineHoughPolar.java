@@ -21,7 +21,7 @@ package boofcv.abst.feature.detect.line;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.HoughTransformLinePolar;
 import boofcv.alg.feature.detect.line.ImageLinePruneMerge;
@@ -51,7 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectLineHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>> implements DetectLine<I> {
+public class DetectLineHoughPolar<D extends ImageGray<D>> implements DetectEdgeLines<D> {
 
 	// transform algorithm
 	HoughTransformLinePolar alg;
@@ -59,15 +59,8 @@ public class DetectLineHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>
 	// extractor used by hough transform
 	NonMaxSuppression extractor;
 
-	// computes image gradient
-	ImageGradient<I,D> gradient;
-
 	// used to create binary edge image
 	float thresholdEdge;
-
-	// image gradient
-	D derivX;
-	D derivY;
 
 	// edge intensity image
 	GrayF32 intensity = new GrayF32(1,1);
@@ -97,6 +90,8 @@ public class DetectLineHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>
 	// post processing pruning
 	ImageLinePruneMerge post = new ImageLinePruneMerge();
 
+	List<LineParametric2D_F32> foundLines;
+
 	/**
 	 * Configures hough line detector.
 	 *
@@ -106,34 +101,29 @@ public class DetectLineHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>
 	 * @param resolutionAngle Resolution of line angle in radius.  Try PI/180
 	 * @param thresholdEdge Edge detection threshold. Try 50.
 	 * @param maxLines Maximum number of lines to return. If &le; 0 it will return them all.
-	 * @param gradient Algorithm for computing image gradient.
 	 */
 	public DetectLineHoughPolar(int localMaxRadius,
 								int minCounts,
 								double resolutionRange ,
 								double resolutionAngle ,
 								float thresholdEdge,
-								int maxLines ,
-								ImageGradient<I, D> gradient)
+								int maxLines )
 	{
 		pruneAngleTol = (float)((localMaxRadius+1)*resolutionAngle);
 		pruneRangeTol = (float)((localMaxRadius+1)*resolutionRange);
 		this.localMaxRadius = localMaxRadius;
-		this.gradient = gradient;
 		this.thresholdEdge = thresholdEdge;
 		this.resolutionRange = resolutionRange;
 		this.resolutionAngle = resolutionAngle;
 		this.maxLines = maxLines <= 0 ? Integer.MAX_VALUE : maxLines;
 		extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(localMaxRadius, minCounts, 0, false));
-		derivX = gradient.getDerivativeType().createImage(1, 1);
-		derivY = gradient.getDerivativeType().createImage(1, 1);
 	}
 
 	@Override
-	public List<LineParametric2D_F32> detect(I input) {
-		setInputSize(input.width,input.height);
+	public void detect( D derivX , D derivY ) {
+		InputSanityCheck.checkSameShape(derivX,derivY);
+		setInputSize(derivX.width,derivX.height);
 
-		gradient.process(input, derivX, derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
 
 		// non-max suppression reduces the number of line pixels, reducing the number of false positives
@@ -151,24 +141,20 @@ public class DetectLineHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>
 		alg.transform(binary);
 		FastQueue<LineParametric2D_F32> lines = alg.extractLines();
 
-		List<LineParametric2D_F32> ret = new ArrayList<>();
+		foundLines = new ArrayList<>();
 		for( int i = 0; i < lines.size; i++ )
-			ret.add(lines.get(i));
+			foundLines.add(lines.get(i));
 
-		ret = pruneLines(input, ret);
-
-		return ret;
+		foundLines = pruneLines(derivX, foundLines);
 	}
 
 	public void setInputSize( int width , int height ) {
 		// see if the input image shape has changed.
-		if( derivX.width != width || derivY.height != height ) {
+		if( intensity.width != width || intensity.height != height ) {
 			double r = Math.sqrt(width*width + height*height);
 			int numBinsRange = (int)Math.ceil(r/resolutionRange);
 			int numBinsAngle = (int)Math.ceil(Math.PI/resolutionAngle);
 			alg = new HoughTransformLinePolar(extractor,numBinsRange,numBinsAngle);
-			derivX.reshape(width,height);
-			derivY.reshape(width,height);
 			intensity.reshape(width,height);
 			binary.reshape(width, height);
 //			angle.reshape(width, height);
@@ -177,7 +163,7 @@ public class DetectLineHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>
 		}
 	}
 
-	private List<LineParametric2D_F32> pruneLines(I input, List<LineParametric2D_F32> ret) {
+	private List<LineParametric2D_F32> pruneLines(D input, List<LineParametric2D_F32> ret) {
 		float intensity[] = alg.getFoundIntensity();
 		post.reset();
 		for( int i = 0; i < ret.size(); i++ ) {
@@ -194,19 +180,16 @@ public class DetectLineHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>
 		return alg;
 	}
 
-	public D getDerivX() {
-		return derivX;
-	}
-
-	public D getDerivY() {
-		return derivY;
-	}
-
 	public GrayF32 getEdgeIntensity() {
 		return intensity;
 	}
 
 	public GrayU8 getBinary() {
 		return binary;
+	}
+
+	@Override
+	public List<LineParametric2D_F32> getFoundLines() {
+		return foundLines;
 	}
 }

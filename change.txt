@@ -15,7 +15,10 @@ Version : 0.34
   * Modified edge so that outside pixels can be treated as 0 or 1
   * Block threshold can now handle images smaller than the block size
   * Global threshold algorithm can now have the threshold scaled
-- Hough Line Foot now parameterizes using a soft rule
+- Line Detectors
+  * Created a new interface which takes in image gradient
+  * Improved merging algorithm for hough polar where it was pruning any line that interested inside the image
+  * Hough Line Foot now parameterizes using a soft rule
 - Concurrent code for ImageDistort
 - Demonstrations
   * modernize mosaic and stabilize

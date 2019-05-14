@@ -19,18 +19,19 @@
 package boofcv.demonstrations.feature.detect.line;
 
 
+import boofcv.abst.feature.detect.line.DetectEdgeLinesToLines;
 import boofcv.abst.feature.detect.line.DetectLineHoughPolar;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.ListDisplayPanel;
+import boofcv.gui.ViewedImageInfoPanel;
 import boofcv.gui.binary.VisualizeBinaryData;
-import boofcv.gui.feature.ImageLinePanel;
-import boofcv.gui.image.ImagePanel;
+import boofcv.gui.feature.ImageLinePanelZoom;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
@@ -39,11 +40,19 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,27 +69,53 @@ public class VisualizeHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>>
 	Class<I> imageType;
 	Class<D> derivType;
 
-	I blur;
+	Visualization imagePanel = new Visualization();
+	ControlPanel controlPanel;
 
-	ListDisplayPanel gui = new ListDisplayPanel("Lines","Edges","Parameter Space");
-	ImageLinePanel linePanel = new ImageLinePanel();
+	DetectLineHoughPolar<D> alg;
+	DetectEdgeLinesToLines<I,D> lineDetector; // use a high level line detector since it already has boilerplate code in it
+	ConfigHoughPolar config = new ConfigHoughPolar(5, 10, 2, Math.PI / 180, 25, 10);
+	int blurRadius = 2;
+	int view = 0;
+	boolean logIntensity = false;
 
-	DetectLineHoughPolar<I,D> alg;
+	GrayF32 transformLog = new GrayF32(1,1);
 
 	BufferedImage renderedTran;
 	BufferedImage renderedBinary;
+
+	I blur;
 
 	public VisualizeHoughPolar( List<PathLabel> examples,Class<I> imageType) {
 		super(true,true,examples,ImageType.single(imageType));
 		this.imageType = imageType;
 		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		alg =  FactoryDetectLineAlgs.houghPolar(
-				new ConfigHoughPolar(5, 10, 2, Math.PI / 180, 25, 10), imageType, derivType);
+		controlPanel = new ControlPanel();
+		controlPanel.setListener((zoom)-> imagePanel.setScale(zoom));
+		imagePanel.addMouseWheelListener(controlPanel);
+		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
+				controlPanel.setCursor(p.x,p.y);
 
+				if( SwingUtilities.isLeftMouseButton(e)) {
+					imagePanel.centerView(p.x,p.y);
+				}
+			}
+		});
+
+		createAlg();
 		blur = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
-		add(BorderLayout.CENTER,gui);
+		add(BorderLayout.WEST,controlPanel);
+		add(BorderLayout.CENTER,imagePanel);
+	}
+
+	private synchronized void createAlg() {
+		alg = FactoryDetectLineAlgs.houghPolar(config, derivType);
+		lineDetector = new DetectEdgeLinesToLines<>(alg,imageType,derivType);
 	}
 
 	@Override
@@ -88,39 +123,48 @@ public class VisualizeHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>>
 		blur.reshape(width,height);
 
 		alg.setInputSize(width,height);
-		GrayF32 transform = alg.getTransform().getTransform();
-		renderedTran = ConvertBufferedImage.checkDeclare(transform.width,transform.height,renderedTran,BufferedImage.TYPE_INT_RGB);
+
+		int tranWidth = alg.getTransform().getTransform().width;
+		int tranHeight = alg.getTransform().getTransform().height;
+		renderedTran = ConvertBufferedImage.checkDeclare(tranWidth,tranHeight,renderedTran,BufferedImage.TYPE_INT_RGB);
 		renderedBinary = ConvertBufferedImage.checkDeclare(width,height,renderedBinary,BufferedImage.TYPE_INT_RGB);
 
-		BoofSwingUtil.invokeNowOrLater(()->{
-			gui.getBodyPanel().setPreferredSize(new Dimension(width,height));
-			gui.setItem(0,linePanel);
-			gui.setItem(1,new ImagePanel(renderedBinary));
-			gui.setItem(2,new ImagePanel(renderedTran));
+		BoofSwingUtil.invokeNowOrLater(()-> {
+			imagePanel.setPreferredSize(new Dimension(width, height));
+			controlPanel.setImageSize(width,height);
 		});
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase _input)
+	public synchronized void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase _input)
 	{
 		I input = (I)_input;
 
-		GBlurImageOps.gaussian(input, blur, -1, 2, null);
+		long time0 = System.nanoTime();
+		if( blurRadius > 0 ) {
+			GBlurImageOps.gaussian(input, blur, -1, blurRadius, null);
+		} else {
+			blur.setTo(input);
+		}
+		imagePanel.setLines(lineDetector.detect(blur),input.width,input.height);
+		long time1 = System.nanoTime();
 
-		List<LineParametric2D_F32> lines = alg.detect(blur);
+		imagePanel.input = buffered;
 
-		linePanel.setImage(buffered);
-		linePanel.setLines(lines);
-		linePanel.setPreferredSize(new Dimension(input.width,input.height));
+		if( logIntensity ) {
+			PixelMath.log(alg.getTransform().getTransform(),transformLog);
+			renderedTran = VisualizeImageData.grayMagnitude(transformLog, renderedTran,-1);
+		} else {
+			renderedTran = VisualizeImageData.grayMagnitude(alg.getTransform().getTransform(), renderedTran,-1);
+		}
 
-		VisualizeImageData.grayMagnitude(alg.getTransform().getTransform(), renderedTran,-1);
 		VisualizeBinaryData.renderBinary(alg.getBinary(), false, renderedBinary);
 
 		// Draw the location of lines onto the magnitude image
 		Graphics2D g2 = renderedTran.createGraphics();
 		g2.setColor(Color.RED);
 		Point2D_F64 location = new Point2D_F64();
-		for( LineParametric2D_F32 l : lines ) {
+		for( LineParametric2D_F32 l : alg.getFoundLines() ) {
 			alg.getTransform().lineToCoordinate(l,location);
 			int r = 6;
 			int w = r*2 + 1;
@@ -131,7 +175,105 @@ public class VisualizeHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>>
 			g2.drawOval(x-r,y-r,w,w);
 		}
 
-		gui.repaint();
+		BoofSwingUtil.invokeNowOrLater(()->{
+			imagePanel.handleViewChange();
+			controlPanel.setProcessingTimeMS((time1-time0)*1e-6);
+			imagePanel.repaint();
+		});
+	}
+
+	private class Visualization extends ImageLinePanelZoom {
+		BufferedImage input;
+		@Override
+		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+			if( view == 0 ) {
+				super.paintInPanel(tran,g2);
+			}
+		}
+
+		public void handleViewChange() {
+			switch(view) {
+				case 0:setBufferedImage(input);break;
+				case 1:setBufferedImage(renderedBinary);break;
+				case 2:setBufferedImage(renderedTran);break;
+			}
+		}
+	}
+
+	private class ControlPanel extends ViewedImageInfoPanel
+			implements ChangeListener, ActionListener
+	{
+		JComboBox<String> comboView = combo(0,"Lines","Edges","Parameter Space");
+		JCheckBox checkLog = checkbox("Log Intensity",logIntensity);
+		JSpinner spinnerResRange = spinner(config.resolutionRange,1,50,1);
+		JSpinner spinnerResAngle = spinner(UtilAngle.degree(config.resolutionAngle),0.1, 20,1);
+		JSpinner spinnerMaxLines = spinner(config.maxLines,1,200,1);
+		JSpinner spinnerBlur = spinner(blurRadius,0,20,1);
+		JSpinner spinnerMinCount = spinner(config.minCounts,1,100,1);
+		JSpinner spinnerLocalMax = spinner(config.localMaxRadius,1,100,2);
+		JSpinner spinnerEdgeThresh = spinner(config.thresholdEdge,1,100,2);
+
+		public ControlPanel() {
+			super(BoofSwingUtil.MIN_ZOOM, BoofSwingUtil.MAX_ZOOM, 0.5, false);
+			add(comboView);
+			addAlignLeft(checkLog);
+			addSeparator(120);
+			addLabeled(spinnerResRange, "Res. Range");
+			addLabeled(spinnerResAngle, "Res. Angle");
+			addLabeled(spinnerMaxLines, "Max Lines");
+			addLabeled(spinnerBlur, "Blur Radius");
+			addLabeled(spinnerMinCount, "Min. Count");
+			addLabeled(spinnerLocalMax, "Local Max");
+			addLabeled(spinnerEdgeThresh, "Edge Thresh");
+			addVerticalGlue();
+		}
+
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			if (e.getSource() == spinnerResRange) {
+				config.resolutionRange = (Double) spinnerResRange.getValue();
+				createAlg();
+				reprocessImageOnly();
+			} else if (e.getSource() == spinnerResAngle) {
+				config.resolutionAngle = UtilAngle.radian((Double) spinnerResAngle.getValue());
+				createAlg();
+				reprocessImageOnly();
+			} else if (e.getSource() == spinnerMaxLines) {
+				config.maxLines = (Integer) spinnerMaxLines.getValue();
+				createAlg();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerBlur ) {
+				blurRadius = (Integer) spinnerBlur.getValue();
+				createAlg();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerMinCount ) {
+				config.minCounts = (Integer) spinnerMinCount.getValue();
+				createAlg();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerLocalMax ) {
+				config.localMaxRadius = (Integer) spinnerLocalMax.getValue();
+				createAlg();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerEdgeThresh ) {
+				config.thresholdEdge = ((Number) spinnerEdgeThresh.getValue()).floatValue();
+				createAlg();
+				reprocessImageOnly();
+			} else {
+				super.stateChanged(e);
+			}
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if( e.getSource() == comboView ) {
+				view = comboView.getSelectedIndex();
+				imagePanel.handleViewChange();
+				imagePanel.repaint();
+			} else if( e.getSource() == checkLog ) {
+				logIntensity = checkLog.isSelected();
+				reprocessImageOnly();
+			}
+		}
 	}
 
 	public static void main( String args[] ) {

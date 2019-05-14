@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,11 @@
 
 package boofcv.examples.features;
 
-import boofcv.abst.feature.detect.line.DetectLineHoughPolar;
-import boofcv.abst.feature.detect.line.DetectLineSegmentsGridRansac;
+import boofcv.abst.feature.detect.line.DetectLine;
+import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.factory.feature.detect.line.ConfigHoughPolar;
-import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
+import boofcv.factory.feature.detect.line.ConfigLineRansac;
+import boofcv.factory.feature.detect.line.FactoryDetectLine;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.feature.ImageLinePanel;
 import boofcv.gui.image.ShowImages;
@@ -29,7 +30,6 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineParametric2D_F32;
@@ -58,23 +58,21 @@ public class ExampleLineDetection {
 	 *
 	 * @param image Input image.
 	 * @param imageType Type of image processed by line detector.
-	 * @param derivType Type of image derivative.
 	 */
-	public static<T extends ImageGray<T>, D extends ImageGray<D>>
-			void detectLines( BufferedImage image , 
-							  Class<T> imageType ,
-							  Class<D> derivType )
+	public static<T extends ImageGray<T>>
+			void detectLines( BufferedImage image ,
+							  Class<T> imageType )
 	{
 		// convert the line into a single band image
 		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType );
 
 		// Comment/uncomment to try a different type of line detector
-		DetectLineHoughPolar<T,D> detector = FactoryDetectLineAlgs.houghPolar(
-				new ConfigHoughPolar(3, 30, 2, Math.PI / 180,edgeThreshold, maxLines), imageType, derivType);
-//		DetectLineHoughFoot<T,D> detector = FactoryDetectLineAlgs.houghFoot(
-//				new ConfigHoughFoot(3, 8, 5, edgeThreshold,maxLines), imageType, derivType);
-//		DetectLineHoughFootSubimage<T,D> detector = FactoryDetectLineAlgs.houghFootSub(
-//				new ConfigHoughFootSubimage(3, 8, 5, edgeThreshold,maxLines, 2, 2), imageType, derivType);
+		DetectLine<T> detector = FactoryDetectLine.houghPolar(
+				new ConfigHoughPolar(3, 30, 2, Math.PI / 180,edgeThreshold, maxLines), imageType);
+//		DetectLine<T> detector = FactoryDetectLine.houghFoot(
+//				new ConfigHoughFoot(3, 8, 5, edgeThreshold,maxLines), imageType);
+//		DetectLine<T> detector = FactoryDetectLine.houghFootSub(
+//				new ConfigHoughFootSubimage(3, 8, 5, edgeThreshold,maxLines, 2, 2), imageType);
 
 		List<LineParametric2D_F32> found = detector.detect(input);
 
@@ -92,18 +90,16 @@ public class ExampleLineDetection {
 	 *
 	 * @param image Input image.
 	 * @param imageType Type of image processed by line detector.
-	 * @param derivType Type of image derivative.
 	 */
 	public static<T extends ImageGray<T>, D extends ImageGray<D>>
 	void detectLineSegments( BufferedImage image ,
-							 Class<T> imageType ,
-							 Class<D> derivType )
+							 Class<T> imageType )
 	{
 		// convert the line into a single band image
 		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType );
 
 		// Comment/uncomment to try a different type of line detector
-		DetectLineSegmentsGridRansac<T,D> detector = FactoryDetectLineAlgs.lineRansac(40, 30, 2.36, true, imageType, derivType);
+		DetectLineSegment<T> detector = FactoryDetectLine.lineRansac(new ConfigLineRansac(40, 30, 2.36, true), imageType);
 
 		List<LineSegment2D_F32> found = detector.detect(input);
 
@@ -119,10 +115,10 @@ public class ExampleLineDetection {
 	public static void main( String args[] ) {
 		BufferedImage input = UtilImageIO.loadImage(UtilIO.pathExample("simple_objects.jpg"));
 
-		detectLines(input, GrayU8.class, GrayS16.class);
+		detectLines(input, GrayU8.class);
 
 		// line segment detection is still under development and only works for F32 images right now
-		detectLineSegments(input, GrayF32.class, GrayF32.class);
+		detectLineSegments(input, GrayF32.class);
 
 		ShowImages.showWindow(listPanel, "Detected Lines", true);
 	}

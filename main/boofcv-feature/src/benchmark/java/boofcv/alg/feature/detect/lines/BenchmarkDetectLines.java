@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,7 @@ package boofcv.alg.feature.detect.lines;
 import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.detect.line.ConfigHoughFoot;
-import boofcv.factory.feature.detect.line.ConfigHoughFootSubimage;
-import boofcv.factory.feature.detect.line.ConfigHoughPolar;
-import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
+import boofcv.factory.feature.detect.line.*;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.misc.PerformerBase;
@@ -49,14 +46,12 @@ public class BenchmarkDetectLines<T extends ImageGray<T>, D extends ImageGray<D>
 
 	T input;
 	Class<T> imageType;
-	Class<D> derivType;
 
 	float edgeThreshold = 30;
 	int maxLines = 10;
 
-	public BenchmarkDetectLines( Class<T> imageType , Class<D> derivType ) {
+	public BenchmarkDetectLines( Class<T> imageType ) {
 		this.imageType = imageType;
-		this.derivType = derivType;
 		input = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 
 	}
@@ -64,7 +59,7 @@ public class BenchmarkDetectLines<T extends ImageGray<T>, D extends ImageGray<D>
 	public class HoughPolar extends PerformerBase {
 
 		DetectLine<T> detector =
-				FactoryDetectLineAlgs.houghPolar(new ConfigHoughPolar(3, 30, 4, Math.PI / 180, edgeThreshold, maxLines), imageType, derivType);
+				FactoryDetectLine.houghPolar(new ConfigHoughPolar(3, 30, 4, Math.PI / 180, edgeThreshold, maxLines), imageType);
 
 		@Override
 		public void process() {
@@ -75,7 +70,7 @@ public class BenchmarkDetectLines<T extends ImageGray<T>, D extends ImageGray<D>
 	public class HoughFoot extends PerformerBase {
 
 		DetectLine<T> detector =
-				FactoryDetectLineAlgs.houghFoot(new ConfigHoughFoot(3, 10, 5, edgeThreshold, maxLines), imageType, derivType);
+				FactoryDetectLine.houghFoot(new ConfigHoughFoot(3, 10, 5, edgeThreshold, maxLines), imageType);
 
 		@Override
 		public void process() {
@@ -86,7 +81,7 @@ public class BenchmarkDetectLines<T extends ImageGray<T>, D extends ImageGray<D>
 	public class HoughFootSub extends PerformerBase {
 
 		DetectLine<T> detector =
-				FactoryDetectLineAlgs.houghFootSub(new ConfigHoughFootSubimage(3, 6, 5, edgeThreshold, maxLines, 2, 2), imageType, derivType);
+				FactoryDetectLine.houghFootSub(new ConfigHoughFootSubimage(3, 6, 5, edgeThreshold, maxLines, 2, 2), imageType);
 
 		@Override
 		public void process() {
@@ -96,8 +91,7 @@ public class BenchmarkDetectLines<T extends ImageGray<T>, D extends ImageGray<D>
 
 	public class LineRansac extends PerformerBase {
 
-		DetectLineSegment<T> detector =
-				FactoryDetectLineAlgs.lineRansac(40, 30, 2.36, true, imageType, derivType);
+		DetectLineSegment<T> detector = FactoryDetectLine.lineRansac(new ConfigLineRansac(40, 30, 2.36, true), imageType);
 
 		@Override
 		public void process() {
@@ -123,7 +117,7 @@ public class BenchmarkDetectLines<T extends ImageGray<T>, D extends ImageGray<D>
 		System.out.println("=========  Profile Image Size " + image.getWidth() + " x " + image.getHeight()+ " ==========");
 		System.out.println();
 
-		BenchmarkDetectLines app = new BenchmarkDetectLines(GrayF32.class,GrayF32.class);
+		BenchmarkDetectLines app = new BenchmarkDetectLines(GrayF32.class);
 		app.benchmark(image);
 
 	}

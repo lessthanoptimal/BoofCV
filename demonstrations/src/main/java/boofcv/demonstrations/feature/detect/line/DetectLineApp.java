@@ -23,10 +23,7 @@ import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.detect.line.ConfigHoughFoot;
-import boofcv.factory.feature.detect.line.ConfigHoughFootSubimage;
-import boofcv.factory.feature.detect.line.ConfigHoughPolar;
-import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
+import boofcv.factory.feature.detect.line.*;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.ImageLinePanel;
@@ -97,25 +94,25 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 
 			switch (controls.whichAlg) {
 				case 0:
-					lineDetector = FactoryDetectLineAlgs.houghPolar(
+					lineDetector = FactoryDetectLine.houghPolar(
 							new ConfigHoughPolar(3, 30, 2,
-									Math.PI / 180, edgeThreshold, controls.maxLines), imageType, derivType);
+									Math.PI / 180, edgeThreshold, controls.maxLines), imageType);
 					break;
 
 				case 1:
-					lineDetector = FactoryDetectLineAlgs.houghFoot(
+					lineDetector = FactoryDetectLine.houghFoot(
 							new ConfigHoughFoot(3, 8, 5, edgeThreshold,
-									controls.maxLines), imageType, derivType);
+									controls.maxLines), imageType);
 					break;
 
 				case 2:
-					lineDetector = FactoryDetectLineAlgs.houghFootSub(
+					lineDetector = FactoryDetectLine.houghFootSub(
 							new ConfigHoughFootSubimage(3, 8, 5, edgeThreshold,
-									controls.maxLines, 2, 2), imageType, derivType);
+									controls.maxLines, 2, 2), imageType);
 					break;
 
 				case 3:
-					segmentDetector = FactoryDetectLineAlgs.lineRansac(40, 30, 2.36, true, imageType, derivType);
+					segmentDetector = FactoryDetectLine.lineRansac(new ConfigLineRansac(40, 30, 2.36, true), imageType);
 					break;
 			}
 		}

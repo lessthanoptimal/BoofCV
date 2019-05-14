@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.abst.feature.detect.line;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.HoughTransformLineFootOfNorm;
 import boofcv.alg.feature.detect.line.ImageLinePruneMerge;
@@ -56,8 +55,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectLineHoughFootSubimage<I extends ImageGray<I>, D extends ImageGray<D>>
-		implements DetectLine<I>
+public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
+		implements DetectEdgeLines<D>
 {
 	int totalHorizontalDivisions;
 	int totalVerticalDivisions;
@@ -65,13 +64,10 @@ public class DetectLineHoughFootSubimage<I extends ImageGray<I>, D extends Image
 	// transform algorithm
 	HoughTransformLineFootOfNorm alg;
 
-	// computes image gradient
-	ImageGradient<I,D> gradient;
-
 	// used to create binary edge image
 	float thresholdEdge;
 
-	// image gradient
+	// image gradient, from input
 	D derivX;
 	D derivY;
 
@@ -87,6 +83,7 @@ public class DetectLineHoughFootSubimage<I extends ImageGray<I>, D extends Image
 	// the maximum number of lines it will return
 	int maxLines;
 
+	List<LineParametric2D_F32> foundLines;
 
 	/**
 	 * Specifies detection parameters.  The suggested parameters should be used as a starting point and will
@@ -97,7 +94,6 @@ public class DetectLineHoughFootSubimage<I extends ImageGray<I>, D extends Image
 	 * @param minDistanceFromOrigin Lines which are this close to the origin of the transformed image are ignored.  Try 5.
 	 * @param thresholdEdge Threshold for classifying pixels as edge or not.  Try 30.
 	 * @param maxLines Maximum number of lines it will detect.  Try 10.
-	 * @param gradient Computes the image gradient.
 	 */
 	public DetectLineHoughFootSubimage(int localMaxRadius,
 									   int minCounts,
@@ -105,10 +101,8 @@ public class DetectLineHoughFootSubimage<I extends ImageGray<I>, D extends Image
 									   float thresholdEdge,
 									   int totalHorizontalDivisions ,
 									   int totalVerticalDivisions ,
-									   int maxLines ,
-									   ImageGradient<I, D> gradient)
+									   int maxLines )
 	{
-		this.gradient = gradient;
 		this.thresholdEdge = thresholdEdge;
 		this.totalHorizontalDivisions = totalHorizontalDivisions;
 		this.totalVerticalDivisions = totalVerticalDivisions;
@@ -116,18 +110,16 @@ public class DetectLineHoughFootSubimage<I extends ImageGray<I>, D extends Image
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmaxCandidate(
 				new ConfigExtract(localMaxRadius, minCounts, 0, false));
 		alg = new HoughTransformLineFootOfNorm(extractor,minDistanceFromOrigin);
-		derivX = gradient.getDerivativeType().createImage(1, 1);
-		derivY = gradient.getDerivativeType().createImage(1, 1);
 	}
 
 	@Override
-	public List<LineParametric2D_F32> detect(I input) {
-		derivX.reshape(input.width,input.height);
-		derivY.reshape(input.width,input.height);
-		intensity.reshape(input.width,input.height);
-		binary.reshape(input.width,input.height);
+	public void detect( D derivX , D derivY ) {
+		this.derivX = derivX;
+		this.derivY = derivY;
+		foundLines = null;
+		intensity.reshape(derivX.width,derivX.height);
+		binary.reshape(derivX.width,derivX.height);
 
-		gradient.process(input,derivX,derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
 
 		ThresholdImageOps.threshold(intensity, binary, thresholdEdge, false);
@@ -136,29 +128,36 @@ public class DetectLineHoughFootSubimage<I extends ImageGray<I>, D extends Image
 		post.reset();
 
 		for( int i = 0; i < totalVerticalDivisions; i++ ) {
-			int y0 = input.height*i/totalVerticalDivisions;
-			int y1 = input.height*(i+1)/totalVerticalDivisions;
+			int y0 = intensity.height*i/totalVerticalDivisions;
+			int y1 = intensity.height*(i+1)/totalVerticalDivisions;
 
 			for( int j = 0; j < totalHorizontalDivisions; j++ ) {
-				int x0 = input.width*j/totalVerticalDivisions;
-				int x1 = input.width*(j+1)/totalVerticalDivisions;
+				int x0 = intensity.width*j/totalVerticalDivisions;
+				int x1 = intensity.width*(j+1)/totalVerticalDivisions;
 
 				processSubimage(x0,y0,x1,y1,ret);
 			}
 		}
 
 		// removing duplicate lines  caused by processing sub-images
-		ret = pruneLines(input);
+		foundLines = pruneLines(derivX.width,derivX.height);
 
-		return ret;
+		// remove reference to external data structures
+		this.derivX = null;
+		this.derivY = null;
 	}
 
-	private List<LineParametric2D_F32> pruneLines(I input) {
+	@Override
+	public List<LineParametric2D_F32> getFoundLines() {
+		return foundLines;
+	}
+
+	private List<LineParametric2D_F32> pruneLines( int width , int height ) {
 		// NOTE: angular accuracy is a function of range from sub image center.  This pruning
 		// function uses a constant value for range accuracy.  A custom algorithm should really
 		// be used here.
 		// NOTE: Thresholds should not be hardcoded...
-		post.pruneSimilar((float) (Math.PI * 0.04), 10, input.width, input.height);
+		post.pruneSimilar((float) (Math.PI * 0.04), 10, width, height);
 		post.pruneNBest(maxLines);
 
 		return post.createList();
@@ -186,14 +185,6 @@ public class DetectLineHoughFootSubimage<I extends ImageGray<I>, D extends Image
 
 	public HoughTransformLineFootOfNorm getTransform() {
 		return alg;
-	}
-
-	public D getDerivX() {
-		return derivX;
-	}
-
-	public D getDerivY() {
-		return derivY;
 	}
 
 	public GrayF32 getEdgeIntensity() {
