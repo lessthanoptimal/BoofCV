@@ -88,6 +88,9 @@ public class ChessboardCornerClusterToGrid {
 		if( !orderNodes(cluster.corners,info) )
 			return false;
 
+		// TODO split into grids from largest to smallest to prune stray random connections
+		// TODO add ability to output multiple GridInfo
+
 		// select a valid corner to be (0,0). If there are multiple options select the one which is
 		int corner = selectCorner(info);
 		if( corner == -1 ) {

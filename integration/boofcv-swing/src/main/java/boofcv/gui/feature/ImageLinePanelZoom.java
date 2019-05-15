@@ -21,6 +21,7 @@ package boofcv.gui.feature;
 
 import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.gui.image.ImageZoomPanel;
+import georegression.metric.Distance2D_F32;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 
@@ -39,7 +40,9 @@ public class ImageLinePanelZoom extends ImageZoomPanel {
 
 	public List<LineSegment2D_F32> lines = new ArrayList<>();
 
-	Line2D.Double line = new Line2D.Double();
+	protected Line2D.Double line = new Line2D.Double();
+
+	protected int selectedLine = -1;
 
 
 	public synchronized void setLines(List<LineParametric2D_F32> lines, int width , int height ) {
@@ -47,11 +50,36 @@ public class ImageLinePanelZoom extends ImageZoomPanel {
 		for( LineParametric2D_F32 p : lines ) {
 			this.lines.add(LineImageOps.convert(p, width, height));
 		}
+		selectedLine = -1;
 	}
 
 	public synchronized void setLineSegments(List<LineSegment2D_F32> lines) {
 		this.lines.clear();
 		this.lines.addAll(lines);
+		selectedLine = -1;
+	}
+
+	public synchronized int findLine( double x , double y , double tolerance ) {
+		int bestLine = -1;
+		float bestDistance = Float.MAX_VALUE;
+
+		for (int i = 0; i < lines.size(); i++) {
+			float d = Distance2D_F32.distance(lines.get(i),(float)x,(float)y);
+			if( d < bestDistance ) {
+				bestDistance = d;
+				bestLine = i;
+			}
+		}
+
+		return bestLine;
+	}
+
+	public void setSelected( int selected ) {
+		this.selectedLine = selected;
+	}
+
+	public int getSelected() {
+		return selectedLine;
 	}
 
 	@Override
@@ -60,13 +88,18 @@ public class ImageLinePanelZoom extends ImageZoomPanel {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setStroke(new BasicStroke(3));
 
-		for( LineSegment2D_F32 s : lines ) {
+		for( int i =0; i < lines.size(); i++ ) {
+			LineSegment2D_F32 s = lines.get(i);
 			line.x1 = scale*s.a.x;
 			line.y1 = scale*s.a.y;
 			line.x2 = scale*s.b.x;
 			line.y2 = scale*s.b.y;
 
-			g2.setColor(Color.RED);
+			if( i == selectedLine ) {
+				g2.setColor(Color.GREEN);
+			} else {
+				g2.setColor(Color.RED);
+			}
 			g2.draw(line);
 			g2.setColor(Color.BLUE);
 			g2.fillOval((int)(line.x1)-1,(int)(line.y1)-1,3,3);

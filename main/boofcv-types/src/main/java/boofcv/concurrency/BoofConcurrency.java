@@ -39,8 +39,20 @@ public class BoofConcurrency {
 	// Custom thread pool for streams so that the number of threads can be controlled
 	private static ForkJoinPool pool = new ForkJoinPool();
 
+	/**
+	 * Sets the maximum number of threads available in the thread pool and adjusts USE_CONCURRENT. If
+	 * the number of threads is less than 2 then USE_CONCURRENT will be set to false and the single thread
+	 * version of code will be called. Otherwise USE_CONCURRENT will be true and the max threads in the pool
+	 * set to the specified number.
+	 * @param maxThreads Maximum number of threads. &le 1 means it will not be threaded.
+	 */
 	public static void setMaxThreads( int maxThreads ) {
-		pool = new ForkJoinPool(maxThreads);
+		if( maxThreads <= 1 ) {
+			USE_CONCURRENT = false;
+		} else {
+			USE_CONCURRENT = true;
+			pool = new ForkJoinPool(maxThreads);
+		}
 	}
 
 	/**
@@ -48,6 +60,10 @@ public class BoofConcurrency {
 	 */
 	public static int getMaxThreads() {
 		return pool.getParallelism();
+	}
+
+	public static boolean isUseConcurrent() {
+		return USE_CONCURRENT;
 	}
 
 	/**

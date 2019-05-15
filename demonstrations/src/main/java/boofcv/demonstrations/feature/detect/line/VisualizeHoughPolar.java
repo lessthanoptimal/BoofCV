@@ -53,6 +53,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +103,15 @@ public class VisualizeHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>>
 
 				if( SwingUtilities.isLeftMouseButton(e)) {
 					imagePanel.centerView(p.x,p.y);
+
+					// let the user select a line
+					if( view == 0 ) {
+						int s = imagePanel.findLine(p.x, p.y, 5.0 / imagePanel.getScale());
+						if (s != -1) {
+							imagePanel.setSelected(s);
+							imagePanel.repaint();
+						}
+					}
 				}
 			}
 		});
@@ -160,21 +170,6 @@ public class VisualizeHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>>
 
 		VisualizeBinaryData.renderBinary(alg.getBinary(), false, renderedBinary);
 
-		// Draw the location of lines onto the magnitude image
-		Graphics2D g2 = renderedTran.createGraphics();
-		g2.setColor(Color.RED);
-		Point2D_F64 location = new Point2D_F64();
-		for( LineParametric2D_F32 l : alg.getFoundLines() ) {
-			alg.getTransform().lineToCoordinate(l,location);
-			int r = 6;
-			int w = r*2 + 1;
-			int x = (int)(location.x+0.5);
-			int y = (int)(location.y+0.5);
-//			System.out.println(x+" "+y+"  "+renderedTran.getWidth()+" "+renderedTran.getHeight());
-
-			g2.drawOval(x-r,y-r,w,w);
-		}
-
 		BoofSwingUtil.invokeNowOrLater(()->{
 			imagePanel.handleViewChange();
 			controlPanel.setProcessingTimeMS((time1-time0)*1e-6);
@@ -184,10 +179,38 @@ public class VisualizeHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>>
 
 	private class Visualization extends ImageLinePanelZoom {
 		BufferedImage input;
+		Ellipse2D.Double c = new Ellipse2D.Double();
+
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 			if( view == 0 ) {
 				super.paintInPanel(tran,g2);
+			} else if( view == 2 ) {
+				paintLinesInTransform(g2);
+			}
+		}
+
+		private void paintLinesInTransform(Graphics2D g2) {
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+			int r = 6;
+			g2.setStroke(new BasicStroke(2));
+			int selected = imagePanel.getSelected();
+			Point2D_F64 location = new Point2D_F64();
+			for( int i = 0; i < alg.getFoundLines().size(); i++ ) {
+				LineParametric2D_F32 l = alg.getFoundLines().get(i);
+				alg.getTransform().lineToCoordinate(l,location);
+
+				c.setFrame((location.x+0.5)*scale - r, (location.y+0.5)*scale - r, 2 * r, 2 * r);
+//			System.out.println(x+" "+y+"  "+renderedTran.getWidth()+" "+renderedTran.getHeight());
+
+				if( i == selected ) {
+					g2.setColor(Color.GREEN);
+				} else {
+					g2.setColor(Color.RED);
+				}
+				g2.draw(c);
 			}
 		}
 

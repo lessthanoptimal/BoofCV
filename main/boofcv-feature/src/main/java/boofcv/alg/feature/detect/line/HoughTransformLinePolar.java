@@ -184,7 +184,7 @@ public class HoughTransformLinePolar {
 
 		int w2 = transform.width/2;
 
-		coordinate.x = (int)Math.floor(polar.distance*w2/r_max) + w2;
+		coordinate.x = polar.distance*w2/r_max + w2;
 		coordinate.y = polar.angle*transform.height/Math.PI;
 	}
 

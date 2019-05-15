@@ -25,7 +25,7 @@ import boofcv.struct.calib.CameraPinholeBrown;
 /**
  * @author Peter Abeles
  */
-public class TestLensDistortionRadialTangential extends GeneralLensDistortionNarrowFOVChecks
+public class TestLensDistortionBrown extends GeneralLensDistortionNarrowFOVChecks
 {
 	@Override
 	public LensDistortionNarrowFOV create() {
