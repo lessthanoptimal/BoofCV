@@ -29,7 +29,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-class GeneralTemplateIntensityImage_MT <T extends ImageGray<T>> {
+abstract class GeneralTemplateIntensityImage_MT <T extends ImageGray<T>> {
 
 	Random rand = new Random(344);
 
