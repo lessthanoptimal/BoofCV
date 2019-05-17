@@ -87,8 +87,6 @@ public class DetectLineHoughPolar<D extends ImageGray<D>> implements DetectEdgeL
 	// the maximum number of lines it will return
 	int maxLines;
 
-	int refineRadius = 0;
-
 	// post processing pruning
 	ImageLinePruneMerge post = new ImageLinePruneMerge();
 
@@ -163,7 +161,6 @@ public class DetectLineHoughPolar<D extends ImageGray<D>> implements DetectEdgeL
 //			direction.reshape(width, height);
 			suppressed.reshape(width, height);
 		}
-		alg.setRefineRadius(refineRadius);
 	}
 
 	private List<LineParametric2D_F32> pruneLines(D input, List<LineParametric2D_F32> ret) {
@@ -189,14 +186,6 @@ public class DetectLineHoughPolar<D extends ImageGray<D>> implements DetectEdgeL
 
 	public GrayU8 getBinary() {
 		return binary;
-	}
-
-	public int getRefineRadius() {
-		return refineRadius;
-	}
-
-	public void setRefineRadius(int refineRadius) {
-		this.refineRadius = refineRadius;
 	}
 
 	@Override

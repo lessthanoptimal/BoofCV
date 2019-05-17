@@ -161,7 +161,6 @@ public class FactoryDetectLineAlgs {
 		DetectLineHoughPolar<D> alg = new DetectLineHoughPolar<>(config.localMaxRadius,
 				config.minCounts, config.resolutionRange,
 				config.resolutionAngle, config.thresholdEdge, config.maxLines);
-		alg.setRefineRadius(config.refineRadius);
 		return alg;
 	}
 

@@ -19,7 +19,7 @@ Version : 0.34
   * Created a new interface which takes in image gradient
   * Improved merging algorithm for hough polar where it was pruning any line that interested inside the image
   * Hough Line Foot now parameterizes using a soft rule
-  * Added mean-shift refine to foot and polar form
+  * Added mean-shift refine to foot
 - Concurrent code for ImageDistort
 - Demonstrations
   * modernize mosaic and stabilize

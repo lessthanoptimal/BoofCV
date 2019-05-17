@@ -248,7 +248,6 @@ public class VisualizeHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>>
 		JSpinner spinnerMinCount = spinner(config.minCounts,1,100,1);
 		JSpinner spinnerLocalMax = spinner(config.localMaxRadius,1,100,2);
 		JSpinner spinnerEdgeThresh = spinner(config.thresholdEdge,1,100,2);
-		JSpinner spinnerRefRadius = spinner(config.refineRadius,0,20,1);
 
 		public ControlPanel() {
 			super(BoofSwingUtil.MIN_ZOOM, BoofSwingUtil.MAX_ZOOM, 0.5, false);
@@ -262,7 +261,6 @@ public class VisualizeHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>>
 			addLabeled(spinnerMinCount, "Min. Count");
 			addLabeled(spinnerLocalMax, "Local Max");
 			addLabeled(spinnerEdgeThresh, "Edge Thresh");
-			addLabeled(spinnerRefRadius,"Refine Radius");
 			addVerticalGlue();
 		}
 
@@ -294,10 +292,6 @@ public class VisualizeHoughPolar<I extends ImageGray<I>, D extends ImageGray<D>>
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerEdgeThresh ) {
 				config.thresholdEdge = ((Number) spinnerEdgeThresh.getValue()).floatValue();
-				createAlg();
-				reprocessImageOnly();
-			} else if( e.getSource() == spinnerRefRadius ) {
-				config.refineRadius = (Integer) spinnerRefRadius.getValue();
 				createAlg();
 				reprocessImageOnly();
 			} else {

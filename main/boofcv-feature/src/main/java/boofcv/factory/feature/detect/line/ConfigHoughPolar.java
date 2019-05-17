@@ -52,11 +52,6 @@ public class ConfigHoughPolar implements Configuration {
 	 */
 	public int maxLines = 0;
 
-	/**
-	 * Radius of mean-shift refinement. Set to zero to turn off.
-	 */
-	public int refineRadius = 0;
-
 	public ConfigHoughPolar(int minCounts) {
 		this.minCounts = minCounts;
 	}
