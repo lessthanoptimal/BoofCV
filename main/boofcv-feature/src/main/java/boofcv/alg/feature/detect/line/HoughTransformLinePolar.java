@@ -20,12 +20,16 @@ package boofcv.alg.feature.detect.line;
 
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
+import boofcv.alg.feature.detect.peak.MeanShiftPeak;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.weights.WeightPixelGaussian_F32;
 import boofcv.struct.QueueCorner;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.feature.CachedSineCosine_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.geometry.UtilLine2D_F32;
+import georegression.geometry.UtilPoint2D_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LinePolar2D_F32;
@@ -83,6 +87,10 @@ public class HoughTransformLinePolar {
 	// lookup tables for sine and cosine functions
 	CachedSineCosine_F32 tableTrig;
 
+	// Refine lines using mean shift. If radius <= 0 it won't be used
+	MeanShiftPeak<GrayF32> refine = new MeanShiftPeak<>(10,0.001f,
+			new WeightPixelGaussian_F32(),GrayF32.class, BorderType.WRAP);
+
 	/**
 	 * Specifies parameters of transform.  The minimum number of points specified in the extractor
 	 * is an important tuning parameter.
@@ -96,6 +104,8 @@ public class HoughTransformLinePolar {
 		transform.reshape(numBinsRange,numBinsAngle);
 
 		tableTrig = new CachedSineCosine_F32(0,(float)Math.PI,numBinsAngle);
+		refine.setImage(transform);
+		refine.setRadius(3);
 	}
 
 	public int getNumBinsRange() {
@@ -148,9 +158,21 @@ public class HoughTransformLinePolar {
 		for( int i = 0; i < foundLines.size(); i++ ) {
 			Point2D_I16 p = foundLines.get(i);
 
-			float r = (float)(r_max*(p.x-w2)/w2);
-			float c = tableTrig.c[p.y];
-			float s = tableTrig.s[p.y];
+			refine.search(p.x,p.y);
+
+			// refine the estimate using mean shift and make sure it didn't diverge
+			float x,y;
+			if(UtilPoint2D_F32.distance(p.x,p.y,refine.getPeakX(),refine.getPeakY()) < 2*refine.getRadius()) {
+				x = refine.getPeakX();
+				y = refine.getPeakY();
+			} else {
+				x = p.x;
+				y = p.y;
+			}
+
+			float r = (float)(r_max*(x-w2)/w2);
+			float c = tableTrig.cosine(y);
+			float s = tableTrig.sine(y);
 
 			float x0 = r*c+originX;
 			float y0 = r*s+originY;
@@ -228,5 +250,13 @@ public class HoughTransformLinePolar {
 	 */
 	public float[] getFoundIntensity() {
 		return foundIntensity.data;
+	}
+
+	public void setRefineRadius( int radius ) {
+		refine.setRadius(radius);
+	}
+
+	public int getRefineRadius() {
+		return refine.getRadius();
 	}
 }

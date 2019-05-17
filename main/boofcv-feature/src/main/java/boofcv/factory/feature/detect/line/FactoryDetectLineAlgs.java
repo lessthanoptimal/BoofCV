@@ -158,8 +158,11 @@ public class FactoryDetectLineAlgs {
 		if( config == null )
 			throw new IllegalArgumentException("This is no default since minCounts must be specified");
 
-		return new DetectLineHoughPolar<>(config.localMaxRadius, config.minCounts, config.resolutionRange,
+		DetectLineHoughPolar<D> alg = new DetectLineHoughPolar<>(config.localMaxRadius,
+				config.minCounts, config.resolutionRange,
 				config.resolutionAngle, config.thresholdEdge, config.maxLines);
+		alg.setRefineRadius(config.refineRadius);
+		return alg;
 	}
 
 }

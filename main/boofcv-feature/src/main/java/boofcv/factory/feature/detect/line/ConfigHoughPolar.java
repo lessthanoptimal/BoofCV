@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,6 +51,11 @@ public class ConfigHoughPolar implements Configuration {
 	 * Maximum number of lines to return. If &le; 0 it will return all
 	 */
 	public int maxLines = 0;
+
+	/**
+	 * Radius of mean-shift refinement. Set to zero to turn off.
+	 */
+	public int refineRadius = 0;
 
 	public ConfigHoughPolar(int minCounts) {
 		this.minCounts = minCounts;

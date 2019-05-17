@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,6 +54,26 @@ public class CachedSineCosine_F32 {
 			c[i] = (float)Math.cos(angle);
 			s[i] = (float)Math.sin(angle);
 		}
+	}
+
+	public float cosine( float value ) {
+		return interpolate(value, c);
+	}
+
+	public float sine( float value ) {
+		return interpolate(value, s);
+	}
+
+	private float interpolate(float value, float[] table) {
+		float v = value-minAngle;
+		int i = (int)v;
+		if( i < 0 )
+			return table[0];
+		else if( i >= table.length-1 )
+			return table[table.length-1];
+
+		float w = v-i;
+		return table[i]*(1f-w) + table[i+1]*w;
 	}
 
 	public int computeIndex( float angle ) {
