@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.alg.weights.WeightPixel_F32;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -68,7 +69,7 @@ public class BenchmarkPeakFinding<T extends ImageGray<T>> {
 
 		public MeanShiftGaussian( int radius ) {
 			WeightPixel_F32 weight = new WeightPixelGaussian_F32();
-			this.alg = new MeanShiftPeak(30,0.1f,weight,imageType);
+			this.alg = new MeanShiftPeak(30,0.1f,weight,imageType, BorderType.EXTENDED);
 			alg.setRadius(radius);
 		}
 
@@ -88,7 +89,7 @@ public class BenchmarkPeakFinding<T extends ImageGray<T>> {
 
 		public MeanShiftUniform( int radius ) {
 			WeightPixel_F32 weight = new WeightPixelGaussian_F32();
-			this.alg = new MeanShiftPeak(30,0.1f,weight,imageType);
+			this.alg = new MeanShiftPeak(30,0.1f,weight,imageType, BorderType.EXTENDED);
 			alg.setRadius(radius);
 		}
 

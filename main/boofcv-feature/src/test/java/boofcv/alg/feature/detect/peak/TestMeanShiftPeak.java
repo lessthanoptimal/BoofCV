@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.feature.detect.peak;
 
 
 import boofcv.alg.weights.WeightPixelGaussian_F32;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 
@@ -64,7 +65,7 @@ public class TestMeanShiftPeak {
 
 	public static class Helper extends MeanShiftPeak {
 		public Helper(int maxIterations, float convergenceTol) {
-			super(maxIterations, convergenceTol,new WeightPixelGaussian_F32(),GrayF32.class);
+			super(maxIterations, convergenceTol,new WeightPixelGaussian_F32(),GrayF32.class, BorderType.EXTENDED);
 		}
 
 		@Override

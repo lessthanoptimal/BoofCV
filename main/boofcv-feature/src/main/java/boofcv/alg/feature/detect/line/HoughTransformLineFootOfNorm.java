@@ -21,8 +21,11 @@ package boofcv.alg.feature.detect.line;
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.feature.detect.peak.MeanShiftPeak;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.weights.WeightPixelGaussian_F32;
 import boofcv.struct.QueueCorner;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.*;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.point.Point2D_I16;
@@ -70,6 +73,10 @@ public class HoughTransformLineFootOfNorm {
 	// line intensities for later pruning
 	GrowQueue_F32 foundIntensity = new GrowQueue_F32(10);
 
+	// Refine lines using mean shift. If radius <= 0 it won't be used
+	MeanShiftPeak<GrayF32> refine = new MeanShiftPeak<>(10,0.001f,
+			new WeightPixelGaussian_F32(),GrayF32.class, BorderType.ZERO);
+
 	/**
 	 * Specifies parameters of transform.
 	 *
@@ -80,6 +87,8 @@ public class HoughTransformLineFootOfNorm {
 										int minDistanceFromOrigin) {
 		this.extractor = extractor;
 		this.minDistanceFromOrigin = minDistanceFromOrigin;
+		refine.setImage(transform);
+		refine.setRadius(3);
 	}
 
 	/**
@@ -132,7 +141,13 @@ public class HoughTransformLineFootOfNorm {
 					Math.abs(y0) >= minDistanceFromOrigin ) {
 				LineParametric2D_F32 l = lines.grow();
 				l.p.set(p.x,p.y);
-				l.slope.set(-y0,x0);
+				refine.search(l.p.x,l.p.y);
+				// check for divergence
+				if( l.p.distance(refine.getPeakX(),refine.getPeakY()) < refine.getRadius()*2 ) {
+					l.p.set(refine.getPeakX(),refine.getPeakY());
+				}
+				l.slope.x = -(l.p.y-originY);
+				l.slope.y = l.p.x-originX;
 				foundIntensity.push(transform.get(p.x,p.y));
 			}
 		}
@@ -253,5 +268,13 @@ public class HoughTransformLineFootOfNorm {
 				}
 			}
 		}
+	}
+
+	public void setRefineRadius( int radius ) {
+		refine.setRadius(radius);
+	}
+
+	public int getRefineRadius() {
+		return refine.getRadius();
 	}
 }

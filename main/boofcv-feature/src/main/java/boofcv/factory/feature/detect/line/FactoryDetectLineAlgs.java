@@ -112,6 +112,7 @@ public class FactoryDetectLineAlgs {
 
 		alg.setMergeAngle(config.mergeAngle);
 		alg.setMergeDistance(config.mergeDistance);
+		alg.getTransform().setRefineRadius(config.refineRadius);
 
 		return alg;
 	}

@@ -57,6 +57,11 @@ public class ConfigHoughFoot implements Configuration {
 	 */
 	public double mergeDistance = 10;
 
+	/**
+	 * Radius of mean-shift refinement. Set to zero to turn off.
+	 */
+	public int refineRadius = 3;
+
 	public ConfigHoughFoot() {
 	}
 

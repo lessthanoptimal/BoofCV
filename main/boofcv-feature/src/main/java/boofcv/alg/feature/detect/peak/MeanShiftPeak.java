@@ -62,18 +62,18 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 
 	/**
 	 * Configures search.
-	 *
-	 * @param maxIterations  Maximum number of iterations.  Try 10
+	 *  @param maxIterations  Maximum number of iterations.  Try 10
 	 * @param convergenceTol Convergence tolerance.  Try 1e-3
 	 * @param weights Used to compute the weight each pixel contributes to the mean.  Try a uniform distribution.
+	 * @param borderType
 	 */
 	public MeanShiftPeak(int maxIterations, float convergenceTol,
 						 WeightPixel_F32 weights,
-						 Class<T> imageType) {
+						 Class<T> imageType, BorderType borderType) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
 		this.weights = weights;
-		interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
+		interpolate = FactoryInterpolation.bilinearPixelS(imageType, borderType);
 	}
 
 	/**
@@ -95,8 +95,10 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 	 * Performs a mean-shift search center at the specified coordinates
 	 */
 	public void search( float cx , float cy ) {
-
 		peakX = cx; peakY = cy;
+		if( radius <= 0 ) { // can turn off refinement by setting radius to zero
+			return;
+		}
 		setRegion(cx, cy);
 
 		for( int i = 0; i < maxIterations; i++ ) {
@@ -167,5 +169,17 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 
 	public float getPeakY() {
 		return peakY;
+	}
+
+	public int getRadius() {
+		return radius;
+	}
+
+	public InterpolatePixelS<T> getInterpolate() {
+		return interpolate;
+	}
+
+	public void setInterpolate(InterpolatePixelS<T> interpolate) {
+		this.interpolate = interpolate;
 	}
 }

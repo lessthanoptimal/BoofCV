@@ -74,8 +74,12 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 	Visualization imagePanel = new Visualization();
 	ControlPanel controlPanel;
 
+	//--------------------------
+	final Object lockAlg = new Object();
 	DetectLineHoughFoot<D> alg; // the algorithm being investigated
 	DetectEdgeLinesToLines<I,D> lineDetector; // use a high level line detector since it already has boilerplate code in it
+	//--------------------------
+
 	ConfigHoughFoot config = new ConfigHoughFoot(6, 6, 5, 15, 10);
 	int blurRadius = 2;
 	int view = 0;
@@ -121,16 +125,20 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 		add(BorderLayout.CENTER,imagePanel);
 	}
 
-	private synchronized void createAlg() {
-		alg = FactoryDetectLineAlgs.houghFoot(config, derivType);
-		lineDetector = new DetectEdgeLinesToLines<>(alg,imageType,derivType);
+	private void createAlg() {
+		synchronized (lockAlg) {
+			alg = FactoryDetectLineAlgs.houghFoot(config, derivType);
+			lineDetector = new DetectEdgeLinesToLines<>(alg, imageType, derivType);
+		}
 	}
 
 	@Override
 	protected void handleInputChange(int source, InputMethod method, int width, int height) {
 		blur.reshape(width,height);
 
-		alg.setInputSize(width,height);
+		synchronized (lockAlg) {
+			alg.setInputSize(width, height);
+		}
 		renderedTran = ConvertBufferedImage.checkDeclare(width,height,renderedTran,BufferedImage.TYPE_INT_RGB);
 		renderedBinary = ConvertBufferedImage.checkDeclare(width,height,renderedBinary,BufferedImage.TYPE_INT_RGB);
 
@@ -141,7 +149,7 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 	}
 
 	@Override
-	public synchronized void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase _input)
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase _input)
 	{
 		I input = (I)_input;
 
@@ -151,7 +159,12 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 		} else {
 			blur.setTo(input);
 		}
-		imagePanel.setLines(lineDetector.detect(blur),input.width,input.height);
+		List<LineParametric2D_F32> lines;
+		synchronized (lockAlg) {
+			lines = lineDetector.detect(blur);
+		}
+
+		imagePanel.setLines(lines,input.width,input.height);
 		long time1 = System.nanoTime();
 
 		imagePanel.input = buffered;
@@ -200,17 +213,20 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 			int r = 6;
 			g2.setStroke(new BasicStroke(2));
 			int selected = imagePanel.getSelected();
-			for( int i = 0; i < alg.getFoundLines().size(); i++ ) {
-				LineParametric2D_F32 l = alg.getFoundLines().get(i);
+			synchronized (lockAlg) {
+				List<LineParametric2D_F32>  found = alg.getFoundLines();
+				for (int i = 0; found != null && i < found.size(); i++) {
+					LineParametric2D_F32 l = alg.getFoundLines().get(i);
 
-				c.setFrame((l.p.x+0.5)*scale - r, (l.p.y+0.5)*scale - r, 2 * r, 2 * r);
+					c.setFrame((l.p.x + 0.5) * scale - r, (l.p.y + 0.5) * scale - r, 2 * r, 2 * r);
 
-				if( i == selected ) {
-					g2.setColor(Color.GREEN);
-				} else {
-					g2.setColor(Color.RED);
+					if (i == selected) {
+						g2.setColor(Color.GREEN);
+					} else {
+						g2.setColor(Color.RED);
+					}
+					g2.draw(c);
 				}
-				g2.draw(c);
 			}
 		}
 	}
@@ -225,6 +241,7 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 		JSpinner spinnerMinCount = spinner(config.minCounts,1,100,1);
 		JSpinner spinnerLocalMax = spinner(config.localMaxRadius,1,100,2);
 		JSpinner spinnerEdgeThresh = spinner(config.thresholdEdge,1,100,2);
+		JSpinner spinnerRefRadius = spinner(config.refineRadius,0,20,1);
 
 		public ControlPanel() {
 			super(BoofSwingUtil.MIN_ZOOM,BoofSwingUtil.MAX_ZOOM,0.5,false);
@@ -236,6 +253,7 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 			addLabeled(spinnerMinCount,"Min. Count");
 			addLabeled(spinnerLocalMax,"Local Max");
 			addLabeled(spinnerEdgeThresh,"Edge Thresh");
+			addLabeled(spinnerRefRadius,"Refine Radius");
 			addVerticalGlue();
 		}
 
@@ -259,6 +277,10 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerEdgeThresh ) {
 				config.thresholdEdge = ((Number) spinnerEdgeThresh.getValue()).floatValue();
+				createAlg();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerRefRadius ) {
+				config.refineRadius = (Integer) spinnerRefRadius.getValue();
 				createAlg();
 				reprocessImageOnly();
 			} else {
