@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.calib.chess;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.feature.detect.chess.ChessboardCornerDistance;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.image.ImageGray;
 import georegression.metric.UtilAngle;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
@@ -72,7 +73,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 @SuppressWarnings({"WeakerAccess", "ForLoopReplaceableByForEach"})
-public class ChessboardCornerClusterFinder {
+public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 	// Tolerance for deciding if two directions are the same.
 	private double directionTol =0.60;
@@ -88,6 +89,9 @@ public class ChessboardCornerClusterFinder {
 	// good job removing false positives, meaning that tons of features do not need to be considered
 	private int maxNeighbors=20; // 8 is minimum number given perfect data.
 	private double maxNeighborDistance=Double.MAX_VALUE; // maximum distance away (pixels Euclidean squared) a neighbor can be
+
+	// Computes the intensity of the line which connects two corners
+	private ChessboardCornerEdgeIntensity<T> computeConnInten;
 
 	// Data structures for the crude graph
 	private FastQueue<Vertex> vertexes = new FastQueue<>(Vertex.class,true);
@@ -125,7 +129,12 @@ public class ChessboardCornerClusterFinder {
 	private List<Edge> bestSolution = new ArrayList<>();
 	private List<Edge> solution = new ArrayList<>();
 
-	public ChessboardCornerClusterFinder() {
+	public ChessboardCornerClusterFinder( Class<T> imageType ) {
+		this(new ChessboardCornerEdgeIntensity<>(imageType));
+	}
+
+	public ChessboardCornerClusterFinder(ChessboardCornerEdgeIntensity<T> computeConnInten) {
+		this.computeConnInten = computeConnInten;
 		setDirectionTol(directionTol);
 	}
 
@@ -134,13 +143,14 @@ public class ChessboardCornerClusterFinder {
 	 *
 	 * @param corners Detected chessboard patterns. Not modified.
 	 */
-	public void process(List<ChessboardCorner> corners ) {
+	public void process( T image , List<ChessboardCorner> corners ) {
 		this.corners = corners;
 
 		// reset internal data structures
 		vertexes.reset();
 		edges.reset();
 		clusters.reset();
+		computeConnInten.setImage(image);
 
 		// Create a vertex for each corner
 		for (int idx = 0; idx < corners.size(); idx++) {
@@ -161,6 +171,19 @@ public class ChessboardCornerClusterFinder {
 		handleAmbiguousVertexes(corners);
 //		printDualGraph();
 
+		// use edge intensity to prune connections
+		for (int i = 0; i < vertexes.size; i++) {
+			Vertex v = vertexes.get(i);
+			ChessboardCorner ca = corners.get(v.index);
+			for (int j = 0; j < v.perpendicular.edges.size(); j++) {
+				Edge e = v.perpendicular.edges.get(j);
+				ChessboardCorner cb = corners.get(e.dst.index);
+				e.intensity = computeConnInten.process(ca,cb,e.direction);
+
+				// TODO prune some how if too small
+			}
+		}
+
 		// Prune connections which are not mutual
 		for (int i = 0; i < vertexes.size; i++) {
 			Vertex v = vertexes.get(i);
@@ -168,6 +191,7 @@ public class ChessboardCornerClusterFinder {
 			v.pruneNonMutal(EdgeType.PERPENDICULAR);
 		}
 //		printDualGraph();
+
 
 		// Select the final 2 to 4 connections from perpendicular set
 		// each pair of adjacent perpendicular edge needs to have a matching parallel edge between them
@@ -291,6 +315,7 @@ public class ChessboardCornerClusterFinder {
 			edge.distance = Math.sqrt(r.distance);
 			edge.dst = vertexes.get(r.index);
 			edge.direction = Math.atan2(dy,dx);
+			edge.intensity = -Double.MAX_VALUE;
 
 			double direction180 = UtilAngle.boundHalf(edge.direction);
 			double directionDiff = UtilAngle.distHalf(direction180,r.point.orientation);
@@ -893,6 +918,10 @@ public class ChessboardCornerClusterFinder {
 		this.maxNeighborDistance = maxNeighborDistance;
 	}
 
+	public ChessboardCornerEdgeIntensity<T> getConnectionIntensity() {
+		return computeConnInten;
+	}
+
 	public static class SearchResults {
 		public int index;
 		public double error;
@@ -1007,6 +1036,8 @@ public class ChessboardCornerClusterFinder {
 	 * perspective of the src vertex.
 	 */
 	public static class Edge {
+		// Image edge intensity
+		public double intensity;
 		// Euclidean distance between the two vertexes
 		public double distance;
 		// pointing direction (-pi to pi) from src (x,y) to dst (x,y)

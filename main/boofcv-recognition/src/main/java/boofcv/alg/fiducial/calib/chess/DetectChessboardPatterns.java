@@ -35,7 +35,7 @@ import org.ddogleg.struct.FastQueue;
 public class DetectChessboardPatterns {
 
 	protected DetectChessboardCornersPyramid detector = new DetectChessboardCornersPyramid();
-	protected ChessboardCornerClusterFinder clusterFinder = new ChessboardCornerClusterFinder();
+	protected ChessboardCornerClusterFinder<GrayF32> clusterFinder = new ChessboardCornerClusterFinder<>(GrayF32.class);
 	protected ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
 
 	protected FastQueue<GridInfo> found = new FastQueue<>(GridInfo.class,true);
@@ -76,7 +76,7 @@ public class DetectChessboardPatterns {
 	public void findPatterns(GrayF32 input) {
 		found.reset();
 		detector.process(input);
-		clusterFinder.process(detector.getCorners().toList());
+		clusterFinder.process(input,detector.getCorners().toList());
 		FastQueue<ChessboardCornerGraph> clusters = clusterFinder.getOutputClusters();
 
 		for (int clusterIdx = 0; clusterIdx < clusters.size; clusterIdx++) {

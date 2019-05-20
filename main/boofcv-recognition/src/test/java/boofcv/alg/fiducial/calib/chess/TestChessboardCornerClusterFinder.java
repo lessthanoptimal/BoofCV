@@ -19,6 +19,7 @@
 package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
@@ -42,6 +43,8 @@ class TestChessboardCornerClusterFinder {
 	double offsetX;
 	double offsetY;
 
+	GrayU8 image = new GrayU8(1,1);
+
 	@BeforeEach
 	void setup() {
 		offsetX = 0;
@@ -64,10 +67,10 @@ class TestChessboardCornerClusterFinder {
 
 	void perfect( int rows , int cols ) {
 		List<ChessboardCorner> input = createCorners(rows,cols);
-		ChessboardCornerClusterFinder alg = new ChessboardCornerClusterFinder();
+		ChessboardCornerClusterFinder<GrayU8> alg = createAlg();
 		alg.setMaxNeighbors(10); // this is perfect, 8 should be enough
 		// reduced the number so that having an non-exhaustive search is stressed more
-		alg.process(input);
+		alg.process(image,input);
 
 		FastQueue<ChessboardCornerGraph> found = alg.getOutputClusters();
 		assertEquals(1,found.size);
@@ -100,10 +103,10 @@ class TestChessboardCornerClusterFinder {
 			input.add(d);
 		}
 
-		ChessboardCornerClusterFinder alg = new ChessboardCornerClusterFinder();
+		ChessboardCornerClusterFinder<GrayU8> alg = createAlg();
 		alg.setMaxNeighbors(10); // this is perfect, 8 should be enough
 		// reduced the number so that having an non-exhaustive search is stressed more
-		alg.process(input);
+		alg.process(image,input);
 
 		FastQueue<ChessboardCornerGraph> found = alg.getOutputClusters();
 		if( numAmbiguous == 0 ) {
@@ -126,9 +129,9 @@ class TestChessboardCornerClusterFinder {
 		offsetX = 500;
 		input.addAll(createCorners(3,2));
 
-		ChessboardCornerClusterFinder alg = new ChessboardCornerClusterFinder();
+		ChessboardCornerClusterFinder<GrayU8> alg = createAlg();
 		alg.setMaxNeighborDistance(200);
-		alg.process(input);
+		alg.process(image,input);
 		FastQueue<ChessboardCornerGraph> found = alg.getOutputClusters();
 
 		assertEquals(2,found.size);
@@ -266,6 +269,22 @@ class TestChessboardCornerClusterFinder {
 
 				assertEquals(expected,n.countEdges());
 			}
+		}
+	}
+
+	public ChessboardCornerClusterFinder<GrayU8> createAlg() {
+		return new ChessboardCornerClusterFinder<>(new DummyIntensity());
+	}
+
+	private static class DummyIntensity extends ChessboardCornerEdgeIntensity<GrayU8> {
+
+		public DummyIntensity() {
+			super(GrayU8.class);
+		}
+
+		@Override
+		public double process(ChessboardCorner ca, ChessboardCorner cb, double direction_a_to_b) {
+			return 100.0;
 		}
 	}
 

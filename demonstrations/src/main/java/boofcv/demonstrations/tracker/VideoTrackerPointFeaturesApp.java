@@ -78,6 +78,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 										Class<I> imageType ) {
 		super(examples, ImageType.single(imageType));
 		this.imageType = imageType;
+		this.allowImages = false;
 
 		gui.setPreferredSize(new Dimension(400,400));
 
