@@ -141,6 +141,7 @@ public class DetectCalibrationChessboard2App
 			configDetector.pyramidTopSize = controlPanel.pyramidTop;
 			configDetector.cornerRadius = controlPanel.radius;
 			configDetector.cornerThreshold = controlPanel.cornerThreshold;
+			configDetector.edgeThreshold = controlPanel.edgeThreshold;
 			configDetector.orientaitonTol = controlPanel.orientationTol;
 			configDetector.directionTol = controlPanel.directionTol;
 			configDetector.ambiguousTol = controlPanel.ambiguousTol;
@@ -151,6 +152,10 @@ public class DetectCalibrationChessboard2App
 
 			configGridDimen.numCols = controlPanel.gridCols;
 			configGridDimen.numRows = controlPanel.gridRows;
+
+			// check to see if it should be turned off. 0 is allowed, but we will set it to less than zero
+			if( configDetector.edgeThreshold <= 0 )
+				configDetector.edgeThreshold = -1;
 
 			detector = new CalibrationDetectorChessboard2(configDetector,configGridDimen);
 			detector.getDetector().getDetector().useMeanShift = controlPanel.meanShift;
@@ -345,6 +350,26 @@ public class DetectCalibrationChessboard2App
 				}
 			}
 
+			// displays edge intensity values. Not thread safe
+//			FastQueue<ChessboardCorner> corners = detector.getDetector().getCorners();
+//			List<Vertex> vertexes = detector.getClusterFinder().getVertexes().toList();
+//			g2.setColor(Color.RED);
+//			for (int i = 0; i < vertexes.size(); i++) {
+//				Vertex a = vertexes.get(i);
+//				ChessboardCorner ca = corners.get(a.index);
+//
+//				for( int j = 0; j < a.perpendicular.size(); j++ ) {
+//					double intensity = a.perpendicular.get(j).intensity;
+//					Vertex b = a.perpendicular.get(j).dst;
+//					ChessboardCorner cb = corners.get(b.index);
+//
+//					float x = (float)((ca.x+cb.x)/2.0);
+//					float y = (float)((ca.y+cb.y)/2.0);
+//
+//					g2.drawString(String.format("%.1f",intensity),x*(float)scale,y*(float)scale);
+//				}
+//			}
+
 			if( controlPanel.anyGrid ) {
 				if( controlPanel.showChessboards ) {
 					synchronized (lockCorners) {
@@ -396,6 +421,7 @@ public class DetectCalibrationChessboard2App
 		JCheckBox checkLogIntensity;
 		JSpinner spinnerRadius;
 		JSpinner spinnerCornerThreshold;
+		JSpinner spinnerEdgeThreshold;
 		JSpinner spinnerTop;
 		JSpinner spinnerAmbiguous;
 		JSpinner spinnerDirectionTol;
@@ -420,6 +446,7 @@ public class DetectCalibrationChessboard2App
 		int gridCols = configGridDimen.numCols;
 		int maxDistance;
 		double cornerThreshold;
+		double edgeThreshold;
 		double ambiguousTol;
 		double directionTol;
 		double orientationTol;
@@ -445,12 +472,14 @@ public class DetectCalibrationChessboard2App
 				thresholdPanel.histogramPanel.setApproximateHistogram(false);
 
 				cornerThreshold = configDetector.cornerThreshold;
+				edgeThreshold = configDetector.edgeThreshold;
 			}
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
 			comboView = combo(view,"Intensity","Image","Both","Binary");
 			spinnerCornerThreshold = spinner(cornerThreshold, 0, 100, 0.2);
+			spinnerEdgeThreshold = spinner(edgeThreshold, 0, 1.0, 0.1,1,3);
 			spinnerRadius = spinner(radius, 1, 100, 1);
 			spinnerTop = spinner(pyramidTop, 0, 10000, 50);
 			spinnerOrientationTol = spinner(orientationTol,0,3.0,0.05,1,3);
@@ -477,6 +506,7 @@ public class DetectCalibrationChessboard2App
 			addAlignLeft(checkAnyGrid);
 			addLabeled(spinnerRadius,"Corner Radius");
 			addLabeled(spinnerCornerThreshold,"Corner Threshold");
+			addLabeled(spinnerEdgeThreshold,"Edge Threshold");
 			addLabeled(spinnerTop,"Pyramid Top");
 			addLabeled(spinnerMaxDistance,"Max Dist.");
 			addLabeled(spinnerOrientationTol,"Orientation Tol");
@@ -571,6 +601,10 @@ public class DetectCalibrationChessboard2App
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerCornerThreshold ) {
 				cornerThreshold = ((Number)spinnerCornerThreshold.getValue()).doubleValue();
+				createAlgorithm();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerEdgeThreshold ) {
+				edgeThreshold = ((Number)spinnerEdgeThreshold.getValue()).doubleValue();
 				createAlgorithm();
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerRadius ) {

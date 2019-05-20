@@ -92,6 +92,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 	// Computes the intensity of the line which connects two corners
 	private ChessboardCornerEdgeIntensity<T> computeConnInten;
+	// Threshold relative to corner intensity used to prune. If <= 0 then this test is disabled
+	private double thresholdEdgeIntensity = 0.5;
 
 	// Data structures for the crude graph
 	private FastQueue<Vertex> vertexes = new FastQueue<>(Vertex.class,true);
@@ -172,16 +174,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 //		printDualGraph();
 
 		// use edge intensity to prune connections
-		for (int i = 0; i < vertexes.size; i++) {
-			Vertex v = vertexes.get(i);
-			ChessboardCorner ca = corners.get(v.index);
-			for (int j = 0; j < v.perpendicular.edges.size(); j++) {
-				Edge e = v.perpendicular.edges.get(j);
-				ChessboardCorner cb = corners.get(e.dst.index);
-				e.intensity = computeConnInten.process(ca,cb,e.direction);
-
-				// TODO prune some how if too small
-			}
+		if( thresholdEdgeIntensity >= 0 ) {
+			pruneConnectionsByIntensity(corners);
 		}
 
 		// Prune connections which are not mutual
@@ -191,7 +185,6 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			v.pruneNonMutal(EdgeType.PERPENDICULAR);
 		}
 //		printDualGraph();
-
 
 		// Select the final 2 to 4 connections from perpendicular set
 		// each pair of adjacent perpendicular edge needs to have a matching parallel edge between them
@@ -229,6 +222,33 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 		// Name says it all
 		convertToOutput(corners);
+	}
+
+	/**
+	 * Computes edge intensity and prunes connections if it's too low relative
+	 */
+	protected void pruneConnectionsByIntensity(List<ChessboardCorner> corners) {
+		for (int i = 0; i < vertexes.size; i++) {
+			Vertex v = vertexes.get(i);
+			ChessboardCorner ca = corners.get(v.index);
+
+			// Corner intensity is in units of gradient squared
+			float threshold = (float) (Math.sqrt(ca.intensity) * thresholdEdgeIntensity);
+
+			for (int j = v.perpendicular.edges.size() - 1; j >= 0; j--) {
+				Edge e = v.perpendicular.edges.get(j);
+				ChessboardCorner cb = corners.get(e.dst.index);
+				e.intensity = computeConnInten.process(ca, cb, e.direction);
+
+				// Prune if intensity is too small
+				if (e.intensity < threshold) {
+					v.perpendicular.edges.remove(j);
+					int idx = e.dst.perpendicular.find(v);
+					if( idx >= 0 )
+						e.dst.perpendicular.edges.remove(idx);
+				}
+			}
+		}
 	}
 
 	/**
@@ -918,8 +938,24 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		this.maxNeighborDistance = maxNeighborDistance;
 	}
 
+	public double getThresholdEdgeIntensity() {
+		return thresholdEdgeIntensity;
+	}
+
+	public void setThresholdEdgeIntensity(double thresholdEdgeIntensity) {
+		this.thresholdEdgeIntensity = thresholdEdgeIntensity;
+	}
+
 	public ChessboardCornerEdgeIntensity<T> getConnectionIntensity() {
 		return computeConnInten;
+	}
+
+	public FastQueue<Vertex> getVertexes() {
+		return vertexes;
+	}
+
+	public FastQueue<Edge> getEdges() {
+		return edges;
 	}
 
 	public static class SearchResults {
@@ -999,7 +1035,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	/**
 	 * Collection of edges that share the same relationship with the source vertex. See {@link EdgeType}.
 	 */
-	private static class EdgeSet {
+	public static class EdgeSet {
 		public List<Edge> edges = new ArrayList<>();
 
 		public void reset() {

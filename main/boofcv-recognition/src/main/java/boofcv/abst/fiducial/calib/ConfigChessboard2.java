@@ -46,6 +46,12 @@ public class ConfigChessboard2 implements Configuration {
 	public double cornerThreshold = 1.0;
 
 	/**
+	 * Relative threshold for two corners being connected. The edge between them must have sufficient intensity.
+	 * The definition of sufficient is based on the corner's intensity
+	 */
+	public double edgeThreshold = 0.5;
+
+	/**
 	 * The minimum allowed size for the top most layer in the pyramid. size = min(width,height). To have
 	 * only one layer in the pyramid at the same resolution as the input set this to a value of &le; 0
 	 */

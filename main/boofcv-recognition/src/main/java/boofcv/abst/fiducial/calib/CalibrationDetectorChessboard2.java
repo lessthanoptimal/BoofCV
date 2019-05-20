@@ -83,8 +83,10 @@ public class CalibrationDetectorChessboard2
 			}
 
 			return true;
+		} else {
+			detected = new CalibrationObservation(input.width, input.height);
+			return false;
 		}
-		return false;
 	}
 
 	@Override

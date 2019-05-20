@@ -283,8 +283,8 @@ class TestChessboardCornerClusterFinder {
 		}
 
 		@Override
-		public double process(ChessboardCorner ca, ChessboardCorner cb, double direction_a_to_b) {
-			return 100.0;
+		public float process(ChessboardCorner ca, ChessboardCorner cb, double direction_a_to_b) {
+			return 100.0f;
 		}
 	}
 

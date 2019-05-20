@@ -40,14 +40,15 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	/**
 	 * Number of points along the line from corner a to b that will be sampled
 	 */
-	int lengthSamples=4;
+	int lengthSamples=5;
 	/**
 	 * Number of points radially outwards along the line that are sampled
 	 */
-	int tangentSamples=3;
+	int tangentSamples=2;
 
-	// find the unit normal pointing towards white
+	// find the normal pointing towards white. Magnitude is relative to distance between two corners
 	float nx,ny;
+	float normalDiv = 15.0f;
 
 	public ChessboardCornerEdgeIntensity( Class<T> imageType ) {
 		interpolate = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
@@ -63,9 +64,11 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	 * @param ca corner a
 	 * @param cb corner b
 	 * @param direction_a_to_b Direction from a to b in radians.
-	 * @return the line intensity. more positive more intense
+	 * @return the line intensity. more positive more intense. Units = pixels intensity
 	 */
-	public double process( ChessboardCorner ca , ChessboardCorner cb , double direction_a_to_b ) {
+	public float process( ChessboardCorner ca , ChessboardCorner cb , double direction_a_to_b ) {
+		float cx = (float)ca.x;
+		float cy = (float)ca.y;
 		float dx = (float)(cb.x-ca.x);
 		float dy = (float)(cb.y-ca.y);
 
@@ -74,11 +77,11 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 
 		// move from one side to the other
 		// divide it into lengthSamples+1 regions and don't sample the tail ends
-		float intensity = 0;
+		float intensity = Float.MAX_VALUE;
 		for (int i = 1; i <= lengthSamples; i++) {
 			float f = ((float)i)/(lengthSamples+1);
-			float x0 = dx*i*f;
-			float y0 = dy*i*f;
+			float x0 = cx+dx*f;
+			float y0 = cy+dy*f;
 
 			float maxValue = -Float.MAX_VALUE;
 
@@ -89,19 +92,37 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 				maxValue = Math.max(maxValue,white-black);
 			}
 
-			intensity += maxValue;
+			intensity = Math.min(intensity,maxValue);
 		}
 
-		return intensity/lengthSamples;
+		return intensity;
 	}
 
+	/**
+	 * Finds the line's unit normal and make sure it points towards what should be white pixels
+	 * @param ca corner a
+	 * @param direction_a_to_b direction from corner a to b. radians. -pi to pi
+	 * @param dx b.x - a.x
+	 * @param dy b.y - a.y
+	 */
 	void computeUnitNormal(ChessboardCorner ca, double direction_a_to_b, float dx, float dy) {
 		float r = (float)Math.sqrt(dx*dx + dy*dy);
+
+		// it will now have a normal of 1
 		nx = -dy/r;
 		ny = dx/r;
 
-		double dir = UtilAngle.boundHalf(direction_a_to_b);
-		if(UtilAngle.distHalf(dir,ca.orientation) > Math.PI/2.0 ) {
+		// set the magnitude relative to the square size. Blurred images won't have sharp edges
+		// at the same time the magnitude of |n| shouldn't be less than 1
+		if( r > 1.0 ) {
+			r /= normalDiv;
+			nx *= r;
+			ny *= r;
+		}
+
+		double dir0 = UtilAngle.boundHalf(direction_a_to_b);
+		double dir1 = UtilAngle.boundHalf(ca.orientation-Math.PI/4);
+		if(UtilAngle.distHalf(dir0,dir1) < Math.PI/4.0 ) {
 			nx = -nx;
 			ny = -ny;
 		}

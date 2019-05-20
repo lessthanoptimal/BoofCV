@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,10 +19,6 @@
 package boofcv.abst.fiducial.calib;
 
 import georegression.metric.UtilAngle;
-import georegression.struct.point.Point2D_F64;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Generic class for rendering calibration targets
@@ -31,14 +27,7 @@ import java.util.List;
  */
 public abstract class RenderCalibrationTargets {
 
-	List<Point2D_F64> points;
-	
-	private void reset() {
-		points = new ArrayList<>();
-	}
-	
 	public void chessboard( int rows , int cols , double squareWidth ) {
-		reset();
 		specifySize(squareWidth*cols,squareWidth*rows);
 
 		for (int i = 0; i < rows; i++) {
@@ -53,7 +42,6 @@ public abstract class RenderCalibrationTargets {
 	}
 
 	public void squareGrid( int rows , int cols , double squareWidth, double spaceWidth ) {
-		reset();
 		specifySize(squareWidth*cols,squareWidth*rows);
 
 
@@ -74,8 +62,6 @@ public abstract class RenderCalibrationTargets {
 	}
 
 	public void circleHex( int rows, int cols , double circleDiameter, double centerDistance ) {
-		reset();
-
 		double spaceX = centerDistance/2.0;
 		double spaceY = centerDistance*Math.sin(UtilAngle.radian(60));
 		double radius = circleDiameter/2.0;
@@ -96,8 +82,6 @@ public abstract class RenderCalibrationTargets {
 	}
 
 	public void circleRegular( int rows , int cols , double circleDiameter , double centerDistance ) {
-		reset();
-
 		double imageWidth =  (cols-1)*centerDistance + circleDiameter;
 		double imageHeight = (rows-1)*centerDistance + circleDiameter;
 		specifySize(imageWidth,imageHeight);
