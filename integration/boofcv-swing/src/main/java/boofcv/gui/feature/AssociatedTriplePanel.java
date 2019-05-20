@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -127,6 +127,8 @@ public class AssociatedTriplePanel extends JPanel {
 		}
 
 		Graphics2D g2 = (Graphics2D)g;
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		int sep = 10;
 		int w = image2.getWidth()+sep+image3.getWidth();
@@ -180,9 +182,6 @@ public class AssociatedTriplePanel extends JPanel {
 
 
 	private void drawSingleLine(Graphics2D g2) {
-		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
 		g2.setStroke(new BasicStroke(4));
 		Line2D.Double line = new Line2D.Double();
 
@@ -309,6 +308,14 @@ public class AssociatedTriplePanel extends JPanel {
 	public void setPixelOffset( double x , double y ){
 		this.offX = x;
 		this.offY = y;
+	}
+
+	public Mode getMode() {
+		return mode;
+	}
+
+	public void setMode(Mode mode) {
+		this.mode = mode;
 	}
 
 	enum Mode {
