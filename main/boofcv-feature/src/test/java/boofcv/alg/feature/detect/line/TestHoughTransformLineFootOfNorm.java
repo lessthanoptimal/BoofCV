@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.image.*;
 import georegression.struct.line.LineParametric2D_F32;
 import org.ddogleg.struct.FastQueue;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -71,7 +72,7 @@ public class TestHoughTransformLineFootOfNorm {
 		// normalize the line for easier evaluation
 		l.slope.x /= l.slope.norm();
 		l.slope.y /= l.slope.norm();
-		assertEquals(0,Math.abs(l.slope.x),1e-16);
+		assertEquals(0,Math.abs(l.slope.x), UtilEjml.TEST_F64_SQ);
 		assertEquals(1,Math.abs(l.slope.y), 0.1);
 	}
 }
