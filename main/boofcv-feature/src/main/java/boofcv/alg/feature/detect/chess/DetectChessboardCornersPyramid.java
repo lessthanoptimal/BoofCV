@@ -20,6 +20,7 @@ package boofcv.alg.feature.detect.chess;
 
 import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
@@ -35,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectChessboardCornersPyramid {
+public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends ImageGray<D>> {
 	// TODO have flag that prunes corners which haven't been detected at multiple levels?
 	// TODO prefer corners selected at higher resolution when there's overap
 
@@ -59,12 +60,12 @@ public class DetectChessboardCornersPyramid {
 	NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
 	FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData.class,true);
 
-	public DetectChessboardCornersPyramid(DetectChessboardCorners detector) {
+	public DetectChessboardCornersPyramid(DetectChessboardCorners<T,D> detector) {
 		this.detector = detector;
 	}
 
-	public DetectChessboardCornersPyramid() {
-		this( new DetectChessboardCorners());
+	public DetectChessboardCornersPyramid( Class<T> imageType ) {
+		this( new DetectChessboardCorners<>(imageType));
 	}
 
 	/**

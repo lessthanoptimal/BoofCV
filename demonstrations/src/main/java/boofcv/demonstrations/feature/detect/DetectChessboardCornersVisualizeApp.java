@@ -81,7 +81,7 @@ public class DetectChessboardCornersVisualizeApp
 
 	GrayF32 logIntensity = new GrayF32(1,1);
 
-	DetectChessboardCornersPyramid detector = new DetectChessboardCornersPyramid();
+	DetectChessboardCornersPyramid<GrayF32,GrayF32> detector = new DetectChessboardCornersPyramid<>(GrayF32.class);
 
 	// used to compute feature intensity
 	final Object lockAlgorithm = new Object();
@@ -113,10 +113,10 @@ public class DetectChessboardCornersVisualizeApp
 			ConfigThreshold threshold = controlPanel.thresholdPanel.createConfig();
 			threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
 
-			DetectChessboardCorners corners = new DetectChessboardCorners();
+			DetectChessboardCorners<GrayF32,GrayF32> corners = new DetectChessboardCorners<>(GrayF32.class);
 			corners.setKernelRadius(controlPanel.radius);
 			corners.useMeanShift = controlPanel.meanShift;
-			detector = new DetectChessboardCornersPyramid(corners);
+			detector = new DetectChessboardCornersPyramid<>(corners);
 			detector.setPyramidTopSize(controlPanel.pyramidTop);
 			detector.getDetector().setThresholding(FactoryThresholdBinary.threshold(threshold,GrayF32.class));
 		}

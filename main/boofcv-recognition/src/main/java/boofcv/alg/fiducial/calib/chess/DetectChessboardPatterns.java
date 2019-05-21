@@ -34,7 +34,7 @@ import org.ddogleg.struct.FastQueue;
  */
 public class DetectChessboardPatterns {
 
-	protected DetectChessboardCornersPyramid detector = new DetectChessboardCornersPyramid();
+	protected DetectChessboardCornersPyramid<GrayF32,GrayF32> detector = new DetectChessboardCornersPyramid<>(GrayF32.class);
 	protected ChessboardCornerClusterFinder<GrayF32> clusterFinder = new ChessboardCornerClusterFinder<>(GrayF32.class);
 	protected ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
 

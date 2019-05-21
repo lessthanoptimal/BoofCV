@@ -24,11 +24,13 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
 import boofcv.alg.filter.binary.ContourPacked;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.ImageLineIntegral;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
@@ -41,6 +43,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.geometry.UtilPoint2D_I32;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
@@ -73,7 +76,7 @@ import static boofcv.misc.CircularIndex.addOffset;
  *
  * @author Peter Abeles
  */
-public class DetectChessboardCorners {
+public class DetectChessboardCorners<T extends ImageGray<T>, D extends ImageGray<D>> {
 
 	// intensity image is forced to have this many integer levels for OTSU
 	public static final int GRAY_LEVELS = 300;
@@ -84,7 +87,7 @@ public class DetectChessboardCorners {
 	double cornerIntensityThreshold = 1.0;
 
 	// computes corner intensity image
-	GradientCornerIntensity<GrayF32> cornerIntensity;
+	GradientCornerIntensity<D> cornerIntensity;
 
 	// storage for corner detector output
 	GrayF32 intensity = new GrayF32(1,1);
@@ -102,18 +105,17 @@ public class DetectChessboardCorners {
 	FastQueue<Point2D_I32> contour = new FastQueue<>(Point2D_I32.class,true);
 
 	// Computes the image gradient
-//	ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.three(GrayF32.class,GrayF32.class);
-	ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.prewitt(GrayF32.class,GrayF32.class);
+	ImageGradient<T,D> gradient;
 
 	// Storage for gradient of input image
-	GrayF32 derivX = new GrayF32(1,1), derivY= new GrayF32(1,1);
+	D derivX, derivY;
 
 	// used to sample derivative images at non-integer values
-	InterpolatePixelS<GrayF32> interpX = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.ZERO);
-	InterpolatePixelS<GrayF32> interpY = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.ZERO);
+	InterpolatePixelS<D> interpX;
+	InterpolatePixelS<D> interpY;
 
 	// Used to compute line integrals of spokes around a corner
-	ImageBorder<GrayF32> borderImg = FactoryImageBorder.single(GrayF32.class,BorderType.ZERO);
+	ImageBorder<T> borderImg;
 	ImageLineIntegral integral = new ImageLineIntegral();
 
 	// for mean-shift
@@ -126,17 +128,30 @@ public class DetectChessboardCorners {
 	private final double smoothed[] = new double[numLines];
 	private final Kernel1D_F64 kernelSmooth = FactoryKernelGaussian.gaussian(1,true,64,-1,numLines/4);
 
+	// input image type
+	Class<T> imageType;
+	Class<D> derivType;
+
 	/**
 	 * Declares internal data structures
 	 */
-	public DetectChessboardCorners() {
+	public DetectChessboardCorners( Class<T> imageType ) {
+		this.imageType = imageType;
+		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
 		setKernelRadius(1);
 
 		setThresholding(FactoryThresholdBinary.globalOtsu(0, GRAY_LEVELS,1.0,false,GrayF32.class));
 		contourFinder.setConnectRule(ConnectRule.EIGHT);
 
+		gradient = FactoryDerivative.prewitt(imageType,derivType);
+		derivX = GeneralizedImageOps.createSingleBand(derivType,1,1);
+		derivY = GeneralizedImageOps.createSingleBand(derivType,1,1);
+		interpX = FactoryInterpolation.bilinearPixelS(derivType, BorderType.ZERO);
+		interpY = FactoryInterpolation.bilinearPixelS(derivType, BorderType.ZERO);
+
 		// just give it something. this will be changed later
-		borderImg.setImage(derivX);
+		borderImg = FactoryImageBorder.single(imageType,BorderType.ZERO);
+		borderImg.setImage(GeneralizedImageOps.createSingleBand(imageType,1,1));
 		integral.setImage(FactoryGImageGray.wrap(borderImg));
 	}
 
@@ -144,7 +159,7 @@ public class DetectChessboardCorners {
 	 * Computes chessboard corners inside the image
 	 * @param input Gray image. Not modified.
 	 */
-	public void process( GrayF32 input ) {
+	public void process( T input ) {
 //		System.out.println("ENTER CHESSBOARD CORNER "+input.width+" x "+input.height);
 		borderImg.setImage(input);
 		gradient.process(input,derivX,derivY);
@@ -341,14 +356,14 @@ public class DetectChessboardCorners {
 	public void setKernelRadius( int radius ) {
 		this.shiRadius = radius;
 		this.shiWidth = radius*2+1;
-		cornerIntensity =  FactoryIntensityPointAlg.shiTomasi(radius, false, GrayF32.class);
+		cornerIntensity =  FactoryIntensityPointAlg.shiTomasi(radius, false, derivType);
 
 		// Tell it to ignore all contours which are smaller or larger than the flat region should be in the
 		// shi-tomasi corner intensity image. See clas description for a definition of the flat region
 		// Flat region is a square with width of (radius*2+1) where radius is the radius of the kernel.
 		if( radius == 1 ) {
-			contourFinder.setMaxContour((shiWidth + 1) * 4 + 4);
-			contourFinder.setMinContour(shiWidth * 4 - 4);
+			contourFinder.setMaxContour(1000);
+			contourFinder.setMinContour(0);
 		} else {
 			contourFinder.setMaxContour((shiWidth + 1) * 4 + 4);
 			contourFinder.setMinContour((shiWidth - 1) * 4 - 4);
@@ -365,5 +380,13 @@ public class DetectChessboardCorners {
 
 	public void setCornerIntensityThreshold(double cornerIntensityThreshold) {
 		this.cornerIntensityThreshold = cornerIntensityThreshold;
+	}
+
+	public Class<T> getImageType() {
+		return imageType;
+	}
+
+	public Class<D> getDerivType() {
+		return derivType;
 	}
 }
