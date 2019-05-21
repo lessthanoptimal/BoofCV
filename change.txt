@@ -41,7 +41,6 @@ Version : 0.34
 - Chessboard Detector 2
   * Rewritten from scratch using a new type of corner detector (TODO write tech report)
   * Better handling of blurred and fisheye images
-  * TODO Improve detect fisheye (2 more images) , See if accuracy can be improved.
 - Simulation
   * Concurrent version of SimulatePlanarWorld
 - Concurrent version of template matching

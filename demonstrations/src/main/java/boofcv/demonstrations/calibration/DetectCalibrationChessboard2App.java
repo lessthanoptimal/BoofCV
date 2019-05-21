@@ -642,10 +642,11 @@ public class DetectCalibrationChessboard2App
 
 		examples.add(new PathLabel("Chessboard 1",UtilIO.pathExample("calibration/mono/Sony_DSC-HX5V_Chess/frame06.jpg")));
 		examples.add(new PathLabel("Chessboard 2 ",UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/left03.jpg")));
-		examples.add(new PathLabel("Fisheye",UtilIO.pathExample("calibration/fisheye/chessboard/1.jpg")));
+		examples.add(new PathLabel("Chessboard 3 ",UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/left06.jpg")));
+		examples.add(new PathLabel("Fisheye 1",UtilIO.pathExample("calibration/fisheye/chessboard/1.jpg")));
+		examples.add(new PathLabel("Fisheye 2",UtilIO.pathExample("calibration/fisheye/chessboard/20.jpg")));
+		examples.add(new PathLabel("Fisheye 3",UtilIO.pathExample("calibration/fisheye/chessboard/21.jpg")));
 		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
-		examples.add(new PathLabel("TEMP 1","/home/pja/projects/ValidationBoof/data/fiducials/chessboard/standard/focus/image01.png"));
-		examples.add(new PathLabel("TEMP 2","/home/pja/projects/ValidationBoof/data/fiducials/chessboard/standard/rotation/image01.jpg"));
 
 		SwingUtilities.invokeLater(()->{
 			DetectCalibrationChessboard2App app = new DetectCalibrationChessboard2App(examples);

@@ -37,9 +37,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends ImageGray<D>> {
-	// TODO have flag that prunes corners which haven't been detected at multiple levels?
-	// TODO prefer corners selected at higher resolution when there's overap
-
 	// minimum number of pixels in the top most level in the pyramid
 	// If <= 0 then have a single layer at full resolution
 	int pyramidTopSize = 100;
