@@ -19,17 +19,11 @@
 package boofcv.alg.feature.detect.chess;
 
 import boofcv.abst.distort.FDistort;
-import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.gui.RenderCalibrationTargetsGraphics2D;
-import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayF32;
-import georegression.metric.UtilAngle;
-import georegression.struct.point.Point2D_F32;
 import org.ddogleg.struct.FastQueue;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -40,19 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-class TestDetectChessboardCorners {
-
-	int p = 40;
-	int w = 20;
-	int rows = 4;
-	int cols = 5;
-	double angle;
-
-	@BeforeEach
-	void setup() {
-		p = 40;
-		w = 20;
-	}
+class TestDetectChessboardCorners extends CommonChessboardCorners {
 
 	/**
 	 * Rotate a chessboard pattern and see if all the corners are detected
@@ -108,31 +90,6 @@ class TestDetectChessboardCorners {
 			}
 			assertEquals(1,matches);
 		}
-	}
-
-	private List<ChessboardCorner> createExpected( int rows , int cols , int width , int height ) {
-		List<ChessboardCorner> list = new ArrayList<>();
-
-		PixelTransform<Point2D_F32> inputToOutput = DistortSupport.transformRotate(width/2,height/2,
-				width/2,height/2,(float)-angle);
-
-		Point2D_F32 tmp = new Point2D_F32();
-
-		for (int row = 1; row < rows; row++) {
-			for( int col = 1; col < cols; col++ ) {
-				ChessboardCorner c = new ChessboardCorner();
-				inputToOutput.compute(p+col*w,p+row*w,tmp);
-				c.x = tmp.x;
-				c.y = tmp.y;
-				c.orientation = ((row%2)+(col%2))%2 == 0 ? Math.PI/4 : -Math.PI/4;
-				// take in account the image being rotated
-				c.orientation = UtilAngle.boundHalf(c.orientation+angle);
-
-				list.add(c);
-			}
-		}
-
-		return list;
 	}
 
 	@Test

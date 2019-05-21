@@ -60,12 +60,12 @@ public class ConfigChessboard2 implements Configuration {
 	/**
 	 * How similar the direction of two corners relative to each other need to be.
 	 */
-	public double directionTol = 0.6;
+	public double directionTol = 0.60;
 
 	/**
 	 * How similar two corner orientations need to be
 	 */
-	public double orientaitonTol = 0.60;
+	public double orientaitonTol = 0.65;
 
 	/**
 	 * Ratio used to decide if two corners are spatially close enough to each other to be considered

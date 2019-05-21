@@ -88,6 +88,7 @@ public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends Im
 
 			FastQueue<ChessboardCorner> corners = detector.getCorners();
 			featsLevel.corners.reset();
+
 			for (int i = 0; i < corners.size; i++) {
 				ChessboardCorner cf = corners.get(i);
 
@@ -130,26 +131,33 @@ public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends Im
 	 * seen then the feature in list 1 will be marked as seen. Otherwise the feature which is the most intense
 	 * is marked as first.
 	 */
-	void markSeenAsFalse(FastQueue<ChessboardCorner> corners0 , FastQueue<ChessboardCorner> corners1 ) {
+	void markSeenAsFalse(FastQueue<ChessboardCorner> corners0 , FastQueue<ChessboardCorner> corners1) {
 		nn.setPoints(corners1.toList(),false);
 		// radius of the blob in the intensity image is 2*kernelRadius
 		// Add some buffer because things tend to shift a bit across scales
-		int radius = detector.shiRadius *2+2;
+		int radius = detector.shiRadius*2+2;
 		for (int i = 0; i < corners0.size; i++) {
 			ChessboardCorner c0 = corners0.get(i);
+			if( !c0.first )
+				continue;
+
 			nnSearch.findNearest(c0,radius,5,nnResults);
 
 			// IDEA: Could make this smarter by looking at the orientation too?
+			double maxIntensity = 0;
 			for (int j = 0; j < nnResults.size; j++) {
 				ChessboardCorner c1 = nnResults.get(j).point;
-
-				// if the current one wasn't first then none of its children can be first
-				if( c1.intensity < c0.intensity ) {
-					// keeping the one with the best intensity score seems to help. Formally test this idea
+				maxIntensity = Math.max(c1.intensity,maxIntensity);
+			}
+			// the lower resolution feature must be much more intense than the current level to preferred. This
+			// results in more accurate feature localization
+			if( maxIntensity < c0.intensity*1.5) {
+				for (int j = 0; j < nnResults.size; j++) {
+					ChessboardCorner c1 = nnResults.get(j).point;
 					c1.first = false;
-				} else {
-					c0.first = false;
 				}
+			} else {
+				c0.first = false;
 			}
 		}
 	}
