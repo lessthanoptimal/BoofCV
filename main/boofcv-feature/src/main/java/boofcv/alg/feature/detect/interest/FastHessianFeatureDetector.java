@@ -342,7 +342,11 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 		float a = 0.5f*lower - middle + 0.5f*upper;
 		float b = 0.5f*upper - 0.5f*lower;
 
-		return -b/(2.0f*a);
+		if( a == 0.0f ) {
+			return 0.0f;
+		} else {
+			return -b / (2.0f * a);
+		}
 	}
 
 	public static double polyPeak( double lower , double middle , double upper )
@@ -354,7 +358,11 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 		double a = 0.5*lower - middle + 0.5*upper;
 		double b = 0.5*upper - 0.5*lower;
 
-		return -b/(2.0*a);
+		if( a == 0.0 ) { // TODO or add EPS to denominator? for speed...
+			return 0.0;
+		} else {
+			return -b / (2.0 * a);
+		}
 	}
 
 	public static double polyPeak( double lower , double middle , double upper,

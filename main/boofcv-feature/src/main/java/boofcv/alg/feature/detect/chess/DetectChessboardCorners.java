@@ -33,10 +33,12 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
+import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import georegression.geometry.UtilPoint2D_I32;
@@ -122,6 +124,7 @@ public class DetectChessboardCorners {
 	private final int numLines = 16;
 	private final double lines[] = new double[numLines];
 	private final double smoothed[] = new double[numLines];
+	private final Kernel1D_F64 kernelSmooth = FactoryKernelGaussian.gaussian(1,true,64,-1,numLines/4);
 
 	/**
 	 * Declares internal data structures
@@ -235,17 +238,17 @@ public class DetectChessboardCorners {
 
 		// smooth by applying a block filter. This will ensure it doesn't point towards an edge which just happens
 		// to be slightly darker than the center
-		int r_smooth = numLines /8; //  when viewed head on the black region will be 1/4 of a circle
-		int w_smooth = r_smooth*2+1;
+		int r_smooth = kernelSmooth.getRadius();
+		int w_smooth = kernelSmooth.getWidth();
 		for (int i = 0; i < numLines; i++) {
 			int start = addOffset(i,-r_smooth, numLines);
 
 			double sum = 0;
 			for (int j = 0; j < w_smooth; j++) {
 				int index = addOffset(start,j, numLines);
-				sum += lines[index];
+				sum += lines[index]*kernelSmooth.data[j];
 			}
-			smoothed[i] = sum / w_smooth;
+			smoothed[i] = sum;
 		}
 
 		int indexMin = 0;
