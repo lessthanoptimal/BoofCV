@@ -23,6 +23,7 @@ import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.feature.detect.chess.DetectChessboardCornersPyramid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardPatterns;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -40,7 +41,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class CalibrationDetectorChessboard2
-		extends DetectChessboardPatterns
+		extends DetectChessboardPatterns<GrayF32>
 		implements DetectorFiducialCalibration {
 
 	int cornerRows,cornerCols;
@@ -52,7 +53,7 @@ public class CalibrationDetectorChessboard2
 	Point2Transform2_F64 pixel2undist;
 
 	public CalibrationDetectorChessboard2(ConfigChessboard2 config, ConfigGridDimen shape ) {
-		super(config);
+		super(config, GrayF32.class);
 
 		cornerRows = shape.numRows-1;
 		cornerCols = shape.numCols-1;
@@ -68,7 +69,7 @@ public class CalibrationDetectorChessboard2
 
 		if( found.size >= 1 ) {
 			detected = new CalibrationObservation(input.width, input.height);
-			ChessboardCornerClusterToGrid.GridInfo info = found.get(0);
+			GridInfo info = found.get(0);
 
 			for (int i = 0; i < info.nodes.size(); i++) {
 				detected.add(info.nodes.get(i), i);

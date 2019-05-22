@@ -19,7 +19,7 @@
 package boofcv.alg.feature.detect.chess;
 
 import boofcv.alg.filter.misc.AverageDownSampleOps;
-import boofcv.struct.image.GrayF32;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
@@ -44,10 +44,10 @@ public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends Im
 	// If <= 0 then have a single layer at full resolution
 	int pyramidTopSize = 100;
 	// List of layers in the pyramid
-	List<GrayF32> pyramid = new ArrayList<>();
+	List<T> pyramid = new ArrayList<>();
 
 	// Corner detector
-	DetectChessboardCorners detector;
+	DetectChessboardCorners<T,D> detector;
 
 	// Detection results for each layer in the pyramid
 	FastQueue<PyramidLevel> featureLevels = new FastQueue<>(PyramidLevel.class, PyramidLevel::new);
@@ -71,7 +71,7 @@ public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends Im
 	/**
 	 * Detects corner features inside the input gray scale image.
 	 */
-	public void process(GrayF32 input ) {
+	public void process(T input ) {
 		constructPyramid(input);
 
 		corners.reset();
@@ -167,7 +167,7 @@ public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends Im
 	 * 0 with each layer after that 1/2 the resolution of the previous. 2x2 down sampling is used because it doesn't
 	 * add blur or aliasing.
 	 */
-	void constructPyramid(GrayF32 input) {
+	void constructPyramid(T input) {
 		if( pyramid.size() == 0 ){
 			pyramid.add(input);
 		} else {
@@ -187,9 +187,9 @@ public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends Im
 			int height = input.height/divisor;
 			if( pyramidTopSize == 0 || width < pyramidTopSize || height < pyramidTopSize)
 				break;
-			GrayF32 level;
+			T level;
 			if( pyramid.size() <= levelIndex ) {
-				level = new GrayF32(width,height);
+				level = (T)GeneralizedImageOps.createSingleBand(detector.imageType,width,height);
 				pyramid.add(level);
 			} else {
 				level = pyramid.get(levelIndex);
@@ -210,7 +210,7 @@ public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends Im
 		FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner.class,true);
 	}
 
-	public DetectChessboardCorners getDetector() {
+	public DetectChessboardCorners<T,D>  getDetector() {
 		return detector;
 	}
 
