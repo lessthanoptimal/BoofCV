@@ -167,7 +167,7 @@ public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends Im
 	 * 0 with each layer after that 1/2 the resolution of the previous. 2x2 down sampling is used because it doesn't
 	 * add blur or aliasing.
 	 */
-	private void constructPyramid(GrayF32 input) {
+	void constructPyramid(GrayF32 input) {
 		if( pyramid.size() == 0 ){
 			pyramid.add(input);
 		} else {

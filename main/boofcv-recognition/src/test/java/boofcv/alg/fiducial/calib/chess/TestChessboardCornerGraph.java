@@ -19,10 +19,13 @@
 package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph.Node;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -30,17 +33,36 @@ import static org.junit.jupiter.api.Assertions.fail;
 class TestChessboardCornerGraph {
 	@Test
 	void findClosest() {
-		fail("Implement");
+		ChessboardCornerGraph alg = new ChessboardCornerGraph();
+		for (int i = 0; i < 10; i++) {
+			alg.corners.grow().set(i*5,1);
+		}
+		Node n = alg.findClosest(10.1,0.5);
+		assertEquals(0,n.distance(10,1), UtilEjml.TEST_F64);
 	}
 
 	@Test
 	void reset() {
-		fail("Implement");
+		ChessboardCornerGraph alg = new ChessboardCornerGraph();
+		for (int i = 0; i < 10; i++) {
+			alg.corners.grow().set(i*5,1);
+		}
+		assertTrue(alg.corners.size>0);
+		alg.reset();
+		assertEquals(0, alg.corners.size);
 	}
 
 	@Test
 	void node_putEdgesIntoList() {
-		fail("Implement");
+		Node n = new Node();
+		List<Node> found = new ArrayList<>();
+		found.add( new Node());
+		n.putEdgesIntoList(found);
+		assertEquals(0,found.size());
+
+		n.edges[1] = new Node();
+		n.putEdgesIntoList(found);
+		assertEquals(1,found.size());
 	}
 
 	@Test
@@ -63,11 +85,31 @@ class TestChessboardCornerGraph {
 
 	@Test
 	void node_reset() {
-		fail("Implement");
+		Node n = new Node();
+		n.set(1,2);
+		n.index = 3;
+		n.orientation = 9;
+		n.edges[1] = new Node();
+		n.reset();
+		assertEquals(-1,n.index);
+		for (int i = 0; i < 4; i++) {
+			assertNull(n.edges[i]);
+		}
+		assertEquals(-1,n.x, UtilEjml.TEST_F64);
+		assertEquals(-1,n.y, UtilEjml.TEST_F64);
+		assertTrue(Double.isNaN(n.orientation));
 	}
 
 	@Test
 	void node_countEdges() {
-		fail("Implement");
+		Node n = new Node();
+		assertEquals(0,n.countEdges());
+		n.edges[1] = new Node();
+		assertEquals(1,n.countEdges());
+		n.edges[3] = new Node();
+		assertEquals(2,n.countEdges());
+		n.edges[0] = new Node();
+		n.edges[2] = new Node();
+		assertEquals(4,n.countEdges());
 	}
 }
