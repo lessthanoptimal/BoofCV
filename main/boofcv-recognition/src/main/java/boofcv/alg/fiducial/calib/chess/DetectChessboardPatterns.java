@@ -88,11 +88,11 @@ public class DetectChessboardPatterns {
 		}
 	}
 
-	public DetectChessboardCornersPyramid getDetector() {
+	public DetectChessboardCornersPyramid<GrayF32,GrayF32> getDetector() {
 		return detector;
 	}
 
-	public ChessboardCornerClusterFinder getClusterFinder() {
+	public ChessboardCornerClusterFinder<GrayF32> getClusterFinder() {
 		return clusterFinder;
 	}
 
