@@ -587,47 +587,31 @@ public class DetectCalibrationChessboard2App
 			if( e.getSource() == selectZoom ) {
 				zoom = ((Number)selectZoom.getValue()).doubleValue();
 				imagePanel.setScale(zoom);
-			} else if( e.getSource() == spinnerOrientationTol ) {
+				return;
+			}
+			if( e.getSource() == spinnerOrientationTol ) {
 				orientationTol = ((Number)spinnerOrientationTol.getValue()).doubleValue();
-				createAlgorithm();
-				reprocessImageOnly();
 			} else if( e.getSource() == spinnerDirectionTol ) {
 				directionTol = ((Number)spinnerDirectionTol.getValue()).doubleValue();
-				createAlgorithm();
-				reprocessImageOnly();
 			} else if( e.getSource() == spinnerAmbiguous) {
 				ambiguousTol = ((Number) spinnerAmbiguous.getValue()).doubleValue();
-				createAlgorithm();
-				reprocessImageOnly();
 			} else if( e.getSource() == spinnerCornerThreshold ) {
 				cornerThreshold = ((Number)spinnerCornerThreshold.getValue()).doubleValue();
-				createAlgorithm();
-				reprocessImageOnly();
 			} else if( e.getSource() == spinnerEdgeThreshold ) {
 				edgeThreshold = ((Number)spinnerEdgeThreshold.getValue()).doubleValue();
-				createAlgorithm();
-				reprocessImageOnly();
 			} else if( e.getSource() == spinnerRadius ) {
 				radius = ((Number)spinnerRadius.getValue()).intValue();
-				createAlgorithm();
-				reprocessImageOnly();
 			} else if( e.getSource() == spinnerTop ) {
 				pyramidTop = ((Number)spinnerTop.getValue()).intValue();
-				createAlgorithm();
-				reprocessImageOnly();
 			} else if( e.getSource() == spinnerGridRows ) {
 				gridRows = ((Number)spinnerGridRows.getValue()).intValue();
-				createAlgorithm();
-				reprocessImageOnly();
 			} else if( e.getSource() == spinnerGridCols ) {
 				gridCols = ((Number)spinnerGridCols.getValue()).intValue();
-				createAlgorithm();
-				reprocessImageOnly();
 			} else if( e.getSource() == spinnerMaxDistance ) {
 				maxDistance = ((Number)spinnerMaxDistance.getValue()).intValue();
-				createAlgorithm();
-				reprocessImageOnly();
 			}
+			createAlgorithm();
+			reprocessImageOnly();
 		}
 
 		@Override

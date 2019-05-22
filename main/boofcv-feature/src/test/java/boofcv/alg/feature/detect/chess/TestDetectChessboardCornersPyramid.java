@@ -28,7 +28,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestDetectChessboardCornersPyramid extends CommonChessboardCorners {
 
@@ -82,13 +83,27 @@ class TestDetectChessboardCornersPyramid extends CommonChessboardCorners {
 	}
 
 	@Test
-	void markSeenAsFalse() {
-		fail("implement");
-	}
-
-	@Test
 	void constructPyramid() {
-		fail("implement");
+		DetectChessboardCornersPyramid<GrayF32,GrayF32> alg = new DetectChessboardCornersPyramid<>(GrayF32.class);
+
+		// zero is no pyramid, full resolution only
+		alg.setPyramidTopSize(0);
+
+		alg.constructPyramid(new GrayF32(500,400));
+		assertEquals(1,alg.pyramid.size());
+		assertEquals(500,alg.pyramid.get(0).width);
+		assertEquals(400,alg.pyramid.get(0).height);
+
+		// now it should create a pyramid
+		alg.setPyramidTopSize(100);
+		alg.constructPyramid(new GrayF32(500,400));
+		assertEquals(3,alg.pyramid.size());
+		int divisor = 1;
+		for (int level = 0; level < 3; level++) {
+			assertEquals(500/divisor,alg.pyramid.get(level).width);
+			assertEquals(400/divisor,alg.pyramid.get(level).height);
+			divisor *= 2;
+		}
 	}
 
 	private void checkSolution( GrayF32 input, DetectChessboardCornersPyramid<GrayF32, GrayF32> alg) {

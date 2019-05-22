@@ -25,6 +25,7 @@ import boofcv.alg.feature.detect.chess.DetectChessboardCornersPyramid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -32,15 +33,18 @@ import org.ddogleg.struct.FastQueue;
  * 
  * @author Peter Abeles
  */
-public class DetectChessboardPatterns {
+public class DetectChessboardPatterns<T extends ImageGray<T>> {
 
-	protected DetectChessboardCornersPyramid<GrayF32,GrayF32> detector = new DetectChessboardCornersPyramid<>(GrayF32.class);
-	protected ChessboardCornerClusterFinder<GrayF32> clusterFinder = new ChessboardCornerClusterFinder<>(GrayF32.class);
+	protected DetectChessboardCornersPyramid<T,?> detector;
+	protected ChessboardCornerClusterFinder<T> clusterFinder;
 	protected ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
 
 	protected FastQueue<GridInfo> found = new FastQueue<>(GridInfo.class,true);
 
-	public DetectChessboardPatterns(ConfigChessboard2 config) {
+	public DetectChessboardPatterns(ConfigChessboard2 config , Class<T> imageType ) {
+
+		detector = new DetectChessboardCornersPyramid<>(imageType);
+		clusterFinder = new ChessboardCornerClusterFinder<>(imageType);
 
 		// the user is unlikely to set this value correctly
 		config.threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
@@ -73,7 +77,7 @@ public class DetectChessboardPatterns {
 	/**
 	 * Processes the image and searches for all chessboard patterns.
 	 */
-	public void findPatterns(GrayF32 input) {
+	public void findPatterns(T input) {
 		found.reset();
 		detector.process(input);
 		clusterFinder.process(input,detector.getCorners().toList());
@@ -88,11 +92,11 @@ public class DetectChessboardPatterns {
 		}
 	}
 
-	public DetectChessboardCornersPyramid getDetector() {
+	public DetectChessboardCornersPyramid<T,?> getDetector() {
 		return detector;
 	}
 
-	public ChessboardCornerClusterFinder getClusterFinder() {
+	public ChessboardCornerClusterFinder<T> getClusterFinder() {
 		return clusterFinder;
 	}
 

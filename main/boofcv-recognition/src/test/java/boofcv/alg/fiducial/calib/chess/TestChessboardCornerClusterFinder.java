@@ -31,7 +31,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
@@ -152,19 +153,60 @@ class TestChessboardCornerClusterFinder {
 	}
 
 	/**
-	 * Apply heavy perspective distortion to a grid and see if it's been detected
-	 */
-	@Test
-	void perspective() {
-		fail("Implement");
-	}
-
-	/**
-	 * Apply heavy perspective distortion to a grid and see if it's been detected
+	 * Actual corner observations from a fisheye image
 	 */
 	@Test
 	void fisheye() {
-		fail("Implement");
+		ChessboardCornerClusterFinder<GrayU8> alg = createAlg();
+		alg.setThresholdEdgeIntensity(-1);
+		alg.process(new GrayU8(480,480),createFisheye());
+		FastQueue<ChessboardCornerGraph> found = alg.getOutputClusters();
+		assertEquals(1,found.size);
+		assertEquals(24,found.get(0).corners.size);
+	}
+
+	List<ChessboardCorner> createFisheye() {
+		double[] data = new double[]{
+				901.730 , 19.788 , -0.916481 ,
+				776.088 , 36.243 , 0.800666 ,
+				659.545 , 67.488 , -1.141423 ,
+				556.513 , 110.203 , 0.534072 ,
+				568.884 , 159.993 , -1.193452 ,
+				587.523 , 219.934 , 0.483544 ,
+				609.680 , 284.868 , -1.216572 ,
+				699.776 , 255.642 , 0.630314 ,
+				799.915 , 234.210 , -1.047695 ,
+				906.694 , 223.450 , 0.866288 ,
+				1016.448 , 224.564 , -0.848513 ,
+				1122.507 , 237.118 , 1.029737 ,
+				1135.740 , 163.016 , -0.661328 ,
+				1146.909 , 94.946 , 1.022470 ,
+				1154.920 , 40.350 , -0.735298 ,
+				1026.851 , 77.206 , -0.746636 ,
+				1021.864 , 147.066 , 0.870077 ,
+				904.144 , 146.284 , -0.927371 ,
+				789.445 , 159.577 , 0.700495 ,
+				682.746 , 185.030 , -1.134515 ,
+				668.750 , 120.472 , 0.577675 ,
+				780.841 , 91.222 , -0.959134 ,
+				902.360 , 75.823 , 0.804160 ,
+				1030.534 , 21.252 , 0.903699 };
+
+		// Input image was 1920x1920
+		// let's scale that down to 480x480
+		double scale = 4.0;
+
+		List<ChessboardCorner> out = new ArrayList<>();
+		for (int i = 0; i < data.length; i += 3) {
+			ChessboardCorner c = new ChessboardCorner();
+			c.x = data[  i] / scale;
+			c.y = data[i+1] / scale;
+			c.orientation = data[i+2];
+			c.intensity = 100;
+			out.add(c);
+		}
+
+		return out;
 	}
 
 	List<ChessboardCorner> createCorners( int rows , int cols ) {

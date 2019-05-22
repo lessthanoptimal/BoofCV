@@ -26,9 +26,10 @@ import org.ddogleg.struct.FastQueue;
 import java.util.List;
 
 /**
- * A graph describing the inner corners in a chessboard patterns.
+ * A graph describing the inner corners in a chessboard patterns. Each node is a corner. A node can have 4 edges that
+ * represent the 4 cardinal directions. Edges are directed. orientation refers to the corner's orientation
+ * which has a range of 180 degrees or -pi/2 to pi/2
  *
- * TODO describe orientation
  *
  * @author Peter Abeles
  */
@@ -143,6 +144,8 @@ public class ChessboardCornerGraph {
 		}
 
 		public void reset() {
+			x = y = -1;
+			index = -1;
 			orientation = Double.NaN;
 			for (int i = 0; i < 4; i++) {
 				edges[i] = null;
