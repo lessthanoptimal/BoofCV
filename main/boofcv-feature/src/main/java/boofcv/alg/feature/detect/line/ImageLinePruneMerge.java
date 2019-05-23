@@ -126,28 +126,40 @@ public class ImageLinePruneMerge {
 				Point2D_F32 p = Intersection2D_F32.intersection(a, b, null);
 
 				// If they intersect inside the image they are much more likely to be the same line
-				if( !(p != null && p.x >= 0 && p.y >= 0 && p.x < imgWidth && p.y < imgHeight) )
-					continue;
+				boolean close = false;
+				if( p != null ) {
+					if( p.x >= 0 && p.y >= 0 && p.x < imgWidth && p.y < imgHeight) {
+						close = true;
+					}
+				}
 
 				// While a bit arbitrary look at the distance at the image border as a measure of how visually
 				// similar two lines are
+				if( !close ) {
+					// now just see if they are very close
+					float distA = Distance2D_F32.distance(a, b.a);
+					float distB = Distance2D_F32.distance(a, b.b);
 
-				// now just see if they are very close
-				float distA = Distance2D_F32.distance(a, b.a);
-				float distB = Distance2D_F32.distance(a, b.b);
+					if (distA > toleranceDist && distB > toleranceDist) {
+						continue;
+					}
 
-				if( distA > toleranceDist && distB > toleranceDist ) {
-					continue;
+					distA = Distance2D_F32.distance(b, b.a);
+					distB = Distance2D_F32.distance(b, b.b);
+
+					if (distA > toleranceDist && distB > toleranceDist) {
+						continue;
+					}
+
+					close = true;
 				}
 
-//				distA = Distance2D_F32.distance(b, b.a);
-//				distB = Distance2D_F32.distance(b, b.b);
-//
-//				if( distA > toleranceDist && distB > toleranceDist ) {
-//					continue;
-//				}
-
-				segments.set(j,null);
+				if( close ) {
+					if (lines.get(j).intensity > lines.get(i).intensity) {
+						lines.get(i).intensity = lines.get(j).intensity;
+					}
+					segments.set(j, null);
+				}
 			}
 		}
 

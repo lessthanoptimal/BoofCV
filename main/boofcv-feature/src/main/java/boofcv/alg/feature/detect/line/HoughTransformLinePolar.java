@@ -159,9 +159,6 @@ public class HoughTransformLinePolar {
 			LineParametric2D_F32 l = lines.grow();
 			l.p.set(x0,y0);
 			l.slope.set(-s,c);
-
-			Point2D_F64 p2 = new Point2D_F64(); // todo is this even used?!
-			lineToCoordinate(l,p2);
 		}
 
 		return lines;

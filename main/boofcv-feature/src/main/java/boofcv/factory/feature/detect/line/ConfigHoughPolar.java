@@ -52,6 +52,16 @@ public class ConfigHoughPolar implements Configuration {
 	 */
 	public int maxLines = 0;
 
+	/**
+	 * If two lines have a slope within this tolerance (radians) then they can be merged.
+	 */
+	public double mergeAngle = Math.PI*0.1;//Math.PI*0.05;
+
+	/**
+	 * If two lines are within this distance of each other then they can be merged. units = pixels.
+	 */
+	public double mergeDistance = 10;
+
 	public ConfigHoughPolar(int minCounts) {
 		this.minCounts = minCounts;
 	}

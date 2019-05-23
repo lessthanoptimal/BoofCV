@@ -33,7 +33,6 @@ import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineParametric2D_F32;
 import org.ddogleg.struct.FastQueue;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -72,10 +71,9 @@ public class DetectLineHoughPolar<D extends ImageGray<D>> implements DetectEdgeL
 //	GrayF32 angle = new GrayF32(1,1);
 //	ImageSInt8 direction = new ImageSInt8(1,1);
 
-	// angle tolerance for post processing pruning
-	float pruneAngleTol;
-	// range tolerance for post processing pruning
-	float pruneRangeTol;
+	// tuning parameters for merging
+	double mergeAngle = Math.PI*0.05;
+	double mergeDistance = 10;
 
 	// size of range bin in pixels
 	double resolutionRange;
@@ -109,8 +107,6 @@ public class DetectLineHoughPolar<D extends ImageGray<D>> implements DetectEdgeL
 								float thresholdEdge,
 								int maxLines )
 	{
-		pruneAngleTol = (float)((localMaxRadius+1)*resolutionAngle);
-		pruneRangeTol = (float)((localMaxRadius+1)*resolutionRange);
 		this.localMaxRadius = localMaxRadius;
 		this.thresholdEdge = thresholdEdge;
 		this.resolutionRange = resolutionRange;
@@ -139,13 +135,8 @@ public class DetectLineHoughPolar<D extends ImageGray<D>> implements DetectEdgeL
 		ThresholdImageOps.threshold(suppressed, binary, thresholdEdge, false);
 
 		alg.transform(binary);
-		FastQueue<LineParametric2D_F32> lines = alg.extractLines();
 
-		foundLines = new ArrayList<>();
-		for( int i = 0; i < lines.size; i++ )
-			foundLines.add(lines.get(i));
-
-		foundLines = pruneLines(derivX, foundLines);
+		foundLines = pruneLines(derivX);
 	}
 
 	public void setInputSize( int width , int height ) {
@@ -157,23 +148,39 @@ public class DetectLineHoughPolar<D extends ImageGray<D>> implements DetectEdgeL
 			alg = new HoughTransformLinePolar(extractor,numBinsRange,numBinsAngle);
 			intensity.reshape(width,height);
 			binary.reshape(width, height);
-//			angle.reshape(width, height);
-//			direction.reshape(width, height);
 			suppressed.reshape(width, height);
 		}
 	}
 
-	private List<LineParametric2D_F32> pruneLines(D input, List<LineParametric2D_F32> ret) {
+	private List<LineParametric2D_F32> pruneLines( D input ) {
+		FastQueue<LineParametric2D_F32> lines = alg.extractLines();
 		float intensity[] = alg.getFoundIntensity();
+
 		post.reset();
-		for( int i = 0; i < ret.size(); i++ ) {
-			post.add(ret.get(i),intensity[i]);
+		for( int i = 0; i < lines.size(); i++ ) {
+			post.add(lines.get(i),intensity[i]);
 		}
 
-		post.pruneSimilar(pruneAngleTol, pruneRangeTol, input.width, input.height);
+		post.pruneSimilar((float)mergeAngle, (float)mergeDistance, input.width, input.height);
 		post.pruneNBest(maxLines);
 
 		return post.createList();
+	}
+
+	public double getMergeAngle() {
+		return mergeAngle;
+	}
+
+	public void setMergeAngle(double mergeAngle) {
+		this.mergeAngle = mergeAngle;
+	}
+
+	public double getMergeDistance() {
+		return mergeDistance;
+	}
+
+	public void setMergeDistance(double mergeDistance) {
+		this.mergeDistance = mergeDistance;
 	}
 
 	public HoughTransformLinePolar getTransform() {
