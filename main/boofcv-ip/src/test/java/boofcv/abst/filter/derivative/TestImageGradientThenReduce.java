@@ -83,6 +83,11 @@ public class TestImageGradientThenReduce {
 			derivX.getBand(0).set(5,6,1);
 			derivY.getBand(0).set(5,6,2);
 		}
+
+		@Override
+		public ImageType<Planar<GrayF32>> getInputType() {
+			return ImageType.pl(3,GrayF32.class);
+		}
 	}
 
 	public static class HelperReduce implements GradientMultiToSingleBand<Planar<GrayF32>,GrayF32> {

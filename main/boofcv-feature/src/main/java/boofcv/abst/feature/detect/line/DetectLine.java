@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.abst.feature.detect.line;
 
 
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.line.LineParametric2D_F32;
 
 import java.util.List;
@@ -41,5 +42,7 @@ public interface DetectLine<T extends ImageGray<T>> {
 	 * @param input Input image.
 	 * @return List of found lines.
 	 */
-	public List<LineParametric2D_F32> detect( T input );
+	List<LineParametric2D_F32> detect( T input );
+
+	ImageType<T> getInputType();
 }

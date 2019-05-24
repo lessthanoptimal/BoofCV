@@ -40,7 +40,7 @@ import boofcv.demonstrations.feature.detect.interest.DetectPointScaleOriWithNois
 import boofcv.demonstrations.feature.detect.interest.DetectPointsInsidePyramidApp;
 import boofcv.demonstrations.feature.detect.line.DetectLineApp;
 import boofcv.demonstrations.feature.detect.line.VisualizeHoughFoot;
-import boofcv.demonstrations.feature.detect.line.VisualizeHoughPolar;
+import boofcv.demonstrations.feature.detect.line.VisualizeHoughPolarEdge;
 import boofcv.demonstrations.feature.detect.line.VisualizeLineRansac;
 import boofcv.demonstrations.feature.disparity.VisualizeStereoDisparity;
 import boofcv.demonstrations.feature.flow.DenseFlowApp;
@@ -174,7 +174,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				ShapeFitContourApp.class,
 				DetectLineApp.class,
 				VisualizeHoughFoot.class,
-				VisualizeHoughPolar.class,
+				VisualizeHoughPolarEdge.class,
 				VisualizeLineRansac.class);
 
 		createNodes(root, "Trackers",

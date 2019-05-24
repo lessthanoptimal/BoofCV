@@ -22,6 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.derivative.impl.GradientTwo1_Standard;
 import boofcv.alg.filter.derivative.impl.GradientTwo1_Standard_MT;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel1D;
@@ -30,6 +31,7 @@ import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 import javax.annotation.Nullable;
 
@@ -63,6 +65,18 @@ public class GradientTwo1 {
 			return kernelDeriv_I32;
 		else
 			return kernelDeriv_F32;
+	}
+
+	public static<I extends ImageGray<I>,D extends ImageGray<D>> void process(I input , D derivX , D derivY ,
+																			  @Nullable ImageBorder border)
+	{
+		switch( input.getImageType().getDataType()) {
+			case U8: process((GrayU8)input,(GrayS16)derivX, (GrayS16) derivY , (ImageBorder_S32)border); break;
+			case S16: process((GrayS16)input,(GrayS16)derivX, (GrayS16) derivY , (ImageBorder_S32)border); break;
+			case F32: process((GrayF32)input,(GrayF32)derivX, (GrayF32) derivY , (ImageBorder_F32)border); break;
+			default:
+				throw new IllegalArgumentException("Unknown input image type");
+		}
 	}
 
 	/**

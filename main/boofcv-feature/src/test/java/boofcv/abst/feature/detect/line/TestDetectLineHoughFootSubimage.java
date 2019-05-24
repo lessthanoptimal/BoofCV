@@ -28,7 +28,7 @@ import boofcv.struct.image.ImageGray;
 /**
  * @author Peter Abeles
  */
-public class TestDetectLineHoughFootSubimage extends GeneralDetectLineTests {
+public class TestDetectLineHoughFootSubimage extends GeneralDetectLineGradientTests {
 
 
 	public TestDetectLineHoughFootSubimage() {

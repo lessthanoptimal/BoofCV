@@ -18,18 +18,14 @@
 
 package boofcv.abst.filter.derivative;
 
-import boofcv.alg.filter.derivative.GradientSobel;
-import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Method;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestImageGradient_Reflection {
+public class TestImageHessianDirect_SB {
 
 
 	int width = 20;
@@ -39,15 +35,14 @@ public class TestImageGradient_Reflection {
 	 * See if it throws an exception or not
 	 */
 	@Test
-	public void testNoException() throws NoSuchMethodException {
+	public void testNoException() {
 		GrayF32 input = new GrayF32(width,height);
-		GrayF32 derivX = new GrayF32(width,height);
-		GrayF32 derivY = new GrayF32(width,height);
+		GrayF32 derivXX = new GrayF32(width,height);
+		GrayF32 derivYY = new GrayF32(width,height);
+		GrayF32 derivXY = new GrayF32(width,height);
 
-		Method m = GradientSobel.class.getMethod("process",GrayF32.class,GrayF32.class,GrayF32.class, ImageBorder_F32.class);
+		ImageHessianDirect_SB<GrayF32,GrayF32> alg = new ImageHessianDirect_SB.Sobel<>(GrayF32.class,GrayF32.class);
 
-		ImageGradient_Reflection<GrayF32,GrayF32> alg = new ImageGradient_Reflection<>(m);
-
-		alg.process(input,derivX,derivY);
+		alg.process(input,derivXX,derivYY,derivXY);
 	}
 }

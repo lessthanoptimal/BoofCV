@@ -57,6 +57,8 @@ public class StandardGradientChecks {
 
 			// see if there is a function that can compute the second derivative
 			Class<?> params[] = m.getParameterTypes();
+			if( params[1] == ImageGray.class )
+				continue;
 			Method m2;
 			try {
 				m2 = gradientTarget.getMethod("process",params[1],params[1],params[1],params[3]);

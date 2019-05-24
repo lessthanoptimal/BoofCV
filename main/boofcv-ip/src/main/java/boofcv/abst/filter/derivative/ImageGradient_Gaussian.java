@@ -52,7 +52,7 @@ public class ImageGradient_Gaussian<I extends ImageGray<I>, D extends ImageGray<
 	Kernel1D kernelBlur;
 	Kernel1D kernelDeriv;
 
-	double maxValue;
+	Class<I> imageType;
 
 	public ImageGradient_Gaussian(int radius , Class<I> inputType , Class<D> derivType) {
 		this(sigmaForRadius(radius,0),radius,inputType,derivType);
@@ -60,6 +60,7 @@ public class ImageGradient_Gaussian<I extends ImageGray<I>, D extends ImageGray<
 
 	public ImageGradient_Gaussian(double sigma, int radius,
 								  Class<I> inputType , Class<D> derivType ) {
+		this.imageType = imageType;
 		this.derivType = derivType;
 
 		// need to do this here to make sure the blur and derivative functions have the same paramters.
@@ -103,6 +104,11 @@ public class ImageGradient_Gaussian<I extends ImageGray<I>, D extends ImageGray<
 	@Override
 	public int getBorder() {
 		return 0;
+	}
+
+	@Override
+	public ImageType<I> getInputType() {
+		return ImageType.single(imageType);
 	}
 
 	@Override

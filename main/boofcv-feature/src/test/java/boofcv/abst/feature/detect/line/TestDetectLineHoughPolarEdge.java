@@ -28,10 +28,10 @@ import boofcv.struct.image.ImageGray;
 /**
  * @author Peter Abeles
  */
-public class TestDetectLineHoughPolar extends GeneralDetectLineTests {
+public class TestDetectLineHoughPolarEdge extends GeneralDetectLineGradientTests {
 
 
-	public TestDetectLineHoughPolar() {
+	public TestDetectLineHoughPolarEdge() {
 		super(GrayU8.class,GrayF32.class);
 	}
 

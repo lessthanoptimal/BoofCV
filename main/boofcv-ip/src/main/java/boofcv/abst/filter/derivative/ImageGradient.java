@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.filter.derivative;
 
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 
 /**
@@ -37,6 +38,11 @@ public interface ImageGradient<Input extends ImageBase<Input>, Output extends Im
 	 * @param derivX First order image derivative along the x-axis. Modified.
 	 * @param derivY First order image derivative along the y-axis. Modified.
 	 */
-	public void process( Input inputImage , Output derivX, Output derivY );
+	void process( Input inputImage , Output derivX, Output derivY );
+
+	/**
+	 * Image type of input image
+	 */
+	ImageType<Input> getInputType();
 
 }

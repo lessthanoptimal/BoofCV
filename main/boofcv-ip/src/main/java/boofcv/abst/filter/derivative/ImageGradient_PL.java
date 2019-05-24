@@ -49,6 +49,11 @@ public class ImageGradient_PL<T extends ImageGray<T>, D extends ImageGray<D>>
 	}
 
 	@Override
+	public ImageType<Planar<T>> getInputType() {
+		return ImageType.pl(derivType.numBands,bandGradient.getInputType().getDataType());
+	}
+
+	@Override
 	public void setBorderType(BorderType type) {
 		bandGradient.setBorderType(type);
 	}

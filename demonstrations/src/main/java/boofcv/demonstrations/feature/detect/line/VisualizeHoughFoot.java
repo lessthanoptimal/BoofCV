@@ -307,6 +307,7 @@ public class VisualizeHoughFoot<I extends ImageGray<I>, D extends ImageGray<D>>
 		examples.add(new PathLabel("Simple Objects",UtilIO.pathExample("simple_objects.jpg")));
 		examples.add(new PathLabel("Indoors",UtilIO.pathExample("lines_indoors.jpg")));
 		examples.add(new PathLabel("Outdoors", UtilIO.pathExample("outdoors01.jpg")));
+		examples.add(new PathLabel("Drawn Lines",UtilIO.pathExample("shapes/black_lines_01.jpg")));
 		examples.add(new PathLabel("Indoors Video",UtilIO.pathExample("lines_indoors.mjpeg")));
 
 		SwingUtilities.invokeLater(()->{

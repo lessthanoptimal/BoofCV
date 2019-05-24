@@ -94,7 +94,6 @@ public class HoughTransformLinePolar {
 	public HoughTransformLinePolar(NonMaxSuppression extractor , int numBinsRange , int numBinsAngle) {
 		this.extractor = extractor;
 		transform.reshape(numBinsRange,numBinsAngle);
-
 		tableTrig = new CachedSineCosine_F32(0,(float)Math.PI,numBinsAngle);
 	}
 
@@ -181,7 +180,7 @@ public class HoughTransformLinePolar {
 
 		int w2 = transform.width/2;
 
-		coordinate.x = (int)Math.floor(polar.distance*w2/r_max) + w2;
+		coordinate.x = (int)Math.round(polar.distance*w2/r_max + w2);
 		coordinate.y = polar.angle*transform.height/Math.PI;
 	}
 

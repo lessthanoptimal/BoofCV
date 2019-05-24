@@ -19,14 +19,13 @@
 package boofcv.abst.filter.derivative;
 
 import boofcv.BoofDefaults;
+import boofcv.alg.filter.derivative.HessianSobel;
+import boofcv.alg.filter.derivative.HessianThree;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 
 /**
@@ -34,34 +33,25 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class ImageHessianDirect_Reflection<Input extends ImageGray<Input>, Output extends ImageGray<Output>>
+public abstract class ImageHessianDirect_SB<Input extends ImageGray<Input>, Output extends ImageGray<Output>>
 		implements ImageHessianDirect<Input, Output>
 {
 	// How the image border should be handled
 	BorderType borderType = BoofDefaults.DERIV_BORDER_TYPE;
-	ImageBorder<Output> border;
-	// the image hessian function
-	private Method m;
+	ImageBorder<Input> border;
+	Class<Input> inputType;
+	Class<Output> derivType;
 
-	public ImageHessianDirect_Reflection(Method m ) {
-		this.m = m;
+	public ImageHessianDirect_SB(Class<Input> inputType , Class<Output> derivType ) {
+		this.inputType = inputType;
+		this.derivType = derivType;
 		setBorderType(borderType);
-	}
-
-	@Override
-	public void process(Input inputImage , Output derivXX, Output derivYY, Output derivXY) {
-		try {
-			m.invoke(null,inputImage, derivXX, derivYY, derivXY, border);
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	@Override
 	public void setBorderType(BorderType type) {
 		this.borderType = type;
-		Class imageType = m.getParameterTypes()[0];
-		border = FactoryImageBorder.single(imageType, borderType);
+		border = FactoryImageBorder.single(inputType, borderType);
 	}
 
 	@Override
@@ -77,8 +67,34 @@ public class ImageHessianDirect_Reflection<Input extends ImageGray<Input>, Outpu
 			return 1;
 	}
 
+//	@Override
+	public ImageType<Input> getInputType() {
+		return ImageType.single(inputType);
+	}
+
 	@Override
 	public ImageType<Output> getDerivativeType() {
-		return ImageType.single((Class)m.getParameterTypes()[1]);
+		return ImageType.single(derivType);
 	}
+
+	public static class Sobel<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageHessianDirect_SB<T,D>
+	{
+		public Sobel(Class<T> inputType, Class<D> derivType) { super(inputType, derivType); }
+
+		@Override
+		public void process(T inputImage , D derivXX, D derivYY, D derivXY) {
+			HessianSobel.process(inputImage,derivXX,derivYY,derivXY,border);
+		}
+	}
+
+	public static class Three<T extends ImageGray<T>, D extends ImageGray<D>> extends ImageHessianDirect_SB<T,D>
+	{
+		public Three(Class<T> inputType, Class<D> derivType) { super(inputType, derivType); }
+
+		@Override
+		public void process(T inputImage , D derivXX, D derivYY, D derivXY) {
+			HessianThree.process(inputImage,derivXX,derivYY,derivXY,border);
+		}
+	}
+
 }

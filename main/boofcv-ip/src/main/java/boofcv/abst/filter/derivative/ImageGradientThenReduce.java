@@ -79,4 +79,9 @@ public class ImageGradientThenReduce<Input extends ImageMultiBand<Input>,
 		gradient.process(inputImage, middleX, middleY);
 		reduce.process(middleX,middleY, derivX,derivY);
 	}
+
+	@Override
+	public ImageType<Input> getInputType() {
+		return gradient.getInputType();
+	}
 }

@@ -18,8 +18,8 @@
 
 package boofcv.abst.feature.detect.line;
 
-import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.line.LineParametric2D_F32;
@@ -31,49 +31,43 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectEdgeLinesToLines<T extends ImageGray<T>, D extends ImageGray<D>>
+public class DetectBinaryLinesToLines<T extends ImageGray<T>>
 	implements DetectLine<T>
 {
 	// line detector
-	DetectEdgeLines<D> detector;
+	DetectLineHoughPolarBinary detector;
 
 	// computes image gradient
-	ImageGradient<T,D> gradient;
+	InputToBinary<T> binarization;
 
-	// storage for image gradient
-	D derivX,derivY;
+	GrayU8 binary = new GrayU8(1,1);
 
-	public DetectEdgeLinesToLines( DetectEdgeLines<D> detector ,
-								   ImageGradient<T,D> gradient ) {
+	public DetectBinaryLinesToLines(DetectLineHoughPolarBinary detector ,
+									InputToBinary<T> binarization ) {
 		this.detector = detector;
-		this.gradient = gradient;
-
-		derivX = gradient.getDerivativeType().createImage(1,1);
-		derivY = gradient.getDerivativeType().createImage(1,1);
-	}
-
-	/**
-	 * Constructor with default gradient technique
-	 */
-	public DetectEdgeLinesToLines( DetectEdgeLines<D> detector ,
-								   Class<T> imageType , Class<D> derivType ) {
-		this(detector,FactoryDerivative.sobel(imageType,derivType));
+		this.binarization = binarization;
 	}
 
 	@Override
 	public List<LineParametric2D_F32> detect(T input) {
-		derivX.reshape(input.width,input.height);
-		derivY.reshape(input.width,input.height);
+		binary.reshape(input.width,input.height);
+		binarization.process(input,binary);
 
-		gradient.process(input,derivX,derivY);
-
-		detector.detect(derivX,derivY);
+		detector.detect(binary);
 
 		return detector.getFoundLines();
 	}
 
+	public InputToBinary<T> getBinarization() {
+		return binarization;
+	}
+
+	public GrayU8 getBinary() {
+		return binary;
+	}
+
 	@Override
 	public ImageType<T> getInputType() {
-		return gradient.getInputType();
+		return binarization.getInputType();
 	}
 }

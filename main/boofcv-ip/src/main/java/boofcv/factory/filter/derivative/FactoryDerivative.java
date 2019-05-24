@@ -99,35 +99,25 @@ public class FactoryDerivative {
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		Class which;
-
 		switch( type ) {
 			case PREWITT:
-				which = GradientPrewitt.class;
-				break;
+				return new ImageGradient_SB.Prewitt<>(inputType, derivType);
 
 			case SOBEL:
-				which = GradientSobel.class;
-				break;
+				return new ImageGradient_SB.Sobel<>(inputType, derivType);
 
 			case THREE:
-				which = GradientThree.class;
-				break;
+				return new ImageGradient_SB.Three<>(inputType, derivType);
 
 			case TWO_0:
-				which = GradientTwo0.class;
-				break;
+				return new ImageGradient_SB.Two0<>(inputType, derivType);
 
 			case TWO_1:
-				which = GradientTwo1.class;
-				break;
+				return new ImageGradient_SB.Two1<>(inputType, derivType);
 
 			default:
-				throw new IllegalArgumentException("Unknown type "+type);
+				throw new IllegalArgumentException("Unknown derivative type "+type);
 		}
-
-		Method m = findDerivative(which,inputType,derivType);
-		return new ImageGradient_Reflection<>(m);
 	}
 
 	/**
@@ -185,8 +175,7 @@ public class FactoryDerivative {
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		Method m = findDerivative(GradientPrewitt.class,inputType,derivType);
-		return new ImageGradient_Reflection<>(m);
+		return new ImageGradient_SB.Prewitt<>(inputType,derivType);
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
@@ -195,8 +184,7 @@ public class FactoryDerivative {
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 
-		Method m = findDerivative(GradientSobel.class,inputType,derivType);
-		return new ImageGradient_Reflection<>(m);
+		return new ImageGradient_SB.Sobel<>(inputType,derivType);
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
@@ -204,8 +192,7 @@ public class FactoryDerivative {
 	{
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
-		Method m = findDerivative(GradientThree.class,inputType,derivType);
-		return new ImageGradient_Reflection<>(m);
+		return new ImageGradient_SB.Three<>(inputType,derivType);
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
@@ -213,8 +200,7 @@ public class FactoryDerivative {
 	{
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
-		Method m = findDerivative(GradientTwo0.class,inputType,derivType);
-		return new ImageGradient_Reflection<>(m);
+		return new ImageGradient_SB.Two0<>(inputType,derivType);
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
@@ -222,8 +208,7 @@ public class FactoryDerivative {
 	{
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
-		Method m = findDerivative(GradientTwo1.class,inputType,derivType);
-		return new ImageGradient_Reflection<>(m);
+		return new ImageGradient_SB.Two1<>(inputType,derivType);
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
@@ -231,8 +216,7 @@ public class FactoryDerivative {
 	{
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
-		Method m = findHessian(HessianThree.class,inputType,derivType);
-		return new ImageHessianDirect_Reflection<>(m);
+		return new ImageHessianDirect_SB.Three<>(inputType,derivType);
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
@@ -240,8 +224,7 @@ public class FactoryDerivative {
 	{
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
-		Method m = findHessian(HessianSobel.class,inputType,derivType);
-		return new ImageHessianDirect_Reflection<>(m);
+		return new ImageHessianDirect_SB.Sobel<>(inputType,derivType);
 	}
 
 	public static <D extends ImageGray<D>>

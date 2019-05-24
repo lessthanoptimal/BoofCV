@@ -19,10 +19,7 @@
 package boofcv.factory.feature.detect.line;
 
 
-import boofcv.abst.feature.detect.line.DetectLineHoughFoot;
-import boofcv.abst.feature.detect.line.DetectLineHoughFootSubimage;
-import boofcv.abst.feature.detect.line.DetectLineHoughPolar;
-import boofcv.abst.feature.detect.line.DetectLineSegmentsGridRansac;
+import boofcv.abst.feature.detect.line.*;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.line.ConnectLinesGrid;
 import boofcv.alg.feature.detect.line.GridRansacLineDetector;
@@ -142,9 +139,10 @@ public class FactoryDetectLineAlgs {
 	}
 
 	/**
-	 * Creates a Hough line detector based on polar parametrization.
+	 * Creates a Hough line detector based on polar parametrization. Image gradient is used to identify
+	 * where line edge's are
 	 *
-	 * @see DetectLineHoughPolar
+	 * @see DetectLineHoughPolarEdge
 	 *
 	 * @param config Configuration for line detector.  Can't be null.
 	 * @param derivType Image derivative type.
@@ -152,15 +150,34 @@ public class FactoryDetectLineAlgs {
 	 * @return Line detector.
 	 */
 	public static <D extends ImageGray<D>>
-	DetectLineHoughPolar<D> houghPolar(ConfigHoughPolar config ,
-										 Class<D> derivType ) {
+	DetectLineHoughPolarEdge<D> houghPolarEdge(ConfigHoughPolar config ,
+											   Class<D> derivType ) {
 
 		if( config == null )
 			throw new IllegalArgumentException("This is no default since minCounts must be specified");
 
-		DetectLineHoughPolar<D> alg = new DetectLineHoughPolar<>(config.localMaxRadius,
+		DetectLineHoughPolarEdge<D> alg = new DetectLineHoughPolarEdge<>(config.localMaxRadius,
 				config.minCounts, config.resolutionRange,
 				config.resolutionAngle, config.thresholdEdge, config.maxLines);
+		alg.setMergeAngle(config.mergeAngle);
+		alg.setMergeDistance(config.mergeDistance);
+		return alg;
+	}
+
+	/**
+	 * Creates a Hough line detector based on polar parametrization. A binary image is provided by the
+	 * user to indicate which pixels belong to a line
+	 *
+	 * @see DetectLineHoughPolarBinary
+	 */
+	public static DetectLineHoughPolarBinary houghPolarBinary(ConfigHoughPolar config ) {
+
+		if( config == null )
+			throw new IllegalArgumentException("This is no default since minCounts must be specified");
+
+		DetectLineHoughPolarBinary alg = new DetectLineHoughPolarBinary(config.localMaxRadius,
+				config.minCounts, config.resolutionRange,
+				config.resolutionAngle, config.maxLines);
 		alg.setMergeAngle(config.mergeAngle);
 		alg.setMergeDistance(config.mergeDistance);
 		return alg;

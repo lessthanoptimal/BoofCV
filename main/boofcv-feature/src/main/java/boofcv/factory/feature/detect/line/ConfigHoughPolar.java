@@ -18,10 +18,11 @@
 
 package boofcv.factory.feature.detect.line;
 
+import boofcv.abst.feature.detect.line.DetectLineHoughPolarEdge;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for {@link boofcv.abst.feature.detect.line.DetectLineHoughPolar}
+ * Configuration for {@link DetectLineHoughPolarEdge}
  *
  * @author Peter Abeles
  */
@@ -55,7 +56,7 @@ public class ConfigHoughPolar implements Configuration {
 	/**
 	 * If two lines have a slope within this tolerance (radians) then they can be merged.
 	 */
-	public double mergeAngle = Math.PI*0.1;//Math.PI*0.05;
+	public double mergeAngle = Math.PI*0.05;
 
 	/**
 	 * If two lines are within this distance of each other then they can be merged. units = pixels.

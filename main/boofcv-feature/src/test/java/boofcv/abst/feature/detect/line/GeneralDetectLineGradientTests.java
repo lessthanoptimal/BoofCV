@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 @SuppressWarnings({"unchecked"})
-public abstract class GeneralDetectLineTests {
+public abstract class GeneralDetectLineGradientTests {
 
 	int width = 40;
 	int height = 50;
@@ -49,7 +49,7 @@ public abstract class GeneralDetectLineTests {
 
 	Class[] imageTypes;
 
-	protected GeneralDetectLineTests(Class... imageTypes) {
+	protected GeneralDetectLineGradientTests(Class... imageTypes) {
 		this.imageTypes = imageTypes;
 	}
 

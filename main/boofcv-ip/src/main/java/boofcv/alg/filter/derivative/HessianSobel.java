@@ -21,6 +21,7 @@ package boofcv.alg.filter.derivative;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.derivative.impl.HessianSobel_Shared;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel2D_F32;
@@ -28,6 +29,9 @@ import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
+
+import javax.annotation.Nullable;
 
 
 /**
@@ -101,6 +105,18 @@ public class HessianSobel {
 		     0, 0,0, 0, 0,
 		    -2,-4,0, 4, 2,
 			-1,-2,0, 2, 1});
+
+	public static<I extends ImageGray<I>,D extends ImageGray<D>> void process(I input ,
+																			  D derivXX , D derivYY , D derivXY ,
+																			  @Nullable ImageBorder border)
+	{
+		switch( input.getImageType().getDataType()) {
+			case U8: process((GrayU8)input,(GrayS16)derivXX, (GrayS16) derivYY , (GrayS16) derivXY, (ImageBorder_S32)border); break;
+			case F32: process((GrayF32)input,(GrayF32)derivXX, (GrayF32) derivYY, (GrayF32) derivXY , (ImageBorder_F32)border); break;
+			default:
+				throw new IllegalArgumentException("Unknown input image type");
+		}
+	}
 
 	/**
 	 * Computes the image's second derivatives.

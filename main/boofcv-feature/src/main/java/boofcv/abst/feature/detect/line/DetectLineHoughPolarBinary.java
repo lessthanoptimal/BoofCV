@@ -21,15 +21,10 @@ package boofcv.abst.feature.detect.line;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.alg.InputSanityCheck;
-import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
 import boofcv.alg.feature.detect.line.HoughTransformLinePolar;
 import boofcv.alg.feature.detect.line.ImageLinePruneMerge;
-import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineParametric2D_F32;
 import org.ddogleg.struct.FastQueue;
 
@@ -37,43 +32,26 @@ import java.util.List;
 
 /**
  * <p>
- * Full processing chain for detecting lines using a Hough transform with polar parametrization.
+ * Complete process chain for detecting lines along the edges of objects using {@link HoughTransformLinePolar}.
+ * The user provides a binary image. This is then feed into the hough transform.
+ * Additional processing is done to remove duplicate lines.
  * </p>
  *
- * <p>
- * USAGE NOTES: Blurring the image prior to processing can often improve performance.
- * Results will not be perfect and to detect all the obvious lines in the image several false
- * positives might be returned.
- * </p>
- *
- * @see boofcv.alg.feature.detect.line.HoughTransformLinePolar
+ * @see HoughTransformLinePolar
  *
  * @author Peter Abeles
  */
-public class DetectLineHoughPolar<D extends ImageGray<D>> implements DetectEdgeLines<D> {
+public class DetectLineHoughPolarBinary {
 
 	// transform algorithm
-	HoughTransformLinePolar alg;
+	HoughTransformLinePolar alg = new HoughTransformLinePolar(null,1,1);
 
 	// extractor used by hough transform
 	NonMaxSuppression extractor;
 
-	// used to create binary edge image
-	float thresholdEdge;
-
-	// edge intensity image
-	GrayF32 intensity = new GrayF32(1,1);
-
-	// detected edge image
-	GrayU8 binary = new GrayU8(1,1);
-
-	GrayF32 suppressed = new GrayF32(1,1);
-//	GrayF32 angle = new GrayF32(1,1);
-//	ImageSInt8 direction = new ImageSInt8(1,1);
-
 	// tuning parameters for merging
-	double mergeAngle = Math.PI*0.05;
-	double mergeDistance = 10;
+	protected double mergeAngle = Math.PI*0.05;
+	protected double mergeDistance = 10;
 
 	// size of range bin in pixels
 	double resolutionRange;
@@ -97,62 +75,38 @@ public class DetectLineHoughPolar<D extends ImageGray<D>> implements DetectEdgeL
 	 * @param minCounts Minimum number of counts for detected line.  Critical tuning parameter and image dependent.
 	 * @param resolutionRange Resolution of line range in pixels.  Try 2
 	 * @param resolutionAngle Resolution of line angle in radius.  Try PI/180
-	 * @param thresholdEdge Edge detection threshold. Try 50.
 	 * @param maxLines Maximum number of lines to return. If &le; 0 it will return them all.
 	 */
-	public DetectLineHoughPolar(int localMaxRadius,
-								int minCounts,
-								double resolutionRange ,
-								double resolutionAngle ,
-								float thresholdEdge,
-								int maxLines )
+	public DetectLineHoughPolarBinary(int localMaxRadius,
+									  int minCounts,
+									  double resolutionRange ,
+									  double resolutionAngle ,
+									  int maxLines )
 	{
 		this.localMaxRadius = localMaxRadius;
-		this.thresholdEdge = thresholdEdge;
 		this.resolutionRange = resolutionRange;
 		this.resolutionAngle = resolutionAngle;
 		this.maxLines = maxLines <= 0 ? Integer.MAX_VALUE : maxLines;
 		extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(localMaxRadius, minCounts, 0, false));
 	}
 
-	@Override
-	public void detect( D derivX , D derivY ) {
-		InputSanityCheck.checkSameShape(derivX,derivY);
-		setInputSize(derivX.width,derivX.height);
-
-		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, intensity);
-
-		// non-max suppression reduces the number of line pixels, reducing the number of false positives
-		// When too many pixels are flagged, then more curves randomly cross over in transform space causing
-		// false positives
-
-//		GGradientToEdgeFeatures.direction(derivX, derivY, angle);
-//		GradientToEdgeFeatures.discretizeDirection4(angle, direction);
-//		GradientToEdgeFeatures.nonMaxSuppression4(intensity,direction, suppressed);
-
-		GGradientToEdgeFeatures.nonMaxSuppressionCrude4(intensity,derivX,derivY,suppressed);
-
-		ThresholdImageOps.threshold(suppressed, binary, thresholdEdge, false);
-
+	public void detect( GrayU8 binary ) {
+		setInputSize(binary.width,binary.height);
 		alg.transform(binary);
-
-		foundLines = pruneLines(derivX);
+		foundLines = pruneLines(binary.width, binary.height);
 	}
 
 	public void setInputSize( int width , int height ) {
-		// see if the input image shape has changed.
-		if( intensity.width != width || intensity.height != height ) {
-			double r = Math.sqrt(width*width + height*height);
-			int numBinsRange = (int)Math.ceil(r/resolutionRange);
-			int numBinsAngle = (int)Math.ceil(Math.PI/resolutionAngle);
+		double r = Math.sqrt(width*width + height*height);
+		int numBinsRange = (int)Math.ceil(r/resolutionRange);
+		int numBinsAngle = (int)Math.ceil(Math.PI/resolutionAngle);
+
+		if( numBinsRange != alg.getNumBinsRange() || numBinsAngle != alg.getNumBinsAngle() ) {
 			alg = new HoughTransformLinePolar(extractor,numBinsRange,numBinsAngle);
-			intensity.reshape(width,height);
-			binary.reshape(width, height);
-			suppressed.reshape(width, height);
 		}
 	}
 
-	private List<LineParametric2D_F32> pruneLines( D input ) {
+	private List<LineParametric2D_F32> pruneLines( int width , int height  ) {
 		FastQueue<LineParametric2D_F32> lines = alg.extractLines();
 		float intensity[] = alg.getFoundIntensity();
 
@@ -161,7 +115,7 @@ public class DetectLineHoughPolar<D extends ImageGray<D>> implements DetectEdgeL
 			post.add(lines.get(i),intensity[i]);
 		}
 
-		post.pruneSimilar((float)mergeAngle, (float)mergeDistance, input.width, input.height);
+		post.pruneSimilar((float)mergeAngle, (float)mergeDistance, width, height);
 		post.pruneNBest(maxLines);
 
 		return post.createList();
@@ -187,15 +141,6 @@ public class DetectLineHoughPolar<D extends ImageGray<D>> implements DetectEdgeL
 		return alg;
 	}
 
-	public GrayF32 getEdgeIntensity() {
-		return intensity;
-	}
-
-	public GrayU8 getBinary() {
-		return binary;
-	}
-
-	@Override
 	public List<LineParametric2D_F32> getFoundLines() {
 		return foundLines;
 	}

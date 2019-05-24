@@ -21,6 +21,7 @@ package boofcv.alg.filter.derivative;
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;
 import boofcv.alg.filter.derivative.impl.HessianThree_Standard;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel1D_F32;
@@ -30,6 +31,9 @@ import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
+
+import javax.annotation.Nullable;
 
 /**
  * <p>
@@ -62,6 +66,18 @@ public class HessianThree {
 
 	public static Kernel1D_F32 kernelXXYY_F32 = new Kernel1D_F32(new float[]{0.5f,0,-1,0,0.5f},5);
 	public static Kernel2D_F32 kernelCross_F32 = new Kernel2D_F32(3, new float[]{0.5f,0,-0.5f,0,0,0,-0.5f,0,0.5f});
+
+	public static<I extends ImageGray<I>,D extends ImageGray<D>> void process(I input ,
+																			  D derivXX , D derivYY , D derivXY ,
+																			  @Nullable ImageBorder border)
+	{
+		switch( input.getImageType().getDataType()) {
+			case U8: process((GrayU8)input,(GrayS16)derivXX, (GrayS16) derivYY , (GrayS16) derivXY, (ImageBorder_S32)border); break;
+			case F32: process((GrayF32)input,(GrayF32)derivXX, (GrayF32) derivYY, (GrayF32) derivXY , (ImageBorder_F32)border); break;
+			default:
+				throw new IllegalArgumentException("Unknown input image type");
+		}
+	}
 
 	/**
 	 * <p>
