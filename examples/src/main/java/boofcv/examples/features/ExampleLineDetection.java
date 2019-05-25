@@ -20,7 +20,9 @@ package boofcv.examples.features;
 
 import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
-import boofcv.factory.feature.detect.line.ConfigHoughBinary;
+import boofcv.alg.filter.blur.GBlurImageOps;
+import boofcv.factory.feature.detect.line.ConfigHoughFootSubimage;
+import boofcv.factory.feature.detect.line.ConfigHoughGradient;
 import boofcv.factory.feature.detect.line.ConfigLineRansac;
 import boofcv.factory.feature.detect.line.FactoryDetectLine;
 import boofcv.gui.ListDisplayPanel;
@@ -56,33 +58,44 @@ public class ExampleLineDetection {
 	/**
 	 * Detects lines inside the image using different types of Hough detectors
 	 *
-	 * @param image Input image.
+	 * @param buffered Input image.
 	 * @param imageType Type of image processed by line detector.
 	 */
 	public static<T extends ImageGray<T>>
-			void detectLines( BufferedImage image ,
-							  Class<T> imageType )
+	void detectLines( BufferedImage buffered , Class<T> imageType )
 	{
 		// convert the line into a single band image
-		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType );
+		T input = ConvertBufferedImage.convertFromSingle(buffered, null, imageType );
+		T blurred = input.createSameShape();
 
-		// Comment/uncomment to try a different type of line detector
-		DetectLine<T> detector = FactoryDetectLine.houghPolar(
-				new ConfigHoughBinary(3, 30, 2, Math.PI / 180,edgeThreshold, maxLines), imageType);
-//		DetectLine<T> detector = FactoryDetectLine.houghFoot(
-//				new ConfigHoughFoot(3, 8, 5, edgeThreshold,maxLines), imageType);
-//		DetectLine<T> detector = FactoryDetectLine.houghFootSub(
-//				new ConfigHoughFootSubimage(3, 8, 5, edgeThreshold,maxLines, 2, 2), imageType);
+		// Blur smooths out gradient and improves results
+		GBlurImageOps.gaussian(input,blurred,0,5,null);
 
-		List<LineParametric2D_F32> found = detector.detect(input);
+		// Detect edges of objects using gradient based hough detectors. If you have nice binary lines which are thin
+		// there's another type of hough detector available
+		DetectLine<T> detectorPolar = FactoryDetectLine.houghLinePolar(
+				new ConfigHoughGradient(maxLines),null, imageType);
+		DetectLine<T> detectorFoot = FactoryDetectLine.houghLineFoot(
+				new ConfigHoughGradient(maxLines),null, imageType);
+		DetectLine<T> detectorFootSub = FactoryDetectLine.houghFootSub(
+				new ConfigHoughFootSubimage(3, 8, 5, edgeThreshold,maxLines, 2, 2), imageType);
+
+		detectLines(buffered,blurred,detectorPolar,"Hough Polar");
+		detectLines(buffered,blurred,detectorFoot,"Hough Foot");
+		detectLines(buffered,blurred,detectorFootSub,"Hough Foot-Sub");
+	}
+
+	private static <T extends ImageGray<T>>
+	void detectLines( BufferedImage buffered, T gray , DetectLine<T> detector , String name ) {
+		List<LineParametric2D_F32> found = detector.detect(gray);
 
 		// display the results
 		ImageLinePanel gui = new ImageLinePanel();
-		gui.setImage(image);
+		gui.setImage(buffered);
 		gui.setLines(found);
-		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
+		gui.setPreferredSize(new Dimension(gray.getWidth(),gray.getHeight()));
 
-		listPanel.addItem(gui, "Found Lines");
+		listPanel.addItem(gui, name);
 	}
 
 	/**
@@ -109,7 +122,7 @@ public class ExampleLineDetection {
 		gui.setLineSegments(found);
 		gui.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 
-		listPanel.addItem(gui, "Found Line Segments");
+		listPanel.addItem(gui, "Line Segments");
 	}
 	
 	public static void main( String args[] ) {
