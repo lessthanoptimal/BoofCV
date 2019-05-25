@@ -18,40 +18,31 @@
 
 package boofcv.factory.feature.detect.line;
 
-import boofcv.abst.feature.detect.line.DetectLineHoughPolarEdge;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for {@link DetectLineHoughPolarEdge}
+ * Configuration for {@link boofcv.alg.feature.detect.line.HoughTransformBinary}
  *
  * @author Peter Abeles
  */
-public class ConfigHoughPolar implements Configuration {
+public class ConfigHoughBinary implements Configuration {
 
 	/**
 	 * Radius for local maximum suppression.  Try 2.
 	 */
-	public int localMaxRadius = 2;
+	public int localMaxRadius = 1;
 	/**
-	 * Minimum number of counts for detected line.  Critical tuning parameter and image dependent.
+	 * Minimum number of counts for detected line. This value is critical to speed.
+	 * If absolute it will be the number of counts in a cell. If relative
+	 * it will be relative to the total area of the transform image.
 	 */
-	public int minCounts;
-	/**
-	 * Resolution of line range in pixels.  Try 2
-	 */
-	public double resolutionRange = 2;
-	/**
-	 * Resolution of line angle in radius.  Try PI/180
-	 */
-	public double resolutionAngle = Math.PI/180.0;
-	/**
-	 * Edge detection threshold. Try 50.
-	 */
-	public float thresholdEdge = 50;
+	public ConfigLength minCounts = ConfigLength.relative(0.001,1);
+
 	/**
 	 * Maximum number of lines to return. If &le; 0 it will return all
 	 */
-	public int maxLines = 0;
+	public int maxLines = 10;
 
 	/**
 	 * If two lines have a slope within this tolerance (radians) then they can be merged.
@@ -63,23 +54,7 @@ public class ConfigHoughPolar implements Configuration {
 	 */
 	public double mergeDistance = 10;
 
-	public ConfigHoughPolar(int minCounts) {
-		this.minCounts = minCounts;
-	}
-
-	public ConfigHoughPolar(int minCounts, int maxLines) {
-		this.minCounts = minCounts;
-		this.maxLines = maxLines;
-	}
-
-	public ConfigHoughPolar(int localMaxRadius, int minCounts, double resolutionRange,
-							double resolutionAngle, float thresholdEdge, int maxLines) {
-		this.localMaxRadius = localMaxRadius;
-		this.minCounts = minCounts;
-		this.resolutionRange = resolutionRange;
-		this.resolutionAngle = resolutionAngle;
-		this.thresholdEdge = thresholdEdge;
-		this.maxLines = maxLines;
+	public ConfigHoughBinary() {
 	}
 
 	@Override

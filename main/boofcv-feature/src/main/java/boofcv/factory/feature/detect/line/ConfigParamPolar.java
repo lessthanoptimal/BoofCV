@@ -16,29 +16,27 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.line;
+package boofcv.factory.feature.detect.line;
 
-import boofcv.factory.feature.detect.line.ConfigHoughPolar;
-import boofcv.factory.feature.detect.line.FactoryDetectLine;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
-
+import boofcv.struct.Configuration;
 
 /**
+ * parameters for {@link boofcv.alg.feature.detect.line.HoughParametersPolar}
+ *
  * @author Peter Abeles
  */
-public class TestDetectLineHoughPolarEdge extends GeneralDetectLineGradientTests {
-
-
-	public TestDetectLineHoughPolarEdge() {
-		super(GrayU8.class,GrayF32.class);
-	}
+public class ConfigParamPolar implements Configuration {
+	/**
+	 * Resolution of line range in pixels.  Try 2
+	 */
+	public double resolutionRange = 2;
+	/**
+	 * Number of bins along angle axis. Resolution = 180/binAngle (degrees)
+	 */
+	public int numBinsAngle = 180;
 
 	@Override
-	public <T extends ImageGray<T>>
-	DetectLine<T> createAlg(Class<T> imageType)
-	{
-		return FactoryDetectLine.houghPolar(new ConfigHoughPolar(2, 3, 1.2, Math.PI / 180, 10, 20), imageType);
+	public void checkValidity() {
+
 	}
 }

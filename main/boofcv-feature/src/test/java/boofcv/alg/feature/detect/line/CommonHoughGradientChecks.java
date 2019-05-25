@@ -18,34 +18,30 @@
 
 package boofcv.alg.feature.detect.line;
 
-import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.image.*;
 import georegression.struct.line.LineParametric2D_F32;
-import org.ddogleg.struct.FastQueue;
-import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public class TestHoughTransformLineFootOfNorm {
+public abstract class CommonHoughGradientChecks {
+	Class imageTypes[] = new Class[]{GrayS16.class, GrayS32.class,GrayF32.class};
 	int width = 30;
 	int height = 40;
 
-	/**
-	 * See if it can detect an obvious line in the image
-	 */
+	abstract HoughTransformGradient createAlgorithm();
+
 	@Test
-	public void obviousLines() {
-		obviousLines(GrayF32.class);
-		obviousLines(GrayS16.class);
-		obviousLines(GrayS32.class);
+	void obviousLines() {
+		for( Class imageType : imageTypes ) {
+			obviousLines(imageType);
+		}
 	}
 
 	private <D extends ImageGray<D>> void obviousLines(Class<D> derivType ) {
@@ -58,12 +54,11 @@ public class TestHoughTransformLineFootOfNorm {
 			GeneralizedImageOps.set(derivX,5,i,20);
 		}
 
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 2, 0, true));
-		HoughTransformLineFootOfNorm alg = new HoughTransformLineFootOfNorm(extractor,2);
+		HoughTransformGradient alg = createAlgorithm();
 
 		alg.transform(derivX,derivY,binary);
 
-		FastQueue<LineParametric2D_F32> lines =  alg.extractLines();
+		List<LineParametric2D_F32> lines =  alg.getLinesMerged();
 
 		assertEquals(1,lines.size());
 
@@ -72,7 +67,7 @@ public class TestHoughTransformLineFootOfNorm {
 		// normalize the line for easier evaluation
 		l.slope.x /= l.slope.norm();
 		l.slope.y /= l.slope.norm();
-		assertEquals(0,Math.abs(l.slope.x), UtilEjml.TEST_F64_SQ);
+		assertEquals(0,Math.abs(l.slope.x), 0.1);
 		assertEquals(1,Math.abs(l.slope.y), 0.1);
 	}
 }

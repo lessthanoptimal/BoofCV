@@ -20,7 +20,7 @@ package boofcv.examples.features;
 
 import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
-import boofcv.factory.feature.detect.line.ConfigHoughPolar;
+import boofcv.factory.feature.detect.line.ConfigHoughBinary;
 import boofcv.factory.feature.detect.line.ConfigLineRansac;
 import boofcv.factory.feature.detect.line.FactoryDetectLine;
 import boofcv.gui.ListDisplayPanel;
@@ -68,7 +68,7 @@ public class ExampleLineDetection {
 
 		// Comment/uncomment to try a different type of line detector
 		DetectLine<T> detector = FactoryDetectLine.houghPolar(
-				new ConfigHoughPolar(3, 30, 2, Math.PI / 180,edgeThreshold, maxLines), imageType);
+				new ConfigHoughBinary(3, 30, 2, Math.PI / 180,edgeThreshold, maxLines), imageType);
 //		DetectLine<T> detector = FactoryDetectLine.houghFoot(
 //				new ConfigHoughFoot(3, 8, 5, edgeThreshold,maxLines), imageType);
 //		DetectLine<T> detector = FactoryDetectLine.houghFootSub(

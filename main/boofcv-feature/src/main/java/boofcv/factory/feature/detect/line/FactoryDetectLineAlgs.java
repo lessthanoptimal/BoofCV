@@ -19,11 +19,14 @@
 package boofcv.factory.feature.detect.line;
 
 
-import boofcv.abst.feature.detect.line.*;
+import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
+import boofcv.abst.feature.detect.line.DetectLineHoughFootSubimage;
+import boofcv.abst.feature.detect.line.DetectLineSegmentsGridRansac;
 import boofcv.abst.filter.derivative.ImageGradient;
-import boofcv.alg.feature.detect.line.ConnectLinesGrid;
-import boofcv.alg.feature.detect.line.GridRansacLineDetector;
+import boofcv.alg.feature.detect.line.*;
 import boofcv.alg.feature.detect.line.gridline.*;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
@@ -86,35 +89,6 @@ public class FactoryDetectLineAlgs {
 	}
 
 	/**
-	 * Detects lines using the foot of norm parametrization, see {@link DetectLineHoughFoot}.  The polar
-	 * parametrization is more common, but more difficult to tune.
-	 *
-	 * @see DetectLineHoughFoot
-	 *
-	 * @param config Configuration for line detector.  If null then default will be used.
-	 * @param derivType Image derivative type.
-	 * @param <D> Image derivative type.
-	 * @return Line detector.
-	 */
-	public static <D extends ImageGray<D>>
-	DetectLineHoughFoot<D> houghFoot(@Nullable ConfigHoughFoot config ,
-									   Class<D> derivType ) {
-
-		if( config == null )
-			config = new ConfigHoughFoot();
-
-
-		DetectLineHoughFoot<D> alg = new DetectLineHoughFoot<>(config.localMaxRadius, config.minCounts,
-				config.minDistanceFromOrigin, config.thresholdEdge, config.maxLines);
-
-		alg.setMergeAngle(config.mergeAngle);
-		alg.setMergeDistance(config.mergeDistance);
-		alg.getTransform().setRefineRadius(config.refineRadius);
-
-		return alg;
-	}
-
-	/**
 	 * Detects lines using a foot of norm parametrization and sub images to reduce degenerate
 	 * configurations, see {@link DetectLineHoughFootSubimage} for details.
 	 *
@@ -138,49 +112,52 @@ public class FactoryDetectLineAlgs {
 				config.totalHorizontalDivisions, config.totalVerticalDivisions, config.maxLines);
 	}
 
-	/**
-	 * Creates a Hough line detector based on polar parametrization. Image gradient is used to identify
-	 * where line edge's are
-	 *
-	 * @see DetectLineHoughPolarEdge
-	 *
-	 * @param config Configuration for line detector.  Can't be null.
-	 * @param derivType Image derivative type.
-	 * @param <D> Image derivative type.
-	 * @return Line detector.
-	 */
-	public static <D extends ImageGray<D>>
-	DetectLineHoughPolarEdge<D> houghPolarEdge(ConfigHoughPolar config ,
-											   Class<D> derivType ) {
+	public static HoughTransformGradient houghLineFoot(ConfigHoughGradient configHough , ConfigParamFoot configParam )
+	{
+		HoughParametersFootOfNorm param = new HoughParametersFootOfNorm(configParam.minDistanceFromOrigin);
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
+				new ConfigExtract(configHough.localMaxRadius, configHough.minCounts, 0, true));
 
-		if( config == null )
-			throw new IllegalArgumentException("This is no default since minCounts must be specified");
+		HoughTransformGradient hough = new HoughTransformGradient(extractor,param);
 
-		DetectLineHoughPolarEdge<D> alg = new DetectLineHoughPolarEdge<>(config.localMaxRadius,
-				config.minCounts, config.resolutionRange,
-				config.resolutionAngle, config.thresholdEdge, config.maxLines);
-		alg.setMergeAngle(config.mergeAngle);
-		alg.setMergeDistance(config.mergeDistance);
-		return alg;
+		hough.setMaxLines(configHough.maxLines);
+		hough.setMergeAngle(configHough.mergeAngle);
+		hough.setMergeDistance(configHough.mergeDistance);
+		hough.setRefineRadius(configHough.refineRadius);
+
+		return hough;
 	}
 
-	/**
-	 * Creates a Hough line detector based on polar parametrization. A binary image is provided by the
-	 * user to indicate which pixels belong to a line
-	 *
-	 * @see DetectLineHoughPolarBinary
-	 */
-	public static DetectLineHoughPolarBinary houghPolarBinary(ConfigHoughPolar config ) {
+	public static HoughTransformGradient houghLinePolar(ConfigHoughGradient configHough , ConfigParamPolar configParam )
+	{
+		HoughParametersPolar param = new HoughParametersPolar(configParam.resolutionRange,configParam.numBinsAngle);
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
+				new ConfigExtract(configHough.localMaxRadius, configHough.minCounts, 0, true));
 
-		if( config == null )
-			throw new IllegalArgumentException("This is no default since minCounts must be specified");
+		HoughTransformGradient hough = new HoughTransformGradient(extractor,param);
 
-		DetectLineHoughPolarBinary alg = new DetectLineHoughPolarBinary(config.localMaxRadius,
-				config.minCounts, config.resolutionRange,
-				config.resolutionAngle, config.maxLines);
-		alg.setMergeAngle(config.mergeAngle);
-		alg.setMergeDistance(config.mergeDistance);
-		return alg;
+		hough.setMaxLines(configHough.maxLines);
+		hough.setMergeAngle(configHough.mergeAngle);
+		hough.setMergeDistance(configHough.mergeDistance);
+		hough.setRefineRadius(configHough.refineRadius);
+
+		return hough;
+	}
+
+	public static HoughTransformBinary houghLinePolar( ConfigHoughBinary configHough , ConfigParamPolar configParam )
+	{
+		HoughParametersPolar param = new HoughParametersPolar(configParam.resolutionRange,configParam.numBinsAngle);
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
+				new ConfigExtract(configHough.localMaxRadius, 0, 0, false));
+
+		HoughTransformBinary hough = new HoughTransformBinary(extractor,param);
+
+		hough.setMaxLines(configHough.maxLines);
+		hough.setMergeAngle(configHough.mergeAngle);
+		hough.setMergeDistance(configHough.mergeDistance);
+		hough.setNumberOfCounts(configHough.minCounts.copy());
+
+		return hough;
 	}
 
 }

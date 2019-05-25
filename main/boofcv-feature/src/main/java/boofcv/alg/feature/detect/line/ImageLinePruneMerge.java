@@ -174,8 +174,11 @@ public class ImageLinePruneMerge {
 		lines = filtered;
 	}
 
-	public List<LineParametric2D_F32> createList() {
-		List<LineParametric2D_F32> ret = new ArrayList<>();
+	public List<LineParametric2D_F32> createList( List<LineParametric2D_F32>  ret ) {
+		if( ret == null )
+			ret = new ArrayList<>();
+		else
+			ret.clear();
 		for( Data d : lines ) {
 			ret.add(d.line);
 		}

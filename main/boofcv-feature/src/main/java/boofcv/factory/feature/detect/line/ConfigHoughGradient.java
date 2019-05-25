@@ -21,15 +21,15 @@ package boofcv.factory.feature.detect.line;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for {@link boofcv.abst.feature.detect.line.DetectLineHoughFoot}
+ * Configuration for {@link boofcv.alg.feature.detect.line.HoughTransformGradient}
  *
  * @author Peter Abeles
  */
-public class ConfigHoughFoot implements Configuration {
+public class ConfigHoughGradient implements Configuration {
 	/**
 	 * Lines in transform space must be a local max in a region with this radius. Try 5;
 	 */
-	public int localMaxRadius = 5;
+	public int localMaxRadius = 2;
 	/**
 	 * Minimum number of counts/votes inside the transformed image. Try 5.
 	 */
@@ -62,15 +62,15 @@ public class ConfigHoughFoot implements Configuration {
 	 */
 	public int refineRadius = 3;
 
-	public ConfigHoughFoot() {
+	public ConfigHoughGradient() {
 	}
 
-	public ConfigHoughFoot(int maxLines) {
+	public ConfigHoughGradient(int maxLines) {
 		this.maxLines = maxLines;
 	}
 
-	public ConfigHoughFoot(int localMaxRadius, int minCounts, int minDistanceFromOrigin,
-						   float thresholdEdge, int maxLines) {
+	public ConfigHoughGradient(int localMaxRadius, int minCounts, int minDistanceFromOrigin,
+							   float thresholdEdge, int maxLines) {
 		this.localMaxRadius = localMaxRadius;
 		this.minCounts = minCounts;
 		this.minDistanceFromOrigin = minDistanceFromOrigin;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,25 +18,23 @@
 
 package boofcv.alg.feature.detect.line;
 
-import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.line.LineParametric2D_F32;
-import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
 /**
  * @author Peter Abeles
  */
-public class TestHoughTransformLinePolar {
-
+public abstract class CommonHoughBinaryChecks {
 	int width = 30;
 	int height = 40;
+
+	abstract HoughTransformBinary createAlgorithm();
 
 	/**
 	 * See if it can detect an obvious line in the image
@@ -49,12 +47,11 @@ public class TestHoughTransformLinePolar {
 			image.set(5,i,1);
 		}
 
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4,5,0, true));
-		HoughTransformLinePolar alg = new HoughTransformLinePolar(extractor,40,180);
+		HoughTransformBinary alg = createAlgorithm();
 
 		alg.transform(image);
 
-		FastQueue<LineParametric2D_F32> lines =  alg.extractLines();
+		List<LineParametric2D_F32> lines =  alg.getLinesMerged();
 
 		assertTrue(lines.size() > 0);
 

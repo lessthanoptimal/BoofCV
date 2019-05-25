@@ -22,7 +22,8 @@ package boofcv.abst.feature.detect.line;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.alg.feature.detect.edge.GGradientToEdgeFeatures;
-import boofcv.alg.feature.detect.line.HoughTransformLineFootOfNorm;
+import boofcv.alg.feature.detect.line.HoughParametersFootOfNorm;
+import boofcv.alg.feature.detect.line.HoughTransformGradient;
 import boofcv.alg.feature.detect.line.ImageLinePruneMerge;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
@@ -51,7 +52,7 @@ import java.util.List;
  * [1] Section 9.3 of E.R. Davies, "Machine Vision Theory Algorithms Practicalities," 3rd Ed. 2005
  * </p>
  *
- * @see boofcv.alg.feature.detect.line.HoughTransformLineFootOfNorm
+ * @see boofcv.alg.feature.detect.line.HoughParametersFootOfNorm
  *
  * @author Peter Abeles
  */
@@ -62,7 +63,7 @@ public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 	int totalVerticalDivisions;
 
 	// transform algorithm
-	HoughTransformLineFootOfNorm alg;
+	HoughTransformGradient alg;
 
 	// used to create binary edge image
 	float thresholdEdge;
@@ -109,7 +110,7 @@ public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 		this.maxLines = maxLines;
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmaxCandidate(
 				new ConfigExtract(localMaxRadius, minCounts, 0, false));
-		alg = new HoughTransformLineFootOfNorm(extractor,minDistanceFromOrigin);
+		alg = new HoughTransformGradient(extractor,new HoughParametersFootOfNorm(minDistanceFromOrigin));
 	}
 
 	@Override
@@ -160,7 +161,7 @@ public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 		post.pruneSimilar((float) (Math.PI * 0.04), 10, width, height);
 		post.pruneNBest(maxLines);
 
-		return post.createList();
+		return post.createList(null);
 	}
 
 	private void processSubimage( int x0 , int y0 , int x1 , int y1 ,
@@ -170,7 +171,7 @@ public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 		GrayU8 binary = this.binary.subimage(x0,y0,x1,y1);
 
 		alg.transform(derivX, derivY, binary);
-		FastQueue<LineParametric2D_F32> lines = alg.extractLines();
+		FastQueue<LineParametric2D_F32> lines = alg.getLinesAll();
 		float intensity[] = alg.getFoundIntensity();
 
 		for( int i = 0; i < lines.size; i++ ) {
@@ -183,7 +184,7 @@ public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 		}
 	}
 
-	public HoughTransformLineFootOfNorm getTransform() {
+	public HoughTransformGradient getTransform() {
 		return alg;
 	}
 

@@ -16,29 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.line;
+package boofcv.alg.feature.detect.line;
 
-import boofcv.factory.feature.detect.line.ConfigHoughFoot;
-import boofcv.factory.feature.detect.line.FactoryDetectLine;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
-
+import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 
 /**
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked"})
-public class TestDetectLineHoughFoot extends GeneralDetectLineGradientTests {
-
-
-	public TestDetectLineHoughFoot() {
-		super(GrayU8.class,GrayF32.class);
-	}
-
+class TestHoughParametersFootOfNorm extends CommonHoughGradientChecks {
 	@Override
-	public <T extends ImageGray<T>>
-	DetectLine<T> createAlg(Class<T> imageType) {
-		return FactoryDetectLine.houghFoot(new ConfigHoughFoot(2, 3, 2, 10, 10), imageType);
+	HoughTransformGradient createAlgorithm() {
+		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 2, 0, true));
+		HoughTransformParameters hough = new HoughParametersFootOfNorm(5);
+		return new HoughTransformGradient(extractor,hough);
 	}
 }

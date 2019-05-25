@@ -48,7 +48,10 @@ public class ImageLinePanelZoom extends ImageZoomPanel {
 	public synchronized void setLines(List<LineParametric2D_F32> lines, int width , int height ) {
 		this.lines.clear();
 		for( LineParametric2D_F32 p : lines ) {
-			this.lines.add(LineImageOps.convert(p, width, height));
+			LineSegment2D_F32 l = LineImageOps.convert(p, width, height);
+			if( l == null )
+				throw new RuntimeException("null line?!");
+			this.lines.add(l);
 		}
 		selectedLine = -1;
 	}

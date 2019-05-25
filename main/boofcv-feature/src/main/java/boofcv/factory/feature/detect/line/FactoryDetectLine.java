@@ -21,6 +21,8 @@ package boofcv.factory.feature.detect.line;
 
 import boofcv.abst.feature.detect.line.*;
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.feature.detect.line.HoughTransformBinary;
+import boofcv.alg.feature.detect.line.HoughTransformGradient;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
@@ -56,24 +58,6 @@ public class FactoryDetectLine {
 	}
 
 	/**
-	 * Detects lines using the foot of norm parametrization, see {@link DetectLineHoughFoot}.  The polar
-	 * parametrization is more common, but more difficult to tune.
-	 *
-	 * @see DetectLineHoughFoot
-	 *
-	 * @param config Configuration for line detector.  If null then default will be used.
-	 * @return Line detector.
-	 */
-	public static <T extends ImageGray<T>>
-	DetectLine<T> houghFoot(@Nullable ConfigHoughFoot config , Class<T> imageType ) {
-		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-
-		DetectEdgeLines alg = FactoryDetectLineAlgs.houghFoot(config,derivType);
-
-		return new DetectEdgeLinesToLines(alg,imageType,derivType);
-	}
-
-	/**
 	 * Detects lines using a foot of norm parametrization and sub images to reduce degenerate
 	 * configurations, see {@link DetectLineHoughFootSubimage} for details.
 	 *
@@ -94,48 +78,83 @@ public class FactoryDetectLine {
 	}
 
 	/**
-	 * Creates a Hough line detector based on polar parametrization. Finds lines along the edges of objects using
-	 * the image gradient.
+	 * Used to find edges along the side of objects. Image gradient is found and thresholded. The pixel coordinate
+	 * of each active pixel and its gradient is then used to estimate the parameter of a line.
+	 * Uses {@link HoughTransformGradient} with {@link boofcv.alg.feature.detect.line.HoughParametersFootOfNorm}
 	 *
-	 * @see DetectLineHoughPolarEdge
-	 *
-	 * @param config Configuration for line detector.  Can't be null.
-	 * @param imageType input image type
+	 * @param configHough Configuration for hough binary transform.
+	 * @param configParam Configuration for polar parameters
+	 * @param imageType type of input image
 	 * @return Line detector.
 	 */
 	public static <T extends ImageGray<T>>
-	DetectLine<T> houghPolar(ConfigHoughPolar config , Class<T> imageType ) {
+	DetectLine<T> houghLineFoot(@Nullable ConfigHoughGradient configHough ,
+								@Nullable ConfigParamFoot configParam , Class<T> imageType )
+	{
+		if( configHough == null )
+			configHough = new ConfigHoughGradient();
 
-		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
+		if( configParam == null )
+			configParam = new ConfigParamFoot();
 
-		DetectEdgeLines alg = FactoryDetectLineAlgs.houghPolarEdge(config,derivType);
-
-		return new DetectEdgeLinesToLines(alg,imageType,derivType);
+		HoughTransformGradient hough = FactoryDetectLineAlgs.houghLineFoot(configHough,configParam);
+		HoughGradient_to_DetectLine<T,?> detector = new HoughGradient_to_DetectLine(hough,imageType);
+		detector.setThresholdEdge(configHough.thresholdEdge);
+		return detector;
 	}
 
 	/**
-	 * Creates a Hough line detector based on polar parametrization. Input image is converted into a binary image.
-	 * Every 1 pixel in binary image is assumed to belong to a line.
+	 * Used to find edges along the side of objects. Image gradient is found and thresholded. The pixel coordinate
+	 * of each active pixel and its gradient is then used to estimate the parameter of a line.
+	 * Uses {@link HoughTransformGradient} with {@link boofcv.alg.feature.detect.line.HoughParametersPolar}
 	 *
-	 * @see DetectLineHoughPolarBinary
-	 *
-	 * @param configHough Configuration for line detector.  Can't be null.
-	 * @param configThreshold Configuration for threshold algorithm. Can be null. Defaults to OTSU
-	 * @param imageType input image type
+	 * @param configHough Configuration for hough binary transform.
+	 * @param configParam Configuration for polar parameters
+	 * @param imageType type of input image
 	 * @return Line detector.
 	 */
 	public static <T extends ImageGray<T>>
-	DetectLine<T> houghPolar(ConfigHoughPolar configHough , @Nullable ConfigThreshold configThreshold ,
-							 Class<T> imageType )
+	DetectLine<T> houghLinePolar( @Nullable ConfigHoughGradient configHough ,
+								  @Nullable ConfigParamPolar configParam ,
+								  Class<T> imageType )
 	{
-		if( configThreshold == null ) {
-			configThreshold = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
-		}
+		if( configHough == null )
+			configHough = new ConfigHoughGradient();
 
-		InputToBinary<T> binarization = FactoryThresholdBinary.threshold(configThreshold,imageType);
-		DetectLineHoughPolarBinary alg = FactoryDetectLineAlgs.houghPolarBinary(configHough);
+		if( configParam == null )
+			configParam = new ConfigParamPolar();
 
-		return new DetectBinaryLinesToLines<>(alg,binarization);
+		HoughTransformGradient hough = FactoryDetectLineAlgs.houghLinePolar(configHough,configParam);
+		return new HoughGradient_to_DetectLine(hough,imageType);
 	}
 
+	/**
+	 * Line detector which converts image into a binary one and assumes every pixel with a value of 1 belongs
+	 * to a line. Uses {@link HoughTransformBinary} with {@link boofcv.alg.feature.detect.line.HoughParametersPolar}
+	 *
+	 * @param configHough Configuration for hough binary transform.
+	 * @param configParam Configuration for polar parameters
+	 * @param configThreshold Configuration for image thresholding
+	 * @param imageType type of input image
+	 * @return Line detector.
+	 */
+	public static <T extends ImageGray<T>>
+	DetectLine<T> houghLinePolar(@Nullable ConfigHoughBinary configHough ,
+								 @Nullable ConfigParamPolar configParam ,
+								 @Nullable ConfigThreshold configThreshold ,
+								 Class<T> imageType )
+	{
+		if( configHough == null )
+			configHough = new ConfigHoughBinary();
+
+		if( configParam == null )
+			configParam = new ConfigParamPolar();
+
+		if( configThreshold == null )
+			configThreshold = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
+
+		HoughTransformBinary hough = FactoryDetectLineAlgs.houghLinePolar(configHough,configParam);
+		InputToBinary<T> thresholder = FactoryThresholdBinary.threshold(configThreshold,imageType);
+		return new HoughBinary_to_DetectLine<>(hough,thresholder);
+	}
 }

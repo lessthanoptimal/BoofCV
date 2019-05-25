@@ -16,18 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.line;
+package boofcv.alg.feature.detect.line;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import boofcv.struct.image.GrayF32;
+import georegression.struct.line.LineParametric2D_F32;
+import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_F64;
 
 /**
  * @author Peter Abeles
  */
-class TestDetectLineHoughPolarBinary {
-	@Test
-	void foo() {
-		fail("Implement");
-	}
+public interface HoughTransformParameters {
+	void initialize( int width , int height , GrayF32 transform );
+
+	boolean isTransformValid( int x , int y );
+
+	void lineToCoordinate(LineParametric2D_F32 line , Point2D_F64 coordinate );
+
+	void transformToLine( float x , float y , LineParametric2D_F32 line );
+
+	void parameterize( int x , int y , GrayF32 transform );
+
+	void parameterize( int x , int y , float derivX , float derivY , Point2D_F32 parameter );
 }
