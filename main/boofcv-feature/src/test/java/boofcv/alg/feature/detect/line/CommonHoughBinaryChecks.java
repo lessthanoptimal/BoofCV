@@ -57,9 +57,9 @@ public abstract class CommonHoughBinaryChecks {
 
 		for( int i = 0; i < lines.size(); i++ ) {
 			LineParametric2D_F32 l = lines.get(i);
-			assertEquals(l.p.x,5,0.1);
-			assertEquals(Math.abs(l.slope.x),0,1e-4);
-			assertEquals(Math.abs(l.slope.y),1,0.1);
+			assertEquals(5,l.p.x,0.1);
+			assertEquals(0,Math.abs(l.slope.x),1e-4);
+			assertEquals(1,Math.abs(l.slope.y),0.1);
 		}
 	}
 }

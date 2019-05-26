@@ -119,24 +119,25 @@ public class HoughParametersPolar implements HoughTransformParameters {
 
 	@Override
 	public void parameterize(int x, int y, float derivX, float derivY, Point2D_F32 parameter) {
-		LineParametric2D_F32 line = new LineParametric2D_F32();
-		line.p.x = x - originX;
-		line.p.y = y - originY;
-		line.slope.x = -derivY;
-		line.slope.y = derivX;
-		LinePolar2D_F32 polar = new LinePolar2D_F32();
-		UtilLine2D_F32.convert(line,polar);
+		float  px = x - originX;
+		float  py = y - originY;
+		float  sx = -derivY;
+		float  sy = derivX;
 
-		if( polar.angle < 0 ) {
-			polar.distance = -polar.distance;
-			polar.angle = UtilAngle.toHalfCircle(polar.angle);
+		float top = sy*px -sx*py;
+		float  distance = top/(float)Math.sqrt(sx*sx + sy*sy);
+		float  angle = (float)Math.atan2(-sx,sy);
+
+		if( distance < 0 ) {
+			distance = -distance;
+			angle = UtilAngle.bound(angle + (float)Math.PI);
 		}
 
 		int w2 = numBinsRange/2;
 
-		parameter.x = (int)Math.round(polar.distance*w2/r_max + w2);
+		parameter.x = (int)Math.round(distance*w2/r_max + w2);
 
-		double yy = polar.angle*numBinsAngle;
+		double yy = angle*numBinsAngle;
 		if( yy >= 1.0 )
 			yy -= 1.0;
 

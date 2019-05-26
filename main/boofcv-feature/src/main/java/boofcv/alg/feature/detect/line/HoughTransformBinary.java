@@ -87,7 +87,7 @@ public class HoughTransformBinary {
 	int maxLines = 0;
 
 	// threshold for number of counts. relative is relative to total area of transform. fixed is number of counts
-	ConfigLength thresholdCounts = ConfigLength.relative(0.01,1);
+	ConfigLength thresholdCounts = ConfigLength.relative(0.001,1);
 
 	/**
 	 * Specifies parameters of transform.  The minimum number of points specified in the extractor

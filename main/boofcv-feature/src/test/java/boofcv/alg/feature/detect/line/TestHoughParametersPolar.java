@@ -44,9 +44,11 @@ public class TestHoughParametersPolar {
 
 		@Override
 		HoughTransformBinary createAlgorithm() {
-			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 10, 0, true));
+			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, -1, 0, false));
 			HoughTransformParameters hough = new HoughParametersPolar(0.5,180);
-			return new HoughTransformBinary(extractor,hough);
+			HoughTransformBinary alg = new HoughTransformBinary(extractor,hough);
+			alg.setMaxLines(1);
+			return alg;
 		}
 	}
 }
