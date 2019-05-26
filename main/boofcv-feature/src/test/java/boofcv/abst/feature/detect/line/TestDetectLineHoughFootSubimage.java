@@ -40,7 +40,7 @@ public class TestDetectLineHoughFootSubimage extends GeneralDetectLineGradientTe
 	@Override
 	public <T extends ImageGray<T>>
 	DetectLine<T> createAlg(Class<T> imageType) {
-		return FactoryDetectLine.houghFootSub(
+		return FactoryDetectLine.houghLineFootSub(
 				new ConfigHoughFootSubimage( 2, 3, 2, 10, 10, 2, 2)
 				, imageType);
 	}

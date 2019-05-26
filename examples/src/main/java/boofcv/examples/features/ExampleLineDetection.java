@@ -77,7 +77,7 @@ public class ExampleLineDetection {
 				new ConfigHoughGradient(maxLines),null, imageType);
 		DetectLine<T> detectorFoot = FactoryDetectLine.houghLineFoot(
 				new ConfigHoughGradient(maxLines),null, imageType);
-		DetectLine<T> detectorFootSub = FactoryDetectLine.houghFootSub(
+		DetectLine<T> detectorFootSub = FactoryDetectLine.houghLineFootSub(
 				new ConfigHoughFootSubimage(3, 8, 5, edgeThreshold,maxLines, 2, 2), imageType);
 
 		detectLines(buffered,blurred,detectorPolar,"Hough Polar");

@@ -68,7 +68,7 @@ public class FactoryDetectLine {
 	 * @return Line detector.
 	 */
 	public static <T extends ImageGray<T>>
-	DetectLine<T> houghFootSub(@Nullable ConfigHoughFootSubimage config , Class<T> imageType ) {
+	DetectLine<T> houghLineFootSub(@Nullable ConfigHoughFootSubimage config , Class<T> imageType ) {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
 

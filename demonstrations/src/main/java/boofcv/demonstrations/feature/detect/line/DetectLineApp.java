@@ -105,7 +105,7 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 					break;
 
 				case 2:
-					lineDetector = FactoryDetectLine.houghFootSub(
+					lineDetector = FactoryDetectLine.houghLineFootSub(
 							new ConfigHoughFootSubimage(3, 8, 5, edgeThreshold,
 									controls.maxLines, 2, 2), imageType);
 					break;

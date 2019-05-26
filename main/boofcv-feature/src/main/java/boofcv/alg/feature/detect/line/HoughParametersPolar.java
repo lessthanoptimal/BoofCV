@@ -124,13 +124,17 @@ public class HoughParametersPolar implements HoughTransformParameters {
 		float  sx = -derivY;
 		float  sy = derivX;
 
-		float top = sy*px -sx*py;
-		float  distance = top/(float)Math.sqrt(sx*sx + sy*sy);
-		float  angle = (float)Math.atan2(-sx,sy);
+		float top = sy*px - sx*py;
+		float distance = top/(float)Math.sqrt(sx*sx + sy*sy);
+		float angle = (float)Math.atan2(-sx,sy);
 
 		if( distance < 0 ) {
 			distance = -distance;
 			angle = UtilAngle.bound(angle + (float)Math.PI);
+		}
+		if( angle < 0 ) {
+			distance = -distance;
+			angle = UtilAngle.toHalfCircle(angle);
 		}
 
 		int w2 = numBinsRange/2;
