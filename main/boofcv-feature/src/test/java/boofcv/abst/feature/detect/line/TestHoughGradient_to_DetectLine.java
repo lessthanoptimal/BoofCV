@@ -34,7 +34,7 @@ public class TestHoughGradient_to_DetectLine extends GeneralDetectLineGradientTe
 	public <T extends ImageGray<T>> DetectLine<T> createAlg(Class<T> imageType) {
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 2, 0, true));
 		HoughTransformParameters polar = new HoughParametersPolar(2,180);
-		HoughTransformGradient hough = new HoughTransformGradient(extractor,polar);
+		HoughTransformGradient hough = new HoughTransformGradient(extractor,polar,imageType);
 
 		return new HoughGradient_to_DetectLine(hough,imageType);
 	}

@@ -110,6 +110,18 @@ public class HoughTransformBinary {
 		parameters.initialize(binary.width,binary.height,transform);
 		ImageMiscOps.fill(transform, 0);
 
+		computeParameters(binary);
+
+		extractLines();
+		if( maxLines <= 0 ) {
+			linesMerged.clear();
+			linesMerged.addAll(linesAll.toList());
+		} else {
+			mergeLines(binary.width,binary.height);
+		}
+	}
+
+	void computeParameters(GrayU8 binary) {
 		for( int y = 0; y < binary.height; y++ ) {
 			int start = binary.startIndex + y*binary.stride;
 			int stop = start + binary.width;
@@ -119,14 +131,6 @@ public class HoughTransformBinary {
 					parameters.parameterize(index-start,y,transform);
 				}
 			}
-		}
-
-		extractLines();
-		if( maxLines <= 0 ) {
-			linesMerged.clear();
-			linesMerged.addAll(linesAll.toList());
-		} else {
-			mergeLines(binary.width,binary.height);
 		}
 	}
 

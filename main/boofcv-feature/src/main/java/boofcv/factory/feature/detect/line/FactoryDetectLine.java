@@ -97,7 +97,8 @@ public class FactoryDetectLine {
 		if( configParam == null )
 			configParam = new ConfigParamFoot();
 
-		HoughTransformGradient hough = FactoryDetectLineAlgs.houghLineFoot(configHough,configParam);
+		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
+		HoughTransformGradient hough = FactoryDetectLineAlgs.houghLineFoot(configHough,configParam,derivType);
 		HoughGradient_to_DetectLine<T,?> detector = new HoughGradient_to_DetectLine(hough,imageType);
 		detector.setThresholdEdge(configHough.thresholdEdge);
 		return detector;
@@ -124,8 +125,11 @@ public class FactoryDetectLine {
 		if( configParam == null )
 			configParam = new ConfigParamPolar();
 
-		HoughTransformGradient hough = FactoryDetectLineAlgs.houghLinePolar(configHough,configParam);
-		return new HoughGradient_to_DetectLine(hough,imageType);
+		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
+		HoughTransformGradient hough = FactoryDetectLineAlgs.houghLinePolar(configHough,configParam,derivType);
+		HoughGradient_to_DetectLine<T,?> detector = new HoughGradient_to_DetectLine(hough,imageType);
+		detector.setThresholdEdge(configHough.thresholdEdge);
+		return detector;
 	}
 
 	/**

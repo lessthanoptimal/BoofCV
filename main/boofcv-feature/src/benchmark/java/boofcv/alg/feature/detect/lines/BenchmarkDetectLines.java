@@ -1,124 +1,120 @@
-///*
-// * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
-// *
-// * This file is part of BoofCV (http://boofcv.org).
-// *
-// * Licensed under the Apache License, Version 2.0 (the "License");
-// * you may not use this file except in compliance with the License.
-// * You may obtain a copy of the License at
-// *
-// *   http://www.apache.org/licenses/LICENSE-2.0
-// *
-// * Unless required by applicable law or agreed to in writing, software
-// * distributed under the License is distributed on an "AS IS" BASIS,
-// * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// * See the License for the specific language governing permissions and
-// * limitations under the License.
-// */
-//
-//package boofcv.alg.feature.detect.lines;
-//
-//import boofcv.abst.feature.detect.line.DetectLine;
-//import boofcv.abst.feature.detect.line.DetectLineSegment;
-//import boofcv.core.image.GeneralizedImageOps;
-//import boofcv.factory.feature.detect.line.*;
-//import boofcv.io.UtilIO;
-//import boofcv.io.image.ConvertBufferedImage;
-//import boofcv.misc.PerformerBase;
-//import boofcv.misc.ProfileOperation;
-//import boofcv.struct.image.GrayF32;
-//import boofcv.struct.image.ImageGray;
-//
-//import javax.imageio.ImageIO;
-//import java.awt.image.BufferedImage;
-//import java.io.File;
-//import java.io.IOException;
-//import java.util.Random;
-//
-//
-///**
-// * @author Peter Abeles
-// */
-//public class BenchmarkDetectLines<T extends ImageGray<T>, D extends ImageGray<D>> {
-//
-//	static final long TEST_TIME = 1000;
-//	static Random rand = new Random(234234);
-//
-//	T input;
-//	Class<T> imageType;
-//
-//	float edgeThreshold = 30;
-//	int maxLines = 10;
-//
-//	public BenchmarkDetectLines( Class<T> imageType ) {
-//		this.imageType = imageType;
-//		input = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
-//
-//	}
-//
-//	public class HoughPolar extends PerformerBase {
-//
-//		DetectLine<T> detector =
-//				FactoryDetectLine.houghPolar(new ConfigHoughBinary(3, 30, 4, Math.PI / 180, edgeThreshold, maxLines), imageType);
-//
-//		@Override
-//		public void process() {
-//			detector.detect(input);
-//		}
-//	}
-//
-//	public class HoughFoot extends PerformerBase {
-//
-//		DetectLine<T> detector =
-//				FactoryDetectLine.houghFoot(new ConfigHoughGradient(3, 10, 5, edgeThreshold, maxLines), imageType);
-//
-//		@Override
-//		public void process() {
-//			detector.detect(input);
-//		}
-//	}
-//
-//	public class HoughFootSub extends PerformerBase {
-//
-//		DetectLine<T> detector =
-//				FactoryDetectLine.houghFootSub(new ConfigHoughFootSubimage(3, 6, 5, edgeThreshold, maxLines, 2, 2), imageType);
-//
-//		@Override
-//		public void process() {
-//			detector.detect(input);
-//		}
-//	}
-//
-//	public class LineRansac extends PerformerBase {
-//
-//		DetectLineSegment<T> detector = FactoryDetectLine.lineRansac(new ConfigLineRansac(40, 30, 2.36, true), imageType);
-//
-//		@Override
-//		public void process() {
-//			detector.detect(input);
-//		}
-//	}
-//
-//	public void benchmark( BufferedImage image ) {
-//		input.reshape(image.getWidth(),image.getHeight());
-//		ConvertBufferedImage.convertFromSingle(image, input, imageType);
-//
-//		ProfileOperation.printOpsPerSec(new HoughPolar(), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new HoughFoot(), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new HoughFootSub(), TEST_TIME);
-//		ProfileOperation.printOpsPerSec(new LineRansac(), TEST_TIME);
-//		System.out.println("done");
-//	}
-//
-//	public static void main(String args[]) throws IOException {
-//		BufferedImage image = ImageIO.read(new File(UtilIO.pathExample("lines_indoors.jpg")));
-////		BufferedImage image = UtilImageIO.loadImage(UtilIO.pathExample("lines_indoors.jpg");
-//
-//		System.out.println("=========  Profile Image Size " + image.getWidth() + " x " + image.getHeight()+ " ==========");
-//		System.out.println();
-//
-//		BenchmarkDetectLines app = new BenchmarkDetectLines(GrayF32.class);
-//		app.benchmark(image);
-//
-//	}
-//}
+/*
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.alg.feature.detect.lines;
+
+import boofcv.abst.feature.detect.line.DetectLine;
+import boofcv.abst.feature.detect.line.DetectLineSegment;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.feature.detect.line.ConfigLineRansac;
+import boofcv.factory.feature.detect.line.FactoryDetectLine;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
+
+/**
+ * @author Peter Abeles
+ */
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@State(Scope.Benchmark)
+@Fork(value=1)
+public class BenchmarkDetectLines<T extends ImageGray<T>, D extends ImageGray<D>> {
+
+	@Param({"true","false"})
+	public boolean concurrent;
+
+	@Param({"1000"})
+	public int width;
+
+	T input;
+	Class<T> imageType;
+
+	DetectLine<T> houghFoot;
+	DetectLine<T> houghPolar;
+	DetectLine<T> houghFootSub;
+
+	DetectLineSegment<T> detectorSegment;
+
+	public BenchmarkDetectLines() {
+		this((Class)GrayU8.class);
+	}
+
+	public BenchmarkDetectLines( Class<T> imageType ) {
+		this.imageType = imageType;
+		input = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
+	}
+
+	@Setup
+	public void setup() {
+		BoofConcurrency.USE_CONCURRENT = concurrent;
+
+		// fill it with a few rectangles so that there are some lines
+		input.reshape(width,width);
+		GImageMiscOps.fill(input,0);
+		GImageMiscOps.fillRectangle(input,100,10,15,width/4,width/4);
+		GImageMiscOps.fillRectangle(input,100,width/2,width/2+15,width/4,width/4);
+		GImageMiscOps.fillRectangle(input,100,width/2,0,width/8,width/8);
+		GImageMiscOps.addUniform(input,new Random(234),0,5);
+
+		houghFoot = FactoryDetectLine.houghLineFoot(null,null, imageType);
+		houghPolar = FactoryDetectLine.houghLinePolar(null,null, imageType);
+		houghFootSub = FactoryDetectLine.houghLineFootSub(null, imageType);
+		detectorSegment = FactoryDetectLine.lineRansac(new ConfigLineRansac(40, 30, 2.36, true), imageType);
+	}
+
+	@Benchmark
+	public void gradientHoughFoot() {
+		houghFoot.detect(input);
+	}
+
+	@Benchmark
+	public void gradientHoughPolar() {
+		houghPolar.detect(input);
+	}
+
+	@Benchmark
+	public void gradientHoughFootSub() {
+		houghFootSub.detect(input);
+	}
+
+	@Benchmark
+	public void segment() {
+		detectorSegment.detect(input);
+	}
+
+	public static void main(String[] args) throws RunnerException {
+		Options opt = new OptionsBuilder()
+				.include(BenchmarkDetectLines.class.getSimpleName())
+				.build();
+
+		new Runner(opt).run();
+	}
+}

@@ -21,15 +21,29 @@ package boofcv.alg.feature.detect.line;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
+import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-class TestHoughParametersFootOfNorm extends CommonHoughGradientChecks {
-	@Override
-	HoughTransformGradient createAlgorithm() {
-		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 2, 0, true));
-		HoughTransformParameters hough = new HoughParametersFootOfNorm(5);
-		return new HoughTransformGradient(extractor,hough);
+class TestHoughParametersFootOfNorm {
+	@Nested
+	class Gradient extends CommonHoughGradientChecks {
+		@Override
+		HoughTransformGradient createAlgorithm( Class derivType ) {
+			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 5, 0, true));
+			HoughTransformParameters hough = new HoughParametersFootOfNorm(5);
+			return new HoughTransformGradient(extractor,hough,derivType);
+		}
+	}
+
+	@Nested
+	class Gradient_MT extends CommonHoughGradientChecks {
+		@Override
+		HoughTransformGradient createAlgorithm( Class derivType ) {
+			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 5, 0, true));
+			HoughTransformParameters hough = new HoughParametersFootOfNorm(5);
+			return new HoughTransformGradient_MT(extractor,hough,derivType);
+		}
 	}
 }

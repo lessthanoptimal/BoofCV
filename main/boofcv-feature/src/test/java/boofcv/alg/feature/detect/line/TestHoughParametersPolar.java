@@ -30,12 +30,21 @@ public class TestHoughParametersPolar {
 
 	@Nested
 	class Gradient extends CommonHoughGradientChecks {
-
 		@Override
-		HoughTransformGradient createAlgorithm() {
+		HoughTransformGradient createAlgorithm( Class derivType ) {
 			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 5, 0, true));
 			HoughTransformParameters hough = new HoughParametersPolar(0.5,180);
-			return new HoughTransformGradient(extractor,hough);
+			return new HoughTransformGradient(extractor,hough,derivType);
+		}
+	}
+
+	@Nested
+	class Gradient_MT extends CommonHoughGradientChecks {
+		@Override
+		HoughTransformGradient createAlgorithm( Class derivType ) {
+			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, 5, 0, true));
+			HoughTransformParameters hough = new HoughParametersPolar(0.5,180);
+			return new HoughTransformGradient_MT(extractor,hough,derivType);
 		}
 	}
 
@@ -47,6 +56,19 @@ public class TestHoughParametersPolar {
 			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, -1, 0, false));
 			HoughTransformParameters hough = new HoughParametersPolar(0.5,180);
 			HoughTransformBinary alg = new HoughTransformBinary(extractor,hough);
+			alg.setMaxLines(1);
+			return alg;
+		}
+	}
+
+	@Nested
+	class Binary_MT extends CommonHoughBinaryChecks {
+
+		@Override
+		HoughTransformBinary createAlgorithm() {
+			NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(4, -1, 0, false));
+			HoughTransformParameters hough = new HoughParametersPolar(0.5,180);
+			HoughTransformBinary alg = new HoughTransformBinary_MT(extractor,hough);
 			alg.setMaxLines(1);
 			return alg;
 		}

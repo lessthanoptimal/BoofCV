@@ -35,7 +35,7 @@ public abstract class CommonHoughGradientChecks {
 	int width = 30;
 	int height = 40;
 
-	abstract HoughTransformGradient createAlgorithm();
+	abstract HoughTransformGradient createAlgorithm( Class derivType );
 
 	@Test
 	void obviousLines() {
@@ -54,7 +54,7 @@ public abstract class CommonHoughGradientChecks {
 			GeneralizedImageOps.set(derivX,5,i,20);
 		}
 
-		HoughTransformGradient alg = createAlgorithm();
+		HoughTransformGradient alg = createAlgorithm(derivType);
 
 		alg.transform(derivX,derivY,binary);
 

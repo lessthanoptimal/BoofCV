@@ -24,9 +24,13 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.detect.peak.MeanShiftPeak;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.weights.WeightPixelGaussian_F32;
+import boofcv.core.image.FactoryGImageGray;
+import boofcv.core.image.GImageGray;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.border.BorderType;
-import boofcv.struct.image.*;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I16;
@@ -47,7 +51,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class HoughTransformGradient {
+public class HoughTransformGradient<D extends ImageGray<D>> {
 
 	// extracts line from the transform
 	NonMaxSuppression extractor;
@@ -60,9 +64,9 @@ public class HoughTransformGradient {
 	// floating point image used because that's what FeatureExtractor's take as input
 	GrayF32 transform = new GrayF32(1,1);
 	// found lines in transform space
-	QueueCorner foundLines = new QueueCorner(10);
+	final QueueCorner foundLines = new QueueCorner(10);
 	// list of points in the transform with non-zero values
-	QueueCorner candidates = new QueueCorner(10);
+	final QueueCorner candidates = new QueueCorner(10);
 	// line intensities for later pruning
 	GrowQueue_F32 foundIntensity = new GrowQueue_F32(10);
 
@@ -71,6 +75,9 @@ public class HoughTransformGradient {
 			new WeightPixelGaussian_F32(),GrayF32.class, BorderType.ZERO);
 
 	HoughTransformParameters parameters;
+
+	// used to make the input image type generic
+	GImageGray _derivX,_derivY;
 
 	// post processing pruning
 	ImageLinePruneMerge post = new ImageLinePruneMerge();
@@ -86,11 +93,15 @@ public class HoughTransformGradient {
 	 * @param extractor Extracts local maxima from transform space.  A set of candidates is provided, but can be ignored.
 	 */
 	public HoughTransformGradient(NonMaxSuppression extractor,
-								  HoughTransformParameters parameters) {
+								  HoughTransformParameters parameters,
+								  Class<D> derivType ) {
 		this.extractor = extractor;
 		this.parameters = parameters;
 		refine.setImage(transform);
 		refine.setRadius(3);
+
+		_derivX = FactoryGImageGray.create(derivType);
+		_derivY = FactoryGImageGray.create(derivType);
 	}
 
 	/**
@@ -107,15 +118,9 @@ public class HoughTransformGradient {
 		ImageMiscOps.fill(transform,0);
 
 		candidates.reset();
-
-		if( derivX instanceof GrayF32)
-			_transform((GrayF32)derivX,(GrayF32)derivY,binary);
-		else if( derivX instanceof GrayS16)
-			_transform((GrayS16)derivX,(GrayS16)derivY,binary);
-		else if( derivX instanceof GrayS32)
-			_transform((GrayS32)derivX,(GrayS32)derivY,binary);
-		else
-			throw new IllegalArgumentException("Unsupported derivative image type: "+derivX.getClass().getSimpleName());
+		_derivX.wrap(derivX);
+		_derivY.wrap(derivY);
+		transform(binary);
 
 		extractLines();
 		if( maxLines <= 0 ) {
@@ -230,7 +235,7 @@ public class HoughTransformGradient {
 		return foundIntensity.data;
 	}
 
-	private void _transform(GrayF32 derivX , GrayF32 derivY , GrayU8 binary )
+	void transform(GrayU8 binary )
 	{
 		// apply the transform to the entire image
 		for( int y = 0; y < binary.height; y++ ) {
@@ -240,39 +245,7 @@ public class HoughTransformGradient {
 			for( int index = start; index < end; index++ ) {
 				if( binary.data[index] != 0 ) {
 					int x = index-start;
-					parameterize(x,y,derivX.unsafe_get(x,y),derivY.unsafe_get(x,y));
-				}
-			}
-		}
-	}
-
-	private void _transform(GrayS16 derivX , GrayS16 derivY , GrayU8 binary )
-	{
-		// apply the transform to the entire image
-		for( int y = 0; y < binary.height; y++ ) {
-			int start = binary.startIndex + y*binary.stride;
-			int end = start + binary.width;
-
-			for( int index = start; index < end; index++ ) {
-				if( binary.data[index] != 0 ) {
-					int x = index-start;
-					parameterize(x,y,derivX.unsafe_get(x,y),derivY.unsafe_get(x,y));
-				}
-			}
-		}
-	}
-
-	private void _transform(GrayS32 derivX , GrayS32 derivY , GrayU8 binary )
-	{
-		// apply the transform to the entire image
-		for( int y = 0; y < binary.height; y++ ) {
-			int start = binary.startIndex + y*binary.stride;
-			int end = start + binary.width;
-
-			for( int index = start; index < end; index++ ) {
-				if( binary.data[index] != 0 ) {
-					int x = index-start;
-					parameterize(x,y,derivX.unsafe_get(x,y),derivY.unsafe_get(x,y));
+					parameterize(x,y,_derivX.unsafe_getF(x,y),_derivY.unsafe_getF(x,y));
 				}
 			}
 		}

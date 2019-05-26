@@ -26,6 +26,7 @@ import boofcv.abst.feature.detect.line.DetectLineSegmentsGridRansac;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.line.*;
 import boofcv.alg.feature.detect.line.gridline.*;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayF32;
@@ -109,16 +110,23 @@ public class FactoryDetectLineAlgs {
 
 		return new DetectLineHoughFootSubimage<>(config.localMaxRadius,
 				config.minCounts, config.minDistanceFromOrigin, config.thresholdEdge,
-				config.totalHorizontalDivisions, config.totalVerticalDivisions, config.maxLines);
+				config.totalHorizontalDivisions, config.totalVerticalDivisions, config.maxLines, derivType);
 	}
 
-	public static HoughTransformGradient houghLineFoot(ConfigHoughGradient configHough , ConfigParamFoot configParam )
+	public static <D extends ImageGray<D>>
+	HoughTransformGradient<D> houghLineFoot(ConfigHoughGradient configHough , ConfigParamFoot configParam ,
+													   Class<D> derivType )
 	{
 		HoughParametersFootOfNorm param = new HoughParametersFootOfNorm(configParam.minDistanceFromOrigin);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(configHough.localMaxRadius, configHough.minCounts, 0, true));
 
-		HoughTransformGradient hough = new HoughTransformGradient(extractor,param);
+		HoughTransformGradient<D> hough;
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			hough = new HoughTransformGradient_MT<>(extractor, param, derivType);
+		} else {
+			hough = new HoughTransformGradient<>(extractor, param, derivType);
+		}
 
 		hough.setMaxLines(configHough.maxLines);
 		hough.setMergeAngle(configHough.mergeAngle);
@@ -128,13 +136,20 @@ public class FactoryDetectLineAlgs {
 		return hough;
 	}
 
-	public static HoughTransformGradient houghLinePolar(ConfigHoughGradient configHough , ConfigParamPolar configParam )
+	public static <D extends ImageGray<D>>
+	HoughTransformGradient<D> houghLinePolar(ConfigHoughGradient configHough , ConfigParamPolar configParam ,
+											 Class<D> derivType )
 	{
 		HoughParametersPolar param = new HoughParametersPolar(configParam.resolutionRange,configParam.numBinsAngle);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(configHough.localMaxRadius, configHough.minCounts, 0, true));
 
-		HoughTransformGradient hough = new HoughTransformGradient(extractor,param);
+		HoughTransformGradient<D> hough;
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			hough = new HoughTransformGradient_MT<>(extractor, param, derivType);
+		} else {
+			hough = new HoughTransformGradient<>(extractor, param, derivType);
+		}
 
 		hough.setMaxLines(configHough.maxLines);
 		hough.setMergeAngle(configHough.mergeAngle);
@@ -150,7 +165,12 @@ public class FactoryDetectLineAlgs {
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(configHough.localMaxRadius, 0, 0, false));
 
-		HoughTransformBinary hough = new HoughTransformBinary(extractor,param);
+		HoughTransformBinary hough;
+		if(BoofConcurrency.USE_CONCURRENT ) {
+			hough = new HoughTransformBinary_MT(extractor,param);
+		} else {
+			hough = new HoughTransformBinary(extractor,param);
+		}
 
 		hough.setMaxLines(configHough.maxLines);
 		hough.setMergeAngle(configHough.mergeAngle);

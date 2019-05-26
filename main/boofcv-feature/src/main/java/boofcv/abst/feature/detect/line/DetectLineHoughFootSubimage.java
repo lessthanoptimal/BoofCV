@@ -102,7 +102,8 @@ public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 									   float thresholdEdge,
 									   int totalHorizontalDivisions ,
 									   int totalVerticalDivisions ,
-									   int maxLines )
+									   int maxLines ,
+									   Class<D> derivType )
 	{
 		this.thresholdEdge = thresholdEdge;
 		this.totalHorizontalDivisions = totalHorizontalDivisions;
@@ -110,7 +111,7 @@ public class DetectLineHoughFootSubimage<D extends ImageGray<D>>
 		this.maxLines = maxLines;
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmaxCandidate(
 				new ConfigExtract(localMaxRadius, minCounts, 0, false));
-		alg = new HoughTransformGradient(extractor,new HoughParametersFootOfNorm(minDistanceFromOrigin));
+		alg = new HoughTransformGradient<>(extractor,new HoughParametersFootOfNorm(minDistanceFromOrigin),derivType);
 	}
 
 	@Override
