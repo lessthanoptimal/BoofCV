@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,11 @@
 
 package boofcv.factory.geo;
 
+import boofcv.abst.geo.triangulate.TriangulateRefineMetricLS;
+import boofcv.abst.geo.triangulate.TriangulateRefineProjectiveLS;
+import boofcv.alg.geo.triangulate.PixelDepthLinearMetric;
+import boofcv.alg.geo.triangulate.Triangulate2ViewsGeometricMetric;
+import boofcv.alg.geo.triangulate.TriangulateProjectiveLinearDLT;
 import boofcv.misc.ConfigConverge;
 
 /**
@@ -49,14 +54,22 @@ public class ConfigTriangulation {
 	public enum Type {
 		/**
 		 * Discrete lienear transform
+		 *
+		 * @see PixelDepthLinearMetric
+		 * @see TriangulateProjectiveLinearDLT
 		 */
 		DLT,
 		/**
 		 * Optimal solution for algebraic error
+		 *
+		 * @see TriangulateRefineProjectiveLS
 		 */
 		ALGEBRAIC,
 		/**
 		 * Optimal solution for geometric error
+		 *
+		 * @see Triangulate2ViewsGeometricMetric
+		 * @see TriangulateRefineMetricLS
 		 */
 		GEOMETRIC
 	}

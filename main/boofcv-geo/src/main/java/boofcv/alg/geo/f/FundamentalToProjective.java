@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,6 +35,8 @@ import org.ejml.dense.row.NormOps_DDRM;
 /**
  * Computes projective camera matrices from a fundamental matrix. All work space is predeclared and won't thrash
  * the garbage collector.
+ *
+ * See section 9.5 in R. Hartley, and A. Zisserman, "Multiple View Geometry in Computer Vision", 2nd Ed, Cambridge 2003
  *
  * @author Peter Abeles
  */
