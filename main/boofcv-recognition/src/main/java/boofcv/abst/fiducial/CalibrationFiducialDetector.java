@@ -79,10 +79,10 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	/**
 	 * Configure it to detect chessboard style targets
 	 */
-	public CalibrationFiducialDetector( @Nullable ConfigChessboard configDet,
+	public CalibrationFiducialDetector( @Nullable ConfigChessboardOld configDet,
 										ConfigGridDimen configGrid,
 									   Class<T> imageType) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboard(configDet,configGrid);
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboardOld(configDet,configGrid);
 		sideWidth = configGrid.numCols*configGrid.shapeSize;
 		sideHeight = configGrid.numRows*configGrid.shapeSize;
 
@@ -94,10 +94,10 @@ public class CalibrationFiducialDetector<T extends ImageGray<T>>
 	/**
 	 * Configure it to detect chessboard style targets
 	 */
-	public CalibrationFiducialDetector( @Nullable ConfigChessboard2 configDet,
+	public CalibrationFiducialDetector( @Nullable ConfigChessboard configDet,
 									   ConfigGridDimen configGrid,
 									   Class<T> imageType) {
-		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboard2(configDet,configGrid);
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.chessboard(configDet,configGrid);
 		sideWidth = configGrid.numCols*configGrid.shapeSize;
 		sideHeight = configGrid.numRows*configGrid.shapeSize;
 

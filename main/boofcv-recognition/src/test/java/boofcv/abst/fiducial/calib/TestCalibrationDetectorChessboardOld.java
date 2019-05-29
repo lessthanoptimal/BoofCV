@@ -27,16 +27,16 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static boofcv.abst.fiducial.calib.CalibrationDetectorChessboard.gridChess;
+import static boofcv.abst.fiducial.calib.CalibrationDetectorChessboardOld.gridChess;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestCalibrationDetectorChessboard2 extends GenericPlanarCalibrationDetectorChecks {
+public class TestCalibrationDetectorChessboardOld extends GenericPlanarCalibrationDetectorChecks {
 
 
-	public TestCalibrationDetectorChessboard2() {
+	public TestCalibrationDetectorChessboardOld() {
 		targetConfigs.add( new ConfigGridDimen(5, 4, 30) );
 
 		// tuning made 1 fail. On real world data it does better. <shrug>
@@ -74,6 +74,6 @@ public class TestCalibrationDetectorChessboard2 extends GenericPlanarCalibration
 
 	@Override
 	public DetectorFiducialCalibration createDetector(ConfigGridDimen layout) {
-		return FactoryFiducialCalibration.chessboard2((ConfigChessboard2)null,layout);
+		return FactoryFiducialCalibration.chessboardOld((ConfigChessboardOld)null,layout);
 	}
 }

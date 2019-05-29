@@ -223,7 +223,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		} else if( name.compareTo(QR_CODE) == 0 ) {
 			detector = FactoryFiducial.qrcode3D(null, imageClass);
 		} else if( name.compareTo(CALIB_CHESS) == 0 ) {
-			detector = FactoryFiducial.calibChessboard2(null,new ConfigGridDimen(7, 5, 0.03), imageClass);
+			detector = FactoryFiducial.calibChessboard(null,new ConfigGridDimen(7, 5, 0.03), imageClass);
 		} else if( name.compareTo(CALIB_SQUARE_GRID) == 0 ) {
 			detector = FactoryFiducial.calibSquareGrid(null,new ConfigGridDimen(4, 3, 0.03, 0.03), imageClass);
 		} else if( name.compareTo(CALIB_SQUARE_BINARY_GRID) == 0 ) {

@@ -68,7 +68,7 @@ public class ExampleCalibrateMonocular {
 //		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Square"),"left", null);
 
 		// Chessboard Example
-		detector = FactoryFiducialCalibration.chessboard2(null,new ConfigGridDimen(7, 5, 30));
+		detector = FactoryFiducialCalibration.chessboard(null,new ConfigGridDimen(7, 5, 30));
 		images = UtilIO.listByPrefix(UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess"),"left", null);
 
 		// Declare and setup the calibration algorithm

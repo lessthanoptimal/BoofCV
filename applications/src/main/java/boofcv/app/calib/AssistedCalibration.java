@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.app.calib;
 
-import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
+import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardOld;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
@@ -158,7 +158,7 @@ public class AssistedCalibration {
 		this.quality = quality;
 		this.saver = new ImageSelectorAndSaver(new File(outputDir,imageDirectory).getPath());
 
-		if( detector instanceof CalibrationDetectorChessboard) {
+		if( detector instanceof CalibrationDetectorChessboardOld) {
 			view = new CalibrationView.Chessboard();
 		} else if( detector instanceof CalibrationDetectorSquareGrid) {
 			view = new CalibrationView.SquareGrid();

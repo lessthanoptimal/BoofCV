@@ -57,13 +57,13 @@ public class FactoryFiducialCalibration {
 	 * @return Square grid target detector.
 	 */
 	@Deprecated
-	public static CalibrationDetectorChessboard chessboard(@Nullable ConfigChessboard configDet ,
-														   ConfigGridDimen configGrid ) {
+	public static CalibrationDetectorChessboardOld chessboardOld(@Nullable ConfigChessboardOld configDet ,
+																 ConfigGridDimen configGrid ) {
 		if( configDet == null )
-			configDet = new ConfigChessboard();
+			configDet = new ConfigChessboardOld();
 		configDet.checkValidity();
 
-		return new CalibrationDetectorChessboard(configDet,configGrid);
+		return new CalibrationDetectorChessboardOld(configDet,configGrid);
 	}
 
 	/**
@@ -75,12 +75,12 @@ public class FactoryFiducialCalibration {
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	public static CalibrationDetectorChessboard2 chessboard2(@Nullable ConfigChessboard2 config , ConfigGridDimen dimen ) {
+	public static CalibrationDetectorChessboard chessboard(@Nullable ConfigChessboard config , ConfigGridDimen dimen ) {
 		if( config == null )
-			config = new ConfigChessboard2();
+			config = new ConfigChessboard();
 		config.checkValidity();
 
-		return new CalibrationDetectorChessboard2(config,dimen);
+		return new CalibrationDetectorChessboard(config,dimen);
 	}
 
 	/**

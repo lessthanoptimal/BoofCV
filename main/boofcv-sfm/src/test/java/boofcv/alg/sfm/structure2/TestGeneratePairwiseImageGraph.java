@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestGeneratePairwiseImageGraph {
+class TestGeneratePairwiseImageGraph {
 
 	Random rand = new Random(234);
 
@@ -46,7 +46,7 @@ public class TestGeneratePairwiseImageGraph {
 	 * See if it gracefully handles 0 to 1 images
 	 */
 	@Test
-	public void process_0_to_1() {
+	void process_0_to_1() {
 		GeneratePairwiseImageGraph alg = new GeneratePairwiseImageGraph();
 
 		for( int numViews = 0; numViews < 2; numViews++ ) {
@@ -63,7 +63,7 @@ public class TestGeneratePairwiseImageGraph {
 	 * A fully connected scene with 3D structure
 	 */
 	@Test
-	public void process_connected() {
+	void process_connected() {
 		GeneratePairwiseImageGraph alg = new GeneratePairwiseImageGraph();
 
 		MockLookupSimilarImages similar = new MockLookupSimilarImages(4,123123);
@@ -97,7 +97,7 @@ public class TestGeneratePairwiseImageGraph {
 	}
 
 	@Test
-	public void createEdge_3D() {
+	void createEdge_3D() {
 		GeneratePairwiseImageGraph alg = new GeneratePairwiseImageGraph();
 		alg.graph.createNode("moo");
 		alg.graph.createNode("foo");
@@ -122,7 +122,7 @@ public class TestGeneratePairwiseImageGraph {
 	}
 
 	@Test
-	public void createEdge_Rotation() {
+	void createEdge_Rotation() {
 		GeneratePairwiseImageGraph alg = new GeneratePairwiseImageGraph();
 		alg.graph.createNode("moo");
 		alg.graph.createNode("foo");
@@ -147,7 +147,7 @@ public class TestGeneratePairwiseImageGraph {
 	}
 
 	@Test
-	public void createEdge_Planar() {
+	void createEdge_Planar() {
 		GeneratePairwiseImageGraph alg = new GeneratePairwiseImageGraph();
 		alg.graph.createNode("moo");
 		alg.graph.createNode("foo");

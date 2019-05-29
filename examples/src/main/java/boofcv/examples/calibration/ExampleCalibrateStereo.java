@@ -78,7 +78,7 @@ public class ExampleCalibrateStereo {
 	 */
 	public void setupBumblebeeChess() {
 		// Creates a detector and specifies its physical characteristics
-		detector = FactoryFiducialCalibration.chessboard2(null,new ConfigGridDimen(7, 5, 30));
+		detector = FactoryFiducialCalibration.chessboard(null,new ConfigGridDimen(7, 5, 30));
 
 		String directory = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 

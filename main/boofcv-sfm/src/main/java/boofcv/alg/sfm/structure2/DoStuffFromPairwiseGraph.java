@@ -115,7 +115,7 @@ public class DoStuffFromPairwiseGraph {
 	}
 
 	private List<SeedInfo> selectSeeds(PairwiseImageGraph2 graph, Map<Integer, SeedInfo> mapScores) {
-		// Greedily assign nodes as seeds while making their neighbors as not seeds
+		// Greedily assign nodes as seeds while marking their neighbors as not seeds
 		int maxSeeds = Math.max(1,graph.nodes.size/5);
 		List<SeedInfo> seeds = new ArrayList<>();
 		Collections.sort(scoresNodes);

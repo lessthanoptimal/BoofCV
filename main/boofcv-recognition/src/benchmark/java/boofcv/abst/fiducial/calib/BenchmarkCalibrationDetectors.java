@@ -41,9 +41,9 @@ public class BenchmarkCalibrationDetectors {
 	public static GrayF32 imageChess;
 	public static GrayF32 imageSquare;
 
-	public static class Chessboard extends PerformerBase {
+	public static class ChessboardOld extends PerformerBase {
 		DetectorFiducialCalibration detector = FactoryFiducialCalibration.
-				chessboard((ConfigChessboard)null,new ConfigGridDimen(7, 5, 30));
+				chessboardOld((ConfigChessboardOld)null,new ConfigGridDimen(7, 5, 30));
 
 		@Override
 		public void process() {
@@ -81,7 +81,7 @@ public class BenchmarkCalibrationDetectors {
 		imageChess = loadImage(chess);
 		imageSquare = loadImage(square);
 
-		ProfileOperation.printOpsPerSec(new Chessboard(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new ChessboardOld(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Square(), TEST_TIME);
 	}
 }

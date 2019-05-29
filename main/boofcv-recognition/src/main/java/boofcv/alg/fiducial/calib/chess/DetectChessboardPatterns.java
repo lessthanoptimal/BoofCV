@@ -18,7 +18,7 @@
 
 package boofcv.alg.fiducial.calib.chess;
 
-import boofcv.abst.fiducial.calib.ConfigChessboard2;
+import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
 import boofcv.alg.feature.detect.chess.DetectChessboardCornersPyramid;
@@ -41,7 +41,7 @@ public class DetectChessboardPatterns<T extends ImageGray<T>> {
 
 	protected FastQueue<GridInfo> found = new FastQueue<>(GridInfo.class,true);
 
-	public DetectChessboardPatterns(ConfigChessboard2 config , Class<T> imageType ) {
+	public DetectChessboardPatterns(ConfigChessboard config , Class<T> imageType ) {
 
 		detector = new DetectChessboardCornersPyramid<>(imageType);
 		clusterFinder = new ChessboardCornerClusterFinder<>(imageType);

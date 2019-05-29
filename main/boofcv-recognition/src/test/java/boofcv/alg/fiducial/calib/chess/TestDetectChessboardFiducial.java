@@ -19,7 +19,7 @@
 package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.abst.distort.FDistort;
-import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigChessboardOld;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.misc.ImageMiscOps;
@@ -92,7 +92,7 @@ public class TestDetectChessboardFiducial {
 //		ShowImages.showWindow(gray,"Rendered Image");
 //		try { Thread.sleep(1000); } catch (InterruptedException e) {}
 
-		ConfigChessboard configDet = new ConfigChessboard();
+		ConfigChessboardOld configDet = new ConfigChessboardOld();
 		ConfigGridDimen configChess = new ConfigGridDimen(5, 5, 1);
 
 		DetectPolygonBinaryGrayRefine<GrayF32> detectorSquare =

@@ -81,7 +81,7 @@ public class ExamplePoseOfCalibrationTarget {
 		// Let's use the FiducialDetector interface since it is much easier than coding up
 		// the entire thing ourselves.  Look at FiducialDetector's code if you want to understand how it works.
 		CalibrationFiducialDetector<GrayF32> detector =
-				FactoryFiducial.calibChessboard2(null,new ConfigGridDimen(4, 5, 0.03),GrayF32.class);
+				FactoryFiducial.calibChessboard(null,new ConfigGridDimen(4, 5, 0.03),GrayF32.class);
 
 		detector.setLensDistortion(lensDistortion,intrinsic.width,intrinsic.height);
 

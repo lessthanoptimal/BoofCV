@@ -18,61 +18,74 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
+import boofcv.alg.feature.detect.chess.DetectChessboardCornersPyramid;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
+import boofcv.alg.fiducial.calib.chess.DetectChessboardPatterns;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
-import boofcv.factory.filter.binary.FactoryThresholdBinary;
-import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.struct.distort.PixelTransform;
-import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.distort.Point2Transform2_F64;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
-import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper around {@link DetectChessboardFiducial} for {@link DetectorFiducialCalibration}
+ * Detector for chessboard calibration targets. Returns the first chessboard which is detected and matches
+ * the expected size
  * 
  * @author Peter Abeles
  */
-@Deprecated
-public class CalibrationDetectorChessboard implements DetectorFiducialCalibration {
+public class CalibrationDetectorChessboard
+		extends DetectChessboardPatterns<GrayF32>
+		implements DetectorFiducialCalibration {
 
-	DetectChessboardFiducial<GrayF32> alg;
+	int cornerRows,cornerCols;
 
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
 
-	public CalibrationDetectorChessboard(ConfigChessboard configDet, ConfigGridDimen configGrid ) {
+	// transform from input pixels to undistorted pixels
+	Point2Transform2_F64 pixel2undist;
 
-		DetectPolygonBinaryGrayRefine<GrayF32> detectorSquare =
-				FactoryShapeDetector.polygon(configDet.square,GrayF32.class);
+	public CalibrationDetectorChessboard(ConfigChessboard config, ConfigGridDimen shape ) {
+		super(config, GrayF32.class);
 
-		InputToBinary<GrayF32> inputToBinary =
-				FactoryThresholdBinary.threshold(configDet.thresholding,GrayF32.class);
+		cornerRows = shape.numRows-1;
+		cornerCols = shape.numCols-1;
 
-		alg = new DetectChessboardFiducial<>(
-				configGrid.numRows, configGrid.numCols, configDet.maximumCornerDistance,detectorSquare,inputToBinary);
+		layoutPoints = gridChess(shape.numRows, shape.numCols, shape.shapeSize);
 
-		layoutPoints = gridChess(configGrid.numRows, configGrid.numCols, configGrid.shapeSize);
+		clusterToGrid.setCheckShape((r,c)->r==cornerRows&&c==cornerCols);
 	}
 
 	@Override
 	public boolean process(GrayF32 input) {
-		detected = new CalibrationObservation(input.width,input.height);
-		if( alg.process(input) )  {
-			List<Point2D_F64> found = alg.getCalibrationPoints();
-			for (int i = 0; i < found.size(); i++) {
-				detected.add( found.get(i) , i );
+		super.findPatterns(input);
+
+		if( found.size >= 1 ) {
+			detected = new CalibrationObservation(input.width, input.height);
+			GridInfo info = found.get(0);
+
+			for (int i = 0; i < info.nodes.size(); i++) {
+				detected.add(info.nodes.get(i), i);
 			}
+
+			// remove lens distortion
+			if( pixel2undist != null ) {
+				for (int i = 0; i < info.nodes.size(); i++) {
+					PointIndex2D_F64 p = detected.points.get(i);
+					pixel2undist.compute(p.x,p.y,p);
+				}
+			}
+
 			return true;
 		} else {
+			detected = new CalibrationObservation(input.width, input.height);
 			return false;
 		}
 	}
@@ -89,37 +102,31 @@ public class CalibrationDetectorChessboard implements DetectorFiducialCalibratio
 
 	@Override
 	public void setLensDistortion(LensDistortionNarrowFOV distortion, int width, int height) {
-		if( distortion == null ) {
-			alg.getFindSeeds().getDetectorSquare().setLensDistortion(width, height, null, null);
-		} else {
-			Point2Transform2_F32 pointDistToUndist = distortion.undistort_F32(true, true);
-			Point2Transform2_F32 pointUndistToDist = distortion.distort_F32(true, true);
-			PixelTransform<Point2D_F32> distToUndist = new PointToPixelTransform_F32(pointDistToUndist);
-			PixelTransform<Point2D_F32> undistToDist = new PointToPixelTransform_F32(pointUndistToDist);
-
-			alg.getFindSeeds().getDetectorSquare().setLensDistortion(width,height,distToUndist,undistToDist);
+		if( distortion == null )
+			pixel2undist = null;
+		else {
+			pixel2undist = distortion.undistort_F64(true, true);
 		}
 	}
 
-	/**
-	 * Returns number of rows in the chessboard grid
-	 * @return number of rows
-	 */
-	public int getGridRows() {
-		return alg.getRows();
+	public DetectChessboardCornersPyramid getDetector() {
+		return detector;
 	}
 
-	/**
-	 * Returns number of columns in the chessboard grid
-	 * @return number of columns
-	 */
-	public int getGridColumns() {
-		return alg.getColumns();
+	public ChessboardCornerClusterFinder getClusterFinder() {
+		return clusterFinder;
 	}
 
+	public ChessboardCornerClusterToGrid getClusterToGrid() {
+		return clusterToGrid;
+	}
 
-	public DetectChessboardFiducial<GrayF32> getAlgorithm() {
-		return alg;
+	public int getCornerRows() {
+		return cornerRows;
+	}
+
+	public int getCornerCols() {
+		return cornerCols;
 	}
 
 	/**

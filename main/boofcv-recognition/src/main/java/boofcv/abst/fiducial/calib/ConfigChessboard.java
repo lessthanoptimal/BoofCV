@@ -18,12 +18,10 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
+import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.factory.filter.binary.ConfigThresholdLocalOtsu;
-import boofcv.factory.shape.ConfigPolygonDetector;
-import boofcv.struct.ConfigLength;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.struct.Configuration;
 
 /**
@@ -34,53 +32,74 @@ import boofcv.struct.Configuration;
  * @author Peter Abeles
  */
 public class ConfigChessboard implements Configuration {
-	/**
-	 * The maximum distance in pixels that two corners can be from each other.  In well focused image
-	 * this number can be only a few pixels.  The default value has been selected to handle blurred images.
-	 *
-	 * If relative it is relative to min(image.width,image.height)
-	 */
-	public ConfigLength maximumCornerDistance = ConfigLength.relative(8.0/800.0,8);
 
 	/**
-	 * Configuration for thresholding the image
+	 * Size of a corner in the corner detector. For very small targets 1 is required. Otherwise 2 provides
+	 * much more stable results.
 	 */
-//	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, ConfigLength.fixed(20));
-	public ConfigThreshold thresholding = new ConfigThresholdLocalOtsu(ConfigLength.relative(0.05,10),10);
+	public int cornerRadius = 2;
 
 	/**
-	 * Configuration for square detector.
-	 *
-	 * NOTE: Number of sides, clockwise, and convex are all set by the detector in its consturctor. Values
-	 * specified here are ignored.
+	 * Second threshold on corner intensity. This is applied after orientation has been estimated and is used
+	 * to remove false positives, like corners on a box.
 	 */
-	public ConfigPolygonDetector square = new ConfigPolygonDetector();
+	public double cornerThreshold = 1.0;
+
+	/**
+	 * Relative threshold for two corners being connected. The edge between them must have sufficient intensity.
+	 * The definition of sufficient is based on the corner's intensity
+	 */
+	public double edgeThreshold = 0.5;
+
+	/**
+	 * The minimum allowed size for the top most layer in the pyramid. size = min(width,height). To have
+	 * only one layer in the pyramid at the same resolution as the input set this to a value of &le; 0
+	 */
+	public int pyramidTopSize = 100;
+
+	/**
+	 * How similar the direction of two corners relative to each other need to be.
+	 */
+	public double directionTol = 0.60;
+
+	/**
+	 * How similar two corner orientations need to be
+	 */
+	public double orientaitonTol = 0.65;
+
+	/**
+	 * Ratio used to decide if two corners are spatially close enough to each other to be considered
+	 * as the same corner.
+	 */
+	public double ambiguousTol = 0.25;
+
+	/**
+	 * Maximum number of neighbors returned by nearest neighbor search
+	 */
+	public int maxNeighbors = 20;
+
+	/**
+	 * Maximum search distance for nearest neighbor search. Units = pixels.
+	 */
+	public double maxNeighborDistance = Double.MAX_VALUE;
+
+	/**
+	 * If true then a chessboard has to has to have at least one square which is connected to only one other
+	 * square. BoofCV calibration targets always have this requirements. Other projects might not.
+	 */
+	public boolean requireCornerSquares = false;
+
+	/**
+	 * Selection of threshold for binary image. Intensity image is the input.
+	 */
+	public ConfigThreshold threshold = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
 
 	{
-		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
-		thresholding.scale = 0.85;
-
-		((ConfigPolylineSplitMerge)square.detector.contourToPoly).cornerScorePenalty = 0.2;
-		((ConfigPolylineSplitMerge)square.detector.contourToPoly).minimumSideLength = 2;
-		((ConfigPolylineSplitMerge)square.detector.contourToPoly).thresholdSideSplitScore = 0;
-		// max side error is increased for  shapes which are parially outside of the image, but the local threshold
-		// makes them concave
-		((ConfigPolylineSplitMerge)square.detector.contourToPoly).maxSideError = ConfigLength.relative(0.5,4);
-//		((ConfigPolylineSplitMerge)square.detector.contourToPoly).convexTest = 1000;
-		square.detector.tangentEdgeIntensity = 2.5; // the initial contour is the result of being eroded
-		square.detector.minimumContour = ConfigLength.fixed(10);
-		square.detector.canTouchBorder = true;
-
-		// defaults for if the user toggles it to lines
-		square.refineGray.cornerOffset = 1;
-		square.refineGray.sampleRadius = 3;
-		square.refineGray.lineSamples = 15;
-		square.refineGray.convergeTolPixels = 0.2;
-		square.refineGray.maxIterations = 5;
+		threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
+		threshold.scale = 1.0;
+		threshold.down = false;
 	}
-
 
 	@Override
-	public void checkValidity() {
-	}
+	public void checkValidity() {}
 }

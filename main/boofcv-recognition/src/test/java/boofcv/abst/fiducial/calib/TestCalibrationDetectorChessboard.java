@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static boofcv.abst.fiducial.calib.CalibrationDetectorChessboard.gridChess;
+import static boofcv.abst.fiducial.calib.CalibrationDetectorChessboardOld.gridChess;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**

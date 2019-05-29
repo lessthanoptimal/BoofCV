@@ -99,7 +99,6 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				CalibrateFisheyePlanarGuiApp.class,
 				CalibrateStereoPlanarGuiApp.class,
 				DetectCalibrationChessboardApp.class,
-				DetectCalibrationChessboard2App.class,
 				DetectCalibrationSquareGridApp.class,
 				DetectCalibrationCircleHexagonalApp.class,
 				DetectCalibrationCircleRegularApp.class);

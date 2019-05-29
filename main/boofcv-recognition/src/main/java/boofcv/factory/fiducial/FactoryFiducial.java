@@ -121,15 +121,23 @@ public class FactoryFiducial {
 	 */
 	@Deprecated
 	public static <T extends ImageGray<T>>
-	CalibrationFiducialDetector<T> calibChessboard( @Nullable ConfigChessboard config,
-													ConfigGridDimen dimen, Class<T> imageType) {
+	CalibrationFiducialDetector<T> calibChessboardOld(@Nullable ConfigChessboardOld config,
+													  ConfigGridDimen dimen, Class<T> imageType) {
 		return new CalibrationFiducialDetector<>(config, dimen, imageType);
 	}
 
+	/**
+	 * Wrapper around chessboard calibration detector.   Refine with lines is set to true automatically.  This
+	 * isn't being used for calibration and its better to use the whole line.
+	 *
+	 * @param config Description of the chessboard.
+	 * @param imageType Type of image it's processing
+	 * @return FiducialDetector
+	 */
 	public static <T extends ImageGray<T>>
-	CalibrationFiducialDetector<T> calibChessboard2( @Nullable ConfigChessboard2 config,
-													 ConfigGridDimen dimen,
-													 Class<T> imageType) {
+	CalibrationFiducialDetector<T> calibChessboard(@Nullable ConfigChessboard config,
+												   ConfigGridDimen dimen,
+												   Class<T> imageType) {
 		return new CalibrationFiducialDetector<>(config, dimen, imageType);
 	}
 

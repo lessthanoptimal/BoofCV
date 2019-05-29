@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.app.calib;
 
-import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
+import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardOld;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
@@ -67,7 +67,7 @@ public interface CalibrationView {
 		int pointRows,pointCols;
 
 		public void initialize( DetectorFiducialCalibration detector ) {
-			CalibrationDetectorChessboard chessboard = (CalibrationDetectorChessboard)detector;
+			CalibrationDetectorChessboardOld chessboard = (CalibrationDetectorChessboardOld)detector;
 			this.numRows = chessboard.getGridRows();
 			this.numCols = chessboard.getGridColumns();
 
