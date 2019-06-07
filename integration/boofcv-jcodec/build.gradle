@@ -4,7 +4,7 @@ dependencies {
     api project(':main:boofcv-io')
     api project(':integration:boofcv-swing')
 
-    compile group: 'org.jcodec', name: 'jcodec', version: '0.1.9'
+    compile group: 'org.jcodec', name: 'jcodec', version: '0.2.3'
 }
 
 sourceSets {

@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
-import org.jcodec.common.NIOUtils;
+import org.jcodec.common.io.NIOUtils;
 import org.jcodec.common.model.Picture;
 
 import java.awt.image.BufferedImage;
@@ -124,7 +124,7 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 	@Override
 	public void reset() {
 		try {
-			grabber = new FrameGrab(NIOUtils.readableFileChannel(new File(filename)));
+			grabber = FrameGrab.createFrameGrab(NIOUtils.readableFileChannel(filename));
 		} catch (IOException | JCodecException e) {
 			throw new RuntimeException(e);
 		}
