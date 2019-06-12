@@ -123,7 +123,7 @@ public class BundleAdjustmentMetricResidualFunction
 				SceneObservations.View obsView = observations.views[viewIndex];
 				for (int i = 0; i < obsView.size(); i++) {
 					obsView.get(i, observedPixel);
-					SceneStructureMetric.Point worldPt = structure.points[observedPixel.index];
+					SceneStructureMetric.Point worldPt = structure.points.data[observedPixel.index];
 					worldPt.get(p3);
 
 					SePointOps_F64.transform(view.worldToView, p3, cameraPt);
@@ -185,7 +185,7 @@ public class BundleAdjustmentMetricResidualFunction
 
 				for (int i = 0; i < obsView.size(); i++) {
 					obsView.get(i, observedPixel);
-					SceneStructureMetric.Point worldPt = structure.points[observedPixel.index];
+					SceneStructureMetric.Point worldPt = structure.points.data[observedPixel.index];
 					worldPt.get(p4);
 
 					SePointOps_F64.transform(view.worldToView, p4, cameraPt);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.abst.geo.bundle;
 
+import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 
 /**
@@ -29,7 +30,7 @@ import org.ejml.data.DMatrixRMaj;
  */
 public class SceneStructureProjective extends SceneStructureCommon
 {
-	public View[] views;
+	public final FastQueue<View> views = new FastQueue<>(View.class,true);
 
 	/**
 	 * Configure bundle adjustment
@@ -46,14 +47,15 @@ public class SceneStructureProjective extends SceneStructureCommon
 	 * @param totalPoints Number of points
 	 */
 	public void initialize( int totalViews , int totalPoints ) {
-		views = new View[totalViews];
-		points = new Point[totalPoints];
+		views.resize(totalViews);
+		points.resize(totalPoints);
 
-		for (int i = 0; i < views.length; i++) {
-			views[i] = new View();
+		for (int i = 0; i < views.size; i++) {
+			views.data[i].reset();
 		}
-		for (int i = 0; i < points.length; i++) {
-			points[i] = new Point(pointSize);
+
+		for (int i = 0; i < points.size; i++) {
+			points.data[i].reset();
 		}
 	}
 	/**
@@ -66,10 +68,10 @@ public class SceneStructureProjective extends SceneStructureCommon
 	 */
 	public void setView(int which , boolean fixed , DMatrixRMaj worldToView ,
 						int width , int height ) {
-		views[which].known = fixed;
-		views[which].worldToView.set(worldToView);
-		views[which].width = width;
-		views[which].height = height;
+		views.data[which].known = fixed;
+		views.data[which].worldToView.set(worldToView);
+		views.data[which].width = width;
+		views.data[which].height = height;
 	}
 
 	/**
@@ -78,8 +80,8 @@ public class SceneStructureProjective extends SceneStructureCommon
 	 */
 	public int getUnknownViewCount() {
 		int total = 0;
-		for (int i = 0; i < views.length; i++) {
-			if( !views[i].known) {
+		for (int i = 0; i < views.size; i++) {
+			if( !views.data[i].known) {
 				total++;
 			}
 		}
@@ -92,10 +94,10 @@ public class SceneStructureProjective extends SceneStructureCommon
 	 */
 	@Override
 	public int getParameterCount() {
-		return getUnknownViewCount()*12 + points.length*pointSize;
+		return getUnknownViewCount()*12 + points.size*pointSize;
 	}
 
-	public View[] getViews() {
+	public FastQueue<View> getViews() {
 		return views;
 	}
 
@@ -115,6 +117,12 @@ public class SceneStructureProjective extends SceneStructureCommon
 		 * pixel observations, and X is the 3D feature.
 		 */
 		public DMatrixRMaj worldToView = new DMatrixRMaj(3,4);
+
+		public void reset() {
+			known = false;
+			width = height = 0;
+			worldToView.zero();
+		}
 	}
 
 }

@@ -131,7 +131,7 @@ public class CodecBundleAdjustmentInTheLarge {
     public void save( File file ) throws IOException {
         PrintStream writer = new PrintStream(file);
 
-        writer.println(scene.views.length+" "+scene.points.length+" "+observations.getObservationCount());
+        writer.println(scene.views.length+" "+scene.points.size+" "+observations.getObservationCount());
 
         PointIndex2D_F64 o = new PointIndex2D_F64();
         for (int viewIdx = 0; viewIdx < observations.views.length; viewIdx++) {
@@ -159,8 +159,8 @@ public class CodecBundleAdjustmentInTheLarge {
             writer.printf("%.10f\n%.10f\n%.10f\n",camera.f,camera.k1,camera.k2);
         }
 
-        for (int pointId = 0; pointId < scene.points.length; pointId++) {
-            SceneStructureMetric.Point p = scene.points[pointId];
+        for (int pointId = 0; pointId < scene.points.size; pointId++) {
+            SceneStructureMetric.Point p = scene.points.data[pointId];
             writer.printf("%.10f\n%.10f\n%.10f\n",p.coordinate[0],p.coordinate[1],p.coordinate[2]);
         }
         writer.close();

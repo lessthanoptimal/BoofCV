@@ -20,6 +20,7 @@ package boofcv.abst.geo.bundle;
 
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
@@ -29,7 +30,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  * @author Peter Abeles
  */
 public abstract class SceneStructureCommon implements SceneStructure {
-	public Point[] points;
+	public final FastQueue<Point> points;
 	/**
 	 * True if homogenous coordinates are being used
 	 */
@@ -40,6 +41,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	public SceneStructureCommon(boolean homogenous) {
 		this.homogenous = homogenous;
 		pointSize = homogenous ? 4 : 3;
+		points = new FastQueue<>(Point.class,()->new Point(pointSize));
 	}
 
 	/**
@@ -50,7 +52,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	 * @param z coordinate along z-axis
 	 */
 	public void setPoint( int which , double x , double y , double z ) {
-		points[which].set(x,y,z);
+		points.data[which].set(x,y,z);
 	}
 
 	/**
@@ -62,7 +64,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	 * @param w w-coordinate
 	 */
 	public void setPoint( int which , double x , double y , double z , double w) {
-		points[which].set(x,y,z,w);
+		points.data[which].set(x,y,z,w);
 	}
 
 	/**
@@ -71,7 +73,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	 * @param viewIndex index of view
 	 */
 	public void connectPointToView( int pointIndex , int viewIndex ) {
-		SceneStructureMetric.Point p = points[pointIndex];
+		Point p = points.data[pointIndex];
 
 		for (int i = 0; i < p.views.size; i++) {
 			if( p.views.data[i] == viewIndex )
@@ -80,7 +82,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		p.views.add(viewIndex);
 	}
 
-	public SceneStructureMetric.Point[] getPoints() {
+	public FastQueue<Point> getPoints() {
 		return points;
 	}
 
@@ -91,18 +93,7 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	 * @param which Ordered list of point indexes to remove
 	 */
 	public void removePoints( GrowQueue_I32 which ) {
-		SceneStructureMetric.Point results[] = new SceneStructureMetric.Point[points.length-which.size];
-
-		int indexWhich = 0;
-		for (int i = 0; i < points.length ; i++) {
-			if( indexWhich < which.size && which.data[indexWhich] == i ) {
-				indexWhich++;
-			} else {
-				results[i-indexWhich] = points[i];
-			}
-		}
-
-		points = results;
+		points.remove(which.data,0,which.size,null);
 	}
 
 	public static class Point {
@@ -119,6 +110,11 @@ public abstract class SceneStructureCommon implements SceneStructure {
 
 		public Point( int dof ) {
 			coordinate = new double[dof];
+		}
+
+		public void reset() {
+			views.reset();
+			coordinate[0] = Double.NaN;
 		}
 
 		/**
@@ -218,8 +214,8 @@ public abstract class SceneStructureCommon implements SceneStructure {
 
 	public int getObservationCount() {
 		int total = 0;
-		for (int i = 0; i < points.length; i++) {
-			total += points[i].views.size;
+		for (int i = 0; i < points.size; i++) {
+			total += points.data[i].views.size;
 		}
 		return total;
 	}

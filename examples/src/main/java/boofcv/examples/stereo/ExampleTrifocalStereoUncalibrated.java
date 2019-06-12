@@ -397,13 +397,13 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		int totalBehind = 0;
 		Point3D_F64 X = new Point3D_F64();
-		for (int i = 0; i < structure.points.length; i++) {
-			structure.points[i].get(X);
+		for (int i = 0; i < structure.points.size; i++) {
+			structure.points.data[i].get(X);
 			if( X.z < 0 )
 				totalBehind++;
 		}
 		structure.views[1].worldToView.T.print();
-		if( totalBehind > structure.points.length/2 ) {
+		if( totalBehind > structure.points.size/2 ) {
 			System.out.println("Flipping because it's reversed. score = "+bundleAdjustment.getFitScore());
 			for (int i = 1; i < structure.views.length; i++) {
 				Se3_F64 w2v = structure.views[i].worldToView;
@@ -415,7 +415,7 @@ public class ExampleTrifocalStereoUncalibrated {
 			bundleAdjustment.optimize(structure);
 			System.out.println("  after = "+bundleAdjustment.getFitScore());
 		} else {
-			System.out.println("Points not behind camera. "+totalBehind+" / "+structure.points.length);
+			System.out.println("Points not behind camera. "+totalBehind+" / "+structure.points.size);
 		}
 	}
 

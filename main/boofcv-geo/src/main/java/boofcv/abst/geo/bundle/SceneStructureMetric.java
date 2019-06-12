@@ -77,7 +77,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	public void initialize( int totalCameras , int totalViews , int totalPoints , int totalRigid ) {
 		cameras = new Camera[totalCameras];
 		views = new View[totalViews];
-		points = new Point[totalPoints];
+		points.resize(totalPoints);
 		rigids = new Rigid[totalRigid];
 
 		for (int i = 0; i < cameras.length; i++) {
@@ -86,8 +86,8 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		for (int i = 0; i < views.length; i++) {
 			views[i] = new View();
 		}
-		for (int i = 0; i < points.length; i++) {
-			points[i] = new Point(pointSize);
+		for (int i = 0; i < points.size; i++) {
+			points.data[i].reset();
 		}
 
 		for (int i = 0; i < rigids.length; i++) {
@@ -263,7 +263,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 */
 	@Override
 	public int getParameterCount() {
-		return getUnknownViewCount()*6 + getUnknownRigidCount()*6 + points.length*pointSize + getUnknownCameraParameterCount();
+		return getUnknownViewCount()*6 + getUnknownRigidCount()*6 + points.size*pointSize + getUnknownCameraParameterCount();
 	}
 
 	public Camera[] getCameras() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,13 +38,13 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public abstract class GenericBundleAdjustmentProjectiveChecks {
+abstract class GenericBundleAdjustmentProjectiveChecks {
 	Random rand = new Random(234);
 
-	public abstract BundleAdjustment<SceneStructureProjective> createAlg();
+	abstract BundleAdjustment<SceneStructureProjective> createAlg();
 
 	@Test
-	public void horizontalPerfect() {
+	void horizontalPerfect() {
 		BundleAdjustment<SceneStructureProjective> alg = createAlg();
 
 		Tuple2<SceneStructureProjective, SceneObservations> a = createHorizontalMotion( 123);
@@ -60,7 +60,7 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 	 * Same solution when called multiple times in a row. Checks to see if it is correctly reset
 	 */
 	@Test
-	public void multipleCalls() {
+	void multipleCalls() {
 		BundleAdjustment<SceneStructureProjective> alg = createAlg();
 
 		Tuple2<SceneStructureProjective, SceneObservations> a = createHorizontalMotion( 123);
@@ -76,7 +76,7 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 	}
 
 	@Test
-	public void horizontalNoisyObs() {
+	void horizontalNoisyObs() {
 		BundleAdjustment<SceneStructureProjective> alg = createAlg();
 
 		Tuple2<SceneStructureProjective, SceneObservations> a = createHorizontalMotion( 123);
@@ -99,7 +99,7 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 	}
 
 	@Test
-	public void horizontalNoisyFeatures() {
+	void horizontalNoisyFeatures() {
 		BundleAdjustment<SceneStructureProjective> alg = createAlg();
 
 		Tuple2<SceneStructureProjective, SceneObservations> a = createHorizontalMotion( 123);
@@ -121,8 +121,8 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 
 	private void addNoiseToPoint3D(Tuple2<SceneStructureProjective, SceneObservations> a) {
 		SceneStructureProjective structure = a.data0;
-		for (int i = 0; i < structure.points.length; i++) {
-			SceneStructureProjective.Point p = structure.points[i];
+		for (int i = 0; i < structure.points.size; i++) {
+			SceneStructureProjective.Point p = structure.points.data[i];
 			p.coordinate[0] += rand.nextGaussian()*0.1;
 			p.coordinate[1] += rand.nextGaussian()*0.1;
 			p.coordinate[2] += rand.nextGaussian()*0.1;
@@ -130,7 +130,7 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 	}
 
 	@Test
-	public void horizontalNoisyPose() {
+	void horizontalNoisyPose() {
 		BundleAdjustment<SceneStructureProjective> alg = createAlg();
 
 		Tuple2<SceneStructureProjective, SceneObservations> a = createHorizontalMotion( 123);
@@ -138,8 +138,8 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 		// Add noise to every view pose estimate. Except 0 since that's the world coordinates and it's easier to check
 		// errors if that's unmolested
 		SceneStructureProjective structure = a.data0;
-		for (int i = 1; i < structure.views.length; i++) {
-			SceneStructureProjective.View v = structure.views[i];
+		for (int i = 1; i < structure.views.size; i++) {
+			SceneStructureProjective.View v = structure.views.data[i];
 			v.worldToView.data[3 ] += rand.nextGaussian()*0.1;
 			v.worldToView.data[7 ] += rand.nextGaussian()*0.1;
 			v.worldToView.data[11] += rand.nextGaussian()*0.1;
@@ -157,7 +157,7 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 		assertEquals(a.data0,b.data0,0.1);
 	}
 
-	public static void checkReprojectionError(SceneStructureProjective structure , SceneObservations observations , double tol ) {
+	static void checkReprojectionError(SceneStructureProjective structure , SceneObservations observations , double tol ) {
 
 
 		PointIndex2D_F64 o = new PointIndex2D_F64();
@@ -171,11 +171,11 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 
 				for (int j = 0; j < v.point.size; j++) {
 					v.get(j, o);
-					structure.points[o.index].get(p4);
+					structure.points.data[o.index].get(p4);
 					p3.x = p4.x/p4.w;
 					p3.y = p4.y/p4.w;
 					p3.z = p4.z/p4.w;
-					PerspectiveOps.renderPixel(structure.views[indexView].worldToView,p3,predicted);
+					PerspectiveOps.renderPixel(structure.views.data[indexView].worldToView,p3,predicted);
 					double residual = o.distance(predicted);
 					if (Math.abs(residual) > tol)
 						fail("Error is too large. " + residual);
@@ -188,8 +188,8 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 
 				for (int j = 0; j < v.point.size; j++) {
 					v.get(j, o);
-					structure.points[o.index].get(p3);
-					PerspectiveOps.renderPixel(structure.views[indexView].worldToView,p3,predicted);
+					structure.points.data[o.index].get(p3);
+					PerspectiveOps.renderPixel(structure.views.data[indexView].worldToView,p3,predicted);
 					double residual = o.distance(predicted);
 					if (Math.abs(residual) > tol)
 						fail("Error is too large. " + residual);
@@ -198,7 +198,7 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 		}
 	}
 
-	public static void assertEquals(SceneStructureProjective a , SceneStructureProjective b ,
+	static void assertEquals(SceneStructureProjective a , SceneStructureProjective b ,
 									double tolDistance ) {
 
 		Assertions.assertEquals(a.homogenous, b.homogenous);
@@ -207,16 +207,16 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 			Point4D_F64 pa = new Point4D_F64();
 			Point4D_F64 pb = new Point4D_F64();
 
-			for (int i = 0; i < a.points.length; i++) {
+			for (int i = 0; i < a.points.size; i++) {
 				// need to normalize the points first otherwise they can't be computed
-				a.points[i].normalizeH();
-				b.points[i].normalizeH();
-				double error = a.points[i].distance(b.points[i]);
+				a.points.data[i].normalizeH();
+				b.points.data[i].normalizeH();
+				double error = a.points.data[i].distance(b.points.data[i]);
 				assertTrue( error < tolDistance);
 			}
 		} else {
-			for (int i = 0; i < a.points.length; i++) {
-				double error = a.points[i].distance(b.points[i]);
+			for (int i = 0; i < a.points.size; i++) {
+				double error = a.points.data[i].distance(b.points.data[i]);
 				assertTrue( error < tolDistance);
 			}
 		}
@@ -224,7 +224,7 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 		// don't compare camera matrices because there are infinite equivalent solutions
 	}
 
-	public Tuple2<SceneStructureProjective, SceneObservations>
+	Tuple2<SceneStructureProjective, SceneObservations>
 	createHorizontalMotion( long seed )
 	{
 		Random rand = new Random(seed);
@@ -266,7 +266,7 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 				// see which views it's visible in
 				int count = 0;
 				for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
-					SceneStructureProjective.View v = structure.views[viewIndex];
+					SceneStructureProjective.View v = structure.views.data[viewIndex];
 					PerspectiveOps.renderPixel(v.worldToView,P,pixel);
 					if (pixel.x >= 0 && pixel.x < width && pixel.y >= 0 && pixel.y < width) {
 						count++;
@@ -274,7 +274,7 @@ public abstract class GenericBundleAdjustmentProjectiveChecks {
 				}
 				if (count >= 2) {
 					for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
-						SceneStructureProjective.View v = structure.views[viewIndex];
+						SceneStructureProjective.View v = structure.views.data[viewIndex];
 						PerspectiveOps.renderPixel(v.worldToView,P,pixel);
 						if (pixel.x >= 0 && pixel.x < width && pixel.y >= 0 && pixel.y < width) {
 							observations.getView(viewIndex).add(featureIndex, (float) pixel.x, (float) pixel.y);

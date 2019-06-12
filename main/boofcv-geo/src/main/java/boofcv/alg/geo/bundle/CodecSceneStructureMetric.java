@@ -54,8 +54,8 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 	public void decode(double[] input , SceneStructureMetric structure ) {
 		int index = 0;
 
-		for (int i = 0; i < structure.points.length; i++) {
-			SceneStructureMetric.Point p = structure.points[i];
+		for (int i = 0; i < structure.points.size; i++) {
+			SceneStructureMetric.Point p = structure.points.data[i];
 			p.coordinate[0] = input[index++];
 			p.coordinate[1] = input[index++];
 			p.coordinate[2] = input[index++];
@@ -104,8 +104,8 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 	public void encode(SceneStructureMetric structure , double[] output ) {
 		int index = 0;
 
-		for (int i = 0; i < structure.points.length; i++) {
-			SceneStructureMetric.Point p = structure.points[i];
+		for (int i = 0; i < structure.points.size; i++) {
+			SceneStructureMetric.Point p = structure.points.data[i];
 			output[index++] = p.coordinate[0];
 			output[index++] = p.coordinate[1];
 			output[index++] = p.coordinate[2];

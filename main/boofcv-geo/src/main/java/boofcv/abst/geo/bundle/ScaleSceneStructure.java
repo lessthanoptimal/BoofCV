@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -132,7 +132,7 @@ public class ScaleSceneStructure {
 	void computePixelScaling(SceneStructureProjective structure, SceneObservations observations) {
 		pixelScaling.reset();
 		if( scalePixelsUsingStats ) {
-			for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
+			for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 				SceneObservations.View so = observations.views[viewIdx];
 				int N = so.size();
 				double meanX=0,meanY=0;
@@ -152,8 +152,8 @@ public class ScaleSceneStructure {
 				pixelScaling.grow().set(meanX,meanY,stdX,stdY);
 			}
 		} else {
-			for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
-				SceneStructureProjective.View sv = structure.views[viewIdx];
+			for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
+				SceneStructureProjective.View sv = structure.views.data[viewIdx];
 				if( sv.width <= 0 || sv.height <= 0 ) {
 					throw new IllegalArgumentException("View width and height is unknown. Scale with statistics instead");
 				}
@@ -165,7 +165,7 @@ public class ScaleSceneStructure {
 	public void applyScaleToPixelsAndCameraMatrix(SceneStructureProjective structure ,
 										   SceneObservations observations )
 	{
-		for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
+		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			NormalizationPoint2D n = pixelScaling.get(viewIdx);
 
 			float cx = (float)n.meanX;
@@ -173,7 +173,7 @@ public class ScaleSceneStructure {
 			float stdX = (float)n.stdX;
 			float stdY = (float)n.stdY;
 
-			SceneStructureProjective.View v = structure.views[viewIdx];
+			SceneStructureProjective.View v = structure.views.data[viewIdx];
 			SceneObservations.View ov = observations.views[viewIdx];
 			for (int pixelIdx = 0; pixelIdx < ov.size(); pixelIdx++) {
 				int i = pixelIdx*2;
@@ -189,7 +189,7 @@ public class ScaleSceneStructure {
 	public void undoScaleToPixelsAndCameraMatrix(SceneStructureProjective structure ,
 												 SceneObservations observations )
 	{
-		for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
+		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			NormalizationPoint2D n = pixelScaling.get(viewIdx);
 
 			float cx = (float)n.meanX;
@@ -197,7 +197,7 @@ public class ScaleSceneStructure {
 			float stdX = (float)n.stdX;
 			float stdY = (float)n.stdY;
 
-			SceneStructureProjective.View v = structure.views[viewIdx];
+			SceneStructureProjective.View v = structure.views.data[viewIdx];
 			SceneObservations.View ov = observations.views[viewIdx];
 			for (int pixelIdx = 0; pixelIdx < ov.size(); pixelIdx++) {
 				int i = pixelIdx*2;
@@ -214,14 +214,14 @@ public class ScaleSceneStructure {
 	/**
 	 * For 3D points, computes the median value and variance along each dimension.
 	 */
-	void computePointStatistics(Point[] points ) {
-		final int length = points.length;
+	void computePointStatistics(FastQueue<Point> points ) {
+		final int length = points.size;
 		double v[] = new double[length];
 
 		for (int axis = 0; axis < 3; axis++) {
 			double maxAbs = 0;
 			for (int i = 0; i < length; i++) {
-				v[i] = points[i].coordinate[axis];
+				v[i] = points.get(i).coordinate[axis];
 				maxAbs = Math.max( maxAbs , Math.abs(v[i]));
 			}
 
@@ -234,7 +234,7 @@ public class ScaleSceneStructure {
 		}
 
 		for (int i = 0; i < length; i++) {
-			v[i] = points[i].distanceSq(medianPoint);
+			v[i] = points.get(i).distanceSq(medianPoint);
 		}
 		medianDistancePoint = Math.sqrt(QuickSelect.select(v,length/2,length));
 
@@ -252,8 +252,8 @@ public class ScaleSceneStructure {
 		Point3D_F64 a = new Point3D_F64();
 		Point3D_F64 c = new Point3D_F64();
 
-		for (int i = 0; i < structure.views.length; i++) {
-			SceneStructureProjective.View view = structure.views[i];
+		for (int i = 0; i < structure.views.size; i++) {
+			SceneStructureProjective.View view = structure.views.data[i];
 
 			// X_w = inv(A)*(X_c - T) let X_c = 0 then X_w = -inv(A)*T is center of camera in world
 			CommonOps_DDRM.extract(view.worldToView,0,0,A);
@@ -327,8 +327,8 @@ public class ScaleSceneStructure {
 			Point3D_F64 a = new Point3D_F64();
 			Point3D_F64 c = new Point3D_F64();
 
-			for (int i = 0; i < structure.views.length; i++) {
-				SceneStructureProjective.View view = structure.views[i];
+			for (int i = 0; i < structure.views.size; i++) {
+				SceneStructureProjective.View view = structure.views.data[i];
 
 				// X_w = inv(A)*(X_c - T) let X_c = 0 then X_w = -inv(A)*T is center of camera in world
 				CommonOps_DDRM.extract(view.worldToView, 0, 0, A);
@@ -352,8 +352,8 @@ public class ScaleSceneStructure {
 	}
 
 	private void undoNormPoints3D(SceneStructureCommon structure, double scale) {
-		for (int i = 0; i < structure.points.length; i++) {
-			Point p = structure.points[i];
+		for (int i = 0; i < structure.points.size; i++) {
+			Point p = structure.points.data[i];
 			p.coordinate[0] = p.coordinate[0]/scale + medianPoint.x;
 			p.coordinate[1] = p.coordinate[1]/scale + medianPoint.y;
 			p.coordinate[2] = p.coordinate[2]/scale + medianPoint.z;
@@ -384,8 +384,8 @@ public class ScaleSceneStructure {
 	void applyScaleToPoints3D(SceneStructureCommon structure) {
 		double scale = desiredDistancePoint / medianDistancePoint;
 
-		for (int i = 0; i < structure.points.length; i++) {
-			Point p = structure.points[i];
+		for (int i = 0; i < structure.points.size; i++) {
+			Point p = structure.points.data[i];
 			p.coordinate[0] = scale*(p.coordinate[0] - medianPoint.x);
 			p.coordinate[1] = scale*(p.coordinate[1] - medianPoint.y);
 			p.coordinate[2] = scale*(p.coordinate[2] - medianPoint.z);
@@ -395,10 +395,10 @@ public class ScaleSceneStructure {
 	void applyScaleToPointsHomogenous(SceneStructureCommon structure) {
 
 		Point4D_F64 p = new Point4D_F64();
-		for (int i = 0; i < structure.points.length; i++) {
-			structure.points[i].get(p);
+		for (int i = 0; i < structure.points.size; i++) {
+			structure.points.data[i].get(p);
 			p.normalize();
-			structure.points[i].set(p.x,p.y,p.z,p.w);
+			structure.points.data[i].set(p.x,p.y,p.z,p.w);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,38 +32,37 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestCodecSceneStructureProjective {
+class TestCodecSceneStructureProjective {
 	Random rand = new Random(234);
 
 	final static int width=300,height=200;
 
 	@Test
-	public void encode_decode() {
+	void encode_decode() {
 		SceneStructureProjective original = createScene3D(rand);
 
 		CodecSceneStructureProjective codec = new CodecSceneStructureProjective();
 
-		int N = original.getUnknownViewCount()*12 + original.points.length*3;
-		double param[] = new double[N];
+		int N = original.getUnknownViewCount()*12 + original.points.size*3;
+		double[] param = new double[N];
 		codec.encode(original,param);
 
 		SceneStructureProjective found = createScene3D(rand);
 		codec.decode(param,found);
 
-		for (int i = 0; i < original.points.length; i++) {
-			assertTrue( original.points[i].distance(found.points[i]) < UtilEjml.TEST_F64);
+		for (int i = 0; i < original.points.size; i++) {
+			assertTrue( original.points.data[i].distance(found.points.data[i]) < UtilEjml.TEST_F64);
 		}
 
-
-		for (int i = 0; i < original.views.length; i++) {
-			SceneStructureProjective.View o = original.views[i];
-			SceneStructureProjective.View f = found.views[i];
+		for (int i = 0; i < original.views.size; i++) {
+			SceneStructureProjective.View o = original.views.data[i];
+			SceneStructureProjective.View f = found.views.data[i];
 
 			assertTrue(MatrixFeatures_DDRM.isIdentical(o.worldToView,f.worldToView,UtilEjml.TEST_F64));
 		}
 	}
 
-	public static SceneStructureProjective createScene3D(Random rand ) {
+	static SceneStructureProjective createScene3D(Random rand ) {
 		SceneStructureProjective out = new SceneStructureProjective(false);
 
 		out.initialize(4,5);
@@ -87,16 +86,16 @@ public class TestCodecSceneStructureProjective {
 
 		// Assign first point to all views then the other points to just one view
 		for (int i = 0; i < 4; i++) {
-			out.points[0].views.add(i);
+			out.points.data[0].views.add(i);
 		}
-		for (int i = 1; i < out.points.length; i++) {
-			out.points[i].views.add( i-1);
+		for (int i = 1; i < out.points.size; i++) {
+			out.points.data[i].views.add( i-1);
 		}
 
 		return out;
 	}
 
-	public static SceneStructureProjective createSceneH(Random rand ) {
+	static SceneStructureProjective createSceneH(Random rand ) {
 		SceneStructureProjective out = new SceneStructureProjective(true);
 
 		out.initialize(4,5);
@@ -121,10 +120,10 @@ public class TestCodecSceneStructureProjective {
 
 		// Assign first point to all views then the other points to just one view
 		for (int i = 0; i < 4; i++) {
-			out.points[0].views.add(i);
+			out.points.data[0].views.add(i);
 		}
-		for (int i = 1; i < out.points.length; i++) {
-			out.points[i].views.add( i-1);
+		for (int i = 1; i < out.points.size; i++) {
+			out.points.data[i].views.add( i-1);
 		}
 
 		return out;

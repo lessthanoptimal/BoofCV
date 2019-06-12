@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -63,7 +63,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestMultiViewOps {
+class TestMultiViewOps {
 
 	Random rand = new Random(234);
 
@@ -88,7 +88,7 @@ public class TestMultiViewOps {
 	Vector3D_F64 line2 = new Vector3D_F64();
 	Vector3D_F64 line3 = new Vector3D_F64();
 
-	public TestMultiViewOps() {
+	TestMultiViewOps() {
 		worldToCam2 = new Se3_F64();
 		worldToCam3 = new Se3_F64();
 
@@ -113,7 +113,7 @@ public class TestMultiViewOps {
 	 * Check the trifocal tensor using its definition
 	 */
 	@Test
-	public void createTrifocal_CameraMatrix2() {
+	void createTrifocal_CameraMatrix2() {
 		TrifocalTensor found = MultiViewOps.createTrifocal(P2,P3,null);
 
 		List<Point3D_F64> points = UtilPoint3D_F64.random(new Point3D_F64(0,0,2),-1,1,-1,-1,-0.1,0.1,20,rand);
@@ -150,7 +150,7 @@ public class TestMultiViewOps {
 	 * Check using trifocal constraint
 	 */
 	@Test
-	public void createTrifocal_CameraMatrix3() {
+	void createTrifocal_CameraMatrix3() {
 		DMatrixRMaj P1 = PerspectiveOps.createCameraMatrix(worldToCam1.R,worldToCam1.T,K,null);
 		TrifocalTensor found = MultiViewOps.createTrifocal(P1,P2,P3,null);
 
@@ -178,7 +178,7 @@ public class TestMultiViewOps {
 	 * Check the trifocal tensor using its definition
 	 */
 	@Test
-	public void createTrifocal_SE() {
+	void createTrifocal_SE() {
 
 		TrifocalTensor found = MultiViewOps.createTrifocal(worldToCam2,worldToCam3,null);
 
@@ -206,7 +206,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void constraint_Trifocal_lll() {
+	void constraint_Trifocal_lll() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
 
 		computeLines(X, line1, line2, line3);
@@ -219,7 +219,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void constraint_Trifocal_pll() {
+	void constraint_Trifocal_pll() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
 
 		computeLines(X,line1,line2,line3);
@@ -234,7 +234,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void constraint_Trifocal_plp() {
+	void constraint_Trifocal_plp() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
 
 		computeLines(X,line1,line2,line3);
@@ -252,7 +252,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void constraint_Trifocal_ppl() {
+	void constraint_Trifocal_ppl() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
 
 		computeLines(X,line1,line2,line3);
@@ -270,7 +270,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void constraint_Trifocal_ppp() {
+	void constraint_Trifocal_ppp() {
 		// Point in 3D space being observed
 		Point3D_F64 X = new Point3D_F64(0.1,0.5,3);
 
@@ -291,7 +291,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void constraint_epipolar() {
+	void constraint_epipolar() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
 
 		Point2D_F64 p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
@@ -304,7 +304,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void constraint_homography() {
+	void constraint_homography() {
 
 		double d = 2;
 		Vector3D_F64 N = new Vector3D_F64(0,0,1);
@@ -323,7 +323,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void inducedHomography13() {
+	void inducedHomography13() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
 
 		computeLines(X,line1,line2,line3);
@@ -344,7 +344,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void inducedHomography12() {
+	void inducedHomography12() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
 
 		computeLines(X,line1,line2,line3);
@@ -365,7 +365,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void homographyStereo3Pts() {
+	void homographyStereo3Pts() {
 		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
 
 		DMatrixRMaj H = MultiViewOps.homographyStereo3Pts(common.F, common.p1, common.p2, common.p3);
@@ -374,7 +374,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void homographyStereoLinePt() {
+	void homographyStereoLinePt() {
 		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
 
 		PairLineNorm l1 = CommonHomographyInducedPlane.convert(common.p1,common.p2);
@@ -385,7 +385,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void homographyStereo2Lines() {
+	void homographyStereo2Lines() {
 		CommonHomographyInducedPlane common = new CommonHomographyInducedPlane();
 
 		PairLineNorm l1 = CommonHomographyInducedPlane.convert(common.p1,common.p2);
@@ -432,7 +432,7 @@ public class TestMultiViewOps {
 
 
 	@Test
-	public void extractEpipoles_threeview() {
+	void extractEpipoles_threeview() {
 		Point3D_F64 found2 = new Point3D_F64();
 		Point3D_F64 found3 = new Point3D_F64();
 
@@ -455,7 +455,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void extractFundamental_threeview() {
+	void extractFundamental_threeview() {
 		DMatrixRMaj found2 = new DMatrixRMaj(3,3);
 		DMatrixRMaj found3 = new DMatrixRMaj(3,3);
 
@@ -481,7 +481,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void extractCameraMatrices() {
+	void extractCameraMatrices() {
 		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
 		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
 
@@ -511,7 +511,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void createEssential() {
+	void createEssential() {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.05, -0.04, 0.1, null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 		T.normalize();
@@ -529,7 +529,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void computeFundamental() {
+	void computeFundamental() {
 		DMatrixRMaj E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T, null);
 		DMatrixRMaj F = MultiViewOps.createFundamental(E, K);
 
@@ -541,7 +541,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void computeFundamental2() {
+	void computeFundamental2() {
 		DMatrixRMaj K2 = new DMatrixRMaj(3,3,true,80,0.02,190,0,30,170,0,0,1);
 
 		DMatrixRMaj E = MultiViewOps.createEssential(worldToCam2.R, worldToCam2.T, null);
@@ -555,7 +555,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void createHomography_calibrated() {
+	void createHomography_calibrated() {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.01,0.2, null);
 		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);
 		T.normalize();
@@ -578,7 +578,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void createHomography_uncalibrated() {
+	void createHomography_uncalibrated() {
 		DMatrixRMaj K = new DMatrixRMaj(3,3,true,0.1,0.001,200,0,0.2,250,0,0,1);
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.01,0.2, null);
 		Vector3D_F64 T = new Vector3D_F64(1,1,0.1);
@@ -604,7 +604,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void extractEpipoles_stereo() {
+	void extractEpipoles_stereo() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(400,400,0.1,410,399);
 		for (int i = 0; i < 100; i++) {
 			double rotX = rand.nextGaussian();
@@ -641,7 +641,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void fundamentalToProjective_Two() {
+	void fundamentalToProjective_Two() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		Se3_F64 T = SpecialEuclideanOps_F64.eulerXyz(0.5,0.7,-0.3,EulerType.XYZ,1,2,-0.5,null);
 
@@ -674,7 +674,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void projectiveToFundamental_Two() {
+	void projectiveToFundamental_Two() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 400, 405);
 		Se3_F64 M11 = new Se3_F64();
 		Se3_F64 M12 = SpecialEuclideanOps_F64.eulerXyz(-1, 0, -0.2, EulerType.XYZ, 0,-.2, 0, null);
@@ -697,7 +697,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void fundamentalToEssential() {
+	void fundamentalToEssential() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		for (int i = 0; i < 50; i++) {
 			double Tx = rand.nextGaussian();
@@ -802,7 +802,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void decomposeMetricCamera() {
+	void decomposeMetricCamera() {
 		// compute an arbitrary projection matrix from known values
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 
@@ -838,7 +838,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void decomposeEssential() {
+	void decomposeEssential() {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,1,2,-0.5,null);
 		Vector3D_F64 T = new Vector3D_F64(0.5,0.7,-0.3);
 
@@ -871,7 +871,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void decomposeHomography() {
+	void decomposeHomography() {
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.2, -0.06, -0.05, null);
 		Vector3D_F64 T = new Vector3D_F64(2,1,-3);
 
@@ -897,7 +897,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void transfer13_PL() {
+	void transfer13_PL() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
 
 		computeLines(X,line1,line2,line3);
@@ -917,7 +917,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void transfer13_PP() {
+	void transfer13_PP() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
@@ -936,7 +936,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void transfer12_PL() {
+	void transfer12_PL() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
 
 		computeLines(X,line1,line2,line3);
@@ -956,7 +956,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void transfer12_PP() {
+	void transfer12_PP() {
 		Point3D_F64 X = new Point3D_F64(0.1,-0.05,2);
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
@@ -975,7 +975,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void projectiveToMetric() {
+	void projectiveToMetric() {
 		// Construct a projective camera matrix from its definition
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		Se3_F64 T = SpecialEuclideanOps_F64.eulerXyz(0.5,0.7,-0.3,EulerType.XYZ,1,2,-0.5,null);
@@ -1001,7 +1001,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void projectiveToMetricKnownK() {
+	void projectiveToMetricKnownK() {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(200, 250, 0.0, 100, 110);
 		for (int i = 0; i < 50; i++) {
 			double Tx = rand.nextGaussian();
@@ -1034,7 +1034,7 @@ public class TestMultiViewOps {
 	 * Give it a valid Q but have the sign be inverted
 	 */
 	@Test
-	public void enforceAbsoluteQuadraticConstraints_negative() {
+	void enforceAbsoluteQuadraticConstraints_negative() {
 		Equation eq = new Equation();
 		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("p=rand(3,1)");
@@ -1059,7 +1059,7 @@ public class TestMultiViewOps {
 	 * Give it a valid Q but request that zeros be constrained
 	 */
 	@Test
-	public void enforceAbsoluteQuadraticConstraints_zeros() {
+	void enforceAbsoluteQuadraticConstraints_zeros() {
 		Equation eq = new Equation();
 		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("p=rand(3,1)");
@@ -1084,7 +1084,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void decomposeAbsDualQuadratic() {
+	void decomposeAbsDualQuadratic() {
 		Equation eq = new Equation();
 		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("w=K*K'");
@@ -1108,7 +1108,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void absoluteQuadraticToH() {
+	void absoluteQuadraticToH() {
 		Equation eq = new Equation();
 		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("p=rand(3,1)");
@@ -1128,7 +1128,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void rectifyHToAbsoluteQuadratic() {
+	void rectifyHToAbsoluteQuadratic() {
 		Equation eq = new Equation();
 		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("p=rand(3,1)");
@@ -1147,7 +1147,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void intrinsicFromAbsoluteQuadratic() {
+	void intrinsicFromAbsoluteQuadratic() {
 		Equation eq = new Equation();
 		eq.process("K1=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("K2=[310 1 75;0 310 60; 0 0 1]");
@@ -1172,7 +1172,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void decomposeDiac() {
+	void decomposeDiac() {
 		Equation eq = new Equation();
 		eq.process("K=[300 1 50;0 310 60; 0 0 1]");
 		eq.process("w=1.5*K*K'");
@@ -1190,7 +1190,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void split2() {
+	void split2() {
 		List<AssociatedPair> triples = new ArrayList<>();
 		for (int i = 0; i < 20; i++) {
 			triples.add( new AssociatedPair());
@@ -1209,7 +1209,7 @@ public class TestMultiViewOps {
 	}
 
 	@Test
-	public void split3() {
+	void split3() {
 		List<AssociatedTriple> triples = new ArrayList<>();
 		for (int i = 0; i < 20; i++) {
 			triples.add( new AssociatedTriple());
@@ -1233,7 +1233,7 @@ public class TestMultiViewOps {
 	 * Construct a scene with perfect observations. See if triangulation returns the same points
 	 */
 	@Test
-	public void triangulatePoints() {
+	void triangulatePoints() {
 		CameraPinhole intrinsic = new CameraPinhole(500,500,0,500,500,1000,1000);
 
 		List<Point3D_F64> points = UtilPoint3D_F64.random(new Point3D_F64(0,0,2),-0.5,0.5,100,rand);
@@ -1269,7 +1269,7 @@ public class TestMultiViewOps {
 
 		Point3D_F64 X = new Point3D_F64();
 		for (int i = 0; i < points.size(); i++) {
-			structure.getPoints()[i].get(X);
+			structure.getPoints().get(i).get(X);
 
 			assertEquals(0, points.get(i).distance(X), UtilEjml.TEST_F64_SQ);
 		}

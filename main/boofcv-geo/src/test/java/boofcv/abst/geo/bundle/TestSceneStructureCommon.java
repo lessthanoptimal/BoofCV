@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,21 +22,26 @@ import boofcv.abst.geo.bundle.SceneStructureCommon.Point;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Peter Abeles
  */
-public class TestSceneStructureCommon {
+class TestSceneStructureCommon {
 	@Test
-	public void removePoints() {
+	void removePoints() {
 
 		MockSceneStructureCommon structure = new MockSceneStructureCommon(false);
+		structure.homogenous = false;
+		structure.pointSize = 3;
 
-		Point original[] = structure.points = new Point[20];
-		for (int i = 0; i < structure.points.length; i++) {
-			structure.points[i] = new Point(3);
+		List<Point> original = new ArrayList<>();
+		for (int i = 0; i < 20; i++) {
+			original.add(structure.points.grow());
 		}
 
 		GrowQueue_I32 which = new GrowQueue_I32();
@@ -45,17 +50,17 @@ public class TestSceneStructureCommon {
 
 		structure.removePoints(which);
 
-		assertEquals(18,structure.points.length);
+		assertEquals(18,structure.points.size);
 
-		assertSame(original[0], structure.points[0]);
-		assertSame(original[3], structure.points[2]);
-		assertSame(original[4], structure.points[3]);
-		assertSame(original[7], structure.points[5]);
-		assertSame(original[19], structure.points[17]);
+		assertSame(original.get(0), structure.points.data[0]);
+		assertSame(original.get(3), structure.points.data[2]);
+		assertSame(original.get(4), structure.points.data[3]);
+		assertSame(original.get(7), structure.points.data[5]);
+		assertSame(original.get(19), structure.points.data[17]);
 	}
 
 	@Test
-	public void Point_removeView() {
+	void Point_removeView() {
 		Point p = new Point(3);
 
 		p.views.add(1);
@@ -76,7 +81,7 @@ public class TestSceneStructureCommon {
 
 	private static class MockSceneStructureCommon extends SceneStructureCommon {
 
-		public MockSceneStructureCommon(boolean homogenous) {
+		MockSceneStructureCommon(boolean homogenous) {
 			super(homogenous);
 		}
 

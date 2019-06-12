@@ -116,8 +116,8 @@ public class RefineThreeViewProjectiveGeometric {
 		}
 
 		// save the results
-		P2.set(structure.views[1].worldToView);
-		P3.set(structure.views[2].worldToView);
+		P2.set(structure.views.data[1].worldToView);
+		P3.set(structure.views.data[2].worldToView);
 
 		if( scale ) {
 			// don't use built in unscaling function because it undoes scaling on points. Those are disposable
@@ -166,7 +166,7 @@ public class RefineThreeViewProjectiveGeometric {
 				observations.getView(1).add(i,(float)t.p2.x,(float)t.p2.y);
 				observations.getView(2).add(i,(float)t.p3.x,(float)t.p3.y);
 
-				structure.points[i].set(X.x,X.y,X.z,X.w);
+				structure.points.get(i).set(X.x,X.y,X.z,X.w);
 			} else {
 				needsPruning = true;
 			}

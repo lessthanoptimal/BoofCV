@@ -38,7 +38,6 @@ import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
-import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
@@ -70,7 +69,6 @@ public class ProjectiveInitializeAllCommon {
 	public ConfigRansac configRansac = new ConfigRansac();
 	public ConfigTrifocal configTriRansac = new ConfigTrifocal();
 	public ConfigTrifocalError configError = new ConfigTrifocalError();
-	public ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
 	public ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
 	public ConfigConverge converge = new ConfigConverge(1e-8,1e-8,200);
 	public boolean scaleSBA = true; // if true input is scaled for SBA
@@ -85,6 +83,11 @@ public class ProjectiveInitializeAllCommon {
 	public BundleAdjustment<SceneStructureProjective> sba;
 	public ScaleSceneStructure scaler = new ScaleSceneStructure();
 
+	/**
+	 * Projective camera matrices for 3-View reconstruction. P1 is always identity
+	 */
+	public final DMatrixRMaj P1,P2,P3;
+
 	// used to get pixel coordinates of features in a view
 	private LookupSimilarImages db;
 
@@ -95,7 +98,6 @@ public class ProjectiveInitializeAllCommon {
 
 	// Indexes of common features after all but the inliers have been removed by RANSAC
 	GrowQueue_I32 inlierToSeed = new GrowQueue_I32();
-
 
 	// Indicates if debugging information should be printed
 	PrintStream verbose;
@@ -119,6 +121,10 @@ public class ProjectiveInitializeAllCommon {
 
 		triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.GEOMETRIC);
 
+		P1 = CommonOps_DDRM.identity(3,4);
+		P2 = new DMatrixRMaj(3,4);
+		P3 = new DMatrixRMaj(3,4);
+
 		fixate();
 	}
 
@@ -131,21 +137,23 @@ public class ProjectiveInitializeAllCommon {
 	}
 
 	/**
+	 * Computes a projective reconstruction. Reconstruction will be relative the 'seed' and only used features
+	 * listed in 'common'. The list of views is taken from seed and is specified in 'motions'.
 	 *
 	 * @param seed The seed view that will act as the origin
-	 * @param common Indexes of common features. Index in seed view
-	 * @param motions Index of motions in the seed view to use when initializing
-	 * @return
+	 * @param seedFeatsIdx Indexes of common features in the seed view which are to be used.
+	 * @param seedConnIdx Indexes of motions in the seed view to use when initializing
+	 * @return true is successful
 	 */
-	public boolean process( LookupSimilarImages db , View seed , GrowQueue_I32 common , GrowQueue_I32 motions ) {
+	public boolean projectiveSceneN(LookupSimilarImages db , View seed , GrowQueue_I32 seedFeatsIdx , GrowQueue_I32 seedConnIdx ) {
 		this.db = db;
 
-		if( motions.size == 1 ) {
+		if( seedConnIdx.size == 1 ) {
 			// stereo is a special case and requires different logic
 			throw new IllegalArgumentException("Can't handle the stereo case yet");
 		}
 		// find the 3 view combination with the best score
-		if( !selectInitialTriplet(seed,motions,selectedTriple))
+		if( !selectInitialTriplet(seed,seedConnIdx,selectedTriple))
 			return false;
 
 		// Find tracks between all 3 views
@@ -161,33 +169,75 @@ public class ProjectiveInitializeAllCommon {
 		// Convert associated features into associated triple pixels
 		convertAssociatedTriple(db, seed, viewB, viewC);
 
-		// Use trifocal tensor to prune tracks from that set
-		initializeProjective3(matchesTriple,matchesTripleIdx,motions.size,seed,viewB,viewC,
-				selectedTriple[0],selectedTriple[1]);
+		// Robustly compute camera matrices from initial 3-View
+		if( !projectiveCameras3(db,seed,selectedTriple[0],selectedTriple[1])) {
+			return false;
+		}
+
+		// Compute location of 3D points from initial 3 projective cameras
+		computeScene3(ransac.getMatchSet(),seed,selectedTriple[0],selectedTriple[1]);
 
 		// Estimate projective for each view not in the original triplet
 		// This is simple because the 3D coordinate of each point is already known
-		if( common.size > 2 ) { // only do if more than 3 views
-			if (!findRemainingCameraMatrices(db, seed, motions))
+		if( seedFeatsIdx.size > 2 ) { // only do if more than 3 views
+			if (!findRemainingCameraMatrices(db, seed, seedConnIdx))
 				return false;
 		}
 
 		// create observation data structure for SBA
-		SceneObservations observations = createObservationsForBundleAdjustment(db, seed, motions);
+		SceneObservations observations = createObservationsForBundleAdjustment(db, seed, seedConnIdx);
 
 		// Refine results with projective bundle adjustment
 		return refineWithBundleAdjustment(observations);
 	}
 
 	/**
+	 * Computes projective camera matrices for the 3 connected views. No bundle adjustment or triangulation
+	 *
+	 * 1) Find features with continuous tracks across all 3 views
+	 * 2) Robustly compute trifocal tensor
+	 * 3) Extract compatible camera matrices
+	 *
+	 * @param viewA The origin view
+	 * @param motionIdxB index on edge in viewA for viewB
+	 * @param motionIdxC index on edge in viewA for viewC
+	 * @return true is successful
+	 */
+	public boolean projectiveCameras3( LookupSimilarImages db , View viewA , int motionIdxB , int motionIdxC  ) {
+
+		Motion motionAB = viewA.connections.get(motionIdxB);
+		Motion motionAC = viewA.connections.get(motionIdxC);
+
+		View viewB = motionAB.other(viewA);
+		View viewC = motionAC.other(viewA);
+
+		findTripleMatches(viewA,motionAB,motionAC, matchesTripleIdx);
+		if( matchesTripleIdx.size == 0 )
+			return false;
+
+		// Convert associated features into associated triple pixels
+		convertAssociatedTriple(db, viewA, viewB, viewC);
+
+		// Robustly fit trifocal tensor to 3-view
+		ransac.process(matchesTriple.toList());
+
+		// Extract camera matrices
+		TrifocalTensor model = ransac.getModelParameters();
+
+		MultiViewOps.extractCameraMatrices(model,P2,P3);
+
+		return true;
+	}
+
+	/**
 	 * Exhaustively look at all triplets that connect with the seed view
 	 */
-	boolean selectInitialTriplet( View seed , GrowQueue_I32 motions , int selected[] ) {
+	boolean selectInitialTriplet( View seed , GrowQueue_I32 edgeIdxs , int selected[] ) {
 		double bestScore = 0;
-		for (int i = 0; i < motions.size; i++) {
+		for (int i = 0; i < edgeIdxs.size; i++) {
 			View viewB = seed.connections.get(i).other(seed);
 
-			for (int j = i+1; j < motions.size; j++) {
+			for (int j = i+1; j < edgeIdxs.size; j++) {
 				View viewC = seed.connections.get(j).other(seed);
 
 				double s = scoreTripleView(seed,viewB,viewC);
@@ -201,6 +251,10 @@ public class ProjectiveInitializeAllCommon {
 		return bestScore != 0;
 	}
 
+	/**
+	 * Evaluates how well this set of 3-views can be used to estimate the scene's 3D structure
+	 * @return higher is better. zero means worthless
+	 */
 	double scoreTripleView(View seedA, View viewB , View viewC ) {
 		Motion motionAB = seedA.findMotion(viewB);
 		Motion motionAC = seedA.findMotion(viewC);
@@ -216,6 +270,14 @@ public class ProjectiveInitializeAllCommon {
 		return score;
 	}
 
+	/**
+	 * Creates a list of features tracks which go across all three views
+	 *
+	 * @param seedA The seed view A
+	 * @param edgeAB edge to view B from A
+	 * @param edgeAC edge to view C from A
+	 * @param matchesTri (Output) Indexes of each feature track in all three views
+	 */
 	void findTripleMatches(View seedA, Motion edgeAB , Motion edgeAC ,
 						   FastQueue<AssociatedTripleIndex> matchesTri ) {
 		matchesTri.reset();
@@ -254,6 +316,9 @@ public class ProjectiveInitializeAllCommon {
 		}
 	}
 
+	/**
+	 * Creates a look up table for converting features indexes from view A to view C
+	 */
 	private int[] createFeatureLookup(Motion edgeAC, boolean srcAC, View viewC) {
 		int[] table_C_to_A = new int[viewC.totalFeatures];
 		Arrays.fill(table_C_to_A, 0, viewC.totalFeatures, -1);
@@ -296,7 +361,7 @@ public class ProjectiveInitializeAllCommon {
 			// triangulation can fail if all 3 views have the same pixel value. This has been observed in
 			// simulated 3D scenes
 			if( triangulator.triangulate(triangObs,cameraMatrices,X)) {
-				structure.points[i].set(X.x,X.y,X.z,X.w);
+				structure.points.data[i].set(X.x,X.y,X.z,X.w);
 			} else {
 				throw new RuntimeException("Failed to triangulate a point in the inlier set?! Handle if this is common");
 			}
@@ -325,30 +390,17 @@ public class ProjectiveInitializeAllCommon {
 	 * 2) Extract camera matrices that have a common projective space
 	 * 3) Triangulate location of 3D homogenous points
 	 *
-	 * @param associated List of associated pixels
-	 * @param associatedIdx List of associated feature indexes
+	 * @param inliers Inlier features from trifocal tensor robust fit
 	 */
-	private void initializeProjective3(FastQueue<AssociatedTriple> associated ,
-									   FastQueue<AssociatedTripleIndex> associatedIdx ,
-									   int totalViews,
-									   View viewA , View viewB , View viewC ,
-									   int idxViewB , int idxViewC ) {
-		ransac.process(associated.toList());
+	private void computeScene3(List<AssociatedTriple> inliers , View viewA, int idxViewB , int idxViewC ) {
 
-		List<AssociatedTriple> inliers = ransac.getMatchSet();
-		TrifocalTensor model = ransac.getModelParameters();
-		if( verbose != null )
-			verbose.println("Remaining after RANSAC "+inliers.size()+" / "+associated.size());
-
-		// projective camera matrices for each view
-		DMatrixRMaj P1 = CommonOps_DDRM.identity(3,4);
-		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
-		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
-
-		MultiViewOps.extractCameraMatrices(model,P2,P3);
+		Motion motionAB = viewA.connections.get(idxViewB);
+		Motion motionAC = viewA.connections.get(idxViewC);
+		View viewB = motionAB.other(viewA);
+		View viewC = motionAC.other(viewA);
 
 		// Initialize the 3D scene structure, stored in a format understood by bundle adjustment
-		structure.initialize(totalViews,inliers.size());
+		structure.initialize(3,inliers.size());
 
 		// specify the found projective camera matrices
 		db.lookupShape(viewA.id,shape);
@@ -371,7 +423,7 @@ public class ProjectiveInitializeAllCommon {
 
 			// table to go from inlier list into seed feature index
 			inlierToSeed.data[i] = matchesTripleIdx.get(inputIdx).a;
-			// seed feature index into the ouptut structure index
+			// seed feature index into the output structure index
 			seedToStructure.data[inlierToSeed.data[i]] = i;
 		}
 	}
@@ -383,8 +435,8 @@ public class ProjectiveInitializeAllCommon {
 	 */
 	boolean findRemainingCameraMatrices(LookupSimilarImages db, View seed, GrowQueue_I32 motions) {
 		points3D.reset(); // points in 3D
-		for (int i = 0; i < structure.points.length; i++) {
-			structure.points[i].get(points3D.grow());
+		for (int i = 0; i < structure.points.size; i++) {
+			structure.points.data[i].get(points3D.grow());
 		}
 		// contains associated pairs of pixel observations
 		// save a call to db by using the previously loaded points
@@ -512,8 +564,8 @@ public class ProjectiveInitializeAllCommon {
 
 		if( scaleSBA ) {
 			// only undo scaling on camera matrices since observations are discarded
-			for (int i = 0; i < structure.views.length; i++) {
-				DMatrixRMaj P = structure.views[i].worldToView;
+			for (int i = 0; i < structure.views.size; i++) {
+				DMatrixRMaj P = structure.views.data[i].worldToView;
 				scaler.pixelScaling.get(i).remove(P,P);
 			}
 			scaler.undoScale(structure,observations);

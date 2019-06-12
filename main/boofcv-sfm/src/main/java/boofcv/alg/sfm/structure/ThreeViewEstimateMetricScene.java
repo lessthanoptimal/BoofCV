@@ -463,17 +463,17 @@ public class ThreeViewEstimateMetricScene {
 
 		int totalBehind = 0;
 		Point3D_F64 X = new Point3D_F64();
-		for (int i = 0; i < structure.points.length; i++) {
-			structure.points[i].get(X);
+		for (int i = 0; i < structure.points.size; i++) {
+			structure.points.data[i].get(X);
 			if( X.z < 0 )
 				totalBehind++;
 		}
 
 		if( verbose != null ) {
-			verbose.println("points behind "+totalBehind+" / "+structure.points.length);
+			verbose.println("points behind "+totalBehind+" / "+structure.points.size);
 		}
 
-		return totalBehind > structure.points.length/2;
+		return totalBehind > structure.points.size/2;
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -117,8 +117,8 @@ class TestScaleSceneStructure {
 				// Make sure it was changed
 				if( !homogenous ) {
 					// can't normalize camera matrix in this situation
-					for (int i = 0; i < expected.views.length; i++) {
-						double error = SpecializedOps_DDRM.diffNormF(expected.views[i].worldToView, found.views[i].worldToView);
+					for (int i = 0; i < expected.views.size; i++) {
+						double error = SpecializedOps_DDRM.diffNormF(expected.views.data[i].worldToView, found.views.data[i].worldToView);
 						assertTrue(error > UtilEjml.TEST_F64);
 					}
 				}
@@ -193,13 +193,13 @@ class TestScaleSceneStructure {
 		}
 
 		WorldToCameraToPixel w2p = new WorldToCameraToPixel();
-		for (int i = 0; i < scene.points.length; i++) {
+		for (int i = 0; i < scene.points.size; i++) {
 			// Point in world frame
 			Point3D_F64 X = new Point3D_F64(rand.nextGaussian(),rand.nextGaussian(),3+rand.nextGaussian());
 			if( scene.homogenous ) {
-				scene.points[i].set(X.x, X.y, X.z, 1);
+				scene.points.data[i].set(X.x, X.y, X.z, 1);
 			} else {
-				scene.points[i].set(X.x, X.y, X.z);
+				scene.points.data[i].set(X.x, X.y, X.z);
 			}
 			// Connect the point to views if it's visible inside of
 			for (int j = 0; j < scene.views.length; j++) {
@@ -223,14 +223,14 @@ class TestScaleSceneStructure {
 		Random rand = new Random(seed);
 
 		scene.initialize(5,20);
-		SceneObservations observations = new SceneObservations(scene.views.length);
+		SceneObservations observations = new SceneObservations(scene.views.size);
 
 		CameraPinhole camera0 = new CameraPinhole(500+rand.nextDouble()*10,510+rand.nextDouble()*10,0,450,400,900,800);
 
 		DMatrixRMaj K0 = PerspectiveOps.pinholeToMatrix(camera0,(DMatrixRMaj)null);
 		DMatrixRMaj P = new DMatrixRMaj(3,4);
 
-		for (int i = 0; i < scene.views.length; i++) {
+		for (int i = 0; i < scene.views.size; i++) {
 			Se3_F64 worldToView = new Se3_F64();
 
 			worldToView.T.x = i*0.2 + rand.nextGaussian()*0.1;
@@ -248,17 +248,17 @@ class TestScaleSceneStructure {
 		}
 
 		Point2D_F64 pixel = new Point2D_F64();
-		for (int i = 0; i < scene.points.length; i++) {
+		for (int i = 0; i < scene.points.size; i++) {
 			// Point in world frame
 			Point3D_F64 X = new Point3D_F64(rand.nextGaussian(),rand.nextGaussian(),3+rand.nextGaussian());
 			if( scene.homogenous ) {
-				scene.points[i].set(X.x, X.y, X.z, 1);
+				scene.points.data[i].set(X.x, X.y, X.z, 1);
 			} else {
-				scene.points[i].set(X.x, X.y, X.z);
+				scene.points.data[i].set(X.x, X.y, X.z);
 			}
 			// Connect the point to views if it's visible inside of
-			for (int j = 0; j < scene.views.length; j++) {
-				PerspectiveOps.renderPixel(scene.views[j].worldToView,X,pixel);
+			for (int j = 0; j < scene.views.size; j++) {
+				PerspectiveOps.renderPixel(scene.views.data[j].worldToView,X,pixel);
 
 				if( pixel.x >= 0 && pixel.y >= 0 && pixel.x < camera0.width && pixel.y < camera0.height ) {
 					scene.connectPointToView(i,j);

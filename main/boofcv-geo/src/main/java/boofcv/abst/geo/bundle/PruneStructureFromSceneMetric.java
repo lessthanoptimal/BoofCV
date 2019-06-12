@@ -71,7 +71,7 @@ public class PruneStructureFromSceneMetric {
 
 			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
 				int pointID = v.point.data[pointIndex];
-				SceneStructureMetric.Point f = structure.points[pointID];
+				SceneStructureMetric.Point f = structure.points.data[pointID];
 
 				// Get feature location in world
 				f.get(X);
@@ -118,7 +118,7 @@ public class PruneStructureFromSceneMetric {
 			SceneObservations.View v = observations.views[viewIndex];
 			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
 				int pointID = v.getPointId(pointIndex);
-				SceneStructureMetric.Point f = structure.points[pointID];
+				SceneStructureMetric.Point f = structure.points.data[pointID];
 //				System.out.println("   pointIndex="+pointIndex+" pointID="+pointID+" hash="+f.hashCode());
 				v.get(pointIndex, observation);
 
@@ -148,7 +148,7 @@ public class PruneStructureFromSceneMetric {
 			SceneStructureMetric.View view = structure.views[viewIndex];
 
 			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
-				SceneStructureMetric.Point f = structure.points[v.getPointId(pointIndex)];
+				SceneStructureMetric.Point f = structure.points.get(v.getPointId(pointIndex));
 
 				// Get feature location in world
 				f.get(X);
@@ -182,7 +182,7 @@ public class PruneStructureFromSceneMetric {
 			SceneObservations.View v = observations.views[viewIndex];
 
 			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
-				SceneStructureMetric.Point p = structure.points[v.getPointId(pointIndex)];
+				SceneStructureMetric.Point p = structure.points.data[v.getPointId(pointIndex)];
 
 				if( p.views.size < count ) {
 					v.remove(pointIndex);
@@ -191,12 +191,12 @@ public class PruneStructureFromSceneMetric {
 		}
 
 		// Create a look up table containing from old to new indexes for each point
-		int oldToNew[] = new int[ structure.points.length ];
+		int[] oldToNew = new int[ structure.points.size ];
 		Arrays.fill(oldToNew,-1); // crash is bug
 
 		GrowQueue_I32 prune = new GrowQueue_I32(); // List of point ID's which are to be removed.
-		for (int i = 0; i < structure.points.length; i++) {
-			if( structure.points[i].views.size < count ) {
+		for (int i = 0; i < structure.points.size; i++) {
+			if( structure.points.data[i].views.size < count ) {
 				prune.add(i);
 			} else {
 				oldToNew[i] = i-prune.size;
@@ -237,8 +237,8 @@ public class PruneStructureFromSceneMetric {
 		// Use a nearest neighbor search to find near by points
 		Point3D_F64 worldX = new Point3D_F64();
 		List<Point3D_F64> cloud = new ArrayList<>();
-		for (int i = 0; i < structure.points.length; i++) {
-			SceneStructureMetric.Point structureP = structure.points[i];
+		for (int i = 0; i < structure.points.size; i++) {
+			SceneStructureMetric.Point structureP = structure.points.data[i];
 			structureP.get(worldX);
 			cloud.add(worldX.copy());
 		}
@@ -249,14 +249,14 @@ public class PruneStructureFromSceneMetric {
 		FastQueue<NnData<Point3D_F64>> resultsNN = new FastQueue(NnData.class,true);
 
 		// Create a look up table containing from old to new indexes for each point
-		int oldToNew[] = new int[ structure.points.length ];
+		int[] oldToNew = new int[ structure.points.size ];
 		Arrays.fill(oldToNew,-1); // crash is bug
 		// List of point ID's which are to be removed.
 		GrowQueue_I32 prunePointID = new GrowQueue_I32();
 
 		// identify points which need to be pruned
-		for (int pointId = 0; pointId < structure.points.length; pointId++) {
-			SceneStructureMetric.Point structureP = structure.points[pointId];
+		for (int pointId = 0; pointId < structure.points.size; pointId++) {
+			SceneStructureMetric.Point structureP = structure.points.data[pointId];
 			structureP.get(worldX);
 
 			// distance is squared
@@ -309,10 +309,10 @@ public class PruneStructureFromSceneMetric {
 			for (int pointIdx = 0; pointIdx < view.point.size; pointIdx++) {
 				int pointId = view.getPointId(pointIdx);
 
-				int viewIdx = structure.points[pointId].views.indexOf(viewId);
+				int viewIdx = structure.points.data[pointId].views.indexOf(viewId);
 				if( viewIdx < 0 )
 					throw new RuntimeException("Bug in structure. view has point but point doesn't have view");
-				structure.points[pointId].views.remove(viewIdx);
+				structure.points.data[pointId].views.remove(viewIdx);
 			}
 		}
 
@@ -331,14 +331,14 @@ public class PruneStructureFromSceneMetric {
 	 */
 	public void pruneUnusedCameras() {
 		// Count how many views are used by each camera
-		int histogram[] = new int[structure.cameras.length];
+		int[] histogram = new int[structure.cameras.length];
 
 		for (int i = 0; i < structure.views.length; i++) {
 			histogram[structure.views[i].camera]++;
 		}
 
 		// See which cameras need to be removed and create a look up table from old to new camera IDs
-		int oldToNew[] = new int[structure.cameras.length];
+		int[] oldToNew = new int[structure.cameras.length];
 		List<SceneStructureMetric.Camera> remaining = new ArrayList<>();
 		for (int i = 0; i < structure.cameras.length; i++) {
 			if( histogram[i] > 0 ) {

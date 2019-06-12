@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,13 +56,13 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
+class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 
 	Random rand = new Random(234);
 	CameraPinhole pinhole = new CameraPinhole(400,400,0,500,500,1000,1000);
 
 	@Test
-	public void perfectScene() {
+	void perfectScene() {
 		PairwiseImageGraph pairwise = createPerfectImageGraph();
 
 		EstimateSceneCalibrated alg = new EstimateSceneCalibrated();
@@ -74,7 +74,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 
 		assertEquals(1,structure.cameras.length);
 		assertEquals(5,structure.views.length);
-		assertTrue(structure.points.length>495);
+		assertTrue(structure.points.size>495);
 
 		checkReprojectionError(structure,observations,1e-4);
 	}
@@ -170,7 +170,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	}
 
 	@Test
-	public void decomposeEssential() {
+	void decomposeEssential() {
 		int N = 20;
 
 		for (int trial = 0; trial < 10; trial++) {
@@ -214,7 +214,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	}
 
 	@Test
-	public void medianTriangulationAngle() {
+	void medianTriangulationAngle() {
 		int N = 20;
 		
 		final Motion edge = new Motion();
@@ -248,7 +248,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	}
 
 	@Test
-	public void addTriangulatedStereoFeatures() {
+	void addTriangulatedStereoFeatures() {
 		int N = 10;
 
 		// create one good point and all the others will have an angle which is too small
@@ -310,12 +310,12 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	}
 
 	@Test
-	public void determineScale() {
+	void determineScale() {
 		determineScale(20,false);
 		determineScale(19,true);
 	}
 
-	public void determineScale( int N , boolean expectException ){
+	void determineScale( int N , boolean expectException ){
 
 		double scale = 1.5;
 
@@ -351,7 +351,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	}
 
 	@Test
-	public void determinePose() {
+	void determinePose() {
 		int N = 40;
 		Motion edge = new Motion();
 		edge.viewSrc = new View();
@@ -405,7 +405,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	}
 
 	@Test
-	public void triangulationAngle() {
+	void triangulationAngle() {
 		Point2D_F64 normA = new Point2D_F64(-0.5,0);
 		Point2D_F64 normB = new Point2D_F64(0.5,0);
 		Se3_F64 a_to_b = new Se3_F64();
@@ -421,7 +421,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	}
 
 	@Test
-	public void defineCoordinateSystem() {
+	void defineCoordinateSystem() {
 		int N = 10;
 
 		// create one good point and all the others will have an angle which is too small
@@ -483,7 +483,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	}
 
 	@Test
-	public void selectOriginNode() {
+	void selectOriginNode() {
 		// hack the score so that we know which one will be the best
 		EstimateSceneCalibrated alg = new EstimateSceneCalibrated() {
 			@Override
@@ -503,7 +503,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	}
 
 	@Test
-	public void selectCoordinateBase() {
+	void selectCoordinateBase() {
 		View view = new View();
 
 		for (int i = 0; i < 4; i++) {
@@ -522,7 +522,7 @@ public class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 	}
 
 	@Test
-	public void triangulateMetricStereoEdges() {
+	void triangulateMetricStereoEdges() {
 
 		int N = 20;
 

@@ -414,7 +414,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 				int n = structureEstimator.ransac.getMatchSet().size();
 				double score = structureEstimator.bundleAdjustment.getFitScore();
 				int numObs = structureEstimator.observations.getObservationCount();
-				int numPoints = structureEstimator.structure.points.length;
+				int numPoints = structureEstimator.structure.points.size;
 				controls.addText(String.format("Tri Feats %d\n",n));
 				for (int i = 0; i < 3; i++) {
 					BundlePinholeSimplified c = structureEstimator.structure.cameras[i].getModel();

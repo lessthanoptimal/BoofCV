@@ -111,7 +111,7 @@ class TestProjectiveInitializeAllCommon {
 		alg.structure.initialize(numViews,db.feats3D.size());
 		for (int i = 0; i < db.feats3D.size(); i++) {
 			Point3D_F64 p = db.feats3D.get(i);
-			alg.structure.points[i].set(p.x,p.y,p.z,1);
+			alg.structure.points.data[i].set(p.x,p.y,p.z,1);
 		}
 		alg.seedToStructure.resize(db.featToView.size());
 		alg.seedToStructure.setTo(db.viewToFeat.get(0),0,db.numFeaturse);
@@ -153,12 +153,12 @@ class TestProjectiveInitializeAllCommon {
 	 */
 	private void checkCameraMatrix(SceneStructureProjective structure , int viewIdx,
 								   int[] worldToView, List<Point2D_F64> pixels ) {
-		DMatrixRMaj P = structure.views[viewIdx].worldToView;
+		DMatrixRMaj P = structure.views.data[viewIdx].worldToView;
 
 		Point4D_F64 X = new Point4D_F64();
 		Point2D_F64 x = new Point2D_F64();
-		for (int i = 0; i < structure.points.length; i++) {
-			structure.points[i].get(X);
+		for (int i = 0; i < structure.points.size; i++) {
+			structure.points.data[i].get(X);
 			PerspectiveOps.renderPixel(P,X,x);
 			Point2D_F64 obs = pixels.get( worldToView[i]);
 			assertTrue(x.distance(obs) <= UtilEjml.TEST_F64);

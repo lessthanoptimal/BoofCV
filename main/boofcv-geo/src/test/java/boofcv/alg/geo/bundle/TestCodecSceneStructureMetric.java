@@ -35,25 +35,25 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestCodecSceneStructureMetric {
+class TestCodecSceneStructureMetric {
 	Random rand = new Random(234);
 
 	@Test
-	public void encode_decode() {
+	void encode_decode() {
 		encode_decode(true,false);
 		encode_decode(false,false);
 		encode_decode(true,true);
 		encode_decode(false,true);
 	}
 
-	public void encode_decode( boolean homogenous , boolean hasRigid ) {
+	void encode_decode( boolean homogenous , boolean hasRigid ) {
 		SceneStructureMetric original = createScene(rand,homogenous, hasRigid);
 
 		CodecSceneStructureMetric codec = new CodecSceneStructureMetric();
 
 		int pointLength = homogenous ? 4 : 3;
 		int N = original.getUnknownViewCount()*6 + original.getUnknownRigidCount()*6 +
-				original.points.length*pointLength + original.getUnknownCameraParameterCount();
+				original.points.size*pointLength + original.getUnknownCameraParameterCount();
 		assertEquals(N,original.getParameterCount());
 		double param[] = new double[N];
 		codec.encode(original,param);
@@ -62,16 +62,16 @@ public class TestCodecSceneStructureMetric {
 		codec.decode(param,found);
 
 		assertEquals(homogenous,found.homogenous);
-		for (int i = 0; i < original.points.length; i++) {
-			assertTrue( original.points[i].distance(found.points[i]) < UtilEjml.TEST_F64);
+		for (int i = 0; i < original.points.size; i++) {
+			assertTrue( original.points.data[i].distance(found.points.data[i]) < UtilEjml.TEST_F64);
 		}
 
 		for (int i = 0; i < original.cameras.length; i++) {
 			SceneStructureMetric.Camera o = original.cameras[i];
 			SceneStructureMetric.Camera f = found.cameras[i];
 
-			double po[] = new double[o.model.getIntrinsicCount()];
-			double pf[] = new double[f.model.getIntrinsicCount()];
+			double[] po = new double[o.model.getIntrinsicCount()];
+			double[] pf = new double[f.model.getIntrinsicCount()];
 
 			o.model.getIntrinsic(po,0);
 			f.model.getIntrinsic(pf,0);
@@ -102,7 +102,7 @@ public class TestCodecSceneStructureMetric {
 		}
 	}
 
-	public static SceneStructureMetric createScene(Random rand, boolean homogenous, boolean hasRigid) {
+	static SceneStructureMetric createScene(Random rand, boolean homogenous, boolean hasRigid) {
 		SceneStructureMetric out = new SceneStructureMetric(homogenous);
 
 		int numRigid = hasRigid ? 2 : 0;
@@ -152,12 +152,12 @@ public class TestCodecSceneStructureMetric {
 		out.assignIDsToRigidPoints();
 
 		if( homogenous ) {
-			for (int i = 0; i < out.points.length; i++) {
+			for (int i = 0; i < out.points.size; i++) {
 				double w = rand.nextDouble()*3+0.5;
 				out.setPoint(i, w*(i + 1), w*(i + 2 * rand.nextGaussian()), w*(2 * i - 3 * rand.nextGaussian()),w);
 			}
 		} else {
-			for (int i = 0; i < out.points.length; i++) {
+			for (int i = 0; i < out.points.size; i++) {
 				out.setPoint(i, i + 1, i + 2 * rand.nextGaussian(), 2 * i - 3 * rand.nextGaussian());
 			}
 		}
@@ -179,10 +179,10 @@ public class TestCodecSceneStructureMetric {
 
 		// Assign first point to all views then the other points to just one view
 		for (int i = 0; i < out.views.length; i++) {
-			out.points[0].views.add(i);
+			out.points.data[0].views.add(i);
 		}
-		for (int i = 1; i < out.points.length; i++) {
-			out.points[i].views.add( i-1);
+		for (int i = 1; i < out.points.size; i++) {
+			out.points.data[i].views.add( i-1);
 		}
 
 		return out;

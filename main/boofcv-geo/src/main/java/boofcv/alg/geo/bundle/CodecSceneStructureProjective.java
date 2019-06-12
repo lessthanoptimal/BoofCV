@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,8 +37,8 @@ public class CodecSceneStructureProjective implements BundleAdjustmentSchur_DSCC
 	public void decode(double[] input , SceneStructureProjective structure ) {
 		int index = 0;
 
-		for (int i = 0; i < structure.points.length; i++) {
-			SceneStructureMetric.Point p = structure.points[i];
+		for (int i = 0; i < structure.points.size; i++) {
+			SceneStructureMetric.Point p = structure.points.data[i];
 			p.coordinate[0] = input[index++];
 			p.coordinate[1] = input[index++];
 			p.coordinate[2] = input[index++];
@@ -46,8 +46,8 @@ public class CodecSceneStructureProjective implements BundleAdjustmentSchur_DSCC
 				p.coordinate[3] = input[index++];
 		}
 
-		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			SceneStructureProjective.View view = structure.views[viewIndex];
+		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+			SceneStructureProjective.View view = structure.views.data[viewIndex];
 			// Decode the rigid body transform from world to view
 			if( !view.known ) {
 				for (int i = 0; i < 12; i++) {
@@ -62,8 +62,8 @@ public class CodecSceneStructureProjective implements BundleAdjustmentSchur_DSCC
 	public void encode(SceneStructureProjective structure , double[] output ) {
 		int index = 0;
 
-		for (int i = 0; i < structure.points.length; i++) {
-			SceneStructureMetric.Point p = structure.points[i];
+		for (int i = 0; i < structure.points.size; i++) {
+			SceneStructureMetric.Point p = structure.points.data[i];
 			output[index++] = p.coordinate[0];
 			output[index++] = p.coordinate[1];
 			output[index++] = p.coordinate[2];
@@ -71,8 +71,8 @@ public class CodecSceneStructureProjective implements BundleAdjustmentSchur_DSCC
 				output[index++] = p.coordinate[3];
 		}
 
-		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			SceneStructureProjective.View view = structure.views[viewIndex];
+		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+			SceneStructureProjective.View view = structure.views.data[viewIndex];
 			// Decode the rigid body transform from world to view
 			if( !view.known ) {
 				for (int i = 0; i < 12; i++) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,23 +33,23 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentProjectiveResidualFunction {
+class TestBundleAdjustmentProjectiveResidualFunction {
 	Random rand = new Random(234);
 
 	/**
 	 * Makes sure that when given the same input it produces the same output
 	 */
 	@Test
-	public void multipleCalls() {
+	void multipleCalls() {
 		multipleCalls(false);
 		multipleCalls(true);
 	}
 
-	public void multipleCalls( boolean homogenous ) {
+	void multipleCalls( boolean homogenous ) {
 		SceneStructureProjective structure = homogenous?createSceneH(rand) : createScene3D(rand);
 		SceneObservations obs = createObservations(rand,structure);
 
-		double param[] = new double[structure.getParameterCount()];
+		double[] param = new double[structure.getParameterCount()];
 
 		new CodecSceneStructureProjective().encode(structure,param);
 
@@ -69,14 +69,14 @@ public class TestBundleAdjustmentProjectiveResidualFunction {
 	 * Change each parameter and see if it changes the output
 	 */
 	@Test
-	public void changeInParamChangesOutput() {
+	void changeInParamChangesOutput() {
 		changeInParamChangesOutput(false);
 		changeInParamChangesOutput(true);
 	}
 
-	public void changeInParamChangesOutput( boolean homogenous ) {
+	void changeInParamChangesOutput( boolean homogenous ) {
 		SceneStructureProjective structure = homogenous?createSceneH(rand) : createScene3D(rand);
-		double param[] = new double[structure.getParameterCount()];
+		double[] param = new double[structure.getParameterCount()];
 
 		new CodecSceneStructureProjective().encode(structure,param);
 
@@ -108,11 +108,11 @@ public class TestBundleAdjustmentProjectiveResidualFunction {
 		}
 	}
 
-	public static SceneObservations createObservations(Random rand , SceneStructureProjective structure) {
-		SceneObservations obs = new SceneObservations(structure.views.length);
+	static SceneObservations createObservations(Random rand , SceneStructureProjective structure) {
+		SceneObservations obs = new SceneObservations(structure.views.size);
 
-		for (int j = 0; j < structure.points.length; j++) {
-			SceneStructureProjective.Point p = structure.points[j];
+		for (int j = 0; j < structure.points.size; j++) {
+			SceneStructureProjective.Point p = structure.points.data[j];
 
 			for (int i = 0; i < p.views.size; i++) {
 				SceneObservations.View v = obs.getView(p.views.get(i));

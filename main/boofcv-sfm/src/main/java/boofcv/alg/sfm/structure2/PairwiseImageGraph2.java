@@ -23,6 +23,7 @@ import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -69,13 +70,33 @@ public class PairwiseImageGraph2 {
 		}
 
 		public Motion findMotion( View target ) {
+			int idx = findMotionIdx(target);
+			if( idx == -1 )
+				return null;
+			else
+				return connections.get(idx);
+		}
+
+		public int findMotionIdx( View target ) {
 			for (int i = 0; i < connections.size; i++) {
 				Motion m = connections.get(i);
 				if( m.src == target || m.dst == target ) {
-					return m;
+					return i;
 				}
 			}
-			return null;
+			return -1;
+		}
+
+
+		/**
+		 * Adds the views that it's connected to from the list
+		 */
+		public void addConnections( int[] indexes , int length ,
+									List<View> views ) {
+			views.clear();
+			for (int i = 0; i < length; i++) {
+				views.add( connections.get(indexes[i]).other(this));
+			}
 		}
 	}
 
@@ -105,6 +126,9 @@ public class PairwiseImageGraph2 {
 		public View src;
 		public View dst;
 
+		/**
+		 * Index of motion in edge list.
+		 */
 		public int index;
 
 		public void init() {

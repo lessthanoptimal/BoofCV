@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,11 +62,11 @@ public class PruneStructureFromSceneProjective {
 		List<Errors> errors = new ArrayList<>();
 		for (int viewIndex = 0; viewIndex < observations.views.length; viewIndex++) {
 			SceneObservations.View v = observations.views[viewIndex];
-			SceneStructureProjective.View view = structure.views[viewIndex];
+			SceneStructureProjective.View view = structure.views.data[viewIndex];
 
 			for (int indexInView = 0; indexInView < v.point.size; indexInView++) {
 				int pointID = v.point.data[indexInView];
-				SceneStructureMetric.Point f = structure.points[pointID];
+				SceneStructureMetric.Point f = structure.points.data[pointID];
 
 				// Get observation in image pixels
 				v.get(indexInView, observation);
@@ -112,14 +112,16 @@ public class PruneStructureFromSceneProjective {
 	 */
 	public boolean prunePoints(int count) {
 		// create a lookup table from old to new point indexes
-		int oldToNew[] = new int[ structure.points.length ];
+		int oldToNew[] = new int[ structure.points.size ];
 
 		// list of remaining points
-		List<SceneStructureProjective.Point> remainingP = new ArrayList<>();
-		for (int pointIdx = 0; pointIdx < structure.points.length; pointIdx++) {
-			SceneStructureProjective.Point sp = structure.points[pointIdx];
+		GrowQueue_I32 removeIdx = new GrowQueue_I32();
+//		List<SceneStructureProjective.Point> remainingP = new ArrayList<>();
+		for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
+			SceneStructureProjective.Point sp = structure.points.data[pointIdx];
 
 			if( sp.views.size < count) {
+				removeIdx.add(pointIdx);
 				// remove observations of this point from each view
 				for (int i = 0; i < sp.views.size; i++) {
 					int viewIdx = sp.views.data[i];
@@ -130,17 +132,16 @@ public class PruneStructureFromSceneProjective {
 					ov.remove(localIdx);
 				}
 			} else {
-				oldToNew[pointIdx] = remainingP.size();
-				remainingP.add(sp);
+				oldToNew[pointIdx] = pointIdx - removeIdx.size();
 			}
 		}
 
 		// if all of them are still remaining nothing changed
-		if( remainingP.size() == structure.points.length )
+		if( removeIdx.size == 0 )
 			return false;
 
 		// update point references
-		for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
+		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			SceneObservations.View so = observations.views[viewIdx];
 
 			for (int i = 0; i < so.point.size; i++) {
@@ -148,11 +149,8 @@ public class PruneStructureFromSceneProjective {
 			}
 		}
 
-		// create a new array with just the remaining points
-		structure.points = new SceneStructureProjective.Point[remainingP.size()];
-		for (int i = 0; i < remainingP.size(); i++) {
-			structure.points[i] = remainingP.get(i);
-		}
+		// Remove the pruned points
+		structure.removePoints(removeIdx);
 		return true;
 	}
 
@@ -164,13 +162,13 @@ public class PruneStructureFromSceneProjective {
 	 * @return true if views were pruned or false if not
 	 */
 	public boolean pruneViews(int count) {
-		List<SceneStructureProjective.View> remainingS = new ArrayList<>();
+		GrowQueue_I32 pruneIdxS = new GrowQueue_I32();
 		List<SceneObservations.View> remainingO = new ArrayList<>();
 
 		// count number of observations in each view
-		int counts[] = new int[structure.views.length];
-		for (int pointIdx = 0; pointIdx < structure.points.length; pointIdx++) {
-			GrowQueue_I32 viewsIn = structure.points[pointIdx].views;
+		int[] counts = new int[structure.views.size];
+		for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
+			GrowQueue_I32 viewsIn = structure.points.data[pointIdx].views;
 			for (int i = 0; i < viewsIn.size; i++) {
 				counts[viewsIn.get(i)]++;
 			}
@@ -178,36 +176,35 @@ public class PruneStructureFromSceneProjective {
 
 		// TODO Add a list of points to each view reducing number of iterations through all the points
 		// mark views with too few points for removal
-		for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
+		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			if( counts[viewIdx] > count) {
-				remainingS.add(structure.views[viewIdx]);
 				remainingO.add(observations.views[viewIdx]);
 			} else {
-				structure.views[viewIdx].width = -2;
+				pruneIdxS.add(viewIdx);
+				structure.views.data[viewIdx].width = -2;
 			}
 		}
 
 		// remove the view from points
-		for (int pointIdx = 0; pointIdx < structure.points.length; pointIdx++) {
-			GrowQueue_I32 viewsIn = structure.points[pointIdx].views;
+		for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
+			GrowQueue_I32 viewsIn = structure.points.data[pointIdx].views;
 			for (int i = viewsIn.size-1; i >= 0; i--) {
-				SceneStructureProjective.View v = structure.views[viewsIn.get(i)];
+				SceneStructureProjective.View v = structure.views.data[viewsIn.get(i)];
 				if( v.width == -2 ) {
 					viewsIn.remove(i);
 				}
 			}
 		}
 
-		if( structure.views.length == remainingS.size() ) {
+		if( pruneIdxS.size() == 0 ) {
 			return false;
 		}
 
 		// Create new arrays with the views that were not pruned
-		structure.views = new SceneStructureProjective.View[remainingS.size()];
+		structure.views.remove(pruneIdxS.data,0,pruneIdxS.size,null);
 		observations.views = new SceneObservations.View[remainingO.size()];
 
-		for (int i = 0; i < structure.views.length; i++) {
-			structure.views[i] = remainingS.get(i);
+		for (int i = 0; i < structure.views.size; i++) {
 			observations.views[i] = remainingO.get(i);
 		}
 		return true;
@@ -224,7 +221,7 @@ public class PruneStructureFromSceneProjective {
 			SceneObservations.View v = observations.views[viewIndex];
 			for(int indexInView = v.point.size-1; indexInView >= 0; indexInView-- ) {
 				int pointID = v.getPointId(indexInView);
-				SceneStructureProjective.Point f = structure.points[pointID];
+				SceneStructureProjective.Point f = structure.points.data[pointID];
 //				System.out.println("   pointIndex="+pointIndex+" pointID="+pointID+" hash="+f.hashCode());
 				v.get(indexInView, observation);
 

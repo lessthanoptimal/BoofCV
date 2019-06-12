@@ -123,7 +123,7 @@ public class ExampleMultiviewSceneReconstruction {
 		// Optimize the results
 		int pruneCycles=5;
 		for (int i = 0; i < pruneCycles; i++) {
-			System.out.println("BA + Prune iteration = "+i+"  points="+structure.points.length+"  obs="+observations.getObservationCount());
+			System.out.println("BA + Prune iteration = "+i+"  points="+structure.points.size+"  obs="+observations.getObservationCount());
 			bundleScale.applyScale(structure,observations);
 			sba.setParameters(structure,observations);
 			if( !sba.optimize(structure) ) {
@@ -158,9 +158,9 @@ public class ExampleMultiviewSceneReconstruction {
 		Point3D_F64 world = new Point3D_F64();
 		Point3D_F64 camera = new Point3D_F64();
 		Point2D_F64 pixel = new Point2D_F64();
-		for( int i = 0; i < structure.points.length; i++ ) {
+		for( int i = 0; i < structure.points.size; i++ ) {
 			// Get 3D location
-			SceneStructureMetric.Point p = structure.points[i];
+			SceneStructureMetric.Point p = structure.points.get(i);
 			p.get(world);
 
 			// Project point into an arbitrary view

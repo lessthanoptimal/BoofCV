@@ -45,11 +45,13 @@ public class DoStuffFromPairwiseGraph {
 		List<SeedInfo> seeds = selectSeeds(graph, mapScores);
 
 		for (int i = 0; i < seeds.size(); i++) {
+			SeedInfo seed = seeds.get(i);
+
 			// Find the common features
-			GrowQueue_I32 common = findCommonTracks(seeds.get(i));
+			GrowQueue_I32 common = findCommonTracks(seed);
 
 			// initialize projective scene using common tracks
-			initProjective.process(db,seeds.get(i).seed,common,null); // TODO get just the motions used in scoring
+			initProjective.projectiveSceneN(db,seeds.get(i).seed,common,seed.motions);
 
 			// TODO Grow the projective view to include all connected views that meet minimum conditions
 
@@ -184,8 +186,11 @@ public class DoStuffFromPairwiseGraph {
 	}
 
 	private static class SeedInfo implements Comparable<SeedInfo> {
+		// The potential initial seed
 		View seed;
+		// score for how good of a seed this node would make. higher is better
 		double score;
+		// edges in seed that were used to generate the score
 		GrowQueue_I32 motions = new GrowQueue_I32();
 
 		@Override

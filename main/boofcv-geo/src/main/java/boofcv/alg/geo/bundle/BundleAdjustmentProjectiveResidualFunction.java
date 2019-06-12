@@ -107,12 +107,12 @@ public class BundleAdjustmentProjectiveResidualFunction
 	 */
 	private void project3(double[] output) {
 		int observationIndex = 0;
-		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			SceneStructureProjective.View view = structure.views[viewIndex];
+		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+			SceneStructureProjective.View view = structure.views.data[viewIndex];
 			SceneObservations.View obsView = observations.views[viewIndex];
 			for (int i = 0; i < obsView.size(); i++) {
 				obsView.get(i,observedPixel);
-				SceneStructureMetric.Point worldPt = structure.points[observedPixel.index];
+				SceneStructureMetric.Point worldPt = structure.points.data[observedPixel.index];
 				worldPt.get(p3);
 				PerspectiveOps.renderPixel(view.worldToView, p3, predictedPixel);
 				int outputIndex = observationIndex*2;
@@ -128,12 +128,12 @@ public class BundleAdjustmentProjectiveResidualFunction
 	 */
 	private void project4(double[] output) {
 		int observationIndex = 0;
-		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			SceneStructureProjective.View view = structure.views[viewIndex];
+		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+			SceneStructureProjective.View view = structure.views.data[viewIndex];
 			SceneObservations.View obsView = observations.views[viewIndex];
 			for (int i = 0; i < obsView.size(); i++) {
 				obsView.get(i,observedPixel);
-				SceneStructureMetric.Point worldPt = structure.points[observedPixel.index];
+				SceneStructureMetric.Point worldPt = structure.points.data[observedPixel.index];
 				worldPt.get(p4);
 				PerspectiveOps.renderPixel(view.worldToView, p4, predictedPixel);
 				int outputIndex = observationIndex*2;

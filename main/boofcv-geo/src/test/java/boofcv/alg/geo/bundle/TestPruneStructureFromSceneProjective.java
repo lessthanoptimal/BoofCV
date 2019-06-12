@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestPruneStructureFromSceneProjective {
+class TestPruneStructureFromSceneProjective {
 	SceneStructureProjective structure;
 	SceneObservations observations;
 
@@ -51,7 +51,7 @@ public class TestPruneStructureFromSceneProjective {
 	Point3D_F64 center = new Point3D_F64(0,0,4);
 
 	@Test
-	public void pruneObservationsByErrorRank() {
+	void pruneObservationsByErrorRank() {
 		createPerfectScene();
 
 		// add noise to some of the observations
@@ -59,7 +59,7 @@ public class TestPruneStructureFromSceneProjective {
 		int N = structure.getObservationCount();
 		int noisyCount = (int)(N*0.02+0.5);
 		for (int i = 0; i < noisyCount; i++) {
-			int viewIdx = rand.nextInt(structure.views.length);
+			int viewIdx = rand.nextInt(structure.views.size);
 			SceneObservations.View vo = observations.views[viewIdx];
 
 			int idx = rand.nextInt(vo.point.size);
@@ -76,7 +76,7 @@ public class TestPruneStructureFromSceneProjective {
 	}
 
 	@Test
-	public void prunePoints() {
+	void prunePoints() {
 
 		createPerfectScene();
 		int obsCount = structure.getObservationCount();
@@ -85,37 +85,37 @@ public class TestPruneStructureFromSceneProjective {
 
 		// there should be no change
 		assertFalse(alg.prunePoints(1));
-		assertEquals(500,structure.points.length);
+		assertEquals(500,structure.points.size);
 		assertEquals(obsCount,structure.getObservationCount());
 		checkAllObservationsArePerfect();
 
 		// count the number with 8 or more views
 		int points8 = 0;
-		for (int i = 0; i < structure.points.length; i++) {
-			if( structure.points[i].views.size >= 8 ) {
+		for (int i = 0; i < structure.points.size; i++) {
+			if( structure.points.data[i].views.size >= 8 ) {
 				points8++;
 			}
 		}
 		assertTrue(alg.prunePoints(8));
-		assertEquals(points8,structure.points.length);
+		assertEquals(points8,structure.points.size);
 		assertTrue(obsCount>structure.getObservationCount());
 		checkAllObservationsArePerfect();
 	}
 
 	@Test
-	public void pruneViews() {
+	void pruneViews() {
 		createPerfectScene();
 
 		int initialObs = structure.getObservationCount();
-		int initialViews = structure.views.length;
-		int initialPoints = structure.points.length;
+		int initialViews = structure.views.size;
+		int initialPoints = structure.points.size;
 
 		PruneStructureFromSceneProjective alg = new PruneStructureFromSceneProjective(structure,observations);
 
 		// no change expected
 		alg.pruneViews(100);
-		assertEquals(initialViews,structure.views.length);
-		assertEquals(initialPoints,structure.points.length);
+		assertEquals(initialViews,structure.views.size);
+		assertEquals(initialPoints,structure.points.size);
 		assertEquals(initialObs,structure.getObservationCount());
 		checkAllObservationsArePerfect();
 
@@ -126,8 +126,8 @@ public class TestPruneStructureFromSceneProjective {
 				expectedViews++;
 		}
 		alg.pruneViews(499);
-		assertEquals(expectedViews,structure.views.length);
-		assertEquals(initialPoints,structure.points.length);
+		assertEquals(expectedViews,structure.views.size);
+		assertEquals(initialPoints,structure.points.size);
 		assertTrue(structure.getObservationCount()<initialObs);
 		checkAllObservationsArePerfect();
 	}
@@ -138,7 +138,7 @@ public class TestPruneStructureFromSceneProjective {
 
 		CameraPinhole intrinsic = new CameraPinhole(400,410,0.1,500,501,1000,1000);
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic,(DMatrixRMaj)null);
-		for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
+		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
 			Se3_F64 worldToView = new Se3_F64();
 
 			if( viewIdx > 0 ) {
@@ -156,28 +156,28 @@ public class TestPruneStructureFromSceneProjective {
 			structure.setView(viewIdx,viewIdx==0,cameraMatrix,intrinsic.width,intrinsic.height);
 		}
 
-		List<Point4D_F64> points = UtilPoint4D_F64.randomN(center,0.97,0.5,structure.points.length,rand);
+		List<Point4D_F64> points = UtilPoint4D_F64.randomN(center,0.97,0.5,structure.points.size,rand);
 		for (int i = 0; i < points.size(); i++) {
 			Point4D_F64 p = points.get(i);
 			double s = rand.nextGaussian();
 			if( Math.abs(s) < 1e-5 ) // make sure it isn't scaled by zero
 				s = rand.nextDouble()+0.01;
 			p.scale(s);
-			structure.points[i].set(p.x,p.y,p.z,p.w);
+			structure.points.data[i].set(p.x,p.y,p.z,p.w);
 		}
 
 		createRestOfScene();
 	}
 
 	private void createRestOfScene() {
-		observations = new SceneObservations(structure.views.length);
+		observations = new SceneObservations(structure.views.size);
 
 		Point4D_F64 X = new Point4D_F64();
 		Point3D_F64 xx = new Point3D_F64();
 		Point2D_F64 x = new Point2D_F64();
 
-		for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
-			SceneStructureProjective.View vs = structure.views[viewIdx];
+		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
+			SceneStructureProjective.View vs = structure.views.data[viewIdx];
 
 			DMatrixRMaj P = vs.worldToView;
 			int width = vs.width;
@@ -185,8 +185,8 @@ public class TestPruneStructureFromSceneProjective {
 
 			SceneObservations.View vo = observations.views[viewIdx];
 
-			for (int pointIdx = 0; pointIdx < structure.points.length; pointIdx++) {
-				SceneStructureProjective.Point ps = structure.points[pointIdx];
+			for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
+				SceneStructureProjective.Point ps = structure.points.data[pointIdx];
 				ps.get(X);
 				GeometryMath_F64.mult(P,X,xx);
 
@@ -213,15 +213,15 @@ public class TestPruneStructureFromSceneProjective {
 		Point2D_F64 x = new Point2D_F64();
 		Point2D_F64 y = new Point2D_F64();
 
-		for (int viewIdx = 0; viewIdx < structure.views.length; viewIdx++) {
-			SceneStructureProjective.View vs = structure.views[viewIdx];
+		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
+			SceneStructureProjective.View vs = structure.views.data[viewIdx];
 			DMatrixRMaj P = vs.worldToView;
 
 			SceneObservations.View vo = observations.views[viewIdx];
 
 			for (int i = 0; i < vo.point.size; i++) {
 				int pointIdx = vo.point.get(i);
-				structure.points[pointIdx].get(X);
+				structure.points.data[pointIdx].get(X);
 				GeometryMath_F64.mult(P,X,x);
 				vo.get(i,y);
 				assertEquals(0,x.x-y.x, UtilEjml.TEST_F64_SQ);

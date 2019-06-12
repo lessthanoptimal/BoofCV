@@ -32,25 +32,25 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentMetricResidualFunction {
+class TestBundleAdjustmentMetricResidualFunction {
 	private Random rand = new Random(234);
 
 	/**
 	 * Makes sure that when given the same input it produces the same output
 	 */
 	@Test
-	public void multipleCalls() {
+	void multipleCalls() {
 		multipleCalls(true, false);
 		multipleCalls(false, false);
 		multipleCalls(true, true);
 		multipleCalls(false, true);
 	}
 
-	public void multipleCalls(boolean homogenous, boolean hasRigid) {
+	void multipleCalls(boolean homogenous, boolean hasRigid) {
 		SceneStructureMetric structure = createScene(rand, homogenous, hasRigid);
 		SceneObservations obs = createObservations(rand, structure);
 
-		double param[] = new double[structure.getParameterCount()];
+		double[] param = new double[structure.getParameterCount()];
 
 		new CodecSceneStructureMetric().encode(structure, param);
 
@@ -70,14 +70,14 @@ public class TestBundleAdjustmentMetricResidualFunction {
 	 * Change each parameter and see if it changes the output
 	 */
 	@Test
-	public void changeInParamChangesOutput() {
+	void changeInParamChangesOutput() {
 		changeInParamChangesOutput(true);
 		changeInParamChangesOutput(false);
 	}
 
-	public void changeInParamChangesOutput(boolean homogenous) {
+	void changeInParamChangesOutput(boolean homogenous) {
 		SceneStructureMetric structure = createScene(rand, homogenous, false);
-		double param[] = new double[structure.getParameterCount()];
+		double[] param = new double[structure.getParameterCount()];
 
 		new CodecSceneStructureMetric().encode(structure, param);
 
@@ -108,11 +108,11 @@ public class TestBundleAdjustmentMetricResidualFunction {
 		}
 	}
 
-	public static SceneObservations createObservations(Random rand, SceneStructureMetric structure) {
+	static SceneObservations createObservations(Random rand, SceneStructureMetric structure) {
 		SceneObservations obs = new SceneObservations(structure.views.length, structure.hasRigid());
 
-		for (int j = 0; j < structure.points.length; j++) {
-			SceneStructureMetric.Point p = structure.points[j];
+		for (int j = 0; j < structure.points.size; j++) {
+			SceneStructureMetric.Point p = structure.points.data[j];
 
 			for (int i = 0; i < p.views.size; i++) {
 				SceneObservations.View v = obs.getView(p.views.get(i));

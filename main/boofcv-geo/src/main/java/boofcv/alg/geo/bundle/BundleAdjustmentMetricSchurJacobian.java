@@ -116,7 +116,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		numViewsUnknown = structure.getUnknownViewCount();
 		int numCameraParameters = structure.getUnknownCameraParameterCount();
 
-		indexFirstRigid = structure.points.length*lengthPoint;
+		indexFirstRigid = structure.points.size*lengthPoint;
 		indexFirstView = indexFirstRigid + numRigidUnknown*lengthSE3;
 		indexLastView = indexFirstView + numViewsUnknown*lengthSE3;
 		numParameters = indexLastView + numCameraParameters;
@@ -231,7 +231,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 	public void internalProcess( double[] input, DMatrix leftPoint, DMatrix rightView) {
 		int numRows = getNumOfOutputsM();
 		// number of parameters on left. All points
-		int numPointParam = structure.points.length*lengthPoint + numRigidUnknown*lengthSE3;
+		int numPointParam = structure.points.size*lengthPoint + numRigidUnknown*lengthSE3;
 		// Number of paramters on right. views + camera
 		int numViewParam = numParameters-numPointParam; // view + camera
 

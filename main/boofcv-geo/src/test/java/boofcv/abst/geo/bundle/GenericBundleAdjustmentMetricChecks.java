@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -122,8 +122,8 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 
 	private void addNoiseToPoint3D(Tuple2<SceneStructureMetric, SceneObservations> a) {
 		SceneStructureMetric structure = a.data0;
-		for (int i = 0; i < structure.points.length; i++) {
-			SceneStructureMetric.Point p = structure.points[i];
+		for (int i = 0; i < structure.points.size; i++) {
+			SceneStructureMetric.Point p = structure.points.data[i];
 			p.coordinate[0] += rand.nextGaussian()*0.1;
 			p.coordinate[1] += rand.nextGaussian()*0.1;
 			p.coordinate[2] += rand.nextGaussian()*0.1;
@@ -179,7 +179,7 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 				wcp.configure(intrinsic, structure.views[indexView].worldToView);
 				for (int j = 0; j < v.point.size; j++) {
 					v.get(j, o);
-					structure.points[o.index].get(p4);
+					structure.points.data[o.index].get(p4);
 					p3.x = p4.x/p4.w;
 					p3.y = p4.y/p4.w;
 					p3.z = p4.z/p4.w;
@@ -197,7 +197,7 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 				wcp.configure(intrinsic, structure.views[indexView].worldToView);
 				for (int j = 0; j < v.point.size; j++) {
 					v.get(j, o);
-					structure.points[o.index].get(p3);
+					structure.points.data[o.index].get(p3);
 					wcp.transform(p3, predicted);
 					double residual = o.distance(predicted);
 					if (Math.abs(residual) > tol)
@@ -216,16 +216,16 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 			Point4D_F64 pa = new Point4D_F64();
 			Point4D_F64 pb = new Point4D_F64();
 
-			for (int i = 0; i < a.points.length; i++) {
+			for (int i = 0; i < a.points.size; i++) {
 				// need to normalize the points first otherwise they can't be computed
-				a.points[i].normalizeH();
-				b.points[i].normalizeH();
-				double error = a.points[i].distance(b.points[i]);
+				a.points.data[i].normalizeH();
+				b.points.data[i].normalizeH();
+				double error = a.points.data[i].distance(b.points.data[i]);
 				assertTrue( error < tolDistance);
 			}
 		} else {
-			for (int i = 0; i < a.points.length; i++) {
-				double error = a.points[i].distance(b.points[i]);
+			for (int i = 0; i < a.points.size; i++) {
+				double error = a.points.data[i].distance(b.points.data[i]);
 				assertTrue( error < tolDistance);
 			}
 		}

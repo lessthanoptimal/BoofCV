@@ -1689,10 +1689,10 @@ public class MultiViewOps {
 		Point3D_F64 X = new Point3D_F64();
 
 		List<Se3_F64> worldToViews = new ArrayList<>();
-		for (int i = 0; i < structure.points.length; i++) {
+		for (int i = 0; i < structure.points.size; i++) {
 			normObs.reset();
 			worldToViews.clear();
-			SceneStructureMetric.Point sp = structure.points[i];
+			SceneStructureMetric.Point sp = structure.points.get(i);
 			for (int j = 0; j < sp.views.size; j++) {
 				int viewIdx = sp.views.get(j);
 				SceneStructureMetric.View v = structure.views[viewIdx];

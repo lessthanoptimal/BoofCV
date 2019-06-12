@@ -86,14 +86,14 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 
 		numViewsUnknown = structure.getUnknownViewCount();
 
-		indexFirstView = structure.points.length*lengthPoint;
+		indexFirstView = structure.points.size*lengthPoint;
 		numParameters = indexFirstView + numViewsUnknown*12;
 
-		viewParameterIndexes = new int[structure.views.length];
+		viewParameterIndexes = new int[structure.views.size];
 		int index = 0;
-		for (int i = 0; i < structure.views.length; i++) {
+		for (int i = 0; i < structure.views.size; i++) {
 			viewParameterIndexes[i] = index;
-			if( !structure.views[i].known ) {
+			if( !structure.views.data[i].known ) {
 				index += 12;
 			}
 		}
@@ -117,7 +117,7 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 	 */
 	public void processInternal( double[] input, DMatrix leftPoint, DMatrix rightView) {
 		int numRows = getNumOfOutputsM();
-		int numPointParam = structure.points.length*lengthPoint;
+		int numPointParam = structure.points.size*lengthPoint;
 		int numViewParam = numParameters-numPointParam; // view + camera
 
 		((ReshapeMatrix)leftPoint).reshape(numRows,numPointParam);
@@ -127,8 +127,8 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 
 		int observationIndex = 0;
 		// first decode the transformation
-		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			SceneStructureProjective.View view = structure.views[viewIndex];
+		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+			SceneStructureProjective.View view = structure.views.data[viewIndex];
 
 			if( !view.known ) {
 				int paramIndex = viewParameterIndexes[viewIndex]+indexFirstView;
