@@ -25,6 +25,7 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Specifies a metric (calibrated) scene for optimizing using {@link BundleAdjustment}.
@@ -39,11 +40,11 @@ import georegression.struct.se.Se3_F64;
  */
 public class SceneStructureMetric extends SceneStructureCommon {
 
-	public Camera[] cameras;
-	public View[] views;
+	public FastQueue<Camera> cameras = new FastQueue<>(Camera.class,true);
+	public FastQueue<View> views = new FastQueue<>(View.class,true);
 
 	// data structures for rigid objects.
-	public Rigid[] rigids;
+	public FastQueue<Rigid> rigids = new FastQueue<>(Rigid.class,true);
 	// Lookup table from rigid point to rigid object
 	public int[] lookupRigid;
 
@@ -75,23 +76,17 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @param totalRigid Number of rigid objects
 	 */
 	public void initialize( int totalCameras , int totalViews , int totalPoints , int totalRigid ) {
-		cameras = new Camera[totalCameras];
-		views = new View[totalViews];
+		cameras.resize(totalCameras);
+		views.resize(totalViews);
 		points.resize(totalPoints);
-		rigids = new Rigid[totalRigid];
+		rigids.resize(totalRigid);
 
-		for (int i = 0; i < cameras.length; i++) {
-			cameras[i] = new Camera();
-		}
-		for (int i = 0; i < views.length; i++) {
-			views[i] = new View();
-		}
 		for (int i = 0; i < points.size; i++) {
 			points.data[i].reset();
 		}
 
-		for (int i = 0; i < rigids.length; i++) {
-			rigids[i] = new Rigid();
+		for (int i = 0; i < rigids.size; i++) {
+			rigids.get(i).reset();
 		}
 		// forget old assignments
 		lookupRigid = null;
@@ -109,8 +104,8 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		// at the same time create a look up table that allows for the object that a point belongs to be quickly found
 		lookupRigid = new int[ getTotalRigidPoints() ];
 		int pointID = 0;
-		for (int i = 0; i < rigids.length; i++) {
-			Rigid r = rigids[i];
+		for (int i = 0; i < rigids.size; i++) {
+			Rigid r = rigids.data[i];
 			r.indexFirst = pointID;
 			for (int j = 0; j < r.points.length; j++, pointID++) {
 				lookupRigid[pointID] = i;
@@ -123,7 +118,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * Returns true if the scene contains rigid objects
 	 */
 	public boolean hasRigid() {
-		return rigids.length > 0;
+		return rigids.size > 0;
 	}
 
 	/**
@@ -133,8 +128,8 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @param model The camera model
 	 */
 	public void setCamera(int which , boolean fixed , BundleAdjustmentCamera model  ) {
-		cameras[which].known = fixed;
-		cameras[which].model = model;
+		cameras.get(which).known = fixed;
+		cameras.get(which).model = model;
 	}
 
 	public void setCamera( int which , boolean fixed , CameraPinhole intrinsic ) {
@@ -152,8 +147,8 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @param worldToView The transform from world to view reference frames
 	 */
 	public void setView(int which , boolean fixed , Se3_F64 worldToView ) {
-		views[which].known = fixed;
-		views[which].worldToView.set(worldToView);
+		views.get(which).known = fixed;
+		views.get(which).worldToView.set(worldToView);
 	}
 
 	/**
@@ -166,7 +161,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @param totalPoints Total number of points attached to this rigid object
 	 */
 	public void setRigid( int which , boolean fixed , Se3_F64 worldToObject , int totalPoints ) {
-		Rigid r = rigids[which] = new Rigid();
+		Rigid r = rigids.data[which] = new Rigid();
 		r.known = fixed;
 		r.objectToWorld.set(worldToObject);
 		r.points = new Point[totalPoints];
@@ -181,9 +176,9 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @param cameraIndex index of camera
 	 */
 	public void connectViewToCamera( int viewIndex , int cameraIndex ) {
-		if( views[viewIndex].camera != -1 )
+		if( views.get(viewIndex).camera != -1 )
 			throw new RuntimeException("View has already been assigned a camera");
-		views[viewIndex].camera = cameraIndex;
+		views.get(viewIndex).camera = cameraIndex;
 	}
 
 	/**
@@ -192,8 +187,8 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 */
 	public int getUnknownCameraCount() {
 		int total = 0;
-		for (int i = 0; i < cameras.length; i++) {
-			if( !cameras[i].known) {
+		for (int i = 0; i < cameras.size; i++) {
+			if( !cameras.data[i].known) {
 				total++;
 			}
 		}
@@ -206,8 +201,8 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 */
 	public int getUnknownViewCount() {
 		int total = 0;
-		for (int i = 0; i < views.length; i++) {
-			if( !views[i].known) {
+		for (int i = 0; i < views.size; i++) {
+			if( !views.get(i).known) {
 				total++;
 			}
 		}
@@ -220,8 +215,8 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 */
 	public int getUnknownRigidCount() {
 		int total = 0;
-		for (int i = 0; i < rigids.length; i++) {
-			if( !rigids[i].known) {
+		for (int i = 0; i < rigids.size; i++) {
+			if( !rigids.data[i].known) {
 				total++;
 			}
 		}
@@ -235,9 +230,9 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 */
 	public int getUnknownCameraParameterCount() {
 		int total = 0;
-		for (int i = 0; i < cameras.length; i++) {
-			if( !cameras[i].known) {
-				total += cameras[i].model.getIntrinsicCount();
+		for (int i = 0; i < cameras.size; i++) {
+			if( !cameras.data[i].known) {
+				total += cameras.data[i].model.getIntrinsicCount();
 			}
 		}
 		return total;
@@ -251,8 +246,8 @@ public class SceneStructureMetric extends SceneStructureCommon {
 			return 0;
 
 		int total = 0;
-		for (int i = 0; i < rigids.length; i++) {
-			total += rigids[i].points.length;
+		for (int i = 0; i < rigids.size; i++) {
+			total += rigids.data[i].points.length;
 		}
 		return total;
 	}
@@ -266,15 +261,15 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		return getUnknownViewCount()*6 + getUnknownRigidCount()*6 + points.size*pointSize + getUnknownCameraParameterCount();
 	}
 
-	public Camera[] getCameras() {
+	public FastQueue<Camera> getCameras() {
 		return cameras;
 	}
 
-	public View[] getViews() {
+	public FastQueue<View> getViews() {
 		return views;
 	}
 
-	public Rigid[] getRigids() { return rigids; }
+	public FastQueue<Rigid> getRigids() { return rigids; }
 
 	/**
 	 * Camera which is viewing the scene. Contains intrinsic parameters.
@@ -330,6 +325,12 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		 * Index of the first point in the list
 		 */
 		public int indexFirst;
+
+		public void reset() {
+			objectToWorld.reset();
+			points = null;
+			indexFirst = -1;
+		}
 
 		public void setPoint( int which , double x , double y , double z ) {
 			points[which].set(x,y,z);

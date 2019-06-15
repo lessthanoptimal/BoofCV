@@ -359,23 +359,23 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		System.out.println("Final Views");
 		for (int i = 0; i < 3; i++) {
-			BundlePinholeSimplified cp = structure.getCameras()[i].getModel();
-			Vector3D_F64 T = structure.getViews()[i].worldToView.T;
+			BundlePinholeSimplified cp = structure.getCameras().get(i).getModel();
+			Vector3D_F64 T = structure.getViews().data[i].worldToView.T;
 			System.out.printf("[ %d ] f = %5.1f T=%s\n",i,cp.f,T.toString());
 		}
 
 		System.out.println("\n\nComputing Stereo Disparity");
-		BundlePinholeSimplified cp = structure.getCameras()[0].getModel();
+		BundlePinholeSimplified cp = structure.getCameras().get(0).getModel();
 		CameraPinholeBrown intrinsic01 = new CameraPinholeBrown();
 		intrinsic01.fsetK(cp.f,cp.f,0,cx,cy,width,height);
 		intrinsic01.fsetRadial(cp.k1,cp.k2);
 
-		cp = structure.getCameras()[1].getModel();
+		cp = structure.getCameras().get(1).getModel();
 		CameraPinholeBrown intrinsic02 = new CameraPinholeBrown();
 		intrinsic02.fsetK(cp.f,cp.f,0,cx,cy,width,height);
 		intrinsic02.fsetRadial(cp.k1,cp.k2);
 
-		Se3_F64 leftToRight = structure.views[1].worldToView;
+		Se3_F64 leftToRight = structure.views.data[1].worldToView;
 
 		// TODO dynamic max disparity
 		computeStereoCloud(image01,image02,color01,color02,intrinsic01,intrinsic02,leftToRight,0,250);
@@ -402,11 +402,11 @@ public class ExampleTrifocalStereoUncalibrated {
 			if( X.z < 0 )
 				totalBehind++;
 		}
-		structure.views[1].worldToView.T.print();
+		structure.views.data[1].worldToView.T.print();
 		if( totalBehind > structure.points.size/2 ) {
 			System.out.println("Flipping because it's reversed. score = "+bundleAdjustment.getFitScore());
-			for (int i = 1; i < structure.views.length; i++) {
-				Se3_F64 w2v = structure.views[i].worldToView;
+			for (int i = 1; i < structure.views.size; i++) {
+				Se3_F64 w2v = structure.views.data[i].worldToView;
 				w2v.set(w2v.invert(null));
 			}
 			triangulatePoints(structure,observations);

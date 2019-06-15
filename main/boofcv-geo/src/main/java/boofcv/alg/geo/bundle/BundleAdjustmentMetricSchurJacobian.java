@@ -122,32 +122,32 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		numParameters = indexLastView + numCameraParameters;
 
 		// pre-compute index of first parameter in each unknown rigid object. Left side
-		jacRigidS03 = new JacobianSo3[structure.rigids.length];
+		jacRigidS03 = new JacobianSo3[structure.rigids.size];
 		rigidParameterIndexes = new int[ jacRigidS03.length ];
 		for (int i = 0, index = 0; i < jacRigidS03.length; i++) {
 			rigidParameterIndexes[i] = index;
 			jacRigidS03[i] = new JacobianSo3Rodrigues();
-			if(!structure.rigids[i].known ) {
+			if(!structure.rigids.get(i).known ) {
 				index += lengthSE3;
 			}
 		}
 
 		// pre-compute index of first parameter for each unknown view. Right side
-		viewParameterIndexes = new int[structure.views.length];
-		for (int i = 0, index = 0; i < structure.views.length; i++) {
+		viewParameterIndexes = new int[structure.views.size];
+		for (int i = 0, index = 0; i < structure.views.size; i++) {
 			viewParameterIndexes[i] = index;
-			if( !structure.views[i].known ) {
+			if( !structure.views.data[i].known ) {
 				index += lengthSE3;
 			}
 		}
 
 		// Create a lookup table for each camera. Camera ID to location in parameter vector
-		cameraParameterIndexes = new int[structure.cameras.length];
+		cameraParameterIndexes = new int[structure.cameras.size];
 		int largestCameraSize = 0;
-		for (int i = 0, index = 0; i < structure.cameras.length; i++) {
-			if( !structure.cameras[i].known ) {
+		for (int i = 0, index = 0; i < structure.cameras.size; i++) {
+			if( !structure.cameras.get(i).known ) {
 				cameraParameterIndexes[i] = index;
-				int count = structure.cameras[i].model.getIntrinsicCount();
+				int count = structure.cameras.data[i].model.getIntrinsicCount();
 				largestCameraSize = Math.max(largestCameraSize,count);
 				index += count;
 			}
@@ -171,7 +171,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 									 double[] input, int observationIndex, int viewIndex,
 									 SceneStructureMetric.View view, SceneStructureMetric.Camera camera,
 									 int cameraParamStartIndex) {
-		SceneObservations.View obsView = observations.views[viewIndex];
+		SceneObservations.View obsView = observations.views.get(viewIndex);
 
 		for (int i = 0; i < obsView.size(); i++) {
 			int featureIndex = obsView.point.get(i);
@@ -241,17 +241,17 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 		rightView.zero();
 
 		// parse parameters for rigid bodies. the translation + rotation is the same for all views
-		for (int rigidIndex = 0; rigidIndex < structure.rigids.length; rigidIndex++) {
-			if( !structure.rigids[rigidIndex].known ) {
+		for (int rigidIndex = 0; rigidIndex < structure.rigids.size; rigidIndex++) {
+			if( !structure.rigids.get(rigidIndex).known ) {
 				jacRigidS03[rigidIndex].setParameters(input,indexFirstRigid+rigidParameterIndexes[rigidIndex]);
 			}
 		}
 
 		int observationIndex = 0;
 		// first decode the transformation
-		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			SceneStructureMetric.View view = structure.views[viewIndex];
-			SceneStructureMetric.Camera camera = structure.cameras[view.camera];
+		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+			SceneStructureMetric.View view = structure.views.data[viewIndex];
+			SceneStructureMetric.Camera camera = structure.cameras.data[view.camera];
 
 			if( !view.known ) {
 				int paramIndex = viewParameterIndexes[viewIndex]+indexFirstView;
@@ -272,7 +272,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 			}
 
 			observationIndex = computeGeneralPoints(leftPoint,rightView, input, observationIndex, viewIndex, view, camera, cameraParamStartIndex);
-			if( observations.viewsRigid != null )
+			if( observations.hasRigid() )
 				observationIndex = computeRigidPoints(leftPoint,rightView,observationIndex, viewIndex, view, camera, cameraParamStartIndex);
 		}
 	}
@@ -283,12 +283,12 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 								   SceneStructureMetric.Camera camera,
 								   int cameraParamStartIndex)
 	{
-		SceneObservations.View obsView = observations.viewsRigid[viewIndex];
+		SceneObservations.View obsView = observations.viewsRigid.get(viewIndex);
 
 		for (int i = 0; i < obsView.size(); i++) {
 			int featureIndex = obsView.point.get(i);
 			int rigidIndex = structure.lookupRigid[featureIndex];
-			SceneStructureMetric.Rigid rigid = structure.rigids[rigidIndex];
+			SceneStructureMetric.Rigid rigid = structure.rigids.get(rigidIndex);
 			int pointIndex = featureIndex-rigid.indexFirst; // index of point in rigid body
 
 			if( structure.isHomogenous() ) {

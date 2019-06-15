@@ -139,7 +139,7 @@ public abstract class BundleAdjustmentProjectiveSchurJacobian<M extends DMatrix>
 				worldToView.set(view.worldToView);
 			}
 
-			SceneObservations.View obsView = observations.views[viewIndex];
+			SceneObservations.View obsView = observations.views.data[viewIndex];
 
 			for (int i = 0; i < obsView.size(); i++) {
 				int featureIndex = obsView.point.get(i);

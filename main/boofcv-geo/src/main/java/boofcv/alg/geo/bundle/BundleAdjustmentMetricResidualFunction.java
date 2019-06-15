@@ -114,13 +114,13 @@ public class BundleAdjustmentMetricResidualFunction
 	 */
 	private void project3(double[] output) {
 		int observationIndex = 0;
-		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			SceneStructureMetric.View view = structure.views[viewIndex];
-			SceneStructureMetric.Camera camera = structure.cameras[view.camera];
+		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+			SceneStructureMetric.View view = structure.views.get(viewIndex);
+			SceneStructureMetric.Camera camera = structure.cameras.get(view.camera);
 
 			//=========== Project General Points in this View
 			{
-				SceneObservations.View obsView = observations.views[viewIndex];
+				SceneObservations.View obsView = observations.views.get(viewIndex);
 				for (int i = 0; i < obsView.size(); i++) {
 					obsView.get(i, observedPixel);
 					SceneStructureMetric.Point worldPt = structure.points.data[observedPixel.index];
@@ -138,15 +138,15 @@ public class BundleAdjustmentMetricResidualFunction
 			}
 
 			//=========== Project Rigid Object Points in this View
-			if( observations.viewsRigid != null )
+			if( observations.hasRigid() )
 			{
-				SceneObservations.View obsView = observations.viewsRigid[viewIndex];
+				SceneObservations.View obsView = observations.viewsRigid.get(viewIndex);
 				for (int i = 0; i < obsView.size(); i++) {
 					obsView.get(i,observedPixel);
 
 					// Use lookup table to figure out which rigid object it belongs to
 					int rigidIndex = structure.lookupRigid[observedPixel.index];
-					SceneStructureMetric.Rigid rigid = structure.rigids[rigidIndex];
+					SceneStructureMetric.Rigid rigid = structure.rigids.get(rigidIndex);
 					// Compute the point's index on the rigid object
 					int pointIndex = observedPixel.index - rigid.indexFirst;
 
@@ -175,13 +175,13 @@ public class BundleAdjustmentMetricResidualFunction
 	 */
 	private void project4(double[] output) {
 		int observationIndex = 0;
-		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			SceneStructureMetric.View view = structure.views[viewIndex];
-			SceneStructureMetric.Camera camera = structure.cameras[view.camera];
+		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+			SceneStructureMetric.View view = structure.views.get(viewIndex);
+			SceneStructureMetric.Camera camera = structure.cameras.get(view.camera);
 
 			//=========== Project General Points in this View
 			{
-				SceneObservations.View obsView = observations.views[viewIndex];
+				SceneObservations.View obsView = observations.views.get(viewIndex);
 
 				for (int i = 0; i < obsView.size(); i++) {
 					obsView.get(i, observedPixel);
@@ -200,16 +200,16 @@ public class BundleAdjustmentMetricResidualFunction
 			}
 
 			//=========== Project Rigid Object Points in this View
-			if( observations.viewsRigid != null )
+			if( observations.hasRigid() )
 			{
-				SceneObservations.View obsView = observations.viewsRigid[viewIndex];
+				SceneObservations.View obsView = observations.viewsRigid.get(viewIndex);
 
 				for (int i = 0; i < obsView.size(); i++) {
 					obsView.get(i,observedPixel);
 
 					// Use lookup table to figure out which rigid object it belongs to
 					int rigidIndex = structure.lookupRigid[observedPixel.index];
-					SceneStructureMetric.Rigid rigid = structure.rigids[rigidIndex];
+					SceneStructureMetric.Rigid rigid = structure.rigids.get(rigidIndex);
 					// Compute the point's index on the rigid object
 					int pointIndex = observedPixel.index - rigid.indexFirst;
 

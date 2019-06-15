@@ -76,8 +76,8 @@ class TestScaleSceneStructure {
 			alg.applyScale(found,obs);
 
 			// Make sure it was changed
-			for (int i = 0; i < expected.views.length; i++) {
-				assertNotEquals( expected.views[i].worldToView.T.distance(found.views[i].worldToView.T) , UtilEjml.TEST_F64);
+			for (int i = 0; i < expected.views.size; i++) {
+				assertNotEquals( expected.views.data[i].worldToView.T.distance(found.views.data[i].worldToView.T) , UtilEjml.TEST_F64);
 			}
 
 			// Must still have perfect observations if scaling was correctly applied. Otherwise solution will be changed when optimizing
@@ -150,8 +150,8 @@ class TestScaleSceneStructure {
 		alg.computePixelScaling(structure,null);
 		alg.applyScaleToPixelsAndCameraMatrix(structure,obs);
 
-		for (int viewIdx = 0; viewIdx < obs.views.length; viewIdx++) {
-			SceneObservations.View v = obs.views[viewIdx];
+		for (int viewIdx = 0; viewIdx < obs.views.size; viewIdx++) {
+			SceneObservations.View v = obs.views.data[viewIdx];
 			for (int i = 0; i < v.observations.size; i++) {
 				float o = v.observations.data[i];
 				// the real bounds is -0.5 to 0.5 but this scene can have pixels outside the image's bounds...
@@ -166,7 +166,7 @@ class TestScaleSceneStructure {
 		Random rand = new Random(seed);
 
 		scene.initialize(2,5,20);
-		SceneObservations observations = new SceneObservations(scene.views.length);
+		SceneObservations observations = new SceneObservations(scene.views.size);
 
 		CameraPinhole camera0 = new CameraPinhole(500+rand.nextDouble()*10,510+rand.nextDouble()*10,0,450,400,900,800);
 //		CameraPinhole camera1 = new CameraPinhole(456+rand.nextDouble()*10,510+rand.nextDouble()*10,0,420,410,900,800);
@@ -174,7 +174,7 @@ class TestScaleSceneStructure {
 		scene.setCamera(0,false,camera0);
 //		scene.setCamera(1,false,camera1);
 
-		for (int i = 0; i < scene.views.length; i++) {
+		for (int i = 0; i < scene.views.size; i++) {
 			Se3_F64 worldToView = new Se3_F64();
 
 			worldToView.T.x = i*0.2 + rand.nextGaussian()*0.1;
@@ -202,8 +202,8 @@ class TestScaleSceneStructure {
 				scene.points.data[i].set(X.x, X.y, X.z);
 			}
 			// Connect the point to views if it's visible inside of
-			for (int j = 0; j < scene.views.length; j++) {
-				w2p.configure(camera0,scene.views[j].worldToView); // approximate by using the same camera
+			for (int j = 0; j < scene.views.size; j++) {
+				w2p.configure(camera0,scene.views.data[j].worldToView); // approximate by using the same camera
 
 				Point2D_F64 pixel = w2p.transform(X);
 				if( pixel != null && pixel.x >= 0 && pixel.y >= 0 && pixel.x < camera0.width && pixel.y < camera0.height ) {

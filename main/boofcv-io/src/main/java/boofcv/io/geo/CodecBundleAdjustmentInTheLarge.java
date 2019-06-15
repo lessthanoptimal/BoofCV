@@ -116,7 +116,7 @@ public class CodecBundleAdjustmentInTheLarge {
             scene.setPoint(i,P.x,P.y,P.z);
         }
 
-        for (int i = 0; i < observations.views.length; i++) {
+        for (int i = 0; i < observations.views.size; i++) {
             View v = observations.getView(i);
 
             for (int j = 0; j < v.point.size; j++) {
@@ -131,11 +131,11 @@ public class CodecBundleAdjustmentInTheLarge {
     public void save( File file ) throws IOException {
         PrintStream writer = new PrintStream(file);
 
-        writer.println(scene.views.length+" "+scene.points.size+" "+observations.getObservationCount());
+        writer.println(scene.views.size+" "+scene.points.size+" "+observations.getObservationCount());
 
         PointIndex2D_F64 o = new PointIndex2D_F64();
-        for (int viewIdx = 0; viewIdx < observations.views.length; viewIdx++) {
-            SceneObservations.View view = observations.views[viewIdx];
+        for (int viewIdx = 0; viewIdx < observations.views.size; viewIdx++) {
+            SceneObservations.View view = observations.views.data[viewIdx];
 
             for (int obsIdx = 0; obsIdx < view.size(); obsIdx++) {
                 view.get(obsIdx,o);
@@ -144,9 +144,9 @@ public class CodecBundleAdjustmentInTheLarge {
         }
 
         Rodrigues_F64 axisAngle = new Rodrigues_F64();
-        for (int viewIdx = 0; viewIdx < scene.views.length; viewIdx++) {
-            SceneStructureMetric.View view = scene.views[viewIdx];
-            BundlePinholeSnavely camera = scene.cameras[view.camera].getModel();
+        for (int viewIdx = 0; viewIdx < scene.views.size; viewIdx++) {
+            SceneStructureMetric.View view = scene.views.data[viewIdx];
+            BundlePinholeSnavely camera = scene.cameras.get(view.camera).getModel();
 
             ConvertRotation3D_F64.matrixToRodrigues(view.worldToView.R,axisAngle);
 

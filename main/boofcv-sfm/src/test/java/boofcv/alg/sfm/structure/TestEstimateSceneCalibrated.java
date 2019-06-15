@@ -72,8 +72,8 @@ class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 		SceneObservations observations = alg.getObservations();
 		SceneStructureMetric structure = alg.getSceneStructure();
 
-		assertEquals(1,structure.cameras.length);
-		assertEquals(5,structure.views.length);
+		assertEquals(1,structure.cameras.size);
+		assertEquals(5,structure.views.size);
 		assertTrue(structure.points.size>495);
 
 		checkReprojectionError(structure,observations,1e-4);

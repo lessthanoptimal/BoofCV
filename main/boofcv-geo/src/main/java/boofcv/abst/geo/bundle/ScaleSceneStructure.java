@@ -133,7 +133,7 @@ public class ScaleSceneStructure {
 		pixelScaling.reset();
 		if( scalePixelsUsingStats ) {
 			for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
-				SceneObservations.View so = observations.views[viewIdx];
+				SceneObservations.View so = observations.views.get(viewIdx);
 				int N = so.size();
 				double meanX=0,meanY=0;
 				for (int i = 0,idx=0; i < N; i++) {
@@ -174,7 +174,7 @@ public class ScaleSceneStructure {
 			float stdY = (float)n.stdY;
 
 			SceneStructureProjective.View v = structure.views.data[viewIdx];
-			SceneObservations.View ov = observations.views[viewIdx];
+			SceneObservations.View ov = observations.views.get(viewIdx);
 			for (int pixelIdx = 0; pixelIdx < ov.size(); pixelIdx++) {
 				int i = pixelIdx*2;
 				float x = ov.observations.data[i];
@@ -198,7 +198,7 @@ public class ScaleSceneStructure {
 			float stdY = (float)n.stdY;
 
 			SceneStructureProjective.View v = structure.views.data[viewIdx];
-			SceneObservations.View ov = observations.views[viewIdx];
+			SceneObservations.View ov = observations.views.get(viewIdx);
 			for (int pixelIdx = 0; pixelIdx < ov.size(); pixelIdx++) {
 				int i = pixelIdx*2;
 				float x = ov.observations.data[i];
@@ -290,8 +290,8 @@ public class ScaleSceneStructure {
 		undoNormPoints3D(structure, scale);
 
 		Point3D_F64 c = new Point3D_F64();
-		for (int i = 0; i < structure.views.length; i++) {
-			SceneStructureMetric.View view = structure.views[i];
+		for (int i = 0; i < structure.views.size; i++) {
+			SceneStructureMetric.View view = structure.views.data[i];
 
 			// X_w = R'*(X_c - T) let X_c = 0 then X_w = -R'*T is center of camera in world
 			GeometryMath_F64.multTran(view.worldToView.R,view.worldToView.T,c);
@@ -364,8 +364,8 @@ public class ScaleSceneStructure {
 		double scale = desiredDistancePoint / medianDistancePoint;
 
 		Point3D_F64 c = new Point3D_F64();
-		for (int i = 0; i < structure.views.length; i++) {
-			SceneStructureMetric.View view = structure.views[i];
+		for (int i = 0; i < structure.views.size; i++) {
+			SceneStructureMetric.View view = structure.views.data[i];
 
 			// X_w = R'*(X_c - T) let X_c = 0 then X_w = -R'*T is center of camera in world
 			GeometryMath_F64.multTran(view.worldToView.R,view.worldToView.T,c);

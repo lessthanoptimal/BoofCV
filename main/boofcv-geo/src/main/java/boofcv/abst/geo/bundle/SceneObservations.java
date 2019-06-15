@@ -20,6 +20,7 @@ package boofcv.abst.geo.bundle;
 
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -33,11 +34,11 @@ public class SceneObservations {
 	/**
 	 * Views of general points.
 	 */
-	public View views[];
+	public FastQueue<View> views = new FastQueue<>(View.class,true);
 	/**
 	 * Views of points on rigid objects
 	 */
-	public View viewsRigid[];
+	public FastQueue<View> viewsRigid = new FastQueue<>(View.class,true);
 
 	/**
 	 * Constructor with zero rigid objects assumed.
@@ -54,15 +55,9 @@ public class SceneObservations {
 	 * @param rigidObjects If true then there are rigid objects that can be observed
 	 */
 	public SceneObservations(int numViews , boolean rigidObjects ) {
-		views = new View[numViews];
-		for (int i = 0; i < numViews; i++) {
-			views[i] = new View();
-		}
+		views.resize(numViews);
 		if( rigidObjects ) {
-			viewsRigid = new View[numViews];
-			for (int i = 0; i < numViews; i++) {
-				viewsRigid[i] = new View();
-			}
+			viewsRigid.resize(numViews);
 		}
 	}
 
@@ -74,22 +69,29 @@ public class SceneObservations {
 		return countObservations(viewsRigid) + countObservations(views);
 	}
 
-	private int countObservations( View[] views ) {
+	private int countObservations( FastQueue<View> views ) {
 		if( views == null )
 			return 0;
 		int total = 0;
-		for (int i = 0; i < views.length; i++) {
-			total += views[i].point.size;
+		for (int i = 0; i < views.size; i++) {
+			total += views.data[i].point.size;
 		}
 		return total;
 	}
 
+	/**
+	 * True if there are rigid views
+	 */
+	public boolean hasRigid() {
+		return views.size != 0 && views.size==viewsRigid.size;
+	}
+
 	public View getView( int which ) {
-		return views[which];
+		return views.data[which];
 	}
 
 	public View getViewRigid( int which ) {
-		return viewsRigid[which];
+		return viewsRigid.data[which];
 	}
 
 	public static class View {
@@ -164,8 +166,8 @@ public class SceneObservations {
 	 * Makes sure that each feature is only observed in each view
 	 */
 	public void checkOneObservationPerView() {
-		for (int viewIdx = 0; viewIdx < views.length; viewIdx++) {
-			SceneObservations.View v = views[viewIdx];
+		for (int viewIdx = 0; viewIdx < views.size; viewIdx++) {
+			SceneObservations.View v = views.data[viewIdx];
 
 			for (int obsIdx = 0; obsIdx < v.size(); obsIdx++) {
 				int a = v.point.get(obsIdx);

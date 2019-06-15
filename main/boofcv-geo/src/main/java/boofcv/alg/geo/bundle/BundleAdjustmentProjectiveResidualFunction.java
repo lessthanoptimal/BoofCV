@@ -109,7 +109,7 @@ public class BundleAdjustmentProjectiveResidualFunction
 		int observationIndex = 0;
 		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
 			SceneStructureProjective.View view = structure.views.data[viewIndex];
-			SceneObservations.View obsView = observations.views[viewIndex];
+			SceneObservations.View obsView = observations.views.data[viewIndex];
 			for (int i = 0; i < obsView.size(); i++) {
 				obsView.get(i,observedPixel);
 				SceneStructureMetric.Point worldPt = structure.points.data[observedPixel.index];
@@ -130,7 +130,7 @@ public class BundleAdjustmentProjectiveResidualFunction
 		int observationIndex = 0;
 		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
 			SceneStructureProjective.View view = structure.views.data[viewIndex];
-			SceneObservations.View obsView = observations.views[viewIndex];
+			SceneObservations.View obsView = observations.views.data[viewIndex];
 			for (int i = 0; i < obsView.size(); i++) {
 				obsView.get(i,observedPixel);
 				SceneStructureMetric.Point worldPt = structure.points.data[observedPixel.index];

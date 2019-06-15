@@ -83,8 +83,8 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 
 		// Add noise to every observation
 		SceneObservations observations = a.data1;
-		for (int i = 0; i < observations.views.length; i++) {
-			SceneObservations.View v = observations.views[i];
+		for (int i = 0; i < observations.views.size; i++) {
+			SceneObservations.View v = observations.views.data[i];
 			for (int j = 0; j < v.point.size; j++) {
 				v.observations.data[j*2+0] += rand.nextGaussian()*0.1;
 				v.observations.data[j*2+1] += rand.nextGaussian()*0.1;
@@ -166,8 +166,8 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 		if( structure.homogenous ) {
 			Point4D_F64 p4 = new Point4D_F64();
 			Point3D_F64 p3 = new Point3D_F64();
-			for (int indexView = 0; indexView < observations.views.length; indexView++) {
-				SceneObservations.View v = observations.views[indexView];
+			for (int indexView = 0; indexView < observations.views.size; indexView++) {
+				SceneObservations.View v = observations.views.data[indexView];
 
 				for (int j = 0; j < v.point.size; j++) {
 					v.get(j, o);
@@ -183,8 +183,8 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 			}
 		} else {
 			Point3D_F64 p3 = new Point3D_F64();
-			for (int indexView = 0; indexView < observations.views.length; indexView++) {
-				SceneObservations.View v = observations.views[indexView];
+			for (int indexView = 0; indexView < observations.views.size; indexView++) {
+				SceneObservations.View v = observations.views.data[indexView];
 
 				for (int j = 0; j < v.point.size; j++) {
 					v.get(j, o);

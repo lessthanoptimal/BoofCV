@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,14 +78,14 @@ public class TestThreeViewEstimateMetricScene {
 		// See if the reconstructed seen matches the original to within a high level of precision
 		SceneStructureMetric structure = alg.getStructure();
 		for (int i = 0; i < 3; i++) {
-			BundlePinholeSimplified c = structure.getCameras()[i].getModel();
+			BundlePinholeSimplified c = structure.getCameras().get(i).getModel();
 			assertEquals(intrinsic.fx,c.f, 1e-4);
 			assertEquals(0,c.k1, 1e-5);
 			assertEquals(0,c.k2, 1e-5);
 		}
 
-		Se3_F64 found1 = structure.getViews()[1].worldToView;
-		Se3_F64 found2 = structure.getViews()[2].worldToView;
+		Se3_F64 found1 = structure.getViews().data[1].worldToView;
+		Se3_F64 found2 = structure.getViews().data[2].worldToView;
 
 		view0_to_view1.T.normalize();
 		found1.T.normalize();

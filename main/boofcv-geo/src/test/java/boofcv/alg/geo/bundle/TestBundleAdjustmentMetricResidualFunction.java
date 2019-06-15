@@ -109,7 +109,7 @@ class TestBundleAdjustmentMetricResidualFunction {
 	}
 
 	static SceneObservations createObservations(Random rand, SceneStructureMetric structure) {
-		SceneObservations obs = new SceneObservations(structure.views.length, structure.hasRigid());
+		SceneObservations obs = new SceneObservations(structure.views.size, structure.hasRigid());
 
 		for (int j = 0; j < structure.points.size; j++) {
 			SceneStructureMetric.Point p = structure.points.data[j];
@@ -123,8 +123,8 @@ class TestBundleAdjustmentMetricResidualFunction {
 		}
 
 		if (structure.hasRigid()) {
-			for (int indexRigid = 0; indexRigid < structure.rigids.length; indexRigid++) {
-				SceneStructureMetric.Rigid r = structure.rigids[indexRigid];
+			for (int indexRigid = 0; indexRigid < structure.rigids.size; indexRigid++) {
+				SceneStructureMetric.Rigid r = structure.rigids.data[indexRigid];
 				for (int i = 0; i < r.points.length; i++) {
 					SceneStructureMetric.Point p = r.points[i];
 					int indexPoint = r.indexFirst + i;

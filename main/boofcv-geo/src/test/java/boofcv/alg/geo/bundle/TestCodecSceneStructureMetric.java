@@ -66,9 +66,9 @@ class TestCodecSceneStructureMetric {
 			assertTrue( original.points.data[i].distance(found.points.data[i]) < UtilEjml.TEST_F64);
 		}
 
-		for (int i = 0; i < original.cameras.length; i++) {
-			SceneStructureMetric.Camera o = original.cameras[i];
-			SceneStructureMetric.Camera f = found.cameras[i];
+		for (int i = 0; i < original.cameras.size; i++) {
+			SceneStructureMetric.Camera o = original.cameras.data[i];
+			SceneStructureMetric.Camera f = found.cameras.data[i];
 
 			double[] po = new double[o.model.getIntrinsicCount()];
 			double[] pf = new double[f.model.getIntrinsicCount()];
@@ -79,9 +79,9 @@ class TestCodecSceneStructureMetric {
 			assertArrayEquals(po,pf, UtilEjml.TEST_F64 );
 		}
 
-		for (int i = 0; i < original.views.length; i++) {
-			SceneStructureMetric.View o = original.views[i];
-			SceneStructureMetric.View f = found.views[i];
+		for (int i = 0; i < original.views.size; i++) {
+			SceneStructureMetric.View o = original.views.data[i];
+			SceneStructureMetric.View f = found.views.data[i];
 
 			assertTrue(MatrixFeatures_DDRM.isIdentical(o.worldToView.R,
 					f.worldToView.R, UtilEjml.TEST_F64));
@@ -90,9 +90,9 @@ class TestCodecSceneStructureMetric {
 			assertEquals(o.worldToView.T.z,f.worldToView.T.z, UtilEjml.TEST_F64);
 		}
 
-		for (int i = 0; i < original.rigids.length; i++) {
-			SceneStructureMetric.Rigid o = original.rigids[i];
-			SceneStructureMetric.Rigid f = found.rigids[i];
+		for (int i = 0; i < original.rigids.size; i++) {
+			SceneStructureMetric.Rigid o = original.rigids.data[i];
+			SceneStructureMetric.Rigid f = found.rigids.data[i];
 
 			assertTrue(MatrixFeatures_DDRM.isIdentical(o.objectToWorld.R,
 					f.objectToWorld.R, UtilEjml.TEST_F64));
@@ -122,8 +122,8 @@ class TestCodecSceneStructureMetric {
 			out.setRigid(0,false,worldToRigid0,3);
 			out.setRigid(1,true,worldToRigid1,2);
 
-			for (int i = 0; i < out.rigids.length; i++) {
-				SceneStructureMetric.Rigid r = out.rigids[i];
+			for (int i = 0; i < out.rigids.size; i++) {
+				SceneStructureMetric.Rigid r = out.rigids.data[i];
 				if( homogenous ) {
 					for (int j = 0; j < r.points.length; j++) {
 						double w = rand.nextDouble()*3+0.5;
@@ -137,14 +137,14 @@ class TestCodecSceneStructureMetric {
 			}
 
 			// assign All of first rigid's points to all views
-			SceneStructureMetric.Rigid r = out.rigids[0];
+			SceneStructureMetric.Rigid r = out.rigids.data[0];
 			for (int idxPoint = 0; idxPoint < r.points.length; idxPoint++) {
 				for (int i = 0; i < 4; i++) {
 					r.points[idxPoint].views.add(i);
 				}
 			}
 			// just the first point to each view after this
-			r = out.rigids[1];
+			r = out.rigids.data[1];
 			for (int i = 0; i < 4; i++) {
 				r.points[0].views.add(i);
 			}
@@ -174,11 +174,11 @@ class TestCodecSceneStructureMetric {
 				a.T.set(rand.nextGaussian()*0.2,3*rand.nextGaussian()*0.2,i*7.3+5);
 			}
 			out.setView(i,fixed,a);
-			out.views[i].camera = i/2;
+			out.views.data[i].camera = i/2;
 		}
 
 		// Assign first point to all views then the other points to just one view
-		for (int i = 0; i < out.views.length; i++) {
+		for (int i = 0; i < out.views.size; i++) {
 			out.points.data[0].views.add(i);
 		}
 		for (int i = 1; i < out.points.size; i++) {

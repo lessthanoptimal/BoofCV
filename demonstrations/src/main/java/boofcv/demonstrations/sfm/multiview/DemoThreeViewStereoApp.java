@@ -417,7 +417,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 				int numPoints = structureEstimator.structure.points.size;
 				controls.addText(String.format("Tri Feats %d\n",n));
 				for (int i = 0; i < 3; i++) {
-					BundlePinholeSimplified c = structureEstimator.structure.cameras[i].getModel();
+					BundlePinholeSimplified c = structureEstimator.structure.cameras.get(i).getModel();
 					controls.addText(String.format("cam[%d] f=%.1f\n",i,c.f));
 					controls.addText(String.format("   k1=%.2f k2=%.2f\n",c.k1,c.k2));
 				}
@@ -443,18 +443,18 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		System.out.println("Computing rectification: views "+view0+" "+view1);
 		SceneStructureMetric structure = structureEstimator.getStructure();
 
-		BundlePinholeSimplified cp = structure.getCameras()[view0].getModel();
+		BundlePinholeSimplified cp = structure.getCameras().get(view0).getModel();
 		intrinsic01 = new CameraPinholeBrown();
 		intrinsic01.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[view0].width, dimensions[view0].height);
 		intrinsic01.fsetRadial(cp.k1, cp.k2);
 
-		cp = structure.getCameras()[view1].getModel();
+		cp = structure.getCameras().get(view1).getModel();
 		intrinsic02 = new CameraPinholeBrown();
 		intrinsic02.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[view1].width, dimensions[view1].height);
 		intrinsic02.fsetRadial(cp.k1, cp.k2);
 
-		Se3_F64 w_to_0 = structure.views[view0].worldToView;
-		Se3_F64 w_to_1 = structure.views[view1].worldToView;
+		Se3_F64 w_to_0 = structure.views.data[view0].worldToView;
+		Se3_F64 w_to_1 = structure.views.data[view1].worldToView;
 
 		leftToRight = w_to_0.invert(null).concat(w_to_1,null);
 
@@ -514,9 +514,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	 * z-axis
 	 */
 	private int[] selectBestPair( SceneStructureMetric structure ) {
-		Se3_F64 w_to_0 = structure.views[0].worldToView;
-		Se3_F64 w_to_1 = structure.views[1].worldToView;
-		Se3_F64 w_to_2 = structure.views[2].worldToView;
+		Se3_F64 w_to_0 = structure.views.data[0].worldToView;
+		Se3_F64 w_to_1 = structure.views.data[1].worldToView;
+		Se3_F64 w_to_2 = structure.views.data[2].worldToView;
 
 		Se3_F64 view0_to_1 = w_to_0.invert(null).concat(w_to_1,null);
 		Se3_F64 view0_to_2 = w_to_0.invert(null).concat(w_to_2,null);

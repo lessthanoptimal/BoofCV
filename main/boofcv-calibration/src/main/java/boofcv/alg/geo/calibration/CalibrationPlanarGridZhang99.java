@@ -223,7 +223,7 @@ public class CalibrationPlanarGridZhang99 {
 		// A single rigid planar target is being viewed. It is assumed to be centered at the origin
 		structure.setRigid(0,true,new Se3_F64(),layout.size());
 		// Where the points are on the calibration target
-		SceneStructureMetric.Rigid rigid = structure.rigids[0];
+		SceneStructureMetric.Rigid rigid = structure.rigids.data[0];
 		for (int i = 0; i < layout.size(); i++) {
 			rigid.setPoint(i,layout.get(i).x,layout.get(i).y,0);
 		}
@@ -255,8 +255,8 @@ public class CalibrationPlanarGridZhang99 {
 		function.process(parameters,residuals);
 
 		int idx = 0;
-		for (int i = 0; i < observations.viewsRigid.length; i++) {
-			SceneObservations.View v = observations.viewsRigid[i];
+		for (int i = 0; i < observations.viewsRigid.size; i++) {
+			SceneObservations.View v = observations.viewsRigid.data[i];
 			ImageResults r = new ImageResults(v.size());
 
 			double sumX = 0;
@@ -289,7 +289,7 @@ public class CalibrationPlanarGridZhang99 {
 	}
 
 	public CameraModel getCameraModel() {
-		return cameraGenerator.getCameraModel(structure.cameras[0].model);
+		return cameraGenerator.getCameraModel(structure.cameras.get(0).model);
 	}
 
 	/**

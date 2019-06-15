@@ -133,7 +133,7 @@ public class ExampleBundleAdjustment {
 			// Project point into an arbitrary view
 			for (int j = 0; j < p.views.size; j++) {
 				int viewIdx  = p.views.get(j);
-				SePointOps_F64.transform(structure.views[viewIdx].worldToView,world,camera);
+				SePointOps_F64.transform(structure.views.data[viewIdx].worldToView,world,camera);
 				cloudXyz.add( world.copy() );
 				break;
 			}

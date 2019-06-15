@@ -110,7 +110,7 @@ public abstract class GenericCalibrationZhang99<CM extends CameraModel>
 
 			SceneStructureMetric structure = alg.getStructure();
 
-			CM found = (CM)zhangCamera.getCameraModel(structure.getCameras()[0].model);
+			CM found = (CM)zhangCamera.getCameraModel(structure.getCameras().get(0).model);
 
 			checkIntrinsicOnly(config.model,found, 0.01, 0.1, 0.1);
 		}

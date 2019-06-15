@@ -84,8 +84,8 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 
 		// Add noise to every observation
 		SceneObservations observations = a.data1;
-		for (int i = 0; i < observations.views.length; i++) {
-			SceneObservations.View v = observations.views[i];
+		for (int i = 0; i < observations.views.size; i++) {
+			SceneObservations.View v = observations.views.data[i];
 			for (int j = 0; j < v.point.size; j++) {
 				v.observations.data[j*2+0] += rand.nextGaussian()*0.1;
 				v.observations.data[j*2+1] += rand.nextGaussian()*0.1;
@@ -139,8 +139,8 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 		// Add noise to every view pose estimate. Except 0 since that's the world coordinates and it's easier to check
 		// errors if that's unmolested
 		SceneStructureMetric structure = a.data0;
-		for (int i = 1; i < structure.views.length; i++) {
-			SceneStructureMetric.View v = structure.views[i];
+		for (int i = 1; i < structure.views.size; i++) {
+			SceneStructureMetric.View v = structure.views.data[i];
 			v.worldToView.T.x += rand.nextGaussian()*0.1;
 			v.worldToView.T.y += rand.nextGaussian()*0.1;
 			v.worldToView.T.z += rand.nextGaussian()*0.1;
@@ -160,7 +160,7 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 
 	public static void checkReprojectionError(SceneStructureMetric structure , SceneObservations observations , double tol ) {
 
-		BundlePinhole c = (BundlePinhole)structure.cameras[0].model;
+		BundlePinhole c = (BundlePinhole)structure.cameras.get(0).model;
 
 		// making a bunch of assumptions here...
 		CameraPinhole intrinsic = new CameraPinhole(c.fx,c.fy,c.skew,c.cx,c.cy,600,600);
@@ -173,10 +173,10 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 		if( structure.homogenous ) {
 			Point4D_F64 p4 = new Point4D_F64();
 			Point3D_F64 p3 = new Point3D_F64();
-			for (int indexView = 0; indexView < observations.views.length; indexView++) {
-				SceneObservations.View v = observations.views[indexView];
+			for (int indexView = 0; indexView < observations.views.size; indexView++) {
+				SceneObservations.View v = observations.views.data[indexView];
 
-				wcp.configure(intrinsic, structure.views[indexView].worldToView);
+				wcp.configure(intrinsic, structure.views.data[indexView].worldToView);
 				for (int j = 0; j < v.point.size; j++) {
 					v.get(j, o);
 					structure.points.data[o.index].get(p4);
@@ -191,10 +191,10 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 			}
 		} else {
 			Point3D_F64 p3 = new Point3D_F64();
-			for (int indexView = 0; indexView < observations.views.length; indexView++) {
-				SceneObservations.View v = observations.views[indexView];
+			for (int indexView = 0; indexView < observations.views.size; indexView++) {
+				SceneObservations.View v = observations.views.data[indexView];
 
-				wcp.configure(intrinsic, structure.views[indexView].worldToView);
+				wcp.configure(intrinsic, structure.views.data[indexView].worldToView);
 				for (int j = 0; j < v.point.size; j++) {
 					v.get(j, o);
 					structure.points.data[o.index].get(p3);
@@ -230,11 +230,11 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 			}
 		}
 
-		for (int i = 0; i < a.views.length; i++) {
-			double error = a.views[i].worldToView.T.distance(b.views[i].worldToView.T);
+		for (int i = 0; i < a.views.size; i++) {
+			double error = a.views.data[i].worldToView.T.distance(b.views.data[i].worldToView.T);
 			assertTrue( error < tolDistance );
-			assertTrue(MatrixFeatures_DDRM.isIdentical(a.views[i].worldToView.R,
-					b.views[i].worldToView.R,tolRotation));
+			assertTrue(MatrixFeatures_DDRM.isIdentical(a.views.data[i].worldToView.R,
+					b.views.data[i].worldToView.R,tolRotation));
 		}
 
 	}
@@ -281,7 +281,7 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 				// see which views it's visible in
 				int count = 0;
 				for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
-					SceneStructureMetric.View v = structure.views[viewIndex];
+					SceneStructureMetric.View v = structure.views.data[viewIndex];
 					wcp.configure(intrinsic, v.worldToView);
 					wcp.transform(P, pixel);
 					if (pixel.x >= 0 && pixel.x < width && pixel.y >= 0 && pixel.y < width) {
@@ -290,7 +290,7 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 				}
 				if (count >= 2) {
 					for (int viewIndex = 0; viewIndex < numViews; viewIndex++) {
-						SceneStructureMetric.View v = structure.views[viewIndex];
+						SceneStructureMetric.View v = structure.views.data[viewIndex];
 						wcp.configure(intrinsic, v.worldToView);
 						wcp.transform(P, pixel);
 						if (pixel.x >= 0 && pixel.x < width && pixel.y >= 0 && pixel.y < width) {

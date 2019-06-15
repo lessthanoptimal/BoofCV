@@ -63,8 +63,8 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 				p.coordinate[3] = input[index++];
 		}
 
-		for (int rigidIndex = 0; rigidIndex < structure.rigids.length; rigidIndex++) {
-			SceneStructureMetric.Rigid rigid = structure.rigids[rigidIndex];
+		for (int rigidIndex = 0; rigidIndex < structure.rigids.size; rigidIndex++) {
+			SceneStructureMetric.Rigid rigid = structure.rigids.data[rigidIndex];
 			// Decode the rigid body transform from object to world
 			if( !rigid.known ) {
 				rotation.setParameters(input,index);
@@ -77,8 +77,8 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 			}
 		}
 
-		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			SceneStructureMetric.View view = structure.views[viewIndex];
+		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+			SceneStructureMetric.View view = structure.views.data[viewIndex];
 			// Decode the rigid body transform from world to view
 			if( !view.known ) {
 				rotation.setParameters(input,index);
@@ -91,8 +91,8 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 			}
 		}
 
-		for (int i = 0; i < structure.cameras.length; i++) {
-			SceneStructureMetric.Camera camera = structure.cameras[i];
+		for (int i = 0; i < structure.cameras.size; i++) {
+			SceneStructureMetric.Camera camera = structure.cameras.data[i];
 			if( !camera.known ) {
 				camera.model.setIntrinsic(input,index);
 				index += camera.model.getIntrinsicCount();
@@ -113,8 +113,8 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 				output[index++] = p.coordinate[3];
 		}
 
-		for (int rigidIndex = 0; rigidIndex < structure.rigids.length; rigidIndex++) {
-			SceneStructureMetric.Rigid rigid = structure.rigids[rigidIndex];
+		for (int rigidIndex = 0; rigidIndex < structure.rigids.size; rigidIndex++) {
+			SceneStructureMetric.Rigid rigid = structure.rigids.data[rigidIndex];
 			// Decode the rigid body transform from object to world
 			if( !rigid.known ) {
 				rotation.getParameters(rigid.objectToWorld.R,output,index);
@@ -126,8 +126,8 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 			}
 		}
 
-		for( int viewIndex = 0; viewIndex < structure.views.length; viewIndex++ ) {
-			SceneStructureMetric.View view = structure.views[viewIndex];
+		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
+			SceneStructureMetric.View view = structure.views.data[viewIndex];
 			// Decode the rigid body transform from world to view
 			if( !view.known ) {
 				rotation.getParameters(view.worldToView.R,output,index);
@@ -139,8 +139,8 @@ public class CodecSceneStructureMetric implements BundleAdjustmentSchur_DSCC.Cod
 			}
 		}
 
-		for (int i = 0; i < structure.cameras.length; i++) {
-			SceneStructureMetric.Camera camera = structure.cameras[i];
+		for (int i = 0; i < structure.cameras.size; i++) {
+			SceneStructureMetric.Camera camera = structure.cameras.data[i];
 			if( !camera.known ) {
 				camera.model.getIntrinsic(output,index);
 				index += camera.model.getIntrinsicCount();

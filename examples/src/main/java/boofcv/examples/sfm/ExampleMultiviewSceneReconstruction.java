@@ -166,9 +166,9 @@ public class ExampleMultiviewSceneReconstruction {
 			// Project point into an arbitrary view
 			for (int j = 0; j < p.views.size; j++) {
 				int viewIdx  = p.views.get(j);
-				SePointOps_F64.transform(structure.views[viewIdx].worldToView,world,camera);
-				int cameraIdx = structure.views[viewIdx].camera;
-				structure.cameras[cameraIdx].model.project(camera.x,camera.y,camera.z,pixel);
+				SePointOps_F64.transform(structure.views.data[viewIdx].worldToView,world,camera);
+				int cameraIdx = structure.views.data[viewIdx].camera;
+				structure.cameras.get(cameraIdx).model.project(camera.x,camera.y,camera.z,pixel);
 
 				// Get the points color
 				BufferedImage image = colorImages.get(viewIdx);

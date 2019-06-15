@@ -60,7 +60,7 @@ class TestPruneStructureFromSceneProjective {
 		int noisyCount = (int)(N*0.02+0.5);
 		for (int i = 0; i < noisyCount; i++) {
 			int viewIdx = rand.nextInt(structure.views.size);
-			SceneObservations.View vo = observations.views[viewIdx];
+			SceneObservations.View vo = observations.views.data[viewIdx];
 
 			int idx = rand.nextInt(vo.point.size);
 			vo.observations.data[idx*2] += 5;
@@ -122,7 +122,7 @@ class TestPruneStructureFromSceneProjective {
 		// prune all but perfect coverage views
 		int expectedViews = 0;
 		for (int i = 0; i < initialViews; i++) {
-			if( observations.views[i].point.size >= 500 )
+			if( observations.views.data[i].point.size >= 500 )
 				expectedViews++;
 		}
 		alg.pruneViews(499);
@@ -183,7 +183,7 @@ class TestPruneStructureFromSceneProjective {
 			int width = vs.width;
 			int height = vs.height;
 
-			SceneObservations.View vo = observations.views[viewIdx];
+			SceneObservations.View vo = observations.views.data[viewIdx];
 
 			for (int pointIdx = 0; pointIdx < structure.points.size; pointIdx++) {
 				SceneStructureProjective.Point ps = structure.points.data[pointIdx];
@@ -217,7 +217,7 @@ class TestPruneStructureFromSceneProjective {
 			SceneStructureProjective.View vs = structure.views.data[viewIdx];
 			DMatrixRMaj P = vs.worldToView;
 
-			SceneObservations.View vo = observations.views[viewIdx];
+			SceneObservations.View vo = observations.views.data[viewIdx];
 
 			for (int i = 0; i < vo.point.size; i++) {
 				int pointIdx = vo.point.get(i);

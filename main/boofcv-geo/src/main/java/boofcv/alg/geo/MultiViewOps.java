@@ -1666,16 +1666,16 @@ public class MultiViewOps {
 				triangulateNViewCalibrated(ConfigTriangulation.GEOMETRIC);
 
 		List<RemoveBrownPtoN_F64> list_p_to_n = new ArrayList<>();
-		for (int i = 0; i < structure.cameras.length; i++) {
+		for (int i = 0; i < structure.cameras.size; i++) {
 			RemoveBrownPtoN_F64 p2n = new RemoveBrownPtoN_F64();
-			if( structure.cameras[i].model instanceof BundlePinholeSimplified ) {
-				BundlePinholeSimplified cam = (BundlePinholeSimplified) structure.cameras[i].model;
+			if( structure.cameras.data[i].model instanceof BundlePinholeSimplified ) {
+				BundlePinholeSimplified cam = (BundlePinholeSimplified) structure.cameras.data[i].model;
 				p2n.setK(cam.f, cam.f, 0, 0, 0).setDistortion(new double[]{cam.k1, cam.k2}, 0, 0);
-			} else if( structure.cameras[i].model instanceof BundlePinhole) {
-				BundlePinhole cam = (BundlePinhole) structure.cameras[i].model;
+			} else if( structure.cameras.data[i].model instanceof BundlePinhole) {
+				BundlePinhole cam = (BundlePinhole) structure.cameras.data[i].model;
 				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(new double[]{0,0}, 0,0);
-			} else if( structure.cameras[i].model instanceof BundlePinholeBrown) {
-				BundlePinholeBrown cam = (BundlePinholeBrown) structure.cameras[i].model;
+			} else if( structure.cameras.data[i].model instanceof BundlePinholeBrown) {
+				BundlePinholeBrown cam = (BundlePinholeBrown) structure.cameras.data[i].model;
 				p2n.setK(cam.fx, cam.fy, cam.skew, cam.cx, cam.cy).setDistortion(cam.radial, cam.t1, cam.t2);
 			} else {
 				throw new RuntimeException("Unknown camera model!");
@@ -1695,13 +1695,13 @@ public class MultiViewOps {
 			SceneStructureMetric.Point sp = structure.points.get(i);
 			for (int j = 0; j < sp.views.size; j++) {
 				int viewIdx = sp.views.get(j);
-				SceneStructureMetric.View v = structure.views[viewIdx];
+				SceneStructureMetric.View v = structure.views.data[viewIdx];
 				worldToViews.add(v.worldToView);
 
 				// get the observation in pixels
 				Point2D_F64 n = normObs.grow();
-				int pointidx = observations.views[viewIdx].point.indexOf(i);
-				observations.views[viewIdx].get(pointidx,n);
+				int pointidx = observations.views.get(viewIdx).point.indexOf(i);
+				observations.views.get(viewIdx).get(pointidx,n);
 				// convert to normalized image coordinates
 				list_p_to_n.get(v.camera).compute(n.x,n.y,n);
 			}

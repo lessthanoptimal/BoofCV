@@ -45,7 +45,7 @@ public class TestSceneStructureMetric {
 			assertEquals(1,scene.lookupRigid[i+2]);
 		}
 
-		assertEquals(0,scene.rigids[0].indexFirst);
-		assertEquals(2,scene.rigids[1].indexFirst);
+		assertEquals(0,scene.rigids.data[0].indexFirst);
+		assertEquals(2,scene.rigids.data[1].indexFirst);
 	}
 }

@@ -65,9 +65,9 @@ public class PruneStructureFromSceneMetric {
 
 		// Create a list of observation errors
 		List<Errors> errors = new ArrayList<>();
-		for (int viewIndex = 0; viewIndex < observations.views.length; viewIndex++) {
-			SceneObservations.View v = observations.views[viewIndex];
-			SceneStructureMetric.View view = structure.views[viewIndex];
+		for (int viewIndex = 0; viewIndex < observations.views.size; viewIndex++) {
+			SceneObservations.View v = observations.views.data[viewIndex];
+			SceneStructureMetric.View view = structure.views.data[viewIndex];
 
 			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
 				int pointID = v.point.data[pointIndex];
@@ -82,7 +82,7 @@ public class PruneStructureFromSceneMetric {
 				view.worldToView.transform(X, X);
 
 				// predicted pixel
-				SceneStructureMetric.Camera camera = structure.cameras[view.camera];
+				SceneStructureMetric.Camera camera = structure.cameras.data[view.camera];
 				camera.model.project(X.x, X.y, X.z, predicted);
 
 				Errors e = new Errors();
@@ -99,7 +99,7 @@ public class PruneStructureFromSceneMetric {
 		for (int i = (int) (errors.size() * inlierFraction); i < errors.size(); i++) {
 			Errors e = errors.get(i);
 
-			SceneObservations.View v = observations.views[e.view];
+			SceneObservations.View v = observations.views.get(e.view);
 			v.set(e.pointIndexInView, Float.NaN, Float.NaN);
 		}
 
@@ -113,9 +113,9 @@ public class PruneStructureFromSceneMetric {
 	private void removeMarkedObservations() {
 		Point2D_F64 observation = new Point2D_F64();
 
-		for (int viewIndex = 0; viewIndex < observations.views.length; viewIndex++) {
+		for (int viewIndex = 0; viewIndex < observations.views.size; viewIndex++) {
 //			System.out.println("ViewIndex="+viewIndex);
-			SceneObservations.View v = observations.views[viewIndex];
+			SceneObservations.View v = observations.views.data[viewIndex];
 			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
 				int pointID = v.getPointId(pointIndex);
 				SceneStructureMetric.Point f = structure.points.data[pointID];
@@ -143,9 +143,9 @@ public class PruneStructureFromSceneMetric {
 	public void pruneObservationsBehindCamera() {
 		Point3D_F64 X = new Point3D_F64();
 
-		for (int viewIndex = 0; viewIndex < observations.views.length; viewIndex++) {
-			SceneObservations.View v = observations.views[viewIndex];
-			SceneStructureMetric.View view = structure.views[viewIndex];
+		for (int viewIndex = 0; viewIndex < observations.views.size; viewIndex++) {
+			SceneObservations.View v = observations.views.get(viewIndex);
+			SceneStructureMetric.View view = structure.views.get(viewIndex);
 
 			for (int pointIndex = 0; pointIndex < v.point.size; pointIndex++) {
 				SceneStructureMetric.Point f = structure.points.get(v.getPointId(pointIndex));
@@ -178,8 +178,8 @@ public class PruneStructureFromSceneMetric {
 	 */
 	public void prunePoints(int count ) {
 		// Remove all observations of the Points which are going to be removed
-		for (int viewIndex = observations.views.length-1; viewIndex >= 0; viewIndex--) {
-			SceneObservations.View v = observations.views[viewIndex];
+		for (int viewIndex = observations.views.size-1; viewIndex >= 0; viewIndex--) {
+			SceneObservations.View v = observations.views.data[viewIndex];
 
 			for(int pointIndex = v.point.size-1; pointIndex >= 0; pointIndex-- ) {
 				SceneStructureMetric.Point p = structure.points.data[v.getPointId(pointIndex)];
@@ -214,8 +214,8 @@ public class PruneStructureFromSceneMetric {
 		structure.removePoints(prune);
 
 		// Update the references from observation to features
-		for (int viewIndex = observations.views.length-1; viewIndex >= 0; viewIndex--) {
-			SceneObservations.View v = observations.views[viewIndex];
+		for (int viewIndex = observations.views.size-1; viewIndex >= 0; viewIndex--) {
+			SceneObservations.View v = observations.views.data[viewIndex];
 
 			for(int featureIndex = v.point.size-1; featureIndex >= 0; featureIndex-- ) {
 				v.point.data[featureIndex] = oldToNew[v.point.data[featureIndex]];
@@ -293,17 +293,16 @@ public class PruneStructureFromSceneMetric {
 	 */
 	public void pruneViews( int count ) {
 
-		List<SceneStructureMetric.View> remainingS = new ArrayList<>();
-		List<SceneObservations.View> remainingO = new ArrayList<>();
+		GrowQueue_I32 removeIdx = new GrowQueue_I32();
 
-		for (int viewId = 0; viewId < structure.views.length; viewId++) {
-			SceneObservations.View view = observations.views[viewId];
+
+		for (int viewId = 0; viewId < structure.views.size; viewId++) {
+			SceneObservations.View view = observations.views.data[viewId];
 			// See if has enough observations to not prune
 			if( view.size() > count ) {
-				remainingS.add(structure.views[viewId]);
-				remainingO.add(view);
 				continue;
 			}
+			removeIdx.add(viewId);
 
 			// Go through list of points and remove this view from them
 			for (int pointIdx = 0; pointIdx < view.point.size; pointIdx++) {
@@ -316,14 +315,9 @@ public class PruneStructureFromSceneMetric {
 			}
 		}
 
-		// Create new arrays with the views that were not pruned
-		structure.views = new SceneStructureMetric.View[remainingS.size()];
-		observations.views = new SceneObservations.View[remainingO.size()];
-
-		for (int i = 0; i < structure.views.length; i++) {
-			structure.views[i] = remainingS.get(i);
-			observations.views[i] = remainingO.get(i);
-		}
+		// Remove the views
+		structure.views.remove(removeIdx.data,0,removeIdx.size,null);
+		observations.views.remove(removeIdx.data,0,removeIdx.size,null);
 	}
 
 	/**
@@ -331,31 +325,29 @@ public class PruneStructureFromSceneMetric {
 	 */
 	public void pruneUnusedCameras() {
 		// Count how many views are used by each camera
-		int[] histogram = new int[structure.cameras.length];
+		int[] histogram = new int[structure.cameras.size];
 
-		for (int i = 0; i < structure.views.length; i++) {
-			histogram[structure.views[i].camera]++;
+		for (int i = 0; i < structure.views.size; i++) {
+			histogram[structure.views.data[i].camera]++;
 		}
 
 		// See which cameras need to be removed and create a look up table from old to new camera IDs
-		int[] oldToNew = new int[structure.cameras.length];
-		List<SceneStructureMetric.Camera> remaining = new ArrayList<>();
-		for (int i = 0; i < structure.cameras.length; i++) {
+		int[] oldToNew = new int[structure.cameras.size];
+		GrowQueue_I32 removeIdx = new GrowQueue_I32();
+		for (int i = 0; i < structure.cameras.size; i++) {
 			if( histogram[i] > 0 ) {
-				oldToNew[i] = remaining.size();
-				remaining.add(structure.cameras[i]);
+				oldToNew[i] = i-removeIdx.size();
+			} else {
+				removeIdx.add(i);
 			}
 		}
 
 		// Create the new camera array without the unused cameras
-		structure.cameras = new SceneStructureMetric.Camera[remaining.size()];
-		for (int i = 0; i < remaining.size(); i++) {
-			structure.cameras[i] = remaining.get(i);
-		}
+		structure.cameras.remove(removeIdx.data,0,removeIdx.size,null);
 
 		// Update the references to the cameras
-		for (int i = 0; i < structure.views.length; i++) {
-			SceneStructureMetric.View v = structure.views[i];
+		for (int i = 0; i < structure.views.size; i++) {
+			SceneStructureMetric.View v = structure.views.data[i];
 			v.camera = oldToNew[v.camera];
 		}
 	}

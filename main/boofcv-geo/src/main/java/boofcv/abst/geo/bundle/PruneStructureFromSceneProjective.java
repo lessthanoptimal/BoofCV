@@ -60,8 +60,8 @@ public class PruneStructureFromSceneProjective {
 
 		// Create a list of observation errors
 		List<Errors> errors = new ArrayList<>();
-		for (int viewIndex = 0; viewIndex < observations.views.length; viewIndex++) {
-			SceneObservations.View v = observations.views[viewIndex];
+		for (int viewIndex = 0; viewIndex < observations.views.size; viewIndex++) {
+			SceneObservations.View v = observations.views.data[viewIndex];
 			SceneStructureProjective.View view = structure.views.data[viewIndex];
 
 			for (int indexInView = 0; indexInView < v.point.size; indexInView++) {
@@ -95,7 +95,7 @@ public class PruneStructureFromSceneProjective {
 		for (int i = index0; i < errors.size(); i++) {
 			Errors e = errors.get(i);
 
-			SceneObservations.View v = observations.views[e.view];
+			SceneObservations.View v = observations.views.data[e.view];
 			v.set(e.pointIndexInView, Float.NaN, Float.NaN);
 		}
 
@@ -125,7 +125,7 @@ public class PruneStructureFromSceneProjective {
 				// remove observations of this point from each view
 				for (int i = 0; i < sp.views.size; i++) {
 					int viewIdx = sp.views.data[i];
-					SceneObservations.View ov = observations.views[viewIdx];
+					SceneObservations.View ov = observations.views.get(viewIdx);
 					int localIdx = ov.point.indexOf(pointIdx);
 					if( localIdx == -1 )
 						throw new RuntimeException("Point not in view's observation!?");
@@ -142,7 +142,7 @@ public class PruneStructureFromSceneProjective {
 
 		// update point references
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
-			SceneObservations.View so = observations.views[viewIdx];
+			SceneObservations.View so = observations.views.get(viewIdx);
 
 			for (int i = 0; i < so.point.size; i++) {
 				so.point.data[i] = oldToNew[ so.point.data[i]];
@@ -162,8 +162,7 @@ public class PruneStructureFromSceneProjective {
 	 * @return true if views were pruned or false if not
 	 */
 	public boolean pruneViews(int count) {
-		GrowQueue_I32 pruneIdxS = new GrowQueue_I32();
-		List<SceneObservations.View> remainingO = new ArrayList<>();
+		GrowQueue_I32 pruneIdx = new GrowQueue_I32();
 
 		// count number of observations in each view
 		int[] counts = new int[structure.views.size];
@@ -177,10 +176,8 @@ public class PruneStructureFromSceneProjective {
 		// TODO Add a list of points to each view reducing number of iterations through all the points
 		// mark views with too few points for removal
 		for (int viewIdx = 0; viewIdx < structure.views.size; viewIdx++) {
-			if( counts[viewIdx] > count) {
-				remainingO.add(observations.views[viewIdx]);
-			} else {
-				pruneIdxS.add(viewIdx);
+			if( counts[viewIdx] <= count) {
+				pruneIdx.add(viewIdx);
 				structure.views.data[viewIdx].width = -2;
 			}
 		}
@@ -196,17 +193,13 @@ public class PruneStructureFromSceneProjective {
 			}
 		}
 
-		if( pruneIdxS.size() == 0 ) {
+		if( pruneIdx.size() == 0 ) {
 			return false;
 		}
 
 		// Create new arrays with the views that were not pruned
-		structure.views.remove(pruneIdxS.data,0,pruneIdxS.size,null);
-		observations.views = new SceneObservations.View[remainingO.size()];
-
-		for (int i = 0; i < structure.views.size; i++) {
-			observations.views[i] = remainingO.get(i);
-		}
+		structure.views.remove(pruneIdx.data,0,pruneIdx.size,null);
+		observations.views.remove(pruneIdx.data,0,pruneIdx.size,null);
 		return true;
 	}
 
@@ -216,9 +209,9 @@ public class PruneStructureFromSceneProjective {
 	private void removeMarkedObservations() {
 		Point2D_F64 observation = new Point2D_F64();
 
-		for (int viewIndex = 0; viewIndex < observations.views.length; viewIndex++) {
+		for (int viewIndex = 0; viewIndex < observations.views.size; viewIndex++) {
 //			System.out.println("ViewIndex="+viewIndex);
-			SceneObservations.View v = observations.views[viewIndex];
+			SceneObservations.View v = observations.views.data[viewIndex];
 			for(int indexInView = v.point.size-1; indexInView >= 0; indexInView-- ) {
 				int pointID = v.getPointId(indexInView);
 				SceneStructureProjective.Point f = structure.points.data[pointID];
