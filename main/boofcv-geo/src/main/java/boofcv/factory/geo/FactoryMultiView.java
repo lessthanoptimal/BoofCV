@@ -36,10 +36,7 @@ import boofcv.alg.geo.h.HomographyDirectLinearTransform;
 import boofcv.alg.geo.h.HomographyResidualSampson;
 import boofcv.alg.geo.h.HomographyResidualTransfer;
 import boofcv.alg.geo.h.HomographyTotalLeastSquares;
-import boofcv.alg.geo.pose.P3PFinsterwalder;
-import boofcv.alg.geo.pose.P3PGrunert;
-import boofcv.alg.geo.pose.PnPLepetitEPnP;
-import boofcv.alg.geo.pose.PoseFromPairLinear6;
+import boofcv.alg.geo.pose.*;
 import boofcv.alg.geo.triangulate.*;
 import boofcv.alg.geo.trifocal.RefineThreeViewProjectiveGeometric;
 import boofcv.alg.geo.trifocal.TrifocalAlgebraicPoint7;
@@ -494,6 +491,17 @@ public class FactoryMultiView {
 		FastQueue<Se3_F64> solutions = new FastQueue<>(4, Se3_F64.class, true);
 
 		return new EstimateNto1ofPnP(pnp_N(which,-1),solutions,numTest);
+	}
+
+	/**
+	 * Projective N Point. This is PnP for uncalibrated cameras. Please read algorithms documentation for
+	 * limitations
+	 *
+	 * @see PRnPDirectLinearTransform
+	 * @return Estimator
+	 */
+	public static Estimate1ofPrNP prnp_1() {
+		return new WrapPRnPDirectLinearTransform(new PRnPDirectLinearTransform());
 	}
 
 	/**

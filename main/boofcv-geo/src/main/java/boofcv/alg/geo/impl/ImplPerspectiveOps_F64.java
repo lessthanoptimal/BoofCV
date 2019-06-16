@@ -64,7 +64,7 @@ public class ImplPerspectiveOps_F64 {
 	}
 
 	public static DMatrixRMaj pinholeToMatrix( double fx, double fy, double skew,
-											   double cx, double cy , DMatrixRMaj K ) {
+											   double cx, double cy , @Nullable DMatrixRMaj K ) {
 		if( K == null ) {
 			K = new DMatrixRMaj(3,3);
 		} else {
@@ -83,7 +83,7 @@ public class ImplPerspectiveOps_F64 {
 		return K;
 	}
 
-	public static DMatrixRMaj pinholeToMatrix(CameraPinhole param , DMatrixRMaj K ) {
+	public static DMatrixRMaj pinholeToMatrix(CameraPinhole param , @Nullable DMatrixRMaj K ) {
 		return pinholeToMatrix( (double)param.fx, (double)param.fy, (double)param.skew, (double)param.cx, (double)param.cy,K);
 	}
 

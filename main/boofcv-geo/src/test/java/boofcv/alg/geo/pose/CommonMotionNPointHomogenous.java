@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,6 +47,7 @@ public class CommonMotionNPointHomogenous {
 	protected List<Point4D_F64> worldPts;
 	// list of observation pairs in both reference frames
 	protected List<AssociatedPair> assocPairs;
+	protected List<Point2D_F64> pixelsView2 = new ArrayList<>();
 
 	protected void generateScene(int N, DMatrixRMaj P, boolean planar) {
 		this.projection = P;
@@ -63,6 +64,7 @@ public class CommonMotionNPointHomogenous {
 
 		// transform points into second camera's reference frame
 		assocPairs = new ArrayList<>();
+		pixelsView2 = new ArrayList<>();
 		for(Point4D_F64 X : worldPts ) {
 			Point2D_F64 p1 = PerspectiveOps.renderPixel(P0, X, (Point2D_F64)null);
 			Point2D_F64 p2 = PerspectiveOps.renderPixel(P, X, (Point2D_F64)null);
@@ -71,6 +73,7 @@ public class CommonMotionNPointHomogenous {
 			pair.p1.set(p1.x,p1.y);
 			pair.p2.set(p2.x,p2.y);
 			assocPairs.add(pair);
+			pixelsView2.add(p2);
 		}
 	}
 }

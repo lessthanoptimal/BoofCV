@@ -48,6 +48,8 @@ Version : 0.34
 - Concurrent version of template matching
 - Android
   * Thanks sergiuchuckmisha for fixing a bug/type-o in FOV estimation
+- Geometric
+  * Added Projective N-Point (PRnP) algorithm using DLT
 
 TODO Scene Reconstruction from arbitrary number of photos
 
