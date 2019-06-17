@@ -36,7 +36,7 @@ public class ProjectiveExpandStructure {
 	ProjectiveInitializeAllCommon computeStructure;
 
 	public void process( LookupSimilarImages db ,
-						 View seed , GrowQueue_I32 connIdx , GrowQueue_I32 featIdx,
+						 View seed , GrowQueue_I32 connIdx , GrowQueue_I32 featsIdx,
 						 SceneStructureProjective structure ) {
 
 		// create a list of initial views that are connected to the seed
@@ -82,6 +82,15 @@ public class ProjectiveExpandStructure {
 
 			// TODO Run bundle adjustment
 		}
+	}
+
+	void addCameraMatrix( int viewIdx , GrowQueue_I32 featsIdx) {
+//		FactoryMultiView.
+
+		// create a list of features coordinate and pixel observations
+//		computeStructure.ransac.
+
+
 	}
 
 	/**
