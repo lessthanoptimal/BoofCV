@@ -18,11 +18,13 @@
 
 package boofcv.alg.geo.pose;
 
+import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.linsol.qr.LinearSolverQrHouseCol_DDRM;
 import org.ejml.dense.row.linsol.svd.SolveNullSpaceSvd_DDRM;
+import org.ejml.dense.row.linsol.svd.SolvePseudoInverseSvd_DDRM;
 import org.ejml.interfaces.SolveNullSpace;
 import org.ejml.interfaces.linsol.LinearSolverDense;
 
@@ -48,10 +50,19 @@ public class CompatibleProjectiveHomography {
 	// Linear solver. Change to SVD if a more robust one is needed
 	public LinearSolverDense<DMatrixRMaj> solver = new LinearSolverQrHouseCol_DDRM();
 	public SolveNullSpace<DMatrixRMaj> nullspace = new SolveNullSpaceSvd_DDRM();
+	public SolvePseudoInverseSvd_DDRM solvePInv = new SolvePseudoInverseSvd_DDRM();
 
 	// workspace variables for A*X=B
 	private DMatrixRMaj A = new DMatrixRMaj(1,1);
 	private DMatrixRMaj B = new DMatrixRMaj(1,1);
+
+	private Point4D_F64 a = new Point4D_F64();
+	private Point4D_F64 b = new Point4D_F64();
+
+	// PinvP = pinv(P)*P
+	private DMatrixRMaj PinvP = new DMatrixRMaj(4,4);
+	// storage for nullspace of P
+	private DMatrixRMaj h = new DMatrixRMaj(1,1);
 
 	/**
 	 * Finds the homography H by by minimizing algebriac error. Modified version of algorithm described in [1].
@@ -148,9 +159,80 @@ public class CompatibleProjectiveHomography {
 		return true;
 	}
 
+	/**
+	 *
+	 * <p>H(v) = pinv(P)*P' + hv<sup>T</sup></p>
+	 *
+	 *
+	 * @param camera1
+	 * @param camera2
+	 * @param points1
+	 * @param points2
+	 * @param H
+	 * @return
+	 */
 	public boolean fitCameraPoints(DMatrixRMaj camera1 , DMatrixRMaj camera2 ,
 								   List<Point4D_F64> points1 , List<Point4D_F64> points2 ,
 								   DMatrixRMaj H ) {
+
+		// yes the SVD is computed twice. This can be optimized later, right now it isn't worth it. not a bottle neck
+		if( !solvePInv.setA(camera1) )
+			return false;
+		if( !nullspace.process(camera1,1,h) )
+			return false;
+
+		// PinvP = pinv(P)*P'
+		solvePInv.solve(camera2,PinvP);
+
+		PinvP.print();
+		final int size = points1.size();
+		A.reshape(size*3,4);
+		B.reshape(size*3,1);
+
+		for (int i = 0,idxA=0,idxB=0; i < size; i++) {
+			Point4D_F64 p1 = points1.get(i);
+			Point4D_F64 p2 = points2.get(i);
+
+			// a = P+P'X'
+			GeometryMath_F64.mult(PinvP,p2,a);
+
+			double a4 = a.w;
+			double h4 = h.data[3];
+			double x4 = p1.getIdx(0);
+
+			for (int j = 0; j < 3; j++) {
+
+				// b[k] = h[k]*X[4] - h[4]*X[k]
+				double b_k = h.data[j]*p1.w - h4*x4;
+				// c[k] = X[k]*a[4] - X[4]*a[k]
+				double c_k = p1.getIdx(j)*a4 - x4*a.getIdx(j);
+
+				// b*X'^T*v = c
+				A.data[idxA++] = b_k*p2.x;
+				A.data[idxA++] = b_k*p2.y;
+				A.data[idxA++] = b_k*p2.z;
+				A.data[idxA++] = b_k*p2.w;
+
+				B.data[idxB++] = c_k;
+			}
+		}
+		A.print();
+
+		// Solve for v
+		if( !solver.setA(A) )
+			return false;
+		H.reshape(4,1);
+		solver.solve(B,H);
+
+		// copy v into 'a'
+		a.set(H.data[0],H.data[1],H.data[2],H.data[3]);
+		// H = P+P' + h*v^T
+		H.reshape(4,4);
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				H.data[i*4+j] = PinvP.get(i,j) + h.data[i]*a.getIdx(j);
+			}
+		}
 		return true;
 	}
 
