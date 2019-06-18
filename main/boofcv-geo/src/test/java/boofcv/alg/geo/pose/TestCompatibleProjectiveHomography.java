@@ -43,6 +43,43 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenous {
 
+	List<DMatrixRMaj> camerasB;
+	List<Point4D_F64> sceneB;
+
+	@Override
+	public void createScene(int numFeatures, boolean planar) {
+		super.createScene(numFeatures, planar);
+
+		// Triangulate 3D points in another projective
+		TrifocalTensor T = MultiViewOps.createTrifocal(cameras.get(1),cameras.get(2),null);
+		DMatrixRMaj P1 = super.cameras.get(0).copy();
+		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
+		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
+		MultiViewOps.extractCameraMatrices(T,P2,P3);
+
+		sceneB = new ArrayList<>();
+
+		TriangulateNViewsProjective triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.GEOMETRIC);
+		List<Point2D_F64> observations = new ArrayList<>();
+		for (int i = 0; i < 3; i++) {
+			observations.add(new Point2D_F64());
+		}
+		camerasB = new ArrayList<>();
+		camerasB.add( P1 );
+		camerasB.add( P2 );
+		camerasB.add( P3 );
+		for (int i = 0; i < numFeatures; i++) {
+			AssociatedTriple t = triples.get(i);
+			observations.get(0).set(t.p1);
+			observations.get(1).set(t.p2);
+			observations.get(2).set(t.p3);
+			Point4D_F64 location = new Point4D_F64();
+			assertTrue(triangulator.triangulate(observations,camerasB,location));
+
+			sceneB.add(location);
+		}
+	}
+
 	@Test
 	void fitPoints() {
 		// minimum number of points
@@ -54,139 +91,56 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 	void fitPoints( int N ) {
 		createScene(N,false);
 
-		// Triangulate 3D points in another projective
-		TrifocalTensor T = MultiViewOps.createTrifocal(cameras.get(1),cameras.get(2),null);
-		DMatrixRMaj P1 = super.cameras.get(0);
-		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
-		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
-		MultiViewOps.extractCameraMatrices(T,P2,P3);
-
-		List<Point4D_F64> sceneB = new ArrayList<>();
-
-		TriangulateNViewsProjective triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.GEOMETRIC);
-		List<Point2D_F64> observations = new ArrayList<>();
-		for (int i = 0; i < 3; i++) {
-			observations.add(new Point2D_F64());
-		}
-		List<DMatrixRMaj> camerasB = new ArrayList<>();
-		camerasB.add( P1 );
-		camerasB.add( P2 );
-		camerasB.add( P3 );
-		for (int i = 0; i < N; i++) {
-			AssociatedTriple t = triples.get(i);
-			observations.get(0).set(t.p1);
-			observations.get(1).set(t.p2);
-			observations.get(2).set(t.p3);
-			Point4D_F64 location = new Point4D_F64();
-			assertTrue(triangulator.triangulate(observations,camerasB,location));
-
-			sceneB.add(location);
-		}
-
 		// Find the homography
 		DMatrixRMaj H = new DMatrixRMaj(4,4);
 		CompatibleProjectiveHomography alg = new CompatibleProjectiveHomography();
 		assertTrue(alg.fitPoints(worldPts,sceneB,H));
 
-		DMatrixRMaj H_inv = new DMatrixRMaj(4,4);
-		CommonOps_DDRM.invert(H,H_inv);
-
-		// test the solution
-		checkCameras(P1, P2, P3, H_inv, 1e-4);
+		checkCamerasH(H, 1e-7 );
 	}
 
 	@Test
 	void fitCameras() {
 		createScene(10,false);
 
-		// get equivalent cameras but in a different projective frame
-//		TrifocalTensor T = new TrifocalTensor();
-//		Estimate1ofTrifocalTensor estimateTri = FactoryMultiView.trifocal_1(null);
-//		estimateTri.process(triples,T);
-
-		TrifocalTensor T = MultiViewOps.createTrifocal(cameras.get(1),cameras.get(2),null);
-
-		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
-		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
-
-		MultiViewOps.extractCameraMatrices(T,P2,P3);
-
-//		Point4D_F64 X = worldPts.get(0);
-//		Point2D_F64 pixel = new Point2D_F64();
-//		PerspectiveOps.renderPixel(P2,X,pixel);
-//		pixel.print();
-//		PerspectiveOps.renderPixel(cameras.get(1),X,pixel);
-//		pixel.print();
-
 		List<DMatrixRMaj> camerasA = new ArrayList<>();
-		List<DMatrixRMaj> camerasB = new ArrayList<>();
+		List<DMatrixRMaj> camerasB = new ArrayList<>(this.camerasB);
 
 		// both views have identity for first view
 		DMatrixRMaj P1 = super.cameras.get(0);
-//		camerasA.add(P1);
+		camerasA.add(P1);
 		camerasA.add(super.cameras.get(1));
 		camerasA.add(super.cameras.get(2));
 
-//		camerasB.add(P1);
-		camerasB.add(P2);
-		camerasB.add(P3);
-
 		CompatibleProjectiveHomography alg = new CompatibleProjectiveHomography();
 
-		DMatrixRMaj H = new DMatrixRMaj(4,4);
-		assertTrue(alg.fitCameras(camerasA,camerasB,H));
+		DMatrixRMaj H_inv = new DMatrixRMaj(4,4);
+		assertTrue(alg.fitCameras(camerasA,camerasB,H_inv));
+		checkCamerasHinv( H_inv, 0.1);
 
-		checkCameras(P1, P2, P3, H, 0.1);
+		// should still work with 2 cameras
+		camerasA.remove(0);
+		camerasB.remove(0);
+		assertTrue(alg.fitCameras(camerasA,camerasB,H_inv));
+		checkCamerasHinv( H_inv, 0.1);
 	}
 
 	@Test
 	void fitCameraPoints() {
-//		fitCameraPoints(2);
+		fitCameraPoints(2);
 		fitCameraPoints(6);
 	}
 
 	void fitCameraPoints( int N ) {
 		createScene(N,false);
 
-		// Triangulate 3D points in another projective
-		TrifocalTensor T = MultiViewOps.createTrifocal(cameras.get(1),cameras.get(2),null);
-		DMatrixRMaj P1 = super.cameras.get(0);
-		DMatrixRMaj P2 = new DMatrixRMaj(3,4);
-		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
-		MultiViewOps.extractCameraMatrices(T,P2,P3);
-
-		List<Point4D_F64> sceneB = new ArrayList<>();
-
-		TriangulateNViewsProjective triangulator = FactoryMultiView.triangulateNView(ConfigTriangulation.GEOMETRIC);
-		List<Point2D_F64> observations = new ArrayList<>();
-		for (int i = 0; i < 3; i++) {
-			observations.add(new Point2D_F64());
-		}
-		List<DMatrixRMaj> camerasB = new ArrayList<>();
-		camerasB.add( P1 );
-		camerasB.add( P2 );
-		camerasB.add( P3 );
-		for (int i = 0; i < N; i++) {
-			AssociatedTriple t = triples.get(i);
-			observations.get(0).set(t.p1);
-			observations.get(1).set(t.p2);
-			observations.get(2).set(t.p3);
-			Point4D_F64 location = new Point4D_F64();
-			assertTrue(triangulator.triangulate(observations,camerasB,location));
-
-			sceneB.add(location);
-		}
-
 		// Find the homography
 		DMatrixRMaj H = new DMatrixRMaj(4,4);
 		CompatibleProjectiveHomography alg = new CompatibleProjectiveHomography();
-		assertTrue(alg.fitCameraPoints(cameras.get(1),P2,worldPts,sceneB,H));
-
-		DMatrixRMaj H_inv = new DMatrixRMaj(4,4);
-		CommonOps_DDRM.invert(H,H_inv);
-
-		// test the solution
-		checkCameras(P1, P2, P3, H_inv, 1e-4 );
+		for (int i = 0; i < 3; i++) {
+			assertTrue(alg.fitCameraPoints(cameras.get(i),camerasB.get(i),worldPts,sceneB,H));
+			checkCamerasH(H, 1e-8 );
+		}
 	}
 
 	@Test
@@ -194,20 +148,31 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 		fail("Implement");
 	}
 
-	private void checkCameras(DMatrixRMaj p1, DMatrixRMaj p2, DMatrixRMaj p3, DMatrixRMaj h_inv, double tol ) {
+	private void checkCamerasH(DMatrixRMaj H, double tol ) {
+		DMatrixRMaj H_inv = new DMatrixRMaj(4,4);
+		CommonOps_DDRM.invert(H,H_inv);
+		checkCamerasHinv(H_inv,tol);
+	}
+
+	private void checkCamerasHinv(DMatrixRMaj h_inv, double tol )
+	{
+		DMatrixRMaj P1 = camerasB.get(0);
+		DMatrixRMaj P2 = camerasB.get(1);
+		DMatrixRMaj P3 = camerasB.get(2);
+
 		DMatrixRMaj PP = new DMatrixRMaj(3,4);
 		for (int i = (tol>0.01?1:0); i < 3; i++) {
 			switch(i) {
-				case 0:CommonOps_DDRM.mult(p1, h_inv, PP);break;
-				case 1:CommonOps_DDRM.mult(p2, h_inv, PP);break;
-				case 2:CommonOps_DDRM.mult(p3, h_inv, PP);break;
+				case 0:CommonOps_DDRM.mult(P1, h_inv, PP);break;
+				case 1:CommonOps_DDRM.mult(P2, h_inv, PP);break;
+				case 2:CommonOps_DDRM.mult(P3, h_inv, PP);break;
 			}
 
 			DMatrixRMaj A = cameras.get(i);
 			commonScale(A,PP);
 
-			A.print();
-			PP.print();
+//			A.print();
+//			PP.print();
 			assertTrue(MatrixFeatures_DDRM.isIdentical(A,PP,tol));
 		}
 	}

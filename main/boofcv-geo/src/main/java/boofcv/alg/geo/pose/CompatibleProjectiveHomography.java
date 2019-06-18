@@ -184,7 +184,6 @@ public class CompatibleProjectiveHomography {
 		// PinvP = pinv(P)*P'
 		solvePInv.solve(camera2,PinvP);
 
-		PinvP.print();
 		final int size = points1.size();
 		A.reshape(size*3,4);
 		B.reshape(size*3,1);
@@ -198,14 +197,14 @@ public class CompatibleProjectiveHomography {
 
 			double a4 = a.w;
 			double h4 = h.data[3];
-			double x4 = p1.getIdx(0);
+			double x4 = p1.w;
 
-			for (int j = 0; j < 3; j++) {
+			for (int k = 0; k < 3; k++) {
 
 				// b[k] = h[k]*X[4] - h[4]*X[k]
-				double b_k = h.data[j]*p1.w - h4*x4;
+				double b_k = h.data[k]*x4 - h4*p1.getIdx(k);
 				// c[k] = X[k]*a[4] - X[4]*a[k]
-				double c_k = p1.getIdx(j)*a4 - x4*a.getIdx(j);
+				double c_k = p1.getIdx(k)*a4 - x4*a.getIdx(k);
 
 				// b*X'^T*v = c
 				A.data[idxA++] = b_k*p2.x;
@@ -216,7 +215,6 @@ public class CompatibleProjectiveHomography {
 				B.data[idxB++] = c_k;
 			}
 		}
-		A.print();
 
 		// Solve for v
 		if( !solver.setA(A) )
