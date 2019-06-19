@@ -195,16 +195,20 @@ public class CompatibleProjectiveHomography {
 			// a = P+P'X'
 			GeometryMath_F64.mult(PinvP,p2,a);
 
-			double a4 = a.w;
-			double h4 = h.data[3];
-			double x4 = p1.w;
+//			double a4 = a.w;
+//			double h4 = h.data[3];
+//			double x4 = p1.w;
+
+			// Use sum instead of a[4], ... so that points at infinity can be handled
+			double a_sum = a.x+a.y+a.z+a.w;
+			double h_sum = h.data[0]+h.data[1]+h.data[2]+h.data[3];
+			double x_sum = p1.x+p1.y+p1.z+p1.w;
 
 			for (int k = 0; k < 3; k++) {
-
 				// b[k] = h[k]*X[4] - h[4]*X[k]
-				double b_k = h.data[k]*x4 - h4*p1.getIdx(k);
+				double b_k = h.data[k]*x_sum - h_sum*p1.getIdx(k);
 				// c[k] = X[k]*a[4] - X[4]*a[k]
-				double c_k = p1.getIdx(k)*a4 - x4*a.getIdx(k);
+				double c_k = p1.getIdx(k)*a_sum - x_sum*a.getIdx(k);
 
 				// b*X'^T*v = c
 				A.data[idxA++] = b_k*p2.x;
@@ -215,6 +219,8 @@ public class CompatibleProjectiveHomography {
 				B.data[idxB++] = c_k;
 			}
 		}
+
+//		A.print();
 
 		// Solve for v
 		if( !solver.setA(A) )
@@ -231,6 +237,8 @@ public class CompatibleProjectiveHomography {
 				H.data[i*4+j] = PinvP.get(i,j) + h.data[i]*a.getIdx(j);
 			}
 		}
+//		H.print();
+//		CommonOps_DDRM.scale(1.0/ NormOps_DDRM.normF(H),H);
 		return true;
 	}
 

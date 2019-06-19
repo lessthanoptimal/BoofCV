@@ -139,7 +139,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 		CompatibleProjectiveHomography alg = new CompatibleProjectiveHomography();
 		for (int i = 0; i < 3; i++) {
 			assertTrue(alg.fitCameraPoints(cameras.get(i),camerasB.get(i),worldPts,sceneB,H));
-			checkCamerasH(H, 1e-8 );
+			checkCamerasH(H, 1e-7 );
 		}
 	}
 
@@ -171,6 +171,7 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 			DMatrixRMaj A = cameras.get(i);
 			commonScale(A,PP);
 
+//			System.out.println("------------");
 //			A.print();
 //			PP.print();
 			assertTrue(MatrixFeatures_DDRM.isIdentical(A,PP,tol));
