@@ -29,7 +29,6 @@ import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.struct.se.SpecialEuclideanOps_F64;
 import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,14 +58,14 @@ public abstract class CommonThreeViewHomogenous {
 		if( planar ) {
 			worldPts = CommonHomographyChecks.createRandomPlaneH(rand, 3, numFeatures);
 		} else {
-			worldPts = GeoTestingOps.randomPointsH_F64(-1, 1, numFeatures, rand);
+			worldPts = GeoTestingOps.randomPointsH_F64(-1, 1,-1,1,2,4, numFeatures, rand);
 		}
 
-		Se3_F64 motion_0_to_1 = SpecialEuclideanOps_F64.eulerXyz(0.01,0.1,0.5,0.01,-0.02,0.015,null);
-		Se3_F64 motion_0_to_2 = SpecialEuclideanOps_F64.eulerXyz(0.05,0.03,0.53,0.02,0.01,-0.01,null);
+		Se3_F64 motion_0_to_0 = new Se3_F64();
+		Se3_F64 motion_0_to_1 = SpecialEuclideanOps_F64.eulerXyz(0.01,0.5,0.2,0.1,-0.02,0.015,null);
+		Se3_F64 motion_0_to_2 = SpecialEuclideanOps_F64.eulerXyz(0.05,0.03,0.53,0.02,0.1,-0.01,null);
 
-		DMatrixRMaj P0 = new DMatrixRMaj(3,4);
-		CommonOps_DDRM.setIdentity(P0);
+		DMatrixRMaj P0 = PerspectiveOps.createCameraMatrix(motion_0_to_0.R,motion_0_to_0.T,K,null);
 		DMatrixRMaj P1 = PerspectiveOps.createCameraMatrix(motion_0_to_1.R,motion_0_to_1.T,K,null);
 		DMatrixRMaj P2 = PerspectiveOps.createCameraMatrix(motion_0_to_2.R,motion_0_to_2.T,K,null);
 
