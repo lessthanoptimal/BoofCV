@@ -64,7 +64,7 @@ public class RemoveBrownNtoN_F32 implements Point2Transform2_F32 {
 	}
 
 	@Override
-	public RemoveBrownNtoN_F32 copy() {
+	public RemoveBrownNtoN_F32 copyConcurrent() {
 		RemoveBrownNtoN_F32 ret = new RemoveBrownNtoN_F32();
 		ret.tol = tol;
 		ret.params = new RadialTangential_F32(this.params);

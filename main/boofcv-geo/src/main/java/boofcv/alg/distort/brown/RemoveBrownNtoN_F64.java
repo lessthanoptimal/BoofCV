@@ -64,7 +64,7 @@ public class RemoveBrownNtoN_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public RemoveBrownNtoN_F64 copy() {
+	public RemoveBrownNtoN_F64 copyConcurrent() {
 		RemoveBrownNtoN_F64 ret = new RemoveBrownNtoN_F64();
 		ret.tol = tol;
 		ret.params = new RadialTangential_F64(this.params);

@@ -138,7 +138,7 @@ public class TestQrPose3DUtils {
 			}
 
 			@Override
-			public Point2Transform2_F64 copy() {
+			public Point2Transform2_F64 copyConcurrent() {
 				return null;
 			}
 

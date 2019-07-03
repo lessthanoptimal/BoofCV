@@ -49,10 +49,10 @@ public class SequencePoint2Transform2_F32 implements Point2Transform2_F32 {
 	 * Creates a copy
 	 */
 	@Override
-	public SequencePoint2Transform2_F32 copy() {
+	public SequencePoint2Transform2_F32 copyConcurrent() {
 		Point2Transform2_F32[] s = new Point2Transform2_F32[ sequence.length ];
 		for (int i = 0; i < sequence.length; i++) {
-			s[i] = sequence[i].copy();
+			s[i] = sequence[i].copyConcurrent();
 		}
 		return new SequencePoint2Transform2_F32(s);
 	}

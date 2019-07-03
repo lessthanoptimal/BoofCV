@@ -70,7 +70,7 @@ public class PixelTransformHomography_F32 implements PixelTransform<Point2D_F32>
 	}
 
 	@Override
-	public PixelTransformHomography_F32 copy() {
+	public PixelTransformHomography_F32 copyConcurrent() {
 		return new PixelTransformHomography_F32(homo.copy());
 	}
 }

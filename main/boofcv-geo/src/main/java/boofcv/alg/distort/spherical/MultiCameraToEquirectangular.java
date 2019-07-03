@@ -310,7 +310,7 @@ public class MultiCameraToEquirectangular<T extends ImageBase<T>> {
 		}
 
 		@Override
-		public EquiToCamera copy() {
+		public EquiToCamera copyConcurrent() {
 			throw new RuntimeException("Implement");
 		}
 	}

@@ -106,7 +106,7 @@ public class RemoveBrownPtoN_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public RemoveBrownPtoN_F64 copy() {
+	public RemoveBrownPtoN_F64 copyConcurrent() {
 		RemoveBrownPtoN_F64 ret = new RemoveBrownPtoN_F64(tol);
 		ret.fx = fx; // don't use set since it recompuets it. inputs would be floats not double, so diff solution
 		ret.fy = fy;

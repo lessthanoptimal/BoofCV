@@ -76,7 +76,7 @@ public class ImageDistortCache_SB_MT<Input extends ImageGray<Input>,Output exten
 			}
 
 			BoofConcurrency.loopBlocks(0,height,(y0, y1)->{
-				PixelTransform<Point2D_F32> dstToSrc = this.dstToSrc.copy();
+				PixelTransform<Point2D_F32> dstToSrc = this.dstToSrc.copyConcurrent();
 				for( int y = y0; y < y1; y++ ) {
 					int index = y*width;
 					for( int x = 0; x < width; x++ ) {

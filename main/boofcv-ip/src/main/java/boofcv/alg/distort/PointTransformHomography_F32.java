@@ -72,7 +72,7 @@ public class PointTransformHomography_F32 implements Point2Transform2Model_F32<H
 	}
 
 	@Override
-	public PointTransformHomography_F32 copy() {
+	public PointTransformHomography_F32 copyConcurrent() {
 		return new PointTransformHomography_F32(homo.copy());
 	}
 }

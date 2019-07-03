@@ -90,6 +90,8 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 		}
 	}
 
+	protected ImageDeformPointMLS_F32(){}
+
 	/**
 	 * Discards all existing control points
 	 */
@@ -284,8 +286,17 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	}
 
 	@Override
-	public ImageDeformPointMLS_F32 copy() {
-		throw new RuntimeException("Implement");
+	public ImageDeformPointMLS_F32 copyConcurrent() {
+		ImageDeformPointMLS_F32 out = new ImageDeformPointMLS_F32();
+		out.controls = controls;
+		out.gridRows = gridRows;
+		out.gridCols = gridCols;
+		out.grid = grid;
+		out.model = model;
+		out.scaleX = scaleX;
+		out.scaleY = scaleY;
+		out.alpha = alpha;
+		return out;
 	}
 
 	/**

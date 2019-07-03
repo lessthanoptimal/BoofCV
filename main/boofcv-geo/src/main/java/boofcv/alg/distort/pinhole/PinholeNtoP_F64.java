@@ -57,7 +57,7 @@ public class PinholeNtoP_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public PinholeNtoP_F64 copy() {
+	public PinholeNtoP_F64 copyConcurrent() {
 		return new PinholeNtoP_F64(this);
 	}
 }

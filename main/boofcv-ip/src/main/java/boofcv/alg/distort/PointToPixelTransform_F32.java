@@ -47,7 +47,7 @@ public class PointToPixelTransform_F32 implements PixelTransform<Point2D_F32> {
 	}
 
 	@Override
-	public PointToPixelTransform_F32 copy() {
-		return new PointToPixelTransform_F32(alg.copy());
+	public PointToPixelTransform_F32 copyConcurrent() {
+		return new PointToPixelTransform_F32(alg.copyConcurrent());
 	}
 }

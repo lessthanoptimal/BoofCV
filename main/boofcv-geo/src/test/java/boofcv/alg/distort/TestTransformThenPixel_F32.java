@@ -70,7 +70,7 @@ public class TestTransformThenPixel_F32 {
 		}
 
 		@Override
-		public Point2Transform2_F32 copy() {
+		public Point2Transform2_F32 copyConcurrent() {
 			return null;
 		}
 	}

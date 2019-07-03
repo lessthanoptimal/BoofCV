@@ -40,7 +40,7 @@ public class SphereToNarrowPixel_F32 implements Point3Transform2_F32 {
 	}
 
 	@Override
-	public Point3Transform2_F32 copy() {
-		return new SphereToNarrowPixel_F32(projToPixel.copy());
+	public Point3Transform2_F32 copyConcurrent() {
+		return new SphereToNarrowPixel_F32(projToPixel.copyConcurrent());
 	}
 }

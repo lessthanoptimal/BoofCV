@@ -62,7 +62,7 @@ public class CylinderToEquirectangular_F64 extends EquirectangularDistortBase_F6
 	}
 
 	@Override
-	public CylinderToEquirectangular_F64 copy() {
+	public CylinderToEquirectangular_F64 copyConcurrent() {
 		CylinderToEquirectangular_F64 out = new CylinderToEquirectangular_F64();
 		out.setTo(this);
 		return out;

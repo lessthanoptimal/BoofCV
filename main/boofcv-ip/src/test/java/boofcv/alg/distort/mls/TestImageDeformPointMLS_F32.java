@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestImageDeformPointMLS_F32 {
+class TestImageDeformPointMLS_F32 {
 
 	int width = 45;
 	int height = 60;
@@ -39,7 +39,7 @@ public class TestImageDeformPointMLS_F32 {
 	 * There was a problem where different scales were provided to each axis messing up similarity and rigid
 	 */
 	@Test
-	public void test_shape_independent() {
+	void test_shape_independent() {
 		for( TypeDeformMLS type : TypeDeformMLS.values() ) {
 			ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(type);
 
@@ -80,7 +80,7 @@ public class TestImageDeformPointMLS_F32 {
 	 * When sampled exactly on a control point the distortion should be the distortion for that point
 	 */
 	@Test
-	public void testAllAtOnce_OnControlPoints() {
+	void testAllAtOnce_OnControlPoints() {
 		for( TypeDeformMLS type : TypeDeformMLS.values() ) {
 //			System.out.println("type "+type);
 			ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(type);
@@ -119,7 +119,7 @@ public class TestImageDeformPointMLS_F32 {
 	 * See if the distorted point is closer to the closest control point
 	 */
 	@Test
-	public void testAllAtOnce_CloserToCloser() {
+	void testAllAtOnce_CloserToCloser() {
 		for( TypeDeformMLS type : TypeDeformMLS.values() ) {
 			ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(type);
 			alg.configure(width, height, rows, cols);
@@ -154,7 +154,7 @@ public class TestImageDeformPointMLS_F32 {
 	 * Should produce identical results when fixate is called multiple times
 	 */
 	@Test
-	public void multipleCallsToFixate() {
+	void multipleCallsToFixate() {
 		for( TypeDeformMLS type : TypeDeformMLS.values() ) {
 			ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(type);
 			alg.configure(width, height, rows, cols);
@@ -189,7 +189,7 @@ public class TestImageDeformPointMLS_F32 {
 
 
 	@Test
-	public void computeAverageP() {
+	void computeAverageP() {
 		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
 		alg.configure(width,height, rows, cols);
 
@@ -219,7 +219,7 @@ public class TestImageDeformPointMLS_F32 {
 	}
 
 	@Test
-	public void computeAverageQ() {
+	void computeAverageQ() {
 		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
 		alg.configure(width,height, rows, cols);
 
@@ -243,7 +243,7 @@ public class TestImageDeformPointMLS_F32 {
 	}
 
 	@Test
-	public void computeWeights() {
+	void computeWeights() {
 		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
 		alg.configure(width,height, rows, cols);
 
@@ -287,7 +287,7 @@ public class TestImageDeformPointMLS_F32 {
 	}
 
 	@Test
-	public void interpolateDeformedPoint() {
+	void interpolateDeformedPoint() {
 		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
 		alg.configure(width,height, rows, cols);
 
@@ -320,5 +320,46 @@ public class TestImageDeformPointMLS_F32 {
 
 		assertEquals(expectedX, p.x, GrlConstants.TEST_F32);
 		assertEquals(expectedY, p.y, GrlConstants.TEST_F32);
+	}
+
+	@Test
+	void copyConcurrent() {
+		for( TypeDeformMLS type : TypeDeformMLS.values() ) {
+//			System.out.println("type "+type);
+			ImageDeformPointMLS_F32 orig = new ImageDeformPointMLS_F32(type);
+			orig.configure(100, 100, 11, 11);
+
+			// carefully place control points on grid points to minimze the affect of the bilinear interpolation step
+			orig.addControl(10, 0);
+			orig.addControl(10, 20);
+			orig.addControl(30, 40);
+			orig.addControl(80, 30);
+
+			orig.setDistorted(0, 10, 5);
+			orig.setDistorted(1, 14, 30);
+			orig.setDistorted(2, 25, 45);
+			orig.setDistorted(3, 20, 8);
+
+			orig.fixateUndistorted();
+			orig.fixateDistorted();
+
+			ImageDeformPointMLS_F32 copy = orig.copyConcurrent();
+
+			checkCompute(10, 0 , orig, copy);
+			checkCompute(10, 20, orig, copy);
+			checkCompute(30, 40, orig, copy);
+			checkCompute(80, 30, orig, copy);
+		}
+	}
+
+	private void checkCompute( float x , float y ,
+							   ImageDeformPointMLS_F32 orig, ImageDeformPointMLS_F32 copy) {
+		Point2D_F32 expected = new Point2D_F32();
+		Point2D_F32 found = new Point2D_F32();
+		orig.compute(x,y, expected);
+		copy.compute(x,y, found);
+
+		assertEquals(expected.x, found.x, GrlConstants.TEST_F32);
+		assertEquals(expected.y, found.y, GrlConstants.TEST_F32);
 	}
 }

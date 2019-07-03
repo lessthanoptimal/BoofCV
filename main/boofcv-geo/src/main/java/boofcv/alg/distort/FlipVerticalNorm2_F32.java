@@ -45,8 +45,8 @@ public class FlipVerticalNorm2_F32 implements Point2Transform2_F32 {
 	}
 
 	@Override
-	public FlipVerticalNorm2_F32 copy() {
-		return new FlipVerticalNorm2_F32(pixelToNormalized.copy(),height);
+	public FlipVerticalNorm2_F32 copyConcurrent() {
+		return new FlipVerticalNorm2_F32(pixelToNormalized.copyConcurrent(),height);
 	}
 
 }

@@ -34,7 +34,7 @@ public class DoNothingPixelTransform_F32 implements PixelTransform<Point2D_F32> 
 	}
 
 	@Override
-	public DoNothingPixelTransform_F32 copy() {
+	public DoNothingPixelTransform_F32 copyConcurrent() {
 		return new DoNothingPixelTransform_F32();
 	}
 

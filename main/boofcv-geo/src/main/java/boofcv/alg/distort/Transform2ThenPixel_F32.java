@@ -58,9 +58,9 @@ public class Transform2ThenPixel_F32 implements Point2Transform2_F32 {
 	}
 
 	@Override
-	public Transform2ThenPixel_F32 copy() {
+	public Transform2ThenPixel_F32 copyConcurrent() {
 		Transform2ThenPixel_F32 ret = new Transform2ThenPixel_F32();
-		ret.first = this.first.copy();
+		ret.first = this.first.copyConcurrent();
 		ret.fx = fx;
 		ret.fy = fy;
 		ret.skew = skew;

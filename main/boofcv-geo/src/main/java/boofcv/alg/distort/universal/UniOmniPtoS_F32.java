@@ -114,7 +114,7 @@ public class UniOmniPtoS_F32 implements Point2Transform3_F32 {
 	}
 
 	@Override
-	public Point2Transform3_F32 copy() {
+	public Point2Transform3_F32 copyConcurrent() {
 		UniOmniPtoS_F32 c = new UniOmniPtoS_F32();
 		c.distortion = new RadialTangential_F32(this.distortion);
 		c.mirrorOffset = this.mirrorOffset;

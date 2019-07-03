@@ -44,7 +44,7 @@ public class FlipVertical_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public FlipVertical_F64 copy() {
+	public FlipVertical_F64 copyConcurrent() {
 		return new FlipVertical_F64(height);
 	}
 }

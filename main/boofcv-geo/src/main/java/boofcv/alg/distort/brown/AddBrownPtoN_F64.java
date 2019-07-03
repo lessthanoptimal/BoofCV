@@ -104,7 +104,7 @@ public class AddBrownPtoN_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public AddBrownPtoN_F64 copy() {
+	public AddBrownPtoN_F64 copyConcurrent() {
 		AddBrownPtoN_F64 ret = new AddBrownPtoN_F64();
 		ret.a11 = a11;
 		ret.a12 = a12;

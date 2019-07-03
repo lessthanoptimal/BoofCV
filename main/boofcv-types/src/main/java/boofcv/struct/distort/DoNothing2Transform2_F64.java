@@ -33,7 +33,7 @@ public class DoNothing2Transform2_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public DoNothing2Transform2_F64 copy() {
+	public DoNothing2Transform2_F64 copyConcurrent() {
 		return new DoNothing2Transform2_F64();
 	}
 }

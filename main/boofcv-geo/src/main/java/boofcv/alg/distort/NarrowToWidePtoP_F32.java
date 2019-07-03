@@ -89,11 +89,11 @@ public class NarrowToWidePtoP_F32 implements Point2Transform2_F32 {
 	}
 
 	@Override
-	public Point2Transform2_F32 copy() {
+	public Point2Transform2_F32 copyConcurrent() {
 		NarrowToWidePtoP_F32 ret = new NarrowToWidePtoP_F32();
 		ret.rotateWideToNarrow = this.rotateWideToNarrow.copy();
-		ret.narrowToNorm = this.narrowToNorm.copy();
-		ret.unitToWide = this.unitToWide.copy();
+		ret.narrowToNorm = this.narrowToNorm.copyConcurrent();
+		ret.unitToWide = this.unitToWide.copyConcurrent();
 		return ret;
 	}
 }

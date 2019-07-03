@@ -208,7 +208,7 @@ public class TestMultiCameraToEquirectangular {
 		}
 
 		@Override
-		public Point3Transform2_F32 copy() {
+		public Point3Transform2_F32 copyConcurrent() {
 			return null;
 		}
 	}
@@ -227,7 +227,7 @@ public class TestMultiCameraToEquirectangular {
 		}
 
 		@Override
-		public Point2Transform3_F32 copy() {
+		public Point2Transform3_F32 copyConcurrent() {
 			return null;
 		}
 	}

@@ -34,7 +34,7 @@ public class DoNothingPixelTransform_F64 implements PixelTransform<Point2D_F64> 
 	}
 
 	@Override
-	public DoNothingPixelTransform_F64 copy() {
+	public DoNothingPixelTransform_F64 copyConcurrent() {
 		return new DoNothingPixelTransform_F64();
 	}
 

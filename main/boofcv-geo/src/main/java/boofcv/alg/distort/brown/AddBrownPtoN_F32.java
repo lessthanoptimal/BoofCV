@@ -104,7 +104,7 @@ public class AddBrownPtoN_F32 implements Point2Transform2_F32 {
 	}
 
 	@Override
-	public AddBrownPtoN_F32 copy() {
+	public AddBrownPtoN_F32 copyConcurrent() {
 		AddBrownPtoN_F32 ret = new AddBrownPtoN_F32();
 		ret.a11 = a11;
 		ret.a12 = a12;

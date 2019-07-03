@@ -86,7 +86,7 @@ public class PixelTransformCached_F32 implements PixelTransform<Point2D_F32> {
 	}
 
 	@Override
-	public PixelTransform<Point2D_F32> copy() {
+	public PixelTransform<Point2D_F32> copyConcurrent() {
 		PixelTransformCached_F32 ret = new PixelTransformCached_F32();
 		ret.map = new Point2D_F32[this.map.length];
 		for (int i = 0; i < ret.map.length; i++) {

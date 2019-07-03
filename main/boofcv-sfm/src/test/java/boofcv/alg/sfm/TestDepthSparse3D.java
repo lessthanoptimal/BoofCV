@@ -55,7 +55,7 @@ public class TestDepthSparse3D {
 			}
 
 			@Override
-			public PixelTransform<Point2D_F32> copy() {
+			public PixelTransform<Point2D_F32> copyConcurrent() {
 				return null;
 			}
 		};

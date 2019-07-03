@@ -33,7 +33,7 @@ abstract class TestEquirectangularDistortBase_F64 {
 
 		original.setEquirectangularShape(equiWidth,equiHeight);
 
-		PixelTransform<Point2D_F64> copy = original.copy();
+		PixelTransform<Point2D_F64> copy = original.copyConcurrent();
 
 		Point2D_F64 origP = new Point2D_F64();
 		Point2D_F64 copyC = new Point2D_F64();

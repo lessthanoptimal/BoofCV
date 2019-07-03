@@ -123,7 +123,7 @@ public class ImageDistortBasic_IL_MT
 		float values[] = new float[getNumberOfBands()];
 
 		public void init() {
-			dstToSrc = ImageDistortBasic_IL_MT.this.dstToSrc.copy();
+			dstToSrc = ImageDistortBasic_IL_MT.this.dstToSrc.copyConcurrent();
 			interp.setImage(srcImg);
 		}
 

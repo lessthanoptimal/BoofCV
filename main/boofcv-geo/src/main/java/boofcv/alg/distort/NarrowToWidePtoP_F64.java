@@ -89,11 +89,11 @@ public class NarrowToWidePtoP_F64 implements Point2Transform2_F64 {
 	}
 
 	@Override
-	public Point2Transform2_F64 copy() {
+	public Point2Transform2_F64 copyConcurrent() {
 		NarrowToWidePtoP_F64 ret = new NarrowToWidePtoP_F64();
 		ret.rotateWideToNarrow = this.rotateWideToNarrow.copy();
-		ret.narrowToNorm = this.narrowToNorm.copy();
-		ret.unitToWide = this.unitToWide.copy();
+		ret.narrowToNorm = this.narrowToNorm.copyConcurrent();
+		ret.unitToWide = this.unitToWide.copyConcurrent();
 		return ret;
 	}
 }

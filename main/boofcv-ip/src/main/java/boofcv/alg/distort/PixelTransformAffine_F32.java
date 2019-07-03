@@ -55,7 +55,7 @@ public class PixelTransformAffine_F32 implements PixelTransform<Point2D_F32> {
 	}
 
 	@Override
-	public PixelTransformAffine_F32 copy() {
+	public PixelTransformAffine_F32 copyConcurrent() {
 		return new PixelTransformAffine_F32(affine.copy());
 	}
 }

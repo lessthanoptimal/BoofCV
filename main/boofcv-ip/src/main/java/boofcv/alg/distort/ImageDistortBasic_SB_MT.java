@@ -115,7 +115,7 @@ public class ImageDistortBasic_SB_MT<Input extends ImageGray<Input>,Output exten
 		InterpolatePixelS<Input> interp = ImageDistortBasic_SB_MT.this.interp.copy();
 
 		public void init() {
-			this.dstToSrc = ImageDistortBasic_SB_MT.this.dstToSrc.copy();
+			this.dstToSrc = ImageDistortBasic_SB_MT.this.dstToSrc.copyConcurrent();
 			interp.setImage(srcImg);
 		}
 

@@ -44,7 +44,7 @@ public class FlipVertical_F32 implements Point2Transform2_F32 {
 	}
 
 	@Override
-	public FlipVertical_F32 copy() {
+	public FlipVertical_F32 copyConcurrent() {
 		return new FlipVertical_F32(height);
 	}
 }

@@ -51,7 +51,7 @@ public abstract class CommonImageDistort_SB {
 		}
 
 		@Override
-		public PixelTransform<Point2D_F32> copy() {
+		public PixelTransform<Point2D_F32> copyConcurrent() {
 			return null;
 		}
 	};

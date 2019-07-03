@@ -46,7 +46,7 @@ public class NarrowPixelToSphere_F64 implements Point2Transform3_F64 {
 	}
 
 	@Override
-	public Point2Transform3_F64 copy() {
-		return new NarrowPixelToSphere_F64(this.pixelToNorm.copy());
+	public Point2Transform3_F64 copyConcurrent() {
+		return new NarrowPixelToSphere_F64(this.pixelToNorm.copyConcurrent());
 	}
 }

@@ -39,5 +39,5 @@ public interface Point2Transform3_F32 {
 	/**
 	 * Creates a copy
 	 */
-	Point2Transform3_F32 copy();
+	Point2Transform3_F32 copyConcurrent();
 }
