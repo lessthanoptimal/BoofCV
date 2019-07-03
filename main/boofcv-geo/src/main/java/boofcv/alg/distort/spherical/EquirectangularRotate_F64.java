@@ -48,7 +48,7 @@ public class EquirectangularRotate_F64 extends EquirectangularDistortBase_F64 {
 	@Override
 	public EquirectangularRotate_F64 copyConcurrent() {
 		EquirectangularRotate_F64 out = new EquirectangularRotate_F64();
-		out.setTo(this);
+		out.setConcurrent(this);
 		return out;
 	}
 }

@@ -182,10 +182,10 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		ShowRectifyCalibratedApp app = new ShowRectifyCalibratedApp();
 
 		// camera config, image left, image right
-		String dir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/");
+		String dir = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess");
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("BumbleBee",dir + "stereo.yaml",dir + "left05.jpg",dir + "right05.jpg"));
+		inputs.add(new PathLabel("BumbleBee",dir + "/stereo.yaml",dir + "/left05.jpg",dir + "/right05.jpg"));
 
 		app.setInputList(inputs);
 

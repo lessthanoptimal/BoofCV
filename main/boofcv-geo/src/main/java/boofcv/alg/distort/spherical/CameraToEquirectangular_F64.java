@@ -91,7 +91,7 @@ public class CameraToEquirectangular_F64
 	@Override
 	public CameraToEquirectangular_F64 copyConcurrent() {
 		CameraToEquirectangular_F64 out = new CameraToEquirectangular_F64();
-		out.setTo(this);
+		out.setConcurrent(this);
 		return out;
 	}
 }
