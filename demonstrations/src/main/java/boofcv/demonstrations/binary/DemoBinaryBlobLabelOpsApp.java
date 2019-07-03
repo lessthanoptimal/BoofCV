@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,16 +78,16 @@ public class DemoBinaryBlobLabelOpsApp<T extends ImageGray<T>> extends SelectAlg
 
 		this.imageType = imageType;
 
-		addAlgorithm(0,"Erode-4", FactoryBinaryImageOps.erode4());
-		addAlgorithm(0,"Erode-8", FactoryBinaryImageOps.erode8());
-		addAlgorithm(0,"Dilate-4", FactoryBinaryImageOps.dilate4());
-		addAlgorithm(0,"Dilate-8", FactoryBinaryImageOps.dilate8());
+		addAlgorithm(0,"Erode-4", FactoryBinaryImageOps.erode4(1));
+		addAlgorithm(0,"Erode-8", FactoryBinaryImageOps.erode8(1));
+		addAlgorithm(0,"Dilate-4", FactoryBinaryImageOps.dilate4(1));
+		addAlgorithm(0,"Dilate-8", FactoryBinaryImageOps.dilate8(1));
 		addAlgorithm(0,"Remove Noise", FactoryBinaryImageOps.removePointNoise());
 
-		addAlgorithm(1,"Erode-4", FactoryBinaryImageOps.erode4());
-		addAlgorithm(1,"Erode-8", FactoryBinaryImageOps.erode8());
-		addAlgorithm(1,"Dilate-4", FactoryBinaryImageOps.dilate4());
-		addAlgorithm(1,"Dilate-8", FactoryBinaryImageOps.dilate8());
+		addAlgorithm(1,"Erode-4", FactoryBinaryImageOps.erode4(1));
+		addAlgorithm(1,"Erode-8", FactoryBinaryImageOps.erode8(1));
+		addAlgorithm(1,"Dilate-4", FactoryBinaryImageOps.dilate4(1));
+		addAlgorithm(1,"Dilate-8", FactoryBinaryImageOps.dilate8(1));
 		addAlgorithm(1,"Remove Noise", FactoryBinaryImageOps.removePointNoise());
 
 		addAlgorithm(2, "Label-4", 4);

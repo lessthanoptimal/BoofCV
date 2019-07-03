@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.factory.filter.binary;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.abst.filter.FilterImageReflection;
+import boofcv.abst.filter.binary.BinaryFilters;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
@@ -34,50 +35,50 @@ public class FactoryBinaryImageOps {
 	/**
 	 * Filter implementation of {@link BinaryImageOps#erode4(GrayU8, int, GrayU8)}
 	 */
-	public static FilterImageInterface<GrayU8, GrayU8> erode4() {
-		return new FilterImageReflection<>(BinaryImageOps.class, "erode4", 0, 0, GrayU8.class, GrayU8.class);
+	public static FilterImageInterface<GrayU8, GrayU8> erode4(int numTimes) {
+		return new BinaryFilters.Erode4(numTimes);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#erode8(GrayU8, int, GrayU8)}
 	 */
-	public static FilterImageInterface<GrayU8, GrayU8> erode8() {
-		return new FilterImageReflection<>(BinaryImageOps.class, "erode8", 0, 0, GrayU8.class, GrayU8.class);
+	public static FilterImageInterface<GrayU8, GrayU8> erode8(int numTimes) {
+		return new BinaryFilters.Erode8(numTimes);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#dilate4(GrayU8, int, GrayU8)}
 	 */
-	public static FilterImageInterface<GrayU8, GrayU8> dilate4() {
-		return new FilterImageReflection<>(BinaryImageOps.class, "dilate4", 0, 0, GrayU8.class, GrayU8.class);
+	public static FilterImageInterface<GrayU8, GrayU8> dilate4(int numTimes) {
+		return new BinaryFilters.Dilate4(numTimes);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#dilate8(GrayU8, int, GrayU8)}
 	 */
-	public static FilterImageInterface<GrayU8, GrayU8> dilate8() {
-		return new FilterImageReflection<>(BinaryImageOps.class, "dilate8", 0, 0, GrayU8.class, GrayU8.class);
+	public static FilterImageInterface<GrayU8, GrayU8> dilate8(int numTimes) {
+		return new BinaryFilters.Dilate8(numTimes);
 	}
 
 	/**
-	 * Filter implementation of {@link BinaryImageOps#edge4(GrayU8, GrayU8)}
+	 * Filter implementation of {@link BinaryImageOps#edge4(GrayU8, GrayU8, boolean)}
 	 */
-	public static FilterImageInterface<GrayU8, GrayU8> edge4() {
-		return new FilterImageReflection<>(BinaryImageOps.class, "edge4", 0, 0, GrayU8.class, GrayU8.class);
+	public static FilterImageInterface<GrayU8, GrayU8> edge4(boolean outsideZero) {
+		return new BinaryFilters.Edge4(outsideZero);
 	}
 
 	/**
-	 * Filter implementation of {@link BinaryImageOps#edge8(GrayU8, GrayU8)}
+	 * Filter implementation of {@link BinaryImageOps#edge8(GrayU8, GrayU8, boolean)}
 	 */
-	public static FilterImageInterface<GrayU8, GrayU8> edge8() {
-		return new FilterImageReflection<>(BinaryImageOps.class, "edge8", 0, 0, GrayU8.class, GrayU8.class);
+	public static FilterImageInterface<GrayU8, GrayU8> edge8(boolean outsideZero) {
+		return new BinaryFilters.Edge8(outsideZero);
 	}
 
 	/**
 	 * Filter implementation of {@link BinaryImageOps#removePointNoise(GrayU8, GrayU8)}
 	 */
 	public static FilterImageInterface<GrayU8, GrayU8> removePointNoise() {
-		return new FilterImageReflection<>(BinaryImageOps.class, "removePointNoise", 0, 0, GrayU8.class, GrayU8.class);
+		return new BinaryFilters.RemovePointNoise();
 	}
 
 	/**

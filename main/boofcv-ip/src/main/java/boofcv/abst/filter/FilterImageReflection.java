@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,6 +40,7 @@ public class FilterImageReflection<Input extends ImageGray<Input>, Output extend
 	// size of horizontal and vertical borders
 	int borderX;
 	int borderY;
+	boolean outsideZero;
 
 	public FilterImageReflection(Class owner, String methodName, int borderX, int borderY, Class<Input> inputType, Class<Output> outputType) {
 		try {
@@ -59,7 +60,6 @@ public class FilterImageReflection<Input extends ImageGray<Input>, Output extend
 		if (!ImageGray.class.isAssignableFrom(param[0]) || !ImageGray.class.isAssignableFrom(param[0]))
 			throw new IllegalArgumentException("TWo input parameters must be of type ImageGray");
 	}
-
 
 	public FilterImageReflection(Method m, int borderX, int borderY, Class<Input> inputType, Class<Output> outputType) {
 		this.m = m;
