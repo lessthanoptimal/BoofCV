@@ -24,7 +24,6 @@ import boofcv.alg.distort.universal.LensDistortionUniversalOmni;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.CameraUniversalOmni;
-import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.Point2Transform3_F64;
 import georegression.struct.point.Point2D_F64;
@@ -91,6 +90,8 @@ public class CameraToEquirectangular_F64
 
 	@Override
 	public CameraToEquirectangular_F64 copy() {
-		throw new RuntimeException("Implement");
+		CameraToEquirectangular_F64 out = new CameraToEquirectangular_F64();
+		out.setTo(this);
+		return out;
 	}
 }

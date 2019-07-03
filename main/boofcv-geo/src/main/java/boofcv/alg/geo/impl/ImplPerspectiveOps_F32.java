@@ -64,7 +64,7 @@ public class ImplPerspectiveOps_F32 {
 	}
 
 	public static FMatrixRMaj pinholeToMatrix( float fx, float fy, float skew,
-											   float cx, float cy , FMatrixRMaj K ) {
+											   float cx, float cy , @Nullable FMatrixRMaj K ) {
 		if( K == null ) {
 			K = new FMatrixRMaj(3,3);
 		} else {
@@ -83,7 +83,7 @@ public class ImplPerspectiveOps_F32 {
 		return K;
 	}
 
-	public static FMatrixRMaj pinholeToMatrix(CameraPinhole param , FMatrixRMaj K ) {
+	public static FMatrixRMaj pinholeToMatrix(CameraPinhole param , @Nullable FMatrixRMaj K ) {
 		return pinholeToMatrix( (float)param.fx, (float)param.fy, (float)param.skew, (float)param.cx, (float)param.cy,K);
 	}
 

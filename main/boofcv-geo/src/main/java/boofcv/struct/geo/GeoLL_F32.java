@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,4 +34,25 @@ public class GeoLL_F32 {
 	 * longitude
 	 */
 	public float lon;
+
+	public void setTo( GeoLL_F32 src ) {
+		this.lat = src.lat;
+		this.lon = src.lon;
+	}
+
+	public float getLat() {
+		return lat;
+	}
+
+	public void setLat(float lat) {
+		this.lat = lat;
+	}
+
+	public float getLon() {
+		return lon;
+	}
+
+	public void setLon(float lon) {
+		this.lon = lon;
+	}
 }

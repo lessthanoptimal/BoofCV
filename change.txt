@@ -41,7 +41,7 @@ Version : 0.34
 - PixelMath added logSign to handle images with positive and negative values
 - Split apart calibration detector configuration and shape configuration
 - Chessboard Detector 2
-  * Rewritten from scratch using a new type of corner detector (TODO write tech report)
+  * Rewritten from scratch using a new type of corner detector
   * Better handling of blurred and fisheye images
 - Simulation
   * Concurrent version of SimulatePlanarWorld
@@ -50,26 +50,6 @@ Version : 0.34
   * Thanks sergiuchuckmisha for fixing a bug/type-o in FOV estimation
 - Geometric
   * Added Projective N-Point (PRnP) algorithm using DLT
-
-TODO Scene Reconstruction from arbitrary number of photos
-
-TODO Perspective-n-conic
-
-TODO
-  - Circle Target Detection
-    * three choices; center point, tangent points, or conics.
-    * center = "Detection of Concentric Circles for Camera Calibration" or use ellipse center like most?
-
-TODO Regression
-  - homography estimation
-  - QR Code fiducial 3D pose regression
-  - Line detector regression
-
-TODO
-  - QR Code
-    * Target 100% in rotation and not degrading anything else
-  - Self Calibration
-    * TODO Weighted iterated DIAC
 
 ---------------------------------------------
 Date    : 2019/03/18

@@ -47,6 +47,8 @@ public class EquirectangularRotate_F32 extends EquirectangularDistortBase_F32 {
 
 	@Override
 	public EquirectangularRotate_F32 copy() {
-		throw new RuntimeException("Implement");
+		EquirectangularRotate_F32 out = new EquirectangularRotate_F32();
+		out.setTo(this);
+		return out;
 	}
 }

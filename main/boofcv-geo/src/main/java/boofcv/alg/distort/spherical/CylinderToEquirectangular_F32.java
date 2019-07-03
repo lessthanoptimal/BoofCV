@@ -63,6 +63,8 @@ public class CylinderToEquirectangular_F32 extends EquirectangularDistortBase_F3
 
 	@Override
 	public CylinderToEquirectangular_F32 copy() {
-		throw new RuntimeException("Implement");
+		CylinderToEquirectangular_F32 out = new CylinderToEquirectangular_F32();
+		out.setTo(this);
+		return out;
 	}
 }

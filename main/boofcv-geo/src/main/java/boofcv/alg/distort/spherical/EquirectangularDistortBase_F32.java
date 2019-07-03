@@ -61,6 +61,25 @@ public abstract class EquirectangularDistortBase_F32 implements PixelTransform<P
 	}
 
 	/**
+	 * Sets this class to be equivalent to the passed in class
+	 */
+	public void setTo( EquirectangularDistortBase_F32 original ) {
+		tools.configure(original.tools.width,original.tools.height);
+		tools.temp.setTo(tools.temp);
+		this.outWidth = original.outWidth;
+		this.R.set(original.R);
+		this.n.set(original.n);
+		setEquirectangularShape(original.tools.width,original.tools.height);
+		// TODO this is a hack to avoid copying a large array
+		this.vectors = original.vectors;
+//		declareVectors(outWidth,original.vectors.length/outWidth);
+//		final int N = (float)Math.min(vectors.length,original.vectors.length);
+//		for (int i = 0; i < N; i++) {
+//			vectors[i].set(original.vectors[i]);
+//		}
+	}
+
+	/**
 	 * Specifies the rotation offset from the canonical location using yaw and pitch.
 	 * @param yaw Radian from -pi to pi
 	 * @param pitch Radian from -pi/2 to pi/2

@@ -27,13 +27,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestEquirectangularRotate_F32 {
+class TestEquirectangularRotate_F32 extends TestEquirectangularDistortBase_F32 {
 
 	/**
 	 * Sees if recentering moves it to approximately the expected location
 	 */
 	@Test
-	public void simpleTests() {
+	void simpleTests() {
 
 		EquirectangularRotate_F32 alg = new EquirectangularRotate_F32();
 		alg.setEquirectangularShape(300,251);
@@ -65,5 +65,13 @@ public class TestEquirectangularRotate_F32 {
 	private void assertMatch(Point2D_F32 tran , float x , float y ) {
 		assertEquals( x , tran.x, GrlConstants.TEST_F32);
 		assertEquals( y , tran.y, GrlConstants.TEST_F32);
+	}
+
+	@Test
+	void copy() {
+		EquirectangularRotate_F32 alg = new EquirectangularRotate_F32();
+		alg.setEquirectangularShape(300,251);
+
+		copy(alg,100,120);
 	}
 }

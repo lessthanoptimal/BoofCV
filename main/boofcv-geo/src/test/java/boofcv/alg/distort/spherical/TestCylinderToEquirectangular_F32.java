@@ -30,13 +30,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestCylinderToEquirectangular_F32 {
+class TestCylinderToEquirectangular_F32 extends TestEquirectangularDistortBase_F32 {
 
 	/**
 	 * The latitude and longitude should be zero when sampling the middle of the cylindrical image
 	 */
 	@Test
-	public void pointingAtZero() {
+	void pointingAtZero() {
 
 		CylinderToEquirectangular_F32 alg = new CylinderToEquirectangular_F32();
 		alg.setEquirectangularShape(400,501); // even division to make sure math works out nicely
@@ -57,7 +57,7 @@ public class TestCylinderToEquirectangular_F32 {
 	 * Make sure the requested VFOV is the actual
 	 */
 	@Test
-	public void checkFOV() {
+	void checkFOV() {
 		CylinderToEquirectangular_F32 alg = new CylinderToEquirectangular_F32();
 		alg.setEquirectangularShape(400,500);
 
@@ -80,13 +80,20 @@ public class TestCylinderToEquirectangular_F32 {
 	 * Crude vector check.  Make sure it's pointing -z at top of image and +z at bottom
 	 */
 	@Test
-	public void checkVectors() {
+	void checkVectors() {
 		CylinderToEquirectangular_F32 alg = new CylinderToEquirectangular_F32();
 		alg.setEquirectangularShape(400, 500);
 		alg.configure(200, 300, UtilAngle.radian(100));
 
 		assertTrue( alg.vectors[0].z < 0 );
 		assertTrue( alg.vectors[299*200].z > 0 );
+	}
 
+	@Test
+	void copy() {
+		CylinderToEquirectangular_F32 alg = new CylinderToEquirectangular_F32();
+		alg.configure(200, 300, UtilAngle.radian(100));
+
+		copy(alg,100,120);
 	}
 }

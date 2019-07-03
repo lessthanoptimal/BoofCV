@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestCameraToEquirectangular_F64 {
+class TestCameraToEquirectangular_F64 extends TestEquirectangularDistortBase_F64 {
 	private int equiWidth = 600;
 	private int equiHeight = 400;
 
@@ -41,7 +41,7 @@ public class TestCameraToEquirectangular_F64 {
 	 * the center of the pinhole at default orientation.
 	 */
 	@Test
-	public void canonicalIsPointedPositiveZ() {
+	void canonicalIsPointedPositiveZ() {
 		CameraPinholeBrown intrinsic = new CameraPinholeBrown(400,400,0,imgWidth/2,imgHeight/2,imgWidth,imgHeight);
 		intrinsic.setRadial(0.1,0.2);
 
@@ -57,7 +57,7 @@ public class TestCameraToEquirectangular_F64 {
 	 * Rotate the camera and see if the camera center is pointing in the right direction now
 	 */
 	@Test
-	public void setDirection() {
+	void setDirection() {
 		CameraPinholeBrown intrinsic = new CameraPinholeBrown(400,400,0,imgWidth/2,imgHeight/2,imgWidth,imgHeight);
 		intrinsic.setRadial(0.1,0.2);
 
@@ -85,5 +85,16 @@ public class TestCameraToEquirectangular_F64 {
 		assertEquals( nx, n.x, GrlConstants.TEST_F64);
 		assertEquals( ny, n.y, GrlConstants.TEST_F64);
 		assertEquals( nz, n.z, GrlConstants.TEST_F64);
+	}
+
+	@Test
+	void copy() {
+		CameraPinholeBrown intrinsic = new CameraPinholeBrown(400,400,0,imgWidth/2,imgHeight/2,imgWidth,imgHeight);
+		intrinsic.setRadial(0.1,0.2);
+
+		CameraToEquirectangular_F64 origin = new CameraToEquirectangular_F64();
+
+		origin.setCameraModel(intrinsic);
+		copy(origin,equiWidth,equiHeight);
 	}
 }

@@ -49,5 +49,4 @@ public class NarrowPixelToSphere_F32 implements Point2Transform3_F32 {
 	public Point2Transform3_F32 copy() {
 		return new NarrowPixelToSphere_F32(this.pixelToNorm.copy());
 	}
-
 }
