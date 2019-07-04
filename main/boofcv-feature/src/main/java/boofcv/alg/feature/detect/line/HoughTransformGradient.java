@@ -181,7 +181,7 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 	 * @param derivX gradient of point.
 	 * @param derivY gradient of point.
 	 */
-	protected void parameterize( int x , int y , float derivX , float derivY )
+	final protected void parameterize( final QueueCorner candidates, final int x , final int y , float derivX , float derivY )
 	{
 		Point2D_F32 parameter = new Point2D_F32();
 		parameters.parameterize(x,y,derivX,derivY,parameter);
@@ -195,13 +195,13 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 		float wy = parameter.y-y0;
 
 		// make a soft decision and spread counts across neighbors
-		addParameters(x0,y0, (1f-wx)*(1f-wy));
-		addParameters(x0+1,y0, (wx)*(1f-wy));
-		addParameters(x0,y0+1, (1f-wx)*(wy));
-		addParameters(x0+1,y0+1, (wx)*(wy));
+		addParameters(candidates,x0,y0, (1f-wx)*(1f-wy));
+		addParameters(candidates,x0+1,y0, (wx)*(1f-wy));
+		addParameters(candidates,x0,y0+1, (1f-wx)*(wy));
+		addParameters(candidates,x0+1,y0+1, (wx)*(wy));
 	}
 
-	protected void addParameters( int x , int y , float amount ) {
+	final protected void addParameters( QueueCorner candidates, int x , int y , float amount ) {
 		if( transform.isInBounds(x,y)) {
 			int index = transform.startIndex+y*transform.stride+x;
 			// keep track of candidate pixels so that a sparse search can be done
@@ -245,7 +245,7 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 			for( int index = start; index < end; index++ ) {
 				if( binary.data[index] != 0 ) {
 					int x = index-start;
-					parameterize(x,y,_derivX.unsafe_getF(x,y),_derivY.unsafe_getF(x,y));
+					parameterize(candidates,x,y,_derivX.unsafe_getF(x,y),_derivY.unsafe_getF(x,y));
 				}
 			}
 		}

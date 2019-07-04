@@ -24,6 +24,8 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 
 /**
+ * Parameterizes a line to a coordinate for the Hough transform. Many of these functions need to be thread safe
+ *
  * @author Peter Abeles
  */
 public interface HoughTransformParameters {

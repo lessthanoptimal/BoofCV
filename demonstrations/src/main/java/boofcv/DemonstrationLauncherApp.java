@@ -31,6 +31,7 @@ import boofcv.demonstrations.feature.associate.VisualizeAssociationScoreApp;
 import boofcv.demonstrations.feature.describe.VisualizeHogDescriptorApp;
 import boofcv.demonstrations.feature.describe.VisualizeImageHogCellApp;
 import boofcv.demonstrations.feature.describe.VisualizeRegionDescriptionApp;
+import boofcv.demonstrations.feature.detect.DetectChessboardCornersVisualizeApp;
 import boofcv.demonstrations.feature.detect.edge.ShowEdgeContourApp;
 import boofcv.demonstrations.feature.detect.extract.CompareFeatureExtractorApp;
 import boofcv.demonstrations.feature.detect.intensity.IntensityFeaturePyramidApp;
@@ -132,6 +133,7 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				IntensityFeaturePyramidApp.class,
 				IntensityPointFeatureApp.class,
 				DemoDetectPointFeaturesApp.class,
+				DetectChessboardCornersVisualizeApp.class,
 //				DetectPointsWithNoiseApp.class,
 				DetectPointScaleOriWithNoiseApp.class,
 				DetectPointsInsidePyramidApp.class,

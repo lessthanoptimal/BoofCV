@@ -57,6 +57,10 @@ public class ConfigHoughBinary implements Configuration {
 	public ConfigHoughBinary() {
 	}
 
+	public ConfigHoughBinary(int maxLines) {
+		this.maxLines = maxLines;
+	}
+
 	@Override
 	public void checkValidity() {
 

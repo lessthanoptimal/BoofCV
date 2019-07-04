@@ -62,7 +62,10 @@ public class HoughGradient_to_DetectLine<I extends ImageGray<I>, D extends Image
 	GrayU8 binary = new GrayU8(1,1);
 
 	// threshold for intensity image
-	float thresholdEdge =20;
+	float thresholdEdge = 20;
+
+	// should it apply non-max or not
+	boolean nonMaxSuppression=true;
 
 	Class<I> inputType;
 	Class<D> derivType;
@@ -85,9 +88,12 @@ public class HoughGradient_to_DetectLine<I extends ImageGray<I>, D extends Image
 	public List<LineParametric2D_F32> detect(I input) {
 		gradient.process(input,derivX,derivY);
 		GGradientToEdgeFeatures.intensityAbs(derivX, derivY, edgeIntensity);
-		GGradientToEdgeFeatures.nonMaxSuppressionCrude4(edgeIntensity,derivX,derivY,suppressed);
-
-		ThresholdImageOps.threshold(suppressed, binary, thresholdEdge, false);
+		if( nonMaxSuppression ) {
+			GGradientToEdgeFeatures.nonMaxSuppressionCrude4(edgeIntensity, derivX, derivY, suppressed);
+			ThresholdImageOps.threshold(suppressed, binary, thresholdEdge, false);
+		} else {
+			ThresholdImageOps.threshold(edgeIntensity, binary, thresholdEdge, false);
+		}
 
 		hough.transform(derivX,derivY,binary);
 
@@ -129,5 +135,13 @@ public class HoughGradient_to_DetectLine<I extends ImageGray<I>, D extends Image
 
 	public D getDerivY() {
 		return derivY;
+	}
+
+	public boolean isNonMaxSuppression() {
+		return nonMaxSuppression;
+	}
+
+	public void setNonMaxSuppression(boolean nonMaxSuppression) {
+		this.nonMaxSuppression = nonMaxSuppression;
 	}
 }

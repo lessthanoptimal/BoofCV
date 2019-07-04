@@ -20,10 +20,8 @@ package boofcv.alg.feature.detect.line;
 
 import boofcv.struct.feature.CachedSineCosine_F32;
 import boofcv.struct.image.GrayF32;
-import georegression.geometry.UtilLine2D_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.line.LineParametric2D_F32;
-import georegression.struct.line.LinePolar2D_F32;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 
@@ -68,21 +66,24 @@ public class HoughParametersPolar implements HoughTransformParameters {
 
 	@Override
 	public void lineToCoordinate(LineParametric2D_F32 line, Point2D_F64 coordinate) {
-		line = line.copy();
-		line.p.x -= originX;
-		line.p.y -= originY;
-		LinePolar2D_F32 polar = new LinePolar2D_F32();
-		UtilLine2D_F32.convert(line,polar);
 
-		if( polar.angle < 0 ) {
-			polar.distance = -polar.distance;
-			polar.angle = UtilAngle.toHalfCircle(polar.angle);
+		float px = line.p.x - originX;
+		float py = line.p.y - originY;
+
+		// convert line info polar notation
+		float top = line.slope.y*px - line.slope.x*py;
+		float distance = top/line.slope.norm();
+		float angle = (float)Math.atan2(-line.slope.x,line.slope.y);
+
+		if( distance < 0 ) {
+			distance = -distance;
+			angle = UtilAngle.bound(angle + (float)Math.PI);
 		}
 
 		int w2 = numBinsRange/2;
 
-		coordinate.x = (int)Math.round(polar.distance*w2/r_max + w2);
-		coordinate.y = polar.angle*numBinsAngle/Math.PI;
+		coordinate.x = (int)Math.round(distance*w2/r_max + w2);
+		coordinate.y = angle*numBinsAngle/Math.PI;
 	}
 
 	@Override

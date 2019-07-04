@@ -20,8 +20,10 @@ package boofcv.alg.feature.detect.line;
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Concurrent version of {@link HoughTransformGradient}
@@ -31,6 +33,9 @@ import boofcv.struct.image.ImageGray;
 public class HoughTransformGradient_MT<D extends ImageGray<D>>
 	extends HoughTransformGradient<D>
 {
+
+	// storage for candidates in each thread's block
+	private final FastQueue<QueueCorner> blockCandidates = new FastQueue<>(QueueCorner.class,true);
 
 	/**
 	 * Specifies parameters of transform.
@@ -46,30 +51,33 @@ public class HoughTransformGradient_MT<D extends ImageGray<D>>
 	@Override
 	void transform(GrayU8 binary )
 	{
-		BoofConcurrency.loopFor(0,binary.height,y->{
-			int start = binary.startIndex + y*binary.stride;
-			int end = start + binary.width;
+		blockCandidates.reset();
+		BoofConcurrency.loopBlocks(0,binary.height,(y0,y1)->{
+			QueueCorner storage;
+			synchronized (blockCandidates) {
+				storage = blockCandidates.grow();
+			}
+			storage.reset();
+			for (int y = y0; y < y1; y++) {
+				int start = binary.startIndex + y*binary.stride;
+				int end = start + binary.width;
 
-			for( int index = start; index < end; index++ ) {
-				if( binary.data[index] != 0 ) {
-					int x = index-start;
-					parameterize(x,y,_derivX.unsafe_getF(x,y),_derivY.unsafe_getF(x,y));
+				for( int index = start; index < end; index++ ) {
+					if( binary.data[index] != 0 ) {
+						int x = index-start;
+						parameterize(storage,x,y,_derivX.unsafe_getF(x,y),_derivY.unsafe_getF(x,y));
+					}
 				}
 			}
 		});
-	}
 
-	protected void addParameters( int x , int y , float amount ) {
-		if( transform.isInBounds(x,y)) {
-			int index = transform.startIndex+y*transform.stride+x;
-			// keep track of candidate pixels so that a sparse search can be done
-			// to detect lines
-			if( transform.data[index] == 0 ) {
-				synchronized (candidates) {
-					candidates.add(x, y);
-				}
+		this.candidates.reset();
+		for (int i = 0; i < blockCandidates.size; i++) {
+			QueueCorner s = blockCandidates.get(i);
+			for (int j = 0; j < s.size; j++) {
+				candidates.grow().set(s.get(j));
 			}
-			transform.data[index] += amount;
 		}
 	}
+
 }

@@ -82,7 +82,7 @@ public class BenchmarkDetectLines<T extends ImageGray<T>, D extends ImageGray<D>
 		GImageMiscOps.fillRectangle(input,100,10,15,width/4,width/4);
 		GImageMiscOps.fillRectangle(input,100,width/2,width/2+15,width/4,width/4);
 		GImageMiscOps.fillRectangle(input,100,width/2,0,width/8,width/8);
-		GImageMiscOps.addUniform(input,new Random(234),0,5);
+		GImageMiscOps.addUniform(input,new Random(234),0,20);
 
 		houghFoot = FactoryDetectLine.houghLineFoot(null,null, imageType);
 		houghPolar = FactoryDetectLine.houghLinePolar(null,null, imageType);
