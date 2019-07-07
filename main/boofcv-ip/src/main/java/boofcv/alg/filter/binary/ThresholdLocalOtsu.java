@@ -19,7 +19,6 @@
 package boofcv.alg.filter.binary;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.InputSanityCheck;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -79,7 +78,7 @@ public class ThresholdLocalOtsu implements InputToBinary<GrayU8> {
 	 * @param output Output binary image
 	 */
 	public void process(GrayU8 input , GrayU8 output ) {
-		InputSanityCheck.checkSameShape(input, output);
+		output.reshape(input.width,input.height);
 
 		regionWidth = regionWidthLength.computeI(Math.min(input.width,input.height));
 
