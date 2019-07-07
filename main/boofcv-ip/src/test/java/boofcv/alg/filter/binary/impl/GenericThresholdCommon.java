@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -52,7 +53,7 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>>
 	 * be true or false. There was a bug where this wasn't happening and wasn't caught
 	 */
 	@Test
-	public void sanityCheckThreshold() {
+	void sanityCheckThreshold() {
 		T input = GeneralizedImageOps.createSingleBand(imageType,100,120);
 		GImageMiscOps.fillUniform(input,rand,0,255);
 
@@ -68,7 +69,7 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>>
 	}
 
 	@Test
-	public void toggleDown() {
+	void toggleDown() {
 		T input = GeneralizedImageOps.createSingleBand(imageType,100,120);
 		GImageMiscOps.fillUniform(input,rand,0,255);
 
@@ -90,7 +91,7 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>>
 	 * Should process the image just fine. If a local region the block/region is adjusted for the image
 	 */
 	@Test
-	public void widthLargerThanImage() {
+	void widthLargerThanImage() {
 		T input = GeneralizedImageOps.createSingleBand(imageType,10,12);
 		GImageMiscOps.fillUniform(input,rand,0,255);
 		GrayU8 output = new GrayU8(10,12);
@@ -102,7 +103,7 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>>
 	}
 
 	@Test
-	public void subImage() {
+	void subImage() {
 		T input = GeneralizedImageOps.createSingleBand(imageType,100,120);
 		GImageMiscOps.fillUniform(input,rand,0,255);
 
@@ -117,5 +118,18 @@ public abstract class GenericThresholdCommon<T extends ImageGray<T>>
 		alg.process(sub_input,sub_output);
 
 		BoofTesting.assertEquals(expected,sub_output,0);
+	}
+
+	@Test
+	void resize_output() {
+		T input = GeneralizedImageOps.createSingleBand(imageType,100,120);
+		GImageMiscOps.fillUniform(input,rand,0,255);
+
+		GrayU8 output = new GrayU8(80,20);
+
+		createAlg(6,1.0,true).process(input,output);
+
+		assertEquals(input.width,output.width);
+		assertEquals(input.height,output.height);
 	}
 }
