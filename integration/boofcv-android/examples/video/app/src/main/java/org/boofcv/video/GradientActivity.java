@@ -35,6 +35,7 @@ import java.util.Locale;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.camera2.VisualizeCamera2Activity;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;

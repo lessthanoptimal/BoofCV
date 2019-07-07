@@ -42,6 +42,7 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.camera2.VisualizeCamera2Activity;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.misc.MovingAverage;

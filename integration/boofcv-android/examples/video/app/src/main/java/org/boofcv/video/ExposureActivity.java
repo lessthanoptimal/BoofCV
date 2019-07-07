@@ -14,6 +14,7 @@ import android.widget.Toast;
 import java.util.Locale;
 
 import boofcv.android.camera2.SimpleCamera2Activity;
+import boofcv.concurrency.BoofConcurrency;
 
 /**
  * Demonstrates how to change the settings in a camera which is already open. In this case, each
