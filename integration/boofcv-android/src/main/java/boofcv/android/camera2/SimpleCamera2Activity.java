@@ -1089,6 +1089,8 @@ public abstract class SimpleCamera2Activity extends Activity {
 		}
 
 		public void clearCamera() {
+			if( !mLock.isLocked() )
+				throw new RuntimeException("Calling clearCamera() when not locked!");
 			mCameraCharacterstics = null;
 			mCameraDevice = null;
 			mCameraSize = null;
