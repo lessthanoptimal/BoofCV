@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2019
+Date    : 2019-July-07
 Version : 0.34
 
 - Applications
@@ -48,6 +48,7 @@ Version : 0.34
 - Concurrent version of template matching
 - Android
   * Thanks sergiuchuckmisha for fixing a bug/type-o in FOV estimation
+  * Possible fix for a failed resolution change
 - Geometric
   * Added Projective N-Point (PRnP) algorithm using DLT
 

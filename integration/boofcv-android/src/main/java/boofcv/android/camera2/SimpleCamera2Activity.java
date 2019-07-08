@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -107,7 +107,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 	private volatile boolean canProcessImages;
 
 	// If true there will be verbose output to Log
-	protected boolean verbose = true;
+	protected boolean verbose = false;
 
 	/**
 	 * An additional thread for running tasks that shouldn't block the UI.
@@ -347,6 +347,8 @@ public abstract class SimpleCamera2Activity extends Activity {
 		}
 
 		if (isFinishing()) {
+			if( verbose )
+				Log.d(TAG,"openCamera isFinishing()==true");
 			return;
 		}
 		CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
@@ -356,6 +358,9 @@ public abstract class SimpleCamera2Activity extends Activity {
 		// The camera should be released here until a camera has been successfully initialized
 		boolean releaseLock = true;
 		try {
+			if( verbose )
+				Log.d(TAG,"openCamera open.state=="+open.state);
+
 			if (!open.mLock.tryLock(2500, TimeUnit.MILLISECONDS)) {
 				throw new RuntimeException("Time out waiting to lock camera opening.");
 			}
@@ -957,9 +962,11 @@ public abstract class SimpleCamera2Activity extends Activity {
 		}
 
 		Image image = imageReader.acquireLatestImage();
-		if (image == null)
+		if (image == null) {
+			if( verbose )
+				Log.d(TAG,"OnImageAvailableListener: acquireLatestImage() returned null");
 			return;
-		try {
+		} try {
 			// safely acquire the camera resolution
 			int cameraWidth, cameraHeight, cameraOrientation;
 			open.mLock.lock();
@@ -974,7 +981,8 @@ public abstract class SimpleCamera2Activity extends Activity {
 			}
 
 			if (firstFrame) {
-				firstFrame = false;
+				if( verbose )
+					Log.i(TAG,"OnImageAvailableListener: first frame!");
 				canProcessImages = false;
 				// sometimes we request a resolution and Android say's f-you and gives us something else even if it's
 				// in the valid list. Re-adjust everything to what the actual resolution is
@@ -983,18 +991,27 @@ public abstract class SimpleCamera2Activity extends Activity {
 							"  Expected=" + cameraWidth + "x" + cameraHeight);
 					open.mLock.lock();
 					try {
-						if (open.mCameraSize == null)
+						if (open.mCameraSize == null) {
+							if( verbose )
+								Log.i(TAG,"OnImageAvailableListener: open.mCameraSize == null");
 							return;
+						}
 						open.mCameraSize = new Size(image.getWidth(), image.getHeight());
 					} finally {
 						open.mLock.unlock();
 					}
+					firstFrame = false;
 					runOnUiThread(() -> {
 						configureTransform(viewWidth, viewHeight);
 						onCameraResolutionChange(cameraWidth, cameraHeight, cameraOrientation);
 						canProcessImages = true;
+						if( verbose )
+							Log.i(TAG,"OnImageAvailableListener: UI Called back for first frame resolution finished");
+						// this frame will most likely not be processed because this code is run
+						// on another frame
 					});
 				} else {
+					firstFrame = false;
 					canProcessImages = true;
 				}
 			}
