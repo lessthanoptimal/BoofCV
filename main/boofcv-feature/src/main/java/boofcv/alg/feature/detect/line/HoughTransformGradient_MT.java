@@ -52,11 +52,7 @@ public class HoughTransformGradient_MT<D extends ImageGray<D>>
 	void transform(GrayU8 binary )
 	{
 		blockCandidates.reset();
-		BoofConcurrency.loopBlocks(0,binary.height,(y0,y1)->{
-			QueueCorner storage;
-			synchronized (blockCandidates) {
-				storage = blockCandidates.grow();
-			}
+		BoofConcurrency.loopBlocks(0,binary.height,blockCandidates,(storage,y0,y1)->{
 			storage.reset();
 			for (int y = y0; y < y1; y++) {
 				int start = binary.startIndex + y*binary.stride;
@@ -71,6 +67,7 @@ public class HoughTransformGradient_MT<D extends ImageGray<D>>
 			}
 		});
 
+		// Combine results found in each thread together
 		this.candidates.reset();
 		for (int i = 0; i < blockCandidates.size; i++) {
 			QueueCorner s = blockCandidates.get(i);
