@@ -18,6 +18,8 @@
 
 package boofcv.concurrency;
 
+import org.ddogleg.struct.FastQueue;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.IntConsumer;
@@ -165,6 +167,35 @@ public class BoofConcurrency {
 
 		try {
 			pool.submit(new IntRangeTask(start,endExclusive,blockSize,consumer)).get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Splits the range of values up into blocks. For each block workspace data will be declared using a
+	 * {@link FastQueue} and passed on. This workspace can be used to collect results and combine later on
+	 *
+	 * @param start First index, inclusive
+	 * @param endExclusive Last index, exclusive
+	 * @param consumer The consumer
+	 */
+	public static <T>void loopBlocks(int start , int endExclusive , FastQueue<T> workspace, IntRangeObjectConsumer<T> consumer ) {
+		final ForkJoinPool pool = BoofConcurrency.pool;
+		int numThreads = pool.getParallelism();
+
+		int range = endExclusive-start;
+		if( range == 0 ) // nothing to do here!
+			return;
+		if( range < 0 )
+			throw new IllegalArgumentException("end must be more than start. "+start+" -> "+endExclusive);
+
+		// Did some experimentation here. Gave it more threads than were needed or exactly what was needed
+		// exactly seemed to do better in the test cases
+		int blockSize = Math.max(1,range/numThreads);
+
+		try {
+			pool.submit(new IntRangeObjectTask<>(start,endExclusive,blockSize,workspace,consumer)).get();
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}
