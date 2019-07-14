@@ -113,7 +113,7 @@ public class GradientTwo1 {
 	 */
 	public static void process(GrayS16 orig,
 							   GrayS16 derivX, GrayS16 derivY, @Nullable ImageBorder_S32 border) {
-		InputSanityCheck.checkSameShape(orig, derivX, derivY);
+		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
 			GradientTwo1_Standard_MT.process(orig, derivX, derivY);
@@ -137,7 +137,7 @@ public class GradientTwo1 {
 	 */
 	public static void process(GrayF32 orig,
 							   GrayF32 derivX, GrayF32 derivY, @Nullable ImageBorder_F32 border) {
-		InputSanityCheck.checkSameShape(orig, derivX, derivY);
+		InputSanityCheck.reshapeOneIn(orig, derivX, derivY);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
 			GradientTwo1_Standard_MT.process(orig, derivX, derivY);

@@ -3,6 +3,24 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2019
+Version : 0.35
+
+- Calibration
+  * TODO Calibrate using partially obscured chessboard patterns
+  * TODO Add ability to remove images and recalibrate from application
+
+TODO Tech Report for new chessboard detector, assisted calibration, line fitting
+TODO Videos - hough line detectors
+            - chessboard corner detector + improvements
+
+TODO corner detector 2 tech report
+TODO Scene Reconstruction from arbitrary number of photos
+TODO regression for line detectors
+TODO hough circle detector
+TODO concurrent SIFT
+
+---------------------------------------------
 Date    : 2019-July-07
 Version : 0.34
 

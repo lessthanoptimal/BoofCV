@@ -1,5 +1,4 @@
 TODO corner detector 2 tech report
-
 TODO Scene Reconstruction from arbitrary number of photos
 
 TODO Perspective-n-conic
