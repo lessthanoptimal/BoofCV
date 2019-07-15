@@ -28,53 +28,57 @@ import org.ejml.UtilEjml;
  */
 public class XCornerAbeles2019Intensity {
 
-	int radius = 2;
+	int radiusA = 3;
+	int radiusD = 2;
 
 	GrayF32 blurred = new GrayF32(1,1);
 
 	public void process(GrayF32 input, GrayF32 intensity) {
 		intensity.reshape(input.width,input.height);
-		ImageMiscOps.fillBorder(intensity,0,radius);
+		ImageMiscOps.fillBorder(intensity,0, radiusA);
 
 		blurred.reshape(input.width,input.height);
 		GBlurImageOps.gaussian(input,blurred,-1,1,null);
 
-		for (int y = radius; y < input.height - radius; y++) {
-			int outputIdx = intensity.startIndex + y*intensity.stride + radius;
-			for (int x = radius; x < input.width - radius; x++) {
-				float a = blurred.unsafe_get(x,y-radius);
-				float b = blurred.unsafe_get(x,y+radius);
-				float c = blurred.unsafe_get(x-radius,y);
-				float d = blurred.unsafe_get(x+radius,y);
-
-				float e = blurred.unsafe_get(x-radius,y-radius);
-				float f = blurred.unsafe_get(x+radius,y+radius);
-				float g = blurred.unsafe_get(x-radius,y+radius);
-				float h = blurred.unsafe_get(x+radius,y-radius);
-
-				float mean = (a+b+c+d)/4f;
-				float div = mean + UtilEjml.F_EPS;
-
-				a = (a-mean)/div;
-				b = (b-mean)/div;
-				c = (c-mean)/div;
-				d = (d-mean)/div;
-
-				float inten0 = a*b + c*d;
-
-				mean = (e+f+g+h)/4f;
-				div = mean + UtilEjml.F_EPS;
-
-				e = (e-mean)/div;
-				f = (f-mean)/div;
-				g = (g-mean)/div;
-				h = (h-mean)/div;
-
-				float inten1 = e*f + g*h;
-
-				intensity.data[outputIdx++] = Math.max(0,Math.max(inten0,inten1));
+		for (int y = radiusA; y < input.height - radiusA; y++) {
+			int outputIdx = intensity.startIndex + y*intensity.stride + radiusA;
+			for (int x = radiusA; x < input.width - radiusA; x++) {
+				intensity.data[outputIdx++] = score(x,y);
 			}
 		}
+	}
 
+	private float score( int x , int y ) {
+		float a = blurred.unsafe_get(x,y - radiusA);
+		float b = blurred.unsafe_get(x,y + radiusA);
+		float c = blurred.unsafe_get(x - radiusA,y);
+		float d = blurred.unsafe_get(x + radiusA,y);
+
+		float e = blurred.unsafe_get(x - radiusD,y - radiusD);
+		float f = blurred.unsafe_get(x + radiusD,y + radiusD);
+		float g = blurred.unsafe_get(x - radiusD,y + radiusD);
+		float h = blurred.unsafe_get(x + radiusD,y - radiusD);
+
+		float mean = (a+b+c+d)/4f;
+		float div = mean + UtilEjml.F_EPS;
+
+		a = (a-mean)/div;
+		b = (b-mean)/div;
+		c = (c-mean)/div;
+		d = (d-mean)/div;
+
+		float inten0 = a*b + c*d;
+
+		mean = (e+f+g+h)/4f;
+		div = mean + UtilEjml.F_EPS;
+
+		e = (e-mean)/div;
+		f = (f-mean)/div;
+		g = (g-mean)/div;
+		h = (h-mean)/div;
+
+		float inten1 = e*f + g*h;
+
+		return Math.max(inten0,inten1);
 	}
 }

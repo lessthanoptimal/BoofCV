@@ -30,7 +30,6 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
@@ -74,9 +73,7 @@ public class DetectChessboardCornersVisualizeApp2
 
 	// intensity image is rendered here
 	BufferedImage visualized;
-	BufferedImage binary;
 	BufferedImage original;
-
 
 	GrayF32 logIntensity = new GrayF32(1,1);
 
@@ -166,13 +163,11 @@ public class DetectChessboardCornersVisualizeApp2
 			featureImg = detector.getIntensity();
 
 			if( controlPanel.logItensity ) {
-				PixelMath.log(featureImg,logIntensity);
+				PixelMath.logSign(featureImg,logIntensity);
 				VisualizeImageData.colorizeSign(logIntensity, visualized, ImageStatistics.maxAbs(logIntensity));
 			} else {
 				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
 			}
-
-			binary=VisualizeBinaryData.renderBinary(detector.getBinary(),false,binary);
 
 			synchronized (lockCorners) {
 				FastQueue<ChessboardCorner> orig = detector.getCorners();
@@ -195,8 +190,6 @@ public class DetectChessboardCornersVisualizeApp2
 			imagePanel.setBufferedImageNoChange(visualized);
 		} else if( controlPanel.view == 1 ) {
 			imagePanel.setBufferedImageNoChange(original);
-		} else if( controlPanel.view == 3 ) {
-			imagePanel.setBufferedImageNoChange(binary);
 		}
 	}
 
@@ -280,7 +273,7 @@ public class DetectChessboardCornersVisualizeApp2
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
-			comboView = combo(view,"Intensity","Image","Both","Binary");
+			comboView = combo(view,"Intensity","Image","Both");
 			spinnerRadius = spinner(radius, 1, 100, 1);
 			spinnerTop = spinner(pyramidTop, 50, 10000, 50);
 			checkShowCorners = checkbox("Show Corners", showCorners);
