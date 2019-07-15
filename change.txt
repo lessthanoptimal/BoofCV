@@ -6,6 +6,10 @@ Date Format: year/month/day
 Date    : 2019
 Version : 0.35
 
+- Mean Shift
+  * Even kernel sizes
+  * Configuration class
+  * Ignore negative values
 - Calibration
   * TODO Calibrate using partially obscured chessboard patterns
   * TODO Add ability to remove images and recalibrate from application

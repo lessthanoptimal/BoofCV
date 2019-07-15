@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.detect.peak;
 
+import boofcv.factory.feature.detect.peak.ConfigMeanShiftSearch;
 import boofcv.factory.feature.detect.peak.FactorySearchLocalPeak;
 import boofcv.struct.image.GrayF32;
 
@@ -27,6 +28,6 @@ import boofcv.struct.image.GrayF32;
 public class TestMeanShiftPeak_to_SearchLocalPeak extends GeneralSearchLocalPeakChecks {
 	@Override
 	public SearchLocalPeak createSearch( Class<GrayF32> imageType ) {
-		return FactorySearchLocalPeak.meanShiftGaussian(50,1e-3f,imageType);
+		return FactorySearchLocalPeak.meanShiftGaussian(new ConfigMeanShiftSearch(50,1e-3f),imageType);
 	}
 }

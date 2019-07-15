@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,15 +28,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestWeightPixelKernel_F32 {
+class TestWeightPixelKernel_F32 {
 
 	Random rand = new Random(234);
 
 	@Test
-	public void kernelLookup() {
+	void kernelLookup() {
 		WeightPixelKernel_F32 alg = new WeightPixelKernel_F32() {
 			@Override
-			public void setRadius(int radiusX, int radiusY) {}
+			public void setRadius(int radiusX, int radiusY, boolean odd) {}
 		};
 
 		alg.kernel = FactoryKernel.random2D_F32(5,2,-2,2,rand);

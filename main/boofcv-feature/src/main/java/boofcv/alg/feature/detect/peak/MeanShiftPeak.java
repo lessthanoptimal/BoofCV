@@ -33,6 +33,8 @@ import boofcv.struct.image.ImageGray;
  * If the image border is hit while searching the square will be push back until it is entirely contained inside
  * the image.
  *
+ * This is NOT thread safe.
+ *
  * @author Peter Abeles
  */
 public class MeanShiftPeak<T extends ImageGray<T>> {
@@ -54,8 +56,7 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 	// The peak in x and y
 	protected float peakX,peakY;
 
-	// top left corner of sample region
-	protected float x0,y0;
+	boolean odd = true;
 
 	// used to compute the weight each pixel contributes to the mean
 	protected WeightPixel_F32 weights;
@@ -68,10 +69,11 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 	 * @param borderType
 	 */
 	public MeanShiftPeak(int maxIterations, float convergenceTol,
-						 WeightPixel_F32 weights,
+						 WeightPixel_F32 weights, boolean odd,
 						 Class<T> imageType, BorderType borderType) {
 		this.maxIterations = maxIterations;
 		this.convergenceTol = convergenceTol;
+		this.odd = odd;
 		this.weights = weights;
 		interpolate = FactoryInterpolation.bilinearPixelS(imageType, borderType);
 	}
@@ -86,9 +88,13 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 	}
 
 	public void setRadius(int radius) {
-		this.weights.setRadius( radius, radius );
+		this.weights.setRadius( radius, radius, odd );
 		this.radius = radius;
-		this.width = radius*2+1;
+		if( odd ) {
+			this.width = radius*2+1;
+		} else {
+			this.width = radius*2;
+		}
 	}
 
 	/**
@@ -99,7 +105,7 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 		if( radius <= 0 ) { // can turn off refinement by setting radius to zero
 			return;
 		}
-		setRegion(cx, cy);
+		float offset = -radius + (odd?0:0.5f);
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			float total = 0;
@@ -108,33 +114,35 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 			int kernelIndex = 0;
 
 			// see if it can use fast interpolation otherwise use the safer technique
-			if( interpolate.isInFastBounds(x0, y0) &&
-					interpolate.isInFastBounds(x0 + width - 1, y0 + width - 1)) {
+			if( interpolate.isInFastBounds(peakX+offset, peakY+offset) &&
+					interpolate.isInFastBounds(peakX-offset, peakY-offset)) {
 				for( int yy = 0; yy < width; yy++ ) {
+					float y = offset+yy;
 					for( int xx = 0; xx < width; xx++ ) {
+						float x = offset+xx;
 						float w = weights.weightIndex(kernelIndex++);
-						float weight = w*interpolate.get_fast(x0 + xx, y0 + yy);
+						float weight = w*interpolate.get_fast(peakX+x, peakY+y);
 						total += weight;
-						sumX += weight*(xx+x0);
-						sumY += weight*(yy+y0);
+						sumX += weight*x;
+						sumY += weight*y;
 					}
 				}
 			} else {
 				for( int yy = 0; yy < width; yy++ ) {
+					float y = offset+yy;
 					for( int xx = 0; xx < width; xx++ ) {
+						float x = offset+xx;
 						float w = weights.weightIndex(kernelIndex++);
-						float weight = w*interpolate.get(x0 + xx, y0 + yy);
+						float weight = w*interpolate.get(peakX+x, peakY+y);
 						total += weight;
-						sumX += weight*(xx+x0);
-						sumY += weight*(yy+y0);
+						sumX += weight*x;
+						sumY += weight*y;
 					}
 				}
 			}
 
-			cx = sumX/total;
-			cy = sumY/total;
-
-			setRegion(cx, cy);
+			cx = peakX + sumX/total;
+			cy = peakY + sumY/total;
 
 			float dx = cx-peakX;
 			float dy = cy-peakY;
@@ -148,19 +156,65 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Updates the location of the rectangular bounding box
-	 * @param cx Image center x-axis
-	 * @param cy Image center y-axis
+	 * Performs a mean-shift search center at the specified coordinates but with negative weights ignored
 	 */
-	protected void setRegion(float cx, float cy) {
-		x0 = cx - radius;
-		y0 = cy - radius;
+	public void searchPositive( float cx , float cy ) {
+		peakX = cx; peakY = cy;
+		if( radius <= 0 ) { // can turn off refinement by setting radius to zero
+			return;
+		}
+		float offset = -radius + (odd?0:0.5f);
 
-		if( x0 < 0 ) { x0 = 0;}
-		else if( x0+width > image.width ) { x0 = image.width-width; }
-		if( y0 < 0 ) { y0 = 0;}
-		else if( y0+width > image.height ) { y0 = image.height-width; }
+		for( int i = 0; i < maxIterations; i++ ) {
+			float total = 0;
+			float sumX = 0, sumY = 0;
 
+			int kernelIndex = 0;
+
+			// see if it can use fast interpolation otherwise use the safer technique
+			if( interpolate.isInFastBounds(peakX+offset, peakY+offset) &&
+					interpolate.isInFastBounds(peakX-offset, peakY-offset)) {
+				for( int yy = 0; yy < width; yy++ ) {
+					float y = offset+yy;
+					for( int xx = 0; xx < width; xx++ ) {
+						float x = offset+xx;
+						float w = weights.weightIndex(kernelIndex++);
+						float weight = w*interpolate.get_fast(peakX+x, peakY+y);
+						if( weight > 0f ) {
+							total += weight;
+							sumX += weight * x;
+							sumY += weight * y;
+						}
+					}
+				}
+			} else {
+				for( int yy = 0; yy < width; yy++ ) {
+					float y = offset+yy;
+					for( int xx = 0; xx < width; xx++ ) {
+						float x = offset+xx;
+						float w = weights.weightIndex(kernelIndex++);
+						float weight = w*interpolate.get(peakX+x, peakY+y);
+						if( weight > 0f ) {
+							total += weight;
+							sumX += weight * x;
+							sumY += weight * y;
+						}
+					}
+				}
+			}
+
+			cx = peakX + sumX/total;
+			cy = peakY + sumY/total;
+
+			float dx = cx-peakX;
+			float dy = cy-peakY;
+
+			peakX = cx; peakY = cy;
+
+			if( Math.abs(dx) < convergenceTol && Math.abs(dy) < convergenceTol ) {
+				break;
+			}
+		}
 	}
 
 	public float getPeakX() {
@@ -181,5 +235,9 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 
 	public void setInterpolate(InterpolatePixelS<T> interpolate) {
 		this.interpolate = interpolate;
+	}
+
+	public boolean isOdd() {
+		return odd;
 	}
 }

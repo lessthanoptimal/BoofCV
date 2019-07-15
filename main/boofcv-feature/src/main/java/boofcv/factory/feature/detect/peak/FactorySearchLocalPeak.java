@@ -36,29 +36,29 @@ public class FactorySearchLocalPeak {
 
 	/**
 	 * Mean-shift based search with a uniform kernel
-	 * @param maxIterations Maximum number of iterations.  Try 15
-	 * @param convergenceTol Convergence tolerance.  try 1e-3
+	 * @param config Configuration for the search
 	 * @param imageType Type of input image
 	 * @return mean-shift search
 	 */
 	public static <T extends ImageGray<T>>
-	SearchLocalPeak<T> meanShiftUniform( int maxIterations, float convergenceTol , Class<T> imageType ) {
+	SearchLocalPeak<T> meanShiftUniform( ConfigMeanShiftSearch config , Class<T> imageType ) {
 		WeightPixel_F32 weights = new WeightPixelUniform_F32();
-		MeanShiftPeak<T> alg = new MeanShiftPeak<>(maxIterations, convergenceTol, weights, imageType, BorderType.EXTENDED);
-		return new MeanShiftPeak_to_SearchLocalPeak<>(alg);
+		MeanShiftPeak<T> alg = new MeanShiftPeak<>(config.maxIterations, (float)config.convergenceTol,
+				weights, config.odd, imageType, BorderType.EXTENDED);
+		return new MeanShiftPeak_to_SearchLocalPeak<>(alg, config.positiveOnly);
 	}
 
 	/**
 	 * Mean-shift based search with a Gaussian kernel
-	 * @param maxIterations Maximum number of iterations.  Try 15
-	 * @param convergenceTol Convergence tolerance.  try 1e-3
+	 * @param config Configuration for the search
 	 * @param imageType Type of input image
 	 * @return mean-shift search
 	 */
 	public static <T extends ImageGray<T>>
-	SearchLocalPeak<T> meanShiftGaussian( int maxIterations, float convergenceTol , Class<T> imageType) {
+	SearchLocalPeak<T> meanShiftGaussian( ConfigMeanShiftSearch config , Class<T> imageType) {
 		WeightPixel_F32 weights = new WeightPixelGaussian_F32();
-		MeanShiftPeak<T> alg = new MeanShiftPeak<>(maxIterations, convergenceTol, weights, imageType, BorderType.EXTENDED);
-		return new MeanShiftPeak_to_SearchLocalPeak<>(alg);
+		MeanShiftPeak<T> alg = new MeanShiftPeak<>(config.maxIterations, (float)config.convergenceTol,
+				weights, config.odd, imageType, BorderType.EXTENDED);
+		return new MeanShiftPeak_to_SearchLocalPeak<>(alg, config.positiveOnly);
 	}
 }

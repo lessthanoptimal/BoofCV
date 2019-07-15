@@ -109,12 +109,7 @@ public class DetectChessboardCornersVisualizeApp2
 			ConfigThreshold threshold = controlPanel.thresholdPanel.createConfig();
 			threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
 
-			DetectChessboardCorners<GrayF32,GrayF32> corners = new DetectChessboardCorners<>(GrayF32.class);
-			corners.setKernelRadius(controlPanel.radius);
-			corners.useMeanShift = controlPanel.meanShift;
-//			detector = new DetectChessboardCornersPyramid<>(corners);
-//			detector.setPyramidTopSize(controlPanel.pyramidTop);
-//			detector.getDetector().setThresholding(FactoryThresholdBinary.threshold(threshold,GrayF32.class));
+			detector.useMeanShift = controlPanel.meanShift;
 		}
 	}
 
@@ -170,9 +165,9 @@ public class DetectChessboardCornersVisualizeApp2
 			}
 
 			synchronized (lockCorners) {
-				FastQueue<ChessboardCorner> orig = detector.getCorners();
+				List<ChessboardCorner> orig = detector.getCorners();
 				foundCorners.reset();
-				for (int i = 0; i < orig.size; i++) {
+				for (int i = 0; i < orig.size(); i++) {
 					foundCorners.grow().set( orig.get(i) );
 				}
 			}

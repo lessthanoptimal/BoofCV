@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.transform.fft.DiscreteFourierTransform;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.PixelMath;
 import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
+import boofcv.factory.feature.detect.peak.ConfigMeanShiftSearch;
 import boofcv.factory.feature.detect.peak.FactorySearchLocalPeak;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF64;
@@ -129,7 +130,7 @@ public class CirculantTracker<T extends ImageGray<T>> {
 
 	// used to compute sub-pixel location
 	private SearchLocalPeak<GrayF64> localPeak =
-			FactorySearchLocalPeak.meanShiftUniform(5, 1e-4f, GrayF64.class);
+			FactorySearchLocalPeak.meanShiftUniform(new ConfigMeanShiftSearch(5, 1e-4), GrayF64.class);
 
 	// adjustment from sub-pixel
 	protected float offX,offY;

@@ -35,6 +35,9 @@ public class ChessboardCorner extends Point2D_F64 {
 	 */
 	public double intensity;
 
+	public double edge;
+	public double circleRatio;
+
 	/**
 	 * Internal book keeping. if true then this indicates that this is the first corner seen in this level
 	 */
