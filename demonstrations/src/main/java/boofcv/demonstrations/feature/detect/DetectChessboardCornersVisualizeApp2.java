@@ -20,7 +20,7 @@ package boofcv.demonstrations.feature.detect;
 
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
-import boofcv.alg.feature.detect.chess.DetectChessboardCorners2;
+import boofcv.alg.feature.detect.chess.DetectChessboardCorners2Pyramid;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
@@ -77,7 +77,7 @@ public class DetectChessboardCornersVisualizeApp2
 
 	GrayF32 logIntensity = new GrayF32(1,1);
 
-	DetectChessboardCorners2<GrayF32,GrayF32> detector = new DetectChessboardCorners2<>(GrayF32.class);
+	DetectChessboardCorners2Pyramid<GrayF32,GrayF32> detector = new DetectChessboardCorners2Pyramid<>(GrayF32.class);
 
 	// used to compute feature intensity
 	final Object lockAlgorithm = new Object();
@@ -119,7 +119,7 @@ public class DetectChessboardCornersVisualizeApp2
 			ConfigThreshold threshold = controlPanel.thresholdPanel.createConfig();
 			threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
 
-			detector.useMeanShift = controlPanel.meanShift;
+			detector.getDetector().useMeanShift = controlPanel.meanShift;
 		}
 	}
 
@@ -165,7 +165,7 @@ public class DetectChessboardCornersVisualizeApp2
 			long time1 = System.nanoTime();
 			processingTime = (time1-time0)*1e-6; // milliseconds
 
-			featureImg = detector.getIntensity();
+			featureImg = detector.getDetector().getIntensity();
 
 			if( controlPanel.logItensity ) {
 				PixelMath.logSign(featureImg,logIntensity);
@@ -174,10 +174,10 @@ public class DetectChessboardCornersVisualizeApp2
 				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
 			}
 
-			binary= VisualizeBinaryData.renderBinary(detector.getBinary(),false,binary);
+			binary= VisualizeBinaryData.renderBinary(detector.getDetector().getBinary(),false,binary);
 
 			synchronized (lockCorners) {
-				List<ChessboardCorner> orig = detector.getCorners();
+				FastQueue<ChessboardCorner> orig = detector.getCorners();
 				foundCorners.reset();
 				for (int i = 0; i < orig.size(); i++) {
 					foundCorners.grow().set( orig.get(i) );
