@@ -18,8 +18,8 @@
 
 package boofcv.alg.feature.detect.intensity;
 
-import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import org.ejml.UtilEjml;
 
@@ -28,36 +28,40 @@ import org.ejml.UtilEjml;
  */
 public class XCornerAbeles2019Intensity {
 
+	GrayF32 input;
 	int radiusA = 3;
 	int radiusD = 2;
 
-	GrayF32 blurred = new GrayF32(1,1);
-
 	public void process(GrayF32 input, GrayF32 intensity) {
+		this.input = input;
 		intensity.reshape(input.width,input.height);
 		ImageMiscOps.fillBorder(intensity,0, radiusA);
 
-		blurred.reshape(input.width,input.height);
-		GBlurImageOps.gaussian(input,blurred,-1,1,null);
-
-		for (int y = radiusA; y < input.height - radiusA; y++) {
+		BoofConcurrency.loopFor(radiusA,input.height-radiusA,y->{
 			int outputIdx = intensity.startIndex + y*intensity.stride + radiusA;
 			for (int x = radiusA; x < input.width - radiusA; x++) {
 				intensity.data[outputIdx++] = score(x,y);
 			}
-		}
+		});
+//		for (int y = radiusA; y < input.height - radiusA; y++) {
+//			int outputIdx = intensity.startIndex + y*intensity.stride + radiusA;
+//			for (int x = radiusA; x < input.width - radiusA; x++) {
+//				intensity.data[outputIdx++] = score(x,y);
+//			}
+//		}
+		this.input = null;
 	}
 
 	private float score( int x , int y ) {
-		float a = blurred.unsafe_get(x,y - radiusA);
-		float b = blurred.unsafe_get(x,y + radiusA);
-		float c = blurred.unsafe_get(x - radiusA,y);
-		float d = blurred.unsafe_get(x + radiusA,y);
+		float a = input.unsafe_get(x,y - radiusA);
+		float b = input.unsafe_get(x,y + radiusA);
+		float c = input.unsafe_get(x - radiusA,y);
+		float d = input.unsafe_get(x + radiusA,y);
 
-		float e = blurred.unsafe_get(x - radiusD,y - radiusD);
-		float f = blurred.unsafe_get(x + radiusD,y + radiusD);
-		float g = blurred.unsafe_get(x - radiusD,y + radiusD);
-		float h = blurred.unsafe_get(x + radiusD,y - radiusD);
+		float e = input.unsafe_get(x - radiusD,y - radiusD);
+		float f = input.unsafe_get(x + radiusD,y + radiusD);
+		float g = input.unsafe_get(x - radiusD,y + radiusD);
+		float h = input.unsafe_get(x + radiusD,y - radiusD);
 
 		float mean = (a+b+c+d)/4f;
 		float div = mean + UtilEjml.F_EPS;

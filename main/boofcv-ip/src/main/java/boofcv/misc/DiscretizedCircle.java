@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -17,6 +17,9 @@
  */
 
 package boofcv.misc;
+
+import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Functions related to discretized circles for image processing
@@ -70,6 +73,38 @@ public class DiscretizedCircle {
 			System.arraycopy(temp, 0, ret, 0, i);
 
 			return ret;
+		}
+	}
+
+	public static void coordinates(double radius, FastQueue<Point2D_I32> coordinates ) {
+
+		coordinates.reset();
+
+		double PI2 = Math.PI * 2.0;
+
+		double circumference = PI2 * radius;
+		int num = (int) Math.ceil(circumference);
+		num = num - num % 4;
+
+		double angleStep = PI2 / num;
+
+		int width = (int)Math.ceil(radius)*2+1;
+
+		int i = 0;
+
+		int prev = 0;
+
+		for (double ang = 0; ang < PI2; ang += angleStep) {
+			int x = (int) Math.round(Math.cos(ang) * radius);
+			int y = (int) Math.round(Math.sin(ang) * radius);
+
+
+			int pixel = y * width + x;
+
+			if (pixel != prev) {
+				coordinates.grow().set(x,y);
+			}
+			prev = pixel;
 		}
 	}
 

@@ -30,6 +30,7 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
+import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
@@ -39,16 +40,14 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -74,6 +73,7 @@ public class DetectChessboardCornersVisualizeApp2
 	// intensity image is rendered here
 	BufferedImage visualized;
 	BufferedImage original;
+	BufferedImage binary;
 
 	GrayF32 logIntensity = new GrayF32(1,1);
 
@@ -99,6 +99,16 @@ public class DetectChessboardCornersVisualizeApp2
 			public void keyPressed(KeyEvent e) {
 				if( e.getKeyCode()==KeyEvent.VK_SPACE) {
 					streamPaused = !streamPaused;
+				}
+			}
+		});
+
+		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if( SwingUtilities.isLeftMouseButton(e)) {
+					Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
+					System.out.printf("Clicked at %.2f , %.2f\n",p.x,p.y);
 				}
 			}
 		});
@@ -164,6 +174,8 @@ public class DetectChessboardCornersVisualizeApp2
 				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
 			}
 
+			binary= VisualizeBinaryData.renderBinary(detector.getBinary(),false,binary);
+
 			synchronized (lockCorners) {
 				List<ChessboardCorner> orig = detector.getCorners();
 				foundCorners.reset();
@@ -185,6 +197,8 @@ public class DetectChessboardCornersVisualizeApp2
 			imagePanel.setBufferedImageNoChange(visualized);
 		} else if( controlPanel.view == 1 ) {
 			imagePanel.setBufferedImageNoChange(original);
+		} else if( controlPanel.view == 3 ) {
+			imagePanel.setBufferedImageNoChange(binary);
 		}
 	}
 
@@ -268,7 +282,7 @@ public class DetectChessboardCornersVisualizeApp2
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
-			comboView = combo(view,"Intensity","Image","Both");
+			comboView = combo(view,"Intensity","Image","Both","Binary");
 			spinnerRadius = spinner(radius, 1, 100, 1);
 			spinnerTop = spinner(pyramidTop, 50, 10000, 50);
 			checkShowCorners = checkbox("Show Corners", showCorners);
@@ -347,7 +361,7 @@ public class DetectChessboardCornersVisualizeApp2
 
 			app.openExample(examples.get(0));
 			app.waitUntilInputSizeIsKnown();
-			app.display("Chessboard Corner Detector");
+			app.display("X-Corner Detector");
 		});
 	}
 }
