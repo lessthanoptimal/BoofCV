@@ -19,15 +19,13 @@
 package boofcv.demonstrations.feature.detect;
 
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
-import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
 import boofcv.alg.feature.detect.chess.DetectChessboardCorners2Pyramid;
+import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
-import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
@@ -116,9 +114,6 @@ public class DetectChessboardCornersVisualizeApp2
 
 	private void createAlgorithm() {
 		synchronized (lockAlgorithm) {
-			ConfigThreshold threshold = controlPanel.thresholdPanel.createConfig();
-			threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
-
 			detector.getDetector().useMeanShift = controlPanel.meanShift;
 		}
 	}
@@ -149,13 +144,25 @@ public class DetectChessboardCornersVisualizeApp2
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
-
-		original = ConvertBufferedImage.checkCopy(buffered, original);
-
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input)
+	{
 		GrayF32 gray = (GrayF32) input;
 
-		controlPanel.thresholdPanel.updateHistogram(gray);
+		if( controlPanel.scaleDown > 1 ) {
+			int scale = controlPanel.scaleDown;
+			GrayF32 scaled = new GrayF32(input.width/scale,input.height/scale);
+			AverageDownSampleOps.down(gray,scaled);
+			gray = scaled;
+
+			visualized = ConvertBufferedImage.checkDeclare(scaled.width,scaled.height, visualized,BufferedImage.TYPE_INT_RGB);
+
+			original = ConvertBufferedImage.checkDeclare(scaled.width,scaled.height, original,buffered.getType());
+			Graphics2D g2 = original.createGraphics();
+			g2.setTransform(AffineTransform.getScaleInstance(1.0/scale,1.0/scale));
+			g2.drawImage(buffered,0,0,null);
+		} else {
+			original = ConvertBufferedImage.checkCopy(buffered, original);
+		}
 
 		GrayF32 featureImg;
 		double processingTime;
@@ -174,7 +181,7 @@ public class DetectChessboardCornersVisualizeApp2
 				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
 			}
 
-			binary= VisualizeBinaryData.renderBinary(detector.getDetector().getBinary(),false,binary);
+			binary = VisualizeBinaryData.renderBinary(detector.getDetector().getBinary(),false,binary);
 
 			synchronized (lockCorners) {
 				FastQueue<ChessboardCorner> orig = detector.getCorners();
@@ -193,11 +200,9 @@ public class DetectChessboardCornersVisualizeApp2
 	}
 
 	private void changeViewImage() {
-		if( controlPanel.view == 0 || controlPanel.view == 2 ) {
-			imagePanel.setBufferedImageNoChange(visualized);
-		} else if( controlPanel.view == 1 ) {
+		if( controlPanel.view == 0 ) {
 			imagePanel.setBufferedImageNoChange(original);
-		} else if( controlPanel.view == 3 ) {
+		} else if( controlPanel.view == 1 ) {
 			imagePanel.setBufferedImageNoChange(binary);
 		}
 	}
@@ -210,15 +215,16 @@ public class DetectChessboardCornersVisualizeApp2
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-			if(  controlPanel.view == 2 ) {
+			if( controlPanel.translucent > 0 ) {
 				// this requires some explaining
 				// for some reason it was decided that the transform would apply a translation, but not a scale
 				// so this scale will be concatted on top of the translation in the g2
 				tran.setTransform(scale,0,0,scale,0,0);
 				Composite beforeAC = g2.getComposite();
-				AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f);
+				float translucent = controlPanel.translucent/100.0f;
+				AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, translucent);
 				g2.setComposite(ac);
-				g2.drawImage(original,tran,null);
+				g2.drawImage(visualized,tran,null);
 				g2.setComposite(beforeAC);
 			}
 
@@ -259,45 +265,47 @@ public class DetectChessboardCornersVisualizeApp2
 	{
 		JComboBox<String> comboView;
 		JCheckBox checkLogIntensity;
+		JSpinner spinnerScaleDown;
 		JSpinner spinnerRadius;
 		JSpinner spinnerTop;
 		JCheckBox checkShowCorners;
 		JCheckBox checkDebug;
-		public ThresholdControlPanel thresholdPanel;
+		JSlider sliderTranslucent = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
 
 		int pyramidTop = 100;
-		int radius = 1;
+		int radius = 1; // todo change to blur radius
 		boolean showCorners =true;
 		boolean logItensity =false;
-		int view = 1;
+		int view = 0;
 		boolean meanShift = true;
+		int translucent = 0;
+		int scaleDown = 1;
 
 		public ControlPanel() {
-			{
-				ConfigThreshold config = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
-				config.down = false;
-				thresholdPanel = new ThresholdControlPanel(this,config);
-				thresholdPanel.addHistogramGraph();
-			}
-
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
-			comboView = combo(view,"Intensity","Image","Both","Binary");
+			comboView = combo(view,"Input","Binary");
+			spinnerScaleDown = spinner(scaleDown,1,128,1);
 			spinnerRadius = spinner(radius, 1, 100, 1);
 			spinnerTop = spinner(pyramidTop, 50, 10000, 50);
 			checkShowCorners = checkbox("Show Corners", showCorners);
 			checkDebug = checkbox("Mean Shift", meanShift);
 
+			sliderTranslucent.setMaximumSize(new Dimension(120,26));
+			sliderTranslucent.setPreferredSize(sliderTranslucent.getMaximumSize());
+			sliderTranslucent.addChangeListener(this);
+
 			addLabeled(processingTimeLabel, "Time (ms)");
 			addLabeled(imageSizeLabel,"Image Size");
+			addLabeled(spinnerScaleDown,"Scale Down");
 			addLabeled(comboView,"View");
+			addLabeled(sliderTranslucent,"X-Corners");
 			addLabeled(selectZoom,"Zoom");
 			addAlignLeft(checkLogIntensity);
 			addAlignLeft(checkShowCorners);
 			addAlignLeft(checkDebug);
 			addLabeled(spinnerRadius,"Corner Radius");
 			addLabeled(spinnerTop,"Pyramid Top");
-			addAlignCenter(thresholdPanel);
 		}
 
 		@Override
@@ -332,6 +340,12 @@ public class DetectChessboardCornersVisualizeApp2
 				pyramidTop = ((Number)spinnerTop.getValue()).intValue();
 				createAlgorithm();
 				reprocessImageOnly();
+			} else if( e.getSource() == spinnerScaleDown ) {
+				scaleDown = ((Number)spinnerScaleDown.getValue()).intValue();
+				reprocessImageOnly();
+			} else if( e.getSource() == sliderTranslucent ) {
+				translucent = ((Number)sliderTranslucent.getValue()).intValue();
+				imagePanel.repaint();
 			}
 		}
 

@@ -61,10 +61,9 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 	// Threshold used to filter out corners
 	double cornerIntensityThreshold = 1.0;
 
-	int radius = 4;
 	float intensityThresh = 2.0f*0.10f; // max possible value for intensity is 2.0
-
-	float edgeRatioThreshold = 0.05f;
+	float edgeRatioThreshold = 0.01f;
+	int blurRadius = 1;
 
 	T blurred;
 	BlurFilter<T> blurFilter;
@@ -114,7 +113,8 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		this.imageType = imageType;
 		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
-		blurFilter = FactoryBlurFilter.gaussian(imageType,-1,1);
+		blurFilter = FactoryBlurFilter.gaussian(imageType,-1,blurRadius);
+//		blurFilter = FactoryBlurFilter.mean(imageType,blurRadius);
 		blurred = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
 		// just give it something. this will be changed later
@@ -152,7 +152,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		computeIntensity.process((GrayF32)blurred, intensity);
 
 		intensityInterp.setImage(intensity);
-		inputInterp.setImage((GrayF32)blurred);
+		inputInterp.setImage((GrayF32)input);
 		meanShift.setImage(intensity);
 
 		contourMaximums();
@@ -173,11 +173,11 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 				continue;
 			}
 
-			if( !checkNegativeOutside3(xx,yy,outsideCircle4,4,4)) {
+			if( !checkChessboardCircle(xx,yy,outsideCircle4,4,4)) {
 				continue;
 			}
 
-			if( !checkNegativeOutside3(xx,yy,outsideCircle3,3,4)) {
+			if( !checkChessboardCircle(xx,yy,outsideCircle3,3,4)) {
 				continue;
 			}
 
@@ -395,7 +395,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		return sides >= 4;
 	}
 
-	private boolean checkNegativeOutside3(float cx , float cy , FastQueue<Point2D_I32> outside , int min , int max ) {
+	private boolean checkChessboardCircle(float cx , float cy , FastQueue<Point2D_I32> outside , int min , int max ) {
 		int radius = 4;
 		if( cx < radius || cx >= intensity.width-radius || cy < radius || cy >= intensity.height-radius )
 			return false;
@@ -456,7 +456,6 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 //		System.out.println("Count "+count);
 		return count >= threshold;
 	}
-
 
 	private boolean checkCircular(ChessboardCorner c ) {
 		int radius = 3;
