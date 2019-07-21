@@ -123,6 +123,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 					corners.grow().set(c);
 			}
 		}
+		System.out.println("Found "+corners.size);
 	}
 
 	/**

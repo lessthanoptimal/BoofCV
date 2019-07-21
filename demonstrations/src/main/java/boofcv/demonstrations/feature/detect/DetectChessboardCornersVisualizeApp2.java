@@ -114,7 +114,10 @@ public class DetectChessboardCornersVisualizeApp2
 
 	private void createAlgorithm() {
 		synchronized (lockAlgorithm) {
+			detector.setPyramidTopSize(controlPanel.pyramidTop);
 			detector.getDetector().useMeanShift = controlPanel.meanShift;
+			detector.getDetector().edgeRatioThreshold = controlPanel.threshEdge;
+			detector.getDetector().nonmaxThresholdRatio = controlPanel.threshXCorner;
 		}
 	}
 
@@ -161,6 +164,8 @@ public class DetectChessboardCornersVisualizeApp2
 			g2.setTransform(AffineTransform.getScaleInstance(1.0/scale,1.0/scale));
 			g2.drawImage(buffered,0,0,null);
 		} else {
+			visualized = ConvertBufferedImage.checkDeclare(gray.width,gray.height, visualized,BufferedImage.TYPE_INT_RGB);
+			original = ConvertBufferedImage.checkDeclare(gray.width,gray.height, original,buffered.getType());
 			original = ConvertBufferedImage.checkCopy(buffered, original);
 		}
 
@@ -266,27 +271,35 @@ public class DetectChessboardCornersVisualizeApp2
 		JComboBox<String> comboView;
 		JCheckBox checkLogIntensity;
 		JSpinner spinnerScaleDown;
-		JSpinner spinnerRadius;
 		JSpinner spinnerTop;
+		JSpinner spinnerEdge;
+		JSpinner spinnerXCorner;
 		JCheckBox checkShowCorners;
 		JCheckBox checkDebug;
 		JSlider sliderTranslucent = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
 
 		int pyramidTop = 100;
-		int radius = 1; // todo change to blur radius
 		boolean showCorners =true;
 		boolean logItensity =false;
 		int view = 0;
 		boolean meanShift = true;
 		int translucent = 0;
 		int scaleDown = 1;
+		float threshEdge;
+		float threshXCorner;
 
 		public ControlPanel() {
+			{
+				threshEdge = detector.getDetector().getEdgeRatioThreshold();
+				threshXCorner = detector.getDetector().getNonmaxThresholdRatio();
+			}
+
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
 			comboView = combo(view,"Input","Binary");
+			spinnerEdge = spinner(threshEdge, 0.0, 1.0, 0.01,1,4);
+			spinnerXCorner = spinner(threshXCorner, 0.0, 100.0, 0.01,1,4);
 			spinnerScaleDown = spinner(scaleDown,1,128,1);
-			spinnerRadius = spinner(radius, 1, 100, 1);
 			spinnerTop = spinner(pyramidTop, 50, 10000, 50);
 			checkShowCorners = checkbox("Show Corners", showCorners);
 			checkDebug = checkbox("Mean Shift", meanShift);
@@ -304,7 +317,8 @@ public class DetectChessboardCornersVisualizeApp2
 			addAlignLeft(checkLogIntensity);
 			addAlignLeft(checkShowCorners);
 			addAlignLeft(checkDebug);
-			addLabeled(spinnerRadius,"Corner Radius");
+			addLabeled(spinnerEdge,"Edge");
+			addLabeled(spinnerXCorner,"X-Corner");
 			addLabeled(spinnerTop,"Pyramid Top");
 		}
 
@@ -332,8 +346,12 @@ public class DetectChessboardCornersVisualizeApp2
 			if( e.getSource() == selectZoom ) {
 				zoom = ((Number)selectZoom.getValue()).doubleValue();
 				imagePanel.setScale(zoom);
-			} else if( e.getSource() == spinnerRadius ) {
-				radius = ((Number)spinnerRadius.getValue()).intValue();
+			} else if( e.getSource() == spinnerEdge ) {
+				threshEdge = ((Number)spinnerEdge.getValue()).floatValue();
+				createAlgorithm();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerXCorner ) {
+				threshXCorner = ((Number)spinnerXCorner.getValue()).floatValue();
 				createAlgorithm();
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerTop ) {

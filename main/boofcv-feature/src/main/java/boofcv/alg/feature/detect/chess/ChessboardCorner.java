@@ -35,6 +35,8 @@ public class ChessboardCorner extends Point2D_F64 {
 	 */
 	public double intensity;
 
+	public double intensityXCorner;
+
 	public double edge;
 	public double circleRatio;
 

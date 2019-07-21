@@ -18,19 +18,21 @@
 
 package boofcv.alg.feature.detect.chess;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.peak.SearchLocalPeak;
 import boofcv.abst.filter.binary.BinaryContourFinderLinearExternal;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.detect.intensity.XCornerAbeles2019Intensity;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
-import boofcv.alg.filter.binary.ContourPacked;
-import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.ImageLineIntegral;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.peak.ConfigMeanShiftSearch;
 import boofcv.factory.feature.detect.peak.FactorySearchLocalPeak;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
@@ -38,6 +40,7 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.DiscretizedCircle;
 import boofcv.struct.ConnectRule;
+import boofcv.struct.QueueCorner;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.Kernel1D_F64;
@@ -45,6 +48,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F32;
+import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
@@ -61,18 +65,22 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 	// Threshold used to filter out corners
 	double cornerIntensityThreshold = 1.0;
 
-	float intensityThresh = 2.0f*0.10f; // max possible value for intensity is 2.0
-	float edgeRatioThreshold = 0.01f;
+	public float nonmaxThresholdRatio = 0.1f;
+	public float edgeRatioThreshold = 0.01f;
 	int blurRadius = 1;
+	int nonmaxRadius = 5;
+
+	// dynamically computed thresholds
+	float nonmaxThreshold;
 
 	T blurred;
 	BlurFilter<T> blurFilter;
 
-	XCornerAbeles2019Intensity computeIntensity = new XCornerAbeles2019Intensity();
+	XCornerAbeles2019Intensity computeIntensity = new XCornerAbeles2019Intensity(3);
 	SearchLocalPeak<GrayF32> meanShift;
 
-	FastQueue<Point2D_F32> maximums = new FastQueue<>(Point2D_F32.class,true);
-	FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner.class,true);
+//	FastQueue<Point2D_F32> maximums = new FastQueue<>(Point2D_F32.class,true);
+	private FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner.class,true);
 	List<ChessboardCorner> filtered = new ArrayList<>();
 
 	// storage for corner detector output
@@ -86,6 +94,9 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 	InterpolatePixelS<GrayF32> inputInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class,BorderType.ZERO);
 	InterpolatePixelS<GrayF32> intensityInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class,BorderType.ZERO);
 	public boolean useMeanShift = true;
+
+	NonMaxSuppression nonmax;
+	QueueCorner foundNonmax = new QueueCorner();
 
 	private GrayU8 binary = new GrayU8(1,1);
 
@@ -112,6 +123,16 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 	public DetectChessboardCorners2(Class<T> imageType ) {
 		this.imageType = imageType;
 		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
+		{
+			ConfigExtract config = new ConfigExtract();
+			config.radius = nonmaxRadius;
+			config.threshold = 0;
+			config.detectMaximums = true;
+			config.detectMinimums = false;
+			config.useStrictRule = true;
+			nonmax = FactoryFeatureExtractor.nonmax(config);
+		}
 
 		blurFilter = FactoryBlurFilter.gaussian(imageType,-1,blurRadius);
 //		blurFilter = FactoryBlurFilter.mean(imageType,blurRadius);
@@ -145,6 +166,9 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 	 * @param input Gray image. Not modified.
 	 */
 	public void process( T input ) {
+		filtered.clear();
+		corners.reset();
+
 //		System.out.println("ENTER CHESSBOARD CORNER "+input.width+" x "+input.height);
 		borderImg.setImage(input);
 
@@ -155,19 +179,36 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		inputInterp.setImage((GrayF32)input);
 		meanShift.setImage(intensity);
 
-		contourMaximums();
+		// intensity is squared, so the ratio is squared too
+		nonmaxThreshold = ImageStatistics.max(intensity)*nonmaxThresholdRatio*nonmaxThresholdRatio;
+		// TODO better dynamic threshold. a single bright pxiel can throw it off
+
+		nonmax.setThresholdMaximum(nonmaxThreshold);
+		nonmax.process(intensity,null,null,null,foundNonmax);
+		for (int i = 0; i < foundNonmax.size; i++) {
+			Point2D_I16 c = foundNonmax.get(i);
+			ChessboardCorner corner = corners.grow();
+			corner.set(c.x,c.y);
+			corner.intensityXCorner = intensity.unsafe_get(c.x,c.y);
+			// set edge so that it will be filtered out if not updated later on
+			corner.edge = -1;
+		}
+
+//		contourMaximums();
 
 		double maxEdge = 0;
 		double maxIntensity = 0;
 
-		filtered.clear();
-		corners.reset();
 //		System.out.println("  * features.size = "+packed.size());
-		for (int i = 0; i < maximums.size(); i++) {
-			Point2D_F32 p = maximums.get(i);
+		for (int i = 0; i < corners.size(); i++) {
+			ChessboardCorner c = corners.get(i);
 
-			int xx = (int)(p.x+0.5f);
-			int yy = (int)(p.y+0.5f);
+			int xx = (int)(c.x+0.5f);
+			int yy = (int)(c.y+0.5f);
+
+			if( !checkPositiveInside(xx,yy,4) ) {
+				continue;
+			}
 
 			if( !checkNegativeInside(xx,yy,12)) {
 				continue;
@@ -180,15 +221,6 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 			if( !checkChessboardCircle(xx,yy,outsideCircle3,3,4)) {
 				continue;
 			}
-
-			// TODO much faster if negative region can be used to eliminate at this stage
-
-			ChessboardCorner c = corners.grow();
-
-			// compensate for the bias caused by how pixels are counted.
-			// Example: a 4x4 region is expected. Center should be at (2,2) but will instead be (1.5,1.5)
-			c.x = p.x;
-			c.y = p.y;
 
 			if( useMeanShift ) {
 				meanShift.search((float)c.x,(float)c.y);
@@ -203,16 +235,16 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 			computeFeatures(c.x,c.y,c);
 
 			boolean accepted =
-					c.intensity >= cornerIntensityThreshold;
+					c.intensity >= cornerIntensityThreshold &&
 					checkCircular(c);
 
 //			boolean accepted = true;
 
-			if( !accepted ) {
-				corners.removeTail();
-			} else {
+			if( accepted ) {
 				maxEdge = Math.max(maxEdge,c.edge);
 				maxIntensity = Math.max(c.intensity,maxIntensity);
+			} else {
+				c.edge = -1;
 			}
 		}
 
@@ -220,57 +252,58 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		// Filter corners based on edge intensity of found corners
 		for (int i = corners.size-1; i >= 0;  i--) {
 			if( corners.get(i).edge >= edgeRatioThreshold*maxEdge ) {
+//			if( corners.get(i).edge >= 0 ) {
 				filtered.add(corners.get(i));
 			}
 		}
 
-		System.out.println("  corners "+corners.size+"  filters "+filtered.size());
+//		System.out.println("  corners "+corners.size+"  filters "+filtered.size());
 
 //		System.out.println("Dropped "+dropped+" / "+packed.size());
 	}
 
-	private void contourMaximums() {
-		GThresholdImageOps.threshold(intensity,binary,intensityThresh,false);
-		contourFinder.process(binary);
-
-		List<ContourPacked> packed = contourFinder.getContours();
-//		System.out.println("  * features.size = "+packed.size());
-		maximums.reset();
-		Point2D_F32 meanPt = new Point2D_F32();
-
-		int totalFailed = 0;
-		for (int i = 0; i < packed.size(); i++) {
-			contourFinder.loadContour(i, contour);
-
-			if( validateRepeatedPoints(meanPt) ) {
-				totalFailed++;
-				continue;
-			}
-
-			// NOTE: Commented out because it filtered corners in fisheye images at the image border
-//			// the size is known. Filter if it's a long and skinny contour
-//			boolean failed = false;
-//			float r_max = 0;
-//			for (int j = 0; j < contour.size; j++) {
-//				Point2D_I32 c = contour.get(j);
-//				float dx = c.x-meanPt.x;
-//				float dy = c.y-meanPt.y;
-//				float rr = dx*dx + dy*dy;
-//				if( rr > r_max ) {
-//					r_max = rr;
-//				}
-//			}
+//	private void contourMaximums() {
+//		GThresholdImageOps.threshold(intensity,binary,intensityThresh,false);
+//		contourFinder.process(binary);
 //
-////			System.out.println("ratio "+(contour.size/Math.sqrt(r_max)));
-//			if( contour.size/Math.sqrt(r_max) < 3.5f ) {
+//		List<ContourPacked> packed = contourFinder.getContours();
+////		System.out.println("  * features.size = "+packed.size());
+//		maximums.reset();
+//		Point2D_F32 meanPt = new Point2D_F32();
+//
+//		int totalFailed = 0;
+//		for (int i = 0; i < packed.size(); i++) {
+//			contourFinder.loadContour(i, contour);
+//
+//			if( validateRepeatedPoints(meanPt) ) {
 //				totalFailed++;
 //				continue;
 //			}
-
-			maximums.grow().set(meanPt);
-		}
-		System.out.println("failed "+totalFailed+" / "+packed.size());
-	}
+//
+//			// NOTE: Commented out because it filtered corners in fisheye images at the image border
+////			// the size is known. Filter if it's a long and skinny contour
+////			boolean failed = false;
+////			float r_max = 0;
+////			for (int j = 0; j < contour.size; j++) {
+////				Point2D_I32 c = contour.get(j);
+////				float dx = c.x-meanPt.x;
+////				float dy = c.y-meanPt.y;
+////				float rr = dx*dx + dy*dy;
+////				if( rr > r_max ) {
+////					r_max = rr;
+////				}
+////			}
+////
+//////			System.out.println("ratio "+(contour.size/Math.sqrt(r_max)));
+////			if( contour.size/Math.sqrt(r_max) < 3.5f ) {
+////				totalFailed++;
+////				continue;
+////			}
+//
+//			maximums.grow().set(meanPt);
+//		}
+//		System.out.println("failed "+totalFailed+" / "+packed.size());
+//	}
 
 	/**
 	 * In oddly shaped contours it has to double back, these are typically false positives
@@ -314,7 +347,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		int count=0;
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
-				if( intensity.unsafe_get(x,y) >= intensityThresh )
+				if( intensity.unsafe_get(x,y) >= nonmaxThreshold)
 					count++;
 			}
 		}
@@ -357,7 +390,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		int count=0;
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
-				if( intensity.unsafe_get(x,y) <= -intensityThresh*0.5 )
+				if( intensity.unsafe_get(x,y) <= -nonmaxThreshold )
 					count++;
 			}
 		}
@@ -428,7 +461,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		int count = 0;
 
 		for (int i = 0; i < length; i++) {
-			if( intensity.unsafe_get(x0,y0) <= -intensityThresh) {
+			if( intensity.unsafe_get(x0,y0) <= -nonmaxThreshold) {
 				count++;
 			}
 			x0 += stepX;
@@ -447,9 +480,9 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		for (int i = 0; i < outsideCircle4.size; i++) {
 			Point2D_I32 p = outsideCircle4.get(i);
 
-			if( intensity.get(cx+p.x,cy+p.y) <= -intensityThresh*0.5f )
+			if( intensity.get(cx+p.x,cy+p.y) <= -nonmaxThreshold *0.5f )
 				count++;
-			else if( intensity.get(cx+p.x,cy+p.y) >= intensityThresh )
+			else if( intensity.get(cx+p.x,cy+p.y) >= nonmaxThreshold)
 				count--;
 		}
 
@@ -481,7 +514,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 				float weight = Math.abs(intensityInterp.get(x,y));
 
-				if( weight > intensityThresh ) {
+				if( weight > nonmaxThreshold) {
 					xx += dx * dx * weight;
 					xy += dx * dy * weight;
 					yy += dy * dy * weight;
@@ -504,7 +537,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		// the smallest eigenvalue divided by largest
 		c.circleRatio = (left - right)/(left+right);
 
-		return c.circleRatio >= 0.2;
+		return c.circleRatio >= 0.1;
 	}
 
 	/**
@@ -599,6 +632,22 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 	public void setCornerIntensityThreshold(double cornerIntensityThreshold) {
 		this.cornerIntensityThreshold = cornerIntensityThreshold;
+	}
+
+	public float getNonmaxThresholdRatio() {
+		return nonmaxThresholdRatio;
+	}
+
+	public void setNonmaxThresholdRatio(float nonmaxThresholdRatio) {
+		this.nonmaxThresholdRatio = nonmaxThresholdRatio;
+	}
+
+	public float getEdgeRatioThreshold() {
+		return edgeRatioThreshold;
+	}
+
+	public void setEdgeRatioThreshold(float edgeRatioThreshold) {
+		this.edgeRatioThreshold = edgeRatioThreshold;
 	}
 
 	public Class<T> getImageType() {
