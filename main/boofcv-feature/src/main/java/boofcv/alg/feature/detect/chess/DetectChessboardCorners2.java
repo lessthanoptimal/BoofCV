@@ -47,10 +47,12 @@ import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
+import org.ejml.UtilEjml;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +70,9 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 	public float nonmaxThresholdRatio = 0.1f;
 	public float edgeRatioThreshold = 0.01f;
 	int blurRadius = 1;
-	int nonmaxRadius = 5;
+
+	// TODO Sample center radius 1 or 2
+	//      if its nearly identical intensity to one of the axis drop feature
 
 	// dynamically computed thresholds
 	float nonmaxThreshold;
@@ -92,6 +96,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 	// for mean-shift
 	InterpolatePixelS<GrayF32> inputInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class,BorderType.ZERO);
+	InterpolatePixelS<GrayF32> blurInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class,BorderType.ZERO);
 	InterpolatePixelS<GrayF32> intensityInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class,BorderType.ZERO);
 	public boolean useMeanShift = true;
 
@@ -101,10 +106,13 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 	private GrayU8 binary = new GrayU8(1,1);
 
 	// predeclare memory for compute a feature's orientation
-	private final int numLines = 16;
-	private final double lines[] = new double[numLines];
-	private final double smoothed[] = new double[numLines];
-	private final Kernel1D_F64 kernelSmooth = FactoryKernelGaussian.gaussian(1,true,64,-1,numLines/4);
+	private final int numSpokes = 32;
+	private final int numSpokeDiam = numSpokes/2;
+	private final double[] spokesRadi = new double[numSpokes];
+	private final double[] spokesDiam = new double[numSpokeDiam];
+	private final double[] smoothedDiam = new double[numSpokeDiam];
+	private final double[] scoreDiam = new double[numSpokeDiam];
+	private final Kernel1D_F64 kernelSmooth = FactoryKernelGaussian.gaussian(1,true,64,-1,numSpokeDiam/4);
 
 	FastQueue<Point2D_I32> outsideCircle4 = new FastQueue<>(Point2D_I32.class,true);
 	FastQueue<Point2D_I32> outsideCircle3 = new FastQueue<>(Point2D_I32.class,true);
@@ -126,7 +134,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 		{
 			ConfigExtract config = new ConfigExtract();
-			config.radius = nonmaxRadius;
+			config.radius = 5;
 			config.threshold = 0;
 			config.detectMaximums = true;
 			config.detectMinimums = false;
@@ -139,7 +147,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		blurred = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
 		// just give it something. this will be changed later
-		borderImg = FactoryImageBorder.single(imageType,BorderType.ZERO);
+		borderImg = FactoryImageBorder.single(imageType,BorderType.EXTENDED);
 		borderImg.setImage(GeneralizedImageOps.createSingleBand(imageType,1,1));
 		integral.setImage(FactoryGImageGray.wrap(borderImg));
 
@@ -168,6 +176,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 	public void process( T input ) {
 		filtered.clear();
 		corners.reset();
+		foundNonmax.reset();
 
 //		System.out.println("ENTER CHESSBOARD CORNER "+input.width+" x "+input.height);
 		borderImg.setImage(input);
@@ -177,6 +186,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 		intensityInterp.setImage(intensity);
 		inputInterp.setImage((GrayF32)input);
+		blurInterp.setImage((GrayF32)blurred);
 		meanShift.setImage(intensity);
 
 		// intensity is squared, so the ratio is squared too
@@ -190,8 +200,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 			ChessboardCorner corner = corners.grow();
 			corner.set(c.x,c.y);
 			corner.intensityXCorner = intensity.unsafe_get(c.x,c.y);
-			// set edge so that it will be filtered out if not updated later on
-			corner.edge = -1;
+			corner.reset();
 		}
 
 //		contourMaximums();
@@ -228,38 +237,37 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 				c.y = meanShift.getPeakY();
 			}
 
+			if( !checkCorner(c)) {
+				c.edge = -1;
+				continue;
+			}
+
+			if( !computeFeatures(c) ) {
+				c.edge = -1;
+				continue;
+			}
+
 			// account for bias due to discretion
 			c.x += 0.5f;
 			c.y += 0.5f;
 
-			computeFeatures(c.x,c.y,c);
-
-			boolean accepted =
-					c.intensity >= cornerIntensityThreshold &&
-					checkCircular(c);
-
-//			boolean accepted = true;
-
-			if( accepted ) {
-				maxEdge = Math.max(maxEdge,c.edge);
-				maxIntensity = Math.max(c.intensity,maxIntensity);
-			} else {
-				c.edge = -1;
-			}
+			maxEdge = Math.max(maxEdge,c.edge);
+			maxIntensity = Math.max(c.intensity,maxIntensity);
 		}
-
 
 		// Filter corners based on edge intensity of found corners
 		for (int i = corners.size-1; i >= 0;  i--) {
 			if( corners.get(i).edge >= edgeRatioThreshold*maxEdge ) {
 //			if( corners.get(i).edge >= 0 ) {
+//				System.out.println("transitions "+corners.get(i).circleRatio );
 				filtered.add(corners.get(i));
+				if( Double.isNaN(corners.get(i).orientation))
+					System.out.println("Egads");
 			}
 		}
 
-//		System.out.println("  corners "+corners.size+"  filters "+filtered.size());
-
-//		System.out.println("Dropped "+dropped+" / "+packed.size());
+		int dropped = corners.size-filtered.size();
+		System.out.println("  corners "+corners.size+"  filters "+filtered.size() + " dropped = "+(dropped/(double)corners.size));
 	}
 
 //	private void contourMaximums() {
@@ -490,15 +498,27 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		return count >= threshold;
 	}
 
-	private boolean checkCircular(ChessboardCorner c ) {
+	private int countTransitions( double mean ) {
+		int transitions = 0;
+
+		boolean above = spokesRadi[numSpokes-1] > mean;
+		for (int i = 0; i < numSpokes; i++) {
+			boolean a = spokesRadi[i] > mean ;
+			if( above != a ) {
+				above = a;
+				transitions++;
+			}
+		}
+		return transitions;
+	}
+
+	private boolean checkCorner( ChessboardCorner c ) {
 		int radius = 3;
 
 		int cx = (int)(c.x+0.5f);
 		int cy = (int)(c.y+0.5f);
 
 		float xx=0,yy=0,xy=0;
-
-		float totalWeight=0;
 
 		int width = radius*2+1;
 
@@ -512,17 +532,16 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 				float dx = inputInterp.get(x+0.5f,y)- inputInterp.get(x-0.5f,y);
 				float dy = inputInterp.get(x,y+0.5f)- inputInterp.get(x,y-0.5f);
 
-				float weight = Math.abs(intensityInterp.get(x,y));
+//				float weight = Math.abs(intensityInterp.get(x,y));
 
-				if( weight > nonmaxThreshold) {
-					xx += dx * dx * weight;
-					xy += dx * dy * weight;
-					yy += dy * dy * weight;
-					totalWeight += weight;
-				}
+//				if( weight > intensityThresh ) {
+					xx += dx * dx;
+					xy += dx * dy;
+					yy += dy * dy;
 			}
 		}
 
+		float totalWeight=width*width;
 		xx /= totalWeight;
 		xy /= totalWeight;
 		yy /= totalWeight;
@@ -535,9 +554,12 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		// but that makes the corner no longer invariant to affine changes in light, e.g. changes in scale and offset
 		c.edge = left-right; // smallest eigen value
 		// the smallest eigenvalue divided by largest
-		c.circleRatio = (left - right)/(left+right);
+		float eigenRatio = (left - right)/(left+right);
 
-		return c.circleRatio >= 0.1;
+//		System.out.println(" edge "+c.edge+" ratio "+eigenRatio);
+		// NOTE: Setting the Eigen ratio to a higher value is an effective ratio, but for fisheye images it will
+		//       filter out many of the corners at the border where they are highly distorted
+		return c.edge > 10 && eigenRatio >= 0.10;
 	}
 
 	/**
@@ -549,73 +571,133 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 	 * Intensity is found by subtracting bright lines from the dark line on the other side. dark/light lines are
 	 * offset by 90 degrees.
 	 */
-	private void computeFeatures(double cx , double cy , ChessboardCorner corner ) {
-		double r = 3;
+	private boolean computeFeatures( ChessboardCorner corner ) {
+		double r = 4;
 
 		// magnitude of the difference is used remove false chessboard corners caused by the corners on black
 		// squares. In that situation there will be a large difference between the left and right values
-		// in the integral below for 1/2 the lines
+		// in the integral below for 1/2 the line
+		double cx = corner.x;
+		double cy = corner.y;
 		double sumDifference = 0;
-		for (int i = 0; i < numLines; i++) {
-			// TODO precompute sines and cosines
-			double angle = Math.PI*i/ numLines -Math.PI/2.0;
+		double mean = 0;
+		for (int i = 0; i < numSpokeDiam; i++) {
+			int j = (i+ numSpokeDiam)%numSpokes;
+			double angle = Math.PI*i/ numSpokeDiam;
 			double c = Math.cos(angle);
 			double s = Math.sin(angle);
 
-			double x0 = cx-r*c;
-			double y0 = cy-r*s;
-			double x1 = cx+r*c;
-			double y1 = cy+r*s;
+			double valA = spokesRadi[i] = integral.compute(cx,cy,cx+r*c,cy+r*s)/r;
+			double valB = spokesRadi[j] = integral.compute(cx,cy,cx-r*c,cy-r*s)/r;
 
-			double left = integral.compute(cx,cy,x0,y0);
-			double right = integral.compute(cx,cy,x1,y1);
+			spokesDiam[i] = valA+valB;
 
-			sumDifference += Math.abs(left-right);
-
-			lines[i] = left+right;
+			sumDifference += Math.abs(valA-valB);
+			mean += valA + valB;
 		}
+		mean /= numSpokes;
+		sumDifference /= numSpokeDiam;
 
-		// smooth by applying a block filter. This will ensure it doesn't point towards an edge which just happens
-		// to be slightly darker than the center
-		int r_smooth = kernelSmooth.getRadius();
-		int w_smooth = kernelSmooth.getWidth();
-		for (int i = 0; i < numLines; i++) {
-			int start = addOffset(i,-r_smooth, numLines);
+		// There should be 4 transitions between above and below the mean
+		if( countTransitions(mean) != 4 )
+			return false;
 
-			double sum = 0;
-			for (int j = 0; j < w_smooth; j++) {
-				int index = addOffset(start,j, numLines);
-				sum += lines[index]*kernelSmooth.data[j];
-			}
-			smoothed[i] = sum;
-		}
-
-		int indexMin = 0;
-		double valueMin = Double.MAX_VALUE;
-		for (int i = 0; i < numLines; i++) {
-			if( smoothed[i] < valueMin ) {
-				valueMin = smoothed[i];
-				indexMin = i;
+		//
+		smoothSpokeDiam();
+		// Select the orientation
+		int bestSpoke = -1;
+		double bestScore = Double.MAX_VALUE;
+		for (int i = 0; i < numSpokeDiam; i++) {
+			// j = 90 off, which should be the opposite color
+			int j = (i+ numSpokeDiam /2)% numSpokeDiam;
+			double score = scoreDiam[i] = smoothedDiam[i] - smoothedDiam[j];
+			// select black 'i', which will negative because white has a higher value
+			if( score < bestScore ) {
+				bestScore = score;
+				bestSpoke = i;
 			}
 		}
 
 		// Use a quadratic to estimate the peak's location to a sub-bin accuracy
-		double value0 = smoothed[ addOffset(indexMin,-1, numLines)];
-		double value2 = smoothed[ addOffset(indexMin, 1, numLines)];
+		double value0 = scoreDiam[ addOffset(bestSpoke,-1, numSpokeDiam)];
+		double value2 = scoreDiam[ addOffset(bestSpoke, 1, numSpokeDiam)];
 
-		double adjustedIndex = indexMin + FastHessianFeatureDetector.polyPeak(value0,valueMin,value2);
-		corner.orientation = Math.PI*adjustedIndex/ numLines -Math.PI/2.0;
+		double adjustedIndex = bestSpoke + FastHessianFeatureDetector.polyPeak(value0,bestSpoke,value2);
+		corner.orientation = UtilAngle.boundHalf(Math.PI*adjustedIndex/ numSpokeDiam);
 
-		// Score the corner's fit quality using the fact that the function would be oscilate (sin/cosine)
-		// and values 90 degrees offset are at the other side
-		double intensity = 0;
-		for (int i = 0; i < numLines /2; i++) {
-			int idx0 = addOffset(indexMin,i- numLines /4, numLines);
-			int idx1 = addOffset(idx0, numLines /2, numLines);
-			intensity += smoothed[idx1] - smoothed[idx0];
+		// Compute a how X-Corner like metric
+		double stdev = 0;
+		for (int i = 0; i < numSpokes; i++) {
+			double diff = mean - spokesRadi[i];
+			stdev += diff*diff;
 		}
-		corner.intensity = intensity/(r*2+1+ numLines/2);
-		corner.intensity /= (sumDifference/numLines);
+		stdev = Math.sqrt(stdev/numSpokes);
+
+		// NOTE: Requiring that the center not have a similar value to the spokes is a bad idea. When a square
+		//       is diagonal there's a good chance it will have a value very similar to one of the spokes, even
+		//       when the image is mostly in focus
+		// The value in the center should be significantly different from all the others
+//		double centerValue0 = inputInterp.get((float)corner.x,(float)corner.y);
+//		double centerValue1 = blurInterp.get((float)corner.x,(float)corner.y);
+//		double scoreCenter = Double.MAX_VALUE;
+//		double maxDifference = 0;
+//		for (int i = 0; i < 4; i++) {
+//			int index = (bestSpoke + i* numSpokeDiam /2)%numSpokes;
+////			scoreCenter = Math.min(scoreCenter,Math.abs(centerValue0-spokesRadi[index]));
+//			scoreCenter = Math.min(scoreCenter,Math.abs(centerValue1- spokesRadi[index]));
+//
+////			maxDifference = Math.max(maxDifference,Math.abs(centerValue0-spokesRadi[index]));
+//			maxDifference = Math.max(maxDifference,Math.abs(centerValue1- spokesRadi[index]));
+//		}
+//
+//		scoreCenter = scoreCenter/maxDifference;
+
+//		System.out.println("ori = "+corner.orientation);
+
+		corner.intensity = -bestScore*stdev/(sumDifference + UtilEjml.EPS);
+
+//		System.out.printf(" scoreCenter %1.2f score %1.2f diff %4.1f stdev %5.2f intensity %8.2f\n",scoreCenter,bestScore,sumDifference,stdev,corner.intensity);
+
+//		if( corner.distance(985,465) < 1.5 ) {
+//			System.out.printf(" scoreCenter %1.2f score %1.2f diff %4.1f stdev %5.2f intensity %8.2f\n",scoreCenter,bestScore,sumDifference,stdev,corner.intensity);
+//			System.out.println("False positive!");
+//		}
+//
+//		if( corner.distance(886,475) < 1.5 ) {
+//			System.out.printf(" scoreCenter %1.2f score %1.2f diff %4.1f stdev %5.2f intensity %8.2f\n",scoreCenter,bestScore,sumDifference,stdev,corner.intensity);
+//			System.out.println("False positive!");
+//		}
+//
+//		if( corner.distance(968,839) < 1.5 ) {
+//			System.out.printf(" scoreCenter %1.2f score %1.2f diff %4.1f stdev %5.2f intensity %8.2f\n",scoreCenter,bestScore,sumDifference,stdev,corner.intensity);
+//			System.out.printf("True positive! %.0f %.0f\n",cx,cy);
+//		}
+//
+//		if( corner.distance(170,178) < 1.5 ) {
+//			System.out.printf(" scoreCenter %1.2f score %1.2f diff %4.1f stdev %5.2f intensity %8.2f\n",scoreCenter,bestScore,sumDifference,stdev,corner.intensity);
+//			System.out.printf("True positive! %.0f %.0f\n",cx,cy);
+//		}
+
+//		return scoreCenter >= 0.0;
+		return corner.intensity >= 20;
+//		return true;//corner.intensity >= cornerIntensityThreshold;
+	}
+
+	private void smoothSpokeDiam() {
+		// smooth by applying a block filter. This will ensure it doesn't point towards an edge which just happens
+		// to be slightly darker than the center
+		int r_smooth = kernelSmooth.getRadius();
+		int w_smooth = kernelSmooth.getWidth();
+		for (int i = 0; i < numSpokeDiam; i++) {
+			int start = addOffset(i,-r_smooth, numSpokeDiam);
+
+			double sum = 0;
+			for (int j = 0; j < w_smooth; j++) {
+				int index = addOffset(start,j, numSpokeDiam);
+				sum += spokesDiam[index]*kernelSmooth.data[j];
+			}
+			smoothedDiam[i] = sum;
+		}
 	}
 
 	public GrayF32 getIntensity() {
@@ -648,6 +730,14 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 	public void setEdgeRatioThreshold(float edgeRatioThreshold) {
 		this.edgeRatioThreshold = edgeRatioThreshold;
+	}
+
+	public int getNonmaxRadius() {
+		return nonmax.getSearchRadius();
+	}
+
+	public void setNonmaxRadius(int nonmaxRadius) {
+		nonmax.setSearchRadius(nonmaxRadius);
 	}
 
 	public Class<T> getImageType() {

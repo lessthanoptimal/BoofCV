@@ -198,4 +198,19 @@ public class XCornerAbeles2019Intensity {
 
 		return a*c/255f + b*d/255f;
 	}
+
+	private float score8( float middle , float a , float b , float c , float d ) {
+		float mean = (a+b+c+d)/4f;
+
+		a = (a-mean);
+		b = (b-mean);
+		c = (c-mean);
+		d = (d-mean);
+
+		// the middle should be approximately the average
+		float error = mean-middle;
+		error = 1.0f/(1.0f+error*error);
+
+		return error*(a*c/255f + b*d/255f);
+	}
 }

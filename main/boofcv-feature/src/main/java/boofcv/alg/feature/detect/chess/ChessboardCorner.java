@@ -38,12 +38,19 @@ public class ChessboardCorner extends Point2D_F64 {
 	public double intensityXCorner;
 
 	public double edge;
-	public double circleRatio;
 
 	/**
 	 * Internal book keeping. if true then this indicates that this is the first corner seen in this level
 	 */
 	public boolean first;
+
+	public void reset() {
+		orientation = Double.NaN;
+		intensity = Double.NaN;
+		intensityXCorner = Double.NaN;
+		edge = -1;
+		first = false;
+	}
 
 	public void set(ChessboardCorner c) {
 		super.set(c);

@@ -118,6 +118,7 @@ public class DetectChessboardCornersVisualizeApp2
 			detector.getDetector().useMeanShift = controlPanel.meanShift;
 			detector.getDetector().edgeRatioThreshold = controlPanel.threshEdge;
 			detector.getDetector().nonmaxThresholdRatio = controlPanel.threshXCorner;
+			detector.getDetector().setNonmaxRadius(controlPanel.nonmaxRadius);
 		}
 	}
 
@@ -274,6 +275,7 @@ public class DetectChessboardCornersVisualizeApp2
 		JSpinner spinnerTop;
 		JSpinner spinnerEdge;
 		JSpinner spinnerXCorner;
+		JSpinner spinnerNonMaxRadius;
 		JCheckBox checkShowCorners;
 		JCheckBox checkDebug;
 		JSlider sliderTranslucent = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
@@ -287,11 +289,13 @@ public class DetectChessboardCornersVisualizeApp2
 		int scaleDown = 1;
 		float threshEdge;
 		float threshXCorner;
+		int nonmaxRadius;
 
 		public ControlPanel() {
 			{
 				threshEdge = detector.getDetector().getEdgeRatioThreshold();
 				threshXCorner = detector.getDetector().getNonmaxThresholdRatio();
+				nonmaxRadius = detector.getDetector().getNonmaxRadius();
 			}
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
@@ -299,6 +303,7 @@ public class DetectChessboardCornersVisualizeApp2
 			comboView = combo(view,"Input","Binary");
 			spinnerEdge = spinner(threshEdge, 0.0, 1.0, 0.01,1,4);
 			spinnerXCorner = spinner(threshXCorner, 0.0, 100.0, 0.01,1,4);
+			spinnerNonMaxRadius = spinner(nonmaxRadius, 1, 20, 1);
 			spinnerScaleDown = spinner(scaleDown,1,128,1);
 			spinnerTop = spinner(pyramidTop, 50, 10000, 50);
 			checkShowCorners = checkbox("Show Corners", showCorners);
@@ -319,6 +324,7 @@ public class DetectChessboardCornersVisualizeApp2
 			addAlignLeft(checkDebug);
 			addLabeled(spinnerEdge,"Edge");
 			addLabeled(spinnerXCorner,"X-Corner");
+			addLabeled(spinnerNonMaxRadius,"NonMax Radius");
 			addLabeled(spinnerTop,"Pyramid Top");
 		}
 
@@ -352,6 +358,10 @@ public class DetectChessboardCornersVisualizeApp2
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerXCorner ) {
 				threshXCorner = ((Number)spinnerXCorner.getValue()).floatValue();
+				createAlgorithm();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerNonMaxRadius ) {
+				nonmaxRadius = ((Number)spinnerNonMaxRadius.getValue()).intValue();
 				createAlgorithm();
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerTop ) {

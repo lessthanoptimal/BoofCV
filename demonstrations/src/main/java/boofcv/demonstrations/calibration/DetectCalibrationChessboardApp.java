@@ -208,7 +208,7 @@ public class DetectCalibrationChessboardApp
 
 			featureImg = detector.getDetector().getDetector().getIntensity();
 
-			controlPanel.thresholdPanel.updateHistogram(featureImg);
+//			controlPanel.thresholdPanel.updateHistogram(featureImg);
 
 			if( controlPanel.logItensity ) {
 				PixelMath.log(featureImg,logIntensity);

@@ -119,11 +119,12 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 			// only add corners if they were first seen in this level
 			for (int i = 0; i < level.corners.size; i++) {
 				ChessboardCorner c = level.corners.get(i);
-				if( c.first )
+				if( c.first ) {
 					corners.grow().set(c);
+				}
 			}
 		}
-		System.out.println("Found "+corners.size);
+		System.out.println("Found Pyramid "+corners.size);
 	}
 
 	/**

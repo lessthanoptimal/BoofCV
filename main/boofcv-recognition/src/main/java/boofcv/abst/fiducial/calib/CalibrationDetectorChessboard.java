@@ -20,7 +20,7 @@ package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.feature.detect.chess.DetectChessboardCornersPyramid;
+import boofcv.alg.feature.detect.chess.DetectChessboardCorners2Pyramid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
@@ -109,7 +109,7 @@ public class CalibrationDetectorChessboard
 		}
 	}
 
-	public DetectChessboardCornersPyramid getDetector() {
+	public DetectChessboardCorners2Pyramid getDetector() {
 		return detector;
 	}
 
