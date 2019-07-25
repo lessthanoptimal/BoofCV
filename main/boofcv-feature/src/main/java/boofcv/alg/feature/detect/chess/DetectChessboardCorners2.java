@@ -134,7 +134,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 		{
 			ConfigExtract config = new ConfigExtract();
-			config.radius = 5;
+			config.radius = 4;
 			config.threshold = 0;
 			config.detectMaximums = true;
 			config.detectMinimums = false;
@@ -526,11 +526,12 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		for (int iy = 0; iy < width; iy++) {
 			for (int ix = 0; ix < width; ix++, idx++) {
 
-				float y = cy + iy - radius;
-				float x = cx + ix - radius;
+				int y = cy + iy - radius;
+				int x = cx + ix - radius;
 
-				float dx = inputInterp.get(x+0.5f,y)- inputInterp.get(x-0.5f,y);
-				float dy = inputInterp.get(x,y+0.5f)- inputInterp.get(x,y-0.5f);
+				// TODO change to border image
+				float dx = blurInterp.get(x+1,y)- blurInterp.get(x-1,y);
+				float dy = blurInterp.get(x,y+1)- blurInterp.get(x,y-1);
 
 //				float weight = Math.abs(intensityInterp.get(x,y));
 
@@ -556,10 +557,9 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		// the smallest eigenvalue divided by largest
 		float eigenRatio = (left - right)/(left+right);
 
-//		System.out.println(" edge "+c.edge+" ratio "+eigenRatio);
 		// NOTE: Setting the Eigen ratio to a higher value is an effective ratio, but for fisheye images it will
 		//       filter out many of the corners at the border where they are highly distorted
-		return c.edge > 10 && eigenRatio >= 0.10;
+		return eigenRatio >= 0.20;
 	}
 
 	/**

@@ -43,7 +43,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 	// List of layers in the pyramid
 	List<T> pyramid = new ArrayList<>();
 
-	int radius = 4;
+	int radius = 7;
 
 	// Corner detector
 	DetectChessboardCorners2<T,D> detector;
