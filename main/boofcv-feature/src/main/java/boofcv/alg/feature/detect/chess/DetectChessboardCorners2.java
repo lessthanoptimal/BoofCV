@@ -68,7 +68,9 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 	double cornerIntensityThreshold = 1.0;
 
 	public float nonmaxThresholdRatio = 0.1f;
-	public float edgeRatioThreshold = 0.01f;
+	public double edgeIntensityRatioThreshold = 0.01;
+	public double edgeAspectRatioThreshold = 0.1;
+	public double cornerIntensity = 20;
 	int blurRadius = 1;
 
 	// TODO Sample center radius 1 or 2
@@ -134,7 +136,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 		{
 			ConfigExtract config = new ConfigExtract();
-			config.radius = 4;
+			config.radius = 3;
 			config.threshold = 0;
 			config.detectMaximums = true;
 			config.detectMinimums = false;
@@ -238,12 +240,12 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 			}
 
 			if( !checkCorner(c)) {
-				c.edge = -1;
+				c.edgeIntensity = -1;
 				continue;
 			}
 
 			if( !computeFeatures(c) ) {
-				c.edge = -1;
+				c.edgeIntensity = -1;
 				continue;
 			}
 
@@ -251,23 +253,21 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 			c.x += 0.5f;
 			c.y += 0.5f;
 
-			maxEdge = Math.max(maxEdge,c.edge);
+			maxEdge = Math.max(maxEdge,c.edgeIntensity);
 			maxIntensity = Math.max(c.intensity,maxIntensity);
 		}
 
 		// Filter corners based on edge intensity of found corners
 		for (int i = corners.size-1; i >= 0;  i--) {
-			if( corners.get(i).edge >= edgeRatioThreshold*maxEdge ) {
-//			if( corners.get(i).edge >= 0 ) {
+			if( corners.get(i).edgeIntensity >= edgeIntensityRatioThreshold*maxEdge ) {
+//			if( corners.get(i).edgeIntensity >= 0 ) {
 //				System.out.println("transitions "+corners.get(i).circleRatio );
 				filtered.add(corners.get(i));
-				if( Double.isNaN(corners.get(i).orientation))
-					System.out.println("Egads");
 			}
 		}
 
 		int dropped = corners.size-filtered.size();
-		System.out.println("  corners "+corners.size+"  filters "+filtered.size() + " dropped = "+(dropped/(double)corners.size));
+		System.out.printf("  corners %4d filters %5d dropped = %4.1f%%\n",corners.size,filtered.size(),(100*dropped/(double)corners.size));
 	}
 
 //	private void contourMaximums() {
@@ -553,13 +553,14 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 		// tempting to use edge intensity as a way to filter out false positives
 		// but that makes the corner no longer invariant to affine changes in light, e.g. changes in scale and offset
-		c.edge = left-right; // smallest eigen value
-		// the smallest eigenvalue divided by largest
-		float eigenRatio = (left - right)/(left+right);
+		c.edgeIntensity = left-right; // smallest eigen value
+		// the smallest eigenvalue divided by largest. A perfect corner would be 1. As it approaches zero it indicates
+		// that there's more of a line.
+		c.edgeRatio = (left - right)/(left+right);
 
 		// NOTE: Setting the Eigen ratio to a higher value is an effective ratio, but for fisheye images it will
 		//       filter out many of the corners at the border where they are highly distorted
-		return eigenRatio >= 0.20;
+		return c.edgeRatio >= edgeAspectRatioThreshold;
 	}
 
 	/**
@@ -679,7 +680,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 //		}
 
 //		return scoreCenter >= 0.0;
-		return corner.intensity >= 20;
+		return corner.intensity >= cornerIntensity;
 //		return true;//corner.intensity >= cornerIntensityThreshold;
 	}
 
@@ -724,12 +725,12 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		this.nonmaxThresholdRatio = nonmaxThresholdRatio;
 	}
 
-	public float getEdgeRatioThreshold() {
-		return edgeRatioThreshold;
+	public double getEdgeIntensityRatioThreshold() {
+		return edgeIntensityRatioThreshold;
 	}
 
-	public void setEdgeRatioThreshold(float edgeRatioThreshold) {
-		this.edgeRatioThreshold = edgeRatioThreshold;
+	public void setEdgeIntensityRatioThreshold(double edgeIntensityRatioThreshold) {
+		this.edgeIntensityRatioThreshold = edgeIntensityRatioThreshold;
 	}
 
 	public int getNonmaxRadius() {

@@ -106,7 +106,8 @@ public class DetectChessboardCornersVisualizeApp2
 			public void mousePressed(MouseEvent e) {
 				if( SwingUtilities.isLeftMouseButton(e)) {
 					Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
-					System.out.printf("Clicked at %.2f , %.2f\n",p.x,p.y);
+					float value = detector.getDetector().getIntensity().get((int)p.x,(int)p.y);
+					System.out.printf("Clicked at ( %.2f , %.2f ) x-corner = %e \n",p.x,p.y,value);
 				}
 			}
 		});
@@ -116,7 +117,8 @@ public class DetectChessboardCornersVisualizeApp2
 		synchronized (lockAlgorithm) {
 			detector.setPyramidTopSize(controlPanel.pyramidTop);
 			detector.getDetector().useMeanShift = controlPanel.meanShift;
-			detector.getDetector().edgeRatioThreshold = controlPanel.threshEdge;
+			detector.getDetector().edgeIntensityRatioThreshold = controlPanel.threshEdgeIntensity;
+			detector.getDetector().edgeAspectRatioThreshold = controlPanel.threshEdgeAspect;
 			detector.getDetector().nonmaxThresholdRatio = controlPanel.threshXCorner;
 			detector.getDetector().setNonmaxRadius(controlPanel.nonmaxRadius);
 		}
@@ -273,7 +275,8 @@ public class DetectChessboardCornersVisualizeApp2
 		JCheckBox checkLogIntensity;
 		JSpinner spinnerScaleDown;
 		JSpinner spinnerTop;
-		JSpinner spinnerEdge;
+		JSpinner spinnerEdgeIntensity;
+		JSpinner spinnerEdgeAspect;
 		JSpinner spinnerXCorner;
 		JSpinner spinnerNonMaxRadius;
 		JCheckBox checkShowCorners;
@@ -287,13 +290,15 @@ public class DetectChessboardCornersVisualizeApp2
 		boolean meanShift = true;
 		int translucent = 0;
 		int scaleDown = 1;
-		float threshEdge;
+		double threshEdgeIntensity;
+		double threshEdgeAspect;
 		float threshXCorner;
 		int nonmaxRadius;
 
 		public ControlPanel() {
 			{
-				threshEdge = detector.getDetector().getEdgeRatioThreshold();
+				threshEdgeIntensity = detector.getDetector().getEdgeIntensityRatioThreshold();
+				threshEdgeAspect = detector.getDetector().edgeAspectRatioThreshold;
 				threshXCorner = detector.getDetector().getNonmaxThresholdRatio();
 				nonmaxRadius = detector.getDetector().getNonmaxRadius();
 			}
@@ -301,7 +306,8 @@ public class DetectChessboardCornersVisualizeApp2
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
 			comboView = combo(view,"Input","Binary");
-			spinnerEdge = spinner(threshEdge, 0.0, 1.0, 0.01,1,4);
+			spinnerEdgeIntensity = spinner(threshEdgeIntensity, 0.0, 1.0, 0.01,1,4);
+			spinnerEdgeAspect = spinner(threshEdgeAspect, 0.0, 1.0, 0.01,1,4);
 			spinnerXCorner = spinner(threshXCorner, 0.0, 100.0, 0.01,1,4);
 			spinnerNonMaxRadius = spinner(nonmaxRadius, 1, 20, 1);
 			spinnerScaleDown = spinner(scaleDown,1,128,1);
@@ -322,7 +328,8 @@ public class DetectChessboardCornersVisualizeApp2
 			addAlignLeft(checkLogIntensity);
 			addAlignLeft(checkShowCorners);
 			addAlignLeft(checkDebug);
-			addLabeled(spinnerEdge,"Edge");
+			addLabeled(spinnerEdgeIntensity,"Edge Inten");
+			addLabeled(spinnerEdgeAspect,"Edge Aspect");
 			addLabeled(spinnerXCorner,"X-Corner");
 			addLabeled(spinnerNonMaxRadius,"NonMax Radius");
 			addLabeled(spinnerTop,"Pyramid Top");
@@ -352,8 +359,12 @@ public class DetectChessboardCornersVisualizeApp2
 			if( e.getSource() == selectZoom ) {
 				zoom = ((Number)selectZoom.getValue()).doubleValue();
 				imagePanel.setScale(zoom);
-			} else if( e.getSource() == spinnerEdge ) {
-				threshEdge = ((Number)spinnerEdge.getValue()).floatValue();
+			} else if( e.getSource() == spinnerEdgeIntensity) {
+				threshEdgeIntensity = ((Number) spinnerEdgeIntensity.getValue()).doubleValue();
+				createAlgorithm();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerEdgeAspect) {
+				threshEdgeAspect = ((Number) spinnerEdgeAspect.getValue()).doubleValue();
 				createAlgorithm();
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerXCorner ) {
