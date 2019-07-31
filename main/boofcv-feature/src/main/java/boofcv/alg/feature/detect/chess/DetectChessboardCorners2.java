@@ -118,6 +118,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 	FastQueue<Point2D_I32> outsideCircle4 = new FastQueue<>(Point2D_I32.class,true);
 	FastQueue<Point2D_I32> outsideCircle3 = new FastQueue<>(Point2D_I32.class,true);
+	private final float[] outsideCircleValues;
 
 	// input image type
 	Class<T> imageType;
@@ -169,6 +170,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 		DiscretizedCircle.coordinates(4, outsideCircle4);
 		DiscretizedCircle.coordinates(3, outsideCircle3);
+		outsideCircleValues = new float[ outsideCircle4.size ];
 	}
 
 	/**
@@ -225,11 +227,11 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 				continue;
 			}
 
-			if( !checkChessboardCircle(xx,yy,outsideCircle4,4,4)) {
+			if( !checkChessboardCircle((float)c.x,(float)c.y,outsideCircle4,4,4,3)) {
 				continue;
 			}
 
-			if( !checkChessboardCircle(xx,yy,outsideCircle3,3,4)) {
+			if( !checkChessboardCircle((float)c.x,(float)c.y,outsideCircle3,3,4,3)) {
 				continue;
 			}
 
@@ -237,6 +239,12 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 				meanShift.search((float)c.x,(float)c.y);
 				c.x = meanShift.getPeakX();
 				c.y = meanShift.getPeakY();
+			}
+
+			// tighter tolerance now that the center is known
+			if( !checkChessboardCircle((float)c.x,(float)c.y,outsideCircle4,4,4,2)) {
+				c.edgeIntensity = -1;
+				continue;
 			}
 
 			if( !checkCorner(c)) {
@@ -256,6 +264,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 			maxEdge = Math.max(maxEdge,c.edgeIntensity);
 			maxIntensity = Math.max(c.intensity,maxIntensity);
 		}
+		System.out.println("max edge "+maxEdge);
 
 		// Filter corners based on edge intensity of found corners
 		for (int i = corners.size-1; i >= 0;  i--) {
@@ -436,33 +445,46 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		return sides >= 4;
 	}
 
-	private boolean checkChessboardCircle(float cx , float cy , FastQueue<Point2D_I32> outside , int min , int max ) {
-		int radius = 4;
-		if( cx < radius || cx >= intensity.width-radius || cy < radius || cy >= intensity.height-radius )
-			return false;
+	private boolean checkChessboardCircle(float cx , float cy , FastQueue<Point2D_I32> outside , int min , int max , int symmetric ) {
+//		int radius = 4;
+//		if( cx < radius || cx >= intensity.width-radius || cy < radius || cy >= intensity.height-radius )
+//			return false;
 
 		float mean = 0;
 		for (int i = 0; i < outside.size; i++) {
 			Point2D_I32 p = outside.get(i);
-			mean += inputInterp.get(cx+p.x,cy+p.y);
+			float v = inputInterp.get(cx+p.x,cy+p.y);
+			outsideCircleValues[i] = v;
+			mean += v;
 		}
 		mean /= outside.size;
 
-		Point2D_I32 p = outside.get(0);
 		int numUpDown = 0;
-		int prevDir = inputInterp.get(cx+p.x,cy+p.y) > mean ? 1 : -1;
+		int prevDir = outsideCircleValues[0] > mean ? 1 : -1;
 		for (int i = 1; i < outside.size; i++) {
-			p = outside.get(i);
-			int dir = inputInterp.get(cx+p.x,cy+p.y) > mean ? 1 : -1;
+			int dir = outsideCircleValues[i] > mean ? 1 : -1;
 			if( prevDir != dir ) {
 				numUpDown++;
 				prevDir = dir;
 			}
 		}
 
+		// Sample points around the circle should be symmetric. This checks to see if a pixle that was above
+		// the mean is also above the mean on the other side, and vis-versa
+		int numMirror = 0;
+		int halfCount = outside.size/2;
+		for (int i = 0; i < halfCount; i++) {
+			int dirI = outsideCircleValues[i] > mean ? 1 : -1;
+			int dirJ = outsideCircleValues[i+halfCount] > mean ? 1 : -1;
+
+			if( dirI == dirJ )
+				numMirror++;
+		}
+
+//		System.out.println("Mirror "+numMirror+"/"+halfCount);
 //		System.out.println("U0Down "+numUpDown+"  circle.size "+outside.size);
 //		return numUpDown <= 5 && numUpDown >= 4;
-		return numUpDown >= min && numUpDown <= max;
+		return numUpDown >= min && numUpDown <= max && numMirror >= halfCount-symmetric;
 	}
 
 	private int countNegative( int x0 , int y0 , int stepX , int stepY , int length ) {
