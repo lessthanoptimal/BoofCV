@@ -76,7 +76,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 		corners.reset();
 
 		// top to bottom. This way the intensity image is at the input image's scale. Which is useful
-		// for visualiztion purposes
+		// for visualization purposes
 		double scale = Math.pow(2.0,pyramid.size()-1);
 		for (int level = pyramid.size()-1; level >= 0; level--) {
 			// find the corners
@@ -102,18 +102,24 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 			scale /= 2.0;
 		}
 
-		// Create a combined set of features from all the levels. Only add each feature once by searching
-		// for it in the next level down
+		// Perform non-maximum suppression against features in each scale.
+		// Because of the scale difference the search radius changes depending on the scale of the layer in the pyramid
+		double baseScale = 1.0;
 		for (int levelIdx = 0; levelIdx < pyramid.size(); levelIdx++) {
 			PyramidLevel level0 = featureLevels.get(levelIdx);
 
+			scale = baseScale*2.0;
 			// mark features in the next level as seen if they match ones in this level
 			for( int nextIdx = levelIdx+1; nextIdx < pyramid.size(); nextIdx++ ) {
 				PyramidLevel level1 = featureLevels.get(nextIdx);
-				markSeenAsFalse(level0.corners,level1.corners);
+				markSeenAsFalse(level0.corners,level1.corners, scale);
+				scale *= 2;
 			}
+			baseScale *= 2.0;
 		}
 
+		// Only keep flagged features for the final output
+		int dropped = 0;
 		for (int levelIdx = 0; levelIdx < pyramid.size(); levelIdx++) {
 			PyramidLevel level = featureLevels.get(levelIdx);
 			// only add corners if they were first seen in this level
@@ -121,49 +127,45 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 				ChessboardCorner c = level.corners.get(i);
 				if( c.first ) {
 					corners.grow().set(c);
+				} else {
+					dropped++;
 				}
 			}
 		}
-		System.out.println("Found Pyramid "+corners.size);
+		System.out.println("Found Pyramid "+corners.size+" dropped "+dropped);
 	}
 
-	/**
-	 * Finds corners in list 1 which match corners in list 0. If the feature in list 0 has already been
-	 * seen then the feature in list 1 will be marked as seen. Otherwise the feature which is the most intense
-	 * is marked as first.
-	 */
-	void markSeenAsFalse(FastQueue<ChessboardCorner> corners0 , FastQueue<ChessboardCorner> corners1) {
+	void markSeenAsFalse(FastQueue<ChessboardCorner> corners0 , FastQueue<ChessboardCorner> corners1, double scale ) {
 		nn.setPoints(corners1.toList(),false);
-		// radius of the blob in the intensity image is 2*kernelRadius
-		// Add some buffer because things tend to shift a bit across scales
+
+		double searchRadius = radius*scale;
 		for (int i = 0; i < corners0.size; i++) {
 			ChessboardCorner c0 = corners0.get(i);
-			if( !c0.first )
-				continue;
 
-			nnSearch.findNearest(c0,radius,5,nnResults);
+			// prefer features found at higher resolutions since they can be more accurate
+			final double intensity = c0.intensity;
 
-			// IDEA: Could make this smarter by looking at the orientation too?
-			double maxIntensity = 0;
+			nnSearch.findNearest(c0,searchRadius,10,nnResults);
+
+			boolean maximum = true;
+
 			for (int j = 0; j < nnResults.size; j++) {
 				ChessboardCorner c1 = nnResults.get(j).point;
-				maxIntensity = Math.max(c1.intensity,maxIntensity);
-			}
-			// the lower resolution feature must be much more intense than the current level to preferred. This
-			// results in more accurate feature localization
-			if( maxIntensity < c0.intensity*1.5) {
-				for (int j = 0; j < nnResults.size; j++) {
-					ChessboardCorner c1 = nnResults.get(j).point;
+				if( c1.intensity < intensity ) {
 					c1.first = false;
+				} else {
+					maximum = false;
 				}
-			} else {
+			}
+
+			if( !maximum ) {
 				c0.first = false;
 			}
 		}
 	}
 
 	/**
-	 * Creates an image pyrmaid by 2x2 average down sampling the input image. The original input image is at layer
+	 * Creates an image pyramid by 2x2 average down sampling the input image. The original input image is at layer
 	 * 0 with each layer after that 1/2 the resolution of the previous. 2x2 down sampling is used because it doesn't
 	 * add blur or aliasing.
 	 */

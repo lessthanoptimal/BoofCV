@@ -28,7 +28,6 @@ import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
@@ -71,7 +70,6 @@ public class DetectChessboardCornersVisualizeApp2
 	// intensity image is rendered here
 	BufferedImage visualized;
 	BufferedImage original;
-	BufferedImage binary;
 
 	GrayF32 logIntensity = new GrayF32(1,1);
 
@@ -189,8 +187,6 @@ public class DetectChessboardCornersVisualizeApp2
 				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
 			}
 
-			binary = VisualizeBinaryData.renderBinary(detector.getDetector().getBinary(),false,binary);
-
 			synchronized (lockCorners) {
 				FastQueue<ChessboardCorner> orig = detector.getCorners();
 				foundCorners.reset();
@@ -201,18 +197,10 @@ public class DetectChessboardCornersVisualizeApp2
 		}
 
 		SwingUtilities.invokeLater(() -> {
+			imagePanel.setBufferedImageNoChange(original);
 			controlPanel.setProcessingTimeMS(processingTime);
-			changeViewImage();
 			imagePanel.repaint();
 		});
-	}
-
-	private void changeViewImage() {
-		if( controlPanel.view == 0 ) {
-			imagePanel.setBufferedImageNoChange(original);
-		} else if( controlPanel.view == 1 ) {
-			imagePanel.setBufferedImageNoChange(binary);
-		}
 	}
 
 	class DisplayPanel extends ShapeVisualizePanel {
@@ -271,7 +259,6 @@ public class DetectChessboardCornersVisualizeApp2
 	class ControlPanel extends DetectBlackShapePanel
 			implements ActionListener , ChangeListener , ThresholdControlPanel.Listener
 	{
-		JComboBox<String> comboView;
 		JCheckBox checkLogIntensity;
 		JSpinner spinnerScaleDown;
 		JSpinner spinnerTop;
@@ -305,7 +292,6 @@ public class DetectChessboardCornersVisualizeApp2
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
-			comboView = combo(view,"Input","Binary");
 			spinnerEdgeIntensity = spinner(threshEdgeIntensity, 0.0, 1.0, 0.01,1,4);
 			spinnerEdgeAspect = spinner(threshEdgeAspect, 0.0, 1.0, 0.01,1,4);
 			spinnerXCorner = spinner(threshXCorner, 0.0, 100.0, 0.01,1,4);
@@ -322,13 +308,12 @@ public class DetectChessboardCornersVisualizeApp2
 			addLabeled(processingTimeLabel, "Time (ms)");
 			addLabeled(imageSizeLabel,"Image Size");
 			addLabeled(spinnerScaleDown,"Scale Down");
-			addLabeled(comboView,"View");
 			addLabeled(sliderTranslucent,"X-Corners");
 			addLabeled(selectZoom,"Zoom");
 			addAlignLeft(checkLogIntensity);
 			addAlignLeft(checkShowCorners);
 			addAlignLeft(checkDebug);
-			addLabeled(spinnerEdgeIntensity,"Edge Inten");
+			addLabeled(spinnerEdgeIntensity,"Edge Intensity");
 			addLabeled(spinnerEdgeAspect,"Edge Aspect");
 			addLabeled(spinnerXCorner,"X-Corner");
 			addLabeled(spinnerNonMaxRadius,"NonMax Radius");
@@ -337,11 +322,7 @@ public class DetectChessboardCornersVisualizeApp2
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == comboView ) {
-				view = comboView.getSelectedIndex();
-				changeViewImage();
-				imagePanel.repaint();
-			} else if( e.getSource() == checkShowCorners) {
+			if( e.getSource() == checkShowCorners) {
 				showCorners = checkShowCorners.isSelected();
 				imagePanel.repaint();
 			} else if( e.getSource() == checkLogIntensity) {
@@ -394,10 +375,6 @@ public class DetectChessboardCornersVisualizeApp2
 			reprocessImageOnly();
 		}
 	}
-
-	// TODO visualize contours
-	// TODO show each layer in the pyramid
-	// TODO control corner intensity threshold
 
 	public static void main( String args[] ) {
 		List<PathLabel> examples = new ArrayList<>();

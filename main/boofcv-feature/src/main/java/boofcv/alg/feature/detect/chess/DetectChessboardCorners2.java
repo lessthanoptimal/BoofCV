@@ -21,11 +21,9 @@ package boofcv.alg.feature.detect.chess;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.peak.SearchLocalPeak;
-import boofcv.abst.filter.binary.BinaryContourFinderLinearExternal;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.alg.feature.detect.intensity.XCornerAbeles2019Intensity;
 import boofcv.alg.feature.detect.interest.FastHessianFeatureDetector;
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.ImageLineIntegral;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.misc.ImageStatistics;
@@ -39,16 +37,13 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.misc.DiscretizedCircle;
-import boofcv.struct.ConnectRule;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import georegression.metric.UtilAngle;
-import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
@@ -71,10 +66,16 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 	public double edgeIntensityRatioThreshold = 0.01;
 	public double edgeAspectRatioThreshold = 0.1;
 	public double cornerIntensity = 20;
+	/**
+	 * Tolerance number of "spokes" in the wheel which break symmetry. Symmetry is defined as both sides being above
+	 * or below the mean value. Larger the value more tolerant it is.
+	 */
+	public int symmetricTol = 3;
+	/**
+	 * Amount of blurred applied to input image. A radius of 1 was selected so that a 3x3 region would be sampled
+	 * when computing x-corner feature intensity.
+	 */
 	int blurRadius = 1;
-
-	// TODO Sample center radius 1 or 2
-	//      if its nearly identical intensity to one of the axis drop feature
 
 	// dynamically computed thresholds
 	float nonmaxThreshold;
@@ -105,8 +106,6 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 	NonMaxSuppression nonmax;
 	QueueCorner foundNonmax = new QueueCorner();
 
-	private GrayU8 binary = new GrayU8(1,1);
-
 	// predeclare memory for compute a feature's orientation
 	private final int numSpokes = 32;
 	private final int numSpokeDiam = numSpokes/2;
@@ -122,18 +121,12 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 	// input image type
 	Class<T> imageType;
-	Class<D> derivType;
-
-	// blob feature detector
-	FastQueue<Point2D_I32> contour = new FastQueue<>(Point2D_I32.class,true);
-	BinaryContourFinderLinearExternal contourFinder = new BinaryContourFinderLinearExternal();
 
 	/**
 	 * Declares internal data structures
 	 */
 	public DetectChessboardCorners2(Class<T> imageType ) {
 		this.imageType = imageType;
-		this.derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		{
 			ConfigExtract config = new ConfigExtract();
@@ -162,12 +155,6 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 			meanShift.setSearchRadius(2);
 		}
 
-		{
-			contourFinder.setConnectRule(ConnectRule.EIGHT);
-			contourFinder.setMaxContour(25);
-			contourFinder.setMinContour(5);
-		}
-
 		DiscretizedCircle.coordinates(4, outsideCircle4);
 		DiscretizedCircle.coordinates(3, outsideCircle3);
 		outsideCircleValues = new float[ outsideCircle4.size ];
@@ -175,6 +162,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 	/**
 	 * Computes chessboard corners inside the image
+	 *
 	 * @param input Gray image. Not modified.
 	 */
 	public void process( T input ) {
@@ -207,8 +195,6 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 			corner.reset();
 		}
 
-//		contourMaximums();
-
 		double maxEdge = 0;
 		double maxIntensity = 0;
 
@@ -227,11 +213,12 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 				continue;
 			}
 
-			if( !checkChessboardCircle((float)c.x,(float)c.y,outsideCircle4,4,4,3)) {
+			// TODO improve these functions
+			if (!checkChessboardCircle((float) c.x, (float) c.y, outsideCircle4, 4, 4, symmetricTol)) {
 				continue;
 			}
 
-			if( !checkChessboardCircle((float)c.x,(float)c.y,outsideCircle3,3,4,3)) {
+			if (!checkChessboardCircle((float) c.x, (float) c.y, outsideCircle3, 3, 4, symmetricTol)) {
 				continue;
 			}
 
@@ -242,7 +229,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 			}
 
 			// tighter tolerance now that the center is known
-			if( !checkChessboardCircle((float)c.x,(float)c.y,outsideCircle4,4,4,2)) {
+			if (!checkChessboardCircle((float) c.x, (float) c.y, outsideCircle4, 4, 4, symmetricTol-1)) {
 				c.edgeIntensity = -1;
 				continue;
 			}
@@ -264,7 +251,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 			maxEdge = Math.max(maxEdge,c.edgeIntensity);
 			maxIntensity = Math.max(c.intensity,maxIntensity);
 		}
-		System.out.println("max edge "+maxEdge);
+//		System.out.println("max edge "+maxEdge);
 
 		// Filter corners based on edge intensity of found corners
 		for (int i = corners.size-1; i >= 0;  i--) {
@@ -277,78 +264,6 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 		int dropped = corners.size-filtered.size();
 		System.out.printf("  corners %4d filters %5d dropped = %4.1f%%\n",corners.size,filtered.size(),(100*dropped/(double)corners.size));
-	}
-
-//	private void contourMaximums() {
-//		GThresholdImageOps.threshold(intensity,binary,intensityThresh,false);
-//		contourFinder.process(binary);
-//
-//		List<ContourPacked> packed = contourFinder.getContours();
-////		System.out.println("  * features.size = "+packed.size());
-//		maximums.reset();
-//		Point2D_F32 meanPt = new Point2D_F32();
-//
-//		int totalFailed = 0;
-//		for (int i = 0; i < packed.size(); i++) {
-//			contourFinder.loadContour(i, contour);
-//
-//			if( validateRepeatedPoints(meanPt) ) {
-//				totalFailed++;
-//				continue;
-//			}
-//
-//			// NOTE: Commented out because it filtered corners in fisheye images at the image border
-////			// the size is known. Filter if it's a long and skinny contour
-////			boolean failed = false;
-////			float r_max = 0;
-////			for (int j = 0; j < contour.size; j++) {
-////				Point2D_I32 c = contour.get(j);
-////				float dx = c.x-meanPt.x;
-////				float dy = c.y-meanPt.y;
-////				float rr = dx*dx + dy*dy;
-////				if( rr > r_max ) {
-////					r_max = rr;
-////				}
-////			}
-////
-//////			System.out.println("ratio "+(contour.size/Math.sqrt(r_max)));
-////			if( contour.size/Math.sqrt(r_max) < 3.5f ) {
-////				totalFailed++;
-////				continue;
-////			}
-//
-//			maximums.grow().set(meanPt);
-//		}
-//		System.out.println("failed "+totalFailed+" / "+packed.size());
-//	}
-
-	/**
-	 * In oddly shaped contours it has to double back, these are typically false positives
-	 * compute the mean point here too to avoid double counting
-	 * @return
-	 */
-	private boolean validateRepeatedPoints(Point2D_F32 meanPt ) {
-		meanPt.set(0,0);
-		int count = 0;
-		for (int i = 0; i < contour.size; i++) {
-			Point2D_I32 p = contour.get(i);
-			if( binary.get(p.x,p.y) == 2 ) {
-				count++;
-			} else {
-				meanPt.x += p.x;
-				meanPt.y += p.y;
-				binary.set(p.x,p.y,2);
-			}
-		}
-		for (int i = 0; i < contour.size; i++) {
-			Point2D_I32 p = contour.get(i);
-			binary.set(p.x,p.y,1);
-		}
-
-		meanPt.x /= (contour.size-count);
-		meanPt.y /= (contour.size-count);
-
-		return count >= 3 || (count >= 1 && contour.size <= 6);
 	}
 
 	private boolean checkPositiveInside(int cx , int cy , int threshold ) {
@@ -369,27 +284,6 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 			}
 		}
 		return count >= threshold;
-	}
-
-	private float averageInside( int cx , int cy , int radius ) {
-		final int x0 = cx - radius;
-		final int y0 = cy - radius;
-		final int x1 = cx + radius + 1;
-		final int y1 = cy + radius + 1;
-
-		float sum = 0;
-		int count = 0;
-		for (int y = y0; y < y1; y++) {
-			for (int x = x0; x < x1; x++) {
-				float v = intensity.unsafe_get(x,y);
-				if( v > 0 ) {
-					count++;
-					sum += v;
-				}
-			}
-		}
-
-		return sum/count;
 	}
 
 	private boolean checkNegativeInside(int cx , int cy , int threshold ) {
@@ -417,34 +311,6 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		return count >= threshold;
 	}
 
-	/**
-	 * Checks to see if there is a set of pixels with negative x-corner intensity values surrounding
-	 */
-	private boolean checkNegativeOutside(int cx , int cy , int radius , int threshold ) {
-		if( cx < radius || cx >= intensity.width-radius || cy < radius || cy >= intensity.height-radius )
-			return false;
-
-		final int x0 = cx - radius;
-		final int y0 = cy - radius;
-		final int x1 = cx + radius;
-		final int y1 = cy + radius;
-
-		int w = radius*2;
-
-		int sides = 0;
-
-		int count0 = countNegative(x0,y0,1,0,w) + countNegative(x0,y0+1,1,0,w);
-		if( count0 >= threshold) sides++;
-		int count1 = countNegative(x1,y0,0,1,w) + countNegative(x1-1,y0,0,1,w);
-		if( count1 >= threshold) sides++;
-		int count2 = countNegative(x1,y1,-1,0,w) + countNegative(x1,y1-1,-1,0,w);
-		if( count2 >= threshold) sides++;
-		int count3 = countNegative(x0,y1,0,-1,w) + countNegative(x0+1,y1,0,-1,w);
-		if( count3 >= threshold) sides++;
-
-		return sides >= 4;
-	}
-
 	private boolean checkChessboardCircle(float cx , float cy , FastQueue<Point2D_I32> outside , int min , int max , int symmetric ) {
 //		int radius = 4;
 //		if( cx < radius || cx >= intensity.width-radius || cy < radius || cy >= intensity.height-radius )
@@ -459,6 +325,8 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		}
 		mean /= outside.size;
 
+		// Compute the number of times the pixel value transition below and above the mean
+		// There should be 4 transitions in a chessboard
 		int numUpDown = 0;
 		int prevDir = outsideCircleValues[0] > mean ? 1 : -1;
 		for (int i = 1; i < outside.size; i++) {
@@ -500,26 +368,6 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		return count;
 	}
 
-	private boolean checkNegativeOutside2(int cx , int cy , int threshold ) {
-
-		int radius = 4;
-		if( cx < radius || cx >= intensity.width-radius || cy < radius || cy >= intensity.height-radius )
-			return false;
-
-		int count = 0;
-		for (int i = 0; i < outsideCircle4.size; i++) {
-			Point2D_I32 p = outsideCircle4.get(i);
-
-			if( intensity.get(cx+p.x,cy+p.y) <= -nonmaxThreshold *0.5f )
-				count++;
-			else if( intensity.get(cx+p.x,cy+p.y) >= nonmaxThreshold)
-				count--;
-		}
-
-//		System.out.println("Count "+count);
-		return count >= threshold;
-	}
-
 	private int countTransitions( double mean ) {
 		int transitions = 0;
 
@@ -555,12 +403,9 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 				float dx = blurInterp.get(x+1,y)- blurInterp.get(x-1,y);
 				float dy = blurInterp.get(x,y+1)- blurInterp.get(x,y-1);
 
-//				float weight = Math.abs(intensityInterp.get(x,y));
-
-//				if( weight > intensityThresh ) {
-					xx += dx * dx;
-					xy += dx * dy;
-					yy += dy * dy;
+				xx += dx * dx;
+				xy += dx * dy;
+				yy += dy * dy;
 			}
 		}
 
@@ -594,7 +439,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 	 * Intensity is found by subtracting bright lines from the dark line on the other side. dark/light lines are
 	 * offset by 90 degrees.
 	 */
-	private boolean computeFeatures( ChessboardCorner corner ) {
+	private boolean computeFeatures(ChessboardCorner corner) {
 		double r = 4;
 
 		// magnitude of the difference is used remove false chessboard corners caused by the corners on black
@@ -656,54 +501,9 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		}
 		stdev = Math.sqrt(stdev/numSpokes);
 
-		// NOTE: Requiring that the center not have a similar value to the spokes is a bad idea. When a square
-		//       is diagonal there's a good chance it will have a value very similar to one of the spokes, even
-		//       when the image is mostly in focus
-		// The value in the center should be significantly different from all the others
-//		double centerValue0 = inputInterp.get((float)corner.x,(float)corner.y);
-//		double centerValue1 = blurInterp.get((float)corner.x,(float)corner.y);
-//		double scoreCenter = Double.MAX_VALUE;
-//		double maxDifference = 0;
-//		for (int i = 0; i < 4; i++) {
-//			int index = (bestSpoke + i* numSpokeDiam /2)%numSpokes;
-////			scoreCenter = Math.min(scoreCenter,Math.abs(centerValue0-spokesRadi[index]));
-//			scoreCenter = Math.min(scoreCenter,Math.abs(centerValue1- spokesRadi[index]));
-//
-////			maxDifference = Math.max(maxDifference,Math.abs(centerValue0-spokesRadi[index]));
-//			maxDifference = Math.max(maxDifference,Math.abs(centerValue1- spokesRadi[index]));
-//		}
-//
-//		scoreCenter = scoreCenter/maxDifference;
-
-//		System.out.println("ori = "+corner.orientation);
-
 		corner.intensity = -bestScore*stdev/(sumDifference + UtilEjml.EPS);
 
-//		System.out.printf(" scoreCenter %1.2f score %1.2f diff %4.1f stdev %5.2f intensity %8.2f\n",scoreCenter,bestScore,sumDifference,stdev,corner.intensity);
-
-//		if( corner.distance(985,465) < 1.5 ) {
-//			System.out.printf(" scoreCenter %1.2f score %1.2f diff %4.1f stdev %5.2f intensity %8.2f\n",scoreCenter,bestScore,sumDifference,stdev,corner.intensity);
-//			System.out.println("False positive!");
-//		}
-//
-//		if( corner.distance(886,475) < 1.5 ) {
-//			System.out.printf(" scoreCenter %1.2f score %1.2f diff %4.1f stdev %5.2f intensity %8.2f\n",scoreCenter,bestScore,sumDifference,stdev,corner.intensity);
-//			System.out.println("False positive!");
-//		}
-//
-//		if( corner.distance(968,839) < 1.5 ) {
-//			System.out.printf(" scoreCenter %1.2f score %1.2f diff %4.1f stdev %5.2f intensity %8.2f\n",scoreCenter,bestScore,sumDifference,stdev,corner.intensity);
-//			System.out.printf("True positive! %.0f %.0f\n",cx,cy);
-//		}
-//
-//		if( corner.distance(170,178) < 1.5 ) {
-//			System.out.printf(" scoreCenter %1.2f score %1.2f diff %4.1f stdev %5.2f intensity %8.2f\n",scoreCenter,bestScore,sumDifference,stdev,corner.intensity);
-//			System.out.printf("True positive! %.0f %.0f\n",cx,cy);
-//		}
-
-//		return scoreCenter >= 0.0;
 		return corner.intensity >= cornerIntensity;
-//		return true;//corner.intensity >= cornerIntensityThreshold;
 	}
 
 	private void smoothSpokeDiam() {
@@ -765,13 +565,5 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 	public Class<T> getImageType() {
 		return imageType;
-	}
-
-	public Class<D> getDerivType() {
-		return derivType;
-	}
-
-	public GrayU8 getBinary() {
-		return binary;
 	}
 }

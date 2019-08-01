@@ -22,7 +22,6 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
-import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -32,10 +31,8 @@ import boofcv.core.graph.FeatureGraph2D;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
-import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.VisualizeImageData;
@@ -83,7 +80,6 @@ public class DetectCalibrationChessboardApp
 
 	// Workspace for visualized image data
 	private BufferedImage visualized;
-	private BufferedImage binary;
 	private BufferedImage original;
 
 	// The chessboard corner detector
@@ -135,9 +131,6 @@ public class DetectCalibrationChessboardApp
 
 	private void createAlgorithm() {
 		synchronized (lockAlgorithm) {
-			ConfigThreshold threshold = controlPanel.thresholdPanel.createConfig();
-			threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
-			configDetector.threshold = threshold;
 			configDetector.pyramidTopSize = controlPanel.pyramidTop;
 			configDetector.cornerRadius = controlPanel.radius;
 			configDetector.cornerThreshold = controlPanel.cornerThreshold;
@@ -217,8 +210,6 @@ public class DetectCalibrationChessboardApp
 				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
 			}
 
-			binary=VisualizeBinaryData.renderBinary(detector.getDetector().getDetector().getBinary(),false,binary);
-
 			synchronized (lockCorners) {
 				this.success = success;
 				FastQueue<ChessboardCorner> orig = detector.getDetector().getCorners();
@@ -268,8 +259,6 @@ public class DetectCalibrationChessboardApp
 			imagePanel.setBufferedImageNoChange(visualized);
 		} else if( controlPanel.view == 1 ) {
 			imagePanel.setBufferedImageNoChange(original);
-		} else if( controlPanel.view == 3 ) {
-			imagePanel.setBufferedImageNoChange(binary);
 		}
 	}
 
@@ -438,7 +427,6 @@ public class DetectCalibrationChessboardApp
 		JCheckBox checkShowCorners;
 		JCheckBox checkMeanShift;
 		JCheckBox checkAnyGrid;
-		ThresholdControlPanel thresholdPanel;
 
 		int pyramidTop;
 		int radius;
@@ -466,10 +454,6 @@ public class DetectCalibrationChessboardApp
 				ambiguousTol = configDetector.ambiguousTol;
 				directionTol = configDetector.directionTol;
 				orientationTol = configDetector.orientaitonTol;
-				thresholdPanel = new ThresholdControlPanel(this,configDetector.threshold);
-				thresholdPanel.addHistogramGraph();
-				// use the actual image histogram. Peaks are rare and the approximate one will be very inaccurate
-				thresholdPanel.histogramPanel.setApproximateHistogram(false);
 
 				cornerThreshold = configDetector.cornerThreshold;
 				edgeThreshold = configDetector.edgeThreshold;
@@ -477,7 +461,7 @@ public class DetectCalibrationChessboardApp
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
-			comboView = combo(view,"Intensity","Image","Both","Binary");
+			comboView = combo(view,"Intensity","Image");
 			spinnerCornerThreshold = spinner(cornerThreshold, 0, 100, 0.2);
 			spinnerEdgeThreshold = spinner(edgeThreshold, 0, 1.0, 0.1,1,3);
 			spinnerRadius = spinner(radius, 1, 100, 1);
@@ -512,7 +496,6 @@ public class DetectCalibrationChessboardApp
 			addLabeled(spinnerOrientationTol,"Orientation Tol");
 			addLabeled(spinnerDirectionTol,"Direction Tol");
 			addLabeled(spinnerAmbiguous,"Ambiguous Tol");
-			addAlignCenter(thresholdPanel);
 		}
 
 		JPanel createCheckPanel() {
