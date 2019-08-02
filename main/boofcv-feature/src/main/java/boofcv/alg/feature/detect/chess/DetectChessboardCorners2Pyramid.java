@@ -142,11 +142,15 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 		for (int i = 0; i < corners0.size; i++) {
 			ChessboardCorner c0 = corners0.get(i);
 
-			// prefer features found at higher resolutions since they can be more accurate
-			final double intensity = c0.intensity;
+			// prefer features found at higher resolutions since they can be more accurate. Do this by increasing
+			// their intensity value, but because non-max is being done here you have to be careful to not increase
+			// the value of a "non-maximum" corner and remove all!
+			//
+			// NOTE: With blurred images, the lower resolution images will have higher intensity
+			//       so as you go up scale intensity smoothly (more or less) increases
+			final double intensity = c0.intensity*(c0.first?2.0:1.0);
 
 			nnSearch.findNearest(c0,searchRadius,10,nnResults);
-
 			boolean maximum = true;
 
 			for (int j = 0; j < nnResults.size; j++) {

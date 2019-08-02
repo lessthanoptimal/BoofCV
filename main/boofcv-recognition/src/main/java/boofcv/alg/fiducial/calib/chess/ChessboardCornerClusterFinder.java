@@ -75,10 +75,12 @@ import java.util.List;
 @SuppressWarnings({"WeakerAccess", "ForLoopReplaceableByForEach"})
 public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
+	// TODO prune fake cluster borders by seeing of the edge continues a little bit past
+
 	// Tolerance for deciding if two directions are the same.
-	private double directionTol =0.60;
+	private double directionTol = 0.60;
 	// Tolerance for deciding of two corner orientations are the same.
-	private double orientationTol =0.50;
+	private double orientationTol = 0.50;
 	// Tolerance for how close two corners need to be to be considered ambiguous. Relative
 	private double ambiguousTol = 0.25;
 
@@ -93,7 +95,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	// Computes the intensity of the line which connects two corners
 	private ChessboardCornerEdgeIntensity<T> computeConnInten;
 	// Threshold relative to corner intensity used to prune. If <= 0 then this test is disabled
-	private double thresholdEdgeIntensity = 0.5;
+	private double thresholdEdgeIntensity = 0.05;
 
 	// Data structures for the crude graph
 	private FastQueue<Vertex> vertexes = new FastQueue<>(Vertex.class,true);
@@ -174,7 +176,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 //		printDualGraph();
 
 		// use edge intensity to prune connections
-		if( thresholdEdgeIntensity >= 0 ) {
+		if( thresholdEdgeIntensity > 0 ) {
 			pruneConnectionsByIntensity(corners);
 		}
 
@@ -228,27 +230,78 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	 * Computes edge intensity and prunes connections if it's too low relative
 	 */
 	protected void pruneConnectionsByIntensity(List<ChessboardCorner> corners) {
+
+		// Compute edge intensity for all the edges
 		for (int i = 0; i < vertexes.size; i++) {
 			Vertex v = vertexes.get(i);
 			ChessboardCorner ca = corners.get(v.index);
+			for (int j = v.perpendicular.edges.size() - 1; j >= 0; j--) {
+				Edge e = v.perpendicular.edges.get(j);
 
-			// Corner intensity is in units of gradient squared
-			float threshold = (float) (Math.sqrt(ca.intensity) * thresholdEdgeIntensity);
+				// Avoid computing the edge's intensity twice
+				if( e.intensity == -Double.MAX_VALUE ) {
+					ChessboardCorner cb = corners.get(e.dst.index);
+					e.intensity = computeConnInten.process(ca, cb, e.direction);
+
+					// find the equivalent edge from the destination vertex
+					int which = e.dst.perpendicular.find(v);
+					if( which != -1 ) {
+						e.dst.perpendicular.get(which).intensity = e.intensity;
+					}
+				}
+			}
+		}
+
+		// Mark edges to be pruned. You don't want to prune them here since that will change the dynamic
+		// threshold and makes output determined by the vertex.
+		for (int i = 0; i < vertexes.size; i++) {
+			Vertex v = vertexes.get(i);
+
+			// Compute an edge threshold using the intensity of the local edges
+			double threshold = meanIntensity(v);
+			for (int j = 0; j < v.perpendicular.edges.size(); j++) {
+				threshold = Math.max(threshold,meanIntensity(v.perpendicular.edges.get(j).dst));
+			}
+			threshold *= thresholdEdgeIntensity;
 
 			for (int j = v.perpendicular.edges.size() - 1; j >= 0; j--) {
 				Edge e = v.perpendicular.edges.get(j);
-				ChessboardCorner cb = corners.get(e.dst.index);
-				e.intensity = computeConnInten.process(ca, cb, e.direction);
 
-				// Prune if intensity is too small
+				// Mark it to be pruned if too small
 				if (e.intensity < threshold) {
+					e.intensity = -Double.MAX_VALUE;
+				}
+			}
+		}
+
+		// Prune marked edges
+		for (int i = 0; i < vertexes.size; i++) {
+			Vertex v = vertexes.get(i);
+			for (int j = v.perpendicular.edges.size() - 1; j >= 0; j--) {
+				Edge e = v.perpendicular.edges.get(j);
+
+				// prune if marked
+				if (e.intensity == -Double.MAX_VALUE) {
 					v.perpendicular.edges.remove(j);
 					int idx = e.dst.perpendicular.find(v);
-					if( idx >= 0 )
+					if (idx >= 0)
 						e.dst.perpendicular.edges.remove(idx);
 				}
 			}
 		}
+	}
+
+	double meanIntensity( Vertex v ) {
+//		double total = 0;
+//		for (int j = 0; j < v.perpendicular.edges.size(); j++) {
+//			total += v.perpendicular.edges.get(j).intensity;
+//		}
+//		return total / v.perpendicular.edges.size();
+		double total = 0.0;
+		for (int j = 0; j < v.perpendicular.edges.size(); j++) {
+			total = Math.max(total,v.perpendicular.edges.get(j).intensity);
+		}
+		return total;
 	}
 
 	/**
