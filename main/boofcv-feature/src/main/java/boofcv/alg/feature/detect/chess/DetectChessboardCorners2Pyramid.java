@@ -148,10 +148,14 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 			//
 			// NOTE: With blurred images, the lower resolution images will have higher intensity
 			//       so as you go up scale intensity smoothly (more or less) increases
-			final double intensity = c0.intensity*(c0.first?2.0:1.0);
+			final double intensity = c0.intensity*(c0.first?8.0:1.0);
 
 			nnSearch.findNearest(c0,searchRadius,10,nnResults);
 			boolean maximum = true;
+
+			// Location accuracy is better at higher resolution but angle accuracy is better at lower resolution
+			// accept the new angle if it has higher corner intensity
+			ChessboardCorner resultsMax = c0;
 
 			for (int j = 0; j < nnResults.size; j++) {
 				ChessboardCorner c1 = nnResults.get(j).point;
@@ -160,11 +164,15 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 				} else {
 					maximum = false;
 				}
+				if( c1.intensity > resultsMax.intensity) {
+					resultsMax = c1;
+				}
 			}
 
 			if( !maximum ) {
 				c0.first = false;
 			}
+			c0.orientation = resultsMax.orientation;
 		}
 	}
 

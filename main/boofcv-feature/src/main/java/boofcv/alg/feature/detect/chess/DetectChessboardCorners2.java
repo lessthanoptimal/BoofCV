@@ -62,7 +62,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 	// Threshold used to filter out corners
 	double cornerIntensityThreshold = 1.0;
 
-	public float nonmaxThresholdRatio = 0.1f;
+	public float nonmaxThresholdRatio = 0.05f;
 	public double edgeIntensityRatioThreshold = 0.01;
 	public double edgeAspectRatioThreshold = 0.1;
 	public double cornerIntensity = 20;
@@ -174,7 +174,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 		borderImg.setImage(input);
 
 		blurFilter.process(input,blurred);
-		computeIntensity.process((GrayF32)blurred, intensity);
+		computeIntensity.process3((GrayF32)blurred, intensity);
 
 		intensityInterp.setImage(intensity);
 		inputInterp.setImage((GrayF32)input);
@@ -223,6 +223,9 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 			}
 
 			if( useMeanShift ) {
+				// TODO improve localization using KLT feature intensity?
+				//      x-corner intensity is more robust but less precise
+				// TODO is there a way to use the input image directly instead?
 				meanShift.search((float)c.x,(float)c.y);
 				c.x = meanShift.getPeakX();
 				c.y = meanShift.getPeakY();

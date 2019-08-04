@@ -58,9 +58,9 @@ public class ConfigChessboard implements Configuration {
 	public int pyramidTopSize = 100;
 
 	/**
-	 * How similar the direction of two corners relative to each other need to be.
+	 * How similar the direction of two corners relative to each other need to be. 0 to 1. Higher is more tolerant
 	 */
-	public double directionTol = 0.75;
+	public double directionTol = 0.85;
 
 	/**
 	 * How similar two corner orientations need to be
@@ -101,5 +101,9 @@ public class ConfigChessboard implements Configuration {
 	}
 
 	@Override
-	public void checkValidity() {}
+	public void checkValidity() {
+		if( directionTol < 0 || directionTol > 1 )
+			throw new IllegalArgumentException("directionTol must be 0 to 1");
+
+	}
 }

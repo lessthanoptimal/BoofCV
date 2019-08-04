@@ -114,6 +114,52 @@ public class XCornerAbeles2019Intensity {
 //		}
 	}
 
+	public void process3(GrayF32 input, GrayF32 intensity) {
+		int radiusA = 3;
+		int radiusD = 2;
+
+		final float ker0 = 0.25f;
+		final float ker1 = 0.25f;
+
+		intensity.reshape(input.width,input.height);
+		ImageMiscOps.fillBorder(intensity,0, radiusA);
+
+		BoofConcurrency.loopFor(radiusA,input.height-radiusA,y->{
+//		for (int y = radiusA; y < input.height - radiusA; y++) {
+			int outputIdx = intensity.startIndex + y*intensity.stride + radiusA;
+			for (int x = radiusA; x < input.width - radiusA; x++) {
+				float v00 = input.unsafe_get(x,y - 3);
+				float v01 = input.unsafe_get(x+1,y - 3);
+				float v02 = input.unsafe_get(x+2,y - 2);
+				float v03 = input.unsafe_get(x+3,y - 1 );
+				float v04 = input.unsafe_get(x+3,y + 0);
+				float v05 = input.unsafe_get(x+3,y + 1 );
+				float v06 = input.unsafe_get(x+2,y + 2 );
+				float v07 = input.unsafe_get(x+1,y + 3 );
+				float v08 = input.unsafe_get(x+0,y + 3 );
+				float v09 = input.unsafe_get(x-1,y + 3 );
+				float v10 = input.unsafe_get(x-2,y + 2 );
+				float v11 = input.unsafe_get(x-3,y + 1 );
+				float v12 = input.unsafe_get(x-3,y + 0 );
+				float v13 = input.unsafe_get(x-3,y - 1 );
+				float v14 = input.unsafe_get(x-2,y - 2 );
+				float v15 = input.unsafe_get(x-1,y - 3 );
+
+				float a = (v15+v00+v01);
+				float b = (v03+v04+v05);
+				float c = (v07+v08+v09);
+				float d = (v11+v12+v13);
+
+				float e = (v01+v02+v03);
+				float f = (v05+v06+v07);
+				float g = (v09+v10+v11);
+				float h = (v13+v14+v15);
+
+				intensity.data[outputIdx++] = Math.max(score7(a,b,c,d),score7(e,f,g,h))/9f;
+			}
+		});
+	}
+
 	private float score( float a , float b , float c , float d ) {
 		float mean = (a+b+c+d)/4f;
 		float div = mean + UtilEjml.F_EPS;

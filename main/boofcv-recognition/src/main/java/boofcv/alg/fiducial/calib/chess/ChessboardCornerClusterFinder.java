@@ -77,15 +77,12 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 	// TODO prune fake cluster borders by seeing of the edge continues a little bit past
 
-	// Tolerance for deciding if two directions are the same.
-	private double directionTol = 0.60;
-	// Tolerance for deciding of two corner orientations are the same.
+	// Tolerance for deciding if two directions are the same. 0 to 1. Higher is more tolerant
+	private double directionTol = 0.8;
+	// Tolerance for deciding of two corner orientations are the same. Radians
 	private double orientationTol = 0.50;
 	// Tolerance for how close two corners need to be to be considered ambiguous. Relative
 	private double ambiguousTol = 0.25;
-
-	// automatically computed
-	private double parallelTol; // angle tolerance for parallel lines. smaller than direction
 
 	// Number of nearest neighbors it will search. It's assumed that the feature detector does a very
 	// good job removing false positives, meaning that tons of features do not need to be considered
@@ -243,10 +240,17 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 					ChessboardCorner cb = corners.get(e.dst.index);
 					e.intensity = computeConnInten.process(ca, cb, e.direction);
 
+//					if(ca.distance(1754.6,1827.8)<2 &&  cb.distance(2351.7,1850.2)<2)
+//						System.out.println("Found it!");
+
+					// See if it's a x-corner at the scale determined by the line length
+					e.xcorner = true;//computeConnInten.computeXCorner(ca) && computeConnInten.computeXCorner(cb);
+
 					// find the equivalent edge from the destination vertex
 					int which = e.dst.perpendicular.find(v);
-					if( which != -1 ) {
+					if (which != -1) {
 						e.dst.perpendicular.get(which).intensity = e.intensity;
+						e.dst.perpendicular.get(which).xcorner = e.xcorner;
 					}
 				}
 			}
@@ -258,18 +262,18 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			Vertex v = vertexes.get(i);
 
 			// Compute an edge threshold using the intensity of the local edges
-			double threshold = meanIntensity(v);
+			double threshold = maxIntensityOfPerpendicular(v);
 			for (int j = 0; j < v.perpendicular.edges.size(); j++) {
-				threshold = Math.max(threshold,meanIntensity(v.perpendicular.edges.get(j).dst));
+				threshold = Math.max(threshold, maxIntensityOfPerpendicular(v.perpendicular.edges.get(j).dst));
 			}
 			threshold *= thresholdEdgeIntensity;
 
 			for (int j = v.perpendicular.edges.size() - 1; j >= 0; j--) {
 				Edge e = v.perpendicular.edges.get(j);
 
-				// Mark it to be pruned if too small
-				if (e.intensity < threshold) {
-					e.intensity = -Double.MAX_VALUE;
+				// Mark it to be pruned if too small or has invalid corners
+				if (e.intensity < threshold || !e.xcorner) {
+					e.invalidateIntensity();
 				}
 			}
 		}
@@ -291,7 +295,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		}
 	}
 
-	double meanIntensity( Vertex v ) {
+	double maxIntensityOfPerpendicular(Vertex v ) {
 //		double total = 0;
 //		for (int j = 0; j < v.perpendicular.edges.size(); j++) {
 //			total += v.perpendicular.edges.get(j).intensity;
@@ -350,10 +354,6 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	 * perpendicular.
 	 */
 	void findVertexNeighbors(Vertex target  , List<ChessboardCorner> corners ) {
-//		if( target.index == 18 ) {
-//			System.out.println("Vertex Neighbors "+target.index);
-//		}
-
 		ChessboardCorner targetCorner = corners.get(target.index);
 		// distance is Euclidean squared
 		double maxDist = Double.MAX_VALUE==maxNeighborDistance?maxNeighborDistance:maxNeighborDistance*maxNeighborDistance;
@@ -361,6 +361,9 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 		// storage distances here to find median distance of closest neighbors
 		distanceTmp.reset();
+
+//		if( targetCorner.distance(3003,1887) < 2 )
+//			System.out.println("Egads");
 
 		for (int i = 0; i < nnResults.size; i++) {
 			NnData<ChessboardCorner> r = nnResults.get(i);
@@ -388,19 +391,31 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			edge.distance = Math.sqrt(r.distance);
 			edge.dst = vertexes.get(r.index);
 			edge.direction = Math.atan2(dy,dx);
-			edge.intensity = -Double.MAX_VALUE;
+			edge.invalidateIntensity();
+			edge.xcorner = false;
 
 			double direction180 = UtilAngle.boundHalf(edge.direction);
-			double directionDiff = UtilAngle.distHalf(direction180,r.point.orientation);
+			double directionDiff_A = UtilAngle.distHalf(direction180,targetCorner.orientation);
+			double directionDiff_B = UtilAngle.distHalf(direction180,r.point.orientation);
 			boolean remove;
 			EdgeSet edgeSet;
 			if( parallel ) {
 				// test to see if direction and orientation are aligned or off by 90 degrees
-				remove = directionDiff > 2* directionTol && Math.abs(directionDiff-Math.PI/2.0) > 2* directionTol;
+//				double errorA = Math.min(directionDiff_A,Math.abs(directionDiff_A-Math.PI/2.0));
+//				double errorB = Math.min(directionDiff_B,Math.abs(directionDiff_B-Math.PI/2.0));
+//				remove = errorA > directionTol*Math.PI/4;
+//				remove |= errorB > directionTol*Math.PI/4;
+
+				remove = false;
+
 				edgeSet = target.parallel;
 			} else {
-				// should be at 45 degree angle
-				remove = Math.abs(directionDiff-Math.PI/4.0) > 2* directionTol;
+				// should be at 45 degree angle or 135 degrees
+				double errorA = Math.min(Math.abs(directionDiff_A-Math.PI/4.0), Math.abs(directionDiff_A-3*Math.PI/4.0));
+				double errorB = Math.min(Math.abs(directionDiff_B-Math.PI/4.0), Math.abs(directionDiff_B-3*Math.PI/4.0));
+
+				remove = errorA > directionTol*Math.PI/4;
+				remove |= errorB > directionTol*Math.PI/4;
 				edgeSet = target.perpendicular;
 			}
 
@@ -408,6 +423,9 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 				edges.removeTail();
 				continue;
 			}
+
+			if( targetCorner.distance(510,395) < 1.5 && r.point.distance(541,375) < 2)
+				System.out.println("Connected two edges. Parallel = "+parallel);
 
 			edgeSet.add(edge);
 		}
@@ -556,6 +574,10 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		if( target.perpendicular.size() <= 1 )
 			return;
 
+//		if( corners.get(target.index).distance(548,135) < 1.5 ) {
+//			System.out.println("Found it. idx="+target.index);
+//		}
+
 //		if( target.index == 16 ) {
 //			System.out.println("ASDSAD");
 //		}
@@ -625,6 +647,10 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	boolean findNext( int firstIdx , EdgeSet splitterSet , EdgeSet candidateSet ,
 					  double parallel,
 					  SearchResults results ) {
+
+		// maximum allowed error between the corner's angle and the edge's direction
+		final double tolCornerToEdge = Math.PI*0.4;
+
 		Edge e0 = candidateSet.get(firstIdx);
 
 		results.index = -1;
@@ -647,7 +673,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 				double a = UtilAngle.boundHalf(eI.direction);
 				double b = UtilAngle.boundHalf(parallel);
 				double distanceParallel = UtilAngle.distHalf(a,b);
-				if( distanceParallel > parallelTol ) {
+				if( distanceParallel > directionTol*Math.PI/4 ) {
 					continue;
 				}
 			}
@@ -662,7 +688,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 					e0.dst.perpendicular.get(tuple3.b).direction);
 			double error0 = UtilAngle.dist(acute0,Math.PI/2.0);
 
-			if( error0 > Math.PI*0.3 )
+			if( error0 > tolCornerToEdge )
 				continue;
 
 			double acute1 = UtilAngle.dist(
@@ -670,7 +696,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 					eI.dst.perpendicular.get(tuple3.c).direction);
 			double error1 = UtilAngle.dist(acute1,Math.PI/2.0);
 
-			if( error1 > Math.PI*0.3 )
+			if( error1 > tolCornerToEdge )
 				continue;
 
 			// Find the edge from corner 0 to corner i. The direction of this vector and the corner's
@@ -678,7 +704,6 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			int e0_to_eI = e0.dst.parallel.find(eI.dst);
 			if( e0_to_eI < 0 )
 				continue;
-
 
 			// The quadrilateral with the smallest area is most often the best solution. Area is more expensive
 			// so the perimeter is computed instead. one side is left off since all of them have that side
@@ -956,7 +981,6 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 	public void setDirectionTol(double directionTol) {
 		this.directionTol = directionTol;
-		this.parallelTol = directionTol /2;
 	}
 
 	public int getMaxNeighbors() {
@@ -1133,6 +1157,14 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		public double direction;
 		// Destination vertex
 		public Vertex dst;
+		public boolean xcorner;
+
+		public boolean isIntensityInvalid() {
+			return intensity == -Double.MAX_VALUE;
+		}
+		public void invalidateIntensity() {
+			intensity = -Double.MAX_VALUE;
+		}
 	}
 
 	private enum EdgeType {
