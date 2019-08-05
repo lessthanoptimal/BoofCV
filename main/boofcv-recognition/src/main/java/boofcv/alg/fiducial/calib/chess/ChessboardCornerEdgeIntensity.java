@@ -85,8 +85,8 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	 * @return the line intensity. more positive more intense. Units = pixels intensity
 	 */
 	public float process( ChessboardCorner ca , ChessboardCorner cb , double direction_a_to_b ) {
-		if( ca.distance(510,395) < 1.5 && cb.distance(541,375) < 2)
-			System.out.println("stop for intensity");
+//		if( ca.distance(510,395) < 1.5 && cb.distance(541,375) < 2)
+//			System.out.println("stop for intensity");
 
 		float cx = (float)ca.x;
 		float cy = (float)ca.y;
@@ -105,9 +105,8 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 			dy -= 2 * ny;
 		}
 
-		if( ca.distance(1041,80) < 2 && cb.distance(1294,232) < 2 )
-			System.out.println("Egads");
-
+//		if( ca.distance(1041,80) < 2 && cb.distance(1294,232) < 2 )
+//			System.out.println("Egads");
 
 		// move from one side to the other
 		// divide it into lengthSamples+1 regions and don't sample the tail ends

@@ -136,7 +136,7 @@ public class DetectCalibrationChessboardApp
 			configDetector.cornerRadius = controlPanel.radius;
 			configDetector.cornerThreshold = controlPanel.cornerThreshold;
 			configDetector.edgeThreshold = controlPanel.edgeThreshold;
-			configDetector.orientaitonTol = controlPanel.orientationTol;
+			configDetector.orientationTol = controlPanel.orientationTol;
 			configDetector.directionTol = controlPanel.directionTol;
 			configDetector.ambiguousTol = controlPanel.ambiguousTol;
 			if( controlPanel.maxDistance == 0 )
@@ -472,7 +472,7 @@ public class DetectCalibrationChessboardApp
 				radius = configDetector.cornerRadius;
 				ambiguousTol = configDetector.ambiguousTol;
 				directionTol = configDetector.directionTol;
-				orientationTol = configDetector.orientaitonTol;
+				orientationTol = configDetector.orientationTol;
 
 				cornerThreshold = configDetector.cornerThreshold;
 				edgeThreshold = configDetector.edgeThreshold;

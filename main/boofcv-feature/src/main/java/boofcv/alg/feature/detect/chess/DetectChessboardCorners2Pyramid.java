@@ -98,6 +98,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 				ChessboardCorner cl = featsLevel.corners.grow();
 				cl.first = true;
 				cl.set(x,y,cf.orientation,cf.intensity);
+				cl.constrast = cf.constrast;
 			}
 			scale /= 2.0;
 		}
@@ -173,6 +174,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 				c0.first = false;
 			}
 			c0.orientation = resultsMax.orientation;
+			c0.intensity = resultsMax.intensity;
 		}
 	}
 

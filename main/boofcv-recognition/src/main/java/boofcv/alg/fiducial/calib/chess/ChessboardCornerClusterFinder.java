@@ -238,75 +238,37 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 				// Avoid computing the edge's intensity twice
 				if( e.intensity == -Double.MAX_VALUE ) {
 					ChessboardCorner cb = corners.get(e.dst.index);
-					e.intensity = computeConnInten.process(ca, cb, e.direction);
+
+					double contrast = (ca.constrast + cb.constrast)/2;
+
+					e.intensity = computeConnInten.process(ca, cb, e.direction)/contrast;
+
+					if( e.intensity >= thresholdEdgeIntensity ) {
+						e.xcorner = true;//computeConnInten.computeXCorner(ca) && computeConnInten.computeXCorner(cb);
+
+						// find the equivalent edge from the destination vertex
+						int which = e.dst.perpendicular.find(v);
+						if (which != -1) {
+							e.dst.perpendicular.get(which).intensity = e.intensity;
+							e.dst.perpendicular.get(which).xcorner = e.xcorner;
+						}
+					} else {
+						v.perpendicular.edges.remove(j);
+						int idx = e.dst.perpendicular.find(v);
+						if (idx >= 0)
+							e.dst.perpendicular.edges.remove(idx);
+					}
 
 //					if(ca.distance(1754.6,1827.8)<2 &&  cb.distance(2351.7,1850.2)<2)
 //						System.out.println("Found it!");
 
 					// See if it's a x-corner at the scale determined by the line length
-					e.xcorner = true;//computeConnInten.computeXCorner(ca) && computeConnInten.computeXCorner(cb);
 
-					// find the equivalent edge from the destination vertex
-					int which = e.dst.perpendicular.find(v);
-					if (which != -1) {
-						e.dst.perpendicular.get(which).intensity = e.intensity;
-						e.dst.perpendicular.get(which).xcorner = e.xcorner;
-					}
-				}
-			}
-		}
-
-		// Mark edges to be pruned. You don't want to prune them here since that will change the dynamic
-		// threshold and makes output determined by the vertex.
-		for (int i = 0; i < vertexes.size; i++) {
-			Vertex v = vertexes.get(i);
-
-			// Compute an edge threshold using the intensity of the local edges
-			double threshold = maxIntensityOfPerpendicular(v);
-			for (int j = 0; j < v.perpendicular.edges.size(); j++) {
-				threshold = Math.max(threshold, maxIntensityOfPerpendicular(v.perpendicular.edges.get(j).dst));
-			}
-			threshold *= thresholdEdgeIntensity;
-
-			for (int j = v.perpendicular.edges.size() - 1; j >= 0; j--) {
-				Edge e = v.perpendicular.edges.get(j);
-
-				// Mark it to be pruned if too small or has invalid corners
-				if (e.intensity < threshold || !e.xcorner) {
-					e.invalidateIntensity();
-				}
-			}
-		}
-
-		// Prune marked edges
-		for (int i = 0; i < vertexes.size; i++) {
-			Vertex v = vertexes.get(i);
-			for (int j = v.perpendicular.edges.size() - 1; j >= 0; j--) {
-				Edge e = v.perpendicular.edges.get(j);
-
-				// prune if marked
-				if (e.intensity == -Double.MAX_VALUE) {
-					v.perpendicular.edges.remove(j);
-					int idx = e.dst.perpendicular.find(v);
-					if (idx >= 0)
-						e.dst.perpendicular.edges.remove(idx);
 				}
 			}
 		}
 	}
 
-	double maxIntensityOfPerpendicular(Vertex v ) {
-//		double total = 0;
-//		for (int j = 0; j < v.perpendicular.edges.size(); j++) {
-//			total += v.perpendicular.edges.get(j).intensity;
-//		}
-//		return total / v.perpendicular.edges.size();
-		double total = 0.0;
-		for (int j = 0; j < v.perpendicular.edges.size(); j++) {
-			total = Math.max(total,v.perpendicular.edges.get(j).intensity);
-		}
-		return total;
-	}
 
 	/**
 	 * Prints the graph. Used for debugging the code.

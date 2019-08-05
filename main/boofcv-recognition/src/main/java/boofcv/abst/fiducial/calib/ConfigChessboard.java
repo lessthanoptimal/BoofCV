@@ -47,9 +47,9 @@ public class ConfigChessboard implements Configuration {
 
 	/**
 	 * Relative threshold for two corners being connected. The edge between them must have sufficient intensity.
-	 * The definition of sufficient is based on the intensity of other local edges.
+	 * The definition of sufficient is based on the contrast of the two x-corners.
 	 */
-	public double edgeThreshold = 0.05;
+	public double edgeThreshold = 0.3;
 
 	/**
 	 * The minimum allowed size for the top most layer in the pyramid. size = min(width,height). To have
@@ -65,7 +65,7 @@ public class ConfigChessboard implements Configuration {
 	/**
 	 * How similar two corner orientations need to be
 	 */
-	public double orientaitonTol = 0.65;
+	public double orientationTol = 0.65;
 
 	/**
 	 * Ratio used to decide if two corners are spatially close enough to each other to be considered

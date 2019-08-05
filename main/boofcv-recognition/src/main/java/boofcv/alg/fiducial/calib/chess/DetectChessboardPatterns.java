@@ -58,7 +58,7 @@ public class DetectChessboardPatterns<T extends ImageGray<T>> {
 
 		clusterFinder.setAmbiguousTol(config.ambiguousTol);
 		clusterFinder.setDirectionTol(config.directionTol);
-		clusterFinder.setOrientationTol(config.orientaitonTol);
+		clusterFinder.setOrientationTol(config.orientationTol);
 		clusterFinder.setMaxNeighbors(config.maxNeighbors);
 		clusterFinder.setMaxNeighborDistance(config.maxNeighborDistance);
 		clusterFinder.setThresholdEdgeIntensity(config.edgeThreshold);

@@ -506,6 +506,9 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 
 		corner.intensity = -bestScore*stdev/(sumDifference + UtilEjml.EPS);
 
+		// Compute difference between white and black region
+		corner.constrast = (scoreDiam[(bestSpoke+numSpokeDiam/2)%numSpokeDiam] - scoreDiam[bestSpoke])/2.0;
+
 		return corner.intensity >= cornerIntensity;
 	}
 

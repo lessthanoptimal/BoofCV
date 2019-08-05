@@ -31,9 +31,16 @@ public class ChessboardCorner extends Point2D_F64 {
 	 */
 	public double orientation;
 	/**
-	 * Used to judge how good of a fit the corner is to an ideal chessboard corner.
+	 * Used to judge how good of a fit the corner is to an ideal chessboard corner. Higher the value
+	 * the more x-corner like
 	 */
 	public double intensity;
+
+	/**
+	 * The white region subtracted the black region at the chessboard corner. Can be used later on
+	 * for locally adaptive thresholds
+	 */
+	public double constrast;
 
 	public double intensityXCorner;
 
@@ -50,6 +57,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		intensityXCorner = Double.NaN;
 		edgeIntensity = -1;
 		edgeRatio = -1;
+		constrast = 0;
 		first = false;
 	}
 
@@ -57,6 +65,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		super.set(c);
 		this.orientation = c.orientation;
 		this.intensity = c.intensity;
+		this.constrast = c.constrast;
 	}
 
 	public void set(double x, double y, double angle, double intensity) {
