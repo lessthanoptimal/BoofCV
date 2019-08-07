@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,8 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.abst.filter.derivative.ImageHessian;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.transform.pyramid.impl.ImplPyramidOps;
+import boofcv.alg.transform.pyramid.impl.ImplPyramidOps_MT;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -152,9 +154,17 @@ public class PyramidOps {
 	public static <T extends ImageGray<T>>
 	void scaleDown2(T input , T output ) {
 		if( input instanceof GrayF32) {
-			ImplPyramidOps.scaleDown2((GrayF32)input,(GrayF32)output);
+			if(BoofConcurrency.USE_CONCURRENT) {
+				ImplPyramidOps_MT.scaleDown2((GrayF32) input, (GrayF32) output);
+			} else {
+				ImplPyramidOps.scaleDown2((GrayF32) input, (GrayF32) output);
+			}
 		} else if( input instanceof GrayU8) {
-			ImplPyramidOps.scaleDown2((GrayU8)input,(GrayU8)output);
+			if(BoofConcurrency.USE_CONCURRENT) {
+				ImplPyramidOps_MT.scaleDown2((GrayU8) input, (GrayU8) output);
+			} else {
+				ImplPyramidOps.scaleDown2((GrayU8) input, (GrayU8) output);
+			}
 		} else {
 			throw new IllegalArgumentException("Image type not yet supported");
 		}
@@ -170,9 +180,17 @@ public class PyramidOps {
 		if( scale <= 1 )
 			throw new IllegalArgumentException("Scale must be >= 2");
 		if( input instanceof GrayF32) {
-			ImplPyramidOps.scaleImageUp((GrayF32)input,(GrayF32)output,scale,(InterpolatePixelS)interp);
+			if(BoofConcurrency.USE_CONCURRENT) {
+				ImplPyramidOps_MT.scaleImageUp((GrayF32) input, (GrayF32) output, scale, (InterpolatePixelS) interp);
+			} else {
+				ImplPyramidOps.scaleImageUp((GrayF32) input, (GrayF32) output, scale, (InterpolatePixelS) interp);
+			}
 		} else if( input instanceof GrayU8) {
-			ImplPyramidOps.scaleImageUp((GrayU8)input,(GrayU8)output,scale,(InterpolatePixelS)interp);
+			if(BoofConcurrency.USE_CONCURRENT) {
+				ImplPyramidOps_MT.scaleImageUp((GrayU8) input, (GrayU8) output, scale, (InterpolatePixelS) interp);
+			} else {
+				ImplPyramidOps.scaleImageUp((GrayU8) input, (GrayU8) output, scale, (InterpolatePixelS) interp);
+			}
 		} else {
 			throw new IllegalArgumentException("Image type not yet supported");
 		}
