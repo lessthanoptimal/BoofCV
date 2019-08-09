@@ -26,6 +26,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageGray;
 import georegression.metric.UtilAngle;
 import org.ddogleg.sorting.QuickSelect;
+import org.ddogleg.struct.GrowQueue_F32;
 
 /**
  * Computes edge intensity for the line between two corners. Assumes the edge is approximately straight. This means
@@ -44,6 +45,7 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	 */
 	private int lengthSamples=10;
 	private float[] sampleValues = new float[lengthSamples];
+	private GrowQueue_F32 samples = new GrowQueue_F32();
 
 	/**
 	 * Number of points radially outwards along the line that are sampled
@@ -110,10 +112,20 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 
 		// move from one side to the other
 		// divide it into lengthSamples+1 regions and don't sample the tail ends
+		float maxLongitudinal = 0;
+		float prevLong=0;
 		for (int i = 1; i <= lengthSamples; i++) {
 			float f = ((float)i)/(lengthSamples+1);
 			float x0 = cx+dx*f;
 			float y0 = cy+dy*f;
+
+			float v = interpolate.get(x0,y0);
+			float d = Math.abs(v-prevLong);
+			if( i > 1 ) {
+				if( d > maxLongitudinal )
+					maxLongitudinal = d;
+			}
+			prevLong = v;
 
 			float maxValue = -Float.MAX_VALUE;
 
@@ -129,7 +141,63 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 
 		// Select one of the most intense values.
 		// Originally min was used but that proved too sensitive to outliers
-		return QuickSelect.select(sampleValues,2,lengthSamples);
+		return QuickSelect.select(sampleValues,2,lengthSamples)-maxLongitudinal;
+	}
+
+	public float longitudinalEdge( ChessboardCorner ca , ChessboardCorner cb , double direction_a_to_b ) {
+		float cx = (float)ca.x;
+		float cy = (float)ca.y;
+		float dx = (float)(cb.x-ca.x);
+		float dy = (float)(cb.y-ca.y);
+
+		// find the direction that it should be and the magnitude of the step in tangential direction
+		computeUnitNormal(ca, direction_a_to_b, dx, dy);
+
+		tx /= 2;
+		ty /= 2;
+
+		// step away from the corner points. This is only really important with small chessboard where the samples
+		// will put it next to the corner
+		if( lineLength > 2f ) {
+			cx += nx;
+			cy += ny;
+			dx -= 2 * nx;
+			dy -= 2 * ny;
+		}
+
+		float previousA=Float.NaN;
+		float previousB=Float.NaN;
+		float previousC=Float.NaN;
+
+		samples.reset();
+		for (int i = 0; i < lengthSamples; i++) {
+			float f = ((float)(i+2))/(lengthSamples+4);
+
+			float x = cx+dx*f;
+			float y = cy+dy*f;
+
+			float valA = interpolate.get(x-ty,y+tx);
+			float valB = interpolate.get(x,y);
+			float valC = interpolate.get(x+ty,y-tx);
+
+			if( i > 0 )
+				samples.add( Math.abs(valB-previousB));
+			if( i > 2 && i < lengthSamples-2 ) {
+				samples.add( Math.abs(valA-previousA));
+				samples.add( Math.abs(valC-previousC));
+			}
+			previousA = valA;
+			previousB = valB;
+			previousC = valC;
+		}
+
+		float maxValue = 0;
+		for (int i = 0; i < samples.size; i++) {
+			maxValue = Math.max(maxValue,samples.data[i]);
+		}
+		return maxValue;
+
+//		return QuickSelect.select(samples.data,samples.size-2,samples.size);
 	}
 
 	/**

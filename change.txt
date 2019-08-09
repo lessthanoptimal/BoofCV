@@ -23,6 +23,7 @@ TODO Scene Reconstruction from arbitrary number of photos
 TODO regression for line detectors
 TODO hough circle detector
 TODO concurrent SIFT
+TODO figure out why circulant is slower if concurrent
 
 ---------------------------------------------
 Date    : 2019-July-07

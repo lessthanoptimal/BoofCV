@@ -175,6 +175,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 			}
 			c0.orientation = resultsMax.orientation;
 			c0.intensity = resultsMax.intensity;
+			c0.constrast = resultsMax.constrast;
 		}
 	}
 

@@ -22,6 +22,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder.LineInfo;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder.Vertex;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
@@ -339,39 +340,49 @@ public class DetectCalibrationChessboardApp
 				}
 			}
 
-			if( controlPanel.showConnections ) {
+			if( controlPanel.showParallel || controlPanel.showPerpendicular ) {
 				// Locking the algorithm will kill performance.
 				synchronized (lockAlgorithm) {
 					Font regular = new Font("Serif", Font.PLAIN, 12);
 					g2.setFont(regular);
 					g2.setStroke(new BasicStroke(1));
-					List<Vertex> vertexes = detector.getClusterFinder().getVertexes().toList();
+//					List<Vertex> vertexes = detector.getClusterFinder().getVertexes().toList();
+					List<LineInfo> lines = detector.getClusterFinder().getLines().toList();
 
-					for (int i = 0; i < vertexes.size(); i++) {
-						Vertex a = vertexes.get(i);
-						ChessboardCorner ca = foundCorners.get(a.index);
+					for (int i = 0; i < lines.size(); i++) {
+						LineInfo lineInfo = lines.get(i);
+						if( lineInfo.isDisconnected() )
+							continue;
+						if( lineInfo.parallel && !controlPanel.showParallel )
+							continue;
+						if( !lineInfo.parallel && !controlPanel.showPerpendicular )
+							continue;
 
-						for (int j = 0; j < a.perpendicular.size(); j++) {
-							double intensity = a.perpendicular.get(j).intensity;
-							if( intensity == -Double.MAX_VALUE )
-								intensity = Double.NaN;
-							Vertex b = a.perpendicular.get(j).dst;
-							ChessboardCorner cb = foundCorners.get(b.index);
+						Vertex va = lineInfo.endA.dst;
+						Vertex vb = lineInfo.endB.dst;
 
-							line.setLine(ca.x * scale, ca.y * scale, cb.x * scale, cb.y * scale);
-							// Use color to indicate if it's mutual or not
-							if (b.perpendicular.find(a) != -1)
-								g2.setColor(Color.BLUE);
-							else
-								g2.setColor(Color.MAGENTA);
-							g2.draw(line);
+						ChessboardCorner ca = foundCorners.get(va.index);
+						ChessboardCorner cb = foundCorners.get(vb.index);
 
-							float x = (float) ((ca.x + cb.x) / 2.0);
-							float y = (float) ((ca.y + cb.y) / 2.0);
+//						if( !(ca.distance(2524.6,2431.1) < 1.5 || cb.distance(2524.6,2431.1) < 1.5 ))
+//							continue;
 
-							g2.setColor(Color.RED);
-							g2.drawString(String.format("%.1f", intensity), x * (float) scale, y * (float) scale);
+						double intensity = lineInfo.intensity == -Double.MAX_VALUE ? Double.NaN : lineInfo.intensity;
+						line.setLine(ca.x * scale, ca.y * scale, cb.x * scale, cb.y * scale);
+
+						if( lineInfo.parallel ) {
+							g2.setColor(Color.BLUE);
+						} else {
+							g2.setColor(Color.CYAN);
 						}
+
+						g2.draw(line);
+
+						float x = (float) ((ca.x + cb.x) / 2.0);
+						float y = (float) ((ca.y + cb.y) / 2.0);
+
+						g2.setColor(Color.RED);
+						g2.drawString(String.format("%.1f", intensity), x * (float) scale, y * (float) scale);
 					}
 				}
 			}
@@ -441,7 +452,8 @@ public class DetectCalibrationChessboardApp
 		JCheckBox checkShowTargets;
 		JCheckBox checkShowNumbers;
 		JCheckBox checkShowClusters;
-		JCheckBox checkShowConnections;
+		JCheckBox checkShowParallel;
+		JCheckBox checkShowPerpendicular;
 		JCheckBox checkShowCorners;
 		JCheckBox checkMeanShift;
 		JCheckBox checkAnyGrid;
@@ -459,7 +471,8 @@ public class DetectCalibrationChessboardApp
 		boolean showChessboards = true;
 		boolean showNumbers = true;
 		boolean showClusters = false;
-		boolean showConnections = false;
+		boolean showParallel = false;
+		boolean showPerpendicular = false;
 		boolean showCorners = false;
 		boolean logItensity =false;
 		int view = 1;
@@ -495,7 +508,8 @@ public class DetectCalibrationChessboardApp
 			checkShowTargets = checkbox("Chessboard", showChessboards);
 			checkShowNumbers = checkbox("Numbers", showNumbers);
 			checkShowClusters = checkbox("Clusters", showClusters);
-			checkShowConnections = checkbox("Connections", showConnections);
+			checkShowParallel = checkbox("Parallel", showParallel);
+			checkShowPerpendicular = checkbox("Perp.", showPerpendicular);
 			checkShowCorners = checkbox("Corners", showCorners);
 			checkMeanShift = checkbox("Mean Shift", meanShift);
 			checkAnyGrid = checkbox("Any Grid",anyGrid);
@@ -524,7 +538,8 @@ public class DetectCalibrationChessboardApp
 			panel.add(checkShowTargets);
 			panel.add(checkShowNumbers);
 			panel.add(checkShowClusters);
-			panel.add(checkShowConnections);
+			panel.add(checkShowParallel);
+			panel.add(checkShowPerpendicular);
 			panel.add(checkShowCorners);
 			panel.add(checkLogIntensity);
 
@@ -573,8 +588,11 @@ public class DetectCalibrationChessboardApp
 			} else if( e.getSource() == checkShowClusters) {
 				showClusters = checkShowClusters.isSelected();
 				imagePanel.repaint();
-			} else if( e.getSource() == checkShowConnections) {
-				showConnections = checkShowConnections.isSelected();
+			} else if( e.getSource() == checkShowParallel) {
+				showParallel = checkShowParallel.isSelected();
+				imagePanel.repaint();
+			} else if( e.getSource() == checkShowPerpendicular) {
+				showPerpendicular = checkShowPerpendicular.isSelected();
 				imagePanel.repaint();
 			} else if( e.getSource() == checkMeanShift) {
 				meanShift = checkMeanShift.isSelected();
