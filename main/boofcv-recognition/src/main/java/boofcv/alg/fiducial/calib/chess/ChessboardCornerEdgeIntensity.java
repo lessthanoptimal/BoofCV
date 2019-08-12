@@ -87,7 +87,9 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	 * @return the line intensity. more positive more intense. Units = pixels intensity
 	 */
 	public float process( ChessboardCorner ca , ChessboardCorner cb , double direction_a_to_b ) {
-//		if( ca.distance(510,395) < 1.5 && cb.distance(541,375) < 2)
+//		if( ca.distance(392,970) < 1.5 && cb.distance(385,937) < 2)
+//			System.out.println("stop for intensity");
+//		if( cb.distance(392,970) < 1.5 && ca.distance(385,937) < 2)
 //			System.out.println("stop for intensity");
 
 		float cx = (float)ca.x;
@@ -96,19 +98,16 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 		float dy = (float)(cb.y-ca.y);
 
 		// find the direction that it should be and the magnitude of the step in tangential direction
-		computeUnitNormal(ca, direction_a_to_b, dx, dy);
+		computeUnitNormal(ca,cb, direction_a_to_b, dx, dy);
 
 		// step away from the corner points. This is only really important with small chessboard where the samples
 		// will put it next to the corner
-		if( lineLength > 2f ) {
-			cx += nx;
-			cy += ny;
-			dx -= 2 * nx;
-			dy -= 2 * ny;
-		}
-
-//		if( ca.distance(1041,80) < 2 && cb.distance(1294,232) < 2 )
-//			System.out.println("Egads");
+//		if( lineLength > 2f ) {
+//			cx += nx;
+//			cy += ny;
+//			dx -= 2 * nx;
+//			dy -= 2 * ny;
+//		}
 
 		// move from one side to the other
 		// divide it into lengthSamples+1 regions and don't sample the tail ends
@@ -151,7 +150,7 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 		float dy = (float)(cb.y-ca.y);
 
 		// find the direction that it should be and the magnitude of the step in tangential direction
-		computeUnitNormal(ca, direction_a_to_b, dx, dy);
+		computeUnitNormal(ca,cb, direction_a_to_b, dx, dy);
 
 		tx /= 2;
 		ty /= 2;
@@ -271,7 +270,7 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	 * @param dx b.x - a.x
 	 * @param dy b.y - a.y
 	 */
-	void computeUnitNormal(ChessboardCorner ca, double direction_a_to_b, float dx, float dy) {
+	void computeUnitNormal(ChessboardCorner ca, ChessboardCorner cb, double direction_a_to_b, float dx, float dy) {
 		lineLength = (float)Math.sqrt(dx*dx + dy*dy);
 
 		// it will now have a normal of 1
@@ -286,9 +285,27 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 
 		double dir0 = UtilAngle.boundHalf(direction_a_to_b);
 		double dir1 = UtilAngle.boundHalf(ca.orientation-Math.PI/4);
-		if(UtilAngle.distHalf(dir0,dir1) < Math.PI/4.0 ) {
-			tx = -tx;
-			ty = -ty;
+
+		double distA = UtilAngle.distHalf(dir0,dir1);
+
+		dir0 = UtilAngle.boundHalf(UtilAngle.bound(direction_a_to_b+Math.PI));
+		dir1 = UtilAngle.boundHalf(cb.orientation+Math.PI/4);
+
+		double distB = UtilAngle.distHalf(dir0,dir1);
+
+		// Under fisheye distortion it's possible to have a corner's orientation point along the line connecting
+		// two corners. In that situation you should go with the corner that has an orientation with the
+		// most discrimination
+		if( UtilAngle.distHalf(distA,Math.PI/4.0) > UtilAngle.distHalf(distB,Math.PI/4.0) ) {
+			if(distA < Math.PI/4.0 ) {
+				tx = -tx;
+				ty = -ty;
+			}
+		} else {
+			if(distB < Math.PI/4.0 ) {
+				tx = -tx;
+				ty = -ty;
+			}
 		}
 	}
 

@@ -58,7 +58,7 @@ import static boofcv.misc.CircularIndex.addOffset;
  *
  * @author Peter Abeles
  */
-public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGray<D>> {
+public class DetectChessboardCorners2<T extends ImageGray<T>> {
 	// Threshold used to filter out corners
 	double cornerIntensityThreshold = 1.0;
 
@@ -527,6 +527,10 @@ public class DetectChessboardCorners2<T extends ImageGray<T>, D extends ImageGra
 			}
 			smoothedDiam[i] = sum;
 		}
+	}
+
+	public T getBlurred() {
+		return blurred;
 	}
 
 	public GrayF32 getIntensity() {

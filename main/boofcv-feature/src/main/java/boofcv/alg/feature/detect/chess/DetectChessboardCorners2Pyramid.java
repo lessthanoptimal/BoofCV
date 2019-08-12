@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends ImageGray<D>> {
+public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 	// minimum number of pixels in the top most level in the pyramid
 	// If <= 0 then have a single layer at full resolution
 	int pyramidTopSize = 100;
@@ -46,7 +46,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 	int radius = 7;
 
 	// Corner detector
-	DetectChessboardCorners2<T,D> detector;
+	DetectChessboardCorners2<T> detector;
 
 	// Detection results for each layer in the pyramid
 	FastQueue<PyramidLevel> featureLevels = new FastQueue<>(PyramidLevel.class, PyramidLevel::new);
@@ -59,7 +59,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 	NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
 	FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData.class,true);
 
-	public DetectChessboardCorners2Pyramid(DetectChessboardCorners2<T,D> detector) {
+	public DetectChessboardCorners2Pyramid(DetectChessboardCorners2<T> detector) {
 		this.detector = detector;
 	}
 
@@ -227,7 +227,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>, D extends I
 		FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner.class,true);
 	}
 
-	public DetectChessboardCorners2<T,D>  getDetector() {
+	public DetectChessboardCorners2<T>  getDetector() {
 		return detector;
 	}
 
