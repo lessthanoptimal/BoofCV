@@ -130,7 +130,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>> {
 
 		{
 			ConfigExtract config = new ConfigExtract();
-			config.radius = 3;
+			config.radius = 1;
 			config.threshold = 0;
 			config.detectMaximums = true;
 			config.detectMinimums = false;

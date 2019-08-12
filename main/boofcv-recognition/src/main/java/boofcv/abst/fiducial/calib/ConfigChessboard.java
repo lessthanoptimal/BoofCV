@@ -37,7 +37,7 @@ public class ConfigChessboard implements Configuration {
 	 * Size of a corner in the corner detector. For very small targets 1 is required. Otherwise 2 provides
 	 * much more stable results.
 	 */
-	public int cornerRadius = 2;
+	public int cornerRadius = 1;
 
 	/**
 	 * Second threshold on corner intensity. This is applied after orientation has been estimated and is used

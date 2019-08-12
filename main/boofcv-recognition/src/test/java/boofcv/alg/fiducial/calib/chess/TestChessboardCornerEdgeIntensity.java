@@ -80,23 +80,23 @@ class TestChessboardCornerEdgeIntensity {
 		double n = 20/15.0;
 
 		// horizontal relationship
-		alg.computeUnitNormal(a11,0.0,20,0);
+		alg.computeUnitNormal(a11,a12,0.0,20,0);
 		assertEquals(0.0,alg.nx, UtilEjml.TEST_F32);
 		assertEquals(-n,alg.ny, UtilEjml.TEST_F32);
 
-		alg.computeUnitNormal(a12,Math.PI,-20,0);
+		alg.computeUnitNormal(a12,a11,Math.PI,-20,0);
 		assertEquals(0.0,alg.nx, UtilEjml.TEST_F32);
 		assertEquals(-n,alg.ny, UtilEjml.TEST_F32);
-		alg.computeUnitNormal(a12,-Math.PI,-20,0);
+		alg.computeUnitNormal(a12,a11,-Math.PI,-20,0);
 		assertEquals(0.0,alg.nx, UtilEjml.TEST_F32);
 		assertEquals(-n,alg.ny, UtilEjml.TEST_F32);
 
 		// vertical relationship
-		alg.computeUnitNormal(a11,Math.PI/2.0,0,20);
+		alg.computeUnitNormal(a11,a12,Math.PI/2.0,0,20);
 		assertEquals(-n,alg.nx, UtilEjml.TEST_F32);
 		assertEquals( 0.0,alg.ny, UtilEjml.TEST_F32);
 
-		alg.computeUnitNormal(a12,-Math.PI/2.0,0,-20);
+		alg.computeUnitNormal(a12,a12,-Math.PI/2.0,0,-20);
 		assertEquals(-n,alg.nx, UtilEjml.TEST_F32);
 		assertEquals( 0.0,alg.ny, UtilEjml.TEST_F32);
 	}
