@@ -28,6 +28,7 @@ import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
 import org.ddogleg.sorting.QuickSort_F64;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_B;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -75,8 +76,6 @@ import java.util.List;
 @SuppressWarnings({"WeakerAccess", "ForLoopReplaceableByForEach"})
 public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
-	// TODO prune fake cluster borders by seeing of the edge continues a little bit past
-
 	// Tolerance for deciding if two directions are the same. 0 to 1. Higher is more tolerant
 	private double directionTol = 0.8;
 	// Tolerance for deciding of two corner orientations are the same. Radians
@@ -86,7 +85,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 	// Number of nearest neighbors it will search. It's assumed that the feature detector does a very
 	// good job removing false positives, meaning that tons of features do not need to be considered
-	private int maxNeighbors=20; // 8 is minimum number given perfect data.
+	private int maxNeighbors=14; // 8 is minimum number given perfect data.
 	private double maxNeighborDistance=Double.MAX_VALUE; // maximum distance away (pixels Euclidean squared) a neighbor can be
 
 	// Computes the intensity of the line which connects two corners
@@ -130,6 +129,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	// Workspace for connecting vertices
 	private List<Edge> bestSolution = new ArrayList<>();
 	private List<Edge> solution = new ArrayList<>();
+	private FastQueue<PairIdx> pairs = new FastQueue<>(PairIdx.class, PairIdx::new);
+	private GrowQueue_B matched = new GrowQueue_B();
 
 	public ChessboardCornerClusterFinder( Class<T> imageType ) {
 		this(new ChessboardCornerEdgeIntensity<>(imageType));
@@ -165,11 +166,11 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		// Initialize nearest-neighbor search.
 		nn.setPoints(corners,true);
 
-		// TODO Should edges always be mutual now?
-
 		// Connect corners to each other based on relative distance on orientation
 		for (int i = 0; i < corners.size(); i++) {
 			findVertexNeighbors(vertexes.get(i),corners);
+			// Order edges by angle to simplify later processing
+			vertexes.get(i).perpendicular.sortByAngle();
 		}
 
 		// If more than one vertex's are near each other, pick one and remove the others
@@ -188,7 +189,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		for (int idx = 0; idx < vertexes.size(); idx++) {
 			selectConnections(vertexes.get(idx));
 		}
-//		printConnectionGraph();
+		//		printConnectionGraph();
 
 		// Connects must be mutual to be accepted. Keep track of vertexes which were modified
 		dirtyVertexes.clear();
@@ -220,29 +221,6 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		convertToOutput(corners);
 	}
 
-//	public void check() {
-//		System.out.println("Running check");
-//		int total = 0;
-//		for( LineInfo line : lines.toList() ) {
-//			if( line.isDisconnected() || line.parallel )
-//				continue;
-//
-//			total++;
-//			Vertex va = line.endA.dst;
-//			Vertex vb = line.endB.dst;
-//
-//			ChessboardCorner ca = corners.get(va.index);
-//			ChessboardCorner cb = corners.get(vb.index);
-//
-//			if( ca.distance(2524.6,2431.1) < 1.5 && cb.distance(3184.9,2365.3) < 1.5 ) {
-//				System.out.println("Survived "+line.intensity+" "+line.parallel);
-//			} else if( cb.distance(2524.6,2431.1) < 1.5 && ca.distance(3184.9,2365.3) < 1.5 ) {
-//				System.out.println("Survived "+line.intensity+" "+line.parallel);
-//			}
-//		}
-//		System.out.println("total perp "+total);
-//	}
-
 	/**
 	 * Computes edge intensity and prunes connections if it's too low relative
 	 *
@@ -252,8 +230,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		for (int i = 0; i < lines.size; i++) {
 			LineInfo line = lines.get(i);
 
-			// TODO prune parallel lines
-			if( line.isDisconnected() )
+			if( line.isDisconnected() || line.parallel )
 				continue;
 
 			Vertex va = line.endA.dst;
@@ -263,34 +240,16 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			ChessboardCorner cb = corners.get(vb.index);
 
 			double contrast = (ca.constrast + cb.constrast)/2;
+//			double contrast = Math.max(ca.constrast , cb.constrast);
 
-			if( line.parallel ) {
-				// TODO explain why edge intensity for parallel lines is a bad idea. blurred images, extreme distortion, ..etc
-				line.intensity = 1.0 - computeConnInten.longitudinalEdge(ca, cb, line.endA.direction) / contrast;
-			} else {
-				line.intensity = computeConnInten.process(ca, cb, line.endA.direction) / contrast;
-			}
-
-			if( ca.distance(2524.6,2431.1) < 1.5 && cb.distance(3184.9,2365.3) < 1.5 ) {
-				System.out.println("So intenense "+line.intensity+" "+line.parallel);
-			} else if( cb.distance(2524.6,2431.1) < 1.5 && ca.distance(3184.9,2365.3) < 1.5 ) {
-				System.out.println("So intenense "+line.intensity+" "+line.parallel);
-			}
+			line.intensity = computeConnInten.process(ca, cb, line.endA.direction) / contrast;
 
 			if( line.intensity < thresholdEdgeIntensity ) {
-				if( line.parallel ) {
-//					if( !va.parallel.remove(line) )
-//						throw new RuntimeException("BUG");
-//					if( !vb.parallel.remove(line) )
-//						throw new RuntimeException("BUG");
-//					line.disconnect();
-				} else {
-					if( !va.perpendicular.remove(line) )
-						throw new RuntimeException("BUG");
-					if( !vb.perpendicular.remove(line) )
-						throw new RuntimeException("BUG");
-					line.disconnect();
-				}
+				if( !va.perpendicular.remove(line) )
+					throw new RuntimeException("BUG");
+				if( !vb.perpendicular.remove(line) )
+					throw new RuntimeException("BUG");
+				line.disconnect();
 			}
 		}
 	}
@@ -309,12 +268,6 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			System.out.printf("["+format+"] {%3.0f, %3.0f} ->  90[ ",n.index,c.x,c.y);
 			for (int i = 0; i < n.perpendicular.size(); i++) {
 				Edge e = n.perpendicular.get(i);
-				System.out.printf(format+" ",e.dst.index);
-			}
-			System.out.println("]");
-			System.out.print("                -> 180[ ");
-			for (int i = 0; i < n.parallel.size(); i++) {
-				Edge e = n.parallel.get(i);
 				System.out.printf(format+" ",e.dst.index);
 			}
 			System.out.println("]");
@@ -358,12 +311,6 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			if( r.index == va.index) continue;
 
 			Vertex vb = vertexes.get(r.index );
-
-			if( targetCorner.distance(2524.6,2431.1) < 1.5 && r.point.distance(3184.9,2365.3) < 1.5 ) {
-				System.out.println("There! A");
-//			} else if( r.point.distance(604.89,709.55) < 1.5 && targetCorner.distance(772.5,861.26) < 1.5 ) {
-//				System.out.println("There! B");
-			}
 
 			distanceTmp.add( r.distance );
 
@@ -414,22 +361,9 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			line.endB = eb;
 
 			if( parallel ) {
-				// test to see if direction and orientation are aligned or off by 90 degrees
-//				double errorA = Math.min(directionDiff_A,Math.abs(directionDiff_A-Math.PI/2.0));
-//				double errorB = Math.min(directionDiff_B,Math.abs(directionDiff_B-Math.PI/2.0));
-//				remove = errorA > directionTol*Math.PI/4;
-//				remove |= errorB > directionTol*Math.PI/4;
-
 				va.parallel.add(ea);
 				vb.parallel.add(eb);
 			} else {
-				// should be at 45 degree angle or 135 degrees
-//				double errorA = Math.min(Math.abs(directionDiff_A-Math.PI/4.0), Math.abs(directionDiff_A-3*Math.PI/4.0));
-//				double errorB = Math.min(Math.abs(directionDiff_B-Math.PI/4.0), Math.abs(directionDiff_B-3*Math.PI/4.0));
-
-//				remove = errorA > directionTol*Math.PI/4;
-//				remove |= errorB > directionTol*Math.PI/4;
-
 				va.perpendicular.add(ea);
 				vb.perpendicular.add(eb);
 			}
@@ -575,225 +509,128 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		removeSet.reset();
 	}
 
-	/**
-	 * Select the best 2,3, or 4 perpendicular vertexes to connect to. These are the output grid connections.
-	 */
-	void selectConnections( Vertex target ) {
+	// TODO Comment
+	// TODO check if lines are parallel if > 2 connections
+	void selectConnections(Vertex target ) {
 		// There needs to be at least two corners
 		if( target.perpendicular.size() <= 1 )
 			return;
 
-//		if( corners.get(target.index).distance(548,135) < 1.5 ) {
-//			System.out.println("Found it. idx="+target.index);
-//		}
-
-//		if( target.index == 16 ) {
-//			System.out.println("ASDSAD");
-//		}
-//		System.out.println("======= Connecting "+target.index);
-
-		double bestError = Double.MAX_VALUE;
-		List<Edge> bestSolution = target.connections.edges;
-
-		// Greedily select one vertex at a time to connect to. findNext() looks at all possible
-		// vertexes it can connect too and minimizes an error function based on projectively invariant features
+		// go through each connection and select the one which should come after it
+		pairs.reset();
 		for (int i = 0; i < target.perpendicular.size(); i++) {
-			Edge e = target.perpendicular.get(i);
-			solution.clear();
-			solution.add(e);
+			selectNext(target,i,target.perpendicular,pairs.grow());
+		}
 
-			double sumDistance = solution.get(0).line.distance;
-			double minDistance = sumDistance;
+		// Select the sequence which the largest score
+		int bestStart = -1;
+		double bestScore = 0;
 
-			if( !findNext(i,target.parallel,target.perpendicular,Double.NaN,results) ) {
+		matched.resize(pairs.size);
+		for (int i = 0; i < pairs.size(); i++) {
+			matched.fill(false);
+			double score = 0;
+			int count = 1;
+			PairIdx a = pairs.get(i);
+			if( a.score <= 0 )
 				continue;
+			do {
+				count++;
+				matched.set(a.idx0,true);
+				score += a.score;
+				a = pairs.get(a.idx1);
+			} while( a.idx1 >= 0 && !matched.get(a.idx1) && count < 4);
+
+			if( score > bestScore ) {
+				bestScore = score;
+				bestStart = i;
 			}
+		}
 
-			solution.add(target.perpendicular.get(results.index));
-			sumDistance += solution.get(1).line.distance;
-			minDistance = Math.min(minDistance,solution.get(1).line.distance);
-
-			// Use knowledge that solution[0] and solution[2] form a line.
-			// Lines are straight under projective distortion
-			if( findNext(results.index,target.parallel,target.perpendicular,solution.get(0).direction,results) ) {
-				solution.add(target.perpendicular.get(results.index));
-				sumDistance += solution.get(2).line.distance;
-				minDistance = Math.min(minDistance,solution.get(2).line.distance);
-
-				// Use knowledge that solution[1] and solution[3] form a line.
-				if( findNext(results.index,target.parallel,target.perpendicular,solution.get(1).direction,results) ) {
-					solution.add(target.perpendicular.get(results.index));
-					sumDistance += solution.get(3).line.distance;
-					minDistance = Math.min(minDistance,solution.get(3).line.distance);
-				}
-			}
-
-			// Prefer closer valid sets of edges and larger sets.
-			// the extra + minDistance was needed to bias it against smaller sets which would be more likely
-			// to have a smaller average error. Division by the square of set/solution size biases it towards larger sets
-			double error = (sumDistance+minDistance)/(solution.size()*solution.size());
-
-//			System.out.println("  first="+solution.get(0).dst.index+"  size="+solution.size()+" error="+error);
-
-			if( error < bestError ) {
-				bestError = error;
-				bestSolution.clear();
-				bestSolution.addAll(solution);
-			}
+		// Set the connections at this vertex to be the selected connections
+		if( bestStart >= 0 ) {
+			matched.fill(false);
+			PairIdx a = pairs.get(bestStart);
+			target.connections.add(target.perpendicular.edges.get(a.idx0));
+			matched.set(a.idx0,true);
+			do {
+				matched.set(a.idx1,true);
+				target.connections.add(target.perpendicular.edges.get(a.idx1));
+				a = pairs.get(a.idx1);
+				// iterate until there is no next or it loops or it has the max number of connections
+			} while( a.idx1 >= 0 && !matched.get(a.idx1) && target.connections.size() < 4 );
 		}
 	}
 
-	/**
-	 * Greedily select the next edge that will belong to the final graph.
-	 *
-	 * @param firstIdx Index of the edge CW of the one being considered
-	 * @param splitterSet Set of edges that the splitter can belong to
-	 * @param candidateSet Set of edges that the next edge can belong to
-	 * @param parallel if NaN this is the angle the edge should be parallel to
-	 * @param results Output.
-	 * @return true if successful.
-	 */
-	boolean findNext( int firstIdx , EdgeSet splitterSet , EdgeSet candidateSet ,
-					  double parallel,
-					  SearchResults results ) {
+	boolean selectNext(Vertex target, int idx0 , EdgeSet connections , PairIdx output ) {
 
-		// maximum allowed error between the corner's angle and the edge's direction
-		final double tolCornerToEdge = Math.PI*0.4;
+		output.idx0 = idx0;
+		output.idx1 = -1;
+		output.score = -Double.MAX_VALUE;
 
-		Edge e0 = candidateSet.get(firstIdx);
+		Edge edge0 = connections.get(idx0);
+		for (int i = 1; i < connections.size(); i++) {
+			int idx1 = (idx0+i)%connections.size();
+			Edge edge1 = connections.get(idx1);
 
-		results.index = -1;
-		results.error = Double.MAX_VALUE;
-		boolean checkParallel = !Double.isNaN(parallel);
-
-		for (int i = 0; i < candidateSet.size(); i++) {
-			if( i == firstIdx )
-				continue;
-
-			// stop considering edges when they are more than 180 degrees away
-			Edge eI = candidateSet.get(i);
-
-			double distanceCCW = UtilAngle.distanceCCW(e0.direction,eI.direction);
-			if( distanceCCW >= Math.PI*0.9 ) // Multiplying by 0.9 helped remove a lot of bad matches
-				continue;                    // It was pairing up opposite corners under heavy perspective distortion
-
-			// It should be parallel to a previously found line
-			if( checkParallel ) {
-				double a = UtilAngle.boundHalf(eI.direction);
-				double b = UtilAngle.boundHalf(parallel);
-				double distanceParallel = UtilAngle.distHalf(a,b);
-				if( distanceParallel > directionTol*Math.PI/4 ) {
+			// Find all the common nodes between these two edges
+			for (int idxA = 0; idxA < edge0.dst.perpendicular.size(); idxA++) {
+				Vertex da = edge0.dst.perpendicular.get(idxA).dst;
+				if( da == target )
 					continue;
+				for (int idxB = 0; idxB < edge1.dst.perpendicular.size(); idxB++) {
+					Vertex db = edge1.dst.perpendicular.get(idxB).dst;
+
+					// found a common, compute the score and see if it's better than the previous best
+					if( da == db ) {
+						double score = score(target,idx0,idx1,da);
+						if( score > output.score ) {
+							output.score = score;
+							output.idx1 = idx1;
+						}
+					}
 				}
 			}
-
-			// find the perpendicular corner which splits these two edges and also find the index of
-			// the perpendicular sets which points towards the splitter.
-			if( !findSplitter(e0.direction,eI.direction,splitterSet,e0.dst.perpendicular,eI.dst.perpendicular,tuple3) )
-				continue;
-
-			double acute0 = UtilAngle.dist(
-					candidateSet.get(firstIdx).direction,
-					e0.dst.perpendicular.get(tuple3.b).direction);
-			double error0 = UtilAngle.dist(acute0,Math.PI/2.0);
-
-			if( error0 > tolCornerToEdge )
-				continue;
-
-			double acute1 = UtilAngle.dist(
-					candidateSet.get(i).direction,
-					eI.dst.perpendicular.get(tuple3.c).direction);
-			double error1 = UtilAngle.dist(acute1,Math.PI/2.0);
-
-			if( error1 > tolCornerToEdge )
-				continue;
-
-			// Find the edge from corner 0 to corner i. The direction of this vector and the corner's
-			// orientation has a known relationship described by 'phaseOri'
-			int e0_to_eI = e0.dst.parallel.find(eI.dst);
-			if( e0_to_eI < 0 )
-				continue;
-
-			// The quadrilateral with the smallest area is most often the best solution. Area is more expensive
-			// so the perimeter is computed instead. one side is left off since all of them have that side
-			double error = e0.dst.perpendicular.get(tuple3.b).line.distance;
-			error += eI.dst.perpendicular.get(tuple3.c).line.distance;
-			error += eI.line.distance;
-
-			if( error < results.error ) {
-				results.error = error;
-				results.index = i;
-			}
 		}
 
-		return results.index != -1;
+		return output.score > 0;
 	}
 
-	/**
-	 * Splitter is a vertex that has an angle between two edges being considered.
-	 *
-	 * @param ccw0 angle of edge 0
-	 * @param ccw1 angle of edge 1
-	 * @param master Set of edges that contains all potential spitters
-	 * @param other1 set of perpendicular edges to vertex ccw0
-	 * @param other2 set of perpendicular edges to vertex ccw1
-	 * @param output index of indexes for edges in master, other1, other2
-	 * @return true if successful
-	 */
-	boolean findSplitter(double ccw0 , double ccw1 ,
-						 EdgeSet master , EdgeSet other1 , EdgeSet other2 ,
-						 TupleI32 output ) {
+	private double score( Vertex tgt, int idxA , int idxB , Vertex common ) {
+		// TODO comment
 
-		double bestDistance = Double.MAX_VALUE;
+		double angleA = tgt.perpendicular.get(idxA).direction;
+		double distA = tgt.perpendicular.get(idxA).line.distance;
+		double angleB = tgt.perpendicular.get(idxB).direction;
+		double distB = tgt.perpendicular.get(idxB).line.distance;
 
-		for (int i = 0; i < master.size(); i++) {
-			// select the splitter
-			Edge me = master.get(i);
+		ChessboardCorner targetCorner = corners.get(tgt.index);
+		ChessboardCorner commonCorner = corners.get(common.index);
 
-			// TODO decide if this is helpful or not
-			// check that it lies between these two angles
-			if( UtilAngle.distanceCCW(ccw0 , me.direction) > Math.PI*0.9 ||
-					UtilAngle.distanceCW(ccw1,me.direction) > Math.PI*0.9 )
-				continue;
+		double angleC = Math.atan2(commonCorner.y-targetCorner.y,commonCorner.x-targetCorner.x);
+		double distC = targetCorner.distance(commonCorner);
 
-			// Find indexes which point towards the splitter corner
-			int idxB = other1.find(me.dst);
-			if( idxB == -1 )
-				continue;
+		// Perpendicular edges are ordered by increasing direction
+		double angDistAB = UtilAngle.distanceCCW(angleA,angleB);
+		double angDistAC = UtilAngle.distanceCCW(angleA,angleC);
 
-			double thetaB = UtilAngle.distanceCCW(ccw0 , other1.get(idxB).direction);
-			if( thetaB < 0.05 )
-				continue;
+		// See if C comes after B. If it's "before" the circle wraps around and it will appear to be after
+		if( angDistAC > angDistAB )
+			return -Double.MAX_VALUE;
 
-			int idxC = other2.find(me.dst);
-			if( idxC == -1 )
-				continue;
+		// it should be about perpendicular
+		if( angDistAB > Math.PI*0.95 )
+			return -Double.MAX_VALUE;
 
-			double thetaC = UtilAngle.distanceCW(ccw1 , other2.get(idxC).direction);
-			if( thetaC < 0.05 )
-				continue;
+		// Prefer a wider angle
+		double angleScore = Math.min(angDistAC,angDistAB-angDistAC);
 
-			// want it to be closer and without parallel lines
-			double error = me.line.distance/(0.5+Math.min(thetaB,thetaC));
+		// distA and distB should be the same length
+		// prefer a distC which is closer
+		double distScore = 0.1+(Math.abs(distA-distB)+distC)/(distA+distB);
+//		double distScore = Math.abs(1.0-(distB+distC*0.707)/(2*distA));
 
-			if( error < bestDistance ) {
-				bestDistance = error;
-				output.a = i;
-				output.b = idxB;
-				output.c = idxC;
-			}
-		}
-
-		// Reject the best solution if it doesn't form a convex quadrilateral
-		if( bestDistance < Double.MAX_VALUE ) {
-			// 2 is CCW of 1, and since both of them are pointing towards the splitter we know
-			// how to compute the angular distance
-			double pointingB = other1.edges.get(output.b).direction;
-			double pointingC = other2.edges.get(output.c).direction;
-			return UtilAngle.distanceCW(pointingB, pointingC) < Math.PI;
-		} else {
-			return false;
-		}
+		return angleScore/distScore;
 	}
 
 	/**
@@ -1177,6 +1014,10 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			edges.remove(idx);
 			return true;
 		}
+
+		public void sortByAngle() {
+			edges.sort((o1, o2) -> Double.compare(o1.direction, o2.direction));
+		}
 	}
 
 	public static class Edge {
@@ -1242,5 +1083,11 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 	private enum EdgeType {
 		PARALLEL,PERPENDICULAR,CONNECTION
+	}
+
+	private static class PairIdx {
+		public int idx0;
+		public int idx1;
+		public double score;
 	}
 }

@@ -61,7 +61,7 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	float nx,ny;
 	// tangent step
 	float tx,ty;
-	float normalDiv =20.0f;
+	float normalDiv = 40.0f;
 
 	// length of the line segment between the two points
 	float lineLength;
@@ -114,14 +114,14 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 		// divide it into lengthSamples+1 regions and don't sample the tail ends
 		float maxLongitudinal = 0;
 		float prevLong=0;
-		for (int i = 1; i <= lengthSamples; i++) {
-			float f = ((float)i)/(lengthSamples+1);
+		for (int i = 0; i < lengthSamples; i++) {
+			float f = 0.15f+((float)i)/(lengthSamples-1)*0.7f;
 			float x0 = cx+dx*f;
 			float y0 = cy+dy*f;
 
 			float v = interpolate.get(x0,y0);
 			float d = Math.abs(v-prevLong);
-			if( i > 1 ) {
+			if( i > 0 ) {
 				if( d > maxLongitudinal )
 					maxLongitudinal = d;
 			}
@@ -136,7 +136,7 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 				maxValue = Math.max(maxValue,white-black);
 			}
 
-			sampleValues[i-1] = maxValue;
+			sampleValues[i] = maxValue;
 		}
 
 		// Select one of the most intense values.
@@ -166,7 +166,7 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 		}
 
 		float previousA=Float.NaN;
-		float previousB=Float.NaN;
+//		float previousB=Float.NaN;
 		float previousC=Float.NaN;
 
 		samples.reset();
@@ -177,17 +177,17 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 			float y = cy+dy*f;
 
 			float valA = interpolate.get(x-ty,y+tx);
-			float valB = interpolate.get(x,y);
+//			float valB = interpolate.get(x,y);
 			float valC = interpolate.get(x+ty,y-tx);
 
-			if( i > 0 )
-				samples.add( Math.abs(valB-previousB));
+//			if( i > 0 )
+//				samples.add( Math.abs(valB-previousB));
 			if( i > 2 && i < lengthSamples-2 ) {
 				samples.add( Math.abs(valA-previousA));
 				samples.add( Math.abs(valC-previousC));
 			}
 			previousA = valA;
-			previousB = valB;
+//			previousB = valB;
 			previousC = valC;
 		}
 

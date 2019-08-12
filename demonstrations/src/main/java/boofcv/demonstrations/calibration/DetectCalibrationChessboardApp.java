@@ -340,22 +340,20 @@ public class DetectCalibrationChessboardApp
 				}
 			}
 
-			if( controlPanel.showParallel || controlPanel.showPerpendicular ) {
+			if( controlPanel.showPerpendicular ) {
 				// Locking the algorithm will kill performance.
 				synchronized (lockAlgorithm) {
 					Font regular = new Font("Serif", Font.PLAIN, 12);
 					g2.setFont(regular);
-					g2.setStroke(new BasicStroke(1));
+					BasicStroke thin = new BasicStroke(2);
+					BasicStroke thick = new BasicStroke(4);
+//					g2.setStroke(new BasicStroke(1));
 //					List<Vertex> vertexes = detector.getClusterFinder().getVertexes().toList();
 					List<LineInfo> lines = detector.getClusterFinder().getLines().toList();
 
 					for (int i = 0; i < lines.size(); i++) {
 						LineInfo lineInfo = lines.get(i);
-						if( lineInfo.isDisconnected() )
-							continue;
-						if( lineInfo.parallel && !controlPanel.showParallel )
-							continue;
-						if( !lineInfo.parallel && !controlPanel.showPerpendicular )
+						if( lineInfo.isDisconnected() || lineInfo.parallel )
 							continue;
 
 						Vertex va = lineInfo.endA.dst;
@@ -364,17 +362,15 @@ public class DetectCalibrationChessboardApp
 						ChessboardCorner ca = foundCorners.get(va.index);
 						ChessboardCorner cb = foundCorners.get(vb.index);
 
-//						if( !(ca.distance(2524.6,2431.1) < 1.5 || cb.distance(2524.6,2431.1) < 1.5 ))
-//							continue;
-
 						double intensity = lineInfo.intensity == -Double.MAX_VALUE ? Double.NaN : lineInfo.intensity;
 						line.setLine(ca.x * scale, ca.y * scale, cb.x * scale, cb.y * scale);
 
-						if( lineInfo.parallel ) {
-							g2.setColor(Color.BLUE);
-						} else {
-							g2.setColor(Color.CYAN);
-						}
+						g2.setStroke(thick);
+						g2.setColor(Color.BLACK);
+						g2.draw(line);
+
+						g2.setStroke(thin);
+						g2.setColor(Color.CYAN);
 
 						g2.draw(line);
 
@@ -452,7 +448,6 @@ public class DetectCalibrationChessboardApp
 		JCheckBox checkShowTargets;
 		JCheckBox checkShowNumbers;
 		JCheckBox checkShowClusters;
-		JCheckBox checkShowParallel;
 		JCheckBox checkShowPerpendicular;
 		JCheckBox checkShowCorners;
 		JCheckBox checkMeanShift;
@@ -471,7 +466,6 @@ public class DetectCalibrationChessboardApp
 		boolean showChessboards = true;
 		boolean showNumbers = true;
 		boolean showClusters = false;
-		boolean showParallel = false;
 		boolean showPerpendicular = false;
 		boolean showCorners = false;
 		boolean logItensity =false;
@@ -508,7 +502,6 @@ public class DetectCalibrationChessboardApp
 			checkShowTargets = checkbox("Chessboard", showChessboards);
 			checkShowNumbers = checkbox("Numbers", showNumbers);
 			checkShowClusters = checkbox("Clusters", showClusters);
-			checkShowParallel = checkbox("Parallel", showParallel);
 			checkShowPerpendicular = checkbox("Perp.", showPerpendicular);
 			checkShowCorners = checkbox("Corners", showCorners);
 			checkMeanShift = checkbox("Mean Shift", meanShift);
@@ -538,7 +531,6 @@ public class DetectCalibrationChessboardApp
 			panel.add(checkShowTargets);
 			panel.add(checkShowNumbers);
 			panel.add(checkShowClusters);
-			panel.add(checkShowParallel);
 			panel.add(checkShowPerpendicular);
 			panel.add(checkShowCorners);
 			panel.add(checkLogIntensity);
@@ -587,9 +579,6 @@ public class DetectCalibrationChessboardApp
 				imagePanel.repaint();
 			} else if( e.getSource() == checkShowClusters) {
 				showClusters = checkShowClusters.isSelected();
-				imagePanel.repaint();
-			} else if( e.getSource() == checkShowParallel) {
-				showParallel = checkShowParallel.isSelected();
 				imagePanel.repaint();
 			} else if( e.getSource() == checkShowPerpendicular) {
 				showPerpendicular = checkShowPerpendicular.isSelected();
