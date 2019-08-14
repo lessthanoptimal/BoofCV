@@ -75,14 +75,17 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 
 		corners.reset();
 
-		// top to bottom. This way the intensity image is at the input image's scale. Which is useful
-		// for visualization purposes
+		// top to bottom i.e. low res to high res.
+		// Two reasons. 1) maximum image intensity can be feed into high resolution images, see below.
+		//              2) The intensity image is at the input image's scale. Which is useful for visualization
+		//                 purposes
 		float maxIntensityImage = 0;
+		detector.considerMaxIntensityImage = maxIntensityImage;
 		double scale = Math.pow(2.0,pyramid.size()-1);
 		for (int level = pyramid.size()-1; level >= 0; level--) {
 			// In blurred images the x-corner intensity is likely to be much greater at lower resolutions
-			// At higher resolution there might be no corners, but if a threshold which is too low is selected
-			// then a large fraction of the image would be a false positive, slowing things down!
+			// At higher resolution there might be no corners and a very small non-maximum threshold is selected.
+			// This will cause a large percentage of the image to be selected as an x-corner, slowing things down!
 			// Thus the maximum intensity found so far is used in each layer.
 			detector.considerMaxIntensityImage = maxIntensityImage;
 			detector.process(pyramid.get(level));
