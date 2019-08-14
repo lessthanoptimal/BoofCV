@@ -65,7 +65,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>> {
 	public float nonmaxThresholdRatio = 0.05f;
 	public double edgeIntensityRatioThreshold = 0.01;
 	public double edgeAspectRatioThreshold = 0.1;
-	public double cornerIntensity = 20;
+	public double cornerIntensity = 10;
 	/**
 	 * Tolerance number of "spokes" in the wheel which break symmetry. Symmetry is defined as both sides being above
 	 * or below the mean value. Larger the value more tolerant it is.
@@ -92,6 +92,16 @@ public class DetectChessboardCorners2<T extends ImageGray<T>> {
 
 	// storage for corner detector output
 	GrayF32 intensity = new GrayF32(1,1);
+	/**
+	 * Maximum pixel value in the corner intensity image
+	 */
+	public float maxIntensityImage;
+	/**
+	 * The maximum of this value of the image's intensity will be used when dynamically computing the non-max threshold.
+	 * Useful when computing features across a pyramid. The layer with maximum intensity is likely to be a better
+	 * threshold for corners.
+	 */
+	public float considerMaxIntensityImage = 0;
 
 	// Used to compute line integrals of spokes around a corner
 	ImageBorder<T> borderImg;
@@ -181,10 +191,17 @@ public class DetectChessboardCorners2<T extends ImageGray<T>> {
 		blurInterp.setImage((GrayF32)blurred);
 		meanShift.setImage(intensity);
 
+		// Compute the maximum value in the x-corner intensity image
+		// If computed as a pyramid the maximum value in another layer might be "considered"
+		// Considered just means use whichever one has a larger value. It's also fine that consider is zero by default
+		// since anything less than zero is not a corner.
+		// This makes a big difference in heavily blurred images at high resolution where the highest resolution image
+		// is unlikely to have any x-corners and 100,000s of false positives in intensity image.
+		maxIntensityImage = ImageStatistics.max(intensity);
 		// intensity is squared, so the ratio is squared too
-		nonmaxThreshold = ImageStatistics.max(intensity)*nonmaxThresholdRatio*nonmaxThresholdRatio;
-		// TODO better dynamic threshold. a single bright pxiel can throw it off
+		nonmaxThreshold = Math.max(considerMaxIntensityImage, maxIntensityImage)*nonmaxThresholdRatio*nonmaxThresholdRatio;
 
+		// Find features using non-maximum suppression and the threshold computed above
 		nonmax.setThresholdMaximum(nonmaxThreshold);
 		nonmax.process(intensity,null,null,null,foundNonmax);
 		for (int i = 0; i < foundNonmax.size; i++) {
@@ -214,7 +231,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>> {
 			}
 
 			// TODO improve these functions
-			if (!checkChessboardCircle((float) c.x, (float) c.y, outsideCircle4, 4, 4, symmetricTol)) {
+			if (!checkChessboardCircle((float) c.x, (float) c.y, outsideCircle4, 3, 6, symmetricTol)) {
 				continue;
 			}
 
@@ -258,15 +275,16 @@ public class DetectChessboardCorners2<T extends ImageGray<T>> {
 
 		// Filter corners based on edge intensity of found corners
 		for (int i = corners.size-1; i >= 0;  i--) {
-			if( corners.get(i).edgeIntensity >= edgeIntensityRatioThreshold*maxEdge ) {
-//			if( corners.get(i).edgeIntensity >= 0 ) {
-//				System.out.println("transitions "+corners.get(i).circleRatio );
-				filtered.add(corners.get(i));
+			ChessboardCorner c = corners.get(i);
+			if( c.edgeIntensity >= edgeIntensityRatioThreshold*maxEdge ) {
+//			if( c.edgeIntensity >= 0 ) {
+				filtered.add(c);
 			}
 		}
 
 		int dropped = corners.size-filtered.size();
-		System.out.printf("  corners %4d filters %5d dropped = %4.1f%%\n",corners.size,filtered.size(),(100*dropped/(double)corners.size));
+		System.out.printf("  max-pixel %3.1f corners %4d filters %5d dropped = %4.1f%%\n",
+				maxIntensityImage,corners.size,filtered.size(),(100*dropped/(double)corners.size));
 	}
 
 	private boolean checkPositiveInside(int cx , int cy , int threshold ) {

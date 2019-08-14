@@ -14,6 +14,10 @@ Version : 0.35
   * TODO Calibrate using partially obscured chessboard patterns
   * TODO Add ability to remove images and recalibrate from application
 
+TODO Chessboard Regression
+     - More blur
+     - More up close show
+
 TODO Tech Report for new chessboard detector, assisted calibration, line fitting
 TODO Videos - hough line detectors
             - chessboard corner detector + improvements

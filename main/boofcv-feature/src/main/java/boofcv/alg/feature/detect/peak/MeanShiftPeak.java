@@ -141,6 +141,10 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 				}
 			}
 
+			// avoid divided by zero
+			if( total == 0 )
+				break;
+
 			cx = peakX + sumX/total;
 			cy = peakY + sumY/total;
 
@@ -202,6 +206,10 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 					}
 				}
 			}
+
+			// avoid divided by zero
+			if( total == 0 )
+				break;
 
 			cx = peakX + sumX/total;
 			cy = peakY + sumY/total;

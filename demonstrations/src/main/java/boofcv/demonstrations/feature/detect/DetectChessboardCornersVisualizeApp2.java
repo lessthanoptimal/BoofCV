@@ -118,6 +118,7 @@ public class DetectChessboardCornersVisualizeApp2
 			detector.getDetector().edgeIntensityRatioThreshold = controlPanel.threshEdgeIntensity;
 			detector.getDetector().edgeAspectRatioThreshold = controlPanel.threshEdgeAspect;
 			detector.getDetector().nonmaxThresholdRatio = controlPanel.threshXCorner;
+			detector.getDetector().cornerIntensity = controlPanel.thresholdIntensity;
 			detector.getDetector().setNonmaxRadius(controlPanel.nonmaxRadius);
 		}
 	}
@@ -265,6 +266,7 @@ public class DetectChessboardCornersVisualizeApp2
 		JSpinner spinnerEdgeIntensity;
 		JSpinner spinnerEdgeAspect;
 		JSpinner spinnerXCorner;
+		JSpinner spinnerIntensity;
 		JSpinner spinnerNonMaxRadius;
 		JCheckBox checkShowCorners;
 		JCheckBox checkDebug;
@@ -280,6 +282,7 @@ public class DetectChessboardCornersVisualizeApp2
 		double threshEdgeIntensity;
 		double threshEdgeAspect;
 		float threshXCorner;
+		double thresholdIntensity;
 		int nonmaxRadius;
 
 		public ControlPanel() {
@@ -288,13 +291,15 @@ public class DetectChessboardCornersVisualizeApp2
 				threshEdgeAspect = detector.getDetector().edgeAspectRatioThreshold;
 				threshXCorner = detector.getDetector().getNonmaxThresholdRatio();
 				nonmaxRadius = detector.getDetector().getNonmaxRadius();
+				thresholdIntensity = detector.getDetector().cornerIntensity;
 			}
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
 			spinnerEdgeIntensity = spinner(threshEdgeIntensity, 0.0, 1.0, 0.01,1,4);
 			spinnerEdgeAspect = spinner(threshEdgeAspect, 0.0, 1.0, 0.01,1,4);
-			spinnerXCorner = spinner(threshXCorner, 0.0, 100.0, 0.01,1,4);
+			spinnerXCorner = spinner(threshXCorner, 0.0, 1.0, 0.01,1,4);
+			spinnerIntensity = spinner(thresholdIntensity, 0.0, 1000.0, 5,3,1);
 			spinnerNonMaxRadius = spinner(nonmaxRadius, 1, 20, 1);
 			spinnerScaleDown = spinner(scaleDown,1,128,1);
 			spinnerTop = spinner(pyramidTop, 50, 10000, 50);
@@ -316,6 +321,7 @@ public class DetectChessboardCornersVisualizeApp2
 			addLabeled(spinnerEdgeIntensity,"Edge Intensity");
 			addLabeled(spinnerEdgeAspect,"Edge Aspect");
 			addLabeled(spinnerXCorner,"X-Corner");
+			addLabeled(spinnerIntensity,"Intensity");
 			addLabeled(spinnerNonMaxRadius,"NonMax Radius");
 			addLabeled(spinnerTop,"Pyramid Top");
 		}
@@ -350,6 +356,10 @@ public class DetectChessboardCornersVisualizeApp2
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerXCorner ) {
 				threshXCorner = ((Number)spinnerXCorner.getValue()).floatValue();
+				createAlgorithm();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerIntensity ) {
+				thresholdIntensity = ((Number)spinnerIntensity.getValue()).floatValue();
 				createAlgorithm();
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerNonMaxRadius ) {

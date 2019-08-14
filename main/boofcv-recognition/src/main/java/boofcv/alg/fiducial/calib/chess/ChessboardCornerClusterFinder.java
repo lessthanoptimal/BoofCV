@@ -179,9 +179,13 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 		// use edge intensity to prune connections
 		if( thresholdEdgeIntensity > 0 ) {
+			// TODO set sampling distance based on corner scale
 			pruneConnectionsByIntensity(corners);
 		}
 //		printDualGraph();
+
+		// TODO Change pruning of ambiguous vertexes here
+		//      use incoming perpendicular edges to set distance threshold
 
 		// Select the final 2 to 4 connections from perpendicular set
 		// each pair of adjacent perpendicular edge needs to have a matching parallel edge between them
