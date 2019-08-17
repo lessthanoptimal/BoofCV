@@ -108,6 +108,8 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 				cl.first = true;
 				cl.set(x,y,cf.orientation,cf.intensity);
 				cl.constrast = cf.constrast;
+				cl.level1 = level;
+				cl.level2 = level;
 			}
 			scale /= 2.0;
 		}
@@ -185,6 +187,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 			c0.orientation = resultsMax.orientation;
 			c0.intensity = resultsMax.intensity;
 			c0.constrast = resultsMax.constrast;
+			c0.level2 = resultsMax.level2;
 		}
 	}
 

@@ -246,7 +246,13 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			double contrast = (ca.constrast + cb.constrast)/2;
 //			double contrast = Math.max(ca.constrast , cb.constrast);
 
-			line.intensity = computeConnInten.process(ca, cb, line.endA.direction) / contrast;
+			// if it was only seen at higher pyramid levels it needs to scan farther out
+			// Note pyramid levels start at 0 for the highest resolution
+			float scale = 1.0f + (float)Math.sqrt(Math.max(ca.level1,cb.level1))*0.5f;
+			// sqrt and scaling by 0.5f is make it more conservative. This increases the radial distance
+			// that is sampled and doing it by too much creates a lot of false positives
+
+			line.intensity = computeConnInten.process(ca, cb, line.endA.direction,scale) / contrast;
 
 			if( line.intensity < thresholdEdgeIntensity ) {
 				if( !va.perpendicular.remove(line) )

@@ -84,13 +84,15 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	 * @param ca corner a
 	 * @param cb corner b
 	 * @param direction_a_to_b Direction from a to b in radians.
+	 * @param scale The scale that the corners were detected at. 1.0 = full resolution image > 1.0 is low res
 	 * @return the line intensity. more positive more intense. Units = pixels intensity
 	 */
-	public float process( ChessboardCorner ca , ChessboardCorner cb , double direction_a_to_b ) {
-//		if( ca.distance(392,970) < 1.5 && cb.distance(385,937) < 2)
-//			System.out.println("stop for intensity");
-//		if( cb.distance(392,970) < 1.5 && ca.distance(385,937) < 2)
-//			System.out.println("stop for intensity");
+	public float process( ChessboardCorner ca , ChessboardCorner cb , double direction_a_to_b, float scale ) {
+//		boolean meow = false;
+//		if( ca.distance(200,369) < 1.5 && cb.distance(198,358) < 2)
+//			meow = true;
+//		if( cb.distance(200,369) < 1.5 && ca.distance(198,358) < 2)
+//			meow = true;
 
 		float cx = (float)ca.x;
 		float cy = (float)ca.y;
@@ -102,19 +104,20 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 
 		// step away from the corner points. This is only really important with small chessboard where the samples
 		// will put it next to the corner
-//		if( lineLength > 2f ) {
-//			cx += nx;
-//			cy += ny;
-//			dx -= 2 * nx;
-//			dy -= 2 * ny;
-//		}
+		if( lineLength > 2f ) {
+			cx += nx;
+			cy += ny;
+			dx -= 2 * nx;
+			dy -= 2 * ny;
+		}
 
 		// move from one side to the other
 		// divide it into lengthSamples+1 regions and don't sample the tail ends
 		float maxLongitudinal = 0;
 		float prevLong=0;
+
 		for (int i = 0; i < lengthSamples; i++) {
-			float f = 0.15f+((float)i)/(lengthSamples-1)*0.7f;
+			float f = 0.1f+((float)i)/(lengthSamples-1)*0.8f;
 			float x0 = cx+dx*f;
 			float y0 = cy+dy*f;
 
@@ -129,14 +132,20 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 			float maxValue = -Float.MAX_VALUE;
 
 			for (int l = 1; l <= tangentSamples; l++) {
-				float white = interpolate.get(x0-ty*l,y0+tx*l);
-				float black = interpolate.get(x0+ty*l,y0-tx*l);
+				float white = interpolate.get(x0-ty*l*scale,y0+tx*l*scale);
+				float black = interpolate.get(x0+ty*l*scale,y0-tx*l*scale);
+
+//				if( meow ) {
+//					System.out.printf("i=%2d white=%5.2f black=%5.2f\n",i,white,black);
+//				}
 
 				maxValue = Math.max(maxValue,white-black);
 			}
 
 			sampleValues[i] = maxValue;
 		}
+//		if( meow )
+//			System.out.println("done");
 
 		// Select one of the most intense values.
 		// Originally min was used but that proved too sensitive to outliers
