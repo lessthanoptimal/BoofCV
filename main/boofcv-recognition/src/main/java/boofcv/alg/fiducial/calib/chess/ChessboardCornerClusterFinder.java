@@ -252,7 +252,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			// sqrt and scaling by 0.5f is make it more conservative. This increases the radial distance
 			// that is sampled and doing it by too much creates a lot of false positives
 
-			line.intensity = computeConnInten.process(ca, cb, line.endA.direction,scale) / contrast;
+			line.intensity = computeConnInten.process(ca, cb, line.endA.direction,scale,contrast);
 
 			if( line.intensity < thresholdEdgeIntensity ) {
 				if( !va.perpendicular.remove(line) )

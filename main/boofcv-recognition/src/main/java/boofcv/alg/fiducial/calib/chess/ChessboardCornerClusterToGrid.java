@@ -25,10 +25,7 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_B;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Given a chessboard corner cluster find the grid which it matches. The grid will be in "standard order". Depending
@@ -45,6 +42,8 @@ import java.util.Queue;
  * Edges will be ordered in CCW direction and the index of an edge which connects two adjacent corners to
  * each other follows the (i+2)%4 relationship. If multiple corners can be (0,0) then the one closest to
  * the top left corner will be selected.
+ *
+ * TODO update this and unit test
  *
  * @author Peter Abeles
  */
@@ -68,6 +67,10 @@ public class ChessboardCornerClusterToGrid {
 	// optional check on the shape
 	CheckShape checkShape;
 
+	FastQueue<GridElement> sparseGrid = new FastQueue<>(GridElement.class,true);
+	int sparseCols,sparseRows;
+	GridElement[] denseGrid = new GridElement[0];
+
 	/**
 	 * Puts cluster nodes into grid order and computes the number of rows and columns. If the cluster is not
 	 * a complete grid this function will fail and return false
@@ -77,6 +80,8 @@ public class ChessboardCornerClusterToGrid {
 	 * @return true if successful or false if it failed
 	 */
 	public boolean convert( ChessboardCornerGraph cluster , GridInfo info ) {
+		sparseGrid.reset();
+
 		// default to an invalid value to ensure a failure doesn't go unnoticed.
 		info.reset();
 
@@ -84,13 +89,12 @@ public class ChessboardCornerClusterToGrid {
 		if( !orderEdges(cluster) )
 			return false;
 
-		// Now we need to order the nodes into a proper grid which follows right hand rule
-		if( !orderNodes(cluster.corners,info) )
+		if(!createSparseGrid(cluster.corners) )
 			return false;
-
-		// TODO split into grids from largest to smallest to prune stray random connections
-		// TODO add ability to output multiple GridInfo
-
+		sparseToDense();
+		if( !findLargestRectangle(info)) {
+			return false;
+		}
 		// select a valid corner to be (0,0). If there are multiple options select the one which is
 		int corner = selectCorner(info);
 		if( corner == -1 ) {
@@ -103,6 +107,195 @@ public class ChessboardCornerClusterToGrid {
 		}
 
 		return true;
+	}
+
+	boolean createSparseGrid(FastQueue<Node> corners) {
+		marked.resize(corners.size);
+		marked.fill(false);
+
+		sparseGrid.resize(corners.size);
+		for (int i = 0; i < sparseGrid.size; i++) {
+			sparseGrid.get(i).reset();
+		}
+
+		open.clear();
+
+		GridElement g = sparseGrid.get(0);
+		Node n = corners.get(0);
+		g.node = n;
+		g.row = g.col = 0;
+		marked.set(0,true);
+		open.add(n);
+
+		int minCol = Integer.MAX_VALUE;
+		int minRow = Integer.MAX_VALUE;
+		sparseCols = -1;
+		sparseRows = -1;
+
+		while( !open.isEmpty() ) {
+			n = open.remove();
+			g = sparseGrid.get(n.index);
+
+			for (int idx = 0; idx < 4; idx++) {
+				Node e = n.edges[idx];
+				if( e == null )
+					continue;
+
+				GridElement ge = sparseGrid.get(e.index);
+				int row = g.row,col = g.col;
+
+				switch( idx ) {
+					case 0: col += 1; break;
+					case 1: row += 1; break;
+					case 2: col -= 1; break;
+					case 3: row -= 1; break;
+				}
+
+				if( !ge.isAssigned() ) {
+					ge.node = e;
+					ge.row = row;
+					ge.col = col;
+					if( row < minRow ) minRow = row;
+					if( col < minCol ) minCol = col;
+					if( row > sparseRows ) sparseRows = row;
+					if( col > sparseCols ) sparseCols = col;
+				} else if( ge.row != row || ge.col != col ) {
+					if( verbose != null )
+						verbose.println("Contradiction in graph found.");
+					return false;
+				}
+
+				if( !marked.get(e.index) ) {
+					open.add(e);
+					marked.set(e.index,true);
+				}
+			}
+		}
+
+		// make sure all cols and rows are >= 0
+		if( minCol < 0 || minRow < 0 ) {
+			if( minRow < 0 )
+				sparseRows += -minRow;
+			if( minCol < 0 )
+				sparseCols += -minCol;
+			for (int i = 0; i < sparseGrid.size; i++) {
+				GridElement e = sparseGrid.get(i);
+				if( !e.isAssigned() )
+					throw new RuntimeException("BUG! grid element not assigned");
+				e.col -= minCol;
+				e.row -= minRow;
+			}
+		}
+		sparseRows += 1;
+		sparseCols += 1;
+
+		return true;
+	}
+
+	void sparseToDense() {
+		int N = sparseCols*sparseRows;
+		if( denseGrid.length < N )
+			denseGrid = new GridElement[N];
+		Arrays.fill(denseGrid,null);
+
+		for (int i = 0; i < sparseGrid.size; i++) {
+			GridElement g = sparseGrid.get(i);
+			denseGrid[g.row*sparseCols + g.col] = g;
+		}
+	}
+
+	boolean findLargestRectangle( GridInfo info ) {
+		int row0 = 0;
+		int row1 = sparseRows;
+		int col0 = 0;
+		int col1 = sparseCols;
+
+		int[] rowZeros = new int[sparseRows];
+		int[] colZeros = new int[sparseCols];
+
+		for (int i = 0; i < sparseRows; i++) {
+			rowZeros[i] = countZeros(i,i+1,0,sparseCols,0,1);
+		}
+		for (int i = 0; i < sparseCols; i++) {
+			colZeros[i] = countZeros(0,sparseRows,i,i+1,1,0);
+		}
+
+		boolean success = false;
+		while( row0 < row1 && col0 < col1 ) {
+			int rz = Math.max(rowZeros[row0],rowZeros[row1-1]);
+			int cz = Math.max(colZeros[col0],colZeros[col1-1]);
+
+			if( rz == 0 && cz == 0 ) {
+				success = true;
+				break;
+			}
+
+			// prune the outside edge with the most zeros
+			if( rz > cz ) {
+				if( rowZeros[row0] > rowZeros[row1-1]) {
+					for (int i = col0; i < col1; i++) {
+						if( grid(row0,i) == null )
+							colZeros[i] -= 1;
+					}
+					row0 += 1;
+				} else {
+					for (int i = col0; i < col1; i++) {
+						if( grid(row1-1,i) == null )
+							colZeros[i] -= 1;
+					}
+					row1 -= 1;
+				}
+			} else {
+				if( colZeros[col0] > colZeros[col1-1]) {
+					for (int i = row0; i < row1; i++) {
+						if( grid(i,col0) == null )
+							rowZeros[i] -= 1;
+					}
+					col0 += 1;
+				} else {
+					for (int i = row0; i < row1; i++) {
+						if( grid(i,col1-1) == null )
+							rowZeros[i] -= 1;
+					}
+					col1 -= 1;
+				}
+			}
+		}
+
+		if( success ) {
+			info.nodes.clear();
+			info.rows = row1-row0;
+			info.cols = col1-col0;
+
+			for (int row = row0; row < row1; row++) {
+				for (int col = col0; col < col1; col++) {
+					GridElement g = grid(row,col);
+					if( g == null ) {
+						if( verbose != null )
+							verbose.println("Failed due to hole inside of grid");
+						return false;
+					}
+					info.nodes.add(g.node);
+				}
+			}
+		}
+		return success;
+	}
+
+	int countZeros( int row0 , int row1 , int col0 , int col1 , int stepRow , int stepCol ) {
+		int total = 0;
+		while( row0 != row1 && col0 != col1 ) {
+			if( grid(row0,col0)== null )
+				total++;
+
+			row0 += stepRow;
+			col0 += stepCol;
+		}
+		return total;
+	}
+
+	final GridElement grid( int row , int col ) {
+		return denseGrid[row*sparseCols+col];
 	}
 
 	/**
@@ -415,9 +608,28 @@ public class ChessboardCornerClusterToGrid {
 		this.requireCornerSquares = requireCornerSquares;
 	}
 
+	public static class GridElement {
+		public Node node;
+		public int row,col;
+		public int rowLength,colLength;
+
+		public boolean isAssigned() {
+			return row != Integer.MAX_VALUE;
+		}
+
+		public void reset() {
+			node = null;
+			rowLength = colLength = -1;
+			row=Integer.MAX_VALUE;
+			col=Integer.MAX_VALUE;
+		}
+	}
+
+
 	public static class GridInfo {
 		public List<Node> nodes = new ArrayList<>();
 		public int rows,cols;
+
 		/**
 		 * Indicates if there are no "corner" corner points. See class JavaDoc.
 		 */
@@ -425,6 +637,7 @@ public class ChessboardCornerClusterToGrid {
 
 		public void reset() {
 			rows = cols = -1;
+
 			hasCornerSquare = true;
 			nodes.clear();
 		}
