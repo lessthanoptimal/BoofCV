@@ -179,7 +179,6 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 
 		// use edge intensity to prune connections
 		if( thresholdEdgeIntensity > 0 ) {
-			// TODO set sampling distance based on corner scale
 			pruneConnectionsByIntensity(corners);
 		}
 //		printDualGraph();
@@ -522,6 +521,9 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	// TODO Comment
 	// TODO check if lines are parallel if > 2 connections
 	void selectConnections(Vertex target ) {
+		// TODO prefer sets of lines with similar length
+		// TODO of on other side prefer that the lines be parallel
+
 		// There needs to be at least two corners
 		if( target.perpendicular.size() <= 1 )
 			return;
