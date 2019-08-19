@@ -10,13 +10,18 @@ Version : 0.35
   * Even kernel sizes
   * Configuration class
   * Ignore negative values
+- Concurrency
+  * PixelMath now only uses concurrent algorithm when input image is more than 10,000 pixels.
+    This caused circulant to slow down.
 - Calibration
   * TODO Calibrate using partially obscured chessboard patterns
   * TODO Add ability to remove images and recalibrate from application
+  * TODO change high level API to be able to return more than one pattern. String ID
+- Chessboard Detector
+  * TODO detect first at low resolution
+  * TODO Prune similar based on edge difference
+  * TODO why pick long line in calib?
 
-TODO Chessboard Regression
-     - More blur
-     - More up close show
 
 TODO Tech Report for new chessboard detector, assisted calibration, line fitting
 TODO Videos - hough line detectors
@@ -27,7 +32,6 @@ TODO Scene Reconstruction from arbitrary number of photos
 TODO regression for line detectors
 TODO hough circle detector
 TODO concurrent SIFT
-TODO figure out why circulant is slower if concurrent
 
 ---------------------------------------------
 Date    : 2019-July-07

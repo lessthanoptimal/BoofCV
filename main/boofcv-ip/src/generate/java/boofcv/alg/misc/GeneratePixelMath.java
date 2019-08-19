@@ -36,6 +36,7 @@ import static boofcv.generate.AutoTypeImage.*;
  */
 public class GeneratePixelMath extends CodeGeneratorBase {
 
+	private int SMALL = 100*100;
 	private AutoTypeImage input;
 
 	ImageType.Family families[] = new ImageType.Family[]{ImageType.Family.GRAY,ImageType.Family.INTERLEAVED};
@@ -132,7 +133,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 						"\t\toutput.reshape(input.width,input.height);\n" +
 						"\n" +
 						"\t\tint columns = " + columns + ";\n" +
-						"\t\tif(BoofConcurrency.USE_CONCURRENT ) {\n" +
+						"\t\tint N = input.width*input.height;\n" +
+						"\t\tif( BoofConcurrency.USE_CONCURRENT && N > "+SMALL+") {\n" +
 						"\t\t\tImplPixelMath_MT."+funcName+"(input.data, input.startIndex, input.stride,\n" +
 						"\t\t\t\t\toutput.data, output.startIndex, output.stride,\n" +
 						"\t\t\t\t\tinput.height, columns);\n" +
@@ -217,7 +219,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 							"\t\t" + reshape+ "\n" +
 							"\n" +
 							"\t\tint columns = " + columns + ";\n" +
-							"\t\tif(BoofConcurrency.USE_CONCURRENT ) {\n" +
+							"\t\tint N = input.width*input.height;\n" +
+							"\t\tif( BoofConcurrency.USE_CONCURRENT && N > "+SMALL+") {\n" +
 							"\t\t\tImplPixelMath_MT." + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + ", lower, upper ,\n" +
 							"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
 							"\t\t\t\t\tinput.height,columns);\n" +
@@ -241,7 +244,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 							"\t\t" + reshape+ "\n" +
 							"\n" +
 							"\t\tint columns = " + columns + ";\n" +
-							"\t\tif(BoofConcurrency.USE_CONCURRENT ) {\n" +
+							"\t\tint N = input.width*input.height;\n" +
+							"\t\tif( BoofConcurrency.USE_CONCURRENT && N > "+SMALL+") {\n" +
 							"\t\t\tImplPixelMath_MT." + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + " , \n" +
 							"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
 							"\t\t\t\t\tinput.height,columns);\n" +
@@ -286,7 +290,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
 				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\tint N = imgA.width*imgA.height;\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > "+SMALL+") {\n" +
 				"\t\t\tImplPixelMath_MT.diffAbs(imgA, imgB, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplPixelMath.diffAbs(imgA, imgB, output);\n" +
@@ -308,7 +313,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
 				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\tint N = imgA.width*imgA.height;\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > "+SMALL+") {\n" +
 				"\t\t\tImplPixelMath_MT.add(imgA, imgB, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplPixelMath.add(imgA, imgB, output);\n" +
@@ -331,7 +337,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
 				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\tint N = imgA.width*imgA.height;\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > "+SMALL+") {\n" +
 				"\t\t\tImplPixelMath_MT.subtract(imgA, imgB, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplPixelMath.subtract(imgA, imgB, output);\n" +
@@ -353,7 +360,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
 				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\tint N = imgA.width*imgA.height;\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > "+SMALL+") {\n" +
 				"\t\t\tImplPixelMath_MT.multiply(imgA, imgB, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplPixelMath.multiply(imgA, imgB, output);\n" +
@@ -376,7 +384,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
 				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\tint N = imgA.width*imgA.height;\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > "+SMALL+") {\n" +
 				"\t\t\tImplPixelMath_MT.divide(imgA,imgB,output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplPixelMath.divide(imgA,imgB,output);\n" +
@@ -396,7 +405,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\n" +
 				"\t\toutput.reshape(input.width,input.height);\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\tint N = input.width*input.height;\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > "+SMALL+") {\n" +
 				"\t\t\tImplPixelMath_MT.log(input,output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplPixelMath.log(input,output);\n" +
@@ -417,7 +427,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\n" +
 				"\t\toutput.reshape(input.width,input.height);\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\tint N = input.width*input.height;\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > "+SMALL+") {\n" +
 				"\t\t\tImplPixelMath_MT.logSign(input,output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplPixelMath.logSign(input,output);\n" +
@@ -438,7 +449,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\n" +
 				"\t\toutput.reshape(input.width,input.height);\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\tint N = input.width*input.height;\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > "+SMALL+") {\n" +
 				"\t\t\tImplPixelMath_MT.pow2(input,output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplPixelMath.pow2(input,output);\n" +
@@ -459,7 +471,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\n" +
 				"\t\toutput.reshape(input.width,input.height);\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\tint N = input.width*input.height;\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > "+SMALL+") {\n" +
 				"\t\t\tImplPixelMath_MT.sqrt(input,output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplPixelMath.sqrt(input,output);\n" +

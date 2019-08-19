@@ -43,6 +43,10 @@ public class BoofMiscOps {
 		return String.format("%03d:%02d:%02d:%02d (days:hrs:min:sec)", days, hour, minute, second);
 	}
 
+	public static double diffRatio(double a , double b ) {
+		return Math.abs(a-b)/Math.max(a,b);
+	}
+
 	/**
 	 * Returns the number of digits in a number. E.g. 345 = 3, -345 = 4, 0 = 1
 	 */
