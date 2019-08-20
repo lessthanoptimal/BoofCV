@@ -24,7 +24,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -34,38 +34,18 @@ public class TestMeanShiftPeak {
 	GrayF32 image = new GrayF32(30,40);
 
 	@Test
-	public void setRegion_inside() {
-
-		Helper helper = new Helper(10,0.01f);
-		helper.setRadius(5);
-
-		helper.setImage(image);
-		helper.setRegion(6.2f,7.5f);
-
-		// in the middle, there should be no clipping
-		assertEquals(1.2f,helper.x0,1e-4);
-		assertEquals(2.5f,helper.y0,1e-4);
-
-		// outside top left border
-		helper.setRegion(4.5f,3);
-		assertEquals(0,helper.x0,1e-4);
-		assertEquals(0,helper.y0,1e-4);
-
-		// outside bottom right border
-		helper.setRegion(26.5f,39f);
-		assertEquals(30-11,helper.x0,1e-4);
-		assertEquals(40-11,helper.y0,1e-4);
-
+	void even_odd() {
+		fail("Implement");
 	}
 
 	@Test
-	public void searchTest() {
+	void searchTest() {
 		// this is intentionally blank since it is covered by the abstract test
 	}
 
 	public static class Helper extends MeanShiftPeak {
 		public Helper(int maxIterations, float convergenceTol) {
-			super(maxIterations, convergenceTol,new WeightPixelGaussian_F32(),GrayF32.class, BorderType.EXTENDED);
+			super(maxIterations, convergenceTol,new WeightPixelGaussian_F32(),true,GrayF32.class, BorderType.EXTENDED);
 		}
 
 		@Override

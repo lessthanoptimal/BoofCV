@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,22 +20,21 @@ package boofcv.alg.weights;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestWeightPixelGaussian_F32 {
+class TestWeightPixelGaussian_F32 {
 
 	/**
 	 * Sees if changing the radius has the expected result
 	 */
 	@Test
-	public void changeRadius() {
+	void changeRadius() {
 		WeightPixelGaussian_F32 alg = new WeightPixelGaussian_F32();
 
-		alg.setRadius(2,2);
+		alg.setRadius(2,2, true);
 		assertEquals(2,alg.getRadiusX());
 		assertEquals(2,alg.getRadiusY());
 		float middle = alg.weight(0,0);
@@ -45,7 +44,7 @@ public class TestWeightPixelGaussian_F32 {
 		alg.weight( 0, -2);alg.weight(0, 2);
 
 		// make it larger
-		alg.setRadius(3,3);
+		alg.setRadius(3,3, true);
 		assertEquals(3,alg.getRadiusX());
 		assertEquals(3,alg.getRadiusY());
 		assertTrue( middle > alg.weight(0,0));
@@ -54,8 +53,13 @@ public class TestWeightPixelGaussian_F32 {
 
 		// shouldn't declare a new kernel if the same size is requested
 		Object before = alg.kernel;
-		alg.setRadius(3,3);
+		alg.setRadius(3,3, true);
 		assertTrue( before == alg.kernel );
+	}
+
+	@Test
+	void radiusIsEven() {
+		fail("Implement");
 	}
 
 }

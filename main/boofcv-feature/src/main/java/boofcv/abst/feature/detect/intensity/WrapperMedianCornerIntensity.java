@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class WrapperMedianCornerIntensity<I extends ImageGray<I>, D extends Imag
 		this.medianFilter = medianFilter;
 		Class<I> imageType = medianFilter.getInputType().getImageClass();
 		try {
-			m = MedianCornerIntensity.class.getMethod("process",GrayF32.class,imageType,imageType);
+			m = MedianCornerIntensity.class.getMethod("process",imageType,imageType,GrayF32.class);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
@@ -62,7 +62,7 @@ public class WrapperMedianCornerIntensity<I extends ImageGray<I>, D extends Imag
 		
 		medianFilter.process(input,medianImage);
 		try {
-			m.invoke(null,intensity,input,medianImage);
+			m.invoke(null,input,medianImage,intensity);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}

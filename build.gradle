@@ -1,5 +1,5 @@
 plugins {
-    id "com.peterabeles.gversion" version "1.5.1" apply false
+    id "com.peterabeles.gversion" version "1.5.2" apply false
 }
 
 ext.libpath = file('./').absolutePath
@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '0.34'
+    version = '0.35-SNAPSHOT'
 
     ext.COMMONS_IO_VERSION = '2.6'
 

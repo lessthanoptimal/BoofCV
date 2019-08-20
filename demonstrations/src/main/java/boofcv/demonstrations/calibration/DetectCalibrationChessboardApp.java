@@ -22,7 +22,8 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
-import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder.LineInfo;
+import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder.Vertex;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerGraph;
 import boofcv.alg.geo.calibration.CalibrationObservation;
@@ -32,10 +33,8 @@ import boofcv.core.graph.FeatureGraph2D;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
-import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.VisualizeImageData;
@@ -83,7 +82,6 @@ public class DetectCalibrationChessboardApp
 
 	// Workspace for visualized image data
 	private BufferedImage visualized;
-	private BufferedImage binary;
 	private BufferedImage original;
 
 	// The chessboard corner detector
@@ -135,14 +133,11 @@ public class DetectCalibrationChessboardApp
 
 	private void createAlgorithm() {
 		synchronized (lockAlgorithm) {
-			ConfigThreshold threshold = controlPanel.thresholdPanel.createConfig();
-			threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
-			configDetector.threshold = threshold;
 			configDetector.pyramidTopSize = controlPanel.pyramidTop;
 			configDetector.cornerRadius = controlPanel.radius;
 			configDetector.cornerThreshold = controlPanel.cornerThreshold;
 			configDetector.edgeThreshold = controlPanel.edgeThreshold;
-			configDetector.orientaitonTol = controlPanel.orientationTol;
+			configDetector.orientationTol = controlPanel.orientationTol;
 			configDetector.directionTol = controlPanel.directionTol;
 			configDetector.ambiguousTol = controlPanel.ambiguousTol;
 			if( controlPanel.maxDistance == 0 )
@@ -208,7 +203,7 @@ public class DetectCalibrationChessboardApp
 
 			featureImg = detector.getDetector().getDetector().getIntensity();
 
-			controlPanel.thresholdPanel.updateHistogram(featureImg);
+//			controlPanel.thresholdPanel.updateHistogram(featureImg);
 
 			if( controlPanel.logItensity ) {
 				PixelMath.log(featureImg,logIntensity);
@@ -216,8 +211,6 @@ public class DetectCalibrationChessboardApp
 			} else {
 				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
 			}
-
-			binary=VisualizeBinaryData.renderBinary(detector.getDetector().getDetector().getBinary(),false,binary);
 
 			synchronized (lockCorners) {
 				this.success = success;
@@ -268,8 +261,6 @@ public class DetectCalibrationChessboardApp
 			imagePanel.setBufferedImageNoChange(visualized);
 		} else if( controlPanel.view == 1 ) {
 			imagePanel.setBufferedImageNoChange(original);
-		} else if( controlPanel.view == 3 ) {
-			imagePanel.setBufferedImageNoChange(binary);
 		}
 	}
 
@@ -331,7 +322,6 @@ public class DetectCalibrationChessboardApp
 					int width = img.getWidth();
 					int height = img.getHeight();
 
-
 					for (int i = 0; i < foundClusters.size; i++) {
 						FeatureGraph2D graph = foundClusters.get(i);
 
@@ -350,25 +340,48 @@ public class DetectCalibrationChessboardApp
 				}
 			}
 
-			// displays edge intensity values. Not thread safe
-//			FastQueue<ChessboardCorner> corners = detector.getDetector().getCorners();
-//			List<Vertex> vertexes = detector.getClusterFinder().getVertexes().toList();
-//			g2.setColor(Color.RED);
-//			for (int i = 0; i < vertexes.size(); i++) {
-//				Vertex a = vertexes.get(i);
-//				ChessboardCorner ca = corners.get(a.index);
-//
-//				for( int j = 0; j < a.perpendicular.size(); j++ ) {
-//					double intensity = a.perpendicular.get(j).intensity;
-//					Vertex b = a.perpendicular.get(j).dst;
-//					ChessboardCorner cb = corners.get(b.index);
-//
-//					float x = (float)((ca.x+cb.x)/2.0);
-//					float y = (float)((ca.y+cb.y)/2.0);
-//
-//					g2.drawString(String.format("%.1f",intensity),x*(float)scale,y*(float)scale);
-//				}
-//			}
+			if( controlPanel.showPerpendicular ) {
+				// Locking the algorithm will kill performance.
+				synchronized (lockAlgorithm) {
+					Font regular = new Font("Serif", Font.PLAIN, 12);
+					g2.setFont(regular);
+					BasicStroke thin = new BasicStroke(2);
+					BasicStroke thick = new BasicStroke(4);
+//					g2.setStroke(new BasicStroke(1));
+//					List<Vertex> vertexes = detector.getClusterFinder().getVertexes().toList();
+					List<LineInfo> lines = detector.getClusterFinder().getLines().toList();
+
+					for (int i = 0; i < lines.size(); i++) {
+						LineInfo lineInfo = lines.get(i);
+						if( lineInfo.isDisconnected() || lineInfo.parallel )
+							continue;
+
+						Vertex va = lineInfo.endA.dst;
+						Vertex vb = lineInfo.endB.dst;
+
+						ChessboardCorner ca = foundCorners.get(va.index);
+						ChessboardCorner cb = foundCorners.get(vb.index);
+
+						double intensity = lineInfo.intensity == -Double.MAX_VALUE ? Double.NaN : lineInfo.intensity;
+						line.setLine(ca.x * scale, ca.y * scale, cb.x * scale, cb.y * scale);
+
+						g2.setStroke(thick);
+						g2.setColor(Color.BLACK);
+						g2.draw(line);
+
+						g2.setStroke(thin);
+						g2.setColor(Color.CYAN);
+
+						g2.draw(line);
+
+						float x = (float) ((ca.x + cb.x) / 2.0);
+						float y = (float) ((ca.y + cb.y) / 2.0);
+
+						g2.setColor(Color.RED);
+						g2.drawString(String.format("%.1f", intensity), x * (float) scale, y * (float) scale);
+					}
+				}
+			}
 
 			if( controlPanel.anyGrid ) {
 				if( controlPanel.showChessboards ) {
@@ -435,10 +448,10 @@ public class DetectCalibrationChessboardApp
 		JCheckBox checkShowTargets;
 		JCheckBox checkShowNumbers;
 		JCheckBox checkShowClusters;
+		JCheckBox checkShowPerpendicular;
 		JCheckBox checkShowCorners;
 		JCheckBox checkMeanShift;
 		JCheckBox checkAnyGrid;
-		ThresholdControlPanel thresholdPanel;
 
 		int pyramidTop;
 		int radius;
@@ -453,6 +466,7 @@ public class DetectCalibrationChessboardApp
 		boolean showChessboards = true;
 		boolean showNumbers = true;
 		boolean showClusters = false;
+		boolean showPerpendicular = false;
 		boolean showCorners = false;
 		boolean logItensity =false;
 		int view = 1;
@@ -465,11 +479,7 @@ public class DetectCalibrationChessboardApp
 				radius = configDetector.cornerRadius;
 				ambiguousTol = configDetector.ambiguousTol;
 				directionTol = configDetector.directionTol;
-				orientationTol = configDetector.orientaitonTol;
-				thresholdPanel = new ThresholdControlPanel(this,configDetector.threshold);
-				thresholdPanel.addHistogramGraph();
-				// use the actual image histogram. Peaks are rare and the approximate one will be very inaccurate
-				thresholdPanel.histogramPanel.setApproximateHistogram(false);
+				orientationTol = configDetector.orientationTol;
 
 				cornerThreshold = configDetector.cornerThreshold;
 				edgeThreshold = configDetector.edgeThreshold;
@@ -477,13 +487,13 @@ public class DetectCalibrationChessboardApp
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
-			comboView = combo(view,"Intensity","Image","Both","Binary");
+			comboView = combo(view,"Intensity","Image");
 			spinnerCornerThreshold = spinner(cornerThreshold, 0, 100, 0.2);
 			spinnerEdgeThreshold = spinner(edgeThreshold, 0, 1.0, 0.1,1,3);
 			spinnerRadius = spinner(radius, 1, 100, 1);
 			spinnerTop = spinner(pyramidTop, 0, 10000, 50);
 			spinnerOrientationTol = spinner(orientationTol,0,3.0,0.05,1,3);
-			spinnerDirectionTol = spinner(directionTol,0,3.0,0.05,1,3);
+			spinnerDirectionTol = spinner(directionTol,0,1.0,0.05,1,3);
 			spinnerAmbiguous = spinner(ambiguousTol,0,1.0,0.05,1,3);
 			spinnerGridRows = spinner(gridRows,3,200,1);
 			spinnerGridCols = spinner(gridCols,3,200,1);
@@ -492,6 +502,7 @@ public class DetectCalibrationChessboardApp
 			checkShowTargets = checkbox("Chessboard", showChessboards);
 			checkShowNumbers = checkbox("Numbers", showNumbers);
 			checkShowClusters = checkbox("Clusters", showClusters);
+			checkShowPerpendicular = checkbox("Perp.", showPerpendicular);
 			checkShowCorners = checkbox("Corners", showCorners);
 			checkMeanShift = checkbox("Mean Shift", meanShift);
 			checkAnyGrid = checkbox("Any Grid",anyGrid);
@@ -512,7 +523,6 @@ public class DetectCalibrationChessboardApp
 			addLabeled(spinnerOrientationTol,"Orientation Tol");
 			addLabeled(spinnerDirectionTol,"Direction Tol");
 			addLabeled(spinnerAmbiguous,"Ambiguous Tol");
-			addAlignCenter(thresholdPanel);
 		}
 
 		JPanel createCheckPanel() {
@@ -521,6 +531,7 @@ public class DetectCalibrationChessboardApp
 			panel.add(checkShowTargets);
 			panel.add(checkShowNumbers);
 			panel.add(checkShowClusters);
+			panel.add(checkShowPerpendicular);
 			panel.add(checkShowCorners);
 			panel.add(checkLogIntensity);
 
@@ -568,6 +579,9 @@ public class DetectCalibrationChessboardApp
 				imagePanel.repaint();
 			} else if( e.getSource() == checkShowClusters) {
 				showClusters = checkShowClusters.isSelected();
+				imagePanel.repaint();
+			} else if( e.getSource() == checkShowPerpendicular) {
+				showPerpendicular = checkShowPerpendicular.isSelected();
 				imagePanel.repaint();
 			} else if( e.getSource() == checkMeanShift) {
 				meanShift = checkMeanShift.isSelected();

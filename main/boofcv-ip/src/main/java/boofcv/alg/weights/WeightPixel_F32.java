@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public interface WeightPixel_F32 {
 	 * @param index index of grid element
 	 * @return the weight
 	 */
-	public float weightIndex( int index );
+	float weightIndex( int index );
 
 	/**
 	 * Access the weight using coordinates.
@@ -48,25 +48,26 @@ public interface WeightPixel_F32 {
 	 * @param y y-coordinate: range = -radius to radius, inclusive
 	 * @return the weight
 	 */
-	public float weight( int x , int y );
+	float weight( int x , int y );
 
 	/**
 	 * Change the kernel's size
 	 *
 	 * @param radiusX Radius along x-axis
 	 * @param radiusY Radius along y-axis
+	 * @param odd If odd then the width will be 2*radius+1, otherwise 2*radius
 	 */
-	public void setRadius( int radiusX , int radiusY );
+	void setRadius( int radiusX , int radiusY , boolean odd );
 
 	/**
 	 * Returns the kernel's radius along the x-axis
 	 * @return Radius of kernel
 	 */
-	public int getRadiusX();
+	int getRadiusX();
 
 	/**
 	 * Returns the kernel's radius along the y-axis
 	 * @return Radius of kernel
 	 */
-	public int getRadiusY();
+	int getRadiusY();
 }

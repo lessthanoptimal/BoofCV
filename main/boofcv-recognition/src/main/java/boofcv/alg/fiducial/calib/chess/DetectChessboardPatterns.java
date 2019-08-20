@@ -19,12 +19,9 @@
 package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
-import boofcv.alg.feature.detect.chess.DetectChessboardCornersPyramid;
+import boofcv.alg.feature.detect.chess.DetectChessboardCorners2Pyramid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
-import boofcv.factory.filter.binary.FactoryThresholdBinary;
-import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import org.ddogleg.struct.FastQueue;
 
@@ -35,7 +32,7 @@ import org.ddogleg.struct.FastQueue;
  */
 public class DetectChessboardPatterns<T extends ImageGray<T>> {
 
-	protected DetectChessboardCornersPyramid<T,?> detector;
+	protected DetectChessboardCorners2Pyramid<T> detector;
 	protected ChessboardCornerClusterFinder<T> clusterFinder;
 	protected ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
 
@@ -43,22 +40,18 @@ public class DetectChessboardPatterns<T extends ImageGray<T>> {
 
 	public DetectChessboardPatterns(ConfigChessboard config , Class<T> imageType ) {
 
-		detector = new DetectChessboardCornersPyramid<>(imageType);
+		detector = new DetectChessboardCorners2Pyramid<>(imageType);
 		clusterFinder = new ChessboardCornerClusterFinder<>(imageType);
 
 		// the user is unlikely to set this value correctly
 		config.threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
 
-		InputToBinary<GrayF32> thresholder = FactoryThresholdBinary.threshold(config.threshold,GrayF32.class);
-
-		detector.getDetector().setThresholding(thresholder);
-		detector.getDetector().setKernelRadius(config.cornerRadius);
-		detector.getDetector().setCornerIntensityThreshold(config.cornerThreshold);
 		detector.setPyramidTopSize(config.pyramidTopSize);
+		detector.getDetector().setNonmaxRadius(config.cornerRadius);
 
 		clusterFinder.setAmbiguousTol(config.ambiguousTol);
 		clusterFinder.setDirectionTol(config.directionTol);
-		clusterFinder.setOrientationTol(config.orientaitonTol);
+		clusterFinder.setOrientationTol(config.orientationTol);
 		clusterFinder.setMaxNeighbors(config.maxNeighbors);
 		clusterFinder.setMaxNeighborDistance(config.maxNeighborDistance);
 		clusterFinder.setThresholdEdgeIntensity(config.edgeThreshold);
@@ -80,6 +73,7 @@ public class DetectChessboardPatterns<T extends ImageGray<T>> {
 	public void findPatterns(T input) {
 		found.reset();
 		detector.process(input);
+//		T blurred = detector.getDetector().getBlurred();
 		clusterFinder.process(input,detector.getCorners().toList());
 		FastQueue<ChessboardCornerGraph> clusters = clusterFinder.getOutputClusters();
 
@@ -92,7 +86,7 @@ public class DetectChessboardPatterns<T extends ImageGray<T>> {
 		}
 	}
 
-	public DetectChessboardCornersPyramid<T,?> getDetector() {
+	public DetectChessboardCorners2Pyramid<T> getDetector() {
 		return detector;
 	}
 

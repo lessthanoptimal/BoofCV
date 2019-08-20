@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,8 @@ public class WeightPixelUniform_F32 implements WeightPixel_F32 {
 	public WeightPixelUniform_F32() {
 	}
 
-	public WeightPixelUniform_F32(int radiusX, int radiusY) {
-		setRadius(radiusX,radiusY);
+	public WeightPixelUniform_F32(int radiusX, int radiusY, boolean odd ) {
+		setRadius(radiusX,radiusY,odd);
 	}
 
 	@Override
@@ -47,12 +47,16 @@ public class WeightPixelUniform_F32 implements WeightPixel_F32 {
 	}
 
 	@Override
-	public void setRadius(int radiusX, int radiusY) {
+	public void setRadius(int radiusX, int radiusY, boolean odd ) {
 		this.radiusX = radiusX;
 		this.radiusY = radiusY;
 
-		int w = radiusX*2+1;
-		int h = radiusY*2+1;
+		int w = radiusX*2;
+		int h = radiusY*2;
+		if( odd ) {
+			w += 1;
+			h += 1;
+		}
 		weight = 1.0f/(w*h);
 	}
 

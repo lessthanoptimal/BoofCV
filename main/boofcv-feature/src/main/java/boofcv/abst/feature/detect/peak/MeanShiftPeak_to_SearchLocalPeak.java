@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,9 +29,11 @@ import boofcv.struct.image.ImageGray;
 public class MeanShiftPeak_to_SearchLocalPeak<T extends ImageGray<T>> implements SearchLocalPeak<T> {
 
 	MeanShiftPeak<T> search;
+	boolean positive;
 
-	public MeanShiftPeak_to_SearchLocalPeak(MeanShiftPeak<T> search) {
+	public MeanShiftPeak_to_SearchLocalPeak(MeanShiftPeak<T> search, boolean positive ) {
 		this.search = search;
+		this.positive = positive;
 	}
 
 	@Override
@@ -46,7 +48,11 @@ public class MeanShiftPeak_to_SearchLocalPeak<T extends ImageGray<T>> implements
 
 	@Override
 	public void search(float x, float y) {
-		search.search(x,y);
+		if( positive ) {
+			search.searchPositive(x,y);
+		} else {
+			search.search(x, y);
+		}
 	}
 
 	@Override

@@ -69,7 +69,7 @@ public class BenchmarkPeakFinding<T extends ImageGray<T>> {
 
 		public MeanShiftGaussian( int radius ) {
 			WeightPixel_F32 weight = new WeightPixelGaussian_F32();
-			this.alg = new MeanShiftPeak(30,0.1f,weight,imageType, BorderType.EXTENDED);
+			this.alg = new MeanShiftPeak(30,0.1f,weight,true,imageType, BorderType.EXTENDED);
 			alg.setRadius(radius);
 		}
 
@@ -89,7 +89,7 @@ public class BenchmarkPeakFinding<T extends ImageGray<T>> {
 
 		public MeanShiftUniform( int radius ) {
 			WeightPixel_F32 weight = new WeightPixelGaussian_F32();
-			this.alg = new MeanShiftPeak(30,0.1f,weight,imageType, BorderType.EXTENDED);
+			this.alg = new MeanShiftPeak(30,0.1f,weight,true,imageType, BorderType.EXTENDED);
 			alg.setRadius(radius);
 		}
 

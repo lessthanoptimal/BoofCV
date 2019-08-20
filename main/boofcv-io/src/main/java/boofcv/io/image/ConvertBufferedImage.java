@@ -41,6 +41,10 @@ public class ConvertBufferedImage {
 	 * If the provided image does not have the same shape and same type a new one is declared and returned.
 	 */
 	public static BufferedImage checkDeclare( int width , int height , BufferedImage image , int type ) {
+		// webcam images can have type 0, which is unknown
+		if( type == 0 ) {
+			type = BufferedImage.TYPE_INT_RGB;
+		}
 		if( image == null )
 			return new BufferedImage(width,height,type);
 		if( image.getType() != type )

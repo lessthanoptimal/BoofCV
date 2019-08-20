@@ -35,6 +35,10 @@ import javax.annotation.Generated;
  */
 @Generated("boofcv.alg.misc.GeneratePixelMath")
 public class PixelMath {
+	/**
+	 * If an image has fewer pixels than this it will not run a concurrent algorithm. The overhead makes it slower.
+	 */
+	public static int SMALL_IMAGE = 100*100;
 
 	/**
 	 * Sets each pixel in the output image to be the absolute value of the input image.
@@ -48,7 +52,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -71,7 +76,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -94,7 +100,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -117,7 +124,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -140,7 +148,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -163,7 +172,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -186,7 +196,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -209,7 +220,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -232,7 +244,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -255,7 +268,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -278,7 +292,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -301,7 +316,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.abs(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -323,7 +339,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -345,7 +362,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -367,7 +385,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -389,7 +408,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -411,7 +431,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -433,7 +454,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -455,7 +477,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -477,7 +500,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -499,7 +523,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -521,7 +546,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -543,7 +569,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -565,7 +592,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.negative(input.data, input.startIndex, input.stride,
 					output.data, output.startIndex, output.stride,
 					input.height, columns);
@@ -589,7 +617,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -613,7 +642,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -637,7 +667,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -661,7 +692,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -685,7 +717,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -709,7 +742,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -733,7 +767,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -757,7 +792,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -781,7 +817,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -805,7 +842,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -829,7 +867,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -853,7 +892,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -877,7 +917,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -901,7 +942,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -925,7 +967,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -949,7 +992,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -973,7 +1017,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -997,7 +1042,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1021,7 +1067,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1045,7 +1092,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1069,7 +1117,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1093,7 +1142,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1117,7 +1167,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1141,7 +1192,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1165,7 +1217,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1189,7 +1242,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1213,7 +1267,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1237,7 +1292,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1261,7 +1317,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1285,7 +1342,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1309,7 +1367,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1333,7 +1392,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1356,7 +1416,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1379,7 +1440,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1402,7 +1464,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1425,7 +1488,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1448,7 +1512,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1471,7 +1536,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1494,7 +1560,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1517,7 +1584,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1540,7 +1608,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1563,7 +1632,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1586,7 +1656,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1609,7 +1680,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1632,7 +1704,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1655,7 +1728,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1678,7 +1752,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1701,7 +1776,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1724,7 +1800,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1747,7 +1824,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1770,7 +1848,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1793,7 +1872,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1816,7 +1896,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1839,7 +1920,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1862,7 +1944,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1885,7 +1968,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1908,7 +1992,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1931,7 +2016,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1954,7 +2040,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -1977,7 +2064,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2000,7 +2088,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2023,7 +2112,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2046,7 +2136,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2069,7 +2160,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2092,7 +2184,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2115,7 +2208,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2138,7 +2232,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2161,7 +2256,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2184,7 +2280,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2207,7 +2304,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2230,7 +2328,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2253,7 +2352,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2276,7 +2376,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2299,7 +2400,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2322,7 +2424,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2345,7 +2448,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2368,7 +2472,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2391,7 +2496,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2414,7 +2520,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2437,7 +2544,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2460,7 +2568,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2483,7 +2592,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2506,7 +2616,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2529,7 +2640,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2552,7 +2664,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2575,7 +2688,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2598,7 +2712,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2621,7 +2736,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2644,7 +2760,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2667,7 +2784,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2690,7 +2808,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2713,7 +2832,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2736,7 +2856,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2759,7 +2880,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2782,7 +2904,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2805,7 +2928,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2828,7 +2952,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2851,7 +2976,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2874,7 +3000,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2897,7 +3024,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2920,7 +3048,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2943,7 +3072,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2966,7 +3096,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -2989,7 +3120,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3012,7 +3144,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3035,7 +3168,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3058,7 +3192,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3081,7 +3216,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3104,7 +3240,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3127,7 +3264,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3150,7 +3288,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3173,7 +3312,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3196,7 +3336,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3219,7 +3360,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3242,7 +3384,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3265,7 +3408,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3288,7 +3432,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3311,7 +3456,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3334,7 +3480,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3357,7 +3504,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3380,7 +3528,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3403,7 +3552,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3426,7 +3576,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3449,7 +3600,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3472,7 +3624,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3495,7 +3648,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3518,7 +3672,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3541,7 +3696,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3564,7 +3720,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3587,7 +3744,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3610,7 +3768,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3633,7 +3792,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3656,7 +3816,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3679,7 +3840,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3702,7 +3864,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3725,7 +3888,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3748,7 +3912,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3771,7 +3936,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3794,7 +3960,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3817,7 +3984,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3840,7 +4008,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3863,7 +4032,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3886,7 +4056,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3909,7 +4080,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3932,7 +4104,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3955,7 +4128,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -3978,7 +4152,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -4001,7 +4176,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -4024,7 +4200,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -4047,7 +4224,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -4070,7 +4248,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -4093,7 +4272,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -4116,7 +4296,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -4139,7 +4320,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -4162,7 +4344,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -4185,7 +4368,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -4208,7 +4392,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -4231,7 +4416,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -4254,7 +4440,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height);
 
 		int columns = input.width;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -4277,7 +4464,8 @@ public class PixelMath {
 		output.reshape(input.width,input.height,input.numBands);
 
 		int columns = input.width*input.numBands;
-		if(BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value, lower, upper ,
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
@@ -4312,7 +4500,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
 		} else {
 			ImplPixelMath.diffAbs(imgA, imgB, output);
@@ -4343,7 +4532,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
 		} else {
 			ImplPixelMath.diffAbs(imgA, imgB, output);
@@ -4374,7 +4564,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
 		} else {
 			ImplPixelMath.diffAbs(imgA, imgB, output);
@@ -4405,7 +4596,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
 		} else {
 			ImplPixelMath.diffAbs(imgA, imgB, output);
@@ -4436,7 +4628,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
 		} else {
 			ImplPixelMath.diffAbs(imgA, imgB, output);
@@ -4467,7 +4660,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
 		} else {
 			ImplPixelMath.diffAbs(imgA, imgB, output);
@@ -4498,7 +4692,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
 		} else {
 			ImplPixelMath.diffAbs(imgA, imgB, output);
@@ -4529,7 +4724,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.diffAbs(imgA, imgB, output);
 		} else {
 			ImplPixelMath.diffAbs(imgA, imgB, output);
@@ -4549,7 +4745,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.add(imgA, imgB, output);
 		} else {
 			ImplPixelMath.add(imgA, imgB, output);
@@ -4569,7 +4766,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.subtract(imgA, imgB, output);
 		} else {
 			ImplPixelMath.subtract(imgA, imgB, output);
@@ -4589,7 +4787,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.add(imgA, imgB, output);
 		} else {
 			ImplPixelMath.add(imgA, imgB, output);
@@ -4609,7 +4808,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.subtract(imgA, imgB, output);
 		} else {
 			ImplPixelMath.subtract(imgA, imgB, output);
@@ -4629,7 +4829,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.add(imgA, imgB, output);
 		} else {
 			ImplPixelMath.add(imgA, imgB, output);
@@ -4649,7 +4850,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.subtract(imgA, imgB, output);
 		} else {
 			ImplPixelMath.subtract(imgA, imgB, output);
@@ -4669,7 +4871,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.add(imgA, imgB, output);
 		} else {
 			ImplPixelMath.add(imgA, imgB, output);
@@ -4689,7 +4892,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.subtract(imgA, imgB, output);
 		} else {
 			ImplPixelMath.subtract(imgA, imgB, output);
@@ -4709,7 +4913,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.add(imgA, imgB, output);
 		} else {
 			ImplPixelMath.add(imgA, imgB, output);
@@ -4729,7 +4934,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.subtract(imgA, imgB, output);
 		} else {
 			ImplPixelMath.subtract(imgA, imgB, output);
@@ -4749,7 +4955,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.add(imgA, imgB, output);
 		} else {
 			ImplPixelMath.add(imgA, imgB, output);
@@ -4769,7 +4976,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.subtract(imgA, imgB, output);
 		} else {
 			ImplPixelMath.subtract(imgA, imgB, output);
@@ -4789,7 +4997,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.add(imgA, imgB, output);
 		} else {
 			ImplPixelMath.add(imgA, imgB, output);
@@ -4809,7 +5018,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.subtract(imgA, imgB, output);
 		} else {
 			ImplPixelMath.subtract(imgA, imgB, output);
@@ -4829,7 +5039,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply(imgA, imgB, output);
 		} else {
 			ImplPixelMath.multiply(imgA, imgB, output);
@@ -4849,7 +5060,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide(imgA,imgB,output);
 		} else {
 			ImplPixelMath.divide(imgA,imgB,output);
@@ -4867,7 +5079,8 @@ public class PixelMath {
 
 		output.reshape(input.width,input.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.log(input,output);
 		} else {
 			ImplPixelMath.log(input,output);
@@ -4886,7 +5099,8 @@ public class PixelMath {
 
 		output.reshape(input.width,input.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.logSign(input,output);
 		} else {
 			ImplPixelMath.logSign(input,output);
@@ -4903,7 +5117,8 @@ public class PixelMath {
 
 		output.reshape(input.width,input.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.pow2(input,output);
 		} else {
 			ImplPixelMath.pow2(input,output);
@@ -4921,7 +5136,8 @@ public class PixelMath {
 
 		output.reshape(input.width,input.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.sqrt(input,output);
 		} else {
 			ImplPixelMath.sqrt(input,output);
@@ -4941,7 +5157,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.add(imgA, imgB, output);
 		} else {
 			ImplPixelMath.add(imgA, imgB, output);
@@ -4961,7 +5178,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.subtract(imgA, imgB, output);
 		} else {
 			ImplPixelMath.subtract(imgA, imgB, output);
@@ -4981,7 +5199,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.multiply(imgA, imgB, output);
 		} else {
 			ImplPixelMath.multiply(imgA, imgB, output);
@@ -5001,7 +5220,8 @@ public class PixelMath {
 		InputSanityCheck.checkSameShape(imgA,imgB);
 		output.reshape(imgA.width,imgA.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = imgA.width*imgA.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.divide(imgA,imgB,output);
 		} else {
 			ImplPixelMath.divide(imgA,imgB,output);
@@ -5019,7 +5239,8 @@ public class PixelMath {
 
 		output.reshape(input.width,input.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.log(input,output);
 		} else {
 			ImplPixelMath.log(input,output);
@@ -5038,7 +5259,8 @@ public class PixelMath {
 
 		output.reshape(input.width,input.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.logSign(input,output);
 		} else {
 			ImplPixelMath.logSign(input,output);
@@ -5055,7 +5277,8 @@ public class PixelMath {
 
 		output.reshape(input.width,input.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.pow2(input,output);
 		} else {
 			ImplPixelMath.pow2(input,output);
@@ -5073,7 +5296,8 @@ public class PixelMath {
 
 		output.reshape(input.width,input.height);
 
-		if( BoofConcurrency.USE_CONCURRENT ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
 			ImplPixelMath_MT.sqrt(input,output);
 		} else {
 			ImplPixelMath.sqrt(input,output);

@@ -52,18 +52,18 @@ class TestChessboardCornerEdgeIntensity {
 		ChessboardCorner a21 = create(x0,y0+length,yawB);
 		ChessboardCorner a22 = create(x0+length,y0+length,yawA);
 
-		double found0 = alg.process(a11,a12,0);
-		double found1 = alg.process(a11,a21,Math.PI/2.0);
-		double found2 = alg.process(a21,a22,0);
+		double found0 = alg.process(a11,a12,0,1,1);
+		double found1 = alg.process(a11,a21,Math.PI/2.0,1,1);
+		double found2 = alg.process(a21,a22,0,1,1);
 
 		assertEquals(255,found0);
 		assertEquals(255,found1);
 		assertEquals(255,found2);
 
 		// same results in the other direction
-		found0 = alg.process(a12,a11,Math.PI);
-		found1 = alg.process(a21,a11,-Math.PI/2.0);
-		found2 = alg.process(a22,a21,Math.PI);
+		found0 = alg.process(a12,a11,Math.PI,1,1);
+		found1 = alg.process(a21,a11,-Math.PI/2.0,1,1);
+		found2 = alg.process(a22,a21,Math.PI,1,1);
 
 		assertEquals(255,found0);
 		assertEquals(255,found1);
@@ -80,23 +80,23 @@ class TestChessboardCornerEdgeIntensity {
 		double n = 20/15.0;
 
 		// horizontal relationship
-		alg.computeUnitNormal(a11,0.0,20,0);
+		alg.computeUnitNormal(a11,a12,0.0,20,0);
 		assertEquals(0.0,alg.nx, UtilEjml.TEST_F32);
 		assertEquals(-n,alg.ny, UtilEjml.TEST_F32);
 
-		alg.computeUnitNormal(a12,Math.PI,-20,0);
+		alg.computeUnitNormal(a12,a11,Math.PI,-20,0);
 		assertEquals(0.0,alg.nx, UtilEjml.TEST_F32);
 		assertEquals(-n,alg.ny, UtilEjml.TEST_F32);
-		alg.computeUnitNormal(a12,-Math.PI,-20,0);
+		alg.computeUnitNormal(a12,a11,-Math.PI,-20,0);
 		assertEquals(0.0,alg.nx, UtilEjml.TEST_F32);
 		assertEquals(-n,alg.ny, UtilEjml.TEST_F32);
 
 		// vertical relationship
-		alg.computeUnitNormal(a11,Math.PI/2.0,0,20);
+		alg.computeUnitNormal(a11,a12,Math.PI/2.0,0,20);
 		assertEquals(-n,alg.nx, UtilEjml.TEST_F32);
 		assertEquals( 0.0,alg.ny, UtilEjml.TEST_F32);
 
-		alg.computeUnitNormal(a12,-Math.PI/2.0,0,-20);
+		alg.computeUnitNormal(a12,a12,-Math.PI/2.0,0,-20);
 		assertEquals(-n,alg.nx, UtilEjml.TEST_F32);
 		assertEquals( 0.0,alg.ny, UtilEjml.TEST_F32);
 	}

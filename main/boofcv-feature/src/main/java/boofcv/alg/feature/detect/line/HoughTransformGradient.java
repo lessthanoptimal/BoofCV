@@ -72,7 +72,7 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 
 	// Refine lines using mean shift. If radius <= 0 it won't be used
 	MeanShiftPeak<GrayF32> refine = new MeanShiftPeak<>(10,0.001f,
-			new WeightPixelGaussian_F32(),GrayF32.class, BorderType.ZERO);
+			new WeightPixelGaussian_F32(),true,GrayF32.class, BorderType.ZERO);
 
 	HoughTransformParameters parameters;
 

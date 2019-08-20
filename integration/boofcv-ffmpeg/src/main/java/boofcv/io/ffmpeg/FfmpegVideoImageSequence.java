@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -172,7 +172,7 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 			finished = false;
 			frameGrabber.start();
 		} catch (FrameGrabber.Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 			finished = true;
 			return;
 		}

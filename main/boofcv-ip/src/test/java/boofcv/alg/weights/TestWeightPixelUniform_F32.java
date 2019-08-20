@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,16 +21,17 @@ package boofcv.alg.weights;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestWeightPixelUniform_F32 {
+class TestWeightPixelUniform_F32 {
 
 	@Test
-	public void inside() {
+	void inside() {
 		WeightPixelUniform_F32 alg = new WeightPixelUniform_F32();
-		alg.setRadius(2,3);
+		alg.setRadius(2,3,true);
 
 		float expected = 1.0f/(5f*7f);
 
@@ -47,12 +48,17 @@ public class TestWeightPixelUniform_F32 {
 	 * check to see if that's the case.
 	 */
 	@Test
-	public void outside() {
+	void outside() {
 		WeightPixelUniform_F32 alg = new WeightPixelUniform_F32();
-		alg.setRadius(2,2);
+		alg.setRadius(2,2,true);
 
 		float expected = 1.0f/25.0f;
 
 		assertEquals(expected,alg.weight(-3,0),1e-4);
+	}
+
+	@Test
+	void even_odd() {
+		fail("implement");
 	}
 }

@@ -3,6 +3,37 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2019
+Version : 0.35
+
+- Mean Shift
+  * Even kernel sizes
+  * Configuration class
+  * Ignore negative values
+- Concurrency
+  * PixelMath now only uses concurrent algorithm when input image is more than 10,000 pixels.
+    This caused circulant to slow down.
+- Calibration
+  * TODO Calibrate using partially obscured chessboard patterns
+  * TODO Add ability to remove images and recalibrate from application
+  * TODO change high level API to be able to return more than one pattern. String ID
+- Chessboard Detector
+  * TODO detect first at low resolution
+  * TODO Prune similar based on edge difference
+  * TODO why pick long line in calib?
+
+
+TODO Tech Report for new chessboard detector, assisted calibration, line fitting
+TODO Videos - hough line detectors
+            - chessboard corner detector + improvements
+
+TODO corner detector 2 tech report
+TODO Scene Reconstruction from arbitrary number of photos
+TODO regression for line detectors
+TODO hough circle detector
+TODO concurrent SIFT
+
+---------------------------------------------
 Date    : 2019-July-07
 Version : 0.34
 

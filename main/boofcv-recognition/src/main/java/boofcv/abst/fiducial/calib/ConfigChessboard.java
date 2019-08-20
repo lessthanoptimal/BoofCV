@@ -37,7 +37,7 @@ public class ConfigChessboard implements Configuration {
 	 * Size of a corner in the corner detector. For very small targets 1 is required. Otherwise 2 provides
 	 * much more stable results.
 	 */
-	public int cornerRadius = 2;
+	public int cornerRadius = 1;
 
 	/**
 	 * Second threshold on corner intensity. This is applied after orientation has been estimated and is used
@@ -47,9 +47,9 @@ public class ConfigChessboard implements Configuration {
 
 	/**
 	 * Relative threshold for two corners being connected. The edge between them must have sufficient intensity.
-	 * The definition of sufficient is based on the corner's intensity
+	 * The definition of sufficient is based on the contrast of the two x-corners.
 	 */
-	public double edgeThreshold = 0.5;
+	public double edgeThreshold = 0.05;
 
 	/**
 	 * The minimum allowed size for the top most layer in the pyramid. size = min(width,height). To have
@@ -58,14 +58,14 @@ public class ConfigChessboard implements Configuration {
 	public int pyramidTopSize = 100;
 
 	/**
-	 * How similar the direction of two corners relative to each other need to be.
+	 * How similar the direction of two corners relative to each other need to be. 0 to 1. Higher is more tolerant
 	 */
-	public double directionTol = 0.60;
+	public double directionTol = 0.85;
 
 	/**
 	 * How similar two corner orientations need to be
 	 */
-	public double orientaitonTol = 0.65;
+	public double orientationTol = 0.65;
 
 	/**
 	 * Ratio used to decide if two corners are spatially close enough to each other to be considered
@@ -101,5 +101,9 @@ public class ConfigChessboard implements Configuration {
 	}
 
 	@Override
-	public void checkValidity() {}
+	public void checkValidity() {
+		if( directionTol < 0 || directionTol > 1 )
+			throw new IllegalArgumentException("directionTol must be 0 to 1");
+
+	}
 }
