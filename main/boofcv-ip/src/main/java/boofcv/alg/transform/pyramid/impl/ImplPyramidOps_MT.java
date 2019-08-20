@@ -19,10 +19,9 @@
 package boofcv.alg.transform.pyramid.impl;
 
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
 /**
  * <p>
@@ -36,7 +35,7 @@ import boofcv.struct.image.GrayU8;
  * @author Peter Abeles
  */
 @SuppressWarnings("Duplicates")
-public class ImplPyramidOps {
+public class ImplPyramidOps_MT {
 
 	/**
 	 * Scales an image up using interpolation
@@ -48,8 +47,7 @@ public class ImplPyramidOps {
 		float fdiv = 1/(float)scale;
 		interp.setImage(input);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, output.height, y -> {
-		for (int y = 0; y < output.height; y++) {
+		BoofConcurrency.loopFor(0, output.height, y -> {
 			float inputY = y*fdiv;
 			int indexOutput = output.getIndex(0,y);
 
@@ -58,8 +56,7 @@ public class ImplPyramidOps {
 
 				output.data[indexOutput++] = interp.get(inputX,inputY);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -69,15 +66,13 @@ public class ImplPyramidOps {
 		
 		output.reshape(input.width / 2, input.height / 2);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, output.height, y -> {
-		for (int y = 0; y < output.height; y++) {
+		BoofConcurrency.loopFor(0, output.height, y -> {
 			int indexInput = 2*y*input.stride;
 			int indexOutput = y*output.stride;
 			for (int x = 0; x < output.width; x++,indexInput+=2) {
 				output.data[indexOutput++] = input.data[indexInput];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -90,8 +85,7 @@ public class ImplPyramidOps {
 		float fdiv = 1/(float)scale;
 		interp.setImage(input);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, output.height, y -> {
-		for (int y = 0; y < output.height; y++) {
+		BoofConcurrency.loopFor(0, output.height, y -> {
 			float inputY = y*fdiv;
 			int indexOutput = output.getIndex(0,y);
 
@@ -100,8 +94,7 @@ public class ImplPyramidOps {
 
 				output.data[indexOutput++] = (byte)interp.get(inputX,inputY);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	/**
@@ -111,15 +104,13 @@ public class ImplPyramidOps {
 		
 		output.reshape(input.width / 2, input.height / 2);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, output.height, y -> {
-		for (int y = 0; y < output.height; y++) {
+		BoofConcurrency.loopFor(0, output.height, y -> {
 			int indexInput = 2*y*input.stride;
 			int indexOutput = y*output.stride;
 			for (int x = 0; x < output.width; x++,indexInput+=2) {
 				output.data[indexOutput++] = input.data[indexInput];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 

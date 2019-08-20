@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.struct.image.GrayU8;
  */
 public class ImplMedianCornerIntensity {
 
-	public static void process(GrayF32 intensity , GrayF32 originalImage, GrayF32 medianImage)
+	public static void process(GrayF32 originalImage, GrayF32 medianImage, GrayF32 intensity)
 	{
 		final int width = originalImage.width;
 		final int height = originalImage.height;
@@ -48,7 +48,7 @@ public class ImplMedianCornerIntensity {
 		}
 	}
 
-	public static void process(GrayF32 intensity , GrayU8 originalImage, GrayU8 medianImage)
+	public static void process(GrayU8 originalImage, GrayU8 medianImage, GrayF32 intensity)
 	{
 		final int width = originalImage.width;
 		final int height = originalImage.height;
