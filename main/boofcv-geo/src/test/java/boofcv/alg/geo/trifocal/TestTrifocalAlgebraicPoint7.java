@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,19 +35,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
+class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 
 	/**
 	 * Give it perfect inputs and make sure it doesn't screw things up
 	 */
 	@Test
-	public void perfect() {
+	void perfect() {
+		perfect(true);
+		perfect(false);
+	}
+
+	private void perfect( boolean planar ) {
+		createSceneObservations(planar);
+
 		UnconstrainedLeastSquares optimizer = FactoryOptimization.levenbergMarquardt(null,false);
 		TrifocalAlgebraicPoint7 alg = new TrifocalAlgebraicPoint7(optimizer,300,1e-20,1e-20);
 
 		assertTrue(alg.process(observations, found));
 
-		checkTrifocalWithConstraint(found, 1e-8);
+		checkTrifocalWithConstraint(found, 5e-7);
 		assertEquals(0, computeTransferError(found,observations), UtilEjml.TEST_F64);
 	}
 
@@ -55,7 +62,13 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 	 * Give it noisy inputs and see if it produces a better solution than the non-iterative algorithm.
 	 */
 	@Test
-	public void noisy() {
+	void noisy() {
+//		noisy(true); // can't test the planar scenario here because the linear solution is used and that blows up
+		noisy(false);
+	}
+	private void noisy( boolean planar ) {
+		createSceneObservations(planar);
+
 		List<AssociatedTriple> noisyObs = new ArrayList<>();
 
 		// create a noisy set of observations
@@ -93,7 +106,7 @@ public class TestTrifocalAlgebraicPoint7 extends CommonTrifocalChecks {
 	/**
 	 * Computes the error using induced homographies.
 	 */
-	public double computeTransferError(TrifocalTensor tensor , List<AssociatedTriple> observations )
+	double computeTransferError(TrifocalTensor tensor , List<AssociatedTriple> observations )
 	{
 		TrifocalTransfer transfer = new TrifocalTransfer();
 		transfer.setTrifocal(tensor);

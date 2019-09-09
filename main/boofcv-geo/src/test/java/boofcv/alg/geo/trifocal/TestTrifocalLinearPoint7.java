@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,7 @@ public class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 	 */
 	@Test
 	public void checkLinearSystem() {
+		createSceneObservations(true);
 
 		TrifocalLinearPoint7 alg = new TrifocalLinearPoint7();
 

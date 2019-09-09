@@ -37,7 +37,7 @@ public class DoStuffFromPairwiseGraph {
 	FastQueue<ScoreIndex> scoresMotions = new FastQueue<>(ScoreIndex.class,true);
 
 	ProjectiveInitializeAllCommon initProjective = new ProjectiveInitializeAllCommon();
-	ProjectiveExpandStructure expandProjective = new ProjectiveExpandStructure();
+	ProjectiveExpandToNeighbors expandProjective = new ProjectiveExpandToNeighbors();
 
 	public void process( LookupSimilarImages db , PairwiseImageGraph2 graph ) {
 		// Score nodes for their ability to be seeds
@@ -53,7 +53,12 @@ public class DoStuffFromPairwiseGraph {
 			// initialize projective scene using common tracks
 			initProjective.projectiveSceneN(db,seeds.get(i).seed,common,seed.motions);
 
+			// TODO save found camera matrices
+
+			// select all 3D connections to see, find camera pointing to see and 1 other node
+
 			// TODO Grow the projective view to include all connected views that meet minimum conditions
+//			expandProjective.process(db,seed.seed,common,);
 
 			// TODO Compute metric scenes from projective
 		}

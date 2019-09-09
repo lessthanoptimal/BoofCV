@@ -113,6 +113,9 @@ public class CommonHomographyChecks {
 		return ret;
 	}
 
+	/**
+	 * Create a random set of points which line on the x-y plane at distance 'd'
+	 */
 	public static List<Point4D_F64> createRandomPlaneH(Random rand , double d , int N )
 	{
 		List<Point4D_F64> ret = new ArrayList<>();
@@ -121,7 +124,7 @@ public class CommonHomographyChecks {
 			double x = (rand.nextDouble()-0.5)*2;
 			double y = (rand.nextDouble()-0.5)*2;
 
-			// make it more interesting by not haing the same W for all the point
+			// make it more interesting by not having the same W for all the point
 			double scale = rand.nextDouble()+0.1;
 			if( rand.nextBoolean() )
 				scale *= -1;

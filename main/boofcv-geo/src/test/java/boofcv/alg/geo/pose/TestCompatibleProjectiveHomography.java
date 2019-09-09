@@ -103,7 +103,11 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 
 	@Test
 	void fitCameras() {
-		createScene(10,false);
+		fitCameras(true);
+		fitCameras(false);
+	}
+	void fitCameras(boolean planar) {
+		createScene(10,planar);
 
 		List<DMatrixRMaj> camerasA = new ArrayList<>(super.cameras);
 		List<DMatrixRMaj> camerasB = new ArrayList<>(this.camerasB);
@@ -128,7 +132,11 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 	 */
 	@Test
 	void fitCameras_RandomH() {
-		createScene(10,false);
+		fitCameras_RandomH(true);
+		fitCameras_RandomH(false);
+	}
+	void fitCameras_RandomH(boolean planar ) {
+		createScene(10,planar);
 
 		DMatrixRMaj H = RandomMatrices_DDRM.rectangle(4,4,rand);
 
@@ -158,12 +166,12 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 	@Test
 	void fitCameraPoints() {
 //		fitCameraPoints(2); // two should be the minimum but isn't working
-		fitCameraPoints(4);
+//		fitCameraPoints(4);
 		fitCameraPoints(20);
 	}
 
 	void fitCameraPoints( int N ) {
-		createScene(N,false);
+		createScene(N,true);
 
 		// Find the homography
 		DMatrixRMaj H = new DMatrixRMaj(4,4);

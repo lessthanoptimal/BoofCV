@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,6 +35,8 @@ import java.util.List;
  * then iteratively refines the solution to minimize algebraic error by adjusting the two epipoles.
  * The solution will enforce all the constraints and be geometrically valid. See page 395 in [1].
  * </p>
+ *
+ * <p>Note: This works with planes!</p>
  *
  * <p>References:</p>
  * <ul>

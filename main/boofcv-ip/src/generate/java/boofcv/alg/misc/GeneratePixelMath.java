@@ -36,7 +36,6 @@ import static boofcv.generate.AutoTypeImage.*;
  */
 public class GeneratePixelMath extends CodeGeneratorBase {
 
-	private int SMALL = 100*100;
 	private AutoTypeImage input;
 
 	ImageType.Family families[] = new ImageType.Family[]{ImageType.Family.GRAY,ImageType.Family.INTERLEAVED};

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,7 +99,7 @@ public class PoseFromPairLinear6 {
 	 * observed feature locations in each camera image and the depth (z-coordinate) of each feature
 	 * must be known.  Feature locations are in calibrated image coordinates.
 	 *
-	 * @param observations List of observations on the image plane in calibrated coordinates.
+	 * @param observations List of pixel or normalized image coordinate observations
 	 * @param locations List of object locations in homogenous coordinates.  One for each observation pair.
 	 */
 	public boolean processHomogenous( List<AssociatedPair> observations , List<Point4D_F64> locations ) {

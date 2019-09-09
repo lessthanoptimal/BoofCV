@@ -65,7 +65,7 @@ public class CompatibleProjectiveHomography {
 	public LinearSolverDense<DMatrixRMaj> solver = LinearSolverFactory_DDRM.leastSquares(200,16);
 	public SolveNullSpace<DMatrixRMaj> nullspace = new SolveNullSpaceSvd_DDRM();
 	public SolvePseudoInverseSvd_DDRM solvePInv = new SolvePseudoInverseSvd_DDRM();
-	// in the paper it doesn't specify by probably uses a simpler pseudo inverse. A+ = A'inv(A*A')
+	// in the paper it doesn't specify so it probably uses a simpler pseudo inverse. A+ = A'inv(A*A')
 
 	// workspace variables for A*X=B
 	private DMatrixRMaj A = new DMatrixRMaj(1,1);
@@ -159,6 +159,7 @@ public class CompatibleProjectiveHomography {
 	 *
 	 * <p>P1[i] = P2[i]*inv(H)</p>
 	 *
+	 * <p>NOTE: This will work with planar scenes!</p>
 	 * <p>NOTE: It's likely that this approach can be improved. See in code comments</p>
 	 *
 	 * @param cameras1 list of camera matrices
@@ -206,7 +207,7 @@ public class CompatibleProjectiveHomography {
 	 * The math was double checked and no fundamental flaw could be found in the test. More investigation is needed.
 	 * There is a large difference in scales that could be contributing to this problem.</p>
 	 *
-	 * <p>NOTE: Produces poor results when all points lie on the same plane</p>
+	 * <p>NOTE: Produces poor results when the scene is planar</p>
 	 *
 	 * @param camera1 Camera matrix
 	 * @param camera2 Camera matrix of the same view but another projective space
@@ -433,7 +434,7 @@ public class CompatibleProjectiveHomography {
 
 		@Override
 		public int getNumOfInputsN() {
-			return 16; // HMM only 15 DOF, scale invariant. This wil float
+			return 16; // HMM only 15 DOF, scale invariant. This will float
 		}
 
 		@Override

@@ -1,3 +1,0 @@
-- Stereo VO using 3 views
-- High level interface for 2D image motion
-  * Image stitching with added distortion

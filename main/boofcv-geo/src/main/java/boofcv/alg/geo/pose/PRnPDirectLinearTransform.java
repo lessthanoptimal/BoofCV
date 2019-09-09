@@ -33,7 +33,9 @@ import java.util.List;
  * of the perspective N Point (PnP) problem. Each point consists of a 2D pixel observations and 3D
  * homogenous coordinate. Pixels are normalized to have zero means and standard deviation of 1. 3D points are
  * scaled to have a f-norm of 1. See [1] for details. Each point provides 2 linearly independent equations, requiring
- * a minimum of 6 points. More points are allowed. <b>Planar surfaces are critical and it will fail on those.</b>
+ * a minimum of 6 points. More points are allowed.
+ *
+ * <p>WARNING: Planar surfaces are critical and it will fail on those.</p>
  *
  * <p>[1] Peter Abeles, "Scene Reconstruction Notes: BoofCV Technical Report" 2019</p>
  *

@@ -42,10 +42,6 @@ TODO
 
 
 TOP ITEMS
-- TODO New chessboard detector (current is too brittle)
-  * binary, contour, line segments
-  * look for line segments which have end points that are close to each other
-
 - TODO QR Code algorithm
   * Better rejection of finder patterns using graph
   * See if a better reading of mode bits is needed

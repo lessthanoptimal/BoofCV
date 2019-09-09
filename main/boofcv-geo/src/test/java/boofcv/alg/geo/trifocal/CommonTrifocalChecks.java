@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,7 @@ public abstract class CommonTrifocalChecks {
 		worldToCam2 = eulerXyz(0.3,0,0.05,0.05, 0.05, -0.02,null);
 		worldToCam3 = eulerXyz(0.6, 0.2, -0.02,0.1,-0.2,0.05,null);
 
-		computeStuffFromPose();
+		createSceneObservations(false);
 	}
 
 	public void checkTrifocalWithConstraint( TrifocalTensor tensor , double tol ) {
@@ -87,7 +87,7 @@ public abstract class CommonTrifocalChecks {
 		}
 	}
 
-	public void createRandomScenario() {
+	public void createRandomScenario( boolean planar ) {
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,
 				rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, -rand.nextGaussian()*0.1, worldToCam2.R);
 		worldToCam2.getT().set(0.3,0,0.05);
@@ -96,10 +96,10 @@ public abstract class CommonTrifocalChecks {
 				rand.nextGaussian()*0.1, rand.nextGaussian()*0.1, -rand.nextGaussian()*0.1, worldToCam3.R);
 		worldToCam3.getT().set(0.6, 0.2, -0.02);
 
-		computeStuffFromPose();
+		createSceneObservations(planar);
 	}
 
-	private void computeStuffFromPose() {
+	void createSceneObservations(boolean planar ) {
 		P1_k = PerspectiveOps.createCameraMatrix(worldToCam1.R, worldToCam1.T, K, null);
 		// P1 = [I|0]
 		P2 = PerspectiveOps.createCameraMatrix(worldToCam2.R, worldToCam2.T, K, null);
@@ -116,12 +116,16 @@ public abstract class CommonTrifocalChecks {
 		observationsPixels = new ArrayList<>();
 		observationsNorm = new ArrayList<>();
 
+
 		for(int i = 0; i < numFeatures; i++ ) {
 			Point3D_F64 p = new Point3D_F64();
 			p.x = rand.nextGaussian()*0.5;
 			p.y = rand.nextGaussian()*0.5;
-			p.z = rand.nextGaussian()*0.5 + 2;
-
+			if( planar ) {
+				p.z = 2;
+			} else {
+				p.z = rand.nextGaussian() * 0.5 + 2;
+			}
 			worldPts.add(p);
 
 			AssociatedTriple o = new AssociatedTriple();

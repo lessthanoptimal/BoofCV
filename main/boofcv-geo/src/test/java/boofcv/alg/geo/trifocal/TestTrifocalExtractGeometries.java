@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 		TrifocalExtractGeometries alg = new TrifocalExtractGeometries();
 
 		for( int i = 0; i < 5; i++ ) {
-			createRandomScenario();
+			createRandomScenario(false);
 
 			Point3D_F64 found2 = new Point3D_F64();
 			Point3D_F64 found3 = new Point3D_F64();
@@ -80,7 +80,7 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 		DMatrixRMaj P3 = new DMatrixRMaj(3,4);
 
 		for( int trial = 0; trial < 5; trial++ ) {
-			createRandomScenario();
+			createRandomScenario(false);
 
 			// solve for the tensor to make this more realistic
 			linear.process(observationsPixels,found);
@@ -114,7 +114,7 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 		DMatrixRMaj found2 = new DMatrixRMaj(3,3);
 		DMatrixRMaj found3 = new DMatrixRMaj(3,3);
 		for( int trial = 0; trial < 5; trial++ ) {
-			createRandomScenario();
+			createRandomScenario(false);
 
 			TrifocalTensor input = tensor.copy();
 			alg.setTensor(input);

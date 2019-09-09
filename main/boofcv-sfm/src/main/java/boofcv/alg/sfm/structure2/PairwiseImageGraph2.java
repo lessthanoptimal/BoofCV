@@ -56,7 +56,13 @@ public class PairwiseImageGraph2 {
 	}
 
 	public static class View {
+		/**
+		 * Unique identifier for this view
+		 */
 		public String id;
+		/**
+		 * Total number of features in this view
+		 */
 		public int totalFeatures;
 
 		/**
@@ -91,8 +97,8 @@ public class PairwiseImageGraph2 {
 		/**
 		 * Adds the views that it's connected to from the list
 		 */
-		public void addConnections( int[] indexes , int length ,
-									List<View> views ) {
+		public void getConnections(int[] indexes , int length ,
+								   List<View> views ) {
 			views.clear();
 			for (int i = 0; i < length; i++) {
 				views.add( connections.get(indexes[i]).other(this));
