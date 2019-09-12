@@ -52,18 +52,18 @@ class TestChessboardCornerEdgeIntensity {
 		ChessboardCorner a21 = create(x0,y0+length,yawB);
 		ChessboardCorner a22 = create(x0+length,y0+length,yawA);
 
-		double found0 = alg.process(a11,a12,0,1,1);
-		double found1 = alg.process(a11,a21,Math.PI/2.0,1,1);
-		double found2 = alg.process(a21,a22,0,1,1);
+		double found0 = alg.process(a11,a12,0,1);
+		double found1 = alg.process(a11,a21,Math.PI/2.0,1);
+		double found2 = alg.process(a21,a22,0,1);
 
 		assertEquals(255,found0);
 		assertEquals(255,found1);
 		assertEquals(255,found2);
 
 		// same results in the other direction
-		found0 = alg.process(a12,a11,Math.PI,1,1);
-		found1 = alg.process(a21,a11,-Math.PI/2.0,1,1);
-		found2 = alg.process(a22,a21,Math.PI,1,1);
+		found0 = alg.process(a12,a11,Math.PI,1);
+		found1 = alg.process(a21,a11,-Math.PI/2.0,1);
+		found2 = alg.process(a22,a21,Math.PI,1);
 
 		assertEquals(255,found0);
 		assertEquals(255,found1);

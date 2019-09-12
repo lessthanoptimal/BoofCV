@@ -22,6 +22,7 @@ import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.LensDistortionOps_F32;
+import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -317,6 +318,46 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 		AffineTransform origTran = g2.getTransform();
 		for( int i = 0; i < points.size(); i++ ) {
 			Point2D_F64 p = points.get(i);
+
+			if( transform != null ) {
+				transform.compute((float)p.x,(float)p.y,adj);
+			} else {
+				adj.set((float)p.x,(float)p.y);
+			}
+
+			String text = String.format(format,i);
+
+			int x = (int)(adj.x*scale);
+			int y = (int)(adj.y*scale);
+
+			g2.setColor(Color.BLACK);
+			g2.drawString(text,x-1,y);
+			g2.drawString(text,x+1,y);
+			g2.drawString(text,x,y-1);
+			g2.drawString(text,x,y+1);
+			g2.setTransform(origTran);
+			g2.setColor(Color.GREEN);
+			g2.drawString(text,x,y);
+		}
+	}
+
+	public static void drawIndexes( Graphics2D g2 , int fontSize , List<ChessboardCorner> points ,
+									Point2Transform2_F32 transform ,
+									int minLevel,
+									double scale ) {
+
+		int numDigits = BoofMiscOps.numDigits(points.size());
+		String format ="%"+numDigits+"d";
+		Font regular = new Font("Serif", Font.PLAIN, fontSize);
+		g2.setFont(regular);
+
+		Point2D_F32 adj = new Point2D_F32();
+
+		AffineTransform origTran = g2.getTransform();
+		for( int i = 0; i < points.size(); i++ ) {
+			ChessboardCorner p = points.get(i);
+			if( p.level2 < minLevel )
+				continue;
 
 			if( transform != null ) {
 				transform.compute((float)p.x,(float)p.y,adj);

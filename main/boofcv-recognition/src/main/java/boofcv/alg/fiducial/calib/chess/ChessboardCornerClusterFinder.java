@@ -26,10 +26,8 @@ import georegression.metric.UtilAngle;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
-import org.ddogleg.sorting.QuickSort_F64;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_B;
-import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
@@ -116,8 +114,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	private GrowQueue_I32 open = new GrowQueue_I32(); // list of corner index's which still need ot be processed
 
 	// Work space to store distances from NN searched to find median distance
-	private GrowQueue_F64 distanceTmp = new GrowQueue_F64();
-	private QuickSort_F64 sorter = new QuickSort_F64(); // use this instead of build in to minimize memory allocation
+//	private GrowQueue_F64 distanceTmp = new GrowQueue_F64();
+//	private QuickSort_F64 sorter = new QuickSort_F64(); // use this instead of build in to minimize memory allocation
 
 	// reference to input corners for debugging
 	private List<ChessboardCorner> corners;
@@ -146,7 +144,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	 *
 	 * @param corners Detected chessboard patterns. Not modified.
 	 */
-	public void process( T image , List<ChessboardCorner> corners ) {
+	public void process( T image , List<ChessboardCorner> corners , int numLevels ) {
 		this.corners = corners;
 
 		// reset internal data structures
@@ -163,18 +161,43 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			v.index = idx;
 		}
 
-		// Initialize nearest-neighbor search.
-		nn.setPoints(corners,true);
+		List<GrowQueue_I32> cornersInLevel = new ArrayList<>();
 
-		// Connect corners to each other based on relative distance on orientation
-		for (int i = 0; i < corners.size(); i++) {
-			findVertexNeighbors(vertexes.get(i),corners);
-			// Order edges by angle to simplify later processing
-			vertexes.get(i).perpendicular.sortByAngle();
+		for (int level = 0; level < numLevels; level++) {
+			cornersInLevel.add( new GrowQueue_I32());
 		}
 
-		// If more than one vertex's are near each other, pick one and remove the others
-		handleAmbiguousVertexes(corners);
+		for (int i = 0; i < corners.size(); i++) {
+			ChessboardCorner c = corners.get(i);
+			cornersInLevel.get(c.level2).add(i);
+		}
+
+		List<ChessboardCorner> cornersUpToLevel = new ArrayList<>();
+		GrowQueue_I32 indexesUpToLevel = new GrowQueue_I32();
+
+		// start from top of the pyramid, which is the lowest resolution
+		for (int level = numLevels-1; level >= 0; level--) {
+			GrowQueue_I32 levelCornerIdx = cornersInLevel.get(level);
+			for (int i = 0; i < levelCornerIdx.size; i++) {
+				cornersUpToLevel.add(corners.get(levelCornerIdx.get(i)));
+			}
+			indexesUpToLevel.addAll(levelCornerIdx);
+//			System.out.println("level = "+level+" count "+levelCornerIdx.size+" total "+indexesUpToLevel.size);
+
+			// Initialize nearest-neighbor search.
+			nn.setPoints(cornersUpToLevel,true);
+
+			// Connect corners to each other based on relative distance on orientation
+			for (int i = 0; i < levelCornerIdx.size(); i++) {
+				Vertex v = vertexes.get(levelCornerIdx.get(i));
+				findVertexNeighbors(v,indexesUpToLevel,corners);
+				// Order edges by angle to simplify later processing
+				v.perpendicular.sortByAngle();
+			}
+		}
+//		if( indexesUpToLevel.size != corners.size() )
+//			throw new RuntimeException("BUG!");
+
 //		printDualGraph();
 
 		// use edge intensity to prune connections
@@ -182,6 +205,17 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			pruneConnectionsByIntensity(corners);
 		}
 //		printDualGraph();
+
+		// Prune vertexes with just a single connection
+		for (int i = 0; i < vertexes.size; i++) {
+			Vertex va = vertexes.get(i);
+			if( va.perpendicular.size() == 1 ) {
+				removeReferences(va,EdgeType.PERPENDICULAR,true);
+			}
+		}
+
+		// If more than one vertex's are near each other, pick one and remove the others
+		handleAmbiguousVertexes(corners);
 
 		// TODO Change pruning of ambiguous vertexes here
 		//      use incoming perpendicular edges to set distance threshold
@@ -251,7 +285,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			// sqrt and scaling by 0.5f is make it more conservative. This increases the radial distance
 			// that is sampled and doing it by too much creates a lot of false positives
 
-			line.intensity = computeConnInten.process(ca, cb, line.endA.direction,scale,contrast);
+			line.intensityRaw = computeConnInten.process(ca, cb, line.endA.direction,scale);
+			line.intensity = line.intensityRaw/contrast;
 
 			if( line.intensity < thresholdEdgeIntensity ) {
 				if( !va.perpendicular.remove(line) )
@@ -303,25 +338,18 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	 * Use nearest neighbor search to find closest corners. Split those into two groups, parallel and
 	 * perpendicular.
 	 */
-	void findVertexNeighbors(Vertex va  , List<ChessboardCorner> corners ) {
+	void findVertexNeighbors(Vertex va  , GrowQueue_I32 indexesUpToLevel, List<ChessboardCorner> corners ) {
 		ChessboardCorner targetCorner = corners.get(va.index);
 		// distance is Euclidean squared
 		double maxDist = Double.MAX_VALUE==maxNeighborDistance?maxNeighborDistance:maxNeighborDistance*maxNeighborDistance;
 		nnSearch.findNearest(corners.get(va.index),maxDist,maxNeighbors,nnResults);
 
-		// storage distances here to find median distance of closest neighbors
-		distanceTmp.reset();
-
-//		if( targetCorner.distance(3003,1887) < 2 )
-//			System.out.println("Egads");
-
 		for (int i = 0; i < nnResults.size; i++) {
 			NnData<ChessboardCorner> r = nnResults.get(i);
-			if( r.index == va.index) continue;
+			int cindex = indexesUpToLevel.get(r.index);
+			if( cindex == va.index) continue;
 
-			Vertex vb = vertexes.get(r.index );
-
-			distanceTmp.add( r.distance );
+			Vertex vb = vertexes.get( cindex );
 
 			double oriDiff = UtilAngle.distHalf( targetCorner.orientation , r.point.orientation );
 			boolean parallel = oriDiff <= Math.PI/4.0;
@@ -377,16 +405,6 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 				vb.perpendicular.add(eb);
 			}
 		}
-
-		// Compute the distance of the closest neighbors. This is used later on to identify ambiguous corners.
-		// If it's a graph corner there should be at least 3 right next to the node.
-		if( distanceTmp.size == 0 ) {
-			va.neighborDistance = 0;
-		} else {
-			sorter.sort(distanceTmp.data, distanceTmp.size);
-			int idx = Math.min(3,distanceTmp.size-1);
-			va.neighborDistance = Math.sqrt(distanceTmp.data[idx]); // NN distance is Euclidean squared
-		}
 	}
 
 	/**
@@ -397,44 +415,70 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		List<Vertex> candidates = new ArrayList<>();
 		for (int idx = 0; idx < vertexes.size(); idx++) {
 			Vertex target = vertexes.get(idx);
+			if( target.perpendicular.size() == 0 )
+				continue;
 
-			// median distance was previously found based on the closer neighbors. In an actual chessboard
-			// there are solid white and black squares with no features, in theory
-			double threshold = target.neighborDistance *ambiguousTol;
+			ChessboardCorner tc = corners.get(target.index);
+//			if( c.distance(298.8,367.3) < 2 ) {
+//				System.out.println("Inspecting")
+//			}
 
+			// Find candidates by looking at the neighbors of neighbors
+			// these are the vertexes which might be confused by two near by
 			candidates.clear();
-			// only need to search parallel since perpendicular nodes won't be confused for the target
-			for (int i = 0; i < target.parallel.size(); i++) {
-				Edge c = target.parallel.get(i);
-				if( c.line.distance <= threshold ) {
-					candidates.add(c.dst);
-				}
-			}
+			for (int i = 0; i < target.perpendicular.size(); i++) {
+				Vertex a = target.perpendicular.get(i).dst;
+				int targetIdx = a.perpendicular.find(target);
+				double targetDir = a.perpendicular.get(targetIdx).direction;
+				for (int j = 0; j < a.perpendicular.size(); j++) {
+					Edge e = a.perpendicular.get(j);
+					Vertex b = e.dst;
+					ChessboardCorner tb = corners.get(b.index);
+					if( b == target )
+						continue;
 
-			if( candidates.size() > 0 ) {
-				candidates.add(target);
-
-				int bestIndex = -1;
-				double bestScore = 0;
-
-//				System.out.println("==== Resolving ambiguity. src="+target.index);
-				for (int i = 0; i < candidates.size(); i++) {
-					Vertex v = candidates.get(i);
-//					System.out.println("   candidate = "+v.index);
-					double intensity = corners.get(v.index).intensity;
-					if( intensity > bestScore ) {
-						bestScore = intensity;
-						bestIndex = i;
+					// We define too close and possibly confusing as pointing in a similar direction
+					// and being at a distance not far relative to the line's length
+					double acute = UtilAngle.dist(e.direction,targetDir);
+					double foo = tc.distance(tb)/e.line.distance;
+					if( acute < Math.PI/3 && foo < ambiguousTol && !candidates.contains(b)) {
+						candidates.add(b);
 					}
 				}
+			}
+			if( candidates.size() == 0 )
+				continue;
+			candidates.add(target);
+
+			int bestIndex = -1;
+			double bestScore = 0;
+
+//				System.out.println("==== Resolving ambiguity. src="+target.index);
+			for (int i = 0; i < candidates.size(); i++) {
+				Vertex v = candidates.get(i);
+				ChessboardCorner b = corners.get(v.index);
+				double edgeIntensity = 0;
+				for (int j = 0; j < v.perpendicular.size(); j++) {
+					edgeIntensity += v.perpendicular.get(j).line.intensityRaw;
+				}
+				edgeIntensity /= v.perpendicular.size();
+//				edgeIntensity *= (b.level2-b.level1+1);
+				// TODO take in account line angles. prefer stuff that involve parallel lines and close to 90
+				//      see large shadow
+
+//					System.out.println("   candidate = "+v.index);
+				if( edgeIntensity > bestScore ) {
+					bestScore = edgeIntensity;
+					bestIndex = i;
+				}
+			}
 //				System.out.println("==== Resolved ambiguity. Selected "+candidates.get(bestIndex).index);
 
-				for (int i = 0; i < candidates.size(); i++) {
-					if( i == bestIndex )
-						continue;
-					removeReferences(candidates.get(i),EdgeType.PARALLEL,true);
-					removeReferences(candidates.get(i),EdgeType.PERPENDICULAR,true);
-				}
+			for (int i = 0; i < candidates.size(); i++) {
+				if( i == bestIndex )
+					continue;
+				removeReferences(candidates.get(i),EdgeType.PARALLEL,true);
+				removeReferences(candidates.get(i),EdgeType.PERPENDICULAR,true);
 			}
 		}
 	}
@@ -1055,8 +1099,10 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	 * perspective of the src vertex.
 	 */
 	public static class LineInfo {
-		// Image edge intensity
+		// Image edge intensity normalized by corner intensity
 		public double intensity;
+		// Edge intensity without normalization
+		public double intensityRaw;
 		// Euclidean distance between the two vertexes
 		public double distance;
 
@@ -1082,6 +1128,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		}
 		public void invalidateIntensity() {
 			intensity = -Double.MAX_VALUE;
+			intensityRaw = -Double.MAX_VALUE;
 		}
 
 		public void disconnect() {

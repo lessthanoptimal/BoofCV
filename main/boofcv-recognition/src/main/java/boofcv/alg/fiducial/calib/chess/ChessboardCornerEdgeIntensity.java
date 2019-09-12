@@ -79,8 +79,8 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	 * @param scale The scale that the corners were detected at. 1.0 = full resolution image > 1.0 is low res
 	 * @return the line intensity. more positive more intense. Units = pixels intensity
 	 */
-	public float process( ChessboardCorner ca , ChessboardCorner cb , double direction_a_to_b,
-						  float scale , double constrast ) {
+	public float process(ChessboardCorner ca, ChessboardCorner cb, double direction_a_to_b,
+						 float scale) {
 //		boolean meow = false;
 //		if( ca.distance(200,369) < 1.5 && cb.distance(198,358) < 2)
 //			meow = true;
@@ -149,7 +149,7 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 
 		// Select one of the most intense values.
 		// Originally min was used but that proved too sensitive to outliers
-		return (float)((QuickSelect.select(sampleValues,2,lengthSamples)-maxLongitudinal)/constrast);
+		return (QuickSelect.select(sampleValues,2,lengthSamples)-maxLongitudinal);
 	}
 
 	/**

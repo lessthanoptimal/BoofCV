@@ -169,8 +169,11 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 			// accept the new angle if it has higher corner intensity
 			ChessboardCorner resultsMax = c0;
 
+			// set the second level to the lowest resolution a neighbor is found in
+			int level2 = c0.level2;
 			for (int j = 0; j < nnResults.size; j++) {
 				ChessboardCorner c1 = nnResults.get(j).point;
+				level2 = c1.level2;
 				if( c1.intensity < intensity ) {
 					c1.first = false;
 				} else {
@@ -187,7 +190,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 			c0.orientation = resultsMax.orientation;
 			c0.intensity = resultsMax.intensity;
 			c0.constrast = resultsMax.constrast;
-			c0.level2 = resultsMax.level2;
+			c0.level2 = level2;
 		}
 	}
 
@@ -245,6 +248,10 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 
 	public FastQueue<ChessboardCorner> getCorners() {
 		return corners;
+	}
+
+	public int getNumberOfLevels() {
+		return pyramid.size();
 	}
 
 	public int getPyramidTopSize() {

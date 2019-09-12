@@ -74,7 +74,7 @@ public class DetectChessboardPatterns<T extends ImageGray<T>> {
 		found.reset();
 		detector.process(input);
 //		T blurred = detector.getDetector().getBlurred();
-		clusterFinder.process(input,detector.getCorners().toList());
+		clusterFinder.process(input,detector.getCorners().toList(),detector.getNumberOfLevels());
 		FastQueue<ChessboardCornerGraph> clusters = clusterFinder.getOutputClusters();
 
 		for (int clusterIdx = 0; clusterIdx < clusters.size; clusterIdx++) {

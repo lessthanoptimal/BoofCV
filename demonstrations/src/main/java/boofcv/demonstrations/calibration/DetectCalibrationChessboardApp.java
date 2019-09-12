@@ -35,6 +35,7 @@ import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
+import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.calibration.DisplayPinholeCalibrationPanel;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.VisualizeImageData;
@@ -292,6 +293,9 @@ public class DetectCalibrationChessboardApp
 				synchronized (lockCorners) {
 					for (int i = 0; i < foundCorners.size; i++) {
 						ChessboardCorner c = foundCorners.get(i);
+						if( c.level2 < controlPanel.minPyrLevel )
+							continue;
+
 						double x = c.x;
 						double y = c.y;
 
@@ -312,7 +316,8 @@ public class DetectCalibrationChessboardApp
 					}
 
 					if( controlPanel.showNumbers ) {
-						DisplayPinholeCalibrationPanel.drawIndexes(g2,18,(List)foundCorners.toList(),null,scale);
+						DisplayPinholeCalibrationPanel.drawIndexes(g2,18,foundCorners.toList(),null,
+								controlPanel.minPyrLevel,scale);
 					}
 				}
 			}
@@ -452,6 +457,7 @@ public class DetectCalibrationChessboardApp
 		JCheckBox checkShowCorners;
 		JCheckBox checkMeanShift;
 		JCheckBox checkAnyGrid;
+		JSpinner spinnerMinPyrLevel;
 
 		int pyramidTop;
 		int radius;
@@ -472,6 +478,7 @@ public class DetectCalibrationChessboardApp
 		int view = 1;
 		boolean meanShift = true;
 		boolean anyGrid = false;
+		int minPyrLevel = 0;
 
 		ControlPanel() {
 			{
@@ -498,6 +505,7 @@ public class DetectCalibrationChessboardApp
 			spinnerGridRows = spinner(gridRows,3,200,1);
 			spinnerGridCols = spinner(gridCols,3,200,1);
 			spinnerMaxDistance = spinner(maxDistance,0,50000,1);
+			spinnerMinPyrLevel = spinner(minPyrLevel,0,20,1);
 
 			checkShowTargets = checkbox("Chessboard", showChessboards);
 			checkShowNumbers = checkbox("Numbers", showNumbers);
@@ -526,22 +534,26 @@ public class DetectCalibrationChessboardApp
 		}
 
 		JPanel createCheckPanel() {
-			JPanel panel = new JPanel(new GridLayout(0,2));
+			JPanel panelChecks = new JPanel(new GridLayout(0,2));
 
-			panel.add(checkShowTargets);
-			panel.add(checkShowNumbers);
-			panel.add(checkShowClusters);
-			panel.add(checkShowPerpendicular);
-			panel.add(checkShowCorners);
-			panel.add(checkLogIntensity);
+			panelChecks.add(checkShowTargets);
+			panelChecks.add(checkShowNumbers);
+			panelChecks.add(checkShowClusters);
+			panelChecks.add(checkShowPerpendicular);
+			panelChecks.add(checkShowCorners);
+			panelChecks.add(checkLogIntensity);
 
-			panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
+			panelChecks.setPreferredSize(panelChecks.getMinimumSize());
+			panelChecks.setMaximumSize(panelChecks.getMinimumSize());
+
+			StandardAlgConfigPanel vertPanel = new StandardAlgConfigPanel();
+			vertPanel.add(panelChecks);
+			vertPanel.addLabeled(spinnerMinPyrLevel,"Min Level");
+
+			vertPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
 					"Visualize",TitledBorder.CENTER, TitledBorder.TOP));
 
-			panel.setPreferredSize(panel.getMinimumSize());
-			panel.setMaximumSize(panel.getMinimumSize());
-
-			return panel;
+			return vertPanel;
 		}
 
 		JPanel createGridShapePanel() {
@@ -623,6 +635,10 @@ public class DetectCalibrationChessboardApp
 				gridCols = ((Number)spinnerGridCols.getValue()).intValue();
 			} else if( e.getSource() == spinnerMaxDistance ) {
 				maxDistance = ((Number)spinnerMaxDistance.getValue()).intValue();
+			} else if( e.getSource() == spinnerMinPyrLevel ) {
+				minPyrLevel = ((Number)spinnerMinPyrLevel.getValue()).intValue();
+				imagePanel.repaint();
+				return;
 			}
 			createAlgorithm();
 			reprocessImageOnly();
