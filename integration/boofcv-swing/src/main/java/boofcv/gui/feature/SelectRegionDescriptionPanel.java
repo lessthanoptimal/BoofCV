@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -112,6 +112,9 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 		g2.drawImage(background,0,0,dstWidth,dstHeight,0,0,background.getWidth(),background.getHeight(),null);
 
 		if( target != null ) {
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
 			int x1 = (int)(imageScale*target.x);
 			int y1 = (int)(imageScale*target.y);
 			int x2 = (int)(imageScale*current.x);
@@ -126,9 +129,10 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 
 			// draw feature size
 			r = (int)(imageScale*UtilPoint2D_I32.distance(target,current));
-			w = r*2+1;
-			g2.setColor(Color.PINK);
-			g2.drawOval(x1-r,y1-r,w,w);
+			g2.setStroke(new BasicStroke(6));
+			drawOval(g2,x1,y1,r,Color.black);
+			g2.setStroke(new BasicStroke(2));
+			drawOval(g2,x1,y1,r,new Color(180,180,255));
 
 			// draw the feature location
 			r = 5;
@@ -140,6 +144,12 @@ public class SelectRegionDescriptionPanel extends JPanel implements MouseListene
 			g2.setColor(Color.red);
 			g2.fillOval(x1-r,y1-r,w,w);
 		}
+	}
+
+	private void drawOval( Graphics2D g2 , int x , int y , int r , Color color ) {
+		int w = r*2+1;
+		g2.setColor(color);
+		g2.drawOval(x-r,y-r,w,w);
 	}
 
 	private void computeScale() {

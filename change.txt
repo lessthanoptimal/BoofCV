@@ -15,6 +15,7 @@ Version : 0.35
     This caused circulant to slow down.
 - Demonstrations
   * Updated DenseFlowApp
+  * Updated VisualizeRegionDescriptionApp TODO - video update. all desc work. color
 - SFM
   * TODO projective camera with lens distortion
 - Calibration

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,24 +20,24 @@ package boofcv.demonstrations.feature.describe;
 
 import boofcv.abst.feature.describe.ConfigBrief;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.gui.SelectAlgorithmAndInputPanel;
+import boofcv.gui.DemonstrationBase;
+import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.feature.SelectRegionDescriptionPanel;
 import boofcv.gui.feature.TupleDescPanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
-import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_I32;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -48,101 +48,52 @@ import java.util.ArrayList;
  * @author Peter Abeles
  */
 public class VisualizeRegionDescriptionApp <T extends ImageGray<T>, D extends ImageGray<D>>
-	extends SelectAlgorithmAndInputPanel implements SelectRegionDescriptionPanel.Listener
+	extends DemonstrationBase implements SelectRegionDescriptionPanel.Listener
 {
-	boolean processedImage = false;
-
-	Class<T> imageType;
 	BufferedImage image;
 
-	DescribeRegionPoint describe;
+	private final Object lock = new Object();
+	private DescribeRegionPoint describe;
 
-	SelectRegionDescriptionPanel panel = new SelectRegionDescriptionPanel();
+	private SelectRegionDescriptionPanel panel = new SelectRegionDescriptionPanel();
+	private Controls controls = new Controls();
 
-	TupleDescPanel tuplePanel = new TupleDescPanel();
+	private TupleDescPanel tuplePanel = new TupleDescPanel();
 
 	// most recently requested pixel description.  Used when the algorithm is changed
-	Point2D_I32 targetPt;
-	double targetRadius;
-	double targetOrientation;
+	private Point2D_I32 targetPt;
+	private double targetRadius;
+	private double targetOrientation;
 
-	public VisualizeRegionDescriptionApp( Class<T> imageType , Class<D> derivType  ) {
-		super(1);
-
-		this.imageType = imageType;
-
-		addAlgorithm(0,"SURF-S", FactoryDescribeRegionPoint.surfStable(null, imageType));
-		addAlgorithm(0,"SURF-S Color", FactoryDescribeRegionPoint.surfColorStable(null, ImageType.pl(3, imageType)));
-		addAlgorithm(0,"SIFT", FactoryDescribeRegionPoint.sift(null,null, imageType));
-		addAlgorithm(0,"BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));
-		addAlgorithm(0,"BRIEFO", FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType));
-		addAlgorithm(0,"Pixel 5x5", FactoryDescribeRegionPoint.pixel(5, 5, imageType));
-		addAlgorithm(0,"NCC 5x5", FactoryDescribeRegionPoint.pixelNCC(5, 5, imageType));
+	public VisualizeRegionDescriptionApp( java.util.List<PathLabel> examples , Class<T> imageType  ) {
+		super(examples,ImageType.single(imageType));
 
 		panel.setListener(this);
 		tuplePanel.setPreferredSize(new Dimension(100,50));
-		add(tuplePanel,BorderLayout.SOUTH);
-		setMainGUI(panel);
+
+		createAlgorithm();
+
+		add(BorderLayout.WEST, controls);
+		add(BorderLayout.CENTER, panel);
+		add(BorderLayout.SOUTH, tuplePanel);
 	}
 
-	public void process( final BufferedImage image ) {
-		this.image = image;
-		setDescriptorInput();
+	@Override
+	public void processImage(int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input) {
+		this.image = bufferedIn;
 
-
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				panel.setBackground(image);
-				panel.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
-				processedImage = true;
-			}});
-
-
-		doRefreshAll();
-	}
-
-	private void setDescriptorInput() {
-		if( describe != null )  {
-			if( describe.getImageType().getFamily() == ImageType.Family.GRAY) {
-				T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
-				describe.setImage(input);
-			} else {
-				Planar<T> input = ConvertBufferedImage.convertFromPlanar(image, null, true, imageType);
+		synchronized (lock) {
+			if( describe != null ) {
 				describe.setImage(input);
 			}
 		}
-	}
 
-	@Override
-	public void loadConfigurationFile(String fileName) {}
-
-	@Override
-	public boolean getHasProcessedImage() {
-		return processedImage;
-	}
-
-	@Override
-	public void refreshAll(Object[] cookies) {
-		setActiveAlgorithm(0,null,cookies[0]);
-	}
-
-	@Override
-	public synchronized void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		this.describe = (DescribeRegionPoint<T,TupleDesc>)cookie;
-		setDescriptorInput();
-		
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				updateTargetDescription();
-				repaint();
-			}});
-	}
-
-	@Override
-	public void changeInput(String name, int index) {
-		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
-
-		process(image);
+		SwingUtilities.invokeLater(() -> {
+			panel.setBackground(image);
+			panel.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
+			panel.repaint();
+			updateTargetDescription();
+		});
 	}
 
 	@Override
@@ -161,37 +112,69 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>, D extends Im
 	 * Extracts the target description and updates the panel.  Should only be called from a swing thread
 	 */
 	private void updateTargetDescription() {
-		if( targetPt != null ) {
-			TupleDesc feature = describe.createDescription();
-			describe.process(targetPt.x,targetPt.y,targetOrientation,targetRadius,feature);
-			tuplePanel.setDescription(feature);
-		} else {
-			tuplePanel.setDescription(null);
+		synchronized (lock) {
+			if (targetPt != null) {
+				TupleDesc feature = describe.createDescription();
+				// ensure that the visual circle matches the region it samples
+				double adjustedRadius = targetRadius/(describe.getCanonicalWidth()/2);
+				describe.process(targetPt.x, targetPt.y, targetOrientation, adjustedRadius, feature);
+				tuplePanel.setDescription(feature);
+			} else {
+				tuplePanel.setDescription(null);
+			}
 		}
 		tuplePanel.repaint();
 	}
 
+	private void createAlgorithm() {
+		Class<T> imageType = super.getImageType(0).getImageClass();
+		synchronized (lock) {
+			switch( controls.selectedDescriptor ) {
+				case 0: describe = FactoryDescribeRegionPoint.surfStable(null, imageType); break;
+				case 1: describe = FactoryDescribeRegionPoint.surfColorStable(null, ImageType.pl(3, imageType)); break;
+				case 2: describe = FactoryDescribeRegionPoint.sift(null,null, imageType); break;
+				case 3: describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType); break;
+				case 4: describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType); break;
+				case 5: describe = FactoryDescribeRegionPoint.pixel(5, 5, imageType); break;
+				case 6: describe = FactoryDescribeRegionPoint.pixelNCC(5, 5, imageType); break;
+			}
+		}
+	}
+
+	class Controls extends StandardAlgConfigPanel implements ActionListener {
+		JComboBox<String> comboDescribe;
+
+		int selectedDescriptor = 0;
+
+		Controls() {
+			comboDescribe = combo(selectedDescriptor, "SURF-S", "SURF-S Color", "SIFT", "BRIEF", "BRIEFSO", "Pixel 5x5", "NCC 5x5");
+			addAlignLeft(comboDescribe);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if( e.getSource() == comboDescribe ) {
+				selectedDescriptor = comboDescribe.getSelectedIndex();
+				createAlgorithm();
+				reprocessInput();
+			}
+		}
+	}
 
 	public static void main( String args[] ) {
 		Class imageType = GrayF32.class;
-		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-
-		VisualizeRegionDescriptionApp app = new VisualizeRegionDescriptionApp(imageType,derivType);
 
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Cave", UtilIO.pathExample("stitch/cave_01.jpg")));
 		inputs.add(new PathLabel("Kayak",UtilIO.pathExample("stitch/kayak_02.jpg")));
 		inputs.add(new PathLabel("Forest",UtilIO.pathExample("scale/rainforest_01.jpg")));
 
-		app.setPreferredSize(new Dimension(500,500));
-		app.setSize(500,500);
-		app.setInputList(inputs);
+		SwingUtilities.invokeLater(()->{
+			VisualizeRegionDescriptionApp app = new VisualizeRegionDescriptionApp(inputs,GrayF32.class);
 
-		// wait for it to process one image so that the size isn't all screwed up
-		while( !app.getHasProcessedImage() ) {
-			Thread.yield();
-		}
-
-		ShowImages.showWindow(app,"Region Descriptor Visualization", true);
+			// Processing time takes a bit so don't open right away
+			app.openExample(inputs.get(0));
+			app.display("Region Descriptor Visualization");
+		});
 	}
 }

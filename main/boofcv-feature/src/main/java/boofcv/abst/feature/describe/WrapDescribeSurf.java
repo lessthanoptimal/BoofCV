@@ -86,7 +86,7 @@ public class WrapDescribeSurf<T extends ImageGray<T>, II extends ImageGray<II>>
 
 	@Override
 	public double getCanonicalWidth() {
-		return surf.getCanonicalWidth();
+		return surf.getCanonicalWidth()/BoofDefaults.SURF_SCALE_TO_RADIUS;
 	}
 
 	@Override
