@@ -20,6 +20,8 @@ package boofcv.demonstrations.feature.describe;
 
 import boofcv.abst.feature.describe.ConfigBrief;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.core.image.GConvertImage;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -47,7 +49,7 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-public class VisualizeRegionDescriptionApp <T extends ImageGray<T>, D extends ImageGray<D>>
+public class VisualizeRegionDescriptionApp <T extends ImageGray<T>>
 	extends DemonstrationBase implements SelectRegionDescriptionPanel.Listener
 {
 	BufferedImage image;
@@ -65,8 +67,12 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>, D extends Im
 	private double targetRadius;
 	private double targetOrientation;
 
+	T gray;
+
 	public VisualizeRegionDescriptionApp( java.util.List<PathLabel> examples , Class<T> imageType  ) {
-		super(examples,ImageType.single(imageType));
+		super(examples,ImageType.pl(3,imageType));
+
+		gray = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
 		panel.setListener(this);
 		tuplePanel.setPreferredSize(new Dimension(100,50));
@@ -79,18 +85,28 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>, D extends Im
 	}
 
 	@Override
+	protected void handleInputChange(int source, InputMethod method, int width, int height) {
+		panel.setPreferredSize(new Dimension(width,height));
+	}
+
+	@Override
 	public void processImage(int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input) {
 		this.image = bufferedIn;
 
+		GConvertImage.convert(input,gray);
+
 		synchronized (lock) {
 			if( describe != null ) {
-				describe.setImage(input);
+				if( describe.getImageType().getFamily() == ImageType.Family.PLANAR ) {
+					describe.setImage(input);
+				} else {
+					describe.setImage(gray);
+				}
 			}
 		}
 
 		SwingUtilities.invokeLater(() -> {
 			panel.setBackground(image);
-			panel.setPreferredSize(new Dimension(image.getWidth(),image.getHeight()));
 			panel.repaint();
 			updateTargetDescription();
 		});
@@ -162,8 +178,6 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>, D extends Im
 	}
 
 	public static void main( String args[] ) {
-		Class imageType = GrayF32.class;
-
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel("Cave", UtilIO.pathExample("stitch/cave_01.jpg")));
 		inputs.add(new PathLabel("Kayak",UtilIO.pathExample("stitch/kayak_02.jpg")));

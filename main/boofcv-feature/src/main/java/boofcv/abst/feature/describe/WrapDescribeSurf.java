@@ -18,7 +18,6 @@
 
 package boofcv.abst.feature.describe;
 
-import boofcv.BoofDefaults;
 import boofcv.alg.feature.describe.DescribePointSurf;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.struct.feature.BrightFeature;
@@ -63,9 +62,7 @@ public class WrapDescribeSurf<T extends ImageGray<T>, II extends ImageGray<II>>
 
 	@Override
 	public boolean process(double x, double y, double orientation , double radius, BrightFeature storage) {
-
-		surf.describe(x,y, orientation, radius/ BoofDefaults.SURF_SCALE_TO_RADIUS, storage);
-
+		surf.describe(x,y, orientation, radius, storage);
 		return true;
 	}
 
@@ -86,7 +83,7 @@ public class WrapDescribeSurf<T extends ImageGray<T>, II extends ImageGray<II>>
 
 	@Override
 	public double getCanonicalWidth() {
-		return surf.getCanonicalWidth()/BoofDefaults.SURF_SCALE_TO_RADIUS;
+		return surf.getCanonicalWidth();
 	}
 
 	@Override

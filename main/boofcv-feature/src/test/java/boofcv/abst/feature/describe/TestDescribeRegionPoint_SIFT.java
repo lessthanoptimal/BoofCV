@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,20 +26,16 @@ import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-public class TestDescribeRegionPoint_SIFT {
-
-	Random rand = new Random(234);
+class TestDescribeRegionPoint_SIFT extends GenericDescribeRegionPointChecks {
 
 	@Test
-	public void flags() {
+	void flags() {
 		DescribeRegionPoint_SIFT<GrayF32> alg = declare();
 
 		assertTrue(alg.requiresOrientation());
@@ -52,7 +48,7 @@ public class TestDescribeRegionPoint_SIFT {
 	}
 
 	@Test
-	public void process() {
+	void process() {
 
 		GrayF32 image = new GrayF32(640,480);
 		GImageMiscOps.fillUniform(image,rand,0,200);
@@ -81,7 +77,7 @@ public class TestDescribeRegionPoint_SIFT {
 		assertTrue(alg.process(100,479,0.5,10,desc0));
 	}
 
-	public static void assertNotEquals( double a , double b , double tol ) {
+	static void assertNotEquals( double a , double b , double tol ) {
 		assertTrue(Math.abs(a-b)>tol);
 	}
 
@@ -91,5 +87,10 @@ public class TestDescribeRegionPoint_SIFT {
 		DescribePointSift<GrayF32> desc = FactoryDescribePointAlgs.sift(null,GrayF32.class);
 
 		return new DescribeRegionPoint_SIFT<>(ss,desc,GrayF32.class);
+	}
+
+	@Override
+	protected DescribeRegionPoint_SIFT<GrayF32> createAlg() {
+		return declare();
 	}
 }

@@ -69,7 +69,7 @@ public class WrapFHtoInterestPoint<T extends ImageGray<T>, II extends ImageGray<
 
 	@Override
 	public double getRadius(int featureIndex) {
-		return location.get(featureIndex).scale* BoofDefaults.SURF_SCALE_TO_RADIUS;
+		return location.get(featureIndex).scale*BoofDefaults.SURF_SCALE_TO_RADIUS;
 	}
 
 	@Override
