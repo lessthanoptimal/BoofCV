@@ -47,6 +47,7 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 
@@ -127,6 +128,38 @@ public class DetectCalibrationChessboardApp
 				if( SwingUtilities.isLeftMouseButton(e)) {
 					Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
 					System.out.printf("Clicked at %.2f , %.2f\n",p.x,p.y);
+					String text = "";
+
+					// show info for a corner if the user clicked near it
+					if( controlPanel.showCorners ) {
+						synchronized (lockCorners) {
+							ChessboardCorner best = null;
+							int bextId = -1;
+							// Must be closer if zoomed in. The on screen pixels represent a smaller distance
+							double bestDistance = 10/imagePanel.getScale();
+							for (int i = 0; i < foundCorners.size; i++) {
+								ChessboardCorner c = foundCorners.get(i);
+								// make sure it's a visible corner
+								if( c.level2 < controlPanel.minPyrLevel )
+									continue;
+								double d = c.distance(p);
+								if( d < bestDistance ) {
+									bestDistance = d;
+									best = c;
+									bextId = i;
+								}
+							}
+
+							if( best != null ) {
+								text = String.format("Corner #%d\n",bextId);
+								text += String.format("  pixel (%7.1f , %7.1f )\n",best.x,best.y);
+								text += String.format("  levels %d to %d\n",best.level1,best.level2);
+								text += String.format("  intensity %f\n",best.intensity);
+								text += String.format("  orientation %.2f (deg)\n", UtilAngle.degree(best.orientation));
+							}
+						}
+					}
+					controlPanel.setInfoText(text);
 				}
 			}
 		});
@@ -459,6 +492,8 @@ public class DetectCalibrationChessboardApp
 		JCheckBox checkAnyGrid;
 		JSpinner spinnerMinPyrLevel;
 
+		JTextArea textArea = new JTextArea();
+
 		int pyramidTop;
 		int radius;
 		int gridRows = configGridDimen.numRows;
@@ -492,6 +527,10 @@ public class DetectCalibrationChessboardApp
 				edgeThreshold = configDetector.edgeThreshold;
 			}
 
+			textArea.setEditable(false);
+			textArea.setWrapStyleWord(true);
+			textArea.setLineWrap(true);
+
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
 			comboView = combo(view,"Intensity","Image");
@@ -515,22 +554,33 @@ public class DetectCalibrationChessboardApp
 			checkMeanShift = checkbox("Mean Shift", meanShift);
 			checkAnyGrid = checkbox("Any Grid",anyGrid);
 
+			StandardAlgConfigPanel controlPanel = new StandardAlgConfigPanel();
+			controlPanel.addAlignLeft(checkMeanShift);
+			controlPanel.addAlignLeft(checkAnyGrid);
+			controlPanel.addLabeled(spinnerRadius,"Corner Radius");
+			controlPanel.addLabeled(spinnerCornerThreshold,"Corner Threshold");
+			controlPanel.addLabeled(spinnerEdgeThreshold,"Edge Threshold");
+			controlPanel.addLabeled(spinnerTop,"Pyramid Top");
+			controlPanel.addLabeled(spinnerMaxDistance,"Max Dist.");
+			controlPanel.addLabeled(spinnerOrientationTol,"Orientation Tol");
+			controlPanel.addLabeled(spinnerDirectionTol,"Direction Tol");
+			controlPanel.addLabeled(spinnerAmbiguous,"Ambiguous Tol");
+
+			JTabbedPane tabbedPane = new JTabbedPane();
+			tabbedPane.addTab("Controls",controlPanel);
+			tabbedPane.addTab("Info",textArea);
+
 			addLabeled(processingTimeLabel, "Time (ms)");
 			addLabeled(imageSizeLabel,"Image Size");
 			addLabeled(comboView,"View");
 			addLabeled(selectZoom,"Zoom");
 			add(createCheckPanel());
 			add(createGridShapePanel());
-			addAlignLeft(checkMeanShift);
-			addAlignLeft(checkAnyGrid);
-			addLabeled(spinnerRadius,"Corner Radius");
-			addLabeled(spinnerCornerThreshold,"Corner Threshold");
-			addLabeled(spinnerEdgeThreshold,"Edge Threshold");
-			addLabeled(spinnerTop,"Pyramid Top");
-			addLabeled(spinnerMaxDistance,"Max Dist.");
-			addLabeled(spinnerOrientationTol,"Orientation Tol");
-			addLabeled(spinnerDirectionTol,"Direction Tol");
-			addLabeled(spinnerAmbiguous,"Ambiguous Tol");
+			add(tabbedPane);
+		}
+
+		void setInfoText( String text ) {
+			SwingUtilities.invokeLater(()->textArea.setText(text));
 		}
 
 		JPanel createCheckPanel() {
