@@ -53,7 +53,9 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	float nx,ny;
 	// tangent step
 	float tx,ty;
-	float normalDiv = 40.0f;
+	float normalDiv = 30.0f;
+	// dynamically computed based on length of side. This is how far away it samples
+	private float tangentSampleStep;
 
 	// length of the line segment between the two points
 	float lineLength;
@@ -76,11 +78,9 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	 * @param ca corner a
 	 * @param cb corner b
 	 * @param direction_a_to_b Direction from a to b in radians.
-	 * @param scale The scale that the corners were detected at. 1.0 = full resolution image > 1.0 is low res
 	 * @return the line intensity. more positive more intense. Units = pixels intensity
 	 */
-	public float process(ChessboardCorner ca, ChessboardCorner cb, double direction_a_to_b,
-						 float scale) {
+	public float process(ChessboardCorner ca, ChessboardCorner cb, double direction_a_to_b ) {
 //		boolean meow = false;
 //		if( ca.distance(200,369) < 1.5 && cb.distance(198,358) < 2)
 //			meow = true;
@@ -95,14 +95,20 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 		// find the direction that it should be and the magnitude of the step in tangential direction
 		computeUnitNormal(ca,cb, direction_a_to_b, dx, dy);
 
+		// corners will not perfectly touch. Depending on the highest resolution that a corner was detected at
+		// set the offset. 2 pixels because that's the radius of the circle that the corner detector uses
+		float offsetA = (float)Math.pow(2,ca.levelMax);
+		float offsetB = (float)Math.pow(2,cb.levelMax);
+
 		// step away from the corner points. This is only really important with small chessboard where the samples
 		// will put it next to the corner
-		if( lineLength > 2f ) {
-			cx += nx;
-			cy += ny;
-			dx -= 2 * nx;
-			dy -= 2 * ny;
-			lineLength -= 2f;
+		if( lineLength > offsetA+offsetB ) {
+			double l = offsetA+offsetB;
+			cx += nx*offsetA;
+			cy += ny*offsetA;
+			dx -= l * nx;
+			dy -= l * ny;
+			lineLength -= l;
 		}
 
 		// move from one side to the other
@@ -117,12 +123,16 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 		}
 
 		for (int i = 0; i < lengthSamples; i++) {
-			float f = 0.1f+((float)i)/(lengthSamples-1)*0.8f;
+			float f = ((float)i)/(lengthSamples-1);
 			float x0 = cx+dx*f;
 			float y0 = cy+dy*f;
 
+			// Linearly increase sampling distance along tangent the closer it is to sampling the center.
+			// fp = [0,1]
+			float fp = (0.5f-Math.abs(f-0.5f))/0.5f;
+
 			float v = interpolate.get(x0,y0);
-			float d = Math.abs(v-prevLong);
+			float d = Math.abs(v-prevLong)*(0.1f+fp); // multiply by FP since it's more likely to be white at edges
 			if( i > 0 ) {
 				if( d > maxLongitudinal )
 					maxLongitudinal = d;
@@ -131,9 +141,10 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 
 			float maxValue = -Float.MAX_VALUE;
 
-			for (int l = 1; l <= tangentSamples; l++) {
-				float white = interpolate.get(x0-ty*l*scale,y0+tx*l*scale);
-				float black = interpolate.get(x0+ty*l*scale,y0-tx*l*scale);
+			for (int l = 0; l < tangentSamples; l++) {
+				float perpDist = (offsetA+offsetB)/2f + l*tangentSampleStep*(0.1f+fp);
+				float white = interpolate.get(x0-ty*perpDist,y0+tx*perpDist);
+				float black = interpolate.get(x0+ty*perpDist,y0-tx*perpDist);
 
 //				if( meow ) {
 //					System.out.printf("i=%2d white=%5.2f black=%5.2f\n",i,white,black);
@@ -168,9 +179,7 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 
 		// set the magnitude relative to the square size. Blurred images won't have sharp edges
 		// at the same time the magnitude of |n| shouldn't be less than 1
-		float sampleLength = Math.max(1f,lineLength/normalDiv);
-		tx *= sampleLength;
-		ty *= sampleLength;
+		tangentSampleStep = Math.max(1f,lineLength/normalDiv);
 
 		double dir0 = UtilAngle.boundHalf(direction_a_to_b);
 		double dir1 = UtilAngle.boundHalf(ca.orientation-Math.PI/4);

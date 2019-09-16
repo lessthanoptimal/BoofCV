@@ -125,11 +125,11 @@ public class DetectCalibrationChessboardApp
 		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
+				Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
 				if( SwingUtilities.isLeftMouseButton(e)) {
-					Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
 					System.out.printf("Clicked at %.2f , %.2f\n",p.x,p.y);
+				} else if( SwingUtilities.isRightMouseButton(e) ) {
 					String text = "";
-
 					// show info for a corner if the user clicked near it
 					if( controlPanel.showCorners ) {
 						synchronized (lockCorners) {
@@ -154,6 +154,7 @@ public class DetectCalibrationChessboardApp
 								text = String.format("Corner #%d\n",bextId);
 								text += String.format("  pixel (%7.1f , %7.1f )\n",best.x,best.y);
 								text += String.format("  levels %d to %d\n",best.level1,best.level2);
+								text += String.format("  levelMax %d\n",best.levelMax);
 								text += String.format("  intensity %f\n",best.intensity);
 								text += String.format("  orientation %.2f (deg)\n", UtilAngle.degree(best.orientation));
 							}
