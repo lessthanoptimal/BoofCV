@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,8 @@ import boofcv.gui.StandardAlgConfigPanel;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -32,9 +34,10 @@ import java.awt.event.ItemListener;
  * @author Peter Abeles
  */
 public class ControlHogDescriptorPanel extends StandardAlgConfigPanel
-	implements ChangeListener, ItemListener
+	implements ChangeListener, ItemListener, ActionListener
 {
 	JCheckBox showGrid;
+	JCheckBox showLogScaling;
 	JCheckBox useFast;
 
 
@@ -44,6 +47,7 @@ public class ControlHogDescriptorPanel extends StandardAlgConfigPanel
 	JSpinner selectGridY;
 
 	boolean doShowGrid = true;
+	boolean doShowLog = false;
 
 	int cellWidth = 20;
 	int histogram = 9;
@@ -61,6 +65,8 @@ public class ControlHogDescriptorPanel extends StandardAlgConfigPanel
 		showGrid.setSelected(doShowGrid);
 		showGrid.addItemListener(this);
 		showGrid.setMaximumSize(showGrid.getPreferredSize());
+
+		showLogScaling = checkbox("Show Log",doShowLog);
 
 		useFast = new JCheckBox("Fast HOG");
 		useFast.setSelected(fast);
@@ -85,6 +91,7 @@ public class ControlHogDescriptorPanel extends StandardAlgConfigPanel
 
 
 		addAlignLeft(showGrid, this);
+		addAlignLeft(showLogScaling, this);
 		addAlignLeft(useFast,this);
 
 		addLabeled(selectWidth, "Cell Size:", this);
@@ -120,6 +127,14 @@ public class ControlHogDescriptorPanel extends StandardAlgConfigPanel
 		} else if( useFast == e.getSource() ) {
 			fast = useFast.isSelected();
 			owner.configChanged();
+		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if( showLogScaling == e.getSource() ) {
+			doShowLog = showLogScaling.isSelected();
+			owner.visualsChanged();
 		}
 	}
 }

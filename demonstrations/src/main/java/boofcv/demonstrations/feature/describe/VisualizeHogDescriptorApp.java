@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,8 +56,8 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 	final Object hogLock = new Object();
 	DescribeImageDenseHoG<T> hog;
 
-	Color colors[];
-	float cos[],sin[];
+	Color[] colors;
+	float[] cos,sin;
 
 
 	Point2D_I32 selectedPixel;
@@ -70,10 +70,6 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 	public VisualizeHogDescriptorApp(List<String> exampleInputs, ImageType<T> imageType) {
 		super(exampleInputs, imageType);
 
-		colors = new Color[256];
-		for (int i = 0; i < colors.length; i++) {
-			colors[i] = new Color(i, i, i);
-		}
 
 		add(controlPanel,BorderLayout.WEST);
 		add(imagePanel,BorderLayout.CENTER);
@@ -83,6 +79,8 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 
 		updateDescriptor();
 
+		setColors(controlPanel.doShowLog);
+
 		imagePanel.setScaling(ScaleOptions.NONE);
 		imagePanel.setCentering(false);
 		imagePanel.addMouseListener(new MouseAdapter() {
@@ -91,6 +89,22 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 				selectRegion(e.getX(),e.getY());
 			}
 		});
+	}
+
+	private void setColors( boolean logIntensity ) {
+		Color colors[] = new Color[256];
+		if( logIntensity ) {
+			double k = 255.0 / Math.log(255);
+			for (int i = 0; i < colors.length; i++) {
+				int v = (int) (k * Math.log(i + 1));
+				colors[i] = new Color(v, v, v);
+			}
+		} else {
+			for (int i = 0; i < colors.length; i++) {
+				colors[i] = new Color(i, i, i);
+			}
+		}
+		this.colors = colors;
 	}
 
 	private void selectRegion( int x , int y ) {
@@ -193,6 +207,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 
 		float foo = config.pixelsPerCell/2.0f;
 
+		Color[] colors = this.colors; // safety just in case it changes in another thread
 		int index = 0;
 		for (int cellY = 0; cellY < config.cellsPerBlockY; cellY++) {
 			for (int cellX = 0; cellX < config.cellsPerBlockX; cellX++) {
@@ -241,6 +256,7 @@ public class VisualizeHogDescriptorApp<T extends ImageBase<T>> extends Demonstra
 	}
 
 	public void visualsChanged() {
+		setColors(controlPanel.doShowLog);
 		imagePanel.repaint();
 	}
 
