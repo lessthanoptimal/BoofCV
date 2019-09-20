@@ -21,7 +21,6 @@ package boofcv.alg.fiducial.calib.chess;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.struct.image.GrayU8;
-import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -68,37 +67,6 @@ class TestChessboardCornerEdgeIntensity {
 		assertEquals(255,found0);
 		assertEquals(255,found1);
 		assertEquals(255,found2);
-	}
-
-	@Test
-	void computeUnitNormal() {
-		ChessboardCorner a11 = create(0,0, Math.PI/4);
-		ChessboardCorner a12 = create(0,0, -Math.PI/4);
-		ChessboardCornerEdgeIntensity<GrayU8> alg = new ChessboardCornerEdgeIntensity<>(GrayU8.class);
-
-		// magnitude of the norma
-		double n = 20/15.0;
-
-		// horizontal relationship
-		alg.computeUnitNormal(a11,a12,0.0,20,0);
-		assertEquals(0.0,alg.nx, UtilEjml.TEST_F32);
-		assertEquals(-n,alg.ny, UtilEjml.TEST_F32);
-
-		alg.computeUnitNormal(a12,a11,Math.PI,-20,0);
-		assertEquals(0.0,alg.nx, UtilEjml.TEST_F32);
-		assertEquals(-n,alg.ny, UtilEjml.TEST_F32);
-		alg.computeUnitNormal(a12,a11,-Math.PI,-20,0);
-		assertEquals(0.0,alg.nx, UtilEjml.TEST_F32);
-		assertEquals(-n,alg.ny, UtilEjml.TEST_F32);
-
-		// vertical relationship
-		alg.computeUnitNormal(a11,a12,Math.PI/2.0,0,20);
-		assertEquals(-n,alg.nx, UtilEjml.TEST_F32);
-		assertEquals( 0.0,alg.ny, UtilEjml.TEST_F32);
-
-		alg.computeUnitNormal(a12,a12,-Math.PI/2.0,0,-20);
-		assertEquals(-n,alg.nx, UtilEjml.TEST_F32);
-		assertEquals( 0.0,alg.ny, UtilEjml.TEST_F32);
 	}
 
 	private static ChessboardCorner create( double x , double y , double yaw ) {
