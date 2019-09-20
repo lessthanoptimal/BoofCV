@@ -108,6 +108,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 				cl.first = true;
 				cl.set(x,y,cf.orientation,cf.intensity);
 				cl.constrast = cf.constrast;
+				cl.levelMax = level;
 				cl.level1 = level;
 				cl.level2 = level;
 			}
@@ -168,6 +169,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 			// Location accuracy is better at higher resolution but angle accuracy is better at lower resolution
 			// accept the new angle if it has higher corner intensity
 			ChessboardCorner resultsMax = c0;
+			double distanceMax = 0;
 
 			// set the second level to the lowest resolution a neighbor is found in
 			int level2 = c0.level2;
@@ -180,6 +182,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 					maximum = false;
 				}
 				if( c1.intensity > resultsMax.intensity) {
+					distanceMax = nnResults.get(j).distance;
 					resultsMax = c1;
 				}
 			}
@@ -187,10 +190,16 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 			if( !maximum ) {
 				c0.first = false;
 			}
-			c0.orientation = resultsMax.orientation;
-			c0.intensity = resultsMax.intensity;
-			c0.constrast = resultsMax.constrast;
-			c0.level2 = level2;
+
+			// Require it to be within the non-maximum radius to actually be merged into c0
+			// This is to prevent a feature from "drifting" and incorrectly appearing to go deep down in the pyramid
+			if( distanceMax <= radius*radius ) {
+				c0.orientation = resultsMax.orientation;
+				c0.intensity = resultsMax.intensity;
+				c0.constrast = resultsMax.constrast;
+				c0.levelMax = resultsMax.levelMax;
+				c0.level2 = level2;
+			}
 		}
 	}
 

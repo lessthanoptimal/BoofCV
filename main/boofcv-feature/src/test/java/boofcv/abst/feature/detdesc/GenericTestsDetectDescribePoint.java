@@ -51,6 +51,9 @@ public abstract class GenericTestsDetectDescribePoint<T extends ImageBase<T>,D e
 	protected ImageType<T> imageType;
 	Class<D> descType;
 
+	// how precise the radius needs to be
+	double radiusTol = 0.1;
+
 	protected GenericTestsDetectDescribePoint(boolean hasScale, boolean hasOrientation,
 											  ImageType<T> imageType, Class<D> descType) {
 		this.hasScale = hasScale;

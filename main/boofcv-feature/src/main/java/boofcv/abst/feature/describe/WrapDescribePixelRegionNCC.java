@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,9 +81,8 @@ public class WrapDescribePixelRegionNCC<T extends ImageGray<T>>
 
 	@Override
 	public double getCanonicalWidth() {
-		throw new RuntimeException("Not yet implemented");
+		return (alg.getRegionWidth()+alg.getRegionHeight())/2.0;
 	}
-
 	@Override
 	public Class<NccFeature> getDescriptionType() {
 		return NccFeature.class;

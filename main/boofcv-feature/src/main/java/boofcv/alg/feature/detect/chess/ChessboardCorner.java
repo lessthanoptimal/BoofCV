@@ -51,11 +51,16 @@ public class ChessboardCorner extends Point2D_F64 {
 	 * The first and second level in the pyramid the corner was seen at. level1 <= level2
 	 */
 	public int level1, level2;
+	/**
+	 * Level with the maximum corner intensity
+	 */
+	public int levelMax;
 
 	/**
 	 * Internal book keeping. if true then this indicates that this is the first corner seen in this level
 	 */
 	public boolean first; // TODO prune? use levels as a flag instead
+	public ChessboardCorner parent;
 
 	public void reset() {
 		orientation = Double.NaN;
@@ -64,8 +69,9 @@ public class ChessboardCorner extends Point2D_F64 {
 		edgeIntensity = -1;
 		edgeRatio = -1;
 		constrast = 0;
+		parent = null;
 		first = false;
-		level1 = level2 = -1;
+		level1 = level2 = levelMax = -1;
 	}
 
 	public void set(ChessboardCorner c) {
@@ -75,6 +81,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		this.constrast = c.constrast;
 		this.level1 = c.level1;
 		this.level2 = c.level2;
+		this.levelMax = c.levelMax;
 	}
 
 	public void set(double x, double y, double angle, double intensity) {

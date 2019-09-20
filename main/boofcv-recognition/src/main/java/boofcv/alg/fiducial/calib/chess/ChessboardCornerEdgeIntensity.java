@@ -23,8 +23,8 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.ImageGray;
-import georegression.metric.UtilAngle;
-import org.ddogleg.sorting.QuickSelect;
+
+import java.util.Arrays;
 
 /**
  * Computes edge intensity for the line between two corners. Assumes the edge is approximately straight. This means
@@ -41,19 +41,16 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	/**
 	 * Number of points along the line from corner a to b that will be sampled
 	 */
-	private int lengthSamples=10;
+	private int lengthSamples=15;
 	private float[] sampleValues = new float[lengthSamples];
-
-	/**
-	 * Number of points radially outwards along the line that are sampled
-	 */
-	int tangentSamples=2;
 
 	// find the normal pointing towards white. Magnitude is relative to distance between two corners
 	float nx,ny;
 	// tangent step
 	float tx,ty;
-	float normalDiv = 40.0f;
+	float normalDiv = 15.0f;
+	// dynamically computed based on length of side. This is how far away it samples
+	private float tangentSampleStep;
 
 	// length of the line segment between the two points
 	float lineLength;
@@ -76,11 +73,9 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	 * @param ca corner a
 	 * @param cb corner b
 	 * @param direction_a_to_b Direction from a to b in radians.
-	 * @param scale The scale that the corners were detected at. 1.0 = full resolution image > 1.0 is low res
 	 * @return the line intensity. more positive more intense. Units = pixels intensity
 	 */
-	public float process(ChessboardCorner ca, ChessboardCorner cb, double direction_a_to_b,
-						 float scale) {
+	public float process(ChessboardCorner ca, ChessboardCorner cb, double direction_a_to_b) {
 //		boolean meow = false;
 //		if( ca.distance(200,369) < 1.5 && cb.distance(198,358) < 2)
 //			meow = true;
@@ -93,109 +88,124 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 		float dy = (float)(cb.y-ca.y);
 
 		// find the direction that it should be and the magnitude of the step in tangential direction
-		computeUnitNormal(ca,cb, direction_a_to_b, dx, dy);
+		computeUnitNormal(dx, dy);
+
+		// corners will not perfectly touch. Depending on the highest resolution that a corner was detected at
+		// set the offset. 2 pixels because that's the radius of the circle that the corner detector uses
+		float offsetA = (float)Math.pow(2,ca.levelMax);
+		float offsetB = (float)Math.pow(2,cb.levelMax);
+
+		offsetA = Math.max(1,Math.min(offsetA,lineLength*0.1f));
+		offsetB = Math.max(1,Math.min(offsetB,lineLength*0.1f));
 
 		// step away from the corner points. This is only really important with small chessboard where the samples
 		// will put it next to the corner
-		if( lineLength > 2f ) {
-			cx += nx;
-			cy += ny;
-			dx -= 2 * nx;
-			dy -= 2 * ny;
-			lineLength -= 2f;
+		if( lineLength > offsetA+offsetB ) {
+			double l = offsetA+offsetB;
+			cx += nx*offsetA;
+			cy += ny*offsetA;
+			dx -= l * nx;
+			dy -= l * ny;
+			lineLength -= l;
 		}
-
-		// move from one side to the other
-		// divide it into lengthSamples+1 regions and don't sample the tail ends
-		float maxLongitudinal = 0;
-		float prevLong=0;
-
 		// don't sample less than 1 pixel. This will make longitudinal checks fail
 		int lengthSamples = this.lengthSamples;
 		if( lengthSamples > lineLength ) {
 			lengthSamples = (int)lineLength;
 		}
 
+		// previous samples values along the tangent
+		float prevLeft=0;
+		float prevRight=0;
+		float prevMiddle=0;
+		// The maximum longitudinal gradient magnitude
+		float longitudinalMaxValue = 0;
+
+		// The maximum distance it will sample in tangent direction. The offsets are added later which
+		// is why they are substracted here
+		float tangentMaxDistance = Math.max(0.0f,tangentSampleStep-(offsetA+offsetB)/2f);
+
+		// move from one side to the other
+		// divide it into lengthSamples+1 regions and don't sample the tail ends
 		for (int i = 0; i < lengthSamples; i++) {
-			float f = 0.1f+((float)i)/(lengthSamples-1)*0.8f;
+			float f = ((float)i)/(lengthSamples-1);
 			float x0 = cx+dx*f;
 			float y0 = cy+dy*f;
 
-			float v = interpolate.get(x0,y0);
-			float d = Math.abs(v-prevLong);
+			// Linearly increase sampling distance along tangent the closer it is to sampling the center.
+			// fp = [0,1]
+			float fp = (0.5f-Math.abs(f-0.5f))/0.5f;
+
+			// Sample along the tangent now and look to see how strong the edge is
+			float perpDist = offsetA*(1.0f-f) + offsetB*f + tangentMaxDistance*fp;
+			float leftVal = interpolate.get(x0-tx*perpDist,y0-ty*perpDist);
+			float rightVal = interpolate.get(x0+tx*perpDist,y0+ty*perpDist);
+			float middle = interpolate.get(x0,y0);
+
+			// Compute the gradient along the line
 			if( i > 0 ) {
-				if( d > maxLongitudinal )
-					maxLongitudinal = d;
+				//-0.5 is needed to make it independent of the order of ca and cb
+				float ff = (i-0.5f)/(lengthSamples-1);
+				// rises from 0.1 to 1.1 is flat for a bit, then falls to 0.1
+				float fpp = 0.1f+Math.min(1.0f,Math.abs(0.5f-Math.abs(ff-0.5f))/0.35f);
+
+				// Compute longitudinal max error
+				longitudinalMaxValue = Math.max(longitudinalMaxValue,Math.abs(leftVal-prevLeft)*fpp);
+				longitudinalMaxValue = Math.max(longitudinalMaxValue,Math.abs(rightVal-prevRight)*fpp);
+				longitudinalMaxValue = Math.max(longitudinalMaxValue,Math.abs(middle-prevMiddle)*fpp);
 			}
-			prevLong = v;
+			prevLeft = leftVal;
+			prevRight = rightVal;
+			prevMiddle = middle;
 
-			float maxValue = -Float.MAX_VALUE;
-
-			for (int l = 1; l <= tangentSamples; l++) {
-				float white = interpolate.get(x0-ty*l*scale,y0+tx*l*scale);
-				float black = interpolate.get(x0+ty*l*scale,y0-tx*l*scale);
-
-//				if( meow ) {
-//					System.out.printf("i=%2d white=%5.2f black=%5.2f\n",i,white,black);
-//				}
-
-				maxValue = Math.max(maxValue,white-black);
-			}
-
-			sampleValues[i] = maxValue;
+			sampleValues[i] = leftVal-rightVal;
 		}
-//		if( meow )
-//			System.out.println("done");
 
-		// Select one of the most intense values.
-		// Originally min was used but that proved too sensitive to outliers
-		return (QuickSelect.select(sampleValues,2,lengthSamples)-maxLongitudinal);
+		// Compute the average of perpendicular gradients after removing outliers
+		Arrays.sort(sampleValues,0,lengthSamples);
+		float perpendicularAverage = 0;
+		int n = lengthSamples > 6 ? 2 : lengthSamples >= 3 ? 1 : 0;
+		for (int i = n; i < lengthSamples-n; i++) {
+			perpendicularAverage += sampleValues[i];
+		}
+		perpendicularAverage /= lengthSamples-n*2;
+
+		// The tangent direction was arbitrarily selected. See if the sign needs to be flipped
+		int numNegative = 0;
+		for (int i = 0; i < lengthSamples; i++) {
+			if( sampleValues[i] < 0 )
+				numNegative++;
+		}
+		if( numNegative > lengthSamples*3/4) {
+			perpendicularAverage *= -1;
+		}
+
+		// Maximum perpendicular gradient and minimize longitudinal gradient
+		return perpendicularAverage-longitudinalMaxValue;
 	}
 
 	/**
 	 * Finds the line's unit normal and make sure it points towards what should be white pixels
-	 * @param ca corner a
-	 * @param direction_a_to_b direction from corner a to b. radians. -pi to pi
 	 * @param dx b.x - a.x
 	 * @param dy b.y - a.y
 	 */
-	void computeUnitNormal(ChessboardCorner ca, ChessboardCorner cb, double direction_a_to_b, float dx, float dy) {
+	void computeUnitNormal( float dx, float dy) {
 		lineLength = (float)Math.sqrt(dx*dx + dy*dy);
 
 		// it will now have a normal of 1
-		nx = tx = dx/lineLength;
-		ny = ty = dy/lineLength;
+		nx = dx/lineLength;
+		ny = dy/lineLength;
+
+		// the sign is currently one known, just pick one
+		tx = -ny;
+		ty =  nx;
+		// In the past corner orientation was used. That worked 99.5% of the time, but the 0.5% if fails was very
+		// difficult to fix. It was an effective way to eliminate some false positives, but to bring it back
+		// there would have to be some sort of confidence value to know when to use it
 
 		// set the magnitude relative to the square size. Blurred images won't have sharp edges
 		// at the same time the magnitude of |n| shouldn't be less than 1
-		float sampleLength = Math.max(1f,lineLength/normalDiv);
-		tx *= sampleLength;
-		ty *= sampleLength;
-
-		double dir0 = UtilAngle.boundHalf(direction_a_to_b);
-		double dir1 = UtilAngle.boundHalf(ca.orientation-Math.PI/4);
-
-		double distA = UtilAngle.distHalf(dir0,dir1);
-
-		dir0 = UtilAngle.boundHalf(UtilAngle.bound(direction_a_to_b+Math.PI));
-		dir1 = UtilAngle.boundHalf(cb.orientation+Math.PI/4);
-
-		double distB = UtilAngle.distHalf(dir0,dir1);
-
-		// Under fisheye distortion it's possible to have a corner's orientation point along the line connecting
-		// two corners. In that situation you should go with the corner that has an orientation with the
-		// most discrimination
-		if( UtilAngle.distHalf(distA,Math.PI/4.0) > UtilAngle.distHalf(distB,Math.PI/4.0) ) {
-			if(distA < Math.PI/4.0 ) {
-				tx = -tx;
-				ty = -ty;
-			}
-		} else {
-			if(distB < Math.PI/4.0 ) {
-				tx = -tx;
-				ty = -ty;
-			}
-		}
+		tangentSampleStep = Math.max(1f,lineLength/normalDiv);
 	}
 
 	public int getLengthSamples() {
@@ -206,14 +216,6 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 		this.lengthSamples = lengthSamples;
 		if( sampleValues.length < lengthSamples)
 			sampleValues = new float[lengthSamples];
-	}
-
-	public int getTangentSamples() {
-		return tangentSamples;
-	}
-
-	public void setTangentSamples(int tangentSamples) {
-		this.tangentSamples = tangentSamples;
 	}
 
 	public Class<T> getImageType() {

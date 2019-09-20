@@ -18,7 +18,6 @@
 
 package boofcv.abst.feature.describe;
 
-import boofcv.BoofDefaults;
 import boofcv.alg.feature.describe.DescribePointSurfPlanar;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GConvertImage;
@@ -75,7 +74,7 @@ public class SurfPlanar_to_DescribeRegionPoint<T extends ImageGray<T>, II extend
 	@Override
 	public boolean process(double x, double y, double orientation, double radius, BrightFeature description) {
 
-		alg.describe(x,y,orientation, radius/ BoofDefaults.SURF_SCALE_TO_RADIUS,description);
+		alg.describe(x,y,orientation, radius,description);
 
 		return true;
 	}
