@@ -100,14 +100,17 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 
 		// step away from the corner points. This is only really important with small chessboard where the samples
 		// will put it next to the corner
-		if( lineLength > offsetA+offsetB ) {
-			double l = offsetA+offsetB;
-			cx += nx*offsetA;
-			cy += ny*offsetA;
-			dx -= l * nx;
-			dy -= l * ny;
-			lineLength -= l;
-		}
+		double l = offsetA+offsetB;
+		cx += nx*offsetA;
+		cy += ny*offsetA;
+		dx -= l * nx;
+		dy -= l * ny;
+		lineLength -= l;
+
+		// the line is too small, abort
+		if( lineLength < 2 )
+			return -1;
+
 		// don't sample less than 1 pixel. This will make longitudinal checks fail
 		int lengthSamples = this.lengthSamples;
 		if( lengthSamples > lineLength ) {

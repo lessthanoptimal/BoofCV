@@ -34,16 +34,15 @@ import boofcv.struct.Configuration;
 public class ConfigChessboard implements Configuration {
 
 	/**
-	 * Size of a corner in the corner detector. For very small targets 1 is required. Otherwise 2 provides
-	 * much more stable results.
+	 * Size of a corner in the corner detector. 1 is recommended in general. 2 or higher can be used to run faster
+	 * if the image quality and the apparent target size is large.
 	 */
 	public int cornerRadius = 1;
 
 	/**
-	 * Second threshold on corner intensity. This is applied after orientation has been estimated and is used
-	 * to remove false positives, like corners on a box.
+	 * Non-maximum threshold relative to maximum corner intensity. 0 to 1, inclusive
 	 */
-	public double cornerThreshold = 1.0;
+	public double cornerNonMaxThreshold = 0.05;
 
 	/**
 	 * Relative threshold for two corners being connected. The edge between them must have sufficient intensity.

@@ -48,6 +48,7 @@ public class DetectChessboardPatterns<T extends ImageGray<T>> {
 
 		detector.setPyramidTopSize(config.pyramidTopSize);
 		detector.getDetector().setNonmaxRadius(config.cornerRadius);
+		detector.getDetector().setNonmaxThresholdRatio((float)config.cornerNonMaxThreshold);
 
 		clusterFinder.setAmbiguousTol(config.ambiguousTol);
 		clusterFinder.setDirectionTol(config.directionTol);

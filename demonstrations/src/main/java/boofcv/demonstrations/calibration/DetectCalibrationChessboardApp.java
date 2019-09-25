@@ -170,7 +170,7 @@ public class DetectCalibrationChessboardApp
 		synchronized (lockAlgorithm) {
 			configDetector.pyramidTopSize = controlPanel.pyramidTop;
 			configDetector.cornerRadius = controlPanel.radius;
-			configDetector.cornerThreshold = controlPanel.cornerThreshold;
+			configDetector.cornerNonMaxThreshold = controlPanel.cornerNonMaxThreshold/100.0;
 			configDetector.edgeThreshold = controlPanel.edgeThreshold;
 			configDetector.orientationTol = controlPanel.orientationTol;
 			configDetector.directionTol = controlPanel.directionTol;
@@ -241,7 +241,7 @@ public class DetectCalibrationChessboardApp
 //			controlPanel.thresholdPanel.updateHistogram(featureImg);
 
 			if( controlPanel.logItensity ) {
-				PixelMath.log(featureImg,logIntensity);
+				PixelMath.logSign(featureImg,logIntensity);
 				VisualizeImageData.colorizeSign(logIntensity, visualized, ImageStatistics.maxAbs(logIntensity));
 			} else {
 				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
@@ -286,17 +286,9 @@ public class DetectCalibrationChessboardApp
 
 		SwingUtilities.invokeLater(() -> {
 			controlPanel.setProcessingTimeMS(processingTime);
-			changeViewImage();
+			imagePanel.setBufferedImageNoChange(original);
 			imagePanel.repaint();
 		});
-	}
-
-	private void changeViewImage() {
-		if( controlPanel.view == 0 || controlPanel.view == 2 ) {
-			imagePanel.setBufferedImageNoChange(visualized);
-		} else if( controlPanel.view == 1 ) {
-			imagePanel.setBufferedImageNoChange(original);
-		}
 	}
 
 	class DisplayPanel extends ShapeVisualizePanel {
@@ -310,15 +302,16 @@ public class DetectCalibrationChessboardApp
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-			if(  controlPanel.view == 2 ) {
+			if( controlPanel.translucent > 0 ) {
 				// this requires some explaining
 				// for some reason it was decided that the transform would apply a translation, but not a scale
 				// so this scale will be concatted on top of the translation in the g2
 				tran.setTransform(scale,0,0,scale,0,0);
 				Composite beforeAC = g2.getComposite();
-				AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f);
+				float translucent = controlPanel.translucent/100.0f;
+				AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, translucent);
 				g2.setComposite(ac);
-				g2.drawImage(original,tran,null);
+				g2.drawImage(visualized,tran,null);
 				g2.setComposite(beforeAC);
 			}
 
@@ -469,7 +462,7 @@ public class DetectCalibrationChessboardApp
 	class ControlPanel extends DetectBlackShapePanel
 			implements ActionListener , ChangeListener , ThresholdControlPanel.Listener
 	{
-		JComboBox<String> comboView;
+		JSlider sliderTranslucent = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
 		JCheckBox checkLogIntensity;
 		JSpinner spinnerRadius;
 		JSpinner spinnerCornerThreshold;
@@ -500,7 +493,7 @@ public class DetectCalibrationChessboardApp
 		int gridRows = configGridDimen.numRows;
 		int gridCols = configGridDimen.numCols;
 		int maxDistance;
-		double cornerThreshold;
+		int cornerNonMaxThreshold;
 		double edgeThreshold;
 		double ambiguousTol;
 		double directionTol;
@@ -511,10 +504,10 @@ public class DetectCalibrationChessboardApp
 		boolean showPerpendicular = false;
 		boolean showCorners = false;
 		boolean logItensity =false;
-		int view = 1;
 		boolean meanShift = true;
 		boolean anyGrid = false;
 		int minPyrLevel = 0;
+		int translucent = 0;
 
 		ControlPanel() {
 			{
@@ -524,7 +517,7 @@ public class DetectCalibrationChessboardApp
 				directionTol = configDetector.directionTol;
 				orientationTol = configDetector.orientationTol;
 
-				cornerThreshold = configDetector.cornerThreshold;
+				cornerNonMaxThreshold = (int)(configDetector.cornerNonMaxThreshold*100);
 				edgeThreshold = configDetector.edgeThreshold;
 			}
 
@@ -534,8 +527,7 @@ public class DetectCalibrationChessboardApp
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
-			comboView = combo(view,"Intensity","Image");
-			spinnerCornerThreshold = spinner(cornerThreshold, 0, 100, 0.2);
+			spinnerCornerThreshold = spinner(cornerNonMaxThreshold, 0, 100, 5);
 			spinnerEdgeThreshold = spinner(edgeThreshold, 0, 1.0, 0.1,1,3);
 			spinnerRadius = spinner(radius, 1, 100, 1);
 			spinnerTop = spinner(pyramidTop, 0, 10000, 50);
@@ -546,6 +538,10 @@ public class DetectCalibrationChessboardApp
 			spinnerGridCols = spinner(gridCols,3,200,1);
 			spinnerMaxDistance = spinner(maxDistance,0,50000,1);
 			spinnerMinPyrLevel = spinner(minPyrLevel,0,20,1);
+
+			sliderTranslucent.setMaximumSize(new Dimension(120,26));
+			sliderTranslucent.setPreferredSize(sliderTranslucent.getMaximumSize());
+			sliderTranslucent.addChangeListener(this);
 
 			checkShowTargets = checkbox("Chessboard", showChessboards);
 			checkShowNumbers = checkbox("Numbers", showNumbers);
@@ -573,7 +569,7 @@ public class DetectCalibrationChessboardApp
 
 			addLabeled(processingTimeLabel, "Time (ms)");
 			addLabeled(imageSizeLabel,"Image Size");
-			addLabeled(comboView,"View");
+			addLabeled(sliderTranslucent,"X-Corners");
 			addLabeled(selectZoom,"Zoom");
 			add(createCheckPanel());
 			add(createGridShapePanel());
@@ -624,11 +620,7 @@ public class DetectCalibrationChessboardApp
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == comboView ) {
-				view = comboView.getSelectedIndex();
-				changeViewImage();
-				imagePanel.repaint();
-			} else if( e.getSource() == checkShowCorners) {
+			if( e.getSource() == checkShowCorners) {
 				showCorners = checkShowCorners.isSelected();
 				imagePanel.repaint();
 			} else if( e.getSource() == checkLogIntensity) {
@@ -673,7 +665,7 @@ public class DetectCalibrationChessboardApp
 			} else if( e.getSource() == spinnerAmbiguous) {
 				ambiguousTol = ((Number) spinnerAmbiguous.getValue()).doubleValue();
 			} else if( e.getSource() == spinnerCornerThreshold ) {
-				cornerThreshold = ((Number)spinnerCornerThreshold.getValue()).doubleValue();
+				cornerNonMaxThreshold = ((Number)spinnerCornerThreshold.getValue()).intValue();
 			} else if( e.getSource() == spinnerEdgeThreshold ) {
 				edgeThreshold = ((Number)spinnerEdgeThreshold.getValue()).doubleValue();
 			} else if( e.getSource() == spinnerRadius ) {
@@ -688,6 +680,10 @@ public class DetectCalibrationChessboardApp
 				maxDistance = ((Number)spinnerMaxDistance.getValue()).intValue();
 			} else if( e.getSource() == spinnerMinPyrLevel ) {
 				minPyrLevel = ((Number)spinnerMinPyrLevel.getValue()).intValue();
+				imagePanel.repaint();
+				return;
+			} else if( e.getSource() == sliderTranslucent ) {
+				translucent = ((Number)sliderTranslucent.getValue()).intValue();
 				imagePanel.repaint();
 				return;
 			}
