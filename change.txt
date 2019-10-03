@@ -6,6 +6,8 @@ Date Format: year/month/day
 Date    : 2019
 Version : 0.35
 
+- Build
+  * Fixed some dependencies not being included in the library zip (Thanks changbaishan)
 - Mean Shift
   * Even kernel sizes
   * Configuration class

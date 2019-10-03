@@ -244,7 +244,7 @@ task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+
         ext.boofJars += files(javadocProjects.collect { project(it).tasks.sourcesJar.archivePath })
 
         // This will be a list of just external dependencies
-        ext.listExternal = files(javadocProjects.collect { project(it).configurations.compile })
+        ext.listExternal = files(javadocProjects.collect { project(it).configurations.runtimeClasspath })
         ext.listExternal = ext.listExternal - ext.boofJars
         ext.listExternal = ext.listExternal.findAll({ !it.getName().contains("android.jar") })
 
