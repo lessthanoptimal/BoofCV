@@ -108,7 +108,6 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, panel);
-
 	}
 
 	@Override

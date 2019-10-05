@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.feature.associate;
 
+import boofcv.abst.feature.associate.*;
 import boofcv.abst.feature.describe.ConfigBrief;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
@@ -27,6 +28,7 @@ import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -34,19 +36,26 @@ import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
-import boofcv.gui.SelectAlgorithmAndInputPanel;
+import boofcv.gui.BoofSwingUtil;
+import boofcv.gui.DemonstrationBase;
+import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.dialogs.OpenImageSetDialog;
 import boofcv.gui.feature.AssociationScorePanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.feature.*;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
 import javax.swing.*;
+import javax.swing.border.EtchedBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,12 +70,15 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends ImageGray<D>>
-		extends SelectAlgorithmAndInputPanel implements VisualizeScorePanel.Listener {
+		extends DemonstrationBase {
 	// These classes process the input images and compute association score
 	InterestPointDetector<T> detector;
-	DescribeRegionPoint<T, TupleDesc> describe;
+	DescribeRegionPoint descriptor;
 	OrientationImage<T> orientation;
 
+	// copies of input image
+	BufferedImage buffLeft;
+	BufferedImage buffRight;
 	// gray scale versions of input image
 	T imageLeft;
 	T imageRight;
@@ -76,93 +88,104 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 	AssociationScorePanel<TupleDesc> scorePanel;
 	VisualizeScorePanel controlPanel;
 
-	// has the image been processed yet
-	boolean processedImage = false;
-
-	public VisualizeAssociationScoreApp(Class<T> imageType,
-										Class<D> derivType) {
-		super(2);
+	public VisualizeAssociationScoreApp(java.util.List<PathLabel> examples , Class<T> imageType) {
+		super(true,false,examples, ImageType.single(imageType));
 		this.imageType = imageType;
 
 		imageLeft = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
 		imageRight = GeneralizedImageOps.createSingleBand(imageType, 1, 1);
-
-		GeneralFeatureDetector<T, D> alg;
-
-		addAlgorithm(0, "Fast Hessian", FactoryInterestPoint.fastHessian(new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4)));
-		addAlgorithm(0, "SIFT", FactoryInterestPoint.sift(null,new ConfigSiftDetector(500),imageType));
-		alg = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(500,2,1), null, derivType);
-		addAlgorithm(0, "Shi-Tomasi", FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType));
-
-		addAlgorithm(1, "SURF", FactoryDescribeRegionPoint.surfStable(null, imageType));
-		addAlgorithm(1, "SIFT", FactoryDescribeRegionPoint.sift(null,null, imageType));
-		addAlgorithm(1, "BRIEF", FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType));
-		addAlgorithm(1, "BRIEFO", FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType));
-		addAlgorithm(1, "Pixel 11x11", FactoryDescribeRegionPoint.pixel(11, 11, imageType));
-		addAlgorithm(1, "NCC 11x11", FactoryDescribeRegionPoint.pixelNCC(11, 11, imageType));
 
 		// estimate orientation using this once since it is fast
 		Class integralType = GIntegralImageOps.getIntegralType(imageType);
 		OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(null, integralType);
 		orientation = FactoryOrientation.convertImage(orientationII, imageType);
 
-		controlPanel = new VisualizeScorePanel(this);
+		controlPanel = new VisualizeScorePanel();
 		scorePanel = new AssociationScorePanel<>(3);
 
-		JPanel gui = new JPanel();
-		gui.setLayout(new BorderLayout());
+		declareAlgorithms();
 
-		gui.add(controlPanel, BorderLayout.WEST);
-		gui.add(scorePanel, BorderLayout.CENTER);
-
-		setMainGUI(gui);
+		add(BorderLayout.WEST, controlPanel);
+		add(BorderLayout.CENTER, scorePanel);
 	}
 
-	public void process(BufferedImage buffLeft, BufferedImage buffRight) {
-		// copy the input images
-		imageLeft.reshape(buffLeft.getWidth(), buffLeft.getHeight());
-		imageRight.reshape(buffRight.getWidth(), buffRight.getHeight());
+	private void declareAlgorithms() {
+		switch( controlPanel.selectedDetector ) {
+			case 0: detector = FactoryInterestPoint.fastHessian(new ConfigFastHessian( 1, 2, 200, 1, 9, 4, 4)); break;
+			case 1: detector = FactoryInterestPoint.sift(null,new ConfigSiftDetector(400),imageType); break;
+			case 2: {
+				Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
+				GeneralFeatureDetector<T, D> alg = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(500,2,1), null, derivType);
+				detector = FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType);
+			} break;
 
-		ConvertBufferedImage.convertFromSingle(buffLeft, imageLeft, imageType);
-		ConvertBufferedImage.convertFromSingle(buffRight, imageRight, imageType);
+			default:
+				throw new IllegalArgumentException("Unknown detector");
+		}
 
-		// update the GUI's background images
-		scorePanel.setImages(buffLeft, buffRight);
+		switch( controlPanel.selectedDescriptor ) {
+			case 0:descriptor = FactoryDescribeRegionPoint.surfStable(null, imageType); break;
+			case 1:descriptor = FactoryDescribeRegionPoint.surfColorStable(null, ImageType.pl(3, imageType)); break;
+			case 2:descriptor = FactoryDescribeRegionPoint.sift(null,null, imageType); break;
+			case 3:descriptor = FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType); break;
+			case 4:descriptor = FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType); break;
+			case 5:descriptor = FactoryDescribeRegionPoint.pixel(11, 11, imageType); break;
+			case 6:descriptor = FactoryDescribeRegionPoint.pixelNCC(11, 11, imageType); break;
+			default:
+				throw new IllegalArgumentException("Unknown descriptor");
+		}
 
-		processedImage = true;
+		SwingUtilities.invokeLater(()-> {
+			controlPanel.setFeatureType(descriptor.getDescriptionType());
+		});
 
-		// tell it to update everything
-		doRefreshAll();
+		// estimate orientation using this once since it is fast and accurate
+		Class integralType = GIntegralImageOps.getIntegralType(imageType);
+		OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(null, integralType);
+		orientation = FactoryOrientation.convertImage(orientationII,imageType);
 	}
 
 	@Override
-	public void loadConfigurationFile(String fileName) {
+	protected void openFileMenuBar() {
+		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY,2);
+		if( files == null )
+			return;
+		BoofSwingUtil.invokeNowOrLater(()->openImageSet(files));
 	}
 
 	@Override
-	public void refreshAll(Object[] cookies) {
-		detector = (InterestPointDetector<T>) cookies[0];
-		describe = (DescribeRegionPoint<T, TupleDesc>) cookies[1];
-		controlPanel.setFeatureType(describe.getDescriptionType());
-
-		processImage();
-	}
-
-	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		switch (indexFamily) {
+	protected void handleInputChange( int source , InputMethod method , final int width , final int height ) {
+		switch( source ) {
 			case 0:
-				detector = (InterestPointDetector<T>) cookie;
+				buffLeft = ConvertBufferedImage.checkDeclare(width,height,buffLeft,BufferedImage.TYPE_INT_RGB);
+				SwingUtilities.invokeLater(()->{
+					scorePanel.setPreferredSize(width,height,width,height);
+					controlPanel.setImageSize(width,height);
+				});
 				break;
 
 			case 1:
-				describe = (DescribeRegionPoint<T, TupleDesc>) cookie;
+				buffRight = ConvertBufferedImage.checkDeclare(width,height,buffRight,BufferedImage.TYPE_INT_RGB);
 				break;
 		}
+	}
 
-		controlPanel.setFeatureType(describe.getDescriptionType());
+	@Override
+	public void processImage(int sourceID, long frameID, BufferedImage bufferedIn, ImageBase input) {
+		switch( sourceID ) {
+			case 0:
+				imageLeft.setTo((T)input);
+				buffLeft.createGraphics().drawImage(bufferedIn,0,0,null);
+				break;
 
-		processImage();
+			case 1:
+				imageRight.setTo((T)input);
+				buffRight.createGraphics().drawImage(bufferedIn,0,0,null);
+
+				BoofSwingUtil.invokeNowOrLater((()-> scorePanel.setImages(buffLeft,buffRight)));
+				processImage();
+				break;
+		}
 	}
 
 	/**
@@ -181,13 +204,11 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		extractImageFeatures(progressMonitor, 0, imageLeft, leftDesc, leftPts);
 		extractImageFeatures(progressMonitor, 2, imageRight, rightDesc, rightPts);
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				progressMonitor.close();
-				scorePanel.setScorer(controlPanel.getSelected());
-				scorePanel.setLocation(leftPts, rightPts, leftDesc, rightDesc);
-				repaint();
-			}
+		SwingUtilities.invokeLater(() -> {
+			progressMonitor.close();
+			scorePanel.setScorer(controlPanel.getSelected());
+			scorePanel.setLocation(leftPts, rightPts, leftDesc, rightDesc);
+			repaint();
 		});
 	}
 
@@ -198,19 +219,13 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 	private void extractImageFeatures(final ProgressMonitor progressMonitor, final int progress,
 									  T image,
 									  List<TupleDesc> descs, List<Point2D_F64> locs) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				progressMonitor.setNote("Detecting");
-			}
-		});
+		SwingUtilities.invokeLater(() -> progressMonitor.setNote("Detecting"));
 		detector.detect(image);
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				progressMonitor.setProgress(progress + 1);
-				progressMonitor.setNote("Describing");
-			}
+		SwingUtilities.invokeLater(() -> {
+			progressMonitor.setProgress(progress + 1);
+			progressMonitor.setNote("Describing");
 		});
-		describe.setImage(image);
+		descriptor.setImage(image);
 		orientation.setImage(image);
 
 		// See if the detector can detect the feature's scale
@@ -220,13 +235,13 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 
 				Point2D_F64 pt = detector.getLocation(i);
 				double radius = detector.getRadius(i);
-				if (describe.requiresOrientation()) {
+				if (descriptor.requiresOrientation()) {
 					orientation.setObjectRadius(radius);
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
-				TupleDesc d = describe.createDescription();
-				if ( describe.process(pt.x, pt.y, yaw, radius, d) ) {
+				TupleDesc d = descriptor.createDescription();
+				if ( descriptor.process(pt.x, pt.y, yaw, radius, d) ) {
 					descs.add(d);
 					locs.add(pt.copy());
 				}
@@ -238,77 +253,134 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 				double yaw = 0;
 
 				Point2D_F64 pt = detector.getLocation(i);
-				if (describe.requiresOrientation()) {
+				if (descriptor.requiresOrientation()) {
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 
-				TupleDesc d = describe.createDescription();
-				if (describe.process(pt.x, pt.y, yaw, 1, d)) {
+				TupleDesc d = descriptor.createDescription();
+				if (descriptor.process(pt.x, pt.y, yaw, 1, d)) {
 					descs.add(d);
 					locs.add(pt.copy());
 				}
 			}
 		}
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				progressMonitor.setProgress(progress + 2);
+		SwingUtilities.invokeLater(() -> progressMonitor.setProgress(progress + 2));
+	}
+
+	public class VisualizeScorePanel extends StandardAlgConfigPanel implements ActionListener {
+		JLabel labelSize = new JLabel();
+
+		JComboBox<String> comboDetect;
+		JComboBox<String> comboDescribe;
+
+		// selects which image to view
+		JComboBox scoreTypes = new JComboBox();
+
+		Class type;
+		ScoreAssociation selected;
+
+
+		public int selectedDetector;
+		public int selectedDescriptor;
+
+		public VisualizeScorePanel() {
+			setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+			setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+
+			comboDetect = combo(selectedDetector,"Fast Hessian","SIFT","Shi-Tomasi");
+			comboDescribe = combo(selectedDescriptor,"SURF-S","SURF-S Color","SIFT","BRIEF","BRIEFSO","Pixel 11x11","NCC 11x11");
+
+			scoreTypes.addActionListener(this);
+			scoreTypes.setMaximumSize(scoreTypes.getPreferredSize());
+			add(labelSize);
+			addLabeled(scoreTypes, "Score: ", this);
+		}
+
+		public void setImageSize( int width , int height ) {
+			labelSize.setText(width+" x "+height);
+		}
+
+		public void setFeatureType( Class type ) {
+			if( this.type == type )
+				return;
+
+			this.type = type;
+
+			scoreTypes.removeActionListener(this);
+			scoreTypes.removeAllItems();
+			if( type == TupleDesc_B.class ) {
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateHamming_B(),"Hamming"));
+			} else if( type == NccFeature.class ) {
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateNccFeature(),"NCC"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclidean_F64(),"Euclidean"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq_F64(),"Euclidean2"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad_F64(),"SAD"));
+			} else if( TupleDesc_F64.class.isAssignableFrom(type) ) {
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclidean_F64(),"Euclidean"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq_F64(),"Euclidean2"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad_F64(),"SAD"));
+			} else if( type == TupleDesc_F32.class ) {
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateEuclideanSq_F32(),"Euclidean2"));
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad_F32(),"SAD"));
+			} else if( type == TupleDesc_U8.class ) {
+				scoreTypes.addItem(new ScoreItem(new ScoreAssociateSad_U8(),"SAD"));
+			} else {
+				throw new RuntimeException("Unknown description type "+type.getSimpleName());
 			}
-		});
+			selected = ((ScoreItem)scoreTypes.getSelectedItem()).assoc;
+			scoreTypes.revalidate();
+			scoreTypes.addActionListener(this);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			ScoreItem item = (ScoreItem)scoreTypes.getSelectedItem();
+			selected = item.assoc;
+
+			scorePanel.setScorer(controlPanel.getSelected());
+		}
+
+		public ScoreAssociation getSelected() {
+			return selected;
+		}
 	}
 
+	private static class ScoreItem
+	{
+		String name;
+		ScoreAssociation assoc;
 
-	@Override
-	public void changeInput(String name, int index) {
-		BufferedImage left = media.openImage(inputRefs.get(index).getPath(0));
-		BufferedImage right = media.openImage(inputRefs.get(index).getPath(1));
+		private ScoreItem(ScoreAssociation assoc, String name) {
+			this.assoc = assoc;
+			this.name = name;
+		}
 
-		process(left, right);
-	}
-
-	@Override
-	public boolean getHasProcessedImage() {
-		return processedImage;
-	}
-
-	@Override
-	public void changedSetting() {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				scorePanel.setScorer(controlPanel.getSelected());
-				repaint();
-			}
-		});
+		@Override
+		public String toString() {
+			return name;
+		}
 	}
 
 	public static void main(String args[]) {
+		List<PathLabel> examples = new ArrayList<>();
 
-		Class imageType = GrayF32.class;
-		Class derivType = GrayF32.class;
-
-		VisualizeAssociationScoreApp app = new VisualizeAssociationScoreApp(imageType, derivType);
-
-		List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("Cave",
+		examples.add(new PathLabel("Cave",
 				UtilIO.pathExample("stitch/cave_01.jpg"), UtilIO.pathExample("stitch/cave_02.jpg")));
-		inputs.add(new PathLabel("Kayak",
+		examples.add(new PathLabel("Kayak",
 				UtilIO.pathExample("stitch/kayak_02.jpg"), UtilIO.pathExample("stitch/kayak_03.jpg")));
-		inputs.add(new PathLabel("Forest",
+		examples.add(new PathLabel("Forest",
 				UtilIO.pathExample("scale/rainforest_01.jpg"), UtilIO.pathExample("scale/rainforest_02.jpg")));
-		inputs.add(new PathLabel("Building",
+		examples.add(new PathLabel("Building",
 				UtilIO.pathExample("stitch/apartment_building_01.jpg"), UtilIO.pathExample("stitch/apartment_building_02.jpg")));
-		inputs.add(new PathLabel("Trees Rotate",
+		examples.add(new PathLabel("Trees Rotate",
 				UtilIO.pathExample("stitch/trees_rotate_01.jpg"), UtilIO.pathExample("stitch/trees_rotate_03.jpg")));
 
-		app.setPreferredSize(new Dimension(1000, 500));
-		app.setSize(1000, 500);
-		app.setInputList(inputs);
+		SwingUtilities.invokeLater(()->{
+			VisualizeAssociationScoreApp app = new VisualizeAssociationScoreApp(examples,GrayF32.class);
 
-		// wait for it to process one image so that the size isn't all screwed up
-		while (!app.getHasProcessedImage()) {
-			Thread.yield();
-		}
-
-		ShowImages.showWindow(app, "Association Relative Score", true);
-
+			// Processing time takes a bit so don't open right away
+			app.openExample(examples.get(0));
+			app.display("Visualize Association Score");
+		});
 	}
 }

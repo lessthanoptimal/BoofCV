@@ -18,6 +18,8 @@ Version : 0.35
 - Demonstrations
   * Updated DenseFlowApp
   * Updated VisualizeRegionDescriptionApp TODO - video update. all desc work. color
+  * Updated VisualizeAssociationScoreApp
+  * TODO Updated VisualizeImageSegmentationApp
 - SFM
   * TODO projective camera with lens distortion
 - Calibration
@@ -25,7 +27,6 @@ Version : 0.35
   * TODO Add ability to remove images and recalibrate from application
   * TODO change high level API to be able to return more than one pattern. String ID
 - Chessboard Detector
-  * TODO detect first at low resolution
   * TODO Prune similar based on edge difference
   * TODO why pick long line in calib?
 

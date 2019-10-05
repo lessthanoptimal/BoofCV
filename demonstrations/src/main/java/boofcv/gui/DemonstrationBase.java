@@ -738,8 +738,8 @@ public abstract class DemonstrationBase extends JPanel {
 				}
 				if( first ) {
 					setInputName(f.getName());
-					handleInputChange(0, inputMethod, buffered.getWidth(), buffered.getHeight());
 				}
+				handleInputChange(i, inputMethod, buffered.getWidth(), buffered.getHeight());
 
 				ConvertBufferedImage.convertFrom(buffered,boof,true);
 
