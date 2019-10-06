@@ -76,6 +76,11 @@ public class BenchmarkImageDerivatives {
 	}
 
 	@Benchmark
+	public void hessianDet() {
+		HessianThreeDeterminant.process(input,derivX,borderI32);
+	}
+
+	@Benchmark
 	public void sobel() {
 		GradientSobel.process(input,derivX,derivY,borderI32);
 	}

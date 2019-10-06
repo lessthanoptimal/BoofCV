@@ -25,7 +25,7 @@ import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 
 /**
- * Laplacian thich processes the inner image only
+ * Laplacian which processes the inner image only
  *
  * @see DerivativeLaplacian
  *

@@ -178,7 +178,7 @@ public class FactoryDetectPoint {
 	}
 
 	/**
-	 * Creates a Hessian based blob detector. Minimums and Maximums.
+	 * Creates a Hessian based blob detector. Minimums and Maximums. Uses gradient images.
 	 *
 	 * @param type            The type of Hessian based blob detector to use. DETERMINANT often works well.
 	 * @param configDetector Configuration for feature detector.
@@ -186,12 +186,41 @@ public class FactoryDetectPoint {
 	 * @see HessianBlobIntensity
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createHessian(HessianBlobIntensity.Type type,
-											   @Nullable ConfigGeneralDetector configDetector, Class<D> derivType) {
+	GeneralFeatureDetector<T, D> createHessianDeriv(HessianBlobIntensity.Type type,
+													@Nullable ConfigGeneralDetector configDetector, Class<D> derivType) {
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
 		GeneralFeatureIntensity<T, D> intensity = FactoryIntensityPoint.hessian(type, derivType);
+		return createGeneral(intensity, configDetector);
+	}
+
+	/**
+	 * Creates a Hessian based blob detector. Minimums and Maximums. Direct from input image.
+	 *
+	 * @param type            The type of Hessian based blob detector to use. DETERMINANT often works well.
+	 * @param configDetector Configuration for feature detector.
+	 * @see HessianBlobIntensity
+	 */
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
+	GeneralFeatureDetector<T, D> createHessianDirect(HessianBlobIntensity.Type type,
+													 @Nullable ConfigGeneralDetector configDetector) {
+		if( configDetector == null)
+			configDetector = new ConfigGeneralDetector();
+
+		GeneralFeatureIntensity<T, D> intensity;
+		switch (type) {
+			case DETERMINANT:
+				intensity = FactoryIntensityPoint.hessianDet();
+				break;
+
+			case TRACE:
+				intensity = (GeneralFeatureIntensity)FactoryIntensityPoint.laplacian();
+				break;
+
+			default:
+				throw new IllegalArgumentException("Unknown type");
+		}
 		return createGeneral(intensity, configDetector);
 	}
 

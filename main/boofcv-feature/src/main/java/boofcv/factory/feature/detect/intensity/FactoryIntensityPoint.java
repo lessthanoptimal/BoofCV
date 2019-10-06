@@ -24,6 +24,7 @@ import boofcv.alg.feature.detect.intensity.FastCornerDetector;
 import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HarrisCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
+import boofcv.alg.filter.derivative.HessianThreeDeterminant;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -127,7 +128,21 @@ public class FactoryIntensityPoint {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureIntensity<I,D> hessian(HessianBlobIntensity.Type type, Class<D> derivType) {
-		return new WrapperHessianBlobIntensity<>(type, derivType);
+		return new WrapperHessianDerivBlobIntensity<>(type, derivType);
+	}
+
+	/**
+	 * Computes the Hessian determinant directly from the input image pixels. Does not use passed in derivatives
+	 *
+	 * @see HessianThreeDeterminant
+
+	 * @param <I> Input image type.
+	 * @param <D> Derivative type.
+	 * @return Hessian based blob intensity
+	 */
+	public static <I extends ImageGray<I>, D extends ImageGray<D>>
+	GeneralFeatureIntensity<I,D> hessianDet() {
+		return new WrapperHessianThreeImageDetIntensity<>();
 	}
 
 	/**

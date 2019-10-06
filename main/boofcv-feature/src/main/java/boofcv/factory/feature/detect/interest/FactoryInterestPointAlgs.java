@@ -24,7 +24,7 @@ import boofcv.abst.feature.detect.extract.NonMaxLimiter;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.intensity.WrapperGradientCornerIntensity;
-import boofcv.abst.feature.detect.intensity.WrapperHessianBlobIntensity;
+import boofcv.abst.feature.detect.intensity.WrapperHessianDerivBlobIntensity;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.filter.ImageFunctionSparse;
@@ -63,7 +63,7 @@ public class FactoryInterestPointAlgs {
 										int maxFeatures,
 										Class<T> imageType,
 										Class<D> derivType) {
-		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<>(HessianBlobIntensity.Type.DETERMINANT, derivType);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianDerivBlobIntensity<>(HessianBlobIntensity.Type.DETERMINANT, derivType);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractor);
@@ -118,7 +118,7 @@ public class FactoryInterestPointAlgs {
 											   int maxFeatures,
 											   Class<T> imageType,
 											   Class<D> derivType) {
-		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianBlobIntensity<>(HessianBlobIntensity.Type.DETERMINANT, derivType);
+		GeneralFeatureIntensity<T, D> intensity = new WrapperHessianDerivBlobIntensity<>(HessianBlobIntensity.Type.DETERMINANT, derivType);
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(
 				new ConfigExtract(extractRadius, detectThreshold, extractRadius, true));
 		GeneralFeatureDetector<T, D> detector = new GeneralFeatureDetector<>(intensity, extractor);

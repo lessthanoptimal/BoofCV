@@ -334,13 +334,13 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 	private void createHessian() {
 		controls.configExtract.detectMinimums = false;
 		controls.adjustControls(false,false);
-		changeDetector(FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.DETERMINANT,
+		changeDetector(FactoryDetectPoint.createHessianDeriv(HessianBlobIntensity.Type.DETERMINANT,
 				controls.configExtract, derivClass));
 	}
 	private void createLaplace() {
 		controls.configExtract.detectMinimums = true;
 		controls.adjustControls(false,false);
-		changeDetector(FactoryDetectPoint.createHessian(HessianBlobIntensity.Type.TRACE,
+		changeDetector(FactoryDetectPoint.createHessianDeriv(HessianBlobIntensity.Type.TRACE,
 				controls.configExtract, derivClass));
 	}
 

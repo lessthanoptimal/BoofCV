@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-public class WrapperHessianBlobIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
+public class WrapperHessianDerivBlobIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
 		extends BaseGeneralFeatureIntensity<I,D>
 {
 
@@ -39,12 +39,12 @@ public class WrapperHessianBlobIntensity<I extends ImageGray<I>, D extends Image
 	Method m;
 	boolean minimum;
 
-	public WrapperHessianBlobIntensity(HessianBlobIntensity.Type type, Class<D> derivType) {
+	public WrapperHessianDerivBlobIntensity(HessianBlobIntensity.Type type, Class<D> derivType) {
 		this.type = type;
 		try {
 			switch( type ) {
 				case DETERMINANT:
-					minimum = false;
+					minimum = true;
 					m = HessianBlobIntensity.class.getMethod("determinant",GrayF32.class,derivType,derivType,derivType);
 					break;
 
