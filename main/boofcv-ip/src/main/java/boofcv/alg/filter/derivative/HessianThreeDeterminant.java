@@ -24,8 +24,6 @@ import boofcv.alg.filter.derivative.impl.HessianThreeDeterminant_Inner_MT;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
-import boofcv.struct.convolve.Kernel2D_F32;
-import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -46,9 +44,6 @@ import javax.annotation.Nullable;
  * @author Peter Abeles
  */
 public class HessianThreeDeterminant {
-	public static Kernel2D_S32 kernel_I32 = new Kernel2D_S32(3, new int[]{0,1,0,1,-4,1,0,1,0});
-	public static Kernel2D_F32 kernel_F32 = new Kernel2D_F32(3, new float[]{0,1,0,1,-4,1,0,1,0});
-
 	/**
 	 * Computes the Laplacian of input image.
 	 *

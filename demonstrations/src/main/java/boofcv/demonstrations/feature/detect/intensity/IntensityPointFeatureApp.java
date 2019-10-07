@@ -259,6 +259,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 					detector = FactoryDetectPoint.createHessianDeriv(HessianBlobIntensity.Type.TRACE,config,derivType);
 					break;
 				case "Hessian Det":
+					config.detectMinimums = true;
 					detector = FactoryDetectPoint.createHessianDeriv(HessianBlobIntensity.Type.DETERMINANT,config,derivType);
 					break;
 

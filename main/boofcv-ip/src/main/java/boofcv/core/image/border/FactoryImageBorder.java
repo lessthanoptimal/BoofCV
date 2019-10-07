@@ -98,7 +98,7 @@ public class FactoryImageBorder {
 	 * @param borderType Which border algorithm should it use.
 	 * @return The requested {@link ImageBorder}.
 	 */
-	public static <T extends ImageGray<T>> ImageBorder<T>
+	public static <T extends ImageGray<T>,Border extends ImageBorder<T>> Border
 	single(Class<T> imageType, BorderType borderType)
 	{
 		Class<?> borderClass;
@@ -126,20 +126,20 @@ public class FactoryImageBorder {
 				break;
 
 			case ZERO:
-				return FactoryImageBorder.singleValue(imageType, 0);
+				return (Border)FactoryImageBorder.singleValue(imageType, 0);
 
 			default:
 				throw new IllegalArgumentException("Border type not supported: "+borderType);
 		}
 
 		if( imageType == GrayF32.class )
-			return (ImageBorder<T>)new ImageBorder1D_F32(borderClass);
+			return (Border)new ImageBorder1D_F32(borderClass);
 		if( imageType == GrayF64.class )
-			return (ImageBorder<T>)new ImageBorder1D_F64(borderClass);
+			return (Border)new ImageBorder1D_F64(borderClass);
 		else if( GrayI.class.isAssignableFrom(imageType) )
-			return (ImageBorder<T>)new ImageBorder1D_S32((Class)borderClass);
+			return (Border)new ImageBorder1D_S32((Class)borderClass);
 		else if( imageType == GrayS64.class )
-			return (ImageBorder<T>)new ImageBorder1D_S64(borderClass);
+			return (Border)new ImageBorder1D_S64(borderClass);
 		else
 			throw new IllegalArgumentException("Unknown image type: "+imageType.getSimpleName());
 	}

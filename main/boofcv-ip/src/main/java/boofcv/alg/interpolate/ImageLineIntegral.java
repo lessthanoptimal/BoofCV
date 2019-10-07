@@ -86,13 +86,13 @@ public class ImageLineIntegral {
 		int px = (int)x0;
 		int py = (int)y0;
 
-		if( slopeX == 0 || slopeY == 0 ) {
+		if( Math.abs(slopeX) < 1e-6 || Math.abs(slopeY) < 1e-6) {
 			// handle a pathological case
 			if( slopeX == slopeY )
 				return 0;
 
 			double t;
-			if (slopeX == 0) {
+			if (Math.abs(slopeX) < 1e-6) {
 				t = slopeY > 0 ? py + 1 - y0 : py - y0;
 			} else {
 				t = slopeX > 0 ? px + 1 - x0 : px - x0;
@@ -134,7 +134,7 @@ public class ImageLineIntegral {
 			int ny = py + sgnY;
 
 			while( t < 1 ) {
-				deltaTX = (nx-x)/slopeX;
+				deltaTX = (nx-x)/slopeX; // TODO reformulate so that very small slope values can be handled?
 				deltaTY = (ny-y)/slopeY;
 
 				double deltaT = Math.min(deltaTX,deltaTY);

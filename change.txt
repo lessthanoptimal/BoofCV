@@ -12,6 +12,8 @@ Version : 0.35
   * Even kernel sizes
   * Configuration class
   * Ignore negative values
+- Image Processing
+  * Added Hessian determinant direct from input image
 - Concurrency
   * PixelMath now only uses concurrent algorithm when input image is more than 10,000 pixels.
     This caused circulant to slow down.
