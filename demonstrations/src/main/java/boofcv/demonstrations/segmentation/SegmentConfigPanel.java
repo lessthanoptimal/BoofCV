@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,9 @@ import boofcv.factory.segmentation.ConfigFh04;
 import boofcv.factory.segmentation.ConfigSegmentMeanShift;
 import boofcv.factory.segmentation.ConfigSlic;
 import boofcv.factory.segmentation.ConfigWatershed;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.gui.ViewedImageInfoPanel;
 import boofcv.struct.ConnectRule;
 
 import javax.swing.*;
@@ -37,9 +39,10 @@ import java.awt.event.ActionListener;
  *
  * @author Peter Abeles
  */
-public class SegmentConfigPanel extends StandardAlgConfigPanel implements ActionListener{
+public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionListener {
 
-	JComboBox selectVisualize;
+	JComboBox<String> comboVisual = combo(0,"Color","Border","Regions","Input");
+	JComboBox<String> comboAlgorithm = combo(0,"FH04","SLIC Superpixel","Mean-Shift","Watershed");
 
 	JProgressBar progress = new JProgressBar();
 
@@ -58,71 +61,61 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 	PanelConfigMeanShift panelMS = new PanelConfigMeanShift();
 	PanelConfigWatershed panelWater = new PanelConfigWatershed();
 
-	public SegmentConfigPanel(VisualizeImageSegmentationApp owner) {
-		this.owner = owner;
+	public int selectedAlgorithm = 0;
+	public int selectedVisual=0;
 
-		selectVisualize = new JComboBox(new String[]{"Color","Border","Regions"});
-		selectVisualize.addActionListener(this);
-		selectVisualize.setMaximumSize(selectVisualize.getPreferredSize());
+	public SegmentConfigPanel(VisualizeImageSegmentationApp owner) {
+		super(BoofSwingUtil.MIN_ZOOM,BoofSwingUtil.MAX_ZOOM,0.5,false);
+		this.owner = owner;
 
 		recompute.addActionListener(this);
 
 		panelConfig.setLayout(new BorderLayout());
 
-		addLabeled(selectVisualize, "Visualize", this);
+		addLabeled(comboVisual, "Visualize", this);
 		addSeparator(100);
+		addLabeled(comboAlgorithm, "Method", this);
 		addAlignCenter(recompute,this);
 		addAlignCenter(progress, this);
 		addAlignCenter(panelConfig,this);
 	}
 
 	public void setComputing( final boolean isComputing ) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				if( isComputing ) {
-					progress.setIndeterminate(true);
-					progress.setEnabled(true);
-				} else {
-					progress.setIndeterminate(false);
-					progress.setEnabled(false);
-				}
-			}});
-	}
-
-	protected void configHasChange() {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				recompute.setEnabled(true);
-			}});
-	}
-
-	public void switchAlgorithm( final int which ) {
-		// the GUI freezes if this is invoked in the GUI thread!?!?
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
+		SwingUtilities.invokeLater(() -> {
+			if( isComputing ) {
 				recompute.setEnabled(false);
-				panelConfig.removeAll();
-				if( which == 0 ) {
-					panelConfig.add(panelFh,BorderLayout.CENTER);
-				} else if( which == 1 ) {
-					panelConfig.add(panelSlic,BorderLayout.CENTER);
-				} else if( which == 2 ) {
-					panelConfig.add(panelMS,BorderLayout.CENTER);
-				} else if( which == 3 ) {
-					panelConfig.add(panelWater,BorderLayout.CENTER);
-				}
-				panelConfig.revalidate();
-				repaint();
-			}});
+				progress.setIndeterminate(true);
+				progress.setEnabled(true);
+			} else {
+				recompute.setEnabled(true);
+				progress.setIndeterminate(false);
+				progress.setEnabled(false);
+			}
+		});
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if( selectVisualize == e.getSource() )
-			owner.updateActiveDisplay(selectVisualize.getSelectedIndex());
-		else if( recompute == e.getSource() ) {
-			recompute.setEnabled(false);
-			owner.recompute();
+		if( comboAlgorithm == e.getSource() ) {
+			selectedAlgorithm = comboAlgorithm.getSelectedIndex();
+			panelConfig.removeAll();
+			if( selectedAlgorithm == 0 ) {
+				panelConfig.add(panelFh,BorderLayout.CENTER);
+			} else if( selectedAlgorithm == 1 ) {
+				panelConfig.add(panelSlic,BorderLayout.CENTER);
+			} else if( selectedAlgorithm == 2 ) {
+				panelConfig.add(panelMS,BorderLayout.CENTER);
+			} else if( selectedAlgorithm == 3 ) {
+				panelConfig.add(panelWater,BorderLayout.CENTER);
+			}
+			panelConfig.revalidate();
+			repaint();
+			owner.handleControlsChanged();
+		} else if( comboVisual == e.getSource() ) {
+			selectedVisual = comboVisual.getSelectedIndex();
+			owner.handleGuiChange();
+		} else if( recompute == e.getSource() ) {
+			owner.handleControlsChanged();
 		}
 	}
 
@@ -164,7 +157,6 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			configHasChange();
 			if( selectConnect == e.getSource() ) {
 				int which = selectConnect.getSelectedIndex();
 				if( which == 0 )
@@ -176,7 +168,6 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			configHasChange();
 			if( spinnerSize == e.getSource() ) {
 				configFh.minimumRegionSize = ((Number) spinnerSize.getValue()).intValue();
 			} else if( spinnerK == e.getSource() ) {
@@ -223,7 +214,6 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			configHasChange();
 			if( selectConnect == e.getSource() ) {
 				int which = selectConnect.getSelectedIndex();
 				if( which == 0 )
@@ -235,7 +225,6 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			configHasChange();
 			if( spinnerTotal == e.getSource() ) {
 				configSlic.numberOfRegions = ((Number) spinnerTotal.getValue()).intValue();
 			} else if( spinnerWeight == e.getSource() ) {
@@ -296,7 +285,6 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			configHasChange();
 			if( selectConnect == e.getSource() ) {
 				int which = selectConnect.getSelectedIndex();
 				if( which == 0 )
@@ -308,7 +296,6 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			configHasChange();
 			if( spinnerSize == e.getSource() ) {
 				configMeanShift.minimumRegionSize = ((Number) spinnerSize.getValue()).intValue();
 			} else if( spinnerSpacial == e.getSource() ) {
@@ -354,7 +341,6 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			configHasChange();
 			if( selectConnect == e.getSource() ) {
 				int which = selectConnect.getSelectedIndex();
 				if( which == 0 )
@@ -366,7 +352,6 @@ public class SegmentConfigPanel extends StandardAlgConfigPanel implements Action
 
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			configHasChange();
 			if( spinnerSize == e.getSource() ) {
 				configWatershed.minimumRegionSize = ((Number) spinnerSize.getValue()).intValue();
 			}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,9 @@ import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
-import boofcv.gui.SelectAlgorithmAndInputPanel;
+import boofcv.gui.DemonstrationBase;
 import boofcv.gui.feature.VisualizeRegions;
 import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -45,12 +44,9 @@ import java.util.ArrayList;
  *
  * @author Peter Abeles
  */
-// TODO Show image size on left panel
 public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
-		extends SelectAlgorithmAndInputPanel
+		extends DemonstrationBase
 {
-	ImageType<T> imageType;
-
 	BufferedImage inputImage;
 	BufferedImage outColor = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
 	BufferedImage outSegments = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
@@ -58,150 +54,94 @@ public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
 
 	ImageSuperpixels<T> alg = null;
 
-	int activeDisplay = 0;
-
 	T color;
 	GrayS32 pixelToRegion = new GrayS32(1,1);
 
-	SegmentConfigPanel leftPanel;
+	SegmentConfigPanel controls = new SegmentConfigPanel(this);
 	ImagePanel gui = new ImagePanel();
 
-	boolean processImage = false;
-	boolean busy = false;
-
-	public VisualizeImageSegmentationApp() {
-		this((ImageType)ImageType.pl(3,GrayF32.class));
-	}
-
-	public VisualizeImageSegmentationApp(ImageType<T> imageType ) {
-		super(1);
-		this.imageType = imageType;
-
-
-		addAlgorithm(0, "FH04",0);
-		addAlgorithm(0, "SLIC Superpixel", 1);
-		addAlgorithm(0, "Mean-Shift", 2);
-		addAlgorithm(0, "Watershed",3);
-
+	public VisualizeImageSegmentationApp(java.util.List<PathLabel> examples, ImageType<T> imageType ) {
+		super(true,false,examples,imageType);
+		allowVideos = false;
 		color = imageType.createImage(1,1);
 
-		JPanel viewArea = new JPanel(new BorderLayout());
-		leftPanel = new SegmentConfigPanel(this);
-		viewArea.add(leftPanel, BorderLayout.WEST);
-		viewArea.add(gui, BorderLayout.CENTER);
+		add(gui,BorderLayout.CENTER);
+		add(controls,BorderLayout.WEST);
 
-		declareAlgorithm(0);
-		setMainGUI(viewArea);
+		declareAlgorithm();
 	}
 
-	public void process(final BufferedImage input) {
-		setInputImage(input);
-		this.inputImage = input;
-
-		color.reshape(input.getWidth(),input.getHeight());
-		pixelToRegion.reshape(color.width, color.height);
-		ConvertBufferedImage.convertFrom(input, color,true);
-
-		if( input.getWidth() != outColor.getWidth() || input.getHeight() != outColor.getHeight()) {
-			outColor = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
-			outSegments = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
-			outBorder = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
-		}
-
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				gui.setPreferredSize(new Dimension(color.getWidth(), color.getHeight()));
-				gui.setImage(input);
-				gui.revalidate();
-				processImage = true;
-			}
-		});
-		doRefreshAll();
-	}
-
-	@Override
-	public void loadConfigurationFile(String fileName) {
-	}
-
-	@Override
-	public void refreshAll(Object[] cookies) {
-		setActiveAlgorithm(0, null, cookies[0]);
-	}
-
-	@Override
-	public void setActiveAlgorithm(int indexFamily, String name, Object cookie) {
-		if (inputImage == null)
-			return;
-
-		synchronized( imageType ) {
-			busy = true;
-
-			leftPanel.setComputing(true);
-			declareAlgorithm((Integer) cookie);
-			performSegmentation();
-			updateActiveDisplay(activeDisplay);
-			leftPanel.setComputing(false);
-
-			busy = false;
-			gui.repaint();
-		}
-	}
-
-	private void declareAlgorithm(int which) {
+	public void declareAlgorithm() {
 		alg = null;
-		switch( which ) {
-			case 0: alg = FactoryImageSegmentation.fh04(leftPanel.configFh, imageType); break;
-			case 1: alg = FactoryImageSegmentation.slic(leftPanel.configSlic, imageType); break;
-			case 2: alg = FactoryImageSegmentation.meanShift(leftPanel.configMeanShift, imageType); break;
-			case 3: alg = FactoryImageSegmentation.watershed(leftPanel.configWatershed, imageType); break;
+		ImageType<T> imageType = getImageType(0);
+		switch( controls.selectedAlgorithm ) {
+			case 0: alg = FactoryImageSegmentation.fh04(controls.configFh, imageType); break;
+			case 1: alg = FactoryImageSegmentation.slic(controls.configSlic, imageType); break;
+			case 2: alg = FactoryImageSegmentation.meanShift(controls.configMeanShift, imageType); break;
+			case 3: alg = FactoryImageSegmentation.watershed(controls.configWatershed, imageType); break;
 			default: throw new RuntimeException("BUG!");
 		}
-
-		leftPanel.switchAlgorithm(which);
 	}
 
 	@Override
-	public void changeInput(String name, int index) {
-		BufferedImage image = media.openImage(inputRefs.get(index).getPath());
+	protected void handleInputChange( int source , InputMethod method , final int width , final int height ) {
+		color.reshape(width, height);
+		pixelToRegion.reshape(width, height);
 
-		if (image != null) {
-			process(image);
+		outColor = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
+		outSegments = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
+		outBorder = new BufferedImage(color.width,color.height,BufferedImage.TYPE_INT_RGB);
+
+		handleGuiChange();
+
+		SwingUtilities.invokeLater(()->{
+			gui.setPreferredSize(new Dimension(width,height));
+			controls.setImageSize(width,height);
+		});
+	}
+
+	@Override
+	public void processImage(int sourceID, long frameID, final BufferedImage buffered, ImageBase input) {
+		this.inputImage = buffered;
+
+		color.setTo((T)input);
+		pixelToRegion.reshape(color.width, color.height);
+		performSegmentation();
+
+		SwingUtilities.invokeLater(() -> {
+			gui.setPreferredSize(new Dimension(color.getWidth(), color.getHeight()));
+			gui.revalidate();
+		});
+	}
+
+	public void handleControlsChanged() {
+		declareAlgorithm();
+		reprocessImageOnly();
+	}
+
+	public void handleGuiChange() {
+		switch (controls.selectedVisual) {
+			case 0:gui.setImage(outColor);break;
+			case 1:gui.setImage(outBorder);break;
+			case 2:gui.setImage(outSegments);break;
+			case 3:gui.setImage(inputImage);break;
+			default: throw new RuntimeException("Unknown mode");
 		}
-	}
-
-	@Override
-	public boolean getHasProcessedImage() {
-		return processImage;
-	}
-
-	public void updateActiveDisplay( final int value ) {
-		activeDisplay = value;
-
-		Runnable r = new Runnable() {
-			public void run() {
-				if( activeDisplay == 0 ) {
-					gui.setImage(outColor);
-				} else if( activeDisplay == 1 ) {
-					gui.setImage(outBorder);
-				} else if( activeDisplay == 2 ) {
-					gui.setImage(outSegments);
-				}
-				gui.repaint();
-			}};
-
-
-		if( SwingUtilities.isEventDispatchThread() )
-			r.run();
-		else
-			SwingUtilities.invokeLater(r);
+		gui.repaint();
 	}
 
 	private void performSegmentation() {
-		long before = System.currentTimeMillis();
+		controls.setComputing(true);
+		// local reference to segmentation to avoid alg getting changed in another thread
+		ImageSuperpixels<T> alg = this.alg;
+		if( alg == null )
+			return;
+		long before = System.nanoTime();
 		alg.segment(color, pixelToRegion);
-		long after = System.currentTimeMillis();
+		long after = System.nanoTime();
+		controls.setComputing(false);
 
-		System.out.println("Total time "+(after-before));
+		SwingUtilities.invokeLater(()->controls.setProcessingTimeMS((after-before)*1e-6));
 
 		int numSegments = alg.getTotalSuperpixels();
 
@@ -224,15 +164,8 @@ public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
 		// Make edges appear black
 		ConvertBufferedImage.convertTo(color,outBorder,true);
 		VisualizeRegions.regionBorders(pixelToRegion,0x000000,outBorder);
-	}
 
-	public void recompute() {
-		synchronized( imageType ) {
-			if( busy )
-				return;
-			busy = true;
-		}
-		doRefreshAll();
+		gui.repaint();
 	}
 
 	public static void main(String[] args) {
@@ -241,26 +174,19 @@ public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
 //		ImageType<GrayF32> defaultType = ImageType.single(GrayF32.class);
 //		ImageType<GrayU8> defaultType = ImageType.single(GrayU8.class);
 
-		VisualizeImageSegmentationApp app = new VisualizeImageSegmentationApp(imageType);
+		java.util.List<PathLabel> examples = new ArrayList<>();
+		examples.add(new PathLabel("Horses", UtilIO.pathExample("segment/berkeley_horses.jpg")));
+		examples.add(new PathLabel("Kangaroo", UtilIO.pathExample("segment/berkeley_kangaroo.jpg")));
+		examples.add(new PathLabel("Man", UtilIO.pathExample("segment/berkeley_man.jpg")));
+		examples.add(new PathLabel("Pines People", UtilIO.pathExample("segment/mountain_pines_people.jpg")));
+		examples.add(new PathLabel("Sunflowers", UtilIO.pathExample("sunflowers.jpg")));
+		examples.add(new PathLabel("Shapes", UtilIO.pathExample("shapes/shapes01.png")));
 
-//		app.setBaseDirectory(UtilIO.pathExample("segment/");
-//		app.loadInputData(UtilIO.pathExample("segment/segment.txt");
+		SwingUtilities.invokeLater(()->{
+			VisualizeImageSegmentationApp app = new VisualizeImageSegmentationApp(examples,imageType);
 
-		java.util.List<PathLabel> inputs = new ArrayList<>();
-		inputs.add(new PathLabel("Horses", UtilIO.pathExample("segment/berkeley_horses.jpg")));
-		inputs.add(new PathLabel("Kangaroo", UtilIO.pathExample("segment/berkeley_kangaroo.jpg")));
-		inputs.add(new PathLabel("Man", UtilIO.pathExample("segment/berkeley_man.jpg")));
-		inputs.add(new PathLabel("Pines People", UtilIO.pathExample("segment/mountain_pines_people.jpg")));
-		inputs.add(new PathLabel("Sunflowers", UtilIO.pathExample("sunflowers.jpg")));
-		inputs.add(new PathLabel("Shapes", UtilIO.pathExample("shapes/shapes01.png")));
-
-		app.setInputList(inputs);
-
-		// wait for it to process one image so that the size isn't all screwed up
-		while (!app.getHasProcessedImage()) {
-			Thread.yield();
-		}
-
-		ShowImages.showWindow(app, "Image Segmentation",true);
+			app.openExample(examples.get(0));
+			app.display("Image Segmentation");
+		});
 	}
 }

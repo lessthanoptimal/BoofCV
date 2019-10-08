@@ -21,7 +21,7 @@ Version : 0.35
   * Updated DenseFlowApp
   * Updated VisualizeRegionDescriptionApp TODO - video update. all desc work. color
   * Updated VisualizeAssociationScoreApp
-  * TODO Updated VisualizeImageSegmentationApp
+  *git config user.name "John Doe" Updated VisualizeImageSegmentationApp
 - SFM
   * TODO projective camera with lens distortion
 - Calibration
