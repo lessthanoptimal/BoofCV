@@ -18,6 +18,10 @@
 
 package boofcv.abst.geo.bundle;
 
+import boofcv.alg.geo.bundle.cameras.BundlePinhole;
+import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
+import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -30,6 +34,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  * @author Peter Abeles
  */
 public abstract class SceneStructureCommon implements SceneStructure {
+	public FastQueue<Camera> cameras = new FastQueue<>(Camera.class,true);
 	public final FastQueue<Point> points;
 	/**
 	 * True if homogenous coordinates are being used
@@ -68,6 +73,25 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	}
 
 	/**
+	 * Specifies the camera model being used.
+	 * @param which Which camera is being specified
+	 * @param fixed If these parameters are constant or not
+	 * @param model The camera model
+	 */
+	public void setCamera(int which , boolean fixed , BundleAdjustmentCamera model  ) {
+		cameras.get(which).known = fixed;
+		cameras.get(which).model = model;
+	}
+
+	public void setCamera( int which , boolean fixed , CameraPinhole intrinsic ) {
+		setCamera(which,fixed,new BundlePinhole(intrinsic));
+	}
+
+	public void setCamera( int which , boolean fixed , CameraPinholeBrown intrinsic ) {
+		setCamera(which,fixed,new BundlePinholeBrown(intrinsic));
+	}
+
+	/**
 	 * Specifies that the point was observed in this view.
 	 * @param pointIndex index of point
 	 * @param viewIndex index of view
@@ -86,6 +110,25 @@ public abstract class SceneStructureCommon implements SceneStructure {
 		return points;
 	}
 
+	public FastQueue<Camera> getCameras() {
+		return cameras;
+	}
+
+	/**
+	 * Counts the total number of unknown camera parameters that will be optimized/
+	 *
+	 * @return Number of parameters
+	 */
+	public int getUnknownCameraParameterCount() {
+		int total = 0;
+		for (int i = 0; i < cameras.size; i++) {
+			if( !cameras.data[i].known) {
+				total += cameras.data[i].model.getIntrinsicCount();
+			}
+		}
+		return total;
+	}
+
 	/**
 	 * Removes the points specified in 'which' from the list of points. 'which' must be ordered
 	 * from lowest to highest index.
@@ -94,6 +137,26 @@ public abstract class SceneStructureCommon implements SceneStructure {
 	 */
 	public void removePoints( GrowQueue_I32 which ) {
 		points.remove(which.data,0,which.size,null);
+	}
+
+	/**
+	 * Camera which is viewing the scene. Contains intrinsic parameters.
+	 */
+	public static class Camera {
+		/**
+		 * If the parameters are assumed to be known and should not be optimised.
+		 */
+		public boolean known = true;
+		public BundleAdjustmentCamera model;
+
+		public <T extends BundleAdjustmentCamera>T getModel() {
+			return (T)model;
+		}
+
+		public void reset() {
+			known = true;
+			model = null;
+		}
 	}
 
 	public static class Point {

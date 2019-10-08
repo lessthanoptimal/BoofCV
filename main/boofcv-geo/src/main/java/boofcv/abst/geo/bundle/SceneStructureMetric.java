@@ -18,10 +18,6 @@
 
 package boofcv.abst.geo.bundle;
 
-import boofcv.alg.geo.bundle.cameras.BundlePinhole;
-import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
-import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
@@ -40,7 +36,6 @@ import org.ddogleg.struct.FastQueue;
  */
 public class SceneStructureMetric extends SceneStructureCommon {
 
-	public FastQueue<Camera> cameras = new FastQueue<>(Camera.class,true);
 	public FastQueue<View> views = new FastQueue<>(View.class,true);
 
 	// data structures for rigid objects.
@@ -81,6 +76,10 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		points.resize(totalPoints);
 		rigids.resize(totalRigid);
 
+		for (int i = 0; i < cameras.size; i++) {
+			cameras.data[i].reset();
+		}
+
 		for (int i = 0; i < points.size; i++) {
 			points.data[i].reset();
 		}
@@ -119,25 +118,6 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 */
 	public boolean hasRigid() {
 		return rigids.size > 0;
-	}
-
-	/**
-	 * Specifies the camera model being used.
-	 * @param which Which camera is being specified
-	 * @param fixed If these parameters are constant or not
-	 * @param model The camera model
-	 */
-	public void setCamera(int which , boolean fixed , BundleAdjustmentCamera model  ) {
-		cameras.get(which).known = fixed;
-		cameras.get(which).model = model;
-	}
-
-	public void setCamera( int which , boolean fixed , CameraPinhole intrinsic ) {
-		setCamera(which,fixed,new BundlePinhole(intrinsic));
-	}
-
-	public void setCamera( int which , boolean fixed , CameraPinholeBrown intrinsic ) {
-		setCamera(which,fixed,new BundlePinholeBrown(intrinsic));
 	}
 
 	/**
@@ -224,21 +204,6 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	}
 
 	/**
-	 * Counts the total number of unknown camera parameters that will be optimized/
-	 *
-	 * @return Number of parameters
-	 */
-	public int getUnknownCameraParameterCount() {
-		int total = 0;
-		for (int i = 0; i < cameras.size; i++) {
-			if( !cameras.data[i].known) {
-				total += cameras.data[i].model.getIntrinsicCount();
-			}
-		}
-		return total;
-	}
-
-	/**
 	 * Returns total number of points associated with rigid objects.
 	 */
 	public int getTotalRigidPoints() {
@@ -261,30 +226,11 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		return getUnknownViewCount()*6 + getUnknownRigidCount()*6 + points.size*pointSize + getUnknownCameraParameterCount();
 	}
 
-	public FastQueue<Camera> getCameras() {
-		return cameras;
-	}
-
 	public FastQueue<View> getViews() {
 		return views;
 	}
 
 	public FastQueue<Rigid> getRigids() { return rigids; }
-
-	/**
-	 * Camera which is viewing the scene. Contains intrinsic parameters.
-	 */
-	public static class Camera {
-		/**
-		 * If the parameters are assumed to be known and should not be optimised.
-		 */
-		public boolean known = true;
-		public BundleAdjustmentCamera model;
-
-		public <T extends BundleAdjustmentCamera>T getModel() {
-			return (T)model;
-		}
-	}
 
 	/**
 	 * Observations from a camera of points.
