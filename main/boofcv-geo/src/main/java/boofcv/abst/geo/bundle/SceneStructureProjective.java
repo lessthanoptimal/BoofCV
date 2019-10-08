@@ -18,6 +18,7 @@
 
 package boofcv.abst.geo.bundle;
 
+import boofcv.alg.geo.bundle.cameras.BundleCameraProjective;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 
@@ -41,14 +42,35 @@ public class SceneStructureProjective extends SceneStructureCommon
 	}
 
 	/**
-	 * Call this function first. Specifies number of each type of data which is available.
+	 * Initialization with the assumption that a {@link boofcv.alg.geo.bundle.cameras.BundleCameraProjective}
+	 * is used for all views.
 	 *
 	 * @param totalViews Number of views
 	 * @param totalPoints Number of points
 	 */
 	public void initialize( int totalViews , int totalPoints ) {
+		this.initialize(1,totalViews,totalPoints);
+		setCamera(0,true,new BundleCameraProjective());
+		for (int viewIdx = 0; viewIdx < views.size; viewIdx++) {
+			connectViewToCamera(viewIdx,0);
+		}
+	}
+
+	/**
+	 * Call this function first. Specifies number of each type of data which is available.
+	 *
+	 * @param totalCameras Number of camera models
+	 * @param totalViews Number of views
+	 * @param totalPoints Number of points
+	 */
+	public void initialize( int totalCameras , int totalViews , int totalPoints ) {
+		cameras.resize(totalCameras);
 		views.resize(totalViews);
 		points.resize(totalPoints);
+
+		for (int i = 0; i < cameras.size; i++) {
+			cameras.data[i].reset();
+		}
 
 		for (int i = 0; i < views.size; i++) {
 			views.data[i].reset();
@@ -58,6 +80,7 @@ public class SceneStructureProjective extends SceneStructureCommon
 			points.data[i].reset();
 		}
 	}
+
 	/**
 	 * Specifies the spacial transform for a view.
 	 * @param which Which view is being specified/
@@ -72,6 +95,17 @@ public class SceneStructureProjective extends SceneStructureCommon
 		views.data[which].worldToView.set(worldToView);
 		views.data[which].width = width;
 		views.data[which].height = height;
+	}
+
+	/**
+	 * Specifies that the view uses the specified camera
+	 * @param viewIndex index of view
+	 * @param cameraIndex index of camera
+	 */
+	public void connectViewToCamera( int viewIndex , int cameraIndex ) {
+		if( views.get(viewIndex).camera != -1 )
+			throw new RuntimeException("View has already been assigned a camera");
+		views.get(viewIndex).camera = cameraIndex;
 	}
 
 	/**
@@ -94,7 +128,7 @@ public class SceneStructureProjective extends SceneStructureCommon
 	 */
 	@Override
 	public int getParameterCount() {
-		return getUnknownViewCount()*12 + points.size*pointSize;
+		return getUnknownViewCount()*12 + getUnknownCameraParameterCount() + points.size*pointSize;
 	}
 
 	public FastQueue<View> getViews() {
@@ -117,11 +151,16 @@ public class SceneStructureProjective extends SceneStructureCommon
 		 * pixel observations, and X is the 3D feature.
 		 */
 		public DMatrixRMaj worldToView = new DMatrixRMaj(3,4);
+		/**
+		 * The camera associated with this view
+		 */
+		public int camera = -1;
 
 		public void reset() {
 			known = false;
 			width = height = 0;
 			worldToView.zero();
+			camera = -1;
 		}
 	}
 
