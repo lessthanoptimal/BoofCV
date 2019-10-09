@@ -24,18 +24,32 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 public class TestMeanShiftPeak {
 
-	GrayF32 image = new GrayF32(30,40);
-
 	@Test
 	void even_odd() {
-		fail("Implement");
+		even_odd(true);
+		even_odd(false);
+	}
+	void even_odd( boolean odd ) {
+		WeightPixelGaussian_F32 weight = new WeightPixelGaussian_F32();
+
+		MeanShiftPeak<GrayF32> alg = new MeanShiftPeak<>(10,1e-4f,weight,odd,GrayF32.class,BorderType.EXTENDED);
+		alg.setRadius(2);
+		assertEquals(odd,alg.isOdd());
+		assertEquals(odd?5:4,alg.width);
+		assertEquals(2,alg.radius);
+
+		// verify that set radius correctly handles the originally specified polarity
+		alg.setRadius(3);
+		assertEquals(odd,alg.isOdd());
+		assertEquals(odd?7:6,alg.width);
+		assertEquals(3,alg.radius);
 	}
 
 	@Test

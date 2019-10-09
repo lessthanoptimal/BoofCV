@@ -41,4 +41,9 @@ public class WeightPixelGaussian_F32 extends WeightPixelKernel_F32 {
 			}
 		}
 	}
+
+	@Override
+	public boolean isOdd() {
+		return kernel.width%2 == 1;
+	}
 }

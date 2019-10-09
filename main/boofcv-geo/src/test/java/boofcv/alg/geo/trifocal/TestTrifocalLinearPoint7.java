@@ -37,13 +37,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
+class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 
 	/**
 	 * Check the linear constraint matrix by seeing if the correct solution is in the null space
 	 */
 	@Test
-	public void checkLinearSystem() {
+	void checkLinearSystem() {
 		createSceneObservations(true);
 
 		TrifocalLinearPoint7 alg = new TrifocalLinearPoint7();
@@ -61,7 +61,7 @@ public class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 		DMatrixRMaj expectedA = createSystem(observationsNorm);
 		assertTrue(MatrixFeatures_DDRM.isIdentical(A,expectedA, UtilEjml.TEST_F64));
 
-		// make sure the;re's a unique solution
+		// make sure there's a unique solution
 		assertEquals(1,SingularOps_DDRM.nullity(A, UtilEjml.TEST_F64));
 	}
 
@@ -118,7 +118,7 @@ public class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 	}
 
 	@Test
-	public void fullTest() {
+	void fullTest() {
 		TrifocalLinearPoint7 alg = new TrifocalLinearPoint7();
 
 		assertTrue(alg.process(observationsPixels,found));

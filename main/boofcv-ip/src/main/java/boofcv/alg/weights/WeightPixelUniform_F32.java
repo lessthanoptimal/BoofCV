@@ -28,6 +28,7 @@ package boofcv.alg.weights;
 public class WeightPixelUniform_F32 implements WeightPixel_F32 {
 	int radiusX,radiusY;
 	float weight;
+	boolean odd;
 
 	public WeightPixelUniform_F32() {
 	}
@@ -50,6 +51,7 @@ public class WeightPixelUniform_F32 implements WeightPixel_F32 {
 	public void setRadius(int radiusX, int radiusY, boolean odd ) {
 		this.radiusX = radiusX;
 		this.radiusY = radiusY;
+		this.odd = odd;
 
 		int w = radiusX*2;
 		int h = radiusY*2;
@@ -68,5 +70,10 @@ public class WeightPixelUniform_F32 implements WeightPixel_F32 {
 	@Override
 	public int getRadiusY() {
 		return radiusY;
+	}
+
+	@Override
+	public boolean isOdd() {
+		return odd;
 	}
 }

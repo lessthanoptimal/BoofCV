@@ -37,6 +37,9 @@ class TestWeightPixelKernel_F32 {
 		WeightPixelKernel_F32 alg = new WeightPixelKernel_F32() {
 			@Override
 			public void setRadius(int radiusX, int radiusY, boolean odd) {}
+
+			@Override
+			public boolean isOdd() {return true;}
 		};
 
 		alg.kernel = FactoryKernel.random2D_F32(5,2,-2,2,rand);

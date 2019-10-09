@@ -18,6 +18,7 @@
 
 package boofcv.alg.weights;
 
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,9 +40,15 @@ class TestWeightPixelGaussian_F32 {
 		assertEquals(2,alg.getRadiusY());
 		float middle = alg.weight(0,0);
 
+		assertTrue(alg.isOdd());
+
 		// see if it blows up
 		alg.weight(-2,  0);alg.weight(2, 0);
 		alg.weight( 0, -2);alg.weight(0, 2);
+
+		// these should be equal
+		assertEquals(alg.weight(-2,0),alg.weight(2,0), UtilEjml.TEST_F32);
+		assertEquals(alg.weight(0,-2),alg.weight(0,2), UtilEjml.TEST_F32);
 
 		// make it larger
 		alg.setRadius(3,3, true);
@@ -58,8 +65,18 @@ class TestWeightPixelGaussian_F32 {
 	}
 
 	@Test
-	void radiusIsEven() {
-		fail("Implement");
-	}
+	void withEvenRadius() {
+		WeightPixelGaussian_F32 alg = new WeightPixelGaussian_F32();
 
+		alg.setRadius(2,2, false);
+		assertFalse(alg.isOdd());
+
+		// see if it blows up
+		alg.weight(-2,0);alg.weight(1,0);
+		alg.weight(0,-2);alg.weight(0,1);
+
+		// make sure they are equal. they won't be off odd
+		assertEquals(alg.weight(-2,0),alg.weight(1,0), UtilEjml.TEST_F32);
+		assertEquals(alg.weight(0,-2),alg.weight(0,1), UtilEjml.TEST_F32);
+	}
 }

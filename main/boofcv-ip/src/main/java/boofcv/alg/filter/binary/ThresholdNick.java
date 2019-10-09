@@ -81,6 +81,7 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 	 */
 	@Override
 	public void process(GrayF32 input , GrayU8 output ) {
+		output.reshape(input.width,input.height);
 		imageI2.reshape(input.width,input.height);
 		meanImage.reshape(input.width,input.height);
 		meanI2.reshape(input.width,input.height);

@@ -56,7 +56,7 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 	// The peak in x and y
 	protected float peakX,peakY;
 
-	boolean odd = true;
+	protected boolean odd;
 
 	// used to compute the weight each pixel contributes to the mean
 	protected WeightPixel_F32 weights;
@@ -105,7 +105,7 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 		if( radius <= 0 ) { // can turn off refinement by setting radius to zero
 			return;
 		}
-		float offset = -radius + (odd?0:0.5f);
+		float offset = -radius + (weights.isOdd()?0:0.5f);
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			float total = 0;
@@ -167,7 +167,7 @@ public class MeanShiftPeak<T extends ImageGray<T>> {
 		if( radius <= 0 ) { // can turn off refinement by setting radius to zero
 			return;
 		}
-		float offset = -radius + (odd?0:0.5f);
+		float offset = -radius + (weights.isOdd()?0:0.5f);
 
 		for( int i = 0; i < maxIterations; i++ ) {
 			float total = 0;

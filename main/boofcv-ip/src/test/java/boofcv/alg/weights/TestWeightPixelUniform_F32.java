@@ -18,10 +18,10 @@
 
 package boofcv.alg.weights;
 
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -58,7 +58,38 @@ class TestWeightPixelUniform_F32 {
 	}
 
 	@Test
-	void even_odd() {
-		fail("implement");
+	void withEvenRadius() {
+		WeightPixelUniform_F32 alg = new WeightPixelUniform_F32();
+
+		alg.setRadius(2,2, false);
+		assertFalse(alg.isOdd());
+
+		// see if it blows up
+		alg.weight(-2,0);alg.weight(1,0);
+		alg.weight(0,-2);alg.weight(0,1);
+
+		// make sure they are equal. they won't be off odd
+		for (int i = 0; i < 4; i++) {
+			assertEquals(1.0/16.0,alg.weight(i-2,0), UtilEjml.TEST_F32);
+			assertEquals(1.0/16.0,alg.weight(0,i-2), UtilEjml.TEST_F32);
+		}
+	}
+
+	@Test
+	void withOddRadius() {
+		WeightPixelUniform_F32 alg = new WeightPixelUniform_F32();
+
+		alg.setRadius(2,2, true);
+		assertTrue(alg.isOdd());
+
+		// see if it blows up
+		alg.weight(-2,0);alg.weight(2,0);
+		alg.weight(0,-2);alg.weight(0,2);
+
+		// make sure they are equal. they won't be off odd
+		for (int i = 0; i < 5; i++) {
+			assertEquals(1.0/25.0,alg.weight(i-2,0), UtilEjml.TEST_F32);
+			assertEquals(1.0/25.0,alg.weight(0,i-2), UtilEjml.TEST_F32);
+		}
 	}
 }

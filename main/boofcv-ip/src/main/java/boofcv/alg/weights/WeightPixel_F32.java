@@ -70,4 +70,9 @@ public interface WeightPixel_F32 {
 	 * @return Radius of kernel
 	 */
 	int getRadiusY();
+
+	/**
+	 * If the width is an even or odd number
+	 */
+	boolean isOdd();
 }
