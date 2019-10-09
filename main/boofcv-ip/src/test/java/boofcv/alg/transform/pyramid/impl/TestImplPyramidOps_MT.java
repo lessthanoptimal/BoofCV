@@ -18,14 +18,85 @@
 
 package boofcv.alg.transform.pyramid.impl;
 
+import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.alg.interpolate.InterpolationType;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.Random;
 
 class TestImplPyramidOps_MT {
+
 	@Test
-	void implement() {
-		fail("implement");
+	void scaleImageUp_F32() {
+		Random rand = new Random(234);
+		GrayF32 input = GeneralizedImageOps.createSingleBand(GrayF32.class,120, 95);
+		GImageMiscOps.fillUniform(input, rand, -10, 10);
+
+		GrayF32 output1 = GeneralizedImageOps.createSingleBand(GrayF32.class,1, 1);
+		GrayF32 output2 = GeneralizedImageOps.createSingleBand(GrayF32.class,1, 1);
+
+		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.
+				createPixelS(0,255, InterpolationType.BILINEAR, BorderType.EXTENDED,GrayF32.class);
+
+		ImplPyramidOps.scaleImageUp(input,output1,2,interp);
+		ImplPyramidOps_MT.scaleImageUp(input,output2,2,interp);
+
+		BoofTesting.assertEquals(output1,output2,1e-4);
+	}
+
+	@Test
+	void scaleDown2_F32() {
+		Random rand = new Random(234);
+		GrayF32 input = GeneralizedImageOps.createSingleBand(GrayF32.class,120, 95);
+		GImageMiscOps.fillUniform(input, rand, -10, 10);
+
+		GrayF32 output1 = GeneralizedImageOps.createSingleBand(GrayF32.class,1, 1);
+		GrayF32 output2 = GeneralizedImageOps.createSingleBand(GrayF32.class,1, 1);
+
+		ImplPyramidOps.scaleDown2(input,output1);
+		ImplPyramidOps_MT.scaleDown2(input,output2);
+
+		BoofTesting.assertEquals(output1,output2,1e-4);
+	}
+
+	@Test
+	void scaleImageUp_U8() {
+		Random rand = new Random(234);
+		GrayU8 input = GeneralizedImageOps.createSingleBand(GrayU8.class,120, 95);
+		GImageMiscOps.fillUniform(input, rand, -10, 10);
+
+		GrayU8 output1 = GeneralizedImageOps.createSingleBand(GrayU8.class,1, 1);
+		GrayU8 output2 = GeneralizedImageOps.createSingleBand(GrayU8.class,1, 1);
+
+		InterpolatePixelS<GrayU8> interp = FactoryInterpolation.
+				createPixelS(0,255, InterpolationType.BILINEAR, BorderType.EXTENDED,GrayU8.class);
+
+		ImplPyramidOps.scaleImageUp(input,output1,2,interp);
+		ImplPyramidOps_MT.scaleImageUp(input,output2,2,interp);
+
+		BoofTesting.assertEquals(output1,output2,1e-4);
+	}
+
+	@Test
+	void scaleDown2_U8() {
+		Random rand = new Random(234);
+		GrayU8 input = GeneralizedImageOps.createSingleBand(GrayU8.class,120, 95);
+		GImageMiscOps.fillUniform(input, rand, -10, 10);
+
+		GrayU8 output1 = GeneralizedImageOps.createSingleBand(GrayU8.class,1, 1);
+		GrayU8 output2 = GeneralizedImageOps.createSingleBand(GrayU8.class,1, 1);
+
+		ImplPyramidOps.scaleDown2(input,output1);
+		ImplPyramidOps_MT.scaleDown2(input,output2);
+
+		BoofTesting.assertEquals(output1,output2,1e-4);
 	}
 }
 
