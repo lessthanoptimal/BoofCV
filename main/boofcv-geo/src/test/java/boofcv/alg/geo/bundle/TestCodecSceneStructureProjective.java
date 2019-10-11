@@ -18,7 +18,10 @@
 
 package boofcv.alg.geo.bundle;
 
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
+import boofcv.alg.geo.bundle.cameras.BundleCameraProjective;
+import boofcv.struct.calib.CameraPinhole;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
@@ -27,6 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -43,7 +47,7 @@ class TestCodecSceneStructureProjective {
 
 		CodecSceneStructureProjective codec = new CodecSceneStructureProjective();
 
-		int N = original.getUnknownViewCount()*12 + original.points.size*3;
+		int N = original.getUnknownViewCount()*12 + original.points.size*3 + original.getUnknownCameraParameterCount();
 		double[] param = new double[N];
 		codec.encode(original,param);
 
@@ -52,6 +56,19 @@ class TestCodecSceneStructureProjective {
 
 		for (int i = 0; i < original.points.size; i++) {
 			assertTrue( original.points.data[i].distance(found.points.data[i]) < UtilEjml.TEST_F64);
+		}
+
+		for (int i = 0; i < original.cameras.size; i++) {
+			SceneStructureMetric.Camera o = original.cameras.data[i];
+			SceneStructureMetric.Camera f = found.cameras.data[i];
+
+			double[] po = new double[o.model.getIntrinsicCount()];
+			double[] pf = new double[f.model.getIntrinsicCount()];
+
+			o.model.getIntrinsic(po,0);
+			f.model.getIntrinsic(pf,0);
+
+			assertArrayEquals(po,pf, UtilEjml.TEST_F64 );
 		}
 
 		for (int i = 0; i < original.views.size; i++) {
@@ -65,7 +82,12 @@ class TestCodecSceneStructureProjective {
 	static SceneStructureProjective createScene3D(Random rand ) {
 		SceneStructureProjective out = new SceneStructureProjective(false);
 
-		out.initialize(4,5);
+		out.initialize(2,4,5);
+
+		out.setCamera(0,true,new BundleCameraProjective());
+//		out.setCamera(1,true,new BundleCameraProjective());
+		out.setCamera(1,false,new CameraPinhole(100,110,
+				0.0001,rand.nextGaussian()/100,rand.nextGaussian()/100,1,1));
 
 		for (int i = 0; i < 5; i++) {
 			out.setPoint(i,i+1,i+2*rand.nextGaussian(),2*i-3*rand.nextGaussian());
@@ -82,6 +104,7 @@ class TestCodecSceneStructureProjective {
 			} else
 				RandomMatrices_DDRM.fillUniform(P,rand);
 			out.setView(i,fixed,P,width,height);
+			out.views.data[i].camera = i/2;
 		}
 
 		// Assign first point to all views then the other points to just one view
@@ -98,7 +121,12 @@ class TestCodecSceneStructureProjective {
 	static SceneStructureProjective createSceneH(Random rand ) {
 		SceneStructureProjective out = new SceneStructureProjective(true);
 
-		out.initialize(4,5);
+		out.initialize(2,4,5);
+
+		out.setCamera(0,true,new BundleCameraProjective());
+//		out.setCamera(1,true,new BundleCameraProjective());
+		out.setCamera(1,false,new CameraPinhole(100,110,
+				0.0001,rand.nextGaussian()/100,rand.nextGaussian()/100,1,1));
 
 		for (int i = 0; i < 5; i++) {
 			double w = rand.nextDouble()*0.1;
@@ -111,11 +139,12 @@ class TestCodecSceneStructureProjective {
 			DMatrixRMaj P = new DMatrixRMaj(3,4);
 			if( fixed ) {
 				for (int j = 0; j < 12; j++) {
-					P.data[j] = 0.1+j*0.2;
+					P.data[j] = 10.1+j*0.2;
 				}
 			} else
 				RandomMatrices_DDRM.fillUniform(P,rand);
 			out.setView(i,fixed,P,width,height);
+			out.views.data[i].camera = i/2;
 		}
 
 		// Assign first point to all views then the other points to just one view

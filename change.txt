@@ -23,7 +23,7 @@ Version : 0.35
   * Updated VisualizeAssociationScoreApp
   * Updated VisualizeImageSegmentationApp
 - SFM
-  * TODO projective camera with lens distortion
+  * Projective camera with lens distortion
 - Calibration
   * TODO Calibrate using partially obscured chessboard patterns
   * TODO Add ability to remove images and recalibrate from application

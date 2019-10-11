@@ -18,10 +18,7 @@
 
 package boofcv.alg.geo.bundle;
 
-import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
-import boofcv.abst.geo.bundle.SceneObservations;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
-import boofcv.abst.geo.bundle.SceneStructureProjective;
+import boofcv.abst.geo.bundle.*;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -63,8 +60,12 @@ public class BundleAdjustmentProjectiveResidualFunction
 	// Used to write the "unknown" paramters into the scene
 	private CodecSceneStructureProjective codec = new CodecSceneStructureProjective();
 
+	// Point in world frame
 	private Point3D_F64 p3 = new Point3D_F64();
 	private Point4D_F64 p4 = new Point4D_F64();
+
+	// Pixel in homogenous image coordinate
+	private Point3D_F64 pix = new Point3D_F64();
 
 	/**
 	 * Specifies the scenes structure and observed feature locations
@@ -110,11 +111,20 @@ public class BundleAdjustmentProjectiveResidualFunction
 		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
 			SceneStructureProjective.View view = structure.views.data[viewIndex];
 			SceneObservations.View obsView = observations.views.data[viewIndex];
+			SceneStructureCommon.Camera camera = structure.cameras.get(view.camera);
+
 			for (int i = 0; i < obsView.size(); i++) {
 				obsView.get(i,observedPixel);
 				SceneStructureMetric.Point worldPt = structure.points.data[observedPixel.index];
 				worldPt.get(p3);
-				PerspectiveOps.renderPixel(view.worldToView, p3, predictedPixel);
+
+				// Apply projective camera to point in world coordinates
+				PerspectiveOps.renderPixel(view.worldToView,p3,pix);
+
+				// Apply camera model to pixel in homogenous coordinates
+				camera.model.project(pix.x,pix.y,pix.z,predictedPixel);
+
+				// Save results
 				int outputIndex = observationIndex*2;
 				output[outputIndex  ] = predictedPixel.x - observedPixel.x;
 				output[outputIndex+1] = predictedPixel.y - observedPixel.y;
@@ -131,11 +141,20 @@ public class BundleAdjustmentProjectiveResidualFunction
 		for( int viewIndex = 0; viewIndex < structure.views.size; viewIndex++ ) {
 			SceneStructureProjective.View view = structure.views.data[viewIndex];
 			SceneObservations.View obsView = observations.views.data[viewIndex];
+			SceneStructureCommon.Camera camera = structure.cameras.get(view.camera);
+
 			for (int i = 0; i < obsView.size(); i++) {
 				obsView.get(i,observedPixel);
 				SceneStructureMetric.Point worldPt = structure.points.data[observedPixel.index];
 				worldPt.get(p4);
-				PerspectiveOps.renderPixel(view.worldToView, p4, predictedPixel);
+
+				// Apply projective camera to point in world coordinates
+				PerspectiveOps.renderPixel(view.worldToView,p4,pix);
+
+				// Apply camera model to pixel in homogenous coordinates
+				camera.model.project(pix.x,pix.y,pix.z,predictedPixel);
+
+				// Save results
 				int outputIndex = observationIndex*2;
 				output[outputIndex  ] = predictedPixel.x - observedPixel.x;
 				output[outputIndex+1] = predictedPixel.y - observedPixel.y;

@@ -23,7 +23,6 @@ import boofcv.abst.geo.bundle.SceneStructureProjective;
 import org.ddogleg.optimization.DerivativeChecker;
 import org.ddogleg.optimization.functions.FunctionNtoMxN;
 import org.ddogleg.optimization.wrap.SchurJacobian_to_NtoMxN;
-import org.ejml.UtilEjml;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.Test;
 
@@ -37,11 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestBundleAdjustmentProjectiveSchurJacobian_DDRM {
+class TestBundleAdjustmentProjectiveSchurJacobian_DDRM {
 	Random rand = new Random(48854);
 
 	@Test
-	public void compareToNumerical_3D() {
+	void compareToNumerical_3D() {
 		SceneStructureProjective structure = createScene3D(rand);
 		SceneObservations observations = createObservations(rand,structure);
 
@@ -56,12 +55,12 @@ public class TestBundleAdjustmentProjectiveSchurJacobian_DDRM {
 		alg.configure(structure,observations);
 		func.configure(structure,observations);
 
-//		DerivativeChecker.jacobianPrintR(func, jac, param, 1e-3);
-		assertTrue(DerivativeChecker.jacobianR(func, jac, param, 1e-3));
+//		DerivativeChecker.jacobianPrint(func, jac, param, 0.1 );
+		assertTrue(DerivativeChecker.jacobian(func, jac, param, 0.1 ));
 	}
 
 	@Test
-	public void compareToNumerical_Homogenous() {
+	void compareToNumerical_Homogenous() {
 		SceneStructureProjective structure = createSceneH(rand);
 		SceneObservations observations = createObservations(rand,structure);
 
@@ -76,7 +75,7 @@ public class TestBundleAdjustmentProjectiveSchurJacobian_DDRM {
 		alg.configure(structure,observations);
 		func.configure(structure,observations);
 
-//		DerivativeChecker.jacobianPrint(func, jac, param, UtilEjml.TEST_F64_SQ );
-		assertTrue(DerivativeChecker.jacobian(func, jac, param, UtilEjml.TEST_F64_SQ ));
+//		DerivativeChecker.jacobianPrint(func, jac, param, 0.1 );
+		assertTrue(DerivativeChecker.jacobian(func, jac, param, 0.1 ));
 	}
 }

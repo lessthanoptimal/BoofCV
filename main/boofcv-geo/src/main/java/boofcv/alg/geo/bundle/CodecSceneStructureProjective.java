@@ -19,6 +19,7 @@
 package boofcv.alg.geo.bundle;
 
 import boofcv.abst.geo.bundle.BundleAdjustmentSchur_DSCC;
+import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.geo.bundle.SceneStructureProjective;
 
@@ -56,6 +57,13 @@ public class CodecSceneStructureProjective implements BundleAdjustmentSchur_DSCC
 			}
 		}
 
+		for (int i = 0; i < structure.cameras.size; i++) {
+			SceneStructureCommon.Camera camera = structure.cameras.data[i];
+			if( !camera.known ) {
+				camera.model.setIntrinsic(input,index);
+				index += camera.model.getIntrinsicCount();
+			}
+		}
 	}
 
 	@Override
@@ -78,6 +86,14 @@ public class CodecSceneStructureProjective implements BundleAdjustmentSchur_DSCC
 				for (int i = 0; i < 12; i++) {
 					output[index++] = view.worldToView.data[i];
 				}
+			}
+		}
+
+		for (int i = 0; i < structure.cameras.size; i++) {
+			SceneStructureCommon.Camera camera = structure.cameras.data[i];
+			if( !camera.known ) {
+				camera.model.getIntrinsic(output,index);
+				index += camera.model.getIntrinsicCount();
 			}
 		}
 	}
