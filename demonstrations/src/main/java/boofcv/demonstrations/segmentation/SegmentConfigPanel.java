@@ -72,6 +72,8 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 
 		panelConfig.setLayout(new BorderLayout());
 
+		setMethodControls();
+
 		addLabeled(comboVisual, "Visualize", this);
 		addSeparator(100);
 		addLabeled(comboAlgorithm, "Method", this);
@@ -99,15 +101,7 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 		if( comboAlgorithm == e.getSource() ) {
 			selectedAlgorithm = comboAlgorithm.getSelectedIndex();
 			panelConfig.removeAll();
-			if( selectedAlgorithm == 0 ) {
-				panelConfig.add(panelFh,BorderLayout.CENTER);
-			} else if( selectedAlgorithm == 1 ) {
-				panelConfig.add(panelSlic,BorderLayout.CENTER);
-			} else if( selectedAlgorithm == 2 ) {
-				panelConfig.add(panelMS,BorderLayout.CENTER);
-			} else if( selectedAlgorithm == 3 ) {
-				panelConfig.add(panelWater,BorderLayout.CENTER);
-			}
+			setMethodControls();
 			panelConfig.revalidate();
 			repaint();
 			owner.handleControlsChanged();
@@ -119,11 +113,24 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 		}
 	}
 
+	private void setMethodControls() {
+		if( selectedAlgorithm == 0 ) {
+			panelConfig.add(panelFh, BorderLayout.CENTER);
+		} else if( selectedAlgorithm == 1 ) {
+			panelConfig.add(panelSlic,BorderLayout.CENTER);
+		} else if( selectedAlgorithm == 2 ) {
+			panelConfig.add(panelMS,BorderLayout.CENTER);
+		} else if( selectedAlgorithm == 3 ) {
+			panelConfig.add(panelWater,BorderLayout.CENTER);
+		}
+	}
+
 	private class PanelConfigFH extends StandardAlgConfigPanel implements ActionListener, ChangeListener {
 
 		JComboBox selectConnect;
 		JSpinner spinnerSize;
 		JSpinner spinnerK;
+		JCheckBox checkApproximate = checkbox("Approx. Sort",configFh.approximateSortBins!=0);
 
 		public PanelConfigFH() {
 			selectConnect = new JComboBox(new String[]{"4-Connect","8-Connect"});
@@ -143,6 +150,7 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 			addAlignCenter(selectConnect,this);
 			addLabeled(spinnerSize, "Min Size", this);
 			addLabeled(spinnerK, "K", this);
+			addAlignLeft(checkApproximate,this);
 		}
 
 		private void configure() {
@@ -163,6 +171,12 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 					configFh.connectRule = ConnectRule.FOUR;
 				else
 					configFh.connectRule = ConnectRule.EIGHT;
+			} else if( checkApproximate == e.getSource() ) {
+				if( checkApproximate.isSelected() ) {
+					configFh.approximateSortBins = 2000;
+				} else {
+					configFh.approximateSortBins = 0;
+				}
 			}
 		}
 
@@ -313,7 +327,7 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 		JComboBox selectConnect;
 		JSpinner spinnerSize;
 
-		public PanelConfigWatershed() {
+		PanelConfigWatershed() {
 			selectConnect = new JComboBox(new String[]{"4-Connect","8-Connect"});
 			selectConnect.addActionListener(this);
 			selectConnect.setMaximumSize(selectConnect.getPreferredSize());
@@ -321,8 +335,6 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 			spinnerSize = new JSpinner(new SpinnerNumberModel(10,0,500,5));
 			spinnerSize.addChangeListener(this);
 			spinnerSize.setMaximumSize(spinnerSize.getPreferredSize());
-
-
 
 			configure();
 

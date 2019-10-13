@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.alg.segmentation.slic;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.alg.segmentation.ms.ClusterLabeledImage;
 import boofcv.alg.segmentation.ms.MergeSmallRegions;
@@ -129,19 +128,16 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 		this.regionColor = new ColorQueue_F32(numBands);
 
 		// custom declaration for pixel color
-		clusters = new FastQueue<Cluster>(Cluster.class,true) {
-			@Override
-			protected Cluster createInstance() {
-				Cluster c = new Cluster();
-				c.color = new float[ SegmentSlic.this.numBands ];
-				return c;
-			}
-		};
+		clusters = new FastQueue<>(Cluster.class, () -> {
+			Cluster c = new Cluster();
+			c.color = new float[ SegmentSlic.this.numBands ];
+			return c;
+		});
 	}
 
 	public void process( T input , GrayS32 output ) {
+		output.reshape(input.width,input.height);
 		stopRequested = false;
-		InputSanityCheck.checkSameShape(input,output);
 		if( input.width < 2*BORDER || input.height < 2*BORDER)
 			throw new IllegalArgumentException(
 					"Image is too small to process.  Must have a width and height of at least "+(2*BORDER));
