@@ -44,7 +44,8 @@ class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 	 */
 	@Test
 	void checkLinearSystem() {
-		createSceneObservations(true);
+		// if planar then the nullity isn't 1. so I'm not going to do that. The real test is below
+//		createSceneObservations(true);
 
 		TrifocalLinearPoint7 alg = new TrifocalLinearPoint7();
 
@@ -119,6 +120,13 @@ class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 
 	@Test
 	void fullTest() {
+		// see if it works with planar and non-planar scenes. It's interesting that it appears to be
+		// working with planar scenes even though the null space isn't unique, see test above
+		fullTest(true);
+		fullTest(false);
+	}
+	void fullTest(boolean planar ) {
+		createSceneObservations(planar);
 		TrifocalLinearPoint7 alg = new TrifocalLinearPoint7();
 
 		assertTrue(alg.process(observationsPixels,found));
@@ -127,12 +135,15 @@ class TestTrifocalLinearPoint7 extends CommonTrifocalChecks {
 		for( AssociatedTriple a : observationsPixels ) {
 			DMatrixRMaj A = MultiViewOps.constraint(found,a.p1,a.p2,a.p3,null);
 
-			assertEquals(0,NormOps_DDRM.normF(A),1e-7);
+			assertEquals(0,NormOps_DDRM.normF(A),1e-6);
 		}
 
 		// see if epipoles are zero
 		for (int i = 0; i < 3; i++) {
 			DMatrixRMaj T = found.getT(i);
+			// sanity check that it just isn't zero
+			assertTrue(NormOps_DDRM.normF(T) > 1e-7 );
+			// rank should be 2
 			assertEquals(2,SingularOps_DDRM.rank(T, UtilEjml.TEST_F64));
 		}
 	}
