@@ -131,9 +131,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>>
 		synchronized (lock) {
 			if (targetPt != null) {
 				TupleDesc feature = describe.createDescription();
-				// ensure that the visual circle matches the region it samples
-				double adjustedRadius = targetRadius/(describe.getCanonicalWidth()/2);
-				describe.process(targetPt.x, targetPt.y, targetOrientation, adjustedRadius, feature);
+				describe.process(targetPt.x, targetPt.y, targetOrientation, targetRadius, feature);
 				tuplePanel.setDescription(feature);
 			} else {
 				tuplePanel.setDescription(null);

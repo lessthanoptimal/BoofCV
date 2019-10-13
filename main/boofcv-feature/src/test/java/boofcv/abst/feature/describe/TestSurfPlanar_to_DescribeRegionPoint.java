@@ -22,17 +22,17 @@ import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.Planar;
 
 /**
  * @author Peter Abeles
  */
-class TestWrapDescribeSurf extends GenericDescribeRegionPointChecks<GrayF32> {
-	TestWrapDescribeSurf() {
-		super(ImageType.single(GrayF32.class));
+class TestSurfPlanar_to_DescribeRegionPoint extends GenericDescribeRegionPointChecks<Planar<GrayF32>> {
+	TestSurfPlanar_to_DescribeRegionPoint() {
+		super(ImageType.pl(3,GrayF32.class));
 	}
-
 	@Override
-	protected DescribeRegionPoint<GrayF32, TupleDesc_F64> createAlg() {
-		return (DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(null,GrayF32.class);
+	protected DescribeRegionPoint<Planar<GrayF32>, TupleDesc_F64> createAlg() {
+		return (DescribeRegionPoint) FactoryDescribeRegionPoint.surfColorStable(null, imageType);
 	}
 }

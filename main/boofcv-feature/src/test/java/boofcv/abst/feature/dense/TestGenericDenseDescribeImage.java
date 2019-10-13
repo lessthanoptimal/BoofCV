@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class TestGenericDenseDescribeImage {
 	public void process() {
 		DummyFeature sparse = new DummyFeature();
 
-		GenericDenseDescribeImageDense alg = new GenericDenseDescribeImageDense(sparse,1,1.5,3,4);
+		GenericDenseDescribeImageDense alg = new GenericDenseDescribeImageDense(sparse,1.5,3,4);
 
 		GrayU8 image = new GrayU8(100,110);
 
@@ -89,7 +89,7 @@ public class TestGenericDenseDescribeImage {
 
 		GrayU8 image = new GrayU8(100,110);
 
-		GenericDenseDescribeImageDense alg = new GenericDenseDescribeImageDense(sparse,1,1,8,9);
+		GenericDenseDescribeImageDense alg = new GenericDenseDescribeImageDense(sparse,1,8,9);
 
 		alg.configure(1, 8, 9);
 		alg.process(image);

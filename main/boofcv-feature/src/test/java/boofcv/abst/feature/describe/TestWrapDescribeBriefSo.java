@@ -19,20 +19,22 @@
 package boofcv.abst.feature.describe;
 
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.struct.feature.TupleDesc_F64;
+import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 
 /**
  * @author Peter Abeles
  */
-class TestWrapDescribeSurf extends GenericDescribeRegionPointChecks<GrayF32> {
-	TestWrapDescribeSurf() {
+class TestWrapDescribeBriefSo extends GenericDescribeRegionPointChecks<GrayF32> {
+	TestWrapDescribeBriefSo() {
 		super(ImageType.single(GrayF32.class));
 	}
 
 	@Override
-	protected DescribeRegionPoint<GrayF32, TupleDesc_F64> createAlg() {
-		return (DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(null,GrayF32.class);
+	protected DescribeRegionPoint<GrayF32, TupleDesc_B> createAlg() {
+		ConfigBrief config = new ConfigBrief();
+		config.fixed = false;
+		return FactoryDescribeRegionPoint.brief(config,GrayF32.class);
 	}
 }

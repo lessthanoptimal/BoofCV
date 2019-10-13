@@ -90,11 +90,6 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 
 	@Override
 	protected void createTree( DefaultMutableTreeNode root ) {
-		createNodes(root,"Binary",
-				DemoImageThresholdingApp.class,
-				DemoBinaryBlobLabelOpsApp.class,
-				DemoBinaryImageOpsApp.class);
-
 		createNodes(root,"Calibration",
 				CalibratePinholePlanarGuiApp.class,
 				CalibrateFisheyePlanarGuiApp.class,
@@ -158,15 +153,20 @@ public class DemonstrationLauncherApp extends ApplicationLauncherApp {
 				VisualizeSquareFiducial.class);
 
 		createNodes(root,"Image Processing",
+				DemoBinaryImageOpsApp.class,
 				DisplayGaussianKernelApp.class,
 				DisplaySteerableGaussianApp.class,
 				ShowImageBlurApp.class,
 				ShowImageDerivativeApp.class,
 				DemonstrationInterpolateScaleApp.class,
 				VisualizeFlipRotate.class,
-				VisualizeImageSegmentationApp.class,
-				VisualizeWatershedApp.class,
 				DenseFlowApp.class);
+
+		createNodes(root,"Segmentation",
+				DemoImageThresholdingApp.class,
+				DemoBinaryBlobLabelOpsApp.class,
+				VisualizeImageSegmentationApp.class,
+				VisualizeWatershedApp.class);
 
 		createNodes(root, "Shapes",
 				DetectPolylineApp.class,

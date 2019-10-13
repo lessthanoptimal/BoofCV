@@ -37,11 +37,13 @@ public class WrapDescribeSurf<T extends ImageGray<T>, II extends ImageGray<II>>
 	II ii;
 
 	ImageType<T> imageType;
+	final double canonicalRadius;
 
 	public WrapDescribeSurf(DescribePointSurf<II> surf , Class<T> imageType)
 	{
 		this.surf = surf;
 		this.imageType = ImageType.single(imageType);
+		this.canonicalRadius = surf.getCanonicalWidth()/2.0;
 	}
 
 	@Override
@@ -62,7 +64,8 @@ public class WrapDescribeSurf<T extends ImageGray<T>, II extends ImageGray<II>>
 
 	@Override
 	public boolean process(double x, double y, double orientation , double radius, BrightFeature storage) {
-		surf.describe(x,y, orientation, radius, storage);
+		double scale = radius/canonicalRadius;
+		surf.describe(x,y, orientation, scale, storage);
 		return true;
 	}
 

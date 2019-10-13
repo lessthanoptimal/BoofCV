@@ -28,12 +28,12 @@ import boofcv.struct.image.GrayF32;
 /**
  * @author Peter Abeles
  */
-public class TestOrientationSiftToImage extends GenericOrientationImageTests {
+public class TestOrientationSiftToImage extends GenericOrientationImageTests<GrayF32> {
 	final static double angleTol = 0.1;
 	final static ConfigSiftOrientation config = new ConfigSiftOrientation();
-	final static double pixelRadiusAtRadius1 = config.sigmaEnlarge/BoofDefaults.SIFT_SCALE_TO_RADIUS;
+	final static double pixelRadiusAtRadius1 = config.sigmaEnlarge*BoofDefaults.SIFT_SCALE_TO_RADIUS;
 
-	public TestOrientationSiftToImage() {
+	TestOrientationSiftToImage() {
 		super(angleTol, (int)(pixelRadiusAtRadius1+0.5), GrayF32.class);
 
 		SiftScaleSpace ss = new SiftScaleSpace(-1,5,3,1.6);

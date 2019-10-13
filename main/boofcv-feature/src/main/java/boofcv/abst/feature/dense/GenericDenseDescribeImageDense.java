@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,6 @@ public class GenericDenseDescribeImageDense<T extends ImageBase<T>, Desc extends
 	// Computes the image feature
 	DescribeRegionPoint<T,Desc> alg;
 
-	// conversion from scale to feature radius
-	double scaleToRadius;
 	// Radius of the "detected" feature
 	double radius;
 	// The width of the area the feature will sample
@@ -54,19 +52,16 @@ public class GenericDenseDescribeImageDense<T extends ImageBase<T>, Desc extends
 	/**
 	 * Configures dense description.
 	 * @param alg Sparse feature sampler.
-	 * @param scaleToRadius Conversion between requested descriptor scale to its actual radius
 	 * @param descriptorScale Relative scale of the descriptor's region
 	 * @param samplePeriodX How frequently the image is sampled in pixels. X-axis
 	 * @param samplePeriodY How frequently the image is sampled in pixels. Y-axis
 	 */
 	public GenericDenseDescribeImageDense(DescribeRegionPoint<T, Desc> alg,
-										  double scaleToRadius,
 										  double descriptorScale,
 										  double samplePeriodX ,
 										  double samplePeriodY ) {
-		this.scaleToRadius = scaleToRadius;
 		this.alg = alg;
-
+		descriptions = new FastQueue<>(alg.getDescriptionType(), alg::createDescription);
 		configure(descriptorScale,samplePeriodX,samplePeriodY);
 	}
 
@@ -78,17 +73,10 @@ public class GenericDenseDescribeImageDense<T extends ImageBase<T>, Desc extends
 	 * @param periodY Period in pixels along y-axis of samples
 	 */
 	public void configure( double descriptorRegionScale , double periodX, double periodY) {
-		this.radius = descriptorRegionScale*scaleToRadius;
+		this.radius = (alg.getCanonicalWidth()/2.0)*descriptorRegionScale;
 		this.periodX = (int)(periodX+0.5);
 		this.periodY = (int)(periodY+0.5);
 		this.featureWidth = (int)(alg.getCanonicalWidth()*descriptorRegionScale + 0.5);
-
-		descriptions = new FastQueue<Desc>(alg.getDescriptionType(),true) {
-			@Override
-			protected Desc createInstance() {
-				return alg.createDescription();
-			}
-		};
 	}
 
 	@Override

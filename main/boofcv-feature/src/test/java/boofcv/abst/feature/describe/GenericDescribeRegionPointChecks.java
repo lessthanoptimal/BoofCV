@@ -18,9 +18,10 @@
 
 package boofcv.abst.feature.describe;
 
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.feature.TupleDesc_F64;
-import boofcv.struct.image.GrayF32;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -32,10 +33,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-abstract class GenericDescribeRegionPointChecks {
+abstract class GenericDescribeRegionPointChecks<T extends ImageBase<T>> {
 
+	protected ImageType<T> imageType;
 	protected Random rand = new Random(234);
-	protected abstract DescribeRegionPoint<GrayF32,TupleDesc_F64> createAlg();
+	protected abstract DescribeRegionPoint<T,?> createAlg();
+
+	public GenericDescribeRegionPointChecks(ImageType<T> imageType) {
+		this.imageType = imageType;
+	}
 
 	/**
 	 * A course check to see if it respects the radius size parameter. just checks to see if the descriptor changes
@@ -43,34 +49,35 @@ abstract class GenericDescribeRegionPointChecks {
 	 */
 	@Test
 	void radiusSize() {
-		GrayF32 image = new GrayF32(100,120);
+		T image = imageType.createImage(100,120);
 
 		int cx = 45;
 		int cy = 48;
 		int radius = 20;
-		int aradius = radius+3;
+		int extra = 3;
+		int aradius = radius+extra;
 
-		ImageMiscOps.fill(image,255);
-		ImageMiscOps.fill(image.subimage(cx-aradius,cy-aradius,cx+aradius+1,cy+aradius+1),50);
+		GImageMiscOps.fill(image,255);
+		GImageMiscOps.fill(image.subimage(cx-aradius,cy-aradius,cx+aradius+1,cy+aradius+1),50);
 //		image.set(cx,cy,100); // give it some texture so it doesn't amplify noise
 
-		DescribeRegionPoint<GrayF32,TupleDesc_F64> describe = createAlg();
+		DescribeRegionPoint<T,TupleDesc> describe = (DescribeRegionPoint)createAlg();
 		describe.setImage(image);
 
-		TupleDesc_F64 t1 = (TupleDesc_F64)describe.createDescription();
+		TupleDesc t1 = describe.createDescription();
 		describe.process(cx,cy,0,radius,t1);
-		TupleDesc_F64 t2 = (TupleDesc_F64)describe.createDescription();
+		TupleDesc t2 = describe.createDescription();
 
 		// Moving by 1 pixels should make no difference
 		describe.process(cx+1,cy,0,radius,t2);
 		checkEquals(t1,t2);
 
 		// Move it so that the feature's edge goes past the edge
-		describe.process(cx+4,cy,0,radius,t2);
+		describe.process(cx+extra+2,cy,0,radius,t2);
 		checkNotEquals(t1,t2);
 	}
 
-	void checkEquals( TupleDesc_F64 a , TupleDesc_F64 b ) {
+	void checkEquals( TupleDesc a , TupleDesc b ) {
 		assertEquals(a.size(),b.size());
 
 		int totalMissMatches = 0;
@@ -79,10 +86,10 @@ abstract class GenericDescribeRegionPointChecks {
 				totalMissMatches++;
 			}
 		}
-		assertTrue(totalMissMatches < a.size()/8);
+		assertTrue(totalMissMatches <= a.size()/32);
 	}
 
-	void checkNotEquals( TupleDesc_F64 a , TupleDesc_F64 b ) {
+	void checkNotEquals(TupleDesc a , TupleDesc b ) {
 		assertEquals(a.size(),b.size());
 		int totalMissMatches = 0;
 		for (int i = 0; i < a.size(); i++) {
@@ -90,6 +97,7 @@ abstract class GenericDescribeRegionPointChecks {
 				totalMissMatches++;
 			}
 		}
-		assertTrue(totalMissMatches > a.size()/8);
+		// there might be some stray matches
+		assertTrue(totalMissMatches > a.size()/32);
 	}
 }

@@ -18,7 +18,6 @@
 
 package boofcv.factory.feature.dense;
 
-import boofcv.BoofDefaults;
 import boofcv.abst.feature.dense.*;
 import boofcv.abst.feature.describe.ConfigSiftDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
@@ -66,8 +65,7 @@ public class FactoryDescribeImageDense {
 		DescribeRegionPoint<T,TupleDesc_F64> surf =
 				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfFast(config.surf, imageType);
 
-		return new GenericDenseDescribeImageDense<>(surf, BoofDefaults.SURF_SCALE_TO_RADIUS,
-				config.descriptorScale, config.sampling.periodX, config.sampling.periodY);
+		return new GenericDenseDescribeImageDense<>(surf, config.descriptorScale, config.sampling.periodX, config.sampling.periodY);
 	}
 
 	/**
@@ -95,8 +93,7 @@ public class FactoryDescribeImageDense {
 		DescribeRegionPoint<T,TupleDesc_F64> surf =
 				(DescribeRegionPoint)FactoryDescribeRegionPoint.surfStable(config.surf, imageType);
 
-		return new GenericDenseDescribeImageDense<>(surf, BoofDefaults.SURF_SCALE_TO_RADIUS,
-				config.descriptorScale, config.sampling.periodX, config.sampling.periodY);
+		return new GenericDenseDescribeImageDense<>(surf, config.descriptorScale, config.sampling.periodX, config.sampling.periodY);
 	}
 
 	/**

@@ -45,6 +45,7 @@ public class SurfPlanar_to_DescribeRegionPoint<T extends ImageGray<T>, II extend
 	Planar<II> bandII;
 
 	ImageType<Planar<T>> imageType;
+	final double canonicalRadius;
 
 	public SurfPlanar_to_DescribeRegionPoint(DescribePointSurfPlanar<II> alg,
 											 Class<T> imageType, Class<II> integralType ) {
@@ -55,6 +56,8 @@ public class SurfPlanar_to_DescribeRegionPoint<T extends ImageGray<T>, II extend
 		bandII = new Planar<>(integralType, 1, 1, alg.getNumBands());
 
 		this.imageType = ImageType.pl(alg.getNumBands(), imageType);
+
+		canonicalRadius = alg.getDescribe().getCanonicalWidth()/2.0;
 	}
 
 	@Override
@@ -74,7 +77,8 @@ public class SurfPlanar_to_DescribeRegionPoint<T extends ImageGray<T>, II extend
 	@Override
 	public boolean process(double x, double y, double orientation, double radius, BrightFeature description) {
 
-		alg.describe(x,y,orientation, radius,description);
+		double scale = radius/canonicalRadius;
+		alg.describe(x,y,orientation, scale, description);
 
 		return true;
 	}

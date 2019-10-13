@@ -24,6 +24,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,7 +33,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestDescribeRegionPoint_SIFT extends GenericDescribeRegionPointChecks {
+class TestDescribeRegionPoint_SIFT extends GenericDescribeRegionPointChecks<GrayF32> {
+
+	TestDescribeRegionPoint_SIFT() {
+		super(ImageType.single(GrayF32.class));
+	}
 
 	@Test
 	void flags() {

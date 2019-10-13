@@ -36,7 +36,7 @@ public class BoofDefaults {
 	public static final double TEST_DOUBLE_TOL = 1e-8;
 
 	public static final double SURF_SCALE_TO_RADIUS = 2.0;
-	public static final double SIFT_SCALE_TO_RADIUS = 1.0;
+	public static final double SIFT_SCALE_TO_RADIUS = 6;
 	public static final double BRIEF_SCALE_TO_RADIUS = 2.0;
 
 	// Use extended borders when computing image derivatives 
