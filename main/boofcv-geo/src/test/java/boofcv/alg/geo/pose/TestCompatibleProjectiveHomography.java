@@ -166,12 +166,12 @@ public class TestCompatibleProjectiveHomography extends CommonThreeViewHomogenou
 	@Test
 	void fitCameraPoints() {
 //		fitCameraPoints(2); // two should be the minimum but isn't working
-//		fitCameraPoints(4);
+		fitCameraPoints(4);
 		fitCameraPoints(20);
 	}
 
 	void fitCameraPoints( int N ) {
-		createScene(N,true);
+		createScene(N,false);
 
 		// Find the homography
 		DMatrixRMaj H = new DMatrixRMaj(4,4);
