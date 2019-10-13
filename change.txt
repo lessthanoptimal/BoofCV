@@ -16,14 +16,15 @@ Version : 0.35
   * Added Hessian determinant direct from input image
 - Concurrency
   * PixelMath now only uses concurrent algorithm when input image is more than 10,000 pixels.
-    This caused circulant to slow down.
+    Going MT on small images caused Circulant tracker to slow down.
 - Demonstrations
   * Updated DenseFlowApp
-  * Updated VisualizeRegionDescriptionApp TODO - video update. all desc work. color
+  * Updated VisualizeRegionDescriptionApp
   * Updated VisualizeAssociationScoreApp
   * Updated VisualizeImageSegmentationApp
 - SFM
   * Projective camera with lens distortion
+  * TODO Stereo VO Quad - Now uses trifocal tensor and sparse bundle adjustment
 - Calibration
   * TODO Calibrate using partially obscured chessboard patterns
   * TODO Add ability to remove images and recalibrate from application
