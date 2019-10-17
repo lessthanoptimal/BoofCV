@@ -38,7 +38,7 @@ class TestImplImageStatistics_MT extends CompareIdenticalFunctions {
 
 	@Test
 	void performTests() {
-		performTests(72);
+		performTests(84);
 	}
 
 	@Override
@@ -99,6 +99,7 @@ class TestImplImageStatistics_MT extends CompareIdenticalFunctions {
 				break;
 
 			case "sum":
+			case "sumAbs":
 				parameters[0] = input1;
 				break;
 

@@ -34,6 +34,10 @@ import java.util.stream.IntStream;
  */
 public class BoofConcurrency {
 	/**
+	 * If an image has fewer pixels than this it will not run a concurrent algorithm. The overhead makes it slower.
+	 */
+	public static int SMALL_IMAGE = 100*100;
+	/**
 	 * If set to true it will use a concurrent algorithm
 	 */
 	public static boolean USE_CONCURRENT = true;

@@ -84,6 +84,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 			}
 			for( ImageType.Family f : families ) {
 				printSum(f);
+				printSumAbs(f);
 				printMean(f);
 			}
 
@@ -103,7 +104,8 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
 				"\t */\n" +
 				"\tpublic static void histogram( "+input.getSingleBandName()+" input , "+sumType+" minValue , int histogram[] ) {\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\tint N = input.width*input.height;\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {\n" +
 				"\t\t\tImplImageStatistics_MT.histogram(input,minValue,histogram);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageStatistics.histogram(input,minValue,histogram);\n" +
@@ -122,14 +124,40 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t * \n" +
 				"\t * @param img Input image. Not modified.\n" +
 				"\t */\n" +
-				"\tpublic static "+sumType+" sum( "+input.getImageName(family)+" img ) {\n" +
+				"\tpublic static "+sumType+" sum( "+input.getImageName(family)+" input ) {\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
-				"\t\t\treturn ImplImageStatistics_MT.sum(img);\n" +
+				"\t\tint N = input.width*input.height;\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {\n" +
+				"\t\t\treturn ImplImageStatistics_MT.sum(input);\n" +
 				"\t\t} else {\n" +
-				"\t\t\treturn ImplImageStatistics.sum(img);\n" +
+				"\t\t\treturn ImplImageStatistics.sum(input);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
+	}
+
+	public void printSumAbs( ImageType.Family family ) {
+
+		String sumType = input.getSumType();
+
+		out.print("\t/**\n" +
+				"\t * <p>\n" +
+				"\t * Returns the sum of all the pixels in the image.\n" +
+				"\t * </p>\n" +
+				"\t * \n" +
+				"\t * @param img Input image. Not modified.\n" +
+				"\t */\n" +
+				"\tpublic static "+sumType+" sumAbs( "+input.getImageName(family)+" input ) {\n");
+		if( input.isSigned() ) {
+			out.print("\n\t\tint N = input.width*input.height;\n" +
+					"\t\tif( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {\n" +
+					"\t\t\treturn ImplImageStatistics_MT.sumAbs(input);\n" +
+					"\t\t} else {\n" +
+					"\t\t\treturn ImplImageStatistics.sumAbs(input);\n" +
+					"\t\t}\n");
+		} else {
+			out.print("\t\treturn sum(input);\n");
+		}
+		out.print("\t}\n\n");
 	}
 
 	public void printMean( ImageType.Family family  ) {
@@ -160,7 +188,8 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tpublic static "+sumType+" variance( "+input.getSingleBandName()+" img , "+sumType+" mean ) {\n" +
 				"\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+				"\t\tint N = img.width*img.height;\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {\n" +
 				"\t\t\treturn ImplImageStatistics_MT.variance(img,mean);\n" +
 				"\t\t} else {\n" +
 				"\t\t\treturn ImplImageStatistics.variance(img,mean);\n" +
@@ -271,7 +300,8 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 			out.println(javaDoc);
 			out.print(
 					"\tpublic static "+sumType+" "+name+"( "+input.getImageName(family)+" input ) {\n" +
-					"\t\tif( BoofConcurrency.USE_CONCURRENT ) {\n" +
+					"\t\tint N = input.width*input.height;\n" +
+					"\t\tif( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {\n" +
 					"\t\t\treturn ImplImageStatistics_MT."+nameUn+"(input.data, input.startIndex, input.height, "+columns+" , input.stride);\n" +
 					"\t\t} else {\n" +
 					"\t\t\treturn ImplImageStatistics."+nameUn+"(input.data, input.startIndex, input.height, "+columns+" , input.stride);\n" +
@@ -302,7 +332,8 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 			out.println(javaDoc);
 			out.print("\tpublic static double "+name+"("+imageName+" imgA, "+imageName+" imgB ) {\n" +
 					"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
-					"\t\tif(BoofConcurrency.USE_CONCURRENT) {\n" +
+					"\t\tint N = imgA.width*imgA.height;\n" +
+					"\t\tif( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {\n" +
 					"\t\t\treturn ImplImageStatistics_MT."+nameUn+"(imgA.data,imgA.startIndex,imgA.stride, imgB.data,imgB.startIndex,imgB.stride,imgA.height, "+columns+");\n" +
 					"\t\t} else {\n" +
 					"\t\t\treturn ImplImageStatistics."+nameUn+"(imgA.data,imgA.startIndex,imgA.stride, imgB.data,imgB.startIndex,imgB.stride,imgA.height, "+columns+");\n" +

@@ -85,7 +85,9 @@ public class FactoryDerivative {
 	}
 
 	/**
-	 * Returns the gradient for single band images of the specified type
+	 * Returns the gradient filter for single band images of the specified type. The border will be handled
+	 * using the approach specified by {@link boofcv.BoofDefaults#DERIV_BORDER_TYPE}
+	 *
 	 * @param type Type of gradient
 	 * @param inputType Type of input image
 	 * @param derivType Type of gradient image.  null for default
@@ -121,7 +123,8 @@ public class FactoryDerivative {
 	}
 
 	/**
-	 * Filters for computing the gradient of {@link Planar} images.
+	 * Returns the gradient filter for planar images of the specified type. The border will be handled
+	 * using the approach specified by {@link boofcv.BoofDefaults#DERIV_BORDER_TYPE}
 	 *
 	 * @param type Which gradient to compute
 	 * @param numBands Number of bands in the image
@@ -140,6 +143,16 @@ public class FactoryDerivative {
 	}
 
 
+	/**
+	 * Creates a {@link ImageGradient} for an arbitrary image type. The border will be handled
+	 * using the approach specified by {@link boofcv.BoofDefaults#DERIV_BORDER_TYPE}
+	 *
+	 * @param type Which gradient to compute
+	 * @param inputType Type of data on input
+	 * @param derivType Type of data on output (null for default)
+	 * @param <I> Image type
+	 * @param <D> Derivative type
+	 */
 	public static <I extends ImageBase<I>, D extends ImageBase<D>>
 	ImageGradient<I,D>
 	gradient(DerivativeType type , ImageType<I> inputType , ImageType<D> derivType )

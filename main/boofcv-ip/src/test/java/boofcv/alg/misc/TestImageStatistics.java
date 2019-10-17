@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class TestImageStatistics {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 9*8 + 7*8;
+		int numExpected = 10*8 + 8*8;
 		Method methods[] = ImageStatistics.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -60,6 +60,8 @@ public class TestImageStatistics {
 					testMaxAbs(m);
 				} else if( m.getName().compareTo("sum") == 0 ) {
 					testSum(m);
+				} else if( m.getName().compareTo("sumAbs") == 0 ) {
+					testSumAbs(m);
 				} else if( m.getName().compareTo("mean") == 0 ) {
 					testMean(m);
 				} else if( m.getName().compareTo("variance") == 0 ) {
@@ -183,6 +185,32 @@ public class TestImageStatistics {
 			for( int j = 0; j < width; j++ ) {
 				for (int k = 0; k < numBands; k++) {
 					expected += GeneralizedImageOps.get(inputA,j,i,k);
+				}
+			}
+		}
+
+		assertEqualsAdjustTol(inputA, (Number) result, expected);
+	}
+
+	private void testSumAbs( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageBase inputA = GeneralizedImageOps.createImage(paramTypes[0], width, height, numBands);
+
+		int numBands = inputA.getImageType().getNumBands();
+
+		if( inputA.getImageType().getDataType().isSigned() ) {
+			GImageMiscOps.fillUniform(inputA, rand, -20,20);
+		} else {
+			GImageMiscOps.fillUniform(inputA, rand, 0,20);
+		}
+
+		Object result = m.invoke(null,inputA);
+
+		double expected = 0;
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				for (int k = 0; k < numBands; k++) {
+					expected += Math.abs(GeneralizedImageOps.get(inputA,j,i,k));
 				}
 			}
 		}

@@ -353,6 +353,27 @@ public class ImplImageStatistics {
 		//CONCURRENT_ABOVE return total;}).intValue();
 	}
 
+	public static int sumAbs( GrayS8 img ) {
+
+		final int rows = img.height;
+		final int columns = img.width;
+
+		//CONCURRENT_REMOVE_BELOW
+		int total = 0;
+
+		//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height,int.class,y->{
+			//CONCURRENT_BELOW int total = 0;
+		for (int y = 0; y < rows; y++) {
+			int index = img.startIndex + y * img.stride;
+			
+			int indexEnd = index+columns;
+			for (; index < indexEnd; index++ ) {
+				total += Math.abs(img.data[index] );
+			}
+		} return total;
+		//CONCURRENT_ABOVE return total;}).intValue();
+	}
+
 	public static int sum( InterleavedS8 img ) {
 
 		final int rows = img.height;
@@ -369,6 +390,27 @@ public class ImplImageStatistics {
 			int indexEnd = index+columns;
 			for (; index < indexEnd; index++ ) {
 				total += img.data[index] ;
+			}
+		} return total;
+		//CONCURRENT_ABOVE return total;}).intValue();
+	}
+
+	public static int sumAbs( InterleavedS8 img ) {
+
+		final int rows = img.height;
+		final int columns = img.width*img.numBands;
+
+		//CONCURRENT_REMOVE_BELOW
+		int total = 0;
+
+		//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height,int.class,y->{
+			//CONCURRENT_BELOW int total = 0;
+		for (int y = 0; y < rows; y++) {
+			int index = img.startIndex + y * img.stride;
+			
+			int indexEnd = index+columns;
+			for (; index < indexEnd; index++ ) {
+				total += Math.abs(img.data[index] );
 			}
 		} return total;
 		//CONCURRENT_ABOVE return total;}).intValue();
@@ -735,6 +777,27 @@ public class ImplImageStatistics {
 		//CONCURRENT_ABOVE return total;}).intValue();
 	}
 
+	public static int sumAbs( GrayS16 img ) {
+
+		final int rows = img.height;
+		final int columns = img.width;
+
+		//CONCURRENT_REMOVE_BELOW
+		int total = 0;
+
+		//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height,int.class,y->{
+			//CONCURRENT_BELOW int total = 0;
+		for (int y = 0; y < rows; y++) {
+			int index = img.startIndex + y * img.stride;
+			
+			int indexEnd = index+columns;
+			for (; index < indexEnd; index++ ) {
+				total += Math.abs(img.data[index] );
+			}
+		} return total;
+		//CONCURRENT_ABOVE return total;}).intValue();
+	}
+
 	public static int sum( InterleavedS16 img ) {
 
 		final int rows = img.height;
@@ -751,6 +814,27 @@ public class ImplImageStatistics {
 			int indexEnd = index+columns;
 			for (; index < indexEnd; index++ ) {
 				total += img.data[index] ;
+			}
+		} return total;
+		//CONCURRENT_ABOVE return total;}).intValue();
+	}
+
+	public static int sumAbs( InterleavedS16 img ) {
+
+		final int rows = img.height;
+		final int columns = img.width*img.numBands;
+
+		//CONCURRENT_REMOVE_BELOW
+		int total = 0;
+
+		//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height,int.class,y->{
+			//CONCURRENT_BELOW int total = 0;
+		for (int y = 0; y < rows; y++) {
+			int index = img.startIndex + y * img.stride;
+			
+			int indexEnd = index+columns;
+			for (; index < indexEnd; index++ ) {
+				total += Math.abs(img.data[index] );
 			}
 		} return total;
 		//CONCURRENT_ABOVE return total;}).intValue();
@@ -926,6 +1010,27 @@ public class ImplImageStatistics {
 		//CONCURRENT_ABOVE return total;}).intValue();
 	}
 
+	public static int sumAbs( GrayS32 img ) {
+
+		final int rows = img.height;
+		final int columns = img.width;
+
+		//CONCURRENT_REMOVE_BELOW
+		int total = 0;
+
+		//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height,int.class,y->{
+			//CONCURRENT_BELOW int total = 0;
+		for (int y = 0; y < rows; y++) {
+			int index = img.startIndex + y * img.stride;
+			
+			int indexEnd = index+columns;
+			for (; index < indexEnd; index++ ) {
+				total += Math.abs(img.data[index] );
+			}
+		} return total;
+		//CONCURRENT_ABOVE return total;}).intValue();
+	}
+
 	public static int sum( InterleavedS32 img ) {
 
 		final int rows = img.height;
@@ -942,6 +1047,27 @@ public class ImplImageStatistics {
 			int indexEnd = index+columns;
 			for (; index < indexEnd; index++ ) {
 				total += img.data[index] ;
+			}
+		} return total;
+		//CONCURRENT_ABOVE return total;}).intValue();
+	}
+
+	public static int sumAbs( InterleavedS32 img ) {
+
+		final int rows = img.height;
+		final int columns = img.width*img.numBands;
+
+		//CONCURRENT_REMOVE_BELOW
+		int total = 0;
+
+		//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height,int.class,y->{
+			//CONCURRENT_BELOW int total = 0;
+		for (int y = 0; y < rows; y++) {
+			int index = img.startIndex + y * img.stride;
+			
+			int indexEnd = index+columns;
+			for (; index < indexEnd; index++ ) {
+				total += Math.abs(img.data[index] );
 			}
 		} return total;
 		//CONCURRENT_ABOVE return total;}).intValue();
@@ -1117,6 +1243,27 @@ public class ImplImageStatistics {
 		//CONCURRENT_ABOVE return total;}).longValue();
 	}
 
+	public static long sumAbs( GrayS64 img ) {
+
+		final int rows = img.height;
+		final int columns = img.width;
+
+		//CONCURRENT_REMOVE_BELOW
+		long total = 0;
+
+		//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height,long.class,y->{
+			//CONCURRENT_BELOW long total = 0;
+		for (int y = 0; y < rows; y++) {
+			int index = img.startIndex + y * img.stride;
+			
+			int indexEnd = index+columns;
+			for (; index < indexEnd; index++ ) {
+				total += Math.abs(img.data[index] );
+			}
+		} return total;
+		//CONCURRENT_ABOVE return total;}).longValue();
+	}
+
 	public static long sum( InterleavedS64 img ) {
 
 		final int rows = img.height;
@@ -1133,6 +1280,27 @@ public class ImplImageStatistics {
 			int indexEnd = index+columns;
 			for (; index < indexEnd; index++ ) {
 				total += img.data[index] ;
+			}
+		} return total;
+		//CONCURRENT_ABOVE return total;}).longValue();
+	}
+
+	public static long sumAbs( InterleavedS64 img ) {
+
+		final int rows = img.height;
+		final int columns = img.width*img.numBands;
+
+		//CONCURRENT_REMOVE_BELOW
+		long total = 0;
+
+		//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height,long.class,y->{
+			//CONCURRENT_BELOW long total = 0;
+		for (int y = 0; y < rows; y++) {
+			int index = img.startIndex + y * img.stride;
+			
+			int indexEnd = index+columns;
+			for (; index < indexEnd; index++ ) {
+				total += Math.abs(img.data[index] );
 			}
 		} return total;
 		//CONCURRENT_ABOVE return total;}).longValue();
@@ -1308,6 +1476,27 @@ public class ImplImageStatistics {
 		//CONCURRENT_ABOVE return total;}).floatValue();
 	}
 
+	public static float sumAbs( GrayF32 img ) {
+
+		final int rows = img.height;
+		final int columns = img.width;
+
+		//CONCURRENT_REMOVE_BELOW
+		float total = 0;
+
+		//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height,float.class,y->{
+			//CONCURRENT_BELOW float total = 0;
+		for (int y = 0; y < rows; y++) {
+			int index = img.startIndex + y * img.stride;
+			
+			int indexEnd = index+columns;
+			for (; index < indexEnd; index++ ) {
+				total += Math.abs(img.data[index] );
+			}
+		} return total;
+		//CONCURRENT_ABOVE return total;}).floatValue();
+	}
+
 	public static float sum( InterleavedF32 img ) {
 
 		final int rows = img.height;
@@ -1324,6 +1513,27 @@ public class ImplImageStatistics {
 			int indexEnd = index+columns;
 			for (; index < indexEnd; index++ ) {
 				total += img.data[index] ;
+			}
+		} return total;
+		//CONCURRENT_ABOVE return total;}).floatValue();
+	}
+
+	public static float sumAbs( InterleavedF32 img ) {
+
+		final int rows = img.height;
+		final int columns = img.width*img.numBands;
+
+		//CONCURRENT_REMOVE_BELOW
+		float total = 0;
+
+		//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height,float.class,y->{
+			//CONCURRENT_BELOW float total = 0;
+		for (int y = 0; y < rows; y++) {
+			int index = img.startIndex + y * img.stride;
+			
+			int indexEnd = index+columns;
+			for (; index < indexEnd; index++ ) {
+				total += Math.abs(img.data[index] );
 			}
 		} return total;
 		//CONCURRENT_ABOVE return total;}).floatValue();
@@ -1499,6 +1709,27 @@ public class ImplImageStatistics {
 		//CONCURRENT_ABOVE return total;}).doubleValue();
 	}
 
+	public static double sumAbs( GrayF64 img ) {
+
+		final int rows = img.height;
+		final int columns = img.width;
+
+		//CONCURRENT_REMOVE_BELOW
+		double total = 0;
+
+		//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height,double.class,y->{
+			//CONCURRENT_BELOW double total = 0;
+		for (int y = 0; y < rows; y++) {
+			int index = img.startIndex + y * img.stride;
+			
+			int indexEnd = index+columns;
+			for (; index < indexEnd; index++ ) {
+				total += Math.abs(img.data[index] );
+			}
+		} return total;
+		//CONCURRENT_ABOVE return total;}).doubleValue();
+	}
+
 	public static double sum( InterleavedF64 img ) {
 
 		final int rows = img.height;
@@ -1515,6 +1746,27 @@ public class ImplImageStatistics {
 			int indexEnd = index+columns;
 			for (; index < indexEnd; index++ ) {
 				total += img.data[index] ;
+			}
+		} return total;
+		//CONCURRENT_ABOVE return total;}).doubleValue();
+	}
+
+	public static double sumAbs( InterleavedF64 img ) {
+
+		final int rows = img.height;
+		final int columns = img.width*img.numBands;
+
+		//CONCURRENT_REMOVE_BELOW
+		double total = 0;
+
+		//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height,double.class,y->{
+			//CONCURRENT_BELOW double total = 0;
+		for (int y = 0; y < rows; y++) {
+			int index = img.startIndex + y * img.stride;
+			
+			int indexEnd = index+columns;
+			for (; index < indexEnd; index++ ) {
+				total += Math.abs(img.data[index] );
 			}
 		} return total;
 		//CONCURRENT_ABOVE return total;}).doubleValue();

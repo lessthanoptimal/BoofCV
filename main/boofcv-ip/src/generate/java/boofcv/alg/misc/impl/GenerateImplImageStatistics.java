@@ -82,6 +82,9 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 			}
 			for( ImageType.Family f : families ) {
 				printSum(f);
+				if( t.isSigned() ) {
+					printSumAbs(f);
+				}
 			}
 
 			printVariance();
@@ -154,6 +157,36 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 				"\t\t//CONCURRENT_ABOVE return total;})."+numTo+";\n" +
 				"\t}\n\n");
 	}
+
+	public void printSumAbs( ImageType.Family family ) {
+
+		String bitWise = input.getBitWise();
+		String columns = family == ImageType.Family.INTERLEAVED ? "*img.numBands" : "";
+		String sumType = input.getSumType();
+		String numTo = input.getSumNumberToType();
+		out.print(
+				"\tpublic static "+sumType+" sumAbs( "+input.getImageName(family)+" img ) {\n" +
+						"\n" +
+						"\t\tfinal int rows = img.height;\n" +
+						"\t\tfinal int columns = img.width"+columns+";\n" +
+						"\n" +
+						"\t\t//CONCURRENT_REMOVE_BELOW\n" +
+						"\t\t"+sumType+" total = 0;\n" +
+						"\n" +
+						"\t\t//CONCURRENT_INLINE return BoofConcurrency.sum(0,img.height,"+sumType+".class,y->{\n" +
+						"\t\t\t//CONCURRENT_BELOW "+sumType+" total = 0;\n" +
+						"\t\tfor (int y = 0; y < rows; y++) {\n" +
+						"\t\t\tint index = img.startIndex + y * img.stride;\n" +
+						"\t\t\t\n" +
+						"\t\t\tint indexEnd = index+columns;\n" +
+						"\t\t\tfor (; index < indexEnd; index++ ) {\n" +
+						"\t\t\t\ttotal += Math.abs(img.data[index] "+bitWise+");\n" +
+						"\t\t\t}\n" +
+						"\t\t} return total;\n" +
+						"\t\t//CONCURRENT_ABOVE return total;})."+numTo+";\n" +
+						"\t}\n\n");
+	}
+
 
 	public void printVariance() {
 

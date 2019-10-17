@@ -14,6 +14,7 @@ Version : 0.35
   * Ignore negative values
 - Image Processing
   * Added Hessian determinant direct from input image
+  * Added sumAbs() to ImageStatistics
 - Concurrency
   * PixelMath now only uses concurrent algorithm when input image is more than 10,000 pixels.
     Going MT on small images caused Circulant tracker to slow down.
