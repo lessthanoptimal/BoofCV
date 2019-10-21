@@ -34,6 +34,14 @@ import java.util.List;
  */
 public class BoofMiscOps {
 
+	public static int numBands( ImageBase img ) {
+		if( img instanceof ImageMultiBand ) {
+			return ((ImageMultiBand)img).getNumBands();
+		} else {
+			return 1;
+		}
+	}
+
 	public static String milliToHuman( long milliseconds ) {
 		long second = (milliseconds / 1000) % 60;
 		long minute = (milliseconds / (1000 * 60)) % 60;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 	// Input image
 	T image;
 	// Number of bands in the input image
-	final int numBands;
+	int numBands;
 
 	// storage for the sum of each color
 	FastQueue<float[]> regionSums;
@@ -61,6 +61,12 @@ public abstract class ComputeRegionMeanColor<T extends ImageBase<T>> {
 	public void process( T image , GrayS32 pixelToRegion ,
 						 GrowQueue_I32 regionMemberCount ,
 						 FastQueue<float[]> regionColor  )  {
+
+		// See if the input image has the expected number of bands
+		if( image.getImageType().getFamily() != ImageType.Family.GRAY ) {
+			this.numBands = ((ImageMultiBand)image).getNumBands();
+			regionSums = new ColorQueue_F32(numBands);
+		}
 
 		this.image = image;
 

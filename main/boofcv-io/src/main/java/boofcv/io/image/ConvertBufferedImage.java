@@ -666,7 +666,9 @@ public class ConvertBufferedImage {
 		} else if( src instanceof Planar) {
 			Planar ms = (Planar)src;
 
-			if( GrayU8.class == ms.getBandType() ) {
+			if( ms.getNumBands() == 1 ) {
+				return convertTo(ms.getBand(0),dst,orderRgb);
+			} else if( GrayU8.class == ms.getBandType() ) {
 				return convertTo_U8((Planar<GrayU8>) ms, dst, orderRgb);
 			} else if( GrayF32.class == ms.getBandType() ) {
 				return convertTo_F32((Planar<GrayF32>) ms, dst, orderRgb);

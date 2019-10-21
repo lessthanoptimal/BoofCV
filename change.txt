@@ -23,6 +23,7 @@ Version : 0.35
   * Updated VisualizeRegionDescriptionApp
   * Updated VisualizeAssociationScoreApp
   * Updated VisualizeImageSegmentationApp
+- Fixed bugs related to processing 1-band planar images
 - SFM
   * Projective camera with lens distortion
   * TODO Stereo VO Quad - Now uses trifocal tensor and sparse bundle adjustment

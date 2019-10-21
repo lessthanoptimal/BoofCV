@@ -133,20 +133,19 @@ public class FactorySegmentationAlg {
 				}
 			}
 		} else if( imageType.getFamily() == ImageType.Family.PLANAR) {
-			int N = imageType.getNumBands();
 			if( rule == ConnectRule.FOUR ) {
 				switch( imageType.getDataType() ) {
 					case U8:
-						return (FhEdgeWeights)new FhEdgeWeights4_PLU8(N);
+						return (FhEdgeWeights)new FhEdgeWeights4_PLU8();
 					case F32:
-						return (FhEdgeWeights)new FhEdgeWeights4_PLF32(N);
+						return (FhEdgeWeights)new FhEdgeWeights4_PLF32();
 				}
 			} else if( rule == ConnectRule.EIGHT ) {
 				switch( imageType.getDataType() ) {
 					case U8:
-						return (FhEdgeWeights)new FhEdgeWeights8_PLU8(N);
+						return (FhEdgeWeights)new FhEdgeWeights8_PLU8();
 					case F32:
-						return (FhEdgeWeights)new FhEdgeWeights8_PLF32(N);
+						return (FhEdgeWeights)new FhEdgeWeights8_PLF32();
 				}
 			}
 		}

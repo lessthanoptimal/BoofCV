@@ -29,6 +29,7 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.*;
 import org.ddogleg.struct.FastQueue;
@@ -149,7 +150,8 @@ public class VisualizeImageSegmentationApp <T extends ImageBase<T>>
 		ImageType<T> type = color.getImageType();
 		ComputeRegionMeanColor<T> colorize = FactorySegmentationAlg.regionMeanColor(type);
 
-		FastQueue<float[]> segmentColor = new ColorQueue_F32(type.getNumBands());
+		int numBands = BoofMiscOps.numBands(color);
+		FastQueue<float[]> segmentColor = new ColorQueue_F32(numBands);
 		segmentColor.resize(numSegments);
 
 		GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
