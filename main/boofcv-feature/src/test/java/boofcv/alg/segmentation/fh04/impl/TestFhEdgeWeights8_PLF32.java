@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,13 +29,13 @@ import boofcv.struct.image.Planar;
  */
 public class TestFhEdgeWeights8_PLF32 extends GenericFhEdgeWeightsChecks<Planar<GrayF32>>{
 
-	public TestFhEdgeWeights8_PLF32() {
+	TestFhEdgeWeights8_PLF32() {
 		super(ImageType.pl(3, GrayF32.class), ConnectRule.EIGHT);
 	}
 
 	@Override
 	public FhEdgeWeights<Planar<GrayF32>> createAlg() {
-		return new FhEdgeWeights8_PLF32(3);
+		return new FhEdgeWeights8_PLF32();
 	}
 
 	@Override
