@@ -95,6 +95,13 @@ public class ConvertBufferedImage {
 	}
 
 	/**
+	 * Returns the number of bands or channels that the BoofCV image needs to have for this iamge type
+	 */
+	public static int numChannels( BufferedImage image ) {
+		return image.getRaster().getNumBands();
+	}
+
+	/**
 	 * Returns an image which doesn't have an alpha channel.  If the input image doesn't have an alpha
 	 * channel to start then its returned as is.  Otherwise a new image is created and the RGB channels are
 	 * copied and the new image returned.

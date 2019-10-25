@@ -316,11 +316,13 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			int h = (int)(scale*input.getHeight()+0.5);
 
 			// Use BoofCV to down sample since Graphics2D introduced too many aliasing artifacts
-			BufferedImage output = new BufferedImage(w,h,input.getType());
-			Planar<GrayU8> a = new Planar<>(GrayU8.class,input.getWidth(),input.getHeight(),3);
-			Planar<GrayU8> b = new Planar<>(GrayU8.class,w,h,3);
+			int numBands = ConvertBufferedImage.numChannels(input);
+
+			Planar<GrayU8> a = new Planar<>(GrayU8.class,input.getWidth(),input.getHeight(),numBands);
+			Planar<GrayU8> b = new Planar<>(GrayU8.class,w,h,numBands);
 			ConvertBufferedImage.convertFrom(input,a,true);
 			AverageDownSampleOps.down(a,b);
+			BufferedImage output = new BufferedImage(w,h,input.getType());
 			ConvertBufferedImage.convertTo(b,output,true);
 			return output;
 		}
