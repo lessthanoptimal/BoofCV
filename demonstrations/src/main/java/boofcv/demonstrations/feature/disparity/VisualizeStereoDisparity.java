@@ -44,6 +44,8 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.visualize.PointCloudViewer;
+import boofcv.visualize.RainbowColor_Y;
+import boofcv.visualize.RainbowColor_Y_XZ;
 import boofcv.visualize.VisualizeData;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -151,11 +153,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 		progress.stopThread();
 
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				disparityRender();
-			}
-		});
+		SwingUtilities.invokeLater(this::disparityRender);
 	}
 
 	/**
@@ -168,31 +166,21 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			BufferedImage img;
 
 			switch (control.selectedView) {
-				case 0:
-					img = disparityOut;
-					break;
-
-				case 1:
-					img = colorLeft;
-					break;
-
-				case 2:
-					img = colorRight;
-					break;
-
-				default:
-					throw new RuntimeException("Unknown option");
+				case 0: img = disparityOut; break;
+				case 1: img = colorLeft; break;
+				case 2: img = colorRight; break;
+				default: throw new RuntimeException("Unknown option");
 			}
 
 			gui.setImage(img);
 			gui.setPreferredSize(new Dimension(origLeft.getWidth(), origLeft.getHeight()));
 			comp = gui;
 		} else {
+			double baseline = calib.getRightToLeft().getT().norm();
 			if( !computedCloud ) {
 				computedCloud = true;
 				DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 
-				double baseline = calib.getRightToLeft().getT().norm();
 				d2c.configure(baseline, rectK,rectR, leftRectToPixel, control.minDisparity,control.maxDisparity);
 				d2c.process(activeAlg.getDisparity(),colorLeft);
 
@@ -200,8 +188,13 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 						rectK,colorLeft.getWidth(),colorLeft.getHeight(),null);
 				pcv.clearPoints();
 				pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
-				pcv.setTranslationStep(5);
+				pcv.setTranslationStep(baseline/30);
 				pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
+			}
+			switch( control.colorScheme ) {
+				case 0: pcv.removeColorizer();break;
+				case 1: pcv.setColorizer(new RainbowColor_Y(baseline*5)); break;
+				case 2: pcv.setColorizer(new RainbowColor_Y_XZ(baseline*5,baseline*20)); break;
 			}
 			comp = pcv.getComponent();
 			comp.requestFocusInWindow();
@@ -294,9 +287,11 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	@Override
 	public synchronized void disparitySettingChange() {
-		processCalled = false;
-		activeAlg = createAlg();
-		doRefreshAll();
+		if( control.recompute ) {
+			processCalled = false;
+			activeAlg = createAlg();
+			doRefreshAll();
+		}
 	}
 
 	@Override
@@ -384,18 +379,14 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	 * Active and deactivates different GUI configurations
 	 */
 	private void changeGuiActive( final boolean error , final boolean reverse ) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				control.setActiveGui(error,reverse);
-			}
-		});
+		SwingUtilities.invokeLater(() -> control.setActiveGui(error,reverse));
 	}
 
 	@Override
 	public synchronized void changeInputScale() {
 		calib = new StereoParameters(origCalib);
 
-		double scale = control.inputScale;
+		double scale = control.inputScale/100.0;
 
 		PerspectiveOps.scaleIntrinsic(calib.left,scale);
 		PerspectiveOps.scaleIntrinsic(calib.right,scale);

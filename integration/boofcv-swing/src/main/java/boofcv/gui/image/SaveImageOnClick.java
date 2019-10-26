@@ -18,6 +18,7 @@
 
 package boofcv.gui.image;
 
+import boofcv.gui.BoofSwingUtil;
 import boofcv.io.image.UtilImageIO;
 
 import javax.swing.*;
@@ -46,10 +47,7 @@ public class SaveImageOnClick extends MouseAdapter {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		boolean clicked = SwingUtilities.isMiddleMouseButton(e);
-
-		// This is for Mac OS X. Checks to see if control-command are held down with the mouse press
-		clicked |= e.isControlDown() && ((e.getModifiersEx() & 256) != 0);
+		boolean clicked = BoofSwingUtil.isMiddleMouseButton(e);
 
 		if( clicked ) {
 			String fileName = String.format("saved_image%03d.png",saveCounter++);

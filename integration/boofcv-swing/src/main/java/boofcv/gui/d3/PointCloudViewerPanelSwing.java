@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,12 @@ package boofcv.gui.d3;
 
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.gui.image.SaveImageOnClick;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
+import boofcv.visualize.PointCloudViewer;
 import georegression.geometry.ConvertRotation3D_F32;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
@@ -71,6 +73,8 @@ public class PointCloudViewerPanelSwing extends JPanel
 	// If true then fog is rendered. This makes points fade to background color at a distance
 	boolean fog;
 
+	PointCloudViewer.Colorizer colorizer;
+
 	// intrinsic camera parameters
 	float hfov = UtilAngle.radian(50);
 
@@ -98,6 +102,8 @@ public class PointCloudViewerPanelSwing extends JPanel
 	ScheduledExecutorService pressedTask;
 
 	public PointCloudViewerPanelSwing(float keyStepSize ) {
+
+		addMouseListener(new SaveImageOnClick(this));
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -202,10 +208,14 @@ public class PointCloudViewerPanelSwing extends JPanel
 		ImageMiscOps.fill(imageDepth,Float.MAX_VALUE);
 		ImageMiscOps.fill(imageRgb,backgroundColor);
 
+		PointCloudViewer.Colorizer colorizer = this.colorizer;
+
 		float maxDistanceSq = maxRenderDistance*maxRenderDistance;
 		if( Float.isInfinite(maxDistanceSq))
 			maxDistanceSq = Float.MAX_VALUE;
 
+		// NOTE: To make this concurrent there needs to be a way to write the points and not run into race conditions
+		//       Each thread writing to its own image seems too expensive for large images and combining the results
 		int totalPoints = cloudXyz.size/3;
 		for( int i = 0,pointIdx=0; i < totalPoints; i++ ) {
 			worldPt.x = cloudXyz.data[pointIdx++];
@@ -225,14 +235,19 @@ public class PointCloudViewerPanelSwing extends JPanel
 			pixel.x = fx * cameraPt.x/cameraPt.z + cx;
 			pixel.y = fy * cameraPt.y/cameraPt.z + cy;
 
-
 			int x = (int)(pixel.x+0.5f);
 			int y = (int)(pixel.y+0.5f);
 
 			if( !imageDepth.isInBounds(x,y) )
 				continue;
 
-			int rgb = cloudColor.data[i];
+			int rgb;
+			if( colorizer == null ) {
+				rgb = cloudColor.data[i];
+			} else {
+				rgb = colorizer.color(i,worldPt.x,worldPt.y,worldPt.z);
+			}
+
 			if( fog ) {
 				rgb = applyFog(rgb, 1.0f-(float)Math.sqrt(r2)/maxRenderDistance );
 			}
@@ -306,7 +321,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 						default:
 							if( !pressed.remove(e.getKeyCode()) ) {
 								System.err.println("Possible Java / Mac OS X bug related to 'character accent menu'" +
-										" if using Java 1.8 try upgrading to 11");
+										" if using Java 1.8 try upgrading to 11 or later");
 							}
 							break;
 					}

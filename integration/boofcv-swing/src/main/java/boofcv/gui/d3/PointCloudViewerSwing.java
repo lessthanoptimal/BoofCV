@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -144,6 +144,16 @@ public class PointCloudViewerSwing implements PointCloudViewer {
 				panel.clearCloud();
 			});
 		}
+	}
+
+	@Override
+	public void setColorizer(Colorizer colorizer) {
+		panel.colorizer = colorizer;
+	}
+
+	@Override
+	public void removeColorizer() {
+		panel.colorizer = null;
 	}
 
 	@Override

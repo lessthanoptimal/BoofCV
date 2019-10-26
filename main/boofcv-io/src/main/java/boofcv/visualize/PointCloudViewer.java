@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,6 +80,17 @@ public interface PointCloudViewer {
 	void clearPoints();
 
 	/**
+	 * Used to assign colors to points using a custom function based on their position and/or index. If
+	 * a color is specified it will override it
+	 */
+	void setColorizer( Colorizer colorizer );
+
+	/**
+	 * If a colorizer has been specified this will remove it
+	 */
+	void removeColorizer();
+
+	/**
 	 * Specifies the camera's FOV in radians
 	 * @param radians FOV size
 	 */
@@ -92,4 +103,11 @@ public interface PointCloudViewer {
 	void setCameraToWorld(Se3_F64 cameraToWorld );
 
 	JComponent getComponent();
+
+	/**
+	 * Computes the color for a point
+	 */
+	interface Colorizer {
+		int color( int index , double x , double y , double z );
+	}
 }

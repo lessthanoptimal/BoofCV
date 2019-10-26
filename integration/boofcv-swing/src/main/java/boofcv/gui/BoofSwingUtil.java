@@ -53,6 +53,15 @@ public class BoofSwingUtil {
 						(e.getModifiers() & InputEvent.CTRL_MASK) != 0));
 	}
 
+	public static boolean isMiddleMouseButton(MouseEvent e) {
+		boolean clicked = SwingUtilities.isMiddleMouseButton(e);
+
+		// This is for Mac OS X. Checks to see if control-command are held down with the mouse press
+		clicked |= e.isControlDown() && ((e.getModifiersEx() & 256) != 0);
+
+		return clicked;
+	}
+
 	public static File saveFileChooser(Component parent, FileTypes ...filters) {
 		return fileChooser(parent,false,new File(".").getPath(),filters);
 	}
