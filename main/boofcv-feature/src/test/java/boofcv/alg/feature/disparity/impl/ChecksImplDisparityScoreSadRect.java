@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * @author Peter Abeles
  */
@@ -42,7 +44,7 @@ public abstract class ChecksImplDisparityScoreSadRect<I extends ImageGray<I>, DI
 	Class<I> imageType;
 	Class<DI> disparityType;
 
-	public ChecksImplDisparityScoreSadRect(Class<I> imageType , Class<DI> disparityType ) {
+	ChecksImplDisparityScoreSadRect(Class<I> imageType , Class<DI> disparityType ) {
 		this.imageType = imageType;
 		this.disparityType = disparityType;
 
@@ -60,7 +62,7 @@ public abstract class ChecksImplDisparityScoreSadRect<I extends ImageGray<I>, DI
 	 * Basic generic disparity calculation tests
 	 */
 	@Test
-	public void basicTest() {
+	void basicTest() {
 		BasicDisparityTests<I, DI> alg =
 				new BasicDisparityTests<I, DI>(imageType) {
 
@@ -93,7 +95,7 @@ public abstract class ChecksImplDisparityScoreSadRect<I extends ImageGray<I>, DI
 	 * configurations
 	 */
 	@Test
-	public void compareToNaive() {
+	void compareToNaive() {
 		int w = 20, h = 25;
 		I left = GeneralizedImageOps.createSingleBand(imageType,w, h);
 		I right = GeneralizedImageOps.createSingleBand(imageType,w, h);
@@ -132,5 +134,10 @@ public abstract class ChecksImplDisparityScoreSadRect<I extends ImageGray<I>, DI
 		naive.process(left,right,expected);
 
 		BoofTesting.assertEquals(found, expected, 1);
+	}
+
+	@Test
+	void checkConcurrent() {
+		fail("Implement");
 	}
 }

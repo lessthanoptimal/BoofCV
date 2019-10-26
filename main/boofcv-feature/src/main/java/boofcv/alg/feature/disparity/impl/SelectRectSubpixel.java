@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.disparity.impl;
 
+import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.struct.image.GrayF32;
 
 /**
@@ -47,6 +48,10 @@ public class SelectRectSubpixel {
 			super(maxError, rightToLeftTolerance, texture);
 		}
 
+		S32_F32( S32_F32 original ) {
+			super(original);
+		}
+
 		@Override
 		protected void setDisparity(int index, int disparityValue) {
 
@@ -64,6 +69,11 @@ public class SelectRectSubpixel {
 		}
 
 		@Override
+		public DisparitySelect<int[], GrayF32> concurrentCopy() {
+			return new S32_F32(this);
+		}
+
+		@Override
 		public Class<GrayF32> getDisparityType() {
 			return GrayF32.class;
 		}
@@ -75,6 +85,10 @@ public class SelectRectSubpixel {
 	public static class F32_F32 extends ImplSelectRectStandardBase_F32<GrayF32> {
 		public F32_F32(int maxError, int rightToLeftTolerance, double texture) {
 			super(maxError, rightToLeftTolerance, texture);
+		}
+
+		F32_F32( F32_F32 original ) {
+			super(original);
 		}
 
 		@Override
@@ -91,6 +105,12 @@ public class SelectRectSubpixel {
 
 				imageDisparity.data[index] = disparityValue +  offset;
 			}
+		}
+
+
+		@Override
+		public DisparitySelect<float[], GrayF32> concurrentCopy() {
+			return new F32_F32(this);
 		}
 
 		@Override

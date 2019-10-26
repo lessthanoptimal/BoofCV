@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.disparity.impl;
 
+import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.alg.feature.disparity.SelectRectBasicWta;
 import boofcv.struct.image.GrayU8;
 
@@ -59,6 +60,11 @@ public class ImplSelectRectBasicWta_F32_U8 extends SelectRectBasicWta<float[],Gr
 
 			imageDisparity.data[indexDisparity++] = (byte)bestDisparity;
 		}
+	}
+
+	@Override
+	public DisparitySelect<float[], GrayU8> concurrentCopy() {
+		return this;
 	}
 
 	@Override

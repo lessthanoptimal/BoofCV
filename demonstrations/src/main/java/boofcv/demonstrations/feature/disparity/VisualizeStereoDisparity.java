@@ -94,10 +94,10 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	private RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 	// GUI components
-	private DisparityDisplayPanel control = new DisparityDisplayPanel();
-	private JPanel panel = new JPanel();
-	private ImagePanel gui = new ImagePanel();
-	private PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
+	private final DisparityDisplayPanel control = new DisparityDisplayPanel();
+	private final JPanel panel = new JPanel();
+	private final ImagePanel gui = new ImagePanel();
+	private final PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
 
 	// if true the point cloud has already been computed and does not need to be recomputed
 	private boolean computedCloud;

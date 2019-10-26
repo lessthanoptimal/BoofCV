@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public interface DisparitySelect<Array , T extends ImageGray> {
 	 * @param maxDisparity Maximum disparity that is calculated
 	 * @param radiusX Radius of the rectangular region being matched along x-axis.
 	 */
-	public void configure(T imageDisparity, int minDisparity , int maxDisparity, int radiusX);
+	void configure(T imageDisparity, int minDisparity , int maxDisparity, int radiusX);
 
 	/**
 	 * Processes the array of scores. The score format is described in
@@ -56,12 +56,18 @@ public interface DisparitySelect<Array , T extends ImageGray> {
 	 * @param row Image row the scores are from.
 	 * @param scoresArray Array containing scores. (int[] or float[])
 	 */
-	public void process(int row, Array scoresArray);
+	void process(int row, Array scoresArray);
+
+	/**
+	 * Creates a copy with separate working space. Used for concurrency. Data structures which are threadsafe
+	 * can be shared
+	 */
+	DisparitySelect<Array,T> concurrentCopy();
 
 	/**
 	 * Type of image the disparity is
 	 *
 	 * @return Image type for disparity
 	 */
-	public Class<T> getDisparityType();
+	Class<T> getDisparityType();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.disparity.impl;
 
+import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.struct.image.GrayU8;
 
 /**
@@ -33,12 +34,21 @@ public class ImplSelectRectStandard_F32_U8 extends ImplSelectRectStandardBase_F3
 		super(maxError, rightToLeftTolerance, texture);
 	}
 
+	public ImplSelectRectStandard_F32_U8(ImplSelectRectStandard_F32_U8 original) {
+		super(original);
+	}
+
 	@Override
 	public void configure(GrayU8 imageDisparity, int minDisparity, int maxDisparity, int radiusX) {
 		super.configure(imageDisparity, minDisparity, maxDisparity, radiusX);
 
 		if( rangeDisparity > 254 )
 			throw new IllegalArgumentException("(max - min) disparity must be <= 254");
+	}
+
+	@Override
+	public DisparitySelect<float[], GrayU8> concurrentCopy() {
+		return new ImplSelectRectStandard_F32_U8(this);
 	}
 
 	protected void setDisparity( int index , int value ) {

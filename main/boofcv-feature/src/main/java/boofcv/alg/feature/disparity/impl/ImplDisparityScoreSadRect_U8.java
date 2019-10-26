@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,8 +20,11 @@ package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.DisparityScoreSadRect;
 import boofcv.alg.feature.disparity.DisparitySelect;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.IntRangeObjectConsumer;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * <p>
@@ -37,56 +40,97 @@ import boofcv.struct.image.ImageGray;
 public class ImplDisparityScoreSadRect_U8<DI extends ImageGray<DI>>
 	extends DisparityScoreSadRect<GrayU8, DI>
 {
+	// Computes disparity from scores. Concurrent code copies this
+	DisparitySelect<int[], DI> disparitySelect0;
 
-	// Computes disparity from scores
-	DisparitySelect<int[], DI> computeDisparity;
+	// reference to input images;
+	GrayU8 left, right;
+	DI disparity;
 
-	// stores the local scores for the width of the region
-	int elementScore[];
-	// scores along horizontal axis for current block
-	// To allow right to left validation all disparity scores are stored for the entire row
-	// size = num columns * maxDisparity
-	// disparity for column i is stored in elements i*maxDisparity to (i+1)*maxDisparity
-	int horizontalScore[][];
-	// summed scores along vertical axis
-	// This is simply the sum of like elements in horizontal score
-	int verticalScore[];
+	FastQueue workspace = new FastQueue<>(WorkSpace.class, WorkSpace::new);
+	ComputeBlock computeBlock = new ComputeBlock();
 
 	public ImplDisparityScoreSadRect_U8( int minDisparity , int maxDisparity,
 										int regionRadiusX, int regionRadiusY,
 										DisparitySelect<int[], DI> computeDisparity) {
 		super(minDisparity,maxDisparity,regionRadiusX,regionRadiusY);
 
-		this.computeDisparity = computeDisparity;
+		this.disparitySelect0 = computeDisparity;
+		workspace.grow();
 	}
 
 	@Override
 	public void _process(GrayU8 left , GrayU8 right , DI disparity ) {
-		if( horizontalScore == null || verticalScore.length < lengthHorizontal ) {
-			horizontalScore = new int[regionHeight][lengthHorizontal];
-			verticalScore = new int[lengthHorizontal];
-			elementScore = new int[ left.width ];
+		this.left = left;
+		this.right = right;
+		this.disparity = disparity;
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			BoofConcurrency.loopBlocks(0,left.height,regionHeight,workspace,computeBlock);
+		} else {
+			computeBlock.accept((WorkSpace)workspace.get(0),0,left.height);
 		}
+	}
 
-		computeDisparity.configure(disparity,minDisparity,maxDisparity,radiusX);
+	class WorkSpace {
+		// stores the local scores for the width of the region
+		int[] elementScore;
+		// scores along horizontal axis for current block
+		// To allow right to left validation all disparity scores are stored for the entire row
+		// size = num columns * maxDisparity
+		// disparity for column i is stored in elements i*maxDisparity to (i+1)*maxDisparity
+		int[][] horizontalScore = new int[0][0];
+		// summed scores along vertical axis
+		// This is simply the sum of like elements in horizontal score
+		int[] verticalScore = new int[0];
 
-		// initialize computation
-		computeFirstRow(left, right);
-		// efficiently compute rest of the rows using previous results to avoid repeat computations
-		computeRemainingRows(left, right);
+		DisparitySelect<int[], DI> computeDisparity;
+
+		public void checkSize() {
+			if( horizontalScore.length != regionHeight || horizontalScore[0].length != lengthHorizontal ) {
+				horizontalScore = new int[regionHeight][lengthHorizontal];
+				verticalScore = new int[lengthHorizontal];
+				elementScore = new int[ left.width ];
+			}
+			if( computeDisparity == null ) {
+				computeDisparity = disparitySelect0.concurrentCopy();
+			}
+			computeDisparity.configure(disparity,minDisparity,maxDisparity,radiusX);
+		}
+	}
+
+	private class ComputeBlock implements IntRangeObjectConsumer<WorkSpace> {
+		@Override
+		public void accept(WorkSpace workspace, int minInclusive, int maxExclusive) {
+
+			workspace.checkSize();
+
+			// The image border will be skipped, so it needs to back track some
+			int row0 = Math.max(0,minInclusive-radiusY);
+			int row1 = Math.min(left.height,maxExclusive+radiusY);
+
+			// initialize computation
+			computeFirstRow(row0, workspace.computeDisparity,
+					workspace.elementScore, workspace.horizontalScore, workspace.verticalScore);
+
+			// efficiently compute rest of the rows using previous results to avoid repeat computations
+			computeRemainingRows(row0,row1, workspace.computeDisparity,
+					workspace.elementScore, workspace.horizontalScore, workspace.verticalScore);
+		}
 	}
 
 	/**
 	 * Initializes disparity calculation by finding the scores for the initial block of horizontal
 	 * rows.
 	 */
-	private void computeFirstRow(GrayU8 left, GrayU8 right ) {
+	private void computeFirstRow(int row0 ,
+								 DisparitySelect<int[], DI> computeDisparity,
+								 final int[] elementScore, final int[][] horizontalScore, final int[] verticalScore) {
+		final GrayU8 left = this.left, right = this.right;
 		// compute horizontal scores for first row block
 		for( int row = 0; row < regionHeight; row++ ) {
-
-			int scores[] = horizontalScore[row];
-
-			UtilDisparityScore.computeScoreRow(left, right, row, scores,
+			final int[] scores = horizontalScore[row];
+			UtilDisparityScore.computeScoreRow(left, right,row0+row, scores,
 					minDisparity,maxDisparity,regionWidth,elementScore);
 		}
 
@@ -100,7 +144,7 @@ public class ImplDisparityScoreSadRect_U8<DI extends ImageGray<DI>>
 		}
 
 		// compute disparity
-		computeDisparity.process(radiusY, verticalScore);
+		computeDisparity.process(row0+radiusY, verticalScore);
 	}
 
 	/**
@@ -108,13 +152,16 @@ public class ImplDisparityScoreSadRect_U8<DI extends ImageGray<DI>>
 	 * When a new block is processes the last row/column is subtracted and the new row/column is
 	 * added.
 	 */
-	private void computeRemainingRows(GrayU8 left, GrayU8 right )
+	private void computeRemainingRows(int row0 , int row1,
+									  DisparitySelect<int[], DI> computeDisparity,
+									  final int[] elementScore, final int[][] horizontalScore, final int[] verticalScore )
 	{
-		for( int row = regionHeight; row < left.height; row++ ) {
+		final GrayU8 left = this.left, right = this.right;
+		for( int row = row0+regionHeight; row < row1; row++ ) {
 			int oldRow = row%regionHeight;
 
 			// subtract first row from vertical score
-			int scores[] = horizontalScore[oldRow];
+			final int[] scores = horizontalScore[oldRow];
 			for( int i = 0; i < lengthHorizontal; i++ ) {
 				verticalScore[i] -= scores[i];
 			}
@@ -139,7 +186,6 @@ public class ImplDisparityScoreSadRect_U8<DI extends ImageGray<DI>>
 
 	@Override
 	public Class<DI> getDisparityType() {
-		return computeDisparity.getDisparityType();
+		return disparitySelect0.getDisparityType();
 	}
-
 }

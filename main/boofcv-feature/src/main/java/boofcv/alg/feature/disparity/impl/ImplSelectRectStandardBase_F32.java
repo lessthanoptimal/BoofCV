@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,6 +45,10 @@ public abstract class ImplSelectRectStandardBase_F32<T extends ImageGray<T>>
 
 	public ImplSelectRectStandardBase_F32(int maxError, int rightToLeftTolerance, double texture) {
 		super(maxError,rightToLeftTolerance,texture);
+	}
+
+	public ImplSelectRectStandardBase_F32( ImplSelectRectStandardBase_F32<T> original ) {
+		this(original.maxError,original.rightToLeftTolerance,original.textureThreshold);
 	}
 
 	@Override

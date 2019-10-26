@@ -206,6 +206,35 @@ public class BoofConcurrency {
 	}
 
 	/**
+	 * Splits the range of values up into blocks. For each block workspace data will be declared using a
+	 * {@link FastQueue} and passed on. This workspace can be used to collect results and combine later on
+	 *
+	 * @param start First index, inclusive
+	 * @param endExclusive Last index, exclusive
+	 * @param minBlock Minimum size of a block
+	 * @param consumer The consumer
+	 */
+	public static <T>void loopBlocks(int start , int endExclusive , int minBlock ,
+									 FastQueue<T> workspace, IntRangeObjectConsumer<T> consumer ) {
+		final ForkJoinPool pool = BoofConcurrency.pool;
+		int numThreads = pool.getParallelism();
+
+		int range = endExclusive-start;
+		if( range == 0 ) // nothing to do here!
+			return;
+		if( range < 0 )
+			throw new IllegalArgumentException("end must be more than start. "+start+" -> "+endExclusive);
+
+		int blockSize = selectBlockSize(range,minBlock,numThreads);
+
+		try {
+			pool.submit(new IntRangeObjectTask<>(start,endExclusive,blockSize,workspace,consumer)).get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
 	 * Computes sums up the results using the specified primitive type
 	 *
 	 * @param start First index, inclusive
