@@ -152,15 +152,15 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 			texture = ((Number) textureSpinner.getValue()).doubleValue();
 		} else if( e.getSource() == sliderPeriodColor ) {
 			periodAdjust = sliderPeriodColor.getValue();
-			listener.disparityRender();
+			listener.changeView3D();
 			return;
 		} else if( e.getSource() == sliderOffsetColor ) {
 			offsetAdjust = sliderOffsetColor.getValue();
-			listener.disparityRender();
+			listener.changeView3D();
 			return;
 		} else if( e.getSource() == sliderSpeed3D) {
 			speedAdjust = sliderSpeed3D.getValue();
-			listener.changeSpeed3D();
+			listener.changeView3D();
 			return;
 		}
 
@@ -182,7 +182,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 			listener.disparityGuiChange();
 		} else if( e.getSource() == comboColorizer) {
 			colorScheme = comboColorizer.getSelectedIndex();
-			listener.disparityGuiChange();
+			listener.changeView3D();
 		} else if( e.getSource() == invalidToggle) {
 			colorInvalid = invalidToggle.isSelected();
 			listener.disparityRender();
@@ -247,6 +247,6 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		void disparityGuiChange();
 		void disparityRender();
 		void changeInputScale();
-		void changeSpeed3D();
+		void changeView3D();
 	}
 }

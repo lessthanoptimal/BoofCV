@@ -179,11 +179,12 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			gui.setPreferredSize(new Dimension(origLeft.getWidth(), origLeft.getHeight()));
 			comp = gui;
 		} else {
-			double baseline = calib.getRightToLeft().getT().norm();
+
 			if( !computedCloud ) {
 				computedCloud = true;
 				DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 
+				double baseline = calib.getRightToLeft().getT().norm();
 				d2c.configure(baseline, rectK,rectR, leftRectToPixel, control.minDisparity,control.maxDisparity);
 				d2c.process(activeAlg.getDisparity(),colorLeft);
 
@@ -192,23 +193,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 				pcv.clearPoints();
 				pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
 				pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
-				changeSpeed3D();
-			}
-			double periodColor = baseline*5*control.periodScale();
-			PeriodicColorizer colorizer=null;
-			switch( control.colorScheme ) {
-				case 0: pcv.removeColorizer();break;
-				case 1: colorizer = new RainbowColorSingleAxis.X(); break;
-				case 2: colorizer = new RainbowColorSingleAxis.Y(); break;
-				case 3: colorizer = new RainbowColorSingleAxis.Z(); break;
-				case 4: colorizer = new RainbowColorAxisPlane.X_YZ(4.0); break;
-				case 5: colorizer = new RainbowColorAxisPlane.Y_XZ(4.0); break;
-				case 6: colorizer = new RainbowColorAxisPlane.Z_XY(4.0); break;
-			}
-			if( colorizer != null ) {
-				colorizer.setPeriod(periodColor);
-				colorizer.setOffset(control.offsetScale());
-				pcv.setColorizer(colorizer);
+				changeView3D();
 			}
 			comp = pcv.getComponent();
 			comp.requestFocusInWindow();
@@ -432,9 +417,27 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	}
 
 	@Override
-	public void changeSpeed3D() {
+	public void changeView3D() {
 		double baseline = calib.getRightToLeft().getT().norm();
+		double periodColor = baseline*5*control.periodScale();
+		PeriodicColorizer colorizer=null;
+		switch( control.colorScheme ) {
+			case 0: pcv.removeColorizer();break;
+			case 1: colorizer = new RainbowColorSingleAxis.X(); break;
+			case 2: colorizer = new RainbowColorSingleAxis.Y(); break;
+			case 3: colorizer = new RainbowColorSingleAxis.Z(); break;
+			case 4: colorizer = new RainbowColorAxisPlane.X_YZ(4.0); break;
+			case 5: colorizer = new RainbowColorAxisPlane.Y_XZ(4.0); break;
+			case 6: colorizer = new RainbowColorAxisPlane.Z_XY(4.0); break;
+		}
+		if( colorizer != null ) {
+			colorizer.setPeriod(periodColor);
+			colorizer.setOffset(control.offsetScale());
+			pcv.setColorizer(colorizer);
+		}
+
 		pcv.setTranslationStep(control.speedScale()*baseline/30);
+		pcv.getComponent().repaint();
 	}
 
 	/**
