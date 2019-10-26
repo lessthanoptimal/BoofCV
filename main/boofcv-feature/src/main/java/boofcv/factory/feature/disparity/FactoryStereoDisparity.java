@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,10 +26,7 @@ import boofcv.alg.feature.disparity.DisparityScoreRowFormat;
 import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.DisparitySparseSelect;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.*;
 
 import static boofcv.factory.feature.disparity.FactoryStereoDisparityAlgs.*;
 
@@ -108,6 +105,9 @@ public class FactoryStereoDisparity {
 				if( imageType == GrayU8.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(minDisparity,
 							maxDisparity,regionRadiusX,regionRadiusY,select);
+				} else if( imageType == GrayU16.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_U16(minDisparity,
+							maxDisparity, regionRadiusX, regionRadiusY, select);
 				} else if( imageType == GrayS16.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_S16(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);
@@ -121,6 +121,9 @@ public class FactoryStereoDisparity {
 				if( imageType == GrayU8.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U8(minDisparity,
 							maxDisparity,regionRadiusX,regionRadiusY,select);
+				} else if( imageType == GrayU16.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U16(minDisparity,
+							maxDisparity, regionRadiusX, regionRadiusY, select);
 				} else if( imageType == GrayS16.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_S16(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);
@@ -191,6 +194,9 @@ public class FactoryStereoDisparity {
 				if( imageType == GrayU8.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(minDisparity,
 							maxDisparity,regionRadiusX,regionRadiusY,select);
+				} else if( imageType == GrayU16.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_U16(minDisparity,
+							maxDisparity, regionRadiusX, regionRadiusY, select);
 				} else if( imageType == GrayS16.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_S16(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);
@@ -204,6 +210,9 @@ public class FactoryStereoDisparity {
 				if( imageType == GrayU8.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U8(minDisparity,
 							maxDisparity,regionRadiusX,regionRadiusY,select);
+				} else if( imageType == GrayU16.class ) {
+					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U16(minDisparity,
+							maxDisparity, regionRadiusX, regionRadiusY, select);
 				} else if( imageType == GrayS16.class ) {
 					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_S16(minDisparity,
 							maxDisparity, regionRadiusX, regionRadiusY, select);

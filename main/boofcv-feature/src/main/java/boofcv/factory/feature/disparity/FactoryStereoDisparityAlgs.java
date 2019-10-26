@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,10 +20,7 @@ package boofcv.factory.feature.disparity;
 
 import boofcv.alg.feature.disparity.*;
 import boofcv.alg.feature.disparity.impl.*;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.*;
 
 /**
  * Algorithms related to computing the disparity between two rectified stereo images.
@@ -91,6 +88,15 @@ public class FactoryStereoDisparityAlgs {
 				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
 	}
 
+	public static <T extends ImageGray<T>> DisparityScoreSadRect<GrayU16,T>
+	scoreDisparitySadRect_U16( int minDisparity , int maxDisparity,
+							   int regionRadiusX, int regionRadiusY,
+							   DisparitySelect<int[],T> computeDisparity)
+	{
+		return new ImplDisparityScoreSadRect_U16<>(minDisparity,
+				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
+	}
+
 	public static <T extends ImageGray<T>> DisparityScoreSadRect<GrayS16,T>
 	scoreDisparitySadRect_S16( int minDisparity , int maxDisparity,
 							  int regionRadiusX, int regionRadiusY,
@@ -115,6 +121,15 @@ public class FactoryStereoDisparityAlgs {
 								  DisparitySelect<int[],T> computeDisparity)
 	{
 		return new ImplDisparityScoreSadRectFive_U8<>(minDisparity,
+				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
+	}
+
+	public static <T extends ImageGray<T>> DisparityScoreWindowFive<GrayU16,T>
+	scoreDisparitySadRectFive_U16( int minDisparity , int maxDisparity,
+								   int regionRadiusX, int regionRadiusY,
+								   DisparitySelect<int[],T> computeDisparity)
+	{
+		return new ImplDisparityScoreSadRectFive_U16<>(minDisparity,
 				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
 	}
 

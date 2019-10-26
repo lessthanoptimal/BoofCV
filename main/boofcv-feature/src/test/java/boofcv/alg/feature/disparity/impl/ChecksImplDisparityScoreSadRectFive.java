@@ -21,17 +21,14 @@ package boofcv.alg.feature.disparity.impl;
 import boofcv.alg.feature.disparity.DisparityScoreWindowFive;
 import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
-
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -48,7 +45,7 @@ public abstract class ChecksImplDisparityScoreSadRectFive<I extends ImageGray<I>
 		this.imageType = imageType;
 		this.disparityType = disparityType;
 
-		if( imageType == GrayU8.class || imageType == GrayS16.class ) {
+		if( imageType == GrayU8.class || imageType == GrayU16.class|| imageType == GrayS16.class ) {
 			compDisp = (DisparitySelect)new ImplSelectRectBasicWta_S32_U8();
 		} else {
 			compDisp = (DisparitySelect)new ImplSelectRectBasicWta_F32_U8();
@@ -57,6 +54,12 @@ public abstract class ChecksImplDisparityScoreSadRectFive<I extends ImageGray<I>
 
 	protected abstract DisparityScoreWindowFive<I, DI>
 	createAlg( int minDisparity , int maxDisparity , int radiusX, int radiusY, DisparitySelect compDisp);
+
+	@BeforeEach
+	void before() {
+		// Test single thread performance first
+		BoofConcurrency.USE_CONCURRENT = false;
+	}
 
 	/**
 	 * Basic generic disparity calculation tests
@@ -138,6 +141,47 @@ public abstract class ChecksImplDisparityScoreSadRectFive<I extends ImageGray<I>
 
 	@Test
 	void checkConcurrent() {
-		fail("Implement");
+		int w = 35, h = 40;
+		I left = GeneralizedImageOps.createSingleBand(imageType,w, h);
+		I right = GeneralizedImageOps.createSingleBand(imageType,w, h);
+
+		if( left.getDataType().isSigned() ) {
+			GImageMiscOps.fillUniform(left, rand, -20, 20);
+			GImageMiscOps.fillUniform(right, rand, -20, 20);
+		} else {
+			GImageMiscOps.fillUniform(left, rand, 0, 20);
+			GImageMiscOps.fillUniform(right, rand, 0, 20);
+		}
+
+		int radiusX = 3;
+		int radiusY = 2;
+
+		// compare to naive with different settings
+		checkConcurrent(left, right, 0, 10, radiusX, radiusY);
+		checkConcurrent(left, right, 4, 10, radiusX, radiusY);
+	}
+
+	private void checkConcurrent(I left, I right,
+								 int minDisparity, int maxDisparity,
+								 int radiusX, int radiusY)
+	{
+		int w = left.width;
+		int h = left.height;
+
+		DI found = GeneralizedImageOps.createSingleBand(disparityType,w,h);
+		DI expected = GeneralizedImageOps.createSingleBand(disparityType,w,h);
+
+		BoofConcurrency.USE_CONCURRENT = false;
+		DisparityScoreWindowFive<I, DI> alg = createAlg(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
+		alg.process(left,right,expected);
+		BoofConcurrency.USE_CONCURRENT = true;
+		alg = createAlg(minDisparity,maxDisparity,radiusX,radiusY,compDisp);
+		alg.process(left,right,found);
+
+//		((GrayU8)expected).print();
+//		System.out.println();
+//		((GrayU8)found).print();
+
+		BoofTesting.assertEquals(found, expected, 1);
 	}
 }

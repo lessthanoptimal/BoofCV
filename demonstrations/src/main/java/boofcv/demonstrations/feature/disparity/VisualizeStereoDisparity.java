@@ -23,6 +23,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
@@ -146,9 +147,11 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		progress.start();
 
 		computedCloud = false;
+		BoofConcurrency.USE_CONCURRENT = control.concurrent;
 		long time0 = System.nanoTime();
 		activeAlg.process(rectLeft, rectRight);
 		long time1 = System.nanoTime();
+		BoofConcurrency.USE_CONCURRENT = true;
 		processCalled = true;
 
 		progress.stopThread();
@@ -216,7 +219,11 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		int s = ((Number)cookie).intValue();
 		if( s != selectedAlg ) {
 			selectedAlg = s;
+			// In some cases the concurrency algorithm is selected when instantiated others do it when
+			// called
+			BoofConcurrency.USE_CONCURRENT = control.concurrent;
 			activeAlg = createAlg();
+			BoofConcurrency.USE_CONCURRENT = true;
 
 			doRefreshAll();
 		}

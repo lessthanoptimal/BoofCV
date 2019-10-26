@@ -38,6 +38,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	// which image to show
 	int selectedView;
 
+	boolean concurrent=true;
 	boolean recompute=true;
 	boolean colorInvalid = false;
 	boolean useSubpixel = true;
@@ -67,9 +68,9 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	protected JLabel imageSizeLabel = new JLabel();
 
 	// how much the input should be scaled down by
-	JSpinner inputScaleSpinner;
+	JSpinner inputScaleSpinner = spinner(inputScale,5,100,10);
 	// selects which image to view
-	JComboBox viewSelector;
+	JComboBox viewSelector = combo(selectedView,"Disparity","Left","Right","View 3D");
 	// If the point cloud should be colorized or not
 	JComboBox comboColorizer = combo(0,"Natural","X","Y","Z","X-YZ","Y-XZ","Z-XY");
 
@@ -78,34 +79,25 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	JSlider sliderSpeed3D = slider(0,1000,speedAdjust,100);
 
 	// toggles if invalid pixels are black or not
-	JCheckBox invalidToggle;
+	JCheckBox invalidToggle = checkbox("Color Invalid",colorInvalid);
 
-	JCheckBox checkRecompute;
+	JCheckBox checkRecompute  = checkbox("Recompute",recompute);
+	JCheckBox checkConcurrent = checkbox("concurrent",concurrent);
 
-	JSpinner minDisparitySpinner;
-	JSpinner maxDisparitySpinner;
-	JCheckBox subpixelToggle;
-	JSpinner radiusSpinner;
-	JSpinner errorSpinner;
-	JSpinner reverseSpinner;
-	JSpinner textureSpinner;
+	JSpinner minDisparitySpinner = spinner(minDisparity,0,255,5);
+	JSpinner maxDisparitySpinner = spinner(maxDisparity,1,255,5);
+	JCheckBox subpixelToggle = checkbox("Subpixel",useSubpixel);
+	JSpinner radiusSpinner = spinner(regionRadius,1,30,1);
+	JSpinner errorSpinner = spinner(pixelError,-1,80,5);
+	JSpinner reverseSpinner = spinner(reverseTol,-1,50,1);
+	JSpinner textureSpinner = spinner(texture,0.0,1.0,0.05,1,3);
 
 	// listener for changes in states
 	Listener listener;
 
 	public DisparityDisplayPanel() {
 
-		inputScaleSpinner = spinner(inputScale,5,100,10);
-		viewSelector = combo(selectedView,"Disparity","Left","Right","View 3D");
-		invalidToggle = checkbox("Color Invalid",colorInvalid);
-		minDisparitySpinner = spinner(minDisparity,0,255,5);
-		maxDisparitySpinner = spinner(maxDisparity,1,255,5);
-		subpixelToggle = checkbox("Subpixel",useSubpixel);
-		radiusSpinner = spinner(regionRadius,1,30,1);
-		errorSpinner = spinner(pixelError,-1,80,5);
-		reverseSpinner = spinner(reverseTol,-1,50,1);
-		textureSpinner = spinner(texture,0.0,1.0,0.05,1,3);
-		checkRecompute = checkbox("Recompute",recompute);
+		update3DControls();
 
 		addLabeled(processingTimeLabel, "Time (ms)");
 		addLabeled(imageSizeLabel,"Image Size");
@@ -126,6 +118,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addSeparator(100);
 		addLabeled(inputScaleSpinner, "Image Scale");
 		addAlignLeft(checkRecompute);
+		addAlignLeft(checkConcurrent);
 		addVerticalGlue();
 	}
 
@@ -179,6 +172,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 
 		if( e.getSource() == viewSelector ) {
 			selectedView = viewSelector.getSelectedIndex();
+			update3DControls();
 			listener.disparityGuiChange();
 		} else if( e.getSource() == comboColorizer) {
 			colorScheme = comboColorizer.getSelectedIndex();
@@ -192,7 +186,19 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		} else if( e.getSource() == checkRecompute ) {
 			recompute = checkRecompute.isSelected();
 			listener.disparitySettingChange();
+		} else if( e.getSource() == checkConcurrent ) {
+			concurrent = checkConcurrent.isSelected();
+			listener.disparitySettingChange();
 		}
+	}
+
+	private void update3DControls() {
+		// disable controls which can't be used
+		boolean view3D = selectedView==3;
+		comboColorizer.setEnabled(view3D);
+		sliderOffsetColor.setEnabled(view3D);
+		sliderPeriodColor.setEnabled(view3D);
+		sliderSpeed3D.setEnabled(view3D);
 	}
 
 	public double periodScale() {

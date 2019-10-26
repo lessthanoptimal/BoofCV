@@ -23,7 +23,7 @@ import boofcv.alg.feature.disparity.DisparityScoreWindowFive;
 import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.IntRangeObjectConsumer;
-import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.ImageGray;
 import org.ddogleg.struct.FastQueue;
 
@@ -32,7 +32,7 @@ import javax.annotation.Generated;
 /**
  * <p>
  * Implementation of {@link boofcv.alg.feature.disparity.DisparityScoreWindowFive} for processing
- * images of type {@link GrayS16}.
+ * images of type {@link GrayU16}.
  * </p>
  *
  * <p>
@@ -42,20 +42,20 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.feature.disparity.impl.GenerateDisparityScoreSadRectFive")
-public class ImplDisparityScoreSadRectFive_S16<DI extends ImageGray<DI>>
-		extends DisparityScoreWindowFive<GrayS16,DI>
+public class ImplDisparityScoreSadRectFive_U16<DI extends ImageGray<DI>>
+		extends DisparityScoreWindowFive<GrayU16,DI>
 {
 	// Computes disparity from scores
 	DisparitySelect<int[], DI> disparitySelect0;
 
 	// reference to input images;
-	GrayS16 left, right;
+	GrayU16 left, right;
 	DI disparity;
 
 	FastQueue workspace = new FastQueue<>(WorkSpace.class, WorkSpace::new);
 	ComputeBlock computeBlock = new ComputeBlock();
 
-	public ImplDisparityScoreSadRectFive_S16(int minDisparity, int maxDisparity,
+	public ImplDisparityScoreSadRectFive_U16(int minDisparity, int maxDisparity,
 											int regionRadiusX, int regionRadiusY,
 											DisparitySelect<int[], DI> computeDisparity) {
 		super(minDisparity,maxDisparity,regionRadiusX,regionRadiusY);
@@ -64,7 +64,7 @@ public class ImplDisparityScoreSadRectFive_S16<DI extends ImageGray<DI>>
 	}
 
 	@Override
-	public void _process(GrayS16 left , GrayS16 right , DI disparity ) {
+	public void _process(GrayU16 left , GrayU16 right , DI disparity ) {
 		InputSanityCheck.checkSameShape(left,right);
 		disparity.reshape(left.width,left.height);
 		this.left = left;
@@ -241,8 +241,8 @@ public class ImplDisparityScoreSadRectFive_S16<DI extends ImageGray<DI>>
 	}
 
 	@Override
-	public Class<GrayS16> getInputType() {
-		return GrayS16.class;
+	public Class<GrayU16> getInputType() {
+		return GrayU16.class;
 	}
 
 	@Override
