@@ -47,6 +47,14 @@ public class StandardAlgConfigPanel extends JPanel {
 		return control;
 	}
 
+	protected JSlider slider( int min , int max , int initial , int widgetWidth ) {
+		JSlider slider = new JSlider(min,max,initial);
+		slider.setMaximumSize(new Dimension(widgetWidth,24));
+		slider.setPreferredSize(slider.getMaximumSize());
+		slider.addChangeListener((ChangeListener)this);
+		return slider;
+	}
+
 	protected JComboBox<String> combo( int initial , String... items ) {
 		JComboBox<String> c = new JComboBox<>();
 

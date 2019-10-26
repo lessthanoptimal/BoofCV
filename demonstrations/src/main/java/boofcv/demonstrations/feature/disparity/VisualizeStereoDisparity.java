@@ -26,6 +26,7 @@ import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.SelectAlgorithmAndInputPanel;
 import boofcv.gui.d3.DisparityToColorPointCloud;
 import boofcv.gui.image.ImagePanel;
@@ -43,10 +44,7 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.visualize.PointCloudViewer;
-import boofcv.visualize.RainbowColor_Y;
-import boofcv.visualize.RainbowColor_Y_XZ;
-import boofcv.visualize.VisualizeData;
+import boofcv.visualize.*;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
@@ -148,12 +146,17 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		progress.start();
 
 		computedCloud = false;
+		long time0 = System.nanoTime();
 		activeAlg.process(rectLeft, rectRight);
+		long time1 = System.nanoTime();
 		processCalled = true;
 
 		progress.stopThread();
 
-		SwingUtilities.invokeLater(this::disparityRender);
+		SwingUtilities.invokeLater(()->{
+			control.setProcessingTimeMS((time1-time0)/1e6);
+			disparityRender();
+		});
 	}
 
 	/**
@@ -188,13 +191,24 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 						rectK,colorLeft.getWidth(),colorLeft.getHeight(),null);
 				pcv.clearPoints();
 				pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
-				pcv.setTranslationStep(baseline/30);
 				pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
+				changeSpeed3D();
 			}
+			double periodColor = baseline*5*control.periodScale();
+			PeriodicColorizer colorizer=null;
 			switch( control.colorScheme ) {
 				case 0: pcv.removeColorizer();break;
-				case 1: pcv.setColorizer(new RainbowColor_Y(baseline*5)); break;
-				case 2: pcv.setColorizer(new RainbowColor_Y_XZ(baseline*5,baseline*20)); break;
+				case 1: colorizer = new RainbowColorSingleAxis.X(); break;
+				case 2: colorizer = new RainbowColorSingleAxis.Y(); break;
+				case 3: colorizer = new RainbowColorSingleAxis.Z(); break;
+				case 4: colorizer = new RainbowColorAxisPlane.X_YZ(4.0); break;
+				case 5: colorizer = new RainbowColorAxisPlane.Y_XZ(4.0); break;
+				case 6: colorizer = new RainbowColorAxisPlane.Z_XY(4.0); break;
+			}
+			if( colorizer != null ) {
+				colorizer.setPeriod(periodColor);
+				colorizer.setOffset(control.offsetScale());
+				pcv.setColorizer(colorizer);
 			}
 			comp = pcv.getComponent();
 			comp.requestFocusInWindow();
@@ -412,7 +426,15 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 		rectifyInputImages();
 
+		BoofSwingUtil.invokeNowOrLater(()->control.setImageSize(rectLeft.width,rectLeft.height));
+
 		doRefreshAll();
+	}
+
+	@Override
+	public void changeSpeed3D() {
+		double baseline = calib.getRightToLeft().getT().norm();
+		pcv.setTranslationStep(control.speedScale()*baseline/30);
 	}
 
 	/**
@@ -428,11 +450,10 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 		@Override
 		public void doRun() {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					monitor.setProgress(state);
-					state = (++state % 100);
-				}});
+			SwingUtilities.invokeLater(() -> {
+				monitor.setProgress(state);
+				state = (++state % 100);
+			});
 		}
 	}
 

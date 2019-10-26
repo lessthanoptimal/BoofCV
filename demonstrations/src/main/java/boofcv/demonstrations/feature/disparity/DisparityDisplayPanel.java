@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.feature.disparity;
 
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
@@ -34,27 +35,6 @@ import java.awt.event.ActionListener;
 public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		implements ChangeListener, ActionListener
 {
-
-	// how much the input should be scaled down by
-	JSpinner inputScaleSpinner;
-	// selects which image to view
-	JComboBox viewSelector;
-	// If the point cloud should be colorized or not
-	JComboBox comboColorizer = combo(0,"Natural","Y","Y-XZ");
-
-	// toggles if invalid pixels are black or not
-	JCheckBox invalidToggle;
-
-	JCheckBox checkRecompute;
-
-	JSpinner minDisparitySpinner;
-	JSpinner maxDisparitySpinner;
-	JCheckBox subpixelToggle;
-	JSpinner radiusSpinner;
-	JSpinner errorSpinner;
-	JSpinner reverseSpinner;
-	JSpinner textureSpinner;
-
 	// which image to show
 	int selectedView;
 
@@ -62,6 +42,10 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	boolean colorInvalid = false;
 	boolean useSubpixel = true;
 
+	// range 0 to 1000
+	int periodAdjust=500;
+	int offsetAdjust=500;
+	int speedAdjust=500;
 
 	int colorScheme = 0;
 	// minimum disparity to calculate
@@ -78,6 +62,33 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	double texture = 0.15;
 	// scale factor for input images
 	int inputScale = 100;
+
+	protected JLabel processingTimeLabel = new JLabel();
+	protected JLabel imageSizeLabel = new JLabel();
+
+	// how much the input should be scaled down by
+	JSpinner inputScaleSpinner;
+	// selects which image to view
+	JComboBox viewSelector;
+	// If the point cloud should be colorized or not
+	JComboBox comboColorizer = combo(0,"Natural","X","Y","Z","X-YZ","Y-XZ","Z-XY");
+
+	JSlider sliderPeriodColor = slider(0,1000,periodAdjust,100);
+	JSlider sliderOffsetColor = slider(0,1000,offsetAdjust,100);
+	JSlider sliderSpeed3D = slider(0,1000,speedAdjust,100);
+
+	// toggles if invalid pixels are black or not
+	JCheckBox invalidToggle;
+
+	JCheckBox checkRecompute;
+
+	JSpinner minDisparitySpinner;
+	JSpinner maxDisparitySpinner;
+	JCheckBox subpixelToggle;
+	JSpinner radiusSpinner;
+	JSpinner errorSpinner;
+	JSpinner reverseSpinner;
+	JSpinner textureSpinner;
 
 	// listener for changes in states
 	Listener listener;
@@ -96,8 +107,13 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		textureSpinner = spinner(texture,0.0,1.0,0.05,1,3);
 		checkRecompute = checkbox("Recompute",recompute);
 
+		addLabeled(processingTimeLabel, "Time (ms)");
+		addLabeled(imageSizeLabel,"Image Size");
 		addLabeled(viewSelector, "View");
 		addLabeled(comboColorizer,"Color");
+		addLabeled(sliderOffsetColor,"Offset");
+		addLabeled(sliderPeriodColor,"Period");
+		addLabeled(sliderSpeed3D,"Speed");
 		addAlignLeft(invalidToggle);
 		addSeparator(100);
 		addLabeled(minDisparitySpinner, "Min Disparity");
@@ -134,6 +150,18 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 			regionRadius = ((Number) radiusSpinner.getValue()).intValue();
 		} else if( e.getSource() == textureSpinner) {
 			texture = ((Number) textureSpinner.getValue()).doubleValue();
+		} else if( e.getSource() == sliderPeriodColor ) {
+			periodAdjust = sliderPeriodColor.getValue();
+			listener.disparityRender();
+			return;
+		} else if( e.getSource() == sliderOffsetColor ) {
+			offsetAdjust = sliderOffsetColor.getValue();
+			listener.disparityRender();
+			return;
+		} else if( e.getSource() == sliderSpeed3D) {
+			speedAdjust = sliderSpeed3D.getValue();
+			listener.changeSpeed3D();
+			return;
 		}
 
 		if( minDisparity >= maxDisparity ) {
@@ -167,50 +195,58 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		}
 	}
 
+	public double periodScale() {
+		if( periodAdjust > 500 ) {
+			double f = (periodAdjust-500)/500.0;
+			return 1.0+f*10;
+		} else if( periodAdjust < 500 ) {
+			double f = (500-periodAdjust)/500.0;
+			return 1.0-0.98*f;
+		} else {
+			return 1.0;
+		}
+	}
+
+	public double offsetScale() {
+		return (offsetAdjust-500)/500.0;
+	}
+
+	public double speedScale() {
+		if( speedAdjust > 500 ) {
+			double f = (speedAdjust-500)/500.0;
+			return Math.pow(2.0,f*6);
+		} else if( speedAdjust < 500 ) {
+			double f = (500-speedAdjust)/500.0;
+			return 1.0-0.98*f;
+		} else {
+			return 1.0;
+		}
+	}
+
 	public void setActiveGui( boolean error , boolean reverse ) {
-		setEnabled(12,error);
-		setEnabled(13,reverse);
-		setEnabled(14,error);
-		setEnabled(15,reverse);
+		errorSpinner.setEnabled(error);
+		reverseSpinner.setEnabled(reverse);
+	}
+
+	public void setImageSize( final int width , final int height ) {
+		BoofSwingUtil.invokeNowOrLater(() -> imageSizeLabel.setText(width+" x "+height));
+	}
+
+	public void setProcessingTimeMS(double ms ) {
+		BoofSwingUtil.checkGuiThread();
+		processingTimeLabel.setText(String.format("%7.1f",ms));
 	}
 
 	public void setListener(Listener listener ) {
 		this.listener = listener;
 	}
 
-	public int getReverseTol() {
-		return reverseTol;
-	}
-
-	public int getMaxDisparity() {
-
-		return maxDisparity;
-	}
-
-	public int getPixelError() {
-		return pixelError;
-	}
-
-	public int getSelectedView() {
-		return selectedView;
-	}
-
-	public int getRegionRadius() {
-		return regionRadius;
-	}
-
-	public double getTexture() {
-		return texture;
-	}
-
 	public interface Listener
 	{
 		void disparitySettingChange();
-
 		void disparityGuiChange();
-
 		void disparityRender();
-
 		void changeInputScale();
+		void changeSpeed3D();
 	}
 }
