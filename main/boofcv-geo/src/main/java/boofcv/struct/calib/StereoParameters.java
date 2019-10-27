@@ -22,6 +22,7 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ejml.dense.row.MatrixFeatures_DDRM;
 
 import java.io.Serializable;
 
@@ -94,6 +95,21 @@ public class StereoParameters implements Serializable {
 	 */
 	public double getBaseline() {
 		return rightToLeft.getT().norm();
+	}
+
+	/**
+	 * Checks to see if the parameters define a rectified stereo pair
+	 * @param tol Numeric tolerance. Try 1e-7
+	 * @return if true then it's rectified
+	 */
+	public boolean isRectified( double tol ) {
+		if( !left.isDistorted() && !right.isDistorted() ) {
+			Vector3D_F64 T = rightToLeft.T;
+			if( T.y == 0 && T.z == 0.0 && MatrixFeatures_DDRM.isIdentity(rightToLeft.R,tol)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void print() {

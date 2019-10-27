@@ -69,6 +69,9 @@ public abstract class DemonstrationBase extends JPanel {
 	// controls by synchornized(inputStreams)
 	protected InputMethod inputMethod = InputMethod.NONE;
 
+	// if set to true then the input isn't assumed to be images any more and references to files is passed in
+	protected boolean inputAsFile = false;
+
 	// When set to true the input's size is known and the GUI should be adjusted
 	volatile boolean inputSizeKnown = false;
 
@@ -339,6 +342,11 @@ public abstract class DemonstrationBase extends JPanel {
 	public abstract void processImage(int sourceID, long frameID, final BufferedImage buffered , final ImageBase input  );
 
 	/**
+	 * Called when the input is a set of files and not image based
+	 */
+	public void processFiles( String[] filePaths  ){}
+
+	/**
 	 * Opens a file.  First it will attempt to open it as an image.  If that fails it will try opening it as a
 	 * video.  If all else fails tell the user it has failed.  If a streaming source was running before it will
 	 * be stopped.
@@ -412,13 +420,19 @@ public abstract class DemonstrationBase extends JPanel {
 
 		stopAllInputProcessing();
 
-		synchronized (inputStreams) {
-			inputMethod = InputMethod.IMAGE_SET;
+		if( inputAsFile ) {
 			inputFileSet = files;
-			if( threadProcess != null )
-				throw new RuntimeException("There is still an active stream thread!");
-			threadProcess = new ProcessImageSetThread(files);
+			threadProcess = new ProcessFileSetThread(files);
 			imageSetSize = files.length;
+		} else {
+			synchronized (inputStreams) {
+				inputMethod = InputMethod.IMAGE_SET;
+				inputFileSet = files;
+				if (threadProcess != null)
+					throw new RuntimeException("There is still an active stream thread!");
+				threadProcess = new ProcessImageSetThread(files);
+				imageSetSize = files.length;
+			}
 		}
 		threadPool.execute(threadProcess);
 	}
@@ -707,6 +721,26 @@ public abstract class DemonstrationBase extends JPanel {
 	abstract class ProcessThread implements Runnable {
 		volatile boolean requestStop = false;
 		volatile boolean running = true;
+	}
+
+	class ProcessFileSetThread extends ProcessThread {
+
+		String[] files;
+
+		public ProcessFileSetThread(String[] files) {
+			this.files = files;
+		}
+
+		@Override
+		public void run() {
+			processFiles(files);
+			inputSizeKnown = true;
+			synchronized (lockStartingProcess) {
+				startingProcess = false;
+			}
+
+			running = false;
+		}
 	}
 
 	class ProcessImageSetThread extends ProcessThread {

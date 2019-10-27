@@ -48,6 +48,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	int offsetAdjust=500;
 	int speedAdjust=500;
 
+	// which algorithm to run
+	int selectedAlg = 0;
 	int colorScheme = 0;
 	// minimum disparity to calculate
 	int minDisparity = 0;
@@ -84,6 +86,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	JCheckBox checkRecompute  = checkbox("Recompute",recompute);
 	JCheckBox checkConcurrent = checkbox("concurrent",concurrent);
 
+	JComboBox comboAlg = combo(selectedAlg,"Five Regions","Region","Region Basic");
 	JSpinner minDisparitySpinner = spinner(minDisparity,0,255,5);
 	JSpinner maxDisparitySpinner = spinner(maxDisparity,1,255,5);
 	JCheckBox subpixelToggle = checkbox("Subpixel",useSubpixel);
@@ -107,7 +110,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addLabeled(sliderPeriodColor,"Period");
 		addLabeled(sliderSpeed3D,"Speed");
 		addAlignLeft(invalidToggle);
-		addSeparator(100);
+		addSeparator(150);
+		addAlignCenter(comboAlg);
 		addLabeled(minDisparitySpinner, "Min Disparity");
 		addLabeled(maxDisparitySpinner, "Max Disparity");
 		addAlignLeft(subpixelToggle);
@@ -115,8 +119,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addLabeled(errorSpinner,     "Max Error");
 		addLabeled(textureSpinner,   "Texture");
 		addLabeled(reverseSpinner,   "Reverse");
-		addSeparator(100);
-		addLabeled(inputScaleSpinner, "Image Scale");
+		addSeparator(150);
+		addLabeled(inputScaleSpinner, "Scale Input");
 		addAlignLeft(checkRecompute);
 		addAlignLeft(checkConcurrent);
 		addVerticalGlue();
@@ -177,6 +181,9 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		} else if( e.getSource() == comboColorizer) {
 			colorScheme = comboColorizer.getSelectedIndex();
 			listener.changeView3D();
+		} else if( e.getSource() == comboAlg) {
+			selectedAlg = comboAlg.getSelectedIndex();
+			listener.algorithmChanged();
 		} else if( e.getSource() == invalidToggle) {
 			colorInvalid = invalidToggle.isSelected();
 			listener.disparityRender();
@@ -249,6 +256,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 
 	public interface Listener
 	{
+		void algorithmChanged();
 		void disparitySettingChange();
 		void disparityGuiChange();
 		void disparityRender();
