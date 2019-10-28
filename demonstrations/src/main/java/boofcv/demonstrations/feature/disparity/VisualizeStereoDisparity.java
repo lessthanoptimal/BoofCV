@@ -44,6 +44,7 @@ import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.*;
 import boofcv.visualize.*;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
@@ -52,6 +53,10 @@ import org.ejml.ops.ConvertMatrixData;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -96,7 +101,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	// GUI components
 	private final DisparityDisplayPanel control = new DisparityDisplayPanel();
 	private final JPanel panel = new JPanel();
-	private final ShapeVisualizePanel gui = new ShapeVisualizePanel();
+	private final DisparityImageView gui = new DisparityImageView();
 	private final PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
 
 	// if true the point cloud has already been computed and does not need to be recomputed
@@ -223,6 +228,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 				double baseline = calib.getRightToLeft().getT().norm();
 				d2c.configure(baseline, rectK,rectR, leftRectToPixel, control.minDisparity,control.maxDisparity);
+				if(gui.state==2) // has the user defined the ROI?
+					d2c.setRegionOfInterest(gui.x0,gui.y0,gui.x1,gui.y1);
 				d2c.process(activeAlg.getDisparity(),colorLeft);
 
 				CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(
@@ -239,6 +246,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		panel.remove(pcv.getComponent());
 		panel.add(comp,BorderLayout.CENTER);
 		panel.validate();
+		comp.requestFocus();
 		comp.repaint();
 	}
 
@@ -431,6 +439,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		// When the input image has changed automatically scale and center
 		gui.autoScaleCenterOnSetImage = true;
 		gui.setPreferredSize(new Dimension(inputLeft.width,inputLeft.height));
+		gui.resetRoi();
 
 		rectifyInputImages();
 
@@ -472,6 +481,126 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	@Override
 	public void changeZoom() {
 		gui.setScale(control.zoom);
+	}
+
+	/**
+	 * Displays images and sets the user select a region of interest
+	 */
+	public class DisparityImageView extends ShapeVisualizePanel implements MouseListener, MouseMotionListener {
+		int x0,y0,x1,y1;
+
+		int state = 0;
+
+		public DisparityImageView() {
+			resetRoi();
+
+			panel.addMouseListener(this);
+			panel.addMouseMotionListener(this);
+
+			panel.addMouseWheelListener(e->{
+				double curr = scale;
+
+				if( e.getWheelRotation() > 0 )
+					curr *= 1.1;
+				else if( e.getWheelRotation() < 0 )
+					curr /= 1.1;
+				else
+					return;
+
+				setScale(curr);
+			});
+		}
+
+		@Override
+		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
+			if( state == 0 )
+				return;
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+			g2.setStroke(new BasicStroke(4));
+			g2.setColor(Color.RED);
+
+			int x0 = (int)Math.round(this.x0*scale);
+			int y0 = (int)Math.round(this.y0*scale);
+			int x1 = (int)Math.round(this.x1*scale);
+			int y1 = (int)Math.round(this.y1*scale);
+
+			g2.drawLine(x0,y0,x1,y0);
+			g2.drawLine(x1,y0,x1,y1);
+			g2.drawLine(x0,y1,x1,y1);
+			g2.drawLine(x0,y0,x0,y1);
+		}
+
+		void resetRoi() {
+			x0 = y0 = -1;
+			x1 = y1 = Integer.MAX_VALUE;
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			// clear region if one has been selected
+			if( state != 0 ) {
+				state = 0;
+				repaint();
+			}
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			panel.requestFocus();
+			if( SwingUtilities.isLeftMouseButton(e)) {
+				Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
+
+				// if shift it down the user is defining the ROI
+				if( (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0 ) {
+					state = 1;
+					x0 = x1 = (int)Math.round(p.x);
+					y0 = y1 = (int)Math.round(p.y);
+				} else {
+					centerView(p.x,p.y);
+				}
+			}
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			// Finish defining the ROI, save it, and update the cloud
+			if( state == 1 ) {
+				Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
+				x1 = (int)Math.round(p.x);
+				y1 = (int)Math.round(p.y);
+				state = 2;
+				changeImageView();
+			}
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// user exited, clear the ROI that's in progress
+			if( state == 1 ) {
+				resetRoi();
+				state = 0;
+			}
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			if( state == 1 ) {
+				Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
+				x1 = (int)Math.round(p.x);
+				y1 = (int)Math.round(p.y);
+				// just repaint what's needed. in theory
+//				panel.repaint(x0-10,y0-10,x1-x0+10,y1-y0+10);
+				panel.repaint();
+			}
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {}
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.struct.image.ImageGray;
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F32;
+import georegression.struct.shapes.Rectangle2D_I32;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
@@ -82,6 +83,9 @@ public class DisparityToColorPointCloud {
 
 	Point3D_F32 p = new Point3D_F32();
 
+	// region of interest
+	Rectangle2D_I32 roi = new Rectangle2D_I32();
+
 	/**
 	 * Stereo and intrinsic camera parameters
 	 * @param baseline Stereo baseline (world units)
@@ -105,6 +109,8 @@ public class DisparityToColorPointCloud {
 		this.minDisparity = minDisparity;
 
 		this.rangeDisparity = maxDisparity-minDisparity;
+
+		clearRegionOfInterest();
 	}
 
 	/**
@@ -128,10 +134,15 @@ public class DisparityToColorPointCloud {
 
 	private void process(GrayU8 disparity , BufferedImage color ) {
 
-		for( int pixelY = 0; pixelY < disparity.height; pixelY++ ) {
-			int index = disparity.startIndex + disparity.stride*pixelY;
+		final int x0 = Math.max(roi.x0,0);
+		final int y0 = Math.max(roi.y0,0);
+		final int x1 = Math.min(roi.x1,disparity.width);
+		final int y1 = Math.min(roi.y1,disparity.height);
 
-			for( int pixelX = 0; pixelX < disparity.width; pixelX++ ) {
+		for( int pixelY = y0; pixelY < y1; pixelY++ ) {
+			int index = disparity.startIndex + disparity.stride*pixelY + x0;
+
+			for( int pixelX = x0; pixelX < x1; pixelX++ ) {
 				int value = disparity.data[index++] & 0xFF;
 
 				if( value >= rangeDisparity )
@@ -162,10 +173,17 @@ public class DisparityToColorPointCloud {
 
 	private void process(GrayF32 disparity , BufferedImage color ) {
 
-		for( int pixelY = 0; pixelY < disparity.height; pixelY++ ) {
-			int index = disparity.startIndex + disparity.stride*pixelY;
+		final int x0 = Math.max(roi.x0,0);
+		final int y0 = Math.max(roi.y0,0);
+		final int x1 = Math.min(roi.x1,disparity.width);
+		final int y1 = Math.min(roi.y1,disparity.height);
 
-			for( int pixelX = 0; pixelX < disparity.width; pixelX++ ) {
+//		System.out.println("ROI "+)
+
+		for( int pixelY = y0; pixelY < y1; pixelY++ ) {
+			int index = disparity.startIndex + disparity.stride*pixelY + x0;
+
+			for( int pixelX = x0; pixelX < x1; pixelX++ ) {
 				float value = disparity.data[index++];
 
 				// invalid disparity
@@ -200,6 +218,14 @@ public class DisparityToColorPointCloud {
 		} else {
 			return 0x000000;
 		}
+	}
+
+	public void setRegionOfInterest(int x0 , int y0 , int x1 , int y1 ) {
+		roi.set(x0, y0, x1, y1);
+	}
+
+	public void clearRegionOfInterest() {
+		roi.set(-1,-1,Integer.MAX_VALUE,Integer.MAX_VALUE);
 	}
 
 	public GrowQueue_F32 getCloud() {
