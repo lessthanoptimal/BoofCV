@@ -36,7 +36,6 @@ public abstract class DetectBlackShapePanel extends StandardAlgConfigPanel {
 
 	public double zoom = 1;
 
-
 	public void setZoom( double _zoom ) {
 		_zoom = Math.max(MIN_ZOOM,_zoom);
 		_zoom = Math.min(MAX_ZOOM,_zoom);

@@ -211,7 +211,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 			active = work;
 		}
 
-		guiImage.setBufferedImage(active);
+		guiImage.setImage(active);
 		guiImage.setScale(controls.zoom);
 
 		guiImage.repaint();

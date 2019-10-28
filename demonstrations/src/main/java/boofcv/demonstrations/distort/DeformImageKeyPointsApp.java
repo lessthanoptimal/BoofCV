@@ -163,7 +163,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		BoofSwingUtil.invokeNowOrLater(new Runnable() {
 			@Override
 			public void run() {
-				gui.setBufferedImage(distortedBuff);
+				gui.setImage(distortedBuff);
 				gui.repaint();
 			}
 		});

@@ -208,13 +208,13 @@ public class VisualizeHoughBinary
 		public void handleViewChange() {
 			switch (view) {
 				case 0:
-					setBufferedImage(input);
+					setImage(input);
 					break;
 				case 1:
-					setBufferedImage(renderedBinary);
+					setImage(renderedBinary);
 					break;
 				case 2:
-					setBufferedImage(renderedTran);
+					setImage(renderedTran);
 					break;
 			}
 		}

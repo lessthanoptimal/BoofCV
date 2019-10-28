@@ -101,9 +101,9 @@ public class DisplayFisheyeCalibrationPanel extends DisplayCalibrationPanel<Came
 	}
 
 	@Override
-	public void setBufferedImage(BufferedImage image) {
+	public void setImage(BufferedImage image) {
 		BoofSwingUtil.checkGuiThread();
-		super.setBufferedImage(image);
+		super.setImage(image);
 		ConvertBufferedImage.convertFrom(image,imageFisheye,true);
 
 		if( imageFisheye.getNumBands() != imageRendered.getNumBands() ) {

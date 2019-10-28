@@ -211,8 +211,8 @@ public class StereoPlanarPanel extends JPanel
 		BufferedImage imageLeft = UtilImageIO.loadImage(listLeft.get(selected).getPath());
 		BufferedImage imageRight = UtilImageIO.loadImage(listRight.get(selected).getPath());
 
-		leftView.setBufferedImage(imageLeft);
-		rightView.setBufferedImage(imageRight);
+		leftView.setImage(imageLeft);
+		rightView.setImage(imageRight);
 
 		if( leftObservations == null )
 			return;

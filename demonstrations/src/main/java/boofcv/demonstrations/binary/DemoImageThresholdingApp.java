@@ -109,8 +109,8 @@ public class DemoImageThresholdingApp<T extends ImageGray<T>>
 
 	public void changeView() {
 		switch( controlPanel.view ) {
-			case 0: gui.setBufferedImage(inputCopy); break;
-			case 1: gui.setBufferedImage(visualizedBinary); break;
+			case 0: gui.setImage(inputCopy); break;
+			case 1: gui.setImage(visualizedBinary); break;
 		}
 		gui.repaint();
 	}

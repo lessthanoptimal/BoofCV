@@ -37,6 +37,9 @@ public class ImageZoomPanel extends JScrollPane {
 	protected BufferedImage img;
 	protected ImagePanel panel = new ImagePanel();
 
+	public boolean autoScaleCenterOnSetImage = true;
+	private boolean hasImageChanged = false;
+
 	protected double scale=1;
 	protected double transX=0,transY=0;
 
@@ -61,6 +64,28 @@ public class ImageZoomPanel extends JScrollPane {
 		panel.mouseListener = null;
 	}
 
+	/**
+	 * Automatically recomputes the scale to fit inside the window and centers it in the view
+	 * @param img
+	 */
+	private void autoScaleAndCenter( BufferedImage img ) {
+		double ratioW = (double) getWidth() / (double) img.getWidth();
+		double ratioH = (double) getHeight() / (double) img.getHeight();
+
+		double scale = Math.min(ratioW, ratioH);
+		if ( scale >= 1 )
+			scale = 1;
+
+		boolean scaleChange = this.scale != scale;
+		this.scale = scale;
+		if( scaleChange) {
+			if( listener != null ) {
+				listener.handleScaleChange(this.scale);
+			}
+		}
+		centerView(img.getWidth()/2,img.getHeight()/2);
+	}
+
 	public synchronized void setScale( double scale ) {
 		// do nothing if the scale has not changed
 		if( this.scale == scale )
@@ -83,7 +108,7 @@ public class ImageZoomPanel extends JScrollPane {
 		{
 			ImageZoomListener listener = this.listener;
 			if( listener != null ) {
-				listener.handleScalehange(this.scale);
+				listener.handleScaleChange(this.scale);
 			}
 		}
 	}
@@ -105,7 +130,7 @@ public class ImageZoomPanel extends JScrollPane {
 		if( scaleChanged ) {
 			ImageZoomListener listener = this.listener;
 			if( listener != null ) {
-				listener.handleScalehange(this.scale);
+				listener.handleScaleChange(this.scale);
 			}
 		}
 	}
@@ -124,13 +149,14 @@ public class ImageZoomPanel extends JScrollPane {
 	 *
 	 * @param image The new image which will be displayed.
 	 */
-	public synchronized void setBufferedImage(BufferedImage image) {
+	public synchronized void setImage(BufferedImage image) {
 		// assume the image was initially set before the GUI was invoked
 		if( checkEventDispatch && this.img != null ) {
 			if( !SwingUtilities.isEventDispatchThread() )
 				throw new RuntimeException("Changed image when not in GUI thread?");
 		}
 
+		hasImageChanged = true;
 		this.img = image;
 		if( image != null )
 			updateSize(image.getWidth(),image.getHeight());
@@ -154,6 +180,7 @@ public class ImageZoomPanel extends JScrollPane {
 			if( !SwingUtilities.isEventDispatchThread() )
 				throw new RuntimeException("Changed image when not in GUI thread?");
 		}
+		hasImageChanged = true;
 		this.img = image;
 	}
 
@@ -190,7 +217,15 @@ public class ImageZoomPanel extends JScrollPane {
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 
+
 			if( img == null ) return;
+
+			if( hasImageChanged ) {
+				hasImageChanged = false;
+				if( autoScaleCenterOnSetImage ) {
+					autoScaleAndCenter(img);
+				}
+			}
 
 			// render to a buffer first to improve performance. This is particularly evident when rendering
 			// lines for some reason
@@ -249,6 +284,6 @@ public class ImageZoomPanel extends JScrollPane {
 	}
 
 	public interface ImageZoomListener {
-		void handleScalehange( double scale );
+		void handleScaleChange(double scale );
 	}
 }

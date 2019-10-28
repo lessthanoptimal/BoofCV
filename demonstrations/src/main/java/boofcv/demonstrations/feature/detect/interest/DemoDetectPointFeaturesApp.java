@@ -132,7 +132,7 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		BoofSwingUtil.invokeNowOrLater(() -> {
 
 			controls.setProcessingTime(period.update(seconds));
-			imagePanel.setBufferedImage(buffered);
+			imagePanel.setImage(buffered);
 			imagePanel.repaint();
 		});
 	}

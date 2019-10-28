@@ -224,9 +224,12 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 
 		public void handleViewChange() {
 			switch(view) {
-				case 0:setBufferedImage(input);break;
-				case 1:setBufferedImage(renderedBinary);break;
-				case 2:setBufferedImage(renderedTran);break;
+				case 0:
+					setImage(input);break;
+				case 1:
+					setImage(renderedBinary);break;
+				case 2:
+					setImage(renderedTran);break;
 			}
 		}
 

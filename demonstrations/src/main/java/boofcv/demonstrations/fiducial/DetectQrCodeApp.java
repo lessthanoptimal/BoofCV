@@ -489,7 +489,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 			active = work;
 		}
 
-		guiImage.setBufferedImage(active);
+		guiImage.setImage(active);
 		guiImage.setScale(controls.zoom);
 
 		guiImage.repaint();

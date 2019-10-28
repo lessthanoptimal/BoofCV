@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,7 +101,7 @@ public class WebcamZoomApp {
 		}
 		while( s.camera.isOpen() ) {
 			BufferedImage image = s.camera.getImage();
-			SwingUtilities.invokeLater(()->{gui.setBufferedImage(image);gui.repaint();});
+			SwingUtilities.invokeLater(()->{gui.setImage(image);gui.repaint();});
 		}
 	}
 }

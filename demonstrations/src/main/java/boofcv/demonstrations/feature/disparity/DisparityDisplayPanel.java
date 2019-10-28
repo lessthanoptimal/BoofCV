@@ -27,6 +27,9 @@ import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
+import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
+
 /**
  * Controls GUI and settings for disparity calculation
  *
@@ -37,6 +40,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 {
 	// which image to show
 	int selectedView;
+
+	public double zoom = 1;
 
 	boolean concurrent=true;
 	boolean recompute=true;
@@ -69,12 +74,15 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	protected JLabel processingTimeLabel = new JLabel();
 	protected JLabel imageSizeLabel = new JLabel();
 
+	// For zooming in and out of images
+	protected JSpinner selectZoom = spinner(1,MIN_ZOOM,MAX_ZOOM,0.1);
+
 	// how much the input should be scaled down by
 	JSpinner inputScaleSpinner = spinner(inputScale,5,100,10);
 	// selects which image to view
 	JComboBox viewSelector = combo(selectedView,"Disparity","Left","Right","View 3D");
 	// If the point cloud should be colorized or not
-	JComboBox comboColorizer = combo(0,"Natural","X","Y","Z","X-YZ","Y-XZ","Z-XY");
+	JComboBox comboColorizer = combo(0,"Color","X","Y","Z","X-YZ","Y-XZ","Z-XY");
 
 	JSlider sliderPeriodColor = slider(0,1000,periodAdjust,100);
 	JSlider sliderOffsetColor = slider(0,1000,offsetAdjust,100);
@@ -105,6 +113,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addLabeled(processingTimeLabel, "Time (ms)");
 		addLabeled(imageSizeLabel,"Image Size");
 		addLabeled(viewSelector, "View");
+		addLabeled(selectZoom,"Zoom");
 		addLabeled(comboColorizer,"Color");
 		addLabeled(sliderOffsetColor,"Offset");
 		addLabeled(sliderPeriodColor,"Period");
@@ -124,6 +133,16 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addAlignLeft(checkRecompute);
 		addAlignLeft(checkConcurrent);
 		addVerticalGlue();
+	}
+
+	public void setZoom( double _zoom ) {
+		_zoom = Math.max(MIN_ZOOM,_zoom);
+		_zoom = Math.min(MAX_ZOOM,_zoom);
+		if( _zoom == zoom )
+			return;
+		zoom = _zoom;
+
+		BoofSwingUtil.invokeNowOrLater(() -> selectZoom.setValue(zoom));
 	}
 
 	@Override
@@ -158,6 +177,10 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		} else if( e.getSource() == sliderSpeed3D) {
 			speedAdjust = sliderSpeed3D.getValue();
 			listener.changeView3D();
+			return;
+		} else if( e.getSource() == selectZoom ) {
+			zoom = ((Number) selectZoom.getValue()).doubleValue();
+			listener.changeZoom();
 			return;
 		}
 
@@ -262,5 +285,6 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		void disparityRender();
 		void changeInputScale();
 		void changeView3D();
+		void changeZoom();
 	}
 }

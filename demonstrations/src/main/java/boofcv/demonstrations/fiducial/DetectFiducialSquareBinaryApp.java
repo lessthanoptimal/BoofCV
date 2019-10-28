@@ -190,7 +190,7 @@ public class DetectFiducialSquareBinaryApp
 			active = work;
 		}
 
-		guiImage.setBufferedImage(active);
+		guiImage.setImage(active);
 		guiImage.setScale(controls.zoom);
 
 		guiImage.repaint();

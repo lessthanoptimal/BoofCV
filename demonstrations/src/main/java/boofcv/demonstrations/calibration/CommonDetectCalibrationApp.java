@@ -220,9 +220,9 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 	public void calibEventGUI() {
 		imagePanel.setScale(controlPanel.viewInfo.getZoom());
 		if( controlPanel.getSelectedView() == 0 ) {
-			imagePanel.setBufferedImage(input);
+			imagePanel.setImage(input);
 		} else if( controlPanel.getSelectedView() == 1 ){
-			imagePanel.setBufferedImage(binary);
+			imagePanel.setImage(binary);
 		} else {
 			throw new RuntimeException("Unknown");
 		}

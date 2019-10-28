@@ -98,7 +98,7 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 		BoofSwingUtil.invokeNowOrLater(new Runnable() {
 			@Override
 			public void run() {
-				mainView.setBufferedImage(image);
+				mainView.setImage(image);
 				double zoom = BoofSwingUtil.selectZoomToShowAll(mainView,image.getWidth(),image.getHeight());
 				mainView.setScale(zoom);
 				mainView.repaint();
@@ -156,7 +156,7 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 		if( selected < features.size() )
 			mainView.setResults(features.get(selected),results.get(selected), features);
 
-		mainView.setBufferedImage(image);
+		mainView.setImage(image);
 		double zoom = BoofSwingUtil.selectZoomToShowAll(mainView,image.getWidth(),image.getHeight());
 		mainView.setScale(zoom);
 		mainView.repaint();

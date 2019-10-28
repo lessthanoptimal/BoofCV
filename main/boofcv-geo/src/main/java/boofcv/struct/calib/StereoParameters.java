@@ -22,7 +22,6 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.EulerType;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
-import org.ejml.dense.row.MatrixFeatures_DDRM;
 
 import java.io.Serializable;
 
@@ -104,8 +103,8 @@ public class StereoParameters implements Serializable {
 	 */
 	public boolean isRectified( double tol ) {
 		if( !left.isDistorted() && !right.isDistorted() ) {
-			Vector3D_F64 T = rightToLeft.T;
-			if( T.y == 0 && T.z == 0.0 && MatrixFeatures_DDRM.isIdentity(rightToLeft.R,tol)) {
+			double angle = ConvertRotation3D_F64.matrixToRodrigues(rightToLeft.R,null).theta;
+			if( Math.abs(angle) < tol ) {
 				return true;
 			}
 		}

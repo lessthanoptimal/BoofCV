@@ -76,7 +76,7 @@ public class DisplayPinholeCalibrationPanel extends DisplayCalibrationPanel<Came
 	int lineY=-1;
 
 	@Override
-	public void setBufferedImage(BufferedImage image) {
+	public void setImage(BufferedImage image) {
 		this.distorted = image;
 
 		undoRadialDistortion(distorted);

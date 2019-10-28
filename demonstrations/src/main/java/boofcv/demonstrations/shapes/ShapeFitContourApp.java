@@ -135,7 +135,7 @@ public class ShapeFitContourApp
 			@Override
 			public void run() {
 				gui.setScale(controlPanel.getZoom());
-				gui.setBufferedImage(work);
+				gui.setImage(work);
 				gui.repaint();
 			}
 		});

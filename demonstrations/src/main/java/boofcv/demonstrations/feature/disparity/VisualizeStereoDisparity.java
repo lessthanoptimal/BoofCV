@@ -25,12 +25,12 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.d3.DisparityToColorPointCloud;
-import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
@@ -96,7 +96,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	// GUI components
 	private final DisparityDisplayPanel control = new DisparityDisplayPanel();
 	private final JPanel panel = new JPanel();
-	private final ImagePanel gui = new ImagePanel();
+	private final ShapeVisualizePanel gui = new ShapeVisualizePanel();
 	private final PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
 
 	// if true the point cloud has already been computed and does not need to be recomputed
@@ -136,6 +136,10 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 		add(BorderLayout.WEST,control);
 		add(BorderLayout.CENTER,panel);
+
+		// When a new image is opened it will be automatically re-scaled, Turn off that feature so that it doesn't
+		// keep on happening when views change
+		gui.setListener(scale-> {gui.autoScaleCenterOnSetImage = false;control.setZoom(gui.getScale());});
 	}
 
 	@Override
@@ -243,7 +247,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	 */
 	private void rectifyInputImages() {
 		// Check to see if the input images have already been recitified
-		rectifiedImages = calib.isRectified(1e-7);
+		rectifiedImages = calib.isRectified(1e-3);
 
 		// get intrinsic camera calibration matrices
 		DMatrixRMaj K1 = PerspectiveOps.pinholeToMatrix(calib.left, (DMatrixRMaj)null);
@@ -424,7 +428,9 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		ConvertBufferedImage.convertFrom(colorLeft,inputLeft,true);
 		ConvertBufferedImage.convertFrom(colorRight,inputRight,true);
 
-		setPreferredSize(new Dimension(200+inputLeft.width,30+inputLeft.height));
+		// When the input image has changed automatically scale and center
+		gui.autoScaleCenterOnSetImage = true;
+		gui.setPreferredSize(new Dimension(inputLeft.width,inputLeft.height));
 
 		rectifyInputImages();
 
@@ -461,6 +467,11 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 		pcv.setTranslationStep(control.speedScale()*baseline/30);
 		pcv.getComponent().repaint();
+	}
+
+	@Override
+	public void changeZoom() {
+		gui.setScale(control.zoom);
 	}
 
 	/**

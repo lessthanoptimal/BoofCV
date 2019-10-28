@@ -173,7 +173,7 @@ public class ImageEnhanceApp extends DemonstrationBase {
 		}
 
 		SwingUtilities.invokeLater(() -> {
-			imagePanel.setBufferedImage(output);
+			imagePanel.setImage(output);
 			imagePanel.repaint();
 		});
 	}
