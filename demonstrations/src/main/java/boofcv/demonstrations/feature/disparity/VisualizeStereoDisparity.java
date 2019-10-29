@@ -25,12 +25,12 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.d3.DisparityToColorPointCloud;
+import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
 import boofcv.io.ProgressMonitorThread;
@@ -101,7 +101,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	// GUI components
 	private final DisparityDisplayPanel control = new DisparityDisplayPanel();
 	private final JPanel panel = new JPanel();
-	private final DisparityImageView gui = new DisparityImageView();
+	private final DisparityImageView imagePanel = new DisparityImageView();
 	private final PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
 
 	// if true the point cloud has already been computed and does not need to be recomputed
@@ -137,14 +137,15 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 		panel.setLayout(new BorderLayout());
 		panel.add(control, BorderLayout.WEST);
-		panel.add(gui,BorderLayout.CENTER);
+		panel.add(imagePanel,BorderLayout.CENTER);
 
 		add(BorderLayout.WEST,control);
 		add(BorderLayout.CENTER,panel);
 
 		// When a new image is opened it will be automatically re-scaled, Turn off that feature so that it doesn't
 		// keep on happening when views change
-		gui.setListener(scale-> {gui.autoScaleCenterOnSetImage = false;control.setZoom(gui.getScale());});
+		imagePanel.setListener(scale-> {
+			imagePanel.autoScaleCenterOnSetImage = false;control.setZoom(imagePanel.getScale());});
 	}
 
 	@Override
@@ -207,7 +208,9 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	 */
 	private synchronized void changeImageView()
 	{
-		JComponent comp;
+		if( !SwingUtilities.isEventDispatchThread() )
+			throw new RuntimeException("Must be in UI thread");
+
 		if( control.selectedView < 3 ) {
 			BufferedImage img;
 
@@ -218,18 +221,19 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 				default: throw new RuntimeException("Unknown option");
 			}
 
-			gui.setImage(img);
-			gui.setPreferredSize(new Dimension(origLeft.getWidth(), origLeft.getHeight()));
-			comp = gui;
+			imagePanel.setImage(img);
+			imagePanel.setPreferredSize(new Dimension(origLeft.getWidth(), origLeft.getHeight()));
+			swapVisualizationPanel(imagePanel,pcv.getComponent());
 		} else {
+			// TODO spawn this into it's own thread?
 			if( !computedCloud ) {
 				computedCloud = true;
 				DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 
 				double baseline = calib.getRightToLeft().getT().norm();
 				d2c.configure(baseline, rectK,rectR, leftRectToPixel, control.minDisparity,control.maxDisparity);
-				if(gui.state==2) // has the user defined the ROI?
-					d2c.setRegionOfInterest(gui.x0,gui.y0,gui.x1,gui.y1);
+				if(imagePanel.state==2) // has the user defined the ROI?
+					d2c.setRegionOfInterest(imagePanel.x0, imagePanel.y0, imagePanel.x1, imagePanel.y1);
 				d2c.process(activeAlg.getDisparity(),colorLeft);
 
 				CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(
@@ -239,15 +243,19 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 				pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
 				changeView3D();
 			}
-			comp = pcv.getComponent();
-			comp.requestFocusInWindow();
+
+			swapVisualizationPanel(pcv.getComponent(), imagePanel);
 		}
-		panel.remove(gui);
-		panel.remove(pcv.getComponent());
-		panel.add(comp,BorderLayout.CENTER);
-		panel.validate();
-		comp.requestFocus();
-		comp.repaint();
+	}
+
+	private void swapVisualizationPanel( Component target , Component other ) {
+		if( panel != target.getParent() ) {
+			panel.removeAll();
+			panel.add(target,BorderLayout.CENTER);
+			panel.revalidate();
+		}
+		panel.repaint();
+		target.requestFocus();
 	}
 
 	/**
@@ -437,9 +445,9 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		ConvertBufferedImage.convertFrom(colorRight,inputRight,true);
 
 		// When the input image has changed automatically scale and center
-		gui.autoScaleCenterOnSetImage = true;
-		gui.setPreferredSize(new Dimension(inputLeft.width,inputLeft.height));
-		gui.resetRoi();
+		imagePanel.autoScaleCenterOnSetImage = true;
+		imagePanel.setPreferredSize(new Dimension(inputLeft.width,inputLeft.height));
+		imagePanel.resetRoi();
 
 		rectifyInputImages();
 
@@ -480,13 +488,13 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	@Override
 	public void changeZoom() {
-		gui.setScale(control.zoom);
+		imagePanel.setScale(control.zoom);
 	}
 
 	/**
 	 * Displays images and sets the user select a region of interest
 	 */
-	public class DisparityImageView extends ShapeVisualizePanel implements MouseListener, MouseMotionListener {
+	public class DisparityImageView extends ImageZoomPanel implements MouseListener, MouseMotionListener {
 		int x0,y0,x1,y1;
 
 		int state = 0;
@@ -541,7 +549,12 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		public void mouseClicked(MouseEvent e) {
 			// clear region if one has been selected
 			if( state != 0 ) {
+				boolean change = state == 2;
 				state = 0;
+				if( change ) {
+					computedCloud = false;
+					changeImageView();
+				}
 				repaint();
 			}
 		}
@@ -570,7 +583,20 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 				Point2D_F64 p = pixelToPoint(e.getX(), e.getY());
 				x1 = (int)Math.round(p.x);
 				y1 = (int)Math.round(p.y);
+
+				// make sure the top left is the lower extent
+				int x0 = Math.min(this.x0,this.x1);
+				int x1 = Math.max(this.x0,this.x1);
+				int y0 = Math.min(this.y0,this.y1);
+				int y1 = Math.max(this.y0,this.y1);
+				this.x0=x0;
+				this.x1=x1;
+				this.y0=y0;
+				this.y1=y1;
+
+				// tell it to update the view with the new region
 				state = 2;
+				computedCloud = false;
 				changeImageView();
 			}
 		}
@@ -584,6 +610,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			if( state == 1 ) {
 				resetRoi();
 				state = 0;
+				computedCloud = false;
+				changeImageView();
 			}
 		}
 
