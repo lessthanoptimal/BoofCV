@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.shapes;
 
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ImageZoomPanel;
 import georegression.struct.point.Point2D_F64;
 
@@ -39,16 +40,7 @@ public class ShapeVisualizePanel extends ImageZoomPanel {
 		});
 
 		panel.addMouseWheelListener(e->{
-			double curr = scale;
-
-			if( e.getWheelRotation() > 0 )
-				curr *= 1.1;
-			else if( e.getWheelRotation() < 0 )
-				curr /= 1.1;
-			else
-				return;
-
-			setScale(curr);
+			setScale(BoofSwingUtil.mouseWheelImageZoom(scale,e));
 		});
 	}
 }

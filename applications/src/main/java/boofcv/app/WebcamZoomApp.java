@@ -18,6 +18,7 @@
 
 package boofcv.app;
 
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.webcamcapture.OpenWebcamDialog;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
@@ -46,14 +47,7 @@ public class WebcamZoomApp {
 		gui.getImagePanel().addMouseWheelListener(new MouseAdapter() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				double curr = gui.getScale();
-
-				if( e.getWheelRotation() > 0 )
-					curr *= 1.1;
-				else
-					curr /= 1.1;
-
-				gui.setScale(curr);
+				gui.setScale(BoofSwingUtil.mouseWheelImageZoom(gui.getScale(),e));
 			}
 		});
 

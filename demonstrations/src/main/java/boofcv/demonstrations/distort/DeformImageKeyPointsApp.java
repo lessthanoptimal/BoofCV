@@ -95,12 +95,7 @@ public class DeformImageKeyPointsApp<T extends ImageBase<T>> extends Demonstrati
 		gui.addMouseWheelListener(new MouseAdapter() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				double curr = control.zoom;
-				if( e.getWheelRotation() > 0 )
-					curr *= 1.1;
-				else
-					curr /= 1.1;
-				control.setZoom(curr);
+				control.setZoom(BoofSwingUtil.mouseWheelImageZoom(control.zoom,e));
 			}
 		});
 	}

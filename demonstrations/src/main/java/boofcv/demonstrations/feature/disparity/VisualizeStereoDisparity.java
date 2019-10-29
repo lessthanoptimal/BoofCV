@@ -506,16 +506,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			panel.addMouseMotionListener(this);
 
 			panel.addMouseWheelListener(e->{
-				double curr = scale;
-
-				if( e.getWheelRotation() > 0 )
-					curr *= 1.1;
-				else if( e.getWheelRotation() < 0 )
-					curr /= 1.1;
-				else
-					return;
-
-				setScale(curr);
+				setScale(BoofSwingUtil.mouseWheelImageZoom(scale,e));
 			});
 		}
 

@@ -30,6 +30,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -60,6 +61,15 @@ public class BoofSwingUtil {
 		clicked |= e.isControlDown() && ((e.getModifiersEx() & 256) != 0);
 
 		return clicked;
+	}
+
+	public static double mouseWheelImageZoom(double scale , MouseWheelEvent e ) {
+		if( e.getWheelRotation() > 0 ) {
+			scale *= e.getWheelRotation()*1.1;
+		} else if( e.getWheelRotation() < 0 ){
+			scale /= -e.getWheelRotation()*1.1;
+		}
+		return scale;
 	}
 
 	public static File saveFileChooser(Component parent, FileTypes ...filters) {

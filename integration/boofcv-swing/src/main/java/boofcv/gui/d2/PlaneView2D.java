@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.gui.d2;
 
+import boofcv.gui.BoofSwingUtil;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -99,17 +100,16 @@ public class PlaneView2D extends JPanel implements MouseMotionListener, MouseLis
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		if( e.getWheelRotation() > 0 ) {
-			scale *= e.getWheelRotation()*1.2;
-		} else {
-			scale *= -e.getWheelRotation()*0.8;
-		}
+		double scale = BoofSwingUtil.mouseWheelImageZoom(this.scale,e);
+		if( scale == this.scale )
+			return;
 
 		if( scale < 0.001 )
 			scale = 0.001;
 		else if( scale > 1000 )
 			scale = 1000;
 
+		this.scale = scale;
 		repaint();
 	}
 

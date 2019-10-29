@@ -85,14 +85,7 @@ public class ImageEnhanceApp extends DemonstrationBase {
 		imagePanel.addMouseWheelListener(new MouseAdapter() {
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-
-				double curr = ImageEnhanceApp.this.controls.zoom;
-
-				if( e.getWheelRotation() > 0 )
-					curr *= 1.1;
-				else
-					curr /= 1.1;
-				controls.setZoom(curr);
+				controls.setZoom(BoofSwingUtil.mouseWheelImageZoom(ImageEnhanceApp.this.controls.zoom,e));
 			}
 		});
 

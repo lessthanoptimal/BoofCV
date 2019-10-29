@@ -109,17 +109,7 @@ public class ViewedImageInfoPanel extends StandardAlgConfigPanel
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-
-		double curr = zoom;
-
-		if( e.getWheelRotation() > 0 )
-			curr *= 1.1;
-		else if( e.getWheelRotation() < 0 )
-			curr /= 1.1;
-		else
-			return;
-
-		setScale(curr);
+		setScale(BoofSwingUtil.mouseWheelImageZoom(zoom,e));
 	}
 
 	public void setScale(double scale) {
