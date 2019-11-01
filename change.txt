@@ -15,6 +15,7 @@ Version : 0.35
 - Image Processing
   * Added Hessian determinant direct from input image
   * Added sumAbs() to ImageStatistics
+  * Added Census transform
 - Concurrency
   * PixelMath now only uses concurrent algorithm when input image is more than 10,000 pixels.
     Going MT on small images caused Circulant tracker to slow down.
@@ -46,8 +47,10 @@ TODO Videos - hough line detectors
 TODO corner detector 2 tech report
 TODO Scene Reconstruction from arbitrary number of photos
 TODO regression for line detectors
+TODO regression for stereo disparity using ground truth
 TODO hough circle detector
 TODO concurrent SIFT
+TODO concurrent dense features?
 
 ---------------------------------------------
 Date    : 2019-July-07
