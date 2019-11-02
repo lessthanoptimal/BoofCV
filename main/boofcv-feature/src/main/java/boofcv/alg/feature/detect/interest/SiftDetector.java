@@ -150,7 +150,7 @@ public class SiftDetector {
 		derivXY = FactoryConvolveSparse.convolve2D(GrayF32.class, kernelXY);
 		derivYY = FactoryConvolveSparse.vertical1D(GrayF32.class, kernelDD);
 
-		ImageBorder<GrayF32> border = FactoryImageBorder.single(GrayF32.class, BorderType.EXTENDED);
+		ImageBorder<GrayF32> border = FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class);
 
 		derivXX.setImageBorder(border);
 		derivXY.setImageBorder(border);

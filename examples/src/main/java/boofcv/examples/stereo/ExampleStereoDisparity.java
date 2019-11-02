@@ -23,7 +23,8 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.factory.feature.disparity.DisparityAlgorithms;
+import boofcv.factory.feature.disparity.ConfigureDisparityBMBest5;
+import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.image.ShowImages;
@@ -77,9 +78,17 @@ public class ExampleStereoDisparity {
 	{
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
-		StereoDisparity<GrayU8,GrayU8> disparityAlg =
-				FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT_FIVE,
-						minDisparity, maxDisparity, regionSize, regionSize, 25, 1, 0.2, GrayU8.class);
+		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
+		config.error = DisparityError.SAD;
+		config.minDisparity = minDisparity;
+		config.maxDisparity = maxDisparity;
+		config.subpixel = false;
+		config.regionRadiusX = config.regionRadiusY = regionSize;
+		config.maxPerPixelError = 25;
+		config.validateRtoL = 1;
+		config.texture = 0.2;
+		StereoDisparity<GrayU8, GrayU8> disparityAlg =
+				FactoryStereoDisparity.blockMatchBest5(config, GrayU8.class, GrayU8.class);
 
 		// process and return the results
 		disparityAlg.process(rectLeft,rectRight);
@@ -97,9 +106,17 @@ public class ExampleStereoDisparity {
 	{
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
-		StereoDisparity<GrayU8,GrayF32> disparityAlg =
-				FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-						minDisparity, maxDisparity, regionSize, regionSize, 25, 1, 0.2, GrayU8.class);
+		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
+		config.error = DisparityError.SAD;
+		config.minDisparity = minDisparity;
+		config.maxDisparity = maxDisparity;
+		config.subpixel = true;
+		config.regionRadiusX = config.regionRadiusY = regionSize;
+		config.maxPerPixelError = 25;
+		config.validateRtoL = 1;
+		config.texture = 0.2;
+		StereoDisparity<GrayU8, GrayF32> disparityAlg =
+				FactoryStereoDisparity.blockMatchBest5(config, GrayU8.class, GrayF32.class);
 
 		// process and return the results
 		disparityAlg.process(rectLeft,rectRight);

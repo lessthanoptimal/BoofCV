@@ -125,13 +125,13 @@ public class TestConvolveImageSparse {
 	protected static ImageBorder createBorder(Class<?> borderType ) {
 		ImageBorder ret;
 		if (ImageBorder_F32.class == borderType) {
-			ret = FactoryImageBorder.single(GrayF32.class, BorderType.REFLECT);
+			ret = FactoryImageBorder.single(BorderType.REFLECT, GrayF32.class);
 		} else if (ImageBorder_F64.class == borderType) {
-			ret = FactoryImageBorder.single(GrayF64.class, BorderType.REFLECT);
+			ret = FactoryImageBorder.single(BorderType.REFLECT, GrayF64.class);
 		} else if (ImageBorder_S32.class == borderType) {
-			ret =FactoryImageBorder.single(GrayS32.class, BorderType.REFLECT);
+			ret =FactoryImageBorder.single(BorderType.REFLECT, GrayS32.class);
 		} else if (ImageBorder_S64.class == borderType) {
-			ret = FactoryImageBorder.single(GrayS64.class, BorderType.REFLECT);
+			ret = FactoryImageBorder.single(BorderType.REFLECT, GrayS64.class);
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}

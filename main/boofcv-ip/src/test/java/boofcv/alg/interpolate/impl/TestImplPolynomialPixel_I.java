@@ -60,7 +60,7 @@ public class TestImplPolynomialPixel_I extends GeneralChecksInterpolationPixelS<
 
 		// set it up so that it will be equivalent to bilinear interpolation
 		InterpolatePixelS<GrayU8> alg = (InterpolatePixelS)new ImplPolynomialPixel_I(2,0,255);
-		alg.setBorder( FactoryImageBorder.singleValue(GrayU8.class, 0));
+		alg.setBorder( FactoryImageBorder.singleValue(0, GrayU8.class));
 
 		ImageDistort<GrayU8,GrayU8> distorter = FactoryDistort.distortSB(false, alg, GrayU8.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));

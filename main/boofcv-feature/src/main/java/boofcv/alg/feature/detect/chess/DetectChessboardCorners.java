@@ -150,7 +150,7 @@ public class DetectChessboardCorners<T extends ImageGray<T>, D extends ImageGray
 		interpY = FactoryInterpolation.bilinearPixelS(derivType, BorderType.ZERO);
 
 		// just give it something. this will be changed later
-		borderImg = FactoryImageBorder.single(imageType,BorderType.ZERO);
+		borderImg = FactoryImageBorder.single(BorderType.ZERO, imageType);
 		borderImg.setImage(GeneralizedImageOps.createSingleBand(imageType,1,1));
 		integral.setImage(FactoryGImageGray.wrap(borderImg));
 	}

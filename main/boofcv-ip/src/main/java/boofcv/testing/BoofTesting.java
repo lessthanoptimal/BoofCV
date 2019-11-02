@@ -605,23 +605,48 @@ public class BoofTesting {
 
 		// if no specialized check exists, use a slower generalized approach
 		if( imgA instanceof ImageGray) {
-			GImageGray a = FactoryGImageGray.wrap((ImageGray)imgA);
-			GImageGray b = FactoryGImageGray.wrap((ImageGray)imgB);
+			GImageGray a = FactoryGImageGray.wrap((ImageGray) imgA);
+			GImageGray b = FactoryGImageGray.wrap((ImageGray) imgB);
 
-			for( int y = borderY0; y < imgA.height-borderY1; y++ ) {
-				for( int x = borderX0; x < imgA.width-borderX1; x++ ) {
-					double valA = a.get(x,y).doubleValue();
-					double valB = b.get(x,y).doubleValue();
+			for (int y = borderY0; y < imgA.height - borderY1; y++) {
+				for (int x = borderX0; x < imgA.width - borderX1; x++) {
+					double valA = a.get(x, y).doubleValue();
+					double valB = b.get(x, y).doubleValue();
 
 					double error = Math.abs(valA - valB);
-					if( relative ) {
+					if (relative) {
 						double denominator = Math.abs(valA) + Math.abs(valB);
-						if( denominator == 0 )
+						if (denominator == 0)
 							denominator = 1;
 						error /= denominator;
 					}
-					if( error > tol )
-						throw new RuntimeException("Values not equal at ("+x+","+y+") "+valA+"  "+valB);
+					if (error > tol)
+						throw new RuntimeException("Values not equal at (" + x + "," + y + ") " + valA + "  " + valB);
+				}
+			}
+		} else if( imgA instanceof ImageInterleaved ) {
+			GImageMultiBand a = FactoryGImageMultiBand.wrap((ImageInterleaved) imgA);
+			GImageMultiBand b = FactoryGImageMultiBand.wrap((ImageInterleaved) imgB);
+
+			int numBands = a.getNumberOfBands();
+
+			for (int y = borderY0; y < imgA.height - borderY1; y++) {
+				for (int x = borderX0; x < imgA.width - borderX1; x++) {
+					for (int band = 0; band < numBands; band++) {
+						double valA = a.get(x, y, band).doubleValue();
+						double valB = b.get(x, y, band).doubleValue();
+
+						double error = Math.abs(valA - valB);
+						if (relative) {
+							double denominator = Math.abs(valA) + Math.abs(valB);
+							if (denominator == 0)
+								denominator = 1;
+							error /= denominator;
+						}
+						if (error > tol)
+							throw new RuntimeException("Values not equal at (" + x + "," + y + ","+band+") " + valA + "  " + valB);
+					}
+
 				}
 			}
 		} else if( imgA instanceof Planar){
@@ -731,6 +756,48 @@ public class BoofTesting {
 		}
 	}
 
+	/**
+	 * Checks to see if only the image borders are equal to each other within tolerance
+	 */
+	public static void assertEqualsBorder(ImageInterleaved imgA, ImageInterleaved imgB, double tol, int borderX, int borderY) {
+		if (imgA.getWidth() != imgB.getWidth())
+			throw new RuntimeException("Widths are not equals");
+
+		if (imgA.getHeight() != imgB.getHeight())
+			throw new RuntimeException("Heights are not equals");
+
+		int numBands = imgA.numBands;
+
+		GImageMultiBand a = FactoryGImageMultiBand.wrap(imgA);
+		GImageMultiBand b = FactoryGImageMultiBand.wrap(imgB);
+
+		for (int y = 0; y < imgA.getHeight(); y++) {
+			for (int x = 0; x < borderX; x++) {
+				for (int band = 0; band < numBands; band++) {
+					compareValues(tol, a, b, x, y, band);
+				}
+			}
+			for (int x = imgA.getWidth() - borderX; x < imgA.getWidth(); x++) {
+				for (int band = 0; band < numBands; band++) {
+					compareValues(tol, a, b, x, y, band);
+				}
+			}
+		}
+
+		for (int x = borderX; x < imgA.getWidth() - borderX; x++) {
+			for (int y = 0; y < borderY; y++) {
+				for (int band = 0; band < numBands; band++) {
+					compareValues(tol, a, b, x, y, band);
+				}
+			}
+			for (int y = imgA.getHeight() - borderY; y < imgA.getHeight(); y++) {
+				for (int band = 0; band < numBands; band++) {
+					compareValues(tol, a, b, x, y, band);
+				}
+			}
+		}
+	}
+
 	private static void compareValues(double tol, GImageGray a, GImageGray b, int x, int y) {
 		double normalizer = Math.abs(a.get(x, y).doubleValue()) + Math.abs(b.get(x, y).doubleValue());
 		if (normalizer < 1.0) normalizer = 1.0;
@@ -738,7 +805,12 @@ public class BoofTesting {
 			throw new RuntimeException("values not equal at (" + x + " " + y + ") " + a.get(x, y) + "  " + b.get(x, y));
 	}
 
-
+	private static void compareValues(double tol, GImageMultiBand a, GImageMultiBand b, int x, int y, int band) {
+		double normalizer = Math.abs(a.get(x, y, band).doubleValue()) + Math.abs(b.get(x, y, band).doubleValue());
+		if (normalizer < 1.0) normalizer = 1.0;
+		if (Math.abs(a.get(x, y, band).doubleValue() - b.get(x, y, band).doubleValue()) / normalizer > tol)
+			throw new RuntimeException("values not equal at (" + x + " " + y + " "+band+") " + a.get(x, y, band) + "  " + b.get(x, y, band));
+	}
 
 	public static void checkBorderZero(ImageGray outputImage, int border) {
 		GImageGray img = FactoryGImageGray.wrap(outputImage);

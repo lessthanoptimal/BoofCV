@@ -153,7 +153,7 @@ public class DetectChessboardCorners2<T extends ImageGray<T>> {
 		blurred = GeneralizedImageOps.createSingleBand(imageType,1,1);
 
 		// just give it something. this will be changed later
-		borderImg = FactoryImageBorder.single(imageType,BorderType.EXTENDED);
+		borderImg = FactoryImageBorder.single(BorderType.EXTENDED, imageType);
 		borderImg.setImage(GeneralizedImageOps.createSingleBand(imageType,1,1));
 		integral.setImage(FactoryGImageGray.wrap(borderImg));
 

@@ -247,7 +247,7 @@ public class TestLinearContourLabelChang2004 {
 	private List<Point2D_I32> findContour8(GrayS32 labeled, int target) {
 		List<Point2D_I32> list = new ArrayList<>();
 
-		ImageBorder<GrayS32> border = FactoryImageBorder.singleValue(labeled, 0);
+		ImageBorder<GrayS32> border = FactoryImageBorder.singleValue(0, labeled);
 
 		for( int y = 0; y < labeled.height; y++ ) {
 			for( int x = 0; x < labeled.width; x++ ) {
@@ -293,7 +293,7 @@ public class TestLinearContourLabelChang2004 {
 	private List<Point2D_I32> findContour4(GrayS32 labeled, int target) {
 		List<Point2D_I32> list = new ArrayList<>();
 
-		ImageBorder<GrayS32> border = FactoryImageBorder.singleValue(labeled, 0);
+		ImageBorder<GrayS32> border = FactoryImageBorder.singleValue(0, labeled);
 
 		for( int y = 0; y < labeled.height; y++ ) {
 			for( int x = 0; x < labeled.width; x++ ) {

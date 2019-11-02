@@ -56,7 +56,7 @@ public abstract class CommonImageDistortCacheTests<T extends ImageGray<T>> {
 	protected CommonImageDistortCacheTests(Class<T> imageType) {
 		this.imageType = imageType;
 		interp = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
-		interp.setBorder(FactoryImageBorder.singleValue(imageType, 1));
+		interp.setBorder(FactoryImageBorder.singleValue(1, imageType));
 
 		src = GeneralizedImageOps.createSingleBand(imageType,200,300);
 		dst0 = GeneralizedImageOps.createSingleBand(imageType,200,300);

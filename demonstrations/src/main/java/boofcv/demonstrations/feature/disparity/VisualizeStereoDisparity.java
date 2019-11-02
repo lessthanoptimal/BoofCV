@@ -24,8 +24,9 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.disparity.DisparityAlgorithms;
+import boofcv.factory.feature.disparity.ConfigureDisparityBM;
+import boofcv.factory.feature.disparity.ConfigureDisparityBMBest5;
+import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -294,7 +295,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		// compute transforms to apply rectify the images
 		leftRectToPixel = transformRectToPixel(calib.left, rect1);
 
-		ImageType<T> imageType = ImageType.single(activeAlg.getInputType());
+		ImageType<T> imageType = activeAlg.getInputType();
 
 		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3); // TODO simplify code some how
 		FMatrixRMaj rect2_F32 = new FMatrixRMaj(3,3);
@@ -359,54 +360,36 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		int maxDisparity = Math.min(colorLeft.getWidth()-2*r,control.maxDisparity);
 		int minDisparity = Math.min(maxDisparity,control.minDisparity);
 
-		if( control.useSubpixel ) {
-			switch( control.selectedAlg ) {
-				case 2:
-					changeGuiActive(false,false);
-					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT,minDisparity,
-							maxDisparity, r, r, -1, -1, -1, GrayU8.class);
+		Class dispType = control.useSubpixel ? GrayF32.class : GrayU8.class;
+		DisparityError error = control.selectedError == 0 ? DisparityError.SAD : DisparityError.CENSUS;
 
-				case 1:
-					changeGuiActive(true,true);
-					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT,minDisparity,
-							maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
-							GrayU8.class);
-
-				case 0:
-					changeGuiActive(true,true);
-					return (StereoDisparity)FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-							minDisparity, maxDisparity, r, r,
-							control.pixelError, control.reverseTol, control.texture,
-							GrayU8.class);
-
-				default:
-					throw new RuntimeException("Unknown selection");
-			}
+		if( control.selectedAlg == 0 ) {
+			changeGuiActive(true,true);
+			ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
+			config.error = error;
+			config.minDisparity = minDisparity;
+			config.maxDisparity = maxDisparity;
+			config.subpixel = control.useSubpixel;
+			config.regionRadiusX = config.regionRadiusY = r;
+			config.maxPerPixelError = control.pixelError;
+			config.validateRtoL = control.reverseTol;
+			config.texture = control.texture;
+			return FactoryStereoDisparity.blockMatchBest5(config,GrayU8.class,dispType);
+		} else if( control.selectedAlg == 1 ) {
+			changeGuiActive(true,true);
+			ConfigureDisparityBM config = new ConfigureDisparityBM();
+			config.error = error;
+			config.minDisparity = minDisparity;
+			config.maxDisparity = maxDisparity;
+			config.subpixel = control.useSubpixel;
+			config.regionRadiusX = config.regionRadiusY = r;
+			config.maxPerPixelError = control.pixelError;
+			config.validateRtoL = control.reverseTol;
+			config.texture = control.texture;
+			return FactoryStereoDisparity.blockMatch(config,GrayU8.class,dispType);
 		} else {
-			switch( control.selectedAlg ) {
-				case 2:
-					changeGuiActive(false,false);
-					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,minDisparity,
-							maxDisparity, r, r, -1, -1, -1, GrayU8.class);
-
-				case 1:
-					changeGuiActive(true,true);
-					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,minDisparity,
-							maxDisparity, r, r, control.pixelError, control.reverseTol, control.texture,
-							GrayU8.class);
-
-				case 0:
-					changeGuiActive(true,true);
-					return (StereoDisparity)FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT_FIVE,
-							minDisparity, maxDisparity, r, r,
-							control.pixelError, control.reverseTol, control.texture,
-							GrayU8.class);
-
-				default:
-					throw new RuntimeException("Unknown selection");
-			}
+			throw new RuntimeException("Unknown type");
 		}
-
 	}
 
 	/**
@@ -436,10 +419,10 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 		createAlgConcurrent();
 
-		inputLeft = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
-		inputRight = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
-		rectLeft = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
-		rectRight = GeneralizedImageOps.createSingleBand(activeAlg.getInputType(),w,h);
+		inputLeft = activeAlg.getInputType().createImage(w,h);
+		inputRight = activeAlg.getInputType().createImage(w,h);
+		rectLeft = activeAlg.getInputType().createImage(w,h);
+		rectRight = activeAlg.getInputType().createImage(w,h);
 
 		ConvertBufferedImage.convertFrom(colorLeft,inputLeft,true);
 		ConvertBufferedImage.convertFrom(colorRight,inputRight,true);

@@ -23,7 +23,7 @@ import boofcv.struct.image.ImageGray;
 /**
  * <p>
  * Selects the best disparity given the set of scores calculated by
- * {@link boofcv.alg.feature.disparity.DisparityScoreSadRect}. The scores
+ * {@link DisparityBlockMatch}. The scores
  * are provided as an array of integers or floats.  A disparity of zero either means
  * no match was found or the disparity was in fact zero.
  * </p>
@@ -50,7 +50,7 @@ public interface DisparitySelect<Array , T extends ImageGray> {
 
 	/**
 	 * Processes the array of scores. The score format is described in
-	 * {@link boofcv.alg.feature.disparity.DisparityScoreSadRect}.  The results are written directly into the
+	 * {@link DisparityBlockMatch}.  The results are written directly into the
 	 * disparity image passed to it in {@link #configure(ImageGray, int, int, int)}.
 	 *
 	 * @param row Image row the scores are from.

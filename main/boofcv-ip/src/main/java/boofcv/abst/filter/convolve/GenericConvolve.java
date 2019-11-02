@@ -58,7 +58,7 @@ public class GenericConvolve<Input extends ImageBase<Input>, Output extends Imag
 		if( type == BorderType.SKIP || type == BorderType.NORMALIZED )
 			this.borderRule = null;
 		else
-			borderRule = FactoryImageBorder.single((Class) params[1], type);
+			borderRule = FactoryImageBorder.single(type, (Class) params[1]);
 	}
 
 	@Override

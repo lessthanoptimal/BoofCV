@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,10 @@
 
 package boofcv.abst.feature.disparity;
 
-import boofcv.alg.feature.disparity.impl.ImplDisparitySparseScoreSadRect_F32;
+import boofcv.alg.feature.disparity.impl.ImplDisparitySparseScoreBM_SAD_F32;
 import boofcv.alg.feature.disparity.impl.ImplSelectSparseBasicWta_F32;
-import boofcv.factory.feature.disparity.DisparityAlgorithms;
+import boofcv.factory.feature.disparity.ConfigureDisparityBM;
+import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -53,12 +54,21 @@ public class TestWrapDisparitySparseSadRect {
 		GrayF32 left = new GrayF32(w,h);
 		GrayF32 right = new GrayF32(w,h);
 
+		ConfigureDisparityBM config = new ConfigureDisparityBM();
+		config.regionRadiusX = config.regionRadiusY = r;
+		config.subpixel = false;
+		config.error = DisparityError.SAD;
+		config.minDisparity = minDisparity;
+		config.maxDisparity = maxDisparity;
+		config.maxPerPixelError = -1;
+		config.texture = -1;
+		config.validateRtoL = -1;
+
 		StereoDisparity<GrayF32,GrayU8> validator =
-				FactoryStereoDisparity.regionWta(DisparityAlgorithms.RECT,
-						minDisparity,maxDisparity,r,r,-1,-1,-1,GrayF32.class);
+				FactoryStereoDisparity.blockMatch(config,GrayF32.class,GrayU8.class);
 		StereoDisparitySparse<GrayF32> alg =
-				new WrapDisparitySparseSadRect<>(
-						new ImplDisparitySparseScoreSadRect_F32(minDisparity, maxDisparity, r, r),
+				new WrapDisparityBlockSparseSad<>(
+						new ImplDisparitySparseScoreBM_SAD_F32(minDisparity, maxDisparity, r, r),
 						new ImplSelectSparseBasicWta_F32());
 
 		validator.process(left,right);

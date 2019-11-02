@@ -55,6 +55,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 
 	// which algorithm to run
 	int selectedAlg = 0;
+	// Which error method to use
+	int selectedError = 0;
 	int colorScheme = 0;
 	// minimum disparity to calculate
 	int minDisparity = 0;
@@ -95,6 +97,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	JCheckBox checkConcurrent = checkbox("concurrent",concurrent);
 
 	JComboBox comboAlg = combo(selectedAlg,"Five Regions","Region","Region Basic");
+	JComboBox comboError = combo(selectedError,"SAD","Census");
 	JSpinner minDisparitySpinner = spinner(minDisparity,0,255,5);
 	JSpinner maxDisparitySpinner = spinner(maxDisparity,1,255,5);
 	JCheckBox subpixelToggle = checkbox("Subpixel",useSubpixel);
@@ -121,6 +124,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addAlignLeft(invalidToggle);
 		addSeparator(150);
 		addAlignCenter(comboAlg);
+		addAlignCenter(comboError);
 		addLabeled(minDisparitySpinner, "Min Disparity");
 		addLabeled(maxDisparitySpinner, "Max Disparity");
 		addAlignLeft(subpixelToggle);
@@ -206,6 +210,9 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 			listener.changeView3D();
 		} else if( e.getSource() == comboAlg) {
 			selectedAlg = comboAlg.getSelectedIndex();
+			listener.algorithmChanged();
+		} else if( e.getSource() == comboError) {
+			selectedError = comboError.getSelectedIndex();
 			listener.algorithmChanged();
 		} else if( e.getSource() == invalidToggle) {
 			colorInvalid = invalidToggle.isSelected();

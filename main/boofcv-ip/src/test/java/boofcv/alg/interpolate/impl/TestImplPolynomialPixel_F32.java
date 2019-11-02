@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,14 +59,14 @@ public class TestImplPolynomialPixel_F32 extends GeneralChecksInterpolationPixel
 
 		// set it up so that it will be equivalent to bilinear interpolation
 		ImplPolynomialPixel_F32 alg = new ImplPolynomialPixel_F32(2,0,255);
-		alg.setBorder(FactoryImageBorder.singleValue(GrayF32.class, 0));
+		alg.setBorder(FactoryImageBorder.singleValue(0, GrayF32.class));
 
 		ImageDistort<GrayF32,GrayF32> distorter = FactoryDistort.distortSB(false, alg, GrayF32.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));
 		distorter.apply(img,found);
 
 		InterpolatePixelS<GrayF32> bilinear = FactoryInterpolation.bilinearPixelS(GrayF32.class,null);
-		bilinear.setBorder(FactoryImageBorder.singleValue(GrayF32.class, 0));
+		bilinear.setBorder(FactoryImageBorder.singleValue(0, GrayF32.class));
 
 		distorter = FactoryDistort.distortSB(false, bilinear, GrayF32.class);
 		distorter.setModel(new PixelTransformAffine_F32(tran));

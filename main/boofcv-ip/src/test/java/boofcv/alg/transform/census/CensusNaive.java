@@ -21,10 +21,11 @@ package boofcv.alg.transform.census;
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
 import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.BorderType;
-import boofcv.struct.image.GrayS32;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.*;
+import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * Brute force implementation of Census Transform used for testing
@@ -74,6 +75,59 @@ public class CensusNaive {
 					}
 				}
 				output.set(x,y,census);
+			}
+		}
+	}
+
+	public static void sample(ImageGray input , final FastQueue<Point2D_I32> sample, GrayS64 output ) {
+		output.reshape(input.width,input.height);
+		GImageGray src = FactoryGImageGray.wrap(FactoryImageBorder.wrap(BorderType.EXTENDED,input));
+
+		for (int y = 0; y < input.height; y++) {
+			for (int x = 0; x < input.width; x++) {
+				long census = 0;
+				int bit = 1;
+				double center = src.get(x,y).doubleValue();
+				for (int i = 0; i < sample.size; i++) {
+					Point2D_I32 p = sample.get(i);
+					if( src.get(x+p.x,y+p.y).doubleValue() > center ) {
+						census |= bit;
+					}
+					bit <<= 1;
+				}
+
+				output.set(x,y,census);
+			}
+		}
+	}
+
+	public static void sample(ImageGray input , final FastQueue<Point2D_I32> sample, InterleavedU16 output ) {
+		int numBlocks = BoofMiscOps.bitsToWords(sample.size,16);
+		output.reshape(input.width,input.height,numBlocks);
+		GImageGray src = FactoryGImageGray.wrap(FactoryImageBorder.wrap(BorderType.EXTENDED,input));
+
+		for (int y = 0; y < input.height; y++) {
+			for (int x = 0; x < input.width; x++) {
+				int census = 0;
+				int bit = 1;
+				double center = src.get(x,y).doubleValue();
+				for (int i = 0; i < sample.size; i++) {
+					Point2D_I32 p = sample.get(i);
+					if( src.get(x+p.x,y+p.y).doubleValue() > center ) {
+						census |= bit;
+					}
+					if( (i+1)%16 == 0 ) {
+						bit = 1;
+						output.setBand(x,y,i/16,census);
+						census = 0;
+					} else {
+						bit <<= 1;
+					}
+				}
+
+				if( bit != 1 ) {
+					output.setBand(x,y,sample.size/16,census);
+				}
 			}
 		}
 	}

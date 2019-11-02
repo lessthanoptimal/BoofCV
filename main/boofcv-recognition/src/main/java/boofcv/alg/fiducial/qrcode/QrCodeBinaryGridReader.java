@@ -51,7 +51,7 @@ public class QrCodeBinaryGridReader<T extends ImageGray<T>> {
 	public QrCodeBinaryGridReader( Class<T> imageType ) {
 		// use nearest neighbor to avoid shifting the location
 		interpolate = FactoryInterpolation.nearestNeighborPixelS(imageType);
-		interpolate.setBorder(FactoryImageBorder.single(imageType, BorderType.EXTENDED));
+		interpolate.setBorder(FactoryImageBorder.single(BorderType.EXTENDED, imageType));
 	}
 
 	public void setImage(T image ) {

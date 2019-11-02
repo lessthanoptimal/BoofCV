@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.feature.disparity;
 
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 /**
  * <p>
@@ -48,53 +49,53 @@ public interface StereoDisparity<Image extends ImageGray, Disparity extends Imag
 	 * @param imageLeft Input left rectified image.
 	 * @param imageRight Input right rectified image.
 	 */
-	public void process( Image imageLeft , Image imageRight );
+	void process( Image imageLeft , Image imageRight );
 
 	/**
 	 * Return the computed disparity image.  See comments in class description on disparity image format.
 	 *
 	 * @return Output disparity from left to right image.
 	 */
-	public Disparity getDisparity();
+	Disparity getDisparity();
 
 	/**
 	 * The minimum disparity which will be checked for.
 	 *
 	 * @return Minimum disparity.
 	 */
-	public int getMinDisparity();
+	int getMinDisparity();
 
 	/**
 	 * The maximum disparity which will be checked for.
 	 *
 	 * @return Maximum disparity.
 	 */
-	public int getMaxDisparity();
+	int getMaxDisparity();
 
 	/**
 	 * Border around the image's x-axis which is not processed.
 	 * @return border x-axis
 	 */
-	public int getBorderX();
+	int getBorderX();
 
 	/**
 	 * Border around the image's y-axis which is not processed.
 	 * @return border y-axis
 	 */
-	public int getBorderY();
+	int getBorderY();
 
 	/**
 	 * Type of input images it can process
 	 *
 	 * @return Input image type
 	 */
-	public Class<Image> getInputType();
+	ImageType<Image> getInputType();
 
 	/**
 	 * Type of disparity image it can write to.
 	 *
 	 * @return Output image type
 	 */
-	public Class<Disparity> getDisparityType();
+	Class<Disparity> getDisparityType();
 
 }

@@ -60,7 +60,7 @@ public class BackgroundMovingBasic_SB<T extends ImageGray<T>, Motion extends Inv
 		this.interpolateInput = FactoryInterpolation.bilinearPixelS(imageType, BorderType.EXTENDED);
 
 		this.interpolationBG = FactoryInterpolation.createPixelS(0, 255, interpType, BorderType.EXTENDED, GrayF32.class);
-		this.interpolationBG.setBorder(FactoryImageBorder.single(GrayF32.class, BorderType.EXTENDED));
+		this.interpolationBG.setBorder(FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class));
 		this.interpolationBG.setImage(background);
 
 		inputWrapper = FactoryGImageGray.create(imageType);

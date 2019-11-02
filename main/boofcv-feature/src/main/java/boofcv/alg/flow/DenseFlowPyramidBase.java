@@ -58,7 +58,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 		this.sigma = sigma;
 		this.maxLayers = maxLayers;
 		this.interp = interp;
-		interp.setBorder(FactoryImageBorder.single(GrayF32.class, BorderType.EXTENDED));
+		interp.setBorder(FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class));
 	}
 
 	/**
@@ -120,7 +120,7 @@ public abstract class DenseFlowPyramidBase<T extends ImageGray<T>> {
 	 * in the current layer.  Adjusts for change in image scale.
 	 */
 	protected void warpImageTaylor(GrayF32 before, GrayF32 flowX , GrayF32 flowY , GrayF32 after) {
-		interp.setBorder(FactoryImageBorder.single(before.getImageType().getImageClass(), BorderType.EXTENDED));
+		interp.setBorder(FactoryImageBorder.single(BorderType.EXTENDED, before.getImageType().getImageClass()));
 		interp.setImage(before);
 
 		for( int y = 0; y < before.height; y++ ) {

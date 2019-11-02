@@ -26,7 +26,8 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.robust.ModelMatcherMultiview;
 import boofcv.factory.distort.LensDistortionFactory;
-import boofcv.factory.feature.disparity.DisparityAlgorithms;
+import boofcv.factory.feature.disparity.ConfigureDisparityBMBest5;
+import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.ConfigEssential;
 import boofcv.factory.geo.ConfigRansac;
@@ -114,9 +115,17 @@ public class ExampleStereoTwoViewsOneCamera {
 				rectifiedLeft, rectifiedRight,rectifiedMask, rectifiedK,rectifiedR);
 
 		// compute disparity
+		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
+		config.error = DisparityError.SAD;
+		config.minDisparity = minDisparity;
+		config.maxDisparity = maxDisparity;
+		config.subpixel = true;
+		config.regionRadiusX = config.regionRadiusY = 5;
+		config.maxPerPixelError = 20;
+		config.validateRtoL = 1;
+		config.texture = 0.1;
 		StereoDisparity<GrayS16, GrayF32> disparityAlg =
-				FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-						minDisparity, maxDisparity, 5, 5, 20, 1, 0.1, GrayS16.class);
+				FactoryStereoDisparity.blockMatchBest5(config, GrayS16.class, GrayF32.class);
 
 		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
 		GrayS16 derivLeft = new GrayS16(rectifiedLeft.width,rectifiedLeft.height);

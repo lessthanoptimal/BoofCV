@@ -192,7 +192,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 	public void get_outside_border(T img) {
 		InterpolatePixelMB<T> interp = wrap(img, 0, 100);
 
-		ImageBorder<T> border = (ImageBorder)FactoryImageBorder.interleavedValue((Class) img.getClass(), 5);
+		ImageBorder<T> border = (ImageBorder)FactoryImageBorder.interleavedValue(5, (Class) img.getClass());
 		interp.setBorder(border);
 		interp.setImage(img);
 
@@ -283,7 +283,7 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 		T img = createImage(20, 30, numBands);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 		InterpolatePixelMB<T> interp = wrap(img, 0, 100);
-		interp.setBorder((ImageBorder)FactoryImageBorder.interleavedValue((ImageInterleaved)img, 0));
+		interp.setBorder((ImageBorder)FactoryImageBorder.interleavedValue(0, (ImageInterleaved)img));
 
 		for( int off = 0; off < 5; off++ ) {
 			float frac = off/5.0f;
@@ -312,8 +312,8 @@ public abstract class GeneralChecksInterpolationPixelMB<T extends ImageMultiBand
 		T imgB = BoofTesting.createSubImageOf(imgA);
 		InterpolatePixelMB<T> interpB = wrap(imgB, 0, 100);
 
-		interpA.setBorder((ImageBorder)FactoryImageBorder.interleavedValue((ImageInterleaved)imgA, 0));
-		interpB.setBorder((ImageBorder) FactoryImageBorder.interleavedValue((ImageInterleaved) imgB, 0));
+		interpA.setBorder((ImageBorder)FactoryImageBorder.interleavedValue(0, (ImageInterleaved)imgA));
+		interpB.setBorder((ImageBorder) FactoryImageBorder.interleavedValue(0, (ImageInterleaved) imgB));
 
 		for (int y = 0; y < 40; y++) {
 			for (int x = 0; x < 30; x++) {

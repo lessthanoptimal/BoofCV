@@ -49,7 +49,7 @@ public class TestHessianThreeDeterminant_Border {
 	}
 
 	public void process_U8_S16(GrayU8 img, GrayS16 deriv) {
-		ImageBorder_S32<GrayU8> border = (ImageBorder_S32) FactoryImageBorder.single(GrayU8.class, BorderType.EXTENDED);
+		ImageBorder_S32<GrayU8> border = (ImageBorder_S32) FactoryImageBorder.single(BorderType.EXTENDED, GrayU8.class);
 		HessianThreeDeterminant_Border.process(img, deriv, border);
 
 		GrayS16 expected = hessianDetFromConv_U8_S16(img);
@@ -66,7 +66,7 @@ public class TestHessianThreeDeterminant_Border {
 	}
 
 	public void process_U8_F32(GrayU8 img, GrayF32 deriv) {
-		ImageBorder_S32<GrayU8> border = (ImageBorder_S32) FactoryImageBorder.single(GrayU8.class, BorderType.EXTENDED);
+		ImageBorder_S32<GrayU8> border = (ImageBorder_S32) FactoryImageBorder.single(BorderType.EXTENDED, GrayU8.class);
 		HessianThreeDeterminant_Border.process(img, deriv, border);
 
 		GrayS16 expected = hessianDetFromConv_U8_S16(img);
@@ -83,7 +83,7 @@ public class TestHessianThreeDeterminant_Border {
 	}
 
 	public void process_F32(GrayF32 img, GrayF32 deriv) {
-		ImageBorder_F32 border = (ImageBorder_F32) FactoryImageBorder.single(GrayF32.class, BorderType.EXTENDED);
+		ImageBorder_F32 border = (ImageBorder_F32) FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class);
 		HessianThreeDeterminant_Border.process(img, deriv, border);
 
 		GrayF32 expected = hessianDetFromConv_F32_F32(img);
@@ -91,7 +91,7 @@ public class TestHessianThreeDeterminant_Border {
 	}
 
 	public static GrayS16 hessianDetFromConv_U8_S16(GrayU8 img) {
-		ImageBorder_S32<GrayU8> border = (ImageBorder_S32) FactoryImageBorder.single(GrayU8.class, BorderType.EXTENDED);
+		ImageBorder_S32<GrayU8> border = (ImageBorder_S32) FactoryImageBorder.single(BorderType.EXTENDED, GrayU8.class);
 		GrayS16 Lxx = new GrayS16(img.width,img.height);
 		GrayS16 Lyy = new GrayS16(img.width,img.height);
 		GrayS16 Lxy = new GrayS16(img.width,img.height);
@@ -111,7 +111,7 @@ public class TestHessianThreeDeterminant_Border {
 	}
 
 	public static GrayF32 hessianDetFromConv_F32_F32(GrayF32 img) {
-		ImageBorder_F32 border = (ImageBorder_F32) FactoryImageBorder.single(GrayF32.class, BorderType.EXTENDED);
+		ImageBorder_F32 border = (ImageBorder_F32) FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class);
 		GrayF32 Lxx = new GrayF32(img.width,img.height);
 		GrayF32 Lyy = new GrayF32(img.width,img.height);
 		GrayF32 Lxy = new GrayF32(img.width,img.height);

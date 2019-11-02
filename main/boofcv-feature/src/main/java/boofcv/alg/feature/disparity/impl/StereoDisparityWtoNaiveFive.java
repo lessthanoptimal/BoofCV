@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.feature.disparity.DisparityBlockMatchBestFive;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
@@ -26,7 +27,7 @@ import boofcv.struct.image.ImageGray;
 import java.util.Arrays;
 
 /**
- * Naive version of {@link boofcv.alg.feature.disparity.DisparityScoreWindowFive}.
+ * Naive version of {@link DisparityBlockMatchBestFive}.
  *
  * @author Peter Abeles
  */

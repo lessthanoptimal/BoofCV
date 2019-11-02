@@ -20,7 +20,11 @@ package boofcv.alg.transform.census.impl;
 
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayS64;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.InterleavedU16;
+import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * @author Peter Abeles
@@ -45,7 +49,7 @@ public class ImplCensusTransformBorder {
 		return census;
 	}
 
-	public static void region3x3(final ImageBorder_S32 input, final GrayU8 output ) {
+	public static void dense3x3_U8(final ImageBorder_S32 input, final GrayU8 output ) {
 		final int width = output.width;
 		final int height = output.height;
 
@@ -69,7 +73,7 @@ public class ImplCensusTransformBorder {
 		}
 	}
 
-	public static void region5x5(final ImageBorder_S32 input, final GrayS32 output ) {
+	public static void dense5x5_U8(final ImageBorder_S32 input, final GrayS32 output ) {
 		final int width = output.width;
 		final int height = output.height;
 
@@ -100,6 +104,109 @@ public class ImplCensusTransformBorder {
 			indexDst1 += output.stride;
 			indexDst2 += output.stride;
 			indexDst3 += output.stride;
+		}
+	}
+
+	public static void sample_S64(final ImageBorder_S32 input, final int radius , final FastQueue<Point2D_I32> offsets,
+								  GrayS64 output  )
+	{
+		final int width = output.width;
+		final int height = output.height;
+
+		for (int r = 0; r < radius; r++) {
+			int indexDst0 = output.startIndex + r*output.stride;
+			int indexDst1 = output.startIndex + (height-r-1)*output.stride;
+			for (int x = 0; x < width; x++) {
+				output.data[indexDst0++] = sample_S64(input,x,r,offsets);
+				output.data[indexDst1++] = sample_S64(input,x,height-r-1,offsets);
+			}
+		}
+
+		for (int r = 0; r < radius; r++) {
+			int indexDst0 = output.startIndex + radius*output.stride+r;
+			int indexDst1 = output.startIndex + radius*output.stride+(width-r-1);
+			for (int y = radius; y < height-radius; y++) {
+				output.data[indexDst0] = sample_S64(input,r,y,offsets);
+				output.data[indexDst1] = sample_S64(input,width-r-1,y,offsets);
+				indexDst0 += output.stride;
+				indexDst1 += output.stride;
+			}
+		}
+	}
+
+	public static short sample( final ImageBorder_S32 input , int cx , int cy ,
+								  final FastQueue<Point2D_I32> offsets , int idx0 , int idx1 ) {
+		int center = input.get(cx, cy);
+		int census = 0;
+
+		int bit = 1;
+		for (int i = idx0; i < idx1; i++) {
+			Point2D_I32 p = offsets.data[i];
+			if( input.get(cx+p.x,cy+p.y) > center )
+				census |= bit;
+			bit <<= 1;
+		}
+
+		return (short)census;
+	}
+
+	public static long sample_S64( final ImageBorder_S32 input , int cx , int cy ,
+								   final FastQueue<Point2D_I32> offsets ) {
+		int center = input.get(cx, cy);
+		long census = 0;
+
+		int bit = 1;
+		for (int i = 0; i < offsets.size; i++) {
+			Point2D_I32 p = offsets.data[i];
+			if( input.get(cx+p.x,cy+p.y) > center )
+				census |= bit;
+			bit <<= 1;
+		}
+
+		return census;
+	}
+
+	public static void sample_IU16(final ImageBorder_S32 input , final int radius , final FastQueue<Point2D_I32> offsets,
+								   final InterleavedU16 output ) {
+		final int width = output.width;
+		final int height = output.height;
+
+		int numBands = output.numBands;
+
+		int fullBlocks = offsets.size/16;
+
+		for (int r = 0; r < radius; r++) {
+			int indexDst0 = output.startIndex + r*output.stride;
+			int indexDst1 = output.startIndex + (height-r-1)*output.stride;
+			for (int x = 0; x < width; x++) {
+				for (int i = 0; i < fullBlocks; i++) {
+					int idx0 = i*16;
+					int idx1 = idx0+16;
+					output.data[indexDst0++] = sample(input,x,r,offsets,idx0,idx1);
+					output.data[indexDst1++] = sample(input,x,height-r-1,offsets,idx0,idx1);
+				}
+				if( numBands != fullBlocks) {
+					output.data[indexDst0++] = sample(input,x,r,offsets,fullBlocks*16,offsets.size);
+					output.data[indexDst1++] = sample(input,x,height-r-1,offsets,fullBlocks*16,offsets.size);
+				}
+			}
+		}
+
+		for (int r = 0; r < radius; r++) {
+			for (int y = radius; y < height-radius; y++) {
+				int indexDst0 = output.startIndex + y*output.stride+r*numBands;
+				int indexDst1 = output.startIndex + y*output.stride+(width-r-1)*numBands;
+				for (int i = 0; i < fullBlocks; i++) {
+					int idx0 = i*16;
+					int idx1 = idx0+16;
+					output.data[indexDst0++] = sample(input,r,y,offsets,idx0,idx1);
+					output.data[indexDst1++] = sample(input,width-r-1,y,offsets,idx0,idx1);
+					}
+				if( numBands != fullBlocks) {
+					output.data[indexDst0++] = sample(input,r,y,offsets,fullBlocks*16,offsets.size);
+					output.data[indexDst1++] = sample(input,width-r-1,y,offsets,fullBlocks*16,offsets.size);
+				}
+			}
 		}
 	}
 }

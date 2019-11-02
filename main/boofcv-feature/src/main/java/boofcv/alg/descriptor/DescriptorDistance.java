@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -217,5 +217,9 @@ public class DescriptorDistance {
 		v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
 		c = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
 		return c;
+	}
+
+	public static int hamming( long val ) {
+		return hamming((int)val) + hamming((int)(val>>32));
 	}
 }

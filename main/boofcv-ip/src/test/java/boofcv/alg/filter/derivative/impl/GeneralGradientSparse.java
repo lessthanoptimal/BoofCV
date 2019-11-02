@@ -95,7 +95,7 @@ public abstract class GeneralGradientSparse {
 	@Test
 	public void compareToFullImage_Border() {
 
-		ImageBorder border = FactoryImageBorder.single(imageType, BorderType.EXTENDED);
+		ImageBorder border = FactoryImageBorder.single(BorderType.EXTENDED, imageType);
 
 		ImageGradient gradient = createGradient();
 		gradient.setBorderType(BorderType.EXTENDED);

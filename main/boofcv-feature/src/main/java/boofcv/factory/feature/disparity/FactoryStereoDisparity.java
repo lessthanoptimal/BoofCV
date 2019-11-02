@@ -18,15 +18,18 @@
 
 package boofcv.factory.feature.disparity;
 
-import boofcv.abst.feature.disparity.StereoDisparity;
-import boofcv.abst.feature.disparity.StereoDisparitySparse;
-import boofcv.abst.feature.disparity.WrapDisparitySadRect;
-import boofcv.abst.feature.disparity.WrapDisparitySparseSadRect;
-import boofcv.alg.feature.disparity.DisparityScoreRowFormat;
+import boofcv.abst.feature.disparity.*;
+import boofcv.abst.filter.FilterImageInterface;
+import boofcv.alg.feature.disparity.DisparityBlockMatchRowFormat;
 import boofcv.alg.feature.disparity.DisparitySelect;
 import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.DisparitySparseSelect;
+import boofcv.alg.feature.disparity.impl.*;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.factory.transform.census.FactoryCensusTransform;
 import boofcv.struct.image.*;
+
+import javax.annotation.Nullable;
 
 import static boofcv.factory.feature.disparity.FactoryStereoDisparityAlgs.*;
 
@@ -54,182 +57,170 @@ import static boofcv.factory.feature.disparity.FactoryStereoDisparityAlgs.*;
 @SuppressWarnings("unchecked")
 public class FactoryStereoDisparity {
 
-	/**
-	 * <p>
-	 * Crates algorithms for computing dense disparity images up to pixel level accuracy.
-	 * </p>
-	 *
-	 * <p>
-	 * NOTE: For RECT_FIVE the size of the sub-regions it uses is what is specified.
-	 * </p>
-	 *
-	 * @param minDisparity Minimum disparity that it will check. Must be &ge; 0 and &lt; maxDisparity
-	 * @param maxDisparity Maximum disparity that it will calculate. Must be &gt; 0
-	 * @param regionRadiusX Radius of the rectangular region along x-axis.
-	 * @param regionRadiusY Radius of the rectangular region along y-axis.
-	 * @param maxPerPixelError Maximum allowed error in a region per pixel.  Set to &lt; 0 to disable.
-	 * @param validateRtoL Tolerance for how difference the left to right associated values can be.  Try 6
-	 * @param texture Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
-	 *                Try 0.1
-	 * @param imageType Type of input image.
-	 * @return Rectangular region based WTA disparity.algorithm.
-	 */
-	public static <T extends ImageGray<T>> StereoDisparity<T,GrayU8>
-	regionWta( DisparityAlgorithms whichAlg ,
-			   int minDisparity , int maxDisparity,
-			   int regionRadiusX, int regionRadiusY ,
-			   double maxPerPixelError ,
-			   int validateRtoL ,
-			   double texture ,
-			   Class<T> imageType ) {
+	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T,DI>
+	blockMatch(@Nullable ConfigureDisparityBM config , Class<T> imageType , Class<DI> dispType ) {
+		if( config == null )
+			config = new ConfigureDisparityBM();
 
-		double maxError = (regionRadiusX*2+1)*(regionRadiusY*2+1)*maxPerPixelError;
+		if( config.subpixel ) {
+			if( dispType != GrayF32.class )
+				throw new IllegalArgumentException("With subpixel on, disparity image must be GrayF32");
+		} else {
+			if( dispType != GrayU8.class )
+				throw new IllegalArgumentException("With subpixel on, disparity image must be GrayU8");
+		}
 
-		// 3 regions are used not just one in this case
-		if( whichAlg == DisparityAlgorithms.RECT_FIVE )
-			maxError *= 3;
+		double maxError = (config.regionRadiusX*2+1)*(config.regionRadiusY*2+1)*config.maxPerPixelError;
 
 		DisparitySelect select;
 		if( imageType == GrayU8.class || imageType == GrayS16.class ) {
-			select = selectDisparity_S32((int) maxError, validateRtoL, texture);
+			if( config.subpixel ) {
+				select = selectDisparitySubpixel_S32((int) maxError, config.validateRtoL, config.texture);
+			} else {
+				select = selectDisparity_S32((int) maxError, config.validateRtoL, config.texture);
+			}
 		} else if( imageType == GrayF32.class ) {
-			select = selectDisparity_F32((int) maxError, validateRtoL, texture);
+			if( config.subpixel ) {
+				select = selectDisparitySubpixel_F32((int) maxError, config.validateRtoL, config.texture);
+			} else {
+				select = selectDisparity_F32((int) maxError, config.validateRtoL, config.texture);
+			}
 		} else {
 			throw new IllegalArgumentException("Unknown image type");
 		}
 
-		DisparityScoreRowFormat<T,GrayU8> alg = null;
+		switch( config.error ) {
+			case SAD: {
+				BlockRowScore rowScore = createScoreRowSad(imageType);
+				DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
+				return new WrapDisparityBlockMatchRowFormat(alg);
+			}
 
-		switch( whichAlg ) {
-			case RECT:
-				if( imageType == GrayU8.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(minDisparity,
-							maxDisparity,regionRadiusX,regionRadiusY,select);
-				} else if( imageType == GrayU16.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_U16(minDisparity,
-							maxDisparity, regionRadiusX, regionRadiusY, select);
-				} else if( imageType == GrayS16.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_S16(minDisparity,
-							maxDisparity, regionRadiusX, regionRadiusY, select);
-				} else if( imageType == GrayF32.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_F32(minDisparity,
-							maxDisparity, regionRadiusX, regionRadiusY, select);
+			case CENSUS: { // TODO support multiple census
+				FilterImageInterface censusTran = FactoryCensusTransform.blockDense(3,imageType);
+				Class censusType = censusTran.getOutputType().getImageClass();
+				BlockRowScore rowScore;
+				if (censusType == GrayU8.class) {
+					rowScore = new BlockRowScoreCensus.U8();
+				} else if (censusType == GrayS32.class) {
+					rowScore = new BlockRowScoreCensus.S32();
+				} else if (censusType == GrayS64.class) {
+					rowScore = new BlockRowScoreCensus.S64();
+				} else {
+					throw new IllegalArgumentException("Unsupported image type");
 				}
-				break;
 
-			case RECT_FIVE:
-				if( imageType == GrayU8.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U8(minDisparity,
-							maxDisparity,regionRadiusX,regionRadiusY,select);
-				} else if( imageType == GrayU16.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U16(minDisparity,
-							maxDisparity, regionRadiusX, regionRadiusY, select);
-				} else if( imageType == GrayS16.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_S16(minDisparity,
-							maxDisparity, regionRadiusX, regionRadiusY, select);
-				} else if( imageType == GrayF32.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_F32(minDisparity,
-							maxDisparity, regionRadiusX, regionRadiusY, select);
-				}
-				break;
+				DisparityBlockMatchRowFormat alg = createBlockMatching(config, (Class<T>) imageType, select, rowScore);
+				return new WrapDisparityBlockMatchCensus<>(censusTran, alg);
+			}
 
 			default:
-				throw new IllegalArgumentException("Unknown algorithms "+whichAlg);
-
+				throw new IllegalArgumentException("Unsupported error type "+config.error);
 		}
-		if( alg == null)
-			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
-
-		return new WrapDisparitySadRect<>(alg);
 	}
 
-	/**
-	 * <p>
-	 * Returns an algorithm for computing a dense disparity images with sub-pixel disparity accuracy.
-	 * </p>
-	 *
-	 * <p>
-	 * NOTE: For RECT_FIVE the size of the sub-regions it uses is what is specified.
-	 * </p>
-	 *
-	 * @param minDisparity Minimum disparity that it will check. Must be &ge; 0 and &lt; maxDisparity
-	 * @param maxDisparity Maximum disparity that it will calculate. Must be &gt; 0
-	 * @param regionRadiusX Radius of the rectangular region along x-axis. Try 3.
-	 * @param regionRadiusY Radius of the rectangular region along y-axis. Try 3.
-	 * @param maxPerPixelError Maximum allowed error in a region per pixel.  Set to &lt; 0 to disable.
-	 * @param validateRtoL Tolerance for how difference the left to right associated values can be.  Try 6
-	 * @param texture Tolerance for how similar optimal region is to other region.  Disable with a value &le; 0.
-	 *                Closer to zero is more tolerant. Try 0.1
-	 * @param imageType Type of input image.
-	 * @return Rectangular region based WTA disparity.algorithm.
-	 */
-	public static <T extends ImageGray<T>> StereoDisparity<T,GrayF32>
-	regionSubpixelWta( DisparityAlgorithms whichAlg ,
-					   int minDisparity , int maxDisparity,
-					   int regionRadiusX, int regionRadiusY ,
-					   double maxPerPixelError ,
-					   int validateRtoL ,
-					   double texture ,
-					   Class<T> imageType ) {
+	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T,DI>
+	blockMatchBest5(@Nullable ConfigureDisparityBMBest5 config , Class<T> imageType , Class<DI> dispType ) {
+		if( config == null )
+			config = new ConfigureDisparityBMBest5();
 
-		double maxError = (regionRadiusX*2+1)*(regionRadiusY*2+1)*maxPerPixelError;
+		if( config.subpixel ) {
+			if( dispType != GrayF32.class )
+				throw new IllegalArgumentException("With subpixel on, disparity image must be GrayF32");
+		} else {
+			if( dispType != GrayU8.class )
+				throw new IllegalArgumentException("With subpixel on, disparity image must be GrayU8");
+		}
 
-		// 3 regions are used not just one in this case
-		if( whichAlg == DisparityAlgorithms.RECT_FIVE )
-			maxError *= 3;
+		double maxError = (config.regionRadiusX*2+1)*(config.regionRadiusY*2+1)*config.maxPerPixelError;
 
 		DisparitySelect select;
 		if( imageType == GrayU8.class || imageType == GrayS16.class ) {
-			select = selectDisparitySubpixel_S32((int) maxError, validateRtoL, texture);
+			if( config.subpixel ) {
+				select = selectDisparitySubpixel_S32((int) maxError, config.validateRtoL, config.texture);
+			} else {
+				select = selectDisparity_S32((int) maxError, config.validateRtoL, config.texture);
+			}
 		} else if( imageType == GrayF32.class ) {
-			select = selectDisparitySubpixel_F32((int) maxError, validateRtoL, texture);
+			if( config.subpixel ) {
+				select = selectDisparitySubpixel_F32((int) maxError, config.validateRtoL, config.texture);
+			} else {
+				select = selectDisparity_F32((int) maxError, config.validateRtoL, config.texture);
+			}
 		} else {
 			throw new IllegalArgumentException("Unknown image type");
 		}
 
-		DisparityScoreRowFormat<T,GrayF32> alg = null;
+		switch( config.error ) {
+			case SAD: {
+				BlockRowScore rowScore = createScoreRowSad(imageType);
+				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
+				return new WrapDisparityBlockMatchRowFormat(alg);
+			}
 
-		switch( whichAlg ) {
-			case RECT:
-				if( imageType == GrayU8.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_U8(minDisparity,
-							maxDisparity,regionRadiusX,regionRadiusY,select);
-				} else if( imageType == GrayU16.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_U16(minDisparity,
-							maxDisparity, regionRadiusX, regionRadiusY, select);
-				} else if( imageType == GrayS16.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_S16(minDisparity,
-							maxDisparity, regionRadiusX, regionRadiusY, select);
-				} else if( imageType == GrayF32.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRect_F32(minDisparity,
-							maxDisparity, regionRadiusX, regionRadiusY, select);
+			case CENSUS: { // TODO support multiple census
+				FilterImageInterface censusTran = FactoryCensusTransform.blockDense(3,imageType);
+				Class censusType = censusTran.getOutputType().getImageClass();
+				BlockRowScore rowScore;
+				if (censusType == GrayU8.class) {
+					rowScore = new BlockRowScoreCensus.U8();
+				} else if (censusType == GrayS32.class) {
+					rowScore = new BlockRowScoreCensus.S32();
+				} else if (censusType == GrayS64.class) {
+					rowScore = new BlockRowScoreCensus.S64();
+				} else {
+					throw new IllegalArgumentException("Unsupported image type");
 				}
-				break;
 
-			case RECT_FIVE:
-				if( imageType == GrayU8.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U8(minDisparity,
-							maxDisparity,regionRadiusX,regionRadiusY,select);
-				} else if( imageType == GrayU16.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_U16(minDisparity,
-							maxDisparity, regionRadiusX, regionRadiusY, select);
-				} else if( imageType == GrayS16.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_S16(minDisparity,
-							maxDisparity, regionRadiusX, regionRadiusY, select);
-				} else if( imageType == GrayF32.class ) {
-					alg = FactoryStereoDisparityAlgs.scoreDisparitySadRectFive_F32(minDisparity,
-							maxDisparity, regionRadiusX, regionRadiusY, select);
-				}
-				break;
+				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
+				return new WrapDisparityBlockMatchCensus<>(censusTran, alg);
+			}
 
 			default:
-				throw new IllegalArgumentException("Unknown algorithms "+whichAlg);
-
+				throw new IllegalArgumentException("Unsupported error type "+config.error);
 		}
-		if( alg == null)
-			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
+	}
 
-		return new WrapDisparitySadRect<>(alg);
+	public static <T extends ImageGray<T>> BlockRowScore createScoreRowSad(Class<T> imageType) {
+		BlockRowScore rowScore;
+		if (imageType == GrayU8.class) {
+			rowScore = new BlockRowScoreSad.U8();
+		} else if (imageType == GrayU16.class) {
+			rowScore = new BlockRowScoreSad.U16();
+		} else if (imageType == GrayS16.class) {
+			rowScore = new BlockRowScoreSad.S16();
+		} else if (imageType == GrayF32.class) {
+			rowScore = new BlockRowScoreSad.F32();
+		} else {
+			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
+		}
+		return rowScore;
+	}
+
+	private static <T extends ImageGray<T>> DisparityBlockMatchRowFormat
+	createBlockMatching(ConfigureDisparityBM config, Class<T> imageType, DisparitySelect select, BlockRowScore rowScore) {
+		DisparityBlockMatchRowFormat alg;
+		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
+			alg = new ImplDisparityScoreBM_F32<>(config.minDisparity,
+					config.maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
+		} else {
+			alg = new ImplDisparityScoreBM_S32(config.minDisparity,
+					config.maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
+		}
+		return alg;
+	}
+
+	private static <T extends ImageGray<T>> DisparityBlockMatchRowFormat
+	createBestFive(ConfigureDisparityBM config, Class<T> imageType, DisparitySelect select, BlockRowScore rowScore) {
+		DisparityBlockMatchRowFormat alg;
+		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
+			alg = new ImplDisparityScoreBMBestFive_F32(config.minDisparity,
+					config.maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
+		} else {
+			alg = new ImplDisparityScoreBMBestFive_S32(config.minDisparity,
+					config.maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
+		}
+		return alg;
 	}
 
 	/**
@@ -267,7 +258,7 @@ public class FactoryStereoDisparity {
 			DisparitySparseScoreSadRect<int[],GrayU8>
 					score = scoreDisparitySparseSadRect_U8(minDisparity,maxDisparity, regionRadiusX, regionRadiusY);
 
-			return new WrapDisparitySparseSadRect(score,select);
+			return new WrapDisparityBlockSparseSad(score,select);
 		} else if( imageType == GrayF32.class ) {
 			DisparitySparseSelect<float[]> select;
 			if( subpixelInterpolation )
@@ -278,7 +269,7 @@ public class FactoryStereoDisparity {
 			DisparitySparseScoreSadRect<float[],GrayF32>
 					score = scoreDisparitySparseSadRect_F32(minDisparity,maxDisparity, regionRadiusX, regionRadiusY);
 
-			return new WrapDisparitySparseSadRect(score,select);
+			return new WrapDisparityBlockSparseSad(score,select);
 		} else
 			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
 	}

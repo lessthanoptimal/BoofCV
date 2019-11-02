@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,9 @@
 
 package boofcv.abst.feature.disparity;
 
-import boofcv.alg.feature.disparity.DisparityScoreSadRect;
+import boofcv.alg.feature.disparity.DisparityBlockMatch;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,7 +36,7 @@ public class TestWrapDisparitySadRect {
 	public void borderSetToInvalid() {
 		int range = 4;
 		Foo foo = new Foo(1,1+range,2,2);
-		WrapDisparitySadRect<GrayF32,GrayF32> alg = new WrapDisparitySadRect<>(foo);
+		WrapDisparityBlockMatchRowFormat<GrayF32,GrayF32> alg = new WrapDisparityBlockMatchRowFormat<>(foo);
 
 		GrayF32 l = new GrayF32(10,20);
 		GrayF32 r = new GrayF32(10,20);
@@ -49,7 +50,7 @@ public class TestWrapDisparitySadRect {
 				assertTrue(found.get(x,y) > range );
 	}
 
-	private static class Foo extends DisparityScoreSadRect<GrayF32,GrayF32>
+	private static class Foo extends DisparityBlockMatch<GrayF32,GrayF32>
 	{
 		public Foo(int minDisparity, int maxDisparity, int regionRadiusX, int regionRadiusY) {
 			super(minDisparity, maxDisparity, regionRadiusX, regionRadiusY);
@@ -60,8 +61,8 @@ public class TestWrapDisparitySadRect {
 		}
 
 		@Override
-		public Class<GrayF32> getInputType() {
-			return GrayF32.class;
+		public ImageType<GrayF32> getInputType() {
+			return ImageType.single(GrayF32.class);
 		}
 
 		@Override

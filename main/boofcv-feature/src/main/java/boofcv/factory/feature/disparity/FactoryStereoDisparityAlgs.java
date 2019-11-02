@@ -18,9 +18,12 @@
 
 package boofcv.factory.feature.disparity;
 
-import boofcv.alg.feature.disparity.*;
+import boofcv.alg.feature.disparity.DisparitySelect;
+import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
+import boofcv.alg.feature.disparity.DisparitySparseSelect;
 import boofcv.alg.feature.disparity.impl.*;
-import boofcv.struct.image.*;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Algorithms related to computing the disparity between two rectified stereo images.
@@ -79,83 +82,11 @@ public class FactoryStereoDisparityAlgs {
 		return new SelectSparseStandardSubpixel.F32(maxError,texture);
 	}
 
-	public static <T extends ImageGray<T>> DisparityScoreSadRect<GrayU8,T>
-	scoreDisparitySadRect_U8( int minDisparity , int maxDisparity,
-						   int regionRadiusX, int regionRadiusY,
-						   DisparitySelect<int[],T> computeDisparity)
-	{
-		return new ImplDisparityScoreSadRect_U8<>(minDisparity,
-				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
-	}
-
-	public static <T extends ImageGray<T>> DisparityScoreSadRect<GrayU16,T>
-	scoreDisparitySadRect_U16( int minDisparity , int maxDisparity,
-							   int regionRadiusX, int regionRadiusY,
-							   DisparitySelect<int[],T> computeDisparity)
-	{
-		return new ImplDisparityScoreSadRect_U16<>(minDisparity,
-				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
-	}
-
-	public static <T extends ImageGray<T>> DisparityScoreSadRect<GrayS16,T>
-	scoreDisparitySadRect_S16( int minDisparity , int maxDisparity,
-							  int regionRadiusX, int regionRadiusY,
-							  DisparitySelect<int[],T> computeDisparity)
-	{
-		return new ImplDisparityScoreSadRect_S16<>(minDisparity,
-				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
-	}
-
-	public static <T extends ImageGray<T>> DisparityScoreSadRect<GrayF32,T>
-	scoreDisparitySadRect_F32( int minDisparity , int maxDisparity,
-							  int regionRadiusX, int regionRadiusY,
-							  DisparitySelect<float[],T> computeDisparity)
-	{
-		return new ImplDisparityScoreSadRect_F32<>(minDisparity,
-				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
-	}
-
-	public static <T extends ImageGray<T>> DisparityScoreWindowFive<GrayU8,T>
-	scoreDisparitySadRectFive_U8( int minDisparity , int maxDisparity,
-								  int regionRadiusX, int regionRadiusY,
-								  DisparitySelect<int[],T> computeDisparity)
-	{
-		return new ImplDisparityScoreSadRectFive_U8<>(minDisparity,
-				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
-	}
-
-	public static <T extends ImageGray<T>> DisparityScoreWindowFive<GrayU16,T>
-	scoreDisparitySadRectFive_U16( int minDisparity , int maxDisparity,
-								   int regionRadiusX, int regionRadiusY,
-								   DisparitySelect<int[],T> computeDisparity)
-	{
-		return new ImplDisparityScoreSadRectFive_U16<>(minDisparity,
-				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
-	}
-
-	public static <T extends ImageGray<T>> DisparityScoreWindowFive<GrayS16,T>
-	scoreDisparitySadRectFive_S16( int minDisparity , int maxDisparity,
-								  int regionRadiusX, int regionRadiusY,
-								  DisparitySelect<int[],T> computeDisparity)
-	{
-		return new ImplDisparityScoreSadRectFive_S16<>(minDisparity,
-				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
-	}
-
-	public static <T extends ImageGray<T>> DisparityScoreWindowFive<GrayF32,T>
-	scoreDisparitySadRectFive_F32( int minDisparity , int maxDisparity,
-								   int regionRadiusX, int regionRadiusY,
-								   DisparitySelect<float[],T> computeDisparity)
-	{
-		return new ImplDisparityScoreSadRectFive_F32<>(minDisparity,
-				maxDisparity, regionRadiusX, regionRadiusY, computeDisparity);
-	}
-
 	public static DisparitySparseScoreSadRect<int[],GrayU8>
 	scoreDisparitySparseSadRect_U8( int minDisparity , int maxDisparity,
 									int regionRadiusX, int regionRadiusY )
 	{
-		return new ImplDisparitySparseScoreSadRect_U8(minDisparity,
+		return new ImplDisparitySparseScoreBM_SAD_U8(minDisparity,
 				maxDisparity,regionRadiusX,regionRadiusY);
 	}
 
@@ -163,7 +94,8 @@ public class FactoryStereoDisparityAlgs {
 	scoreDisparitySparseSadRect_F32( int minDisparity, int maxDisparity,
 									 int regionRadiusX, int regionRadiusY )
 	{
-		return new ImplDisparitySparseScoreSadRect_F32(minDisparity,
+		return new ImplDisparitySparseScoreBM_SAD_F32(minDisparity,
 				maxDisparity,regionRadiusX,regionRadiusY);
 	}
+
 }

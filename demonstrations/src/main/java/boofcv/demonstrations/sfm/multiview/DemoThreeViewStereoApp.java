@@ -37,7 +37,8 @@ import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.feature.disparity.DisparityAlgorithms;
+import boofcv.factory.feature.disparity.ConfigureDisparityBMBest5;
+import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -620,9 +621,17 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		ConvertImage.average(rectColor2,rectifiedRight);
 
 		// compute disparity
+		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
+		config.error = DisparityError.SAD;
+		config.minDisparity = controls.minDisparity;
+		config.maxDisparity = controls.maxDisparity;
+		config.subpixel = true;
+		config.regionRadiusX = config.regionRadiusY = 6;
+		config.maxPerPixelError = 30;
+		config.validateRtoL = 3;
+		config.texture = 0.05;
 		StereoDisparity<GrayS16, GrayF32> disparityAlg =
-				FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-						controls.minDisparity, controls.maxDisparity, 6, 6, 30, 3, 0.05, GrayS16.class);
+				FactoryStereoDisparity.blockMatchBest5(config, GrayS16.class, GrayF32.class);
 
 		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
 		GrayS16 derivLeft = new GrayS16(rectColor1.width,rectColor1.height);

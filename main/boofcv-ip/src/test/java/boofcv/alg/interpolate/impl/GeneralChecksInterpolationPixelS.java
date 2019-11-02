@@ -165,7 +165,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 	public void get_outside_border(T img) {
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
 
-		ImageBorder<T> border = (ImageBorder)FactoryImageBorder.singleValue(img.getClass(), 5);
+		ImageBorder<T> border = (ImageBorder)FactoryImageBorder.singleValue(5, img.getClass());
 		interp.setBorder(border);
 		interp.setImage(img);
 
@@ -248,7 +248,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 		T img = createImage(20, 30);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 		InterpolatePixelS<T> interp = wrap(img, 0, 100);
-		interp.setBorder(FactoryImageBorder.singleValue(img, 0));
+		interp.setBorder(FactoryImageBorder.singleValue(0, img));
 
 		for( int off = 0; off < 5; off++ ) {
 			float frac = off/5.0f;
@@ -275,8 +275,8 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 		T imgB = BoofTesting.createSubImageOf(imgA);
 		InterpolatePixelS<T> interpB = wrap(imgB, 0, 100);
 
-		interpA.setBorder(FactoryImageBorder.singleValue(imgA, 0));
-		interpB.setBorder(FactoryImageBorder.singleValue(imgB, 0));
+		interpA.setBorder(FactoryImageBorder.singleValue(0, imgA));
+		interpB.setBorder(FactoryImageBorder.singleValue(0, imgB));
 
 		for (int y = 0; y < 40; y++) {
 			for (int x = 0; x < 30; x++) {
@@ -301,7 +301,7 @@ public abstract class GeneralChecksInterpolationPixelS<T extends ImageGray<T>> {
 		T img = createImage(30, 40);
 		GImageMiscOps.fillUniform(img, rand, 0, 100);
 
-		ImageBorder<T> border = (ImageBorder)FactoryImageBorder.singleValue(img.getClass(), 5);
+		ImageBorder<T> border = (ImageBorder)FactoryImageBorder.singleValue(5, img.getClass());
 		InterpolatePixelS<T> interpA = wrap(img, 0, 100);
 		interpA.setBorder(border);
 

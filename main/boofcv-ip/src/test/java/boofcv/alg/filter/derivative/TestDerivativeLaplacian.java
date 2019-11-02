@@ -55,7 +55,7 @@ public class TestDerivativeLaplacian {
 	}
 
 	public void process_U8_S16(GrayU8 img, GrayS16 deriv) {
-		ImageBorder_S32<GrayU8> border = (ImageBorder_S32)FactoryImageBorder.single(GrayU8.class, BorderType.EXTENDED);
+		ImageBorder_S32<GrayU8> border = (ImageBorder_S32)FactoryImageBorder.single(BorderType.EXTENDED, GrayU8.class);
 		DerivativeLaplacian.process(img, deriv, border);
 
 		GrayS16 expected = deriv.createSameShape();
@@ -92,7 +92,7 @@ public class TestDerivativeLaplacian {
 	}
 
 	public void process_F32(GrayF32 img, GrayF32 deriv) {
-		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorder.single(GrayF32.class, BorderType.EXTENDED);
+		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class);
 		DerivativeLaplacian.process(img, deriv, border);
 
 		GrayF32 expected = deriv.createSameShape();

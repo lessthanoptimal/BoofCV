@@ -24,7 +24,12 @@ import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayS64;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.InterleavedU16;
+import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.openjdk.jmh.annotations.*;
 
 import java.util.Random;
@@ -50,8 +55,15 @@ public class BenchmarkCensus {
 	private GrayU8 input = new GrayU8(size, size);
 	private GrayU8 output8 = new GrayU8(size, size);
 	private GrayS32 output32 = new GrayS32(size, size);
+	private GrayS64 output64 = new GrayS64(size, size);
+	private InterleavedU16 outputI16 = new InterleavedU16(size, size,1);
 
 	private ImageBorder_S32<GrayU8> border = (ImageBorder_S32)FactoryImageBorder.wrap(BorderType.ZERO,input);
+
+	private FastQueue<Point2D_I32> points5x5 = CensusTransform.createBlockSamples(2);
+	private FastQueue<Point2D_I32> points7x7 = CensusTransform.createBlockSamples(3);
+	private FastQueue<Point2D_I32> points9x9 = CensusTransform.createBlockSamples(4);
+	private GrowQueue_I32 workSpace = new GrowQueue_I32();
 
 	@Setup
 	public void setup() {
@@ -67,11 +79,31 @@ public class BenchmarkCensus {
 
 	@Benchmark
 	public void region3x3() {
-		CensusTransform.region3x3(input,output8, border);
+		CensusTransform.dense3x3_U8(input,output8, border);
 	}
 
 	@Benchmark
 	public void region5x5() {
-		CensusTransform.region5x5(input,output32, border);
+		CensusTransform.dense5x5_U8(input,output32, border);
+	}
+
+	@Benchmark
+	public void samples5x5_S64() {
+		CensusTransform.sample(input,points5x5,output64, border,workSpace);
+	}
+
+	@Benchmark
+	public void samples7x7_S64() {
+		CensusTransform.sample(input,points7x7,output64, border,workSpace);
+	}
+
+	@Benchmark
+	public void samples5x5_IU16() {
+		CensusTransform.sample(input,points5x5,outputI16, border,workSpace);
+	}
+
+	@Benchmark
+	public void samples9x9_IU16() {
+		CensusTransform.sample(input,points9x9,outputI16, border,workSpace);
 	}
 }

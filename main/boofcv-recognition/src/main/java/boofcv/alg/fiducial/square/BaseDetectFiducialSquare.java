@@ -157,7 +157,7 @@ public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 		// this combines two separate sources of distortion together so that it can be removed in the final image which
 		// is sent to fiducial decoder
 		InterpolatePixelS<T> interp = FactoryInterpolation.nearestNeighborPixelS(inputType);
-		interp.setBorder(FactoryImageBorder.single(inputType, BorderType.EXTENDED));
+		interp.setBorder(FactoryImageBorder.single(BorderType.EXTENDED, inputType));
 		removePerspective = FactoryDistort.distortSB(false, interp, GrayF32.class);
 
 		// if no camera parameters is specified default to this

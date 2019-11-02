@@ -51,7 +51,7 @@ public abstract class ImageHessianDirect_SB<Input extends ImageGray<Input>, Outp
 	@Override
 	public void setBorderType(BorderType type) {
 		this.borderType = type;
-		border = FactoryImageBorder.single(inputType, borderType);
+		border = FactoryImageBorder.single(borderType, inputType);
 	}
 
 	@Override

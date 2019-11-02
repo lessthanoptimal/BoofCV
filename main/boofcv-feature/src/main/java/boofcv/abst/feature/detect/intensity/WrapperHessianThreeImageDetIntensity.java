@@ -36,8 +36,8 @@ import boofcv.struct.image.ImageGray;
 public class WrapperHessianThreeImageDetIntensity<I extends ImageGray<I>,D extends ImageGray<D>>
 		extends BaseGeneralFeatureIntensity<I,D>
 {
-	ImageBorder_F32 borderF32 = (ImageBorder_F32)FactoryImageBorder.single(GrayF32.class,BorderType.EXTENDED);
-	ImageBorder_S32 borderS32 = (ImageBorder_S32<GrayU8>)FactoryImageBorder.single(GrayU8.class,BorderType.EXTENDED);
+	ImageBorder_F32 borderF32 = (ImageBorder_F32)FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class);
+	ImageBorder_S32 borderS32 = (ImageBorder_S32<GrayU8>)FactoryImageBorder.single(BorderType.EXTENDED, GrayU8.class);
 
 
 	@Override

@@ -54,7 +54,7 @@ public class TestDerivativeLaplacian_Inner {
 	public void process_U8_S16(GrayU8 img, GrayS16 deriv) {
 		DerivativeLaplacian_Inner.process(img, deriv);
 
-		ImageBorder_S32<GrayU8> border = (ImageBorder_S32) FactoryImageBorder.single(GrayU8.class, BorderType.EXTENDED);
+		ImageBorder_S32<GrayU8> border = (ImageBorder_S32) FactoryImageBorder.single(BorderType.EXTENDED, GrayU8.class);
 		GrayS16 expected = deriv.createSameShape();
 		ConvolveImage.convolve(DerivativeLaplacian.kernel_I32,img,expected,border);
 
@@ -91,7 +91,7 @@ public class TestDerivativeLaplacian_Inner {
 	public void process_F32(GrayF32 img, GrayF32 deriv) {
 		DerivativeLaplacian_Inner.process(img, deriv);
 
-		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorder.single(GrayF32.class, BorderType.EXTENDED);
+		ImageBorder_F32 border = (ImageBorder_F32)FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class);
 		GrayF32 expected = deriv.createSameShape();
 		ConvolveImage.convolve(DerivativeLaplacian.kernel_F32,img,expected,border);
 

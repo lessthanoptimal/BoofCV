@@ -123,9 +123,9 @@ public abstract class InterleavedI16<T extends InterleavedI16<T>> extends Interl
 	@Override
 	public void setBand(int x, int y, int band, int value) {
 		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds.");
+			throw new ImageAccessException("Requested pixel is out of bounds. ("+x+","+y+")");
 		if (band < 0 || band >= numBands)
-			throw new ImageAccessException("Invalid band requested.");
+			throw new ImageAccessException("Invalid band requested. band="+band);
 
 		data[getIndex(x, y, band)] = (short)value;
 	}

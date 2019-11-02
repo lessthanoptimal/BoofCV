@@ -103,7 +103,7 @@ public class FactoryInterpolation {
 		}
 
 		if( borderType != null )
-			alg.setBorder(FactoryImageBorder.single(imageType, borderType));
+			alg.setBorder(FactoryImageBorder.single(borderType, imageType));
 		return alg;
 	}
 
@@ -186,7 +186,7 @@ public class FactoryInterpolation {
 			throw new RuntimeException("Unknown image type: "+ typeName(imageType));
 
 		if( borderType != null )
-			alg.setBorder(FactoryImageBorder.single(imageType, borderType));
+			alg.setBorder(FactoryImageBorder.single(borderType, imageType));
 
 		return alg;
 	}
@@ -234,7 +234,7 @@ public class FactoryInterpolation {
 			}
 
 			if( borderType != null )
-				alg.setBorder(FactoryImageBorder.interleaved(imageType.getImageClass(), borderType));
+				alg.setBorder(FactoryImageBorder.interleaved(borderType, imageType.getImageClass()));
 		} else {
 			throw new IllegalArgumentException("Only interleaved current supported here");
 		}
@@ -268,7 +268,7 @@ public class FactoryInterpolation {
 			}
 
 			if( borderType != null )
-				alg.setBorder(FactoryImageBorder.interleaved(imageType.getImageClass(), borderType));
+				alg.setBorder(FactoryImageBorder.interleaved(borderType, imageType.getImageClass()));
 		} else {
 			throw new IllegalArgumentException("Only interleaved current supported here");
 		}

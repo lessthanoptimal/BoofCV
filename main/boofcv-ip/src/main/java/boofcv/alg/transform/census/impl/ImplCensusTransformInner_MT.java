@@ -20,13 +20,16 @@ package boofcv.alg.transform.census.impl;
 
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayS64;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.InterleavedU16;
+import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * @author Peter Abeles
  */
 public class ImplCensusTransformInner_MT {
-	public static void region3x3(final GrayU8 input , final GrayU8 output ) {
+	public static void dense3x3_U8(final GrayU8 input , final GrayU8 output ) {
 		final int height = input.height-1;
 		final byte[] src = input.data;
 
@@ -76,7 +79,7 @@ public class ImplCensusTransformInner_MT {
 		});
 	}
 
-	public static void region5x5(final GrayU8 input , final GrayS32 output ) {
+	public static void dense5x5_U8(final GrayU8 input , final GrayS32 output ) {
 		final int height = input.height-2;
 		final byte[] src = input.data;
 
@@ -169,6 +172,102 @@ public class ImplCensusTransformInner_MT {
 				output.data[indexDst] = census;
 
 				indexDst++;
+				indexSrc++;
+			}
+		});
+	}
+
+	public static void sample_S64(final GrayU8 input , final int radius , final GrowQueue_I32 offsets,
+								  final GrayS64 output ) {
+		final int height = input.height-radius;
+		final byte[] src = input.data;
+
+		BoofConcurrency.loopFor(radius,height,y->{
+			int indexSrc = input.startIndex  + y*input.stride  + radius;
+			int indexDst = output.startIndex + y*output.stride + radius;
+
+			final int end = indexDst+input.width-2*radius;
+//			for (int x = radius; x < width-radius; x++) {
+			while( indexDst < end ) {
+				int center = src[indexSrc]&0xFF;
+
+				long census = 0;
+				int bit=1;
+				for (int i = 0; i < offsets.size; i++) {
+					if ((src[indexSrc + offsets.data[i]] & 0xFF) > center)
+						census |= bit;
+					bit <<= 1;
+				}
+				output.data[indexDst++] = census;
+				indexSrc++;
+			}
+		});
+	}
+
+	public static void sample_IU16(final GrayU8 input , final int radius , final GrowQueue_I32 offsets,
+								   final InterleavedU16 output ) {
+		final int height = input.height-radius;
+		final byte[] src = input.data;
+
+		int bitBlocks = offsets.size/16;
+
+		BoofConcurrency.loopFor(radius,height,y->{
+			int indexSrc = input.startIndex  + y*input.stride  + radius;
+			int indexDst = output.startIndex + y*output.stride + radius*output.numBands;
+
+			final int end = indexDst+(input.width-2*radius)*output.numBands;
+//			for (int x = radius; x < width-radius; x++) {
+			while( indexDst < end ) {
+				int center = src[indexSrc]&0xFF;
+
+				int idx = 0;
+				for (int block = 0; block < bitBlocks; block++) {
+					short census = 0;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x0001;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x0002;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x0004;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x0008;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x0010;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x0020;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x0040;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x0080;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x0100;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x0200;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x0400;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x0800;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x1000;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x2000;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x4000;
+					if( (src[indexSrc+offsets.data[idx++]]&0xFF) > center)
+						census |= 0x8000;
+
+					output.data[indexDst++] = census;
+				}
+				if( idx != offsets.size ) {
+					short census = 0;
+					int bit = 1;
+					while (idx < offsets.size) {
+						if ((src[indexSrc + offsets.data[idx++]] & 0xFF) > center)
+							census |= bit;
+						bit <<= 1;
+					}
+					output.data[indexDst++] = census;
+				}
 				indexSrc++;
 			}
 		});

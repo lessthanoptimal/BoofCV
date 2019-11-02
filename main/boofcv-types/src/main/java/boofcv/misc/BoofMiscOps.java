@@ -34,6 +34,10 @@ import java.util.List;
  */
 public class BoofMiscOps {
 
+	public static int bitsToWords( int bits , int wordBits ) {
+		return (bits/wordBits) + (bits%wordBits==0?0:1);
+	}
+
 	public static int numBands( ImageBase img ) {
 		if( img instanceof ImageMultiBand ) {
 			return ((ImageMultiBand)img).getNumBands();

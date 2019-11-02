@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.factory.feature.disparity;
 
+import boofcv.alg.feature.disparity.DisparityBlockMatch;
+import boofcv.alg.feature.disparity.DisparityBlockMatchBestFive;
+
 /**
  * List of disparity algorithms which can be selected through a high level interface
  *
@@ -27,13 +30,13 @@ public enum DisparityAlgorithms {
 	/**
 	 * Rectangular region.
 	 *
-	 * @see boofcv.alg.feature.disparity.DisparityScoreSadRect
+	 * @see DisparityBlockMatch
 	 */
 	RECT,
 	/**
 	 * Dynamically selects the best regions out of five local sub-regions
 	 *
-	 * @see boofcv.alg.feature.disparity.DisparityScoreWindowFive
+	 * @see DisparityBlockMatchBestFive
 	 */
 	RECT_FIVE
 }
