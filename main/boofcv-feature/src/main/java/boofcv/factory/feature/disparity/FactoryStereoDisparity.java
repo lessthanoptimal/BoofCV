@@ -134,6 +134,9 @@ public class FactoryStereoDisparity {
 
 		double maxError = (config.regionRadiusX*2+1)*(config.regionRadiusY*2+1)*config.maxPerPixelError;
 
+		// 3 regions are used not just one in this case
+		maxError *= 3;
+
 		DisparitySelect select;
 		if( imageType == GrayU8.class || imageType == GrayS16.class ) {
 			if( config.subpixel ) {
