@@ -34,16 +34,16 @@ public class FactoryStereoDisparityAlgs {
 
 	public static DisparitySelect<int[],GrayU8> selectDisparity_S32(int maxError , int tolR2L , double texture) {
 		if( maxError < 0 && tolR2L < 0  & texture <= 0 )
-			return new ImplSelectRectBasicWta_S32_U8();
+			return new ImplSelectBasicWta_S32_U8();
 		else
-			return new ImplSelectRectStandard_S32_U8(maxError,tolR2L,texture);
+			return new ImplSelectBasicWta_F32_U8_S32_U8(maxError,tolR2L,texture);
 	}
 
 	public static DisparitySelect<float[],GrayU8> selectDisparity_F32(int maxError , int tolR2L , double texture) {
 		if( maxError < 0 && tolR2L < 0  & texture <= 0 )
-			return new ImplSelectRectBasicWta_F32_U8();
+			return new ImplSelectBasicWta_F32_U8();
 		else
-			return new ImplSelectRectStandard_F32_U8(maxError,tolR2L,texture);
+			return new ImplSelectWithChecksWta_F32_U8(maxError,tolR2L,texture);
 	}
 
 	public static DisparitySelect<int[],GrayF32>
@@ -61,7 +61,7 @@ public class FactoryStereoDisparityAlgs {
 		if( maxError < 0 && texture <= 0 )
 			return new ImplSelectSparseBasicWta_S32();
 		else
-			return new ImplSelectSparseStandardWta_S32(maxError,texture);
+			return new ImplSelectSparseWithChecksWta_S32(maxError,texture);
 	}
 
 	public static DisparitySparseSelect<float[]>
@@ -69,7 +69,7 @@ public class FactoryStereoDisparityAlgs {
 		if( maxError < 0 && texture <= 0 )
 			return new ImplSelectSparseBasicWta_F32();
 		else
-			return new ImplSelectSparseStandardWta_F32(maxError,texture);
+			return new ImplSelectSparseWithChecksWta_F32(maxError,texture);
 	}
 
 	public static DisparitySparseSelect<int[]>

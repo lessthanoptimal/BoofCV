@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ public class TestImplSelectRectStandard_S32_U8 extends ChecksSelectRectStandardB
 	}
 
 	@Override
-	public ImplSelectRectStandardBase_S32<GrayU8> createSelector(int maxError, int rightToLeftTolerance, double texture) {
-		return new ImplSelectRectStandard_S32_U8(maxError,rightToLeftTolerance,texture);
+	public ImplSelectWithChecksBase_S32<GrayU8> createSelector(int maxError, int rightToLeftTolerance, double texture) {
+		return new ImplSelectBasicWta_F32_U8_S32_U8(maxError,rightToLeftTolerance,texture);
 	}
 }

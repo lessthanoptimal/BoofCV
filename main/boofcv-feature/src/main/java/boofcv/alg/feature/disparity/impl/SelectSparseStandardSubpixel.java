@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,7 +28,7 @@ package boofcv.alg.feature.disparity.impl;
  */
 public class SelectSparseStandardSubpixel {
 
-	public static class S32 extends ImplSelectSparseStandardWta_S32 {
+	public static class S32 extends ImplSelectSparseWithChecksWta_S32 {
 		public S32(int maxError, double texture) {
 			super(maxError, texture);
 		}
@@ -59,7 +59,7 @@ public class SelectSparseStandardSubpixel {
 
 	}
 
-	public static class F32 extends ImplSelectSparseStandardWta_F32 {
+	public static class F32 extends ImplSelectSparseWithChecksWta_F32 {
 		public F32(int maxError, double texture) {
 			super(maxError, texture);
 		}

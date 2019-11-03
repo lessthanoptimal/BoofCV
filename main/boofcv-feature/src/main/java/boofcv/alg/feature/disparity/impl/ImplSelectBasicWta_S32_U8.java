@@ -19,12 +19,12 @@
 package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.DisparitySelect;
-import boofcv.alg.feature.disparity.SelectRectBasicWta;
+import boofcv.alg.feature.disparity.SelectDisparityBasicWta;
 import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
- * Implementation of {@link SelectRectBasicWta} for scores of type S32.
+ * Implementation of {@link SelectDisparityBasicWta} for scores of type S32.
  * </p>
  *
  * <p>
@@ -33,7 +33,7 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class ImplSelectRectBasicWta_S32_U8 extends SelectRectBasicWta<int[],GrayU8>
+public class ImplSelectBasicWta_S32_U8 extends SelectDisparityBasicWta<int[],GrayU8>
 {
 	@Override
 	public void process(int row, int[] scores) {

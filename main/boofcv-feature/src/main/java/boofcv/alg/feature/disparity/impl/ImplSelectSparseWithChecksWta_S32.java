@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,13 +31,13 @@ import boofcv.alg.feature.disparity.SelectSparseStandardWta;
  *
  * @author Peter Abeles
  */
-public class ImplSelectSparseStandardWta_S32 extends SelectSparseStandardWta<int[]> {
+public class ImplSelectSparseWithChecksWta_S32 extends SelectSparseStandardWta<int[]> {
 
 	// texture threshold, use an integer value for speed.
 	protected int textureThreshold;
 	protected static final int discretizer = 10000;
 
-	public ImplSelectSparseStandardWta_S32(int maxError, double texture) {
+	public ImplSelectSparseWithChecksWta_S32(int maxError, double texture) {
 		super(maxError,texture);
 	}
 

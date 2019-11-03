@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.disparity.impl;
 
 import boofcv.alg.feature.disparity.DisparitySelect;
-import boofcv.alg.feature.disparity.SelectRectStandard;
+import boofcv.alg.feature.disparity.SelectDisparityWithChecksWta;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
@@ -58,7 +58,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 		GImageMiscOps.fill(disparity, reject);
 	}
 
-	public abstract SelectRectStandard<ArrayData,T> createSelector( int maxError, int rightToLeftTolerance, double texture );
+	public abstract SelectDisparityWithChecksWta<ArrayData,T> createSelector(int maxError, int rightToLeftTolerance, double texture );
 
 	@Test
 	public void basic() {
@@ -79,7 +79,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 
 		int y = 3;
 
-		SelectRectStandard<ArrayData,T> alg = createSelector(2,-1,-1);
+		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(2,-1,-1);
 		alg.configure(disparity,0,maxDisparity,2);
 
 		int scores[] = new int[w*maxDisparity];
@@ -134,7 +134,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 		int y = 3;
 		int r = 2;
 
-		SelectRectStandard<ArrayData,T> alg = createSelector(-1,1,-1);
+		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,1,-1);
 		alg.configure(disparity,minDisparity,maxDisparity,r);
 
 		int scores[] = new int[w*maxDisparity];
@@ -175,7 +175,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 		int minValue = 3;
 		int y = 3;
 
-		SelectRectStandard<ArrayData,T> alg = createSelector(-1,-1,3);
+		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,-1,3);
 		alg.configure(disparity,0,maxDisparity,2);
 
 		int scores[] = new int[w*maxDisparity];
@@ -208,7 +208,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 		int y = 3;
 		int r = 2;
 
-		SelectRectStandard<ArrayData,T> alg = createSelector(-1,-1,3);
+		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,-1,3);
 		alg.configure(disparity,minDisparity,maxDisparity,r);
 
 		int scores[] = new int[w*maxDisparity];

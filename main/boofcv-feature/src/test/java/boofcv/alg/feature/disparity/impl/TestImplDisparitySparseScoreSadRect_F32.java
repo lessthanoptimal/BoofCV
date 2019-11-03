@@ -36,7 +36,7 @@ public class TestImplDisparitySparseScoreSadRect_F32 extends ChecksImplDisparity
 	public DisparityBlockMatch<GrayF32, GrayU8> createDense(int minDisparity, int maxDisparity,
 															int radiusX, int radiusY, BlockRowScore scoreRow) {
 		return new ImplDisparityScoreBM_F32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,
-				new ImplSelectRectBasicWta_F32_U8());
+				new ImplSelectBasicWta_F32_U8());
 	}
 
 	@Override

@@ -26,11 +26,14 @@ Version : 0.35
   * Updated VisualizeImageSegmentationApp
   * Updated VisualizeStereoDisparity
 - Fixed bugs related to processing 1-band planar images
+- Stereo
+  * Concurrent block matching disparity
+  * Support for U16 images
+  * Block Matching can now be scored using Census and TODO NCC
+  * TODO Ensure that all auto code generators still work
+  * TODO Add semi-global
 - SFM
-  * Concurrent stereo disparity
-  * Added stereo support for U16 images
   * Projective camera with lens distortion
-  * Add support for census to block matching
   * TODO Stereo VO Quad - Now uses trifocal tensor and sparse bundle adjustment
 - Calibration
   * TODO Calibrate using partially obscured chessboard patterns

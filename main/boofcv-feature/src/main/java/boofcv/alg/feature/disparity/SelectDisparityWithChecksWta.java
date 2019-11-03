@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class SelectRectStandard <Array , T extends ImageGray>
+public abstract class SelectDisparityWithChecksWta<Array , T extends ImageGray>
 		implements DisparitySelect<Array,T>
 {
 	// output containing disparity
@@ -76,7 +76,7 @@ public abstract class SelectRectStandard <Array , T extends ImageGray>
 	 * @param texture Tolerance for how similar optimal region is to other region.  Disable with a value &le; 0.
 	 *                Closer to zero is more tolerant. Try 0.1
 	 */
-	public SelectRectStandard(int maxError, int rightToLeftTolerance, double texture) {
+	public SelectDisparityWithChecksWta(int maxError, int rightToLeftTolerance, double texture) {
 		this.maxError = maxError <= 0 ? Integer.MAX_VALUE : maxError;
 		this.rightToLeftTolerance = rightToLeftTolerance;
 		setTexture(texture);

@@ -18,12 +18,12 @@
 
 package boofcv.alg.feature.disparity.impl;
 
-import boofcv.alg.feature.disparity.SelectRectStandard;
+import boofcv.alg.feature.disparity.SelectDisparityWithChecksWta;
 import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
- * Implementation of {@link SelectRectStandard} as a base class for arrays of type F32.
+ * Implementation of {@link SelectDisparityWithChecksWta} as a base class for arrays of type F32.
  * Extend for different output image types.
  * </p>
  *
@@ -33,8 +33,8 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class ImplSelectRectStandardBase_F32<T extends ImageGray<T>>
-		extends SelectRectStandard<float[],T>
+public abstract class ImplSelectWithChecksBase_F32<T extends ImageGray<T>>
+		extends SelectDisparityWithChecksWta<float[],T>
 {
 	// scores organized for more efficient processing
 	float columnScore[] = new float[1];
@@ -43,11 +43,11 @@ public abstract class ImplSelectRectStandardBase_F32<T extends ImageGray<T>>
 	// texture threshold, use an integer value for speed.
 	protected float textureThreshold;
 
-	public ImplSelectRectStandardBase_F32(int maxError, int rightToLeftTolerance, double texture) {
+	public ImplSelectWithChecksBase_F32(int maxError, int rightToLeftTolerance, double texture) {
 		super(maxError,rightToLeftTolerance,texture);
 	}
 
-	public ImplSelectRectStandardBase_F32( ImplSelectRectStandardBase_F32<T> original ) {
+	public ImplSelectWithChecksBase_F32(ImplSelectWithChecksBase_F32<T> original ) {
 		this(original.maxError,original.rightToLeftTolerance,original.textureThreshold);
 	}
 

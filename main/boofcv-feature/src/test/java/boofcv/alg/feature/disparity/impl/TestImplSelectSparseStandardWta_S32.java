@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,6 @@ public class TestImplSelectSparseStandardWta_S32 extends ChecksSelectSparseStand
 
 	@Override
 	protected SelectSparseStandardWta<int[]> createAlg(int maxError, double texture) {
-		return new ImplSelectSparseStandardWta_S32(maxError,texture);
+		return new ImplSelectSparseWithChecksWta_S32(maxError,texture);
 	}
 }

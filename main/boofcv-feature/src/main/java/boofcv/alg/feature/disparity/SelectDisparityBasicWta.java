@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class SelectRectBasicWta<Array , Disparity extends ImageGray>
+public abstract class SelectDisparityBasicWta<Array , Disparity extends ImageGray>
 		implements DisparitySelect<Array,Disparity>
 {
 	// Output disparity image

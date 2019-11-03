@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ public class TestSelectRectSubpixel_F32_F32 extends ChecksSelectRectStandardBase
 	}
 
 	@Override
-	public ImplSelectRectStandardBase_F32<GrayF32> createSelector(int maxError, int rightToLeftTolerance, double texture) {
+	public ImplSelectWithChecksBase_F32<GrayF32> createSelector(int maxError, int rightToLeftTolerance, double texture) {
 		return new SelectRectSubpixel.F32_F32(maxError, rightToLeftTolerance, texture);
 	}
 

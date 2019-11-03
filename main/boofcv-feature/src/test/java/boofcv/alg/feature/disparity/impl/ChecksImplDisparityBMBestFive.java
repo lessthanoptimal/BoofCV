@@ -48,9 +48,9 @@ public abstract class ChecksImplDisparityBMBestFive<I extends ImageGray<I>, DI e
 		this.disparityType = disparityType;
 
 		if( imageType == GrayU8.class || imageType == GrayU16.class|| imageType == GrayS16.class ) {
-			compDisp = (DisparitySelect)new ImplSelectRectBasicWta_S32_U8();
+			compDisp = (DisparitySelect)new ImplSelectBasicWta_S32_U8();
 		} else {
-			compDisp = (DisparitySelect)new ImplSelectRectBasicWta_F32_U8();
+			compDisp = (DisparitySelect)new ImplSelectBasicWta_F32_U8();
 		}
 
 		scoreRow = FactoryStereoDisparity.createScoreRowSad(imageType);

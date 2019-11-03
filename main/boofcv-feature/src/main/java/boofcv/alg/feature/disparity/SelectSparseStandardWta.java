@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ package boofcv.alg.feature.disparity;
  * <p>
  * Selects the disparity the smallest error and optionally applies several different types of validation to remove false
  * positives.  The two validations it can apply are maxError and texture based.
- * See {@link boofcv.alg.feature.disparity.SelectRectStandard} for more details on validation checks.
+ * See {@link SelectDisparityWithChecksWta} for more details on validation checks.
  * </p>
  *
  * @author Peter Abeles

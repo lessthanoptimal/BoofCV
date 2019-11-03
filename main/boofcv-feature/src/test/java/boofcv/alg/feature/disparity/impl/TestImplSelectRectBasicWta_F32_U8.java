@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,6 @@ public class TestImplSelectRectBasicWta_F32_U8 extends BasicDisparitySelectRectT
 
 	@Override
 	public DisparitySelect<float[],GrayU8> createAlg() {
-		return new ImplSelectRectBasicWta_F32_U8();
+		return new ImplSelectBasicWta_F32_U8();
 	}
 }
