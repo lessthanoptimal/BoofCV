@@ -15,6 +15,7 @@ Version : 0.35
 - Image Processing
   * Added Hessian determinant direct from input image
   * Added sumAbs() to ImageStatistics
+  * Added histogramScaled() to ImageStatistics
   * Added Census transform
 - Concurrency
   * PixelMath now only uses concurrent algorithm when input image is more than 10,000 pixels.

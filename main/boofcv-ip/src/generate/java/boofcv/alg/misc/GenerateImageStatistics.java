@@ -90,6 +90,7 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 
 			printVariance();
 			printHistogram();
+			printHistogramScaled();
 		}
 	}
 
@@ -109,6 +110,26 @@ public class GenerateImageStatistics extends CodeGeneratorBase {
 				"\t\t\tImplImageStatistics_MT.histogram(input,minValue,histogram);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplImageStatistics.histogram(input,minValue,histogram);\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printHistogramScaled() {
+		String sumType = input.getSumType();
+
+		out.print("\t/**\n" +
+				"\t * Computes the histogram of intensity values for the image while scaling the range to match the histogram.\n" +
+				"\t * \n" +
+				"\t * @param input (input) Image.\n" +
+				"\t * @param minValue (input) Minimum possible intensity value   \n" +
+				"\t * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.\n" +
+				"\t */\n" +
+				"\tpublic static void histogramScaled( "+input.getSingleBandName()+" input , "+sumType+" minValue , "+sumType+" maxValue , int histogram[] ) {\n" +
+				"\t\tint N = input.width*input.height;\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {\n" +
+				"\t\t\tImplImageStatistics_MT.histogramScaled(input,minValue,maxValue,histogram);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplImageStatistics.histogramScaled(input,minValue,maxValue,histogram);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}

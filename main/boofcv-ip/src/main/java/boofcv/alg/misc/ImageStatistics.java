@@ -306,6 +306,22 @@ public class ImageStatistics {
 	}
 
 	/**
+	 * Computes the histogram of intensity values for the image while scaling the range to match the histogram.
+	 * 
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogramScaled( GrayU8 input , int minValue , int maxValue , int histogram[] ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {
+			ImplImageStatistics_MT.histogramScaled(input,minValue,maxValue,histogram);
+		} else {
+			ImplImageStatistics.histogramScaled(input,minValue,maxValue,histogram);
+		}
+	}
+
+	/**
 	 * Returns the minimum element value.
 	 * 
 	 * @param input Input image. Not modified.
@@ -585,6 +601,22 @@ public class ImageStatistics {
 	}
 
 	/**
+	 * Computes the histogram of intensity values for the image while scaling the range to match the histogram.
+	 * 
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogramScaled( GrayS8 input , int minValue , int maxValue , int histogram[] ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {
+			ImplImageStatistics_MT.histogramScaled(input,minValue,maxValue,histogram);
+		} else {
+			ImplImageStatistics.histogramScaled(input,minValue,maxValue,histogram);
+		}
+	}
+
+	/**
 	 * Returns the minimum element value.
 	 * 
 	 * @param input Input image. Not modified.
@@ -848,6 +880,22 @@ public class ImageStatistics {
 			ImplImageStatistics_MT.histogram(input,minValue,histogram);
 		} else {
 			ImplImageStatistics.histogram(input,minValue,histogram);
+		}
+	}
+
+	/**
+	 * Computes the histogram of intensity values for the image while scaling the range to match the histogram.
+	 * 
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogramScaled( GrayU16 input , int minValue , int maxValue , int histogram[] ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {
+			ImplImageStatistics_MT.histogramScaled(input,minValue,maxValue,histogram);
+		} else {
+			ImplImageStatistics.histogramScaled(input,minValue,maxValue,histogram);
 		}
 	}
 
@@ -1131,6 +1179,22 @@ public class ImageStatistics {
 	}
 
 	/**
+	 * Computes the histogram of intensity values for the image while scaling the range to match the histogram.
+	 * 
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogramScaled( GrayS16 input , int minValue , int maxValue , int histogram[] ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {
+			ImplImageStatistics_MT.histogramScaled(input,minValue,maxValue,histogram);
+		} else {
+			ImplImageStatistics.histogramScaled(input,minValue,maxValue,histogram);
+		}
+	}
+
+	/**
 	 * Returns the minimum element value.
 	 * 
 	 * @param input Input image. Not modified.
@@ -1406,6 +1470,22 @@ public class ImageStatistics {
 			ImplImageStatistics_MT.histogram(input,minValue,histogram);
 		} else {
 			ImplImageStatistics.histogram(input,minValue,histogram);
+		}
+	}
+
+	/**
+	 * Computes the histogram of intensity values for the image while scaling the range to match the histogram.
+	 * 
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogramScaled( GrayS32 input , int minValue , int maxValue , int histogram[] ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {
+			ImplImageStatistics_MT.histogramScaled(input,minValue,maxValue,histogram);
+		} else {
+			ImplImageStatistics.histogramScaled(input,minValue,maxValue,histogram);
 		}
 	}
 
@@ -1689,6 +1769,22 @@ public class ImageStatistics {
 	}
 
 	/**
+	 * Computes the histogram of intensity values for the image while scaling the range to match the histogram.
+	 * 
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogramScaled( GrayS64 input , long minValue , long maxValue , int histogram[] ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {
+			ImplImageStatistics_MT.histogramScaled(input,minValue,maxValue,histogram);
+		} else {
+			ImplImageStatistics.histogramScaled(input,minValue,maxValue,histogram);
+		}
+	}
+
+	/**
 	 * Returns the minimum element value.
 	 * 
 	 * @param input Input image. Not modified.
@@ -1968,6 +2064,22 @@ public class ImageStatistics {
 	}
 
 	/**
+	 * Computes the histogram of intensity values for the image while scaling the range to match the histogram.
+	 * 
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogramScaled( GrayF32 input , float minValue , float maxValue , int histogram[] ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {
+			ImplImageStatistics_MT.histogramScaled(input,minValue,maxValue,histogram);
+		} else {
+			ImplImageStatistics.histogramScaled(input,minValue,maxValue,histogram);
+		}
+	}
+
+	/**
 	 * Returns the minimum element value.
 	 * 
 	 * @param input Input image. Not modified.
@@ -2243,6 +2355,22 @@ public class ImageStatistics {
 			ImplImageStatistics_MT.histogram(input,minValue,histogram);
 		} else {
 			ImplImageStatistics.histogram(input,minValue,histogram);
+		}
+	}
+
+	/**
+	 * Computes the histogram of intensity values for the image while scaling the range to match the histogram.
+	 * 
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogramScaled( GrayF64 input , double minValue , double maxValue , int histogram[] ) {
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N >= BoofConcurrency.SMALL_IMAGE ) {
+			ImplImageStatistics_MT.histogramScaled(input,minValue,maxValue,histogram);
+		} else {
+			ImplImageStatistics.histogramScaled(input,minValue,maxValue,histogram);
 		}
 	}
 

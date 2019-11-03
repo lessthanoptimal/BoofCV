@@ -41,7 +41,7 @@ public class TestImageStatistics {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 10*8 + 8*8;
+		int numExpected = 11*8 + 8*8;
 		Method methods[] = ImageStatistics.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -72,6 +72,8 @@ public class TestImageStatistics {
 					testMeanDiffAbs(m);
 				} else if( m.getName().compareTo("histogram") == 0 ) {
 					testHistogram(m);
+				} else if( m.getName().compareTo("histogramScaled") == 0 ) {
+					testHistogramScaled(m);
 				} else {
 					throw new RuntimeException("Unknown function: "+m.getName());
 				}
@@ -388,6 +390,40 @@ public class TestImageStatistics {
 		}
 
 		for( int i = 0; i < 40; i++ ) {
+			assertEquals(expected[i],histogram[i],"index "+i);
+		}
+	}
+
+	private void testHistogramScaled(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageGray inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+
+		int histogram[] = new int[ 40 ];
+		// it should be zeroed
+		for( int i = 0; i < histogram.length; i++ )
+			histogram[i] = 100;
+
+		int minValue,maxValue;
+		if( inputA.getDataType().isSigned() ) {
+			minValue = -20; maxValue = 59;
+			GImageMiscOps.fillUniform(inputA, rand, minValue,maxValue);
+			m.invoke(null,inputA,minValue,maxValue,histogram);
+		} else {
+			minValue = 5; maxValue = 79;
+			GImageMiscOps.fillUniform(inputA, rand, minValue,maxValue);
+			m.invoke(null,inputA,minValue,maxValue,histogram);
+		}
+
+		// manually compute the histogram
+		int expected[] = new int[ histogram.length ];
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double a = GeneralizedImageOps.get(inputA,j,i);
+				expected[ (int)(histogram.length*(a-minValue)/(maxValue-minValue+1)) ]++;
+			}
+		}
+
+		for( int i = 0; i < histogram.length; i++ ) {
 			assertEquals(expected[i],histogram[i],"index "+i);
 		}
 	}

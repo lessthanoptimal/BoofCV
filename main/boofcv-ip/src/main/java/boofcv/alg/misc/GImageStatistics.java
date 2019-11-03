@@ -517,4 +517,34 @@ public class GImageStatistics {
 			throw new IllegalArgumentException("Unknown image Type");
 		}
 	}
+
+	/**
+	 * Computes the histogram of intensity values for the image.  For floating point images it is rounded
+	 * to the nearest integer using "(int)value".
+	 *
+	 * @param input (input) Image.
+	 * @param minValue (input) Minimum possible intensity value   Ignored for unsigned images.
+	 * @param histogram (output) Storage for histogram. Number of elements must be equal to max value.
+	 */
+	public static void histogramScaled(ImageGray input , double minValue , double maxValue, int histogram[] ) {
+		if( GrayU8.class == input.getClass() ) {
+			ImageStatistics.histogramScaled((GrayU8)input,(int)minValue,(int)maxValue,histogram);
+		} else if( GrayS8.class == input.getClass() ) {
+			ImageStatistics.histogramScaled((GrayS8)input,(int)minValue,(int)maxValue,histogram);
+		} else if( GrayU16.class == input.getClass() ) {
+			ImageStatistics.histogramScaled((GrayU16)input,(int)minValue,(int)maxValue,histogram);
+		} else if( GrayS16.class == input.getClass() ) {
+			ImageStatistics.histogramScaled((GrayS16)input,(int)minValue,(int)maxValue,histogram);
+		} else if( GrayS32.class == input.getClass() ) {
+			ImageStatistics.histogramScaled((GrayS32)input,(int)minValue,(int)maxValue,histogram);
+		} else if( GrayS64.class == input.getClass() ) {
+			ImageStatistics.histogramScaled((GrayS64)input,(long)minValue,(long)maxValue,histogram);
+		} else if( GrayF32.class == input.getClass() ) {
+			ImageStatistics.histogramScaled((GrayF32)input,(float)minValue,(float)maxValue,histogram);
+		} else if( GrayF64.class == input.getClass() ) {
+			ImageStatistics.histogramScaled((GrayF64)input,minValue,maxValue,histogram);
+		} else {
+			throw new IllegalArgumentException("Unknown image Type");
+		}
+	}
 }

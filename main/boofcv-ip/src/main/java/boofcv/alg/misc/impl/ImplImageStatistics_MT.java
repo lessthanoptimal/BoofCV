@@ -198,6 +198,32 @@ public class ImplImageStatistics_MT {
 		}
 	}
 
+	public static void histogramScaled( GrayU8 input , int minValue , int maxValue, int[] histogram ) {
+		Arrays.fill(histogram,0);
+
+		final int histLength = histogram.length;
+		final int rangeValue = maxValue-minValue+1;
+		
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			while( index < end ) {
+				h[(int)(histLength*((input.data[index++]& 0xFF) - minValue)/rangeValue) ]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
+			}
+		}
+	}
+
 	public static int min( byte[] array , int startIndex , int rows , int columns , int stride ) {
 
 		final int _output = array[startIndex];
@@ -392,6 +418,32 @@ public class ImplImageStatistics_MT {
 		}
 	}
 
+	public static void histogramScaled( GrayS8 input , int minValue , int maxValue, int[] histogram ) {
+		Arrays.fill(histogram,0);
+
+		final int histLength = histogram.length;
+		final int rangeValue = maxValue-minValue+1;
+		
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			while( index < end ) {
+				h[(int)(histLength*((input.data[index++]) - minValue)/rangeValue) ]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
+			}
+		}
+	}
+
 	public static int minU( short[] array , int startIndex , int rows , int columns , int stride ) {
 
 		final int _output = array[startIndex]& 0xFFFF;
@@ -541,6 +593,32 @@ public class ImplImageStatistics_MT {
 
 			while( index < end ) {
 				h[(input.data[index++]& 0xFFFF) - minValue ]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
+			}
+		}
+	}
+
+	public static void histogramScaled( GrayU16 input , int minValue , int maxValue, int[] histogram ) {
+		Arrays.fill(histogram,0);
+
+		final int histLength = histogram.length;
+		final int rangeValue = maxValue-minValue+1;
+		
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			while( index < end ) {
+				h[(int)(histLength*((input.data[index++]& 0xFFFF) - minValue)/rangeValue) ]++;
 			}
 		}
 		synchronized(list){list.add(h);}});
@@ -746,6 +824,32 @@ public class ImplImageStatistics_MT {
 		}
 	}
 
+	public static void histogramScaled( GrayS16 input , int minValue , int maxValue, int[] histogram ) {
+		Arrays.fill(histogram,0);
+
+		final int histLength = histogram.length;
+		final int rangeValue = maxValue-minValue+1;
+		
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			while( index < end ) {
+				h[(int)(histLength*((input.data[index++]) - minValue)/rangeValue) ]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
+			}
+		}
+	}
+
 	public static int min( int[] array , int startIndex , int rows , int columns , int stride ) {
 
 		final int _output = array[startIndex];
@@ -929,6 +1033,32 @@ public class ImplImageStatistics_MT {
 
 			while( index < end ) {
 				h[(input.data[index++]) - minValue ]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
+			}
+		}
+	}
+
+	public static void histogramScaled( GrayS32 input , int minValue , int maxValue, int[] histogram ) {
+		Arrays.fill(histogram,0);
+
+		final int histLength = histogram.length;
+		final int rangeValue = maxValue-minValue+1;
+		
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			while( index < end ) {
+				h[(int)(histLength*((input.data[index++]) - minValue)/rangeValue) ]++;
 			}
 		}
 		synchronized(list){list.add(h);}});
@@ -1134,6 +1264,32 @@ public class ImplImageStatistics_MT {
 		}
 	}
 
+	public static void histogramScaled( GrayS64 input , long minValue , long maxValue, int[] histogram ) {
+		Arrays.fill(histogram,0);
+
+		final long histLength = histogram.length;
+		final long rangeValue = maxValue-minValue+1;
+		
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			while( index < end ) {
+				h[(int)(histLength*(input.data[index++] - minValue)/rangeValue)]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
+			}
+		}
+	}
+
 	public static float min( float[] array , int startIndex , int rows , int columns , int stride ) {
 
 		final float _output = array[startIndex];
@@ -1328,6 +1484,32 @@ public class ImplImageStatistics_MT {
 		}
 	}
 
+	public static void histogramScaled( GrayF32 input , float minValue , float maxValue, int[] histogram ) {
+		Arrays.fill(histogram,0);
+
+		final float histLength = histogram.length;
+		final float rangeValue = maxValue-minValue+1;
+		
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			while( index < end ) {
+				h[(int)(histLength*(input.data[index++] - minValue)/rangeValue)]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
+			}
+		}
+	}
+
 	public static double min( double[] array , int startIndex , int rows , int columns , int stride ) {
 
 		final double _output = array[startIndex];
@@ -1511,6 +1693,32 @@ public class ImplImageStatistics_MT {
 
 			while( index < end ) {
 				h[(int)(input.data[index++] - minValue)]++;
+			}
+		}
+		synchronized(list){list.add(h);}});
+		for (int i = 0; i < list.size(); i++) {
+			int[] h = list.get(i);
+			for (int j = 0; j < histogram.length; j++) {
+				histogram[j] += h[j];
+			}
+		}
+	}
+
+	public static void histogramScaled( GrayF64 input , double minValue , double maxValue, int[] histogram ) {
+		Arrays.fill(histogram,0);
+
+		final double histLength = histogram.length;
+		final double rangeValue = maxValue-minValue+1;
+		
+		final List<int[]> list = new ArrayList<>();
+		BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{
+		final int[] h = new int[histogram.length];
+		for( int y = y0; y < y1; y++ ) {
+			int index = input.startIndex + y*input.stride;
+			int end = index + input.width;
+
+			while( index < end ) {
+				h[(int)(histLength*(input.data[index++] - minValue)/rangeValue)]++;
 			}
 		}
 		synchronized(list){list.add(h);}});

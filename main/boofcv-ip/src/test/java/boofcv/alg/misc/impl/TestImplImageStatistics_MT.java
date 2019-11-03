@@ -38,7 +38,7 @@ class TestImplImageStatistics_MT extends CompareIdenticalFunctions {
 
 	@Test
 	void performTests() {
-		performTests(84);
+		performTests(92);
 	}
 
 	@Override
@@ -62,13 +62,14 @@ class TestImplImageStatistics_MT extends CompareIdenticalFunctions {
 			input2 = (ImageGray)t.createImage(width,height);
 		}
 
+		int minValue,maxValue;
 		if( input1.getImageType().getDataType().isSigned() ) {
-			GImageMiscOps.fillUniform(input1, rand, -100, 100);
-			GImageMiscOps.fillUniform(input2, rand, -100, 100);
+			minValue = -100; maxValue = 100;
 		} else {
-			GImageMiscOps.fillUniform(input1, rand, 0, 200);
-			GImageMiscOps.fillUniform(input2, rand, 0, 200);
+			minValue = 0; maxValue = 200;
 		}
+		GImageMiscOps.fillUniform(input1, rand, minValue, maxValue);
+		GImageMiscOps.fillUniform(input2, rand, minValue, maxValue);
 
 		switch (candidate.getName()) {
 			case "min":
@@ -105,13 +106,15 @@ class TestImplImageStatistics_MT extends CompareIdenticalFunctions {
 
 			case "histogram":
 				parameters[0] = input1;
-				if( input1.getImageType().getDataType().isSigned() ) {
-					parameters[1] = BoofTesting.primitive(-100, types[1]);
-				} else {
-					parameters[1] = BoofTesting.primitive(0, types[1]);
-
-				}
+				parameters[1] = BoofTesting.primitive(minValue, types[1]);
 				parameters[2] = new int[256];
+				break;
+
+			case "histogramScaled":
+				parameters[0] = input1;
+				parameters[1] = BoofTesting.primitive(minValue, types[1]);
+				parameters[2] = BoofTesting.primitive(maxValue, types[2]);
+				parameters[3] = new int[90];
 				break;
 
 			case "variance":

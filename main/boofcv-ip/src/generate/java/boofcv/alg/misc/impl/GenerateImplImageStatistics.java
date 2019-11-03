@@ -89,6 +89,7 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 
 			printVariance();
 			printHistogram();
+			printHistogramScaled();
 		}
 	}
 
@@ -116,6 +117,45 @@ public class GenerateImplImageStatistics extends CodeGeneratorBase {
 				out.print("\t\t\t\th[(input.data[index++]"+input.getBitWise()+") - minValue ]++;\n");
 		} else {
 			out.print("\t\t\t\th[(int)(input.data[index++] - minValue)]++;\n");
+		}
+		out.print("\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t\t//CONCURRENT_INLINE synchronized(list){list.add(h);}});\n" +
+				"\t\t//CONCURRENT_INLINE for (int i = 0; i < list.size(); i++) {\n" +
+				"\t\t//CONCURRENT_INLINE \tint[] h = list.get(i);\n" +
+				"\t\t//CONCURRENT_INLINE \tfor (int j = 0; j < histogram.length; j++) {\n" +
+				"\t\t//CONCURRENT_INLINE \t\thistogram[j] += h[j];\n" +
+				"\t\t//CONCURRENT_INLINE \t}\n" +
+				"\t\t//CONCURRENT_INLINE }\n" +
+				"\t}\n\n");
+	}
+
+	public void printHistogramScaled() {
+		String sumType = input.getSumType();
+
+		out.print("\tpublic static void histogramScaled( "+input.getSingleBandName()+" input , "+sumType+" minValue , "+sumType+" maxValue, int[] histogram ) {\n" +
+				"\t\tArrays.fill(histogram,0);\n" +
+				"\n" +
+				"\t\tfinal "+sumType+" histLength = histogram.length;\n" +
+				"\t\tfinal "+sumType+" rangeValue = maxValue-minValue+1;\n" +
+				"\t\t\n" +
+				"\t\t//CONCURRENT_INLINE final List<int[]> list = new ArrayList<>();\n" +
+				"\t\t//CONCURRENT_INLINE BoofConcurrency.loopBlocks(0,input.height,(y0,y1)->{\n" +
+				"\t\t//CONCURRENT_BELOW final int[] h = new int[histogram.length];\n" +
+				"\t\tfinal int[] h = histogram;\n" +
+				"\t\t//CONCURRENT_BELOW for( int y = y0; y < y1; y++ ) {\n" +
+				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+				"\t\t\tint index = input.startIndex + y*input.stride;\n" +
+				"\t\t\tint end = index + input.width;\n" +
+				"\n" +
+				"\t\t\twhile( index < end ) {\n");
+		if( input.isInteger()) {
+			if( input.getNumBits() == 64 )
+				out.print("\t\t\t\th[(int)(histLength*(input.data[index++] - minValue)/rangeValue)]++;\n");
+			else
+				out.print("\t\t\t\th[(int)(histLength*((input.data[index++]"+input.getBitWise()+") - minValue)/rangeValue) ]++;\n");
+		} else {
+			out.print("\t\t\t\th[(int)(histLength*(input.data[index++] - minValue)/rangeValue)]++;\n");
 		}
 		out.print("\t\t\t}\n" +
 				"\t\t}\n" +

@@ -41,7 +41,7 @@ public class TestGImageStatistics extends BaseGClassChecksInMisc {
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(9);
+		performTests(10);
 	}
 
 	@Override
@@ -82,6 +82,12 @@ public class TestGImageStatistics extends BaseGClassChecksInMisc {
 			ret[0][0] = inputA;
 			ret[0][1] = -10;
 			ret[0][2] = new int[histogramSize];
+		} else if( name.equals("histogramScaled")) {
+			int histogramSize = 6;
+			ret[0][0] = inputA;
+			ret[0][1] = -10;
+			ret[0][2] = 10;
+			ret[0][3] = new int[histogramSize];
 		}
 
 		fillRandom(inputA);

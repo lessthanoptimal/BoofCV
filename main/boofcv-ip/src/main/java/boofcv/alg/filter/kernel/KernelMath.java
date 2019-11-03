@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -163,6 +163,57 @@ public class KernelMath {
 		}
 
 		return ret;
+	}
+
+	/**
+	 * Applies a smoothing kernel the the array. The kernel must sum to 1. Array borders are handling by
+	 * normalizing based on the overlap of the kernel with the image at that point
+	 * @param kernel Smothing kernel that sums to 1
+	 * @param src Input array
+	 * @param dst Output array
+	 * @param length Effective length of the array
+	 */
+	public static void convolveSmooth( final Kernel1D_F32 kernel ,
+									   final float[]src , final float[]dst ,
+									   final int length ) {
+		int idx0 = kernel.offset;
+		int idx1 = length - kernel.width + kernel.offset;
+
+		// Convolve the inner array first where we don't need to worry about the border
+		for (int i = idx0; i < idx1; i++) {
+			float sum = 0;
+			int loc = i-kernel.offset;
+			for (int j = 0; j < kernel.width; j++, loc++ ) {
+				sum += kernel.data[j]*src[loc];
+			}
+			dst[i] = sum;
+		}
+
+		// Now handle the border by normalizing the kernel
+		for (int i = 0; i < idx0; i++) {
+			float weight = 0;
+			float sum = 0;
+			int loc = i-kernel.offset;
+			for (int j = 0; j < kernel.width; j++, loc++ ) {
+				if( loc > 0 && loc < length ) {
+					sum += kernel.data[j] * src[loc];
+					weight += kernel.data[j];
+				}
+			}
+			dst[i] = sum/weight;
+		}
+		for (int i = idx1; i < length; i++) {
+			float weight = 0;
+			float sum = 0;
+			int loc = i-kernel.offset;
+			for (int j = 0; j < kernel.width; j++, loc++ ) {
+				if( loc > 0 && loc < length ) {
+					sum += kernel.data[j] * src[loc];
+					weight += kernel.data[j];
+				}
+			}
+			dst[i] = sum/weight;
+		}
 	}
 
 	public static Kernel2D convolve2D( Kernel2D a , Kernel2D b ) {
