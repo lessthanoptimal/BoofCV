@@ -18,8 +18,8 @@
 
 package boofcv.abst.feature.disparity;
 
-import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
-import boofcv.alg.feature.disparity.DisparitySparseSelect;
+import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
+import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
 import boofcv.struct.image.ImageGray;
 
 /**

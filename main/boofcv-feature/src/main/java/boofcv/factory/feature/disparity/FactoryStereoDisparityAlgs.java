@@ -18,10 +18,10 @@
 
 package boofcv.factory.feature.disparity;
 
-import boofcv.alg.feature.disparity.DisparitySelect;
-import boofcv.alg.feature.disparity.DisparitySparseScoreSadRect;
-import boofcv.alg.feature.disparity.DisparitySparseSelect;
-import boofcv.alg.feature.disparity.impl.*;
+import boofcv.alg.feature.disparity.block.DisparitySelect;
+import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
+import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
+import boofcv.alg.feature.disparity.block.impl.*;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 
@@ -36,7 +36,7 @@ public class FactoryStereoDisparityAlgs {
 		if( maxError < 0 && tolR2L < 0  & texture <= 0 )
 			return new ImplSelectBasicWta_S32_U8();
 		else
-			return new ImplSelectBasicWta_F32_U8_S32_U8(maxError,tolR2L,texture);
+			return new ImplSelectWithChecksWta_S32_U8(maxError,tolR2L,texture);
 	}
 
 	public static DisparitySelect<float[],GrayU8> selectDisparity_F32(int maxError , int tolR2L , double texture) {
@@ -48,12 +48,12 @@ public class FactoryStereoDisparityAlgs {
 
 	public static DisparitySelect<int[],GrayF32>
 	selectDisparitySubpixel_S32( int maxError , int tolR2L , double texture) {
-		return new SelectRectSubpixel.S32_F32(maxError,tolR2L,texture);
+		return new SelectDisparitySubpixel.S32_F32(maxError,tolR2L,texture);
 	}
 
 	public static DisparitySelect<float[],GrayF32>
 	selectDisparitySubpixel_F32( int maxError , int tolR2L , double texture) {
-		return new SelectRectSubpixel.F32_F32(maxError,tolR2L,texture);
+		return new SelectDisparitySubpixel.F32_F32(maxError,tolR2L,texture);
 	}
 
 	public static DisparitySparseSelect<int[]>

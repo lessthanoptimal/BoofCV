@@ -19,6 +19,7 @@
 package boofcv.alg.feature.disparity;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
