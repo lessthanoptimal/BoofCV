@@ -89,15 +89,15 @@ public class FactoryStereoDisparity {
 			throw new IllegalArgumentException("Unknown image type");
 		}
 
-		switch( config.error ) {
+		switch( config.errorType) {
 			case SAD: {
 				BlockRowScore rowScore = createScoreRowSad(imageType);
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
 				return new WrapDisparityBlockMatchRowFormat(alg);
 			}
 
-			case CENSUS: { // TODO support multiple census
-				FilterImageInterface censusTran = FactoryCensusTransform.blockDense(3,imageType);
+			case CENSUS: {
+				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.censusVariant,imageType);
 				Class censusType = censusTran.getOutputType().getImageClass();
 				BlockRowScore rowScore;
 				if (censusType == GrayU8.class) {
@@ -115,7 +115,7 @@ public class FactoryStereoDisparity {
 			}
 
 			default:
-				throw new IllegalArgumentException("Unsupported error type "+config.error);
+				throw new IllegalArgumentException("Unsupported error type "+config.errorType);
 		}
 	}
 
@@ -154,15 +154,15 @@ public class FactoryStereoDisparity {
 			throw new IllegalArgumentException("Unknown image type");
 		}
 
-		switch( config.error ) {
+		switch( config.errorType) {
 			case SAD: {
 				BlockRowScore rowScore = createScoreRowSad(imageType);
 				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
 				return new WrapDisparityBlockMatchRowFormat(alg);
 			}
 
-			case CENSUS: { // TODO support multiple census
-				FilterImageInterface censusTran = FactoryCensusTransform.blockDense(3,imageType);
+			case CENSUS: {
+				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.censusVariant,imageType);
 				Class censusType = censusTran.getOutputType().getImageClass();
 				BlockRowScore rowScore;
 				if (censusType == GrayU8.class) {
@@ -180,7 +180,7 @@ public class FactoryStereoDisparity {
 			}
 
 			default:
-				throw new IllegalArgumentException("Unsupported error type "+config.error);
+				throw new IllegalArgumentException("Unsupported error type "+config.errorType);
 		}
 	}
 

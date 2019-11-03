@@ -40,6 +40,8 @@ public class FilterCensusTransformSampleS64<In extends ImageGray<In>>
 	GrowQueue_I32 workSpace = new GrowQueue_I32();
 
 	public FilterCensusTransformSampleS64(FastQueue<Point2D_I32> samples , ImageBorder<In> border, Class<In> imageType ) {
+		if( samples.size > 64 )
+			throw new IllegalArgumentException("At most 64 sample points for now. size = "+samples.size);
 		this.samples = samples;
 		this.border = border;
 		this.inputType = ImageType.single(imageType);

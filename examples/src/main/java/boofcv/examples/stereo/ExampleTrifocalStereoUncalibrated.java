@@ -459,7 +459,7 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		// compute disparity
 		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
-		config.error = DisparityError.SAD;
+		config.errorType = DisparityError.SAD;
 		config.minDisparity = minDisparity;
 		config.maxDisparity = maxDisparity;
 		config.subpixel = true;

@@ -18,12 +18,14 @@
 
 package boofcv.demonstrations.feature.disparity;
 
+import boofcv.factory.transform.census.CensusType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -57,6 +59,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	int selectedAlg = 0;
 	// Which error method to use
 	int selectedError = 0;
+	// The sub type of error
+	int selectedErrorVariant = 0;
 	int colorScheme = 0;
 	// minimum disparity to calculate
 	int minDisparity = 0;
@@ -86,9 +90,9 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	// If the point cloud should be colorized or not
 	JComboBox comboColorizer = combo(0,"Color","X","Y","Z","X-YZ","Y-XZ","Z-XY");
 
-	JSlider sliderPeriodColor = slider(0,1000,periodAdjust,100);
-	JSlider sliderOffsetColor = slider(0,1000,offsetAdjust,100);
-	JSlider sliderSpeed3D = slider(0,1000,speedAdjust,100);
+	JSlider sliderPeriodColor = slider(0,1000,periodAdjust,120);
+	JSlider sliderOffsetColor = slider(0,1000,offsetAdjust,120);
+	JSlider sliderSpeed3D = slider(0,1000,speedAdjust,120);
 
 	// toggles if invalid pixels are black or not
 	JCheckBox invalidToggle = checkbox("Color Invalid",colorInvalid);
@@ -98,6 +102,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 
 	JComboBox comboAlg = combo(selectedAlg,"Five Regions","Region","Region Basic");
 	JComboBox comboError = combo(selectedError,"SAD","Census");
+	JComboBox comboErrorVariant = combo(selectedErrorVariant,"FOOBAR");
 	JSpinner minDisparitySpinner = spinner(minDisparity,0,255,5);
 	JSpinner maxDisparitySpinner = spinner(maxDisparity,1,255,5);
 	JCheckBox subpixelToggle = checkbox("Subpixel",useSubpixel);
@@ -112,6 +117,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	public DisparityDisplayPanel() {
 
 		update3DControls();
+		updateErrorVariant();
 
 		addLabeled(processingTimeLabel, "Time (ms)");
 		addLabeled(imageSizeLabel,"Image Size");
@@ -123,8 +129,9 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addLabeled(sliderSpeed3D,"Speed");
 		addAlignLeft(invalidToggle);
 		addSeparator(150);
-		addAlignCenter(comboAlg);
-		addAlignCenter(comboError);
+		addLabeled(comboAlg,"Method");
+		addLabeled(comboError,"Error Type");
+		addLabeled(comboErrorVariant,"Variant");
 		addLabeled(minDisparitySpinner, "Min Disparity");
 		addLabeled(maxDisparitySpinner, "Max Disparity");
 		addAlignLeft(subpixelToggle);
@@ -137,6 +144,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addAlignLeft(checkRecompute);
 		addAlignLeft(checkConcurrent);
 		addVerticalGlue();
+
+		setPreferredSize(new Dimension(180,0));
 	}
 
 	public void setZoom( double _zoom ) {
@@ -196,6 +205,20 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		}
 	}
 
+	private void updateErrorVariant() {
+		DefaultComboBoxModel model;
+		if( selectedError == 0 ) {
+			selectedErrorVariant = -1;
+			model = new DefaultComboBoxModel();
+			comboErrorVariant.setEnabled(false);
+		} else {
+			selectedErrorVariant = 0;
+			model = new DefaultComboBoxModel(CensusType.values());
+			comboErrorVariant.setEnabled(true);
+		}
+		comboErrorVariant.setModel(model);
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if( listener == null )
@@ -213,6 +236,10 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 			listener.algorithmChanged();
 		} else if( e.getSource() == comboError) {
 			selectedError = comboError.getSelectedIndex();
+			updateErrorVariant();
+			listener.algorithmChanged();
+		} else if( e.getSource() == comboErrorVariant) {
+			selectedErrorVariant = comboErrorVariant.getSelectedIndex();
 			listener.algorithmChanged();
 		} else if( e.getSource() == invalidToggle) {
 			colorInvalid = invalidToggle.isSelected();
@@ -269,6 +296,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	public void setActiveGui( boolean error , boolean reverse ) {
 		errorSpinner.setEnabled(error);
 		reverseSpinner.setEnabled(reverse);
+		subpixelToggle.setEnabled(reverse);
+		textureSpinner.setEnabled(reverse);
 	}
 
 	public void setImageSize( final int width , final int height ) {

@@ -27,5 +27,7 @@ public enum CensusType {
 	BLOCK_3_3,
 	BLOCK_5_5,
 	BLOCK_7_7,
+	BLOCK_9_7,
+	BLOCK_13_5,
 	CIRCLE_9
 }

@@ -19,6 +19,7 @@
 package boofcv.factory.feature.disparity;
 
 import boofcv.alg.feature.disparity.DisparityBlockMatch;
+import boofcv.factory.transform.census.CensusType;
 
 /**
  * Configuration for the basic block matching stereo algorithm that employs a greedy winner takes all strategy.
@@ -51,12 +52,12 @@ public class ConfigureDisparityBM {
 	 */
 	public double maxPerPixelError=0;
 	/**
-	 * Tolerance for how difference the left to right associated values can be.  Try 1
+	 * Tolerance for how difference the left to right associated values can be.  Try 1. Disable with -1
 	 */
 	public int validateRtoL=1;
 	/**
 	 * Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
-	 * Try 0.1
+	 * Try 0.1. Disable with a value &le; 0
 	 */
 	public double texture = 0.1;
 
@@ -69,5 +70,10 @@ public class ConfigureDisparityBM {
 	/**
 	 * How the error is computed for each block
 	 */
-	public DisparityError error = DisparityError.CENSUS;
+	public DisparityError errorType = DisparityError.SAD;
+
+	/**
+	 * If Census error is used which variant should it use
+	 */
+	public CensusType censusVariant = CensusType.BLOCK_5_5;
 }

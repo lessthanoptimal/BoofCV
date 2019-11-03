@@ -28,6 +28,7 @@ import boofcv.factory.feature.disparity.ConfigureDisparityBM;
 import boofcv.factory.feature.disparity.ConfigureDisparityBMBest5;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
+import boofcv.factory.transform.census.CensusType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.d3.DisparityToColorPointCloud;
@@ -366,7 +367,9 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		if( control.selectedAlg == 0 ) {
 			changeGuiActive(true,true);
 			ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
-			config.error = error;
+			config.errorType = error;
+			if( error == DisparityError.CENSUS )
+				config.censusVariant = CensusType.values()[control.selectedErrorVariant];
 			config.minDisparity = minDisparity;
 			config.maxDisparity = maxDisparity;
 			config.subpixel = control.useSubpixel;
@@ -375,20 +378,29 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			config.validateRtoL = control.reverseTol;
 			config.texture = control.texture;
 			return FactoryStereoDisparity.blockMatchBest5(config,GrayU8.class,dispType);
-		} else if( control.selectedAlg == 1 ) {
-			changeGuiActive(true,true);
+		} else {
 			ConfigureDisparityBM config = new ConfigureDisparityBM();
-			config.error = error;
+			config.errorType = error;
+			if( error == DisparityError.CENSUS )
+				config.censusVariant = CensusType.values()[control.selectedErrorVariant];
 			config.minDisparity = minDisparity;
 			config.maxDisparity = maxDisparity;
-			config.subpixel = control.useSubpixel;
 			config.regionRadiusX = config.regionRadiusY = r;
-			config.maxPerPixelError = control.pixelError;
-			config.validateRtoL = control.reverseTol;
-			config.texture = control.texture;
+			if( control.selectedAlg == 1 ) {
+				changeGuiActive(true,true);
+				config.subpixel = control.useSubpixel;
+				config.maxPerPixelError = control.pixelError;
+				config.validateRtoL = control.reverseTol;
+				config.texture = control.texture;
+			} else {
+				changeGuiActive(false,false);
+				dispType = GrayU8.class;
+				config.subpixel = false;
+				config.maxPerPixelError = -1;
+				config.validateRtoL = -1;
+				config.texture = 0;
+			}
 			return FactoryStereoDisparity.blockMatch(config,GrayU8.class,dispType);
-		} else {
-			throw new RuntimeException("Unknown type");
 		}
 	}
 

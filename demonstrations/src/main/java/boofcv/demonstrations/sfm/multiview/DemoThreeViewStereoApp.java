@@ -622,7 +622,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		// compute disparity
 		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
-		config.error = DisparityError.SAD;
+		config.errorType = DisparityError.SAD;
 		config.minDisparity = controls.minDisparity;
 		config.maxDisparity = controls.maxDisparity;
 		config.subpixel = true;

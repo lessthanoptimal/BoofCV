@@ -57,7 +57,7 @@ public class TestWrapDisparitySparseSadRect {
 		ConfigureDisparityBM config = new ConfigureDisparityBM();
 		config.regionRadiusX = config.regionRadiusY = r;
 		config.subpixel = false;
-		config.error = DisparityError.SAD;
+		config.errorType = DisparityError.SAD;
 		config.minDisparity = minDisparity;
 		config.maxDisparity = maxDisparity;
 		config.maxPerPixelError = -1;

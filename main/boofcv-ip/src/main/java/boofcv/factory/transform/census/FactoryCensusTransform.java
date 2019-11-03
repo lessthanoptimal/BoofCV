@@ -37,6 +37,23 @@ import org.ddogleg.struct.FastQueue;
  */
 @SuppressWarnings("unchecked")
 public class FactoryCensusTransform {
+
+	public static <In extends ImageGray<In>, Out extends ImageBase<Out>>
+	FilterImageInterface<In, Out> variant( CensusType type , Class<In> imageType) {
+		switch( type ) {
+			case BLOCK_3_3: return blockDense(1,imageType);
+			case BLOCK_5_5: return blockDense(2,imageType);
+			case BLOCK_7_7: return blockDense( 3, imageType);
+			case BLOCK_9_7: return blockDense(4,3,imageType);
+			case BLOCK_13_5: return blockDense(5,2,imageType);
+			case CIRCLE_9: {
+				FastQueue<Point2D_I32> points = CensusTransform.createCircleSamples();
+				return new FilterCensusTransformSampleS64(points,FactoryImageBorder.single(BorderType.ZERO,imageType), imageType);
+			}
+			default: throw new IllegalArgumentException("Unknown type "+type);
+		}
+	}
+
 	/**
 	 * Samples a dense square block
 	 *
@@ -61,5 +78,10 @@ public class FactoryCensusTransform {
 			default:
 				throw new IllegalArgumentException("Currently only radius 1 to 3 is supported");
 		}
+	}
+	public static <In extends ImageGray<In>, Out extends ImageBase<Out>>
+	FilterImageInterface<In, Out> blockDense( int radiusX , int radiusY , Class<In> imageType) {
+		FastQueue<Point2D_I32> points = CensusTransform.createBlockSamples(radiusX,radiusY);
+		return new FilterCensusTransformSampleS64(points,FactoryImageBorder.single(BorderType.ZERO,imageType), imageType);
 	}
 }

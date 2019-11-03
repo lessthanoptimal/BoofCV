@@ -65,10 +65,41 @@ public class CensusTransform {
 
 		for (int y = -radius; y <= radius; y++) {
 			for (int x = -radius; x <= radius; x++) {
+				if( x == 0 && y == 0) // don't sample the center
+					continue;
 				samples.grow().set(x,y);
 			}
 		}
 
+		return samples;
+	}
+
+	public static FastQueue<Point2D_I32> createBlockSamples( int radiusX , int radiusY) {
+		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32.class,true);
+		int wx = radiusX*2+1;
+		int wy = radiusY*2+1;
+		samples.growArray(wx*wy-1);
+
+		for (int y = -radiusY; y <= radiusY; y++) {
+			for (int x = -radiusX; x <= radiusX; x++) {
+				if( x == 0 && y == 0) // don't sample the center
+					continue;
+				samples.grow().set(x,y);
+			}
+		}
+
+		return samples;
+	}
+
+	public static FastQueue<Point2D_I32> createCircleSamples(){
+		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32.class,true);
+		for (int row = 0; row < 9; row++) {
+			int col0 = row <= 4 ? Math.max(0,3-row) : row-5;
+			int col1 = 9-col0;
+			for (int col = col0; col < col1; col++) {
+				samples.grow().set(row-4,col-4);
+			}
+		}
 		return samples;
 	}
 

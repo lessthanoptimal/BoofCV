@@ -79,7 +79,7 @@ public class ExampleStereoDisparity {
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
 		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
-		config.error = DisparityError.SAD;
+		config.errorType = DisparityError.SAD;
 		config.minDisparity = minDisparity;
 		config.maxDisparity = maxDisparity;
 		config.subpixel = false;
@@ -107,7 +107,7 @@ public class ExampleStereoDisparity {
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
 		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
-		config.error = DisparityError.SAD;
+		config.errorType = DisparityError.SAD;
 		config.minDisparity = minDisparity;
 		config.maxDisparity = maxDisparity;
 		config.subpixel = true;
