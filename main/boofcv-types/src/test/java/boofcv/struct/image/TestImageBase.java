@@ -26,10 +26,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestImageBase {
+class TestImageBase {
 
 	@Test
-	public void isInBounds() {
+	void isInBounds() {
 		Dummy a = new Dummy();
 		a.width = 10;
 		a.height = 11;
@@ -43,7 +43,7 @@ public class TestImageBase {
 	}
 
 	@Test
-	public void indexToPixel() {
+	void indexToPixel() {
 		Dummy a = new Dummy();
 		
 		a.startIndex = 7;
@@ -58,7 +58,7 @@ public class TestImageBase {
 	}
 
 	@Test
-	public void isSubimage() {
+	void isSubimage() {
 		Dummy a = new Dummy();
 		a.subImage = false;
 
@@ -66,6 +66,14 @@ public class TestImageBase {
 
 		a.subImage = true;
 		assertTrue(a.isSubimage());
+	}
+
+	@Test
+	void totalPixels() {
+		Dummy a = new Dummy();
+		a.width = 10;
+		a.height = 22;
+		assertEquals(10*22, a.totalPixels());
 	}
 	
 	private static class Dummy extends ImageBase

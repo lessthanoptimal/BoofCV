@@ -20,14 +20,29 @@ package boofcv.alg.feature.disparity.sgm;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
 class TestStereoMutualInformation {
 	@Test
-	void foo() {
+	void computeMI() {
+		fail("Implement");
+	}
+
+	@Test
+	void computeJointHistogram() {
+		fail("Implement");
+	}
+
+	@Test
+	void computeProbabilities() {
+		fail("Implement");
+	}
+
+	@Test
+	void computeEntropy() {
 		fail("Implement");
 	}
 }

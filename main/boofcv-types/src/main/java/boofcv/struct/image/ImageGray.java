@@ -159,6 +159,13 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	}
 
 	/**
+	 * Reshape to match the input image's width and height
+	 */
+	public void reshape( ImageBase img ) {
+		reshape(img.width,img.height);
+	}
+
+	/**
 	 * Sets the values of each pixel equal to the pixels in the specified matrix. If the images are not
 	 * the same shape this will be resized.
 	 *

@@ -212,6 +212,13 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	}
 
 	/**
+	 * Returns the number of pixels in the image. width*height
+	 */
+	public int totalPixels() {
+		return width*height;
+	}
+
+	/**
 	 * Creates an identical image.  Note that if this image is a sub-image portions of hte image which are not part
 	 * of the sub-image are not copied.
 	 *
