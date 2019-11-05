@@ -18,7 +18,6 @@
 
 package boofcv.alg.filter.convolve;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive_IL;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalizedNaive_SB;
 import boofcv.alg.filter.convolve.normalized.ConvolveNormalized_JustBorder_IL;
@@ -47,7 +46,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
@@ -74,7 +73,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_F32 kernel, GrayF32 src, GrayF32 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
@@ -101,7 +100,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve(Kernel2D_F32 kernel, GrayF32 src, GrayF32 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
@@ -128,7 +127,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
@@ -155,7 +154,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
@@ -182,7 +181,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve(Kernel2D_F32 kernel, InterleavedF32 src, InterleavedF32 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
@@ -209,7 +208,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
@@ -236,7 +235,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_F64 kernel, GrayF64 src, GrayF64 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
@@ -263,7 +262,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve(Kernel2D_F64 kernel, GrayF64 src, GrayF64 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
@@ -290,7 +289,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
@@ -317,7 +316,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
@@ -344,7 +343,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve(Kernel2D_F64 kernel, InterleavedF64 src, InterleavedF64 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
@@ -371,7 +370,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
@@ -393,7 +392,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_S32 kernel, GrayU8 src, GrayI8 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
@@ -415,7 +414,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve(Kernel2D_S32 kernel, GrayU8 src, GrayI8 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
@@ -437,7 +436,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
@@ -459,7 +458,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
@@ -481,7 +480,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve(Kernel2D_S32 kernel, InterleavedU8 src, InterleavedI8 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
@@ -503,7 +502,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
@@ -525,7 +524,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_S32 kernel, GrayS16 src, GrayI16 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
@@ -547,7 +546,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve(Kernel2D_S32 kernel, GrayS16 src, GrayI16 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
@@ -569,7 +568,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
@@ -591,7 +590,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
@@ -613,7 +612,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve(Kernel2D_S32 kernel, InterleavedS16 src, InterleavedI16 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
@@ -635,7 +634,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
@@ -657,7 +656,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_S32 kernel, GrayU16 src, GrayI16 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
@@ -679,7 +678,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve(Kernel2D_S32 kernel, GrayU16 src, GrayI16 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
@@ -701,7 +700,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_S32 kernel, InterleavedU16 src, InterleavedI16 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
@@ -723,7 +722,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_S32 kernel, InterleavedU16 src, InterleavedI16 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
@@ -745,7 +744,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve(Kernel2D_S32 kernel, InterleavedU16 src, InterleavedI16 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
@@ -767,7 +766,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
@@ -789,7 +788,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_S32 kernel, GrayS32 src, GrayS32 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
@@ -811,7 +810,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve(Kernel2D_S32 kernel, GrayS32 src, GrayS32 dst ) {
-		InputSanityCheck.checkSameShape(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		
@@ -833,7 +832,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void horizontal(Kernel1D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeHorizontal(kernel,src,dst);
 		
@@ -855,7 +854,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void vertical(Kernel1D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeVertical(kernel,src,dst);
 		
@@ -877,7 +876,7 @@ public class ConvolveImageNormalized {
 	 * @param kernel The kernel that is being convolved. Not modified.
 	 */
 	public static void convolve(Kernel2D_S32 kernel, InterleavedS32 src, InterleavedS32 dst ) {
-		InputSanityCheck.checkSameShapeB(src, dst);
+		dst.reshape(src.width,src.height);
 
 		boolean processed = BOverrideConvolveImageNormalized.invokeNativeConvolve(kernel,src,dst);
 		

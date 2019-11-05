@@ -167,7 +167,7 @@ public class DetectChessboardCornersVisualizeApp
 			featureImg = detector.getDetector().getIntensity();
 
 			if( controlPanel.logItensity ) {
-				PixelMath.log(featureImg,logIntensity);
+				PixelMath.log(featureImg,1.0f,logIntensity);
 				VisualizeImageData.colorizeSign(logIntensity, visualized, ImageStatistics.maxAbs(logIntensity));
 			} else {
 				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));

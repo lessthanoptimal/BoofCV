@@ -2455,7 +2455,7 @@ public class ImplPixelMath {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void log( GrayF32 input , GrayF32 output ) {
+	public static void log( GrayF32 input , final float val , GrayF32 output ) {
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
@@ -2463,13 +2463,13 @@ public class ImplPixelMath {
 			int end = indexSrc + input.width;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output.data[indexDst] = (float)Math.log(1 + input.data[indexSrc]);
+				output.data[indexDst] = (float)Math.log(val + input.data[indexSrc]);
 			}
 		}
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void logSign( GrayF32 input , GrayF32 output ) {
+	public static void logSign( GrayF32 input , final float val , GrayF32 output ) {
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
@@ -2479,9 +2479,9 @@ public class ImplPixelMath {
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
 				float value = input.data[indexSrc];
 				if( value < 0 ) {
-					output.data[indexDst] = (float)-Math.log(1 - value);
+					output.data[indexDst] = (float)-Math.log(val - value);
 				} else {
-					output.data[indexDst] = (float)Math.log(1 + value);
+					output.data[indexDst] = (float)Math.log(val + value);
 				}
 			}
 		}
@@ -2599,7 +2599,7 @@ public class ImplPixelMath {
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void log( GrayF64 input , GrayF64 output ) {
+	public static void log( GrayF64 input , final double val , GrayF64 output ) {
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
@@ -2607,13 +2607,13 @@ public class ImplPixelMath {
 			int end = indexSrc + input.width;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output.data[indexDst] = Math.log(1 + input.data[indexSrc]);
+				output.data[indexDst] = Math.log(val + input.data[indexSrc]);
 			}
 		}
 		//CONCURRENT_ABOVE });
 	}
 
-	public static void logSign( GrayF64 input , GrayF64 output ) {
+	public static void logSign( GrayF64 input , final double val , GrayF64 output ) {
 		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
 		for( int y = 0; y < input.height; y++ ) {
 			int indexSrc = input.startIndex + y* input.stride;
@@ -2623,9 +2623,9 @@ public class ImplPixelMath {
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
 				double value = input.data[indexSrc];
 				if( value < 0 ) {
-					output.data[indexDst] = -Math.log(1 - value);
+					output.data[indexDst] = -Math.log(val - value);
 				} else {
-					output.data[indexDst] = Math.log(1 + value);
+					output.data[indexDst] = Math.log(val + value);
 				}
 			}
 		}

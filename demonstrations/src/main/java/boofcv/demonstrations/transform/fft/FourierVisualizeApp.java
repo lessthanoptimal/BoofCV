@@ -99,7 +99,7 @@ public class FourierVisualizeApp
 		GDiscreteFourierTransformOps.phase(transform, phase);
 
 		// Convert it to a log scale for visibility
-		GPixelMath.log(magnitude, magnitude);
+		GPixelMath.log(magnitude,1.0, magnitude);
 
 		this.buffOriginal = buffered;
 

@@ -464,18 +464,18 @@ public class GPixelMath {
 	}
 
 	/**
-	 * Sets each pixel in the output image to log( 1 + input(x,y)) of the input image.
+	 * Sets each pixel in the output image to log( val + input(x,y)) of the input image.
 	 * Both the input and output image can be the same instance.
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the log image is written to. Modified.
 	 */
-	public static <T extends ImageBase<T>> void log(T input , T output ) {
+	public static <T extends ImageBase<T>> void log(T input , double val, T output ) {
 		if( input instanceof ImageGray ) {
 			if (GrayF32.class == input.getClass()) {
-				PixelMath.log((GrayF32) input, (GrayF32) output);
+				PixelMath.log((GrayF32) input, (float)val, (GrayF32) output);
 			} else if (GrayF64.class == input.getClass()) {
-				PixelMath.log((GrayF64) input, (GrayF64) output);
+				PixelMath.log((GrayF64) input, val, (GrayF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
 			}
@@ -484,24 +484,24 @@ public class GPixelMath {
 			Planar out = (Planar)output;
 
 			for (int i = 0; i < in.getNumBands(); i++) {
-				log( in.getBand(i), out.getBand(i));
+				log( in.getBand(i), val, out.getBand(i));
 			}
 		}
 	}
 
 	/**
-	 * Sets each pixel in the output image to sgn*log( 1 + sgn*input(x,y)) of the input image.
+	 * Sets each pixel in the output image to sgn*log( val + sgn*input(x,y)) of the input image.
 	 * where sng is the sign of input(x,y).
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the log image is written to. Modified.
 	 */
-	public static <T extends ImageBase<T>> void logSign(T input , T output ) {
+	public static <T extends ImageBase<T>> void logSign(T input , double val, T output ) {
 		if( input instanceof ImageGray ) {
 			if (GrayF32.class == input.getClass()) {
-				PixelMath.logSign((GrayF32) input, (GrayF32) output);
+				PixelMath.logSign((GrayF32) input, (float)val, (GrayF32) output);
 			} else if (GrayF64.class == input.getClass()) {
-				PixelMath.logSign((GrayF64) input, (GrayF64) output);
+				PixelMath.logSign((GrayF64) input, val, (GrayF64) output);
 			} else {
 				throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
 			}
@@ -510,7 +510,7 @@ public class GPixelMath {
 			Planar out = (Planar)output;
 
 			for (int i = 0; i < in.getNumBands(); i++) {
-				logSign( in.getBand(i), out.getBand(i));
+				logSign( in.getBand(i), val, out.getBand(i));
 			}
 		}
 	}

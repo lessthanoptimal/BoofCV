@@ -148,7 +148,7 @@ public class VisualizeHoughBinary
 			imagePanel.input = buffered;
 
 			if (logIntensity) {
-				PixelMath.log(alg.getHough().getTransform(), transformLog);
+				PixelMath.log(alg.getHough().getTransform(),1.0f, transformLog);
 				renderedTran = VisualizeImageData.grayMagnitude(transformLog, renderedTran, -1);
 			} else {
 				renderedTran = VisualizeImageData.grayMagnitude(alg.getHough().getTransform(), renderedTran, -1);

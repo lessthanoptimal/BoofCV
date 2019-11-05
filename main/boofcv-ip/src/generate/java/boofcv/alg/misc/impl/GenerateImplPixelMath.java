@@ -320,11 +320,12 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 	}
 
 	public void printLog( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+		String sumType = typeIn.getSumType();
 		String bitWise = typeIn.getBitWise();
 		String typeCast = typeOut != AutoTypeImage.F64 ? "("+typeOut.getDataType()+")" : "";
 
 		out.print(
-				"\tpublic static void log( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
+				"\tpublic static void log( "+typeIn.getSingleBandName()+" input , final "+sumType+" val , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
 				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
@@ -332,7 +333,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\t\t\tint end = indexSrc + input.width;\n" +
 				"\n" +
 				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
-				"\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.log(1 + input.data[indexSrc]"+bitWise+");\n" +
+				"\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.log(val + input.data[indexSrc]"+bitWise+");\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\t//CONCURRENT_ABOVE });\n" +
@@ -345,7 +346,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		String typeCast = typeOut != AutoTypeImage.F64 ? "("+typeOut.getDataType()+")" : "";
 
 		out.print(
-				"\tpublic static void logSign( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
+				"\tpublic static void logSign( "+typeIn.getSingleBandName()+" input , final "+sumType+" val , "+typeOut.getSingleBandName()+" output ) {\n" +
 						"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
 						"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
 						"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
@@ -355,9 +356,9 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 						"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
 						"\t\t\t\t"+sumType+" value = input.data[indexSrc]"+bitWise+";\n" +
 						"\t\t\t\tif( value < 0 ) {\n" +
-						"\t\t\t\t\toutput.data[indexDst] = "+typeCast+"-Math.log(1 - value);\n" +
+						"\t\t\t\t\toutput.data[indexDst] = "+typeCast+"-Math.log(val - value);\n" +
 						"\t\t\t\t} else {\n" +
-						"\t\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.log(1 + value);\n" +
+						"\t\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.log(val + value);\n" +
 						"\t\t\t\t}\n" +
 						"\t\t\t}\n" +
 						"\t\t}\n" +

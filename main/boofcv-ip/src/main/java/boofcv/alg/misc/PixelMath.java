@@ -5069,41 +5069,41 @@ public class PixelMath {
 	}
 
 	/**
-	 * Sets each pixel in the output image to log( 1 + input(x,y)) of the input image.
+	 * Sets each pixel in the output image to log( val + input(x,y)) of the input image.
 	 * Both the input and output image can be the same instance.
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the log image is written to. Modified.
 	 */
-	public static void log( GrayF32 input , GrayF32 output ) {
+	public static void log( GrayF32 input , final float val , GrayF32 output ) {
 
 		output.reshape(input.width,input.height);
 
 		int N = input.width*input.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.log(input,output);
+			ImplPixelMath_MT.log(input,val,output);
 		} else {
-			ImplPixelMath.log(input,output);
+			ImplPixelMath.log(input,val,output);
 		}
 	}
 
 	/**
-	 * Sets each pixel in the output image to sgn*log( 1 + sgn*input(x,y)) of the input image.
+	 * Sets each pixel in the output image to sgn*log( val + sgn*input(x,y)) of the input image.
 	 * where sng is the sign of input(x,y). 
 	 * Both the input and output image can be the same instance.
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the log image is written to. Modified.
 	 */
-	public static void logSign( GrayF32 input , GrayF32 output ) {
+	public static void logSign( GrayF32 input , final float val, GrayF32 output ) {
 
 		output.reshape(input.width,input.height);
 
 		int N = input.width*input.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.logSign(input,output);
+			ImplPixelMath_MT.logSign(input,val,output);
 		} else {
-			ImplPixelMath.logSign(input,output);
+			ImplPixelMath.logSign(input,val,output);
 		}
 	}
 
@@ -5229,41 +5229,41 @@ public class PixelMath {
 	}
 
 	/**
-	 * Sets each pixel in the output image to log( 1 + input(x,y)) of the input image.
+	 * Sets each pixel in the output image to log( val + input(x,y)) of the input image.
 	 * Both the input and output image can be the same instance.
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the log image is written to. Modified.
 	 */
-	public static void log( GrayF64 input , GrayF64 output ) {
+	public static void log( GrayF64 input , final double val , GrayF64 output ) {
 
 		output.reshape(input.width,input.height);
 
 		int N = input.width*input.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.log(input,output);
+			ImplPixelMath_MT.log(input,val,output);
 		} else {
-			ImplPixelMath.log(input,output);
+			ImplPixelMath.log(input,val,output);
 		}
 	}
 
 	/**
-	 * Sets each pixel in the output image to sgn*log( 1 + sgn*input(x,y)) of the input image.
+	 * Sets each pixel in the output image to sgn*log( val + sgn*input(x,y)) of the input image.
 	 * where sng is the sign of input(x,y). 
 	 * Both the input and output image can be the same instance.
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the log image is written to. Modified.
 	 */
-	public static void logSign( GrayF64 input , GrayF64 output ) {
+	public static void logSign( GrayF64 input , final double val, GrayF64 output ) {
 
 		output.reshape(input.width,input.height);
 
 		int N = input.width*input.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.logSign(input,output);
+			ImplPixelMath_MT.logSign(input,val,output);
 		} else {
-			ImplPixelMath.logSign(input,output);
+			ImplPixelMath.logSign(input,val,output);
 		}
 	}
 

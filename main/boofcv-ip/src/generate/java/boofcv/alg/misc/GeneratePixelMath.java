@@ -398,44 +398,46 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 	}
 
 	public void printLog( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+		String sumType = typeIn.getSumType();
 		out.print("\t/**\n" +
-				"\t * Sets each pixel in the output image to log( 1 + input(x,y)) of the input image.\n" +
+				"\t * Sets each pixel in the output image to log( val + input(x,y)) of the input image.\n" +
 				"\t * Both the input and output image can be the same instance.\n" +
 				"\t *\n" +
 				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param output Where the log image is written to. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void log( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
+				"\tpublic static void log( "+typeIn.getSingleBandName()+" input , final "+sumType+" val , "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\toutput.reshape(input.width,input.height);\n" +
 				"\n" +
 				"\t\tint N = input.width*input.height;\n" +
 				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {\n" +
-				"\t\t\tImplPixelMath_MT.log(input,output);\n" +
+				"\t\t\tImplPixelMath_MT.log(input,val,output);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tImplPixelMath.log(input,output);\n" +
+				"\t\t\tImplPixelMath.log(input,val,output);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
 	public void printLogSign( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+		String sumType = typeIn.getSumType();
 		out.print("\t/**\n" +
-				"\t * Sets each pixel in the output image to sgn*log( 1 + sgn*input(x,y)) of the input image.\n" +
+				"\t * Sets each pixel in the output image to sgn*log( val + sgn*input(x,y)) of the input image.\n" +
 				"\t * where sng is the sign of input(x,y). \n" +
 				"\t * Both the input and output image can be the same instance.\n" +
 				"\t *\n" +
 				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param output Where the log image is written to. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void logSign( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
+				"\tpublic static void logSign( "+typeIn.getSingleBandName()+" input , final "+sumType+" val, "+typeOut.getSingleBandName()+" output ) {\n" +
 				"\n" +
 				"\t\toutput.reshape(input.width,input.height);\n" +
 				"\n" +
 				"\t\tint N = input.width*input.height;\n" +
 				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {\n" +
-				"\t\t\tImplPixelMath_MT.logSign(input,output);\n" +
+				"\t\t\tImplPixelMath_MT.logSign(input,val,output);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tImplPixelMath.logSign(input,output);\n" +
+				"\t\t\tImplPixelMath.logSign(input,val,output);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}

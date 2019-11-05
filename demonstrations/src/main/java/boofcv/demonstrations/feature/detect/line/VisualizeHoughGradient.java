@@ -193,7 +193,7 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 		renderedTran = ConvertBufferedImage.checkDeclare(tranWidth, tranHeight, renderedTran, BufferedImage.TYPE_INT_RGB);
 
 		if( logIntensity ) {
-			PixelMath.log(lineDetector.getHough().getTransform(),transformLog);
+			PixelMath.log(lineDetector.getHough().getTransform(),1.0f,transformLog);
 			VisualizeImageData.grayMagnitude(transformLog, renderedTran,-1);
 		} else {
 			VisualizeImageData.grayMagnitude(lineDetector.getHough().getTransform(), renderedTran,-1);

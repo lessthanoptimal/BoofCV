@@ -119,7 +119,7 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 				"\t */\n" );
 
 		out.print("\tpublic static void "+name+"("+kernelTypeName+" kernel, "+inputName+" src, "+outputName+" dst ) {\n" +
-				"\t\tInputSanityCheck.checkSameShape"+suffice2+"(src, dst);\n" +
+				"\t\tdst.reshape(src.width,src.height);\n" +
 				"\n" +
 				"\t\tboolean processed = BOverrideConvolveImageNormalized.invokeNative"+overrideName+"(kernel,src,dst);\n" +
 				"\t\t\n" +

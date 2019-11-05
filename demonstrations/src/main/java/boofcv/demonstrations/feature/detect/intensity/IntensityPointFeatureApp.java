@@ -169,7 +169,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 			featureImg = detector.getIntensity();
 
 			if( controlPanel.logIntensity ) {
-				PixelMath.logSign(featureImg,featureImg);
+				PixelMath.logSign(featureImg,1.0f,featureImg);
 				VisualizeImageData.colorizeSign(featureImg, visualized, -1);
 			} else {
 				VisualizeImageData.colorizeSign(featureImg, visualized, -1);
