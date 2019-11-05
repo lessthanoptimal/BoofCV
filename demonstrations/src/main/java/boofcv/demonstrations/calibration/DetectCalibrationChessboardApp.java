@@ -241,7 +241,7 @@ public class DetectCalibrationChessboardApp
 //			controlPanel.thresholdPanel.updateHistogram(featureImg);
 
 			if( controlPanel.logItensity ) {
-				PixelMath.logSign(featureImg,1.0f,logIntensity);
+				PixelMath.logSign(featureImg,0.2f,logIntensity);
 				VisualizeImageData.colorizeSign(logIntensity, visualized, ImageStatistics.maxAbs(logIntensity));
 			} else {
 				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));

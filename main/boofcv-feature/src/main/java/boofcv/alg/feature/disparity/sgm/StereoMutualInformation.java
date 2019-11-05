@@ -125,18 +125,20 @@ public class StereoMutualInformation {
 	}
 
 	/**
-	 * Computes the mutual information score given pixel values from left and right images
+	 * Computes the mutual information cost given pixel values from left and right images. Must call
+	 * {@link #process} first.
+	 *
 	 * @param leftValue Value in left image. I(x,y)
 	 * @param rightValue Value of pixel in right image I(x-d,y)
 	 * @return the mutual information score
 	 */
-	public float computeMI( int leftValue , int rightValue ) {
+	public float cost(int leftValue , int rightValue ) {
 		// Scale the input value to be in the same range as the histogram
 		int leftScale = scalePixelValue(leftValue);
 		int rightScale = scalePixelValue(rightValue);
 
 		// Equation 8b and 9a
-		return -(entropyLeft.data[leftScale] + entropyRight.data[rightScale] - entropyJoint.unsafe_get(leftScale,rightScale));
+		return -(entropyLeft.data[leftScale] + entropyRight.data[rightScale] - entropyJoint.unsafe_get(rightScale,leftScale));
 	}
 
 	/**
@@ -179,7 +181,7 @@ public class StereoMutualInformation {
 		float totalPixels = ImageStatistics.sum(histJoint);
 		int histN = histJoint.width*histJoint.height;
 		for (int i = 0; i < histN; i++) {
-			entropyJoint.data[i] = histJoint.data[i]/totalPixels + eps;
+			entropyJoint.data[i] = histJoint.data[i]/totalPixels;
 		}
 
 		// Compute probabilities for left and right images by summing rows and columns of the joint probability
@@ -205,19 +207,19 @@ public class StereoMutualInformation {
 		// Supposedly this is effectively Parezen Estimation
 		ConvolveImageNormalized.horizontal(smoothKernel, entropyJoint, smoothWork);
 		ConvolveImageNormalized.vertical(smoothKernel, smoothWork, entropyJoint);
-		PixelMath.log(entropyJoint, 0.0f, entropyJoint);
+		PixelMath.log(entropyJoint, eps, entropyJoint);
 		ConvolveImageNormalized.horizontal(smoothKernel, entropyJoint, smoothWork);
 		ConvolveImageNormalized.vertical(smoothKernel, smoothWork, entropyJoint);
 		PixelMath.divide(entropyJoint,-entropyJoint.totalPixels(), entropyJoint);
 
 		// Compute entropy for each image using a similar approach
 		ConvolveImageNormalized.horizontal(smoothKernel, entropyLeft, smoothWork);
-		PixelMath.log(smoothWork,0.0f,smoothWork);
+		PixelMath.log(smoothWork,eps,smoothWork);
 		ConvolveImageNormalized.horizontal(smoothKernel, smoothWork, entropyLeft);
 		PixelMath.divide(entropyLeft,-entropyLeft.totalPixels(), entropyLeft);
 
 		ConvolveImageNormalized.horizontal(smoothKernel, entropyRight, smoothWork);
-		PixelMath.log(smoothWork,0.0f,smoothWork);
+		PixelMath.log(smoothWork,eps,smoothWork);
 		ConvolveImageNormalized.horizontal(smoothKernel, smoothWork, entropyRight);
 		PixelMath.divide(entropyRight,-entropyRight.totalPixels(), entropyRight);
 	}

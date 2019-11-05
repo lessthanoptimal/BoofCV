@@ -37,7 +37,14 @@ class TestStereoMutualInformation {
 	final Random rand = new Random(234);
 
 	@Test
-	void computeMI() {
+	void cost() {
+		// Create two images that are offset by a constant disparity
+
+		// Compute MI with incorrect disparity
+
+		// Compute MI with correct disparity
+
+		// The cost should be much less with correct disparity
 		fail("Implement");
 	}
 
@@ -105,7 +112,6 @@ class TestStereoMutualInformation {
 	@Test
 	void computeProbabilities() {
 		StereoMutualInformation alg = new StereoMutualInformation();
-		alg.setEps(0); // zero EPS to make these checks easier
 		alg.configureHistogram(250,250);
 		// fill just the right column with the same value. This will have a specific structure
 		for (int i = 0; i < 251; i++) {
@@ -136,7 +142,6 @@ class TestStereoMutualInformation {
 	@Test
 	void computeEntropy_Zeros() {
 		StereoMutualInformation alg = new StereoMutualInformation();
-//		alg.setEps(0); // This will cause the test to fail
 		alg.configureHistogram(250,250);
 
 		// only a few non-zero values

@@ -180,7 +180,6 @@ public class ImageZoomPanel extends JScrollPane {
 			if( !SwingUtilities.isEventDispatchThread() )
 				throw new RuntimeException("Changed image when not in GUI thread?");
 		}
-		hasImageChanged = true;
 		this.img = image;
 	}
 
