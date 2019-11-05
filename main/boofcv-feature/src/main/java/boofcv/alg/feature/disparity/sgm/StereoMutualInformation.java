@@ -18,8 +18,10 @@
 
 package boofcv.alg.feature.disparity.sgm;
 
+import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.ConvolveImageNormalized;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
@@ -27,6 +29,7 @@ import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
+import org.ejml.UtilEjml;
 
 /**
  * <p></p>Computes the Mutual Information error metric from a rectified stereo pair. Mutual information
@@ -51,10 +54,15 @@ public class StereoMutualInformation {
 	Kernel1D_F32 smoothKernel;
 	GrayF32 smoothWork = new GrayF32(1,1); // work space for smoothing
 
-	// Maximum intensity value a pixel can have
-	int maxIntensityValue;
+	// To avoid log(0) this is added to all probabilities
+	float eps = UtilEjml.F_EPS;
+
+	// Maximum intensity value a pixel of the input image can have
+	int maxPixelValue;
 	// Storage for pixel intensity histogram after scaling
 	int[] histogramIntensity;
+	// The maximum intensity value after scaling is applied. Always histogram.length-1
+	int maxHistogramValue;
 
 	GrayS32 histJoint = new GrayS32(1,1);
 
@@ -65,16 +73,28 @@ public class StereoMutualInformation {
 
 	public StereoMutualInformation() {
 		// this is a reasonable default for 8-bit images
-		configureHistogram(255,256);
+		configureHistogram(255,255);
 
 		configureSmoothing(3);
 	}
 
-	public void configureHistogram(int maxIntensityValue , int intensityBins ) {
+	/**
+	 * Configures the histogram and how the input is scaled. For an 8-bit input image just pass in
+	 * 0xFF for both values.
+	 *
+	 * @param maxPixelValue The maximum value a pixel in the input image can have
+	 * @param maxHistogramValue The maximum value that the pixel can have after being scaled
+	 */
+	public void configureHistogram(int maxPixelValue , int maxHistogramValue ) {
+		if( maxHistogramValue > maxPixelValue )
+			throw new IllegalArgumentException("Maximum histogram value can't be more than max pixel value");
 
-		this.maxIntensityValue = maxIntensityValue;
+		this.maxPixelValue = maxPixelValue;
+		this.maxHistogramValue = maxHistogramValue;
+		int intensityBins = maxHistogramValue+1;
 		histogramIntensity = new int[intensityBins];
 
+		histJoint.reshape(intensityBins,intensityBins);
 		entropyJoint.reshape(intensityBins,intensityBins);
 		entropyLeft.reshape(intensityBins,1);
 		entropyRight.reshape(intensityBins,1);
@@ -92,9 +112,13 @@ public class StereoMutualInformation {
 	 * @param invalid Value of disparity pixels which are invalid
 	 */
 	public void process(GrayU8 left , GrayU8 right , GrayU8 disparity , int invalid ) {
+		// Check input to make sure it's valid
+		InputSanityCheck.checkSameShape(left,right);
 		if( left.isSubimage() || right.isSubimage() || disparity.isSubimage() )
 			throw new IllegalArgumentException("Can't process sub images. Is this a major issue? Could be fixed");
+		disparity.reshape(left);
 
+		// Compute entropy tables
 		computeJointHistogram(left, right, disparity, invalid);
 		computeProbabilities();
 		computeEntropy();
@@ -108,9 +132,8 @@ public class StereoMutualInformation {
 	 */
 	public float computeMI( int leftValue , int rightValue ) {
 		// Scale the input value to be in the same range as the histogram
-		int N = histogramIntensity.length;
-		int leftScale = N*leftValue/maxIntensityValue;
-		int rightScale = N*rightValue/maxIntensityValue;
+		int leftScale = scalePixelValue(leftValue);
+		int rightScale = scalePixelValue(rightValue);
 
 		// Equation 8b and 9a
 		return -(entropyLeft.data[leftScale] + entropyRight.data[rightScale] - entropyJoint.unsafe_get(leftScale,rightScale));
@@ -120,26 +143,30 @@ public class StereoMutualInformation {
 	 * Computes the joint histogram of pixel intensities (2D histogram) while skipping over pixels with
 	 * no correspondences
 	 */
-	private void computeJointHistogram(GrayU8 left, GrayU8 right, GrayU8 disparity, int invalid) {
-		final int N = histogramIntensity.length;
+	void computeJointHistogram(GrayU8 left, GrayU8 right, GrayU8 disparity, int invalid) {
+		// zero the histogram
+		ImageMiscOps.fill(histJoint,0);
+
+		int histLength = histogramIntensity.length;
 
 		// Compute the joint histogram
 		for (int row = 0; row < left.height; row++) {
-			int idx = row*left.width;
+			int idx = row*left.stride;
 			for (int col = 0; col < left.width; col++, idx++ ) {
 				int d = disparity.data[idx]&0xFF;
 				// Don't consider pixels without correspondences
-				if( d != invalid ) {
-					int leftValue = left.data[idx];     // I(x,y)
-					int rightValue = right.data[idx-d]; // I(x-d,y)
+				if( d == invalid )
+					continue;
 
-					// scale the pixel intensity for the histogram
-					leftValue = N*leftValue/maxIntensityValue;
-					rightValue = N*rightValue/maxIntensityValue;
+				int leftValue = left.data[idx]&0xFF;     // I(x,y)
+				int rightValue = right.data[idx-d]&0xFF; // I(x-d,y)
 
-					// increment the histogram
-					histJoint.data[leftValue*N+rightValue]++; // H(L,R) += 1
-				}
+				// scale the pixel intensity for the histogram
+				leftValue = scalePixelValue(leftValue);
+				rightValue = scalePixelValue(rightValue);
+
+				// increment the histogram
+				histJoint.data[leftValue*histLength+rightValue]++; // H(L,R) += 1
 			}
 		}
 	}
@@ -147,12 +174,12 @@ public class StereoMutualInformation {
 	/**
 	 * Computes the joint and image specific probabilities using the joint histogram.
 	 */
-	private void computeProbabilities() {
+	void computeProbabilities() {
 		// Convert joint histogram into a joint probability
 		float totalPixels = ImageStatistics.sum(histJoint);
 		int histN = histJoint.width*histJoint.height;
 		for (int i = 0; i < histN; i++) {
-			entropyJoint.data[i] = histJoint.data[i]/totalPixels;
+			entropyJoint.data[i] = histJoint.data[i]/totalPixels + eps;
 		}
 
 		// Compute probabilities for left and right images by summing rows and columns of the joint probability
@@ -169,26 +196,44 @@ public class StereoMutualInformation {
 		}
 	}
 
-	private void computeEntropy() {
+	/**
+	 * Compute Entropy from the already computed probabilities
+	 */
+	void computeEntropy() {
 		// Compute Joint Entropy Eq. 5
 		// H = -(1/n)*log(I*G)*G
 		// Supposedly this is effectively Parezen Estimation
 		ConvolveImageNormalized.horizontal(smoothKernel, entropyJoint, smoothWork);
 		ConvolveImageNormalized.vertical(smoothKernel, smoothWork, entropyJoint);
-		PixelMath.log(entropyJoint, entropyJoint);
+		PixelMath.log(entropyJoint, 0.0f, entropyJoint);
 		ConvolveImageNormalized.horizontal(smoothKernel, entropyJoint, smoothWork);
 		ConvolveImageNormalized.vertical(smoothKernel, smoothWork, entropyJoint);
 		PixelMath.divide(entropyJoint,-entropyJoint.totalPixels(), entropyJoint);
 
 		// Compute entropy for each image using a similar approach
 		ConvolveImageNormalized.horizontal(smoothKernel, entropyLeft, smoothWork);
-		PixelMath.log(smoothWork,smoothWork);
+		PixelMath.log(smoothWork,0.0f,smoothWork);
 		ConvolveImageNormalized.horizontal(smoothKernel, smoothWork, entropyLeft);
 		PixelMath.divide(entropyLeft,-entropyLeft.totalPixels(), entropyLeft);
 
 		ConvolveImageNormalized.horizontal(smoothKernel, entropyRight, smoothWork);
-		PixelMath.log(smoothWork,smoothWork);
+		PixelMath.log(smoothWork,0.0f,smoothWork);
 		ConvolveImageNormalized.horizontal(smoothKernel, smoothWork, entropyRight);
 		PixelMath.divide(entropyRight,-entropyRight.totalPixels(), entropyRight);
+	}
+
+	/**
+	 * Scales input pixel intensity to histogram range
+	 */
+	final int scalePixelValue(int value ) {
+		return maxHistogramValue*value/maxPixelValue;
+	}
+
+	public float getEps() {
+		return eps;
+	}
+
+	public void setEps(float eps) {
+		this.eps = eps;
 	}
 }
