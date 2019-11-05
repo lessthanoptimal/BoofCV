@@ -237,10 +237,10 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		} else if( e.getSource() == comboError) {
 			selectedError = comboError.getSelectedIndex();
 			updateErrorVariant();
-			listener.algorithmChanged();
+			listener.disparitySettingChange();
 		} else if( e.getSource() == comboErrorVariant) {
 			selectedErrorVariant = comboErrorVariant.getSelectedIndex();
-			listener.algorithmChanged();
+			listener.disparitySettingChange();
 		} else if( e.getSource() == invalidToggle) {
 			colorInvalid = invalidToggle.isSelected();
 			listener.disparityRender();
