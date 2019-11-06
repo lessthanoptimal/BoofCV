@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.tracker;
 
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
@@ -35,18 +36,18 @@ import java.awt.event.ActionListener;
  */
 public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements ActionListener, ChangeListener {
 
-	JTextArea displayFPS;
-	JTextArea displayTracking;
+	public boolean autoStart = true;
+	private double maxFPS = 30;
 
-	JSpinner selectMaxVideoFPS;
+	protected JTextArea displayFPS = createTextInfo();
+	protected JTextArea displayTracking = createTextInfo();
+	protected JTextArea imageSizeLabel = createTextInfo();
 
+	JSpinner selectMaxVideoFPS = spinner(maxFPS,0,100,5);
+	JCheckBox checkAutoStart = checkbox("Auto Start",autoStart);
 	JButton buttonPlay;
 
-
-	JButton buttonReplay;
-
 	Listener listener;
-	private double maxFPS = 30;
 
 	public TrackerQuadInfoPanel( Listener listener  ) {
 		this.listener = listener;
@@ -54,33 +55,24 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
-		displayFPS = createTextInfo();
-		displayTracking = createTextInfo();
-
 		buttonPlay = new JButton("Start");
 		buttonPlay.addActionListener(this);
 
-
-		buttonReplay = new JButton("Replay");
-		buttonReplay.addActionListener(this);
-
-		selectMaxVideoFPS = new JSpinner(new SpinnerNumberModel(maxFPS,0,100,5));
-		selectMaxVideoFPS.addChangeListener(this);
-		selectMaxVideoFPS.setMaximumSize(selectMaxVideoFPS.getPreferredSize());
-
-		addLabeledV(displayFPS,"Algorithm FPS:",this);
-		addLabeledV(selectMaxVideoFPS,"Max Video FPS:",this);
-		addLabeledV(displayTracking, "Tracking:", this);
+		addLabeledV(imageSizeLabel,"Video Size");
+		addLabeledV(displayFPS,"Algorithm FPS");
+		addLabeledV(selectMaxVideoFPS,"Max Video FPS");
+		addLabeledV(displayTracking, "Tracking");
 		addSeparator(200);
 		add(buttonPlay);
-		addAlignCenter(buttonPlay, this);
-		addAlignCenter(buttonReplay, this);
+		addAlignCenter(checkAutoStart);
+		addAlignCenter(buttonPlay);
 
 		listener.setMaxFPS(maxFPS);
 	}
 
 	private JTextArea createTextInfo() {
-		JTextArea comp = new JTextArea(1,6);
+
+		JTextArea comp = new JTextArea(1,7);
 		comp.setMaximumSize(comp.getPreferredSize());
 		comp.setEditable(false);
 		return comp;
@@ -121,8 +113,8 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 	public void actionPerformed(ActionEvent e) {
 		if( e.getSource() == buttonPlay ) {
 			listener.togglePause();
-		} else if( e.getSource() == buttonReplay) {
-			listener.replayVideo();
+		} else if( e.getSource() == checkAutoStart ) {
+			this.autoStart = checkAutoStart.isSelected();
 		}
 	}
 
@@ -134,14 +126,16 @@ public class TrackerQuadInfoPanel extends StandardAlgConfigPanel implements Acti
 		}
 	}
 
+	public void setImageSize( final int width , final int height ) {
+		BoofSwingUtil.invokeNowOrLater(() -> imageSizeLabel.setText(width+" x "+height));
+	}
+
 	public double getMaxFPS() {
 		return maxFPS;
 	}
 
-	public static interface Listener {
-		public void togglePause();
-
-		public void replayVideo();
+	public interface Listener {
+		void togglePause();
 
 		void setMaxFPS( double fps );
 	}

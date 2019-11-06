@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -126,10 +126,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 			videoPanel.setMode(TrackerObjectQuadPanel.Mode.IDLE);
 			targetSelected = false;
 		} else {
-			videoPanel.setDefaultTarget(targetDefault);
-			targetSelected = true;
-			initializeTracker = true;
-			target.set(targetDefault);
+			resetTracker();
 		}
 
 		trackerChanged = true;
@@ -140,6 +137,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 
 		// override default speed
 		setMaxFPS( infoBar.getMaxFPS());
+		infoBar.setImageSize(width,height);
 
 		videoPanel.setPreferredSize(new Dimension(width, height));
 		videoPanel.setMaximumSize(new Dimension(width, height));
@@ -187,12 +185,7 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 			}
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				updateGUI(buffered);
-			}
-		});
+		SwingUtilities.invokeLater(() -> updateGUI(buffered));
 
 	}
 
@@ -248,7 +241,8 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 		this.target.set(target);
 		targetSelected = true;
 		initializeTracker = true;
-		streamPaused = false;
+		if( infoBar.autoStart )
+			streamPaused = false;
 	}
 
 	@Override
@@ -262,10 +256,25 @@ public class VideoTrackerObjectQuadApp<I extends ImageGray<I>>
 	}
 
 	@Override
-	public void replayVideo() {
+	public void reprocessInput() {
+		super.reprocessInput();
 		if( inputMethod == InputMethod.VIDEO ) {
-			super.reprocessInput();
+			// reset the target to the default and pause the video
+			resetTracker();
+			setPaused(true);
 		}
+	}
+
+	private void resetTracker() {
+		if( hasDefaultRect ) {
+			videoPanel.setDefaultTarget(targetDefault);
+			target.set(targetDefault);
+			targetSelected = true;
+		} else {
+			videoPanel.setMode(TrackerObjectQuadPanel.Mode.IDLE);
+			targetSelected = false;
+		}
+		initializeTracker = true;
 	}
 
 	@Override
