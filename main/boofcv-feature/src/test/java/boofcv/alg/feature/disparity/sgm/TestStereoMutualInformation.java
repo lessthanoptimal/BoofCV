@@ -52,13 +52,13 @@ class TestStereoMutualInformation {
 		ImageMiscOps.fillUniform(right,rand,80,125);
 
 		StereoMutualInformation alg = new StereoMutualInformation();
-		alg.process(left,right,disparity,255);
+		alg.process(left,right,0,disparity,255);
 		float costIncorrect = computeCost(left, right, null, alg);
 
 		// Compute MI with correct disparity
 		ImageMiscOps.copy(10,0,0,0,w-10,h,left,right);
 		PixelMath.multiply(right,0.5,right);
-		alg.process(left,right,disparity,255);
+		alg.process(left,right,0,disparity,255);
 		float costCorrect = computeCost(left, right, disparity, alg);
 
 		// The cost should be much less with correct disparity
@@ -82,7 +82,7 @@ class TestStereoMutualInformation {
 		ImageMiscOps.fillUniform(right,rand,80,125);
 
 		StereoMutualInformation alg = new StereoMutualInformation();
-		alg.process(left,right,disparity,255);
+		alg.process(left,right,0,disparity,255);
 		alg.precomputeScaledCost(2047);
 
 		int costIncorrect = computeCostScaled(left, right, null, alg);
@@ -90,7 +90,7 @@ class TestStereoMutualInformation {
 		// Compute MI with correct disparity
 		ImageMiscOps.copy(10,0,0,0,w-10,h,left,right);
 		PixelMath.multiply(right,0.5,right);
-		alg.process(left,right,disparity,255);
+		alg.process(left,right,0,disparity,255);
 		alg.precomputeScaledCost(2047);
 		int costCorrect = computeCostScaled(left, right, disparity, alg);
 
@@ -145,10 +145,10 @@ class TestStereoMutualInformation {
 		ImageMiscOps.fillRectangle(disparity,255,0,0,8,h); // avoid going out of bounds
 
 		StereoMutualInformation alg = new StereoMutualInformation();
-		alg.process(left,right,disparity,255);
+		alg.process(left,right,0,disparity,255);
 		float cost0 = computeCost(left, right, disparity, alg);
 
-		alg.process(left,right,disparity,255);
+		alg.process(left,right,0,disparity,255);
 		float cost1 = computeCost(left, right, disparity, alg);
 
 		// the cost should be identical
@@ -166,7 +166,7 @@ class TestStereoMutualInformation {
 
 		StereoMutualInformation alg = new StereoMutualInformation();
 		alg.configureHistogram(250,250);
-		alg.computeJointHistogram(left,right,disparity,500);
+		alg.computeJointHistogram(left,right,0,disparity,500);
 
 		// Histogram can only have non-zero values where col=2*row because the right has been scaled by a factor
 		// of two
@@ -202,7 +202,7 @@ class TestStereoMutualInformation {
 
 		StereoMutualInformation alg = new StereoMutualInformation();
 		alg.configureHistogram(250,250);
-		alg.computeJointHistogram(left,right,disparity,invalid);
+		alg.computeJointHistogram(left,right,0,disparity,invalid);
 
 		int found = ImageStatistics.sum(alg.histJoint);
 		assertEquals(w*h/2,found);
