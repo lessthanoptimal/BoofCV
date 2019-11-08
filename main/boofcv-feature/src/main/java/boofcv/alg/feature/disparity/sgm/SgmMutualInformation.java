@@ -18,10 +18,53 @@
 
 package boofcv.alg.feature.disparity.sgm;
 
+import boofcv.alg.InputSanityCheck;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
+
 /**
  *
  *
  * @author Peter Abeles
  */
-public class SgmMutualInformation {
+public class SgmMutualInformation implements SgmDisparityCost<GrayU8> {
+	StereoMutualInformation mutual;
+
+	public SgmMutualInformation(StereoMutualInformation mutual) {
+		this.mutual = mutual;
+	}
+
+	/**
+	 * Must call {@link #getMutual()} and then invoke {@link StereoMutualInformation#process(GrayU8, GrayU8, int, GrayU8, int)}
+	 * first to initialize the data structure, then {@link StereoMutualInformation#precomputeScaledCost(int)} before
+	 * this function can be called
+	 */
+	@Override
+	public void process(GrayU8 left, GrayU8 right, int minDisparity, int maxDisparity, Planar<GrayU16> output) {
+		InputSanityCheck.checkSameShape(left,right);
+		output.reshape(left.width,left.height,maxDisparity-minDisparity+1);
+
+		for (int d = minDisparity; d <= maxDisparity; d++) {
+			GrayU16 cost = output.getBand(d-minDisparity);
+
+			for (int y = 0; y < left.height; y++) {
+				int idxLeft = left.startIndex + y*left.stride + d;
+				int idxRight = right.startIndex + y*right.stride;
+				int idxOut = output.startIndex + y*output.stride + d;
+
+				for (int x = d; x < left.width; x++) {
+					int valLeft  = left.data[idxLeft++]  & 0xFF;
+					int valRight = left.data[idxRight++] & 0xFF;
+
+					cost.data[idxOut++] = (short)mutual.costScaled(valLeft,valRight);
+				}
+			}
+		}
+	}
+
+	public StereoMutualInformation getMutual() {
+		return mutual;
+	}
+
 }

@@ -28,6 +28,7 @@ import boofcv.factory.filter.kernel.FactoryKernelGaussian;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import org.ejml.UtilEjml;
 
@@ -64,6 +65,10 @@ public class StereoMutualInformation {
 	// The maximum intensity value after scaling is applied. Always histogram.length-1
 	int maxHistogramValue;
 
+	// total number of corresponding pixels with disparity values
+	int totalDispPixels;
+
+	// histogram mapping pixel intensities from left to right image
 	GrayS32 histJoint = new GrayS32(1,1);
 
 	// Storage for entropy. Initially the probabilities will be stored here but that is overwritten
@@ -71,11 +76,14 @@ public class StereoMutualInformation {
 	GrayF32 entropyLeft = new GrayF32(1,1);
 	GrayF32 entropyRight = new GrayF32(1,1);
 
+	// Precomputed scaled cost
+	GrayU16 scaledCost = new GrayU16(1,1);
+
 	public StereoMutualInformation() {
 		// this is a reasonable default for 8-bit images
 		configureHistogram(255,255);
 
-		configureSmoothing(3);
+		configureSmoothing(1);
 	}
 
 	/**
@@ -100,6 +108,10 @@ public class StereoMutualInformation {
 		entropyRight.reshape(intensityBins,1);
 	}
 
+	/**
+	 * Amount of smooth that's applied to the kernels
+	 * @param radius A radius of 3 is recommended in the paper
+	 */
 	public void configureSmoothing( int radius ) {
 		smoothKernel = FactoryKernelGaussian.gaussian(1,true,32,-1,radius);
 	}
@@ -108,10 +120,11 @@ public class StereoMutualInformation {
 	 * Process the images and compute the entropy terms which will be in turn used to compute mutual information
 	 * @param left Left rectified image
 	 * @param right Right rectified image
+	 * @param minDisparity The minimum allowed disparity
 	 * @param disparity Disparity from left to right
 	 * @param invalid Value of disparity pixels which are invalid
 	 */
-	public void process(GrayU8 left , GrayU8 right , GrayU8 disparity , int invalid ) {
+	public void process(GrayU8 left , GrayU8 right , int minDisparity , GrayU8 disparity , int invalid ) {
 		// Check input to make sure it's valid
 		InputSanityCheck.checkSameShape(left,right);
 		if( left.isSubimage() || right.isSubimage() || disparity.isSubimage() )
@@ -119,7 +132,7 @@ public class StereoMutualInformation {
 		disparity.reshape(left);
 
 		// Compute entropy tables
-		computeJointHistogram(left, right, disparity, invalid);
+		computeJointHistogram(left, right, minDisparity, disparity, invalid);
 		computeProbabilities();
 		computeEntropy();
 	}
@@ -141,11 +154,15 @@ public class StereoMutualInformation {
 		return -(entropyLeft.data[leftScale] + entropyRight.data[rightScale] - entropyJoint.unsafe_get(rightScale,leftScale));
 	}
 
+	public int costScaled( int leftValue , int rightValue ) {
+		return scaledCost.unsafe_get(rightValue,leftValue);
+	}
+
 	/**
 	 * Computes the joint histogram of pixel intensities (2D histogram) while skipping over pixels with
 	 * no correspondences
 	 */
-	void computeJointHistogram(GrayU8 left, GrayU8 right, GrayU8 disparity, int invalid) {
+	void computeJointHistogram(GrayU8 left, GrayU8 right, int minDisparity , GrayU8 disparity, int invalid) {
 		// zero the histogram
 		ImageMiscOps.fill(histJoint,0);
 
@@ -160,11 +177,17 @@ public class StereoMutualInformation {
 				if( d == invalid )
 					continue;
 
-				int leftValue = left.data[idx]&0xFF;     // I(x,y)
+				d += minDisparity;
+
+				// NOTE: Paper says to take care to avoid double mappings due to occlusions. Not sure I'm doing that.
+
+				// The equation below assumes that all disparitys are valid and won't result in a pixel going
+				// outside the image
+				int leftValue  =  left.data[idx  ]&0xFF; // I(x  ,y)
 				int rightValue = right.data[idx-d]&0xFF; // I(x-d,y)
 
 				// scale the pixel intensity for the histogram
-				leftValue = scalePixelValue(leftValue);
+				leftValue  = scalePixelValue(leftValue);
 				rightValue = scalePixelValue(rightValue);
 
 				// increment the histogram
@@ -178,8 +201,8 @@ public class StereoMutualInformation {
 	 */
 	void computeProbabilities() {
 		// Convert joint histogram into a joint probability
-		float totalPixels = ImageStatistics.sum(histJoint);
-		int histN = histJoint.width*histJoint.height;
+		float totalPixels = totalDispPixels = ImageStatistics.sum(histJoint);
+		int histN = histJoint.totalPixels();
 		for (int i = 0; i < histN; i++) {
 			entropyJoint.data[i] = histJoint.data[i]/totalPixels;
 		}
@@ -202,26 +225,57 @@ public class StereoMutualInformation {
 	 * Compute Entropy from the already computed probabilities
 	 */
 	void computeEntropy() {
+
 		// Compute Joint Entropy Eq. 5
 		// H = -(1/n)*log(I*G)*G
 		// Supposedly this is effectively Parezen Estimation
 		ConvolveImageNormalized.horizontal(smoothKernel, entropyJoint, smoothWork);
 		ConvolveImageNormalized.vertical(smoothKernel, smoothWork, entropyJoint);
-		PixelMath.log(entropyJoint, eps, entropyJoint);
+		PixelMath.log(entropyJoint, eps, entropyJoint); // NOTE: The paper says replace zero with EPS not add to all
 		ConvolveImageNormalized.horizontal(smoothKernel, entropyJoint, smoothWork);
 		ConvolveImageNormalized.vertical(smoothKernel, smoothWork, entropyJoint);
-		PixelMath.divide(entropyJoint,-entropyJoint.totalPixels(), entropyJoint);
+		PixelMath.divide(entropyJoint,-totalDispPixels, entropyJoint);
 
 		// Compute entropy for each image using a similar approach
 		ConvolveImageNormalized.horizontal(smoothKernel, entropyLeft, smoothWork);
 		PixelMath.log(smoothWork,eps,smoothWork);
 		ConvolveImageNormalized.horizontal(smoothKernel, smoothWork, entropyLeft);
-		PixelMath.divide(entropyLeft,-entropyLeft.totalPixels(), entropyLeft);
+		PixelMath.divide(entropyLeft,-totalDispPixels, entropyLeft);
 
 		ConvolveImageNormalized.horizontal(smoothKernel, entropyRight, smoothWork);
 		PixelMath.log(smoothWork,eps,smoothWork);
 		ConvolveImageNormalized.horizontal(smoothKernel, smoothWork, entropyRight);
-		PixelMath.divide(entropyRight,-entropyRight.totalPixels(), entropyRight);
+		PixelMath.divide(entropyRight,-totalDispPixels, entropyRight);
+	}
+
+	/**
+	 * Precompute cost scaled to have a range of 0 to maxCost, inclusive
+	 */
+	public void precomputeScaledCost( int maxCost ) {
+		final int N = maxHistogramValue;
+
+		float minValue = Float.MAX_VALUE;
+		float maxValue = -Float.MAX_VALUE;
+
+		//NOTE: Is there a way to compute this without going through exaustively?
+		for (int y = 0; y < N; y++) {
+			for (int x = 0; x < N; x++) {
+				float v = -(entropyLeft.data[y] + entropyRight.data[x] - entropyJoint.unsafe_get(x,y));
+				if( minValue > v )
+					minValue = v;
+				if( maxValue < v )
+					maxValue = v;
+			}
+		}
+		float rangeValue = maxValue-minValue;
+
+		scaledCost.reshape(N,N);
+		for (int left = 0; left < N; left++) {
+			for (int right = 0; right < N; right++) {
+				float v = -(entropyLeft.data[left] + entropyRight.data[right] - entropyJoint.unsafe_get(right,left));
+				scaledCost.data[left*N+right] = (short)(maxCost*(v-minValue)/rangeValue);
+			}
+		}
 	}
 
 	/**

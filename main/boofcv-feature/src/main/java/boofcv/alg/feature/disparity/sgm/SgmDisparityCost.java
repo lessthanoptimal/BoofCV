@@ -27,5 +27,22 @@ import boofcv.struct.image.Planar;
  */
 public interface SgmDisparityCost<T extends ImageBase<T>> {
 
-	void process(T left , T right , Planar<GrayU16> output );
+	/**
+	 * Maximum allowed cost fo a disparity 11-bits as suggested in the paper
+	 */
+	int MAX_COST = 2048-1;
+
+	/**
+	 * Computes the score for all possible disparity values across all pixels. If a disparity value would
+	 * go outside of the image then it's value is left as is and not writen over.
+	 *
+	 * @param left left image
+	 * @param right right image
+	 * @param minDisparity Minimum possible disparity, inclusive
+	 * @param maxDisparity Maximum possible disparity, inclusive
+	 * @param output Cost of output scaled to have a range of 0 to {@link SgmDisparityCost#MAX_COST}, inclusive.
+	 */
+	void process(T left , T right ,
+				 int minDisparity , int maxDisparity,
+				 Planar<GrayU16> output );
 }

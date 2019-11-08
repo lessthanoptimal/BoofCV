@@ -33,19 +33,100 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 class TestStereoMutualInformation {
-	final int w = 20,h=30;
+	final int w = 30,h=40;
 	final Random rand = new Random(234);
 
 	@Test
 	void cost() {
 		// Create two images that are offset by a constant disparity
+		GrayU8 left = new GrayU8(w,h);
+		GrayU8 right = new GrayU8(w,h);
+		GrayU8 disparity = new GrayU8(w,h);
 
-		// Compute MI with incorrect disparity
+		// Set the disparity to 10
+		ImageMiscOps.fill(disparity,10);
+		ImageMiscOps.fillRectangle(disparity,255,0,0,10,h);
+
+		// Compute MI with no correlation between left and right images
+		ImageMiscOps.fillUniform(left,rand,125,150);
+		ImageMiscOps.fillUniform(right,rand,80,125);
+
+		StereoMutualInformation alg = new StereoMutualInformation();
+		alg.process(left,right,disparity,255);
+		float costIncorrect = computeCost(left, right, null, alg);
 
 		// Compute MI with correct disparity
+		ImageMiscOps.copy(10,0,0,0,w-10,h,left,right);
+		PixelMath.multiply(right,0.5,right);
+		alg.process(left,right,disparity,255);
+		float costCorrect = computeCost(left, right, disparity, alg);
 
 		// The cost should be much less with correct disparity
-		fail("Implement");
+		// not sure how to quantiyf much less since positive and negative values are allowed
+		assertTrue(costCorrect < costIncorrect);
+	}
+
+	@Test
+	void costScaled() {
+		// Create two images that are offset by a constant disparity
+		GrayU8 left = new GrayU8(w,h);
+		GrayU8 right = new GrayU8(w,h);
+		GrayU8 disparity = new GrayU8(w,h);
+
+		// Set the disparity to 10
+		ImageMiscOps.fill(disparity,10);
+		ImageMiscOps.fillRectangle(disparity,255,0,0,10,h);
+
+		// Compute MI with no correlation between left and right images
+		ImageMiscOps.fillUniform(left,rand,125,150);
+		ImageMiscOps.fillUniform(right,rand,80,125);
+
+		StereoMutualInformation alg = new StereoMutualInformation();
+		alg.process(left,right,disparity,255);
+		alg.precomputeScaledCost(2047);
+
+		int costIncorrect = computeCostScaled(left, right, null, alg);
+
+		// Compute MI with correct disparity
+		ImageMiscOps.copy(10,0,0,0,w-10,h,left,right);
+		PixelMath.multiply(right,0.5,right);
+		alg.process(left,right,disparity,255);
+		alg.precomputeScaledCost(2047);
+		int costCorrect = computeCostScaled(left, right, disparity, alg);
+
+		// The cost should be much less with correct disparity
+		// Is this enough of a difference?
+		assertTrue(costCorrect*1.5 < costIncorrect);
+	}
+
+	private float computeCost(GrayU8 left, GrayU8 right, GrayU8 disparity, StereoMutualInformation alg) {
+		float cost = 0;
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				int d = disparity != null ? disparity.get(x,y) : 0;
+				if( d == 255 )
+					continue;
+				int xx = x-d;
+				if( xx >= 0 )
+					cost += alg.cost(left.get(x,y),right.get(xx,y));
+			}
+		}
+		return cost;
+	}
+
+	private int computeCostScaled(GrayU8 left, GrayU8 right, GrayU8 disparity, StereoMutualInformation alg) {
+		int cost = 0;
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				int d = disparity != null ? disparity.get(x,y) : 0;
+				if( d == 255 )
+					continue;
+				int xx = x-d;
+				if( xx >= 0 )
+					cost += alg.costScaled(left.get(x,y),right.get(xx,y));
+			}
+		}
+		return cost;
 	}
 
 	/**
@@ -53,7 +134,25 @@ class TestStereoMutualInformation {
 	 */
 	@Test
 	void multipleCalls() {
-		fail("implement");
+		// Create arbitrary inputs
+		GrayU8 left = new GrayU8(w,h);
+		GrayU8 right = new GrayU8(w,h);
+		GrayU8 disparity = new GrayU8(w,h);
+
+		ImageMiscOps.fillUniform(left,rand,10,220);
+		ImageMiscOps.fillUniform(right,rand,10,220);
+		ImageMiscOps.fillUniform(disparity,rand,0,8);
+		ImageMiscOps.fillRectangle(disparity,255,0,0,8,h); // avoid going out of bounds
+
+		StereoMutualInformation alg = new StereoMutualInformation();
+		alg.process(left,right,disparity,255);
+		float cost0 = computeCost(left, right, disparity, alg);
+
+		alg.process(left,right,disparity,255);
+		float cost1 = computeCost(left, right, disparity, alg);
+
+		// the cost should be identical
+		assertEquals(cost0, cost1);
 	}
 
 	@Test
