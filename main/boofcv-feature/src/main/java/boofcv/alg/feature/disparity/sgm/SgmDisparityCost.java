@@ -23,6 +23,13 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.Planar;
 
 /**
+ * <p>Computes a stack of matching costs for all pixels across all possible disparities for use
+ * with {@link SgmCostAggregation}. Pay close attention to the element ordering in the output. That was
+ * selected to reduce cache misses when aggregating the costs.</p>
+ *
+ * <p>The output is really a 3D tensor, but to avoid creating another custom data type planar image is used.
+ * The other reason to use a planar image is that it was desirable to have multiple arrays define the tensor.</p>
+ *
  * @author Peter Abeles
  */
 public interface SgmDisparityCost<T extends ImageBase<T>> {
@@ -40,9 +47,10 @@ public interface SgmDisparityCost<T extends ImageBase<T>> {
 	 * @param right right image
 	 * @param minDisparity Minimum possible disparity, inclusive
 	 * @param maxDisparity Maximum possible disparity, inclusive
-	 * @param output Cost of output scaled to have a range of 0 to {@link SgmDisparityCost#MAX_COST}, inclusive.
+	 * @param costYXD Cost of output scaled to have a range of 0 to {@link SgmDisparityCost#MAX_COST}, inclusive.
+	 *                Reshaped to match input and disparity range.
 	 */
 	void process(T left , T right ,
 				 int minDisparity , int maxDisparity,
-				 Planar<GrayU16> output );
+				 Planar<GrayU16> costYXD );
 }

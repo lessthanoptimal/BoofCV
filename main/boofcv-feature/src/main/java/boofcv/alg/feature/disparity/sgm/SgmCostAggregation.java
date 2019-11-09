@@ -29,6 +29,11 @@ import boofcv.struct.image.Planar;
  */
 public class SgmCostAggregation {
 
+	// TODO compute forward then reverse. In forward save read cost. In reverse add results to local cache before
+	//      adding to aggregated
+
+	// Contains aggregated cost. The image is being used to store a tensor.
+	// band = y-axis, x=x-axis, y=depth
 	Planar<GrayU16> aggregated = new Planar<>(GrayU16.class,1,1,2);
 
 	Planar<GrayU16> costYXD;
@@ -120,6 +125,8 @@ public class SgmCostAggregation {
 		for (int i = 1; i < lengthPath; i++) {
 			costXD = costYXD.getBand(y);
 			idxCost = costXD.getIndex(x,0);
+
+			// Read results from the previous location along the path
 			int idxWork = (i-1)*lengthD;
 
 			// find the minimum cost for all D in the previous
@@ -146,11 +153,12 @@ public class SgmCostAggregation {
 
 	private void computeCostInnerD(GrayU16 costXD, int idxCost, int idxWork, int minCostPrev, int minCostPrevTotal) {
 		final int lengthD = this.lengthD;
-		for (int d = 1; d < lengthD-1; d++) {
+		idxWork += 1; // start at d=1
+		for (int d = 1; d < lengthD-1; d++, idxWork++) {
 			int cost = costXD.data[idxCost+d] & 0xFFFF;
 
-			int a = pathWork[idxWork  ]&0xFFFF; // Lr(p-r,d)
 			int b = pathWork[idxWork-1]&0xFFFF; // Lr(p-r,d-1)
+			int a = pathWork[idxWork  ]&0xFFFF; // Lr(p-r,d)
 			int c = pathWork[idxWork+1]&0xFFFF; // Lr(p-r,d+1)
 
 			// Add penalty terms
@@ -166,10 +174,13 @@ public class SgmCostAggregation {
 				a = minCostPrevTotal;
 
 			// minCostPrev is done to reduce the rate at which the cost increases
-			pathWork[idxWork+lengthD+d] = (short)(cost + a - minCostPrev);
+			pathWork[idxWork+lengthD] = (short)(cost + a - minCostPrev);
 		}
 	}
 
+	/**
+	 * Copies the work array into the aggregated cost Tensor
+	 */
 	private void saveWorkToAggregated( int x0 , int y0 , int dx , int dy , int length ) {
 		int idxWork = 0;
 		int x = x0;

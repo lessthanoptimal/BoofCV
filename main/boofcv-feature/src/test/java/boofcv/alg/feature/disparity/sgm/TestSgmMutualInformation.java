@@ -18,16 +18,15 @@
 
 package boofcv.alg.feature.disparity.sgm;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
-public class TestSgmMutualInformation {
-	@Test
-	void stuff() {
-		fail("Implement");
+class TestSgmMutualInformation extends ChecksSgmDisparityCost {
+
+	@Override
+	SgmDisparityCost<GrayU8> createAlg() {
+		return null;
 	}
 }
