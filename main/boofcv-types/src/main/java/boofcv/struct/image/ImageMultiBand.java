@@ -49,4 +49,18 @@ public abstract class ImageMultiBand<T extends ImageMultiBand<T>> extends ImageB
 		reshape(width, height);
 		setNumberOfBands(numberOfBands);
 	}
+
+	/**
+	 * Reshapes to match the (width,height,bands) of input image
+	 */
+	public void reshape( ImageMultiBand image ) {
+		reshape(image.width,image.height,image.getNumBands());
+	}
+
+	/**
+	 * Reshapes to match the (width,height) of input image. Number of bands is left the same
+	 */
+	public void reshape( ImageGray image ) {
+		reshape(image.width,image.height);
+	}
 }

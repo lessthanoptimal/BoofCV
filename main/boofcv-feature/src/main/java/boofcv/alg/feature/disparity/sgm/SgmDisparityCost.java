@@ -34,7 +34,7 @@ public interface SgmDisparityCost<T extends ImageBase<T>> {
 
 	/**
 	 * Computes the score for all possible disparity values across all pixels. If a disparity value would
-	 * go outside of the image then it's value is left as is and not writen over.
+	 * go outside of the image then the cost is set to {@link #MAX_COST}
 	 *
 	 * @param left left image
 	 * @param right right image
