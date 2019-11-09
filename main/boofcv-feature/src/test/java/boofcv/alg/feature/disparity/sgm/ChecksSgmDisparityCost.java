@@ -18,10 +18,14 @@
 
 package boofcv.alg.feature.disparity.sgm;
 
+import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
+import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Common unit tests for implementations of {@link SgmDisparityCost}
@@ -30,21 +34,111 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 abstract class ChecksSgmDisparityCost {
 
-	// In some tests pixels are assigned two values and a check is done to see if the disparity is at the right
-	// location or not
-	int VALUE_LOW = 10;
-	int VALUE_HIGH = 200;
+	// Image shape
+	int width=25;
+	int height=20;
 
-	// TODO ensure cost does not exceed max
+	int maxPixelValue = 255;
+
+	GrayU8 left = new GrayU8(width,height);
+	GrayU8 right = new GrayU8(width,height);
 
 	abstract SgmDisparityCost<GrayU8> createAlg();
 
 	/**
-	 * Sanity checks the ordering of values in the cost image
+	 * Give it a simple problem that's composed of a horizontal gradient. See if cost matches expectation
 	 */
 	@Test
-	void costOrder() {
-		fail("Implement");
+	void simple_gradient() {
+		// see if min and max disparity are both respected
+		simple_gradient(0, 20);
+		simple_gradient(4, 20);
+		simple_gradient(5, 5); // test of inclusive
+	}
+
+	/**
+	 * It should output the same answer when called multiple times
+	 */
+	@Test
+	void multipleCalls() {
+		int disparity = 5;
+		fillWithGradient(disparity);
+
+		SgmDisparityCost<GrayU8> alg = createAlg();
+		Planar<GrayU16> cost1 = new Planar<>(GrayU16.class,1,1,1);
+		Planar<GrayU16> cost2 = new Planar<>(GrayU16.class,1,1,1);
+		alg.process(left,right,1,15,cost1);
+		alg.process(left,right,1,15,cost2);
+
+		BoofTesting.assertEquals(cost1,cost2,0);
+	}
+
+	private void simple_gradient(int minDisparity, int maxDisparity) {
+		// the actual disparity of each pixel
+		int disparity = 5;
+
+		// Set each image to a gradient that has a simple known solution
+		fillWithGradient(disparity);
+
+		// This has a known solution. See if it worked
+		Planar<GrayU16> cost = new Planar<>(GrayU16.class,1,1,1);
+		SgmDisparityCost<GrayU8> alg = createAlg();
+		alg.process(left,right,minDisparity,maxDisparity,cost);
+
+		// Check outside
+		checkOutsideDispIsMax(minDisparity,maxDisparity, cost);
+
+		// For each pixel, find the best disparity and see if it matches up with the input image
+		for (int y = 0; y < height; y++) {
+			for (int x = disparity; x < width - disparity; x++) {
+				int d = selectDisparity(x,y,cost)+minDisparity;
+				assertEquals(left.get(x,y),right.get(x-d,y),1,y+" "+x+" "+d);
+			}
+		}
+	}
+
+	private void fillWithGradient(int disparity) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				left.set(x,y, y + x+20);
+				right.set(x,y, y + x+20+disparity);
+			}
+		}
+	}
+
+	private int selectDisparity(int x , int y , Planar<GrayU16> cost ) {
+		int bestValue = Integer.MAX_VALUE;
+		int best = -1;
+
+		for (int d = 0; d < cost.width; d++) {
+			int v = lookup(cost,x,y,d);
+			assertTrue(v <= SgmMutualInformation.MAX_COST);
+			if( v < bestValue ) {
+				bestValue = v;
+				best = d;
+			}
+		}
+
+		return best;
+	}
+
+	/**
+	 * Make sure that the of the cost which go outside the image should be filled with max value
+	 */
+	private void checkOutsideDispIsMax(int minD, int maxD, Planar<GrayU16> cost) {
+		int rangeD = maxD-minD;
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < rangeD; x++) {
+				// skip over disparity of zero since it will be inside the right image
+				for (int d = x+Math.max(minD,1); d <= maxD; d++) {
+					assertEquals(SgmDisparityCost.MAX_COST,lookup(cost,x,y,d-minD),y+" "+x+" "+d);
+				}
+			}
+		}
+	}
+
+	private static int lookup( Planar<GrayU16> cost , int x , int y , int d ) {
+		return cost.getBand(y).get(d,x);
 	}
 
 	/**
@@ -52,22 +146,14 @@ abstract class ChecksSgmDisparityCost {
 	 */
 	@Test
 	void reshape() {
-		fail("Implement");
-	}
+		SgmDisparityCost<GrayU8> alg = createAlg();
 
-	/**
-	 * Is the min disparity parameter obeyed?
-	 */
-	@Test
-	void minDisparity() {
-		fail("Implement");
-	}
+		Planar<GrayU16> cost = new Planar<>(GrayU16.class,1,1,1);
+		alg.process(left,right,5,10,cost);
 
-	/**
-	 * Is the min disparity parameter obeyed?
-	 */
-	@Test
-	void maxDisparity() {
-		fail("Implement");
+		// cost is Y,X,D order
+		assertEquals(height,cost.getNumBands());
+		assertEquals(width,cost.getHeight());
+		assertEquals(6,cost.getWidth());
 	}
 }

@@ -103,9 +103,10 @@ public class StereoMutualInformation {
 		histogramIntensity = new int[intensityBins];
 
 		histJoint.reshape(intensityBins,intensityBins);
-		entropyJoint.reshape(intensityBins,intensityBins);
+		entropyJoint.reshape(histJoint);
 		entropyLeft.reshape(intensityBins,1);
 		entropyRight.reshape(intensityBins,1);
+		scaledCost.reshape(histJoint);
 	}
 
 	/**
@@ -269,7 +270,6 @@ public class StereoMutualInformation {
 		}
 		float rangeValue = maxValue-minValue;
 
-		scaledCost.reshape(N,N);
 		for (int left = 0; left < N; left++) {
 			for (int right = 0; right < N; right++) {
 				float v = -(entropyLeft.data[left] + entropyRight.data[right] - entropyJoint.unsafe_get(right,left));

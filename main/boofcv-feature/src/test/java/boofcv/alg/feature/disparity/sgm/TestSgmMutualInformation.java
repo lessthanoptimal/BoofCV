@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.disparity.sgm;
 
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayU8;
 
 /**
@@ -27,6 +28,16 @@ class TestSgmMutualInformation extends ChecksSgmDisparityCost {
 
 	@Override
 	SgmDisparityCost<GrayU8> createAlg() {
-		return null;
+		StereoMutualInformation smi = new StereoMutualInformation();
+		smi.configureHistogram(maxPixelValue,maxPixelValue);
+
+		// A bit of a hack below.
+		// Everything his high cost but the same pixel values
+		ImageMiscOps.fill(smi.scaledCost,1000);
+		for (int i = 0; i < maxPixelValue; i++) {
+			smi.scaledCost.set(i,i, 10);
+		}
+
+		return new SgmMutualInformation(smi);
 	}
 }

@@ -43,24 +43,27 @@ public class SgmMutualInformation implements SgmDisparityCost<GrayU8> {
 	@Override
 	public void process(GrayU8 left, GrayU8 right, int minDisparity, int maxDisparity, Planar<GrayU16> costYXD) {
 		InputSanityCheck.checkSameShape(left,right);
-		costYXD.reshape(left.width,left.height,maxDisparity-minDisparity+1);
+
+		// Declare the "tensor" with shape (lengthY,lengthX,lengthD)
+		costYXD.reshape(maxDisparity-minDisparity+1,left.width,left.height);
 
 		for (int y = 0; y < left.height; y++) {
 			GrayU16 costXD = costYXD.getBand(y);
 
 			int idxLeft  = left.startIndex  + y*left.stride;
 
-			for (int x = minDisparity; x < left.width; x++) {
-				int idxOut = costYXD.startIndex + x*costYXD.stride + x - minDisparity;
+			for (int x = 0; x < left.width; x++) {
+				int idxOut = costXD.startIndex + x*costYXD.stride;
 
+				// the maximum disparity in which the pixel will be inside the right image
 				int m = Math.min(x,maxDisparity);
 				int valLeft = left.data[idxLeft++] & 0xFF;
 
 				// start reading the right image at the smallest disparity then increase disparity size
-				int idxRight = right.startIndex + y*right.stride + x;
+				int idxRight = right.startIndex + y*right.stride + x - minDisparity;
 
 				for (int d = minDisparity; d <= m; d++) {
-					int valRight = left.data[idxRight--] & 0xFF;
+					int valRight = right.data[idxRight--] & 0xFF;
 					costXD.data[idxOut++] = (short)mutual.costScaled(valLeft,valRight);
 				}
 
