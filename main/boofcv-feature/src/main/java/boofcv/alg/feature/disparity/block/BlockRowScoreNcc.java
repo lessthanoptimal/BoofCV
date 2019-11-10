@@ -34,9 +34,6 @@ import org.ejml.UtilEjml;
  */
 public class BlockRowScoreNcc<A extends ImageBase<A>,B extends ImageBase<B>>
 {
-	// Radius of local region for NCC calculation. This is not going to be the same as the block region
-	int radius;
-
 	// Storage for mean of left + right image
 	A meanL, meanR;
 	// Storage for power of 2 images
@@ -50,16 +47,17 @@ public class BlockRowScoreNcc<A extends ImageBase<A>,B extends ImageBase<B>>
 	BlurStorageFilter<A> meanFilterA;
 	BlurStorageFilter<B> meanFilterB;
 
-	public BlockRowScoreNcc( int radius , ImageType<A> meanType, ImageType<B> powType ) {
-		this.radius = radius;
+	public BlockRowScoreNcc( int radiusX , int radiusY ,
+							 ImageType<A> meanType, ImageType<B> powType ) {
+		if( radiusX != radiusY )
+			throw new IllegalArgumentException("Non-square regions are currently not supported");
 
 		meanL = meanType.createImage(1,1);
 		meanR = meanType.createImage(1,1);
 		powL = powType.createImage(1,1);
 		powR = powType.createImage(1,1);
 
-
-		meanFilterA = FactoryBlurFilter.mean(meanType,radius);
+		meanFilterA = FactoryBlurFilter.mean(meanType,radiusX);
 		// save memory and use the same filter / images
 		if( meanType.isSameType(powType)) {
 			tmpPow2 = (B)meanL;
@@ -70,7 +68,7 @@ public class BlockRowScoreNcc<A extends ImageBase<A>,B extends ImageBase<B>>
 			tmpPow2 = powType.createImage(1,1);
 			stdevL = meanType.createImage(1,1);
 			stdevR = meanType.createImage(1,1);
-			meanFilterB = FactoryBlurFilter.mean(powType, radius);
+			meanFilterB = FactoryBlurFilter.mean(powType, radiusX);
 		}
 	}
 
@@ -92,8 +90,9 @@ public class BlockRowScoreNcc<A extends ImageBase<A>,B extends ImageBase<B>>
 
 	public static class U8 extends BlockRowScore.ArrayS32<GrayU8> {
 		BlockRowScoreNcc<GrayU8, GrayU16> helper;
-		public U8(int radiusNCC) {
-			helper = new BlockRowScoreNcc<>(radiusNCC,ImageType.single(GrayU8.class),ImageType.single(GrayU16.class));
+		public U8(int radiusWidth , int radiusHeight) {
+			helper = new BlockRowScoreNcc<>(radiusWidth,radiusHeight,
+					ImageType.single(GrayU8.class),ImageType.single(GrayU16.class));
 		}
 
 		@Override
@@ -106,6 +105,7 @@ public class BlockRowScoreNcc<A extends ImageBase<A>,B extends ImageBase<B>>
 		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
 			for( int rCol = 0; rCol < elementMax; rCol++ ) {
 				elementScore[rCol] = (left.data[ indexLeft++ ]&0xFF) * (right.data[ indexRight++ ]&0xFF);
+//				elementScore[rCol] = Math.abs((left.data[ indexLeft++ ]&0xFF) - (right.data[ indexRight++ ]&0xFF));
 			}
 		}
 
@@ -121,15 +121,16 @@ public class BlockRowScoreNcc<A extends ImageBase<A>,B extends ImageBase<B>>
 			int idxRight = row*helper.meanL.stride+colRight;
 
 			for (int i = 0; i < numCols; i++, idxLeft++, idxRight++ ) {
-				int correlation = scores[indexScores+i];
+				// scores will always be positive so you can round quickly this way
+				float correlation = (scores[indexScores+i]+round)/area;
 
-				int meanL = helper.meanL.data[idxLeft]&0xFF;
-				int meanR = helper.meanR.data[idxRight]&0xFF;
-				int sigmaL = helper.stdevL.data[idxLeft]&0XFF;
-				int sigmaR = helper.stdevR.data[idxRight]&0XFF;
+				float meanL = helper.meanL.data[idxLeft]&0xFF;
+				float meanR = helper.meanR.data[idxRight]&0xFF;
+				float sigmaL = helper.stdevL.data[idxLeft]&0XFF;
+				float sigmaR = helper.stdevR.data[idxRight]&0XFF;
 
 				// invert score since the minimum is selected for disparity
-				scores[i] = -(((correlation+round)/area - meanL*meanR)/(1+sigmaL*sigmaR));
+				scores[indexScores+i] = (int)(-1000.0f*((correlation - meanL*meanR)/(1f+sigmaL*sigmaR)));
 			}
 		}
 
@@ -141,8 +142,9 @@ public class BlockRowScoreNcc<A extends ImageBase<A>,B extends ImageBase<B>>
 
 	public static class F32 extends BlockRowScore.ArrayF32<GrayF32> {
 		BlockRowScoreNcc<GrayF32,GrayF32> helper;
-		public F32(int radiusNCC) {
-			helper = new BlockRowScoreNcc<>(radiusNCC,ImageType.single(GrayF32.class),ImageType.single(GrayF32.class));
+		public F32(int radiusWidth , int radiusHeight) {
+			helper = new BlockRowScoreNcc<>(radiusWidth,radiusHeight,
+					ImageType.single(GrayF32.class),ImageType.single(GrayF32.class));
 		}
 
 		@Override
@@ -164,20 +166,20 @@ public class BlockRowScoreNcc<A extends ImageBase<A>,B extends ImageBase<B>>
 								   float[] scores, int indexScores) {
 			final float area = regionWidth*regionHeight;
 
-			int idxLeft = row*helper.meanL.stride+colLeft;
-			int idxRight = row*helper.meanL.stride+colRight;
+			int stride = helper.meanL.stride;
+			int idxLeft  = row*stride + colLeft;
+			int idxRight = row*stride + colRight;
 
 			for (int i = 0; i < numCols; i++, idxLeft++, idxRight++ ) {
-				float correlation = scores[indexScores+i];
+				float correlation = scores[indexScores+i]/area;
 
 				float meanL = helper.meanL.data[idxLeft];
 				float meanR = helper.meanR.data[idxRight];
-				float sigmaL = helper.powL.data[idxLeft];
-				float sigmaR = helper.powR.data[idxRight];
+				float sigmaL = helper.stdevL.data[idxLeft];
+				float sigmaR = helper.stdevR.data[idxRight];
 
 				// invert score since the minimum is selected for disparity
-
-				scores[i] = -(correlation/area - meanL*meanR)/(UtilEjml.F_EPS+sigmaL*sigmaR);
+				scores[indexScores+i] = -(correlation - meanL*meanR)/(UtilEjml.F_EPS+sigmaL*sigmaR);
 			}
 		}
 

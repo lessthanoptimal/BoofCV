@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.disparity;
 
-import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -41,7 +41,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public interface StereoDisparity<Image extends ImageGray, Disparity extends ImageGray> {
+public interface StereoDisparity<Image extends ImageBase<Image>, Disparity extends ImageBase<Disparity>> {
 
 	/**
 	 * Computes stereo disparity.

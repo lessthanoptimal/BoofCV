@@ -186,6 +186,11 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		if( !rectifiedImages )
 			return;
 
+		// if the data types have changed the images need to be rectified again
+		if( !activeAlg.getInputType().isSameType(rectLeft.getImageType())) {
+			changeInputScale();
+		}
+
 		ProcessThread progress = new ProcessThread(this);
 		progress.start();
 
@@ -325,7 +330,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	public synchronized void disparitySettingChange() {
 		if( control.recompute ) {
 			processCalled = false;
-			activeAlg = createAlg();
+			algorithmChanged();
 			processDisparityInThread();
 		}
 	}
@@ -361,12 +366,14 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		int maxDisparity = Math.min(colorLeft.getWidth()-2*r,control.maxDisparity);
 		int minDisparity = Math.min(maxDisparity,control.minDisparity);
 
+		Class inputType = GrayU8.class;
+
 		Class dispType = control.useSubpixel ? GrayF32.class : GrayU8.class;
 		DisparityError error;
 		switch( control.selectedError ) {
 			case 0: error =  DisparityError.SAD; break;
 			case 1: error =  DisparityError.CENSUS; break;
-			case 2: error =  DisparityError.NCC; break;
+			case 2: error =  DisparityError.NCC; inputType = GrayF32.class;break;
 			default: throw new RuntimeException("Add new error type");
 		}
 
@@ -383,7 +390,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			config.maxPerPixelError = control.pixelError;
 			config.validateRtoL = control.reverseTol;
 			config.texture = control.texture;
-			return FactoryStereoDisparity.blockMatchBest5(config,GrayU8.class,dispType);
+			return FactoryStereoDisparity.blockMatchBest5(config,inputType,dispType);
 		} else {
 			ConfigureDisparityBM config = new ConfigureDisparityBM();
 			config.errorType = error;
@@ -406,7 +413,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 				config.validateRtoL = -1;
 				config.texture = 0;
 			}
-			return FactoryStereoDisparity.blockMatch(config,GrayU8.class,dispType);
+			return FactoryStereoDisparity.blockMatch(config,inputType,dispType);
 		}
 	}
 

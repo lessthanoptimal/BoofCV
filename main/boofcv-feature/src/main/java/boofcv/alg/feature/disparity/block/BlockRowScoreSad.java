@@ -40,14 +40,14 @@ public interface BlockRowScoreSad
 	abstract class SadArrayS32<T extends ImageBase<T>> extends ArrayS32<T> {
 		// no normalization needed
 		@Override
-		public void normalizeScoreRow(int row, int[] scores,
-									  int minDisparity, int maxDisparity, int regionWidth, int regionHeight) {}
+		public void normalizeRegionScores(int row, int[] scores,
+										  int minDisparity, int maxDisparity, int regionWidth, int regionHeight) {}
 	}
 	abstract class SadArrayF32<T extends ImageBase<T>> extends ArrayF32<T> {
 		// no normalization needed
 		@Override
-		public void normalizeScoreRow(int row, float[] scores,
-									  int minDisparity, int maxDisparity, int regionWidth, int regionHeight) {}
+		public void normalizeRegionScores(int row, float[] scores,
+										  int minDisparity, int maxDisparity, int regionWidth, int regionHeight) {}
 	}
 
 	class U8 extends SadArrayS32<GrayU8> {

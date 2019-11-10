@@ -68,8 +68,8 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 	 * @param regionWidth Size of the sample region's width
 	 * @param regionHeight Size of the sample region's height
 	 */
-	void normalizeScoreRow(int row, Array scores,
-						   int minDisparity, int maxDisparity, int regionWidth, int regionHeight );
+	void normalizeRegionScores(int row, Array scores,
+							   int minDisparity, int maxDisparity, int regionWidth, int regionHeight );
 
 	/**
 	 * Applies normalization to a single row
@@ -133,8 +133,10 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 		}
 
 		@Override
-		public void normalizeScoreRow(int row, int[] scores,
-									  int minDisparity, int maxDisparity, int regionWidth, int regionHeight ) {
+		public void normalizeRegionScores(int row, int[] scores,
+										  int minDisparity, int maxDisparity, int regionWidth, int regionHeight )
+		{
+			int r = regionWidth/2;
 			// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
 			for( int d = minDisparity; d < maxDisparity; d++ ) {
 				int dispFromMin = d - minDisparity;
@@ -147,10 +149,7 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 				// indexes that data is read to/from for different data structures
 				int indexScore = left.width*dispFromMin + dispFromMin;
 
-				// scores for the remaining columns
-				for( int col = 0; col < scoreMax; col++ , indexScore++ ) {
-					normalizeScore(row,col+d,col,colMax,regionWidth,regionHeight,scores,indexScore);
-				}
+				normalizeScore(row,d+r,r,scoreMax+1,regionWidth,regionHeight,scores,indexScore);
 			}
 		}
 
@@ -204,8 +203,9 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 		}
 
 		@Override
-		public void normalizeScoreRow(int row, float[] scores,
-									  int minDisparity, int maxDisparity, int regionWidth, int regionHeight ) {
+		public void normalizeRegionScores(int row, float[] scores,
+										  int minDisparity, int maxDisparity, int regionWidth, int regionHeight ) {
+			int r = regionWidth/2;
 			// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
 			for( int d = minDisparity; d < maxDisparity; d++ ) {
 				int dispFromMin = d - minDisparity;
@@ -218,10 +218,7 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 				// indexes that data is read to/from for different data structures
 				int indexScore = left.width*dispFromMin + dispFromMin;
 
-				// scores for the remaining columns
-				for( int col = 0; col < scoreMax; col++ , indexScore++ ) {
-					normalizeScore(row,col+d,col,colMax,regionWidth,regionHeight,scores,indexScore);
-				}
+				normalizeScore(row,d+r,r,scoreMax+1,regionWidth,regionHeight,scores,indexScore);
 			}
 		}
 

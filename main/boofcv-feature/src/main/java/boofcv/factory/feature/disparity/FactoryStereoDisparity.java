@@ -116,7 +116,7 @@ public class FactoryStereoDisparity {
 			}
 
 			case NCC: {
-				BlockRowScore rowScore = createScoreRowNcc(config.radiusNCC,imageType);
+				BlockRowScore rowScore = createScoreRowNcc(config.regionRadiusX,config.regionRadiusY,imageType);
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
 				return new WrapDisparityBlockMatchRowFormat(alg);
 			}
@@ -187,7 +187,7 @@ public class FactoryStereoDisparity {
 			}
 
 			case NCC: {
-				BlockRowScore rowScore = createScoreRowNcc(config.radiusNCC,imageType);
+				BlockRowScore rowScore = createScoreRowNcc(config.regionRadiusX,config.regionRadiusY,imageType);
 				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
 				return new WrapDisparityBlockMatchRowFormat(alg);
 			}
@@ -213,12 +213,12 @@ public class FactoryStereoDisparity {
 		return rowScore;
 	}
 
-	public static <T extends ImageGray<T>> BlockRowScore createScoreRowNcc( int radius , Class<T> imageType) {
+	public static <T extends ImageGray<T>> BlockRowScore createScoreRowNcc( int radiusX , int radiusY , Class<T> imageType) {
 		BlockRowScore rowScore;
 		if (imageType == GrayU8.class) {
-			rowScore = new BlockRowScoreNcc.U8(radius);
+			rowScore = new BlockRowScoreNcc.U8(radiusX,radiusY);
 		} else if (imageType == GrayF32.class) {
-			rowScore = new BlockRowScoreNcc.F32(radius);
+			rowScore = new BlockRowScoreNcc.F32(radiusX,radiusY);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
 		}

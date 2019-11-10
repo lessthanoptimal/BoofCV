@@ -70,9 +70,9 @@ public abstract class DisparityBlockMatchRowFormat
 	public DisparityBlockMatchRowFormat(int minDisparity, int maxDisparity,
 										int regionRadiusX, int regionRadiusY ) {
 		if( maxDisparity <= 0 )
-			throw new IllegalArgumentException("Max disparity must be greater than zero");
+			throw new IllegalArgumentException("Max disparity must be greater than zero. max="+maxDisparity);
 		if( minDisparity < 0 || minDisparity >= maxDisparity )
-			throw new IllegalArgumentException("Min disparity must be >= 0 and < maxDisparity");
+			throw new IllegalArgumentException("Min disparity must be >= 0 and < maxDisparity. min="+minDisparity+" max="+maxDisparity);
 
 		this.minDisparity = minDisparity;
 		this.maxDisparity = maxDisparity;
@@ -94,7 +94,8 @@ public abstract class DisparityBlockMatchRowFormat
 	 */
 	public void process( Input left , Input right , Disparity disparity ) {
 		// initialize data structures
-		InputSanityCheck.checkSameShape(left, right, disparity);
+		InputSanityCheck.checkSameShape(left, right);
+		disparity.reshape(left);
 
 		if( maxDisparity >  left.width-2*radiusX )
 			throw new RuntimeException(

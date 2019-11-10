@@ -32,8 +32,8 @@ public interface BlockRowScoreCensus
 	abstract class CensusArrayS32<T extends ImageBase<T>> extends ArrayS32<T> {
 		// no normalization needed
 		@Override
-		public void normalizeScoreRow(int row, int[] scores,
-									  int minDisparity, int maxDisparity, int regionWidth, int regionHeight) {}
+		public void normalizeRegionScores(int row, int[] scores,
+										  int minDisparity, int maxDisparity, int regionWidth, int regionHeight) {}
 	}
 
 	class U8 extends CensusArrayS32<GrayU8> {

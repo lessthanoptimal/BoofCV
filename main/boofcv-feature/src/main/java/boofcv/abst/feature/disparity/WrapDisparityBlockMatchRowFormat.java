@@ -42,7 +42,9 @@ public class WrapDisparityBlockMatchRowFormat<T extends ImageGray<T>, D extends 
 		if( disparity == null || disparity.width != imageLeft.width || disparity.height != imageLeft.height )  {
 			// make sure the image borders are marked as invalid
 			disparity = GeneralizedImageOps.createSingleBand(alg.getDisparityType(),imageLeft.width,imageLeft.height);
-			GImageMiscOps.fill(disparity, getMaxDisparity() + 1);
+			GImageMiscOps.fill(disparity, getMaxDisparity() - getMinDisparity() + 1);
+			// TODO move this outside and run it every time. Need to fill border
+			//      left border will be radius + min disparity
 		}
 
 		alg.process(imageLeft,imageRight,disparity);

@@ -18,7 +18,6 @@
 
 package boofcv.alg.feature.disparity.block.impl;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.disparity.DisparityBlockMatch;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
@@ -71,8 +70,6 @@ public class ImplDisparityScoreBM_F32<DI extends ImageGray<DI>>
 
 	@Override
 	public void _process(GrayF32 left , GrayF32 right , DI disparity ) {
-		InputSanityCheck.checkSameShape(left,right);
-		disparity.reshape(left.width,left.height);
 		this.left = left;
 		this.right = right;
 		this.disparity = disparity;
@@ -155,6 +152,8 @@ public class ImplDisparityScoreBM_F32<DI extends ImageGray<DI>>
 			verticalScore[i] = sum;
 		}
 
+		scoreRows.normalizeRegionScores(row0+radiusY, verticalScore,minDisparity,maxDisparity,regionWidth,regionHeight);
+
 		// compute disparity
 		computeDisparity.process(row0+radiusY, verticalScore);
 	}
@@ -184,6 +183,8 @@ public class ImplDisparityScoreBM_F32<DI extends ImageGray<DI>>
 			for( int i = 0; i < lengthHorizontal; i++ ) {
 				verticalScore[i] += scores[i];
 			}
+
+			scoreRows.normalizeRegionScores(row - regionHeight + 1 + radiusY, verticalScore,minDisparity,maxDisparity,regionWidth,regionHeight);
 
 			// compute disparity
 			computeDisparity.process(row - regionHeight + 1 + radiusY, verticalScore);
