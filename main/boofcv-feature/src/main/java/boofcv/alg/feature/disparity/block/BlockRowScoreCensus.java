@@ -19,18 +19,26 @@
 package boofcv.alg.feature.disparity.block;
 
 import boofcv.alg.descriptor.DescriptorDistance;
-import boofcv.alg.feature.disparity.block.BlockRowScore;
+import boofcv.alg.feature.disparity.block.BlockRowScore.ArrayS32;
 import boofcv.struct.image.*;
 
 /**
+ * TODO Comment
+ *
  * @author Peter Abeles
  */
-public abstract class BlockRowScoreCensus<T extends ImageBase<T>,Array>
-		implements BlockRowScore<T,Array>
+public interface BlockRowScoreCensus
 {
-	public static class U8 extends ArrayS32<GrayU8> {
+	abstract class CensusArrayS32<T extends ImageBase<T>> extends ArrayS32<T> {
+		// no normalization needed
 		@Override
-		public void score(GrayU8 left, GrayU8 right, int elementMax, int indexLeft, int indexRight, int[] elementScore) {
+		public void normalizeScoreRow(int row, int[] scores,
+									  int minDisparity, int maxDisparity, int regionWidth, int regionHeight) {}
+	}
+
+	class U8 extends CensusArrayS32<GrayU8> {
+		@Override
+		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
 			for( int rCol = 0; rCol < elementMax; rCol++ ) {
 				final int a = left.data[ indexLeft++ ]& 0xFF;
 				final int b = right.data[ indexRight++ ]& 0xFF;
@@ -44,9 +52,9 @@ public abstract class BlockRowScoreCensus<T extends ImageBase<T>,Array>
 		}
 	}
 
-	public static class S32 extends ArrayS32<GrayS32> {
+	class S32 extends CensusArrayS32<GrayS32> {
 		@Override
-		public void score(GrayS32 left, GrayS32 right, int elementMax, int indexLeft, int indexRight, int[] elementScore) {
+		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
 			for( int rCol = 0; rCol < elementMax; rCol++ ) {
 				final int a = left.data[ indexLeft++ ];
 				final int b = right.data[ indexRight++ ];
@@ -60,9 +68,9 @@ public abstract class BlockRowScoreCensus<T extends ImageBase<T>,Array>
 		}
 	}
 
-	public static class S64 extends ArrayS32<GrayS64> {
+	class S64 extends CensusArrayS32<GrayS64> {
 		@Override
-		public void score(GrayS64 left, GrayS64 right, int elementMax, int indexLeft, int indexRight, int[] elementScore) {
+		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
 			for( int rCol = 0; rCol < elementMax; rCol++ ) {
 				final long a = left.data[ indexLeft++ ];
 				final long b = right.data[ indexRight++ ];

@@ -40,6 +40,10 @@ TODO
 
 - TODO determine why solving for nullspace with QRP causes decoding regression to get worse
 
+- Stereo Disparity
+  * Optimise Census Transform block code. Can make about 4x faster
+  * Optimise NCC
+
 
 TOP ITEMS
 - TODO QR Code algorithm

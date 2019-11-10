@@ -2235,20 +2235,6 @@ public class ImplPixelMath_MT {
 		});
 	}
 
-	public static void pow2( GrayF32 input , GrayF32 output ) {
-
-		BoofConcurrency.loopFor(0,input.height,y->{
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				float v = input.data[indexSrc];
-				output.data[indexDst] = v*v;
-			}
-		});
-	}
-
 	public static void sqrt( GrayF32 input , GrayF32 output ) {
 
 		BoofConcurrency.loopFor(0,input.height,y->{
@@ -2363,20 +2349,6 @@ public class ImplPixelMath_MT {
 		});
 	}
 
-	public static void pow2( GrayF64 input , GrayF64 output ) {
-
-		BoofConcurrency.loopFor(0,input.height,y->{
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				double v = input.data[indexSrc];
-				output.data[indexDst] = v*v;
-			}
-		});
-	}
-
 	public static void sqrt( GrayF64 input , GrayF64 output ) {
 
 		BoofConcurrency.loopFor(0,input.height,y->{
@@ -2386,6 +2358,150 @@ public class ImplPixelMath_MT {
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
 				output.data[indexDst] = Math.sqrt(input.data[indexSrc]);
+			}
+		});
+	}
+
+	public static void pow2( GrayU8 input , GrayU16 output ) {
+
+		BoofConcurrency.loopFor(0,input.height,y->{
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				int v = input.data[indexSrc]& 0xFF;
+				output.data[indexDst] = (short)(v*v);
+			}
+		});
+	}
+
+	public static void stdev( GrayU8 mean , GrayU16 pow2 , GrayU8 stdev ) {
+
+		final int h = mean.getHeight();
+		final int w = mean.getWidth();
+
+		BoofConcurrency.loopFor(0,h,y->{
+			int indexMean = mean.startIndex + y * mean.stride;
+			int indexPow = pow2.startIndex + y * pow2.stride;
+			int indexStdev = stdev.startIndex + y * stdev.stride;
+
+			int indexEnd = indexMean+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexMean < indexEnd; indexMean++, indexPow++, indexStdev++ ) {
+				int mu = mean.data[indexMean]& 0xFF;
+				int p2 = pow2.data[indexPow]& 0xFFFF;
+				int sigma = (int)Math.sqrt(Math.max(0,p2-mu*mu));
+
+				stdev.data[indexStdev] = (byte)sigma;
+			}
+		});
+	}
+
+	public static void pow2( GrayU16 input , GrayS32 output ) {
+
+		BoofConcurrency.loopFor(0,input.height,y->{
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				int v = input.data[indexSrc]& 0xFFFF;
+				output.data[indexDst] = (v*v);
+			}
+		});
+	}
+
+	public static void stdev( GrayU16 mean , GrayS32 pow2 , GrayU16 stdev ) {
+
+		final int h = mean.getHeight();
+		final int w = mean.getWidth();
+
+		BoofConcurrency.loopFor(0,h,y->{
+			int indexMean = mean.startIndex + y * mean.stride;
+			int indexPow = pow2.startIndex + y * pow2.stride;
+			int indexStdev = stdev.startIndex + y * stdev.stride;
+
+			int indexEnd = indexMean+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexMean < indexEnd; indexMean++, indexPow++, indexStdev++ ) {
+				int mu = mean.data[indexMean]& 0xFFFF;
+				int p2 = pow2.data[indexPow];
+				int sigma = (int)Math.sqrt(p2-mu*mu);
+
+				stdev.data[indexStdev] = (short)sigma;
+			}
+		});
+	}
+
+	public static void pow2( GrayF32 input , GrayF32 output ) {
+
+		BoofConcurrency.loopFor(0,input.height,y->{
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				float v = input.data[indexSrc];
+				output.data[indexDst] = (v*v);
+			}
+		});
+	}
+
+	public static void stdev( GrayF32 mean , GrayF32 pow2 , GrayF32 stdev ) {
+
+		final int h = mean.getHeight();
+		final int w = mean.getWidth();
+
+		BoofConcurrency.loopFor(0,h,y->{
+			int indexMean = mean.startIndex + y * mean.stride;
+			int indexPow = pow2.startIndex + y * pow2.stride;
+			int indexStdev = stdev.startIndex + y * stdev.stride;
+
+			int indexEnd = indexMean+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexMean < indexEnd; indexMean++, indexPow++, indexStdev++ ) {
+				float mu = mean.data[indexMean];
+				float p2 = pow2.data[indexPow];
+				float sigma = (float)Math.sqrt(p2-mu*mu);
+
+				stdev.data[indexStdev] = (float)sigma;
+			}
+		});
+	}
+
+	public static void pow2( GrayF64 input , GrayF64 output ) {
+
+		BoofConcurrency.loopFor(0,input.height,y->{
+			int indexSrc = input.startIndex + y* input.stride;
+			int indexDst = output.startIndex + y* output.stride;
+			int end = indexSrc + input.width;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				double v = input.data[indexSrc];
+				output.data[indexDst] = (v*v);
+			}
+		});
+	}
+
+	public static void stdev( GrayF64 mean , GrayF64 pow2 , GrayF64 stdev ) {
+
+		final int h = mean.getHeight();
+		final int w = mean.getWidth();
+
+		BoofConcurrency.loopFor(0,h,y->{
+			int indexMean = mean.startIndex + y * mean.stride;
+			int indexPow = pow2.startIndex + y * pow2.stride;
+			int indexStdev = stdev.startIndex + y * stdev.stride;
+
+			int indexEnd = indexMean+w;
+			// for(int x = 0; x < w; x++ ) {
+			for (; indexMean < indexEnd; indexMean++, indexPow++, indexStdev++ ) {
+				double mu = mean.data[indexMean];
+				double p2 = pow2.data[indexPow];
+				double sigma = (double)Math.sqrt(p2-mu*mu);
+
+				stdev.data[indexStdev] = (double)sigma;
 			}
 		});
 	}

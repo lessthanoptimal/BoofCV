@@ -112,10 +112,19 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				printDivTwoImages(types[i],types[i]);
 				printLog(types[i],types[i]);
 				printLogSign(types[i],types[i]);
-				printPow2(types[i], types[i]);
 				printSqrt(types[i], types[i]);
 			}
 		}
+
+		increaseBits(U8,U16);
+		increaseBits(U16,S32);
+		increaseBits(F32,F32);
+		increaseBits(F64,F64);
+	}
+
+	private void increaseBits( AutoTypeImage a , AutoTypeImage b ) {
+		printPow2(a,b);
+		printStdev(a,b);
 	}
 
 	private void print( String funcName , String javadoc , String operation , AutoTypeImage types[] ) {
@@ -446,7 +455,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 
 		out.print("\t/**\n" +
 				"\t * Raises each pixel in the input image to the power of two. Both the input and output image can be the \n" +
-				"\t * same instance." +
+				"\t * same instance.\n" +
 				"\t *\n" +
 				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param output Where the pow2 image is written to. Can be same as input. Modified.\n" +
@@ -482,6 +491,28 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t\t\tImplPixelMath_MT.sqrt(input,output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tImplPixelMath.sqrt(input,output);\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public void printStdev( AutoTypeImage typeMean , AutoTypeImage typePow2 ) {
+		out.print("\t/**\n" +
+				"\t * Computes the standard deviation of each pixel in a local region.\n" +
+				"\t *\n" +
+				"\t * @param mean (Input) Image with local mean\n" +
+				"\t * @param pow2 (Input) Image with local mean pixel-wise power of 2 \n" +
+				"\t * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.  \n" +
+				"\t */\n" +
+				"\tpublic static void stdev( "+typeMean.getSingleBandName()+" mean , "+typePow2.getSingleBandName()+" pow2 , "+typeMean.getSingleBandName()+" stdev) {\n" +
+				"\n" +
+				"\t\tInputSanityCheck.checkSameShape(mean,pow2);\n" +
+				"\t\tstdev.reshape(mean.width,mean.height);\n" +
+				"\n" +
+				"\t\tint N = mean.width*mean.height;\n" +
+				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {\n" +
+				"\t\t\tImplPixelMath_MT.stdev(mean,pow2,stdev);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tImplPixelMath.stdev(mean,pow2,stdev);\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}

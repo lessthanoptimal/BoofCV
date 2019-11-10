@@ -20,8 +20,8 @@ package boofcv.alg.feature.disparity.block.impl;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.disparity.DisparityBlockMatch;
-import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
+import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.IntRangeObjectConsumer;
 import boofcv.struct.image.GrayU8;
@@ -77,6 +77,8 @@ public class ImplDisparityScoreBM_S32<T extends ImageBase<T>,DI extends ImageGra
 		this.left = left;
 		this.right = right;
 		this.disparity = disparity;
+
+		scoreRows.setInput(left,right);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
 			BoofConcurrency.loopBlocks(0,left.height,regionHeight,workspace,computeBlock);
@@ -142,7 +144,7 @@ public class ImplDisparityScoreBM_S32<T extends ImageBase<T>,DI extends ImageGra
 		// compute horizontal scores for first row block
 		for( int row = 0; row < regionHeight; row++ ) {
 			final int[] scores = horizontalScore[row];
-			scoreRows.scoreRow(left, right,row0+row, scores,minDisparity,maxDisparity,regionWidth,elementScore);
+			scoreRows.scoreRow(row0+row, scores,minDisparity,maxDisparity,regionWidth,elementScore);
 		}
 
 		// compute score for the top possible row
@@ -177,7 +179,7 @@ public class ImplDisparityScoreBM_S32<T extends ImageBase<T>,DI extends ImageGra
 				verticalScore[i] -= scores[i];
 			}
 
-			scoreRows.scoreRow(left, right, row, scores,minDisparity,maxDisparity,regionWidth,elementScore);
+			scoreRows.scoreRow(row, scores,minDisparity,maxDisparity,regionWidth,elementScore);
 
 			// add the new score
 			for( int i = 0; i < lengthHorizontal; i++ ) {

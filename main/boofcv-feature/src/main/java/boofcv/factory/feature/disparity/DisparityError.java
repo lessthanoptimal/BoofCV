@@ -30,13 +30,15 @@ public enum DisparityError {
 	 */
 	SAD,
 	/**
-	 * Census. Can handle affine changes in lighting between the two images.
+	 * Census. Can handle affine changes in lighting between the two images. There are many different possible
+	 * sampling patterns.
 	 *
 	 * @see boofcv.alg.transform.census.CensusTransform
 	 */
 	CENSUS,
 	/**
-	 * Normalized Cross Correlation.
+	 * Normalized Cross Correlation. The NCC radius specifies the size of the local region used to compute
+	 * normalization statistics.
 	 */
 	NCC
 }

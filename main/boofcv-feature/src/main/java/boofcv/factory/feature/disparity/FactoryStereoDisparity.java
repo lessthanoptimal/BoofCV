@@ -21,13 +21,11 @@ package boofcv.factory.feature.disparity;
 import boofcv.abst.feature.disparity.*;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.feature.disparity.DisparityBlockMatchRowFormat;
-import boofcv.alg.feature.disparity.block.DisparitySelect;
-import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
-import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
-import boofcv.alg.feature.disparity.block.BlockRowScore;
-import boofcv.alg.feature.disparity.block.BlockRowScoreCensus;
-import boofcv.alg.feature.disparity.block.BlockRowScoreSad;
-import boofcv.alg.feature.disparity.block.impl.*;
+import boofcv.alg.feature.disparity.block.*;
+import boofcv.alg.feature.disparity.block.impl.ImplDisparityScoreBMBestFive_F32;
+import boofcv.alg.feature.disparity.block.impl.ImplDisparityScoreBMBestFive_S32;
+import boofcv.alg.feature.disparity.block.impl.ImplDisparityScoreBM_F32;
+import boofcv.alg.feature.disparity.block.impl.ImplDisparityScoreBM_S32;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.transform.census.FactoryCensusTransform;
 import boofcv.struct.image.*;
@@ -117,6 +115,12 @@ public class FactoryStereoDisparity {
 				return new WrapDisparityBlockMatchCensus<>(censusTran, alg);
 			}
 
+			case NCC: {
+				BlockRowScore rowScore = createScoreRowNcc(config.radiusNCC,imageType);
+				DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
+				return new WrapDisparityBlockMatchRowFormat(alg);
+			}
+
 			default:
 				throw new IllegalArgumentException("Unsupported error type "+config.errorType);
 		}
@@ -182,6 +186,12 @@ public class FactoryStereoDisparity {
 				return new WrapDisparityBlockMatchCensus<>(censusTran, alg);
 			}
 
+			case NCC: {
+				BlockRowScore rowScore = createScoreRowNcc(config.radiusNCC,imageType);
+				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
+				return new WrapDisparityBlockMatchRowFormat(alg);
+			}
+
 			default:
 				throw new IllegalArgumentException("Unsupported error type "+config.errorType);
 		}
@@ -197,6 +207,18 @@ public class FactoryStereoDisparity {
 			rowScore = new BlockRowScoreSad.S16();
 		} else if (imageType == GrayF32.class) {
 			rowScore = new BlockRowScoreSad.F32();
+		} else {
+			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
+		}
+		return rowScore;
+	}
+
+	public static <T extends ImageGray<T>> BlockRowScore createScoreRowNcc( int radius , Class<T> imageType) {
+		BlockRowScore rowScore;
+		if (imageType == GrayU8.class) {
+			rowScore = new BlockRowScoreNcc.U8(radius);
+		} else if (imageType == GrayF32.class) {
+			rowScore = new BlockRowScoreNcc.F32(radius);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
 		}

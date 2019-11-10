@@ -18,7 +18,8 @@
 
 package boofcv.alg.feature.disparity.block;
 
-import boofcv.alg.feature.disparity.block.BlockRowScore;
+import boofcv.alg.feature.disparity.block.BlockRowScore.ArrayF32;
+import boofcv.alg.feature.disparity.block.BlockRowScore.ArrayS32;
 import boofcv.struct.image.*;
 
 /**
@@ -34,12 +35,24 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public abstract class BlockRowScoreSad<T extends ImageBase<T>,Array>
-	implements BlockRowScore<T,Array>
+public interface BlockRowScoreSad
 {
-	public static class U8 extends ArrayS32<GrayU8> {
+	abstract class SadArrayS32<T extends ImageBase<T>> extends ArrayS32<T> {
+		// no normalization needed
 		@Override
-		public void score(GrayU8 left, GrayU8 right, int elementMax, int indexLeft, int indexRight, int[] elementScore) {
+		public void normalizeScoreRow(int row, int[] scores,
+									  int minDisparity, int maxDisparity, int regionWidth, int regionHeight) {}
+	}
+	abstract class SadArrayF32<T extends ImageBase<T>> extends ArrayF32<T> {
+		// no normalization needed
+		@Override
+		public void normalizeScoreRow(int row, float[] scores,
+									  int minDisparity, int maxDisparity, int regionWidth, int regionHeight) {}
+	}
+
+	class U8 extends SadArrayS32<GrayU8> {
+		@Override
+		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
 			for( int rCol = 0; rCol < elementMax; rCol++ ) {
 				int diff = (left.data[ indexLeft++ ]& 0xFF) - (right.data[ indexRight++ ]& 0xFF);
 
@@ -53,9 +66,9 @@ public abstract class BlockRowScoreSad<T extends ImageBase<T>,Array>
 		}
 	}
 
-	public static class U16 extends ArrayS32<GrayU16> {
+	class U16 extends SadArrayS32<GrayU16> {
 		@Override
-		public void score(GrayU16 left, GrayU16 right, int elementMax, int indexLeft, int indexRight, int[] elementScore) {
+		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
 			for( int rCol = 0; rCol < elementMax; rCol++ ) {
 				int diff = (left.data[ indexLeft++ ]& 0xFFFF) - (right.data[ indexRight++ ]& 0xFFFF);
 
@@ -69,9 +82,9 @@ public abstract class BlockRowScoreSad<T extends ImageBase<T>,Array>
 		}
 	}
 
-	public static class S16 extends ArrayS32<GrayS16> {
+	class S16 extends SadArrayS32<GrayS16> {
 		@Override
-		public void score(GrayS16 left, GrayS16 right, int elementMax, int indexLeft, int indexRight, int[] elementScore) {
+		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
 			for( int rCol = 0; rCol < elementMax; rCol++ ) {
 				int diff = left.data[ indexLeft++ ] - right.data[ indexRight++ ];
 
@@ -85,9 +98,9 @@ public abstract class BlockRowScoreSad<T extends ImageBase<T>,Array>
 		}
 	}
 
-	public static class F32 extends ArrayF32<GrayF32> {
+	class F32 extends SadArrayF32<GrayF32> {
 		@Override
-		public void score(GrayF32 left, GrayF32 right, int elementMax, int indexLeft, int indexRight, float[] elementScore) {
+		public void score(int elementMax, int indexLeft, int indexRight, float[] elementScore) {
 			for( int rCol = 0; rCol < elementMax; rCol++ ) {
 				float diff = left.data[ indexLeft++ ] - right.data[ indexRight++ ];
 

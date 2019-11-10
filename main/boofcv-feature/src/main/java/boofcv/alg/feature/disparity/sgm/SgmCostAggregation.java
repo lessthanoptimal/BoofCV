@@ -95,6 +95,7 @@ public class SgmCostAggregation {
 				score(lengthX-1,y,dx,dy);
 			}
 		}
+		// TODO avoid computing the same cost more than once
 		if( dy > 0 ) {
 			for (int x = 0; x < lengthX; x++) {
 				score(x,0,dx,dy);

@@ -101,7 +101,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	JCheckBox checkConcurrent = checkbox("concurrent",concurrent);
 
 	JComboBox comboAlg = combo(selectedAlg,"Five Regions","Region","Region Basic");
-	JComboBox comboError = combo(selectedError,"SAD","Census");
+	JComboBox comboError = combo(selectedError,"SAD","Census","NCC");
 	JComboBox comboErrorVariant = combo(selectedErrorVariant,"FOOBAR");
 	JSpinner minDisparitySpinner = spinner(minDisparity,0,255,5);
 	JSpinner maxDisparitySpinner = spinner(maxDisparity,1,255,5);

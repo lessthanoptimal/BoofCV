@@ -362,7 +362,13 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		int minDisparity = Math.min(maxDisparity,control.minDisparity);
 
 		Class dispType = control.useSubpixel ? GrayF32.class : GrayU8.class;
-		DisparityError error = control.selectedError == 0 ? DisparityError.SAD : DisparityError.CENSUS;
+		DisparityError error;
+		switch( control.selectedError ) {
+			case 0: error =  DisparityError.SAD; break;
+			case 1: error =  DisparityError.CENSUS; break;
+			case 2: error =  DisparityError.NCC; break;
+			default: throw new RuntimeException("Add new error type");
+		}
 
 		if( control.selectedAlg == 0 ) {
 			changeGuiActive(true,true);

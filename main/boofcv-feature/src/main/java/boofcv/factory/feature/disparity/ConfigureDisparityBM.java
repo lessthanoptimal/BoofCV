@@ -76,4 +76,9 @@ public class ConfigureDisparityBM {
 	 * If Census error is used which variant should it use
 	 */
 	public CensusType censusVariant = CensusType.BLOCK_5_5;
+
+	/**
+	 * Radius of local region used to compute NCC statistics
+	 */
+	public int radiusNCC = 2;
 }

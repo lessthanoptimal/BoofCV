@@ -20,8 +20,8 @@ package boofcv.alg.feature.disparity.block.impl;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.disparity.DisparityBlockMatch;
-import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
+import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.IntRangeObjectConsumer;
 import boofcv.struct.image.GrayF32;
@@ -76,6 +76,8 @@ public class ImplDisparityScoreBM_F32<DI extends ImageGray<DI>>
 		this.left = left;
 		this.right = right;
 		this.disparity = disparity;
+
+		scoreRows.setInput(left,right);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
 			BoofConcurrency.loopBlocks(0,left.height,regionHeight,workspace,computeBlock);
@@ -141,11 +143,10 @@ public class ImplDisparityScoreBM_F32<DI extends ImageGray<DI>>
 		// compute horizontal scores for first row block
 		for( int row = 0; row < regionHeight; row++ ) {
 			final float[] scores = horizontalScore[row];
-			scoreRows.scoreRow(left, right,row0+row, scores,
-					minDisparity,maxDisparity,regionWidth,elementScore);
+			scoreRows.scoreRow(row0+row, scores,minDisparity,maxDisparity,regionWidth,elementScore);
 		}
 
-		// compute score for the top possible row
+		// compute score for the top most row
 		for( int i = 0; i < lengthHorizontal; i++ ) {
 			float sum = 0;
 			for( int row = 0; row < regionHeight; row++ ) {
@@ -177,7 +178,7 @@ public class ImplDisparityScoreBM_F32<DI extends ImageGray<DI>>
 				verticalScore[i] -= scores[i];
 			}
 
-			scoreRows.scoreRow(left, right, row, scores, minDisparity,maxDisparity,regionWidth,elementScore);
+			scoreRows.scoreRow(row, scores, minDisparity,maxDisparity,regionWidth,elementScore);
 
 			// add the new score
 			for( int i = 0; i < lengthHorizontal; i++ ) {

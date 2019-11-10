@@ -102,10 +102,19 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				printDivTwoImages(types[i],types[i]);
 				printLog(types[i],types[i]);
 				printLogSign(types[i], types[i]);
-				printPow2(types[i], types[i]);
 				printSqrt(types[i], types[i]);
 			}
 		}
+
+		increaseBits(U8,U16);
+		increaseBits(U16,S32);
+		increaseBits(F32,F32);
+		increaseBits(F64,F64);
+	}
+
+	private void increaseBits( AutoTypeImage a , AutoTypeImage b ) {
+		printPow2(a,b);
+		printStdev(a,b);
 	}
 
 	private void print( String funcName , String operation , AutoTypeImage types[] ) {
@@ -368,6 +377,8 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 
 	public void printPow2( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
 		String bitWise = typeIn.getBitWise();
+		String sumType = typeIn.getSumType();
+		String typeCast = typeOut.getDataType().equals(sumType) ? "" : "("+typeOut.getDataType()+")";
 
 		out.print(
 				"\tpublic static void pow2( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
@@ -379,8 +390,8 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\t\t\tint end = indexSrc + input.width;\n" +
 				"\n" +
 				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
-				"\t\t\t\t"+typeOut.getDataType()+" v = input.data[indexSrc]"+bitWise+";\n" +
-				"\t\t\t\toutput.data[indexDst] = v*v;\n" +
+				"\t\t\t\t"+sumType+" v = input.data[indexSrc]"+bitWise+";\n" +
+				"\t\t\t\toutput.data[indexDst] = "+typeCast+"(v*v);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\t//CONCURRENT_ABOVE });\n" +
@@ -402,6 +413,37 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\n" +
 				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
 				"\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.sqrt(input.data[indexSrc]"+bitWise+");\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t\t//CONCURRENT_ABOVE });\n" +
+				"\t}\n\n");
+	}
+
+	public void printStdev( AutoTypeImage typeMean , AutoTypeImage typePow2 ) {
+		String bitWiseMean = typeMean.getBitWise();
+		String bitWisePow = typePow2.getBitWise();
+		String typeCast = typeMean.getDataType();
+		String sumType = typeMean.getSumType();
+
+		out.print("\tpublic static void stdev( "+typeMean.getSingleBandName()+" mean , "+typePow2.getSingleBandName()+" pow2 , "+typeMean.getSingleBandName()+" stdev ) {\n" +
+				"\n" +
+				"\t\tfinal int h = mean.getHeight();\n" +
+				"\t\tfinal int w = mean.getWidth();\n" +
+				"\n" +
+				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
+				"\t\tfor (int y = 0; y < h; y++) {\n" +
+				"\t\t\tint indexMean = mean.startIndex + y * mean.stride;\n" +
+				"\t\t\tint indexPow = pow2.startIndex + y * pow2.stride;\n" +
+				"\t\t\tint indexStdev = stdev.startIndex + y * stdev.stride;\n" +
+				"\n" +
+				"\t\t\tint indexEnd = indexMean+w;\n" +
+				"\t\t\t// for(int x = 0; x < w; x++ ) {\n" +
+				"\t\t\tfor (; indexMean < indexEnd; indexMean++, indexPow++, indexStdev++ ) {\n" +
+				"\t\t\t\t"+sumType+" mu = mean.data[indexMean]"+bitWiseMean+";\n" +
+				"\t\t\t\t"+sumType+" p2 = pow2.data[indexPow]"+bitWisePow+";\n" +
+				"\t\t\t\t"+sumType+" sigma = ("+sumType+")Math.sqrt(Math.max(0,p2-mu*mu));\n" +
+				"\n" +
+				"\t\t\t\tstdev.data[indexStdev] = ("+typeCast+")sigma;\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\t//CONCURRENT_ABOVE });\n" +

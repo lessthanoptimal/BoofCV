@@ -486,6 +486,8 @@ public class GPixelMath {
 			for (int i = 0; i < in.getNumBands(); i++) {
 				log( in.getBand(i), val, out.getBand(i));
 			}
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -512,6 +514,8 @@ public class GPixelMath {
 			for (int i = 0; i < in.getNumBands(); i++) {
 				logSign( in.getBand(i), val, out.getBand(i));
 			}
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -522,9 +526,14 @@ public class GPixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the pow2 image is written to. Modified.
 	 */
-	public static <T extends ImageBase<T>> void pow2(T input , T output ) {
+	public static <A extends ImageBase<A>,B extends ImageBase<B>>
+	void pow2(A input , B output ) {
 		if( input instanceof ImageGray ) {
-			if (GrayF32.class == input.getClass()) {
+			if (GrayU8.class == input.getClass()) {
+				PixelMath.pow2((GrayU8) input, (GrayU16) output);
+			} else if (GrayU16.class == input.getClass()) {
+				PixelMath.pow2((GrayU16) input, (GrayS32) output);
+			} else if (GrayF32.class == input.getClass()) {
 				PixelMath.pow2((GrayF32) input, (GrayF32) output);
 			} else if (GrayF64.class == input.getClass()) {
 				PixelMath.pow2((GrayF64) input, (GrayF64) output);
@@ -538,6 +547,8 @@ public class GPixelMath {
 			for (int i = 0; i < in.getNumBands(); i++) {
 				pow2( in.getBand(i), out.getBand(i));
 			}
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -564,6 +575,8 @@ public class GPixelMath {
 			for (int i = 0; i < in.getNumBands(); i++) {
 				sqrt( in.getBand(i), out.getBand(i));
 			}
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -982,6 +995,8 @@ public class GPixelMath {
 			for (int i = 0; i < inA.getNumBands(); i++) {
 				add(inA.getBand(i),inB.getBand(i),out.getBand(i));
 			}
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+inputA.getClass().getSimpleName());
 		}
 	}
 
@@ -1063,6 +1078,8 @@ public class GPixelMath {
 			for (int i = 0; i < in.getNumBands(); i++) {
 				boundImage( in.getBand(i), min, max);
 			}
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
 		}
 	}
 
@@ -1104,6 +1121,40 @@ public class GPixelMath {
 			for (int i = 0; i < inA.getNumBands(); i++) {
 				diffAbs( inA.getBand(i), inB.getBand(i), out.getBand(i));
 			}
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+inputA.getClass().getSimpleName());
+		}
+	}
+	/**
+	 * Computes the standard deviation of each pixel in a local region.
+	 *
+	 * @param mean (Input) Image with local mean
+	 * @param pow2 (Input) Image with local mean pixel-wise power of 2
+	 * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.
+	 */
+	public static <T extends ImageBase<T>, B extends ImageBase<B>> void stdev(T mean , B pow2 , T stdev ) {
+		if( mean instanceof ImageGray ) {
+			if (GrayU8.class == mean.getClass()) {
+				PixelMath.stdev((GrayU8) mean, (GrayU16) pow2, (GrayU8) stdev);
+			} else if (GrayU16.class == mean.getClass()) {
+				PixelMath.stdev((GrayU16) mean, (GrayS32) pow2, (GrayU16) stdev);
+			} else if (GrayF32.class == mean.getClass()) {
+				PixelMath.stdev((GrayF32) mean, (GrayF32) pow2, (GrayF32) stdev);
+			} else if (GrayF64.class == mean.getClass()) {
+				PixelMath.stdev((GrayF64) mean, (GrayF64) pow2, (GrayF64) stdev);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: " + mean.getClass().getSimpleName());
+			}
+		} else if( mean instanceof Planar ) {
+			Planar inA = (Planar)mean;
+			Planar inB = (Planar)pow2;
+			Planar out = (Planar)stdev;
+
+			for (int i = 0; i < inA.getNumBands(); i++) {
+				stdev( inA.getBand(i), inB.getBand(i), out.getBand(i));
+			}
+		} else {
+			throw new IllegalArgumentException("Unknown image Type: "+mean.getClass().getSimpleName());
 		}
 	}
 }

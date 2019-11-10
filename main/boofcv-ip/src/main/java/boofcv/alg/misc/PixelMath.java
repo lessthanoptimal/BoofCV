@@ -5108,24 +5108,6 @@ public class PixelMath {
 	}
 
 	/**
-	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the 
-	 * same instance.	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the pow2 image is written to. Can be same as input. Modified.
-	 */
-	public static void pow2( GrayF32 input , GrayF32 output ) {
-
-		output.reshape(input.width,input.height);
-
-		int N = input.width*input.height;
-		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.pow2(input,output);
-		} else {
-			ImplPixelMath.pow2(input,output);
-		}
-	}
-
-	/**
 	 * Computes the square root of each pixel in the input image. Both the input and output image can be the
 	 * same instance.
 	 *
@@ -5268,8 +5250,145 @@ public class PixelMath {
 	}
 
 	/**
+	 * Computes the square root of each pixel in the input image. Both the input and output image can be the
+	 * same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the sqrt() image is written to. Can be same as input. Modified.
+	 */
+	public static void sqrt( GrayF64 input , GrayF64 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.sqrt(input,output);
+		} else {
+			ImplPixelMath.sqrt(input,output);
+		}
+	}
+
+	/**
 	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the 
-	 * same instance.	 *
+	 * same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the pow2 image is written to. Can be same as input. Modified.
+	 */
+	public static void pow2( GrayU8 input , GrayU16 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.pow2(input,output);
+		} else {
+			ImplPixelMath.pow2(input,output);
+		}
+	}
+
+	/**
+	 * Computes the standard deviation of each pixel in a local region.
+	 *
+	 * @param mean (Input) Image with local mean
+	 * @param pow2 (Input) Image with local mean pixel-wise power of 2 
+	 * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.  
+	 */
+	public static void stdev( GrayU8 mean , GrayU16 pow2 , GrayU8 stdev) {
+
+		InputSanityCheck.checkSameShape(mean,pow2);
+		stdev.reshape(mean.width,mean.height);
+
+		int N = mean.width*mean.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.stdev(mean,pow2,stdev);
+		} else {
+			ImplPixelMath.stdev(mean,pow2,stdev);
+		}
+	}
+
+	/**
+	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the 
+	 * same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the pow2 image is written to. Can be same as input. Modified.
+	 */
+	public static void pow2( GrayU16 input , GrayS32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.pow2(input,output);
+		} else {
+			ImplPixelMath.pow2(input,output);
+		}
+	}
+
+	/**
+	 * Computes the standard deviation of each pixel in a local region.
+	 *
+	 * @param mean (Input) Image with local mean
+	 * @param pow2 (Input) Image with local mean pixel-wise power of 2 
+	 * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.  
+	 */
+	public static void stdev( GrayU16 mean , GrayS32 pow2 , GrayU16 stdev) {
+
+		InputSanityCheck.checkSameShape(mean,pow2);
+		stdev.reshape(mean.width,mean.height);
+
+		int N = mean.width*mean.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.stdev(mean,pow2,stdev);
+		} else {
+			ImplPixelMath.stdev(mean,pow2,stdev);
+		}
+	}
+
+	/**
+	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the 
+	 * same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the pow2 image is written to. Can be same as input. Modified.
+	 */
+	public static void pow2( GrayF32 input , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.pow2(input,output);
+		} else {
+			ImplPixelMath.pow2(input,output);
+		}
+	}
+
+	/**
+	 * Computes the standard deviation of each pixel in a local region.
+	 *
+	 * @param mean (Input) Image with local mean
+	 * @param pow2 (Input) Image with local mean pixel-wise power of 2 
+	 * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.  
+	 */
+	public static void stdev( GrayF32 mean , GrayF32 pow2 , GrayF32 stdev) {
+
+		InputSanityCheck.checkSameShape(mean,pow2);
+		stdev.reshape(mean.width,mean.height);
+
+		int N = mean.width*mean.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.stdev(mean,pow2,stdev);
+		} else {
+			ImplPixelMath.stdev(mean,pow2,stdev);
+		}
+	}
+
+	/**
+	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the 
+	 * same instance.
+	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the pow2 image is written to. Can be same as input. Modified.
 	 */
@@ -5286,21 +5405,22 @@ public class PixelMath {
 	}
 
 	/**
-	 * Computes the square root of each pixel in the input image. Both the input and output image can be the
-	 * same instance.
+	 * Computes the standard deviation of each pixel in a local region.
 	 *
-	 * @param input The input image. Not modified.
-	 * @param output Where the sqrt() image is written to. Can be same as input. Modified.
+	 * @param mean (Input) Image with local mean
+	 * @param pow2 (Input) Image with local mean pixel-wise power of 2 
+	 * @param stdev (Output) standard deviation of each pixel. Can be same instance as either input.  
 	 */
-	public static void sqrt( GrayF64 input , GrayF64 output ) {
+	public static void stdev( GrayF64 mean , GrayF64 pow2 , GrayF64 stdev) {
 
-		output.reshape(input.width,input.height);
+		InputSanityCheck.checkSameShape(mean,pow2);
+		stdev.reshape(mean.width,mean.height);
 
-		int N = input.width*input.height;
+		int N = mean.width*mean.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.sqrt(input,output);
+			ImplPixelMath_MT.stdev(mean,pow2,stdev);
 		} else {
-			ImplPixelMath.sqrt(input,output);
+			ImplPixelMath.stdev(mean,pow2,stdev);
 		}
 	}
 

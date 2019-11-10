@@ -20,8 +20,8 @@ package boofcv.alg.feature.disparity.block.impl;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.disparity.DisparityBlockMatchBestFive;
-import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
+import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.IntRangeObjectConsumer;
 import boofcv.struct.image.GrayU8;
@@ -77,6 +77,7 @@ public class ImplDisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends 
 		this.left = left;
 		this.right = right;
 		this.disparity = disparity;
+		scoreRows.setInput(left,right);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
 			BoofConcurrency.loopBlocks(0,left.height,regionHeight,workspace,computeBlock);
@@ -143,10 +144,9 @@ public class ImplDisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends 
 		// compute horizontal scores for first row block
 		for( int row = 0; row < regionHeight; row++ ) {
 
-			int scores[] = workSpace.horizontalScore[row];
+			int[] scores = workSpace.horizontalScore[row];
 
-			scoreRows.scoreRow(left, right, row0+row, scores,
-					minDisparity, maxDisparity, regionWidth, workSpace.elementScore);
+			scoreRows.scoreRow(row0+row, scores, minDisparity, maxDisparity, regionWidth, workSpace.elementScore);
 		}
 
 		// compute score for the top possible row
@@ -172,13 +172,12 @@ public class ImplDisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends 
 			int active[] = workSpace.verticalScore[ workSpace.activeVerticalScore % regionHeight ];
 
 			// subtract first row from vertical score
-			int scores[] = workSpace.horizontalScore[oldRow];
+			int[] scores = workSpace.horizontalScore[oldRow];
 			for( int i = 0; i < lengthHorizontal; i++ ) {
 				active[i] = previous[i] - scores[i];
 			}
 
-			scoreRows.scoreRow(left, right, row, scores,
-					minDisparity,maxDisparity,regionWidth,workSpace.elementScore);
+			scoreRows.scoreRow(row, scores, minDisparity,maxDisparity,regionWidth,workSpace.elementScore);
 
 			// add the new score
 			for( int i = 0; i < lengthHorizontal; i++ ) {
