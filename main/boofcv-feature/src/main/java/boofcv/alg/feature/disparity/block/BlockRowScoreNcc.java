@@ -105,14 +105,18 @@ public class BlockRowScoreNcc<A extends ImageBase<A>,B extends ImageBase<B>>
 		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
 			for( int rCol = 0; rCol < elementMax; rCol++ ) {
 				elementScore[rCol] = (left.data[ indexLeft++ ]&0xFF) * (right.data[ indexRight++ ]&0xFF);
-//				elementScore[rCol] = Math.abs((left.data[ indexLeft++ ]&0xFF) - (right.data[ indexRight++ ]&0xFF));
 			}
+		}
+
+		@Override
+		public boolean isRequireNormalize() {
+			return true;
 		}
 
 		@Override
 		public void normalizeScore(int row, int colLeft, int colRight, int numCols,
 								   int regionWidth, int regionHeight,
-								   int[] scores, int indexScores) {
+								   int[] scores, int indexScores, int[] scoresNorm ) {
 			final int area = regionWidth*regionHeight;
 			final int round = area/2;
 
@@ -130,7 +134,7 @@ public class BlockRowScoreNcc<A extends ImageBase<A>,B extends ImageBase<B>>
 				float sigmaR = helper.stdevR.data[idxRight]&0XFF;
 
 				// invert score since the minimum is selected for disparity
-				scores[indexScores+i] = (int)(-1000.0f*((correlation - meanL*meanR)/(1f+sigmaL*sigmaR)));
+				scoresNorm[indexScores+i] = (int)(-1000.0f*((correlation - meanL*meanR)/(1f+sigmaL*sigmaR)));
 			}
 		}
 
@@ -161,9 +165,14 @@ public class BlockRowScoreNcc<A extends ImageBase<A>,B extends ImageBase<B>>
 		}
 
 		@Override
+		public boolean isRequireNormalize() {
+			return true;
+		}
+
+		@Override
 		public void normalizeScore(int row, int colLeft, int colRight, int numCols,
 								   int regionWidth, int regionHeight,
-								   float[] scores, int indexScores) {
+								   float[] scores, int indexScores, float[] scoresNorm) {
 			final float area = regionWidth*regionHeight;
 
 			int stride = helper.meanL.stride;
@@ -179,7 +188,7 @@ public class BlockRowScoreNcc<A extends ImageBase<A>,B extends ImageBase<B>>
 				float sigmaR = helper.stdevR.data[idxRight];
 
 				// invert score since the minimum is selected for disparity
-				scores[indexScores+i] = -(correlation - meanL*meanR)/(UtilEjml.F_EPS+sigmaL*sigmaR);
+				scoresNorm[indexScores+i] = -(correlation - meanL*meanR)/(UtilEjml.F_EPS+sigmaL*sigmaR);
 			}
 		}
 

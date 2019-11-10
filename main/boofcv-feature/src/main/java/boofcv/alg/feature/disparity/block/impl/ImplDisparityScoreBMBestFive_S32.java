@@ -94,6 +94,7 @@ public class ImplDisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends 
 		// summed scores along vertical axis
 		// Save the last regionHeight scores in a rolling window
 		int[][] verticalScore;
+		int[][] verticalScoreNorm;
 		// In the rolling verticalScore window, which one is the active one
 		int activeVerticalScore;
 		// Where the final score it stored that has been computed from five regions
@@ -105,6 +106,8 @@ public class ImplDisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends 
 			if( horizontalScore == null || verticalScore.length < lengthHorizontal ) {
 				horizontalScore = new int[regionHeight][lengthHorizontal];
 				verticalScore = new int[regionHeight][lengthHorizontal];
+				if( scoreRows.isRequireNormalize() )
+					verticalScoreNorm = new int[regionHeight][lengthHorizontal];
 				elementScore = new int[ left.width ];
 				fiveScore = new int[ lengthHorizontal ];
 			}
@@ -138,7 +141,6 @@ public class ImplDisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends 
 	 * rows.
 	 */
 	private void computeFirstRow( final int row0 , final WorkSpace workSpace ) {
-		final int firstRow[] = workSpace.verticalScore[0];
 		workSpace.activeVerticalScore = 1;
 
 		// compute horizontal scores for first row block
@@ -150,6 +152,7 @@ public class ImplDisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends 
 		}
 
 		// compute score for the top possible row
+		final int firstRow[] = workSpace.verticalScore[0];
 		for( int i = 0; i < lengthHorizontal; i++ ) {
 			int sum = 0;
 			for( int row = 0; row < regionHeight; row++ ) {
@@ -157,6 +160,10 @@ public class ImplDisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends 
 			}
 			firstRow[i] = sum;
 		}
+
+		if( scoreRows.isRequireNormalize() )
+			scoreRows.normalizeRegionScores(row0+radiusY,
+					firstRow,minDisparity,maxDisparity,regionWidth,regionHeight,workSpace.verticalScoreNorm[0]);
 	}
 
 	/**
@@ -167,9 +174,10 @@ public class ImplDisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends 
 	private void computeRemainingRows(final int row0 , final int row1, final WorkSpace workSpace )
 	{
 		for( int row = row0+regionHeight; row < row1; row++ , workSpace.activeVerticalScore++) {
+			int activeIndex = workSpace.activeVerticalScore % regionHeight;
 			int oldRow = (row-row0)%regionHeight;
 			int previous[] = workSpace.verticalScore[ (workSpace.activeVerticalScore -1) % regionHeight ];
-			int active[] = workSpace.verticalScore[ workSpace.activeVerticalScore % regionHeight ];
+			int active[] = workSpace.verticalScore[ activeIndex ];
 
 			// subtract first row from vertical score
 			int[] scores = workSpace.horizontalScore[oldRow];
@@ -184,10 +192,21 @@ public class ImplDisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends 
 				active[i] += scores[i];
 			}
 
+			if( scoreRows.isRequireNormalize() )
+				scoreRows.normalizeRegionScores(row-radiusY,
+						active,minDisparity,maxDisparity,regionWidth,regionHeight,workSpace.verticalScoreNorm[activeIndex]);
+
 			if( workSpace.activeVerticalScore >= regionHeight-1 ) {
-				int top[] = workSpace.verticalScore[ (workSpace.activeVerticalScore -2*radiusY) % regionHeight ];
-				int middle[] = workSpace.verticalScore[ (workSpace.activeVerticalScore -radiusY) % regionHeight ];
-				int bottom[] = workSpace.verticalScore[workSpace. activeVerticalScore % regionHeight ];
+				int[] top, middle, bottom;
+				if( scoreRows.isRequireNormalize() ) {
+					top = workSpace.verticalScoreNorm[ (workSpace.activeVerticalScore -2*radiusY) % regionHeight ];
+					middle = workSpace.verticalScoreNorm[ (workSpace.activeVerticalScore -radiusY) % regionHeight ];
+					bottom = workSpace.verticalScoreNorm[workSpace. activeVerticalScore % regionHeight ];
+				} else {
+					top = workSpace.verticalScore[ (workSpace.activeVerticalScore -2*radiusY) % regionHeight ];
+					middle = workSpace.verticalScore[ (workSpace.activeVerticalScore -radiusY) % regionHeight ];
+					bottom = workSpace.verticalScore[workSpace. activeVerticalScore % regionHeight ];
+				}
 
 				computeScoreFive(top,middle,bottom,workSpace.fiveScore,left.width);
 				workSpace.computeDisparity.process(row - (1 + 4*radiusY) + 2*radiusY+1, workSpace.fiveScore );

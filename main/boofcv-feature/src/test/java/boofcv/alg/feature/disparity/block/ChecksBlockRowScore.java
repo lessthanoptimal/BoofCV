@@ -116,6 +116,7 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 		Array scores = createArray(width*disparityRange);
 		Array elementScore = createArray(width);
 		Array scoresSum = createArray(width*disparityRange);
+		Array scoresSumNorm = createArray(width*disparityRange);
 
 		// compute the scores one row at a time then sum them up to get the unnormalized region score
 		for (int i = -r; i <= r; i++) {
@@ -123,13 +124,13 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 			addToSum(scores,scoresSum);
 		}
 		// Normalize the region score
-		alg.normalizeRegionScores(row,scoresSum,minDisparity,maxDisparity,w,w);
+		alg.normalizeRegionScores(row,scoresSum,minDisparity,maxDisparity,w,w,scoresSumNorm);
 
 		for (int d = minDisparity; d < maxDisparity; d++) {
 			int idx = width*(d-minDisparity)+d-minDisparity;
 			for (int x = d+r; x < width-r; x++) {
 				double expected = naiveScoreRegion(x,row,d,r);
-				double found = get(idx++,scoresSum);
+				double found = get(idx++,scoresSumNorm);
 //				System.out.printf("%3d  %7.4f e=%8.3f f=%8.3f\n",idx,(expected-found),expected,found);
 //				System.out.println("diff "+(expected-found)+"   expected "+expected);
 				assertEquals(expected,found,1e-3);

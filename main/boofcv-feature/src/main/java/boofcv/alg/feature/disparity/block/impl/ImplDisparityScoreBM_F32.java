@@ -94,6 +94,8 @@ public class ImplDisparityScoreBM_F32<DI extends ImageGray<DI>>
 		// summed scores along vertical axis
 		// This is simply the sum of like elements in horizontal score
 		float[] verticalScore = new float[0];
+		// storage for scores after normalization
+		float[] verticalScoreNorm = new float[0];
 
 		DisparitySelect<float[], DI> computeDisparity;
 
@@ -101,6 +103,8 @@ public class ImplDisparityScoreBM_F32<DI extends ImageGray<DI>>
 			if( horizontalScore.length != regionHeight || horizontalScore[0].length != lengthHorizontal ) {
 				horizontalScore = new float[regionHeight][lengthHorizontal];
 				verticalScore = new float[lengthHorizontal];
+				if( scoreRows.isRequireNormalize() )
+					verticalScoreNorm = new float[lengthHorizontal];
 				elementScore = new float[ left.width ];
 			}
 			if( computeDisparity == null ) {
@@ -122,11 +126,11 @@ public class ImplDisparityScoreBM_F32<DI extends ImageGray<DI>>
 
 			// initialize computation
 			computeFirstRow(row0, workspace.computeDisparity,
-					workspace.elementScore, workspace.horizontalScore, workspace.verticalScore);
+					workspace.elementScore, workspace.horizontalScore, workspace.verticalScore, workspace.verticalScoreNorm);
 
 			// efficiently compute rest of the rows using previous results to avoid repeat computations
 			computeRemainingRows(row0,row1, workspace.computeDisparity,
-					workspace.elementScore, workspace.horizontalScore, workspace.verticalScore);
+					workspace.elementScore, workspace.horizontalScore, workspace.verticalScore, workspace.verticalScoreNorm);
 		}
 	}
 
@@ -135,7 +139,8 @@ public class ImplDisparityScoreBM_F32<DI extends ImageGray<DI>>
 	 * rows.
 	 */
 	private void computeFirstRow(int row0 , DisparitySelect<float[], DI> computeDisparity,
-								 final float[] elementScore, final float[][] horizontalScore, final float[] verticalScore) {
+								 final float[] elementScore, final float[][] horizontalScore, final float[] verticalScore,
+								 final float[] verticalScoreNorm ) {
 		final GrayF32 left = this.left, right = this.right;
 		// compute horizontal scores for first row block
 		for( int row = 0; row < regionHeight; row++ ) {
@@ -152,10 +157,13 @@ public class ImplDisparityScoreBM_F32<DI extends ImageGray<DI>>
 			verticalScore[i] = sum;
 		}
 
-		scoreRows.normalizeRegionScores(row0+radiusY, verticalScore,minDisparity,maxDisparity,regionWidth,regionHeight);
-
 		// compute disparity
-		computeDisparity.process(row0+radiusY, verticalScore);
+		if( scoreRows.isRequireNormalize() ) {
+			scoreRows.normalizeRegionScores(row0 + radiusY, verticalScore, minDisparity, maxDisparity, regionWidth, regionHeight, verticalScoreNorm);
+			computeDisparity.process(row0 + radiusY, verticalScoreNorm);
+		} else {
+			computeDisparity.process(row0 + radiusY, verticalScore);
+		}
 	}
 
 	/**
@@ -165,7 +173,8 @@ public class ImplDisparityScoreBM_F32<DI extends ImageGray<DI>>
 	 */
 	private void computeRemainingRows(int row0 , int row1,
 									  DisparitySelect<float[], DI> computeDisparity,
-									  final float[] elementScore, final float[][] horizontalScore, final float[] verticalScore )
+									  final float[] elementScore, final float[][] horizontalScore,
+									  final float[] verticalScore, final float[] verticalScoreNorm  )
 	{
 		final GrayF32 left = this.left, right = this.right;
 		for( int row = row0+regionHeight; row < row1; row++ ) {
@@ -184,10 +193,14 @@ public class ImplDisparityScoreBM_F32<DI extends ImageGray<DI>>
 				verticalScore[i] += scores[i];
 			}
 
-			scoreRows.normalizeRegionScores(row - regionHeight + 1 + radiusY, verticalScore,minDisparity,maxDisparity,regionWidth,regionHeight);
-
 			// compute disparity
-			computeDisparity.process(row - regionHeight + 1 + radiusY, verticalScore);
+			if( scoreRows.isRequireNormalize() ) {
+				scoreRows.normalizeRegionScores(row - regionHeight + 1 + radiusY,
+						verticalScore,minDisparity,maxDisparity,regionWidth,regionHeight,verticalScoreNorm);
+				computeDisparity.process(row - regionHeight + 1 + radiusY, verticalScoreNorm);
+			} else {
+				computeDisparity.process(row - regionHeight + 1 + radiusY, verticalScore);
+			}
 		}
 	}
 
