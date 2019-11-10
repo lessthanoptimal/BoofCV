@@ -28,6 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
 
+import static boofcv.testing.BoofTesting.primitive;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -46,7 +47,7 @@ public class TestPixelMath {
 
 	@Test
 	public void checkAll() {
-		int numExpected = 228;
+		int numExpected = 234;
 		Method methods[] = PixelMath.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -107,6 +108,8 @@ public class TestPixelMath {
 				    testDiffAbs(m);
 				} else if( m.getName().compareTo("averageBand") == 0 ) {
 					TestAverageBand(m);
+				} else if( m.getName().compareTo("stdev") == 0 ) {
+					testStdev(m);
 				} else {
 					throw new RuntimeException("Unknown function: "+m.getName());
 				}
@@ -678,41 +681,46 @@ public class TestPixelMath {
 	}
 
 	private void testLog(Method m) throws InvocationTargetException, IllegalAccessException {
+		double value=0.5;
 		Class paramTypes[] = m.getParameterTypes();
 		ImageGray inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
-		ImageGray inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
+		Object number = primitive(value , paramTypes[1]);;
+		ImageGray inputB = GeneralizedImageOps.createSingleBand(paramTypes[2], width, height);
 
 		GImageMiscOps.fillUniform(inputA, rand, -20,20);
 		GImageMiscOps.fillUniform(inputB, rand, -20,20);
 
-		m.invoke(null,inputA,inputB);
+		m.invoke(null,inputA,number,inputB);
 
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double a = GeneralizedImageOps.get(inputA,j,i);
 				double b = GeneralizedImageOps.get(inputB,j,i);
 
-				assertEquals(Math.log(1+a),b,1e-4);
+				assertEquals(Math.log(value+a),b,1e-4);
 			}
 		}
 	}
 
 	private void testLogSign(Method m) throws InvocationTargetException, IllegalAccessException {
+		double value=0.5;
+
 		Class paramTypes[] = m.getParameterTypes();
 		ImageGray inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
-		ImageGray inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
+		Object number = primitive(value , paramTypes[1]);;
+		ImageGray inputB = GeneralizedImageOps.createSingleBand(paramTypes[2], width, height);
 
 		GImageMiscOps.fillUniform(inputA, rand, -20,20);
 		GImageMiscOps.fillUniform(inputB, rand, -20,20);
 
-		m.invoke(null,inputA,inputB);
+		m.invoke(null,inputA,number,inputB);
 
 		for( int i = 0; i < height; i++ ) {
 			for( int j = 0; j < width; j++ ) {
 				double a = GeneralizedImageOps.get(inputA,j,i);
 				double b = GeneralizedImageOps.get(inputB,j,i);
 
-				double expected = a<0?-Math.log(1-a):Math.log(1+a);
+				double expected = a<0?-Math.log(value-a):Math.log(value+a);
 
 				assertEquals(expected,b,1e-4);
 			}
@@ -724,9 +732,13 @@ public class TestPixelMath {
 		ImageGray inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		ImageGray inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
 
-		GImageMiscOps.fillUniform(inputA, rand, -20,20);
-		GImageMiscOps.fillUniform(inputB, rand, -20,20);
-
+		if( inputA.getDataType().isSigned() ) {
+			GImageMiscOps.fillUniform(inputA, rand, -20, 20);
+			GImageMiscOps.fillUniform(inputB, rand, -20, 20);
+		} else {
+			GImageMiscOps.fillUniform(inputA, rand, 0, 40);
+			GImageMiscOps.fillUniform(inputB, rand, 0, 40);
+		}
 		m.invoke(null,inputA,inputB);
 
 		for( int i = 0; i < height; i++ ) {
@@ -735,6 +747,32 @@ public class TestPixelMath {
 				double b = GeneralizedImageOps.get(inputB,j,i);
 
 				assertEquals(a*a,b,1e-4);
+			}
+		}
+	}
+
+	private void testStdev(Method m) throws InvocationTargetException, IllegalAccessException {
+		Class paramTypes[] = m.getParameterTypes();
+		ImageGray inputA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
+		ImageGray inputB = GeneralizedImageOps.createSingleBand(paramTypes[1], width, height);
+		ImageGray output = GeneralizedImageOps.createSingleBand(paramTypes[2], width, height);
+
+		GImageMiscOps.fillUniform(inputA, rand, 0, 40);
+		GImageMiscOps.fillUniform(inputB, rand, 0, 100);
+		GImageMiscOps.fillUniform(output, rand, 0, 40);
+		m.invoke(null,inputA,inputB,output);
+
+		double tol = inputA.getDataType().isInteger() ? 1.0 : 1e-4;
+
+		for( int i = 0; i < height; i++ ) {
+			for( int j = 0; j < width; j++ ) {
+				double a = GeneralizedImageOps.get(inputA,j,i);
+				double b = GeneralizedImageOps.get(inputB,j,i);
+				double found = GeneralizedImageOps.get(output,j,i);
+
+				double expected = Math.sqrt(Math.max(0,b-a*a));
+
+				assertEquals(expected,found,tol);
 			}
 		}
 	}

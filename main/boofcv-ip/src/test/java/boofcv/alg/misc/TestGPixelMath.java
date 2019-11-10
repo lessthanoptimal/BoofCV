@@ -37,13 +37,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestGPixelMath extends BaseGClassChecksInMisc {
 
-	public TestGPixelMath() {
+	TestGPixelMath() {
 		super(GPixelMath.class, PixelMath.class);
 	}
 
 	@Test
-	public void compareToPixelMath() {
-		performTests(22);
+	void compareToPixelMath() {
+		performTests(23);
 	}
 
 	@Override
@@ -129,13 +129,15 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 			ret[0][3] = 12;
 			ret[0][4] = output;
 		} else if( name.equals("log") ) {
-			inputB = createImage(param[1],null);
+			inputB = createImage(param[0],null);
 			ret[0][0] = inputA;
-			ret[0][1] = inputB;
+			ret[0][1] = BoofTesting.primitive(0.5,param[1]);
+			ret[0][2] = inputB;
 		} else if( name.equals("logSign") ) {
-			inputB = createImage(param[1],null);
+			inputB = createImage(param[0],null);
 			ret[0][0] = inputA;
-			ret[0][1] = inputB;
+			ret[0][1] = BoofTesting.primitive(0.5,param[1]);
+			ret[0][2] = inputB;
 		} else if( name.equals("pow2") ) {
 			inputB = createImage(param[1],null);
 			ret[0][0] = inputA;
@@ -171,6 +173,12 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 			output = createImage(param[1],null);
 			ret[0][0] = inputA;
 			ret[0][1] = output;
+		} else if( name.equals("stdev") ) {
+			inputB = createImage(param[1],null);
+			output = createImage(param[2],null);
+			ret[0][0] = inputA;
+			ret[0][1] = inputB;
+			ret[0][2] = output;
 		}
 
 		fillRandom(inputA);
@@ -213,7 +221,7 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 	 * Tests all functions with inputs from planar images
 	 */
 	@Test
-	public void all_planar_images() {
+	void all_planar_images() {
 
 		int total = 0;
 		Method[] methods = GPixelMath.class.getMethods();
@@ -270,9 +278,13 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 			} else if( name.equals("boundImage") ) {
 				inputs[1] = 2;
 				inputs[2] = 8;
+			} else if( name.equals("log") || name.equals("logSign")) {
+				inputs[1] = BoofTesting.primitive(0.5,param[1]);
 			} else if( name.equals("averageBand")) {
 				continue;
 			}
+
+//			System.out.println(name);
 
 			try {
 				// create the expected results
@@ -293,7 +305,7 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 				throw new RuntimeException(e);
 			}
 		}
-		assertEquals(22,total);
+		assertEquals(23,total);
 	}
 
 	private Object[] copy( Object inputs[] ) {
@@ -331,7 +343,7 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 
 
 	@Test
-	public void divide_planar_by_gray_3() {
+	void divide_planar_by_gray_3() {
 		Planar<GrayF32> numerator = new Planar<>(GrayF32.class,width,height,2);
 		GrayF32 denominator = new GrayF32(width,height);
 		GImageMiscOps.fillUniform(numerator,rand,-10,10);
@@ -350,7 +362,7 @@ public class TestGPixelMath extends BaseGClassChecksInMisc {
 	}
 
 	@Test
-	public void multiply_planar_by_gray_3() {
+	void multiply_planar_by_gray_3() {
 		Planar<GrayF32> numerator = new Planar<>(GrayF32.class,width,height,2);
 		GrayF32 denominator = new GrayF32(width,height);
 		GImageMiscOps.fillUniform(numerator,rand,-10,10);

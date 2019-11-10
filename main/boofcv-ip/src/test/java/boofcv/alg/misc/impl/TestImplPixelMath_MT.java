@@ -42,7 +42,7 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 
 	@Test
 	void performTests() {
-		performTests(128);
+		performTests(136);
 	}
 
 	@Override
@@ -67,6 +67,8 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 				case "boundImage": return boundImage(types);
 				case "negative":
 				case "abs": return abs(types);
+				case "log":
+				case "logSign": return log(types);
 				default:
 					throw new RuntimeException("Unknown function "+candidate.getName());
 			}
@@ -97,6 +99,20 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 		inputs[5] = 11;
 		inputs[6] = 12;
 		inputs[7] = 9;
+		return new Object[][]{inputs};
+	}
+
+	private Object[][] log( Class[] inputTypes ) {
+		ImageBase a = GeneralizedImageOps.createImage(inputTypes[0],width,height,2);
+		ImageBase b = GeneralizedImageOps.createImage(inputTypes[2],width,height,2);
+
+		GImageMiscOps.fillUniform(a,rand,0,200);
+		GImageMiscOps.fillUniform(b,rand,0,200);
+
+		Object[] inputs = new Object[3];
+		inputs[0] = a;
+		inputs[1] = primitive(0.5 , inputTypes[1]);;
+		inputs[2] = b;
 		return new Object[][]{inputs};
 	}
 
