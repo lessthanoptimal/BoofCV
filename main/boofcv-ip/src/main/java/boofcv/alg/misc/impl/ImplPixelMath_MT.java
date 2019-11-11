@@ -2382,8 +2382,8 @@ public class ImplPixelMath_MT {
 		final int w = mean.getWidth();
 
 		BoofConcurrency.loopFor(0,h,y->{
-			int indexMean = mean.startIndex + y * mean.stride;
-			int indexPow = pow2.startIndex + y * pow2.stride;
+			int indexMean  = mean.startIndex  + y * mean.stride;
+			int indexPow   = pow2.startIndex  + y * pow2.stride;
 			int indexStdev = stdev.startIndex + y * stdev.stride;
 
 			int indexEnd = indexMean+w;
@@ -2391,9 +2391,8 @@ public class ImplPixelMath_MT {
 			for (; indexMean < indexEnd; indexMean++, indexPow++, indexStdev++ ) {
 				int mu = mean.data[indexMean]& 0xFF;
 				int p2 = pow2.data[indexPow]& 0xFFFF;
-				int sigma = (int)Math.sqrt(Math.max(0,p2-mu*mu));
 
-				stdev.data[indexStdev] = (byte)sigma;
+				stdev.data[indexStdev] = (byte)Math.sqrt(Math.max(0,p2-mu*mu));
 			}
 		});
 	}
@@ -2418,8 +2417,8 @@ public class ImplPixelMath_MT {
 		final int w = mean.getWidth();
 
 		BoofConcurrency.loopFor(0,h,y->{
-			int indexMean = mean.startIndex + y * mean.stride;
-			int indexPow = pow2.startIndex + y * pow2.stride;
+			int indexMean  = mean.startIndex  + y * mean.stride;
+			int indexPow   = pow2.startIndex  + y * pow2.stride;
 			int indexStdev = stdev.startIndex + y * stdev.stride;
 
 			int indexEnd = indexMean+w;
@@ -2427,9 +2426,8 @@ public class ImplPixelMath_MT {
 			for (; indexMean < indexEnd; indexMean++, indexPow++, indexStdev++ ) {
 				int mu = mean.data[indexMean]& 0xFFFF;
 				int p2 = pow2.data[indexPow];
-				int sigma = (int)Math.sqrt(p2-mu*mu);
 
-				stdev.data[indexStdev] = (short)sigma;
+				stdev.data[indexStdev] = (short)Math.sqrt(Math.max(0,p2-mu*mu));
 			}
 		});
 	}
@@ -2454,8 +2452,8 @@ public class ImplPixelMath_MT {
 		final int w = mean.getWidth();
 
 		BoofConcurrency.loopFor(0,h,y->{
-			int indexMean = mean.startIndex + y * mean.stride;
-			int indexPow = pow2.startIndex + y * pow2.stride;
+			int indexMean  = mean.startIndex  + y * mean.stride;
+			int indexPow   = pow2.startIndex  + y * pow2.stride;
 			int indexStdev = stdev.startIndex + y * stdev.stride;
 
 			int indexEnd = indexMean+w;
@@ -2463,9 +2461,8 @@ public class ImplPixelMath_MT {
 			for (; indexMean < indexEnd; indexMean++, indexPow++, indexStdev++ ) {
 				float mu = mean.data[indexMean];
 				float p2 = pow2.data[indexPow];
-				float sigma = (float)Math.sqrt(p2-mu*mu);
 
-				stdev.data[indexStdev] = (float)sigma;
+				stdev.data[indexStdev] = (float)Math.sqrt(Math.max(0,p2-mu*mu));
 			}
 		});
 	}
@@ -2490,8 +2487,8 @@ public class ImplPixelMath_MT {
 		final int w = mean.getWidth();
 
 		BoofConcurrency.loopFor(0,h,y->{
-			int indexMean = mean.startIndex + y * mean.stride;
-			int indexPow = pow2.startIndex + y * pow2.stride;
+			int indexMean  = mean.startIndex  + y * mean.stride;
+			int indexPow   = pow2.startIndex  + y * pow2.stride;
 			int indexStdev = stdev.startIndex + y * stdev.stride;
 
 			int indexEnd = indexMean+w;
@@ -2499,9 +2496,8 @@ public class ImplPixelMath_MT {
 			for (; indexMean < indexEnd; indexMean++, indexPow++, indexStdev++ ) {
 				double mu = mean.data[indexMean];
 				double p2 = pow2.data[indexPow];
-				double sigma = (double)Math.sqrt(p2-mu*mu);
 
-				stdev.data[indexStdev] = (double)sigma;
+				stdev.data[indexStdev] = (double)Math.sqrt(Math.max(0,p2-mu*mu));
 			}
 		});
 	}

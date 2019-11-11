@@ -37,8 +37,8 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 
 	// the Gaussian's standard deviation
 	private double sigma;
-	// size of the blur region
-	private int radius;
+	// size of the blur region along each axis
+	private int radiusX,radiusY;
 	// stores intermediate results
 	private T storage;
 
@@ -47,11 +47,16 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	WorkArrays workArray;
 
 	public BlurStorageFilter( String functionName , ImageType<T> inputType, int radius) {
-		this(functionName,inputType,-1,radius);
+		this(functionName,inputType,-1,radius,radius);
 	}
 
-	public BlurStorageFilter( String functionName , ImageType<T> inputType, double sigma , int radius) {
-		this.radius = radius;
+	public BlurStorageFilter( String functionName , ImageType<T> inputType, int radiusX, int radiusY) {
+		this(functionName,inputType,-1,radiusX,radiusY);
+	}
+
+	public BlurStorageFilter( String functionName , ImageType<T> inputType, double sigma , int radiusX, int radiusY) {
+		this.radiusX = radiusX;
+		this.radiusY = radiusY;
 		this.sigma = sigma;
 		this.inputType = inputType;
 
@@ -59,9 +64,13 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 			operation = new MeanOperation();
 			createStorage();
 		} else if( functionName.equals("gaussian")) {
+			if( radiusX != radiusY )
+				throw new IllegalArgumentException("Gaussian currently only supports equal radius");
 			operation = new GaussianOperation();
 			createStorage();
 		} else if( functionName.equals("median")) {
+			if( radiusX != radiusY )
+				throw new IllegalArgumentException("Median currently only supports equal radius");
 			operation = new MedianOperator();
 		} else {
 			throw new IllegalArgumentException("Unknown function "+functionName);
@@ -85,12 +94,13 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	 */
 	@Override
 	public int getRadius() {
-		return radius;
+		return radiusX;
 	}
 
 	@Override
 	public void setRadius(int radius) {
-		this.radius = radius;
+		this.radiusX = radius;
+		this.radiusY = radius;
 	}
 
 	@Override
@@ -127,21 +137,21 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	private class MeanOperation implements BlurOperation {
 		@Override
 		public void process(ImageBase input, ImageBase output) {
-			GBlurImageOps.mean(input,output,radius,storage,workArray);
+			GBlurImageOps.mean(input,output, radiusX,radiusY,storage,workArray);
 		}
 	}
 
 	private class GaussianOperation implements BlurOperation {
 		@Override
 		public void process(ImageBase input, ImageBase output) {
-			GBlurImageOps.gaussian(input,output,sigma,radius,storage);
+			GBlurImageOps.gaussian(input,output,sigma, radiusX,storage);
 		}
 	}
 
 	private class MedianOperator implements BlurOperation {
 		@Override
 		public void process(ImageBase input, ImageBase output) {
-			GBlurImageOps.median(input,output,radius,workArray);
+			GBlurImageOps.median(input,output, radiusX,workArray);
 		}
 	}
 }

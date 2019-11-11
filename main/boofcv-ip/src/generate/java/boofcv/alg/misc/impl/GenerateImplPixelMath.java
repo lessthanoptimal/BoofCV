@@ -432,8 +432,8 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y->{\n" +
 				"\t\tfor (int y = 0; y < h; y++) {\n" +
-				"\t\t\tint indexMean = mean.startIndex + y * mean.stride;\n" +
-				"\t\t\tint indexPow = pow2.startIndex + y * pow2.stride;\n" +
+				"\t\t\tint indexMean  = mean.startIndex  + y * mean.stride;\n" +
+				"\t\t\tint indexPow   = pow2.startIndex  + y * pow2.stride;\n" +
 				"\t\t\tint indexStdev = stdev.startIndex + y * stdev.stride;\n" +
 				"\n" +
 				"\t\t\tint indexEnd = indexMean+w;\n" +
@@ -441,9 +441,8 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 				"\t\t\tfor (; indexMean < indexEnd; indexMean++, indexPow++, indexStdev++ ) {\n" +
 				"\t\t\t\t"+sumType+" mu = mean.data[indexMean]"+bitWiseMean+";\n" +
 				"\t\t\t\t"+sumType+" p2 = pow2.data[indexPow]"+bitWisePow+";\n" +
-				"\t\t\t\t"+sumType+" sigma = ("+sumType+")Math.sqrt(Math.max(0,p2-mu*mu));\n" +
 				"\n" +
-				"\t\t\t\tstdev.data[indexStdev] = ("+typeCast+")sigma;\n" +
+				"\t\t\t\tstdev.data[indexStdev] = ("+typeCast+")Math.sqrt(Math.max(0,p2-mu*mu));\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\t//CONCURRENT_ABOVE });\n" +

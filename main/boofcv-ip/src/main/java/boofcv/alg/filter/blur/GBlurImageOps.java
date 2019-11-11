@@ -64,6 +64,34 @@ public class GBlurImageOps {
 	}
 
 	/**
+	 * Applies a mean box filter.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radiusX Radius of the box blur function along the x-axis
+	 * @param radiusY Radius of the box blur function along the y-axis
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
+	public static <T extends ImageBase<T>>
+	T mean(T input, @Nullable T output, int radiusX, int radiusY, @Nullable ImageBase storage , @Nullable WorkArrays workVert ) {
+		if( input instanceof GrayU8) {
+			return (T) BlurImageOps.mean((GrayU8) input, (GrayU8) output, radiusX, radiusY, (GrayU8) storage, (IWorkArrays)workVert);
+		} else if( input instanceof GrayU16) {
+			return (T)BlurImageOps.mean((GrayU16)input,(GrayU16)output,radiusX, radiusY,(GrayU16)storage, (IWorkArrays)workVert);
+		} else if( input instanceof GrayF32) {
+			return (T)BlurImageOps.mean((GrayF32)input,(GrayF32)output,radiusX, radiusY,(GrayF32)storage, (FWorkArrays)workVert);
+		} else if( input instanceof GrayF64) {
+			return (T)BlurImageOps.mean((GrayF64)input,(GrayF64)output,radiusX, radiusY,(GrayF64)storage, (DWorkArrays)workVert);
+		} else if( input instanceof Planar) {
+			return (T)BlurImageOps.mean((Planar)input,(Planar)output,radiusX, radiusY,(ImageGray)storage, workVert);
+		} else  {
+			throw new IllegalArgumentException("Unsupported image type");
+		}
+	}
+
+	/**
 	 * Applies a median filter.
 	 *
 	 * @param input Input image.  Not modified.
