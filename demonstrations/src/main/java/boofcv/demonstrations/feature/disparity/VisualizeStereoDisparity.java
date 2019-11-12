@@ -330,8 +330,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	public synchronized void disparitySettingChange() {
 		if( control.recompute ) {
 			processCalled = false;
-			algorithmChanged();
-			processDisparityInThread();
+			// NOTE: createAlgConcurrent() was causing swing to go bonkers some times when run in the GUI thread
+			new Thread(this::algorithmChanged).start();
 		}
 	}
 
@@ -364,7 +364,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 		// make sure the disparity is in a valid range
 		int maxDisparity = Math.min(colorLeft.getWidth()-2*r,control.maxDisparity);
-		int minDisparity = Math.min(maxDisparity,control.minDisparity);
+		int minDisparity = Math.min(maxDisparity-1,control.minDisparity);
 
 		Class inputType = GrayU8.class;
 
