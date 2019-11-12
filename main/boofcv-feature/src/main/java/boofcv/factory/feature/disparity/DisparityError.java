@@ -40,5 +40,16 @@ public enum DisparityError {
 	 * Normalized Cross Correlation. The NCC radius specifies the size of the local region used to compute
 	 * normalization statistics.
 	 */
-	NCC
+	NCC;
+
+	public boolean isCorrelation() {
+		switch( this ) {
+			case SAD:
+			case CENSUS:
+				return false;
+
+			default:
+				return true;
+		}
+	}
 }

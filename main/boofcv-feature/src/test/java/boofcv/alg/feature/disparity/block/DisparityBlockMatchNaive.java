@@ -50,19 +50,22 @@ public abstract class DisparityBlockMatchNaive<T extends ImageBase<T>> {
 		ImageMiscOps.fill(disparity,maxDisparity-minDisparity+1);
 		for (int y = radius; y < left.height - radius; y++) {
 			for (int x = radius+minDisparity; x < left.width - radius; x++) {
-				for (int d = minDisparity; d < maxDisparity; d++) {
-					if( x-radius-d >= 0 )
-						scores[d-minDisparity] = computeScore(left,right,x,y,d);
-					else {
-						scores[d-minDisparity] = minimize ? Double.MAX_VALUE : -Double.MAX_VALUE;
-					}
+				int maxConsider = Math.min(x-radius+1,maxDisparity)-minDisparity;
+
+				for (int d = 0; d < maxConsider; d++) {
+					scores[d] = computeScore(left,right,x,y,d+minDisparity);
 				}
+
+//				boolean print = (x==34&&y==131);
 
 				int bestDisparity = 0;
 				double bestScore = scores[0];
 
-				for (int d = 1; d < maxDisparity - minDisparity; d++) {
+//				if( print ) System.out.printf(" %5.2f ",bestScore);
+
+				for (int d = 1; d < maxConsider; d++) {
 					double s = scores[d];
+//					if( print ) System.out.printf("%2d %5.2f : ",d,s);
 					if( minimize ) {
 						if( s < bestScore ) {
 							bestScore = s;
@@ -75,6 +78,7 @@ public abstract class DisparityBlockMatchNaive<T extends ImageBase<T>> {
 						}
 					}
 				}
+//				if( print ) System.out.println("   naive");
 
 				disparity.set(x,y,bestDisparity);
 			}

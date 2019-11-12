@@ -22,10 +22,10 @@ import boofcv.abst.feature.disparity.*;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.feature.disparity.DisparityBlockMatchRowFormat;
 import boofcv.alg.feature.disparity.block.*;
-import boofcv.alg.feature.disparity.block.impl.ImplDisparityScoreBMBestFive_F32;
-import boofcv.alg.feature.disparity.block.impl.ImplDisparityScoreBMBestFive_S32;
-import boofcv.alg.feature.disparity.block.impl.ImplDisparityScoreBM_F32;
-import boofcv.alg.feature.disparity.block.impl.ImplDisparityScoreBM_S32;
+import boofcv.alg.feature.disparity.block.score.ImplDisparityScoreBMBestFive_F32;
+import boofcv.alg.feature.disparity.block.score.ImplDisparityScoreBMBestFive_S32;
+import boofcv.alg.feature.disparity.block.score.ImplDisparityScoreBM_F32;
+import boofcv.alg.feature.disparity.block.score.ImplDisparityScoreBM_S32;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.transform.census.FactoryCensusTransform;
 import boofcv.struct.image.*;
@@ -73,22 +73,7 @@ public class FactoryStereoDisparity {
 
 		double maxError = (config.regionRadiusX*2+1)*(config.regionRadiusY*2+1)*config.maxPerPixelError;
 
-		DisparitySelect select;
-		if( imageType == GrayU8.class || imageType == GrayS16.class ) {
-			if( config.subpixel ) {
-				select = selectDisparitySubpixel_S32((int) maxError, config.validateRtoL, config.texture);
-			} else {
-				select = selectDisparity_S32((int) maxError, config.validateRtoL, config.texture);
-			}
-		} else if( imageType == GrayF32.class ) {
-			if( config.subpixel ) {
-				select = selectDisparitySubpixel_F32((int) maxError, config.validateRtoL, config.texture);
-			} else {
-				select = selectDisparity_F32((int) maxError, config.validateRtoL, config.texture);
-			}
-		} else {
-			throw new IllegalArgumentException("Unknown image type");
-		}
+		DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
 
 		switch( config.errorType) {
 			case SAD: {
@@ -126,6 +111,36 @@ public class FactoryStereoDisparity {
 		}
 	}
 
+	private static <T extends ImageGray<T>> DisparitySelect
+	createDisparitySelect(ConfigureDisparityBM config, Class<T> imageType, int maxError) {
+		DisparitySelect select;
+		if( !GeneralizedImageOps.isFloatingPoint(imageType) ) {
+			if( config.errorType.isCorrelation() )
+				throw new IllegalArgumentException("Can't do correlation scores for integer image types");
+			if( config.subpixel ) {
+				select = selectDisparitySubpixel_S32(maxError, config.validateRtoL, config.texture);
+			} else {
+				select = selectDisparity_S32(maxError, config.validateRtoL, config.texture);
+			}
+		} else if( imageType == GrayF32.class ) {
+			if( config.subpixel ) {
+				if( config.errorType.isCorrelation() ) {
+					select = selectCorrelation_F32(config.validateRtoL, config.texture, true);
+				} else {
+					select = selectDisparitySubpixel_F32(maxError, config.validateRtoL, config.texture);
+				}
+			} else {
+				if( config.errorType.isCorrelation() )
+					select = selectCorrelation_F32(config.validateRtoL, config.texture, false);
+				else
+					select = selectDisparity_F32(maxError, config.validateRtoL, config.texture);
+			}
+		} else {
+			throw new IllegalArgumentException("Unknown image type");
+		}
+		return select;
+	}
+
 	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T,DI>
 	blockMatchBest5(@Nullable ConfigureDisparityBMBest5 config , Class<T> imageType , Class<DI> dispType ) {
 		if( config == null )
@@ -144,22 +159,7 @@ public class FactoryStereoDisparity {
 		// 3 regions are used not just one in this case
 		maxError *= 3;
 
-		DisparitySelect select;
-		if( imageType == GrayU8.class || imageType == GrayS16.class ) {
-			if( config.subpixel ) {
-				select = selectDisparitySubpixel_S32((int) maxError, config.validateRtoL, config.texture);
-			} else {
-				select = selectDisparity_S32((int) maxError, config.validateRtoL, config.texture);
-			}
-		} else if( imageType == GrayF32.class ) {
-			if( config.subpixel ) {
-				select = selectDisparitySubpixel_F32((int) maxError, config.validateRtoL, config.texture);
-			} else {
-				select = selectDisparity_F32((int) maxError, config.validateRtoL, config.texture);
-			}
-		} else {
-			throw new IllegalArgumentException("Unknown image type");
-		}
+		DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
 
 		switch( config.errorType) {
 			case SAD: {
@@ -215,9 +215,7 @@ public class FactoryStereoDisparity {
 
 	public static <T extends ImageGray<T>> BlockRowScore createScoreRowNcc( int radiusX , int radiusY , Class<T> imageType) {
 		BlockRowScore rowScore;
-		if (imageType == GrayU8.class) {
-			rowScore = new BlockRowScoreNcc.U8(radiusX,radiusY);
-		} else if (imageType == GrayF32.class) {
+		if (imageType == GrayF32.class) {
 			rowScore = new BlockRowScoreNcc.F32(radiusX,radiusY);
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());

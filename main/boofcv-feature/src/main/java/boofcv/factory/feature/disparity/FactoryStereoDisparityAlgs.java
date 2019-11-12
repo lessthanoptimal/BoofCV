@@ -21,9 +21,12 @@ package boofcv.factory.feature.disparity;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
-import boofcv.alg.feature.disparity.block.impl.*;
+import boofcv.alg.feature.disparity.block.score.ImplDisparitySparseScoreBM_SAD_F32;
+import boofcv.alg.feature.disparity.block.score.ImplDisparitySparseScoreBM_SAD_U8;
+import boofcv.alg.feature.disparity.block.select.*;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Algorithms related to computing the disparity between two rectified stereo images.
@@ -44,6 +47,15 @@ public class FactoryStereoDisparityAlgs {
 			return new ImplSelectBasicWta_F32_U8();
 		else
 			return new ImplSelectWithChecksWta_F32_U8(maxError,tolR2L,texture);
+	}
+
+	public static <D extends ImageGray<D>> DisparitySelect<float[],D> selectCorrelation_F32(int tolR2L , double texture, boolean subpixel) {
+		if( !subpixel &&  tolR2L < 0 && texture <= 0 )
+			return (DisparitySelect)new ImplSelectCorrelationWta_F32_U8();
+		else if( !subpixel )
+			return (DisparitySelect)new ImplSelectCorrelationChecksWta_F32_U8(tolR2L,texture);
+		else
+			return (DisparitySelect)new SelectCorrelationSubpixel.F32_F32(tolR2L,texture);
 	}
 
 	public static DisparitySelect<int[],GrayF32>

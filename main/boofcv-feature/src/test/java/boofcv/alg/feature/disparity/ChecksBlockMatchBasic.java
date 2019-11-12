@@ -20,10 +20,11 @@ package boofcv.alg.feature.disparity;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.feature.disparity.block.DisparityBlockMatchNaive;
-import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.disparity.ConfigureDisparityBM;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
@@ -53,9 +54,12 @@ public abstract class ChecksBlockMatchBasic<T extends ImageBase<T>> {
 
 	@Test
 	void compare() {
+//		BoofConcurrency.USE_CONCURRENT=false;
 		compare(25,20,2,0,10);
 		compare(25,20,2,3,10);
 		compare(10,15,1,5,6);
+
+//		compare(400,300,2,0,120);
 	}
 
 	void compare( int width , int height , int radius , int minDisparity , int maxDisparity ) {
@@ -64,8 +68,14 @@ public abstract class ChecksBlockMatchBasic<T extends ImageBase<T>> {
 		left.reshape(width,height);
 		right.reshape(width,height);
 
-		GImageMiscOps.fillUniform(left,rand,0,maxPixel);
-		GImageMiscOps.fillUniform(right,rand,0,maxPixel);
+		// Create two images with gradient. This should have a clear best fit and not be nearl as sensitive
+		// to noise as a random fill that can have multiple very similar solutions
+		for (int j = 0; j < height; j++) {
+			for (int x = 0; x < width; x++) {
+				GeneralizedImageOps.set((ImageGray)left,x,j,x+j);
+				GeneralizedImageOps.set((ImageGray)right,x,j,x+j+2);
+			}
+		}
 
 		DisparityBlockMatchNaive<T> naive = createNaive(radius,minDisparity,maxDisparity);
 		StereoDisparity<T, GrayU8> alg = createAlg(radius,minDisparity,maxDisparity);
