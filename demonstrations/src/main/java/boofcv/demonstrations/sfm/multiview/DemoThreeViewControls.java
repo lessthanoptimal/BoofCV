@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,6 +32,8 @@ import java.awt.event.ActionListener;
 public class DemoThreeViewControls extends StandardAlgConfigPanel
 	implements ChangeListener, ActionListener
 {
+	public static final int MAX_DISPARITY_RANGE=254;
+
 	JComboBox imageView;
 
 	// TODO select features, e.g. sift, surf, ShiTomasi, BRIEF
@@ -69,8 +71,8 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		sPrune = spinner(prune,0,100,5);
 		cFocalAuto = checkbox("Auto Focal",autoFocal);
 		sFocal = spinner(focal,100,3000,50);
-		sMinDisparity = spinner(minDisparity,0,255,10);
-		sMaxDisparity = spinner(maxDisparity,20,255,10);
+		sMinDisparity = spinner(minDisparity,0,1000,10);
+		sMaxDisparity = spinner(maxDisparity,1,1001,10);
 		bCompute.addActionListener(this);
 		bCompute.setMinimumSize(bCompute.getPreferredSize());
 
@@ -120,9 +122,11 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		boolean compute = true;
 		if( e.getSource() == sMinDisparity ) {
 			minDisparity = ((Number)sMinDisparity.getValue()).intValue();
+			constrainDisparity();
 			stereoChanged = true;
 		} else if( e.getSource() == sMaxDisparity ) {
 			maxDisparity = ((Number)sMaxDisparity.getValue()).intValue();
+			constrainDisparity();
 			stereoChanged = true;
 		} else if( e.getSource() == sInliers ) {
 			inliers = ((Number)sInliers.getValue()).doubleValue();
@@ -139,6 +143,16 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		}
 		if( compute )
 			bCompute.setEnabled(true);
+	}
+
+	// TODO Create a custom disparity widget and share with VisualizeStereoDisparity
+	private void constrainDisparity() {
+		if( maxDisparity-minDisparity>MAX_DISPARITY_RANGE ) {
+			minDisparity = Math.max(0,maxDisparity-MAX_DISPARITY_RANGE);
+			maxDisparity = minDisparity+MAX_DISPARITY_RANGE;
+			sMinDisparity.setValue(minDisparity);
+			sMaxDisparity.setValue(maxDisparity);
+		}
 	}
 
 	@Override
