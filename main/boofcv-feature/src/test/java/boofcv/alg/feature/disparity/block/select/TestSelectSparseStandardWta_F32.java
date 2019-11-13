@@ -18,29 +18,19 @@
 
 package boofcv.alg.feature.disparity.block.select;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import boofcv.alg.feature.disparity.block.SelectSparseStandardWta;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplSelectSparseBasicWta_S32 {
+public class TestSelectSparseStandardWta_F32 extends ChecksSelectSparseStandardWta<float[]> {
 
-	@Test
-	public void simple() {
-		int maxDisparity = 30;
+	public TestSelectSparseStandardWta_F32() {
+		super(float[].class);
+	}
 
-		int scores[] = new int[50];
-		for( int i = 0; i < maxDisparity; i++) {
-			scores[i] = Math.abs(i-5)+2;
-		}
-
-		SelectSparseErrorBasicWta_S32 alg = new SelectSparseErrorBasicWta_S32();
-
-		assertTrue(alg.select(scores,maxDisparity));
-
-		assertEquals(5,(int)alg.getDisparity());
+	@Override
+	protected SelectSparseStandardWta<float[]> createAlg(int maxError, double texture) {
+		return new SelectSparseErrorWithChecksWta_F32(maxError,texture);
 	}
 }

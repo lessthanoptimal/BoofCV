@@ -37,7 +37,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public abstract class ChecksImplDisparityBMBestFive<I extends ImageGray<I>, DI extends ImageGray<DI>> {
+public abstract class ChecksDisparityBMBestFive<I extends ImageGray<I>, DI extends ImageGray<DI>> {
 
 	Random rand = new Random(234);
 
@@ -46,7 +46,7 @@ public abstract class ChecksImplDisparityBMBestFive<I extends ImageGray<I>, DI e
 	Class<I> imageType;
 	Class<DI> disparityType;
 
-	public ChecksImplDisparityBMBestFive(Class<I> imageType, Class<DI> disparityType) {
+	public ChecksDisparityBMBestFive(Class<I> imageType, Class<DI> disparityType) {
 		this.imageType = imageType;
 		this.disparityType = disparityType;
 

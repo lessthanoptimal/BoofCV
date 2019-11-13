@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class ChecksImplDisparitySparseScoreSadRect<I extends ImageGray<I>,ArrayData> {
+public abstract class ChecksDisparitySparseScoreSadRect<I extends ImageGray<I>,ArrayData> {
 	Random rand = new Random(234);
 
 	BlockRowScore scoreRow;
@@ -47,7 +47,7 @@ public abstract class ChecksImplDisparitySparseScoreSadRect<I extends ImageGray<
 
 	Class<I> imageType;
 
-	public ChecksImplDisparitySparseScoreSadRect(Class<I> imageType) {
+	public ChecksDisparitySparseScoreSadRect(Class<I> imageType) {
 		this.imageType = imageType;
 
 		if( imageType == GrayF32.class ) {

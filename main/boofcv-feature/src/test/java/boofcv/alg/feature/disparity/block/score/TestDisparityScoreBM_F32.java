@@ -21,21 +21,21 @@ package boofcv.alg.feature.disparity.block.score;
 import boofcv.alg.feature.disparity.DisparityBlockMatch;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
-import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplDisparityScoreBM_S32 extends ChecksImplDisparityBM<GrayS16,GrayU8> {
+public class TestDisparityScoreBM_F32 extends CheckslDisparityBM<GrayF32,GrayU8> {
 
-	public TestImplDisparityScoreBM_S32() {
-		super(GrayS16.class, GrayU8.class);
+	TestDisparityScoreBM_F32() {
+		super(GrayF32.class, GrayU8.class);
 	}
 
 	@Override
-	protected DisparityBlockMatch<GrayS16, GrayU8>
+	protected DisparityBlockMatch<GrayF32, GrayU8>
 	createAlg(int minDisparity, int maxDisparity, int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp) {
-		return new DisparityScoreBM_S32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
+		return new DisparityScoreBM_F32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
 	}
 }

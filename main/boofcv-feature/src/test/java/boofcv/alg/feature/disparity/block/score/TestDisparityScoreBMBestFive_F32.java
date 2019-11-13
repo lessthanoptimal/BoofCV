@@ -27,9 +27,9 @@ import boofcv.struct.image.GrayU8;
 /**
  * @author Peter Abeles
  */
-public class TestImplDisparityScoreBMBestFive_F32 extends ChecksImplDisparityBMBestFive<GrayF32,GrayU8> {
+public class TestDisparityScoreBMBestFive_F32 extends ChecksDisparityBMBestFive<GrayF32,GrayU8> {
 
-	public TestImplDisparityScoreBMBestFive_F32() {
+	TestDisparityScoreBMBestFive_F32() {
 		super(GrayF32.class, GrayU8.class);
 	}
 

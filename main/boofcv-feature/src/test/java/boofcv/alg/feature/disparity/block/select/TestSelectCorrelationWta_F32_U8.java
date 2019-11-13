@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-public class TestImplSelectCorrelationWta_F32_U8 {
+class TestSelectCorrelationWta_F32_U8 {
 	@Test
 	void stuff() {
 		fail("Implement");

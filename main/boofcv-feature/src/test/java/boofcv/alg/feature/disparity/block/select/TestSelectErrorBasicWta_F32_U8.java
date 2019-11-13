@@ -24,14 +24,14 @@ import boofcv.struct.image.GrayU8;
 /**
  * @author Peter Abeles
  */
-public class TestImplSelectRectBasicWta_S32_U8 extends BasicDisparitySelectRectTests<int[],GrayU8> {
+public class TestSelectErrorBasicWta_F32_U8 extends BasicDisparitySelectRectTests<float[],GrayU8> {
 
-	public TestImplSelectRectBasicWta_S32_U8() {
-		super(int[].class,GrayU8.class);
+	TestSelectErrorBasicWta_F32_U8() {
+		super(float[].class,GrayU8.class);
 	}
 
 	@Override
-	public DisparitySelect<int[],GrayU8> createAlg() {
-		return new SelectErrorBasicWta_S32_U8();
+	public DisparitySelect<float[],GrayU8> createAlg() {
+		return new SelectErrorBasicWta_F32_U8();
 	}
 }

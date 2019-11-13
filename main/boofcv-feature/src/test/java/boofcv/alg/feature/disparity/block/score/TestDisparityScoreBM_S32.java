@@ -16,21 +16,26 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.disparity.block.select;
+package boofcv.alg.feature.disparity.block.score;
 
+import boofcv.alg.feature.disparity.DisparityBlockMatch;
+import boofcv.alg.feature.disparity.block.BlockRowScore;
+import boofcv.alg.feature.disparity.block.DisparitySelect;
+import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
-public class TestImplSelectRectStandard_F32_U8 extends ChecksSelectRectStandardBase<float[],GrayU8> {
+public class TestDisparityScoreBM_S32 extends CheckslDisparityBM<GrayS16,GrayU8> {
 
-	public TestImplSelectRectStandard_F32_U8() {
-		super(float[].class,GrayU8.class);
+	TestDisparityScoreBM_S32() {
+		super(GrayS16.class, GrayU8.class);
 	}
 
 	@Override
-	public SelectErrorChecksBase_F32<GrayU8> createSelector(int maxError, int rightToLeftTolerance, double texture) {
-		return new SelectErrorWithChecksWta_F32_U8(maxError,rightToLeftTolerance,texture);
+	protected DisparityBlockMatch<GrayS16, GrayU8>
+	createAlg(int minDisparity, int maxDisparity, int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp) {
+		return new DisparityScoreBM_S32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
 	}
 }
