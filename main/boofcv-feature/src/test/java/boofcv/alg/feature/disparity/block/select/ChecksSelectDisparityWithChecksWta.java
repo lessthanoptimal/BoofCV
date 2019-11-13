@@ -28,11 +28,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for implementers of {@link SelectRectStandardBase_S32}
+ * Unit tests for implementers of {@link SelectDisparityWithChecksWta}
  *
  * @author Peter Abeles
  */
-public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray<T>> {
+@SuppressWarnings("WeakerAccess")
+public abstract class ChecksSelectDisparityWithChecksWta<ArrayData,T extends ImageGray<T>> {
 
 	Class<ArrayData> arrayType;
 
@@ -45,7 +46,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 	T disparity;
 	Class<T> disparityType;
 
-	public ChecksSelectRectStandardBase(Class<ArrayData> arrayType, Class<T> disparityType) {
+	public ChecksSelectDisparityWithChecksWta(Class<ArrayData> arrayType, Class<T> disparityType) {
 		this.disparityType = disparityType;
 		this.arrayType = arrayType;
 		disparity = GeneralizedImageOps.createSingleBand(disparityType,w,h);
@@ -61,9 +62,9 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 	public abstract SelectDisparityWithChecksWta<ArrayData,T> createSelector(int maxError, int rightToLeftTolerance, double texture );
 
 	@Test
-	public void basic() {
-		BasicDisparitySelectRectTests<ArrayData,T> test =
-				new BasicDisparitySelectRectTests<ArrayData,T>(arrayType, disparityType) {
+	void basic() {
+		BasicDisparitySelectTests<ArrayData,T> test =
+				new BasicDisparitySelectTests<ArrayData,T>(arrayType, disparityType) {
 					@Override
 					public DisparitySelect<ArrayData,T> createAlg() {
 						return createSelector(-1, -1, -1);
@@ -74,7 +75,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 	}
 
 	@Test
-	public void maxError() {
+	void maxError() {
 		init(0,10);
 
 		int y = 3;
@@ -122,7 +123,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 	 * Similar to simpleTest but takes in account the effects of right to left validation
 	 */
 	@Test
-	public void testRightToLeftValidation() {
+	void testRightToLeftValidation() {
 
 		rightToLeftValidation(0);
 		rightToLeftValidation(2);
@@ -130,6 +131,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 
 	private void rightToLeftValidation( int minDisparity ) {
 		init( minDisparity , 10 );
+		int rangeDisparity = maxDisparity-minDisparity;
 
 		int y = 3;
 		int r = 2;
@@ -137,9 +139,9 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,1,-1);
 		alg.configure(disparity,minDisparity,maxDisparity,r);
 
-		int scores[] = new int[w*maxDisparity];
+		int scores[] = new int[w*rangeDisparity];
 
-		for( int d = 0; d < 10; d++ ) {
+		for( int d = 0; d < rangeDisparity; d++ ) {
 			for( int x = 0; x < w; x++ ) {
 				scores[w*d+x] = Math.abs(d-5);
 			}
@@ -147,12 +149,14 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 
 		alg.process(y,copyToCorrectType(scores,arrayType));
 
-		// outside the border should be maxDisparity+1
+		// outside the border should be 'reject'
 		for( int i = 0; i < r+minDisparity; i++ )
 			assertEquals(reject, getDisparity(i + r, y), 1e-8);
+
 		// These should all be zero since other pixels will have lower scores
 		for( int i = r+minDisparity; i < r+4+minDisparity; i++ )
 			assertEquals(reject, getDisparity(i, y), 1e-8);
+
 		// the tolerance is one, so this should be 4
 		assertEquals(4, getDisparity(4 + r + minDisparity, y), 1e-8);
 		// should be at 5 for the remainder
@@ -170,7 +174,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 	 * Test the confidence in a region with very similar cost score (little texture)
 	 */
 	@Test
-	public void confidenceFlatRegion() {
+	void confidenceFlatRegion() {
 		init( 0,10 );
 		int minValue = 3;
 		int y = 3;
@@ -196,7 +200,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 	 * There are two similar peaks.  Repeated pattern
 	 */
 	@Test
-	public void confidenceMultiplePeak() {
+	void confidenceMultiplePeak() {
 		confidenceMultiplePeak(3,0);
 		confidenceMultiplePeak(0,0);
 		confidenceMultiplePeak(3,2);
@@ -226,7 +230,7 @@ public abstract class ChecksSelectRectStandardBase<ArrayData,T extends ImageGray
 			assertEquals(reject, getDisparity(i, y), 1e-8);
 	}
 
-	public static <ArrayData> ArrayData copyToCorrectType( int scores[] , Class<ArrayData> arrayType ) {
+	static <ArrayData> ArrayData copyToCorrectType( int scores[] , Class<ArrayData> arrayType ) {
 
 		if( arrayType == int[].class )
 			return (ArrayData)scores;

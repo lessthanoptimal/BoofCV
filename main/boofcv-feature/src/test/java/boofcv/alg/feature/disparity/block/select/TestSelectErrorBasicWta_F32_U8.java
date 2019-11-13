@@ -24,7 +24,7 @@ import boofcv.struct.image.GrayU8;
 /**
  * @author Peter Abeles
  */
-public class TestSelectErrorBasicWta_F32_U8 extends BasicDisparitySelectRectTests<float[],GrayU8> {
+public class TestSelectErrorBasicWta_F32_U8 extends BasicDisparitySelectTests<float[],GrayU8> {
 
 	TestSelectErrorBasicWta_F32_U8() {
 		super(float[].class,GrayU8.class);

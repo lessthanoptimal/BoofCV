@@ -21,12 +21,13 @@ package boofcv.alg.feature.disparity.block.select;
 import boofcv.alg.feature.disparity.block.SelectSparseStandardWta;
 import org.junit.jupiter.api.Test;
 
-import static boofcv.alg.feature.disparity.block.select.ChecksSelectRectStandardBase.copyToCorrectType;
+import static boofcv.alg.feature.disparity.block.select.ChecksSelectDisparityWithChecksWta.copyToCorrectType;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings("WeakerAccess")
 public abstract class ChecksSelectSparseStandardWta<ArrayData> {
 
 	Class<ArrayData> arrayType;
@@ -41,7 +42,7 @@ public abstract class ChecksSelectSparseStandardWta<ArrayData> {
 	 * All validation tests are turned off
 	 */
 	@Test
-	public void everythingOff() {
+	void everythingOff() {
 		int maxDisparity = 30;
 
 		int scores[] = new int[50];
@@ -62,7 +63,7 @@ public abstract class ChecksSelectSparseStandardWta<ArrayData> {
 	 * Test the confidence in a region with very similar cost score (little texture)
 	 */
 	@Test
-	public void confidenceFlatRegion() {
+	void confidenceFlatRegion() {
 		int minValue = 3;
 		int maxDisparity=10;
 
@@ -81,7 +82,7 @@ public abstract class ChecksSelectSparseStandardWta<ArrayData> {
 	 * There are two similar peaks.  Repeated pattern
 	 */
 	@Test
-	public void confidenceMultiplePeak() {
+	void confidenceMultiplePeak() {
 		confidenceMultiplePeak(3);
 		confidenceMultiplePeak(0);
 	}
@@ -105,12 +106,10 @@ public abstract class ChecksSelectSparseStandardWta<ArrayData> {
 	 * this at one point.
 	 */
 	@Test
-	public void multiplePeakFirstAtIndexZero() {
+	void multiplePeakFirstAtIndexZero() {
 
 		int maxDisparity=10;
-
 		SelectSparseStandardWta<ArrayData> alg = createAlg(-1,3);
-
 		int scores[] = new int[maxDisparity+10];
 
 		for( int d = 0; d < 10; d++ ) {

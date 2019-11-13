@@ -31,7 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Peter Abeles
  */
-public abstract class BasicDisparitySelectRectTests <ArrayData , D extends ImageGray<D>> {
+@SuppressWarnings("WeakerAccess")
+public abstract class BasicDisparitySelectTests<ArrayData , D extends ImageGray<D>> {
 
 	Class<ArrayData> arrayType;
 
@@ -43,7 +44,7 @@ public abstract class BasicDisparitySelectRectTests <ArrayData , D extends Image
 
 	DisparitySelect<ArrayData,D> alg;
 
-	protected BasicDisparitySelectRectTests( Class<ArrayData> arrayType , Class<D> disparityType ) {
+	BasicDisparitySelectTests(Class<ArrayData> arrayType , Class<D> disparityType ) {
 
 		this.arrayType = arrayType;
 		disparity = GeneralizedImageOps.createSingleBand(disparityType,w,h);
@@ -62,7 +63,7 @@ public abstract class BasicDisparitySelectRectTests <ArrayData , D extends Image
 	 * Give it a hand crafted score with known results for WTA.  See if it produces those results
 	 */
 	@Test
-	public void simpleTest() {
+	void simpleTest() {
 
 		int y = 3;
 
@@ -113,7 +114,7 @@ public abstract class BasicDisparitySelectRectTests <ArrayData , D extends Image
 	 * Set the minimum disparity to a non zero number and see if it has the expected behavior
 	 */
 	@Test
-	public void minDisparity() {
+	void minDisparity() {
 		int minDisparity = 2;
 		int maxDisparity = 10;
 		int r = 2;

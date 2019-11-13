@@ -23,14 +23,14 @@ import boofcv.struct.image.GrayU8;
 /**
  * @author Peter Abeles
  */
-public class TestSelectErrorWithChecksWta_F32_U8 extends ChecksSelectRectStandardBase<float[],GrayU8> {
+public class TestSelectErrorWithChecksWta_F32_U8 extends ChecksSelectDisparityWithChecksWta<float[],GrayU8> {
 
 	TestSelectErrorWithChecksWta_F32_U8() {
 		super(float[].class,GrayU8.class);
 	}
 
 	@Override
-	public SelectErrorChecksBase_F32<GrayU8> createSelector(int maxError, int rightToLeftTolerance, double texture) {
+	public SelectErrorWithChecks_F32<GrayU8> createSelector(int maxError, int rightToLeftTolerance, double texture) {
 		return new SelectErrorWithChecksWta_F32_U8(maxError,rightToLeftTolerance,texture);
 	}
 }

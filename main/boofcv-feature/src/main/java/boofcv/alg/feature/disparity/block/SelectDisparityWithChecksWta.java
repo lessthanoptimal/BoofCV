@@ -57,7 +57,7 @@ public abstract class SelectDisparityWithChecksWta<Array , T extends ImageGray>
 	// value that an invalid pixel will be assigned
 	protected int invalidDisparity;
 	// max allowed disparity at the current pixel
-	protected int localMax;
+	protected int localMaxDisparity;
 	// radius and width of the region being compared
 	protected int radiusX;
 	protected int regionWidth;
@@ -115,7 +115,7 @@ public abstract class SelectDisparityWithChecksWta<Array , T extends ImageGray>
 	/**
 	 * For debugging purposes only
 	 */
-	public void setLocalMax(int value) {
-		localMax = value;
+	public void setLocalMaxDisparity(int value) {
+		localMaxDisparity = value;
 	}
 }

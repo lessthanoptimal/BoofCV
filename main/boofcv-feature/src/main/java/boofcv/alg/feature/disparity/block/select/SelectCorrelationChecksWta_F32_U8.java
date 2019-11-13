@@ -23,7 +23,7 @@ import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
- * Implementation of {@link SelectErrorChecksBase_F32} for {@link GrayU8}.
+ * Implementation of {@link SelectErrorWithChecks_F32} for {@link GrayU8}.
  * </p>
  *
  * @author Peter Abeles

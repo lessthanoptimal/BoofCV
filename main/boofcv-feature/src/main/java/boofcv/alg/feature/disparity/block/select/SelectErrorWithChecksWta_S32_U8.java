@@ -23,12 +23,12 @@ import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
- * Implementation of {@link SelectErrorWithChecksBase_S32} for {@link GrayU8}.
+ * Implementation of {@link SelectErrorWithChecks_S32} for {@link GrayU8}.
  * </p>
  *
  * @author Peter Abeles
  */
-public class SelectErrorWithChecksWta_S32_U8 extends SelectErrorWithChecksBase_S32<GrayU8>
+public class SelectErrorWithChecksWta_S32_U8 extends SelectErrorWithChecks_S32<GrayU8>
 {
 	public SelectErrorWithChecksWta_S32_U8(int maxError, int rightToLeftTolerance, double texture) {
 		super(maxError, rightToLeftTolerance, texture);
