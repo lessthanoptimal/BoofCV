@@ -30,7 +30,7 @@ public class TestImplSelectRectStandard_S32_U8 extends ChecksSelectRectStandardB
 	}
 
 	@Override
-	public ImplSelectWithChecksBase_S32<GrayU8> createSelector(int maxError, int rightToLeftTolerance, double texture) {
-		return new ImplSelectWithChecksWta_S32_U8(maxError,rightToLeftTolerance,texture);
+	public SelectErrorWithChecksBase_S32<GrayU8> createSelector(int maxError, int rightToLeftTolerance, double texture) {
+		return new SelectErrorWithChecksWta_S32_U8(maxError,rightToLeftTolerance,texture);
 	}
 }

@@ -31,13 +31,13 @@ import boofcv.alg.feature.disparity.block.SelectSparseStandardWta;
  *
  * @author Peter Abeles
  */
-public class ImplSelectSparseWithChecksWta_S32 extends SelectSparseStandardWta<int[]> {
+public class SelectSparseErrorWithChecksWta_S32 extends SelectSparseStandardWta<int[]> {
 
 	// texture threshold, use an integer value for speed.
 	protected int textureThreshold;
 	protected static final int discretizer = 10000;
 
-	public ImplSelectSparseWithChecksWta_S32(int maxError, double texture) {
+	public SelectSparseErrorWithChecksWta_S32(int maxError, double texture) {
 		super(maxError,texture);
 	}
 

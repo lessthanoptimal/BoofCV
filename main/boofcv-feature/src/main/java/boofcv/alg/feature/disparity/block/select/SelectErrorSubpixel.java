@@ -23,7 +23,7 @@ import boofcv.struct.image.GrayF32;
 
 /**
  * <p>
- * Implementation of {@link ImplSelectWithChecksBase_S32} that adds sub-pixel accuracy. Using
+ * Implementation of {@link SelectErrorWithChecksBase_S32} that adds sub-pixel accuracy. Using
  * equation (3) from [1]:<br>
  *
  * d_sub = d + (C0 - C2)/(2*(C0 - 2*C1 + C2)<br>
@@ -38,12 +38,12 @@ import boofcv.struct.image.GrayF32;
  *
  * @author Peter Abeles
  */
-public class SelectDisparitySubpixel {
+public class SelectErrorSubpixel {
 
 	/**
 	 * For scores of type int[]
 	 */
-	public static class S32_F32 extends ImplSelectWithChecksBase_S32<GrayF32> {
+	public static class S32_F32 extends SelectErrorWithChecksBase_S32<GrayF32> {
 		public S32_F32(int maxError, int rightToLeftTolerance, double texture) {
 			super(maxError, rightToLeftTolerance, texture);
 		}
@@ -82,7 +82,7 @@ public class SelectDisparitySubpixel {
 	/**
 	 * For scores of type float[]
 	 */
-	public static class F32_F32 extends ImplSelectWithChecksBase_F32<GrayF32> {
+	public static class F32_F32 extends SelectErrorChecksBase_F32<GrayF32> {
 		public F32_F32(int maxError, int rightToLeftTolerance, double texture) {
 			super(maxError, rightToLeftTolerance, texture);
 		}

@@ -19,13 +19,13 @@
 package boofcv.alg.feature.disparity.block.score;
 
 import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.GrayF32;
 
 import java.util.Arrays;
 
 /**
  * <p>
- * Implementation of {@link DisparitySparseScoreSadRect} that processes images of type {@link GrayU8}.
+ * Implementation of {@link DisparitySparseScoreSadRect} that processes images of type {@link GrayF32}.
  * </p>
  *
  * <p>
@@ -34,15 +34,15 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class ImplDisparitySparseScoreBM_SAD_U8 extends DisparitySparseScoreSadRect<int[],GrayU8> {
+public class DisparitySparseScoreBM_SAD_F32 extends DisparitySparseScoreSadRect<float[],GrayF32> {
 
 	// scores up to the maximum baseline
-	int scores[];
+	float scores[];
 
-	public ImplDisparitySparseScoreBM_SAD_U8(int minDisparity , int maxDisparity, int radiusX, int radiusY) {
+	public DisparitySparseScoreBM_SAD_F32(int minDisparity , int maxDisparity, int radiusX, int radiusY) {
 		super(minDisparity,maxDisparity,radiusX, radiusY);
 
-		scores = new int[ maxDisparity ];
+		scores = new float[ maxDisparity ];
 	}
 
 	@Override
@@ -65,9 +65,9 @@ public class ImplDisparitySparseScoreBM_SAD_U8 extends DisparitySparseScoreSadRe
 				int indexLeft = startLeft;
 				int indexRight = startRight-i;
 
-				int score = 0;
+				float score = 0;
 				for( int j = 0; j < regionWidth; j++ ) {
-					int diff = (left.data[ indexLeft++ ]& 0xFF) - (right.data[ indexRight++ ]& 0xFF);
+					float diff = (left.data[ indexLeft++ ]) - (right.data[ indexRight++ ]);
 
 					score += Math.abs(diff);
 				}
@@ -79,13 +79,13 @@ public class ImplDisparitySparseScoreBM_SAD_U8 extends DisparitySparseScoreSadRe
 	}
 
 	@Override
-	public int[] getScore() {
+	public float[] getScore() {
 		return scores;
 	}
 
 	@Override
-	public Class<GrayU8> getImageType() {
-		return GrayU8.class;
+	public Class<GrayF32> getImageType() {
+		return GrayF32.class;
 	}
 
 }

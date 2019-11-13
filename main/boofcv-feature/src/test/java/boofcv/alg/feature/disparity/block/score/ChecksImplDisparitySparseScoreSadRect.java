@@ -22,8 +22,8 @@ import boofcv.alg.feature.disparity.DisparityBlockMatch;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
-import boofcv.alg.feature.disparity.block.select.ImplSelectSparseBasicWta_F32;
-import boofcv.alg.feature.disparity.block.select.ImplSelectSparseBasicWta_S32;
+import boofcv.alg.feature.disparity.block.select.SelectSparseErrorBasicWta_F32;
+import boofcv.alg.feature.disparity.block.select.SelectSparseErrorBasicWta_S32;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
@@ -51,9 +51,9 @@ public abstract class ChecksImplDisparitySparseScoreSadRect<I extends ImageGray<
 		this.imageType = imageType;
 
 		if( imageType == GrayF32.class ) {
-			selectAlg = (DisparitySparseSelect)new ImplSelectSparseBasicWta_F32();
+			selectAlg = (DisparitySparseSelect)new SelectSparseErrorBasicWta_F32();
 		} else {
-			selectAlg = (DisparitySparseSelect)new ImplSelectSparseBasicWta_S32();
+			selectAlg = (DisparitySparseSelect)new SelectSparseErrorBasicWta_S32();
 		}
 		scoreRow = FactoryStereoDisparity.createScoreRowSad(imageType);
 	}

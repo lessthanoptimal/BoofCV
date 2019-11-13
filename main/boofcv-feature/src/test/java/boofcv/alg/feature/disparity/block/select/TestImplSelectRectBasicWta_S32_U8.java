@@ -32,6 +32,6 @@ public class TestImplSelectRectBasicWta_S32_U8 extends BasicDisparitySelectRectT
 
 	@Override
 	public DisparitySelect<int[],GrayU8> createAlg() {
-		return new ImplSelectBasicWta_S32_U8();
+		return new SelectErrorBasicWta_S32_U8();
 	}
 }

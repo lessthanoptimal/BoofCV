@@ -34,8 +34,8 @@ public class TestSelectDisparitySubpixel_F32_F32 extends ChecksSelectRectStandar
 	}
 
 	@Override
-	public ImplSelectWithChecksBase_F32<GrayF32> createSelector(int maxError, int rightToLeftTolerance, double texture) {
-		return new SelectDisparitySubpixel.F32_F32(maxError, rightToLeftTolerance, texture);
+	public SelectErrorChecksBase_F32<GrayF32> createSelector(int maxError, int rightToLeftTolerance, double texture) {
+		return new SelectErrorSubpixel.F32_F32(maxError, rightToLeftTolerance, texture);
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class TestSelectDisparitySubpixel_F32_F32 extends ChecksSelectRectStandar
 
 		GrayF32 img = new GrayF32(w,h);
 
-		SelectDisparitySubpixel.F32_F32 alg = new SelectDisparitySubpixel.F32_F32(-1,-1,-1);
+		SelectErrorSubpixel.F32_F32 alg = new SelectErrorSubpixel.F32_F32(-1,-1,-1);
 
 		alg.configure(img,0,20,2);
 		alg.setLocalMax(20);

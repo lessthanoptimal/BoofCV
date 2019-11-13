@@ -31,6 +31,6 @@ public class TestImplSelectSparseStandardWta_S32 extends ChecksSelectSparseStand
 
 	@Override
 	protected SelectSparseStandardWta<int[]> createAlg(int maxError, double texture) {
-		return new ImplSelectSparseWithChecksWta_S32(maxError,texture);
+		return new SelectSparseErrorWithChecksWta_S32(maxError,texture);
 	}
 }

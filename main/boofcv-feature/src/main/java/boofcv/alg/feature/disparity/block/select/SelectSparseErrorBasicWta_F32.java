@@ -29,7 +29,7 @@ import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
  *
  * @author Peter Abeles
  */
-public class ImplSelectSparseBasicWta_F32 implements DisparitySparseSelect<float[]> {
+public class SelectSparseErrorBasicWta_F32 implements DisparitySparseSelect<float[]> {
 
 	// selected disparity
 	int disparity;

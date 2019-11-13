@@ -36,7 +36,7 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class ImplSelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[],GrayU8>
+public class SelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[],GrayU8>
 {
 	Kernel1D_F32 box = FactoryKernel.table1D_F32(2,true);
 //	float[] scoresByD;

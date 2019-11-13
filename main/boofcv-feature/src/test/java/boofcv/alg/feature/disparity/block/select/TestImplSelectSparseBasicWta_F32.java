@@ -37,7 +37,7 @@ public class TestImplSelectSparseBasicWta_F32 {
 			scores[i] = Math.abs(i-5)+2;
 		}
 
-		ImplSelectSparseBasicWta_F32 alg = new ImplSelectSparseBasicWta_F32();
+		SelectSparseErrorBasicWta_F32 alg = new SelectSparseErrorBasicWta_F32();
 
 		assertTrue(alg.select(scores,maxDisparity));
 

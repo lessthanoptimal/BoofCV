@@ -21,7 +21,7 @@ package boofcv.alg.feature.disparity.block.score;
 import boofcv.alg.feature.disparity.DisparityBlockMatch;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
-import boofcv.alg.feature.disparity.block.select.ImplSelectBasicWta_F32_U8;
+import boofcv.alg.feature.disparity.block.select.SelectErrorBasicWta_F32_U8;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 
@@ -37,13 +37,13 @@ public class TestImplDisparitySparseScoreSadRect_F32 extends ChecksImplDisparity
 	@Override
 	public DisparityBlockMatch<GrayF32, GrayU8> createDense(int minDisparity, int maxDisparity,
 															int radiusX, int radiusY, BlockRowScore scoreRow) {
-		return new ImplDisparityScoreBM_F32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,
-				new ImplSelectBasicWta_F32_U8());
+		return new DisparityScoreBM_F32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,
+				new SelectErrorBasicWta_F32_U8());
 	}
 
 	@Override
 	public DisparitySparseScoreSadRect<float[], GrayF32> createSparse(int minDisparity, int maxDisparity,
 																	  int radiusX, int radiusY) {
-		return new ImplDisparitySparseScoreBM_SAD_F32(minDisparity,maxDisparity,radiusX,radiusY);
+		return new DisparitySparseScoreBM_SAD_F32(minDisparity,maxDisparity,radiusX,radiusY);
 	}
 }

@@ -36,6 +36,6 @@ public class TestImplDisparityScoreBM_F32 extends ChecksImplDisparityBM<GrayF32,
 	@Override
 	protected DisparityBlockMatch<GrayF32, GrayU8>
 	createAlg(int minDisparity, int maxDisparity, int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp) {
-		return new ImplDisparityScoreBM_F32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
+		return new DisparityScoreBM_F32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
 	}
 }

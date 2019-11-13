@@ -21,8 +21,8 @@ package boofcv.alg.feature.disparity.block.score;
 import boofcv.alg.feature.disparity.DisparityBlockMatch;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
-import boofcv.alg.feature.disparity.block.select.ImplSelectBasicWta_F32_U8;
-import boofcv.alg.feature.disparity.block.select.ImplSelectBasicWta_S32_U8;
+import boofcv.alg.feature.disparity.block.select.SelectErrorBasicWta_F32_U8;
+import boofcv.alg.feature.disparity.block.select.SelectErrorBasicWta_S32_U8;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
@@ -51,9 +51,9 @@ public abstract class ChecksImplDisparityBM<I extends ImageGray<I>, DI extends I
 		this.disparityType = disparityType;
 
 		if( imageType == GrayU8.class || imageType == GrayU16.class || imageType == GrayS16.class ) {
-			compDisp = (DisparitySelect)new ImplSelectBasicWta_S32_U8();
+			compDisp = (DisparitySelect)new SelectErrorBasicWta_S32_U8();
 		} else {
-			compDisp = (DisparitySelect)new ImplSelectBasicWta_F32_U8();
+			compDisp = (DisparitySelect)new SelectErrorBasicWta_F32_U8();
 		}
 
 		scoreRow = FactoryStereoDisparity.createScoreRowSad(imageType);

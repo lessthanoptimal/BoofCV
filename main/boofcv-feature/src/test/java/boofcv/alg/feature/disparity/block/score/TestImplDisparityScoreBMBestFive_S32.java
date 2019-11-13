@@ -37,6 +37,6 @@ public class TestImplDisparityScoreBMBestFive_S32 extends ChecksImplDisparityBMB
 	protected DisparityBlockMatchBestFive<GrayU16, GrayU8>
 	createAlg(int minDisparity, int maxDisparity, int radiusX, int radiusY,
 			  BlockRowScore scoreRow, DisparitySelect compDisp) {
-		return new ImplDisparityScoreBMBestFive_S32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
+		return new DisparityScoreBMBestFive_S32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
 	}
 }

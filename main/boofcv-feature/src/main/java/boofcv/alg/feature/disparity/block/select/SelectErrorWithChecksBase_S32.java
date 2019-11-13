@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class ImplSelectWithChecksBase_S32<T extends ImageGray<T>>
+public abstract class SelectErrorWithChecksBase_S32<T extends ImageGray<T>>
 		extends SelectDisparityWithChecksWta<int[],T>
 {
 	// scores organized for more efficient processing
@@ -44,11 +44,11 @@ public abstract class ImplSelectWithChecksBase_S32<T extends ImageGray<T>>
 	protected int textureThreshold;
 	protected static final int discretizer = 10000;
 
-	public ImplSelectWithChecksBase_S32(int maxError, int rightToLeftTolerance, double texture) {
+	public SelectErrorWithChecksBase_S32(int maxError, int rightToLeftTolerance, double texture) {
 		super(maxError,rightToLeftTolerance,texture);
 	}
 
-	public ImplSelectWithChecksBase_S32(ImplSelectWithChecksBase_S32<T> original ) {
+	public SelectErrorWithChecksBase_S32(SelectErrorWithChecksBase_S32<T> original ) {
 		this(original.maxError,original.rightToLeftTolerance,original.textureThreshold/(double)discretizer);
 	}
 

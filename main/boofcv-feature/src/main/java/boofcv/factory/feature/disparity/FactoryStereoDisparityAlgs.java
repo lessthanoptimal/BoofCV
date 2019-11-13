@@ -21,8 +21,8 @@ package boofcv.factory.feature.disparity;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
-import boofcv.alg.feature.disparity.block.score.ImplDisparitySparseScoreBM_SAD_F32;
-import boofcv.alg.feature.disparity.block.score.ImplDisparitySparseScoreBM_SAD_U8;
+import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_F32;
+import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_U8;
 import boofcv.alg.feature.disparity.block.select.*;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -37,68 +37,68 @@ public class FactoryStereoDisparityAlgs {
 
 	public static DisparitySelect<int[],GrayU8> selectDisparity_S32(int maxError , int tolR2L , double texture) {
 		if( maxError < 0 && tolR2L < 0  & texture <= 0 )
-			return new ImplSelectBasicWta_S32_U8();
+			return new SelectErrorBasicWta_S32_U8();
 		else
-			return new ImplSelectWithChecksWta_S32_U8(maxError,tolR2L,texture);
+			return new SelectErrorWithChecksWta_S32_U8(maxError,tolR2L,texture);
 	}
 
 	public static DisparitySelect<float[],GrayU8> selectDisparity_F32(int maxError , int tolR2L , double texture) {
 		if( maxError < 0 && tolR2L < 0  & texture <= 0 )
-			return new ImplSelectBasicWta_F32_U8();
+			return new SelectErrorBasicWta_F32_U8();
 		else
-			return new ImplSelectWithChecksWta_F32_U8(maxError,tolR2L,texture);
+			return new SelectErrorWithChecksWta_F32_U8(maxError,tolR2L,texture);
 	}
 
 	public static <D extends ImageGray<D>> DisparitySelect<float[],D> selectCorrelation_F32(int tolR2L , double texture, boolean subpixel) {
 		if( !subpixel &&  tolR2L < 0 && texture <= 0 )
-			return (DisparitySelect)new ImplSelectCorrelationWta_F32_U8();
+			return (DisparitySelect)new SelectCorrelationWta_F32_U8();
 		else if( !subpixel )
-			return (DisparitySelect)new ImplSelectCorrelationChecksWta_F32_U8(tolR2L,texture);
+			return (DisparitySelect)new SelectCorrelationChecksWta_F32_U8(tolR2L,texture);
 		else
 			return (DisparitySelect)new SelectCorrelationSubpixel.F32_F32(tolR2L,texture);
 	}
 
 	public static DisparitySelect<int[],GrayF32>
 	selectDisparitySubpixel_S32( int maxError , int tolR2L , double texture) {
-		return new SelectDisparitySubpixel.S32_F32(maxError,tolR2L,texture);
+		return new SelectErrorSubpixel.S32_F32(maxError,tolR2L,texture);
 	}
 
 	public static DisparitySelect<float[],GrayF32>
 	selectDisparitySubpixel_F32( int maxError , int tolR2L , double texture) {
-		return new SelectDisparitySubpixel.F32_F32(maxError,tolR2L,texture);
+		return new SelectErrorSubpixel.F32_F32(maxError,tolR2L,texture);
 	}
 
 	public static DisparitySparseSelect<int[]>
 	selectDisparitySparse_S32( int maxError , double texture) {
 		if( maxError < 0 && texture <= 0 )
-			return new ImplSelectSparseBasicWta_S32();
+			return new SelectSparseErrorBasicWta_S32();
 		else
-			return new ImplSelectSparseWithChecksWta_S32(maxError,texture);
+			return new SelectSparseErrorWithChecksWta_S32(maxError,texture);
 	}
 
 	public static DisparitySparseSelect<float[]>
 	selectDisparitySparse_F32( int maxError , double texture) {
 		if( maxError < 0 && texture <= 0 )
-			return new ImplSelectSparseBasicWta_F32();
+			return new SelectSparseErrorBasicWta_F32();
 		else
-			return new ImplSelectSparseWithChecksWta_F32(maxError,texture);
+			return new SelectSparseErrorWithChecksWta_F32(maxError,texture);
 	}
 
 	public static DisparitySparseSelect<int[]>
 	selectDisparitySparseSubpixel_S32( int maxError , double texture) {
-		return new SelectSparseStandardSubpixel.S32(maxError,texture);
+		return new SelectSparseErrorSubpixel.S32(maxError,texture);
 	}
 
 	public static DisparitySparseSelect<float[]>
 	selectDisparitySparseSubpixel_F32( int maxError , double texture) {
-		return new SelectSparseStandardSubpixel.F32(maxError,texture);
+		return new SelectSparseErrorSubpixel.F32(maxError,texture);
 	}
 
 	public static DisparitySparseScoreSadRect<int[],GrayU8>
 	scoreDisparitySparseSadRect_U8( int minDisparity , int maxDisparity,
 									int regionRadiusX, int regionRadiusY )
 	{
-		return new ImplDisparitySparseScoreBM_SAD_U8(minDisparity,
+		return new DisparitySparseScoreBM_SAD_U8(minDisparity,
 				maxDisparity,regionRadiusX,regionRadiusY);
 	}
 
@@ -106,7 +106,7 @@ public class FactoryStereoDisparityAlgs {
 	scoreDisparitySparseSadRect_F32( int minDisparity, int maxDisparity,
 									 int regionRadiusX, int regionRadiusY )
 	{
-		return new ImplDisparitySparseScoreBM_SAD_F32(minDisparity,
+		return new DisparitySparseScoreBM_SAD_F32(minDisparity,
 				maxDisparity,regionRadiusX,regionRadiusY);
 	}
 

@@ -36,7 +36,7 @@ public class TestSelectSparseStandardSubpixel_F32 extends ChecksSelectSparseStan
 
 	@Override
 	protected SelectSparseStandardWta<float[]> createAlg(int maxError, double texture) {
-		return new SelectSparseStandardSubpixel.F32(maxError,texture);
+		return new SelectSparseErrorSubpixel.F32(maxError,texture);
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class TestSelectSparseStandardSubpixel_F32 extends ChecksSelectSparseStan
 	@Test
 	public void addSubpixelBias() {
 
-		SelectSparseStandardSubpixel.F32 alg = new SelectSparseStandardSubpixel.F32(-1,-1);
+		SelectSparseErrorSubpixel.F32 alg = new SelectSparseErrorSubpixel.F32(-1,-1);
 
 		float scores[] = new float[30];
 		Arrays.fill(scores,0,10,500);

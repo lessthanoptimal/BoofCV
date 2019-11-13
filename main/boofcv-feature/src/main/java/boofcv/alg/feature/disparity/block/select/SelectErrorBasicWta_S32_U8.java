@@ -24,7 +24,7 @@ import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
- * Implementation of {@link SelectDisparityBasicWta} for scores of type F32.
+ * Implementation of {@link SelectDisparityBasicWta} for scores of type S32.
  * </p>
  *
  * <p>
@@ -33,10 +33,10 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class ImplSelectBasicWta_F32_U8 extends SelectDisparityBasicWta<float[],GrayU8>
+public class SelectErrorBasicWta_S32_U8 extends SelectDisparityBasicWta<int[],GrayU8>
 {
 	@Override
-	public void process(int row, float[] scores) {
+	public void process(int row, int[] scores) {
 
 		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride + radiusX + minDisparity;
 
@@ -47,11 +47,11 @@ public class ImplSelectBasicWta_F32_U8 extends SelectDisparityBasicWta<float[],G
 			int indexScore = col-minDisparity;
 
 			int bestDisparity = 0;
-			float scoreBest = scores[indexScore];
+			int scoreBest = scores[indexScore];
 			indexScore += imageWidth;
 
 			for( int i = 1; i < localMax; i++ ,indexScore += imageWidth) {
-				float s = scores[indexScore];
+				int s = scores[indexScore];
 				if( s < scoreBest ) {
 					scoreBest = s;
 					bestDisparity = i;
@@ -63,7 +63,7 @@ public class ImplSelectBasicWta_F32_U8 extends SelectDisparityBasicWta<float[],G
 	}
 
 	@Override
-	public DisparitySelect<float[], GrayU8> concurrentCopy() {
+	public DisparitySelect<int[], GrayU8> concurrentCopy() {
 		return this;
 	}
 

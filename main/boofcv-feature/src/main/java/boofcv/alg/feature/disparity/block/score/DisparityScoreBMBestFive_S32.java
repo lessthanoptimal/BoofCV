@@ -45,7 +45,7 @@ import javax.annotation.Generated;
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.feature.disparity.impl.GenerateDisparityBMBestFive_SAD")
-public class ImplDisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends ImageGray<DI>>
+public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends ImageGray<DI>>
 		extends DisparityBlockMatchBestFive<T,DI>
 {
 	// Computes disparity from scores
@@ -60,10 +60,10 @@ public class ImplDisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends 
 	FastQueue workspace = new FastQueue<>(WorkSpace.class, WorkSpace::new);
 	ComputeBlock computeBlock = new ComputeBlock();
 
-	public ImplDisparityScoreBMBestFive_S32(int minDisparity, int maxDisparity,
-											int regionRadiusX, int regionRadiusY,
-											BlockRowScore<T,int[]> scoreRows,
-											DisparitySelect<int[], DI> computeDisparity) {
+	public DisparityScoreBMBestFive_S32(int minDisparity, int maxDisparity,
+										int regionRadiusX, int regionRadiusY,
+										BlockRowScore<T,int[]> scoreRows,
+										DisparitySelect<int[], DI> computeDisparity) {
 		super(minDisparity,maxDisparity,regionRadiusX,regionRadiusY);
 		this.scoreRows = scoreRows;
 		this.disparitySelect0 = computeDisparity;

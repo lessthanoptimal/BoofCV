@@ -23,18 +23,18 @@ import boofcv.struct.image.GrayU8;
 
 /**
  * <p>
- * Implementation of {@link ImplSelectWithChecksBase_F32} for {@link GrayU8}.
+ * Implementation of {@link SelectErrorChecksBase_F32} for {@link GrayU8}.
  * </p>
  *
  * @author Peter Abeles
  */
-public class ImplSelectWithChecksWta_F32_U8 extends ImplSelectWithChecksBase_F32<GrayU8>
+public class SelectErrorWithChecksWta_F32_U8 extends SelectErrorChecksBase_F32<GrayU8>
 {
-	public ImplSelectWithChecksWta_F32_U8(int maxError, int rightToLeftTolerance, double texture) {
+	public SelectErrorWithChecksWta_F32_U8(int maxError, int rightToLeftTolerance, double texture) {
 		super(maxError, rightToLeftTolerance, texture);
 	}
 
-	public ImplSelectWithChecksWta_F32_U8(ImplSelectWithChecksWta_F32_U8 original) {
+	public SelectErrorWithChecksWta_F32_U8(SelectErrorWithChecksWta_F32_U8 original) {
 		super(original);
 	}
 
@@ -48,7 +48,7 @@ public class ImplSelectWithChecksWta_F32_U8 extends ImplSelectWithChecksBase_F32
 
 	@Override
 	public DisparitySelect<float[], GrayU8> concurrentCopy() {
-		return new ImplSelectWithChecksWta_F32_U8(this);
+		return new SelectErrorWithChecksWta_F32_U8(this);
 	}
 
 	protected void setDisparity( int index , int value ) {

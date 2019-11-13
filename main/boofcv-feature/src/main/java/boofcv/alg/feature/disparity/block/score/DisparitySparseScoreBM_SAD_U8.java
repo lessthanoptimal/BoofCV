@@ -19,13 +19,13 @@
 package boofcv.alg.feature.disparity.block.score;
 
 import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
-import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 import java.util.Arrays;
 
 /**
  * <p>
- * Implementation of {@link DisparitySparseScoreSadRect} that processes images of type {@link GrayS16}.
+ * Implementation of {@link DisparitySparseScoreSadRect} that processes images of type {@link GrayU8}.
  * </p>
  *
  * <p>
@@ -34,12 +34,12 @@ import java.util.Arrays;
  *
  * @author Peter Abeles
  */
-public class ImplDisparitySparseScoreBM_SAD_S16 extends DisparitySparseScoreSadRect<int[],GrayS16> {
+public class DisparitySparseScoreBM_SAD_U8 extends DisparitySparseScoreSadRect<int[],GrayU8> {
 
 	// scores up to the maximum baseline
 	int scores[];
 
-	public ImplDisparitySparseScoreBM_SAD_S16(int minDisparity , int maxDisparity, int radiusX, int radiusY) {
+	public DisparitySparseScoreBM_SAD_U8(int minDisparity , int maxDisparity, int radiusX, int radiusY) {
 		super(minDisparity,maxDisparity,radiusX, radiusY);
 
 		scores = new int[ maxDisparity ];
@@ -67,7 +67,7 @@ public class ImplDisparitySparseScoreBM_SAD_S16 extends DisparitySparseScoreSadR
 
 				int score = 0;
 				for( int j = 0; j < regionWidth; j++ ) {
-					int diff = (left.data[ indexLeft++ ]) - (right.data[ indexRight++ ]);
+					int diff = (left.data[ indexLeft++ ]& 0xFF) - (right.data[ indexRight++ ]& 0xFF);
 
 					score += Math.abs(diff);
 				}
@@ -84,8 +84,8 @@ public class ImplDisparitySparseScoreBM_SAD_S16 extends DisparitySparseScoreSadR
 	}
 
 	@Override
-	public Class<GrayS16> getImageType() {
-		return GrayS16.class;
+	public Class<GrayU8> getImageType() {
+		return GrayU8.class;
 	}
 
 }

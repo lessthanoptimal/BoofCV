@@ -33,7 +33,7 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class ImplSelectCorrelationChecksBase_F32<T extends ImageGray<T>>
+public abstract class SelectCorrelationChecksBase_F32<T extends ImageGray<T>>
 		extends SelectDisparityWithChecksWta<float[],T>
 {
 	// scores organized for more efficient processing
@@ -43,11 +43,11 @@ public abstract class ImplSelectCorrelationChecksBase_F32<T extends ImageGray<T>
 	// texture threshold, use an integer value for speed.
 	protected float textureThreshold;
 
-	public ImplSelectCorrelationChecksBase_F32(int rightToLeftTolerance, double texture) {
+	public SelectCorrelationChecksBase_F32(int rightToLeftTolerance, double texture) {
 		super(-1,rightToLeftTolerance,texture);
 	}
 
-	public ImplSelectCorrelationChecksBase_F32(ImplSelectCorrelationChecksBase_F32<T> original ) {
+	public SelectCorrelationChecksBase_F32(SelectCorrelationChecksBase_F32<T> original ) {
 		this(original.rightToLeftTolerance,original.textureThreshold);
 	}
 

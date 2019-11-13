@@ -31,12 +31,12 @@ import boofcv.alg.feature.disparity.block.SelectSparseStandardWta;
  *
  * @author Peter Abeles
  */
-public class ImplSelectSparseWithChecksWta_F32 extends SelectSparseStandardWta<float[]> {
+public class SelectSparseErrorWithChecksWta_F32 extends SelectSparseStandardWta<float[]> {
 
 	// texture threshold
 	protected float textureThreshold;
 
-	public ImplSelectSparseWithChecksWta_F32(int maxError, double texture) {
+	public SelectSparseErrorWithChecksWta_F32(int maxError, double texture) {
 		super(maxError,texture);
 	}
 

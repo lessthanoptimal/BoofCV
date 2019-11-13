@@ -23,7 +23,7 @@ import boofcv.struct.image.GrayF32;
 
 /**
  * <p>
- * Implementation of {@link ImplSelectWithChecksBase_S32} that adds sub-pixel accuracy. Using
+ * Implementation of {@link SelectErrorWithChecksBase_S32} that adds sub-pixel accuracy. Using
  * equation (3) from [1]:<br>
  *
  * d_sub = d + (C0 - C2)/(2*(C0 - 2*C1 + C2)<br>
@@ -43,7 +43,7 @@ public class SelectCorrelationSubpixel {
 	/**
 	 * For scores of type float[]
 	 */
-	public static class F32_F32 extends ImplSelectCorrelationChecksBase_F32<GrayF32> {
+	public static class F32_F32 extends SelectCorrelationChecksBase_F32<GrayF32> {
 		public F32_F32(int rightToLeftTolerance, double texture) {
 			super(rightToLeftTolerance, texture);
 		}
@@ -61,6 +61,15 @@ public class SelectCorrelationSubpixel {
 				float c0 = columnScore[disparityValue-1];
 				float c1 = columnScore[disparityValue];
 				float c2 = columnScore[disparityValue+1];
+
+				float min = Math.min(c0,c2);
+
+				// Visually it's hard to tell if the code below helps or hurts
+				// The idea was that SAD error grows linearly and this interpolation seems to work well
+				// for it. The sqrt() grows linearly.
+//				c0 = (float)Math.sqrt(c0-min);
+//				c1 = (float)Math.sqrt(c1-min);
+//				c2 = (float)Math.sqrt(c2-min);
 
 				float offset = (c0-c2)/(2f*(c0-2f*c1+c2));
 

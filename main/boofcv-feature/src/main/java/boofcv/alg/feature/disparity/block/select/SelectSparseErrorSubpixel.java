@@ -20,15 +20,15 @@ package boofcv.alg.feature.disparity.block.select;
 
 /**
  * <p>
- * Subpixel accuracy for disparity.  See {@link SelectDisparitySubpixel} for more details on the
+ * Subpixel accuracy for disparity.  See {@link SelectErrorSubpixel} for more details on the
  * mathematics.
  * </p>
  *
  * @author Peter Abeles
  */
-public class SelectSparseStandardSubpixel {
+public class SelectSparseErrorSubpixel {
 
-	public static class S32 extends ImplSelectSparseWithChecksWta_S32 {
+	public static class S32 extends SelectSparseErrorWithChecksWta_S32 {
 		public S32(int maxError, double texture) {
 			super(maxError, texture);
 		}
@@ -59,7 +59,7 @@ public class SelectSparseStandardSubpixel {
 
 	}
 
-	public static class F32 extends ImplSelectSparseWithChecksWta_F32 {
+	public static class F32 extends SelectSparseErrorWithChecksWta_F32 {
 		public F32(int maxError, double texture) {
 			super(maxError, texture);
 		}
