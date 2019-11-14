@@ -1405,6 +1405,306 @@ public class PixelMath {
 	}
 
 	/**
+	 * Multiply each element by a scalar value. Both input and output images can
+	 * be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What each element is multiplied by.
+	 * @param output The output image. Modified.
+	 */
+	public static void multiply( GrayU8 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Multiply each element by a scalar value. Both input and output images can
+	 * be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What each element is multiplied by.
+	 * @param output The output image. Modified.
+	 */
+	public static void multiply( InterleavedU8 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Multiply each element by a scalar value. Both input and output images can
+	 * be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What each element is multiplied by.
+	 * @param output The output image. Modified.
+	 */
+	public static void multiply( GrayS8 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Multiply each element by a scalar value. Both input and output images can
+	 * be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What each element is multiplied by.
+	 * @param output The output image. Modified.
+	 */
+	public static void multiply( InterleavedS8 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Multiply each element by a scalar value. Both input and output images can
+	 * be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What each element is multiplied by.
+	 * @param output The output image. Modified.
+	 */
+	public static void multiply( GrayU16 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Multiply each element by a scalar value. Both input and output images can
+	 * be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What each element is multiplied by.
+	 * @param output The output image. Modified.
+	 */
+	public static void multiply( InterleavedU16 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiplyU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Multiply each element by a scalar value. Both input and output images can
+	 * be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What each element is multiplied by.
+	 * @param output The output image. Modified.
+	 */
+	public static void multiply( GrayS16 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Multiply each element by a scalar value. Both input and output images can
+	 * be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What each element is multiplied by.
+	 * @param output The output image. Modified.
+	 */
+	public static void multiply( InterleavedS16 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Multiply each element by a scalar value. Both input and output images can
+	 * be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What each element is multiplied by.
+	 * @param output The output image. Modified.
+	 */
+	public static void multiply( GrayS32 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Multiply each element by a scalar value. Both input and output images can
+	 * be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What each element is multiplied by.
+	 * @param output The output image. Modified.
+	 */
+	public static void multiply( InterleavedS32 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Multiply each element by a scalar value. Both input and output images can
+	 * be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What each element is multiplied by.
+	 * @param output The output image. Modified.
+	 */
+	public static void multiply( GrayS64 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Multiply each element by a scalar value. Both input and output images can
+	 * be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What each element is multiplied by.
+	 * @param output The output image. Modified.
+	 */
+	public static void multiply( InterleavedS64 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.multiply_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
 	 * Divide each element by a scalar value. Both input and output images can be the same instance.
 	 *
 	 * @param input The input image. Not modified.
@@ -2167,6 +2467,294 @@ public class PixelMath {
 					input.height,columns);
 		} else {
 			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Divide each element by a scalar value. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param denominator What each element is divided by.
+	 * @param output The output image. Modified.
+	 */
+	public static void divide( GrayU8 input , float denominator , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Divide each element by a scalar value. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param denominator What each element is divided by.
+	 * @param output The output image. Modified.
+	 */
+	public static void divide( InterleavedU8 input , float denominator , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Divide each element by a scalar value. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param denominator What each element is divided by.
+	 * @param output The output image. Modified.
+	 */
+	public static void divide( GrayS8 input , float denominator , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Divide each element by a scalar value. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param denominator What each element is divided by.
+	 * @param output The output image. Modified.
+	 */
+	public static void divide( InterleavedS8 input , float denominator , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Divide each element by a scalar value. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param denominator What each element is divided by.
+	 * @param output The output image. Modified.
+	 */
+	public static void divide( GrayU16 input , float denominator , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Divide each element by a scalar value. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param denominator What each element is divided by.
+	 * @param output The output image. Modified.
+	 */
+	public static void divide( InterleavedU16 input , float denominator , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divideU_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Divide each element by a scalar value. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param denominator What each element is divided by.
+	 * @param output The output image. Modified.
+	 */
+	public static void divide( GrayS16 input , float denominator , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Divide each element by a scalar value. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param denominator What each element is divided by.
+	 * @param output The output image. Modified.
+	 */
+	public static void divide( InterleavedS16 input , float denominator , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Divide each element by a scalar value. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param denominator What each element is divided by.
+	 * @param output The output image. Modified.
+	 */
+	public static void divide( GrayS32 input , float denominator , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Divide each element by a scalar value. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param denominator What each element is divided by.
+	 * @param output The output image. Modified.
+	 */
+	public static void divide( InterleavedS32 input , float denominator , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Divide each element by a scalar value. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param denominator What each element is divided by.
+	 * @param output The output image. Modified.
+	 */
+	public static void divide( GrayS64 input , float denominator , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Divide each element by a scalar value. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param denominator What each element is divided by.
+	 * @param output The output image. Modified.
+	 */
+	public static void divide( InterleavedS64 input , float denominator , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.divide_A(input.data,input.startIndex,input.stride,denominator , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.divide_A(input.data,input.startIndex,input.stride,denominator , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
 		}
@@ -2941,6 +3529,294 @@ public class PixelMath {
 	}
 
 	/**
+	 * Adds a scalar value to each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is added to each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void plus( GrayU8 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Adds a scalar value to each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is added to each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void plus( InterleavedU8 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Adds a scalar value to each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is added to each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void plus( GrayS8 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Adds a scalar value to each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is added to each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void plus( InterleavedS8 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Adds a scalar value to each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is added to each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void plus( GrayU16 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Adds a scalar value to each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is added to each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void plus( InterleavedU16 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Adds a scalar value to each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is added to each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void plus( GrayS16 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Adds a scalar value to each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is added to each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void plus( InterleavedS16 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Adds a scalar value to each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is added to each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void plus( GrayS32 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Adds a scalar value to each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is added to each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void plus( InterleavedS32 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Adds a scalar value to each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is added to each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void plus( GrayS64 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Adds a scalar value to each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is added to each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void plus( InterleavedS64 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.plus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
 	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
 	 *
 	 * @param input The input image. Not modified.
@@ -3703,6 +4579,294 @@ public class PixelMath {
 					input.height,columns);
 		} else {
 			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value, lower, upper ,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( GrayU8 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( InterleavedU8 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( GrayS8 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( InterleavedS8 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( GrayU16 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( InterleavedU16 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( GrayS16 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( InterleavedS16 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( GrayS32 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( InterleavedS32 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( GrayS64 input , float value , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts a scalar value from each element. Both input and output images can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param value What is subtracted from each element.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( InterleavedS64 input , float value , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_A(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_A(input.data,input.startIndex,input.stride,value , 
 					output.data,output.startIndex,output.stride,
 					input.height,columns);
 		}
@@ -4477,6 +5641,294 @@ public class PixelMath {
 	}
 
 	/**
+	 * Subtracts each element's value from a scalar. Both input and output images can be the same instance.
+	 *
+	 * @param value Scalar value
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( float value , GrayU8 input , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts each element's value from a scalar. Both input and output images can be the same instance.
+	 *
+	 * @param value Scalar value
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( float value , InterleavedU8 input , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts each element's value from a scalar. Both input and output images can be the same instance.
+	 *
+	 * @param value Scalar value
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( float value , GrayS8 input , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts each element's value from a scalar. Both input and output images can be the same instance.
+	 *
+	 * @param value Scalar value
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( float value , InterleavedS8 input , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts each element's value from a scalar. Both input and output images can be the same instance.
+	 *
+	 * @param value Scalar value
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( float value , GrayU16 input , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts each element's value from a scalar. Both input and output images can be the same instance.
+	 *
+	 * @param value Scalar value
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( float value , InterleavedU16 input , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minusU_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts each element's value from a scalar. Both input and output images can be the same instance.
+	 *
+	 * @param value Scalar value
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( float value , GrayS16 input , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts each element's value from a scalar. Both input and output images can be the same instance.
+	 *
+	 * @param value Scalar value
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( float value , InterleavedS16 input , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts each element's value from a scalar. Both input and output images can be the same instance.
+	 *
+	 * @param value Scalar value
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( float value , GrayS32 input , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts each element's value from a scalar. Both input and output images can be the same instance.
+	 *
+	 * @param value Scalar value
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( float value , InterleavedS32 input , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts each element's value from a scalar. Both input and output images can be the same instance.
+	 *
+	 * @param value Scalar value
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( float value , GrayS64 input , GrayF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Subtracts each element's value from a scalar. Both input and output images can be the same instance.
+	 *
+	 * @param value Scalar value
+	 * @param input The input image. Not modified.
+	 * @param output The output image. Modified.
+	 */
+	public static void minus( float value , InterleavedS64 input , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height,input.numBands);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.minus_B(input.data,input.startIndex,input.stride,value , 
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
 	 * Bounds image pixels to be between these two values
 	 * 
 	 * @param img Image
@@ -5075,15 +6527,21 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the log image is written to. Modified.
 	 */
-	public static void log( GrayF32 input , final float val , GrayF32 output ) {
+	public static void log( GrayF32 input , final float val, GrayF32 output ) {
 
 		output.reshape(input.width,input.height);
 
 		int N = input.width*input.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.log(input,val,output);
+			ImplPixelMath_MT.log(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
 		} else {
-			ImplPixelMath.log(input,val,output);
+			ImplPixelMath.log(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
 		}
 	}
 
@@ -5101,9 +6559,15 @@ public class PixelMath {
 
 		int N = input.width*input.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.logSign(input,val,output);
+			ImplPixelMath_MT.logSign(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
 		} else {
-			ImplPixelMath.logSign(input,val,output);
+			ImplPixelMath.logSign(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
 		}
 	}
 
@@ -5120,9 +6584,94 @@ public class PixelMath {
 
 		int N = input.width*input.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.sqrt(input,output);
+			ImplPixelMath_MT.sqrt(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
 		} else {
-			ImplPixelMath.sqrt(input,output);
+			ImplPixelMath.sqrt(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
+		}
+	}
+
+	/**
+	 * Sets each pixel in the output image to log( val + input(x,y)) of the input image.
+	 * Both the input and output image can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the log image is written to. Modified.
+	 */
+	public static void log( InterleavedF32 input , final float val, InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.log(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.log(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Sets each pixel in the output image to sgn*log( val + sgn*input(x,y)) of the input image.
+	 * where sng is the sign of input(x,y). 
+	 * Both the input and output image can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the log image is written to. Modified.
+	 */
+	public static void logSign( InterleavedF32 input , final float val, InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.logSign(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.logSign(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Computes the square root of each pixel in the input image. Both the input and output image can be the
+	 * same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the sqrt() image is written to. Can be same as input. Modified.
+	 */
+	public static void sqrt( InterleavedF32 input , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.sqrt(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.sqrt(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -5217,15 +6766,21 @@ public class PixelMath {
 	 * @param input The input image. Not modified.
 	 * @param output Where the log image is written to. Modified.
 	 */
-	public static void log( GrayF64 input , final double val , GrayF64 output ) {
+	public static void log( GrayF64 input , final double val, GrayF64 output ) {
 
 		output.reshape(input.width,input.height);
 
 		int N = input.width*input.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.log(input,val,output);
+			ImplPixelMath_MT.log(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
 		} else {
-			ImplPixelMath.log(input,val,output);
+			ImplPixelMath.log(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
 		}
 	}
 
@@ -5243,9 +6798,15 @@ public class PixelMath {
 
 		int N = input.width*input.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.logSign(input,val,output);
+			ImplPixelMath_MT.logSign(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
 		} else {
-			ImplPixelMath.logSign(input,val,output);
+			ImplPixelMath.logSign(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
 		}
 	}
 
@@ -5262,9 +6823,94 @@ public class PixelMath {
 
 		int N = input.width*input.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.sqrt(input,output);
+			ImplPixelMath_MT.sqrt(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
 		} else {
-			ImplPixelMath.sqrt(input,output);
+			ImplPixelMath.sqrt(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
+		}
+	}
+
+	/**
+	 * Sets each pixel in the output image to log( val + input(x,y)) of the input image.
+	 * Both the input and output image can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the log image is written to. Modified.
+	 */
+	public static void log( InterleavedF64 input , final double val, InterleavedF64 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.log(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.log(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Sets each pixel in the output image to sgn*log( val + sgn*input(x,y)) of the input image.
+	 * where sng is the sign of input(x,y). 
+	 * Both the input and output image can be the same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the log image is written to. Modified.
+	 */
+	public static void logSign( InterleavedF64 input , final double val, InterleavedF64 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.logSign(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.logSign(
+					input.data,input.startIndex,input.stride,val,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		}
+	}
+
+	/**
+	 * Computes the square root of each pixel in the input image. Both the input and output image can be the
+	 * same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the sqrt() image is written to. Can be same as input. Modified.
+	 */
+	public static void sqrt( InterleavedF64 input , InterleavedF64 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.sqrt(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.sqrt(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -5281,9 +6927,41 @@ public class PixelMath {
 
 		int N = input.width*input.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.pow2(input,output);
+			ImplPixelMath_MT.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
 		} else {
-			ImplPixelMath.pow2(input,output);
+			ImplPixelMath.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
+		}
+	}
+
+	/**
+	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the 
+	 * same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the pow2 image is written to. Can be same as input. Modified.
+	 */
+	public static void pow2( InterleavedU8 input , InterleavedU16 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -5320,9 +6998,41 @@ public class PixelMath {
 
 		int N = input.width*input.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.pow2(input,output);
+			ImplPixelMath_MT.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
 		} else {
-			ImplPixelMath.pow2(input,output);
+			ImplPixelMath.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
+		}
+	}
+
+	/**
+	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the 
+	 * same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the pow2 image is written to. Can be same as input. Modified.
+	 */
+	public static void pow2( InterleavedU16 input , InterleavedS32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -5359,9 +7069,41 @@ public class PixelMath {
 
 		int N = input.width*input.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.pow2(input,output);
+			ImplPixelMath_MT.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
 		} else {
-			ImplPixelMath.pow2(input,output);
+			ImplPixelMath.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
+		}
+	}
+
+	/**
+	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the 
+	 * same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the pow2 image is written to. Can be same as input. Modified.
+	 */
+	public static void pow2( InterleavedF32 input , InterleavedF32 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 
@@ -5398,9 +7140,41 @@ public class PixelMath {
 
 		int N = input.width*input.height;
 		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
-			ImplPixelMath_MT.pow2(input,output);
+			ImplPixelMath_MT.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
 		} else {
-			ImplPixelMath.pow2(input,output);
+			ImplPixelMath.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,input.width);
+		}
+	}
+
+	/**
+	 * Raises each pixel in the input image to the power of two. Both the input and output image can be the 
+	 * same instance.
+	 *
+	 * @param input The input image. Not modified.
+	 * @param output Where the pow2 image is written to. Can be same as input. Modified.
+	 */
+	public static void pow2( InterleavedF64 input , InterleavedF64 output ) {
+
+		output.reshape(input.width,input.height);
+
+		int columns = input.width*input.numBands;
+		int N = input.width*input.height;
+		if( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {
+			ImplPixelMath_MT.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
+		} else {
+			ImplPixelMath.pow2(
+					input.data,input.startIndex,input.stride,
+					output.data,output.startIndex,output.stride,
+					input.height,columns);
 		}
 	}
 

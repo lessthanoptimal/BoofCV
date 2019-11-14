@@ -55,7 +55,7 @@ public class SelectDisparitySubpixel {
 		@Override
 		protected void setDisparity(int index, int disparityValue) {
 
-			if( disparityValue <= 0 || disparityValue >= localMax-1) {
+			if( disparityValue <= 0 || disparityValue >= localDisparityMax -1) {
 				imageDisparity.data[index] = disparityValue;
 			} else {
 				int c0 = columnScore[disparityValue-1];
@@ -94,7 +94,7 @@ public class SelectDisparitySubpixel {
 		@Override
 		protected void setDisparity(int index, int disparityValue) {
 
-			if( disparityValue <= 0 || disparityValue >= localMax-1) {
+			if( disparityValue <= 0 || disparityValue >= localDisparityMax -1) {
 				imageDisparity.data[index] = disparityValue;
 			} else {
 				float c0 = columnScore[disparityValue-1];

@@ -43,6 +43,7 @@ Version : 0.35
          - Get working with integer images
          - Validate BM-5 with naive implementation. I'm not confident the normalization for rows
          - Benchmark to see if other algorithms got slower because of this
+         - Improve filtering when stdev is low
 - SFM
   * Projective camera with lens distortion
   * TODO Stereo VO Quad - Now uses trifocal tensor and sparse bundle adjustment

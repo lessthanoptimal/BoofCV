@@ -37,6 +37,7 @@ import static boofcv.generate.AutoTypeImage.*;
 public class GeneratePixelMath extends CodeGeneratorBase {
 
 	private AutoTypeImage input;
+	private AutoTypeImage output;
 
 	ImageType.Family families[] = new ImageType.Family[]{ImageType.Family.GRAY,ImageType.Family.INTERLEAVED};
 
@@ -57,6 +58,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 		for( TwoTemplate t : listTwo ) {
 			print_img_scalar(t,false);
 			print_img_scalar(t,true);
+			print_img_scalar_Int_to_Float(t);
 		}
 
 		printAll();
@@ -108,11 +110,13 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 			printSubtractTwoImages(types[i],outputsSub[i]);
 
 			if( !types[i].isInteger() ) {
-				printMultTwoImages(types[i],types[i]);
-				printDivTwoImages(types[i],types[i]);
-				printLog(types[i],types[i]);
-				printLogSign(types[i],types[i]);
-				printSqrt(types[i], types[i]);
+				printMultTwoImages(ImageType.Family.GRAY,types[i],types[i]);
+				printDivTwoImages(ImageType.Family.GRAY,types[i],types[i]);
+				for( ImageType.Family f : families ) {
+					printLog(f,types[i],types[i]);
+					printLogSign(f,types[i],types[i]);
+					printSqrt(f,types[i], types[i]);
+				}
 			}
 		}
 
@@ -123,7 +127,8 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 	}
 
 	private void increaseBits( AutoTypeImage a , AutoTypeImage b ) {
-		printPow2(a,b);
+		printPow2(ImageType.Family.GRAY,a,b);
+		printPow2(ImageType.Family.INTERLEAVED,a,b);
 		printStdev(a,b);
 	}
 
@@ -193,82 +198,105 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 
 		for( AutoTypeImage t : template.getTypes() ) {
 			input = t;
-			String variableType;
-			if( template.isScaleOp() )
-				variableType = input.isInteger() ? "double" : input.getSumType();
-			else
-				variableType = input.getSumType();
+			output = t;
 
-			String funcArrayName = input.isSigned() ? funcName : funcName+"U";
-			funcArrayName += template.isImageFirst() ? "_A" : "_B";
+			print_img_scalar(template, bounded, funcName, varName);
+		}
+	}
 
-			for (ImageType.Family family : families) {
-				String inputName, columns, reshape;
-				if (family == ImageType.Family.INTERLEAVED) {
-					inputName = input.getInterleavedName();
-					columns = "input.width*input.numBands";
-					reshape = "output.reshape(input.width,input.height,input.numBands);";
+	private void print_img_scalar_Int_to_Float( TwoTemplate template )
+	{
+		String funcName = template.getName();
+		String varName = template.getVariableName();
+
+		for( AutoTypeImage t : template.getTypes() ) {
+			// float to float is already covered
+			if( !t.isInteger() )
+				continue;
+			input = t;
+			output = F32;
+			print_img_scalar(template, false, funcName, varName);
+		}
+	}
+
+	private void print_img_scalar(TwoTemplate template, boolean bounded, String funcName, String varName) {
+		String variableType;
+		if( template.isScaleOp() )
+			variableType = output.isInteger() ? "double" : output.getSumType();
+		else
+			variableType = output.getSumType();
+
+		String funcArrayName = input.isSigned() ? funcName : funcName+"U";
+		funcArrayName += template.isImageFirst() ? "_A" : "_B";
+
+		for (ImageType.Family family : families) {
+			String inputName, outputName, columns, reshape;
+			if (family == ImageType.Family.INTERLEAVED) {
+				inputName = input.getInterleavedName();
+				outputName = output.getInterleavedName();
+				columns = "input.width*input.numBands";
+				reshape = "output.reshape(input.width,input.height,input.numBands);";
+			} else {
+				inputName = input.getSingleBandName();
+				outputName = output.getSingleBandName();
+				columns = "input.width";
+				reshape = "output.reshape(input.width,input.height);";
+			}
+
+			if( bounded ) {
+				String sumType = input.getSumType();
+
+				String prototype;
+				if (template.isImageFirst()) {
+					prototype = "( " + inputName + " input , " + variableType + " " + varName +
+							" , " + sumType +" lower , " +sumType+ " upper , " + outputName + " output )";
 				} else {
-					inputName = input.getSingleBandName();
-					columns = "input.width";
-					reshape = "output.reshape(input.width,input.height);";
+					prototype = "( " + variableType + " " + varName + " , " + inputName + " input , " +
+							sumType +" lower , " +sumType+ " upper , " + outputName + " output )";
 				}
 
-				if( bounded ) {
-					String sumType = input.getSumType();
-
-					String prototype;
-					if (template.isImageFirst()) {
-						prototype = "( " + inputName + " input , " + variableType + " " + varName +
-								" , " + sumType +" lower , " +sumType+ " upper , " + inputName + " output )";
-					} else {
-						prototype = "( " + variableType + " " + varName + " , " + inputName + " input , " +
-								sumType +" lower , " +sumType+ " upper , " + inputName + " output )";
-					}
-
-					out.println(template.getJavaDoc());
-					out.println("\tpublic static void " + funcName + prototype + " {\n" +
-							"\n" +
-							"\t\t" + reshape+ "\n" +
-							"\n" +
-							"\t\tint columns = " + columns + ";\n" +
-							"\t\tint N = input.width*input.height;\n" +
-							"\t\tif( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {\n" +
-							"\t\t\tImplPixelMath_MT." + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + ", lower, upper ,\n" +
-							"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
-							"\t\t\t\t\tinput.height,columns);\n" +
-							"\t\t} else {\n" +
-							"\t\t\tImplPixelMath." + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + ", lower, upper ,\n" +
-							"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
-							"\t\t\t\t\tinput.height,columns);\n" +
-							"\t\t}\n" +
-							"\t}\n");
+				out.println(template.getJavaDoc());
+				out.println("\tpublic static void " + funcName + prototype + " {\n" +
+						"\n" +
+						"\t\t" + reshape+ "\n" +
+						"\n" +
+						"\t\tint columns = " + columns + ";\n" +
+						"\t\tint N = input.width*input.height;\n" +
+						"\t\tif( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {\n" +
+						"\t\t\tImplPixelMath_MT." + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + ", lower, upper ,\n" +
+						"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
+						"\t\t\t\t\tinput.height,columns);\n" +
+						"\t\t} else {\n" +
+						"\t\t\tImplPixelMath." + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + ", lower, upper ,\n" +
+						"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
+						"\t\t\t\t\tinput.height,columns);\n" +
+						"\t\t}\n" +
+						"\t}\n");
+			} else {
+				String prototype;
+				if (template.isImageFirst()) {
+					prototype = "( " + inputName + " input , " + variableType + " " + varName + " , " + outputName + " output )";
 				} else {
-					String prototype;
-					if (template.isImageFirst()) {
-						prototype = "( " + inputName + " input , " + variableType + " " + varName + " , " + inputName + " output )";
-					} else {
-						prototype = "( " + variableType + " " + varName + " , " + inputName + " input , " + inputName + " output )";
-					}
-
-					out.println(template.getJavaDoc());
-					out.println("\tpublic static void " + funcName + prototype + " {\n" +
-							"\n" +
-							"\t\t" + reshape+ "\n" +
-							"\n" +
-							"\t\tint columns = " + columns + ";\n" +
-							"\t\tint N = input.width*input.height;\n" +
-							"\t\tif( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {\n" +
-							"\t\t\tImplPixelMath_MT." + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + " , \n" +
-							"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
-							"\t\t\t\t\tinput.height,columns);\n" +
-							"\t\t} else {\n" +
-							"\t\t\tImplPixelMath." + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + " , \n" +
-							"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
-							"\t\t\t\t\tinput.height,columns);\n" +
-							"\t\t}\n" +
-							"\t}\n");
+					prototype = "( " + variableType + " " + varName + " , " + inputName + " input , " + outputName + " output )";
 				}
+
+				out.println(template.getJavaDoc());
+				out.println("\tpublic static void " + funcName + prototype + " {\n" +
+						"\n" +
+						"\t\t" + reshape+ "\n" +
+						"\n" +
+						"\t\tint columns = " + columns + ";\n" +
+						"\t\tint N = input.width*input.height;\n" +
+						"\t\tif( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {\n" +
+						"\t\t\tImplPixelMath_MT." + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + " , \n" +
+						"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
+						"\t\t\t\t\tinput.height,columns);\n" +
+						"\t\t} else {\n" +
+						"\t\t\tImplPixelMath." + funcArrayName + "(input.data,input.startIndex,input.stride," + varName + " , \n" +
+						"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
+						"\t\t\t\t\tinput.height,columns);\n" +
+						"\t\t}\n" +
+						"\t}\n");
 			}
 		}
 	}
@@ -359,7 +387,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public void printMultTwoImages( AutoTypeImage typeIn , AutoTypeImage typeOut  ) {
+	public void printMultTwoImages( ImageType.Family f , AutoTypeImage typeIn , AutoTypeImage typeOut  ) {
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
 				"\t * Performs pixel-wise multiplication<br>\n" +
@@ -369,7 +397,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param imgB Input image. Not modified.\n" +
 				"\t * @param output Output image. Can be either input. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void multiply( "+typeIn.getSingleBandName()+" imgA , "+typeIn.getSingleBandName()+" imgB , "+typeOut.getSingleBandName()+" output ) {\n" +
+				"\tpublic static void multiply( "+typeIn.getName(f)+" imgA , "+typeIn.getName(f)+" imgB , "+typeOut.getName(f)+" output ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
 				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
 				"\n" +
@@ -382,7 +410,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public void printDivTwoImages( AutoTypeImage typeIn , AutoTypeImage typeOut  ) {
+	public void printDivTwoImages( ImageType.Family f , AutoTypeImage typeIn , AutoTypeImage typeOut  ) {
 
 		out.print("\t/**\n" +
 				"\t * <p>\n" +
@@ -393,7 +421,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t * @param imgB Input image. Not modified.\n" +
 				"\t * @param output Output image. Can be either input. Modified.\n" +
 				"\t */\n" +
-				"\tpublic static void divide( "+typeIn.getSingleBandName()+" imgA , "+typeIn.getSingleBandName()+" imgB , "+typeOut.getSingleBandName()+" output ) {\n" +
+				"\tpublic static void divide( "+typeIn.getName(f)+" imgA , "+typeIn.getName(f)+" imgB , "+typeOut.getName(f)+" output ) {\n" +
 				"\t\tInputSanityCheck.checkSameShape(imgA,imgB);\n" +
 				"\t\toutput.reshape(imgA.width,imgA.height);\n" +
 				"\n" +
@@ -406,7 +434,7 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public void printLog( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+	public void printLog( ImageType.Family f , AutoTypeImage typeIn , AutoTypeImage typeOut ) {
 		String sumType = typeIn.getSumType();
 		out.print("\t/**\n" +
 				"\t * Sets each pixel in the output image to log( val + input(x,y)) of the input image.\n" +
@@ -414,21 +442,11 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param output Where the log image is written to. Modified.\n" +
-				"\t */\n" +
-				"\tpublic static void log( "+typeIn.getSingleBandName()+" input , final "+sumType+" val , "+typeOut.getSingleBandName()+" output ) {\n" +
-				"\n" +
-				"\t\toutput.reshape(input.width,input.height);\n" +
-				"\n" +
-				"\t\tint N = input.width*input.height;\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {\n" +
-				"\t\t\tImplPixelMath_MT.log(input,val,output);\n" +
-				"\t\t} else {\n" +
-				"\t\t\tImplPixelMath.log(input,val,output);\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
+				"\t */\n");
+		printNonImageVal("log",f,typeIn,typeOut);
 	}
 
-	public void printLogSign( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+	public void printLogSign( ImageType.Family f , AutoTypeImage typeIn , AutoTypeImage typeOut ) {
 		String sumType = typeIn.getSumType();
 		out.print("\t/**\n" +
 				"\t * Sets each pixel in the output image to sgn*log( val + sgn*input(x,y)) of the input image.\n" +
@@ -437,21 +455,11 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param output Where the log image is written to. Modified.\n" +
-				"\t */\n" +
-				"\tpublic static void logSign( "+typeIn.getSingleBandName()+" input , final "+sumType+" val, "+typeOut.getSingleBandName()+" output ) {\n" +
-				"\n" +
-				"\t\toutput.reshape(input.width,input.height);\n" +
-				"\n" +
-				"\t\tint N = input.width*input.height;\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {\n" +
-				"\t\t\tImplPixelMath_MT.logSign(input,val,output);\n" +
-				"\t\t} else {\n" +
-				"\t\t\tImplPixelMath.logSign(input,val,output);\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
+				"\t */\n");
+				printNonImageVal("logSign",f,typeIn,typeOut);
 	}
 
-	public void printPow2( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+	public void printPow2(  ImageType.Family f , AutoTypeImage typeIn , AutoTypeImage typeOut ) {
 
 		out.print("\t/**\n" +
 				"\t * Raises each pixel in the input image to the power of two. Both the input and output image can be the \n" +
@@ -459,21 +467,11 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param output Where the pow2 image is written to. Can be same as input. Modified.\n" +
-				"\t */\n" +
-				"\tpublic static void pow2( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
-				"\n" +
-				"\t\toutput.reshape(input.width,input.height);\n" +
-				"\n" +
-				"\t\tint N = input.width*input.height;\n" +
-				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {\n" +
-				"\t\t\tImplPixelMath_MT.pow2(input,output);\n" +
-				"\t\t} else {\n" +
-				"\t\t\tImplPixelMath.pow2(input,output);\n" +
-				"\t\t}\n" +
-				"\t}\n\n");
+				"\t */\n");
+		printNonImage("pow2",f,typeIn,typeOut);
 	}
 
-	public void printSqrt( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+	public void printSqrt( ImageType.Family f , AutoTypeImage typeIn , AutoTypeImage typeOut ) {
 
 		out.print("\t/**\n" +
 				"\t * Computes the square root of each pixel in the input image. Both the input and output image can be the\n" +
@@ -481,18 +479,55 @@ public class GeneratePixelMath extends CodeGeneratorBase {
 				"\t *\n" +
 				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param output Where the sqrt() image is written to. Can be same as input. Modified.\n" +
-				"\t */\n" +
-				"\tpublic static void sqrt( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
+				"\t */\n");
+		printNonImage("sqrt",f,typeIn,typeOut);
+	}
+
+	public void printNonImage( String op , ImageType.Family f , AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+		String columns = f == ImageType.Family.GRAY ? "" : "\t\tint columns = input.width*input.numBands;\n";
+		String width = f == ImageType.Family.GRAY ? "input.width" : "columns";
+		out.print(
+				"\tpublic static void "+op+"( "+typeIn.getName(f)+" input , "+typeOut.getName(f)+" output ) {\n" +
 				"\n" +
 				"\t\toutput.reshape(input.width,input.height);\n" +
 				"\n" +
+				columns +
 				"\t\tint N = input.width*input.height;\n" +
 				"\t\tif( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {\n" +
-				"\t\t\tImplPixelMath_MT.sqrt(input,output);\n" +
+				"\t\t\tImplPixelMath_MT."+op+"(\n" +
+				"\t\t\t\t\tinput.data,input.startIndex,input.stride,\n" +
+				"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
+				"\t\t\t\t\tinput.height,"+width+");\n"+
 				"\t\t} else {\n" +
-				"\t\t\tImplPixelMath.sqrt(input,output);\n" +
+				"\t\t\tImplPixelMath."+op+"(\n" +
+				"\t\t\t\t\tinput.data,input.startIndex,input.stride,\n" +
+				"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
+				"\t\t\t\t\tinput.height,"+width+");\n"+
 				"\t\t}\n" +
 				"\t}\n\n");
+	}
+	public void printNonImageVal( String op , ImageType.Family f , AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+		String columns = f == ImageType.Family.GRAY ? "" : "\t\tint columns = input.width*input.numBands;\n";
+		String width = f == ImageType.Family.GRAY ? "input.width" : "columns";
+		out.print(
+				"\tpublic static void "+op+"( "+typeIn.getName(f)+" input , final "+typeIn.getSumType()+" val, "+typeOut.getName(f)+" output ) {\n" +
+						"\n" +
+						"\t\toutput.reshape(input.width,input.height);\n" +
+						"\n" +
+						columns +
+						"\t\tint N = input.width*input.height;\n" +
+						"\t\tif( BoofConcurrency.USE_CONCURRENT && N > SMALL_IMAGE) {\n" +
+						"\t\t\tImplPixelMath_MT."+op+"(\n" +
+						"\t\t\t\t\tinput.data,input.startIndex,input.stride,val,\n" +
+						"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
+						"\t\t\t\t\tinput.height,"+width+");\n"+
+						"\t\t} else {\n" +
+						"\t\t\tImplPixelMath."+op+"(\n" +
+						"\t\t\t\t\tinput.data,input.startIndex,input.stride,val,\n" +
+						"\t\t\t\t\toutput.data,output.startIndex,output.stride,\n" +
+						"\t\t\t\t\tinput.height,"+width+");\n"+
+						"\t\t}\n" +
+						"\t}\n\n");
 	}
 
 	public void printStdev( AutoTypeImage typeMean , AutoTypeImage typePow2 ) {

@@ -42,7 +42,7 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 
 	@Test
 	void performTests() {
-		performTests(136);
+		performTests(172);
 	}
 
 	@Override
@@ -149,6 +149,23 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 		}
 	}
 
+	private Object[][] elementWiseInputs(Class[] inputTypes  ) {
+		if( inputTypes.length == 8 ) {
+			Object[] inputs = new Object[8];
+			inputs[0] = randomArray(inputTypes[0], 200, rand);
+			inputs[1] = 1;
+			inputs[2] = 10;
+			inputs[3] = randomArray(inputTypes[3], 200, rand);
+			inputs[4] = 0;
+			inputs[5] = 11;
+			inputs[6] = 12;
+			inputs[7] = 9;
+			return new Object[][]{inputs};
+		} else {
+			throw new IllegalArgumentException("Unexpected");
+		}
+	}
+
 	private Object[][] defaultInputs( Class[] inputTypes , String name ) {
 		if( inputTypes.length == 3 ) {
 			boolean allImages = true;
@@ -164,6 +181,8 @@ class TestImplPixelMath_MT extends CompareIdenticalFunctions  {
 		} else if( inputTypes.length == 9 || inputTypes.length == 11 ) {
 			double value = name.startsWith("divide") ? 1.5 : 20;
 			return elementWiseInputs(inputTypes,value);
+		} else if( inputTypes.length == 8 ) {
+			return elementWiseInputs(inputTypes);
 		}
 		return null;
 	}

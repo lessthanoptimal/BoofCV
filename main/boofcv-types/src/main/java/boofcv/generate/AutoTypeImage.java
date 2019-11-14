@@ -206,6 +206,17 @@ public enum AutoTypeImage {
 		return imageSingleName;
 	}
 
+	public String getName( ImageType.Family family ) {
+		switch( family ) {
+			case GRAY:
+				return getSingleBandName();
+			case INTERLEAVED:
+				return getInterleavedName();
+			default:
+				throw new IllegalArgumentException("Not supported");
+		}
+	}
+
 	public String getDataType() {
 		return dataType;
 	}

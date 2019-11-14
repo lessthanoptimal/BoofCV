@@ -72,7 +72,7 @@ public abstract class ImplSelectWithChecksBase_F32<T extends ImageGray<T>>
 		for( int col = minDisparity; col <= imageWidth-regionWidth; col++ ) {
 			// Determine the number of disparities that can be considered at this column
 			// make sure the disparity search doesn't go outside the image border
-			localMax = maxDisparityAtColumnL2R(col);
+			localDisparityMax = maxDisparityAtColumnL2R(col);
 
 			// index of the element being examined in the score array
 			int indexScore = col - minDisparity;
@@ -82,7 +82,7 @@ public abstract class ImplSelectWithChecksBase_F32<T extends ImageGray<T>>
 			float scoreBest = columnScore[0] = scores[indexScore];
 			indexScore += imageWidth;
 
-			for( int i = 1; i < localMax; i++ ,indexScore += imageWidth) {
+			for(int i = 1; i < localDisparityMax; i++ ,indexScore += imageWidth) {
 				float s = scores[indexScore];
 				columnScore[i] = s;
 				if( s < scoreBest ) {
@@ -106,7 +106,7 @@ public abstract class ImplSelectWithChecksBase_F32<T extends ImageGray<T>>
 			}
 			// test to see if the region lacks sufficient texture if:
 			// 1) not already eliminated 2) sufficient disparities to check, 3) it's activated
-			if( textureThreshold > 0 && bestDisparity != invalidDisparity && localMax >= 3 ) {
+			if( textureThreshold > 0 && bestDisparity != invalidDisparity && localDisparityMax >= 3 ) {
 				// find the second best disparity value and exclude its neighbors
 				float secondBest = Float.MAX_VALUE;
 				for( int i = 0; i < bestDisparity-1; i++ ) {
@@ -114,7 +114,7 @@ public abstract class ImplSelectWithChecksBase_F32<T extends ImageGray<T>>
 						secondBest = columnScore[i];
 					}
 				}
-				for( int i = bestDisparity+2; i < localMax; i++ ) {
+				for(int i = bestDisparity+2; i < localDisparityMax; i++ ) {
 					if( columnScore[i] < secondBest ) {
 						secondBest = columnScore[i];
 					}

@@ -74,7 +74,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.abs(input[indexSrc]);
+				output[indexDst] = (int)Math.abs(input[indexSrc]);
 			}
 		});
 	}
@@ -89,7 +89,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.abs(input[indexSrc]);
+				output[indexDst] = (long)Math.abs(input[indexSrc]);
 			}
 		});
 	}
@@ -104,7 +104,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.abs(input[indexSrc]);
+				output[indexDst] = (float)Math.abs(input[indexSrc]);
 			}
 		});
 	}
@@ -119,7 +119,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.abs(input[indexSrc]);
+				output[indexDst] = (double)Math.abs(input[indexSrc]);
 			}
 		});
 	}
@@ -164,7 +164,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = -input[indexSrc];
+				output[indexDst] = (int)-input[indexSrc];
 			}
 		});
 	}
@@ -179,7 +179,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = -input[indexSrc];
+				output[indexDst] = (long)-input[indexSrc];
 			}
 		});
 	}
@@ -194,7 +194,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = -input[indexSrc];
+				output[indexDst] = (float)-input[indexSrc];
 			}
 		});
 	}
@@ -209,7 +209,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = -input[indexSrc];
+				output[indexDst] = (double)-input[indexSrc];
 			}
 		});
 	}
@@ -494,6 +494,102 @@ public class ImplPixelMath_MT {
 		});
 	}
 
+	public static void multiplyU_A( byte[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = Math.round((input[indexSrc] & 0xFF) * value);
+			}
+		});
+	}
+
+	public static void multiply_A( byte[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = Math.round((input[indexSrc] ) * value);
+			}
+		});
+	}
+
+	public static void multiplyU_A( short[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = Math.round((input[indexSrc] & 0xFFFF) * value);
+			}
+		});
+	}
+
+	public static void multiply_A( short[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = Math.round((input[indexSrc] ) * value);
+			}
+		});
+	}
+
+	public static void multiply_A( int[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = Math.round((input[indexSrc] ) * value);
+			}
+		});
+	}
+
+	public static void multiply_A( long[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = Math.round((input[indexSrc] ) * value);
+			}
+		});
+	}
+
 	public static void divideU_A( byte[] input , int inputStart , int inputStride , 
 							   double denominator ,
 							   byte[] output , int outputStart , int outputStride ,
@@ -770,6 +866,102 @@ public class ImplPixelMath_MT {
 				if( val < lower ) val = lower;
 				if( val > upper ) val = upper;
 				output[indexDst] = val;
+			}
+		});
+	}
+
+	public static void divideU_A( byte[] input , int inputStart , int inputStride , 
+							   float denominator ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = Math.round((input[indexSrc] & 0xFF) / denominator);
+			}
+		});
+	}
+
+	public static void divide_A( byte[] input , int inputStart , int inputStride , 
+							   float denominator ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = Math.round((input[indexSrc] ) / denominator);
+			}
+		});
+	}
+
+	public static void divideU_A( short[] input , int inputStart , int inputStride , 
+							   float denominator ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = Math.round((input[indexSrc] & 0xFFFF) / denominator);
+			}
+		});
+	}
+
+	public static void divide_A( short[] input , int inputStart , int inputStride , 
+							   float denominator ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = Math.round((input[indexSrc] ) / denominator);
+			}
+		});
+	}
+
+	public static void divide_A( int[] input , int inputStart , int inputStride , 
+							   float denominator ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = Math.round((input[indexSrc] ) / denominator);
+			}
+		});
+	}
+
+	public static void divide_A( long[] input , int inputStart , int inputStride , 
+							   float denominator ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = Math.round((input[indexSrc] ) / denominator);
 			}
 		});
 	}
@@ -1054,6 +1246,102 @@ public class ImplPixelMath_MT {
 		});
 	}
 
+	public static void plusU_A( byte[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = ((input[indexSrc] & 0xFF) + value);
+			}
+		});
+	}
+
+	public static void plus_A( byte[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = ((input[indexSrc] ) + value);
+			}
+		});
+	}
+
+	public static void plusU_A( short[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = ((input[indexSrc] & 0xFFFF) + value);
+			}
+		});
+	}
+
+	public static void plus_A( short[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = ((input[indexSrc] ) + value);
+			}
+		});
+	}
+
+	public static void plus_A( int[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = ((input[indexSrc] ) + value);
+			}
+		});
+	}
+
+	public static void plus_A( long[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = ((input[indexSrc] ) + value);
+			}
+		});
+	}
+
 	public static void minusU_A( byte[] input , int inputStart , int inputStride , 
 							   int value ,
 							   byte[] output , int outputStart , int outputStride ,
@@ -1334,6 +1622,102 @@ public class ImplPixelMath_MT {
 		});
 	}
 
+	public static void minusU_A( byte[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = ((input[indexSrc] & 0xFF) - value);
+			}
+		});
+	}
+
+	public static void minus_A( byte[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = ((input[indexSrc] ) - value);
+			}
+		});
+	}
+
+	public static void minusU_A( short[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = ((input[indexSrc] & 0xFFFF) - value);
+			}
+		});
+	}
+
+	public static void minus_A( short[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = ((input[indexSrc] ) - value);
+			}
+		});
+	}
+
+	public static void minus_A( int[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = ((input[indexSrc] ) - value);
+			}
+		});
+	}
+
+	public static void minus_A( long[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = ((input[indexSrc] ) - value);
+			}
+		});
+	}
+
 	public static void minusU_B( byte[] input , int inputStart , int inputStride , 
 							   int value ,
 							   byte[] output , int outputStart , int outputStride ,
@@ -1610,6 +1994,102 @@ public class ImplPixelMath_MT {
 				if( val < lower ) val = lower;
 				if( val > upper ) val = upper;
 				output[indexDst] = val;
+			}
+		});
+	}
+
+	public static void minusU_B( byte[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = (value - (input[indexSrc] & 0xFF));
+			}
+		});
+	}
+
+	public static void minus_B( byte[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = (value - (input[indexSrc] ));
+			}
+		});
+	}
+
+	public static void minusU_B( short[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = (value - (input[indexSrc] & 0xFFFF));
+			}
+		});
+	}
+
+	public static void minus_B( short[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = (value - (input[indexSrc] ));
+			}
+		});
+	}
+
+	public static void minus_B( int[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = (value - (input[indexSrc] ));
+			}
+		});
+	}
+
+	public static void minus_B( long[] input , int inputStart , int inputStride , 
+							   float value ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = (value - (input[indexSrc] ));
 			}
 		});
 	}
@@ -2206,48 +2686,6 @@ public class ImplPixelMath_MT {
 		});
 	}
 
-	public static void log( GrayF32 input , final float val , GrayF32 output ) {
-		BoofConcurrency.loopFor(0,input.height,y->{
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output.data[indexDst] = (float)Math.log(val + input.data[indexSrc]);
-			}
-		});
-	}
-
-	public static void logSign( GrayF32 input , final float val , GrayF32 output ) {
-		BoofConcurrency.loopFor(0,input.height,y->{
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				float value = input.data[indexSrc];
-				if( value < 0 ) {
-					output.data[indexDst] = (float)-Math.log(val - value);
-				} else {
-					output.data[indexDst] = (float)Math.log(val + value);
-				}
-			}
-		});
-	}
-
-	public static void sqrt( GrayF32 input , GrayF32 output ) {
-
-		BoofConcurrency.loopFor(0,input.height,y->{
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output.data[indexDst] = (float)Math.sqrt(input.data[indexSrc]);
-			}
-		});
-	}
-
 	public static void add( GrayF64 imgA , GrayF64 imgB , GrayF64 output ) {
 
 		final int h = imgA.getHeight();
@@ -2320,58 +2758,170 @@ public class ImplPixelMath_MT {
 		});
 	}
 
-	public static void log( GrayF64 input , final double val , GrayF64 output ) {
-		BoofConcurrency.loopFor(0,input.height,y->{
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
+	public static void log( float[] input , int inputStart , int inputStride ,
+							   float val ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output.data[indexDst] = Math.log(val + input.data[indexSrc]);
-			}
+				output[indexDst] = (float)Math.log(val + input[indexSrc]);			}
 		});
 	}
 
-	public static void logSign( GrayF64 input , final double val , GrayF64 output ) {
-		BoofConcurrency.loopFor(0,input.height,y->{
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
+	public static void log( double[] input , int inputStart , int inputStride ,
+							   double val ,
+							   double[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				double value = input.data[indexSrc];
+				output[indexDst] = (double)Math.log(val + input[indexSrc]);			}
+		});
+	}
+
+	public static void logSign( float[] input , int inputStart , int inputStride ,
+							   float val ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				float value = input[indexSrc];
 				if( value < 0 ) {
-					output.data[indexDst] = -Math.log(val - value);
+					output[indexDst] = (float)-Math.log(val - value);
 				} else {
-					output.data[indexDst] = Math.log(val + value);
-				}
+					output[indexDst] = (float)Math.log(val + value);
+				}			}
+		});
+	}
+
+	public static void logSign( double[] input , int inputStart , int inputStride ,
+							   double val ,
+							   double[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				double value = input[indexSrc];
+				if( value < 0 ) {
+					output[indexDst] = (double)-Math.log(val - value);
+				} else {
+					output[indexDst] = (double)Math.log(val + value);
+				}			}
+		});
+	}
+
+	public static void sqrt( float[] input , int inputStart , int inputStride ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				output[indexDst] = (float)Math.sqrt(input[indexSrc]);
 			}
 		});
 	}
 
-	public static void sqrt( GrayF64 input , GrayF64 output ) {
-
-		BoofConcurrency.loopFor(0,input.height,y->{
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
+	public static void sqrt( double[] input , int inputStart , int inputStride ,
+							   double[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output.data[indexDst] = Math.sqrt(input.data[indexSrc]);
+				output[indexDst] = (double)Math.sqrt(input[indexSrc]);
 			}
 		});
 	}
 
-	public static void pow2( GrayU8 input , GrayU16 output ) {
-
-		BoofConcurrency.loopFor(0,input.height,y->{
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
+	public static void pow2( byte[] input , int inputStart , int inputStride ,
+							   short[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int v = input.data[indexSrc]& 0xFF;
-				output.data[indexDst] = (short)(v*v);
+				int v = input[indexSrc]& 0xFF;
+				output[indexDst] = (short)(v*v);
+
+			}
+		});
+	}
+
+	public static void pow2( short[] input , int inputStart , int inputStride ,
+							   int[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				int v = input[indexSrc]& 0xFFFF;
+				output[indexDst] = (int)(v*v);
+
+			}
+		});
+	}
+
+	public static void pow2( float[] input , int inputStart , int inputStride ,
+							   float[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				float v = input[indexSrc];
+				output[indexDst] = (float)(v*v);
+
+			}
+		});
+	}
+
+	public static void pow2( double[] input , int inputStart , int inputStride ,
+							   double[] output , int outputStart , int outputStride ,
+							   int rows , int cols )
+	{
+		BoofConcurrency.loopFor(0,rows,y->{
+			int indexSrc = inputStart + y*inputStride;
+			int indexDst = outputStart + y*outputStride;
+			int end = indexSrc + cols;
+
+			for( ; indexSrc < end; indexSrc++ , indexDst++) {
+				double v = input[indexSrc];
+				output[indexDst] = (double)(v*v);
+
 			}
 		});
 	}
@@ -2397,20 +2947,6 @@ public class ImplPixelMath_MT {
 		});
 	}
 
-	public static void pow2( GrayU16 input , GrayS32 output ) {
-
-		BoofConcurrency.loopFor(0,input.height,y->{
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				int v = input.data[indexSrc]& 0xFFFF;
-				output.data[indexDst] = (v*v);
-			}
-		});
-	}
-
 	public static void stdev( GrayU16 mean , GrayS32 pow2 , GrayU16 stdev ) {
 
 		final int h = mean.getHeight();
@@ -2432,20 +2968,6 @@ public class ImplPixelMath_MT {
 		});
 	}
 
-	public static void pow2( GrayF32 input , GrayF32 output ) {
-
-		BoofConcurrency.loopFor(0,input.height,y->{
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				float v = input.data[indexSrc];
-				output.data[indexDst] = (v*v);
-			}
-		});
-	}
-
 	public static void stdev( GrayF32 mean , GrayF32 pow2 , GrayF32 stdev ) {
 
 		final int h = mean.getHeight();
@@ -2463,20 +2985,6 @@ public class ImplPixelMath_MT {
 				float p2 = pow2.data[indexPow];
 
 				stdev.data[indexStdev] = (float)Math.sqrt(Math.max(0,p2-mu*mu));
-			}
-		});
-	}
-
-	public static void pow2( GrayF64 input , GrayF64 output ) {
-
-		BoofConcurrency.loopFor(0,input.height,y->{
-			int indexSrc = input.startIndex + y* input.stride;
-			int indexDst = output.startIndex + y* output.stride;
-			int end = indexSrc + input.width;
-
-			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				double v = input.data[indexSrc];
-				output.data[indexDst] = (v*v);
 			}
 		});
 	}

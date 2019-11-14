@@ -36,6 +36,7 @@ import static boofcv.generate.AutoTypeImage.*;
 public class GenerateImplPixelMath extends CodeGeneratorBase {
 
 	private AutoTypeImage input;
+	private AutoTypeImage output;
 
 	@Override
 	public void generate() throws FileNotFoundException {
@@ -54,6 +55,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		for( TwoTemplate t : listTwo ) {
 			print_img_scalar(t,false);
 			print_img_scalar(t,true);
+			print_img_scalar_Int_to_Float(t);
 		}
 
 		printAll();
@@ -90,8 +92,8 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 			printDiffAbs();
 		}
 
-		AutoTypeImage outputsAdd[] = new AutoTypeImage[]{U16,S16,S32,S32,S32,S64,F32,F64};
-		AutoTypeImage outputsSub[] = new AutoTypeImage[]{I16,S16,S32,S32,S32,S64,F32,F64};
+		AutoTypeImage[] outputsAdd = new AutoTypeImage[]{U16,S16,S32,S32,S32,S64,F32,F64};
+		AutoTypeImage[] outputsSub = new AutoTypeImage[]{I16,S16,S32,S32,S32,S64,F32,F64};
 
 		for( int i = 0; i < types.length; i++ ) {
 			printAddTwoImages(types[i],outputsAdd[i]);
@@ -100,21 +102,41 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 			if( !types[i].isInteger() ) {
 				printMultTwoImages(types[i],types[i]);
 				printDivTwoImages(types[i],types[i]);
-				printLog(types[i],types[i]);
-				printLogSign(types[i], types[i]);
-				printSqrt(types[i], types[i]);
+//				printLog(types[i],types[i]);
+//				printLogSign(types[i], types[i]);
+//				printSqrt(types[i], types[i]);
 			}
 		}
 
-		increaseBits(U8,U16);
-		increaseBits(U16,S32);
-		increaseBits(F32,F32);
-		increaseBits(F64,F64);
+		printVal("log",(in,out)-> "\t\t\t\toutput[indexDst] = ("+in.getDataType()+")Math.log(val + input[indexSrc]);",
+				AutoTypeImage.getFloatingTypes(),AutoTypeImage.getFloatingTypes());
+		printVal("logSign",(in,out)-> {
+			String type = in.getDataType();
+			return "\t\t\t\t"+type+" value = input[indexSrc];\n" +
+					"\t\t\t\tif( value < 0 ) {\n" +
+					"\t\t\t\t\toutput[indexDst] = ("+type+")-Math.log(val - value);\n" +
+					"\t\t\t\t} else {\n" +
+					"\t\t\t\t\toutput[indexDst] = ("+type+")Math.log(val + value);\n" +
+					"\t\t\t\t}";
+				},
+				AutoTypeImage.getFloatingTypes(),AutoTypeImage.getFloatingTypes());
+
+		print("sqrt","Math.sqrt(input[indexSrc])",AutoTypeImage.getFloatingTypes());
+
+		increaseBits(new AutoTypeImage[]{U8,U16,F32,F64},new AutoTypeImage[]{U16,S32,F32,F64});
 	}
 
-	private void increaseBits( AutoTypeImage a , AutoTypeImage b ) {
-		printPow2(a,b);
-		printStdev(a,b);
+	private void increaseBits( AutoTypeImage[] typesSrc, AutoTypeImage[] typesDst ) {
+
+		print("pow2",(in,out)->{
+			String bitwise = in.getBitWise();
+			return "\t\t\t\t"+in.getSumType()+" v = input[indexSrc]"+bitwise+";\n" +
+					"\t\t\t\toutput[indexDst] = ("+out.getDataType()+")(v*v);\n";
+		},typesSrc,typesDst);
+
+		for (int i = 0; i < typesSrc.length; i++) {
+			printStdev(typesSrc[i],typesDst[i]);
+		}
 	}
 
 	private void print( String funcName , String operation , AutoTypeImage types[] ) {
@@ -132,7 +154,65 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 							"\t\t\tint end = indexSrc + cols;\n" +
 							"\n" +
 							"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
-							"\t\t\t\toutput[indexDst] = "+input.getTypeCastFromSum()+operation +";\n" +
+							"\t\t\t\toutput[indexDst] = ("+input.getDataType()+")"+operation +";\n" +
+							"\t\t\t}\n" +
+							"\t\t}\n" +
+							"\t\t//CONCURRENT_ABOVE });\n" +
+							"\t}\n");
+		}
+	}
+
+	private void print( String funcName , PrintString2 operation ,
+						AutoTypeImage[] typesSrc, AutoTypeImage[] typesDst ) {
+		for (int idxType = 0; idxType < typesSrc.length; idxType++) {
+			AutoTypeImage input = typesSrc[idxType];
+			AutoTypeImage output = typesDst[idxType];
+
+			String arrayTypeIn = input.getDataType();
+			String arrayTypeOut = output.getDataType();
+
+			out.println(
+					"\tpublic static void "+funcName+"( "+arrayTypeIn+"[] input , int inputStart , int inputStride ,\n" +
+							"\t\t\t\t\t\t\t   "+arrayTypeOut+"[] output , int outputStart , int outputStride ,\n" +
+							"\t\t\t\t\t\t\t   int rows , int cols )\n" +
+							"\t{\n" +
+							"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
+							"\t\tfor( int y = 0; y < rows; y++ ) {\n" +
+							"\t\t\tint indexSrc = inputStart + y*inputStride;\n" +
+							"\t\t\tint indexDst = outputStart + y*outputStride;\n" +
+							"\t\t\tint end = indexSrc + cols;\n" +
+							"\n" +
+							"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
+							operation.print(input,output)+"\n"+
+							"\t\t\t}\n" +
+							"\t\t}\n" +
+							"\t\t//CONCURRENT_ABOVE });\n" +
+							"\t}\n");
+		}
+	}
+
+	private void printVal( String funcName , PrintString2 operation ,
+						   AutoTypeImage[] typesSrc, AutoTypeImage[] typesDst ) {
+		for (int idxType = 0; idxType < typesSrc.length; idxType++) {
+			AutoTypeImage input = typesSrc[idxType];
+			AutoTypeImage output = typesDst[idxType];
+
+			String arrayType = input.getDataType();
+			String sumType = input.getSumType();
+			out.println(
+					"\tpublic static void "+funcName+"( "+arrayType+"[] input , int inputStart , int inputStride ,\n" +
+							"\t\t\t\t\t\t\t   "+sumType+" val ,\n"+
+							"\t\t\t\t\t\t\t   "+arrayType+"[] output , int outputStart , int outputStride ,\n" +
+							"\t\t\t\t\t\t\t   int rows , int cols )\n" +
+							"\t{\n" +
+							"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
+							"\t\tfor( int y = 0; y < rows; y++ ) {\n" +
+							"\t\t\tint indexSrc = inputStart + y*inputStride;\n" +
+							"\t\t\tint indexDst = outputStart + y*outputStride;\n" +
+							"\t\t\tint end = indexSrc + cols;\n" +
+							"\n" +
+							"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
+							operation.print(input,output) +
 							"\t\t\t}\n" +
 							"\t\t}\n" +
 							"\t\t//CONCURRENT_ABOVE });\n" +
@@ -151,39 +231,59 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 	}
 
 	private void print_img_scalar( TwoTemplate template , boolean bounded ) {
-
 		String funcName = template.getName();
 		String varName = template.getVariableName();
 
 		for( AutoTypeImage t : template.getTypes() ) {
 			input = t;
-			String variableType;
-			if( template.isScaleOp() )
-				variableType = input.isInteger() ? "double" : input.getSumType();
-			else
-				variableType = input.getSumType();
+			output = t;
+			print_img_scalar(template, bounded, funcName, varName);
+		}
+	}
 
-			String funcArrayName = input.isSigned() ? funcName : funcName+"U";
-			funcArrayName += template.isImageFirst() ? "_A" : "_B";
+	private void print_img_scalar_Int_to_Float( TwoTemplate template ) {
+		String funcName = template.getName();
+		String varName = template.getVariableName();
 
-			if( bounded ) {
-				print_array_scalar_bounded(funcArrayName, variableType, varName, template.getOperation());
-			} else {
-				print_array_scalar(funcArrayName, variableType, varName, template.getOperation());
-			}
+		for( AutoTypeImage t : template.getTypes() ) {
+			// float to float is already covered
+			if( !t.isInteger() )
+				continue;
+			input = t;
+			output = F32;
+
+			print_img_scalar(template, false, funcName, varName);
+		}
+	}
+
+	private void print_img_scalar(TwoTemplate template, boolean bounded, String funcName, String varName) {
+		String variableType;
+		if (template.isScaleOp())
+			variableType = output.isInteger() ? "double" : output.getSumType();
+		else
+			variableType = output.getSumType();
+
+		String funcArrayName = input.isSigned() ? funcName : funcName + "U";
+		funcArrayName += template.isImageFirst() ? "_A" : "_B";
+
+		if (bounded) {
+			print_array_scalar_bounded(funcArrayName, variableType, varName, template.getOperation());
+		} else {
+			print_array_scalar(funcArrayName, variableType, varName, template.getOperation());
 		}
 	}
 
 	public void print_array_scalar(String funcName , String varType , String varName , String operation  )
 	{
-		String arrayType = input.getDataType();
+		String arrayTypeSrc = input.getDataType();
+		String arrayTypeDst = output.getDataType();
 
-		String typeCast = varType.equals(input.getDataType()) ? "" : "("+input.getDataType()+")";
+		String typeCast = varType.equals(output.getDataType()) ? "" : "("+output.getDataType()+")";
 
 		out.println(
-				"\tpublic static void "+funcName+"( "+arrayType+"[] input , int inputStart , int inputStride , \n" +
+				"\tpublic static void "+funcName+"( "+arrayTypeSrc+"[] input , int inputStart , int inputStride , \n" +
 				"\t\t\t\t\t\t\t   "+varType+" "+varName+" ,\n" +
-				"\t\t\t\t\t\t\t   "+arrayType+"[] output , int outputStart , int outputStride ,\n" +
+				"\t\t\t\t\t\t\t   "+arrayTypeDst+"[] output , int outputStart , int outputStride ,\n" +
 				"\t\t\t\t\t\t\t   int rows , int cols )\n" +
 				"\t{\n" +
 				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,rows,y->{\n" +
@@ -328,96 +428,96 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 						"\t}\n\n");
 	}
 
-	public void printLog( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
-		String sumType = typeIn.getSumType();
-		String bitWise = typeIn.getBitWise();
-		String typeCast = typeOut != AutoTypeImage.F64 ? "("+typeOut.getDataType()+")" : "";
+//	public void printLog( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+//		String sumType = typeIn.getSumType();
+//		String bitWise = typeIn.getBitWise();
+//		String typeCast = typeOut != AutoTypeImage.F64 ? "("+typeOut.getDataType()+")" : "";
+//
+//		out.print(
+//				"\tpublic static void log( "+typeIn.getSingleBandName()+" input , final "+sumType+" val , "+typeOut.getSingleBandName()+" output ) {\n" +
+//				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
+//				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+//				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
+//				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
+//				"\t\t\tint end = indexSrc + input.width;\n" +
+//				"\n" +
+//				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
+//				"\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.log(val + input.data[indexSrc]"+bitWise+");\n" +
+//				"\t\t\t}\n" +
+//				"\t\t}\n" +
+//				"\t\t//CONCURRENT_ABOVE });\n" +
+//				"\t}\n\n");
+//	}
+//
+//	public void printLogSign( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+//		String sumType = typeIn.getSumType();
+//		String bitWise = typeIn.getBitWise();
+//		String typeCast = typeOut != AutoTypeImage.F64 ? "("+typeOut.getDataType()+")" : "";
+//
+//		out.print(
+//				"\tpublic static void logSign( "+typeIn.getSingleBandName()+" input , final "+sumType+" val , "+typeOut.getSingleBandName()+" output ) {\n" +
+//						"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
+//						"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+//						"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
+//						"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
+//						"\t\t\tint end = indexSrc + input.width;\n" +
+//						"\n" +
+//						"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
+//						"\t\t\t\t"+sumType+" value = input.data[indexSrc]"+bitWise+";\n" +
+//						"\t\t\t\tif( value < 0 ) {\n" +
+//						"\t\t\t\t\toutput.data[indexDst] = "+typeCast+"-Math.log(val - value);\n" +
+//						"\t\t\t\t} else {\n" +
+//						"\t\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.log(val + value);\n" +
+//						"\t\t\t\t}\n" +
+//						"\t\t\t}\n" +
+//						"\t\t}\n" +
+//						"\t\t//CONCURRENT_ABOVE });\n" +
+//						"\t}\n\n");
+//	}
 
-		out.print(
-				"\tpublic static void log( "+typeIn.getSingleBandName()+" input , final "+sumType+" val , "+typeOut.getSingleBandName()+" output ) {\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
-				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
-				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
-				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
-				"\t\t\tint end = indexSrc + input.width;\n" +
-				"\n" +
-				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
-				"\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.log(val + input.data[indexSrc]"+bitWise+");\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t\t//CONCURRENT_ABOVE });\n" +
-				"\t}\n\n");
-	}
+//	public void printPow2( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+//		String bitWise = typeIn.getBitWise();
+//		String sumType = typeIn.getSumType();
+//		String typeCast = typeOut.getDataType().equals(sumType) ? "" : "("+typeOut.getDataType()+")";
+//
+//		out.print(
+//				"\tpublic static void pow2( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
+//				"\n" +
+//				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
+//				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+//				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
+//				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
+//				"\t\t\tint end = indexSrc + input.width;\n" +
+//				"\n" +
+//				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
+//				"\t\t\t\t"+sumType+" v = input.data[indexSrc]"+bitWise+";\n" +
+//				"\t\t\t\toutput.data[indexDst] = "+typeCast+"(v*v);\n" +
+//				"\t\t\t}\n" +
+//				"\t\t}\n" +
+//				"\t\t//CONCURRENT_ABOVE });\n" +
+//				"\t}\n\n");
+//	}
 
-	public void printLogSign( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
-		String sumType = typeIn.getSumType();
-		String bitWise = typeIn.getBitWise();
-		String typeCast = typeOut != AutoTypeImage.F64 ? "("+typeOut.getDataType()+")" : "";
-
-		out.print(
-				"\tpublic static void logSign( "+typeIn.getSingleBandName()+" input , final "+sumType+" val , "+typeOut.getSingleBandName()+" output ) {\n" +
-						"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
-						"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
-						"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
-						"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
-						"\t\t\tint end = indexSrc + input.width;\n" +
-						"\n" +
-						"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
-						"\t\t\t\t"+sumType+" value = input.data[indexSrc]"+bitWise+";\n" +
-						"\t\t\t\tif( value < 0 ) {\n" +
-						"\t\t\t\t\toutput.data[indexDst] = "+typeCast+"-Math.log(val - value);\n" +
-						"\t\t\t\t} else {\n" +
-						"\t\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.log(val + value);\n" +
-						"\t\t\t\t}\n" +
-						"\t\t\t}\n" +
-						"\t\t}\n" +
-						"\t\t//CONCURRENT_ABOVE });\n" +
-						"\t}\n\n");
-	}
-
-	public void printPow2( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
-		String bitWise = typeIn.getBitWise();
-		String sumType = typeIn.getSumType();
-		String typeCast = typeOut.getDataType().equals(sumType) ? "" : "("+typeOut.getDataType()+")";
-
-		out.print(
-				"\tpublic static void pow2( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
-				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
-				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
-				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
-				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
-				"\t\t\tint end = indexSrc + input.width;\n" +
-				"\n" +
-				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
-				"\t\t\t\t"+sumType+" v = input.data[indexSrc]"+bitWise+";\n" +
-				"\t\t\t\toutput.data[indexDst] = "+typeCast+"(v*v);\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t\t//CONCURRENT_ABOVE });\n" +
-				"\t}\n\n");
-	}
-
-	public void printSqrt( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
-		String bitWise = typeIn.getBitWise();
-		String typeCast = typeOut != AutoTypeImage.F64 ? "("+typeOut.getDataType()+")" : "";
-
-		out.print(
-				"\tpublic static void sqrt( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
-				"\n" +
-				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
-				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
-				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
-				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
-				"\t\t\tint end = indexSrc + input.width;\n" +
-				"\n" +
-				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
-				"\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.sqrt(input.data[indexSrc]"+bitWise+");\n" +
-				"\t\t\t}\n" +
-				"\t\t}\n" +
-				"\t\t//CONCURRENT_ABOVE });\n" +
-				"\t}\n\n");
-	}
+//	public void printSqrt( AutoTypeImage typeIn , AutoTypeImage typeOut ) {
+//		String bitWise = typeIn.getBitWise();
+//		String typeCast = typeOut != AutoTypeImage.F64 ? "("+typeOut.getDataType()+")" : "";
+//
+//		out.print(
+//				"\tpublic static void sqrt( "+typeIn.getSingleBandName()+" input , "+typeOut.getSingleBandName()+" output ) {\n" +
+//				"\n" +
+//				"\t\t//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{\n" +
+//				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
+//				"\t\t\tint indexSrc = input.startIndex + y* input.stride;\n" +
+//				"\t\t\tint indexDst = output.startIndex + y* output.stride;\n" +
+//				"\t\t\tint end = indexSrc + input.width;\n" +
+//				"\n" +
+//				"\t\t\tfor( ; indexSrc < end; indexSrc++ , indexDst++) {\n" +
+//				"\t\t\t\toutput.data[indexDst] = "+typeCast+"Math.sqrt(input.data[indexSrc]"+bitWise+");\n" +
+//				"\t\t\t}\n" +
+//				"\t\t}\n" +
+//				"\t\t//CONCURRENT_ABOVE });\n" +
+//				"\t}\n\n");
+//	}
 
 	public void printStdev( AutoTypeImage typeMean , AutoTypeImage typePow2 ) {
 		String bitWiseMean = typeMean.getBitWise();
@@ -556,6 +656,13 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 		boolean isImageFirst();
 
 		AutoTypeImage[] getTypes();
+	}
+
+	interface PrintString {
+		String print( AutoTypeImage type );
+	}
+	interface PrintString2 {
+		String print( AutoTypeImage typeSrc, AutoTypeImage typeDst );
 	}
 
 	public static void main( String[] args ) throws FileNotFoundException {
