@@ -80,7 +80,7 @@ public class ConfigureDisparityBM {
 	/**
 	 * Used to avoid a divide by zero error when dividing by the standard deviation. Only used with NCC. Smaller
 	 * values are more mathematically accurate but make it more sensitive to floating point error.
-	 * A reasonable value will depend on the range of pixel intensity values. This was tuned to 8-bit images.
+	 * This has been tuned to work with inputs that have been scaled to have values from -1 to 1.
 	 */
-	public double nccEps = 0.1;
+	public double nccEps = 5e-5;
 }
