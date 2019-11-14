@@ -24,6 +24,7 @@ import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.IntRangeObjectConsumer;
+import boofcv.misc.Compare_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -67,6 +68,9 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 		this.disparitySelect0 = computeDisparity;
 		this.scoreRows = scoreRows;
 		workspace.grow();
+
+		if( !(computeDisparity instanceof Compare_F32) )
+			throw new IllegalArgumentException("computeDisparity must also implement Compare_F32");
 	}
 
 	@Override
@@ -175,8 +179,8 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 		for( int row = row0+regionHeight; row < row1; row++ , workSpace.activeVerticalScore++) {
 			int activeIndex = workSpace.activeVerticalScore % regionHeight;
 			int oldRow = (row-row0)%regionHeight;
-			float previous[] = workSpace.verticalScore[ (workSpace.activeVerticalScore -1) % regionHeight ];
-			float active[] = workSpace.verticalScore[ activeIndex ];
+			float[] previous = workSpace.verticalScore[ (workSpace.activeVerticalScore -1) % regionHeight ];
+			float[] active = workSpace.verticalScore[ activeIndex ];
 
 			// subtract first row from vertical score
 			float[] scores = workSpace.horizontalScore[oldRow];
@@ -207,7 +211,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 					bottom = workSpace.verticalScore[workSpace. activeVerticalScore % regionHeight ];
 				}
 
-				computeScoreFive(top,middle,bottom,workSpace.fiveScore,left.width);
+				computeScoreFive(top,middle,bottom,workSpace.fiveScore,left.width,(Compare_F32)workSpace.computeDisparity);
 				workSpace.computeDisparity.process(row - (1 + 4*radiusY) + 2*radiusY+1, workSpace.fiveScore );
 			}
 		}
@@ -217,7 +221,8 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 	 * Compute the final score by sampling the 5 regions.  Four regions are sampled around the center
 	 * region.  Out of those four only the two with the smallest score are used.
 	 */
-	protected void computeScoreFive( float top[] , float middle[] , float bottom[] , float score[] , int width ) {
+	protected void computeScoreFive( float top[] , float middle[] , float bottom[] , float score[] , int width ,
+									 Compare_F32 compare ) {
 
 		// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
 		for( int d = minDisparity; d < maxDisparity; d++ ) {
@@ -227,8 +232,6 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 			int indexDst = (d-minDisparity)*width + (d-minDisparity);
 			int end = indexSrc + (width-d-4*radiusX);
 			while( indexSrc < end ) {
-				int s = 0;
-
 				// sample four outer regions at the corners around the center region
 				float val0 = top[indexSrc-radiusX];
 				float val1 = top[indexSrc+radiusX];
@@ -236,27 +239,25 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 				float val3 = bottom[indexSrc+radiusX];
 
 				// select the two best scores from outer for regions
-				if( val1 < val0 ) {
+				if( compare.compare(val0,val1) < 0 ) {
 					float temp = val0;
 					val0 = val1;
 					val1 = temp;
 				}
 
-				if( val3 < val2 ) {
+				if( compare.compare(val2,val3) < 0 ) {
 					float temp = val2;
 					val2 = val3;
 					val3 = temp;
 				}
 
-				if( val3 < val0 ) {
-					s += val2;
-					s += val3;
-				} else if( val2 < val1 ) {
-					s += val2;
-					s += val0;
+				float s;
+				if( compare.compare(val0,val3) < 0 ) {
+					s = val2 + val3;
+				} else if( compare.compare(val1,val2) < 0 ) {
+					s = val2 + val0;
 				} else {
-					s += val0;
-					s += val1;
+					s = val0 + val0;
 				}
 
 				score[indexDst++] = s + middle[indexSrc++];

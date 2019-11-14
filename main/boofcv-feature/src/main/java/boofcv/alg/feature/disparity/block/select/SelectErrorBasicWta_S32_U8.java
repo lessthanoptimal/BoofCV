@@ -20,6 +20,7 @@ package boofcv.alg.feature.disparity.block.select;
 
 import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.alg.feature.disparity.block.SelectDisparityBasicWta;
+import boofcv.misc.Compare_S32;
 import boofcv.struct.image.GrayU8;
 
 /**
@@ -33,7 +34,7 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class SelectErrorBasicWta_S32_U8 extends SelectDisparityBasicWta<int[],GrayU8>
+public class SelectErrorBasicWta_S32_U8 extends SelectDisparityBasicWta<int[],GrayU8> implements Compare_S32
 {
 	@Override
 	public void process(int row, int[] scores) {
@@ -70,5 +71,10 @@ public class SelectErrorBasicWta_S32_U8 extends SelectDisparityBasicWta<int[],Gr
 	@Override
 	public Class<GrayU8> getDisparityType() {
 		return GrayU8.class;
+	}
+
+	@Override
+	public int compare(int scoreA, int scoreB) {
+		return Integer.compare(-scoreA, -scoreB);
 	}
 }

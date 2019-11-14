@@ -16,40 +16,20 @@
  * limitations under the License.
  */
 
-package boofcv.alg.misc;
+package boofcv.misc;
 
 /**
- * Parameters used to normalize an image for numerics.
- *
- * output = scale*(input - offset)
+ * Compares two scores to see which is better
  *
  * @author Peter Abeles
  */
-public class NormalizeParameters {
-	public double offset;
-	public double divisor;
-
-	public NormalizeParameters() {
-	}
-
-	public NormalizeParameters(double offset, double divisor) {
-		this.offset = offset;
-		this.divisor = divisor;
-	}
-
-	public double getOffset() {
-		return offset;
-	}
-
-	public void setOffset(double offset) {
-		this.offset = offset;
-	}
-
-	public double getDivisor() {
-		return divisor;
-	}
-
-	public void setDivisor(double divisor) {
-		this.divisor = divisor;
-	}
+public interface Compare_F32 {
+	/**
+	 * <ul>
+	 *     <li>1 = scoreA is better than scoreB</li>
+	 *     <li>0 = scoreA is equivalent than scoreB</li>
+	 *     <li>-1 = scoreA is worse than scoreB</li>
+	 * </ul>
+	 */
+	int compare( float scoreA , float scoreB );
 }

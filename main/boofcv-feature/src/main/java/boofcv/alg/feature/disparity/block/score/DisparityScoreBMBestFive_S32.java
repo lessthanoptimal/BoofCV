@@ -24,6 +24,7 @@ import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.concurrency.IntRangeObjectConsumer;
+import boofcv.misc.Compare_S32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
@@ -68,6 +69,9 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends Imag
 		this.scoreRows = scoreRows;
 		this.disparitySelect0 = computeDisparity;
 		workspace.grow();
+
+		if( !(computeDisparity instanceof Compare_S32) )
+			throw new IllegalArgumentException("computeDisparity must also implement Compare_S32");
 	}
 
 	@Override
@@ -208,7 +212,7 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends Imag
 					bottom = workSpace.verticalScore[workSpace. activeVerticalScore % regionHeight ];
 				}
 
-				computeScoreFive(top,middle,bottom,workSpace.fiveScore,left.width);
+				computeScoreFive(top,middle,bottom,workSpace.fiveScore,left.width,(Compare_S32)workSpace.computeDisparity);
 				workSpace.computeDisparity.process(row - (1 + 4*radiusY) + 2*radiusY+1, workSpace.fiveScore );
 			}
 		}
@@ -218,7 +222,8 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends Imag
 	 * Compute the final score by sampling the 5 regions.  Four regions are sampled around the center
 	 * region.  Out of those four only the two with the smallest score are used.
 	 */
-	protected void computeScoreFive( int top[] , int middle[] , int bottom[] , int score[] , int width ) {
+	protected void computeScoreFive( int top[] , int middle[] , int bottom[] , int score[] , int width ,
+									 Compare_S32 compare  ) {
 
 		// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
 		for( int d = minDisparity; d < maxDisparity; d++ ) {
@@ -228,8 +233,6 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends Imag
 			int indexDst = (d-minDisparity)*width + (d-minDisparity);
 			int end = indexSrc + (width-d-4*radiusX);
 			while( indexSrc < end ) {
-				int s = 0;
-
 				// sample four outer regions at the corners around the center region
 				int val0 = top[indexSrc-radiusX];
 				int val1 = top[indexSrc+radiusX];
@@ -237,27 +240,25 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends Imag
 				int val3 = bottom[indexSrc+radiusX];
 
 				// select the two best scores from outer for regions
-				if( val1 < val0 ) {
+				if( compare.compare(val0,val1) < 0 ) {
 					int temp = val0;
 					val0 = val1;
 					val1 = temp;
 				}
 
-				if( val3 < val2 ) {
+				if( compare.compare(val2,val3) < 0 ) {
 					int temp = val2;
 					val2 = val3;
 					val3 = temp;
 				}
 
-				if( val3 < val0 ) {
-					s += val2;
-					s += val3;
-				} else if( val2 < val1 ) {
-					s += val2;
-					s += val0;
+				int s;
+				if( compare.compare(val0,val3) < 0 ) {
+					s = val2 + val3;
+				} else if( compare.compare(val1,val2) < 0 ) {
+					s = val2 + val0;
 				} else {
-					s += val0;
-					s += val1;
+					s = val0 + val0;
 				}
 
 				score[indexDst++] = s + middle[indexSrc++];

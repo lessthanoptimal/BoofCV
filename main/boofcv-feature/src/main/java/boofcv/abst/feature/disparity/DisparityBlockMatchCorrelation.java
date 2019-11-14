@@ -21,6 +21,7 @@ package boofcv.abst.feature.disparity;
 import boofcv.alg.feature.disparity.DisparityBlockMatchRowFormat;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageNormalization;
+import boofcv.alg.misc.NormalizeParameters;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
@@ -40,6 +41,7 @@ public class DisparityBlockMatchCorrelation<T extends ImageGray<T>, D extends Im
 	TF adjustedLeft,adjustedRight;
 
 	boolean normalizeInput=true;
+	NormalizeParameters parameters = new NormalizeParameters();
 
 	ImageType<T> inputType;
 
@@ -63,8 +65,10 @@ public class DisparityBlockMatchCorrelation<T extends ImageGray<T>, D extends Im
 
 		if( normalizeInput ) {
 			// normalize to reduce numerical problems, e.g. overflow/underflow
-			ImageNormalization.zeroMeanMaxOne(imageLeft, adjustedLeft, null);
-			ImageNormalization.zeroMeanMaxOne(imageRight, adjustedRight, null);
+			ImageNormalization.zeroMeanMaxOne(imageLeft, adjustedLeft, parameters);
+			// Here I'm assuming the cameras have their gain/exposure synchronized so you want to use the same
+			// parameters or else you might degrade your performance.
+			ImageNormalization.apply(imageRight, parameters, adjustedRight);
 		} else {
 			GConvertImage.convert(imageLeft,adjustedLeft);
 			GConvertImage.convert(imageRight,adjustedRight);

@@ -19,6 +19,7 @@
 package boofcv.alg.feature.disparity.block.select;
 
 import boofcv.alg.feature.disparity.block.SelectDisparityWithChecksWta;
+import boofcv.misc.Compare_S32;
 import boofcv.struct.image.ImageGray;
 
 /**
@@ -35,6 +36,7 @@ import boofcv.struct.image.ImageGray;
  */
 public abstract class SelectErrorWithChecks_S32<T extends ImageGray<T>>
 		extends SelectDisparityWithChecksWta<int[],T>
+		implements Compare_S32
 {
 	// scores organized for more efficient processing
 	int columnScore[] = new int[1];
@@ -156,4 +158,8 @@ public abstract class SelectErrorWithChecks_S32<T extends ImageGray<T>>
 		return indexBest;
 	}
 
+	@Override
+	public int compare(int scoreA, int scoreB) {
+		return Integer.compare(-scoreA, -scoreB);
+	}
 }

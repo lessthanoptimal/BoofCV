@@ -31,6 +31,17 @@ import javax.annotation.Nullable;
 public class ImageNormalization {
 
 	/**
+	 * Applies the normalization to the image.
+	 * @param input Input image.
+	 * @param parameter Normalziation parameters
+	 * @param output Output image. Can be the same instance as the input image.
+	 */
+	public static void apply(ImageGray input, NormalizeParameters parameter, ImageGray output) {
+		GPixelMath.plus(input,parameter.offset,output);
+		GPixelMath.divide(output,parameter.divisor,output);
+	}
+
+	/**
 	 * Ensures that the output image has a mean zero and a max abs(pixel) of 1
 	 * @param input Input image
 	 * @param output Scaled output image.
@@ -47,7 +58,7 @@ public class ImageNormalization {
 	
 		if( parameters != null ) {
 			parameters.offset = -mean;
-			parameters.scale = 1.0/scale;
+			parameters.divisor = scale;
 		}
 	}
 
@@ -71,7 +82,7 @@ public class ImageNormalization {
 
 		if( parameters != null ) {
 			parameters.offset = -mean;
-			parameters.scale = 1.0/stdev;
+			parameters.divisor = stdev;
 		}
 	}
 }
