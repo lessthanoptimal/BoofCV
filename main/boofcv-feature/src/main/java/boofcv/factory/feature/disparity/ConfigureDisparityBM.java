@@ -76,4 +76,11 @@ public class ConfigureDisparityBM {
 	 * If Census error is used which variant should it use
 	 */
 	public CensusType censusVariant = CensusType.BLOCK_5_5;
+
+	/**
+	 * Used to avoid a divide by zero error when dividing by the standard deviation. Only used with NCC. Smaller
+	 * values are more mathematically accurate but make it more sensitive to floating point error.
+	 * A reasonable value will depend on the range of pixel intensity values. This was tuned to 8-bit images.
+	 */
+	public double nccEps = 0.1;
 }

@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSelectDisparitySubpixel_S32_F32 extends ChecksSelectRectStandardBase<int[],GrayF32> {
+public class TestSelectDisparitySubpixel_S32_F32 extends ChecksSelectDisparityWithChecksWta<int[],GrayF32> {
 
 
 	public TestSelectDisparitySubpixel_S32_F32() {
@@ -34,8 +34,8 @@ public class TestSelectDisparitySubpixel_S32_F32 extends ChecksSelectRectStandar
 	}
 
 	@Override
-	public ImplSelectWithChecksBase_S32<GrayF32> createSelector(int maxError, int rightToLeftTolerance, double texture) {
-		return new SelectDisparitySubpixel.S32_F32(maxError, rightToLeftTolerance, texture);
+	public SelectErrorWithChecks_S32<GrayF32> createSelector(int maxError, int rightToLeftTolerance, double texture) {
+		return new SelectErrorSubpixel.S32_F32(maxError, rightToLeftTolerance, texture);
 	}
 
 	/**
@@ -46,10 +46,10 @@ public class TestSelectDisparitySubpixel_S32_F32 extends ChecksSelectRectStandar
 
 		GrayF32 img = new GrayF32(w,h);
 
-		SelectDisparitySubpixel.S32_F32 alg = new SelectDisparitySubpixel.S32_F32(-1,-1,-1);
+		SelectErrorSubpixel.S32_F32 alg = new SelectErrorSubpixel.S32_F32(-1,-1,-1);
 
 		alg.configure(img,0,20,2);
-		alg.setLocalDisparityMax(20);
+		alg.setLocalMaxDisparity(20);
 
 		// should be biased towards 4
 		alg.columnScore[4] = 100;

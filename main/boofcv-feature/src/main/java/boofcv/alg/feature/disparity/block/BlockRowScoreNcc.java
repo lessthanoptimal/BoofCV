@@ -82,6 +82,8 @@ public class BlockRowScoreNcc<T extends ImageBase<T>>
 
 	public static class F32 extends BlockRowScore.ArrayF32<GrayF32> {
 		BlockRowScoreNcc<GrayF32> helper;
+		public float eps=UtilEjml.F_EPS;
+
 		public F32(int radiusWidth , int radiusHeight) {
 			helper = new BlockRowScoreNcc<>(radiusWidth,radiusHeight,ImageType.single(GrayF32.class));
 		}
@@ -123,7 +125,7 @@ public class BlockRowScoreNcc<T extends ImageBase<T>>
 				float sigmaR = helper.stdevR.data[idxRight];
 
 				// invert score since the minimum is selected for disparity
-				scoresNorm[indexScores+i] = (correlation - meanL*meanR)/(UtilEjml.F_EPS+sigmaL*sigmaR);
+				scoresNorm[indexScores+i] = (correlation - meanL*meanR)/(eps+sigmaL*sigmaR);
 			}
 		}
 

@@ -38,14 +38,53 @@ import boofcv.struct.image.GrayF32;
  *
  * @author Peter Abeles
  */
-public class SelectCorrelationSubpixel {
+public class SelectErrorSubpixel {
+
+	/**
+	 * For scores of type int[]
+	 */
+	public static class S32_F32 extends SelectErrorWithChecks_S32<GrayF32> {
+		public S32_F32(int maxError, int rightToLeftTolerance, double texture) {
+			super(maxError, rightToLeftTolerance, texture);
+		}
+
+		S32_F32( S32_F32 original ) {
+			super(original);
+		}
+
+		@Override
+		protected void setDisparity(int index, int disparityValue) {
+
+			if( disparityValue <= 0 || disparityValue >= localMaxDisparity -1) {
+				imageDisparity.data[index] = disparityValue;
+			} else {
+				int c0 = columnScore[disparityValue-1];
+				int c1 = columnScore[disparityValue];
+				int c2 = columnScore[disparityValue+1];
+
+				float offset = (float)(c0-c2)/(float)(2*(c0-2*c1+c2));
+
+				imageDisparity.data[index] = disparityValue + offset;
+			}
+		}
+
+		@Override
+		public DisparitySelect<int[], GrayF32> concurrentCopy() {
+			return new S32_F32(this);
+		}
+
+		@Override
+		public Class<GrayF32> getDisparityType() {
+			return GrayF32.class;
+		}
+	}
 
 	/**
 	 * For scores of type float[]
 	 */
-	public static class F32_F32 extends SelectCorrelationChecksBase_F32<GrayF32> {
-		public F32_F32(int rightToLeftTolerance, double texture) {
-			super(rightToLeftTolerance, texture);
+	public static class F32_F32 extends SelectErrorWithChecks_F32<GrayF32> {
+		public F32_F32(int maxError, int rightToLeftTolerance, double texture) {
+			super(maxError, rightToLeftTolerance, texture);
 		}
 
 		F32_F32( F32_F32 original ) {
@@ -61,15 +100,6 @@ public class SelectCorrelationSubpixel {
 				float c0 = columnScore[disparityValue-1];
 				float c1 = columnScore[disparityValue];
 				float c2 = columnScore[disparityValue+1];
-
-				float min = Math.min(c0,c2);
-
-				// Visually it's hard to tell if the code below helps or hurts
-				// The idea was that SAD error grows linearly and this interpolation seems to work well
-				// for it. The sqrt() grows linearly.
-//				c0 = (float)Math.sqrt(c0-min);
-//				c1 = (float)Math.sqrt(c1-min);
-//				c2 = (float)Math.sqrt(c2-min);
 
 				float offset = (c0-c2)/(2f*(c0-2f*c1+c2));
 

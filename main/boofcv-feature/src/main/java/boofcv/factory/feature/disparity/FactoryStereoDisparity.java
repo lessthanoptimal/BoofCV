@@ -22,10 +22,10 @@ import boofcv.abst.feature.disparity.*;
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.feature.disparity.DisparityBlockMatchRowFormat;
 import boofcv.alg.feature.disparity.block.*;
-import boofcv.alg.feature.disparity.block.score.ImplDisparityScoreBMBestFive_F32;
-import boofcv.alg.feature.disparity.block.score.ImplDisparityScoreBMBestFive_S32;
-import boofcv.alg.feature.disparity.block.score.ImplDisparityScoreBM_F32;
-import boofcv.alg.feature.disparity.block.score.ImplDisparityScoreBM_S32;
+import boofcv.alg.feature.disparity.block.score.DisparityScoreBMBestFive_F32;
+import boofcv.alg.feature.disparity.block.score.DisparityScoreBMBestFive_S32;
+import boofcv.alg.feature.disparity.block.score.DisparityScoreBM_F32;
+import boofcv.alg.feature.disparity.block.score.DisparityScoreBM_S32;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.transform.census.FactoryCensusTransform;
 import boofcv.struct.image.*;
@@ -101,7 +101,7 @@ public class FactoryStereoDisparity {
 			}
 
 			case NCC: {
-				BlockRowScore rowScore = createScoreRowNcc(config.regionRadiusX,config.regionRadiusY,GrayF32.class);
+				BlockRowScore rowScore = createScoreRowNcc(config.nccEps, config.regionRadiusX,config.regionRadiusY,GrayF32.class);
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, GrayF32.class, select, rowScore);
 				return new DisparityBlockMatchCorrelation(alg,imageType);
 			}
@@ -187,7 +187,7 @@ public class FactoryStereoDisparity {
 			}
 
 			case NCC: {
-				BlockRowScore rowScore = createScoreRowNcc(config.regionRadiusX,config.regionRadiusY,GrayF32.class);
+				BlockRowScore rowScore = createScoreRowNcc(config.nccEps,config.regionRadiusX,config.regionRadiusY,GrayF32.class);
 				DisparityBlockMatchRowFormat alg = createBestFive(config, GrayF32.class, select, rowScore);
 				return new DisparityBlockMatchCorrelation(alg,imageType);
 			}
@@ -213,10 +213,11 @@ public class FactoryStereoDisparity {
 		return rowScore;
 	}
 
-	public static <T extends ImageGray<T>> BlockRowScore createScoreRowNcc( int radiusX , int radiusY , Class<T> imageType) {
+	public static <T extends ImageGray<T>> BlockRowScore createScoreRowNcc( double eps, int radiusX , int radiusY , Class<T> imageType) {
 		BlockRowScore rowScore;
 		if (imageType == GrayF32.class) {
 			rowScore = new BlockRowScoreNcc.F32(radiusX,radiusY);
+			((BlockRowScoreNcc.F32)rowScore).eps = (float)eps;
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
 		}
@@ -227,10 +228,10 @@ public class FactoryStereoDisparity {
 	createBlockMatching(ConfigureDisparityBM config, Class<T> imageType, DisparitySelect select, BlockRowScore rowScore) {
 		DisparityBlockMatchRowFormat alg;
 		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
-			alg = new ImplDisparityScoreBM_F32<>(config.minDisparity,
+			alg = new DisparityScoreBM_F32<>(config.minDisparity,
 					config.maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
 		} else {
-			alg = new ImplDisparityScoreBM_S32(config.minDisparity,
+			alg = new DisparityScoreBM_S32(config.minDisparity,
 					config.maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
 		}
 		return alg;
@@ -240,10 +241,10 @@ public class FactoryStereoDisparity {
 	createBestFive(ConfigureDisparityBM config, Class<T> imageType, DisparitySelect select, BlockRowScore rowScore) {
 		DisparityBlockMatchRowFormat alg;
 		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
-			alg = new ImplDisparityScoreBMBestFive_F32(config.minDisparity,
+			alg = new DisparityScoreBMBestFive_F32(config.minDisparity,
 					config.maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
 		} else {
-			alg = new ImplDisparityScoreBMBestFive_S32(config.minDisparity,
+			alg = new DisparityScoreBMBestFive_S32(config.minDisparity,
 					config.maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
 		}
 		return alg;

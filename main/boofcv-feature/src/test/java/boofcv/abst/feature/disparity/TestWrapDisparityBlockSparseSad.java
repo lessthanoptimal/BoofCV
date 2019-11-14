@@ -18,8 +18,8 @@
 
 package boofcv.abst.feature.disparity;
 
-import boofcv.alg.feature.disparity.block.score.ImplDisparitySparseScoreBM_SAD_F32;
-import boofcv.alg.feature.disparity.block.select.ImplSelectSparseBasicWta_F32;
+import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_F32;
+import boofcv.alg.feature.disparity.block.select.SelectSparseErrorBasicWta_F32;
 import boofcv.factory.feature.disparity.ConfigureDisparityBM;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
@@ -68,8 +68,8 @@ public class TestWrapDisparityBlockSparseSad {
 				FactoryStereoDisparity.blockMatch(config,GrayF32.class,GrayU8.class);
 		StereoDisparitySparse<GrayF32> alg =
 				new WrapDisparityBlockSparseSad<>(
-						new ImplDisparitySparseScoreBM_SAD_F32(minDisparity, maxDisparity, r, r),
-						new ImplSelectSparseBasicWta_F32());
+						new DisparitySparseScoreBM_SAD_F32(minDisparity, maxDisparity, r, r),
+						new SelectSparseErrorBasicWta_F32());
 
 		validator.process(left,right);
 		GrayU8 expected = validator.getDisparity();
