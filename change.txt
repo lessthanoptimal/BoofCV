@@ -18,6 +18,7 @@ Version : 0.35
   * Added histogramScaled() to ImageStatistics
   * Added Census transform
   * Added stdev to Pixelmath
+  * Created ImageNormalization for normalizing input images to be zero mean with values around 1
   * Added mean blur where you can select a different radius along each axis
   * PixelMath.log() no longer has the 1 + hard coded. Any arbitrary value can be put there.
 - Concurrency
@@ -37,13 +38,10 @@ Version : 0.35
   * TODO Ensure that all auto code generators still work
   * TODO Add semi-global
   * TODO NCC issues
-         - Why are there artifacts on the right hand side?
-         - Make texture validation operational for NCC
-         - Can texture error be used? Prune all positive
-         - Get working with integer images
          - Validate BM-5 with naive implementation. I'm not confident the normalization for rows
+         - Why is there little change between BM-5 and BM?
          - Benchmark to see if other algorithms got slower because of this
-         - Improve filtering when stdev is low
+         - Control EPS in GUI
 - SFM
   * Projective camera with lens distortion
   * TODO Stereo VO Quad - Now uses trifocal tensor and sparse bundle adjustment

@@ -101,9 +101,9 @@ public class FactoryStereoDisparity {
 			}
 
 			case NCC: {
-				BlockRowScore rowScore = createScoreRowNcc(config.regionRadiusX,config.regionRadiusY,imageType);
-				DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
-				return new WrapDisparityBlockMatchRowFormat(alg);
+				BlockRowScore rowScore = createScoreRowNcc(config.regionRadiusX,config.regionRadiusY,GrayF32.class);
+				DisparityBlockMatchRowFormat alg = createBlockMatching(config, GrayF32.class, select, rowScore);
+				return new DisparityBlockMatchCorrelation(alg,imageType);
 			}
 
 			default:
@@ -187,9 +187,9 @@ public class FactoryStereoDisparity {
 			}
 
 			case NCC: {
-				BlockRowScore rowScore = createScoreRowNcc(config.regionRadiusX,config.regionRadiusY,imageType);
-				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
-				return new WrapDisparityBlockMatchRowFormat(alg);
+				BlockRowScore rowScore = createScoreRowNcc(config.regionRadiusX,config.regionRadiusY,GrayF32.class);
+				DisparityBlockMatchRowFormat alg = createBestFive(config, GrayF32.class, select, rowScore);
+				return new DisparityBlockMatchCorrelation(alg,imageType);
 			}
 
 			default:

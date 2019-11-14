@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestWrapDisparitySadRect {
+public class TestWrapDisparityBlockMatchRowFormat {
 	/**
 	 * The whole image should be set as invalid since it is not being written over
 	 */

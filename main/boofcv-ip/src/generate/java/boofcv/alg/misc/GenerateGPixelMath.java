@@ -46,13 +46,13 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 
 		printFunction(abs(),signedTypes,signedTypes);
 		printFunction(negative(),signedTypes,signedTypes);
-		printFunction(divide_ISI(false),standardTypes);
+		printFunction2(divide_ISI(false),standardTypes);
 		printFunction(divide_ISI(true),standardTypes);
-		printFunction(multiply_ISI(false),standardTypes);
+		printFunction2(multiply_ISI(false),standardTypes);
 		printFunction(multiply_ISI(true),standardTypes);
-		printFunction(plus_ISI(false),standardTypes);
+		printFunction2(plus_ISI(false),standardTypes);
 		printFunction(plus_ISI(true),standardTypes);
-		printFunction(minus_ISI(false),standardTypes);
+		printFunction2(minus_ISI(false),standardTypes);
 		printFunction(minus_ISI(true),standardTypes);
 		printFunction(minus_SII(false),standardTypes);
 		printFunction(minus_SII(true),standardTypes);
@@ -114,11 +114,67 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
+	private void printFunction2( Function f , AutoTypeImage[] typesIn) {
+		out.print(
+				"\t/**\n" +f.printJavadoc() +
+						"\t */\n" +
+						"\tpublic static "+f.printGenerics()+" void "+f.name+"( "+f.printArguments()+" )\n" +
+						"\t{\n" +
+						"\t\tif( input instanceof ImageGray) {\n"+
+						"\t\t\tif( input.getClass() == output.getClass() ) {\n");
+		singleBand = true;
+		printSwitch(f,typesIn,typesIn,"\t\t\t\t");
+		out.print("\t\t\t} else if( GrayF32.class == output.getClass() ) {\n");
+		printSwitch(f,typesIn,F32,"\t\t\t\t");
+		out.print(
+				"\t\t\t}\n" +
+				"\t\t} else if( input instanceof ImageInterleaved ) {\n"+
+						"\t\t\tif( input.getClass() == output.getClass() ) {\n");
+		singleBand = false;
+		printSwitch(f,typesIn, typesIn,"\t\t\t\t\t");
+		out.print("\t\t\t} else if( InterleavedF32.class == output.getClass() ) {\n");
+		printSwitch(f,typesIn,F32,"\t\t\t\t");
+		out.print(
+				"\t\t\t}\n" +
+				"\t\t} else if( input instanceof Planar ) {\n" +
+				"\t\t\tPlanar in = (Planar)input;\n" +
+				"\t\t\tPlanar out = (Planar)output;\n" +
+				"\n" +
+				"\t\t\tfor (int i = 0; i < in.getNumBands(); i++) {\n" +
+				"\t\t\t\t"+f.name+"("+f.printCallPlanar()+");\n" +
+				"\t\t\t}\n" +
+				"\t\t} else {\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Unknown image Type: \"+input.getClass().getSimpleName());\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
 
 	private void printSwitch( Function f , AutoTypeImage[] typesIn, AutoTypeImage[] typesOut, String prefix ) {
 		for (int i = 0; i < typesIn.length; i++) {
 			input = typesIn[i];
 			output = typesOut[i];
+			if( i == 0 ) {
+				out.print(prefix+"if ("+name(input)+".class == input.getClass()) {\n" +
+						prefix+"\tPixelMath."+f.name+"("+f.printCall()+");\n");
+			} else {
+				out.print(prefix+"} else if ("+name(input)+".class == input.getClass()) {\n" +
+						prefix+"\tPixelMath."+f.name+"("+f.printCall()+");\n");
+			}
+		}
+		out.print(prefix+"} else {\n" +
+				prefix+"\tthrow new IllegalArgumentException(\"Unknown image Type: \" + input.getClass().getSimpleName());\n" +
+				prefix+"}\n");
+	}
+
+	private void printSwitch( Function f , AutoTypeImage[] typesIn, AutoTypeImage typeOut, String prefix ) {
+		for (int i = 0; i < typesIn.length; i++) {
+			input = typesIn[i];
+			output = typeOut;
+
+			if( !input.isInteger() ) // TODO hack. assumes what this function is for...
+				continue;
+
 			if( i == 0 ) {
 				out.print(prefix+"if ("+name(input)+".class == input.getClass()) {\n" +
 						prefix+"\tPixelMath."+f.name+"("+f.printCall()+");\n");
@@ -358,6 +414,11 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 		}
 
 		@Override
+		public String printGenerics() {
+			return "<T extends ImageBase<T>,O extends ImageBase<O>>";
+		}
+
+		@Override
 		public String printJavadoc() {
 			if( bounded ) {
 				return 	"\t *\n" +
@@ -377,18 +438,22 @@ public class GenerateGPixelMath extends CodeGeneratorBase {
 		@Override
 		public String printArguments() {
 			if( bounded)
-				return "T input, double "+scalarName+", double lower, double upper, T output";
+				return "T input, double "+scalarName+", double lower, double upper, O output";
 			else
-				return "T input, double "+scalarName+", T output";
+				return "T input, double "+scalarName+", O output";
 		}
 
 		@Override
 		public String printCall() {
 			String t = typecastSum();
 			String scalarCast;
-			if( onlyFloat )
-				scalarCast = !input.isInteger()&&input.getNumBits()==32?"(float) ":"";
-			else
+			if( onlyFloat ) {
+				if( input==output )
+					scalarCast = !input.isInteger() && input.getNumBits() == 32 ? "(float) " : "";
+				else { // this is a bit of a hack. Assumes output is F32 always
+					scalarCast = "(float)";
+				}
+			} else
 				scalarCast = t;
 			if( bounded )
 				return String.format("(%s) input, %s%s, %s lower, %s upper, (%s) output",name(input),scalarCast,scalarName,t,t,name(output));

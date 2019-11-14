@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestWrapDisparitySparseSadRect {
+public class TestWrapDisparityBlockSparseSad {
 
 	Random rand = new Random(234);
 	int w = 30;
