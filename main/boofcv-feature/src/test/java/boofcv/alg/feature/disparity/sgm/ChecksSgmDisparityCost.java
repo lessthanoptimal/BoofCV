@@ -52,8 +52,8 @@ abstract class ChecksSgmDisparityCost {
 	void simple_gradient() {
 		// see if min and max disparity are both respected
 		simple_gradient(0, 20);
-		simple_gradient(4, 20);
-		simple_gradient(5, 5); // test of inclusive
+		simple_gradient(4, 16);
+		simple_gradient(5, 1);
 	}
 
 	/**
@@ -67,13 +67,13 @@ abstract class ChecksSgmDisparityCost {
 		SgmDisparityCost<GrayU8> alg = createAlg();
 		Planar<GrayU16> cost1 = new Planar<>(GrayU16.class,1,1,1);
 		Planar<GrayU16> cost2 = new Planar<>(GrayU16.class,1,1,1);
-		alg.process(left,right,1,15,cost1);
-		alg.process(left,right,1,15,cost2);
+		alg.process(left,right,1,14,cost1);
+		alg.process(left,right,1,14,cost2);
 
 		BoofTesting.assertEquals(cost1,cost2,0);
 	}
 
-	private void simple_gradient(int minDisparity, int maxDisparity) {
+	private void simple_gradient(int minDisparity, int disparityRange) {
 		// the actual disparity of each pixel
 		int disparity = 5;
 
@@ -83,10 +83,10 @@ abstract class ChecksSgmDisparityCost {
 		// This has a known solution. See if it worked
 		Planar<GrayU16> cost = new Planar<>(GrayU16.class,1,1,1);
 		SgmDisparityCost<GrayU8> alg = createAlg();
-		alg.process(left,right,minDisparity,maxDisparity,cost);
+		alg.process(left,right,minDisparity,disparityRange,cost);
 
 		// Check outside
-		checkOutsideDispIsMax(minDisparity,maxDisparity, cost);
+		checkOutsideDispIsMax(minDisparity,disparityRange, cost);
 
 		// For each pixel, find the best disparity and see if it matches up with the input image
 		for (int y = 0; y < height; y++) {
@@ -125,12 +125,11 @@ abstract class ChecksSgmDisparityCost {
 	/**
 	 * Make sure that the of the cost which go outside the image should be filled with max value
 	 */
-	private void checkOutsideDispIsMax(int minD, int maxD, Planar<GrayU16> cost) {
-		int rangeD = maxD-minD;
+	private void checkOutsideDispIsMax(int minD, int rangeD, Planar<GrayU16> cost) {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < rangeD; x++) {
 				// skip over disparity of zero since it will be inside the right image
-				for (int d = x+Math.max(minD,1); d <= maxD; d++) {
+				for (int d = x+Math.max(minD,1); d < minD+rangeD; d++) {
 					assertEquals(SgmDisparityCost.MAX_COST,lookup(cost,x,y,d-minD),y+" "+x+" "+d);
 				}
 			}
@@ -148,12 +147,13 @@ abstract class ChecksSgmDisparityCost {
 	void reshape() {
 		SgmDisparityCost<GrayU8> alg = createAlg();
 
+		int rangeD = 6;
 		Planar<GrayU16> cost = new Planar<>(GrayU16.class,1,1,1);
-		alg.process(left,right,5,10,cost);
+		alg.process(left,right,5,rangeD,cost);
 
 		// cost is Y,X,D order
 		assertEquals(height,cost.getNumBands());
 		assertEquals(width,cost.getHeight());
-		assertEquals(6,cost.getWidth());
+		assertEquals(rangeD,cost.getWidth());
 	}
 }

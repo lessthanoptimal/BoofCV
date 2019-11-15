@@ -41,11 +41,13 @@ public class SgmMutualInformation implements SgmDisparityCost<GrayU8> {
 	 * this function can be called
 	 */
 	@Override
-	public void process(GrayU8 left, GrayU8 right, int minDisparity, int maxDisparity, Planar<GrayU16> costYXD) {
+	public void process(GrayU8 left, GrayU8 right, int minDisparity, int disparityRange, Planar<GrayU16> costYXD) {
 		InputSanityCheck.checkSameShape(left,right);
 
 		// Declare the "tensor" with shape (lengthY,lengthX,lengthD)
-		costYXD.reshape(maxDisparity-minDisparity+1,left.width,left.height);
+		costYXD.reshape(disparityRange,left.width,left.height);
+
+		int maxDisparity = minDisparity+disparityRange-1;
 
 		for (int y = 0; y < left.height; y++) {
 			GrayU16 costXD = costYXD.getBand(y);
