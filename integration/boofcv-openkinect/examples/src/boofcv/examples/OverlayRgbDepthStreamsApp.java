@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,7 +74,7 @@ public class OverlayRgbDepthStreamsApp implements StreamOpenKinectRgbDepth.Liste
 
 	@Override
 	public void processKinect(Planar<GrayU8> rgb, GrayU16 depth, long timeRgb, long timeDepth) {
-		VisualizeImageData.disparity(depth, buffDepth, 0, UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE,0);
+		VisualizeImageData.disparity(depth, buffDepth, UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE,0);
 		ConvertBufferedImage.convertTo_U8(rgb,buffRgb,true);
 
 		Graphics2D g2 = buffRgb.createGraphics();

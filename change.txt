@@ -32,14 +32,13 @@ Version : 0.35
   * Updated VisualizeStereoDisparity
 - Fixed bugs related to processing 1-band planar images
 - Stereo
+  * Improved high level API
   * Concurrent block matching disparity
   * Support for U16 images
   * Block Matching can now be scored using Census and NCC
   * TODO Ensure that all auto code generators still work
   * TODO Add semi-global
   * TODO NCC issues
-         - Validate BM-5 with naive implementation. I'm not confident the normalization for rows
-         - Why is there little change between BM-5 and BM?
          - Benchmark to see if other algorithms got slower because of this
          - Control EPS in GUI
 - SFM

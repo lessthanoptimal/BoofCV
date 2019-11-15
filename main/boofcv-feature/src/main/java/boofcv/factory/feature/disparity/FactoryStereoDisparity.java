@@ -159,16 +159,18 @@ public class FactoryStereoDisparity {
 		// 3 regions are used not just one in this case
 		maxError *= 3;
 
-		DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
+
 
 		switch( config.errorType) {
 			case SAD: {
+				DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
 				BlockRowScore rowScore = createScoreRowSad(imageType);
 				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
 				return new WrapDisparityBlockMatchRowFormat(alg);
 			}
 
 			case CENSUS: {
+				DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.censusVariant,imageType);
 				Class censusType = censusTran.getOutputType().getImageClass();
 				BlockRowScore rowScore;
@@ -187,6 +189,7 @@ public class FactoryStereoDisparity {
 			}
 
 			case NCC: {
+				DisparitySelect select = createDisparitySelect(config, GrayF32.class, (int) maxError);
 				BlockRowScore rowScore = createScoreRowNcc(config.nccEps,config.regionRadiusX,config.regionRadiusY,GrayF32.class);
 				DisparityBlockMatchRowFormat alg = createBestFive(config, GrayF32.class, select, rowScore);
 				return new DisparityBlockMatchCorrelation(alg,imageType);

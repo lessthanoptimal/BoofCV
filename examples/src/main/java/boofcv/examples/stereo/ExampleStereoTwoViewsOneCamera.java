@@ -139,7 +139,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		RectifyImageOps.applyMask(disparity,rectifiedMask,0);
 
 		// show results
-		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, minDisparity, maxDisparity, 0);
+		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, maxDisparity-minDisparity, 0);
 
 		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectifiedLeft, null);
 		BufferedImage outRight = ConvertBufferedImage.convertTo(rectifiedRight, null);

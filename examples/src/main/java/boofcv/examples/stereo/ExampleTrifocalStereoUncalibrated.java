@@ -31,7 +31,6 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.feature.associate.AssociateThreeByPairs;
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.GeometricResult;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -53,14 +52,16 @@ import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.geo.AssociatedTriple;
 import boofcv.struct.geo.TrifocalTensor;
-import boofcv.struct.image.*;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
@@ -459,30 +460,23 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		// compute disparity
 		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
-		config.errorType = DisparityError.SAD;
+		config.errorType = DisparityError.NCC;
 		config.minDisparity = minDisparity;
 		config.maxDisparity = maxDisparity;
 		config.subpixel = true;
 		config.regionRadiusX = config.regionRadiusY = 6;
-		config.maxPerPixelError = 30;
-		config.validateRtoL = 3;
-		config.texture = 0.05;
-		StereoDisparity<GrayS16, GrayF32> disparityAlg =
-				FactoryStereoDisparity.blockMatchBest5(config, GrayS16.class, GrayF32.class);
-
-		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
-		GrayS16 derivLeft = new GrayS16(width,height);
-		GrayS16 derivRight = new GrayS16(width,height);
-		GImageDerivativeOps.laplace(rectifiedLeft, derivLeft, BorderType.EXTENDED);
-		GImageDerivativeOps.laplace(rectifiedRight,derivRight, BorderType.EXTENDED);
+		config.validateRtoL = 1;
+		config.texture = 0.6;
+		StereoDisparity<GrayU8, GrayF32> disparityAlg =
+				FactoryStereoDisparity.blockMatchBest5(config, GrayU8.class, GrayF32.class);
 
 		// process and return the results
-		disparityAlg.process(derivLeft, derivRight);
+		disparityAlg.process(rectifiedLeft, rectifiedRight);
 		GrayF32 disparity = disparityAlg.getDisparity();
 		RectifyImageOps.applyMask(disparity,rectMask,0);
 
 		// show results
-		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, minDisparity, maxDisparity, 0);
+		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, maxDisparity-minDisparity, 0);
 
 		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectColorLeft, new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB),true);
 		BufferedImage outRight = ConvertBufferedImage.convertTo(rectColorRight, new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB),true);

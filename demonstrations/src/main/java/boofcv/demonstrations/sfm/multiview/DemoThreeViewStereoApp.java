@@ -27,7 +27,6 @@ import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.feature.associate.AssociateThreeByPairs;
-import boofcv.alg.filter.derivative.DerivativeLaplacian;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -501,7 +500,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		BoofSwingUtil.invokeNowOrLater(()-> {
 			VisualizeImageData.disparity(disparity, visualDisparity,
-					controls.minDisparity, controls.maxDisparity, 0);
+					controls.maxDisparity-controls.minDisparity, 0);
 			guiDisparity.setImageRepaint(visualDisparity);
 			controls.setViews(3);
 		});
@@ -614,7 +613,6 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 	public GrayF32 computeDisparity( Planar<GrayU8> rectColor1 , Planar<GrayU8> rectColor2 )
 	{
-
 		GrayU8 rectifiedLeft = new GrayU8(rectColor1.width,rectColor1.height);
 		GrayU8 rectifiedRight = new GrayU8(rectColor2.width,rectColor2.height);
 		ConvertImage.average(rectColor1,rectifiedLeft);
@@ -622,25 +620,18 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		// compute disparity
 		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
-		config.errorType = DisparityError.SAD;
+		config.errorType = DisparityError.NCC;
 		config.minDisparity = controls.minDisparity;
 		config.maxDisparity = controls.maxDisparity;
 		config.subpixel = true;
 		config.regionRadiusX = config.regionRadiusY = 6;
-		config.maxPerPixelError = 30;
-		config.validateRtoL = 3;
-		config.texture = 0.05;
-		StereoDisparity<GrayS16, GrayF32> disparityAlg =
-				FactoryStereoDisparity.blockMatchBest5(config, GrayS16.class, GrayF32.class);
-
-		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
-		GrayS16 derivLeft = new GrayS16(rectColor1.width,rectColor1.height);
-		GrayS16 derivRight = new GrayS16(rectColor2.width,rectColor2.height);
-		DerivativeLaplacian.process(rectifiedLeft, derivLeft,null);
-		DerivativeLaplacian.process(rectifiedRight,derivRight,null);
+		config.validateRtoL = 1;
+		config.texture = 0.6;
+		StereoDisparity<GrayU8, GrayF32> disparityAlg =
+				FactoryStereoDisparity.blockMatchBest5(config, GrayU8.class, GrayF32.class);
 
 		// process and return the results
-		disparityAlg.process(derivLeft, derivRight);
+		disparityAlg.process(rectifiedLeft, rectifiedRight);
 		return disparityAlg.getDisparity();
 	}
 

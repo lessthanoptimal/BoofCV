@@ -20,7 +20,6 @@ package boofcv.abst.feature.disparity;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.feature.disparity.DisparityBlockMatchRowFormat;
-import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -32,10 +31,8 @@ import boofcv.struct.image.ImageType;
  */
 public class WrapDisparityBlockMatchCensus
 		<T extends ImageGray<T>, C extends ImageGray<C>,DI extends ImageGray<DI>>
-		implements StereoDisparity<T, DI>
+		extends WrapBaseBlockMatch<T,C,DI>
 {
-	DisparityBlockMatchRowFormat<C, DI> alg;
-	DI disparity;
 
 	FilterImageInterface<T, C> censusTran;
 
@@ -46,6 +43,7 @@ public class WrapDisparityBlockMatchCensus
 	public WrapDisparityBlockMatchCensus(FilterImageInterface<T, C> censusTran,
 										 DisparityBlockMatchRowFormat<C, DI> alg)
 	{
+		super(alg);
 		this.censusTran = censusTran;
 		this.alg = alg;
 		disparity = GeneralizedImageOps.createSingleBand(alg.getDisparityType(),1,1);
@@ -54,24 +52,13 @@ public class WrapDisparityBlockMatchCensus
 	}
 
 	@Override
-	public void process(T imageLeft, T imageRight) {
-
-		if( disparity.width != imageLeft.width || disparity.height != imageLeft.height )  {
-			disparity.reshape(imageLeft.width,imageLeft.height);
-			GImageMiscOps.fill(disparity, getMaxDisparity() - getMinDisparity() + 1);
-		}
-
+	public void _process(T imageLeft, T imageRight) {
 		// Apply Census Transform to input images
 		censusTran.process(imageLeft,cleft);
 		censusTran.process(imageRight,cright);
 
 		// Now compute the disparity
 		alg.process(cleft,cright,disparity);
-	}
-
-	@Override
-	public DI getDisparity() {
-		return disparity;
 	}
 
 	public C getCLeft() {
@@ -83,37 +70,8 @@ public class WrapDisparityBlockMatchCensus
 	}
 
 	@Override
-	public int getBorderX() {
-		return alg.getBorderX();
-	}
-
-	@Override
-	public int getBorderY() {
-		return alg.getBorderY();
-	}
-
-	@Override
-	public int getMinDisparity() {
-		return alg.getMinDisparity();
-	}
-
-	@Override
-	public int getMaxDisparity() {
-		return alg.getMaxDisparity();
-	}
-
-	@Override
 	public ImageType<T> getInputType() {
 		return censusTran.getInputType();
-	}
-
-	@Override
-	public Class<DI> getDisparityType() {
-		return alg.getDisparityType();
-	}
-
-	public DisparityBlockMatchRowFormat<C, DI> getDisparityAlg() {
-		return alg;
 	}
 
 	public FilterImageInterface<T, C> getCensusTran() {

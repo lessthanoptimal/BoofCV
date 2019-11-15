@@ -191,7 +191,7 @@ public class ExampleStereoDisparity {
 //		GrayF32 disparity = denseDisparitySubpixel(rectLeft,rectRight,5,10,60);
 
 		// show results
-		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,10,60,0);
+		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,60-10,0);
 
 		ListDisplayPanel gui = new ListDisplayPanel();
 		gui.addImage(rectLeft, "Rectified");

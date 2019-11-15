@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,7 +81,7 @@ public class ExampleDepthPointCloud {
 		// ---------- Display depth image
 		// use the actual max value in the image to maximize its appearance
 		int maxValue = ImageStatistics.max(depth);
-		BufferedImage depthOut = VisualizeImageData.disparity(depth, null, 0, maxValue, 0);
+		BufferedImage depthOut = VisualizeImageData.disparity(depth, null, maxValue, 0);
 		ShowImages.showWindow(depthOut,"Depth Image", true);
 
 		// ---------- Display colorized point cloud

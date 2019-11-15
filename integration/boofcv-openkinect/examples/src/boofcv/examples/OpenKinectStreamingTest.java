@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2014, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,7 +99,7 @@ public class OpenKinectStreamingTest {
 		UtilOpenKinect.bufferDepthToU16(frame, depth);
 
 //		VisualizeImageData.grayUnsigned(depth,outDepth,UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE);
-		VisualizeImageData.disparity(depth, outDepth, 0, UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE,0);
+		VisualizeImageData.disparity(depth, outDepth, UtilOpenKinect.FREENECT_DEPTH_MM_MAX_VALUE,0);
 		guiDepth.repaint();
 	}
 

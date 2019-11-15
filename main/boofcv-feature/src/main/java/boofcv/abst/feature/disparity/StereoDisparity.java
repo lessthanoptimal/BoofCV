@@ -66,11 +66,17 @@ public interface StereoDisparity<Image extends ImageBase<Image>, Disparity exten
 	int getMinDisparity();
 
 	/**
-	 * The maximum disparity which will be checked for.
+	 * The number of possible disparity values. The maximum value (inclusive) is min + range -1.
 	 *
 	 * @return Maximum disparity.
 	 */
-	int getMaxDisparity();
+	int getRangeDisparity();
+
+	/**
+	 * Specifies the value that pixels with no valid disparity estimate will be filled in with. This
+	 * is always range, but any value >= range should be considered invalid.
+	 */
+	int getInvalidValue();
 
 	/**
 	 * Border around the image's x-axis which is not processed.

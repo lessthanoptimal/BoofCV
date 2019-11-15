@@ -48,7 +48,8 @@ public class ConfigureDisparityBM {
 	 */
 	public int regionRadiusY=3;
 	/**
-	 * Maximum allowed error in a region per pixel.  Set to &lt; 0 to disable.
+	 * Maximum allowed error in a region per pixel.  Only used by "error" based measures, e.g. NCC does not
+	 * use this value. Set to &lt; 0 to disable.
 	 */
 	public double maxPerPixelError=0;
 	/**
@@ -57,13 +58,13 @@ public class ConfigureDisparityBM {
 	public int validateRtoL=1;
 	/**
 	 * Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
-	 * Try 0.1. Disable with a value &le; 0
+	 * Try 0.1 for SAD or 0.7 for NCC. Disable with a value &le; 0
 	 */
 	public double texture = 0.1;
 
 	/**
-	 * If subpixel should be used to find disparity or not. If on then output image needs to me GrayF32. If false
-	 * then GrayU8
+	 * If subpixel should be used to find disparity or not. If on then output disparity image needs to me GrayF32.
+	 * If false then GrayU8.
 	 */
 	public boolean subpixel = true;
 
@@ -80,7 +81,7 @@ public class ConfigureDisparityBM {
 	/**
 	 * Used to avoid a divide by zero error when dividing by the standard deviation. Only used with NCC. Smaller
 	 * values are more mathematically accurate but make it more sensitive to floating point error.
-	 * This has been tuned to work with inputs that have been scaled to have values from -1 to 1.
+	 * This has been tuned to work with pixel values that have been scaled to -1 to 1.
 	 */
 	public double nccEps = 5e-5;
 }

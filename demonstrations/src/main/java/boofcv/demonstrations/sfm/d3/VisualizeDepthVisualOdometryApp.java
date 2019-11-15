@@ -347,7 +347,7 @@ public class VisualizeDepthVisualOdometryApp
 		final Se3_F64 leftToWorld = ((Se3_F64)alg.getCameraToWorld()).copy();
 
 		// TODO magic value from kinect.  Add to config file?
-		VisualizeImageData.disparity(imageDepth, renderedDepth, 0, 10000, 0);
+		VisualizeImageData.disparity(imageDepth, renderedDepth, 10000, 0);
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {

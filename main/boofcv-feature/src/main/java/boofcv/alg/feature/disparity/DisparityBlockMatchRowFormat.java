@@ -44,9 +44,9 @@ import boofcv.struct.image.ImageType;
 public abstract class DisparityBlockMatchRowFormat
 		<Input extends ImageBase<Input>, Disparity extends ImageGray<Disparity>>
 {
-	// the minimum disparity that it will check
+	// the minimum disparity value (inclusive)
 	protected int minDisparity;
-	// maximum allowed image disparity
+	// maximum allowed image disparity (exclusive)
 	protected int maxDisparity;
 	// difference between max and min
 	protected int rangeDisparity;

@@ -19,72 +19,26 @@
 package boofcv.abst.feature.disparity;
 
 import boofcv.alg.feature.disparity.DisparityBlockMatchRowFormat;
-import boofcv.alg.misc.GImageMiscOps;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
  * @author Peter Abeles
  */
-public class WrapDisparityBlockMatchRowFormat<T extends ImageGray<T>, D extends ImageGray<D>>
-		implements StereoDisparity<T,D>
+public class WrapDisparityBlockMatchRowFormat<T extends ImageGray<T>, DI extends ImageGray<DI>>
+		extends WrapBaseBlockMatch<T,T, DI>
 {
-	DisparityBlockMatchRowFormat<T,D> alg;
-	D disparity;
-
-	public WrapDisparityBlockMatchRowFormat(DisparityBlockMatchRowFormat<T,D> alg) {
-		this.alg = alg;
+	public WrapDisparityBlockMatchRowFormat(DisparityBlockMatchRowFormat<T, DI> alg) {
+		super(alg);
 	}
 
 	@Override
-	public void process(T imageLeft, T imageRight) {
-		if( disparity == null || disparity.width != imageLeft.width || disparity.height != imageLeft.height )  {
-			// make sure the image borders are marked as invalid
-			disparity = GeneralizedImageOps.createSingleBand(alg.getDisparityType(),imageLeft.width,imageLeft.height);
-			GImageMiscOps.fill(disparity, getMaxDisparity() - getMinDisparity() + 1);
-			// TODO move this outside and run it every time. Need to fill border
-			//      left border will be radius + min disparity
-		}
-
+	public void _process(T imageLeft, T imageRight) {
 		alg.process(imageLeft,imageRight,disparity);
-	}
-
-	public D getDisparity() {
-		return disparity;
-	}
-
-	@Override
-	public int getBorderX() {
-		return alg.getBorderX();
-	}
-
-	@Override
-	public int getBorderY() {
-		return alg.getBorderY();
-	}
-
-	@Override
-	public int getMinDisparity() {
-		return alg.getMinDisparity();
-	}
-
-	@Override
-	public int getMaxDisparity() {
-		return alg.getMaxDisparity();
 	}
 
 	@Override
 	public ImageType<T> getInputType() {
 		return alg.getInputType();
-	}
-
-	@Override
-	public Class<D> getDisparityType() {
-		return alg.getDisparityType();
-	}
-
-	public DisparityBlockMatchRowFormat<T,D> getAlg() {
-		return alg;
 	}
 }

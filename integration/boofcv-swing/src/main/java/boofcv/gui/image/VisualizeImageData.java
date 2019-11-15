@@ -237,34 +237,30 @@ public class VisualizeImageData {
 	 *
 	 * @param disparity    Input disparity image
 	 * @param dst          Where the image is rendered into.  If null a new BufferedImage will be created and return.
-	 * @param minDisparity Minimum disparity that can be computed
-	 * @param maxDisparity Maximum disparity that can be computed
+	 * @param disparityRange Number of possible disparity values
 	 * @param invalidColor RGB value for invalid pixels.  Try 0xFF << 8 for green
 	 * @return Rendered image.
 	 */
 	public static BufferedImage disparity(ImageGray disparity, BufferedImage dst,
-										  int minDisparity, int maxDisparity, int invalidColor) {
+										  int disparityRange, int invalidColor) {
 		if( dst == null )
 			dst = new BufferedImage(disparity.getWidth(),disparity.getHeight(),BufferedImage.TYPE_INT_RGB);
 
 		if (disparity.getDataType().isInteger()) {
-			return disparity((GrayI) disparity, dst, minDisparity, maxDisparity, invalidColor);
+			return disparity((GrayI) disparity, dst, disparityRange, invalidColor);
 		} else if (disparity instanceof GrayF32) {
-			return disparity((GrayF32) disparity, dst, minDisparity, maxDisparity, invalidColor);
+			return disparity((GrayF32) disparity, dst, disparityRange, invalidColor);
 		} else {
 			throw new RuntimeException("Add support");
 		}
 	}
 
-	private static BufferedImage disparity(GrayI src, BufferedImage dst,
-										   int minValue, int maxValue, int invalidColor) {
-		int range = maxValue - minValue;
-
+	private static BufferedImage disparity(GrayI src, BufferedImage dst, int range, int invalidColor) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				int v = src.unsafe_get(x, y);
 
-				if (v > range) {
+				if (v >= range) {
 					dst.setRGB(x, y, invalidColor);
 				} else {
 					int r, b;
@@ -272,8 +268,8 @@ public class VisualizeImageData {
 					if (v == 0) {
 						r = b = 0;
 					} else {
-						r = 255 * v / maxValue;
-						b = 255 * (maxValue - v) / maxValue;
+						r = 255 * v / range;
+						b = 255 * (range - v) / range;
 					}
 
 					dst.setRGB(x, y, r << 16 | b);
@@ -285,14 +281,12 @@ public class VisualizeImageData {
 	}
 
 	private static BufferedImage disparity(GrayF32 src, BufferedImage dst,
-										   int minValue, int maxValue, int invalidColor) {
-		float range = maxValue - minValue;
-
+										   int range, int invalidColor) {
 		for (int y = 0; y < src.height; y++) {
 			for (int x = 0; x < src.width; x++) {
 				float v = src.unsafe_get(x, y);
 
-				if (v > range) {
+				if (v >= range) {
 					dst.setRGB(x, y, invalidColor);
 				} else {
 					int r, b;
@@ -300,8 +294,8 @@ public class VisualizeImageData {
 					if (v == 0) {
 						r = b = 0;
 					} else {
-						r = (int) (255 * v / maxValue);
-						b = (int) (255 * (maxValue - v) / maxValue);
+						r = (int) (255 * v / range);
+						b = (int) (255 * (range - v) / range);
 					}
 
 					dst.setRGB(x, y, r << 16 | b);

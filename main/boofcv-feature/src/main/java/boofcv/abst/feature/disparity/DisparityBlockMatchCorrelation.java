@@ -19,11 +19,9 @@
 package boofcv.abst.feature.disparity;
 
 import boofcv.alg.feature.disparity.DisparityBlockMatchRowFormat;
-import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageNormalization;
 import boofcv.alg.misc.NormalizeParameters;
 import boofcv.core.image.GConvertImage;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
@@ -34,10 +32,8 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class DisparityBlockMatchCorrelation<T extends ImageGray<T>, D extends ImageGray<D>, TF extends ImageGray<TF>>
-		implements StereoDisparity<T,D>
+		extends WrapBaseBlockMatch<T,TF,D>
 {
-	DisparityBlockMatchRowFormat<TF,D> alg;
-	D disparity;
 	TF adjustedLeft,adjustedRight;
 
 	boolean normalizeInput=true;
@@ -46,7 +42,7 @@ public class DisparityBlockMatchCorrelation<T extends ImageGray<T>, D extends Im
 	ImageType<T> inputType;
 
 	public DisparityBlockMatchCorrelation(DisparityBlockMatchRowFormat<TF,D> alg, Class<T> inputType ) {
-		this.alg = alg;
+		super(alg);
 		this.inputType = ImageType.single(inputType);
 
 		adjustedLeft = alg.getInputType().createImage(1,1);
@@ -54,15 +50,7 @@ public class DisparityBlockMatchCorrelation<T extends ImageGray<T>, D extends Im
 	}
 
 	@Override
-	public void process(T imageLeft, T imageRight) {
-		if( disparity == null || disparity.width != imageLeft.width || disparity.height != imageLeft.height )  {
-			// make sure the image borders are marked as invalid
-			disparity = GeneralizedImageOps.createSingleBand(alg.getDisparityType(),imageLeft.width,imageLeft.height);
-			GImageMiscOps.fill(disparity, getMaxDisparity() - getMinDisparity() + 1);
-			// TODO move this outside and run it every time. Need to fill border
-			//      left border will be radius + min disparity
-		}
-
+	public void _process(T imageLeft, T imageRight) {
 		if( normalizeInput ) {
 			// normalize to reduce numerical problems, e.g. overflow/underflow
 			ImageNormalization.zeroMeanMaxOne(imageLeft, adjustedLeft, parameters);
@@ -77,42 +65,8 @@ public class DisparityBlockMatchCorrelation<T extends ImageGray<T>, D extends Im
 	}
 
 	@Override
-	public D getDisparity() {
-		return disparity;
-	}
-
-	@Override
-	public int getBorderX() {
-		return alg.getBorderX();
-	}
-
-	@Override
-	public int getBorderY() {
-		return alg.getBorderY();
-	}
-
-	@Override
-	public int getMinDisparity() {
-		return alg.getMinDisparity();
-	}
-
-	@Override
-	public int getMaxDisparity() {
-		return alg.getMaxDisparity();
-	}
-
-	@Override
 	public ImageType<T> getInputType() {
 		return inputType;
-	}
-
-	@Override
-	public Class<D> getDisparityType() {
-		return alg.getDisparityType();
-	}
-
-	public DisparityBlockMatchRowFormat<TF,D> getAlg() {
-		return alg;
 	}
 
 	public TF getAdjustedLeft() {

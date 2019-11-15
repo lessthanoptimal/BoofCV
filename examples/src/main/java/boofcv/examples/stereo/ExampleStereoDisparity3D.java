@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -164,7 +164,7 @@ public class ExampleStereoDisparity3D {
 		viewer.setPreferredSize(new Dimension(600,600*param.left.height/param.left.width));
 
 		// display the results.  Click and drag to change point cloud camera
-		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,minDisparity, maxDisparity,0);
+		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,maxDisparity-minDisparity,0);
 		ShowImages.showWindow(visualized,"Disparity", true);
 		ShowImages.showWindow(viewer,"Point Cloud", true);
 	}

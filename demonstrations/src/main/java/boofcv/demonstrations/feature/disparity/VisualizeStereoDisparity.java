@@ -349,9 +349,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 		D disparity = activeAlg.getDisparity();
 
-		disparityOut = VisualizeImageData.disparity(disparity,null,
-				activeAlg.getMinDisparity(),activeAlg.getMaxDisparity(),
-				color);
+		// TODO Got a NPE inside of this function once when rapidly changing settings. Make sure everything is locked down
+		disparityOut = VisualizeImageData.disparity(disparity,null, activeAlg.getRangeDisparity(), color);
 
 		changeImageView();
 	}
