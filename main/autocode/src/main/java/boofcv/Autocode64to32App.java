@@ -42,6 +42,7 @@ public class Autocode64to32App extends RecursiveConvert {
                 "main/boofcv-geo/src/main/java/boofcv/struct/geo",
                 "main/boofcv-ip/src/main/java/boofcv/alg/distort",
                 "main/boofcv-types/src/main/java/boofcv/struct/distort",
+                "main/boofcv-io/src/main/java/boofcv/io/points/impl"
                 };
 
         ConvertFile32From64 converter = new ConvertFile32From64(false);

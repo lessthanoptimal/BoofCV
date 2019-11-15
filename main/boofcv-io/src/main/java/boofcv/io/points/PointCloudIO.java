@@ -18,10 +18,15 @@
 
 package boofcv.io.points;
 
+import boofcv.io.points.impl.PlyCodec_F32;
+import boofcv.io.points.impl.PlyCodec_F64;
+import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.List;
 
 /**
@@ -31,110 +36,58 @@ import java.util.List;
  */
 public class PointCloudIO {
 
-	public void save( Format format , List<Point3D_F64> cloud , File path ) throws IOException {
-		Writer writer = new FileWriter(path);
+	public static void save3D32F(Format format , List<Point3D_F32> cloud , Writer writer ) throws IOException {
 		switch( format ) {
 			case PLY_ASCII:
-				savePlyAscii_F64(cloud,writer);
+				PlyCodec_F32.saveAscii(cloud, writer);
 				break;
+			case PLY_BINARY:
+				throw new IllegalArgumentException("Not yet supported");
 			default:
 				throw new IllegalArgumentException("Unknown format "+format);
 		}
 	}
 
-	public void load( Format format , File path , FastQueue<Point3D_F64> storage  ) throws IOException {
-		Reader reader = new FileReader(path);
+	public static void save3D64F( Format format , List<Point3D_F64> cloud , Writer writer ) throws IOException {
 		switch( format ) {
 			case PLY_ASCII:
-				readPly_F64(reader,storage);
+				PlyCodec_F64.saveAscii(cloud, writer);
+				break;
+			case PLY_BINARY:
+				throw new IllegalArgumentException("Not yet supported");
 			default:
 				throw new IllegalArgumentException("Unknown format "+format);
 		}
 	}
 
-	private void savePlyAscii_F64(List<Point3D_F64> cloud , Writer outputWriter ) throws IOException {
-		outputWriter.write("PLY\n");
-		outputWriter.write("format ascii 1.0\n");
-		outputWriter.write("comment Created using BoofCV!\n");
-		outputWriter.write("element vertex "+cloud.size()+"\n" +
-				"property float x\n" +
-				"property float y\n" +
-				"property float z\n" +
-				"end_header\n");
-
-		for (int i = 0; i < cloud.size(); i++) {
-			Point3D_F64 p = cloud.get(i);
-			outputWriter.write(String.format("%f %f %f\n",p.x,p.y,p.z));
-		}
-	}
-
-	private void readPly_F64(Reader inputReader, FastQueue<Point3D_F64> output ) throws IOException {
-		BufferedReader reader = new BufferedReader(inputReader);
-		String line = reader.readLine();
-		if( line == null ) throw new IOException("Missing first line");
-		if( !line.equals("PLY") ) throw new IOException("Expected PLY at start of file");
-
-		int vertexCount = -1;
-
-		boolean ascii = false;
-		line = readNextPly(reader,true);
-		while( line != null ) {
-			if( line.equals("end_header") )
+	public static void load3D32F( Format format , Reader reader , FastQueue<Point3D_F32> storage  ) throws IOException {
+		switch( format ) {
+			case PLY_ASCII:
+				PlyCodec_F32.read(reader,storage);
 				break;
-			String[] words = line.split("\\s+");
-			if( words.length == 1 )
-				throw new IOException("Expected more than one word");
-			if( line.startsWith("format")) {
-				if( words[1].equals("ascii")) {
-					ascii = true;
-				} else {
-					ascii = false;
-				}
-			} else if( line.startsWith("element")) {
-				if( words[1].equals("vertex")) {
-					vertexCount = Integer.parseInt(words[2]);
-				}
-			} else if( words[0].equals("property") ) {
-				// I should do something here
-			} else {
-				throw new IOException("Unknown header element");
-			}
-			line = readNextPly(reader,true);
+			case PLY_BINARY:
+				throw new IllegalArgumentException("Not yet supported");
+			default:
+				throw new IllegalArgumentException("Unknown format "+format);
 		}
-		if( vertexCount == -1 )
-			throw new IOException("File is missing vertex count");
-
-		output.growArray(output.data.length+vertexCount);
-
-		for (int i = 0; i < vertexCount; i++) {
-			line = readNextPly(reader,true);
-			String[] words = line.split("\\s+");
-			Point3D_F64 p = output.grow();
-			p.x = Double.parseDouble(words[0]);
-			p.y = Double.parseDouble(words[1]);
-			p.z = Double.parseDouble(words[2]);
-		}
-
 	}
 
-	private String readNextPly(BufferedReader reader , boolean failIfNull ) throws IOException {
-		String line = reader.readLine();
-		while( line != null ) {
-			if( line.startsWith("comment") )
-				line = reader.readLine();
-			else {
-				return line;
-			}
+	public static void load3D64F( Format format , Reader reader , FastQueue<Point3D_F64> storage  ) throws IOException {
+		switch( format ) {
+			case PLY_ASCII:
+				PlyCodec_F64.read(reader,storage);
+				break;
+			case PLY_BINARY:
+				throw new IllegalArgumentException("Not yet supported");
+			default:
+				throw new IllegalArgumentException("Unknown format "+format);
 		}
-		if( failIfNull )
-			throw new IOException("Unexpected end of file");
-		return null;
 	}
 
 	public enum Format {
 		/**
 		 * https://en.wikipedia.org/wiki/PLY_(file_format)
 		 */
-		PLY_ASCII
+		PLY_ASCII,PLY_BINARY
 	}
 }

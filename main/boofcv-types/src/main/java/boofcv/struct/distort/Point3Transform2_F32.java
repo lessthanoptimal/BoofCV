@@ -38,7 +38,9 @@ public interface Point3Transform2_F32 {
 	void compute(float x, float y, float z, Point2D_F32 out);
 
 	/**
-	 * Creates a copy
+	 * Creates a copy of this transform for use in concurrent application. What that means is that any variable
+	 * which might be modified by a concurrent call to {@link #compute} is not passed to the 'copied' output.
+	 * Expensive to compute models might be passed in as a reference.
 	 */
 	Point3Transform2_F32 copyConcurrent();
 }

@@ -91,7 +91,7 @@ public class CameraToEquirectangular_F32
 	@Override
 	public CameraToEquirectangular_F32 copyConcurrent() {
 		CameraToEquirectangular_F32 out = new CameraToEquirectangular_F32();
-		out.setTo(this);
+		out.setConcurrent(this);
 		return out;
 	}
 }
