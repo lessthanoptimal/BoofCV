@@ -20,19 +20,19 @@ package boofcv.visualize;
 
 /**
  * Generates colors using a primary axis and the sum of the other two axises. This is intended to provide
- * more visual variety than {@link RainbowColorSingleAxis}
+ * more visual variety than {@link SingleAxisMagentaBlue}
  *
  * @author Peter Abeles
  */
-public abstract class RainbowColorAxisPlane extends PeriodicColorizer {
+public abstract class TwoAxisRgbPlane extends PeriodicColorizer {
 
 	double planeScale;
 
-	public RainbowColorAxisPlane(double planeScale) {
+	public TwoAxisRgbPlane(double planeScale) {
 		this.planeScale = planeScale;
 	}
 
-	public static class X_YZ extends RainbowColorAxisPlane {
+	public static class X_YZ extends TwoAxisRgbPlane {
 		public X_YZ(double planeScale) {
 			super(planeScale);
 		}
@@ -45,7 +45,7 @@ public abstract class RainbowColorAxisPlane extends PeriodicColorizer {
 		}
 	}
 
-	public static class Y_XZ extends RainbowColorAxisPlane {
+	public static class Y_XZ extends TwoAxisRgbPlane {
 		public Y_XZ(double planeScale) {
 			super(planeScale);
 		}
@@ -58,7 +58,7 @@ public abstract class RainbowColorAxisPlane extends PeriodicColorizer {
 		}
 	}
 
-	public static class Z_XY extends RainbowColorAxisPlane {
+	public static class Z_XY extends TwoAxisRgbPlane {
 		public Z_XY(double planeScale) {
 			super(planeScale);
 		}

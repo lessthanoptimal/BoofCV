@@ -23,39 +23,36 @@ package boofcv.visualize;
  *
  * @author Peter Abeles
  */
-public abstract class RainbowColorSingleAxis extends PeriodicColorizer {
+public abstract class SingleAxisMagentaBlue extends PeriodicColorizer {
+	private static final int HV = 225;
+	private static final int LV = 30;
 
-	public static class X extends RainbowColorSingleAxis {
+	final int color( double val ) {
+		double a = triangleWave(val);
+		int red = (int)(HV*a)+LV;
+		int blue = (int)(HV*(1.0-a))+LV;
+
+		return (red << 16) | blue;
+	}
+
+	public static class X extends SingleAxisMagentaBlue {
 		@Override
 		public int color(int index, double x, double y, double z) {
-			double a = triangleWave(x);
-			int red = (int)(235*a)+20;
-			int blue = (int)(235*(1.0-a))+20;
-
-			return (red << 16) | blue;
+			return color(x);
 		}
 	}
 
-	public static class Y extends RainbowColorSingleAxis {
+	public static class Y extends SingleAxisMagentaBlue {
 		@Override
 		public int color(int index, double x, double y, double z) {
-			double a = triangleWave(y);
-			int red = (int)(235*a)+20;
-			int blue = (int)(235*(1.0-a))+20;
-
-			return (red << 16) | blue;
+			return color(y);
 		}
 	}
 
-	public static class Z extends RainbowColorSingleAxis {
+	public static class Z extends SingleAxisMagentaBlue {
 		@Override
 		public int color(int index, double x, double y, double z) {
-			double a = triangleWave(z);
-
-			int red = (int)(235*a)+20;
-			int blue = (int)(235*(1.0-a))+20;
-
-			return (red << 16) | blue;
+			return color(z);
 		}
 	}
 }

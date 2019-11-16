@@ -91,7 +91,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	// selects which image to view
 	JComboBox viewSelector = combo(selectedView,"Disparity","Left","Right","View 3D");
 	// If the point cloud should be colorized or not
-	JComboBox comboColorizer = combo(0,"Color","X","Y","Z","X-YZ","Y-XZ","Z-XY");
+	JComboBox comboColorizer = combo(0,"Color","X-YZ","Y-XZ","Z-XY","RB-X","RB-Y","RB-Z","RGB-X","RGB-Y","RGB-Z");
 
 	JSlider sliderPeriodColor = slider(0,1000,periodAdjust,120);
 	JSlider sliderOffsetColor = slider(0,1000,offsetAdjust,120);

@@ -38,10 +38,10 @@ public abstract class PeriodicColorizer implements PointCloudViewer.Colorizer {
 	}
 
 	final double triangleWave(double value ) {
-		return Math.abs(offset+value/period - Math.floor(offset+value/period + 0.5));
+		return 2.0*Math.abs(offset+value/period - Math.floor(offset+value/period + 0.5));
 	}
 	final double triangleWave(double value , double period) {
-		return Math.abs(offset+value/period - Math.floor(offset+value/period + 0.5));
+		return 2.0*Math.abs(offset+value/period - Math.floor(offset+value/period + 0.5));
 	}
 
 	public double getPeriod() {

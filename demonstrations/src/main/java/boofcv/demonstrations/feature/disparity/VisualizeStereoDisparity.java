@@ -472,16 +472,19 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	@Override
 	public void changeView3D() {
 		double baseline = calib.getRightToLeft().getT().norm();
-		double periodColor = baseline*5*control.periodScale();
+		double periodColor = baseline*10*control.periodScale();
 		PeriodicColorizer colorizer=null;
 		switch( control.colorScheme ) {
 			case 0: pcv.removeColorizer();break;
-			case 1: colorizer = new RainbowColorSingleAxis.X(); break;
-			case 2: colorizer = new RainbowColorSingleAxis.Y(); break;
-			case 3: colorizer = new RainbowColorSingleAxis.Z(); break;
-			case 4: colorizer = new RainbowColorAxisPlane.X_YZ(4.0); break;
-			case 5: colorizer = new RainbowColorAxisPlane.Y_XZ(4.0); break;
-			case 6: colorizer = new RainbowColorAxisPlane.Z_XY(4.0); break;
+			case 1: colorizer = new TwoAxisRgbPlane.X_YZ(4.0); break;
+			case 2: colorizer = new TwoAxisRgbPlane.Y_XZ(4.0); break;
+			case 3: colorizer = new TwoAxisRgbPlane.Z_XY(4.0); break;
+			case 4: colorizer = new SingleAxisMagentaBlue.X(); break;
+			case 5: colorizer = new SingleAxisMagentaBlue.Y(); break;
+			case 6: colorizer = new SingleAxisMagentaBlue.Z(); break;
+			case 7: colorizer = new SingleAxisRgb.X(); break;
+			case 8: colorizer = new SingleAxisRgb.Y(); break;
+			case 9: colorizer = new SingleAxisRgb.Z(); break;
 		}
 		if( colorizer != null ) {
 			colorizer.setPeriod(periodColor);
