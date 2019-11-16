@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class PlyCodec_F64 {
 	public static void saveAscii(List<Point3D_F64> cloud , Writer outputWriter ) throws IOException {
-		outputWriter.write("PLY\n");
+		outputWriter.write("ply\n");
 		outputWriter.write("format ascii 1.0\n");
 		outputWriter.write("comment Created using BoofCV!\n");
 		outputWriter.write("element vertex "+cloud.size()+"\n" +
@@ -53,7 +53,7 @@ public class PlyCodec_F64 {
 		BufferedReader reader = new BufferedReader(inputReader);
 		String line = reader.readLine();
 		if( line == null ) throw new IOException("Missing first line");
-		if( !line.equals("PLY") ) throw new IOException("Expected PLY at start of file");
+		if( line.compareToIgnoreCase("ply")!=0 ) throw new IOException("Expected PLY at start of file");
 
 		int vertexCount = -1;
 

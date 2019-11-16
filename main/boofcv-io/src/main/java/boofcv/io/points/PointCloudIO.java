@@ -24,6 +24,7 @@ import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -60,7 +61,11 @@ public class PointCloudIO {
 		}
 	}
 
-	public static void load3D32F( Format format , Reader reader , FastQueue<Point3D_F32> storage  ) throws IOException {
+	public static FastQueue<Point3D_F32>
+	load3D32F( Format format , Reader reader , @Nullable FastQueue<Point3D_F32> storage  ) throws IOException {
+		if( storage == null )
+			storage = new FastQueue<>(Point3D_F32.class,true);
+
 		switch( format ) {
 			case PLY_ASCII:
 				PlyCodec_F32.read(reader,storage);
@@ -70,9 +75,14 @@ public class PointCloudIO {
 			default:
 				throw new IllegalArgumentException("Unknown format "+format);
 		}
+		return storage;
 	}
 
-	public static void load3D64F( Format format , Reader reader , FastQueue<Point3D_F64> storage  ) throws IOException {
+	public static FastQueue<Point3D_F64>
+	load3D64F( Format format , Reader reader , @Nullable FastQueue<Point3D_F64> storage  ) throws IOException {
+		if( storage == null )
+			storage = new FastQueue<>(Point3D_F64.class,true);
+
 		switch( format ) {
 			case PLY_ASCII:
 				PlyCodec_F64.read(reader,storage);
@@ -82,6 +92,7 @@ public class PointCloudIO {
 			default:
 				throw new IllegalArgumentException("Unknown format "+format);
 		}
+		return storage;
 	}
 
 	public enum Format {
