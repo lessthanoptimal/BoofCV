@@ -24,8 +24,8 @@ import boofcv.struct.image.Planar;
 
 /**
  * <p>Computes a stack of matching costs for all pixels across all possible disparities for use
- * with {@link SgmCostAggregation}. Pay close attention to the element ordering in the output. That was
- * selected to reduce cache misses when aggregating the costs.</p>
+ * with {@link SgmCostAggregation}. Pay close attention to the element ordering in the output. Ordering was
+ * selected to reduce CPU cache misses when aggregating the costs.</p>
  *
  * <p>The output is really a 3D tensor, but to avoid creating another custom data type planar images are used.
  * The other reason to use a planar image is that it was desirable to have multiple arrays define the tensor.</p>

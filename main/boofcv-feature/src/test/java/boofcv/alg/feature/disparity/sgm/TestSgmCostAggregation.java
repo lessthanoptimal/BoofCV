@@ -53,19 +53,24 @@ class TestSgmCostAggregation {
 	 */
 	@Test
 	void score_SinglePath() {
-		Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,width,height, rangeD);
+		Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,rangeD,width,height);
 		GImageMiscOps.fillUniform(costYXD,rand,0,SgmDisparityCost.MAX_COST);
 
 		SgmCostAggregation alg = new SgmCostAggregation();
 
 		alg.init(costYXD);
+		int before = countNotZero(alg.aggregated);
+
 		alg.score(0,0,1,1);
 
 		// the length is the number of elements to expect
 		int length = alg.computePathLength(0,0,1,1);
 		int foundCount = countNotZero(alg.aggregated);
 
-		assertEquals(length,foundCount);
+		// for each point in the path it computed the aggregated cost
+		assertEquals(length*rangeD,foundCount);
+
+		// TODO check the actual value using a brute force approach
 	}
 
 	private int countNotZero( Planar<GrayU16> aggregated ) {
@@ -84,13 +89,13 @@ class TestSgmCostAggregation {
 
 	@Test
 	void computeCostInnerD() {
-		Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,width,height, rangeD);
+		Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,rangeD,width,height);
 		GImageMiscOps.fillUniform(costYXD,rand,0,SgmDisparityCost.MAX_COST);
 
 		SgmCostAggregation alg = new SgmCostAggregation();
 		alg.init(costYXD);
-		for (int i = 0; i < alg.pathWork.length; i++) {
-			alg.pathWork[i] = (short)rand.nextInt(SgmDisparityCost.MAX_COST);
+		for (int i = 0; i < alg.workCostLr.length; i++) {
+			alg.workCostLr[i] = (short)rand.nextInt(SgmDisparityCost.MAX_COST);
 		}
 
 		GrayU16 costXD = costYXD.getBand(2);
@@ -103,7 +108,7 @@ class TestSgmCostAggregation {
 		int minCostPrev = 6;
 
 		// Compute the cost using this algorithm
-		alg.computeCostInnerD(costXD,idxCost,idxWork,minCostPrev,minCostPrev+alg.penalty2);
+		alg.computeCostInnerD(costXD,idxCost,idxWork,minCostPrev);
 
 		// Now compare it to a brute force solution
 		for (int d = 1; d < rangeD-1; d++) {
@@ -124,7 +129,7 @@ class TestSgmCostAggregation {
 	}
 
 	int workArray( SgmCostAggregation alg , int pathIdx , int d ) {
-		return alg.pathWork[alg.lengthD*pathIdx+d]&0xFFFF;
+		return alg.workCostLr[alg.lengthD*pathIdx+d]&0xFFFF;
 	}
 
 	@Test
