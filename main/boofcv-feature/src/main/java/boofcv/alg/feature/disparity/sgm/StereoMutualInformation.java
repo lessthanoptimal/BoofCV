@@ -32,6 +32,8 @@ import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import org.ejml.UtilEjml;
 
+import java.util.Random;
+
 /**
  * <p></p>Computes the Mutual Information error metric from a rectified stereo pair. Mutual information
  * between two images is defined as: MI(I1,I2) = H<sub>I1</sub> + H<sub>I2</sub> + H<sub>I1,I2</sub>.
@@ -107,6 +109,18 @@ public class StereoMutualInformation {
 		entropyLeft.reshape(intensityBins,1);
 		entropyRight.reshape(intensityBins,1);
 		scaledCost.reshape(histJoint);
+	}
+
+	/**
+	 * Computes random values for the cost between left and right values.
+	 *
+	 * @param rand Random number generator
+	 */
+	public void randomHistogram( Random rand , int maxCost ) {
+		int N = scaledCost.totalPixels();
+		for (int i = 0; i < N; i++) {
+			scaledCost.data[i] = (short)rand.nextInt(maxCost);
+		}
 	}
 
 	/**

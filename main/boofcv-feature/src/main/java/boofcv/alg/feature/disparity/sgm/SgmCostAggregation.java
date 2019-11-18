@@ -48,7 +48,8 @@ public class SgmCostAggregation {
 
 	// Stores aggregated cost along a single path. Row major (path[i], depth).
 	// Size = (max path length) * lengthD.
-	// Is copied into 'aggregated' once done
+	// After computed it is then added to 'aggregated' once done.
+	// This is actually why a work space is required and aggregated isn't used directly
 	short[] workCostLr = new short[0];
 
 	int maxPathsConsidered = 8;
@@ -67,28 +68,28 @@ public class SgmCostAggregation {
 		init(costYXD);
 
 		if( maxPathsConsidered >= 2 ) {
-			score(1, 0);
-			score(-1, 0);
+			scoreDirection(1, 0);
+			scoreDirection(-1, 0);
 		}
 		if( maxPathsConsidered >= 4 ) {
-			score(0, 1);
-			score(0, -1);
+			scoreDirection(0, 1);
+			scoreDirection(0, -1);
 		}
 		if( maxPathsConsidered >= 8 ) {
-			score(1, 1);
-			score(-1, -1);
-			score(-1, 1);
-			score(1, -1);
+			scoreDirection(1, 1);
+			scoreDirection(-1, -1);
+			scoreDirection(-1, 1);
+			scoreDirection(1, -1);
 		}
 		if( maxPathsConsidered >= 16 ) {
-			score(1, 2);
-			score(2, 1);
-			score(2, -1);
-			score(1, -2);
-			score(-1, -2);
-			score(-2, -1);
-			score(-2, 1);
-			score(-1, 2);
+			scoreDirection(1, 2);
+			scoreDirection(2, 1);
+			scoreDirection(2, -1);
+			scoreDirection(1, -2);
+			scoreDirection(-1, -2);
+			scoreDirection(-2, -1);
+			scoreDirection(-2, 1);
+			scoreDirection(-1, 2);
 		}
 	}
 
@@ -107,24 +108,30 @@ public class SgmCostAggregation {
 		this.workCostLr = new short[ Math.max(lengthX,lengthY)*lengthD ];
 	}
 
-	void score( int dx , int dy ) {
+	/**
+	 * Scores all possible paths for this given direction and add it to the aggregated cost
+	 */
+	void scoreDirection(int dx , int dy ) {
 		if( dx > 0 ) {
 			for (int y = 0; y < lengthY; y++) {
-				score(0,y,dx,dy);
+				scorePath(0,y,dx,dy);
 			}
 		} else if( dx < 0 ) {
 			for (int y = 0; y < lengthY; y++) {
-				score(lengthX-1,y,dx,dy);
+				scorePath(lengthX-1,y,dx,dy);
 			}
 		}
-		// TODO avoid computing the same cost more than once
 		if( dy > 0 ) {
-			for (int x = 0; x < lengthX; x++) {
-				score(x,0,dx,dy);
+			int x0 = dx > 0 ? 1 : 0;
+			int x1 = dx < 0 ? lengthX-1 : lengthX;
+			for (int x = x0; x < x1; x++) {
+				scorePath(x,0,dx,dy);
 			}
 		} else if( dy < 0 ) {
-			for (int x = 0; x < lengthX; x++) {
-				score(x,lengthY-1,dx,dy);
+			int x0 = dx > 0 ? 1 : 0;
+			int x1 = dx < 0 ? lengthX-1 : lengthX;
+			for (int x = x0; x < x1; x++) {
+				scorePath(x,lengthY-1,dx,dy);
 			}
 		}
 	}
@@ -136,7 +143,7 @@ public class SgmCostAggregation {
 	 * @param dx step x-axis
 	 * @param dy step y-axis
 	 */
-	void score( int x0 , int y0 , int dx , int dy ) {
+	void scorePath(int x0 , int y0 , int dx , int dy ) {
 		// there is no previous disparity score so simply fill the cost for d=0
 		GrayU16 costXD = costYXD.getBand(y0);
 		int idxCost = costXD.getIndex(0,x0);   // C(0,0)
@@ -180,7 +187,7 @@ public class SgmCostAggregation {
 	}
 
 	/**
-	 * Copies the work array into the aggregated cost Tensor
+	 * Adds the work LR onto the aggregated cost Tensor, which is the sum of all paths
 	 */
 	void saveWorkToAggregated( int x0 , int y0 , int dx , int dy , int length ) {
 		int idxWork = 0;

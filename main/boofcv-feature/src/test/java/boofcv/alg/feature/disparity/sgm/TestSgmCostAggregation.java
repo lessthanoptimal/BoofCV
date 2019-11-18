@@ -21,7 +21,9 @@ package boofcv.alg.feature.disparity.sgm;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
+import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -49,19 +51,61 @@ class TestSgmCostAggregation {
 	}
 
 	/**
+	 * Makes sure all possible paths are scored once and only once
+	 */
+	@Test
+	void scoreDirection()
+	{
+		scoreDirection(1,0);
+		scoreDirection(0,1);
+		scoreDirection(1,1);
+		scoreDirection(-1,0);
+		scoreDirection(0,-1);
+		scoreDirection(-1,-1);
+		scoreDirection(1,2);
+		scoreDirection(2,1);
+		scoreDirection(1,-2);
+		scoreDirection(-2,1);
+		scoreDirection(-1,-2);
+		scoreDirection(-2,-1);
+	}
+
+	void scoreDirection( int dx , int dy )  {
+		Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,rangeD,width,height);
+		ScorePathHelper alg = new ScorePathHelper();
+		alg.init(costYXD);
+		alg.scoreDirection(dx,dy);
+
+		GrayU8 expected = alg.scored.createSameShape();
+
+		for (int x = 0; x < width; x++) {
+			if( dy > 0 )
+				expected.set(x,0,1);
+			else if( dy < 0 )
+				expected.set(x,height-1,1);
+		}
+		for (int y = 0; y < height; y++) {
+			if( dx > 0 )
+				expected.set(0,y,1);
+			else if( dx < 0 )
+				expected.set(width-1,y,1);
+		}
+		BoofTesting.assertEquals(expected,alg.scored,0);
+	}
+
+	/**
 	 * Checks the fill in pattern when a single path is scored
 	 */
 	@Test
-	void score_SinglePath() {
+	void scorePath() {
 		Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,rangeD,width,height);
 		GImageMiscOps.fillUniform(costYXD,rand,0,SgmDisparityCost.MAX_COST);
 
 		SgmCostAggregation alg = new SgmCostAggregation();
 
 		alg.init(costYXD);
-		int before = countNotZero(alg.aggregated);
 
-		alg.score(0,0,1,1);
+		alg.scorePath(0,0,1,1);
 
 		// the length is the number of elements to expect
 		int length = alg.computePathLength(0,0,1,1);
@@ -193,5 +237,21 @@ class TestSgmCostAggregation {
 		}
 
 		return count;
+	}
+
+	private static class ScorePathHelper extends SgmCostAggregation {
+		GrayU8 scored = new GrayU8(1,1);
+
+		@Override
+		void init(Planar<GrayU16> costYXD) {
+			super.init(costYXD);
+			scored.reshape(costYXD.height,costYXD.getNumBands());
+		}
+
+		@Override
+		void scorePath(int x0, int y0, int dx, int dy) {
+			int total = scored.get(x0,y0);
+			scored.set(x0,y0,total+1);
+		}
 	}
 }
