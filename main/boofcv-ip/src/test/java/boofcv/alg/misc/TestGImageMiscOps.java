@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(17);
+		performTests(18);
 	}
 
 	@Override
@@ -113,9 +113,18 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 			ret[0][1] = 1;
 			ret[0][2] = output;
 		} else if( name.equals("fillBorder")) {
-			ret[0][0] = inputA;
-			ret[0][1] = 3;
-			ret[0][2] = 2;
+			if( param.length == 3 ) {
+				ret[0][0] = inputA;
+				ret[0][1] = 3;
+				ret[0][2] = 2;
+			} else {
+				ret[0][0] = inputA;
+				ret[0][1] = 3;
+				ret[0][2] = 1;
+				ret[0][3] = 3;
+				ret[0][4] = 2;
+				ret[0][5] = 4;
+			}
 		} else if( name.equals("fillRectangle")) {
 			ret[0][0] = inputA;
 			ret[0][1] = 3;

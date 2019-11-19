@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -237,6 +237,50 @@ public class ImageMiscOps {
 				
 				indexLeft += input.stride;
 				indexRight += input.stride;
+			}
+		}
+	}
+
+	/**
+	 * Fills the border with independent border widths for each side
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param borderX0 Width of border on left
+	 * @param borderY0 Width of border on top   
+	 * @param borderX1 Width of border on right
+	 * @param borderY1 Width of border on bottom
+	 */
+	public static void fillBorder(GrayI8 input, int value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
+
+		// top and bottom
+		for (int y = 0; y < borderY0; y++) {
+			int srcIdx = input.startIndex + y * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[srcIdx++] = (byte)value;
+			}
+		}
+		for (int y = input.height-borderY1; y < input.height; y++) {
+			int srcIdx = input.startIndex + y * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[srcIdx++] = (byte)value;
+			}
+		}
+
+		// left and right
+		int h = input.height-borderY1;
+		for (int x = 0; x < borderX0; x++) {
+			int srcIdx = input.startIndex + borderY0*input.stride + x;
+			for (int y = borderY0; y < h; y++) {
+				input.data[srcIdx] = (byte)value;
+				srcIdx += input.stride;
+			}
+		}
+		for (int x = input.width-borderX1; x < input.width; x++) {
+			int srcIdx = input.startIndex + borderY0*input.stride + x;
+			for (int y = borderY0; y < h; y++) {
+				input.data[srcIdx] = (byte)value;
+				srcIdx += input.stride;
 			}
 		}
 	}
@@ -780,6 +824,50 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills the border with independent border widths for each side
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param borderX0 Width of border on left
+	 * @param borderY0 Width of border on top   
+	 * @param borderX1 Width of border on right
+	 * @param borderY1 Width of border on bottom
+	 */
+	public static void fillBorder(GrayI16 input, int value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
+
+		// top and bottom
+		for (int y = 0; y < borderY0; y++) {
+			int srcIdx = input.startIndex + y * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[srcIdx++] = (short)value;
+			}
+		}
+		for (int y = input.height-borderY1; y < input.height; y++) {
+			int srcIdx = input.startIndex + y * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[srcIdx++] = (short)value;
+			}
+		}
+
+		// left and right
+		int h = input.height-borderY1;
+		for (int x = 0; x < borderX0; x++) {
+			int srcIdx = input.startIndex + borderY0*input.stride + x;
+			for (int y = borderY0; y < h; y++) {
+				input.data[srcIdx] = (short)value;
+				srcIdx += input.stride;
+			}
+		}
+		for (int x = input.width-borderX1; x < input.width; x++) {
+			int srcIdx = input.startIndex + borderY0*input.stride + x;
+			for (int y = borderY0; y < h; y++) {
+				input.data[srcIdx] = (short)value;
+				srcIdx += input.stride;
+			}
+		}
+	}
+
+	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
 	 * @param img Image the rectangle is drawn in.  Modified
@@ -1313,6 +1401,50 @@ public class ImageMiscOps {
 				
 				indexLeft += input.stride;
 				indexRight += input.stride;
+			}
+		}
+	}
+
+	/**
+	 * Fills the border with independent border widths for each side
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param borderX0 Width of border on left
+	 * @param borderY0 Width of border on top   
+	 * @param borderX1 Width of border on right
+	 * @param borderY1 Width of border on bottom
+	 */
+	public static void fillBorder(GrayS32 input, int value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
+
+		// top and bottom
+		for (int y = 0; y < borderY0; y++) {
+			int srcIdx = input.startIndex + y * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[srcIdx++] = value;
+			}
+		}
+		for (int y = input.height-borderY1; y < input.height; y++) {
+			int srcIdx = input.startIndex + y * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[srcIdx++] = value;
+			}
+		}
+
+		// left and right
+		int h = input.height-borderY1;
+		for (int x = 0; x < borderX0; x++) {
+			int srcIdx = input.startIndex + borderY0*input.stride + x;
+			for (int y = borderY0; y < h; y++) {
+				input.data[srcIdx] = value;
+				srcIdx += input.stride;
+			}
+		}
+		for (int x = input.width-borderX1; x < input.width; x++) {
+			int srcIdx = input.startIndex + borderY0*input.stride + x;
+			for (int y = borderY0; y < h; y++) {
+				input.data[srcIdx] = value;
+				srcIdx += input.stride;
 			}
 		}
 	}
@@ -1856,6 +1988,50 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills the border with independent border widths for each side
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param borderX0 Width of border on left
+	 * @param borderY0 Width of border on top   
+	 * @param borderX1 Width of border on right
+	 * @param borderY1 Width of border on bottom
+	 */
+	public static void fillBorder(GrayS64 input, long value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
+
+		// top and bottom
+		for (int y = 0; y < borderY0; y++) {
+			int srcIdx = input.startIndex + y * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[srcIdx++] = value;
+			}
+		}
+		for (int y = input.height-borderY1; y < input.height; y++) {
+			int srcIdx = input.startIndex + y * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[srcIdx++] = value;
+			}
+		}
+
+		// left and right
+		int h = input.height-borderY1;
+		for (int x = 0; x < borderX0; x++) {
+			int srcIdx = input.startIndex + borderY0*input.stride + x;
+			for (int y = borderY0; y < h; y++) {
+				input.data[srcIdx] = value;
+				srcIdx += input.stride;
+			}
+		}
+		for (int x = input.width-borderX1; x < input.width; x++) {
+			int srcIdx = input.startIndex + borderY0*input.stride + x;
+			for (int y = borderY0; y < h; y++) {
+				input.data[srcIdx] = value;
+				srcIdx += input.stride;
+			}
+		}
+	}
+
+	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
 	 * @param img Image the rectangle is drawn in.  Modified
@@ -2394,6 +2570,50 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Fills the border with independent border widths for each side
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param borderX0 Width of border on left
+	 * @param borderY0 Width of border on top   
+	 * @param borderX1 Width of border on right
+	 * @param borderY1 Width of border on bottom
+	 */
+	public static void fillBorder(GrayF32 input, float value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
+
+		// top and bottom
+		for (int y = 0; y < borderY0; y++) {
+			int srcIdx = input.startIndex + y * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[srcIdx++] = value;
+			}
+		}
+		for (int y = input.height-borderY1; y < input.height; y++) {
+			int srcIdx = input.startIndex + y * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[srcIdx++] = value;
+			}
+		}
+
+		// left and right
+		int h = input.height-borderY1;
+		for (int x = 0; x < borderX0; x++) {
+			int srcIdx = input.startIndex + borderY0*input.stride + x;
+			for (int y = borderY0; y < h; y++) {
+				input.data[srcIdx] = value;
+				srcIdx += input.stride;
+			}
+		}
+		for (int x = input.width-borderX1; x < input.width; x++) {
+			int srcIdx = input.startIndex + borderY0*input.stride + x;
+			for (int y = borderY0; y < h; y++) {
+				input.data[srcIdx] = value;
+				srcIdx += input.stride;
+			}
+		}
+	}
+
+	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
 	 * @param img Image the rectangle is drawn in.  Modified
@@ -2927,6 +3147,50 @@ public class ImageMiscOps {
 				
 				indexLeft += input.stride;
 				indexRight += input.stride;
+			}
+		}
+	}
+
+	/**
+	 * Fills the border with independent border widths for each side
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param borderX0 Width of border on left
+	 * @param borderY0 Width of border on top   
+	 * @param borderX1 Width of border on right
+	 * @param borderY1 Width of border on bottom
+	 */
+	public static void fillBorder(GrayF64 input, double value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
+
+		// top and bottom
+		for (int y = 0; y < borderY0; y++) {
+			int srcIdx = input.startIndex + y * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[srcIdx++] = value;
+			}
+		}
+		for (int y = input.height-borderY1; y < input.height; y++) {
+			int srcIdx = input.startIndex + y * input.stride;
+			for (int x = 0; x < input.width; x++) {
+				input.data[srcIdx++] = value;
+			}
+		}
+
+		// left and right
+		int h = input.height-borderY1;
+		for (int x = 0; x < borderX0; x++) {
+			int srcIdx = input.startIndex + borderY0*input.stride + x;
+			for (int y = borderY0; y < h; y++) {
+				input.data[srcIdx] = value;
+				srcIdx += input.stride;
+			}
+		}
+		for (int x = input.width-borderX1; x < input.width; x++) {
+			int srcIdx = input.startIndex + borderY0*input.stride + x;
+			for (int y = borderY0; y < h; y++) {
+				input.data[srcIdx] = value;
+				srcIdx += input.stride;
 			}
 		}
 	}

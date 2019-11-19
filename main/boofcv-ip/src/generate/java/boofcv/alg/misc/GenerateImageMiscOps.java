@@ -60,7 +60,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				" *\n" +
 				" * @author Peter Abeles\n" +
 				" */\n" +
-				"private class " + className + " {\n\n");
+				"public class " + className + " {\n\n");
 	}
 
 	private void printAllGeneric() {
@@ -80,6 +80,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			printInsertBandInterleaved();
 			printExtractBandInterleaved();
 			printFillBorder();
+			printFillBorder2();
 			printFillRectangle();
 			printFillRectangleInterleaved();
 			printFillUniform();
@@ -126,7 +127,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param input Input image\n" +
 				"\t * @param output output image\n" +
 				"\t */\n" +
-				"\tprivate static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,\n" +
+				"\tpublic static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,\n" +
 				"\t\t\t\t\t\t\t "+imageName+" input , "+imageName+" output ) {\n" +
 				"\n" +
 				"\t\tif( input.width < srcX+width || input.height < srcY+height )\n" +
@@ -160,7 +161,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param input Input image\n" +
 				"\t * @param output output image\n" +
 				"\t */\n" +
-				"\tprivate static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,\n" +
+				"\tpublic static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,\n" +
 				"\t\t\t\t\t\t\t "+imageNameI+" input , "+imageNameI+" output ) {\n" +
 				"\n" +
 				"\t\tif( input.width < srcX+width || input.height < srcY+height )\n" +
@@ -190,7 +191,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param input An image.\n" +
 				"\t * @param value The value that the image is being filled with.\n" +
 				"\t */\n" +
-				"\tprivate static void fill("+imageName+" input, "+imageType.getSumType()+" value) {\n" +
+				"\tpublic static void fill("+imageName+" input, "+imageType.getSumType()+" value) {\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
@@ -209,7 +210,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param input An image.\n" +
 				"\t * @param value The value that the image is being filled with.\n" +
 				"\t */\n" +
-				"\tprivate static void fill("+imageName+" input, "+imageType.getSumType()+" value) {\n" +
+				"\tpublic static void fill("+imageName+" input, "+imageType.getSumType()+" value) {\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
 				"\t\t\tint index = input.getStartIndex() + y * input.getStride();\n" +
@@ -230,7 +231,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param input An image.\n" +
 				"\t * @param values Array which contains the values each band is to be filled with.\n" +
 				"\t */\n" +
-				"\tprivate static void fill("+imageName+" input, "+imageType.getSumType()+"[] values) {\n" +
+				"\tpublic static void fill("+imageName+" input, "+imageType.getSumType()+"[] values) {\n" +
 				"\n" +
 				"\t\tfinal int numBands = input.numBands;\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
@@ -258,7 +259,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param band Which band is to be filled with the specified value   \n" +
 				"\t * @param value The value that the image is being filled with.\n" +
 				"\t */\n" +
-				"\tprivate static void fillBand("+imageName+" input, int band , "+imageType.getSumType()+" value) {\n" +
+				"\tpublic static void fillBand("+imageName+" input, int band , "+imageType.getSumType()+" value) {\n" +
 				"\n" +
 				"\t\tfinal int numBands = input.numBands;\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
@@ -283,7 +284,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param band Which band the image is to be inserted into\n" +
 				"\t * @param output The multi-band image which the input image is to be inserted into\n" +
 				"\t */\n" +
-				"\tprivate static void insertBand( "+singleName+" input, int band , "+interleavedName+" output) {\n" +
+				"\tpublic static void insertBand( "+singleName+" input, int band , "+interleavedName+" output) {\n" +
 				"\n" +
 				"\t\tfinal int numBands = output.numBands;\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
@@ -309,7 +310,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 						"\t * @param band which bad is to be extracted   \n" +
 						"\t * @param output The single band image\n" +
 						"\t */\n" +
-						"\tprivate static void extractBand( "+interleavedName+" input, int band , "+singleName+" output) {\n" +
+						"\tpublic static void extractBand( "+interleavedName+" input, int band , "+singleName+" output) {\n" +
 						"\n" +
 						"\t\tfinal int numBands = input.numBands;\n" +
 						"\t\tfor (int y = 0; y < input.height; y++) {\n" +
@@ -334,7 +335,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param value The value that the image is being filled with.\n" +
 				"\t * @param radius Border width.   \n" +
 				"\t */\n" +
-				"\tprivate static void fillBorder("+imageName+" input, "+imageType.getSumType()+" value, int radius ) {\n" +
+				"\tpublic static void fillBorder("+imageName+" input, "+imageType.getSumType()+" value, int radius ) {\n" +
 				"\n" +
 				"\t\t// top and bottom\n" +
 				"\t\tfor (int y = 0; y < radius; y++) {\n" +
@@ -362,6 +363,55 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
+	private void printFillBorder2()
+	{
+		String typeCast = imageType.getTypeCastFromSum();
+
+		out.print("\t/**\n" +
+				"\t * Fills the border with independent border widths for each side\n" +
+				"\t *\n" +
+				"\t * @param input An image.\n" +
+				"\t * @param value The value that the image is being filled with.\n" +
+				"\t * @param borderX0 Width of border on left\n" +
+				"\t * @param borderY0 Width of border on top   \n" +
+				"\t * @param borderX1 Width of border on right\n" +
+				"\t * @param borderY1 Width of border on bottom\n" +
+				"\t */\n" +
+				"\tpublic static void fillBorder("+imageName+" input, "+imageType.getSumType()+" value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {\n" +
+				"\n" +
+				"\t\t// top and bottom\n" +
+				"\t\tfor (int y = 0; y < borderY0; y++) {\n" +
+				"\t\t\tint srcIdx = input.startIndex + y * input.stride;\n" +
+				"\t\t\tfor (int x = 0; x < input.width; x++) {\n" +
+				"\t\t\t\tinput.data[srcIdx++] = "+typeCast+"value;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t\tfor (int y = input.height-borderY1; y < input.height; y++) {\n" +
+				"\t\t\tint srcIdx = input.startIndex + y * input.stride;\n" +
+				"\t\t\tfor (int x = 0; x < input.width; x++) {\n" +
+				"\t\t\t\tinput.data[srcIdx++] = "+typeCast+"value;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\n" +
+				"\t\t// left and right\n" +
+				"\t\tint h = input.height-borderY1;\n" +
+				"\t\tfor (int x = 0; x < borderX0; x++) {\n" +
+				"\t\t\tint srcIdx = input.startIndex + borderY0*input.stride + x;\n" +
+				"\t\t\tfor (int y = borderY0; y < h; y++) {\n" +
+				"\t\t\t\tinput.data[srcIdx] = "+typeCast+"value;\n" +
+				"\t\t\t\tsrcIdx += input.stride;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t\tfor (int x = input.width-borderX1; x < input.width; x++) {\n" +
+				"\t\t\tint srcIdx = input.startIndex + borderY0*input.stride + x;\n" +
+				"\t\t\tfor (int y = borderY0; y < h; y++) {\n" +
+				"\t\t\t\tinput.data[srcIdx] = "+typeCast+"value;\n" +
+				"\t\t\t\tsrcIdx += input.stride;\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
 
 	private void printFillRectangle()
 	{
@@ -375,7 +425,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param width Rectangle width\n" +
 				"\t * @param height Rectangle height\n" +
 				"\t */\n" +
-				"\tprivate static void fillRectangle("+imageName+" img, "+imageType.getSumType()+" value, int x0, int y0, int width, int height) {\n" +
+				"\tpublic static void fillRectangle("+imageName+" img, "+imageType.getSumType()+" value, int x0, int y0, int width, int height) {\n" +
 				"\t\tint x1 = x0 + width;\n" +
 				"\t\tint y1 = y0 + height;\n" +
 				"\n" +
@@ -406,7 +456,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param width Rectangle width\n" +
 				"\t * @param height Rectangle height\n" +
 				"\t */\n" +
-				"\tprivate static void fillRectangle("+imageName+" img, "+dataType+" value, int x0, int y0, int width, int height) {\n" +
+				"\tpublic static void fillRectangle("+imageName+" img, "+dataType+" value, int x0, int y0, int width, int height) {\n" +
 				"\t\tint x1 = x0 + width;\n" +
 				"\t\tint y1 = y0 + height;\n" +
 				"\n" +
@@ -438,7 +488,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param min Minimum value of the distribution, inclusive\n" +
 				"\t * @param max Maximum value of the distribution, "+maxInclusive+"\n" +
 				"\t */\n" +
-				"\tprivate static void fillUniform("+imageName+" img, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
+				"\tpublic static void fillUniform("+imageName+" img, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
 				"\t\t"+sumType+" range = max-min;\n" +
 				"\n" +
 				"\t\t"+dataType+"[] data = img.data;\n" +
@@ -474,7 +524,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param min Minimum value of the distribution, inclusive\n" +
 				"\t * @param max Maximum value of the distribution, "+maxInclusive+"\n" +
 				"\t */\n" +
-				"\tprivate static void fillUniform("+imageName+" img, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
+				"\tpublic static void fillUniform("+imageName+" img, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
 				"\t\t"+sumType+" range = max-min;\n" +
 				"\n" +
 				"\t\t"+dataType+"[] data = img.data;\n" +
@@ -514,7 +564,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param lowerBound Lower bound of value clip\n" +
 				"\t * @param upperBound Upper bound of value clip\n" +
 				"\t */\n" +
-				"\tprivate static void fillGaussian("+imageName+" input, Random rand , double mean , double sigma , "
+				"\tpublic static void fillGaussian("+imageName+" input, Random rand , double mean , double sigma , "
 				+sumType+" lowerBound , "+sumType+" upperBound ) {\n" +
 				"\t\t"+dataType+"[] data = input.data;\n" +
 				"\n" +
@@ -549,7 +599,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param lowerBound Lower bound of value clip\n" +
 				"\t * @param upperBound Upper bound of value clip\n" +
 				"\t */\n" +
-				"\tprivate static void fillGaussian("+imageName+" input, Random rand , double mean , double sigma , "
+				"\tpublic static void fillGaussian("+imageName+" input, Random rand , double mean , double sigma , "
 				+sumType+" lowerBound , "+sumType+" upperBound ) {\n" +
 				"\t\t"+dataType+"[] data = input.data;\n" +
 				"\t\tint length = input.width*input.numBands;\n" +
@@ -578,7 +628,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.\n" +
 				"\t */\n" +
-				"\tprivate static void addUniform("+imageName+" input, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
+				"\tpublic static void addUniform("+imageName+" input, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
 				"\t\t"+sumType+" range = max-min;\n" +
 				"\n" +
 				"\t\t"+dataType+"[] data = input.data;\n" +
@@ -616,7 +666,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.\n" +
 				"\t */\n" +
-				"\tprivate static void addUniform("+imageName+" input, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
+				"\tpublic static void addUniform("+imageName+" input, Random rand , "+sumType+" min , "+sumType+" max) {\n" +
 				"\t\t"+sumType+" range = max-min;\n" +
 				"\n" +
 				"\t\t"+dataType+"[] data = input.data;\n" +
@@ -660,7 +710,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param lowerBound Allowed lower bound\n" +
 				"\t * @param upperBound Allowed upper bound\n" +
 				"\t */\n" +
-				"\tprivate static void addGaussian("+imageName+" input, Random rand , double sigma , "
+				"\tpublic static void addGaussian("+imageName+" input, Random rand , double sigma , "
 				+sumType+" lowerBound , "+sumType+" upperBound ) {\n" +
 				"\n" +
 				"\t\tfor (int y = 0; y < input.height; y++) {\n" +
@@ -690,7 +740,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * @param lowerBound Allowed lower bound\n" +
 				"\t * @param upperBound Allowed upper bound\n" +
 				"\t */\n" +
-				"\tprivate static void addGaussian("+imageName+" input, Random rand , double sigma , "
+				"\tpublic static void addGaussian("+imageName+" input, Random rand , double sigma , "
 				+sumType+" lowerBound , "+sumType+" upperBound ) {\n" +
 				"\n" +
 				"\t\tint length = input.width*input.numBands;\n" +
@@ -714,7 +764,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Flips the image from top to bottom\n" +
 				"\t */\n" +
-				"\tprivate static void flipVertical( "+imageName+" input ) {\n" +
+				"\tpublic static void flipVertical( "+imageName+" input ) {\n" +
 				"\t\tint h2 = input.height/2;\n" +
 				"\n" +
 				"\t\tfor( int y = 0; y < h2; y++ ) {\n" +
@@ -738,7 +788,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Flips the image from left to right\n" +
 				"\t */\n" +
-				"\tprivate static void flipHorizontal( "+imageName+" input ) {\n" +
+				"\tpublic static void flipHorizontal( "+imageName+" input ) {\n" +
 				"\t\tint w2 = input.width/2;\n" +
 				"\n" +
 				"\t\tfor( int y = 0; y < input.height; y++ ) {\n" +
@@ -762,7 +812,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * In-place 90 degree image rotation in the clockwise direction.  Only works on\n" +
 				"\t * square images.\n" +
 				"\t */\n" +
-				"\tprivate static void rotateCW( "+imageName+" image ) {\n" +
+				"\tpublic static void rotateCW( "+imageName+" image ) {\n" +
 				"\t\tif( image.width != image.height )\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Image must be square\");\n" +
 				"\n" +
@@ -795,7 +845,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Rotates the image 90 degrees in the clockwise direction.\n" +
 				"\t */\n" +
-				"\tprivate static void rotateCW( "+imageName+" input , "+imageName+" output ) {\n" +
+				"\tpublic static void rotateCW( "+imageName+" input , "+imageName+" output ) {\n" +
 				"\t\tif( input.width != output.height || input.height != output.width )\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Incompatible shapes\");\n" +
 				"\n" +
@@ -814,7 +864,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Rotates the image 90 degrees in the clockwise direction.\n" +
 				"\t */\n" +
-				"\tprivate static void rotateCW( "+imageNameI+" input , "+imageNameI+" output ) {\n" +
+				"\tpublic static void rotateCW( "+imageNameI+" input , "+imageNameI+" output ) {\n" +
 				"\t\tif( input.width != output.height || input.height != output.width || input.numBands != output.numBands )\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Incompatible shapes\");\n" +
 				"\n" +
@@ -840,7 +890,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * In-place 90 degree image rotation in the counter-clockwise direction.  Only works on\n" +
 				"\t * square images.\n" +
 				"\t */\n" +
-				"\tprivate static void rotateCCW( "+imageName+" image ) {\n" +
+				"\tpublic static void rotateCCW( "+imageName+" image ) {\n" +
 				"\t\tif( image.width != image.height )\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Image must be square\");\n" +
 				"\n" +
@@ -873,7 +923,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Rotates the image 90 degrees in the counter-clockwise direction.\n" +
 				"\t */\n" +
-				"\tprivate static void rotateCCW( "+imageName+" input , "+imageName+" output ) {\n" +
+				"\tpublic static void rotateCCW( "+imageName+" input , "+imageName+" output ) {\n" +
 				"\t\tif( input.width != output.height || input.height != output.width )\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Incompatible shapes\");\n" +
 				"\n" +
@@ -892,7 +942,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Rotates the image 90 degrees in the counter-clockwise direction.\n" +
 				"\t */\n" +
-				"\tprivate static void rotateCCW( "+imageNameI+" input , "+imageNameI+" output ) {\n" +
+				"\tpublic static void rotateCCW( "+imageNameI+" input , "+imageNameI+" output ) {\n" +
 				"\t\tif( input.width != output.height || input.height != output.width || input.numBands != output.numBands )\n" +
 				"\t\t\tthrow new IllegalArgumentException(\"Incompatible shapes\");\n" +
 				"\n" +

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestImageMiscOps {
+@SuppressWarnings("unchecked")
+class TestImageMiscOps {
 
 	int width = 10;
 	int height = 15;
@@ -43,8 +44,8 @@ public class TestImageMiscOps {
 	Random rand = new Random(234);
 
 	@Test
-	public void checkAll() {
-		int numExpected = 23*6 + 4*8;
+	void checkAll() {
+		int numExpected = 24*6 + 4*8;
 		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -339,20 +340,41 @@ public class TestImageMiscOps {
 		ImageGray orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		GImageMiscOps.fill(orig, 4);
 
-		int r = 2;
-		if( orig.getDataType().isInteger()) {
-			m.invoke(null,orig,5,r);
-		} else {
-			m.invoke(null,orig,5,r);
-		}
+		if( paramTypes.length == 3 ) {
+			int r = 2;
+			if (orig.getDataType().isInteger()) {
+				m.invoke(null, orig, 5, r);
+			} else {
+				m.invoke(null, orig, 5, r);
+			}
 
-		GImageGray a = FactoryGImageGray.wrap(orig);
-		for( int i = 0; i < height; i++ ) {
-			for( int j = 0; j < width; j++ ) {
-				if( j < r || i < r || j >= width-r || i >= height-r )
-					assertEquals(5,a.get(j,i).doubleValue(),1e-4,i+" "+j);
-				else
-					assertEquals(4,a.get(j,i).doubleValue(),1e-4);
+			GImageGray a = FactoryGImageGray.wrap(orig);
+			for (int i = 0; i < height; i++) {
+				for (int j = 0; j < width; j++) {
+					if (j < r || i < r || j >= width - r || i >= height - r)
+						assertEquals(5, a.get(j, i).doubleValue(), 1e-4, i + " " + j);
+					else
+						assertEquals(4, a.get(j, i).doubleValue(), 1e-4);
+				}
+			}
+		} else {
+			int borderX0 = 1, borderX1 = 3;
+			int borderY0 = 2, borderY1 = 4;
+
+			if (orig.getDataType().isInteger()) {
+				m.invoke(null, orig, 5, borderX0, borderY0 , borderX1 , borderY1);
+			} else {
+				m.invoke(null, orig, 5, borderX0, borderY0 , borderX1 , borderY1);
+			}
+
+			GImageGray a = FactoryGImageGray.wrap(orig);
+			for (int i = 0; i < height; i++) {
+				for (int j = 0; j < width; j++) {
+					if (j < borderX0 || i < borderY0 || j >= width - borderX1 || i >= height - borderY1)
+						assertEquals(5, a.get(j, i).doubleValue(), 1e-4, i + " " + j);
+					else
+						assertEquals(4, a.get(j, i).doubleValue(), 1e-4);
+				}
 			}
 		}
 	}
@@ -743,12 +765,12 @@ public class TestImageMiscOps {
 			for( int x = 0; x < width; x++ ) {
 				double valA = GeneralizedImageOps.get(imgA,width-x-1,y);
 				double valB = GeneralizedImageOps.get(imgB,x,y);
-				assertTrue(valA==valB);
+				assertEquals(valA, valB);
 			}
 		}
 	}
 
-	public void testRotateCW( Method m ) throws InvocationTargetException, IllegalAccessException {
+	void testRotateCW( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		if( paramTypes.length == 1 ) {
 			testRotateCW_one(m);
@@ -761,7 +783,7 @@ public class TestImageMiscOps {
 		}
 	}
 
-	public void testRotateCW_one( Method m ) throws InvocationTargetException, IllegalAccessException {
+	void testRotateCW_one( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 
 		// test even and odd width
@@ -784,7 +806,7 @@ public class TestImageMiscOps {
 		}
 	}
 
-	public void testRotateCW_two_single( Method m ) throws InvocationTargetException, IllegalAccessException {
+	void testRotateCW_two_single( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageGray a = GeneralizedImageOps.createSingleBand(paramTypes[0], 3, 2);
 		ImageGray b = GeneralizedImageOps.createSingleBand(paramTypes[0], 2, 3);
@@ -803,7 +825,7 @@ public class TestImageMiscOps {
 		assertEquals(2,GeneralizedImageOps.get(b,1,2),1e-8);
 	}
 
-	public void testRotateCW_two_interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
+	void testRotateCW_two_interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageInterleaved a = GeneralizedImageOps.createInterleaved(paramTypes[0], 3, 2,2);
 		ImageInterleaved b = GeneralizedImageOps.createInterleaved(paramTypes[0], 2, 3,2);
@@ -826,7 +848,7 @@ public class TestImageMiscOps {
 		}
 	}
 
-	public void testRotateCCW( Method m ) throws InvocationTargetException, IllegalAccessException {
+	void testRotateCCW( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		if( paramTypes.length == 1 ) {
 			testRotateCCW_one(m);
@@ -839,7 +861,7 @@ public class TestImageMiscOps {
 		}
 	}
 
-	public void testRotateCCW_one( Method m ) throws InvocationTargetException, IllegalAccessException {
+	void testRotateCCW_one( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		// test even and odd width
 		for (int i = 0; i < 2; i++) {
@@ -861,7 +883,7 @@ public class TestImageMiscOps {
 		}
 	}
 
-	public void testRotateCCW_two_single( Method m ) throws InvocationTargetException, IllegalAccessException {
+	void testRotateCCW_two_single( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageGray a = GeneralizedImageOps.createSingleBand(paramTypes[0], 3, 2);
 		ImageGray b = GeneralizedImageOps.createSingleBand(paramTypes[0], 2, 3);
@@ -880,7 +902,7 @@ public class TestImageMiscOps {
 		assertEquals(3,GeneralizedImageOps.get(b,1,2),1e-8);
 	}
 
-	public void testRotateCCW_two_interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
+	void testRotateCCW_two_interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class paramTypes[] = m.getParameterTypes();
 		ImageInterleaved a = GeneralizedImageOps.createInterleaved(paramTypes[0], 3, 2,2);
 		ImageInterleaved b = GeneralizedImageOps.createInterleaved(paramTypes[0], 2, 3,2);

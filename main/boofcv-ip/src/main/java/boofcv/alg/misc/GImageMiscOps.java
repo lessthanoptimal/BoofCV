@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -275,6 +275,43 @@ public class GImageMiscOps {
 			Planar m = (Planar)input;
 			for( int i = 0; i < m.getNumBands(); i++ )
 				fillBorder(m.getBand(i), value, radius);
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
+		}
+	}
+
+	/**
+	 * Fills the border with independent border widths for each side
+	 *
+	 * @param input An image.
+	 * @param value The value that the image is being filled with.
+	 * @param borderX0 Width of border on left
+	 * @param borderY0 Width of border on top
+	 * @param borderX1 Width of border on right
+	 * @param borderY1 Width of border on bottom
+	 */
+	public static void fillBorder(ImageBase input, double value, int borderX0 , int borderY0 , int borderX1 , int borderY1 )
+	{
+		if( input instanceof ImageGray) {
+			if( GrayI8.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillBorder((GrayI8) input, (int) value, borderX0,borderY0,borderX1,borderY1);
+			} else if( GrayI16.class.isAssignableFrom(input.getClass()) ) {
+				ImageMiscOps.fillBorder((GrayI16) input, (int) value, borderX0,borderY0,borderX1,borderY1);
+			} else if( GrayS32.class == input.getClass() ) {
+				ImageMiscOps.fillBorder((GrayS32) input, (int) value, borderX0,borderY0,borderX1,borderY1);
+			} else if( GrayS64.class == input.getClass() ) {
+				ImageMiscOps.fillBorder((GrayS64) input, (long) value, borderX0,borderY0,borderX1,borderY1);
+			} else if( GrayF32.class == input.getClass() ) {
+				ImageMiscOps.fillBorder((GrayF32) input, (float) value, borderX0,borderY0,borderX1,borderY1);
+			} else if( GrayF64.class == input.getClass() ) {
+				ImageMiscOps.fillBorder((GrayF64) input, value, borderX0,borderY0,borderX1,borderY1);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: "+input.getClass().getSimpleName());
+			}
+		} else if( input instanceof Planar) {
+			Planar m = (Planar)input;
+			for( int i = 0; i < m.getNumBands(); i++ )
+				fillBorder(m.getBand(i), value, borderX0,borderY0,borderX1,borderY1);
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
 		}
