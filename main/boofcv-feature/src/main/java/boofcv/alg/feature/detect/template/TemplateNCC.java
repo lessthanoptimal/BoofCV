@@ -21,6 +21,7 @@ package boofcv.alg.feature.detect.template;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
+import org.ejml.UtilEjml;
 
 /**
  * Template matching which uses normalized cross correlation (NCC).
@@ -30,12 +31,19 @@ import boofcv.struct.image.ImageBase;
 public abstract class TemplateNCC <T extends ImageBase<T>>
 		implements TemplateIntensityImage.EvaluatorMethod<T>
 {
+	// used to avoid divide by zero
+	float EPS = UtilEjml.F_EPS;
 	TemplateIntensityImage<T> o;
 
 	@Override
 	public void initialize( TemplateIntensityImage<T> owner  ) {
 		this.o = owner;
 		setupTemplate(o.template);
+	}
+
+	@Override
+	public boolean isMaximize() {
+		return true;
 	}
 
 	/**
@@ -81,7 +89,7 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 			imageSigma = (float)Math.sqrt(imageSigma/area);
 
 			// technically top should be divided by area, but that won't change the solution
-			return top/(imageSigma*templateSigma);
+			return top/(EPS + imageSigma*templateSigma);
 		}
 
 		@Override
@@ -118,7 +126,7 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 			imageSigma = (float)Math.sqrt(imageSigma/area);
 
 			// technically top should be divided by area, but that won't change the solution
-			return top/(imageSigma*templateSigma);
+			return top/(EPS + imageSigma*templateSigma);
 		}
 
 		@Override
@@ -192,7 +200,7 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 			imageSigma = (float) Math.sqrt(imageSigma / area);
 
 			// technically top should be divided by area, but that won't change the solution
-			return top / (imageSigma * templateSigma);
+			return top / (EPS + imageSigma * templateSigma);
 		}
 
 		@Override
@@ -231,7 +239,7 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 			imageSigma = (float) Math.sqrt(imageSigma / area);
 
 			// technically top should be divided by area, but that won't change the solution
-			return top / (imageSigma * templateSigma);
+			return top / (EPS + imageSigma * templateSigma);
 		}
 
 		@Override

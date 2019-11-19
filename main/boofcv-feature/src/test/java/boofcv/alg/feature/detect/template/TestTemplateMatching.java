@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public class TestTemplateMatching {
+class TestTemplateMatching {
 	int width = 30;
 	int height = 40;
 
@@ -46,7 +46,7 @@ public class TestTemplateMatching {
 	 * Basic detection task with an extraction algorithm that has no border
 	 */
 	@Test
-	public void basicTest_NOBORDER() {
+	void basicTest_NOBORDER() {
 		expected = new ArrayList<>();
 		expected.add(new Match(10, 11, 15));
 		expected.add(new Match(17, 15, 18));
@@ -68,7 +68,7 @@ public class TestTemplateMatching {
 	 * Basic detection task with an extraction algorithm that has a border
 	 */
 	@Test
-	public void basicTest_BORDER() {
+	void basicTest_BORDER() {
 		expected = new ArrayList<>();
 		expected.add(new Match(10, 11, 15));
 		expected.add(new Match(16, 15, 18));
@@ -85,11 +85,26 @@ public class TestTemplateMatching {
 		checkResults(alg.getResults().toList(), expected, 4, 5);
 	}
 
+	@Test
+	void templateAndImageSameSize() {
+		expected = new ArrayList<>();
+		expected.add(new Match(input.width/2, input.height/2, 15));
+
+		DummyIntensity intensity = new DummyIntensity(true, 0, 0);
+		TemplateMatching alg = new TemplateMatching(intensity);
+		// when the input matches the output the shape will be (1,1)
+		alg.setImage(input);
+		alg.setTemplate(template, null, 10);
+		alg.process();
+
+		checkResults(alg.getResults().toList(), expected, 0, 0);
+	}
+
 	/**
 	 * Makes sure maximum number of matches is handled correctly
 	 */
 	@Test
-	public void maxMatches() {
+	void maxMatches() {
 		expected = new ArrayList<>();
 		expected.add(new Match(10, 11, 15));
 		expected.add(new Match(16, 15, 18));
@@ -112,7 +127,7 @@ public class TestTemplateMatching {
 	}
 
 	@Test
-	public void withMask() {
+	void withMask() {
 		expected = new ArrayList<>();
 		DummyIntensity intensity = new DummyIntensity(false, 4, 5);
 
@@ -157,12 +172,12 @@ public class TestTemplateMatching {
 
 		@Override
 		public void setInputImage(ImageBase image) {
-			assertTrue(image!=null);
+			assertNotNull(image);
 		}
 
 		@Override
 		public void process(ImageBase template) {
-			assertTrue(template!=null);
+			assertNotNull(template);
 			GImageMiscOps.fill(intensity, 0);
 
 			for (Match m : expected) {
@@ -172,7 +187,7 @@ public class TestTemplateMatching {
 
 		@Override
 		public void process(ImageBase template, ImageBase mask) {
-			assertTrue(mask!=null);
+			assertNotNull(mask);
 			maskedCalled = true;
 			process(template);
 		}
@@ -205,6 +220,11 @@ public class TestTemplateMatching {
 		@Override
 		public int getBorderY1() {
 			return offsetY;
+		}
+
+		@Override
+		public boolean isMaximize() {
+			return true;
 		}
 	}
 }

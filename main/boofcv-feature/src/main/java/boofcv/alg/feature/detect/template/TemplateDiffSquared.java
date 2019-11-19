@@ -49,35 +49,45 @@ public abstract class TemplateDiffSquared<T extends ImageBase<T>>
 
 			float total = 0;
 
+			// Reduce chance of numerical overflow and delay conversion to float
+			float div = 255.0f*255.0f;
+
 			for (int y = 0; y < o.template.height; y++) {
 				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
 				int templateIndex = o.template.startIndex + y * o.template.stride;
 
+				float rowTotal=0.0f;
 				for (int x = 0; x < o.template.width; x++) {
-					float error = o.image.data[imageIndex++] - o.template.data[templateIndex++];
-					total += error * error;
+					float error = (o.image.data[imageIndex++] - o.template.data[templateIndex++]);
+					rowTotal += error * error;
 				}
+				total += rowTotal/div;
 			}
 
-			return -total;
+			return total;
 		}
 
 		@Override
 		public float evaluateMask(int tl_x, int tl_y) {
 			float total = 0;
 
+			// Reduce chance of numerical overflow and delay conversion to float
+			float div = 255.0f*255.0f;
+
 			for (int y = 0; y < o.template.height; y++) {
 				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
 				int templateIndex = o.template.startIndex + y * o.template.stride;
 				int maskIndex = o.mask.startIndex + y * o.mask.stride;
 
+				float rowTotal=0.0f;
 				for (int x = 0; x < o.template.width; x++) {
 					float error = o.image.data[imageIndex++] - o.template.data[templateIndex++];
-					total += o.mask.data[maskIndex++] * error * error;
+					rowTotal += o.mask.data[maskIndex++] * error * error;
 				}
+				total += rowTotal/div;
 			}
 
-			return -total;
+			return total;
 		}
 	}
 
@@ -87,8 +97,8 @@ public abstract class TemplateDiffSquared<T extends ImageBase<T>>
 
 			float total = 0;
 
-			// Reduce change of numerical overflow and delay conversion to float
-			float div = 255.0f * 255.0f;
+			// Reduce chance of numerical overflow and delay conversion to float
+			float div = 255.0f*255.0f;
 
 			for (int y = 0; y < o.template.height; y++) {
 				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
@@ -103,7 +113,7 @@ public abstract class TemplateDiffSquared<T extends ImageBase<T>>
 				total += rowTotal / div;
 			}
 
-			return -total;
+			return total;
 		}
 
 		@Override
@@ -111,8 +121,8 @@ public abstract class TemplateDiffSquared<T extends ImageBase<T>>
 
 			float total = 0;
 
-			// Reduce change of numerical overflow and delay conversion to float
-			float div = 255.0f * 255.0f * 255.0f;
+			// Reduce chance of numerical overflow and delay conversion to float
+			float div = 255.0f*255.0f;
 
 			for (int y = 0; y < o.template.height; y++) {
 				int imageIndex = o.image.startIndex + (tl_y + y) * o.image.stride + tl_x;
@@ -129,12 +139,17 @@ public abstract class TemplateDiffSquared<T extends ImageBase<T>>
 				total += rowTotal / div;
 			}
 
-			return -total;
+			return total;
 		}
 	}
 
 	@Override
 	public boolean isBorderProcessed() {
+		return false;
+	}
+
+	@Override
+	public boolean isMaximize() {
 		return false;
 	}
 }

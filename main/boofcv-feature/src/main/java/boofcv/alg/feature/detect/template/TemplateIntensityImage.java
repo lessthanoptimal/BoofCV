@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.detect.template;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 
@@ -57,13 +58,16 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 		this.mask = null;
 		intensity.reshape(image.width, image.height);
 
-		int w = image.width - template.width;
-		int h = image.height - template.height;
+		int w = image.width - template.width + 1;
+		int h = image.height - template.height + 1;
 
 		borderX0 = template.width / 2;
 		borderY0 = template.height / 2;
 		borderX1 = template.width-borderX0;
 		borderY1 = template.height-borderY0;
+
+		// set the outside border to the lowest possible score
+		GImageMiscOps.fillBorder(intensity,0.0f,borderX0,borderY0,borderX1,borderY1);
 
 		method.initialize(this);
 
@@ -94,11 +98,13 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 		this.mask = mask;
 		intensity.reshape(image.width, image.height);
 
-		int w = image.width - template.width;
-		int h = image.height - template.height;
+		int w = image.width - template.width + 1;
+		int h = image.height - template.height + 1;
 
 		borderX0 = template.width / 2;
 		borderY0 = template.height / 2;
+		borderX1 = template.width-borderX0;
+		borderY1 = template.height-borderY0;
 
 		method.initialize(this);
 
@@ -144,6 +150,11 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 	}
 
 	@Override
+	public boolean isMaximize() {
+		return method.isMaximize();
+	}
+
+	@Override
 	public boolean isBorderProcessed() {
 		return method.isBorderProcessed();
 	}
@@ -168,6 +179,8 @@ public class TemplateIntensityImage<T extends ImageBase<T>>
 		 * @return match value with better matches having a more positive value
 		 */
 		float evaluateMask(int tl_x, int tl_y);
+
+		boolean isMaximize();
 
 		boolean isBorderProcessed();
 	}

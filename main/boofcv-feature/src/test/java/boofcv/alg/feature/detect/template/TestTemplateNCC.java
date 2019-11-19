@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,26 +20,24 @@ package boofcv.alg.feature.detect.template;
 
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-public class TestTemplateNCC {
+class TestTemplateNCC {
 
-	@Test
-	public void instanceF32() {
-		TemplateNCC.F32 alg = new TemplateNCC.F32();
-
-		new GeneralTemplateMatchTests<GrayF32>(alg, GrayF32.class) {
-		}.allTests();
+	@Nested
+	class F32 extends GeneralTemplateMatchTests<GrayF32> {
+		F32() {
+			super(new TemplateNCC.F32(), GrayF32.class);
+		}
 	}
 
-	@Test
-	public void instanceU8() {
-		TemplateNCC.U8 alg = new TemplateNCC.U8();
-
-		new GeneralTemplateMatchTests<GrayU8>(alg, GrayU8.class) {
-		}.allTests();
+	@Nested
+	class U8 extends GeneralTemplateMatchTests<GrayU8> {
+		U8() {
+			super(new TemplateNCC.U8(), GrayU8.class);
+		}
 	}
 }

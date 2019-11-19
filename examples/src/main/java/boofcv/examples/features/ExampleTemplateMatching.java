@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,14 +66,13 @@ public class ExampleTemplateMatching {
 		matcher.process();
 
 		return matcher.getResults().toList();
-
 	}
 
 	/**
 	 * Computes the template match intensity image and displays the results. Brighter intensity indicates
 	 * a better match to the template.
 	 */
-	public static void showMatchIntensity(GrayF32 image, GrayF32 template, GrayF32 mask) {
+	private static void showMatchIntensity(GrayF32 image, GrayF32 template, GrayF32 mask) {
 
 		// create algorithm for computing intensity image
 		TemplateMatchingIntensity<GrayF32> matchIntensity =
@@ -86,8 +85,8 @@ public class ExampleTemplateMatching {
 		// get the results
 		GrayF32 intensity = matchIntensity.getIntensity();
 
-		// adjust the intensity image so that white indicates a good match and black a poor match
-		// the scale is kept linear to highlight how ambiguous the solution is
+		// White will indicate a good match and black a bad match, or the reverse
+		// depending on the cost function used.
 		float min = ImageStatistics.min(intensity);
 		float max = ImageStatistics.max(intensity);
 		float range = max - min;
@@ -145,10 +144,10 @@ public class ExampleTemplateMatching {
 		int h = template.height + 2 * r;
 
 		for (Match m : found) {
-			System.out.println("Match "+m.x+" "+m.y+"    score "+m.score);
+			System.out.printf("Match %3d %3d    score = %6.2f\n",m.x,m.y,m.score);
 			// this demonstrates how to filter out false positives
 			// the meaning of score will depend on the template technique
-//			if( m.score < -1000 )  // This line is commented out for demonstration purposes
+//			if( m.score < -5 )  // This line is commented out for demonstration purposes
 //				continue;
 
 			// the return point is the template's top left corner

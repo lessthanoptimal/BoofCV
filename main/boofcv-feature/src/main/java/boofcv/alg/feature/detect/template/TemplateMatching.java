@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,14 @@ public class TemplateMatching<T extends ImageBase<T>> {
 	public TemplateMatching(TemplateMatchingIntensity<T> match) {
 		this.match = match;
 
-		extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, -Float.MAX_VALUE, 0, true));
+		ConfigExtract config;
+		if( match.isMaximize() ) {
+			config = new ConfigExtract(2, -Float.MAX_VALUE, 0, true);
+		} else {
+			config = new ConfigExtract(2, -Float.MAX_VALUE, 0, true, true, false);
+		}
+
+		extractor = FactoryFeatureExtractor.nonmax(config);
 	}
 
 	/**
@@ -124,10 +131,10 @@ public class TemplateMatching<T extends ImageBase<T>> {
 		// adjust intensity image size depending on if there is a border or not
 		if (!match.isBorderProcessed()) {
 			int x0 = match.getBorderX0();
-			int x1 = imageWidth - (template.width - x0);
+			int x1 = imageWidth - match.getBorderX1();
 			int y0 = match.getBorderY0();
-			int y1 = imageHeight - (template.height - y0);
-			intensity = intensity.subimage(x0, y0, x1, y1, null);
+			int y1 = imageHeight - match.getBorderY1();
+			intensity = intensity.subimage(x0, y0, x1+1, y1+1, null);
 		} else {
 			offsetX = match.getBorderX0();
 			offsetY = match.getBorderY0();
@@ -135,7 +142,10 @@ public class TemplateMatching<T extends ImageBase<T>> {
 
 		// find local peaks in intensity image
 		candidates.reset();
-		extractor.process(intensity, null,null,null, candidates);
+		if( match.isMaximize() )
+			extractor.process(intensity, null,null,null, candidates);
+		else
+			extractor.process(intensity, null,null,candidates, null);
 
 		// select the best matches
 		if (scores.length < candidates.size) {
@@ -143,10 +153,11 @@ public class TemplateMatching<T extends ImageBase<T>> {
 			indexes = new int[candidates.size];
 		}
 
+		float sgn = match.isMaximize() ? -1.0f : 1.0f;
 		for (int i = 0; i < candidates.size; i++) {
 			Point2D_I16 p = candidates.get(i);
 
-			scores[i] = -intensity.get(p.x, p.y);
+			scores[i] = sgn*intensity.get(p.x, p.y);
 		}
 
 		int N = Math.min(maxMatches, candidates.size);

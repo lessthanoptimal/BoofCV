@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,8 +83,8 @@ public class TemplateCorrelationFFT
 
 	@Override
 	public void process(GrayF32 template, GrayF32 mask) {
-		if( template.width >= fftImage.width || template.height >= fftImage.height )
-			throw new IllegalArgumentException("Template must be smaller than the image");
+		if( template.width > fftImage.width || template.height > fftImage.height )
+			throw new IllegalArgumentException("Template must be smaller than or equal to the image");
 
 		// normalize the input image to reduce buffer overflow
 		normalizedTemplate.reshape(template.width,template.height);
@@ -164,5 +164,10 @@ public class TemplateCorrelationFFT
 	@Override
 	public int getBorderY1() {
 		return borderY1;
+	}
+
+	@Override
+	public boolean isMaximize() {
+		return true;
 	}
 }

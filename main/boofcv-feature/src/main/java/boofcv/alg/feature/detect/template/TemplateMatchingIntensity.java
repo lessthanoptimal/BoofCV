@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,40 +75,45 @@ public interface TemplateMatchingIntensity<T extends ImageBase<T>> {
 	 *
 	 * @return Feature intensity
 	 */
-	public GrayF32 getIntensity();
+	GrayF32 getIntensity();
 
 	/**
 	 * Does this algorithm process the image's border.  If it does not process the border
 	 *
 	 * @return true if the border is processed and false otherwise.
 	 */
-	public boolean isBorderProcessed();
+	boolean isBorderProcessed();
 
 	/**
 	 * Thickness of border along the image left side (lower extent)
 	 *
 	 * @return Border in pixels
 	 */
-	public int getBorderX0();
+	int getBorderX0();
 
 	/**
 	 * Thickness of border along the image right side (upper extent)
 	 *
 	 * @return Border in pixels
 	 */
-	public int getBorderX1();
+	int getBorderX1();
 
 	/**
 	 * Thickness of border along the image top (lower extent)
 	 *
 	 * @return Border in pixels
 	 */
-	public int getBorderY0();
+	int getBorderY0();
 
 	/**
 	 * Thickness of border along the image bottom (upper extent)
 	 *
 	 * @return Border in pixels
 	 */
-	public int getBorderY1();
+	int getBorderY1();
+
+	/**
+	 * If true then a better fit is a larger number, otherwise a smaller number is a better fit
+	 */
+	boolean isMaximize();
 }
