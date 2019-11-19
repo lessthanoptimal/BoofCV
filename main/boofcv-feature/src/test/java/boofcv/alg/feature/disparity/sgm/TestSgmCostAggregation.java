@@ -42,6 +42,7 @@ class TestSgmCostAggregation {
 
 	@Test
 	void process_basic() {
+		// Give it a perfect costYXD and see if it selects the correct path
 		fail("Implement");
 	}
 

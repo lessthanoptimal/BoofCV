@@ -18,16 +18,56 @@
 
 package boofcv.alg.feature.disparity.sgm;
 
+import boofcv.struct.image.GrayU8;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
 class TestSgmStereoDisparityHmi {
+	private int width = 80,height = 60;
+
+	private GrayU8 left  = new GrayU8(width,height);
+	private GrayU8 right = new GrayU8(width,height);;
+
+	/**
+	 * The entire image should have a disparity of 5. Each pixel if visually distinctive from its neighbors
+	 */
 	@Test
-	void stuff() {
-		fail("Implement");
+	void easy_scenario() {
+		createStereoPair(5);
+
+		SgmStereoDisparityHmi alg = create();
+		alg.process(left,right,0,10);
+
+		// sanity check on internal data structures
+		assertEquals(3,alg.getPyrLeft().getLevelsCount());
+		assertEquals(3,alg.getPyrRight().getLevelsCount());
+
+		// disparity should be 5 everywhere
+		GrayU8 found = alg.getDisparity();
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				assertEquals(5,found.get(x,y));
+			}
+		}
+	}
+
+	void createStereoPair( int d ) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				right.set(x,y, y*10+x);
+				left.set(x,y, y*10+x+d);
+			}
+		}
+	}
+
+	SgmStereoDisparityHmi create() {
+		StereoMutualInformation stereoMI = new StereoMutualInformation();
+		stereoMI.configureHistogram(255,255);
+		SgmDisparitySelector selector = new SgmDisparitySelector();
+		return new SgmStereoDisparityHmi(20,stereoMI,selector);
 	}
 }

@@ -24,7 +24,10 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 
 /**
+ * TODO document
  *
+ * <p>[1] Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
+ * IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.</p>
  *
  * @author Peter Abeles
  */

@@ -18,16 +18,54 @@
 
 package boofcv.alg.transform.pyramid;
 
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Peter Abeles
  */
 class TestPyramidDiscreteNN2 {
+	private Random rand = new Random(30);
+
 	@Test
-	void stuff() {
-		fail("Implement");
+	void basicTest() {
+		GrayF32 input = new GrayF32(40, 80);
+		ImageMiscOps.fillUniform(input, rand, -20, 50);
+
+		PyramidDiscreteNN2<GrayF32> alg = new PyramidDiscreteNN2<>(ImageType.single(GrayF32.class));
+
+		// Specify pyramid size using different methods
+		alg.setMinWidth(10);
+		checkSolution(input, alg);
+
+		alg = new PyramidDiscreteNN2<>(ImageType.single(GrayF32.class));
+		alg.setMinHeight(20);
+		checkSolution(input, alg);
+
+		alg = new PyramidDiscreteNN2<>(ImageType.single(GrayF32.class));
+		alg.setNumLevelsRequested(3);
+		checkSolution(input, alg);
+	}
+
+	private void checkSolution(GrayF32 input, PyramidDiscreteNN2<GrayF32> alg) {
+		alg.process(input);
+
+		// Level zero is the input image
+		assertSame(input, alg.getLayer(0));
+
+		// There should be 3 levels
+		assertEquals(3, alg.getLevelsCount());
+
+		// nearest-neighbor interpolation
+		assertEquals(input.get(0,0),alg.getLayer(1).get(0,0),1e-4);
+		assertEquals(input.get(2,2),alg.getLayer(1).get(1,1),1e-4);
+		assertEquals(input.get(6,4),alg.getLayer(1).get(3,2),1e-4);
 	}
 }

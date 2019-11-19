@@ -35,7 +35,7 @@ public class PyramidDiscreteNN2<T extends ImageBase<T>> {
 	FDistort distort;
 
 	// if not -1 then it specifies the number of levels in the pyramid
-	int numLevels=-1;
+	int numLevelsRequested =-1;
 	// if not -1 then it specifies the minimum width/height of the highest level in the pyramid
 	int minWidth=-1,minHeight=-1;
 
@@ -52,16 +52,16 @@ public class PyramidDiscreteNN2<T extends ImageBase<T>> {
 	}
 
 	public void process(T input) {
-		if( numLevels > 0 ) {
-			if( levels.length != numLevels ) {
-				declareArray(numLevels);
+		if( numLevelsRequested > 0 ) {
+			if( levels.length != numLevelsRequested) {
+				declareArray(numLevelsRequested);
 			}
 		} else if( minWidth > 0 ) {
-			int numLevels = Math.max(1,input.width/minWidth);
+			int numLevels = computeNumLevels(input.width,minWidth);
 			if( levels.length != numLevels )
 				declareArray(numLevels);
 		} else if( minHeight > 0 ) {
-			int numLevels = Math.max(1,input.height/minHeight);
+			int numLevels = computeNumLevels(input.height,minHeight);
 			if( levels.length != numLevels )
 				declareArray(numLevels);
 		} else {
@@ -72,7 +72,7 @@ public class PyramidDiscreteNN2<T extends ImageBase<T>> {
 		levels[0] = input;
 		// scale down each image by a factor of two relative to the previous level
 		int scale = 2;
-		for (int level = levels.length-2; level >= 0; level--) {
+		for (int level = 1; level < levels.length; level++) {
 			int width = input.width/scale;
 			int height = input.height/scale;
 
@@ -85,7 +85,12 @@ public class PyramidDiscreteNN2<T extends ImageBase<T>> {
 
 			scale *= 2;
 		}
+	}
 
+	private int computeNumLevels( int length , int minLengt ) {
+		double scale = length/(double)minLengt;
+		double levels = Math.log(scale)/Math.log(2);
+		return (int)Math.floor(levels)+1;
 	}
 
 	private void declareArray( int numLevels ) {
@@ -99,16 +104,24 @@ public class PyramidDiscreteNN2<T extends ImageBase<T>> {
 		return levels[i];
 	}
 
+	public T getLayer( int i ) {
+		return levels[i];
+	}
+
 	public ImageType<T> getImageType() {
 		return imageType;
 	}
 
-	public int getNumLevels() {
-		return numLevels;
+	public int getLevelsCount() {
+		return levels.length;
 	}
 
-	public void setNumLevels(int numLevels) {
-		this.numLevels = numLevels;
+	public int getNumLevelsRequested() {
+		return numLevelsRequested;
+	}
+
+	public void setNumLevelsRequested(int numLevelsRequested) {
+		this.numLevelsRequested = numLevelsRequested;
 	}
 
 	public int getMinWidth() {
