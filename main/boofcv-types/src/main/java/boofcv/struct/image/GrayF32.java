@@ -54,7 +54,7 @@ public class GrayF32 extends GrayF<GrayF32> {
 	 */
 	public float get(int x, int y) {
 		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds: ( " + x + " , " + y + " )");
+			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
 
 		return unsafe_get(x,y);
 	}

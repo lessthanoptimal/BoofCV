@@ -46,7 +46,7 @@ public abstract class GrayI16<T extends GrayI16<T>> extends GrayI<T> {
 	@Override
 	public void set(int x, int y, int value) {
 		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds");
+			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
 
 		data[getIndex(x, y)] = (short) value;
 	}

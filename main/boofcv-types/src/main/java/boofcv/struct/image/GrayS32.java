@@ -65,7 +65,7 @@ public class GrayS32 extends GrayI<GrayS32> {
 	@Override
 	public void set(int x, int y, int value) {
 		if (!isInBounds(x, y))
-			throw new ImageAccessException("Requested pixel is out of bounds");
+			throw new ImageAccessException("Requested pixel is out of bounds: "+x+" "+y);
 
 		data[getIndex(x, y)] = value;
 	}
