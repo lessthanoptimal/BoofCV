@@ -22,6 +22,7 @@ import boofcv.struct.image.GrayU8;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -33,11 +34,20 @@ class TestSgmStereoDisparityHmi {
 	private GrayU8 right = new GrayU8(width,height);;
 
 	/**
+	 * No pyramid is required where. MI is initialized with perfect disparity
+	 */
+	@Test
+	void perfect_MutualInformation() {
+		fail("implement");
+	}
+
+	/**
 	 * The entire image should have a disparity of 5. Each pixel if visually distinctive from its neighbors
 	 */
 	@Test
 	void easy_scenario() {
-		createStereoPair(5);
+		int d = 5;
+		createStereoPair(d);
 
 		SgmStereoDisparityHmi alg = create();
 		alg.process(left,right,0,10);
@@ -49,7 +59,8 @@ class TestSgmStereoDisparityHmi {
 		// disparity should be 5 everywhere
 		GrayU8 found = alg.getDisparity();
 		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
+			// only check where the actual solution can be found
+			for (int x = d; x < width; x++) {
 				assertEquals(5,found.get(x,y));
 			}
 		}

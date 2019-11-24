@@ -109,7 +109,6 @@ public class SgmStereoDisparityHmi {
 		// randomly initialize MI
 		stereoMI.randomHistogram(rand,SgmDisparityCost.MAX_COST);
 
-		int invalid = disparityRange; // TODO make accessible as a getInvalid()
 
 		// Process from low to high resolution. The only disparity esitmate which is
 		// saved is the full resolution one. All prior estimates are done to estimate the mutual information
@@ -119,9 +118,11 @@ public class SgmStereoDisparityHmi {
 
 			sgmCost.process(levelLeft,levelRight, disparityMin, disparityRange,costYXD);
 			aggregation.process(costYXD);
-			selector.select(costYXD,disparityMin,invalid,disparity);
+			selector.setMinDisparity(disparityMin);
+			selector.select(costYXD,disparity);
 
 			if( level > 0 ) {
+				int invalid = selector.getInvalidDisparity();
 				// Update the mututal information model using the latest disparity estimate
 				stereoMI.process(levelLeft, levelRight, disparityMin, disparity, invalid);
 				stereoMI.precomputeScaledCost(SgmDisparityCost.MAX_COST);
@@ -159,5 +160,9 @@ public class SgmStereoDisparityHmi {
 
 	public PyramidDiscreteNN2<GrayU8> getPyrRight() {
 		return pyrRight;
+	}
+
+	public int getInvalidDisparity() {
+		return selector.getInvalidDisparity();
 	}
 }
