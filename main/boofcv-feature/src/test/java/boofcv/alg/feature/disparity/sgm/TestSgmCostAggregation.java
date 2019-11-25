@@ -199,7 +199,7 @@ class TestSgmCostAggregation {
 		int minCostPrev = 6;
 
 		// Compute the cost using this algorithm
-		alg.computeCostInnerD(costXD,idxCost,idxWork,minCostPrev);
+		alg.computeCostInnerD(costXD,idxCost,idxWork,minCostPrev, rangeD);
 
 		// Now compare it to a brute force solution
 		for (int d = 1; d < rangeD-1; d++) {

@@ -59,10 +59,9 @@ public class ExampleStereoDisparity3D {
 	// Specifies what size input images are scaled to
 	public static final double scale = 0.5;
 
-	// Specifies what range of disparity is considered
+	// Specifies what disparity values are considered
 	public static final int minDisparity = 0;
-	public static final int maxDisparity = 40;
-	public static final int rangeDisparity = maxDisparity-minDisparity;
+	public static final int rangeDisparity = 40;
 
 	public static void main( String args[] ) {
 		// ------------- Compute Stereo Correspondence
@@ -98,7 +97,8 @@ public class ExampleStereoDisparity3D {
 		RectifyCalibrated rectAlg = ExampleStereoDisparity.rectify(scaledLeft,scaledRight,param,rectLeft,rectRight);
 
 //		GrayU8 disparity = ExampleStereoDisparity.denseDisparity(rectLeft, rectRight, 3,minDisparity, maxDisparity);
-		GrayF32 disparity = ExampleStereoDisparity.denseDisparitySubpixel(rectLeft, rectRight, 3, minDisparity, maxDisparity);
+		GrayF32 disparity = ExampleStereoDisparity.denseDisparitySubpixel(
+				rectLeft, rectRight, 3, minDisparity, rangeDisparity);
 
 		// ------------- Convert disparity image into a 3D point cloud
 
@@ -164,7 +164,7 @@ public class ExampleStereoDisparity3D {
 		viewer.setPreferredSize(new Dimension(600,600*param.left.height/param.left.width));
 
 		// display the results.  Click and drag to change point cloud camera
-		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,maxDisparity-minDisparity,0);
+		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,rangeDisparity,0);
 		ShowImages.showWindow(visualized,"Disparity", true);
 		ShowImages.showWindow(viewer,"Point Cloud", true);
 	}

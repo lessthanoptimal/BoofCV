@@ -20,6 +20,7 @@ package boofcv.factory.feature.disparity;
 
 import boofcv.alg.feature.disparity.DisparityBlockMatch;
 import boofcv.factory.transform.census.CensusType;
+import boofcv.struct.Configuration;
 
 /**
  * Configuration for the basic block matching stereo algorithm that employs a greedy winner takes all strategy.
@@ -28,17 +29,15 @@ import boofcv.factory.transform.census.CensusType;
  *
  * @author Peter Abeles
  */
-public class ConfigureDisparityBM {
+public class ConfigureDisparityBM implements Configuration {
 	/**
 	 * Minimum disparity that it will check. Must be &ge; 0 and &lt; maxDisparity
 	 */
 	public int minDisparity=0;
 	/**
-	 * Maximum disparity that it will calculate. The maximum size is set by the type of disparity
-	 * image. This is almost always U8 and that means 254. It's not 255 so that 255 can be
-	 * the invalid pixel value. Must be &gt; 0
+	 * Number of disparity values considered. Must be &gt; 0
 	 */
-	public int maxDisparity=100;
+	public int rangeDisparity=100;
 	/**
 	 * Radius of the rectangular region along x-axis.
 	 */
@@ -84,4 +83,13 @@ public class ConfigureDisparityBM {
 	 * This has been tuned to work with pixel values that have been scaled to -1 to 1.
 	 */
 	public double nccEps = 5e-5;
+
+	@Override
+	public void checkValidity() {
+		if( minDisparity < 0 )
+			throw new IllegalArgumentException("miDisparity < 0");
+		if( rangeDisparity < 1 )
+			throw new IllegalArgumentException("rangeDisparity < 1");
+
+	}
 }

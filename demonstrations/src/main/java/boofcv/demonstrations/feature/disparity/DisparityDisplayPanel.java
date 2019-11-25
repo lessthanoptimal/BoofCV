@@ -29,7 +29,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import static boofcv.demonstrations.sfm.multiview.DemoThreeViewControls.MAX_DISPARITY_RANGE;
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 
@@ -41,8 +40,6 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		implements ChangeListener, ActionListener
 {
-	public static final int MAX_DISPARITY = 1000;
-
 	// which image to show
 	int selectedView;
 
@@ -68,7 +65,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	// minimum disparity to calculate
 	int minDisparity = 0;
 	// maximum disparity to calculate
-	int maxDisparity = 150;
+	int rangeDisparity = 150;
 	// maximum allowed per pixel error
 	int pixelError = 30;
 	// reverse association tolerance
@@ -106,8 +103,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	JComboBox comboAlg = combo(selectedAlg,"Five Regions","Region","Region Basic");
 	JComboBox comboError = combo(selectedError,"SAD","Census","NCC");
 	JComboBox comboErrorVariant = combo(selectedErrorVariant,"FOOBAR");
-	JSpinner minDisparitySpinner = spinner(minDisparity,0,MAX_DISPARITY+1,5);
-	JSpinner maxDisparitySpinner = spinner(maxDisparity,1,MAX_DISPARITY+1,5);
+	JSpinner minDisparitySpinner = spinner(minDisparity,0, 1000,5);
+	JSpinner rangeDisparitySpinner = spinner(rangeDisparity,1, 254,5);
 	JCheckBox subpixelToggle = checkbox("Subpixel",useSubpixel);
 	JSpinner radiusSpinner = spinner(regionRadius,1,30,1);
 	JSpinner errorSpinner = spinner(pixelError,-1,80,5);
@@ -136,7 +133,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addLabeled(comboError,"Error Type");
 		addLabeled(comboErrorVariant,"Variant");
 		addLabeled(minDisparitySpinner, "Min Disparity");
-		addLabeled(maxDisparitySpinner, "Max Disparity");
+		addLabeled(rangeDisparitySpinner, "Range Disparity");
 		addAlignLeft(subpixelToggle);
 		addLabeled(radiusSpinner,    "Region Radius");
 		addLabeled(errorSpinner,     "Max Error");
@@ -173,23 +170,9 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		} else if( e.getSource() == reverseSpinner) {
 			reverseTol = ((Number) reverseSpinner.getValue()).intValue();
 		} else if( e.getSource() == minDisparitySpinner) {
-			int v = ((Number) minDisparitySpinner.getValue()).intValue();
-//			System.out.println("========= min changed ========== "+v);
-			if( minDisparity != v ) {
-				minDisparity = v;
-				constrainDisparity(true);
-			} else { // ignore if no change
-				return;
-			}
-		} else if( e.getSource() == maxDisparitySpinner) {
-			int v = ((Number) maxDisparitySpinner.getValue()).intValue();
-//			System.out.println("========= max changed ========== "+v+"  curr="+maxDisparity);
-			if( maxDisparity != v ) {
-				maxDisparity = v;
-				constrainDisparity(false);
-			} else { // ignore if no change
-				return;
-			}
+			minDisparity = ((Number) minDisparitySpinner.getValue()).intValue();
+		} else if( e.getSource() == rangeDisparitySpinner) {
+			rangeDisparity = ((Number) rangeDisparitySpinner.getValue()).intValue();
 		} else if( e.getSource() == errorSpinner) {
 			pixelError = ((Number) errorSpinner.getValue()).intValue();
 		} else if( e.getSource() == radiusSpinner) {
@@ -266,32 +249,6 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 			concurrent = checkConcurrent.isSelected();
 			listener.disparitySettingChange();
 		}
-	}
-
-	private void constrainDisparity( boolean modifiedMin ) {
-//		System.out.println("B "+minDisparity+" "+maxDisparity);
-		if( maxDisparity-minDisparity>MAX_DISPARITY_RANGE ) {
-			if( modifiedMin ) {
-				if( minDisparity+MAX_DISPARITY_RANGE > MAX_DISPARITY) {
-					minDisparity = MAX_DISPARITY-MAX_DISPARITY_RANGE;
-				}
-				maxDisparity = minDisparity + MAX_DISPARITY_RANGE;
-			} else {
-				if( maxDisparity-MAX_DISPARITY_RANGE < 0 ) {
-					maxDisparity = MAX_DISPARITY;
-				}
-				minDisparity = maxDisparity - MAX_DISPARITY_RANGE;
-			}
-		}
-//		// one last sanity check. Ensure everything is in the valid range and max > min
-		minDisparity = Math.max(0,minDisparity);
-		maxDisparity = Math.min(MAX_DISPARITY,maxDisparity);
-		maxDisparity = Math.max(1,maxDisparity);
-		minDisparity = Math.min(minDisparity,maxDisparity-1);
-
-//		System.out.println("FINAL "+minDisparity+" "+maxDisparity);
-		minDisparitySpinner.setValue(minDisparity);
-		maxDisparitySpinner.setValue(maxDisparity);
 	}
 
 	private void update3DControls() {

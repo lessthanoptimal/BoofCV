@@ -238,7 +238,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 				DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 
 				double baseline = calib.getRightToLeft().getT().norm();
-				d2c.configure(baseline, rectK,rectR, leftRectToPixel, control.minDisparity,control.maxDisparity);
+				d2c.configure(baseline, rectK,rectR, leftRectToPixel, control.minDisparity,control.rangeDisparity);
 				if(imagePanel.state==2) // has the user defined the ROI?
 					d2c.setRegionOfInterest(imagePanel.x0, imagePanel.y0, imagePanel.x1, imagePanel.y1);
 				d2c.process(activeAlg.getDisparity(),colorLeft);
@@ -362,7 +362,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		int r = control.regionRadius;
 
 		// make sure the disparity is in a valid range
-		int maxDisparity = Math.min(colorLeft.getWidth()-2*r,control.maxDisparity);
+		int maxDisparity = Math.min(colorLeft.getWidth()-2*r,
+				control.minDisparity+control.rangeDisparity);
 		int minDisparity = Math.min(maxDisparity-1,control.minDisparity);
 
 		Class inputType = GrayU8.class;
@@ -383,7 +384,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			if( error == DisparityError.CENSUS )
 				config.censusVariant = CensusType.values()[control.selectedErrorVariant];
 			config.minDisparity = minDisparity;
-			config.maxDisparity = maxDisparity;
+			config.rangeDisparity = maxDisparity-minDisparity;
 			config.subpixel = control.useSubpixel;
 			config.regionRadiusX = config.regionRadiusY = r;
 			config.maxPerPixelError = control.pixelError;
@@ -396,7 +397,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			if( error == DisparityError.CENSUS )
 				config.censusVariant = CensusType.values()[control.selectedErrorVariant];
 			config.minDisparity = minDisparity;
-			config.maxDisparity = maxDisparity;
+			config.rangeDisparity = maxDisparity-minDisparity;
 			config.regionRadiusX = config.regionRadiusY = r;
 			if( control.selectedAlg == 1 ) {
 				changeGuiActive(true,true);

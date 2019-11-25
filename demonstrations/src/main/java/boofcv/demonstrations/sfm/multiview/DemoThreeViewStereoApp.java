@@ -489,7 +489,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			return false;
 		}
 
-		System.out.println("Computing disparity. min="+controls.minDisparity+" max="+controls.maxDisparity);
+		System.out.println("Computing disparity. min="+controls.minDisparity+" range="+controls.rangeDisparity);
 		GrayF32 disparity = computeDisparity(rectColor1,rectColor2);
 
 		// remove annoying false points
@@ -499,8 +499,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 				disparity.width,disparity.height,visualDisparity,visualDisparity.getType());
 
 		BoofSwingUtil.invokeNowOrLater(()-> {
-			VisualizeImageData.disparity(disparity, visualDisparity,
-					controls.maxDisparity-controls.minDisparity, 0);
+			VisualizeImageData.disparity(disparity, visualDisparity, controls.rangeDisparity, 0);
 			guiDisparity.setImageRepaint(visualDisparity);
 			controls.setViews(3);
 		});
@@ -622,7 +621,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
 		config.errorType = DisparityError.NCC;
 		config.minDisparity = controls.minDisparity;
-		config.maxDisparity = controls.maxDisparity;
+		config.rangeDisparity = controls.rangeDisparity;
 		config.subpixel = true;
 		config.regionRadiusX = config.regionRadiusY = 6;
 		config.validateRtoL = 1;
@@ -643,7 +642,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	{
 		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 		double baseline = motion.getT().norm();
-		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), controls.minDisparity, controls.maxDisparity);
+		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), controls.minDisparity,
+				controls.minDisparity+controls.rangeDisparity);
 		d2c.process(disparity,left);
 
 		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK,disparity.width,disparity.height,null);

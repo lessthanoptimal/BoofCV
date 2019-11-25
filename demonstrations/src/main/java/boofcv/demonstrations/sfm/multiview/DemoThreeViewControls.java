@@ -32,7 +32,6 @@ import java.awt.event.ActionListener;
 public class DemoThreeViewControls extends StandardAlgConfigPanel
 	implements ChangeListener, ActionListener
 {
-	public static final int MAX_DISPARITY_RANGE=254;
 
 	JComboBox imageView;
 
@@ -43,7 +42,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	JCheckBox cFocalAuto;
 	JSpinner sFocal;
 	JSpinner sMinDisparity;
-	JSpinner sMaxDisparity;
+	JSpinner sRangeDisparity;
 	JButton bCompute = new JButton("Compute");
 
 	JTextArea textInfo = new JTextArea();
@@ -55,7 +54,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	boolean autoFocal=true;
 	int focal = 500;
 	int minDisparity = 0;
-	int maxDisparity = 255;
+	int rangeDisparity = 255;
 
 	DemoThreeViewStereoApp owner;
 
@@ -72,7 +71,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		cFocalAuto = checkbox("Auto Focal",autoFocal);
 		sFocal = spinner(focal,100,3000,50);
 		sMinDisparity = spinner(minDisparity,0,1000,10);
-		sMaxDisparity = spinner(maxDisparity,1,1001,10);
+		sRangeDisparity = spinner(rangeDisparity,1,254,10);
 		bCompute.addActionListener(this);
 		bCompute.setMinimumSize(bCompute.getPreferredSize());
 
@@ -89,7 +88,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		addAlignLeft(cFocalAuto);
 		addLabeled(sFocal,"Focal");
 		addLabeled(sMinDisparity,"Min Disparity");
-		addLabeled(sMaxDisparity,"Max Disparity");
+		addLabeled(sRangeDisparity,"Range Disparity");
 		add(new JScrollPane(textInfo));
 		addAlignCenter(bCompute);
 
@@ -122,11 +121,9 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		boolean compute = true;
 		if( e.getSource() == sMinDisparity ) {
 			minDisparity = ((Number)sMinDisparity.getValue()).intValue();
-			constrainDisparity();
 			stereoChanged = true;
-		} else if( e.getSource() == sMaxDisparity ) {
-			maxDisparity = ((Number)sMaxDisparity.getValue()).intValue();
-			constrainDisparity();
+		} else if( e.getSource() == sRangeDisparity) {
+			rangeDisparity = ((Number) sRangeDisparity.getValue()).intValue();
 			stereoChanged = true;
 		} else if( e.getSource() == sInliers ) {
 			inliers = ((Number)sInliers.getValue()).doubleValue();
@@ -143,16 +140,6 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		}
 		if( compute )
 			bCompute.setEnabled(true);
-	}
-
-	// TODO Create a custom disparity widget and share with VisualizeStereoDisparity
-	private void constrainDisparity() {
-		if( maxDisparity-minDisparity>MAX_DISPARITY_RANGE ) {
-			minDisparity = Math.max(0,maxDisparity-MAX_DISPARITY_RANGE);
-			maxDisparity = minDisparity+MAX_DISPARITY_RANGE;
-			sMinDisparity.setValue(minDisparity);
-			sMaxDisparity.setValue(maxDisparity);
-		}
 	}
 
 	@Override

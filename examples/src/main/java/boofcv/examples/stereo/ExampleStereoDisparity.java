@@ -69,19 +69,19 @@ public class ExampleStereoDisparity {
 	 * @param rectRight Rectified right camera image
 	 * @param regionSize Radius of region being matched
 	 * @param minDisparity Minimum disparity that is considered
-	 * @param maxDisparity Maximum disparity that is considered
+	 * @param rangeDisparity Number of disparity values considered.
 	 * @return Disparity image
 	 */
 	public static GrayU8 denseDisparity(GrayU8 rectLeft , GrayU8 rectRight ,
 										int regionSize,
-										int minDisparity , int maxDisparity )
+										int minDisparity , int rangeDisparity )
 	{
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
 		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
 		config.errorType = DisparityError.SAD;
 		config.minDisparity = minDisparity;
-		config.maxDisparity = maxDisparity;
+		config.rangeDisparity = rangeDisparity;
 		config.subpixel = false;
 		config.regionRadiusX = config.regionRadiusY = regionSize;
 		config.maxPerPixelError = 25;
@@ -102,14 +102,14 @@ public class ExampleStereoDisparity {
 	 */
 	public static GrayF32 denseDisparitySubpixel(GrayU8 rectLeft , GrayU8 rectRight ,
 												 int regionSize ,
-												 int minDisparity , int maxDisparity )
+												 int minDisparity , int rangeDisparity )
 	{
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
 		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
 		config.errorType = DisparityError.SAD;
 		config.minDisparity = minDisparity;
-		config.maxDisparity = maxDisparity;
+		config.rangeDisparity = rangeDisparity;
 		config.subpixel = true;
 		config.regionRadiusX = config.regionRadiusY = regionSize;
 		config.maxPerPixelError = 25;
@@ -187,11 +187,11 @@ public class ExampleStereoDisparity {
 		rectify(distLeft,distRight,param,rectLeft,rectRight);
 
 		// compute disparity
-		GrayU8 disparity = denseDisparity(rectLeft,rectRight,5,10,60);
+		GrayU8 disparity = denseDisparity(rectLeft,rectRight,5,10,50);
 //		GrayF32 disparity = denseDisparitySubpixel(rectLeft,rectRight,5,10,60);
 
 		// show results
-		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,60-10,0);
+		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,50,0);
 
 		ListDisplayPanel gui = new ListDisplayPanel();
 		gui.addImage(rectLeft, "Rectified");

@@ -121,8 +121,8 @@ public class SgmStereoDisparityHmi {
 			GrayU8 levelRight = pyrRight.get(level);
 
 			sgmCost.process(levelLeft,levelRight, levelDisparityMin, levelDisparityRange,costYXD);
-			aggregation.process(costYXD);
-			selector.setMinDisparity(levelDisparityMin);
+			aggregation.process(costYXD,disparityMin);
+			selector.setMinDisparity(levelDisparityMin); // todo move to function below
 			selector.select(aggregation.getAggregated(),disparity);
 
 			if( level > 0 ) {
@@ -162,10 +162,10 @@ public class SgmStereoDisparityHmi {
 		// Compute the cost using mutual information
 		sgmCost.process(left,right, disparityMin, disparityRange,costYXD);
 		// Aggregate the cost along all the paths
-		aggregation.process(costYXD);
+		aggregation.process(costYXD,disparityMin);
 
 		// Select the best disparity for each pixel given the cost
-		selector.setMinDisparity(disparityMin);
+		selector.setMinDisparity(disparityMin); // TODO move to function below
 		selector.select(aggregation.getAggregated(),disparity);
 	}
 

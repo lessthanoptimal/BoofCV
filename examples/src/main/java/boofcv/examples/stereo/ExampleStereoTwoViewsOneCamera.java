@@ -74,7 +74,7 @@ public class ExampleStereoTwoViewsOneCamera {
 
 	// Disparity calculation parameters
 	private static final int minDisparity = 15;
-	private static final int maxDisparity = 100;
+	private static final int rangeDisparity = 85;
 
 	public static void main(String args[]) {
 		// specify location of images and calibration
@@ -118,7 +118,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
 		config.errorType = DisparityError.SAD;
 		config.minDisparity = minDisparity;
-		config.maxDisparity = maxDisparity;
+		config.rangeDisparity = rangeDisparity;
 		config.subpixel = true;
 		config.regionRadiusX = config.regionRadiusY = 5;
 		config.maxPerPixelError = 20;
@@ -139,7 +139,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		RectifyImageOps.applyMask(disparity,rectifiedMask,0);
 
 		// show results
-		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, maxDisparity-minDisparity, 0);
+		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, rangeDisparity, 0);
 
 		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectifiedLeft, null);
 		BufferedImage outRight = ConvertBufferedImage.convertTo(rectifiedRight, null);
@@ -147,7 +147,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight), "Rectification",true);
 		ShowImages.showWindow(visualized, "Disparity",true);
 
-		showPointCloud(disparity, outLeft, leftToRight, rectifiedK,rectifiedR, minDisparity, maxDisparity);
+		showPointCloud(disparity, outLeft, leftToRight, rectifiedK,rectifiedR, minDisparity, rangeDisparity);
 
 		System.out.println("Total found " + matchedCalibrated.size());
 		System.out.println("Total Inliers " + inliers.size());
@@ -289,11 +289,11 @@ public class ExampleStereoTwoViewsOneCamera {
 	 */
 	public static void showPointCloud(ImageGray disparity, BufferedImage left,
 									  Se3_F64 motion, DMatrixRMaj rectifiedK , DMatrixRMaj rectifiedR,
-									  int minDisparity, int maxDisparity)
+									  int minDisparity, int rangeDisparity)
 	{
 		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 		double baseline = motion.getT().norm();
-		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), minDisparity, maxDisparity);
+		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), minDisparity, minDisparity+rangeDisparity);
 		d2c.process(disparity,left);
 
 		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK,disparity.width,disparity.height,null);

@@ -426,7 +426,7 @@ public class ExampleTrifocalStereoUncalibrated {
 										   CameraPinholeBrown intrinsicLeft ,
 										   CameraPinholeBrown intrinsicRight ,
 										   Se3_F64 leftToRight ,
-										   int minDisparity , int maxDisparity) {
+										   int minDisparity , int rangeDisparity) {
 
 //		drawInliers(origLeft, origRight, intrinsic, inliers);
 		int width = distortedLeft.width;
@@ -462,7 +462,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
 		config.errorType = DisparityError.NCC;
 		config.minDisparity = minDisparity;
-		config.maxDisparity = maxDisparity;
+		config.rangeDisparity = rangeDisparity;
 		config.subpixel = true;
 		config.regionRadiusX = config.regionRadiusY = 6;
 		config.validateRtoL = 1;
@@ -476,7 +476,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		RectifyImageOps.applyMask(disparity,rectMask,0);
 
 		// show results
-		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, maxDisparity-minDisparity, 0);
+		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, rangeDisparity, 0);
 
 		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectColorLeft, new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB),true);
 		BufferedImage outRight = ConvertBufferedImage.convertTo(rectColorRight, new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB),true);
@@ -484,6 +484,6 @@ public class ExampleTrifocalStereoUncalibrated {
 		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight), "Rectification",true);
 		ShowImages.showWindow(visualized, "Disparity",true);
 
-		showPointCloud(disparity, outLeft, leftToRight, rectifiedK,rectifiedR, minDisparity, maxDisparity);
+		showPointCloud(disparity, outLeft, leftToRight, rectifiedK,rectifiedR, minDisparity, rangeDisparity);
 	}
 }

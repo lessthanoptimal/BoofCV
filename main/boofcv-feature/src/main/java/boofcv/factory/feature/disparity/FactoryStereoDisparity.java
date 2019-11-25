@@ -159,8 +159,6 @@ public class FactoryStereoDisparity {
 		// 3 regions are used not just one in this case
 		maxError *= 3;
 
-
-
 		switch( config.errorType) {
 			case SAD: {
 				DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
@@ -230,12 +228,11 @@ public class FactoryStereoDisparity {
 	private static <T extends ImageGray<T>> DisparityBlockMatchRowFormat
 	createBlockMatching(ConfigureDisparityBM config, Class<T> imageType, DisparitySelect select, BlockRowScore rowScore) {
 		DisparityBlockMatchRowFormat alg;
+		int maxDisparity = config.minDisparity+config.rangeDisparity;
 		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
-			alg = new DisparityScoreBM_F32<>(config.minDisparity,
-					config.maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
+			alg = new DisparityScoreBM_F32<>(config.minDisparity,maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
 		} else {
-			alg = new DisparityScoreBM_S32(config.minDisparity,
-					config.maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
+			alg = new DisparityScoreBM_S32(config.minDisparity,maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
 		}
 		return alg;
 	}
@@ -243,12 +240,11 @@ public class FactoryStereoDisparity {
 	private static <T extends ImageGray<T>> DisparityBlockMatchRowFormat
 	createBestFive(ConfigureDisparityBM config, Class<T> imageType, DisparitySelect select, BlockRowScore rowScore) {
 		DisparityBlockMatchRowFormat alg;
+		int maxDisparity = config.minDisparity+config.rangeDisparity;
 		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
-			alg = new DisparityScoreBMBestFive_F32(config.minDisparity,
-					config.maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
+			alg = new DisparityScoreBMBestFive_F32(config.minDisparity,maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
 		} else {
-			alg = new DisparityScoreBMBestFive_S32(config.minDisparity,
-					config.maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
+			alg = new DisparityScoreBMBestFive_S32(config.minDisparity,maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
 		}
 		return alg;
 	}
@@ -257,7 +253,7 @@ public class FactoryStereoDisparity {
 	 * WTA algorithms that computes disparity on a sparse per-pixel basis as requested..
 	 *
 	 * @param minDisparity Minimum disparity that it will check. Must be &ge; 0 and &lt; maxDisparity
-	 * @param maxDisparity Maximum disparity that it will calculate. Must be &gt; 0
+	 * @param rangeDisparity Number of disparity values considered. Must be &gt; 0
 	 * @param regionRadiusX Radius of the rectangular region along x-axis.
 	 * @param regionRadiusY Radius of the rectangular region along y-axis.
 	 * @param maxPerPixelError Maximum allowed error in a region per pixel.  Set to &lt; 0 to disable.
@@ -269,13 +265,14 @@ public class FactoryStereoDisparity {
 	 * @return Sparse disparity algorithm
 	 */
 	public static <T extends ImageGray<T>> StereoDisparitySparse<T>
-	regionSparseWta( int minDisparity , int maxDisparity,
+	regionSparseWta( int minDisparity , int rangeDisparity,
 					 int regionRadiusX, int regionRadiusY ,
 					 double maxPerPixelError ,
 					 double texture ,
 					 boolean subpixelInterpolation ,
 					 Class<T> imageType ) {
 
+		int maxDisparity = minDisparity+rangeDisparity;
 		double maxError = (regionRadiusX*2+1)*(regionRadiusY*2+1)*maxPerPixelError;
 
 		if( imageType == GrayU8.class ) {
