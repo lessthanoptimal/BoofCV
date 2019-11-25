@@ -96,7 +96,7 @@ public class ExampleStereoDisparity3D {
 
 		RectifyCalibrated rectAlg = ExampleStereoDisparity.rectify(scaledLeft,scaledRight,param,rectLeft,rectRight);
 
-//		GrayU8 disparity = ExampleStereoDisparity.denseDisparity(rectLeft, rectRight, 3,minDisparity, maxDisparity);
+//		GrayU8 disparity = ExampleStereoDisparity.denseDisparity(rectLeft, rectRight, 3,minDisparity, rangeDisparity);
 		GrayF32 disparity = ExampleStereoDisparity.denseDisparitySubpixel(
 				rectLeft, rectRight, 3, minDisparity, rangeDisparity);
 

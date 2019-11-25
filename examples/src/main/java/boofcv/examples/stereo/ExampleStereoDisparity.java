@@ -188,7 +188,7 @@ public class ExampleStereoDisparity {
 
 		// compute disparity
 		GrayU8 disparity = denseDisparity(rectLeft,rectRight,5,10,50);
-//		GrayF32 disparity = denseDisparitySubpixel(rectLeft,rectRight,5,10,60);
+//		GrayF32 disparity = denseDisparitySubpixel(rectLeft,rectRight,5,10,50);
 
 		// show results
 		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,50,0);
