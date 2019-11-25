@@ -109,9 +109,18 @@ public class SgmStereoDisparityHmi {
 		stereoMI.diagonalHistogram(SgmDisparityCost.MAX_COST);
 //		stereoMI.randomHistogram(rand,SgmDisparityCost.MAX_COST);
 
+		// While 'learning' the MI turn off right to left validation. Incorrect matches tend to help more than
+		// hurt at this step
+//		int rightToLeftTol = selector.getRightToLeftTolerance();
+
 		// Process from low to high resolution. The only disparity esitmate which is
 		// saved is the full resolution one. All prior estimates are done to estimate the mutual information
 		for (int level = pyrLeft.getLevelsCount()-1; level >= 0; level-- ) {
+//			if( level > 0 ) {
+//				selector.setRightToLeftTolerance(-1);
+//			} else {
+//				selector.setRightToLeftTolerance(rightToLeftTol);
+//			}
 			int scale = 1 << level;
 			// reduce the minimum disparity for this scale otherwise it might not consider any matches at this scale
 			int levelDisparityMin = (int)Math.round(disparityMin/(double)scale);
@@ -180,9 +189,9 @@ public class SgmStereoDisparityHmi {
 				int d = src.unsafe_get(x,y);
 				float subpixel;
 				if( d > 0 && d < maxLocalDisparity-1) {
-					int c0 = costXD.unsafe_get(d-1,y);
-					int c1 = costXD.unsafe_get(d  ,y);
-					int c2 = costXD.unsafe_get(d+1,y);
+					int c0 = costXD.unsafe_get(d-1,x);
+					int c1 = costXD.unsafe_get(d  ,x);
+					int c2 = costXD.unsafe_get(d+1,x);
 
 					float offset = (float)(c0-c2)/(float)(2*(c0-2*c1+c2));
 					subpixel = d + offset;

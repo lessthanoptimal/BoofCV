@@ -67,10 +67,10 @@ public class SgmDisparitySelector {
 
 			// if 'x' is less than minDisparity then that's nothing that it can compare against
 			for (int x = 0; x < minDisparity; x++) {
-				disparity.unsafe_set(x,y,invalidDisparity);
+				disparity.unsafe_set(x,y, invalidDisparity);
 			}
 			for (int x = minDisparity; x < lengthX; x++) {
-				disparity.unsafe_set(x,y, processPixel(x));
+				disparity.unsafe_set(x,y, findBestDisparity(x));
 			}
 		}
 	}
@@ -88,31 +88,32 @@ public class SgmDisparitySelector {
 	}
 
 	/**
-	 * Selects the disparity for the specified pixel
+	 * Selects the disparity for the specified pixel using a winner takes all strategy
 	 */
-	int processPixel(int x ) {
+	int findBestDisparity(int x ) {
 		// The maximum disparity range that can be considered at 'x'
 		int maxLocalDisparity = maxLocalDisparity(x);
 		int bestScore = maxError;
-		int bestDisparity = invalidDisparity;
+		int bestRange = invalidDisparity;
 
 		int idx = aggregatedXD.getIndex(0,x);
 		for (int d = 0; d < maxLocalDisparity; d++) {
 			int cost = aggregatedXD.data[idx++] & 0xFFFF;
 			if( cost < bestScore ) {
 				bestScore = cost;
-				bestDisparity = d;
+				bestRange = d;
 			}
 		}
 
 		// right to left consistency check
-		if( rightToLeftTolerance >= 0 && bestDisparity != invalidDisparity ) {
-			int bestX = selectRightToLeft(x-bestDisparity);
+		if( rightToLeftTolerance >= 0 && bestRange != invalidDisparity ) {
+			int bestX = selectRightToLeft(x-bestRange-minDisparity);
 			if( Math.abs(bestX-x) > rightToLeftTolerance )
-				bestDisparity = invalidDisparity;
+				bestRange = invalidDisparity;
+			// TODO average the two?
 		}
 
-		return bestDisparity;
+		return bestRange;
 	}
 
 	public final int maxLocalDisparity( int x ) {
@@ -123,18 +124,18 @@ public class SgmDisparitySelector {
 	 * Finds the best fit region going from the column (x-coordinate) in right image to left. To find
 	 * the pixel in left image that's compared against a pixel in right image, take it's x-coordinate then add
 	 * the disparity. e.g. x=10 in right matches x=15 and d=5 in left
-	 * @param col x-coordinate of point in right image
+	 * @param x x-coordinate of point in right image
 	 * @return best fit disparity from right to left
 	 */
-	private int selectRightToLeft( int col ) {
+	private int selectRightToLeft( int x ) {
 		// The range of disparities it can search
-		int maxLocalDisparity = Math.min(this.lengthX, col+this.lengthD)-col-minDisparity;
+		int maxLocalDisparity = Math.min(this.lengthX, x+this.lengthD)-x-minDisparity;
 
-		int idx = aggregatedXD.getIndex(0,col); // disparity of zero at col
+		int idx = aggregatedXD.getIndex(0,x); // disparity of zero at col
 
 		// best column in left image that it matches up with col in right
 		int bestD = 0;
-		float scoreBest = aggregatedXD.data[idx];
+		float scoreBest = aggregatedXD.data[idx] & 0xFFFF;
 
 		for( int i = 1; i < maxLocalDisparity; i++ ) {
 			idx += lengthD; // go to index next x-coordinate
@@ -146,7 +147,7 @@ public class SgmDisparitySelector {
 			}
 		}
 
-		return col+minDisparity+bestD;
+		return x+minDisparity+bestD;
 	}
 
 	public int getRightToLeftTolerance() {

@@ -106,7 +106,7 @@ class TestSgmStereoDisparityHmi extends CommonSgmChecks{
 		}
 		assertEquals(0,totalFailed);
 		double errorAve = errorSum/(double)totalSuccess;
-		assertTrue(errorAve<1,"ave error "+errorAve);
+		assertTrue(errorAve<0.2,"ave error "+errorAve);
 //		assertTrue(errorMax<2,"max error "+errorMax);
 	}
 

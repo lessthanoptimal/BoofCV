@@ -134,9 +134,9 @@ class TestSgmDisparitySelector {
 			// see the match will be within tolerance
 			// minDisparity offsets the estimated disparity so take that in account
 			if( i < d-3-minDisparity )
-				assertEquals(alg.getInvalidDisparity(), alg.processPixel(tx));
+				assertEquals(alg.getInvalidDisparity(), alg.findBestDisparity(tx));
 			else
-				assertEquals(d, alg.processPixel(tx));
+				assertEquals(d, alg.findBestDisparity(tx));
 		}
 	}
 
@@ -155,11 +155,11 @@ class TestSgmDisparitySelector {
 		alg.setup(aggregatedYXD);
 
 		// the only value on the right which can be matched with the left is x
-		assertEquals(d, alg.processPixel(tx));
+		assertEquals(d, alg.findBestDisparity(tx));
 
 		// this will fail because it's not within the allowed range
 		alg.setMinDisparity(1);
-		assertEquals(alg.getInvalidDisparity(), alg.processPixel(tx));
+		assertEquals(alg.getInvalidDisparity(), alg.findBestDisparity(tx));
 	}
 
 	@Test
