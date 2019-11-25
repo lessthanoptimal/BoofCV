@@ -82,7 +82,7 @@ public class SgmDisparitySelector {
 		this.lengthY = aggregatedYXD.getNumBands();
 		this.lengthX = aggregatedYXD.height;
 		this.lengthD = aggregatedYXD.width;
-		this.invalidDisparity = lengthD;
+		this.invalidDisparity = invalidGivenRange(lengthD);
 		if( invalidDisparity > 255 )
 			throw new IllegalArgumentException("Disparity range is too great. Must be < 256 not "+lengthD);
 	}
@@ -92,7 +92,7 @@ public class SgmDisparitySelector {
 	 */
 	int processPixel(int x ) {
 		// The maximum disparity range that can be considered at 'x'
-		int maxLocalDisparity = Math.min(x-minDisparity+1,lengthD);
+		int maxLocalDisparity = maxLocalDisparity(x);
 		int bestScore = maxError;
 		int bestDisparity = invalidDisparity;
 
@@ -113,6 +113,10 @@ public class SgmDisparitySelector {
 		}
 
 		return bestDisparity;
+	}
+
+	public final int maxLocalDisparity( int x ) {
+		return Math.min(x-minDisparity+1,lengthD);
 	}
 
 	/**
@@ -171,5 +175,13 @@ public class SgmDisparitySelector {
 
 	public int getInvalidDisparity() {
 		return invalidDisparity;
+	}
+
+	/**
+	 * Convenience function to make it clear what the value assigned to an invalid disparity is. Any
+	 * value
+	 */
+	public static int invalidGivenRange( int disparityRange ) {
+		return disparityRange;
 	}
 }

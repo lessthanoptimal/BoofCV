@@ -25,27 +25,25 @@ import boofcv.struct.image.GrayU8;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-class TestStereoMutualInformation {
-	final int w = 30,h=40;
-	final Random rand = new Random(234);
+class TestStereoMutualInformation extends CommonSgmChecks {
+
+	TestStereoMutualInformation() {
+		super(30, 40);
+	}
 
 	@Test
 	void cost() {
 		// Create two images that are offset by a constant disparity
-		GrayU8 left = new GrayU8(w,h);
-		GrayU8 right = new GrayU8(w,h);
-		GrayU8 disparity = new GrayU8(w,h);
+		GrayU8 disparity = new GrayU8(width,height);
 
 		// Set the disparity to 10
 		ImageMiscOps.fill(disparity,10);
-		ImageMiscOps.fillRectangle(disparity,255,0,0,10,h);
+		ImageMiscOps.fillRectangle(disparity,255,0,0,10, height);
 
 		// Compute MI with no correlation between left and right images
 		ImageMiscOps.fillUniform(left,rand,125,150);
@@ -56,7 +54,7 @@ class TestStereoMutualInformation {
 		float costIncorrect = computeCost(left, right, null, alg);
 
 		// Compute MI with correct disparity
-		ImageMiscOps.copy(10,0,0,0,w-10,h,left,right);
+		ImageMiscOps.copy(10,0,0,0, width -10, height,left,right);
 		PixelMath.multiply(right,0.5,right);
 		alg.process(left,right,0,disparity,255);
 		float costCorrect = computeCost(left, right, disparity, alg);
@@ -69,13 +67,11 @@ class TestStereoMutualInformation {
 	@Test
 	void costScaled() {
 		// Create two images that are offset by a constant disparity
-		GrayU8 left = new GrayU8(w,h);
-		GrayU8 right = new GrayU8(w,h);
-		GrayU8 disparity = new GrayU8(w,h);
+		GrayU8 disparity = new GrayU8(width,height);
 
 		// Set the disparity to 10
 		ImageMiscOps.fill(disparity,10);
-		ImageMiscOps.fillRectangle(disparity,255,0,0,10,h);
+		ImageMiscOps.fillRectangle(disparity,255,0,0,10, height);
 
 		// Compute MI with no correlation between left and right images
 		ImageMiscOps.fillUniform(left,rand,125,150);
@@ -88,7 +84,7 @@ class TestStereoMutualInformation {
 		int costIncorrect = computeCostScaled(left, right, null, alg);
 
 		// Compute MI with correct disparity
-		ImageMiscOps.copy(10,0,0,0,w-10,h,left,right);
+		ImageMiscOps.copy(10,0,0,0, width -10, height,left,right);
 		PixelMath.multiply(right,0.5,right);
 		alg.process(left,right,0,disparity,255);
 		alg.precomputeScaledCost(2047);
@@ -99,10 +95,44 @@ class TestStereoMutualInformation {
 		assertTrue(costCorrect*1.5 < costIncorrect);
 	}
 
+	@Test
+	void cost_minimum() {
+		int invalid = 10;
+		renderStereoStep(8,invalid);
+		StereoMutualInformation alg = new StereoMutualInformation();
+		alg.configureHistogram(255,255);
+		alg.configureSmoothing(1);
+		alg.process(left,right,0,disparityTruth,invalid);
+		alg.precomputeScaledCost(SgmDisparityCost.MAX_COST);
+
+		// Scores are only valid when the pixel value has been observed
+		int maxValue = ImageStatistics.max(left);
+
+		// sanity check TODO DELETE?
+		for (int i = 0; i < maxValue; i++) {
+			assertEquals(alg.entropyLeft.data[i],alg.entropyRight.data[i], UtilEjml.F_EPS,"i = "+i);
+		}
+
+		// The minimum should always be when the two values rwo the same
+		for (int i = 0; i < maxValue; i++) {
+			int bestScore = Integer.MAX_VALUE;
+			int bestIdx = -1;
+			for (int j = 0; j < maxValue; j++) {
+				int c = alg.costScaled(i,j);
+				if( c < bestScore ) {
+					bestScore = c;
+					bestIdx = j;
+				}
+			}
+			System.out.println("i="+i+" bestIdx="+bestIdx+"  score="+bestScore);
+//			assertEquals(i,bestIdx);
+		}
+	}
+
 	private float computeCost(GrayU8 left, GrayU8 right, GrayU8 disparity, StereoMutualInformation alg) {
 		float cost = 0;
-		for (int y = 0; y < h; y++) {
-			for (int x = 0; x < w; x++) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
 				int d = disparity != null ? disparity.get(x,y) : 0;
 				if( d == 255 )
 					continue;
@@ -116,8 +146,8 @@ class TestStereoMutualInformation {
 
 	private int computeCostScaled(GrayU8 left, GrayU8 right, GrayU8 disparity, StereoMutualInformation alg) {
 		int cost = 0;
-		for (int y = 0; y < h; y++) {
-			for (int x = 0; x < w; x++) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
 				int d = disparity != null ? disparity.get(x,y) : 0;
 				if( d == 255 )
 					continue;
@@ -135,14 +165,12 @@ class TestStereoMutualInformation {
 	@Test
 	void multipleCalls() {
 		// Create arbitrary inputs
-		GrayU8 left = new GrayU8(w,h);
-		GrayU8 right = new GrayU8(w,h);
-		GrayU8 disparity = new GrayU8(w,h);
+		GrayU8 disparity = new GrayU8(width, height);
 
 		ImageMiscOps.fillUniform(left,rand,10,220);
 		ImageMiscOps.fillUniform(right,rand,10,220);
 		ImageMiscOps.fillUniform(disparity,rand,0,8);
-		ImageMiscOps.fillRectangle(disparity,255,0,0,8,h); // avoid going out of bounds
+		ImageMiscOps.fillRectangle(disparity,255,0,0,8, height); // avoid going out of bounds
 
 		StereoMutualInformation alg = new StereoMutualInformation();
 		alg.process(left,right,0,disparity,255);
@@ -157,9 +185,7 @@ class TestStereoMutualInformation {
 
 	@Test
 	void computeJointHistogram() {
-		GrayU8 left = new GrayU8(w,h);
-		GrayU8 right = new GrayU8(w,h);
-		GrayU8 disparity = new GrayU8(w,h); // Filled with zero. So each pixel is matched at same coordinate
+		GrayU8 disparity = new GrayU8(width, height); // Filled with zero. So each pixel is matched at same coordinate
 
 		ImageMiscOps.fillUniform(left,rand,10,100);
 		PixelMath.multiply(left,2.0,right);
@@ -181,7 +207,7 @@ class TestStereoMutualInformation {
 			}
 		}
 		// make sure the non-zero elements is more than 0
-		assertEquals(w*h,nonZero);
+		assertEquals(width * height,nonZero);
 	}
 
 	/**
@@ -189,23 +215,21 @@ class TestStereoMutualInformation {
 	 */
 	@Test
 	void computeJointHistogram_SkipInvalid() {
-		GrayU8 left = new GrayU8(w,h);
-		GrayU8 right = new GrayU8(w,h);
-		GrayU8 disparity = new GrayU8(w,h);
+		GrayU8 disparity = new GrayU8(width, height);
 
 		ImageMiscOps.fillUniform(left,rand,10,100);
 		right.setTo(left);
 
 		// set the top half of the image to have invalid disparities
 		int invalid = 255;
-		ImageMiscOps.fillRectangle(disparity,invalid,0,0,w,h/2);
+		ImageMiscOps.fillRectangle(disparity,invalid,0,0, width, height /2);
 
 		StereoMutualInformation alg = new StereoMutualInformation();
 		alg.configureHistogram(250,250);
 		alg.computeJointHistogram(left,right,0,disparity,invalid);
 
 		int found = ImageStatistics.sum(alg.histJoint);
-		assertEquals(w*h/2,found);
+		assertEquals(width * height /2,found);
 	}
 
 	@Test

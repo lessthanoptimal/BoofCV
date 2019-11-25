@@ -199,13 +199,23 @@ public class SgmCostAggregation {
 			GrayU16 aggrXD = aggregated.getBand(y);
 
 			int idxAggr = aggrXD.getIndex(0,x);   // Lr(i,0)
-			for (int d = 0; d < lengthD; d++) {
-				aggrXD.data[idxAggr++] += workCostLr[idxWork++];
+			for (int d = 0; d < lengthD; d++, idxAggr++, idxWork++) {
+				aggrXD.data[idxAggr] = (short)((aggrXD.data[idxAggr] & 0xFFFF) + (workCostLr[idxWork]&0xFFFF));
 			}
 
 			x += dx;
 			y += dy;
 		}
+	}
+
+	private void printCost( int x0 , int y0 ) {
+		GrayU16 aggrXD = aggregated.getBand(y0);
+		int idxAggr = aggrXD.getIndex(0,x0);
+		for (int d = 0; d < lengthD; d++) {
+			int c = aggrXD.data[idxAggr+d]&0xFFFF;
+			System.out.printf("%4d ",c);
+		}
+		System.out.println();
 	}
 
 	/**
@@ -294,6 +304,10 @@ public class SgmCostAggregation {
 			return (t0+1-step/2)/(-step);
 		else
 			return Integer.MAX_VALUE;
+	}
+
+	public Planar<GrayU16> getAggregated() {
+		return aggregated;
 	}
 
 	public int getPenalty1() {

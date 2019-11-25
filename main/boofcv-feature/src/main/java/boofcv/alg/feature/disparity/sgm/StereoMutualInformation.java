@@ -84,7 +84,6 @@ public class StereoMutualInformation {
 	public StereoMutualInformation() {
 		// this is a reasonable default for 8-bit images
 		configureHistogram(255,255);
-
 		configureSmoothing(1);
 	}
 
@@ -123,6 +122,16 @@ public class StereoMutualInformation {
 		}
 	}
 
+	public void diagonalHistogram( int maxCost ) {
+		int costLow = maxCost/20;
+		int costHigh = maxCost/3;
+		for (int y = 0,idx=0; y < scaledCost.height; y++) {
+			for (int x = 0; x < scaledCost.width; x++ ) {
+				scaledCost.data[idx++] = (short)((x==y) ? costLow : costHigh);
+			}
+		}
+	}
+
 	/**
 	 * Amount of smooth that's applied to the kernels
 	 * @param radius A radius of 3 is recommended in the paper
@@ -148,8 +157,30 @@ public class StereoMutualInformation {
 
 		// Compute entropy tables
 		computeJointHistogram(left, right, minDisparity, disparity, invalid);
+//		printRowJointHist(4);
 		computeProbabilities();
+//		printRowJoint(4);
 		computeEntropy();
+//		printRowJoint(4);
+	}
+
+	private void printRowJoint( int y ) {
+		for (int x = 0; x < entropyJoint.width; x++) {
+			if( entropyJoint.get(x,y) == 0 )
+				System.out.print(" . ");
+			else
+				System.out.printf("%2d ",(int)(10000*entropyJoint.get(x,y)));
+		}
+		System.out.println();
+	}
+	private void printRowJointHist( int y ) {
+		for (int x = 0; x < histJoint.width; x++) {
+			if( histJoint.get(x,y) == 0 )
+				System.out.print(" . ");
+			else
+				System.out.printf("%2d ",histJoint.get(x,y));
+		}
+		System.out.println();
 	}
 
 	/**
@@ -166,7 +197,7 @@ public class StereoMutualInformation {
 		int rightScale = scalePixelValue(rightValue);
 
 		// Equation 8b and 9a
-		return -(entropyLeft.data[leftScale] + entropyRight.data[rightScale] - entropyJoint.unsafe_get(rightScale,leftScale));
+		return entropyJoint.unsafe_get(rightScale,leftScale) - entropyLeft.data[leftScale] - entropyRight.data[rightScale];
 	}
 
 	public int costScaled( int leftValue , int rightValue ) {
@@ -181,7 +212,7 @@ public class StereoMutualInformation {
 		// zero the histogram
 		ImageMiscOps.fill(histJoint,0);
 
-		int histLength = histogramIntensity.length;
+		final int histLength = histogramIntensity.length;
 
 		// Compute the joint histogram
 		for (int row = 0; row < left.height; row++) {
@@ -191,15 +222,16 @@ public class StereoMutualInformation {
 				// Don't consider pixels without correspondences
 				if( d == invalid )
 					continue;
-
+				// Don't need to check to see if disparity is inside the image because it is assumed that
+				// the disparity is physically possible
 				d += minDisparity;
 
 				// NOTE: Paper says to take care to avoid double mappings due to occlusions. Not sure I'm doing that.
 
-				// The equation below assumes that all disparitys are valid and won't result in a pixel going
+				// The equation below assumes that all disparities are valid and won't result in a pixel going
 				// outside the image
 				int leftValue  =  left.data[idx  ]&0xFF; // I(x  ,y)
-				int rightValue = right.data[idx-d]&0xFF; // I(x-d,y)
+				int rightValue = right.data[idx-d]&0xFF; // I(x-d,y) // TODO multiple left could map to this pixel
 
 				// scale the pixel intensity for the histogram
 				leftValue  = scalePixelValue(leftValue);
@@ -240,7 +272,6 @@ public class StereoMutualInformation {
 	 * Compute Entropy from the already computed probabilities
 	 */
 	void computeEntropy() {
-
 		// Compute Joint Entropy Eq. 5
 		// H = -(1/n)*log(I*G)*G
 		// Supposedly this is effectively Parezen Estimation
@@ -267,15 +298,20 @@ public class StereoMutualInformation {
 	 * Precompute cost scaled to have a range of 0 to maxCost, inclusive
 	 */
 	public void precomputeScaledCost( int maxCost ) {
-		final int N = maxHistogramValue;
+		final int N = scaledCost.width;
 
 		float minValue = Float.MAX_VALUE;
 		float maxValue = -Float.MAX_VALUE;
 
+		// TODO WARNING. N* is my own invention. As the size of the histogram increases the influence
+		//      of joint decreases N*N
+
 		//NOTE: Is there a way to compute this without going through exaustively?
-		for (int y = 0; y < N; y++) {
-			for (int x = 0; x < N; x++) {
-				float v = -(entropyLeft.data[y] + entropyRight.data[x] - entropyJoint.unsafe_get(x,y));
+		for (int left = 0; left < N; left++) {
+			for (int right = 0; right < N; right++) {
+				float v = N*entropyJoint.unsafe_get(right,left) - entropyLeft.data[left] - entropyRight.data[right];
+//				float v = entropyJoint.unsafe_get(right,left);
+//				float v = -(entropyLeft.data[left] + entropyRight.data[right] - entropyJoint.unsafe_get(right,left));
 				if( minValue > v )
 					minValue = v;
 				if( maxValue < v )
@@ -286,7 +322,9 @@ public class StereoMutualInformation {
 
 		for (int left = 0; left < N; left++) {
 			for (int right = 0; right < N; right++) {
-				float v = -(entropyLeft.data[left] + entropyRight.data[right] - entropyJoint.unsafe_get(right,left));
+				float v = N*entropyJoint.unsafe_get(right,left) - entropyLeft.data[left] - entropyRight.data[right];
+//				float v = entropyJoint.unsafe_get(right,left);
+//				float v = -(entropyLeft.data[left] + entropyRight.data[right] - entropyJoint.unsafe_get(right,left));
 				scaledCost.data[left*N+right] = (short)(maxCost*(v-minValue)/rangeValue);
 			}
 		}

@@ -22,23 +22,40 @@ import boofcv.struct.image.GrayU8;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
-class TestSgmStereoDisparityHmi {
-	private int width = 80,height = 60;
+class TestSgmStereoDisparityHmi extends CommonSgmChecks{
+	TestSgmStereoDisparityHmi() {
+		super(80,50);
+	}
 
-	private GrayU8 left  = new GrayU8(width,height);
-	private GrayU8 right = new GrayU8(width,height);;
 
 	/**
 	 * No pyramid is required where. MI is initialized with perfect disparity
 	 */
 	@Test
 	void perfect_MutualInformation() {
-		fail("implement");
+		int rangeD = 15;
+		int d = 6;
+
+		// Render an image with a smooth gradient. If given a perfect initial disparity
+		// it should produce a perfect output. If given a random disparity there's a good chance
+		// it would converge to an incorrect solution
+		renderStereoGradient(d,rangeD);
+
+		SgmStereoDisparityHmi alg = create();
+		alg.getSelector().setRightToLeftTolerance(0);
+		alg.getAggregation().setMaxPathsConsidered(4);
+		alg.setDisparityMin(0);
+		alg.setDisparityRange(rangeD);
+		alg.process(left,right,disparityTruth,rangeD);
+
+		// disparity should be 5 everywhere
+		GrayU8 found = alg.getDisparity();
+		evaluateFound(rangeD, d, found);
 	}
 
 	/**
@@ -46,11 +63,16 @@ class TestSgmStereoDisparityHmi {
 	 */
 	@Test
 	void easy_scenario() {
-		int d = 5;
-		createStereoPair(d);
+		int rangeD = 12;
+		int d = 7;
+		renderStereoStep(d,rangeD);
 
 		SgmStereoDisparityHmi alg = create();
-		alg.process(left,right,0,10);
+		alg.setDisparityMin(0);
+		alg.setDisparityRange(rangeD);
+		alg.processHmi(left,right);
+		alg.getAggregation().setPenalty1(10);
+		alg.getAggregation().setPenalty2(20);
 
 		// sanity check on internal data structures
 		assertEquals(3,alg.getPyrLeft().getLevelsCount());
@@ -58,27 +80,42 @@ class TestSgmStereoDisparityHmi {
 
 		// disparity should be 5 everywhere
 		GrayU8 found = alg.getDisparity();
+		evaluateFound(rangeD, d, found);
+	}
+
+	private void evaluateFound(int rangeD, int d, GrayU8 found) {
+		int errorSum = 0;
+		int errorMax = 0;
+		int totalFailed = 0;
+		int totalSuccess = 0;
 		for (int y = 0; y < height; y++) {
 			// only check where the actual solution can be found
 			for (int x = d; x < width; x++) {
-				assertEquals(5,found.get(x,y));
+				int f = found.get(x,y);
+				if( f >= rangeD ) {
+					totalFailed++;
+					continue;
+				} else {
+					totalSuccess++;
+				}
+				int errorAbs = Math.abs(d-f);
+				errorSum += errorAbs;
+				errorMax = Math.max(errorMax,errorAbs);
+//				assertEquals(d,found.get(x,y), x+" "+y);
 			}
 		}
-	}
-
-	void createStereoPair( int d ) {
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				right.set(x,y, y*10+x);
-				left.set(x,y, y*10+x+d);
-			}
-		}
+		assertEquals(0,totalFailed);
+		double errorAve = errorSum/(double)totalSuccess;
+		assertTrue(errorAve<1,"ave error "+errorAve);
+//		assertTrue(errorMax<2,"max error "+errorMax);
 	}
 
 	SgmStereoDisparityHmi create() {
 		StereoMutualInformation stereoMI = new StereoMutualInformation();
+		stereoMI.configureSmoothing(3);
 		stereoMI.configureHistogram(255,255);
 		SgmDisparitySelector selector = new SgmDisparitySelector();
+		selector.setRightToLeftTolerance(-1);
 		return new SgmStereoDisparityHmi(20,stereoMI,selector);
 	}
 }
