@@ -34,14 +34,15 @@ public class WrapDisparitySgm implements StereoDisparity<GrayU8, GrayF32> {
 		stereoMI.configureSmoothing(3);
 		stereoMI.configureHistogram(255,255);
 		SgmDisparitySelector selector = new SgmDisparitySelector();
-		selector.setRightToLeftTolerance(2);
-//		selector.setMaxError(10000); //TODO make relative to max possible error
+		selector.setRightToLeftTolerance(1);
+//		selector.setMaxError(700);
+		selector.setTextureThreshold(0.5);
 		sgm = new SgmStereoDisparityHmi(50,stereoMI,selector);
 		sgm.setDisparityMin(0);
 		sgm.setDisparityRange(disparityRange);
-		sgm.getAggregation().setMaxPathsConsidered(8);
-		sgm.getAggregation().setPenalty1(5);
-		sgm.getAggregation().setPenalty2(1500);
+		sgm.getAggregation().setMaxPathsConsidered(16);
+		sgm.getAggregation().setPenalty1(1400);
+		sgm.getAggregation().setPenalty2(2000);
 	}
 
 	@Override

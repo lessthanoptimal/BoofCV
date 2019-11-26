@@ -41,6 +41,9 @@ public class SgmDisparitySelector {
 
 	// reference to input cost tensor
 	GrayU16 aggregatedXD;
+	GrayU16 costXD;
+
+	double textureThreshold=0.0;
 
 	// The minimum possible disparity
 	int minDisparity=0;
@@ -56,7 +59,7 @@ public class SgmDisparitySelector {
 	 * @param aggregatedYXD (Input) Aggregated disparity cost for each pixel
 	 * @param disparity (output) selected disparity
 	 */
-	public void select(Planar<GrayU16> aggregatedYXD , GrayU8 disparity ) {
+	public void select(Planar<GrayU16> costYXD, Planar<GrayU16> aggregatedYXD , GrayU8 disparity ) {
 		setup(aggregatedYXD);
 
 		// Ensure that the output matches the input
@@ -64,6 +67,7 @@ public class SgmDisparitySelector {
 
 		for (int y = 0; y < lengthY; y++) {
 			aggregatedXD = aggregatedYXD.getBand(y);
+			costXD = costYXD.getBand(y);
 
 			// if 'x' is less than minDisparity then that's nothing that it can compare against
 			for (int x = 0; x < minDisparity; x++) {
@@ -93,25 +97,59 @@ public class SgmDisparitySelector {
 	int findBestDisparity(int x ) {
 		// The maximum disparity range that can be considered at 'x'
 		int maxLocalDisparity = maxLocalDisparity(x);
-		int bestScore = maxError;
+		int bestScore = Integer.MAX_VALUE;
 		int bestRange = invalidDisparity;
 
-		int idx = aggregatedXD.getIndex(0,x);
+		// Select the disparity with the lowest aggregated cost
+		final int idx = aggregatedXD.getIndex(0,x);
 		for (int d = 0; d < maxLocalDisparity; d++) {
-			int cost = aggregatedXD.data[idx++] & 0xFFFF;
+			int cost = aggregatedXD.data[idx+d] & 0xFFFF;
 			if( cost < bestScore ) {
 				bestScore = cost;
 				bestRange = d;
 			}
 		}
 
+		// See if the maximum error is exceeded
+		if( bestRange != invalidDisparity && maxError <= SgmDisparityCost.MAX_COST) {
+			int cost = costXD.get(bestRange,x);
+			if( cost > maxError ) {
+				bestRange = invalidDisparity;
+			}
+		}
+
 		// right to left consistency check
-		if( rightToLeftTolerance >= 0 && bestRange != invalidDisparity ) {
+		if( bestRange != invalidDisparity && rightToLeftTolerance >= 0 ) {
 			int bestX = selectRightToLeft(x-bestRange-minDisparity);
 			if( Math.abs(bestX-x) > rightToLeftTolerance )
 				bestRange = invalidDisparity;
 			// TODO average the two?
 		}
+
+		// See if the best solution is ambiguous
+		if( bestRange != invalidDisparity && maxLocalDisparity > 3 && textureThreshold > 0 ) {
+			// find the second best disparity value and exclude its neighbors
+			int secondBest = Integer.MAX_VALUE;
+			for( int d = 0; d < bestRange-1; d++ ) {
+				int v = aggregatedXD.data[idx+d] & 0xFFFF;
+				if( v < secondBest ) {
+					secondBest = v;
+				}
+			}
+			for(int d = bestRange+2; d < maxLocalDisparity; d++ ) {
+				int v = aggregatedXD.data[idx+d] & 0xFFFF;
+				if( v < secondBest ) {
+					secondBest = v;
+				}
+			}
+
+			// similar scores indicate lack of texture
+			// C = (C2-C1)/C1
+			if( secondBest-bestScore <= textureThreshold*bestScore )
+				bestRange = invalidDisparity;
+		}
+
+		// TODO add texture validation?
 
 		return bestRange;
 	}
@@ -176,6 +214,14 @@ public class SgmDisparitySelector {
 
 	public int getInvalidDisparity() {
 		return invalidDisparity;
+	}
+
+	public double getTextureThreshold() {
+		return textureThreshold;
+	}
+
+	public void setTextureThreshold(double textureThreshold) {
+		this.textureThreshold = textureThreshold;
 	}
 
 	/**

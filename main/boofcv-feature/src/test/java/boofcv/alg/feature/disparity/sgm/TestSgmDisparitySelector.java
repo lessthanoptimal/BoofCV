@@ -52,7 +52,7 @@ class TestSgmDisparitySelector {
 		SgmDisparitySelector alg = new SgmDisparitySelector();
 		alg.setMinDisparity(minDisparity);
 		alg.setRightToLeftTolerance(-1); // disable right to left
-		alg.select(aggregatedYXD,disparity);
+		alg.select(null,aggregatedYXD,disparity);
 
 		// Check the solution
 		for (int y = 0; y < height; y++) {

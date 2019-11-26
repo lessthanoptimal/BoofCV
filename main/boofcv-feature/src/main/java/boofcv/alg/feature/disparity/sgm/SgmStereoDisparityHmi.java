@@ -132,7 +132,7 @@ public class SgmStereoDisparityHmi {
 			sgmCost.process(levelLeft,levelRight, levelDisparityMin, levelDisparityRange,costYXD);
 			aggregation.process(costYXD,disparityMin);
 			selector.setMinDisparity(levelDisparityMin); // todo move to function below
-			selector.select(aggregation.getAggregated(),disparity);
+			selector.select(costYXD,aggregation.getAggregated(),disparity);
 
 			if( level > 0 ) {
 				int invalid = selector.getInvalidDisparity();
@@ -175,7 +175,7 @@ public class SgmStereoDisparityHmi {
 
 		// Select the best disparity for each pixel given the cost
 		selector.setMinDisparity(disparityMin); // TODO move to function below
-		selector.select(aggregation.getAggregated(),disparity);
+		selector.select(costYXD,aggregation.getAggregated(),disparity);
 	}
 
 	// TODO remove need to compute U8 first

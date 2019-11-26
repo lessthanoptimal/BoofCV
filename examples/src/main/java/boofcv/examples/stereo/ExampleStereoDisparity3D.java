@@ -18,7 +18,6 @@
 
 package boofcv.examples.stereo;
 
-import boofcv.abst.distort.FDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.gui.image.ShowImages;
@@ -43,8 +42,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Expanding upon ExampleStereoDisparity, this example demonstrates how to rescale an image for stereo processing and
@@ -56,12 +53,9 @@ import java.util.List;
  */
 public class ExampleStereoDisparity3D {
 
-	// Specifies what size input images are scaled to
-	public static final double scale = 0.5;
-
 	// Specifies what disparity values are considered
 	public static final int minDisparity = 0;
-	public static final int rangeDisparity = 40;
+	public static final int rangeDisparity = 60;
 
 	public static void main( String args[] ) {
 		// ------------- Compute Stereo Correspondence
@@ -79,22 +73,11 @@ public class ExampleStereoDisparity3D {
 		GrayU8 distLeft = ConvertBufferedImage.convertFrom(origLeft, (GrayU8) null);
 		GrayU8 distRight = ConvertBufferedImage.convertFrom(origRight,(GrayU8)null);
 
-		// re-scale input images
-		GrayU8 scaledLeft = new GrayU8((int)(distLeft.width*scale),(int)(distLeft.height*scale));
-		GrayU8 scaledRight = new GrayU8((int)(distRight.width*scale),(int)(distRight.height*scale));
-
-		new FDistort(distLeft,scaledLeft).scaleExt().apply();
-		new FDistort(distRight,scaledRight).scaleExt().apply();
-
-		// Don't forget to adjust camera parameters for the change in scale!
-		PerspectiveOps.scaleIntrinsic(param.left, scale);
-		PerspectiveOps.scaleIntrinsic(param.right,scale);
-
 		// rectify images and compute disparity
-		GrayU8 rectLeft = new GrayU8(scaledLeft.width,scaledLeft.height);
-		GrayU8 rectRight = new GrayU8(scaledRight.width,scaledRight.height);
+		GrayU8 rectLeft = distLeft.createSameShape();
+		GrayU8 rectRight = distRight.createSameShape();
 
-		RectifyCalibrated rectAlg = ExampleStereoDisparity.rectify(scaledLeft,scaledRight,param,rectLeft,rectRight);
+		RectifyCalibrated rectAlg = ExampleStereoDisparity.rectify(distLeft,distRight,param,rectLeft,rectRight);
 
 //		GrayU8 disparity = ExampleStereoDisparity.denseDisparity(rectLeft, rectRight, 3,minDisparity, rangeDisparity);
 		GrayF32 disparity = ExampleStereoDisparity.denseDisparitySubpixel(
@@ -119,7 +102,6 @@ public class ExampleStereoDisparity3D {
 		PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
 		pcv.setTranslationStep(1.5);
 
-		List<Point3D_F64> temp = new ArrayList<>();
 		Point3D_F64 pointRect = new Point3D_F64();
 		Point3D_F64 pointLeft = new Point3D_F64();
 		for( int y = 0; y < disparity.height; y++ ) {
@@ -156,8 +138,12 @@ public class ExampleStereoDisparity3D {
 		ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,-0.4,0,cameraToWorld.R);
 
 		// Configure the display
-//		pcv.addCloud(temp);
-//		pcv.setShowAxis(true);
+//		pcv.setFog(true);
+//		pcv.setClipDistance(baseline*45);
+//		PeriodicColorizer colorizer = new TwoAxisRgbPlane.Z_XY(4.0);
+//		colorizer.setPeriod(baseline*5);
+//		pcv.setColorizer(colorizer); // sometimes pseudo color can be easier to view
+		pcv.setDotSize(1);
 		pcv.setCameraHFov(PerspectiveOps.computeHFov(param.left));
 		pcv.setCameraToWorld(cameraToWorld);
 		JComponent viewer = pcv.getComponent();
