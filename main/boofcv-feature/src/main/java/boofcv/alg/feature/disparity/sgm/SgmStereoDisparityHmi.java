@@ -181,10 +181,10 @@ public class SgmStereoDisparityHmi {
 	// TODO remove need to compute U8 first
 	public void subpixel( GrayU8 src , GrayF32 dst ) {
 		dst.reshape(src);
-		Planar<GrayU16> costYXD = aggregation.getAggregated();
+		Planar<GrayU16> aggregatedYXD = aggregation.getAggregated();
 
-		for (int y = 0; y < costYXD.getNumBands(); y++) {
-			GrayU16 costXD = costYXD.getBand(y);
+		for (int y = 0; y < aggregatedYXD.getNumBands(); y++) {
+			GrayU16 costXD = aggregatedYXD.getBand(y);
 			for (int x = 0; x < costXD.height; x++) {
 				int maxLocalDisparity = selector.maxLocalDisparity(x);
 				int d = src.unsafe_get(x,y);

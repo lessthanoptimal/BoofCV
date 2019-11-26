@@ -40,17 +40,7 @@ class TestPyramidDiscreteNN2 {
 		ImageMiscOps.fillUniform(input, rand, -20, 50);
 
 		PyramidDiscreteNN2<GrayF32> alg = new PyramidDiscreteNN2<>(ImageType.single(GrayF32.class));
-
-		// Specify pyramid size using different methods
-		alg.setMinWidth(10);
-		checkSolution(input, alg);
-
-		alg = new PyramidDiscreteNN2<>(ImageType.single(GrayF32.class));
-		alg.setMinHeight(20);
-		checkSolution(input, alg);
-
-		alg = new PyramidDiscreteNN2<>(ImageType.single(GrayF32.class));
-		alg.setNumLevelsRequested(3);
+		alg.getConfigLayers().numLevelsRequested = 3;
 		checkSolution(input, alg);
 	}
 

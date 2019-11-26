@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.disparity.sgm;
 
+import boofcv.alg.transform.pyramid.ConfigPyramid2;
 import boofcv.struct.image.GrayU8;
 import org.junit.jupiter.api.Test;
 
@@ -116,6 +117,6 @@ class TestSgmStereoDisparityHmi extends CommonSgmChecks{
 		stereoMI.configureHistogram(255,255);
 		SgmDisparitySelector selector = new SgmDisparitySelector();
 		selector.setRightToLeftTolerance(-1);
-		return new SgmStereoDisparityHmi(20,stereoMI,selector);
+		return new SgmStereoDisparityHmi(new ConfigPyramid2(-1,20,20),stereoMI,selector);
 	}
 }
