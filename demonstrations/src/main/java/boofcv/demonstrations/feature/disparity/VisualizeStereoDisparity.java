@@ -24,10 +24,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.factory.feature.disparity.ConfigureDisparityBM;
-import boofcv.factory.feature.disparity.ConfigureDisparityBMBest5;
-import boofcv.factory.feature.disparity.DisparityError;
-import boofcv.factory.feature.disparity.FactoryStereoDisparity;
+import boofcv.factory.feature.disparity.*;
 import boofcv.factory.transform.census.CensusType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -391,7 +388,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			config.validateRtoL = control.reverseTol;
 			config.texture = control.texture;
 			return FactoryStereoDisparity.blockMatchBest5(config,inputType,dispType);
-		} else {
+		} else if( control.selectedAlg < 2 ) {
 			ConfigureDisparityBM config = new ConfigureDisparityBM();
 			config.errorType = error;
 			if( error == DisparityError.CENSUS )
@@ -414,6 +411,15 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 				config.texture = 0;
 			}
 			return FactoryStereoDisparity.blockMatch(config,inputType,dispType);
+		} else {
+			ConfigureDisparitySGM config = control.configSgm;
+			config.minDisparity = minDisparity;
+			config.rangeDisparity = maxDisparity-minDisparity;
+			config.subpixel = control.useSubpixel;
+//			config.maxError = control.pixelError; TODO add later after updating GUI
+			config.validateRtoL = control.reverseTol;
+			config.texture = control.texture;
+			return FactoryStereoDisparity.sgm(config,inputType,dispType);
 		}
 	}
 

@@ -24,9 +24,14 @@ import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
 import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_F32;
 import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_U8;
 import boofcv.alg.feature.disparity.block.select.*;
+import boofcv.alg.feature.disparity.sgm.SgmDisparitySelector;
+import boofcv.alg.feature.disparity.sgm.SgmStereoDisparityHmi;
+import boofcv.alg.feature.disparity.sgm.StereoMutualInformation;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+
+import javax.annotation.Nullable;
 
 /**
  * Algorithms related to computing the disparity between two rectified stereo images.
@@ -34,6 +39,32 @@ import boofcv.struct.image.ImageGray;
  * @author Peter Abeles
  */
 public class FactoryStereoDisparityAlgs {
+
+	/**
+	 * Creates SGM stereo using HMI.
+	 */
+	public static SgmStereoDisparityHmi createSgmHmi( @Nullable ConfigureDisparitySGM config ) {
+		if( config == null )
+			config = new ConfigureDisparitySGM();
+
+		int maxError = config.maxError < 0 ? Integer.MAX_VALUE : config.maxError;
+
+		StereoMutualInformation stereoMI = new StereoMutualInformation();
+		stereoMI.configureSmoothing(config.smoothingRadius);
+		stereoMI.configureHistogram(255,255);
+		SgmDisparitySelector selector = new SgmDisparitySelector();
+		selector.setRightToLeftTolerance(config.validateRtoL);
+		selector.setMaxError(maxError);
+		selector.setTextureThreshold(config.texture);
+		SgmStereoDisparityHmi sgm = new SgmStereoDisparityHmi(config.pyramidLayers,stereoMI,selector);
+		sgm.setDisparityMin(config.minDisparity);
+		sgm.setDisparityRange(config.rangeDisparity);
+		sgm.getAggregation().setMaxPathsConsidered(config.paths);
+		sgm.getAggregation().setPenalty1(config.penaltySmallChange);
+		sgm.getAggregation().setPenalty2(config.penaltyLargeChange);
+
+		return sgm;
+	}
 
 	public static DisparitySelect<int[],GrayU8> selectDisparity_S32(int maxError , int tolR2L , double texture) {
 		if( maxError < 0 && tolR2L < 0  & texture <= 0 )

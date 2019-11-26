@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.feature.disparity;
 
+import boofcv.factory.feature.disparity.ConfigureDisparitySGM;
 import boofcv.factory.transform.census.CensusType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -77,6 +78,9 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	// scale factor for input images
 	int inputScale = 100;
 
+	// Configuration specific for SGM
+	final protected ConfigureDisparitySGM configSgm = new ConfigureDisparitySGM();
+
 	protected JLabel processingTimeLabel = new JLabel();
 	protected JLabel imageSizeLabel = new JLabel();
 
@@ -100,7 +104,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	JCheckBox checkRecompute  = checkbox("Recompute",recompute);
 	JCheckBox checkConcurrent = checkbox("concurrent",concurrent);
 
-	JComboBox comboAlg = combo(selectedAlg,"Five Regions","Region","Region Basic");
+	JComboBox comboAlg = combo(selectedAlg,"Five Regions","Region","Region Basic","SGM");
 	JComboBox comboError = combo(selectedError,"SAD","Census","NCC");
 	JComboBox comboErrorVariant = combo(selectedErrorVariant,"FOOBAR");
 	JSpinner minDisparitySpinner = spinner(minDisparity,0, 1000,5);

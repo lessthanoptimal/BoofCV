@@ -94,7 +94,7 @@ public class StereoMutualInformation {
 	 * @param maxPixelValue The maximum value a pixel in the input image can have
 	 * @param maxHistogramValue The maximum value that the pixel can have after being scaled
 	 */
-	public void configureHistogram(int maxPixelValue , int maxHistogramValue ) {
+	public void configureHistogram(int maxPixelValue , int maxHistogramValue ) { // TODO is this whole maxHistValues stupid?
 		if( maxHistogramValue > maxPixelValue )
 			throw new IllegalArgumentException("Maximum histogram value can't be more than max pixel value");
 

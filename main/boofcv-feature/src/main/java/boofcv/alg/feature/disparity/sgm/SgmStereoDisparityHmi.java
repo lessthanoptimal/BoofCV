@@ -19,6 +19,7 @@
 package boofcv.alg.feature.disparity.sgm;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.transform.pyramid.ConfigPyramid2;
 import boofcv.alg.transform.pyramid.PyramidDiscreteNN2;
 import boofcv.struct.image.*;
 
@@ -76,18 +77,17 @@ public class SgmStereoDisparityHmi {
 	/**
 	 * Provides configurations and internal implementations of different components
 	 *
-	 * @param minWidth Minimum width in the image pyramid. Used to dynamically create the pyramid
+	 * @param configPyr Specifies number of layers in the pyramid
 	 * @param stereoMI Computes mutual information from a stereo pair with known disparity
 	 * @param selector Selects the best disparity given the cost
 	 */
-	public SgmStereoDisparityHmi( int minWidth,
+	public SgmStereoDisparityHmi( ConfigPyramid2 configPyr,
 								  StereoMutualInformation stereoMI ,
 								  SgmDisparitySelector selector ) {
 		this.stereoMI = stereoMI;
 		this.selector = selector;
-		pyrLeft.setMinWidth(minWidth);
-		pyrRight.setMinWidth(minWidth);
-
+		pyrLeft.getConfigLayers().set(configPyr);
+		pyrRight.getConfigLayers().set(configPyr);
 		sgmCost = new SgmMutualInformation(stereoMI);
 	}
 
@@ -180,6 +180,7 @@ public class SgmStereoDisparityHmi {
 
 	// TODO remove need to compute U8 first
 	public void subpixel( GrayU8 src , GrayF32 dst ) {
+		dst.reshape(src);
 		Planar<GrayU16> costYXD = aggregation.getAggregated();
 
 		for (int y = 0; y < costYXD.getNumBands(); y++) {

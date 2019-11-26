@@ -26,6 +26,7 @@ import boofcv.alg.feature.disparity.block.score.DisparityScoreBMBestFive_F32;
 import boofcv.alg.feature.disparity.block.score.DisparityScoreBMBestFive_S32;
 import boofcv.alg.feature.disparity.block.score.DisparityScoreBM_F32;
 import boofcv.alg.feature.disparity.block.score.DisparityScoreBM_S32;
+import boofcv.alg.feature.disparity.sgm.SgmStereoDisparityHmi;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.transform.census.FactoryCensusTransform;
 import boofcv.struct.image.*;
@@ -299,5 +300,35 @@ public class FactoryStereoDisparity {
 			return new WrapDisparityBlockSparseSad(score,select);
 		} else
 			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
+	}
+
+	/**
+	 * Disparity computed using Semi Global Matching (SGM)
+	 * @param config Configuration for SGM
+	 * @param imageType Type of input image
+	 * @param dispType Type of disparity image. F32 is sub-pixel is turned on, U8 otherwise
+	 * @return The algorithm.
+	 */
+	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T,DI>
+	sgm(@Nullable ConfigureDisparitySGM config , Class<T> imageType , Class<DI> dispType ) {
+		if( config == null )
+			config = new ConfigureDisparitySGM();
+
+		if( config.subpixel ){
+			if( dispType != GrayF32.class ) {
+				throw new IllegalArgumentException("Disparity must be F32 for sub-pixel precision");
+			}
+		} else {
+			if( dispType != GrayU8.class ) {
+				throw new IllegalArgumentException("Disparity must be U8 for pixel precision");
+			}
+		}
+
+		if( imageType == GrayU8.class ) {
+			SgmStereoDisparityHmi alg = FactoryStereoDisparityAlgs.createSgmHmi(config);
+			return (StereoDisparity)new WrapDisparitySgm(alg);
+		} else {
+			throw new IllegalArgumentException("Only U8 input supported");
+		}
 	}
 }

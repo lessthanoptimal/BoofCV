@@ -34,11 +34,7 @@ public class PyramidDiscreteNN2<T extends ImageBase<T>> {
 
 	FDistort distort;
 
-	// if not -1 then it specifies the number of levels in the pyramid
-	int numLevelsRequested =-1;
-	// if not -1 then it specifies the minimum width/height of the highest level in the pyramid
-	int minWidth=-1,minHeight=-1;
-
+	private ConfigPyramid2 configLayers = new ConfigPyramid2();
 
 	// Levels in the pyramid
 	T[] levels;
@@ -52,20 +48,9 @@ public class PyramidDiscreteNN2<T extends ImageBase<T>> {
 	}
 
 	public void process(T input) {
-		if( numLevelsRequested > 0 ) {
-			if( levels.length != numLevelsRequested) {
-				declareArray(numLevelsRequested);
-			}
-		} else if( minWidth > 0 ) {
-			int numLevels = computeNumLevels(input.width,minWidth);
-			if( levels.length != numLevels )
-				declareArray(numLevels);
-		} else if( minHeight > 0 ) {
-			int numLevels = computeNumLevels(input.height,minHeight);
-			if( levels.length != numLevels )
-				declareArray(numLevels);
-		} else {
-			throw new IllegalArgumentException("Need to specify numLevels or minWidth or minHeight");
+		int requestedLayers = configLayers.computeLayers(input.width,input.height);
+		if( levels.length != requestedLayers ) {
+			declareArray(requestedLayers);
 		}
 
 		// level 0 is always the input image
@@ -112,31 +97,12 @@ public class PyramidDiscreteNN2<T extends ImageBase<T>> {
 		return imageType;
 	}
 
+
 	public int getLevelsCount() {
 		return levels.length;
 	}
 
-	public int getNumLevelsRequested() {
-		return numLevelsRequested;
-	}
-
-	public void setNumLevelsRequested(int numLevelsRequested) {
-		this.numLevelsRequested = numLevelsRequested;
-	}
-
-	public int getMinWidth() {
-		return minWidth;
-	}
-
-	public void setMinWidth(int minWidth) {
-		this.minWidth = minWidth;
-	}
-
-	public int getMinHeight() {
-		return minHeight;
-	}
-
-	public void setMinHeight(int minHeight) {
-		this.minHeight = minHeight;
+	public ConfigPyramid2 getConfigLayers() {
+		return configLayers;
 	}
 }
