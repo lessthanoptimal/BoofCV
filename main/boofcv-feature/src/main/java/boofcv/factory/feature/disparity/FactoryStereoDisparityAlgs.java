@@ -51,7 +51,7 @@ public class FactoryStereoDisparityAlgs {
 
 		StereoMutualInformation stereoMI = new StereoMutualInformation();
 		stereoMI.configureSmoothing(config.smoothingRadius);
-		stereoMI.configureHistogram(255,255);
+		stereoMI.configureHistogram(config.totalGrayLevels);
 		SgmDisparitySelector selector = new SgmDisparitySelector();
 		selector.setRightToLeftTolerance(config.validateRtoL);
 		selector.setMaxError(maxError);
@@ -59,7 +59,7 @@ public class FactoryStereoDisparityAlgs {
 		SgmStereoDisparityHmi sgm = new SgmStereoDisparityHmi(config.pyramidLayers,stereoMI,selector);
 		sgm.setDisparityMin(config.minDisparity);
 		sgm.setDisparityRange(config.rangeDisparity);
-		sgm.getAggregation().setMaxPathsConsidered(config.paths);
+		sgm.getAggregation().setPathsConsidered(config.paths);
 		sgm.getAggregation().setPenalty1(config.penaltySmallChange);
 		sgm.getAggregation().setPenalty2(config.penaltyLargeChange);
 

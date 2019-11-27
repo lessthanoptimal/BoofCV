@@ -60,12 +60,8 @@ public class StereoMutualInformation {
 	// To avoid log(0) this is added to all probabilities
 	float eps = UtilEjml.F_EPS;
 
-	// Maximum intensity value a pixel of the input image can have
-	int maxPixelValue;
 	// Storage for pixel intensity histogram after scaling
 	int[] histogramIntensity;
-	// The maximum intensity value after scaling is applied. Always histogram.length-1
-	int maxHistogramValue;
 
 	// total number of corresponding pixels with disparity values
 	int totalDispPixels;
@@ -83,7 +79,7 @@ public class StereoMutualInformation {
 
 	public StereoMutualInformation() {
 		// this is a reasonable default for 8-bit images
-		configureHistogram(255,255);
+		configureHistogram(256);
 		configureSmoothing(1);
 	}
 
@@ -91,22 +87,14 @@ public class StereoMutualInformation {
 	 * Configures the histogram and how the input is scaled. For an 8-bit input image just pass in
 	 * 0xFF for both values.
 	 *
-	 * @param maxPixelValue The maximum value a pixel in the input image can have
-	 * @param maxHistogramValue The maximum value that the pixel can have after being scaled
+	 * @param totalGrayLevels Number of possible gray scale values. Typically 256 for 8-bit images.
 	 */
-	public void configureHistogram(int maxPixelValue , int maxHistogramValue ) { // TODO is this whole maxHistValues stupid?
-		if( maxHistogramValue > maxPixelValue )
-			throw new IllegalArgumentException("Maximum histogram value can't be more than max pixel value");
-
-		this.maxPixelValue = maxPixelValue;
-		this.maxHistogramValue = maxHistogramValue;
-		int intensityBins = maxHistogramValue+1;
-		histogramIntensity = new int[intensityBins];
-
-		histJoint.reshape(intensityBins,intensityBins);
+	public void configureHistogram( int totalGrayLevels) {
+		histogramIntensity = new int[totalGrayLevels];
+		histJoint.reshape(totalGrayLevels,totalGrayLevels);
 		entropyJoint.reshape(histJoint);
-		entropyLeft.reshape(intensityBins,1);
-		entropyRight.reshape(intensityBins,1);
+		entropyLeft.reshape(totalGrayLevels,1);
+		entropyRight.reshape(totalGrayLevels,1);
 		scaledCost.reshape(histJoint);
 	}
 
@@ -157,30 +145,8 @@ public class StereoMutualInformation {
 
 		// Compute entropy tables
 		computeJointHistogram(left, right, minDisparity, disparity, invalid);
-//		printRowJointHist(4);
 		computeProbabilities();
-//		printRowJoint(4);
 		computeEntropy();
-//		printRowJoint(4);
-	}
-
-	private void printRowJoint( int y ) {
-		for (int x = 0; x < entropyJoint.width; x++) {
-			if( entropyJoint.get(x,y) == 0 )
-				System.out.print(" . ");
-			else
-				System.out.printf("%2d ",(int)(10000*entropyJoint.get(x,y)));
-		}
-		System.out.println();
-	}
-	private void printRowJointHist( int y ) {
-		for (int x = 0; x < histJoint.width; x++) {
-			if( histJoint.get(x,y) == 0 )
-				System.out.print(" . ");
-			else
-				System.out.printf("%2d ",histJoint.get(x,y));
-		}
-		System.out.println();
 	}
 
 	/**
@@ -192,12 +158,8 @@ public class StereoMutualInformation {
 	 * @return the mutual information score
 	 */
 	public float cost(int leftValue , int rightValue ) {
-		// Scale the input value to be in the same range as the histogram
-		int leftScale = scalePixelValue(leftValue);
-		int rightScale = scalePixelValue(rightValue);
-
 		// Equation 8b and 9a
-		return entropyJoint.unsafe_get(rightScale,leftScale) - entropyLeft.data[leftScale] - entropyRight.data[rightScale];
+		return entropyJoint.unsafe_get(rightValue,leftValue) - entropyLeft.data[leftValue] - entropyRight.data[rightValue];
 	}
 
 	public int costScaled( int leftValue , int rightValue ) {
@@ -215,12 +177,12 @@ public class StereoMutualInformation {
 		final int histLength = histogramIntensity.length;
 
 		// Compute the joint histogram
-		for (int row = 0; row < left.height; row++) {
-			int idx = row*left.stride;
-			for (int col = 0; col < left.width; col++, idx++ ) {
+		for (int y = 0; y < left.height; y++) {
+			int idx = y*left.stride;
+			for (int x = 0; x < left.width; x++, idx++ ) {
 				int d = disparity.data[idx]&0xFF;
 				// Don't consider pixels without correspondences
-				if( d == invalid )
+				if( d >= invalid )
 					continue;
 				// Don't need to check to see if disparity is inside the image because it is assumed that
 				// the disparity is physically possible
@@ -232,10 +194,6 @@ public class StereoMutualInformation {
 				// outside the image
 				int leftValue  =  left.data[idx  ]&0xFF; // I(x  ,y)
 				int rightValue = right.data[idx-d]&0xFF; // I(x-d,y) // TODO multiple left could map to this pixel
-
-				// scale the pixel intensity for the histogram
-				leftValue  = scalePixelValue(leftValue);
-				rightValue = scalePixelValue(rightValue);
 
 				// increment the histogram
 				histJoint.data[leftValue*histLength+rightValue]++; // H(L,R) += 1
@@ -309,32 +267,27 @@ public class StereoMutualInformation {
 		//NOTE: Is there a way to compute this without going through exaustively?
 		for (int left = 0; left < N; left++) {
 			for (int right = 0; right < N; right++) {
-				float v = N*entropyJoint.unsafe_get(right,left) - entropyLeft.data[left] - entropyRight.data[right];
+//				float v = N*entropyJoint.unsafe_get(right,left) - entropyLeft.data[left] - entropyRight.data[right];
 //				float v = entropyJoint.unsafe_get(right,left);
-//				float v = -(entropyLeft.data[left] + entropyRight.data[right] - entropyJoint.unsafe_get(right,left));
+				float v = entropyJoint.unsafe_get(right,left) - entropyLeft.data[left] - entropyRight.data[right];
 				if( minValue > v )
 					minValue = v;
 				if( maxValue < v )
 					maxValue = v;
 			}
 		}
+//		minValue = 0; // Clipping the entropy at zero seems to improve performance?!
 		float rangeValue = maxValue-minValue;
 
 		for (int left = 0; left < N; left++) {
 			for (int right = 0; right < N; right++) {
-				float v = N*entropyJoint.unsafe_get(right,left) - entropyLeft.data[left] - entropyRight.data[right];
+//				float v = N*entropyJoint.unsafe_get(right,left) - entropyLeft.data[left] - entropyRight.data[right];
 //				float v = entropyJoint.unsafe_get(right,left);
-//				float v = -(entropyLeft.data[left] + entropyRight.data[right] - entropyJoint.unsafe_get(right,left));
+				float v = entropyJoint.unsafe_get(right,left) - entropyLeft.data[left] - entropyRight.data[right];
+//				scaledCost.data[left*N+right] = v < 0 ? 0 : (short)(maxCost*(v-minValue)/rangeValue);
 				scaledCost.data[left*N+right] = (short)(maxCost*(v-minValue)/rangeValue);
 			}
 		}
-	}
-
-	/**
-	 * Scales input pixel intensity to histogram range
-	 */
-	final int scalePixelValue(int value ) {
-		return maxHistogramValue*value/maxPixelValue;
 	}
 
 	public float getEps() {

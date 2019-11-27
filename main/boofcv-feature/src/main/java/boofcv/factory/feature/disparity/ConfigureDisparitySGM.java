@@ -32,6 +32,22 @@ import static boofcv.alg.feature.disparity.sgm.SgmDisparityCost.MAX_COST;
  */
 public class ConfigureDisparitySGM implements Configuration {
 	/**
+	 * Number of possible pixel values. This is typically specified by the number of bits per pixel. This is ued
+	 * by Mutual Information. MI was designed around 8-bit images and performance might degrade for large values.
+	 * <pre>
+	 *      8-bit = 256
+	 *      9-bit = 512
+	 *     10-bit = 1024
+	 *     11-bit = 2048
+	 *     12-bit = 4096
+	 *     13-bit = 8192
+	 *     14-bit = 16384
+	 *     15-bit = 32768
+	 *     16-bit = 65536
+	 * </pre>
+	 */
+	public int totalGrayLevels=256;
+	/**
 	 * Minimum disparity that it will check. Must be &ge; 0 and &lt; maxDisparity
 	 */
 	public int minDisparity=0;

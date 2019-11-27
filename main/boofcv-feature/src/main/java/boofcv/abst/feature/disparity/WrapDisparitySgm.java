@@ -21,15 +21,17 @@ package boofcv.abst.feature.disparity;
 import boofcv.alg.feature.disparity.sgm.SgmStereoDisparityHmi;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
-public class WrapDisparitySgm implements StereoDisparity<GrayU8, GrayF32> {
+public class WrapDisparitySgm<DI extends ImageGray<DI>> implements StereoDisparity<GrayU8, DI> {
 
 	SgmStereoDisparityHmi sgm;
-	GrayF32 subpixel = new GrayF32(1,1);
+	GrayF32 subpixel;
 
-	public WrapDisparitySgm( SgmStereoDisparityHmi sgm) {
+	public WrapDisparitySgm( SgmStereoDisparityHmi sgm, boolean subPixel) {
 		this.sgm = sgm;
+		this.subpixel = subPixel ? new GrayF32(1,1) : null;
 	}
 
 	@Override
@@ -38,9 +40,13 @@ public class WrapDisparitySgm implements StereoDisparity<GrayU8, GrayF32> {
 	}
 
 	@Override
-	public GrayF32 getDisparity() {
-		sgm.subpixel(sgm.getDisparity(),subpixel);
-		return subpixel;
+	public DI getDisparity() {
+		if( subpixel != null ) {
+			sgm.subpixel(sgm.getDisparity(), subpixel);
+			return (DI)subpixel;
+		} else {
+			return (DI)sgm.getDisparity();
+		}
 	}
 
 	@Override
@@ -74,8 +80,8 @@ public class WrapDisparitySgm implements StereoDisparity<GrayU8, GrayF32> {
 	}
 
 	@Override
-	public Class<GrayF32> getDisparityType() {
-		return GrayF32.class;
+	public Class<DI> getDisparityType() {
+		return (Class)(subpixel == null ? GrayF32.class : GrayU8.class);
 	}
 
 	public SgmStereoDisparityHmi getAlgorithm() {

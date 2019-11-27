@@ -30,8 +30,7 @@ import boofcv.struct.image.Planar;
  */
 public class SgmDisparitySelector {
 
-	// TODO add texture ambiguity
-	// TODO sub-pixel
+	protected final SgmHelper helper = new SgmHelper();
 
 	// tolerance for right to left validation. if < 0 then it's disabled
 	protected int rightToLeftTolerance=1;
@@ -87,6 +86,7 @@ public class SgmDisparitySelector {
 		this.lengthX = aggregatedYXD.height;
 		this.lengthD = aggregatedYXD.width;
 		this.invalidDisparity = invalidGivenRange(lengthD);
+		helper.configure(lengthX,minDisparity,lengthD);
 		if( invalidDisparity > 255 )
 			throw new IllegalArgumentException("Disparity range is too great. Must be < 256 not "+lengthD);
 	}
@@ -96,7 +96,7 @@ public class SgmDisparitySelector {
 	 */
 	int findBestDisparity(int x ) {
 		// The maximum disparity range that can be considered at 'x'
-		int maxLocalDisparity = maxLocalDisparity(x);
+		int maxLocalDisparity = helper.localDisparityRangeLeft(x);
 		int bestScore = Integer.MAX_VALUE;
 		int bestRange = invalidDisparity;
 
@@ -149,13 +149,7 @@ public class SgmDisparitySelector {
 				bestRange = invalidDisparity;
 		}
 
-		// TODO add texture validation?
-
 		return bestRange;
-	}
-
-	public final int maxLocalDisparity( int x ) {
-		return Math.min(x-minDisparity+1,lengthD);
 	}
 
 	/**
@@ -166,8 +160,8 @@ public class SgmDisparitySelector {
 	 * @return best fit disparity from right to left
 	 */
 	private int selectRightToLeft( int x ) {
-		// The range of disparities it can search
-		int maxLocalDisparity = Math.min(this.lengthX, x+this.lengthD)-x-minDisparity;
+		// The range of disparities it can search from right to left
+		int maxLocalDisparity = helper.localDisparityRangeRight(x);
 
 		int idx = aggregatedXD.getIndex(0,x); // disparity of zero at col
 

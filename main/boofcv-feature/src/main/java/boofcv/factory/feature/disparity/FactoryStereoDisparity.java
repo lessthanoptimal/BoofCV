@@ -326,7 +326,7 @@ public class FactoryStereoDisparity {
 
 		if( imageType == GrayU8.class ) {
 			SgmStereoDisparityHmi alg = FactoryStereoDisparityAlgs.createSgmHmi(config);
-			return (StereoDisparity)new WrapDisparitySgm(alg);
+			return (StereoDisparity)new WrapDisparitySgm(alg,config.subpixel);
 		} else {
 			throw new IllegalArgumentException("Only U8 input supported");
 		}

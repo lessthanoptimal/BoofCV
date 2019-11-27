@@ -40,6 +40,8 @@ public class SgmCostAggregation {
 	// TODO compute forward then reverse. In forward save read cost. In reverse add results to local cache before
 	//      adding to aggregated
 
+	protected SgmHelper helper = new SgmHelper();
+
 	// Contains aggregated cost. The image is being used to store a tensor.
 	// band = y-axis, x=x-axis, y=depth
 	Planar<GrayU16> aggregated = new Planar<>(GrayU16.class,1,1,2);
@@ -54,12 +56,16 @@ public class SgmCostAggregation {
 	// This is actually why a work space is required and aggregated isn't used directly
 	short[] workCostLr = new short[0];
 
-	int maxPathsConsidered = 8;
+	/**
+	 * Number of paths to consider. 1 to 16 is valid
+	 */
+	int pathsConsidered = 8;
 
 	// Cost applied to small and large changes in the neighborhood
-	int penalty1 =1, penalty2 =2;
+	int penalty1 =50, penalty2 =500;
 
-	int disparityMin;
+	// The minimum disparity that will be considered.
+	int minDisparity;
 
 	/**
 	 * Aggregates the cost in the tensor `costYXD`. From the aggregated cost the disparity can be computed.
@@ -70,23 +76,25 @@ public class SgmCostAggregation {
 	 */
 	public void process( Planar<GrayU16> costYXD , int disparityMin ) {
 		init(costYXD);
-		this.disparityMin = disparityMin;
+		this.minDisparity = disparityMin;
 
-		if( maxPathsConsidered >= 2 ) {
+		if( pathsConsidered >= 1 ) {
 			scoreDirection(1, 0);
+		}
+		if( pathsConsidered >= 2 ) {
 			scoreDirection(-1, 0);
 		}
-		if( maxPathsConsidered >= 4 ) {
+		if( pathsConsidered >= 4 ) {
 			scoreDirection(0, 1);
 			scoreDirection(0, -1);
 		}
-		if( maxPathsConsidered >= 8 ) {
+		if( pathsConsidered >= 8 ) {
 			scoreDirection(1, 1);
 			scoreDirection(-1, -1);
 			scoreDirection(-1, 1);
 			scoreDirection(1, -1);
 		}
-		if( maxPathsConsidered >= 16 ) {
+		if( pathsConsidered >= 16 ) {
 			scoreDirection(1, 2);
 			scoreDirection(2, 1);
 			scoreDirection(2, -1);
@@ -102,6 +110,8 @@ public class SgmCostAggregation {
 	 * Initializes data structures
 	 */
 	void init(Planar<GrayU16> costYXD) {
+		if( pathsConsidered < 1 || pathsConsidered > 16 )
+			throw new IllegalArgumentException("Number of paths must be 1 to 16, inclusive. Not "+ pathsConsidered);
 		this.costYXD = costYXD;
 		aggregated.reshape(costYXD);
 		GImageMiscOps.fill(aggregated,0);
@@ -110,7 +120,10 @@ public class SgmCostAggregation {
 		this.lengthD = costYXD.getWidth();
 		this.lengthY = costYXD.getNumBands();
 
-		this.workCostLr = new short[ Math.max(lengthX,lengthY)*lengthD ];
+		int N = Math.max(lengthX,lengthY)*lengthD;
+		if( workCostLr.length != N )
+			this.workCostLr = new short[ N ];
+		helper.configure(lengthX, minDisparity,lengthD);
 	}
 
 	/**
@@ -120,7 +133,7 @@ public class SgmCostAggregation {
 		// TODO fully support disparityMin here
 		if( dx > 0 ) {
 			for (int y = 0; y < lengthY; y++) {
-				scorePath(disparityMin,y,dx,dy);
+				scorePath(minDisparity,y,dx,dy);
 			}
 		} else if( dx < 0 ) {
 			for (int y = 0; y < lengthY; y++) {
@@ -151,13 +164,14 @@ public class SgmCostAggregation {
 	 */
 	void scorePath(int x0 , int y0 , int dx , int dy ) {
 		// there is no previous disparity score so simply fill the cost for d=0
-		GrayU16 costXD = costYXD.getBand(y0);
-		int idxCost = costXD.getIndex(0,x0);   // C(0,0)
 
 		{
-			final int localLengthD = Math.min(x0-disparityMin+1,this.lengthD);
+			final GrayU16 costXD = costYXD.getBand(y0);
+			final int idxCost = costXD.getIndex(0,x0);   // C(0,0)
+			final int localLengthD = helper.localDisparityRangeLeft(x0);
 			for (int d = 0; d < localLengthD; d++) {
 				workCostLr[d] = costXD.data[idxCost + d]; // Lr(0,d) = C(0,d)
+				// no & 0xFFFF needed, short copy to short
 			}
 		}
 
@@ -171,7 +185,7 @@ public class SgmCostAggregation {
 			int idxLrPrev = (i-1)*lengthD;
 
 			// Don't consider disparity values that go outside the right image
-			final int prevLengthD = Math.min(x-1-disparityMin+1,this.lengthD);
+			final int prevLengthD = helper.localDisparityRangeLeft(x-dx);
 
 			// find the minimum path cost for all D in the previous point in path
 			int minLrPrev = Integer.MAX_VALUE;
@@ -182,15 +196,14 @@ public class SgmCostAggregation {
 			}
 
 			// Index of cost for C(y,p0+i,0)
-			costXD = costYXD.getBand(y);
-			idxCost = costXD.getIndex(0,x);
-
-			final int localLengthD = Math.min(x-disparityMin+1,this.lengthD); // todo make common function
+			final GrayU16 costXD = costYXD.getBand(y);
+			final int idxCost = costXD.getIndex(0,x);
+			final int localLengthD = helper.localDisparityRangeLeft(x);
 
 			// Score the inner portion of disparity first to avoid bounds checks
 			computeCostInnerD(costXD, idxCost, idxLrPrev, minLrPrev, localLengthD);
 
-			// Now handle the borders
+			// Now handle the borders at d=0 and d=N-1
 			computeCostBorderD(idxCost,idxLrPrev,0,costXD,minLrPrev, localLengthD);
 			computeCostBorderD(idxCost,idxLrPrev,localLengthD-1,costXD,minLrPrev, localLengthD);
 		}
@@ -204,30 +217,16 @@ public class SgmCostAggregation {
 	void saveWorkToAggregated( int x0 , int y0 , int dx , int dy , int length ) {
 		int x = x0;
 		int y = y0;
-		for (int i = 0; i < length; i++) {
-			final int localLengthD = Math.min(x-disparityMin+1,this.lengthD); // todo common
+		for (int i = 0; i < length; i++, x += dx, y += dy) {
+			final int localLengthD = helper.localDisparityRangeLeft(x);
 			GrayU16 aggrXD = aggregated.getBand(y);
 
 			int idxWork = i*lengthD;
 			int idxAggr = aggrXD.getIndex(0,x);   // Lr(i,0)
 			for (int d = 0; d < localLengthD; d++, idxAggr++, idxWork++) {
-				// TODO add then comment out code that checks for overflow here
 				aggrXD.data[idxAggr] = (short)((aggrXD.data[idxAggr] & 0xFFFF) + (workCostLr[idxWork]&0xFFFF));
 			}
-
-			x += dx;
-			y += dy;
 		}
-	}
-
-	private void printCost( int x0 , int y0 ) {
-		GrayU16 aggrXD = aggregated.getBand(y0);
-		int idxAggr = aggrXD.getIndex(0,x0);
-		for (int d = 0; d < lengthD; d++) {
-			int c = aggrXD.data[idxAggr+d]&0xFFFF;
-			System.out.printf("%4d ",c);
-		}
-		System.out.println();
 	}
 
 	/**
@@ -267,19 +266,19 @@ public class SgmCostAggregation {
 	 * Computes the aggregate cost but with bounds checks to ensure it doesn't sample outside of the
 	 * disparity change.
 	 * @param idxCost Index of value in costXD
-	 * @param idxLr Index of value in workCostLr
+	 * @param idxLrPrev Index of value in workCostLr
 	 * @param d disparity value being considered
 	 * @param costXD cost in X-D plane
 	 * @param minLrPrev value of minimum cost in previous location along the path
 	 */
-	void computeCostBorderD(int idxCost , int idxLr , int d , GrayU16 costXD , int minLrPrev ,
+	void computeCostBorderD(int idxCost , int idxLrPrev , int d , GrayU16 costXD , int minLrPrev ,
 							int lengthLocalD ) {
-		int cost = costXD.data[idxCost+d] & 0xFFFF;
+		int cost = costXD.data[idxCost+d] & 0xFFFF;  // C(p,d)
 
 		// Sample previously computed aggregate costs with bounds checking
-		int a = workCostLr[idxLr+d]&0xFFFF; // Lr(p-r,d)
-		int b = d > 0 ? workCostLr[idxLr+d-1]&0xFFFF : SgmDisparityCost.MAX_COST; // Lr(p-r,d-1)
-		int c = d < lengthLocalD-1 ? workCostLr[idxLr+d+1]&0xFFFF : SgmDisparityCost.MAX_COST; // Lr(p-r,d+1)
+		int a = workCostLr[idxLrPrev+d]&0xFFFF; // Lr(p-r,d)
+		int b = d > 0 ? workCostLr[idxLrPrev+d-1]&0xFFFF : SgmDisparityCost.MAX_COST; // Lr(p-r,d-1)
+		int c = d < lengthLocalD-1 ? workCostLr[idxLrPrev+d+1]&0xFFFF : SgmDisparityCost.MAX_COST; // Lr(p-r,d+1)
 
 		// Add penalty terms
 		b += penalty1;
@@ -294,7 +293,7 @@ public class SgmCostAggregation {
 			a = minLrPrev + penalty2;
 
 		// minCostPrev is done to reduce the rate at which the cost increases. It has potential for overflow otherwise
-		workCostLr[idxLr+this.lengthD+d] = (short)(cost + a - minLrPrev);
+		workCostLr[idxLrPrev+this.lengthD+d] = (short)(cost + a - minLrPrev);
 	}
 
 	/**
@@ -309,6 +308,9 @@ public class SgmCostAggregation {
 		return Math.min(pathX,pathY);
 	}
 
+	/**
+	 * Returns number of steps it takes to reach the end of the path
+	 */
 	private int pathLength( int t0 , int step , int length ) {
 		if( step > 0 )
 			return (length-t0+step/2)/step;
@@ -338,11 +340,11 @@ public class SgmCostAggregation {
 		this.penalty2 = penalty2;
 	}
 
-	public int getMaxPathsConsidered() {
-		return maxPathsConsidered;
+	public int getPathsConsidered() {
+		return pathsConsidered;
 	}
 
-	public void setMaxPathsConsidered(int maxPathsConsidered) {
-		this.maxPathsConsidered = maxPathsConsidered;
+	public void setPathsConsidered(int pathsConsidered) {
+		this.pathsConsidered = pathsConsidered;
 	}
 }

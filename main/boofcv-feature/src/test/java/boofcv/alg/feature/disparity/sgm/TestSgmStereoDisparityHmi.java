@@ -49,7 +49,7 @@ class TestSgmStereoDisparityHmi extends CommonSgmChecks{
 
 		SgmStereoDisparityHmi alg = create();
 		alg.getSelector().setRightToLeftTolerance(0);
-		alg.getAggregation().setMaxPathsConsidered(4);
+		alg.getAggregation().setPathsConsidered(4);
 		alg.setDisparityMin(0);
 		alg.setDisparityRange(rangeD);
 		alg.process(left,right,disparityTruth,rangeD);

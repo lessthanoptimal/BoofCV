@@ -61,6 +61,7 @@ public class SgmStereoDisparityHmi {
 
 	protected SgmCostAggregation aggregation = new SgmCostAggregation();
 	protected SgmDisparitySelector selector;
+	protected SgmHelper helper = new SgmHelper();
 
 	protected Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,1,1,1);
 
@@ -100,6 +101,8 @@ public class SgmStereoDisparityHmi {
 	public void processHmi(GrayU8 left , GrayU8 right ) {
 		InputSanityCheck.checkSameShape(left,right);
 		disparity.reshape(left);
+
+		helper.configure(left.width,disparityMin,disparityRange);
 
 		// Create image pyramid
 		pyrLeft.process(left);
@@ -186,7 +189,7 @@ public class SgmStereoDisparityHmi {
 		for (int y = 0; y < aggregatedYXD.getNumBands(); y++) {
 			GrayU16 costXD = aggregatedYXD.getBand(y);
 			for (int x = 0; x < costXD.height; x++) {
-				int maxLocalDisparity = selector.maxLocalDisparity(x);
+				int maxLocalDisparity = helper.localDisparityRangeLeft(x);
 				int d = src.unsafe_get(x,y);
 				float subpixel;
 				if( d > 0 && d < maxLocalDisparity-1) {
