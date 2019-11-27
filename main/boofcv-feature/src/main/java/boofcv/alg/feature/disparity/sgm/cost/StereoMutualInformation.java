@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.disparity.sgm;
+package boofcv.alg.feature.disparity.sgm.cost;
 
 import boofcv.alg.InputSanityCheck;
 import boofcv.alg.filter.convolve.ConvolveImageNormalized;

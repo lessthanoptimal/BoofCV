@@ -19,9 +19,12 @@
 package boofcv.alg.feature.disparity.sgm;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.feature.disparity.sgm.cost.SgmMutualInformation_U8;
+import boofcv.alg.feature.disparity.sgm.cost.StereoMutualInformation;
 import boofcv.alg.transform.pyramid.ConfigPyramid2;
 import boofcv.alg.transform.pyramid.PyramidDiscreteNN2;
-import boofcv.struct.image.*;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 
 import java.util.Random;
 
@@ -51,29 +54,18 @@ import java.util.Random;
  * @author Peter Abeles
  */
 @SuppressWarnings("WeakerAccess")
-public class SgmStereoDisparityHmi {
+public class SgmStereoDisparityHmi extends SgmStereoDisparity<GrayU8> {
 
 	protected Random rand = new Random(234);
 
 	// Mutual information based cost
 	protected StereoMutualInformation stereoMI;
-	protected SgmMutualInformation sgmCost;
 
-	protected SgmCostAggregation aggregation = new SgmCostAggregation();
-	protected SgmDisparitySelector selector;
-	protected SgmHelper helper = new SgmHelper();
-
-	protected Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,1,1,1);
+	// Number of extra iterations to perform when at the highest resolution level in the pyramid
+	protected int extraIterations = 0;
 
 	protected PyramidDiscreteNN2<GrayU8> pyrLeft = new PyramidDiscreteNN2<>(ImageType.single(GrayU8.class));
 	protected PyramidDiscreteNN2<GrayU8> pyrRight = new PyramidDiscreteNN2<>(ImageType.single(GrayU8.class));
-
-	// Minimum disparity and number of possible disparity values
-	protected int disparityMin = 0;
-	protected int disparityRange = 0;
-
-	// Storage for found disparity
-	protected GrayU8 disparity = new GrayU8(1,1);
 
 	/**
 	 * Provides configurations and internal implementations of different components
@@ -85,11 +77,10 @@ public class SgmStereoDisparityHmi {
 	public SgmStereoDisparityHmi( ConfigPyramid2 configPyr,
 								  StereoMutualInformation stereoMI ,
 								  SgmDisparitySelector selector ) {
+		super(new SgmMutualInformation_U8(stereoMI),selector);
 		this.stereoMI = stereoMI;
-		this.selector = selector;
 		pyrLeft.getConfigLayers().set(configPyr);
 		pyrRight.getConfigLayers().set(configPyr);
-		sgmCost = new SgmMutualInformation(stereoMI);
 	}
 
 	/**
@@ -98,7 +89,8 @@ public class SgmStereoDisparityHmi {
 	 * @param left (Input) left rectified stereo image
 	 * @param right (Input) right rectified stereo image
 	 */
-	public void processHmi(GrayU8 left , GrayU8 right ) {
+	@Override
+	public void process(GrayU8 left , GrayU8 right ) {
 		InputSanityCheck.checkSameShape(left,right);
 		disparity.reshape(left);
 
@@ -112,18 +104,9 @@ public class SgmStereoDisparityHmi {
 		stereoMI.diagonalHistogram(SgmDisparityCost.MAX_COST);
 //		stereoMI.randomHistogram(rand,SgmDisparityCost.MAX_COST);
 
-		// While 'learning' the MI turn off right to left validation. Incorrect matches tend to help more than
-		// hurt at this step
-//		int rightToLeftTol = selector.getRightToLeftTolerance();
-
 		// Process from low to high resolution. The only disparity esitmate which is
 		// saved is the full resolution one. All prior estimates are done to estimate the mutual information
 		for (int level = pyrLeft.getLevelsCount()-1; level >= 0; level-- ) {
-//			if( level > 0 ) {
-//				selector.setRightToLeftTolerance(-1);
-//			} else {
-//				selector.setRightToLeftTolerance(rightToLeftTol);
-//			}
 			int scale = 1 << level;
 			// reduce the minimum disparity for this scale otherwise it might not consider any matches at this scale
 			int levelDisparityMin = (int)Math.round(disparityMin/(double)scale);
@@ -133,7 +116,7 @@ public class SgmStereoDisparityHmi {
 			GrayU8 levelRight = pyrRight.get(level);
 
 			sgmCost.process(levelLeft,levelRight, levelDisparityMin, levelDisparityRange,costYXD);
-			aggregation.process(costYXD,disparityMin);
+			aggregation.process(costYXD,levelDisparityMin);
 			selector.setMinDisparity(levelDisparityMin); // todo move to function below
 			selector.select(costYXD,aggregation.getAggregated(),disparity);
 
@@ -144,15 +127,14 @@ public class SgmStereoDisparityHmi {
 				stereoMI.precomputeScaledCost(SgmDisparityCost.MAX_COST);
 			}
 		}
-//		for (int i = 0; i < 2; i++) {
-//			stereoMI.process(left, right, disparityMin, disparity, selector.getInvalidDisparity());
-//			stereoMI.precomputeScaledCost(SgmDisparityCost.MAX_COST);
-//			sgmCost.process(left,right, disparityMin, disparityRange,costYXD);
-//			aggregation.process(costYXD);
-//			selector.setMinDisparity(disparityMin);
-//			selector.select(aggregation.getAggregated(),disparity);
-//		}
-		// TODO optional estimate of disparity to sub-pixel accuracy
+		for (int i = 0; i < extraIterations; i++) {
+			stereoMI.process(left, right, disparityMin, disparity, selector.getInvalidDisparity());
+			stereoMI.precomputeScaledCost(SgmDisparityCost.MAX_COST);
+			sgmCost.process(left,right, disparityMin, disparityRange,costYXD);
+			aggregation.process(costYXD,disparityMin);
+			selector.setMinDisparity(disparityMin);
+			selector.select(costYXD,aggregation.getAggregated(),disparity);
+		}
 	}
 
 	/**
@@ -165,66 +147,16 @@ public class SgmStereoDisparityHmi {
 	 */
 	public void process( GrayU8 left , GrayU8 right , GrayU8 disparityEst , int invalid) {
 		InputSanityCheck.checkSameShape(left,right,disparityEst);
-		disparity.reshape(left);
 
 		// Compute mutual information model given the initial disparity estimate
 		stereoMI.process(left, right, disparityMin, disparityEst, invalid);
 		stereoMI.precomputeScaledCost(SgmDisparityCost.MAX_COST);
 
-		// Compute the cost using mutual information
-		sgmCost.process(left,right, disparityMin, disparityRange,costYXD);
-		// Aggregate the cost along all the paths
-		aggregation.process(costYXD,disparityMin);
-
-		// Select the best disparity for each pixel given the cost
-		selector.setMinDisparity(disparityMin); // TODO move to function below
-		selector.select(costYXD,aggregation.getAggregated(),disparity);
-	}
-
-	// TODO remove need to compute U8 first
-	public void subpixel( GrayU8 src , GrayF32 dst ) {
-		dst.reshape(src);
-		Planar<GrayU16> aggregatedYXD = aggregation.getAggregated();
-
-		for (int y = 0; y < aggregatedYXD.getNumBands(); y++) {
-			GrayU16 costXD = aggregatedYXD.getBand(y);
-			for (int x = 0; x < costXD.height; x++) {
-				int maxLocalDisparity = helper.localDisparityRangeLeft(x);
-				int d = src.unsafe_get(x,y);
-				float subpixel;
-				if( d > 0 && d < maxLocalDisparity-1) {
-					int c0 = costXD.unsafe_get(d-1,x);
-					int c1 = costXD.unsafe_get(d  ,x);
-					int c2 = costXD.unsafe_get(d+1,x);
-
-					float offset = (float)(c0-c2)/(float)(2*(c0-2*c1+c2));
-					subpixel = d + offset;
-				} else {
-					subpixel = d;
-				}
-				dst.set(x,y,subpixel);
-			}
-		}
-	}
-
-	public GrayU8 getDisparity() {
-		return disparity;
+		super.process(left,right);
 	}
 
 	public StereoMutualInformation getStereoMI() {
 		return stereoMI;
-	}
-
-	public SgmDisparityCost<GrayU8> getSgmCost() {
-		return sgmCost;
-	}
-
-	public SgmCostAggregation getAggregation() {
-		return aggregation;
-	}
-
-	public Planar<GrayU16> getCostYXD() {
-		return costYXD;
 	}
 
 	public PyramidDiscreteNN2<GrayU8> getPyrLeft() {
@@ -235,27 +167,11 @@ public class SgmStereoDisparityHmi {
 		return pyrRight;
 	}
 
-	public int getInvalidDisparity() {
-		return selector.getInvalidDisparity();
+	public int getExtraIterations() {
+		return extraIterations;
 	}
 
-	public int getDisparityMin() {
-		return disparityMin;
-	}
-
-	public void setDisparityMin(int disparityMin) {
-		this.disparityMin = disparityMin;
-	}
-
-	public int getDisparityRange() {
-		return disparityRange;
-	}
-
-	public void setDisparityRange(int disparityRange) {
-		this.disparityRange = disparityRange;
-	}
-
-	public SgmDisparitySelector getSelector() {
-		return selector;
+	public void setExtraIterations(int extraIterations) {
+		this.extraIterations = extraIterations;
 	}
 }

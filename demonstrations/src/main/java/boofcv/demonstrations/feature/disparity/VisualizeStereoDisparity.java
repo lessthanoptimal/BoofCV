@@ -419,6 +419,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 //			config.maxError = control.pixelError; TODO add later after updating GUI
 			config.validateRtoL = control.reverseTol;
 			config.texture = control.texture;
+			config.errorType = DisparitySgmError.ABSOLUTE_DIFFERENCE;
 			return FactoryStereoDisparity.sgm(config,inputType,dispType);
 		}
 	}

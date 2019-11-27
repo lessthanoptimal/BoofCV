@@ -18,7 +18,7 @@
 
 package boofcv.abst.feature.disparity;
 
-import boofcv.alg.feature.disparity.sgm.SgmStereoDisparityHmi;
+import boofcv.alg.feature.disparity.sgm.SgmStereoDisparity;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -26,17 +26,17 @@ import boofcv.struct.image.ImageType;
 
 public class WrapDisparitySgm<DI extends ImageGray<DI>> implements StereoDisparity<GrayU8, DI> {
 
-	SgmStereoDisparityHmi sgm;
+	SgmStereoDisparity<GrayU8> sgm;
 	GrayF32 subpixel;
 
-	public WrapDisparitySgm( SgmStereoDisparityHmi sgm, boolean subPixel) {
+	public WrapDisparitySgm( SgmStereoDisparity<GrayU8> sgm, boolean subPixel) {
 		this.sgm = sgm;
 		this.subpixel = subPixel ? new GrayF32(1,1) : null;
 	}
 
 	@Override
 	public void process(GrayU8 imageLeft, GrayU8 imageRight) {
-		sgm.processHmi(imageLeft,imageRight);
+		sgm.process(imageLeft,imageRight);
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class WrapDisparitySgm<DI extends ImageGray<DI>> implements StereoDispari
 		return (Class)(subpixel == null ? GrayF32.class : GrayU8.class);
 	}
 
-	public SgmStereoDisparityHmi getAlgorithm() {
+	public SgmStereoDisparity<GrayU8> getAlgorithm() {
 		return sgm;
 	}
 }

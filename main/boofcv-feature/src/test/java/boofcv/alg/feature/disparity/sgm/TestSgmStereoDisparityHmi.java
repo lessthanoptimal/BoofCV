@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.disparity.sgm;
 
+import boofcv.alg.feature.disparity.sgm.cost.StereoMutualInformation;
 import boofcv.alg.transform.pyramid.ConfigPyramid2;
 import boofcv.struct.image.GrayU8;
 import org.junit.jupiter.api.Test;
@@ -71,7 +72,7 @@ class TestSgmStereoDisparityHmi extends CommonSgmChecks{
 		SgmStereoDisparityHmi alg = create();
 		alg.setDisparityMin(0);
 		alg.setDisparityRange(rangeD);
-		alg.processHmi(left,right);
+		alg.process(left,right);
 		alg.getAggregation().setPenalty1(10);
 		alg.getAggregation().setPenalty2(20);
 
@@ -114,7 +115,7 @@ class TestSgmStereoDisparityHmi extends CommonSgmChecks{
 	SgmStereoDisparityHmi create() {
 		StereoMutualInformation stereoMI = new StereoMutualInformation();
 		stereoMI.configureSmoothing(3);
-		stereoMI.configureHistogram(255,255);
+		stereoMI.configureHistogram(256);
 		SgmDisparitySelector selector = new SgmDisparitySelector();
 		selector.setRightToLeftTolerance(-1);
 		return new SgmStereoDisparityHmi(new ConfigPyramid2(-1,20,20),stereoMI,selector);

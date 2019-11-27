@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.disparity.sgm;
+package boofcv.alg.feature.disparity.sgm.cost;
 
+import boofcv.alg.feature.disparity.sgm.SgmDisparityCost;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
@@ -38,7 +39,7 @@ abstract class ChecksSgmDisparityCost {
 	int width=25;
 	int height=20;
 
-	int maxPixelValue = 255;
+	int numGrayLevels = 256;
 
 	GrayU8 left = new GrayU8(width,height);
 	GrayU8 right = new GrayU8(width,height);
@@ -112,7 +113,7 @@ abstract class ChecksSgmDisparityCost {
 
 		for (int d = 0; d < cost.width; d++) {
 			int v = lookup(cost,x,y,d);
-			assertTrue(v <= SgmMutualInformation.MAX_COST);
+			assertTrue(v <= SgmMutualInformation_U8.MAX_COST);
 			if( v < bestValue ) {
 				bestValue = v;
 				best = d;

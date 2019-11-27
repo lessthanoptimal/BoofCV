@@ -25,8 +25,10 @@ import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_F32;
 import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_U8;
 import boofcv.alg.feature.disparity.block.select.*;
 import boofcv.alg.feature.disparity.sgm.SgmDisparitySelector;
+import boofcv.alg.feature.disparity.sgm.SgmStereoDisparity;
 import boofcv.alg.feature.disparity.sgm.SgmStereoDisparityHmi;
-import boofcv.alg.feature.disparity.sgm.StereoMutualInformation;
+import boofcv.alg.feature.disparity.sgm.cost.SgmCostAbsoluteValue_U8;
+import boofcv.alg.feature.disparity.sgm.cost.StereoMutualInformation;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -43,20 +45,36 @@ public class FactoryStereoDisparityAlgs {
 	/**
 	 * Creates SGM stereo using HMI.
 	 */
-	public static SgmStereoDisparityHmi createSgmHmi( @Nullable ConfigureDisparitySGM config ) {
+	public static SgmStereoDisparity createSgm(@Nullable ConfigureDisparitySGM config ) {
 		if( config == null )
 			config = new ConfigureDisparitySGM();
 
 		int maxError = config.maxError < 0 ? Integer.MAX_VALUE : config.maxError;
 
-		StereoMutualInformation stereoMI = new StereoMutualInformation();
-		stereoMI.configureSmoothing(config.smoothingRadius);
-		stereoMI.configureHistogram(config.totalGrayLevels);
 		SgmDisparitySelector selector = new SgmDisparitySelector();
 		selector.setRightToLeftTolerance(config.validateRtoL);
 		selector.setMaxError(maxError);
 		selector.setTextureThreshold(config.texture);
-		SgmStereoDisparityHmi sgm = new SgmStereoDisparityHmi(config.pyramidLayers,stereoMI,selector);
+
+		SgmStereoDisparity sgm;
+
+		switch( config.errorType) {
+			case MUTUAL_INFORMATION: {
+				StereoMutualInformation stereoMI = new StereoMutualInformation();
+				stereoMI.configureSmoothing(config.errorHMI.smoothingRadius);
+				stereoMI.configureHistogram(config.errorHMI.totalGrayLevels);
+				sgm = new SgmStereoDisparityHmi(config.errorHMI.pyramidLayers,stereoMI,selector);
+				((SgmStereoDisparityHmi)sgm).setExtraIterations(config.errorHMI.extraIterations);
+			} break;
+
+			case ABSOLUTE_DIFFERENCE: {
+				sgm = new SgmStereoDisparity(new SgmCostAbsoluteValue_U8(),selector);
+			} break;
+
+			default:
+				throw new IllegalArgumentException("Unknown error type "+config.errorType);
+		}
+
 		sgm.setDisparityMin(config.minDisparity);
 		sgm.setDisparityRange(config.rangeDisparity);
 		sgm.getAggregation().setPathsConsidered(config.paths);

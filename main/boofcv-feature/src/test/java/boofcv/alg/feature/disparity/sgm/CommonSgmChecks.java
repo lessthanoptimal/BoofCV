@@ -24,14 +24,14 @@ import boofcv.struct.image.GrayU8;
 import java.util.Random;
 
 public class CommonSgmChecks {
-	Random rand = new Random(234);
-	int width,height;
+	protected Random rand = new Random(234);
+	protected int width,height;
 
 	protected GrayU8 left  = new GrayU8(1,1);
 	protected GrayU8 right = new GrayU8(1,1);
 	protected GrayU8 disparityTruth = new GrayU8(1,1);
 
-	CommonSgmChecks( int width , int height ) {
+	protected CommonSgmChecks( int width , int height ) {
 		this.width = width;
 		this.height = height;
 		left.reshape(width,height);
@@ -42,7 +42,7 @@ public class CommonSgmChecks {
 	/**
 	 * Renders a stereo pair with a step gradient and a fixed constant disparity
 	 */
-	void renderStereoStep( int d , int invalid ) {
+	protected void renderStereoStep( int d , int invalid ) {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				// Create a step function
@@ -60,7 +60,7 @@ public class CommonSgmChecks {
 		}
 	}
 
-	void renderStereoGradient( int d , int invalid ) {
+	protected void renderStereoGradient( int d , int invalid ) {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				// Create a step function

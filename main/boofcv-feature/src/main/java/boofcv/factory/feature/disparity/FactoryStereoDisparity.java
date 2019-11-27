@@ -26,7 +26,7 @@ import boofcv.alg.feature.disparity.block.score.DisparityScoreBMBestFive_F32;
 import boofcv.alg.feature.disparity.block.score.DisparityScoreBMBestFive_S32;
 import boofcv.alg.feature.disparity.block.score.DisparityScoreBM_F32;
 import boofcv.alg.feature.disparity.block.score.DisparityScoreBM_S32;
-import boofcv.alg.feature.disparity.sgm.SgmStereoDisparityHmi;
+import boofcv.alg.feature.disparity.sgm.SgmStereoDisparity;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.transform.census.FactoryCensusTransform;
 import boofcv.struct.image.*;
@@ -325,7 +325,7 @@ public class FactoryStereoDisparity {
 		}
 
 		if( imageType == GrayU8.class ) {
-			SgmStereoDisparityHmi alg = FactoryStereoDisparityAlgs.createSgmHmi(config);
+			SgmStereoDisparity alg = FactoryStereoDisparityAlgs.createSgm(config);
 			return (StereoDisparity)new WrapDisparitySgm(alg,config.subpixel);
 		} else {
 			throw new IllegalArgumentException("Only U8 input supported");

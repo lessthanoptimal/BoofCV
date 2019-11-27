@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.disparity.sgm;
+package boofcv.alg.feature.disparity.sgm.cost;
 
+import boofcv.alg.feature.disparity.sgm.CommonSgmChecks;
+import boofcv.alg.feature.disparity.sgm.SgmDisparityCost;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
@@ -100,7 +102,7 @@ class TestStereoMutualInformation extends CommonSgmChecks {
 		int invalid = 10;
 		renderStereoStep(8,invalid);
 		StereoMutualInformation alg = new StereoMutualInformation();
-		alg.configureHistogram(255,255);
+		alg.configureHistogram(256);
 		alg.configureSmoothing(1);
 		alg.process(left,right,0,disparityTruth,invalid);
 		alg.precomputeScaledCost(SgmDisparityCost.MAX_COST);
@@ -191,7 +193,7 @@ class TestStereoMutualInformation extends CommonSgmChecks {
 		PixelMath.multiply(left,2.0,right);
 
 		StereoMutualInformation alg = new StereoMutualInformation();
-		alg.configureHistogram(250,250);
+		alg.configureHistogram(251);
 		alg.computeJointHistogram(left,right,0,disparity,500);
 
 		// Histogram can only have non-zero values where col=2*row because the right has been scaled by a factor
@@ -225,7 +227,7 @@ class TestStereoMutualInformation extends CommonSgmChecks {
 		ImageMiscOps.fillRectangle(disparity,invalid,0,0, width, height /2);
 
 		StereoMutualInformation alg = new StereoMutualInformation();
-		alg.configureHistogram(250,250);
+		alg.configureHistogram(251);
 		alg.computeJointHistogram(left,right,0,disparity,invalid);
 
 		int found = ImageStatistics.sum(alg.histJoint);
@@ -235,7 +237,7 @@ class TestStereoMutualInformation extends CommonSgmChecks {
 	@Test
 	void computeProbabilities() {
 		StereoMutualInformation alg = new StereoMutualInformation();
-		alg.configureHistogram(250,250);
+		alg.configureHistogram(251);
 		// fill just the right column with the same value. This will have a specific structure
 		for (int i = 0; i < 251; i++) {
 			alg.histJoint.set(250,i,40);
@@ -265,7 +267,7 @@ class TestStereoMutualInformation extends CommonSgmChecks {
 	@Test
 	void computeEntropy_Zeros() {
 		StereoMutualInformation alg = new StereoMutualInformation();
-		alg.configureHistogram(250,250);
+		alg.configureHistogram(251);
 
 		// only a few non-zero values
 		for (int i = 0; i < 251; i++) {
@@ -283,21 +285,5 @@ class TestStereoMutualInformation extends CommonSgmChecks {
 				assertFalse(UtilEjml.isUncountable(alg.entropyJoint.get(j,i)));
 			}
 		}
-	}
-
-	@Test
-	void scalePixelValue() {
-		StereoMutualInformation alg = new StereoMutualInformation();
-
-		// test using hand computed values
-		alg.configureHistogram(250,250);
-		assertEquals(100,alg.scalePixelValue(100));
-		assertEquals(250,alg.scalePixelValue(250));
-
-		// 12-bit gray to 8-bit gray
-		alg.configureHistogram(4095,255);
-		assertEquals(255,alg.scalePixelValue(4095));
-		assertEquals(32,alg.scalePixelValue(518));
-		assertEquals(68,alg.scalePixelValue(1099));
 	}
 }

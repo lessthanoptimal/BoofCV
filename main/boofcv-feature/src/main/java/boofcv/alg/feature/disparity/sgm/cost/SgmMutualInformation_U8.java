@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.disparity.sgm;
+package boofcv.alg.feature.disparity.sgm.cost;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.feature.disparity.sgm.SgmDisparityCost;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
@@ -31,10 +32,10 @@ import boofcv.struct.image.Planar;
  *
  * @author Peter Abeles
  */
-public class SgmMutualInformation implements SgmDisparityCost<GrayU8> {
+public class SgmMutualInformation_U8 implements SgmDisparityCost<GrayU8> {
 	StereoMutualInformation mutual;
 
-	public SgmMutualInformation(StereoMutualInformation mutual) {
+	public SgmMutualInformation_U8(StereoMutualInformation mutual) {
 		this.mutual = mutual;
 	}
 

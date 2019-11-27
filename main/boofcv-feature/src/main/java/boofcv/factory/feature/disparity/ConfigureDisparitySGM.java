@@ -32,22 +32,6 @@ import static boofcv.alg.feature.disparity.sgm.SgmDisparityCost.MAX_COST;
  */
 public class ConfigureDisparitySGM implements Configuration {
 	/**
-	 * Number of possible pixel values. This is typically specified by the number of bits per pixel. This is ued
-	 * by Mutual Information. MI was designed around 8-bit images and performance might degrade for large values.
-	 * <pre>
-	 *      8-bit = 256
-	 *      9-bit = 512
-	 *     10-bit = 1024
-	 *     11-bit = 2048
-	 *     12-bit = 4096
-	 *     13-bit = 8192
-	 *     14-bit = 16384
-	 *     15-bit = 32768
-	 *     16-bit = 65536
-	 * </pre>
-	 */
-	public int totalGrayLevels=256;
-	/**
 	 * Minimum disparity that it will check. Must be &ge; 0 and &lt; maxDisparity
 	 */
 	public int minDisparity=0;
@@ -89,13 +73,13 @@ public class ConfigureDisparitySGM implements Configuration {
 	 */
 	public int paths = 8;
 	/**
-	 * Specifies the smallest layer in pyramid. Used to compute Mutual Information Cost
+	 * Which error model should it use
 	 */
-	public ConfigPyramid2 pyramidLayers = new ConfigPyramid2(-1,50,-1);
+	public DisparitySgmError errorType = DisparitySgmError.MUTUAL_INFORMATION;
 	/**
-	 * Radius of Gaussian kernel when applying smoothing during Mutual Information computation.
+	 * Configuration for mutual information error. Only used if mutual information is selected
 	 */
-	public int smoothingRadius = 3;
+	public MutualInformation errorHMI = new MutualInformation();
 
 	@Override
 	public void checkValidity() {
@@ -109,5 +93,41 @@ public class ConfigureDisparitySGM implements Configuration {
 			throw new IllegalArgumentException("Minimum disparity must be >= 0");
 		if( paths < 2 || paths > 16 )
 			throw new IllegalArgumentException("Invalid number of paths. "+paths);
+	}
+
+	/**
+	 * Configuration for HMI cost
+	 */
+	public static class MutualInformation {
+		/**
+		 * Number of possible pixel values. This is typically specified by the number of bits per pixel. This is ued
+		 * by Mutual Information. MI was designed around 8-bit images and performance might degrade for large values.
+		 * <pre>
+		 *      8-bit = 256
+		 *      9-bit = 512
+		 *     10-bit = 1024
+		 *     11-bit = 2048
+		 *     12-bit = 4096
+		 *     13-bit = 8192
+		 *     14-bit = 16384
+		 *     15-bit = 32768
+		 *     16-bit = 65536
+		 * </pre>
+		 */
+		public int totalGrayLevels=256;
+		/**
+		 * Specifies the smallest layer in pyramid. Used to compute Mutual Information Cost
+		 */
+		public ConfigPyramid2 pyramidLayers = new ConfigPyramid2(-1,50,-1);
+		/**
+		 * Radius of Gaussian kernel when applying smoothing during Mutual Information computation.
+		 */
+		public int smoothingRadius = 3;
+
+		/**
+		 * Number of additional iterations to perform. This should improve the MI estimate, but the cost
+		 * is significant.
+		 */
+		public int extraIterations = 0;
 	}
 }
