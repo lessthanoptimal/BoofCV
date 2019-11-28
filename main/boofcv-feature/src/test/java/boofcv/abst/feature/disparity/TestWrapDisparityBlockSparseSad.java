@@ -20,7 +20,7 @@ package boofcv.abst.feature.disparity;
 
 import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_F32;
 import boofcv.alg.feature.disparity.block.select.SelectSparseErrorBasicWta_F32;
-import boofcv.factory.feature.disparity.ConfigureDisparityBM;
+import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.struct.image.GrayF32;
@@ -54,7 +54,7 @@ public class TestWrapDisparityBlockSparseSad {
 		GrayF32 left = new GrayF32(w,h);
 		GrayF32 right = new GrayF32(w,h);
 
-		ConfigureDisparityBM config = new ConfigureDisparityBM();
+		ConfigDisparityBM config = new ConfigDisparityBM();
 		config.regionRadiusX = config.regionRadiusY = r;
 		config.subpixel = false;
 		config.errorType = DisparityError.SAD;

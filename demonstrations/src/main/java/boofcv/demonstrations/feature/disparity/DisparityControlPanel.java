@@ -21,7 +21,7 @@ package boofcv.demonstrations.feature.disparity;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.feature.disparity.sgm.SgmDisparityCost;
 import boofcv.factory.feature.disparity.*;
-import boofcv.factory.transform.census.CensusType;
+import boofcv.factory.transform.census.CensusVariants;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.struct.image.GrayF32;
@@ -42,12 +42,12 @@ import java.awt.event.ActionListener;
 public class DisparityControlPanel extends StandardAlgConfigPanel {
 
 	private static String[] ERRORS_BLOCK = new String[]{"SAD","Census","NCC"};
-	private static String[] ERRORS_BGM = new String[]{"SAD","Census","MI"};
+	private static String[] ERRORS_BGM = new String[]{"SAD","Census","HMI"};
 
 	// which algorithm to run
 	int selectedMethod = 0;
-	public final ConfigureDisparityBMBest5 configBM = new ConfigureDisparityBMBest5();
-	public final ConfigureDisparitySGM configSGM = new ConfigureDisparitySGM();
+	public final ConfigDisparityBMBest5 configBM = new ConfigDisparityBMBest5();
+	public final ConfigDisparitySGM configSGM = new ConfigDisparitySGM();
 
 	JComboBox comboMethod = combo(e -> handleMethod(), selectedMethod,"BlockMatch-5","BlockMatch","SGM");
 	JComboBox comboError = combo(e -> handleErrorSelected(false),configBM.errorType.ordinal(),ERRORS_BLOCK);
@@ -62,7 +62,9 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 	ControlsSAD controlSad = new ControlsSAD();
 	ControlsCensus controlCensus = new ControlsCensus();
 	ControlsNCC controlNCC = new ControlsNCC();
-	ControlsMutualInfo controlMI = new ControlsMutualInfo();
+	ControlsMutualInfo controlHMI = new ControlsMutualInfo();
+
+	boolean ignoreChanges=false;
 
 	Listener listener;
 	Class imageType;
@@ -89,6 +91,8 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 	public void broadcastChange() {
 		Listener listener = this.listener;
 		if( listener == null )
+			return;
+		if( ignoreChanges )
 			return;
 
 		listener.handleDisparityChange();
@@ -137,6 +141,9 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		selectedMethod = comboMethod.getSelectedIndex();
 		boolean block = isBlockSelected();
 
+		// All the code above can cause multiple calls to broadcastChange() as listeners are triggered
+		ignoreChanges = true;
+
 		// swap out the controls and stuff
 		if( block != previousBlock ) {
 			int activeTab = tabbedPane.getSelectedIndex(); // don't switch out of the current tab
@@ -155,7 +162,9 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 			tabbedPane.setSelectedIndex(activeTab);
 			handleErrorSelected(true);
 		}
-		broadcastChange();
+
+		// This will ignore all changes until after they have been processed
+		SwingUtilities.invokeLater(()->{ignoreChanges=false;broadcastChange();});
 	}
 
 	private boolean isBlockSelected() {
@@ -169,6 +178,10 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 			return;
 		int selectedIdx = comboError.getSelectedIndex();
 
+		// Avoid multiple calls to broadcastChange()
+		if( !force )
+			ignoreChanges = true;
+
 		// If not forced that means the user selected a new error type, make that tab active
 		// If forced keep the previously active tab active
 		int activeTab = !force ? 1 : tabbedPane.getSelectedIndex();
@@ -176,7 +189,8 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		Component c;
 		if( block ) {
 			configBM.errorType = DisparityError.values()[selectedIdx];
-			controlCensus.update(configBM.censusVariant);
+			controlCensus.update(configBM.configCensus);
+			controlNCC.update(configBM.configNCC);
 			switch( selectedIdx ) {
 				case 0: c = controlSad; break;
 				case 1: c = controlCensus; break;
@@ -185,12 +199,12 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 			}
 		} else {
 			configSGM.errorType = DisparitySgmError.values()[selectedIdx];
-			controlCensus.update(configSGM.censusVariant);
-			controlMI.update(configSGM.errorHMI);
+			controlCensus.update(configSGM.configCensus);
+			controlHMI.update(configSGM.configHMI);
 			switch( selectedIdx ) {
 				case 0: c = controlSad; break;
 				case 1: c = controlCensus; break;
-				case 2: c = controlMI; break;
+				case 2: c = controlHMI; break;
 				default: throw new IllegalArgumentException("Unknown");
 			}
 		}
@@ -199,7 +213,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		tabbedPane.setSelectedIndex(activeTab);
 
 		if( !force )
-			broadcastChange();
+			SwingUtilities.invokeLater(()->{ignoreChanges=false;broadcastChange();});
 	}
 
 	public class ControlsBlockMatching extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
@@ -306,7 +320,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if( e.getSource() == comboPaths) {
-				configSGM.paths = ConfigureDisparitySGM.Paths.values()[comboPaths.getSelectedIndex()];
+				configSGM.paths = ConfigDisparitySGM.Paths.values()[comboPaths.getSelectedIndex()];
 			} else if( e.getSource() == subpixelToggle) {
 					configSGM.subpixel = subpixelToggle.isSelected();
 			} else {
@@ -321,14 +335,16 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 	}
 
 	class ControlsCensus extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
-		JComboBox comboVariant = combo(0, (Object[]) CensusType.values());
+		JComboBox comboVariant = combo(0, (Object[]) CensusVariants.values());
+		ConfigDisparityError.Census settings;
 
 		public ControlsCensus() {
 			addLabeled(comboVariant, "Variant");
 		}
 
-		public void update( CensusType settings ) {
-			comboVariant.setSelectedIndex(settings.ordinal());
+		public void update( ConfigDisparityError.Census settings ) {
+			this.settings = settings;
+			comboVariant.setSelectedIndex(settings.variant.ordinal());
 		}
 
 		@Override
@@ -338,24 +354,36 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-
+			if( e.getSource() == comboVariant) {
+				settings.variant = CensusVariants.values()[comboVariant.getSelectedIndex()];
+			} else {
+				throw new RuntimeException("Unknown");
+			}
+			broadcastChange();
 		}
 	}
 
 	class ControlsNCC extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
-		JSpinner spinnerEps = spinner(0.0,0, 1.0,0.001);
+		JSpinner spinnerEps = spinner(0.0,0, 1.0,0.001,"0.0E0",10);
+		ConfigDisparityError.NCC settings;
 
 		ControlsNCC() {
 			addLabeled(spinnerEps, "EPS");
 		}
 
-		public void update( double eps ) {
-			spinnerEps.setValue(eps);
+		public void update( ConfigDisparityError.NCC settings) {
+			this.settings = settings;
+			spinnerEps.setValue(settings.eps);
 		}
 
 		@Override
 		public void stateChanged(ChangeEvent e) {
-
+			if( e.getSource() == spinnerEps) {
+				settings.eps = ((Number) spinnerEps.getValue()).doubleValue();
+			} else {
+				throw new RuntimeException("Unknown");
+			}
+			broadcastChange();
 		}
 
 		@Override
@@ -369,7 +397,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		JSpinner spinnerPyramidWidth = spinner(20,20, 10000,50);
 		JSpinner spinnerExtra = spinner(0,0, 5,1);
 
-		ConfigureDisparitySGM.MutualInformation settings;
+		ConfigDisparityError.HMI settings;
 
 		ControlsMutualInfo() {
 			addLabeled(spinnerBlur, "Blur Radius");
@@ -377,7 +405,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 			addLabeled(spinnerExtra, "Extra Iter.");
 		}
 
-		public void update( ConfigureDisparitySGM.MutualInformation settings ) {
+		public void update( ConfigDisparityError.HMI settings ) {
 			this.settings = settings;
 			spinnerBlur.setValue(settings.smoothingRadius);
 			spinnerPyramidWidth.setValue(settings.pyramidLayers.minWidth);
@@ -386,7 +414,17 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 
 		@Override
 		public void stateChanged(ChangeEvent e) {
-
+			if( e.getSource() == spinnerBlur) {
+				settings.smoothingRadius = ((Number) spinnerBlur.getValue()).intValue();
+			} else if( e.getSource() == spinnerPyramidWidth) {
+				settings.pyramidLayers.minWidth = ((Number) spinnerPyramidWidth.getValue()).intValue();
+				settings.pyramidLayers.minHeight = ((Number) spinnerPyramidWidth.getValue()).intValue();
+			} else if( e.getSource() == spinnerExtra) {
+				settings.extraIterations = ((Number) spinnerExtra.getValue()).intValue();
+			} else {
+				throw new RuntimeException("Unknown");
+			}
+			broadcastChange();
 		}
 
 		@Override

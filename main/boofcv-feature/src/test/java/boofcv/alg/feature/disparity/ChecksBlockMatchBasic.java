@@ -21,7 +21,7 @@ package boofcv.alg.feature.disparity;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.feature.disparity.block.DisparityBlockMatchNaive;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.feature.disparity.ConfigureDisparityBM;
+import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
@@ -86,8 +86,8 @@ public abstract class ChecksBlockMatchBasic<T extends ImageBase<T>> {
 		BoofTesting.assertEquals(expected,alg.getDisparity(),1e-4);
 	}
 
-	public static ConfigureDisparityBM createConfigBasicBM(int blockRadius, int minDisparity, int maxDisparity) {
-		ConfigureDisparityBM config = new ConfigureDisparityBM();
+	public static ConfigDisparityBM createConfigBasicBM(int blockRadius, int minDisparity, int maxDisparity) {
+		ConfigDisparityBM config = new ConfigDisparityBM();
 		config.regionRadiusX = config.regionRadiusY = blockRadius;
 		config.minDisparity = minDisparity;
 		config.rangeDisparity = maxDisparity-minDisparity;

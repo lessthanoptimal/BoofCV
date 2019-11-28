@@ -26,7 +26,7 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.robust.ModelMatcherMultiview;
 import boofcv.factory.distort.LensDistortionFactory;
-import boofcv.factory.feature.disparity.ConfigureDisparityBMBest5;
+import boofcv.factory.feature.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.ConfigEssential;
@@ -115,7 +115,7 @@ public class ExampleStereoTwoViewsOneCamera {
 				rectifiedLeft, rectifiedRight,rectifiedMask, rectifiedK,rectifiedR);
 
 		// compute disparity
-		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
+		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
 		config.errorType = DisparityError.SAD;
 		config.minDisparity = minDisparity;
 		config.rangeDisparity = rangeDisparity;

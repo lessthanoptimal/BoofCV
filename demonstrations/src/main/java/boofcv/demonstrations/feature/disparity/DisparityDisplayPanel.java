@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.feature.disparity;
 
-import boofcv.factory.feature.disparity.ConfigureDisparitySGM;
+import boofcv.factory.feature.disparity.ConfigDisparitySGM;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 
@@ -60,7 +60,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	int inputScale = 100;
 
 	// Configuration specific for SGM
-	final protected ConfigureDisparitySGM configSgm = new ConfigureDisparitySGM();
+	final protected ConfigDisparitySGM configSgm = new ConfigDisparitySGM();
 
 	protected JLabel processingTimeLabel = new JLabel();
 	protected JLabel imageSizeLabel = new JLabel();

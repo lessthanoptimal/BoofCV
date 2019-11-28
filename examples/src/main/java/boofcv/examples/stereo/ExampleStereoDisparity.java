@@ -23,7 +23,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.factory.feature.disparity.ConfigureDisparityBMBest5;
+import boofcv.factory.feature.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.ListDisplayPanel;
@@ -78,7 +78,7 @@ public class ExampleStereoDisparity {
 	{
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
-		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
+		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
 		config.errorType = DisparityError.SAD;
 		config.minDisparity = minDisparity;
 		config.rangeDisparity = rangeDisparity;
@@ -106,7 +106,7 @@ public class ExampleStereoDisparity {
 	{
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
-		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
+		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
 		config.errorType = DisparityError.SAD;
 		config.minDisparity = minDisparity;
 		config.rangeDisparity = rangeDisparity;

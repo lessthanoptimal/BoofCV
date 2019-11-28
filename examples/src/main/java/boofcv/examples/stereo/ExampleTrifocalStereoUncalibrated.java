@@ -41,7 +41,7 @@ import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.feature.disparity.ConfigureDisparityBMBest5;
+import boofcv.factory.feature.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.*;
@@ -459,7 +459,7 @@ public class ExampleTrifocalStereoUncalibrated {
 		ConvertImage.average(rectColorRight,rectifiedRight);
 
 		// compute disparity
-		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
+		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
 		config.errorType = DisparityError.NCC;
 		config.minDisparity = minDisparity;
 		config.rangeDisparity = rangeDisparity;

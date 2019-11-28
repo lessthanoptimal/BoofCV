@@ -184,9 +184,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	public synchronized void processDisparity() {
 		if( !rectifiedImages ) {
-			SwingUtilities.invokeLater(()->{
-				control.enableAlgControls(true);
-			});
+			SwingUtilities.invokeLater(()-> control.enableAlgControls(true));
 			return;
 		}
 

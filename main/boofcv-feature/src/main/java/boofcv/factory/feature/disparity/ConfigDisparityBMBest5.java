@@ -28,5 +28,5 @@ import boofcv.alg.feature.disparity.DisparityBlockMatchBestFive;
  *
  * @author Peter Abeles
  */
-public class ConfigureDisparityBMBest5 extends ConfigureDisparityBM {
+public class ConfigDisparityBMBest5 extends ConfigDisparityBM {
 }

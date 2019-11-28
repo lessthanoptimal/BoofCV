@@ -44,9 +44,9 @@ public class FactoryStereoDisparityAlgs {
 	/**
 	 * Creates SGM stereo using HMI.
 	 */
-	public static SgmStereoDisparity createSgm(@Nullable ConfigureDisparitySGM config ) {
+	public static SgmStereoDisparity createSgm(@Nullable ConfigDisparitySGM config ) {
 		if( config == null )
-			config = new ConfigureDisparitySGM();
+			config = new ConfigDisparitySGM();
 
 		int maxError = config.maxError < 0 ? Integer.MAX_VALUE : config.maxError;
 
@@ -60,10 +60,10 @@ public class FactoryStereoDisparityAlgs {
 		switch( config.errorType) {
 			case MUTUAL_INFORMATION: {
 				StereoMutualInformation stereoMI = new StereoMutualInformation();
-				stereoMI.configureSmoothing(config.errorHMI.smoothingRadius);
-				stereoMI.configureHistogram(config.errorHMI.totalGrayLevels);
-				sgm = new SgmStereoDisparityHmi(config.errorHMI.pyramidLayers,stereoMI,selector);
-				((SgmStereoDisparityHmi)sgm).setExtraIterations(config.errorHMI.extraIterations);
+				stereoMI.configureSmoothing(config.configHMI.smoothingRadius);
+				stereoMI.configureHistogram(config.configHMI.totalGrayLevels);
+				sgm = new SgmStereoDisparityHmi(config.configHMI.pyramidLayers,stereoMI,selector);
+				((SgmStereoDisparityHmi)sgm).setExtraIterations(config.configHMI.extraIterations);
 			} break;
 
 			case ABSOLUTE_DIFFERENCE: {
@@ -71,7 +71,7 @@ public class FactoryStereoDisparityAlgs {
 			} break;
 
 			case CENSUS: {
-				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.censusVariant,GrayU8.class);
+				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,GrayU8.class);
 				Class censusType = censusTran.getOutputType().getImageClass();
 				SgmCostHamming cost;
 				if (censusType == GrayU8.class) {

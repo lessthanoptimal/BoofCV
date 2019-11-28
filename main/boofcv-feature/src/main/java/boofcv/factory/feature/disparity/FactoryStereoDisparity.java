@@ -60,9 +60,9 @@ import static boofcv.factory.feature.disparity.FactoryStereoDisparityAlgs.*;
 public class FactoryStereoDisparity {
 
 	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T,DI>
-	blockMatch(@Nullable ConfigureDisparityBM config , Class<T> imageType , Class<DI> dispType ) {
+	blockMatch(@Nullable ConfigDisparityBM config , Class<T> imageType , Class<DI> dispType ) {
 		if( config == null )
-			config = new ConfigureDisparityBM();
+			config = new ConfigDisparityBM();
 
 		if( config.subpixel ) {
 			if( dispType != GrayF32.class )
@@ -84,7 +84,7 @@ public class FactoryStereoDisparity {
 			}
 
 			case CENSUS: {
-				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.censusVariant,imageType);
+				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,imageType);
 				Class censusType = censusTran.getOutputType().getImageClass();
 				BlockRowScore rowScore;
 				if (censusType == GrayU8.class) {
@@ -102,7 +102,7 @@ public class FactoryStereoDisparity {
 			}
 
 			case NCC: {
-				BlockRowScore rowScore = createScoreRowNcc(config.nccEps, config.regionRadiusX,config.regionRadiusY,GrayF32.class);
+				BlockRowScore rowScore = createScoreRowNcc(config.configNCC.eps, config.regionRadiusX,config.regionRadiusY,GrayF32.class);
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, GrayF32.class, select, rowScore);
 				return new DisparityBlockMatchCorrelation(alg,imageType);
 			}
@@ -113,7 +113,7 @@ public class FactoryStereoDisparity {
 	}
 
 	private static <T extends ImageGray<T>> DisparitySelect
-	createDisparitySelect(ConfigureDisparityBM config, Class<T> imageType, int maxError) {
+	createDisparitySelect(ConfigDisparityBM config, Class<T> imageType, int maxError) {
 		DisparitySelect select;
 		if( !GeneralizedImageOps.isFloatingPoint(imageType) ) {
 			if( config.errorType.isCorrelation() )
@@ -143,9 +143,9 @@ public class FactoryStereoDisparity {
 	}
 
 	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T,DI>
-	blockMatchBest5(@Nullable ConfigureDisparityBMBest5 config , Class<T> imageType , Class<DI> dispType ) {
+	blockMatchBest5(@Nullable ConfigDisparityBMBest5 config , Class<T> imageType , Class<DI> dispType ) {
 		if( config == null )
-			config = new ConfigureDisparityBMBest5();
+			config = new ConfigDisparityBMBest5();
 
 		if( config.subpixel ) {
 			if( dispType != GrayF32.class )
@@ -170,7 +170,7 @@ public class FactoryStereoDisparity {
 
 			case CENSUS: {
 				DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
-				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.censusVariant,imageType);
+				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,imageType);
 				Class censusType = censusTran.getOutputType().getImageClass();
 				BlockRowScore rowScore;
 				if (censusType == GrayU8.class) {
@@ -189,7 +189,7 @@ public class FactoryStereoDisparity {
 
 			case NCC: {
 				DisparitySelect select = createDisparitySelect(config, GrayF32.class, (int) maxError);
-				BlockRowScore rowScore = createScoreRowNcc(config.nccEps,config.regionRadiusX,config.regionRadiusY,GrayF32.class);
+				BlockRowScore rowScore = createScoreRowNcc(config.configNCC.eps,config.regionRadiusX,config.regionRadiusY,GrayF32.class);
 				DisparityBlockMatchRowFormat alg = createBestFive(config, GrayF32.class, select, rowScore);
 				return new DisparityBlockMatchCorrelation(alg,imageType);
 			}
@@ -227,7 +227,7 @@ public class FactoryStereoDisparity {
 	}
 
 	private static <T extends ImageGray<T>> DisparityBlockMatchRowFormat
-	createBlockMatching(ConfigureDisparityBM config, Class<T> imageType, DisparitySelect select, BlockRowScore rowScore) {
+	createBlockMatching(ConfigDisparityBM config, Class<T> imageType, DisparitySelect select, BlockRowScore rowScore) {
 		DisparityBlockMatchRowFormat alg;
 		int maxDisparity = config.minDisparity+config.rangeDisparity;
 		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
@@ -239,7 +239,7 @@ public class FactoryStereoDisparity {
 	}
 
 	private static <T extends ImageGray<T>> DisparityBlockMatchRowFormat
-	createBestFive(ConfigureDisparityBM config, Class<T> imageType, DisparitySelect select, BlockRowScore rowScore) {
+	createBestFive(ConfigDisparityBM config, Class<T> imageType, DisparitySelect select, BlockRowScore rowScore) {
 		DisparityBlockMatchRowFormat alg;
 		int maxDisparity = config.minDisparity+config.rangeDisparity;
 		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
@@ -310,9 +310,9 @@ public class FactoryStereoDisparity {
 	 * @return The algorithm.
 	 */
 	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T,DI>
-	sgm(@Nullable ConfigureDisparitySGM config , Class<T> imageType , Class<DI> dispType ) {
+	sgm(@Nullable ConfigDisparitySGM config , Class<T> imageType , Class<DI> dispType ) {
 		if( config == null )
-			config = new ConfigureDisparitySGM();
+			config = new ConfigDisparitySGM();
 
 		if( config.subpixel ){
 			if( dispType != GrayF32.class ) {

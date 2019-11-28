@@ -19,7 +19,6 @@
 package boofcv.factory.feature.disparity;
 
 import boofcv.alg.feature.disparity.DisparityBlockMatch;
-import boofcv.factory.transform.census.CensusType;
 import boofcv.struct.Configuration;
 
 /**
@@ -29,7 +28,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class ConfigureDisparityBM implements Configuration {
+public class ConfigDisparityBM implements Configuration {
 	/**
 	 * Minimum disparity that it will check. Must be &ge; 0 and &lt; maxDisparity
 	 */
@@ -59,30 +58,24 @@ public class ConfigureDisparityBM implements Configuration {
 	 * Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
 	 * Try 0.1 for SAD or 0.7 for NCC. Disable with a value &le; 0
 	 */
-	public double texture = 0.1;
-
+	public double texture = 0.15;
 	/**
 	 * If subpixel should be used to find disparity or not. If on then output disparity image needs to me GrayF32.
 	 * If false then GrayU8.
 	 */
 	public boolean subpixel = true;
-
 	/**
 	 * How the error is computed for each block
 	 */
 	public DisparityError errorType = DisparityError.SAD;
-
 	/**
-	 * If Census error is used which variant should it use
+	 * Used if error type is Census
 	 */
-	public CensusType censusVariant = CensusType.BLOCK_5_5;
-
+	public ConfigDisparityError.Census configCensus = new ConfigDisparityError.Census();
 	/**
-	 * Used to avoid a divide by zero error when dividing by the standard deviation. Only used with NCC. Smaller
-	 * values are more mathematically accurate but make it more sensitive to floating point error.
-	 * This has been tuned to work with pixel values that have been scaled to -1 to 1.
+	 * Used if error type is NCC
 	 */
-	public double nccEps = 5e-5;
+	public ConfigDisparityError.NCC configNCC = new ConfigDisparityError.NCC();
 
 	@Override
 	public void checkValidity() {
@@ -90,6 +83,5 @@ public class ConfigureDisparityBM implements Configuration {
 			throw new IllegalArgumentException("miDisparity < 0");
 		if( rangeDisparity < 1 )
 			throw new IllegalArgumentException("rangeDisparity < 1");
-
 	}
 }

@@ -20,7 +20,7 @@ package boofcv.alg.feature.disparity;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.feature.disparity.block.DisparityBlockMatchNaive;
-import boofcv.factory.feature.disparity.ConfigureDisparityBM;
+import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.struct.image.GrayF32;
@@ -66,7 +66,7 @@ class TestBlockMatchBasic_SAD<T extends ImageBase<T>> {
 
 		@Override
 		public StereoDisparity<GrayU8, GrayU8> createAlg(int blockRadius, int minDisparity, int maxDisparity) {
-			ConfigureDisparityBM config = createConfigBasicBM(blockRadius, minDisparity, maxDisparity);
+			ConfigDisparityBM config = createConfigBasicBM(blockRadius, minDisparity, maxDisparity);
 			config.errorType = DisparityError.SAD;
 			return FactoryStereoDisparity.blockMatch(config,GrayU8.class,GrayU8.class);
 		}
@@ -101,7 +101,7 @@ class TestBlockMatchBasic_SAD<T extends ImageBase<T>> {
 
 		@Override
 		public StereoDisparity<GrayF32, GrayU8> createAlg(int blockRadius, int minDisparity, int maxDisparity) {
-			ConfigureDisparityBM config = createConfigBasicBM(blockRadius, minDisparity, maxDisparity);
+			ConfigDisparityBM config = createConfigBasicBM(blockRadius, minDisparity, maxDisparity);
 			config.errorType = DisparityError.SAD;
 			return FactoryStereoDisparity.blockMatch(config,GrayF32.class,GrayU8.class);
 		}

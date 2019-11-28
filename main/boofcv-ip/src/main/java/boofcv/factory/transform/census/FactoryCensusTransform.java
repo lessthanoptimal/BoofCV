@@ -39,7 +39,7 @@ import org.ddogleg.struct.FastQueue;
 public class FactoryCensusTransform {
 
 	public static <In extends ImageGray<In>, Out extends ImageBase<Out>>
-	FilterImageInterface<In, Out> variant( CensusType type , Class<In> imageType) {
+	FilterImageInterface<In, Out> variant(CensusVariants type , Class<In> imageType) {
 		switch( type ) {
 			case BLOCK_3_3: return blockDense(1,imageType);
 			case BLOCK_5_5: return blockDense(2,imageType);

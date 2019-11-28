@@ -36,7 +36,7 @@ import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.feature.disparity.ConfigureDisparityBMBest5;
+import boofcv.factory.feature.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.BoofSwingUtil;
@@ -618,7 +618,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		ConvertImage.average(rectColor2,rectifiedRight);
 
 		// compute disparity
-		ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
+		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
 		config.errorType = DisparityError.NCC;
 		config.minDisparity = controls.minDisparity;
 		config.rangeDisparity = controls.rangeDisparity;

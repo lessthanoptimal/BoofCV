@@ -25,7 +25,7 @@ package boofcv.factory.feature.disparity;
  */
 public enum DisparityError {
 	/**
-	 * Sum of Absolute Difference. It's often recommended that an image derivative like Laplacian is applied
+	 * Sum of Absolute Difference (SAD). It's often recommended that an image derivative like Laplacian is applied
 	 * first to add improved performance ot variable lighting between the two images.
 	 */
 	SAD,
@@ -37,7 +37,7 @@ public enum DisparityError {
 	 */
 	CENSUS,
 	/**
-	 * Normalized Cross Correlation. The NCC radius specifies the size of the local region used to compute
+	 * Normalized Cross Correlation (NCC). The NCC radius specifies the size of the local region used to compute
 	 * normalization statistics.
 	 */
 	NCC;

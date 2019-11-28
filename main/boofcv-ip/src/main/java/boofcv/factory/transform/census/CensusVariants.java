@@ -23,7 +23,7 @@ package boofcv.factory.transform.census;
  *
  * @author Peter Abeles
  */
-public enum CensusType {
+public enum CensusVariants {
 	BLOCK_3_3,
 	BLOCK_5_5,
 	BLOCK_7_7,

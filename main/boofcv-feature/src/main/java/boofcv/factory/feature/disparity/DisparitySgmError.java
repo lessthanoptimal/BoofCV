@@ -24,7 +24,7 @@ package boofcv.factory.feature.disparity;
  * @author Peter Abeles
  */
 public enum DisparitySgmError {
-	MUTUAL_INFORMATION,
 	ABSOLUTE_DIFFERENCE,
-	CENSUS
+	CENSUS,
+	MUTUAL_INFORMATION,
 }
