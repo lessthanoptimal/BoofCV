@@ -21,6 +21,7 @@ package boofcv.factory.feature.disparity;
 import boofcv.alg.feature.disparity.sgm.SgmDisparityCost;
 import boofcv.alg.feature.disparity.sgm.SgmStereoDisparityHmi;
 import boofcv.alg.transform.pyramid.ConfigPyramid2;
+import boofcv.factory.transform.census.CensusType;
 import boofcv.struct.Configuration;
 
 import static boofcv.alg.feature.disparity.sgm.SgmDisparityCost.MAX_COST;
@@ -80,6 +81,10 @@ public class ConfigureDisparitySGM implements Configuration {
 	 * Configuration for mutual information error. Only used if mutual information is selected
 	 */
 	public MutualInformation errorHMI = new MutualInformation();
+	/**
+	 * If Census error is used which variant should it use
+	 */
+	public CensusType censusVariant = CensusType.BLOCK_13_5;
 
 	@Override
 	public void checkValidity() {

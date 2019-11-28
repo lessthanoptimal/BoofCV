@@ -45,12 +45,12 @@ public interface SgmDisparityCost<T extends ImageBase<T>> {
 	 *
 	 * @param left left image
 	 * @param right right image
-	 * @param minDisparity Minimum possible disparity, inclusive
+	 * @param disparityMin Minimum possible disparity, inclusive
 	 * @param disparityRange Number of possible disparity values estimated. The max possible disparity is min+range-1.
 	 * @param costYXD Cost of output scaled to have a range of 0 to {@link SgmDisparityCost#MAX_COST}, inclusive.
 	 *                Reshaped to match input and disparity range.
 	 */
 	void process(T left , T right ,
-				 int minDisparity , int disparityRange,
+				 int disparityMin , int disparityRange,
 				 Planar<GrayU16> costYXD );
 }

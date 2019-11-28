@@ -54,7 +54,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 @SuppressWarnings("WeakerAccess")
-public class SgmStereoDisparityHmi extends SgmStereoDisparity<GrayU8> {
+public class SgmStereoDisparityHmi extends SgmStereoDisparityError<GrayU8> {
 
 	protected Random rand = new Random(234);
 

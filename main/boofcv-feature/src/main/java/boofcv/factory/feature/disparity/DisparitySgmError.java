@@ -26,7 +26,6 @@ package boofcv.factory.feature.disparity;
 public enum DisparitySgmError {
 	MUTUAL_INFORMATION,
 	ABSOLUTE_DIFFERENCE,
-	// TODO SAD
-	// TODO CENSUS
+	CENSUS,
 	// TODO NCC?
 }

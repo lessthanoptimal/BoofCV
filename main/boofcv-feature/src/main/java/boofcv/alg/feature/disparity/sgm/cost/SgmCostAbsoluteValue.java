@@ -19,18 +19,24 @@
 package boofcv.alg.feature.disparity.sgm.cost;
 
 import boofcv.alg.feature.disparity.sgm.SgmDisparityCost;
-import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.Planar;
+import boofcv.struct.image.ImageBase;
 
 /**
- * Computes the cost using a block matching algorithm
+ * Computes the cost as the absolute value between two pixels, i.e. cost = |left-right|.
  *
  * @author Peter Abeles
  */
-public class SgmCostFromBlockMatching_U8  implements SgmDisparityCost<GrayU8> {
-	@Override
-	public void process(GrayU8 left, GrayU8 right, int minDisparity, int disparityRange, Planar<GrayU16> costYXD) {
-
+public abstract class SgmCostAbsoluteValue<T extends ImageBase<T>> extends SgmCostBase<T>
+{
+	public static class U8 extends SgmCostAbsoluteValue<GrayU8> {
+		@Override
+		protected void computeDisparityErrors(int idxLeft, int idxRight, int idxOut, int disparityMin, int disparityMax) {
+			int valLeft = left.data[idxLeft] & 0xFF;
+			for (int d = disparityMin; d <= disparityMax; d++) {
+				int valRight = right.data[idxRight--] & 0xFF;
+				costXD.data[idxOut+d] = (short)(SgmDisparityCost.MAX_COST*Math.abs(valRight-valLeft)/255);
+			}
+		}
 	}
 }

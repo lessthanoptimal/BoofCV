@@ -18,7 +18,6 @@
 
 package boofcv.alg.feature.disparity.sgm;
 
-import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.*;
 
 /**
@@ -26,10 +25,9 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public class SgmStereoDisparity <T extends ImageBase<T>> {
-
-
-	protected SgmDisparityCost<T> sgmCost;
+public abstract class SgmStereoDisparity<T extends ImageBase<T>, C extends ImageBase<C>>
+{
+	protected SgmDisparityCost<C> sgmCost;
 
 	// Minimum disparity and number of possible disparity values
 	protected int disparityMin = 0;
@@ -44,7 +42,7 @@ public class SgmStereoDisparity <T extends ImageBase<T>> {
 	// Storage for found disparity
 	protected GrayU8 disparity = new GrayU8(1,1);
 
-	public SgmStereoDisparity(SgmDisparityCost<T> sgmCost, SgmDisparitySelector selector) {
+	public SgmStereoDisparity(SgmDisparityCost<C> sgmCost, SgmDisparitySelector selector) {
 		this.sgmCost = sgmCost;
 		this.selector = selector;
 	}
@@ -55,20 +53,7 @@ public class SgmStereoDisparity <T extends ImageBase<T>> {
 	 * @param left (Input) left rectified stereo image
 	 * @param right (Input) right rectified stereo image
 	 */
-	public void process( T left , T right ) {
-		InputSanityCheck.checkSameShape(left,right);
-		disparity.reshape(left);
-		helper.configure(left.width,disparityMin,disparityRange);
-
-		// Compute the cost using mutual information
-		sgmCost.process(left,right, disparityMin, disparityRange,costYXD);
-		// Aggregate the cost along all the paths
-		aggregation.process(costYXD,disparityMin);
-
-		// Select the best disparity for each pixel given the cost
-		selector.setMinDisparity(disparityMin); // TODO move to function below
-		selector.select(costYXD,aggregation.getAggregated(),disparity);
-	}
+	public abstract void process( T left , T right );
 
 	// TODO remove need to compute U8 first
 	public void subpixel( GrayU8 src , GrayF32 dst ) {
@@ -100,7 +85,7 @@ public class SgmStereoDisparity <T extends ImageBase<T>> {
 		return disparity;
 	}
 
-	public SgmDisparityCost<T> getSgmCost() {
+	public SgmDisparityCost<C> getSgmCost() {
 		return sgmCost;
 	}
 

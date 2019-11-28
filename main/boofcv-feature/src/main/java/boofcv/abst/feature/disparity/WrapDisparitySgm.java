@@ -26,10 +26,10 @@ import boofcv.struct.image.ImageType;
 
 public class WrapDisparitySgm<DI extends ImageGray<DI>> implements StereoDisparity<GrayU8, DI> {
 
-	SgmStereoDisparity<GrayU8> sgm;
+	SgmStereoDisparity<GrayU8,?> sgm;
 	GrayF32 subpixel;
 
-	public WrapDisparitySgm( SgmStereoDisparity<GrayU8> sgm, boolean subPixel) {
+	public WrapDisparitySgm( SgmStereoDisparity<GrayU8,?> sgm, boolean subPixel) {
 		this.sgm = sgm;
 		this.subpixel = subPixel ? new GrayF32(1,1) : null;
 	}
@@ -84,7 +84,7 @@ public class WrapDisparitySgm<DI extends ImageGray<DI>> implements StereoDispari
 		return (Class)(subpixel == null ? GrayF32.class : GrayU8.class);
 	}
 
-	public SgmStereoDisparity<GrayU8> getAlgorithm() {
+	public SgmStereoDisparity<GrayU8,?> getAlgorithm() {
 		return sgm;
 	}
 }

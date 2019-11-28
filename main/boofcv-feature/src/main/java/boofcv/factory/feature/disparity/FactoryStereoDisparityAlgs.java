@@ -18,20 +18,19 @@
 
 package boofcv.factory.feature.disparity;
 
+import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
 import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_F32;
 import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_U8;
 import boofcv.alg.feature.disparity.block.select.*;
-import boofcv.alg.feature.disparity.sgm.SgmDisparitySelector;
-import boofcv.alg.feature.disparity.sgm.SgmStereoDisparity;
-import boofcv.alg.feature.disparity.sgm.SgmStereoDisparityHmi;
-import boofcv.alg.feature.disparity.sgm.cost.SgmCostAbsoluteValue_U8;
+import boofcv.alg.feature.disparity.sgm.*;
+import boofcv.alg.feature.disparity.sgm.cost.SgmCostAbsoluteValue;
+import boofcv.alg.feature.disparity.sgm.cost.SgmCostHamming;
 import boofcv.alg.feature.disparity.sgm.cost.StereoMutualInformation;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
+import boofcv.factory.transform.census.FactoryCensusTransform;
+import boofcv.struct.image.*;
 
 import javax.annotation.Nullable;
 
@@ -68,7 +67,23 @@ public class FactoryStereoDisparityAlgs {
 			} break;
 
 			case ABSOLUTE_DIFFERENCE: {
-				sgm = new SgmStereoDisparity(new SgmCostAbsoluteValue_U8(),selector);
+				sgm = new SgmStereoDisparityError(new SgmCostAbsoluteValue.U8(),selector);
+			} break;
+
+			case CENSUS: {
+				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.censusVariant,GrayU8.class);
+				Class censusType = censusTran.getOutputType().getImageClass();
+				SgmCostHamming cost;
+				if (censusType == GrayU8.class) {
+					cost = new SgmCostHamming.U8();
+				} else if (censusType == GrayS32.class) {
+					cost = new SgmCostHamming.S32();
+				} else if (censusType == GrayS64.class) {
+					cost = new SgmCostHamming.S64();
+				} else {
+					throw new IllegalArgumentException("Unsupported image type");
+				}
+				sgm = new SgmStereoDisparityCensus(censusTran,cost,selector);
 			} break;
 
 			default:
