@@ -19,7 +19,6 @@
 package boofcv.demonstrations.feature.disparity;
 
 import boofcv.factory.feature.disparity.ConfigureDisparitySGM;
-import boofcv.factory.transform.census.CensusType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 
@@ -56,25 +55,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	int offsetAdjust=500;
 	int speedAdjust=500;
 
-	// which algorithm to run
-	int selectedAlg = 0;
-	// Which error method to use
-	int selectedError = 0;
-	// The sub type of error
-	int selectedErrorVariant = 0;
 	int colorScheme = 0;
-	// minimum disparity to calculate
-	int minDisparity = 0;
-	// maximum disparity to calculate
-	int rangeDisparity = 150;
-	// maximum allowed per pixel error
-	int pixelError = 30;
-	// reverse association tolerance
-	int reverseTol = 1;
-	// how large the region radius is
-	int regionRadius = 3;
-	// How diverse the texture needs to be
-	double texture = 0.15;
 	// scale factor for input images
 	int inputScale = 100;
 
@@ -104,24 +85,16 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	JCheckBox checkRecompute  = checkbox("Recompute",recompute);
 	JCheckBox checkConcurrent = checkbox("concurrent",concurrent);
 
-	JComboBox comboAlg = combo(selectedAlg,"Five Regions","Region","Region Basic","SGM");
-	JComboBox comboError = combo(selectedError,"SAD","Census","NCC");
-	JComboBox comboErrorVariant = combo(selectedErrorVariant,"FOOBAR");
-	JSpinner minDisparitySpinner = spinner(minDisparity,0, 1000,5);
-	JSpinner rangeDisparitySpinner = spinner(rangeDisparity,1, 254,5);
-	JCheckBox subpixelToggle = checkbox("Subpixel",useSubpixel);
-	JSpinner radiusSpinner = spinner(regionRadius,1,30,1);
-	JSpinner errorSpinner = spinner(pixelError,-1,80,5);
-	JSpinner reverseSpinner = spinner(reverseTol,-1,50,1);
-	JSpinner textureSpinner = spinner(texture,0.0,1.0,0.05,1,3);
+	DisparityControlPanel controlDisparity;
 
 	// listener for changes in states
 	Listener listener;
 
-	public DisparityDisplayPanel() {
+	public DisparityDisplayPanel( int disparityMin , int disparityRange,  Class imageType ) {
+		controlDisparity = new DisparityControlPanel(disparityMin,disparityRange,imageType);
+		controlDisparity.setListener(()->listener.algorithmChanged());
 
 		update3DControls();
-		updateErrorVariant();
 
 		addLabeled(processingTimeLabel, "Time (ms)");
 		addLabeled(imageSizeLabel,"Image Size");
@@ -133,23 +106,25 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addLabeled(sliderSpeed3D,"Speed");
 		addAlignLeft(invalidToggle);
 		addSeparator(150);
-		addLabeled(comboAlg,"Method");
-		addLabeled(comboError,"Error Type");
-		addLabeled(comboErrorVariant,"Variant");
-		addLabeled(minDisparitySpinner, "Min Disparity");
-		addLabeled(rangeDisparitySpinner, "Range Disparity");
-		addAlignLeft(subpixelToggle);
-		addLabeled(radiusSpinner,    "Region Radius");
-		addLabeled(errorSpinner,     "Max Error");
-		addLabeled(textureSpinner,   "Texture");
-		addLabeled(reverseSpinner,   "Reverse");
+		add(controlDisparity);
 		addSeparator(150);
 		addLabeled(inputScaleSpinner, "Scale Input");
 		addAlignLeft(checkRecompute);
 		addAlignLeft(checkConcurrent);
 		addVerticalGlue();
 
-		setPreferredSize(new Dimension(180,0));
+		setPreferredSize(new Dimension(200,0));
+	}
+
+	/**
+	 * Disable any control which can cause a request for the disparity to be recomputed by the user
+	 */
+	public void enableAlgControls( boolean enable ) {
+		BoofSwingUtil.checkGuiThread();
+		BoofSwingUtil.recursiveEnable(controlDisparity,enable);
+		inputScaleSpinner.setEnabled(enable);
+		checkRecompute.setEnabled(enable);
+		checkConcurrent.setEnabled(enable);
 	}
 
 	public void setZoom( double _zoom ) {
@@ -171,19 +146,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 			inputScale = ((Number) inputScaleSpinner.getValue()).intValue();
 			listener.changeInputScale();
 			return;
-		} else if( e.getSource() == reverseSpinner) {
-			reverseTol = ((Number) reverseSpinner.getValue()).intValue();
-		} else if( e.getSource() == minDisparitySpinner) {
-			minDisparity = ((Number) minDisparitySpinner.getValue()).intValue();
-		} else if( e.getSource() == rangeDisparitySpinner) {
-			rangeDisparity = ((Number) rangeDisparitySpinner.getValue()).intValue();
-		} else if( e.getSource() == errorSpinner) {
-			pixelError = ((Number) errorSpinner.getValue()).intValue();
-		} else if( e.getSource() == radiusSpinner) {
-			regionRadius = ((Number) radiusSpinner.getValue()).intValue();
-		} else if( e.getSource() == textureSpinner) {
-			texture = ((Number) textureSpinner.getValue()).doubleValue();
-		} else if( e.getSource() == sliderPeriodColor ) {
+		} if( e.getSource() == sliderPeriodColor ) {
 			periodAdjust = sliderPeriodColor.getValue();
 			listener.changeView3D();
 			return;
@@ -199,23 +162,9 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 			zoom = ((Number) selectZoom.getValue()).doubleValue();
 			listener.changeZoom();
 			return;
-		}
-
-		listener.disparitySettingChange();
-	}
-
-	private void updateErrorVariant() {
-		DefaultComboBoxModel model;
-		if( selectedError == 0 ) {
-			selectedErrorVariant = -1;
-			model = new DefaultComboBoxModel();
-			comboErrorVariant.setEnabled(false);
 		} else {
-			selectedErrorVariant = 0;
-			model = new DefaultComboBoxModel(CensusType.values());
-			comboErrorVariant.setEnabled(true);
+			throw new RuntimeException("Egads");
 		}
-		comboErrorVariant.setModel(model);
 	}
 
 	@Override
@@ -230,28 +179,12 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		} else if( e.getSource() == comboColorizer) {
 			colorScheme = comboColorizer.getSelectedIndex();
 			listener.changeView3D();
-		} else if( e.getSource() == comboAlg) {
-			selectedAlg = comboAlg.getSelectedIndex();
-			listener.algorithmChanged();
-		} else if( e.getSource() == comboError) {
-			selectedError = comboError.getSelectedIndex();
-			updateErrorVariant();
-			listener.disparitySettingChange();
-		} else if( e.getSource() == comboErrorVariant) {
-			selectedErrorVariant = comboErrorVariant.getSelectedIndex();
-			listener.disparitySettingChange();
-		} else if( e.getSource() == invalidToggle) {
-			colorInvalid = invalidToggle.isSelected();
-			listener.disparityRender();
-		} else if( e.getSource() == subpixelToggle ) {
-			useSubpixel = subpixelToggle.isSelected();
-			listener.disparitySettingChange();
 		} else if( e.getSource() == checkRecompute ) {
 			recompute = checkRecompute.isSelected();
-			listener.disparitySettingChange();
+			listener.recompute();
 		} else if( e.getSource() == checkConcurrent ) {
 			concurrent = checkConcurrent.isSelected();
-			listener.disparitySettingChange();
+			listener.recompute();
 		}
 	}
 
@@ -292,13 +225,6 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		}
 	}
 
-	public void setActiveGui( boolean error , boolean reverse ) {
-		errorSpinner.setEnabled(error);
-		reverseSpinner.setEnabled(reverse);
-		subpixelToggle.setEnabled(reverse);
-		textureSpinner.setEnabled(reverse);
-	}
-
 	public void setImageSize( final int width , final int height ) {
 		BoofSwingUtil.invokeNowOrLater(() -> imageSizeLabel.setText(width+" x "+height));
 	}
@@ -315,7 +241,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	public interface Listener
 	{
 		void algorithmChanged();
-		void disparitySettingChange();
+		void recompute();
 		void disparityGuiChange();
 		void disparityRender();
 		void changeInputScale();

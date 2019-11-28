@@ -54,7 +54,7 @@ public class ConfigureDisparitySGM implements Configuration {
 	 * Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
 	 * Try 0.1 for SAD or 0.7 for NCC. Disable with a value &le; 0
 	 */
-	public double texture = 0.3;
+	public double texture = 0.15;
 	/**
 	 * If subpixel should be used to find disparity or not. If on then output disparity image needs to me GrayF32.
 	 * If false then GrayU8.
@@ -64,15 +64,15 @@ public class ConfigureDisparitySGM implements Configuration {
 	 * The penalty applied to a small change in disparity. 0 &le; x &le; {@link SgmDisparityCost#MAX_COST} and
 	 * must be less than {@link #penaltyLargeChange}.
 	 */
-	public int penaltySmallChange = 100;
+	public int penaltySmallChange = 200;
 	/**
 	 * The penalty applied to a large change in disparity. 0 &le; x &le; {@link SgmDisparityCost#MAX_COST}
 	 */
-	public int penaltyLargeChange = 1500;
+	public int penaltyLargeChange = 2000;
 	/**
-	 * Number of paths it should consider. 2,4,8,16 are valid numbers of paths.
+	 * Number of paths it should consider. 4 or 8 is most common. More paths slower it will run.
 	 */
-	public int paths = 8;
+	public Paths paths = Paths.P8;
 	/**
 	 * Which error model should it use
 	 */
@@ -84,7 +84,7 @@ public class ConfigureDisparitySGM implements Configuration {
 	/**
 	 * If Census error is used which variant should it use
 	 */
-	public CensusType censusVariant = CensusType.BLOCK_13_5;
+	public CensusType censusVariant = CensusType.BLOCK_5_5;
 
 	@Override
 	public void checkValidity() {
@@ -96,8 +96,6 @@ public class ConfigureDisparitySGM implements Configuration {
 			throw new IllegalArgumentException("Invalid value for penaltySmallChange.");
 		if( minDisparity < 0 )
 			throw new IllegalArgumentException("Minimum disparity must be >= 0");
-		if( paths < 2 || paths > 16 )
-			throw new IllegalArgumentException("Invalid number of paths. "+paths);
 	}
 
 	/**
@@ -134,5 +132,20 @@ public class ConfigureDisparitySGM implements Configuration {
 		 * is significant.
 		 */
 		public int extraIterations = 0;
+	}
+
+	/**
+	 * Allowed number of paths
+	 */
+	public enum Paths {
+		P1(1),P2(2),P4(4),P8(8),P16(16);
+		private int count;
+		Paths(int count) {
+			this.count = count;
+		}
+
+		public int getCount() {
+			return count;
+		}
 	}
 }

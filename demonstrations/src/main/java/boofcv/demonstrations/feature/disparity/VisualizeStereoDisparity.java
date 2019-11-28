@@ -24,8 +24,6 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.factory.feature.disparity.*;
-import boofcv.factory.transform.census.CensusType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.d3.DisparityToColorPointCloud;
@@ -41,7 +39,10 @@ import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.distort.Point2Transform2_F64;
-import boofcv.struct.image.*;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.visualize.*;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
@@ -98,7 +99,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	private RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 	// GUI components
-	private final DisparityDisplayPanel control = new DisparityDisplayPanel();
+	private final DisparityDisplayPanel control = new DisparityDisplayPanel(0,150,GrayU8.class);
 	private final JPanel panel = new JPanel();
 	private final DisparityImageView imagePanel = new DisparityImageView();
 	private final PointCloudViewer pcv = VisualizeData.createPointCloudViewer();
@@ -123,7 +124,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	Point2Transform2_F64 leftRectToPixel;
 
 	public VisualizeStereoDisparity(List<PathLabel> examples ) {
-		super(true,false,examples,ImageType.single(GrayF32.class));
+		super(true,false,examples,ImageType.single(GrayU8.class));
 
 		// Tell the demo code to not extract inputs from inputs
 		super.inputAsFile = true;
@@ -176,12 +177,18 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 
 	public void processDisparityInThread() {
+		// make sure the user can't modify settings while the disparity is being computed
+		control.enableAlgControls(false);
 		new Thread(this::processDisparity).start();
 	}
 
 	public synchronized void processDisparity() {
-		if( !rectifiedImages )
+		if( !rectifiedImages ) {
+			SwingUtilities.invokeLater(()->{
+				control.enableAlgControls(true);
+			});
 			return;
+		}
 
 		// if the data types have changed the images need to be rectified again
 		if( !activeAlg.getInputType().isSameType(rectLeft.getImageType())) {
@@ -202,6 +209,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		progress.stopThread();
 
 		SwingUtilities.invokeLater(()->{
+			control.enableAlgControls(true);
 			control.setProcessingTimeMS((time1-time0)/1e6);
 			disparityRender();
 		});
@@ -234,8 +242,11 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 				computedCloud = true;
 				DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 
+				int minDisparity = control.controlDisparity.getDisparityMin();
+				int rangeDisparity = control.controlDisparity.getDisparityRange();
+
 				double baseline = calib.getRightToLeft().getT().norm();
-				d2c.configure(baseline, rectK,rectR, leftRectToPixel, control.minDisparity,control.rangeDisparity);
+				d2c.configure(baseline, rectK,rectR, leftRectToPixel, minDisparity,rangeDisparity);
 				if(imagePanel.state==2) // has the user defined the ROI?
 					d2c.setRegionOfInterest(imagePanel.x0, imagePanel.y0, imagePanel.x1, imagePanel.y1);
 				d2c.process(activeAlg.getDisparity(),colorLeft);
@@ -318,17 +329,18 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	}
 
 	@Override
-	public void algorithmChanged() {
+	public synchronized void algorithmChanged() {
 		createAlgConcurrent();
-		processDisparityInThread();
+		// Only disparity of the user wants to on every setting change
+		if( control.recompute ) {
+			processDisparityInThread();
+		}
 	}
 
 	@Override
-	public synchronized void disparitySettingChange() {
+	public synchronized void recompute() {
 		if( control.recompute ) {
-			processCalled = false;
-			// NOTE: createAlgConcurrent() was causing swing to go bonkers some times when run in the GUI thread
-			new Thread(this::algorithmChanged).start();
+			processDisparityInThread();
 		}
 	}
 
@@ -350,87 +362,6 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		disparityOut = VisualizeImageData.disparity(disparity,null, activeAlg.getRangeDisparity(), color);
 
 		changeImageView();
-	}
-
-	@SuppressWarnings("unchecked")
-	public StereoDisparity<T,D> createAlg() {
-		processCalled = false;
-
-		int r = control.regionRadius;
-
-		// make sure the disparity is in a valid range
-		int maxDisparity = Math.min(colorLeft.getWidth()-2*r,
-				control.minDisparity+control.rangeDisparity);
-		int minDisparity = Math.min(maxDisparity-1,control.minDisparity);
-
-		Class inputType = GrayU8.class;
-
-		Class dispType = control.useSubpixel ? GrayF32.class : GrayU8.class;
-		DisparityError error;
-		switch( control.selectedError ) {
-			case 0: error =  DisparityError.SAD; break;
-			case 1: error =  DisparityError.CENSUS; break;
-			case 2: error =  DisparityError.NCC; inputType = GrayF32.class;break;
-			default: throw new RuntimeException("Add new error type");
-		}
-
-		if( control.selectedAlg == 0 ) {
-			changeGuiActive(true,true);
-			ConfigureDisparityBMBest5 config = new ConfigureDisparityBMBest5();
-			config.errorType = error;
-			if( error == DisparityError.CENSUS )
-				config.censusVariant = CensusType.values()[control.selectedErrorVariant];
-			config.minDisparity = minDisparity;
-			config.rangeDisparity = maxDisparity-minDisparity;
-			config.subpixel = control.useSubpixel;
-			config.regionRadiusX = config.regionRadiusY = r;
-			config.maxPerPixelError = control.pixelError;
-			config.validateRtoL = control.reverseTol;
-			config.texture = control.texture;
-			return FactoryStereoDisparity.blockMatchBest5(config,inputType,dispType);
-		} else if( control.selectedAlg < 2 ) {
-			ConfigureDisparityBM config = new ConfigureDisparityBM();
-			config.errorType = error;
-			if( error == DisparityError.CENSUS )
-				config.censusVariant = CensusType.values()[control.selectedErrorVariant];
-			config.minDisparity = minDisparity;
-			config.rangeDisparity = maxDisparity-minDisparity;
-			config.regionRadiusX = config.regionRadiusY = r;
-			if( control.selectedAlg == 1 ) {
-				changeGuiActive(true,true);
-				config.subpixel = control.useSubpixel;
-				config.maxPerPixelError = control.pixelError;
-				config.validateRtoL = control.reverseTol;
-				config.texture = control.texture;
-			} else {
-				changeGuiActive(false,false);
-				dispType = GrayU8.class;
-				config.subpixel = false;
-				config.maxPerPixelError = -1;
-				config.validateRtoL = -1;
-				config.texture = 0;
-			}
-			return FactoryStereoDisparity.blockMatch(config,inputType,dispType);
-		} else {
-			ConfigureDisparitySGM config = control.configSgm;
-			config.minDisparity = minDisparity;
-			config.rangeDisparity = maxDisparity-minDisparity;
-			config.subpixel = control.useSubpixel;
-//			config.maxError = control.pixelError; TODO add later after updating GUI
-			config.validateRtoL = control.reverseTol;
-			config.texture = control.texture;
-			config.errorType = DisparitySgmError.ABSOLUTE_DIFFERENCE;
-//			if( config.errorType == DisparitySgmError.CENSUS )
-//				config.censusVariant = CensusType.values()[control.selectedErrorVariant];
-			return FactoryStereoDisparity.sgm(config,inputType,dispType);
-		}
-	}
-
-	/**
-	 * Active and deactivates different GUI configurations
-	 */
-	private void changeGuiActive( final boolean error , final boolean reverse ) {
-		SwingUtilities.invokeLater(() -> control.setActiveGui(error,reverse));
 	}
 
 	@Override
@@ -475,7 +406,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	private void createAlgConcurrent() {
 		BoofConcurrency.USE_CONCURRENT = false;
-		activeAlg = createAlg();
+		activeAlg = control.controlDisparity.createAlgorithm();
 		BoofConcurrency.USE_CONCURRENT = true;
 	}
 

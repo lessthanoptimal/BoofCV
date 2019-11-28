@@ -55,14 +55,27 @@ public class StandardAlgConfigPanel extends JPanel {
 		return slider;
 	}
 
-	protected JComboBox<String> combo( int initial , String... items ) {
+	protected JComboBox<String> combo( int initial , Object... items ) {
 		JComboBox<String> c = new JComboBox<>();
 
 		for (int i = 0; i < items.length; i++) {
-			c.addItem(items[i]);
+			c.addItem(items[i].toString());
 		}
 		c.setSelectedIndex(initial);
 		c.addActionListener((ActionListener)this);
+		c.setMaximumSize(c.getPreferredSize());
+		return c;
+	}
+
+	protected JComboBox<String> combo( ActionListener listener, int initial , Object... items ) {
+		JComboBox<String> c = new JComboBox<>();
+
+		for (int i = 0; i < items.length; i++) {
+			c.addItem(items[i].toString());
+		}
+		c.setSelectedIndex(initial);
+		if( listener != null )
+			c.addActionListener(listener);
 		c.setMaximumSize(c.getPreferredSize());
 		return c;
 	}

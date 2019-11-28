@@ -92,7 +92,7 @@ public class FactoryStereoDisparityAlgs {
 
 		sgm.setDisparityMin(config.minDisparity);
 		sgm.setDisparityRange(config.rangeDisparity);
-		sgm.getAggregation().setPathsConsidered(config.paths);
+		sgm.getAggregation().setPathsConsidered(config.paths.getCount());
 		sgm.getAggregation().setPenalty1(config.penaltySmallChange);
 		sgm.getAggregation().setPenalty2(config.penaltyLargeChange);
 

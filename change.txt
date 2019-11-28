@@ -43,8 +43,9 @@ Version : 0.35
   * Concurrent block matching disparity
   * Support for U16 images
   * Block Matching can now be scored using Census and NCC
+  * Added Semi-Global Matching with several options for score functions
+  * TODO Add blocks for SGM error options
   * TODO Ensure that all auto code generators still work
-  * TODO Add semi-global
   * TODO NCC issues
          - Benchmark to see if other algorithms got slower because of this
          - Control EPS in GUI

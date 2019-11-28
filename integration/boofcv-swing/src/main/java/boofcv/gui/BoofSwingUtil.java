@@ -72,6 +72,19 @@ public class BoofSwingUtil {
 		return scale;
 	}
 
+	public static void recursiveEnable(JComponent panel, Boolean isEnabled) {
+		panel.setEnabled(isEnabled);
+
+		Component[] components = panel.getComponents();
+
+		for (Component component : components) {
+			if (component instanceof JComponent) {
+				recursiveEnable((JComponent) component, isEnabled);
+			}
+			component.setEnabled(isEnabled);
+		}
+	}
+
 	public static File saveFileChooser(Component parent, FileTypes ...filters) {
 		return fileChooser(parent,false,new File(".").getPath(),filters);
 	}
