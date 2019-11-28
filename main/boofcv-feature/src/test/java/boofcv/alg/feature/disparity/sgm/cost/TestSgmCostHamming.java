@@ -18,25 +18,16 @@
 
 package boofcv.alg.feature.disparity.sgm.cost;
 
-import boofcv.alg.feature.disparity.sgm.SgmDisparityCost;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Computes the cost as the absolute value between two pixels, i.e. cost = |left-right|.
- *
  * @author Peter Abeles
  */
-public abstract class SgmCostAbsoluteValue<T extends ImageBase<T>> extends SgmCostBase<T>
-{
-	public static class U8 extends SgmCostAbsoluteValue<GrayU8> {
-		@Override
-		protected void computeDisparityErrors(int idxLeft, int idxRight, int idxOut, int disparityMin, int disparityMax) {
-			int valLeft = left.data[idxLeft] & 0xFF;
-			for (int d = disparityMin; d <= disparityMax; d++) {
-				int valRight = right.data[idxRight--] & 0xFF;
-				costXD.data[idxOut+d] = (short)(SgmDisparityCost.MAX_COST*Math.abs(valRight-valLeft)/255);
-			}
-		}
+class TestSgmCostHamming {
+	@Test
+	void stuff() {
+		fail("Implement");
 	}
 }

@@ -26,7 +26,7 @@ import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_F32;
 import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_U8;
 import boofcv.alg.feature.disparity.block.select.*;
 import boofcv.alg.feature.disparity.sgm.*;
-import boofcv.alg.feature.disparity.sgm.cost.SgmCostAbsoluteValue;
+import boofcv.alg.feature.disparity.sgm.cost.SgmCostAbsoluteDifference;
 import boofcv.alg.feature.disparity.sgm.cost.SgmCostHamming;
 import boofcv.alg.feature.disparity.sgm.cost.StereoMutualInformation;
 import boofcv.factory.transform.census.FactoryCensusTransform;
@@ -67,7 +67,7 @@ public class FactoryStereoDisparityAlgs {
 			} break;
 
 			case ABSOLUTE_DIFFERENCE: {
-				sgm = new SgmStereoDisparityError(new SgmCostAbsoluteValue.U8(),selector);
+				sgm = new SgmStereoDisparityError(new SgmCostAbsoluteDifference.U8(),selector);
 			} break;
 
 			case CENSUS: {

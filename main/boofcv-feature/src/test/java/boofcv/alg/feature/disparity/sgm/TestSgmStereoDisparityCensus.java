@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.feature.disparity.sgm.cost;
+package boofcv.alg.feature.disparity.sgm;
 
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-class TestSgmCostFromBlockMatching_U8 {
+class TestSgmStereoDisparityCensus {
 	@Test
 	void stuff() {
 		fail("Implement");

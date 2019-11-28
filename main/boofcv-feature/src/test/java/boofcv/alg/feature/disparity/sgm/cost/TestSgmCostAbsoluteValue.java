@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * @author Peter Abeles
  */
-class TestSgmCostAbsoluteValue_U8 {
+class TestSgmCostAbsoluteValue {
 	@Test
 	void stuff() {
 		fail("Implement");

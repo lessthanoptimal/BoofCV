@@ -16,15 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.factory.feature.disparity;
+package boofcv.alg.feature.disparity.sgm;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Different types of error which can be applied to SGM
- *
  * @author Peter Abeles
  */
-public enum DisparitySgmError {
-	MUTUAL_INFORMATION,
-	ABSOLUTE_DIFFERENCE,
-	CENSUS
+class TestSgmStereoDisparityError {
+	@Test
+	void stuff() {
+		fail("Implement");
+	}
 }
