@@ -51,7 +51,7 @@ public interface ConfigDisparityError extends Configuration {
 		 * values are more mathematically accurate but make it more sensitive to floating point error.
 		 * This has been tuned to work with pixel values that have been scaled to -1 to 1.
 		 */
-		public double eps = 5.5e-5;
+		public double eps = 5.5e-6;
 
 		@Override
 		public void checkValidity() {
