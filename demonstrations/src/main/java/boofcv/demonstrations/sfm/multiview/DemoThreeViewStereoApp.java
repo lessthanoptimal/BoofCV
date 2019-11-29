@@ -70,6 +70,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static boofcv.gui.BoofSwingUtil.saveDisparityDialog;
+
 /**
  * Computes a stereo point cloud using three uncalibrated images. Visualizes different pre-processing steps and
  * lets the user change a few parameters.
@@ -110,6 +112,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	CameraPinholeBrown intrinsic01;
 	CameraPinholeBrown intrinsic02;
 	Se3_F64 leftToRight;
+
+	// Saved disparity image for saving to disk
+	ImageGray disparity;
 
 	// Visualized Disparity
 	BufferedImage visualDisparity= new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
@@ -159,6 +164,29 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		if( files == null )
 			return;
 		BoofSwingUtil.invokeNowOrLater(()->openImageSet(false,files));
+	}
+
+	@Override
+	protected void customAddToFileMenu(JMenu menuFile) {
+		menuFile.addSeparator();
+
+		JMenuItem itemSaveDisparity = new JMenuItem("Save Disparity");
+		itemSaveDisparity.addActionListener(e -> saveDisparity());
+		menuFile.add(itemSaveDisparity);
+
+		JMenuItem itemSaveCloud = new JMenuItem("Save Point Cloud");
+		itemSaveCloud.addActionListener(e -> savePointCloud());
+		menuFile.add(itemSaveCloud);
+	}
+
+	private void saveDisparity() {
+		ImageGray disparity = this.disparity;
+		if( disparity != null )
+			saveDisparityDialog(this,disparity);
+	}
+
+	private void savePointCloud() {
+		BoofSwingUtil.savePointCloudDialog(this,guiPointCloud);
 	}
 
 	void updateVisibleGui() {
@@ -501,7 +529,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		int disparityRange = controls.controlDisparity.getDisparityRange();
 		System.out.println("Computing disparity. range="+disparityRange);
-		ImageGray disparity = computeDisparity(rectColor1,rectColor2);
+		disparity = computeDisparity(rectColor1,rectColor2);
 
 		// remove annoying false points
 		if( disparity instanceof GrayU8)

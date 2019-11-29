@@ -24,7 +24,6 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.core.image.ConvertImage;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.d3.DisparityToColorPointCloud;
@@ -35,21 +34,18 @@ import boofcv.io.ProgressMonitorThread;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.ConvertImageMisc;
-import boofcv.io.image.UtilImageIO;
-import boofcv.io.points.PointCloudIO;
-import boofcv.struct.Point3dRgbI_F64;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.distort.Point2Transform2_F64;
-import boofcv.struct.image.*;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.visualize.*;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
-import org.apache.commons.io.FilenameUtils;
-import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
@@ -63,13 +59,11 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static boofcv.alg.geo.RectifyImageOps.transformRectToPixel;
+import static boofcv.gui.BoofSwingUtil.saveDisparityDialog;
 
 /**
  * Computes and displays disparity from still disparity images.  The disparity can be viewed
@@ -166,49 +160,15 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	private void saveDisparity() {
 		StereoDisparity<T,D> activeAlg = this.activeAlg;
-		if( activeAlg == null )
-			return;
-
-		JFileChooser fileChooser = new JFileChooser();
-		if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-			// Convert disparity into a U16 image format
-			D d = activeAlg.getDisparity();
-			GrayF32 disparity;
-			if( d instanceof GrayF32 ) {
-				disparity = (GrayF32)d;
-			} else {
-				disparity = new GrayF32(d.width,d.height);
-				ConvertImage.convert((GrayU8)d,disparity);
-			}
-			GrayU16 output = new GrayU16(disparity.width,disparity.height);
-			ConvertImageMisc.convert_F32_U16(disparity,8,output);
-
-			// save as 16-bit png
-			File file = fileChooser.getSelectedFile();
-			String n = FilenameUtils.getBaseName(file.getName())+".png";
-			UtilImageIO.saveImage(output,new File(file.getParent(),n).getAbsolutePath());
-		}
+		if( activeAlg != null )
+			saveDisparityDialog(this,activeAlg.getDisparity());
 	}
 
 	private void savePointCloud() {
 		if( !computedCloud ) {
 			JOptionPane.showMessageDialog(this, "Need to generate point cloud first");
-			return;
-		}
-
-		JFileChooser fileChooser = new JFileChooser();
-		if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-			FastQueue<Point3dRgbI_F64> cloud = pcv.copyCloud(null);
-			File file = fileChooser.getSelectedFile();
-			String n = FilenameUtils.getBaseName(file.getName())+".ply";
-			try {
-				File f = new File(file.getParent(),n);
-				FileWriter w = new FileWriter(f);
-				PointCloudIO.save3DRgbI64F(PointCloudIO.Format.PLY_ASCII, cloud.toList(),w);
-				w.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		} else {
+			BoofSwingUtil.savePointCloudDialog(this,pcv);
 		}
 	}
 

@@ -18,8 +18,19 @@
 
 package boofcv.gui;
 
+import boofcv.core.image.ConvertImage;
 import boofcv.gui.dialogs.OpenImageSetDialog;
+import boofcv.io.image.ConvertImageMisc;
+import boofcv.io.image.UtilImageIO;
+import boofcv.io.points.PointCloudIO;
+import boofcv.struct.Point3dRgbI_F64;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
+import boofcv.visualize.PointCloudViewer;
 import org.apache.commons.io.FilenameUtils;
+import org.ddogleg.struct.FastQueue;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -33,6 +44,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -451,6 +463,51 @@ public class BoofSwingUtil {
 		if( home == null )
 			home = "";
 		return new File(home);
+	}
+
+	/**
+	 * Opens a dialog, asks the user where to save the point cloud, then saves the point cloud
+	 */
+	public static void savePointCloudDialog(Component owner,PointCloudViewer pcv) {
+		JFileChooser fileChooser = new JFileChooser();
+		if (fileChooser.showSaveDialog(owner) == JFileChooser.APPROVE_OPTION) {
+			FastQueue<Point3dRgbI_F64> cloud = pcv.copyCloud(null);
+			File file = fileChooser.getSelectedFile();
+			String n = FilenameUtils.getBaseName(file.getName())+".ply";
+			try {
+				File f = new File(file.getParent(),n);
+				FileWriter w = new FileWriter(f);
+				PointCloudIO.save3DRgbI64F(PointCloudIO.Format.PLY_ASCII, cloud.toList(),w);
+				w.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Opens a dialog, asks the user where to save the disparity image, converts the image into a U16 format,
+	 * saves it as a PNG
+	 */
+	public static void saveDisparityDialog( JComponent owner, ImageGray d) {
+		JFileChooser fileChooser = new JFileChooser();
+		if (fileChooser.showSaveDialog(owner) == JFileChooser.APPROVE_OPTION) {
+			// Convert disparity into a U16 image format
+			GrayF32 disparity;
+			if( d instanceof GrayF32 ) {
+				disparity = (GrayF32)d;
+			} else {
+				disparity = new GrayF32(d.width,d.height);
+				ConvertImage.convert((GrayU8)d,disparity);
+			}
+			GrayU16 output = new GrayU16(disparity.width,disparity.height);
+			ConvertImageMisc.convert_F32_U16(disparity,8,output);
+
+			// save as 16-bit png
+			File file = fileChooser.getSelectedFile();
+			String n = FilenameUtils.getBaseName(file.getName())+".png";
+			UtilImageIO.saveImage(output,new File(file.getParent(),n).getAbsolutePath());
+		}
 	}
 
 	public enum FileTypes
