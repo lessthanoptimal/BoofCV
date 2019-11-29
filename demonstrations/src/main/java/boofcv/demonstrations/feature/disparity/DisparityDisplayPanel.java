@@ -91,7 +91,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	Listener listener;
 
 	public DisparityDisplayPanel( int disparityMin , int disparityRange,  Class imageType ) {
-		controlDisparity = new DisparityControlPanel(disparityMin,disparityRange,imageType);
+		controlDisparity = DisparityControlPanel.createRange(disparityMin,disparityRange,imageType);
 		controlDisparity.setListener(()->listener.algorithmChanged());
 
 		update3DControls();

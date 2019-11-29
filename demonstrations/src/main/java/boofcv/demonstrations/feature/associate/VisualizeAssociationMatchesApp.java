@@ -142,7 +142,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY,2);
 		if( files == null )
 			return;
-		BoofSwingUtil.invokeNowOrLater(()->openImageSet(files));
+		BoofSwingUtil.invokeNowOrLater(()->openImageSet(false,files));
 	}
 
 	@Override

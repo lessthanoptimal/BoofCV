@@ -50,7 +50,6 @@ Version : 0.35
   * TODO Ensure that all auto code generators still work
   * TODO NCC issues
          - Benchmark to see if other algorithms got slower because of this
-         - Control EPS in GUI
 - SFM
   * Projective camera with lens distortion
   * TODO Stereo VO Quad - Now uses trifocal tensor and sparse bundle adjustment
@@ -62,18 +61,17 @@ Version : 0.35
   * TODO Prune similar based on edge difference
   * TODO why pick long line in calib?
 
-
 TODO Tech Report for new chessboard detector, assisted calibration, line fitting
 TODO Videos - hough line detectors
             - chessboard corner detector + improvements
 
 TODO corner detector 2 tech report
 TODO Scene Reconstruction from arbitrary number of photos
-TODO regression for line detectors
 TODO regression for stereo disparity using ground truth
 TODO hough circle detector
 TODO concurrent SIFT
 TODO concurrent dense features?
+TODO Estimate focal lengths given disparity image
 
 ---------------------------------------------
 Date    : 2019-July-07

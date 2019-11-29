@@ -117,7 +117,7 @@ public class DenseFlowApp
 		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY,2);
 		if( files == null )
 			return;
-		BoofSwingUtil.invokeNowOrLater(()->openImageSet(files));
+		BoofSwingUtil.invokeNowOrLater(()->openImageSet(false,files));
 	}
 
 	@Override

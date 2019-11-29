@@ -46,31 +46,45 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 
 	// which algorithm to run
 	int selectedMethod = 0;
-	public final ConfigDisparityBMBest5 configBM = new ConfigDisparityBMBest5();
-	public final ConfigDisparitySGM configSGM = new ConfigDisparitySGM();
+	public final ConfigDisparityBMBest5 configBM;
+	public final ConfigDisparitySGM configSGM;
 
-	JComboBox comboMethod = combo(e -> handleMethod(), selectedMethod,"BlockMatch-5","BlockMatch","SGM");
-	JComboBox comboError = combo(e -> handleErrorSelected(false),configBM.errorType.ordinal(),ERRORS_BLOCK);
+	JComboBox comboMethod, comboError;
 
 	JTabbedPane tabbedPane = new JTabbedPane();
 
 	// Controls for families of algorithms
-	ControlsBlockMatching controlBM = new ControlsBlockMatching();
-	ControlsSemiGlobal controlSGM = new ControlsSemiGlobal();
+	ControlsBlockMatching controlBM;
+	ControlsSemiGlobal controlSGM;
 
 	// Controls for error types
-	ControlsSAD controlSad = new ControlsSAD();
-	ControlsCensus controlCensus = new ControlsCensus();
-	ControlsNCC controlNCC = new ControlsNCC();
-	ControlsMutualInfo controlHMI = new ControlsMutualInfo();
+	ControlsSAD controlSad;
+	ControlsCensus controlCensus;
+	ControlsNCC controlNCC;
+	ControlsMutualInfo controlHMI;
 
 	boolean ignoreChanges=false;
 
 	Listener listener;
 	Class imageType;
 
-	public DisparityControlPanel( int disparityMin , int disparityRange, Class imageType) {
+	public DisparityControlPanel( ConfigDisparityBMBest5 configBM,
+								  ConfigDisparitySGM configSGM,
+								  Class imageType)
+	{
+		this.configBM = configBM;
+		this.configSGM = configSGM;
 		this.imageType = imageType;
+
+		comboMethod = combo(e -> handleMethod(), selectedMethod,"BlockMatch-5","BlockMatch","SGM");
+		comboError = combo(e -> handleErrorSelected(false),configBM.errorType.ordinal(),ERRORS_BLOCK);
+		controlBM = new ControlsBlockMatching();
+		controlSGM = new ControlsSemiGlobal();
+		controlSad = new ControlsSAD();
+		controlCensus = new ControlsCensus();
+		controlNCC = new ControlsNCC();
+		controlHMI = new ControlsMutualInfo();
+
 		tabbedPane.addTab("Method",controlBM);
 		tabbedPane.addTab("Error",controlSad);
 
@@ -80,12 +94,18 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		addLabeled(comboMethod,"Method");
 		addLabeled(comboError,"Error");
 		add(tabbedPane);
+	}
 
-		// initially set both to have the same values for disparity
-		controlBM.spinnerDisparityMin.setValue(disparityMin);
-		controlBM.spinnerDisparityRange.setValue(disparityRange);
-		controlSGM.spinnerDisparityMin.setValue(disparityMin);
-		controlSGM.spinnerDisparityRange.setValue(disparityRange);
+	public static DisparityControlPanel createRange( int disparityMin , int disparityRange, Class imageType) {
+		ConfigDisparityBMBest5 configBM = new ConfigDisparityBMBest5();
+		ConfigDisparitySGM configSGM = new ConfigDisparitySGM();
+
+		configBM.minDisparity = disparityMin;
+		configBM.rangeDisparity = disparityRange;
+		configSGM.minDisparity = disparityMin;
+		configSGM.rangeDisparity = disparityRange;
+
+		return new DisparityControlPanel(configBM,configSGM,imageType);
 	}
 
 	public void broadcastChange() {
@@ -446,7 +466,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 	}
 
 	public static void main(String[] args) {
-		DisparityControlPanel controls = new DisparityControlPanel(0,150,null);
+		DisparityControlPanel controls = DisparityControlPanel.createRange(0,150,null);
 		ShowImages.showWindow(controls,"Controls");
 	}
 }

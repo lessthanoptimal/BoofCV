@@ -18,7 +18,13 @@
 
 package boofcv.demonstrations.sfm.multiview;
 
+import boofcv.demonstrations.feature.disparity.DisparityControlPanel;
+import boofcv.factory.feature.disparity.ConfigDisparityBMBest5;
+import boofcv.factory.feature.disparity.ConfigDisparitySGM;
+import boofcv.factory.feature.disparity.DisparityError;
+import boofcv.factory.transform.census.CensusVariants;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.struct.image.GrayU8;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -41,8 +47,6 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	JSpinner sPrune;
 	JCheckBox cFocalAuto;
 	JSpinner sFocal;
-	JSpinner sMinDisparity;
-	JSpinner sRangeDisparity;
 	JButton bCompute = new JButton("Compute");
 
 	JTextArea textInfo = new JTextArea();
@@ -53,14 +57,14 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	int prune = 30; // percentage of features it will prune at the very end
 	boolean autoFocal=true;
 	int focal = 500;
-	int minDisparity = 0;
-	int rangeDisparity = 255;
+
+	DisparityControlPanel controlDisparity;
 
 	DemoThreeViewStereoApp owner;
 
-	boolean scaleChanged = false;
-	boolean assocChanged = false;
-	boolean stereoChanged = false;
+	boolean scaleChanged = true;
+	boolean assocChanged = true;
+	boolean stereoChanged = true;
 
 	public DemoThreeViewControls( DemoThreeViewStereoApp owner ) {
 		this.owner = owner;
@@ -70,10 +74,9 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		sPrune = spinner(prune,0,100,5);
 		cFocalAuto = checkbox("Auto Focal",autoFocal);
 		sFocal = spinner(focal,100,3000,50);
-		sMinDisparity = spinner(minDisparity,0,1000,10);
-		sRangeDisparity = spinner(rangeDisparity,1,254,10);
 		bCompute.addActionListener(this);
 		bCompute.setMinimumSize(bCompute.getPreferredSize());
+		addDisparityControls();
 
 		textInfo.setEditable(false);
 
@@ -81,18 +84,41 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 			sFocal.setEnabled(false);
 		}
 
+		JTabbedPane tabs = new JTabbedPane();
+		tabs.addTab("Self",createSelfCalibPanel());
+		tabs.addTab("Stereo",controlDisparity);
+		tabs.setMaximumSize(tabs.getPreferredSize());
+
 		addLabeled(imageView,"View");
-		addLabeled(sMaxSize,"Image Size");
-		addLabeled(sInliers,"Inliers");
-		addLabeled(sPrune,"Prune");
-		addAlignLeft(cFocalAuto);
-		addLabeled(sFocal,"Focal");
-		addLabeled(sMinDisparity,"Min Disparity");
-		addLabeled(sRangeDisparity,"Range Disparity");
+		add(tabs);
 		add(new JScrollPane(textInfo));
 		addAlignCenter(bCompute);
 
 		disableComputeButton();
+	}
+
+	private void addDisparityControls() {
+		ConfigDisparityBMBest5 configBM = new ConfigDisparityBMBest5();
+		ConfigDisparitySGM configSGM = new ConfigDisparitySGM();
+
+		configBM.minDisparity = configSGM.minDisparity = 0;
+		configBM.rangeDisparity = configSGM.rangeDisparity = 200;
+		configBM.regionRadiusX = configBM.regionRadiusY = 4;
+		configBM.errorType = DisparityError.CENSUS;
+		configBM.configCensus.variant = CensusVariants.BLOCK_7_7;
+
+		controlDisparity = new DisparityControlPanel(configBM,configSGM, GrayU8.class);
+		controlDisparity.setListener(this::handleStereoChanged);
+	}
+
+	private JPanel createSelfCalibPanel() {
+		StandardAlgConfigPanel panel = new StandardAlgConfigPanel();
+		panel.addLabeled(sMaxSize,"Image Size");
+		panel.addLabeled(sInliers,"Inliers");
+		panel.addLabeled(sPrune,"Prune");
+		panel.addAlignLeft(cFocalAuto);
+		panel.addLabeled(sFocal,"Focal");
+		return panel;
 	}
 
 	public void clearText() {
@@ -110,22 +136,17 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 
 	public void disableComputeButton() {
 		bCompute.setEnabled(false);
+	}
 
-		scaleChanged = false;
-		assocChanged = false;
-		stereoChanged = false;
+	void handleStereoChanged() {
+		stereoChanged = true;
+		bCompute.setEnabled(true);
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		boolean compute = true;
-		if( e.getSource() == sMinDisparity ) {
-			minDisparity = ((Number)sMinDisparity.getValue()).intValue();
-			stereoChanged = true;
-		} else if( e.getSource() == sRangeDisparity) {
-			rangeDisparity = ((Number) sRangeDisparity.getValue()).intValue();
-			stereoChanged = true;
-		} else if( e.getSource() == sInliers ) {
+		if( e.getSource() == sInliers ) {
 			inliers = ((Number)sInliers.getValue()).doubleValue();
 			stereoChanged = true;
 		} else if( e.getSource() == sPrune ) {

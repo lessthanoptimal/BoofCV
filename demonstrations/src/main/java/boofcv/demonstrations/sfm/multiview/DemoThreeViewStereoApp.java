@@ -36,9 +36,6 @@ import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.feature.disparity.ConfigDisparityBMBest5;
-import boofcv.factory.feature.disparity.DisparityError;
-import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.d3.DisparityToColorPointCloud;
@@ -119,6 +116,10 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	BufferedImage visualRect1= new BufferedImage(1,1, BufferedImage.TYPE_INT_RGB),
 			visualRect2= new BufferedImage(1,1, BufferedImage.TYPE_INT_RGB);
 
+	Planar<GrayU8> rectColor1 = new Planar<>(GrayU8.class, 1,1, 3);
+	Planar<GrayU8> rectColor2 = new Planar<>(GrayU8.class, 1,1, 3);
+	GrayU8 rectMask = new GrayU8(1,1);
+
 	final Object lockProcessing = new Object();
 	boolean processing = false;
 	boolean hasAllImages = false;
@@ -149,7 +150,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, gui);
 
-		setPreferredSize(new Dimension(800,600));
+		setPreferredSize(new Dimension(900,700));
 	}
 
 	@Override
@@ -157,7 +158,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY,3);
 		if( files == null )
 			return;
-		BoofSwingUtil.invokeNowOrLater(()->openImageSet(files));
+		BoofSwingUtil.invokeNowOrLater(()->openImageSet(false,files));
 	}
 
 	void updateVisibleGui() {
@@ -201,7 +202,13 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	 * Prevent the user from tring to process more than one image at once
 	 */
 	@Override
-	public void openImageSet(String ...files ) {
+	public void openImageSet(boolean reopen, String ...files ) {
+		// Make sure it recomputes everything when a new image set is opened
+		if(!reopen) {
+			controls.scaleChanged = true;
+			controls.assocChanged = true;
+			controls.stereoChanged = true;
+		}
 		synchronized (lockProcessing) {
 			if( processing ) {
 				JOptionPane.showMessageDialog(this, "Still processing");
@@ -210,7 +217,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		}
 		// disable the menu until it finish processing the images
 		setMenuBarEnabled(false);
-		super.openImageSet(files);
+		super.openImageSet(reopen,files);
 	}
 
 	void handleComputePressed() {
@@ -224,19 +231,21 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		if( controls.scaleChanged ) {
 			reprocessInput();
 		} else {
-			boolean skipAssociate = true;
-			boolean skipStructure = true;
-
-			if (controls.assocChanged) {
-				skipAssociate = false;
-				skipStructure = false;
+			boolean skipAssociate = false;
+			boolean skipSparseStructure = false;
+			if( !controls.assocChanged ) {
+				skipAssociate = true;
+				if( controls.stereoChanged ) {
+					skipSparseStructure = true;
+				}
 			}
-			if (controls.stereoChanged) {
-				skipStructure = false;
-			}
+			controls.scaleChanged = false;
+			controls.assocChanged = false;
+			controls.stereoChanged = false;
+//			System.out.println("computePressed associate "+skipAssociate+" sparse "+skipSparseStructure);
 
 			boolean _assoc = skipAssociate;
-			boolean _struct = skipStructure;
+			boolean _struct = skipSparseStructure;
 
 			new Thread(()-> safeProcessImages(_assoc, _struct)).start();
 		}
@@ -294,6 +303,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			hasAllImages = true;
 		}
 
+		controls.scaleChanged = false;
+		controls.assocChanged = false;
+		controls.stereoChanged = false;
 		safeProcessImages(false,false);
 	}
 
@@ -328,7 +340,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		}
 	}
 
-	private void safeProcessImages( boolean skipAssociate , boolean skipStructure ) {
+	private void safeProcessImages( boolean skipAssociate , boolean skipSparseStructure ) {
 		// bad stuff happens if processing is called twice at once
 		synchronized (lockProcessing) {
 			if( processing )
@@ -342,7 +354,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		SwingUtilities.invokeLater(()->setMenuBarEnabled(false));
 
 		try {
-			processImages(skipAssociate,skipStructure);
+			processImages(skipAssociate,skipSparseStructure);
 		} catch (RuntimeException e ) {
 
 		} finally {
@@ -431,7 +443,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		// Pick the two best views to compute stereo from
 		int[]selected = selectBestPair(structureEstimator.structure);
 
-		if (computeStereoCloud(selected[0],selected[1], cx, cy))
+		if (computeStereoCloud(selected[0],selected[1], cx, cy,skipStructure))
 			return;
 
 		long time1 = System.currentTimeMillis();
@@ -441,65 +453,67 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		System.out.println("Success!");
 	}
 
-	private boolean computeStereoCloud( int view0 , int view1, double cx, double cy) {
-		System.out.println("Computing rectification: views "+view0+" "+view1);
-		SceneStructureMetric structure = structureEstimator.getStructure();
+	private boolean computeStereoCloud( int view0 , int view1, double cx, double cy, boolean skipRectify) {
+		if( !skipRectify ) {
+			System.out.println("Computing rectification: views " + view0 + " " + view1);
+			SceneStructureMetric structure = structureEstimator.getStructure();
 
-		BundlePinholeSimplified cp = structure.getCameras().get(view0).getModel();
-		intrinsic01 = new CameraPinholeBrown();
-		intrinsic01.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[view0].width, dimensions[view0].height);
-		intrinsic01.fsetRadial(cp.k1, cp.k2);
+			BundlePinholeSimplified cp = structure.getCameras().get(view0).getModel();
+			intrinsic01 = new CameraPinholeBrown();
+			intrinsic01.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[view0].width, dimensions[view0].height);
+			intrinsic01.fsetRadial(cp.k1, cp.k2);
 
-		cp = structure.getCameras().get(view1).getModel();
-		intrinsic02 = new CameraPinholeBrown();
-		intrinsic02.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[view1].width, dimensions[view1].height);
-		intrinsic02.fsetRadial(cp.k1, cp.k2);
+			cp = structure.getCameras().get(view1).getModel();
+			intrinsic02 = new CameraPinholeBrown();
+			intrinsic02.fsetK(cp.f, cp.f, 0, cx, cy, dimensions[view1].width, dimensions[view1].height);
+			intrinsic02.fsetRadial(cp.k1, cp.k2);
 
-		Se3_F64 w_to_0 = structure.views.data[view0].worldToView;
-		Se3_F64 w_to_1 = structure.views.data[view1].worldToView;
+			Se3_F64 w_to_0 = structure.views.data[view0].worldToView;
+			Se3_F64 w_to_1 = structure.views.data[view1].worldToView;
 
-		leftToRight = w_to_0.invert(null).concat(w_to_1,null);
+			leftToRight = w_to_0.invert(null).concat(w_to_1, null);
 
-		Planar<GrayU8> color1 = new Planar<>(GrayU8.class, dimensions[view0].width, dimensions[view0].height, 3);
-		Planar<GrayU8> color2 = new Planar<>(GrayU8.class, dimensions[view1].width, dimensions[view1].height, 3);
-		ConvertBufferedImage.convertFrom(buff[view0], color1, true);
-		ConvertBufferedImage.convertFrom(buff[view1], color2, true);
+			Planar<GrayU8> color1 = new Planar<>(GrayU8.class, dimensions[view0].width, dimensions[view0].height, 3);
+			Planar<GrayU8> color2 = new Planar<>(GrayU8.class, dimensions[view1].width, dimensions[view1].height, 3);
+			ConvertBufferedImage.convertFrom(buff[view0], color1, true);
+			ConvertBufferedImage.convertFrom(buff[view1], color2, true);
 
-		// rectify a colored image
-		Planar<GrayU8> rectColor1 = new Planar<>(GrayU8.class, color1.width, color1.height, 3);
-		Planar<GrayU8> rectColor2 = new Planar<>(GrayU8.class, color2.width, color2.height, 3);
-		GrayU8 rectMask = new GrayU8(color1.width, color1.height);
+			// rectify a colored image
+			rectifyImages(color1, color2, leftToRight, intrinsic01, intrinsic02,
+					rectColor1, rectColor2, rectMask, rectifiedK, rectifiedR);
 
-		rectifyImages(color1, color2, leftToRight, intrinsic01, intrinsic02,
-				rectColor1, rectColor2,rectMask, rectifiedK, rectifiedR);
-
-		visualRect1 = ConvertBufferedImage.checkDeclare(
-				rectColor1.width, rectColor1.height, visualRect1, visualRect1.getType());
-		visualRect2 = ConvertBufferedImage.checkDeclare(
-				rectColor2.width, rectColor2.height, visualRect2, visualRect2.getType());
-		ConvertBufferedImage.convertTo(rectColor1, visualRect1, true);
-		ConvertBufferedImage.convertTo(rectColor2, visualRect2, true);
-		BoofSwingUtil.invokeNowOrLater(() -> {
-			rectifiedPanel.setImages(visualRect1, visualRect2);
-			controls.setViews(2);
-		});
+			visualRect1 = ConvertBufferedImage.checkDeclare(
+					rectColor1.width, rectColor1.height, visualRect1, visualRect1.getType());
+			visualRect2 = ConvertBufferedImage.checkDeclare(
+					rectColor2.width, rectColor2.height, visualRect2, visualRect2.getType());
+			ConvertBufferedImage.convertTo(rectColor1, visualRect1, true);
+			ConvertBufferedImage.convertTo(rectColor2, visualRect2, true);
+			BoofSwingUtil.invokeNowOrLater(() -> {
+				rectifiedPanel.setImages(visualRect1, visualRect2);
+				controls.setViews(2);
+			});
+		}
 
 		if (rectifiedK.get(0, 0) < 0) {
 			SwingUtilities.invokeLater(()-> controls.addText("Rectification Failed!\n"));
 			return false;
 		}
 
-		System.out.println("Computing disparity. min="+controls.minDisparity+" range="+controls.rangeDisparity);
-		GrayF32 disparity = computeDisparity(rectColor1,rectColor2);
+		int disparityRange = controls.controlDisparity.getDisparityRange();
+		System.out.println("Computing disparity. range="+disparityRange);
+		ImageGray disparity = computeDisparity(rectColor1,rectColor2);
 
 		// remove annoying false points
-		RectifyImageOps.applyMask(disparity,rectMask,0);
+		if( disparity instanceof GrayU8)
+			RectifyImageOps.applyMask((GrayU8)disparity,rectMask,0);
+		else
+			RectifyImageOps.applyMask((GrayF32)disparity,rectMask,0);
 
 		visualDisparity = ConvertBufferedImage.checkDeclare(
 				disparity.width,disparity.height,visualDisparity,visualDisparity.getType());
 
 		BoofSwingUtil.invokeNowOrLater(()-> {
-			VisualizeImageData.disparity(disparity, visualDisparity, controls.rangeDisparity, 0);
+			VisualizeImageData.disparity(disparity, visualDisparity, disparityRange, 0);
 			guiDisparity.setImageRepaint(visualDisparity);
 			controls.setViews(3);
 		});
@@ -605,12 +619,15 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		ImageDistort<C,C> distortRight =
 				RectifyImageOps.rectifyImage(intrinsic2, rect2_F32, BorderType.EXTENDED, distorted2.getImageType());
 
-		rectifiedMask.reshape(rectified1.width,rectified2.height);
+		rectifiedMask.reshape(distorted1);
+		rectified1.reshape(distorted1.width,distorted1.height);
+		rectified2.reshape(distorted1.width,distorted1.height);
+
 		distortLeft.apply(distorted1, rectified1, rectifiedMask);
 		distortRight.apply(distorted2, rectified2);
 	}
 
-	public GrayF32 computeDisparity( Planar<GrayU8> rectColor1 , Planar<GrayU8> rectColor2 )
+	public ImageGray computeDisparity( Planar<GrayU8> rectColor1 , Planar<GrayU8> rectColor2 )
 	{
 		GrayU8 rectifiedLeft = new GrayU8(rectColor1.width,rectColor1.height);
 		GrayU8 rectifiedRight = new GrayU8(rectColor2.width,rectColor2.height);
@@ -618,32 +635,25 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		ConvertImage.average(rectColor2,rectifiedRight);
 
 		// compute disparity
-		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
-		config.errorType = DisparityError.NCC;
-		config.minDisparity = controls.minDisparity;
-		config.rangeDisparity = controls.rangeDisparity;
-		config.subpixel = true;
-		config.regionRadiusX = config.regionRadiusY = 6;
-		config.validateRtoL = 1;
-		config.texture = 0.6;
-		StereoDisparity<GrayU8, GrayF32> disparityAlg =
-				FactoryStereoDisparity.blockMatchBest5(config, GrayU8.class, GrayF32.class);
-
-		// process and return the results
+		StereoDisparity disparityAlg = controls.controlDisparity.createAlgorithm();
 		disparityAlg.process(rectifiedLeft, rectifiedRight);
-		return disparityAlg.getDisparity();
+
+		return (ImageGray)disparityAlg.getDisparity();
 	}
 
 	/**
 	 * Show results as a point cloud
 	 */
-	public void showPointCloud(GrayF32 disparity, BufferedImage left,
+	public void showPointCloud(ImageGray disparity, BufferedImage left,
 							   Se3_F64 motion, DMatrixRMaj rectifiedK , DMatrixRMaj rectifiedR)
 	{
 		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 		double baseline = motion.getT().norm();
-		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), controls.minDisparity,
-				controls.minDisparity+controls.rangeDisparity);
+		int disparityMin = controls.controlDisparity.getDisparityMin();
+		int disparityRange = controls.controlDisparity.getDisparityRange();
+
+		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(),
+				disparityMin,disparityMin+disparityRange);
 		d2c.process(disparity,left);
 
 		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK,disparity.width,disparity.height,null);

@@ -258,7 +258,7 @@ public abstract class DemonstrationBase extends JPanel {
 				openFile(new File(p.path[0]));
 			else {
 //				openFile(new File(p.path[0]));
-				openImageSet(p.path);
+				openImageSet(false,p.path);
 			}
 		} else if (o instanceof String) {
 			openFile(new File((String) o));
@@ -409,7 +409,7 @@ public abstract class DemonstrationBase extends JPanel {
 	 * Opens a set of images
 	 * @param files
 	 */
-	public void openImageSet(String ...files ) {
+	public void openImageSet(boolean reopen, String ...files ) {
 		synchronized (lockStartingProcess) {
 			if( startingProcess ) {
 				System.out.println("Ignoring open image set request.  Detected spamming");
@@ -918,7 +918,7 @@ public abstract class DemonstrationBase extends JPanel {
 			BufferedImage buff = inputStreams.get(0).getBufferedImage();
 			openImage(true,new File(inputFilePath).getName(),buff);// TODO still does a pointless image conversion
 		} else if( inputMethod == InputMethod.IMAGE_SET ) {
-			openImageSet(inputFileSet);
+			openImageSet(true,inputFileSet);
 		}
 	}
 
