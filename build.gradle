@@ -321,9 +321,9 @@ task testReport(type: TestReport) {
     reportOn subprojects*.test
 }
 
-task wrapper(type: Wrapper) {
+wrapper {
     distributionType = Wrapper.DistributionType.BIN
-    gradleVersion = '4.10.2'
+    gradleVersion = '5.6.4'
 }
 
 // Disable the creation of jars for distribution.  If you don't do this it will crash
