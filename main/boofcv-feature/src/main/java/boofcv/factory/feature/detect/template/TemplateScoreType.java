@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,9 @@
 
 package boofcv.factory.feature.detect.template;
 
+import boofcv.alg.feature.detect.template.TemplateSumAbsoluteDifference;
+import boofcv.alg.feature.detect.template.TemplateSumSquaredError;
+
 /**
  * List of formulas used to score matches in a template.
  *
@@ -25,13 +28,21 @@ package boofcv.factory.feature.detect.template;
  */
 public enum TemplateScoreType {
 	/**
+	 * <p>Sum of the absolute difference error.</p>
+	 *
+	 * <p>error = Sum<sub>(o,u)</sub> | I(x,y) - T(x-o,y-u) | </p>
+	 *
+	 * @see TemplateSumAbsoluteDifference
+	 */
+	SUM_ABSOLUTE_DIFFERENCE,
+	/**
 	 * <p>Sum of the difference squared or Euclidean error squared.</p>
 	 *
 	 * <p>error = Sum<sub>(o,u)</sub> [ I(x,y) - T(x-o,y-u) ]^2 </p>
 	 *
-	 * @see boofcv.alg.feature.detect.template.TemplateDiffSquared
+	 * @see TemplateSumSquaredError
 	 */
-	SUM_DIFF_SQ,
+	SUM_SQUARE_ERROR,
 	/**
 	 * <p>
 	 * Normalized Cross Correlation (NCC) error metric.  Adds invariance to lighting conditions

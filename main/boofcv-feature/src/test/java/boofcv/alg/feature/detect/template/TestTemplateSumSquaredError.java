@@ -25,19 +25,18 @@ import org.junit.jupiter.api.Nested;
 /**
  * @author Peter Abeles
  */
-class TestTemplateDiffSquared_MT {
-
+class TestTemplateSumSquaredError {
 	@Nested
-	class F32 extends GeneralTemplateIntensityImage_MT<GrayF32> {
+	class F32 extends GeneralTemplateMatchTests<GrayF32> {
 		F32() {
-			super(new TemplateDiffSquared.F32(), GrayF32.class);
+			super(new TemplateSumSquaredError.F32(), GrayF32.class);
 		}
 	}
 
 	@Nested
-	class U8 extends GeneralTemplateIntensityImage_MT<GrayU8> {
+	class U8 extends GeneralTemplateMatchTests<GrayU8> {
 		U8() {
-			super(new TemplateDiffSquared.U8(), GrayU8.class);
+			super(new TemplateSumSquaredError.U8(), GrayU8.class);
 		}
 	}
 }

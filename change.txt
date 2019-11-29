@@ -27,7 +27,9 @@ Version : 0.35
     * Thanks waicool20 for reporting this bug
   * Functions which maximize and minimized have specialized code
     * Fixed edge cases where having a border of zero messed things up
-  * Sum Squared error produces similarly scaled numbers for U8 and F32 now
+  * Sum Squared Error (SSE) produces similarly scaled numbers for U8 and F32 now
+  * Added Sum Absolute Difference (SAD) error
+  * Updated error names to make them more common
 - Concurrency
   * PixelMath now only uses concurrent algorithm when input image is more than 10,000 pixels.
     Going MT on small images caused Circulant tracker to slow down.

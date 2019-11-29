@@ -75,8 +75,8 @@ public class BenchmarkTemplateIntensity {
 		GImageMiscOps.fillUniform(template_F32, rand, 0, 200);
 		GImageMiscOps.fillUniform(template_U8, rand, 0, 200);
 
-		ssd_F32 = FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_DIFF_SQ,GrayF32.class);
-		ssd_U8 = FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_DIFF_SQ,GrayU8.class);
+		ssd_F32 = FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_SQUARE_ERROR,GrayF32.class);
+		ssd_U8 = FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_SQUARE_ERROR,GrayU8.class);
 
 		ncc_F32 = FactoryTemplateMatching.createIntensity(TemplateScoreType.NCC,GrayF32.class);
 		ncc_U8 = FactoryTemplateMatching.createIntensity(TemplateScoreType.NCC,GrayU8.class);

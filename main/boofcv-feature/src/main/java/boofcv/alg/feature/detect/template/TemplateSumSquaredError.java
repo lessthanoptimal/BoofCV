@@ -24,7 +24,7 @@ import boofcv.struct.image.ImageBase;
 
 /**
  * <p>
- * Scores the difference between the template and the image using difference squared error.
+ * Scores the difference between the template and the image using sum of squared error (SSE).
  * The error is multiplied by -1 to ensure that the best fits are peaks and not minimums.
  * </p>
  *
@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageBase;
  *
  * @author Peter Abeles
  */
-public abstract class TemplateDiffSquared<T extends ImageBase<T>>
+public abstract class TemplateSumSquaredError<T extends ImageBase<T>>
 		implements TemplateIntensityImage.EvaluatorMethod<T>
 {
 	TemplateIntensityImage<T> o;
@@ -43,7 +43,7 @@ public abstract class TemplateDiffSquared<T extends ImageBase<T>>
 	}
 	// IF MORE IMAGE TYPES ARE ADDED CREATE A GENERATOR FOR THIS CLASS
 
-	public static class F32 extends TemplateDiffSquared<GrayF32> {
+	public static class F32 extends TemplateSumSquaredError<GrayF32> {
 		@Override
 		public float evaluate(int tl_x, int tl_y) {
 
@@ -91,7 +91,7 @@ public abstract class TemplateDiffSquared<T extends ImageBase<T>>
 		}
 	}
 
-	public static class U8 extends TemplateDiffSquared<GrayU8> {
+	public static class U8 extends TemplateSumSquaredError<GrayU8> {
 		@Override
 		public float evaluate(int tl_x, int tl_y) {
 

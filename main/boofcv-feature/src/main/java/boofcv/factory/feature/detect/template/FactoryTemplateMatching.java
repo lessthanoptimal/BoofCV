@@ -54,11 +54,21 @@ public class FactoryTemplateMatching {
 		EvaluatorMethod<T> method;
 
 		switch (type) {
-			case SUM_DIFF_SQ:
+			case SUM_ABSOLUTE_DIFFERENCE:
 				if (imageType == GrayU8.class) {
-					method = (EvaluatorMethod<T>)new TemplateDiffSquared.U8();
+					method = (EvaluatorMethod<T>)new TemplateSumAbsoluteDifference.U8();
 				} else if (imageType == GrayF32.class) {
-					method = (EvaluatorMethod<T>)new TemplateDiffSquared.F32();
+					method = (EvaluatorMethod<T>)new TemplateSumAbsoluteDifference.F32();
+				} else {
+					throw new IllegalArgumentException("Image type not supported. " + imageType.getSimpleName());
+				}
+				break;
+
+			case SUM_SQUARE_ERROR:
+				if (imageType == GrayU8.class) {
+					method = (EvaluatorMethod<T>)new TemplateSumSquaredError.U8();
+				} else if (imageType == GrayF32.class) {
+					method = (EvaluatorMethod<T>)new TemplateSumSquaredError.F32();
 				} else {
 					throw new IllegalArgumentException("Image type not supported. " + imageType.getSimpleName());
 				}

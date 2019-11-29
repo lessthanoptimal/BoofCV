@@ -58,7 +58,7 @@ public class ExampleTemplateMatching {
 										   int expectedMatches) {
 		// create template matcher.
 		TemplateMatching<GrayF32> matcher =
-				FactoryTemplateMatching.createMatcher(TemplateScoreType.SUM_DIFF_SQ, GrayF32.class);
+				FactoryTemplateMatching.createMatcher(TemplateScoreType.SUM_SQUARE_ERROR, GrayF32.class);
 
 		// Find the points which match the template the best
 		matcher.setImage(image);
@@ -76,7 +76,7 @@ public class ExampleTemplateMatching {
 
 		// create algorithm for computing intensity image
 		TemplateMatchingIntensity<GrayF32> matchIntensity =
-				FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_DIFF_SQ, GrayF32.class);
+				FactoryTemplateMatching.createIntensity(TemplateScoreType.SUM_SQUARE_ERROR, GrayF32.class);
 
 		// apply the template to the image
 		matchIntensity.setInputImage(image);
