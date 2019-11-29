@@ -202,11 +202,6 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			File file = fileChooser.getSelectedFile();
 			String n = FilenameUtils.getBaseName(file.getName())+".ply";
 			try {
-				for( Point3dRgbI_F64 p : cloud.toList() ) {
-					p.x /= 1000.0;
-					p.y /= 1000.0;
-					p.z /= 1000.0;
-				}
 				File f = new File(file.getParent(),n);
 				FileWriter w = new FileWriter(f);
 				PointCloudIO.save3DRgbI64F(PointCloudIO.Format.PLY_ASCII, cloud.toList(),w);

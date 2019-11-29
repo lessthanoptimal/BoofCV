@@ -48,6 +48,7 @@ public class PlyCodec_F32 {
 			Point3D_F32 p = cloud.get(i);
 			outputWriter.write(String.format("%f %f %f\n",p.x,p.y,p.z));
 		}
+		outputWriter.flush();
 	}
 
 	public static void read(Reader inputReader, FastQueue<Point3D_F32> output ) throws IOException {
@@ -135,6 +136,7 @@ public class PlyCodec_F32 {
 			int b = p.rgb&0xFF;
 			outputWriter.write(String.format("%f %f %f %d %d %d\n",p.x,p.y,p.z,r,g,b));
 		}
+		outputWriter.flush();
 	}
 
 	public static void readRgbI(Reader inputReader, FastQueue<Point3dRgbI_F32> output ) throws IOException {

@@ -48,6 +48,7 @@ public class PlyCodec_F64 {
 			Point3D_F64 p = cloud.get(i);
 			outputWriter.write(String.format("%f %f %f\n",p.x,p.y,p.z));
 		}
+		outputWriter.flush();
 	}
 
 	public static void read(Reader inputReader, FastQueue<Point3D_F64> output ) throws IOException {
@@ -135,7 +136,6 @@ public class PlyCodec_F64 {
 			int b = p.rgb&0xFF;
 			outputWriter.write(String.format("%f %f %f %d %d %d\n",p.x,p.y,p.z,r,g,b));
 		}
-		outputWriter.write("\n");
 		outputWriter.flush();
 	}
 
