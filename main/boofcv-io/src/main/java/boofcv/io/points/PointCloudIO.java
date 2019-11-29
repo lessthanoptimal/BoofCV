@@ -20,6 +20,7 @@ package boofcv.io.points;
 
 import boofcv.io.points.impl.PlyCodec_F32;
 import boofcv.io.points.impl.PlyCodec_F64;
+import boofcv.struct.Point3dRgbI_F64;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -61,6 +62,18 @@ public class PointCloudIO {
 		}
 	}
 
+	public static void save3DRgbI64F(Format format , List<Point3dRgbI_F64> cloud , Writer writer ) throws IOException {
+		switch( format ) {
+			case PLY_ASCII:
+				PlyCodec_F64.saveAsciiRgbI(cloud, writer);
+				break;
+			case PLY_BINARY:
+				throw new IllegalArgumentException("Not yet supported");
+			default:
+				throw new IllegalArgumentException("Unknown format "+format);
+		}
+	}
+
 	public static FastQueue<Point3D_F32>
 	load3D32F( Format format , Reader reader , @Nullable FastQueue<Point3D_F32> storage  ) throws IOException {
 		if( storage == null )
@@ -86,6 +99,23 @@ public class PointCloudIO {
 		switch( format ) {
 			case PLY_ASCII:
 				PlyCodec_F64.read(reader,storage);
+				break;
+			case PLY_BINARY:
+				throw new IllegalArgumentException("Not yet supported");
+			default:
+				throw new IllegalArgumentException("Unknown format "+format);
+		}
+		return storage;
+	}
+
+	public static FastQueue<Point3dRgbI_F64>
+	load3DRgb64F(Format format , Reader reader , @Nullable FastQueue<Point3dRgbI_F64> storage  ) throws IOException {
+		if( storage == null )
+			storage = new FastQueue<>(Point3dRgbI_F64.class,true);
+
+		switch( format ) {
+			case PLY_ASCII:
+				PlyCodec_F64.readRgbI(reader,storage);
 				break;
 			case PLY_BINARY:
 				throw new IllegalArgumentException("Not yet supported");

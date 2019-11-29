@@ -18,11 +18,14 @@
 
 package boofcv.visualize;
 
+import boofcv.struct.Point3dRgbI_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 import java.util.List;
 
@@ -102,6 +105,17 @@ public interface PointCloudViewer {
 	 */
 	void setCameraToWorld(Se3_F64 cameraToWorld );
 
+	/**
+	 * Copies the point cloud into the passed in list.
+	 *
+	 * @param copy Where the cloud should be copied into. if null a new instance is created
+	 * @return The copy
+	 */
+	FastQueue<Point3dRgbI_F64> copyCloud(@Nullable FastQueue<Point3dRgbI_F64> copy);
+
+	/**
+	 * Returns a swing component for adding to a GUI
+	 */
 	JComponent getComponent();
 
 	/**

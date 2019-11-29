@@ -18,6 +18,7 @@
 
 package boofcv.io.points.impl;
 
+import boofcv.struct.Point3dRgbI_F32;
 import georegression.struct.point.Point3D_F32;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
@@ -34,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class TestPlyCodec_F32 {
 	@Test
-	void encode_decode_ascii() throws IOException {
+	void encode_decode_3D_ascii() throws IOException {
 		List<Point3D_F32> expected = new ArrayList<>();
 		for (int i = 0; i < 10; i++) {
 			expected.add( new Point3D_F32(i*123.45f,i-1.01f,i+2.34f));
@@ -52,4 +53,31 @@ class TestPlyCodec_F32 {
 			assertEquals(0.0f,found.get(i).distance(expected.get(i)), UtilEjml.TEST_F32);
 		}
 	}
+
+	@Test
+	void encode_decode_3DRGB_ascii() throws IOException {
+		List<Point3dRgbI_F32> expected = new ArrayList<>();
+		for (int i = 0; i < 10; i++) {
+			int r = (10*i)&0xFF;
+			int g = (28*i)&0xFF;
+			int b = (58*i)&0xFF;
+
+			int rgb = r << 16 | g << 16 | b;
+
+			expected.add( new Point3dRgbI_F32(i*123.45f,i-1.01f,i+2.34f,rgb));
+		}
+
+		FastQueue<Point3dRgbI_F32> found = new FastQueue<>(Point3dRgbI_F32.class,true);
+
+		Writer writer = new StringWriter();
+		PlyCodec_F32.saveAsciiRgbI(expected,writer);
+		Reader reader = new StringReader(writer.toString());
+		PlyCodec_F32.readRgbI(reader,found);
+
+		assertEquals(expected.size(),found.size);
+		for (int i = 0; i < found.size; i++) {
+			assertEquals(0.0f,found.get(i).distance(expected.get(i)), UtilEjml.TEST_F32);
+		}
+	}
+
 }

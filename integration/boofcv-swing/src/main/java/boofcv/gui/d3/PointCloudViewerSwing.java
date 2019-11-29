@@ -19,14 +19,17 @@
 package boofcv.gui.d3;
 
 import boofcv.gui.BoofSwingUtil;
+import boofcv.struct.Point3dRgbI_F64;
 import boofcv.visualize.PointCloudViewer;
 import georegression.struct.ConvertFloatType;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F32;
 import georegression.struct.se.Se3_F64;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 import java.util.List;
 
@@ -167,6 +170,38 @@ public class PointCloudViewerSwing implements PointCloudViewer {
 		Se3_F32 worldToCameraF32 = new Se3_F32();
 		ConvertFloatType.convert(worldToCamera,worldToCameraF32);
 		BoofSwingUtil.invokeNowOrLater(()->panel.setWorldToCamera(worldToCameraF32));
+	}
+
+	@Override
+	public FastQueue<Point3dRgbI_F64> copyCloud(@Nullable FastQueue<Point3dRgbI_F64> copy) {
+		if( copy == null )
+			copy = new FastQueue<>(Point3dRgbI_F64.class,true);
+		else
+			copy.reset();
+
+		// See if it has color information on the points or not
+		int N = panel.cloudXyz.size/3;
+		if( N == panel.cloudColor.size ) {
+			int idxXyz = 0;
+			for (int i = 0; i < N; i++) {
+				Point3dRgbI_F64 p = copy.grow();
+				p.x = panel.cloudXyz.data[idxXyz++];
+				p.y = panel.cloudXyz.data[idxXyz++];
+				p.z = panel.cloudXyz.data[idxXyz++];
+				p.rgb = panel.cloudColor.data[i];
+			}
+		} else {
+			int idxXyz = 0;
+			for (int i = 0; i < N; i++) {
+				Point3dRgbI_F64 p = copy.grow();
+				p.x = panel.cloudXyz.data[idxXyz++];
+				p.y = panel.cloudXyz.data[idxXyz++];
+				p.z = panel.cloudXyz.data[idxXyz++];
+				p.rgb = 0;
+			}
+		}
+
+		return copy;
 	}
 
 	@Override
