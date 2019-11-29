@@ -29,7 +29,6 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
-import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point2D_I32;
 import org.ejml.UtilEjml;
@@ -395,8 +394,7 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> {
 			int numMatches = 0;
 
 			for (Point2D_I16 f : found.toList()) {
-				double d = UtilPoint2D_F64.distance(f.x,f.y,expected.x,expected.y);
-				if (d <= 1)
+				if ( expected.distance(f.x,f.y) == 0.0 )
 					numMatches++;
 			}
 

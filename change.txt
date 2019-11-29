@@ -24,7 +24,7 @@ Version : 0.35
   * PixelMath.log() no longer has the 1 + hard coded. Any arbitrary value can be put there.
 - Template Match
   * Fixed bug where if the template matched the input image it would not be processed
-    * Thanks aicool20 for reporting this bug
+    * Thanks waicool20 for reporting this bug
   * Functions which maximize and minimized have specialized code
     * Fixed edge cases where having a border of zero messed things up
   * Sum Squared error produces similarly scaled numbers for U8 and F32 now
