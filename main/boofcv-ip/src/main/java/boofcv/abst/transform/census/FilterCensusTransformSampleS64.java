@@ -19,7 +19,7 @@
 package boofcv.abst.transform.census;
 
 import boofcv.abst.filter.FilterImageInterface;
-import boofcv.alg.transform.census.CensusTransform;
+import boofcv.alg.transform.census.GCensusTransform;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayS64;
 import boofcv.struct.image.ImageGray;
@@ -49,7 +49,7 @@ public class FilterCensusTransformSampleS64<In extends ImageGray<In>>
 
 	@Override
 	public void process(In in, GrayS64 out) {
-		CensusTransform.sample(in,samples,out,border,workSpace);
+		GCensusTransform.sample_S64(in,samples,out,border,workSpace);
 	}
 
 	@Override

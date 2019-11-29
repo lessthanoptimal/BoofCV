@@ -79,31 +79,31 @@ public class BenchmarkCensus {
 
 	@Benchmark
 	public void region3x3() {
-		CensusTransform.dense3x3_U8(input,output8, border);
+		CensusTransform.dense3x3(input,output8, border);
 	}
 
 	@Benchmark
 	public void region5x5() {
-		CensusTransform.dense5x5_U8(input,output32, border);
+		CensusTransform.dense5x5(input,output32, border);
 	}
 
 	@Benchmark
 	public void samples5x5_S64() {
-		CensusTransform.sample(input,points5x5,output64, border,workSpace);
+		CensusTransform.sample_S64(input,points5x5,output64, border,workSpace);
 	}
 
 	@Benchmark
 	public void samples7x7_S64() {
-		CensusTransform.sample(input,points7x7,output64, border,workSpace);
+		CensusTransform.sample_S64(input,points7x7,output64, border,workSpace);
 	}
 
 	@Benchmark
 	public void samples5x5_IU16() {
-		CensusTransform.sample(input,points5x5,outputI16, border,workSpace);
+		CensusTransform.sample_IU16(input,points5x5,outputI16, border,workSpace);
 	}
 
 	@Benchmark
 	public void samples9x9_IU16() {
-		CensusTransform.sample(input,points9x9,outputI16, border,workSpace);
+		CensusTransform.sample_IU16(input,points9x9,outputI16, border,workSpace);
 	}
 }

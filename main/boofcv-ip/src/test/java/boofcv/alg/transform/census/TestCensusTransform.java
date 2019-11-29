@@ -18,16 +18,64 @@
 
 package boofcv.alg.transform.census;
 
+import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastQueue;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
+ * Only tests sampling functions. The actual transforms are tested by GCensusTransform
+ *
  * @author Peter Abeles
  */
 class TestCensusTransform {
 	@Test
-	void foo() {
-		fail("Implement");
+	void createBlockSamples_1() {
+		FastQueue<Point2D_I32> samples = CensusTransform.createBlockSamples(2);
+		assertEquals(5*5-1, samples.size);
+		for (int y = -2, i=0; y < 3; y++) {
+			for (int x = -2; x < 3; x++) {
+				if( x == 0 && y == 0)
+					continue;
+				assertTrue(samples.get(i++).distance(x,y) <= UtilEjml.EPS);
+			}
+		}
+	}
+
+	@Test
+	void createBlockSamples_2() {
+		FastQueue<Point2D_I32> samples = CensusTransform.createBlockSamples(1,2);
+		assertEquals(3*5-1, samples.size);
+		for (int y = -2, i=0; y < 3; y++) {
+			for (int x = -1; x < 2; x++) {
+				if( x == 0 && y == 0)
+					continue;
+				assertTrue(samples.get(i++).distance(x,y) <= UtilEjml.EPS);
+			}
+		}
+	}
+
+	@Test
+	void createCircleSamples() {
+		FastQueue<Point2D_I32> samples = CensusTransform.createCircleSamples();
+		assertEquals(9 * 9 - 4 * 6 - 1, samples.size);
+
+		// make sure there's no zero
+		for (Point2D_I32 p : samples.toList()) {
+			assertFalse(p.x == 0 && p.y == 0);
+		}
+
+		// make sure no point is more than 4 away and the mean is zero
+		int meanX = 0;
+		int meanY = 0;
+		for (Point2D_I32 p : samples.toList()) {
+			assertFalse(p.distance(0, 0) > 4.5);
+			meanX += p.x;
+			meanY += p.y;
+		}
+		assertEquals(0, meanX);
+		assertEquals(0, meanY);
 	}
 }

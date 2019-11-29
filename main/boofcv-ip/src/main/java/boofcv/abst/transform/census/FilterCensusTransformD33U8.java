@@ -19,7 +19,7 @@
 package boofcv.abst.transform.census;
 
 import boofcv.abst.filter.FilterImageInterface;
-import boofcv.alg.transform.census.CensusTransform;
+import boofcv.alg.transform.census.GCensusTransform;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
@@ -41,7 +41,7 @@ public class FilterCensusTransformD33U8<In extends ImageGray<In>>
 
 	@Override
 	public void process(In in, GrayU8 out) {
-		CensusTransform.dense3x3(in,out,border);
+		GCensusTransform.dense3x3(in,out,border);
 	}
 
 	@Override

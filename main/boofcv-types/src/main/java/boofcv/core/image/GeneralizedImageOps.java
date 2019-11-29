@@ -106,7 +106,7 @@ public class GeneralizedImageOps {
 		else if( ImageInterleaved.class.isAssignableFrom(type))
 			return (T)createInterleaved((Class)type,width,height,numBands);
 		else
-			throw new RuntimeException("Unknown");
+			throw new RuntimeException("Unknown. "+type.getSimpleName());
 	}
 	public static <T extends ImageGray<T>> T createSingleBand(Class<T> type, int width, int height) {
 		type = convertGenericToSpecificType(type);

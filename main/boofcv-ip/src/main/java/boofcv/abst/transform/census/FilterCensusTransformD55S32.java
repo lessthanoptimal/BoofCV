@@ -19,7 +19,7 @@
 package boofcv.abst.transform.census;
 
 import boofcv.abst.filter.FilterImageInterface;
-import boofcv.alg.transform.census.CensusTransform;
+import boofcv.alg.transform.census.GCensusTransform;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageGray;
@@ -41,7 +41,7 @@ public class FilterCensusTransformD55S32 <In extends ImageGray<In>>
 
 	@Override
 	public void process(In in, GrayS32 out) {
-		CensusTransform.dense5x5(in,out,border);
+		GCensusTransform.dense5x5(in,out,border);
 	}
 
 	@Override

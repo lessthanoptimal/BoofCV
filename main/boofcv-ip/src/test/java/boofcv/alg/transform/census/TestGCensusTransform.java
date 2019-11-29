@@ -16,30 +16,31 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.census.impl;
+package boofcv.alg.transform.census;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageGray;
 import boofcv.testing.CompareIdenticalFunctions;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.util.Random;
 
 import static boofcv.alg.transform.census.impl.TestImplCensusTransformInner.createSamples;
-import static boofcv.alg.transform.census.impl.TestImplCensusTransformInner.samplesToIndexes;
 
-class TestImplCensusTransformInner_MT extends CompareIdenticalFunctions {
-	int width = 70,height=80;
+/**
+ * @author Peter Abeles
+ */
+class TestGCensusTransform extends CompareIdenticalFunctions {
+	int width = 70, height = 80;
 	Random rand = new Random(234);
 
-	TestImplCensusTransformInner_MT() {
-		super(ImplCensusTransformInner_MT.class, ImplCensusTransformInner.class);
+	// Swap test and validation so that all the functions in census are compared against the 4 in GCensusTransform
+	TestGCensusTransform() {
+		super(CensusTransform.class, GCensusTransform.class);
 	}
 
 	@Test
@@ -48,26 +49,43 @@ class TestImplCensusTransformInner_MT extends CompareIdenticalFunctions {
 	}
 
 	@Override
+	protected boolean isEquivalent(Method candidate, Method evaluation) {
+		if( evaluation.getName().compareTo(candidate.getName()) != 0 )
+			return false;
+
+		Class<?> e[] = evaluation.getParameterTypes();
+		Class<?> c[] = candidate.getParameterTypes();
+
+		if( e.length != c.length )
+			return false;
+
+		for( int i = 0; i < e.length; i++ ) {
+			if( !c[i].isAssignableFrom(e[i]))
+				return false;
+		}
+		return true;
+	}
+
+	@Override
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 		Class[] types = candidate.getParameterTypes();
 		Object[] parameters = new Object[types.length];
 
-		parameters[0] = GeneralizedImageOps.createImage(types[0],width,height,3);
-		GImageMiscOps.fillUniform((ImageBase)parameters[0],rand,0,100);
+		parameters[0] = GeneralizedImageOps.createImage(types[0], width, height, 3);
+		GImageMiscOps.fillUniform((ImageBase) parameters[0], rand, 0, 100);
 
-		if( candidate.getName().startsWith("dense") ) {
-			parameters[1] = GeneralizedImageOps.createSingleBand(types[1],width,height);
-		} else if( candidate.getName().startsWith("sample") ) {
+		if (candidate.getName().startsWith("dense")) {
+			parameters[1] = GeneralizedImageOps.createSingleBand(types[1], width, height);
+		} else if (candidate.getName().startsWith("sample")) {
 			int r = 3;
 			FastQueue<Point2D_I32> samples = createSamples(r);
-			GrowQueue_I32 indexes = samplesToIndexes((ImageGray)parameters[0],samples);
-			parameters[1] = r;
-			parameters[2] = indexes;
-			parameters[3] = GeneralizedImageOps.createImage(types[3],width,height,1);
+			parameters[1] = samples;
+			parameters[2] = GeneralizedImageOps.createImage(types[2], width, height, 1);
+			parameters[3] = null; // really should provide a border function
+			parameters[4] = null;
 		} else {
 			throw new RuntimeException("Egads");
 		}
 		return new Object[][]{parameters};
 	}
 }
-
