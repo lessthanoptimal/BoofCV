@@ -22,6 +22,7 @@ Version : 0.35
   * Created ImageNormalization for normalizing input images to be zero mean with values around 1
   * Added mean blur where you can select a different radius along each axis
   * PixelMath.log() no longer has the 1 + hard coded. Any arbitrary value can be put there.
+  * Created ConvertImageMisc and added code to convert F32 to U16 images
 - Template Match
   * Fixed bug where if the template matched the input image it would not be processed
     * Thanks waicool20 for reporting this bug

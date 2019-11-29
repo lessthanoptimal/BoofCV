@@ -19,6 +19,6 @@
 package boofcv.io.image.impl;
 
 class TestImplConvertRaster_MT {
-	// This unit test should really be created. Skipping for now because it will be a real paint to write
+	// This unit test should really be created. Skipping for now because it will be a real pain to write
 }
 

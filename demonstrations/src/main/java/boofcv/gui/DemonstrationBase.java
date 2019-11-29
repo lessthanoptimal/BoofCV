@@ -191,6 +191,9 @@ public abstract class DemonstrationBase extends JPanel {
 			menuItemWebcam.addActionListener(listener);
 			menuFile.add(menuItemWebcam);
 		}
+
+		customAddToFileMenu(menuFile);
+
 		menuItenQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
 		menuItenQuit.addActionListener(listener);
 		BoofSwingUtil.setMenuItemKeys(menuItenQuit,KeyEvent.VK_Q,KeyEvent.VK_Q);
@@ -219,6 +222,11 @@ public abstract class DemonstrationBase extends JPanel {
 			}
 		}
 	}
+
+	/**
+	 * Override this method to add custom items to the file menu
+	 */
+	protected void customAddToFileMenu(JMenu menuFile){}
 
 	protected void setMenuBarEnabled( boolean enabled ) {
 		menuBar.setEnabled(enabled);

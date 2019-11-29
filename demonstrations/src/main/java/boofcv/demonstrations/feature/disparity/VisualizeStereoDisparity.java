@@ -129,10 +129,6 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		// Tell the demo code to not extract inputs from inputs
 		super.inputAsFile = true;
 
-//		addAlgorithm(0,"Five Region",0);
-//		addAlgorithm(0,"Region",1);
-//		addAlgorithm(0,"Region Basic",2);
-
 		control.setListener(this);
 
 		panel.setLayout(new BorderLayout());
@@ -146,6 +142,27 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		// keep on happening when views change
 		imagePanel.setListener(scale-> {
 			imagePanel.autoScaleCenterOnSetImage = false;control.setZoom(imagePanel.getScale());});
+	}
+
+	@Override
+	protected void customAddToFileMenu(JMenu menuFile) {
+		menuFile.addSeparator();
+
+		JMenuItem itemSaveDisparity = new JMenuItem("Save Disparity");
+		itemSaveDisparity.addActionListener(e -> saveDisparity());
+		menuFile.add(itemSaveDisparity);
+
+		JMenuItem itemSaveCloud = new JMenuItem("Save Point Cloud");
+		itemSaveCloud.addActionListener(e -> savePointCloud());
+		menuFile.add(itemSaveCloud);
+	}
+
+	private void saveDisparity() {
+
+	}
+
+	private void savePointCloud() {
+
 	}
 
 	@Override
