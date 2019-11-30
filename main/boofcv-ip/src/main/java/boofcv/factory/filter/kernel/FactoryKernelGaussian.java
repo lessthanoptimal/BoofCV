@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -277,9 +277,41 @@ public class FactoryKernelGaussian {
 		return ret;
 	}
 
+	// This will throw an exception because 2D kernels have to have the same width. Leaving it here as
+	// a reminder to fix that
+	public static Kernel2D_F32 gaussian2D_F32(double sigmaX, int radiusX, boolean oddX,
+											  double sigmaY, int radiusY, boolean oddY,
+											  boolean normalize) {
+		Kernel1D_F32 kernelX = gaussian1D_F32(sigmaX,radiusX, oddX, false);
+		Kernel1D_F32 kernelY = gaussian1D_F32(sigmaY,radiusY, oddY, false);
+
+		Kernel2D_F32 ret = KernelMath.convolve2D(kernelX, kernelY);
+
+		if (normalize) {
+			KernelMath.normalizeSumToOne(ret);
+		}
+
+		return ret;
+	}
+
 	public static Kernel2D_F64 gaussian2D_F64(double sigma, int radius, boolean odd, boolean normalize) {
 		Kernel1D_F64 kernel1D = gaussian1D_F64(sigma,radius, odd, false);
 		Kernel2D_F64 ret = KernelMath.convolve2D(kernel1D, kernel1D);
+
+		if (normalize) {
+			KernelMath.normalizeSumToOne(ret);
+		}
+
+		return ret;
+	}
+
+	public static Kernel2D_F64 gaussian2D_F64(double sigmaX, int radiusX, boolean oddX,
+											  double sigmaY, int radiusY, boolean oddY,
+											  boolean normalize) {
+		Kernel1D_F64 kernelX = gaussian1D_F64(sigmaX,radiusX, oddX, false);
+		Kernel1D_F64 kernelY = gaussian1D_F64(sigmaY,radiusY, oddY, false);
+
+		Kernel2D_F64 ret = KernelMath.convolve2D(kernelX, kernelY);
 
 		if (normalize) {
 			KernelMath.normalizeSumToOne(ret);

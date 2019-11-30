@@ -39,6 +39,9 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public class TestBlurImageOps {
+	// TODO full support of interleaved image for all types
+	// TODO unit tests for different kernels along x and y axis. Can't do that just yet because
+	//      2D kernels have to have the same width along each axis!
 
 	Random rand = new Random(234);
 
@@ -49,6 +52,11 @@ public class TestBlurImageOps {
 			ImageType.single(GrayU8.class),ImageType.single(GrayF32.class),
 			ImageType.pl(2,GrayU8.class),ImageType.pl(2,GrayF32.class)};
 //			ImageType.il(2,InterleavedU8.class),ImageType.il(2,InterleavedF32.class)}; TODO add in future
+
+	ImageType imageTypesGaussian[] = new ImageType[]{
+			ImageType.single(GrayU8.class),ImageType.single(GrayF32.class),
+			ImageType.pl(2,GrayU8.class),ImageType.pl(2,GrayF32.class),
+			ImageType.il(2,InterleavedU8.class),ImageType.il(2,InterleavedF32.class)}; // delete after all support interleaved
 
 	@Test
 	public void mean() {
@@ -90,7 +98,7 @@ public class TestBlurImageOps {
 
 	@Test
 	public void gaussian() {
-		for( ImageType type : imageTypes ) {
+		for( ImageType type : imageTypesGaussian ) {
 			ImageBase input = type.createImage(width,height);
 			ImageBase found = type.createImage(width,height);
 			ImageBase expected = type.createImage(width,height);

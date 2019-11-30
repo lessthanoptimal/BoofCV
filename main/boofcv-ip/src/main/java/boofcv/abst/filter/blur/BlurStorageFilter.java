@@ -36,7 +36,7 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	private BlurOperation operation;
 
 	// the Gaussian's standard deviation
-	private double sigma;
+	private double sigmaX,sigmaY;
 	// size of the blur region along each axis
 	private int radiusX,radiusY;
 	// stores intermediate results
@@ -47,25 +47,25 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	WorkArrays workArray;
 
 	public BlurStorageFilter( String functionName , ImageType<T> inputType, int radius) {
-		this(functionName,inputType,-1,radius,radius);
+		this(functionName,inputType,-1,radius,-1,radius);
 	}
 
 	public BlurStorageFilter( String functionName , ImageType<T> inputType, int radiusX, int radiusY) {
-		this(functionName,inputType,-1,radiusX,radiusY);
+		this(functionName,inputType,-1,radiusX,-1,radiusY);
 	}
 
-	public BlurStorageFilter( String functionName , ImageType<T> inputType, double sigma , int radiusX, int radiusY) {
+	public BlurStorageFilter( String functionName , ImageType<T> inputType,
+							  double sigmaX, int radiusX, double sigmaY , int radiusY) {
 		this.radiusX = radiusX;
 		this.radiusY = radiusY;
-		this.sigma = sigma;
+		this.sigmaX = sigmaX;
+		this.sigmaY = sigmaY;
 		this.inputType = inputType;
 
 		if( functionName.equals("mean")) {
 			operation = new MeanOperation();
 			createStorage();
 		} else if( functionName.equals("gaussian")) {
-			if( radiusX != radiusY )
-				throw new IllegalArgumentException("Gaussian currently only supports equal radius");
 			operation = new GaussianOperation();
 			createStorage();
 		} else if( functionName.equals("median")) {
@@ -131,7 +131,7 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	}
 
 	private interface BlurOperation {
-		public void process(ImageBase input , ImageBase output );
+		void process(ImageBase input , ImageBase output );
 	}
 
 	private class MeanOperation implements BlurOperation {
@@ -144,7 +144,7 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	private class GaussianOperation implements BlurOperation {
 		@Override
 		public void process(ImageBase input, ImageBase output) {
-			GBlurImageOps.gaussian(input,output,sigma, radiusX,storage);
+			GBlurImageOps.gaussian(input,output,sigmaX, radiusX,sigmaY,radiusY,storage);
 		}
 	}
 

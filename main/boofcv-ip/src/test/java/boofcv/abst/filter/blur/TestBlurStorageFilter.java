@@ -50,7 +50,7 @@ public class TestBlurStorageFilter {
 
 			GImageMiscOps.fillUniform(input,rand,0,100);
 
-			BlurStorageFilter alg = new BlurStorageFilter<>("gaussian",c,-1,2);
+			BlurStorageFilter alg = new BlurStorageFilter<>("gaussian",c,-1.0,2,-1.0,2);
 
 			GBlurImageOps.gaussian(input,found,-1,2,storage);
 

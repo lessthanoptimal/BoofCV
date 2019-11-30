@@ -46,7 +46,7 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 	}
 	
 	public interface Gaussian<T extends ImageBase<T>> {
-		void processGaussian(T input, T output, double sigma , int radius, T storage );
+		void processGaussian(T input, T output, double sigmaX , int radiusX, double sigmaY, int radiusY, T storage );
 	}
 
 	public static <T extends ImageBase<T>>
@@ -75,11 +75,11 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 
 	// TODO replace with native normalized?
 	public static <T extends ImageBase<T>>
-	boolean invokeNativeGaussian(T input, T output, double sigma , int radius, T storage) {
+	boolean invokeNativeGaussian(T input, T output, double sigmaX , int radiusX, double sigmaY , int radiusY,T storage) {
 		boolean processed = false;
 		if( BOverrideBlurImageOps.gaussian != null ) {
 			try {
-				BOverrideBlurImageOps.gaussian.processGaussian(input,output,sigma,radius,storage);
+				BOverrideBlurImageOps.gaussian.processGaussian(input,output,sigmaX,radiusX,sigmaY,radiusY,storage);
 				processed = true;
 			} catch( RuntimeException ignore ) {}
 		}

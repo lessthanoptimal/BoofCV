@@ -20,7 +20,8 @@ Version : 0.35
   * Added stdev to Pixelmath
   * Added fillBorder(x0,y0,x1,y1) to ImageMiscOps
   * Created ImageNormalization for normalizing input images to be zero mean with values around 1
-  * Added mean blur where you can select a different radius along each axis
+  * Added blur where you can select a different radius along each axis
+    - Mean and Gaussian
   * PixelMath.log() no longer has the 1 + hard coded. Any arbitrary value can be put there.
   * Created ConvertImageMisc and added code to convert F32 to U16 images
 - Template Match
