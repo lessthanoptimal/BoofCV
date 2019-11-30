@@ -105,9 +105,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addLabeled(sliderPeriodColor,"Period");
 		addLabeled(sliderSpeed3D,"Speed");
 		addAlignLeft(invalidToggle);
-		addSeparator(150);
 		add(controlDisparity);
-		addSeparator(150);
 		addLabeled(inputScaleSpinner, "Scale Input");
 		addAlignLeft(checkRecompute);
 		addAlignLeft(checkConcurrent);

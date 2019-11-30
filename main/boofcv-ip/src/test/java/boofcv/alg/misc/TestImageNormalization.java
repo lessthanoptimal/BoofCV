@@ -18,7 +18,12 @@
 
 package boofcv.alg.misc;
 
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
 import org.junit.jupiter.api.Test;
+
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -26,11 +31,16 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Peter Abeles
  */
 class TestImageNormalization {
+	Random rand = new Random(2345);
+	int width = 40;
+	int height = 30;
 	// TODO write a speed benchmark
 
 	// TODO go through expected input types exhaustively
 
 	// TODO ensure with and without parameters works
+
+	private Class[] types = new Class[]{GrayU8.class, GrayU16.class, GrayF32.class};
 
 	@Test
 	void zeroMeanMaxOne() {
@@ -41,5 +51,4 @@ class TestImageNormalization {
 	void zeroMeanStdOne() {
 		fail("Implement");
 	}
-
 }

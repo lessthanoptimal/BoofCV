@@ -74,16 +74,16 @@ public class FactoryStereoDisparity {
 
 		double maxError = (config.regionRadiusX*2+1)*(config.regionRadiusY*2+1)*config.maxPerPixelError;
 
-		DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
-
 		switch( config.errorType) {
 			case SAD: {
+				DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
 				BlockRowScore rowScore = createScoreRowSad(imageType);
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
 				return new WrapDisparityBlockMatchRowFormat(alg);
 			}
 
 			case CENSUS: {
+				DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,imageType);
 				Class censusType = censusTran.getOutputType().getImageClass();
 				BlockRowScore rowScore;
@@ -102,6 +102,7 @@ public class FactoryStereoDisparity {
 			}
 
 			case NCC: {
+				DisparitySelect select = createDisparitySelect(config, GrayF32.class, (int) maxError);
 				BlockRowScore rowScore = createScoreRowNcc(config.configNCC.eps, config.regionRadiusX,config.regionRadiusY,GrayF32.class);
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, GrayF32.class, select, rowScore);
 				return new DisparityBlockMatchCorrelation(alg,imageType);

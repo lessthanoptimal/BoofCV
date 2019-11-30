@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -168,6 +168,19 @@ public class UtilIO {
 			}
 		} catch (IOException ignore) {}
 		return null;
+	}
+
+	/**
+	 * Reads a line from an input stream.
+	 */
+	private static String readLine( InputStream input, StringBuffer buffer ) throws IOException {
+		buffer.setLength(0);
+		while( true ) {
+			int v = input.read();
+			if( v == -1 || v == '\n' )
+				return buffer.toString();
+			buffer.append((char)v);
+		}
 	}
 
 	public static String pathExample( String path ) {
