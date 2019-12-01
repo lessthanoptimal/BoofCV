@@ -2097,7 +2097,7 @@ public class ImageMiscOps {
 		for (int y = 0; y < img.height; y++) {
 			int index = img.getStartIndex() + y * img.getStride();
 			for (int x = 0; x < img.width; x++) {
-				data[index++] = rand.nextInt((int)range)+min;
+				data[index++] = (rand.nextLong()%range)+min;
 			}
 		}
 	}
@@ -2119,7 +2119,7 @@ public class ImageMiscOps {
 			int index = img.getStartIndex() + y * img.getStride();
 			int end = index + img.width*img.numBands;
 			for (; index <  end; index++) {
-				data[index] = rand.nextInt((int)range)+min;
+				data[index] = (rand.nextLong()%range)+min;
 			}
 		}
 	}
