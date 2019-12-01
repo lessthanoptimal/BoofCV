@@ -33,7 +33,7 @@ public class HoughParametersPolar implements HoughTransformParameters {
 	int originX;
 	int originY;
 	// maximum allowed range
-	double r_max;
+	float r_max;
 	// lookup tables for sine and cosine functions
 	CachedSineCosine_F32 tableTrig;
 
@@ -54,7 +54,7 @@ public class HoughParametersPolar implements HoughTransformParameters {
 	public void initialize(int width, int height, GrayF32 transform) {
 		this.originX = width/2;
 		this.originY = height/2;
-		this.r_max = Math.sqrt(originX*originX+originY*originY);
+		this.r_max = (float)Math.sqrt(originX*originX+originY*originY);
 		this.numBinsRange = (int)Math.ceil(r_max/ rangeResolution);
 		transform.reshape(numBinsRange,numBinsAngle);
 	}
@@ -74,11 +74,6 @@ public class HoughParametersPolar implements HoughTransformParameters {
 		float top = line.slope.y*px - line.slope.x*py;
 		float distance = top/line.slope.norm();
 		float angle = (float)Math.atan2(-line.slope.x,line.slope.y);
-
-		if( distance < 0 ) {
-			distance = -distance;
-			angle = UtilAngle.bound(angle + (float)Math.PI);
-		}
 
 		int w2 = numBinsRange/2;
 
@@ -140,7 +135,7 @@ public class HoughParametersPolar implements HoughTransformParameters {
 
 		int w2 = numBinsRange/2;
 
-		parameter.x = (int)Math.round(distance*w2/r_max + w2);
+		parameter.x = distance*w2/r_max + w2;
 
 		double yy = angle*numBinsAngle;
 		if( yy >= 1.0 )

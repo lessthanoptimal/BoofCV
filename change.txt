@@ -24,6 +24,7 @@ Version : 0.35
     - Mean and Gaussian
   * PixelMath.log() no longer has the 1 + hard coded. Any arbitrary value can be put there.
   * Created ConvertImageMisc and added code to convert F32 to U16 images
+  * Hough Polar Gradient type casted a float to an int when it shouldn't have
 - Template Match
   * Fixed bug where if the template matched the input image it would not be processed
     * Thanks waicool20 for reporting this bug

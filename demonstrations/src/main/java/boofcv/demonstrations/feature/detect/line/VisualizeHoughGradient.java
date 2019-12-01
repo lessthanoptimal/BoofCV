@@ -87,11 +87,15 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 	int view = 0;
 	boolean logIntensity = false;
 	Type type = Type.FOOT;
+	boolean mergeSimilar=true;
 
 	GrayF32 transformLog = new GrayF32(1,1);
 
 	BufferedImage renderedTran;
 	BufferedImage renderedBinary;
+
+	// is this the first time the image has been opened?
+	boolean firstOpenImage = true;
 
 	public VisualizeHoughGradient(List<PathLabel> examples, Class<I> imageType) {
 		super(true,true,examples, ImageType.single(imageType));
@@ -123,6 +127,7 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 				}
 			}
 		});
+		imagePanel.setListener(scale -> controlPanel.setScale(scale));
 
 		createAlg();
 		blur = GeneralizedImageOps.createSingleBand(imageType,1,1);
@@ -132,6 +137,16 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 	}
 
 	private void createAlg() {
+		if( mergeSimilar ) {
+			ConfigHoughGradient tmp = new ConfigHoughGradient();
+			configHough.mergeAngle = tmp.mergeAngle;
+			configHough.mergeDistance = tmp.mergeDistance;
+		} else {
+			// disable merging similar lines
+			configHough.mergeAngle = -1;
+			configHough.mergeDistance = -1;
+		}
+
 		synchronized (lockAlg) {
 			switch( type ) {
 				case FOOT:
@@ -165,6 +180,9 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 			imagePanel.setPreferredSize(new Dimension(width, height));
 			controlPanel.setImageSize(width,height);
 		});
+
+		// let it know a new image has been opened so that the view can be reset later
+		firstOpenImage = true;
 	}
 
 	@Override
@@ -202,7 +220,11 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 		VisualizeBinaryData.renderBinary(lineDetector.getBinary(), false, renderedBinary);
 
 		BoofSwingUtil.invokeNowOrLater(()->{
-			imagePanel.handleViewChange();
+			imagePanel.handleViewChange(view);
+			if( firstOpenImage ) {
+				firstOpenImage = false;
+				imagePanel.autoScaleCenterOnSetImage = true;
+			}
 			controlPanel.setProcessingTimeMS((time1-time0)*1e-6);
 			imagePanel.repaint();
 		});
@@ -222,15 +244,21 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 			}
 		}
 
-		public void handleViewChange() {
-			switch(view) {
+		public void handleViewChange( int newView ) {
+			boolean centerAndRescale = false;
+			switch(newView) {
 				case 0:
+					centerAndRescale = view == 2;
 					setImage(input);break;
 				case 1:
+					centerAndRescale = view == 2;
 					setImage(renderedBinary);break;
 				case 2:
+					centerAndRescale = view < 2;
 					setImage(renderedTran);break;
 			}
+			view = newView;
+			autoScaleCenterOnSetImage = centerAndRescale;
 		}
 
 		private void paintLinesInTransform(Graphics2D g2) {
@@ -272,6 +300,7 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 		JSpinner spinnerLocalMax = spinner(configHough.localMaxRadius,1,100,2);
 		JSpinner spinnerEdgeThresh = spinner(configHough.thresholdEdge,1,100,2);
 		JSpinner spinnerRefRadius = spinner(configHough.refineRadius,0,20,1);
+		JCheckBox checkMergeSimilar = checkbox("Merge Similar",mergeSimilar);
 
 		JSpinner spinnerResRange = spinner(configPolar.resolutionRange, 0.1, 50, 0.5);
 		JSpinner spinnerBinsAngle = spinner(configPolar.numBinsAngle, 10, 1000, 1);
@@ -288,6 +317,7 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 			addLabeled(spinnerLocalMax,"Local Max");
 			addLabeled(spinnerEdgeThresh,"Edge Thresh");
 			addLabeled(spinnerRefRadius,"Refine Radius");
+			addAlignLeft(checkMergeSimilar);
 			addSeparator(120);
 			addLabeled(spinnerResRange, "Res. Range");
 			addLabeled(spinnerBinsAngle, "Bins Angle");
@@ -340,11 +370,14 @@ public class VisualizeHoughGradient<I extends ImageGray<I>, D extends ImageGray<
 				createAlg();
 				reprocessImageOnly();
 			} else if( e.getSource() == comboView ) {
-				view = comboView.getSelectedIndex();
-				imagePanel.handleViewChange();
+				imagePanel.handleViewChange(comboView.getSelectedIndex());
 				imagePanel.repaint();
 			} else if( e.getSource() == checkLog ) {
 				logIntensity = checkLog.isSelected();
+				reprocessImageOnly();
+			} else if( e.getSource() == checkMergeSimilar ) {
+				mergeSimilar = checkMergeSimilar.isSelected();
+				createAlg();
 				reprocessImageOnly();
 			}
 		}

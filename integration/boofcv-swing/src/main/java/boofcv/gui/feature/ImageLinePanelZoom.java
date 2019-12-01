@@ -50,7 +50,8 @@ public class ImageLinePanelZoom extends ImageZoomPanel {
 		for( LineParametric2D_F32 p : lines ) {
 			LineSegment2D_F32 l = LineImageOps.convert(p, width, height);
 			if( l == null )
-				throw new RuntimeException("null line?!");
+				continue;
+//				throw new RuntimeException("null line?!");
 			this.lines.add(l);
 		}
 		selectedLine = -1;

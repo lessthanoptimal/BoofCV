@@ -64,11 +64,15 @@ public class ImageZoomPanel extends JScrollPane {
 		panel.mouseListener = null;
 	}
 
+	public void autoScaleAndAlign(){
+		this.autoScaleAndAlign(img);
+	}
+
 	/**
 	 * Automatically recomputes the scale to fit inside the window and centers it in the view
 	 * @param img
 	 */
-	private void autoScaleAndCenter( BufferedImage img ) {
+	private void autoScaleAndAlign(final BufferedImage img ) {
 		double ratioW = (double) getWidth() / (double) img.getWidth();
 		double ratioH = (double) getHeight() / (double) img.getHeight();
 
@@ -82,8 +86,11 @@ public class ImageZoomPanel extends JScrollPane {
 			if( listener != null ) {
 				listener.handleScaleChange(this.scale);
 			}
+			updateSize(img.getWidth(),img.getHeight());
 		}
-		centerView(img.getWidth()/2,img.getHeight()/2);
+		// Scroll it to the top left (this is the align part)
+		getHorizontalScrollBar().setValue(0);
+		getVerticalScrollBar().setValue(0);
 	}
 
 	public synchronized void setScale( double scale ) {
@@ -222,7 +229,7 @@ public class ImageZoomPanel extends JScrollPane {
 			if( hasImageChanged ) {
 				hasImageChanged = false;
 				if( autoScaleCenterOnSetImage ) {
-					autoScaleAndCenter(img);
+					autoScaleAndAlign();
 				}
 			}
 

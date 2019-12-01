@@ -233,41 +233,45 @@ public class LineImageOps {
 	 */
 	public static LineSegment2D_F32 convert(LineParametric2D_F32 l,
 									 int width, int height) {
-		double t0 = (0-l.p.x)/l.getSlopeX();
-		double t1 = (0-l.p.y)/l.getSlopeY();
-		double t2 = (width-l.p.x)/l.getSlopeX();
-		double t3 = (height-l.p.y)/l.getSlopeY();
-
-		Point2D_F32 a = computePoint(l, t0);
-		Point2D_F32 b = computePoint(l, t1);
-		Point2D_F32 c = computePoint(l, t2);
-		Point2D_F32 d = computePoint(l, t3);
+		LineParametric2D_F32 side = new LineParametric2D_F32();
+		side.p.set(0,0);
+		side.slope.set(1,0);
 
 		List<Point2D_F32> inside = new ArrayList<>();
-		checkAddInside(width , height , a, inside);
-		checkAddInside(width , height , b, inside);
-		checkAddInside(width , height , c, inside);
-		checkAddInside(width , height , d, inside);
+		Point2D_F32 a = new Point2D_F32();
+		if( null != Intersection2D_F32.intersection(side,l,a) ){
+			checkAddInside(width , height , a, inside);
+		}
+		side.slope.set(0,1);
+		if( null != Intersection2D_F32.intersection(side,l,a) ){
+			checkAddInside(width , height , a, inside);
+		}
+		side.p.set(width-1,height-1);
+		side.slope.set(-1,0);
+		if( null != Intersection2D_F32.intersection(side,l,a) ){
+			checkAddInside(width , height , a, inside);
+		}
+		side.slope.set(0,-1);
+		if( null != Intersection2D_F32.intersection(side,l,a) ){
+			checkAddInside(width , height , a, inside);
+		}
 
+		// if a corner is right next to a border it might fail this test
 		if( inside.size() != 2 ) {
+//			System.out.println("Not 2! N = "+inside.size()+" x = "+inside.get(0).x);
 			return null;
-//			System.out.println("interesting");
 		}
 		return new LineSegment2D_F32(inside.get(0),inside.get(1));
 	}
 
 	public static void checkAddInside(int width, int height, Point2D_F32 a, List<Point2D_F32> inside) {
-		if( a.x >= -foo && a.x <= width+foo && a.y >= -foo && a.y <= height+foo ) {
+		if( a.x >= 0 && a.x <= width-0.999f && a.y >= 0 && a.y <= height-0.999f ) {
 
 			for( Point2D_F32 p : inside ) {
 				if( p.distance(a) < foo )
 					return;
 			}
-			inside.add(a);
+			inside.add(a.copy());
 		}
-	}
-
-	public static Point2D_F32 computePoint(LineParametric2D_F32 l, double t) {
-		return new Point2D_F32((float)(t*l.slope.x+l.p.x) , (float)(t*l.slope.y + l.p.y));
 	}
 }
