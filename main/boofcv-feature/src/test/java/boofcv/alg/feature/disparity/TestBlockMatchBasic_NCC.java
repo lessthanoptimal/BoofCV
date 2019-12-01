@@ -21,6 +21,7 @@ package boofcv.alg.feature.disparity;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.feature.disparity.block.DisparityBlockMatchNaive;
 import boofcv.alg.feature.disparity.block.TestBlockRowScoreNcc;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
@@ -61,7 +62,14 @@ class TestBlockMatchBasic_NCC<T extends ImageBase<T>> {
 		public StereoDisparity<GrayF32, GrayU8> createAlg(int blockRadius, int minDisparity, int maxDisparity) {
 			ConfigDisparityBM config = createConfigBasicBM(blockRadius, minDisparity, maxDisparity);
 			config.errorType = DisparityError.NCC;
+			config.configNCC.eps = UtilEjml.F_EPS;
 			return FactoryStereoDisparity.blockMatch(config,GrayF32.class,GrayU8.class);
+		}
+
+		@Override
+		protected void fillInStereoImages() {
+			GImageMiscOps.fillUniform(left,rand,-1,1);
+			GImageMiscOps.fillUniform(right,rand,-1,1);
 		}
 	}
 }

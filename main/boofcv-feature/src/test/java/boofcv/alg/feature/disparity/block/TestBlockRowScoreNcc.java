@@ -80,14 +80,16 @@ public class TestBlockRowScoreNcc {
 
 		double total = 0;
 		for (int y = -radius; y <= radius; y++) {
+			double sumRow = 0;
 			for (int x = -radius; x <= radius; x++) {
 				double va = GeneralizedImageOps.get(left,cx+x,cy+y)-meanLeft;
 				double vb = GeneralizedImageOps.get(right,cx+x-disparity,cy+y)-meanRight;
 
-				total += va*vb;
+				sumRow += va*vb;
 			}
+			total += sumRow/(radius*2+1);
 		}
-		total /= (radius*2+1)*(radius*2+1);
+		total /= (radius*2+1);
 
 		return total/(eps +stdLeft*stdRight);
 	}

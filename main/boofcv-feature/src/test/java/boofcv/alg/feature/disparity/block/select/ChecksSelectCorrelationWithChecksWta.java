@@ -33,9 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends ImageGray<T>> {
-
-	Class<ArrayData> arrayType;
+public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends ImageGray<T>>
+		extends CheckBasicSelectDisparity.ScoreCorrelation<ArrayData,T>
+{
 
 	int w=20;
 	int h=25;
@@ -44,10 +44,9 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 	int reject;
 
 	T disparity;
-	Class<T> disparityType;
 
 	public ChecksSelectCorrelationWithChecksWta(Class<ArrayData> arrayType, Class<T> disparityType) {
-		this.disparityType = disparityType;
+		super(arrayType, disparityType);
 		this.arrayType = arrayType;
 		disparity = GeneralizedImageOps.createSingleBand(disparityType,w,h);
 	}
@@ -59,53 +58,11 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 		GImageMiscOps.fill(disparity, reject);
 	}
 
-	public abstract SelectDisparityWithChecksWta<ArrayData,T> createSelector(int maxError, int rightToLeftTolerance, double texture );
+	public abstract SelectDisparityWithChecksWta<ArrayData,T> createSelector(int rightToLeftTolerance, double texture );
 
-	@Test
-	void basic() {
-		BasicDisparitySelectTests<ArrayData,T> test =
-				new BasicDisparitySelectTests<ArrayData,T>(arrayType, disparityType) {
-					@Override
-					public DisparitySelect<ArrayData,T> createAlg() {
-						return createSelector(-1, -1, -1);
-					}
-				};
-
-		test.allTests();
-	}
-
-	@Test
-	void maxError() {
-		init(0,10);
-
-		int y = 3;
-
-		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(2,-1,-1);
-		alg.configure(disparity,0,maxDisparity,2);
-
-		int scores[] = new int[w*maxDisparity];
-
-		for( int d = 0; d < 10; d++ ) {
-			for( int x = 0; x < w; x++ ) {
-				scores[w*d+x] = d==0 ? 5 : x;
-			}
-		}
-
-		alg.process(y, copyToCorrectType(scores,arrayType));
-
-		// Below error threshold and disparity of 1 should be optimal
-		assertEquals(1, getDisparity( 1 + 2, y), 1e-8);
-		assertEquals(1, getDisparity(2 + 2, y), 1);
-		// At this point the error should become too high
-		assertEquals(reject, getDisparity(3 + 2, y), 1e-8);
-		assertEquals(reject, getDisparity(4 + 2, y), 1e-8);
-
-		// Sanity check, much higher error threshold
-		alg = createSelector(20,-1,-1);
-		alg.configure(disparity,0,maxDisparity,2);
-		alg.process(y,copyToCorrectType(scores,arrayType));
-		assertEquals(1, getDisparity( 3+2, y), 1);
-		assertEquals(1, getDisparity(4 + 2, y), 1);
+	@Override
+	public DisparitySelect<ArrayData, T> createAlg() {
+		return createSelector(-1,-1);
 	}
 
 	/**
@@ -124,7 +81,6 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 	 */
 	@Test
 	void testRightToLeftValidation() {
-
 		rightToLeftValidation(0);
 		rightToLeftValidation(2);
 	}
@@ -136,14 +92,14 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 		int y = 3;
 		int r = 2;
 
-		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,1,-1);
+		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(1,-1);
 		alg.configure(disparity,minDisparity,maxDisparity,r);
 
-		int scores[] = new int[w*rangeDisparity];
+		int[] scores = new int[w*rangeDisparity];
 
 		for( int d = 0; d < rangeDisparity; d++ ) {
 			for( int x = 0; x < w; x++ ) {
-				scores[w*d+x] = Math.abs(d-5);
+				scores[w*d+x] = computeError(d);
 			}
 		}
 
@@ -164,7 +120,7 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 			assertEquals(5, getDisparity(i, y), 1e-8);
 
 		// sanity check, I now set the tolerance to zero
-		alg = createSelector(-1,0,-1);
+		alg = createSelector(0,-1);
 		alg.configure(disparity,minDisparity,maxDisparity,2);
 		alg.process(y,copyToCorrectType(scores,arrayType));
 		assertEquals(reject, getDisparity(4 + r + minDisparity, y), 1e-8);
@@ -179,10 +135,10 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 		int minValue = 3;
 		int y = 3;
 
-		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,-1,3);
+		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,3);
 		alg.configure(disparity,0,maxDisparity,2);
 
-		int scores[] = new int[w*maxDisparity];
+		int[] scores = new int[w*maxDisparity];
 
 		for( int d = 0; d < 10; d++ ) {
 			for( int x = 0; x < w; x++ ) {
@@ -212,10 +168,10 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 		int y = 3;
 		int r = 2;
 
-		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,-1,3);
+		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,3);
 		alg.configure(disparity,minDisparity,maxDisparity,r);
 
-		int scores[] = new int[w*maxDisparity];
+		int[] scores = new int[w*maxDisparity];
 
 		for( int d = 0; d < 10; d++ ) {
 			for( int x = 0; x < w; x++ ) {

@@ -20,8 +20,6 @@ package boofcv.alg.feature.disparity.block.select;
 
 import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.alg.feature.disparity.block.SelectDisparityBasicWta;
-import boofcv.factory.filter.kernel.FactoryKernel;
-import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayU8;
 
 /**
@@ -38,10 +36,6 @@ import boofcv.struct.image.GrayU8;
  */
 public class SelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[],GrayU8>
 {
-	Kernel1D_F32 box = FactoryKernel.table1D_F32(2,true);
-//	float[] scoresByD;
-//	float[] smoothed;
-
 	@Override
 	public void configure(GrayU8 imageDisparity, int minDisparity, int maxDisparity, int radiusX) {
 		super.configure(imageDisparity, minDisparity, maxDisparity, radiusX);
@@ -49,35 +43,19 @@ public class SelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[]
 
 	@Override
 	public void process(int row, float[] blockOfScores) {
-		// declare it to be the maximum length possible
-		float[] scoresByD = new float[ maxDisparity-minDisparity+1];
-		float[] smoothed = new float[ scoresByD.length ];
-
 		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride + radiusX + minDisparity;
 
 		for( int col = minDisparity; col <= imageWidth-regionWidth; col++ ) {
-			boolean print = ((col+radiusX)==34&&row==131);
-
 			// make sure the disparity search doesn't go outside the image border
-			int localMax = maxDisparityAtColumnL2R(col);
+			int localMaxRange = maxDisparityAtColumnL2R(col);
 
-
+			// Find the disparity with the best score, which is the largest score for correlation
 			int indexScore = col-minDisparity;
-			for( int i = 0; i < localMax; i++ ,indexScore += imageWidth) {
-				scoresByD[i] = blockOfScores[indexScore];
-//				if( print ) System.out.printf("%2d %5.2f : ",i,scoresByD[i]);
-			}
-//			if( print )System.out.println("   done");
-
-//			if( localMax >= box.width )
-//				KernelMath.convolveSmooth(box,scoresByD,smoothed,localMax);
-//			else
-				System.arraycopy(scoresByD,0,smoothed,0,localMax);
-
-			float maxValue = smoothed[0];
 			int maxIndex = 0;
-			for (int i = 1; i < localMax; i++) {
-				float v = smoothed[i];
+			float maxValue = blockOfScores[indexScore];
+			indexScore += imageWidth;
+			for( int i = 1; i < localMaxRange; i++ ,indexScore += imageWidth) {
+				float v = blockOfScores[indexScore];
 				if( v > maxValue ) {
 					maxValue = v;
 					maxIndex = i;

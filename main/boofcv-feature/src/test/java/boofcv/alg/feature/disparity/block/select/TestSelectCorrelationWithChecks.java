@@ -18,16 +18,22 @@
 
 package boofcv.alg.feature.disparity.block.select;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import boofcv.struct.image.GrayU8;
+import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-class TestSelectCorrelationChecksWta_F32_U8 {
-	@Test
-	void foo() {
-		fail("Implement");
+class TestSelectCorrelationWithChecks {
+	@Nested
+	public class F32_U8 extends ChecksSelectCorrelationWithChecksWta<float[], GrayU8> {
+		F32_U8() {
+			super(float[].class,GrayU8.class);
+		}
+
+		@Override
+		public SelectCorrelationWithChecks_F32<GrayU8> createSelector(int rightToLeftTolerance, double texture) {
+			return new SelectCorrelationWithChecks_F32.DispU8(rightToLeftTolerance,texture);
+		}
 	}
 }

@@ -37,7 +37,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public abstract class CheckslDisparityBM<I extends ImageGray<I>, DI extends ImageGray<DI>> {
+public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends ImageGray<DI>> {
 
 	Random rand = new Random(234);
 
@@ -46,7 +46,7 @@ public abstract class CheckslDisparityBM<I extends ImageGray<I>, DI extends Imag
 	Class<I> imageType;
 	Class<DI> disparityType;
 
-	CheckslDisparityBM(Class<I> imageType , Class<DI> disparityType ) {
+	ChecksDisparityBM(Class<I> imageType , Class<DI> disparityType ) {
 		this.imageType = imageType;
 		this.disparityType = disparityType;
 

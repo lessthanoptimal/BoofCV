@@ -33,9 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGray<T>> {
-
-	Class<ArrayData> arrayType;
+public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGray<T>>
+		extends CheckBasicSelectDisparity.ScoreError<ArrayData,T>
+{
 
 	int w=20;
 	int h=25;
@@ -43,11 +43,8 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 	int maxDisparity=10;
 	int reject;
 
-	T disparity;
-	Class<T> disparityType;
-
 	public ChecksSelectErrorWithChecksWta(Class<ArrayData> arrayType, Class<T> disparityType) {
-		this.disparityType = disparityType;
+		super(arrayType,disparityType);
 		this.arrayType = arrayType;
 		disparity = GeneralizedImageOps.createSingleBand(disparityType,w,h);
 	}
@@ -61,17 +58,8 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 
 	public abstract SelectDisparityWithChecksWta<ArrayData,T> createSelector(int maxError, int rightToLeftTolerance, double texture );
 
-	@Test
-	void basic() {
-		BasicDisparitySelectTests<ArrayData,T> test =
-				new BasicDisparitySelectTests<ArrayData,T>(arrayType, disparityType) {
-					@Override
-					public DisparitySelect<ArrayData,T> createAlg() {
-						return createSelector(-1, -1, -1);
-					}
-				};
-
-		test.allTests();
+	public DisparitySelect<ArrayData, T> createAlg() {
+		return createSelector(-1, -1, -1);
 	}
 
 	@Test
@@ -83,7 +71,7 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(2,-1,-1);
 		alg.configure(disparity,0,maxDisparity,2);
 
-		int scores[] = new int[w*maxDisparity];
+		int[] scores = new int[w*maxDisparity];
 
 		for( int d = 0; d < 10; d++ ) {
 			for( int x = 0; x < w; x++ ) {
@@ -139,7 +127,7 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,1,-1);
 		alg.configure(disparity,minDisparity,maxDisparity,r);
 
-		int scores[] = new int[w*rangeDisparity];
+		int[] scores = new int[w*rangeDisparity];
 
 		for( int d = 0; d < rangeDisparity; d++ ) {
 			for( int x = 0; x < w; x++ ) {
@@ -182,7 +170,7 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,-1,3);
 		alg.configure(disparity,0,maxDisparity,2);
 
-		int scores[] = new int[w*maxDisparity];
+		int[] scores = new int[w*maxDisparity];
 
 		for( int d = 0; d < 10; d++ ) {
 			for( int x = 0; x < w; x++ ) {
@@ -215,7 +203,7 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,-1,3);
 		alg.configure(disparity,minDisparity,maxDisparity,r);
 
-		int scores[] = new int[w*maxDisparity];
+		int[] scores = new int[w*maxDisparity];
 
 		for( int d = 0; d < 10; d++ ) {
 			for( int x = 0; x < w; x++ ) {

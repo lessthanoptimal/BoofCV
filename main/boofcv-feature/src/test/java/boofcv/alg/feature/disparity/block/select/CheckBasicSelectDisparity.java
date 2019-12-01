@@ -27,12 +27,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Basic tests for selecting disparity
+ * Basic tests for selecting disparity with a correlation score
  *
  * @author Peter Abeles
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class BasicDisparitySelectTests<ArrayData , D extends ImageGray<D>> {
+public abstract class CheckBasicSelectDisparity<ArrayData , D extends ImageGray<D>> {
 
 	Class<ArrayData> arrayType;
 
@@ -44,7 +44,7 @@ public abstract class BasicDisparitySelectTests<ArrayData , D extends ImageGray<
 
 	DisparitySelect<ArrayData,D> alg;
 
-	BasicDisparitySelectTests(Class<ArrayData> arrayType , Class<D> disparityType ) {
+	protected CheckBasicSelectDisparity(Class<ArrayData> arrayType , Class<D> disparityType ) {
 
 		this.arrayType = arrayType;
 		disparity = GeneralizedImageOps.createSingleBand(disparityType,w,h);
@@ -54,17 +54,11 @@ public abstract class BasicDisparitySelectTests<ArrayData , D extends ImageGray<
 
 	public abstract DisparitySelect<ArrayData,D> createAlg();
 
-	public void allTests() {
-		simpleTest();
-		minDisparity();
-	}
-
 	/**
 	 * Give it a hand crafted score with known results for WTA.  See if it produces those results
 	 */
 	@Test
 	void simpleTest() {
-
 		int y = 3;
 
 		GImageMiscOps.fill(disparity, 0);
@@ -74,7 +68,7 @@ public abstract class BasicDisparitySelectTests<ArrayData , D extends ImageGray<
 
 		for( int d = 0; d < 10; d++ ) {
 			for( int x = 0; x < w; x++ ) {
-				scores[w*d+x] = Math.abs(d-5);
+				scores[w*d+x] = computeError(d);
 			}
 		}
 
@@ -90,10 +84,10 @@ public abstract class BasicDisparitySelectTests<ArrayData , D extends ImageGray<
 
 		// should ramp up to 5 here
 		for( int i = 0; i < 5; i++ )
-			assertEquals(i, GeneralizedImageOps.get(disparity, i+2, y), 1e-8);
+			assertEquals(i, GeneralizedImageOps.get(disparity, i+2, y));
 		// should be at 5 for the remainder
 		for( int i = 5; i < w-4; i++ )
-			assertEquals(5, GeneralizedImageOps.get(disparity, i+2, y), 1e-8);
+			assertEquals(5, GeneralizedImageOps.get(disparity, i+2, y));
 	}
 
 	private ArrayData copyToCorrectType( int scores[] ) {
@@ -130,7 +124,7 @@ public abstract class BasicDisparitySelectTests<ArrayData , D extends ImageGray<
 
 		for( int d = 0; d < range; d++ ) {
 			for( int x = 0; x < w-(r*2+1); x++ ) {
-				scores[w*d+x] = Math.abs(d-5);
+				scores[w*d+x] = computeError(d);
 			}
 		}
 
@@ -148,5 +142,29 @@ public abstract class BasicDisparitySelectTests<ArrayData , D extends ImageGray<
 		// should be at 7 for the remainder
 		for( int i = 5; i < w-4-minDisparity; i++ )
 			assertEquals(7, minDisparity+GeneralizedImageOps.get(disparity, i+2+minDisparity, y), 1e-8);
+	}
+
+	public abstract int computeError( int d );
+
+	public abstract static class ScoreError<ArrayData , D extends ImageGray<D>>
+			extends CheckBasicSelectDisparity<ArrayData,D>
+	{
+		protected ScoreError(Class<ArrayData> arrayType, Class<D> disparityType) {
+			super(arrayType, disparityType);
+		}
+		public int computeError( int d ) {
+			return Math.abs(d-5);
+		}
+	}
+
+	public abstract static class ScoreCorrelation<ArrayData , D extends ImageGray<D>>
+			extends CheckBasicSelectDisparity<ArrayData,D>
+	{
+		protected ScoreCorrelation(Class<ArrayData> arrayType, Class<D> disparityType) {
+			super(arrayType, disparityType);
+		}
+		public int computeError( int d ) {
+			return 5-Math.abs(d-5);
+		}
 	}
 }

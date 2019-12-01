@@ -20,11 +20,10 @@ package boofcv.alg.feature.disparity;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.feature.disparity.block.DisparityBlockMatchNaive;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
@@ -38,8 +37,7 @@ import java.util.Random;
  */
 public abstract class ChecksBlockMatchBasic<T extends ImageBase<T>> {
 
-	double maxPixel = 255;
-
+	Random rand = new Random(345);
 	T left,right;
 	GrayU8 expected = new GrayU8(1,1);
 
@@ -63,19 +61,11 @@ public abstract class ChecksBlockMatchBasic<T extends ImageBase<T>> {
 	}
 
 	void compare( int width , int height , int radius , int minDisparity , int maxDisparity ) {
-		Random rand = new Random(234);
 		expected.reshape(width,height);
 		left.reshape(width,height);
 		right.reshape(width,height);
 
-		// Create two images with gradient. This should have a clear best fit and not be nearl as sensitive
-		// to noise as a random fill that can have multiple very similar solutions
-		for (int j = 0; j < height; j++) {
-			for (int x = 0; x < width; x++) {
-				GeneralizedImageOps.set((ImageGray)left,x,j,x+j);
-				GeneralizedImageOps.set((ImageGray)right,x,j,x+j+2);
-			}
-		}
+		fillInStereoImages();
 
 		DisparityBlockMatchNaive<T> naive = createNaive(radius,minDisparity,maxDisparity);
 		StereoDisparity<T, GrayU8> alg = createAlg(radius,minDisparity,maxDisparity);
@@ -86,11 +76,19 @@ public abstract class ChecksBlockMatchBasic<T extends ImageBase<T>> {
 		BoofTesting.assertEquals(expected,alg.getDisparity(),1e-4);
 	}
 
+	/**
+	 * Depending on the cost function different preconditions will need to be meet
+	 */
+	protected void fillInStereoImages() {
+		GImageMiscOps.fillUniform(left,rand,0,255);
+		GImageMiscOps.fillUniform(right,rand,0,255);
+	}
+
 	public static ConfigDisparityBM createConfigBasicBM(int blockRadius, int minDisparity, int maxDisparity) {
 		ConfigDisparityBM config = new ConfigDisparityBM();
 		config.regionRadiusX = config.regionRadiusY = blockRadius;
 		config.minDisparity = minDisparity;
-		config.rangeDisparity = maxDisparity-minDisparity;
+		config.rangeDisparity = maxDisparity-minDisparity+1;
 		// turn off all validation
 		config.texture = 0;
 		config.validateRtoL = -1;

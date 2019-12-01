@@ -32,6 +32,7 @@ public abstract class DisparityBlockMatchNaive<T extends ImageBase<T>> {
 	protected int radius;
 	protected int width;
 	protected int minDisparity,maxDisparity;
+	protected int rangeDisparity;
 
 	protected double[] scores;
 
@@ -41,46 +42,42 @@ public abstract class DisparityBlockMatchNaive<T extends ImageBase<T>> {
 		this.radius = radius;
 		this.minDisparity = minDisparity;
 		this.maxDisparity = maxDisparity;
+		this.rangeDisparity = maxDisparity-minDisparity+1;
 
 		this.width = radius*2+1;
-		this.scores = new double[maxDisparity-minDisparity];
+		this.scores = new double[rangeDisparity];
 	}
 
 	public void process(T left , T right , GrayU8 disparity ) {
 		ImageMiscOps.fill(disparity,maxDisparity-minDisparity+1);
 		for (int y = radius; y < left.height - radius; y++) {
 			for (int x = radius+minDisparity; x < left.width - radius; x++) {
-				int maxConsider = Math.min(x-radius+1,maxDisparity)-minDisparity;
+				int localMaxRange = Math.min(x-radius+1-minDisparity,rangeDisparity);
 
-				for (int d = 0; d < maxConsider; d++) {
+				for (int d = 0; d < localMaxRange; d++) {
 					scores[d] = computeScore(left,right,x,y,d+minDisparity);
 				}
 
-//				boolean print = (x==34&&y==131);
-
-				int bestDisparity = 0;
+				int bestRange = 0;
 				double bestScore = scores[0];
 
-//				if( print ) System.out.printf(" %5.2f ",bestScore);
 
-				for (int d = 1; d < maxConsider; d++) {
+				for (int d = 1; d < localMaxRange; d++) {
 					double s = scores[d];
-//					if( print ) System.out.printf("%2d %5.2f : ",d,s);
 					if( minimize ) {
 						if( s < bestScore ) {
 							bestScore = s;
-							bestDisparity = d;
+							bestRange = d;
 						}
 					} else {
 						if( s > bestScore ) {
 							bestScore = s;
-							bestDisparity = d;
+							bestRange = d;
 						}
 					}
 				}
-//				if( print ) System.out.println("   naive");
 
-				disparity.set(x,y,bestDisparity);
+				disparity.set(x,y,bestRange);
 			}
 		}
 	}
