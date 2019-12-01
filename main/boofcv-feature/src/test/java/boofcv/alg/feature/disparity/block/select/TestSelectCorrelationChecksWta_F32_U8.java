@@ -18,19 +18,16 @@
 
 package boofcv.alg.feature.disparity.block.select;
 
-import boofcv.struct.image.GrayU8;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
-public class TestSelectErrorWithChecksWta_F32_U8 extends ChecksSelectDisparityWithChecksWta<float[],GrayU8> {
-
-	TestSelectErrorWithChecksWta_F32_U8() {
-		super(float[].class,GrayU8.class);
-	}
-
-	@Override
-	public SelectErrorWithChecks_F32<GrayU8> createSelector(int maxError, int rightToLeftTolerance, double texture) {
-		return new SelectErrorWithChecksWta_F32_U8(maxError,rightToLeftTolerance,texture);
+class TestSelectCorrelationChecksWta_F32_U8 {
+	@Test
+	void foo() {
+		fail("Implement");
 	}
 }

@@ -69,8 +69,8 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 
 	private void scoreRow_naive(int minDisparity, int maxDisparity, int r) {
 		int w = r*2+1;
-		GImageMiscOps.fillUniform(left,rand,0,255);
-		GImageMiscOps.fillUniform(right,rand,0,255);
+		GImageMiscOps.fillUniform(left,rand,0,maxPixelValue);
+		GImageMiscOps.fillUniform(right,rand,0,maxPixelValue);
 
 		BlockRowScore<T,Array> alg = createAlg(r,r);
 
@@ -104,8 +104,8 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 	}
 	void score_naive(int minDisparity, int maxDisparity, int r) {
 		int w = r*2+1;
-		GImageMiscOps.fillUniform(left,rand,0,255);
-		GImageMiscOps.fillUniform(right,rand,0,255);
+		GImageMiscOps.fillUniform(left,rand,0,maxPixelValue);
+		GImageMiscOps.fillUniform(right,rand,0,maxPixelValue);
 
 		BlockRowScore<T,Array> alg = createAlg(r,r);
 		alg.setInput(left,right);
@@ -117,6 +117,7 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 		Array elementScore = createArray(width);
 		Array scoresSum = createArray(width*disparityRange);
 		Array scoresSumNorm = createArray(width*disparityRange);
+		Array scoresEvaluated;
 
 		// compute the scores one row at a time then sum them up to get the unnormalized region score
 		for (int i = -r; i <= r; i++) {
@@ -124,13 +125,18 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 			addToSum(scores,scoresSum);
 		}
 		// Normalize the region score
-		alg.normalizeRegionScores(row,scoresSum,minDisparity,maxDisparity,w,w,scoresSumNorm);
+		if( alg.isRequireNormalize()) {
+			alg.normalizeRegionScores(row, scoresSum, minDisparity, maxDisparity, w, w, scoresSumNorm);
+			scoresEvaluated = scoresSumNorm;
+		} else {
+			scoresEvaluated = scoresSum;
+		}
 
 		for (int d = minDisparity; d < maxDisparity; d++) {
 			int idx = width*(d-minDisparity)+d-minDisparity;
 			for (int x = d+r; x < width-r; x++) {
 				double expected = naiveScoreRegion(x,row,d,r);
-				double found = get(idx++,scoresSumNorm);
+				double found = get(idx++,scoresEvaluated);
 //				System.out.printf("%3d  %7.4f e=%8.3f f=%8.3f\n",idx,(expected-found),expected,found);
 //				System.out.println("diff "+(expected-found)+"   expected "+expected);
 				assertEquals(expected,found,1e-3);

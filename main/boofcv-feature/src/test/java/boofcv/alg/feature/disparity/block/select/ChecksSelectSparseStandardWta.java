@@ -21,7 +21,7 @@ package boofcv.alg.feature.disparity.block.select;
 import boofcv.alg.feature.disparity.block.SelectSparseStandardWta;
 import org.junit.jupiter.api.Test;
 
-import static boofcv.alg.feature.disparity.block.select.ChecksSelectDisparityWithChecksWta.copyToCorrectType;
+import static boofcv.alg.feature.disparity.block.select.ChecksSelectErrorWithChecksWta.copyToCorrectType;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

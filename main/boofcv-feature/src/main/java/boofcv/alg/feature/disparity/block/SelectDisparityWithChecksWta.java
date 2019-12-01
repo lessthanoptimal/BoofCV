@@ -45,11 +45,11 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class SelectDisparityWithChecksWta<Array , T extends ImageGray>
-		implements DisparitySelect<Array,T>
+public abstract class SelectDisparityWithChecksWta<Array , DI extends ImageGray<DI>>
+		implements DisparitySelect<Array, DI>
 {
 	// output containing disparity
-	protected T imageDisparity;
+	protected DI imageDisparity;
 	// minimum and maximum disparity that will be checked
 	protected int minDisparity;
 	protected int maxDisparity;
@@ -67,6 +67,9 @@ public abstract class SelectDisparityWithChecksWta<Array , T extends ImageGray>
 	// tolerance for right to left validation. if < 0 then it's disabled
 	protected int rightToLeftTolerance;
 
+	// type of disparity image
+	protected Class<DI> disparityType;
+
 	/**
 	 * Configures tolerances
 	 *
@@ -76,16 +79,17 @@ public abstract class SelectDisparityWithChecksWta<Array , T extends ImageGray>
 	 * @param texture Tolerance for how similar optimal region is to other region.  Disable with a value &le; 0.
 	 *                Closer to zero is more tolerant. Try 0.1
 	 */
-	public SelectDisparityWithChecksWta(int maxError, int rightToLeftTolerance, double texture) {
+	public SelectDisparityWithChecksWta(int maxError, int rightToLeftTolerance, double texture,Class<DI> disparityType) {
 		this.maxError = maxError <= 0 ? Integer.MAX_VALUE : maxError;
 		this.rightToLeftTolerance = rightToLeftTolerance;
+		this.disparityType = disparityType;
 		setTexture(texture);
 	}
 
 	public abstract void setTexture( double threshold );
 
 	@Override
-	public void configure(T imageDisparity, int minDisparity , int maxDisparity , int radiusX ) {
+	public void configure(DI imageDisparity, int minDisparity , int maxDisparity , int radiusX ) {
 		this.imageDisparity = imageDisparity;
 		this.minDisparity = minDisparity;
 		this.maxDisparity = maxDisparity;
@@ -94,6 +98,9 @@ public abstract class SelectDisparityWithChecksWta<Array , T extends ImageGray>
 		rangeDisparity = maxDisparity-minDisparity;
 		regionWidth = radiusX*2+1;
 		invalidDisparity = rangeDisparity+1;
+
+		if( invalidDisparity > (int)imageDisparity.getDataType().getMaxValue()-1 )
+			throw new IllegalArgumentException("Max range exceeds maximum value in disparity image. v="+invalidDisparity);
 	}
 
 	/**
@@ -117,5 +124,10 @@ public abstract class SelectDisparityWithChecksWta<Array , T extends ImageGray>
 	 */
 	public void setLocalMaxDisparity(int value) {
 		localMaxDisparity = value;
+	}
+
+	@Override
+	public Class<DI> getDisparityType() {
+		return null;
 	}
 }

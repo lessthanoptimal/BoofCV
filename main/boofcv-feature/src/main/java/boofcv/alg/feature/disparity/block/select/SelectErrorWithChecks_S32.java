@@ -18,8 +18,10 @@
 
 package boofcv.alg.feature.disparity.block.select;
 
+import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.alg.feature.disparity.block.SelectDisparityWithChecksWta;
 import boofcv.misc.Compare_S32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 
 /**
@@ -34,8 +36,8 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class SelectErrorWithChecks_S32<T extends ImageGray<T>>
-		extends SelectDisparityWithChecksWta<int[],T>
+public abstract class SelectErrorWithChecks_S32<DI extends ImageGray<DI>>
+		extends SelectDisparityWithChecksWta<int[], DI>
 		implements Compare_S32
 {
 	// scores organized for more efficient processing
@@ -46,12 +48,13 @@ public abstract class SelectErrorWithChecks_S32<T extends ImageGray<T>>
 	protected int textureThreshold;
 	protected static final int discretizer = 10000;
 
-	public SelectErrorWithChecks_S32(int maxError, int rightToLeftTolerance, double texture) {
-		super(maxError,rightToLeftTolerance,texture);
+	public SelectErrorWithChecks_S32(int maxError, int rightToLeftTolerance, double texture,Class<DI> disparityType) {
+		super(maxError,rightToLeftTolerance,texture,disparityType);
 	}
 
-	public SelectErrorWithChecks_S32(SelectErrorWithChecks_S32<T> original ) {
-		this(original.maxError,original.rightToLeftTolerance,original.textureThreshold/(double)discretizer);
+	public SelectErrorWithChecks_S32(SelectErrorWithChecks_S32<DI> original ) {
+		this(original.maxError,original.rightToLeftTolerance,
+				original.textureThreshold/(double)discretizer,original.disparityType);
 	}
 
 	@Override
@@ -60,7 +63,7 @@ public abstract class SelectErrorWithChecks_S32<T extends ImageGray<T>>
 	}
 
 	@Override
-	public void configure(T imageDisparity, int minDisparity, int maxDisparity , int radiusX ) {
+	public void configure(DI imageDisparity, int minDisparity, int maxDisparity , int radiusX ) {
 		super.configure(imageDisparity,minDisparity,maxDisparity,radiusX);
 
 		columnScore = new int[maxDisparity-minDisparity];
@@ -161,5 +164,28 @@ public abstract class SelectErrorWithChecks_S32<T extends ImageGray<T>>
 	@Override
 	public int compare(int scoreA, int scoreB) {
 		return Integer.compare(-scoreA, -scoreB);
+	}
+
+	/**
+	 * Implementation for disparity images of type GrayU8
+	 */
+	public static class DispU8 extends SelectErrorWithChecks_S32<GrayU8>
+	{
+		public DispU8(int maxError, int rightToLeftTolerance, double texture) {
+			super(maxError, rightToLeftTolerance, texture, GrayU8.class);
+		}
+
+		public DispU8(DispU8 original) {
+			super(original);
+		}
+
+		@Override
+		public DisparitySelect<int[], GrayU8> concurrentCopy() {
+			return new DispU8(this);
+		}
+
+		protected void setDisparity( int index , int value ) {
+			imageDisparity.data[index] = (byte)value;
+		}
 	}
 }

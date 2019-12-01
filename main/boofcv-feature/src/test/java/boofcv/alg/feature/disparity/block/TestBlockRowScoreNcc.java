@@ -34,7 +34,7 @@ public class TestBlockRowScoreNcc {
 	class F32 extends ChecksBlockRowScore<GrayF32,float[]> {
 
 		F32() {
-			super(255, ImageType.single(GrayF32.class));
+			super(1000, ImageType.single(GrayF32.class));
 		}
 
 		@Override
@@ -61,7 +61,7 @@ public class TestBlockRowScoreNcc {
 
 		@Override
 		public double naiveScoreRegion(int cx, int cy, int disparity, int radius) {
-			return -ncc(left,right,cx,cy,disparity,radius,UtilEjml.F_EPS);
+			return ncc(left,right,cx,cy,disparity,radius,UtilEjml.F_EPS);
 		}
 
 		@Override

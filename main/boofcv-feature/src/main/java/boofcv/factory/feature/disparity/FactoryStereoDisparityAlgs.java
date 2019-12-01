@@ -103,21 +103,21 @@ public class FactoryStereoDisparityAlgs {
 		if( maxError < 0 && tolR2L < 0  & texture <= 0 )
 			return new SelectErrorBasicWta_S32_U8();
 		else
-			return new SelectErrorWithChecksWta_S32_U8(maxError,tolR2L,texture);
+			return new SelectErrorWithChecks_S32.DispU8(maxError,tolR2L,texture);
 	}
 
 	public static DisparitySelect<float[],GrayU8> selectDisparity_F32(int maxError , int tolR2L , double texture) {
 		if( maxError < 0 && tolR2L < 0  & texture <= 0 )
 			return new SelectErrorBasicWta_F32_U8();
 		else
-			return new SelectErrorWithChecksWta_F32_U8(maxError,tolR2L,texture);
+			return new SelectErrorWithChecks_F32.DispU8(maxError,tolR2L,texture);
 	}
 
 	public static <D extends ImageGray<D>> DisparitySelect<float[],D> selectCorrelation_F32(int tolR2L , double texture, boolean subpixel) {
 		if( !subpixel &&  tolR2L < 0 && texture <= 0 )
 			return (DisparitySelect)new SelectCorrelationWta_F32_U8();
 		else if( !subpixel )
-			return (DisparitySelect)new SelectCorrelationChecksWta_F32_U8(tolR2L,texture);
+			return (DisparitySelect)new SelectCorrelationWithChecks_F32.DispU8(tolR2L, texture);
 		else
 			return (DisparitySelect)new SelectCorrelationSubpixel.F32_F32(tolR2L,texture);
 	}

@@ -258,7 +258,7 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends Imag
 				} else if( compare.compare(val1,val2) < 0 ) {
 					s = val2 + val0;
 				} else {
-					s = val0 + val0;
+					s = val0 + val1;
 				}
 
 				score[indexDst++] = s + middle[indexSrc++];

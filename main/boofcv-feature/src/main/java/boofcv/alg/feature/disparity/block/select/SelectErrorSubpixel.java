@@ -45,7 +45,7 @@ public class SelectErrorSubpixel {
 	 */
 	public static class S32_F32 extends SelectErrorWithChecks_S32<GrayF32> {
 		public S32_F32(int maxError, int rightToLeftTolerance, double texture) {
-			super(maxError, rightToLeftTolerance, texture);
+			super(maxError, rightToLeftTolerance, texture, GrayF32.class);
 		}
 
 		S32_F32( S32_F32 original ) {
@@ -72,11 +72,6 @@ public class SelectErrorSubpixel {
 		public DisparitySelect<int[], GrayF32> concurrentCopy() {
 			return new S32_F32(this);
 		}
-
-		@Override
-		public Class<GrayF32> getDisparityType() {
-			return GrayF32.class;
-		}
 	}
 
 	/**
@@ -84,7 +79,7 @@ public class SelectErrorSubpixel {
 	 */
 	public static class F32_F32 extends SelectErrorWithChecks_F32<GrayF32> {
 		public F32_F32(int maxError, int rightToLeftTolerance, double texture) {
-			super(maxError, rightToLeftTolerance, texture);
+			super(maxError, rightToLeftTolerance, texture, GrayF32.class);
 		}
 
 		F32_F32( F32_F32 original ) {
@@ -111,11 +106,6 @@ public class SelectErrorSubpixel {
 		@Override
 		public DisparitySelect<float[], GrayF32> concurrentCopy() {
 			return new F32_F32(this);
-		}
-
-		@Override
-		public Class<GrayF32> getDisparityType() {
-			return GrayF32.class;
 		}
 	}
 }

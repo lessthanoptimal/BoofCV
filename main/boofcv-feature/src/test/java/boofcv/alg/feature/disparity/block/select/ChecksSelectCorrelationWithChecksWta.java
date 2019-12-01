@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class ChecksSelectDisparityWithChecksWta<ArrayData,T extends ImageGray<T>> {
+public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends ImageGray<T>> {
 
 	Class<ArrayData> arrayType;
 
@@ -46,7 +46,7 @@ public abstract class ChecksSelectDisparityWithChecksWta<ArrayData,T extends Ima
 	T disparity;
 	Class<T> disparityType;
 
-	public ChecksSelectDisparityWithChecksWta(Class<ArrayData> arrayType, Class<T> disparityType) {
+	public ChecksSelectCorrelationWithChecksWta(Class<ArrayData> arrayType, Class<T> disparityType) {
 		this.disparityType = disparityType;
 		this.arrayType = arrayType;
 		disparity = GeneralizedImageOps.createSingleBand(disparityType,w,h);

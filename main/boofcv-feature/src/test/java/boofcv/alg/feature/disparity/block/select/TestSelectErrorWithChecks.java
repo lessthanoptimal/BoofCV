@@ -19,18 +19,34 @@
 package boofcv.alg.feature.disparity.block.select;
 
 import boofcv.struct.image.GrayU8;
+import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-public class TestSelectErrorWithChecksWta_S32_U8 extends ChecksSelectDisparityWithChecksWta<int[],GrayU8> {
+public class TestSelectErrorWithChecks {
 
-	TestSelectErrorWithChecksWta_S32_U8() {
-		super(int[].class,GrayU8.class);
+	@Nested
+	public class F32_U8 extends ChecksSelectErrorWithChecksWta<float[],GrayU8> {
+		F32_U8() {
+			super(float[].class,GrayU8.class);
+		}
+
+		@Override
+		public SelectErrorWithChecks_F32<GrayU8> createSelector(int maxError, int rightToLeftTolerance, double texture) {
+			return new SelectErrorWithChecks_F32.DispU8(maxError,rightToLeftTolerance,texture);
+		}
 	}
 
-	@Override
-	public SelectErrorWithChecks_S32<GrayU8> createSelector(int maxError, int rightToLeftTolerance, double texture) {
-		return new SelectErrorWithChecksWta_S32_U8(maxError,rightToLeftTolerance,texture);
+	@Nested
+	public class S32_U8 extends ChecksSelectErrorWithChecksWta<int[],GrayU8> {
+		S32_U8() {
+			super(int[].class,GrayU8.class);
+		}
+
+		@Override
+		public SelectErrorWithChecks_S32<GrayU8> createSelector(int maxError, int rightToLeftTolerance, double texture) {
+			return new SelectErrorWithChecks_S32.DispU8(maxError,rightToLeftTolerance,texture);
+		}
 	}
 }

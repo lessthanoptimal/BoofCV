@@ -23,7 +23,7 @@ import boofcv.struct.image.GrayF32;
 
 /**
  * <p>
- * Implementation of {@link SelectErrorWithChecks_S32} that adds sub-pixel accuracy. Using
+ * Implementation of {@link SelectCorrelationWithChecks_F32} that adds sub-pixel accuracy. Using
  * equation (3) from [1]:<br>
  *
  * d_sub = d + (C0 - C2)/(2*(C0 - 2*C1 + C2)<br>
@@ -43,9 +43,9 @@ public class SelectCorrelationSubpixel {
 	/**
 	 * For scores of type float[]
 	 */
-	public static class F32_F32 extends SelectCorrelationChecksBase_F32<GrayF32> {
+	public static class F32_F32 extends SelectCorrelationWithChecks_F32<GrayF32> {
 		public F32_F32(int rightToLeftTolerance, double texture) {
-			super(rightToLeftTolerance, texture);
+			super(rightToLeftTolerance, texture,GrayF32.class);
 		}
 
 		F32_F32( F32_F32 original ) {
@@ -76,7 +76,6 @@ public class SelectCorrelationSubpixel {
 				imageDisparity.data[index] = disparityValue +  offset;
 			}
 		}
-
 
 		@Override
 		public DisparitySelect<float[], GrayF32> concurrentCopy() {
