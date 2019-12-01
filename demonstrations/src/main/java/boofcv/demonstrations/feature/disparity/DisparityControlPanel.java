@@ -42,7 +42,7 @@ import java.awt.event.ActionListener;
 public class DisparityControlPanel extends StandardAlgConfigPanel {
 
 	private static String[] ERRORS_BLOCK = new String[]{"SAD","Census","NCC"};
-	private static String[] ERRORS_BGM = new String[]{"SAD","Census","HMI"};
+	private static String[] ERRORS_SGM = new String[]{"SAD","Census","HMI"};
 
 	// which algorithm to run
 	int selectedMethod = 0;
@@ -77,7 +77,10 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		this.imageType = imageType;
 
 		comboMethod = combo(e -> handleMethod(), selectedMethod,"BlockMatch-5","BlockMatch","SGM");
-		comboError = combo(e -> handleErrorSelected(false),configBM.errorType.ordinal(),ERRORS_BLOCK);
+		if( isBlockSelected() )
+			comboError = combo(e -> handleErrorSelected(false),configBM.errorType.ordinal(),ERRORS_BLOCK);
+		else
+			comboError = combo(e -> handleErrorSelected(false),configSGM.errorType.ordinal(), ERRORS_SGM);
 		controlBM = new ControlsBlockMatching();
 		controlSGM = new ControlsSemiGlobal();
 		controlSad = new ControlsSAD();
@@ -85,8 +88,8 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		controlNCC = new ControlsNCC();
 		controlHMI = new ControlsMutualInfo();
 
-		tabbedPane.addTab("Method",controlBM);
-		tabbedPane.addTab("Error",controlSad);
+		tabbedPane.addTab("Method",getModelControl(isBlockSelected()));
+		tabbedPane.addTab("Error",getErrorControl(comboError.getSelectedIndex()));
 
 		// SGM is larger than BM, make the initial area larger
 		controlBM.setPreferredSize(controlSGM.getPreferredSize());
@@ -167,16 +170,14 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		// swap out the controls and stuff
 		if( block != previousBlock ) {
 			int activeTab = tabbedPane.getSelectedIndex(); // don't switch out of the current tab
-			Component c;
 			if( block ) {
-				c = controlBM;
 				comboError.setModel( new DefaultComboBoxModel( ERRORS_BLOCK ) );
 				comboError.setSelectedIndex(configBM.errorType.ordinal());
 			} else {
-				c = controlSGM;
-				comboError.setModel( new DefaultComboBoxModel( ERRORS_BGM ) );
+				comboError.setModel( new DefaultComboBoxModel( ERRORS_SGM ) );
 				comboError.setSelectedIndex(configSGM.errorType.ordinal());
 			}
+			Component c = getModelControl(block);
 			tabbedPane.removeTabAt(0);
 			tabbedPane.insertTab("Method",null,c,null,0);
 			tabbedPane.setSelectedIndex(activeTab);
@@ -185,6 +186,16 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 
 		// This will ignore all changes until after they have been processed
 		SwingUtilities.invokeLater(()->{ignoreChanges=false;broadcastChange();});
+	}
+
+	private Component getModelControl( boolean block ) {
+		Component c;
+		if( block ) {
+			c = controlBM;
+		} else {
+			c = controlSGM;
+		}
+		return c;
 	}
 
 	private boolean isBlockSelected() {
@@ -206,11 +217,28 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		// If forced keep the previously active tab active
 		int activeTab = !force ? 1 : tabbedPane.getSelectedIndex();
 //		System.out.println("error for block="+block+" idx="+selectedIdx);
-		Component c;
+
 		if( block ) {
 			configBM.errorType = DisparityError.values()[selectedIdx];
 			controlCensus.update(configBM.configCensus);
 			controlNCC.update(configBM.configNCC);
+		} else {
+			configSGM.errorType = DisparitySgmError.values()[selectedIdx];
+			controlCensus.update(configSGM.configCensus);
+			controlHMI.update(configSGM.configHMI);
+		}
+		Component c = getErrorControl(selectedIdx);
+		tabbedPane.removeTabAt(1);
+		tabbedPane.insertTab("Error",null,c,null,1);
+		tabbedPane.setSelectedIndex(activeTab);
+
+		if( !force )
+			SwingUtilities.invokeLater(()->{ignoreChanges=false;broadcastChange();});
+	}
+
+	private Component getErrorControl( int selectedIdx ) {
+		Component c;
+		if( isBlockSelected() ) {
 			switch( selectedIdx ) {
 				case 0: c = controlSad; break;
 				case 1: c = controlCensus; break;
@@ -218,9 +246,6 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 				default: throw new IllegalArgumentException("Unknown");
 			}
 		} else {
-			configSGM.errorType = DisparitySgmError.values()[selectedIdx];
-			controlCensus.update(configSGM.configCensus);
-			controlHMI.update(configSGM.configHMI);
 			switch( selectedIdx ) {
 				case 0: c = controlSad; break;
 				case 1: c = controlCensus; break;
@@ -228,12 +253,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 				default: throw new IllegalArgumentException("Unknown");
 			}
 		}
-		tabbedPane.removeTabAt(1);
-		tabbedPane.insertTab("Error",null,c,null,1);
-		tabbedPane.setSelectedIndex(activeTab);
-
-		if( !force )
-			SwingUtilities.invokeLater(()->{ignoreChanges=false;broadcastChange();});
+		return c;
 	}
 
 	public class ControlsBlockMatching extends StandardAlgConfigPanel implements ChangeListener, ActionListener {

@@ -74,6 +74,10 @@ TODO hough circle detector
 TODO concurrent SIFT
 TODO concurrent dense features?
 TODO Estimate focal lengths given disparity image
+TODO Disparity
+     Extend disparity to handle border regions
+     Remove islands
+     Fill in holes
 
 ---------------------------------------------
 Date    : 2019-July-07
