@@ -496,10 +496,15 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t\tfor (int y = 0; y < img.height; y++) {\n" +
 				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
 				"\t\t\tfor (int x = 0; x < img.width; x++) {\n");
-		if( imageType.isInteger() && imageType.getNumBits() < 64) {
-			out.print("\t\t\t\tdata[index++] = "+typeCast+"(rand.nextInt(range)+min);\n");
-		} else if( imageType.isInteger() ) {
-			out.print("\t\t\t\tdata[index++] = rand.nextInt((int)range)+min;\n");
+		if( imageType.isInteger() ) {
+			if( imageType.getNumBits() < 32 ) {
+				out.print("\t\t\t\tdata[index++] = "+typeCast+"(rand.nextInt(range)+min);\n");
+			} else if( imageType.getNumBits() < 64) {
+				out.print("\t\t\t\tdata[index++] = rand.nextInt((int)range)+min;\n");
+			} else {
+				// 0.9999 is to make sure max is exclusive and not inclusive
+				out.print("\t\t\t\tdata[index++] = (long)(rand.nextDouble()*0.9999*range)+min;\n");
+			}
 		} else {
 			String randType = imageType.getRandType();
 			out.print("\t\t\t\tdata[index++] = rand.next"+randType+"()*range+min;\n");
@@ -533,10 +538,14 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t\t\tint index = img.getStartIndex() + y * img.getStride();\n" +
 				"\t\t\tint end = index + img.width*img.numBands;\n" +
 				"\t\t\tfor (; index <  end; index++) {\n");
-		if( imageType.isInteger() && imageType.getNumBits() < 64) {
-			out.print("\t\t\t\tdata[index] = "+typeCast+"(rand.nextInt(range)+min);\n");
-		} else if( imageType.isInteger() ) {
-			out.print("\t\t\t\tdata[index] = rand.nextInt((int)range)+min;\n");
+		if( imageType.isInteger() ) {
+			if( imageType.getNumBits() < 32 ) {
+				out.print("\t\t\t\tdata[index] = "+typeCast+"(rand.nextInt(range)+min);\n");
+			} else if( imageType.getNumBits() < 64) {
+				out.print("\t\t\t\tdata[index] = rand.nextInt((int)range)+min;\n");
+			} else {
+				out.print("\t\t\t\tdata[index] = (long)(rand.nextDouble()*0.9999*range)+min;\n");
+			}
 		} else {
 			String randType = imageType.getRandType();
 			out.print("\t\t\t\tdata[index] = rand.next"+randType+"()*range+min;\n");
