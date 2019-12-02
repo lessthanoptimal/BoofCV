@@ -95,6 +95,11 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	private T rectLeft;
 	private T rectRight;
 
+	// Stored disparity results. if a new instance of the detector is created we will
+	// still have a reference to the old image and things won't blow up
+	private D disparityImage;
+	private int disparityMin,disparityRange;
+
 	// calibration parameters
 	private StereoParameters calib;
 	// rectification algorithm
@@ -243,6 +248,9 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		long time1 = System.nanoTime();
 		BoofConcurrency.USE_CONCURRENT = true;
 		processCalled = true;
+		disparityImage = activeAlg.getDisparity();
+		disparityMin = activeAlg.getMinDisparity();
+		disparityRange = activeAlg.getRangeDisparity();
 
 		progress.stopThread();
 
@@ -276,18 +284,16 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			swapVisualizationPanel(imagePanel,pcv.getComponent());
 		} else {
 			// TODO spawn this into it's own thread?
+			// TODO is thread safety a concern here? What happens if these settings are changed at the same time?
 			if( !computedCloud ) {
 				computedCloud = true;
 				DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 
-				int minDisparity = control.controlDisparity.getDisparityMin();
-				int rangeDisparity = control.controlDisparity.getDisparityRange();
-
 				double baseline = calib.getRightToLeft().getT().norm();
-				d2c.configure(baseline, rectK,rectR, leftRectToPixel, minDisparity,rangeDisparity);
+				d2c.configure(baseline, rectK,rectR, leftRectToPixel, disparityMin,disparityMin+disparityRange);
 				if(imagePanel.state==2) // has the user defined the ROI?
 					d2c.setRegionOfInterest(imagePanel.x0, imagePanel.y0, imagePanel.x1, imagePanel.y1);
-				d2c.process(activeAlg.getDisparity(),colorLeft);
+				d2c.process(disparityImage,colorLeft);
 
 				CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(
 						rectK,colorLeft.getWidth(),colorLeft.getHeight(),null);
@@ -633,14 +639,28 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	public static void main( String args[] ) {
 
+		String argoDir = "/home/pabeles/thirdparty/VIsionSketch/";
+		String argoCalib = argoDir+"stereo.yaml";
+
+		String base200 = "315969866399927211";
+		String base148 = "315969887399927212";
+		String base116 = "315969903049927219";
+		String base52 = "315969929099927219";
+		String base19 = "315969961449927217";
+		String base3 = "315969982449927213";
+
 		String stereoCalib = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/stereo.yaml");
 
 		List<PathLabel> examples = new ArrayList<>();
-		examples.add(new PathLabel("Chair 1",  stereoCalib
-				,UtilIO.pathExample("stereo/chair01_left.jpg"),UtilIO.pathExample("stereo/chair01_right.jpg")));
-//		inputs.add(new PathLabel("Chair 2",  new File(dirCalib,"stereo.yaml"),dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
 		examples.add(new PathLabel("Stones 1", stereoCalib
 				,UtilIO.pathExample("stereo/stones01_left.jpg"),UtilIO.pathExample("stereo/stones01_right.jpg")));
+		examples.add(new PathLabel("200", argoCalib,argoDir+base200+"_left.png",argoDir+base200+"_right.png"));
+		examples.add(new PathLabel("148", argoCalib,argoDir+base148+"_left.png",argoDir+base148+"_right.png"));
+		examples.add(new PathLabel("116", argoCalib,argoDir+base116+"_left.png",argoDir+base116+"_right.png"));
+		examples.add(new PathLabel("52", argoCalib,argoDir+base52+"_left.png",argoDir+base52+"_right.png"));
+		examples.add(new PathLabel("19", argoCalib,argoDir+base19+"_left.png",argoDir+base19+"_right.png"));
+		examples.add(new PathLabel("3", argoCalib,argoDir+base3+"_left.png",argoDir+base3+"_right.png"));
+//		inputs.add(new PathLabel("Chair 2",  new File(dirCalib,"stereo.yaml"),dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
 		examples.add(new PathLabel("Lantern 1",stereoCalib
 				,UtilIO.pathExample("stereo/lantern01_left.jpg"),UtilIO.pathExample("stereo/lantern01_right.jpg")));
 		examples.add(new PathLabel("Wall 1",   stereoCalib
