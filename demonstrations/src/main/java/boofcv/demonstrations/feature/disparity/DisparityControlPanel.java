@@ -42,7 +42,7 @@ import java.awt.event.ActionListener;
 public class DisparityControlPanel extends StandardAlgConfigPanel {
 
 	private static String[] ERRORS_BLOCK = new String[]{"SAD","Census","NCC"};
-	private static String[] ERRORS_SGM = new String[]{"SAD","Census","HMI"};
+	private static String[] ERRORS_SGM = new String[]{"Absolute Diff","Census","HMI"};
 
 	// which algorithm to run
 	int selectedMethod = 0;
@@ -213,9 +213,8 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		if( !force )
 			ignoreChanges = true;
 
-		// If not forced that means the user selected a new error type, make that tab active
 		// If forced keep the previously active tab active
-		int activeTab = !force ? 1 : tabbedPane.getSelectedIndex();
+		int activeTab = tabbedPane.getSelectedIndex();
 //		System.out.println("error for block="+block+" idx="+selectedIdx);
 
 		if( block ) {
@@ -318,7 +317,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 
 		JSpinner spinnerDisparityMin = spinner(configSGM.minDisparity,0, 1000,5);
 		JSpinner spinnerDisparityRange = spinner(configSGM.rangeDisparity,1, 254,5);
-		JSpinner spinnerError = spinner(configSGM.maxError,-1,SgmDisparityCost.MAX_COST,5);
+		JSpinner spinnerError = spinner(configSGM.maxError,-1,Short.MAX_VALUE,200);
 		JSpinner spinnerReverse = spinner(configSGM.validateRtoL,-1,50,1);
 		JSpinner spinnerTexture = spinner(configSGM.texture,0.0,1.0,0.05,1,3);
 		JCheckBox subpixelToggle = checkbox("Subpixel",configSGM.subpixel);

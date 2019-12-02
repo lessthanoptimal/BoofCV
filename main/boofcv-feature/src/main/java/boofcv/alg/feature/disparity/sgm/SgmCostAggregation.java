@@ -181,7 +181,7 @@ public class SgmCostAggregation {
 			final int localLengthD = helper.localDisparityRangeLeft(x0);
 			for (int d = 0; d < localLengthD; d++) {
 				int v = costXD.data[idxCost + d]&0xFFFF; // Lr(0,d) = C(0,d)
-				workCostLr[d] = costXD.data[idxCost + d];
+				workCostLr[d] = (short)v;
 				minCost = Math.min(minCost,v);
 			}
 			// The modified equation 13. Cost Equation 12 - min[k] Lr(p,k)

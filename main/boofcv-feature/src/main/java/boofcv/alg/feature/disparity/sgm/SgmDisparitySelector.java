@@ -111,19 +111,17 @@ public class SgmDisparitySelector {
 		}
 
 		// See if the maximum error is exceeded
-		if( bestRange != invalidDisparity && maxError <= SgmDisparityCost.MAX_COST) {
-			int cost = costXD.get(bestRange,x);
-			if( cost > maxError ) {
-				bestRange = invalidDisparity;
-			}
+		if( bestRange != invalidDisparity &&  bestScore > maxError ) {
+			bestRange = invalidDisparity;
 		}
 
 		// right to left consistency check
 		if( bestRange != invalidDisparity && rightToLeftTolerance >= 0 ) {
-			int bestX = selectRightToLeft(x-bestRange-minDisparity);
-			if( Math.abs(bestX-x) > rightToLeftTolerance )
+			// TODO why isn't this pruning the left side of the disparity image as much as block is?
+			// Not nearly as effective at pruning as it is with
+			int bestRange_R_to_L = selectRightToLeft(x-bestRange-minDisparity);
+			if( Math.abs(bestRange_R_to_L-bestRange) > rightToLeftTolerance )
 				bestRange = invalidDisparity;
-			// TODO average the two?
 		}
 
 		// See if the best solution is ambiguous
@@ -147,6 +145,7 @@ public class SgmDisparitySelector {
 			// C = (C2-C1)/C1
 			if( secondBest-bestScore <= textureThreshold*bestScore )
 				bestRange = invalidDisparity;
+			// TODO try this same check for right to left disparity
 		}
 
 		return bestRange;
@@ -179,7 +178,7 @@ public class SgmDisparitySelector {
 			}
 		}
 
-		return x+minDisparity+bestD;
+		return bestD;
 	}
 
 	public int getRightToLeftTolerance() {
