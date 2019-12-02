@@ -38,6 +38,13 @@ import org.ddogleg.struct.FastQueue;
 @SuppressWarnings("unchecked")
 public class FactoryCensusTransform {
 
+	/**
+	 * For SGM it's important that you don't use a constant value border. If it's say zero, it will always perfectly
+	 * match the pixels outside the border in the right image, giving it a lower cost. That lower cost will bias
+	 * the error making it more likely to select border pixel.
+	 */
+	public static BorderType CENSUS_BORDER = BorderType.REFLECT;
+
 	public static <In extends ImageGray<In>, Out extends ImageBase<Out>>
 	FilterImageInterface<In, Out> variant(CensusVariants type , Class<In> imageType) {
 		switch( type ) {
@@ -48,7 +55,7 @@ public class FactoryCensusTransform {
 			case BLOCK_13_5: return blockDense(5,2,imageType);
 			case CIRCLE_9: {
 				FastQueue<Point2D_I32> points = CensusTransform.createCircleSamples();
-				return new FilterCensusTransformSampleS64(points,FactoryImageBorder.single(BorderType.ZERO,imageType), imageType);
+				return new FilterCensusTransformSampleS64(points,FactoryImageBorder.single(CENSUS_BORDER,imageType), imageType);
 			}
 			default: throw new IllegalArgumentException("Unknown type "+type);
 		}
@@ -67,12 +74,12 @@ public class FactoryCensusTransform {
 	FilterImageInterface<In, Out> blockDense( int radius , Class<In> imageType) {
 		switch( radius ) {
 			case 1:
-				return new FilterCensusTransformD33U8(FactoryImageBorder.single(BorderType.ZERO,imageType), imageType);
+				return new FilterCensusTransformD33U8(FactoryImageBorder.single(CENSUS_BORDER,imageType), imageType);
 			case 2:
-				return new FilterCensusTransformD55S32(FactoryImageBorder.single(BorderType.ZERO,imageType), imageType);
+				return new FilterCensusTransformD55S32(FactoryImageBorder.single(CENSUS_BORDER,imageType), imageType);
 			case 3: {
 				FastQueue<Point2D_I32> points7x7 = CensusTransform.createBlockSamples(3);
-				return new FilterCensusTransformSampleS64(points7x7,FactoryImageBorder.single(BorderType.ZERO,imageType), imageType);
+				return new FilterCensusTransformSampleS64(points7x7,FactoryImageBorder.single(CENSUS_BORDER,imageType), imageType);
 			}
 
 			default:
@@ -82,6 +89,6 @@ public class FactoryCensusTransform {
 	public static <In extends ImageGray<In>, Out extends ImageBase<Out>>
 	FilterImageInterface<In, Out> blockDense( int radiusX , int radiusY , Class<In> imageType) {
 		FastQueue<Point2D_I32> points = CensusTransform.createBlockSamples(radiusX,radiusY);
-		return new FilterCensusTransformSampleS64(points,FactoryImageBorder.single(BorderType.ZERO,imageType), imageType);
+		return new FilterCensusTransformSampleS64(points,FactoryImageBorder.single(CENSUS_BORDER,imageType), imageType);
 	}
 }
