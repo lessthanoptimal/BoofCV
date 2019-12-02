@@ -299,7 +299,7 @@ public class OpenImageSetDialog extends JPanel {
                 }
 
                 BufferedImage full = UtilImageIO.loadImage(path);
-                System.out.println("Full is null " +(full==null));
+//                System.out.println("Full is null " +(full==null));
                 if( full == null ) {
                     preview.setImageRepaint(null);
                 } else {

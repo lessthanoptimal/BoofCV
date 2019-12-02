@@ -27,6 +27,7 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.d3.DisparityToColorPointCloud;
+import boofcv.gui.dialogs.OpenImageSetDialog;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
@@ -174,7 +175,10 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	@Override
 	protected void openFileMenuBar() {
-		JOptionPane.showMessageDialog(this, "Opening files not yet supported");
+		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY,2);
+		if( files == null )
+			return;
+		BoofSwingUtil.invokeNowOrLater(()->openImageSet(false,files));
 	}
 
 	@Override
@@ -188,14 +192,26 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	@Override
 	public void processFiles(String[] files) {
-		if( files.length != 3 )
-			throw new IllegalArgumentException("3 Files required");
 
-		origCalib = CalibrationIO.load(media.openFile(files[0]));
 
-		origLeft = media.openImage(files[1]);
-		origRight = media.openImage(files[2]);
+		if( files.length == 3 ) {
+			origCalib = CalibrationIO.load(media.openFile(files[0]));
+			origLeft = media.openImage(files[1]);
+			origRight = media.openImage(files[2]);
+		} else if( files.length == 2 ) {
+			origLeft = media.openImage(files[0]);
+			origRight = media.openImage(files[1]);
 
+			// Guess something "reasonable"
+			// baseline of 1 and distortion free cameras with a 90 HFOV
+			origCalib = new StereoParameters();
+			origCalib.rightToLeft = new Se3_F64();
+			origCalib.rightToLeft.T.x = 1;
+			origCalib.left = PerspectiveOps.createIntrinsic(origLeft.getWidth(),origLeft.getHeight(), 90);
+			origCalib.right = PerspectiveOps.createIntrinsic(origRight.getWidth(),origRight.getHeight(), 90);
+		} else {
+			throw new IllegalArgumentException("Unexpected number of files. "+files.length);
+		}
 		changeInputScale();
 	}
 

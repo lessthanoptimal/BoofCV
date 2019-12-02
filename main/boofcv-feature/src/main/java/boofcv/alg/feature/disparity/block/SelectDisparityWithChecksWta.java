@@ -128,6 +128,6 @@ public abstract class SelectDisparityWithChecksWta<Array , DI extends ImageGray<
 
 	@Override
 	public Class<DI> getDisparityType() {
-		return null;
+		return disparityType;
 	}
 }

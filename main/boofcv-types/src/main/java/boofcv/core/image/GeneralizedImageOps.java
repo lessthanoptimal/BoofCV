@@ -130,6 +130,8 @@ public class GeneralizedImageOps {
 		} else if( (Class)type == GrayI.class ) {
 			// ImageInteger is a generic type, so just create something
 			return (T)new GrayS32(width,height);
+		} else if( type == null ) {
+			throw new IllegalArgumentException("You passed in a null type...");
 		}
 		throw new RuntimeException("Unknown type: "+type.getSimpleName());
 	}
