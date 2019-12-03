@@ -19,8 +19,11 @@
 package boofcv.alg.feature.disparity.sgm;
 
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.concurrency.IntRangeObjectConsumer;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.Planar;
+import org.ddogleg.struct.FastQueue;
 
 /**
  * TODO fill in
@@ -50,22 +53,21 @@ public class SgmCostAggregation {
 	// Length of original image. x = col, y = rows, d = disparity range
 	int lengthX,lengthY,lengthD;
 
-	// Stores aggregated cost along a single path. Row major (path[i], depth).
-	// Size = (max path length) * lengthD.
-	// After computed it is then added to 'aggregated' once done.
-	// This is actually why a work space is required and aggregated isn't used directly
-	short[] workCostLr = new short[0];
-
 	/**
 	 * Number of paths to consider. 1 to 16 is valid
 	 */
 	int pathsConsidered = 8;
 
 	// Cost applied to small and large changes in the neighborhood
-	int penalty1 =50, penalty2 =500;
+	int penalty1 =200, penalty2 =2000;
 
 	// The minimum disparity that will be considered.
 	int minDisparity;
+
+	// Book keeping for concurrency
+	FastQueue<Trajectory> trajectories = new FastQueue<>(Trajectory.class,Trajectory::new);
+	FastQueue<WorkSpace> workspace = new FastQueue<>(WorkSpace.class, WorkSpace::new);
+	ComputeBlock computeBlock = new ComputeBlock();
 
 	/**
 	 * Aggregates the cost in the tensor `costYXD`. From the aggregated cost the disparity can be computed.
@@ -120,37 +122,62 @@ public class SgmCostAggregation {
 		this.lengthD = costYXD.getWidth();
 		this.lengthY = costYXD.getNumBands();
 
-		int N = Math.max(lengthX,lengthY)*lengthD;
-		if( workCostLr.length != N )
-			this.workCostLr = new short[ N ];
 		helper.configure(lengthX, minDisparity,lengthD);
+		workspace.resize(1);
 	}
 
 	/**
-	 * Scores all possible paths for this given direction and add it to the aggregated cost
+	 * Scores all possible paths for this given direction and add it to the aggregated cost.
+	 *
+	 * Concurrency note: It's safe to write to the aggregated score without synchronization since only one
+	 * path in the block below will touch a pixel.
 	 */
 	void scoreDirection(int dx , int dy ) {
-		// TODO fully support disparityMin here
+
+		// Create a list of paths it will score
+		trajectories.reset();
 		if( dx > 0 ) {
 			for (int y = 0; y < lengthY; y++) {
-				scorePath(minDisparity,y,dx,dy);
+				trajectories.grow().set(0,y,dx,dy);
 			}
 		} else if( dx < 0 ) {
 			for (int y = 0; y < lengthY; y++) {
-				scorePath(lengthX-1,y,dx,dy);
+				trajectories.grow().set(lengthX-1,y,dx,dy);
 			}
 		}
 		if( dy > 0 ) {
 			int x0 = dx > 0 ? 1 : 0;
 			int x1 = dx < 0 ? lengthX-1 : lengthX;
 			for (int x = x0; x < x1; x++) {
-				scorePath(x,0,dx,dy);
+				trajectories.grow().set(x,0,dx,dy);
 			}
 		} else if( dy < 0 ) {
 			int x0 = dx > 0 ? 1 : 0;
 			int x1 = dx < 0 ? lengthX-1 : lengthX;
 			for (int x = x0; x < x1; x++) {
-				scorePath(x,lengthY-1,dx,dy);
+				trajectories.grow().set(x,lengthY-1,dx,dy);
+			}
+		}
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			BoofConcurrency.loopBlocks(0,trajectories.size,1,workspace,computeBlock);
+		} else {
+			WorkSpace w= workspace.get(0);
+			for (int i = 0; i < trajectories.size; i++) {
+				Trajectory t = trajectories.get(i);
+				scorePath(t.x0, t.y0, t.dx, t.dy, w.workCostLr);
+			}
+		}
+	}
+
+	private class ComputeBlock implements IntRangeObjectConsumer<WorkSpace> {
+		@Override
+		public void accept(WorkSpace workspace, int minInclusive, int maxExclusive) {
+			workspace.checkSize();
+
+			for (int i = minInclusive; i < maxExclusive; i++) {
+				Trajectory t = trajectories.get(i);
+				scorePath(t.x0,t.y0,t.dx,t.dy,workspace.workCostLr);
 			}
 		}
 	}
@@ -171,7 +198,7 @@ public class SgmCostAggregation {
 	 * @param dx step x-axis
 	 * @param dy step y-axis
 	 */
-	void scorePath(int x0 , int y0 , int dx , int dy ) {
+	void scorePath(int x0 , int y0 , int dx , int dy , short[] workCostLr) {
 		// there is no previous disparity score so simply fill the cost for d=0
 
 		{
@@ -206,11 +233,11 @@ public class SgmCostAggregation {
 			int idxLrPrev = (i-1)*lengthD;
 
 			// Score the inner portion of disparity first to avoid bounds checks
-			computeCostInnerD(costXD, idxCost, idxLrPrev, lengthLocalD);
+			computeCostInnerD(costXD, idxCost, idxLrPrev, lengthLocalD, workCostLr);
 
 			// Now handle the borders at d=0 and d=N-1
-			computeCostBorderD(idxCost,idxLrPrev,0,costXD, lengthLocalD);
-			computeCostBorderD(idxCost,idxLrPrev,lengthLocalD-1,costXD, lengthLocalD);
+			computeCostBorderD(idxCost,idxLrPrev,0,costXD, lengthLocalD, workCostLr);
+			computeCostBorderD(idxCost,idxLrPrev,lengthLocalD-1,costXD, lengthLocalD, workCostLr);
 
 			// The modified equation 13. Cost Equation 12 - min[k] Lr(p,k)
 			int minCost = Integer.MAX_VALUE;
@@ -224,13 +251,13 @@ public class SgmCostAggregation {
 
 		}
 
-		saveWorkToAggregated(x0,y0,dx,dy,lengthPath);
+		saveWorkToAggregated(x0,y0,dx,dy,lengthPath, workCostLr);
 	}
 
 	/**
 	 * Adds the work LR onto the aggregated cost Tensor, which is the sum of all paths
 	 */
-	void saveWorkToAggregated( int x0 , int y0 , int dx , int dy , int length ) {
+	void saveWorkToAggregated( int x0 , int y0 , int dx , int dy , int length , short[] workCostLr) {
 		int x = x0;
 		int y = y0;
 		for (int i = 0; i < length; i++, x += dx, y += dy) {
@@ -258,7 +285,7 @@ public class SgmCostAggregation {
 	 *
 	 * @param idxLrPrev index of work at the previous location in the path, i.e. Lr(p-r,0)
 	 */
-	void computeCostInnerD(GrayU16 costXD, int idxCost, int idxLrPrev, int lengthLocalD ) {
+	void computeCostInnerD(GrayU16 costXD, int idxCost, int idxLrPrev, int lengthLocalD , short[] workCostLr) {
 		idxLrPrev += 1; // start at d=1
 		for (int d = 1; d < lengthLocalD-1; d++, idxLrPrev++) {
 			int cost = costXD.data[idxCost+d] & 0xFFFF; // C(p,d)
@@ -295,7 +322,7 @@ public class SgmCostAggregation {
 	 * @param d disparity value being considered
 	 * @param costXD cost in X-D plane
 	 */
-	void computeCostBorderD(int idxCost , int idxLrPrev , int d , GrayU16 costXD , int lengthLocalD ) {
+	void computeCostBorderD(int idxCost , int idxLrPrev , int d , GrayU16 costXD , int lengthLocalD , short[] workCostLr) {
 		int cost = costXD.data[idxCost+d] & 0xFFFF;  // C(p,d)
 
 		// Sample previously computed aggregate costs with bounds checking
@@ -344,6 +371,32 @@ public class SgmCostAggregation {
 		else
 			return Integer.MAX_VALUE;
 	}
+
+	class WorkSpace {
+		// Stores aggregated cost along a single path. Row major (path[i], depth).
+		// Size = (max path length) * lengthD.
+		// After computed it is then added to 'aggregated' once done.
+		// This is actually why a work space is required and aggregated isn't used directly
+		short[] workCostLr = new short[0];
+
+		public void checkSize() {
+			int N = Math.max(lengthX,lengthY)*lengthD;
+			if( workCostLr.length != N )
+				this.workCostLr = new short[ N ];
+		}
+	}
+
+	private static class Trajectory {
+		public int x0,y0,dx,dy;
+
+		public void set(int x0, int y0, int dx , int dy ) {
+			this.x0 = x0;
+			this.y0 = y0;
+			this.dx = dx;
+			this.dy = dy;
+		}
+	}
+
 
 	public Planar<GrayU16> getAggregated() {
 		return aggregated;

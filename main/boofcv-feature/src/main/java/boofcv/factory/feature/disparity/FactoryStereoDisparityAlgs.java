@@ -29,6 +29,7 @@ import boofcv.alg.feature.disparity.sgm.*;
 import boofcv.alg.feature.disparity.sgm.cost.SgmCostAbsoluteDifference;
 import boofcv.alg.feature.disparity.sgm.cost.SgmCostHamming;
 import boofcv.alg.feature.disparity.sgm.cost.StereoMutualInformation;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.factory.transform.census.FactoryCensusTransform;
 import boofcv.struct.image.*;
 
@@ -50,7 +51,8 @@ public class FactoryStereoDisparityAlgs {
 
 		int maxError = config.maxError < 0 ? Integer.MAX_VALUE : config.maxError;
 
-		SgmDisparitySelector selector = new SgmDisparitySelector();
+		SgmDisparitySelector selector = BoofConcurrency.USE_CONCURRENT ?
+				new SgmDisparitySelector_MT() : new SgmDisparitySelector();
 		selector.setRightToLeftTolerance(config.validateRtoL);
 		selector.setMaxError(maxError);
 		selector.setTextureThreshold(config.texture);

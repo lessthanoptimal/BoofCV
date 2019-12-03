@@ -449,7 +449,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	}
 
 	private void createAlgConcurrent() {
-		BoofConcurrency.USE_CONCURRENT = false;
+		BoofConcurrency.USE_CONCURRENT = control.concurrent;
 		activeAlg = control.controlDisparity.createAlgorithm();
 		BoofConcurrency.USE_CONCURRENT = true;
 	}

@@ -51,8 +51,7 @@ Version : 0.35
   * Added Semi-Global Matching with several options for score functions
   * TODO Add blocks for SGM error options
   * TODO Ensure that all auto code generators still work
-  * TODO NCC issues
-         - Benchmark to see if other algorithms got slower because of this
+  * TODO Make cost computation concurrent for SGM
 - SFM
   * Projective camera with lens distortion
   * TODO Stereo VO Quad - Now uses trifocal tensor and sparse bundle adjustment

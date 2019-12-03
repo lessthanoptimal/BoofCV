@@ -149,7 +149,7 @@ class TestSgmCostAggregation {
 
 		alg.init(costYXD);
 
-		alg.scorePath(0,0,1,1);
+		alg.scorePath(0,0,1,1, null);
 
 		// the length is the number of elements to expect
 		int length = alg.computePathLength(0,0,1,1);
@@ -185,8 +185,9 @@ class TestSgmCostAggregation {
 
 		SgmCostAggregation alg = new SgmCostAggregation();
 		alg.init(costYXD);
-		for (int i = 0; i < alg.workCostLr.length; i++) {
-			alg.workCostLr[i] = (short)rand.nextInt(SgmDisparityCost.MAX_COST);
+		short[] workCostLr = alg.workspace.get(0).workCostLr;
+		for (int i = 0; i < workCostLr.length; i++) {
+			workCostLr[i] = (short)rand.nextInt(SgmDisparityCost.MAX_COST);
 		}
 
 		GrayU16 costXD = costYXD.getBand(2);
@@ -198,7 +199,7 @@ class TestSgmCostAggregation {
 		int idxWork = alg.lengthD*pathI;
 
 		// Compute the cost using this algorithm
-		alg.computeCostInnerD(costXD,idxCost,idxWork, rangeD);
+		alg.computeCostInnerD(costXD,idxCost,idxWork, rangeD, workCostLr);
 
 		// Now compare it to a brute force solution
 		for (int d = 1; d < rangeD-1; d++) {
@@ -219,7 +220,8 @@ class TestSgmCostAggregation {
 	}
 
 	int workArray( SgmCostAggregation alg , int pathIdx , int d ) {
-		return alg.workCostLr[alg.lengthD*pathIdx+d]&0xFFFF;
+		short[] workCostLr = alg.workspace.get(0).workCostLr;
+		return workCostLr[alg.lengthD*pathIdx+d]&0xFFFF;
 	}
 
 	@Test
@@ -266,6 +268,14 @@ class TestSgmCostAggregation {
 		checkComputePathLength(alg,0,5,1,2);
 	}
 
+	/**
+	 * Compare concurrent to non-concurrent results
+	 */
+	@Test
+	public void compareConcurrent() {
+		fail("implement");
+	}
+
 	void checkComputePathLength(SgmCostAggregation alg , int x0, int y0, int dx, int dy) {
 		int expected = bruteForceLength(x0, y0, dx, dy);
 		int found = alg.computePathLength(x0, y0, dx, dy);
@@ -295,7 +305,7 @@ class TestSgmCostAggregation {
 		}
 
 		@Override
-		void scorePath(int x0, int y0, int dx, int dy) {
+		void scorePath(int x0, int y0, int dx, int dy, short[] work) {
 			int total = scored.get(x0,y0);
 			scored.set(x0,y0,total+1);
 		}

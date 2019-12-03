@@ -125,7 +125,7 @@ class TestSgmDisparitySelector {
 		aggregatedYXD.getBand(ty).set(3, tx-d+3 , 50);
 
 		SgmDisparitySelector alg = new SgmDisparitySelector();
-		alg.aggregatedXD = aggregatedYXD.getBand(ty);
+		GrayU16 aggregatedXD = aggregatedYXD.getBand(ty);
 		alg.setMinDisparity(minDisparity);
 		alg.setup(aggregatedYXD);
 
@@ -134,9 +134,9 @@ class TestSgmDisparitySelector {
 			// see the match will be within tolerance
 			// minDisparity offsets the estimated disparity so take that in account
 			if( i < d-3-minDisparity )
-				assertEquals(alg.getInvalidDisparity(), alg.findBestDisparity(tx));
+				assertEquals(alg.getInvalidDisparity(), alg.findBestDisparity(tx,aggregatedXD));
 			else
-				assertEquals(d, alg.findBestDisparity(tx));
+				assertEquals(d, alg.findBestDisparity(tx,aggregatedXD));
 		}
 	}
 
@@ -150,16 +150,16 @@ class TestSgmDisparitySelector {
 		int tx = width-1, ty=6, d = 5;
 
 		SgmDisparitySelector alg = new SgmDisparitySelector();
-		alg.aggregatedXD = aggregatedYXD.getBand(ty);
+		GrayU16 aggregatedXD = aggregatedYXD.getBand(ty);
 		alg.setMinDisparity(0);
 		alg.setup(aggregatedYXD);
 
 		// the only value on the right which can be matched with the left is x
-		assertEquals(d, alg.findBestDisparity(tx));
+		assertEquals(d, alg.findBestDisparity(tx,aggregatedXD));
 
 		// this will fail because it's not within the allowed range
 		alg.setMinDisparity(1);
-		assertEquals(alg.getInvalidDisparity(), alg.findBestDisparity(tx));
+		assertEquals(alg.getInvalidDisparity(), alg.findBestDisparity(tx,aggregatedXD));
 	}
 
 	@Test

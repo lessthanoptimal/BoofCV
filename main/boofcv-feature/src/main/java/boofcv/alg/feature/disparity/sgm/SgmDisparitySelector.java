@@ -38,9 +38,6 @@ public class SgmDisparitySelector {
 	// Maximum allowed error
 	int maxError = Integer.MAX_VALUE;
 
-	// reference to input cost tensor
-	GrayU16 aggregatedXD;
-	GrayU16 costXD;
 
 	double textureThreshold=0.0;
 
@@ -65,17 +62,17 @@ public class SgmDisparitySelector {
 		disparity.reshape(lengthX,lengthY);
 
 		for (int y = 0; y < lengthY; y++) {
-			aggregatedXD = aggregatedYXD.getBand(y);
-			costXD = costYXD.getBand(y);
+			GrayU16 aggregatedXD = aggregatedYXD.getBand(y);
 
 			// if 'x' is less than minDisparity then that's nothing that it can compare against
 			for (int x = 0; x < minDisparity; x++) {
 				disparity.unsafe_set(x,y, invalidDisparity);
 			}
 			for (int x = minDisparity; x < lengthX; x++) {
-				disparity.unsafe_set(x,y, findBestDisparity(x));
+				disparity.unsafe_set(x,y, findBestDisparity(x,aggregatedXD));
 			}
 		}
+
 	}
 
 	/**
@@ -94,7 +91,7 @@ public class SgmDisparitySelector {
 	/**
 	 * Selects the disparity for the specified pixel using a winner takes all strategy
 	 */
-	int findBestDisparity(int x ) {
+	int findBestDisparity(int x , GrayU16 aggregatedXD) {
 		// The maximum disparity range that can be considered at 'x'
 		int maxLocalDisparity = helper.localDisparityRangeLeft(x);
 		int bestScore = Integer.MAX_VALUE;
@@ -119,7 +116,7 @@ public class SgmDisparitySelector {
 		if( bestRange != invalidDisparity && rightToLeftTolerance >= 0 ) {
 			// TODO why isn't this pruning the left side of the disparity image as much as block is?
 			// Not nearly as effective at pruning as it is with
-			int bestRange_R_to_L = selectRightToLeft(x-bestRange-minDisparity);
+			int bestRange_R_to_L = selectRightToLeft(x-bestRange-minDisparity,aggregatedXD);
 			if( Math.abs(bestRange_R_to_L-bestRange) > rightToLeftTolerance )
 				bestRange = invalidDisparity;
 		}
@@ -158,7 +155,7 @@ public class SgmDisparitySelector {
 	 * @param x x-coordinate of point in right image
 	 * @return best fit disparity from right to left
 	 */
-	private int selectRightToLeft( int x ) {
+	private int selectRightToLeft( int x , GrayU16 aggregatedXD) {
 		// The range of disparities it can search from right to left
 		int maxLocalDisparity = helper.localDisparityRangeRight(x);
 
