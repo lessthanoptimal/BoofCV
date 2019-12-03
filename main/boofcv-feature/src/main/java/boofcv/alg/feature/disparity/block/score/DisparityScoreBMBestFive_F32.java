@@ -225,7 +225,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 									 Compare_F32 compare ) {
 
 		// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
-		for( int d = minDisparity; d < maxDisparity; d++ ) {
+		for( int d = minDisparity; d <= maxDisparity; d++ ) {
 
 			// take in account the different in image border between the sub-regions and the effective region
 			int indexSrc = (d-minDisparity)*width + (d-minDisparity) + radiusX;

@@ -95,7 +95,7 @@ public abstract class SelectDisparityWithChecksWta<Array , DI extends ImageGray<
 		this.maxDisparity = maxDisparity;
 		this.radiusX = radiusX;
 
-		rangeDisparity = maxDisparity-minDisparity;
+		rangeDisparity = maxDisparity-minDisparity+1;
 		regionWidth = radiusX*2+1;
 		invalidDisparity = rangeDisparity+1;
 

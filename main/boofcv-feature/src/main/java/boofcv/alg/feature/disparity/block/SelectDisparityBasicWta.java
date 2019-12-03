@@ -53,7 +53,7 @@ public abstract class SelectDisparityBasicWta<Array , Disparity extends ImageGra
 		this.maxDisparity = maxDisparity;
 		this.radiusX = radiusX;
 
-		rangeDisparity = maxDisparity-minDisparity;
+		rangeDisparity = maxDisparity-minDisparity+1;
 		regionWidth = radiusX*2+1;
 		imageWidth = imageDisparity.width;
 	}

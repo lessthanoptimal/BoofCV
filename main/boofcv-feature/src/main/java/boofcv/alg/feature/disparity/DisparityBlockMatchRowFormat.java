@@ -51,7 +51,7 @@ public abstract class DisparityBlockMatchRowFormat
 	// difference between max and min
 	protected int rangeDisparity;
 
-	// number of score elements: (image width - regionWidth)*maxDisparity
+	// number of score elements: image_width*rangeDisparity
 	protected int lengthHorizontal;
 
 	// radius of the region along x and y axis
@@ -79,7 +79,7 @@ public abstract class DisparityBlockMatchRowFormat
 		this.radiusX = regionRadiusX;
 		this.radiusY = regionRadiusY;
 
-		this.rangeDisparity = maxDisparity - minDisparity;
+		this.rangeDisparity = maxDisparity-minDisparity+1;
 
 		this.regionWidth = regionRadiusX*2+1;
 		this.regionHeight = regionRadiusY*2+1;
