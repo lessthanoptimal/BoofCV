@@ -197,8 +197,6 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	@Override
 	public void processFiles(String[] files) {
-
-
 		if( files.length == 3 ) {
 			origCalib = CalibrationIO.load(media.openFile(files[0]));
 			origLeft = media.openImage(files[1]);
@@ -217,6 +215,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		} else {
 			throw new IllegalArgumentException("Unexpected number of files. "+files.length);
 		}
+		if( activeAlg == null )
+			createAlgConcurrent();
 		changeInputScale();
 	}
 
@@ -297,6 +297,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 				CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(
 						rectK,colorLeft.getWidth(),colorLeft.getHeight(),null);
+				pcv.setBackgroundColor(control.backgroundColor);
 				pcv.clearPoints();
 				pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
 				pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
@@ -426,8 +427,6 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		colorLeft.createGraphics().drawImage(origLeft, AffineTransform.getScaleInstance(scale,scale),null);
 		colorRight.createGraphics().drawImage(origRight, AffineTransform.getScaleInstance(scale,scale),null);
 
-		createAlgConcurrent();
-
 		inputLeft = activeAlg.getInputType().createImage(w,h);
 		inputRight = activeAlg.getInputType().createImage(w,h);
 		rectLeft = activeAlg.getInputType().createImage(w,h);
@@ -484,6 +483,12 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	@Override
 	public void changeZoom() {
 		imagePanel.setScale(control.zoom);
+	}
+
+	@Override
+	public void changeBackgroundColor() {
+		pcv.setBackgroundColor(control.backgroundColor);
+		pcv.getComponent().repaint();
 	}
 
 	/**

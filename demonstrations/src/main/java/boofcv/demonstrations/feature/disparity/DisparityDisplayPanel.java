@@ -58,11 +58,16 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	// scale factor for input images
 	int inputScale = 100;
 
+	// Default background color for 3D cloud
+	int backgroundColor = 0x000000;
+
 	protected JLabel processingTimeLabel = new JLabel();
 	protected JLabel imageSizeLabel = new JLabel();
 
 	// For zooming in and out of images
 	protected JSpinner selectZoom = spinner(1,MIN_ZOOM,MAX_ZOOM,0.1);
+
+	JButton bColorBackGround;
 
 	// how much the input should be scaled down by
 	JSpinner inputScaleSpinner = spinner(inputScale,5,100,10);
@@ -96,7 +101,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addLabeled(imageSizeLabel,"Image Size");
 		addLabeled(viewSelector, "View");
 		addLabeled(selectZoom,"Zoom");
-		addLabeled(comboColorizer,"Color");
+		addLabeled(createColorPanel(),"Color");
 		addLabeled(sliderOffsetColor,"Offset");
 		addLabeled(sliderPeriodColor,"Period");
 		addLabeled(sliderSpeed3D,"Speed");
@@ -108,6 +113,34 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addVerticalGlue();
 
 		setPreferredSize(new Dimension(200,0));
+	}
+
+	/**
+	 * Button for selecting background color and another for selecting how to colorize
+	 */
+	private JPanel createColorPanel() {
+		bColorBackGround = new JButton();
+		bColorBackGround.addActionListener(e->{
+			Color newColor = JColorChooser.showDialog(
+					DisparityDisplayPanel.this,
+					"Background Color",
+					new Color(backgroundColor));
+			backgroundColor = newColor.getRGB();
+			bColorBackGround.setBackground(newColor);
+			listener.changeBackgroundColor();
+		});
+		bColorBackGround.setPreferredSize(new Dimension(20,20));
+		bColorBackGround.setMinimumSize(bColorBackGround.getPreferredSize());
+		bColorBackGround.setMaximumSize(bColorBackGround.getPreferredSize());
+		bColorBackGround.setBackground(new Color(backgroundColor));
+
+		JPanel p = new JPanel();
+		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
+		p.setBorder(BorderFactory.createEmptyBorder());
+		p.add(bColorBackGround);
+		p.add(Box.createRigidArea(new Dimension(5,5)));
+		p.add(comboColorizer);
+		return p;
 	}
 
 	/**
@@ -241,5 +274,6 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		void changeInputScale();
 		void changeView3D();
 		void changeZoom();
+		void changeBackgroundColor();
 	}
 }
