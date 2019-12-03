@@ -110,12 +110,13 @@ public class StereoMutualInformation {
 		}
 	}
 
-	public void diagonalHistogram( int maxCost ) {
+	public void diagonalHistogram( double scaleLeftToRight , int maxCost ) {
 		int costLow = maxCost/20;
 		int costHigh = maxCost/3;
 		for (int y = 0,idx=0; y < scaledCost.height; y++) {
+			int matchingX = (int)Math.round(Math.min(scaledCost.width-1,Math.max(0,y*scaleLeftToRight)));
 			for (int x = 0; x < scaledCost.width; x++ ) {
-				scaledCost.data[idx++] = (short)((x==y) ? costLow : costHigh);
+				scaledCost.data[idx++] = (short)((x==matchingX) ? costLow : costHigh);
 			}
 		}
 	}

@@ -100,12 +100,16 @@ public class SgmStereoDisparityHmi extends SgmStereoDisparityError<GrayU8> {
 		pyrLeft.process(left);
 		pyrRight.process(right);
 
-		// randomly initialize MI
-		stereoMI.diagonalHistogram(SgmDisparityCost.MAX_COST);
+		// Initialize MI by assuming pixels with a similar value are similar
+		// NOTE: Scaling by average pixel intensity seems to be a wash. helps/hurts equally.
+		stereoMI.diagonalHistogram(1.0,SgmDisparityCost.MAX_COST);
+		// Random is the suggested approach but only works on simplistic scenes
 //		stereoMI.randomHistogram(rand,SgmDisparityCost.MAX_COST);
 
-		// Process from low to high resolution. The only disparity esitmate which is
+		// Process from low to high resolution. The only disparity estimate which is
 		// saved is the full resolution one. All prior estimates are done to estimate the mutual information
+		int tol_R_to_L = selector.getRightToLeftTolerance();
+		double textureThreshold = selector.getTextureThreshold();
 		for (int level = pyrLeft.getLevelsCount()-1; level >= 0; level-- ) {
 			int scale = 1 << level;
 			// reduce the minimum disparity for this scale otherwise it might not consider any matches at this scale
@@ -115,6 +119,15 @@ public class SgmStereoDisparityHmi extends SgmStereoDisparityError<GrayU8> {
 			GrayU8 levelLeft = pyrLeft.get(level);
 			GrayU8 levelRight = pyrRight.get(level);
 
+			if( level > 0 ) {
+				// Turning off these validation checks when learning seems to result in a better model
+				// This was shown in Middlebury where the number of bad or invalid pixels decreased significantly overall
+				selector.setTextureThreshold(-1);
+				selector.setRightToLeftTolerance(-1);
+			} else {
+				selector.setTextureThreshold(textureThreshold);
+				selector.setRightToLeftTolerance(tol_R_to_L);
+			}
 			sgmCost.process(levelLeft,levelRight, levelDisparityMin, levelDisparityRange,costYXD);
 			aggregation.process(costYXD,levelDisparityMin);
 			selector.setMinDisparity(levelDisparityMin); // todo move to function below
