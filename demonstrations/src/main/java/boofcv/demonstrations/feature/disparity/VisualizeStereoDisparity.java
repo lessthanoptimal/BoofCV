@@ -639,28 +639,14 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	public static void main( String args[] ) {
 
-		String argoDir = "/home/pabeles/thirdparty/VIsionSketch/";
-		String argoCalib = argoDir+"stereo.yaml";
-
-		String base200 = "315969866399927211";
-		String base148 = "315969887399927212";
-		String base116 = "315969903049927219";
-		String base52 = "315969929099927219";
-		String base19 = "315969961449927217";
-		String base3 = "315969982449927213";
-
 		String stereoCalib = UtilIO.pathExample("calibration/stereo/Bumblebee2_Chess/stereo.yaml");
 
 		List<PathLabel> examples = new ArrayList<>();
+		examples.add(new PathLabel("Chair 1",  stereoCalib
+				,UtilIO.pathExample("stereo/chair01_left.jpg"),UtilIO.pathExample("stereo/chair01_right.jpg")));
+//		inputs.add(new PathLabel("Chair 2",  new File(dirCalib,"stereo.yaml"),dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
 		examples.add(new PathLabel("Stones 1", stereoCalib
 				,UtilIO.pathExample("stereo/stones01_left.jpg"),UtilIO.pathExample("stereo/stones01_right.jpg")));
-		examples.add(new PathLabel("200", argoCalib,argoDir+base200+"_left.png",argoDir+base200+"_right.png"));
-		examples.add(new PathLabel("148", argoCalib,argoDir+base148+"_left.png",argoDir+base148+"_right.png"));
-		examples.add(new PathLabel("116", argoCalib,argoDir+base116+"_left.png",argoDir+base116+"_right.png"));
-		examples.add(new PathLabel("52", argoCalib,argoDir+base52+"_left.png",argoDir+base52+"_right.png"));
-		examples.add(new PathLabel("19", argoCalib,argoDir+base19+"_left.png",argoDir+base19+"_right.png"));
-		examples.add(new PathLabel("3", argoCalib,argoDir+base3+"_left.png",argoDir+base3+"_right.png"));
-//		inputs.add(new PathLabel("Chair 2",  new File(dirCalib,"stereo.yaml"),dirImgs+"chair02_left.jpg",dirImgs+"chair02_right.jpg"));
 		examples.add(new PathLabel("Lantern 1",stereoCalib
 				,UtilIO.pathExample("stereo/lantern01_left.jpg"),UtilIO.pathExample("stereo/lantern01_right.jpg")));
 		examples.add(new PathLabel("Wall 1",   stereoCalib
