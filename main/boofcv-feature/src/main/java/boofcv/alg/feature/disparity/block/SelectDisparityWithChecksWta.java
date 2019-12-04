@@ -97,7 +97,7 @@ public abstract class SelectDisparityWithChecksWta<Array , DI extends ImageGray<
 
 		rangeDisparity = maxDisparity-minDisparity+1;
 		regionWidth = radiusX*2+1;
-		invalidDisparity = rangeDisparity+1;
+		invalidDisparity = rangeDisparity;
 
 		if( invalidDisparity > (int)imageDisparity.getDataType().getMaxValue()-1 )
 			throw new IllegalArgumentException("Max range exceeds maximum value in disparity image. v="+invalidDisparity);

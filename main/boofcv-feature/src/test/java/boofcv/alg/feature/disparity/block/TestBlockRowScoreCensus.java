@@ -30,7 +30,8 @@ import org.junit.jupiter.api.Nested;
  */
 class TestBlockRowScoreCensus {
 	@Nested
-	class U8 extends ChecksBlockRowScore<GrayU8,int[]> {
+	class U8 extends ChecksBlockRowScore.ArrayIntI<GrayU8> {
+
 		U8() {super(255, ImageType.single(GrayU8.class));}
 
 		@Override
@@ -39,43 +40,14 @@ class TestBlockRowScoreCensus {
 		}
 
 		@Override
-		public int[] createArray(int length) {
-			return new int[length];
-		}
-
-		@Override
-		public double naiveScoreRow(int cx, int cy, int disparity, int radius) {
-			double total = 0;
-			for (int x = -radius; x <= radius; x++) {
-				int va = left.get(cx+x,cy);
-				int vb = right.get(cx+x-disparity,cy);
-				total += DescriptorDistance.hamming(va^vb);
-			}
-			return total;
-		}
-
-		@Override
-		public double naiveScoreRegion(int cx, int cy, int disparity, int radius) {
-			double total = 0;
-			for (int y = -radius; y <= radius; y++) {
-				for (int x = -radius; x <= radius; x++) {
-					int va = left.get(cx + x, cy + y);
-					int vb = right.get(cx + x - disparity, cy + y);
-
-					total += DescriptorDistance.hamming(va^vb);
-				}
-			}
-			return total;
-		}
-
-		@Override
-		public double get(int index, int[] array) {
-			return array[index];
+		protected int computeError(int a, int b) {
+			return DescriptorDistance.hamming(a^b);
 		}
 	}
 
 	@Nested
-	class S32 extends ChecksBlockRowScore<GrayS32,int[]> {
+	class S32 extends ChecksBlockRowScore.ArrayIntI<GrayS32> {
+
 		S32() {super(Integer.MAX_VALUE-1000, ImageType.single(GrayS32.class));}
 
 		@Override
@@ -84,44 +56,15 @@ class TestBlockRowScoreCensus {
 		}
 
 		@Override
-		public int[] createArray(int length) {
-			return new int[length];
-		}
-
-		@Override
-		public double naiveScoreRow(int cx, int cy, int disparity, int radius) {
-			double total = 0;
-			for (int x = -radius; x <= radius; x++) {
-				int va = left.get(cx+x,cy);
-				int vb = right.get(cx+x-disparity,cy);
-				total += DescriptorDistance.hamming(va^vb);
-			}
-			return total;
-		}
-
-		@Override
-		public double naiveScoreRegion(int cx, int cy, int disparity, int radius) {
-			double total = 0;
-			for (int y = -radius; y <= radius; y++) {
-				for (int x = -radius; x <= radius; x++) {
-					int va = left.get(cx + x, cy + y);
-					int vb = right.get(cx + x - disparity, cy + y);
-
-					total += DescriptorDistance.hamming(va^vb);
-				}
-			}
-			return total;
-		}
-
-		@Override
-		public double get(int index, int[] array) {
-			return array[index];
+		protected int computeError(int a, int b) {
+			return DescriptorDistance.hamming(a^b);
 		}
 	}
 
 	@Nested
-	class S64 extends ChecksBlockRowScore<GrayS64,int[]> {
-		S64() {super(Long.MAX_VALUE-1000, ImageType.single(GrayS64.class));}
+	class S64 extends ChecksBlockRowScore.ArrayIntL {
+
+		S64() {super(Integer.MAX_VALUE-1000);}
 
 		@Override
 		public BlockRowScore<GrayS64, int[]> createAlg(int radiusWidth, int radiusHeight) {
@@ -129,38 +72,8 @@ class TestBlockRowScoreCensus {
 		}
 
 		@Override
-		public int[] createArray(int length) {
-			return new int[length];
-		}
-
-		@Override
-		public double naiveScoreRow(int cx, int cy, int disparity, int radius) {
-			double total = 0;
-			for (int x = -radius; x <= radius; x++) {
-				long va = left.get(cx+x,cy);
-				long vb = right.get(cx+x-disparity,cy);
-				total += DescriptorDistance.hamming(va^vb);
-			}
-			return total;
-		}
-
-		@Override
-		public double naiveScoreRegion(int cx, int cy, int disparity, int radius) {
-			double total = 0;
-			for (int y = -radius; y <= radius; y++) {
-				for (int x = -radius; x <= radius; x++) {
-					long va = left.get(cx + x, cy + y);
-					long vb = right.get(cx + x - disparity, cy + y);
-
-					total += DescriptorDistance.hamming(va^vb);
-				}
-			}
-			return total;
-		}
-
-		@Override
-		public double get(int index, int[] array) {
-			return array[index];
+		protected int computeError(long a, long b) {
+			return DescriptorDistance.hamming(a^b);
 		}
 	}
 }

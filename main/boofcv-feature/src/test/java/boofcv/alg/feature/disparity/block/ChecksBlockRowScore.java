@@ -19,6 +19,8 @@
 package boofcv.alg.feature.disparity.block;
 
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.image.GrayI;
+import boofcv.struct.image.GrayS64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.Test;
@@ -75,7 +77,7 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 		BlockRowScore<T,Array> alg = createAlg(r,r);
 
 		int row = r+1;
-		int disparityRange = maxDisparity-minDisparity;
+		int disparityRange = maxDisparity-minDisparity+1;
 
 		Array scores = createArray(width*disparityRange);
 		Array elementScore = createArray(width);
@@ -111,7 +113,7 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 		alg.setInput(left,right);
 
 		int row = r+1;
-		int disparityRange = maxDisparity-minDisparity;
+		int disparityRange = maxDisparity-minDisparity+1;
 
 		Array scores = createArray(width*disparityRange);
 		Array elementScore = createArray(width);
@@ -139,7 +141,8 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 				double found = get(idx++,scoresEvaluated);
 //				System.out.printf("%3d  %7.4f e=%8.3f f=%8.3f\n",idx,(expected-found),expected,found);
 //				System.out.println("diff "+(expected-found)+"   expected "+expected);
-				assertEquals(expected,found,1e-3);
+				double tol = Math.max(1,Math.abs(expected))*1e-3;
+				assertEquals(expected,found,tol,"x = "+x+" d = "+d);
 			}
 		}
 	}
@@ -157,6 +160,98 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 			for (int i = 0; i < a.length; i++) {
 				b[i] += a[i];
 			}
+		}
+	}
+
+	protected static abstract class ArrayIntI<T extends GrayI<T>> extends ChecksBlockRowScore<T,int[]> {
+
+		public ArrayIntI(double maxPixelValue, ImageType<T> imageType) {
+			super(maxPixelValue, imageType);
+		}
+
+		@Override
+		public int[] createArray(int length) {
+			return new int[length];
+		}
+
+		protected abstract int computeError( int a , int b );
+
+		@Override
+		public double naiveScoreRow(int cx, int cy, int disparity, int radius) {
+//			System.out.println(cx+" "+cy+" "+disparity+" "+radius);
+			int x0 = Math.max(disparity,cx-radius);
+			int x1 = Math.min(left.width,cx+radius+1);
+
+			int total = 0;
+			for (int x = x0; x < x1; x++) {
+				int va = left.get(x,cy);
+				int vb = right.get(x-disparity,cy);
+				total += computeError(va,vb);
+			}
+			return total;
+		}
+
+		@Override
+		public double naiveScoreRegion(int cx, int cy, int disparity, int radius) {
+			int y0 = Math.max(0,cy-radius);
+			int y1 = Math.min(left.height,cy+radius+1);
+
+			int total = 0;
+			for (int y = y0; y < y1; y++) {
+				total += (int)naiveScoreRow(cx, y, disparity, radius);
+			}
+			return total;
+		}
+
+		@Override
+		public double get(int index, int[] array) {
+			return array[index];
+		}
+	}
+
+	protected static abstract class ArrayIntL extends ChecksBlockRowScore<GrayS64,int[]> {
+
+		public ArrayIntL(double maxPixelValue) {
+			super(maxPixelValue, ImageType.single(GrayS64.class));
+		}
+
+		@Override
+		public int[] createArray(int length) {
+			return new int[length];
+		}
+
+		protected abstract int computeError( long a , long b );
+
+		@Override
+		public double naiveScoreRow(int cx, int cy, int disparity, int radius) {
+//			System.out.println(cx+" "+cy+" "+disparity+" "+radius);
+			int x0 = Math.max(disparity,cx-radius);
+			int x1 = Math.min(left.width,cx+radius+1);
+
+			long total = 0;
+			for (int x = x0; x < x1; x++) {
+				long va = left.get(x,cy);
+				long vb = right.get(x-disparity,cy);
+				total += computeError(va,vb);
+			}
+			return total;
+		}
+
+		@Override
+		public double naiveScoreRegion(int cx, int cy, int disparity, int radius) {
+			int y0 = Math.max(0,cy-radius);
+			int y1 = Math.min(left.height,cy+radius+1);
+
+			long total = 0;
+			for (int y = y0; y < y1; y++) {
+				total += (long)naiveScoreRow(cx, y, disparity, radius);
+			}
+			return total;
+		}
+
+		@Override
+		public double get(int index, int[] array) {
+			return array[index];
 		}
 	}
 }

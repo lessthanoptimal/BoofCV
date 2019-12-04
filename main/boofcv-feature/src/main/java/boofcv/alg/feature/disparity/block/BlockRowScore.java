@@ -107,7 +107,7 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 							 int minDisparity, int maxDisparity, int regionWidth,
 							 int[] elementScore) {
 			// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
-			for( int d = minDisparity; d < maxDisparity; d++ ) {
+			for( int d = minDisparity; d <= maxDisparity; d++ ) {
 				int dispFromMin = d - minDisparity;
 
 				// number of individual columns the error is computed in
@@ -144,7 +144,7 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 		{
 			int r = regionWidth/2;
 			// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
-			for( int d = minDisparity; d < maxDisparity; d++ ) {
+			for( int d = minDisparity; d <= maxDisparity; d++ ) {
 				int dispFromMin = d - minDisparity;
 
 				// number of individual columns the error is computed in
@@ -178,7 +178,7 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 							 int minDisparity, int maxDisparity, int regionWidth,
 							 float[] elementScore) {
 			// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
-			for( int d = minDisparity; d < maxDisparity; d++ ) {
+			for( int d = minDisparity; d <= maxDisparity; d++ ) {
 				int dispFromMin = d - minDisparity;
 
 				// number of individual columns the error is computed in
@@ -213,7 +213,7 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 										  int minDisparity, int maxDisparity, int regionWidth, int regionHeight, float[] scoresNorm ) {
 			int r = regionWidth/2;
 			// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
-			for( int d = minDisparity; d < maxDisparity; d++ ) {
+			for( int d = minDisparity; d <= maxDisparity; d++ ) {
 				int dispFromMin = d - minDisparity;
 
 				// number of individual columns the error is computed in

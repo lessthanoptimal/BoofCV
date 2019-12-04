@@ -39,8 +39,9 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 
 	int w=20;
 	int h=25;
-	int minDisparity=0;
-	int maxDisparity=10;
+	int minDisparity=-1;
+	int maxDisparity=-1;
+	int rangeDisparity;
 	int reject;
 
 	public ChecksSelectErrorWithChecksWta(Class<ArrayData> arrayType, Class<T> disparityType) {
@@ -52,7 +53,8 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 	void init( int min , int max ) {
 		this.minDisparity = min;
 		this.maxDisparity = max;
-		this.reject = (max-min)+1;
+		this.rangeDisparity = maxDisparity-minDisparity+1;
+		this.reject = rangeDisparity;
 		GImageMiscOps.fill(disparity, reject);
 	}
 
@@ -71,9 +73,9 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(2,-1,-1);
 		alg.configure(disparity,0,maxDisparity,2);
 
-		int[] scores = new int[w*maxDisparity];
+		int[] scores = new int[w*rangeDisparity];
 
-		for( int d = 0; d < 10; d++ ) {
+		for( int d = 0; d < rangeDisparity; d++ ) {
 			for( int x = 0; x < w; x++ ) {
 				scores[w*d+x] = d==0 ? 5 : x;
 			}
@@ -119,7 +121,6 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 
 	private void rightToLeftValidation( int minDisparity ) {
 		init( minDisparity , 10 );
-		int rangeDisparity = maxDisparity-minDisparity;
 
 		int y = 3;
 		int r = 2;
@@ -170,9 +171,9 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,-1,3);
 		alg.configure(disparity,0,maxDisparity,2);
 
-		int[] scores = new int[w*maxDisparity];
+		int[] scores = new int[w*rangeDisparity];
 
-		for( int d = 0; d < 10; d++ ) {
+		for( int d = 0; d < rangeDisparity; d++ ) {
 			for( int x = 0; x < w; x++ ) {
 				scores[w*d+x] = minValue + Math.abs(2-d);
 			}
@@ -203,9 +204,9 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,-1,3);
 		alg.configure(disparity,minDisparity,maxDisparity,r);
 
-		int[] scores = new int[w*maxDisparity];
+		int[] scores = new int[w*rangeDisparity];
 
-		for( int d = 0; d < 10; d++ ) {
+		for( int d = 0; d < rangeDisparity; d++ ) {
 			for( int x = 0; x < w; x++ ) {
 				scores[w*d+x] = minValue + (d % 3);
 			}
