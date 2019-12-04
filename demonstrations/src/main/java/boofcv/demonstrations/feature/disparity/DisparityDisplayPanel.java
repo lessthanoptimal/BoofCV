@@ -212,6 +212,9 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		} else if( e.getSource() == checkConcurrent ) {
 			concurrent = checkConcurrent.isSelected();
 			listener.recompute();
+		} else if( e.getSource() == invalidToggle ) {
+			colorInvalid = invalidToggle.isSelected();
+			listener.disparityGuiChange();
 		}
 	}
 

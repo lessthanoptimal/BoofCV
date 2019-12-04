@@ -391,7 +391,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	@Override
 	public synchronized void disparityGuiChange() {
-		changeImageView();
+		disparityRender();
 	}
 
 	@Override
