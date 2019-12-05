@@ -18,19 +18,16 @@
 
 package boofcv.alg.feature.disparity.block;
 
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.image.*;
 import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-@SuppressWarnings("InnerClassMayBeStatic")
 class TestBlockRowScoreSad {
 	@Nested
 	class U8 extends ChecksBlockRowScore.ArrayIntI<GrayU8> {
-
 		U8() {super(255, ImageType.single(GrayU8.class));}
 
 		@Override
@@ -45,8 +42,37 @@ class TestBlockRowScoreSad {
 	}
 
 	@Nested
-	class F32 extends ChecksBlockRowScore<GrayF32,float[]> {
+	class U16 extends ChecksBlockRowScore.ArrayIntI<GrayU16> {
+		U16() {super(5000, ImageType.single(GrayU16.class));}
 
+		@Override
+		public BlockRowScore<GrayU16, int[]> createAlg(int radiusWidth, int radiusHeight) {
+			return new BlockRowScoreSad.U16();
+		}
+
+		@Override
+		protected int computeError(int a, int b) {
+			return Math.abs(a-b);
+		}
+	}
+
+	@Nested
+	class S16 extends ChecksBlockRowScore.ArrayIntI<GrayS16> {
+		S16() {super(5000, ImageType.single(GrayS16.class));}
+
+		@Override
+		public BlockRowScore<GrayS16, int[]> createAlg(int radiusWidth, int radiusHeight) {
+			return new BlockRowScoreSad.S16();
+		}
+
+		@Override
+		protected int computeError(int a, int b) {
+			return Math.abs(a-b);
+		}
+	}
+
+	@Nested
+	class F32 extends ChecksBlockRowScore<GrayF32,float[]> {
 		F32() {super(1000, ImageType.single(GrayF32.class));}
 
 		@Override
@@ -59,28 +85,28 @@ class TestBlockRowScoreSad {
 
 		@Override
 		public double naiveScoreRow(int cx, int cy, int disparity, int radius) {
-			int x0 = Math.max(disparity,cx-radius);
-			int x1 = Math.min(left.width,cx+radius+1);
+			int x0 = cx-radius;
+			int x1 = cx+radius+1;
 
 			float total = 0;
 			for (int x = x0; x < x1; x++) {
-				float va = left.get(x,cy);
-				float vb = right.get(x-disparity,cy);
+				float va = ((ImageBorder_F32)bleft).get(x,cy);
+				float vb = ((ImageBorder_F32)bright).get(x-disparity,cy);
 				total += Math.abs(va-vb);
 			}
-			return total*(radius*2+1)/(x1-x0);
+			return total;
 		}
 
 		@Override
 		public double naiveScoreRegion(int cx, int cy, int disparity, int radius) {
-			int y0 = Math.max(0,cy-radius);
-			int y1 = Math.min(left.height,cy+radius+1);
+			int y0 = cy-radius;
+			int y1 = cy+radius+1;
 
 			float total = 0;
 			for (int y = y0; y < y1; y++) {
 				total += (float)naiveScoreRow(cx, y, disparity, radius);
 			}
-			return total*(radius*2+1)/(y1-y0);
+			return total;
 		}
 
 		@Override

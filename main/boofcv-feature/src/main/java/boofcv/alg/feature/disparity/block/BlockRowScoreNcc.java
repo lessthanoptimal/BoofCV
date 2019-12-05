@@ -21,6 +21,7 @@ package boofcv.alg.feature.disparity.block;
 import boofcv.abst.filter.blur.BlurStorageFilter;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -63,6 +64,10 @@ public class BlockRowScoreNcc<T extends ImageBase<T>>
 		stdevR = powR;
 	}
 
+	public void setBorder(ImageBorder<T> border ) {
+		meanFilter.setBorder(border.copy());
+	}
+
 	public void computeStatistics(T left , T right )
 	{
 		// Compute mean of L^2 and R^2
@@ -80,7 +85,7 @@ public class BlockRowScoreNcc<T extends ImageBase<T>>
 		GPixelMath.stdev(meanR, powR, stdevR);
 	}
 
-	public static class F32 extends BlockRowScore.ArrayF32<GrayF32> {
+	public static class F32 extends BlockRowScore.ArrayS32_BF32{
 		BlockRowScoreNcc<GrayF32> helper;
 		public float eps=UtilEjml.F_EPS;
 
@@ -95,9 +100,22 @@ public class BlockRowScoreNcc<T extends ImageBase<T>>
 		}
 
 		@Override
-		public void score(int elementMax, int indexLeft, int indexRight, float[] elementScore) {
-			for( int rCol = 0; rCol < elementMax; rCol++ ) {
-				elementScore[rCol] = left.data[ indexLeft++ ] * right.data[ indexRight++ ];
+		public void setBorder(ImageBorder<GrayF32> border) {
+			super.setBorder(border);
+			helper.setBorder(border);
+		}
+
+		@Override
+		public void score(int indexLeft, int indexRight, int offset, int length, float[] elementScore) {
+			for( int i = 0; i < length; i++ ) {
+				elementScore[offset+i] = left.data[ indexLeft++ ] * right.data[ indexRight++ ];
+			}
+		}
+
+		@Override
+		public void scoreBorder(int x, int y, int d , int offset, int length, float[] scores) {
+			for( int i = 0; i < length; i++ ,x++) {
+				scores[offset+i] = borderLeft.get(x,y) * borderRight.get(x-d,y);
 			}
 		}
 
@@ -117,15 +135,18 @@ public class BlockRowScoreNcc<T extends ImageBase<T>>
 								   float[] scores, int indexScores, float[] scoresNorm) {
 			final float area = regionWidth*regionHeight;
 
-			int stride = helper.meanL.stride;
+			if( row < 0 || row >= left.height )
+				throw new IllegalArgumentException("Egads. row="+row);
+
+			int stride   = helper.meanL.stride;
 			int idxLeft  = row*stride + colLeft;
 			int idxRight = row*stride + colRight;
 
 			for (int i = 0; i < numCols; i++, idxLeft++, idxRight++ ) {
 				float correlation = scores[indexScores+i]/area;
 
-				float meanL = helper.meanL.data[idxLeft];
-				float meanR = helper.meanR.data[idxRight];
+				float meanL  = helper.meanL.data[idxLeft];
+				float meanR  = helper.meanR.data[idxRight];
 				float sigmaL = helper.stdevL.data[idxLeft];
 				float sigmaR = helper.stdevR.data[idxRight];
 

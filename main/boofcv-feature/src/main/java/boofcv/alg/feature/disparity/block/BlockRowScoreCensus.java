@@ -19,7 +19,6 @@
 package boofcv.alg.feature.disparity.block;
 
 import boofcv.alg.descriptor.DescriptorDistance;
-import boofcv.alg.feature.disparity.block.BlockRowScore.ArrayS32;
 import boofcv.struct.image.*;
 
 /**
@@ -29,22 +28,31 @@ import boofcv.struct.image.*;
  */
 public interface BlockRowScoreCensus
 {
-	abstract class CensusArrayS32<T extends ImageBase<T>> extends ArrayS32<T> {
-		CensusArrayS32( int maxPerPixel ) { super(maxPerPixel); }
+	abstract class CensusArrayS32_B32<T extends GrayI<T>> extends BlockRowScore.ArrayS32_BS32<T> {
+		CensusArrayS32_B32( int maxPerPixel ) { super(maxPerPixel); }
 		@Override
 		public boolean isRequireNormalize() {
 			return false;
 		}
+
+		@Override
+		public void scoreBorder(int x, int y, int d , int offset, int length, int[] elementScore) {
+			for( int i = 0; i < length; i++ ,x++) {
+				final int a = borderLeft.get(x,y);
+				final int b = borderRight.get(x-d,y);
+				elementScore[offset+i] = DescriptorDistance.hamming(a^b);
+			}
+		}
 	}
 
-	class U8 extends CensusArrayS32<GrayU8> {
+	class U8 extends CensusArrayS32_B32<GrayU8> {
 		public U8( int maxPerPixel ) { super(maxPerPixel); }
 		@Override
-		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
-			for( int rCol = 0; rCol < elementMax; rCol++ ) {
+		public void score(int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
+			for( int i = 0; i < length; i++ ) {
 				final int a = left.data[ indexLeft++ ]& 0xFF;
 				final int b = right.data[ indexRight++ ]& 0xFF;
-				elementScore[rCol] = DescriptorDistance.hamming(a^b);
+				elementScore[offset+i] = DescriptorDistance.hamming(a^b);
 			}
 		}
 
@@ -54,14 +62,14 @@ public interface BlockRowScoreCensus
 		}
 	}
 
-	class S32 extends CensusArrayS32<GrayS32> {
+	class S32 extends CensusArrayS32_B32<GrayS32> {
 		public S32( int maxPerPixel ) { super(maxPerPixel); }
 		@Override
-		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
-			for( int rCol = 0; rCol < elementMax; rCol++ ) {
+		public void score(int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
+			for( int i = 0; i < length; i++ ) {
 				final int a = left.data[ indexLeft++ ];
 				final int b = right.data[ indexRight++ ];
-				elementScore[rCol] = DescriptorDistance.hamming(a^b);
+				elementScore[offset+i] = DescriptorDistance.hamming(a^b);
 			}
 		}
 
@@ -71,15 +79,29 @@ public interface BlockRowScoreCensus
 		}
 	}
 
-	class S64 extends CensusArrayS32<GrayS64> {
+	class S64 extends BlockRowScore.ArrayS32_BS64{
 		public S64( int maxPerPixel ) { super(maxPerPixel); }
 		@Override
-		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
-			for( int rCol = 0; rCol < elementMax; rCol++ ) {
+		public void score(int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
+			for( int i = 0; i < length; i++ ) {
 				final long a = left.data[ indexLeft++ ];
 				final long b = right.data[ indexRight++ ];
-				elementScore[rCol] = DescriptorDistance.hamming(a^b);
+				elementScore[offset+i] = DescriptorDistance.hamming(a^b);
 			}
+		}
+
+		@Override
+		public void scoreBorder(int x, int y, int d , int offset, int length, int[] elementScore) {
+			for( int i = 0; i < length; i++ ,x++) {
+				final long a = borderLeft.get(x,y);
+				final long b = borderRight.get(x-d,y);
+				elementScore[offset+i] = DescriptorDistance.hamming(a^b);
+			}
+		}
+
+		@Override
+		public boolean isRequireNormalize() {
+			return false;
 		}
 
 		@Override

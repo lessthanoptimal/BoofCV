@@ -19,6 +19,7 @@
 package boofcv.alg.feature.disparity.block.score;
 
 import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
+import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayS16;
 
 import java.util.Arrays;
@@ -37,45 +38,68 @@ import java.util.Arrays;
 public class DisparitySparseScoreBM_SAD_S16 extends DisparitySparseScoreSadRect<int[],GrayS16> {
 
 	// scores up to the maximum baseline
-	int scores[];
+	int[] scores;
 
 	public DisparitySparseScoreBM_SAD_S16(int minDisparity , int maxDisparity, int radiusX, int radiusY) {
 		super(minDisparity,maxDisparity,radiusX, radiusY);
 
-		scores = new int[ maxDisparity ];
+		scores = new int[ rangeDisparity ];
 	}
 
 	@Override
 	public boolean process( int x , int y ) {
-		// adjust disparity for image border
-		localMaxDisparity = Math.min(rangeDisparity,x-radiusX+1-minDisparity);
-
-		if( localMaxDisparity <= 0 || x >= left.width-radiusX || y < radiusY || y >= left.height-radiusY )
+		// can't estimate disparity if there are no pixels it can estimate disparity from
+		if( x < minDisparity )
 			return false;
 
-		Arrays.fill(scores,0);
+		// adjust disparity for image border
+		localMaxRange = Math.min(x,maxDisparity)-minDisparity+1;
 
+		Arrays.fill(scores,0);
+		if( x < localMaxRange+radiusX+minDisparity || x >= left.width-radiusX || y < radiusY || y >= left.height-radiusY )
+			scoreBorder(x,y);
+		else
+			scoreInner(x, y);
+
+		return true;
+	}
+
+	private void scoreBorder(int cx, int cy) {
+		ImageBorder_S32 bleft = (ImageBorder_S32)this.bleft;
+		ImageBorder_S32 bright = (ImageBorder_S32)this.bright;
+
+		// sum up horizontal errors in the region
+		for (int y = -radiusY; y <= radiusY; y++) {
+			for (int d = 0; d < localMaxRange; d++) {
+				int score = 0;
+				for (int x = -radiusX; x <= radiusX; x++) {
+					int diff = bleft.get(cx+x,cy+y)-bright.get(cx+x-d-minDisparity,+cy+y);
+					score += Math.abs(diff);
+				}
+				scores[d] += score;
+			}
+		}
+	}
+
+	private void scoreInner(int x, int y) {
 		// sum up horizontal errors in the region
 		for( int row = 0; row < regionHeight; row++ ) {
 			// pixel indexes
 			int startLeft = left.startIndex + left.stride*(y-radiusY+row) + x-radiusX;
 			int startRight = right.startIndex + right.stride*(y-radiusY+row) + x-radiusX-minDisparity;
 
-			for( int i = 0; i < localMaxDisparity; i++ ) {
+			for(int i = 0; i < localMaxRange; i++ ) {
 				int indexLeft = startLeft;
 				int indexRight = startRight-i;
 
 				int score = 0;
 				for( int j = 0; j < regionWidth; j++ ) {
 					int diff = (left.data[ indexLeft++ ]) - (right.data[ indexRight++ ]);
-
 					score += Math.abs(diff);
 				}
 				scores[i] += score;
 			}
 		}
-
-		return true;
 	}
 
 	@Override

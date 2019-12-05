@@ -20,6 +20,7 @@ package boofcv.factory.feature.disparity;
 
 import boofcv.alg.feature.disparity.DisparityBlockMatch;
 import boofcv.struct.Configuration;
+import boofcv.struct.border.BorderType;
 
 /**
  * Configuration for the basic block matching stereo algorithm that employs a greedy winner takes all strategy.
@@ -76,6 +77,11 @@ public class ConfigDisparityBM implements Configuration {
 	 * Used if error type is NCC
 	 */
 	public ConfigDisparityError.NCC configNCC = new ConfigDisparityError.NCC();
+	/**
+	 * Specifies how the image border is handled. In general you want to avoid an approach which would bias the
+	 * error to prefer a region with lots of pixels outside the image border.
+	 */
+	public BorderType border = BorderType.REFLECT;
 
 	@Override
 	public void checkValidity() {
@@ -83,5 +89,7 @@ public class ConfigDisparityBM implements Configuration {
 			throw new IllegalArgumentException("miDisparity < 0");
 		if( rangeDisparity < 1 )
 			throw new IllegalArgumentException("rangeDisparity < 1");
+		if( border == BorderType.NORMALIZED || border == BorderType.SKIP )
+			throw new IllegalArgumentException("Normalized and Skip are not supported");
 	}
 }

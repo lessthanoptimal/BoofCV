@@ -20,16 +20,23 @@ package boofcv.alg.feature.disparity.block.score;
 
 import boofcv.alg.feature.disparity.DisparityBlockMatch;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
+import boofcv.alg.feature.disparity.block.DisparityBlockMatchNaive;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
+import boofcv.alg.feature.disparity.block.select.SelectCorrelationWta_F32_U8;
 import boofcv.alg.feature.disparity.block.select.SelectErrorBasicWta_F32_U8;
 import boofcv.alg.feature.disparity.block.select.SelectErrorBasicWta_S32_U8;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.factory.feature.disparity.ConfigDisparityBM;
+import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -39,26 +46,61 @@ import java.util.Random;
  */
 public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends ImageGray<DI>> {
 
+	float eps = UtilEjml.F_EPS;
 	Random rand = new Random(234);
 
 	BlockRowScore scoreRow;
 	DisparitySelect compDisp;
 	Class<I> imageType;
 	Class<DI> disparityType;
+	DisparityError errorType;
 
-	ChecksDisparityBM(Class<I> imageType , Class<DI> disparityType ) {
+	// minimum and maximum pixel intensity
+	double minVal,maxVal;
+
+	ChecksDisparityBM(double minVal , double maxVal, DisparityError errorType,  Class<I> imageType , Class<DI> disparityType ) {
+		this.minVal = minVal;
+		this.maxVal = maxVal;
 		this.imageType = imageType;
 		this.disparityType = disparityType;
+		this.errorType = errorType;
 
-		if( imageType == GrayU8.class || imageType == GrayU16.class || imageType == GrayS16.class ) {
-			compDisp = (DisparitySelect)new SelectErrorBasicWta_S32_U8();
+		if( errorType.isCorrelation() ) {
+			compDisp = (DisparitySelect) new SelectCorrelationWta_F32_U8();
 		} else {
-			compDisp = (DisparitySelect)new SelectErrorBasicWta_F32_U8();
+			if (imageType == GrayU8.class || imageType == GrayU16.class || imageType == GrayS16.class) {
+				compDisp = (DisparitySelect) new SelectErrorBasicWta_S32_U8();
+			} else {
+				compDisp = (DisparitySelect) new SelectErrorBasicWta_F32_U8();
+			}
 		}
-
-		scoreRow = FactoryStereoDisparity.createScoreRowSad(imageType);
 	}
 
+	protected void createScoreRow(int radiusX , int radiusY) {
+		ConfigDisparityBM config = new ConfigDisparityBM();
+		config.border = DisparityBlockMatchNaive.BORDER_TYPE;
+		config.configNCC.eps = eps;
+		config.regionRadiusX = radiusX;
+		config.regionRadiusY = radiusY;
+		switch( errorType ) {
+			case SAD:
+				scoreRow = FactoryStereoDisparity.createScoreRowSad(config,imageType);
+				break;
+			case NCC:
+				scoreRow = FactoryStereoDisparity.createScoreRowNcc(config,imageType);
+				break;
+			default:
+				throw new IllegalArgumentException("Only NCC and SAD supported");
+		}
+		scoreRow.setBorder(FactoryImageBorder.generic(DisparityBlockMatchNaive.BORDER_TYPE, ImageType.single(imageType)));
+	}
+
+	protected DisparityBlockMatch<I, DI>
+	createAlg( int minDisparity , int maxDisparity , int radiusX, int radiusY)
+	{
+		createScoreRow(radiusX,radiusY);
+		return createAlg(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
+	}
 	protected abstract DisparityBlockMatch<I, DI>
 	createAlg( int minDisparity , int maxDisparity , int radiusX, int radiusY,
 			   BlockRowScore scoreRow, DisparitySelect compDisp);
@@ -69,36 +111,23 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 		BoofConcurrency.USE_CONCURRENT = false;
 	}
 
-	/**
-	 * Basic generic disparity calculation tests
-	 */
-	@Test
-	void basicTest() {
-		BasicDisparityTests<I, DI> alg =
-				new BasicDisparityTests<I, DI>(imageType) {
+	@Nested
+	class BasicTests extends BasicDisparityTests<I,DI> {
+		DisparityBlockMatch<I, DI> alg;
 
-					DisparityBlockMatch<I, DI> alg;
+		BasicTests() { super(ChecksDisparityBM.this.minVal,ChecksDisparityBM.this.maxVal,imageType); }
 
-					@Override
-					public DI computeDisparity(I left, I right ) {
-						DI ret = GeneralizedImageOps.createSingleBand(disparityType, left.width, left.height);
+		@Override
+		public void initialize(int minDisparity, int maxDisparity) {
+			alg = createAlg(minDisparity,maxDisparity,2,3);
+		}
 
-						alg.process(left,right,ret);
-
-						return ret;
-					}
-
-					@Override
-					public void initialize(int minDisparity , int maxDisparity) {
-						alg = createAlg(minDisparity,maxDisparity,2,3,scoreRow,compDisp);
-					}
-
-					@Override public int getBorderX() { return 2; }
-
-					@Override public int getBorderY() { return 4; }
-				};
-
-		alg.allChecks();
+		@Override
+		public DI computeDisparity(I left, I right) {
+			DI ret = GeneralizedImageOps.createSingleBand(disparityType, left.width, left.height);
+			alg.process(left,right,ret);
+			return ret;
+		}
 	}
 
 	/**
@@ -111,13 +140,8 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 		I left = GeneralizedImageOps.createSingleBand(imageType,w, h);
 		I right = GeneralizedImageOps.createSingleBand(imageType,w, h);
 
-		if( left.getDataType().isSigned() ) {
-			GImageMiscOps.fillUniform(left, rand, -20, 20);
-			GImageMiscOps.fillUniform(right, rand, -20, 20);
-		} else {
-			GImageMiscOps.fillUniform(left, rand, 0, 20);
-			GImageMiscOps.fillUniform(right, rand, 0, 20);
-		}
+		GImageMiscOps.fillUniform(left, rand, minVal, maxVal);
+		GImageMiscOps.fillUniform(right, rand, minVal, maxVal);
 
 		int radiusX = 3;
 		int radiusY = 2;
@@ -134,9 +158,10 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 		int w = left.width;
 		int h = left.height;
 
-		DisparityBlockMatch<I, DI> alg = createAlg(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
-		StereoDisparityWtoNaive<I> naive =
-				new StereoDisparityWtoNaive<>(minDisparity, maxDisparity, radiusX, radiusY);
+		DisparityBlockMatch<I, DI> alg = createAlg(minDisparity,maxDisparity,radiusX,radiusY);
+		DisparityBlockMatchNaive<I> naive = new DisparityBlockMatchNaive<>(errorType);
+		naive.configure(minDisparity, maxDisparity, radiusX, radiusY);
+		naive.setBorder(FactoryImageBorder.generic(DisparityBlockMatchNaive.BORDER_TYPE,ImageType.single(imageType)));
 
 		DI found = GeneralizedImageOps.createSingleBand(disparityType,w,h);
 		GrayF32 expected = new GrayF32(w,h);
@@ -153,13 +178,8 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 		I left = GeneralizedImageOps.createSingleBand(imageType,w, h);
 		I right = GeneralizedImageOps.createSingleBand(imageType,w, h);
 
-		if( left.getDataType().isSigned() ) {
-			GImageMiscOps.fillUniform(left, rand, -20, 20);
-			GImageMiscOps.fillUniform(right, rand, -20, 20);
-		} else {
-			GImageMiscOps.fillUniform(left, rand, 0, 20);
-			GImageMiscOps.fillUniform(right, rand, 0, 20);
-		}
+		GImageMiscOps.fillUniform(left, rand, minVal, maxVal);
+		GImageMiscOps.fillUniform(right, rand, minVal, maxVal);
 
 		int radiusX = 3;
 		int radiusY = 2;
@@ -180,10 +200,10 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 		DI found = GeneralizedImageOps.createSingleBand(disparityType,w,h);
 
 		BoofConcurrency.USE_CONCURRENT = false;
-		DisparityBlockMatch<I, DI> alg = createAlg(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
+		DisparityBlockMatch<I, DI> alg = createAlg(minDisparity,maxDisparity,radiusX,radiusY);
 		alg.process(left,right,expected);
 		BoofConcurrency.USE_CONCURRENT = true;
-		alg = createAlg(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
+		alg = createAlg(minDisparity,maxDisparity,radiusX,radiusY);
 		alg.process(left,right,found);
 
 //		((GrayU8)expected).print();

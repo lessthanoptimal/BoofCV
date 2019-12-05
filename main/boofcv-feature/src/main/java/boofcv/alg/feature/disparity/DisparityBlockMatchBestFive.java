@@ -58,11 +58,11 @@ public abstract class DisparityBlockMatchBestFive<I extends ImageBase<I>, DI ext
 
 	@Override
 	public int getBorderX() {
-		return radiusX*2;
+		return radiusX;
 	}
 
 	@Override
 	public int getBorderY() {
-		return radiusY*2;
+		return radiusY;
 	}
 }

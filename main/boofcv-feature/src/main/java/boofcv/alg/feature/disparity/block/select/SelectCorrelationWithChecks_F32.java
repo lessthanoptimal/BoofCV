@@ -59,19 +59,24 @@ public abstract class SelectCorrelationWithChecks_F32<DI extends ImageGray<DI>>
 	public void configure(DI imageDisparity, int minDisparity, int maxDisparity , int radiusX ) {
 		super.configure(imageDisparity,minDisparity,maxDisparity,radiusX);
 
-		columnScore = new float[maxDisparity-minDisparity];
+		columnScore = new float[rangeDisparity];
 		imageWidth = imageDisparity.width;
 	}
 
 	@Override
 	public void process(int row, float[] scores ) {
 
-		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride + radiusX + minDisparity;
+		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride;
 
-		for( int col = minDisparity; col <= imageWidth-regionWidth; col++ ) {
+		// Mark all pixels as invalid which can't be estimate due to minDisparity
+		for (int col = 0; col < minDisparity; col++) {
+			setDisparity(indexDisparity++ , rangeDisparity );
+		}
+
+		// Select the best disparity from all the rest
+		for( int col = minDisparity; col < imageWidth; col++ ) {
 			// Determine the number of disparities that can be considered at this column
-			// make sure the disparity search doesn't go outside the image border
-			localMaxDisparity = maxDisparityAtColumnL2R(col);
+			localRange = maxDisparityAtColumnL2R(col)-minDisparity+1;
 
 			// index of the element being examined in the score array
 			int indexScore = col - minDisparity;
@@ -82,7 +87,7 @@ public abstract class SelectCorrelationWithChecks_F32<DI extends ImageGray<DI>>
 			float scoreWorst = scoreBest;
 			indexScore += imageWidth;
 
-			for(int i = 1; i < localMaxDisparity; i++ ,indexScore += imageWidth) {
+			for(int i = 1; i < localRange; i++ ,indexScore += imageWidth) {
 				float s = scores[indexScore];
 				columnScore[i] = s;
 				if( s > scoreBest ) {
@@ -104,7 +109,7 @@ public abstract class SelectCorrelationWithChecks_F32<DI extends ImageGray<DI>>
 			}
 			// test to see if the region lacks sufficient texture if:
 			// 1) not already eliminated 2) sufficient disparities to check, 3) it's activated
-			if( textureThreshold > 0 && bestDisparity != invalidDisparity && localMaxDisparity >= 3 ) {
+			if( textureThreshold > 0 && bestDisparity != invalidDisparity && localRange >= 3 ) {
 				// find the second best disparity value and exclude its neighbors
 				float secondBest = scoreWorst;
 				for( int i = 0; i < bestDisparity-1; i++ ) {
@@ -112,7 +117,7 @@ public abstract class SelectCorrelationWithChecks_F32<DI extends ImageGray<DI>>
 						secondBest = columnScore[i];
 					}
 				}
-				for(int i = bestDisparity+2; i < localMaxDisparity; i++ ) {
+				for(int i = bestDisparity+2; i < localRange; i++ ) {
 					if( columnScore[i] > secondBest ) {
 						secondBest = columnScore[i];
 					}
@@ -138,7 +143,7 @@ public abstract class SelectCorrelationWithChecks_F32<DI extends ImageGray<DI>>
 	 */
 	private int selectRightToLeft( int col , float[] scores ) {
 		// see how far it can search
-		int localMax = Math.min(imageWidth-regionWidth,col+maxDisparity)-col-minDisparity;
+		int localMax = Math.min(imageWidth,col+maxDisparity)-col-minDisparity;
 
 		int indexBest = 0;
 		int indexScore = col;
@@ -182,6 +187,11 @@ public abstract class SelectCorrelationWithChecks_F32<DI extends ImageGray<DI>>
 
 		protected void setDisparity( int index , int value ) {
 			imageDisparity.data[index] = (byte)value;
+		}
+
+		@Override
+		protected void setDisparityInvalid(int index) {
+			imageDisparity.data[index] = (byte)invalidDisparity;
 		}
 	}
 }

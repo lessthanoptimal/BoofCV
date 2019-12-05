@@ -39,8 +39,9 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 
 	int w=20;
 	int h=25;
-	int minDisparity=0;
-	int maxDisparity=10;
+	int minDisparity;
+	int maxDisparity;
+	int rangeDisparity;
 	int reject;
 
 	T disparity;
@@ -54,8 +55,9 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 	void init( int min , int max ) {
 		this.minDisparity = min;
 		this.maxDisparity = max;
-		this.reject = (max-min)+1;
-		GImageMiscOps.fill(disparity, reject);
+		this.rangeDisparity = max-min+1;
+		this.reject = rangeDisparity;
+		GImageMiscOps.fill(disparity, rangeDisparity);
 	}
 
 	public abstract SelectDisparityWithChecksWta<ArrayData,T> createSelector(int rightToLeftTolerance, double texture );
@@ -87,7 +89,6 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 
 	private void rightToLeftValidation( int minDisparity ) {
 		init( minDisparity , 10 );
-		int rangeDisparity = maxDisparity-minDisparity;
 
 		int y = 3;
 		int r = 2;
@@ -105,25 +106,25 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 
 		alg.process(y,copyToCorrectType(scores,arrayType));
 
-		// outside the border should be 'reject'
-		for( int i = 0; i < r+minDisparity; i++ )
+		// Less than the minimum disparity should be reject
+		for( int i = 0; i < minDisparity; i++ )
 			assertEquals(reject, getDisparity(i + r, y), 1e-8);
 
 		// These should all be zero since other pixels will have lower scores
-		for( int i = r+minDisparity; i < r+4+minDisparity; i++ )
+		for( int i = minDisparity; i < 4+minDisparity; i++ )
 			assertEquals(reject, getDisparity(i, y), 1e-8);
 
 		// the tolerance is one, so this should be 4
-		assertEquals(4, getDisparity(4 + r + minDisparity, y), 1e-8);
+		assertEquals(4, getDisparity(4 + minDisparity, y), 1e-8);
 		// should be at 5 for the remainder
-		for( int i = r+minDisparity+5; i < w-r; i++ )
+		for( int i = minDisparity+5; i < w-r; i++ )
 			assertEquals(5, getDisparity(i, y), 1e-8);
 
 		// sanity check, I now set the tolerance to zero
 		alg = createSelector(0,-1);
 		alg.configure(disparity,minDisparity,maxDisparity,2);
 		alg.process(y,copyToCorrectType(scores,arrayType));
-		assertEquals(reject, getDisparity(4 + r + minDisparity, y), 1e-8);
+		assertEquals(reject, getDisparity(4 + minDisparity, y), 1e-8);
 	}
 
 	/**
@@ -136,11 +137,11 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 		int y = 3;
 
 		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,3);
-		alg.configure(disparity,0,maxDisparity,2);
+		alg.configure(disparity,minDisparity,maxDisparity,2);
 
-		int[] scores = new int[w*maxDisparity];
+		int[] scores = new int[w*rangeDisparity];
 
-		for( int d = 0; d < 10; d++ ) {
+		for( int d = 0; d < rangeDisparity; d++ ) {
 			for( int x = 0; x < w; x++ ) {
 				scores[w*d+x] = minValue + Math.abs(2-d);
 			}
@@ -171,9 +172,9 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,3);
 		alg.configure(disparity,minDisparity,maxDisparity,r);
 
-		int[] scores = new int[w*maxDisparity];
+		int[] scores = new int[w*rangeDisparity];
 
-		for( int d = 0; d < 10; d++ ) {
+		for( int d = 0; d < rangeDisparity; d++ ) {
 			for( int x = 0; x < w; x++ ) {
 				scores[w*d+x] = minValue + (d % 3);
 			}

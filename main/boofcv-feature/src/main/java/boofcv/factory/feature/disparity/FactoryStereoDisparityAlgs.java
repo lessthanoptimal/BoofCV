@@ -126,13 +126,14 @@ public class FactoryStereoDisparityAlgs {
 		configBM.regionRadiusY = config.configBlockMatch.radiusY;
 		configBM.minDisparity = config.minDisparity;
 		configBM.rangeDisparity = config.rangeDisparity;
+		configBM.border = config.border;
 
 		SgmCostFromBlocks<T> blockCost = new SgmCostFromBlocks<T>();
 		DisparityBlockMatchRowFormat<T, GrayU8> blockScore;
 
 		switch( config.errorType) {
 			case ABSOLUTE_DIFFERENCE: {
-				BlockRowScore rowScore = createScoreRowSad(imageType);
+				BlockRowScore rowScore = createScoreRowSad(configBM,imageType);
 				if( config.configBlockMatch.regular )
 					blockScore = createBlockMatching(configBM, imageType, blockCost, rowScore);
 				else

@@ -25,7 +25,7 @@ import boofcv.struct.image.ImageGray;
 /**
  * @author Peter Abeles
  */
-public class WrapDisparityBlockSparseSad<ArrayData,T extends ImageGray>
+public class WrapDisparityBlockSparseSad<ArrayData,T extends ImageGray<T>>
 		implements StereoDisparitySparse<T>
 {
 	DisparitySparseScoreSadRect<ArrayData,T> computeScore;
@@ -54,7 +54,7 @@ public class WrapDisparityBlockSparseSad<ArrayData,T extends ImageGray>
 	@Override
 	public boolean process(int x, int y) {
 		if( computeScore.process(x,y) ) {
-			return select.select(computeScore.getScore(), computeScore.getLocalMaxDisparity());
+			return select.select(computeScore.getScore(), computeScore.getLocalMaxRange());
 		}
 		return false;
 	}

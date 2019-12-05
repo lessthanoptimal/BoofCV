@@ -22,27 +22,28 @@ import boofcv.alg.feature.disparity.DisparityBlockMatch;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.block.select.SelectErrorBasicWta_S32_U8;
+import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
-public class TestDisparitySparseScoreSadRect_U8 extends ChecksDisparitySparseScoreSadRect<GrayU8,int[]> {
+public class TestDisparitySparseScoreBM_SAD_S16 extends ChecksDisparitySparseScoreBM<GrayS16,int[]> {
 
-	TestDisparitySparseScoreSadRect_U8() {
-		super(GrayU8.class);
+	TestDisparitySparseScoreBM_SAD_S16() {
+		super(GrayS16.class);
 	}
 
 	@Override
-	public DisparityBlockMatch<GrayU8, GrayU8> createDense(int minDisparity, int maxDisparity,
-														   int radiusX, int radiusY, BlockRowScore scoreRow) {
+	public DisparityBlockMatch<GrayS16, GrayU8> createDense(int minDisparity, int maxDisparity,
+															int radiusX, int radiusY, BlockRowScore scoreRow) {
 		return new DisparityScoreBM_S32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,
 				new SelectErrorBasicWta_S32_U8());
 	}
 
 	@Override
-	public DisparitySparseScoreSadRect<int[], GrayU8> createSparse(int minDisparity, int maxDisparity,
-																   int radiusX, int radiusY) {
-		return new DisparitySparseScoreBM_SAD_U8(minDisparity,maxDisparity,radiusX,radiusY);
+	public DisparitySparseScoreSadRect<int[], GrayS16> createSparse(int minDisparity, int maxDisparity,
+																	int radiusX, int radiusY) {
+		return new DisparitySparseScoreBM_SAD_S16(minDisparity,maxDisparity,radiusX,radiusY);
 	}
 }

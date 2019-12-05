@@ -38,7 +38,10 @@ public abstract class CheckBasicSelectDisparity<ArrayData , D extends ImageGray<
 
 	int w=20;
 	int h=25;
-	int maxDisparity=10;
+	int radius;
+	int minDisparity;
+	int maxDisparity;
+	int rangeDisparity;
 
 	D disparity;
 
@@ -54,40 +57,21 @@ public abstract class CheckBasicSelectDisparity<ArrayData , D extends ImageGray<
 
 	public abstract DisparitySelect<ArrayData,D> createAlg();
 
+	void init( int minDisparity, int maxDisparity , int radius ) {
+		this.radius = radius;
+		this.minDisparity = minDisparity;
+		this.maxDisparity = maxDisparity;
+		this.rangeDisparity = maxDisparity-minDisparity+1;
+	}
+
 	/**
 	 * Give it a hand crafted score with known results for WTA.  See if it produces those results
 	 */
 	@Test
 	void simpleTest() {
-		int y = 3;
-
-		GImageMiscOps.fill(disparity, 0);
-		alg.configure(disparity,0,maxDisparity,2);
-
-		int scores[] = new int[w*maxDisparity];
-
-		for( int d = 0; d < 10; d++ ) {
-			for( int x = 0; x < w; x++ ) {
-				scores[w*d+x] = computeError(d);
-			}
-		}
-
-		ArrayData s = copyToCorrectType(scores);
-
-		alg.process(y,s);
-
-		// make sure image borders are zero
-		assertEquals(0, GeneralizedImageOps.get(disparity, 0, y), 1e-8);
-		assertEquals(0, GeneralizedImageOps.get(disparity, 1, y), 1e-8);
-		assertEquals(0, GeneralizedImageOps.get(disparity, w-2, y), 1e-8);
-		assertEquals(0, GeneralizedImageOps.get(disparity, w-1, y), 1e-8);
-
-		// should ramp up to 5 here
-		for( int i = 0; i < 5; i++ )
-			assertEquals(i, GeneralizedImageOps.get(disparity, i+2, y));
-		// should be at 5 for the remainder
-		for( int i = 5; i < w-4; i++ )
-			assertEquals(5, GeneralizedImageOps.get(disparity, i+2, y));
+		simpleTest(0,10,2);
+		simpleTest(2,10,2);
+		simpleTest(4,11,3);
 	}
 
 	private ArrayData copyToCorrectType( int scores[] ) {
@@ -104,44 +88,34 @@ public abstract class CheckBasicSelectDisparity<ArrayData , D extends ImageGray<
 		return (ArrayData)ret;
 	}
 
-	/**
-	 * Set the minimum disparity to a non zero number and see if it has the expected behavior
-	 */
-	@Test
-	void minDisparity() {
-		int minDisparity = 2;
-		int maxDisparity = 10;
-		int r = 2;
-
-		int range = maxDisparity-minDisparity;
+	void simpleTest(int minDisparity, int maxDisparity , int radius ) {
+		init(minDisparity,maxDisparity,radius);
 
 		int y = 3;
 
 		GImageMiscOps.fill(disparity,0);
-		alg.configure(disparity,minDisparity,maxDisparity,r);
+		alg.configure(disparity,minDisparity,maxDisparity,rangeDisparity);
 
-		int scores[] = new int[w*range];
+		int[] scores = new int[w*rangeDisparity];
 
-		for( int d = 0; d < range; d++ ) {
-			for( int x = 0; x < w-(r*2+1); x++ ) {
+		for( int d = 0; d < rangeDisparity; d++ ) {
+			for( int x = 0; x < w-minDisparity; x++ ) {
 				scores[w*d+x] = computeError(d);
 			}
 		}
 
 		alg.process(y,copyToCorrectType(scores));
 
-		// make sure image borders are zero
-		for( int i = 0; i < 2+minDisparity; i++ )
-			assertEquals(0, GeneralizedImageOps.get(disparity, i, y), 1e-8);
-		assertEquals(0, GeneralizedImageOps.get(disparity, w-2, y), 1e-8);
-		assertEquals(0, GeneralizedImageOps.get(disparity, w-1, y), 1e-8);
+		// When x is less than min disparity it should be zero
+		for( int i = 0; i < minDisparity; i++ )
+			assertEquals(rangeDisparity, GeneralizedImageOps.get(disparity, i, y), 1e-8);
 
-		// should ramp up to 7 starting at 2
-		for( int i = 0; i < 5; i++ )
-			assertEquals(i+2, minDisparity+GeneralizedImageOps.get(disparity, i+2+minDisparity, y), 1e-8);
-		// should be at 7 for the remainder
-		for( int i = 5; i < w-4-minDisparity; i++ )
-			assertEquals(7, minDisparity+GeneralizedImageOps.get(disparity, i+2+minDisparity, y), 1e-8);
+		// should ramp up to 5
+		for( int i = minDisparity; i < minDisparity+5; i++ )
+			assertEquals(i-minDisparity, GeneralizedImageOps.get(disparity, i, y),0.99);
+		// should be at 5 for the remainder
+		for( int i = minDisparity+5; i < w; i++ )
+			assertEquals(5, GeneralizedImageOps.get(disparity, i, y),0.99);
 	}
 
 	public abstract int computeError( int d );

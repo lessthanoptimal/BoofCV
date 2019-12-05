@@ -19,10 +19,13 @@
 package boofcv.alg.feature.disparity;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
-import boofcv.alg.feature.disparity.block.DisparityBlockMatchNaive;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -38,16 +41,21 @@ import org.junit.jupiter.api.Nested;
 class TestBlockMatchBasic_SAD<T extends ImageBase<T>> {
 
 	@Nested
-	class U8 extends ChecksBlockMatchBasic<GrayU8> {
+	class U8 extends ChecksDisparityBlockMatchNaive<GrayU8> {
 
 		U8() {
 			super(ImageType.single(GrayU8.class));
 		}
 
 		@Override
-		public DisparityBlockMatchNaive<GrayU8> createNaive(int blockRadius, int minDisparity, int maxDisparity) {
-			DisparityBlockMatchNaive<GrayU8> naive = new DisparityBlockMatchNaive<GrayU8>(blockRadius,minDisparity,maxDisparity) {
-				public double computeScore(GrayU8 left, GrayU8 right, int cx, int cy, int disparity) {
+		public BruteForceBlockMatch<GrayU8> createNaive(BorderType borderType, ImageType<GrayU8> imageType) {
+			BruteForceBlockMatch<GrayU8> naive = new BruteForceBlockMatch<GrayU8>(borderType,imageType) {
+				public double computeScore(ImageBorder<GrayU8> _left, ImageBorder<GrayU8> _right,
+										   int cx, int cy, int disparity)
+				{
+					ImageBorder_S32<GrayU8> left = (ImageBorder_S32<GrayU8>)_left;
+					ImageBorder_S32<GrayU8> right = (ImageBorder_S32<GrayU8>)_right;
+
 					int total = 0;
 					for (int y = -radius; y <= radius; y++) {
 						for (int x = -radius; x <= radius; x++) {
@@ -68,21 +76,27 @@ class TestBlockMatchBasic_SAD<T extends ImageBase<T>> {
 		public StereoDisparity<GrayU8, GrayU8> createAlg(int blockRadius, int minDisparity, int maxDisparity) {
 			ConfigDisparityBM config = createConfigBasicBM(blockRadius, minDisparity, maxDisparity);
 			config.errorType = DisparityError.SAD;
+			config.border = BORDER_TYPE;
 			return FactoryStereoDisparity.blockMatch(config,GrayU8.class,GrayU8.class);
 		}
 	}
 
 	@Nested
-	class F32 extends ChecksBlockMatchBasic<GrayF32> {
+	class F32 extends ChecksDisparityBlockMatchNaive<GrayF32> {
 
 		F32() {
 			super(ImageType.single(GrayF32.class));
 		}
 
 		@Override
-		public DisparityBlockMatchNaive<GrayF32> createNaive(int blockRadius, int minDisparity, int maxDisparity) {
-			DisparityBlockMatchNaive<GrayF32> naive = new DisparityBlockMatchNaive<GrayF32>(blockRadius,minDisparity,maxDisparity) {
-				public double computeScore(GrayF32 left, GrayF32 right, int cx, int cy, int disparity) {
+		public BruteForceBlockMatch<GrayF32> createNaive(BorderType borderType, ImageType<GrayF32> imageType) {
+			BruteForceBlockMatch<GrayF32> naive = new BruteForceBlockMatch<GrayF32>(borderType,imageType) {
+				public double computeScore(ImageBorder<GrayF32> _left, ImageBorder<GrayF32> _right,
+										   int cx, int cy, int disparity)
+				{
+					ImageBorder_F32 left = (ImageBorder_F32)_left;
+					ImageBorder_F32 right = (ImageBorder_F32)_right;
+
 					float total = 0;
 					for (int y = -radius; y <= radius; y++) {
 						for (int x = -radius; x <= radius; x++) {
@@ -103,6 +117,7 @@ class TestBlockMatchBasic_SAD<T extends ImageBase<T>> {
 		public StereoDisparity<GrayF32, GrayU8> createAlg(int blockRadius, int minDisparity, int maxDisparity) {
 			ConfigDisparityBM config = createConfigBasicBM(blockRadius, minDisparity, maxDisparity);
 			config.errorType = DisparityError.SAD;
+			config.border = BORDER_TYPE;
 			return FactoryStereoDisparity.blockMatch(config,GrayF32.class,GrayU8.class);
 		}
 	}

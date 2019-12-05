@@ -18,8 +18,11 @@
 
 package boofcv.alg.feature.disparity.block;
 
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_S32;
+import boofcv.struct.border.ImageBorder_S64;
+import boofcv.struct.image.*;
 
 /**
  * Interface for computing disparity scores across an entire row
@@ -29,6 +32,8 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public interface BlockRowScore<T extends ImageBase<T>,Array> {
+
+	void setBorder( ImageBorder<T> border );
 
 	/**
 	 * Specifies the input images
@@ -53,8 +58,9 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 				  int minDisparity , int maxDisparity , int regionWidth ,
 				  Array elementScore);
 
-	void score(int elementMax, int indexLeft, int indexRight,
-			   Array elementScore);
+	void score(int indexLeft, int indexRight, int offset, int length, Array elementScore);
+
+	void scoreBorder( int x0 , int y0, int d , int offset, int length , Array elementScore );
 
 	/**
 	 * Returns the maximum error each pixel in the region can contribute
@@ -118,32 +124,51 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 		public void scoreRow(int row, int[] scores,
 							 int minDisparity, int maxDisparity, int regionWidth,
 							 int[] elementScore) {
+			int regionRadius = regionWidth/2;
+			int widthAndBorder = left.width+regionRadius*2; // image width plus left and right borders
+
 			// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
 			for( int d = minDisparity; d <= maxDisparity; d++ ) {
 				int dispFromMin = d - minDisparity;
 
-				// number of individual columns the error is computed in
-				final int colMax = left.width-d;
-				// number of regions that a score/error is computed in
-				final int scoreMax = colMax-regionWidth;
-
-				// indexes that data is read to/from for different data structures
-				int indexScore = left.width*dispFromMin + dispFromMin;
-				int indexLeft = left.startIndex + left.stride*row + d;
-				int indexRight = right.startIndex + right.stride*row;
-
+				// TODO Alternative approach. Create a with border pixels instead?
+				//      Simpler but not sure if it's faster or slower.
 				// Fill elementScore with scores for individual elements for this row at disparity d
-				score(colMax, indexLeft, indexRight, elementScore);
+				if( row >= 0 && row < left.height ) {
+					// Compute in segments because using the border function is expensive while score() can
+					// be computed very fast
+					int x0 = dispFromMin-regionRadius+minDisparity;
+					int x1 = dispFromMin+minDisparity;
+					int x2 = left.width;
+					int x3 = x2+regionRadius;
+					int offset = 0;
+
+					// border at lower extent. Left image pixels 0 to r-1
+					scoreBorder(x0,row,d,offset,x1-x0,elementScore);
+					offset += x1-x0;
+
+					// indexes that data is read to/from for different data structures
+					int indexLeft = left.startIndex + left.stride * row + d;
+					int indexRight = right.startIndex + right.stride * row;
+					score(indexLeft, indexRight, offset,x2-x1, elementScore);
+					offset += x2-x1;
+
+					// border at lower extent. Left image pixels colMax-r to colMax-1
+					scoreBorder(x2,row,d,offset,x3-x2,elementScore);
+				} else {
+					scoreBorder(dispFromMin-regionRadius+minDisparity,row,d,0,widthAndBorder-dispFromMin-minDisparity,elementScore);
+				}
 
 				// score at the first column
 				int score = 0;
 				for( int i = 0; i < regionWidth; i++ )
 					score += elementScore[i];
 
+				int indexScore = left.width * dispFromMin + dispFromMin;
 				scores[indexScore++] = score;
 
 				// scores for the remaining columns
-				for( int col = 0; col < scoreMax; col++ , indexScore++ ) {
+				for( int col = 0; col < left.width-dispFromMin-1; col++ , indexScore++ ) {
 					scores[indexScore] = score += elementScore[col+regionWidth] - elementScore[col];
 				}
 			}
@@ -154,20 +179,17 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 										  int minDisparity, int maxDisparity, int regionWidth, int regionHeight,
 										  int[] scoresNorm )
 		{
-			int r = regionWidth/2;
 			// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
 			for( int d = minDisparity; d <= maxDisparity; d++ ) {
 				int dispFromMin = d - minDisparity;
 
 				// number of individual columns the error is computed in
 				final int colMax = left.width-d;
-				// number of regions that a score/error is computed in
-				final int scoreMax = colMax-regionWidth;
 
 				// indexes that data is read to/from for different data structures
 				int indexScore = left.width*dispFromMin + dispFromMin;
 
-				normalizeScore(row,d+r,r,scoreMax+1,regionWidth,regionHeight,scores,indexScore,scoresNorm);
+				normalizeScore(row,d,0,colMax,regionWidth,regionHeight,scores,indexScore,scoresNorm);
 			}
 		}
 
@@ -180,6 +202,50 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 			if( maxPerPixel < 0 )
 				throw new RuntimeException("Not supported");
 			return maxPerPixel;
+		}
+	}
+
+	abstract class ArrayS32_BS32<T extends GrayI<T>> extends ArrayS32<T> {
+		ImageBorder_S32<T> borderLeft;
+		ImageBorder_S32<T> borderRight;
+
+		protected ArrayS32_BS32(int maxPerPixel) {
+			super(maxPerPixel);
+		}
+
+		@Override
+		public void setBorder(ImageBorder<T> border) {
+			this.borderLeft = (ImageBorder_S32<T>)border.copy();
+			this.borderRight = (ImageBorder_S32<T>)border.copy();
+		}
+
+		@Override
+		public void setInput(T left, T right) {
+			super.setInput(left, right);
+			borderLeft.setImage(left);
+			borderRight.setImage(right);
+		}
+	}
+
+	abstract class ArrayS32_BS64 extends ArrayS32<GrayS64> {
+		ImageBorder_S64 borderLeft;
+		ImageBorder_S64 borderRight;
+
+		protected ArrayS32_BS64(int maxPerPixel) {
+			super(maxPerPixel);
+		}
+
+		@Override
+		public void setBorder(ImageBorder<GrayS64> border) {
+			this.borderLeft = (ImageBorder_S64)border.copy();
+			this.borderRight = (ImageBorder_S64)border.copy();
+		}
+
+		@Override
+		public void setInput(GrayS64 left, GrayS64 right) {
+			super.setInput(left, right);
+			borderLeft.setImage(left);
+			borderRight.setImage(right);
 		}
 	}
 
@@ -196,32 +262,49 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 		public void scoreRow(int row, float[] scores,
 							 int minDisparity, int maxDisparity, int regionWidth,
 							 float[] elementScore) {
+			int regionRadius = regionWidth/2;
+			int widthAndBorder = left.width+2*regionRadius;
+
 			// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
 			for( int d = minDisparity; d <= maxDisparity; d++ ) {
 				int dispFromMin = d - minDisparity;
 
-				// number of individual columns the error is computed in
-				final int colMax = left.width-d;
-				// number of regions that a score/error is computed in
-				final int scoreMax = colMax-regionWidth;
-
-				// indexes that data is read to/from for different data structures
-				int indexScore = left.width*dispFromMin + dispFromMin;
-				int indexLeft = left.startIndex + left.stride*row + d;
-				int indexRight = right.startIndex + right.stride*row;
-
 				// Fill elementScore with scores for individual elements for this row at disparity d
-				score(colMax, indexLeft, indexRight, elementScore);
+				if( row >= 0 && row < left.height ) {
+					// Compute in segments because using the border function is expensive while score() can
+					// be computed very fast
+					int x0 = dispFromMin-regionRadius+minDisparity;
+					int x1 = dispFromMin+minDisparity;
+					int x2 = left.width;
+					int x3 = x2+regionRadius;
+					int offset = 0;
+
+					// border at lower extent. Left image pixels 0 to r-1
+					scoreBorder(x0,row,d,offset,x1-x0,elementScore);
+					offset += x1-x0;
+
+					// indexes that data is read to/from for different data structures
+					int indexLeft = left.startIndex + left.stride * row + d;
+					int indexRight = right.startIndex + right.stride * row;
+					score(indexLeft, indexRight, offset,x2-x1, elementScore);
+					offset += x2-x1;
+
+					// border at lower extent. Left image pixels colMax-r to colMax-1
+					scoreBorder(x2,row,d,offset,x3-x2,elementScore);
+				} else {
+					scoreBorder(dispFromMin-regionRadius+minDisparity,row,d,0,widthAndBorder-dispFromMin-minDisparity,elementScore);
+				}
 
 				// score at the first column
 				float score = 0;
 				for( int i = 0; i < regionWidth; i++ )
 					score += elementScore[i];
 
+				int indexScore = left.width * dispFromMin + dispFromMin;
 				scores[indexScore++] = score;
 
 				// scores for the remaining columns
-				for( int col = 0; col < scoreMax; col++ , indexScore++ ) {
+				for( int col = 0; col < left.width-dispFromMin-1; col++ , indexScore++ ) {
 					scores[indexScore] = score += elementScore[col+regionWidth] - elementScore[col];
 				}
 			}
@@ -230,20 +313,17 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 		@Override
 		public void normalizeRegionScores(int row, float[] scores,
 										  int minDisparity, int maxDisparity, int regionWidth, int regionHeight, float[] scoresNorm ) {
-			int r = regionWidth/2;
 			// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
 			for( int d = minDisparity; d <= maxDisparity; d++ ) {
 				int dispFromMin = d - minDisparity;
 
 				// number of individual columns the error is computed in
 				final int colMax = left.width-d;
-				// number of regions that a score/error is computed in
-				final int scoreMax = colMax-regionWidth;
 
 				// indexes that data is read to/from for different data structures
 				int indexScore = left.width*dispFromMin + dispFromMin;
 
-				normalizeScore(row,d+r,r,scoreMax+1,regionWidth,regionHeight,scores,indexScore,scoresNorm);
+				normalizeScore(row,d,0,colMax,regionWidth,regionHeight,scores,indexScore,scoresNorm);
 			}
 		}
 
@@ -256,5 +336,23 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 			throw new RuntimeException("Maximum error is not supported for the image type");
 		}
 
+	}
+
+	abstract class ArrayS32_BF32 extends ArrayF32<GrayF32> {
+		ImageBorder_F32 borderLeft;
+		ImageBorder_F32 borderRight;
+
+		@Override
+		public void setBorder(ImageBorder<GrayF32> border) {
+			this.borderLeft = (ImageBorder_F32)border.copy();
+			this.borderRight = (ImageBorder_F32)border.copy();
+		}
+
+		@Override
+		public void setInput(GrayF32 left, GrayF32 right) {
+			super.setInput(left, right);
+			borderLeft.setImage(left);
+			borderRight.setImage(right);
+		}
 	}
 }

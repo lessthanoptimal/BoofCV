@@ -19,9 +19,9 @@
 package boofcv.alg.feature.disparity;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
-import boofcv.alg.feature.disparity.block.DisparityBlockMatchNaive;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -35,29 +35,31 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public abstract class ChecksBlockMatchBasic<T extends ImageBase<T>> {
+public abstract class ChecksDisparityBlockMatchNaive<T extends ImageBase<T>> {
+
+	protected static BorderType BORDER_TYPE = BorderType.EXTENDED;
 
 	Random rand = new Random(345);
 	T left,right;
+
 	GrayU8 expected = new GrayU8(1,1);
 
-	ChecksBlockMatchBasic(ImageType<T> imageType ) {
+	ChecksDisparityBlockMatchNaive(ImageType<T> imageType ) {
 		left = imageType.createImage(1,1);
 		right = imageType.createImage(1,1);
 	}
 
-	public abstract DisparityBlockMatchNaive<T> createNaive( int blockRadius , int minDisparity , int maxDisparity );
+	public abstract BruteForceBlockMatch<T> createNaive(BorderType borderType , ImageType<T> imageType );
 
 	public abstract StereoDisparity<T,GrayU8> createAlg( int blockRadius , int minDisparity , int maxDisparity );
 
 	@Test
 	void compare() {
 //		BoofConcurrency.USE_CONCURRENT=false;
-		compare(25,20,2,0,10);
-		compare(25,20,2,3,10);
-		compare(10,15,1,5,6);
-
-//		compare(400,300,2,0,120);
+		compare(40,35,2,0,10);
+		compare(40,35,2,3,10);
+		// only one possible disparity value can be considered
+		compare(10,15,1,5,5);
 	}
 
 	void compare( int width , int height , int radius , int minDisparity , int maxDisparity ) {
@@ -67,7 +69,8 @@ public abstract class ChecksBlockMatchBasic<T extends ImageBase<T>> {
 
 		fillInStereoImages();
 
-		DisparityBlockMatchNaive<T> naive = createNaive(radius,minDisparity,maxDisparity);
+		BruteForceBlockMatch<T> naive = createNaive(BORDER_TYPE,left.getImageType());
+		naive.configure(radius,minDisparity,maxDisparity);
 		StereoDisparity<T, GrayU8> alg = createAlg(radius,minDisparity,maxDisparity);
 
 		naive.process(left,right,expected);
@@ -94,6 +97,7 @@ public abstract class ChecksBlockMatchBasic<T extends ImageBase<T>> {
 		config.validateRtoL = -1;
 		config.subpixel = false;
 		config.maxPerPixelError = -1;
+		config.border = BORDER_TYPE;
 		return config;
 	}
 }

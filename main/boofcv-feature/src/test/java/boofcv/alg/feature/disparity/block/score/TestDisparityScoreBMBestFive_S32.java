@@ -21,22 +21,27 @@ package boofcv.alg.feature.disparity.block.score;
 import boofcv.alg.feature.disparity.DisparityBlockMatchBestFive;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
+import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
+import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-public class TestDisparityScoreBMBestFive_S32 extends ChecksDisparityBMBestFive<GrayU16,GrayU8> {
+public class TestDisparityScoreBMBestFive_S32 {
 
-	TestDisparityScoreBMBestFive_S32() {
-		super(GrayU16.class, GrayU8.class);
-	}
+	@Nested
+	public class SAD extends ChecksDisparityBMBestFive<GrayU16,GrayU8> {
+		SAD() {
+			super(0,200,DisparityError.SAD,GrayU16.class, GrayU8.class);
+		}
 
-	@Override
-	protected DisparityBlockMatchBestFive<GrayU16, GrayU8>
-	createAlg(int minDisparity, int maxDisparity, int radiusX, int radiusY,
-			  BlockRowScore scoreRow, DisparitySelect compDisp) {
-		return new DisparityScoreBMBestFive_S32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
+		@Override
+		protected DisparityBlockMatchBestFive<GrayU16, GrayU8>
+		createAlg(int minDisparity, int maxDisparity, int radiusX, int radiusY,
+				  BlockRowScore scoreRow, DisparitySelect compDisp) {
+			return new DisparityScoreBMBestFive_S32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
+		}
 	}
 }

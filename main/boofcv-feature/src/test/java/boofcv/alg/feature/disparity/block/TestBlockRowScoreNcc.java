@@ -18,11 +18,9 @@
 
 package boofcv.alg.feature.disparity.block;
 
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Nested;
 
 /**
@@ -32,14 +30,18 @@ public class TestBlockRowScoreNcc {
 
 	@Nested
 	class F32 extends ChecksBlockRowScore<GrayF32,float[]> {
-
+		float eps = 1e-3f;
 		F32() {
-			super(1000, ImageType.single(GrayF32.class));
+			super(0, ImageType.single(GrayF32.class));
+			this.maxPixelValue = 1;
+			this.minPixelValue = -1;
 		}
 
 		@Override
 		public BlockRowScore<GrayF32, float[]> createAlg(int radiusWidth, int radiusHeight) {
-			return new BlockRowScoreNcc.F32(radiusWidth,radiusHeight);
+			BlockRowScoreNcc.F32 alg = new BlockRowScoreNcc.F32(radiusWidth,radiusHeight);
+			alg.eps = eps;
+			return alg;
 		}
 
 		@Override
@@ -51,9 +53,8 @@ public class TestBlockRowScoreNcc {
 		public double naiveScoreRow(int cx, int cy, int disparity, int radius) {
 			double total = 0;
 			for (int x = -radius; x <= radius; x++) {
-				double va = left.get(cx+x,cy);
-				double vb = right.get(cx+x-disparity,cy);
-
+				double va = ((ImageBorder_F32)bleft).get(cx+x,cy);
+				double vb = ((ImageBorder_F32)bright).get(cx+x-disparity,cy);
 				total += va*vb;
 			}
 			return total;
@@ -61,7 +62,8 @@ public class TestBlockRowScoreNcc {
 
 		@Override
 		public double naiveScoreRegion(int cx, int cy, int disparity, int radius) {
-			return ncc(left,right,cx,cy,disparity,radius,UtilEjml.F_EPS);
+			return ncc((ImageBorder_F32)bleft,(ImageBorder_F32)bright,
+					cx,cy,disparity,radius,radius,eps);
 		}
 
 		@Override
@@ -70,52 +72,67 @@ public class TestBlockRowScoreNcc {
 		}
 	}
 
-	public static double ncc( ImageGray left , ImageGray right ,
-							  int cx, int cy, int disparity, int radius , double eps )
+	public static double ncc( ImageBorder_F32 bleft , ImageBorder_F32 bright ,
+							  int cx, int cy, int disparity, int radiusX , int radiusY, float eps )
 	{
-		double meanLeft = mean(left,cx,cy,radius);
-		double stdLeft = stdev(left,cx,cy,radius,meanLeft);
-		double meanRight = mean(right,cx-disparity,cy,radius);
-		double stdRight = stdev(right,cx-disparity,cy,radius,meanRight);
+		float meanLeft  = meanR(  bleft,cx,cy,radiusX,radiusY);
+		float stdLeft   = stdevR( bleft,cx,cy,radiusX,radiusY,meanLeft);
+		float meanRight = meanR(  bright,cx-disparity,cy,radiusX,radiusY);
+		float stdRight  = stdevR( bright,cx-disparity,cy,radiusX,radiusY,meanRight);
 
-		double total = 0;
-		for (int y = -radius; y <= radius; y++) {
-			double sumRow = 0;
-			for (int x = -radius; x <= radius; x++) {
-				double va = GeneralizedImageOps.get(left,cx+x,cy+y)-meanLeft;
-				double vb = GeneralizedImageOps.get(right,cx+x-disparity,cy+y)-meanRight;
-
+		float total = 0;
+		for (int y = -radiusY; y <= radiusY; y++) {
+			float sumRow = 0;
+			for (int x = -radiusX; x <= radiusX; x++) {
+				float va = bleft.get(cx+x,cy+y);
+				float vb = bright.get(cx+x-disparity,cy+y);
 				sumRow += va*vb;
 			}
-			total += sumRow/(radius*2+1);
+			total += sumRow/(2*radiusX+1);
 		}
-		total /= (radius*2+1);
+		total /= (2*radiusY+1);
 
-		return total/(eps +stdLeft*stdRight);
+		return (total-meanLeft*meanRight)/(eps + stdLeft*stdRight);
 	}
 
-	public static double mean( ImageGray img , int cx , int cy , int radius ) {
-		double total = 0;
-		for (int y = -radius; y <= radius; y++) {
-			for (int x = -radius; x <= radius; x++) {
-				total += GeneralizedImageOps.get(img,cx+x,cy+y);
-			}
-		}
-
-		return total / ((radius*2+1)*(radius*2+1));
+	public static float meanR( ImageBorder_F32 img , int cx, int cy, int radiusX, int radiusY ) {
+		int x0 = cx-radiusX;
+		int x1 = cx+radiusX+1;
+		int y0 = cy-radiusY;
+		int y1 = cy+radiusY+1;
+		return mean(img,x0,y0,x1,y1);
 	}
 
-	public static double stdev(ImageGray img , int cx , int cy , int radius, double mean ) {
-		double total = 0;
-		for (int y = -radius; y <= radius; y++) {
-			for (int x = -radius; x <= radius; x++) {
-				double delta = GeneralizedImageOps.get(img,cx+x,cy+y) - mean;
-				total += delta*delta;
+	public static float stdevR( ImageBorder_F32 img , int cx, int cy, int radiusX , int radiusY, float mean ) {
+		int x0 = cx-radiusX;
+		int x1 = cx+radiusX+1;
+		int y0 = cy-radiusY;
+		int y1 = cy+radiusY+1;
+		return stdev(img,x0,y0,x1,y1,mean);
+	}
+
+	public static float mean( ImageBorder_F32 img , int x0, int y0, int x1, int y1 ) {
+		float total = 0;
+		for (int y = y0; y < y1; y++) {
+			float rowTotal = 0.0f;
+			for (int x = x0; x < x1; x++) {
+				rowTotal += img.get(x,y);
 			}
+			total += rowTotal/(x1-x0);
 		}
+		return total / (y1-y0);
+	}
 
-		int N = (radius*2+1)*(radius*2+1);
-
-		return Math.sqrt(total/N);
+	public static float stdev(ImageBorder_F32 img , int x0, int y0, int x1, int y1 , float mean ) {
+		float total = 0;
+		for (int y = y0; y < y1; y++) {
+			float rowTotal = 0.0f;
+			for (int x = x0; x < x1; x++) {
+				float delta = img.get(x,y) - mean;
+				rowTotal += delta*delta;
+			}
+			total += rowTotal/(x1-x0);
+		}
+		return (float)Math.sqrt(total/(y1-y0));
 	}
 }

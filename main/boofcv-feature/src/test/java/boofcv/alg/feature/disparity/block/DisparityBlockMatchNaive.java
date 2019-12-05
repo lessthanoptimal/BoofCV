@@ -18,69 +18,35 @@
 
 package boofcv.alg.feature.disparity.block;
 
-import boofcv.alg.misc.ImageMiscOps;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
+import boofcv.factory.feature.disparity.DisparityError;
+import boofcv.struct.image.ImageGray;
 
 /**
- * Brute force block matching stereo
+ * Very basic algorithm for testing stereo disparity algorithms for correctness and employs a
+ * "winner takes all" strategy for selecting the solution. No optimization
+ * is done to improve performance and minimize cache misses. The advantage is that it can take in
+ * any image type.
  *
  * @author Peter Abeles
  */
-public abstract class DisparityBlockMatchNaive<T extends ImageBase<T>> {
+public class DisparityBlockMatchNaive<I extends ImageGray<I>>
+	extends CommonDisparityBlockMatch<I>
+{
 
-	protected int radius;
-	protected int width;
-	protected int minDisparity,maxDisparity;
-	protected int rangeDisparity;
-
-	protected double[] scores;
-
-	public boolean minimize = true;
-
-	public DisparityBlockMatchNaive(int radius, int minDisparity, int maxDisparity) {
-		this.radius = radius;
-		this.minDisparity = minDisparity;
-		this.maxDisparity = maxDisparity;
-		this.rangeDisparity = maxDisparity-minDisparity+1;
-
-		this.width = radius*2+1;
-		this.scores = new double[rangeDisparity];
+	public DisparityBlockMatchNaive(DisparityError errorType ) {
+		super(errorType);
 	}
 
-	public void process(T left , T right , GrayU8 disparity ) {
-		ImageMiscOps.fill(disparity,maxDisparity-minDisparity+1);
-		for (int y = radius; y < left.height - radius; y++) {
-			for (int x = radius+minDisparity; x < left.width - radius; x++) {
-				int localMaxRange = Math.min(x-radius+1-minDisparity,rangeDisparity);
-
-				for (int d = 0; d < localMaxRange; d++) {
-					scores[d] = computeScore(left,right,x,y,d+minDisparity);
-				}
-
-				int bestRange = 0;
-				double bestScore = scores[0];
-
-
-				for (int d = 1; d < localMaxRange; d++) {
-					double s = scores[d];
-					if( minimize ) {
-						if( s < bestScore ) {
-							bestScore = s;
-							bestRange = d;
-						}
-					} else {
-						if( s > bestScore ) {
-							bestScore = s;
-							bestRange = d;
-						}
-					}
-				}
-
-				disparity.set(x,y,bestRange);
-			}
-		}
+	/**
+	 * Compute SAD (Sum of Absolute Difference) error.
+	 *
+	 * @param leftX X-axis center left image
+	 * @param rightX X-axis center left image
+	 * @param centerY Y-axis center for both images
+	 * @return Fit score for both regions.
+	 */
+	@Override
+	protected double computeScore( int leftX , int rightX , int centerY ) {
+		return computeScoreBlock(leftX, rightX, centerY);
 	}
-
-	public abstract double computeScore( T left , T right , int cx , int cy , int disparity );
 }

@@ -19,10 +19,18 @@
 package boofcv.alg.feature.disparity.block;
 
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder_S32;
+import boofcv.struct.border.ImageBorder_S64;
 import boofcv.struct.image.GrayI;
 import boofcv.struct.image.GrayS64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.ejml.UtilEjml;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -34,17 +42,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 
+	public static final BorderType BORDER_TYPE = BorderType.REFLECT;
+
 	int width=15;
 	int height=10;
 
-	double maxPixelValue;
+	// min and max pixel intensity values
+	protected double minPixelValue,maxPixelValue;
+	protected double tol= UtilEjml.TEST_F32;
 
 	T left,right;
+	ImageBorder<T> bleft,bright;
 
 	Random rand = new Random(234);
 
 	public ChecksBlockRowScore( double maxPixelValue, ImageType<T> imageType ) {
 		this.maxPixelValue = maxPixelValue;
+		bleft = FactoryImageBorder.generic(BORDER_TYPE,imageType);
+		bright = FactoryImageBorder.generic(BORDER_TYPE,imageType);
+
 		left = imageType.createImage(width,height);
 		right = imageType.createImage(width,height);
 	}
@@ -59,37 +75,51 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 
 	public abstract double get( int index , Array array );
 
+	@BeforeEach
+	void before() {
+		BoofConcurrency.USE_CONCURRENT = false;
+
+		left = left.getImageType().createImage(width,height);
+		right = left.getImageType().createImage(width,height);
+
+		bleft.setImage(left);
+		bright.setImage(right);
+	}
+
 	/**
 	 * Score the row and compare to a naive implementation
 	 */
 	@Test
 	void scoreRow_naive() {
-		scoreRow_naive(0, 10, 1);
-		scoreRow_naive(0, 5, 2);
-		scoreRow_naive(2, 5, 2);
+		scoreRow_naive(0, 10, 1,2);
+		scoreRow_naive(0, 10, 5,6);
+		scoreRow_naive(0, 5, 2,3);
+		scoreRow_naive(2, 5, 2,4);
+		scoreRow_naive(2, 5, 2,0);
+		scoreRow_naive(2, 5, 2,height-1);
 	}
 
-	private void scoreRow_naive(int minDisparity, int maxDisparity, int r) {
-		int w = r*2+1;
+	private void scoreRow_naive(int minDisparity, int maxDisparity, int radius, int row) {
+		int w = radius*2+1;
 		GImageMiscOps.fillUniform(left,rand,0,maxPixelValue);
 		GImageMiscOps.fillUniform(right,rand,0,maxPixelValue);
 
-		BlockRowScore<T,Array> alg = createAlg(r,r);
+		BlockRowScore<T,Array> alg = createAlg(radius,radius);
+		alg.setBorder(FactoryImageBorder.generic(BORDER_TYPE,alg.getImageType()));
 
-		int row = r+1;
 		int disparityRange = maxDisparity-minDisparity+1;
 
 		Array scores = createArray(width*disparityRange);
-		Array elementScore = createArray(width);
+		Array elementScore = createArray( width+2*radius);// image width + border on each side
 
 		alg.setInput(left,right);
 		alg.scoreRow(row,scores,minDisparity,maxDisparity,w,elementScore);
 
 		for (int d = minDisparity; d < maxDisparity; d++) {
 			int idx = width*(d-minDisparity)+d-minDisparity;
-			for (int x = d+r; x < width-r; x++) {
+			for (int x = d; x < width; x++) {
 				double found = get(idx++,scores);
-				double expected = naiveScoreRow(x,row,d,r);
+				double expected = naiveScoreRow(x,row,d,radius);
 				assertEquals(expected,found,1);
 			}
 		}
@@ -100,29 +130,32 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 	 */
 	@Test
 	void score_naive() {
-		score_naive(0, 10, 1);
-		score_naive(0, 5, 2);
-		score_naive(2, 5, 2);
+		score_naive(0, 10, 1,2);
+		score_naive(0, 10, 5,6);
+		score_naive(0, 5, 2,3);
+		score_naive(2, 5, 2,4);
+		score_naive(2, 5, 2,0);
+		score_naive(2, 5, 2,height-1);
 	}
-	void score_naive(int minDisparity, int maxDisparity, int r) {
-		int w = r*2+1;
+	void score_naive(int minDisparity, int maxDisparity, int radius, int row ) {
+		int w = radius*2+1;
 		GImageMiscOps.fillUniform(left,rand,0,maxPixelValue);
 		GImageMiscOps.fillUniform(right,rand,0,maxPixelValue);
 
-		BlockRowScore<T,Array> alg = createAlg(r,r);
+		BlockRowScore<T,Array> alg = createAlg(radius,radius);
+		alg.setBorder(FactoryImageBorder.generic(BORDER_TYPE,alg.getImageType()));
 		alg.setInput(left,right);
 
-		int row = r+1;
 		int disparityRange = maxDisparity-minDisparity+1;
 
 		Array scores = createArray(width*disparityRange);
-		Array elementScore = createArray(width);
+		Array elementScore = createArray(width+2*radius);
 		Array scoresSum = createArray(width*disparityRange);
 		Array scoresSumNorm = createArray(width*disparityRange);
 		Array scoresEvaluated;
 
 		// compute the scores one row at a time then sum them up to get the unnormalized region score
-		for (int i = -r; i <= r; i++) {
+		for (int i = -radius; i <= radius; i++) {
 			alg.scoreRow(row+i,scores,minDisparity,maxDisparity,w,elementScore);
 			addToSum(scores,scoresSum);
 		}
@@ -136,13 +169,13 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 
 		for (int d = minDisparity; d < maxDisparity; d++) {
 			int idx = width*(d-minDisparity)+d-minDisparity;
-			for (int x = d+r; x < width-r; x++) {
-				double expected = naiveScoreRegion(x,row,d,r);
+			for (int x = d; x < width; x++) {
+				double expected = naiveScoreRegion(x,row,d,radius);
 				double found = get(idx++,scoresEvaluated);
 //				System.out.printf("%3d  %7.4f e=%8.3f f=%8.3f\n",idx,(expected-found),expected,found);
 //				System.out.println("diff "+(expected-found)+"   expected "+expected);
-				double tol = Math.max(1,Math.abs(expected))*1e-3;
-				assertEquals(expected,found,tol,"x = "+x+" d = "+d);
+				double tol = Math.max(1,Math.abs(expected))*this.tol;
+				assertEquals(expected,found,tol,"y = "+row+" x = "+x+" d = "+d);
 			}
 		}
 	}
@@ -178,14 +211,13 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 
 		@Override
 		public double naiveScoreRow(int cx, int cy, int disparity, int radius) {
-//			System.out.println(cx+" "+cy+" "+disparity+" "+radius);
-			int x0 = Math.max(disparity,cx-radius);
-			int x1 = Math.min(left.width,cx+radius+1);
+			int x0 = cx-radius;
+			int x1 = cx+radius+1;
 
 			int total = 0;
 			for (int x = x0; x < x1; x++) {
-				int va = left.get(x,cy);
-				int vb = right.get(x-disparity,cy);
+				int va = ((ImageBorder_S32)bleft).get(x,cy);
+				int vb = ((ImageBorder_S32)bright).get(x-disparity,cy);
 				total += computeError(va,vb);
 			}
 			return total;
@@ -193,8 +225,8 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 
 		@Override
 		public double naiveScoreRegion(int cx, int cy, int disparity, int radius) {
-			int y0 = Math.max(0,cy-radius);
-			int y1 = Math.min(left.height,cy+radius+1);
+			int y0 = cy-radius;
+			int y1 = cy+radius+1;
 
 			int total = 0;
 			for (int y = y0; y < y1; y++) {
@@ -224,14 +256,13 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 
 		@Override
 		public double naiveScoreRow(int cx, int cy, int disparity, int radius) {
-//			System.out.println(cx+" "+cy+" "+disparity+" "+radius);
-			int x0 = Math.max(disparity,cx-radius);
-			int x1 = Math.min(left.width,cx+radius+1);
+			int x0 = cx-radius;
+			int x1 = cx+radius+1;
 
 			long total = 0;
 			for (int x = x0; x < x1; x++) {
-				long va = left.get(x,cy);
-				long vb = right.get(x-disparity,cy);
+				long va = ((ImageBorder_S64)bleft).get(x,cy);
+				long vb = ((ImageBorder_S64)bright).get(x-disparity,cy);
 				total += computeError(va,vb);
 			}
 			return total;
@@ -239,8 +270,8 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 
 		@Override
 		public double naiveScoreRegion(int cx, int cy, int disparity, int radius) {
-			int y0 = Math.max(0,cy-radius);
-			int y1 = Math.min(left.height,cy+radius+1);
+			int y0 = cy-radius;
+			int y1 = cy+radius+1;
 
 			long total = 0;
 			for (int y = y0; y < y1; y++) {

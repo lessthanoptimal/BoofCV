@@ -39,23 +39,27 @@ public class SelectErrorBasicWta_F32_U8 extends SelectDisparityBasicWta<float[],
 	@Override
 	public void process(int row, float[] scores) {
 
-		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride + radiusX + minDisparity;
+		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride;
 
-		for( int col = minDisparity; col <= imageWidth-regionWidth; col++ ) {
-			// make sure the disparity search doesn't go outside the image border
-			int localMax = maxDisparityAtColumnL2R(col);
+		// Mark all pixels as invalid which can't be estimate due to minDisparity
+		for (int col = 0; col < minDisparity; col++) {
+			imageDisparity.data[indexDisparity++] = (byte)rangeDisparity;
+		}
 
+		// Select the best disparity from all the rest
+		for( int col = minDisparity; col < imageWidth; col++ ) {
+			int localRange = maxDisparityAtColumnL2R(col)-minDisparity+1;
 			int indexScore = col-minDisparity;
 
 			int bestDisparity = 0;
 			float scoreBest = scores[indexScore];
 			indexScore += imageWidth;
 
-			for( int i = 1; i < localMax; i++ ,indexScore += imageWidth) {
+			for( int disparity = 1; disparity < localRange; disparity++ ,indexScore += imageWidth) {
 				float s = scores[indexScore];
 				if( s < scoreBest ) {
 					scoreBest = s;
-					bestDisparity = i;
+					bestDisparity = disparity;
 				}
 			}
 

@@ -55,14 +55,12 @@ public class SelectCorrelationSubpixel {
 		@Override
 		protected void setDisparity(int index, int disparityValue) {
 
-			if( disparityValue <= 0 || disparityValue >= localMaxDisparity -1) {
+			if( disparityValue <= 0 || disparityValue >= localRange -1) {
 				imageDisparity.data[index] = disparityValue;
 			} else {
 				float c0 = columnScore[disparityValue-1];
 				float c1 = columnScore[disparityValue];
 				float c2 = columnScore[disparityValue+1];
-
-				float min = Math.min(c0,c2);
 
 				// Visually it's hard to tell if the code below helps or hurts
 				// The idea was that SAD error grows linearly and this interpolation seems to work well
@@ -75,6 +73,11 @@ public class SelectCorrelationSubpixel {
 
 				imageDisparity.data[index] = disparityValue +  offset;
 			}
+		}
+
+		@Override
+		protected void setDisparityInvalid(int index) {
+			imageDisparity.data[index] = (byte)invalidDisparity;
 		}
 
 		@Override

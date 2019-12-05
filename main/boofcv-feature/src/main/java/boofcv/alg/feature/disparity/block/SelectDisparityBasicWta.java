@@ -63,6 +63,6 @@ public abstract class SelectDisparityBasicWta<Array , Disparity extends ImageGra
 	 * as limited by the image border.
 	 */
 	protected int maxDisparityAtColumnL2R( int col) {
-		return 1+col-minDisparity-Math.max(0,col-maxDisparity+1);
+		return Math.min(col,maxDisparity);
 	}
 }

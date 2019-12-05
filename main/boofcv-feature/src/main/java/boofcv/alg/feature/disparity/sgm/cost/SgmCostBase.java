@@ -42,7 +42,7 @@ public abstract class SgmCostBase<T extends ImageBase<T>> implements SgmDisparit
 		// Declare the "tensor" with shape (lengthY,lengthX,lengthD)
 		costYXD.reshape(disparityRange,left.width,left.height);
 
-		int maxDisparity = disparityMin +disparityRange-1;
+		int maxDisparity = disparityMin + disparityRange - 1;
 
 		for (int y = 0; y < left.height; y++) {
 			costXD = costYXD.getBand(y);

@@ -21,6 +21,7 @@ package boofcv.alg.feature.disparity.block.score;
 import boofcv.alg.feature.disparity.DisparityBlockMatch;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
+import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 
@@ -30,7 +31,7 @@ import boofcv.struct.image.GrayU8;
 public class TestDisparityScoreBM_S32 extends ChecksDisparityBM<GrayS16,GrayU8> {
 
 	TestDisparityScoreBM_S32() {
-		super(GrayS16.class, GrayU8.class);
+		super(0,2000, DisparityError.SAD,GrayS16.class, GrayU8.class);
 	}
 
 	@Override

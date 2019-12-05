@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Nested;
 class TestBlockRowScoreCensus {
 	@Nested
 	class U8 extends ChecksBlockRowScore.ArrayIntI<GrayU8> {
-
 		U8() {super(255, ImageType.single(GrayU8.class));}
 
 		@Override
@@ -47,7 +46,6 @@ class TestBlockRowScoreCensus {
 
 	@Nested
 	class S32 extends ChecksBlockRowScore.ArrayIntI<GrayS32> {
-
 		S32() {super(Integer.MAX_VALUE-1000, ImageType.single(GrayS32.class));}
 
 		@Override
@@ -63,7 +61,6 @@ class TestBlockRowScoreCensus {
 
 	@Nested
 	class S64 extends ChecksBlockRowScore.ArrayIntL {
-
 		S64() {super(Integer.MAX_VALUE-1000);}
 
 		@Override

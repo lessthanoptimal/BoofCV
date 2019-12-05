@@ -55,7 +55,7 @@ public class SelectErrorSubpixel {
 		@Override
 		protected void setDisparity(int index, int disparityValue) {
 
-			if( disparityValue <= 0 || disparityValue >= localMaxDisparity -1) {
+			if( disparityValue <= 0 || disparityValue >= localRange -1) {
 				imageDisparity.data[index] = disparityValue;
 			} else {
 				int c0 = columnScore[disparityValue-1];
@@ -66,6 +66,11 @@ public class SelectErrorSubpixel {
 
 				imageDisparity.data[index] = disparityValue + offset;
 			}
+		}
+
+		@Override
+		protected void setDisparityInvalid(int index) {
+			imageDisparity.data[index] = (byte)invalidDisparity;
 		}
 
 		@Override
@@ -89,7 +94,7 @@ public class SelectErrorSubpixel {
 		@Override
 		protected void setDisparity(int index, int disparityValue) {
 
-			if( disparityValue <= 0 || disparityValue >= localMaxDisparity -1) {
+			if( disparityValue <= 0 || disparityValue >= localRange -1) {
 				imageDisparity.data[index] = disparityValue;
 			} else {
 				float c0 = columnScore[disparityValue-1];
@@ -102,6 +107,10 @@ public class SelectErrorSubpixel {
 			}
 		}
 
+		@Override
+		protected void setDisparityInvalid(int index) {
+			imageDisparity.data[index] = (byte)invalidDisparity;
+		}
 
 		@Override
 		public DisparitySelect<float[], GrayF32> concurrentCopy() {

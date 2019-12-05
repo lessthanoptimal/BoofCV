@@ -18,19 +18,20 @@
 
 package boofcv.alg.feature.disparity.block.score;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Provides a series of simple tests that check basic functionality at computing image disparity
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
 public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends ImageGray<DI>> {
 	I left;
 	I right;
@@ -39,106 +40,82 @@ public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends Ima
 	int w = 50;
 	int h = 60;
 
+	// minimum and maximum pixel intensity
+	double minVal,maxVal;
+
 	int maxDisparity = 40;
 
 	Random rand = new Random();
 
-	public BasicDisparityTests( Class<I> imageType ) {
+	BasicDisparityTests( double minVal , double maxVal, Class<I> imageType ) {
+		this.minVal = minVal;
+		this.maxVal = maxVal;
 		left = GeneralizedImageOps.createSingleBand(imageType,w,h);
 		right = GeneralizedImageOps.createSingleBand(imageType,w,h);
 	}
 
 	public abstract void initialize( int minDisparity , int maxDisparity );
 
-	public abstract int getBorderX();
-
-	public abstract int getBorderY();
-
 	public abstract DI computeDisparity(I left , I right );
 
-	public void allChecks() {
-		checkGradient();
-		checkMinimumDisparity();
-	}
-
 	/**
-	 * Set the intensity values to have a gradient and see if it generates the correct
-	 * solution
+	 * A random image is generated then it's shifted by a fixed amount into the right image
 	 */
-	public void checkGradient() {
+	@Test
+	void checkShifted() {
 		initialize(0,maxDisparity);
 
 		int disparity = 5;
 
-		for( int y = 0; y < h; y++ ) {
-			for( int x = 0; x < w; x++ ) {
-				GeneralizedImageOps.set(left,x,y,10+x+y);
-				GeneralizedImageOps.set(right,x,y,10+x+disparity+y);
-			}
-		}
+		GImageMiscOps.fill(right,0);
+		GImageMiscOps.fillUniform(left,rand,minVal,maxVal);
+		GImageMiscOps.copy(disparity,0,0,0,left.width-disparity,left.height,left,right);
 
 		DI output = computeDisparity(left,right);
 
-		int borderX = getBorderX();
-		int borderY = getBorderY();
-
-		for( int y = borderY; y < h-borderY; y++ ) {
-			// borders should be zero since they are not modified
-			for( int x = 0; x < borderX; x++ ) {
-				double found = GeneralizedImageOps.get(output,x,y);
-				assertEquals(0,found,1e-8);
-			}
-			for( int x = w-borderX; x < w; x++ ) {
-				double found = GeneralizedImageOps.get(output,x,y);
-				assertEquals(0,found,1e-8);
-			}
-
-			// check the inside image
-			for( int x = borderX+disparity; x < w-borderX; x++ ) {
-				double found = GeneralizedImageOps.get(output,x,y);
-				assertEquals(disparity,found,1e-8);
-			}
-		}
+		assertTrue(checkSolution(disparity,0, output, 0.12));
 	}
 
 	/**
 	 * Set the minimum disparity to a non-zero value and see if it has the expected results
 	 */
-	public void checkMinimumDisparity() {
+	@Test
+	void checkMinimumDisparity() {
 		int disparity = 4;
 		int minDisparity = disparity+2;
 		initialize(disparity+2,maxDisparity);
 
-		for( int y = 0; y < h; y++ ) {
-			for( int x = 0; x < w; x++ ) {
-				GeneralizedImageOps.set(left,x,y,10+x+y);
-				GeneralizedImageOps.set(right,x,y,10+x+disparity+y);
-			}
-		}
+		GImageMiscOps.fillUniform(left,rand,minVal,maxVal);
+		GImageMiscOps.copy(disparity,0,0,0,left.width-disparity,left.height,left,right);
 
 		DI output = computeDisparity(left,right);
 
-		int borderX = getBorderX();
-		int borderY = getBorderY();
+		// this should fail because the motion is less than the minimum disparity
+		assertFalse(checkSolution(disparity,minDisparity, output, 0.8));
+	}
 
-		for( int y = borderY; y < h-borderY; y++ ) {
-			// borders should be zero since they are not modified
-			for( int x = 0; x < borderX+minDisparity; x++ ) {
+	private boolean checkSolution(int expected, int minDisparity, DI output, double fraction ) {
+		int total = 0;
+		int errors = 0;
+		for( int y = 0; y < h; y++ ) {
+			// pixel's less than min disparity should be marked as invalid since there's nothing to compare against
+			for (int x = 0; x < minDisparity; x++) {
 				double found = GeneralizedImageOps.get(output,x,y);
-				assertEquals(0,found,1e-8);
+				assertEquals(maxDisparity-minDisparity+1,found,1e-8);
 			}
-			for( int x = w-borderX; x < w; x++ ) {
-				double found = GeneralizedImageOps.get(output,x,y);
-				assertEquals(0,found,1e-8);
-			}
-
-			// check inside image
-			for( int x = borderX+minDisparity; x < w-borderX; x++ ) {
+			for( int x = minDisparity; x < w; x++ ) {
 				double found = GeneralizedImageOps.get(output,x,y) + minDisparity;
 				// the minimum disparity should  be the closest match
-				assertEquals(minDisparity,found,1e-8);
+				if( Math.abs(expected-found) > 1e-8 )
+					errors++;
+				total++;
 			}
 		}
+
+		System.out.println(errors+" vs "+total);
+		// Inputs are random so the match might not be perfect, especially around border regions
+		return( errors/(double)total <= fraction);
 	}
+
 
 }

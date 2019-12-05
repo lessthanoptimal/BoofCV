@@ -126,8 +126,8 @@ class TestStereoMutualInformation extends CommonSgmChecks {
 					bestIdx = j;
 				}
 			}
-			System.out.println("i="+i+" bestIdx="+bestIdx+"  score="+bestScore);
-//			assertEquals(i,bestIdx);
+//			System.out.println("i="+i+" bestIdx="+bestIdx+"  score="+bestScore);
+			assertEquals(i,bestIdx);
 		}
 	}
 

@@ -106,13 +106,13 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 		DisparitySelect<float[], DI> computeDisparity;
 
 		public void checkSize() {
-			if( horizontalScore == null || verticalScore.length < lengthHorizontal ) {
-				horizontalScore = new float[regionHeight][lengthHorizontal];
-				verticalScore = new float[regionHeight][lengthHorizontal];
+			if( horizontalScore == null || verticalScore.length < widthDisparityBlock) {
+				horizontalScore = new float[regionHeight][widthDisparityBlock];
+				verticalScore = new float[regionHeight][widthDisparityBlock];
 				if( scoreRows.isRequireNormalize() )
-					verticalScoreNorm = new float[regionHeight][lengthHorizontal];
-				elementScore = new float[ left.width ];
-				fiveScore = new float[ lengthHorizontal ];
+					verticalScoreNorm = new float[regionHeight][widthDisparityBlock];
+				elementScore = new float[ left.width+2*radiusX ];
+				fiveScore = new float[widthDisparityBlock];
 			}
 			if( computeDisparity == null ) {
 				computeDisparity = disparitySelect0.concurrentCopy();
@@ -125,11 +125,10 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 		@Override
 		public void accept(WorkSpace workspace, int minInclusive, int maxExclusive)
 		{
+			// NOTE: for out of image pixels maybe the approach used in horizontal direction should be adapted?
 			workspace.checkSize();
-
-			// The image border will be skipped, so it needs to back track some
-			int row0 = Math.max(0,minInclusive-2*radiusY);
-			int row1 = Math.min(left.height,maxExclusive+2*radiusY);
+			int row0 = minInclusive-2*radiusY;
+			int row1 = maxExclusive+2*radiusY;
 
 			// initialize computation
 			computeFirstRow(row0, workspace);
@@ -156,7 +155,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 
 		// compute score for the top possible row
 		final float firstRow[] = workSpace.verticalScore[0];
-		for( int i = 0; i < lengthHorizontal; i++ ) {
+		for(int i = 0; i < widthDisparityBlock; i++ ) {
 			float sum = 0;
 			for( int row = 0; row < regionHeight; row++ ) {
 				sum += workSpace.horizontalScore[row][i];
@@ -164,9 +163,10 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 			firstRow[i] = sum;
 		}
 
-		if( scoreRows.isRequireNormalize() )
+		if( scoreRows.isRequireNormalize() && row0+radiusY >= 0 ) {
 			scoreRows.normalizeRegionScores(row0+radiusY,
 					firstRow,minDisparity,maxDisparity,regionWidth,regionHeight,workSpace.verticalScoreNorm[0]);
+		}
 	}
 
 	/**
@@ -184,35 +184,53 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 
 			// subtract first row from vertical score
 			float[] scores = workSpace.horizontalScore[oldRow];
-			for( int i = 0; i < lengthHorizontal; i++ ) {
+			for(int i = 0; i < widthDisparityBlock; i++ ) {
 				active[i] = previous[i] - scores[i];
 			}
 
 			scoreRows.scoreRow(row, scores,minDisparity,maxDisparity,regionWidth,workSpace.elementScore);
 
 			// add the new score
-			for( int i = 0; i < lengthHorizontal; i++ ) {
+			for(int i = 0; i < widthDisparityBlock; i++ ) {
 				active[i] += scores[i];
 			}
 
-			if( scoreRows.isRequireNormalize() )
-				scoreRows.normalizeRegionScores(row-radiusY,
+			if( scoreRows.isRequireNormalize() && row >= radiusY && row < left.height+radiusY) {
+				scoreRows.normalizeRegionScores( row - radiusY,
 						active,minDisparity,maxDisparity,regionWidth,regionHeight,workSpace.verticalScoreNorm[activeIndex]);
+			}
 
-			if( workSpace.activeVerticalScore >= regionHeight-1 ) {
+			if( workSpace.activeVerticalScore >= 2*radiusY ) {
+				// The y-axis in the output disparity image
+				int disparityY = row-2*radiusY;
+				// always compute the score using a row that's inside the image
+				// This greatly simplifies normalizeRegionScores() code
+				int off0 = -2*radiusY;
+				int off1 = -radiusY;
+				int off2 = 0;
+
+				if( disparityY-radiusY < 0 ) {
+					off0 = off0 - (disparityY-radiusY);
+				}
+				if( disparityY+radiusY >= left.height ) {
+					off2 = off2 - (disparityY+radiusY-left.height) -1;
+				}
+
+				// The five-regions have different rows seperated by -radiusY. Use either normalized
+				// or unnormalized scores
 				float[] top, middle, bottom;
 				if( scoreRows.isRequireNormalize() ) {
-					top = workSpace.verticalScoreNorm[ (workSpace.activeVerticalScore -2*radiusY) % regionHeight ];
-					middle = workSpace.verticalScoreNorm[ (workSpace.activeVerticalScore -radiusY) % regionHeight ];
-					bottom = workSpace.verticalScoreNorm[workSpace. activeVerticalScore % regionHeight ];
+					top    = workSpace.verticalScoreNorm[ (workSpace.activeVerticalScore + off0) % regionHeight ];
+					middle = workSpace.verticalScoreNorm[ (workSpace.activeVerticalScore + off1) % regionHeight ];
+					bottom = workSpace.verticalScoreNorm[ (workSpace.activeVerticalScore + off2) % regionHeight ];
 				} else {
-					top = workSpace.verticalScore[ (workSpace.activeVerticalScore -2*radiusY) % regionHeight ];
-					middle = workSpace.verticalScore[ (workSpace.activeVerticalScore -radiusY) % regionHeight ];
-					bottom = workSpace.verticalScore[workSpace. activeVerticalScore % regionHeight ];
+					top    = workSpace.verticalScore[ (workSpace.activeVerticalScore + off0) % regionHeight ];
+					middle = workSpace.verticalScore[ (workSpace.activeVerticalScore + off1) % regionHeight ];
+					bottom = workSpace.verticalScore[ (workSpace.activeVerticalScore + off2) % regionHeight ];
 				}
 
 				computeScoreFive(top,middle,bottom,workSpace.fiveScore,left.width,(Compare_F32)workSpace.computeDisparity);
-				workSpace.computeDisparity.process(row - (1 + 4*radiusY) + 2*radiusY+1, workSpace.fiveScore );
+				workSpace.computeDisparity.process(row - 2*radiusY, workSpace.fiveScore );
 			}
 		}
 	}
@@ -224,43 +242,52 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 	protected void computeScoreFive( float top[] , float middle[] , float bottom[] , float score[] , int width ,
 									 Compare_F32 compare ) {
 
+		float WORST_SCORE = Float.MAX_VALUE*compare.compare(0,1);
+
 		// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
-		for( int d = minDisparity; d <= maxDisparity; d++ ) {
-
+		for( int d = minDisparity; d <= maxDisparity; d++ )
+		{
 			// take in account the different in image border between the sub-regions and the effective region
-			int indexSrc = (d-minDisparity)*width + (d-minDisparity) + radiusX;
+			int indexSrc = (d-minDisparity)*width + (d-minDisparity);
 			int indexDst = (d-minDisparity)*width + (d-minDisparity);
-			int end = indexSrc + (width-d-4*radiusX);
-			while( indexSrc < end ) {
-				// sample four outer regions at the corners around the center region
-				float val0 = top[indexSrc-radiusX];
-				float val1 = top[indexSrc+radiusX];
-				float val2 = bottom[indexSrc-radiusX];
-				float val3 = bottom[indexSrc+radiusX];
 
+			for (int i = 0; i < width - d; i++, indexSrc++) {
+				float val0 = WORST_SCORE;
+				float val1 = WORST_SCORE;
+				float val2 = WORST_SCORE;
+				float val3 = WORST_SCORE;
+
+				if( i+d+radiusX<width) { // is the sample in the left image inside
+					val1 = top[indexSrc + radiusX];
+					val3 = bottom[indexSrc + radiusX];
+				}
+				if( i-radiusX>=0) { // is the sample in the right image inside
+					val0 = top[indexSrc - radiusX];
+					val2 = bottom[indexSrc - radiusX];
+				}
 				// select the two best scores from outer for regions
-				if( compare.compare(val0,val1) < 0 ) {
+				if (compare.compare(val0, val1) < 0) {
 					float temp = val0;
 					val0 = val1;
 					val1 = temp;
 				}
 
-				if( compare.compare(val2,val3) < 0 ) {
+				if (compare.compare(val2, val3) < 0) {
 					float temp = val2;
 					val2 = val3;
 					val3 = temp;
 				}
 
 				float s;
-				if( compare.compare(val0,val3) < 0 ) {
+				if (compare.compare(val0, val3) < 0) {
 					s = val2 + val3;
-				} else if( compare.compare(val1,val2) < 0 ) {
+				} else if (compare.compare(val1, val2) < 0) {
 					s = val2 + val0;
 				} else {
 					s = val0 + val1;
 				}
 
-				score[indexDst++] = s + middle[indexSrc++];
+				score[indexDst++] = s + middle[indexSrc];
 			}
 		}
 	}

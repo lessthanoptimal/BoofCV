@@ -21,6 +21,7 @@ package boofcv.factory.feature.disparity;
 import boofcv.alg.feature.disparity.sgm.SgmDisparityCost;
 import boofcv.alg.feature.disparity.sgm.SgmStereoDisparityHmi;
 import boofcv.struct.Configuration;
+import boofcv.struct.border.BorderType;
 
 import static boofcv.alg.feature.disparity.sgm.SgmDisparityCost.MAX_COST;
 
@@ -91,6 +92,11 @@ public class ConfigDisparitySGM implements Configuration {
 	 * The error can be computed using code taken from block matching
 	 */
 	public ConfigBlockMatchError configBlockMatch = new ConfigBlockMatchError();
+	/**
+	 * Specifies how the image border is handled. In general you want to avoid an approach which would bias the
+	 * error to prefer a region with lots of pixels outside the image border.
+	 */
+	public BorderType border = BorderType.REFLECT;
 
 	public static class ConfigBlockMatchError implements Configuration {
 

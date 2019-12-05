@@ -57,7 +57,7 @@ public abstract class SelectDisparityWithChecksWta<Array , DI extends ImageGray<
 	// value that an invalid pixel will be assigned
 	protected int invalidDisparity;
 	// max allowed disparity at the current pixel
-	protected int localMaxDisparity;
+	protected int localRange;
 	// radius and width of the region being compared
 	protected int radiusX;
 	protected int regionWidth;
@@ -111,19 +111,21 @@ public abstract class SelectDisparityWithChecksWta<Array , DI extends ImageGray<
 	 */
 	protected abstract void setDisparity( int index , int disparityValue );
 
+	protected abstract void setDisparityInvalid( int index );
+
 	/**
 	 * Returns the maximum allowed disparity for a particular column in left to right direction,
 	 * as limited by the image border.
 	 */
 	protected int maxDisparityAtColumnL2R( int col) {
-		return 1+col-minDisparity-Math.max(0,col-maxDisparity+1);
+		return Math.min(col,maxDisparity);
 	}
 
 	/**
 	 * For debugging purposes only
 	 */
 	public void setLocalMaxDisparity(int value) {
-		localMaxDisparity = value;
+		localRange = value;
 	}
 
 	@Override

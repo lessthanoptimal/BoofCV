@@ -19,6 +19,7 @@
 package boofcv.alg.feature.disparity.block;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageGray;
 
 /**
@@ -27,13 +28,13 @@ import boofcv.struct.image.ImageGray;
  *
  * @author Peter Abeles
  */
-public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends ImageGray> {
+public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends ImageGray<Input>> {
 	// maximum and minimum allowed image disparity
 	protected int minDisparity;
 	protected int maxDisparity;
 	protected int rangeDisparity;
 	// maximum disparity at the most recently processed point
-	protected int localMaxDisparity;
+	protected int localMaxRange;
 
 	// radius of the region along x and y axis
 	protected int radiusX,radiusY;
@@ -43,6 +44,8 @@ public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends Ima
 	// input images
 	protected Input left;
 	protected Input right;
+	protected ImageBorder<Input> bleft;
+	protected ImageBorder<Input> bright;
 
 	/**
 	 * Configures disparity calculation.
@@ -58,9 +61,14 @@ public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends Ima
 		this.radiusX = radiusX;
 		this.radiusY = radiusY;
 
-		this.rangeDisparity = maxDisparity - minDisparity;
+		this.rangeDisparity = maxDisparity - minDisparity+1;
 		this.regionWidth = radiusX*2 + 1;
 		this.regionHeight = radiusY*2 + 1;
+	}
+
+	public void setBorder( ImageBorder<Input> border ) {
+		this.bleft = border.copy();
+		this.bright = border.copy();
 	}
 
 	/**
@@ -74,6 +82,8 @@ public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends Ima
 
 		this.left = left;
 		this.right = right;
+		this.bleft.setImage(left);
+		this.bright.setImage(right);
 	}
 
 	/**
@@ -88,8 +98,8 @@ public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends Ima
 	/**
 	 * How many disparity values were considered.
 	 */
-	public int getLocalMaxDisparity() {
-		return localMaxDisparity;
+	public int getLocalMaxRange() {
+		return localMaxRange;
 	}
 
 	public int getMinDisparity() {
@@ -111,7 +121,7 @@ public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends Ima
 	/**
 	 * Array containing disparity score values at most recently processed point.  Array
 	 * indices correspond to disparity.  score[i] = score at disparity i.  To know how many
-	 * disparity values there are call {@link #getLocalMaxDisparity()}
+	 * disparity values there are call {@link #getLocalMaxRange()}
 	 */
 	public abstract ArrayData getScore();
 

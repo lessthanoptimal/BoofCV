@@ -19,17 +19,18 @@
 package boofcv.alg.feature.disparity;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
-import boofcv.alg.feature.disparity.block.DisparityBlockMatchNaive;
 import boofcv.alg.feature.disparity.block.TestBlockRowScoreNcc;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Nested;
 
 /**
@@ -41,17 +42,22 @@ import org.junit.jupiter.api.Nested;
 class TestBlockMatchBasic_NCC<T extends ImageBase<T>> {
 
 	@Nested
-	class F32 extends ChecksBlockMatchBasic<GrayF32> {
+	class F32 extends ChecksDisparityBlockMatchNaive<GrayF32> {
+		float eps = 1e-4f;
 
 		F32() {
 			super(ImageType.single(GrayF32.class));
 		}
 
 		@Override
-		public DisparityBlockMatchNaive<GrayF32> createNaive(int blockRadius, int minDisparity, int maxDisparity) {
-			DisparityBlockMatchNaive<GrayF32> naive = new DisparityBlockMatchNaive<GrayF32>(blockRadius,minDisparity,maxDisparity) {
-				public double computeScore(GrayF32 left, GrayF32 right, int cx, int cy, int disparity) {
-					return TestBlockRowScoreNcc.ncc(left,right,cx,cy,disparity,radius, UtilEjml.F_EPS);
+		public BruteForceBlockMatch<GrayF32> createNaive(BorderType borderType, ImageType<GrayF32> imageType) {
+			BruteForceBlockMatch<GrayF32> naive = new BruteForceBlockMatch<GrayF32>(borderType,imageType) {
+				public double computeScore(ImageBorder<GrayF32> _left, ImageBorder<GrayF32> _right,
+										   int cx, int cy, int disparity)
+				{
+					ImageBorder_F32 left = (ImageBorder_F32)_left;
+					ImageBorder_F32 right = (ImageBorder_F32)_right;
+					return TestBlockRowScoreNcc.ncc(left,right,cx,cy,disparity,radius,radius, eps);
 				}
 			};
 			naive.minimize = false;
@@ -61,8 +67,9 @@ class TestBlockMatchBasic_NCC<T extends ImageBase<T>> {
 		@Override
 		public StereoDisparity<GrayF32, GrayU8> createAlg(int blockRadius, int minDisparity, int maxDisparity) {
 			ConfigDisparityBM config = createConfigBasicBM(blockRadius, minDisparity, maxDisparity);
+			config.border = BORDER_TYPE;
 			config.errorType = DisparityError.NCC;
-			config.configNCC.eps = UtilEjml.F_EPS;
+			config.configNCC.eps = eps;
 			return FactoryStereoDisparity.blockMatch(config,GrayF32.class,GrayU8.class);
 		}
 

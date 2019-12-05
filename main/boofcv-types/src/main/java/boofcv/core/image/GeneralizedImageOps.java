@@ -19,6 +19,10 @@
 package boofcv.core.image;
 
 import boofcv.concurrency.*;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_F64;
+import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
 
 /**
@@ -37,6 +41,18 @@ public class GeneralizedImageOps {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	public static double get(ImageBorder img, int x, int y) {
+		if (img instanceof ImageBorder_S32) {
+			return ((ImageBorder_S32) img).get(x, y);
+		} else if (img instanceof ImageBorder_F32) {
+			return ((ImageBorder_F32) img).get(x, y);
+		} else if (img instanceof ImageBorder_F64) {
+			return ((ImageBorder_F64) img).get(x, y);
+		} else {
+			throw new IllegalArgumentException("Unknown or incompatible image type: " + img.getClass().getSimpleName());
 		}
 	}
 

@@ -20,6 +20,7 @@ package boofcv.alg.feature.disparity.block.select;
 
 import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.alg.feature.disparity.block.SelectDisparityBasicWta;
+import boofcv.misc.Compare_F32;
 import boofcv.struct.image.GrayU8;
 
 /**
@@ -35,6 +36,7 @@ import boofcv.struct.image.GrayU8;
  * @author Peter Abeles
  */
 public class SelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[],GrayU8>
+		implements Compare_F32
 {
 	@Override
 	public void configure(GrayU8 imageDisparity, int minDisparity, int maxDisparity, int radiusX) {
@@ -43,11 +45,17 @@ public class SelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[]
 
 	@Override
 	public void process(int row, float[] blockOfScores) {
-		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride + radiusX + minDisparity;
+		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride;
 
-		for( int col = minDisparity; col <= imageWidth-regionWidth; col++ ) {
+		// Mark all pixels as invalid which can't be estimate due to minDisparity
+		for (int col = 0; col < minDisparity; col++) {
+			imageDisparity.data[indexDisparity++] = (byte)rangeDisparity;
+		}
+
+		// Select the best disparity from all the rest
+		for( int col = minDisparity; col < imageWidth; col++ ) {
 			// make sure the disparity search doesn't go outside the image border
-			int localMaxRange = maxDisparityAtColumnL2R(col);
+			int localMaxRange = maxDisparityAtColumnL2R(col)-minDisparity+1;
 
 			// Find the disparity with the best score, which is the largest score for correlation
 			int indexScore = col-minDisparity;
@@ -74,5 +82,10 @@ public class SelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[]
 	@Override
 	public Class<GrayU8> getDisparityType() {
 		return GrayU8.class;
+	}
+
+	@Override
+	public int compare(float scoreA, float scoreB) {
+		return Float.compare(scoreA,scoreB);
 	}
 }

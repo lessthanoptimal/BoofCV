@@ -18,8 +18,6 @@
 
 package boofcv.alg.feature.disparity.block;
 
-import boofcv.alg.feature.disparity.block.BlockRowScore.ArrayF32;
-import boofcv.alg.feature.disparity.block.BlockRowScore.ArrayS32;
 import boofcv.struct.image.*;
 
 /**
@@ -37,16 +35,33 @@ import boofcv.struct.image.*;
  */
 public interface BlockRowScoreSad
 {
-	abstract class SadArrayS32<T extends ImageBase<T>> extends ArrayS32<T> {
+	abstract class SadArrayS32<T extends GrayI<T>> extends BlockRowScore.ArrayS32_BS32<T> {
 		SadArrayS32( int maxPerPixel ) {
 			super(maxPerPixel);
 		}
+		@Override
+		public void scoreBorder(int x, int y, int d , int offset, int length, int[] elementScore) {
+			for( int i = 0; i < length; i++ ,x++) {
+				int difference = borderLeft.get(x,y) - borderRight.get(x-d,y);
+				elementScore[offset+i] = Math.abs(difference);
+			}
+		}
+
 		@Override
 		public boolean isRequireNormalize() {
 			return false;
 		}
 	}
-	abstract class SadArrayF32<T extends ImageBase<T>> extends ArrayF32<T> {
+
+	abstract class SadArrayF32 extends BlockRowScore.ArrayS32_BF32 {
+		@Override
+		public void scoreBorder(int x, int y, int d , int offset, int length, float[] elementScore) {
+			for( int i = 0; i < length; i++ ,x++) {
+				float difference = borderLeft.get(x,y) - borderRight.get(x-d,y);
+				elementScore[offset+i] = Math.abs(difference);
+			}
+		}
+
 		@Override
 		public boolean isRequireNormalize() {
 			return false;
@@ -65,10 +80,10 @@ public interface BlockRowScoreSad
 		}
 
 		@Override
-		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
-			for( int i = 0; i < elementMax; i++ ) {
-				int diff = (left.data[ indexLeft++ ]& 0xFF) - (right.data[ indexRight++ ]& 0xFF);
-				elementScore[i] = Math.abs(diff);
+		public void score(int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
+			for( int i = 0; i < length; i++ ) {
+				int difference = (left.data[ indexLeft++ ]& 0xFF) - (right.data[ indexRight++ ]& 0xFF);
+				elementScore[offset+i] = Math.abs(difference);
 			}
 		}
 
@@ -83,11 +98,10 @@ public interface BlockRowScoreSad
 			super(-1);
 		}
 		@Override
-		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
-			for( int rCol = 0; rCol < elementMax; rCol++ ) {
-				int diff = (left.data[ indexLeft++ ]& 0xFFFF) - (right.data[ indexRight++ ]& 0xFFFF);
-
-				elementScore[rCol] = Math.abs(diff);
+		public void score(int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
+			for( int i = 0; i < length; i++ ) {
+				int difference = (left.data[ indexLeft++ ]& 0xFFFF) - (right.data[ indexRight++ ]& 0xFFFF);
+				elementScore[offset+i] = Math.abs(difference);
 			}
 		}
 
@@ -103,11 +117,10 @@ public interface BlockRowScoreSad
 		}
 
 		@Override
-		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
-			for( int rCol = 0; rCol < elementMax; rCol++ ) {
-				int diff = left.data[ indexLeft++ ] - right.data[ indexRight++ ];
-
-				elementScore[rCol] = Math.abs(diff);
+		public void score(int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
+			for( int rCol = 0; rCol < length; rCol++ ) {
+				int difference = left.data[ indexLeft++ ] - right.data[ indexRight++ ];
+				elementScore[offset+rCol] = Math.abs(difference);
 			}
 		}
 
@@ -117,13 +130,12 @@ public interface BlockRowScoreSad
 		}
 	}
 
-	class F32 extends SadArrayF32<GrayF32> {
+	class F32 extends SadArrayF32 {
 		@Override
-		public void score(int elementMax, int indexLeft, int indexRight, float[] elementScore) {
-			for( int rCol = 0; rCol < elementMax; rCol++ ) {
-				float diff = left.data[ indexLeft++ ] - right.data[ indexRight++ ];
-
-				elementScore[rCol] = Math.abs(diff);
+		public void score(int indexLeft, int indexRight, int offset, int length, float[] elementScore) {
+			for( int i = 0; i < length; i++ ) {
+				float difference = left.data[ indexLeft++ ] - right.data[ indexRight++ ];
+				elementScore[offset+i] = Math.abs(difference);
 			}
 		}
 

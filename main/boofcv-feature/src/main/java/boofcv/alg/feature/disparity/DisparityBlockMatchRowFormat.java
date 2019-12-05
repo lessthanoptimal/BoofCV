@@ -52,7 +52,7 @@ public abstract class DisparityBlockMatchRowFormat
 	protected int rangeDisparity;
 
 	// number of score elements: image_width*rangeDisparity
-	protected int lengthHorizontal;
+	protected int widthDisparityBlock;
 
 	// radius of the region along x and y axis
 	protected int radiusX,radiusY;
@@ -71,7 +71,7 @@ public abstract class DisparityBlockMatchRowFormat
 										int regionRadiusX, int regionRadiusY ) {
 		if( maxDisparity <= 0 )
 			throw new IllegalArgumentException("Max disparity must be greater than zero. max="+maxDisparity);
-		if( minDisparity < 0 || minDisparity >= maxDisparity )
+		if( minDisparity < 0 || minDisparity > maxDisparity )
 			throw new IllegalArgumentException("Min disparity must be >= 0 and < maxDisparity. min="+minDisparity+" max="+maxDisparity);
 
 		this.minDisparity = minDisparity;
@@ -96,11 +96,12 @@ public abstract class DisparityBlockMatchRowFormat
 		// initialize data structures
 		InputSanityCheck.checkSameShape(left, right);
 
-		if( maxDisparity >  left.width-2*radiusX )
+		if( maxDisparity > left.width )
 			throw new RuntimeException(
-					"The maximum disparity is too large for this image size: max size "+(left.width-2*radiusX));
+					"The maximum disparity is too large for this image size: max size "+left.width);
 
-		lengthHorizontal = left.width*rangeDisparity;
+		// Stores error for all x-coordinates and disparity values along a single row
+		widthDisparityBlock = left.width*rangeDisparity;
 
 		_process(left,right,disparity);
 	}
@@ -123,7 +124,7 @@ public abstract class DisparityBlockMatchRowFormat
 	}
 
 	public int getBorderX() {
-		return radiusX;
+		return 0;
 	}
 
 	public int getBorderY() {

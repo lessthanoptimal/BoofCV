@@ -96,16 +96,20 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 		float[] verticalScore = new float[0];
 		// storage for scores after normalization
 		float[] verticalScoreNorm = new float[0];
+		// Used to store a copy of the image's row, plus outside border pixels
+		Object leftRow,rightRow;
 
 		DisparitySelect<float[], DI> computeDisparity;
 
 		public void checkSize() {
-			if( horizontalScore.length != regionHeight || horizontalScore[0].length != lengthHorizontal ) {
-				horizontalScore = new float[regionHeight][lengthHorizontal];
-				verticalScore = new float[lengthHorizontal];
+			if( horizontalScore.length != regionHeight || horizontalScore[0].length != widthDisparityBlock) {
+				horizontalScore = new float[regionHeight][widthDisparityBlock];
+				verticalScore = new float[widthDisparityBlock];
 				if( scoreRows.isRequireNormalize() )
-					verticalScoreNorm = new float[lengthHorizontal];
-				elementScore = new float[ left.width ];
+					verticalScoreNorm = new float[widthDisparityBlock];
+				elementScore = new float[ left.width+2*radiusX ];
+				leftRow = left.getImageType().getDataType().newArray(elementScore.length);
+				rightRow = right.getImageType().getDataType().newArray(elementScore.length);
 			}
 			if( computeDisparity == null ) {
 				computeDisparity = disparitySelect0.concurrentCopy();
@@ -119,10 +123,8 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 		public void accept(WorkSpace workspace, int minInclusive, int maxExclusive) {
 
 			workspace.checkSize();
-
-			// The image border will be skipped, so it needs to back track some
-			int row0 = Math.max(0,minInclusive-radiusY);
-			int row1 = Math.min(left.height,maxExclusive+radiusY);
+			int row0 = minInclusive-radiusY;
+			int row1 = maxExclusive+radiusY;
 
 			// initialize computation
 			computeFirstRow(row0, workspace.computeDisparity,
@@ -149,7 +151,7 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 		}
 
 		// compute score for the top most row
-		for( int i = 0; i < lengthHorizontal; i++ ) {
+		for(int i = 0; i < widthDisparityBlock; i++ ) {
 			float sum = 0;
 			for( int row = 0; row < regionHeight; row++ ) {
 				sum += horizontalScore[row][i];
@@ -182,14 +184,14 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 
 			// subtract first row from vertical score
 			final float[] scores = horizontalScore[oldRow];
-			for( int i = 0; i < lengthHorizontal; i++ ) {
+			for(int i = 0; i < widthDisparityBlock; i++ ) {
 				verticalScore[i] -= scores[i];
 			}
 
 			scoreRows.scoreRow(row, scores, minDisparity,maxDisparity,regionWidth,elementScore);
 
 			// add the new score
-			for( int i = 0; i < lengthHorizontal; i++ ) {
+			for(int i = 0; i < widthDisparityBlock; i++ ) {
 				verticalScore[i] += scores[i];
 			}
 

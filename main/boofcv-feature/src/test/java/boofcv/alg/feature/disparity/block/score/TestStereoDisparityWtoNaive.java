@@ -18,41 +18,38 @@
 
 package boofcv.alg.feature.disparity.block.score;
 
+import boofcv.alg.feature.disparity.block.DisparityBlockMatchNaive;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import org.junit.jupiter.api.Test;
+import boofcv.struct.image.ImageType;
+import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-public class TestStereoDisparityWtoNaive {
+class TestStereoDisparityWtoNaive {
 
-	@Test
-	public void basicTest() {
-		BasicDisparityTests<GrayU8,GrayF32> alg =
-				new BasicDisparityTests<GrayU8,GrayF32>(GrayU8.class) {
+	@Nested
+	class BasicTests extends BasicDisparityTests<GrayU8,GrayF32> {
+		DisparityBlockMatchNaive<GrayU8> alg;
 
-					StereoDisparityWtoNaive<GrayU8> alg;
+		BasicTests() { super(0,100,GrayU8.class); }
 
-					@Override
-					public GrayF32 computeDisparity(GrayU8 left, GrayU8 right ) {
-						GrayF32 ret = new GrayF32(left.width,left.height);
+		@Override
+		public void initialize(int minDisparity, int maxDisparity) {
+			alg = new DisparityBlockMatchNaive<>(DisparityError.SAD);
+			alg.configure(minDisparity,maxDisparity,2,3);
+			alg.setBorder(FactoryImageBorder.
+					generic(DisparityBlockMatchNaive.BORDER_TYPE, ImageType.single(GrayU8.class)));
+		}
 
-						alg.process(left,right,ret);
-
-						return ret;
-					}
-
-					@Override
-					public void initialize(int minDisparity , int maxDisparity) {
-						alg = new StereoDisparityWtoNaive<>(minDisparity,maxDisparity,2,3);
-					}
-
-					@Override public int getBorderX() { return 2; }
-
-					@Override public int getBorderY() { return 3; }
-				};
-
-		alg.allChecks();
+		@Override
+		public GrayF32 computeDisparity(GrayU8 left, GrayU8 right) {
+			GrayF32 ret = new GrayF32(left.width,left.height);
+			alg.process(left,right,ret);
+			return ret;
+		}
 	}
 }
