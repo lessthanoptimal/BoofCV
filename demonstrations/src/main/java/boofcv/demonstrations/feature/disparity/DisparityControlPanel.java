@@ -301,7 +301,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if( e.getSource() == subpixelToggle) {
-				configSGM.subpixel = subpixelToggle.isSelected();
+				configBM.subpixel = subpixelToggle.isSelected();
 			} else {
 				throw new RuntimeException("Unknown");
 			}
