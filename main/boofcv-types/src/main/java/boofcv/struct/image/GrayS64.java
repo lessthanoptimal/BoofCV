@@ -103,6 +103,18 @@ public class GrayS64 extends ImageGray<GrayS64> {
 		return new GrayS64(imgWidth, imgHeight);
 	}
 
+	@Override
+	public void copyCol(int col , int row0 , int row1 ,int offset, Object array) {
+		long[] dst = (long[])array;
+		int idxSrc = startIndex + stride*row0 + col;
+		int idxDst = offset;
+		int end = idxSrc + (row1-row0)*stride;
+		while( idxSrc < end ) {
+			dst[idxDst++] = data[idxSrc];
+			idxSrc += stride;
+		}
+	}
+
 	public long[] getData() {
 		return data;
 	}

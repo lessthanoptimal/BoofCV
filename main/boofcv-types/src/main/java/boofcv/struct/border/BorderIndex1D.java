@@ -37,4 +37,6 @@ public abstract class BorderIndex1D {
 	public abstract int getIndex( int index );
 
 	protected int length;
+
+	public abstract BorderIndex1D copy();
 }

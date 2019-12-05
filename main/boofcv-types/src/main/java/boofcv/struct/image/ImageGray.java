@@ -199,6 +199,12 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 		return GeneralizedImageOps.createSingleBand(type,width,height);
 	}
 
+	@Override
+	public void copyRow(int row, int col0, int col1, int offset, Object array) {
+		int idxSrc = startIndex + stride*row + col0;
+		System.arraycopy(_getData(),idxSrc,array,offset,col1-col0);
+	}
+
 	/**
 	 * Returns the data array the image is stored in.
 	 *

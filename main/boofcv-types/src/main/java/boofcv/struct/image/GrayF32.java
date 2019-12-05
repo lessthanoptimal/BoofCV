@@ -126,6 +126,18 @@ public class GrayF32 extends GrayF<GrayF32> {
 	}
 
 	@Override
+	public void copyCol(int col , int row0 , int row1 , int offset, Object array) {
+		float[] dst = (float[])array;
+		int idxSrc = startIndex + stride*row0 + col;
+		int idxDst = offset;
+		int end = idxSrc + (row1-row0)*stride;
+		while( idxSrc < end ) {
+			dst[idxDst++] = data[idxSrc];
+			idxSrc += stride;
+		}
+	}
+
+	@Override
 	public ImageDataType getDataType() {
 		return ImageDataType.F32;
 	}

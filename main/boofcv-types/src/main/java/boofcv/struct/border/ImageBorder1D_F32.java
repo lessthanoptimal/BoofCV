@@ -60,6 +60,11 @@ public class ImageBorder1D_F32 extends ImageBorder_F32 implements ImageBorder1D 
 	}
 
 	@Override
+	public ImageBorder1D_F32 copy() {
+		return new ImageBorder1D_F32(this.rowWrap.copy() ,this.colWrap.copy());
+	}
+
+	@Override
 	public float getOutside(int x, int y) {
 		return image.get( colWrap.getIndex(x) , rowWrap.getIndex(y) );
 	}

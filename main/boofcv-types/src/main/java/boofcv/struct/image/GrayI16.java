@@ -64,6 +64,18 @@ public abstract class GrayI16<T extends GrayI16<T>> extends GrayI<T> {
 	}
 
 	@Override
+	public void copyCol(int col , int row0 , int row1 , int offset, Object array) {
+		short[] dst = (short[])array;
+		int idxSrc = startIndex + stride*row0 + col;
+		int idxDst = offset;
+		int end = idxSrc + (row1-row0)*stride;
+		while( idxSrc < end ) {
+			dst[idxDst++] = data[idxSrc];
+			idxSrc += stride;
+		}
+	}
+
+	@Override
 	protected Object _getData() {
 		return data;
 	}

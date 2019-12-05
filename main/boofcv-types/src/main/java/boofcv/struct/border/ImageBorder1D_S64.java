@@ -68,6 +68,11 @@ public class ImageBorder1D_S64
 	}
 
 	@Override
+	public ImageBorder1D_S64 copy() {
+		return new ImageBorder1D_S64(this.rowWrap.copy() ,this.colWrap.copy());
+	}
+
+	@Override
 	public long getOutside(int x, int y) {
 		return image.get( colWrap.getIndex(x) , rowWrap.getIndex(y) );
 	}

@@ -208,6 +208,12 @@ public abstract class ImageInterleaved<T extends ImageInterleaved<T>> extends Im
 	protected abstract void _setData(Object data);
 
 	@Override
+	public void copyRow(int row, int col0, int col1, int offset, Object array) {
+		int idxSrc = startIndex + stride*row + col0*numBands;
+		System.arraycopy(_getData(),idxSrc,array,offset,(col1-col0)*numBands);
+	}
+
+	@Override
 	public String toString() {
 		String out = getClass().getSimpleName()+" : w="+width+", h="+height+", c="+numBands+"\n";
 		for (int y = 0; y < height; y++) {

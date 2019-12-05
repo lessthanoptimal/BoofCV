@@ -257,6 +257,16 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 		return new Planar<>(type, imgWidth, imgHeight, bands.length);
 	}
 
+	@Override
+	public void copyRow(int row, int col0, int col1, int offset, Object array) {
+		throw new IllegalArgumentException("Not supported for planar images");
+	}
+
+	@Override
+	public void copyCol(int col, int row0, int row1, int offset, Object array) {
+		throw new IllegalArgumentException("Not supported for planar images");
+	}
+
 	/**
 	 * Returns a new {@link Planar} which references the same internal single band images at this one.
 	 *

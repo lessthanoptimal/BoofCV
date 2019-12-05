@@ -92,5 +92,11 @@ class TestImageBase {
 		public ImageBase createNew(int imgWidth, int imgHeight) {
 			return null;
 		}
+
+		@Override
+		public void copyRow(int row, int col0, int col1, int offset, Object array) {}
+
+		@Override
+		public void copyCol(int col, int row0, int row1, int offset, Object array) {}
 	}
 }

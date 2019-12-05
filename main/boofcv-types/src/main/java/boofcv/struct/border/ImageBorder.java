@@ -48,4 +48,6 @@ public abstract class ImageBorder<T extends ImageBase<T>> {
 	public abstract void getGeneral(int x, int y, double[] pixel);
 
 	public abstract void setGeneral(int x, int y, double[] pixel);
+
+	public abstract ImageBorder<T> copy();
 }

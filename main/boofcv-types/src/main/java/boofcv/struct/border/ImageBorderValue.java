@@ -93,6 +93,11 @@ public class ImageBorderValue {
 		public void setOutside(int x, int y, long val) {
 			// do nothing since it is a constant value
 		}
+
+		@Override
+		public Value_I64 copy() {
+			return new Value_I64(value);
+		}
 	}
 
 	public static class Value_F64 extends ImageBorder_F64 {
@@ -115,6 +120,11 @@ public class ImageBorderValue {
 		@Override
 		public void setOutside(int x, int y, double val) {
 			// do nothing since it is a constant value
+		}
+
+		@Override
+		public Value_F64 copy() {
+			return new Value_F64(value);
 		}
 	}
 
@@ -139,6 +149,11 @@ public class ImageBorderValue {
 		public void setOutside(int x, int y, float val) {
 			// do nothing since it is a constant value
 		}
+
+		@Override
+		public Value_F32 copy() {
+			return new Value_F32(value);
+		}
 	}
 
 	public static class Value_I extends ImageBorder_S32 {
@@ -162,6 +177,11 @@ public class ImageBorderValue {
 		public void setOutside(int x, int y, int value) {
 			// do nothing since it is a constant
 		}
+
+		@Override
+		public Value_I copy() {
+			return new Value_I(value);
+		}
 	}
 
 	public static class Value_IL_F32 extends ImageBorder_IL_F32 {
@@ -178,6 +198,11 @@ public class ImageBorderValue {
 
 		@Override
 		public void setOutside(int x, int y, float[] pixel) {}
+
+		@Override
+		public Value_IL_F32 copy() {
+			return new Value_IL_F32(value);
+		}
 	}
 
 	public static class Value_IL_F64 extends ImageBorder_IL_F64 {
@@ -194,6 +219,11 @@ public class ImageBorderValue {
 
 		@Override
 		public void setOutside(int x, int y, double[] pixel) {}
+
+		@Override
+		public Value_IL_F64 copy() {
+			return new Value_IL_F64(value);
+		}
 	}
 
 	public static class Value_IL_S32 extends ImageBorder_IL_S32 {
@@ -210,6 +240,11 @@ public class ImageBorderValue {
 
 		@Override
 		public void setOutside(int x, int y, int[] pixel) {}
+
+		@Override
+		public Value_IL_S32 copy() {
+			return new Value_IL_S32(value);
+		}
 	}
 
 	public static class Value_IL_S64 extends ImageBorder_IL_S64 {
@@ -226,5 +261,10 @@ public class ImageBorderValue {
 
 		@Override
 		public void setOutside(int x, int y, long[] pixel) {}
+
+		@Override
+		public Value_IL_S64 copy() {
+			return new Value_IL_S64(value);
+		}
 	}
 }

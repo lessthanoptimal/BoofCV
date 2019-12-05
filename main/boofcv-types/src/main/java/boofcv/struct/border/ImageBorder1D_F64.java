@@ -60,6 +60,11 @@ public class ImageBorder1D_F64 extends ImageBorder_F64 implements ImageBorder1D 
 	}
 
 	@Override
+	public ImageBorder1D_F64 copy() {
+		return new ImageBorder1D_F64(this.rowWrap.copy() ,this.colWrap.copy());
+	}
+
+	@Override
 	public double getOutside(int x, int y) {
 		return image.get( colWrap.getIndex(x) , rowWrap.getIndex(y) );
 	}

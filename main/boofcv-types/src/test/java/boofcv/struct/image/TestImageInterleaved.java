@@ -237,5 +237,10 @@ public class TestImageInterleaved {
 		public DummyImage createNew(int imgWidth, int imgHeight) {
 			return new DummyImage(imgWidth,imgHeight,numBands);
 		}
+
+		@Override
+		public void copyCol(int col, int row0, int row1, int offset, Object array) {
+
+		}
 	}
 }

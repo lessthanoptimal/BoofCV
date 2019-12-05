@@ -168,5 +168,10 @@ public class TestImageGray {
 		public DummyImage createNew(int imgWidth, int imgHeight) {
 			return new DummyImage(imgWidth,imgHeight);
 		}
+
+		@Override
+		public void copyCol(int col, int row0, int row1, int offset, Object array) {
+
+		}
 	}
 }

@@ -18,6 +18,8 @@
 
 package boofcv.struct.image;
 
+import boofcv.core.image.GeneralizedImageOps;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Array;
@@ -259,5 +261,59 @@ public abstract class StandardImageInterleavedTests<T extends ImageInterleaved<T
 		assertTrue(a._getData() == null);
 		assertTrue(a.getPrimitiveDataType() != null);
 		assertTrue(a.getImageType() != null);
+	}
+
+	@Test
+	public void copyRow() {
+		T img = createImage(10, 20, 3);
+		setRandom(img);
+
+		Object arrayRow = img.getDataType().newArray(img.width*img.numBands);
+
+		copyRow(1,0,10,img,arrayRow);
+		copyRow(19,0,10,img,arrayRow);
+		copyRow(1,5,10,img,arrayRow);
+		copyRow(1,5,6,img,arrayRow);
+	}
+
+	private void copyRow( int row , int col0 , int col1 , T img , Object array ) {
+		img.copyRow(row,col0,col1,0,array);
+
+		boolean signed = img.getDataType().isSigned();
+		int idx = 0;
+		for (int x = col0; x < col1; x++) {
+			for (int band = 0; band < img.numBands; band++) {
+				double valA = GeneralizedImageOps.get(img,x,row,band);
+				double valB = GeneralizedImageOps.arrayElement(array,idx++,signed);
+				assertEquals(valA,valB, UtilEjml.TEST_F64);
+			}
+		}
+	}
+
+	@Test
+	public void copyCol() {
+		T img = createImage(10, 20, 3);
+		setRandom(img);
+
+		Object arrayCol = img.getDataType().newArray(img.height*img.numBands);
+
+		copyCol(0,0,20,img,arrayCol);
+		copyCol(9,0,20,img,arrayCol);
+		copyCol(1,5,20,img,arrayCol);
+		copyCol(1,5,6,img,arrayCol);
+	}
+
+	private void copyCol( int col , int row0 , int row1 , T img , Object array ) {
+		img.copyCol(col,row0,row1,0,array);
+
+		boolean signed = img.getDataType().isSigned();
+		int idx = 0;
+		for (int y = row0; y < row1; y++) {
+			for (int band = 0; band < img.numBands; band++) {
+				double valA = GeneralizedImageOps.get(img, col, y,band);
+				double valB = GeneralizedImageOps.arrayElement(array, idx++, signed);
+				assertEquals(valA, valB, UtilEjml.TEST_F64);
+			}
+		}
 	}
 }

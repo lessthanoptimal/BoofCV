@@ -68,6 +68,11 @@ public class ImageBorder1D_S32<T extends GrayI<T>>
 	}
 
 	@Override
+	public ImageBorder1D_S32<T> copy() {
+		return new ImageBorder1D_S32<>(this.rowWrap.copy() ,this.colWrap.copy());
+	}
+
+	@Override
 	public int getOutside(int x, int y) {
 		return image.get( colWrap.getIndex(x) , rowWrap.getIndex(y) );
 	}

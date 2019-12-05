@@ -117,6 +117,18 @@ public class GrayF64 extends GrayF<GrayF64> {
 	}
 
 	@Override
+	public void copyCol(int col , int row0 , int row1 ,int offset, Object array) {
+		double[] dst = (double[])array;
+		int idxSrc = startIndex + stride*row0 + col;
+		int idxDst = offset;
+		int end = idxSrc + (row1-row0)*stride;
+		while( idxSrc < end ) {
+			dst[idxDst++] = data[idxSrc];
+			idxSrc += stride;
+		}
+	}
+
+	@Override
 	public ImageDataType getDataType() {
 		return ImageDataType.F64;
 	}

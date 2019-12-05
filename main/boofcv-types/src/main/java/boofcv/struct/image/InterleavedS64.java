@@ -137,6 +137,20 @@ public class InterleavedS64 extends ImageInterleaved<InterleavedS64> {
 	}
 
 	@Override
+	public void copyCol(int col , int row0 , int row1 ,int offset, Object array) {
+		long[] dst = (long[])array;
+		int idxSrc = startIndex + stride*row0 + col*numBands;
+		int idxDst = offset;
+		int end = idxSrc + (row1-row0)*stride;
+		while( idxSrc < end ) {
+			for (int i = 0; i < numBands; i++) {
+				dst[idxDst++] = data[idxSrc+i];
+			}
+			idxSrc += stride;
+		}
+	}
+
+	@Override
 	protected Object _getData() {
 		return data;
 	}

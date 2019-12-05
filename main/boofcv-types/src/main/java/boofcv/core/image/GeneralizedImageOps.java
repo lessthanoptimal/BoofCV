@@ -320,4 +320,30 @@ public class GeneralizedImageOps {
 		else
 			throw new RuntimeException("Unknown");
 	}
+
+	public static double arrayElement(Object array, int i, boolean signed ) {
+		if( array instanceof byte[] ){
+			byte v = ((byte[])array)[i];
+			if( signed )
+				return v;
+			else
+				return v&0xFF;
+		} else if( array instanceof short[] ){
+			short v = ((short[])array)[i];
+			if( signed )
+				return v;
+			else
+				return v&0xFFFF;
+		} else if( array instanceof int[] ){
+			return ((int[])array)[i];
+		} else if( array instanceof long[] ){
+			return ((long[])array)[i];
+		} else if( array instanceof float[] ){
+			return ((float[])array)[i];
+		} else if( array instanceof double[] ){
+			return ((double[])array)[i];
+		} else {
+			throw new IllegalArgumentException("Unknown array type.");
+		}
+	}
 }

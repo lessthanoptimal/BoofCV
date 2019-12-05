@@ -34,4 +34,9 @@ public class BorderIndex1D_Wrap extends BorderIndex1D {
 		else
 			return index;
 	}
+
+	@Override
+	public BorderIndex1D_Wrap copy() {
+		return new BorderIndex1D_Wrap();
+	}
 }

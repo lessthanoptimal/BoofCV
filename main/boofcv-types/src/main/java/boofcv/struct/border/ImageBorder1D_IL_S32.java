@@ -62,6 +62,11 @@ public class ImageBorder1D_IL_S32<T extends InterleavedInteger<T>>
 	}
 
 	@Override
+	public ImageBorder1D_IL_S32<T> copy() {
+		return new ImageBorder1D_IL_S32<>(this.rowWrap.copy() ,this.colWrap.copy());
+	}
+
+	@Override
 	public void getOutside(int x, int y, int pixel[] ) {
 		image.unsafe_get(colWrap.getIndex(x), rowWrap.getIndex(y), pixel);
 	}

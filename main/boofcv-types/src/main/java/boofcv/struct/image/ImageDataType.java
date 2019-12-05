@@ -26,21 +26,21 @@ package boofcv.struct.image;
  */
 public enum ImageDataType {
 	/** Unsigned 8-bit image */
-	U8(false,byte.class),
+	U8(false,byte.class, byte[]::new),
 	/** Signed 8-bit image */
-	S8(true,byte.class),
+	S8(true,byte.class, byte[]::new),
 	/** Unsigned 16-bit image */
-	U16(false,short.class),
+	U16(false,short.class, short[]::new),
 	/** Signed 16-bit integer image */
-	S16(true,short.class),
+	S16(true,short.class, short[]::new),
 	/** Signed 32-bit integer image */
-	S32(true,int.class),
+	S32(true,int.class, int[]::new),
 	/** Signed 64-bit integer image */
-	S64(true,long.class),
+	S64(true,long.class, long[]::new),
 	/** 32-bit floating point image */
-	F32(true,float.class),
+	F32(true,float.class, float[]::new),
 	/** 64-bit floating point image */
-	F64(true,double.class),
+	F64(true,double.class, double[]::new),
 	/** 8-bit integer image */
 	I8(byte.class),
 	/** 16-bit integer image */
@@ -58,6 +58,7 @@ public enum ImageDataType {
 	private double minValue;
 	private Class dataType;
 	private Class sumType;
+	private CreateArray createArray;
 
 	public static ImageDataType classToType( Class imageClass ) {
 		if( imageClass == GrayU8.class )
@@ -177,10 +178,11 @@ public enum ImageDataType {
 		configureByDataType(dataType);
 	}
 
-	ImageDataType(boolean isSigned, Class<?> dataType) {
+	ImageDataType(boolean isSigned, Class<?> dataType , CreateArray createArray ) {
 		this.isAbstract = false;
 		this.isSigned = isSigned;
 		this.dataType = dataType;
+		this.createArray = createArray;
 
 		configureByDataType(dataType);
 	}
@@ -254,6 +256,14 @@ public enum ImageDataType {
 			maxValue += -minValue;
 			minValue = 0;
 		}
+	}
+
+	public Object newArray(int length ) {
+		return createArray.create(length);
+	}
+
+	private interface CreateArray {
+		Object create( int length );
 	}
 
 	/**

@@ -219,6 +219,26 @@ public abstract class ImageBase<T extends ImageBase> implements Serializable, Cl
 	}
 
 	/**
+	 * Copies the row into the array.
+	 * @param row Which row to copy.
+	 * @param col0 First column. Inclusive.
+	 * @param col1 Last column. Exclusive.
+	 * @param offset First index in output array
+	 * @param array Output array
+	 */
+	public abstract void copyRow( int row, int col0 , int col1 , int offset , Object array );
+
+	/**
+	 * Copies the column into the array.
+	 * @param col Which column to copy.
+	 * @param row0 First row. Inclusive.
+	 * @param row1 Last row. Exclusive.
+	 * @param offset First index in output array
+	 * @param array Output array
+	 */
+	public abstract void copyCol(int col , int row0 , int row1 , int offset , Object array );
+
+	/**
 	 * Creates an identical image.  Note that if this image is a sub-image portions of hte image which are not part
 	 * of the sub-image are not copied.
 	 *

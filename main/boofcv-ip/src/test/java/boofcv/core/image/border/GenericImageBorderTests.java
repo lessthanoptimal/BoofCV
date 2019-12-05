@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 
 /**
  * Common tests for implementers of {@link ImageBorder}.
@@ -119,6 +121,10 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
 		}
 	}
 
+	@Test
+	public void copy() {
+		fail("Implement");
+	}
 
 	private void checkSet(T image, ImageBorder<T> border) {
 		// test the image's inside where there is no border condition

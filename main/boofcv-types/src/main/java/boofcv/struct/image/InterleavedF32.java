@@ -143,6 +143,20 @@ public class InterleavedF32 extends ImageInterleaved<InterleavedF32> {
 	}
 
 	@Override
+	public void copyCol(int col , int row0 , int row1 ,int offset, Object array) {
+		float[] dst = (float[])array;
+		int idxSrc = startIndex + stride*row0 + col*numBands;
+		int idxDst = offset;
+		int end = idxSrc + (row1-row0)*stride;
+		while( idxSrc < end ) {
+			for (int i = 0; i < numBands; i++) {
+				dst[idxDst++] = data[idxSrc+i];
+			}
+			idxSrc += stride;
+		}
+	}
+
+	@Override
 	protected Object _getData() {
 		return data;
 	}

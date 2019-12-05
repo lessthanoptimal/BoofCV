@@ -39,4 +39,9 @@ public class BorderIndex1D_Reflect extends BorderIndex1D {
 		else
 			return index;
 	}
+
+	@Override
+	public BorderIndex1D_Reflect copy() {
+		return new BorderIndex1D_Reflect();
+	}
 }

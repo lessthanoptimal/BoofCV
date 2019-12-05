@@ -78,6 +78,18 @@ public abstract class GrayI8<T extends GrayI8<T>> extends GrayI<T> {
 	}
 
 	@Override
+	public void copyCol(int col , int row0 , int row1 ,int offset, Object array) {
+		byte[] dst = (byte[])array;
+		int idxSrc = startIndex + stride*row0 + col;
+		int idxDst = offset;
+		int end = idxSrc + (row1-row0)*stride;
+		while( idxSrc < end ) {
+			dst[idxDst++] = data[idxSrc];
+			idxSrc += stride;
+		}
+	}
+
+	@Override
 	public void unsafe_set(int x, int y, int value) {
 		data[getIndex(x,y)] = (byte)value;
 	}

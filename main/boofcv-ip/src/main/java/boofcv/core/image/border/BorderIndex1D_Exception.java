@@ -31,4 +31,9 @@ public class BorderIndex1D_Exception extends BorderIndex1D {
 	public int getIndex(int index) {
 		throw new IllegalArgumentException("Tried to access a pixel outside of the image");
 	}
+
+	@Override
+	public BorderIndex1D copy() {
+		return this;
+	}
 }

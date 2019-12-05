@@ -35,4 +35,9 @@ public class BorderIndex1D_Extend extends BorderIndex1D {
 			return length-1;
 		return index;
 	}
+
+	@Override
+	public BorderIndex1D_Extend copy() {
+		return new BorderIndex1D_Extend();
+	}
 }
