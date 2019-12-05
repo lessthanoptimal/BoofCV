@@ -163,6 +163,7 @@ public class SgmCostAggregation {
 			BoofConcurrency.loopBlocks(0,trajectories.size,1,workspace,computeBlock);
 		} else {
 			WorkSpace w= workspace.get(0);
+			w.checkSize();
 			for (int i = 0; i < trajectories.size; i++) {
 				Trajectory t = trajectories.get(i);
 				scorePath(t.x0, t.y0, t.dx, t.dy, w.workCostLr);
