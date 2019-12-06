@@ -258,8 +258,8 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 	public class ControlsBlockMatching extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
 		JSpinner spinnerDisparityMin = spinner(configBM.minDisparity,0, 1000,5);
 		JSpinner spinnerDisparityRange = spinner(configBM.rangeDisparity,1, 254,5);
-		JSpinner radiusXSpinner = spinner(configBM.regionRadiusX,1,30,1); // TODO move to error
-		JSpinner radiusYSpinner = spinner(configBM.regionRadiusY,1,30,1);
+		JSpinner radiusXSpinner = spinner(configBM.regionRadiusX,0,50,1); // TODO move to error
+		JSpinner radiusYSpinner = spinner(configBM.regionRadiusY,0,50,1);
 		JSpinner spinnerError = spinner(configBM.maxPerPixelError,-1,80,5);
 		JSpinner spinnerReverse = spinner(configBM.validateRtoL,-1,50,1);
 		JSpinner spinnerTexture = spinner(configBM.texture,0.0,1.0,0.05,1,3);
@@ -321,6 +321,10 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		JSpinner spinnerReverse = spinner(configSGM.validateRtoL,-1,50,1);
 		JSpinner spinnerTexture = spinner(configSGM.texture,0.0,1.0,0.05,1,3);
 		JCheckBox subpixelToggle = checkbox("Subpixel",configSGM.subpixel);
+		JCheckBox useBlocks = checkbox("Use Blocks",configSGM.useBlocks);
+		JCheckBox useRegularBlocks = checkbox("Regular Blocks",configSGM.configBlockMatch.regular);
+		JSpinner radiusXSpinner = spinner(configSGM.configBlockMatch.radiusX,0,50,1); // TODO move to error
+		JSpinner radiusYSpinner = spinner(configSGM.configBlockMatch.radiusY,0,50,1);
 
 		ControlsSemiGlobal() {
 			addLabeled(spinnerDisparityMin, "Min Disp.");
@@ -332,6 +336,10 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 			addLabeled(spinnerPenaltySmall, "Penalty Small");
 			addLabeled(spinnerPenaltyLarge, "Penalty Large");
 			addAlignLeft(subpixelToggle);
+			addAlignLeft(useBlocks);
+			addAlignLeft(useRegularBlocks);
+			addLabeled(radiusXSpinner,    "Radius X");
+			addLabeled(radiusYSpinner,    "Radius Y");
 		}
 
 		@Override
@@ -350,6 +358,10 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 				configSGM.penaltySmallChange = ((Number) spinnerPenaltySmall.getValue()).intValue();
 			} else if( e.getSource() == spinnerPenaltyLarge) {
 				configSGM.penaltyLargeChange = ((Number) spinnerPenaltyLarge.getValue()).intValue();
+			} else if( e.getSource() == radiusXSpinner) {
+				configSGM.configBlockMatch.radiusX = ((Number) radiusXSpinner.getValue()).intValue();
+			} else if( e.getSource() == radiusYSpinner) {
+				configSGM.configBlockMatch.radiusY = ((Number) radiusYSpinner.getValue()).intValue();
 			} else {
 				throw new RuntimeException("Unknown");
 			}
@@ -361,7 +373,11 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 			if( e.getSource() == comboPaths) {
 				configSGM.paths = ConfigDisparitySGM.Paths.values()[comboPaths.getSelectedIndex()];
 			} else if( e.getSource() == subpixelToggle) {
-					configSGM.subpixel = subpixelToggle.isSelected();
+				configSGM.subpixel = subpixelToggle.isSelected();
+			} else if( e.getSource() == useBlocks) {
+				configSGM.useBlocks = useBlocks.isSelected();
+			} else if( e.getSource() == useRegularBlocks) {
+				configSGM.configBlockMatch.regular = useRegularBlocks.isSelected();
 			} else {
 				throw new RuntimeException("Unknown");
 			}

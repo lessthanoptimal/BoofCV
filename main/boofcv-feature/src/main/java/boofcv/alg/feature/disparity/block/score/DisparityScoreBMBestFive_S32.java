@@ -77,7 +77,6 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends Imag
 	@Override
 	public void _process(T left , T right , DI disparity ) {
 		InputSanityCheck.checkSameShape(left,right);
-		disparity.reshape(left.width,left.height);
 		this.left = left;
 		this.right = right;
 		this.disparity = disparity;
@@ -274,6 +273,16 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends Imag
 	@Override
 	public Class<DI> getDisparityType() {
 		return disparitySelect0.getDisparityType();
+	}
+
+	@Override
+	public int getMaxRegionError() {
+		return 3*regionWidth*regionHeight*getMaxPerPixelError();
+	}
+
+	@Override
+	protected int getMaxPerPixelError() {
+		return scoreRows.getMaxPerPixelError();
 	}
 
 }

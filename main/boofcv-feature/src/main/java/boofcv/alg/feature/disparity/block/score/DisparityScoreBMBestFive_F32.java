@@ -275,4 +275,9 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 		return disparitySelect0.getDisparityType();
 	}
 
+	@Override
+	protected int getMaxPerPixelError() {
+		return scoreRows.getMaxPerPixelError();
+	}
+
 }

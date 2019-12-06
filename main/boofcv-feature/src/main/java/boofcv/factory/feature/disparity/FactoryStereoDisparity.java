@@ -85,17 +85,7 @@ public class FactoryStereoDisparity {
 			case CENSUS: {
 				DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,imageType);
-				Class censusType = censusTran.getOutputType().getImageClass();
-				BlockRowScore rowScore;
-				if (censusType == GrayU8.class) {
-					rowScore = new BlockRowScoreCensus.U8();
-				} else if (censusType == GrayS32.class) {
-					rowScore = new BlockRowScoreCensus.S32();
-				} else if (censusType == GrayS64.class) {
-					rowScore = new BlockRowScoreCensus.S64();
-				} else {
-					throw new IllegalArgumentException("Unsupported image type");
-				}
+				BlockRowScore rowScore = createCensusRowScore(config, censusTran);
 
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, (Class<T>) imageType, select, rowScore);
 				return new WrapDisparityBlockMatchCensus<>(censusTran, alg);
@@ -113,7 +103,23 @@ public class FactoryStereoDisparity {
 		}
 	}
 
-	private static <T extends ImageGray<T>> DisparitySelect
+	public static BlockRowScore createCensusRowScore( ConfigDisparityBM config, FilterImageInterface censusTran) {
+		Class censusType = censusTran.getOutputType().getImageClass();
+		int bits = config.configCensus.variant.getBits();
+		BlockRowScore rowScore;
+		if (censusType == GrayU8.class) {
+			rowScore = new BlockRowScoreCensus.U8(bits);
+		} else if (censusType == GrayS32.class) {
+			rowScore = new BlockRowScoreCensus.S32(bits);
+		} else if (censusType == GrayS64.class) {
+			rowScore = new BlockRowScoreCensus.S64(bits);
+		} else {
+			throw new IllegalArgumentException("Unsupported image type");
+		}
+		return rowScore;
+	}
+
+	static <T extends ImageGray<T>> DisparitySelect
 	createDisparitySelect(ConfigDisparityBM config, Class<T> imageType, int maxError) {
 		DisparitySelect select;
 		if( !GeneralizedImageOps.isFloatingPoint(imageType) ) {
@@ -172,18 +178,7 @@ public class FactoryStereoDisparity {
 			case CENSUS: {
 				DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,imageType);
-				Class censusType = censusTran.getOutputType().getImageClass();
-				BlockRowScore rowScore;
-				if (censusType == GrayU8.class) {
-					rowScore = new BlockRowScoreCensus.U8();
-				} else if (censusType == GrayS32.class) {
-					rowScore = new BlockRowScoreCensus.S32();
-				} else if (censusType == GrayS64.class) {
-					rowScore = new BlockRowScoreCensus.S64();
-				} else {
-					throw new IllegalArgumentException("Unsupported image type");
-				}
-
+				BlockRowScore rowScore = createCensusRowScore(config, censusTran);
 				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
 				return new WrapDisparityBlockMatchCensus<>(censusTran, alg);
 			}
@@ -227,7 +222,7 @@ public class FactoryStereoDisparity {
 		return rowScore;
 	}
 
-	private static <T extends ImageGray<T>> DisparityBlockMatchRowFormat
+	static <T extends ImageGray<T>> DisparityBlockMatchRowFormat
 	createBlockMatching(ConfigDisparityBM config, Class<T> imageType, DisparitySelect select, BlockRowScore rowScore) {
 		DisparityBlockMatchRowFormat alg;
 		int maxDisparity = config.minDisparity+config.rangeDisparity;
@@ -239,7 +234,7 @@ public class FactoryStereoDisparity {
 		return alg;
 	}
 
-	private static <T extends ImageGray<T>> DisparityBlockMatchRowFormat
+	static <T extends ImageGray<T>> DisparityBlockMatchRowFormat
 	createBestFive(ConfigDisparityBM config, Class<T> imageType, DisparitySelect select, BlockRowScore rowScore) {
 		DisparityBlockMatchRowFormat alg;
 		int maxDisparity = config.minDisparity+config.rangeDisparity;

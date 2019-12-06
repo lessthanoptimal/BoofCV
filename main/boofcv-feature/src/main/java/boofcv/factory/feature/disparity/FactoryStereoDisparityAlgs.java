@@ -19,6 +19,8 @@
 package boofcv.factory.feature.disparity;
 
 import boofcv.abst.filter.FilterImageInterface;
+import boofcv.alg.feature.disparity.DisparityBlockMatchRowFormat;
+import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
@@ -27,6 +29,7 @@ import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_U8;
 import boofcv.alg.feature.disparity.block.select.*;
 import boofcv.alg.feature.disparity.sgm.*;
 import boofcv.alg.feature.disparity.sgm.cost.SgmCostAbsoluteDifference;
+import boofcv.alg.feature.disparity.sgm.cost.SgmCostFromBlocks;
 import boofcv.alg.feature.disparity.sgm.cost.SgmCostHamming;
 import boofcv.alg.feature.disparity.sgm.cost.StereoMutualInformation;
 import boofcv.concurrency.BoofConcurrency;
@@ -34,6 +37,8 @@ import boofcv.factory.transform.census.FactoryCensusTransform;
 import boofcv.struct.image.*;
 
 import javax.annotation.Nullable;
+
+import static boofcv.factory.feature.disparity.FactoryStereoDisparity.*;
 
 /**
  * Algorithms related to computing the disparity between two rectified stereo images.
@@ -59,6 +64,24 @@ public class FactoryStereoDisparityAlgs {
 
 		SgmStereoDisparity sgm;
 
+		// There's currently no block variant of MI
+		if( !config.useBlocks || config.errorType==DisparitySgmError.MUTUAL_INFORMATION)
+			sgm = createSgmNativeCost(config, selector);
+		else
+			sgm = createSgmBlockCost(config, selector, GrayU8.class);
+
+		sgm.setDisparityMin(config.minDisparity);
+		sgm.setDisparityRange(config.rangeDisparity);
+		sgm.getAggregation().setPathsConsidered(config.paths.getCount());
+		sgm.getAggregation().setPenalty1(config.penaltySmallChange);
+		sgm.getAggregation().setPenalty2(config.penaltyLargeChange);
+
+		return sgm;
+	}
+
+	private static SgmStereoDisparity createSgmNativeCost( ConfigDisparitySGM config, SgmDisparitySelector selector) {
+		SgmStereoDisparity sgm;
+
 		switch( config.errorType) {
 			case MUTUAL_INFORMATION: {
 				StereoMutualInformation stereoMI = new StereoMutualInformation();
@@ -73,7 +96,7 @@ public class FactoryStereoDisparityAlgs {
 			} break;
 
 			case CENSUS: {
-				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,GrayU8.class);
+				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, GrayU8.class);
 				Class censusType = censusTran.getOutputType().getImageClass();
 				SgmCostHamming cost;
 				if (censusType == GrayU8.class) {
@@ -91,13 +114,46 @@ public class FactoryStereoDisparityAlgs {
 			default:
 				throw new IllegalArgumentException("Unknown error type "+config.errorType);
 		}
+		return sgm;
+	}
 
-		sgm.setDisparityMin(config.minDisparity);
-		sgm.setDisparityRange(config.rangeDisparity);
-		sgm.getAggregation().setPathsConsidered(config.paths.getCount());
-		sgm.getAggregation().setPenalty1(config.penaltySmallChange);
-		sgm.getAggregation().setPenalty2(config.penaltyLargeChange);
+	private static <T extends ImageGray<T>>
+	SgmStereoDisparity createSgmBlockCost(ConfigDisparitySGM config, SgmDisparitySelector selector, Class<T> imageType)
+	{
+		SgmStereoDisparity sgm;
+		ConfigDisparityBM configBM = new ConfigDisparityBM();
+		configBM.regionRadiusX = config.configBlockMatch.radiusX;
+		configBM.regionRadiusY = config.configBlockMatch.radiusY;
+		configBM.minDisparity = config.minDisparity;
+		configBM.rangeDisparity = config.rangeDisparity;
 
+		SgmCostFromBlocks<T> blockCost = new SgmCostFromBlocks<T>();
+		DisparityBlockMatchRowFormat<T, GrayU8> blockScore;
+
+		switch( config.errorType) {
+			case ABSOLUTE_DIFFERENCE: {
+				BlockRowScore rowScore = createScoreRowSad(imageType);
+				if( config.configBlockMatch.regular )
+					blockScore = createBlockMatching(configBM, imageType, blockCost, rowScore);
+				else
+					blockScore = createBestFive(configBM, imageType, blockCost, rowScore);
+				sgm = new SgmStereoDisparityError(blockCost,selector);
+			} break;
+
+			case CENSUS: {
+				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,imageType);
+				BlockRowScore rowScore = createCensusRowScore(configBM, censusTran);
+				if( config.configBlockMatch.regular )
+					blockScore = createBlockMatching(configBM, imageType, blockCost, rowScore);
+				else
+					blockScore = createBestFive(configBM, imageType, blockCost, rowScore);
+				sgm = new SgmStereoDisparityCensus(censusTran,blockCost,selector);
+			} break;
+
+			default:
+				throw new IllegalArgumentException("Unknown error type "+config.errorType);
+		}
+		blockCost.setBlockScore(blockScore);
 		return sgm;
 	}
 

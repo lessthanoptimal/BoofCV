@@ -57,6 +57,13 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 			   Array elementScore);
 
 	/**
+	 * Returns the maximum error each pixel in the region can contribute
+	 * {@link RuntimeException} should be thrown.
+	 * @return Largest possible error for the region.
+	 */
+	int getMaxPerPixelError();
+
+	/**
 	 * If true then the score needs to be normalized
 	 */
 	boolean isRequireNormalize();
@@ -94,7 +101,12 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 	ImageType<T> getImageType();
 
 	abstract class ArrayS32<T extends ImageBase<T>> implements BlockRowScore<T,int[]> {
+		protected int maxPerPixel;
 		T left, right;
+
+		protected ArrayS32( int maxPerPixel ) {
+			this.maxPerPixel = maxPerPixel;
+		}
 
 		@Override
 		public void setInput(T left, T right) {
@@ -162,6 +174,13 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 		@Override
 		public void normalizeScore(int row, int colLeft, int colRight, int numCols, int regionWidth, int regionHeight,
 								   int[] scores, int indexScores, int[] scoresNorm) {}
+
+		@Override
+		public int getMaxPerPixelError() {
+			if( maxPerPixel < 0 )
+				throw new RuntimeException("Not supported");
+			return maxPerPixel;
+		}
 	}
 
 	abstract class ArrayF32<T extends ImageBase<T>> implements BlockRowScore<T,float[]> {
@@ -231,5 +250,11 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 		@Override
 		public void normalizeScore(int row, int colLeft, int colRight, int numCols, int regionWidth, int regionHeight,
 								   float[] scores, int indexScores, float[] scoresNorm) {}
+
+		@Override
+		public int getMaxPerPixelError() {
+			throw new RuntimeException("Maximum error is not supported for the image type");
+		}
+
 	}
 }

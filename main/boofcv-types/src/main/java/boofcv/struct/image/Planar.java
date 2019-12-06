@@ -131,7 +131,7 @@ public class Planar<T extends ImageGray<T>> extends ImageMultiBand<Planar<T>>{
 	 */
 	public T getBand(int band) {
 		if (band >= bands.length || band < 0)
-			throw new IllegalArgumentException("The specified band is out of bounds: "+band);
+			throw new IllegalArgumentException("The specified band is out of range. "+band+" / "+bands.length);
 
 		return bands[band];
 	}

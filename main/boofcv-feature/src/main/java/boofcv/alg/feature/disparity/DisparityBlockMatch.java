@@ -36,8 +36,8 @@ import boofcv.struct.image.ImageGray;
  * </p>
  *
  * <p>
- * Score Format:  The index of the score for column i &ge; radiusX + minDisparity at disparity d is: <br>
- * index = imgWidth*(d-minDisparity-radiusX) + i - minDisparity-radiusX<br>
+ * Score Format:  The index of score for column i minDisparity at disparity d is: <br>
+ * index = imgWidth*(d-minDisparity) + i - minDisparity<br>
  * Format Comment:<br>
  * This ordering is a bit unnatural when searching for the best disparity, but reduces cache misses
  * when writing.  Performance boost is about 20%-30% depending on max disparity and image size.

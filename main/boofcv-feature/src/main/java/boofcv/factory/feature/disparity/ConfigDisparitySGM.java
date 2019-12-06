@@ -76,6 +76,10 @@ public class ConfigDisparitySGM implements Configuration {
 	 */
 	public DisparitySgmError errorType = DisparitySgmError.CENSUS;
 	/**
+	 * If true it will use block variants of errors.
+	 */
+	public boolean useBlocks=false;
+	/**
 	 * Used if error type is Census
 	 */
 	public ConfigDisparityError.Census configCensus = new ConfigDisparityError.Census();
@@ -83,6 +87,23 @@ public class ConfigDisparitySGM implements Configuration {
 	 * Used if error type is HMI
 	 */
 	public ConfigDisparityError.HMI configHMI = new ConfigDisparityError.HMI();
+	/**
+	 * The error can be computed using code taken from block matching
+	 */
+	public ConfigBlockMatchError configBlockMatch = new ConfigBlockMatchError();
+
+	public static class ConfigBlockMatchError implements Configuration {
+
+		public int radiusX=0;
+		public int radiusY=0;
+
+		public boolean regular=true;
+
+		@Override
+		public void checkValidity() {
+
+		}
+	}
 
 	@Override
 	public void checkValidity() {
@@ -94,6 +115,7 @@ public class ConfigDisparitySGM implements Configuration {
 			throw new IllegalArgumentException("Invalid value for penaltySmallChange.");
 		if( minDisparity < 0 )
 			throw new IllegalArgumentException("Minimum disparity must be >= 0");
+		configBlockMatch.checkValidity();
 	}
 
 	/**

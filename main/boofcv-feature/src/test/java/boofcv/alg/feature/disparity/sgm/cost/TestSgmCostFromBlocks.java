@@ -16,28 +16,18 @@
  * limitations under the License.
  */
 
-package boofcv.factory.transform.census;
+package boofcv.alg.feature.disparity.sgm.cost;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Different sampling patterns for {@link boofcv.alg.transform.census.CensusTransform}.
- *
  * @author Peter Abeles
  */
-public enum CensusVariants {
-	BLOCK_3_3(3*3-1),
-	BLOCK_5_5(5*5-1),
-	BLOCK_7_7(7*7-1),
-	BLOCK_9_7(9*7-1),
-	BLOCK_13_5(13*5-1),
-	CIRCLE_9(9*9 - 4*6 - 1);
-
-	CensusVariants( int bits ) {
-		this.bits = bits;
-	}
-
-	int bits;
-
-	public int getBits() {
-		return bits;
+class TestSgmCostFromBlocks {
+	@Test
+	void stuff() {
+		fail("Implement");
 	}
 }

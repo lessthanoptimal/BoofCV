@@ -49,6 +49,7 @@ public abstract class WrapBaseBlockMatch <In extends ImageGray<In>, T extends Im
 			//      left border will be radius + min disparity
 		}
 
+		disparity.reshape(imageLeft);
 		_process(imageLeft,imageRight);
 	}
 

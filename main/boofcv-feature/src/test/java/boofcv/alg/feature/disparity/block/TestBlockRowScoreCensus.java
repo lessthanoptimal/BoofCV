@@ -36,7 +36,7 @@ class TestBlockRowScoreCensus {
 
 		@Override
 		public BlockRowScore<GrayU8, int[]> createAlg(int radiusWidth, int radiusHeight) {
-			return new BlockRowScoreCensus.U8();
+			return new BlockRowScoreCensus.U8(-1);
 		}
 
 		@Override
@@ -52,7 +52,7 @@ class TestBlockRowScoreCensus {
 
 		@Override
 		public BlockRowScore<GrayS32, int[]> createAlg(int radiusWidth, int radiusHeight) {
-			return new BlockRowScoreCensus.S32();
+			return new BlockRowScoreCensus.S32(-1);
 		}
 
 		@Override
@@ -68,7 +68,7 @@ class TestBlockRowScoreCensus {
 
 		@Override
 		public BlockRowScore<GrayS64, int[]> createAlg(int radiusWidth, int radiusHeight) {
-			return new BlockRowScoreCensus.S64();
+			return new BlockRowScoreCensus.S64(-1);
 		}
 
 		@Override

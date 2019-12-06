@@ -214,4 +214,12 @@ public class DisparityScoreBM_S32<T extends ImageBase<T>,DI extends ImageGray<DI
 		return disparitySelect0.getDisparityType();
 	}
 
+	@Override
+	protected int getMaxPerPixelError() {
+		return scoreRows.getMaxPerPixelError();
+	}
+
+	public void setDisparitySelect0(DisparitySelect<int[], DI> disparitySelect0) {
+		this.disparitySelect0 = disparitySelect0;
+	}
 }

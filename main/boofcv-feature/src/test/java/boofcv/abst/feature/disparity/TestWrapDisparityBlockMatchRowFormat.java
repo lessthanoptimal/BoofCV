@@ -69,6 +69,11 @@ public class TestWrapDisparityBlockMatchRowFormat {
 		public Class<GrayF32> getDisparityType() {
 			return GrayF32.class;
 		}
+
+		@Override
+		protected int getMaxPerPixelError() {
+			return 0;
+		}
 	}
 
 

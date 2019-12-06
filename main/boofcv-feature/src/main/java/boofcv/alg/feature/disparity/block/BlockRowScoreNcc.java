@@ -102,6 +102,11 @@ public class BlockRowScoreNcc<T extends ImageBase<T>>
 		}
 
 		@Override
+		public int getMaxPerPixelError() {
+			throw new RuntimeException("There is no maximum error for NCC");
+		}
+
+		@Override
 		public boolean isRequireNormalize() {
 			return true;
 		}

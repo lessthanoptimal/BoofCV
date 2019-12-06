@@ -38,6 +38,9 @@ import boofcv.struct.image.*;
 public interface BlockRowScoreSad
 {
 	abstract class SadArrayS32<T extends ImageBase<T>> extends ArrayS32<T> {
+		SadArrayS32( int maxPerPixel ) {
+			super(maxPerPixel);
+		}
 		@Override
 		public boolean isRequireNormalize() {
 			return false;
@@ -48,15 +51,24 @@ public interface BlockRowScoreSad
 		public boolean isRequireNormalize() {
 			return false;
 		}
+
+		@Override
+		public int getMaxPerPixelError() {
+			throw new RuntimeException("Not supported for float images");
+		}
+
 	}
 
 	class U8 extends SadArrayS32<GrayU8> {
+		public U8() {
+			super(255);
+		}
+
 		@Override
 		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
-			for( int rCol = 0; rCol < elementMax; rCol++ ) {
+			for( int i = 0; i < elementMax; i++ ) {
 				int diff = (left.data[ indexLeft++ ]& 0xFF) - (right.data[ indexRight++ ]& 0xFF);
-
-				elementScore[rCol] = Math.abs(diff);
+				elementScore[i] = Math.abs(diff);
 			}
 		}
 
@@ -67,6 +79,9 @@ public interface BlockRowScoreSad
 	}
 
 	class U16 extends SadArrayS32<GrayU16> {
+		public U16() {
+			super(-1);
+		}
 		@Override
 		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
 			for( int rCol = 0; rCol < elementMax; rCol++ ) {
@@ -83,6 +98,10 @@ public interface BlockRowScoreSad
 	}
 
 	class S16 extends SadArrayS32<GrayS16> {
+		public S16() {
+			super(-1);
+		}
+
 		@Override
 		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
 			for( int rCol = 0; rCol < elementMax; rCol++ ) {

@@ -242,21 +242,30 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		progress.start();
 
 		computedCloud = false;
-		BoofConcurrency.USE_CONCURRENT = control.concurrent;
-		long time0 = System.nanoTime();
-		activeAlg.process(rectLeft, rectRight);
-		long time1 = System.nanoTime();
-		BoofConcurrency.USE_CONCURRENT = true;
-		processCalled = true;
-		disparityImage = activeAlg.getDisparity();
-		disparityMin = activeAlg.getMinDisparity();
-		disparityRange = activeAlg.getRangeDisparity();
+		long elapsedTime=0;
+		try {
+			BoofConcurrency.USE_CONCURRENT = control.concurrent;
+			long time0 = System.nanoTime();
+			activeAlg.process(rectLeft, rectRight);
+			long time1 = System.nanoTime();
+			elapsedTime = time1-time0;
+			disparityImage = activeAlg.getDisparity();
+			disparityMin = activeAlg.getMinDisparity();
+			disparityRange = activeAlg.getRangeDisparity();
+		} catch( RuntimeException e ) {
+			e.printStackTrace();
+			BoofSwingUtil.warningDialog(this,e);
+		} finally {
+			BoofConcurrency.USE_CONCURRENT = true;
+			processCalled = true;
+		}
 
 		progress.stopThread();
 
+		final long _elapsedTime = elapsedTime;
 		SwingUtilities.invokeLater(()->{
 			control.enableAlgControls(true);
-			control.setProcessingTimeMS((time1-time0)/1e6);
+			control.setProcessingTimeMS(_elapsedTime/1e6);
 			disparityRender();
 		});
 	}

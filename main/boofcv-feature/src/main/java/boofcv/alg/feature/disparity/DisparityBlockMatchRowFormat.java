@@ -95,7 +95,6 @@ public abstract class DisparityBlockMatchRowFormat
 	public void process( Input left , Input right , Disparity disparity ) {
 		// initialize data structures
 		InputSanityCheck.checkSameShape(left, right);
-		disparity.reshape(left);
 
 		if( maxDisparity >  left.width-2*radiusX )
 			throw new RuntimeException(
@@ -130,4 +129,13 @@ public abstract class DisparityBlockMatchRowFormat
 	public int getBorderY() {
 		return radiusY;
 	}
+
+	/**
+	 * The maximum possible error for the region
+	 */
+	public int getMaxRegionError() {
+		return regionWidth*regionHeight*getMaxPerPixelError();
+	}
+
+	protected abstract int getMaxPerPixelError();
 }

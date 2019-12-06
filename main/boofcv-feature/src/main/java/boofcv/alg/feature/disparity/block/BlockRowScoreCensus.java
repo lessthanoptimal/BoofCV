@@ -30,6 +30,7 @@ import boofcv.struct.image.*;
 public interface BlockRowScoreCensus
 {
 	abstract class CensusArrayS32<T extends ImageBase<T>> extends ArrayS32<T> {
+		CensusArrayS32( int maxPerPixel ) { super(maxPerPixel); }
 		@Override
 		public boolean isRequireNormalize() {
 			return false;
@@ -37,6 +38,7 @@ public interface BlockRowScoreCensus
 	}
 
 	class U8 extends CensusArrayS32<GrayU8> {
+		public U8( int maxPerPixel ) { super(maxPerPixel); }
 		@Override
 		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
 			for( int rCol = 0; rCol < elementMax; rCol++ ) {
@@ -53,6 +55,7 @@ public interface BlockRowScoreCensus
 	}
 
 	class S32 extends CensusArrayS32<GrayS32> {
+		public S32( int maxPerPixel ) { super(maxPerPixel); }
 		@Override
 		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
 			for( int rCol = 0; rCol < elementMax; rCol++ ) {
@@ -69,6 +72,7 @@ public interface BlockRowScoreCensus
 	}
 
 	class S64 extends CensusArrayS32<GrayS64> {
+		public S64( int maxPerPixel ) { super(maxPerPixel); }
 		@Override
 		public void score(int elementMax, int indexLeft, int indexRight, int[] elementScore) {
 			for( int rCol = 0; rCol < elementMax; rCol++ ) {
