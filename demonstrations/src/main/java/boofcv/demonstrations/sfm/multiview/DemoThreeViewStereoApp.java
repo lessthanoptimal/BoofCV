@@ -128,6 +128,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	final Object lockProcessing = new Object();
 	boolean processing = false;
 	boolean hasAllImages = false;
+	// change panels automatically while computing. Only do this the first time an image is opened
+	// after that you might be tweaking a setting and don't want the view to change
+	boolean automaticChangeViews = false;
 
 	public DemoThreeViewStereoApp(List<PathLabel> examples) {
 		super(true, false, examples, ImageType.single(GrayU8.class));
@@ -233,6 +236,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	public void openImageSet(boolean reopen, String ...files ) {
 		// Make sure it recomputes everything when a new image set is opened
 		if(!reopen) {
+			automaticChangeViews = true;
 			controls.scaleChanged = true;
 			controls.assocChanged = true;
 			controls.stereoChanged = true;
@@ -395,6 +399,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	}
 
 	private void processImages( boolean skipAssociate , boolean skipStructure ) {
+		boolean _automaticChangeViews = this.automaticChangeViews;
+		this.automaticChangeViews = false;
+
 		int width = buff[0].getWidth();
 		int height = buff[0].getHeight();
 
@@ -432,7 +439,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 				guiAssoc.setPixelOffset(cx, cy);
 				guiAssoc.setImages(buff[0], buff[1], buff[2]);
 				guiAssoc.setAssociation(associated.toList());
-				controls.setViews(1);
+				if( _automaticChangeViews )
+					controls.setViews(1);
 			});
 		}
 
@@ -471,7 +479,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		// Pick the two best views to compute stereo from
 		int[]selected = selectBestPair(structureEstimator.structure);
 
-		if (computeStereoCloud(selected[0],selected[1], cx, cy,skipStructure))
+		if ( !computeStereoCloud(selected[0],selected[1], cx, cy,skipStructure,_automaticChangeViews) )
 			return;
 
 		long time1 = System.currentTimeMillis();
@@ -481,7 +489,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		System.out.println("Success!");
 	}
 
-	private boolean computeStereoCloud( int view0 , int view1, double cx, double cy, boolean skipRectify) {
+	private boolean computeStereoCloud( int view0 , int view1, double cx, double cy, boolean skipRectify,
+										boolean _automaticChangeViews) {
 		if( !skipRectify ) {
 			System.out.println("Computing rectification: views " + view0 + " " + view1);
 			SceneStructureMetric structure = structureEstimator.getStructure();
@@ -518,7 +527,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			ConvertBufferedImage.convertTo(rectColor2, visualRect2, true);
 			BoofSwingUtil.invokeNowOrLater(() -> {
 				rectifiedPanel.setImages(visualRect1, visualRect2);
-				controls.setViews(2);
+				if( _automaticChangeViews )
+					controls.setViews(2);
 			});
 		}
 
@@ -541,13 +551,15 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 				disparity.width,disparity.height,visualDisparity,visualDisparity.getType());
 
 		BoofSwingUtil.invokeNowOrLater(()-> {
+			controls.addText("Associated "+associated.size+"\n");
 			VisualizeImageData.disparity(disparity, visualDisparity, disparityRange, 0);
 			guiDisparity.setImageRepaint(visualDisparity);
-			controls.setViews(3);
+			if( _automaticChangeViews )
+				controls.setViews(3);
 		});
 
 		System.out.println("Computing Point Cloud");
-		showPointCloud(disparity,visualRect1,leftToRight,rectifiedK,rectifiedR);
+		showPointCloud(disparity,visualRect1,leftToRight,rectifiedK,rectifiedR,_automaticChangeViews);
 
 		return true;
 	}
@@ -673,7 +685,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	 * Show results as a point cloud
 	 */
 	public void showPointCloud(ImageGray disparity, BufferedImage left,
-							   Se3_F64 motion, DMatrixRMaj rectifiedK , DMatrixRMaj rectifiedR)
+							   Se3_F64 motion, DMatrixRMaj rectifiedK , DMatrixRMaj rectifiedR,
+							   boolean _automaticChangeViews )
 	{
 		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 		double baseline = motion.getT().norm();
@@ -688,8 +701,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		PointCloudViewer pcv = guiPointCloud;
 		pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
-		pcv.setCameraToWorld(new Se3_F64());
-		pcv.setTranslationStep(baseline/3);
+		if( _automaticChangeViews ) // snape back to home position
+			pcv.setCameraToWorld(new Se3_F64());
 		pcv.clearPoints();
 		pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
 		pcv.setDotSize(1);
@@ -697,9 +710,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		pcv.getComponent().setPreferredSize(new Dimension(left.getWidth(), left.getHeight()));
 
-		BoofSwingUtil.invokeNowOrLater(()->{
-			controls.setViews(4);
-		});
+		if( _automaticChangeViews ) {
+			BoofSwingUtil.invokeNowOrLater(() -> controls.setViews(4));
+		}
 	}
 
 
