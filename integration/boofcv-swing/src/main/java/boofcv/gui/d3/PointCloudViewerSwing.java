@@ -173,6 +173,15 @@ public class PointCloudViewerSwing implements PointCloudViewer {
 	}
 
 	@Override
+	public Se3_F64 getCameraToWorld(@Nullable Se3_F64 cameraToWorld) {
+		if( cameraToWorld == null )
+			cameraToWorld = new Se3_F64();
+		Se3_F32 worldToCamera = panel.getWorldToCamera(null);
+		ConvertFloatType.convert(worldToCamera.invert(null),cameraToWorld);
+		return cameraToWorld;
+	}
+
+	@Override
 	public FastQueue<Point3dRgbI_F64> copyCloud(@Nullable FastQueue<Point3dRgbI_F64> copy) {
 		if( copy == null )
 			copy = new FastQueue<>(Point3dRgbI_F64.class,true);

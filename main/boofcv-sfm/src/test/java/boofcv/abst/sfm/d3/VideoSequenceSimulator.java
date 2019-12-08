@@ -120,10 +120,10 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> {
 		GImageMiscOps.fill(outputImage, 0);
 
 		for( Square s : squares ) {
-			Point2D_F64 p1 = PerspectiveOps.renderPixel(worldToCamera,K,s.a);
-			Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCamera,K,s.b);
-			Point2D_F64 p3 = PerspectiveOps.renderPixel(worldToCamera,K,s.c);
-			Point2D_F64 p4 = PerspectiveOps.renderPixel(worldToCamera,K,s.d);
+			Point2D_F64 p1 = PerspectiveOps.renderPixel(worldToCamera,K,s.a, null);
+			Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCamera,K,s.b, null);
+			Point2D_F64 p3 = PerspectiveOps.renderPixel(worldToCamera,K,s.c, null);
+			Point2D_F64 p4 = PerspectiveOps.renderPixel(worldToCamera,K,s.d, null);
 
 			if( p1 == null || p2 == null || p3 == null || p4 == null )
 				continue;
@@ -145,10 +145,10 @@ public class VideoSequenceSimulator<I extends ImageGray<I>> {
 
 		GImageMiscOps.fill(depthImage,0);
 		for( Square s : squares ) {
-			Point2D_F64 p1 = PerspectiveOps.renderPixel(worldToCamera,K,s.a);
-			Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCamera,K,s.b);
-			Point2D_F64 p3 = PerspectiveOps.renderPixel(worldToCamera,K,s.c);
-			Point2D_F64 p4 = PerspectiveOps.renderPixel(worldToCamera,K,s.d);
+			Point2D_F64 p1 = PerspectiveOps.renderPixel(worldToCamera,K,s.a, null);
+			Point2D_F64 p2 = PerspectiveOps.renderPixel(worldToCamera,K,s.b, null);
+			Point2D_F64 p3 = PerspectiveOps.renderPixel(worldToCamera,K,s.c, null);
+			Point2D_F64 p4 = PerspectiveOps.renderPixel(worldToCamera,K,s.d, null);
 
 			if( p1 == null || p2 == null || p3 == null || p4 == null )
 				continue;

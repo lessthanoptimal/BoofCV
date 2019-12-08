@@ -508,36 +508,41 @@ public class PerspectiveOps {
 	 * @param worldToCamera Transform from world to camera frame
 	 * @param K Optional.  Intrinsic camera calibration matrix.  If null then normalized image coordinates are returned.
 	 * @param X 3D Point in world reference frame..
+	 * @param pixel (Output) storage for the rendered pixel
 	 * @return 2D Render point on image plane or null if it's behind the camera
 	 */
-	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , DMatrixRMaj K , Point3D_F64 X ) {
-		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,K,X);
+	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X, Point2D_F64 pixel) {
+		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,K,X, pixel);
 //		if( K == null )
 //			return renderPixel(worldToCamera,X);
 //		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,
 //				K.data[0], K.data[1], K.data[2], K.data[4], K.data[5], X);
 	}
 
-	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , CameraPinhole K , Point3D_F64 X ) {
+	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, CameraPinhole K, Point3D_F64 X, Point2D_F64 pixel) {
 		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,
-				K.fy, K.skew, K.cx, K.fy, K.cy, X);
+				K.fy, K.skew, K.cx, K.fy, K.cy, X, pixel);
 	}
 
-	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , Point3D_F64 X ) {
+	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, Point3D_F64 X, Point2D_F64 pixel) {
 		return ImplPerspectiveOps_F64.renderPixel(worldToCamera,
-				1, 0, 0, 1, 0, X);
+				1, 0, 0, 1, 0, X, pixel);
 	}
 
 	/**
-	 * Renders a point in camera coordinates into the image plane in pixels.
+	 * Renders a point in camera coordinates into the image plane in pixels. Does not check to see
+	 * if the point is behind the camera or not
 	 *
 	 * @param intrinsic Intrinsic camera parameters.
-	 * @param X 3D Point in world reference frame..
-	 * @return 2D Render point on image plane or null if it's behind the camera
+	 * @param X 3D Point in camera reference frame..
+	 * @param pixel (Output) Storage for output pixel. Can be null
+	 * @return 2D Render point on image plane
 	 */
-	public static Point2D_F64 renderPixel(CameraPinhole intrinsic , Point3D_F64 X ) {
-		Point2D_F64 norm = new Point2D_F64(X.x/X.z,X.y/X.z);
-		return convertNormToPixel(intrinsic, norm, norm);
+	public static Point2D_F64 renderPixel(CameraPinhole intrinsic, Point3D_F64 X, Point2D_F64 pixel) {
+		if( pixel == null )
+			pixel = new Point2D_F64();
+		pixel.set(X.x/X.z,X.y/X.z);
+		return convertNormToPixel(intrinsic, pixel, pixel);
 	}
 
 	/**

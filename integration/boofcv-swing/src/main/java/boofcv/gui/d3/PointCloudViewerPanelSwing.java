@@ -36,6 +36,7 @@ import georegression.transform.se.SePointOps_F32;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -79,7 +80,8 @@ public class PointCloudViewerPanelSwing extends JPanel
 	float hfov = UtilAngle.radian(50);
 
 	// transform from world frame to camera frame
-	Se3_F32 worldToCamera = new Se3_F32();
+	// Only write to it inside the UI thread. If it is read outside of the UI thread then it needs to be locked
+	final Se3_F32 worldToCamera = new Se3_F32();
 
 	// how far it moves in the world frame for each key press
 	float stepSize;
@@ -175,6 +177,18 @@ public class PointCloudViewerPanelSwing extends JPanel
 			cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
 			cloudColor.data[i] = pointsRGB[i];
 		}
+	}
+
+	/**
+	 * Returns a copy of the worldToCamera transform
+	 */
+	public Se3_F32 getWorldToCamera(@Nullable Se3_F32 worldToCamera ) {
+		if( worldToCamera == null )
+			worldToCamera = new Se3_F32();
+		synchronized (this.worldToCamera ) {
+			worldToCamera.set(this.worldToCamera);
+		}
+		return worldToCamera;
 	}
 
 	@Override
@@ -400,8 +414,10 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 		Se3_F32 rotTran = new Se3_F32();
 		ConvertRotation3D_F32.eulerToMatrix(EulerType.XYZ,rotX,rotY,rotZ,rotTran.getR());
-		Se3_F32 temp = worldToCamera.concat(rotTran,null);
-		worldToCamera.set(temp);
+		synchronized (worldToCamera) {
+			Se3_F32 temp = worldToCamera.concat(rotTran, null);
+			worldToCamera.set(temp);
+		}
 
 		prevX = e.getX();
 		prevY = e.getY();

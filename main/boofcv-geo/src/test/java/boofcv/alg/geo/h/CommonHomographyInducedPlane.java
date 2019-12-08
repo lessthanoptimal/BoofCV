@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,8 +79,8 @@ public class CommonHomographyInducedPlane {
 	public static AssociatedPair render( Se3_F64 leftToRight , DMatrixRMaj K , Point3D_F64 X1 ) {
 		AssociatedPair ret = new AssociatedPair();
 
-		ret.p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X1);
-		ret.p2 = PerspectiveOps.renderPixel(leftToRight,K,X1);
+		ret.p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X1, null);
+		ret.p2 = PerspectiveOps.renderPixel(leftToRight,K,X1, null);
 
 		return ret;
 	}

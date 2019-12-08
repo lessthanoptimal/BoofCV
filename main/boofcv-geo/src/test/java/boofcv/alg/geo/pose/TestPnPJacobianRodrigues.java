@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,7 +68,7 @@ public class TestPnPJacobianRodrigues {
 			p.location.set( rand.nextGaussian()*0.1,
 					rand.nextGaussian()*0.2 , 3 + rand.nextGaussian() );
 
-			p.observation = PerspectiveOps.renderPixel(worldToCamera, p.location);
+			p.observation = PerspectiveOps.renderPixel(worldToCamera, p.location, null);
 
 			p.observation.x += rand.nextGaussian()*noise;
 			p.observation.y += rand.nextGaussian()*noise;

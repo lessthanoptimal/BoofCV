@@ -129,19 +129,19 @@ public abstract class CommonTrifocalChecks {
 			worldPts.add(p);
 
 			AssociatedTriple o = new AssociatedTriple();
-			o.p1 = PerspectiveOps.renderPixel(new Se3_F64(), p);
+			o.p1 = PerspectiveOps.renderPixel(new Se3_F64(), p, null);
 			o.p2 = PerspectiveOps.renderPixel(P2,p);
 			o.p3 = PerspectiveOps.renderPixel(P3,p);
 
 			AssociatedTriple oP = new AssociatedTriple();
-			oP.p1 = PerspectiveOps.renderPixel(new Se3_F64(), K, p);
+			oP.p1 = PerspectiveOps.renderPixel(new Se3_F64(), K, p, null);
 			oP.p2 = PerspectiveOps.renderPixel(P2,p);
 			oP.p3 = PerspectiveOps.renderPixel(P3,p);
 
 			AssociatedTriple oN = new AssociatedTriple();
-			oN.p1 = PerspectiveOps.renderPixel(new Se3_F64(), p);
-			oN.p2 = PerspectiveOps.renderPixel(worldToCam2,p);
-			oN.p3 = PerspectiveOps.renderPixel(worldToCam3,p);
+			oN.p1 = PerspectiveOps.renderPixel(new Se3_F64(), p, null);
+			oN.p2 = PerspectiveOps.renderPixel(worldToCam2,p, null);
+			oN.p3 = PerspectiveOps.renderPixel(worldToCam3,p, null);
 
 			observations.add(o);
 			observationsPixels.add(oP);

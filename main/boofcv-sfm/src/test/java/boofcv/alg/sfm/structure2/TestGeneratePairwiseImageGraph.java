@@ -194,8 +194,8 @@ class TestGeneratePairwiseImageGraph {
 			Point3D_F64 X = feats3D.get(i);
 			AssociatedPair a = associated.grow();
 
-			a.p1.set(PerspectiveOps.renderPixel(intrinsic,X));
-			a.p2.set(PerspectiveOps.renderPixel(view0_to_view1,intrinsic,X));
+			a.p1.set(PerspectiveOps.renderPixel(intrinsic,X, null));
+			a.p2.set(PerspectiveOps.renderPixel(view0_to_view1,intrinsic,X, null));
 
 			// add a little bit of noise so that it isn't perfect
 			a.p1.x += rand.nextGaussian()*0.5;

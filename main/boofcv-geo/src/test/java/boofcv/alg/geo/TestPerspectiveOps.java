@@ -108,13 +108,13 @@ class TestPerspectiveOps {
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(param, (DMatrixRMaj)null);
 
 		// find the pixel location in the unscaled image
-		Point2D_F64 a = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
+		Point2D_F64 a = PerspectiveOps.renderPixel(new Se3_F64(),K,X, null);
 
 		PerspectiveOps.scaleIntrinsic(param,0.5);
 		K = PerspectiveOps.pinholeToMatrix(param,(DMatrixRMaj)null);
 
 		// find the pixel location in the scaled image
-		Point2D_F64 b = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
+		Point2D_F64 b = PerspectiveOps.renderPixel(new Se3_F64(),K,X, null);
 
 		assertEquals(a.x*0.5,b.x,1e-8);
 		assertEquals(a.y*0.5,b.y,1e-8);
@@ -345,7 +345,7 @@ class TestPerspectiveOps {
 		Point2D_F64 found;
 
 		// calibrated case
-		found = PerspectiveOps.renderPixel(worldToCamera,X);
+		found = PerspectiveOps.renderPixel(worldToCamera,X, null);
 		assertEquals(X_cam.x/X_cam.z,found.x,1e-8);
 		assertEquals(X_cam.y/X_cam.z,found.y,1e-8);
 
@@ -355,7 +355,7 @@ class TestPerspectiveOps {
 		expected.y = X_cam.y/X_cam.z;
 		GeometryMath_F64.mult(K,expected,expected);
 
-		found = PerspectiveOps.renderPixel(worldToCamera,K,X);
+		found = PerspectiveOps.renderPixel(worldToCamera,K,X, null);
 		assertEquals(expected.x,found.x,1e-8);
 		assertEquals(expected.y,found.y,1e-8);
 	}
@@ -372,7 +372,7 @@ class TestPerspectiveOps {
 		Point2D_F64 expected = new Point2D_F64();
 		PerspectiveOps.convertNormToPixel(intrinsic,normX,normY,expected);
 
-		Point2D_F64 found = PerspectiveOps.renderPixel(intrinsic,X);
+		Point2D_F64 found = PerspectiveOps.renderPixel(intrinsic,X, null);
 
 		assertEquals(expected.x,found.x,1e-8);
 		assertEquals(expected.y,found.y,1e-8);

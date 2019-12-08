@@ -60,9 +60,9 @@ public class TestThreeViewEstimateMetricScene {
 		for (int i = 0; i < features.size(); i++) {
 			Point3D_F64 X = features.get(i);
 
-			Point2D_F64 x0 = PerspectiveOps.renderPixel(intrinsic,X);
-			Point2D_F64 x1 = PerspectiveOps.renderPixel(view0_to_view1,intrinsic,X);
-			Point2D_F64 x2 = PerspectiveOps.renderPixel(view0_to_view2,intrinsic,X);
+			Point2D_F64 x0 = PerspectiveOps.renderPixel(intrinsic,X, null);
+			Point2D_F64 x1 = PerspectiveOps.renderPixel(view0_to_view1,intrinsic,X, null);
+			Point2D_F64 x2 = PerspectiveOps.renderPixel(view0_to_view2,intrinsic,X, null);
 
 			views.add(new AssociatedTriple(x0,x1,x2));
 		}

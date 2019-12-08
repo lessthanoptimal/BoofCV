@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,9 +94,9 @@ public class TestSelfCalibrationLinearDualQuadratic extends CommonAutoCalibratio
 			Point3D_F64 X = cloud.get(i);
 
 			AssociatedTriple t = new AssociatedTriple();
-			t.p1 = PerspectiveOps.renderPixel(listCameraToWorld.get(0),intrinsic,X);
-			t.p2 = PerspectiveOps.renderPixel(listCameraToWorld.get(1),intrinsic,X);
-			t.p3 = PerspectiveOps.renderPixel(listCameraToWorld.get(2),intrinsic,X);
+			t.p1 = PerspectiveOps.renderPixel(listCameraToWorld.get(0),intrinsic,X, null);
+			t.p2 = PerspectiveOps.renderPixel(listCameraToWorld.get(1),intrinsic,X, null);
+			t.p3 = PerspectiveOps.renderPixel(listCameraToWorld.get(2),intrinsic,X, null);
 
 			obs.add(t);
 		}

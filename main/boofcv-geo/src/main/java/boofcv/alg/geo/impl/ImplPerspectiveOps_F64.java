@@ -186,7 +186,7 @@ public class ImplPerspectiveOps_F64 {
 	}
 
 
-	public static Point2D_F64 renderPixel( Se3_F64 worldToCamera , DMatrixRMaj K , Point3D_F64 X ) {
+	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera, DMatrixRMaj K, Point3D_F64 X, @Nullable Point2D_F64 pixel) {
 		Point3D_F64 X_cam = new Point3D_F64();
 
 		SePointOps_F64.transform(worldToCamera, X, X_cam);
@@ -195,18 +195,22 @@ public class ImplPerspectiveOps_F64 {
 		if( X_cam.z <= 0 )
 			return null;
 
-		Point2D_F64 norm = new Point2D_F64(X_cam.x/X_cam.z,X_cam.y/X_cam.z);
+		if( pixel == null )
+			pixel = new Point2D_F64();
+
+		pixel.set(X_cam.x/X_cam.z,X_cam.y/X_cam.z);
 
 		if( K == null )
-			return norm;
+			return pixel;
 
 		// convert into pixel coordinates
-		return GeometryMath_F64.mult(K, norm, norm);
+		return GeometryMath_F64.mult(K, pixel, pixel);
 	}
 
 	public static Point2D_F64 renderPixel(Se3_F64 worldToCamera,
 										  double fx, double skew, double cx, double fy, double cy,
-										  Point3D_F64 X) {
+										  Point3D_F64 X, @Nullable Point2D_F64 pixel) {
+
 		Point3D_F64 X_cam = new Point3D_F64();
 
 		SePointOps_F64.transform(worldToCamera, X, X_cam);
@@ -215,10 +219,12 @@ public class ImplPerspectiveOps_F64 {
 		if( X_cam.z <= 0 )
 			return null;
 
+		if( pixel == null )
+			pixel = new Point2D_F64();
+
 		double xx = X_cam.x/X_cam.z;
 		double yy = X_cam.y/X_cam.z;
 
-		Point2D_F64 pixel = new Point2D_F64();
 		pixel.x = fx*xx + skew*yy + cx;
 		pixel.y = fy*yy + cy;
 

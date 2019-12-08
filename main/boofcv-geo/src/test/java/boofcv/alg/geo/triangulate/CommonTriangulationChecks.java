@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,7 +105,7 @@ public class CommonTriangulationChecks {
 
 			SePointOps_F64.transform(tranWtoI, worldPoint,cameraPoint);
 
-			Point2D_F64 pixel = PerspectiveOps.renderPixel(intrinsic,cameraPoint);
+			Point2D_F64 pixel = PerspectiveOps.renderPixel(intrinsic,cameraPoint, null);
 
 			obsPts.add(pixel);
 			motionWorldToCamera.add(tranWtoI);

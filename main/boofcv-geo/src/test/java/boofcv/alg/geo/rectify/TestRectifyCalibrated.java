@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,10 +72,10 @@ public class TestRectifyCalibrated {
 		Point3D_F64 X = new Point3D_F64(0,0,3);
 
 		// compare results, both should match because of rotation only being around y-axis
-		assertEquals(PerspectiveOps.renderPixel(poseR1,K,X).x, PerspectiveOps.renderPixel(foundP1,X).x,1e-5);
-		assertEquals(PerspectiveOps.renderPixel(poseR1,K,X).y, PerspectiveOps.renderPixel(foundP1,X).y,1e-5);
-		assertEquals(PerspectiveOps.renderPixel(poseR2,K,X).x, PerspectiveOps.renderPixel(foundP2,X).x,1e-5);
-		assertEquals(PerspectiveOps.renderPixel(poseR2,K,X).y, PerspectiveOps.renderPixel(foundP2,X).y,1e-5);
+		assertEquals(PerspectiveOps.renderPixel(poseR1,K,X, null).x, PerspectiveOps.renderPixel(foundP1,X).x,1e-5);
+		assertEquals(PerspectiveOps.renderPixel(poseR1,K,X, null).y, PerspectiveOps.renderPixel(foundP1,X).y,1e-5);
+		assertEquals(PerspectiveOps.renderPixel(poseR2,K,X, null).x, PerspectiveOps.renderPixel(foundP2,X).x,1e-5);
+		assertEquals(PerspectiveOps.renderPixel(poseR2,K,X, null).y, PerspectiveOps.renderPixel(foundP2,X).y,1e-5);
 	}
 
 	/**
@@ -91,8 +91,8 @@ public class TestRectifyCalibrated {
 		Se3_F64 poseA2 = createPose(0.2,-0.1,0.02,    1  ,0,0.1).invert(null);
 
 		// project epipoles
-		Point2D_F64 epi1 = PerspectiveOps.renderPixel(poseA1, K, new Point3D_F64(1, 0, 0.1));
-		Point2D_F64 epi2 = PerspectiveOps.renderPixel(poseA2, K, new Point3D_F64(0.1, 0, 0.1));
+		Point2D_F64 epi1 = PerspectiveOps.renderPixel(poseA1, K, new Point3D_F64(1, 0, 0.1), null);
+		Point2D_F64 epi2 = PerspectiveOps.renderPixel(poseA2, K, new Point3D_F64(0.1, 0, 0.1), null);
 
 		// compute transforms
 		RectifyCalibrated alg = new RectifyCalibrated();
@@ -139,8 +139,8 @@ public class TestRectifyCalibrated {
 		Point3D_F64 X = new Point3D_F64(0,0,4);
 
 		// unrectified observation
-		Point2D_F64 o1 = PerspectiveOps.renderPixel(poseA1, K1, X);
-		Point2D_F64 o2 = PerspectiveOps.renderPixel(poseA2, K2, X);
+		Point2D_F64 o1 = PerspectiveOps.renderPixel(poseA1, K1, X, null);
+		Point2D_F64 o2 = PerspectiveOps.renderPixel(poseA2, K2, X, null);
 
 		// original observations should not line up
 		assertTrue(Math.abs(o1.y - o2.y) > 1e-8 );

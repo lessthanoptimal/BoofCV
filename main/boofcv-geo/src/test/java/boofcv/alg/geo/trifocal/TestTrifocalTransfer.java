@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,9 +37,9 @@ public class TestTrifocalTransfer extends CommonTrifocalChecks {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
-		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
-		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X, null);
+		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X, null);
+		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X, null);
 
 		Point3D_F64 found = new Point3D_F64();
 		TrifocalTransfer alg = new TrifocalTransfer();
@@ -59,9 +59,9 @@ public class TestTrifocalTransfer extends CommonTrifocalChecks {
 
 		// When the tensor was constructed the first view was assumed to be [I|0], which
 		// is why normalized image coordinates are used for the first view
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X);
-		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X);
-		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),X, null);
+		Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2,K,X, null);
+		Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3,K,X, null);
 
 		Point3D_F64 found = new Point3D_F64();
 		TrifocalTransfer alg = new TrifocalTransfer();

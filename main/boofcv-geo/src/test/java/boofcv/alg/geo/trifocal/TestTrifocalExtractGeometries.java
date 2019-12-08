@@ -130,9 +130,9 @@ public class TestTrifocalExtractGeometries extends CommonTrifocalChecks {
 			Point3D_F64 X = new Point3D_F64(0.1,0.05,2);
 
 			// remember the first view is assumed to have a projection matrix of [I|0]
-			Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(), X);
-			Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2, K, X);
-			Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3, K, X);
+			Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(), X, null);
+			Point2D_F64 x2 = PerspectiveOps.renderPixel(worldToCam2, K, X, null);
+			Point2D_F64 x3 = PerspectiveOps.renderPixel(worldToCam3, K, X, null);
 
 			assertEquals(0, MultiViewOps.constraint(found2, x1, x2), 1e-8);
 			assertEquals(0, MultiViewOps.constraint(found3, x1, x3), 1e-8);

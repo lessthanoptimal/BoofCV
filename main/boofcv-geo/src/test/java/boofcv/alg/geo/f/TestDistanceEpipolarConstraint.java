@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,8 +48,8 @@ public class TestDistanceEpipolarConstraint {
 	public TestDistanceEpipolarConstraint() {
 		worldToCamera.getT().set(0.1,-0.1,0.2);
 
-		p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X);
-		p2 = PerspectiveOps.renderPixel(worldToCamera,K,X);
+		p1 = PerspectiveOps.renderPixel(new Se3_F64(),K,X, null);
+		p2 = PerspectiveOps.renderPixel(worldToCamera,K,X, null);
 
 		E = MultiViewOps.createEssential(worldToCamera.getR(),worldToCamera.getT(), null);
 		F = MultiViewOps.createFundamental(E,K);

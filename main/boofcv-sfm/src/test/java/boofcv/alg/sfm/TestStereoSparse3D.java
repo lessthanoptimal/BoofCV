@@ -73,8 +73,8 @@ public class TestStereoSparse3D {
 		Point3D_F64 X = new Point3D_F64(0.2,-0.34,3);
 
 		// original pixel coordinates
-		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),K1,X);
-		Point2D_F64 x2 = PerspectiveOps.renderPixel(param.rightToLeft.invert(null),K2,X);
+		Point2D_F64 x1 = PerspectiveOps.renderPixel(new Se3_F64(),K1,X, null);
+		Point2D_F64 x2 = PerspectiveOps.renderPixel(param.rightToLeft.invert(null),K2,X, null);
 
 		Point2Transform2_F64 pixelToRect1 = RectifyImageOps.transformPixelToRect(param.left, alg.rect1);
 		Point2Transform2_F64 pixelToRect2 = RectifyImageOps.transformPixelToRect(param.right, alg.rect2);

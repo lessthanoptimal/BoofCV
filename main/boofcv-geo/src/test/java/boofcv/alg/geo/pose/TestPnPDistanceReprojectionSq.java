@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ public class TestPnPDistanceReprojectionSq {
 		double deltaY = -0.2;
 
 		// create a noisy observed
-		Point2D_F64 observed = PerspectiveOps.renderPixel(worldToCamera, K, X);
+		Point2D_F64 observed = PerspectiveOps.renderPixel(worldToCamera, K, X, null);
 
 		observed.x += deltaX;
 		observed.y += deltaY;
@@ -88,7 +88,7 @@ public class TestPnPDistanceReprojectionSq {
 		// Point location in world frame
 		Point3D_F64 X = new Point3D_F64(0.1,-0.04,2.3);
 
-		Point2D_F64 observed = PerspectiveOps.renderPixel(worldToCamera, K, X);
+		Point2D_F64 observed = PerspectiveOps.renderPixel(worldToCamera, K, X, null);
 
 		PnPDistanceReprojectionSq alg = new PnPDistanceReprojectionSq();
 		alg.setIntrinsic(0, PerspectiveOps.matrixToPinhole(K,0,0,null));
@@ -117,7 +117,7 @@ public class TestPnPDistanceReprojectionSq {
 					new Point3D_F64(rand.nextGaussian()*0.2,rand.nextGaussian()*0.2,2.3+rand.nextGaussian()*0.2);
 
 			// create a noisy observed
-			Point2D_F64 observed = PerspectiveOps.renderPixel(worldToCamera, K, X);
+			Point2D_F64 observed = PerspectiveOps.renderPixel(worldToCamera, K, X, null);
 
 			double deltaX = rand.nextGaussian()*0.2;
 			double deltaY = rand.nextGaussian()*0.2;

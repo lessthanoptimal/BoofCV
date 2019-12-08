@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,8 +53,8 @@ public class TestNormalizedToPixelError {
 
 		Point3D_F64 X = new Point3D_F64(0.1,-0.02,3);
 
-		n0 = PerspectiveOps.renderPixel(worldToCamera,X);
-		p0 = PerspectiveOps.renderPixel(worldToCamera,K,X);
+		n0 = PerspectiveOps.renderPixel(worldToCamera,X, null);
+		p0 = PerspectiveOps.renderPixel(worldToCamera,K,X, null);
 
 		p1 = p0.copy();
 		p1.x += 0.2;

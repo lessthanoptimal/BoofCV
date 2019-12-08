@@ -106,6 +106,13 @@ public interface PointCloudViewer {
 	void setCameraToWorld(Se3_F64 cameraToWorld );
 
 	/**
+	 * Returns a copy of the camera to world transform currently being used
+	 * @param storage (Optional) storage for the transform
+	 * @return The transform
+	 */
+	Se3_F64 getCameraToWorld( @Nullable Se3_F64 storage );
+
+	/**
 	 * Copies the point cloud into the passed in list.
 	 *
 	 * @param copy Where the cloud should be copied into. if null a new instance is created

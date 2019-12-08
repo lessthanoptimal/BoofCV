@@ -92,7 +92,7 @@ class MockLookupSimilarImages implements LookupSimilarImages{
 
 			for (int obsID = 0; obsID < feats3D.size(); obsID++) {
 				Point3D_F64 X = feats3D.get(v2f[obsID]);
-				feats2D.add(PerspectiveOps.renderPixel(view0_to_viewi,intrinsic,X));
+				feats2D.add(PerspectiveOps.renderPixel(view0_to_viewi,intrinsic,X, null));
 			}
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,10 +53,10 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 		double deltaY1 = 0.05;
 
 		// create a noisy observed
-		Point2D_F64 obsLeft = PerspectiveOps.renderPixel(worldToLeft, K_left, X);
+		Point2D_F64 obsLeft = PerspectiveOps.renderPixel(worldToLeft, K_left, X, null);
 		obsLeft.x += deltaX0;
 		obsLeft.y += deltaY0;
-		Point2D_F64 obsRight = PerspectiveOps.renderPixel(worldToRight, K_right, X);
+		Point2D_F64 obsRight = PerspectiveOps.renderPixel(worldToRight, K_right, X, null);
 		obsRight.x += deltaX1;
 		obsRight.y += deltaY1;
 
@@ -98,8 +98,8 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 			DMatrixRMaj K_right = PerspectiveOps.pinholeToMatrix(param.right, (DMatrixRMaj)null);
 
 			// create a noisy observed
-			Point2D_F64 obsLeft = PerspectiveOps.renderPixel(worldToLeft, K_left, X);
-			Point2D_F64 obsRight = PerspectiveOps.renderPixel(worldToRight, K_right, X);
+			Point2D_F64 obsLeft = PerspectiveOps.renderPixel(worldToLeft, K_left, X, null);
+			Point2D_F64 obsRight = PerspectiveOps.renderPixel(worldToRight, K_right, X, null);
 
 			// convert to normalized image coordinates
 			PerspectiveOps.convertPixelToNorm(K_left,obsLeft,obsLeft);
@@ -135,10 +135,10 @@ public class TestPnPStereoDistanceReprojectionSq extends CommonStereoMotionNPoin
 			Point3D_F64 X = new Point3D_F64(rand.nextGaussian(),rand.nextGaussian(),2.3);
 
 			// create a noisy observed
-			Point2D_F64 obsLeft = PerspectiveOps.renderPixel(worldToLeft, K_left, X);
+			Point2D_F64 obsLeft = PerspectiveOps.renderPixel(worldToLeft, K_left, X, null);
 			obsLeft.x += rand.nextGaussian()*0.05;
 			obsLeft.y += rand.nextGaussian()*0.05;
-			Point2D_F64 obsRight = PerspectiveOps.renderPixel(worldToRight, K_right, X);
+			Point2D_F64 obsRight = PerspectiveOps.renderPixel(worldToRight, K_right, X, null);
 			obsRight.x += rand.nextGaussian()*0.05;
 			obsRight.y += rand.nextGaussian()*0.05;
 

@@ -73,15 +73,21 @@ public class ImagePanel extends JPanel {
 
 	public ImagePanel( boolean addMouseListener ) {
 		if( addMouseListener ) {
-			// Adds the ability to save an image using the middle mouse button.  A dialog is shown to the user
-			// so that they know what has happened.  They can hide it in the future if they wish.
-			mouseListener = new SaveImageOnClick(this);
-			addMouseListener(mouseListener);
+			addClickToSaveListener();
 		}
 	}
 
 	public ImagePanel() {
 		this(true);
+	}
+
+	/**
+	 * Adds the ability to save an image using the middle mouse button.  A dialog is shown to the user
+	 * so that they know what has happened.  They can hide it in the future if they wish.
+	 */
+	public void addClickToSaveListener() {
+		mouseListener = new SaveImageOnClick(this);
+		addMouseListener(mouseListener);
 	}
 
 	@Override
