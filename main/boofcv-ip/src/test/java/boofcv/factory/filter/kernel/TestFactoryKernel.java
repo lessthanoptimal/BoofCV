@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ public class TestFactoryKernel {
 
 	@Test
 	public void table1D_I32() {
-		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(3);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(3);
 
 		assertEquals(7,kernel.width);
 

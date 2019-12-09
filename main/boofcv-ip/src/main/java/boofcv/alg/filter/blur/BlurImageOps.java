@@ -28,6 +28,10 @@ import boofcv.alg.filter.convolve.ConvolveImageNormalized;
 import boofcv.concurrency.*;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_F64;
+import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.convolve.Kernel1D_S32;
@@ -59,7 +63,7 @@ public class BlurImageOps {
 	public static GrayU8 mean(GrayU8 input, @Nullable GrayU8 output, int radius,
 							  @Nullable GrayU8 storage, @Nullable IWorkArrays workVert ) {
 
-		return mean(input, output, radius, radius, storage, workVert);
+		return mean(input, output, radius, radius, null, storage, workVert);
 	}
 
 	/**
@@ -73,6 +77,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU8 mean( GrayU8 input, @Nullable GrayU8 output, int radiusX, int radiusY,
+							  @Nullable ImageBorder_S32<GrayU8> binput,
 							  @Nullable GrayU8 storage, @Nullable IWorkArrays workVert ) {
 
 		if( radiusX <= 0 || radiusY <= 0)
@@ -81,11 +86,17 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, binput, storage);
 
-		if( !processed ){
+		if( processed )
+			return output;
+
+		if( binput == null ) {
 			ConvolveImageMean.horizontal(input, storage, radiusX);
 			ConvolveImageMean.vertical(storage, output, radiusY, workVert);
+		} else {
+			ConvolveImageMean.horizontal(input, storage, radiusX, binput);
+			ConvolveImageMean.vertical(storage, output, radiusY, binput, workVert);
 		}
 
 		return output;
@@ -201,7 +212,7 @@ public class BlurImageOps {
 	public static GrayU16 mean(GrayU16 input, @Nullable GrayU16 output, int radius,
 							  @Nullable GrayU16 storage, @Nullable IWorkArrays workVert ) {
 
-		return mean(input, output, radius, radius, storage, workVert);
+		return mean(input, output, radius, radius, null, storage, workVert);
 	}
 
 	/**
@@ -215,6 +226,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU16 mean( GrayU16 input, @Nullable GrayU16 output, int radiusX, int radiusY,
+							  @Nullable ImageBorder_S32<GrayU16> binput,
 							  @Nullable GrayU16 storage, @Nullable IWorkArrays workVert ) {
 
 		if( radiusX <= 0 || radiusY <= 0)
@@ -223,11 +235,17 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, binput, storage);
 
-		if( !processed ){
+		if( processed )
+			return output;
+
+		if( binput == null ) {
 			ConvolveImageMean.horizontal(input, storage, radiusX);
 			ConvolveImageMean.vertical(storage, output, radiusY, workVert);
+		} else {
+			ConvolveImageMean.horizontal(input, storage, radiusX, binput);
+			ConvolveImageMean.vertical(storage, output, radiusY, binput, workVert);
 		}
 
 		return output;
@@ -343,7 +361,7 @@ public class BlurImageOps {
 	public static GrayF32 mean(GrayF32 input, @Nullable GrayF32 output, int radius,
 							  @Nullable GrayF32 storage, @Nullable FWorkArrays workVert ) {
 
-		return mean(input, output, radius, radius, storage, workVert);
+		return mean(input, output, radius, radius, null, storage, workVert);
 	}
 
 	/**
@@ -357,6 +375,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF32 mean( GrayF32 input, @Nullable GrayF32 output, int radiusX, int radiusY,
+							  @Nullable ImageBorder_F32 binput,
 							  @Nullable GrayF32 storage, @Nullable FWorkArrays workVert ) {
 
 		if( radiusX <= 0 || radiusY <= 0)
@@ -365,11 +384,17 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, binput, storage);
 
-		if( !processed ){
+		if( processed )
+			return output;
+
+		if( binput == null ) {
 			ConvolveImageMean.horizontal(input, storage, radiusX);
 			ConvolveImageMean.vertical(storage, output, radiusY, workVert);
+		} else {
+			ConvolveImageMean.horizontal(input, storage, radiusX, binput);
+			ConvolveImageMean.vertical(storage, output, radiusY, binput, workVert);
 		}
 
 		return output;
@@ -485,7 +510,7 @@ public class BlurImageOps {
 	public static GrayF64 mean(GrayF64 input, @Nullable GrayF64 output, int radius,
 							  @Nullable GrayF64 storage, @Nullable DWorkArrays workVert ) {
 
-		return mean(input, output, radius, radius, storage, workVert);
+		return mean(input, output, radius, radius, null, storage, workVert);
 	}
 
 	/**
@@ -499,6 +524,7 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF64 mean( GrayF64 input, @Nullable GrayF64 output, int radiusX, int radiusY,
+							  @Nullable ImageBorder_F64 binput,
 							  @Nullable GrayF64 storage, @Nullable DWorkArrays workVert ) {
 
 		if( radiusX <= 0 || radiusY <= 0)
@@ -507,11 +533,17 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, binput, storage);
 
-		if( !processed ){
+		if( processed )
+			return output;
+
+		if( binput == null ) {
 			ConvolveImageMean.horizontal(input, storage, radiusX);
 			ConvolveImageMean.vertical(storage, output, radiusY, workVert);
+		} else {
+			ConvolveImageMean.horizontal(input, storage, radiusX, binput);
+			ConvolveImageMean.vertical(storage, output, radiusY, binput, workVert);
 		}
 
 		return output;
@@ -678,9 +710,9 @@ public class BlurImageOps {
 	 */
 	public static <T extends ImageGray<T>>
 	Planar<T> mean(Planar<T> input, @Nullable Planar<T> output, int radius ,
-				   @Nullable T storage , @Nullable WorkArrays workVert )
+				   @Nullable ImageBorder<T> border, @Nullable T storage , @Nullable WorkArrays workVert )
 	{
-		return mean(input,output,radius,radius,storage,workVert);
+		return mean(input,output,radius,radius,border,storage,workVert);
 	}
 
 	/**
@@ -695,7 +727,7 @@ public class BlurImageOps {
 	 */
 	public static <T extends ImageGray<T>>
 	Planar<T> mean(Planar<T> input, @Nullable Planar<T> output, int radiusX , int radiusY,
-				   @Nullable T storage , @Nullable WorkArrays workVert )
+				   @Nullable ImageBorder<T> border, @Nullable T storage , @Nullable WorkArrays workVert )
 	{
 		if( storage == null )
 			storage = GeneralizedImageOps.createSingleBand(input.getBandType(),input.width,input.height);
@@ -703,7 +735,7 @@ public class BlurImageOps {
 			output = input.createNew(input.width,input.height);
 
 		for( int band = 0; band < input.getNumBands(); band++ ) {
-			GBlurImageOps.mean(input.getBand(band),output.getBand(band),radiusX,radiusY, storage, workVert);
+			GBlurImageOps.mean(input.getBand(band),output.getBand(band),radiusX,radiusY,border,storage, workVert);
 		}
 		return output;
 	}

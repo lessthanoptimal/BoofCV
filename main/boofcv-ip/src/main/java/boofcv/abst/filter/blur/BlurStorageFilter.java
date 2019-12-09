@@ -21,6 +21,7 @@ package boofcv.abst.filter.blur;
 import boofcv.alg.filter.blur.GBlurImageOps;
 import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -45,6 +46,9 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	// type of image it processes
 	ImageType<T> inputType;
 	WorkArrays workArray;
+
+	// Specified how the border is handled for mean images. If null then it's normalized
+	ImageBorder<T> border = null;
 
 	public BlurStorageFilter( String functionName , ImageType<T> inputType, int radius) {
 		this(functionName,inputType,-1,radius,-1,radius);
@@ -85,6 +89,14 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 		} else {
 			storage = inputType.createImage(1,1);
 		}
+	}
+
+	public ImageBorder<T> getBorder() {
+		return border;
+	}
+
+	public void setBorder(ImageBorder<T> border) {
+		this.border = border;
 	}
 
 	/**
@@ -137,7 +149,7 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	private class MeanOperation implements BlurOperation {
 		@Override
 		public void process(ImageBase input, ImageBase output) {
-			GBlurImageOps.mean(input,output, radiusX,radiusY,storage,workArray);
+			GBlurImageOps.mean(input,output, radiusX,radiusY,(ImageBorder)border,storage,workArray);
 		}
 	}
 

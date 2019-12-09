@@ -24,7 +24,7 @@ import boofcv.generate.CodeGeneratorBase;
 import java.io.FileNotFoundException;
 
 /**
- * Code generator for {@link ConvolveJustBorder_General_SB}.
+ * Code generator
  *
  * @author Peter Abeles
  */
@@ -41,9 +41,15 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 
 		printPreamble();
 
-		createMethod(AutoTypeImage.F32);
-		createMethod(AutoTypeImage.I16);
-		createMethod(AutoTypeImage.S32);
+		createMethod(AutoTypeImage.I16,false);
+		createMethod(AutoTypeImage.S32,false);
+		createMethod(AutoTypeImage.F32,false);
+		createMethod(AutoTypeImage.F64,false);
+
+		createMethod(AutoTypeImage.I8,true);
+		createMethod(AutoTypeImage.I16,true);
+		createMethod(AutoTypeImage.S32,true);
+		createMethod(AutoTypeImage.F32,true);
 
 //		createBound(AutoTypeImage.F32);
 //		createBound(AutoTypeImage.I8);
@@ -51,7 +57,7 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 		out.println("}");
 	}
 
-	public void createMethod( AutoTypeImage imageOut ) {
+	public void createMethod( AutoTypeImage imageOut , boolean divide ) {
 		this.imageOut = imageOut;
 
 		typeKernel = imageOut.getKernelType();
@@ -61,9 +67,9 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 		sumType = imageOut.getSumType();
 		String typeCast = imageOut.getTypeCastFromSum();
 
-		addHorizontal(typeCast);
-		addVertical(typeCast);
-		addConvolution(typeCast);
+		addHorizontal(typeCast,divide);
+		addVertical(typeCast,divide);
+		addConvolution(typeCast,divide);
 	}
 
 	public void createBound( AutoTypeImage imageOut ) {
@@ -80,14 +86,15 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 	}
 
 	public void printPreamble() {
-		out.print("import boofcv.core.image.border.ImageBorder_F32;\n" +
-				"import boofcv.core.image.border.ImageBorder_S32;\n" +
+		out.print("import boofcv.struct.border.ImageBorder_F32;\n" +
+				"import boofcv.struct.border.ImageBorder_S32;\n" +
+				"import boofcv.struct.border.ImageBorder_F64;\n" +
 				"import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"\n" +
 				"/**\n" +
 				" * <p>\n" +
-				" * Convolves just the image's border.  How the border condition is handled is specified by the {@link boofcv.core.image.border.ImageBorder}\n" +
+				" * Convolves just the image's border.  How the border condition is handled is specified by the {@link boofcv.struct.border.ImageBorder}\n" +
 				" * passed in.  For 1D kernels only the horizontal or vertical borders are processed.\n" +
 				" * </p>\n" +
 				" * \n" +
@@ -100,11 +107,14 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 				"public class "+className+" {\n\n");
 	}
 
-	public void addHorizontal( String typeCast ) {
+	public void addHorizontal( String typeCast , boolean divide ) {
 		String typeOutput = imageOut.getSingleBandName();
 		String dataOutput = imageOut.getDataType();
+		String divideHeader = divide ? ", int divisor" : "";
+		String strTotal = divide ? "((total+halfDivisor)/divisor)" : "total";
+		String divideHalf = divide ? "\t\tfinal int halfDivisor = divisor/2;\n" : "";
 
-		out.print("\tpublic static void horizontal(Kernel1D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output ) {\n" +
+		out.print("\tpublic static void horizontal(Kernel1D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output "+divideHeader+") {\n" +
 				"\t\tfinal "+dataOutput+"[] dataDst = output.data;\n" +
 				"\t\tfinal "+dataKernel+"[] dataKer = kernel.data;\n" +
 				"\n" +
@@ -113,6 +123,7 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 				"\t\tfinal int width = output.getWidth();\n" +
 				"\t\tfinal int height = output.getHeight();\n" +
 				"\t\tfinal int borderRight = kernelWidth-offset-1;\n" +
+				divideHalf +
 				"\n" +
 				"\t\tfor (int y = 0; y < height; y++) {\n" +
 				"\t\t\tint indexDest = output.startIndex + y * output.stride;\n" +
@@ -122,7 +133,7 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 				"\t\t\t\tfor (int k = 0; k < kernelWidth; k++) {\n" +
 				"\t\t\t\t\ttotal += input.get(x+k-offset,y) * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDest++] = "+typeCast+"total;\n" +
+				"\t\t\t\tdataDst[indexDest++] = "+typeCast+""+strTotal+";\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\tindexDest = output.startIndex + y * output.stride + width-borderRight;\n" +
@@ -131,17 +142,20 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 				"\t\t\t\tfor (int k = 0; k < kernelWidth; k++) {\n" +
 				"\t\t\t\t\ttotal += input.get(x+k-offset,y) * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDest++] = "+typeCast+"total;\n" +
+				"\t\t\t\tdataDst[indexDest++] = "+typeCast+""+strTotal+";\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
-	public void addVertical( String typeCast ) {
+	public void addVertical( String typeCast , boolean divide ) {
 		String typeOutput = imageOut.getSingleBandName();
 		String dataOutput = imageOut.getDataType();
+		String divideHeader = divide ? ", int divisor" : "";
+		String strTotal = divide ? "((total+halfDivisor)/divisor)" : "total";
+		String divideHalf = divide ? "\t\tfinal int halfDivisor = divisor/2;\n" : "";
 
-		out.print("\tpublic static void vertical(Kernel1D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output ) {\n" +
+		out.print("\tpublic static void vertical(Kernel1D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output "+divideHeader+") {\n" +
 				"\t\tfinal "+dataOutput+"[] dataDst = output.data;\n" +
 				"\t\tfinal "+dataKernel+"[] dataKer = kernel.data;\n" +
 				"\n" +
@@ -150,6 +164,7 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 				"\t\tfinal int width = output.getWidth();\n" +
 				"\t\tfinal int height = output.getHeight();\n" +
 				"\t\tfinal int borderBottom = kernelWidth-offset-1;\n" +
+				divideHalf +
 				"\n" +
 				"\t\tfor ( int x = 0; x < width; x++ ) {\n" +
 				"\t\t\tint indexDest = output.startIndex + x;\n" +
@@ -159,7 +174,7 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 				"\t\t\t\tfor (int k = 0; k < kernelWidth; k++) {\n" +
 				"\t\t\t\t\ttotal += input.get(x,y+k-offset) * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDest] = "+typeCast+"total;\n" +
+				"\t\t\t\tdataDst[indexDest] = "+typeCast+""+strTotal+";\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\tindexDest = output.startIndex + (height-borderBottom) * output.stride + x;\n" +
@@ -168,17 +183,20 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 				"\t\t\t\tfor (int k = 0; k < kernelWidth; k++ ) {\n" +
 				"\t\t\t\t\ttotal += input.get(x,y+k-offset) * dataKer[k];\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDest] = "+typeCast+"total;\n" +
+				"\t\t\t\tdataDst[indexDest] = "+typeCast+""+strTotal+";\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
 
-	public void addConvolution( String typeCast ) {
+	public void addConvolution( String typeCast , boolean divide ) {
 		String typeOutput = imageOut.getSingleBandName();
 		String dataOutput = imageOut.getDataType();
+		String divideHeader = divide ? ", int divisor" : "";
+		String strTotal = divide ? "((total+halfDivisor)/divisor)" : "total";
+		String divideHalf = divide ? "\t\tfinal int halfDivisor = divisor/2;\n" : "";
 
-		out.print("\tpublic static void convolve(Kernel2D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output ) {\n" +
+		out.print("\tpublic static void convolve(Kernel2D_"+typeKernel+" kernel, "+typeInput+" input, "+typeOutput+" output "+divideHeader+") {\n" +
 				"\t\tfinal "+dataOutput+"[] dataDst = output.data;\n" +
 				"\t\tfinal "+dataKernel+"[] dataKer = kernel.data;\n" +
 				"\n" +
@@ -186,6 +204,7 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 				"\t\tfinal int offsetR = kernel.getWidth()-offsetL-1;\n"+
 				"\t\tfinal int width = output.getWidth();\n" +
 				"\t\tfinal int height = output.getHeight();\n" +
+				divideHalf +
 				"\n" +
 				"\t\t// convolve along the left and right borders\n" +
 				"\t\tfor (int y = 0; y < height; y++) {\n" +
@@ -199,7 +218,7 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDest++] = "+typeCast+"total;\n" +
+				"\t\t\t\tdataDst[indexDest++] = "+typeCast+""+strTotal+";\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\tindexDest = output.startIndex + y * output.stride + width-offsetR;\n" +
@@ -211,7 +230,7 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDest++] = "+typeCast+"total;\n" +
+				"\t\t\t\tdataDst[indexDest++] = "+typeCast+""+strTotal+";\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\n" +
@@ -227,7 +246,7 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDest] = "+typeCast+"total;\n" +
+				"\t\t\t\tdataDst[indexDest] = "+typeCast+""+strTotal+";\n" +
 				"\t\t\t}\n" +
 				"\n" +
 				"\t\t\tindexDest = output.startIndex + (height-offsetR) * output.stride + x;\n" +
@@ -239,7 +258,7 @@ public class GenerateConvolveJustBorder_General_SB extends CodeGeneratorBase {
 				"\t\t\t\t\t\ttotal += input.get(x+j,y+i) * dataKer[indexKer++];\n" +
 				"\t\t\t\t\t}\n" +
 				"\t\t\t\t}\n" +
-				"\t\t\t\tdataDst[indexDest] = "+typeCast+"total;\n" +
+				"\t\t\t\tdataDst[indexDest] = "+typeCast+""+strTotal+";\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

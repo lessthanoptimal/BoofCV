@@ -99,7 +99,7 @@ public class BenchmarkConvolveAbstracted {
 			System.out.println();
 			BenchmarkConvolveAbstracted.radius = radius;
 			kernelF32 = FactoryKernel.table1D_F32(radius,true);
-			kernelI32 = FactoryKernel.table1D_I32(radius);
+			kernelI32 = FactoryKernel.table1D_S32(radius);
 			
 
 			ProfileOperation.printOpsPerSec(new Convolve_Vertical_I8_I16(),TEST_TIME);

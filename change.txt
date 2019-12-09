@@ -27,6 +27,8 @@ Version : 0.35
   * Hough Polar Gradient type casted a float to an int when it shouldn't have
   * Added generalized function for copying rows and columns from images
   * Added the ability to make a copy of an ImageBorder
+  * Mean filter now supports different image border methods
+  * TODO ImageMiscOps.growBorder(src,border,dst)
 - Template Match
   * Fixed bug where if the template matched the input image it would not be processed
     * Thanks waicool20 for reporting this bug

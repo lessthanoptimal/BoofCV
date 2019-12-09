@@ -20,7 +20,10 @@ package boofcv.alg.filter.blur;
 
 import boofcv.override.BOverrideClass;
 import boofcv.override.BOverrideManager;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
+
+import javax.annotation.Nullable;
 
 /**
  * Override for blur image ops functions
@@ -38,7 +41,7 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 	public static Gaussian gaussian;
 
 	public interface Mean<T extends ImageBase<T>> {
-		void processMean(T input, T output, int radiusX, int radiusY, T storage);
+		void processMean(T input, T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border , T storage);
 	}
 
 	public interface Median<T extends ImageBase<T>> {
@@ -50,11 +53,11 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 	}
 
 	public static <T extends ImageBase<T>>
-	boolean invokeNativeMean(T input, T output, int radiusX, int radiusY, T storage) {
+	boolean invokeNativeMean(T input, T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border , T storage) {
 		boolean processed = false;
 		if( BOverrideBlurImageOps.mean != null ) {
 			try {
-				BOverrideBlurImageOps.mean.processMean(input,output,radiusX,radiusY,storage);
+				BOverrideBlurImageOps.mean.processMean(input,output,radiusX,radiusY,border,storage);
 				processed = true;
 			} catch( RuntimeException ignore ) {}
 		}

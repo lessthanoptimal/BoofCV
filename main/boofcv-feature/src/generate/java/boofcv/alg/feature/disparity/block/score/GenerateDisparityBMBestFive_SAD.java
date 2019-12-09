@@ -311,7 +311,6 @@ public class GenerateDisparityBMBestFive_SAD extends CodeGeneratorBase {
 
 	public static void main( String args[] ) throws FileNotFoundException {
 		GenerateDisparityBMBestFive_SAD gen = new GenerateDisparityBMBestFive_SAD();
-
 		gen.generate();
 	}
 }

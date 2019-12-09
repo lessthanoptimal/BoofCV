@@ -65,7 +65,7 @@ public class BenchmarkConvolveBox {
 
 	protected void setUp() throws Exception {
 		kernelF32 = FactoryKernel.table1D_F32(radius,false);
-		kernelI32 = FactoryKernel.table1D_I32(radius);
+		kernelI32 = FactoryKernel.table1D_S32(radius);
 	}
 
 	public int timeConvolve_Vertical_I8_I16(int reps) {

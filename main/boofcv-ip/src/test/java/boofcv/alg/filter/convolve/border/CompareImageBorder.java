@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,8 @@
 
 package boofcv.alg.filter.convolve.border;
 
-import boofcv.alg.filter.convolve.ConvolveImageNoBorder;
+import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard_IL;
+import boofcv.alg.filter.convolve.noborder.ConvolveImageStandard_SB;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.convolve.KernelBase;
@@ -44,7 +45,7 @@ public abstract class CompareImageBorder extends CompareEquivalentFunctions {
 	protected int borderX1=0,borderY1=0;
 
 	public CompareImageBorder(Class<?> targetClass ) {
-		super(targetClass, ConvolveImageNoBorder.class);
+		super(targetClass, ConvolveImageStandard_SB.class, ConvolveImageStandard_IL.class);
 	}
 
 	protected void computeBorder( KernelBase kernel , String functionName ) {

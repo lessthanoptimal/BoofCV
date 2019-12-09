@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,7 +72,7 @@ public class ExamplePyramidDiscrete<T extends ImageGray<T>> {
 		if(GeneralizedImageOps.isFloatingPoint(imageType) ) {
 			kernel = FactoryKernel.table1D_F32(2,true);
 		} else {
-			kernel = FactoryKernel.table1D_I32(2);
+			kernel = FactoryKernel.table1D_S32(2);
 		}
 	}
 

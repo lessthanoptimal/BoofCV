@@ -75,7 +75,7 @@ public class TestConvolveJustBorder_General_SB extends CompareImageBorder {
 		// set the while image equal to the specified value
 		GImageMiscOps.fill(larger,fillValue);
 
-		// make the inner post part equal to the original image
+		// make the inner most part equal to the original image
 		stripBorder(larger,borderX0,borderY0,borderX1,borderY1).setTo(smaller);
 	}
 

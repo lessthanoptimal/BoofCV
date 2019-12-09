@@ -71,7 +71,7 @@ public class BenchmarkConvolveMean {
 	protected void setUp() throws Exception {
 		filter = FactoryBlurFilter.mean(ImageType.single(GrayF32.class),radius);
 		kernelF32 = FactoryKernel.table1D_F32(radius, true);
-		kernelI32 = FactoryKernel.table1D_I32(radius);
+		kernelI32 = FactoryKernel.table1D_S32(radius);
 	}
 
 	public int timeConvolve_Vertical_U8_I8(int reps) {

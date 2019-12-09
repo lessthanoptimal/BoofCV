@@ -56,6 +56,9 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"import boofcv.concurrency.*;\n" +
 				"import boofcv.core.image.GeneralizedImageOps;\n" +
 				"import boofcv.factory.filter.kernel.FactoryKernelGaussian;\n" +
+				"import boofcv.struct.border.ImageBorder_F32;\n" +
+				"import boofcv.struct.border.ImageBorder_F64;\n" +
+				"import boofcv.struct.border.ImageBorder_S32;\n" +
 				"import boofcv.struct.convolve.Kernel1D_F32;\n" +
 				"import boofcv.struct.convolve.Kernel1D_F64;\n" +
 				"import boofcv.struct.convolve.Kernel1D_S32;\n" +
@@ -78,6 +81,8 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 	private void generateMean(AutoTypeImage type ) {
 		String imageName = type.getSingleBandName();
 		String letter = type.isInteger() ? "I" : type.getNumBits()==32?"F":"D";
+		String suffix = type.getKernelType();
+		String borderSuffix = type.isInteger() ? suffix+"<"+imageName+">" : suffix;
 		out.print("\t/**\n" +
 				"\t * Applies a mean box filter.\n" +
 				"\t *\n" +
@@ -90,7 +95,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\tpublic static "+imageName+" mean("+imageName+" input, @Nullable "+imageName+" output, int radius,\n" +
 				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage, @Nullable "+letter+"WorkArrays workVert ) {\n" +
 				"\n" +
-				"\t\treturn mean(input, output, radius, radius, storage, workVert);\n" +
+				"\t\treturn mean(input, output, radius, radius, null, storage, workVert);\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
@@ -104,6 +109,7 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t * @return Output blurred image.\n" +
 				"\t */\n" +
 				"\tpublic static "+imageName+" mean( "+imageName+" input, @Nullable "+imageName+" output, int radiusX, int radiusY,\n" +
+				"\t\t\t\t\t\t\t  @Nullable ImageBorder_"+borderSuffix+" binput,\n" +
 				"\t\t\t\t\t\t\t  @Nullable "+imageName+" storage, @Nullable "+letter+"WorkArrays workVert ) {\n" +
 				"\n" +
 				"\t\tif( radiusX <= 0 || radiusY <= 0)\n" +
@@ -112,11 +118,17 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\toutput = InputSanityCheck.checkDeclare(input,output);\n" +
 				"\t\tstorage = InputSanityCheck.checkDeclare(input,storage);\n" +
 				"\n" +
-				"\t\tboolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, storage);\n" +
+				"\t\tboolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, binput, storage);\n" +
 				"\n" +
-				"\t\tif( !processed ){\n" +
+				"\t\tif( processed )\n" +
+				"\t\t\treturn output;\n" +
+				"\n" +
+				"\t\tif( binput == null ) {\n" +
 				"\t\t\tConvolveImageMean.horizontal(input, storage, radiusX);\n" +
 				"\t\t\tConvolveImageMean.vertical(storage, output, radiusY, workVert);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tConvolveImageMean.horizontal(input, storage, radiusX, binput);\n" +
+				"\t\t\tConvolveImageMean.vertical(storage, output, radiusY, binput, workVert);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\treturn output;\n" +

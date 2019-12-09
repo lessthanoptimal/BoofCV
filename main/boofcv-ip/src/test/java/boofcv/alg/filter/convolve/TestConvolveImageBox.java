@@ -125,7 +125,7 @@ public class TestConvolveImageBox extends CompareEquivalentFunctions {
 		} else if (Kernel1D_F64.class == kernelType) {
 			kernel = FactoryKernel.table1D_F64(kernelRadius, false);
 		} else if (Kernel1D_S32.class == kernelType) {
-			kernel = FactoryKernel.table1D_I32(kernelRadius);
+			kernel = FactoryKernel.table1D_S32(kernelRadius);
 		} else {
 			throw new RuntimeException("Unknown kernel type: "+kernelType.getSimpleName());
 		}

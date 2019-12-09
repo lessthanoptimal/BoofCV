@@ -70,7 +70,7 @@ public class ConvolveImageBox {
 	public static void horizontal(GrayU8 input, GrayI16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
 		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
 		if(BoofConcurrency.USE_CONCURRENT ) {
 			ImplConvolveBox_MT.horizontal(input, output, radius);
@@ -89,7 +89,7 @@ public class ConvolveImageBox {
 	public static void horizontal(GrayU8 input, GrayS32 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
 		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
 		if(BoofConcurrency.USE_CONCURRENT ) {
 			ImplConvolveBox_MT.horizontal(input, output, radius);
@@ -108,7 +108,7 @@ public class ConvolveImageBox {
 	public static void horizontal(GrayS16 input, GrayI16 output, int radius) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
 		ConvolveJustBorder_General_SB.horizontal(kernel,ImageBorderValue.wrap(input,0),output);
 		if(BoofConcurrency.USE_CONCURRENT ) {
 			ImplConvolveBox_MT.horizontal(input, output, radius);
@@ -146,7 +146,7 @@ public class ConvolveImageBox {
 	public static void vertical(GrayU8 input, GrayI16 output, int radius, @Nullable IWorkArrays work) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
 		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
 		if(BoofConcurrency.USE_CONCURRENT ) {
 			ImplConvolveBox_MT.vertical(input, output, radius, work);
@@ -165,7 +165,7 @@ public class ConvolveImageBox {
 	public static void vertical(GrayU8 input, GrayS32 output, int radius, @Nullable IWorkArrays work) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
 		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
 		if(BoofConcurrency.USE_CONCURRENT ) {
 			ImplConvolveBox_MT.vertical(input, output, radius, work);
@@ -184,7 +184,7 @@ public class ConvolveImageBox {
 	public static void vertical(GrayS16 input, GrayI16 output, int radius, @Nullable IWorkArrays work) {
 		InputSanityCheck.checkSameShape(input , output);
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_I32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
 		ConvolveJustBorder_General_SB.vertical(kernel,ImageBorderValue.wrap(input,0),output);
 		if(BoofConcurrency.USE_CONCURRENT ) {
 			ImplConvolveBox_MT.vertical(input, output, radius, work);

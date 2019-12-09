@@ -61,7 +61,7 @@ public abstract class CompareEquivalentFunctions {
 				Method candidates[] = vc.getMethods();
 				for (Method c : candidates) {
 					if (isEquivalent(c, m)) {
-//					System.out.println("Examining: "+m.getName());
+						System.out.println("Examining: "+m.getName());
 						foundMatch = true;
 						compareMethods(m, c);
 						break escape;

@@ -22,6 +22,10 @@ import boofcv.concurrency.DWorkArrays;
 import boofcv.concurrency.FWorkArrays;
 import boofcv.concurrency.IWorkArrays;
 import boofcv.concurrency.WorkArrays;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_F64;
+import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
 
 import javax.annotation.Nullable;
@@ -57,7 +61,7 @@ public class GBlurImageOps {
 		} else if( input instanceof GrayF64) {
 			return (T)BlurImageOps.mean((GrayF64)input,(GrayF64)output,radius,(GrayF64)storage, (DWorkArrays)workVert);
 		} else if( input instanceof Planar) {
-			return (T)BlurImageOps.mean((Planar)input,(Planar)output,radius,(ImageGray)storage, workVert);
+			return (T)BlurImageOps.mean((Planar)input,(Planar)output,radius,null,(ImageGray)storage, workVert);
 		} else  {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
@@ -75,17 +79,17 @@ public class GBlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
-	T mean(T input, @Nullable T output, int radiusX, int radiusY, @Nullable ImageBase storage , @Nullable WorkArrays workVert ) {
+	T mean(T input, @Nullable T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border, @Nullable ImageBase storage , @Nullable WorkArrays workVert ) {
 		if( input instanceof GrayU8) {
-			return (T) BlurImageOps.mean((GrayU8) input, (GrayU8) output, radiusX, radiusY, (GrayU8) storage, (IWorkArrays)workVert);
+			return (T) BlurImageOps.mean((GrayU8) input, (GrayU8) output, radiusX, radiusY, (ImageBorder_S32)border, (GrayU8) storage, (IWorkArrays)workVert);
 		} else if( input instanceof GrayU16) {
-			return (T)BlurImageOps.mean((GrayU16)input,(GrayU16)output,radiusX, radiusY,(GrayU16)storage, (IWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayU16)input,(GrayU16)output,radiusX, radiusY, (ImageBorder_S32)border,(GrayU16)storage, (IWorkArrays)workVert);
 		} else if( input instanceof GrayF32) {
-			return (T)BlurImageOps.mean((GrayF32)input,(GrayF32)output,radiusX, radiusY,(GrayF32)storage, (FWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayF32)input,(GrayF32)output,radiusX, radiusY, (ImageBorder_F32)border,(GrayF32)storage, (FWorkArrays)workVert);
 		} else if( input instanceof GrayF64) {
-			return (T)BlurImageOps.mean((GrayF64)input,(GrayF64)output,radiusX, radiusY,(GrayF64)storage, (DWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayF64)input,(GrayF64)output,radiusX, radiusY, (ImageBorder_F64)border, (GrayF64)storage, (DWorkArrays)workVert);
 		} else if( input instanceof Planar) {
-			return (T)BlurImageOps.mean((Planar)input,(Planar)output,radiusX, radiusY,(ImageGray)storage, workVert);
+			return (T)BlurImageOps.mean((Planar)input,(Planar)output,radiusX, radiusY, (ImageBorder)border, (ImageGray)storage, workVert);
 		} else  {
 			throw new IllegalArgumentException("Unsupported image type");
 		}

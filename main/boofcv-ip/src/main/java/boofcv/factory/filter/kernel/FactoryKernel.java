@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -126,7 +126,7 @@ public class FactoryKernel {
 	 * @param radius kernel's radius.
 	 * @return table kernel.
 	 */
-	public static Kernel1D_S32 table1D_I32(int radius) {
+	public static Kernel1D_S32 table1D_S32(int radius) {
 		Kernel1D_S32 ret = new Kernel1D_S32(radius * 2 + 1);
 
 		for (int i = 0; i < ret.data.length; i++) {
