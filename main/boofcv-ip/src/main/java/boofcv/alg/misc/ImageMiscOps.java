@@ -18,6 +18,11 @@
 
 package boofcv.alg.misc;
 
+import boofcv.alg.misc.impl.ImplImageMiscOps;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_F64;
+import boofcv.struct.border.ImageBorder_S32;
+import boofcv.struct.border.ImageBorder_S64;
 import boofcv.struct.image.*;
 
 import java.util.Arrays;
@@ -616,6 +621,20 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Creates a new image which is a copy of the src image but extended with border pixels.
+	 * 
+	 * @param src (Input) source image
+	 * @param border (Input) image border generator
+	 * @param radiusX (Input) radius of border x-axis
+	 * @param radiusY (Input) radius of border y-axis
+	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
+	 */
+	public static <T extends GrayI8<T>>
+	void growBorder(T src , ImageBorder_S32<T> border, int radiusX, int radiusY , T dst ) {
+		ImplImageMiscOps.growBorder(src,border,radiusX,radiusY,dst);
+	}
+
+	/**
 	 * Copies a rectangular region from one image into another.<br>
 	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
@@ -1195,6 +1214,20 @@ public class ImageMiscOps {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Creates a new image which is a copy of the src image but extended with border pixels.
+	 * 
+	 * @param src (Input) source image
+	 * @param border (Input) image border generator
+	 * @param radiusX (Input) radius of border x-axis
+	 * @param radiusY (Input) radius of border y-axis
+	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
+	 */
+	public static <T extends GrayI16<T>>
+	void growBorder(T src , ImageBorder_S32<T> border, int radiusX, int radiusY , T dst ) {
+		ImplImageMiscOps.growBorder(src,border,radiusX,radiusY,dst);
 	}
 
 	/**
@@ -1780,6 +1813,19 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Creates a new image which is a copy of the src image but extended with border pixels.
+	 * 
+	 * @param src (Input) source image
+	 * @param border (Input) image border generator
+	 * @param radiusX (Input) radius of border x-axis
+	 * @param radiusY (Input) radius of border y-axis
+	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
+	 */
+	public static void growBorder(GrayS32 src , ImageBorder_S32 border, int radiusX, int radiusY , GrayS32 dst ) {
+		ImplImageMiscOps.growBorder(src,border,radiusX,radiusY,dst);
+	}
+
+	/**
 	 * Copies a rectangular region from one image into another.<br>
 	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
@@ -2359,6 +2405,19 @@ public class ImageMiscOps {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Creates a new image which is a copy of the src image but extended with border pixels.
+	 * 
+	 * @param src (Input) source image
+	 * @param border (Input) image border generator
+	 * @param radiusX (Input) radius of border x-axis
+	 * @param radiusY (Input) radius of border y-axis
+	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
+	 */
+	public static void growBorder(GrayS64 src , ImageBorder_S64 border, int radiusX, int radiusY , GrayS64 dst ) {
+		ImplImageMiscOps.growBorder(src,border,radiusX,radiusY,dst);
 	}
 
 	/**
@@ -2944,6 +3003,19 @@ public class ImageMiscOps {
 	}
 
 	/**
+	 * Creates a new image which is a copy of the src image but extended with border pixels.
+	 * 
+	 * @param src (Input) source image
+	 * @param border (Input) image border generator
+	 * @param radiusX (Input) radius of border x-axis
+	 * @param radiusY (Input) radius of border y-axis
+	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
+	 */
+	public static void growBorder(GrayF32 src , ImageBorder_F32 border, int radiusX, int radiusY , GrayF32 dst ) {
+		ImplImageMiscOps.growBorder(src,border,radiusX,radiusY,dst);
+	}
+
+	/**
 	 * Copies a rectangular region from one image into another.<br>
 	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
 	 *
@@ -3523,6 +3595,19 @@ public class ImageMiscOps {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Creates a new image which is a copy of the src image but extended with border pixels.
+	 * 
+	 * @param src (Input) source image
+	 * @param border (Input) image border generator
+	 * @param radiusX (Input) radius of border x-axis
+	 * @param radiusY (Input) radius of border y-axis
+	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
+	 */
+	public static void growBorder(GrayF64 src , ImageBorder_F64 border, int radiusX, int radiusY , GrayF64 dst ) {
+		ImplImageMiscOps.growBorder(src,border,radiusX,radiusY,dst);
 	}
 
 	/**

@@ -28,7 +28,7 @@ Version : 0.35
   * Added generalized function for copying rows and columns from images
   * Added the ability to make a copy of an ImageBorder
   * Mean filter now supports different image border methods
-  * TODO ImageMiscOps.growBorder(src,border,dst)
+  * Added ImageMiscOps.growBorder() to create a new image that is the src image plus a border
 - Template Match
   * Fixed bug where if the template matched the input image it would not be processed
     * Thanks waicool20 for reporting this bug

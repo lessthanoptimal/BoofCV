@@ -18,10 +18,15 @@
 
 package boofcv.alg.misc;
 
+import boofcv.alg.misc.impl.ImplImageMiscOps;
 import boofcv.core.image.*;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageInterleaved;
+import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Array;
@@ -45,7 +50,7 @@ class TestImageMiscOps {
 
 	@Test
 	void checkAll() {
-		int numExpected = 24*6 + 4*8;
+		int numExpected = 25*6 + 4*8;
 		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -85,6 +90,8 @@ class TestImageMiscOps {
 					testRotateCW(m);
 				} else if( m.getName().compareTo("rotateCCW") == 0 ) {
 					testRotateCCW(m);
+				} else if( m.getName().compareTo("growBorder") == 0 ) {
+					testGrowBorder(m);
 				} else {
 					throw new RuntimeException("Unknown function");
 				}
@@ -923,5 +930,24 @@ class TestImageMiscOps {
 		for (int i = 0; i < 6; i++) {
 			assertEquals(0,GeneralizedImageOps.get(b,i/3,i%3,1),1e-8);
 		}
+	}
+
+	void testGrowBorder( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class[] paramTypes = m.getParameterTypes();
+		ImageGray src = GeneralizedImageOps.createSingleBand(paramTypes[0],width,height);
+		ImageGray found = GeneralizedImageOps.createSingleBand(paramTypes[4],1,1);
+		ImageBorder extend = FactoryImageBorder.generic(BorderType.EXTENDED,src.getImageType());
+		int radiusX = 2;
+		int radiusY = 3;
+
+		GImageMiscOps.fillUniform(src,rand,0,100);
+		m.invoke(null,src,extend, radiusX,radiusY, found);
+
+		Method t = BoofTesting.findMethod(ImplImageMiscOps.class,"growBorder",paramTypes);
+		ImageGray expected = GeneralizedImageOps.createSingleBand(paramTypes[4],1,1);
+		t.invoke(null,src,extend, radiusX,radiusY, expected);
+
+		BoofTesting.assertEquals(expected,found,0.0);
+
 	}
 }

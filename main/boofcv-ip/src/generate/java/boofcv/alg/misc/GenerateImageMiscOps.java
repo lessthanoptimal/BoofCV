@@ -48,6 +48,11 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print("import boofcv.struct.image.*;\n" +
+				"import boofcv.alg.misc.impl.ImplImageMiscOps;\n" +
+				"import boofcv.struct.border.ImageBorder_F32;\n" +
+				"import boofcv.struct.border.ImageBorder_F64;\n" +
+				"import boofcv.struct.border.ImageBorder_S32;\n" +
+				"import boofcv.struct.border.ImageBorder_S64;\n" +
 				"\n" +
 				"import java.util.Random;\n" +
 				"import java.util.Arrays;\n" +
@@ -95,6 +100,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 			printRotateCCW_one();
 			printRotateCCW_two();
 			printRotateCCW_two_interleaved();
+			printGrowBorder();
 		}
 	}
 
@@ -971,7 +977,30 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	private void printGrowBorder() {
+		String borderName = "ImageBorder_"+imageType.getKernelType();
+		String generic = "";
+		String srcType = imageName;
+		if( imageType.isInteger() && imageType.getNumBits() < 32 ) {
+			generic = "<T extends GrayI"+imageType.getNumBits()+"<T>>\n\t";
+			srcType = "T";
+			borderName += "<T>";
+		}
+		out.print("\t/**\n" +
+				"\t * Creates a new image which is a copy of the src image but extended with border pixels.\n" +
+				"\t * \n" +
+				"\t * @param src (Input) source image\n" +
+				"\t * @param border (Input) image border generator\n" +
+				"\t * @param radiusX (Input) radius of border x-axis\n" +
+				"\t * @param radiusY (Input) radius of border y-axis\n" +
+				"\t * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY\n" +
+				"\t */\n" +
+				"\tpublic static "+generic+"void growBorder("+srcType+" src , "+borderName+" border, int radiusX, int radiusY , "+srcType+" dst ) {\n" +
+				"\t\tImplImageMiscOps.growBorder(src,border,radiusX,radiusY,dst);\n" +
+				"\t}\n\n");
+	}
+
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImageMiscOps gen = new GenerateImageMiscOps();
 		gen.generate();
 	}

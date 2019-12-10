@@ -32,12 +32,15 @@ public abstract class CompareEquivalentFunctions {
 	// the class being tested
 	Class<?> testClass;
 	// class being validated
-	Class<?> validationClasses[];
+	Class<?>[] validationClasses;
 
 	// the method being tested
 	protected Method methodTest;
 	// the method being used to validate the test
 	protected Method methodValidation;
+
+	// flag used to indicate if a parameter can be skipped when computing sub-image
+	protected boolean[] ignoreSubimage=new boolean[0];
 
 	protected CompareEquivalentFunctions(Class<?> testClass, Class<?> ...validationClass) {
 		this.testClass = testClass;
@@ -61,7 +64,7 @@ public abstract class CompareEquivalentFunctions {
 				Method candidates[] = vc.getMethods();
 				for (Method c : candidates) {
 					if (isEquivalent(c, m)) {
-						System.out.println("Examining: "+m.getName());
+//						System.out.println("Examining: "+m.getName());
 						foundMatch = true;
 						compareMethods(m, c);
 						break escape;
@@ -104,6 +107,8 @@ public abstract class CompareEquivalentFunctions {
 
 		methodTest = target;
 		methodValidation = validation;
+		// by default don't skip a parameter for sub-image
+		ignoreSubimage = new boolean[target.getParameterCount()];
 
 		Object [][]targetParamArray = createInputParam(target,validation);
 
@@ -141,7 +146,7 @@ public abstract class CompareEquivalentFunctions {
 		for( int i = 0; i < param.length; i++ ) {
 			if( param[i] == null )
 				continue;
-			if( ImageGray.class.isAssignableFrom(param[i].getClass())) {
+			if( !ignoreSubimage[i] && ImageGray.class.isAssignableFrom(param[i].getClass())) {
 				ret[i] = BoofTesting.createSubImageOf((ImageGray)param[i]);
 			} else {
 				ret[i] = param[i];
