@@ -22,13 +22,14 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -123,7 +124,36 @@ public abstract class GenericImageBorderTests<T extends ImageBase<T>> {
 
 	@Test
 	public void copy() {
-		fail("Implement");
+		for( ImageType<T> imageType : imageTypes ) {
+			init(imageType);
+			T img = imageType.createImage(width, height);
+			GImageMiscOps.fillUniform(img, rand, 0, 100);
+
+			ImageBorder<T> borderA = wrap(img);
+			ImageBorder<T> borderB = borderA.copy();
+			borderB.setImage(img);
+
+			checkEquals(1, 1, borderA, borderB);
+			checkEquals(0, 0, borderA, borderB);
+			checkEquals(width - 1, height - 1, borderA, borderB);
+
+			checkEquals(-1,0,borderA,borderB);
+			checkEquals(-2,0,borderA,borderB);
+			checkEquals(0,-1,borderA,borderB);
+			checkEquals(0,-2,borderA,borderB);
+
+			checkEquals(width, height - 1, borderA, borderB);
+			checkEquals(width + 1, height - 1, borderA, borderB);
+			checkEquals(width - 1, height, borderA, borderB);
+			checkEquals(width - 1, height + 1, borderA, borderB);
+		}
+	}
+	private void checkEquals( int x , int y , ImageBorder<T> borderA, ImageBorder<T> borderB ) {
+		borderA.getGeneral(x, y, tmp0);
+		borderB.getGeneral(x, y, tmp1);
+		for (int i = 0; i < tmp0.length; i++) {
+			assertEquals(tmp0[i],tmp1[i], UtilEjml.TEST_F64);
+		}
 	}
 
 	private void checkSet(T image, ImageBorder<T> border) {

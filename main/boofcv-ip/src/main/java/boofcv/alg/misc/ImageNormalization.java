@@ -51,14 +51,34 @@ public class ImageNormalization {
 		if( output.getDataType().isInteger() )
 			throw new IllegalArgumentException("Output must be a floating point image");
 
-		double mean = GImageStatistics.mean(input);
-		GPixelMath.minus(input,mean,output);
-		double scale = GImageStatistics.maxAbs(output);
-		GPixelMath.divide(output,scale,output);
-	
-		if( parameters != null ) {
-			parameters.offset = -mean;
-			parameters.divisor = scale;
+		// Numerical errors is a concern and if you sum up the input it could overflow
+		double scale = GImageStatistics.maxAbs(input);
+		if( scale != 0.0 ) {
+			GPixelMath.divide(input, scale, output);
+			// Work with this scaled image
+			double mean = GImageStatistics.mean(output);
+			GPixelMath.minus(output, mean, output);
+			double scale2;
+			if (input.getDataType().isSigned()) {
+				scale2 = GImageStatistics.maxAbs(output);
+			} else {
+				// image is scaled from 0 to 1.0
+				scale2 = mean < 0.5 ? 1.0 - mean : mean;
+			}
+			if( scale2 != 0.0 )
+				GPixelMath.divide(output, scale2, output);
+			else
+				scale2 = 1.0;
+
+			if (parameters != null) {
+				parameters.offset = -mean * scale;
+				parameters.divisor = scale * scale2;
+			}
+		} else {
+			if (parameters != null) {
+				parameters.offset = 0.0;
+				parameters.divisor = 1.0;
+			}
 		}
 	}
 
@@ -74,15 +94,29 @@ public class ImageNormalization {
 		if( output.getDataType().isInteger() )
 			throw new IllegalArgumentException("Output must be a floating point image");
 
-		double mean = GImageStatistics.mean(input);
-		double stdev = Math.sqrt(GImageStatistics.variance(input,mean));
+		// avoid overflow
+		double scale = GImageStatistics.maxAbs(input);
+		if( scale != 0.0 ) {
+			GPixelMath.divide(input, scale, output);
+			double mean = GImageStatistics.mean(output);
+			double stdev = Math.sqrt(GImageStatistics.variance(output,mean));
 
-		GPixelMath.minus(input,mean,output);
-		GPixelMath.divide(output,stdev,output);
+			GPixelMath.minus(output,mean,output);
+			if( stdev != 0.0 ) {
+				GPixelMath.divide(output,stdev,output);
+			} else {
+				stdev = 1.0;
+			}
 
-		if( parameters != null ) {
-			parameters.offset = -mean;
-			parameters.divisor = stdev;
+			if( parameters != null ) {
+				parameters.offset = -mean*scale;
+				parameters.divisor = stdev*scale;
+			}
+		} else {
+			if (parameters != null) {
+				parameters.offset = 0.0;
+				parameters.divisor = 1.0;
+			}
 		}
 	}
 }

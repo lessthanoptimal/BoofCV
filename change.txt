@@ -53,9 +53,9 @@ Version : 0.35
   * Support for U16 images
   * Block Matching can now be scored using Census and NCC
   * Added Semi-Global Matching with several options for score functions
-  * TODO Add blocks for SGM error options
   * TODO Ensure that all auto code generators still work
-  * TODO Make cost computation concurrent for SGM
+  * TODO SGM and min disparity
+  * TODO revert speed regression for BM
 - SFM
   * Projective camera with lens distortion
   * TODO Stereo VO Quad - Now uses trifocal tensor and sparse bundle adjustment

@@ -568,7 +568,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 
 		@Override
 		public String getOperation() {
-			String round = input.isInteger() ? "Math.round" : "";
+			String round = output.isInteger() ? "Math.round" : "";
 
 			return round+"((input[indexSrc] "+input.getBitWise()+") * value)";
 		}
@@ -589,7 +589,7 @@ public class GenerateImplPixelMath extends CodeGeneratorBase {
 
 		@Override
 		public String getOperation() {
-			String round = input.isInteger() ? "Math.round" : "";
+			String round = output.isInteger() ? "Math.round" : "";
 
 			return round+"((input[indexSrc] "+input.getBitWise()+") / denominator)";
 		}

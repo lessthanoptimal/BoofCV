@@ -319,6 +319,6 @@ public enum ImageDataType {
 	 * Returns the minimum allowed value for data elements in this data type
 	 */
 	public double getMinValue() {
-		return maxValue;
+		return minValue;
 	}
 }

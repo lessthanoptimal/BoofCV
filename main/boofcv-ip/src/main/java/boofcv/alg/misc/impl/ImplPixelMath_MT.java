@@ -505,7 +505,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.round((input[indexSrc] & 0xFF) * value);
+				output[indexDst] = ((input[indexSrc] & 0xFF) * value);
 			}
 		});
 	}
@@ -521,7 +521,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.round((input[indexSrc] ) * value);
+				output[indexDst] = ((input[indexSrc] ) * value);
 			}
 		});
 	}
@@ -537,7 +537,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.round((input[indexSrc] & 0xFFFF) * value);
+				output[indexDst] = ((input[indexSrc] & 0xFFFF) * value);
 			}
 		});
 	}
@@ -553,7 +553,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.round((input[indexSrc] ) * value);
+				output[indexDst] = ((input[indexSrc] ) * value);
 			}
 		});
 	}
@@ -569,7 +569,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.round((input[indexSrc] ) * value);
+				output[indexDst] = ((input[indexSrc] ) * value);
 			}
 		});
 	}
@@ -585,7 +585,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.round((input[indexSrc] ) * value);
+				output[indexDst] = ((input[indexSrc] ) * value);
 			}
 		});
 	}
@@ -881,7 +881,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.round((input[indexSrc] & 0xFF) / denominator);
+				output[indexDst] = ((input[indexSrc] & 0xFF) / denominator);
 			}
 		});
 	}
@@ -897,7 +897,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.round((input[indexSrc] ) / denominator);
+				output[indexDst] = ((input[indexSrc] ) / denominator);
 			}
 		});
 	}
@@ -913,7 +913,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.round((input[indexSrc] & 0xFFFF) / denominator);
+				output[indexDst] = ((input[indexSrc] & 0xFFFF) / denominator);
 			}
 		});
 	}
@@ -929,7 +929,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.round((input[indexSrc] ) / denominator);
+				output[indexDst] = ((input[indexSrc] ) / denominator);
 			}
 		});
 	}
@@ -945,7 +945,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.round((input[indexSrc] ) / denominator);
+				output[indexDst] = ((input[indexSrc] ) / denominator);
 			}
 		});
 	}
@@ -961,7 +961,7 @@ public class ImplPixelMath_MT {
 			int end = indexSrc + cols;
 
 			for( ; indexSrc < end; indexSrc++ , indexDst++) {
-				output[indexDst] = Math.round((input[indexSrc] ) / denominator);
+				output[indexDst] = ((input[indexSrc] ) / denominator);
 			}
 		});
 	}
