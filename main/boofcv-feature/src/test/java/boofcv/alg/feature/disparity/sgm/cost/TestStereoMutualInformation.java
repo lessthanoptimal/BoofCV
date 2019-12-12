@@ -24,6 +24,8 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
@@ -32,10 +34,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-class TestStereoMutualInformation extends CommonSgmChecks {
+class TestStereoMutualInformation extends CommonSgmChecks<GrayU8> {
 
 	TestStereoMutualInformation() {
-		super(30, 40);
+		super(30, 40, ImageType.SB_U8);
 	}
 
 	@Test
@@ -97,37 +99,54 @@ class TestStereoMutualInformation extends CommonSgmChecks {
 		assertTrue(costCorrect*1.5 < costIncorrect);
 	}
 
+	/**
+	 * Given that it's know that the left and right images have the same histograms, see if the same pixel
+	 * values have the minimum costs
+	 */
 	@Test
 	void cost_minimum() {
 		int invalid = 10;
-		renderStereoStep(8,invalid);
+		int maxValue = 20;
+
+		renderStereoRandom(0,maxValue-1,8,invalid);
 		StereoMutualInformation alg = new StereoMutualInformation();
-		alg.configureHistogram(256);
+		alg.configureHistogram(maxValue);
 		alg.configureSmoothing(1);
 		alg.process(left,right,0,disparityTruth,invalid);
 		alg.precomputeScaledCost(SgmDisparityCost.MAX_COST);
 
-		// Scores are only valid when the pixel value has been observed
-		int maxValue = ImageStatistics.max(left);
 
-		// sanity check TODO DELETE?
-		for (int i = 0; i < maxValue; i++) {
-			assertEquals(alg.entropyLeft.data[i],alg.entropyRight.data[i], UtilEjml.F_EPS,"i = "+i);
+		// Get a list of values in the left and right image
+		// Mutual information isn't designed to handle cases where you attempt to match up with a non-existing pixel
+		GrowQueue_I32 valuesLeft = new GrowQueue_I32();
+		GrowQueue_I32 valuesRight = new GrowQueue_I32();
+
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if( disparityTruth.get(x,y) == invalid )
+					continue;
+				if( !valuesLeft.contains(left.get(x,y)))
+					valuesLeft.add(left.get(x,y));
+				if( !valuesRight.contains(right.get(x,y)))
+					valuesRight.add(right.get(x,y));
+			}
 		}
 
-		// The minimum should always be when the two values rwo the same
-		for (int i = 0; i < maxValue; i++) {
+		// For every value that appeared in the left image make sure the same value in the right minimizes it
+		// dont' consider values not in the left image since those are kinda undefined
+		for (int i = 0; i < valuesLeft.size; i++) {
 			int bestScore = Integer.MAX_VALUE;
-			int bestIdx = -1;
-			for (int j = 0; j < maxValue; j++) {
-				int c = alg.costScaled(i,j);
+			int bestVR = -1;
+			int vl = valuesLeft.get(i);
+			for (int j = 0; j < valuesRight.size; j++) {
+				int c = alg.costScaled(vl,valuesRight.get(j));
 				if( c < bestScore ) {
 					bestScore = c;
-					bestIdx = j;
+					bestVR = valuesRight.get(j);
 				}
 			}
-//			System.out.println("i="+i+" bestIdx="+bestIdx+"  score="+bestScore);
-			assertEquals(i,bestIdx);
+//			System.out.println("left="+vl+" right="+bestVR+"  score="+bestScore);
+			assertEquals(vl,bestVR);
 		}
 	}
 

@@ -21,6 +21,7 @@ package boofcv.alg.feature.disparity.sgm;
 import boofcv.alg.feature.disparity.sgm.cost.StereoMutualInformation;
 import boofcv.alg.transform.pyramid.ConfigPyramid2;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,56 +30,38 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestSgmStereoDisparityHmi extends CommonSgmChecks{
-	TestSgmStereoDisparityHmi() {
-		super(80,50);
+class TestSgmStereoDisparityHmi extends GenericSgmStereoDisparityChecks<GrayU8,GrayU8> {
+
+	protected TestSgmStereoDisparityHmi() {
+		super(ImageType.SB_U8);
+		// HMI doesn't excel in these scenarios as much as the others
+		this.acceptTol = 0.15;
+		// HMI needs more structure to work well
+		this.useRandomImage = false;
 	}
 
+	@Override
+	public SgmStereoDisparity<GrayU8, GrayU8> createAlgorithm() {
+		return create();
+	}
 
 	/**
 	 * No pyramid is required where. MI is initialized with perfect disparity
 	 */
 	@Test
-	void perfect_MutualInformation() {
-		int rangeD = 15;
-		int d = 6;
+	void perfect_GivenTrueDisparity() {
+		int rangeD = 12;
+		int d = 7;
 
 		// Render an image with a smooth gradient. If given a perfect initial disparity
 		// it should produce a perfect output. If given a random disparity there's a good chance
 		// it would converge to an incorrect solution
-		renderStereoGradient(d,rangeD);
-
-		SgmStereoDisparityHmi alg = create();
-		alg.getSelector().setRightToLeftTolerance(0);
-		alg.getAggregation().setPathsConsidered(4);
-		alg.setDisparityMin(0);
-		alg.setDisparityRange(rangeD);
-		alg.process(left,right,disparityTruth,rangeD);
-
-		// disparity should be 5 everywhere
-		GrayU8 found = alg.getDisparity();
-		evaluateFound(rangeD, d, found);
-	}
-
-	/**
-	 * The entire image should have a disparity of 5. Each pixel if visually distinctive from its neighbors
-	 */
-	@Test
-	void easy_scenario() {
-		int rangeD = 12;
-		int d = 7;
 		renderStereoStep(d,rangeD);
 
 		SgmStereoDisparityHmi alg = create();
 		alg.setDisparityMin(0);
 		alg.setDisparityRange(rangeD);
-		alg.process(left,right);
-		alg.getAggregation().setPenalty1(10);
-		alg.getAggregation().setPenalty2(20);
-
-		// sanity check on internal data structures
-		assertEquals(3,alg.getPyrLeft().getLevelsCount());
-		assertEquals(3,alg.getPyrRight().getLevelsCount());
+		alg.process(left,right,disparityTruth,rangeD);
 
 		// disparity should be 5 everywhere
 		GrayU8 found = alg.getDisparity();

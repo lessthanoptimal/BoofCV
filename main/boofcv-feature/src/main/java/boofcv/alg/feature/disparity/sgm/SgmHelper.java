@@ -26,13 +26,13 @@ package boofcv.alg.feature.disparity.sgm;
 public class SgmHelper {
 	// Image width
 	public int width;
-	public int minDisparity;
-	public int rangeDisparity;
+	public int disparityMin;
+	public int disparityRange;
 
 	public void configure(int width, int disparityMin, int disparityRange) {
 		this.width = width;
-		this.minDisparity = disparityMin;
-		this.rangeDisparity = disparityRange;
+		this.disparityMin = disparityMin;
+		this.disparityRange = disparityRange;
 	}
 
 	/**
@@ -40,13 +40,13 @@ public class SgmHelper {
 	 * Values greater than this are out of the right image bounds or greater than 'rangeDisparity'
 	 */
 	public final int localDisparityRangeLeft(int x ) {
-		return Math.min(x- minDisparity +1, rangeDisparity);
+		return Math.min(x- disparityMin +1, disparityRange);
 	}
 
 	/**
 	 * Same as {@link #localDisparityRangeLeft(int)} but for the right image boundary
 	 */
 	public final int localDisparityRangeRight(int x ) {
-		return Math.min(width-x, rangeDisparity)-minDisparity; // TODO double check this
+		return Math.min(width-x- disparityMin, disparityRange);
 	}
 }

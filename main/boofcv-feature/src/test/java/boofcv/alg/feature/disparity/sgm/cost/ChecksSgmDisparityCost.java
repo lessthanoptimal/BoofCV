@@ -19,11 +19,15 @@
 package boofcv.alg.feature.disparity.sgm.cost;
 
 import boofcv.alg.feature.disparity.sgm.SgmDisparityCost;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayU16;
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
+
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,28 +37,42 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-abstract class ChecksSgmDisparityCost {
+abstract class ChecksSgmDisparityCost<T extends ImageGray<T>> {
+
+	Random rand = new Random(2345);
+	ImageType<T> imageType;
 
 	// Image shape
 	int width=25;
 	int height=20;
 
-	int numGrayLevels = 256;
+	// minimum and maximum pixel values, inclusive
+	double minValue,maxValue;
 
-	GrayU8 left = new GrayU8(width,height);
-	GrayU8 right = new GrayU8(width,height);
+	T left;
+	T right;
 
-	abstract SgmDisparityCost<GrayU8> createAlg();
+	public ChecksSgmDisparityCost(double minValue, double maxValue, ImageType<T> imageType ) {
+		this.minValue = minValue;
+		this.maxValue = maxValue;
+		this.imageType = imageType;
+
+		left = imageType.createImage(width,height);
+		right = imageType.createImage(width,height);
+	}
+
+	abstract SgmDisparityCost<T> createAlg();
 
 	/**
 	 * Give it a simple problem that's composed of a horizontal gradient. See if cost matches expectation
 	 */
 	@Test
-	void simple_gradient() {
+	void disparityBounds() {
 		// see if min and max disparity are both respected
-		simple_gradient(0, 20);
-		simple_gradient(4, 16);
-		simple_gradient(5, 1);
+		disparityBounds(5, 0, 20, true);
+		disparityBounds(10, 0, 6, false);
+		disparityBounds(5, 4, 16, true);
+		disparityBounds(5, 6, 1,false);
 	}
 
 	/**
@@ -63,75 +81,85 @@ abstract class ChecksSgmDisparityCost {
 	@Test
 	void multipleCalls() {
 		int disparity = 5;
-		fillWithGradient(disparity);
+		fillRandom(disparity);
 
-		SgmDisparityCost<GrayU8> alg = createAlg();
+		SgmDisparityCost<T> alg = createAlg();
 		Planar<GrayU16> cost1 = new Planar<>(GrayU16.class,1,1,1);
 		Planar<GrayU16> cost2 = new Planar<>(GrayU16.class,1,1,1);
-		alg.process(left,right,1,14,cost1);
-		alg.process(left,right,1,14,cost2);
+		alg.configure(0,14);
+		alg.process(left,right,cost1);
+		alg.process(left,right,cost2);
 
 		BoofTesting.assertEquals(cost1,cost2,0);
 	}
 
-	private void simple_gradient(int minDisparity, int disparityRange) {
-		// the actual disparity of each pixel
-		int disparity = 5;
+	private void disparityBounds(int disparity, int minDisparity, int disparityRange, boolean shouldSucceed ) {
 
 		// Set each image to a gradient that has a simple known solution
-		fillWithGradient(disparity);
+		fillRandom(disparity);
 
 		// This has a known solution. See if it worked
-		Planar<GrayU16> cost = new Planar<>(GrayU16.class,1,1,1);
-		SgmDisparityCost<GrayU8> alg = createAlg();
-		alg.process(left,right,minDisparity,disparityRange,cost);
+		Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,1,1,1);
+		SgmDisparityCost<T> alg = createAlg();
+		alg.configure(minDisparity,disparityRange);
+		alg.process(left,right,costYXD);
 
 		// Check outside
-		checkOutsideDispIsMax(minDisparity,disparityRange, cost);
+		checkInvalidRangeIsMax(minDisparity,disparityRange, costYXD);
 
 		// For each pixel, find the best disparity and see if it matches up with the input image
+		int failure = 0;
+		int total   = 0;
 		for (int y = 0; y < height; y++) {
-			for (int x = disparity; x < width - disparity; x++) {
-				int d = selectDisparity(x,y,cost)+minDisparity;
-				assertEquals(left.get(x,y),right.get(x-d,y),1,y+" "+x+" "+d);
-			}
-		}
-	}
+			GrayU16 costXD = costYXD.getBand(y);
+			for (int x = minDisparity; x < width; x++) {
+				int localRange = Math.min(disparityRange,x-minDisparity+1);
 
-	private void fillWithGradient(int disparity) {
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				left.set(x,y, y + x+20);
-				right.set(x,y, y + x+20+disparity);
-			}
-		}
-	}
+				// If it can't find the correct solution due to local limitations skip
+				if( shouldSucceed && disparity >= minDisparity+localRange)
+					continue;
 
-	private int selectDisparity(int x , int y , Planar<GrayU16> cost ) {
-		int bestValue = Integer.MAX_VALUE;
-		int best = -1;
+				int bestD = 0;
+				int bestCost = costXD.get(0,x-minDisparity);
+				for (int d = 1; d < localRange; d++) {
+					int c = costXD.get(d,x-minDisparity);
+					if( bestCost > c ) {
+						bestCost = c;
+						bestD = d;
+					}
+				}
 
-		for (int d = 0; d < cost.width; d++) {
-			int v = lookup(cost,x,y,d);
-			assertTrue(v <= SgmMutualInformation_U8.MAX_COST);
-			if( v < bestValue ) {
-				bestValue = v;
-				best = d;
+				if( bestD+minDisparity != disparity ) {
+					failure++;
+				}
+				total++;
 			}
 		}
 
-		return best;
+		if( shouldSucceed )
+			assertTrue( failure/(double)total < 0.05 , failure+" vs "+total);
+		else
+			assertTrue( failure/(double)total > 0.90 , failure+" vs "+total);
 	}
 
 	/**
-	 * Make sure that the of the cost which go outside the image should be filled with max value
+	 * Randomly fills in the left image and copies it by a fixed amount into the right
 	 */
-	private void checkOutsideDispIsMax(int minD, int rangeD, Planar<GrayU16> cost) {
+	private void fillRandom(int disparity) {
+		GImageMiscOps.fillUniform(left,rand,minValue,maxValue);
+		GImageMiscOps.fill(right,0);
+		GImageMiscOps.copy(disparity,0,0,0,left.width-disparity,left.height,left,right);
+	}
+
+	/**
+	 * Makes sure that if a range can't be reached it is set to the max possible cost
+	 */
+	private void checkInvalidRangeIsMax(int minD, int rangeD, Planar<GrayU16> costYXD) {
 		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < rangeD; x++) {
-				// skip over disparity of zero since it will be inside the right image
-				for (int d = x+Math.max(minD,1); d < minD+rangeD; d++) {
-					assertEquals(SgmDisparityCost.MAX_COST,lookup(cost,x,y,d-minD),y+" "+x+" "+d);
+			for (int x = minD; x < width; x++) {
+				int localMaxRange = Math.min(rangeD,x-minD+1);
+				for (int d = localMaxRange; d < rangeD; d++) {
+					assertEquals(SgmDisparityCost.MAX_COST,lookup(costYXD,x-minD,y,d),y+" "+x+" "+d);
 				}
 			}
 		}
@@ -146,11 +174,12 @@ abstract class ChecksSgmDisparityCost {
 	 */
 	@Test
 	void reshape() {
-		SgmDisparityCost<GrayU8> alg = createAlg();
+		SgmDisparityCost<T> alg = createAlg();
 
 		int rangeD = 6;
 		Planar<GrayU16> cost = new Planar<>(GrayU16.class,1,1,1);
-		alg.process(left,right,5,rangeD,cost);
+		alg.configure(5,rangeD);
+		alg.process(left,right,cost);
 
 		// cost is Y,X,D order
 		assertEquals(height,cost.getNumBands());

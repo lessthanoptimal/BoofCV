@@ -44,14 +44,16 @@ public class SgmStereoDisparityError<T extends ImageBase<T>>
 		InputSanityCheck.checkSameShape(left,right);
 		disparity.reshape(left);
 		helper.configure(left.width,disparityMin,disparityRange);
+		sgmCost.configure(disparityMin,disparityRange);
+		aggregation.configure(disparityMin);
 
 		// Compute the cost using mutual information
-		sgmCost.process(left,right, disparityMin, disparityRange,costYXD);
+		sgmCost.process(left,right,costYXD);
 		// Aggregate the cost along all the paths
-		aggregation.process(costYXD,disparityMin);
+		aggregation.process(costYXD);
 
 		// Select the best disparity for each pixel given the cost
-		selector.setMinDisparity(disparityMin); // TODO move to function below
+		selector.setDisparityMin(disparityMin); // TODO move to function below
 		selector.select(costYXD,aggregation.getAggregated(),disparity);
 	}
 

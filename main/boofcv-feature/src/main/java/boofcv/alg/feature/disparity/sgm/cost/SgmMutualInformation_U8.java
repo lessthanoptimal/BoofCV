@@ -21,10 +21,12 @@ package boofcv.alg.feature.disparity.sgm.cost;
 import boofcv.struct.image.GrayU8;
 
 /**
- * TODO document
+ * Computes the cost using Mutual Information as described in [1].
  *
  * <p>[1] Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
  * IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.</p>
+ *
+ * @see StereoMutualInformation
  *
  * @author Peter Abeles
  */
@@ -36,9 +38,9 @@ public class SgmMutualInformation_U8 extends SgmCostBase<GrayU8> {
 	}
 
 	@Override
-	protected void computeDisparityErrors(int idxLeft, int idxRight, int idxOut, int disparityMin, int disparityMax) {
+	protected void computeDisparityErrors(int idxLeft, int idxRight, int idxOut, int disparityRange) {
 		int valLeft = left.data[idxLeft] & 0xFF;
-		for (int d = disparityMin; d <= disparityMax; d++) {
+		for (int d = 0; d < disparityRange; d++) {
 			int valRight = right.data[idxRight--] & 0xFF;
 			costXD.data[idxOut++] = (short)mutual.costScaled(valLeft,valRight);
 		}

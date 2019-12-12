@@ -18,37 +18,201 @@
 
 package boofcv.alg.feature.disparity.sgm;
 
+import boofcv.alg.feature.disparity.sgm.cost.SgmCostAbsoluteDifference;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.alg.misc.ImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 import boofcv.testing.BoofTesting;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
 import static java.lang.Math.min;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings("SuspiciousNameCombination")
 class TestSgmCostAggregation {
 
 	Random rand = new Random(234);
 	int width=40,height=30, rangeD =5;
 
-	@Test
-	void process_basic() {
-		// Give it a perfect costYXD and see if it selects the correct path
-		fail("Implement");
+	@BeforeEach
+	void setup() {
+		// Turn off concurrency since it's easier to debug without it
+		BoofConcurrency.USE_CONCURRENT = false;
 	}
 
 	@Test
+	void process_basic() {
+		int expectedD = 5;
+		Planar<GrayU16> costYXD = createCostWithStep(22,5,0);
+
+		// This simple test only works well for paths that are aligned along the axis
+		// diagonal paths yield incorrect solutions near the border depending on the path's length it seems
+		// Don't think it's a bug, but maybe there's room to improve the algorithm?
+		for( int paths : new int[]{2,4}) {
+			SgmCostAggregation alg = new SgmCostAggregation();
+			alg.configure(0);
+			alg.setPenalty1(200);
+			alg.setPenalty2(2000);
+			alg.setPathsConsidered(paths);
+			alg.process(costYXD);
+			Planar<GrayU16> aggregatedYXD = alg.getAggregated();
+
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					int localRangeD = alg.helper.localDisparityRangeLeft(x);
+					int bestD = -1;
+					int bestScore = Integer.MAX_VALUE;
+					for (int d = 0; d < localRangeD; d++) {
+						int score = aggregatedYXD.getBand(y).get(d,x);
+						if( score < bestScore ) {
+							bestScore = score;
+							bestD = d;
+						}
+					}
+//					System.out.println(x+" "+y+"  bestD "+bestD);
+					// the outside border's will pick a bad disparity because there is no corresponding pixel
+					// in the other one
+					if( x >= expectedD && x < width-expectedD ) {
+						assertEquals(expectedD,bestD);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Compute the cost using AD. The image has two pixel values and there's a step at stepX.
+	 * @param stepX where the values change
+	 */
+	private Planar<GrayU16> createCostWithStep( int stepX , int disparity , int minDisparity) {
+		Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,1,1,1);
+		GrayU8 left = new GrayU8(width,height);
+		GrayU8 right = new GrayU8(width,height);
+
+		ImageMiscOps.fillRectangle(left,100,stepX,0,width-stepX,height);
+		ImageMiscOps.fillRectangle(right,100,stepX-disparity,0,width-stepX-disparity,height);
+
+		SgmCostAbsoluteDifference<GrayU8> cost = new SgmCostAbsoluteDifference.U8();
+		cost.configure(minDisparity,20);
+		cost.process(left,right,costYXD);
+
+		return costYXD;
+	}
+
+	/**
+	 * Does it produce the same results when called multiple times with the same input?
+	 */
+	@Test
 	void process_MultipleCalls() {
-		fail("Implement");
+		Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,width,height,12);
+		GImageMiscOps.fillUniform(costYXD,rand,0,100);
+
+		SgmCostAggregation alg = new SgmCostAggregation();
+
+		for( int paths : new int[]{1,2,4,8,16}) {
+			alg.setPathsConsidered(paths);
+			alg.process(costYXD);
+			Planar<GrayU16> expected = alg.getAggregated().clone();
+			alg.process(costYXD);
+			Planar<GrayU16> found = alg.getAggregated();
+
+			BoofTesting.assertEquals(expected,found,0.0);
+		}
+	}
+
+	/**
+	 * See if it properly handles and respects the requested disparity search bounds?
+	 */
+	@Test
+	void process_DisparitySearch() {
+		SgmCostAggregation alg = new SgmCostAggregation();
+		alg.setPathsConsidered(4);
+
+		process_DisparitySearch(alg,0,5);
+		process_DisparitySearch(alg,4,5);
+		process_DisparitySearch(alg,6,5);
+		process_DisparitySearch(alg,8,5);
+	}
+
+	void process_DisparitySearch( SgmCostAggregation alg, int minDisparity , int expectedD ) {
+		Planar<GrayU16> costYXD = createCostWithStep(22,expectedD, minDisparity);
+		alg.configure(minDisparity);
+		alg.process(costYXD);
+
+		double successRate = fractionSuccess(alg,expectedD);
+		if( minDisparity <= expectedD )
+			assertTrue( successRate> 0.95 , "rate = "+successRate );
+		else
+			assertTrue( successRate < 0.10 , "rate = "+successRate);
+	}
+
+	private double fractionSuccess(SgmCostAggregation alg, int expectedD) {
+		int correct = 0;
+		int total = 0;
+		Planar<GrayU16> aggregatedYXD = alg.getAggregated();
+
+		final int disparityMin = alg.disparityMin;
+
+		for (int y = 0; y < height; y++) {
+			for (int x = disparityMin; x < width; x++) {
+				int localRangeD = alg.helper.localDisparityRangeLeft(x);
+				int bestD = -1;
+				int bestScore = Integer.MAX_VALUE;
+				for (int d = 0; d < localRangeD; d++) {
+					int score = aggregatedYXD.getBand(y).get(d,x-disparityMin);
+					if( score < bestScore ) {
+						bestScore = score;
+						bestD = d;
+					}
+				}
+//					System.out.println(x+" "+y+"  bestD "+bestD);
+				// the outside border's will pick a bad disparity because there is no corresponding pixel
+				// in the other one
+				if( x >= expectedD && x < width-expectedD ) {
+					if( expectedD == bestD+disparityMin )
+						correct++;
+					total++;
+				}
+			}
+		}
+
+		return correct/(double)total;
+	}
+
+	/**
+	 * Compare concurrent to non-concurrent results
+	 */
+	@Test
+	void compareConcurrent() {
+		// larger image to give the threads more time to mess stuff up
+		Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,120,60,20);
+		GImageMiscOps.fillUniform(costYXD,rand,0,100);
+
+		Planar<GrayU16> expected;
+		BoofConcurrency.USE_CONCURRENT = false;
+		{
+			SgmCostAggregation alg = new SgmCostAggregation();
+			alg.process(costYXD);
+			expected = alg.getAggregated();
+		}
+
+		BoofConcurrency.USE_CONCURRENT = true;
+		{
+			SgmCostAggregation alg = new SgmCostAggregation();
+			alg.process(costYXD);
+			BoofTesting.assertEquals(expected,alg.getAggregated(),0.0);
+		}
 	}
 
 	/**
@@ -73,13 +237,15 @@ class TestSgmCostAggregation {
 
 	void scoreDirection( int dx , int dy )  {
 		Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,rangeD,width,height);
+
+		// The helper will increment score every time it's accessed
 		ScorePathHelper alg = new ScorePathHelper();
 		alg.init(costYXD);
 		alg.scoreDirection(dx,dy);
 
+		// Create a matrix with all the elements that should have been scored set to 1
 		GrayU8 expected = alg.scored.createSameShape();
-
-		for (int x = 0; x < width; x++) {
+		for (int x = 0; x < alg.effectiveLengthX; x++) {
 			if( dy > 0 )
 				expected.set(x,0,1);
 			else if( dy < 0 )
@@ -89,8 +255,10 @@ class TestSgmCostAggregation {
 			if( dx > 0 )
 				expected.set(0,y,1);
 			else if( dx < 0 )
-				expected.set(width-1,y,1);
+				expected.set(alg.effectiveLengthX-1,y,1);
 		}
+
+		// expected and found scores should be identical
 		BoofTesting.assertEquals(expected,alg.scored,0);
 	}
 
@@ -123,16 +291,20 @@ class TestSgmCostAggregation {
 		for (int y = 0; y < height; y++) {
 			GrayU16 aggregatedXD = aggregatedYXD.getBand(y);
 			for (int x = 0; x < width; x++) {
+				int localRangeD = alg.helper.localDisparityRangeLeft(x);
 				int bestD = -1;
 				int bestCost = Integer.MAX_VALUE;
-				for (int d = 0; d < rangeD; d++) {
-					if( aggregatedXD.get(d,x) < bestCost ) {
+				for (int d = 0; d < localRangeD; d++) {
+					int cost = aggregatedXD.get(d,x);
+					if( cost < bestCost ) {
 						bestCost = aggregatedXD.get(d,x);
 						bestD = d;
 					}
 				}
-				assertEquals(targetD,bestD);
-//				assertEquals(200,bestCost);
+				if( localRangeD > targetD )
+					assertEquals(targetD,bestD);
+				else
+					assertTrue(bestD<targetD||bestD>=0);
 			}
 		}
 	}
@@ -142,32 +314,40 @@ class TestSgmCostAggregation {
 	 */
 	@Test
 	void scorePath() {
+		int x0=0,y0=0,dx=1,dy=1;
+
 		Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,rangeD,width,height);
-		GImageMiscOps.fillUniform(costYXD,rand,0,SgmDisparityCost.MAX_COST);
+		GImageMiscOps.fillUniform(costYXD,rand,1,SgmDisparityCost.MAX_COST);
 
 		SgmCostAggregation alg = new SgmCostAggregation();
 
 		alg.init(costYXD);
-
-		alg.scorePath(0,0,1,1, null);
+		GImageMiscOps.fill(alg.aggregated,0xBEEF);
+		short[] workCostlr = new short[width*rangeD];
+		alg.scorePath(x0,y0,dx,dy, workCostlr);
 
 		// the length is the number of elements to expect
-		int length = alg.computePathLength(0,0,1,1);
-		int foundCount = countNotZero(alg.aggregated);
+		int foundCount = countNotValue(alg.aggregated,0xBEEF);
+
+		// Find the number of non-zero elements
+		int length = alg.computePathLength(x0,y0,dx,dy);
+		int expected = 0;
+		for (int i = 0, x=x0,y=y0; i < length; i++,x+=dx,y+=dy) {
+			expected += alg.helper.localDisparityRangeLeft(x);
+		}
+		expected -= length; // at least one element will be zero for each element in the path
 
 		// for each point in the path it computed the aggregated cost
-		assertEquals(length*rangeD,foundCount);
-
-		// TODO check the actual value using a brute force approach
+		assertEquals(expected,foundCount);
 	}
 
-	private int countNotZero( Planar<GrayU16> aggregated ) {
+	private int countNotValue( Planar<GrayU16> aggregated , int value ) {
 		int count = 0;
 		for (int band = 0; band < aggregated.getNumBands(); band++) {
 			GrayU16 b = aggregated.getBand(band);
 			for (int row = 0; row < b.height; row++) {
 				for (int col = 0; col < b.width; col++) {
-					if( b.unsafe_get(col,row) != 0 )
+					if( b.unsafe_get(col,row) != value )
 						count++;
 				}
 			}
@@ -176,38 +356,51 @@ class TestSgmCostAggregation {
 	}
 
 	/**
-	 * Compare the computed cost against a brute force implementation that's easy to check
+	 * Compute the cost using inner and border methods then compare against a brute force implementationcomputeCostBorderD
 	 */
 	@Test
-	void computeCostInnerD() {
+	void computeCost_inner_and_border() {
 		Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,rangeD,width,height);
 		GImageMiscOps.fillUniform(costYXD,rand,0,SgmDisparityCost.MAX_COST);
 
 		SgmCostAggregation alg = new SgmCostAggregation();
 		alg.init(costYXD);
+		alg.workspace.get(0).checkSize();
 		short[] workCostLr = alg.workspace.get(0).workCostLr;
 		for (int i = 0; i < workCostLr.length; i++) {
 			workCostLr[i] = (short)rand.nextInt(SgmDisparityCost.MAX_COST);
 		}
 
-		GrayU16 costXD = costYXD.getBand(2);
+		int y = 2;
+		int x = rangeD + 2;  // x-value away from the image border
 
-		int x = rangeD + 2;  // x-value in image
+		GrayU16 costXD = costYXD.getBand(y);
+
 		int pathI = 3;       // location along the path
 
 		int idxCost = costXD.getIndex(0,x); // x=row, d=col
-		int idxWork = alg.lengthD*pathI;
+		int idxLrPrev = alg.lengthD*pathI;
 
 		// Compute the cost using this algorithm
-		alg.computeCostInnerD(costXD,idxCost,idxWork, rangeD, workCostLr);
+		alg.computeCostInnerD(costXD,idxCost,idxLrPrev, rangeD, workCostLr);
+		alg.computeCostBorderD(idxCost,idxLrPrev,0,costXD, rangeD, workCostLr);
+		alg.computeCostBorderD(idxCost,idxLrPrev,rangeD-1,costXD, rangeD, workCostLr);
 
 		// Now compare it to a brute force solution
-		for (int d = 1; d < rangeD-1; d++) {
+		bruteForceCost(alg,x,y,pathI,rangeD);
+
+	}
+
+	private void bruteForceCost( SgmCostAggregation alg , int x , int y , int pathI , int localRangeD  ) {
+		GrayU16 costXD = alg.costYXD.getBand(y);
+		final int MC = SgmDisparityCost.MAX_COST;
+
+		for (int d = 0; d < localRangeD; d++) {
 			int cost_p_d = costXD.get(d,x);
 
 			int l0 = workArray(alg,pathI,d);
-			int l1 = workArray(alg,pathI,d-1) + alg.penalty1;
-			int l2 = workArray(alg,pathI,d+1) + alg.penalty1;
+			int l1 = (d>0?workArray(alg,pathI,d-1):MC) + alg.penalty1;
+			int l2 = (d<localRangeD-1?workArray(alg,pathI,d+1):MC) + alg.penalty1;
 			int l3 = alg.penalty2;
 
 			int v = min(min(min(l0,l1),l2),l3);
@@ -225,19 +418,56 @@ class TestSgmCostAggregation {
 	}
 
 	@Test
-	void compare_cost_border_to_inner() {
-		fail("Implement");
-	}
-
-	@Test
 	void saveWorkToAggregated() {
-		fail("Implement");
+		saveWorkToAggregated(0);
+		saveWorkToAggregated(2);
+	}
+	void saveWorkToAggregated(int disparityMin) {
+		SgmCostAggregation alg = new SgmCostAggregation();
+		alg.configure(disparityMin);
+		alg.init(new Planar<>(GrayU16.class,rangeD,width,height));
+
+		// set the aggregated cost to 1 so that we can tell the difference between assign and add
+		GImageMiscOps.fill(alg.aggregated,1);
+
+		int x0=2,y0=2;
+		int dx=1,dy=2;
+		int length = alg.computePathLength(x0,y0,dx,dy);
+		short[] workCostLr = new short[length*rangeD];
+
+		// fill in the work cost with a fixed known set of values
+		for (int i = 0,x=x0,y=y0; i < length; i++, x+=dx, y+=dy ) {
+			int localRange = alg.helper.localDisparityRangeLeft(x+disparityMin);
+			for (int d = 0; d < localRange; d++) {
+				workCostLr[i*rangeD+d] = (short)(1+i+d);
+			}
+		}
+
+		// Add the data to the aggregated cost
+		alg.saveWorkToAggregated(x0,y0,dx,dy,length,workCostLr);
+
+		// Check to aggregated cost's value along the path
+		for (int i = 0,x=x0,y=y0; i < length; i++, x+=dx, y+=dy ) {
+			int localRange = alg.helper.localDisparityRangeLeft(x+disparityMin);
+			for (int d = 0; d < localRange; d++) {
+				short expected = (short)(2+i+d);
+				assertEquals(expected,alg.aggregated.getBand(y).get(d,x),i+" "+d);
+				// set the value back to one so that other values can be easily tested
+				alg.aggregated.getBand(y).set(d,x,1);
+			}
+		}
+
+		// Aggregated should be all ones now
+		Planar<GrayU16> ones = alg.aggregated.createSameShape();
+		GImageMiscOps.fill(ones,1);
+		BoofTesting.assertEquals(ones,alg.aggregated,0);
 	}
 
 	@Test
 	void computePathLength() {
 		SgmCostAggregation alg = new SgmCostAggregation();
-		alg.lengthX = width;
+		// The effective length should be used instead of the actual length to take in account min disparity
+		alg.effectiveLengthX = width;
 		alg.lengthY = height;
 
 		checkComputePathLength(alg,0,0,1,0);
@@ -266,14 +496,6 @@ class TestSgmCostAggregation {
 		checkComputePathLength(alg,0,5,0,1);
 		checkComputePathLength(alg,0,5,2,1);
 		checkComputePathLength(alg,0,5,1,2);
-	}
-
-	/**
-	 * Compare concurrent to non-concurrent results
-	 */
-	@Test
-	public void compareConcurrent() {
-		fail("implement");
 	}
 
 	void checkComputePathLength(SgmCostAggregation alg , int x0, int y0, int dx, int dy) {
@@ -306,8 +528,8 @@ class TestSgmCostAggregation {
 
 		@Override
 		void scorePath(int x0, int y0, int dx, int dy, short[] work) {
-			int total = scored.get(x0,y0);
-			scored.set(x0,y0,total+1);
+			// increment scored every time it's accessed
+			scored.set(x0,y0,scored.get(x0,y0)+1);
 		}
 	}
 }

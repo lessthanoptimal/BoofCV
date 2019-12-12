@@ -18,16 +18,24 @@
 
 package boofcv.alg.feature.disparity.sgm.cost;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import boofcv.alg.feature.disparity.sgm.SgmDisparityCost;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
+import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
-class TestSgmCostAbsoluteValue {
-	@Test
-	void stuff() {
-		fail("Implement");
+class TestSgmCostAbsoluteDifference {
+	@Nested
+	public class U8 extends ChecksSgmDisparityCost<GrayU8>{
+		public U8() {
+			super(0, 255, ImageType.single(GrayU8.class));
+		}
+
+		@Override
+		SgmDisparityCost<GrayU8> createAlg() {
+			return new SgmCostAbsoluteDifference.U8();
+		}
 	}
 }

@@ -30,6 +30,11 @@ import boofcv.struct.image.Planar;
  * <p>The output is really a 3D tensor, but to avoid creating another custom data type planar images are used.
  * The other reason to use a planar image is that it was desirable to have multiple arrays define the tensor.</p>
  *
+ * <p>
+ * Format of costYXD. YXD indicates the ordering of values in the tensor. The outer most is T, which is the bands.
+ * X is the row in a planar image and D the columns. Thus, (y,x,d) = costYXD.getBand(y).get(d,x-disparityMin).
+ * </p>
+ *
  * @author Peter Abeles
  */
 public interface SgmDisparityCost<T extends ImageBase<T>> {
@@ -40,17 +45,21 @@ public interface SgmDisparityCost<T extends ImageBase<T>> {
 	int MAX_COST = 2048-1;
 
 	/**
+	 * Configures the disparity search
+	 *
+	 * @param disparityMin Minimum possible disparity, inclusive
+	 * @param disparityRange Number of possible disparity values estimated. The max possible disparity is min+range-1.
+	 */
+	void configure( int disparityMin , int disparityRange );
+
+	/**
 	 * Computes the score for all possible disparity values across all pixels. If a disparity value would
 	 * go outside of the image then the cost is set to {@link #MAX_COST}
 	 *
 	 * @param left left image
 	 * @param right right image
-	 * @param disparityMin Minimum possible disparity, inclusive
-	 * @param disparityRange Number of possible disparity values estimated. The max possible disparity is min+range-1.
 	 * @param costYXD Cost of output scaled to have a range of 0 to {@link SgmDisparityCost#MAX_COST}, inclusive.
 	 *                Reshaped to match input and disparity range.
 	 */
-	void process(T left , T right ,
-				 int disparityMin , int disparityRange,
-				 Planar<GrayU16> costYXD );
+	void process(T left , T right , Planar<GrayU16> costYXD );
 }

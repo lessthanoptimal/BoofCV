@@ -18,25 +18,44 @@
 
 package boofcv.alg.feature.disparity.sgm;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 import java.util.Random;
 
-public class CommonSgmChecks {
+public class CommonSgmChecks<T extends ImageGray<T>> {
 	protected Random rand = new Random(234);
 	protected int width,height;
 
-	protected GrayU8 left  = new GrayU8(1,1);
-	protected GrayU8 right = new GrayU8(1,1);
+	ImageType<T> imageType;
+
+	protected T left;
+	protected T right;
 	protected GrayU8 disparityTruth = new GrayU8(1,1);
 
-	protected CommonSgmChecks( int width , int height ) {
+	protected CommonSgmChecks( int width , int height , ImageType<T> imageType ) {
+		this.imageType = imageType;
 		this.width = width;
 		this.height = height;
-		left.reshape(width,height);
-		right.reshape(width,height);
+		left = imageType.createImage(width,height);
+		right = imageType.createImage(width,height);
 		disparityTruth.reshape(width,height);
+	}
+
+	/**
+	 * Randomly fills in the left image and copies it by a fixed amount into the right
+	 */
+	protected void renderStereoRandom( int min, int max, int disparity, int invalid ) {
+		GImageMiscOps.fillUniform(left,rand,min,max);
+		GImageMiscOps.fill(right,0);
+		GImageMiscOps.copy(disparity,0,0,0,left.width-disparity,left.height,left,right);
+
+		GImageMiscOps.fill(disparityTruth,invalid);
+		GImageMiscOps.fillRectangle(disparityTruth,disparity,disparity,0,left.width-disparity,left.height);
 	}
 
 	/**
@@ -48,8 +67,8 @@ public class CommonSgmChecks {
 				// Create a step function
 				int valueR = y*3 + ((x+d)/6)*4;
 				int valueL = y*3 + (x/6)*4;
-				right.set(x,y, valueR);
-				left.set(x,y, valueL);
+				GeneralizedImageOps.set(left,x,y,valueL);
+				GeneralizedImageOps.set(right,x,y,valueR);
 			}
 		}
 		ImageMiscOps.fill(disparityTruth,d);
@@ -66,8 +85,8 @@ public class CommonSgmChecks {
 				// Create a step function
 				int valueR = y + x+d;
 				int valueL = y + x;
-				right.set(x,y, valueR);
-				left.set(x,y, valueL);
+				GeneralizedImageOps.set(left,x,y,valueL);
+				GeneralizedImageOps.set(right,x,y,valueR);
 			}
 		}
 		ImageMiscOps.fill(disparityTruth,d);

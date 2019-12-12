@@ -33,9 +33,9 @@ import boofcv.struct.image.ImageBase;
 public abstract class SgmCostHamming<T extends ImageBase<T>> extends SgmCostBase<T> {
 	public static class U8 extends SgmCostHamming<GrayU8> {
 		@Override
-		protected void computeDisparityErrors(int idxLeft, int idxRight, int idxOut, int disparityMin, int disparityMax) {
+		protected void computeDisparityErrors(int idxLeft, int idxRight, int idxOut, int disparityRange) {
 			int valLeft = left.data[idxLeft] & 0xFF;
-			for (int d = disparityMin; d <= disparityMax; d++) {
+			for (int d = 0; d < disparityRange; d++) {
 				int valRight = right.data[idxRight--] & 0xFF;
 				costXD.data[idxOut+d] = (short) (SgmDisparityCost.MAX_COST*DescriptorDistance.hamming(valLeft^valRight)/8);
 			}
@@ -44,9 +44,9 @@ public abstract class SgmCostHamming<T extends ImageBase<T>> extends SgmCostBase
 
 	public static class S32 extends SgmCostHamming<GrayS32> {
 		@Override
-		protected void computeDisparityErrors(int idxLeft, int idxRight, int idxOut, int disparityMin, int disparityMax) {
+		protected void computeDisparityErrors(int idxLeft, int idxRight, int idxOut, int disparityRange) {
 			int valLeft = left.data[idxLeft];
-			for (int d = disparityMin; d <= disparityMax; d++) {
+			for (int d = 0; d < disparityRange; d++) {
 				int valRight = right.data[idxRight--];
 				costXD.data[idxOut+d] = (short) (SgmDisparityCost.MAX_COST*DescriptorDistance.hamming(valLeft^valRight)/32);
 			}
@@ -55,9 +55,9 @@ public abstract class SgmCostHamming<T extends ImageBase<T>> extends SgmCostBase
 
 	public static class S64 extends SgmCostHamming<GrayS64> {
 		@Override
-		protected void computeDisparityErrors(int idxLeft, int idxRight, int idxOut, int disparityMin, int disparityMax) {
+		protected void computeDisparityErrors(int idxLeft, int idxRight, int idxOut, int disparityRange) {
 			long valLeft = left.data[idxLeft];
-			for (int d = disparityMin; d <= disparityMax; d++) {
+			for (int d = 0; d < disparityRange; d++) {
 				long valRight = right.data[idxRight--];
 				costXD.data[idxOut+d] = (short) (SgmDisparityCost.MAX_COST*DescriptorDistance.hamming(valLeft^valRight)/64);
 			}

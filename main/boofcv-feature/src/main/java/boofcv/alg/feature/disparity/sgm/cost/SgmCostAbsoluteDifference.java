@@ -31,9 +31,9 @@ public abstract class SgmCostAbsoluteDifference<T extends ImageBase<T>> extends 
 {
 	public static class U8 extends SgmCostAbsoluteDifference<GrayU8> {
 		@Override
-		protected void computeDisparityErrors(int idxLeft, int idxRight, int idxOut, int disparityMin, int disparityMax) {
+		protected void computeDisparityErrors(int idxLeft, int idxRight, int idxOut, int disparityRange) {
 			int valLeft = left.data[idxLeft] & 0xFF;
-			for (int d = disparityMin; d <= disparityMax; d++) {
+			for (int d = 0; d < disparityRange; d++) {
 				int valRight = right.data[idxRight--] & 0xFF;
 				costXD.data[idxOut+d] = (short)(SgmDisparityCost.MAX_COST*Math.abs(valRight-valLeft)/255);
 			}

@@ -35,19 +35,31 @@ import org.ejml.UtilEjml;
 import java.util.Random;
 
 /**
- * <p></p>Computes the Mutual Information error metric from a rectified stereo pair. Mutual information
+ * <p>Computes the Mutual Information error metric from a rectified stereo pair. Mutual information
  * between two images is defined as: MI(I1,I2) = H<sub>I1</sub> + H<sub>I2</sub> + H<sub>I1,I2</sub>.
  * Where H is an entropy function, e.g. H<sub>I</sub> = -sum_i P<sub>I</sub>(i)log(P<sub>I</sub>(i)),
  * where P<sub>I</sub>(i) is the probability of a pixel in image 'I' having that intensity. See [1]
  * for details.</p>
  *
- * <p>This implementation has been designed to handle images with pixel intensity greater than 8-bit.
- * That was done by allowing the number of bins in a histogram to be specified.
- * High dynamic range images are problematic because the joint entropy instead of being a 256x256 image might now be a
- * 4096x4096 image. The PDF for each image might also appear to be too flat.</p>
+ * The following steps need to be followed to use this class.
+ * <ol>
+ *     <li>Specify the maximum number of gray values using {@link #randomHistogram}</li>
+ *     <li>Initialize the histogram. If the disparity is known that can be used. Otherwise it's recommended that
+ *     {@link #diagonalHistogram} is used instead. Random initialization was suggested in the paper but that has been
+ *     found to only work on simple scenes</li>
+ *     <li>Call {@link #process} to compute the mutual information scores</li>
+ *     <li>Then call {@link #precomputeScaledCost(int)} to compute the scaled cost in a look up table</li>
+ *     <li>To get the cost use {@link #costScaled(int, int)}</li>
+ * </ol>
+ *
+ * <p>It was noted in later works that MI does not scale well to gray scales images greater than 8-bits,
+ * such as the common 12-bit ones used today. This is because the distribution of values becomes too
+ * sparse.</p>
  *
  * <p>[1] Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
  * IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.</p>
+ *
+ * @see boofcv.alg.feature.disparity.sgm.SgmStereoDisparityHmi
  *
  * @author Peter Abeles
  */
@@ -99,7 +111,8 @@ public class StereoMutualInformation {
 	}
 
 	/**
-	 * Computes random values for the cost between left and right values.
+	 * Computes random values for the cost between left and right values. Not recommended since it only seems
+	 * to work with simplistic images
 	 *
 	 * @param rand Random number generator
 	 */
@@ -110,6 +123,14 @@ public class StereoMutualInformation {
 		}
 	}
 
+	/**
+	 * Creates a diagonal histogram. This assumes that the pixel values are within a scale factor of each
+	 * other in the left and right images. You can specify the scale factor. Most of the time 1.0 works just fine
+	 * Non diagonal elements are given a higher score.
+	 *
+	 * @param scaleLeftToRight Ratio of pixel intensity values from left to right image
+	 * @param maxCost The worst cost.
+	 */
 	public void diagonalHistogram( double scaleLeftToRight , int maxCost ) {
 		int costLow = maxCost/20;
 		int costHigh = maxCost/3;
@@ -194,7 +215,7 @@ public class StereoMutualInformation {
 				// The equation below assumes that all disparities are valid and won't result in a pixel going
 				// outside the image
 				int leftValue  =  left.data[idx  ]&0xFF; // I(x  ,y)
-				int rightValue = right.data[idx-d]&0xFF; // I(x-d,y) // TODO multiple left could map to this pixel
+				int rightValue = right.data[idx-d]&0xFF; // I(x-d,y)
 
 				// increment the histogram
 				histJoint.data[leftValue*histLength+rightValue]++; // H(L,R) += 1
@@ -262,14 +283,10 @@ public class StereoMutualInformation {
 		float minValue = Float.MAX_VALUE;
 		float maxValue = -Float.MAX_VALUE;
 
-		// TODO WARNING. N* is my own invention. As the size of the histogram increases the influence
-		//      of joint decreases N*N
-
-		//NOTE: Is there a way to compute this without going through exaustively?
+		// NOTE: Is there a way to compute this without going through exhaustively?
 		for (int left = 0; left < N; left++) {
 			for (int right = 0; right < N; right++) {
-//				float v = N*entropyJoint.unsafe_get(right,left) - entropyLeft.data[left] - entropyRight.data[right];
-//				float v = entropyJoint.unsafe_get(right,left);
+
 				float v = entropyJoint.unsafe_get(right,left) - entropyLeft.data[left] - entropyRight.data[right];
 				if( minValue > v )
 					minValue = v;
@@ -277,15 +294,11 @@ public class StereoMutualInformation {
 					maxValue = v;
 			}
 		}
-//		minValue = 0; // Clipping the entropy at zero seems to improve performance?!
 		float rangeValue = maxValue-minValue;
 
 		for (int left = 0; left < N; left++) {
 			for (int right = 0; right < N; right++) {
-//				float v = N*entropyJoint.unsafe_get(right,left) - entropyLeft.data[left] - entropyRight.data[right];
-//				float v = entropyJoint.unsafe_get(right,left);
 				float v = entropyJoint.unsafe_get(right,left) - entropyLeft.data[left] - entropyRight.data[right];
-//				scaledCost.data[left*N+right] = v < 0 ? 0 : (short)(maxCost*(v-minValue)/rangeValue);
 				scaledCost.data[left*N+right] = (short)(maxCost*(v-minValue)/rangeValue);
 			}
 		}

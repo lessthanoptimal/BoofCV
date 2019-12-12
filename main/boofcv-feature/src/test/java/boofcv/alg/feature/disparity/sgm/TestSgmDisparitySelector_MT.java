@@ -18,16 +18,45 @@
 
 package boofcv.alg.feature.disparity.sgm;
 
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.struct.image.GrayU16;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.Planar;
+import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.Random;
 
 /**
  * @author Peter Abeles
  */
 class TestSgmDisparitySelector_MT {
+	Random rand = new Random(2345);
+	int width=60;
+	int height=50;
+	int rangeD=30;
+	/**
+	 * Compte threaded to single threaded
+	 */
 	@Test
-	void stuff() {
-		fail("Implement");
+	void compareToSingle() {
+		Planar<GrayU16> aggregatedYXD = new Planar<>(GrayU16.class,rangeD,width,height);
+		GImageMiscOps.fillUniform(aggregatedYXD,rand,0,SgmDisparityCost.MAX_COST);
+
+		SgmDisparitySelector single = new SgmDisparitySelector();
+		SgmDisparitySelector multi = new SgmDisparitySelector_MT();
+
+		GrayU8 expected = new GrayU8(width,height);
+		GrayU8 found = new GrayU8(width,height);
+
+		for (int rightToLeft = 0; rightToLeft < 2; rightToLeft++) {
+			single.setRightToLeftTolerance(rightToLeft);
+			multi.setRightToLeftTolerance(rightToLeft);
+
+			single.select(null,aggregatedYXD,expected);
+			multi.select(null,aggregatedYXD,found);
+
+			BoofTesting.assertEquals(expected,found,0);
+		}
 	}
 }

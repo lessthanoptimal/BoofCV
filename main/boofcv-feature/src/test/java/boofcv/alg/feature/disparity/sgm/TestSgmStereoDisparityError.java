@@ -18,16 +18,26 @@
 
 package boofcv.alg.feature.disparity.sgm;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import boofcv.alg.feature.disparity.sgm.cost.SgmCostAbsoluteDifference;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
+import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
 class TestSgmStereoDisparityError {
-	@Test
-	void stuff() {
-		fail("Implement");
+	@Nested
+	public class U8_U8 extends GenericSgmStereoDisparityChecks<GrayU8,GrayU8>
+	{
+		protected U8_U8() {
+			super(ImageType.SB_U8);
+		}
+
+		@Override
+		public SgmStereoDisparity<GrayU8, GrayU8> createAlgorithm() {
+			SgmDisparitySelector selector = new SgmDisparitySelector();
+			return new SgmStereoDisparityError<>(new SgmCostAbsoluteDifference.U8(),selector);
+		}
 	}
 }

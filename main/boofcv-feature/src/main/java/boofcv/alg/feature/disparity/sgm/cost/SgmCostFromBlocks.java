@@ -42,14 +42,21 @@ public class SgmCostFromBlocks<T extends ImageBase<T>>
 	protected DisparityBlockMatchRowFormat<T,GrayU8> blockScore;
 	private GrayU8 dummy=null;
 	private int maxRegionError = 0;
+	private int disparityMin;
+	private int disparityRange;
 
 	@Override
-	public void process(T left, T right, int disparityMin, int disparityRange, Planar<GrayU16> costYXD) {
-		InputSanityCheck.checkSameShape(left,right);
-		costYXD.reshape(disparityRange,left.width,left.height);
+	public void configure(int disparityMin, int disparityRange) {
+		blockScore.configure(disparityMin,disparityRange);
+		this.disparityMin = disparityMin;
+		this.disparityRange = disparityRange;
+	}
 
-		// disparity min + range should be configured only once at construction and fixed after that
+	@Override
+	public void process(T left, T right, Planar<GrayU16> costYXD) {
+		InputSanityCheck.checkSameShape(left,right);
 		this.costYXD = costYXD;
+		costYXD.reshape(disparityRange,left.width,left.height);
 		maxRegionError = blockScore.getMaxRegionError();
 		blockScore.process(left,right,dummy);
 	}
@@ -61,19 +68,22 @@ public class SgmCostFromBlocks<T extends ImageBase<T>>
 	public void process(int row, int[] scoresArray) {
 		GrayU16 costXD = costYXD.getBand(row);
 		final int lengthX = costXD.height;
-		final int lengthD = costXD.width;
 
-		for (int x = 0; x < lengthX; x++) {
-			int dstIdx = x*lengthD; // TODO find the localLengthD
-			for (int d = 0; d < lengthD; d++) {
+		for (int x = disparityMin; x < lengthX; x++) {
+			int localRangeD = Math.min(disparityRange,x-disparityMin+1);
+			int dstIdx = (x-disparityMin)*disparityRange;
+			for (int d = 0; d < localRangeD; d++) {
 				// copy the error and range it's range
-				int srcIdx = d*lengthX + x;
+				int srcIdx = d*lengthX + x-disparityMin;
 				costXD.data[dstIdx++] = (short)(SgmDisparityCost.MAX_COST*scoresArray[srcIdx]/maxRegionError);
 
-				if( scoresArray[srcIdx] > maxRegionError || scoresArray[srcIdx] < 0 ) {
-					throw new RuntimeException("score is out of bounds. "+scoresArray[srcIdx]+
-							" / "+maxRegionError);
-				}
+//				if( scoresArray[srcIdx] > maxRegionError || scoresArray[srcIdx] < 0 ) {
+//					throw new RuntimeException("score is out of bounds. "+scoresArray[srcIdx]+
+//							" / "+maxRegionError);
+//				}
+			}
+			for (int d = localRangeD; d < disparityRange; d++) {
+				costXD.data[dstIdx++] = SgmDisparityCost.MAX_COST;
 			}
 		}
 	}

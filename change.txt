@@ -56,9 +56,9 @@ Version : 0.35
   * Block Matching can now be scored using Census and NCC
   * Added Semi-Global Matching with several options for score functions
   * TODO Ensure that all auto code generators still work
-  * TODO SGM and min disparity
   * TODO revert speed regression for BM
   * TODO Block HMI
+  * TODO Filter small disparity regions
 - SFM
   * Projective camera with lens distortion
   * TODO Stereo VO Quad - Now uses trifocal tensor and sparse bundle adjustment
@@ -80,10 +80,7 @@ TODO hough circle detector
 TODO concurrent SIFT
 TODO concurrent dense features?
 TODO Estimate focal lengths given disparity image
-TODO Disparity
-     Extend disparity to handle border regions
-     Remove islands
-     Fill in holes
+TODO Disparity - fill in holes
 
 ---------------------------------------------
 Date    : 2019-July-07

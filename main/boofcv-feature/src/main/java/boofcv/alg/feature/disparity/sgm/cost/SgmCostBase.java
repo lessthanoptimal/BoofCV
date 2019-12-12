@@ -25,7 +25,8 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.Planar;
 
 /**
- * Base class for computing SGM cost using single pixel error metrics.
+ * Base class for computing SGM cost using single pixel error metrics. It handles iterating through all possible
+ * disparity values for all pixels in the image and any other book keeping. Only the score needs to be implemented.
  *
  * @author Peter Abeles
  */
@@ -33,39 +34,49 @@ public abstract class SgmCostBase<T extends ImageBase<T>> implements SgmDisparit
 	protected T left, right;
 	protected GrayU16 costXD;
 
+	protected int disparityMin;
+	protected int disparityRange;
+
 	@Override
-	public void process(T left, T right, int disparityMin, int disparityRange, Planar<GrayU16> costYXD) {
+	public void configure(int disparityMin, int disparityRange) {
+		this.disparityMin = disparityMin;
+		this.disparityRange = disparityRange;
+	}
+
+	@Override
+	public void process(T left, T right, Planar<GrayU16> costYXD) {
 		InputSanityCheck.checkSameShape(left,right);
+		if( disparityRange == 0)
+			throw new IllegalArgumentException("disparityRange is 0. Did you call configure()?");
 		this.left = left;
 		this.right = right;
 
 		// Declare the "tensor" with shape (lengthY,lengthX,lengthD)
 		costYXD.reshape(disparityRange,left.width,left.height);
 
-		int maxDisparity = disparityMin + disparityRange - 1;
-
 		for (int y = 0; y < left.height; y++) {
 			costXD = costYXD.getBand(y);
 
-			int idxLeft  = left.startIndex  + y*left.stride;
+			int idxLeft  = left.startIndex  + y*left.stride + disparityMin;
 
-			for (int x = 0; x < left.width; x++, idxLeft++) {
-				int idxOut = costXD.startIndex + x*costYXD.stride;
+			for (int x = disparityMin; x < left.width; x++, idxLeft++) {
+				int idxOut = costXD.startIndex + (x-disparityMin)*costYXD.stride;
 
-				// the maximum disparity in which the pixel will be inside the right image
-				int m = Math.min(x,maxDisparity);
+				// The local limits on ranges that can be examined
+				int localRange = Math.min(disparityRange,x-disparityMin+1);
+
 				// start reading the right image at the smallest disparity then increase disparity size
 				int idxRight = right.startIndex + y*right.stride + x - disparityMin;
 
-				computeDisparityErrors(idxLeft,idxRight,idxOut,disparityMin,m);
+				computeDisparityErrors(idxLeft,idxRight,idxOut,localRange);
 
 				// Fill in the disparity values outside the image with max cost
-				for (int d =m+1; d <= maxDisparity; d++) {
+				for (int d = localRange; d < disparityRange; d++) {
 					costXD.data[idxOut+d] = SgmDisparityCost.MAX_COST;
 				}
 			}
 		}
 	}
 
-	protected abstract void computeDisparityErrors( int idxLeft , int idxRight , int idxOut, int disparityMin , int disparityMax );
+	protected abstract void computeDisparityErrors( int idxLeft , int idxRight , int idxOut, int localRange );
 }

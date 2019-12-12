@@ -62,21 +62,25 @@ public abstract class SgmStereoDisparity<T extends ImageBase<T>, C extends Image
 
 		for (int y = 0; y < aggregatedYXD.getNumBands(); y++) {
 			GrayU16 costXD = aggregatedYXD.getBand(y);
-			for (int x = 0; x < costXD.height; x++) {
-				int maxLocalDisparity = helper.localDisparityRangeLeft(x);
+			for (int x = 0; x < disparityMin; x++) {
+				dst.unsafe_set(x,y,disparityRange); // make as invalid
+			}
+			for (int x = disparityMin; x < costXD.height; x++) {
+				int localMaxRange = helper.localDisparityRangeLeft(x);
 				int d = src.unsafe_get(x,y);
 				float subpixel;
-				if( d > 0 && d < maxLocalDisparity-1) {
-					int c0 = costXD.unsafe_get(d-1,x);
-					int c1 = costXD.unsafe_get(d  ,x);
-					int c2 = costXD.unsafe_get(d+1,x);
+				if( d > 0 && d < localMaxRange-1) {
+					int adjX = x - disparityMin; // see how cost tensor is defined
+					int c0 = costXD.unsafe_get(d-1,adjX);
+					int c1 = costXD.unsafe_get(d  ,adjX);
+					int c2 = costXD.unsafe_get(d+1,adjX);
 
 					float offset = (float)(c0-c2)/(float)(2*(c0-2*c1+c2));
 					subpixel = d + offset;
 				} else {
 					subpixel = d;
 				}
-				dst.set(x,y,subpixel);
+				dst.unsafe_set(x,y,subpixel);
 			}
 		}
 	}

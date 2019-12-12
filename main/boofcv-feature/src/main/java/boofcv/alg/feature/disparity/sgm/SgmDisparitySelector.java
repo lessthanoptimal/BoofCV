@@ -42,7 +42,7 @@ public class SgmDisparitySelector {
 	double textureThreshold=0.0;
 
 	// The minimum possible disparity
-	int minDisparity=0;
+	int disparityMin = 0;
 	// specified which value was used to indivate that a disparity is invalid
 	int invalidDisparity=-1;
 
@@ -65,10 +65,10 @@ public class SgmDisparitySelector {
 			GrayU16 aggregatedXD = aggregatedYXD.getBand(y);
 
 			// if 'x' is less than minDisparity then that's nothing that it can compare against
-			for (int x = 0; x < minDisparity; x++) {
+			for (int x = 0; x < disparityMin; x++) {
 				disparity.unsafe_set(x,y, invalidDisparity);
 			}
-			for (int x = minDisparity; x < lengthX; x++) {
+			for (int x = disparityMin; x < lengthX; x++) {
 				disparity.unsafe_set(x,y, findBestDisparity(x,aggregatedXD));
 			}
 		}
@@ -83,23 +83,25 @@ public class SgmDisparitySelector {
 		this.lengthX = aggregatedYXD.height;
 		this.lengthD = aggregatedYXD.width;
 		this.invalidDisparity = invalidGivenRange(lengthD);
-		helper.configure(lengthX,minDisparity,lengthD);
+		helper.configure(lengthX, disparityMin,lengthD);
 		if( invalidDisparity > 255 )
 			throw new IllegalArgumentException("Disparity range is too great. Must be < 256 not "+lengthD);
 	}
 
 	/**
 	 * Selects the disparity for the specified pixel using a winner takes all strategy
+	 *
+	 * @param x x-coordinate in original image coordinates. DO NOT SUBTRACT disparityMin
 	 */
 	int findBestDisparity(int x , GrayU16 aggregatedXD) {
 		// The maximum disparity range that can be considered at 'x'
-		int maxLocalDisparity = helper.localDisparityRangeLeft(x);
+		int localMaxRange = helper.localDisparityRangeLeft(x);
 		int bestScore = Integer.MAX_VALUE;
 		int bestRange = invalidDisparity;
 
 		// Select the disparity with the lowest aggregated cost
-		final int idx = aggregatedXD.getIndex(0,x);
-		for (int d = 0; d < maxLocalDisparity; d++) {
+		final int idx = aggregatedXD.getIndex(0,x-disparityMin);
+		for (int d = 0; d < localMaxRange; d++) {
 			int cost = aggregatedXD.data[idx+d] & 0xFFFF;
 			if( cost < bestScore ) {
 				bestScore = cost;
@@ -107,22 +109,25 @@ public class SgmDisparitySelector {
 			}
 		}
 
+		if( bestRange == invalidDisparity )
+			return invalidDisparity;
+
 		// See if the maximum error is exceeded
-		if( bestRange != invalidDisparity &&  bestScore > maxError ) {
-			bestRange = invalidDisparity;
+		if( bestScore > maxError ) {
+			return invalidDisparity;
 		}
 
 		// right to left consistency check
-		if( bestRange != invalidDisparity && rightToLeftTolerance >= 0 ) {
-			// TODO why isn't this pruning the left side of the disparity image as much as block is?
+		if( rightToLeftTolerance >= 0 ) {
+			// TODO why isn't this pruning the left side of the disparity image as much as block matching does?
 			// Not nearly as effective at pruning as it is with
-			int bestRange_R_to_L = selectRightToLeft(x-bestRange-minDisparity,aggregatedXD);
+			int bestRange_R_to_L = selectRightToLeft(x-bestRange-disparityMin,aggregatedXD);
 			if( Math.abs(bestRange_R_to_L-bestRange) > rightToLeftTolerance )
-				bestRange = invalidDisparity;
+				return invalidDisparity;
 		}
 
 		// See if the best solution is ambiguous
-		if( bestRange != invalidDisparity && maxLocalDisparity > 3 && textureThreshold > 0 ) {
+		if( localMaxRange > 3 && textureThreshold > 0 ) {
 			// find the second best disparity value and exclude its neighbors
 			int secondBest = Integer.MAX_VALUE;
 			for( int d = 0; d < bestRange-1; d++ ) {
@@ -131,7 +136,7 @@ public class SgmDisparitySelector {
 					secondBest = v;
 				}
 			}
-			for(int d = bestRange+2; d < maxLocalDisparity; d++ ) {
+			for(int d = bestRange+2; d < localMaxRange; d++ ) {
 				int v = aggregatedXD.data[idx+d] & 0xFFFF;
 				if( v < secondBest ) {
 					secondBest = v;
@@ -157,15 +162,18 @@ public class SgmDisparitySelector {
 	 */
 	private int selectRightToLeft( int x , GrayU16 aggregatedXD) {
 		// The range of disparities it can search from right to left
-		int maxLocalDisparity = helper.localDisparityRangeRight(x);
+		int localDisparityRange = helper.localDisparityRangeRight(x);
+		if( localDisparityRange <= 0) // it can't perform the check because it's too far right, just give it a pass
+			return x;
 
+		// Note in the cost x=0 is really disparityMin, this is the idx at x+disparityMin
 		int idx = aggregatedXD.getIndex(0,x); // disparity of zero at col
 
 		// best column in left image that it matches up with col in right
 		int bestD = 0;
 		float scoreBest = aggregatedXD.data[idx] & 0xFFFF;
 
-		for( int i = 1; i < maxLocalDisparity; i++ ) {
+		for( int i = 1; i < localDisparityRange; i++ ) {
 			idx += lengthD; // go to index next x-coordinate
 			int s = aggregatedXD.data[idx+i] & 0xFFFF;
 
@@ -194,12 +202,12 @@ public class SgmDisparitySelector {
 		this.maxError = maxError;
 	}
 
-	public int getMinDisparity() {
-		return minDisparity;
+	public int getDisparityMin() {
+		return disparityMin;
 	}
 
-	public void setMinDisparity(int minDisparity) {
-		this.minDisparity = minDisparity;
+	public void setDisparityMin(int disparityMin) {
+		this.disparityMin = disparityMin;
 	}
 
 	public int getInvalidDisparity() {

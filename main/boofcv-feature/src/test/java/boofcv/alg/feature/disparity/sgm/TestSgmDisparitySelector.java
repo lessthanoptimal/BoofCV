@@ -18,18 +18,17 @@
 
 package boofcv.alg.feature.disparity.sgm;
 
-import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"SuspiciousNameCombination", "SameParameterValue"})
 class TestSgmDisparitySelector {
 
 	int width=30;
@@ -45,61 +44,63 @@ class TestSgmDisparitySelector {
 		simple(5);
 	}
 
-	private void simple(int minDisparity) {
-		Planar<GrayU16> aggregatedYXD = createCostSimple();
+	private void simple(int disparityMin) {
+		Planar<GrayU16> aggregatedYXD = createCostSimple(disparityMin);
 
 		GrayU8 disparity = new GrayU8(width,height);
 		SgmDisparitySelector alg = new SgmDisparitySelector();
-		alg.setMinDisparity(minDisparity);
+		alg.setDisparityMin(disparityMin);
 		alg.setRightToLeftTolerance(-1); // disable right to left
 		alg.select(null,aggregatedYXD,disparity);
 
 		// Check the solution
 		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
+			for (int x = 0; x < disparityMin; x++) {
+				assertEquals(rangeD,disparity.get(x,y),x+" "+y);
+			}
+			for (int x = disparityMin; x < width; x++) {
 				// the max possible disparity that it can consider
-				int maxRangePlus1 = Math.min(x-minDisparity+1,rangeD);
-				int expected = (x+y)%rangeD;
+				int localRangeD = alg.helper.localDisparityRangeLeft(x);
+				int expectedRange = (x+y)%rangeD;
+				int foundRange = disparity.get(x, y);
 
 				// The expected disparity is within the range it can compare
-				if( maxRangePlus1 > expected )
-					assertEquals(expected,disparity.get(x,y),x+" "+y);
-				else if( maxRangePlus1 > 0 )
+				if( expectedRange > disparityMin && expectedRange < disparityMin+localRangeD ) {
+					assertEquals(expectedRange-disparityMin, foundRange, x + " " + y);
+				} else {
 					// the cost for d=0 is the same as all other cost so it will be selected
-					assertEquals(0,disparity.get(x,y),x+" "+y);
-				else
-					// can't sample within the allowed disparity range
-					assertEquals(alg.getInvalidDisparity(),disparity.get(x,y));
+					assertEquals(0, foundRange, x + " " + y);
+				}
 			}
 		}
 	}
 
-	private Planar<GrayU16> createCostSimple() {
+	private Planar<GrayU16> createCostSimple( int disparityMin) {
 		Planar<GrayU16> aggregatedYXD = new Planar<>(GrayU16.class,rangeD,width,height);
 
 		// Fill in the cost with known and obvious minimums
 		for (int y = 0; y < height; y++) {
 			GrayU16 costXD = aggregatedYXD.getBand(y);
-			for (int x = 0; x < width; x++) {
-				for (int d = 0; d < rangeD; d++) {
-					int c = d == (x+y)%rangeD ? 0 : 200;
-					costXD.set(d,x,c);
+			for (int x = disparityMin; x < width; x++) {
+				int localRangeMax =  Math.min(x- disparityMin + 1, rangeD);
+				for (int d = 0; d < localRangeMax; d++) {
+					int c = (disparityMin+d) == (x+y)%rangeD ? 0 : 200;
+					costXD.set(d,x-disparityMin,c);
 				}
 			}
 		}
 		return aggregatedYXD;
 	}
-	private Planar<GrayU16> createCostConst(int selectedD ) {
+	private Planar<GrayU16> createCostConst(int disparityMin, int selectedD ) {
 		Planar<GrayU16> aggregatedYXD = new Planar<>(GrayU16.class,rangeD,width,height);
-
-		GImageMiscOps.fill(aggregatedYXD,SgmDisparityCost.MAX_COST);
 
 		// Fill in the cost with known and obvious minimums
 		for (int y = 0; y < height; y++) {
 			GrayU16 costXD = aggregatedYXD.getBand(y);
-			for (int x = 0; x < width; x++) {
-				for (int d = 0; d < Math.min(rangeD,x+1); d++) {
-					int c = d == selectedD ? 0 : 200;
+			for (int x = disparityMin; x < width; x++) {
+				int localRangeMax =  Math.min(x- disparityMin + 1, rangeD);
+				for (int d = 0; d < localRangeMax; d++) {
+					int c = (disparityMin+d) == selectedD ? 0 : 200;
 					costXD.set(d,x,c);
 				}
 			}
@@ -116,27 +117,31 @@ class TestSgmDisparitySelector {
 	void rightToLeft() {
 		rightToLeft(0);
 		rightToLeft(1); // this won't run into border issues
+		rightToLeft(2);
 	}
-	void rightToLeft(int minDisparity) {
-		Planar<GrayU16> aggregatedYXD = createCostConst(5);
+	void rightToLeft(int disparityMin) {
+		int d = 5;
+		Planar<GrayU16> aggregatedYXD = createCostConst(disparityMin,d);
 
-		int tx = 7, ty=6, d = 5;
-		aggregatedYXD.getBand(ty).set(d, tx , 100);
-		aggregatedYXD.getBand(ty).set(3, tx-d+3 , 50);
+		int tx = 7, ty=6;
+		aggregatedYXD.getBand(ty).set(d-disparityMin, tx-disparityMin , 100);
+		// when right to left is considered it will find this lower cost
+		aggregatedYXD.getBand(ty).set(3-disparityMin, tx-d+3-disparityMin , 50);
 
 		SgmDisparitySelector alg = new SgmDisparitySelector();
 		GrayU16 aggregatedXD = aggregatedYXD.getBand(ty);
-		alg.setMinDisparity(minDisparity);
+		alg.setDisparityMin(disparityMin);
 		alg.setup(aggregatedYXD);
 
-		for (int i = 0; i < 3; i++) {
-			alg.setRightToLeftTolerance(i);
+		for (int tol = 0; tol < 3; tol++) {
+			alg.setRightToLeftTolerance(tol);
+			int found = alg.findBestDisparity(tx,aggregatedXD);
 			// see the match will be within tolerance
 			// minDisparity offsets the estimated disparity so take that in account
-			if( i < d-3-minDisparity )
-				assertEquals(alg.getInvalidDisparity(), alg.findBestDisparity(tx,aggregatedXD));
+			if( tol < d-3+disparityMin )
+				assertEquals(alg.getInvalidDisparity(), found,"tol = "+tol);
 			else
-				assertEquals(d, alg.findBestDisparity(tx,aggregatedXD));
+				assertEquals(d-disparityMin, found,"tol = "+tol);
 		}
 	}
 
@@ -145,25 +150,78 @@ class TestSgmDisparitySelector {
 	 */
 	@Test
 	void rightToLeft_RightBorder() {
-		Planar<GrayU16> aggregatedYXD = createCostConst(5);
-
+		rightToLeft_RightBorder(0);
+		rightToLeft_RightBorder(1);
+	}
+	void rightToLeft_RightBorder( int disparityMin ) {
 		int tx = width-1, ty=6, d = 5;
-
-		SgmDisparitySelector alg = new SgmDisparitySelector();
+		Planar<GrayU16> aggregatedYXD = createCostConst(disparityMin, d);
 		GrayU16 aggregatedXD = aggregatedYXD.getBand(ty);
-		alg.setMinDisparity(0);
+		SgmDisparitySelector alg = new SgmDisparitySelector();
+		alg.setDisparityMin(disparityMin);
 		alg.setup(aggregatedYXD);
-
-		// the only value on the right which can be matched with the left is x
-		assertEquals(d, alg.findBestDisparity(tx,aggregatedXD));
-
-		// this will fail because it's not within the allowed range
-		alg.setMinDisparity(1);
-		assertEquals(alg.getInvalidDisparity(), alg.findBestDisparity(tx,aggregatedXD));
+		alg.setRightToLeftTolerance(0);
+		assertEquals(d-disparityMin, alg.findBestDisparity(tx, aggregatedXD));
 	}
 
 	@Test
 	void maxError() {
-		fail("ensure that max error");
+		maxError(0);
+		maxError(1);
+	}
+	void maxError( int disparityMin ) {
+		int tx = width-1, ty=6, d = 5;
+		Planar<GrayU16> aggregatedYXD = createCostConst(disparityMin, d);
+		GrayU16 aggregatedXD = aggregatedYXD.getBand(ty);
+
+		// set the cost for the target to a non-zero value so it can be filtered
+		aggregatedXD.set(d-disparityMin, tx-disparityMin , 100);
+
+		SgmDisparitySelector alg = new SgmDisparitySelector();
+		alg.setDisparityMin(disparityMin);
+		alg.setup(aggregatedYXD);
+		alg.setRightToLeftTolerance(-1);
+
+		// test obvious scenarios
+		alg.setMaxError(150);
+		assertEquals(d-disparityMin, alg.findBestDisparity(tx, aggregatedXD));
+		alg.setMaxError(50);
+		assertEquals(alg.getInvalidDisparity(), alg.findBestDisparity(tx, aggregatedXD));
+
+		// test cases on the threshold
+		alg.setMaxError(100);
+		assertEquals(d-disparityMin, alg.findBestDisparity(tx, aggregatedXD));
+		alg.setMaxError(99);
+		assertEquals(alg.getInvalidDisparity(), alg.findBestDisparity(tx, aggregatedXD));
+	}
+
+	@Test
+	void texture() {
+		texture(0);
+		texture(1);
+	}
+	void texture( int disparityMin ) {
+		int tx = width-1, ty=6, d = 5;
+		Planar<GrayU16> aggregatedYXD = createCostConst(disparityMin, d);
+		GrayU16 aggregatedXD = aggregatedYXD.getBand(ty);
+
+		// Set another cost along the disparity that will have a value close to the optimal
+		aggregatedXD.set(d-disparityMin, tx-disparityMin , 100);
+		aggregatedXD.set(d-disparityMin, tx-disparityMin , 120);
+
+		SgmDisparitySelector alg = new SgmDisparitySelector();
+		alg.setDisparityMin(disparityMin);
+		alg.setup(aggregatedYXD);
+		alg.setRightToLeftTolerance(-1);
+
+		// Turn off texture validation
+		alg.setTextureThreshold(0.0);
+		assertEquals(d-disparityMin, alg.findBestDisparity(tx, aggregatedXD));
+		// should still be accepted
+		alg.setTextureThreshold(0.05);
+		assertEquals(d-disparityMin, alg.findBestDisparity(tx, aggregatedXD));
+		// now it should reject everything
+		alg.setTextureThreshold(1.0);
+		assertEquals(alg.getInvalidDisparity(), alg.findBestDisparity(tx, aggregatedXD));
 	}
 }

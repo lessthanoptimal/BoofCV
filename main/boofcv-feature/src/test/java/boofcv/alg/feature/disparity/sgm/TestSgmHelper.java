@@ -20,14 +20,59 @@ package boofcv.alg.feature.disparity.sgm;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Peter Abeles
  */
 class TestSgmHelper {
 	@Test
-	void stuff() {
-		fail("Implement");
+	void localDisparityRangeLeft() {
+		SgmHelper helper = new SgmHelper();
+		helper.width = 100;
+		helper.disparityMin = 0;
+		helper.disparityRange = 10;
+
+		for (int x = 0; x < 10; x++) {
+			assertEquals(x+1,helper.localDisparityRangeLeft(x));
+		}
+		assertEquals(10,helper.localDisparityRangeLeft(10));
+		assertEquals(10,helper.localDisparityRangeLeft(20));
+
+		helper.disparityMin = 5;
+		for (int x = 5; x < 15; x++) {
+			assertEquals(x+1-5,helper.localDisparityRangeLeft(x));
+		}
+		assertEquals(10,helper.localDisparityRangeLeft(15));
+		assertEquals(10,helper.localDisparityRangeLeft(25));
+	}
+
+	@Test
+	void localDisparityRangeRight() {
+		SgmHelper helper = new SgmHelper();
+		helper.width = 100;
+		helper.disparityMin = 0;
+		helper.disparityRange = 10;
+
+		for (int x = 0; x < 10; x++) {
+			assertEquals(10,helper.localDisparityRangeRight(x));
+		}
+		assertEquals(10,helper.localDisparityRangeRight(helper.width-10));
+		for (int i = 0; i < 10; i++) {
+			assertEquals(9-i,helper.localDisparityRangeRight(helper.width-9+i));
+		}
+
+		helper.disparityMin = 5;
+		for (int x = 0; x < 10; x++) {
+			assertEquals(10,helper.localDisparityRangeRight(x));
+		}
+		assertEquals(10,helper.localDisparityRangeRight(helper.width-15));
+		for (int i = 0; i < 10; i++) {
+			assertEquals(9-i,helper.localDisparityRangeRight(helper.width-14+i));
+		}
+		for (int i = 0; i < 5; i++) {
+			assertTrue(helper.localDisparityRangeRight(helper.width-4+i)<=0);
+		}
 	}
 }

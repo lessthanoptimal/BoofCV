@@ -18,16 +18,33 @@
 
 package boofcv.alg.feature.disparity.sgm.cost;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import boofcv.alg.feature.disparity.block.BlockRowScore;
+import boofcv.alg.feature.disparity.block.BlockRowScoreSad;
+import boofcv.alg.feature.disparity.block.score.DisparityScoreBM_S32;
+import boofcv.alg.feature.disparity.sgm.SgmDisparityCost;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
+import org.junit.jupiter.api.Nested;
 
 /**
  * @author Peter Abeles
  */
 class TestSgmCostFromBlocks {
-	@Test
-	void stuff() {
-		fail("Implement");
+	@Nested
+	public class U8 extends ChecksSgmDisparityCost<GrayU8>{
+		public U8() {
+			super(0, 255, ImageType.single(GrayU8.class));
+		}
+
+		@Override
+		SgmDisparityCost<GrayU8> createAlg() {
+			SgmCostFromBlocks<GrayU8> blockCost = new SgmCostFromBlocks<>();
+			BlockRowScore<GrayU8,int[]> rowScore = new BlockRowScoreSad.U8();
+			rowScore.setBorder(FactoryImageBorder.generic(BorderType.REFLECT,ImageType.single(GrayU8.class)));
+			blockCost.blockScore = new DisparityScoreBM_S32( 1,1, rowScore, blockCost);
+			return blockCost;
+		}
 	}
 }

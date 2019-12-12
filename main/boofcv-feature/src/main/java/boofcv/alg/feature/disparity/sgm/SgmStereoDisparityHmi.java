@@ -128,9 +128,11 @@ public class SgmStereoDisparityHmi extends SgmStereoDisparityError<GrayU8> {
 				selector.setTextureThreshold(textureThreshold);
 				selector.setRightToLeftTolerance(tol_R_to_L);
 			}
-			sgmCost.process(levelLeft,levelRight, levelDisparityMin, levelDisparityRange,costYXD);
-			aggregation.process(costYXD,levelDisparityMin);
-			selector.setMinDisparity(levelDisparityMin); // todo move to function below
+			sgmCost.configure(levelDisparityMin,levelDisparityRange);
+			aggregation.configure(levelDisparityMin);
+			sgmCost.process(levelLeft,levelRight,costYXD);
+			aggregation.process(costYXD);
+			selector.setDisparityMin(levelDisparityMin); // todo move to function below
 			selector.select(costYXD,aggregation.getAggregated(),disparity);
 
 			if( level > 0 ) {
@@ -143,9 +145,11 @@ public class SgmStereoDisparityHmi extends SgmStereoDisparityError<GrayU8> {
 		for (int i = 0; i < extraIterations; i++) {
 			stereoMI.process(left, right, disparityMin, disparity, selector.getInvalidDisparity());
 			stereoMI.precomputeScaledCost(SgmDisparityCost.MAX_COST);
-			sgmCost.process(left,right, disparityMin, disparityRange,costYXD);
-			aggregation.process(costYXD,disparityMin);
-			selector.setMinDisparity(disparityMin);
+			sgmCost.configure(disparityMin,disparityRange);
+			aggregation.configure(disparityMin);
+			sgmCost.process(left,right,costYXD);
+			aggregation.process(costYXD);
+			selector.setDisparityMin(disparityMin);
 			selector.select(costYXD,aggregation.getAggregated(),disparity);
 		}
 	}

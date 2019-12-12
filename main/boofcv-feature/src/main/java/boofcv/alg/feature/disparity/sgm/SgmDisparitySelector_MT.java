@@ -37,10 +37,10 @@ public class SgmDisparitySelector_MT extends SgmDisparitySelector {
 			GrayU16 aggregatedXD = aggregatedYXD.getBand(y);
 
 			// if 'x' is less than minDisparity then that's nothing that it can compare against
-			for (int x = 0; x < minDisparity; x++) {
+			for (int x = 0; x < disparityMin; x++) {
 				disparity.unsafe_set(x,y, invalidDisparity);
 			}
-			for (int x = minDisparity; x < lengthX; x++) {
+			for (int x = disparityMin; x < lengthX; x++) {
 				disparity.unsafe_set(x,y, findBestDisparity(x,aggregatedXD));
 			}
 		});
