@@ -176,12 +176,14 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 				ret[0][1] = inputA.createNew(height,width);
 			}
 		} else if( name.equals("growBorder")) {
-			ignoreSubimage[4] = true; // this has to be resized
+			ignoreSubimage[6] = true; // this has to be resized
 			ret[0][0] = inputA;
 			ret[0][1] = FactoryImageBorder.generic(BorderType.EXTENDED,inputA.getImageType());
 			ret[0][2] = 2;
 			ret[0][3] = 3;
-			ret[0][4] = inputA.createNew(width,height);
+			ret[0][4] = 3;
+			ret[0][5] = 4;
+			ret[0][6] = inputA.createNew(width,height);
 		} else {
 			throw new RuntimeException("Unknown function: "+name);
 		}

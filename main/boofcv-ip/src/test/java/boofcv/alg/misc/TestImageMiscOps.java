@@ -935,17 +935,19 @@ class TestImageMiscOps {
 	void testGrowBorder( Method m ) throws InvocationTargetException, IllegalAccessException {
 		Class[] paramTypes = m.getParameterTypes();
 		ImageGray src = GeneralizedImageOps.createSingleBand(paramTypes[0],width,height);
-		ImageGray found = GeneralizedImageOps.createSingleBand(paramTypes[4],1,1);
+		ImageGray found = GeneralizedImageOps.createSingleBand(paramTypes[6],1,1);
 		ImageBorder extend = FactoryImageBorder.generic(BorderType.EXTENDED,src.getImageType());
-		int radiusX = 2;
-		int radiusY = 3;
+		int borderX0 = 2;
+		int borderX1 = 3;
+		int borderY0 = 3;
+		int borderY1 = 4;
 
 		GImageMiscOps.fillUniform(src,rand,0,100);
-		m.invoke(null,src,extend, radiusX,radiusY, found);
+		m.invoke(null,src,extend, borderX0,borderY0,borderX1,borderY1, found);
 
 		Method t = BoofTesting.findMethod(ImplImageMiscOps.class,"growBorder",paramTypes);
-		ImageGray expected = GeneralizedImageOps.createSingleBand(paramTypes[4],1,1);
-		t.invoke(null,src,extend, radiusX,radiusY, expected);
+		ImageGray expected = GeneralizedImageOps.createSingleBand(paramTypes[6],1,1);
+		t.invoke(null,src,extend, borderX0,borderY0,borderX1,borderY1, expected);
 
 		BoofTesting.assertEquals(expected,found,0.0);
 
