@@ -724,6 +724,15 @@ public class BoofTesting {
 		}
 	}
 
+	public static void assertEqualsBorder(ImageBase imgA, ImageBase imgB, double tol, int borderX, int borderY) {
+		if( imgA instanceof ImageGray ) {
+			assertEqualsBorder((ImageGray)imgA, (ImageGray)imgB, tol, borderX, borderY);
+		} else if ( imgA instanceof ImageInterleaved ) {
+			assertEqualsBorder((ImageInterleaved)imgA, (ImageInterleaved)imgB, tol, borderX, borderY);
+		} else {
+			throw new RuntimeException("Unsupported image type");
+		}
+	}
 	/**
 	 * Checks to see if only the image borders are equal to each other within tolerance
 	 */

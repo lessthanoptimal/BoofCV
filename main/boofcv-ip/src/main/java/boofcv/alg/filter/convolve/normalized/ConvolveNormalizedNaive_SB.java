@@ -18,6 +18,9 @@
 
 package boofcv.alg.filter.convolve.normalized;
 
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_F64;
+import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.convolve.*;
 import boofcv.struct.image.*;
 
@@ -129,6 +132,74 @@ public class ConvolveNormalizedNaive_SB {
 		}
 	}
 
+	public static void horizontal(Kernel1D_F32 kernel, GrayF32 input, GrayF32 output, ImageBorder_F32 binput ) {
+
+		binput.setImage(input);
+		final int offset = kernel.getOffset();
+		final float weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				float total = 0;
+
+				for( int j = 0; j < kernel.getWidth(); j++ ) {
+					int xx = x - offset + j;
+					float v = kernel.get(j);
+					total += binput.get(xx,y)*v;
+				}
+				output.set(x,y, total/weight);
+			}
+		}
+	}
+
+	public static void vertical(Kernel1D_F32 kernel, GrayF32 input, GrayF32 output, ImageBorder_F32 binput ) {
+		final int offset = kernel.getOffset();
+		final float weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				float total = 0;
+
+				for( int j = 0; j < kernel.getWidth(); j++ ) {
+					int yy = y - offset + j;
+					float v = kernel.get(j);
+					total += binput.get(x,yy)*v;
+				}
+				output.set(x,y, total/weight);
+			}
+		}
+	}
+
+	public static void convolve(Kernel2D_F32 kernel, GrayF32 input, GrayF32 output, ImageBorder_F32 binput ) {
+		final int offset = kernel.getOffset();
+		final float weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				float total = 0;
+
+				for( int i = 0; i < kernel.getWidth(); i++ ) {
+					int yy = y - offset + i; 
+					for( int j = 0; j < kernel.getWidth(); j++ ) {
+						int xx = x - offset + j;
+						float v = kernel.get(j,i);
+						total += binput.get(xx,yy)*v;
+					}
+				}
+				output.set(x,y, total/weight);
+			}
+		}
+	}
+
 	public static void horizontal(Kernel1D_F64 kernel, GrayF64 input, GrayF64 output ) {
 
 		final int offset = kernel.getOffset();
@@ -218,6 +289,74 @@ public class ConvolveNormalizedNaive_SB {
 					}
 				}
 				output.set(x,y, total/weight );
+			}
+		}
+	}
+
+	public static void horizontal(Kernel1D_F64 kernel, GrayF64 input, GrayF64 output, ImageBorder_F64 binput ) {
+
+		binput.setImage(input);
+		final int offset = kernel.getOffset();
+		final double weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				double total = 0;
+
+				for( int j = 0; j < kernel.getWidth(); j++ ) {
+					int xx = x - offset + j;
+					double v = kernel.get(j);
+					total += binput.get(xx,y)*v;
+				}
+				output.set(x,y, total/weight);
+			}
+		}
+	}
+
+	public static void vertical(Kernel1D_F64 kernel, GrayF64 input, GrayF64 output, ImageBorder_F64 binput ) {
+		final int offset = kernel.getOffset();
+		final double weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				double total = 0;
+
+				for( int j = 0; j < kernel.getWidth(); j++ ) {
+					int yy = y - offset + j;
+					double v = kernel.get(j);
+					total += binput.get(x,yy)*v;
+				}
+				output.set(x,y, total/weight);
+			}
+		}
+	}
+
+	public static void convolve(Kernel2D_F64 kernel, GrayF64 input, GrayF64 output, ImageBorder_F64 binput ) {
+		final int offset = kernel.getOffset();
+		final double weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				double total = 0;
+
+				for( int i = 0; i < kernel.getWidth(); i++ ) {
+					int yy = y - offset + i; 
+					for( int j = 0; j < kernel.getWidth(); j++ ) {
+						int xx = x - offset + j;
+						double v = kernel.get(j,i);
+						total += binput.get(xx,yy)*v;
+					}
+				}
+				output.set(x,y, total/weight);
 			}
 		}
 	}
@@ -315,6 +454,74 @@ public class ConvolveNormalizedNaive_SB {
 		}
 	}
 
+	public static void horizontal(Kernel1D_S32 kernel, GrayU8 input, GrayI8 output, ImageBorder_S32<GrayU8> binput ) {
+
+		binput.setImage(input);
+		final int offset = kernel.getOffset();
+		final int weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+
+				for( int j = 0; j < kernel.getWidth(); j++ ) {
+					int xx = x - offset + j;
+					int v = kernel.get(j);
+					total += binput.get(xx,y)*v;
+				}
+				output.set(x,y, (total+weight/2)/weight);
+			}
+		}
+	}
+
+	public static void vertical(Kernel1D_S32 kernel, GrayU8 input, GrayI8 output, ImageBorder_S32<GrayU8> binput ) {
+		final int offset = kernel.getOffset();
+		final int weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+
+				for( int j = 0; j < kernel.getWidth(); j++ ) {
+					int yy = y - offset + j;
+					int v = kernel.get(j);
+					total += binput.get(x,yy)*v;
+				}
+				output.set(x,y, (total+weight/2)/weight);
+			}
+		}
+	}
+
+	public static void convolve(Kernel2D_S32 kernel, GrayU8 input, GrayI8 output, ImageBorder_S32<GrayU8> binput ) {
+		final int offset = kernel.getOffset();
+		final int weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+
+				for( int i = 0; i < kernel.getWidth(); i++ ) {
+					int yy = y - offset + i; 
+					for( int j = 0; j < kernel.getWidth(); j++ ) {
+						int xx = x - offset + j;
+						int v = kernel.get(j,i);
+						total += binput.get(xx,yy)*v;
+					}
+				}
+				output.set(x,y, (total+weight/2)/weight);
+			}
+		}
+	}
+
 	public static void horizontal(Kernel1D_S32 kernel, GrayS16 input, GrayI16 output ) {
 
 		final int offset = kernel.getOffset();
@@ -404,6 +611,74 @@ public class ConvolveNormalizedNaive_SB {
 					}
 				}
 				output.set(x,y, (total+weight/2)/weight );
+			}
+		}
+	}
+
+	public static void horizontal(Kernel1D_S32 kernel, GrayS16 input, GrayI16 output, ImageBorder_S32<GrayS16> binput ) {
+
+		binput.setImage(input);
+		final int offset = kernel.getOffset();
+		final int weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+
+				for( int j = 0; j < kernel.getWidth(); j++ ) {
+					int xx = x - offset + j;
+					int v = kernel.get(j);
+					total += binput.get(xx,y)*v;
+				}
+				output.set(x,y, (total+weight/2)/weight);
+			}
+		}
+	}
+
+	public static void vertical(Kernel1D_S32 kernel, GrayS16 input, GrayI16 output, ImageBorder_S32<GrayS16> binput ) {
+		final int offset = kernel.getOffset();
+		final int weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+
+				for( int j = 0; j < kernel.getWidth(); j++ ) {
+					int yy = y - offset + j;
+					int v = kernel.get(j);
+					total += binput.get(x,yy)*v;
+				}
+				output.set(x,y, (total+weight/2)/weight);
+			}
+		}
+	}
+
+	public static void convolve(Kernel2D_S32 kernel, GrayS16 input, GrayI16 output, ImageBorder_S32<GrayS16> binput ) {
+		final int offset = kernel.getOffset();
+		final int weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+
+				for( int i = 0; i < kernel.getWidth(); i++ ) {
+					int yy = y - offset + i; 
+					for( int j = 0; j < kernel.getWidth(); j++ ) {
+						int xx = x - offset + j;
+						int v = kernel.get(j,i);
+						total += binput.get(xx,yy)*v;
+					}
+				}
+				output.set(x,y, (total+weight/2)/weight);
 			}
 		}
 	}
@@ -501,6 +776,74 @@ public class ConvolveNormalizedNaive_SB {
 		}
 	}
 
+	public static void horizontal(Kernel1D_S32 kernel, GrayU16 input, GrayI16 output, ImageBorder_S32<GrayU16> binput ) {
+
+		binput.setImage(input);
+		final int offset = kernel.getOffset();
+		final int weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+
+				for( int j = 0; j < kernel.getWidth(); j++ ) {
+					int xx = x - offset + j;
+					int v = kernel.get(j);
+					total += binput.get(xx,y)*v;
+				}
+				output.set(x,y, (total+weight/2)/weight);
+			}
+		}
+	}
+
+	public static void vertical(Kernel1D_S32 kernel, GrayU16 input, GrayI16 output, ImageBorder_S32<GrayU16> binput ) {
+		final int offset = kernel.getOffset();
+		final int weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+
+				for( int j = 0; j < kernel.getWidth(); j++ ) {
+					int yy = y - offset + j;
+					int v = kernel.get(j);
+					total += binput.get(x,yy)*v;
+				}
+				output.set(x,y, (total+weight/2)/weight);
+			}
+		}
+	}
+
+	public static void convolve(Kernel2D_S32 kernel, GrayU16 input, GrayI16 output, ImageBorder_S32<GrayU16> binput ) {
+		final int offset = kernel.getOffset();
+		final int weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+
+				for( int i = 0; i < kernel.getWidth(); i++ ) {
+					int yy = y - offset + i; 
+					for( int j = 0; j < kernel.getWidth(); j++ ) {
+						int xx = x - offset + j;
+						int v = kernel.get(j,i);
+						total += binput.get(xx,yy)*v;
+					}
+				}
+				output.set(x,y, (total+weight/2)/weight);
+			}
+		}
+	}
+
 	public static void horizontal(Kernel1D_S32 kernel, GrayS32 input, GrayS32 output ) {
 
 		final int offset = kernel.getOffset();
@@ -590,6 +933,73 @@ public class ConvolveNormalizedNaive_SB {
 					}
 				}
 				output.set(x,y, (total+weight/2)/weight );
+			}
+		}
+	}
+
+	public static void horizontal(Kernel1D_S32 kernel, GrayS32 input, GrayS32 output, ImageBorder_S32<GrayS32> binput ) {
+
+		binput.setImage(input);
+		final int offset = kernel.getOffset();
+		final int weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+
+				for( int j = 0; j < kernel.getWidth(); j++ ) {
+					int xx = x - offset + j;
+					total += binput.get(xx,y)*kernel.get(j);
+				}
+				output.set(x,y, (total+weight/2)/weight);
+			}
+		}
+	}
+
+	public static void vertical(Kernel1D_S32 kernel, GrayS32 input, GrayS32 output, ImageBorder_S32<GrayS32> binput ) {
+		final int offset = kernel.getOffset();
+		final int weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+
+				for( int j = 0; j < kernel.getWidth(); j++ ) {
+					int yy = y - offset + j;
+					int v = kernel.get(j);
+					total += binput.get(x,yy)*v;
+				}
+				output.set(x,y, (total+weight/2)/weight);
+			}
+		}
+	}
+
+	public static void convolve(Kernel2D_S32 kernel, GrayS32 input, GrayS32 output, ImageBorder_S32<GrayS32> binput ) {
+		final int offset = kernel.getOffset();
+		final int weight = kernel.computeSum();
+
+		final int width = input.getWidth();
+		final int height = input.getHeight();
+
+		for (int y = 0; y < height; y++) {
+			for( int x = 0; x < width; x++ ) {
+				int total = 0;
+
+				for( int i = 0; i < kernel.getWidth(); i++ ) {
+					int yy = y - offset + i; 
+					for( int j = 0; j < kernel.getWidth(); j++ ) {
+						int xx = x - offset + j;
+						int v = kernel.get(j,i);
+						total += binput.get(xx,yy)*v;
+					}
+				}
+				output.set(x,y, (total+weight/2)/weight);
 			}
 		}
 	}

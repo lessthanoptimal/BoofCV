@@ -40,213 +40,213 @@ import javax.annotation.Generated;
 public class ImplImageMiscOps {
 
 	public static <T extends GrayI8<T>>
-	void growBorder(T src , ImageBorder_S32<T> border, int radiusX, int radiusY , T dst )
+	void growBorder(T src , ImageBorder_S32<T> border, int borderX0, int borderY0, int borderX1, int borderY1 , T dst )
 	{
-		dst.reshape(src.width+2*radiusX, src.height+2*radiusY);
+		dst.reshape(src.width+borderX0+borderX1, src.height+borderY0+borderY1);
 		border.setImage(src);
 
 		// Copy src into the inner portion of dst
-		ImageMiscOps.copy(0,0,radiusX,radiusY,src.width,src.height,src,dst);
+		ImageMiscOps.copy(0,0,borderX0,borderY0,src.width,src.height,src,dst);
 
 		// Top border
-		for (int y = 0; y < radiusY; y++) {
+		for (int y = 0; y < borderY0; y++) {
 			int idxDst = dst.startIndex + y*dst.stride;
 			for (int x = 0; x < dst.width; x++) {
-				dst.data[idxDst++] = (byte)border.get(x-radiusX,y-radiusY);
+				dst.data[idxDst++] = (byte)border.get(x-borderX0,y-borderY0);
 			}
 		}
 		// Bottom border
-		for (int y = 0; y < radiusY; y++) {
-			int idxDst = dst.startIndex + (dst.height-radiusY+y)*dst.stride;
+		for (int y = 0; y < borderY1; y++) {
+			int idxDst = dst.startIndex + (dst.height-borderY1+y)*dst.stride;
 			for (int x = 0; x < dst.width; x++) {
-				dst.data[idxDst++] = (byte)border.get(x-radiusX,src.height+y);
+				dst.data[idxDst++] = (byte)border.get(x-borderX0,src.height+y);
 			}
 		}
 		// Left and right border
-		for (int y = radiusY; y < dst.height-radiusY; y++) {
+		for (int y = borderY0; y < dst.height-borderY1; y++) {
 			int idxDst = dst.startIndex + y*dst.stride;
-			for (int x = 0; x < radiusX; x++) {
-				dst.data[idxDst++] = (byte)border.get(x-radiusX,y-radiusY);
+			for (int x = 0; x < borderX0; x++) {
+				dst.data[idxDst++] = (byte)border.get(x-borderX0,y-borderY0);
 			}
-			idxDst = dst.startIndex + y*dst.stride+src.width+radiusX;
-			for (int x = 0; x < radiusX; x++) {
-				dst.data[idxDst++] = (byte)border.get(src.width+x,y-radiusY);
+			idxDst = dst.startIndex + y*dst.stride+src.width+borderX0;
+			for (int x = 0; x < borderX1; x++) {
+				dst.data[idxDst++] = (byte)border.get(src.width+x,y-borderY0);
 			}
 		}
 	}
 
 	public static <T extends GrayI16<T>>
-	void growBorder(T src , ImageBorder_S32<T> border, int radiusX, int radiusY , T dst )
+	void growBorder(T src , ImageBorder_S32<T> border, int borderX0, int borderY0, int borderX1, int borderY1 , T dst )
 	{
-		dst.reshape(src.width+2*radiusX, src.height+2*radiusY);
+		dst.reshape(src.width+borderX0+borderX1, src.height+borderY0+borderY1);
 		border.setImage(src);
 
 		// Copy src into the inner portion of dst
-		ImageMiscOps.copy(0,0,radiusX,radiusY,src.width,src.height,src,dst);
+		ImageMiscOps.copy(0,0,borderX0,borderY0,src.width,src.height,src,dst);
 
 		// Top border
-		for (int y = 0; y < radiusY; y++) {
+		for (int y = 0; y < borderY0; y++) {
 			int idxDst = dst.startIndex + y*dst.stride;
 			for (int x = 0; x < dst.width; x++) {
-				dst.data[idxDst++] = (short)border.get(x-radiusX,y-radiusY);
+				dst.data[idxDst++] = (short)border.get(x-borderX0,y-borderY0);
 			}
 		}
 		// Bottom border
-		for (int y = 0; y < radiusY; y++) {
-			int idxDst = dst.startIndex + (dst.height-radiusY+y)*dst.stride;
+		for (int y = 0; y < borderY1; y++) {
+			int idxDst = dst.startIndex + (dst.height-borderY1+y)*dst.stride;
 			for (int x = 0; x < dst.width; x++) {
-				dst.data[idxDst++] = (short)border.get(x-radiusX,src.height+y);
+				dst.data[idxDst++] = (short)border.get(x-borderX0,src.height+y);
 			}
 		}
 		// Left and right border
-		for (int y = radiusY; y < dst.height-radiusY; y++) {
+		for (int y = borderY0; y < dst.height-borderY1; y++) {
 			int idxDst = dst.startIndex + y*dst.stride;
-			for (int x = 0; x < radiusX; x++) {
-				dst.data[idxDst++] = (short)border.get(x-radiusX,y-radiusY);
+			for (int x = 0; x < borderX0; x++) {
+				dst.data[idxDst++] = (short)border.get(x-borderX0,y-borderY0);
 			}
-			idxDst = dst.startIndex + y*dst.stride+src.width+radiusX;
-			for (int x = 0; x < radiusX; x++) {
-				dst.data[idxDst++] = (short)border.get(src.width+x,y-radiusY);
+			idxDst = dst.startIndex + y*dst.stride+src.width+borderX0;
+			for (int x = 0; x < borderX1; x++) {
+				dst.data[idxDst++] = (short)border.get(src.width+x,y-borderY0);
 			}
 		}
 	}
 
-	public static void growBorder(GrayS32 src , ImageBorder_S32 border, int radiusX, int radiusY , GrayS32 dst )
+	public static void growBorder(GrayS32 src , ImageBorder_S32 border, int borderX0, int borderY0, int borderX1, int borderY1 , GrayS32 dst )
 	{
-		dst.reshape(src.width+2*radiusX, src.height+2*radiusY);
+		dst.reshape(src.width+borderX0+borderX1, src.height+borderY0+borderY1);
 		border.setImage(src);
 
 		// Copy src into the inner portion of dst
-		ImageMiscOps.copy(0,0,radiusX,radiusY,src.width,src.height,src,dst);
+		ImageMiscOps.copy(0,0,borderX0,borderY0,src.width,src.height,src,dst);
 
 		// Top border
-		for (int y = 0; y < radiusY; y++) {
+		for (int y = 0; y < borderY0; y++) {
 			int idxDst = dst.startIndex + y*dst.stride;
 			for (int x = 0; x < dst.width; x++) {
-				dst.data[idxDst++] = border.get(x-radiusX,y-radiusY);
+				dst.data[idxDst++] = border.get(x-borderX0,y-borderY0);
 			}
 		}
 		// Bottom border
-		for (int y = 0; y < radiusY; y++) {
-			int idxDst = dst.startIndex + (dst.height-radiusY+y)*dst.stride;
+		for (int y = 0; y < borderY1; y++) {
+			int idxDst = dst.startIndex + (dst.height-borderY1+y)*dst.stride;
 			for (int x = 0; x < dst.width; x++) {
-				dst.data[idxDst++] = border.get(x-radiusX,src.height+y);
+				dst.data[idxDst++] = border.get(x-borderX0,src.height+y);
 			}
 		}
 		// Left and right border
-		for (int y = radiusY; y < dst.height-radiusY; y++) {
+		for (int y = borderY0; y < dst.height-borderY1; y++) {
 			int idxDst = dst.startIndex + y*dst.stride;
-			for (int x = 0; x < radiusX; x++) {
-				dst.data[idxDst++] = border.get(x-radiusX,y-radiusY);
+			for (int x = 0; x < borderX0; x++) {
+				dst.data[idxDst++] = border.get(x-borderX0,y-borderY0);
 			}
-			idxDst = dst.startIndex + y*dst.stride+src.width+radiusX;
-			for (int x = 0; x < radiusX; x++) {
-				dst.data[idxDst++] = border.get(src.width+x,y-radiusY);
+			idxDst = dst.startIndex + y*dst.stride+src.width+borderX0;
+			for (int x = 0; x < borderX1; x++) {
+				dst.data[idxDst++] = border.get(src.width+x,y-borderY0);
 			}
 		}
 	}
 
-	public static void growBorder(GrayS64 src , ImageBorder_S64 border, int radiusX, int radiusY , GrayS64 dst )
+	public static void growBorder(GrayS64 src , ImageBorder_S64 border, int borderX0, int borderY0, int borderX1, int borderY1 , GrayS64 dst )
 	{
-		dst.reshape(src.width+2*radiusX, src.height+2*radiusY);
+		dst.reshape(src.width+borderX0+borderX1, src.height+borderY0+borderY1);
 		border.setImage(src);
 
 		// Copy src into the inner portion of dst
-		ImageMiscOps.copy(0,0,radiusX,radiusY,src.width,src.height,src,dst);
+		ImageMiscOps.copy(0,0,borderX0,borderY0,src.width,src.height,src,dst);
 
 		// Top border
-		for (int y = 0; y < radiusY; y++) {
+		for (int y = 0; y < borderY0; y++) {
 			int idxDst = dst.startIndex + y*dst.stride;
 			for (int x = 0; x < dst.width; x++) {
-				dst.data[idxDst++] = border.get(x-radiusX,y-radiusY);
+				dst.data[idxDst++] = border.get(x-borderX0,y-borderY0);
 			}
 		}
 		// Bottom border
-		for (int y = 0; y < radiusY; y++) {
-			int idxDst = dst.startIndex + (dst.height-radiusY+y)*dst.stride;
+		for (int y = 0; y < borderY1; y++) {
+			int idxDst = dst.startIndex + (dst.height-borderY1+y)*dst.stride;
 			for (int x = 0; x < dst.width; x++) {
-				dst.data[idxDst++] = border.get(x-radiusX,src.height+y);
+				dst.data[idxDst++] = border.get(x-borderX0,src.height+y);
 			}
 		}
 		// Left and right border
-		for (int y = radiusY; y < dst.height-radiusY; y++) {
+		for (int y = borderY0; y < dst.height-borderY1; y++) {
 			int idxDst = dst.startIndex + y*dst.stride;
-			for (int x = 0; x < radiusX; x++) {
-				dst.data[idxDst++] = border.get(x-radiusX,y-radiusY);
+			for (int x = 0; x < borderX0; x++) {
+				dst.data[idxDst++] = border.get(x-borderX0,y-borderY0);
 			}
-			idxDst = dst.startIndex + y*dst.stride+src.width+radiusX;
-			for (int x = 0; x < radiusX; x++) {
-				dst.data[idxDst++] = border.get(src.width+x,y-radiusY);
+			idxDst = dst.startIndex + y*dst.stride+src.width+borderX0;
+			for (int x = 0; x < borderX1; x++) {
+				dst.data[idxDst++] = border.get(src.width+x,y-borderY0);
 			}
 		}
 	}
 
-	public static void growBorder(GrayF32 src , ImageBorder_F32 border, int radiusX, int radiusY , GrayF32 dst )
+	public static void growBorder(GrayF32 src , ImageBorder_F32 border, int borderX0, int borderY0, int borderX1, int borderY1 , GrayF32 dst )
 	{
-		dst.reshape(src.width+2*radiusX, src.height+2*radiusY);
+		dst.reshape(src.width+borderX0+borderX1, src.height+borderY0+borderY1);
 		border.setImage(src);
 
 		// Copy src into the inner portion of dst
-		ImageMiscOps.copy(0,0,radiusX,radiusY,src.width,src.height,src,dst);
+		ImageMiscOps.copy(0,0,borderX0,borderY0,src.width,src.height,src,dst);
 
 		// Top border
-		for (int y = 0; y < radiusY; y++) {
+		for (int y = 0; y < borderY0; y++) {
 			int idxDst = dst.startIndex + y*dst.stride;
 			for (int x = 0; x < dst.width; x++) {
-				dst.data[idxDst++] = border.get(x-radiusX,y-radiusY);
+				dst.data[idxDst++] = border.get(x-borderX0,y-borderY0);
 			}
 		}
 		// Bottom border
-		for (int y = 0; y < radiusY; y++) {
-			int idxDst = dst.startIndex + (dst.height-radiusY+y)*dst.stride;
+		for (int y = 0; y < borderY1; y++) {
+			int idxDst = dst.startIndex + (dst.height-borderY1+y)*dst.stride;
 			for (int x = 0; x < dst.width; x++) {
-				dst.data[idxDst++] = border.get(x-radiusX,src.height+y);
+				dst.data[idxDst++] = border.get(x-borderX0,src.height+y);
 			}
 		}
 		// Left and right border
-		for (int y = radiusY; y < dst.height-radiusY; y++) {
+		for (int y = borderY0; y < dst.height-borderY1; y++) {
 			int idxDst = dst.startIndex + y*dst.stride;
-			for (int x = 0; x < radiusX; x++) {
-				dst.data[idxDst++] = border.get(x-radiusX,y-radiusY);
+			for (int x = 0; x < borderX0; x++) {
+				dst.data[idxDst++] = border.get(x-borderX0,y-borderY0);
 			}
-			idxDst = dst.startIndex + y*dst.stride+src.width+radiusX;
-			for (int x = 0; x < radiusX; x++) {
-				dst.data[idxDst++] = border.get(src.width+x,y-radiusY);
+			idxDst = dst.startIndex + y*dst.stride+src.width+borderX0;
+			for (int x = 0; x < borderX1; x++) {
+				dst.data[idxDst++] = border.get(src.width+x,y-borderY0);
 			}
 		}
 	}
 
-	public static void growBorder(GrayF64 src , ImageBorder_F64 border, int radiusX, int radiusY , GrayF64 dst )
+	public static void growBorder(GrayF64 src , ImageBorder_F64 border, int borderX0, int borderY0, int borderX1, int borderY1 , GrayF64 dst )
 	{
-		dst.reshape(src.width+2*radiusX, src.height+2*radiusY);
+		dst.reshape(src.width+borderX0+borderX1, src.height+borderY0+borderY1);
 		border.setImage(src);
 
 		// Copy src into the inner portion of dst
-		ImageMiscOps.copy(0,0,radiusX,radiusY,src.width,src.height,src,dst);
+		ImageMiscOps.copy(0,0,borderX0,borderY0,src.width,src.height,src,dst);
 
 		// Top border
-		for (int y = 0; y < radiusY; y++) {
+		for (int y = 0; y < borderY0; y++) {
 			int idxDst = dst.startIndex + y*dst.stride;
 			for (int x = 0; x < dst.width; x++) {
-				dst.data[idxDst++] = border.get(x-radiusX,y-radiusY);
+				dst.data[idxDst++] = border.get(x-borderX0,y-borderY0);
 			}
 		}
 		// Bottom border
-		for (int y = 0; y < radiusY; y++) {
-			int idxDst = dst.startIndex + (dst.height-radiusY+y)*dst.stride;
+		for (int y = 0; y < borderY1; y++) {
+			int idxDst = dst.startIndex + (dst.height-borderY1+y)*dst.stride;
 			for (int x = 0; x < dst.width; x++) {
-				dst.data[idxDst++] = border.get(x-radiusX,src.height+y);
+				dst.data[idxDst++] = border.get(x-borderX0,src.height+y);
 			}
 		}
 		// Left and right border
-		for (int y = radiusY; y < dst.height-radiusY; y++) {
+		for (int y = borderY0; y < dst.height-borderY1; y++) {
 			int idxDst = dst.startIndex + y*dst.stride;
-			for (int x = 0; x < radiusX; x++) {
-				dst.data[idxDst++] = border.get(x-radiusX,y-radiusY);
+			for (int x = 0; x < borderX0; x++) {
+				dst.data[idxDst++] = border.get(x-borderX0,y-borderY0);
 			}
-			idxDst = dst.startIndex + y*dst.stride+src.width+radiusX;
-			for (int x = 0; x < radiusX; x++) {
-				dst.data[idxDst++] = border.get(src.width+x,y-radiusY);
+			idxDst = dst.startIndex + y*dst.stride+src.width+borderX0;
+			for (int x = 0; x < borderX1; x++) {
+				dst.data[idxDst++] = border.get(src.width+x,y-borderY0);
 			}
 		}
 	}

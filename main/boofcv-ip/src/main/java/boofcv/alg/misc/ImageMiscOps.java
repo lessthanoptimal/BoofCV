@@ -625,13 +625,15 @@ public class ImageMiscOps {
 	 * 
 	 * @param src (Input) source image
 	 * @param border (Input) image border generator
-	 * @param radiusX (Input) radius of border x-axis
-	 * @param radiusY (Input) radius of border y-axis
+	 * @param borderX0 (Input) Border x-axis lower extent
+	 * @param borderY0 (Input) Border y-axis lower extent
+	 * @param borderX1 (Input) Border x-axis upper extent
+	 * @param borderY1 (Input) Border y-axis upper extent
 	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
 	 */
 	public static <T extends GrayI8<T>>
-	void growBorder(T src , ImageBorder_S32<T> border, int radiusX, int radiusY , T dst ) {
-		ImplImageMiscOps.growBorder(src,border,radiusX,radiusY,dst);
+	void growBorder(T src , ImageBorder_S32<T> border, int borderX0, int borderY0, int borderX1, int borderY1, T dst ) {
+		ImplImageMiscOps.growBorder(src,border,borderX0,borderY0,borderX1,borderY1,dst);
 	}
 
 	/**
@@ -1221,13 +1223,15 @@ public class ImageMiscOps {
 	 * 
 	 * @param src (Input) source image
 	 * @param border (Input) image border generator
-	 * @param radiusX (Input) radius of border x-axis
-	 * @param radiusY (Input) radius of border y-axis
+	 * @param borderX0 (Input) Border x-axis lower extent
+	 * @param borderY0 (Input) Border y-axis lower extent
+	 * @param borderX1 (Input) Border x-axis upper extent
+	 * @param borderY1 (Input) Border y-axis upper extent
 	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
 	 */
 	public static <T extends GrayI16<T>>
-	void growBorder(T src , ImageBorder_S32<T> border, int radiusX, int radiusY , T dst ) {
-		ImplImageMiscOps.growBorder(src,border,radiusX,radiusY,dst);
+	void growBorder(T src , ImageBorder_S32<T> border, int borderX0, int borderY0, int borderX1, int borderY1, T dst ) {
+		ImplImageMiscOps.growBorder(src,border,borderX0,borderY0,borderX1,borderY1,dst);
 	}
 
 	/**
@@ -1817,12 +1821,14 @@ public class ImageMiscOps {
 	 * 
 	 * @param src (Input) source image
 	 * @param border (Input) image border generator
-	 * @param radiusX (Input) radius of border x-axis
-	 * @param radiusY (Input) radius of border y-axis
+	 * @param borderX0 (Input) Border x-axis lower extent
+	 * @param borderY0 (Input) Border y-axis lower extent
+	 * @param borderX1 (Input) Border x-axis upper extent
+	 * @param borderY1 (Input) Border y-axis upper extent
 	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
 	 */
-	public static void growBorder(GrayS32 src , ImageBorder_S32 border, int radiusX, int radiusY , GrayS32 dst ) {
-		ImplImageMiscOps.growBorder(src,border,radiusX,radiusY,dst);
+	public static void growBorder(GrayS32 src , ImageBorder_S32 border, int borderX0, int borderY0, int borderX1, int borderY1, GrayS32 dst ) {
+		ImplImageMiscOps.growBorder(src,border,borderX0,borderY0,borderX1,borderY1,dst);
 	}
 
 	/**
@@ -2412,12 +2418,14 @@ public class ImageMiscOps {
 	 * 
 	 * @param src (Input) source image
 	 * @param border (Input) image border generator
-	 * @param radiusX (Input) radius of border x-axis
-	 * @param radiusY (Input) radius of border y-axis
+	 * @param borderX0 (Input) Border x-axis lower extent
+	 * @param borderY0 (Input) Border y-axis lower extent
+	 * @param borderX1 (Input) Border x-axis upper extent
+	 * @param borderY1 (Input) Border y-axis upper extent
 	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
 	 */
-	public static void growBorder(GrayS64 src , ImageBorder_S64 border, int radiusX, int radiusY , GrayS64 dst ) {
-		ImplImageMiscOps.growBorder(src,border,radiusX,radiusY,dst);
+	public static void growBorder(GrayS64 src , ImageBorder_S64 border, int borderX0, int borderY0, int borderX1, int borderY1, GrayS64 dst ) {
+		ImplImageMiscOps.growBorder(src,border,borderX0,borderY0,borderX1,borderY1,dst);
 	}
 
 	/**
@@ -3007,12 +3015,14 @@ public class ImageMiscOps {
 	 * 
 	 * @param src (Input) source image
 	 * @param border (Input) image border generator
-	 * @param radiusX (Input) radius of border x-axis
-	 * @param radiusY (Input) radius of border y-axis
+	 * @param borderX0 (Input) Border x-axis lower extent
+	 * @param borderY0 (Input) Border y-axis lower extent
+	 * @param borderX1 (Input) Border x-axis upper extent
+	 * @param borderY1 (Input) Border y-axis upper extent
 	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
 	 */
-	public static void growBorder(GrayF32 src , ImageBorder_F32 border, int radiusX, int radiusY , GrayF32 dst ) {
-		ImplImageMiscOps.growBorder(src,border,radiusX,radiusY,dst);
+	public static void growBorder(GrayF32 src , ImageBorder_F32 border, int borderX0, int borderY0, int borderX1, int borderY1, GrayF32 dst ) {
+		ImplImageMiscOps.growBorder(src,border,borderX0,borderY0,borderX1,borderY1,dst);
 	}
 
 	/**
@@ -3602,12 +3612,14 @@ public class ImageMiscOps {
 	 * 
 	 * @param src (Input) source image
 	 * @param border (Input) image border generator
-	 * @param radiusX (Input) radius of border x-axis
-	 * @param radiusY (Input) radius of border y-axis
+	 * @param borderX0 (Input) Border x-axis lower extent
+	 * @param borderY0 (Input) Border y-axis lower extent
+	 * @param borderX1 (Input) Border x-axis upper extent
+	 * @param borderY1 (Input) Border y-axis upper extent
 	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
 	 */
-	public static void growBorder(GrayF64 src , ImageBorder_F64 border, int radiusX, int radiusY , GrayF64 dst ) {
-		ImplImageMiscOps.growBorder(src,border,radiusX,radiusY,dst);
+	public static void growBorder(GrayF64 src , ImageBorder_F64 border, int borderX0, int borderY0, int borderX1, int borderY1, GrayF64 dst ) {
+		ImplImageMiscOps.growBorder(src,border,borderX0,borderY0,borderX1,borderY1,dst);
 	}
 
 	/**

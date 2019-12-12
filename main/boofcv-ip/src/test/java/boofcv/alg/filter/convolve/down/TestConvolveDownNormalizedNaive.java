@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.FactoryGImageGray;
 import boofcv.core.image.GImageGray;
 import boofcv.factory.filter.kernel.FactoryKernel;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestConvolveDownNormalizedNaive {
+class TestConvolveDownNormalizedNaive {
 Random rand = new Random(0xFF);
 
 	static int width;
@@ -47,7 +48,7 @@ Random rand = new Random(0xFF);
 	static int skip;
 
 	@Test
-	public void compareToFullNaive() {
+	void compareToFullNaive() {
 		CompareToFull compare = new CompareToFull(ConvolveDownNormalizedNaive.class);
 
 		for( int i = 0; i < 2; i++ ) {
@@ -119,10 +120,12 @@ Random rand = new Random(0xFF);
 			if( evaluation.getName().compareTo(candidate.getName()) != 0 )
 				return false;
 
-			Class<?> e[] = evaluation.getParameterTypes();
-			Class<?> c[] = candidate.getParameterTypes();
+			Class<?>[] e = evaluation.getParameterTypes();
+			Class<?>[] c = candidate.getParameterTypes();
 
 			if( c.length < 3 )
+				return false;
+			if( ImageBorder.class.isAssignableFrom(c[c.length-1]))
 				return false;
 
 			for( int i = 0; i < 3; i++ ) {

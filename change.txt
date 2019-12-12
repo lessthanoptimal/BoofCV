@@ -56,6 +56,7 @@ Version : 0.35
   * TODO Ensure that all auto code generators still work
   * TODO SGM and min disparity
   * TODO revert speed regression for BM
+  * TODO Block HMI
 - SFM
   * Projective camera with lens distortion
   * TODO Stereo VO Quad - Now uses trifocal tensor and sparse bundle adjustment

@@ -26,6 +26,7 @@ import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
@@ -81,13 +82,17 @@ public class TestBlurImageOps {
 					Class storage = type.getFamily() == ImageType.Family.PLANAR ?
 							ImageGray.class : input.getClass();
 					Class work = GeneralizedImageOps.createWorkArray(type).getClass();
-					if( type.getFamily() == ImageType.Family.PLANAR )
+					if( type.getFamily() == ImageType.Family.PLANAR ) {
 						work = WorkArrays.class;
+						Method m = BlurImageOps.class.getMethod(
+								"mean",input.getClass(), found.getClass(), int.class, ImageBorder.class,storage,work);
+						m.invoke(null,input,found, radius, null, null, null);
+					} else {
+						Method m = BlurImageOps.class.getMethod(
+								"mean",input.getClass(), found.getClass(), int.class, storage,work);
+						m.invoke(null,input,found, radius, null, null);
+					}
 
-					Method m = BlurImageOps.class.getMethod(
-							"mean",input.getClass(), found.getClass(), int.class, storage,work);
-
-					m.invoke(null,input,found, radius, null, null);
 					BoofTesting.assertEquals(expected,found,2);
 				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 					throw new RuntimeException(e);

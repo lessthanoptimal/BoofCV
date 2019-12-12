@@ -24,10 +24,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Peter Abeles
  */
-public class TestConvolveImageNormalized {
+class TestConvolveImageNormalized {
 	@Test
-	public void compareToNaive() {
-		int numFunctions = 36;
+	void compareToNaive() {
+		int numFunctions = 54;
 		CompareToStandardConvolutionNormalized test = new CompareToStandardConvolutionNormalized(ConvolveImageNormalized.class);
 
 		for( int i = 0; i < 2; i++ ) {

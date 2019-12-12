@@ -991,12 +991,14 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t * \n" +
 				"\t * @param src (Input) source image\n" +
 				"\t * @param border (Input) image border generator\n" +
-				"\t * @param radiusX (Input) radius of border x-axis\n" +
-				"\t * @param radiusY (Input) radius of border y-axis\n" +
+				"\t * @param borderX0 (Input) Border x-axis lower extent\n" +
+				"\t * @param borderY0 (Input) Border y-axis lower extent\n" +
+				"\t * @param borderX1 (Input) Border x-axis upper extent\n" +
+				"\t * @param borderY1 (Input) Border y-axis upper extent\n" +
 				"\t * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY\n" +
 				"\t */\n" +
-				"\tpublic static "+generic+"void growBorder("+srcType+" src , "+borderName+" border, int radiusX, int radiusY , "+srcType+" dst ) {\n" +
-				"\t\tImplImageMiscOps.growBorder(src,border,radiusX,radiusY,dst);\n" +
+				"\tpublic static "+generic+"void growBorder("+srcType+" src , "+borderName+" border, int borderX0, int borderY0, int borderX1, int borderY1, "+srcType+" dst ) {\n" +
+				"\t\tImplImageMiscOps.growBorder(src,border,borderX0,borderY0,borderX1,borderY1,dst);\n" +
 				"\t}\n\n");
 	}
 

@@ -67,29 +67,31 @@ public class TestImplImageMiscOps {
 	private void growBorder(Method m) throws InvocationTargetException, IllegalAccessException {
 		Class[] paramTypes = m.getParameterTypes();
 		ImageGray src = GeneralizedImageOps.createSingleBand(paramTypes[0],width,height);
-		ImageGray dst = GeneralizedImageOps.createSingleBand(paramTypes[4],1,1);
+		ImageGray dst = GeneralizedImageOps.createSingleBand(paramTypes[6],1,1);
 		ImageBorder extend = FactoryImageBorder.generic(BorderType.EXTENDED,src.getImageType());
-		int radiusX = 2;
-		int radiusY = 3;
+		int borderX0 = 2;
+		int borderX1 = 3;
+		int borderY0 = 3;
+		int borderY1 = 2;
 
 		GImageMiscOps.fillUniform(src,rand,0,100);
 
-		m.invoke(null,src,extend, radiusX,radiusY, dst);
+		m.invoke(null,src,extend, borderX0,borderX1,borderY0,borderY1, dst);
 
-		assertEquals(width+2*radiusX,dst.width);
-		assertEquals(height+2*radiusY,dst.height);
+		assertEquals(width+borderX0+borderX1,dst.width);
+		assertEquals(height+borderY0+borderY1,dst.height);
 
 		for (int y = 0; y < dst.height; y++) {
-			int yy = Math.min(src.height-1,Math.max(0,y-radiusY));
+			int yy = Math.min(src.height-1,Math.max(0,y-borderY0));
 
 			for (int x = 0; x < dst.width; x++) {
-				int xx = Math.min(src.width-1,Math.max(0,x-radiusX));
+				int xx = Math.min(src.width-1,Math.max(0,x-borderX0));
 
 				// manually do the extend border
 				double expected = GeneralizedImageOps.get(src,xx,yy);
 				double found = GeneralizedImageOps.get(dst,x,y);
 
-				assertEquals(expected,found, UtilEjml.TEST_F64);
+				assertEquals(expected,found, UtilEjml.TEST_F64,x+" "+y);
 			}
 		}
 

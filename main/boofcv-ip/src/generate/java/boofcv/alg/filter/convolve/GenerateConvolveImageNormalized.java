@@ -32,6 +32,7 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 	String kernelType;
 	String borderName;
 	String inputName, outputName, typeIn, typeOut, sumType;
+	String borderType;
 
 	int totalFunctions = 0;
 
@@ -52,8 +53,9 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 
 	private void printPreamble() {
 		out.print(
-				"import boofcv.alg.InputSanityCheck;\n" +
+				"import boofcv.alg.filter.convolve.border.ConvolveJustBorder_General_SB;\n" +
 				"import boofcv.struct.convolve.*;\n" +
+				"import boofcv.struct.border.*;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import boofcv.alg.filter.convolve.normalized.*;\n" +
 				"import boofcv.alg.filter.kernel.KernelMath;\n");
@@ -74,6 +76,7 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 	private void printAllOps(AutoTypeImage input, AutoTypeImage output)
 	{
 		kernelType = input.getKernelType();
+		borderType = input.getBorderNameSB();
 		typeIn = input.name();
 		typeOut = output.name();
 		sumType = input.getSumType();
@@ -83,19 +86,21 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 		outputName = output.getSingleBandName();
 		borderName = "ImageBorder_";
 
-		printFunction("horizontal", true);
-		printFunction("vertical", true);
-		printFunction("convolve", true);
+		for( boolean border : new boolean[]{false,true} ){
+			printFunction("horizontal", true, border);
+			printFunction("vertical", true, border);
+			printFunction("convolve", true, border);
+		}
 
 		inputName = input.getInterleavedName();
 		outputName = output.getInterleavedName();
 		borderName = "ImageBorder_IL_";
-		printFunction("horizontal", false);
-		printFunction("vertical", false);
-		printFunction("convolve", false);
+		printFunction("horizontal", false,false);
+		printFunction("vertical", false,false);
+		printFunction("convolve", false,false);
 	}
 
-	private void printFunction(  String name , boolean singleBand ) {
+	private void printFunction(  String name , boolean singleBand , boolean border ) {
 
 		totalFunctions++;
 
@@ -108,6 +113,22 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 		String kernelTypeName = "Kernel"+dimen+"_"+kernelType;
 
 		String overrideName = name.equals("convolve") ? "Convolve" : name.equals("horizontal") ? "Horizontal" : "Vertical";
+		String workArray = name.equals("convolve") && singleBand ? ", null" : "";
+
+		String borderArgument = border ? ", "+borderType+" bsrc" : "";
+
+		String commentsOverride = border ? "//" : "";
+
+		String justBorder;
+		if( border ) {
+			if( isInteger )
+				justBorder = "\t\t\tConvolveJustBorder_General_SB."+name+"(kernel, bsrc, dst, kernel.computeSum());\n";
+			else
+				justBorder = "\t\t\tConvolveJustBorder_General_SB."+name+"(kernel, bsrc, dst);\n";
+		} else {
+			justBorder = "\t\t\tConvolveNormalized_JustBorder_"+suffice+"."+name+"(kernel, src, dst);\n";
+		}
+		String bsrc = border ? ", bsrc" : "";
 
 		out.print(
 				"\t/**\n" +
@@ -118,12 +139,15 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 				"\t * @param kernel The kernel that is being convolved. Not modified.\n" +
 				"\t */\n" );
 
-		out.print("\tpublic static void "+name+"("+kernelTypeName+" kernel, "+inputName+" src, "+outputName+" dst ) {\n" +
+		out.print("\tpublic static void "+name+"("+kernelTypeName+" kernel, "+inputName+" src, "+outputName+" dst "+borderArgument+") {\n" +
 				"\t\tdst.reshape(src.width,src.height);\n" +
 				"\n" +
-				"\t\tboolean processed = BOverrideConvolveImageNormalized.invokeNative"+overrideName+"(kernel,src,dst);\n" +
-				"\t\t\n" +
-				"\t\tif( !processed ) {\n");
+				"\t\t"+commentsOverride+"if( BOverrideConvolveImageNormalized.invokeNative"+overrideName+"(kernel,src,dst) )\n"+
+				"\t\t"+commentsOverride+"\treturn;\n\n");
+
+		if( border ) {
+			out.print("\t\tbsrc.setImage(src);\n\n");
+		}
 
 		String insideTest;
 		if( name.equals("horizontal") ) {
@@ -135,27 +159,26 @@ public class GenerateConvolveImageNormalized extends CodeGeneratorBase {
 		}
 
 		if( isInteger ) {
-			out.print("\t\t\tif( "+insideTest+" ) {\n" +
-					"\t\t\t\tConvolveNormalizedNaive_"+suffice+"."+name+"(kernel, src, dst);\n" +
-					"\t\t\t} else {\n" +
-					"\t\t\t\tConvolveImageNoBorder."+name+"(kernel, src, dst, kernel.computeSum());\n" +
-					"\t\t\t\tConvolveNormalized_JustBorder_"+suffice+"."+name+"(kernel, src, dst);\n" +
-					"\t\t\t}\n");
+			out.print("\t\tif( "+insideTest+" ) {\n" +
+					"\t\t\tConvolveNormalizedNaive_"+suffice+"."+name+"(kernel, src, dst"+bsrc+");\n" +
+					"\t\t} else {\n" +
+					"\t\t\tConvolveImageNoBorder."+name+"(kernel, src, dst, kernel.computeSum()"+workArray+");\n" +
+					justBorder +
+					"\t\t}\n");
 		} else {
-			out.print("\t\t\tif( "+insideTest+" ) {\n" +
-					"\t\t\t\tConvolveNormalizedNaive_"+suffice+"."+name+"(kernel,src,dst);\n" +
-					"\t\t\t} else {\n" +
-					"\t\t\t\tif( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {\n" +
-					"\t\t\t\t\t"+kernelTypeName+" k = kernel.copy();\n" +
-					"\t\t\t\t\tKernelMath.normalizeSumToOne(k);\n" +
-					"\t\t\t\t\tkernel = k;\n" +
-					"\t\t\t\t}\n" +
-					"\t\t\t\tConvolveImageNoBorder."+name+"(kernel,src,dst);\n" +
-					"\t\t\t\tConvolveNormalized_JustBorder_"+suffice+"."+name+"(kernel,src,dst);\n" +
-					"\t\t\t}\n");
+			out.print("\t\tif( "+insideTest+" ) {\n" +
+					"\t\t\tConvolveNormalizedNaive_"+suffice+"."+name+"(kernel, src, dst"+bsrc+");\n" +
+					"\t\t} else {\n" +
+					"\t\t\tif( Math.abs(kernel.computeSum() - 1.0f) > 1e-4f ) {\n" +
+					"\t\t\t\t"+kernelTypeName+" k = kernel.copy();\n" +
+					"\t\t\t\tKernelMath.normalizeSumToOne(k);\n" +
+					"\t\t\t\tkernel = k;\n" +
+					"\t\t\t}\n" +
+					"\t\t\tConvolveImageNoBorder."+name+"(kernel,src,dst);\n" +
+					justBorder +
+					"\t\t}\n");
 		}
-		out.print("\t\t}\n" +
-				"\t}\n\n");
+		out.print("\t}\n\n");
 	}
 
 	public static void main(String[] args) {

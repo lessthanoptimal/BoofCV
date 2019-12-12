@@ -20,7 +20,10 @@ package boofcv.alg.filter.convolve;
 
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.filter.kernel.FactoryKernel;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.convolve.Kernel1D_S32;
@@ -50,50 +53,70 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 
 	@Test
 	public void compareToStandard() {
-		performTests(10);
+		performTests(20);
 	}
 
 	@Override
 	protected boolean isTestMethod(Method m) {
 		Class<?> params[] = m.getParameterTypes();
 
-		if( params.length != 3 && params.length != 4)
+		if( params.length < 3 || params.length > 5)
 			return false;
 
 		return ImageGray.class.isAssignableFrom(params[0]);
 	}
 
 	@Override
-	protected boolean isEquivalent(Method candidate, Method validation) {
+	protected boolean isEquivalent(Method validation, Method target) {
 
-		Class<?> v[] = candidate.getParameterTypes();
-		Class<?> c[] = validation.getParameterTypes();
+		Class<?>[] v = validation.getParameterTypes();
+		Class<?>[] c = target.getParameterTypes();
 
-		if( !candidate.getName().equals(validation.getName()))
+		if( !target.getName().equals(validation.getName()))
 			return false;
 
-		if (v.length != 3 && v.length != 4)
+		if( c[0] != v[1] || c[1] != v[2])
 			return false;
-		return v[1].isAssignableFrom(c[0]) && v[2].isAssignableFrom(c[1]);
+
+		if( target.getName().equals("vertical")) {
+			if( ImageBorder.class.isAssignableFrom(c[3]) ) {
+				return v.length >= 4 && ImageBorder.class.isAssignableFrom(v[3]);
+			} else if( v.length != 3 ){
+				return false;
+			}
+		} else if( (c.length == 3) ^ (v.length == 3)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override
 	protected Object[][] createInputParam(Method candidate, Method validation) {
 
-		Class c[] = candidate.getParameterTypes();
+		Class[] c = candidate.getParameterTypes();
 
 		ImageGray input = GeneralizedImageOps.createSingleBand(c[0], width, height);
 		ImageGray output = GeneralizedImageOps.createSingleBand(c[1], width, height);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
+		ImageBorder border = FactoryImageBorder.generic(BorderType.REFLECT,input.getImageType());
+
 		Object[][] ret = new Object[2][];
 		if( c.length == 3 ) {
 			ret[0] = new Object[]{input, output, kernelRadius};
 			ret[1] = new Object[]{input, output, kernelRadius2};
-		} else {
+		} else if( c.length == 4 ) {
 			ret[0] = new Object[]{input, output, kernelRadius, null};
 			ret[1] = new Object[]{input, output, kernelRadius2, null};
+			if( ImageBorder.class.isAssignableFrom(c[3]) ) {
+				ret[0][3] = border;
+				ret[1][3] = border;
+			}
+		} else {
+			ret[0] = new Object[]{input, output, kernelRadius, border, null};
+			ret[1] = new Object[]{input, output, kernelRadius2, border, null};
 		}
 
 		return ret;
@@ -101,13 +124,17 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 
 	@Override
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
-		Class<?> params[] = m.getParameterTypes();
+		Class<?>[] params = m.getParameterTypes();
 		int radius = (Integer)targetParam[2];
 		Object kernel = createTableKernel(params[0],radius);
 
 		ImageGray output = (ImageGray)((ImageGray)targetParam[1]).clone();
 
-		return new Object[]{kernel, targetParam[0], output};
+		if( ImageBorder.class.isAssignableFrom(params[params.length-1])) {
+			return new Object[]{kernel, targetParam[0], output, targetParam[3]};
+		} else {
+			return new Object[]{kernel, targetParam[0], output};
+		}
 	}
 
 	@Override
@@ -119,7 +146,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 
 			BoofTesting.assertEquals(expected, found, 1e-4);
 		} else {
-			ImageGray expected = (ImageGray) validationParam[3];
+			ImageGray expected = (ImageGray) validationParam[2];
 			ImageGray found = (ImageGray) targetParam[1];
 
 			BoofTesting.assertEquals(expected, found, 1e-4);

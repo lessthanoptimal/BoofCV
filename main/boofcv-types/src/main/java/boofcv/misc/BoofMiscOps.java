@@ -24,6 +24,7 @@ import boofcv.struct.image.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.List;
 
@@ -87,6 +88,16 @@ public class BoofMiscOps {
 
 	public static void sortFilesByName(List<File> images ) {
 		images.sort(Comparator.comparing(File::getName));
+	}
+
+	public static void printMethodInfo(Method target) {
+		Class[] types = target.getParameterTypes();
+		System.err.println("Method: "+target.getName()+" param.length = "+types.length);
+		System.err.print("    { ");
+		for (int i = 0; i < types.length; i++) {
+			System.err.print(types[i].getSimpleName()+" ");
+		}
+		System.err.println("}");
 	}
 
 	private static class CompareStringNames implements Comparator<String> {

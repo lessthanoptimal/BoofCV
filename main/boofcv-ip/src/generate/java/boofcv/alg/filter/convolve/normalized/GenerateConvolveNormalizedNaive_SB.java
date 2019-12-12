@@ -21,8 +21,6 @@ package boofcv.alg.filter.convolve.normalized;
 import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
 
-import java.io.FileNotFoundException;
-
 /**
  * Code generator which creates re-normalizing convolution code
  *
@@ -31,6 +29,7 @@ import java.io.FileNotFoundException;
 public class GenerateConvolveNormalizedNaive_SB extends CodeGeneratorBase {
 	String divide;
 
+	@Override
 	public void generate() {
 		printPreamble();
 		printAllOps(AutoTypeImage.F32,AutoTypeImage.F32);
@@ -47,7 +46,9 @@ public class GenerateConvolveNormalizedNaive_SB extends CodeGeneratorBase {
 	}
 
 	private void printPreamble() {
-		out.print("import boofcv.struct.convolve.*;\n" +
+		out.print(
+				"import boofcv.struct.border.*;\n" +
+				"import boofcv.struct.convolve.*;\n" +
 				"import boofcv.struct.image.*;\n" +
 				"import javax.annotation.Generated;\n"+
 				"\n" +
@@ -79,6 +80,9 @@ public class GenerateConvolveNormalizedNaive_SB extends CodeGeneratorBase {
 		printHorizontal(kernelType,inputType,outputType,kernelData,sumType);
 		printVertical(kernelType,inputType,outputType,kernelData,sumType);
 		printConvolve(kernelType,inputType,outputType,kernelData,sumType);
+		printHorizontalBorder(input,output);
+		printVerticalBorder(input,output);
+		printConvolveBorder(input,output);
 	}
 
 	private void printVertical2Int( AutoTypeImage input , AutoTypeImage output ) {
@@ -241,8 +245,96 @@ public class GenerateConvolveNormalizedNaive_SB extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main(String args[]) throws FileNotFoundException {
-		GenerateConvolveNormalizedNaive_SB gen = new GenerateConvolveNormalizedNaive_SB();
-		gen.generate();
+	private void printHorizontalBorder( AutoTypeImage input , AutoTypeImage output ) {
+		String kernelType = input.getKernelType();
+		String inputType = input.getSingleBandName();
+		String outputType = output.getSingleBandName();
+		String borderType = input.getBorderNameSB();
+		String sumType = input.getSumType();
+
+		out.print("\tpublic static void horizontal(Kernel1D_"+kernelType+" kernel, "+inputType+" input, "+outputType+" output, "+borderType+" binput ) {\n" +
+				"\n" +
+				"\t\tbinput.setImage(input);\n" +
+				"\t\tfinal int offset = kernel.getOffset();\n" +
+				"\t\tfinal "+sumType+" weight = kernel.computeSum();\n" +
+				"\n" +
+				"\t\tfinal int width = input.getWidth();\n" +
+				"\t\tfinal int height = input.getHeight();\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < height; y++) {\n" +
+				"\t\t\tfor( int x = 0; x < width; x++ ) {\n" +
+				"\t\t\t\t"+sumType+" total = 0;\n" +
+				"\n" +
+				"\t\t\t\tfor( int j = 0; j < kernel.getWidth(); j++ ) {\n" +
+				"\t\t\t\t\tint xx = x - offset + j;\n" +
+				"\t\t\t\t\ttotal += binput.get(xx,y)*kernel.get(j);\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t\toutput.set(x,y, "+divide+");\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	private void printVerticalBorder( AutoTypeImage input , AutoTypeImage output ) {
+		String kernelType = input.getKernelType();
+		String inputType = input.getSingleBandName();
+		String outputType = output.getSingleBandName();
+		String borderType = input.getBorderNameSB();
+		String sumType = input.getSumType();
+
+		out.print("\tpublic static void vertical(Kernel1D_"+kernelType+" kernel, "+inputType+" input, "+outputType+" output, "+borderType+" binput ) {\n" +
+				"\t\tfinal int offset = kernel.getOffset();\n" +
+				"\t\tfinal "+sumType+" weight = kernel.computeSum();\n" +
+				"\n" +
+				"\t\tfinal int width = input.getWidth();\n" +
+				"\t\tfinal int height = input.getHeight();\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < height; y++) {\n" +
+				"\t\t\tfor( int x = 0; x < width; x++ ) {\n" +
+				"\t\t\t\t"+sumType+" total = 0;\n" +
+				"\n" +
+				"\t\t\t\tfor( int j = 0; j < kernel.getWidth(); j++ ) {\n" +
+				"\t\t\t\t\tint yy = y - offset + j;\n" +
+				"\t\t\t\t\ttotal += binput.get(x,yy)*kernel.get(j);\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t\toutput.set(x,y, "+divide+");\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	private void printConvolveBorder( AutoTypeImage input , AutoTypeImage output ) {
+		String kernelType = input.getKernelType();
+		String inputType = input.getSingleBandName();
+		String outputType = output.getSingleBandName();
+		String borderType = input.getBorderNameSB();
+		String sumType = input.getSumType();
+
+		out.print("\tpublic static void convolve(Kernel2D_"+kernelType+" kernel, "+inputType+" input, "+outputType+" output, "+borderType+" binput ) {\n" +
+				"\t\tfinal int offset = kernel.getOffset();\n" +
+				"\t\tfinal "+sumType+" weight = kernel.computeSum();\n" +
+				"\n" +
+				"\t\tfinal int width = input.getWidth();\n" +
+				"\t\tfinal int height = input.getHeight();\n" +
+				"\n" +
+				"\t\tfor (int y = 0; y < height; y++) {\n" +
+				"\t\t\tfor( int x = 0; x < width; x++ ) {\n" +
+				"\t\t\t\t"+sumType+" total = 0;\n" +
+				"\n" +
+				"\t\t\t\tfor( int i = 0; i < kernel.getWidth(); i++ ) {\n" +
+				"\t\t\t\t\tint yy = y - offset + i; \n" +
+				"\t\t\t\t\tfor( int j = 0; j < kernel.getWidth(); j++ ) {\n" +
+				"\t\t\t\t\t\tint xx = x - offset + j;\n" +
+				"\t\t\t\t\t\ttotal += binput.get(xx,yy)*kernel.get(j,i);\n" +
+				"\t\t\t\t\t}\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t\toutput.set(x,y, "+divide+");\n" +
+				"\t\t\t}\n" +
+				"\t\t}\n" +
+				"\t}\n\n");
+	}
+
+	public static void main(String[] args) {
+		new GenerateConvolveNormalizedNaive_SB().generate();
 	}
 }

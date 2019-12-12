@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,10 @@ package boofcv.alg.filter.convolve.normalized;
 
 import boofcv.alg.filter.convolve.ConvolutionTestHelper;
 import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.filter.kernel.FactoryKernel;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.convolve.KernelBase;
 import boofcv.struct.image.ImageBase;
 import boofcv.testing.CompareIdenticalFunctions;
@@ -63,7 +66,7 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 
 	@Override
 	protected Object[][] createInputParam(Method candidate, Method validation) {
-		Class<?> paramTypes[] = candidate.getParameterTypes();
+		Class<?>[] paramTypes = candidate.getParameterTypes();
 
 		Object[][] ret = new Object[1][paramTypes.length];
 
@@ -83,6 +86,9 @@ public class CompareToStandardConvolutionNormalized extends CompareIdenticalFunc
 		ImageBase dst = ConvolutionTestHelper.createImage(paramTypes[index], width, height);
 		ret[0][index] = dst;
 
+		if( paramTypes.length == 4 && ImageBorder.class.isAssignableFrom(paramTypes[3])) {
+			ret[0][3] = FactoryImageBorder.generic(BorderType.REFLECT,src.getImageType());
+		}
 
 		return ret;
 	}

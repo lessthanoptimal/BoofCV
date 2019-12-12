@@ -18,9 +18,9 @@
 
 package boofcv.testing;
 
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageGray;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -56,15 +56,16 @@ public abstract class CompareEquivalentFunctions {
 			if( !isTestMethod(m))
 				continue;
 
+//			BoofMiscOps.printMethodInfo(m);
 			boolean foundMatch = false;
 
 			escape:
 			for( Class<?> vc : validationClasses ) {
 				// check for equivalence for each match
-				Method candidates[] = vc.getMethods();
+				Method[] candidates = vc.getMethods();
 				for (Method c : candidates) {
 					if (isEquivalent(c, m)) {
-//						System.out.println("Examining: "+m.getName());
+//						System.out.println("Examining: "+m.getName()+" param "+c.getParameterCount()+" vs "+m.getParameterCount());
 						foundMatch = true;
 						compareMethods(m, c);
 						break escape;
@@ -72,7 +73,8 @@ public abstract class CompareEquivalentFunctions {
 				}
 			}
 			if (!foundMatch) {
-				System.out.println("Warning: Can't find an equivalent function in validation class. " + m.getName()+" params = "+m.getParameterTypes().length);
+				System.err.println("Warning: Can't find an equivalent function in validation class." );
+				BoofMiscOps.printMethodInfo(m);
 			} else {
 //				System.out.println("success with "+m.getName());
 				numFound++;
@@ -108,7 +110,7 @@ public abstract class CompareEquivalentFunctions {
 		methodTest = target;
 		methodValidation = validation;
 		// by default don't skip a parameter for sub-image
-		ignoreSubimage = new boolean[target.getParameterCount()];
+		ignoreSubimage = new boolean[Math.max(target.getParameterCount(),validation.getParameterCount())];
 
 		Object [][]targetParamArray = createInputParam(target,validation);
 
@@ -134,8 +136,8 @@ public abstract class CompareEquivalentFunctions {
 			validationResult = validation.invoke(null,validationParamSub);
 
 			compareResults(targetResult,targetParamSub,validationResult,validationParamSub);
-		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
-			System.err.println("Method: "+target.getName()+" param.length = "+targetParam.length);
+		} catch (Exception e) {
+			BoofMiscOps.printMethodInfo(target);
 			throw new RuntimeException(e);
 		}
 	}

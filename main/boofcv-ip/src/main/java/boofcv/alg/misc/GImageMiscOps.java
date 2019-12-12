@@ -810,25 +810,27 @@ public class GImageMiscOps {
 	 *
 	 * @param src (Input) source image
 	 * @param border (Input) image border generator
-	 * @param radiusX (Input) radius of border x-axis
-	 * @param radiusY (Input) radius of border y-axis
+	 * @param borderX0 (Input) Border x-axis lower extent
+	 * @param borderY0 (Input) Border y-axis lower extent
+	 * @param borderX1 (Input) Border x-axis upper extent
+	 * @param borderY1 (Input) Border y-axis upper extent
 	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
 	 */
 	public static <T extends ImageBase<T>>
-	void growBorder(T src , ImageBorder<T> border, int radiusX, int radiusY , T dst ) {
+	void growBorder(T src , ImageBorder<T> border, int borderX0, int borderY0, int borderX1, int borderY1, T dst ) {
 		if( src instanceof ImageGray) {
 			if( GrayI8.class.isAssignableFrom(src.getClass()) ) {
-				ImageMiscOps.growBorder((GrayI8) src, (ImageBorder_S32)border,radiusX,radiusY,(GrayI8)dst);
+				ImageMiscOps.growBorder((GrayI8) src, (ImageBorder_S32)border,borderX0,borderY0,borderX1,borderY1,(GrayI8)dst);
 			} else if( GrayI16.class.isAssignableFrom(src.getClass()) ) {
-				ImageMiscOps.growBorder((GrayI16) src, (ImageBorder_S32)border,radiusX,radiusY,(GrayI16)dst);
+				ImageMiscOps.growBorder((GrayI16) src, (ImageBorder_S32)border,borderX0,borderY0,borderX1,borderY1,(GrayI16)dst);
 			} else if ( GrayS32.class.isAssignableFrom(src.getClass()) ) {
-				ImageMiscOps.growBorder((GrayS32) src, (ImageBorder_S32)border,radiusX,radiusY,(GrayS32)dst);
+				ImageMiscOps.growBorder((GrayS32) src, (ImageBorder_S32)border,borderX0,borderY0,borderX1,borderY1,(GrayS32)dst);
 			} else if ( GrayS64.class.isAssignableFrom(src.getClass()) ) {
-				ImageMiscOps.growBorder((GrayS64) src, (ImageBorder_S64)border,radiusX,radiusY,(GrayS64)dst);
+				ImageMiscOps.growBorder((GrayS64) src, (ImageBorder_S64)border,borderX0,borderY0,borderX1,borderY1,(GrayS64)dst);
 			} else if (GrayF32.class.isAssignableFrom(src.getClass()) ) {
-				ImageMiscOps.growBorder((GrayF32) src, (ImageBorder_F32) border,radiusX,radiusY,(GrayF32)dst);
+				ImageMiscOps.growBorder((GrayF32) src, (ImageBorder_F32) border,borderX0,borderY0,borderX1,borderY1,(GrayF32)dst);
 			} else if (GrayF64.class.isAssignableFrom(src.getClass()) ) {
-				ImageMiscOps.growBorder((GrayF64) src, (ImageBorder_F64)border,radiusX,radiusY,(GrayF64)dst);
+				ImageMiscOps.growBorder((GrayF64) src, (ImageBorder_F64)border,borderX0,borderY0,borderX1,borderY1,(GrayF64)dst);
 			} else {
 				throw new IllegalArgumentException("Unknown or incompatible image type: " + src.getClass().getSimpleName());
 			}
@@ -839,7 +841,7 @@ public class GImageMiscOps {
 			Planar b = (Planar)dst;
 			b.reshape(a.width,a.height,a.getNumBands());
 			for( int i = 0; i < a.getNumBands(); i++ )
-				growBorder(a.getBand(i),(ImageBorder)border,radiusX,radiusY, b.getBand(i));
+				growBorder(a.getBand(i),(ImageBorder)border,borderX0,borderY0,borderX1,borderY1, b.getBand(i));
 		} else {
 			throw new IllegalArgumentException("Unknown image type: " + src.getClass().getSimpleName());
 		}

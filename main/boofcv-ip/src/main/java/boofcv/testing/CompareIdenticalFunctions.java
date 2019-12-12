@@ -58,8 +58,8 @@ public abstract class CompareIdenticalFunctions extends CompareEquivalentFunctio
 		if( evaluation.getName().compareTo(candidate.getName()) != 0 )
 			return false;
 
-		Class<?> e[] = evaluation.getParameterTypes();
-		Class<?> c[] = candidate.getParameterTypes();
+		Class<?>[] e = evaluation.getParameterTypes();
+		Class<?>[] c = candidate.getParameterTypes();
 
 		if( e.length != c.length )
 			return false;

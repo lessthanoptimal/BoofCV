@@ -91,37 +91,37 @@ public class GenerateImplImageMiscOps extends CodeGeneratorBase {
 		} else {
 			typecast = "";
 		}
-		out.print("\tpublic static "+generic+"void growBorder("+srcType+" src , "+borderName+" border, int radiusX, int radiusY , "+srcType+" dst )\n" +
+		out.print("\tpublic static "+generic+"void growBorder("+srcType+" src , "+borderName+" border, int borderX0, int borderY0, int borderX1, int borderY1 , "+srcType+" dst )\n" +
 				"\t{\n" +
-				"\t\tdst.reshape(src.width+2*radiusX, src.height+2*radiusY);\n" +
+				"\t\tdst.reshape(src.width+borderX0+borderX1, src.height+borderY0+borderY1);\n" +
 				"\t\tborder.setImage(src);\n" +
 				"\n" +
 				"\t\t// Copy src into the inner portion of dst\n" +
-				"\t\tImageMiscOps.copy(0,0,radiusX,radiusY,src.width,src.height,src,dst);\n" +
+				"\t\tImageMiscOps.copy(0,0,borderX0,borderY0,src.width,src.height,src,dst);\n" +
 				"\n" +
 				"\t\t// Top border\n" +
-				"\t\tfor (int y = 0; y < radiusY; y++) {\n" +
+				"\t\tfor (int y = 0; y < borderY0; y++) {\n" +
 				"\t\t\tint idxDst = dst.startIndex + y*dst.stride;\n" +
 				"\t\t\tfor (int x = 0; x < dst.width; x++) {\n" +
-				"\t\t\t\tdst.data[idxDst++] = "+typecast+"border.get(x-radiusX,y-radiusY);\n" +
+				"\t\t\t\tdst.data[idxDst++] = "+typecast+"border.get(x-borderX0,y-borderY0);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\t// Bottom border\n" +
-				"\t\tfor (int y = 0; y < radiusY; y++) {\n" +
-				"\t\t\tint idxDst = dst.startIndex + (dst.height-radiusY+y)*dst.stride;\n" +
+				"\t\tfor (int y = 0; y < borderY1; y++) {\n" +
+				"\t\t\tint idxDst = dst.startIndex + (dst.height-borderY1+y)*dst.stride;\n" +
 				"\t\t\tfor (int x = 0; x < dst.width; x++) {\n" +
-				"\t\t\t\tdst.data[idxDst++] = "+typecast+"border.get(x-radiusX,src.height+y);\n" +
+				"\t\t\t\tdst.data[idxDst++] = "+typecast+"border.get(x-borderX0,src.height+y);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\t// Left and right border\n" +
-				"\t\tfor (int y = radiusY; y < dst.height-radiusY; y++) {\n" +
+				"\t\tfor (int y = borderY0; y < dst.height-borderY1; y++) {\n" +
 				"\t\t\tint idxDst = dst.startIndex + y*dst.stride;\n" +
-				"\t\t\tfor (int x = 0; x < radiusX; x++) {\n" +
-				"\t\t\t\tdst.data[idxDst++] = "+typecast+"border.get(x-radiusX,y-radiusY);\n" +
+				"\t\t\tfor (int x = 0; x < borderX0; x++) {\n" +
+				"\t\t\t\tdst.data[idxDst++] = "+typecast+"border.get(x-borderX0,y-borderY0);\n" +
 				"\t\t\t}\n" +
-				"\t\t\tidxDst = dst.startIndex + y*dst.stride+src.width+radiusX;\n" +
-				"\t\t\tfor (int x = 0; x < radiusX; x++) {\n" +
-				"\t\t\t\tdst.data[idxDst++] = "+typecast+"border.get(src.width+x,y-radiusY);\n" +
+				"\t\t\tidxDst = dst.startIndex + y*dst.stride+src.width+borderX0;\n" +
+				"\t\t\tfor (int x = 0; x < borderX1; x++) {\n" +
+				"\t\t\t\tdst.data[idxDst++] = "+typecast+"border.get(src.width+x,y-borderY0);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");

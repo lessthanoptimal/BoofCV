@@ -97,19 +97,18 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\tpublic static void horizontal("+ srcName+" input, "+ dstName+" output, int radius) {\n" +
 				"\t\toutput.reshape(input);\n" +
 				"\n" +
-				"\t\tboolean processed = BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, radius);\n" +
+				"\t\tif( BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, radius) )\n" +
+				"\t\t\treturn;\n" +
 				"\n" +
-				"\t\tif( !processed ) {\n" +
-				"\t\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(radius"+normalized+");\n" +
-				"\t\t\tif (kernel.width > input.width) {\n" +
-				"\t\t\t\tConvolveImageNormalized.horizontal(kernel, input, output);\n" +
+				"\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(radius"+normalized+");\n" +
+				"\t\tif (kernel.width > input.width) {\n" +
+				"\t\t\tConvolveImageNormalized.horizontal(kernel, input, output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);\n" +
+				"\t\t\tif(BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\t\tImplConvolveMean_MT.horizontal(input, output, radius);\n" +
 				"\t\t\t} else {\n" +
-				"\t\t\t\tConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);\n" +
-				"\t\t\t\tif(BoofConcurrency.USE_CONCURRENT) {\n" +
-				"\t\t\t\t\tImplConvolveMean_MT.horizontal(input, output, radius);\n" +
-				"\t\t\t\t} else {\n" +
-				"\t\t\t\t\tImplConvolveMean.horizontal(input, output, radius);\n" +
-				"\t\t\t\t}\n" +
+				"\t\t\t\tImplConvolveMean.horizontal(input, output, radius);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -130,19 +129,19 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\t */\n" +
 				"\tpublic static void vertical("+srcName+" input, "+dstName+" output, int radius, @Nullable "+workArray+" work) {\n" +
 				"\t\toutput.reshape(input);\n" +
-				"\t\tboolean processed = BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius);\n" +
 				"\n" +
-				"\t\tif( !processed ) {\n" +
-				"\t\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(radius"+normalized+");\n" +
-				"\t\t\tif (kernel.width > input.height) {\n" +
-				"\t\t\t\tConvolveImageNormalized.vertical(kernel, input, output);\n" +
+				"\t\tif( BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius) )\n" +
+				"\t\t\treturn;\n" +
+				"\n" +
+				"\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(radius"+normalized+");\n" +
+				"\t\tif (kernel.width > input.height) {\n" +
+				"\t\t\tConvolveImageNormalized.vertical(kernel, input, output);\n" +
+				"\t\t} else {\n" +
+				"\t\t\tConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);\n" +
+				"\t\t\tif(BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\t\tImplConvolveMean_MT.vertical(input, output, radius,work);\n" +
 				"\t\t\t} else {\n" +
-				"\t\t\t\tConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);\n" +
-				"\t\t\t\tif(BoofConcurrency.USE_CONCURRENT) {\n" +
-				"\t\t\t\t\tImplConvolveMean_MT.vertical(input, output, radius,work);\n" +
-				"\t\t\t\t} else {\n" +
-				"\t\t\t\t\tImplConvolveMean.vertical(input, output, radius,work);\n" +
-				"\t\t\t\t}\n" +
+				"\t\t\t\tImplConvolveMean.vertical(input, output, radius,work);\n" +
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
@@ -152,7 +151,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 
 		String suffix = src.getKernelType();
 		String normalized = src.isInteger() ? "" : " , true";
-		String divisor = src.isInteger() ? ", kernel.width" : "";
+		String divisor = src.isInteger() ? ", kernel.computeSum()" : "";
 		String borderSuffix = src.isInteger() ? suffix+"<"+srcName+">" : suffix;
 
 		out.print("\t/**\n" +
@@ -168,10 +167,12 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\n" +
 				"\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(radius"+normalized+");\n" +
 				"\t\tConvolveJustBorder_General_SB.horizontal(kernel, binput, output"+divisor+");\n" +
-				"\t\tif(BoofConcurrency.USE_CONCURRENT) {\n" +
-				"\t\t\tImplConvolveMean_MT.horizontal(input, output, radius);\n" +
-				"\t\t} else {\n" +
-				"\t\t\tImplConvolveMean.horizontal(input, output, radius);\n" +
+				"\t\tif (kernel.width <= input.width) {\n" +
+				"\t\t\tif(BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\t\tImplConvolveMean_MT.horizontal(input, output, radius);\n" +
+				"\t\t\t} else {\n" +
+				"\t\t\t\tImplConvolveMean.horizontal(input, output, radius);\n" +
+				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}
@@ -180,7 +181,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 		String workArray = src.getLetterSum()+"WorkArrays";
 		String suffix = src.getKernelType();
 		String normalized = src.isInteger() ? "" : " , true";
-		String divisor = src.isInteger() ? ", kernel.width" : "";
+		String divisor = src.isInteger() ? ", kernel.computeSum()" : "";
 		String borderSuffix = src.isInteger() ? suffix+"<"+srcName+">" : suffix;
 
 		out.print("\t/**\n" +
@@ -197,10 +198,12 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\n" +
 				"\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(radius"+normalized+");\n" +
 				"\t\tConvolveJustBorder_General_SB.vertical(kernel, binput, output"+divisor+");\n" +
-				"\t\tif(BoofConcurrency.USE_CONCURRENT) {\n" +
-				"\t\t\tImplConvolveMean_MT.vertical(input, output, radius,work);\n" +
-				"\t\t} else {\n" +
-				"\t\t\tImplConvolveMean.vertical(input, output, radius,work);\n" +
+				"\t\tif (kernel.width <= input.height) {\n" +
+				"\t\t\tif(BoofConcurrency.USE_CONCURRENT) {\n" +
+				"\t\t\t\tImplConvolveMean_MT.vertical(input, output, radius,work);\n" +
+				"\t\t\t} else {\n" +
+				"\t\t\t\tImplConvolveMean.vertical(input, output, radius,work);\n" +
+				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t}\n\n");
 	}

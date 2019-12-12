@@ -156,6 +156,14 @@ public enum AutoTypeImage {
 		}
 	}
 
+	public String getBorderNameSB() {
+		String name = "ImageBorder_"+getKernelType();
+		if( isInteger() && getNumBits() <= 32 ) {
+			name += "<"+getSingleBandName()+">";
+		}
+		return name;
+	}
+
 	public String getKernelType() {
 		return isInteger() ? getNumBits()==64 ? "S64":"S32" : getNumBits()==64 ? "F64" : "F32";
 	}
