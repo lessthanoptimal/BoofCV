@@ -98,12 +98,13 @@ public abstract class ChecksDisparityBMBestFive<I extends ImageGray<I>, DI exten
 	protected DisparityBlockMatchBestFive<I, DI>
 	createAlg( int minDisparity , int maxDisparity , int radiusX, int radiusY) {
 		computeError(radiusX,radiusY);
-		return createAlg(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
+		DisparityBlockMatchBestFive<I, DI> alg = createAlg(radiusX,radiusY,scoreRow,compDisp);
+		alg.configure(minDisparity,maxDisparity-minDisparity+1);
+		return alg;
 	}
 
 	protected abstract DisparityBlockMatchBestFive<I, DI>
-	createAlg( int minDisparity , int maxDisparity , int radiusX, int radiusY,
-			   BlockRowScore scoreRow, DisparitySelect compDisp);
+	createAlg( int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp);
 
 	@BeforeEach
 	void before() {

@@ -57,11 +57,10 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 	FastQueue workspace = new FastQueue<>(WorkSpace.class, WorkSpace::new);
 	ComputeBlock computeBlock = new ComputeBlock();
 
-	public DisparityScoreBM_F32(int minDisparity , int maxDisparity,
-								int regionRadiusX, int regionRadiusY,
+	public DisparityScoreBM_F32(int regionRadiusX, int regionRadiusY,
 								BlockRowScore<GrayF32,float[]> scoreRows,
 								DisparitySelect<float[], DI> computeDisparity) {
-		super(minDisparity,maxDisparity,regionRadiusX,regionRadiusY);
+		super(regionRadiusX,regionRadiusY);
 
 		this.scoreRows = scoreRows;
 		this.disparitySelect0 = computeDisparity;
@@ -88,8 +87,8 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 		float[] elementScore;
 		// scores along horizontal axis for current block
 		// To allow right to left validation all disparity scores are stored for the entire row
-		// size = num columns * maxDisparity
-		// disparity for column i is stored in elements i*rangeDisparity to (i+1)*rangeDisparity
+		// size = num columns * disparityMax
+		// disparity for column i is stored in elements i*disparityRange to (i+1)*disparityRange
 		float[][] horizontalScore = new float[0][0];
 		// summed scores along vertical axis
 		// Sum of horizontalScore along it's rows. This contains the entire box score for a pixel+disparity.
@@ -114,7 +113,7 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 			if( computeDisparity == null ) {
 				computeDisparity = disparitySelect0.concurrentCopy();
 			}
-			computeDisparity.configure(disparity,minDisparity,maxDisparity,radiusX);
+			computeDisparity.configure(disparity, disparityMin, disparityMax,radiusX);
 		}
 	}
 
@@ -147,7 +146,7 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 		// compute horizontal scores for first row block
 		for( int row = 0; row < regionHeight; row++ ) {
 			final float[] scores = horizontalScore[row];
-			scoreRows.scoreRow(row0+row, scores,minDisparity,maxDisparity,regionWidth,elementScore);
+			scoreRows.scoreRow(row0+row, scores, disparityMin, disparityMax,regionWidth,elementScore);
 		}
 
 		// compute score for the top most row
@@ -161,7 +160,7 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 
 		// compute disparity
 		if( scoreRows.isRequireNormalize() ) {
-			scoreRows.normalizeRegionScores(row0 + radiusY, verticalScore, minDisparity, maxDisparity, regionWidth, regionHeight, verticalScoreNorm);
+			scoreRows.normalizeRegionScores(row0 + radiusY, verticalScore, disparityMin, disparityMax, regionWidth, regionHeight, verticalScoreNorm);
 			computeDisparity.process(row0 + radiusY, verticalScoreNorm);
 		} else {
 			computeDisparity.process(row0 + radiusY, verticalScore);
@@ -188,7 +187,7 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 				verticalScore[i] -= scores[i];
 			}
 
-			scoreRows.scoreRow(row, scores, minDisparity,maxDisparity,regionWidth,elementScore);
+			scoreRows.scoreRow(row, scores, disparityMin, disparityMax,regionWidth,elementScore);
 
 			// add the new score
 			for(int i = 0; i < widthDisparityBlock; i++ ) {
@@ -198,7 +197,7 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 			// compute disparity
 			if( scoreRows.isRequireNormalize() ) {
 				scoreRows.normalizeRegionScores(row - regionHeight + 1 + radiusY,
-						verticalScore,minDisparity,maxDisparity,regionWidth,regionHeight,verticalScoreNorm);
+						verticalScore, disparityMin, disparityMax,regionWidth,regionHeight,verticalScoreNorm);
 				computeDisparity.process(row - regionHeight + 1 + radiusY, verticalScoreNorm);
 			} else {
 				computeDisparity.process(row - regionHeight + 1 + radiusY, verticalScore);

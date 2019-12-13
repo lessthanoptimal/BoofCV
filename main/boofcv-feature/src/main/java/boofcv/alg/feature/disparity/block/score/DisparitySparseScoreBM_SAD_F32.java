@@ -40,23 +40,27 @@ public class DisparitySparseScoreBM_SAD_F32 extends DisparitySparseScoreSadRect<
 	// scores up to the maximum baseline
 	float[] scores;
 
-	public DisparitySparseScoreBM_SAD_F32(int minDisparity , int maxDisparity, int radiusX, int radiusY) {
-		super(minDisparity,maxDisparity,radiusX, radiusY);
+	public DisparitySparseScoreBM_SAD_F32(int radiusX, int radiusY) {
+		super(radiusX, radiusY);
+	}
 
-		scores = new float[ rangeDisparity ];
+	@Override
+	public void configure(int disparityMin, int disparityRange) {
+		super.configure(disparityMin, disparityRange);
+		scores = new float[ disparityRange ];
 	}
 
 	@Override
 	public boolean process( int x , int y ) {
 		// can't estimate disparity if there are no pixels it can estimate disparity from
-		if( x < minDisparity )
+		if( x < disparityMin)
 			return false;
 
 		// adjust disparity for image border
-		localMaxRange = Math.min(x,maxDisparity)-minDisparity+1;
+		localMaxRange = Math.min(x, disparityMax)- disparityMin +1;
 
 		Arrays.fill(scores,0);
-		if( x < localMaxRange+radiusX+minDisparity || x >= left.width-radiusX || y < radiusY || y >= left.height-radiusY )
+		if( x < localMaxRange+radiusX+ disparityMin || x >= left.width-radiusX || y < radiusY || y >= left.height-radiusY )
 			scoreBorder(x,y);
 		else
 			scoreInner(x, y);
@@ -73,7 +77,7 @@ public class DisparitySparseScoreBM_SAD_F32 extends DisparitySparseScoreSadRect<
 			for (int d = 0; d < localMaxRange; d++) {
 				float score = 0;
 				for (int x = -radiusX; x <= radiusX; x++) {
-					float diff = bleft.get(cx+x,cy+y)-bright.get(cx+x-d-minDisparity,+cy+y);
+					float diff = bleft.get(cx+x,cy+y)-bright.get(cx+x-d- disparityMin,+cy+y);
 					score += Math.abs(diff);
 				}
 				scores[d] += score;
@@ -86,7 +90,7 @@ public class DisparitySparseScoreBM_SAD_F32 extends DisparitySparseScoreSadRect<
 		for( int row = 0; row < regionHeight; row++ ) {
 			// pixel indexes
 			int startLeft = left.startIndex + left.stride*(y-radiusY+row) + x-radiusX;
-			int startRight = right.startIndex + right.stride*(y-radiusY+row) + x-radiusX-minDisparity;
+			int startRight = right.startIndex + right.stride*(y-radiusY+row) + x-radiusX- disparityMin;
 
 			for(int i = 0; i < localMaxRange; i++ ) {
 				int indexLeft = startLeft;

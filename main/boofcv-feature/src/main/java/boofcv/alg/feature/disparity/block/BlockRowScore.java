@@ -49,13 +49,13 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 	 *
 	 * @param row Image row being examined
 	 * @param scores Storage for disparity scores.
-	 * @param minDisparity Minimum disparity to consider
-	 * @param maxDisparity Maximum disparity to consider
+	 * @param disparityMin Minimum disparity to consider
+	 * @param disparityMax Maximum disparity to consider
 	 * @param regionWidth Size of the sample region's width
 	 * @param elementScore Storage for scores of individual pixels
 	 */
 	void scoreRow(int row, Array scores,
-				  int minDisparity , int maxDisparity , int regionWidth ,
+				  int disparityMin , int disparityMax , int regionWidth ,
 				  Array elementScore);
 
 	void score(int indexLeft, int indexRight, int offset, int length, Array elementScore);
@@ -80,13 +80,13 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 	 *
 	 * @param row Image row being examined
 	 * @param scores Storage for disparity scores.
-	 * @param minDisparity Minimum disparity to consider
-	 * @param maxDisparity Maximum disparity to consider
+	 * @param disparityMin Minimum disparity to consider
+	 * @param disparityMax Maximum disparity to consider
 	 * @param regionWidth Size of the sample region's width
 	 * @param regionHeight Size of the sample region's height
 	 */
 	void normalizeRegionScores(int row, Array scores,
-							   int minDisparity, int maxDisparity, int regionWidth, int regionHeight,
+							   int disparityMin, int disparityMax, int regionWidth, int regionHeight,
 							   Array scoresNorm );
 
 	/**
@@ -122,14 +122,14 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 
 		@Override
 		public void scoreRow(int row, int[] scores,
-							 int minDisparity, int maxDisparity, int regionWidth,
+							 int disparityMin, int disparityMax, int regionWidth,
 							 int[] elementScore) {
 			int regionRadius = regionWidth/2;
 			int widthAndBorder = left.width+regionRadius*2; // image width plus left and right borders
 
 			// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
-			for( int d = minDisparity; d <= maxDisparity; d++ ) {
-				int dispFromMin = d - minDisparity;
+			for( int d = disparityMin; d <= disparityMax; d++ ) {
+				int dispFromMin = d - disparityMin;
 
 				// TODO Alternative approach. Create a with border pixels instead?
 				//      Simpler but not sure if it's faster or slower.
@@ -137,8 +137,8 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 				if( row >= 0 && row < left.height ) {
 					// Compute in segments because using the border function is expensive while score() can
 					// be computed very fast
-					int x0 = dispFromMin-regionRadius+minDisparity;
-					int x1 = dispFromMin+minDisparity;
+					int x0 = dispFromMin-regionRadius+disparityMin;
+					int x1 = dispFromMin+disparityMin;
 					int x2 = left.width;
 					int x3 = x2+regionRadius;
 					int offset = 0;
@@ -156,7 +156,7 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 					// border at lower extent. Left image pixels colMax-r to colMax-1
 					scoreBorder(x2,row,d,offset,x3-x2,elementScore);
 				} else {
-					scoreBorder(dispFromMin-regionRadius+minDisparity,row,d,0,widthAndBorder-dispFromMin-minDisparity,elementScore);
+					scoreBorder(dispFromMin-regionRadius+disparityMin,row,d,0,widthAndBorder-dispFromMin-disparityMin,elementScore);
 				}
 
 				// score at the first column
@@ -176,12 +176,12 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 
 		@Override
 		public void normalizeRegionScores(int row, int[] scores,
-										  int minDisparity, int maxDisparity, int regionWidth, int regionHeight,
+										  int disparityMin, int disparityMax, int regionWidth, int regionHeight,
 										  int[] scoresNorm )
 		{
 			// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
-			for( int d = minDisparity; d <= maxDisparity; d++ ) {
-				int dispFromMin = d - minDisparity;
+			for( int d = disparityMin; d <= disparityMax; d++ ) {
+				int dispFromMin = d - disparityMin;
 
 				// number of individual columns the error is computed in
 				final int colMax = left.width-d;
@@ -260,21 +260,21 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 
 		@Override
 		public void scoreRow(int row, float[] scores,
-							 int minDisparity, int maxDisparity, int regionWidth,
+							 int disparityMin, int disparityMax, int regionWidth,
 							 float[] elementScore) {
 			int regionRadius = regionWidth/2;
 			int widthAndBorder = left.width+2*regionRadius;
 
 			// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
-			for( int d = minDisparity; d <= maxDisparity; d++ ) {
-				int dispFromMin = d - minDisparity;
+			for( int d = disparityMin; d <= disparityMax; d++ ) {
+				int dispFromMin = d - disparityMin;
 
 				// Fill elementScore with scores for individual elements for this row at disparity d
 				if( row >= 0 && row < left.height ) {
 					// Compute in segments because using the border function is expensive while score() can
 					// be computed very fast
-					int x0 = dispFromMin-regionRadius+minDisparity;
-					int x1 = dispFromMin+minDisparity;
+					int x0 = dispFromMin-regionRadius+disparityMin;
+					int x1 = dispFromMin+disparityMin;
 					int x2 = left.width;
 					int x3 = x2+regionRadius;
 					int offset = 0;
@@ -292,7 +292,7 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 					// border at lower extent. Left image pixels colMax-r to colMax-1
 					scoreBorder(x2,row,d,offset,x3-x2,elementScore);
 				} else {
-					scoreBorder(dispFromMin-regionRadius+minDisparity,row,d,0,widthAndBorder-dispFromMin-minDisparity,elementScore);
+					scoreBorder(dispFromMin-regionRadius+disparityMin,row,d,0,widthAndBorder-dispFromMin-disparityMin,elementScore);
 				}
 
 				// score at the first column
@@ -312,10 +312,10 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 
 		@Override
 		public void normalizeRegionScores(int row, float[] scores,
-										  int minDisparity, int maxDisparity, int regionWidth, int regionHeight, float[] scoresNorm ) {
+										  int disparityMin, int disparityMax, int regionWidth, int regionHeight, float[] scoresNorm ) {
 			// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
-			for( int d = minDisparity; d <= maxDisparity; d++ ) {
-				int dispFromMin = d - minDisparity;
+			for( int d = disparityMin; d <= disparityMax; d++ ) {
+				int dispFromMin = d - disparityMin;
 
 				// number of individual columns the error is computed in
 				final int colMax = left.width-d;

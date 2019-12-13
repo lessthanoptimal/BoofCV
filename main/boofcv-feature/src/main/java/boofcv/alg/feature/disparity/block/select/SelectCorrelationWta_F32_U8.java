@@ -39,26 +39,26 @@ public class SelectCorrelationWta_F32_U8 extends SelectDisparityBasicWta<float[]
 		implements Compare_F32
 {
 	@Override
-	public void configure(GrayU8 imageDisparity, int minDisparity, int maxDisparity, int radiusX) {
-		super.configure(imageDisparity, minDisparity, maxDisparity, radiusX);
+	public void configure(GrayU8 imageDisparity, int disparityMin, int disparityMax, int radiusX) {
+		super.configure(imageDisparity, disparityMin, disparityMax, radiusX);
 	}
 
 	@Override
 	public void process(int row, float[] blockOfScores) {
 		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride;
 
-		// Mark all pixels as invalid which can't be estimate due to minDisparity
-		for (int col = 0; col < minDisparity; col++) {
-			imageDisparity.data[indexDisparity++] = (byte)rangeDisparity;
+		// Mark all pixels as invalid which can't be estimate due to disparityMin
+		for (int col = 0; col < disparityMin; col++) {
+			imageDisparity.data[indexDisparity++] = (byte)disparityRange;
 		}
 
 		// Select the best disparity from all the rest
-		for( int col = minDisparity; col < imageWidth; col++ ) {
+		for( int col = disparityMin; col < imageWidth; col++ ) {
 			// make sure the disparity search doesn't go outside the image border
-			int localMaxRange = maxDisparityAtColumnL2R(col)-minDisparity+1;
+			int localMaxRange = disparityMaxAtColumnL2R(col)-disparityMin+1;
 
 			// Find the disparity with the best score, which is the largest score for correlation
-			int indexScore = col-minDisparity;
+			int indexScore = col-disparityMin;
 			int maxIndex = 0;
 			float maxValue = blockOfScores[indexScore];
 			indexScore += imageWidth;

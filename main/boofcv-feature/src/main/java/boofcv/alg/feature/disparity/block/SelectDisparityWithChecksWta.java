@@ -51,9 +51,9 @@ public abstract class SelectDisparityWithChecksWta<Array , DI extends ImageGray<
 	// output containing disparity
 	protected DI imageDisparity;
 	// minimum and maximum disparity that will be checked
-	protected int minDisparity;
-	protected int maxDisparity;
-	protected int rangeDisparity;
+	protected int disparityMin;
+	protected int disparityMax;
+	protected int disparityRange;
 	// value that an invalid pixel will be assigned
 	protected int invalidDisparity;
 	// max allowed disparity at the current pixel
@@ -89,15 +89,15 @@ public abstract class SelectDisparityWithChecksWta<Array , DI extends ImageGray<
 	public abstract void setTexture( double threshold );
 
 	@Override
-	public void configure(DI imageDisparity, int minDisparity , int maxDisparity , int radiusX ) {
+	public void configure(DI imageDisparity, int disparityMin , int disparityMax , int radiusX ) {
 		this.imageDisparity = imageDisparity;
-		this.minDisparity = minDisparity;
-		this.maxDisparity = maxDisparity;
+		this.disparityMin = disparityMin;
+		this.disparityMax = disparityMax;
 		this.radiusX = radiusX;
 
-		rangeDisparity = maxDisparity-minDisparity+1;
+		disparityRange = disparityMax-disparityMin+1;
 		regionWidth = radiusX*2+1;
-		invalidDisparity = rangeDisparity;
+		invalidDisparity = disparityRange;
 
 		if( invalidDisparity > (int)imageDisparity.getDataType().getMaxValue()-1 )
 			throw new IllegalArgumentException("Max range exceeds maximum value in disparity image. v="+invalidDisparity);
@@ -117,14 +117,14 @@ public abstract class SelectDisparityWithChecksWta<Array , DI extends ImageGray<
 	 * Returns the maximum allowed disparity for a particular column in left to right direction,
 	 * as limited by the image border.
 	 */
-	protected int maxDisparityAtColumnL2R( int col) {
-		return Math.min(col,maxDisparity);
+	protected int disparityMaxAtColumnL2R( int col) {
+		return Math.min(col,disparityMax);
 	}
 
 	/**
 	 * For debugging purposes only
 	 */
-	public void setLocalMaxDisparity(int value) {
+	public void setLocalDisparityMax(int value) {
 		localRange = value;
 	}
 

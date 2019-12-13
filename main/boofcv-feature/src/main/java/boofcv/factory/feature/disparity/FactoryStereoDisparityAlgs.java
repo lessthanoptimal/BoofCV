@@ -218,19 +218,15 @@ public class FactoryStereoDisparityAlgs {
 	}
 
 	public static DisparitySparseScoreSadRect<int[],GrayU8>
-	scoreDisparitySparseSadRect_U8( int minDisparity , int maxDisparity,
-									int regionRadiusX, int regionRadiusY )
+	scoreDisparitySparseSadRect_U8( int regionRadiusX, int regionRadiusY )
 	{
-		return new DisparitySparseScoreBM_SAD_U8(minDisparity,
-				maxDisparity,regionRadiusX,regionRadiusY);
+		return new DisparitySparseScoreBM_SAD_U8(regionRadiusX,regionRadiusY);
 	}
 
 	public static DisparitySparseScoreSadRect<float[],GrayF32>
-	scoreDisparitySparseSadRect_F32( int minDisparity, int maxDisparity,
-									 int regionRadiusX, int regionRadiusY )
+	scoreDisparitySparseSadRect_F32( int regionRadiusX, int regionRadiusY )
 	{
-		return new DisparitySparseScoreBM_SAD_F32(minDisparity,
-				maxDisparity,regionRadiusX,regionRadiusY);
+		return new DisparitySparseScoreBM_SAD_F32(regionRadiusX,regionRadiusY);
 	}
 
 }

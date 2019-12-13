@@ -34,12 +34,12 @@ public class SelectSparseErrorSubpixel {
 		}
 
 		@Override
-		public boolean select(int[] scores, int maxDisparity) {
-			if( super.select(scores, maxDisparity) ) {
+		public boolean select(int[] scores, int disparityMax) {
+			if( super.select(scores, disparityMax) ) {
 
 				int disparityValue = (int)disparity;
 
-				if( disparityValue == 0 || disparityValue == maxDisparity-1) {
+				if( disparityValue == 0 || disparityValue == disparityMax-1) {
 					return true;
 				} else {
 					int c0 = scores[disparityValue-1];
@@ -65,12 +65,12 @@ public class SelectSparseErrorSubpixel {
 		}
 
 		@Override
-		public boolean select(float[] scores, int maxDisparity) {
-			if( super.select(scores, maxDisparity) ) {
+		public boolean select(float[] scores, int disparityMax) {
+			if( super.select(scores, disparityMax) ) {
 
 				int disparityValue = (int)disparity;
 
-				if( disparityValue == 0 || disparityValue == maxDisparity-1) {
+				if( disparityValue == 0 || disparityValue == disparityMax-1) {
 					return true;
 				} else {
 					float c0 = scores[disparityValue-1];

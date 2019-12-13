@@ -70,11 +70,9 @@ public abstract class ChecksDisparitySparseScoreBM<I extends ImageGray<I>,ArrayD
 		scoreRow = FactoryStereoDisparity.createScoreRowSad(config,imageType);
 	}
 
-	public abstract DisparityBlockMatch<I,GrayU8> createDense(int minDisparity , int maxDisparity,
-															  int radiusX, int radiusY , BlockRowScore scoreRow);
+	public abstract DisparityBlockMatch<I,GrayU8> createDense(int radiusX, int radiusY , BlockRowScore scoreRow);
 
-	public abstract DisparitySparseScoreSadRect<ArrayData, I> createSparse(int minDisparity , int maxDisparity,
-																		   int radiusX, int radiusY );
+	public abstract DisparitySparseScoreSadRect<ArrayData, I> createSparse(int radiusX, int radiusY );
 
 	/**
 	 * Compute disparity using the equivalent dense algorithm and see if the sparse one produces the
@@ -103,11 +101,15 @@ public abstract class ChecksDisparitySparseScoreBM<I extends ImageGray<I>,ArrayD
 		int maxDisparity = 10;
 		int radiusX = 3;
 		int radiusY = 2;
-		int invalid = maxDisparity-minDisparity+1;
+		int rangeDisparity = maxDisparity-minDisparity+1;
+		int invalid = rangeDisparity;
 
-		DisparityBlockMatch<I,GrayU8> denseAlg = createDense(minDisparity,maxDisparity,radiusX,radiusY,scoreRow);
-		DisparitySparseScoreSadRect<ArrayData, I> alg = createSparse(minDisparity,maxDisparity,radiusX,radiusY);
+		DisparityBlockMatch<I,GrayU8> denseAlg = createDense(radiusX,radiusY,scoreRow);
+		DisparitySparseScoreSadRect<ArrayData, I> alg = createSparse(radiusX,radiusY);
 		alg.setBorder(imageBorder);
+
+		denseAlg.configure(minDisparity,rangeDisparity);
+		alg.configure(minDisparity,rangeDisparity);
 
 		GrayU8 denseDisparity = new GrayU8(w,h);
 		denseAlg.process(left, right, denseDisparity);
@@ -120,7 +122,7 @@ public abstract class ChecksDisparitySparseScoreBM<I extends ImageGray<I>,ArrayD
 					assertEquals(expected,invalid);
 				} else {
 					selectAlg.select(alg.getScore(),alg.getLocalMaxRange());
-					int found = (int)(alg.getMinDisparity()+selectAlg.getDisparity());
+					int found = (int)(alg.getDisparityMin()+selectAlg.getDisparity());
 					if( expected == invalid )
 						fail("Expected sparse to fail");
 					else

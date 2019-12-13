@@ -39,8 +39,8 @@ public class TestDisparityScoreBM_F32 {
 
 		@Override
 		protected DisparityBlockMatch<GrayF32, GrayU8>
-		createAlg(int minDisparity, int maxDisparity, int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp) {
-			return new DisparityScoreBM_F32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
+		createAlg(int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp) {
+			return new DisparityScoreBM_F32<>(radiusX,radiusY,scoreRow,compDisp);
 		}
 	}
 
@@ -55,8 +55,8 @@ public class TestDisparityScoreBM_F32 {
 
 		@Override
 		protected DisparityBlockMatch<GrayF32, GrayU8>
-		createAlg(int minDisparity, int maxDisparity, int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp) {
-			return new DisparityScoreBM_F32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
+		createAlg(int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp) {
+			return new DisparityScoreBM_F32<>(radiusX,radiusY,scoreRow,compDisp);
 		}
 	}
 }

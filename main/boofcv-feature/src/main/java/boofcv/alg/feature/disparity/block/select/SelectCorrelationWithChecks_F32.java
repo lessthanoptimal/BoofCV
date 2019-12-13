@@ -56,10 +56,10 @@ public abstract class SelectCorrelationWithChecks_F32<DI extends ImageGray<DI>>
 	}
 
 	@Override
-	public void configure(DI imageDisparity, int minDisparity, int maxDisparity , int radiusX ) {
-		super.configure(imageDisparity,minDisparity,maxDisparity,radiusX);
+	public void configure(DI imageDisparity, int disparityMin, int disparityMax , int radiusX ) {
+		super.configure(imageDisparity,disparityMin,disparityMax,radiusX);
 
-		columnScore = new float[rangeDisparity];
+		columnScore = new float[disparityRange];
 		imageWidth = imageDisparity.width;
 	}
 
@@ -68,18 +68,18 @@ public abstract class SelectCorrelationWithChecks_F32<DI extends ImageGray<DI>>
 
 		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride;
 
-		// Mark all pixels as invalid which can't be estimate due to minDisparity
-		for (int col = 0; col < minDisparity; col++) {
-			setDisparity(indexDisparity++ , rangeDisparity );
+		// Mark all pixels as invalid which can't be estimate due to disparityMin
+		for (int col = 0; col < disparityMin; col++) {
+			setDisparity(indexDisparity++ , disparityRange );
 		}
 
 		// Select the best disparity from all the rest
-		for( int col = minDisparity; col < imageWidth; col++ ) {
+		for( int col = disparityMin; col < imageWidth; col++ ) {
 			// Determine the number of disparities that can be considered at this column
-			localRange = maxDisparityAtColumnL2R(col)-minDisparity+1;
+			localRange = disparityMaxAtColumnL2R(col)-disparityMin+1;
 
 			// index of the element being examined in the score array
-			int indexScore = col - minDisparity;
+			int indexScore = col - disparityMin;
 
 			// select the best disparity
 			int bestDisparity = 0;
@@ -101,7 +101,7 @@ public abstract class SelectCorrelationWithChecks_F32<DI extends ImageGray<DI>>
 			// detect bad matches
 			if( rightToLeftTolerance >= 0 ) {
 				// if the associate is different going the other direction it is probably noise
-				int disparityRtoL = selectRightToLeft(col-bestDisparity-minDisparity,scores);
+				int disparityRtoL = selectRightToLeft(col-bestDisparity-disparityMin,scores);
 
 				if( Math.abs(disparityRtoL-bestDisparity) > rightToLeftTolerance ) {
 					bestDisparity = invalidDisparity;
@@ -143,7 +143,7 @@ public abstract class SelectCorrelationWithChecks_F32<DI extends ImageGray<DI>>
 	 */
 	private int selectRightToLeft( int col , float[] scores ) {
 		// see how far it can search
-		int localMax = Math.min(imageWidth,col+maxDisparity)-col-minDisparity;
+		int localMax = Math.min(imageWidth,col+disparityMax)-col-disparityMin;
 
 		int indexBest = 0;
 		int indexScore = col;

@@ -60,11 +60,10 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 	FastQueue workspace = new FastQueue<>(WorkSpace.class, WorkSpace::new);
 	ComputeBlock computeBlock = new ComputeBlock();
 
-	public DisparityScoreBMBestFive_F32(int minDisparity, int maxDisparity,
-										int regionRadiusX, int regionRadiusY,
+	public DisparityScoreBMBestFive_F32(int regionRadiusX, int regionRadiusY,
 										BlockRowScore<GrayF32,float[]> scoreRows,
 										DisparitySelect<float[], DI> computeDisparity) {
-		super(minDisparity,maxDisparity,regionRadiusX,regionRadiusY);
+		super(regionRadiusX,regionRadiusY);
 		this.disparitySelect0 = computeDisparity;
 		this.scoreRows = scoreRows;
 		workspace.grow();
@@ -117,7 +116,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 			if( computeDisparity == null ) {
 				computeDisparity = disparitySelect0.concurrentCopy();
 			}
-			computeDisparity.configure(disparity,minDisparity,maxDisparity,radiusX*2);
+			computeDisparity.configure(disparity, disparityMin, disparityMax,radiusX*2);
 		}
 	}
 
@@ -150,7 +149,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 
 			float[] scores = workSpace.horizontalScore[row];
 
-			scoreRows.scoreRow(row0+row, scores,minDisparity, maxDisparity, regionWidth, workSpace.elementScore);
+			scoreRows.scoreRow(row0+row, scores, disparityMin, disparityMax, regionWidth, workSpace.elementScore);
 		}
 
 		// compute score for the top possible row
@@ -165,7 +164,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 
 		if( scoreRows.isRequireNormalize() && row0+radiusY >= 0 ) {
 			scoreRows.normalizeRegionScores(row0+radiusY,
-					firstRow,minDisparity,maxDisparity,regionWidth,regionHeight,workSpace.verticalScoreNorm[0]);
+					firstRow, disparityMin, disparityMax,regionWidth,regionHeight,workSpace.verticalScoreNorm[0]);
 		}
 	}
 
@@ -188,7 +187,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 				active[i] = previous[i] - scores[i];
 			}
 
-			scoreRows.scoreRow(row, scores,minDisparity,maxDisparity,regionWidth,workSpace.elementScore);
+			scoreRows.scoreRow(row, scores, disparityMin, disparityMax,regionWidth,workSpace.elementScore);
 
 			// add the new score
 			for(int i = 0; i < widthDisparityBlock; i++ ) {
@@ -197,7 +196,7 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 
 			if( scoreRows.isRequireNormalize() && row >= radiusY && row < left.height+radiusY) {
 				scoreRows.normalizeRegionScores( row - radiusY,
-						active,minDisparity,maxDisparity,regionWidth,regionHeight,workSpace.verticalScoreNorm[activeIndex]);
+						active, disparityMin, disparityMax,regionWidth,regionHeight,workSpace.verticalScoreNorm[activeIndex]);
 			}
 
 			if( workSpace.activeVerticalScore >= 2*radiusY ) {
@@ -245,11 +244,11 @@ public class DisparityScoreBMBestFive_F32<DI extends ImageGray<DI>>
 		float WORST_SCORE = Float.MAX_VALUE*compare.compare(0,1);
 
 		// disparity as the outer loop to maximize common elements in inner loops, reducing redundant calculations
-		for( int d = minDisparity; d <= maxDisparity; d++ )
+		for(int d = disparityMin; d <= disparityMax; d++ )
 		{
 			// take in account the different in image border between the sub-regions and the effective region
-			int indexSrc = (d-minDisparity)*width + (d-minDisparity);
-			int indexDst = (d-minDisparity)*width + (d-minDisparity);
+			int indexSrc = (d- disparityMin)*width + (d- disparityMin);
+			int indexDst = (d- disparityMin)*width + (d- disparityMin);
 
 			for (int i = 0; i < width - d; i++, indexSrc++) {
 				float val0 = WORST_SCORE;

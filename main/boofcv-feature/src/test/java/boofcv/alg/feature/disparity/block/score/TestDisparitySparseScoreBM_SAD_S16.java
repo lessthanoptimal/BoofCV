@@ -35,15 +35,12 @@ public class TestDisparitySparseScoreBM_SAD_S16 extends ChecksDisparitySparseSco
 	}
 
 	@Override
-	public DisparityBlockMatch<GrayS16, GrayU8> createDense(int minDisparity, int maxDisparity,
-															int radiusX, int radiusY, BlockRowScore scoreRow) {
-		return new DisparityScoreBM_S32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,
-				new SelectErrorBasicWta_S32_U8());
+	public DisparityBlockMatch<GrayS16, GrayU8> createDense(int radiusX, int radiusY, BlockRowScore scoreRow) {
+		return new DisparityScoreBM_S32<>(radiusX,radiusY,scoreRow, new SelectErrorBasicWta_S32_U8());
 	}
 
 	@Override
-	public DisparitySparseScoreSadRect<int[], GrayS16> createSparse(int minDisparity, int maxDisparity,
-																	int radiusX, int radiusY) {
-		return new DisparitySparseScoreBM_SAD_S16(minDisparity,maxDisparity,radiusX,radiusY);
+	public DisparitySparseScoreSadRect<int[], GrayS16> createSparse(int radiusX, int radiusY) {
+		return new DisparitySparseScoreBM_SAD_S16(radiusX,radiusY);
 	}
 }

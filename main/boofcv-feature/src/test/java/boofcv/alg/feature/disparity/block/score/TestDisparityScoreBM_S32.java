@@ -36,7 +36,7 @@ public class TestDisparityScoreBM_S32 extends ChecksDisparityBM<GrayS16,GrayU8> 
 
 	@Override
 	protected DisparityBlockMatch<GrayS16, GrayU8>
-	createAlg(int minDisparity, int maxDisparity, int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp) {
-		return new DisparityScoreBM_S32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
+	createAlg(int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp) {
+		return new DisparityScoreBM_S32<>(radiusX,radiusY,scoreRow,compDisp);
 	}
 }

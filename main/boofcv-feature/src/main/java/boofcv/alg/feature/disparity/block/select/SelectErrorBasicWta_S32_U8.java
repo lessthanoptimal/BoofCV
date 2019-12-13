@@ -41,15 +41,15 @@ public class SelectErrorBasicWta_S32_U8 extends SelectDisparityBasicWta<int[],Gr
 
 		int indexDisparity = imageDisparity.startIndex + row*imageDisparity.stride;
 
-		// Mark all pixels as invalid which can't be estimate due to minDisparity
-		for (int col = 0; col < minDisparity; col++) {
-			imageDisparity.data[indexDisparity++] = (byte)rangeDisparity;
+		// Mark all pixels as invalid which can't be estimate due to disparityMin
+		for (int col = 0; col < disparityMin; col++) {
+			imageDisparity.data[indexDisparity++] = (byte)disparityRange;
 		}
 
 		// Select the best disparity from all the rest
-		for( int col = minDisparity; col < imageWidth; col++ ) {
-			int localRange = maxDisparityAtColumnL2R(col)-minDisparity+1;
-			int indexScore = col-minDisparity;
+		for( int col = disparityMin; col < imageWidth; col++ ) {
+			int localRange = disparityMaxAtColumnL2R(col)-disparityMin+1;
+			int indexScore = col-disparityMin;
 
 			int bestDisparity = 0;
 			int scoreBest = scores[indexScore];

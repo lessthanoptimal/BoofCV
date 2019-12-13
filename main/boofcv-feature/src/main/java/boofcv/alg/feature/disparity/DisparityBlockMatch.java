@@ -55,8 +55,7 @@ import boofcv.struct.image.ImageGray;
 public abstract class DisparityBlockMatch<I extends ImageBase<I>, DI extends ImageGray<DI>>
 	extends DisparityBlockMatchRowFormat<I, DI>
 {
-	public DisparityBlockMatch(int minDisparity, int maxDisparity,
-							   int regionRadiusX, int regionRadiusY) {
-		super(minDisparity, maxDisparity, regionRadiusX, regionRadiusY);
+	public DisparityBlockMatch(int regionRadiusX, int regionRadiusY) {
+		super(regionRadiusX, regionRadiusY);
 	}
 }

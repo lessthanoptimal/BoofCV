@@ -36,9 +36,9 @@ public abstract class SelectDisparityBasicWta<Array , Disparity extends ImageGra
 	// Output disparity image
 	protected Disparity imageDisparity;
 	// The minimum and maximum disparity it will search
-	protected int minDisparity;
-	protected int maxDisparity;
-	protected int rangeDisparity;
+	protected int disparityMin;
+	protected int disparityMax;
+	protected int disparityRange;
 	// Radius and width of the comparison region
 	protected int radiusX;
 	protected int regionWidth;
@@ -47,13 +47,13 @@ public abstract class SelectDisparityBasicWta<Array , Disparity extends ImageGra
 	protected int imageWidth;
 
 	@Override
-	public void configure(Disparity imageDisparity, int minDisparity , int maxDisparity , int radiusX ) {
+	public void configure(Disparity imageDisparity, int disparityMin , int disparityMax , int radiusX ) {
 		this.imageDisparity = imageDisparity;
-		this.minDisparity = minDisparity;
-		this.maxDisparity = maxDisparity;
+		this.disparityMin = disparityMin;
+		this.disparityMax = disparityMax;
 		this.radiusX = radiusX;
 
-		rangeDisparity = maxDisparity-minDisparity+1;
+		disparityRange = disparityMax-disparityMin+1;
 		regionWidth = radiusX*2+1;
 		imageWidth = imageDisparity.width;
 	}
@@ -62,7 +62,7 @@ public abstract class SelectDisparityBasicWta<Array , Disparity extends ImageGra
 	 * Returns the maximum allowed disparity for a particular column in left to right direction,
 	 * as limited by the image border.
 	 */
-	protected int maxDisparityAtColumnL2R( int col) {
-		return Math.min(col,maxDisparity);
+	protected int disparityMaxAtColumnL2R( int col) {
+		return Math.min(col,disparityMax);
 	}
 }

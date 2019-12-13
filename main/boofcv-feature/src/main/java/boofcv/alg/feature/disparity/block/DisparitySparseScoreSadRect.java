@@ -30,9 +30,9 @@ import boofcv.struct.image.ImageGray;
  */
 public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends ImageGray<Input>> {
 	// maximum and minimum allowed image disparity
-	protected int minDisparity;
-	protected int maxDisparity;
-	protected int rangeDisparity;
+	protected int disparityMin;
+	protected int disparityMax;
+	protected int disparityRange;
 	// maximum disparity at the most recently processed point
 	protected int localMaxRange;
 
@@ -50,18 +50,12 @@ public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends Ima
 	/**
 	 * Configures disparity calculation.
 	 *
-	 * @param minDisparity Minimum disparity that it will consider.  Must be &ge; 0 && < maxDisparity
-	 * @param maxDisparity Maximum disparity that it will calculate. Must be &gt; 0
 	 * @param radiusX Radius of the rectangular region along x-axis.
 	 * @param radiusY Radius of the rectangular region along y-axis.
 	 */
-	public DisparitySparseScoreSadRect( int minDisparity , int maxDisparity , int radiusX , int radiusY ) {
-		this.minDisparity = minDisparity;
-		this.maxDisparity = maxDisparity;
+	public DisparitySparseScoreSadRect( int radiusX , int radiusY ) {
 		this.radiusX = radiusX;
 		this.radiusY = radiusY;
-
-		this.rangeDisparity = maxDisparity - minDisparity+1;
 		this.regionWidth = radiusX*2 + 1;
 		this.regionHeight = radiusY*2 + 1;
 	}
@@ -69,6 +63,23 @@ public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends Ima
 	public void setBorder( ImageBorder<Input> border ) {
 		this.bleft = border.copy();
 		this.bright = border.copy();
+	}
+
+	/**
+	 * Configures the disparity search
+	 *
+	 * @param disparityMin Minimum disparity that it will check. Must be &ge; 0 and < disparityMax
+	 * @param disparityRange Number of possible disparity values estimated. The max possible disparity is min+range-1.
+	 */
+	public void configure( int disparityMin , int disparityRange ) {
+		if( disparityMin < 0 )
+			throw new IllegalArgumentException("Min disparity must be greater than or equal to zero. max="+disparityMin);
+		if( disparityRange <= 0 )
+			throw new IllegalArgumentException("Disparity range must be more than 0");
+
+		this.disparityMin = disparityMin;
+		this.disparityRange = disparityRange;
+		this.disparityMax = disparityMin+disparityRange-1;
 	}
 
 	/**
@@ -102,12 +113,12 @@ public abstract class DisparitySparseScoreSadRect< ArrayData , Input extends Ima
 		return localMaxRange;
 	}
 
-	public int getMinDisparity() {
-		return minDisparity;
+	public int getDisparityMin() {
+		return disparityMin;
 	}
 
-	public int getMaxDisparity() {
-		return maxDisparity;
+	public int getDisparityMax() {
+		return disparityMax;
 	}
 
 	public int getRadiusX() {

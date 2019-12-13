@@ -35,7 +35,8 @@ public class TestWrapDisparityBlockMatchRowFormat {
 	@Test
 	public void borderSetToInvalid() {
 		int range = 4;
-		Foo foo = new Foo(1,1+range,2,2);
+		Foo foo = new Foo(2,2);
+		foo.configure(1,range);
 		WrapDisparityBlockMatchRowFormat<GrayF32,GrayF32> alg = new WrapDisparityBlockMatchRowFormat<>(foo);
 
 		GrayF32 l = new GrayF32(10,20);
@@ -52,8 +53,8 @@ public class TestWrapDisparityBlockMatchRowFormat {
 
 	private static class Foo extends DisparityBlockMatch<GrayF32,GrayF32>
 	{
-		public Foo(int minDisparity, int maxDisparity, int regionRadiusX, int regionRadiusY) {
-			super(minDisparity, maxDisparity, regionRadiusX, regionRadiusY);
+		public Foo(int regionRadiusX, int regionRadiusY) {
+			super(regionRadiusX, regionRadiusY);
 		}
 
 		@Override

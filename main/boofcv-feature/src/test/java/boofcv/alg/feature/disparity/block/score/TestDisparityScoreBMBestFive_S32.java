@@ -39,9 +39,8 @@ public class TestDisparityScoreBMBestFive_S32 {
 
 		@Override
 		protected DisparityBlockMatchBestFive<GrayU16, GrayU8>
-		createAlg(int minDisparity, int maxDisparity, int radiusX, int radiusY,
-				  BlockRowScore scoreRow, DisparitySelect compDisp) {
-			return new DisparityScoreBMBestFive_S32<>(minDisparity,maxDisparity,radiusX,radiusY,scoreRow,compDisp);
+		createAlg(int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp) {
+			return new DisparityScoreBMBestFive_S32<>(radiusX,radiusY,scoreRow,compDisp);
 		}
 	}
 }

@@ -45,11 +45,11 @@ public abstract class DisparityBlockMatchRowFormat
 		<Input extends ImageBase<Input>, Disparity extends ImageGray<Disparity>>
 {
 	// the minimum disparity value (inclusive)
-	protected int minDisparity;
+	protected int disparityMin;
 	// maximum allowed image disparity (exclusive)
-	protected int maxDisparity;
+	protected int disparityMax;
 	// difference between max and min
-	protected int rangeDisparity;
+	protected int disparityRange;
 
 	// number of score elements: image_width*rangeDisparity
 	protected int widthDisparityBlock;
@@ -62,27 +62,32 @@ public abstract class DisparityBlockMatchRowFormat
 	/**
 	 * Configures disparity calculation.
 	 *
-	 * @param minDisparity Minimum disparity that it will check. Must be &ge; 0 and < maxDisparity
-	 * @param maxDisparity Maximum disparity that it will calculate. Must be &gt; 0
 	 * @param regionRadiusX Radius of the rectangular region along x-axis.
 	 * @param regionRadiusY Radius of the rectangular region along y-axis.
 	 */
-	public DisparityBlockMatchRowFormat(int minDisparity, int maxDisparity,
-										int regionRadiusX, int regionRadiusY ) {
-		if( maxDisparity <= 0 )
-			throw new IllegalArgumentException("Max disparity must be greater than zero. max="+maxDisparity);
-		if( minDisparity < 0 || minDisparity > maxDisparity )
-			throw new IllegalArgumentException("Min disparity must be >= 0 and < maxDisparity. min="+minDisparity+" max="+maxDisparity);
-
-		this.minDisparity = minDisparity;
-		this.maxDisparity = maxDisparity;
+	public DisparityBlockMatchRowFormat(int regionRadiusX, int regionRadiusY ) {
 		this.radiusX = regionRadiusX;
 		this.radiusY = regionRadiusY;
 
-		this.rangeDisparity = maxDisparity-minDisparity+1;
-
 		this.regionWidth = regionRadiusX*2+1;
 		this.regionHeight = regionRadiusY*2+1;
+	}
+
+	/**
+	 * Configures the disparity search
+	 *
+	 * @param disparityMin Minimum disparity that it will check. Must be &ge; 0 and < maxDisparity
+	 * @param disparityRange Number of possible disparity values estimated. The max possible disparity is min+range-1.
+	 */
+	public void configure( int disparityMin , int disparityRange ) {
+		if( disparityMin < 0 )
+			throw new IllegalArgumentException("Min disparity must be greater than or equal to zero. max="+disparityMin);
+		if( disparityRange <= 0 )
+			throw new IllegalArgumentException("Disparity range must be more than 0");
+
+		this.disparityMin = disparityMin;
+		this.disparityRange = disparityRange;
+		this.disparityMax = disparityMin+disparityRange-1;
 	}
 
 	/**
@@ -96,12 +101,12 @@ public abstract class DisparityBlockMatchRowFormat
 		// initialize data structures
 		InputSanityCheck.checkSameShape(left, right);
 
-		if( maxDisparity > left.width )
+		if( disparityMax > left.width )
 			throw new RuntimeException(
 					"The maximum disparity is too large for this image size: max size "+left.width);
 
 		// Stores error for all x-coordinates and disparity values along a single row
-		widthDisparityBlock = left.width*rangeDisparity;
+		widthDisparityBlock = left.width* disparityRange;
 
 		_process(left,right,disparity);
 	}
@@ -115,12 +120,12 @@ public abstract class DisparityBlockMatchRowFormat
 
 	public abstract Class<Disparity> getDisparityType();
 
-	public int getMinDisparity() {
-		return minDisparity;
+	public int getDisparityMin() {
+		return disparityMin;
 	}
 
-	public int getMaxDisparity() {
-		return maxDisparity;
+	public int getDisparityMax() {
+		return disparityMax;
 	}
 
 	public int getBorderX() {

@@ -236,24 +236,24 @@ public class FactoryStereoDisparity {
 	static <T extends ImageGray<T>> DisparityBlockMatchRowFormat
 	createBlockMatching(ConfigDisparityBM config, Class<T> imageType, DisparitySelect select, BlockRowScore rowScore) {
 		DisparityBlockMatchRowFormat alg;
-		int maxDisparity = config.minDisparity+config.rangeDisparity-1;
 		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
-			alg = new DisparityScoreBM_F32<>(config.minDisparity,maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
+			alg = new DisparityScoreBM_F32<>( config.regionRadiusX, config.regionRadiusY, rowScore, select);
 		} else {
-			alg = new DisparityScoreBM_S32(config.minDisparity,maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
+			alg = new DisparityScoreBM_S32( config.regionRadiusX, config.regionRadiusY, rowScore, select);
 		}
+		alg.configure(config.minDisparity,config.rangeDisparity);
 		return alg;
 	}
 
 	static <T extends ImageGray<T>> DisparityBlockMatchRowFormat
 	createBestFive(ConfigDisparityBM config, Class<T> imageType, DisparitySelect select, BlockRowScore rowScore) {
 		DisparityBlockMatchRowFormat alg;
-		int maxDisparity = config.minDisparity+config.rangeDisparity-1;
 		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
-			alg = new DisparityScoreBMBestFive_F32(config.minDisparity,maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
+			alg = new DisparityScoreBMBestFive_F32(config.regionRadiusX, config.regionRadiusY, rowScore, select);
 		} else {
-			alg = new DisparityScoreBMBestFive_S32(config.minDisparity,maxDisparity, config.regionRadiusX, config.regionRadiusY, rowScore, select);
+			alg = new DisparityScoreBMBestFive_S32(config.regionRadiusX, config.regionRadiusY, rowScore, select);
 		}
+		alg.configure(config.minDisparity,config.rangeDisparity);
 		return alg;
 	}
 
@@ -280,7 +280,6 @@ public class FactoryStereoDisparity {
 					 boolean subpixelInterpolation ,
 					 Class<T> imageType ) {
 
-		int maxDisparity = minDisparity+rangeDisparity;
 		double maxError = (regionRadiusX*2+1)*(regionRadiusY*2+1)*maxPerPixelError;
 
 		if( imageType == GrayU8.class ) {
@@ -291,7 +290,8 @@ public class FactoryStereoDisparity {
 				select = selectDisparitySparse_S32((int) maxError, texture);
 
 			DisparitySparseScoreSadRect<int[],GrayU8>
-					score = scoreDisparitySparseSadRect_U8(minDisparity,maxDisparity, regionRadiusX, regionRadiusY);
+					score = scoreDisparitySparseSadRect_U8(regionRadiusX, regionRadiusY);
+			score.configure(minDisparity,rangeDisparity);
 
 			return new WrapDisparityBlockSparseSad(score,select);
 		} else if( imageType == GrayF32.class ) {
@@ -302,7 +302,8 @@ public class FactoryStereoDisparity {
 				select = selectDisparitySparse_F32((int) maxError, texture);
 
 			DisparitySparseScoreSadRect<float[],GrayF32>
-					score = scoreDisparitySparseSadRect_F32(minDisparity,maxDisparity, regionRadiusX, regionRadiusY);
+					score = scoreDisparitySparseSadRect_F32(regionRadiusX, regionRadiusY);
+			score.configure(minDisparity,rangeDisparity);
 
 			return new WrapDisparityBlockSparseSad(score,select);
 		} else

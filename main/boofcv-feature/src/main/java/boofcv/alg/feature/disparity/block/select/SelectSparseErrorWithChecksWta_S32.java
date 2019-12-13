@@ -47,11 +47,11 @@ public class SelectSparseErrorWithChecksWta_S32 extends SelectSparseStandardWta<
 	}
 
 	@Override
-	public boolean select(int[] scores, int maxDisparity) {
+	public boolean select(int[] scores, int disparityMax) {
 		int disparity = 0;
 		int best = scores[0];
 
-		for( int i = 1; i < maxDisparity; i++ ) {
+		for( int i = 1; i < disparityMax; i++ ) {
 			if( scores[i] < best ) {
 				best = scores[i];
 				disparity = i;
@@ -67,7 +67,7 @@ public class SelectSparseErrorWithChecksWta_S32 extends SelectSparseStandardWta<
 				if( scores[i] < secondBest )
 					secondBest = scores[i];
 			}
-			for( int i = disparity+2; i < maxDisparity; i++ ) {
+			for( int i = disparity+2; i < disparityMax; i++ ) {
 				if( scores[i] < secondBest )
 					secondBest = scores[i];
 			}

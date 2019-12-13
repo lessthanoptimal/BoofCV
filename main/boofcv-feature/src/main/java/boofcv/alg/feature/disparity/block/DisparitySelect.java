@@ -30,8 +30,8 @@ import boofcv.struct.image.ImageGray;
  * </p>
  *
  * <p>
- * The selected disparity written into the output image is equal to the found disparity minus the minDisparity.
- * If a pixel is found to be invalid and no disparity found then its value is set to (maxDisparity-minDisparity) + 1.
+ * The selected disparity written into the output image is equal to the found disparity minus the disparityMin.
+ * If a pixel is found to be invalid and no disparity found then its value is set to (disparityMax-disparityMin) + 1.
  * The first requirement maximizes the useful storage of the output image and the second provides an unambiguous
  * way to identify invalid pixels.
  * </p>
@@ -43,11 +43,11 @@ public interface DisparitySelect<Array , T extends ImageGray> {
 	 * Specifies the output and algorithmic configuration.
 	 *
 	 * @param imageDisparity Output disparity image.
-	 * @param minDisparity Minimum disparity that can be computed
-	 * @param maxDisparity Maximum disparity that is calculated
+	 * @param disparityMin Minimum disparity that can be computed
+	 * @param disparityMax Maximum disparity that is calculated
 	 * @param radiusX Radius of the rectangular region being matched along x-axis.
 	 */
-	void configure(T imageDisparity, int minDisparity , int maxDisparity, int radiusX);
+	void configure(T imageDisparity, int disparityMin , int disparityMax, int radiusX);
 
 	/**
 	 * Processes the array of scores. The score format is described in

@@ -51,7 +51,7 @@ public class TestSelectErrorSubpixel {
 			SelectErrorSubpixel.F32_F32 alg = new SelectErrorSubpixel.F32_F32(-1,-1,-1);
 
 			alg.configure(img,0,20,2);
-			alg.setLocalMaxDisparity(20);
+			alg.setLocalDisparityMax(20);
 
 			// should be biased towards 4
 			alg.columnScore[4] = 100;
@@ -91,7 +91,7 @@ public class TestSelectErrorSubpixel {
 			SelectErrorSubpixel.S32_F32 alg = new SelectErrorSubpixel.S32_F32(-1,-1,-1);
 
 			alg.configure(img,0,20,2);
-			alg.setLocalMaxDisparity(20);
+			alg.setLocalDisparityMax(20);
 
 			// should be biased towards 4
 			alg.columnScore[4] = 100;

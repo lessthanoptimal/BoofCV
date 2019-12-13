@@ -43,7 +43,7 @@ public class WrapDisparityBlockSparseSad<ArrayData,T extends ImageGray<T>>
 	@Override
 	public void setImages(T imageLeft, T imageRight ) {
 		computeScore.setImages(imageLeft,imageRight);
-		minDisparityFloat = computeScore.getMinDisparity();
+		minDisparityFloat = computeScore.getDisparityMin();
 	}
 
 	@Override
@@ -71,16 +71,24 @@ public class WrapDisparityBlockSparseSad<ArrayData,T extends ImageGray<T>>
 
 	@Override
 	public int getMinDisparity() {
-		return computeScore.getMinDisparity();
+		return computeScore.getDisparityMin();
 	}
 
 	@Override
 	public int getMaxDisparity() {
-		return computeScore.getMaxDisparity();
+		return computeScore.getDisparityMax();
 	}
 
 	@Override
 	public Class<T> getInputType() {
 		return computeScore.getImageType();
+	}
+
+	public DisparitySparseScoreSadRect<ArrayData, T> getComputeScore() {
+		return computeScore;
+	}
+
+	public DisparitySparseSelect<ArrayData> getSelect() {
+		return select;
 	}
 }

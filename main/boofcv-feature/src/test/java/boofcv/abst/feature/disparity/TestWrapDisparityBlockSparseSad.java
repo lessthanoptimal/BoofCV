@@ -66,10 +66,11 @@ public class TestWrapDisparityBlockSparseSad {
 
 		StereoDisparity<GrayF32,GrayU8> validator =
 				FactoryStereoDisparity.blockMatch(config,GrayF32.class,GrayU8.class);
-		StereoDisparitySparse<GrayF32> alg =
+		WrapDisparityBlockSparseSad<?,GrayF32> alg =
 				new WrapDisparityBlockSparseSad<>(
-						new DisparitySparseScoreBM_SAD_F32(minDisparity, maxDisparity, r, r),
+						new DisparitySparseScoreBM_SAD_F32(r, r),
 						new SelectSparseErrorBasicWta_F32());
+		alg.getComputeScore().configure(minDisparity,maxDisparity-minDisparity+1);
 
 		validator.process(left,right);
 		GrayU8 expected = validator.getDisparity();

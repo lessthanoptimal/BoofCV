@@ -35,11 +35,11 @@ public class SelectSparseErrorBasicWta_F32 implements DisparitySparseSelect<floa
 	int disparity;
 
 	@Override
-	public boolean select(float[] scores, int maxDisparity) {
+	public boolean select(float[] scores, int disparityMax) {
 		disparity = 0;
 		float best = scores[0];
 
-		for( int i = 1; i < maxDisparity; i++ ) {
+		for( int i = 1; i < disparityMax; i++ ) {
 			if( scores[i] < best ) {
 				best = scores[i];
 				disparity = i;
