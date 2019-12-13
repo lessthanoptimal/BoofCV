@@ -58,7 +58,7 @@ public interface BlockRowScoreCensus
 
 		@Override
 		public ImageType<GrayU8> getImageType() {
-			return ImageType.single(GrayU8.class);
+			return ImageType.SB_U8;
 		}
 	}
 

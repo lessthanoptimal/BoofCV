@@ -98,7 +98,7 @@ public class ImplBilinearPixel_F32 extends BilinearPixelS<GrayF32> {
 
 	@Override
 	public ImageType<GrayF32> getImageType() {
-		return ImageType.single(GrayF32.class);
+		return ImageType.SB_F32;
 	}
 
 }

@@ -98,7 +98,7 @@ public class ImplBilinearPixel_U8 extends BilinearPixelS<GrayU8> {
 
 	@Override
 	public ImageType<GrayU8> getImageType() {
-		return ImageType.single(GrayU8.class);
+		return ImageType.SB_U8;
 	}
 
 }

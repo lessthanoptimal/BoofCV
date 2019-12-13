@@ -61,6 +61,6 @@ public class FilterCensusTransformD33U8<In extends ImageGray<In>>
 
 	@Override
 	public ImageType<GrayU8> getOutputType() {
-		return ImageType.single(GrayU8.class);
+		return ImageType.SB_U8;
 	}
 }

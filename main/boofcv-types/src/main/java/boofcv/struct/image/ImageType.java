@@ -29,6 +29,31 @@ import java.lang.reflect.Array;
  * @author Peter Abeles
  */
 public class ImageType<T extends ImageBase> implements Serializable {
+	// Short hand predefined image types
+	public static final ImageType<GrayU8> SB_U8 = ImageType.single(GrayU8.class);
+	public static final ImageType<GrayS8> SB_S8 = ImageType.single(GrayS8.class);
+	public static final ImageType<GrayU16> SB_U16 = ImageType.single(GrayU16.class);
+	public static final ImageType<GrayS16> SB_S16 = ImageType.single(GrayS16.class);
+	public static final ImageType<GrayS32> SB_S32 = ImageType.single(GrayS32.class);
+	public static final ImageType<GrayS64> SB_S64 = ImageType.single(GrayS64.class);
+	public static final ImageType<GrayF32> SB_F32 = ImageType.single(GrayF32.class);
+	public static final ImageType<GrayF64> SB_F64 = ImageType.single(GrayF64.class);
+	public static final ImageType<InterleavedU8> IL_U8 = ImageType.il(0,InterleavedU8.class);
+	public static final ImageType<InterleavedS8> IL_S8 = ImageType.il(0,InterleavedS8.class);
+	public static final ImageType<InterleavedU16> IL_U16 = ImageType.il(0,InterleavedU16.class);
+	public static final ImageType<InterleavedS16> IL_S16 = ImageType.il(0,InterleavedS16.class);
+	public static final ImageType<InterleavedS32> IL_S32 = ImageType.il(0,InterleavedS32.class);
+	public static final ImageType<InterleavedS64> IL_S64 = ImageType.il(0,InterleavedS64.class);
+	public static final ImageType<InterleavedF32> IL_F32 = ImageType.il(0,InterleavedF32.class);
+	public static final ImageType<InterleavedF64> IL_F64 = ImageType.il(0,InterleavedF64.class);
+	public static final ImageType<Planar<GrayU8>> PL_U8 = ImageType.pl(0,GrayU8.class);
+	public static final ImageType<Planar<GrayS8>> PL_S8 = ImageType.pl(0,GrayS8.class);
+	public static final ImageType<Planar<GrayU16>> PL_U16 = ImageType.pl(0,GrayU16.class);
+	public static final ImageType<Planar<GrayS16>> PL_S16 = ImageType.pl(0,GrayS16.class);
+	public static final ImageType<Planar<GrayS32>> PL_S32 = ImageType.pl(0,GrayS32.class);
+	public static final ImageType<Planar<GrayS64>> PL_S64 = ImageType.pl(0,GrayS64.class);
+	public static final ImageType<Planar<GrayF32>> PL_F32 = ImageType.pl(0,GrayF32.class);
+	public static final ImageType<Planar<GrayF64>> PL_F64 = ImageType.pl(0,GrayF64.class);
 
 	/**
 	 * Specifies the image data structure

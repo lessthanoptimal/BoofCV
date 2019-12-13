@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -131,10 +131,10 @@ public class BenchmarkBackgroundStationary {
 		File file = new File(UtilIO.pathExample("background/street_intersection.mp4"));
 
 		List<ImageType> imageTypes = new ArrayList<>();
-		imageTypes.add(ImageType.single(GrayU8.class));
+		imageTypes.add(ImageType.SB_U8);
 		imageTypes.add(ImageType.il(3,InterleavedU8.class));
 		imageTypes.add(ImageType.pl(3,GrayU8.class));
-		imageTypes.add(ImageType.single(GrayF32.class));
+		imageTypes.add(ImageType.SB_F32);
 		imageTypes.add(ImageType.il(3,InterleavedF32.class));
 		imageTypes.add(ImageType.pl(3,GrayF32.class));
 

@@ -20,7 +20,6 @@ package boofcv.alg.interpolate;
 
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.distort.Point2Transform2_F32;
-import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F32;
@@ -107,6 +106,6 @@ public class TestInterpolatePixelDistortS {
 		public int getFastBorderY() {return 0;}
 
 		@Override
-		public ImageType getImageType() {return ImageType.single(GrayU8.class);}
+		public ImageType getImageType() {return ImageType.SB_U8;}
 	}
 }

@@ -89,7 +89,7 @@ public interface BlockRowScoreSad
 
 		@Override
 		public ImageType<GrayU8> getImageType() {
-			return ImageType.single(GrayU8.class);
+			return ImageType.SB_U8;
 		}
 	}
 
@@ -141,7 +141,7 @@ public interface BlockRowScoreSad
 
 		@Override
 		public ImageType<GrayF32> getImageType() {
-			return ImageType.single(GrayF32.class);
+			return ImageType.SB_F32;
 		}
 	}
 }

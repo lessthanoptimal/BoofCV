@@ -140,7 +140,7 @@ public class ThresholdNick implements InputToBinary<GrayF32> {
 
 	@Override
 	public ImageType<GrayF32> getInputType() {
-		return ImageType.single(GrayF32.class);
+		return ImageType.SB_F32;
 	}
 
 	public float getK() {

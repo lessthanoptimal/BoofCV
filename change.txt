@@ -6,6 +6,7 @@ Date Format: year/month/day
 Date    : 2019
 Version : 0.35
 
+- ImageType now as predefined types, e.g. SB_U8, IL_F64, PL_S32, ... etc
 - Build
   * Fixed some dependencies not being included in the library zip (Thanks changbaishan)
 - Mean Shift

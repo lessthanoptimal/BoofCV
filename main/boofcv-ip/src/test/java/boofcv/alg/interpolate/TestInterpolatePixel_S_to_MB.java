@@ -20,7 +20,6 @@ package boofcv.alg.interpolate;
 
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.border.ImageBorder;
-import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.Test;
@@ -111,7 +110,7 @@ public class TestInterpolatePixel_S_to_MB {
 
 		@Override
 		public ImageType getImageType() {
-			return ImageType.single(GrayU8.class);
+			return ImageType.SB_U8;
 		}
 	}
 }

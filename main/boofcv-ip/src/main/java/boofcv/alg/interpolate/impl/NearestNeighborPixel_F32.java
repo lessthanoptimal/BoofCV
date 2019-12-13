@@ -80,7 +80,7 @@ public class NearestNeighborPixel_F32 extends NearestNeighborPixelS<GrayF32> {
 
 	@Override
 	public ImageType<GrayF32> getImageType() {
-		return ImageType.single(GrayF32.class);
+		return ImageType.SB_F32;
 	}
 
 }

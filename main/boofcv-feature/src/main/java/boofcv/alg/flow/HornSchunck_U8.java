@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import boofcv.struct.image.ImageType;
 public class HornSchunck_U8 extends HornSchunck<GrayU8,GrayS16> {
 
 	public HornSchunck_U8(float alpha, int numIterations) {
-		super(alpha,numIterations, ImageType.single(GrayS16.class));
+		super(alpha,numIterations, ImageType.SB_S16);
 	}
 
 	@Override

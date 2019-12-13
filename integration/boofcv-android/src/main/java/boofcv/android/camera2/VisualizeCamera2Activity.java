@@ -35,7 +35,6 @@ import boofcv.android.ConvertBitmap;
 import boofcv.android.ConvertCameraImage;
 import boofcv.concurrency.BWorkArrays;
 import boofcv.misc.MovingAverage;
-import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -521,7 +520,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	 */
 	protected static class BoofImage {
 		protected final Object imageLock = new Object();
-		protected ImageType imageType = ImageType.single(GrayU8.class);
+		protected ImageType imageType = ImageType.SB_U8;
 		protected ColorFormat colorFormat = ColorFormat.RGB;
 		/**
 		 * Images available for use, When inside the stack they must not be referenced anywhere else.

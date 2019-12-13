@@ -76,7 +76,7 @@ public class WrapDisparitySgm<DI extends ImageGray<DI>> implements StereoDispari
 
 	@Override
 	public ImageType<GrayU8> getInputType() {
-		return ImageType.single(GrayU8.class);
+		return ImageType.SB_U8;
 	}
 
 	@Override

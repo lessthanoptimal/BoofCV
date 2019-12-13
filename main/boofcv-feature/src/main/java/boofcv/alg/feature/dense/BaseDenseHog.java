@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,7 +99,7 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 	static <Input extends ImageBase<Input>>
 	ImageGradient<Input,GrayF32> createGradient( ImageType<Input> imageType ) {
 		ImageGradient<Input,GrayF32> gradient;
-		ImageType<GrayF32> typeF32 = ImageType.single(GrayF32.class);
+		ImageType<GrayF32> typeF32 = ImageType.SB_F32;
 
 		if( imageType.getDataType() != ImageDataType.F32 )
 			throw new IllegalArgumentException("Input image type must be F32");

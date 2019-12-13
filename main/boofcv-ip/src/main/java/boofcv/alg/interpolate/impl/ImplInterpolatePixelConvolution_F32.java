@@ -216,7 +216,7 @@ public class ImplInterpolatePixelConvolution_F32 implements InterpolatePixelS<Gr
 
 	@Override
 	public ImageType<GrayF32> getImageType() {
-		return ImageType.single(GrayF32.class);
+		return ImageType.SB_F32;
 	}
 
 }

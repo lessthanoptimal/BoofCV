@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageType;
 public class HornSchunck_F32 extends HornSchunck<GrayF32,GrayF32> {
 
 	public HornSchunck_F32(float alpha, int numIterations) {
-		super(alpha, numIterations, ImageType.single(GrayF32.class));
+		super(alpha, numIterations, ImageType.SB_F32);
 	}
 
 	@Override
