@@ -6,3 +6,8 @@
 **/*.ipr
 .DS_Store
 BoofVersion.java
+
+### Gradle ###
+**/build/
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
