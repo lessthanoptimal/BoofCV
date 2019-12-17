@@ -134,20 +134,14 @@ public class FactoryStereoDisparityAlgs {
 		switch( config.errorType) {
 			case ABSOLUTE_DIFFERENCE: {
 				BlockRowScore rowScore = createScoreRowSad(configBM,imageType);
-				if( config.configBlockMatch.regular )
-					blockScore = createBlockMatching(configBM, imageType, blockCost, rowScore);
-				else
-					blockScore = createBestFive(configBM, imageType, blockCost, rowScore);
+				blockScore = createSgmBlockMatch(config, (Class<T>) imageType, configBM, (SgmCostFromBlocks<T>) blockCost, rowScore);
 				sgm = new SgmStereoDisparityError(blockCost,selector);
 			} break;
 
 			case CENSUS: {
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,imageType);
 				BlockRowScore rowScore = createCensusRowScore(configBM, censusTran);
-				if( config.configBlockMatch.regular )
-					blockScore = createBlockMatching(configBM, imageType, blockCost, rowScore);
-				else
-					blockScore = createBestFive(configBM, imageType, blockCost, rowScore);
+				blockScore = createSgmBlockMatch(config, imageType, configBM, blockCost, rowScore);
 				sgm = new SgmStereoDisparityCensus(censusTran,blockCost,selector);
 			} break;
 
@@ -156,6 +150,23 @@ public class FactoryStereoDisparityAlgs {
 		}
 		blockCost.setBlockScore(blockScore);
 		return sgm;
+	}
+
+	private static <T extends ImageGray<T>> DisparityBlockMatchRowFormat<T, GrayU8> createSgmBlockMatch(ConfigDisparitySGM config, Class<T> imageType, ConfigDisparityBM configBM, SgmCostFromBlocks<T> blockCost, BlockRowScore rowScore) {
+		DisparityBlockMatchRowFormat<T, GrayU8> blockScore;
+		switch (config.configBlockMatch.approach) {
+			case BASIC:
+				blockScore = createBlockMatching(configBM, imageType, blockCost, rowScore);
+				break;
+
+			case BEST5:
+				blockScore = createBestFive(configBM, imageType, blockCost, rowScore);
+				break;
+
+			default:
+				throw new IllegalArgumentException("Unknown type " + config.configBlockMatch.approach);
+		}
+		return blockScore;
 	}
 
 	public static DisparitySelect<int[],GrayU8> selectDisparity_S32(int maxError , int tolR2L , double texture) {

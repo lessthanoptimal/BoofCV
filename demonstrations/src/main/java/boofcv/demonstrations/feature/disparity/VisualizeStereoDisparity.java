@@ -287,6 +287,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 				case 2: img = colorRight; break;
 				default: throw new RuntimeException("Unknown option");
 			}
+			if( img == null )
+				return;
 
 			imagePanel.setImage(img);
 			imagePanel.setPreferredSize(new Dimension(origLeft.getWidth(), origLeft.getHeight()));
@@ -306,7 +308,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 				CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(
 						rectK,colorLeft.getWidth(),colorLeft.getHeight(),null);
-				pcv.setBackgroundColor(control.backgroundColor);
+				pcv.setBackgroundColor(control.backgroundColor3D);
 				pcv.clearPoints();
 				pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
 				pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
@@ -408,12 +410,10 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		if( !processCalled )
 			return;
 
-		int color = control.colorInvalid ? 0x02 << 16 | 0xB0 << 8 | 0x90 : 0;
-
 		D disparity = activeAlg.getDisparity();
 
 		// TODO Got a NPE inside of this function once when rapidly changing settings. Make sure everything is locked down
-		disparityOut = VisualizeImageData.disparity(disparity,null, activeAlg.getRangeDisparity(), color);
+		disparityOut = VisualizeImageData.disparity(disparity,null, activeAlg.getRangeDisparity(), control.backgroundColorDisparity);
 
 		changeImageView();
 	}
@@ -496,8 +496,12 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	@Override
 	public void changeBackgroundColor() {
-		pcv.setBackgroundColor(control.backgroundColor);
-		pcv.getComponent().repaint();
+		if( control.selectedView == 0 ) {
+			disparityRender();
+		} else if( control.selectedView == 3 ) {
+			pcv.setBackgroundColor(control.backgroundColor3D);
+			pcv.getComponent().repaint();
+		}
 	}
 
 	/**

@@ -121,6 +121,12 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		listener.handleDisparityChange();
 	}
 
+	public void updateControlEnabled() {
+		if( !isBlockSelected() ) {
+			controlSGM.updateControlsEnabled();
+		}
+	}
+
 	public StereoDisparity createAlgorithm() {
 //		BoofSwingUtil.checkGuiThread(); // TODO lock instead to make this safe?
 
@@ -178,6 +184,8 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 				comboError.setSelectedIndex(configSGM.errorType.ordinal());
 			}
 			Component c = getModelControl(block);
+			if( !block )
+				controlSGM.updateControlsEnabled();
 			tabbedPane.removeTabAt(0);
 			tabbedPane.insertTab("Method",null,c,null,0);
 			tabbedPane.setSelectedIndex(activeTab);
@@ -322,7 +330,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		JSpinner spinnerTexture = spinner(configSGM.texture,0.0,1.0,0.05,1,3);
 		JCheckBox subpixelToggle = checkbox("Subpixel",configSGM.subpixel);
 		JCheckBox useBlocks = checkbox("Use Blocks",configSGM.useBlocks);
-		JCheckBox useRegularBlocks = checkbox("Regular Blocks",configSGM.configBlockMatch.regular);
+		JComboBox comboBlockApproach = combo(configSGM.configBlockMatch.approach.ordinal(),BlockMatchingApproach.values());
 		JSpinner radiusXSpinner = spinner(configSGM.configBlockMatch.radiusX,0,50,1); // TODO move to error
 		JSpinner radiusYSpinner = spinner(configSGM.configBlockMatch.radiusY,0,50,1);
 
@@ -337,9 +345,10 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 			addLabeled(spinnerPenaltyLarge, "Penalty Large");
 			addAlignLeft(subpixelToggle);
 			addAlignLeft(useBlocks);
-			addAlignLeft(useRegularBlocks);
+			addLabeled(comboBlockApproach,"Approach");
 			addLabeled(radiusXSpinner,    "Radius X");
 			addLabeled(radiusYSpinner,    "Radius Y");
+			updateControlsEnabled();
 		}
 
 		@Override
@@ -376,12 +385,20 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 				configSGM.subpixel = subpixelToggle.isSelected();
 			} else if( e.getSource() == useBlocks) {
 				configSGM.useBlocks = useBlocks.isSelected();
-			} else if( e.getSource() == useRegularBlocks) {
-				configSGM.configBlockMatch.regular = useRegularBlocks.isSelected();
+				updateControlsEnabled();
+			} else if( e.getSource() == comboBlockApproach) {
+				configSGM.configBlockMatch.approach = BlockMatchingApproach.values()[comboBlockApproach.getSelectedIndex()];
 			} else {
 				throw new RuntimeException("Unknown");
 			}
 			broadcastChange();
+		}
+
+		void updateControlsEnabled() {
+			final boolean e = configSGM.useBlocks;
+			comboBlockApproach.setEnabled(e);
+			radiusXSpinner.setEnabled(e);
+			radiusYSpinner.setEnabled(e);
 		}
 	}
 

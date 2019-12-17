@@ -46,8 +46,6 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 
 	boolean concurrent=true;
 	boolean recompute=true;
-	boolean colorInvalid = false;
-	boolean useSubpixel = true;
 
 	// range 0 to 1000
 	int periodAdjust=500;
@@ -58,8 +56,10 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	// scale factor for input images
 	int inputScale = 100;
 
-	// Default background color for 3D cloud
-	int backgroundColor = 0x000000;
+	// Background color for 3D cloud
+	int backgroundColor3D = 0x000000;
+	// Background color for disparity
+	int backgroundColorDisparity = 0x000000;
 
 	protected JLabel processingTimeLabel = new JLabel();
 	protected JLabel imageSizeLabel = new JLabel();
@@ -67,7 +67,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	// For zooming in and out of images
 	protected JSpinner selectZoom = spinner(1,MIN_ZOOM,MAX_ZOOM,0.1);
 
-	JButton bColorBackGround;
+	JButton bColorBackGround = new JButton();
 
 	// how much the input should be scaled down by
 	JSpinner inputScaleSpinner = spinner(inputScale,5,100,10);
@@ -79,9 +79,6 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	JSlider sliderPeriodColor = slider(0,1000,periodAdjust,120);
 	JSlider sliderOffsetColor = slider(0,1000,offsetAdjust,120);
 	JSlider sliderSpeed3D = slider(0,1000,speedAdjust,120);
-
-	// toggles if invalid pixels are black or not
-	JCheckBox invalidToggle = checkbox("Color Invalid",colorInvalid);
 
 	JCheckBox checkRecompute  = checkbox("Recompute",recompute);
 	JCheckBox checkConcurrent = checkbox("concurrent",concurrent);
@@ -105,7 +102,6 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		addLabeled(sliderOffsetColor,"Offset");
 		addLabeled(sliderPeriodColor,"Period");
 		addLabeled(sliderSpeed3D,"Speed");
-		addAlignLeft(invalidToggle);
 		add(controlDisparity);
 		addLabeled(inputScaleSpinner, "Scale Input");
 		addAlignLeft(checkRecompute);
@@ -119,20 +115,27 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	 * Button for selecting background color and another for selecting how to colorize
 	 */
 	private JPanel createColorPanel() {
-		bColorBackGround = new JButton();
 		bColorBackGround.addActionListener(e->{
 			Color newColor = JColorChooser.showDialog(
 					DisparityDisplayPanel.this,
 					"Background Color",
-					new Color(backgroundColor));
-			backgroundColor = newColor.getRGB();
-			bColorBackGround.setBackground(newColor);
+					new Color(getActiveBackgroundColor()));
+			int colorRGB = newColor.getRGB();
+			if( selectedView == 0 ) {
+				backgroundColorDisparity = colorRGB;
+			} else if( selectedView == 3 ) {
+				backgroundColor3D = colorRGB;
+			} else {
+				return;
+			}
+			setColorButtonColor();
 			listener.changeBackgroundColor();
 		});
 		bColorBackGround.setPreferredSize(new Dimension(20,20));
 		bColorBackGround.setMinimumSize(bColorBackGround.getPreferredSize());
 		bColorBackGround.setMaximumSize(bColorBackGround.getPreferredSize());
-		bColorBackGround.setBackground(new Color(backgroundColor));
+		bColorBackGround.setBorder(BorderFactory.createEmptyBorder());
+		setColorButtonColor();
 
 		JPanel p = new JPanel();
 		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
@@ -143,12 +146,30 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		return p;
 	}
 
+	private int getActiveBackgroundColor() {
+		if( selectedView == 0 ) {
+			return backgroundColorDisparity;
+		} else if( selectedView == 3 ) {
+			return backgroundColor3D;
+		} else {
+			return bColorBackGround.getBackground().getRGB();
+		}
+	}
+
+	private void setColorButtonColor() {
+		int color = getActiveBackgroundColor();
+		bColorBackGround.setBackground(new Color(color));
+		bColorBackGround.setForeground(new Color(color));
+	}
+
 	/**
 	 * Disable any control which can cause a request for the disparity to be recomputed by the user
 	 */
 	public void enableAlgControls( boolean enable ) {
 		BoofSwingUtil.checkGuiThread();
 		BoofSwingUtil.recursiveEnable(controlDisparity,enable);
+		if( enable )
+			controlDisparity.updateControlEnabled();
 		inputScaleSpinner.setEnabled(enable);
 		checkRecompute.setEnabled(enable);
 		checkConcurrent.setEnabled(enable);
@@ -201,6 +222,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 
 		if( e.getSource() == viewSelector ) {
 			selectedView = viewSelector.getSelectedIndex();
+			setColorButtonColor();
 			update3DControls();
 			listener.disparityGuiChange();
 		} else if( e.getSource() == comboColorizer) {
@@ -212,9 +234,6 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		} else if( e.getSource() == checkConcurrent ) {
 			concurrent = checkConcurrent.isSelected();
 			listener.recompute();
-		} else if( e.getSource() == invalidToggle ) {
-			colorInvalid = invalidToggle.isSelected();
-			listener.disparityGuiChange();
 		}
 	}
 
@@ -225,6 +244,8 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 		sliderOffsetColor.setEnabled(view3D);
 		sliderPeriodColor.setEnabled(view3D);
 		sliderSpeed3D.setEnabled(view3D);
+		// Color is useful for disparity and 3D
+		bColorBackGround.setEnabled(selectedView==0||selectedView==3);
 	}
 
 	public double periodScale() {

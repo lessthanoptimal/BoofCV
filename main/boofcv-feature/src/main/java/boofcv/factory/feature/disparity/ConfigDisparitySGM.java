@@ -79,7 +79,7 @@ public class ConfigDisparitySGM implements Configuration {
 	/**
 	 * If true it will use block variants of errors.
 	 */
-	public boolean useBlocks=false;
+	public boolean useBlocks=true;
 	/**
 	 * Used if error type is Census
 	 */
@@ -100,10 +100,16 @@ public class ConfigDisparitySGM implements Configuration {
 
 	public static class ConfigBlockMatchError implements Configuration {
 
-		public int radiusX=0;
-		public int radiusY=0;
+		/**
+		 * Block radius X
+		 */
+		public int radiusX=2;
+		/**
+		 * Block radius Y
+		 */
+		public int radiusY=2;
 
-		public boolean regular=true;
+		public BlockMatchingApproach approach=BlockMatchingApproach.BEST5;
 
 		@Override
 		public void checkValidity() {
