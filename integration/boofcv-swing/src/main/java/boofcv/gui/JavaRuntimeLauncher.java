@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -226,20 +227,25 @@ public class JavaRuntimeLauncher {
     }
 
     private String[] configureArguments( Class mainClass , String ...args ) {
-        String out[] = new String[7+args.length];
+        String[] out = new String[7+args.length];
 
         String app = System.getProperty("java.home")+"/bin/java";
 
-        out[0] = app;
-        out[1] = "-server";
-        out[2] = "-Xms"+memoryInMB+"M";
-        out[3] = "-Xmx"+memoryInMB+"M";
-        out[4] = "-classpath";
-        out[5] = classPath;
-        out[6] = mainClass.getName();
-        for (int i = 0; i < args.length; i++) {
-            out[7+i] = args[i];
+        int idx = 0;
+        out[idx++] = app;
+        out[idx++] = "-server";
+        if( memoryInMB > 0 ) {
+            out[idx++] = "-Xms" + memoryInMB + "M";
+            out[idx++] = "-Xmx" + memoryInMB + "M";
         }
+        out[idx++] = "-classpath";
+        out[idx++] = classPath;
+        out[idx++] = mainClass.getName();
+        for (int i = 0; i < args.length; i++) {
+            out[idx++] = args[i];
+        }
+        out = Arrays.copyOf(out,idx);
+
         return out;
     }
 

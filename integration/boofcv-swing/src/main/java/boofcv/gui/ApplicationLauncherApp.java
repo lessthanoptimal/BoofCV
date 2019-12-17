@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,8 +40,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URI;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * Application which lists most of the demonstration application in a GUI and allows the user to double click
@@ -268,7 +268,8 @@ public abstract class ApplicationLauncherApp extends JPanel implements ActionLis
 		process.info = info;
 		process.launcher = new JavaRuntimeLauncher(classPath);
 		process.launcher.setFrozenTime(-1);
-		process.launcher.setMemoryInMB(memoryMB);
+		process.launcher.setMemoryInMB(-1);
+		// Having a fixed amount of memory caused problems with memory hungry apps
 
 		synchronized (processes) {
 			processes.add(process);
