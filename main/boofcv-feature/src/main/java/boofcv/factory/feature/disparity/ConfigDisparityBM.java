@@ -68,7 +68,7 @@ public class ConfigDisparityBM implements Configuration {
 	/**
 	 * How the error is computed for each block
 	 */
-	public DisparityError errorType = DisparityError.SAD;
+	public DisparityError errorType = DisparityError.CENSUS;
 	/**
 	 * Used if error type is Census
 	 */
