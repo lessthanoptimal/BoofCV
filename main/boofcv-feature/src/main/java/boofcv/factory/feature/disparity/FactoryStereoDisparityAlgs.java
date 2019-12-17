@@ -20,10 +20,7 @@ package boofcv.factory.feature.disparity;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.feature.disparity.DisparityBlockMatchRowFormat;
-import boofcv.alg.feature.disparity.block.BlockRowScore;
-import boofcv.alg.feature.disparity.block.DisparitySelect;
-import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
-import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
+import boofcv.alg.feature.disparity.block.*;
 import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_F32;
 import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_U8;
 import boofcv.alg.feature.disparity.block.select.*;
@@ -33,6 +30,7 @@ import boofcv.alg.feature.disparity.sgm.cost.SgmCostFromBlocks;
 import boofcv.alg.feature.disparity.sgm.cost.SgmCostHamming;
 import boofcv.alg.feature.disparity.sgm.cost.StereoMutualInformation;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.transform.census.FactoryCensusTransform;
 import boofcv.struct.image.*;
 
@@ -65,7 +63,7 @@ public class FactoryStereoDisparityAlgs {
 		SgmStereoDisparity sgm;
 
 		// There's currently no block variant of MI
-		if( !config.useBlocks || config.errorType==DisparitySgmError.MUTUAL_INFORMATION)
+		if( !config.useBlocks )
 			sgm = createSgmNativeCost(config, selector);
 		else
 			sgm = createSgmBlockCost(config, selector, GrayU8.class);
@@ -84,9 +82,7 @@ public class FactoryStereoDisparityAlgs {
 
 		switch( config.errorType) {
 			case MUTUAL_INFORMATION: {
-				StereoMutualInformation stereoMI = new StereoMutualInformation();
-				stereoMI.configureSmoothing(config.configHMI.smoothingRadius);
-				stereoMI.configureHistogram(config.configHMI.totalGrayLevels);
+				StereoMutualInformation stereoMI = createStereoMutualInformation(config);
 				sgm = new SgmStereoDisparityHmi(config.configHMI.pyramidLayers,stereoMI,selector);
 				((SgmStereoDisparityHmi)sgm).setExtraIterations(config.configHMI.extraIterations);
 			} break;
@@ -132,6 +128,18 @@ public class FactoryStereoDisparityAlgs {
 		DisparityBlockMatchRowFormat<T, GrayU8> blockScore;
 
 		switch( config.errorType) {
+			case MUTUAL_INFORMATION: {
+				if (imageType != GrayU8.class) {
+					throw new IllegalArgumentException("Only GrayU8 supported at this time for Mutual Information");
+				}
+				StereoMutualInformation stereoMI = createStereoMutualInformation(config);
+				BlockRowScore rowScore = new BlockRowScoreMutualInformation.U8(stereoMI);
+				rowScore.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
+				blockScore = createSgmBlockMatch(config, imageType, configBM, blockCost, rowScore);
+				sgm = new SgmStereoDisparityHmi(config.configHMI.pyramidLayers,stereoMI,selector,(SgmCostFromBlocks)blockCost);
+				((SgmStereoDisparityHmi)sgm).setExtraIterations(config.configHMI.extraIterations);
+			} break;
+
 			case ABSOLUTE_DIFFERENCE: {
 				BlockRowScore rowScore = createScoreRowSad(configBM,imageType);
 				blockScore = createSgmBlockMatch(config, (Class<T>) imageType, configBM, (SgmCostFromBlocks<T>) blockCost, rowScore);
@@ -150,6 +158,13 @@ public class FactoryStereoDisparityAlgs {
 		}
 		blockCost.setBlockScore(blockScore);
 		return sgm;
+	}
+
+	private static StereoMutualInformation createStereoMutualInformation(ConfigDisparitySGM config) {
+		StereoMutualInformation stereoMI = new StereoMutualInformation();
+		stereoMI.configureSmoothing(config.configHMI.smoothingRadius);
+		stereoMI.configureHistogram(config.configHMI.totalGrayLevels);
+		return stereoMI;
 	}
 
 	private static <T extends ImageGray<T>> DisparityBlockMatchRowFormat<T, GrayU8> createSgmBlockMatch(ConfigDisparitySGM config, Class<T> imageType, ConfigDisparityBM configBM, SgmCostFromBlocks<T> blockCost, BlockRowScore rowScore) {

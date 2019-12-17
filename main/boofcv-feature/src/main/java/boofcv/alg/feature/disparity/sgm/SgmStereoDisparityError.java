@@ -22,7 +22,7 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.struct.image.ImageBase;
 
 /**
- * TODO fill in
+ * Base class for SGM score functions that compute the score directly from the input images.
  *
  * @author Peter Abeles
  */
@@ -53,7 +53,7 @@ public class SgmStereoDisparityError<T extends ImageBase<T>>
 		aggregation.process(costYXD);
 
 		// Select the best disparity for each pixel given the cost
-		selector.setDisparityMin(disparityMin); // TODO move to function below
+		selector.setDisparityMin(disparityMin);
 		selector.select(costYXD,aggregation.getAggregated(),disparity);
 	}
 

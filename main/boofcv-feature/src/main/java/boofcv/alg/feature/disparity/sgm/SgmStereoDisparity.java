@@ -21,7 +21,8 @@ package boofcv.alg.feature.disparity.sgm;
 import boofcv.struct.image.*;
 
 /**
- * TODO fill in
+ * Base class for SGM stereo implementations. It combines the cost computation, cost aggregation, and disparity
+ * selector steps. Sub-pixel can be optionally computed afterwards.
  *
  * @author Peter Abeles
  */

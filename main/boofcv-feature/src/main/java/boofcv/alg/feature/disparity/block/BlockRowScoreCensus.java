@@ -22,7 +22,7 @@ import boofcv.alg.descriptor.DescriptorDistance;
 import boofcv.struct.image.*;
 
 /**
- * TODO Comment
+ * Computes the block disparity score using a {@link boofcv.alg.transform.census.CensusTransform}.
  *
  * @author Peter Abeles
  */

@@ -19,6 +19,7 @@
 package boofcv.alg.feature.disparity.sgm;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.feature.disparity.sgm.cost.SgmCostFromBlocks;
 import boofcv.alg.feature.disparity.sgm.cost.SgmMutualInformation_U8;
 import boofcv.alg.feature.disparity.sgm.cost.StereoMutualInformation;
 import boofcv.alg.transform.pyramid.ConfigPyramid2;
@@ -78,6 +79,16 @@ public class SgmStereoDisparityHmi extends SgmStereoDisparityError<GrayU8> {
 								  StereoMutualInformation stereoMI ,
 								  SgmDisparitySelector selector ) {
 		super(new SgmMutualInformation_U8(stereoMI),selector);
+		this.stereoMI = stereoMI;
+		pyrLeft.getConfigLayers().set(configPyr);
+		pyrRight.getConfigLayers().set(configPyr);
+	}
+
+	public SgmStereoDisparityHmi(ConfigPyramid2 configPyr,
+								 StereoMutualInformation stereoMI ,
+								 SgmDisparitySelector selector ,
+								 SgmCostFromBlocks<GrayU8> blockScore ) {
+		super(blockScore,selector);
 		this.stereoMI = stereoMI;
 		pyrLeft.getConfigLayers().set(configPyr);
 		pyrRight.getConfigLayers().set(configPyr);

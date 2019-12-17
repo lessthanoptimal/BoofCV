@@ -24,6 +24,9 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 
 /**
+ * Computes Census score for SGM using a straight forward implementation. A census transform is applied
+ * to the left and right input images. That's then used to compute the census error.
+ *
  * @author Peter Abeles
  */
 public class SgmStereoDisparityCensus<T extends ImageBase<T>,C extends ImageGray<C>>
@@ -67,7 +70,7 @@ public class SgmStereoDisparityCensus<T extends ImageBase<T>,C extends ImageGray
 		aggregation.process(costYXD);
 
 		// Select the best disparity for each pixel given the cost
-		selector.setDisparityMin(disparityMin); // TODO move to function below
+		selector.setDisparityMin(disparityMin);
 		selector.select(costYXD,aggregation.getAggregated(),disparity);
 	}
 }
