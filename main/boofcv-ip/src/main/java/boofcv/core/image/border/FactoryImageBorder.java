@@ -18,6 +18,8 @@
 
 package boofcv.core.image.border;
 
+import boofcv.alg.border.GrowBorder;
+import boofcv.alg.border.GrowBorderSB;
 import boofcv.struct.border.*;
 import boofcv.struct.image.*;
 
@@ -29,6 +31,31 @@ import boofcv.struct.image.*;
  */
 @SuppressWarnings({"unchecked"})
 public class FactoryImageBorder {
+
+	/**
+	 * Creates a {@link GrowBorder} class.
+	 */
+	public static <T extends ImageBase<T>>
+	GrowBorder<T,?> createGrowBorder(ImageType<T> imageType ) {
+		switch( imageType.getFamily() ) {
+			case GRAY: {
+				if( imageType.getDataType().isInteger() ) {
+					switch( imageType.getDataType().getNumBits() ) {
+						case 8: return new GrowBorderSB.SB_I8(imageType);
+						case 16: return new GrowBorderSB.SB_I16(imageType);
+						case 32: return (GrowBorder)new GrowBorderSB.SB_S32();
+						case 64: return (GrowBorder)new GrowBorderSB.SB_S64();
+					}
+				} else {
+					switch( imageType.getDataType().getNumBits() ) {
+						case 32: return (GrowBorder)new GrowBorderSB.SB_F32();
+						case 64: return (GrowBorder)new GrowBorderSB.SB_F64();
+					}
+				}
+			} break;
+		}
+		throw new IllegalArgumentException("image type not yet supported. "+imageType.getFamily());
+	}
 
 	/**
 	 * Given an image type return the appropriate {@link ImageBorder} class type.

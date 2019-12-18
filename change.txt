@@ -30,6 +30,7 @@ Version : 0.35
   * Added the ability to make a copy of an ImageBorder
   * Mean filter now supports different image border methods
   * Added ImageMiscOps.growBorder() to create a new image that is the src image plus a border
+  * Added GrowBorder for extracting rows and columns from images with borders added
 - Template Match
   * Fixed bug where if the template matched the input image it would not be processed
     * Thanks waicool20 for reporting this bug
@@ -57,7 +58,6 @@ Version : 0.35
   * Added Semi-Global Matching with several options for score functions
   * TODO Ensure that all auto code generators still work
   * TODO revert speed regression for BM
-  * TODO Block HMI
   * TODO Filter small disparity regions
 - SFM
   * Projective camera with lens distortion
