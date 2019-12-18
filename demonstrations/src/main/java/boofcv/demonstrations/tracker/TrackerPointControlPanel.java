@@ -64,8 +64,8 @@ public class TrackerPointControlPanel
 
 		comboAlg = combo(algorithm,"KLT","ST-BRIEF","ST-NCC","FH-SURF","ST-SURF-KLT","FH-SURF-KLT");
 		spinnerWidth = spinner(5,3,41,2);
-		spinnerMinFeats = spinner(minFeatures,50,2000,10);
-		spinnerMaxFeats = spinner(maxFeatures,50,2000,10);
+		spinnerMinFeats = spinner(minFeatures,50,10000,10);
+		spinnerMaxFeats = spinner(maxFeatures,50,10000,10);
 
 		buttonPause.addActionListener(e->{
 			paused = !paused;
