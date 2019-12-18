@@ -27,11 +27,11 @@ import org.junit.jupiter.api.Nested;
  */
 class TestBlockRowScoreSad {
 	@Nested
-	class U8 extends ChecksBlockRowScore.ArrayIntI<GrayU8> {
+	class U8 extends ChecksBlockRowScore.ArrayIntI<GrayU8, byte[]> {
 		U8() {super(255, ImageType.single(GrayU8.class));}
 
 		@Override
-		public BlockRowScore<GrayU8, int[]> createAlg(int radiusWidth, int radiusHeight) {
+		public BlockRowScore<GrayU8, int[], byte[]> createAlg(int radiusWidth, int radiusHeight) {
 			return new BlockRowScoreSad.U8();
 		}
 
@@ -42,11 +42,11 @@ class TestBlockRowScoreSad {
 	}
 
 	@Nested
-	class U16 extends ChecksBlockRowScore.ArrayIntI<GrayU16> {
+	class U16 extends ChecksBlockRowScore.ArrayIntI<GrayU16, short[]> {
 		U16() {super(5000, ImageType.single(GrayU16.class));}
 
 		@Override
-		public BlockRowScore<GrayU16, int[]> createAlg(int radiusWidth, int radiusHeight) {
+		public BlockRowScore<GrayU16, int[], short[]> createAlg(int radiusWidth, int radiusHeight) {
 			return new BlockRowScoreSad.U16();
 		}
 
@@ -57,11 +57,11 @@ class TestBlockRowScoreSad {
 	}
 
 	@Nested
-	class S16 extends ChecksBlockRowScore.ArrayIntI<GrayS16> {
+	class S16 extends ChecksBlockRowScore.ArrayIntI<GrayS16, short[]> {
 		S16() {super(5000, ImageType.single(GrayS16.class));}
 
 		@Override
-		public BlockRowScore<GrayS16, int[]> createAlg(int radiusWidth, int radiusHeight) {
+		public BlockRowScore<GrayS16, int[], short[]> createAlg(int radiusWidth, int radiusHeight) {
 			return new BlockRowScoreSad.S16();
 		}
 
@@ -72,11 +72,11 @@ class TestBlockRowScoreSad {
 	}
 
 	@Nested
-	class F32 extends ChecksBlockRowScore<GrayF32,float[]> {
+	class F32 extends ChecksBlockRowScore<GrayF32,float[], float[]> {
 		F32() {super(1000, ImageType.single(GrayF32.class));}
 
 		@Override
-		public BlockRowScore<GrayF32, float[]> createAlg(int radiusWidth, int radiusHeight) {
+		public BlockRowScore<GrayF32, float[], float[]> createAlg(int radiusWidth, int radiusHeight) {
 			return new BlockRowScoreSad.F32();
 		}
 

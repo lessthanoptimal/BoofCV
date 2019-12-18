@@ -19,7 +19,10 @@
 package boofcv.alg.feature.disparity;
 
 import boofcv.alg.InputSanityCheck;
+import boofcv.alg.border.GrowBorder;
 import boofcv.alg.feature.disparity.block.DisparitySelect;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -59,18 +62,30 @@ public abstract class DisparityBlockMatchRowFormat
 	// size of the region: radius*2 + 1
 	protected int regionWidth,regionHeight;
 
+	// Used to extract a row with the border added to it
+	protected GrowBorder<Input,Object> growBorderL;
+	protected GrowBorder<Input,Object> growBorderR;
+
 	/**
 	 * Configures disparity calculation.
 	 *
 	 * @param regionRadiusX Radius of the rectangular region along x-axis.
 	 * @param regionRadiusY Radius of the rectangular region along y-axis.
 	 */
-	public DisparityBlockMatchRowFormat(int regionRadiusX, int regionRadiusY ) {
+	public DisparityBlockMatchRowFormat(int regionRadiusX, int regionRadiusY , ImageType<Input> imageType ) {
 		this.radiusX = regionRadiusX;
 		this.radiusY = regionRadiusY;
 
 		this.regionWidth = regionRadiusX*2+1;
 		this.regionHeight = regionRadiusY*2+1;
+
+		growBorderL = (GrowBorder)FactoryImageBorder.createGrowBorder(imageType);
+		growBorderR = (GrowBorder)FactoryImageBorder.createGrowBorder(imageType);
+	}
+
+	public void setBorder( ImageBorder<Input> border ) {
+		growBorderL.setBorder(border.copy());
+		growBorderR.setBorder(border.copy());
 	}
 
 	/**

@@ -136,6 +136,7 @@ public class FactoryStereoDisparityAlgs {
 				BlockRowScore rowScore = new BlockRowScoreMutualInformation.U8(stereoMI);
 				rowScore.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
 				blockScore = createSgmBlockMatch(config, imageType, configBM, blockCost, rowScore);
+				blockScore.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
 				sgm = new SgmStereoDisparityHmi(config.configHMI.pyramidLayers,stereoMI,selector,(SgmCostFromBlocks)blockCost);
 				((SgmStereoDisparityHmi)sgm).setExtraIterations(config.configHMI.extraIterations);
 			} break;
@@ -143,13 +144,16 @@ public class FactoryStereoDisparityAlgs {
 			case ABSOLUTE_DIFFERENCE: {
 				BlockRowScore rowScore = createScoreRowSad(configBM,imageType);
 				blockScore = createSgmBlockMatch(config, (Class<T>) imageType, configBM, (SgmCostFromBlocks<T>) blockCost, rowScore);
+				blockScore.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
 				sgm = new SgmStereoDisparityError(blockCost,selector);
 			} break;
 
 			case CENSUS: {
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,imageType);
 				BlockRowScore rowScore = createCensusRowScore(configBM, censusTran);
-				blockScore = createSgmBlockMatch(config, imageType, configBM, blockCost, rowScore);
+				blockScore = createSgmBlockMatch(config, censusTran.getOutputType().getImageClass(),
+						configBM, blockCost, rowScore);
+				blockScore.setBorder(FactoryImageBorder.generic(config.border,censusTran.getOutputType()));
 				sgm = new SgmStereoDisparityCensus(censusTran,blockCost,selector);
 			} break;
 

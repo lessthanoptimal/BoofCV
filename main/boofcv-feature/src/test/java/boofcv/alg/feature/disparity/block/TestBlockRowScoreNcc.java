@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Nested;
 public class TestBlockRowScoreNcc {
 
 	@Nested
-	class F32 extends ChecksBlockRowScore<GrayF32,float[]> {
+	class F32 extends ChecksBlockRowScore<GrayF32,float[], float[]> {
 		float eps = 1e-3f;
 		F32() {
 			super(0, ImageType.single(GrayF32.class));
@@ -38,7 +38,7 @@ public class TestBlockRowScoreNcc {
 		}
 
 		@Override
-		public BlockRowScore<GrayF32, float[]> createAlg(int radiusWidth, int radiusHeight) {
+		public BlockRowScore<GrayF32, float[], float[]> createAlg(int radiusWidth, int radiusHeight) {
 			BlockRowScoreNcc.F32 alg = new BlockRowScoreNcc.F32(radiusWidth,radiusHeight);
 			alg.eps = eps;
 			return alg;

@@ -30,11 +30,11 @@ import org.junit.jupiter.api.Nested;
  */
 class TestBlockRowScoreCensus {
 	@Nested
-	class U8 extends ChecksBlockRowScore.ArrayIntI<GrayU8> {
+	class U8 extends ChecksBlockRowScore.ArrayIntI<GrayU8, byte[]> {
 		U8() {super(255, ImageType.single(GrayU8.class));}
 
 		@Override
-		public BlockRowScore<GrayU8, int[]> createAlg(int radiusWidth, int radiusHeight) {
+		public BlockRowScore<GrayU8, int[], byte[]> createAlg(int radiusWidth, int radiusHeight) {
 			return new BlockRowScoreCensus.U8(-1);
 		}
 
@@ -45,11 +45,11 @@ class TestBlockRowScoreCensus {
 	}
 
 	@Nested
-	class S32 extends ChecksBlockRowScore.ArrayIntI<GrayS32> {
+	class S32 extends ChecksBlockRowScore.ArrayIntI<GrayS32, int[]> {
 		S32() {super(Integer.MAX_VALUE-1000, ImageType.single(GrayS32.class));}
 
 		@Override
-		public BlockRowScore<GrayS32, int[]> createAlg(int radiusWidth, int radiusHeight) {
+		public BlockRowScore<GrayS32, int[], int[]> createAlg(int radiusWidth, int radiusHeight) {
 			return new BlockRowScoreCensus.S32(-1);
 		}
 
@@ -64,7 +64,7 @@ class TestBlockRowScoreCensus {
 		S64() {super(Integer.MAX_VALUE-1000);}
 
 		@Override
-		public BlockRowScore<GrayS64, int[]> createAlg(int radiusWidth, int radiusHeight) {
+		public BlockRowScore<GrayS64, int[], long[]> createAlg(int radiusWidth, int radiusHeight) {
 			return new BlockRowScoreCensus.S64(-1);
 		}
 

@@ -24,6 +24,7 @@ import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.Nested;
 
 /**
@@ -40,7 +41,7 @@ public class TestDisparityScoreBMBestFive_S32 {
 		@Override
 		protected DisparityBlockMatchBestFive<GrayU16, GrayU8>
 		createAlg(int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp) {
-			return new DisparityScoreBMBestFive_S32<>(radiusX,radiusY,scoreRow,compDisp);
+			return new DisparityScoreBMBestFive_S32<>(radiusX,radiusY,scoreRow,compDisp, ImageType.SB_U16);
 		}
 	}
 }

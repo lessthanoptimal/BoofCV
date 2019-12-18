@@ -20,11 +20,14 @@ package boofcv.abst.feature.disparity;
 
 import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_F32;
 import boofcv.alg.feature.disparity.block.select.SelectSparseErrorBasicWta_F32;
+import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -71,6 +74,7 @@ public class TestWrapDisparityBlockSparseSad {
 						new DisparitySparseScoreBM_SAD_F32(r, r),
 						new SelectSparseErrorBasicWta_F32());
 		alg.getComputeScore().configure(minDisparity,maxDisparity-minDisparity+1);
+		alg.getComputeScore().setBorder(FactoryImageBorder.generic(BorderType.REFLECT, ImageType.SB_F32));
 
 		validator.process(left,right);
 		GrayU8 expected = validator.getDisparity();

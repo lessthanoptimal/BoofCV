@@ -31,7 +31,7 @@ import boofcv.struct.image.*;
  *
  * @author Peter Abeles
  */
-public interface BlockRowScore<T extends ImageBase<T>,Array> {
+public interface BlockRowScore<T extends ImageBase<T>, ScoreArray, ImageData> {
 
 	void setBorder( ImageBorder<T> border );
 
@@ -54,13 +54,12 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 	 * @param regionWidth Size of the sample region's width
 	 * @param elementScore Storage for scores of individual pixels
 	 */
-	void scoreRow(int row, Array scores,
+	void scoreRow(int row, ImageData leftRow , ImageData rightRow, ScoreArray scores,
 				  int disparityMin , int disparityMax , int regionWidth ,
-				  Array elementScore);
+				  ScoreArray elementScore);
 
-	void score(int indexLeft, int indexRight, int offset, int length, Array elementScore);
-
-	void scoreBorder( int x0 , int y0, int d , int offset, int length , Array elementScore );
+	void score(ImageData leftRow , ImageData rightRow, int indexLeft, int indexRight,
+			   int offset, int length, ScoreArray elementScore);
 
 	/**
 	 * Returns the maximum error each pixel in the region can contribute
@@ -85,9 +84,9 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 	 * @param regionWidth Size of the sample region's width
 	 * @param regionHeight Size of the sample region's height
 	 */
-	void normalizeRegionScores(int row, Array scores,
+	void normalizeRegionScores(int row, ScoreArray scores,
 							   int disparityMin, int disparityMax, int regionWidth, int regionHeight,
-							   Array scoresNorm );
+							   ScoreArray scoresNorm );
 
 	/**
 	 * Applies normalization to a single row
@@ -101,12 +100,12 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 	 * @param scores array with scores that are to be normalized
 	 * @param indexScores first index in scores that is to be normalized
 	 */
-	void normalizeScore( int row , int colLeft , int colRight , int numCols, int regionWidth , int regionHeight,
-						 Array scores , int indexScores , Array scoresNorm );
+	void normalizeScore(int row , int colLeft , int colRight , int numCols, int regionWidth , int regionHeight,
+						ScoreArray scores , int indexScores , ScoreArray scoresNorm );
 
 	ImageType<T> getImageType();
 
-	abstract class ArrayS32<T extends ImageBase<T>> implements BlockRowScore<T,int[]> {
+	abstract class ArrayS32<T extends ImageBase<T>,ImageData> implements BlockRowScore<T,int[],ImageData> {
 		protected int maxPerPixel;
 		T left, right;
 
@@ -121,7 +120,7 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 		}
 
 		@Override
-		public void scoreRow(int row, int[] scores,
+		public void scoreRow(int row, ImageData leftRow , ImageData rightRow, int[] scores,
 							 int disparityMin, int disparityMax, int regionWidth,
 							 int[] elementScore) {
 			int regionRadius = regionWidth/2;
@@ -131,33 +130,8 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 			for( int d = disparityMin; d <= disparityMax; d++ ) {
 				int dispFromMin = d - disparityMin;
 
-				// TODO Alternative approach. Create a with border pixels instead?
-				//      Simpler but not sure if it's faster or slower.
-				// Fill elementScore with scores for individual elements for this row at disparity d
-				if( row >= 0 && row < left.height ) {
-					// Compute in segments because using the border function is expensive while score() can
-					// be computed very fast
-					int x0 = dispFromMin-regionRadius+disparityMin;
-					int x1 = dispFromMin+disparityMin;
-					int x2 = left.width;
-					int x3 = x2+regionRadius;
-					int offset = 0;
-
-					// border at lower extent. Left image pixels 0 to r-1
-					scoreBorder(x0,row,d,offset,x1-x0,elementScore);
-					offset += x1-x0;
-
-					// indexes that data is read to/from for different data structures
-					int indexLeft = left.startIndex + left.stride * row + d;
-					int indexRight = right.startIndex + right.stride * row;
-					score(indexLeft, indexRight, offset,x2-x1, elementScore);
-					offset += x2-x1;
-
-					// border at lower extent. Left image pixels colMax-r to colMax-1
-					scoreBorder(x2,row,d,offset,x3-x2,elementScore);
-				} else {
-					scoreBorder(dispFromMin-regionRadius+disparityMin,row,d,0,widthAndBorder-dispFromMin-disparityMin,elementScore);
-				}
+				// Compute the scores
+				score(leftRow, rightRow, d,0,0,widthAndBorder-d,elementScore);
 
 				// score at the first column
 				int score = 0;
@@ -205,7 +179,7 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 		}
 	}
 
-	abstract class ArrayS32_BS32<T extends GrayI<T>> extends ArrayS32<T> {
+	abstract class ArrayS32_BS32<T extends GrayI<T>,ImageData> extends ArrayS32<T,ImageData> {
 		ImageBorder_S32<T> borderLeft;
 		ImageBorder_S32<T> borderRight;
 
@@ -227,7 +201,7 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 		}
 	}
 
-	abstract class ArrayS32_BS64 extends ArrayS32<GrayS64> {
+	abstract class ArrayS32_BS64 extends ArrayS32<GrayS64,long[]> {
 		ImageBorder_S64 borderLeft;
 		ImageBorder_S64 borderRight;
 
@@ -249,7 +223,7 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 		}
 	}
 
-	abstract class ArrayF32<T extends ImageBase<T>> implements BlockRowScore<T,float[]> {
+	abstract class ArrayF32<T extends ImageBase<T>> implements BlockRowScore<T,float[],float[]> {
 		T left, right;
 
 		@Override
@@ -259,7 +233,7 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 		}
 
 		@Override
-		public void scoreRow(int row, float[] scores,
+		public void scoreRow(int row, float[] leftRow, float[] rightRow, float[] scores,
 							 int disparityMin, int disparityMax, int regionWidth,
 							 float[] elementScore) {
 			int regionRadius = regionWidth/2;
@@ -269,31 +243,8 @@ public interface BlockRowScore<T extends ImageBase<T>,Array> {
 			for( int d = disparityMin; d <= disparityMax; d++ ) {
 				int dispFromMin = d - disparityMin;
 
-				// Fill elementScore with scores for individual elements for this row at disparity d
-				if( row >= 0 && row < left.height ) {
-					// Compute in segments because using the border function is expensive while score() can
-					// be computed very fast
-					int x0 = dispFromMin-regionRadius+disparityMin;
-					int x1 = dispFromMin+disparityMin;
-					int x2 = left.width;
-					int x3 = x2+regionRadius;
-					int offset = 0;
-
-					// border at lower extent. Left image pixels 0 to r-1
-					scoreBorder(x0,row,d,offset,x1-x0,elementScore);
-					offset += x1-x0;
-
-					// indexes that data is read to/from for different data structures
-					int indexLeft = left.startIndex + left.stride * row + d;
-					int indexRight = right.startIndex + right.stride * row;
-					score(indexLeft, indexRight, offset,x2-x1, elementScore);
-					offset += x2-x1;
-
-					// border at lower extent. Left image pixels colMax-r to colMax-1
-					scoreBorder(x2,row,d,offset,x3-x2,elementScore);
-				} else {
-					scoreBorder(dispFromMin-regionRadius+disparityMin,row,d,0,widthAndBorder-dispFromMin-disparityMin,elementScore);
-				}
+				// Compute the scores
+				score(leftRow, rightRow, d,0,0,widthAndBorder-d,elementScore);
 
 				// score at the first column
 				float score = 0;

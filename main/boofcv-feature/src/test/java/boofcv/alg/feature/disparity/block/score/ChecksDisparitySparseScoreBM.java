@@ -105,6 +105,7 @@ public abstract class ChecksDisparitySparseScoreBM<I extends ImageGray<I>,ArrayD
 		int invalid = rangeDisparity;
 
 		DisparityBlockMatch<I,GrayU8> denseAlg = createDense(radiusX,radiusY,scoreRow);
+		denseAlg.setBorder(imageBorder);
 		DisparitySparseScoreSadRect<ArrayData, I> alg = createSparse(radiusX,radiusY);
 		alg.setBorder(imageBorder);
 

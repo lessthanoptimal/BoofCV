@@ -112,7 +112,7 @@ public abstract class BasicDisparityTests<I extends ImageGray<I>, DI extends Ima
 			}
 		}
 
-		System.out.println(errors+" vs "+total);
+//		System.out.println(errors+" vs "+total);
 		// Inputs are random so the match might not be perfect, especially around border regions
 		return( errors/(double)total <= fraction);
 	}

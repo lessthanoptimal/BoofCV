@@ -41,9 +41,9 @@ class TestSgmCostFromBlocks {
 		@Override
 		SgmDisparityCost<GrayU8> createAlg() {
 			SgmCostFromBlocks<GrayU8> blockCost = new SgmCostFromBlocks<>();
-			BlockRowScore<GrayU8,int[]> rowScore = new BlockRowScoreSad.U8();
-			rowScore.setBorder(FactoryImageBorder.generic(BorderType.REFLECT,ImageType.single(GrayU8.class)));
-			blockCost.blockScore = new DisparityScoreBM_S32( 1,1, rowScore, blockCost);
+			BlockRowScore<GrayU8,int[], byte[]> rowScore = new BlockRowScoreSad.U8();
+			blockCost.blockScore = new DisparityScoreBM_S32( 1,1, rowScore, blockCost, imageType);
+			blockCost.blockScore.setBorder(FactoryImageBorder.generic(BorderType.REFLECT,ImageType.single(GrayU8.class)));
 			return blockCost;
 		}
 	}

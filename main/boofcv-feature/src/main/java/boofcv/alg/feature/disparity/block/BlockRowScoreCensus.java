@@ -28,30 +28,21 @@ import boofcv.struct.image.*;
  */
 public interface BlockRowScoreCensus
 {
-	abstract class CensusArrayS32_B32<T extends GrayI<T>> extends BlockRowScore.ArrayS32_BS32<T> {
+	abstract class CensusArrayS32_B32<T extends GrayI<T>,ImageData> extends BlockRowScore.ArrayS32_BS32<T,ImageData> {
 		CensusArrayS32_B32( int maxPerPixel ) { super(maxPerPixel); }
 		@Override
 		public boolean isRequireNormalize() {
 			return false;
 		}
-
-		@Override
-		public void scoreBorder(int x, int y, int d , int offset, int length, int[] elementScore) {
-			for( int i = 0; i < length; i++ ,x++) {
-				final int a = borderLeft.get(x,y);
-				final int b = borderRight.get(x-d,y);
-				elementScore[offset+i] = DescriptorDistance.hamming(a^b);
-			}
-		}
 	}
 
-	class U8 extends CensusArrayS32_B32<GrayU8> {
+	class U8 extends CensusArrayS32_B32<GrayU8,byte[]> {
 		public U8( int maxPerPixel ) { super(maxPerPixel); }
 		@Override
-		public void score(int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
+		public void score(byte[] leftRow, byte[] rightRow, int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
 			for( int i = 0; i < length; i++ ) {
-				final int a = left.data[ indexLeft++ ]& 0xFF;
-				final int b = right.data[ indexRight++ ]& 0xFF;
+				final int a = leftRow[ indexLeft++ ]& 0xFF;
+				final int b = rightRow[ indexRight++ ]& 0xFF;
 				elementScore[offset+i] = DescriptorDistance.hamming(a^b);
 			}
 		}
@@ -62,13 +53,13 @@ public interface BlockRowScoreCensus
 		}
 	}
 
-	class S32 extends CensusArrayS32_B32<GrayS32> {
+	class S32 extends CensusArrayS32_B32<GrayS32,int[]> {
 		public S32( int maxPerPixel ) { super(maxPerPixel); }
 		@Override
-		public void score(int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
+		public void score(int[] leftRow, int[] rightRow, int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
 			for( int i = 0; i < length; i++ ) {
-				final int a = left.data[ indexLeft++ ];
-				final int b = right.data[ indexRight++ ];
+				final int a = leftRow[ indexLeft++ ];
+				final int b = rightRow[ indexRight++ ];
 				elementScore[offset+i] = DescriptorDistance.hamming(a^b);
 			}
 		}
@@ -82,19 +73,10 @@ public interface BlockRowScoreCensus
 	class S64 extends BlockRowScore.ArrayS32_BS64{
 		public S64( int maxPerPixel ) { super(maxPerPixel); }
 		@Override
-		public void score(int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
+		public void score(long[] leftRow, long[] rightRow, int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
 			for( int i = 0; i < length; i++ ) {
-				final long a = left.data[ indexLeft++ ];
-				final long b = right.data[ indexRight++ ];
-				elementScore[offset+i] = DescriptorDistance.hamming(a^b);
-			}
-		}
-
-		@Override
-		public void scoreBorder(int x, int y, int d , int offset, int length, int[] elementScore) {
-			for( int i = 0; i < length; i++ ,x++) {
-				final long a = borderLeft.get(x,y);
-				final long b = borderRight.get(x-d,y);
+				final long a = leftRow[ indexLeft++ ];
+				final long b = rightRow[ indexRight++ ];
 				elementScore[offset+i] = DescriptorDistance.hamming(a^b);
 			}
 		}

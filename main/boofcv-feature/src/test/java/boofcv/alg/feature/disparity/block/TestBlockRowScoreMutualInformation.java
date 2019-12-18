@@ -30,14 +30,14 @@ import org.junit.jupiter.api.Nested;
 class TestBlockRowScoreMutualInformation {
 
 	@Nested
-	class U8 extends ChecksBlockRowScore.ArrayIntI<GrayU8> {
+	class U8 extends ChecksBlockRowScore.ArrayIntI<GrayU8, byte[]> {
 		StereoMutualInformation smi = new StereoMutualInformation();
 
 		U8() {super(255, ImageType.single(GrayU8.class));
 		smi.diagonalHistogram(1.0, SgmDisparityCost.MAX_COST);}
 
 		@Override
-		public BlockRowScore<GrayU8, int[]> createAlg(int radiusWidth, int radiusHeight) {
+		public BlockRowScore<GrayU8, int[], byte[]> createAlg(int radiusWidth, int radiusHeight) {
 			return new BlockRowScoreMutualInformation.U8(smi);
 		}
 

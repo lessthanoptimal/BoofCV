@@ -18,6 +18,7 @@
 
 package boofcv.alg.feature.disparity.block;
 
+import boofcv.alg.border.GrowBorder;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.border.FactoryImageBorder;
@@ -40,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
+public abstract class ChecksBlockRowScore<T extends ImageBase<T>, ScoreArray, DataArray> {
 
 	public static final BorderType BORDER_TYPE = BorderType.REFLECT;
 
@@ -53,6 +54,8 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 
 	T left,right;
 	ImageBorder<T> bleft,bright;
+	GrowBorder<T,DataArray> growBorder;
+	DataArray leftRow,rightRow;
 
 	Random rand = new Random(234);
 
@@ -63,17 +66,24 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 
 		left = imageType.createImage(width,height);
 		right = imageType.createImage(width,height);
+
+		// create work arrays to store rows. Add plenty of buffer
+		leftRow = left.getImageType().getDataType().newArray(left.width*2);
+		rightRow = right.getImageType().getDataType().newArray(left.width*2);
+
+		growBorder = (GrowBorder)FactoryImageBorder.createGrowBorder(imageType);
+		growBorder.setBorder(bleft.copy());
 	}
 
-	public abstract BlockRowScore<T,Array> createAlg( int radiusWidth , int radiusHeight );
+	public abstract BlockRowScore<T, ScoreArray, DataArray> createAlg(int radiusWidth , int radiusHeight );
 
-	public abstract Array createArray( int length );
+	public abstract ScoreArray createArray(int length );
 
 	public abstract double naiveScoreRow(int cx , int cy , int disparity , int radius );
 
 	public abstract double naiveScoreRegion(int cx , int cy , int disparity , int radius );
 
-	public abstract double get( int index , Array array );
+	public abstract double get( int index , ScoreArray array );
 
 	@BeforeEach
 	void before() {
@@ -104,16 +114,19 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 		GImageMiscOps.fillUniform(left,rand,0,maxPixelValue);
 		GImageMiscOps.fillUniform(right,rand,0,maxPixelValue);
 
-		BlockRowScore<T,Array> alg = createAlg(radius,radius);
+		BlockRowScore<T, ScoreArray, DataArray> alg = createAlg(radius,radius);
 		alg.setBorder(FactoryImageBorder.generic(BORDER_TYPE,alg.getImageType()));
 
 		int disparityRange = maxDisparity-minDisparity+1;
 
-		Array scores = createArray(width*disparityRange);
-		Array elementScore = createArray( width+2*radius);// image width + border on each side
+		ScoreArray scores = createArray(width*disparityRange);
+		ScoreArray elementScore = createArray( width+2*radius);// image width + border on each side
 
+		growBorder.setImage(left);growBorder.growRow(row,radius,radius,leftRow,0);
+		growBorder.setImage(right);growBorder.growRow(row,radius,radius,rightRow,0);
 		alg.setInput(left,right);
-		alg.scoreRow(row,scores,minDisparity,maxDisparity,w,elementScore);
+
+		alg.scoreRow(row, leftRow, rightRow, scores,minDisparity,maxDisparity,w,elementScore);
 
 		for (int d = minDisparity; d < maxDisparity; d++) {
 			int idx = width*(d-minDisparity)+d-minDisparity;
@@ -142,21 +155,23 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 		GImageMiscOps.fillUniform(left,rand,0,maxPixelValue);
 		GImageMiscOps.fillUniform(right,rand,0,maxPixelValue);
 
-		BlockRowScore<T,Array> alg = createAlg(radius,radius);
+		BlockRowScore<T, ScoreArray,DataArray> alg = createAlg(radius,radius);
 		alg.setBorder(FactoryImageBorder.generic(BORDER_TYPE,alg.getImageType()));
 		alg.setInput(left,right);
 
 		int disparityRange = maxDisparity-minDisparity+1;
 
-		Array scores = createArray(width*disparityRange);
-		Array elementScore = createArray(width+2*radius);
-		Array scoresSum = createArray(width*disparityRange);
-		Array scoresSumNorm = createArray(width*disparityRange);
-		Array scoresEvaluated;
+		ScoreArray scores = createArray(width*disparityRange);
+		ScoreArray elementScore = createArray(width+2*radius);
+		ScoreArray scoresSum = createArray(width*disparityRange);
+		ScoreArray scoresSumNorm = createArray(width*disparityRange);
+		ScoreArray scoresEvaluated;
 
 		// compute the scores one row at a time then sum them up to get the unnormalized region score
 		for (int i = -radius; i <= radius; i++) {
-			alg.scoreRow(row+i,scores,minDisparity,maxDisparity,w,elementScore);
+			growBorder.setImage(left);growBorder.growRow(row+i,radius,radius,leftRow,0);
+			growBorder.setImage(right);growBorder.growRow(row+i,radius,radius,rightRow,0);
+			alg.scoreRow(row+i, leftRow, rightRow, scores,minDisparity,maxDisparity,w,elementScore);
 			addToSum(scores,scoresSum);
 		}
 		// Normalize the region score
@@ -180,7 +195,7 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 		}
 	}
 
-	private void addToSum( Array scores , Array scoresSum ) {
+	private void addToSum(ScoreArray scores , ScoreArray scoresSum ) {
 		if( scores instanceof int[] ) {
 			int[] a = (int[])scores;
 			int[] b = (int[])scoresSum;
@@ -196,7 +211,7 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 		}
 	}
 
-	protected static abstract class ArrayIntI<T extends GrayI<T>> extends ChecksBlockRowScore<T,int[]> {
+	protected static abstract class ArrayIntI<T extends GrayI<T>,DataArray> extends ChecksBlockRowScore<T,int[],DataArray> {
 
 		public ArrayIntI(double maxPixelValue, ImageType<T> imageType) {
 			super(maxPixelValue, imageType);
@@ -241,7 +256,7 @@ public abstract class ChecksBlockRowScore<T extends ImageBase<T>,Array> {
 		}
 	}
 
-	protected static abstract class ArrayIntL extends ChecksBlockRowScore<GrayS64,int[]> {
+	protected static abstract class ArrayIntL extends ChecksBlockRowScore<GrayS64,int[],long[]> {
 
 		public ArrayIntL(double maxPixelValue) {
 			super(maxPixelValue, ImageType.single(GrayS64.class));

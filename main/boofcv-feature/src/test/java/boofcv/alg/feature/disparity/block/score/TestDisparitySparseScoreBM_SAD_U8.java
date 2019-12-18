@@ -23,6 +23,7 @@ import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.block.select.SelectErrorBasicWta_S32_U8;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 
 /**
  * @author Peter Abeles
@@ -35,7 +36,7 @@ public class TestDisparitySparseScoreBM_SAD_U8 extends ChecksDisparitySparseScor
 
 	@Override
 	public DisparityBlockMatch<GrayU8, GrayU8> createDense(int radiusX, int radiusY, BlockRowScore scoreRow) {
-		return new DisparityScoreBM_S32<>(radiusX,radiusY,scoreRow, new SelectErrorBasicWta_S32_U8());
+		return new DisparityScoreBM_S32<>(radiusX,radiusY,scoreRow, new SelectErrorBasicWta_S32_U8(), ImageType.SB_U8);
 	}
 
 	@Override

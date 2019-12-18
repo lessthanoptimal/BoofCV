@@ -24,20 +24,26 @@ import boofcv.struct.image.*;
  * Base class for SGM stereo implementations. It combines the cost computation, cost aggregation, and disparity
  * selector steps. Sub-pixel can be optionally computed afterwards.
  *
+ * <p>NOTE: [1] suggests applying a median filter. This is not done by any of this class' children.</p>
+ *
+ * <p>[1] Hirschmuller, Heiko. "Stereo processing by semiglobal matching and mutual information."
+ * IEEE Transactions on pattern analysis and machine intelligence 30.2 (2007): 328-341.</p>
+ *
  * @author Peter Abeles
  */
 public abstract class SgmStereoDisparity<T extends ImageBase<T>, C extends ImageBase<C>>
 {
+	// Defines the disparity search range
+	protected int disparityMin = 0;     // minimum disparity considered
+	protected int disparityRange = 0;   // number of disparity values considered
+
+	// These perform different steps in the SGM algorithm
 	protected SgmDisparityCost<C> sgmCost;
-
-	// Minimum disparity and number of possible disparity values
-	protected int disparityMin = 0;
-	protected int disparityRange = 0;
-
 	protected SgmCostAggregation aggregation = new SgmCostAggregation();
 	protected SgmDisparitySelector selector;
 	protected SgmHelper helper = new SgmHelper();
 
+	// Cost tensor. See SgmDisparityCost
 	protected Planar<GrayU16> costYXD = new Planar<>(GrayU16.class,1,1,1);
 
 	// Storage for found disparity

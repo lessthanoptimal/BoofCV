@@ -54,7 +54,7 @@ public class TestWrapDisparityBlockMatchRowFormat {
 	private static class Foo extends DisparityBlockMatch<GrayF32,GrayF32>
 	{
 		public Foo(int regionRadiusX, int regionRadiusY) {
-			super(regionRadiusX, regionRadiusY);
+			super(regionRadiusX, regionRadiusY, ImageType.SB_F32);
 		}
 
 		@Override

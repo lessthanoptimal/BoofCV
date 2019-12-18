@@ -30,6 +30,7 @@ import boofcv.alg.feature.disparity.sgm.SgmStereoDisparity;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.transform.census.FactoryCensusTransform;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.*;
 
 import javax.annotation.Nullable;
@@ -80,8 +81,8 @@ public class FactoryStereoDisparity {
 			case SAD: {
 				DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
 				BlockRowScore rowScore = createScoreRowSad(config,imageType);
-				rowScore.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, imageType, select, rowScore);
+				alg.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
 				return new WrapDisparityBlockMatchRowFormat(alg);
 			}
 
@@ -90,15 +91,17 @@ public class FactoryStereoDisparity {
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,imageType);
 				BlockRowScore rowScore = createCensusRowScore(config, censusTran);
 
-				DisparityBlockMatchRowFormat alg = createBlockMatching(config, (Class<T>) imageType, select, rowScore);
+				DisparityBlockMatchRowFormat alg = createBlockMatching(config,
+						censusTran.getOutputType().getImageClass(), select, rowScore);
+				alg.setBorder(FactoryImageBorder.generic(config.border,censusTran.getOutputType()));
 				return new WrapDisparityBlockMatchCensus<>(censusTran, alg);
 			}
 
 			case NCC: {
 				DisparitySelect select = createDisparitySelect(config, GrayF32.class, (int) maxError);
 				BlockRowScore rowScore = createScoreRowNcc(config,GrayF32.class);
-				rowScore.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, GrayF32.class, select, rowScore);
+				alg.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
 				return new DisparityBlockMatchCorrelation(alg,imageType);
 			}
 
@@ -120,7 +123,6 @@ public class FactoryStereoDisparity {
 		} else {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
-		rowScore.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
 
 		return rowScore;
 	}
@@ -178,8 +180,8 @@ public class FactoryStereoDisparity {
 			case SAD: {
 				DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
 				BlockRowScore rowScore = createScoreRowSad(config,imageType);
-				rowScore.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
 				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
+				alg.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
 				return new WrapDisparityBlockMatchRowFormat(alg);
 			}
 
@@ -187,15 +189,17 @@ public class FactoryStereoDisparity {
 				DisparitySelect select = createDisparitySelect(config, imageType, (int) maxError);
 				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,imageType);
 				BlockRowScore rowScore = createCensusRowScore(config, censusTran);
-				DisparityBlockMatchRowFormat alg = createBestFive(config, imageType, select, rowScore);
+				DisparityBlockMatchRowFormat alg = createBestFive(config,
+						censusTran.getOutputType().getImageClass(), select, rowScore);
+				alg.setBorder(FactoryImageBorder.generic(config.border,censusTran.getOutputType()));
 				return new WrapDisparityBlockMatchCensus<>(censusTran, alg);
 			}
 
 			case NCC: {
 				DisparitySelect select = createDisparitySelect(config, GrayF32.class, (int) maxError);
 				BlockRowScore rowScore = createScoreRowNcc(config,GrayF32.class);
-				rowScore.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
 				DisparityBlockMatchRowFormat alg = createBestFive(config, GrayF32.class, select, rowScore);
+				alg.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
 				return new DisparityBlockMatchCorrelation(alg,imageType);
 			}
 
@@ -217,7 +221,6 @@ public class FactoryStereoDisparity {
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
 		}
-		rowScore.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
 		return rowScore;
 	}
 
@@ -229,7 +232,6 @@ public class FactoryStereoDisparity {
 		} else {
 			throw new IllegalArgumentException("Unsupported image type "+imageType.getSimpleName());
 		}
-		rowScore.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
 		return rowScore;
 	}
 
@@ -239,7 +241,8 @@ public class FactoryStereoDisparity {
 		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
 			alg = new DisparityScoreBM_F32<>( config.regionRadiusX, config.regionRadiusY, rowScore, select);
 		} else {
-			alg = new DisparityScoreBM_S32( config.regionRadiusX, config.regionRadiusY, rowScore, select);
+			alg = new DisparityScoreBM_S32( config.regionRadiusX, config.regionRadiusY, rowScore, select,
+					ImageType.single(imageType));
 		}
 		alg.configure(config.minDisparity,config.rangeDisparity);
 		return alg;
@@ -251,7 +254,8 @@ public class FactoryStereoDisparity {
 		if (GeneralizedImageOps.isFloatingPoint(imageType)) {
 			alg = new DisparityScoreBMBestFive_F32(config.regionRadiusX, config.regionRadiusY, rowScore, select);
 		} else {
-			alg = new DisparityScoreBMBestFive_S32(config.regionRadiusX, config.regionRadiusY, rowScore, select);
+			alg = new DisparityScoreBMBestFive_S32(config.regionRadiusX, config.regionRadiusY, rowScore, select,
+					ImageType.single(imageType));
 		}
 		alg.configure(config.minDisparity,config.rangeDisparity);
 		return alg;
@@ -292,6 +296,7 @@ public class FactoryStereoDisparity {
 			DisparitySparseScoreSadRect<int[],GrayU8>
 					score = scoreDisparitySparseSadRect_U8(regionRadiusX, regionRadiusY);
 			score.configure(minDisparity,rangeDisparity);
+			score.setBorder(FactoryImageBorder.generic(BorderType.REFLECT, ImageType.SB_U8));
 
 			return new WrapDisparityBlockSparseSad(score,select);
 		} else if( imageType == GrayF32.class ) {
@@ -304,6 +309,7 @@ public class FactoryStereoDisparity {
 			DisparitySparseScoreSadRect<float[],GrayF32>
 					score = scoreDisparitySparseSadRect_F32(regionRadiusX, regionRadiusY);
 			score.configure(minDisparity,rangeDisparity);
+			score.setBorder(FactoryImageBorder.generic(BorderType.REFLECT, ImageType.SB_F32));
 
 			return new WrapDisparityBlockSparseSad(score,select);
 		} else

@@ -20,6 +20,7 @@ package boofcv.alg.feature.disparity;
 
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 /**
  * <p>
@@ -51,8 +52,8 @@ import boofcv.struct.image.ImageGray;
 public abstract class DisparityBlockMatchBestFive<I extends ImageBase<I>, DI extends ImageGray<DI>>
 		extends DisparityBlockMatchRowFormat<I, DI>
 {
-	public DisparityBlockMatchBestFive(int regionRadiusX, int regionRadiusY) {
-		super(regionRadiusX, regionRadiusY);
+	public DisparityBlockMatchBestFive(int regionRadiusX, int regionRadiusY, ImageType<I> imageType ) {
+		super(regionRadiusX, regionRadiusY, imageType);
 	}
 
 	@Override

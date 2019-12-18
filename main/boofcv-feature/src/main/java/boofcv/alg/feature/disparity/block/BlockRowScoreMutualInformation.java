@@ -30,7 +30,7 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public interface BlockRowScoreMutualInformation {
-	class U8 extends BlockRowScore.ArrayS32_BS32<GrayU8> {
+	class U8 extends BlockRowScore.ArrayS32_BS32<GrayU8,byte[]> {
 		StereoMutualInformation mi;
 		public U8(StereoMutualInformation mi) {
 			super(SgmDisparityCost.MAX_COST);
@@ -38,18 +38,11 @@ public interface BlockRowScoreMutualInformation {
 		}
 
 		@Override
-		public void score(int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
+		public void score(byte[] leftRow, byte[] rightRow, int indexLeft, int indexRight, int offset, int length, int[] elementScore) {
 			for( int i = 0; i < length; i++ ) {
-				final int a = left.data[ indexLeft++ ]& 0xFF;
-				final int b = right.data[ indexRight++ ]& 0xFF;
+				final int a = leftRow[ indexLeft++ ]& 0xFF;
+				final int b = rightRow[ indexRight++ ]& 0xFF;
 				elementScore[offset+i] = mi.costScaled(a,b);
-			}
-		}
-
-		@Override
-		public void scoreBorder(int x, int y, int d , int offset, int length, int[] elementScore) {
-			for( int i = 0; i < length; i++ ,x++) {
-				elementScore[offset+i] = mi.costScaled(borderLeft.get(x,y),borderRight.get(x-d,y));
 			}
 		}
 

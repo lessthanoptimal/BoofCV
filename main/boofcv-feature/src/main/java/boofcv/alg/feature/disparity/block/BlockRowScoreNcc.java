@@ -106,16 +106,9 @@ public class BlockRowScoreNcc<T extends ImageBase<T>>
 		}
 
 		@Override
-		public void score(int indexLeft, int indexRight, int offset, int length, float[] elementScore) {
+		public void score(float[] leftRow, float[] rightRow, int indexLeft, int indexRight, int offset, int length, float[] elementScore) {
 			for( int i = 0; i < length; i++ ) {
-				elementScore[offset+i] = left.data[ indexLeft++ ] * right.data[ indexRight++ ];
-			}
-		}
-
-		@Override
-		public void scoreBorder(int x, int y, int d , int offset, int length, float[] scores) {
-			for( int i = 0; i < length; i++ ,x++) {
-				scores[offset+i] = borderLeft.get(x,y) * borderRight.get(x-d,y);
+				elementScore[offset+i] = leftRow[ indexLeft++ ] * rightRow[ indexRight++ ];
 			}
 		}
 

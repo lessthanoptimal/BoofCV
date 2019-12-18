@@ -24,6 +24,7 @@ import boofcv.alg.feature.disparity.block.DisparitySelect;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 
 /**
  * @author Peter Abeles
@@ -37,6 +38,6 @@ public class TestDisparityScoreBM_S32 extends ChecksDisparityBM<GrayS16,GrayU8> 
 	@Override
 	protected DisparityBlockMatch<GrayS16, GrayU8>
 	createAlg(int radiusX, int radiusY, BlockRowScore scoreRow, DisparitySelect compDisp) {
-		return new DisparityScoreBM_S32<>(radiusX,radiusY,scoreRow,compDisp);
+		return new DisparityScoreBM_S32<>(radiusX,radiusY,scoreRow,compDisp,ImageType.SB_S16);
 	}
 }

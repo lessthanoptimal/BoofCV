@@ -92,7 +92,6 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 			default:
 				throw new IllegalArgumentException("Only NCC and SAD supported");
 		}
-		scoreRow.setBorder(FactoryImageBorder.generic(DisparityBlockMatchNaive.BORDER_TYPE, ImageType.single(imageType)));
 	}
 
 	protected DisparityBlockMatch<I, DI>
@@ -101,6 +100,7 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 		createScoreRow(radiusX,radiusY);
 		DisparityBlockMatch<I, DI> alg = createAlg(radiusX,radiusY,scoreRow,compDisp);
 		alg.configure(minDisparity,maxDisparity-minDisparity+1);
+		alg.setBorder(FactoryImageBorder.generic(DisparityBlockMatchNaive.BORDER_TYPE, ImageType.single(imageType)));
 		return alg;
 	}
 	protected abstract DisparityBlockMatch<I, DI>
@@ -137,6 +137,7 @@ public abstract class ChecksDisparityBM<I extends ImageGray<I>, DI extends Image
 	 */
 	@Test
 	void compareToNaive() {
+		BoofConcurrency.USE_CONCURRENT = false;
 		int w = 20, h = 25;
 		I left = GeneralizedImageOps.createSingleBand(imageType,w, h);
 		I right = GeneralizedImageOps.createSingleBand(imageType,w, h);

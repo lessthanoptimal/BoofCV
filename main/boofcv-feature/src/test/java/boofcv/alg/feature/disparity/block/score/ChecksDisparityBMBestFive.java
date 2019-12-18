@@ -100,6 +100,7 @@ public abstract class ChecksDisparityBMBestFive<I extends ImageGray<I>, DI exten
 		computeError(radiusX,radiusY);
 		DisparityBlockMatchBestFive<I, DI> alg = createAlg(radiusX,radiusY,scoreRow,compDisp);
 		alg.configure(minDisparity,maxDisparity-minDisparity+1);
+		alg.setBorder(FactoryImageBorder.generic(DisparityBlockMatchNaive.BORDER_TYPE,ImageType.single(imageType)));
 		return alg;
 	}
 

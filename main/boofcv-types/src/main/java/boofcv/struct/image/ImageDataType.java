@@ -258,8 +258,8 @@ public enum ImageDataType {
 		}
 	}
 
-	public Object newArray(int length ) {
-		return createArray.create(length);
+	public <T>T newArray(int length ) {
+		return (T)createArray.create(length);
 	}
 
 	private interface CreateArray {
