@@ -97,6 +97,15 @@ public class BoofSwingUtil {
 		}
 	}
 
+	public static File ensureSuffix( File f , String suffix ) {
+		String name = f.getName();
+		if( !name.toLowerCase().endsWith(suffix) ) {
+			name = FilenameUtils.getBaseName(name)+suffix;
+			f = new File(f.getParent(),name);
+		}
+		return f;
+	}
+
 	public static File saveFileChooser(Component parent, FileTypes ...filters) {
 		return fileChooser(parent,false,new File(".").getPath(),filters);
 	}
@@ -117,6 +126,34 @@ public class BoofSwingUtil {
 			prefs.put(KEY_PREVIOUS_SELECTION, new File(response[0]).getParent());
 		}
 		return response;
+	}
+
+	public static String getDefaultPath(Object parent, String key ) {
+		File defaultPath = BoofSwingUtil.directoryUserHome();
+		if( key == null )
+			return defaultPath.getPath();
+
+		Preferences prefs;
+		if( parent == null ) {
+			prefs = Preferences.userRoot();
+		} else {
+			prefs = Preferences.userRoot().node(parent.getClass().getSimpleName());
+		}
+		return prefs.get(key, defaultPath.getPath());
+	}
+
+	public static void saveDefaultPath(Object parent, String key , File file ) {
+		if( key == null )
+			return;
+		Preferences prefs;
+		if( parent == null ) {
+			prefs = Preferences.userRoot();
+		} else {
+			prefs = Preferences.userRoot().node(parent.getClass().getSimpleName());
+		}
+		if( !file.isDirectory() )
+			file = file.getParentFile();
+		prefs.put(key,file.getAbsolutePath());
 	}
 
 	public static File openFileChooser(Component parent, FileTypes ...filters) {
@@ -468,11 +505,17 @@ public class BoofSwingUtil {
 	/**
 	 * Opens a dialog, asks the user where to save the point cloud, then saves the point cloud
 	 */
-	public static void savePointCloudDialog(Component owner,PointCloudViewer pcv) {
+	public static void savePointCloudDialog(Component owner, String key ,PointCloudViewer pcv) {
+		String path = getDefaultPath(owner,key);
+
 		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setSelectedFile(new File(path,"pointcloud.ply"));
+
 		if (fileChooser.showSaveDialog(owner) == JFileChooser.APPROVE_OPTION) {
-			FastQueue<Point3dRgbI_F64> cloud = pcv.copyCloud(null);
 			File file = fileChooser.getSelectedFile();
+			saveDefaultPath(owner,key,file);
+
+			FastQueue<Point3dRgbI_F64> cloud = pcv.copyCloud(null);
 			String n = FilenameUtils.getBaseName(file.getName())+".ply";
 			try {
 				File f = new File(file.getParent(),n);
@@ -489,9 +532,16 @@ public class BoofSwingUtil {
 	 * Opens a dialog, asks the user where to save the disparity image, converts the image into a U16 format,
 	 * saves it as a PNG
 	 */
-	public static void saveDisparityDialog( JComponent owner, ImageGray d) {
+	public static void saveDisparityDialog( JComponent owner, String key, ImageGray d) {
+
+		String path = getDefaultPath(owner,key);
 		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setSelectedFile(new File(path,"disparity.png"));
+		fileChooser.setDialogTitle("Save Disparity Image");
 		if (fileChooser.showSaveDialog(owner) == JFileChooser.APPROVE_OPTION) {
+			File file = fileChooser.getSelectedFile();
+			saveDefaultPath(owner,key,file);
+
 			// Convert disparity into a U16 image format
 			GrayF32 disparity;
 			if( d instanceof GrayF32 ) {
@@ -504,9 +554,9 @@ public class BoofSwingUtil {
 			ConvertImageMisc.convert_F32_U16(disparity,8,output);
 
 			// save as 16-bit png
-			File file = fileChooser.getSelectedFile();
-			String n = FilenameUtils.getBaseName(file.getName())+".png";
-			UtilImageIO.saveImage(output,new File(file.getParent(),n).getAbsolutePath());
+
+			file = ensureSuffix(file,".png");
+			UtilImageIO.saveImage(output,file.getAbsolutePath());
 		}
 	}
 

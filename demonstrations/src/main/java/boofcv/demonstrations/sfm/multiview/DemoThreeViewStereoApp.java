@@ -46,10 +46,13 @@ import boofcv.gui.image.VisualizeImageData;
 import boofcv.gui.stereo.RectifiedPairPanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.UtilImageIO;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.DoNothing2Transform2_F64;
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.BrightFeature;
@@ -67,10 +70,9 @@ import org.ejml.ops.ConvertMatrixData;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import static boofcv.gui.BoofSwingUtil.saveDisparityDialog;
 
 /**
  * Computes a stereo point cloud using three uncalibrated images. Visualizes different pre-processing steps and
@@ -79,6 +81,7 @@ import static boofcv.gui.BoofSwingUtil.saveDisparityDialog;
  * @author Peter Abeles
  */
 public class DemoThreeViewStereoApp extends DemonstrationBase {
+	public static final String KEY_PREVIOUS_DIRECTORY = "PreviousDirectory";
 
 	JPanel gui = new JPanel();
 	AssociatedTriplePanel guiAssoc = new AssociatedTriplePanel();
@@ -117,9 +120,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	ImageGray disparity;
 
 	// Visualized Disparity
-	BufferedImage visualDisparity= new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
-	BufferedImage visualRect1= new BufferedImage(1,1, BufferedImage.TYPE_INT_RGB),
-			visualRect2= new BufferedImage(1,1, BufferedImage.TYPE_INT_RGB);
+	BufferedImage visualDisparity = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
+	BufferedImage visualRect1     = new BufferedImage(1,1, BufferedImage.TYPE_INT_RGB);
+	BufferedImage visualRect2     = new BufferedImage(1,1, BufferedImage.TYPE_INT_RGB);
 
 	Planar<GrayU8> rectColor1 = new Planar<>(GrayU8.class, 1,1, 3);
 	Planar<GrayU8> rectColor2 = new Planar<>(GrayU8.class, 1,1, 3);
@@ -173,6 +176,14 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	protected void customAddToFileMenu(JMenu menuFile) {
 		menuFile.addSeparator();
 
+		JMenuItem itemSaveCalibration = new JMenuItem("Save Calibration");
+		itemSaveCalibration.addActionListener(e -> saveCalibration());
+		menuFile.add(itemSaveCalibration);
+
+		JMenuItem itemSaveRectified = new JMenuItem("Save Rectified");
+		itemSaveRectified.addActionListener(e -> saveRectified());
+		menuFile.add(itemSaveRectified);
+
 		JMenuItem itemSaveDisparity = new JMenuItem("Save Disparity");
 		itemSaveDisparity.addActionListener(e -> saveDisparity());
 		menuFile.add(itemSaveDisparity);
@@ -182,14 +193,63 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		menuFile.add(itemSaveCloud);
 	}
 
+	private void saveCalibration() {
+		CameraPinholeBrown intrinsic01 = this.intrinsic01;
+		CameraPinholeBrown intrinsic02 = this.intrinsic02;
+		Se3_F64 leftToRight = this.leftToRight;
+
+		if( intrinsic01 == null || intrinsic02 == null || leftToRight == null ) {
+			JOptionPane.showMessageDialog(this, "No calibration to save");
+			return;
+		}
+
+		String home = BoofSwingUtil.getDefaultPath(this,KEY_PREVIOUS_DIRECTORY);
+		File f = BoofSwingUtil.fileChooser(this,false,home, BoofSwingUtil.FileTypes.YAML);
+		if( f == null )
+			return;
+		BoofSwingUtil.saveDefaultPath(this,KEY_PREVIOUS_DIRECTORY,f);
+
+		f = BoofSwingUtil.ensureSuffix(f,".yaml");
+
+		StereoParameters stereo = new StereoParameters();
+		stereo.left = intrinsic01;
+		stereo.right = intrinsic02;
+		stereo.rightToLeft = leftToRight.invert(null);
+
+		CalibrationIO.save(stereo,f.getAbsolutePath());
+	}
+
+	private void saveRectified() {
+		if( rectColor1.width == 1 ) {
+			JOptionPane.showMessageDialog(this, "Not yet rectified");
+			return;
+		}
+
+		String currentPath = BoofSwingUtil.getDefaultPath(this,KEY_PREVIOUS_DIRECTORY);
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Save Rectified Images");
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		fileChooser.setCurrentDirectory(new File(currentPath));
+		if (fileChooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+
+		File parent = fileChooser.getSelectedFile();
+		BoofSwingUtil.saveDefaultPath(this,KEY_PREVIOUS_DIRECTORY,parent);
+
+		UtilImageIO.saveImage(visualRect1,new File(parent,"rectified_left.png").getAbsolutePath());
+		UtilImageIO.saveImage(visualRect2,new File(parent,"rectified_right.png").getAbsolutePath());
+	}
+
 	private void saveDisparity() {
 		ImageGray disparity = this.disparity;
-		if( disparity != null )
-			saveDisparityDialog(this,disparity);
+		if( disparity == null )
+			return;
+		BoofSwingUtil.saveDisparityDialog(this,KEY_PREVIOUS_DIRECTORY,disparity);
 	}
 
 	private void savePointCloud() {
-		BoofSwingUtil.savePointCloudDialog(this,guiPointCloud);
+		BoofSwingUtil.savePointCloudDialog(this,KEY_PREVIOUS_DIRECTORY,guiPointCloud);
 	}
 
 	void updateVisibleGui() {

@@ -64,6 +64,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static boofcv.alg.geo.RectifyImageOps.transformRectToPixel;
+import static boofcv.demonstrations.sfm.multiview.DemoThreeViewStereoApp.KEY_PREVIOUS_DIRECTORY;
 import static boofcv.gui.BoofSwingUtil.saveDisparityDialog;
 
 /**
@@ -166,15 +167,16 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 	private void saveDisparity() {
 		StereoDisparity<T,D> activeAlg = this.activeAlg;
-		if( activeAlg != null )
-			saveDisparityDialog(this,activeAlg.getDisparity());
+		if( activeAlg == null )
+			return;
+		saveDisparityDialog(this,KEY_PREVIOUS_DIRECTORY,activeAlg.getDisparity());
 	}
 
 	private void savePointCloud() {
 		if( !computedCloud ) {
 			JOptionPane.showMessageDialog(this, "Need to generate point cloud first");
 		} else {
-			BoofSwingUtil.savePointCloudDialog(this,pcv);
+			BoofSwingUtil.savePointCloudDialog(this,KEY_PREVIOUS_DIRECTORY,pcv);
 		}
 	}
 
