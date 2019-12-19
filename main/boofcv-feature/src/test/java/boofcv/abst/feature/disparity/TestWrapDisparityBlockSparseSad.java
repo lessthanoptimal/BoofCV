@@ -61,8 +61,8 @@ public class TestWrapDisparityBlockSparseSad {
 		config.regionRadiusX = config.regionRadiusY = r;
 		config.subpixel = false;
 		config.errorType = DisparityError.SAD;
-		config.minDisparity = minDisparity;
-		config.rangeDisparity = maxDisparity-minDisparity;
+		config.disparityMin = minDisparity;
+		config.disparityRange = maxDisparity-minDisparity+1;
 		config.maxPerPixelError = -1;
 		config.texture = -1;
 		config.validateRtoL = -1;

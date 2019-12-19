@@ -18,8 +18,8 @@
 
 package boofcv.abst.feature.disparity;
 
-import boofcv.factory.feature.disparity.ConfigDisparityBM;
-import boofcv.factory.feature.disparity.DisparityError;
+import boofcv.factory.feature.disparity.ConfigDisparitySGM;
+import boofcv.factory.feature.disparity.DisparitySgmError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -29,42 +29,40 @@ import org.junit.jupiter.api.Nested;
 /**
  * @author Peter Abeles
  */
-class TestDisparityBlockMatchCorrelation {
+class TestWrapSgm {
 	@Nested
-	class NCC_F32_U8 extends GenericStereoDisparityChecks<GrayF32,GrayU8> {
+	class SAD_U8 extends GenericStereoDisparityChecks<GrayU8,GrayU8> {
 
-		public NCC_F32_U8() {
-			super(ImageType.SB_F32, ImageType.SB_U8);
+		public SAD_U8() {
+			super(ImageType.SB_U8, ImageType.SB_U8);
 		}
 
 		@Override
-		public StereoDisparity<GrayF32, GrayU8> createAlg(int disparityMin, int disparityRange) {
-			ConfigDisparityBM config = new ConfigDisparityBM();
-			config.errorType = DisparityError.NCC;
+		public StereoDisparity<GrayU8, GrayU8> createAlg(int disparityMin, int disparityRange) {
+			ConfigDisparitySGM config = new ConfigDisparitySGM();
+			config.errorType = DisparitySgmError.ABSOLUTE_DIFFERENCE;
 			config.subpixel = false;
-			config.regionRadiusX = config.regionRadiusY = 1;
 			config.disparityMin = disparityMin;
 			config.disparityRange = disparityRange;
-			return FactoryStereoDisparity.blockMatch(config,inputType.getImageClass(),disparityType.getImageClass());
+			return FactoryStereoDisparity.sgm(config,inputType.getImageClass(),disparityType.getImageClass());
 		}
 	}
 
 	@Nested
-	class NCC_F32_F32 extends GenericStereoDisparityChecks<GrayF32, GrayF32> {
+	class SAD_F32 extends GenericStereoDisparityChecks<GrayU8, GrayF32> {
 
-		public NCC_F32_F32() {
-			super(ImageType.SB_F32, ImageType.SB_F32);
+		public SAD_F32() {
+			super(ImageType.SB_U8, ImageType.SB_F32);
 		}
 
 		@Override
-		public StereoDisparity<GrayF32, GrayF32> createAlg(int disparityMin, int disparityRange) {
-			ConfigDisparityBM config = new ConfigDisparityBM();
-			config.errorType = DisparityError.NCC;
+		public StereoDisparity<GrayU8, GrayF32> createAlg(int disparityMin, int disparityRange) {
+			ConfigDisparitySGM config = new ConfigDisparitySGM();
+			config.errorType = DisparitySgmError.ABSOLUTE_DIFFERENCE;
 			config.subpixel = true;
-			config.regionRadiusX = config.regionRadiusY = 1;
 			config.disparityMin = disparityMin;
 			config.disparityRange = disparityRange;
-			return FactoryStereoDisparity.blockMatch(config,inputType.getImageClass(),disparityType.getImageClass());
+			return FactoryStereoDisparity.sgm(config,inputType.getImageClass(),disparityType.getImageClass());
 		}
 	}
 }

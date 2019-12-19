@@ -68,8 +68,8 @@ public class FactoryStereoDisparityAlgs {
 		else
 			sgm = createSgmBlockCost(config, selector, GrayU8.class);
 
-		sgm.setDisparityMin(config.minDisparity);
-		sgm.setDisparityRange(config.rangeDisparity);
+		sgm.setDisparityMin(config.disparityMin);
+		sgm.setDisparityRange(config.disparityRange);
 		sgm.getAggregation().setPathsConsidered(config.paths.getCount());
 		sgm.getAggregation().setPenalty1(config.penaltySmallChange);
 		sgm.getAggregation().setPenalty2(config.penaltyLargeChange);
@@ -120,8 +120,8 @@ public class FactoryStereoDisparityAlgs {
 		ConfigDisparityBM configBM = new ConfigDisparityBM();
 		configBM.regionRadiusX = config.configBlockMatch.radiusX;
 		configBM.regionRadiusY = config.configBlockMatch.radiusY;
-		configBM.minDisparity = config.minDisparity;
-		configBM.rangeDisparity = config.rangeDisparity;
+		configBM.disparityMin = config.disparityMin;
+		configBM.disparityRange = config.disparityRange;
 		configBM.border = config.border;
 
 		SgmCostFromBlocks<T> blockCost = new SgmCostFromBlocks<T>();

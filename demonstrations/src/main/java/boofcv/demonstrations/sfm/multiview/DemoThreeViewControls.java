@@ -101,8 +101,8 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		ConfigDisparityBMBest5 configBM = new ConfigDisparityBMBest5();
 		ConfigDisparitySGM configSGM = new ConfigDisparitySGM();
 
-		configBM.minDisparity = configSGM.minDisparity = 0;
-		configBM.rangeDisparity = configSGM.rangeDisparity = 200;
+		configBM.disparityMin = configSGM.disparityMin = 0;
+		configBM.disparityRange = configSGM.disparityRange = 200;
 		configBM.regionRadiusX = configBM.regionRadiusY = 4;
 		configBM.errorType = DisparityError.CENSUS;
 		configBM.configCensus.variant = CensusVariants.BLOCK_7_7;

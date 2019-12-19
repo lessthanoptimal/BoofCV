@@ -33,11 +33,11 @@ public class ConfigDisparityBM implements Configuration {
 	/**
 	 * Minimum disparity that it will check. Must be &ge; 0 and &lt; maxDisparity
 	 */
-	public int minDisparity=0;
+	public int disparityMin =0;
 	/**
 	 * Number of disparity values considered. Must be &gt; 0
 	 */
-	public int rangeDisparity=100;
+	public int disparityRange =100;
 	/**
 	 * Radius of the rectangular region along x-axis.
 	 */
@@ -85,9 +85,9 @@ public class ConfigDisparityBM implements Configuration {
 
 	@Override
 	public void checkValidity() {
-		if( minDisparity < 0 )
+		if( disparityMin < 0 )
 			throw new IllegalArgumentException("miDisparity < 0");
-		if( rangeDisparity < 1 )
+		if( disparityRange < 1 )
 			throw new IllegalArgumentException("rangeDisparity < 1");
 		if( border == BorderType.NORMALIZED || border == BorderType.SKIP )
 			throw new IllegalArgumentException("Normalized and Skip are not supported");

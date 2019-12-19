@@ -244,7 +244,7 @@ public class FactoryStereoDisparity {
 			alg = new DisparityScoreBM_S32( config.regionRadiusX, config.regionRadiusY, rowScore, select,
 					ImageType.single(imageType));
 		}
-		alg.configure(config.minDisparity,config.rangeDisparity);
+		alg.configure(config.disparityMin,config.disparityRange);
 		return alg;
 	}
 
@@ -257,7 +257,7 @@ public class FactoryStereoDisparity {
 			alg = new DisparityScoreBMBestFive_S32(config.regionRadiusX, config.regionRadiusY, rowScore, select,
 					ImageType.single(imageType));
 		}
-		alg.configure(config.minDisparity,config.rangeDisparity);
+		alg.configure(config.disparityMin,config.disparityRange);
 		return alg;
 	}
 

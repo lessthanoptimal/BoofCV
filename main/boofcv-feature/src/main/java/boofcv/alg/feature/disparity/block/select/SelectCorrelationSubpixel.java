@@ -62,13 +62,6 @@ public class SelectCorrelationSubpixel {
 				float c1 = columnScore[disparityValue];
 				float c2 = columnScore[disparityValue+1];
 
-				// Visually it's hard to tell if the code below helps or hurts
-				// The idea was that SAD error grows linearly and this interpolation seems to work well
-				// for it. The sqrt() grows linearly.
-//				c0 = (float)Math.sqrt(c0-min);
-//				c1 = (float)Math.sqrt(c1-min);
-//				c2 = (float)Math.sqrt(c2-min);
-
 				float offset = (c0-c2)/(2f*(c0-2f*c1+c2));
 
 				imageDisparity.data[index] = disparityValue +  offset;

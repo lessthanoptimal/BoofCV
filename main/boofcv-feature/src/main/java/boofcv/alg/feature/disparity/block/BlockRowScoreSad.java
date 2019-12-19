@@ -92,7 +92,7 @@ public interface BlockRowScoreSad
 
 		@Override
 		public ImageType<GrayU16> getImageType() {
-			return ImageType.single(GrayU16.class);
+			return ImageType.SB_U16;
 		}
 	}
 
@@ -111,7 +111,7 @@ public interface BlockRowScoreSad
 
 		@Override
 		public ImageType<GrayS16> getImageType() {
-			return ImageType.single(GrayS16.class);
+			return ImageType.SB_S16;
 		}
 	}
 

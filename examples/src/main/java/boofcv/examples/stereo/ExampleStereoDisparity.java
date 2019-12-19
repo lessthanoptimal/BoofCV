@@ -80,8 +80,8 @@ public class ExampleStereoDisparity {
 		// All of these parameters should be turned
 		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
 		config.errorType = DisparityError.SAD;
-		config.minDisparity = minDisparity;
-		config.rangeDisparity = rangeDisparity;
+		config.disparityMin = minDisparity;
+		config.disparityRange = rangeDisparity;
 		config.subpixel = false;
 		config.regionRadiusX = config.regionRadiusY = regionSize;
 		config.maxPerPixelError = 25;
@@ -108,8 +108,8 @@ public class ExampleStereoDisparity {
 		// All of these parameters should be turned
 		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
 		config.errorType = DisparityError.SAD;
-		config.minDisparity = minDisparity;
-		config.rangeDisparity = rangeDisparity;
+		config.disparityMin = minDisparity;
+		config.disparityRange = rangeDisparity;
 		config.subpixel = true;
 		config.regionRadiusX = config.regionRadiusY = regionSize;
 		config.maxPerPixelError = 25;

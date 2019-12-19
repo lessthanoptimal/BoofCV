@@ -3,7 +3,7 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
-Date    : 2019
+Date    : 2020
 Version : 0.35
 
 - ImageType now as predefined types, e.g. SB_U8, IL_F64, PL_S32, ... etc
@@ -55,24 +55,18 @@ Version : 0.35
   * Concurrent block matching disparity
   * Support for U16 images
   * Block Matching can now be scored using Census and NCC
-  * Added Semi-Global Matching with several options for score functions
-  * TODO Ensure that all auto code generators still work
-  * TODO revert speed regression for BM
-  * TODO Filter small disparity regions
+  * Added Semi-Global Matching (SGM) with several options for score functions
 - SFM
   * Projective camera with lens distortion
   * TODO Stereo VO Quad - Now uses trifocal tensor and sparse bundle adjustment
-- Calibration
-  * TODO Calibrate using partially obscured chessboard patterns
-  * TODO Add ability to remove images and recalibrate from application
-  * TODO change high level API to be able to return more than one pattern. String ID
 - Chessboard Detector
   * TODO Prune similar based on edge difference
   * TODO why pick long line in calib?
 
-TODO Tech Report for new chessboard detector, assisted calibration, line fitting
+TODO Tech Reports for new chessboard detector, assisted calibration, line fitting, stereo
 TODO Videos - hough line detectors
             - chessboard corner detector + improvements
+            - stereo and VO updates
 
 TODO corner detector 2 tech report
 TODO Scene Reconstruction from arbitrary number of photos
@@ -80,7 +74,15 @@ TODO hough circle detector
 TODO concurrent SIFT
 TODO concurrent dense features?
 TODO Estimate focal lengths given disparity image
-TODO Disparity - fill in holes
+TODO Disparity post processing
+     - Filter small disparity regions
+     - Fill in holes
+     - mark small disparities as invalid
+TODO SGM - Consider YDX order. Profile to see if it's faster
+TODO Calibration
+     - TODO Calibrate using partially obscured chessboard patterns
+     - TODO Add ability to remove images and recalibrate from application
+     - TODO change high level API to be able to return more than one pattern. String ID
 
 ---------------------------------------------
 Date    : 2019-July-07

@@ -103,10 +103,10 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		ConfigDisparityBMBest5 configBM = new ConfigDisparityBMBest5();
 		ConfigDisparitySGM configSGM = new ConfigDisparitySGM();
 
-		configBM.minDisparity = disparityMin;
-		configBM.rangeDisparity = disparityRange;
-		configSGM.minDisparity = disparityMin;
-		configSGM.rangeDisparity = disparityRange;
+		configBM.disparityMin = disparityMin;
+		configBM.disparityRange = disparityRange;
+		configSGM.disparityMin = disparityMin;
+		configSGM.disparityRange = disparityRange;
 
 		return new DisparityControlPanel(configBM,configSGM,imageType);
 	}
@@ -148,16 +148,16 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 
 	public int getDisparityMin() {
 		if( isBlockSelected() )
-			return configBM.minDisparity;
+			return configBM.disparityMin;
 		else
-			return configSGM.minDisparity;
+			return configSGM.disparityMin;
 	}
 
 	public int getDisparityRange() {
 		if( isBlockSelected() )
-			return configBM.rangeDisparity;
+			return configBM.disparityRange;
 		else
-			return configSGM.rangeDisparity;
+			return configSGM.disparityRange;
 	}
 
 	/**
@@ -264,8 +264,8 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 	}
 
 	public class ControlsBlockMatching extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
-		JSpinner spinnerDisparityMin = spinner(configBM.minDisparity,0, 1000,5);
-		JSpinner spinnerDisparityRange = spinner(configBM.rangeDisparity,1, 254,5);
+		JSpinner spinnerDisparityMin = spinner(configBM.disparityMin,0, 1000,5);
+		JSpinner spinnerDisparityRange = spinner(configBM.disparityRange,1, 254,5);
 		JSpinner radiusXSpinner = spinner(configBM.regionRadiusX,0,50,1); // TODO move to error
 		JSpinner radiusYSpinner = spinner(configBM.regionRadiusY,0,50,1);
 		JSpinner spinnerError = spinner(configBM.maxPerPixelError,-1,80,5);
@@ -289,9 +289,9 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 			if( e.getSource() == spinnerReverse) {
 				configBM.validateRtoL = ((Number) spinnerReverse.getValue()).intValue();
 			} else if( e.getSource() == spinnerDisparityMin) {
-				configBM.minDisparity = ((Number) spinnerDisparityMin.getValue()).intValue();
+				configBM.disparityMin = ((Number) spinnerDisparityMin.getValue()).intValue();
 			} else if( e.getSource() == spinnerDisparityRange) {
-				configBM.rangeDisparity = ((Number) spinnerDisparityRange.getValue()).intValue();
+				configBM.disparityRange = ((Number) spinnerDisparityRange.getValue()).intValue();
 			} else if( e.getSource() == spinnerError) {
 				configBM.maxPerPixelError = ((Number) spinnerError.getValue()).intValue();
 			} else if( e.getSource() == radiusXSpinner) {
@@ -323,8 +323,8 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		JSpinner spinnerPenaltySmall = spinner(configSGM.penaltySmallChange,0, SgmDisparityCost.MAX_COST,10);
 		JSpinner spinnerPenaltyLarge = spinner(configSGM.penaltyLargeChange,1, SgmDisparityCost.MAX_COST,10);
 
-		JSpinner spinnerDisparityMin = spinner(configSGM.minDisparity,0, 1000,5);
-		JSpinner spinnerDisparityRange = spinner(configSGM.rangeDisparity,1, 254,5);
+		JSpinner spinnerDisparityMin = spinner(configSGM.disparityMin,0, 1000,5);
+		JSpinner spinnerDisparityRange = spinner(configSGM.disparityRange,1, 254,5);
 		JSpinner spinnerError = spinner(configSGM.maxError,-1,Short.MAX_VALUE,200);
 		JSpinner spinnerReverse = spinner(configSGM.validateRtoL,-1,50,1);
 		JSpinner spinnerTexture = spinner(configSGM.texture,0.0,1.0,0.05,1,3);
@@ -356,9 +356,9 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 			if( e.getSource() == spinnerReverse) {
 				configSGM.validateRtoL = ((Number) spinnerReverse.getValue()).intValue();
 			} else if( e.getSource() == spinnerDisparityMin) {
-				configSGM.minDisparity = ((Number) spinnerDisparityMin.getValue()).intValue();
+				configSGM.disparityMin = ((Number) spinnerDisparityMin.getValue()).intValue();
 			} else if( e.getSource() == spinnerDisparityRange) {
-				configSGM.rangeDisparity = ((Number) spinnerDisparityRange.getValue()).intValue();
+				configSGM.disparityRange = ((Number) spinnerDisparityRange.getValue()).intValue();
 			} else if( e.getSource() == spinnerError) {
 				configSGM.maxError = ((Number) spinnerError.getValue()).intValue();
 			} else if( e.getSource() == spinnerTexture) {

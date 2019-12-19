@@ -34,12 +34,12 @@ public class ConfigDisparitySGM implements Configuration {
 	/**
 	 * Minimum disparity that it will check. Must be &ge; 0 and &lt; maxDisparity
 	 */
-	public int minDisparity=0;
+	public int disparityMin =0;
 	/**
 	 * Number of disparity values considered. Must be &gt; 0. Maximum number is 255 for 8-bit disparity
 	 * images.
 	 */
-	public int rangeDisparity=100;
+	public int disparityRange =100;
 	/**
 	 * Maximum allowed error for a single pixel. Set to a value less than 0 to disable. Has a range from
 	 * 0 to {@link SgmDisparityCost#MAX_COST}
@@ -125,7 +125,7 @@ public class ConfigDisparitySGM implements Configuration {
 			throw new IllegalArgumentException("Invalid value for penaltySmallChange.");
 		if( penaltyLargeChange < 0 || penaltyLargeChange > MAX_COST )
 			throw new IllegalArgumentException("Invalid value for penaltySmallChange.");
-		if( minDisparity < 0 )
+		if( disparityMin < 0 )
 			throw new IllegalArgumentException("Minimum disparity must be >= 0");
 		configBlockMatch.checkValidity();
 	}

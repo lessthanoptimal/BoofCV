@@ -90,8 +90,8 @@ public abstract class ChecksDisparityBlockMatchNaive<T extends ImageBase<T>> {
 	public static ConfigDisparityBM createConfigBasicBM(int blockRadius, int minDisparity, int maxDisparity) {
 		ConfigDisparityBM config = new ConfigDisparityBM();
 		config.regionRadiusX = config.regionRadiusY = blockRadius;
-		config.minDisparity = minDisparity;
-		config.rangeDisparity = maxDisparity-minDisparity+1;
+		config.disparityMin = minDisparity;
+		config.disparityRange = maxDisparity-minDisparity+1;
 		// turn off all validation
 		config.texture = 0;
 		config.validateRtoL = -1;

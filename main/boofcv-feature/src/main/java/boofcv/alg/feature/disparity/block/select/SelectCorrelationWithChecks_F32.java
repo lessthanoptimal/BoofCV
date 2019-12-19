@@ -36,7 +36,7 @@ public abstract class SelectCorrelationWithChecks_F32<DI extends ImageGray<DI>>
 		extends SelectDisparityWithChecksWta<float[], DI> implements Compare_F32
 {
 	// scores organized for more efficient processing
-	float columnScore[] = new float[1];
+	float[] columnScore = new float[1];
 	int imageWidth;
 
 	// texture threshold, use an integer value for speed.

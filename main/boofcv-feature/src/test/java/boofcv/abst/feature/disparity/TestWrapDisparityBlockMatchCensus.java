@@ -29,20 +29,20 @@ import org.junit.jupiter.api.Nested;
 /**
  * @author Peter Abeles
  */
-class TestDisparityBlockMatchCorrelation {
-	@Nested
-	class NCC_F32_U8 extends GenericStereoDisparityChecks<GrayF32,GrayU8> {
+public class TestWrapDisparityBlockMatchCensus {
 
-		public NCC_F32_U8() {
-			super(ImageType.SB_F32, ImageType.SB_U8);
+	@Nested
+	class CENSUS_U8 extends GenericStereoDisparityChecks<GrayU8,GrayU8> {
+
+		public CENSUS_U8() {
+			super(ImageType.SB_U8, ImageType.SB_U8);
 		}
 
 		@Override
-		public StereoDisparity<GrayF32, GrayU8> createAlg(int disparityMin, int disparityRange) {
+		public StereoDisparity<GrayU8, GrayU8> createAlg(int disparityMin, int disparityRange) {
 			ConfigDisparityBM config = new ConfigDisparityBM();
-			config.errorType = DisparityError.NCC;
+			config.errorType = DisparityError.CENSUS;
 			config.subpixel = false;
-			config.regionRadiusX = config.regionRadiusY = 1;
 			config.disparityMin = disparityMin;
 			config.disparityRange = disparityRange;
 			return FactoryStereoDisparity.blockMatch(config,inputType.getImageClass(),disparityType.getImageClass());
@@ -50,18 +50,17 @@ class TestDisparityBlockMatchCorrelation {
 	}
 
 	@Nested
-	class NCC_F32_F32 extends GenericStereoDisparityChecks<GrayF32, GrayF32> {
+	class CENSUS_F32 extends GenericStereoDisparityChecks<GrayU8, GrayF32> {
 
-		public NCC_F32_F32() {
-			super(ImageType.SB_F32, ImageType.SB_F32);
+		public CENSUS_F32() {
+			super(ImageType.SB_U8, ImageType.SB_F32);
 		}
 
 		@Override
-		public StereoDisparity<GrayF32, GrayF32> createAlg(int disparityMin, int disparityRange) {
+		public StereoDisparity<GrayU8, GrayF32> createAlg(int disparityMin, int disparityRange) {
 			ConfigDisparityBM config = new ConfigDisparityBM();
-			config.errorType = DisparityError.NCC;
+			config.errorType = DisparityError.CENSUS;
 			config.subpixel = true;
-			config.regionRadiusX = config.regionRadiusY = 1;
 			config.disparityMin = disparityMin;
 			config.disparityRange = disparityRange;
 			return FactoryStereoDisparity.blockMatch(config,inputType.getImageClass(),disparityType.getImageClass());
