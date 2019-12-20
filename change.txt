@@ -48,7 +48,7 @@ Version : 0.35
   * Updated VisualizeAssociationScoreApp
   * Updated VisualizeImageSegmentationApp
   * Updated VisualizeStereoDisparity
-  * TODO Three view handle 90 degrees out of orientation images better
+  * Three view handles 90 degrees out of orientation images much better
 - Fixed bugs related to processing 1-band planar images
 - Stereo
   * Improved high level API

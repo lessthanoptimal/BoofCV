@@ -215,7 +215,7 @@ public class DisparityScoreBMBestFive_S32<T extends ImageBase<T>,DI extends Imag
 				active[i] += scores[i];
 			}
 
-			if( scoreRows.isRequireNormalize() && row > radiusY && row < left.height+radiusY) {
+			if( scoreRows.isRequireNormalize() && row >= radiusY && row < left.height+radiusY) {
 				scoreRows.normalizeRegionScores(row - radiusY,
 						active, disparityMin, disparityMax, regionWidth, regionHeight, ws.verticalScoreNorm[activeIndex]);
 			}

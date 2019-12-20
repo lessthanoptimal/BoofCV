@@ -382,7 +382,7 @@ class TestSgmCostAggregation {
 		int idxLrPrev = alg.lengthD*pathI;
 
 		// Compute the cost using this algorithm
-		alg.computeCostInnerD(costXD,idxCost,idxLrPrev, rangeD, workCostLr);
+		alg.computeCostInnerD(costXD.data,idxCost,idxLrPrev, rangeD, workCostLr);
 		alg.computeCostBorderD(idxCost,idxLrPrev,0,costXD, rangeD, workCostLr);
 		alg.computeCostBorderD(idxCost,idxLrPrev,rangeD-1,costXD, rangeD, workCostLr);
 

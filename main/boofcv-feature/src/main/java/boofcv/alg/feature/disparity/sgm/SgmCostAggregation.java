@@ -65,7 +65,7 @@ public class SgmCostAggregation {
 	// Lr(y,x,d) = Lr.getBand(y).get(d,x)
 
 	// TODO compute forward then reverse. In forward save read cost. In reverse add results to local cache before
-	//      adding to aggregated
+	//      adding to aggregated. This could reduce cache misses
 	protected SgmHelper helper = new SgmHelper();
 
 	// Contains aggregated cost. The image is being used to store a tensor.
@@ -272,7 +272,7 @@ public class SgmCostAggregation {
 			int idxLrPrev = (i-1)*lengthD;
 
 			// Score the inner portion of disparity first to avoid bounds checks
-			computeCostInnerD(costXD, idxCost, idxLrPrev, localRangeD, workCostLr);
+			computeCostInnerD(costXD.data, idxCost, idxLrPrev, localRangeD, workCostLr);
 
 			// Now handle the borders at d=0 and d=N-1
 			computeCostBorderD(idxCost,idxLrPrev,0,costXD, localRangeD, workCostLr);
@@ -323,18 +323,30 @@ public class SgmCostAggregation {
 	 *
 	 * @param idxLrPrev index of work at the previous location in the path, i.e. Lr(p-r,0)
 	 */
-	void computeCostInnerD(GrayU16 costXD, int idxCost, int idxLrPrev, int lengthLocalD , short[] workCostLr) {
-		idxLrPrev += 1; // start at d=1
-		for (int d = 1; d < lengthLocalD-1; d++, idxLrPrev++) {
-			int cost = costXD.data[idxCost+d] & 0xFFFF; // C(p,d)
+	void computeCostInnerD( final short[] costXD, final int idxCost, int idxLrPrev, final int lengthLocalD , final short[] workCostLr) {
+		final int nextRow  = this.lengthD-1; // idxLrPrev is +1
+		final int penalty1 = this.penalty1;
+		final int penalty2 = this.penalty2;
 
-			int b = workCostLr[idxLrPrev-1]&0xFFFF; // Lr(p-r,d-1)
-			int a = workCostLr[idxLrPrev  ]&0xFFFF; // Lr(p-r,d  )
-			int c = workCostLr[idxLrPrev+1]&0xFFFF; // Lr(p-r,d+1)
+		idxLrPrev += 1; // start at d=1
+
+		// initialize the sampling at d=1. elements will be exchanged inside the loop
+		int c1 = workCostLr[idxLrPrev-1]&0xFFFF;  // Lr(p-r,d-1)
+		int c2 = workCostLr[idxLrPrev  ]&0xFFFF;  // Lr(p-r,d  )
+		idxLrPrev += 1; // avoid extra addition later on
+
+		for (int d = 1; d < lengthLocalD-1; d++, idxLrPrev++) {
+			int cost = costXD[idxCost+d] & 0xFFFF; // C(p,d)
+
+			int c0=c1; // workCostLr[idxLrPrev-1]&0xFFFF; // Lr(p-r,d-1)
+			c1=c2;     // workCostLr[idxLrPrev  ]&0xFFFF; // Lr(p-r,d  )
+			           // workCostLr[idxLrPrev+1]&0xFFFF; // Lr(p-r,d+1)
+			c2 = workCostLr[idxLrPrev]&0xFFFF;            // Lr(p-r,d+1)
 
 			// Add penalty terms
-			b += penalty1;
-			c += penalty1;
+			int a = c1;
+			int b = c0 + penalty1;
+			int c = c2 + penalty1;
 
 			// Find the minimum of the three scores
 			if( b < a )
@@ -348,7 +360,7 @@ public class SgmCostAggregation {
 //				throw new RuntimeException("Overflowed!");
 
 			// minCostPrev is done to reduce the rate at which the cost increases
-			workCostLr[idxLrPrev+this.lengthD] = (short)(cost + a);
+			workCostLr[idxLrPrev+nextRow] = (short)(cost + a);
 			// Lr(p,d) = above
 		}
 	}
