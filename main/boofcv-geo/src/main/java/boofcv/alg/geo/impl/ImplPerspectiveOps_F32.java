@@ -186,7 +186,7 @@ public class ImplPerspectiveOps_F32 {
 	}
 
 
-	public static Point2D_F32 renderPixel( Se3_F32 worldToCamera , FMatrixRMaj K , Point3D_F32 X ) {
+	public static Point2D_F32 renderPixel(Se3_F32 worldToCamera, FMatrixRMaj K, Point3D_F32 X, @Nullable Point2D_F32 pixel) {
 		Point3D_F32 X_cam = new Point3D_F32();
 
 		SePointOps_F32.transform(worldToCamera, X, X_cam);
@@ -195,18 +195,22 @@ public class ImplPerspectiveOps_F32 {
 		if( X_cam.z <= 0 )
 			return null;
 
-		Point2D_F32 norm = new Point2D_F32(X_cam.x/X_cam.z,X_cam.y/X_cam.z);
+		if( pixel == null )
+			pixel = new Point2D_F32();
+
+		pixel.set(X_cam.x/X_cam.z,X_cam.y/X_cam.z);
 
 		if( K == null )
-			return norm;
+			return pixel;
 
 		// convert into pixel coordinates
-		return GeometryMath_F32.mult(K, norm, norm);
+		return GeometryMath_F32.mult(K, pixel, pixel);
 	}
 
 	public static Point2D_F32 renderPixel(Se3_F32 worldToCamera,
 										  float fx, float skew, float cx, float fy, float cy,
-										  Point3D_F32 X) {
+										  Point3D_F32 X, @Nullable Point2D_F32 pixel) {
+
 		Point3D_F32 X_cam = new Point3D_F32();
 
 		SePointOps_F32.transform(worldToCamera, X, X_cam);
@@ -215,10 +219,12 @@ public class ImplPerspectiveOps_F32 {
 		if( X_cam.z <= 0 )
 			return null;
 
+		if( pixel == null )
+			pixel = new Point2D_F32();
+
 		float xx = X_cam.x/X_cam.z;
 		float yy = X_cam.y/X_cam.z;
 
-		Point2D_F32 pixel = new Point2D_F32();
 		pixel.x = fx*xx + skew*yy + cx;
 		pixel.y = fy*yy + cy;
 

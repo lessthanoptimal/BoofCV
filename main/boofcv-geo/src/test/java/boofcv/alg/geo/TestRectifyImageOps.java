@@ -24,6 +24,7 @@ import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageDimension;
 import georegression.geometry.GeometryMath_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
@@ -63,15 +64,41 @@ public class TestRectifyImageOps {
 		FMatrixRMaj rect2 = CommonOps_FDRM.identity(3);
 		FMatrixRMaj rectK = PerspectiveOps.pinholeToMatrix(param, (FMatrixRMaj)null);
 
-		RectifyImageOps.fullViewLeft(param,rect1,rect2,rectK);
+		RectifyImageOps.fullViewLeft(param,null,rect1,rect2,rectK,null);
 
 		// check left image
 		Point2Transform2_F32 tran = RectifyImageOps.transformPixelToRect(param, rect1);
-		checkInside(tran);
+		checkInside(tran,width,height);
 		// the right view is not checked since it is not part of the contract
 	}
 
-	private void checkInside(Point2Transform2_F32 tran) {
+	/**
+	 * After the camera matrix has been adjusted and a forward rectification transform has been applied
+	 * the output image will be shrink and contained inside the output image.
+	 */
+	@Test
+	public void fullViewLeft_calibrated_rotated() {
+		CameraPinholeBrown param =
+				new CameraPinholeBrown().fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
+
+		// flip x and y
+		FMatrixRMaj rectRot = new FMatrixRMaj(new float[][]{{0,1,0},{1,0,0},{0,0,1}});
+		// do nothing rectification
+		FMatrixRMaj rect1 = CommonOps_FDRM.identity(3);
+		FMatrixRMaj rect2 = CommonOps_FDRM.identity(3);
+		FMatrixRMaj rectK = PerspectiveOps.pinholeToMatrix(param, (FMatrixRMaj)null);
+
+		ImageDimension dimension = new ImageDimension();
+		RectifyImageOps.fullViewLeft(param,rectRot,rect1,rect2,rectK,dimension);
+		assertEquals(width,dimension.height);
+		assertEquals(height,dimension.width);
+
+		// check left image
+		Point2Transform2_F32 tran = RectifyImageOps.transformPixelToRect(param, rect1);
+		checkInside(tran,dimension.width,dimension.height);
+	}
+
+	private void checkInside(Point2Transform2_F32 tran, int width, int height) {
 		for( int y = 0; y < height; y++ ) {
 			checkInside(0,y,tran);
 			checkInside(width-1,y,tran);
@@ -83,7 +110,7 @@ public class TestRectifyImageOps {
 		}
 	}
 
-	private void checkInside(Point2Transform2_F64 tran) {
+	private void checkInside(Point2Transform2_F64 tran, int width , int height) {
 		for( int y = 0; y < height; y++ ) {
 			checkInside(0,y,tran);
 			checkInside(width-1,y,tran);
@@ -126,11 +153,11 @@ public class TestRectifyImageOps {
 		FMatrixRMaj rect2 = CommonOps_FDRM.identity(3);
 		FMatrixRMaj rectK = PerspectiveOps.pinholeToMatrix(param, (FMatrixRMaj)null);
 
-		RectifyImageOps.allInsideLeft(param, rect1, rect2, rectK);
+		RectifyImageOps.allInsideLeft(param, null, rect1, rect2, rectK, null);
 
 		// check left image
 		Point2Transform2_F32 tran = RectifyImageOps.transformRectToPixel(param, rect1);
-		checkInside(tran);
+		checkInside(tran,width,height);
 		// the right view is not checked since it is not part of the contract
 	}
 
@@ -145,11 +172,11 @@ public class TestRectifyImageOps {
 		DMatrixRMaj rect2 = CommonOps_DDRM.identity(3);
 		DMatrixRMaj rectK = PerspectiveOps.pinholeToMatrix(param, (DMatrixRMaj)null);
 
-		RectifyImageOps.allInsideLeft(param, rect1, rect2, rectK);
+		RectifyImageOps.allInsideLeft(param, null, rect1, rect2, rectK, null);
 
 		// check left image
 		Point2Transform2_F64 tran = RectifyImageOps.transformRectToPixel(param, rect1);
-		checkInside(tran);
+		checkInside(tran,width,height);
 		// the right view is not checked since it is not part of the contract
 	}
 
@@ -163,7 +190,31 @@ public class TestRectifyImageOps {
 
 		// check left image
 		PointTransformHomography_F32 tran = new PointTransformHomography_F32(rect1);
-		checkInside(tran);
+		checkInside(tran,width,height);
+		// the right view is not checked since it is not part of the contract
+	}
+
+	@Test
+	public void allInsideLeft_calibrated_rotated_F64() {
+
+		CameraPinholeBrown param = new CameraPinholeBrown().
+				fsetK(300, 320, 0, 150, 130, width, height).fsetRadial(0.1,1e-4);
+
+		// flip x and y
+		DMatrixRMaj rectRot = new DMatrixRMaj(new double[][]{{0,1,0},{1,0,0},{0,0,1}});
+		// do nothing rectification
+		DMatrixRMaj rect1 = CommonOps_DDRM.identity(3);
+		DMatrixRMaj rect2 = CommonOps_DDRM.identity(3);
+		DMatrixRMaj rectK = PerspectiveOps.pinholeToMatrix(param, (DMatrixRMaj)null);
+
+		ImageDimension dimension = new ImageDimension();
+		RectifyImageOps.allInsideLeft(param, rectRot, rect1, rect2, rectK, dimension);
+		assertEquals(width,dimension.height);
+		assertEquals(height,dimension.width);
+
+		// check left image
+		Point2Transform2_F64 tran = RectifyImageOps.transformRectToPixel(param, rect1);
+		checkInside(tran,width,height);
 		// the right view is not checked since it is not part of the contract
 	}
 
@@ -179,7 +230,7 @@ public class TestRectifyImageOps {
 		FMatrixRMaj inv = new FMatrixRMaj(3,3);
 		CommonOps_FDRM.invert(rect1, inv);
 		PointTransformHomography_F32 tran = new PointTransformHomography_F32(inv);
-		checkInside(tran);
+		checkInside(tran,width,height);
 		// the right view is not checked since it is not part of the contract
 	}
 

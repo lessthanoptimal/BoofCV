@@ -231,6 +231,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		rectifyAlg.process(K1, new Se3_F64(), K2, leftToRight);
 
 		// rectification matrix for each image
+		DMatrixRMaj rectRot = rectifyAlg.getRectifiedRotation();
 		DMatrixRMaj rect1 = rectifyAlg.getRect1();
 		DMatrixRMaj rect2 = rectifyAlg.getRect2();
 		rectifiedR.set(rectifyAlg.getRectifiedRotation());
@@ -239,7 +240,14 @@ public class ExampleStereoTwoViewsOneCamera {
 		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
 
 		// Adjust the rectification to make the view area more useful
-		RectifyImageOps.fullViewLeft(intrinsicLeft, rect1, rect2, rectifiedK);
+		ImageDimension rectShape = new ImageDimension();
+		RectifyImageOps.fullViewLeft(intrinsicLeft, rectRot, rect1, rect2, rectifiedK, rectShape);
+//		RectifyImageOps.allInsideLeft(intrinsicLeft, rectR, rect1, rect2, rectifiedK, rectShape);
+		// Taking in account the relative rotation between the image axis and the baseline is important in
+		// this scenario since a person can easily hold the camera at an odd angle. If you don't adjust
+		// the rectified image size you might end up with a lot of wasted pixels and a low resolution model!
+		rectifiedLeft.reshape(rectShape.width,rectShape.height);
+		rectifiedRight.reshape(rectShape.width,rectShape.height);
 
 		// undistorted and rectify images
 		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3);

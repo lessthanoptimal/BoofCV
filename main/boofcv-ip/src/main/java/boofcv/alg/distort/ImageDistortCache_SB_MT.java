@@ -95,7 +95,7 @@ public class ImageDistortCache_SB_MT<Input extends ImageGray<Input>,Output exten
 	}
 
 	@Override
-	public void renderAll() {
+	protected void renderAll() {
 		BoofConcurrency.loopBlocks(y0,y1,(y0, y1)->{
 			BlockDistort b = pop();
 			b.applyAll(y0,y1);
@@ -104,7 +104,7 @@ public class ImageDistortCache_SB_MT<Input extends ImageGray<Input>,Output exten
 	}
 
 	@Override
-	public void renderAll( GrayU8 mask ) {
+	protected void renderAll( GrayU8 mask ) {
 		BoofConcurrency.loopBlocks(y0,y1,(y0,y1)->{
 			BlockDistort b = pop();
 			b.applyAll(y0,y1,mask);
@@ -114,7 +114,7 @@ public class ImageDistortCache_SB_MT<Input extends ImageGray<Input>,Output exten
 	}
 
 	@Override
-	public void applyOnlyInside() {
+	protected void applyOnlyInside() {
 		BoofConcurrency.loopBlocks(y0,y1,(y0,y1)->{
 			BlockDistort b = pop();
 			b.applyOnlyInside(y0,y1);
@@ -123,7 +123,7 @@ public class ImageDistortCache_SB_MT<Input extends ImageGray<Input>,Output exten
 	}
 
 	@Override
-	public void applyOnlyInside( GrayU8 mask ) {
+	protected void applyOnlyInside( GrayU8 mask ) {
 		BoofConcurrency.loopBlocks(y0,y1,(y0,y1)->{
 			BlockDistort b = pop();
 			b.applyOnlyInside(y0,y1,mask);

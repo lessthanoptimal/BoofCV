@@ -148,7 +148,7 @@ public class ExampleStereoDisparity {
 		DMatrixRMaj rectK = rectifyAlg.getCalibrationMatrix();
 
 		// Adjust the rectification to make the view area more useful
-		RectifyImageOps.allInsideLeft(param.left, rect1, rect2, rectK);
+		RectifyImageOps.allInsideLeft(param.left, null, rect1, rect2, rectK, null);
 
 		// undistorted and rectify images
 		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3);

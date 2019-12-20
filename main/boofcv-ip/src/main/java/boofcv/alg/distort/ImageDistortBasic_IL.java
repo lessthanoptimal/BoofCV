@@ -36,7 +36,7 @@ public class ImageDistortBasic_IL
 	AssignPixelValue_MB<Output> assigner;
 
 	// storage for interpolated pixel values
-	float values[] = new float[0];
+	float[] values = new float[0];
 
 	Point2D_F32 distorted = new Point2D_F32();
 

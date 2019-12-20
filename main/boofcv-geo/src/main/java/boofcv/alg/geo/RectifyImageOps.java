@@ -39,6 +39,8 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_FDRM;
 
+import javax.annotation.Nullable;
+
 /**
  * <p>
  * Operations related to rectifying stereo image pairs. Provides functions for 1) creating rectification calculation
@@ -96,8 +98,9 @@ public class RectifyImageOps {
 
 	/**
 	 * <p>
-	 * Adjust the rectification such that the entire original left image can be seen.  For use with
-	 * calibrated stereo images having a known baseline.  Due to lens distortions it is possible for large parts of the
+	 * Adjust the rectification such that the entire original left image can be seen and adjusts the shape
+	 * of the rectified image to maximize it's area. For use with calibrated stereo images having a known baseline.
+	 * Due to lens distortions it is possible for large parts of the
 	 * rectified image to have no overlap with the original and will appear to be black.  This can cause
 	 * issues when processing the image
 	 * </p>
@@ -108,16 +111,20 @@ public class RectifyImageOps {
 	 * </p>
 	 *
 	 * @param paramLeft Intrinsic parameters for left camera. Not modified.
+	 * @param rectifiedR (Optional) Rectification rotation matrix.  Input. Can be null.
 	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
+	 * @param rectifiedSize (Optional) Size that the rectified images should be changed to. Modified.
 	 */
-	// TODO Delete this function?  It should reasonably fill the old view in most non-pathological cases
 	public static void fullViewLeft(CameraPinholeBrown paramLeft,
-									DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
-									DMatrixRMaj rectifyK)
+									@Nullable DMatrixRMaj rectifiedR, DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
+									DMatrixRMaj rectifyK, @Nullable ImageDimension rectifiedSize)
 	{
-		ImplRectifyImageOps_F64.fullViewLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK);
+		if( rectifiedSize == null )
+			rectifiedSize = new ImageDimension();
+
+		ImplRectifyImageOps_F64.fullViewLeft(paramLeft,rectifiedR, rectifyLeft, rectifyRight, rectifyK,rectifiedSize);
 	}
 
 	/**
@@ -134,16 +141,20 @@ public class RectifyImageOps {
 	 * </p>
 	 *
 	 * @param paramLeft Intrinsic parameters for left camera. Not modified.
+	 * @param rectifiedR (Optional) Rectification rotation matrix.  Input. Can be null.
 	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
+	 * @param rectifiedSize (Optional) Size that the rectified images should be changed to. Modified.
 	 */
-	// TODO Delete this function?  It should reasonably fill the old view in most non-pathological cases
 	public static void fullViewLeft(CameraPinholeBrown paramLeft,
-									FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
-									FMatrixRMaj rectifyK)
+									@Nullable FMatrixRMaj rectifiedR, FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
+									FMatrixRMaj rectifyK, @Nullable ImageDimension rectifiedSize)
 	{
-		ImplRectifyImageOps_F32.fullViewLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK);
+		if( rectifiedSize == null )
+			rectifiedSize = new ImageDimension();
+
+		ImplRectifyImageOps_F32.fullViewLeft(paramLeft,rectifiedR, rectifyLeft, rectifyRight, rectifyK,rectifiedSize);
 	}
 
 	/**
@@ -199,15 +210,22 @@ public class RectifyImageOps {
 	 * </p>
 	 *
 	 * @param paramLeft Intrinsic parameters for left camera. Not modified.
+	 * @param rectifiedR (Optional) Rectification rotation matrix.  Input. Can be null.
 	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
+	 * @param rectifiedSize (Optional) Size that the rectified images should be changed to. Modified.
 	 */
 	public static void allInsideLeft(CameraPinholeBrown paramLeft,
+									 @Nullable DMatrixRMaj rectifiedR,
 									 DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
-									 DMatrixRMaj rectifyK)
+									 DMatrixRMaj rectifyK,
+									 @Nullable ImageDimension rectifiedSize)
 	{
-		ImplRectifyImageOps_F64.allInsideLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK);
+		if( rectifiedSize == null )
+			rectifiedSize = new ImageDimension();
+
+		ImplRectifyImageOps_F64.allInsideLeft(paramLeft, rectifiedR, rectifyLeft, rectifyRight, rectifyK, rectifiedSize);
 	}
 
 	/**
@@ -224,10 +242,14 @@ public class RectifyImageOps {
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 */
 	public static void allInsideLeft(CameraPinholeBrown paramLeft,
+									 @Nullable FMatrixRMaj rectifiedR,
 									 FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
-									 FMatrixRMaj rectifyK)
+									 FMatrixRMaj rectifyK,
+									 @Nullable ImageDimension rectifiedSize)
 	{
-		ImplRectifyImageOps_F32.allInsideLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK);
+		if( rectifiedSize == null )
+			rectifiedSize = new ImageDimension();
+		ImplRectifyImageOps_F32.allInsideLeft(paramLeft, rectifiedR, rectifyLeft, rectifyRight, rectifyK, rectifiedSize);
 	}
 
 	/**

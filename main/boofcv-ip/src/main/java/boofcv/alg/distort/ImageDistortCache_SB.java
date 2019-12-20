@@ -87,6 +87,7 @@ public class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends 
 	@Override
 	public void apply(Input srcImg, Output dstImg, GrayU8 mask) {
 		init(srcImg, dstImg);
+		mask.reshape(dstImg);
 
 		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
 
@@ -146,6 +147,7 @@ public class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends 
 			}
 		}
 	}
+
 
 	protected void renderAll( GrayU8 mask ) {
 		float maxWidth = srcImg.getWidth()-1;

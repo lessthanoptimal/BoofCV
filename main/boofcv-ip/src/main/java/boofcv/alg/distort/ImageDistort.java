@@ -56,7 +56,7 @@ public interface ImageDistort<Input extends ImageBase,Output extends ImageBase> 
 	 *
 	 * @param srcImg Input image. Not modified.
 	 * @param dstImg Output image. Modified.
-	 * @param mask Mask. Modified.
+	 * @param mask Mask. Automatically resized to match dstImg. Modified.
 	 */
 	void apply( Input srcImg , Output dstImg , GrayU8 mask );
 
@@ -76,7 +76,7 @@ public interface ImageDistort<Input extends ImageBase,Output extends ImageBase> 
 	 * Specifies if the entire output image should be rendered, even if mapping to the source image is outside
 	 * the source image.
 	 *
-	 * @param renderAll true to render all pixels or false only ones inside the source image
+	 * @param renderAll true to render all pixels. If false then only pixels inside the source image
 	 */
 	void setRenderAll( boolean renderAll );
 

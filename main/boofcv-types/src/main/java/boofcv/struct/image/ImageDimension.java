@@ -38,4 +38,12 @@ public class ImageDimension {
 		this.width = width;
 		this.height = height;
 	}
+
+	@Override
+	public String toString() {
+		return "ImageDimension{" +
+				"width=" + width +
+				", height=" + height +
+				'}';
+	}
 }

@@ -113,9 +113,9 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 
 		// add different types of adjustments
 		addRectified("No Adjustment", rect1,rect2);
-		RectifyImageOps.allInsideLeft(param.left, rect1, rect2, rectK);
+		RectifyImageOps.allInsideLeft(param.left, null, rect1, rect2, rectK, null);
 		addRectified("All Inside", rect1,rect2);
-		RectifyImageOps.fullViewLeft(param.left, rect1, rect2, rectK);
+		RectifyImageOps.fullViewLeft(param.left, null, rect1, rect2, rectK, null);
 		addRectified("Full View", rect1,rect2);
 
 		hasProcessed = true;

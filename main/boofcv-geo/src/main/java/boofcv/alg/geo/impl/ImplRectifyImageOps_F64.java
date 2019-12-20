@@ -26,11 +26,14 @@ import boofcv.alg.distort.pinhole.PinholePtoN_F64;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.distort.SequencePoint2Transform2_F64;
+import boofcv.struct.image.ImageDimension;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.RectangleLength2D_F64;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
+
+import javax.annotation.Nullable;
 
 import static boofcv.factory.distort.LensDistortionFactory.narrow;
 
@@ -44,9 +47,11 @@ import static boofcv.factory.distort.LensDistortionFactory.narrow;
 public class ImplRectifyImageOps_F64 {
 
 	public static void fullViewLeft(CameraPinholeBrown paramLeft,
-									DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
-									DMatrixRMaj rectifyK)
+									@Nullable DMatrixRMaj rectifiedR, DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
+									DMatrixRMaj rectifyK, ImageDimension rectifiedSize)
 	{
+		computeRectifiedSize(paramLeft, rectifiedR, rectifiedSize);
+
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new CameraPinholeBrown(paramLeft);
 
@@ -56,8 +61,8 @@ public class ImplRectifyImageOps_F64 {
 		RectangleLength2D_F64 bound = DistortImageOps.boundBox_F64(paramLeft.width, paramLeft.height,
 				new PointToPixelTransform_F64(tranLeft),work);
 
-		double scaleX = paramLeft.width/bound.width;
-		double scaleY = paramLeft.height/bound.height;
+		double scaleX = rectifiedSize.width/bound.width;
+		double scaleY = rectifiedSize.height/bound.height;
 
 		double scale = Math.min(scaleX, scaleY);
 
@@ -82,9 +87,12 @@ public class ImplRectifyImageOps_F64 {
 	}
 
 	public static void allInsideLeft(CameraPinholeBrown paramLeft,
+									 @Nullable DMatrixRMaj rectifiedR,
 									 DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
-									 DMatrixRMaj rectifyK)
+									 DMatrixRMaj rectifyK, ImageDimension rectifiedSize)
 	{
+		computeRectifiedSize(paramLeft, rectifiedR, rectifiedSize);
+
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new CameraPinholeBrown(paramLeft);
 
@@ -96,12 +104,29 @@ public class ImplRectifyImageOps_F64 {
 
 		LensDistortionOps_F64.roundInside(bound);
 
-		double scaleX = paramLeft.width/(double)bound.width;
-		double scaleY = paramLeft.height/(double)bound.height;
+		double scaleX = rectifiedSize.width/(double)bound.width;
+		double scaleY = rectifiedSize.height/(double)bound.height;
 
 		double scale = Math.max(scaleX, scaleY);
 
 		adjustCalibrated(rectifyLeft, rectifyRight, rectifyK, bound, scale);
+	}
+
+	private static void computeRectifiedSize(CameraPinholeBrown paramLeft, @Nullable DMatrixRMaj rectifiedR, ImageDimension rectifiedSize) {
+		if (rectifiedR != null) {
+			// The image axis and baseline might not be aligned. In that case you will want to rotate the rectified
+			// image to maximize the number of pixels rendered inside of it
+			double theta = Math.atan2(rectifiedR.get(1, 0), rectifiedR.get(0, 0));
+			double c = Math.cos(theta);
+			double s = Math.sin(theta);
+			int w = paramLeft.width;
+			int h = paramLeft.height;
+			rectifiedSize.width = (int) Math.round(Math.abs(c * w + s * h));
+			rectifiedSize.height = (int) Math.round(Math.abs(-s * w + c * h));
+		} else {
+			rectifiedSize.width = paramLeft.width;
+			rectifiedSize.height = paramLeft.height;
+		}
 	}
 
 	public static void allInsideLeft( int imageWidth,int imageHeight,

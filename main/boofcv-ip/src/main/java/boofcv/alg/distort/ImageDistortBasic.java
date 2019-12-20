@@ -76,6 +76,7 @@ public abstract class ImageDistortBasic
 	@Override
 	public void apply(Input srcImg, Output dstImg, GrayU8 mask ) {
 		init(srcImg, dstImg);
+		mask.reshape(dstImg);
 
 		x0 = 0;y0 = 0;x1 = dstImg.width;y1 = dstImg.height;
 

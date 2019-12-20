@@ -98,7 +98,7 @@ public class ExampleRectifyCalibratedStereo {
 		DMatrixRMaj rectK = rectifyAlg.getCalibrationMatrix();
 
 		// Adjust the rectification to make the view area more useful
-		RectifyImageOps.fullViewLeft(param.left, rect1, rect2, rectK);
+		RectifyImageOps.fullViewLeft(param.left, null, rect1, rect2, rectK, null);
 //		RectifyImageOps.allInsideLeft(param.left, leftHanded, rect1, rect2, rectK);
 
 		// undistorted and rectify images

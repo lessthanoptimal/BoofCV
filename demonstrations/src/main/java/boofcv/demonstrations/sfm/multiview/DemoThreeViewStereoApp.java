@@ -80,6 +80,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class DemoThreeViewStereoApp extends DemonstrationBase {
 	public static final String KEY_PREVIOUS_DIRECTORY = "PreviousDirectory";
 
@@ -140,7 +141,6 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		// remove some unused items from the menu bar. This app is an exception
 		JMenu fileMenu = menuBar.getMenu(0);
-		fileMenu.remove(1);
 		fileMenu.remove(1);
 
 		detDesc = FactoryDetectDescribe.surfStable( new ConfigFastHessian(
@@ -287,6 +287,14 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		gui.repaint();
 		// this way if you press a key it manipulates the view the user just opened
 		gui.getComponent(0).requestFocus();
+	}
+
+	@Override
+	public void reprocessInput() {
+		controls.scaleChanged = true;
+		controls.assocChanged = true;
+		controls.stereoChanged = true;
+		super.reprocessInput();
 	}
 
 	/**
@@ -502,6 +510,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 				if( _automaticChangeViews )
 					controls.setViews(1);
 			});
+		} else {
+			SwingUtilities.invokeLater(()-> controls.addText("Skipping Associate\n"));
 		}
 
 		if( !skipStructure ) {
@@ -534,6 +544,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 				controls.addText(String.format("SBA Obs %4d Pts %d\n",numObs,numPoints));
 				controls.addText(String.format("SBA fit score %.3f\n",score));
 			});
+		} else {
+			SwingUtilities.invokeLater(() -> controls.addText("Skipping Structure\n"));
 		}
 
 		// Pick the two best views to compute stereo from
@@ -579,6 +591,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			rectifyImages(color1, color2, leftToRight, intrinsic01, intrinsic02,
 					rectColor1, rectColor2, rectMask, rectifiedK, rectifiedR);
 
+			SwingUtilities.invokeLater(() -> controls.addText("Rectified Image: "+rectColor1.width+" x "+rectColor1.height+"\n"));
+
 			visualRect1 = ConvertBufferedImage.checkDeclare(
 					rectColor1.width, rectColor1.height, visualRect1, visualRect1.getType());
 			visualRect2 = ConvertBufferedImage.checkDeclare(
@@ -590,6 +604,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 				if( _automaticChangeViews )
 					controls.setViews(2);
 			});
+		} else {
+			SwingUtilities.invokeLater(() -> controls.addText("Skipping Rectify\n"));
 		}
 
 		if (rectifiedK.get(0, 0) < 0) {
@@ -705,8 +721,10 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		// New calibration matrix,
 		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
 
-		// Adjust the rectification to make the view area more useful
-		RectifyImageOps.fullViewLeft(intrinsic1, rect1, rect2, rectifiedK);
+		// Maximize the view of the left image and adjust the size of the rectified image
+		ImageDimension rectifiedShape = new ImageDimension();
+		RectifyImageOps.fullViewLeft(intrinsic1, rectifiedR, rect1, rect2, rectifiedK,rectifiedShape);
+//		RectifyImageOps.allInsideLeft(intrinsic1, rectifiedR, rect1, rect2, rectifiedK,rectifiedShape);
 
 		// undistorted and rectify images
 		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3);
@@ -719,9 +737,9 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		ImageDistort<C,C> distortRight =
 				RectifyImageOps.rectifyImage(intrinsic2, rect2_F32, BorderType.EXTENDED, distorted2.getImageType());
 
-		rectifiedMask.reshape(distorted1);
-		rectified1.reshape(distorted1.width,distorted1.height);
-		rectified2.reshape(distorted1.width,distorted1.height);
+		rectifiedMask.reshape(rectifiedShape.width,rectifiedShape.height);
+		rectified1.reshape(rectifiedShape.width,rectifiedShape.height);
+		rectified2.reshape(rectifiedShape.width,rectifiedShape.height);
 
 		distortLeft.apply(distorted1, rectified1, rectifiedMask);
 		distortRight.apply(distorted2, rectified2);

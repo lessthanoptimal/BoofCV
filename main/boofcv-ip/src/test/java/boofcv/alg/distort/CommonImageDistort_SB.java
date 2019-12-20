@@ -104,6 +104,26 @@ public abstract class CommonImageDistort_SB {
 		assertEquals(9*14,alg.getTotal());
 	}
 
+	/**
+	 * Makes sure the mask is resized to match the input image
+	 */
+	@Test
+	public void resize_mask_fit_dst() {
+		GrayF32 src = new GrayF32(10,15);
+		ImageMiscOps.fillUniform(src,rand,0,2);
+		GrayF32 dst = new GrayF32(14,18);
+		GrayU8 mask = new GrayU8(1,1);
+
+		ImageDistort alg = createAlg(interp);
+
+		offX=offY=2;
+		alg.setModel(tran);
+		alg.apply(src,dst,mask);
+
+		assertEquals(dst.width,mask.width);
+		assertEquals(dst.height,mask.height);
+	}
+
 	@Test
 	public void renderAll_mask() {
 		checkMask(true);
