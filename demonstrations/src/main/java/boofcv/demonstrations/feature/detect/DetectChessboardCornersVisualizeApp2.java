@@ -73,7 +73,7 @@ public class DetectChessboardCornersVisualizeApp2
 
 	GrayF32 logIntensity = new GrayF32(1,1);
 
-	DetectChessboardCorners2Pyramid<GrayF32> detector = new DetectChessboardCorners2Pyramid<>(GrayF32.class);
+	DetectChessboardCorners2Pyramid<GrayF32> detector = new DetectChessboardCorners2Pyramid<>(ImageType.SB_F32);
 
 	// used to compute feature intensity
 	final Object lockAlgorithm = new Object();

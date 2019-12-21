@@ -157,8 +157,12 @@ public class DetectCalibrationChessboardApp
 								text += String.format("  levelMax %d\n",best.levelMax);
 								text += String.format("  intensity %f\n",best.intensity);
 								text += String.format("  orientation %.2f (deg)\n", UtilAngle.degree(best.orientation));
+							} else {
+								text += String.format("  pixel (%7.1f , %7.1f )\n",p.x,p.y);
 							}
 						}
+					} else {
+						text += String.format("  pixel (%7.1f , %7.1f )\n",p.x,p.y);
 					}
 					controlPanel.setInfoText(text);
 				}

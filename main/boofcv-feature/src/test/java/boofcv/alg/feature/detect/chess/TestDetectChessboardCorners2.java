@@ -18,36 +18,31 @@
 
 package boofcv.alg.feature.detect.chess;
 
-import boofcv.alg.misc.GImageMiscOps;
-import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
-class TestSaddlePointXCorner {
+class TestDetectChessboardCorners2 {
 	@Test
-	void basic() {
-		GrayF32 input = new GrayF32(100,100);
-		GImageMiscOps.fillRectangle(input,255,0,0,50,50);
-		GImageMiscOps.fillRectangle(input,255,50,50,50,50);
+	void checkPositiveInside() {
+		fail("Implement");
+	}
 
-		SaddlePointXCorner alg = new SaddlePointXCorner();
-		alg.setImage(input);
-		alg.setRadius(8);
+	@Test
+	void checkNegativeInside() {
+		fail("Implement");
+	}
 
-		for (int dy = -2; dy <= 2; dy++) {
-			for (int dx = -2; dx <= 2; dx++) {
-				dx = dy = 2;
-//				System.out.println("dx = "+dx+" dy = "+dy);
-				assertTrue(alg.process(50+dx,50+dy));
+	@Test
+	void checkChessboardCircle() {
+		fail("Implement");
+	}
 
-				assertEquals(50,alg.getSaddleX(), 0.8);
-				assertEquals(50,alg.getSaddleY(), 0.8);
-			}
-		}
+	@Test
+	void computeFeatures() {
+		fail("Implement");
 	}
 }

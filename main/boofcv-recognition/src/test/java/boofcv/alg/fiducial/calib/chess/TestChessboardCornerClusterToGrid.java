@@ -66,15 +66,47 @@ class TestChessboardCornerClusterToGrid
 		}
 	}
 
+	/**
+	 * The input will be a rectangle, but with an extra corner that should be removed
+	 */
+	@Test
+	void convert_extra() {
+		ChessboardCornerClusterToGrid alg = new ChessboardCornerClusterToGrid();
+		alg.setRequireCornerSquares(true);
+
+		ChessboardCornerGraph graph = new ChessboardCornerGraph();
+		graph.corners = createGrid(4,5, true);
+		// add an extra node to the graph
+		Node n = graph.corners.get(graph.corners.size-1);
+		Node extra = graph.corners.grow();
+		extra.orientation = n.orientation*-1;
+		extra.x = n.x+30;
+		extra.y = n.y;
+		extra.index = graph.corners.size-1;
+		n.edges[0] = extra;
+		extra.edges[2] = n;
+
+		// See if it gets removed
+		GridInfo info = new GridInfo();
+		assertTrue(alg.convert(graph,info));
+		assertTrue(info.hasCornerSquare);
+
+		assertEquals(5, info.cols);
+		assertEquals(4, info.rows);
+		assertEquals(5*4, info.nodes.size());
+	}
+
 	void convert(ChessboardCornerClusterToGrid alg, int rows , int cols , boolean randomized ) {
 		ChessboardCornerGraph graph = new ChessboardCornerGraph();
 		graph.corners = createGrid(rows,cols, true);
 
 		if( randomized ) {
-			for (int i = 0; i < graph.corners.size; i++) {
-				shuffle(graph.corners.get(i).edges);
-			}
 			graph.corners.shuffle(rand);
+			for (int i = 0; i < graph.corners.size; i++) {
+				Node n = graph.corners.get(i);
+				shuffle(n.edges);
+				n.index = graph.corners.indexOf(n);
+			}
 		}
 
 		GridInfo info = new GridInfo();

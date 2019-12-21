@@ -19,8 +19,10 @@
 package boofcv.alg.feature.detect.chess;
 
 import boofcv.alg.filter.misc.AverageDownSampleOps;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.ImageNormalization;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
@@ -40,13 +42,18 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 	// minimum number of pixels in the top most level in the pyramid
 	// If <= 0 then have a single layer at full resolution
 	int pyramidTopSize = 100;
-	// List of layers in the pyramid
-	List<T> pyramid = new ArrayList<>();
 
+	// Input image with normalized pixel values
+	GrayF32 normalized = new GrayF32(1,1);
+
+	// List of layers in the pyramid
+	List<GrayF32> pyramid = new ArrayList<>();
+
+	// search radius when checking to see if the same feature has been detected at multiple scales
 	int radius = 7;
 
 	// Corner detector
-	DetectChessboardCorners2<T> detector;
+	DetectChessboardCorners2 detector;
 
 	// Detection results for each layer in the pyramid
 	FastQueue<PyramidLevel> featureLevels = new FastQueue<>(PyramidLevel.class, PyramidLevel::new);
@@ -59,12 +66,15 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 	NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
 	FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData.class,true);
 
-	public DetectChessboardCorners2Pyramid(DetectChessboardCorners2<T> detector) {
+	ImageType<T> imageType;
+
+	public DetectChessboardCorners2Pyramid(DetectChessboardCorners2 detector, ImageType<T> imageType) {
 		this.detector = detector;
+		this.imageType = imageType;
 	}
 
-	public DetectChessboardCorners2Pyramid(Class<T> imageType ) {
-		this( new DetectChessboardCorners2<>(imageType));
+	public DetectChessboardCorners2Pyramid(ImageType<T> imageType) {
+		this( new DetectChessboardCorners2(),imageType);
 	}
 
 	/**
@@ -145,7 +155,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 				}
 			}
 		}
-		System.out.println("Found Pyramid "+corners.size+" dropped "+dropped);
+//		System.out.println("Found Pyramid "+corners.size+" dropped "+dropped);
 	}
 
 	void markSeenAsFalse(FastQueue<ChessboardCorner> corners0 , FastQueue<ChessboardCorner> corners1, double scale ) {
@@ -209,10 +219,11 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 	 * add blur or aliasing.
 	 */
 	void constructPyramid(T input) {
+		ImageNormalization.zeroMeanMaxOne(input,normalized,null);
 		if( pyramid.size() == 0 ){
-			pyramid.add(input);
+			pyramid.add(normalized);
 		} else {
-			pyramid.set(0,input);
+			pyramid.set(0,normalized);
 		}
 
 		// make sure the top most layer in the pyramid isn't too small
@@ -228,9 +239,9 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 			int height = input.height/divisor;
 			if( pyramidTopSize == 0 || width < pyramidTopSize || height < pyramidTopSize)
 				break;
-			T level;
+			GrayF32 level;
 			if( pyramid.size() <= levelIndex ) {
-				level = (T)GeneralizedImageOps.createSingleBand(detector.imageType,width,height);
+				level = new GrayF32(width,height);
 				pyramid.add(level);
 			} else {
 				level = pyramid.get(levelIndex);
@@ -251,7 +262,7 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 		FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner.class,true);
 	}
 
-	public DetectChessboardCorners2<T>  getDetector() {
+	public DetectChessboardCorners2  getDetector() {
 		return detector;
 	}
 
@@ -269,5 +280,9 @@ public class DetectChessboardCorners2Pyramid<T extends ImageGray<T>> {
 
 	public void setPyramidTopSize(int pyramidTopSize) {
 		this.pyramidTopSize = pyramidTopSize;
+	}
+
+	public ImageType<T> getImageType() {
+		return imageType;
 	}
 }

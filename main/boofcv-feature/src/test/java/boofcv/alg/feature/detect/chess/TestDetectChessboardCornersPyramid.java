@@ -18,68 +18,21 @@
 
 package boofcv.alg.feature.detect.chess;
 
-import boofcv.abst.distort.FDistort;
-import boofcv.alg.filter.blur.BlurImageOps;
-import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.struct.image.GrayF32;
-import georegression.metric.UtilAngle;
-import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TestDetectChessboardCornersPyramid extends CommonChessboardCorners {
+class TestDetectChessboardCornersPyramid extends GenericChessboardCornersChecks {
 
-	/**
-	 * Test everything together with perfect input, but rotate the chessboard
-	 */
-	@Test
-	void process_rotate() {
-		// make it bigger so that being a pyramid matters
-		this.w = 50;
-
-		RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(p,1);
-		renderer.chessboard(rows,cols,w);
-
-		GrayF32 original = renderer.getGrayF32();
-		GrayF32 rotated = original.createSameShape();
-
+	@Override
+	public List<ChessboardCorner> process(GrayF32 image) {
 		DetectChessboardCornersPyramid<GrayF32,GrayF32> alg = new DetectChessboardCornersPyramid<>(GrayF32.class);
 		alg.setPyramidTopSize(50);
-
-		for (int i = 0; i < 10; i++) {
-			angle = i*Math.PI/10;
-			new FDistort(original,rotated).rotate(angle).apply();
-			alg.process(rotated);
-			checkSolution(rotated, alg);
-		}
-	}
-
-	/**
-	 * Apply heavy blurring to the input image so that the bottom most layer won't reliably detect corners
-	 */
-	@Test
-	void process_blurred() {
-		// make it bigger so that being a pyramid matters
-		this.w = 50;
-
-		RenderCalibrationTargetsGraphics2D renderer = new RenderCalibrationTargetsGraphics2D(p,1);
-		renderer.chessboard(rows,cols,w);
-
-		GrayF32 original = renderer.getGrayF32();
-		GrayF32 blurred = original.createSameShape();
-
-		DetectChessboardCornersPyramid<GrayF32,GrayF32> alg = new DetectChessboardCornersPyramid<>(GrayF32.class);
-		alg.setPyramidTopSize(50);
-
-		// mean blur messes it up much more than gaussian. This won't work if no pyramid
-		BlurImageOps.mean(original,blurred,5,null,null);
-
-		alg.process(blurred);
-		checkSolution(blurred, alg);
+		alg.process(image);
+		return alg.getCorners().toList();
 	}
 
 	@Test
@@ -103,35 +56,6 @@ class TestDetectChessboardCornersPyramid extends CommonChessboardCorners {
 			assertEquals(500/divisor,alg.pyramid.get(level).width);
 			assertEquals(400/divisor,alg.pyramid.get(level).height);
 			divisor *= 2;
-		}
-	}
-
-	private void checkSolution( GrayF32 input, DetectChessboardCornersPyramid<GrayF32, GrayF32> alg) {
-//		System.out.println("------- ENTER");
-
-		alg.process(input);
-		FastQueue<ChessboardCorner> found = alg.getCorners();
-		List<ChessboardCorner> expected = createExpected(rows,cols, input.width, input.height);
-
-		assertEquals(expected.size(),found.size);
-
-//		for (int i = 0; i < found.size; i++) {
-//			found.get(i).print();
-//		}
-//		System.out.println("-------");
-
-		for( ChessboardCorner c : expected ) {
-			int matches = 0;
-			for (int i = 0; i < found.size; i++) {
-				ChessboardCorner f = found.get(i);
-				if( f.distance(c) < 1.5 ) {
-					matches++;
-					assertEquals(0.0,UtilAngle.distHalf(c.orientation,f.orientation), 0.2);
-					assertTrue(f.intensity>0);
-				}
-			}
-//			c.print();
-			assertEquals(1,matches);
 		}
 	}
 }

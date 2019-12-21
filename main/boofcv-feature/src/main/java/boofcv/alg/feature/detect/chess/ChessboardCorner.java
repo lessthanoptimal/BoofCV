@@ -32,9 +32,10 @@ public class ChessboardCorner extends Point2D_F64 {
 	public double orientation;
 	/**
 	 * Used to judge how good of a fit the corner is to an ideal chessboard corner. Higher the value
-	 * the more x-corner like
+	 * the more x-corner like. Computed on a per-feature basis and should be more accurate than
+	 * the x-corner detector intensity.
 	 */
-	public double intensity; // TODO clarify the two intensities
+	public double intensity;
 
 	/**
 	 * The white region subtracted the black region at the chessboard corner. Can be used later on
@@ -42,9 +43,14 @@ public class ChessboardCorner extends Point2D_F64 {
 	 */
 	public double constrast;
 
-	public double intensityXCorner;
-
+	/**
+	 * Value of smallest Eigen value in edge detector
+	 */
 	public double edgeIntensity;
+
+	/**
+	 * Ratio of smallest and largest Eigen values in edge detector
+	 */
 	public double edgeRatio;
 
 	/**
@@ -59,17 +65,15 @@ public class ChessboardCorner extends Point2D_F64 {
 	/**
 	 * Internal book keeping. if true then this indicates that this is the first corner seen in this level
 	 */
-	public boolean first; // TODO prune? use levels as a flag instead
-	public ChessboardCorner parent;
+	public boolean first;
 
 	public void reset() {
+		super.set(-1,-1);
 		orientation = Double.NaN;
 		intensity = Double.NaN;
-		intensityXCorner = Double.NaN;
 		edgeIntensity = -1;
 		edgeRatio = -1;
 		constrast = 0;
-		parent = null;
 		first = false;
 		level1 = level2 = levelMax = -1;
 	}

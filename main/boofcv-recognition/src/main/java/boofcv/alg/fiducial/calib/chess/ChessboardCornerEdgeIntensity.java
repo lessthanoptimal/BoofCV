@@ -76,12 +76,6 @@ public class ChessboardCornerEdgeIntensity<T extends ImageGray<T>> {
 	 * @return the line intensity. more positive more intense. Units = pixels intensity
 	 */
 	public float process(ChessboardCorner ca, ChessboardCorner cb, double direction_a_to_b) {
-//		boolean meow = false;
-//		if( ca.distance(200,369) < 1.5 && cb.distance(198,358) < 2)
-//			meow = true;
-//		if( cb.distance(200,369) < 1.5 && ca.distance(198,358) < 2)
-//			meow = true;
-
 		float cx = (float)ca.x;
 		float cy = (float)ca.y;
 		float dx = (float)(cb.x-ca.x);

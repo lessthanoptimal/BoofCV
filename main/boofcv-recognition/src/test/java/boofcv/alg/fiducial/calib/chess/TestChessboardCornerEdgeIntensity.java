@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.calib.chess;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.gui.RenderCalibrationTargetsGraphics2D;
 import boofcv.struct.image.GrayU8;
+import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,18 +56,18 @@ class TestChessboardCornerEdgeIntensity {
 		double found1 = alg.process(a11,a21,Math.PI/2.0);
 		double found2 = alg.process(a21,a22,0);
 
-		assertEquals(255,found0);
-		assertEquals(255,found1);
-		assertEquals(255,found2);
+		assertEquals(255,found0, UtilEjml.TEST_F32);
+		assertEquals(255,found1, UtilEjml.TEST_F32);
+		assertEquals(255,found2, UtilEjml.TEST_F32);
 
 		// same results in the other direction
 		found0 = alg.process(a12,a11,Math.PI);
 		found1 = alg.process(a21,a11,-Math.PI/2.0);
 		found2 = alg.process(a22,a21,Math.PI);
 
-		assertEquals(255,found0);
-		assertEquals(255,found1);
-		assertEquals(255,found2);
+		assertEquals(255,found0, UtilEjml.TEST_F32);
+		assertEquals(255,found1, UtilEjml.TEST_F32);
+		assertEquals(255,found2, UtilEjml.TEST_F32);
 	}
 
 	private static ChessboardCorner create( double x , double y , double yaw ) {

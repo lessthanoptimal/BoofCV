@@ -28,9 +28,10 @@ import java.io.PrintStream;
 import java.util.*;
 
 /**
- * Given a chessboard corner cluster find the grid which it matches. The grid will be in "standard order". Depending
- * on the chessboard pattern there might be multiple multiple configurations that are in standard order or a unique
- * ordering.
+ * Given a chessboard corner cluster find the grid which it matches. A grid is an ordering of corners in a specific
+ * order and such that their edges are consistent and form a 4-neighborhood. The grid will be in "standard order".
+ * Depending on the chessboard pattern there might be multiple multiple configurations that are in standard order
+ * or a unique ordering.
  *
  * On a grid a "Corner" is defined as a corner point which has a black square attached to it which is not attached
  * to any more corner points. These are useful in that they allow orientation to be uniquely defined under certain
@@ -43,19 +44,26 @@ import java.util.*;
  * each other follows the (i+2)%4 relationship. If multiple corners can be (0,0) then the one closest to
  * the top left corner will be selected.
  *
- * TODO update this and unit test
+ * The largest rectangular grid is returned. The idea being that it's not uncommon for there to be noise
+ * which adds an extra stray element. This will remove those stray elements.
  *
  * @author Peter Abeles
  */
 public class ChessboardCornerClusterToGrid {
+	// used to put edge into CW order
 	QuickSort_F64 sorter = new QuickSort_F64();
 	double[] directions = new double[4];
 	int[] order = new int[4];
 	Node[] tmpEdges = new Node[4];
+
+	// Indicates which corners have been added to the sparse grd
 	GrowQueue_B marked = new GrowQueue_B();
 	Queue<Node> open = new LinkedList<>(); // FIFO queue
 
+	// Workspace for isCornerValidOrigin
 	List<Node> edgeList = new ArrayList<>();
+
+	// Storage for finding corners in a grid
 	List<Node> cornerList = new ArrayList<>();
 
 	// See documentation above. if true then the requirement that the (0,0) grid element be a corner is removed.
@@ -89,12 +97,14 @@ public class ChessboardCornerClusterToGrid {
 		if( !orderEdges(cluster) )
 			return false;
 
+		// Find the grid which defines a chessboard pattern
 		if(!createSparseGrid(cluster.corners) )
 			return false;
 		sparseToDense();
 		if( !findLargestRectangle(info)) {
 			return false;
 		}
+		// Put grid elements into a specific order
 		// select a valid corner to be (0,0). If there are multiple options select the one which is
 		int corner = selectCorner(info);
 		if( corner == -1 ) {
@@ -109,6 +119,10 @@ public class ChessboardCornerClusterToGrid {
 		return true;
 	}
 
+	/**
+	 * Creates a grid where a sparse data structure is used to define it. The shape and which elements
+	 * are filled in are not known initially. This is used as an intermediate step to building the dense grid
+	 */
 	boolean createSparseGrid(FastQueue<Node> corners) {
 		marked.resize(corners.size);
 		marked.fill(false);
@@ -192,6 +206,9 @@ public class ChessboardCornerClusterToGrid {
 		return true;
 	}
 
+	/**
+	 * Converts the sparse into a dense grid
+	 */
 	void sparseToDense() {
 		int N = sparseCols*sparseRows;
 		if( denseGrid.length < N )
@@ -204,6 +221,9 @@ public class ChessboardCornerClusterToGrid {
 		}
 	}
 
+	/**
+	 * Finds the largest complete rectangle with no holes in it.
+	 */
 	boolean findLargestRectangle( GridInfo info ) {
 		int row0 = 0;
 		int row1 = sparseRows;

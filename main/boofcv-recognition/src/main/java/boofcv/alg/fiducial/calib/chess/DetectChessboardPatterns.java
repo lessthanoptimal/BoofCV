@@ -23,6 +23,7 @@ import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
 import boofcv.alg.feature.detect.chess.DetectChessboardCorners2Pyramid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -40,7 +41,7 @@ public class DetectChessboardPatterns<T extends ImageGray<T>> {
 
 	public DetectChessboardPatterns(ConfigChessboard config , Class<T> imageType ) {
 
-		detector = new DetectChessboardCorners2Pyramid<>(imageType);
+		detector = new DetectChessboardCorners2Pyramid<>(ImageType.single(imageType));
 		clusterFinder = new ChessboardCornerClusterFinder<>(imageType);
 
 		// the user is unlikely to set this value correctly
