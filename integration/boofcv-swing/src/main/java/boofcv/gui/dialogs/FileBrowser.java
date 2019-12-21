@@ -359,14 +359,14 @@ public class FileBrowser extends JSpringPanel {
 		public int compare(File a, File b) {
 			if( a.isDirectory() ) {
 				if( b.isDirectory() ) {
-					return a.getName().compareTo(b.getName());
+					return a.getName().compareToIgnoreCase(b.getName());
 				} else {
 					return -1;
 				}
 			} else if( b.isDirectory() ) {
 				return 1;
 			} else {
-				return a.getName().compareTo(b.getName());
+				return a.getName().compareToIgnoreCase(b.getName());
 			}
 		}
 	}
