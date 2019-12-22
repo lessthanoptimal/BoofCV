@@ -38,7 +38,7 @@ public class ImageNormalization {
 	 */
 	public static void apply(ImageGray input, NormalizeParameters parameter, ImageGray output) {
 		GPixelMath.plus(input,parameter.offset,output);
-		GPixelMath.divide(output,parameter.divisor,output);
+		GPixelMath.multiply(output,1.0f/parameter.divisor,output);
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class ImageNormalization {
 		// Numerical errors is a concern and if you sum up the input it could overflow
 		double scale = GImageStatistics.maxAbs(input);
 		if( scale != 0.0 ) {
-			GPixelMath.divide(input, scale, output);
+			GPixelMath.multiply(input, 1.0f/scale, output);
 			// Work with this scaled image
 			double mean = GImageStatistics.mean(output);
 			GPixelMath.minus(output, mean, output);
@@ -66,7 +66,7 @@ public class ImageNormalization {
 				scale2 = mean < 0.5 ? 1.0 - mean : mean;
 			}
 			if( scale2 != 0.0 )
-				GPixelMath.divide(output, scale2, output);
+				GPixelMath.multiply(output, 1.0f/scale2, output);
 			else
 				scale2 = 1.0;
 
@@ -97,13 +97,13 @@ public class ImageNormalization {
 		// avoid overflow
 		double scale = GImageStatistics.maxAbs(input);
 		if( scale != 0.0 ) {
-			GPixelMath.divide(input, scale, output);
+			GPixelMath.multiply(input, 1.0f/scale, output);
 			double mean = GImageStatistics.mean(output);
 			double stdev = Math.sqrt(GImageStatistics.variance(output,mean));
 
 			GPixelMath.minus(output,mean,output);
 			if( stdev != 0.0 ) {
-				GPixelMath.divide(output,stdev,output);
+				GPixelMath.multiply(output,1.0f/stdev,output);
 			} else {
 				stdev = 1.0;
 			}

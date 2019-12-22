@@ -26,6 +26,7 @@ import boofcv.io.image.ConvertRaster;
 import boofcv.struct.image.*;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferInt;
 import java.awt.image.WritableRaster;
 
@@ -307,9 +308,36 @@ public class VisualizeImageData {
 	}
 
 	private static void colorizeSign(GrayF32 src, BufferedImage dst, float maxAbsValue) {
+		DataBuffer buffer = dst.getRaster().getDataBuffer();
+		if( buffer.getDataType() == DataBuffer.TYPE_INT ) {
+			colorizeSign(src,(DataBufferInt)buffer,maxAbsValue);
+		} else {
+			for (int y = 0; y < src.height; y++) {
+				for (int x = 0; x < src.width; x++) {
+					float v = src.get(x, y);
+
+					int rgb;
+					if (v > 0) {
+						rgb = (int) (255 * v / maxAbsValue) << 16;
+					} else {
+						rgb = (int) (-255 * v / maxAbsValue) << 8;
+					}
+					dst.setRGB(x, y, rgb);
+				}
+			}
+		}
+	}
+
+	private static void colorizeSign(GrayF32 src, DataBufferInt buffer, float maxAbsValue) {
+		final float[] srcData = src.data;
+		final int[] dstData = buffer.getData();
+
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0, src.height, y -> {
 		for (int y = 0; y < src.height; y++) {
+			int indexSrc = src.startIndex + y * src.stride;
+			int indexDst = y * src.width;
 			for (int x = 0; x < src.width; x++) {
-				float v = src.get(x, y);
+				float v = srcData[indexSrc++];
 
 				int rgb;
 				if (v > 0) {
@@ -317,9 +345,10 @@ public class VisualizeImageData {
 				} else {
 					rgb = (int) (-255 * v / maxAbsValue) << 8;
 				}
-				dst.setRGB(x, y, rgb);
+				dstData[indexDst++] = 0xFF << 24 | rgb;
 			}
 		}
+		//CONCURRENT_ABOVE });
 	}
 
 	public static BufferedImage graySign(GrayF32 src, BufferedImage dst, float maxAbsValue) {
