@@ -92,6 +92,7 @@ public abstract class GrayI<T extends GrayI<T>> extends ImageGray<T> {
 		return ImageDataType.I;
 	}
 
+	@Override
 	public void print() {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {

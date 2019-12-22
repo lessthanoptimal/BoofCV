@@ -280,7 +280,7 @@ public class AutocodeConcurrentApp {
 		String[] directories = new String[]{
 //				"main/boofcv-ip/src/main/java/boofcv/alg/filter/derivative/impl/",
 //				"main/boofcv-ip/src/main/java/boofcv/alg/filter/blur/impl/",
-//				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/",
+				"main/boofcv-ip/src/main/java/boofcv/alg/filter/convolve/noborder/",
 //				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary/impl",
 //				"main/boofcv-ip/src/main/java/boofcv/alg/filter/binary",
 //				"main/boofcv-ip/src/main/java/boofcv/alg/filter/misc/",
@@ -291,7 +291,7 @@ public class AutocodeConcurrentApp {
 //				"main/boofcv-ip/src/main/java/boofcv/core/encoding/impl",
 //				"main/boofcv-ip/src/main/java/boofcv/alg/transform/ii/impl/",
 //				"main/boofcv-ip/src/main/java/boofcv/alg/transform/pyramid/impl/",
-				"main/boofcv-ip/src/main/java/boofcv/alg/transform/census/impl/",
+//				"main/boofcv-ip/src/main/java/boofcv/alg/transform/census/impl/",
 //				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/edge/impl",
 //				"main/boofcv-feature/src/main/java/boofcv/alg/feature/detect/intensity/impl",
 //				"main/boofcv-feature/src/main/java/boofcv/alg/feature/associate",

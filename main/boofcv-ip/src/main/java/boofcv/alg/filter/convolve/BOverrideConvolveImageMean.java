@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,29 +35,29 @@ public class BOverrideConvolveImageMean extends BOverrideClass {
 	public static Vertical vertical;
 
 	public interface Horizontal {
-		void horizontal(ImageBase input, ImageBase output, int radius);
+		void horizontal(ImageBase input, ImageBase output, int offset, int length);
 	}
 
 	public interface Vertical {
-		void vertical(ImageBase input, ImageBase output, int radius);
+		void vertical(ImageBase input, ImageBase output, int offset, int length);
 	}
 
-	public static boolean invokeNativeHorizontal(ImageBase input, ImageBase output, int radius) {
+	public static boolean invokeNativeHorizontal(ImageBase input, ImageBase output, int offset, int length) {
 		boolean processed = false;
 		if( BOverrideConvolveImageMean.horizontal != null ) {
 			try {
-				BOverrideConvolveImageMean.horizontal.horizontal(input,output,radius);
+				BOverrideConvolveImageMean.horizontal.horizontal(input,output,offset,length);
 				processed = true;
 			} catch( RuntimeException ignore ) {}
 		}
 		return processed;
 	}
 
-	public static boolean invokeNativeVertical(ImageBase input, ImageBase output, int radius) {
+	public static boolean invokeNativeVertical(ImageBase input, ImageBase output, int offset, int length) {
 		boolean processed = false;
 		if( BOverrideConvolveImageMean.vertical != null ) {
 			try {
-				BOverrideConvolveImageMean.vertical.vertical(input,output,radius);
+				BOverrideConvolveImageMean.vertical.vertical(input,output,offset,length);
 				processed = true;
 			} catch( RuntimeException ignore ) {}
 		}

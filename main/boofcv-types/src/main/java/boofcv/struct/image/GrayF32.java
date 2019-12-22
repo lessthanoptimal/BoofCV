@@ -81,6 +81,7 @@ public class GrayF32 extends GrayF<GrayF32> {
 		data[getIndex(x, y)] = value;
 	}
 
+	@Override
 	public void print() {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {

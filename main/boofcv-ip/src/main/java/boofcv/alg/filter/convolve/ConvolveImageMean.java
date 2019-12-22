@@ -58,23 +58,24 @@ public class ConvolveImageMean {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 */
-	public static void horizontal(GrayU8 input, GrayI8 output, int radius) {
+	public static void horizontal(GrayU8 input, GrayI8 output, int offset, int length) {
 		output.reshape(input);
 
-		if( BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, radius) )
+		if( BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length) )
 			return;
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		if (kernel.width > input.width) {
 			ConvolveImageNormalized.horizontal(kernel, input, output);
 		} else {
 			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, radius);
+				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
-				ImplConvolveMean.horizontal(input, output, radius);
+				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
 	}
@@ -84,24 +85,25 @@ public class ConvolveImageMean {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayU8 input, GrayI8 output, int radius, @Nullable IWorkArrays work) {
+	public static void vertical(GrayU8 input, GrayI8 output, int offset, int length, @Nullable IWorkArrays work) {
 		output.reshape(input);
 
-		if( BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius) )
+		if( BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length) )
 			return;
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		if (kernel.width > input.height) {
 			ConvolveImageNormalized.vertical(kernel, input, output);
 		} else {
 			ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, radius,work);
+				ImplConvolveMean_MT.vertical(input, output, offset, length, work);
 			} else {
-				ImplConvolveMean.vertical(input, output, radius,work);
+				ImplConvolveMean.vertical(input, output, offset, length, work);
 			}
 		}
 	}
@@ -111,19 +113,20 @@ public class ConvolveImageMean {
 	 *
 	 * @param binput Input image with a border wrapper. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 */
-	public static void horizontal(GrayU8 input, GrayI8 output, int radius , ImageBorder_S32<GrayU8> binput) {
+	public static void horizontal(GrayU8 input, GrayI8 output, int offset, int length, ImageBorder_S32<GrayU8> binput) {
 		output.reshape(input.width,output.height);
 		binput.setImage(input);
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		ConvolveJustBorder_General_SB.horizontal(kernel, binput, output, kernel.computeSum());
 		if (kernel.width <= input.width) {
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, radius);
+				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
-				ImplConvolveMean.horizontal(input, output, radius);
+				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
 	}
@@ -133,20 +136,21 @@ public class ConvolveImageMean {
 	 *
 	 * @param binput Input image with a border wrapper. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayU8 input, GrayI8 output, int radius, ImageBorder_S32<GrayU8> binput, @Nullable IWorkArrays work) {
+	public static void vertical(GrayU8 input, GrayI8 output, int offset, int length, ImageBorder_S32<GrayU8> binput, @Nullable IWorkArrays work) {
 		output.reshape(input);
 		binput.setImage(input);
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		ConvolveJustBorder_General_SB.vertical(kernel, binput, output, kernel.computeSum());
 		if (kernel.width <= input.height) {
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, radius,work);
+				ImplConvolveMean_MT.vertical(input, output, offset, length, work);
 			} else {
-				ImplConvolveMean.vertical(input, output, radius,work);
+				ImplConvolveMean.vertical(input, output, offset, length, work);
 			}
 		}
 	}
@@ -156,23 +160,24 @@ public class ConvolveImageMean {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 */
-	public static void horizontal(GrayS16 input, GrayI16 output, int radius) {
+	public static void horizontal(GrayS16 input, GrayI16 output, int offset, int length) {
 		output.reshape(input);
 
-		if( BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, radius) )
+		if( BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length) )
 			return;
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		if (kernel.width > input.width) {
 			ConvolveImageNormalized.horizontal(kernel, input, output);
 		} else {
 			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, radius);
+				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
-				ImplConvolveMean.horizontal(input, output, radius);
+				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
 	}
@@ -182,24 +187,25 @@ public class ConvolveImageMean {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayS16 input, GrayI16 output, int radius, @Nullable IWorkArrays work) {
+	public static void vertical(GrayS16 input, GrayI16 output, int offset, int length, @Nullable IWorkArrays work) {
 		output.reshape(input);
 
-		if( BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius) )
+		if( BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length) )
 			return;
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		if (kernel.width > input.height) {
 			ConvolveImageNormalized.vertical(kernel, input, output);
 		} else {
 			ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, radius,work);
+				ImplConvolveMean_MT.vertical(input, output, offset, length, work);
 			} else {
-				ImplConvolveMean.vertical(input, output, radius,work);
+				ImplConvolveMean.vertical(input, output, offset, length, work);
 			}
 		}
 	}
@@ -209,19 +215,20 @@ public class ConvolveImageMean {
 	 *
 	 * @param binput Input image with a border wrapper. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 */
-	public static void horizontal(GrayS16 input, GrayI16 output, int radius , ImageBorder_S32<GrayS16> binput) {
+	public static void horizontal(GrayS16 input, GrayI16 output, int offset, int length, ImageBorder_S32<GrayS16> binput) {
 		output.reshape(input.width,output.height);
 		binput.setImage(input);
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		ConvolveJustBorder_General_SB.horizontal(kernel, binput, output, kernel.computeSum());
 		if (kernel.width <= input.width) {
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, radius);
+				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
-				ImplConvolveMean.horizontal(input, output, radius);
+				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
 	}
@@ -231,20 +238,21 @@ public class ConvolveImageMean {
 	 *
 	 * @param binput Input image with a border wrapper. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayS16 input, GrayI16 output, int radius, ImageBorder_S32<GrayS16> binput, @Nullable IWorkArrays work) {
+	public static void vertical(GrayS16 input, GrayI16 output, int offset, int length, ImageBorder_S32<GrayS16> binput, @Nullable IWorkArrays work) {
 		output.reshape(input);
 		binput.setImage(input);
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		ConvolveJustBorder_General_SB.vertical(kernel, binput, output, kernel.computeSum());
 		if (kernel.width <= input.height) {
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, radius,work);
+				ImplConvolveMean_MT.vertical(input, output, offset, length, work);
 			} else {
-				ImplConvolveMean.vertical(input, output, radius,work);
+				ImplConvolveMean.vertical(input, output, offset, length, work);
 			}
 		}
 	}
@@ -254,23 +262,24 @@ public class ConvolveImageMean {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 */
-	public static void horizontal(GrayU16 input, GrayI16 output, int radius) {
+	public static void horizontal(GrayU16 input, GrayI16 output, int offset, int length) {
 		output.reshape(input);
 
-		if( BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, radius) )
+		if( BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length) )
 			return;
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		if (kernel.width > input.width) {
 			ConvolveImageNormalized.horizontal(kernel, input, output);
 		} else {
 			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, radius);
+				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
-				ImplConvolveMean.horizontal(input, output, radius);
+				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
 	}
@@ -280,24 +289,25 @@ public class ConvolveImageMean {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayU16 input, GrayI16 output, int radius, @Nullable IWorkArrays work) {
+	public static void vertical(GrayU16 input, GrayI16 output, int offset, int length, @Nullable IWorkArrays work) {
 		output.reshape(input);
 
-		if( BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius) )
+		if( BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length) )
 			return;
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		if (kernel.width > input.height) {
 			ConvolveImageNormalized.vertical(kernel, input, output);
 		} else {
 			ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, radius,work);
+				ImplConvolveMean_MT.vertical(input, output, offset, length, work);
 			} else {
-				ImplConvolveMean.vertical(input, output, radius,work);
+				ImplConvolveMean.vertical(input, output, offset, length, work);
 			}
 		}
 	}
@@ -307,19 +317,20 @@ public class ConvolveImageMean {
 	 *
 	 * @param binput Input image with a border wrapper. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 */
-	public static void horizontal(GrayU16 input, GrayI16 output, int radius , ImageBorder_S32<GrayU16> binput) {
+	public static void horizontal(GrayU16 input, GrayI16 output, int offset, int length, ImageBorder_S32<GrayU16> binput) {
 		output.reshape(input.width,output.height);
 		binput.setImage(input);
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		ConvolveJustBorder_General_SB.horizontal(kernel, binput, output, kernel.computeSum());
 		if (kernel.width <= input.width) {
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, radius);
+				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
-				ImplConvolveMean.horizontal(input, output, radius);
+				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
 	}
@@ -329,20 +340,21 @@ public class ConvolveImageMean {
 	 *
 	 * @param binput Input image with a border wrapper. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayU16 input, GrayI16 output, int radius, ImageBorder_S32<GrayU16> binput, @Nullable IWorkArrays work) {
+	public static void vertical(GrayU16 input, GrayI16 output, int offset, int length, ImageBorder_S32<GrayU16> binput, @Nullable IWorkArrays work) {
 		output.reshape(input);
 		binput.setImage(input);
 
-		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(radius);
+		Kernel1D_S32 kernel = FactoryKernel.table1D_S32(offset, length);
 		ConvolveJustBorder_General_SB.vertical(kernel, binput, output, kernel.computeSum());
 		if (kernel.width <= input.height) {
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, radius,work);
+				ImplConvolveMean_MT.vertical(input, output, offset, length, work);
 			} else {
-				ImplConvolveMean.vertical(input, output, radius,work);
+				ImplConvolveMean.vertical(input, output, offset, length, work);
 			}
 		}
 	}
@@ -352,23 +364,24 @@ public class ConvolveImageMean {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 */
-	public static void horizontal(GrayF32 input, GrayF32 output, int radius) {
+	public static void horizontal(GrayF32 input, GrayF32 output, int offset, int length) {
 		output.reshape(input);
 
-		if( BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, radius) )
+		if( BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length) )
 			return;
 
-		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius , true);
+		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(offset, length , true);
 		if (kernel.width > input.width) {
 			ConvolveImageNormalized.horizontal(kernel, input, output);
 		} else {
 			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, radius);
+				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
-				ImplConvolveMean.horizontal(input, output, radius);
+				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
 	}
@@ -378,24 +391,25 @@ public class ConvolveImageMean {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayF32 input, GrayF32 output, int radius, @Nullable FWorkArrays work) {
+	public static void vertical(GrayF32 input, GrayF32 output, int offset, int length, @Nullable FWorkArrays work) {
 		output.reshape(input);
 
-		if( BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius) )
+		if( BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length) )
 			return;
 
-		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius , true);
+		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(offset, length , true);
 		if (kernel.width > input.height) {
 			ConvolveImageNormalized.vertical(kernel, input, output);
 		} else {
 			ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, radius,work);
+				ImplConvolveMean_MT.vertical(input, output, offset, length, work);
 			} else {
-				ImplConvolveMean.vertical(input, output, radius,work);
+				ImplConvolveMean.vertical(input, output, offset, length, work);
 			}
 		}
 	}
@@ -405,19 +419,20 @@ public class ConvolveImageMean {
 	 *
 	 * @param binput Input image with a border wrapper. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 */
-	public static void horizontal(GrayF32 input, GrayF32 output, int radius , ImageBorder_F32 binput) {
+	public static void horizontal(GrayF32 input, GrayF32 output, int offset, int length, ImageBorder_F32 binput) {
 		output.reshape(input.width,output.height);
 		binput.setImage(input);
 
-		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius , true);
+		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(offset, length , true);
 		ConvolveJustBorder_General_SB.horizontal(kernel, binput, output);
 		if (kernel.width <= input.width) {
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, radius);
+				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
-				ImplConvolveMean.horizontal(input, output, radius);
+				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
 	}
@@ -427,20 +442,21 @@ public class ConvolveImageMean {
 	 *
 	 * @param binput Input image with a border wrapper. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayF32 input, GrayF32 output, int radius, ImageBorder_F32 binput, @Nullable FWorkArrays work) {
+	public static void vertical(GrayF32 input, GrayF32 output, int offset, int length, ImageBorder_F32 binput, @Nullable FWorkArrays work) {
 		output.reshape(input);
 		binput.setImage(input);
 
-		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(radius , true);
+		Kernel1D_F32 kernel = FactoryKernel.table1D_F32(offset, length , true);
 		ConvolveJustBorder_General_SB.vertical(kernel, binput, output);
 		if (kernel.width <= input.height) {
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, radius,work);
+				ImplConvolveMean_MT.vertical(input, output, offset, length, work);
 			} else {
-				ImplConvolveMean.vertical(input, output, radius,work);
+				ImplConvolveMean.vertical(input, output, offset, length, work);
 			}
 		}
 	}
@@ -450,23 +466,24 @@ public class ConvolveImageMean {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 */
-	public static void horizontal(GrayF64 input, GrayF64 output, int radius) {
+	public static void horizontal(GrayF64 input, GrayF64 output, int offset, int length) {
 		output.reshape(input);
 
-		if( BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, radius) )
+		if( BOverrideConvolveImageMean.invokeNativeHorizontal(input, output, offset, length) )
 			return;
 
-		Kernel1D_F64 kernel = FactoryKernel.table1D_F64(radius , true);
+		Kernel1D_F64 kernel = FactoryKernel.table1D_F64(offset, length , true);
 		if (kernel.width > input.width) {
 			ConvolveImageNormalized.horizontal(kernel, input, output);
 		} else {
 			ConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, radius);
+				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
-				ImplConvolveMean.horizontal(input, output, radius);
+				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
 	}
@@ -476,24 +493,25 @@ public class ConvolveImageMean {
 	 *
 	 * @param input The input image. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayF64 input, GrayF64 output, int radius, @Nullable DWorkArrays work) {
+	public static void vertical(GrayF64 input, GrayF64 output, int offset, int length, @Nullable DWorkArrays work) {
 		output.reshape(input);
 
-		if( BOverrideConvolveImageMean.invokeNativeVertical(input, output, radius) )
+		if( BOverrideConvolveImageMean.invokeNativeVertical(input, output, offset, length) )
 			return;
 
-		Kernel1D_F64 kernel = FactoryKernel.table1D_F64(radius , true);
+		Kernel1D_F64 kernel = FactoryKernel.table1D_F64(offset, length , true);
 		if (kernel.width > input.height) {
 			ConvolveImageNormalized.vertical(kernel, input, output);
 		} else {
 			ConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, radius,work);
+				ImplConvolveMean_MT.vertical(input, output, offset, length, work);
 			} else {
-				ImplConvolveMean.vertical(input, output, radius,work);
+				ImplConvolveMean.vertical(input, output, offset, length, work);
 			}
 		}
 	}
@@ -503,19 +521,20 @@ public class ConvolveImageMean {
 	 *
 	 * @param binput Input image with a border wrapper. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 */
-	public static void horizontal(GrayF64 input, GrayF64 output, int radius , ImageBorder_F64 binput) {
+	public static void horizontal(GrayF64 input, GrayF64 output, int offset, int length, ImageBorder_F64 binput) {
 		output.reshape(input.width,output.height);
 		binput.setImage(input);
 
-		Kernel1D_F64 kernel = FactoryKernel.table1D_F64(radius , true);
+		Kernel1D_F64 kernel = FactoryKernel.table1D_F64(offset, length , true);
 		ConvolveJustBorder_General_SB.horizontal(kernel, binput, output);
 		if (kernel.width <= input.width) {
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.horizontal(input, output, radius);
+				ImplConvolveMean_MT.horizontal(input, output, offset, length);
 			} else {
-				ImplConvolveMean.horizontal(input, output, radius);
+				ImplConvolveMean.horizontal(input, output, offset, length);
 			}
 		}
 	}
@@ -525,20 +544,21 @@ public class ConvolveImageMean {
 	 *
 	 * @param binput Input image with a border wrapper. Not modified.
 	 * @param output Where the resulting image is written to. Modified.
-	 * @param radius Kernel size.
+	 * @param offset Start offset from pixel coordinate
+	 * @param length How long the mean filter is
 	 * @param work (Optional) Storage for work array
 	 */
-	public static void vertical(GrayF64 input, GrayF64 output, int radius, ImageBorder_F64 binput, @Nullable DWorkArrays work) {
+	public static void vertical(GrayF64 input, GrayF64 output, int offset, int length, ImageBorder_F64 binput, @Nullable DWorkArrays work) {
 		output.reshape(input);
 		binput.setImage(input);
 
-		Kernel1D_F64 kernel = FactoryKernel.table1D_F64(radius , true);
+		Kernel1D_F64 kernel = FactoryKernel.table1D_F64(offset, length , true);
 		ConvolveJustBorder_General_SB.vertical(kernel, binput, output);
 		if (kernel.width <= input.height) {
 			if(BoofConcurrency.USE_CONCURRENT) {
-				ImplConvolveMean_MT.vertical(input, output, radius,work);
+				ImplConvolveMean_MT.vertical(input, output, offset, length, work);
 			} else {
-				ImplConvolveMean.vertical(input, output, radius,work);
+				ImplConvolveMean.vertical(input, output, offset, length, work);
 			}
 		}
 	}

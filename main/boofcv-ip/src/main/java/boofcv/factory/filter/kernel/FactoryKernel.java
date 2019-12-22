@@ -136,6 +136,16 @@ public class FactoryKernel {
 		return ret;
 	}
 
+	public static Kernel1D_S32 table1D_S32(int offset, int length) {
+		Kernel1D_S32 ret = new Kernel1D_S32(length, offset);
+
+		for (int i = 0; i < length; i++) {
+			ret.data[i] = 1;
+		}
+
+		return ret;
+	}
+
 	/**
 	 * <p>
 	 * Create an floating point table convolution kernel.  If un-normalized then all
@@ -161,14 +171,34 @@ public class FactoryKernel {
 		return ret;
 	}
 
+	public static Kernel1D_F32 table1D_F32(int offset, int length, boolean normalized) {
+		Kernel1D_F32 ret = new Kernel1D_F32(length,offset);
+
+		float val = normalized ? 1.0f / ret.width : 1.0f;
+
+		for (int i = 0; i < length; i++) {
+			ret.data[i] = val;
+		}
+
+		return ret;
+	}
+
 	public static Kernel1D_F64 table1D_F64(int radius, boolean normalized) {
 		Kernel1D_F64 ret = new Kernel1D_F64(radius * 2 + 1);
 
 		double val = normalized ? 1.0 / ret.width : 1.0;
 
-		for (int i = 0; i < ret.data.length; i++) {
-			ret.data[i] = val;
-		}
+		Arrays.fill(ret.data, val);
+
+		return ret;
+	}
+
+	public static Kernel1D_F64 table1D_F64(int offset, int length, boolean normalized) {
+		Kernel1D_F64 ret = new Kernel1D_F64(length,offset);
+
+		double val = normalized ? 1.0 / ret.width : 1.0;
+
+		Arrays.fill(ret.data, val);
 
 		return ret;
 	}

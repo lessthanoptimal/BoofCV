@@ -48,8 +48,8 @@ public class TestConvolveImageStandard_SB {
 
 	Random rand = new Random(0xFF);
 
-	int width = 4;
-	int height = 5;
+	int width = 6;
+	int height = 7;
 	int kernelWidth = 3;
 	int kernelRadius = kernelWidth/2;
 
@@ -142,6 +142,10 @@ public class TestConvolveImageStandard_SB {
 
 		// even non-symmetric kernel shape
 		ker = FactoryKernel.random(ker.getClass(),2,1,0,maxKernelValue,rand);
+		checkHorizontal(ker, img, dest);
+
+		// even non-symmetric kernel shape
+		ker = FactoryKernel.random(ker.getClass(),4,2,0,maxKernelValue,rand);
 		checkHorizontal(ker, img, dest);
 	}
 

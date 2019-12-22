@@ -22,8 +22,6 @@ import boofcv.generate.AutoTypeImage;
 import boofcv.generate.CodeGeneratorBase;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 /**
  * @author Peter Abeles
@@ -33,10 +31,6 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 
 	AutoTypeImage imageIn;
 	AutoTypeImage imageOut;
-
-	public GenerateImplConvolveMean() throws FileNotFoundException {
-		out = new PrintStream(new FileOutputStream(className + ".java"));
-	}
 
 	@Override
 	public void generate() throws FileNotFoundException {
@@ -57,7 +51,6 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 	}
 
 	public void printPreamble() {
-		autoSelectName();
 		out.print(
 				"import boofcv.struct.image.*;\n" +
 				"import javax.annotation.Generated;\n" +
@@ -89,28 +82,26 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 		String declareHalf = imageIn.isInteger() ? "\t\tfinal " + sumType + " halfDivisor = divisor/2;\n" : "";
 		String divide = imageIn.isInteger() ? "(total+halfDivisor)/divisor" : "total/divisor";
 
-		out.print("\tpublic static void horizontal( " + imageIn.getSingleBandName() + " input , " + imageOut.getSingleBandName() + " output , int radius ) {\n" +
-				"\t\tfinal int kernelWidth = radius*2 + 1;\n" +
-				"\n" +
-				"\t\tfinal " + sumType + " divisor = kernelWidth;\n" +
+		out.print("\tpublic static void horizontal( " + imageIn.getSingleBandName() + " input , " + imageOut.getSingleBandName() + " output , int offset , int length ) {\n" +
+				"\t\tfinal " + sumType + " divisor = length;\n" +
 				declareHalf);
 		String body = "";
 
 		body += "\t\t\tint indexIn = input.startIndex + input.stride*y;\n" +
-				"\t\t\tint indexOut = output.startIndex + output.stride*y + radius;\n" +
+				"\t\t\tint indexOut = output.startIndex + output.stride*y + offset;\n" +
 				"\n" +
 				"\t\t\t" + sumType + " total = 0;\n" +
 				"\n" +
-				"\t\t\tint indexEnd = indexIn + kernelWidth;\n" +
+				"\t\t\tint indexEnd = indexIn + length;\n" +
 				"\t\t\t\n" +
 				"\t\t\tfor( ; indexIn < indexEnd; indexIn++ ) {\n" +
 				"\t\t\t\ttotal += input.data[indexIn] " + bitWise + ";\n" +
 				"\t\t\t}\n" +
 				"\t\t\toutput.data[indexOut++] = " + typeCast + "("+divide+");\n" +
 				"\n" +
-				"\t\t\tindexEnd = indexIn + input.width - kernelWidth;\n" +
+				"\t\t\tindexEnd = indexIn + input.width - length;\n" +
 				"\t\t\tfor( ; indexIn < indexEnd; indexIn++ ) {\n" +
-				"\t\t\t\ttotal -= input.data[ indexIn - kernelWidth ] " + bitWise + ";\n" +
+				"\t\t\t\ttotal -= input.data[ indexIn - length ] " + bitWise + ";\n" +
 				"\t\t\t\ttotal += input.data[ indexIn ] " + bitWise + ";\n" +
 				"\n" +
 				"\t\t\t\toutput.data[indexOut++] = " + typeCast + "("+divide+");\n" +
@@ -131,17 +122,17 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 		String workType = imageIn.getLetterSum()+"WorkArrays";
 
 		out.print("\tpublic static void vertical("+imageIn.getSingleBandName()+" input , "+
-				imageOut.getSingleBandName()+" output , int radius, "+workType+" work ) {\n" +
+				imageOut.getSingleBandName()+" output , int offset , int length , "+workType+" work ) {\n" +
 				"\t\tif( work == null ) {\n" +
 				"\t\t\twork = new "+workType+"(input.width);\n" +
 				"\t\t} else {\n" +
 				"\t\t\twork.reset(input.width);\n" +
 				"\t\t}\n" +
 				"\t\tfinal "+workType+" _work = work;\n" +
-				"\t\tfinal int kernelWidth = radius*2 + 1;\n" +
-				"\t\tfinal int backStep = kernelWidth*input.stride;\n" +
+				"\t\tfinal int backStep = length*input.stride;\n" +
+				"\t\tfinal int offsetEnd = length-offset-1;\n" +
 				"\n" +
-				"\t\t"+sumType+" divisor = kernelWidth;\n" +
+				"\t\tfinal "+sumType+" divisor = length;\n" +
 				declareHalf +
 				"\n" +
 				"\t\t// To reduce cache misses it is processed along rows instead of going down columns, which is\n" +
@@ -152,11 +143,11 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 
 		body += "\t\t"+sumType+" totals[] = _work.pop();\n" +
 				"\t\tfor( int x = 0; x < input.width; x++ ) {\n" +
-				"\t\t\tint indexIn = input.startIndex + (y0-radius)*input.stride + x;\n" +
+				"\t\t\tint indexIn = input.startIndex + (y0-offset)*input.stride + x;\n" +
 				"\t\t\tint indexOut = output.startIndex + output.stride*y0 + x;\n" +
 				"\n" +
 				"\t\t\t"+sumType+" total = 0;\n" +
-				"\t\t\tint indexEnd = indexIn + input.stride*kernelWidth;\n" +
+				"\t\t\tint indexEnd = indexIn + input.stride*length;\n" +
 				"\t\t\tfor( ; indexIn < indexEnd; indexIn += input.stride) {\n" +
 				"\t\t\t\ttotal += input.data[indexIn] "+bitWise+";\n" +
 				"\t\t\t}\n" +
@@ -166,7 +157,7 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 				"\n" +
 				"\t\t// change the order it is processed in to reduce cache misses\n" +
 				"\t\tfor( int y = y0+1; y < y1; y++ ) {\n" +
-				"\t\t\tint indexIn = input.startIndex + (y+radius)*input.stride;\n" +
+				"\t\t\tint indexIn = input.startIndex + (y+offsetEnd)*input.stride;\n" +
 				"\t\t\tint indexOut = output.startIndex + y*output.stride;\n" +
 				"\n" +
 				"\t\t\tfor( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {\n" +
@@ -178,14 +169,12 @@ public class GenerateImplConvolveMean extends CodeGeneratorBase {
 				"\t\t}\n" +
 				"\t\t_work.recycle(totals);\n";
 
-		printParallelBlock("y0","y1","radius","output.height-radius","kernelWidth",body);
+		printParallelBlock("y0","y1","offset","output.height-offsetEnd","length",body);
 
 		out.print("\t}\n");
 	}
 
 	public static void main(String args[]) throws FileNotFoundException {
-		GenerateImplConvolveMean generator = new GenerateImplConvolveMean();
-
-		generator.generate();
+		new GenerateImplConvolveMean().generate();
 	}
 }

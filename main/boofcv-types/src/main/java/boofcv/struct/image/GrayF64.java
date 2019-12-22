@@ -81,6 +81,11 @@ public class GrayF64 extends GrayF<GrayF64> {
 		data[getIndex(x, y)] = value;
 	}
 
+	@Override
+	public void print() {
+		print("%4.1f");
+	}
+
 	public void print( String format ) {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {

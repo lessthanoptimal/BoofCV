@@ -124,11 +124,11 @@ public class GenerateBlurImageOps  extends CodeGeneratorBase {
 				"\t\t\treturn output;\n" +
 				"\n" +
 				"\t\tif( binput == null ) {\n" +
-				"\t\t\tConvolveImageMean.horizontal(input, storage, radiusX);\n" +
-				"\t\t\tConvolveImageMean.vertical(storage, output, radiusY, workVert);\n" +
+				"\t\t\tConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1);\n" +
+				"\t\t\tConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, workVert);\n" +
 				"\t\t} else {\n" +
-				"\t\t\tConvolveImageMean.horizontal(input, storage, radiusX, binput);\n" +
-				"\t\t\tConvolveImageMean.vertical(storage, output, radiusY, binput, workVert);\n" +
+				"\t\t\tConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1, binput);\n" +
+				"\t\t\tConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, binput, workVert);\n" +
 				"\t\t}\n" +
 				"\n" +
 				"\t\treturn output;\n" +

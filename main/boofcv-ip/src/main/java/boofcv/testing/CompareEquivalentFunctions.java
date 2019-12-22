@@ -56,7 +56,7 @@ public abstract class CompareEquivalentFunctions {
 			if( !isTestMethod(m))
 				continue;
 
-//			BoofMiscOps.printMethodInfo(m);
+//			BoofMiscOps.printMethodInfo(m, System.out);
 			boolean foundMatch = false;
 
 			escape:
@@ -74,7 +74,7 @@ public abstract class CompareEquivalentFunctions {
 			}
 			if (!foundMatch) {
 				System.err.println("Warning: Can't find an equivalent function in validation class." );
-				BoofMiscOps.printMethodInfo(m);
+				BoofMiscOps.printMethodInfo(m, System.err);
 			} else {
 //				System.out.println("success with "+m.getName());
 				numFound++;
@@ -137,7 +137,7 @@ public abstract class CompareEquivalentFunctions {
 
 			compareResults(targetResult,targetParamSub,validationResult,validationParamSub);
 		} catch (Exception e) {
-			BoofMiscOps.printMethodInfo(target);
+			BoofMiscOps.printMethodInfo(target, System.err);
 			throw new RuntimeException(e);
 		}
 	}

@@ -40,28 +40,26 @@ import javax.annotation.Generated;
 @SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
 public class ImplConvolveMean_MT {
 
-	public static void horizontal( GrayU8 input , GrayI8 output , int radius ) {
-		final int kernelWidth = radius*2 + 1;
-
-		final int divisor = kernelWidth;
+	public static void horizontal( GrayU8 input , GrayI8 output , int offset , int length ) {
+		final int divisor = length;
 		final int halfDivisor = divisor/2;
 
 		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
-			int indexOut = output.startIndex + output.stride*y + radius;
+			int indexOut = output.startIndex + output.stride*y + offset;
 
 			int total = 0;
 
-			int indexEnd = indexIn + kernelWidth;
+			int indexEnd = indexIn + length;
 			
 			for( ; indexIn < indexEnd; indexIn++ ) {
 				total += input.data[indexIn] & 0xFF;
 			}
 			output.data[indexOut++] = (byte)((total+halfDivisor)/divisor);
 
-			indexEnd = indexIn + input.width - kernelWidth;
+			indexEnd = indexIn + input.width - length;
 			for( ; indexIn < indexEnd; indexIn++ ) {
-				total -= input.data[ indexIn - kernelWidth ] & 0xFF;
+				total -= input.data[ indexIn - length ] & 0xFF;
 				total += input.data[ indexIn ] & 0xFF;
 
 				output.data[indexOut++] = (byte)((total+halfDivisor)/divisor);
@@ -69,31 +67,31 @@ public class ImplConvolveMean_MT {
 		});
 	}
 
-	public static void vertical(GrayU8 input , GrayI8 output , int radius, IWorkArrays work ) {
+	public static void vertical(GrayU8 input , GrayI8 output , int offset , int length , IWorkArrays work ) {
 		if( work == null ) {
 			work = new IWorkArrays(input.width);
 		} else {
 			work.reset(input.width);
 		}
 		final IWorkArrays _work = work;
-		final int kernelWidth = radius*2 + 1;
-		final int backStep = kernelWidth*input.stride;
+		final int backStep = length*input.stride;
+		final int offsetEnd = length-offset-1;
 
-		int divisor = kernelWidth;
+		final int divisor = length;
 		final int halfDivisor = divisor/2;
 
 		// To reduce cache misses it is processed along rows instead of going down columns, which is
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(offset, output.height-offsetEnd, length,(y0,y1)->{
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexIn = input.startIndex + (y0-offset)*input.stride + x;
 			int indexOut = output.startIndex + output.stride*y0 + x;
 
 			int total = 0;
-			int indexEnd = indexIn + input.stride*kernelWidth;
+			int indexEnd = indexIn + input.stride*length;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
 				total += input.data[indexIn] & 0xFF;
 			}
@@ -103,7 +101,7 @@ public class ImplConvolveMean_MT {
 
 		// change the order it is processed in to reduce cache misses
 		for( int y = y0+1; y < y1; y++ ) {
-			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexIn = input.startIndex + (y+offsetEnd)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
@@ -116,28 +114,26 @@ public class ImplConvolveMean_MT {
 		_work.recycle(totals);
 		});
 	}
-	public static void horizontal( GrayS16 input , GrayI16 output , int radius ) {
-		final int kernelWidth = radius*2 + 1;
-
-		final int divisor = kernelWidth;
+	public static void horizontal( GrayS16 input , GrayI16 output , int offset , int length ) {
+		final int divisor = length;
 		final int halfDivisor = divisor/2;
 
 		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
-			int indexOut = output.startIndex + output.stride*y + radius;
+			int indexOut = output.startIndex + output.stride*y + offset;
 
 			int total = 0;
 
-			int indexEnd = indexIn + kernelWidth;
+			int indexEnd = indexIn + length;
 			
 			for( ; indexIn < indexEnd; indexIn++ ) {
 				total += input.data[indexIn] ;
 			}
 			output.data[indexOut++] = (short)((total+halfDivisor)/divisor);
 
-			indexEnd = indexIn + input.width - kernelWidth;
+			indexEnd = indexIn + input.width - length;
 			for( ; indexIn < indexEnd; indexIn++ ) {
-				total -= input.data[ indexIn - kernelWidth ] ;
+				total -= input.data[ indexIn - length ] ;
 				total += input.data[ indexIn ] ;
 
 				output.data[indexOut++] = (short)((total+halfDivisor)/divisor);
@@ -145,31 +141,31 @@ public class ImplConvolveMean_MT {
 		});
 	}
 
-	public static void vertical(GrayS16 input , GrayI16 output , int radius, IWorkArrays work ) {
+	public static void vertical(GrayS16 input , GrayI16 output , int offset , int length , IWorkArrays work ) {
 		if( work == null ) {
 			work = new IWorkArrays(input.width);
 		} else {
 			work.reset(input.width);
 		}
 		final IWorkArrays _work = work;
-		final int kernelWidth = radius*2 + 1;
-		final int backStep = kernelWidth*input.stride;
+		final int backStep = length*input.stride;
+		final int offsetEnd = length-offset-1;
 
-		int divisor = kernelWidth;
+		final int divisor = length;
 		final int halfDivisor = divisor/2;
 
 		// To reduce cache misses it is processed along rows instead of going down columns, which is
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(offset, output.height-offsetEnd, length,(y0,y1)->{
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexIn = input.startIndex + (y0-offset)*input.stride + x;
 			int indexOut = output.startIndex + output.stride*y0 + x;
 
 			int total = 0;
-			int indexEnd = indexIn + input.stride*kernelWidth;
+			int indexEnd = indexIn + input.stride*length;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
 				total += input.data[indexIn] ;
 			}
@@ -179,7 +175,7 @@ public class ImplConvolveMean_MT {
 
 		// change the order it is processed in to reduce cache misses
 		for( int y = y0+1; y < y1; y++ ) {
-			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexIn = input.startIndex + (y+offsetEnd)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
@@ -192,28 +188,26 @@ public class ImplConvolveMean_MT {
 		_work.recycle(totals);
 		});
 	}
-	public static void horizontal( GrayU16 input , GrayI16 output , int radius ) {
-		final int kernelWidth = radius*2 + 1;
-
-		final int divisor = kernelWidth;
+	public static void horizontal( GrayU16 input , GrayI16 output , int offset , int length ) {
+		final int divisor = length;
 		final int halfDivisor = divisor/2;
 
 		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
-			int indexOut = output.startIndex + output.stride*y + radius;
+			int indexOut = output.startIndex + output.stride*y + offset;
 
 			int total = 0;
 
-			int indexEnd = indexIn + kernelWidth;
+			int indexEnd = indexIn + length;
 			
 			for( ; indexIn < indexEnd; indexIn++ ) {
 				total += input.data[indexIn] & 0xFFFF;
 			}
 			output.data[indexOut++] = (short)((total+halfDivisor)/divisor);
 
-			indexEnd = indexIn + input.width - kernelWidth;
+			indexEnd = indexIn + input.width - length;
 			for( ; indexIn < indexEnd; indexIn++ ) {
-				total -= input.data[ indexIn - kernelWidth ] & 0xFFFF;
+				total -= input.data[ indexIn - length ] & 0xFFFF;
 				total += input.data[ indexIn ] & 0xFFFF;
 
 				output.data[indexOut++] = (short)((total+halfDivisor)/divisor);
@@ -221,31 +215,31 @@ public class ImplConvolveMean_MT {
 		});
 	}
 
-	public static void vertical(GrayU16 input , GrayI16 output , int radius, IWorkArrays work ) {
+	public static void vertical(GrayU16 input , GrayI16 output , int offset , int length , IWorkArrays work ) {
 		if( work == null ) {
 			work = new IWorkArrays(input.width);
 		} else {
 			work.reset(input.width);
 		}
 		final IWorkArrays _work = work;
-		final int kernelWidth = radius*2 + 1;
-		final int backStep = kernelWidth*input.stride;
+		final int backStep = length*input.stride;
+		final int offsetEnd = length-offset-1;
 
-		int divisor = kernelWidth;
+		final int divisor = length;
 		final int halfDivisor = divisor/2;
 
 		// To reduce cache misses it is processed along rows instead of going down columns, which is
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(offset, output.height-offsetEnd, length,(y0,y1)->{
 		int totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexIn = input.startIndex + (y0-offset)*input.stride + x;
 			int indexOut = output.startIndex + output.stride*y0 + x;
 
 			int total = 0;
-			int indexEnd = indexIn + input.stride*kernelWidth;
+			int indexEnd = indexIn + input.stride*length;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
 				total += input.data[indexIn] & 0xFFFF;
 			}
@@ -255,7 +249,7 @@ public class ImplConvolveMean_MT {
 
 		// change the order it is processed in to reduce cache misses
 		for( int y = y0+1; y < y1; y++ ) {
-			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexIn = input.startIndex + (y+offsetEnd)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
@@ -268,27 +262,25 @@ public class ImplConvolveMean_MT {
 		_work.recycle(totals);
 		});
 	}
-	public static void horizontal( GrayF32 input , GrayF32 output , int radius ) {
-		final int kernelWidth = radius*2 + 1;
-
-		final float divisor = kernelWidth;
+	public static void horizontal( GrayF32 input , GrayF32 output , int offset , int length ) {
+		final float divisor = length;
 
 		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
-			int indexOut = output.startIndex + output.stride*y + radius;
+			int indexOut = output.startIndex + output.stride*y + offset;
 
 			float total = 0;
 
-			int indexEnd = indexIn + kernelWidth;
+			int indexEnd = indexIn + length;
 			
 			for( ; indexIn < indexEnd; indexIn++ ) {
 				total += input.data[indexIn] ;
 			}
 			output.data[indexOut++] = (total/divisor);
 
-			indexEnd = indexIn + input.width - kernelWidth;
+			indexEnd = indexIn + input.width - length;
 			for( ; indexIn < indexEnd; indexIn++ ) {
-				total -= input.data[ indexIn - kernelWidth ] ;
+				total -= input.data[ indexIn - length ] ;
 				total += input.data[ indexIn ] ;
 
 				output.data[indexOut++] = (total/divisor);
@@ -296,30 +288,30 @@ public class ImplConvolveMean_MT {
 		});
 	}
 
-	public static void vertical(GrayF32 input , GrayF32 output , int radius, FWorkArrays work ) {
+	public static void vertical(GrayF32 input , GrayF32 output , int offset , int length , FWorkArrays work ) {
 		if( work == null ) {
 			work = new FWorkArrays(input.width);
 		} else {
 			work.reset(input.width);
 		}
 		final FWorkArrays _work = work;
-		final int kernelWidth = radius*2 + 1;
-		final int backStep = kernelWidth*input.stride;
+		final int backStep = length*input.stride;
+		final int offsetEnd = length-offset-1;
 
-		float divisor = kernelWidth;
+		final float divisor = length;
 
 		// To reduce cache misses it is processed along rows instead of going down columns, which is
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(offset, output.height-offsetEnd, length,(y0,y1)->{
 		float totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexIn = input.startIndex + (y0-offset)*input.stride + x;
 			int indexOut = output.startIndex + output.stride*y0 + x;
 
 			float total = 0;
-			int indexEnd = indexIn + input.stride*kernelWidth;
+			int indexEnd = indexIn + input.stride*length;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
 				total += input.data[indexIn] ;
 			}
@@ -329,7 +321,7 @@ public class ImplConvolveMean_MT {
 
 		// change the order it is processed in to reduce cache misses
 		for( int y = y0+1; y < y1; y++ ) {
-			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexIn = input.startIndex + (y+offsetEnd)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {
@@ -342,27 +334,25 @@ public class ImplConvolveMean_MT {
 		_work.recycle(totals);
 		});
 	}
-	public static void horizontal( GrayF64 input , GrayF64 output , int radius ) {
-		final int kernelWidth = radius*2 + 1;
-
-		final double divisor = kernelWidth;
+	public static void horizontal( GrayF64 input , GrayF64 output , int offset , int length ) {
+		final double divisor = length;
 
 		BoofConcurrency.loopFor(0, input.height, y -> {
 			int indexIn = input.startIndex + input.stride*y;
-			int indexOut = output.startIndex + output.stride*y + radius;
+			int indexOut = output.startIndex + output.stride*y + offset;
 
 			double total = 0;
 
-			int indexEnd = indexIn + kernelWidth;
+			int indexEnd = indexIn + length;
 			
 			for( ; indexIn < indexEnd; indexIn++ ) {
 				total += input.data[indexIn] ;
 			}
 			output.data[indexOut++] = (total/divisor);
 
-			indexEnd = indexIn + input.width - kernelWidth;
+			indexEnd = indexIn + input.width - length;
 			for( ; indexIn < indexEnd; indexIn++ ) {
-				total -= input.data[ indexIn - kernelWidth ] ;
+				total -= input.data[ indexIn - length ] ;
 				total += input.data[ indexIn ] ;
 
 				output.data[indexOut++] = (total/divisor);
@@ -370,30 +360,30 @@ public class ImplConvolveMean_MT {
 		});
 	}
 
-	public static void vertical(GrayF64 input , GrayF64 output , int radius, DWorkArrays work ) {
+	public static void vertical(GrayF64 input , GrayF64 output , int offset , int length , DWorkArrays work ) {
 		if( work == null ) {
 			work = new DWorkArrays(input.width);
 		} else {
 			work.reset(input.width);
 		}
 		final DWorkArrays _work = work;
-		final int kernelWidth = radius*2 + 1;
-		final int backStep = kernelWidth*input.stride;
+		final int backStep = length*input.stride;
+		final int offsetEnd = length-offset-1;
 
-		double divisor = kernelWidth;
+		final double divisor = length;
 
 		// To reduce cache misses it is processed along rows instead of going down columns, which is
 		// more natural for a vertical convolution. For parallel processes this requires building
 		// a book keeping array for each thread.
 
-		BoofConcurrency.loopBlocks(radius, output.height-radius, kernelWidth,(y0,y1)->{
+		BoofConcurrency.loopBlocks(offset, output.height-offsetEnd, length,(y0,y1)->{
 		double totals[] = _work.pop();
 		for( int x = 0; x < input.width; x++ ) {
-			int indexIn = input.startIndex + (y0-radius)*input.stride + x;
+			int indexIn = input.startIndex + (y0-offset)*input.stride + x;
 			int indexOut = output.startIndex + output.stride*y0 + x;
 
 			double total = 0;
-			int indexEnd = indexIn + input.stride*kernelWidth;
+			int indexEnd = indexIn + input.stride*length;
 			for( ; indexIn < indexEnd; indexIn += input.stride) {
 				total += input.data[indexIn] ;
 			}
@@ -403,7 +393,7 @@ public class ImplConvolveMean_MT {
 
 		// change the order it is processed in to reduce cache misses
 		for( int y = y0+1; y < y1; y++ ) {
-			int indexIn = input.startIndex + (y+radius)*input.stride;
+			int indexIn = input.startIndex + (y+offsetEnd)*input.stride;
 			int indexOut = output.startIndex + y*output.stride;
 
 			for( int x = 0; x < input.width; x++ ,indexIn++,indexOut++) {

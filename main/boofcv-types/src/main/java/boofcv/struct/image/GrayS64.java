@@ -122,4 +122,14 @@ public class GrayS64 extends ImageGray<GrayS64> {
 	public void setData(long[] data) {
 		this.data = data;
 	}
+
+	@Override
+	public void print() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				System.out.printf("%3d ",get(x,y));
+			}
+			System.out.println();
+		}
+	}
 }

@@ -41,7 +41,8 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 
 	static int width = 10;
 	static int height = 12;
-	static int kernelRadius = 2;
+	static int kernelOffset = 2;
+	static int kernelLength = 5;
 
 	public TestImplConvolveMean() {
 		super(ImplConvolveMean.class, ConvolveImageStandard_SB.class);
@@ -56,7 +57,7 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 	protected boolean isTestMethod(Method m) {
 		Class<?> params[] = m.getParameterTypes();
 
-		if( params.length != 3 && params.length != 4)
+		if( params.length != 4 && params.length != 5)
 			return false;
 
 		return ImageGray.class.isAssignableFrom(params[0]);
@@ -65,24 +66,24 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 	@Override
 	protected boolean isEquivalent(Method candidate, Method validation) {
 
-		Class<?> v[] = candidate.getParameterTypes();
-		Class<?> c[] = validation.getParameterTypes();
+		Class<?> c[] = candidate.getParameterTypes();
+		Class<?> v[] = validation.getParameterTypes();
 
-		if( v.length < 3 )
+		if( c.length < 3 )
 			return false;
 
-		if( !GeneralizedImageOps.isFloatingPoint(c[0])) {
-			if( v.length != 4 )
+		if( !GeneralizedImageOps.isFloatingPoint(v[0])) {
+			if( c.length != 4 )
 				return false;
 		} else {
-			if( v.length != 3 )
+			if( c.length != 3 )
 				return false;
 		}
 
 		if( !candidate.getName().equals(validation.getName()))
 			return false;
 
-		return c[0] == v[1] && c[1] == v[2];
+		return v[0] == c[1] && v[1] == c[2];
 	}
 
 	@Override
@@ -95,11 +96,17 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 
 		GImageMiscOps.fillUniform(input, rand, 0, 50);
 
-		Object[][] ret = new Object[1][];
-		if( c.length == 3 )
-			ret[0] = new Object[]{input,output,kernelRadius};
-		else
-			ret[0] = new Object[]{input,output,kernelRadius,null}; // vertical has one more argument
+		Object[][] ret = new Object[3][];
+		if( c.length == 4 ) {
+			ret[0] = new Object[]{input, output, kernelOffset, kernelLength};
+			ret[1] = new Object[]{input, output, kernelOffset+1, kernelLength};
+			ret[2] = new Object[]{input, output, kernelOffset, kernelLength-1};
+		} else {
+			// vertical has one more argument
+			ret[0] = new Object[]{input, output, kernelOffset, kernelLength, null};
+			ret[1] = new Object[]{input, output, kernelOffset+1, kernelLength, null};
+			ret[2] = new Object[]{input, output, kernelOffset, kernelLength-1, null};
+		}
 
 		return ret;
 	}
@@ -107,14 +114,12 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 	@Override
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
 		Class<?> params[] = m.getParameterTypes();
-		Object kernel = createTableKernel(params[0],kernelRadius);
+		Object kernel = createTableKernel(params[0], (Integer)targetParam[2],(Integer)targetParam[3]);
 
 		ImageGray output = (ImageGray)((ImageGray)targetParam[1]).clone();
 
-		int w = kernelRadius*2+1;
-
 		if( output.getDataType().isInteger() )
-			return new Object[]{kernel,targetParam[0],output,w};
+			return new Object[]{kernel,targetParam[0],output,targetParam[3]};
 		else
 			return new Object[]{kernel,targetParam[0],output};
 	}
@@ -127,14 +132,14 @@ public class TestImplConvolveMean extends CompareEquivalentFunctions {
 		BoofTesting.assertEquals(expected, found, 1e-4);
 	}
 
-	public static Object createTableKernel(Class<?> kernelType, int kernelRadius ) {
+	public static Object createTableKernel(Class<?> kernelType, int offset , int length ) {
 		Object kernel;
 		if (Kernel1D_F32.class == kernelType) {
-			kernel = FactoryKernel.table1D_F32(kernelRadius, true);
+			kernel = FactoryKernel.table1D_F32(offset, length, true);
 		} else if (Kernel1D_F64.class == kernelType) {
-			kernel = FactoryKernel.table1D_F64(kernelRadius,true);
+			kernel = FactoryKernel.table1D_F64(offset, length,true);
 		} else if (Kernel1D_S32.class == kernelType) {
-			kernel = FactoryKernel.table1D_S32(kernelRadius);
+			kernel = FactoryKernel.table1D_S32(offset, length);
 		} else {
 			throw new RuntimeException("Unknown kernel type");
 		}

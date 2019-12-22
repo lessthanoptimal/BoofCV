@@ -92,11 +92,11 @@ public class BlurImageOps {
 			return output;
 
 		if( binput == null ) {
-			ConvolveImageMean.horizontal(input, storage, radiusX);
-			ConvolveImageMean.vertical(storage, output, radiusY, workVert);
+			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1);
+			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, workVert);
 		} else {
-			ConvolveImageMean.horizontal(input, storage, radiusX, binput);
-			ConvolveImageMean.vertical(storage, output, radiusY, binput, workVert);
+			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1, binput);
+			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, binput, workVert);
 		}
 
 		return output;
@@ -241,11 +241,11 @@ public class BlurImageOps {
 			return output;
 
 		if( binput == null ) {
-			ConvolveImageMean.horizontal(input, storage, radiusX);
-			ConvolveImageMean.vertical(storage, output, radiusY, workVert);
+			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1);
+			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, workVert);
 		} else {
-			ConvolveImageMean.horizontal(input, storage, radiusX, binput);
-			ConvolveImageMean.vertical(storage, output, radiusY, binput, workVert);
+			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1, binput);
+			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, binput, workVert);
 		}
 
 		return output;
@@ -390,11 +390,11 @@ public class BlurImageOps {
 			return output;
 
 		if( binput == null ) {
-			ConvolveImageMean.horizontal(input, storage, radiusX);
-			ConvolveImageMean.vertical(storage, output, radiusY, workVert);
+			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1);
+			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, workVert);
 		} else {
-			ConvolveImageMean.horizontal(input, storage, radiusX, binput);
-			ConvolveImageMean.vertical(storage, output, radiusY, binput, workVert);
+			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1, binput);
+			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, binput, workVert);
 		}
 
 		return output;
@@ -539,11 +539,11 @@ public class BlurImageOps {
 			return output;
 
 		if( binput == null ) {
-			ConvolveImageMean.horizontal(input, storage, radiusX);
-			ConvolveImageMean.vertical(storage, output, radiusY, workVert);
+			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1);
+			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, workVert);
 		} else {
-			ConvolveImageMean.horizontal(input, storage, radiusX, binput);
-			ConvolveImageMean.vertical(storage, output, radiusY, binput, workVert);
+			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1, binput);
+			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, binput, workVert);
 		}
 
 		return output;

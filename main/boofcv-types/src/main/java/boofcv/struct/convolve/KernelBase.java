@@ -42,7 +42,7 @@ public abstract class KernelBase {
 		if (width <= 0)
 			throw new IllegalArgumentException("Kernel width must be greater than zero not "+width);
 		if (offset < 0 || offset >= width)
-			throw new IllegalArgumentException("The offset must be inside the kernel's bounds");
+			throw new IllegalArgumentException("The offset must be inside the kernel's bounds. o="+offset+" w="+width);
 		this.width = width;
 		this.offset = offset;
 	}

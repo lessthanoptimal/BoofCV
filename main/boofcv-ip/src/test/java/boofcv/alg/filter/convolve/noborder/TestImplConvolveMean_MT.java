@@ -65,12 +65,12 @@ public class TestImplConvolveMean_MT {
 
 			try {
 				if( name.equals("horizontal")) {
-					testM.invoke(null, input, expected, 8);
-					m.invoke(null, input, found, 8);
+					testM.invoke(null, input, expected, 4, 8);
+					m.invoke(null, input, found, 4, 8);
 				} else {
 					WorkArrays workArrays = GeneralizedImageOps.createWorkArray(input.imageType);
-					testM.invoke(null, input, expected, 8, workArrays);
-					m.invoke(null, input, found, 8, workArrays);
+					testM.invoke(null, input, expected, 4, 8, workArrays);
+					m.invoke(null, input, found, 4, 8, workArrays);
 				}
 			} catch( Exception e ) {
 				e.printStackTrace();

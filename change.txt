@@ -32,6 +32,7 @@ Version : 0.35
   * Added ImageMiscOps.growBorder() to create a new image that is the src image plus a border
   * Added GrowBorder for extracting rows and columns from images with borders added
   * Rectified images can now be adjusted using the rectified rotation for better usage of space
+  * ConvolveImageMean can now handle non symmetric regions
 - Template Match
   * Fixed bug where if the template matched the input image it would not be processed
     * Thanks waicool20 for reporting this bug

@@ -88,19 +88,19 @@ public class BenchmarkConvolveMean {
 
 	public int timeMean_U8_I8_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveMean.vertical(input_I8, out_I8, radius,workI32);
+			ImplConvolveMean.vertical(input_I8, out_I8, radius, radius*2+1, workI32);
 		return 0;
 	}
 
 	public int timeMean_F32_F32_Vertical(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveMean.vertical(input_F32,out_F32,radius,workF32);
+			ImplConvolveMean.vertical(input_F32,out_F32,radius, radius*2+1, workF32);
 		return 0;
 	}
 
 	public int timeMean_F32_F32_Horizontal(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ImplConvolveMean.horizontal(input_F32, out_F32, radius);
+			ImplConvolveMean.horizontal(input_F32, out_F32, radius, radius*2+1);
 		return 0;
 	}
 

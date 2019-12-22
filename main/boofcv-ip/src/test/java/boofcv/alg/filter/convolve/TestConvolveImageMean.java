@@ -21,12 +21,8 @@ package boofcv.alg.filter.convolve;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
-import boofcv.struct.convolve.Kernel1D_F32;
-import boofcv.struct.convolve.Kernel1D_F64;
-import boofcv.struct.convolve.Kernel1D_S32;
 import boofcv.struct.image.ImageGray;
 import boofcv.testing.BoofTesting;
 import boofcv.testing.CompareEquivalentFunctions;
@@ -34,6 +30,8 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.util.Random;
+
+import static boofcv.alg.filter.convolve.noborder.TestImplConvolveMean.createTableKernel;
 
 /**
  * @author Peter Abeles
@@ -44,8 +42,10 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 
 	static int width = 10;
 	static int height = 12;
-	static int kernelRadius = 2;
-	static int kernelRadius2 = 6; // kernel will be larger than the image
+	static int offset1 = 2;
+	static int offset2 = 6;
+	static int length1 = 5;
+	static int length2 = 13; // kernel will be larger than the image
 
 	public TestConvolveImageMean() {
 		super(ConvolveImageMean.class, ConvolveImageNormalized.class);
@@ -60,7 +60,7 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 	protected boolean isTestMethod(Method m) {
 		Class<?> params[] = m.getParameterTypes();
 
-		if( params.length < 3 || params.length > 5)
+		if( params.length < 4 || params.length > 6)
 			return false;
 
 		return ImageGray.class.isAssignableFrom(params[0]);
@@ -79,12 +79,12 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 			return false;
 
 		if( target.getName().equals("vertical")) {
-			if( ImageBorder.class.isAssignableFrom(c[3]) ) {
+			if( ImageBorder.class.isAssignableFrom(c[4]) ) {
 				return v.length >= 4 && ImageBorder.class.isAssignableFrom(v[3]);
 			} else if( v.length != 3 ){
 				return false;
 			}
-		} else if( (c.length == 3) ^ (v.length == 3)) {
+		} else if( (c.length == 4) ^ (v.length == 3)) {
 			return false;
 		}
 
@@ -104,19 +104,19 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 		ImageBorder border = FactoryImageBorder.generic(BorderType.REFLECT,input.getImageType());
 
 		Object[][] ret = new Object[2][];
-		if( c.length == 3 ) {
-			ret[0] = new Object[]{input, output, kernelRadius};
-			ret[1] = new Object[]{input, output, kernelRadius2};
-		} else if( c.length == 4 ) {
-			ret[0] = new Object[]{input, output, kernelRadius, null};
-			ret[1] = new Object[]{input, output, kernelRadius2, null};
-			if( ImageBorder.class.isAssignableFrom(c[3]) ) {
-				ret[0][3] = border;
-				ret[1][3] = border;
+		if( c.length == 4 ) {
+			ret[0] = new Object[]{input, output, offset1, length1};
+			ret[1] = new Object[]{input, output, offset2, length2};
+		} else if( c.length == 5 ) {
+			ret[0] = new Object[]{input, output, offset1, length1, null};
+			ret[1] = new Object[]{input, output, offset2, length2, null};
+			if( ImageBorder.class.isAssignableFrom(c[4]) ) {
+				ret[0][4] = border;
+				ret[1][4] = border;
 			}
 		} else {
-			ret[0] = new Object[]{input, output, kernelRadius, border, null};
-			ret[1] = new Object[]{input, output, kernelRadius2, border, null};
+			ret[0] = new Object[]{input, output, offset1, length1, border, null};
+			ret[1] = new Object[]{input, output, offset2, length2, border, null};
 		}
 
 		return ret;
@@ -125,13 +125,12 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 	@Override
 	protected Object[] reformatForValidation(Method m, Object[] targetParam) {
 		Class<?>[] params = m.getParameterTypes();
-		int radius = (Integer)targetParam[2];
-		Object kernel = createTableKernel(params[0],radius);
+		Object kernel = createTableKernel(params[0],(Integer)targetParam[2],(Integer)targetParam[3]);
 
 		ImageGray output = (ImageGray)((ImageGray)targetParam[1]).clone();
 
 		if( ImageBorder.class.isAssignableFrom(params[params.length-1])) {
-			return new Object[]{kernel, targetParam[0], output, targetParam[3]};
+			return new Object[]{kernel, targetParam[0], output, targetParam[4]};
 		} else {
 			return new Object[]{kernel, targetParam[0], output};
 		}
@@ -151,19 +150,5 @@ public class TestConvolveImageMean extends CompareEquivalentFunctions {
 
 			BoofTesting.assertEquals(expected, found, 1e-4);
 		}
-	}
-
-	public static Object createTableKernel(Class<?> kernelType, int kernelRadius) {
-		Object kernel;
-		if (Kernel1D_F32.class == kernelType) {
-			kernel = FactoryKernel.table1D_F32(kernelRadius, true);
-		} else if (Kernel1D_F64.class == kernelType) {
-			kernel = FactoryKernel.table1D_F64(kernelRadius,true);
-		} else if (Kernel1D_S32.class == kernelType) {
-			kernel = FactoryKernel.table1D_S32(kernelRadius);
-		} else {
-			throw new RuntimeException("Unknown kernel type");
-		}
-		return kernel;
 	}
 }

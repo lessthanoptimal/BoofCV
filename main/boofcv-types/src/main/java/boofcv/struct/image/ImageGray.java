@@ -206,6 +206,11 @@ public abstract class ImageGray<T extends ImageGray<T>> extends ImageBase<T> {
 	}
 
 	/**
+	 * Prints the image to standard out
+	 */
+	public abstract void print();
+
+	/**
 	 * Returns the data array the image is stored in.
 	 *
 	 * @return data array;

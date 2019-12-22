@@ -150,6 +150,9 @@ public class TestImageGray {
 		}
 
 		@Override
+		public void print() {}
+
+		@Override
 		protected Object _getData() {
 			return data;
 		}
