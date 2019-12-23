@@ -38,6 +38,7 @@ TODO
 TODO Regression
   - homography estimation
   - QR Code fiducial 3D pose regression
+  - Line detector regression
 
 TODO
   - QR Code
