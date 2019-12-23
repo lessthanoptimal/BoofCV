@@ -41,9 +41,20 @@ public class BenchmarkCalibrationDetectors {
 	public static GrayF32 imageChess;
 	public static GrayF32 imageSquare;
 
-	public static class ChessboardOld extends PerformerBase {
+	public static class ChessboardBinary extends PerformerBase {
 		DetectorFiducialCalibration detector = FactoryFiducialCalibration.
 				chessboardB((ConfigChessboardBinary)null,new ConfigGridDimen(7, 5, 30));
+
+		@Override
+		public void process() {
+			if( !detector.process(imageChess) )
+				throw new RuntimeException("Can't find target!");
+		}
+	}
+
+	public static class ChessboardXCorner extends PerformerBase {
+		DetectorFiducialCalibration detector = FactoryFiducialCalibration.
+				chessboardX(null,new ConfigGridDimen(7, 5, 30));
 
 		@Override
 		public void process() {
@@ -81,7 +92,8 @@ public class BenchmarkCalibrationDetectors {
 		imageChess = loadImage(chess);
 		imageSquare = loadImage(square);
 
-		ProfileOperation.printOpsPerSec(new ChessboardOld(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new ChessboardBinary(), TEST_TIME);
+		ProfileOperation.printOpsPerSec(new ChessboardXCorner(), TEST_TIME);
 		ProfileOperation.printOpsPerSec(new Square(), TEST_TIME);
 	}
 }

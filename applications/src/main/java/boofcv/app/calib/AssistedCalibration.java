@@ -18,7 +18,7 @@
 
 package boofcv.app.calib;
 
-import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardBinary;
+import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
@@ -158,7 +158,7 @@ public class AssistedCalibration {
 		this.quality = quality;
 		this.saver = new ImageSelectorAndSaver(new File(outputDir,imageDirectory).getPath());
 
-		if( detector instanceof CalibrationDetectorChessboardBinary) {
+		if( detector instanceof CalibrationDetectorChessboardX) {
 			view = new CalibrationView.Chessboard();
 		} else if( detector instanceof CalibrationDetectorSquareGrid) {
 			view = new CalibrationView.SquareGrid();

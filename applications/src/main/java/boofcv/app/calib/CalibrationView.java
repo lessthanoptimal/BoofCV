@@ -18,7 +18,7 @@
 
 package boofcv.app.calib;
 
-import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardBinary;
+import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
@@ -67,9 +67,9 @@ public interface CalibrationView {
 		int pointRows,pointCols;
 
 		public void initialize( DetectorFiducialCalibration detector ) {
-			CalibrationDetectorChessboardBinary chessboard = (CalibrationDetectorChessboardBinary)detector;
-			this.numRows = chessboard.getGridRows();
-			this.numCols = chessboard.getGridColumns();
+			CalibrationDetectorChessboardX chessboard = (CalibrationDetectorChessboardX)detector;
+			this.numRows = chessboard.getCornerRows()+1;
+			this.numCols = chessboard.getCornerCols()+1;
 
 			pointRows = numRows-1;
 			pointCols = numCols-1;
