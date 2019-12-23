@@ -64,14 +64,14 @@ public interface StereoDisparity<Image extends ImageBase<Image>, Disparity exten
 	 *
 	 * @return Minimum disparity.
 	 */
-	int getMinDisparity();
+	int getDisparityMin();
 
 	/**
 	 * The number of possible disparity values. The maximum value (inclusive) is min + range -1.
 	 *
 	 * @return Maximum disparity.
 	 */
-	int getRangeDisparity();
+	int getDisparityRange();
 
 	/**
 	 * Specifies the value that pixels with no valid disparity estimate will be filled in with. This

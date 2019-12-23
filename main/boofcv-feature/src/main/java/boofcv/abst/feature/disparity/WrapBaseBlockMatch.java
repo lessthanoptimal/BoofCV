@@ -71,18 +71,18 @@ public abstract class WrapBaseBlockMatch <In extends ImageGray<In>, T extends Im
 	}
 
 	@Override
-	public int getMinDisparity() {
+	public int getDisparityMin() {
 		return alg.getDisparityMin();
 	}
 
 	@Override
-	public int getRangeDisparity() {
+	public int getDisparityRange() {
 		return alg.getDisparityMax() - alg.getDisparityMin();
 	}
 
 	@Override
 	public int getInvalidValue() {
-		return getRangeDisparity();
+		return getDisparityRange();
 	}
 
 	@Override

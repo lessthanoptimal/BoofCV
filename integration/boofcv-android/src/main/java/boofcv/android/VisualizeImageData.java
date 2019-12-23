@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -354,19 +354,17 @@ public class VisualizeImageData {
 	 *
 	 * @param disparity (Input) disparity image.
 	 * @param minValue Minimum possible disparity
-	 * @param maxValue Maximum possible disparity
+	 * @param rangeValue Number of possible disparity values
 	 * @param invalidColor RGB value of an invalid pixel
 	 * @param output (Output) Bitmap ARGB_8888 image.
 	 * @param storage Optional working buffer for Bitmap image. Can be null.
 	 */
-	public static void disparity( GrayI disparity, int minValue, int maxValue,
+	public static void disparity( GrayI disparity, int minValue, int rangeValue,
 								  int invalidColor, Bitmap output , byte[] storage ) {
 		shapeShape(disparity, output);
 
 		if( storage == null )
 			storage = declareStorage(output,null);
-
-		int range = maxValue - minValue;
 
 		int indexDst = 0;
 
@@ -375,7 +373,7 @@ public class VisualizeImageData {
 				int v = disparity.unsafe_get(x, y);
 				int r,g,b;
 
-				if (v > range) {
+				if (v >= rangeValue) {
 					r = (invalidColor >> 16) & 0xFF;
 					g = (invalidColor >> 8) & 0xFF;
 					b = (invalidColor) & 0xFF;
@@ -384,8 +382,8 @@ public class VisualizeImageData {
 					if (v == 0) {
 						r = b = 0;
 					} else {
-						r = 255 * v / maxValue;
-						b = 255 * (maxValue - v) / maxValue;
+						r = 255 * (v-minValue) / rangeValue;
+						b = 255 * (rangeValue - v + minValue) / rangeValue;
 					}
 				}
 

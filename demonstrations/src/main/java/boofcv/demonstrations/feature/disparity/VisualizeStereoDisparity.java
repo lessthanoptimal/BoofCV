@@ -252,8 +252,8 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			long time1 = System.nanoTime();
 			elapsedTime = time1-time0;
 			disparityImage = activeAlg.getDisparity();
-			disparityMin = activeAlg.getMinDisparity();
-			disparityRange = activeAlg.getRangeDisparity();
+			disparityMin = activeAlg.getDisparityMin();
+			disparityRange = activeAlg.getDisparityRange();
 		} catch( RuntimeException e ) {
 			e.printStackTrace();
 			BoofSwingUtil.warningDialog(this,e);
@@ -415,7 +415,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		D disparity = activeAlg.getDisparity();
 
 		// TODO Got a NPE inside of this function once when rapidly changing settings. Make sure everything is locked down
-		disparityOut = VisualizeImageData.disparity(disparity,null, activeAlg.getRangeDisparity(), control.backgroundColorDisparity);
+		disparityOut = VisualizeImageData.disparity(disparity,null, activeAlg.getDisparityRange(), control.backgroundColorDisparity);
 
 		changeImageView();
 	}

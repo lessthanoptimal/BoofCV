@@ -50,12 +50,12 @@ public class WrapDisparitySgm<DI extends ImageGray<DI>> implements StereoDispari
 	}
 
 	@Override
-	public int getMinDisparity() {
+	public int getDisparityMin() {
 		return sgm.getDisparityMin();
 	}
 
 	@Override
-	public int getRangeDisparity() {
+	public int getDisparityRange() {
 		return sgm.getDisparityRange();
 	}
 
