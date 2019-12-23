@@ -19,22 +19,14 @@
 package boofcv.alg.fiducial.calib.chess;
 
 import boofcv.abst.distort.FDistort;
-import boofcv.abst.fiducial.calib.ConfigChessboardOld;
-import boofcv.abst.fiducial.calib.ConfigGridDimen;
-import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
-import boofcv.factory.filter.binary.FactoryThresholdBinary;
-import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se2_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -42,14 +34,12 @@ import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
-public class TestDetectChessboardFiducial {
-
+public abstract class GenericDetectFindChessboardCorners {
 	Random rand = new Random(234);
 
 	int squareLength = 30;
@@ -62,6 +52,8 @@ public class TestDetectChessboardFiducial {
 	Se2_F64 transform;
 
 	boolean showRendered = false;
+
+	public abstract List<Point2D_F64> findCorners( int numRows , int numCols, GrayF32 image );
 
 	@BeforeEach
 	public void setup() {
@@ -78,13 +70,13 @@ public class TestDetectChessboardFiducial {
 		for( int numRows = 3; numRows <= 7; numRows++ ) {
 			for( int numCols = 3; numCols <= 7; numCols++ ) {
 //				System.out.println("shape "+numCols+"  "+numRows);
-				basicTest(numRows, numCols, false);
-				basicTest(numRows, numCols, true);
+				basicTest(numRows, numCols);
+				basicTest(numRows, numCols);
 			}
 		}
 	}
 
-	public void basicTest(int numRows, int numCols , boolean localThreshold ) {
+	public void basicTest(int numRows, int numCols ) {
 		GrayF32 gray = renderTarget(numRows, numCols);
 
 		ImageMiscOps.addGaussian(gray,rand,0.1,0,255);
@@ -92,31 +84,11 @@ public class TestDetectChessboardFiducial {
 //		ShowImages.showWindow(gray,"Rendered Image");
 //		try { Thread.sleep(1000); } catch (InterruptedException e) {}
 
-		ConfigChessboardOld configDet = new ConfigChessboardOld();
-		ConfigGridDimen configChess = new ConfigGridDimen(5, 5, 1);
-
-		DetectPolygonBinaryGrayRefine<GrayF32> detectorSquare =
-				FactoryShapeDetector.polygon(configDet.square, GrayF32.class);
-//		detectorSquare.setVerbose(true);
-
-		InputToBinary<GrayF32> inputToBinary;
-		if( localThreshold ) {
-			if( !configDet.thresholding.type.isAdaptive() )
-				throw new RuntimeException("This assumes that the default is local. Update unit test by specifying a local");
-			inputToBinary = FactoryThresholdBinary.threshold(configDet.thresholding, GrayF32.class);
-		} else
-			inputToBinary = FactoryThresholdBinary.globalFixed(50,true,GrayF32.class);
-
-		DetectChessboardFiducial alg =
-				new DetectChessboardFiducial(numRows, numCols, ConfigLength.fixed(4),detectorSquare,inputToBinary);
-
-		if( !alg.process(gray)) {
+		List<Point2D_F64> found = findCorners(numRows,numCols,gray);
+		if( found == null ) {
 			UtilImageIO.saveImage(gray,"savedchessboard.png");
+			fail("Failed to detect target");
 		}
-
-		assertTrue(alg.process(gray));
-
-		List<Point2D_F64> found = alg.getCalibrationPoints();
 		List<Point2D_F64> expected = calibrationPoints(numRows, numCols);
 
 		assertEquals(expected.size(), found.size());
@@ -219,41 +191,7 @@ public class TestDetectChessboardFiducial {
 			else
 				offsetY = 10;
 
-			basicTest(3,4, false);
-		}
-	}
-
-	@Disabled
-	@Test
-	public void touchedBorder_rotate() {
-		List<Se2_F64> transforms = new ArrayList<>();
-
-		transforms.add( new Se2_F64(0,0,0.1));
-		transforms.add( new Se2_F64(w-100,0,0.1));
-		transforms.add( new Se2_F64(w/2,-5,0.4));
-		transforms.add( new Se2_F64(w/2,h-105,0.4));
-		transforms.add( new Se2_F64(w/2,h-100,0.4));
-		transforms.add( new Se2_F64(35,40,Math.PI/4));
-
-		transforms.add( new Se2_F64(50,-5,0.05));
-		transforms.add( new Se2_F64(50,-25,0.05));
-		transforms.add( new Se2_F64(50,h-65,-0.05));
-		transforms.add( new Se2_F64(50,h-90,0.05));
-
-		offsetX = 0;
-		offsetY = 0;
-
-//		showRendered = true;
-
-		for( int test = 0; test < transforms.size(); test++ ) {
-//			System.out.println("====================================== Test = "+test);
-			transform = transforms.get(test);
-
-			// noise is added to images. Make sure the algorithms aren't brittle
-			for (int mc = 0; mc < 5; mc++) {
-				basicTest(3,4, false);
-				basicTest(3,4, true);
-			}
+			basicTest(3,4);
 		}
 	}
 }

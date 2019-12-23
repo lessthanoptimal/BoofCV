@@ -19,8 +19,10 @@
 package boofcv.alg.feature.detect.chess;
 
 import boofcv.alg.filter.misc.AverageDownSampleOps;
-import boofcv.core.image.GeneralizedImageOps;
+import boofcv.alg.misc.ImageNormalization;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
@@ -36,15 +38,22 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends ImageGray<D>> {
+public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 	// minimum number of pixels in the top most level in the pyramid
 	// If <= 0 then have a single layer at full resolution
 	int pyramidTopSize = 100;
+
+	// Input image with normalized pixel values
+	GrayF32 normalized = new GrayF32(1,1);
+
 	// List of layers in the pyramid
-	List<T> pyramid = new ArrayList<>();
+	List<GrayF32> pyramid = new ArrayList<>();
+
+	// search radius when checking to see if the same feature has been detected at multiple scales
+	int radius = 7;
 
 	// Corner detector
-	DetectChessboardCorners<T,D> detector;
+	DetectChessboardCornersX detector;
 
 	// Detection results for each layer in the pyramid
 	FastQueue<PyramidLevel> featureLevels = new FastQueue<>(PyramidLevel.class, PyramidLevel::new);
@@ -57,12 +66,15 @@ public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends Im
 	NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
 	FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData.class,true);
 
-	public DetectChessboardCornersPyramid(DetectChessboardCorners<T,D> detector) {
+	ImageType<T> imageType;
+
+	public DetectChessboardCornersXPyramid(DetectChessboardCornersX detector, ImageType<T> imageType) {
 		this.detector = detector;
+		this.imageType = imageType;
 	}
 
-	public DetectChessboardCornersPyramid( Class<T> imageType ) {
-		this( new DetectChessboardCorners<>(imageType));
+	public DetectChessboardCornersXPyramid(ImageType<T> imageType) {
+		this( new DetectChessboardCornersX(),imageType);
 	}
 
 	/**
@@ -73,20 +85,29 @@ public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends Im
 
 		corners.reset();
 
-		// top to bottom. This way the intensity image is at the input image's scale. Which is useful
-		// for visualiztion purposes
+		// top to bottom i.e. low res to high res.
+		// Two reasons. 1) maximum image intensity can be feed into high resolution images, see below.
+		//              2) The intensity image is at the input image's scale. Which is useful for visualization
+		//                 purposes
+		float maxIntensityImage = 0;
+		detector.considerMaxIntensityImage = maxIntensityImage;
 		double scale = Math.pow(2.0,pyramid.size()-1);
 		for (int level = pyramid.size()-1; level >= 0; level--) {
-			// find the corners
+			// In blurred images the x-corner intensity is likely to be much greater at lower resolutions
+			// At higher resolution there might be no corners and a very small non-maximum threshold is selected.
+			// This will cause a large percentage of the image to be selected as an x-corner, slowing things down!
+			// Thus the maximum intensity found so far is used in each layer.
+			detector.considerMaxIntensityImage = maxIntensityImage;
 			detector.process(pyramid.get(level));
+			maxIntensityImage = Math.max(maxIntensityImage,detector.maxIntensityImage);
 
 			// Add found corners to this level's list
 			PyramidLevel featsLevel = featureLevels.get(level);
 
-			FastQueue<ChessboardCorner> corners = detector.getCorners();
+			List<ChessboardCorner> corners = detector.getCorners();
 			featsLevel.corners.reset();
 
-			for (int i = 0; i < corners.size; i++) {
+			for (int i = 0; i < corners.size(); i++) {
 				ChessboardCorner cf = corners.get(i);
 
 				// convert the coordinate into input image coordinates
@@ -96,85 +117,119 @@ public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends Im
 				ChessboardCorner cl = featsLevel.corners.grow();
 				cl.first = true;
 				cl.set(x,y,cf.orientation,cf.intensity);
+				cl.constrast = cf.constrast;
+				cl.levelMax = level;
+				cl.level1 = level;
+				cl.level2 = level;
 			}
 			scale /= 2.0;
 		}
 
-		// Create a combined set of features from all the levels. Only add each feature once by searching
-		// for it in the next level down
+		// Perform non-maximum suppression against features in each scale.
+		// Because of the scale difference the search radius changes depending on the scale of the layer in the pyramid
+		double baseScale = 1.0;
 		for (int levelIdx = 0; levelIdx < pyramid.size(); levelIdx++) {
 			PyramidLevel level0 = featureLevels.get(levelIdx);
 
+			scale = baseScale*2.0;
 			// mark features in the next level as seen if they match ones in this level
 			for( int nextIdx = levelIdx+1; nextIdx < pyramid.size(); nextIdx++ ) {
 				PyramidLevel level1 = featureLevels.get(nextIdx);
-				markSeenAsFalse(level0.corners,level1.corners);
+				markSeenAsFalse(level0.corners,level1.corners, scale);
+				scale *= 2;
 			}
+			baseScale *= 2.0;
 		}
 
+		// Only keep flagged features for the final output
+		int dropped = 0;
 		for (int levelIdx = 0; levelIdx < pyramid.size(); levelIdx++) {
 			PyramidLevel level = featureLevels.get(levelIdx);
 			// only add corners if they were first seen in this level
 			for (int i = 0; i < level.corners.size; i++) {
 				ChessboardCorner c = level.corners.get(i);
-				if( c.first )
+				if( c.first ) {
 					corners.grow().set(c);
+				} else {
+					dropped++;
+				}
 			}
 		}
+//		System.out.println("Found Pyramid "+corners.size+" dropped "+dropped);
 	}
 
-	/**
-	 * Finds corners in list 1 which match corners in list 0. If the feature in list 0 has already been
-	 * seen then the feature in list 1 will be marked as seen. Otherwise the feature which is the most intense
-	 * is marked as first.
-	 */
-	void markSeenAsFalse(FastQueue<ChessboardCorner> corners0 , FastQueue<ChessboardCorner> corners1) {
+	void markSeenAsFalse(FastQueue<ChessboardCorner> corners0 , FastQueue<ChessboardCorner> corners1, double scale ) {
 		nn.setPoints(corners1.toList(),false);
-		// radius of the blob in the intensity image is 2*kernelRadius
-		// Add some buffer because things tend to shift a bit across scales
-		int radius = detector.shiRadius*2+2;
+
+		double searchRadius = radius*scale;
 		for (int i = 0; i < corners0.size; i++) {
 			ChessboardCorner c0 = corners0.get(i);
-			if( !c0.first )
-				continue;
 
-			nnSearch.findNearest(c0,radius,5,nnResults);
+			// prefer features found at higher resolutions since they can be more accurate. Do this by increasing
+			// their intensity value, but because non-max is being done here you have to be careful to not increase
+			// the value of a "non-maximum" corner and remove all!
+			//
+			// NOTE: With blurred images, the lower resolution images will have higher intensity
+			//       so as you go up scale intensity smoothly (more or less) increases
+			final double intensity = c0.intensity*(c0.first?8.0:1.0);
 
-			// IDEA: Could make this smarter by looking at the orientation too?
-			double maxIntensity = 0;
+			nnSearch.findNearest(c0,searchRadius,10,nnResults);
+			boolean maximum = true;
+
+			// Location accuracy is better at higher resolution but angle accuracy is better at lower resolution
+			// accept the new angle if it has higher corner intensity
+			ChessboardCorner resultsMax = c0;
+			double distanceMax = 0;
+
+			// set the second level to the lowest resolution a neighbor is found in
+			int level2 = c0.level2;
 			for (int j = 0; j < nnResults.size; j++) {
 				ChessboardCorner c1 = nnResults.get(j).point;
-				maxIntensity = Math.max(c1.intensity,maxIntensity);
-			}
-			// the lower resolution feature must be much more intense than the current level to preferred. This
-			// results in more accurate feature localization
-			if( maxIntensity < c0.intensity*1.5) {
-				for (int j = 0; j < nnResults.size; j++) {
-					ChessboardCorner c1 = nnResults.get(j).point;
+				level2 = c1.level2;
+				if( c1.intensity < intensity ) {
 					c1.first = false;
+				} else {
+					maximum = false;
 				}
-			} else {
+				if( c1.intensity > resultsMax.intensity) {
+					distanceMax = nnResults.get(j).distance;
+					resultsMax = c1;
+				}
+			}
+
+			if( !maximum ) {
 				c0.first = false;
+			}
+
+			// Require it to be within the non-maximum radius to actually be merged into c0
+			// This is to prevent a feature from "drifting" and incorrectly appearing to go deep down in the pyramid
+			if( distanceMax <= radius*radius ) {
+				c0.orientation = resultsMax.orientation;
+				c0.intensity = resultsMax.intensity;
+				c0.constrast = resultsMax.constrast;
+				c0.levelMax = resultsMax.levelMax;
+				c0.level2 = level2;
 			}
 		}
 	}
 
 	/**
-	 * Creates an image pyrmaid by 2x2 average down sampling the input image. The original input image is at layer
+	 * Creates an image pyramid by 2x2 average down sampling the input image. The original input image is at layer
 	 * 0 with each layer after that 1/2 the resolution of the previous. 2x2 down sampling is used because it doesn't
 	 * add blur or aliasing.
 	 */
 	void constructPyramid(T input) {
+		ImageNormalization.zeroMeanMaxOne(input,normalized,null);
 		if( pyramid.size() == 0 ){
-			pyramid.add(input);
+			pyramid.add(normalized);
 		} else {
-			pyramid.set(0,input);
+			pyramid.set(0,normalized);
 		}
 
 		// make sure the top most layer in the pyramid isn't too small
 		int pyramidTopSize = this.pyramidTopSize;
-		if( pyramidTopSize != 0 && pyramidTopSize < (1+2*detector.getKernelRadius())*5  ) {
-			pyramidTopSize = (1+2*detector.getKernelRadius())*5;
+		if( pyramidTopSize != 0 && pyramidTopSize < (1+2*radius)*5  ) {
+			pyramidTopSize = (1+2*radius)*5;
 		}
 
 		int levelIndex = 1;
@@ -184,9 +239,9 @@ public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends Im
 			int height = input.height/divisor;
 			if( pyramidTopSize == 0 || width < pyramidTopSize || height < pyramidTopSize)
 				break;
-			T level;
+			GrayF32 level;
 			if( pyramid.size() <= levelIndex ) {
-				level = (T)GeneralizedImageOps.createSingleBand(detector.imageType,width,height);
+				level = new GrayF32(width,height);
 				pyramid.add(level);
 			} else {
 				level = pyramid.get(levelIndex);
@@ -207,12 +262,16 @@ public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends Im
 		FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner.class,true);
 	}
 
-	public DetectChessboardCorners<T,D>  getDetector() {
+	public DetectChessboardCornersX getDetector() {
 		return detector;
 	}
 
 	public FastQueue<ChessboardCorner> getCorners() {
 		return corners;
+	}
+
+	public int getNumberOfLevels() {
+		return pyramid.size();
 	}
 
 	public int getPyramidTopSize() {
@@ -221,5 +280,9 @@ public class DetectChessboardCornersPyramid<T extends ImageGray<T>, D extends Im
 
 	public void setPyramidTopSize(int pyramidTopSize) {
 		this.pyramidTopSize = pyramidTopSize;
+	}
+
+	public ImageType<T> getImageType() {
+		return imageType;
 	}
 }

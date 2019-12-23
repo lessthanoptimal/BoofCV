@@ -19,7 +19,7 @@
 package boofcv.factory.fiducial;
 
 import boofcv.abst.fiducial.calib.*;
-import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
+import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
 
 import javax.annotation.Nullable;
 
@@ -48,39 +48,41 @@ public class FactoryFiducialCalibration {
 	}
 
 	/**
-	 * Detector for chessboard targets.  Squares can be partially outside, but inside corners must be entirely
-	 * inside the image.
+	 * Chessboard detector based on binary images. Fast but not as robust as the X-Corner method. Not recommended
+	 * for fisheye images.
 	 *
-	 * @see DetectChessboardFiducial
+	 * @see DetectChessboardBinaryPattern
 	 *
 	 * @param configDet Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	@Deprecated
-	public static CalibrationDetectorChessboardOld chessboardOld(@Nullable ConfigChessboardOld configDet ,
-																 ConfigGridDimen configGrid ) {
+	public static CalibrationDetectorChessboardBinary chessboardB(@Nullable ConfigChessboardBinary configDet ,
+																  ConfigGridDimen configGrid )
+	{
 		if( configDet == null )
-			configDet = new ConfigChessboardOld();
+			configDet = new ConfigChessboardBinary();
 		configDet.checkValidity();
 
-		return new CalibrationDetectorChessboardOld(configDet,configGrid);
+		return new CalibrationDetectorChessboardBinary(configDet,configGrid);
 	}
 
 	/**
-	 * Detector for chessboard targets.  Squares can be partially outside, but inside corners must be entirely
-	 * inside the image.
+	 * Chessboard detector which searches for x-corners. Very robust but is about 2x to 3x slower on large images
+	 * than the binary method. Comparable speed on smaller images.
 	 *
-	 * @see DetectChessboardFiducial
+	 * @see CalibrationDetectorChessboardX
 	 *
 	 * @param config Configuration for chessboard detector
 	 * @return Square grid target detector.
 	 */
-	public static CalibrationDetectorChessboard chessboard(@Nullable ConfigChessboard config , ConfigGridDimen dimen ) {
+	public static CalibrationDetectorChessboardX chessboardX(@Nullable ConfigChessboardX config ,
+															 ConfigGridDimen dimen )
+	{
 		if( config == null )
-			config = new ConfigChessboard();
+			config = new ConfigChessboardX();
 		config.checkValidity();
 
-		return new CalibrationDetectorChessboard(config,dimen);
+		return new CalibrationDetectorChessboardX(config,dimen);
 	}
 
 	/**

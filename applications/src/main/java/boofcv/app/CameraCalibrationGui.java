@@ -227,7 +227,7 @@ public class CameraCalibrationGui extends JPanel
 
 	private void createDetector() {
 		switch( controlsTarget.selected ) {
-			case CHESSBOARD: app.detector = FactoryFiducialCalibration.chessboard(null,controlsTarget.configChessboard);break;
+			case CHESSBOARD: app.detector = FactoryFiducialCalibration.chessboardX(null,controlsTarget.configChessboard);break;
 			case SQUARE_GRID: app.detector = FactoryFiducialCalibration.squareGrid(null,controlsTarget.configSquare);break;
 			case CIRCLE_GRID: app.detector = FactoryFiducialCalibration.circleRegularGrid(null,controlsTarget.configCircle);break;
 			case CIRCLE_HEX: app.detector = FactoryFiducialCalibration.circleHexagonalGrid(null,controlsTarget.configCircleHex);break;

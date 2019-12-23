@@ -43,7 +43,7 @@ public class BenchmarkCalibrationDetectors {
 
 	public static class ChessboardOld extends PerformerBase {
 		DetectorFiducialCalibration detector = FactoryFiducialCalibration.
-				chessboardOld((ConfigChessboardOld)null,new ConfigGridDimen(7, 5, 30));
+				chessboardB((ConfigChessboardBinary)null,new ConfigGridDimen(7, 5, 30));
 
 		@Override
 		public void process() {

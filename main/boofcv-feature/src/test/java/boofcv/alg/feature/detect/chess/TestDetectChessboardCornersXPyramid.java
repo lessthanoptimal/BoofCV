@@ -18,31 +18,21 @@
 
 package boofcv.alg.feature.detect.chess;
 
-import org.junit.jupiter.api.Test;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.List;
 
 /**
  * @author Peter Abeles
  */
-class TestDetectChessboardCorners2 {
-	@Test
-	void checkPositiveInside() {
-		fail("Implement");
-	}
+class TestDetectChessboardCornersXPyramid extends GenericChessboardCornersChecks {
 
-	@Test
-	void checkNegativeInside() {
-		fail("Implement");
-	}
-
-	@Test
-	void checkChessboardCircle() {
-		fail("Implement");
-	}
-
-	@Test
-	void computeFeatures() {
-		fail("Implement");
+	@Override
+	public List<ChessboardCorner> process(GrayF32 image) {
+		DetectChessboardCornersXPyramid<GrayF32> alg = new DetectChessboardCornersXPyramid<>(ImageType.SB_F32);
+		alg.setPyramidTopSize(50);
+		alg.process(image);
+		return alg.getCorners().toList();
 	}
 }

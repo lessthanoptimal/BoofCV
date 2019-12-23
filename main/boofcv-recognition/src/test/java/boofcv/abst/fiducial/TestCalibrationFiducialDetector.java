@@ -18,7 +18,7 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.abst.fiducial.calib.ConfigChessboardOld;
+import boofcv.abst.fiducial.calib.ConfigChessboardBinary;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.RenderCalibrationTargetsGraphics2D;
@@ -45,7 +45,7 @@ public class TestCalibrationFiducialDetector {
 
 		@Override
 		public FiducialDetector createDetector(ImageType imageType) {
-			return FactoryFiducial.calibChessboardOld((ConfigChessboardOld)null, config, imageType.getImageClass());
+			return FactoryFiducial.calibChessboardB((ConfigChessboardBinary)null, config, imageType.getImageClass());
 		}
 
 		@Override

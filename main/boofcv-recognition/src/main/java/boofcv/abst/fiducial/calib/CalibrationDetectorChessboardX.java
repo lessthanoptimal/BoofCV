@@ -20,11 +20,11 @@ package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.feature.detect.chess.DetectChessboardCorners2Pyramid;
+import boofcv.alg.feature.detect.chess.DetectChessboardCornersXPyramid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
-import boofcv.alg.fiducial.calib.chess.DetectChessboardPatterns;
+import boofcv.alg.fiducial.calib.chess.DetectChessboardXCornerPatterns;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.PointIndex2D_F64;
@@ -35,13 +35,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Detector for chessboard calibration targets. Returns the first chessboard which is detected and matches
- * the expected size
+ * Detector for chessboard calibration targets which searches for X-Corners.
+ * Returns the first chessboard which is detected and matches the expected size is returned.
  * 
  * @author Peter Abeles
  */
-public class CalibrationDetectorChessboard
-		extends DetectChessboardPatterns<GrayF32>
+public class CalibrationDetectorChessboardX
+		extends DetectChessboardXCornerPatterns<GrayF32>
 		implements DetectorFiducialCalibration {
 
 	int cornerRows,cornerCols;
@@ -52,8 +52,9 @@ public class CalibrationDetectorChessboard
 	// transform from input pixels to undistorted pixels
 	Point2Transform2_F64 pixel2undist;
 
-	public CalibrationDetectorChessboard(ConfigChessboard config, ConfigGridDimen shape ) {
+	public CalibrationDetectorChessboardX(ConfigChessboardX config, ConfigGridDimen shape ) {
 		super(config, GrayF32.class);
+
 
 		cornerRows = shape.numRows-1;
 		cornerCols = shape.numCols-1;
@@ -109,7 +110,7 @@ public class CalibrationDetectorChessboard
 		}
 	}
 
-	public DetectChessboardCorners2Pyramid getDetector() {
+	public DetectChessboardCornersXPyramid getDetector() {
 		return detector;
 	}
 

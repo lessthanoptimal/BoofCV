@@ -18,10 +18,10 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.abst.fiducial.calib.ConfigChessboardOld;
+import boofcv.abst.fiducial.calib.ConfigChessboardBinary;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.filter.binary.BinaryContourFinder;
-import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
+import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
 import boofcv.alg.fiducial.calib.squares.SquareNode;
 import boofcv.alg.filter.binary.BinaryImageOps;
@@ -43,17 +43,16 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-// TODO button to save images
-public class DetectCalibrationChessboardOldApp
+public class DetectCalibrationChessboardBinaryApp
 		extends CommonDetectCalibrationApp
 
 {
-	DetectChessboardFiducial<GrayF32> alg;
+	DetectChessboardBinaryPattern<GrayF32> alg;
 	ConfigGridDimen configGrid;
-	ConfigChessboardOld configDet = new ConfigChessboardOld();
+	ConfigChessboardBinary configDet = new ConfigChessboardBinary();
 
-	public DetectCalibrationChessboardOldApp(int numRows , int numColumns ,
-											 List<String> exampleInputs) {
+	public DetectCalibrationChessboardBinaryApp(int numRows , int numColumns ,
+												List<String> exampleInputs) {
 		super(exampleInputs);
 		configGrid = new ConfigGridDimen(numRows, numColumns, 1);
 		setUpGui(new DetectCalibrationPolygonPanel(numRows,numColumns, configDet.square, configDet.thresholding));
@@ -68,7 +67,7 @@ public class DetectCalibrationChessboardOldApp
 		configGrid.numRows = controlPanel.getGridRows();
 		configGrid.numCols = controlPanel.getGridColumns();
 
-		alg = FactoryFiducialCalibration.chessboardOld(configDet,configGrid).getAlgorithm();
+		alg = FactoryFiducialCalibration.chessboardB(configDet,configGrid).getAlgorithm();
 		reprocessImageOnly();
 	}
 
@@ -128,10 +127,10 @@ public class DetectCalibrationChessboardOldApp
 		examples.add(UtilIO.pathExample("fiducial/chessboard/movie.mjpeg"));
 
 		SwingUtilities.invokeLater(()-> {
-			DetectCalibrationChessboardOldApp app = new DetectCalibrationChessboardOldApp(7, 5, examples);
+			DetectCalibrationChessboardBinaryApp app = new DetectCalibrationChessboardBinaryApp(7, 5, examples);
 
 			app.openFile(new File(examples.get(0)));
-			app.display("Calibration Target Detection");
+			app.display("Chessboard (Binary) Detection");
 		});
 	}
 }

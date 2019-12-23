@@ -18,34 +18,30 @@
 
 package boofcv.alg.fiducial.calib.chess;
 
-import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
-import boofcv.alg.feature.detect.chess.DetectChessboardCorners2Pyramid;
+import boofcv.abst.fiducial.calib.ConfigChessboardX;
+import boofcv.alg.feature.detect.chess.DetectChessboardCornersXPyramid;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterToGrid.GridInfo;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
 
 /**
- * Detector which finds all chessboard patterns in view.
+ * Chessboard detector that uses X-Corners and finds all valid chessboard patterns inside the image.
  * 
  * @author Peter Abeles
  */
-public class DetectChessboardPatterns<T extends ImageGray<T>> {
+public class DetectChessboardXCornerPatterns<T extends ImageGray<T>> {
 
-	protected DetectChessboardCorners2Pyramid<T> detector;
+	protected DetectChessboardCornersXPyramid<T> detector;
 	protected ChessboardCornerClusterFinder<T> clusterFinder;
 	protected ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
 
 	protected FastQueue<GridInfo> found = new FastQueue<>(GridInfo.class,true);
 
-	public DetectChessboardPatterns(ConfigChessboard config , Class<T> imageType ) {
+	public DetectChessboardXCornerPatterns(ConfigChessboardX config , Class<T> imageType ) {
 
-		detector = new DetectChessboardCorners2Pyramid<>(ImageType.single(imageType));
+		detector = new DetectChessboardCornersXPyramid<>(ImageType.single(imageType));
 		clusterFinder = new ChessboardCornerClusterFinder<>(imageType);
-
-		// the user is unlikely to set this value correctly
-		config.threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
 
 		detector.setPyramidTopSize(config.pyramidTopSize);
 		detector.getDetector().setNonmaxRadius(config.cornerRadius);
@@ -62,8 +58,8 @@ public class DetectChessboardPatterns<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Used to add a filter which will check the shape of found grids before returning them. This can help
-	 * impossible configurations earlier and possibly reduce by an insignificant amount CPU.
+	 * Used to add a filter which will check the shape of found grids before returning them. This can help prune
+	 * impossible configurations earlier and improve runtime speed.
 	 */
 	public void setCheckShape(ChessboardCornerClusterToGrid.CheckShape checkShape) {
 		clusterToGrid.setCheckShape(checkShape);
@@ -88,7 +84,7 @@ public class DetectChessboardPatterns<T extends ImageGray<T>> {
 		}
 	}
 
-	public DetectChessboardCorners2Pyramid<T> getDetector() {
+	public DetectChessboardCornersXPyramid<T> getDetector() {
 		return detector;
 	}
 

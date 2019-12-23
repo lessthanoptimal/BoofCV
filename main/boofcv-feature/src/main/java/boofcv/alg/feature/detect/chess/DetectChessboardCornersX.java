@@ -41,6 +41,7 @@ import boofcv.misc.DiscretizedCircle;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.convolve.Kernel1D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
@@ -58,7 +59,7 @@ import static boofcv.misc.CircularIndex.addOffset;
 /**
  * Chessboard corner detector that's designed to be robust and fast. Specifically tested under many different lighting
  * conditions, with/without fisheye distortion, motion blur, out of focus, up close, far away, ... etc. This class
- * only operates at a single scale. See {@link DetectChessboardCorners2Pyramid} for multi scale that's needed
+ * only operates at a single scale. See {@link DetectChessboardCornersXPyramid} for multi scale that's needed
  * to work in noisy images.
  *
  * Overview:
@@ -78,7 +79,7 @@ import static boofcv.misc.CircularIndex.addOffset;
  *
  * @author Peter Abeles
  */
-public class DetectChessboardCorners2 {
+public class DetectChessboardCornersX {
 	// Threshold used to filter out corners
 	double cornerIntensityThreshold = 1.0;
 
@@ -114,8 +115,8 @@ public class DetectChessboardCorners2 {
 	List<ChessboardCorner> filtered = new ArrayList<>();
 
 	// storage for corner detector output
-	private GrayF32 intensity = new GrayF32(1,1);
-	private GrayF32 intensity2x2 = new GrayF32(1,1);
+	GrayF32 intensity = new GrayF32(1,1);
+	GrayF32 intensity2x2 = new GrayF32(1,1);
 	/**
 	 * Maximum pixel value in the corner intensity image
 	 */
@@ -128,13 +129,13 @@ public class DetectChessboardCorners2 {
 	public float considerMaxIntensityImage = 0;
 
 	// Used to compute line integrals of spokes around a corner
-	ImageBorder<GrayF32> borderImg;
-	ImageLineIntegral integral = new ImageLineIntegral();
+	final ImageBorder<GrayF32> borderInput = FactoryImageBorder.generic(BorderType.EXTENDED,ImageType.SB_F32);
+	final ImageLineIntegral integral = new ImageLineIntegral();
 
 	// for mean-shift
-	InterpolatePixelS<GrayF32> inputInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class,BorderType.ZERO);
-	InterpolatePixelS<GrayF32> blurInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class,BorderType.ZERO);
-	InterpolatePixelS<GrayF32> intensityInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class,BorderType.ZERO);
+	final ImageBorder_F32 borderBlur = (ImageBorder_F32)FactoryImageBorder.generic(BorderType.EXTENDED,ImageType.SB_F32);
+	final InterpolatePixelS<GrayF32> inputInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class,BorderType.ZERO);
+	final InterpolatePixelS<GrayF32> intensityInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class,BorderType.ZERO);
 	public boolean useMeanShift = true;
 
 	// Find corners in intensity image
@@ -163,7 +164,7 @@ public class DetectChessboardCorners2 {
 	/**
 	 * Declares internal data structures
 	 */
-	public DetectChessboardCorners2() {
+	public DetectChessboardCornersX() {
 		{
 			ConfigExtract config = new ConfigExtract();
 			config.radius = 1;
@@ -177,9 +178,8 @@ public class DetectChessboardCorners2 {
 		blurFilter = FactoryBlurFilter.gaussian(ImageType.SB_F32,-1,blurRadius);
 
 		// just give it something. this will be changed later
-		borderImg = FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class);
-		borderImg.setImage(new GrayF32(1,1));
-		integral.setImage(FactoryGImageGray.wrap(borderImg));
+		borderInput.setImage(new GrayF32(1,1));
+		integral.setImage(FactoryGImageGray.wrap(borderInput));
 
 		{
 			ConfigMeanShiftSearch config = new ConfigMeanShiftSearch(5,1e-6);
@@ -193,8 +193,8 @@ public class DetectChessboardCorners2 {
 		DiscretizedCircle.coordinates(3, outsideCircle3);
 		outsideCircleValues = new float[ outsideCircle4.size ];
 
+		borderBlur.setImage(blurred);
 		intensityInterp.setImage(intensity);
-		blurInterp.setImage(blurred);
 		meanShift.setImage(intensity);
 	}
 
@@ -208,7 +208,7 @@ public class DetectChessboardCorners2 {
 		filtered.clear();
 		corners.reset();
 		foundNonmax.reset();
-		borderImg.setImage(input);
+		borderInput.setImage(input);
 		inputInterp.setImage(input);
 
 		// The x-corner detector requires a little bit of blur to be applied ot the input image
@@ -263,7 +263,6 @@ public class DetectChessboardCorners2 {
 			}
 
 			// Check to see if there's the expected up/down pattern in the surrounding pixels in a circle around
-			// TODO these use a mean pixel value. That might not be a good idea
 			if (!checkChessboardCircle((float) c.x, (float) c.y, outsideCircle4, 3, 6, symmetricTol)) {
 				continue;
 			}
@@ -285,13 +284,13 @@ public class DetectChessboardCorners2 {
 				continue;
 			}
 
-			// TODO describe
+			// See if it's a corner also using the eigen value definition
 			if( !checkCorner(c)) {
 				c.edgeIntensity = -1;
 				continue;
 			}
 
-			// TODO describe
+			// Computes features like orientation
 			if( !computeFeatures(c) ) {
 				c.edgeIntensity = -1;
 				continue;
@@ -319,11 +318,11 @@ public class DetectChessboardCorners2 {
 //				maxIntensityImage,corners.size,filtered.size(),(100*dropped/(double)corners.size));
 	}
 
-	// TODO comment
-	private boolean checkPositiveInside(int cx , int cy , int threshold ) {
+	/**
+	 * Around the corer there should be around 4 pixels which have a positive x-corner score
+	 */
+	boolean checkPositiveInside(int cx , int cy , int threshold ) {
 		int radius = 1;
-		if( cx < radius || cx >= intensity.width-radius || cy < radius || cy >= intensity.height-radius )
-			return false;
 
 		final int x0 = cx - radius;
 		final int y0 = cy - radius;
@@ -340,8 +339,10 @@ public class DetectChessboardCorners2 {
 		return count >= threshold;
 	}
 
-	// TODO comment
-	private boolean checkNegativeInside(int cx , int cy , int threshold ) {
+	/**
+	 * Outside of the center most of the pixels should have a negative x-corner score
+	 */
+	boolean checkNegativeInside(int cx , int cy , int threshold ) {
 		int radius = 3;
 
 		final int x0 = cx - radius;
@@ -360,7 +361,9 @@ public class DetectChessboardCorners2 {
 		return count >= threshold;
 	}
 
-	// TODO comment
+	/**
+	 * Looks for an up down pattern in a circle around the corner
+	 */
 	private boolean checkChessboardCircle(float cx , float cy , FastQueue<Point2D_I32> outside , int min , int max , int symmetric ) {
 		// NOTE: using `mean = (max(:) + min(:))/2` produced slightly better results, but that might have been
 		//       over fitting to the dataset
@@ -401,7 +404,11 @@ public class DetectChessboardCorners2 {
 		return numUpDown >= min && numUpDown <= max && numMirror >= halfCount-symmetric;
 	}
 
-	// TODO comment
+	/**
+	 * Computes how much like an eignevalue corner it is. heavily fisheye's images are very poor eigen corners
+	 * near the chessboard corner, but even with a very forgiving threshold this eliminates a lot of the false
+	 * positives
+	 */
 	private boolean checkCorner( ChessboardCorner c ) {
 		int radius = 3;
 
@@ -419,9 +426,8 @@ public class DetectChessboardCorners2 {
 				int y = cy + iy - radius;
 				int x = cx + ix - radius;
 
-				// TODO change to border image
-				float dx = blurInterp.get(x+1,y)- blurInterp.get(x-1,y);
-				float dy = blurInterp.get(x,y+1)- blurInterp.get(x,y-1);
+				float dx = borderBlur.get(x+1,y)- borderBlur.get(x-1,y);
+				float dy = borderBlur.get(x,y+1)- borderBlur.get(x,y-1);
 
 				xx += dx * dx;
 				xy += dx * dy;

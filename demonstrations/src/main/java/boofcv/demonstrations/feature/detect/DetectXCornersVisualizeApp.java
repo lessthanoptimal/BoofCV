@@ -19,19 +19,15 @@
 package boofcv.demonstrations.feature.detect;
 
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
-import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
-import boofcv.alg.feature.detect.chess.DetectChessboardCornersPyramid;
+import boofcv.alg.feature.detect.chess.DetectChessboardCornersXPyramid;
+import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
-import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.factory.filter.binary.FactoryThresholdBinary;
-import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.VisualizeImageData;
 import boofcv.io.PathLabel;
@@ -41,16 +37,14 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -66,7 +60,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DetectChessboardCornersVisualizeApp
+public class DetectXCornersVisualizeApp
 		extends DemonstrationBase
 {
 	// displays intensity image
@@ -75,13 +69,11 @@ public class DetectChessboardCornersVisualizeApp
 
 	// intensity image is rendered here
 	BufferedImage visualized;
-	BufferedImage binary;
 	BufferedImage original;
-
 
 	GrayF32 logIntensity = new GrayF32(1,1);
 
-	DetectChessboardCornersPyramid<GrayF32,GrayF32> detector = new DetectChessboardCornersPyramid<>(GrayF32.class);
+	DetectChessboardCornersXPyramid<GrayF32> detector = new DetectChessboardCornersXPyramid<>(ImageType.SB_F32);
 
 	// used to compute feature intensity
 	final Object lockAlgorithm = new Object();
@@ -89,7 +81,7 @@ public class DetectChessboardCornersVisualizeApp
 	final Object lockCorners = new Object();
 	FastQueue<ChessboardCorner> foundCorners = new FastQueue<>(ChessboardCorner.class,true);
 
-	public DetectChessboardCornersVisualizeApp(List<PathLabel> examples ) {
+	public DetectXCornersVisualizeApp(List<PathLabel> examples ) {
 		super(true,true,examples,ImageType.single(GrayF32.class));
 
 		controlPanel = new ControlPanel();
@@ -106,19 +98,28 @@ public class DetectChessboardCornersVisualizeApp
 				}
 			}
 		});
+
+		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if( SwingUtilities.isLeftMouseButton(e)) {
+					Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
+					float value = detector.getDetector().getIntensity().get((int)p.x,(int)p.y);
+					System.out.printf("Clicked at ( %.2f , %.2f ) x-corner = %e \n",p.x,p.y,value);
+				}
+			}
+		});
 	}
 
 	private void createAlgorithm() {
 		synchronized (lockAlgorithm) {
-			ConfigThreshold threshold = controlPanel.thresholdPanel.createConfig();
-			threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
-
-			DetectChessboardCorners<GrayF32,GrayF32> corners = new DetectChessboardCorners<>(GrayF32.class);
-			corners.setKernelRadius(controlPanel.radius);
-			corners.useMeanShift = controlPanel.meanShift;
-			detector = new DetectChessboardCornersPyramid<>(corners);
 			detector.setPyramidTopSize(controlPanel.pyramidTop);
-			detector.getDetector().setThresholding(FactoryThresholdBinary.threshold(threshold,GrayF32.class));
+			detector.getDetector().useMeanShift = controlPanel.meanShift;
+			detector.getDetector().edgeIntensityRatioThreshold = controlPanel.threshEdgeIntensity;
+			detector.getDetector().edgeAspectRatioThreshold = controlPanel.threshEdgeAspect;
+			detector.getDetector().nonmaxThresholdRatio = controlPanel.threshXCorner;
+			detector.getDetector().cornerIntensity = controlPanel.thresholdIntensity;
+			detector.getDetector().setNonmaxRadius(controlPanel.nonmaxRadius);
 		}
 	}
 
@@ -148,13 +149,27 @@ public class DetectChessboardCornersVisualizeApp
 	}
 
 	@Override
-	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
-
-		original = ConvertBufferedImage.checkCopy(buffered, original);
-
+	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input)
+	{
 		GrayF32 gray = (GrayF32) input;
 
-		controlPanel.thresholdPanel.updateHistogram(gray);
+		if( controlPanel.scaleDown > 1 ) {
+			int scale = controlPanel.scaleDown;
+			GrayF32 scaled = new GrayF32(input.width/scale,input.height/scale);
+			AverageDownSampleOps.down(gray,scaled);
+			gray = scaled;
+
+			visualized = ConvertBufferedImage.checkDeclare(scaled.width,scaled.height, visualized,BufferedImage.TYPE_INT_RGB);
+
+			original = ConvertBufferedImage.checkDeclare(scaled.width,scaled.height, original,buffered.getType());
+			Graphics2D g2 = original.createGraphics();
+			g2.setTransform(AffineTransform.getScaleInstance(1.0/scale,1.0/scale));
+			g2.drawImage(buffered,0,0,null);
+		} else {
+			visualized = ConvertBufferedImage.checkDeclare(gray.width,gray.height, visualized,BufferedImage.TYPE_INT_RGB);
+			original = ConvertBufferedImage.checkDeclare(gray.width,gray.height, original,buffered.getType());
+			original = ConvertBufferedImage.checkCopy(buffered, original);
+		}
 
 		GrayF32 featureImg;
 		double processingTime;
@@ -167,38 +182,26 @@ public class DetectChessboardCornersVisualizeApp
 			featureImg = detector.getDetector().getIntensity();
 
 			if( controlPanel.logItensity ) {
-				PixelMath.log(featureImg,1.0f,logIntensity);
+				PixelMath.logSign(featureImg,1.0f,logIntensity);
 				VisualizeImageData.colorizeSign(logIntensity, visualized, ImageStatistics.maxAbs(logIntensity));
 			} else {
 				VisualizeImageData.colorizeSign(featureImg, visualized, ImageStatistics.maxAbs(featureImg));
 			}
 
-			binary=VisualizeBinaryData.renderBinary(detector.getDetector().getBinary(),false,binary);
-
 			synchronized (lockCorners) {
 				FastQueue<ChessboardCorner> orig = detector.getCorners();
 				foundCorners.reset();
-				for (int i = 0; i < orig.size; i++) {
+				for (int i = 0; i < orig.size(); i++) {
 					foundCorners.grow().set( orig.get(i) );
 				}
 			}
 		}
 
 		SwingUtilities.invokeLater(() -> {
+			imagePanel.setBufferedImageNoChange(original);
 			controlPanel.setProcessingTimeMS(processingTime);
-			changeViewImage();
 			imagePanel.repaint();
 		});
-	}
-
-	private void changeViewImage() {
-		if( controlPanel.view == 0 || controlPanel.view == 2 ) {
-			imagePanel.setBufferedImageNoChange(visualized);
-		} else if( controlPanel.view == 1 ) {
-			imagePanel.setBufferedImageNoChange(original);
-		} else if( controlPanel.view == 3 ) {
-			imagePanel.setBufferedImageNoChange(binary);
-		}
 	}
 
 	class DisplayPanel extends ShapeVisualizePanel {
@@ -209,15 +212,16 @@ public class DetectChessboardCornersVisualizeApp
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-			if(  controlPanel.view == 2 ) {
+			if( controlPanel.translucent > 0 ) {
 				// this requires some explaining
 				// for some reason it was decided that the transform would apply a translation, but not a scale
 				// so this scale will be concatted on top of the translation in the g2
 				tran.setTransform(scale,0,0,scale,0,0);
 				Composite beforeAC = g2.getComposite();
-				AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f);
+				float translucent = controlPanel.translucent/100.0f;
+				AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, translucent);
 				g2.setComposite(ac);
-				g2.drawImage(original,tran,null);
+				g2.drawImage(visualized,tran,null);
 				g2.setComposite(beforeAC);
 			}
 
@@ -256,56 +260,75 @@ public class DetectChessboardCornersVisualizeApp
 	class ControlPanel extends DetectBlackShapePanel
 			implements ActionListener , ChangeListener , ThresholdControlPanel.Listener
 	{
-		JComboBox<String> comboView;
 		JCheckBox checkLogIntensity;
-		JSpinner spinnerRadius;
+		JSpinner spinnerScaleDown;
 		JSpinner spinnerTop;
+		JSpinner spinnerEdgeIntensity;
+		JSpinner spinnerEdgeAspect;
+		JSpinner spinnerXCorner;
+		JSpinner spinnerIntensity;
+		JSpinner spinnerNonMaxRadius;
 		JCheckBox checkShowCorners;
 		JCheckBox checkDebug;
-		public ThresholdControlPanel thresholdPanel;
+		JSlider sliderTranslucent = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
 
 		int pyramidTop = 100;
-		int radius = 1;
 		boolean showCorners =true;
 		boolean logItensity =false;
-		int view = 1;
+		int view = 0;
 		boolean meanShift = true;
+		int translucent = 0;
+		int scaleDown = 1;
+		double threshEdgeIntensity;
+		double threshEdgeAspect;
+		float threshXCorner;
+		double thresholdIntensity;
+		int nonmaxRadius;
 
 		public ControlPanel() {
 			{
-				ConfigThreshold config = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
-				config.down = false;
-				thresholdPanel = new ThresholdControlPanel(this,config);
-				thresholdPanel.addHistogramGraph();
+				threshEdgeIntensity = detector.getDetector().getEdgeIntensityRatioThreshold();
+				threshEdgeAspect = detector.getDetector().edgeAspectRatioThreshold;
+				threshXCorner = detector.getDetector().getNonmaxThresholdRatio();
+				nonmaxRadius = detector.getDetector().getNonmaxRadius();
+				thresholdIntensity = detector.getDetector().cornerIntensity;
 			}
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
-			comboView = combo(view,"Intensity","Image","Both","Binary");
-			spinnerRadius = spinner(radius, 1, 100, 1);
+			spinnerEdgeIntensity = spinner(threshEdgeIntensity, 0.0, 1.0, 0.01,1,4);
+			spinnerEdgeAspect = spinner(threshEdgeAspect, 0.0, 1.0, 0.01,1,4);
+			spinnerXCorner = spinner(threshXCorner, 0.0, 1.0, 0.01,1,4);
+			spinnerIntensity = spinner(thresholdIntensity, 0.0, 1000.0, 5,3,1);
+			spinnerNonMaxRadius = spinner(nonmaxRadius, 1, 20, 1);
+			spinnerScaleDown = spinner(scaleDown,1,128,1);
 			spinnerTop = spinner(pyramidTop, 50, 10000, 50);
 			checkShowCorners = checkbox("Show Corners", showCorners);
 			checkDebug = checkbox("Mean Shift", meanShift);
 
+			sliderTranslucent.setMaximumSize(new Dimension(120,26));
+			sliderTranslucent.setPreferredSize(sliderTranslucent.getMaximumSize());
+			sliderTranslucent.addChangeListener(this);
+
 			addLabeled(processingTimeLabel, "Time (ms)");
 			addLabeled(imageSizeLabel,"Image Size");
-			addLabeled(comboView,"View");
+			addLabeled(spinnerScaleDown,"Scale Down");
+			addLabeled(sliderTranslucent,"X-Corners");
 			addLabeled(selectZoom,"Zoom");
 			addAlignLeft(checkLogIntensity);
 			addAlignLeft(checkShowCorners);
 			addAlignLeft(checkDebug);
-			addLabeled(spinnerRadius,"Corner Radius");
+			addLabeled(spinnerEdgeIntensity,"Edge Intensity");
+			addLabeled(spinnerEdgeAspect,"Edge Aspect");
+			addLabeled(spinnerXCorner,"X-Corner");
+			addLabeled(spinnerIntensity,"Intensity");
+			addLabeled(spinnerNonMaxRadius,"NonMax Radius");
 			addLabeled(spinnerTop,"Pyramid Top");
-			addAlignCenter(thresholdPanel);
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == comboView ) {
-				view = comboView.getSelectedIndex();
-				changeViewImage();
-				imagePanel.repaint();
-			} else if( e.getSource() == checkShowCorners) {
+			if( e.getSource() == checkShowCorners) {
 				showCorners = checkShowCorners.isSelected();
 				imagePanel.repaint();
 			} else if( e.getSource() == checkLogIntensity) {
@@ -323,14 +346,36 @@ public class DetectChessboardCornersVisualizeApp
 			if( e.getSource() == selectZoom ) {
 				zoom = ((Number)selectZoom.getValue()).doubleValue();
 				imagePanel.setScale(zoom);
-			} else if( e.getSource() == spinnerRadius ) {
-				radius = ((Number)spinnerRadius.getValue()).intValue();
+			} else if( e.getSource() == spinnerEdgeIntensity) {
+				threshEdgeIntensity = ((Number) spinnerEdgeIntensity.getValue()).doubleValue();
+				createAlgorithm();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerEdgeAspect) {
+				threshEdgeAspect = ((Number) spinnerEdgeAspect.getValue()).doubleValue();
+				createAlgorithm();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerXCorner ) {
+				threshXCorner = ((Number)spinnerXCorner.getValue()).floatValue();
+				createAlgorithm();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerIntensity ) {
+				thresholdIntensity = ((Number)spinnerIntensity.getValue()).floatValue();
+				createAlgorithm();
+				reprocessImageOnly();
+			} else if( e.getSource() == spinnerNonMaxRadius ) {
+				nonmaxRadius = ((Number)spinnerNonMaxRadius.getValue()).intValue();
 				createAlgorithm();
 				reprocessImageOnly();
 			} else if( e.getSource() == spinnerTop ) {
 				pyramidTop = ((Number)spinnerTop.getValue()).intValue();
 				createAlgorithm();
 				reprocessImageOnly();
+			} else if( e.getSource() == spinnerScaleDown ) {
+				scaleDown = ((Number)spinnerScaleDown.getValue()).intValue();
+				reprocessImageOnly();
+			} else if( e.getSource() == sliderTranslucent ) {
+				translucent = ((Number)sliderTranslucent.getValue()).intValue();
+				imagePanel.repaint();
 			}
 		}
 
@@ -340,10 +385,6 @@ public class DetectChessboardCornersVisualizeApp
 			reprocessImageOnly();
 		}
 	}
-
-	// TODO visualize contours
-	// TODO show each layer in the pyramid
-	// TODO control corner intensity threshold
 
 	public static void main( String args[] ) {
 		List<PathLabel> examples = new ArrayList<>();
@@ -356,11 +397,11 @@ public class DetectChessboardCornersVisualizeApp
 		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 
 		SwingUtilities.invokeLater(()->{
-			DetectChessboardCornersVisualizeApp app = new DetectChessboardCornersVisualizeApp(examples);
+			DetectXCornersVisualizeApp app = new DetectXCornersVisualizeApp(examples);
 
 			app.openExample(examples.get(0));
 			app.waitUntilInputSizeIsKnown();
-			app.display("Chessboard Corner Detector");
+			app.display("X-Corner Detector");
 		});
 	}
 }

@@ -22,7 +22,7 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.PointToPixelTransform_F32;
-import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
+import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
@@ -37,19 +37,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper around {@link DetectChessboardFiducial} for {@link DetectorFiducialCalibration}
+ * Wrapper around {@link DetectChessboardBinaryPattern} for {@link DetectorFiducialCalibration}
  * 
  * @author Peter Abeles
  */
-@Deprecated
-public class CalibrationDetectorChessboardOld implements DetectorFiducialCalibration {
+public class CalibrationDetectorChessboardBinary implements DetectorFiducialCalibration {
 
-	DetectChessboardFiducial<GrayF32> alg;
+	DetectChessboardBinaryPattern<GrayF32> alg;
 
 	List<Point2D_F64> layoutPoints;
 	CalibrationObservation detected;
 
-	public CalibrationDetectorChessboardOld(ConfigChessboardOld configDet, ConfigGridDimen configGrid ) {
+	public CalibrationDetectorChessboardBinary(ConfigChessboardBinary configDet, ConfigGridDimen configGrid ) {
 
 		DetectPolygonBinaryGrayRefine<GrayF32> detectorSquare =
 				FactoryShapeDetector.polygon(configDet.square,GrayF32.class);
@@ -57,7 +56,7 @@ public class CalibrationDetectorChessboardOld implements DetectorFiducialCalibra
 		InputToBinary<GrayF32> inputToBinary =
 				FactoryThresholdBinary.threshold(configDet.thresholding,GrayF32.class);
 
-		alg = new DetectChessboardFiducial<>(
+		alg = new DetectChessboardBinaryPattern<>(
 				configGrid.numRows, configGrid.numCols, configDet.maximumCornerDistance,detectorSquare,inputToBinary);
 
 		layoutPoints = gridChess(configGrid.numRows, configGrid.numCols, configGrid.shapeSize);
@@ -118,7 +117,7 @@ public class CalibrationDetectorChessboardOld implements DetectorFiducialCalibra
 	}
 
 
-	public DetectChessboardFiducial<GrayF32> getAlgorithm() {
+	public DetectChessboardBinaryPattern<GrayF32> getAlgorithm() {
 		return alg;
 	}
 

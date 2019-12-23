@@ -235,7 +235,7 @@ public class CameraCalibration extends BaseStandardInputApp {
 
 		ConfigGridDimen config = new ConfigGridDimen(numRows, numColumns, 1);
 
-		detector = FactoryFiducialCalibration.chessboard(null,config);
+		detector = FactoryFiducialCalibration.chessboardX(null,config);
 	}
 
 	protected void parseSquareGrid( int index , String []args ) {

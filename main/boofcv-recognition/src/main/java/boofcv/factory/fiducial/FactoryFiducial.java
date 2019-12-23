@@ -112,32 +112,31 @@ public class FactoryFiducial {
 	}
 
 	/**
-	 * Wrapper around chessboard calibration detector.   Refine with lines is set to true automatically.  This
-	 * isn't being used for calibration and its better to use the whole line.
+	 * Chessboard detector based on binary images. Fast but not as robust as the X-Corner method. Not recommended
+	 * for fisheye images.
 	 *
 	 * @param config Description of the chessboard.
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
-	@Deprecated
 	public static <T extends ImageGray<T>>
-	CalibrationFiducialDetector<T> calibChessboardOld(@Nullable ConfigChessboardOld config,
-													  ConfigGridDimen dimen, Class<T> imageType) {
+	CalibrationFiducialDetector<T> calibChessboardB(@Nullable ConfigChessboardBinary config,
+													ConfigGridDimen dimen, Class<T> imageType) {
 		return new CalibrationFiducialDetector<>(config, dimen, imageType);
 	}
 
 	/**
-	 * Wrapper around chessboard calibration detector.   Refine with lines is set to true automatically.  This
-	 * isn't being used for calibration and its better to use the whole line.
+	 * Chessboard detector which searches for x-corners. Very robust but is about 2x to 3x slower on large images
+	 * than the binary method.
 	 *
 	 * @param config Description of the chessboard.
 	 * @param imageType Type of image it's processing
 	 * @return FiducialDetector
 	 */
 	public static <T extends ImageGray<T>>
-	CalibrationFiducialDetector<T> calibChessboard(@Nullable ConfigChessboard config,
-												   ConfigGridDimen dimen,
-												   Class<T> imageType) {
+	CalibrationFiducialDetector<T> calibChessboardX(@Nullable ConfigChessboardX config,
+													ConfigGridDimen dimen,
+													Class<T> imageType) {
 		return new CalibrationFiducialDetector<>(config, dimen, imageType);
 	}
 

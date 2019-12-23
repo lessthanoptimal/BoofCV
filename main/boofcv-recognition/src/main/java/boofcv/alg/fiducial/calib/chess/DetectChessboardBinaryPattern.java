@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * <p>
- * Detects calibration points inside a chessboard calibration target.  The image is first the image
+ * Detects calibration points inside a chessboard calibration target.  First the image
  * is thresholded to create a binary image for square detection, then the binary image is eroded to make sure
  * the squares don't touch.  After that {@link DetectChessboardSquarePoints} is called and it detects and sorts
  * the squares.
@@ -48,8 +48,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-@Deprecated
-public class DetectChessboardFiducial<T extends ImageGray<T>> {
+public class DetectChessboardBinaryPattern<T extends ImageGray<T>> {
 
 	// detects the chess board
 	private DetectChessboardSquarePoints<T> findSeeds;
@@ -68,9 +67,9 @@ public class DetectChessboardFiducial<T extends ImageGray<T>> {
 	 * @param numCols Number of columns in the grid.  Target dependent.
 	 * @param maxCornerDistance The maximum distance two square corners can be from each other in pixels
 	 */
-	public DetectChessboardFiducial(int numRows, int numCols, ConfigLength maxCornerDistance,
-									DetectPolygonBinaryGrayRefine<T> detectorSquare,
-									InputToBinary<T> inputToBinary)
+	public DetectChessboardBinaryPattern(int numRows, int numCols, ConfigLength maxCornerDistance,
+										 DetectPolygonBinaryGrayRefine<T> detectorSquare,
+										 InputToBinary<T> inputToBinary)
 	{
 		this.numRows = numRows;
 		this.numCols = numCols;

@@ -19,7 +19,7 @@
 package boofcv.abst.fiducial.calib;
 
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
-import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
+import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.shape.ConfigPolygonDetector;
@@ -29,12 +29,11 @@ import boofcv.struct.Configuration;
 /**
  * Calibration parameters for chessboard style calibration grid.
  *
- * @see DetectChessboardFiducial
+ * @see DetectChessboardBinaryPattern
  *
  * @author Peter Abeles
  */
-@Deprecated
-public class ConfigChessboardOld implements Configuration {
+public class ConfigChessboardBinary implements Configuration {
 	/**
 	 * The maximum distance in pixels that two corners can be from each other.  In well focused image
 	 * this number can be only a few pixels.  The default value has been selected to handle blurred images.
@@ -47,12 +46,11 @@ public class ConfigChessboardOld implements Configuration {
 	 * Configuration for thresholding the image
 	 */
 	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, ConfigLength.fixed(20));
-//	public ConfigThreshold thresholding = new ConfigThreshold(ConfigLength.relative(0.05,10),10);
 
 	/**
 	 * Configuration for square detector.
 	 *
-	 * NOTE: Number of sides, clockwise, and convex are all set by the detector in its consturctor. Values
+	 * NOTE: Number of sides, clockwise, and convex are all set by the detector in its constructor. Values
 	 * specified here are ignored.
 	 */
 	public ConfigPolygonDetector square = new ConfigPolygonDetector();

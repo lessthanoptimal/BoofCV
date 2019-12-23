@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static boofcv.abst.fiducial.calib.CalibrationDetectorChessboardOld.gridChess;
+import static boofcv.abst.fiducial.calib.CalibrationDetectorChessboardBinary.gridChess;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -74,6 +74,6 @@ public class TestCalibrationDetectorChessboard extends GenericPlanarCalibrationD
 
 	@Override
 	public DetectorFiducialCalibration createDetector(ConfigGridDimen layout) {
-		return FactoryFiducialCalibration.chessboard((ConfigChessboard)null,layout);
+		return FactoryFiducialCalibration.chessboardX((ConfigChessboardX)null,layout);
 	}
 }

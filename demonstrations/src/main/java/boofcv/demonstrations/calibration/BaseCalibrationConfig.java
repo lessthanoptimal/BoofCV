@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
@@ -75,7 +75,7 @@ public class BaseCalibrationConfig {
 			detector = FactoryFiducialCalibration.squareGrid(null,
 					new ConfigGridDimen(numRows, numCols, width, space));
 		} else if( type.compareToIgnoreCase("chess") == 0 ) {
-			detector = FactoryFiducialCalibration.chessboard((ConfigChessboard)null,
+			detector = FactoryFiducialCalibration.chessboardX((ConfigChessboardX)null,
 					new ConfigGridDimen(numRows, numCols, width));
 		} else {
 			throw new RuntimeException("Unknown type: "+type);

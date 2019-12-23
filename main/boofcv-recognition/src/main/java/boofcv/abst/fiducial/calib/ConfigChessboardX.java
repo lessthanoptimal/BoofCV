@@ -18,20 +18,17 @@
 
 package boofcv.abst.fiducial.calib;
 
-import boofcv.alg.feature.detect.chess.DetectChessboardCorners;
-import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
-import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.factory.filter.binary.ThresholdType;
+import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
 import boofcv.struct.Configuration;
 
 /**
  * Calibration parameters for chessboard style calibration grid.
  *
- * @see DetectChessboardFiducial
+ * @see DetectChessboardBinaryPattern
  *
  * @author Peter Abeles
  */
-public class ConfigChessboard implements Configuration {
+public class ConfigChessboardX implements Configuration {
 
 	/**
 	 * Size of a corner in the corner detector. 1 is recommended in general. 2 or higher can be used to run faster
@@ -87,17 +84,6 @@ public class ConfigChessboard implements Configuration {
 	 * square. BoofCV calibration targets always have this requirements. Other projects might not.
 	 */
 	public boolean requireCornerSquares = false;
-
-	/**
-	 * Selection of threshold for binary image. Intensity image is the input.
-	 */
-	public ConfigThreshold threshold = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
-
-	{
-		threshold.maxPixelValue = DetectChessboardCorners.GRAY_LEVELS;
-		threshold.scale = 1.0;
-		threshold.down = false;
-	}
 
 	@Override
 	public void checkValidity() {

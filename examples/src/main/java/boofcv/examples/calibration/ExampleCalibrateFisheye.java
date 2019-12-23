@@ -55,7 +55,7 @@ public class ExampleCalibrateFisheye {
 //		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/square_grid"));
 
 //		 Chessboard Example
-		detector = FactoryFiducialCalibration.chessboard(null,new ConfigGridDimen(7, 5, 30));
+		detector = FactoryFiducialCalibration.chessboardX(null,new ConfigGridDimen(7, 5, 30));
 		images = UtilIO.listAll(UtilIO.pathExample("calibration/fisheye/chessboard"));
 
 		// Declare and setup the calibration algorithm

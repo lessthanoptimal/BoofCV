@@ -167,7 +167,7 @@ public class CalibrateFisheyePlanarGuiApp extends JPanel {
 		DetectorFiducialCalibration detector =
 //				FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(8, 8, 0.5, 7.0 / 18.0));
 //				FactoryFiducialCalibration.squareGrid(null,new ConfigGridDimen(4,3,30,30));
-				FactoryFiducialCalibration.chessboard(null,new ConfigGridDimen(7, 5, 30));
+				FactoryFiducialCalibration.chessboardX(null,new ConfigGridDimen(7, 5, 30));
 //				FactoryFiducialCalibration.circleHexagonalGrid(new ConfigCircleHexagonalGrid(5, 8, 1, 6));
 
 		List<String> images;

@@ -18,8 +18,8 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
-import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX;
+import boofcv.abst.fiducial.calib.ConfigChessboardX;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.fiducial.calib.chess.ChessboardCornerClusterFinder.LineInfo;
@@ -72,10 +72,10 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DetectCalibrationChessboardApp
+public class DetectCalibrationChessboardXCornerApp
 		extends DemonstrationBase
 {
-	private ConfigChessboard configDetector = new ConfigChessboard();
+	private ConfigChessboardX configDetector = new ConfigChessboardX();
 	private ConfigGridDimen configGridDimen = new ConfigGridDimen(5,7,1);
 
 	// GUI Controls and visualization panels
@@ -87,7 +87,7 @@ public class DetectCalibrationChessboardApp
 	private BufferedImage original;
 
 	// The chessboard corner detector
-	private CalibrationDetectorChessboard detector;
+	private CalibrationDetectorChessboardX detector;
 
 	//--------------------
 	// used to compute feature intensity
@@ -104,7 +104,7 @@ public class DetectCalibrationChessboardApp
 	private boolean success;
 	//-----------------
 
-	DetectCalibrationChessboardApp(List<PathLabel> examples ) {
+	DetectCalibrationChessboardXCornerApp(List<PathLabel> examples ) {
 		super(true,true,examples,ImageType.single(GrayF32.class));
 
 		controlPanel = new ControlPanel();
@@ -191,7 +191,7 @@ public class DetectCalibrationChessboardApp
 			if( configDetector.edgeThreshold <= 0 )
 				configDetector.edgeThreshold = -1;
 
-			detector = new CalibrationDetectorChessboard(configDetector,configGridDimen);
+			detector = new CalibrationDetectorChessboardX(configDetector,configGridDimen);
 			detector.getDetector().getDetector().useMeanShift = controlPanel.meanShift;
 
 			if( controlPanel.anyGrid ) {
@@ -714,11 +714,11 @@ public class DetectCalibrationChessboardApp
 		examples.add(new PathLabel("Chessboard Movie",UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 
 		SwingUtilities.invokeLater(()->{
-			DetectCalibrationChessboardApp app = new DetectCalibrationChessboardApp(examples);
+			DetectCalibrationChessboardXCornerApp app = new DetectCalibrationChessboardXCornerApp(examples);
 
 			app.openExample(examples.get(0));
 			app.waitUntilInputSizeIsKnown();
-			app.display("Chessboard Corner Detector");
+			app.display("Chessboard (X-Corner) Detector");
 		});
 	}
 }

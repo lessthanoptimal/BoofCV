@@ -320,7 +320,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 		System.out.println("chessboard: rows = "+rows+" columns = "+cols+"  square width "+width);
 		ConfigGridDimen config = new ConfigGridDimen(rows, cols, width);
 
-		detector = FactoryFiducial.calibChessboard(null,config, GrayU8.class);
+		detector = FactoryFiducial.calibChessboardX(null,config, GrayU8.class);
 	}
 	void parseSquareGrid( int index , String []args ) {
 		int rows=-1,cols=-1;

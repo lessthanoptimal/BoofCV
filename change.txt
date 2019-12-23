@@ -60,16 +60,17 @@ Version : 0.35
   * Added Semi-Global Matching (SGM) with several options for score functions
 - SFM
   * Projective camera with lens distortion
-  * TODO Stereo VO Quad - Now uses trifocal tensor and sparse bundle adjustment
 - Chessboard Detector
-  * TODO Prune similar based on edge difference
-  * TODO why pick long line in calib?
+  * Renamed previous detector to ChessboardBinary since it uses a binary image
+  * Created a new XCorner based method which is much more robust but slower
 
 TODO Tech Reports for new chessboard detector, assisted calibration, line fitting, stereo
 TODO Videos - hough line detectors
             - chessboard corner detector + improvements
             - stereo and VO updates
 
+TODO Visual Odometry
+     - Add SBA to VO algorithms
 TODO corner detector 2 tech report
 TODO Scene Reconstruction from arbitrary number of photos
 TODO hough circle detector
