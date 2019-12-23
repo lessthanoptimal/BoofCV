@@ -39,6 +39,7 @@ public class ShapeVisualizePanel extends ImageZoomPanel {
 			}
 		});
 
+		setWheelScrollingEnabled(false);
 		panel.addMouseWheelListener(e->{
 			setScale(BoofSwingUtil.mouseWheelImageZoom(scale,e));
 		});

@@ -44,6 +44,16 @@ public abstract class PeriodicColorizer implements PointCloudViewer.Colorizer {
 		return 2.0*Math.abs(offset+value/period - Math.floor(offset+value/period + 0.5));
 	}
 
+	public PeriodicColorizer fperiod(double period) {
+		this.period = period;
+		return this;
+	}
+
+	public PeriodicColorizer foffset(double offset) {
+		this.offset = offset;
+		return this;
+	}
+
 	public double getPeriod() {
 		return period;
 	}

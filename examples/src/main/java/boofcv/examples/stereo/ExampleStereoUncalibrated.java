@@ -88,8 +88,8 @@ public class ExampleStereoUncalibrated {
 		BoofConcurrency.USE_CONCURRENT = false;
 
 		// Successful
-		String name = "mono_wall_";
-//		String name = "bobcats_";
+		String name = "bobcats_";
+//		String name = "mono_wall_";
 //		String name = "minecraft_cave1_";
 //		String name = "chicken_";
 //		String name = "books_";

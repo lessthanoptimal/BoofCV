@@ -54,7 +54,7 @@ import java.io.File;
 public class ExampleStereoDisparity3D {
 
 	// Specifies what disparity values are considered
-	public static final int minDisparity = 0;
+	public static final int minDisparity = 10;
 	public static final int rangeDisparity = 60;
 
 	public static void main( String args[] ) {
@@ -81,7 +81,7 @@ public class ExampleStereoDisparity3D {
 
 //		GrayU8 disparity = ExampleStereoDisparity.denseDisparity(rectLeft, rectRight, 3,minDisparity, rangeDisparity);
 		GrayF32 disparity = ExampleStereoDisparity.denseDisparitySubpixel(
-				rectLeft, rectRight, 3, minDisparity, rangeDisparity);
+				rectLeft, rectRight, 5, minDisparity, rangeDisparity);
 
 		// ------------- Convert disparity image into a 3D point cloud
 

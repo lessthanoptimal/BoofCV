@@ -95,13 +95,16 @@ public class DetectLineApp<T extends ImageGray<T>, D extends ImageGray<D>>
 			lineDetector = null;
 			segmentDetector = null;
 
+			ConfigHoughGradient configGradient = new ConfigHoughGradient();
+			configGradient.maxLines = controls.maxLines;
+
 			switch (controls.whichAlg) {
 				case 0:
-					lineDetector = FactoryDetectLine.houghLinePolar((ConfigHoughGradient)null,null, imageType);
+					lineDetector = FactoryDetectLine.houghLinePolar(configGradient,null, imageType);
 					break;
 
 				case 1:
-					lineDetector = FactoryDetectLine.houghLineFoot((ConfigHoughGradient)null,null, imageType);
+					lineDetector = FactoryDetectLine.houghLineFoot(configGradient,null, imageType);
 					break;
 
 				case 2:

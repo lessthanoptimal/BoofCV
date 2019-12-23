@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.demonstrations.shapes;
 
+import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.StandardAlgConfigPanel;
 
 import javax.swing.*;
@@ -156,6 +157,13 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 			showCorners.setEnabled(false);
 			selectCornerPenalty.setEnabled(false);
 			selectMinimumSplitPixels.setEnabled(false);
+		}
+	}
+
+	public void setZoom(double _zoom) {
+		if( this.zoom != _zoom ) {
+			this.zoom = _zoom;
+			BoofSwingUtil.invokeNowOrLater(()->selectZoom.setValue(_zoom));
 		}
 	}
 

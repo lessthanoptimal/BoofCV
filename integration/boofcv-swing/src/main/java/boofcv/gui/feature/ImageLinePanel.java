@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import java.util.List;
  */
 public class ImageLinePanel extends ImagePanel {
 
-	public List<LineSegment2D_F32> lines = new ArrayList<>();
+	public final List<LineSegment2D_F32> lines = new ArrayList<>();
 
 	Line2D.Double line = new Line2D.Double();
 
@@ -48,7 +48,9 @@ public class ImageLinePanel extends ImagePanel {
 	public synchronized void setLines(List<LineParametric2D_F32> lines) {
 		this.lines.clear();
 		for( LineParametric2D_F32 p : lines ) {
-			this.lines.add(LineImageOps.convert(p, img.getWidth(), img.getHeight()));
+			LineSegment2D_F32 s = LineImageOps.convert(p, img.getWidth(), img.getHeight());
+			if( s != null )
+				this.lines.add(s);
 		}
 	}
 

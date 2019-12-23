@@ -429,8 +429,6 @@ public class ExampleTrifocalStereoUncalibrated {
 										   int minDisparity , int rangeDisparity) {
 
 //		drawInliers(origLeft, origRight, intrinsic, inliers);
-		int width = distortedLeft.width;
-		int height = distortedRight.height;
 
 		// Rectify and remove lens distortion for stereo processing
 		DMatrixRMaj rectifiedK = new DMatrixRMaj(3, 3);
@@ -460,13 +458,13 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		// compute disparity
 		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
-		config.errorType = DisparityError.NCC;
+		config.errorType = DisparityError.CENSUS;
 		config.disparityMin = minDisparity;
 		config.disparityRange = rangeDisparity;
 		config.subpixel = true;
 		config.regionRadiusX = config.regionRadiusY = 6;
 		config.validateRtoL = 1;
-		config.texture = 0.6;
+		config.texture = 0.2;
 		StereoDisparity<GrayU8, GrayF32> disparityAlg =
 				FactoryStereoDisparity.blockMatchBest5(config, GrayU8.class, GrayF32.class);
 
@@ -478,8 +476,8 @@ public class ExampleTrifocalStereoUncalibrated {
 		// show results
 		BufferedImage visualized = VisualizeImageData.disparity(disparity, null, rangeDisparity, 0);
 
-		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectColorLeft, new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB),true);
-		BufferedImage outRight = ConvertBufferedImage.convertTo(rectColorRight, new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB),true);
+		BufferedImage outLeft = ConvertBufferedImage.convertTo(rectColorLeft, null,true);
+		BufferedImage outRight = ConvertBufferedImage.convertTo(rectColorRight, null,true);
 
 		ShowImages.showWindow(new RectifiedPairPanel(true, outLeft, outRight), "Rectification",true);
 		ShowImages.showWindow(visualized, "Disparity",true);

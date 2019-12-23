@@ -29,7 +29,6 @@ import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
-import boofcv.gui.image.ImageZoomPanel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.ConnectRule;
@@ -80,7 +79,12 @@ public class ShapeFitContourApp
 	public ShapeFitContourApp(List<String> examples ) {
 		super(examples, ImageType.single(GrayU8.class));
 
+		this.gui.autoScaleCenterOnSetImage = false;
 		controlPanel = new ShapeFitContourPanel(this);
+
+		gui.setListener(scale->{
+			controlPanel.setZoom(scale);
+		});
 
 		add(BorderLayout.WEST, controlPanel);
 		add(BorderLayout.CENTER, gui);
@@ -99,14 +103,12 @@ public class ShapeFitContourApp
 			filtered.reshape(input.getWidth(),input.getHeight());
 			inputPrev.setTo((GrayU8)input);
 
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					Dimension d = gui.getPreferredSize();
-					if( d.getWidth() < buffered.getWidth() || d.getHeight() < buffered.getHeight() ) {
-						gui.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
-					}
-				}});
+			SwingUtilities.invokeLater(() -> {
+				Dimension d = gui.getPreferredSize();
+				if( d.getWidth() < buffered.getWidth() || d.getHeight() < buffered.getHeight() ) {
+					gui.setPreferredSize(new Dimension(buffered.getWidth(), buffered.getHeight()));
+				}
+			});
 		} else {
 			input = inputPrev;
 		}
@@ -236,11 +238,10 @@ public class ShapeFitContourApp
 		}
 	}
 
-	class VisualizePanel extends ImageZoomPanel {
+	class VisualizePanel extends ShapeVisualizePanel {
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 			synchronized ( ShapeFitContourApp.this ) {
-
 				renderVisuals(g2,scale);
 			}
 		}

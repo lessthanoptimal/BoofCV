@@ -28,6 +28,7 @@ import boofcv.io.UtilIO;
 import boofcv.io.geo.CodecBundleAdjustmentInTheLarge;
 import boofcv.misc.BoofMiscOps;
 import boofcv.visualize.PointCloudViewer;
+import boofcv.visualize.SingleAxisRgb;
 import boofcv.visualize.VisualizeData;
 import georegression.geometry.ConvertRotation3D_F64;
 import georegression.metric.UtilAngle;
@@ -141,6 +142,7 @@ public class ExampleBundleAdjustment {
 
 		PointCloudViewer viewer = VisualizeData.createPointCloudViewer();
 		viewer.setFog(true);
+		viewer.setColorizer(new SingleAxisRgb.Z().fperiod(20)); // makes it easier to see points without RGB color
 		viewer.setClipDistance(70); // done for visualization to make it easier to separate objects with the fog
 		viewer.setDotSize(1);
 		viewer.setTranslationStep(0.05);

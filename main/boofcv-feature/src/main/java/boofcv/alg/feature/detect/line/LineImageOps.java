@@ -258,7 +258,6 @@ public class LineImageOps {
 
 		// if a corner is right next to a border it might fail this test
 		if( inside.size() != 2 ) {
-//			System.out.println("Not 2! N = "+inside.size()+" x = "+inside.get(0).x);
 			return null;
 		}
 		return new LineSegment2D_F32(inside.get(0),inside.get(1));

@@ -78,6 +78,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 		this.guiImage = guiImage;
 		this.controls = controls;
 
+		this.guiImage.autoScaleCenterOnSetImage = false;
 		guiImage.setPreferredSize(new Dimension(800,800));
 
 		add(BorderLayout.WEST, controls);
@@ -211,7 +212,8 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 			active = work;
 		}
 
-		guiImage.setImage(active);
+		if( active != guiImage.getImage() )
+			guiImage.setImage(active);
 		guiImage.setScale(controls.zoom);
 
 		guiImage.repaint();

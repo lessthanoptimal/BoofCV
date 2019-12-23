@@ -79,12 +79,12 @@ public class ExampleStereoDisparity {
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
 		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
-		config.errorType = DisparityError.SAD;
+		config.errorType = DisparityError.CENSUS;
 		config.disparityMin = minDisparity;
 		config.disparityRange = rangeDisparity;
 		config.subpixel = false;
 		config.regionRadiusX = config.regionRadiusY = regionSize;
-		config.maxPerPixelError = 25;
+		config.maxPerPixelError = 35;
 		config.validateRtoL = 1;
 		config.texture = 0.2;
 		StereoDisparity<GrayU8, GrayU8> disparityAlg =
@@ -107,12 +107,12 @@ public class ExampleStereoDisparity {
 		// A slower but more accuracy algorithm is selected
 		// All of these parameters should be turned
 		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
-		config.errorType = DisparityError.SAD;
+		config.errorType = DisparityError.CENSUS;
 		config.disparityMin = minDisparity;
 		config.disparityRange = rangeDisparity;
 		config.subpixel = true;
 		config.regionRadiusX = config.regionRadiusY = regionSize;
-		config.maxPerPixelError = 25;
+		config.maxPerPixelError = 35;
 		config.validateRtoL = 1;
 		config.texture = 0.2;
 		StereoDisparity<GrayU8, GrayF32> disparityAlg =
@@ -187,11 +187,11 @@ public class ExampleStereoDisparity {
 		rectify(distLeft,distRight,param,rectLeft,rectRight);
 
 		// compute disparity
-		GrayU8 disparity = denseDisparity(rectLeft,rectRight,5,10,50);
-//		GrayF32 disparity = denseDisparitySubpixel(rectLeft,rectRight,5,10,50);
+		GrayU8 disparity = denseDisparity(rectLeft,rectRight,5,10,60);
+//		GrayF32 disparity = denseDisparitySubpixel(rectLeft,rectRight,5,10,60);
 
 		// show results
-		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,50,0);
+		BufferedImage visualized = VisualizeImageData.disparity(disparity, null,60,0);
 
 		ListDisplayPanel gui = new ListDisplayPanel();
 		gui.addImage(rectLeft, "Rectified");
