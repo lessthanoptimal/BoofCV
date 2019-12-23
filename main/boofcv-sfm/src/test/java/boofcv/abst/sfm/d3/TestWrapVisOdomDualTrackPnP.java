@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,6 +52,6 @@ public class TestWrapVisOdomDualTrackPnP extends CheckVisualOdometryStereoSim<Gr
 		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, GrayF32.class);
 
 		return FactoryVisualOdometry.stereoDualTrackerPnP(90, 2, 1.5, 1.5, 200, 50,
-				trackerLeft, trackerRight, describe,GrayF32.class);
+				trackerLeft, trackerRight, describe,11.0,GrayF32.class);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,6 +74,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 	private PointTracker<T> trackerLeft;
 	private PointTracker<T> trackerRight;
 	private DescribeRegionPoint<T,Desc> describe;
+	private double describeRadius=11.0;
 
 	// Data structures used when associating left and right cameras
 	private FastQueue<Point2D_F64> pointsLeft = new FastQueue<>(Point2D_F64.class, false);
@@ -489,7 +490,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 		for( int i = 0; i < tracks.size(); i++ ) {
 			PointTrack t = tracks.get(i);
 			// ignoring the return value.  most descriptors never return false and the ones that due will rarely do so
-			describe.process(t.x,t.y,0,2,descs.grow());
+			describe.process(t.x,t.y,0,describeRadius,descs.grow());
 
 			points.add( t );
 		}
@@ -529,6 +530,14 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 
 	public ModelMatcher<Se3_F64, Stereo2D3D> getMatcher() {
 		return matcher;
+	}
+
+	public double getDescribeRadius() {
+		return describeRadius;
+	}
+
+	public void setDescribeRadius(double describeRadius) {
+		this.describeRadius = describeRadius;
 	}
 
 	public static class LeftTrackInfo

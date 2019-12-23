@@ -15,12 +15,14 @@
   * OpenKinect
 
 --- Fresh Checkout ---
+BUILD USING JAVA 1.8 FOR ANDROID COMPATIBILITY!!!
 
+JDK=-Dorg.gradle.java.home=/opt/jdk/jdk1.8.0_211/
 VERSION=v0.XX
 git clone -b SNAPSHOT --recursive git@github.com:lessthanoptimal/BoofCV.git boofcv
-cd boofcv;./gradlew createVersionFile;rm -rf .git;cd ..;zip -r boofcv-$VERSION-src.zip boofcv
-cd boofcv;./gradlew createLibraryDirectory;mv boofcv-*-libs ..;cd ..;zip -r boofcv-$VERSION-libs.zip boofcv-*-libs
-cd boofcv;rm -rf docs/api-web;./gradlew alljavadocWeb;zip -r api.zip docs/api-web
+cd boofcv;./gradlew $JDK createVersionFile;rm -rf .git;cd ..;zip -r boofcv-$VERSION-src.zip boofcv
+cd boofcv;./gradlew $JDK createLibraryDirectory;mv boofcv-*-libs ..;cd ..;zip -r boofcv-$VERSION-libs.zip boofcv-*-libs
+cd boofcv;rm -rf docs/api-web;./gradlew $JDK alljavadocWeb;zip -r api.zip docs/api-web
 
 -- Make Sure Tests Pass Again --
 ./gradlew testReport
@@ -45,10 +47,10 @@ To post a SNAPSHOT or full release:
 
 1) ./gradlew assemble
 2) In gradle.properties comment out "org.gradle.parallel=true"
-3) uncomment the following line in build.gradle so that it creates javadoc. Commented out to speed up build
+3) Uncomment the following line in build.gradle so that it creates javadoc. Commented out to speed up build
    archives javadocJar
 4) Upload to Sonatype
-   ./gradlew uploadArchives
+   - ./gradlew clean;./gradlew $JDK uploadArchives
 
 A SNAPSHOT is created if SNAPSHOT is in its name.
 

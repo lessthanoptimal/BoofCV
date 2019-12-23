@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -94,10 +94,8 @@ public class FactoryVisualOdometry {
 	public static <T extends ImageGray<T>>
 	MonocularPlaneVisualOdometry<T> monoPlaneInfinity(int thresholdAdd,
 													  int thresholdRetire,
-
 													  double inlierPixelTol,
 													  int ransacIterations,
-
 													  PointTracker<T> tracker,
 													  ImageType<T> imageType) {
 
@@ -146,10 +144,8 @@ public class FactoryVisualOdometry {
 	MonocularPlaneVisualOdometry<T> monoPlaneOverhead(double cellSize,
 													  double maxCellsPerPixel,
 													  double mapHeightFraction ,
-
 													  double inlierGroundTol,
 													  int ransacIterations ,
-
 													  int thresholdRetire ,
 													  int absoluteMinimumTracks,
 													  double respawnTrackFraction,
@@ -287,6 +283,8 @@ public class FactoryVisualOdometry {
 	 * @param refineIterations Number of iterations done during non-linear optimization.  Try 50 or more.
 	 * @param trackerLeft Tracker used for left camera
 	 * @param trackerRight Tracker used for right camera
+	 * @param descriptor Describes points
+	 * @param describeRadius Radius passed in when describing points. Try 11.0
 	 * @param imageType Type of image being processed
 	 * @return Stereo visual odometry algorithm.
 	 */
@@ -298,6 +296,7 @@ public class FactoryVisualOdometry {
 												 int refineIterations,
 												 PointTracker<T> trackerLeft, PointTracker<T> trackerRight,
 												 DescribeRegionPoint<T,Desc> descriptor,
+												 double describeRadius,
 												 Class<T> imageType)
 	{
 		EstimateNofPnP pnp = FactoryMultiView.pnp_N(EnumPNP.P3P_FINSTERWALDER, -1);
@@ -309,7 +308,7 @@ public class FactoryVisualOdometry {
 		EstimatorToGenerator<Se3_F64,Stereo2D3D> generator = new EstimatorToGenerator<>(pnpStereo);
 
 		// Pixel tolerance for RANSAC inliers - euclidean error squared from left + right images
-		double ransacTOL = 2*inlierPixelTol * inlierPixelTol;
+		double ransacTOL = 2*inlierPixelTol*inlierPixelTol;
 
 		ModelMatcher<Se3_F64, Stereo2D3D> motion =
 				new Ransac<>(2323, manager, generator, distanceStereo, ransacIterations, ransacTOL);
@@ -335,6 +334,7 @@ public class FactoryVisualOdometry {
 
 		VisOdomDualTrackPnP<T,Desc> alg = new VisOdomDualTrackPnP<>(thresholdAdd, thresholdRetire, epipolarPixelTol,
 				trackerLeft, trackerRight, descriptor, associateUnique, triangulate, motion, refinePnP);
+		alg.setDescribeRadius(describeRadius);
 
 		return new WrapVisOdomDualTrackPnP<>(pnpStereo, distanceMono, distanceStereo, associateStereo, alg, refinePnP, imageType);
 	}

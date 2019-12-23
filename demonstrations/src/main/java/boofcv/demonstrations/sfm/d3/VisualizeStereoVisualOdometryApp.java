@@ -325,22 +325,23 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, imageType);
 
 			return FactoryVisualOdometry.stereoDualTrackerPnP(90, 2, 1.5, 1.5, 200, 50,
-					trackerLeft, trackerRight,describe, imageType);
+					trackerLeft, trackerRight,describe,11.0, imageType);
 		} else if( whichAlg == 4 ) {
+			// TODO Fix this. Totally broken and needs to be re-done. Plus name doesn't match what it is
 //			GeneralFeatureIntensity intensity =
 //					FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,defaultType);
 			GeneralFeatureIntensity intensity =
-					FactoryIntensityPoint.shiTomasi(1,false,imageType);
+					FactoryIntensityPoint.shiTomasi(2,false,imageType);
 			NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(2,50,0,true,false,true));
 			GeneralFeatureDetector general = new GeneralFeatureDetector(intensity,nonmax);
-			general.setMaxFeatures(600);
-			DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,2,imageType,derivType);
+			general.setMaxFeatures(1000);
+			DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,11.0,imageType,derivType);
 //			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true),defaultType);
 //			DescribeRegionPoint describe = FactoryDescribeRegionPoint.pixelNCC(5,5,defaultType);
 			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, imageType);
 			DetectDescribeMulti detDescMulti =  new DetectDescribeMultiFusion(detector,null,describe);
 
-			return FactoryVisualOdometry.stereoQuadPnP(1.5, 0.5 ,75, Double.MAX_VALUE, 300, 50, detDescMulti, imageType);
+			return FactoryVisualOdometry.stereoQuadPnP(1.5, 0.5 ,75, Double.MAX_VALUE, 600, 50, detDescMulti, imageType);
 		} else {
 			throw new RuntimeException("Unknown selection");
 		}
