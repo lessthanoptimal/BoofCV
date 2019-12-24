@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -162,6 +162,9 @@ public class SnapToLineEdge<T extends ImageGray<T>>extends BaseIntegralEdge<T> {
 			double sample0 = integral.compute(x, y, x + tanX, y + tanY);
 			x += tanX; y += tanY;
 			for (int j = 0; j < numPts; j++) {
+				// still need to check the next point due to round off error. very rare condition
+				if( j==numPts-1&&!integral.isInside(x + tanX, y + tanY))
+					break;
 				double sample1 = integral.compute(x, y, x + tanX, y + tanY);
 
 				double w = sample0 - sample1;

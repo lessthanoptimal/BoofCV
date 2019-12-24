@@ -21,7 +21,7 @@ package boofcv.abst.fiducial.calib;
 import boofcv.abst.shapes.polyline.ConfigPolylineSplitMerge;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
 import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.factory.filter.binary.ThresholdType;
+import boofcv.factory.filter.binary.ConfigThresholdLocalOtsu;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
@@ -45,7 +45,8 @@ public class ConfigChessboardBinary implements Configuration {
 	/**
 	 * Configuration for thresholding the image
 	 */
-	public ConfigThreshold thresholding = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, ConfigLength.fixed(20));
+	public ConfigThreshold thresholding = new ConfigThresholdLocalOtsu(ConfigLength.relative(0.05,10),10);
+
 
 	/**
 	 * Configuration for square detector.
@@ -57,7 +58,7 @@ public class ConfigChessboardBinary implements Configuration {
 
 	{
 		// this is being used as a way to smooth out the binary image.  Speeds things up quite a bit
-		thresholding.scale = 0.95;
+		thresholding.scale = 0.85;
 
 		((ConfigPolylineSplitMerge)square.detector.contourToPoly).cornerScorePenalty = 0.2;
 		((ConfigPolylineSplitMerge)square.detector.contourToPoly).minimumSideLength = 2;

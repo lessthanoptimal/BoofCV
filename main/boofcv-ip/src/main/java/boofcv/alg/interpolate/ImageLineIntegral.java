@@ -183,7 +183,7 @@ public class ImageLineIntegral {
 	 * @return true if inside or false if outside
 	 */
 	public boolean isInside( double x, double y ) {
-		return x >= 0 && y >= 0 && x <= image.getWidth() && y <= image.getHeight();
+		return x >= 0 && y >= 0 && x < image.getWidth() && y < image.getHeight();
 	}
 
 	/**
