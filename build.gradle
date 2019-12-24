@@ -10,7 +10,7 @@ allprojects {
     apply plugin: 'com.peterabeles.gversion'
 
     group = 'org.boofcv'
-    version = '0.35'
+    version = '0.36-SNAPSHOT'
 
     ext.COMMONS_IO_VERSION = '2.6'
 
@@ -34,8 +34,13 @@ subprojects {
     apply plugin: 'signing'
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    // Creates Java 8 byte code
+    compileJava {
+        options.compilerArgs = [ "--release", "8"  ]
     }
 
     // Fail on jar conflict
@@ -54,9 +59,8 @@ subprojects {
         mavenCentral()
         mavenLocal()
 
-        maven {
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
+        maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url = 'https://jitpack.io' } // needed to use Java 11 with 8 byte code
     }
 
     test {
@@ -127,6 +131,8 @@ subprojects {
             benchmarkCompile('org.openjdk.jmh:jmh-'+a+':1.19') // don't upgrade to 1.21! much slower
         }
 
+        // needed to use Java 11 with 8 byte code
+        annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.2.0'
     }
 
 //    jar {

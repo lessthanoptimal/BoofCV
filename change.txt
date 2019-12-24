@@ -3,6 +3,14 @@ Change Log
 Date Format: year/month/day
 
 ---------------------------------------------
+Date    : 2020
+Version : 0.36
+
+- Starting to use Java 11 (i.e. var) syntax but still will produce Java 1.8 byte code
+  https://github.com/bsideup/jabel
+- TODO try improving 3-view by estimating lens distortion in projective camera
+
+---------------------------------------------
 Date    : 2019-Dec-23
 Version : 0.35
 

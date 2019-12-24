@@ -118,7 +118,7 @@ public class ExampleStereoUncalibrated {
 		List<AssociatedPair> matches = ExampleFundamentalMatrix.computeMatches(buff01, buff02);
 
 		// Prune matches using the epipolar constraint. use a low threshold to prune more false matches
-		List<AssociatedPair> inliers = new ArrayList<>();
+		var inliers = new ArrayList<AssociatedPair>();
 		DMatrixRMaj F = ExampleFundamentalMatrix.robustFundamental(matches, inliers, 0.1);
 
 		// Perform self calibration using the projective view extracted from F
@@ -132,11 +132,11 @@ public class ExampleStereoUncalibrated {
 		double cx = width/2; double cy = height/2;
 
 		// Compute a transform from projective to metric by assuming we know the camera's calibration
-		EstimatePlaneAtInfinityGivenK estimateV = new EstimatePlaneAtInfinityGivenK();
+		var estimateV = new EstimatePlaneAtInfinityGivenK();
 		estimateV.setCamera1(fx,fy,0,cx,cy);
 		estimateV.setCamera2(fx,fy,0,cx,cy);
 
-		Vector3D_F64 v = new Vector3D_F64(); // plane at infinity
+		var v = new Vector3D_F64(); // plane at infinity
 		if( !estimateV.estimatePlaneAtInfinity(P2,v))
 			throw new RuntimeException("Failed!");
 
@@ -146,8 +146,8 @@ public class ExampleStereoUncalibrated {
 		CommonOps_DDRM.mult(P2,H,P2m);
 
 		// Decompose and get the initial estimate for translation
-		DMatrixRMaj tmp = new DMatrixRMaj(3,3);
-		Se3_F64 view1_to_view2 = new Se3_F64();
+		var tmp = new DMatrixRMaj(3,3);
+		var view1_to_view2 = new Se3_F64();
 		MultiViewOps.decomposeMetricCamera(P2m,tmp,view1_to_view2);
 
 		//------------------------- Setting up bundle adjustment
@@ -155,12 +155,12 @@ public class ExampleStereoUncalibrated {
 		System.out.println("Configuring bundle adjustment");
 
 		// Construct bundle adjustment data structure
-		SceneStructureMetric structure = new SceneStructureMetric(false);
-		SceneObservations observations = new SceneObservations(2);
+		var structure = new SceneStructureMetric(false);
+		var observations = new SceneObservations(2);
 
 		// We will assume that the camera has fixed intrinsic parameters
 		structure.initialize(1,2,inliers.size());
-		BundlePinholeSimplified bp = new BundlePinholeSimplified();
+		var bp = new BundlePinholeSimplified();
 		bp.f = fx;
 		structure.setCamera(0,false,bp);
 
@@ -189,10 +189,10 @@ public class ExampleStereoUncalibrated {
 
 		//------------------ Running Bundle Adjustment
 		System.out.println("Performing bundle adjustment");
-		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
+		var configLM = new ConfigLevenbergMarquardt();
 		configLM.dampeningInitial = 1e-3;
 		configLM.hessianScaling = false;
-		ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
+		var configSBA = new ConfigBundleAdjustment();
 		configSBA.configOptimizer = configLM;
 
 		// Create and configure the bundle adjustment solver
@@ -203,7 +203,7 @@ public class ExampleStereoUncalibrated {
 		bundleAdjustment.configure(1e-6, 1e-6, 100);
 
 		// Scaling improve accuracy of numerical calculations
-		ScaleSceneStructure bundleScale = new ScaleSceneStructure();
+		var bundleScale = new ScaleSceneStructure();
 		bundleScale.applyScale(structure,observations);
 
 		bundleAdjustment.setParameters(structure,observations);
@@ -211,7 +211,7 @@ public class ExampleStereoUncalibrated {
 
 		// Sometimes pruning outliers help improve the solution. In the stereo case the errors are likely
 		// to already fatal
-		PruneStructureFromSceneMetric pruner = new PruneStructureFromSceneMetric(structure,observations);
+		var pruner = new PruneStructureFromSceneMetric(structure,observations);
 		pruner.pruneObservationsByErrorRank(0.85);
 		pruner.prunePoints(1);
 		bundleAdjustment.setParameters(structure,observations);
@@ -231,7 +231,7 @@ public class ExampleStereoUncalibrated {
 		// display the inlier matches found using the robust estimator
 		System.out.println("\n\nComputing Stereo Disparity");
 		BundlePinholeSimplified cp = structure.getCameras().get(0).getModel();
-		CameraPinholeBrown intrinsic = new CameraPinholeBrown();
+		var intrinsic = new CameraPinholeBrown();
 		intrinsic.fsetK(cp.f,cp.f,0,cx,cy,width,height);
 		intrinsic.fsetRadial(cp.k1,cp.k2);
 
