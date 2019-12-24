@@ -34,60 +34,66 @@ public class ConfigChessboardX implements Configuration {
 	 * Size of a corner in the corner detector. 1 is recommended in general. 2 or higher can be used to run faster
 	 * if the image quality and the apparent target size is large.
 	 */
-	public int cornerRadius = 1;
+	public int detNonMaxRadius = 1;
 
 	/**
-	 * Non-maximum threshold relative to maximum corner intensity. 0 to 1, inclusive
+	 * Non-maximum threshold relative to maximum x-corner intensity. 0 to 1, inclusive
 	 */
-	public double cornerNonMaxThreshold = 0.05;
+	public double detNonMaxThresholdRatio = 0.05;
 
 	/**
-	 * Relative threshold for two corners being connected. The edge between them must have sufficient intensity.
-	 * The definition of sufficient is based on the contrast of the two x-corners.
+	 * After the initial candidate x-corners have been found a more accurate x-corner intensity is computed which
+	 * doesn't compromise as much for speed. If the refined intensity is less than this value it will be discarded.
 	 */
-	public double edgeThreshold = 0.05;
+	public double detRefinedXCornerThreshold = 0.025;
 
 	/**
 	 * The minimum allowed size for the top most layer in the pyramid. size = min(width,height). To have
 	 * only one layer in the pyramid at the same resolution as the input set this to a value of &le; 0
 	 */
-	public int pyramidTopSize = 100;
+	public int detPyramidTopSize = 100;
+
+	/**
+	 * Relative threshold for two corners being connected. The edge between them must have sufficient intensity.
+	 * The definition of sufficient is based on the contrast of the two x-corners.
+	 */
+	public double connEdgeThreshold = 0.05;
 
 	/**
 	 * How similar the direction of two corners relative to each other need to be. 0 to 1. Higher is more tolerant
 	 */
-	public double directionTol = 0.85;
+	public double connDirectionTol = 0.85;
 
 	/**
 	 * How similar two corner orientations need to be
 	 */
-	public double orientationTol = 0.65;
+	public double connOrientationTol = 0.65;
 
 	/**
 	 * Ratio used to decide if two corners are spatially close enough to each other to be considered
 	 * as the same corner.
 	 */
-	public double ambiguousTol = 0.25;
+	public double connAmbiguousTol = 0.25;
 
 	/**
 	 * Maximum number of neighbors returned by nearest neighbor search
 	 */
-	public int maxNeighbors = 20;
+	public int connMaxNeighbors = 20;
 
 	/**
 	 * Maximum search distance for nearest neighbor search. Units = pixels.
 	 */
-	public double maxNeighborDistance = Double.MAX_VALUE;
+	public double connMaxNeighborDistance = Double.MAX_VALUE;
 
 	/**
 	 * If true then a chessboard has to has to have at least one square which is connected to only one other
 	 * square. BoofCV calibration targets always have this requirements. Other projects might not.
 	 */
-	public boolean requireCornerSquares = false;
+	public boolean gridRequireCornerSquares = false;
 
 	@Override
 	public void checkValidity() {
-		if( directionTol < 0 || directionTol > 1 )
+		if( connDirectionTol < 0 || connDirectionTol > 1 )
 			throw new IllegalArgumentException("directionTol must be 0 to 1");
 
 	}

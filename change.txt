@@ -63,6 +63,8 @@ Version : 0.35
 - Chessboard Detector
   * Renamed previous detector to ChessboardBinary since it uses a binary image
   * Created a new XCorner based method which is much more robust but slower
+  * Removed the old new detector based on Shi-Tomasi Corner + Binary Threshold
+    - About the same speed and as reliable as Chessboard Binary. Maybe it just needed more development
 
 ---------------------------------------------
 Date    : 2019-July-07

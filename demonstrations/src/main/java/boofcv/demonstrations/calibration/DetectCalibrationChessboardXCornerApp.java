@@ -140,7 +140,7 @@ public class DetectCalibrationChessboardXCornerApp
 							for (int i = 0; i < foundCorners.size; i++) {
 								ChessboardCorner c = foundCorners.get(i);
 								// make sure it's a visible corner
-								if( c.level2 < controlPanel.minPyrLevel )
+								if( c.level2 < controlPanel.detMinPyrLevel)
 									continue;
 								double d = c.distance(p);
 								if( d < bestDistance ) {
@@ -172,24 +172,25 @@ public class DetectCalibrationChessboardXCornerApp
 
 	private void createAlgorithm() {
 		synchronized (lockAlgorithm) {
-			configDetector.pyramidTopSize = controlPanel.pyramidTop;
-			configDetector.cornerRadius = controlPanel.radius;
-			configDetector.cornerNonMaxThreshold = controlPanel.cornerNonMaxThreshold/100.0;
-			configDetector.edgeThreshold = controlPanel.edgeThreshold;
-			configDetector.orientationTol = controlPanel.orientationTol;
-			configDetector.directionTol = controlPanel.directionTol;
-			configDetector.ambiguousTol = controlPanel.ambiguousTol;
-			if( controlPanel.maxDistance == 0 )
-				configDetector.maxNeighborDistance = Double.MAX_VALUE;
+			configDetector.detPyramidTopSize = controlPanel.detPyramidTop;
+			configDetector.detNonMaxRadius = controlPanel.detRadius;
+			configDetector.detNonMaxThresholdRatio = controlPanel.detNonMaxThreshold /100.0;
+			configDetector.detRefinedXCornerThreshold = controlPanel.detRefinedXThresh;
+			configDetector.connEdgeThreshold = controlPanel.connEdgeThreshold;
+			configDetector.connOrientationTol = controlPanel.connOrientationTol;
+			configDetector.connDirectionTol = controlPanel.connDirectionTol;
+			configDetector.connAmbiguousTol = controlPanel.connAmbiguousTol;
+			if( controlPanel.connMaxDistance == 0 )
+				configDetector.connMaxNeighborDistance = Double.MAX_VALUE;
 			else
-				configDetector.maxNeighborDistance = controlPanel.maxDistance;
+				configDetector.connMaxNeighborDistance = controlPanel.connMaxDistance;
 
 			configGridDimen.numCols = controlPanel.gridCols;
 			configGridDimen.numRows = controlPanel.gridRows;
 
 			// check to see if it should be turned off. 0 is allowed, but we will set it to less than zero
-			if( configDetector.edgeThreshold <= 0 )
-				configDetector.edgeThreshold = -1;
+			if( configDetector.connEdgeThreshold <= 0 )
+				configDetector.connEdgeThreshold = -1;
 
 			detector = new CalibrationDetectorChessboardX(configDetector,configGridDimen);
 			detector.getDetector().getDetector().useMeanShift = controlPanel.meanShift;
@@ -324,7 +325,7 @@ public class DetectCalibrationChessboardXCornerApp
 				synchronized (lockCorners) {
 					for (int i = 0; i < foundCorners.size; i++) {
 						ChessboardCorner c = foundCorners.get(i);
-						if( c.level2 < controlPanel.minPyrLevel )
+						if( c.level2 < controlPanel.detMinPyrLevel)
 							continue;
 
 						double x = c.x;
@@ -348,7 +349,7 @@ public class DetectCalibrationChessboardXCornerApp
 
 					if( controlPanel.showNumbers ) {
 						DisplayPinholeCalibrationPanel.drawIndexes(g2,18,foundCorners.toList(),null,
-								controlPanel.minPyrLevel,scale);
+								controlPanel.detMinPyrLevel,scale);
 					}
 				}
 			}
@@ -466,42 +467,20 @@ public class DetectCalibrationChessboardXCornerApp
 	class ControlPanel extends DetectBlackShapePanel
 			implements ActionListener , ChangeListener , ThresholdControlPanel.Listener
 	{
-		JSlider sliderTranslucent = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
-		JCheckBox checkLogIntensity;
-		JSpinner spinnerRadius;
-		JSpinner spinnerCornerThreshold;
-		JSpinner spinnerEdgeThreshold;
-		JSpinner spinnerTop;
-		JSpinner spinnerAmbiguous;
-		JSpinner spinnerDirectionTol;
-		JSpinner spinnerOrientationTol;
-		JSpinner spinnerMaxDistance;
-
-		// select the calibration grid's dimensions
-		JSpinner spinnerGridRows;
-		JSpinner spinnerGridCols;
-
-		JCheckBox checkShowTargets;
-		JCheckBox checkShowNumbers;
-		JCheckBox checkShowClusters;
-		JCheckBox checkShowPerpendicular;
-		JCheckBox checkShowCorners;
-		JCheckBox checkMeanShift;
-		JCheckBox checkAnyGrid;
-		JSpinner spinnerMinPyrLevel;
-
 		JTextArea textArea = new JTextArea();
 
-		int pyramidTop;
-		int radius;
 		int gridRows = configGridDimen.numRows;
 		int gridCols = configGridDimen.numCols;
-		int maxDistance;
-		int cornerNonMaxThreshold;
-		double edgeThreshold;
-		double ambiguousTol;
-		double directionTol;
-		double orientationTol;
+		int detPyramidTop = configDetector.detPyramidTopSize;
+		int detRadius = configDetector.detNonMaxRadius;
+		int detNonMaxThreshold = (int)(configDetector.detNonMaxThresholdRatio *100);
+		double detRefinedXThresh = configDetector.detRefinedXCornerThreshold;
+		int connMaxDistance = 0;
+		double connEdgeThreshold = configDetector.connEdgeThreshold;
+		double connAmbiguousTol = configDetector.connAmbiguousTol;
+		double connDirectionTol = configDetector.connDirectionTol;
+		double connOrientationTol = configDetector.connOrientationTol;
+
 		boolean showChessboards = true;
 		boolean showNumbers = true;
 		boolean showClusters = false;
@@ -510,62 +489,61 @@ public class DetectCalibrationChessboardXCornerApp
 		boolean logItensity =false;
 		boolean meanShift = true;
 		boolean anyGrid = false;
-		int minPyrLevel = 0;
+		int detMinPyrLevel = 0;
 		int translucent = 0;
 
+		JSlider sliderTranslucent = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
+		JCheckBox checkLogIntensity = checkbox("Log Intensity", logItensity);
+		JSpinner spinnerDRadius = spinner(detRadius, 1, 100, 1);
+		JSpinner spinnerDNonMaxThreshold = spinner(detNonMaxThreshold, 0, 100, 5);
+		JSpinner spinnerDRefinedXThreshold = spinner(detRefinedXThresh, 0.0, 20.0, 0.005,2,3);
+		JSpinner spinnerDTop = spinner(detPyramidTop, 0, 10000, 50);
+		JSpinner spinnerDMinPyrLevel = spinner(detMinPyrLevel,0,20,1);
+		JSpinner spinnerCEdgeThreshold = spinner(connEdgeThreshold, 0, 1.0, 0.1,1,3);
+		JSpinner spinnerCAmbiguous = spinner(connAmbiguousTol,0,1.0,0.05,1,3);
+		JSpinner spinnerCDirectionTol = spinner(connDirectionTol,0,1.0,0.05,1,3);
+		JSpinner spinnerCOrientationTol = spinner(connOrientationTol,0,3.0,0.05,1,3);
+		JSpinner spinnerCMaxDistance = spinner(connMaxDistance,0,50000,1);
+
+		// select the calibration grid's dimensions
+		JSpinner spinnerGridRows = spinner(gridRows,3,500,1);
+		JSpinner spinnerGridCols = spinner(gridCols,3,500,1);
+
+		JCheckBox checkShowTargets = checkbox("Chessboard", showChessboards);
+		JCheckBox checkShowNumbers = checkbox("Numbers", showNumbers);
+		JCheckBox checkShowClusters = checkbox("Clusters", showClusters);
+		JCheckBox checkShowPerpendicular = checkbox("Perp.", showPerpendicular);
+		JCheckBox checkShowCorners = checkbox("Corners", showCorners);
+		JCheckBox checkMeanShift = checkbox("Mean Shift", meanShift);
+		JCheckBox checkAnyGrid = checkbox("Any Grid",anyGrid);
+
+
 		ControlPanel() {
-			{
-				pyramidTop = configDetector.pyramidTopSize;
-				radius = configDetector.cornerRadius;
-				ambiguousTol = configDetector.ambiguousTol;
-				directionTol = configDetector.directionTol;
-				orientationTol = configDetector.orientationTol;
-
-				cornerNonMaxThreshold = (int)(configDetector.cornerNonMaxThreshold*100);
-				edgeThreshold = configDetector.edgeThreshold;
-			}
-
 			textArea.setEditable(false);
 			textArea.setWrapStyleWord(true);
 			textArea.setLineWrap(true);
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);
 			checkLogIntensity = checkbox("Log Intensity", logItensity);
-			spinnerCornerThreshold = spinner(cornerNonMaxThreshold, 0, 100, 5);
-			spinnerEdgeThreshold = spinner(edgeThreshold, 0, 1.0, 0.1,1,3);
-			spinnerRadius = spinner(radius, 1, 100, 1);
-			spinnerTop = spinner(pyramidTop, 0, 10000, 50);
-			spinnerOrientationTol = spinner(orientationTol,0,3.0,0.05,1,3);
-			spinnerDirectionTol = spinner(directionTol,0,1.0,0.05,1,3);
-			spinnerAmbiguous = spinner(ambiguousTol,0,1.0,0.05,1,3);
-			spinnerGridRows = spinner(gridRows,3,200,1);
-			spinnerGridCols = spinner(gridCols,3,200,1);
-			spinnerMaxDistance = spinner(maxDistance,0,50000,1);
-			spinnerMinPyrLevel = spinner(minPyrLevel,0,20,1);
 
 			sliderTranslucent.setMaximumSize(new Dimension(120,26));
 			sliderTranslucent.setPreferredSize(sliderTranslucent.getMaximumSize());
 			sliderTranslucent.addChangeListener(this);
 
-			checkShowTargets = checkbox("Chessboard", showChessboards);
-			checkShowNumbers = checkbox("Numbers", showNumbers);
-			checkShowClusters = checkbox("Clusters", showClusters);
-			checkShowPerpendicular = checkbox("Perp.", showPerpendicular);
-			checkShowCorners = checkbox("Corners", showCorners);
-			checkMeanShift = checkbox("Mean Shift", meanShift);
-			checkAnyGrid = checkbox("Any Grid",anyGrid);
-
 			StandardAlgConfigPanel controlPanel = new StandardAlgConfigPanel();
+			controlPanel.addCenterLabel("Detect",controlPanel);
 			controlPanel.addAlignLeft(checkMeanShift);
 			controlPanel.addAlignLeft(checkAnyGrid);
-			controlPanel.addLabeled(spinnerRadius,"Corner Radius");
-			controlPanel.addLabeled(spinnerCornerThreshold,"Corner Threshold");
-			controlPanel.addLabeled(spinnerEdgeThreshold,"Edge Threshold");
-			controlPanel.addLabeled(spinnerTop,"Pyramid Top");
-			controlPanel.addLabeled(spinnerMaxDistance,"Max Dist.");
-			controlPanel.addLabeled(spinnerOrientationTol,"Orientation Tol");
-			controlPanel.addLabeled(spinnerDirectionTol,"Direction Tol");
-			controlPanel.addLabeled(spinnerAmbiguous,"Ambiguous Tol");
+			controlPanel.addLabeled(spinnerDRadius,"Corner Radius");
+			controlPanel.addLabeled(spinnerDRefinedXThreshold,"Refined X Threshold");
+			controlPanel.addLabeled(spinnerDNonMaxThreshold,"Non-Max Threshold");
+			controlPanel.addLabeled(spinnerDTop,"Pyramid Top");
+			controlPanel.addCenterLabel("Connect",controlPanel);
+			controlPanel.addLabeled(spinnerCEdgeThreshold,"Edge Threshold");
+			controlPanel.addLabeled(spinnerCMaxDistance,"Max Dist.");
+			controlPanel.addLabeled(spinnerCOrientationTol,"Orientation Tol");
+			controlPanel.addLabeled(spinnerCDirectionTol,"Direction Tol");
+			controlPanel.addLabeled(spinnerCAmbiguous,"Ambiguous Tol");
 
 			JTabbedPane tabbedPane = new JTabbedPane();
 			tabbedPane.addTab("Controls",controlPanel);
@@ -599,7 +577,7 @@ public class DetectCalibrationChessboardXCornerApp
 
 			StandardAlgConfigPanel vertPanel = new StandardAlgConfigPanel();
 			vertPanel.add(panelChecks);
-			vertPanel.addLabeled(spinnerMinPyrLevel,"Min Level");
+			vertPanel.addLabeled(spinnerDMinPyrLevel,"Min Level");
 
 			vertPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
 					"Visualize",TitledBorder.CENTER, TitledBorder.TOP));
@@ -662,28 +640,30 @@ public class DetectCalibrationChessboardXCornerApp
 				imagePanel.setScale(zoom);
 				return;
 			}
-			if( e.getSource() == spinnerOrientationTol ) {
-				orientationTol = ((Number)spinnerOrientationTol.getValue()).doubleValue();
-			} else if( e.getSource() == spinnerDirectionTol ) {
-				directionTol = ((Number)spinnerDirectionTol.getValue()).doubleValue();
-			} else if( e.getSource() == spinnerAmbiguous) {
-				ambiguousTol = ((Number) spinnerAmbiguous.getValue()).doubleValue();
-			} else if( e.getSource() == spinnerCornerThreshold ) {
-				cornerNonMaxThreshold = ((Number)spinnerCornerThreshold.getValue()).intValue();
-			} else if( e.getSource() == spinnerEdgeThreshold ) {
-				edgeThreshold = ((Number)spinnerEdgeThreshold.getValue()).doubleValue();
-			} else if( e.getSource() == spinnerRadius ) {
-				radius = ((Number)spinnerRadius.getValue()).intValue();
-			} else if( e.getSource() == spinnerTop ) {
-				pyramidTop = ((Number)spinnerTop.getValue()).intValue();
+			if( e.getSource() == spinnerCOrientationTol) {
+				connOrientationTol = ((Number) spinnerCOrientationTol.getValue()).doubleValue();
+			} else if( e.getSource() == spinnerCDirectionTol) {
+				connDirectionTol = ((Number) spinnerCDirectionTol.getValue()).doubleValue();
+			} else if( e.getSource() == spinnerCAmbiguous) {
+				connAmbiguousTol = ((Number) spinnerCAmbiguous.getValue()).doubleValue();
+			} else if( e.getSource() == spinnerDRefinedXThreshold) {
+				detRefinedXThresh = ((Number) spinnerDRefinedXThreshold.getValue()).doubleValue();
+			} else if( e.getSource() == spinnerDNonMaxThreshold) {
+				detNonMaxThreshold = ((Number) spinnerDNonMaxThreshold.getValue()).intValue();
+			} else if( e.getSource() == spinnerCEdgeThreshold) {
+				connEdgeThreshold = ((Number) spinnerCEdgeThreshold.getValue()).doubleValue();
+			} else if( e.getSource() == spinnerDRadius) {
+				detRadius = ((Number) spinnerDRadius.getValue()).intValue();
+			} else if( e.getSource() == spinnerDTop) {
+				detPyramidTop = ((Number) spinnerDTop.getValue()).intValue();
 			} else if( e.getSource() == spinnerGridRows ) {
 				gridRows = ((Number)spinnerGridRows.getValue()).intValue();
 			} else if( e.getSource() == spinnerGridCols ) {
 				gridCols = ((Number)spinnerGridCols.getValue()).intValue();
-			} else if( e.getSource() == spinnerMaxDistance ) {
-				maxDistance = ((Number)spinnerMaxDistance.getValue()).intValue();
-			} else if( e.getSource() == spinnerMinPyrLevel ) {
-				minPyrLevel = ((Number)spinnerMinPyrLevel.getValue()).intValue();
+			} else if( e.getSource() == spinnerCMaxDistance) {
+				connMaxDistance = ((Number) spinnerCMaxDistance.getValue()).intValue();
+			} else if( e.getSource() == spinnerDMinPyrLevel) {
+				detMinPyrLevel = ((Number) spinnerDMinPyrLevel.getValue()).intValue();
 				imagePanel.repaint();
 				return;
 			} else if( e.getSource() == sliderTranslucent ) {

@@ -80,9 +80,6 @@ import static boofcv.misc.CircularIndex.addOffset;
  * @author Peter Abeles
  */
 public class DetectChessboardCornersX {
-	// Threshold used to filter out corners
-	double cornerIntensityThreshold = 1.0;
-
 	// The largest x-corner intensity is found in the image then multiplied by this factor to select the cut off point
 	// for non-max suppression
 	public float nonmaxThresholdRatio = 0.05f;
@@ -91,7 +88,7 @@ public class DetectChessboardCornersX {
 	// The smallest allowed edge ratio allowed
 	public double edgeAspectRatioThreshold = 0.1;
 	// The smallest allowed corner intensity.
-	public double cornerIntensity = 0.05;
+	public double refinedXCornerThreshold = 0.025;
 	/**
 	 * Tolerance number of "spokes" in the wheel which break symmetry. Symmetry is defined as both sides being above
 	 * or below the mean value. Larger the value more tolerant it is.
@@ -251,6 +248,10 @@ public class DetectChessboardCornersX {
 			int xx = (int)(c.x+0.5f);
 			int yy = (int)(c.y+0.5f);
 
+			// A bunch of code below will crash if it's near the border
+			if( xx < 3 || yy < 3 || xx >= input.width-3 || yy >= input.height-3 )
+				continue;
+
 			// Very crude checks to remove situations where there was a little bit of noise that caused a corner
 			// They work by seeing if there's a consistent pattern of x-corner like pixels near the center
 			// and non-x-corner like pixels in the outside
@@ -285,7 +286,7 @@ public class DetectChessboardCornersX {
 			}
 
 			// See if it's a corner also using the eigen value definition
-			if( !checkCorner(c)) {
+			if( !checkEigenCorner(c)) {
 				c.edgeIntensity = -1;
 				continue;
 			}
@@ -405,11 +406,11 @@ public class DetectChessboardCornersX {
 	}
 
 	/**
-	 * Computes how much like an eignevalue corner it is. heavily fisheye's images are very poor eigen corners
+	 * Computes how much like an Eigenvalue corner it is. heavily fisheye's images are very poor eigen corners
 	 * near the chessboard corner, but even with a very forgiving threshold this eliminates a lot of the false
 	 * positives
 	 */
-	private boolean checkCorner( ChessboardCorner c ) {
+	private boolean checkEigenCorner(ChessboardCorner c ) {
 		int radius = 3;
 
 		int cx = (int)(c.x+0.5f);
@@ -530,7 +531,7 @@ public class DetectChessboardCornersX {
 		// Compute difference between white and black region
 		corner.constrast = (scoreDiam[(bestSpoke+numSpokeDiam/2)%numSpokeDiam] - scoreDiam[bestSpoke])/2.0;
 
-		return corner.intensity >= cornerIntensity;
+		return corner.intensity >= refinedXCornerThreshold;
 	}
 
 	private void smoothSpokeDiam() {
@@ -562,20 +563,16 @@ public class DetectChessboardCornersX {
 		return filtered;
 	}
 
-	public double getCornerIntensityThreshold() {
-		return cornerIntensityThreshold;
-	}
-
-	public void setCornerIntensityThreshold(double cornerIntensityThreshold) {
-		this.cornerIntensityThreshold = cornerIntensityThreshold;
-	}
-
 	public float getNonmaxThresholdRatio() {
 		return nonmaxThresholdRatio;
 	}
 
 	public void setNonmaxThresholdRatio(float nonmaxThresholdRatio) {
 		this.nonmaxThresholdRatio = nonmaxThresholdRatio;
+	}
+
+	public void setRefinedXCornerThreshold(double refinedXCornerThreshold) {
+		this.refinedXCornerThreshold = refinedXCornerThreshold;
 	}
 
 	public double getEdgeIntensityRatioThreshold() {

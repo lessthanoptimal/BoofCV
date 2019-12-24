@@ -219,7 +219,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 	 * add blur or aliasing.
 	 */
 	void constructPyramid(T input) {
-		ImageNormalization.zeroMeanMaxOne(input,normalized,null);
+		ImageNormalization.maxAbsOfOne(input,normalized,null);
 		if( pyramid.size() == 0 ){
 			pyramid.add(normalized);
 		} else {

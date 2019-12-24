@@ -118,7 +118,7 @@ public class DetectXCornersVisualizeApp
 			detector.getDetector().edgeIntensityRatioThreshold = controlPanel.threshEdgeIntensity;
 			detector.getDetector().edgeAspectRatioThreshold = controlPanel.threshEdgeAspect;
 			detector.getDetector().nonmaxThresholdRatio = controlPanel.threshXCorner;
-			detector.getDetector().cornerIntensity = controlPanel.thresholdIntensity;
+			detector.getDetector().refinedXCornerThreshold = controlPanel.thresholdIntensity;
 			detector.getDetector().setNonmaxRadius(controlPanel.nonmaxRadius);
 		}
 	}
@@ -291,7 +291,7 @@ public class DetectXCornersVisualizeApp
 				threshEdgeAspect = detector.getDetector().edgeAspectRatioThreshold;
 				threshXCorner = detector.getDetector().getNonmaxThresholdRatio();
 				nonmaxRadius = detector.getDetector().getNonmaxRadius();
-				thresholdIntensity = detector.getDetector().cornerIntensity;
+				thresholdIntensity = detector.getDetector().refinedXCornerThreshold;
 			}
 
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1.0);

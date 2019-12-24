@@ -42,6 +42,29 @@ public class ImageNormalization {
 	}
 
 	/**
+	 * Normalizes the image so that the max abs of the image is 1.
+	 * @param input Input image
+	 * @param output Scaled output image.
+	 * @param parameters the parameters
+	 */
+	public static void maxAbsOfOne( ImageGray input , ImageGray output , @Nullable NormalizeParameters parameters ) {
+		output.reshape(input);
+		if( output.getDataType().isInteger() )
+			throw new IllegalArgumentException("Output must be a floating point image");
+		double scale = GImageStatistics.maxAbs(input);
+
+		if( scale == 0.0 ) {
+			scale = 1.0;
+		} else {
+			GPixelMath.multiply(input, 1.0f / scale, output);
+		}
+		if( parameters != null ) {
+			parameters.offset = 0.0;
+			parameters.divisor = scale;
+		}
+	}
+
+	/**
 	 * Ensures that the output image has a mean zero and a max abs(pixel) of 1
 	 * @param input Input image
 	 * @param output Scaled output image.

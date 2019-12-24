@@ -3,6 +3,11 @@ TODO Videos - hough line detectors
             - chessboard corner detector + improvements
             - stereo and VO updates
 
+TODO Chessboard X-Corner
+     - Try computing Eigen corners first, then X-Corner scores for speed
+     - Make refined X-Corner a relative threshold
+     - Improve clustering. One image in Chessboard 2 should have pass but failed. MotionBlur image26, ... etc
+
 TODO Visual Odometry
      - Add SBA to VO algorithms
 TODO corner detector 2 tech report

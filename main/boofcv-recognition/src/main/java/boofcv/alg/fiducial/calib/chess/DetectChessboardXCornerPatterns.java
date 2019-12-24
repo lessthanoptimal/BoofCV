@@ -43,18 +43,19 @@ public class DetectChessboardXCornerPatterns<T extends ImageGray<T>> {
 		detector = new DetectChessboardCornersXPyramid<>(ImageType.single(imageType));
 		clusterFinder = new ChessboardCornerClusterFinder<>(imageType);
 
-		detector.setPyramidTopSize(config.pyramidTopSize);
-		detector.getDetector().setNonmaxRadius(config.cornerRadius);
-		detector.getDetector().setNonmaxThresholdRatio((float)config.cornerNonMaxThreshold);
+		detector.setPyramidTopSize(config.detPyramidTopSize);
+		detector.getDetector().setNonmaxRadius(config.detNonMaxRadius);
+		detector.getDetector().setNonmaxThresholdRatio((float)config.detNonMaxThresholdRatio);
+		detector.getDetector().setRefinedXCornerThreshold(config.detRefinedXCornerThreshold);
 
-		clusterFinder.setAmbiguousTol(config.ambiguousTol);
-		clusterFinder.setDirectionTol(config.directionTol);
-		clusterFinder.setOrientationTol(config.orientationTol);
-		clusterFinder.setMaxNeighbors(config.maxNeighbors);
-		clusterFinder.setMaxNeighborDistance(config.maxNeighborDistance);
-		clusterFinder.setThresholdEdgeIntensity(config.edgeThreshold);
+		clusterFinder.setAmbiguousTol(config.connAmbiguousTol);
+		clusterFinder.setDirectionTol(config.connDirectionTol);
+		clusterFinder.setOrientationTol(config.connOrientationTol);
+		clusterFinder.setMaxNeighbors(config.connMaxNeighbors);
+		clusterFinder.setMaxNeighborDistance(config.connMaxNeighborDistance);
+		clusterFinder.setThresholdEdgeIntensity(config.connEdgeThreshold);
 
-		clusterToGrid.setRequireCornerSquares(config.requireCornerSquares);
+		clusterToGrid.setRequireCornerSquares(config.gridRequireCornerSquares);
 	}
 
 	/**

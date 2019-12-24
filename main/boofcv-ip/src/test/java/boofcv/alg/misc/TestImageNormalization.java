@@ -42,6 +42,41 @@ class TestImageNormalization {
 	private Class[] types = new Class[]{GrayU8.class, GrayU16.class, GrayF32.class};
 
 	@Test
+	void maxAbsOfOne() {
+		for( Class type : types ) {
+			ImageGray src = GeneralizedImageOps.createSingleBand(type,width,height);
+			double maxValue = Math.min(src.getImageType().getDataType().getMaxValue(),2000);
+			double minValue = src.getDataType().isSigned() ? -maxValue : 0;
+
+			GImageMiscOps.fillUniform(src,rand,minValue,maxValue);
+			GrayF32 dst = (GrayF32)src.createSameShape(GrayF32.class);
+
+			NormalizeParameters param = new NormalizeParameters();
+			ImageNormalization.maxAbsOfOne(src,dst,param);
+
+			check_maxAbsOfOne(src, dst, param);
+		}
+	}
+
+	private void check_maxAbsOfOne(ImageGray src, GrayF32 dst, NormalizeParameters param) {
+		double maxAbs = 0;
+
+		for (int y = 0; y < src.height; y++) {
+			for (int x = 0; x < src.width; x++) {
+				float v = dst.get(x,y);
+				maxAbs = Math.max(maxAbs,Math.abs(v));
+			}
+		}
+
+		assertEquals(1.0,maxAbs,1e-2);
+
+		// Apply the parameters and see if it gets the same results
+		GrayF32 dst2 = dst.createSameShape();
+		ImageNormalization.apply(src,param,dst2);
+		BoofTesting.assertEquals(dst,dst2,1e-2);
+	}
+
+	@Test
 	void zeroMeanMaxOne() {
 		for( Class type : types ) {
 			ImageGray src = GeneralizedImageOps.createSingleBand(type,width,height);
