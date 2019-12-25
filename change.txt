@@ -20,6 +20,9 @@ Version : 0.36
          - Filter small disparity regions
          - Fill in holes
          - mark small disparities as invalid
+- Android
+  * Changed image workspace from byte[] to GrowQueue_I8 so that it can be dynamically computed.
+  * Fixed issues with visualizing disparity
 
 TODO Regression
    - Prune empty error files or never generate them

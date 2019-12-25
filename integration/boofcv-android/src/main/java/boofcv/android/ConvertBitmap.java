@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,9 @@ package boofcv.android;
 import android.graphics.Bitmap;
 import boofcv.alg.color.ColorFormat;
 import boofcv.struct.image.*;
+import org.ddogleg.struct.GrowQueue_I8;
 
+import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 
 /**
@@ -33,23 +35,29 @@ import java.nio.ByteBuffer;
  *
  */
 public class ConvertBitmap {
-	
+
 	/**
-	 * Declares a storage array for the provided Bitmap image.  The array will be
-	 * of size = width*height*byteCount where byteCount is the number of bytes per
-	 * pixel.
-	 * 
-	 * @param input Bitmap image.
-	 * @param storage If not null then the array size will be checked, if too small a new array will be returned.
-	 * @return An array of appropriate size.
+	 * Checks to see if the bitmap is the same shape as the input image. if not a new instance is returned which is
+	 * otherwise the same instance is returned.
 	 */
-	public static byte[] declareStorage( Bitmap input , byte[] storage ) {
+	public static Bitmap checkDeclare( ImageBase input , Bitmap bitmap ) {
+		if( input.width != bitmap.getWidth() || input.height != bitmap.getHeight() ) {
+			return Bitmap.createBitmap(input.width, input.height, bitmap.getConfig());
+		} else {
+			return bitmap;
+		}
+	}
+
+	public static GrowQueue_I8 resizeStorage(Bitmap input , @Nullable GrowQueue_I8 storage ) {
 		int byteCount = input.getConfig() == Bitmap.Config.ARGB_8888 ? 4 : 2;
 		int length = input.getWidth()*input.getHeight()*byteCount;
-		
-		if( storage == null || storage.length < length )
-			return new byte[ length ];
-		return storage;
+
+		if( storage == null )
+			return new GrowQueue_I8(length);
+		else {
+			storage.resize(length);
+			return storage;
+		}
 	}
 
 	/**
@@ -59,9 +67,9 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static <T extends ImageBase<T>>
-	void bitmapToBoof( Bitmap input , T output , byte[] storage) {
-
-		if( BOverrideConvertAndroid.invokeBitmapToBoof(input,output,storage))
+	void bitmapToBoof( Bitmap input , T output , @Nullable GrowQueue_I8 storage) {
+		storage = resizeStorage(input,storage);
+		if( BOverrideConvertAndroid.invokeBitmapToBoof(input,output,storage.data))
 			return;
 
 		switch( output.getImageType().getFamily() ) {
@@ -86,8 +94,6 @@ public class ConvertBitmap {
 
 	/**
 	 * Converts Bitmap image into a single band image of arbitrary type.
-	 *
-	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
 	 * @param input Input Bitmap image.
 	 * @param output Output single band image.  If null a new one will be declared.
@@ -96,7 +102,8 @@ public class ConvertBitmap {
 	 * @return The converted gray scale image.
 	 */
 	public static <T extends ImageGray<T>>
-	T bitmapToGray( Bitmap input , T output , Class<T> imageType , byte[] storage) {
+	T bitmapToGray( Bitmap input , T output , Class<T> imageType , @Nullable GrowQueue_I8 storage) {
+		storage = resizeStorage(input,storage);
 		if( imageType == GrayF32.class )
 			return (T)bitmapToGray(input,(GrayF32)output,storage);
 		else if( imageType == GrayU8.class )
@@ -114,53 +121,46 @@ public class ConvertBitmap {
 	 * @param storage Byte array used for internal storage. If null it will be declared internally. 
 	 * @return The converted gray scale image.
 	 */
-	public static GrayU8 bitmapToGray( Bitmap input , GrayU8 output , byte[] storage ) {
+	public static GrayU8 bitmapToGray( Bitmap input , GrayU8 output , @Nullable GrowQueue_I8 storage ) {
+		storage = resizeStorage(input,storage);
 		if( output == null ) {
 			output = new GrayU8( input.getWidth() , input.getHeight() );
 		} else {
 			output.reshape(input.getWidth(), input.getHeight());
 		}
 
+		input.copyPixelsToBuffer(ByteBuffer.wrap(storage.data));
 		
-		if( storage == null )
-			storage = declareStorage(input,null);
-		input.copyPixelsToBuffer(ByteBuffer.wrap(storage));
-		
-		ImplConvertBitmap.arrayToGray(storage, input.getConfig(), output);
+		ImplConvertBitmap.arrayToGray(storage.data, input.getConfig(), output);
 		
 		return output;
 	}
 	
 	/**
 	 * Converts Bitmap image into GrayF32.
-	 *
-	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
 	 * @param input Input Bitmap image.
 	 * @param output Output image.  If null a new one will be declared.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 * @return The converted gray scale image.
 	 */
-	public static GrayF32 bitmapToGray( Bitmap input , GrayF32 output , byte[] storage) {
+	public static GrayF32 bitmapToGray( Bitmap input , GrayF32 output , @Nullable GrowQueue_I8 storage) {
 		if( output == null ) {
 			output = new GrayF32( input.getWidth() , input.getHeight() );
 		} else {
 			output.reshape(input.getWidth(), input.getHeight());
 		}
+
+		storage = resizeStorage(input,storage);
+		input.copyPixelsToBuffer(ByteBuffer.wrap(storage.data));
 		
-		if( storage == null )
-			storage = declareStorage(input,null);
-		input.copyPixelsToBuffer(ByteBuffer.wrap(storage));
-		
-		ImplConvertBitmap.arrayToGray(storage, input.getConfig(), output);
+		ImplConvertBitmap.arrayToGray(storage.data, input.getConfig(), output);
 		
 		return output;
 	}
 	
 	/**
 	 * Converts Bitmap image into Planar image of the appropriate type.
-	 *
-	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
 	 * @param input Input Bitmap image.
 	 * @param output Output image.  If null a new one will be declared.
@@ -169,7 +169,7 @@ public class ConvertBitmap {
 	 * @return The converted Planar image.
 	 */
 	public static <T extends ImageGray<T>>
-	Planar<T> bitmapToPlanar(Bitmap input , Planar<T> output , Class<T> type , byte[] storage ) {
+	Planar<T> bitmapToPlanar(Bitmap input , Planar<T> output , Class<T> type , @Nullable GrowQueue_I8 storage ) {
 		if( output == null ) {
 			output = new Planar<>(type, input.getWidth(), input.getHeight(), 3);
 		} else {
@@ -177,14 +177,13 @@ public class ConvertBitmap {
 			output.reshape(input.getWidth(), input.getHeight(),numBands);
 		}
 
-		if( storage == null )
-			storage = declareStorage(input,null);
-		input.copyPixelsToBuffer(ByteBuffer.wrap(storage));
+		storage = resizeStorage(input,storage);
+		input.copyPixelsToBuffer(ByteBuffer.wrap(storage.data));
 		
 		if( type == GrayU8.class )
-			ImplConvertBitmap.arrayToPlanar_U8(storage, input.getConfig(), (Planar)output);
+			ImplConvertBitmap.arrayToPlanar_U8(storage.data, input.getConfig(), (Planar)output);
 		else if( type == GrayF32.class )
-			ImplConvertBitmap.arrayToPlanar_F32(storage, input.getConfig(), (Planar)output);
+			ImplConvertBitmap.arrayToPlanar_F32(storage.data, input.getConfig(), (Planar)output);
 		else
 			throw new IllegalArgumentException("Unsupported BoofCV Type");
 
@@ -194,14 +193,12 @@ public class ConvertBitmap {
 	/**
 	 * Converts many BoofCV image types into a Bitmap.
 	 *
-	 * @see #declareStorage(android.graphics.Bitmap, byte[])
-	 *
 	 * @param input Input BoofCV image.
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static void boofToBitmap( ImageBase input , Bitmap output , byte[] storage) {
-		if( BOverrideConvertAndroid.invokeBoofToBitmap(ColorFormat.RGB,input,output,storage))
+	public static void boofToBitmap( ImageBase input , Bitmap output , @Nullable GrowQueue_I8 storage) {
+		if( BOverrideConvertAndroid.invokeBoofToBitmap(ColorFormat.RGB,input,output,storage.data))
 			return;
 
 		if( input instanceof Planar ) {
@@ -215,8 +212,9 @@ public class ConvertBitmap {
 		}
 	}
 
-	public static void boofToBitmap(ColorFormat color, ImageBase input , Bitmap output , byte[] storage) {
-		if( BOverrideConvertAndroid.invokeBoofToBitmap(color,input,output,storage))
+	public static void boofToBitmap(ColorFormat color, ImageBase input , Bitmap output , @Nullable GrowQueue_I8 storage) {
+		storage = resizeStorage(output,storage);
+		if( BOverrideConvertAndroid.invokeBoofToBitmap(color,input,output,storage.data))
 			return;
 
 		if( input instanceof ImageGray ) {
@@ -242,13 +240,11 @@ public class ConvertBitmap {
 	/**
 	 * Converts ImageGray into Bitmap.
 	 *
-	 * @see #declareStorage(android.graphics.Bitmap, byte[])
-	 * 
 	 * @param input Input gray scale image.
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static void grayToBitmap( ImageGray input , Bitmap output , byte[] storage) {
+	public static void grayToBitmap( ImageGray input , Bitmap output , @Nullable GrowQueue_I8 storage) {
 		if( input instanceof GrayU8 )
 			grayToBitmap((GrayU8)input,output,storage);
 		else if( input instanceof GrayF32 )
@@ -259,118 +255,105 @@ public class ConvertBitmap {
 	
 	/**
 	 * Converts ImageGray into Bitmap.
-	 *
-	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
 	 * @param input Input gray scale image.
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static void grayToBitmap( GrayU8 input , Bitmap output , byte[] storage) {
+	public static void grayToBitmap( GrayU8 input , Bitmap output , @Nullable GrowQueue_I8 storage) {
 		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
+
+		storage = resizeStorage(output,storage);
 		
-		if( storage == null )
-			storage = declareStorage(output,null);
-		
-		ImplConvertBitmap.grayToArray(input, storage,output.getConfig());
-		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+		ImplConvertBitmap.grayToArray(input, storage.data,output.getConfig());
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage.data));
 	}
 	
 	/**
 	 * Converts ImageGray into Bitmap.
-	 *
-	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 * 
 	 * @param input Input gray scale image.
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
-	public static void grayToBitmap( GrayF32 input , Bitmap output , byte[] storage ) {
+	public static void grayToBitmap( GrayF32 input , Bitmap output ,@Nullable GrowQueue_I8 storage ) {
 		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
+
+		storage = resizeStorage(output,storage);
 		
-		if( storage == null )
-			storage = declareStorage(output,null);
-		
-		ImplConvertBitmap.grayToArray(input, storage,output.getConfig());
-		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+		ImplConvertBitmap.grayToArray(input, storage.data,output.getConfig());
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage.data));
 	}
 	
 	/**
 	 * Converts Planar image into Bitmap.
-	 *
-	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 *
 	 * @param input Input Planar image.
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static <T extends ImageGray<T>>
-	void planarToBitmap(Planar<T> input , Bitmap output , byte[] storage ) {
+	void planarToBitmap(Planar<T> input , Bitmap output , @Nullable GrowQueue_I8 storage ) {
 		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
-		
-		if( storage == null )
-			storage = declareStorage(output,null);
+
+		storage = resizeStorage(output,storage);
 		
 		if( input.getBandType() == GrayU8.class )
-			ImplConvertBitmap.planarToArray_U8((Planar)input, storage,output.getConfig());
+			ImplConvertBitmap.planarToArray_U8((Planar)input, storage.data,output.getConfig());
 		else if( input.getBandType() == GrayF32.class )
-			ImplConvertBitmap.planarToArray_F32((Planar)input, storage,output.getConfig());
+			ImplConvertBitmap.planarToArray_F32((Planar)input, storage.data,output.getConfig());
 		else
 			throw new IllegalArgumentException("Unsupported BoofCV Type");
-		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage.data));
 	}
 
 	/**
 	 * Converts {@link ImageInterleaved} image into Bitmap.
-	 *
-	 * @see #declareStorage(android.graphics.Bitmap, byte[])
 	 *
 	 * @param input Input Planar image.
 	 * @param output Output Bitmap image.
 	 * @param storage Byte array used for internal storage. If null it will be declared internally.
 	 */
 	public static <T extends ImageInterleaved<T>>
-	void interleavedToBitmap(T input, Bitmap output, byte[] storage) {
+	void interleavedToBitmap(T input, Bitmap output, @Nullable GrowQueue_I8 storage) {
 		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
 
-		if( storage == null )
-			storage = declareStorage(output,null);
+		storage = resizeStorage(output,storage);
 
 		if( input.getImageType().getDataType() == ImageDataType.U8 )
-			ImplConvertBitmap.interleavedToArray((InterleavedU8) input, storage, output.getConfig());
+			ImplConvertBitmap.interleavedToArray((InterleavedU8) input, storage.data, output.getConfig());
 		else if( input.getImageType().getDataType() == ImageDataType.F32 )
-			ImplConvertBitmap.interleavedToArray((InterleavedF32) input, storage, output.getConfig());
+			ImplConvertBitmap.interleavedToArray((InterleavedF32) input, storage.data, output.getConfig());
 		else
 			throw new IllegalArgumentException("Unsupported BoofCV Type");
-		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+		output.copyPixelsFromBuffer(ByteBuffer.wrap(storage.data));
 	}
 
 	public static <T extends ImageInterleaved<T>>
-	void interleavedYuvToBitmap(T input, Bitmap output, byte[] storage) {
+	void interleavedYuvToBitmap(T input, Bitmap output, @Nullable GrowQueue_I8 storage) {
 		if( output.getWidth() != input.getWidth() || output.getHeight() != input.getHeight() ) {
 			throw new IllegalArgumentException("Image shapes are not the same");
 		}
 
-		if( storage == null )
-			storage = declareStorage(output,null);
+		storage = resizeStorage(output,storage);
 
 		if( input.getImageType().getDataType() == ImageDataType.U8 ) {
 			switch( output.getConfig() ) {
 				case ARGB_8888:
-					ImplConvertBitmap.interleavedYuvToArgb8888((InterleavedU8) input, storage);
-					output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+					ImplConvertBitmap.interleavedYuvToArgb8888((InterleavedU8) input, storage.data);
+					output.copyPixelsFromBuffer(ByteBuffer.wrap(storage.data));
 					return;
 				case RGB_565:
-					ImplConvertBitmap.interleavedYuvToRGB565((InterleavedU8) input, storage);
-					output.copyPixelsFromBuffer(ByteBuffer.wrap(storage));
+					ImplConvertBitmap.interleavedYuvToRGB565((InterleavedU8) input, storage.data);
+					output.copyPixelsFromBuffer(ByteBuffer.wrap(storage.data));
 					return;
 			}
 		}

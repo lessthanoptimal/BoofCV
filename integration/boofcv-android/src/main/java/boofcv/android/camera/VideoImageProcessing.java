@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,9 @@ package boofcv.android.camera;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import boofcv.android.ConvertBitmap;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.ddogleg.struct.GrowQueue_I8;
 
 /**
  * Visualizes a process where the output is simply a rendered Bitmap image.  Provides an input image
@@ -37,7 +37,7 @@ public abstract class VideoImageProcessing<T extends ImageBase<T>> extends Video
 	// output image which is displayed by the GUI
 	private Bitmap outputGUI;
 	// storage used during image convert
-	private byte[] storage;
+	private GrowQueue_I8 storage = new GrowQueue_I8();
 
 	/**
 	 * Constructor
@@ -53,7 +53,6 @@ public abstract class VideoImageProcessing<T extends ImageBase<T>> extends Video
 		super.declareImages(width,height);
 		output = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888 );
 		outputGUI = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888 );
-		storage = ConvertBitmap.declareStorage(output,storage);
 	}
 
 	@Override
@@ -80,5 +79,5 @@ public abstract class VideoImageProcessing<T extends ImageBase<T>> extends Video
 	 * @param output (Output) Storage for Bitmap image which is to be displayed.
 	 * @param storage Array which can be used when converting the boofcv image into a Bitmap.
 	 */
-	protected abstract void process( T image , Bitmap output , byte[] storage );
+	protected abstract void process( T image , Bitmap output , GrowQueue_I8 storage );
 }

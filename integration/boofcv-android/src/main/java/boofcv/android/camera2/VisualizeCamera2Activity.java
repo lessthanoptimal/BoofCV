@@ -37,6 +37,7 @@ import boofcv.concurrency.BWorkArrays;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import org.ddogleg.struct.GrowQueue_I8;
 
 import java.util.Stack;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -98,7 +99,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 	protected BitmapMode bitmapMode = BitmapMode.DOUBLE_BUFFER;
 	protected Bitmap bitmap = Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888);
 	protected Bitmap bitmapWork = Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888);
-	protected byte[] bitmapTmp =  new byte[1];
+	protected GrowQueue_I8 bitmapTmp =  new GrowQueue_I8();
 	//---- END LOCK BITMAP
 
 	protected LinkedBlockingQueue threadQueue = new LinkedBlockingQueue();
@@ -250,7 +251,6 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 						bitmapWork = Bitmap.createBitmap(cameraWidth, cameraHeight, Bitmap.Config.ARGB_8888);
 					}
 				}
-				bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
 			} finally {
 				bitmapLock.unlock();
 			}
