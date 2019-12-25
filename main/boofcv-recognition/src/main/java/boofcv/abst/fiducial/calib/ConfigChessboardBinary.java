@@ -25,6 +25,8 @@ import boofcv.factory.filter.binary.ConfigThresholdLocalOtsu;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Calibration parameters for chessboard style calibration grid.
@@ -33,6 +35,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
+@Getter @Setter
 public class ConfigChessboardBinary implements Configuration {
 	/**
 	 * The maximum distance in pixels that two corners can be from each other.  In well focused image

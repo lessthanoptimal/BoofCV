@@ -20,6 +20,8 @@ package boofcv.abst.fiducial.calib;
 
 import boofcv.alg.fiducial.calib.chess.DetectChessboardBinaryPattern;
 import boofcv.struct.Configuration;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Calibration parameters for chessboard style calibration grid.
@@ -28,6 +30,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
+@Getter @Setter
 public class ConfigChessboardX implements Configuration {
 
 	/**
@@ -95,6 +98,5 @@ public class ConfigChessboardX implements Configuration {
 	public void checkValidity() {
 		if( connDirectionTol < 0 || connDirectionTol > 1 )
 			throw new IllegalArgumentException("directionTol must be 0 to 1");
-
 	}
 }

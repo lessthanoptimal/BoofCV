@@ -18,11 +18,15 @@
 
 package boofcv.struct;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Specifies a length as a fixed length or relative to the total size of some other object.
  *
  * @author Peter Abeles
  */
+@Getter @Setter
 public class ConfigLength implements Configuration {
 	/**
 	 * If in fixed mode this is the length or it's the minimum length of a relative length is being specified

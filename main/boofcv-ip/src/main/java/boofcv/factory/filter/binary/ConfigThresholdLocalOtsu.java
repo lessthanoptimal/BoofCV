@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,12 +20,15 @@ package boofcv.factory.filter.binary;
 
 import boofcv.alg.filter.binary.ThresholdBlockOtsu;
 import boofcv.struct.ConfigLength;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Configuration for all threshold types.
  *
  * @author Peter Abeles
  */
+@Getter @Setter
 public class ConfigThresholdLocalOtsu extends ConfigThreshold {
 
 	/**

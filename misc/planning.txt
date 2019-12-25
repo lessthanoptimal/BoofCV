@@ -1,33 +1,3 @@
-TODO Tech Reports for new chessboard detector, assisted calibration, line fitting, stereo
-TODO Videos - hough line detectors
-            - chessboard corner detector + improvements
-            - stereo and VO updates
-
-TODO Chessboard X-Corner
-     - Try computing Eigen corners first, then X-Corner scores for speed
-     - Make refined X-Corner a relative threshold
-     - Improve clustering. One image in Chessboard 2 should have pass but failed. MotionBlur image26, ... etc
-
-TODO Visual Odometry
-     - Add SBA to VO algorithms
-TODO corner detector 2 tech report
-TODO Scene Reconstruction from arbitrary number of photos
-TODO hough circle detector
-TODO concurrent SIFT
-TODO concurrent dense features?
-TODO Estimate focal lengths given disparity image
-TODO Disparity post processing
-     - Filter small disparity regions
-     - Fill in holes
-     - mark small disparities as invalid
-TODO SGM - Consider YDX order. Profile to see if it's faster
-TODO Calibration
-     - TODO Calibrate using partially obscured chessboard patterns
-     - TODO Add ability to remove images and recalibrate from application
-     - TODO change high level API to be able to return more than one pattern. String ID
-
-TODO Scene Reconstruction from arbitrary number of photos
-
 TODO Perspective-n-conic
 
 TODO

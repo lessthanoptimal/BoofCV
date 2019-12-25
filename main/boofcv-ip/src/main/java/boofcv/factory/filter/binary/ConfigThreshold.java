@@ -20,12 +20,15 @@ package boofcv.factory.filter.binary;
 
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Configuration for all threshold types.
  *
  * @author Peter Abeles
  */
+@Getter @Setter
 public class ConfigThreshold implements Configuration {
 
 	/**

@@ -60,7 +60,7 @@ subprojects {
         mavenLocal()
 
         maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url = 'https://jitpack.io' } // needed to use Java 11 with 8 byte code
+        maven { url = 'https://jitpack.io' } // Allows annotations past Java 8 to be used
     }
 
     test {
@@ -102,7 +102,9 @@ subprojects {
 
     dependencies {
         api (group: 'org.georegression', name: 'georegression', version: '0.21')
-        
+
+        compileOnly 'org.projectlombok:lombok:1.18.10'
+
         implementation 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
         implementation 'javax.annotation:jsr250-api:1.0'       // @Generated
 
@@ -133,6 +135,8 @@ subprojects {
 
         // needed to use Java 11 with 8 byte code
         annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.2.0'
+        // @Getter @Setter
+        annotationProcessor 'org.projectlombok:lombok:1.18.10'
     }
 
 //    jar {

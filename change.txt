@@ -6,9 +6,46 @@ Date Format: year/month/day
 Date    : 2020
 Version : 0.36
 
-- Starting to use Java 11 (i.e. var) syntax but still will produce Java 1.8 byte code
+- Starting to use Java 11 syntax (e.g. var) but still will produce Java 1.8 byte code
   https://github.com/bsideup/jabel
-- TODO try improving 3-view by estimating lens distortion in projective camera
+- Added Project Lombok for auto generating setters/getters
+- Scene Reconstruction
+  * TODO try improving 3-view by estimating lens distortion in projective camera
+  * TODO Scene Reconstruction from arbitrary number of photos
+- Visual Odometry
+  * TODO Add SBA to all algorithms
+  * TODO Update Demonstration Apps
+- Stereo
+     TODO Disparity post processing
+         - Filter small disparity regions
+         - Fill in holes
+         - mark small disparities as invalid
+
+TODO Regression
+   - Prune empty error files or never generate them
+   - Dump runtime results into their own directory for each device. Use hostname?
+
+TODO Tech Reports for new chessboard detector, assisted calibration, line fitting, stereo
+TODO Videos - hough line detectors
+            - chessboard corner detector + improvements
+            - stereo and VO updates
+
+TODO Chessboard X-Corner
+     - Try computing Eigen corners first, then X-Corner scores for speed
+     - Make refined X-Corner a relative threshold
+     - Improve clustering. One image in Chessboard 2 should have pass but failed. MotionBlur image26, ... etc
+
+
+TODO hough circle detector
+TODO concurrent SIFT
+TODO concurrent dense features?
+TODO Estimate focal lengths given disparity image
+
+TODO SGM - Consider YDX order. Profile to see if it's faster
+TODO Calibration
+     - TODO Calibrate using partially obscured chessboard patterns
+     - TODO Add ability to remove images and recalibrate from application
+     - TODO change high level API to be able to return more than one pattern. String ID
 
 ---------------------------------------------
 Date    : 2019-Dec-23

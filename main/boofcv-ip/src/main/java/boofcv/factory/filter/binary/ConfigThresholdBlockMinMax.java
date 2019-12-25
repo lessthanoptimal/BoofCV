@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,12 +20,15 @@ package boofcv.factory.filter.binary;
 
 
 import boofcv.struct.ConfigLength;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Configuration for {@link boofcv.alg.filter.binary.ThresholdBlockMinMax}
  *
  * @author Peter Abeles
  */
+@Getter @Setter
 public class ConfigThresholdBlockMinMax extends ConfigThreshold {
 	/**
 	 * If the lower and upper histogram values are different by less than or equal to this amount it is considered
