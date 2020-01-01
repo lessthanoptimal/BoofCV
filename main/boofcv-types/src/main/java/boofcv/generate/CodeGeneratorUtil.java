@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ package boofcv.generate;
 public class CodeGeneratorUtil {
 
 	public static String copyright = "/*\n" +
-			" * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.\n" +
+			" * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.\n" +
 			" *\n" +
 			" * This file is part of BoofCV (http://boofcv.org).\n" +
 			" *\n" +

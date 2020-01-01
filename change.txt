@@ -6,6 +6,8 @@ Date Format: year/month/day
 Date    : 2020
 Version : 0.36
 
+- Build
+  * TODO If stable release, fail uploadArchives if dirty
 - Starting to use Java 11 syntax (e.g. var) but still will produce Java 1.8 byte code
   https://github.com/bsideup/jabel
 - Added Project Lombok for auto generating setters/getters
@@ -25,7 +27,6 @@ Version : 0.36
   * Fixed issues with visualizing disparity
 
 TODO Regression
-   - Prune empty error files or never generate them
    - Dump runtime results into their own directory for each device. Use hostname?
 
 TODO Tech Reports for new chessboard detector, assisted calibration, line fitting, stereo

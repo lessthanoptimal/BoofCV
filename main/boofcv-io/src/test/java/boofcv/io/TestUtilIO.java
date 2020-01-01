@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.io;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -158,5 +160,18 @@ public class TestUtilIO {
 			matches = UtilIO.findMatches(new File(f),"\\w*.class");
 		}
 		assertTrue(matches.length>=3);
+	}
+
+	@Test
+	public void delete() throws IOException {
+		File tmp = Files.createTempDirectory("delete").toFile();
+		assertTrue(new File(tmp,"boo.txt").createNewFile());
+		assertTrue(new File(tmp,"moo.txt").createNewFile());
+		assertTrue(new File(tmp,"moo_2.txt").createNewFile());
+		assertEquals(3,tmp.list().length);
+
+		UtilIO.delete(tmp,f->f.getName().startsWith("moo"));
+		assertEquals(1,tmp.list().length);
+		FileUtils.deleteDirectory(tmp);
 	}
 }

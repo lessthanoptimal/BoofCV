@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -800,5 +800,28 @@ public class UtilIO {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Recursively deletes all files in path which pass the test.
+	 * @param f base directory or file
+	 * @param test The test
+	 * @throws IOException Exception if fails to delete a file
+	 */
+	public static void delete( File f , FileTest test ) throws IOException {
+		if ( f.isDirectory() ) {
+			File[] files = f.listFiles();
+			if( files != null ) {
+				for (File c : files) {
+					delete(c,test);
+				}
+			}
+		}
+		if ( test.isTarget(f) && !f.delete())
+			throw new IOException("Failed to delete file: " + f);
+	}
+
+	public interface FileTest {
+		boolean isTarget( File f );
 	}
 }
