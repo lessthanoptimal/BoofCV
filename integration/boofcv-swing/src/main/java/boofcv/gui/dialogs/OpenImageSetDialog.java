@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,7 +89,7 @@ public class OpenImageSetDialog extends JPanel {
         preview.setCentering(true);
 
         JSplitPane splitSelected = new JSplitPane(JSplitPane.VERTICAL_SPLIT,preview,selected);
-        splitSelected.setDividerLocation(100);
+        splitSelected.setDividerLocation(200);
         splitSelected.setResizeWeight(0.0);
         splitSelected.setContinuousLayout(true);
 

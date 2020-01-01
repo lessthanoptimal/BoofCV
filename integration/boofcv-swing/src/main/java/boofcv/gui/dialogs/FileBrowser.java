@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -156,6 +156,9 @@ public class FileBrowser extends JSpringPanel {
 		bUp.setToolTipText("Up Directory");
 		bUp.addActionListener(e->{
 			File f = new File(fileName.getText());
+			if( f.isFile() ) {
+				f = f.getParentFile();
+			}
 			setDirectory(f.getParentFile());
 		});
 
