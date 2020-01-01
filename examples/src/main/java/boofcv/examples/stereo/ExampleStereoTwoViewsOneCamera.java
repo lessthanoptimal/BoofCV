@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -241,8 +241,8 @@ public class ExampleStereoTwoViewsOneCamera {
 
 		// Adjust the rectification to make the view area more useful
 		ImageDimension rectShape = new ImageDimension();
-		RectifyImageOps.fullViewLeft(intrinsicLeft, rectRot, rect1, rect2, rectifiedK, rectShape);
-//		RectifyImageOps.allInsideLeft(intrinsicLeft, rectR, rect1, rect2, rectifiedK, rectShape);
+		RectifyImageOps.fullViewLeft(intrinsicLeft, rect1, rect2, rectifiedK, rectShape);
+//		RectifyImageOps.allInsideLeft(intrinsicLeft, rect1, rect2, rectifiedK, rectShape);
 		// Taking in account the relative rotation between the image axis and the baseline is important in
 		// this scenario since a person can easily hold the camera at an odd angle. If you don't adjust
 		// the rectified image size you might end up with a lot of wasted pixels and a low resolution model!

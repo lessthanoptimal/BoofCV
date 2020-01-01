@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,20 +111,19 @@ public class RectifyImageOps {
 	 * </p>
 	 *
 	 * @param paramLeft Intrinsic parameters for left camera. Not modified.
-	 * @param rectifiedR (Optional) Rectification rotation matrix.  Input. Can be null.
 	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 * @param rectifiedSize (Optional) Size that the rectified images should be changed to. Modified.
 	 */
 	public static void fullViewLeft(CameraPinholeBrown paramLeft,
-									@Nullable DMatrixRMaj rectifiedR, DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
+									DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
 									DMatrixRMaj rectifyK, @Nullable ImageDimension rectifiedSize)
 	{
 		if( rectifiedSize == null )
 			rectifiedSize = new ImageDimension();
 
-		ImplRectifyImageOps_F64.fullViewLeft(paramLeft,rectifiedR, rectifyLeft, rectifyRight, rectifyK,rectifiedSize);
+		ImplRectifyImageOps_F64.fullViewLeft(paramLeft,rectifyLeft, rectifyRight, rectifyK,rectifiedSize);
 	}
 
 	/**
@@ -141,20 +140,19 @@ public class RectifyImageOps {
 	 * </p>
 	 *
 	 * @param paramLeft Intrinsic parameters for left camera. Not modified.
-	 * @param rectifiedR (Optional) Rectification rotation matrix.  Input. Can be null.
 	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 * @param rectifiedSize (Optional) Size that the rectified images should be changed to. Modified.
 	 */
 	public static void fullViewLeft(CameraPinholeBrown paramLeft,
-									@Nullable FMatrixRMaj rectifiedR, FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
+									FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
 									FMatrixRMaj rectifyK, @Nullable ImageDimension rectifiedSize)
 	{
 		if( rectifiedSize == null )
 			rectifiedSize = new ImageDimension();
 
-		ImplRectifyImageOps_F32.fullViewLeft(paramLeft,rectifiedR, rectifyLeft, rectifyRight, rectifyK,rectifiedSize);
+		ImplRectifyImageOps_F32.fullViewLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK,rectifiedSize);
 	}
 
 	/**
@@ -210,14 +208,12 @@ public class RectifyImageOps {
 	 * </p>
 	 *
 	 * @param paramLeft Intrinsic parameters for left camera. Not modified.
-	 * @param rectifiedR (Optional) Rectification rotation matrix.  Input. Can be null.
 	 * @param rectifyLeft Rectification matrix for left image. Input and Output. Modified.
 	 * @param rectifyRight Rectification matrix for right image. Input and Output. Modified.
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 * @param rectifiedSize (Optional) Size that the rectified images should be changed to. Modified.
 	 */
 	public static void allInsideLeft(CameraPinholeBrown paramLeft,
-									 @Nullable DMatrixRMaj rectifiedR,
 									 DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
 									 DMatrixRMaj rectifyK,
 									 @Nullable ImageDimension rectifiedSize)
@@ -225,7 +221,7 @@ public class RectifyImageOps {
 		if( rectifiedSize == null )
 			rectifiedSize = new ImageDimension();
 
-		ImplRectifyImageOps_F64.allInsideLeft(paramLeft, rectifiedR, rectifyLeft, rectifyRight, rectifyK, rectifiedSize);
+		ImplRectifyImageOps_F64.allInsideLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK, rectifiedSize);
 	}
 
 	/**
@@ -242,14 +238,13 @@ public class RectifyImageOps {
 	 * @param rectifyK Rectification calibration matrix. Input and Output. Modified.
 	 */
 	public static void allInsideLeft(CameraPinholeBrown paramLeft,
-									 @Nullable FMatrixRMaj rectifiedR,
 									 FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
 									 FMatrixRMaj rectifyK,
 									 @Nullable ImageDimension rectifiedSize)
 	{
 		if( rectifiedSize == null )
 			rectifiedSize = new ImageDimension();
-		ImplRectifyImageOps_F32.allInsideLeft(paramLeft, rectifiedR, rectifyLeft, rectifyRight, rectifyK, rectifiedSize);
+		ImplRectifyImageOps_F32.allInsideLeft(paramLeft, rectifyLeft, rectifyRight, rectifyK, rectifiedSize);
 	}
 
 	/**

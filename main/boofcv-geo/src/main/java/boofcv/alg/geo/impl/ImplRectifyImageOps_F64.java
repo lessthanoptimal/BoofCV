@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,6 @@ import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
 
-import javax.annotation.Nullable;
-
 import static boofcv.factory.distort.LensDistortionFactory.narrow;
 
 /**
@@ -47,11 +45,9 @@ import static boofcv.factory.distort.LensDistortionFactory.narrow;
 public class ImplRectifyImageOps_F64 {
 
 	public static void fullViewLeft(CameraPinholeBrown paramLeft,
-									@Nullable DMatrixRMaj rectifiedR, DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
+									DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
 									DMatrixRMaj rectifyK, ImageDimension rectifiedSize)
 	{
-		computeRectifiedSize(paramLeft, rectifiedR, rectifiedSize);
-
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new CameraPinholeBrown(paramLeft);
 
@@ -61,10 +57,11 @@ public class ImplRectifyImageOps_F64 {
 		RectangleLength2D_F64 bound = DistortImageOps.boundBox_F64(paramLeft.width, paramLeft.height,
 				new PointToPixelTransform_F64(tranLeft),work);
 
-		double scaleX = rectifiedSize.width/bound.width;
-		double scaleY = rectifiedSize.height/bound.height;
+		// Select scale to maintain the same number of pixels
+		double scale = Math.sqrt((paramLeft.width*paramLeft.height)/(bound.width*bound.height));
 
-		double scale = Math.min(scaleX, scaleY);
+		rectifiedSize.width = (int)(scale*bound.width+0.5);
+		rectifiedSize.height = (int)(scale*bound.height+0.5);
 
 		adjustCalibrated(rectifyLeft, rectifyRight, rectifyK, bound, scale);
 	}
@@ -87,12 +84,9 @@ public class ImplRectifyImageOps_F64 {
 	}
 
 	public static void allInsideLeft(CameraPinholeBrown paramLeft,
-									 @Nullable DMatrixRMaj rectifiedR,
 									 DMatrixRMaj rectifyLeft, DMatrixRMaj rectifyRight,
 									 DMatrixRMaj rectifyK, ImageDimension rectifiedSize)
 	{
-		computeRectifiedSize(paramLeft, rectifiedR, rectifiedSize);
-
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new CameraPinholeBrown(paramLeft);
 
@@ -104,29 +98,13 @@ public class ImplRectifyImageOps_F64 {
 
 		LensDistortionOps_F64.roundInside(bound);
 
-		double scaleX = rectifiedSize.width/(double)bound.width;
-		double scaleY = rectifiedSize.height/(double)bound.height;
+		// Select scale to maintain the same number of pixels
+		double scale = Math.sqrt((paramLeft.width*paramLeft.height)/(bound.width*bound.height));
 
-		double scale = Math.max(scaleX, scaleY);
+		rectifiedSize.width = (int)(scale*bound.width+0.5);
+		rectifiedSize.height = (int)(scale*bound.height+0.5);
 
 		adjustCalibrated(rectifyLeft, rectifyRight, rectifyK, bound, scale);
-	}
-
-	private static void computeRectifiedSize(CameraPinholeBrown paramLeft, @Nullable DMatrixRMaj rectifiedR, ImageDimension rectifiedSize) {
-		if (rectifiedR != null) {
-			// The image axis and baseline might not be aligned. In that case you will want to rotate the rectified
-			// image to maximize the number of pixels rendered inside of it
-			double theta = Math.atan2(rectifiedR.get(1, 0), rectifiedR.get(0, 0));
-			double c = Math.cos(theta);
-			double s = Math.sin(theta);
-			int w = paramLeft.width;
-			int h = paramLeft.height;
-			rectifiedSize.width = (int) Math.round(Math.abs(c * w + s * h));
-			rectifiedSize.height = (int) Math.round(Math.abs(-s * w + c * h));
-		} else {
-			rectifiedSize.width = paramLeft.width;
-			rectifiedSize.height = paramLeft.height;
-		}
 	}
 
 	public static void allInsideLeft( int imageWidth,int imageHeight,
@@ -138,8 +116,8 @@ public class ImplRectifyImageOps_F64 {
 		RectangleLength2D_F64 bound = LensDistortionOps_F64.boundBoxInside(imageWidth, imageHeight,
 				new PointToPixelTransform_F64(tranLeft), work);
 
-		double scaleX = imageWidth/(double)bound.width;
-		double scaleY = imageHeight/(double)bound.height;
+		double scaleX = imageWidth/bound.width;
+		double scaleY = imageHeight/bound.height;
 
 		double scale = Math.max(scaleX, scaleY);
 

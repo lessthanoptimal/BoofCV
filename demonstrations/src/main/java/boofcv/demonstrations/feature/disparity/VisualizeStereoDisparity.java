@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -362,7 +362,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		rectR = rectifyAlg.getRectifiedRotation();
 
 		// adjust view to maximize viewing area while not including black regions
-		RectifyImageOps.allInsideLeft(calib.left, null, rect1, rect2, rectK, null);
+		RectifyImageOps.allInsideLeft(calib.left, rect1, rect2, rectK, null);
 
 		// compute transforms to apply rectify the images
 		leftRectToPixel = transformRectToPixel(calib.left, rect1);

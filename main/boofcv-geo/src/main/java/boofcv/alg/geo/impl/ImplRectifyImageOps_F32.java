@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,6 @@ import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_FDRM;
 import org.ejml.simple.SimpleMatrix;
 
-import javax.annotation.Nullable;
-
 import static boofcv.factory.distort.LensDistortionFactory.narrow;
 
 /**
@@ -47,11 +45,9 @@ import static boofcv.factory.distort.LensDistortionFactory.narrow;
 public class ImplRectifyImageOps_F32 {
 
 	public static void fullViewLeft(CameraPinholeBrown paramLeft,
-									@Nullable FMatrixRMaj rectifiedR, FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
+									FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
 									FMatrixRMaj rectifyK, ImageDimension rectifiedSize)
 	{
-		computeRectifiedSize(paramLeft, rectifiedR, rectifiedSize);
-
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new CameraPinholeBrown(paramLeft);
 
@@ -61,10 +57,11 @@ public class ImplRectifyImageOps_F32 {
 		RectangleLength2D_F32 bound = DistortImageOps.boundBox_F32(paramLeft.width, paramLeft.height,
 				new PointToPixelTransform_F32(tranLeft),work);
 
-		float scaleX = rectifiedSize.width/bound.width;
-		float scaleY = rectifiedSize.height/bound.height;
+		// Select scale to maintain the same number of pixels
+		float scale = (float)Math.sqrt((paramLeft.width*paramLeft.height)/(bound.width*bound.height));
 
-		float scale = (float)Math.min(scaleX, scaleY);
+		rectifiedSize.width = (int)(scale*bound.width+0.5f);
+		rectifiedSize.height = (int)(scale*bound.height+0.5f);
 
 		adjustCalibrated(rectifyLeft, rectifyRight, rectifyK, bound, scale);
 	}
@@ -87,12 +84,9 @@ public class ImplRectifyImageOps_F32 {
 	}
 
 	public static void allInsideLeft(CameraPinholeBrown paramLeft,
-									 @Nullable FMatrixRMaj rectifiedR,
 									 FMatrixRMaj rectifyLeft, FMatrixRMaj rectifyRight,
 									 FMatrixRMaj rectifyK, ImageDimension rectifiedSize)
 	{
-		computeRectifiedSize(paramLeft, rectifiedR, rectifiedSize);
-
 		// need to take in account the order in which image distort will remove rectification later on
 		paramLeft = new CameraPinholeBrown(paramLeft);
 
@@ -104,29 +98,13 @@ public class ImplRectifyImageOps_F32 {
 
 		LensDistortionOps_F32.roundInside(bound);
 
-		float scaleX = rectifiedSize.width/(float)bound.width;
-		float scaleY = rectifiedSize.height/(float)bound.height;
+		// Select scale to maintain the same number of pixels
+		float scale = (float)Math.sqrt((paramLeft.width*paramLeft.height)/(bound.width*bound.height));
 
-		float scale = (float)Math.max(scaleX, scaleY);
+		rectifiedSize.width = (int)(scale*bound.width+0.5f);
+		rectifiedSize.height = (int)(scale*bound.height+0.5f);
 
 		adjustCalibrated(rectifyLeft, rectifyRight, rectifyK, bound, scale);
-	}
-
-	private static void computeRectifiedSize(CameraPinholeBrown paramLeft, @Nullable FMatrixRMaj rectifiedR, ImageDimension rectifiedSize) {
-		if (rectifiedR != null) {
-			// The image axis and baseline might not be aligned. In that case you will want to rotate the rectified
-			// image to maximize the number of pixels rendered inside of it
-			float theta = (float)Math.atan2(rectifiedR.get(1, 0), rectifiedR.get(0, 0));
-			float c = (float)Math.cos(theta);
-			float s = (float)Math.sin(theta);
-			int w = paramLeft.width;
-			int h = paramLeft.height;
-			rectifiedSize.width = (int) (float)Math.round(Math.abs(c * w + s * h));
-			rectifiedSize.height = (int) (float)Math.round(Math.abs(-s * w + c * h));
-		} else {
-			rectifiedSize.width = paramLeft.width;
-			rectifiedSize.height = paramLeft.height;
-		}
 	}
 
 	public static void allInsideLeft( int imageWidth,int imageHeight,
@@ -138,8 +116,8 @@ public class ImplRectifyImageOps_F32 {
 		RectangleLength2D_F32 bound = LensDistortionOps_F32.boundBoxInside(imageWidth, imageHeight,
 				new PointToPixelTransform_F32(tranLeft), work);
 
-		float scaleX = imageWidth/(float)bound.width;
-		float scaleY = imageHeight/(float)bound.height;
+		float scaleX = imageWidth/bound.width;
+		float scaleY = imageHeight/bound.height;
 
 		float scale = (float)Math.max(scaleX, scaleY);
 

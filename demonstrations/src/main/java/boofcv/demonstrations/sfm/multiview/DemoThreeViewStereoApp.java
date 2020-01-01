@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -723,8 +723,8 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 		// Maximize the view of the left image and adjust the size of the rectified image
 		ImageDimension rectifiedShape = new ImageDimension();
-		RectifyImageOps.fullViewLeft(intrinsic1, rectifiedR, rect1, rect2, rectifiedK,rectifiedShape);
-//		RectifyImageOps.allInsideLeft(intrinsic1, rectifiedR, rect1, rect2, rectifiedK,rectifiedShape);
+		RectifyImageOps.fullViewLeft(intrinsic1, rect1, rect2, rectifiedK,rectifiedShape);
+//		RectifyImageOps.allInsideLeft(intrinsic1, rect1, rect2, rectifiedK,rectifiedShape);
 
 		// undistorted and rectify images
 		FMatrixRMaj rect1_F32 = new FMatrixRMaj(3,3);

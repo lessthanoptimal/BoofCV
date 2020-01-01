@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -113,9 +113,9 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 
 		// add different types of adjustments
 		addRectified("No Adjustment", rect1,rect2);
-		RectifyImageOps.allInsideLeft(param.left, null, rect1, rect2, rectK, null);
+		RectifyImageOps.allInsideLeft(param.left, rect1, rect2, rectK, null);
 		addRectified("All Inside", rect1,rect2);
-		RectifyImageOps.fullViewLeft(param.left, null, rect1, rect2, rectK, null);
+		RectifyImageOps.fullViewLeft(param.left, rect1, rect2, rectK, null);
 		addRectified("Full View", rect1,rect2);
 
 		hasProcessed = true;

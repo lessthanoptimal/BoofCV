@@ -12,6 +12,7 @@ Version : 0.36
   https://github.com/bsideup/jabel
 - Added Project Lombok for auto generating setters/getters
 - Scene Reconstruction
+  * Better cropping on rectified image using bounding box instead of rotation matrix
   * TODO try improving 3-view by estimating lens distortion in projective camera
   * TODO Scene Reconstruction from arbitrary number of photos
 - Visual Odometry
