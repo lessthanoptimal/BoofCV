@@ -46,6 +46,9 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 
 	CombinedTrackerScalePoint<I,D, Desc> tracker;
 
+	// ID of the most recently processed frame
+	protected long frameID=-1;
+
 	PyramidDiscrete<I> pyramid;
 	D[] derivX;
 	D[] derivY;
@@ -77,10 +80,17 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 		tracker.reset();
 		previousSpawn = 0;
 		detected = false;
+		frameID=-1;
+	}
+
+	@Override
+	public long getFrameID() {
+		return frameID;
 	}
 
 	@Override
 	public void process(I image) {
+		frameID++;
 		detected = false;
 
 		// update the image pyramid
@@ -131,6 +141,7 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 			p.set(t);
 			p.setDescription(t);
 			p.featureId = t.featureId;
+			p.spawnFrameID = frameID;
 		}
 
 		previousSpawn = tracker.getPureKlt().size() + tracker.getReactivated().size();

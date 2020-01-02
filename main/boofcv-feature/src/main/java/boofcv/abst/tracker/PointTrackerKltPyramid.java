@@ -46,6 +46,9 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	// reference to input image
 	protected I input;
 
+	// ID of the most recently processed frame
+	protected long frameID=-1;
+
 	// Updates the image pyramid's gradient.
 	protected ImageGradient<I,D> gradient;
 
@@ -169,6 +172,8 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 		p.prev.set(x,y);
 
 		if( checkValidSpawn(p) ) {
+			p.featureId = totalFeatures++;
+			p.spawnFrameID = frameID;
 			active.add(t);
 			return p;
 		}
@@ -218,6 +223,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 
 			if( checkValidSpawn(p) ) {
 				p.featureId = totalFeatures++;
+				p.spawnFrameID = frameID;
 
 				// add to appropriate lists
 				active.add(t);
@@ -245,6 +251,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	@Override
 	public void process(I image) {
 		this.input = image;
+		this.frameID++;
 
 		boolean activeTracks = active.size()>0;
 		spawned.clear();
@@ -391,6 +398,12 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	public void reset() {
 		dropAllTracks();
 		totalFeatures = 0;
+		frameID = -1;
+	}
+
+	@Override
+	public long getFrameID() {
+		return frameID;
 	}
 
 	static class PointTrackMod extends PointTrack {

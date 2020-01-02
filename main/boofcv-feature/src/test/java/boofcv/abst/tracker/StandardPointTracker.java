@@ -66,7 +66,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	 * The cookie for tracks should not be set
 	 */
 	@Test
-	public void checkCookieNull() {
+	void checkCookieNull() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -78,6 +78,22 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		}
 	}
 
+	@Test
+	void checkFrameID() {
+		tracker = createTracker();
+		assertEquals(-1,tracker.getFrameID());
+		for (int i = 0; i < 5; i++) {
+			processImage((T)image);
+			assertEquals(i,tracker.getFrameID());
+		}
+		tracker.reset();
+		assertEquals(-1,tracker.getFrameID());
+		for (int i = 0; i < 5; i++) {
+			processImage((T)image);
+			assertEquals(i,tracker.getFrameID());
+		}
+	}
+
 	/**
 	 * After a track has been dropped the cookie should not be modified and returned when
 	 * the track is recycled.
@@ -86,7 +102,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	 * and recycled tracks are put at the end of the queue
 	 */
 	@Test
-	public void checkCookieSaved() {
+	void checkCookieSaved() {
 		// create tracks
 		tracker = createTracker();
 		processImage((T)image);
@@ -115,7 +131,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	 * High level spawn tracks test.
 	 */
 	@Test
-	public void spawnTracks() {
+	void spawnTracks() {
 		// Process an image and make sure no new tracks have been spawned until requested
 		tracker = createTracker();
 		processImage((T)image);
@@ -160,7 +176,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	 * When spawn is called, make sure that it doesn't return identical tracks
 	 */
 	@Test
-	public void spawnTracks_NoDuplicates() {
+	void spawnTracks_NoDuplicates() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -189,8 +205,53 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		assertTrue(y == found.y);
 	}
 
+	/**
+	 * Ensures that the spawn ID is set correctly
+	 */
 	@Test
-	public void dropAllTracks() {
+	void trackSpawnID() {
+		tracker = createTracker();
+		processImage((T)image);
+		tracker.spawnTracks();
+
+		// no new tracks are spawned so their ID's should not be updated
+		for (int i = 0; i < 3; i++) {
+			for( var t : tracker.getActiveTracks(null) ) {
+				assertEquals(0,t.spawnFrameID);
+			}
+			processImage((T)image);
+		}
+
+		// drop half the tracks
+		List<PointTrack> tracks = tracker.getActiveTracks(null);
+		int expectedZero = tracks.size()/2-1;
+		for (int i = tracks.size()-expectedZero-1; i >= 0; i-- ) {
+			tracker.dropTrack(tracks.get(i));
+		}
+
+		// spawn more
+		processImage((T)image);
+		tracker.spawnTracks();
+
+		// count their spawn ID
+		int count0 = 0;
+		int count1 = 0;
+
+		for( var t : tracker.getActiveTracks(null) ) {
+			if( t.spawnFrameID == 0 )
+				count0++;
+			else if( t.spawnFrameID == 4)
+				count1++;
+			else
+				throw new RuntimeException("Unexpected "+t.spawnFrameID);
+		}
+
+		assertEquals(expectedZero,count0);
+		assertTrue(count1 > 5);
+	}
+
+	@Test
+	void dropAllTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -209,7 +270,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	 * Cause tracks to be dropped during the update
 	 */
 	@Test
-	public void testUpdateTrackDrop() {
+	void testUpdateTrackDrop() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -255,7 +316,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	}
 	
 	@Test
-	public void testRequestDrop() {
+	void testRequestDrop() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -277,7 +338,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	}
 
 	@Test
-	public void testTrackUpdate() {
+	void testTrackUpdate() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -296,7 +357,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	}
 
 	@Test
-	public void reset() {
+	void reset() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -334,7 +395,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	}
 
 	@Test
-	public void getAllTracks() {
+	void getAllTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -351,7 +412,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	}
 
 	@Test
-	public void getActiveTracks() {
+	void getActiveTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -368,7 +429,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	}
 
 	@Test
-	public void getInactiveTracks() {
+	void getInactiveTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -386,7 +447,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	}
 
 	@Test
-	public void getDroppedTracks() {
+	void getDroppedTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();
@@ -406,7 +467,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	}
 
 	@Test
-	public void getNewTracks() {
+	void getNewTracks() {
 		tracker = createTracker();
 		processImage((T)image);
 		tracker.spawnTracks();

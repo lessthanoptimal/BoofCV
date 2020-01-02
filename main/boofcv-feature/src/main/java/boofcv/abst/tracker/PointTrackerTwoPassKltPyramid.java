@@ -64,6 +64,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageGray<I>,D extends Imag
 	@Override
 	public void process(I image) {
 		this.input = image;
+		this.frameID++;
 
 		finishedTracking = false;
 		spawned.clear();

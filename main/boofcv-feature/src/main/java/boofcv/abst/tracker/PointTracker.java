@@ -73,10 +73,16 @@ public interface PointTracker<T extends ImageBase<T>> {
 	void reset();
 
 	/**
+	 * Returns the ID of the most recently processed frame. Frames start at 0 and increment by one each time
+	 * process is called. After reset or before any frames have been processed -1 is returned.
+	 */
+	long getFrameID();
+
+	/**
 	 * Drops all feature to be dropped and will no longer be tracked.  Tracks dropped using
 	 * this function will not appear in the dropped list.
 	 */
-	public void dropAllTracks();
+	void dropAllTracks();
 
 	/**
 	 * Manually forces a track to be dropped.  Tracks dropped using this function will not
@@ -90,7 +96,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 * @return true if the request to drop the track was done or if it was ignored because the track wasn't being
 	 * tracked
 	 */
-	public boolean dropTrack(PointTrack track);
+	boolean dropTrack(PointTrack track);
 
 	/**
 	 * Returns a list of all features that are currently being tracked
@@ -99,7 +105,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	public List<PointTrack> getAllTracks(List<PointTrack> list);
+	List<PointTrack> getAllTracks(List<PointTrack> list);
 
 	/**
 	 * Returns a list of active tracks. An active track is defined as a track
@@ -109,7 +115,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	public List<PointTrack> getActiveTracks(List<PointTrack> list);
+	List<PointTrack> getActiveTracks(List<PointTrack> list);
 
 	/**
 	 * Returns a list of inactive tracks.  A track is inactive if it is not
@@ -119,7 +125,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	public List<PointTrack> getInactiveTracks(List<PointTrack> list);
+	List<PointTrack> getInactiveTracks(List<PointTrack> list);
 
 	/**
 	 * Returns a list of tracks dropped by the tracker during the most recent update.
@@ -129,7 +135,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	public List<PointTrack> getDroppedTracks(List<PointTrack> list);
+	List<PointTrack> getDroppedTracks(List<PointTrack> list);
 
 	/**
 	 * Returns a list of tracks that have been added since process was called.
@@ -138,7 +144,7 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 *             If null a new list will be declared internally.
 	 * @return List of tracks.
 	 */
-	public List<PointTrack> getNewTracks(List<PointTrack> list);
+	List<PointTrack> getNewTracks(List<PointTrack> list);
 
 	/**
 	 * Automatically selects new features in the image to track. Returned tracks must
@@ -147,6 +153,6 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 *
 	 * NOTE: This function may or may not also modify the active and inactive lists.
 	 */
-	public void spawnTracks();
+	void spawnTracks();
 }
 

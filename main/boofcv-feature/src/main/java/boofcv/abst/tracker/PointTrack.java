@@ -38,7 +38,10 @@ public class PointTrack extends Point2D_F64 {
 	/** User specified data */
 	public Object cookie;
 
-	/* Description of this feature that is used internally.  Don't mess with this */
+	/** The frame the track was spawned at */
+	public long spawnFrameID;
+
+	/** Description of this feature that is used internally.  Don't mess with this */
 	private Object description;
 
 	public PointTrack(double x, double y, long featureId) {
@@ -51,6 +54,7 @@ public class PointTrack extends Point2D_F64 {
 	
 	public void set( PointTrack t ) {
 		featureId = t.featureId;
+		spawnFrameID = t.spawnFrameID;
 		x = t.x;
 		y = t.y;
 		cookie = t.cookie;
@@ -58,6 +62,7 @@ public class PointTrack extends Point2D_F64 {
 	}
 	
 	public void reset() {
+		spawnFrameID = -1;
 		featureId = -1;
 		cookie = null;
 		description = null;

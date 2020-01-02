@@ -64,6 +64,9 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	// previously declared tracks which are being recycled
 	protected List<PointTrack> unused = new ArrayList<>();
 
+	// ID of the most recently processed frame
+	protected long frameID=-1;
+
 	// number of features created.  Used to assign unique IDs
 	protected long featureID = 0;
 
@@ -120,6 +123,7 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	public void reset() {
 		dropAllTracks();
 		featureID = 0;
+		frameID = -1;
 		for (int i = 0; i < sets.length; i++) {
 			sets[i].featDst.reset();
 			sets[i].locDst.reset();
@@ -128,8 +132,13 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	}
 
 	@Override
-	public void process( I input ) {
+	public long getFrameID() {
+		return frameID;
+	}
 
+	@Override
+	public void process( I input ) {
+		frameID++;
 		tracksActive.clear();
 		tracksInactive.clear();
 		tracksDropped.clear();
@@ -296,6 +305,7 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		p.set(x, y);
 		((Desc)p.getDescription()).setTo(desc);
 		if( checkValidSpawn(setIndex,p) ) {
+			p.spawnFrameID = frameID;
 			p.setId = setIndex;
 			p.featureId = featureID++;
 

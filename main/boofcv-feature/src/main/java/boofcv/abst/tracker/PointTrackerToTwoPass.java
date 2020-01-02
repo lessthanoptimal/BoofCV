@@ -50,6 +50,11 @@ public class PointTrackerToTwoPass<T extends ImageBase<T>>
 	}
 
 	@Override
+	public long getFrameID() {
+		return tracker.getFrameID();
+	}
+
+	@Override
 	public void dropAllTracks() {
 		tracker.dropAllTracks();
 	}

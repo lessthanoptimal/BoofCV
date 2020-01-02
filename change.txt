@@ -15,6 +15,9 @@ Version : 0.36
   * Fixed ImageDistort crashing if an invalid region is specified. It simply does nothing now.
 - Moved KLT from boofcv-geo to boofcv-feature
   * No idea what it was doing in geo originally but it didn't belong there!
+- PointTracker
+  * Added frameID for each processed frame
+  * Added spawnFrameID to tracks
 - PerspectiveOps
   * Added two types of point invariants
 - Scene Reconstruction

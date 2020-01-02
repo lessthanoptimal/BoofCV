@@ -60,6 +60,7 @@ public class DetectDescribeAssociateTwoPass<I extends ImageGray<I>, Desc extends
 
 	@Override
 	public void process( I input ) {
+		frameID++;
 		sourceSet2 = false;
 		tracksActive.clear();
 		tracksInactive.clear();
