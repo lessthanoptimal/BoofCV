@@ -87,5 +87,10 @@ public class TestPyramidDiscrete {
 
 		@Override
 		public double getSigma(int layer) {return 0;}
+
+		@Override
+		public ImagePyramid<T> copyStructure() {
+			return null;
+		}
 	}
 }

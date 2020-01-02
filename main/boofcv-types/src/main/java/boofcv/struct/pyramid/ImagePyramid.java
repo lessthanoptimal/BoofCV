@@ -135,4 +135,9 @@ public interface ImagePyramid<T extends ImageBase<T>> {
 	 * @return Equivalent sigma for Gaussian blur.
 	 */
 	double getSigma( int layer );
+
+	/**
+	 * Creates a copy of the pyramids structure but not the pixel data
+	 */
+	<IP extends ImagePyramid<T>>IP copyStructure();
 }

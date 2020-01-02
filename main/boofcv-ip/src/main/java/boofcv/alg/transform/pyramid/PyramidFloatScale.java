@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidFloat;
 
 
@@ -42,9 +43,14 @@ public class PyramidFloatScale< T extends ImageGray<T>>
 	// interpolation algorithm
 	protected InterpolatePixelS<T> interpolate;
 
-	public PyramidFloatScale(InterpolatePixelS<T> interpolate, double scaleFactors[] , Class<T> imageType) {
+	public PyramidFloatScale(InterpolatePixelS<T> interpolate, double[] scaleFactors , Class<T> imageType) {
 		super(ImageType.single(imageType),scaleFactors);
 		this.interpolate = interpolate;
+	}
+
+	protected PyramidFloatScale( PyramidFloatScale<T> orig ) {
+		super(orig);
+		this.interpolate = orig.interpolate.copy();
 	}
 
 	@Override
@@ -77,5 +83,10 @@ public class PyramidFloatScale< T extends ImageGray<T>>
 	@Override
 	public double getSigma(int layer) {
 		return 0;
+	}
+
+	@Override
+	public ImagePyramid<T> copyStructure() {
+		return new PyramidFloatScale<>(this);
 	}
 }

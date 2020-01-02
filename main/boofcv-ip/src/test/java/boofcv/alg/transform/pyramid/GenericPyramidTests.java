@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,12 @@ import boofcv.alg.misc.GImageStatistics;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
+import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -65,4 +67,30 @@ public abstract class GenericPyramidTests<T extends ImageGray<T>> {
 	}
 
 	protected abstract ImagePyramid<T> createPyramid( int... scales);
+
+	@Test
+	public void copyStructure() {
+		T input = GeneralizedImageOps.createSingleBand(imageType, width, height);
+		ImagePyramid<T> src = createPyramid(1,2,4);
+		GImageMiscOps.fillUniform(input, rand, 0, 100);
+
+		src.process(input);
+
+		ImagePyramid<T> cpy = src.copyStructure();
+
+		// see if the structure is the same
+		assertEquals(src.getNumLayers(),cpy.getNumLayers());
+		for (int i = 0; i < src.getNumLayers(); i++) {
+			assertEquals(src.getScale(i),cpy.getScale(i));
+			assertEquals(src.getWidth(i),cpy.getWidth(i));
+			assertEquals(src.getHeight(i),cpy.getHeight(i));
+			assertEquals(src.getSampleOffset(i),cpy.getSampleOffset(i));
+		}
+
+		// process an image and the data should now be the same
+		cpy.process(input);
+		for (int i = 0; i < src.getNumLayers(); i++) {
+			BoofTesting.assertEquals(src.getLayer(i),cpy.getLayer(i),1e-4);
+		}
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.transform.pyramid;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 /**
@@ -42,6 +43,10 @@ public class PyramidDiscreteAverage<T extends ImageBase<T>> extends PyramidDiscr
 								  boolean saveOriginalReference, int... scaleFactors)
 	{
 		super(imageType,saveOriginalReference,scaleFactors);
+	}
+
+	protected PyramidDiscreteAverage( PyramidDiscreteAverage<T> orig ) {
+		super(orig);
 	}
 
 	@Override
@@ -78,5 +83,10 @@ public class PyramidDiscreteAverage<T extends ImageBase<T>> extends PyramidDiscr
 	@Override
 	public double getSigma(int layer) {
 		return 0;
+	}
+
+	@Override
+	public ImagePyramid<T> copyStructure() {
+		return new PyramidDiscreteAverage<>(this);
 	}
 }

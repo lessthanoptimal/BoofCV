@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidFloat;
 
 
@@ -87,6 +88,17 @@ public class PyramidFloatGaussianScale< T extends ImageGray<T>> extends PyramidF
 		}
 	}
 
+	protected PyramidFloatGaussianScale( PyramidFloatGaussianScale<T> orig ) {
+		super(orig);
+		this.interpolate = orig.interpolate.copy();
+
+		this.sigmaLayers = new float[ orig.sigmaLayers.length ];
+		System.arraycopy(orig.sigmaLayers, 0, this.sigmaLayers, 0, sigmaLayers.length);
+
+		sigma = new double[ orig.sigmaLayers.length ];
+		System.arraycopy(orig.sigma, 0, sigma, 0, orig.sigma.length);
+	}
+
 
 	@Override
 	public void process(T input) {
@@ -134,6 +146,11 @@ public class PyramidFloatGaussianScale< T extends ImageGray<T>> extends PyramidF
 	@Override
 	public double getSigma(int layer) {
 		return sigma[layer];
+	}
+
+	@Override
+	public ImagePyramid<T> copyStructure() {
+		return new PyramidFloatGaussianScale<>(this);
 	}
 
 	public float[] getSigmaLayers() {

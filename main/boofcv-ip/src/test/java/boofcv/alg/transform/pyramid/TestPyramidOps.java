@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -175,5 +175,8 @@ public class TestPyramidOps {
 
 		@Override
 		public double getSigma(int layer) {return 0;}
+
+		@Override
+		public ImagePyramid<T> copyStructure() { return null; }
 	}
 }

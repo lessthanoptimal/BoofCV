@@ -39,7 +39,7 @@ import boofcv.struct.image.ImageType;
 public abstract class PyramidFloat<T extends ImageBase<T>> extends ImagePyramidBase<T> {
 
 	// scale of each layer relative to the previous layer
-	public double scale[];
+	public double[] scale;
 
 	/**
 	 * Defines the image pyramid.
@@ -52,6 +52,12 @@ public abstract class PyramidFloat<T extends ImageBase<T>> extends ImagePyramidB
 		super(imageType,false);
 		if( scaleFactors.length > 0 )
 			setScaleFactors(scaleFactors);
+	}
+
+	protected PyramidFloat( PyramidFloat<T> orig ) {
+		super(orig);
+		if( orig.scale != null )
+			this.scale = orig.scale.clone();
 	}
 
 	/**

@@ -34,7 +34,7 @@ import boofcv.struct.image.ImageType;
 public abstract class PyramidDiscrete<T extends ImageBase<T>> extends ImagePyramidBase<T> {
 
 	// scale of each layer relative to the previous layer
-	public int scale[];
+	public int[] scale;
 
 	/**
 	 * Specifies input image size and behavior of top most layer.
@@ -50,6 +50,11 @@ public abstract class PyramidDiscrete<T extends ImageBase<T>> extends ImagePyram
 		super(imageType,saveOriginalReference);
 		if( scaleFactors.length > 0 )
 			setScaleFactors(scaleFactors);
+	}
+
+	protected PyramidDiscrete( PyramidDiscrete<T> orig ) {
+		super(orig);
+		this.scale = orig.scale.clone();
 	}
 
 	/**

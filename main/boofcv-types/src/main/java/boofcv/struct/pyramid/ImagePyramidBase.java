@@ -45,7 +45,7 @@ public abstract class ImagePyramidBase<T extends ImageBase<T>>
 	protected int bottomHeight;
 
 	// The image at different resolutions.  Larger indexes for lower resolutions
-	public T layers[];
+	public T[] layers;
 
 	// if the top layer is full resolution, should a copy be made or a reference to the original be saved?i
 	protected boolean saveOriginalReference;
@@ -61,6 +61,20 @@ public abstract class ImagePyramidBase<T extends ImageBase<T>>
 	public ImagePyramidBase( ImageType<T> imageType , boolean saveOriginalReference ) {
 		this.imageType = imageType;
 		this.saveOriginalReference = saveOriginalReference;
+	}
+
+	protected ImagePyramidBase( ImagePyramidBase<T> orig ) {
+		this.imageType = orig.imageType;
+		this.saveOriginalReference = orig.saveOriginalReference;
+
+		if( orig.layers != null ) {
+			layers = imageType.createArray(orig.layers.length);
+			for (int i = 0; i < layers.length; i++) {
+				if( orig.layers[i] != null ) {
+					this.layers[i] = orig.layers[i].createSameShape();
+				}
+			}
+		}
 	}
 
 	/**

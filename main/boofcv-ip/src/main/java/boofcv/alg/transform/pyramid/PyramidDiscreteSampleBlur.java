@@ -24,6 +24,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 /**
@@ -84,6 +85,15 @@ public class PyramidDiscreteSampleBlur<T extends ImageBase<T>> extends PyramidDi
 		}
 	}
 
+	protected PyramidDiscreteSampleBlur( PyramidDiscreteSampleBlur<T> orig )
+	{
+		super(orig);
+
+		this.horizontal = orig.horizontal;
+		this.vertical = orig.vertical;
+		this.sigmas = orig.sigmas;
+	}
+
 	@Override
 	public void process(T input) {
 		super.initialize(input.width,input.height);
@@ -137,5 +147,10 @@ public class PyramidDiscreteSampleBlur<T extends ImageBase<T>> extends PyramidDi
 	@Override
 	public double getSigma(int layer) {
 		return sigmas[layer];
+	}
+
+	@Override
+	public ImagePyramid<T> copyStructure() {
+		return new PyramidDiscreteSampleBlur<>(this);
 	}
 }
