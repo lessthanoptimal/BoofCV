@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,6 +70,9 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	protected float Gxx, Gyy, Gxy;
 	// residual times the gradient
 	protected float Ex, Ey;
+
+	// Tolerance for drift in pixels. Computed dynamically
+	protected float maximumDrift;
 
 	// width of the feature
 	protected int widthFeature;
@@ -308,8 +311,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 			// see if it has moved more than possible if it is really tracking a target
 			// this happens in regions with little texture
-			if (Math.abs(feature.x - origX) > widthFeature
-					|| Math.abs(feature.y - origY) > widthFeature)
+			if (Math.abs(feature.x - origX) > maximumDrift || Math.abs(feature.y - origY) > maximumDrift)
 				return KltTrackFault.DRIFTED;
 
 			// see if it has converged to a solution
@@ -331,6 +333,8 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 		// compute the feature's width and temporary storage related to it
 		widthFeature = feature.radius * 2 + 1;
 		lengthFeature = widthFeature * widthFeature;
+
+		maximumDrift = widthFeature*config.driftFracTol;
 
 		allowedLeft = feature.radius;
 		allowedTop = feature.radius;

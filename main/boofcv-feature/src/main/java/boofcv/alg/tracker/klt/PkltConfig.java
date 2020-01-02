@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,14 +18,24 @@
 
 package boofcv.alg.tracker.klt;
 
+import boofcv.struct.Configuration;
+
 /**
  * Configuration class for {@link PyramidKltTracker}.
  *
  * @author Peter Abeles
  */
-public class PkltConfig{
+public class PkltConfig implements Configuration
+{
 	/** configuration for low level KLT tracker */
 	public KltConfig config = new KltConfig();
+
+	/**
+	 * Forwards-Backwards validation tolerance. If set to a value &ge; 0 it will track features from the current
+	 * frame to the previous frame and if the difference in location is greater than this amount the track
+	 * will be dropped.
+	 */
+	public double toleranceFB = -1.0;
 
 	/** The radius of a feature descriptor in layer. 2 is a reasonable number. */
 	public int templateRadius = 2;
@@ -43,5 +53,10 @@ public class PkltConfig{
 	public PkltConfig(int templateRadius, int[] pyramidScaling) {
 		this.templateRadius = templateRadius;
 		this.pyramidScaling = pyramidScaling;
+	}
+
+	@Override
+	public void checkValidity() {
+
 	}
 }

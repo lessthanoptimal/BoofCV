@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,8 +64,8 @@ public class PyramidKltTestBase {
 		ImageMiscOps.fillRectangle(image,100,cornerX,cornerY,20,20);
 		pyramid.process(image);
 
-		derivX = PyramidOps.declareOutput(pyramid,GrayF32.class);
-		derivY = PyramidOps.declareOutput(pyramid,GrayF32.class);
+		derivX = PyramidOps.declareOutput(pyramid,ImageType.SB_F32);
+		derivY = PyramidOps.declareOutput(pyramid,ImageType.SB_F32);
 
 		ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.sobel(GrayF32.class,GrayF32.class);
 		PyramidOps.gradient(pyramid,gradient,derivX,derivY);

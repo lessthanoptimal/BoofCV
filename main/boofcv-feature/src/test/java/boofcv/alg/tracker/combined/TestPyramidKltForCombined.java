@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestPyramidKltForCombined {
+class TestPyramidKltForCombined {
 
 	Random rand = new Random(243);
 
@@ -62,7 +62,7 @@ public class TestPyramidKltForCombined {
 	}
 
 	@BeforeEach
-	public void init() {
+	void init() {
 
 		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,false, ImageType.single(GrayF32.class));
 
@@ -74,13 +74,13 @@ public class TestPyramidKltForCombined {
 				FactoryDerivative.sobel(GrayF32.class, GrayF32.class);
 
 		pyramid.process(input);
-		derivX = PyramidOps.declareOutput(pyramid,GrayF32.class);
-		derivY = PyramidOps.declareOutput(pyramid,GrayF32.class);
+		derivX = PyramidOps.declareOutput(pyramid,ImageType.SB_F32);
+		derivY = PyramidOps.declareOutput(pyramid,ImageType.SB_F32);
 		PyramidOps.gradient(pyramid, gradient, derivX, derivY);
 	}
 
 	@Test
-	public void setDescription() {
+	void setDescription() {
 		PyramidKltForCombined<GrayF32,GrayF32> alg = createAlg();
 
 		alg.setInputs(pyramid,derivX,derivY);
@@ -104,7 +104,7 @@ public class TestPyramidKltForCombined {
 	}
 
 	@Test
-	public void performTracking() {
+	void performTracking() {
 		PyramidKltForCombined<GrayF32,GrayF32> alg = createAlg();
 
 		alg.setInputs(pyramid,derivX,derivY);

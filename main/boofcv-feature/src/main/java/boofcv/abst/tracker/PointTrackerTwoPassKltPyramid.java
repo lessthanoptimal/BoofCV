@@ -24,7 +24,6 @@ import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
-import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
@@ -50,6 +49,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageGray<I>,D extends Imag
 	boolean finishedTracking;
 
 	public PointTrackerTwoPassKltPyramid(KltConfig config,
+										 double toleranceRL,
 										 int templateRadius ,
 										 PyramidDiscrete<I> pyramid,
 										 GeneralFeatureDetector<I, D> detector,
@@ -57,7 +57,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageGray<I>,D extends Imag
 										 InterpolateRectangle<I> interpInput,
 										 InterpolateRectangle<D> interpDeriv)
 	{
-		super(config, templateRadius, pyramid , detector, gradient, interpInput, interpDeriv,
+		super(config, toleranceRL, templateRadius, pyramid , detector, gradient, interpInput, interpDeriv,
 				gradient.getDerivativeType().getImageClass());
 	}
 
@@ -70,9 +70,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageGray<I>,D extends Imag
 		dropped.clear();
 
 		// update image pyramids
-		basePyramid.process(image);
-		declareOutput();
-		PyramidOps.gradient(basePyramid, gradient, derivX, derivY);
+		currPyr.update(image);
 
 		// setup active list
 		originalActive.clear();
@@ -82,7 +80,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageGray<I>,D extends Imag
 		candidateDrop.clear();
 		active.clear();
 
-		tracker.setImage(basePyramid,derivX,derivY);
+		tracker.setImage(currPyr.basePyramid, currPyr.derivX, currPyr.derivY);
 		for( int i = 0; i < originalActive.size(); i++ ) {
 			PyramidKltFeature t = originalActive.get(i);
 			KltTrackFault ret = tracker.track(t);

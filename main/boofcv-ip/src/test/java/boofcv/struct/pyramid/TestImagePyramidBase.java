@@ -37,7 +37,7 @@ public class TestImagePyramidBase {
 	Random rand = new Random(234);
 
 	@Test
-	public void setTo() {
+	void setTo() {
 		Dummy a = new Dummy(GrayU8.class,false);
 		a.setScaleFactors(1, 2, 4);
 		a.initialize(100, 120);
@@ -60,7 +60,7 @@ public class TestImagePyramidBase {
 	 * If told to use the original image then no image should be declared for layer 0
 	 */
 	@Test
-	public void saveOriginalReference() {
+	void saveOriginalReference() {
 		Dummy pyramid = new Dummy(GrayU8.class,false);
 		pyramid.setScaleFactors(1,2,4);
 		pyramid.initialize(100,120);
@@ -82,7 +82,7 @@ public class TestImagePyramidBase {
 	}
 
 	@Test
-	public void initialize() {
+	void initialize() {
 		Dummy pyramid = new Dummy(GrayU8.class,false);
 		pyramid.setScaleFactors(1,2,4);
 		pyramid.initialize(100,120);
@@ -105,7 +105,17 @@ public class TestImagePyramidBase {
 	}
 
 	@Test
-	public void getWidth_Height() {
+	void isInitialized() {
+		Dummy pyramid = new Dummy(GrayU8.class,false);
+		pyramid.setScaleFactors(1,2,4);
+		assertFalse(pyramid.isInitialized());
+
+		pyramid.initialize(100,120);
+		assertTrue(pyramid.isInitialized());
+	}
+
+	@Test
+	void getWidth_Height() {
 		Dummy pyramid = new Dummy(GrayU8.class,false);
 		pyramid.setScaleFactors(1,2,4);
 		pyramid.initialize(100,120);
@@ -119,7 +129,7 @@ public class TestImagePyramidBase {
 	}
 
 	@Test
-	public void checkScales() {
+	void checkScales() {
 		// Test positive cases
 		Dummy pyramid = new Dummy(GrayU8.class,false);
 		pyramid.setScaleFactors(1,2,4,8);

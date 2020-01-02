@@ -108,6 +108,11 @@ public abstract class ImagePyramidBase<T extends ImageBase<T>>
 		}
 	}
 
+	@Override
+	public boolean isInitialized() {
+		return layers != null;
+	}
+
 	/**
 	 * Used to internally check that the provided scales are valid.
 	 */
@@ -172,5 +177,9 @@ public abstract class ImagePyramidBase<T extends ImageBase<T>>
 
 	public boolean isSaveOriginalReference() {
 		return saveOriginalReference;
+	}
+
+	public void setSaveOriginalReference( boolean save ) {
+		this.saveOriginalReference = save;
 	}
 }

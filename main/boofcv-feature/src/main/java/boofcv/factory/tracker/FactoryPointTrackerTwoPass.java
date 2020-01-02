@@ -64,8 +64,8 @@ public class FactoryPointTrackerTwoPass {
 		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(
 				config.pyramidScaling,-1,2,true, ImageType.single(imageType));
 
-		return new PointTrackerTwoPassKltPyramid<>(config.config, config.templateRadius, pyramid, detector,
-				gradient, interpInput, interpDeriv);
+		return new PointTrackerTwoPassKltPyramid<>(config.config, config.toleranceFB,
+				config.templateRadius, pyramid, detector, gradient, interpInput, interpDeriv);
 	}
 
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>

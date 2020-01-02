@@ -125,6 +125,7 @@ public class FactoryPointTracker {
 		if( config == null ) {
 			config = new PkltConfig();
 		}
+		config.checkValidity();
 
 		if( configExtract == null ) {
 			configExtract = new ConfigGeneralDetector();
@@ -139,7 +140,8 @@ public class FactoryPointTracker {
 
 		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidScaling,-1,2,true, ImageType.single(imageType));
 
-		return new PointTrackerKltPyramid<>(config.config, config.templateRadius, pyramid, detector,
+		return new PointTrackerKltPyramid<>(config.config, config.toleranceFB,
+				config.templateRadius, pyramid, detector,
 				gradient, interpInput, interpDeriv, derivType);
 	}
 

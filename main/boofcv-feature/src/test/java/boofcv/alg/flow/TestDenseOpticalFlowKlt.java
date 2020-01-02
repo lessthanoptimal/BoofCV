@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestDenseOpticalFlowKlt {
+class TestDenseOpticalFlowKlt {
 
 	GrayF32 image0 = new GrayF32(30,40);
 	GrayF32 image1 = new GrayF32(30,40);
@@ -54,7 +54,7 @@ public class TestDenseOpticalFlowKlt {
 	PkltConfig config = new PkltConfig();
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		config.pyramidScaling = new int[]{1,2};
 		config.config.maxPerPixelError = 15;
 
@@ -64,8 +64,8 @@ public class TestDenseOpticalFlowKlt {
 		prev.process(image0);
 		curr.process(image0);
 
-		prevDerivX = PyramidOps.declareOutput(prev,GrayF32.class);
-		prevDerivY = PyramidOps.declareOutput(prev,GrayF32.class);
+		prevDerivX = PyramidOps.declareOutput(prev,ImageType.SB_F32);
+		prevDerivY = PyramidOps.declareOutput(prev,ImageType.SB_F32);
 	}
 
 	private void processInputImage() {
@@ -85,7 +85,7 @@ public class TestDenseOpticalFlowKlt {
 	 * Very simple positive case
 	 */
 	@Test
-	public void positive() {
+	void positive() {
 
 		ImageMiscOps.fillRectangle(image0,50,10,12,2,2);
 		ImageMiscOps.fillRectangle(image1,50,11,13,2,2);
@@ -121,7 +121,7 @@ public class TestDenseOpticalFlowKlt {
 	 * Very simple negative case. The second image is blank so it should fail at tracking
 	 */
 	@Test
-	public void negative() {
+	void negative() {
 
 		ImageMiscOps.fillRectangle(image0, 200, 7, 9, 5, 5);
 

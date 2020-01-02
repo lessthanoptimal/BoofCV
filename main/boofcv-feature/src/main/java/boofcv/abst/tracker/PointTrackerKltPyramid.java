@@ -25,7 +25,9 @@ import boofcv.alg.tracker.klt.*;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 
 import java.util.ArrayList;
@@ -47,11 +49,13 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	// Updates the image pyramid's gradient.
 	protected ImageGradient<I,D> gradient;
 
+	// tolerance for forwards-backwards validation in pixels at level 0. disabled if < 0
+	protected double toleranceFB;
+
 	// storage for image pyramid
-	protected PyramidDiscrete<I> basePyramid;
-	protected D[] derivX;
-	protected D[] derivY;
-	protected Class<D> derivType;
+	protected ImageStruct currPyr;
+	protected ImageStruct prevPyr;
+	protected ImageType<D> derivType;
 
 	// configuration for the KLT tracker
 	protected KltConfig config;
@@ -82,6 +86,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	 * Constructor which specified the KLT track manager and how the image pyramids are computed.
 	 *
 	 * @param config KLT tracker configuration
+	 * @param toleranceFB Tolerance in pixels for right to left validation. Disable with a value less than 0.
 	 * @param templateRadius Radius of square templates that are tracked
 	 * @param pyramid The image pyramid which KLT is tracking inside of
 	 * @param detector Feature detector.   If null then no feature detector will be available and spawn won't work.
@@ -91,6 +96,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	 * @param derivType Type of image the gradient is
 	 */
 	public PointTrackerKltPyramid(KltConfig config,
+								  double toleranceFB,
 								  int templateRadius ,
 								  PyramidDiscrete<I> pyramid,
 								  GeneralFeatureDetector<I, D> detector,
@@ -100,12 +106,22 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 								  Class<D> derivType ) {
 
 		this.config = config;
+		this.toleranceFB = toleranceFB;
 		this.templateRadius = templateRadius;
 		this.gradient = gradient;
-		this.basePyramid = pyramid;
-		this.derivType = derivType;
+		this.derivType = ImageType.single(derivType);
+		this.currPyr = new ImageStruct(pyramid);
+		if( toleranceFB >= 0 ) {
+			this.prevPyr = new ImageStruct(pyramid);
+			// don't save the reference because the input image might be the same instance each time and change
+			// between frames
+			this.prevPyr.basePyramid.setSaveOriginalReference(false);
+			this.currPyr.basePyramid.setSaveOriginalReference(false);
+		} else {
+			this.currPyr.basePyramid.setSaveOriginalReference(true);
+		}
 
-		KltTracker<I, D> klt = new KltTracker<>(interpInput, interpDeriv, config);
+		var klt = new KltTracker<>(interpInput, interpDeriv, config);
 		tracker = new PyramidKltTracker<>(klt);
 
 		if( detector != null) {
@@ -117,10 +133,10 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	}
 
 	private void addTrackToUnused() {
-		int numLayers = basePyramid.getNumLayers();
-		PyramidKltFeature t = new PyramidKltFeature(numLayers, templateRadius);
+		int numLayers = currPyr.basePyramid.getNumLayers();
+		var t = new PyramidKltFeature(numLayers, templateRadius);
 
-		PointTrack p = new PointTrack();
+		var p = new PointTrackMod();
 		p.setDescription(t);
 		t.cookie = p;
 
@@ -144,14 +160,13 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 		if( unused.isEmpty() )
 			addTrackToUnused();
 
-		// TODO make sure the feature is inside the image
-
 		PyramidKltFeature t = unused.remove(unused.size() - 1);
 		t.setPosition((float)x,(float)y);
 		tracker.setDescription(t);
 
-		PointTrack p = (PointTrack)t.cookie;
+		PointTrackMod p = t.getCookie();
 		p.set(x,y);
+		p.prev.set(x,y);
 
 		if( checkValidSpawn(p) ) {
 			active.add(t);
@@ -166,7 +181,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 		spawned.clear();
 
 		// used to convert it from the scale of the bottom layer into the original image
-		float scaleBottom = (float) basePyramid.getScale(0);
+		float scaleBottom = (float)currPyr.basePyramid.getScale(0);
 
 		// exclude active tracks
 		excludeList.reset();
@@ -177,7 +192,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 
 		// find new tracks, but no more than the max
 		detector.setExcludeMaximum(excludeList);
-		detector.process(basePyramid.getLayer(0), derivX[0], derivY[0], null, null, null);
+		detector.process(currPyr.basePyramid.getLayer(0), currPyr.derivX[0], currPyr.derivY[0], null, null, null);
 
 		// extract the features
 		QueueCorner found = detector.getMaximums();
@@ -197,8 +212,9 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 			tracker.setDescription(t);
 
 			// set up point description
-			PointTrack p = t.getCookie();
+			PointTrackMod p = t.getCookie();
 			p.set(t.x,t.y);
+			p.prev.set(t.x,t.y);
 
 			if( checkValidSpawn(p) ) {
 				p.featureId = totalFeatures++;
@@ -230,16 +246,15 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	public void process(I image) {
 		this.input = image;
 
+		boolean activeTracks = active.size()>0;
 		spawned.clear();
 		dropped.clear();
 
 		// update image pyramids
-		basePyramid.process(image);
-		declareOutput();
-		PyramidOps.gradient(basePyramid, gradient, derivX,derivY);
+		currPyr.update(image);
 
 		// track features
-		tracker.setImage(basePyramid,derivX,derivY);
+		tracker.setImage(currPyr.basePyramid,currPyr.derivX,currPyr.derivY);
 		for( int i = 0; i < active.size(); ) {
 			PyramidKltFeature t = active.get(i);
 			KltTrackFault ret = tracker.track(t);
@@ -257,24 +272,55 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 			}
 
 			if( !success ) {
-				active.remove(i);
+				active.remove( i );
 				dropped.add( t );
 				unused.add( t );
 			}
 		}
+
+		if( toleranceFB >= 0 ) {
+			// If there are no tracks it must have been reset or this is the first frame
+			if( activeTracks ) {
+				backwardsTrackValidate();
+			} else {
+				this.prevPyr.update(image);
+			}
+
+			// make the current image the previous image
+			ImageStruct tmp = currPyr;
+			currPyr = prevPyr;
+			prevPyr = tmp;
+		}
 	}
 
-	protected void declareOutput() {
-		if( derivX == null ) {
-			// declare storage for image derivative since the image size is now known
-			derivX = PyramidOps.declareOutput(basePyramid, derivType);
-			derivY = PyramidOps.declareOutput(basePyramid,derivType);
-		}
-		else if( derivX[0].width != basePyramid.getLayer(0).width ||
-				derivX[0].height != basePyramid.getLayer(0).height )
-		{
-			PyramidOps.reshapeOutput(basePyramid,derivX);
-			PyramidOps.reshapeOutput(basePyramid,derivY);
+	/**
+	 * Track back to the previous frame and see if the original coordinate is found again. This assumes that all
+	 * tracks in active list existed in the previous frame and were not spawned.
+	 */
+	protected void backwardsTrackValidate() {
+		double tol2 = toleranceFB * toleranceFB;
+
+		tracker.setImage(prevPyr.basePyramid,prevPyr.derivX,prevPyr.derivY);
+		for (int i = active.size()-1; i >= 0; i--) {
+			PyramidKltFeature t = active.get(i);
+			PointTrackMod p = t.getCookie();
+
+			float origX = t.x;
+			float origY = t.y;
+
+			KltTrackFault ret = tracker.track(t);
+
+			if( ret != KltTrackFault.SUCCESS || p.prev.distance2(t.x,t.y) > tol2 ) {
+				active.remove(i);
+				dropped.add( t );
+				unused.add( t );
+			} else {
+				// the new previous will be the current location
+				p.prev.set(origX,origY);
+				// Revert the update by KLT
+				t.x = origX;
+				t.y = origY;
+			}
 		}
 	}
 
@@ -346,4 +392,37 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 		dropAllTracks();
 		totalFeatures = 0;
 	}
+
+	static class PointTrackMod extends PointTrack {
+		// previous location of the track
+		public final Point2D_F64 prev = new PointTrack();
+	}
+
+	/**
+	 * Contains the image pyramid
+	 */
+	class ImageStruct {
+		public PyramidDiscrete<I> basePyramid;
+		public D[] derivX;
+		public D[] derivY;
+
+		public ImageStruct(PyramidDiscrete<I> o ) {
+			basePyramid = o.copyStructure();
+			derivX = PyramidOps.declareOutput(basePyramid, derivType);
+			derivY = PyramidOps.declareOutput(basePyramid, derivType);
+		}
+
+		public void update( I image ) {
+			basePyramid.process(image);
+
+			if( derivX[0].width != basePyramid.getLayer(0).width ||
+					derivX[0].height != basePyramid.getLayer(0).height )
+			{
+				PyramidOps.reshapeOutput(basePyramid,derivX);
+				PyramidOps.reshapeOutput(basePyramid,derivY);
+			}
+			PyramidOps.gradient(basePyramid, gradient, derivX,derivY);
+		}
+	}
+
 }

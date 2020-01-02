@@ -49,7 +49,7 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 	PyramidDiscrete<I> pyramid;
 	D[] derivX;
 	D[] derivY;
-	Class<D> derivType;
+	ImageType<D> derivType;
 
 	ImageGradient<I,D> gradient;
 
@@ -63,7 +63,7 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 								Class<I> imageType, Class<D> derivType) {
 		this.tracker = tracker;
 		this.reactivateThreshold = reactivateThreshold;
-		this.derivType = derivType;
+		this.derivType = ImageType.single(derivType);
 
 		int pyramidScaling[] = tracker.getTrackerKlt().pyramidScaling;
 		pyramid = FactoryPyramid.discreteGaussian(pyramidScaling,-1,2,true, ImageType.single(imageType));

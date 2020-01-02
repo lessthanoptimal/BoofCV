@@ -52,7 +52,7 @@ public class TestPyramidOps {
 	public void declareOutput() {
 		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,scales);
 		in.initialize(width,height);
-		GrayF32[] out = PyramidOps.declareOutput(in,GrayF32.class);
+		GrayF32[] out = PyramidOps.declareOutput(in,ImageType.SB_F32);
 
 		assertEquals(out.length,in.getNumLayers());
 		for( int i = 0; i < in.getNumLayers(); i++ ) {
@@ -69,7 +69,7 @@ public class TestPyramidOps {
 		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,scales);
 
 		in.initialize(width,height);
-		GrayF32[] out = PyramidOps.declareOutput(in,GrayF32.class);
+		GrayF32[] out = PyramidOps.declareOutput(in,ImageType.SB_F32);
 
 		randomize(in, rand, 0, 100);
 		PyramidOps.filter(in, filter, out);
@@ -90,8 +90,8 @@ public class TestPyramidOps {
 		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,scales);
 		in.initialize(width, height);
 
-		GrayF32[] outX = PyramidOps.declareOutput(in,GrayF32.class);
-		GrayF32[] outY = PyramidOps.declareOutput(in,GrayF32.class);
+		GrayF32[] outX = PyramidOps.declareOutput(in,ImageType.SB_F32);
+		GrayF32[] outY = PyramidOps.declareOutput(in,ImageType.SB_F32);
 
 		randomize(in, rand, 0, 100);
 		PyramidOps.gradient(in, gradient, outX,outY);

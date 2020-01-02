@@ -18,6 +18,7 @@
 
 package boofcv.abst.tracker;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.tracker.klt.*;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
+class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 
 	PkltConfig config;
 
@@ -51,7 +52,7 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 	 * Checks to see if tracks are correctly recycled by process and spawn
 	 */
 	@Test
-	public void checkRecycle_Process_Spawn() {
+	void checkRecycle_Process_Spawn() {
 		PointTrackerKltPyramid<GrayF32,GrayF32> alg =
 				(PointTrackerKltPyramid<GrayF32,GrayF32>)createTracker();
 
@@ -73,7 +74,7 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 	}
 
 	@Test
-	public void checkRecycleDropAll() {
+	void checkRecycleDropAll() {
 		PointTrackerKltPyramid<GrayF32,GrayF32> alg =
 				(PointTrackerKltPyramid<GrayF32,GrayF32>)createTracker();
 
@@ -91,7 +92,7 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 	}
 
 	@Test
-	public void checkRecycleDropTrack() {
+	void checkRecycleDropTrack() {
 		PointTrackerKltPyramid<GrayF32,GrayF32> alg =
 				(PointTrackerKltPyramid<GrayF32,GrayF32>)createTracker();
 
@@ -112,7 +113,7 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 	}
 
 	@Test
-	public void addTrack() {
+	void addTrack() {
 		PointTrackerKltPyramid<GrayF32,GrayF32> alg =
 				(PointTrackerKltPyramid<GrayF32,GrayF32>)createTracker();
 
@@ -135,7 +136,7 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 	 * The center of tracks should all be inside the image after process() has been called
 	 */
 	@Test
-	public void process_allPointsInside() {
+	void process_allPointsInside() {
 		PointTrackerKltPyramid<GrayF32,GrayF32> alg =
 				(PointTrackerKltPyramid<GrayF32,GrayF32>)createTracker();
 
@@ -154,7 +155,70 @@ public class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 		alg.process(image);
 		assertEquals(2, alg.getDroppedTracks(null).size());
 		assertEquals(N-2,alg.getActiveTracks(null).size());
+	}
 
+	@Test
+	void validateRightLeft() {
+		PkltConfig config = new PkltConfig();
+		// disable almost all error checking so that without R to L check it will pass
+		config.config.maxIterations = 2;        // limit how far it can move. Reduces out of bound errors
+		config.config.maxPerPixelError = 10000; // disable dropping due to error
+		config.config.driftFracTol = 10000;     // disable features drifting as a source of them being dropped
+
+		// Strict tolerance on check
+		config.toleranceFB = 1e-3;
+
+		var alg = FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true),
+				GrayF32.class, GrayF32.class);
+
+		alg.process(image);
+		alg.spawnTracks();
+
+		int originalTotal = alg.getActiveTracks(null).size();
+		// sanity check
+		assertTrue(originalTotal > 90);
+
+		// process the same image again, it should drop very few tracks
+		alg.process(image);
+		assertEquals(0,alg.getDroppedTracks(null).size());
+
+		// randomize the image, virtually everything should have been dropped
+		GImageMiscOps.fillUniform(image,rand,0,255);
+		alg.process(image);
+		assertTrue(alg.getActiveTracks(null).size() < originalTotal/30 );
+	}
+
+	/**
+	 * Shift the image and see if it still tracks with FB turned on
+	 */
+	@Test
+	void validateRightLeft_shifted() {
+		PkltConfig config = new PkltConfig();
+		config.templateRadius=3;
+		config.toleranceFB = 0.1;
+
+		var alg = FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true),
+				GrayF32.class, GrayF32.class);
+
+		alg.process(image);
+		alg.spawnTracks();
+
+		int originalTotal = alg.getActiveTracks(null).size();
+		// sanity check
+		assertTrue(originalTotal > 90);
+
+		// Shift the image by 2 pixels exactly. Description should be almost the same
+		GrayF32 shifted = image.createSameShape();
+		new FDistort(image,shifted).affine(1,0,0,1,2,0.0).borderExt().apply();
+
+		alg.process(shifted);
+
+		// only tracks at the border should be dropped
+		assertTrue(alg.getActiveTracks(null).size() > originalTotal*0.8 );
+
+		// one last time for good measure
+		alg.process(image);
+		assertTrue(alg.getActiveTracks(null).size() > originalTotal*0.8 );
 	}
 
 	/**

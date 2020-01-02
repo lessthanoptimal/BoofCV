@@ -25,13 +25,11 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.transform.pyramid.impl.ImplPyramidOps;
 import boofcv.alg.transform.pyramid.impl.ImplPyramidOps_MT;
 import boofcv.concurrency.BoofConcurrency;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ImagePyramid;
-
-import java.lang.reflect.Array;
 
 
 /**
@@ -51,13 +49,16 @@ public class PyramidOps {
 	 * @return An array of images
 	 */
 	public static <O extends ImageGray<O>>
-	O[] declareOutput( ImagePyramid<?> pyramid , Class<O> outputType ) {
-		O[] ret = (O[])Array.newInstance(outputType,pyramid.getNumLayers());
+	O[] declareOutput( ImagePyramid<?> pyramid , ImageType<O> outputType ) {
+		O[] ret = outputType.createArray(pyramid.getNumLayers());
 
 		for( int i = 0; i < ret.length; i++ ) {
-			int w = pyramid.getWidth(i);
-			int h = pyramid.getHeight(i);
-			ret[i] = GeneralizedImageOps.createSingleBand(outputType,w,h);
+			ret[i] = outputType.createImage(0,0);
+			if( pyramid.isInitialized() ) {
+				int w = pyramid.getWidth(i);
+				int h = pyramid.getHeight(i);
+				ret[i].reshape(w,h);
+			}
 		}
 
 		return ret;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,10 +18,14 @@
 
 package boofcv.alg.tracker.klt;
 
+import boofcv.struct.Configuration;
+
 /**
+ * Configuration for {@link KltTracker}
+ *
  * @author Peter Abeles
  */
-public class KltConfig {
+public class KltConfig implements Configuration {
 
 	/**
 	 * Due to how the image derivative and interpolation is performed outer most pixels. Features are
@@ -47,4 +51,15 @@ public class KltConfig {
 	 * Stop iterating of the change in x and y is less than this number.
 	 */
 	public float minPositionDelta = 0.01f;
+
+	/**
+	 * Drift tolerance relative to feature's width/
+	 */
+	public float driftFracTol = 1.0f;
+
+	@Override
+	public void checkValidity() {
+		if( driftFracTol < 0 )
+			throw new IllegalArgumentException("driftFracTol must be >= 0");
+	}
 }

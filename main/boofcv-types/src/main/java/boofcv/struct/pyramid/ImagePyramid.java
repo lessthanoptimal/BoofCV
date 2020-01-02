@@ -140,4 +140,9 @@ public interface ImagePyramid<T extends ImageBase<T>> {
 	 * Creates a copy of the pyramids structure but not the pixel data
 	 */
 	<IP extends ImagePyramid<T>>IP copyStructure();
+
+	/**
+	 * Checks to see if the pyramid has been initialized or not
+	 */
+	boolean isInitialized();
 }
