@@ -303,7 +303,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 				DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 
 				double baseline = calib.getRightToLeft().getT().norm();
-				d2c.configure(baseline, rectK,rectR, leftRectToPixel, disparityMin,disparityMin+disparityRange);
+				d2c.configure(baseline, rectK,rectR, leftRectToPixel, disparityMin,disparityRange);
 				if(imagePanel.state==2) // has the user defined the ROI?
 					d2c.setRegionOfInterest(imagePanel.x0, imagePanel.y0, imagePanel.x1, imagePanel.y1);
 				d2c.process(disparityImage,colorLeft);
@@ -375,9 +375,9 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
 		ImageDistort<T,T> distortRect1 = RectifyImageOps.rectifyImage(
-				calib.left, rect1_F32, BorderType.SKIP,imageType);
+				calib.left, rect1_F32, BorderType.EXTENDED,imageType);
 		ImageDistort<T,T> distortRect2 = RectifyImageOps.rectifyImage(
-				calib.right, rect2_F32, BorderType.SKIP, imageType);
+				calib.right, rect2_F32, BorderType.EXTENDED, imageType);
 
 		// rectify and undo distortion
 		distortRect1.apply(inputLeft, rectLeft);

@@ -771,8 +771,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		int disparityMin = controls.controlDisparity.getDisparityMin();
 		int disparityRange = controls.controlDisparity.getDisparityRange();
 
-		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(),
-				disparityMin,disparityMin+disparityRange);
+		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), disparityMin, disparityRange);
 		d2c.process(disparity,left);
 
 		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK,disparity.width,disparity.height,null);

@@ -297,11 +297,11 @@ public class ExampleStereoTwoViewsOneCamera {
 	 */
 	public static void showPointCloud(ImageGray disparity, BufferedImage left,
 									  Se3_F64 motion, DMatrixRMaj rectifiedK , DMatrixRMaj rectifiedR,
-									  int minDisparity, int rangeDisparity)
+									  int disparityMin, int disparityRange)
 	{
 		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
 		double baseline = motion.getT().norm();
-		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), minDisparity, minDisparity+rangeDisparity);
+		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), disparityMin, disparityRange);
 		d2c.process(disparity,left);
 
 		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK,disparity.width,disparity.height,null);

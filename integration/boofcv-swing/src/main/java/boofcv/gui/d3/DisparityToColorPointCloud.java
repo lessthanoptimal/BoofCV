@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,9 +61,9 @@ public class DisparityToColorPointCloud {
 	FMatrixRMaj rectifiedR = new FMatrixRMaj(3,3);
 
 	// minimum disparity
-	int minDisparity;
+	int disparityMin;
 	// maximum minus minimum disparity
-	int rangeDisparity;
+	int disparityRange;
 
 	// How far out it should zoom.
 	double range = 1;
@@ -91,13 +91,13 @@ public class DisparityToColorPointCloud {
 	 * @param baseline Stereo baseline (world units)
 	 * @param K Intrinsic camera calibration matrix of rectified camera
 	 * @param rectifiedToColor Transform from rectified pixels to the color image pixels.
-	 * @param minDisparity Minimum disparity that's computed (pixels)
-	 * @param maxDisparity Maximum disparity that's computed (pixels)
+	 * @param disparityMin Minimum disparity that's computed (pixels)
+	 * @param disparityRange Number of possible disparity values (pixels)
 	 */
 	public void configure(double baseline,
 						  DMatrixRMaj K, DMatrixRMaj rectifiedR,
 						  Point2Transform2_F64 rectifiedToColor,
-						  int minDisparity, int maxDisparity) {
+						  int disparityMin, int disparityRange ) {
 		this.K = K;
 		ConvertMatrixData.convert(rectifiedR,this.rectifiedR);
 		this.rectifiedToColor = rectifiedToColor;
@@ -106,9 +106,8 @@ public class DisparityToColorPointCloud {
 		this.focalLengthY = (float)K.get(1,1);
 		this.centerX = (float)K.get(0,2);
 		this.centerY = (float)K.get(1,2);
-		this.minDisparity = minDisparity;
-
-		this.rangeDisparity = maxDisparity-minDisparity;
+		this.disparityMin = disparityMin;
+		this.disparityRange = disparityRange;
 
 		clearRegionOfInterest();
 	}
@@ -145,10 +144,10 @@ public class DisparityToColorPointCloud {
 			for( int pixelX = x0; pixelX < x1; pixelX++ ) {
 				int value = disparity.data[index++] & 0xFF;
 
-				if( value >= rangeDisparity )
+				if( value >= disparityRange)
 					continue;
 
-				value += minDisparity;
+				value += disparityMin;
 
 				// The point lies at infinity.
 				if( value == 0 )
@@ -187,10 +186,10 @@ public class DisparityToColorPointCloud {
 				float value = disparity.data[index++];
 
 				// invalid disparity
-				if( value >= rangeDisparity )
+				if( value >= disparityRange)
 					continue;
 
-				value += minDisparity;
+				value += disparityMin;
 
 				// The point lies at infinity.
 				if( value == 0 )
