@@ -288,14 +288,14 @@ task oneJarBin(type: Jar, dependsOn: javadocProjects.collect { it + ":compileJav
 
 task alljavadoc(type: Javadoc) {
     // only include source code in src directory to avoid including 3rd party code which some projects do as a hack
-    source = javadocProjects.collect { project(it).fileTree('src').include('**/*.java') }
-//    source = javadocProjects.collect { project(it).sourceSets.main.allJava }
+    source = javadocProjects.collect { project(it).sourceSets.main.allJava }
     classpath = files(javadocProjects.collect { project(it).sourceSets.main.compileClasspath })
 
     destinationDir = file("docs/api")
 
     // Hack for Java 8u121 and beyond. Comment out if running an earlier version of Java
     options.addBooleanOption("-allow-script-in-comments", true)
+    options.addBooleanOption("-no-module-directories", true)
 
     // Add a list of uses of a class to javadoc
     options.use = true
