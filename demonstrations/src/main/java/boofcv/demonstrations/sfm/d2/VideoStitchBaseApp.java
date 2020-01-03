@@ -26,7 +26,7 @@ import boofcv.abst.sfm.d2.PlToGrayMotion2D;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
-import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.sfm.FactoryMotion2D;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.DemonstrationBase;
@@ -130,7 +130,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	}
 
 	protected PointTracker<I> createTracker() {
-		PkltConfig config = new PkltConfig();
+		ConfigPKlt config = new ConfigPKlt();
 		config.templateRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4,8};
 

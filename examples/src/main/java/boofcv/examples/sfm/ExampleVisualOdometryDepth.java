@@ -24,9 +24,9 @@ import boofcv.abst.sfm.d3.DepthVisualOdometry;
 import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.tracker.PointTrackerTwoPass;
 import boofcv.alg.sfm.DepthSparse3D;
-import boofcv.alg.tracker.klt.PkltConfig;
-import boofcv.factory.sfm.FactoryVisualOdometry;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.tracker.FactoryPointTrackerTwoPass;
+import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -63,7 +63,7 @@ public class ExampleVisualOdometryDepth {
 				media.openFile(new File(directory , "visualdepth.yaml").getPath()));
 
 		// specify how the image features are going to be tracked
-		PkltConfig configKlt = new PkltConfig();
+		ConfigPKlt configKlt = new ConfigPKlt();
 		configKlt.pyramidScaling = new int[]{1, 2, 4, 8};
 		configKlt.templateRadius = 3;
 

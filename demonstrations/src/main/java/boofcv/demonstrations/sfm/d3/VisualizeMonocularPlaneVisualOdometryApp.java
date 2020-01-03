@@ -23,9 +23,9 @@ import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.MonocularPlaneVisualOdometry;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.tracker.klt.PkltConfig;
-import boofcv.factory.sfm.FactoryVisualOdometry;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.tracker.FactoryPointTracker;
+import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.d2.PlaneView2D;
@@ -290,7 +290,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageClass);
 
 		if( whichAlg == 0 ) {
-			PkltConfig config = new PkltConfig();
+			ConfigPKlt config = new ConfigPKlt();
 			config.pyramidScaling = new int[]{1,2,4,8};
 			config.templateRadius = 3;
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
@@ -299,7 +299,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 
 			return FactoryVisualOdometry.monoPlaneInfinity(75,2,1.5,200, tracker, imageType);
 		} else if( whichAlg == 1 ) {
-			PkltConfig config = new PkltConfig();
+			ConfigPKlt config = new ConfigPKlt();
 			config.pyramidScaling = new int[]{1,2,4,8};
 			config.templateRadius = 3;
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);

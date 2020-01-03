@@ -39,7 +39,7 @@ import boofcv.abst.tracker.PointTrackerToTwoPass;
 import boofcv.abst.tracker.PointTrackerTwoPass;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
@@ -281,7 +281,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 		StereoDisparitySparse<I> disparity =
 				FactoryStereoDisparity.regionSparseWta(2,150,3,3,30,-1,true,imageType);
 
-		PkltConfig kltConfig = new PkltConfig();
+		ConfigPKlt kltConfig = new ConfigPKlt();
 		kltConfig.templateRadius = 3;
 		kltConfig.pyramidScaling = new int[]{1, 2, 4, 8};
 

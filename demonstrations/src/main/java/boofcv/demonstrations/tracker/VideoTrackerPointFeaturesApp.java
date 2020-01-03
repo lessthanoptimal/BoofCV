@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -38,6 +38,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F64;
 
 import javax.swing.*;
 import java.awt.*;
@@ -61,18 +62,20 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 	VisualizePanel gui = new VisualizePanel();
 	// synchronized when manipulating
+	long frameIdGui = -1;
 	final FastQueue<PointTrack> tracksGui = new FastQueue<>(PointTrack.class,true);
-	final FastQueue<PointTrack> spawnedGui = new FastQueue<>(PointTrack.class,true);
+
+	long selectedTrackID = -1;
 
 	TrackerPointControlPanel controlPanel = new TrackerPointControlPanel(this);
 	Class<I> imageType;
 
 	MovingAverage processingTime = new MovingAverage();
 
-	// slow down a video
-	int delay = 0;
-
-	boolean drawFilled=true;
+	// track duration 50% and 95%
+	volatile double duration50,duration95;
+	// track duration work space
+	GrowQueue_F64 storageDuration = new GrowQueue_F64();
 
 	public VideoTrackerPointFeaturesApp(List<PathLabel> examples,
 										Class<I> imageType ) {
@@ -85,58 +88,58 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		add(BorderLayout.WEST, controlPanel);
 		add(BorderLayout.CENTER, gui);
 
-		setAlgorithm(0);
-
-		// toggle rendering mode when mouse clicked
 		gui.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				drawFilled = !drawFilled;
+				double x = gui.offsetX + e.getX()/gui.scale;
+				double y = gui.offsetY + e.getY()/gui.scale;
+				handleMouseClick(x,y);
 			}
 		});
+
+		setAlgorithm(0);
 	}
 
 	public void setAlgorithm( int which ) {
-		int featRadius = controlPanel.featWidth/2;
 
-		PkltConfig config = new PkltConfig();
-		config.templateRadius = featRadius;
-		config.pyramidScaling = new int[]{1, 2, 4, 8};
+		final int maxFeatures = controlPanel.maxFeatures;
+
+		controlPanel.controlKlt.detector.maxFeatures = maxFeatures;
+		controlPanel.controlsGeneric.detector.maxFeatures = maxFeatures;
+
 
 		ConfigFastHessian configFH = new ConfigFastHessian();
 		configFH.maxFeaturesPerScale = 200;
-		configFH.extractRadius = 4;
+		configFH.extractRadius =  controlPanel.controlsGeneric.detector.radius;
 		configFH.detectThreshold = 15f;
 
-		int maxFeatures = controlPanel.maxFeatures;
-
 		switch( which ) {
-			case 0: tracker = FactoryPointTracker.klt(config,
-					new ConfigGeneralDetector(maxFeatures, featRadius+2, 3),imageType,null); break;
+			case 0: tracker = FactoryPointTracker.klt(controlPanel.controlKlt.klt,controlPanel.controlKlt.detector,
+					imageType,null); break;
 
 			case 1: tracker = FactoryPointTracker.dda_ST_BRIEF(
 					200, new ConfigGeneralDetector(maxFeatures, 3, 1),
 					imageType, null); break;
 
 			case 2: tracker = FactoryPointTracker.dda_ST_NCC(new ConfigGeneralDetector(
-					maxFeatures, featRadius+2, 2), 5, imageType, null); break;
+					maxFeatures, controlPanel.controlsGeneric.detector.radius, 2), 5, imageType, null); break;
 
 			case 3: tracker = FactoryPointTracker.dda_FH_SURF_Fast(
 					configFH, null, null, imageType); break;
 
 			case 4: tracker = FactoryPointTracker.combined_ST_SURF_KLT(
-					new ConfigGeneralDetector(maxFeatures, featRadius+2, 1),
-					config, 50, null, null, imageType, null); break;
+					new ConfigGeneralDetector(maxFeatures,  controlPanel.controlsGeneric.detector.radius, 1),
+					controlPanel.controlKlt.klt, 50, null, null, imageType, null); break;
 
 			case 5: tracker = FactoryPointTracker.combined_FH_SURF_KLT(
-					config, 50, configFH, null, null, imageType); break;
+					controlPanel.controlKlt.klt, 50, configFH, null, null, imageType); break;
 		}
 		processingTime.reset();
 	}
 
 	@Override
 	public void openExample(Object o) {
-		delay = 0;
+		int delay = 0;
 		if (o instanceof PathLabel) {
 			if (((PathLabel) o).label.equals("Shake")) {
 				delay = 100;
@@ -146,6 +149,10 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 				delay = 100;
 			}
 		}
+		int _delay = delay;
+		BoofSwingUtil.invokeNowOrLater(()->{
+			controlPanel.setDelay(_delay);
+		});
 
 		super.openExample(o);
 	}
@@ -154,6 +161,8 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 	protected void configureVideo(int which, SimpleImageSequence sequence) {
 		super.configureVideo(which, sequence);
 		sequence.setLoop(true);
+		controlPanel.setPauseState(false);
+		streamPaused = false;
 	}
 
 	@Override
@@ -162,7 +171,8 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		gui.setPreferredSize(new Dimension(width,height));
 		BoofSwingUtil.invokeNowOrLater(()->{
 			controlPanel.setImageSize(width,height);
-			controlPanel.resetPaused();
+			controlPanel.setPauseState(false);
+			streamPaused = false;
 		});
 	}
 
@@ -174,8 +184,54 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 	}
 
 	@Override
+	public void handleVisualizationUpdated() {
+		gui.repaint();
+	}
+
+	@Override
 	public void handlePause(boolean paused) {
 		super.streamPaused = paused;
+	}
+
+	/**
+	 * Show info on the selected feature and
+	 * @param x
+	 * @param y
+	 */
+	public void handleMouseClick( double x , double y ) {
+		String text = String.format("Clicked %4.1f %4.1f\n",x,y);
+		double tol = 10*10;
+		selectedTrackID = -1;
+		synchronized (tracksGui) {
+			double bestDistance = tol;
+			PointTrack best = null;
+			for (PointTrack p : tracksGui.toList()) {
+				double d = p.distance2(x,y);
+				if( d <= bestDistance ) {
+					best = p;
+					bestDistance = d;
+				}
+			}
+
+
+			if( best != null ) {
+				selectedTrackID = best.featureId;
+				text += stringPointInfo(best);
+			} else {
+				selectedTrackID = -1;
+			}
+		}
+
+		gui.repaint();
+		controlPanel.textArea.setText(text);
+	}
+
+	private String stringPointInfo(PointTrack best) {
+		String text = "Track ID "+best.featureId+"\n";
+		text += "Set      "+best.setId+"\n";
+		text += "Duration "+(frameIdGui-best.spawnFrameID)+"\n";
+		text += String.format("Location %7.2f %7.2f",best.x,best.y);
+		return text;
 	}
 
 	public class VisualizePanel extends ImagePanel {
@@ -190,6 +246,11 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 			synchronized (tracksGui) {
 				for (PointTrack p : tracksGui.toList() ) {
+					long duration = frameIdGui-p.spawnFrameID;
+
+					if( duration < controlPanel.minDuration )
+						continue;
+
 					int red = (int) (2.5 * (p.featureId % 100));
 					int green = (int) ((255.0 / 150.0) * (p.featureId % 150));
 					int blue = (int) (p.featureId % 255);
@@ -197,18 +258,22 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 					double x = offsetX + scale*p.x;
 					double y = offsetY + scale*p.y;
 
-					if( drawFilled )
+					if( duration == 0 ) {
+						VisualizeFeatures.drawPoint(g2, x,y, 5, Color.GREEN,true,ellipse );
+					} else if( controlPanel.fillCircles )
 						VisualizeFeatures.drawPoint(g2, x,y, 5, new Color(red, green, blue),true,ellipse );
 					else {
 						g2.setColor(new Color(red, green, blue));
 						VisualizeFeatures.drawCircle(g2, x, y, 5, ellipse);
 					}
-				}
-
-				for (PointTrack p : spawnedGui.toList() ) {
-					double x = offsetX + scale*p.x;
-					double y = offsetY + scale*p.y;
-					VisualizeFeatures.drawPoint(g2, x, y, 5,Color.green,true,ellipse);
+					// Visually indidate that the user has clicked on this feature
+					if( p.featureId == selectedTrackID ) {
+						controlPanel.textArea.setText(stringPointInfo(p));
+						g2.setColor(Color.CYAN);
+						for (int i = 0; i < 3; i++) {
+							VisualizeFeatures.drawCircle(g2, x, y, 7+i*2, ellipse);
+						}
+					}
 				}
 			}
 		}
@@ -231,33 +296,45 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		processingTime.update((time1-time0)*1e-6);
 
 		List<PointTrack> active = tracker.getActiveTracks(null);
-		List<PointTrack> spawned = tracker.getNewTracks(null);
+
+		// Compute track duration statistics
+		long trackerFrameID = tracker.getFrameID();
+		storageDuration.resize(active.size());
+		for (int i = 0; i < active.size(); i++) {
+			storageDuration.data[i] = trackerFrameID-active.get(i).spawnFrameID;
+		}
+		storageDuration.sort();
+		this.duration50 = storageDuration.getFraction(0.5);
+		this.duration95 = storageDuration.getFraction(0.95);
 
 		int count = active.size();
 
 		SwingUtilities.invokeLater(()->{
 			controlPanel.setTime(processingTime.getAverage());
 			controlPanel.setTrackCount(count);
+			controlPanel.setDuration(duration50,duration95);
 		});
 
 		synchronized (tracksGui) {
 			tracksGui.reset();
-			spawnedGui.reset();
+			frameIdGui = tracker.getFrameID();
 
 			for (int i = 0; i < active.size(); i++) {
 				tracksGui.grow().set(active.get(i));
-			}
-
-			for (int i = 0; i < spawned.size(); i++) {
-				spawnedGui.grow().set(spawned.get(i));
 			}
 		}
 
 		gui.setImageRepaint(buffered);
 
 		// some older videos are too fast if not paused
-		if( delay > 0 )
-			BoofMiscOps.sleep(delay);
+		if( controlPanel.delayMS > 0 )
+			BoofMiscOps.sleep(controlPanel.delayMS);
+
+		if( controlPanel.step ) {
+			controlPanel.step = false;
+			this.streamPaused = true;
+			SwingUtilities.invokeLater(()-> this.controlPanel.setPauseState(true));
+		}
 	}
 
 	public static void main(String args[]) {

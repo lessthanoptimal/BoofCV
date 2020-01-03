@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 
-	PkltConfig config;
+	ConfigPKlt config;
 
 	public TestPointTrackerKltPyramid() {
 		super(false, true);
@@ -43,7 +43,7 @@ class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 
 	@Override
 	public PointTracker<GrayF32> createTracker() {
-		config = new PkltConfig();
+		config = new ConfigPKlt();
 		return FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true),
 				GrayF32.class, GrayF32.class);
 	}
@@ -159,7 +159,7 @@ class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 
 	@Test
 	void validateRightLeft() {
-		PkltConfig config = new PkltConfig();
+		ConfigPKlt config = new ConfigPKlt();
 		// disable almost all error checking so that without R to L check it will pass
 		config.config.maxIterations = 2;        // limit how far it can move. Reduces out of bound errors
 		config.config.maxPerPixelError = 10000; // disable dropping due to error
@@ -193,7 +193,7 @@ class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 	 */
 	@Test
 	void validateRightLeft_shifted() {
-		PkltConfig config = new PkltConfig();
+		ConfigPKlt config = new ConfigPKlt();
 		config.templateRadius=3;
 		config.toleranceFB = 0.1;
 

@@ -21,7 +21,7 @@ package boofcv.abst.sfm.d3;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.tracker.PointTrackerTwoPass;
-import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.FactoryPointTrackerTwoPass;
@@ -41,7 +41,7 @@ public class TestWrapVisOdomPixelDepthPnP extends CheckVisualOdometryStereoSim<G
 		StereoDisparitySparse<GrayF32> disparity =
 				FactoryStereoDisparity.regionSparseWta(2, 150, 3, 3, 30, -1, true, GrayF32.class);
 
-		PkltConfig config = new PkltConfig();
+		ConfigPKlt config = new ConfigPKlt();
 		config.pyramidScaling = new int[]{1,2,4,8};
 		config.templateRadius = 3;
 

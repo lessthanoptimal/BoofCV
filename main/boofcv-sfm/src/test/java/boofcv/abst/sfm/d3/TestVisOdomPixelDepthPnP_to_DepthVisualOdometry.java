@@ -21,7 +21,7 @@ package boofcv.abst.sfm.d3;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.tracker.PointTrackerTwoPass;
 import boofcv.alg.sfm.DepthSparse3D;
-import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.FactoryPointTrackerTwoPass;
 import boofcv.struct.image.GrayS16;
@@ -41,7 +41,7 @@ public class TestVisOdomPixelDepthPnP_to_DepthVisualOdometry extends CheckVisual
 
 	protected DepthVisualOdometry<GrayU8,GrayU16> createAlgorithm() {
 
-		PkltConfig config = new PkltConfig();
+		ConfigPKlt config = new ConfigPKlt();
 		config.pyramidScaling = new int[]{1,2,4,8};
 		config.templateRadius = 3;
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);

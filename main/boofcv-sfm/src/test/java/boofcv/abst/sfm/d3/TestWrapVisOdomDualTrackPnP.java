@@ -21,7 +21,7 @@ package boofcv.abst.sfm.d3;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.FactoryPointTracker;
@@ -40,7 +40,7 @@ public class TestWrapVisOdomDualTrackPnP extends CheckVisualOdometryStereoSim<Gr
 	public StereoVisualOdometry<GrayF32> createAlgorithm() {
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,2,1);
 
-		PkltConfig kltConfig = new PkltConfig();
+		ConfigPKlt kltConfig = new ConfigPKlt();
 		kltConfig.templateRadius = 3;
 		kltConfig.pyramidScaling =  new int[]{1, 2, 4, 8};
 

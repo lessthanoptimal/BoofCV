@@ -27,7 +27,7 @@ import boofcv.abst.tracker.*;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
-import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
@@ -51,7 +51,7 @@ public class FactoryPointTrackerTwoPass {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	PointTrackerTwoPass<I> klt(PkltConfig config, ConfigGeneralDetector configExtract,
+	PointTrackerTwoPass<I> klt(ConfigPKlt config, ConfigGeneralDetector configExtract,
 							   Class<I> imageType, Class<D> derivType) {
 
 		GeneralFeatureDetector<I, D> detector = createShiTomasi(configExtract, derivType);

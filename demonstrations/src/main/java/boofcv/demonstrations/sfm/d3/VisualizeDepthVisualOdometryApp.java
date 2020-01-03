@@ -33,7 +33,7 @@ import boofcv.abst.tracker.PointTrackerTwoPass;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.sfm.DepthSparse3D;
-import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.sfm.FactoryVisualOdometry;
@@ -407,9 +407,9 @@ public class VisualizeDepthVisualOdometryApp
 
 		DepthSparse3D<GrayU16> sparseDepth = new DepthSparse3D.I<>(1e-3);
 
-		PkltConfig pkltConfig = new PkltConfig();
-		pkltConfig.templateRadius = 3;
-		pkltConfig.pyramidScaling = new int[]{1, 2, 4, 8};
+		ConfigPKlt configPKlt = new ConfigPKlt();
+		configPKlt.templateRadius = 3;
+		configPKlt.pyramidScaling = new int[]{1, 2, 4, 8};
 
 		algType = AlgType.UNKNOWN;
 		if (whichAlg == 0) {
@@ -417,7 +417,7 @@ public class VisualizeDepthVisualOdometryApp
 
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600, 3, 1);
 
-			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.klt(pkltConfig, configDetector,
+			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.klt(configPKlt, configDetector,
 					imageType, derivType);
 
 			alg = FactoryVisualOdometry.
@@ -445,7 +445,7 @@ public class VisualizeDepthVisualOdometryApp
 
 			PointTracker tracker = FactoryPointTracker.
 					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 1),
-							pkltConfig, 50, null, null, imageType, derivType);
+							configPKlt, 50, null, null, imageType, derivType);
 
 			PointTrackerTwoPass twopass = new PointTrackerToTwoPass<>(tracker);
 

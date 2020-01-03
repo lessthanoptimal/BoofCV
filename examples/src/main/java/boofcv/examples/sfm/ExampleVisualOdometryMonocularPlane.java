@@ -23,7 +23,7 @@ import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.MonocularPlaneVisualOdometry;
 import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.io.MediaManager;
@@ -61,7 +61,7 @@ public class ExampleVisualOdometryMonocularPlane {
 				new File(directory , "left.mjpeg").getPath(), ImageType.single(GrayU8.class));
 
 		// specify how the image features are going to be tracked
-		PkltConfig configKlt = new PkltConfig();
+		ConfigPKlt configKlt = new ConfigPKlt();
 		configKlt.pyramidScaling = new int[]{1, 2, 4, 8};
 		configKlt.templateRadius = 3;
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);

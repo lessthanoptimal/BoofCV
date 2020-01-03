@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -237,6 +237,15 @@ public class StandardAlgConfigPanel extends JPanel {
 		p.add(Box.createHorizontalGlue());
 		p.add(target);
 		owner.add(p);
+	}
+
+	public static JPanel createHorizontalPanel( JComponent ...children ) {
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
+		for( var c : children ) {
+			panel.add(c);
+		}
+		return panel;
 	}
 
 	public void addLabeledV( JComponent target , String text ) {

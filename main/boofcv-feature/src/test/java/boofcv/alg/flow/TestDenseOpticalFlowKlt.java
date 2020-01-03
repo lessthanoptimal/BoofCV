@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.flow;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -51,7 +51,7 @@ class TestDenseOpticalFlowKlt {
 
 	ImageGradient<GrayF32, GrayF32> gradient = FactoryDerivative.sobel(GrayF32.class, GrayF32.class);
 
-	PkltConfig config = new PkltConfig();
+	ConfigPKlt config = new ConfigPKlt();
 
 	@BeforeEach
 	void setup() {

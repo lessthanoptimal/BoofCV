@@ -21,7 +21,7 @@ package boofcv.examples;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.image.ImagePanel;
@@ -46,7 +46,7 @@ public class ExampleTrackingKlt {
 
 		// tune the tracker for the image size and visual appearance
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(-1,8,1);
-		PkltConfig configKlt = new PkltConfig(3,new int[]{1,2,4,8});
+		ConfigPKlt configKlt = new ConfigPKlt(3,new int[]{1,2,4,8});
 
 		PointTracker<GrayF32> tracker = FactoryPointTracker.klt(configKlt,configDetector,GrayF32.class,null);
 

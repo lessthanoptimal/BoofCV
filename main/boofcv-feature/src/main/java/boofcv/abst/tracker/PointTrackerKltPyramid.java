@@ -185,6 +185,8 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	public void spawnTracks() {
 		spawned.clear();
 
+		tracker.setImage(currPyr.basePyramid,currPyr.derivX,currPyr.derivY);
+
 		// used to convert it from the scale of the bottom layer into the original image
 		float scaleBottom = (float)currPyr.basePyramid.getScale(0);
 
@@ -219,11 +221,11 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 			// set up point description
 			PointTrackMod p = t.getCookie();
 			p.set(t.x,t.y);
-			p.prev.set(t.x,t.y);
 
 			if( checkValidSpawn(p) ) {
 				p.featureId = totalFeatures++;
 				p.spawnFrameID = frameID;
+				p.prev.set(t.x,t.y);
 
 				// add to appropriate lists
 				active.add(t);
@@ -253,6 +255,13 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 		this.input = image;
 		this.frameID++;
 
+		// swap currPyr to prevPyr so that the previous is now the previous
+		if( toleranceFB >= 0 ) {
+			ImageStruct tmp = currPyr;
+			currPyr = prevPyr;
+			prevPyr = tmp;
+		}
+
 		boolean activeTracks = active.size()>0;
 		spawned.clear();
 		dropped.clear();
@@ -262,7 +271,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 
 		// track features
 		tracker.setImage(currPyr.basePyramid,currPyr.derivX,currPyr.derivY);
-		for( int i = 0; i < active.size(); ) {
+		for (int i = active.size()-1; i >= 0; i--) {
 			PyramidKltFeature t = active.get(i);
 			KltTrackFault ret = tracker.track(t);
 
@@ -273,7 +282,6 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 				if( image.isInBounds((int)t.x,(int)t.y) && tracker.setDescription(t) ) {
 					PointTrack p = t.getCookie();
 					p.set(t.x,t.y);
-					i++;
 					success = true;
 				}
 			}
@@ -292,11 +300,6 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 			} else {
 				this.prevPyr.update(image);
 			}
-
-			// make the current image the previous image
-			ImageStruct tmp = currPyr;
-			currPyr = prevPyr;
-			prevPyr = tmp;
 		}
 	}
 
@@ -312,9 +315,6 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 			PyramidKltFeature t = active.get(i);
 			PointTrackMod p = t.getCookie();
 
-			float origX = t.x;
-			float origY = t.y;
-
 			KltTrackFault ret = tracker.track(t);
 
 			if( ret != KltTrackFault.SUCCESS || p.prev.distance2(t.x,t.y) > tol2 ) {
@@ -323,10 +323,10 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 				unused.add( t );
 			} else {
 				// the new previous will be the current location
-				p.prev.set(origX,origY);
+				p.prev.set(p.x,p.y);
 				// Revert the update by KLT
-				t.x = origX;
-				t.y = origY;
+				t.x = (float)p.x;
+				t.y = (float)p.y;
 			}
 		}
 	}

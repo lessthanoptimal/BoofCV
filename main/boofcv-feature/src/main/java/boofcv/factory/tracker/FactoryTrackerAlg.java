@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,9 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
 import boofcv.alg.tracker.combined.PyramidKltForCombined;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.alg.tracker.klt.KltTracker;
-import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.feature.TupleDesc;
@@ -109,12 +109,12 @@ public class FactoryTrackerAlg {
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
 	CombinedTrackerScalePoint<I,D,Desc> combined(DetectDescribePoint<I, Desc> detector,
 												 AssociateDescription<Desc> associate,
-												 @Nullable PkltConfig kltConfig ,
+												 @Nullable ConfigPKlt kltConfig ,
 												 Class<I> imageType,
 												 @Nullable Class<D> derivType)
 	{
 		if( kltConfig == null)
-			kltConfig = new PkltConfig();
+			kltConfig = new ConfigPKlt();
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 

@@ -48,7 +48,7 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
-import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
@@ -98,8 +98,8 @@ public class FactoryPointTracker {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> klt(int scaling[], ConfigGeneralDetector configExtract, int featureRadius,
-						Class<I> imageType, Class<D> derivType) {
-		PkltConfig config = new PkltConfig();
+							 Class<I> imageType, Class<D> derivType) {
+		ConfigPKlt config = new ConfigPKlt();
 		config.pyramidScaling = scaling;
 		config.templateRadius = featureRadius;
 
@@ -116,14 +116,14 @@ public class FactoryPointTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	PointTracker<I> klt(PkltConfig config, ConfigGeneralDetector configExtract,
+	PointTracker<I> klt(ConfigPKlt config, ConfigGeneralDetector configExtract,
 						Class<I> imageType, @Nullable Class<D> derivType ) {
 
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		if( config == null ) {
-			config = new PkltConfig();
+			config = new ConfigPKlt();
 		}
 		config.checkValidity();
 
@@ -386,7 +386,7 @@ public class FactoryPointTracker {
 	 * @return SURF based tracker.
 	 */
 	public static <I extends ImageGray<I>>
-	PointTracker<I> combined_FH_SURF_KLT( PkltConfig kltConfig ,
+	PointTracker<I> combined_FH_SURF_KLT( ConfigPKlt kltConfig ,
 										  int reactivateThreshold ,
 										  ConfigFastHessian configDetector ,
 										  ConfigSurfDescribe.Stability configDescribe ,
@@ -422,7 +422,7 @@ public class FactoryPointTracker {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> combined_ST_SURF_KLT(ConfigGeneralDetector configExtract,
-										 PkltConfig kltConfig,
+										 ConfigPKlt kltConfig,
 										 int reactivateThreshold,
 										 ConfigSurfDescribe.Stability configDescribe,
 										 ConfigSlidingIntegral configOrientation,
@@ -473,7 +473,7 @@ public class FactoryPointTracker {
 							 OrientationImage<I> orientation,
 							 DescribeRegionPoint<I, Desc> describe,
 							 AssociateDescription<Desc> associate,
-							 PkltConfig kltConfig ,
+							 ConfigPKlt kltConfig ,
 							 int reactivateThreshold,
 							 Class<I> imageType)
 	{
@@ -496,13 +496,13 @@ public class FactoryPointTracker {
 	public static <I extends ImageGray<I>, D extends ImageGray<D>, Desc extends TupleDesc>
 	PointTracker<I> combined(DetectDescribePoint<I, Desc> detector,
 							 AssociateDescription<Desc> associate,
-							 PkltConfig kltConfig ,
+							 ConfigPKlt kltConfig ,
 							 int reactivateThreshold, Class<I> imageType )
 	{
 		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		if( kltConfig == null ) {
-			kltConfig = new PkltConfig();
+			kltConfig = new ConfigPKlt();
 		}
 
 		CombinedTrackerScalePoint<I, D,Desc> tracker =

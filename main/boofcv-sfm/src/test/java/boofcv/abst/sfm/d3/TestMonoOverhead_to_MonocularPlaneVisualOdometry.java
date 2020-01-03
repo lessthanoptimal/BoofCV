@@ -20,7 +20,7 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.alg.tracker.klt.PkltConfig;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayS16;
@@ -40,7 +40,7 @@ public class TestMonoOverhead_to_MonocularPlaneVisualOdometry extends CheckVisua
 
 	protected MonocularPlaneVisualOdometry<GrayU8> createAlgorithm() {
 
-		PkltConfig config = new PkltConfig();
+		ConfigPKlt config = new ConfigPKlt();
 		config.pyramidScaling = new int[]{1,2,4,8};
 		config.templateRadius = 3;
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);

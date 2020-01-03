@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class PkltConfig implements Configuration
+public class ConfigPKlt implements Configuration
 {
 	/** configuration for low level KLT tracker */
 	public KltConfig config = new KltConfig();
@@ -43,14 +43,14 @@ public class PkltConfig implements Configuration
 	/** Scale factor for each layer in the pyramid */
 	public int pyramidScaling[] = new int[]{1,2,4};
 
-	public PkltConfig() {
+	public ConfigPKlt() {
 	}
 
-	public PkltConfig(int templateRadius) {
+	public ConfigPKlt(int templateRadius) {
 		this.templateRadius = templateRadius;
 	}
 
-	public PkltConfig(int templateRadius, int[] pyramidScaling) {
+	public ConfigPKlt(int templateRadius, int[] pyramidScaling) {
 		this.templateRadius = templateRadius;
 		this.pyramidScaling = pyramidScaling;
 	}

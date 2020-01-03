@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class TestPointTrackerTwoPassKltPyramid extends StandardPointTrackerTwoPass<GrayF32> {
 
-	PkltConfig config;
+	ConfigPKlt config;
 
 	public TestPointTrackerTwoPassKltPyramid() {
 		super(false, true);
@@ -40,7 +40,7 @@ public class TestPointTrackerTwoPassKltPyramid extends StandardPointTrackerTwoPa
 
 	@Override
 	public PointTrackerTwoPass<GrayF32> createTracker() {
-		config = new PkltConfig();
+		config = new ConfigPKlt();
 		return FactoryPointTrackerTwoPass.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true),
 				GrayF32.class, GrayF32.class);
 	}
