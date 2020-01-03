@@ -20,7 +20,6 @@ package boofcv.examples.stereo;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
@@ -116,7 +115,7 @@ public class ExampleStereoTwoViewsOneCamera {
 
 		// compute disparity
 		ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
-		config.errorType = DisparityError.SAD;
+		config.errorType = DisparityError.CENSUS;
 		config.disparityMin = minDisparity;
 		config.disparityRange = rangeDisparity;
 		config.subpixel = true;
@@ -124,17 +123,11 @@ public class ExampleStereoTwoViewsOneCamera {
 		config.maxPerPixelError = 20;
 		config.validateRtoL = 1;
 		config.texture = 0.1;
-		StereoDisparity<GrayS16, GrayF32> disparityAlg =
-				FactoryStereoDisparity.blockMatchBest5(config, GrayS16.class, GrayF32.class);
-
-		// Apply the Laplacian across the image to add extra resistance to changes in lighting or camera gain
-		GrayS16 derivLeft = new GrayS16(rectifiedLeft.width,rectifiedLeft.height);
-		GrayS16 derivRight = new GrayS16(rectifiedLeft.width,rectifiedLeft.height);
-		GImageDerivativeOps.laplace(rectifiedLeft, derivLeft,BorderType.EXTENDED);
-		GImageDerivativeOps.laplace(rectifiedRight,derivRight,BorderType.EXTENDED);
+		StereoDisparity<GrayU8, GrayF32> disparityAlg =
+				FactoryStereoDisparity.blockMatchBest5(config, GrayU8.class, GrayF32.class);
 
 		// process and return the results
-		disparityAlg.process(derivLeft, derivRight);
+		disparityAlg.process(rectifiedLeft, rectifiedRight);
 		GrayF32 disparity = disparityAlg.getDisparity();
 		RectifyImageOps.applyMask(disparity,rectifiedMask,0);
 
@@ -231,7 +224,6 @@ public class ExampleStereoTwoViewsOneCamera {
 		rectifyAlg.process(K1, new Se3_F64(), K2, leftToRight);
 
 		// rectification matrix for each image
-		DMatrixRMaj rectRot = rectifyAlg.getRectifiedRotation();
 		DMatrixRMaj rect1 = rectifyAlg.getRect1();
 		DMatrixRMaj rect2 = rectifyAlg.getRect2();
 		rectifiedR.set(rectifyAlg.getRectifiedRotation());

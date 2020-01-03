@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,6 +100,10 @@ public class ImageDistortCache_SB<Input extends ImageGray<Input>,Output extends 
 	@Override
 	public void apply(Input srcImg, Output dstImg, int dstX0, int dstY0, int dstX1, int dstY1) {
 		init(srcImg, dstImg);
+
+		// Check that a valid region was specified. If not do nothing
+		if( dstX1 <= dstX0 || dstY1 <= dstY0 )
+			return;
 
 		x0 = dstX0;y0 = dstY0;x1 = dstX1;y1 = dstY1;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.distort;
 
 import boofcv.alg.interpolate.BilinearPixelS;
 import boofcv.alg.interpolate.impl.ImplBilinearPixel_F32;
+import boofcv.alg.misc.GImageStatistics;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.struct.distort.PixelTransform;
@@ -132,6 +133,26 @@ public abstract class CommonImageDistort_SB {
 	@Test
 	public void applyOnlyInside_mask() {
 		checkMask(false);
+	}
+
+	/**
+	 * Give it an invalid region and see if it does nothing
+	 */
+	@Test
+	public void invalidRegion() {
+		GrayF32 src = new GrayF32(10,15);
+		ImageMiscOps.fillUniform(src,rand,0,2);
+		GrayF32 dst = new GrayF32(14,18);
+
+		ImageDistort alg = createAlg(interp);
+		offX=offY=2;
+		alg.setModel(tran);
+		// bad X
+		alg.apply(src,dst,2,3,2,6);
+		assertEquals(0, GImageStatistics.sum(dst));
+		// bad X
+		alg.apply(src,dst,2,3,7,2);
+		assertEquals(0, GImageStatistics.sum(dst));
 	}
 
 	public void checkMask( boolean renderAll ) {
