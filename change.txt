@@ -28,6 +28,8 @@ Version : 0.36
 - Android
   * Changed image workspace from byte[] to GrowQueue_I8 so that it can be dynamically computed.
   * Fixed issues with visualizing disparity
+- Applications
+  * TODO assisted self calibration
 
 TODO Regression
    - Dump runtime results into their own directory for each device. Use hostname?
