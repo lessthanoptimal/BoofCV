@@ -1,0 +1,52 @@
+/*
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package boofcv.alg.fiducial.dots;
+
+import boofcv.alg.drawing.FiducialImageEngine;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+
+/**
+ * Renders Uchiya markers inside of images
+ *
+ * @author Peter Abeles
+ */
+public class UchiyaMarkerGeneratorImage
+	extends UchiyaMarkerGenerator
+{
+	public UchiyaMarkerGeneratorImage() {
+		render = new FiducialImageEngine();
+	}
+
+	public void configure( int width , int height , int border ) {
+		super.documentRegion.setLowerExtent(border,border);
+		super.documentRegion.width = width-2*border;
+		super.documentRegion.height = height-2*border;
+		((FiducialImageEngine)render).configure(border,width-2*border, height-2*border);
+	}
+
+	public GrayU8 getImage() {
+		return ((FiducialImageEngine)render).getGray();
+	}
+
+	public GrayF32 getImageF32() {
+		return ((FiducialImageEngine)render).getGrayF32();
+	}
+
+}
