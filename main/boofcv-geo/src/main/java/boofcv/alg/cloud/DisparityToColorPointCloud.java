@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package boofcv.gui.d3;
+package boofcv.alg.cloud;
 
-import boofcv.misc.BoofMiscOps;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
@@ -33,8 +32,6 @@ import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
-
-import java.awt.image.BufferedImage;
 
 /**
  * <p>
@@ -65,15 +62,7 @@ public class DisparityToColorPointCloud {
 	// maximum minus minimum disparity
 	int disparityRange;
 
-	// How far out it should zoom.
-	double range = 1;
-
-	// Storage for point cloud
-	GrowQueue_F32 cloudXyz = new GrowQueue_F32();
-	GrowQueue_I32 cloudRgb = new GrowQueue_I32();
-
 	// tilt angle in degrees
-	public int tiltAngle = 0;
 	public double radius = 5;
 
 	// converts from rectified pixels into color image pixels
@@ -119,19 +108,16 @@ public class DisparityToColorPointCloud {
 	 * @param disparity Disparity image
 	 * @param color Color image of left camera
 	 */
-	public void process(ImageGray disparity , BufferedImage color ) {
-		cloudRgb.setMaxSize(disparity.width*disparity.height);
-		cloudXyz.setMaxSize(disparity.width*disparity.height*3);
-		cloudRgb.reset();
-		cloudXyz.reset();
+	public void process(ImageGray disparity , ColorImage color , Cloud output ) {
+
 
 		if( disparity instanceof GrayU8)
-			process((GrayU8)disparity,color);
+			process((GrayU8)disparity, color, output);
 		else
-			process((GrayF32)disparity,color);
+			process((GrayF32)disparity, color, output);
 	}
 
-	private void process(GrayU8 disparity , BufferedImage color ) {
+	private void process(GrayU8 disparity , ColorImage color , Cloud output ) {
 
 		final int x0 = Math.max(roi.x0,0);
 		final int y0 = Math.max(roi.y0,0);
@@ -162,15 +148,12 @@ public class DisparityToColorPointCloud {
 				// Bring it back into left camera frame
 				GeometryMath_F32.multTran(rectifiedR,p,p);
 
-				cloudRgb.add(getColor(disparity, color, pixelX, pixelY));
-				cloudXyz.add(p.x);
-				cloudXyz.add(p.y);
-				cloudXyz.add(p.z);
+				output.add(p.x,p.y,p.z,getColor(disparity, color, pixelX, pixelY));
 			}
 		}
 	}
 
-	private void process(GrayF32 disparity , BufferedImage color ) {
+	private void process(GrayF32 disparity , ColorImage color , Cloud output) {
 
 		final int x0 = Math.max(roi.x0,0);
 		final int y0 = Math.max(roi.y0,0);
@@ -202,18 +185,18 @@ public class DisparityToColorPointCloud {
 				// Bring it back into left camera frame
 				GeometryMath_F32.multTran(rectifiedR,p,p);
 
-				cloudRgb.add(getColor(disparity, color, pixelX, pixelY));
-				cloudXyz.add(p.x);
-				cloudXyz.add(p.y);
-				cloudXyz.add(p.z);
+				output.add(p.x,p.y,p.z,getColor(disparity, color, pixelX, pixelY));
 			}
 		}
 	}
 
-	private int getColor(ImageBase disparity, BufferedImage color, int x, int y ) {
+	private int getColor(ImageBase disparity, ColorImage color, int x, int y ) {
 		rectifiedToColor.compute(x,y,colorPt);
-		if( BoofMiscOps.checkInside(disparity, colorPt.x, colorPt.y) ) {
-			return color.getRGB((int)colorPt.x,(int)colorPt.y);
+		int xx = (int)colorPt.getX();
+		int yy = (int)colorPt.getY();
+
+		if( color.isInBounds( xx , yy ) ) {
+			return color.getRGB(xx,yy);
 		} else {
 			return 0x000000;
 		}
@@ -227,12 +210,48 @@ public class DisparityToColorPointCloud {
 		roi.set(-1,-1,Integer.MAX_VALUE,Integer.MAX_VALUE);
 	}
 
-	public GrowQueue_F32 getCloud() {
-		return cloudXyz;
+	public static class CloudArrays implements Cloud {
+		// Storage for point cloud
+		public GrowQueue_F32 cloudXyz = new GrowQueue_F32();
+		public GrowQueue_I32 cloudRgb = new GrowQueue_I32();
+
+		@Override
+		public void init(int width, int height) {
+			cloudRgb.setMaxSize(width*height);
+			cloudXyz.setMaxSize(width*height*3);
+			cloudRgb.reset();
+			cloudXyz.reset();
+		}
+
+		@Override
+		public void add(float x, float y, float z) {
+
+		}
+
+		@Override
+		public void add(float x, float y, float z, int rgb) {
+
+		}
 	}
 
-	public GrowQueue_I32 getCloudColor() {
-		return cloudRgb;
+	/**
+	 * Interface for saving the computed cloud
+	 */
+	public interface Cloud {
+		/**
+		 * Resets the cloud to an empty state and tells it the size of the disparity image
+		 */
+		void init( int width , int height );
+		void add( float x , float y , float z );
+		void add( float x , float y , float z , int rgb );
+	}
+
+	/**
+	 * Interface for accessing RGB values inside an image
+	 */
+	public interface ColorImage {
+		boolean isInBounds( int x , int y );
+		int getRGB( int x , int y );
 	}
 
 }

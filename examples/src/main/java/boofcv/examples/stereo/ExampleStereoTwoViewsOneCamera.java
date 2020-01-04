@@ -19,6 +19,7 @@
 package boofcv.examples.stereo;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
+import boofcv.alg.cloud.DisparityToColorPointCloud;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -31,7 +32,7 @@ import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.ConfigEssential;
 import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.FactoryMultiViewRobust;
-import boofcv.gui.d3.DisparityToColorPointCloud;
+import boofcv.gui.d3.UtilDisparitySwing;
 import boofcv.gui.feature.AssociationPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.gui.image.VisualizeImageData;
@@ -292,9 +293,11 @@ public class ExampleStereoTwoViewsOneCamera {
 									  int disparityMin, int disparityRange)
 	{
 		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
+		DisparityToColorPointCloud.CloudArrays cloud = new DisparityToColorPointCloud.CloudArrays();
+
 		double baseline = motion.getT().norm();
 		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), disparityMin, disparityRange);
-		d2c.process(disparity,left);
+		d2c.process(disparity, UtilDisparitySwing.wrap(left), cloud);
 
 		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK,disparity.width,disparity.height,null);
 
@@ -305,7 +308,7 @@ public class ExampleStereoTwoViewsOneCamera {
 		pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
 		pcv.setCameraToWorld(cameraToWorld);
 		pcv.setTranslationStep(baseline/3);
-		pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
+		pcv.addCloud(cloud.cloudXyz,cloud.cloudRgb);
 		pcv.setDotSize(1);
 		pcv.setTranslationStep(baseline/10);
 

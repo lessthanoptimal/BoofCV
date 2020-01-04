@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.cloud;
 
 import boofcv.alg.nn.KdTreePoint3D_F64;
+import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
@@ -148,5 +149,17 @@ public class PointCloudUtils {
 				colors.remove(i);
 			}
 		}
+	}
+
+	public static void convert(Point3D_F64 src , Point3D_F32 dst ) {
+		dst.x = (float)src.x;
+		dst.y = (float)src.y;
+		dst.z = (float)src.z;
+	}
+
+	public static void convert(Point3D_F32 src , Point3D_F64 dst ) {
+		dst.x = src.x;
+		dst.y = src.y;
+		dst.z = src.z;
 	}
 }

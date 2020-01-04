@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,7 @@
 
 package boofcv.io.points;
 
-import boofcv.io.points.impl.PlyCodec_F32;
-import boofcv.io.points.impl.PlyCodec_F64;
+import boofcv.io.points.impl.PlyCodec;
 import boofcv.struct.Point3dRgbI_F64;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
@@ -29,7 +28,6 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.List;
 
 /**
  * Code for reading different point cloud formats
@@ -38,10 +36,10 @@ import java.util.List;
  */
 public class PointCloudIO {
 
-	public static void save3D32F(Format format , List<Point3D_F32> cloud , Writer writer ) throws IOException {
+	public static void save3D(Format format, PointCloudReader cloud , Writer writer ) throws IOException {
 		switch( format ) {
 			case PLY_ASCII:
-				PlyCodec_F32.saveAscii(cloud, writer);
+				PlyCodec.saveAscii(cloud, writer);
 				break;
 			case PLY_BINARY:
 				throw new IllegalArgumentException("Not yet supported");
@@ -50,22 +48,10 @@ public class PointCloudIO {
 		}
 	}
 
-	public static void save3D64F( Format format , List<Point3D_F64> cloud , Writer writer ) throws IOException {
+	public static void save3DRgb(Format format, PointCloudReader cloud , Writer writer ) throws IOException {
 		switch( format ) {
 			case PLY_ASCII:
-				PlyCodec_F64.saveAscii(cloud, writer);
-				break;
-			case PLY_BINARY:
-				throw new IllegalArgumentException("Not yet supported");
-			default:
-				throw new IllegalArgumentException("Unknown format "+format);
-		}
-	}
-
-	public static void save3DRgbI64F(Format format , List<Point3dRgbI_F64> cloud , Writer writer ) throws IOException {
-		switch( format ) {
-			case PLY_ASCII:
-				PlyCodec_F64.saveAsciiRgbI(cloud, writer);
+				PlyCodec.saveAsciiRgb(cloud, writer);
 				break;
 			case PLY_BINARY:
 				throw new IllegalArgumentException("Not yet supported");
@@ -78,16 +64,8 @@ public class PointCloudIO {
 	load3D32F( Format format , Reader reader , @Nullable FastQueue<Point3D_F32> storage  ) throws IOException {
 		if( storage == null )
 			storage = new FastQueue<>(Point3D_F32.class,true);
-
-		switch( format ) {
-			case PLY_ASCII:
-				PlyCodec_F32.read(reader,storage);
-				break;
-			case PLY_BINARY:
-				throw new IllegalArgumentException("Not yet supported");
-			default:
-				throw new IllegalArgumentException("Unknown format "+format);
-		}
+		PointCloudWriter output = PointCloudWriter.wrapF32(storage);
+		load(format,reader,output);
 		return storage;
 	}
 
@@ -95,16 +73,8 @@ public class PointCloudIO {
 	load3D64F( Format format , Reader reader , @Nullable FastQueue<Point3D_F64> storage  ) throws IOException {
 		if( storage == null )
 			storage = new FastQueue<>(Point3D_F64.class,true);
-
-		switch( format ) {
-			case PLY_ASCII:
-				PlyCodec_F64.read(reader,storage);
-				break;
-			case PLY_BINARY:
-				throw new IllegalArgumentException("Not yet supported");
-			default:
-				throw new IllegalArgumentException("Unknown format "+format);
-		}
+		PointCloudWriter output = PointCloudWriter.wrapF64(storage);
+		load(format,reader,output);
 		return storage;
 	}
 
@@ -112,17 +82,22 @@ public class PointCloudIO {
 	load3DRgb64F(Format format , Reader reader , @Nullable FastQueue<Point3dRgbI_F64> storage  ) throws IOException {
 		if( storage == null )
 			storage = new FastQueue<>(Point3dRgbI_F64.class,true);
+		PointCloudWriter output = PointCloudWriter.wrapF64RGB(storage);
+		load(format,reader,output);
+		return storage;
+	}
 
+	public static void
+	load( Format format , Reader reader , PointCloudWriter output ) throws IOException {
 		switch( format ) {
 			case PLY_ASCII:
-				PlyCodec_F64.readRgbI(reader,storage);
+				PlyCodec.read(reader,output);
 				break;
 			case PLY_BINARY:
 				throw new IllegalArgumentException("Not yet supported");
 			default:
 				throw new IllegalArgumentException("Unknown format "+format);
 		}
-		return storage;
 	}
 
 	public enum Format {

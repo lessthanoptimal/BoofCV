@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.gui.dialogs.OpenImageSetDialog;
 import boofcv.io.image.ConvertImageMisc;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.points.PointCloudIO;
+import boofcv.io.points.PointCloudReader;
 import boofcv.struct.Point3dRgbI_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU16;
@@ -482,13 +483,13 @@ public class BoofSwingUtil {
 	}
 
 	public static JButton button( String name , ActionListener action ) {
-		JButton b = new JButton(name);
+		var b = new JButton(name);
 		b.addActionListener(action);
 		return b;
 	}
 
 	public static JCheckBox checkbox( String name , boolean checked , ActionListener action ) {
-		JCheckBox b = new JCheckBox(name);
+		var b = new JCheckBox(name);
 		if( action != null )
 			b.addActionListener(action);
 		b.setSelected(checked);
@@ -508,7 +509,7 @@ public class BoofSwingUtil {
 	public static void savePointCloudDialog(Component owner, String key ,PointCloudViewer pcv) {
 		String path = getDefaultPath(owner,key);
 
-		JFileChooser fileChooser = new JFileChooser();
+		var fileChooser = new JFileChooser();
 		fileChooser.setSelectedFile(new File(path,"pointcloud.ply"));
 
 		if (fileChooser.showSaveDialog(owner) == JFileChooser.APPROVE_OPTION) {
@@ -518,9 +519,9 @@ public class BoofSwingUtil {
 			FastQueue<Point3dRgbI_F64> cloud = pcv.copyCloud(null);
 			String n = FilenameUtils.getBaseName(file.getName())+".ply";
 			try {
-				File f = new File(file.getParent(),n);
-				FileWriter w = new FileWriter(f);
-				PointCloudIO.save3DRgbI64F(PointCloudIO.Format.PLY_ASCII, cloud.toList(),w);
+				var f = new File(file.getParent(),n);
+				var w = new FileWriter(f);
+				PointCloudIO.save3DRgb(PointCloudIO.Format.PLY_ASCII, PointCloudReader.wrapF64RGB(cloud.toList()),w);
 				w.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -535,7 +536,7 @@ public class BoofSwingUtil {
 	public static void saveDisparityDialog( JComponent owner, String key, ImageGray d) {
 
 		String path = getDefaultPath(owner,key);
-		JFileChooser fileChooser = new JFileChooser();
+		var fileChooser = new JFileChooser();
 		fileChooser.setSelectedFile(new File(path,"disparity.png"));
 		fileChooser.setDialogTitle("Save Disparity Image");
 		if (fileChooser.showSaveDialog(owner) == JFileChooser.APPROVE_OPTION) {
@@ -550,7 +551,7 @@ public class BoofSwingUtil {
 				disparity = new GrayF32(d.width,d.height);
 				ConvertImage.convert((GrayU8)d,disparity);
 			}
-			GrayU16 output = new GrayU16(disparity.width,disparity.height);
+			var output = new GrayU16(disparity.width,disparity.height);
 			ConvertImageMisc.convert_F32_U16(disparity,8,output);
 
 			// save as 16-bit png

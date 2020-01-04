@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,14 +48,14 @@ class TestPointCloudIO {
 			found.grow().set(1,1,1);
 
 			Writer writer = new StringWriter();
-			PointCloudIO.save3D32F(f,expected,writer);
+			PointCloudIO.save3D(f,PointCloudReader.wrapF32(expected),writer);
 			Reader reader = new StringReader(writer.toString());
 			PointCloudIO.load3D32F(f,reader,found);
 
-			// make sure it didn't clear the points
-			assertEquals(expected.size()+1,found.size);
+			// make sure it cleared the points
+			assertEquals(expected.size(),found.size);
 			for (int i = 0; i < expected.size(); i++) {
-				assertEquals(0.0,found.get(i+1).distance(expected.get(i)), UtilEjml.TEST_F32);
+				assertEquals(0.0,found.get(i).distance(expected.get(i)), UtilEjml.TEST_F32);
 			}
 		}
 	}
@@ -73,14 +73,14 @@ class TestPointCloudIO {
 			found.grow().set(1,1,1);
 
 			Writer writer = new StringWriter();
-			PointCloudIO.save3D64F(f,expected,writer);
+			PointCloudIO.save3DRgb(f,PointCloudReader.wrapF64(expected),writer);
 			Reader reader = new StringReader(writer.toString());
 			PointCloudIO.load3D64F(f,reader,found);
 
-			// make sure it didn't clear the points
-			assertEquals(expected.size()+1,found.size);
+			// make sure it cleared the points
+			assertEquals(expected.size(),found.size);
 			for (int i = 0; i < expected.size(); i++) {
-				assertEquals(0.0,found.get(i+1).distance(expected.get(i)), UtilEjml.TEST_F64);
+				assertEquals(0.0,found.get(i).distance(expected.get(i)), UtilEjml.TEST_F64);
 			}
 		}
 	}

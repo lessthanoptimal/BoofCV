@@ -16,41 +16,29 @@
  * limitations under the License.
  */
 
-package boofcv.struct;
+package boofcv.gui.d3;
 
-import georegression.struct.point.Point3D_F32;
+import boofcv.alg.cloud.DisparityToColorPointCloud;
+
+import java.awt.image.BufferedImage;
 
 /**
- * 3D point with RGB stored in a compressed int format
+ * Various utility functions and classes related disparity images and point clouds
  *
  * @author Peter Abeles
  */
-public class Point3dRgbI_F32 extends Point3D_F32 {
-	public int rgb;
+public class UtilDisparitySwing {
+	public static DisparityToColorPointCloud.ColorImage wrap(BufferedImage image ) {
+		return new DisparityToColorPointCloud.ColorImage() {
+			@Override
+			public boolean isInBounds(int x, int y) {
+				return( x >= 0 && x < image.getWidth() && y >= 0 && y < image.getHeight() );
+			}
 
-	public Point3dRgbI_F32( Point3D_F32 p , int rgb ) {
-		this.set(p);
-		this.rgb = rgb;
-	}
-
-	public Point3dRgbI_F32( float x , float y , float z, int rgb ) {
-		this.set(x,y,z);
-		this.rgb = rgb;
-	}
-
-	public Point3dRgbI_F32() {
-	}
-
-	public void set( float x , float y , float z, int rgb ) {
-		this.set(x,y,z);
-		this.rgb = rgb;
-	}
-
-	public int getRgb() {
-		return rgb;
-	}
-
-	public void setRgb(int rgb) {
-		this.rgb = rgb;
+			@Override
+			public int getRGB(int x, int y) {
+				return image.getRGB(x,y);
+			}
+		};
 	}
 }

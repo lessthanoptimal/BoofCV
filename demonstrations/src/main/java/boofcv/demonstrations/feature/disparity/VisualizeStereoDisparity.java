@@ -19,6 +19,7 @@
 package boofcv.demonstrations.feature.disparity;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
+import boofcv.alg.cloud.DisparityToColorPointCloud;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -26,7 +27,7 @@ import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.d3.DisparityToColorPointCloud;
+import boofcv.gui.d3.UtilDisparitySwing;
 import boofcv.gui.dialogs.OpenImageSetDialog;
 import boofcv.gui.image.ImageZoomPanel;
 import boofcv.gui.image.VisualizeImageData;
@@ -301,19 +302,20 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			if( !computedCloud ) {
 				computedCloud = true;
 				DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
+				DisparityToColorPointCloud.CloudArrays cloud = new DisparityToColorPointCloud.CloudArrays();
 
 				double baseline = calib.getRightToLeft().getT().norm();
 				d2c.configure(baseline, rectK,rectR, leftRectToPixel, disparityMin,disparityRange);
 				if(imagePanel.state==2) // has the user defined the ROI?
 					d2c.setRegionOfInterest(imagePanel.x0, imagePanel.y0, imagePanel.x1, imagePanel.y1);
-				d2c.process(disparityImage,colorLeft);
+				d2c.process(disparityImage, UtilDisparitySwing.wrap(colorLeft), cloud);
 
 				CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(
 						rectK,colorLeft.getWidth(),colorLeft.getHeight(),null);
 				pcv.setBackgroundColor(control.backgroundColor3D);
 				pcv.clearPoints();
 				pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
-				pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
+				pcv.addCloud(cloud.cloudXyz,cloud.cloudRgb);
 				changeView3D();
 			}
 

@@ -24,6 +24,7 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.cloud.DisparityToColorPointCloud;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.feature.associate.AssociateThreeByPairs;
@@ -38,7 +39,7 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
-import boofcv.gui.d3.DisparityToColorPointCloud;
+import boofcv.gui.d3.UtilDisparitySwing;
 import boofcv.gui.dialogs.OpenImageSetDialog;
 import boofcv.gui.feature.AssociatedTriplePanel;
 import boofcv.gui.image.ImagePanel;
@@ -767,12 +768,13 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 							   boolean _automaticChangeViews )
 	{
 		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
+		DisparityToColorPointCloud.CloudArrays cloud = new DisparityToColorPointCloud.CloudArrays();
 		double baseline = motion.getT().norm();
 		int disparityMin = controls.controlDisparity.getDisparityMin();
 		int disparityRange = controls.controlDisparity.getDisparityRange();
 
 		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), disparityMin, disparityRange);
-		d2c.process(disparity,left);
+		d2c.process(disparity, UtilDisparitySwing.wrap(left),cloud);
 
 		CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(rectifiedK,disparity.width,disparity.height,null);
 
@@ -781,7 +783,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		if( _automaticChangeViews ) // snape back to home position
 			pcv.setCameraToWorld(new Se3_F64());
 		pcv.clearPoints();
-		pcv.addCloud(d2c.getCloud(),d2c.getCloudColor());
+		pcv.addCloud(cloud.cloudXyz,cloud.cloudRgb);
 		pcv.setDotSize(1);
 		pcv.setTranslationStep(baseline/10);
 
