@@ -57,7 +57,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageGray<I>,D extends Imag
 										 InterpolateRectangle<I> interpInput,
 										 InterpolateRectangle<D> interpDeriv)
 	{
-		super(config, toleranceRL, templateRadius, pyramid , detector, gradient, interpInput, interpDeriv,
+		super(config, toleranceRL, templateRadius, false, pyramid , detector, gradient, interpInput, interpDeriv,
 				gradient.getDerivativeType().getImageClass());
 	}
 

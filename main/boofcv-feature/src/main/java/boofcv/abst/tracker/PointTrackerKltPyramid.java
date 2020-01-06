@@ -21,6 +21,7 @@ package boofcv.abst.tracker;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
+import boofcv.alg.tracker.PruneCloseTracks;
 import boofcv.alg.tracker.klt.*;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.struct.QueueCorner;
@@ -85,12 +86,16 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	// number of features tracked so far
 	private long totalFeatures = 0;
 
+	// Used to prune points close by
+	PruneCloseTracks<PyramidKltFeature> pruneClose;
+	List<PyramidKltFeature> closeDropped = new ArrayList<>();
+
 	/**
 	 * Constructor which specified the KLT track manager and how the image pyramids are computed.
-	 *
-	 * @param config KLT tracker configuration
+	 *  @param config KLT tracker configuration
 	 * @param toleranceFB Tolerance in pixels for right to left validation. Disable with a value less than 0.
 	 * @param templateRadius Radius of square templates that are tracked
+	 * @param performPruneClose If true it will prune tracks that are within the detection radius
 	 * @param pyramid The image pyramid which KLT is tracking inside of
 	 * @param detector Feature detector.   If null then no feature detector will be available and spawn won't work.
 	 * @param gradient Computes gradient image pyramid.
@@ -100,13 +105,13 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	 */
 	public PointTrackerKltPyramid(KltConfig config,
 								  double toleranceFB,
-								  int templateRadius ,
-								  PyramidDiscrete<I> pyramid,
+								  int templateRadius,
+								  boolean performPruneClose, PyramidDiscrete<I> pyramid,
 								  GeneralFeatureDetector<I, D> detector,
 								  ImageGradient<I, D> gradient,
 								  InterpolateRectangle<I> interpInput,
 								  InterpolateRectangle<D> interpDeriv,
-								  Class<D> derivType ) {
+								  Class<D> derivType) {
 
 		this.config = config;
 		this.toleranceFB = toleranceFB;
@@ -132,6 +137,21 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 				throw new IllegalArgumentException("Hessian based feature detectors not yet supported");
 
 			this.detector = detector;
+
+			if( performPruneClose ) {
+				pruneClose = new PruneCloseTracks<>(detector.getSearchRadius(), new PruneCloseTracks.TrackInfo<>() {
+					@Override
+					public void getLocation(PyramidKltFeature track, Point2D_F64 location) {
+						location.x = track.x;
+						location.y = track.y;
+					}
+
+					@Override
+					public long getID(PyramidKltFeature track) {
+						return ((PointTrackMod)track.cookie).featureId;
+					}
+				});
+			}
 		}
 	}
 
@@ -300,6 +320,15 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 			} else {
 				this.prevPyr.update(image);
 			}
+		}
+
+		// If configured to, drop features which are close by each other
+		if( pruneClose != null ) {
+			pruneClose.init(input.width,input.height);
+			pruneClose.process(active,closeDropped);
+			// TODO
+			active.removeAll(closeDropped);
+			dropped.addAll(closeDropped);
 		}
 	}
 

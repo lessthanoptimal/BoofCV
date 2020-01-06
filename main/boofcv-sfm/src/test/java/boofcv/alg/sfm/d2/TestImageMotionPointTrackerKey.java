@@ -166,6 +166,9 @@ public class TestImageMotionPointTrackerKey {
 		public void reset() {}
 
 		@Override
+		public long getFrameID() { return 0; }
+
+		@Override
 		public void process(GrayU8 image) {}
 
 		@Override

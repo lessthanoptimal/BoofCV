@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,7 +25,7 @@ package boofcv.alg.tracker.klt;
  */
 public class PyramidKltFeature {
 	/** KLT feature description for each layer in the pyramid */
-	public KltFeature desc[];
+	public KltFeature[] desc;
 	/** the feature's location in the original image */
 	public float x,y;
 

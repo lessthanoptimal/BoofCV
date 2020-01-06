@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -266,5 +266,9 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	 */
 	public void setSearchRadius( int radius ) {
 		extractor.setSearchRadius(radius);
+	}
+
+	public int getSearchRadius() {
+		return extractor.getSearchRadius();
 	}
 }

@@ -293,6 +293,9 @@ public class TestImageMotionPtkSmartRespawn {
 		public void reset() {}
 
 		@Override
+		public long getFrameID() { return 0; }
+
+		@Override
 		public void dropAllTracks() {}
 
 		@Override

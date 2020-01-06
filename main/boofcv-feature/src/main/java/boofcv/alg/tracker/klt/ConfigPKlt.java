@@ -43,6 +43,12 @@ public class ConfigPKlt implements Configuration
 	/** Scale factor for each layer in the pyramid */
 	public int pyramidScaling[] = new int[]{1,2,4};
 
+	/**
+	 * If true it will prune tracks which come too close to each other. The default behavior is to
+	 * prune tracks will higher feature IDs.
+	 */
+	public boolean pruneClose=false;
+
 	public ConfigPKlt() {
 	}
 

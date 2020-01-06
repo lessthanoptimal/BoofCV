@@ -26,8 +26,7 @@ import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -219,6 +218,11 @@ class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 		// one last time for good measure
 		alg.process(image);
 		assertTrue(alg.getActiveTracks(null).size() > originalTotal*0.8 );
+	}
+
+	@Test
+	void pruneClose() {
+		fail("Implement");
 	}
 
 	/**

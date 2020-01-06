@@ -228,6 +228,7 @@ public class TrackerPointControlPanel
 		private int pyramidLevels = 4;
 
 		private JSpinner spinnerLevels = spinner(pyramidLevels,1,20,1);
+		private JCheckBox checkPruneClose = checkbox("Prune Close", klt.pruneClose);
 		private JSpinner spinnerIterations = spinner(klt.config.maxIterations,1,500,1);
 		private JSpinner spinnerMaxError = spinner(klt.config.maxPerPixelError,0.0,255.0,5.0);
 		private JSpinner spinnerDescRadius = spinner(klt.templateRadius,1,100,1);
@@ -240,6 +241,7 @@ public class TrackerPointControlPanel
 			klt.pyramidScaling = createLevels();
 
 			addLabeled(spinnerLevels,"Pyr. Levels");
+			addAlignLeft(checkPruneClose);
 			addLabeled(spinnerIterations,"Max Iter.");
 			addLabeled(spinnerMaxError,"Max Error");
 			addLabeled(spinnerDetectThresh,"Detect Thresh");
@@ -260,7 +262,10 @@ public class TrackerPointControlPanel
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-
+			if( e.getSource() == checkPruneClose ) {
+				klt.pruneClose = checkPruneClose.isSelected();
+				listener.handleAlgorithmUpdated();
+			}
 		}
 
 		@Override

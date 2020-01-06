@@ -20,6 +20,7 @@ package boofcv.alg.sfm.d2;
 
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.tracker.PruneCloseTracks;
 import boofcv.struct.ImageRectangle_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
@@ -43,7 +44,7 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase<I>, IT extends Inver
 	private ImageMotionPointTrackerKey<I,IT> motion;
 
 	// used to prune feature tracks which are too close together
-	protected PruneCloseTracks pruneClose = new PruneCloseTracks(3,1,1);
+	protected PruneCloseTracks<PointTrack> pruneClose = PruneCloseTracks.prunePointTrack(3);
 
 	// stores list of tracks to prune
 	private List<PointTrack> prune = new ArrayList<>();
@@ -131,7 +132,7 @@ public class ImageMotionPtkSmartRespawn<I extends ImageBase<I>, IT extends Inver
 	}
 
 	private void pruneClosePoints(PointTracker<I> tracker, int width, int height) {
-		pruneClose.resize(width,height);
+		pruneClose.init(width,height);
 		// prune some of the ones which are too close
 		prune.clear();
 		pruneClose.process(tracker.getActiveTracks(null),prune);
