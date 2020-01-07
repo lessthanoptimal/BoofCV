@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.abst.sfm.d2;
 
-import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.sfm.AccessPointTracks;
+import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.sfm.d2.AssociatedPairTrack;
 import boofcv.alg.sfm.d2.ImageMotionPtkSmartRespawn;
 import boofcv.struct.image.ImageBase;

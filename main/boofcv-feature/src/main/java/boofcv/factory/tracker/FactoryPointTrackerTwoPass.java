@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.factory.feature.tracker;
+package boofcv.factory.tracker;
 
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.tracker.*;
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.abst.tracker.*;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
@@ -36,7 +36,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
-import static boofcv.factory.feature.tracker.FactoryPointTracker.createShiTomasi;
+import static boofcv.factory.tracker.FactoryPointTracker.createShiTomasi;
 
 /**
  * @author Peter Abeles

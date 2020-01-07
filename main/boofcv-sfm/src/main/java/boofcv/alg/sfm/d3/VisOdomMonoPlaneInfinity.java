@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.sfm.d3;
 
-import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.abst.tracker.PointTrack;
+import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.sfm.overhead.CameraPlaneProjection;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeBrown;

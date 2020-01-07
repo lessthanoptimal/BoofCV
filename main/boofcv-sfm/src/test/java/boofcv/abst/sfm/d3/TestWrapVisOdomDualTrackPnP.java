@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,11 +20,11 @@ package boofcv.abst.sfm.d3;
 
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
+import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayF32;
 
 /**

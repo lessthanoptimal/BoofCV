@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,25 +16,25 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.tracker;
-
-import georegression.struct.point.Point2D_F64;
+package boofcv.abst.tracker;
 
 /**
- * TODO Fill out comments
+ * Configuration for {@link DetectDescribeAssociate}
  *
  * @author Peter Abeles
  */
-public interface TrackGeometryManager<Model,Info> {
+public class ConfigTrackerDda {
+	/**
+	 * Update the description each time its successfully matched?
+	 */
+	public boolean updateDescription = false;
+	/**
+	 * If there are more than this number of unused tracks they will be randomly discarded.
+	 */
+	public int maxUnusedTracks=500;
 
 	/**
-	 *
-	 * @param track
-	 * @return true to keep track and false to drop track
+	 * Random seed
 	 */
-	public boolean handleSpawnedTrack(PointTrack track);
-
-	public Info extractGeometry( PointTrack track );
-
-	public void predict( Model model , PointTrack track , Point2D_F64 prediction );
+	public long seed=0xDEADBEEF;
 }

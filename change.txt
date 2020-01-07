@@ -10,9 +10,11 @@ Version : 0.36
   * TODO If stable release, fail uploadArchives if dirty
 - Starting to use Java 11 syntax (e.g. var) but still will produce Java 1.8 byte code
   https://github.com/bsideup/jabel
+- Added Project Lombok for auto generating setters/getters
 - Image Processing
   * Fixed ImageDistort crashing if an invalid region is specified. It simply does nothing now.
-- Added Project Lombok for auto generating setters/getters
+- Moved KLT from boofcv-geo to boofcv-feature
+  * No idea what it was doing in geo originally but it didn't belong there!
 - Scene Reconstruction
   * Better cropping on rectified image using bounding box instead of rotation matrix
   * TODO try improving 3-view by estimating lens distortion in projective camera

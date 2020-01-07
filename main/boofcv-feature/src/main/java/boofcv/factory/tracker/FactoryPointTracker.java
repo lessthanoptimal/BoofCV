@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.factory.feature.tracker;
+package boofcv.factory.tracker;
 
 import boofcv.abst.feature.associate.*;
 import boofcv.abst.feature.describe.ConfigSurfDescribe;
@@ -33,8 +33,8 @@ import boofcv.abst.feature.orientation.ConfigAverageIntegral;
 import boofcv.abst.feature.orientation.ConfigSlidingIntegral;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
-import boofcv.abst.feature.tracker.*;
 import boofcv.abst.filter.derivative.ImageGradient;
+import boofcv.abst.tracker.*;
 import boofcv.alg.feature.associate.AssociateSurfBasic;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.DescribePointPixelRegionNCC;
@@ -62,7 +62,6 @@ import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.*;
 import boofcv.struct.image.ImageGray;
@@ -74,7 +73,7 @@ import java.util.Random;
 
 
 /**
- * Factory for creating trackers which implement {@link boofcv.abst.feature.tracker.PointTracker}.  These trackers
+ * Factory for creating trackers which implement {@link boofcv.abst.tracker.PointTracker}.  These trackers
  * are intended for use in SFM applications.  Some features which individual trackers can provide are lost when
  * using the high level interface {@link PointTracker}.  To create low level tracking algorithms see
  * {@link FactoryTrackerAlg}
@@ -99,7 +98,7 @@ public class FactoryPointTracker {
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	PointTracker<I> klt(int scaling[], ConfigGeneralDetector configExtract, int featureRadius,
-							 Class<I> imageType, Class<D> derivType) {
+						Class<I> imageType, Class<D> derivType) {
 		PkltConfig config = new PkltConfig();
 		config.pyramidScaling = scaling;
 		config.templateRadius = featureRadius;
@@ -149,7 +148,7 @@ public class FactoryPointTracker {
 	 * of SURF.
 	 *
 	 * @see DescribePointSurf
-	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
+	 * @see boofcv.abst.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configDetector Configuration for SURF detector
 	 * @param configDescribe Configuration for SURF descriptor
@@ -184,7 +183,7 @@ public class FactoryPointTracker {
 	 * of SURF.
 	 *
 	 * @see DescribePointSurf
-	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
+	 * @see boofcv.abst.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configDetector Configuration for SURF detector
 	 * @param configDescribe Configuration for SURF descriptor
@@ -219,7 +218,7 @@ public class FactoryPointTracker {
 	 *
 	 * @see ShiTomasiCornerIntensity
 	 * @see DescribePointBrief
-	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
+	 * @see boofcv.abst.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param maxAssociationError Maximum allowed association error.  Try 200.
 	 * @param configExtract Configuration for extracting features
@@ -256,7 +255,7 @@ public class FactoryPointTracker {
 	 *
 	 * @see FastCornerDetector
 	 * @see DescribePointBrief
-	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
+	 * @see boofcv.abst.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configFast Configuration for FAST detector
 	 * @param configExtract Configuration for extracting features
@@ -292,7 +291,7 @@ public class FactoryPointTracker {
 	 *
 	 * @see ShiTomasiCornerIntensity
 	 * @see DescribePointPixelRegionNCC
-	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
+	 * @see boofcv.abst.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configExtract Configuration for extracting features
 	 * @param describeRadius Radius of the region being described.  Try 2.
@@ -373,7 +372,7 @@ public class FactoryPointTracker {
 	 * Creates a tracker which detects Fast-Hessian features, describes them with SURF, nominally tracks them using KLT.
 	 *
 	 * @see DescribePointSurf
-	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
+	 * @see boofcv.abst.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param kltConfig Configuration for KLT tracker
 	 * @param reactivateThreshold Tracks are reactivated after this many have been dropped.  Try 10% of maxMatches
@@ -409,7 +408,7 @@ public class FactoryPointTracker {
 	 *
 	 * @see ShiTomasiCornerIntensity
 	 * @see DescribePointSurf
-	 * @see boofcv.abst.feature.tracker.DdaManagerDetectDescribePoint
+	 * @see boofcv.abst.tracker.DdaManagerDetectDescribePoint
 	 *
 	 * @param configExtract Configuration for extracting features
 	 * @param kltConfig Configuration for KLT

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,22 +16,21 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.tracker;
+package boofcv.abst.tracker;
 
 import boofcv.abst.feature.associate.AssociateDescTo2D;
 import boofcv.abst.feature.associate.AssociateDescription2D;
 import boofcv.abst.feature.associate.ScoreAssociateHamming_B;
+import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.WrapDescribeBrief;
-import boofcv.abst.feature.detdesc.DetectDescribeFusion;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
+import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
-import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.GrayF32;
@@ -42,9 +41,9 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestDdaManagerDetectDescribePoint extends StandardPointTracker<GrayF32> {
+public class TestDdaManagerGeneralPoint extends StandardPointTracker<GrayF32> {
 
-	public TestDdaManagerDetectDescribePoint() {
+	public TestDdaManagerGeneralPoint() {
 		super(true, false);
 	}
 
@@ -52,24 +51,25 @@ public class TestDdaManagerDetectDescribePoint extends StandardPointTracker<Gray
 	public PointTracker<GrayF32> createTracker() {
 		DescribePointBrief<GrayF32> brief =
 				FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
-				FactoryBlurFilter.gaussian(ImageType.single(GrayF32.class), 0, 4));
+						FactoryBlurFilter.gaussian(ImageType.single(GrayF32.class), 0, 4));
 
 		GeneralFeatureDetector<GrayF32,GrayF32> corner =
-				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(100,2,0,0,true), null, GrayF32.class);
+				FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(-1,2, 0), null, GrayF32.class);
 
-		InterestPointDetector<GrayF32> detector =
-				FactoryInterestPoint.wrapPoint(corner, 1,GrayF32.class, GrayF32.class);
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
 				new AssociateDescTo2D<>(FactoryAssociation.greedy(score, 400, true));
 
-		DetectDescribeFusion<GrayF32,TupleDesc_B> fused =
-				new DetectDescribeFusion<>(
-						detector, null, new WrapDescribeBrief<>(brief, GrayF32.class));
+		DescribeRegionPoint<GrayF32,TupleDesc_B> describe =
+				new WrapDescribeBrief<>(brief,GrayF32.class);
 
-		DdaManagerDetectDescribePoint<GrayF32,TupleDesc_B> manager;
-		manager = new DdaManagerDetectDescribePoint<>(fused);
+		EasyGeneralFeatureDetector<GrayF32,GrayF32> easy = new
+				EasyGeneralFeatureDetector<>(corner, GrayF32.class, GrayF32.class);
+
+		DdaManagerGeneralPoint<GrayF32,GrayF32,TupleDesc_B> manager;
+		manager = new DdaManagerGeneralPoint<>(easy, describe, 2);
+
 		DetectDescribeAssociate<GrayF32,TupleDesc_B> tracker =
 				new DetectDescribeAssociate<>(manager, association, new ConfigTrackerDda());
 		return tracker;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.tracker;
+package boofcv.abst.tracker;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.tracker.klt.*;
-import boofcv.factory.feature.tracker.FactoryPointTracker;
+import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 

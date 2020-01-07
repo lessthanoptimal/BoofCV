@@ -1,6 +1,5 @@
 dependencies {
     api project(':main:boofcv-ip')
-    api project(':main:boofcv-feature')
 
     testImplementation project(':integration:boofcv-swing')
 }
