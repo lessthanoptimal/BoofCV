@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.AssociatedTriple;
 import georegression.geometry.UtilVector3D_F64;
+import georegression.metric.Area2D_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.GeoTuple3D_F64;
 import georegression.struct.point.*;
@@ -936,5 +937,41 @@ public class PerspectiveOps {
 			P.data[row0] = P.data[row0]*sx + tx*P.data[row2];
 			P.data[row1] = P.data[row1]*sy + ty*P.data[row2];
 		}
+	}
+
+	/**
+	 * <p>Computes the cross-ratio (invariant for projective transform) using 5 coplanar points.</p>
+	 *
+	 * <p>cross ratio = P(1,2,3)*P(1,4,5)/(P(1,2,4)*P(1,3,5))<br>
+	 * where P() is the area of a triangle defined by the 3 points.</p>
+	 *
+	 * <p>NOTE: Perspective and projective transforms are the same thing</p>
+	 *
+	 * <p>Nakai, Tomohiro, Koichi Kise, and Masakazu Iwamura.
+	 * "Hashing with local combinations of feature points and its application to camera-based document
+	 * image retrieval." Proc. CBDAR05 (2005): 87-94.</p>
+	 */
+	public static double invariantProjective(Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3, Point2D_F64 p4, Point2D_F64 p5 )
+	{
+		double a = Area2D_F64.triangle(p1,p2,p3);
+		double b = Area2D_F64.triangle(p1,p4,p5);
+		double c = Area2D_F64.triangle(p1,p2,p4);
+		double d = Area2D_F64.triangle(p1,p3,p5);
+
+		return (a*b)/(c*d);
+	}
+
+	/**
+	 * <p>Computes an invariant under affine distortion using 4 coplanar points.</p>
+	 *
+	 * <p>invariant = P(1,3,4)/P(1,2,3)<br>
+	 * where P() is the area of a triangle defined by the 3 points.</p>
+	 */
+	public static double invariantAffine(Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3, Point2D_F64 p4)
+	{
+		double a = Area2D_F64.triangle(p1,p3,p4);
+		double b = Area2D_F64.triangle(p1,p2,p3);
+
+		return a/b;
 	}
 }

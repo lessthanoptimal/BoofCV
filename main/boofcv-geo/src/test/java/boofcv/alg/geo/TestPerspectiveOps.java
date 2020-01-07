@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,11 +30,16 @@ import georegression.geometry.ConvertRotation3D_F64;
 import georegression.geometry.GeometryMath_F64;
 import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
+import georegression.struct.affine.Affine2D_F64;
+import georegression.struct.homography.Homography2D_F64;
+import georegression.struct.homography.UtilHomography_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.transform.affine.AffinePointOps_F64;
+import georegression.transform.homography.HomographyPointOps_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix3x3;
@@ -589,5 +594,56 @@ class TestPerspectiveOps {
 		PerspectiveOps.inplaceAdjustCameraMatrix(sx,sy,tx,ty,P);
 
 		assertTrue(MatrixFeatures_DDRM.isIdentical(expected,P, UtilEjml.TEST_F64));
+	}
+
+	@Test
+	void invariantProjective() {
+		// Could probably just create an arbitrary H, but this is more realistic
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,1,0.3,null);
+		DMatrixRMaj K = new DMatrixRMaj(new double[][]{{500,0,500},{0,500,500},{0,0,1}});
+		DMatrixRMaj H = MultiViewOps.createHomography(R,new Vector3D_F64(-0.6,1.1,0.0),1,new Vector3D_F64(0,0,1),K);
+		Homography2D_F64 homography = UtilHomography_F64.convert(H,null);
+
+		var points = new ArrayList<Point2D_F64>();
+		points.add( new Point2D_F64(6,9));
+		points.add( new Point2D_F64(8,0));
+		points.add( new Point2D_F64(0,20));
+		points.add( new Point2D_F64(10,16));
+		points.add( new Point2D_F64(12,6.5));
+
+		double expected = PerspectiveOps.invariantProjective(
+				points.get(0),points.get(1),points.get(2),points.get(3),points.get(4));
+
+		for( var p : points ) {
+			HomographyPointOps_F64.transform(homography,p.x,p.y,p);
+		}
+
+		double found = PerspectiveOps.invariantProjective(
+				points.get(0),points.get(1),points.get(2),points.get(3),points.get(4));
+
+		// if this is really an invariant it should be identical
+		assertEquals(expected, found, UtilEjml.TEST_F64_SQ);
+	}
+
+	@Test
+	void invariantAffine() {
+		var affine = new Affine2D_F64(0.9,0.2,-0.1,1.1,-0.4,10);
+
+		var points = new ArrayList<Point2D_F64>();
+		points.add( new Point2D_F64(6,9));
+		points.add( new Point2D_F64(8,0));
+		points.add( new Point2D_F64(0,20));
+		points.add( new Point2D_F64(10,16));
+
+		double expected = PerspectiveOps.invariantAffine(points.get(0),points.get(1),points.get(2),points.get(3));
+
+		for( var p : points ) {
+			AffinePointOps_F64.transform(affine,p.x,p.y,p);
+		}
+
+		double found = PerspectiveOps.invariantAffine(points.get(0),points.get(1),points.get(2),points.get(3));
+
+		// if this is really an invariant it should be identical
+		assertEquals(expected, found, UtilEjml.TEST_F64_SQ);
 	}
 }
