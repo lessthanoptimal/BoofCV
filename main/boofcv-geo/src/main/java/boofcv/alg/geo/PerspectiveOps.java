@@ -714,41 +714,6 @@ public class PerspectiveOps {
 	public static double computeVFov(CameraPinhole intrinsic) {
 		return 2*Math.atan((intrinsic.height/2)/intrinsic.fy);
 	}
-
-	/**
-	 * Computes the cross-ratio between 4 points. This is an invariant under projective geometry.
-	 * @param a0 Point
-	 * @param a1 Point
-	 * @param a2 Point
-	 * @param a3 Point
-	 * @return cross ratio
-	 */
-	public static double crossRatios( Point3D_F64 a0 , Point3D_F64 a1 , Point3D_F64 a2 , Point3D_F64 a3) {
-		double d01 = a0.distance(a1);
-		double d23 = a2.distance(a3);
-		double d02 = a0.distance(a2);
-		double d13 = a1.distance(a3);
-
-		return (d01*d23)/(d02*d13);
-	}
-
-	/**
-	 * Computes the cross-ratio between 4 points. This is an invariant under projective geometry.
-	 * @param a0 Point
-	 * @param a1 Point
-	 * @param a2 Point
-	 * @param a3 Point
-	 * @return cross ratio
-	 */
-	public static double crossRatios( Point2D_F64 a0 , Point2D_F64 a1 , Point2D_F64 a2 , Point2D_F64 a3) {
-		double d01 = a0.distance(a1);
-		double d23 = a2.distance(a3);
-		double d02 = a0.distance(a2);
-		double d13 = a1.distance(a3);
-
-		return (d01*d23)/(d02*d13);
-	}
-
 	/**
 	 * Converts the SE3 into  a 3x4 matrix. [R|T]
 	 * @param m (Input) transform
@@ -940,6 +905,41 @@ public class PerspectiveOps {
 	}
 
 	/**
+	 * Computes the cross-ratio between 4 points that lie along a line. This is an invariant under projective geometry.
+	 * @param a0 Unique point on a line
+	 * @param a1 Unique point on a line
+	 * @param a2 Unique point on a line
+	 * @param a3 Unique point on a line
+	 * @return cross ratio
+	 */
+	public static double invariantCrossLine( Point3D_F64 a0 , Point3D_F64 a1 , Point3D_F64 a2 , Point3D_F64 a3) {
+		double d01 = a0.distance(a1);
+		double d23 = a2.distance(a3);
+		double d02 = a0.distance(a2);
+		double d13 = a1.distance(a3);
+
+		return (d01*d23)/(d02*d13);
+	}
+
+	/**
+	 * Computes the cross-ratio between 4 points that lie along a line. This is an invariant under projective geometry.
+	 * @param a0 Unique point on a line
+	 * @param a1 Unique point on a line
+	 * @param a2 Unique point on a line
+	 * @param a3 Unique point on a line
+	 * @return cross ratio
+	 */
+	public static double invariantCrossLine( Point2D_F64 a0 , Point2D_F64 a1 , Point2D_F64 a2 , Point2D_F64 a3) {
+		double d01 = a0.distance(a1);
+		double d23 = a2.distance(a3);
+		double d02 = a0.distance(a2);
+		double d13 = a1.distance(a3);
+
+		return (d01*d23)/(d02*d13);
+	}
+
+
+	/**
 	 * <p>Computes the cross-ratio (invariant for projective transform) using 5 coplanar points.</p>
 	 *
 	 * <p>cross ratio = P(1,2,3)*P(1,4,5)/(P(1,2,4)*P(1,3,5))<br>
@@ -951,7 +951,7 @@ public class PerspectiveOps {
 	 * "Hashing with local combinations of feature points and its application to camera-based document
 	 * image retrieval." Proc. CBDAR05 (2005): 87-94.</p>
 	 */
-	public static double invariantProjective(Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3, Point2D_F64 p4, Point2D_F64 p5 )
+	public static double invariantCrossRatio(Point2D_F64 p1, Point2D_F64 p2, Point2D_F64 p3, Point2D_F64 p4, Point2D_F64 p5 )
 	{
 		double a = Area2D_F64.triangle(p1,p2,p3);
 		double b = Area2D_F64.triangle(p1,p4,p5);

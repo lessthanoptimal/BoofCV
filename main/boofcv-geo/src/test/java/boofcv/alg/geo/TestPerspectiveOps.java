@@ -38,6 +38,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
+import georegression.struct.se.SpecialEuclideanOps_F64;
 import georegression.transform.affine.AffinePointOps_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -597,7 +598,63 @@ class TestPerspectiveOps {
 	}
 
 	@Test
-	void invariantProjective() {
+	void invariantCrossLine_2D() {
+		// Could probably just create an arbitrary H, but this is more realistic
+		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,1,0.3,null);
+		DMatrixRMaj K = new DMatrixRMaj(new double[][]{{500,0,500},{0,500,500},{0,0,1}});
+		DMatrixRMaj H = MultiViewOps.createHomography(R,new Vector3D_F64(-0.6,1.1,0.0),1,new Vector3D_F64(0,0,1),K);
+		Homography2D_F64 homography = UtilHomography_F64.convert(H,null);
+
+		var points = new ArrayList<Point2D_F64>();
+		double x0 = 4, y0 = 10;
+		double dx = 1.5, dy = 3.6;
+		points.add( new Point2D_F64(x0,y0));
+		points.add( new Point2D_F64(x0+10*dx,y0+10*dy));
+		points.add( new Point2D_F64(x0+30*dx,y0+30*dy));
+		points.add( new Point2D_F64(x0+40*dx,y0+40*dy));
+
+		double expected = PerspectiveOps.invariantCrossLine(
+				points.get(0),points.get(1),points.get(2),points.get(3));
+
+		for( var p : points ) {
+			HomographyPointOps_F64.transform(homography,p.x,p.y,p);
+		}
+
+		double found = PerspectiveOps.invariantCrossLine(
+				points.get(0),points.get(1),points.get(2),points.get(3));
+
+		// if this is really an invariant it should be identical
+		assertEquals(expected, found, UtilEjml.TEST_F64_SQ);
+	}
+
+	@Test
+	void invariantCrossLine_3D() {
+		Se3_F64 motion = SpecialEuclideanOps_F64.eulerXyz(10,15,-8,0.1,-0.05,0.9,null);
+
+		var points = new ArrayList<Point3D_F64>();
+		double x0 = 4, y0 = 10, z0 = 40;
+		double dx = 1.5, dy = 3.6, dz = 0.1;
+		points.add( new Point3D_F64(x0,y0,z0));
+		points.add( new Point3D_F64(x0+10*dx,y0+10*dy,z0 + 10+dz));
+		points.add( new Point3D_F64(x0+30*dx,y0+30*dy,z0 + 30+dz));
+		points.add( new Point3D_F64(x0+40*dx,y0+40*dy,z0 + 40+dz));
+
+		double expected = PerspectiveOps.invariantCrossLine(
+				points.get(0),points.get(1),points.get(2),points.get(3));
+
+		for( var p : points ) {
+			SePointOps_F64.transform(motion,p,p);
+		}
+
+		double found = PerspectiveOps.invariantCrossLine(
+				points.get(0),points.get(1),points.get(2),points.get(3));
+
+		// if this is really an invariant it should be identical
+		assertEquals(expected, found, UtilEjml.TEST_F64_SQ);
+	}
+
+	@Test
+	void invariantCrossRatio() {
 		// Could probably just create an arbitrary H, but this is more realistic
 		DMatrixRMaj R = ConvertRotation3D_F64.eulerToMatrix(EulerType.XYZ,0.1,1,0.3,null);
 		DMatrixRMaj K = new DMatrixRMaj(new double[][]{{500,0,500},{0,500,500},{0,0,1}});
@@ -611,14 +668,14 @@ class TestPerspectiveOps {
 		points.add( new Point2D_F64(10,16));
 		points.add( new Point2D_F64(12,6.5));
 
-		double expected = PerspectiveOps.invariantProjective(
+		double expected = PerspectiveOps.invariantCrossRatio(
 				points.get(0),points.get(1),points.get(2),points.get(3),points.get(4));
 
 		for( var p : points ) {
 			HomographyPointOps_F64.transform(homography,p.x,p.y,p);
 		}
 
-		double found = PerspectiveOps.invariantProjective(
+		double found = PerspectiveOps.invariantCrossRatio(
 				points.get(0),points.get(1),points.get(2),points.get(3),points.get(4));
 
 		// if this is really an invariant it should be identical
