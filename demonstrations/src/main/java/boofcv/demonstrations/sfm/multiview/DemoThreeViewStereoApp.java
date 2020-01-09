@@ -25,6 +25,7 @@ import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.cloud.DisparityToColorPointCloud;
+import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.feature.associate.AssociateThreeByPairs;
@@ -768,7 +769,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 							   boolean _automaticChangeViews )
 	{
 		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
-		DisparityToColorPointCloud.CloudArrays cloud = new DisparityToColorPointCloud.CloudArrays();
+		PointCloudWriter.CloudArraysF32 cloud = new PointCloudWriter.CloudArraysF32();
 		double baseline = motion.getT().norm();
 		int disparityMin = controls.controlDisparity.getDisparityMin();
 		int disparityRange = controls.controlDisparity.getDisparityRange();

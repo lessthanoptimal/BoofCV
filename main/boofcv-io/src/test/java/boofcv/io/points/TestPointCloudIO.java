@@ -18,6 +18,7 @@
 
 package boofcv.io.points;
 
+import boofcv.alg.cloud.PointCloudReader;
 import boofcv.io.points.PointCloudIO.Format;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
@@ -48,7 +49,7 @@ class TestPointCloudIO {
 			found.grow().set(1,1,1);
 
 			Writer writer = new StringWriter();
-			PointCloudIO.save3D(f,PointCloudReader.wrapF32(expected),false,writer);
+			PointCloudIO.save3D(f, PointCloudReader.wrapF32(expected),false,writer);
 			InputStream input = new ByteArrayInputStream(writer.toString().getBytes());
 			PointCloudIO.load3D32F(f,input,found);
 

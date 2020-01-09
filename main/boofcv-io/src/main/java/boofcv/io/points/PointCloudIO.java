@@ -18,6 +18,8 @@
 
 package boofcv.io.points;
 
+import boofcv.alg.cloud.PointCloudReader;
+import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.io.points.impl.PlyCodec;
 import boofcv.struct.Point3dRgbI_F64;
 import georegression.struct.point.Point3D_F32;
@@ -36,7 +38,7 @@ import java.io.Writer;
  */
 public class PointCloudIO {
 
-	public static void save3D(Format format, PointCloudReader cloud , boolean saveRGB,  Writer writer ) throws IOException {
+	public static void save3D(Format format, PointCloudReader cloud , boolean saveRGB, Writer writer ) throws IOException {
 		switch( format ) {
 			case PLY_ASCII:
 				PlyCodec.saveAscii(cloud, saveRGB, writer);

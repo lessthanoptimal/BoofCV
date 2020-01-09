@@ -16,13 +16,15 @@
  * limitations under the License.
  */
 
-package boofcv.io.points;
+package boofcv.alg.cloud;
 
 import boofcv.struct.Point3dRgbI_F32;
 import boofcv.struct.Point3dRgbI_F64;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.GrowQueue_I32;
 
 /**
  * Interface for reading a point cloud
@@ -35,6 +37,35 @@ public interface PointCloudWriter {
 	void add( double x , double y , double z );
 
 	void add( double x , double y , double z , int rgb );
+
+	class CloudArraysF32 implements PointCloudWriter {
+		// Storage for point cloud
+		public GrowQueue_F32 cloudXyz = new GrowQueue_F32();
+		public GrowQueue_I32 cloudRgb = new GrowQueue_I32();
+
+		@Override
+		public void init(int estimatedSize) {
+			cloudRgb.setMaxSize(estimatedSize);
+			cloudXyz.setMaxSize(estimatedSize*3);
+			cloudRgb.reset();
+			cloudXyz.reset();
+		}
+
+		@Override
+		public void add(double x, double y, double z) {
+			cloudXyz.add((float)x);
+			cloudXyz.add((float)y);
+			cloudXyz.add((float)z);
+		}
+
+		@Override
+		public void add(double x, double y, double z, int rgb) {
+			cloudXyz.add((float)x);
+			cloudXyz.add((float)y);
+			cloudXyz.add((float)z);
+			cloudRgb.add(rgb);
+		}
+	}
 
 	static PointCloudWriter wrapF32(FastQueue<Point3D_F32> cloud) {
 		return new PointCloudWriter() {

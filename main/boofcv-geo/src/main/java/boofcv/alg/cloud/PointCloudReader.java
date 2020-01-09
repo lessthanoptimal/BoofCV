@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.io.points;
+package boofcv.alg.cloud;
 
 import boofcv.struct.Point3dRgbI_F32;
 import boofcv.struct.Point3dRgbI_F64;

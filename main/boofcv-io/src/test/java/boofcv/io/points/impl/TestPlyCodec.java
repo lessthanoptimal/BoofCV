@@ -18,8 +18,8 @@
 
 package boofcv.io.points.impl;
 
-import boofcv.io.points.PointCloudReader;
-import boofcv.io.points.PointCloudWriter;
+import boofcv.alg.cloud.PointCloudReader;
+import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.struct.Point3dRgbI_F64;
 import georegression.struct.point.Point3D_F64;
 import org.ddogleg.struct.FastQueue;

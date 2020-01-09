@@ -20,6 +20,7 @@ package boofcv.examples.stereo;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.cloud.DisparityToColorPointCloud;
+import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -293,7 +294,7 @@ public class ExampleStereoTwoViewsOneCamera {
 									  int disparityMin, int disparityRange)
 	{
 		DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
-		DisparityToColorPointCloud.CloudArrays cloud = new DisparityToColorPointCloud.CloudArrays();
+		PointCloudWriter.CloudArraysF32 cloud = new PointCloudWriter.CloudArraysF32();
 
 		double baseline = motion.getT().norm();
 		d2c.configure(baseline, rectifiedK, rectifiedR, new DoNothing2Transform2_F64(), disparityMin, disparityRange);

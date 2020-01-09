@@ -18,12 +18,12 @@
 
 package boofcv.gui;
 
+import boofcv.alg.cloud.PointCloudReader;
 import boofcv.core.image.ConvertImage;
 import boofcv.gui.dialogs.OpenImageSetDialog;
 import boofcv.io.image.ConvertImageMisc;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.points.PointCloudIO;
-import boofcv.io.points.PointCloudReader;
 import boofcv.struct.Point3dRgbI_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU16;

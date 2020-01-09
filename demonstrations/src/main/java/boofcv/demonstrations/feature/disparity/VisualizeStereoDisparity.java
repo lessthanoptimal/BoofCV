@@ -20,6 +20,7 @@ package boofcv.demonstrations.feature.disparity;
 
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.cloud.DisparityToColorPointCloud;
+import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -302,7 +303,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 			if( !computedCloud ) {
 				computedCloud = true;
 				DisparityToColorPointCloud d2c = new DisparityToColorPointCloud();
-				DisparityToColorPointCloud.CloudArrays cloud = new DisparityToColorPointCloud.CloudArrays();
+				PointCloudWriter.CloudArraysF32 cloud = new PointCloudWriter.CloudArraysF32();
 
 				double baseline = calib.getRightToLeft().getT().norm();
 				d2c.configure(baseline, rectK,rectR, leftRectToPixel, disparityMin,disparityRange);

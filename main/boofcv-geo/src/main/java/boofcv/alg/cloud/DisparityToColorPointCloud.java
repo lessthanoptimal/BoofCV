@@ -27,8 +27,6 @@ import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F32;
 import georegression.struct.shapes.Rectangle2D_I32;
-import org.ddogleg.struct.GrowQueue_F32;
-import org.ddogleg.struct.GrowQueue_I32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
@@ -108,8 +106,7 @@ public class DisparityToColorPointCloud {
 	 * @param disparity Disparity image
 	 * @param color Color image of left camera
 	 */
-	public void process(ImageGray disparity , ColorImage color , Cloud output ) {
-
+	public void process(ImageGray disparity , ColorImage color , PointCloudWriter output ) {
 
 		if( disparity instanceof GrayU8)
 			process((GrayU8)disparity, color, output);
@@ -117,7 +114,7 @@ public class DisparityToColorPointCloud {
 			process((GrayF32)disparity, color, output);
 	}
 
-	private void process(GrayU8 disparity , ColorImage color , Cloud output ) {
+	private void process(GrayU8 disparity , ColorImage color , PointCloudWriter output ) {
 
 		final int x0 = Math.max(roi.x0,0);
 		final int y0 = Math.max(roi.y0,0);
@@ -153,7 +150,7 @@ public class DisparityToColorPointCloud {
 		}
 	}
 
-	private void process(GrayF32 disparity , ColorImage color , Cloud output) {
+	private void process(GrayF32 disparity , ColorImage color , PointCloudWriter output) {
 
 		final int x0 = Math.max(roi.x0,0);
 		final int y0 = Math.max(roi.y0,0);
@@ -208,42 +205,6 @@ public class DisparityToColorPointCloud {
 
 	public void clearRegionOfInterest() {
 		roi.set(-1,-1,Integer.MAX_VALUE,Integer.MAX_VALUE);
-	}
-
-	public static class CloudArrays implements Cloud {
-		// Storage for point cloud
-		public GrowQueue_F32 cloudXyz = new GrowQueue_F32();
-		public GrowQueue_I32 cloudRgb = new GrowQueue_I32();
-
-		@Override
-		public void init(int width, int height) {
-			cloudRgb.setMaxSize(width*height);
-			cloudXyz.setMaxSize(width*height*3);
-			cloudRgb.reset();
-			cloudXyz.reset();
-		}
-
-		@Override
-		public void add(float x, float y, float z) {
-
-		}
-
-		@Override
-		public void add(float x, float y, float z, int rgb) {
-
-		}
-	}
-
-	/**
-	 * Interface for saving the computed cloud
-	 */
-	public interface Cloud {
-		/**
-		 * Resets the cloud to an empty state and tells it the size of the disparity image
-		 */
-		void init( int width , int height );
-		void add( float x , float y , float z );
-		void add( float x , float y , float z , int rgb );
 	}
 
 	/**

@@ -18,9 +18,9 @@
 
 package boofcv.io.points.impl;
 
+import boofcv.alg.cloud.PointCloudReader;
+import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.io.UtilIO;
-import boofcv.io.points.PointCloudReader;
-import boofcv.io.points.PointCloudWriter;
 import georegression.struct.point.Point3D_F64;
 
 import java.io.IOException;
