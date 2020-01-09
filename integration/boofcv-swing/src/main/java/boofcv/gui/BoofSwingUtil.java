@@ -521,7 +521,7 @@ public class BoofSwingUtil {
 			try {
 				var f = new File(file.getParent(),n);
 				var w = new FileWriter(f);
-				PointCloudIO.save3DRgb(PointCloudIO.Format.PLY_ASCII, PointCloudReader.wrapF64RGB(cloud.toList()),w);
+				PointCloudIO.save3D(PointCloudIO.Format.PLY_ASCII, PointCloudReader.wrapF64RGB(cloud.toList()), true, w);
 				w.close();
 			} catch (IOException e) {
 				e.printStackTrace();

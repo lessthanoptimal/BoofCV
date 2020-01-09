@@ -26,7 +26,7 @@ import org.ddogleg.struct.FastQueue;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
 import java.io.Writer;
 
 /**
@@ -36,10 +36,10 @@ import java.io.Writer;
  */
 public class PointCloudIO {
 
-	public static void save3D(Format format, PointCloudReader cloud , Writer writer ) throws IOException {
+	public static void save3D(Format format, PointCloudReader cloud , boolean saveRGB,  Writer writer ) throws IOException {
 		switch( format ) {
 			case PLY_ASCII:
-				PlyCodec.saveAscii(cloud, writer);
+				PlyCodec.saveAscii(cloud, saveRGB, writer);
 				break;
 			case PLY_BINARY:
 				throw new IllegalArgumentException("Not yet supported");
@@ -48,50 +48,39 @@ public class PointCloudIO {
 		}
 	}
 
-	public static void save3DRgb(Format format, PointCloudReader cloud , Writer writer ) throws IOException {
-		switch( format ) {
-			case PLY_ASCII:
-				PlyCodec.saveAsciiRgb(cloud, writer);
-				break;
-			case PLY_BINARY:
-				throw new IllegalArgumentException("Not yet supported");
-			default:
-				throw new IllegalArgumentException("Unknown format "+format);
-		}
-	}
 
 	public static FastQueue<Point3D_F32>
-	load3D32F( Format format , Reader reader , @Nullable FastQueue<Point3D_F32> storage  ) throws IOException {
+	load3D32F( Format format , InputStream input , @Nullable FastQueue<Point3D_F32> storage  ) throws IOException {
 		if( storage == null )
 			storage = new FastQueue<>(Point3D_F32.class,true);
 		PointCloudWriter output = PointCloudWriter.wrapF32(storage);
-		load(format,reader,output);
+		load(format,input,output);
 		return storage;
 	}
 
 	public static FastQueue<Point3D_F64>
-	load3D64F( Format format , Reader reader , @Nullable FastQueue<Point3D_F64> storage  ) throws IOException {
+	load3D64F( Format format , InputStream input , @Nullable FastQueue<Point3D_F64> storage  ) throws IOException {
 		if( storage == null )
 			storage = new FastQueue<>(Point3D_F64.class,true);
 		PointCloudWriter output = PointCloudWriter.wrapF64(storage);
-		load(format,reader,output);
+		load(format,input,output);
 		return storage;
 	}
 
 	public static FastQueue<Point3dRgbI_F64>
-	load3DRgb64F(Format format , Reader reader , @Nullable FastQueue<Point3dRgbI_F64> storage  ) throws IOException {
+	load3DRgb64F(Format format , InputStream input , @Nullable FastQueue<Point3dRgbI_F64> storage  ) throws IOException {
 		if( storage == null )
 			storage = new FastQueue<>(Point3dRgbI_F64.class,true);
 		PointCloudWriter output = PointCloudWriter.wrapF64RGB(storage);
-		load(format,reader,output);
+		load(format,input,output);
 		return storage;
 	}
 
 	public static void
-	load( Format format , Reader reader , PointCloudWriter output ) throws IOException {
+	load(Format format , InputStream input , PointCloudWriter output ) throws IOException {
 		switch( format ) {
 			case PLY_ASCII:
-				PlyCodec.read(reader,output);
+				PlyCodec.read(input,output);
 				break;
 			case PLY_BINARY:
 				throw new IllegalArgumentException("Not yet supported");

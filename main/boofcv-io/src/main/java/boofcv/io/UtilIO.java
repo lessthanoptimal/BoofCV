@@ -173,7 +173,7 @@ public class UtilIO {
 	/**
 	 * Reads a line from an input stream.
 	 */
-	private static String readLine( InputStream input, StringBuffer buffer ) throws IOException {
+	public static String readLine( InputStream input, StringBuffer buffer ) throws IOException {
 		buffer.setLength(0);
 		while( true ) {
 			int v = input.read();

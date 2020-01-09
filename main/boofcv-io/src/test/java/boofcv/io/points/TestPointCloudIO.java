@@ -48,9 +48,9 @@ class TestPointCloudIO {
 			found.grow().set(1,1,1);
 
 			Writer writer = new StringWriter();
-			PointCloudIO.save3D(f,PointCloudReader.wrapF32(expected),writer);
-			Reader reader = new StringReader(writer.toString());
-			PointCloudIO.load3D32F(f,reader,found);
+			PointCloudIO.save3D(f,PointCloudReader.wrapF32(expected),false,writer);
+			InputStream input = new ByteArrayInputStream(writer.toString().getBytes());
+			PointCloudIO.load3D32F(f,input,found);
 
 			// make sure it cleared the points
 			assertEquals(expected.size(),found.size);
@@ -73,9 +73,9 @@ class TestPointCloudIO {
 			found.grow().set(1,1,1);
 
 			Writer writer = new StringWriter();
-			PointCloudIO.save3DRgb(f,PointCloudReader.wrapF64(expected),writer);
-			Reader reader = new StringReader(writer.toString());
-			PointCloudIO.load3D64F(f,reader,found);
+			PointCloudIO.save3D(f,PointCloudReader.wrapF64(expected), false, writer);
+			InputStream input = new ByteArrayInputStream(writer.toString().getBytes());
+			PointCloudIO.load3D64F(f,input,found);
 
 			// make sure it cleared the points
 			assertEquals(expected.size(),found.size);

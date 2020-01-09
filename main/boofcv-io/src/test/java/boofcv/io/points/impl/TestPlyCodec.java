@@ -27,6 +27,7 @@ import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,10 +46,10 @@ class TestPlyCodec {
 
 		FastQueue<Point3D_F64> found = new FastQueue<>(Point3D_F64.class,true);
 
-		Writer writer = new StringWriter();
-		PlyCodec.saveAscii(PointCloudReader.wrapF64(expected),writer);
-		Reader reader = new StringReader(writer.toString());
-		PlyCodec.read(reader, PointCloudWriter.wrapF64(found));
+		Writer output = new StringWriter();
+		PlyCodec.saveAscii(PointCloudReader.wrapF64(expected),false,output);
+		InputStream input = new ByteArrayInputStream(output.toString().getBytes());
+		PlyCodec.read(input, PointCloudWriter.wrapF64(found));
 
 		assertEquals(expected.size(),found.size);
 		for (int i = 0; i < found.size; i++) {
@@ -71,14 +72,66 @@ class TestPlyCodec {
 
 		FastQueue<Point3dRgbI_F64> found = new FastQueue<>(Point3dRgbI_F64.class,true);
 
-		Writer writer = new StringWriter();
-		PlyCodec.saveAscii(PointCloudReader.wrapF64RGB(expected),writer);
-		Reader reader = new StringReader(writer.toString());
-		PlyCodec.read(reader,PointCloudWriter.wrapF64RGB(found));
+		Writer output = new StringWriter();
+		PlyCodec.saveAscii(PointCloudReader.wrapF64RGB(expected),true,output);
+		InputStream input = new ByteArrayInputStream(output.toString().getBytes());
+		PlyCodec.read(input,PointCloudWriter.wrapF64RGB(found));
 
 		assertEquals(expected.size(),found.size);
 		for (int i = 0; i < found.size; i++) {
 			assertEquals(0.0,found.get(i).distance(expected.get(i)), UtilEjml.TEST_F64);
+		}
+	}
+
+	@Test
+	void encode_decode_3D_binary() throws IOException {
+		List<Point3D_F64> expected = new ArrayList<>();
+		for (int i = 0; i < 10; i++) {
+			expected.add(new Point3D_F64(i * 123.45, i - 1.01, i + 2.34));
+		}
+
+		for( boolean asFloat : new boolean[]{true,false}) {
+			FastQueue<Point3D_F64> found = new FastQueue<>(Point3D_F64.class, true);
+
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			PlyCodec.saveBinary(PointCloudReader.wrapF64(expected), ByteOrder.BIG_ENDIAN, false, asFloat, output);
+			ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
+			PlyCodec.read(input, PointCloudWriter.wrapF64(found));
+
+			assertEquals(expected.size(), found.size);
+			double tol = asFloat ? UtilEjml.TEST_F32 : UtilEjml.TEST_F64;
+			for (int i = 0; i < found.size; i++) {
+				assertEquals(0.0, found.get(i).distance(expected.get(i)), tol);
+			}
+		}
+	}
+
+	@Test
+	void encode_decode_3DRGB_binary() throws IOException {
+		List<Point3dRgbI_F64> expected = new ArrayList<>();
+		for (int i = 0; i < 10; i++) {
+			int r = (10*i)&0xFF;
+			int g = (28*i)&0xFF;
+			int b = (58*i)&0xFF;
+
+			int rgb = r << 16 | g << 16 | b;
+
+			expected.add( new Point3dRgbI_F64(i*123.45,i-1.01,i+2.34,rgb));
+		}
+
+		for( boolean asFloat : new boolean[]{true,false}) {
+			FastQueue<Point3dRgbI_F64> found = new FastQueue<>(Point3dRgbI_F64.class, true);
+
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			PlyCodec.saveBinary(PointCloudReader.wrapF64RGB(expected), ByteOrder.BIG_ENDIAN, false, asFloat, output);
+			ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
+			PlyCodec.read(input, PointCloudWriter.wrapF64RGB(found));
+
+			assertEquals(expected.size(), found.size);
+			double tol = asFloat ? UtilEjml.TEST_F32 : UtilEjml.TEST_F64;
+			for (int i = 0; i < found.size; i++) {
+				assertEquals(0.0, found.get(i).distance(expected.get(i)), tol);
+			}
 		}
 	}
 
