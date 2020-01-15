@@ -22,6 +22,7 @@ import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.demonstrations.tracker.TrackerPointControlPanel.Marker;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
@@ -46,6 +47,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -251,10 +253,12 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 	public class VisualizePanel extends ImagePanel {
 		Ellipse2D.Double ellipse = new Ellipse2D.Double();
+		Line2D.Double line = new Line2D.Double();
 
 		double maxVelocity=0;
 		int red,green,blue;
 
+		Stroke strokeLine = new BasicStroke(5);
 
 		// Used for computing log scale flow colors
 		double logBase = 0.0;
@@ -269,12 +273,16 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 			final TrackerPointControlPanel.Colorization colorization = controlPanel.colorization;
-			final boolean fillCircles = controlPanel.fillCircles;
+			final Marker markerType = controlPanel.markerType;
 			final int minDuration = controlPanel.minDuration;
+
+			boolean computeMaxFlow = colorization != TrackerPointControlPanel.Colorization.TRACK_ID ||
+								  markerType == Marker.Line;
 
 			synchronized (tracksGui) {
 				// Find max velocity of features which are drawn
-				if( colorization != TrackerPointControlPanel.Colorization.TRACK_ID ) {
+				if( computeMaxFlow )
+				{
 					computeMaxFlowVelocity(minDuration);
 				}
 
@@ -305,14 +313,39 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 					double x = offsetX + scale*p.x;
 					double y = offsetY + scale*p.y;
 
+					Stroke strokeBefore = g2.getStroke();
 					if( duration == 0 ) {
 						VisualizeFeatures.drawPoint(g2, x,y, 5, Color.GREEN,true,ellipse );
-					} else if( fillCircles ) {
-						VisualizeFeatures.drawPoint(g2, x, y, 5, new Color(red, green, blue), true, ellipse);
 					} else {
-						g2.setColor(new Color(red, green, blue));
-						VisualizeFeatures.drawCircle(g2, x, y, 5, ellipse);
+						switch( markerType ) {
+							case Dot:
+								VisualizeFeatures.drawPoint(g2, x, y, 5, new Color(red, green, blue), true, ellipse);
+								break;
+
+							case Circle:
+								g2.setColor(new Color(red, green, blue));
+								VisualizeFeatures.drawCircle(g2, x, y, 5, ellipse);
+								break;
+
+							case Line:
+								Point2D_F64 prev = tracksPrev.get(p.featureId);
+								g2.setColor(new Color(red, green, blue));
+								if( prev == null ) {
+									// this is a bug... show something so that we know there's a bug
+									VisualizeFeatures.drawPoint(g2, x, y, 5, new Color(red, green, blue), true, ellipse);
+								} else {
+									line.x1 = x;
+									line.y1 = y;
+									line.x2 = offsetX+scale*prev.x;
+									line.y2 = offsetY+scale*prev.y;
+									g2.setStroke(strokeLine);
+									g2.draw(line);
+								}
+								break;
+
+						}
 					}
+					g2.setStroke(strokeBefore);
 					// Visually indicates that the user has clicked on this feature
 					if( p.featureId == selectedTrackID ) {
 						controlPanel.textArea.setText(stringPointInfo(p));

@@ -44,7 +44,7 @@ public class TrackerPointControlPanel
 	public int minFeatures = 600;
 	public int maxFeatures = 1000;
 	public int minDuration = 2;
-	public boolean fillCircles = true;
+	public Marker markerType = Marker.Dot;
 	public boolean paused = false;
 	public boolean step = false;
 
@@ -76,7 +76,7 @@ public class TrackerPointControlPanel
 
 	JSpinner spinnerTargetPeriod = spinner(videoPeriod,0,1000,5);
 	JSpinner spinnerMinDuration = spinner(minDuration,0,1000,1);
-	JCheckBox checkFillCircles = checkbox("Fill Circles",fillCircles);
+	JComboBox<String> comboMarker = combo(markerType.ordinal(),Marker.values());
 
 	Listener listener;
 
@@ -112,7 +112,7 @@ public class TrackerPointControlPanel
 		addLabeled(labelTrackCount,"Tracks");
 		addLabeled(labelDuration50,"Duration 50%");
 		addLabeled(labelDuration95,"Duration 95%");
-		addAlignLeft(checkFillCircles);
+		addLabeled(comboMarker,"Markers");
 		addLabeled(comboColor,"Colors");
 		addLabeled(spinnerMinDuration,"Min. Duration");
 		addLabeled(comboAlg,"Tracker");
@@ -183,8 +183,8 @@ public class TrackerPointControlPanel
 		} else if( e.getSource() == comboColor ) {
 			colorization = Colorization.values()[comboColor.getSelectedIndex()];
 			listener.handleVisualizationUpdated();
-		} else if( e.getSource() == checkFillCircles ) {
-			fillCircles = checkFillCircles.isSelected();
+		} else if( e.getSource() == comboMarker ) {
+			markerType = Marker.values()[comboMarker.getSelectedIndex()];
 			listener.handleVisualizationUpdated();
 		}
 	}
@@ -322,5 +322,11 @@ public class TrackerPointControlPanel
 		TRACK_ID,
 		FLOW,
 		FLOW_LOG
+	}
+
+	enum Marker {
+		Dot,
+		Circle,
+		Line
 	}
 }
