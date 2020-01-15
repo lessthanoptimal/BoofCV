@@ -87,8 +87,7 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 					top += imageDiff*(templateVal-templateMean);
 				}
 			}
-			top /= area;
-			imageSigma = (float)Math.sqrt(imageSigma/area);
+			imageSigma = (float)Math.sqrt(imageSigma);
 
 			return top/(EPS + imageSigma*templateSigma);
 		}
@@ -125,8 +124,7 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 					top += o.mask.data[maskIndex++]*imageDiff*(templateVal-templateMean);
 				}
 			}
-			top /= area;
-			imageSigma = (float)Math.sqrt(imageSigma/area);
+			imageSigma = (float)Math.sqrt(imageSigma);
 
 			return top/(EPS + imageSigma*templateSigma);
 		}
@@ -158,7 +156,7 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 				}
 			}
 
-			templateSigma = (float)Math.sqrt(templateSigma/area);
+			templateSigma = (float)Math.sqrt(templateSigma);
 		}
 	}
 
@@ -200,8 +198,7 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 					top += imageDiff * (templateVal - templateMean);
 				}
 			}
-			top /= area;
-			imageSigma = (float) Math.sqrt(imageSigma / area);
+			imageSigma = (float) Math.sqrt(imageSigma);
 
 			return top / (EPS + imageSigma * templateSigma);
 		}
@@ -237,11 +234,10 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 					float imageDiff = imageVal - imageMean;
 					imageSigma += imageDiff * imageDiff;
 
-					top += m * imageDiff * (templateVal - templateMean) / area;
+					top += m * imageDiff * (templateVal - templateMean);
 				}
 			}
-			top /= area;
-			imageSigma = (float) Math.sqrt(imageSigma / area);
+			imageSigma = (float) Math.sqrt(imageSigma);
 
 			return top / (EPS + imageSigma * templateSigma);
 		}
@@ -273,7 +269,7 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 				}
 			}
 
-			templateSigma = (float)Math.sqrt(templateSigma/area);
+			templateSigma = (float)Math.sqrt(templateSigma);
 		}
 	}
 
