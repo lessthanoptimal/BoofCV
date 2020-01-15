@@ -38,30 +38,12 @@ public class TrackerPointControlPanel
 		extends StandardAlgConfigPanel
 		implements ActionListener , ChangeListener
 {
-	JLabel labelSize = new JLabel();
-	JLabel labelTimeMS = new JLabel();
-	JLabel labelTrackCount = new JLabel();
-	JLabel labelDuration50 = new JLabel();
-	JLabel labelDuration95 = new JLabel();
-
-	// Which algorithm to run
-	JComboBox comboAlg;
-
-	// Spawn features when tracks drop below this value
-	JSpinner spinnerMinFeats;
-	JSpinner spinnerMaxFeats;
-
-
-	JTextArea textArea = new JTextArea();
-
-	JButton buttonPause = new JButton("Pause");
-	JButton buttonStep = new JButton("Step");
-
+	public Colorization colorization = Colorization.TRACK_ID;
 	public int algorithm=0;
-	public int delayMS = 0;
+	public int videoPeriod = 33;
 	public int minFeatures = 400;
 	public int maxFeatures = 800;
-	public int minDuration = 0;
+	public int minDuration = 2;
 	public boolean fillCircles = true;
 	public boolean paused = false;
 	public boolean step = false;
@@ -70,9 +52,29 @@ public class TrackerPointControlPanel
 	public ControlsKLT controlKlt = new ControlsKLT();
 	public ControlsGeneric controlsGeneric = new ControlsGeneric();
 
+	JLabel labelSize = new JLabel();
+	JLabel labelFrame = new JLabel();
+	JLabel labelTimeMS = new JLabel();
+	JLabel labelTrackCount = new JLabel();
+	JLabel labelDuration50 = new JLabel();
+	JLabel labelDuration95 = new JLabel();
+
+	// Which algorithm to run
+	JComboBox comboAlg = combo(algorithm,"KLT","ST-BRIEF","ST-NCC","FH-SURF","ST-SURF-KLT","FH-SURF-KLT");
+	JComboBox<String> comboColor = combo(colorization.ordinal(),Colorization.values());
+
+	// Spawn features when tracks drop below this value
+	JSpinner spinnerMinFeats = spinner(minFeatures,50,10000,10);
+	JSpinner spinnerMaxFeats = spinner(maxFeatures,50,10000,10);
+
+	JTextArea textArea = new JTextArea();
+
+	JButton buttonPause = new JButton("Pause");
+	JButton buttonStep = new JButton("Step");
+
 	JPanel controlsPanel = new JPanel(new BorderLayout());
 
-	JSpinner spinnerDelay = spinner(delayMS,0,1000,5);
+	JSpinner spinnerTargetPeriod = spinner(videoPeriod,0,1000,5);
 	JSpinner spinnerMinDuration = spinner(minDuration,0,1000,1);
 	JCheckBox checkFillCircles = checkbox("Fill Circles",fillCircles);
 
@@ -81,14 +83,9 @@ public class TrackerPointControlPanel
 	public TrackerPointControlPanel( Listener listener ) {
 		this.listener = listener;
 
-		comboAlg = combo(algorithm,"KLT","ST-BRIEF","ST-NCC","FH-SURF","ST-SURF-KLT","FH-SURF-KLT");
-
 		textArea.setEditable(false);
 		textArea.setWrapStyleWord(true);
 		textArea.setLineWrap(true);
-
-		spinnerMinFeats = spinner(minFeatures,50,10000,10);
-		spinnerMaxFeats = spinner(maxFeatures,50,10000,10);
 
 		buttonPause.addActionListener(e->{
 			step = false;
@@ -109,14 +106,16 @@ public class TrackerPointControlPanel
 		updateAlgorithmControls();
 
 		addLabeled(labelSize,"Size");
-		addLabeled(labelTimeMS,"Time");
+		addLabeled(labelFrame,"Frame");
+		addLabeled(labelTimeMS,"Track Speed");
+		addLabeled(spinnerTargetPeriod,"Video (ms)");
 		addLabeled(labelTrackCount,"Tracks");
 		addLabeled(labelDuration50,"Duration 50%");
 		addLabeled(labelDuration95,"Duration 95%");
-		addLabeled(spinnerDelay,"Delay (ms)");
 		addAlignLeft(checkFillCircles);
+		addLabeled(comboColor,"Colors");
 		addLabeled(spinnerMinDuration,"Min. Duration");
-		addAlignCenter(comboAlg);
+		addLabeled(comboAlg,"Tracker");
 		addLabeled(spinnerMinFeats,"Min. Feats");
 		addLabeled(spinnerMaxFeats,"Max. Feats");
 		add(controlsPanel);
@@ -152,6 +151,10 @@ public class TrackerPointControlPanel
 		labelSize.setText(String.format("%d x %d",width,height));
 	}
 
+	public void setFrame( int frame ) {
+		labelFrame.setText(""+frame);
+	}
+
 	public void setTime( double time ) {
 		labelTimeMS.setText(String.format("%7.1f (ms)",time));
 	}
@@ -165,10 +168,10 @@ public class TrackerPointControlPanel
 		labelDuration95.setText(String.format("%4.1f",d95));
 	}
 
-	public void setDelay( int value ) {
-		if( delayMS == value )
+	public void setVideoPeriod(int value ) {
+		if( videoPeriod == value )
 			return;
-		spinnerDelay.setValue(value);
+		spinnerTargetPeriod.setValue(value);
 	}
 
 	@Override
@@ -177,6 +180,9 @@ public class TrackerPointControlPanel
 			algorithm = comboAlg.getSelectedIndex();
 			updateAlgorithmControls();
 			listener.handleAlgorithmUpdated();
+		} else if( e.getSource() == comboColor ) {
+			colorization = Colorization.values()[comboColor.getSelectedIndex()];
+			listener.handleVisualizationUpdated();
 		} else if( e.getSource() == checkFillCircles ) {
 			fillCircles = checkFillCircles.isSelected();
 			listener.handleVisualizationUpdated();
@@ -193,8 +199,9 @@ public class TrackerPointControlPanel
 		} else if( e.getSource() == spinnerMinDuration ) {
 			minDuration = ((Number) spinnerMinDuration.getValue()).intValue();
 			listener.handleVisualizationUpdated();
-		} else if( e.getSource() == spinnerDelay ) {
-			delayMS = ((Number) spinnerDelay.getValue()).intValue();
+		} else if( e.getSource() == spinnerTargetPeriod) {
+			videoPeriod = ((Number) spinnerTargetPeriod.getValue()).intValue();
+			listener.handleVisualizationUpdated();
 		}
 	}
 
@@ -302,5 +309,11 @@ public class TrackerPointControlPanel
 		void handleVisualizationUpdated();
 
 		void handlePause( boolean paused );
+	}
+
+	enum Colorization {
+		TRACK_ID,
+		FLOW,
+		FLOW_LOG
 	}
 }
