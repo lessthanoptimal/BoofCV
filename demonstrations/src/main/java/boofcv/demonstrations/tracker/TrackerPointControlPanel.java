@@ -41,8 +41,8 @@ public class TrackerPointControlPanel
 	public Colorization colorization = Colorization.TRACK_ID;
 	public int algorithm=0;
 	public int videoPeriod = 33;
-	public int minFeatures = 400;
-	public int maxFeatures = 800;
+	public int minFeatures = 600;
+	public int maxFeatures = 1000;
 	public int minDuration = 2;
 	public boolean fillCircles = true;
 	public boolean paused = false;
@@ -228,9 +228,16 @@ public class TrackerPointControlPanel
 		}
 	}
 
+	static ConfigPKlt createKltConfig() {
+		ConfigPKlt klt = new ConfigPKlt();
+		klt.pruneClose = true;
+		klt.toleranceFB = 4;
+		return klt;
+	}
+
 	class ControlsKLT extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
-		public ConfigGeneralDetector detector = new ConfigGeneralDetector(maxFeatures,4,3.0f);
-		public ConfigPKlt klt = new ConfigPKlt();
+		public ConfigGeneralDetector detector = new ConfigGeneralDetector(maxFeatures,5,3.0f);
+		public ConfigPKlt klt = createKltConfig();
 
 		private int pyramidLevels = 4;
 

@@ -154,7 +154,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 	@Override
 	public void openExample(Object o) {
-		int period = -1;
+		int period = 33;
 		if (o instanceof PathLabel) {
 			// These examples were made before mp4 capability was added and were kept small by reducing the frame rate
 			switch (((PathLabel) o).label) {
@@ -165,10 +165,8 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 					break;
 			}
 		}
-		if( period != -1 ) {
-			int _period = period;
-			BoofSwingUtil.invokeNowOrLater(() -> controlPanel.setVideoPeriod(_period));
-		}
+		int _period = period;
+		BoofSwingUtil.invokeNowOrLater(() -> controlPanel.setVideoPeriod(_period));
 
 		super.openExample(o);
 	}
