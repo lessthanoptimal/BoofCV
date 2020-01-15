@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,17 +78,18 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 				int templateIndex = o.template.startIndex + y * o.template.stride;
 
 				for (int x = 0; x < o.template.width; x++) {
-					float templateVal = o.template.data[templateIndex++];
+					final float templateVal = o.template.data[templateIndex++];
+					final float imageVal = o.image.data[imageIndex++];
 
-					float diff = o.image.data[imageIndex++] - imageMean;
-					imageSigma += diff*diff;
+					float imageDiff = imageVal - imageMean;
+					imageSigma += imageDiff*imageDiff;
 
-					top += diff*(templateVal-templateMean);
+					top += imageDiff*(templateVal-templateMean);
 				}
 			}
+			top /= area;
 			imageSigma = (float)Math.sqrt(imageSigma/area);
 
-			// technically top should be divided by area, but that won't change the solution
 			return top/(EPS + imageSigma*templateSigma);
 		}
 
@@ -115,17 +116,18 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 				int maskIndex = o.mask.startIndex + y * o.mask.stride;
 
 				for (int x = 0; x < o.template.width; x++) {
-					float templateVal = o.template.data[templateIndex++];
+					final float templateVal = o.template.data[templateIndex++];
+					final float imageVal = o.image.data[imageIndex++];
 
-					float diff = o.image.data[imageIndex++] - imageMean;
-					imageSigma += diff*diff;
+					float imageDiff = imageVal - imageMean;
+					imageSigma += imageDiff*imageDiff;
 
-					top += o.mask.data[maskIndex++]*diff*(templateVal-templateMean);
+					top += o.mask.data[maskIndex++]*imageDiff*(templateVal-templateMean);
 				}
 			}
+			top /= area;
 			imageSigma = (float)Math.sqrt(imageSigma/area);
 
-			// technically top should be divided by area, but that won't change the solution
 			return top/(EPS + imageSigma*templateSigma);
 		}
 
@@ -189,17 +191,18 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 				int templateIndex = o.template.startIndex + y * o.template.stride;
 
 				for (int x = 0; x < o.template.width; x++) {
-					int templateVal = o.template.data[templateIndex++] & 0xFF;
+					final int templateVal = o.template.data[templateIndex++] & 0xFF;
+					final int imageVal = o.image.data[imageIndex++] & 0xFF;
 
-					float diff = (o.image.data[imageIndex++] & 0xFF) - imageMean;
-					imageSigma += diff * diff;
+					float imageDiff = imageVal - imageMean;
+					imageSigma += imageDiff * imageDiff;
 
-					top += diff * (templateVal - templateMean);
+					top += imageDiff * (templateVal - templateMean);
 				}
 			}
+			top /= area;
 			imageSigma = (float) Math.sqrt(imageSigma / area);
 
-			// technically top should be divided by area, but that won't change the solution
 			return top / (EPS + imageSigma * templateSigma);
 		}
 
@@ -227,18 +230,19 @@ public abstract class TemplateNCC <T extends ImageBase<T>>
 				int maskIndex = o.mask.startIndex + y * o.mask.stride;
 
 				for (int x = 0; x < o.template.width; x++) {
-					int templateVal = o.template.data[templateIndex++] & 0xFF;
-					int m = o.mask.data[maskIndex++] & 0xFF;
+					final int templateVal = o.template.data[templateIndex++] & 0xFF;
+					final int imageVal = o.image.data[imageIndex++] & 0xFF;
+					final int m = o.mask.data[maskIndex++] & 0xFF;
 
-					float diff = (o.image.data[imageIndex++] & 0xFF) - imageMean;
-					imageSigma += diff * diff;
+					float imageDiff = imageVal - imageMean;
+					imageSigma += imageDiff * imageDiff;
 
-					top += m * diff * (templateVal - templateMean);
+					top += m * imageDiff * (templateVal - templateMean) / area;
 				}
 			}
+			top /= area;
 			imageSigma = (float) Math.sqrt(imageSigma / area);
 
-			// technically top should be divided by area, but that won't change the solution
 			return top / (EPS + imageSigma * templateSigma);
 		}
 
