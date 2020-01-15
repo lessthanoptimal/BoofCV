@@ -15,6 +15,10 @@ Version : 0.36
   * Fixed ImageDistort crashing if an invalid region is specified. It simply does nothing now.
 - Moved KLT from boofcv-geo to boofcv-feature
   * No idea what it was doing in geo originally but it didn't belong there!
+- QR Code
+  * More informative error message when encoding a QR Code
+  * Fixed incorrect conversion from bits to bytes. Can sometimes store more data!
+  * Thanks phillip-fry for reporting the problem
 - PointTracker
   * Added frameID for each processed frame
   * Added spawnFrameID to tracks

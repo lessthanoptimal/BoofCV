@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -644,7 +644,7 @@ public class QrCodeEncoder {
 				// select the smallest version which can store all the data
 				for (int i = 1; i <= 40; i++) {
 					int dataBits = bitsAtVersion(i);
-					int totalBytes = dataBits / 8 + (dataBits % 8) % 8;
+					int totalBytes = bitsToBytes(dataBits);
 					if (totalBytes <= QrCode.VERSION_INFO[i].totalDataBytes(qr.error)) {
 						qr.version = i;
 						break escape;
@@ -661,7 +661,7 @@ public class QrCodeEncoder {
 				qr.error = null;
 				QrCode.VersionInfo v = QrCode.VERSION_INFO[qr.version];
 				int dataBits = bitsAtVersion(qr.version);
-				int totalBytes = dataBits / 8 + (dataBits % 8) % 8;
+				int totalBytes = bitsToBytes(dataBits);
 				for (QrCode.ErrorLevel level : QrCode.ErrorLevel.values()) {
 					if (totalBytes <= v.totalDataBytes(level)) {
 						qr.error = level;
@@ -675,22 +675,42 @@ public class QrCodeEncoder {
 		}
 		// Sanity check
 		int dataBits = bitsAtVersion(qr.version);
-		int totalBytes = dataBits / 8 + (dataBits % 8) % 8;
+		int totalBytes = bitsToBytes(dataBits);
 		QrCode.VersionInfo v = QrCode.VERSION_INFO[qr.version];
 		if (totalBytes > v.totalDataBytes(qr.error)) {
-			throw new IllegalArgumentException("Version and error level can't encode all the data");
+			int encodedBits = totalEncodedBitsNoOverHead();
+			throw new IllegalArgumentException("Version and error level can't encode all the data. " +
+					"Version = " +qr.version+" , Error = "+qr.error+
+					" , Encoded Bits = " + encodedBits+" , Overhead Bits = "+(dataBits-encodedBits)+
+					" , Data Bytes = "+totalBytes+" , Limit Bytes = "+v.totalDataBytes(qr.error));
 		}
 	}
 
 	/**
+	 * Converts bits to bytes. If there is a remainder (partial byte) then add one byte.
+	 */
+	private static int bitsToBytes( int totalBits ) {
+		return totalBits/8 + ((totalBits%8)>0?1:0);
+	}
+
+	/**
 	 * Computes how many bits it takes to encode the message at this version number
-	 * @param version
-	 * @return
 	 */
 	private int bitsAtVersion( int version ) {
 		int total = 0;
 		for (int i = 0; i < segments.size(); i++) {
 			total += segments.get(i).sizeInBits(version);
+		}
+		return total;
+	}
+
+	/**
+	 * Returns the number of encoded bits without overhead
+	 */
+	private int totalEncodedBitsNoOverHead() {
+		int total = 0;
+		for (int i = 0; i < segments.size(); i++) {
+			total += segments.get(i).encodedSizeBits;
 		}
 		return total;
 	}

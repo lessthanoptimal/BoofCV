@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -189,7 +189,7 @@ public class TestQrCodeEncoder {
 		assertTrue(decoder.applyErrorCorrection(qr));
 		assertTrue(decoder.decodeMessage(qr));
 
-		assertEquals(message, qr.message.toString());
+		assertEquals(message, qr.message);
 	}
 
 	/**
@@ -209,7 +209,8 @@ public class TestQrCodeEncoder {
 		QrCodeEncoder encoder = new QrCodeEncoder()
 				.setVersion(2).setError(QrCode.ErrorLevel.M).
 						setMask(QrCodeMaskPattern.M011).
-						addAlphanumeric("ASDASDJASD983405983094580SDF:LOEFLAWEQ");
+						addAlphanumeric("ASDASDJASD983405983094580SDF:LOEFLAWEQR");
+
 		assertThrows(RuntimeException.class, encoder::fixate);
 	}
 
