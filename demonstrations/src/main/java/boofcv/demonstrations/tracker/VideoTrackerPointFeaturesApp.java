@@ -177,8 +177,11 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 	protected void configureVideo(int which, SimpleImageSequence sequence) {
 		super.configureVideo(which, sequence);
 		sequence.setLoop(true);
-		controlPanel.setPauseState(false);
-		streamPaused = false;
+		tracker.reset();
+		BoofSwingUtil.invokeNowOrLater(()-> {
+			controlPanel.setPauseState(false);
+			streamPaused = false;
+		});
 	}
 
 	@Override
@@ -186,11 +189,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		super.handleInputChange(source, method, width, height);
 		this.streamPeriod = controlPanel.videoPeriod;
 		gui.setPreferredSize(new Dimension(width,height));
-		BoofSwingUtil.invokeNowOrLater(()->{
-			controlPanel.setImageSize(width,height);
-			controlPanel.setPauseState(false);
-			streamPaused = false;
-		});
+		BoofSwingUtil.invokeNowOrLater(()-> controlPanel.setImageSize(width,height));
 	}
 
 	@Override
@@ -213,8 +212,6 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 	/**
 	 * Show info on the selected feature and
-	 * @param x
-	 * @param y
 	 */
 	public void handleMouseClick( double x , double y ) {
 		String text = String.format("Clicked %4.1f %4.1f\n",x,y);
