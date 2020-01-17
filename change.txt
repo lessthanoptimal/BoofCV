@@ -13,6 +13,7 @@ Version : 0.36
 - Added Project Lombok for auto generating setters/getters
 - Image Processing
   * Fixed ImageDistort crashing if an invalid region is specified. It simply does nothing now.
+  * FDistort now supports SKIP border. Thanks Nico Stuurman!
 - Moved KLT from boofcv-geo to boofcv-feature
   * No idea what it was doing in geo originally but it didn't belong there!
 - QR Code

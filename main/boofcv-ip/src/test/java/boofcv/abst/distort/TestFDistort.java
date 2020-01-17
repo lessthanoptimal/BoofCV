@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,11 @@ import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.distort.PixelTransform;
 import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
@@ -50,7 +52,7 @@ public class TestFDistort {
 	Random rand = new Random(234);
 
 	@Test
-	public void scale() {
+	void scale() {
 		ImageMiscOps.fillUniform(input,rand,0,200);
 
 		new FDistort(input,output).scaleExt().apply();
@@ -78,11 +80,8 @@ public class TestFDistort {
 		}
 	}
 
-
-
 	@Test
-	public void rotate() {
-
+	void rotate() {
 		ImageMiscOps.fillUniform(input,rand,0,200);
 		GrayU8 output = new GrayU8(height,width);
 
@@ -103,7 +102,7 @@ public class TestFDistort {
 	}
 
 	@Test
-	public void affine() {
+	void affine() {
 		ImageMiscOps.fillUniform(input, rand, 0, 200);
 
 		Affine2D_F32 affine = new Affine2D_F32(2,0.1f,-0.2f,1.1f,3,4.5f);
@@ -138,9 +137,9 @@ public class TestFDistort {
 	 * Makes sure that setRefs doesn't cause it to blow up
 	 */
 	@Test
-	public void setRefs() {
+	void setRefs() {
 		ImageMiscOps.fillUniform(input, rand, 0, 200);
-		FDistort alg = new FDistort();
+		var alg = new FDistort();
 		alg.setRefs(input,output).interp(InterpolationType.BILINEAR).scaleExt().apply();
 
 		ImageDistort distorter = alg.distorter;
@@ -148,8 +147,8 @@ public class TestFDistort {
 		PixelTransform<Point2D_F32> outputToInput = alg.outputToInput;
 
 		// a new image shouldn't cause new memory to be declared bad stuff to happen
-		GrayU8 found = new GrayU8(width/2,height/2);
-		GrayU8 expected = new GrayU8(width/2,height/2);
+		var found = new GrayU8(width/2,height/2);
+		var expected = new GrayU8(width/2,height/2);
 		alg.setRefs(input,found).scale().apply();
 
 		assertTrue(distorter==alg.distorter);
@@ -165,12 +164,12 @@ public class TestFDistort {
 	 * Makes sure that border recycling doesn't mess things up
 	 */
 	@Test
-	public void setBorderChange() {
+	void setBorderChange() {
 		ImageMiscOps.fillUniform(input, rand, 0, 200);
-		GrayU8 found = new GrayU8(width/2,height/2);
-		GrayU8 expected = new GrayU8(width/2,height/2);
+		var found = new GrayU8(width/2,height/2);
+		var expected = new GrayU8(width/2,height/2);
 
-		FDistort alg = new FDistort();
+		var alg = new FDistort();
 
 		alg.init(input,found).scaleExt().apply();
 
@@ -195,6 +194,29 @@ public class TestFDistort {
 		alg.border(1).apply();
 		new FDistort(input,expected).scale().border(1).apply();
 		BoofTesting.assertEquals(expected,found,1e-4);
+	}
+
+	/**
+	 * Checks to see if SKIP is properly implemented
+	 */
+	@Test
+	void borderSkip() {
+		var histogram = new int[256];
+
+		// Skip the border by specify the border by Type
+		ImageMiscOps.fill(input,11);
+		ImageMiscOps.fill(output,12);
+		new FDistort(input,output).affine(1,0,0,1,10,5).border(BorderType.SKIP).apply();
+		ImageStatistics.histogram(output,0,histogram);
+		assertEquals(500,histogram[12]);
+
+		// Now do it by passing in null
+		ImageMiscOps.fill(input,11);
+		ImageMiscOps.fill(output,12);
+		new FDistort(input,output).affine(1,0,0,1,10,5).border((ImageBorder)null).apply();
+		ImageStatistics.histogram(output,0,histogram);
+		assertEquals(500,histogram[12]);
+
 	}
 
 }

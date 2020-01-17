@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -132,8 +132,7 @@ public class FactoryImageBorder {
 		switch(borderType) {
 			case SKIP:
 				throw new IllegalArgumentException("Skip border can't be implemented here and has to be done " +
-						"externally.  Call this might be a bug. Instead pass in EXTENDED and manually skip over the " +
-						"pixel in a loop some place.");
+						"externally. Instead pass in EXTENDED and manually skip over the in a pixel by pixel basis.");
 //				borderClass = BorderIndex1D_Exception.class;
 //				break;
 

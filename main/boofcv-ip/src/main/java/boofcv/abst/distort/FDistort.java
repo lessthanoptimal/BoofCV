@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -160,9 +160,18 @@ public class FDistort
 
 	/**
 	 * Sets how the interpolation handles borders.
+	 *
+	 * @param border Sets the border. If null then it will skip the border.
 	 */
 	public FDistort border( ImageBorder border ) {
-		interp.setBorder(border);
+		if( border == null ) {
+			this.borderType = BorderType.SKIP;
+			// the edge is less jagged if you extend, even with skip = true
+			interp.setBorder(FactoryImageBorder.generic(BorderType.EXTENDED, inputType));
+		} else {
+			this.borderType = null;
+			interp.setBorder(border);
+		}
 		return this;
 	}
 
@@ -172,8 +181,13 @@ public class FDistort
 	public FDistort border( BorderType type ) {
 		if( borderType == type )
 			return this;
-		borderType = type;
-		return border(FactoryImageBorder.generic(type, inputType));
+		if( type == BorderType.SKIP ) {
+			return border((ImageBorder)null);
+		} else {
+			border(FactoryImageBorder.generic(type, inputType));
+			borderType = type; // border() set's type to null
+			return this;
+		}
 	}
 
 	/**
@@ -346,6 +360,7 @@ public class FDistort
 		}
 		distorter.setModel(outputToInput);
 
+		distorter.setRenderAll(borderType!=BorderType.SKIP);
 		distorter.apply(input,output);
 	}
 }
