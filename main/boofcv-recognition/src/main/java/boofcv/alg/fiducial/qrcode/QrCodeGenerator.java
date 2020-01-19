@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class QrCodeGenerator {
 	 * Generates a QR Code with the specified message. An exception is thrown if the message is
 	 * too long to be encoded.
 	 */
-	public void render( QrCode qr ) {
+	public QrCodeGenerator render( QrCode qr ) {
 		initialize(qr);
 
 		render.init();
@@ -119,6 +119,8 @@ public class QrCodeGenerator {
 		qr.bounds.set(1,markerWidth,0);
 		qr.bounds.set(2,markerWidth,markerWidth);
 		qr.bounds.set(3,0,markerWidth);
+
+		return this;
 	}
 
 	protected void initialize(QrCode qr) {

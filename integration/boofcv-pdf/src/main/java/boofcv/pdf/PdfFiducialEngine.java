@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.app.drawing;
+package boofcv.pdf;
 
 import boofcv.alg.drawing.FiducialRenderEngine;
 import boofcv.io.image.ConvertBufferedImage;
@@ -31,6 +31,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 /**
+ * Renders fiducials to PDF documents.
+ *
  * @author Peter Abeles
  */
 public class PdfFiducialEngine extends FiducialRenderEngine {

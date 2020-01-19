@@ -7,6 +7,7 @@ Date    : 2020
 Version : 0.36
 
 - Build
+  * Created integration/boofcv-pdf module to contain code for reading/writing PDF documents
   * TODO If stable release, fail uploadArchives if dirty
 - Starting to use Java 11 syntax (e.g. var) but still will produce Java 1.8 byte code
   https://github.com/bsideup/jabel

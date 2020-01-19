@@ -8,7 +8,7 @@ include 'examples','demonstrations','applications',
 
         'integration:boofcv-javacv',"integration:boofcv-WebcamCapture",
         'integration:boofcv-jcodec','integration:boofcv-swing',
-        'integration:boofcv-ffmpeg'
+        'integration:boofcv-ffmpeg','integration:boofcv-pdf'
 
 // JavaFX isn't installed universally yet.  If it exists on the system it will be built
 //try {

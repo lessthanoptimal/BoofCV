@@ -13,15 +13,3 @@ dependencies {
         implementation group: 'org.bytedeco.javacpp-presets', name: "ffmpeg", version: '4.1-1.4.4', classifier: "${it}"
     }
 }
-
-sourceSets {
-    test {
-        java {
-            srcDir 'test'
-            srcDir 'examples'
-        }
-        resources {
-            srcDir 'resources/test'
-        }
-    }
-}

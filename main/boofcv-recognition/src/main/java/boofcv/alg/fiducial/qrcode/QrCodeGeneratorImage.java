@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 	}
 
 	@Override
-	public void render(QrCode qr ) {
+	public QrCodeGenerator render(QrCode qr ) {
 		super.render(qr);
 
 		int borderPixels = renderer.getBorderPixels();
@@ -66,6 +66,8 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 		qr.threshRight = 125;
 		qr.threshCorner = 125;
 		qr.threshDown = 125;
+
+		return this;
 	}
 
 	@Override
