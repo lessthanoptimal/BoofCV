@@ -25,6 +25,8 @@ Version : 0.36
 - PointTracker
   * Added frameID for each processed frame
   * Added spawnFrameID to tracks
+- Shape Detectors
+  * BinaryEllipseDetectorPixel will use external only contour detector when it doesn't detect internal contours
 - PerspectiveOps
   * Added two types of point invariants
 - Scene Reconstruction

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.alg.shapes.ellipse;
 
+import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryContourInterface;
 import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
@@ -35,6 +37,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 
+import java.io.PrintStream;
 import java.util.List;
 
 /**
@@ -79,10 +82,12 @@ public class BinaryEllipseDetectorPixel {
 	// Can be used to filter out shapes which are very skinny
 	private double maxMajorToMinorRatio = Double.MAX_VALUE;
 
-	private boolean internalContour = false;
-
+	// connect rule used with contour finding
+	private ConnectRule connectRule;
+	// allow it to switch between two algortihms
 	private BinaryLabelContourFinder contourFinder;
 	private GrayS32 labeled = new GrayS32(1,1);
+	private BinaryContourFinder contourExternal;
 
 	private FitEllipseAlgebraic_F64 algebraic = new FitEllipseAlgebraic_F64();
 
@@ -92,7 +97,7 @@ public class BinaryEllipseDetectorPixel {
 	protected PixelTransform<Point2D_F32> distToUndist;
 	protected Point2D_F32 distortedPoint = new Point2D_F32();
 
-	private boolean verbose = false;
+	private PrintStream verbose = null;
 
 	private FastQueue<Point2D_F64> pointsF = new FastQueue<>(Point2D_F64.class, true);
 
@@ -101,9 +106,9 @@ public class BinaryEllipseDetectorPixel {
 	// temporary storage for a contour
 	private FastQueue<Point2D_I32> contourTmp = new FastQueue<>(Point2D_I32.class,true);
 
-	public BinaryEllipseDetectorPixel(ConnectRule connectRule ) {
-		contourFinder = FactoryBinaryContourFinder.linearChang2004();
-		contourFinder.setConnectRule(connectRule);
+	public BinaryEllipseDetectorPixel( ConnectRule connectRule ) {
+		this.connectRule = connectRule;
+		setInternalContour(false);
 	}
 
 	public BinaryEllipseDetectorPixel() {
@@ -131,18 +136,27 @@ public class BinaryEllipseDetectorPixel {
 	 */
 	public void process( GrayU8 binary ) {
 		found.reset();
-		labeled.reshape(binary.width, binary.height);
 
-		contourFinder.process(binary, labeled);
+		List<ContourPacked> blobs;
+		if( contourFinder != null ) {
+			contourFinder.process(binary, labeled);
+			blobs = contourFinder.getContours();
+		} else {
+			contourExternal.process(binary);
+			blobs = contourExternal.getContours();
+		}
 
-		List<ContourPacked> blobs = contourFinder.getContours();
 		for (int i = 0; i < blobs.size(); i++) {
 			ContourPacked c = blobs.get(i);
 
-			contourFinder.loadContour(c.externalIndex,contourTmp);
+			if( contourFinder != null ) {
+				contourFinder.loadContour(c.externalIndex, contourTmp);
+			} else {
+				contourExternal.loadContour(c.externalIndex, contourTmp);
+			}
 			proccessContour(contourTmp.toList());
 
-			if(internalContour) {
+			if(contourFinder!=null) {
 				for( int j = 0; j < c.internalIndexes.size(); j++ ) {
 					contourFinder.loadContour(c.internalIndexes.get(j),contourTmp);
 					proccessContour(contourTmp.toList());
@@ -153,8 +167,8 @@ public class BinaryEllipseDetectorPixel {
 
 	private void proccessContour(List<Point2D_I32> contour) {
 		if (contour.size() < minimumContour || (maximumContour > 0 && contour.size() > maximumContour) ) {
-			if( verbose )
-				System.out.println("Rejecting: too small (or large) "+contour.size());
+			if( verbose != null )
+				verbose.println("Rejecting: too small (or large) "+contour.size());
 			return;
 		}
 
@@ -167,8 +181,8 @@ public class BinaryEllipseDetectorPixel {
 
 		// fit it to an ellipse.  This will just be approximate.  The more precise technique is much slower
 		if( !algebraic.process(pointsF.toList())) {
-			if( verbose )
-				System.out.println("Rejecting: algebraic fit failed. size = "+pointsF.size());
+			if( verbose != null )
+				verbose.println("Rejecting: algebraic fit failed. size = "+pointsF.size());
 			return;
 		}
 
@@ -179,22 +193,22 @@ public class BinaryEllipseDetectorPixel {
 		boolean accepted = true;
 
 		if( f.ellipse.b <= minimumMinorAxis ) {
-			if( verbose )
-				System.out.println("Rejecting: Minor axis too small. size = "+f.ellipse.b);
+			if( verbose != null )
+				verbose.println("Rejecting: Minor axis too small. size = "+f.ellipse.b);
 			accepted = false;
 		} else if( !isApproximatelyElliptical(f.ellipse,pointsF.toList(),20)) {
-			if( verbose )
-				System.out.println("Rejecting: Not approximately elliptical. size = "+pointsF.size());
+			if( verbose != null )
+				verbose.println("Rejecting: Not approximately elliptical. size = "+pointsF.size());
 			accepted = false;
 		} else if( f.ellipse.a > maxMajorToMinorRatio*f.ellipse.b ) {
-			if( verbose )
-				System.out.println("Rejecting: Major to minor axis length ratio too extreme = "+pointsF.size());
+			if( verbose != null )
+				verbose.println("Rejecting: Major to minor axis length ratio too extreme = "+pointsF.size());
 			accepted = false;
 		}
 
 		if( accepted ) {
-			if (verbose)
-				System.out.println("Success!  size = " + pointsF.size());
+			if( verbose != null )
+				verbose.println("Success!  size = " + pointsF.size());
 
 			adjustElipseForBinaryBias(f.ellipse);
 			f.contour = contour;
@@ -282,23 +296,34 @@ public class BinaryEllipseDetectorPixel {
 		return true;
 	}
 
-	public BinaryLabelContourFinder getContourFinder() {
-		return contourFinder;
+	public BinaryContourInterface getContourFinder() {
+		if( contourFinder != null )
+			return contourFinder;
+		else
+			return contourExternal;
 	}
 
 	public boolean isVerbose() {
-		return verbose;
+		return verbose != null;
 	}
 
 	public boolean isInternalContour() {
-		return internalContour;
+		return contourFinder != null;
 	}
 
 	public void setInternalContour(boolean internalContour) {
-		this.internalContour = internalContour;
+		if( internalContour ) {
+			contourFinder = FactoryBinaryContourFinder.linearChang2004();
+			contourFinder.setConnectRule(connectRule);
+			contourExternal = null;
+		} else {
+			contourExternal = FactoryBinaryContourFinder.linearExternal();
+			contourExternal.setConnectRule(connectRule);
+			contourFinder = null;
+		}
 	}
 
-	public void setVerbose(boolean verbose) {
+	public void setVerbose(PrintStream verbose) {
 		this.verbose = verbose;
 	}
 
