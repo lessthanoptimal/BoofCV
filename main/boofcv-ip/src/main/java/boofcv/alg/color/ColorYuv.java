@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -77,6 +77,17 @@ public class ColorYuv {
 	}
 
 	/**
+	 * Conversion from YUV to 32-bit RGB using same equations as Intel IPP.
+	 */
+	public static int yuvToRgb( double y , double u , double v ) {
+		int r = (int)(y + 1.13983*v + 0.5);
+		int g = (int)(y - 0.39465*u - 0.58060*v + 0.5);
+		int b = (int)(y + 2.032*u + 0.5);
+
+		return (r << 16) | (g << 8) | b;
+	}
+
+	/**
 	 * Conversion from YUV to RGB using same equations as Intel IPP.
 	 */
 	public static void yuvToRgb( double y , double u , double v , double rgb[] ) {
@@ -106,6 +117,34 @@ public class ColorYuv {
 		yuv[0] = (byte)((( 187*r + 629*g + 63*b ) >> 10) + 16);
 		yuv[1] = (byte)(((-103*r - 346*g + 450*b) >> 10) + 128);
 		yuv[2] = (byte)((( 450*r - 409*g - 41*b ) >> 10) + 128);
+	}
+
+	/**
+	 * Conversion from YCbCr to 32-bit RGB.  See [Jack07].
+	 *
+	 * @param y Y [0 to 255]
+	 * @param cb Cb [0 to 255]
+	 * @param cr Cr [0 to 255]
+	 */
+	public static int ycbcrToRgb( int y , int cb , int cr ) {
+		// multiply coefficients in book by 1024, which is 2^10
+		y = 1191*(y - 16);
+		if( y < 0 ) y = 0;
+		cb -= 128;
+		cr -= 128;
+
+		int r = (y + 1836*cr) >> 10;
+		int g = (y - 547*cr - 218*cb) >> 10;
+		int b = (y + 2165*cb) >> 10;
+
+		if( r < 0 ) r = 0;
+		else if( r > 255 ) r = 255;
+		if( g < 0 ) g = 0;
+		else if( g > 255 ) g = 255;
+		if( b < 0 ) b = 0;
+		else if( b > 255 ) b = 255;
+
+		return (r << 16) | (g << 8) | b;
 	}
 
 	/**

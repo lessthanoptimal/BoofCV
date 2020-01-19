@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,6 +97,58 @@ public class ColorHsv {
 	// 360 degrees in radians
 	public static final double PI2_F64 = 2*Math.PI;
 	public static final float PI2_F32 = (float)PI2_F64;
+
+	/**
+	 * Convert HSV color into 32-bit int RGB color
+	 *
+	 * @param h Hue [0,2*PI]
+	 * @param s Saturation [0,1]
+	 * @param v Value. Assumes to have a range of 0 to 255
+	 * @return RGB
+	 */
+	public static int hsvToRgb( double h , double s , double v ) {
+		int r,g,b;
+		if( s == 0 ) {
+			r = g = b = (int)(v + 0.5);
+		} else {
+			h /= d60_F64;
+			int h_int = (int) h;
+			double remainder = h - h_int;
+
+			// adding 0.5 for rounding
+			double p = v * (1 - s) + 0.5;
+			double q = v * (1 - s * remainder) + 0.5;
+			double t = v * (1 - s * (1 - remainder)) + 0.5;
+
+			if (h_int < 1) {
+				r = (int)v;
+				g = (int)t;
+				b = (int)p;
+			} else if (h_int < 2) {
+				r = (int)q;
+				g = (int)v;
+				b = (int)p;
+			} else if (h_int < 3) {
+				r = (int)p;
+				g = (int)v;
+				b = (int)t;
+			} else if (h_int < 4) {
+				r = (int)p;
+				g = (int)q;
+				b = (int)v;
+			} else if (h_int < 5) {
+				r = (int)t;
+				g = (int)p;
+				b = (int)v;
+			} else {
+				r = (int)v;
+				g = (int)p;
+				b = (int)q;
+			}
+		}
+
+		return (r << 16) | (g << 8) | b;
+	}
 
 	/**
 	 * Convert HSV color into RGB color

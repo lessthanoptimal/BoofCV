@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestColorYuv {
+class TestColorYuv {
 	public static final double tol = 0.01;
 
 	Random rand = new Random(234);
@@ -45,7 +45,17 @@ public class TestColorYuv {
 	float rgb_F32[] = new float[3];
 
 	@Test
-	public void backAndForth_F64_and_F32() {
+	void yuv_to_rgb_32bit() {
+		ColorYuv.rgbToYuv(100,120,130, yuv_F64);
+		int found = ColorYuv.yuvToRgb(yuv_F64[0], yuv_F64[1], yuv_F64[2]);
+
+		assertEquals(100, (found>>16)&0xFF );
+		assertEquals(120, (found>>8)&0xFF );
+		assertEquals(130, (found   )&0xFF );
+	}
+
+	@Test
+	void backAndForth_F64_and_F32() {
 
 		check(0.5, 0.3, 0.2);
 		check(0, 0, 0);
@@ -129,6 +139,7 @@ public class TestColorYuv {
 			}
 		}
 	}
+
 	@Test
 	public void ycbcrToRgb_U8_Planar() {
 		Planar<GrayU8> yuv = new Planar<>(GrayU8.class,10,15,3);
@@ -157,6 +168,17 @@ public class TestColorYuv {
 				assertEquals(expected[2]&0xFF,b);
 			}
 		}
+	}
+
+	@Test
+	void ycbcr_to_rgb_32bit() {
+		byte yuv[] = new byte[3];
+		ColorYuv.rgbToYCbCr(100,120,130, yuv);
+		int found = ColorYuv.ycbcrToRgb(yuv[0]&0xFF, yuv[1]&0xFF, yuv[2]&0xFF);
+
+		assertEquals(100, (found>>16)&0xFF , 3.0 );
+		assertEquals(120, (found>>8 )&0xFF , 3.0 );
+		assertEquals(130, (found    )&0xFF , 3.0 );
 	}
 
 

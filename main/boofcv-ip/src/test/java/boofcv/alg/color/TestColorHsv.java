@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,6 +40,16 @@ public class TestColorHsv {
 	double rgb_F64[] = new double[3];
 	float hsv_F32[] = new float[3];
 	float rgb_F32[] = new float[3];
+
+	@Test
+	void yuv_to_rgb_32bit() {
+		ColorHsv.rgbToHsv(100,120,130, hsv_F64);
+		int found = ColorHsv.hsvToRgb(hsv_F64[0], hsv_F64[1], hsv_F64[2]);
+
+		assertEquals(100, (found>>16)&0xFF );
+		assertEquals(120, (found>>8)&0xFF );
+		assertEquals(130, (found   )&0xFF );
+	}
 
 	@Test
 	public void backAndForth_F64_and_F32() {
