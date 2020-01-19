@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -163,10 +163,18 @@ public class ImageZoomPanel extends JScrollPane {
 				throw new RuntimeException("Changed image when not in GUI thread?");
 		}
 
-		hasImageChanged = true;
+		hasImageChanged = this.img != image;
+		int beforeWidth=-1,beforeHeight=-1;
+		if( this.img != null ) {
+			beforeWidth = this.img.getWidth();
+			beforeHeight = this.img.getHeight();
+		}
 		this.img = image;
-		if( image != null )
-			updateSize(image.getWidth(),image.getHeight());
+		// only update size if the image size has changed
+		if( image != null && hasImageChanged && beforeWidth != image.getWidth() && beforeHeight != image.getHeight() )
+		{
+			updateSize(image.getWidth(), image.getHeight());
+		}
 	}
 
 	public void updateSize( int width , int height ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.shapes;
 
-import boofcv.abst.filter.binary.BinaryLabelContourFinder;
+import boofcv.abst.filter.binary.BinaryContourInterface;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
@@ -98,7 +98,7 @@ public class DetectBlackEllipseApp<T extends ImageGray<T>> extends DetectBlackSh
 				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 				if (controls.bShowContour) {
-					BinaryLabelContourFinder contour = detector.getEllipseDetector().getContourFinder();
+					BinaryContourInterface contour = detector.getEllipseDetector().getContourFinder();
 					List<Contour> contours = BinaryImageOps.convertContours(contour);
 
 					g2.setStroke(new BasicStroke(1));

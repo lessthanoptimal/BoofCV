@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.demonstrations.calibration;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.ConfigCircleRegularGrid;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
-import boofcv.abst.filter.binary.BinaryLabelContourFinder;
+import boofcv.abst.filter.binary.BinaryContourInterface;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.fiducial.calib.circle.EllipsesIntoClusters;
 import boofcv.alg.fiducial.calib.squares.SquareGrid;
@@ -227,7 +227,7 @@ public class DetectCalibrationCircleRegularApp extends CommonDetectCalibrationAp
 	@Override
 	protected List<Contour> getContours() {
 
-		BinaryLabelContourFinder contour = detector.getDetector().getEllipseDetector().getEllipseDetector().getContourFinder();
+		BinaryContourInterface contour = detector.getDetector().getEllipseDetector().getEllipseDetector().getContourFinder();
 
 		return BinaryImageOps.convertContours(contour);
 	}

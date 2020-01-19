@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,6 +86,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 
 		controlPanel.setListener(this);
 
+		imagePanel.autoScaleCenterOnSetImage = false;
 		imagePanel.setPreferredSize(new Dimension( 800,800));
 		imagePanel.setScale(controlPanel.getViewInfo().getZoom());
 		imagePanel.getImagePanel().addMouseListener(new MouseAdapter() {
@@ -219,6 +220,10 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 	@Override
 	public void calibEventGUI() {
 		imagePanel.setScale(controlPanel.viewInfo.getZoom());
+		updateImageGUI();
+	}
+
+	private void updateImageGUI() {
 		if( controlPanel.getSelectedView() == 0 ) {
 			imagePanel.setImage(input);
 		} else if( controlPanel.getSelectedView() == 1 ){
@@ -250,7 +255,7 @@ public abstract class CommonDetectCalibrationApp extends DemonstrationBase
 				controlPanel.setSuccessMessage("FOUND", true);
 			else
 				controlPanel.setSuccessMessage("FAILED", false);
-			calibEventGUI();
+			updateImageGUI();
 		});
 	}
 

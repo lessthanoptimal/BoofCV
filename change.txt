@@ -44,6 +44,7 @@ Version : 0.36
   * Fixed issues with visualizing disparity
 - Applications
   * TODO assisted self calibration
+  * Fixed calibration detector apps bug where scale got missed up when playing a movie
 
 TODO Regression
    - Dump runtime results into their own directory for each device. Use hostname?
