@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -168,7 +168,7 @@ public class CreateCalibrationTargetGui extends JPanel
 			f = FileSystemView.getFileSystemView().getHomeDirectory();
 			f = new File(f,"calibration_target.pdf");
 
-			f = BoofSwingUtil.fileChooser(this,false,f.getPath());
+			f = BoofSwingUtil.fileChooser(null,this,false,f.getPath());
 			if (f == null) {
 				return;
 			}

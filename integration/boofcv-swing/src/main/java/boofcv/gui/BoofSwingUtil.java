@@ -108,7 +108,7 @@ public class BoofSwingUtil {
 	}
 
 	public static File saveFileChooser(Component parent, FileTypes ...filters) {
-		return fileChooser(parent,false,new File(".").getPath(),filters);
+		return fileChooser(null,parent,false,new File(".").getPath(),filters);
 	}
 
 	public static String[] openImageSetChooser(Window parent , OpenImageSetDialog.Mode mode , int numberOfImages) {
@@ -157,21 +157,33 @@ public class BoofSwingUtil {
 		prefs.put(key,file.getAbsolutePath());
 	}
 
+	/**
+	 * Opens a file choose when there is no parent component. Instead a string can be passed in so that the
+	 * preference is specific to the application still
+	 */
+	public static File openFileChooser(String preferenceName, FileTypes ...filters) {
+		return fileChooser(preferenceName,null,true,new File(".").getPath(),filters);
+	}
+
 	public static File openFileChooser(Component parent, FileTypes ...filters) {
 		return openFileChooser(parent,new File(".").getPath(),filters);
 	}
 
 	public static File openFileChooser(Component parent, String defaultPath , FileTypes ...filters) {
-		return fileChooser(parent,true,defaultPath,filters);
+		return fileChooser(null,parent,true,defaultPath,filters);
 	}
 
-	public static File fileChooser(Component parent, boolean openFile, String defaultPath , FileTypes ...filters) {
+	public static File fileChooser(String preferenceName, Component parent, boolean openFile, String defaultPath , FileTypes ...filters) {
+
+		if( preferenceName == null && parent != null ) {
+			preferenceName = parent.getClass().getSimpleName();
+		}
 
 		Preferences prefs;
-		if( parent == null ) {
+		if( preferenceName == null ) {
 			prefs = Preferences.userRoot();
 		} else {
-			prefs = Preferences.userRoot().node(parent.getClass().getSimpleName());
+			prefs = Preferences.userRoot().node(preferenceName);
 		}
 		String previousPath=prefs.get(KEY_PREVIOUS_SELECTION, defaultPath);
 		JFileChooser chooser = new JFileChooser(previousPath);

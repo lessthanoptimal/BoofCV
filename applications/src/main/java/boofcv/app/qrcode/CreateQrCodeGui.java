@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -131,7 +131,7 @@ public class CreateQrCodeGui extends JPanel implements  CreateQrCodeControlPanel
 			f = FileSystemView.getFileSystemView().getHomeDirectory();
 			f = new File(f,"qrcode."+controls.format);
 
-			f = BoofSwingUtil.fileChooser(this,false,f.getPath());
+			f = BoofSwingUtil.fileChooser(null,this,false,f.getPath());
 			if (f == null) {
 				return;
 			}

@@ -29,6 +29,8 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * For reading PLY point files
@@ -149,9 +151,9 @@ public class PlyCodec {
 		if( line.length() == 0 ) throw new IOException("Missing first line");
 		if( line.compareToIgnoreCase("ply")!=0 ) throw new IOException("Expected PLY at start of file");
 
-		int vertexCount = -1;
+		var dataWords = new ArrayList<DataWord>();
 
-		int floatBytes = -1;
+		int vertexCount = -1;
 
 		Format format = null;
 		boolean rgb = false;
@@ -174,11 +176,29 @@ public class PlyCodec {
 					vertexCount = Integer.parseInt(words[2]);
 				}
 			} else if( words[0].equals("property") ) {
-				if( words[2].equals("red")) {
-					rgb = true;
-				} else if( words[2].equals("x")) {
-					floatBytes = words[1].equals("float") ? 4 : 8;
+				DataType d;
+				switch( words[1].toLowerCase() ) {
+					case "float": d=DataType.FLOAT;break;
+					case "double":d=DataType.DOUBLE;break;
+					case "char":  d=DataType.CHAR;break;
+					case "short": d=DataType.SHORT;break;
+					case "int":   d=DataType.INT;break;
+					case "uchar": d=DataType.UCHAR;break;
+					case "ushort":d=DataType.USHORT;break;
+					case "uint":  d=DataType.UINT;break;
+					default: throw new RuntimeException("Add support for "+words[1]);
 				}
+				VarType v;
+				switch( words[2].toLowerCase() ) {
+					case "x":     v=VarType.X; break;
+					case "y":     v=VarType.Y; break;
+					case "z":     v=VarType.Z; break;
+					case "red":   v=VarType.R; rgb = true;break;
+					case "green": v=VarType.G; rgb = true;break;
+					case "blue":  v=VarType.B; rgb = true;break;
+					default:      v=VarType.UNKNOWN; break;
+				}
+				dataWords.add( new DataWord(v,d));
 			} else {
 				throw new IOException("Unknown header element");
 			}
@@ -193,8 +213,8 @@ public class PlyCodec {
 
 		switch (format) {
 			case ASCII:readAscii(output, input, buffer, vertexCount, rgb);break;
-			case BINARY_LITTLE:readBinary(output, input, floatBytes, ByteOrder.LITTLE_ENDIAN, vertexCount, rgb);break;
-			case BINARY_BIG:readBinary(output, input, floatBytes, ByteOrder.BIG_ENDIAN, vertexCount, rgb);break;
+			case BINARY_LITTLE:readBinary(output, input, dataWords, ByteOrder.LITTLE_ENDIAN, vertexCount, rgb);break;
+			case BINARY_BIG:readBinary(output, input, dataWords, ByteOrder.BIG_ENDIAN, vertexCount, rgb);break;
 			default: throw new RuntimeException("BUG!");
 		}
 	}
@@ -220,38 +240,94 @@ public class PlyCodec {
 		}
 	}
 
-	private static void readBinary(PointCloudWriter output, InputStream reader, int floatBytes,
+	private static void readBinary(PointCloudWriter output, InputStream reader, List<DataWord> dataWords,
 								   ByteOrder order,
 								   int vertexCount, boolean rgb) throws IOException {
-		final int startRGB = floatBytes*3;
-		final byte[] line = new byte[startRGB + (rgb?3:0)];
+
+		int totalBytes = 0;
+		for (int i = 0; i < dataWords.size(); i++) {
+			totalBytes += dataWords.get(i).data.size;
+		}
+
+		final byte[] line = new byte[totalBytes];
 		final ByteBuffer bb = ByteBuffer.wrap(line);
 		bb.order(order);
+
+		// storage for read in values
+		int I32=-1;
+		double F64=-1;
+
+		// values that are writen to that we care about
+		int r=-1,g=-1,b=-1;
+		double x=-1,y=-1,z=-1;
+
 		for (int i = 0; i < vertexCount; i++) {
 			int found = reader.read(line);
 			if( line.length != found )
 				throw new IOException("Read unexpected number of bytes. "+found+" vs "+line.length);
 
-			double x,y,z;
+			int location = 0;
 
-			if( floatBytes == 4 ) {
-				x = bb.getFloat(0);
-				y = bb.getFloat(4);
-				z = bb.getFloat(8);
-			} else {
-				x = bb.getDouble(0);
-				y = bb.getDouble(8);
-				z = bb.getDouble(16);
+			for (int j = 0; j < dataWords.size(); j++) {
+				DataWord d = dataWords.get(j);
+				switch( d.data ) {
+					case FLOAT:  F64 = bb.getFloat(location); break;
+					case DOUBLE: F64 = bb.getDouble(location); break;
+					case CHAR:  I32 = bb.get(location); break;
+					case UCHAR:  I32 = bb.get(location)&0xFF; break;
+					case SHORT: I32 = bb.getShort(location); break;
+					case USHORT: I32 = bb.getShort(location)&0xFFFF; break;
+					case INT: I32 = bb.getInt(location); break;
+					case UINT: I32 = bb.getInt(location); break; // NOTE: not really uint...
+					default: throw new RuntimeException("Unsupported");
+				}
+				location += d.data.size;
+				switch( d.var ) {
+					case X: x = F64; break;
+					case Y: y = F64; break;
+					case Z: z = F64; break;
+					case R: r = I32; break;
+					case G: g = I32; break;
+					case B: b = I32; break;
+				}
 			}
 
 			if( rgb ) {
-				int r = line[startRGB ]&0xFF;
-				int g = line[startRGB+1]&0xFF;
-				int b = line[startRGB+2]&0xFF;
 				output.add(x,y,z, r << 16 | g << 8 | b);
 			} else {
 				output.add(x,y,z);
 			}
+		}
+	}
+
+	private static class DataWord
+	{
+		VarType var;
+		DataType data;
+
+		public DataWord(VarType var, DataType data) {
+			this.var = var;
+			this.data = data;
+		}
+	}
+
+	private enum VarType {
+		X,Y,Z,R,G,B,UNKNOWN
+	}
+
+	private enum DataType {
+		FLOAT(4),
+		DOUBLE(8),
+		CHAR(1),
+		SHORT(2),
+		INT(4),
+		UCHAR(1),
+		USHORT(2),
+		UINT(4);
+
+		int size;
+		DataType(int size) {
+			this.size = size;
 		}
 	}
 

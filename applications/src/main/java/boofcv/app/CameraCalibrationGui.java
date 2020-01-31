@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,7 +81,7 @@ public class CameraCalibrationGui extends JPanel
 		bOutput.setPreferredSize(new Dimension(30,30));
 		bOutput.setMaximumSize(bOutput.getPreferredSize());
 		bOutput.addActionListener(a->{
-			File f = BoofSwingUtil.fileChooser(this,false,textOutput.getText());
+			File f = BoofSwingUtil.fileChooser(null,this,false,textOutput.getText());
 			if( f != null ) {
 				textOutput.setText(f.getAbsolutePath());
 			}

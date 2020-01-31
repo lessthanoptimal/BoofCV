@@ -82,10 +82,9 @@ public class PointCloudIO {
 	load(Format format , InputStream input , PointCloudWriter output ) throws IOException {
 		switch( format ) {
 			case PLY_ASCII:
+			case PLY_BINARY:
 				PlyCodec.read(input,output);
 				break;
-			case PLY_BINARY:
-				throw new IllegalArgumentException("Not yet supported");
 			default:
 				throw new IllegalArgumentException("Unknown format "+format);
 		}
