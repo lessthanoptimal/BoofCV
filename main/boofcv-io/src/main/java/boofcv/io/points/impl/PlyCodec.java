@@ -212,27 +212,54 @@ public class PlyCodec {
 		output.init(vertexCount);
 
 		switch (format) {
-			case ASCII:readAscii(output, input, buffer, vertexCount, rgb);break;
+			case ASCII:readAscii(output, input, dataWords, buffer, vertexCount, rgb);break;
 			case BINARY_LITTLE:readBinary(output, input, dataWords, ByteOrder.LITTLE_ENDIAN, vertexCount, rgb);break;
 			case BINARY_BIG:readBinary(output, input, dataWords, ByteOrder.BIG_ENDIAN, vertexCount, rgb);break;
 			default: throw new RuntimeException("BUG!");
 		}
 	}
 
-	private static void readAscii(PointCloudWriter output, InputStream reader, StringBuffer buffer, int vertexCount, boolean rgb) throws IOException {
+	private static void readAscii(PointCloudWriter output, InputStream reader, List<DataWord> dataWords,
+								  StringBuffer buffer, int vertexCount, boolean rgb) throws IOException
+	{
+		// storage for read in values
+		int I32=-1;
+		double F64=-1;
+
+		// values that are writen to that we care about
+		int r=-1,g=-1,b=-1;
+		double x=-1,y=-1,z=-1;
+
 		for (int i = 0; i < vertexCount; i++) {
 			String line = readNextPly(reader,true, buffer);
 			String[] words = line.split("\\s+");
-			if( words.length != (rgb?6:3))
+			if( words.length != dataWords.size())
 				throw new IOException("unexpected number of words. "+line);
-			double x = Double.parseDouble(words[0]);
-			double y = Double.parseDouble(words[1]);
-			double z = Double.parseDouble(words[2]);
 
+			for (int j = 0; j < dataWords.size(); j++) {
+				DataWord d = dataWords.get(j);
+				String word = words[j];
+				switch( d.data ) {
+					case FLOAT:
+					case DOUBLE:  F64 = Double.parseDouble(word); break;
+					case UINT:
+					case INT:
+					case USHORT:
+					case SHORT:
+					case UCHAR:
+					case CHAR:  I32 = Integer.parseInt(word); break;
+					default: throw new RuntimeException("Unsupported");
+				}
+				switch( d.var ) {
+					case X: x = F64; break;
+					case Y: y = F64; break;
+					case Z: z = F64; break;
+					case R: r = I32; break;
+					case G: g = I32; break;
+					case B: b = I32; break;
+				}
+			}
 			if( rgb ) {
-				int r = Integer.parseInt(words[3]);
-				int g = Integer.parseInt(words[4]);
-				int b = Integer.parseInt(words[3]);
 				output.add(x,y,z, r << 16 | g << 8 | b);
 			} else {
 				output.add(x,y,z);
