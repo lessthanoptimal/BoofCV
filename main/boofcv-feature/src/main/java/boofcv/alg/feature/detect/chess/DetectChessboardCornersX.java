@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -529,7 +529,7 @@ public class DetectChessboardCornersX {
 		corner.intensity = -bestScore*stdev/(sumDifference + UtilEjml.EPS);
 
 		// Compute difference between white and black region
-		corner.constrast = (scoreDiam[(bestSpoke+numSpokeDiam/2)%numSpokeDiam] - scoreDiam[bestSpoke])/2.0;
+		corner.contrast = (scoreDiam[(bestSpoke+numSpokeDiam/2)%numSpokeDiam] - scoreDiam[bestSpoke])/2.0;
 
 		return corner.intensity >= refinedXCornerThreshold;
 	}

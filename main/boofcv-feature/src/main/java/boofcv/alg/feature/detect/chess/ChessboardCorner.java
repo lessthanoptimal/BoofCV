@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class ChessboardCorner extends Point2D_F64 {
 	 * The white region subtracted the black region at the chessboard corner. Can be used later on
 	 * for locally adaptive thresholds
 	 */
-	public double constrast;
+	public double contrast;
 
 	/**
 	 * Value of smallest Eigen value in edge detector
@@ -73,7 +73,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		intensity = Double.NaN;
 		edgeIntensity = -1;
 		edgeRatio = -1;
-		constrast = 0;
+		contrast = 0;
 		first = false;
 		level1 = level2 = levelMax = -1;
 	}
@@ -82,7 +82,7 @@ public class ChessboardCorner extends Point2D_F64 {
 		super.set(c);
 		this.orientation = c.orientation;
 		this.intensity = c.intensity;
-		this.constrast = c.constrast;
+		this.contrast = c.contrast;
 		this.level1 = c.level1;
 		this.level2 = c.level2;
 		this.levelMax = c.levelMax;

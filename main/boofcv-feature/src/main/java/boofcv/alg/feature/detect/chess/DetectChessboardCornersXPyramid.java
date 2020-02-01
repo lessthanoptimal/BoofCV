@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -117,7 +117,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 				ChessboardCorner cl = featsLevel.corners.grow();
 				cl.first = true;
 				cl.set(x,y,cf.orientation,cf.intensity);
-				cl.constrast = cf.constrast;
+				cl.contrast = cf.contrast;
 				cl.levelMax = level;
 				cl.level1 = level;
 				cl.level2 = level;
@@ -206,7 +206,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 			if( distanceMax <= radius*radius ) {
 				c0.orientation = resultsMax.orientation;
 				c0.intensity = resultsMax.intensity;
-				c0.constrast = resultsMax.constrast;
+				c0.contrast = resultsMax.contrast;
 				c0.levelMax = resultsMax.levelMax;
 				c0.level2 = level2;
 			}

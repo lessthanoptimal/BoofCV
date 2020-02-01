@@ -301,7 +301,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 //				System.out.println("Matched");
 //			}
 
-			double contrast = (ca.constrast + cb.constrast)/2;
+			double contrast = (ca.contrast + cb.contrast)/2;
 //			double contrast = Math.max(ca.constrast , cb.constrast);
 
 			line.intensityRaw = computeConnInten.process(ca, cb, line.endA.direction);
