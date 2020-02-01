@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -919,9 +919,13 @@ public abstract class SimpleCamera2Activity extends Activity {
 	 * Returns the camera intrinsic parameters estimated from the physical parameters returned by
 	 * the camera2 API
 	 */
-	public void cameraIntrinsicNominal(CameraPinhole intrinsic ) {
+	public boolean cameraIntrinsicNominal(CameraPinhole intrinsic ) {
 		open.mLock.lock();
 		try {
+			final Size cameraSize = open.mCameraSize;
+			if( cameraSize == null )
+				return false;
+
 			// This might be called before the camera is open
 			if (open.mCameraCharacterstics != null) {
 				SizeF physicalSize = open.mCameraCharacterstics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);
@@ -943,12 +947,13 @@ public abstract class SimpleCamera2Activity extends Activity {
 					intrinsic.cy = activeSize.centerY()*s;
 					intrinsic.width = open.mCameraSize.getWidth();
 					intrinsic.height = open.mCameraSize.getHeight();
-					return;
+					return true;
 				}
 			}
 			// 60 degrees seems reasonable for a random guess
 			PerspectiveOps.createIntrinsic(open.mCameraSize.getWidth(),open.mCameraSize.getHeight(),
 					UtilAngle.radian(60));
+			return true;
 		} finally {
 			open.mLock.unlock();
 		}

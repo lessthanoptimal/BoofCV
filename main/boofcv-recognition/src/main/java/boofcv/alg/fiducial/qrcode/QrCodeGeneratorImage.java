@@ -45,7 +45,7 @@ public class QrCodeGeneratorImage extends QrCodeGenerator {
 	}
 
 	@Override
-	public QrCodeGenerator render(QrCode qr ) {
+	public QrCodeGeneratorImage render(QrCode qr ) {
 		super.render(qr);
 
 		int borderPixels = renderer.getBorderPixels();

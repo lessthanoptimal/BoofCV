@@ -26,7 +26,10 @@ import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,14 +46,14 @@ class TestPointCloudIO {
 			expected.add( new Point3D_F32(i*123.45f,i-1.01f,i+2.34f));
 		}
 
-		Format[] formats = new Format[]{Format.PLY_ASCII};
+		Format[] formats = new Format[]{Format.PLY_ASCII,Format.PLY_BINARY};
 		for( Format f : formats ) {
 			FastQueue<Point3D_F32> found = new FastQueue<>(Point3D_F32.class,true);
 			found.grow().set(1,1,1);
 
-			Writer writer = new StringWriter();
-			PointCloudIO.save3D(f, PointCloudReader.wrapF32(expected),false,writer);
-			InputStream input = new ByteArrayInputStream(writer.toString().getBytes());
+			ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			PointCloudIO.save3D(f, PointCloudReader.wrapF32(expected),false,stream);
+			InputStream input = new ByteArrayInputStream(stream.toByteArray());
 			PointCloudIO.load3D32F(f,input,found);
 
 			// make sure it cleared the points
@@ -68,14 +71,14 @@ class TestPointCloudIO {
 			expected.add( new Point3D_F64(i*123.45,i-1.01,i+2.34));
 		}
 
-		Format[] formats = new Format[]{Format.PLY_ASCII};
+		Format[] formats = new Format[]{Format.PLY_ASCII,Format.PLY_BINARY};
 		for( Format f : formats ) {
 			FastQueue<Point3D_F64> found = new FastQueue<>(Point3D_F64.class,true);
 			found.grow().set(1,1,1);
 
-			Writer writer = new StringWriter();
-			PointCloudIO.save3D(f,PointCloudReader.wrapF64(expected), false, writer);
-			InputStream input = new ByteArrayInputStream(writer.toString().getBytes());
+			ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			PointCloudIO.save3D(f,PointCloudReader.wrapF64(expected), false, stream);
+			InputStream input = new ByteArrayInputStream(stream.toByteArray());
 			PointCloudIO.load3D64F(f,input,found);
 
 			// make sure it cleared the points

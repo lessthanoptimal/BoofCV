@@ -296,13 +296,7 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 			ChessboardCorner ca = corners.get(va.index);
 			ChessboardCorner cb = corners.get(vb.index);
 
-//			if( (ca.distance(311.0 ,   533.1) < 2 || cb.distance(311.0 ,   533.1) < 2)&&
-//					(ca.distance( 320.1 ,   476.0) < 2 || cb.distance( 320.1 ,   476.0) < 2)) {
-//				System.out.println("Matched");
-//			}
-
 			double contrast = (ca.contrast + cb.contrast)/2;
-//			double contrast = Math.max(ca.constrast , cb.constrast);
 
 			line.intensityRaw = computeConnInten.process(ca, cb, line.endA.direction);
 			line.intensity = line.intensityRaw/contrast;

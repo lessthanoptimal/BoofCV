@@ -76,6 +76,7 @@ public class PlyCodec {
 	 * @param cloud (Input) Point cloud data
 	 * @param order The byte order of the binary data. ByteOrder.BIG_ENDIAN is recommended
 	 * @param saveRgb if true it will save RGB information
+	 * @param saveAsFloat if true it will save it as a 4-byte float and if false as an 8-byte double
 	 * @param outputWriter Stream it will write to
 	 * @throws IOException
 	 */

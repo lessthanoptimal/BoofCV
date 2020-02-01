@@ -29,7 +29,9 @@ import org.ddogleg.struct.FastQueue;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.ByteOrder;
 
 /**
  * Code for reading different point cloud formats
@@ -38,13 +40,15 @@ import java.io.Writer;
  */
 public class PointCloudIO {
 
-	public static void save3D(Format format, PointCloudReader cloud , boolean saveRGB, Writer writer ) throws IOException {
+	public static void save3D(Format format, PointCloudReader cloud , boolean saveRGB, OutputStream outputStream ) throws IOException {
 		switch( format ) {
 			case PLY_ASCII:
-				PlyCodec.saveAscii(cloud, saveRGB, writer);
+				PlyCodec.saveAscii(cloud, saveRGB, new OutputStreamWriter(outputStream));
 				break;
 			case PLY_BINARY:
-				throw new IllegalArgumentException("Not yet supported");
+				PlyCodec.saveBinary(cloud, ByteOrder.BIG_ENDIAN, saveRGB,true, outputStream);
+				break;
+
 			default:
 				throw new IllegalArgumentException("Unknown format "+format);
 		}

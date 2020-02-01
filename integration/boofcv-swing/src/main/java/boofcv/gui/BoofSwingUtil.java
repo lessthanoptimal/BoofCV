@@ -45,7 +45,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -532,8 +532,8 @@ public class BoofSwingUtil {
 			String n = FilenameUtils.getBaseName(file.getName())+".ply";
 			try {
 				var f = new File(file.getParent(),n);
-				var w = new FileWriter(f);
-				PointCloudIO.save3D(PointCloudIO.Format.PLY_ASCII, PointCloudReader.wrapF64RGB(cloud.toList()), true, w);
+				var w = new FileOutputStream(f);
+				PointCloudIO.save3D(PointCloudIO.Format.PLY_BINARY, PointCloudReader.wrapF64RGB(cloud.toList()), true, w);
 				w.close();
 			} catch (IOException e) {
 				e.printStackTrace();

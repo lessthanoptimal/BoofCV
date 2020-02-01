@@ -14,6 +14,10 @@ Version : 0.36
 - Starting to use Java 11 syntax (e.g. var) but still will produce Java 1.8 byte code
   https://github.com/bsideup/jabel
 - Added Project Lombok for auto generating setters/getters
+- Kotlin
+  * Initial release with specialized support for Kotlin
+  * Extensions provided for converting between image types
+  * Operator overloading for PixelMath
 - Image Processing
   * Fixed ImageDistort crashing if an invalid region is specified. It simply does nothing now.
   * FDistort now supports SKIP border. Thanks Nico Stuurman!
@@ -47,6 +51,7 @@ Version : 0.36
 - Android
   * Changed image workspace from byte[] to GrowQueue_I8 so that it can be dynamically computed.
   * Fixed issues with visualizing disparity
+  * SimpleCamera2Activity::cameraIntrinsicNominal() returns false if it fails
 - Applications
   * TODO assisted self calibration
   * Fixed calibration detector apps bug where scale got missed up when playing a movie
