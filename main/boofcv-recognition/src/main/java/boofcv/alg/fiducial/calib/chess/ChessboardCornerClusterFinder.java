@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,6 +31,7 @@ import org.ddogleg.struct.GrowQueue_B;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -1079,7 +1080,8 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 		}
 
 		public void sortByAngle() {
-			edges.sort((o1, o2) -> Double.compare(o1.direction, o2.direction));
+			// Use Collections and not edges.sort() for compatibility with Android 23 or earlier
+			Collections.sort(edges, (o1, o2) -> Double.compare(o1.direction, o2.direction));
 		}
 	}
 

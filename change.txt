@@ -9,6 +9,8 @@ Version : 0.36
 - Build
   * Created integration/boofcv-pdf module to contain code for reading/writing PDF documents
   * TODO If stable release, fail uploadArchives if dirty
+- Android
+  * Changed a sort function in ChessboardCornerClusterFinder for Android compatibility
 - Starting to use Java 11 syntax (e.g. var) but still will produce Java 1.8 byte code
   https://github.com/bsideup/jabel
 - Added Project Lombok for auto generating setters/getters
