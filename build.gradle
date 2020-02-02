@@ -101,9 +101,15 @@ subprojects {
     }
 
     dependencies {
-        api (group: 'org.georegression', name: 'georegression', version: '0.21')
+        api (group: 'org.georegression', name: 'georegression', version: '0.21') {
+            exclude group: 'org.ddogleg'
+        }
+        api(group: 'org.ddogleg', name: 'ddogleg', version: '0.18-SNAPSHOT')
 
         compileOnly 'org.projectlombok:lombok:1.18.10'
+
+        api 'org.eclipse.collections:eclipse-collections-api:10.1.0'
+        implementation 'org.eclipse.collections:eclipse-collections:10.1.0'
 
         implementation 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
         implementation 'javax.annotation:jsr250-api:1.0'       // @Generated
