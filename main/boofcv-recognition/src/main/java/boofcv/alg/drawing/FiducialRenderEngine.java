@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,11 +27,16 @@ import boofcv.struct.image.GrayU8;
  * @author Peter Abeles
  */
 public abstract class FiducialRenderEngine {
+	/**
+	 * Init needs to be called for each new fiducial.
+	 */
 	public abstract void init();
 
 	public void square(double x0 , double y0 , double width ) {
 		rectangle(x0,y0,x0+width,y0+width);
 	}
+
+	public abstract void circle(double cx, double cy , double radius );
 
 	public abstract void square(double x0, double y0, double width0, double thickness);
 

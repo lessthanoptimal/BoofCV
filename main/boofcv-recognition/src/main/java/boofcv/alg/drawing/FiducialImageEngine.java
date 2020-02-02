@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,9 +51,46 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 		gray.reshape(width,width);
 	}
 
+	public void configure( int borderPixels , int markerWidth , int markerHeight ) {
+		this.borderPixels = borderPixels;
+
+		int width = markerWidth +2*borderPixels;
+		int height = markerHeight +2*borderPixels;
+		gray.reshape(width,height);
+	}
+
 	@Override
 	public void init() {
 		ImageMiscOps.fill(gray,white);
+	}
+
+	@Override
+	public void circle(double cx, double cy, double radius) {
+		int x0 = borderPixels+(int)Math.round(cx-radius);
+		int y0 = borderPixels+(int)Math.round(cy-radius);
+		int x1 = borderPixels+(int)Math.round(cx+radius)+1;
+		int y1 = borderPixels+(int)Math.round(cy+radius)+1;
+
+		// border adjusted center
+		double bcx = borderPixels+cx;
+		double bcy = borderPixels+cy;
+
+		// bound it inside the image
+		x0 = Math.max(0,x0);
+		y0 = Math.max(0,y0);
+		x1 = Math.min(gray.width ,x1);
+		y1 = Math.min(gray.height,y1);
+
+		// Brute force circle filling algorithm
+		double r2 = radius*radius;
+		for (int y = y0; y < y1; y++) {
+			double dy = y-bcy;
+			for (int x = x0; x < x1; x++) {
+				double dx = x-bcx;
+				if( dx*dx + dy*dy <= r2)
+					gray.unsafe_set(x,y,black);
+			}
+		}
 	}
 
 	@Override
@@ -63,7 +100,7 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 		int pixelX1 = borderPixels+(int)(x1+0.5);
 		int pixelY1 = borderPixels+(int)(y1+0.5);
 
-		ImageMiscOps.fillRectangle(gray,0,pixelX0,pixelY0,pixelX1-pixelX0,pixelY1-pixelY0);
+		ImageMiscOps.fillRectangle(gray,black,pixelX0,pixelY0,pixelX1-pixelX0,pixelY1-pixelY0);
 	}
 
 	@Override

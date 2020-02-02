@@ -54,6 +54,23 @@ public class PdfFiducialEngine extends FiducialRenderEngine {
 	}
 
 	@Override
+	public void circle(double cx, double cy, double r) {
+		try {
+			pcs.setNonStrokingColor(Color.BLACK);
+
+			final float k = 0.552284749831f;
+			pcs.moveTo( adjustX(cx-r), adjustY(cy));
+			pcs.curveTo(adjustX(cx-r), adjustY(cy+k*r), adjustX(cx-k*r), adjustY(cy+r), adjustX(cx), adjustY(cy+r));
+			pcs.curveTo(adjustX(cx+k*r), adjustY(cy+r), adjustX(cx+r), adjustY(cy+k*r), adjustX(cx+r), adjustY(cy));
+			pcs.curveTo(adjustX(cx+r), adjustY(cy-k*r), adjustX(cx+k*r), adjustY(cy-r), adjustX(cx), adjustY(cy-r));
+			pcs.curveTo(adjustX(cx-k*r), adjustY(cy-r), adjustX(cx-r), adjustY(cy-k*r), adjustX(cx-r), adjustY(cy));
+			pcs.fill();
+		} catch( IOException e ) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
 	public void square(double x0, double y0, double width0, double thickness) {
 		try {
 			pcs.setNonStrokingColor(Color.BLACK);
