@@ -60,8 +60,8 @@ public class TrackerPointControlPanel
 	JLabel labelDuration95 = new JLabel();
 
 	// Which algorithm to run
-	JComboBox comboAlg = combo(algorithm,"KLT","ST-BRIEF","ST-NCC","FH-SURF","ST-SURF-KLT","FH-SURF-KLT");
-	JComboBox<String> comboColor = combo(colorization.ordinal(),Colorization.values());
+	JComboBox<String> comboAlg = combo(algorithm,"KLT","ST-BRIEF","ST-NCC","FH-SURF","ST-SURF-KLT","FH-SURF-KLT");
+	JComboBox<String> comboColor = combo(colorization.ordinal(),(Object[])Colorization.values());
 
 	// Spawn features when tracks drop below this value
 	JSpinner spinnerMinFeats = spinner(minFeatures,50,10000,10);
@@ -76,7 +76,7 @@ public class TrackerPointControlPanel
 
 	JSpinner spinnerTargetPeriod = spinner(videoPeriod,0,1000,5);
 	JSpinner spinnerMinDuration = spinner(minDuration,0,1000,1);
-	JComboBox<String> comboMarker = combo(markerType.ordinal(),Marker.values());
+	JComboBox<String> comboMarker = combo(markerType.ordinal(),(Object[])Marker.values());
 
 	Listener listener;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("rawtypes")
 public class ExampleJCodecDisplayFrames {
 	public static void main(String[] args) {
 
@@ -67,7 +68,7 @@ public class ExampleJCodecDisplayFrames {
 
 			try {
 				Thread.sleep(22);
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException ignore) {}
 		}
 		System.out.println("Only read FPS = "+(totalNano/1000000.0)/sequence.getFrameNumber());
 	}

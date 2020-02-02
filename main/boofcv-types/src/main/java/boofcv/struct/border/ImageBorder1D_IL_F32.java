@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,8 @@ package boofcv.struct.border;
 
 import boofcv.struct.image.InterleavedF32;
 
+import java.lang.reflect.InvocationTargetException;
+
 
 /**
  * @author Peter Abeles
@@ -30,9 +32,9 @@ public class ImageBorder1D_IL_F32 extends ImageBorder_IL_F32 implements ImageBor
 
 	public ImageBorder1D_IL_F32(Class<?> type) {
 		try {
-			this.rowWrap = (BorderIndex1D)type.newInstance();
-			this.colWrap = (BorderIndex1D)type.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
+			this.rowWrap = (BorderIndex1D)type.getConstructor().newInstance();
+			this.colWrap = (BorderIndex1D)type.getConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

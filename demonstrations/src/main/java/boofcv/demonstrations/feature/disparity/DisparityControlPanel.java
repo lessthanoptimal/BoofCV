@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 	public final ConfigDisparityBMBest5 configBM;
 	public final ConfigDisparitySGM configSGM;
 
-	JComboBox comboMethod, comboError;
+	JComboBox<String> comboMethod, comboError;
 
 	JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -78,9 +78,9 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 
 		comboMethod = combo(e -> handleMethod(), selectedMethod,"BlockMatch-5","BlockMatch","SGM");
 		if( isBlockSelected() )
-			comboError = combo(e -> handleErrorSelected(false),configBM.errorType.ordinal(),ERRORS_BLOCK);
+			comboError = combo(e -> handleErrorSelected(false),configBM.errorType.ordinal(),(Object[])ERRORS_BLOCK);
 		else
-			comboError = combo(e -> handleErrorSelected(false),configSGM.errorType.ordinal(), ERRORS_SGM);
+			comboError = combo(e -> handleErrorSelected(false),configSGM.errorType.ordinal(), (Object[])ERRORS_SGM);
 		controlBM = new ControlsBlockMatching();
 		controlSGM = new ControlsSemiGlobal();
 		controlSad = new ControlsSAD();
@@ -127,6 +127,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public StereoDisparity createAlgorithm() {
 //		BoofSwingUtil.checkGuiThread(); // TODO lock instead to make this safe?
 
@@ -177,10 +178,10 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		if( block != previousBlock ) {
 			int activeTab = tabbedPane.getSelectedIndex(); // don't switch out of the current tab
 			if( block ) {
-				comboError.setModel( new DefaultComboBoxModel( ERRORS_BLOCK ) );
+				comboError.setModel( new DefaultComboBoxModel<>( ERRORS_BLOCK ) );
 				comboError.setSelectedIndex(configBM.errorType.ordinal());
 			} else {
-				comboError.setModel( new DefaultComboBoxModel( ERRORS_SGM ) );
+				comboError.setModel( new DefaultComboBoxModel<>( ERRORS_SGM ) );
 				comboError.setSelectedIndex(configSGM.errorType.ordinal());
 			}
 			Component c = getModelControl(block);
@@ -318,7 +319,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 	}
 
 	public class ControlsSemiGlobal extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
-		JComboBox comboPaths = combo(configSGM.paths.ordinal(),"1","2","4","8","16");
+		JComboBox<String> comboPaths = combo(configSGM.paths.ordinal(),"1","2","4","8","16");
 
 		JSpinner spinnerPenaltySmall = spinner(configSGM.penaltySmallChange,0, SgmDisparityCost.MAX_COST,10);
 		JSpinner spinnerPenaltyLarge = spinner(configSGM.penaltyLargeChange,1, SgmDisparityCost.MAX_COST,10);
@@ -330,7 +331,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		JSpinner spinnerTexture = spinner(configSGM.texture,0.0,1.0,0.05,1,3);
 		JCheckBox subpixelToggle = checkbox("Subpixel",configSGM.subpixel);
 		JCheckBox useBlocks = checkbox("Use Blocks",configSGM.useBlocks);
-		JComboBox comboBlockApproach = combo(configSGM.configBlockMatch.approach.ordinal(),BlockMatchingApproach.values());
+		JComboBox<String> comboBlockApproach = combo(configSGM.configBlockMatch.approach.ordinal(),(Object[])BlockMatchingApproach.values());
 		JSpinner radiusXSpinner = spinner(configSGM.configBlockMatch.radiusX,0,50,1); // TODO move to error
 		JSpinner radiusYSpinner = spinner(configSGM.configBlockMatch.radiusY,0,50,1);
 
@@ -407,7 +408,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 	}
 
 	class ControlsCensus extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
-		JComboBox comboVariant = combo(0, (Object[]) CensusVariants.values());
+		JComboBox<String> comboVariant = combo(0, (Object[]) CensusVariants.values());
 		ConfigDisparityError.Census settings;
 
 		public ControlsCensus() {

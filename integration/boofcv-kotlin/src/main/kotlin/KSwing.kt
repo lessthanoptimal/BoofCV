@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package boofcv.kotlin
 
 import boofcv.alg.color.ColorRgb

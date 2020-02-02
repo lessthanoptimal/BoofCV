@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -947,15 +947,15 @@ public class BoofTesting {
 		}
 	}
 
-	public static Object createInstance(Class type) {
+	public static Object createInstance(Class<?> type) {
 		try {
-			return type.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
+			return type.getConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public static WorkArrays createWorkArray(Class type, int length ) {
+	public static WorkArrays createWorkArray(Class<?> type, int length ) {
 		WorkArrays w = (WorkArrays)createInstance(type);
 		w.reset(length);
 		return w;

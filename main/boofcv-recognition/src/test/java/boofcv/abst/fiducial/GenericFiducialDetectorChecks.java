@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class GenericFiducialDetectorChecks {
 
 	// tolerance for difference between pixel location and geometric center from reprojection
@@ -370,7 +371,7 @@ public abstract class GenericFiducialDetectorChecks {
 //			BoofMiscOps.sleep(10_000);
 
 
-			assertTrue(detector.totalFound() == foundIds.length);
+			assertEquals(detector.totalFound(), foundIds.length);
 
 			for (int i = 0; i < detector.totalFound(); i++) {
 				detector.computeStability(i,0.2,results);
@@ -497,8 +498,6 @@ public abstract class GenericFiducialDetectorChecks {
 
 		public Results( int N ) {
 			id = new long[ N ];
-			pose = new ArrayList<>();
-			pixel = new ArrayList<>();
 		}
 	}
 }

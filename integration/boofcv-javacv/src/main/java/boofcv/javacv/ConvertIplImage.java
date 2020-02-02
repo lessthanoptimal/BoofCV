@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,9 +30,10 @@ import static org.bytedeco.javacpp.opencv_core.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class ConvertIplImage {
 
-	public static <T extends ImageBase>T convertFrom( IplImage input ) {
+	public static <T extends ImageBase<T>>T convertFrom( IplImage input ) {
 		if( input.nChannels() == 1 ) {
 			return (T)convertFrom(input,(ImageGray)null);
 		} else {

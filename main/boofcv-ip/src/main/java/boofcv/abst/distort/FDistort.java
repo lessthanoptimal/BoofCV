@@ -51,6 +51,7 @@ import georegression.struct.point.Point2D_F32;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class FDistort
 {
 	// type of input image

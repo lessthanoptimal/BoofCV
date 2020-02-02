@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.generate;
 
 import boofcv.struct.image.*;
+
+import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -56,12 +58,12 @@ public enum AutoTypeImage {
 		imageSingleName = imageType.getSimpleName();
 		bitWise = "";
 		try {
-			ImageGray img = (ImageGray)imageType.newInstance();
+			ImageGray img = (ImageGray)imageType.getConstructor().newInstance();
 			setByDataType(img.getDataType());
 			dataType = primitiveType.getSimpleName();
 
 
-		} catch (InstantiationException | IllegalAccessException e) {
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

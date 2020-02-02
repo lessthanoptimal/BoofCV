@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,8 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel
 
 	JButton resetButton;
 	JCheckBox showView;
-	JComboBox spinnerTracker = combo(0,FeatureTrackerTypes.getTrackerNames().toArray(new String[0]));
-	JComboBox spinnerModels = combo(0,"Affine","Homography");
+	JComboBox<String> spinnerTracker = combo(0,(Object[])FeatureTrackerTypes.getTrackerNames().toArray(new String[0]));
+	JComboBox<String> spinnerModels = combo(0,"Affine","Homography");
 	JCheckBox showInliers;
 	JCheckBox showAll;
 	JTextArea displayPeriodMS;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import org.jcodec.common.model.Picture;
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class UtilJCodec {
 	/**
 	 * Converts an image in JCodec format into one in BoofCV format.
@@ -33,14 +34,14 @@ public class UtilJCodec {
 	 */
 	public static void convertToBoof(Picture input, ImageBase output) {
 		if( input.getColor() == ColorSpace.RGB ) {
-			ImplConvertJCodecPicture.RGB_to_PLU8(input, (Planar) output);
+			ImplConvertJCodecPicture.RGB_to_PLU8(input, (Planar<GrayU8>) output);
 		} else if( input.getColor() == ColorSpace.YUV420 ) {
 			if( output instanceof Planar) {
 				Planar ms = (Planar)output;
 				if( ms.getImageType().getDataType() == ImageDataType.U8 ) {
-					ImplConvertJCodecPicture.yuv420_to_PlRgb_U8(input, ms);
+					ImplConvertJCodecPicture.yuv420_to_PlRgb_U8(input, (Planar<GrayU8>)ms);
 				} else if( ms.getImageType().getDataType() == ImageDataType.F32 ) {
-					ImplConvertJCodecPicture.yuv420_to_PlRgb_F32(input, ms);
+					ImplConvertJCodecPicture.yuv420_to_PlRgb_F32(input, (Planar<GrayF32>)ms);
 				}
 			} else if( output instanceof GrayU8) {
 				ImplConvertJCodecPicture.yuv420_to_U8(input, (GrayU8) output);

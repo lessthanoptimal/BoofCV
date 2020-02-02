@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,51 +36,52 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestConvertBufferedImage {
+@SuppressWarnings({"rawtypes", "unchecked"})
+class TestConvertBufferedImage {
 
 	Random rand = new Random(234);
 
 	int imgWidth = 10;
 	int imgHeight = 20;
 
-	@Test
-	public void checkCopy() {
+ 	@Test
+	void checkCopy() {
 		BufferedImage a = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 3, rand);
 		BufferedImage b = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 3, rand);
 
-		assertTrue( b == ConvertBufferedImage.checkCopy(a,b));
+		assertSame(b, ConvertBufferedImage.checkCopy(a, b));
 		BufferedImageChecks.checkIdentical(a,b);
 
 		BufferedImage c = ConvertBufferedImage.checkCopy(a,null);
 		BufferedImageChecks.checkIdentical(a,c);
 	}
 
-	@Test
-	public void checkInputs() {
+ 	@Test
+	void checkInputs() {
 		BufferedImage found;
 
 		found = ConvertBufferedImage.checkInputs(new GrayU8(10,10),null);
-		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
+		assertEquals(found.getType(), BufferedImage.TYPE_BYTE_GRAY);
 		found = ConvertBufferedImage.checkInputs(new GrayS8(10,10),null);
-		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
+		assertEquals(found.getType(), BufferedImage.TYPE_BYTE_GRAY);
 		found = ConvertBufferedImage.checkInputs(new GrayU16(10,10),null);
-		assertTrue(found.getType() == BufferedImage.TYPE_USHORT_GRAY);
+		assertEquals(found.getType(), BufferedImage.TYPE_USHORT_GRAY);
 		found = ConvertBufferedImage.checkInputs(new GrayS16(10,10),null);
-		assertTrue(found.getType() == BufferedImage.TYPE_USHORT_GRAY);
+		assertEquals(found.getType(), BufferedImage.TYPE_USHORT_GRAY);
 
 		// not really what to do about floating point images.  No equivalent BufferedImage.  Just assume its a regular
 		// gray input image with pixel values from 0 to 255
 		found = ConvertBufferedImage.checkInputs(new GrayF32(10, 10), null);
-		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
+		assertEquals(found.getType(), BufferedImage.TYPE_BYTE_GRAY);
 		found = ConvertBufferedImage.checkInputs(new GrayF64(10,10),null);
-		assertTrue(found.getType() == BufferedImage.TYPE_BYTE_GRAY);
+		assertEquals(found.getType(), BufferedImage.TYPE_BYTE_GRAY);
 
 		found = ConvertBufferedImage.checkInputs(new Planar(GrayU8.class,3,10,10),null);
-		assertTrue(found.getType() == BufferedImage.TYPE_INT_RGB);
+		assertEquals(found.getType(), BufferedImage.TYPE_INT_RGB);
 	}
 
-	@Test
-	public void extractInterleavedU8() {
+ 	@Test
+	void extractInterleavedU8() {
 		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 3, rand);
 
 		InterleavedU8 found = ConvertBufferedImage.extractInterleavedU8(origImg);
@@ -93,7 +94,7 @@ public class TestConvertBufferedImage {
 		assertEquals(3, found.getImageType().getNumBands());
 		assertFalse(found.isSubimage());
 
-		assertTrue(found.data != null);
+		assertNotNull(found.data);
 		assertEquals(imgWidth * imgHeight * 3, found.data.length);
 
 		// test a sub-image input
@@ -109,33 +110,32 @@ public class TestConvertBufferedImage {
 		assertTrue(found.isSubimage());
 	}
 
-	@Test
-	public void extractInterleavedInt8_indexed() {
+ 	@Test
+	void extractInterleavedInt8_indexed() {
 		BufferedImage origImg = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_BYTE_INDEXED);
 
 		assertThrows(IllegalArgumentException.class,
 				()->ConvertBufferedImage.extractInterleavedU8(origImg));
 	}
 
-	@Test
-	public void extractInterleavedU8_fail() {
+ 	@Test
+	void extractInterleavedU8_fail() {
 		try {
 			BufferedImage origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
 			ConvertBufferedImage.extractInterleavedU8(origImg);
 			fail("Should hbe the wrong type");
-		} catch (IllegalArgumentException e) {
-		}
+		} catch (IllegalArgumentException ignore) {}
 	}
 
-	@Test
-	public void extractGrayU8() {
+ 	@Test
+	void extractGrayU8() {
 		BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 1, rand);
 
 		GrayU8 found = ConvertBufferedImage.extractGrayU8(origImg);
 
 		assertEquals(imgWidth, found.width);
 		assertEquals(imgHeight, found.height);
-		assertTrue(found.data != null);
+		assertNotNull(found.data);
 		assertEquals(imgWidth * imgHeight, found.data.length);
 
 		// test a sub-image input
@@ -149,33 +149,31 @@ public class TestConvertBufferedImage {
 		assertEquals(6, found.height);
 	}
 
-	@Test
-	public void extractImageInt8_indexed() {
+ 	@Test
+	void extractImageInt8_indexed() {
 		BufferedImage origImg = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_BYTE_INDEXED);
 
 		assertThrows(IllegalArgumentException.class,
 				()->ConvertBufferedImage.extractGrayU8(origImg));
 	}
 
-	@Test
-	public void extractImageInt8_fail() {
+ 	@Test
+	void extractImageInt8_fail() {
 		try {
 			BufferedImage origImg = TestConvertRaster.createByteBuff(imgWidth, imgHeight, 3, rand);
 			ConvertBufferedImage.extractGrayU8(origImg);
 			fail("Should have had an unexpected number of bands");
-		} catch (IllegalArgumentException e) {
-		}
+		} catch (IllegalArgumentException ignore) {}
 
 		try {
 			BufferedImage origImg = TestConvertRaster.createIntBuff(imgWidth, imgHeight, rand);
 			ConvertBufferedImage.extractGrayU8(origImg);
 			fail("Should be the wrong type");
-		} catch (IllegalArgumentException e) {
-		}
+		} catch (IllegalArgumentException ignore) {}
 	}
 
-	@Test
-	public void extractBuffered_InterleavedU8() {
+ 	@Test
+	void extractBuffered_InterleavedU8() {
 		// test it with 3 bands
 		InterleavedU8 srcImg = new InterleavedU8(imgWidth, imgHeight, 3);
 		ImageInterleavedTestingOps.randomize(srcImg, rand);
@@ -192,8 +190,8 @@ public class TestConvertBufferedImage {
 
 	}
 
-	@Test
-	public void extractBuffered_Int8() {
+ 	@Test
+	void extractBuffered_Int8() {
 		// use a signed image because it is checked against a byte array
 		GrayU8 srcImg = new GrayU8(imgWidth, imgHeight);
 		ImageMiscOps.fillUniform(srcImg, rand, 0, 100);
@@ -206,8 +204,8 @@ public class TestConvertBufferedImage {
 	/**
 	 * Ensures that the orderRgb flag is correctly handled
 	 */
-	@Test
-	public void convertFrom_PL_orderRgb() {
+ 	@Test
+	void convertFrom_PL_orderRgb() {
 		Class []bandTypes = new Class[]{GrayU8.class,GrayF32.class};
 		for( Class b : bandTypes ) {
 			convertFrom_PL_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
@@ -237,8 +235,8 @@ public class TestConvertBufferedImage {
 		checkBandOrder(buffType, reorder, input, numBands, output);
 	}
 
-	@Test
-	public void convertFrom_interlaced_orderRgb() {
+ 	@Test
+	void convertFrom_interlaced_orderRgb() {
 		Class []bandTypes = new Class[]{InterleavedU8.class,InterleavedF32.class};
 		for( Class b : bandTypes ) {
 			convertFrom_interlaced_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
@@ -268,8 +266,8 @@ public class TestConvertBufferedImage {
 		checkBandOrder(buffType, reorder, input, numBands, output);
 	}
 
-	@Test
-	public void convertFromSingle() {
+ 	@Test
+	void convertFromSingle() {
 		BufferedImage origImg;
 
 		for( int i = 0; i < 6; i++ ) {
@@ -308,8 +306,8 @@ public class TestConvertBufferedImage {
 	/**
 	 * Not all types support conversion into 16 bit images, so the special case of 16bit image are handled here
 	 */
-	@Test
-	public void convertFromSingle_I16() {
+ 	@Test
+	void convertFromSingle_I16() {
 		BufferedImage origImg = TestConvertRaster.createShortBuff(imgWidth, imgHeight, rand);
 
 		for( int j = 0; j < 2; j++ ) {
@@ -329,8 +327,8 @@ public class TestConvertBufferedImage {
 		}
 	}
 
-	@Test
-	public void convertFromPlanar() {
+ 	@Test
+	void convertFromPlanar() {
 		BufferedImage origImg;
 
 		for( int i = 0; i < 6; i++ ) {
@@ -365,8 +363,8 @@ public class TestConvertBufferedImage {
 		}
 	}
 
-	@Test
-	public void convertFromInterleaved() {
+ 	@Test
+	void convertFromInterleaved() {
 		BufferedImage origImg;
 
 		for( int i = 0; i < 6; i++ ) {
@@ -414,8 +412,8 @@ public class TestConvertBufferedImage {
 	/**
 	 * Create an image and convert it into a buffered image
 	 */
-	@Test
-	public void convertTo_SB() {
+ 	@Test
+	void convertTo_SB() {
 		Class[] types = new Class[]{GrayU8.class, GrayU16.class, GrayF32.class};
 
 		for (Class t : types) {
@@ -426,8 +424,8 @@ public class TestConvertBufferedImage {
 		}
 	}
 
-	@Test
-	public void convertTo_PL() {
+ 	@Test
+	void convertTo_PL() {
 		Class[] types = new Class[]{GrayU8.class, GrayF32.class};
 
 		for (Class t : types) {
@@ -438,8 +436,8 @@ public class TestConvertBufferedImage {
 		}
 	}
 
-	@Test
-	public void convertTo_IL() {
+ 	@Test
+	void convertTo_IL() {
 		Class[] types = new Class[]{InterleavedU8.class, InterleavedF32.class};
 
 		for (Class t : types) {
@@ -470,8 +468,8 @@ public class TestConvertBufferedImage {
 	/**
 	 * Ensures that the orderRgb flag is correctly handled
 	 */
-	@Test
-	public void convertTo_PL_orderRgb() {
+ 	@Test
+	void convertTo_PL_orderRgb() {
 		Class []bandTypes = new Class[]{GrayU8.class,GrayF32.class};
 		for( Class b : bandTypes ) {
 			convertTo_PL_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
@@ -506,8 +504,8 @@ public class TestConvertBufferedImage {
 		checkBandOrder(buffType, reorder, output, numBands, input);
 	}
 
-	@Test
-	public void convertTo_interleaved_orderRgb() {
+ 	@Test
+	void convertTo_interleaved_orderRgb() {
 		Class []bandTypes = new Class[]{InterleavedI8.class,InterleavedF32.class};
 		for( Class b : bandTypes ) {
 			convertTo_interleaved_orderRgb(BufferedImage.TYPE_3BYTE_BGR, b, true);
@@ -589,8 +587,8 @@ public class TestConvertBufferedImage {
 		}
 	}
 
-	@Test
-	public void convertTo_JComponent() {
+ 	@Test
+	void convertTo_JComponent() {
 		JLabel label = new JLabel("Hi");
 		// need to give it a size
 		label.setBounds(0, 0, imgWidth, imgHeight);
@@ -608,8 +606,8 @@ public class TestConvertBufferedImage {
 		// could check to see that the pixels are not all uniform....
 	}
 
-	@Test
-	public void isSubImage() {
+ 	@Test
+	void isSubImage() {
 		BufferedImage a = new BufferedImage(20,30,BufferedImage.TYPE_BYTE_GRAY);
 
 		assertFalse(ConvertBufferedImage.isSubImage(a));
@@ -627,23 +625,23 @@ public class TestConvertBufferedImage {
 		assertTrue(ConvertBufferedImage.isSubImage(b));
 	}
 
-	@Test
-	public void stripAlphaChannel() {
+ 	@Test
+	void stripAlphaChannel() {
 		BufferedImage a = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_4BYTE_ABGR);
 		BufferedImage b = ConvertBufferedImage.stripAlphaChannel(a);
 
-		assertTrue(a != b);
+		assertNotSame(a, b);
 		assertEquals(3,b.getRaster().getNumBands());
 
 		BufferedImage c = ConvertBufferedImage.stripAlphaChannel(b);
-		assertTrue(b == c);
+		assertSame(b, c);
 
 		a = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_BYTE_GRAY);
 		c = ConvertBufferedImage.stripAlphaChannel(a);
-		assertTrue(a == c);
+		assertSame(a, c);
 
 		a = new BufferedImage(imgWidth,imgHeight,BufferedImage.TYPE_3BYTE_BGR);
 		c = ConvertBufferedImage.stripAlphaChannel(a);
-		assertTrue(a == c);
+		assertSame(a, c);
 	}
 }
