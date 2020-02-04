@@ -46,7 +46,7 @@ class TestPointCloudIO {
 			expected.add( new Point3D_F32(i*123.45f,i-1.01f,i+2.34f));
 		}
 
-		Format[] formats = new Format[]{Format.PLY_ASCII,Format.PLY_BINARY};
+		Format[] formats = new Format[]{Format.PLY};
 		for( Format f : formats ) {
 			FastQueue<Point3D_F32> found = new FastQueue<>(Point3D_F32.class,true);
 			found.grow().set(1,1,1);
@@ -71,7 +71,7 @@ class TestPointCloudIO {
 			expected.add( new Point3D_F64(i*123.45,i-1.01,i+2.34));
 		}
 
-		Format[] formats = new Format[]{Format.PLY_ASCII,Format.PLY_BINARY};
+		Format[] formats = new Format[]{Format.PLY};
 		for( Format f : formats ) {
 			FastQueue<Point3D_F64> found = new FastQueue<>(Point3D_F64.class,true);
 			found.grow().set(1,1,1);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,11 @@
 package boofcv.abst.fiducial.calib;
 
 import georegression.metric.UtilAngle;
+import georegression.struct.point.Point2D_F64;
+import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Generic class for rendering calibration targets
@@ -26,6 +31,11 @@ import georegression.metric.UtilAngle;
  * @author Peter Abeles
  */
 public abstract class RenderCalibrationTargets {
+
+	/**
+	 * Where calibration landmarks are located in the rendered document
+	 */
+	@Getter	List<Point2D_F64> landmarks = new ArrayList<>();
 
 	public void chessboard( int rows , int cols , double squareWidth ) {
 		specifySize(squareWidth*cols,squareWidth*rows);
@@ -39,11 +49,21 @@ public abstract class RenderCalibrationTargets {
 				drawSquare(x,y,squareWidth);
 			}
 		}
+
+		landmarks.clear();
+		for (int i = 1; i < rows; i++) {
+			double y = i*squareWidth;
+			for (int j = 1; j < cols; j ++) {
+				double x = j * squareWidth;
+				Point2D_F64 a = new Point2D_F64();
+				markerToTarget(x,y,a);
+				landmarks.add( a );
+			}
+		}
 	}
 
 	public void squareGrid( int rows , int cols , double squareWidth, double spaceWidth ) {
 		specifySize(squareWidth*cols,squareWidth*rows);
-
 
 		double targetWidth = cols*squareWidth + (cols-1)*spaceWidth;
 		double targetHeight = rows*squareWidth + (rows-1)*spaceWidth;
@@ -99,6 +119,8 @@ public abstract class RenderCalibrationTargets {
 	}
 
 	public abstract void specifySize( double width , double height );
+
+	public abstract void markerToTarget(double x , double y , Point2D_F64 p );
 
 	public abstract void drawSquare( double x , double y , double width );
 

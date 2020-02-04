@@ -473,9 +473,16 @@ public abstract class DemonstrationBase extends JPanel {
 		for (int i = 0; i < files.length; i++) {
 			File f = files[i];
 			String name = f.getName().toLowerCase();
-			// filter out common non image/video files
-			if( name.endsWith(".txt") || name.endsWith(".yaml") || name.endsWith(".xml"))
-				continue;
+			if( inputMethod == InputMethod.IMAGE ) {
+				if( !f.isFile() )
+					continue;
+				if( !BoofSwingUtil.isImage(f) )
+					continue;
+			} else {
+				// filter out common non image/video files
+				if (name.endsWith(".txt") || name.endsWith(".yaml") || name.endsWith(".xml"))
+					continue;
+			}
 
 			if( current.compareTo(f) < 0 ) {
 				if( closest == null || closest.compareTo(f) > 0 ) {

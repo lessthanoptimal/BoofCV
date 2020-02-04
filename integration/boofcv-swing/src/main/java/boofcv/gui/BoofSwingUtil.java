@@ -533,7 +533,7 @@ public class BoofSwingUtil {
 			try {
 				var f = new File(file.getParent(),n);
 				var w = new FileOutputStream(f);
-				PointCloudIO.save3D(PointCloudIO.Format.PLY_BINARY, PointCloudReader.wrapF64RGB(cloud.toList()), true, w);
+				PointCloudIO.save3D(PointCloudIO.Format.PLY, PointCloudReader.wrapF64RGB(cloud.toList()), true, w);
 				w.close();
 			} catch (IOException e) {
 				e.printStackTrace();

@@ -30,7 +30,6 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.nio.ByteOrder;
 
 /**
@@ -40,13 +39,21 @@ import java.nio.ByteOrder;
  */
 public class PointCloudIO {
 
+	/**
+	 * Saves point cloud to disk using a high level API. For more control over the format use the CODEC directly.
+	 *
+	 * @see PlyCodec
+	 *
+	 * @param format
+	 * @param cloud
+	 * @param saveRGB
+	 * @param outputStream
+	 * @throws IOException
+	 */
 	public static void save3D(Format format, PointCloudReader cloud , boolean saveRGB, OutputStream outputStream ) throws IOException {
 		switch( format ) {
-			case PLY_ASCII:
-				PlyCodec.saveAscii(cloud, saveRGB, new OutputStreamWriter(outputStream));
-				break;
-			case PLY_BINARY:
-				PlyCodec.saveBinary(cloud, ByteOrder.BIG_ENDIAN, saveRGB,true, outputStream);
+			case PLY:
+				PlyCodec.saveBinary(cloud, ByteOrder.BIG_ENDIAN, saveRGB,false, outputStream);
 				break;
 
 			default:
@@ -85,8 +92,7 @@ public class PointCloudIO {
 	public static void
 	load(Format format , InputStream input , PointCloudWriter output ) throws IOException {
 		switch( format ) {
-			case PLY_ASCII:
-			case PLY_BINARY:
+			case PLY:
 				PlyCodec.read(input,output);
 				break;
 			default:
@@ -97,7 +103,9 @@ public class PointCloudIO {
 	public enum Format {
 		/**
 		 * https://en.wikipedia.org/wiki/PLY_(file_format)
+		 *
+		 * @see PlyCodec
 		 */
-		PLY_ASCII,PLY_BINARY
+		PLY
 	}
 }

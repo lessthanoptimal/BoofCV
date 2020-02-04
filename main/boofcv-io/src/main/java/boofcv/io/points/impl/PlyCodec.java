@@ -365,4 +365,11 @@ public class PlyCodec {
 		BINARY_BIG
 	}
 
+	public enum Encoding {
+		/**
+		 * https://en.wikipedia.org/wiki/PLY_(file_format)
+		 */
+		PLY_ASCII,PLY_BINARY
+	}
+
 }
