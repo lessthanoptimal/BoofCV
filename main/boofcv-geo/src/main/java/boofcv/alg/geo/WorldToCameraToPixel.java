@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import lombok.Getter;
 
 /**
  * Convenience class which will take a point in world coordinates, translate it to camera reference frame,
@@ -38,13 +39,13 @@ import georegression.transform.se.SePointOps_F64;
 public class WorldToCameraToPixel {
 
 	// transform from world to camera reference frames
-	private Se3_F64 worldToCamera;
+	@Getter private Se3_F64 worldToCamera;
 
 	// storage for point in camera frame
-	private Point3D_F64 cameraPt = new Point3D_F64();
+	@Getter	private Point3D_F64 cameraPt = new Point3D_F64();
 
 	// transform from normalized image coordinates into pixels
-	private Point2Transform2_F64 normToPixel;
+	@Getter private Point2Transform2_F64 normToPixel;
 
 	/**
 	 * Specifies intrinsic camera parameters and  the transform from world to camera.
