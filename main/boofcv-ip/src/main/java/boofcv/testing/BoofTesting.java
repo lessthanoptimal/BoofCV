@@ -34,7 +34,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 // todo remove all comwapare with border functions and use sub-images instead
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings("ALL")
 public class BoofTesting {
 
 	public static <T> T convertToGenericType(Class<?> type) {
@@ -252,7 +252,6 @@ public class BoofTesting {
 	 */
 	// TODO make sure pixels outside are not modified of sub-matrix
 	// todo have the submatrices be from different shaped inputs
-	@SuppressWarnings({"unchecked"})
 	public static void checkSubImage(Object testClass,
 									 String function,
 									 boolean checkEquals,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,8 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.video.VideoInterface;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author Peter Abeles
@@ -53,10 +55,10 @@ public class DynamicWebcamInterface implements WebcamInterface {
 	public static WebcamInterface loadManager( String pathToManager ) {
 		try {
 			Class c = Class.forName(pathToManager);
-			return (WebcamInterface) c.newInstance();
+			return (WebcamInterface) c.getConstructor().newInstance();
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Class not found.  Is it included in the class path?");
-		} catch (InstantiationException | IllegalAccessException e) {
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

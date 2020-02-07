@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.distort;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.interpolate.InterpolatePixelS;
-import boofcv.alg.interpolate.InterpolationType;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.border.BorderType;
@@ -42,8 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-@SuppressWarnings({"unchecked"})
-public class TestDistortImageOps {
+class TestDistortImageOps {
 
 	Random rand = new Random(234);
 	int width = 20;
@@ -53,13 +52,13 @@ public class TestDistortImageOps {
 	 * Checks to see if the two ways of specifying interpolation work
 	 */
 	@Test
-	public void scale_InterpTypeStyle() {
+	void scale_InterpTypeStyle() {
 		GrayF32 input = new GrayF32(width,height);
-		GrayF32 output = new GrayF32(width,height);
+		GrayF32 output = input.createSameShape();
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		DistortImageOps.scale(input,output, BorderType.ZERO, InterpolationType.BILINEAR);
+		new FDistort(input,output).border(BorderType.ZERO).scale().apply();
 
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(input, BorderType.EXTENDED);
 		interp.setImage(input);
@@ -88,13 +87,13 @@ public class TestDistortImageOps {
 	 * Very simple test for rotation accuracy.
 	 */
 	@Test
-	public void rotate_SanityCheck() {
-		GrayF32 input = new GrayF32(width,height);
-		GrayF32 output = new GrayF32(height,width);
+	void rotate_SanityCheck() {
+		var input = new GrayF32(width,height);
+		var output = new GrayF32(height,width);
 
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
-		DistortImageOps.rotate(input, output,BorderType.ZERO, InterpolationType.BILINEAR, (float) Math.PI / 2f);
+		new FDistort(input,output).border(BorderType.ZERO).rotate(Math.PI/2.0).apply();
 
 		double error = 0;
 		// the outside pixels are ignored because numerical round off can cause those to be skipped
@@ -114,13 +113,13 @@ public class TestDistortImageOps {
 	 * boundBox that checks to see if it is contained inside the output image.
 	 */
 	@Test
-	public void boundBox_check() {
+	void boundBox_check() {
 
 		Point2D_F32 work = new Point2D_F32();
 
 		// basic sanity check
-		Affine2D_F32 affine = new Affine2D_F32(1,0,0,1,2,3);
-		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32(affine);
+		var affine = new Affine2D_F32(1,0,0,1,2,3);
+		var transform = new PixelTransformAffine_F32(affine);
 		RectangleLength2D_I32 found = DistortImageOps.boundBox(10,20,30,40,work,transform);
 		
 		assertEquals(2,found.x0);
@@ -145,12 +144,12 @@ public class TestDistortImageOps {
 	}
 
 	@Test
-	public void boundBox() {
+	void boundBox() {
 		Point2D_F32 work = new Point2D_F32();
 
 		// basic sanity check
-		Affine2D_F32 affine = new Affine2D_F32(1,0,0,1,2,3);
-		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32(affine);
+		var affine = new Affine2D_F32(1,0,0,1,2,3);
+		var transform = new PixelTransformAffine_F32(affine);
 		RectangleLength2D_I32 found = DistortImageOps.boundBox(10,20,work,transform);
 
 		assertEquals(2,found.x0);
@@ -160,12 +159,12 @@ public class TestDistortImageOps {
 	}
 
 	@Test
-	public void boundBox_F32() {
+	void boundBox_F32() {
 		Point2D_F32 transformed = new Point2D_F32();
 
 		// basic sanity check
-		Affine2D_F32 affine = new Affine2D_F32(1,0,0,1,2,3);
-		PixelTransformAffine_F32 transform = new PixelTransformAffine_F32(affine);
+		var affine = new Affine2D_F32(1,0,0,1,2,3);
+		var transform = new PixelTransformAffine_F32(affine);
 		RectangleLength2D_F32 found = DistortImageOps.boundBox_F32(10,20,transform,transformed);
 
 		assertEquals(2,found.x0,1e-4);
@@ -175,12 +174,12 @@ public class TestDistortImageOps {
 	}
 
 	@Test
-	public void boundBox_F64() {
+	void boundBox_F64() {
 		Point2D_F64 transformed = new Point2D_F64();
 
 		// basic sanity check
-		Affine2D_F64 affine = new Affine2D_F64(1,0,0,1,2,3);
-		PixelTransformAffine_F64 transform = new PixelTransformAffine_F64(affine);
+		var affine = new Affine2D_F64(1,0,0,1,2,3);
+		var transform = new PixelTransformAffine_F64(affine);
 		RectangleLength2D_F64 found = DistortImageOps.boundBox_F64(10, 20,transform,transformed);
 
 		assertEquals(2,found.x0,1e-8);

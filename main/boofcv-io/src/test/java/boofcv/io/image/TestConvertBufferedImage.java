@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-class TestConvertBufferedImage {
+public class TestConvertBufferedImage {
 
 	Random rand = new Random(234);
 

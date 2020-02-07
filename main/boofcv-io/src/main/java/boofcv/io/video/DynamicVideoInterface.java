@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.struct.image.ImageType;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.List;
 
@@ -45,11 +46,11 @@ public class DynamicVideoInterface implements VideoInterface {
 	public DynamicVideoInterface() {
 		try {
 			ffmpeg = loadManager("boofcv.io.ffmpeg.FfmpegVideo");
-		} catch( RuntimeException e ) {}
+		} catch( RuntimeException ignore ) {}
 
 		try {
 			jcodec = loadManager("boofcv.io.jcodec.JCodecVideoInterface");
-		} catch( RuntimeException e ) {}
+		} catch( RuntimeException ignore ) {}
 	}
 
 	@Override
@@ -114,10 +115,10 @@ public class DynamicVideoInterface implements VideoInterface {
 	public static VideoInterface loadManager( String pathToManager ) {
 		try {
 			Class c = Class.forName(pathToManager);
-			return (VideoInterface) c.newInstance();
+			return (VideoInterface) c.getConstructor().newInstance();
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Class not found.  Is it included in the class path?");
-		} catch (InstantiationException | IllegalAccessException e) {
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

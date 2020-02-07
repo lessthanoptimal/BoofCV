@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,7 @@ public class BenchmarkConvolve  {
 		ImageMiscOps.fillUniform(input_F32,rand,0,20);
 	}
 
-	protected void setUp() throws Exception {
+	protected void setUp() {
 		kernelF32 = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, -1, radius);
 		kernelI32 = FactoryKernelGaussian.gaussian(Kernel1D_S32.class,-1,radius);
 		kernel2D_F32 = FactoryKernelGaussian.gaussian(Kernel2D_F32.class,-1,radius);

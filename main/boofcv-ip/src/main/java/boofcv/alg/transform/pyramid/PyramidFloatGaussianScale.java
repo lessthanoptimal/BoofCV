@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.alg.transform.pyramid;
 
+import boofcv.abst.distort.FDistort;
 import boofcv.abst.filter.blur.BlurStorageFilter;
-import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixelS;
@@ -121,11 +121,12 @@ public class PyramidFloatGaussianScale< T extends ImageGray<T>> extends PyramidF
 			blur.process(prev,tempImage);
 
 			// Resample the blurred image
+			FDistort distort = new FDistort();
 			if( scale[i] == 1 ) {
 				layer.setTo(tempImage);
 			} else {
 				PixelTransformAffine_F32 model = DistortSupport.transformScale(layer,tempImage, null);
-				DistortImageOps.distortSingle(tempImage,layer, true, model,interpolate);
+				distort.setRefs(tempImage,layer).transform(model).interp(interpolate).apply();
 			}
 		}
 	}

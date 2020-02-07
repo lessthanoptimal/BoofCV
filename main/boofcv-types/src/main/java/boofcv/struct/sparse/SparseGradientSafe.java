@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,8 @@ package boofcv.struct.sparse;
 
 import boofcv.struct.image.ImageGray;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Wraps around other {@link SparseImageGradient} classes and checks to see if
  * the image is in bounds or not.  If it is out of bounds the return value is set to one.
@@ -36,8 +38,8 @@ public class SparseGradientSafe<T extends ImageGray<T>, G extends GradientValue>
 		this.wrap = wrap;
 
 		try {
-			zero = (G) wrap.getGradientType().newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
+			zero = (G) wrap.getGradientType().getConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

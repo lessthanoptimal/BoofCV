@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.transform.pyramid;
 
-import boofcv.alg.distort.DistortImageOps;
+import boofcv.abst.distort.FDistort;
 import boofcv.alg.distort.PixelTransformAffine_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixelS;
@@ -60,12 +60,14 @@ public class PyramidFloatScale< T extends ImageGray<T>>
 		if( isSaveOriginalReference() )
 			throw new IllegalArgumentException("The original reference cannot be saved");
 
+		FDistort distort = new FDistort();
+
 		for( int i = 0; i < scale.length; i++ ) {
 			T prev = i == 0 ? input : getLayer(i-1);
 			T layer = getLayer(i);
 
 			PixelTransformAffine_F32 model = DistortSupport.transformScale(layer,prev, null);
-			DistortImageOps.distortSingle(prev,layer, true, model,interpolate);
+			distort.setRefs(prev,layer).transform(model).interp(interpolate).apply();
 		}
 	}
 

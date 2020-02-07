@@ -18,7 +18,6 @@
 
 package boofcv.demonstrations.calibration;
 
-import boofcv.alg.distort.DistortImageOps;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -128,10 +127,10 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		ConvertMatrixData.convert(rect2, rect2_F32);
 
 		// Will rectify the image
-		ImageType<GrayF32> imageType = ImageType.single(GrayF32.class);
-		ImageDistort<GrayF32,GrayF32> imageDistortLeft =
+		ImageType<Planar<GrayF32>> imageType = ImageType.pl(3,GrayF32.class);
+		ImageDistort<Planar<GrayF32>,Planar<GrayF32>> imageDistortLeft =
 				RectifyImageOps.rectifyImage(param.getLeft(), rect1_F32, BorderType.ZERO, imageType);
-		ImageDistort<GrayF32,GrayF32> imageDistortRight =
+		ImageDistort<Planar<GrayF32>,Planar<GrayF32>> imageDistortRight =
 				RectifyImageOps.rectifyImage(param.getRight(), rect2_F32, BorderType.ZERO, imageType);
 
 		// Fill the image with all black
@@ -139,8 +138,8 @@ public class ShowRectifyCalibratedApp extends SelectAlgorithmAndInputPanel {
 		GImageMiscOps.fill(rectRight,0);
 
 		// Render the rectified image
-		DistortImageOps.distortPL(distLeft, rectLeft, imageDistortLeft);
-		DistortImageOps.distortPL(distRight, rectRight, imageDistortRight);
+		imageDistortLeft.apply(distLeft,rectLeft);
+		imageDistortLeft.apply(distRight,rectRight);
 
 		// convert for output
 		final BufferedImage outLeft = ConvertBufferedImage.convertTo(rectLeft, null,true);
