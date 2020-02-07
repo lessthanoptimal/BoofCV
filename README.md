@@ -148,6 +148,14 @@ Code from the following libraries has been integrated into BoofCV
 The optional sub-projects in integration also have several dependencies. See those sub-projects for a list of their dependencies.
 
 ------------------------------------
+
+# CodeGuru
+
+This repository was run through [Amazon Codeguru](https://aws.amazon.com/codeguru/) to automate code review and identify the most expensive lines of code. This was run on Fri 7 Feb 2020. The following lists what has been recommended.
+
+
+
+------------------------------------
 # Contact
 
 For questions or comments about BoofCV please use the message board.  Only post a bug report after doing some due diligence to make sure it is really a bug and that it has not already been reported.
