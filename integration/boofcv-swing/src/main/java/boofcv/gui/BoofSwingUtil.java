@@ -185,9 +185,10 @@ public class BoofSwingUtil {
 		} else {
 			prefs = Preferences.userRoot().node(preferenceName);
 		}
-		String previousPath=prefs.get(KEY_PREVIOUS_SELECTION, defaultPath);
+		File previousPath=new File(prefs.get(KEY_PREVIOUS_SELECTION, defaultPath));
 		JFileChooser chooser = new JFileChooser(previousPath);
-		chooser.setSelectedFile(new File(previousPath));
+		if( previousPath.isFile() )
+			chooser.setSelectedFile(previousPath);
 
 		boolean selectDirectories = false;
 		escape:for( FileTypes t : filters ) {
