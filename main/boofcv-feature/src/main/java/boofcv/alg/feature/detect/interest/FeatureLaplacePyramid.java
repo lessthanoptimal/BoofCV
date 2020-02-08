@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,6 @@ import static boofcv.alg.feature.detect.interest.FastHessianFeatureDetector.poly
  * @author Peter Abeles
  * @see boofcv.factory.feature.detect.interest.FactoryInterestPoint
  */
-@SuppressWarnings({"unchecked"})
 public class FeatureLaplacePyramid<T extends ImageGray<T>, D extends ImageGray<D>>
 		implements InterestPointScaleSpacePyramid<T> {
 

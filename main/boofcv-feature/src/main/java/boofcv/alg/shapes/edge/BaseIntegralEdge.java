@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,7 +65,7 @@ public class BaseIntegralEdge<T extends ImageGray<T>> {
 	}
 
 	/**
-	 * Sets the image which is going to be processed.  Must call {@link #setImage(ImageGray)} first.
+	 * Sets the image which is going to be processed. This must be called first.
 	 */
 	public void setImage(T image) {
 		integralImage.wrap(image);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,21 +39,13 @@ public class UtilFeature {
 	 */
 	public static <TD extends TupleDesc>
 	FastQueue<TD> createQueue(final DescriptorInfo<TD> detDesc , int initialMax ) {
-		return new FastQueue<TD>(initialMax,detDesc.getDescriptionType(),true) {
-			@Override
-			protected TD createInstance() {
-				return detDesc.createDescription();
-			}
-		};
+		FastQueue<TD> ret = new FastQueue<>(detDesc::createDescription);
+		ret.growArray(initialMax);
+		return ret;
 	}
 
 	public static FastQueue<TupleDesc_F64> createQueueF64( final int length ) {
-		return new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
-			@Override
-			protected TupleDesc_F64 createInstance() {
-				return new TupleDesc_F64(length);
-			}
-		};
+		return new FastQueue<>(()->new TupleDesc_F64(length));
 	}
 
 	/**

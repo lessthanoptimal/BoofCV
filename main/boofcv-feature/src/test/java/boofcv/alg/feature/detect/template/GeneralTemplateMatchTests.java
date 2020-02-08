@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
 public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> {
 
 	Random rand = new Random(344);
@@ -283,12 +282,10 @@ public abstract class GeneralTemplateMatchTests<T extends ImageGray<T>> {
 		alg.setInputImage(image);
 		alg.process(template);
 
-		float sgn = alg.isMaximize() ? 1.0f : -1.0f;
-
 		float valueNoMask = fractionBest(alg.isMaximize(),alg.getIntensity(),x,y);
 		float averageNoMask = fractionAverage(alg.isMaximize(),alg.getIntensity(),x,y);
 
-		T mask = (T)image.createNew(tw,th);
+		T mask = image.createNew(tw,th);
 		double v = image.getImageType().getDataType().isInteger() ? 100 : 1;
 		GImageMiscOps.fill(mask,v);
 		GImageMiscOps.fillBorder(mask,0,2); // ignore the border

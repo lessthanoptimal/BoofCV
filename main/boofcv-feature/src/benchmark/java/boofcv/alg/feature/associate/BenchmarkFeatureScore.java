@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,12 +101,8 @@ public class BenchmarkFeatureScore {
 	}
 
 	private static FastQueue<TupleDesc_F64> createSet() {
-		FastQueue<TupleDesc_F64> ret = new FastQueue<TupleDesc_F64>(10,TupleDesc_F64.class, true) {
-			@Override
-			protected TupleDesc_F64 createInstance() {
-				return new TupleDesc_F64(DOF_TUPLE);
-			}
-		};
+		FastQueue<TupleDesc_F64> ret = new FastQueue<>(()->new TupleDesc_F64(DOF_TUPLE));
+
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
 			TupleDesc_F64 t = ret.grow();
 			for( int j = 0; j < DOF_TUPLE; j++ ) {

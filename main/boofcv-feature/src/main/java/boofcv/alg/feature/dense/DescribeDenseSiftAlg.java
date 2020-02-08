@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,12 +86,7 @@ public class DescribeDenseSiftAlg<D extends ImageGray<D>> extends DescribeSiftCo
 		imageDerivX = FactoryGImageGray.create(derivType);
 		imageDerivY = FactoryGImageGray.create(derivType);
 
-		descriptors = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
-			@Override
-			protected TupleDesc_F64 createInstance() {
-				return new TupleDesc_F64(DOF);
-			}
-		};
+		descriptors = new FastQueue<>(()->new TupleDesc_F64(DOF));
 	}
 
 	/**

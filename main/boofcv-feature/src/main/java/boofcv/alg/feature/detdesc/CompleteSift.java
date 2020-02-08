@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -78,12 +78,7 @@ public class CompleteSift extends SiftDetector
 		this.describe = describe;
 
 		final int dof = describe.getDescriptorLength();
-		features = new FastQueue<BrightFeature>(BrightFeature.class,true) {
-			@Override
-			protected BrightFeature createInstance() {
-				return new BrightFeature(dof);
-			}
-		};
+		features = new FastQueue<>(()->new BrightFeature(dof));
 	}
 
 	@Override

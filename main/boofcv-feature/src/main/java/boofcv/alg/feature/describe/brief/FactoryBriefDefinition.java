@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,12 +74,10 @@ public class FactoryBriefDefinition {
 
 		int x,y;
 
-		while( true ) {
-			x = (int)(rand.nextGaussian()*sigma);
-			y = (int)(rand.nextGaussian()*sigma);
-			if( Math.sqrt(x*x + y*y) < radius )
-				break;
-		}
+		do {
+			x = (int) (rand.nextGaussian() * sigma);
+			y = (int) (rand.nextGaussian() * sigma);
+		} while (!(Math.sqrt(x * x + y * y) < radius));
 
 		pt.set(x,y);
 	}

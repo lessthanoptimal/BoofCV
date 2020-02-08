@@ -165,7 +165,7 @@ public class BenchmarkConvolve  {
 
 	public int timeConvolve2D_Extend_I8_I16(int reps) {
 		for( int i = 0; i < reps; i++ )
-			ConvolveImage.convolve(kernel2D_I32, input_U8, out_S16, new ImageBorder1D_S32(BorderIndex1D_Extend.class));
+			ConvolveImage.convolve(kernel2D_I32, input_U8, out_S16, new ImageBorder1D_S32<>(BorderIndex1D_Extend.class));
 		return 0;
 	}
 

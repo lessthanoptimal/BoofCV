@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,13 +31,8 @@ public class NccFeatureQueue extends FastQueue<NccFeature> {
 	int descriptorLength;
 
 	public NccFeatureQueue(int descriptorLength) {
-		super(0,NccFeature.class,true);
+		super(()->new NccFeature(descriptorLength));
 		this.descriptorLength = descriptorLength;
 		growArray(10);
-	}
-
-	@Override
-	protected NccFeature createInstance() {
-		return new NccFeature(descriptorLength);
 	}
 }

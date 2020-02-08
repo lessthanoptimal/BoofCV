@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,6 @@ public abstract class CommonGridRansacLineDetectorChecks< D extends ImageGray<D>
 	/**
 	 * Give it a single straight line and see if it can detect it.  Allow the region size to be changed to check
 	 * for issues related to that
-	 * @param regionSize
 	 */
 	protected void checkObvious( int regionSize ) {
 //		System.out.println("regionSize = "+regionSize);

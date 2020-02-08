@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import java.lang.reflect.Method;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("Duplicates")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ConvertRaster {
 
 	public static void bufferedToGray(DataBufferUShort buffer , WritableRaster src, GrayI16 dst) {
@@ -434,13 +434,10 @@ public class ConvertRaster {
 	public static boolean swapBandOrder(BufferedImage input) {
 		// see if access to the raster is restricted or not
 		int bufferedImageType = input.getType();
-		if( bufferedImageType == BufferedImage.TYPE_3BYTE_BGR ||
+		return bufferedImageType == BufferedImage.TYPE_3BYTE_BGR ||
 				bufferedImageType == BufferedImage.TYPE_INT_BGR ||
 				bufferedImageType == BufferedImage.TYPE_INT_ARGB ||
-				bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR ) {
-			return true;
-		}
-		return false;
+				bufferedImageType == BufferedImage.TYPE_4BYTE_ABGR;
 	}
 
 	public static void interleavedToBuffered( InterleavedU8 src, BufferedImage dst) {

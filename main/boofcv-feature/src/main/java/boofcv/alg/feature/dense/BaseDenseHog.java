@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,12 +84,7 @@ public abstract class BaseDenseHog<I extends ImageBase<I>> {
 
 		final int descriptorLength = orientationBins*cellsPerBlockX*cellsPerBlockY;
 
-		descriptions = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
-			@Override
-			protected TupleDesc_F64 createInstance() {
-				return new TupleDesc_F64(descriptorLength);
-			}
-		};
+		descriptions = new FastQueue<>(()-> new TupleDesc_F64(descriptorLength));
 	}
 
 	/**

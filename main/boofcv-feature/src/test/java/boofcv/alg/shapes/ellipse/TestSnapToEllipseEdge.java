@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -125,10 +125,10 @@ public class TestSnapToEllipseEdge {
 				change(new EllipseRotated_F64(1,2.5,3,4,-0.2), new EllipseRotated_F64(1,2,3,4,-0.2)),1e-8);
 
 		assertNotEquals(0,SnapToEllipseEdge.
-				change(new EllipseRotated_F64(1,2,3.5,4,-0.2), new EllipseRotated_F64(1,2,3,4,-0.2)),1e-8);;
+				change(new EllipseRotated_F64(1,2,3.5,4,-0.2), new EllipseRotated_F64(1,2,3,4,-0.2)),1e-8);
 
 		assertNotEquals(0,SnapToEllipseEdge.
-				change(new EllipseRotated_F64(1,2,3,4.5,-0.25), new EllipseRotated_F64(1,2,3,4,-0.2)),1e-8);;
+				change(new EllipseRotated_F64(1,2,3,4.5,-0.25), new EllipseRotated_F64(1,2,3,4,-0.2)),1e-8);
 
 	}
 

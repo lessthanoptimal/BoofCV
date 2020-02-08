@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import java.awt.image.*;
 /**
  * @author Peter Abeles
  */
-@SuppressWarnings("Duplicates")
+@SuppressWarnings("rawtypes")
 public class BufferedImageChecks {
 	public static void checkIdentical(BufferedImage imgA, BufferedImage imgB ) {
 		if(imgA.getWidth() != imgB.getWidth()) throw new IllegalArgumentException("Widths not equal");
@@ -49,7 +49,7 @@ public class BufferedImageChecks {
 			checkEquals( imgA, (GrayI16) imgB );
 		} else if (GrayF32.class == imgB.getClass()) {
 			checkEquals(imgA, (GrayF32) imgB, (float) tol);
-		} else if (ImageInterleaved.class.isInstance(imgB) ) {
+		} else if (imgB instanceof ImageInterleaved) {
 			checkEquals(imgA, (ImageMultiBand) imgB, boofcvBandOrder, (float)tol );
 		} else if (Planar.class == imgB.getClass()) {
 			checkEquals(imgA, (ImageMultiBand) imgB, boofcvBandOrder,(float) tol);
@@ -141,7 +141,6 @@ public class BufferedImageChecks {
 							throw new RuntimeException("Images are not equal: "+valA+" "+valB);
 					}
 				}
-				return;
 			}
 		} else if (raster.getDataBuffer().getDataType() == DataBuffer.TYPE_USHORT) {
 

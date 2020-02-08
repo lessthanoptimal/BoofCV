@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ import org.ddogleg.struct.FastQueue;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings({"ForLoopReplaceableByForEach","Duplicates"})
+@SuppressWarnings({"Duplicates"})
 public class AssociateGreedy_MT<D> extends AssociateGreedyBase<D> {
 	/**
 	 * Configure association

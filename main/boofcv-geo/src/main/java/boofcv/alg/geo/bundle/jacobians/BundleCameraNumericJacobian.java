@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,6 @@ public class BundleCameraNumericJacobian {
 
 	/**
 	 * Specifies the camera model. The current state of its intrinsic parameters
-	 * @param model
 	 */
 	public void setModel( BundleAdjustmentCamera model ) {
 		this.model = model;

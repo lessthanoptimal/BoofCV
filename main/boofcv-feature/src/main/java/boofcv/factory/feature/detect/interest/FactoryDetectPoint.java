@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -125,7 +125,6 @@ public class FactoryDetectPoint {
 	 * @param imageType ype of input image.
 	 * @see FastCornerDetector
 	 */
-	@SuppressWarnings("UnnecessaryLocalVariable")
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createFast( @Nullable ConfigFastCorner configFast ,
 											 ConfigGeneralDetector configDetector , Class<T> imageType) {

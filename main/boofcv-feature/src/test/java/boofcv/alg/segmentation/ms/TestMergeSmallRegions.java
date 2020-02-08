@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,9 +72,7 @@ public class TestMergeSmallRegions {
 			memberCount.data[pixelToRegion.data[i]]++;
 		}
 
-		FastQueue<float[]> regionColor = new FastQueue<float[]>(float[].class,true) {
-			protected float[] createInstance() {return new float[ 1 ];}
-		};
+		FastQueue<float[]> regionColor = new FastQueue<>(()->new float[ 1 ]);
 		regionColor.resize(10);
 
 		ComputeRegionMeanColor<GrayU8> mean = new ComputeRegionMeanColor.U8();

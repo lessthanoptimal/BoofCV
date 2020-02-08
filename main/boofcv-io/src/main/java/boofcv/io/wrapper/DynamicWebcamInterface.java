@@ -35,7 +35,7 @@ public class DynamicWebcamInterface implements WebcamInterface {
 	public DynamicWebcamInterface() {
 		try {
 			webcam = loadManager("boofcv.io.webcamcapture.WebcamCaptureWebcamInterface");
-		} catch( RuntimeException e ) {}
+		} catch( RuntimeException ignore ) {}
 	}
 
 	@Override
@@ -52,10 +52,11 @@ public class DynamicWebcamInterface implements WebcamInterface {
 	 *
 	 * @return Video interface
 	 */
-	public static WebcamInterface loadManager( String pathToManager ) {
+	@SuppressWarnings("unchecked")
+	public static WebcamInterface loadManager(String pathToManager ) {
 		try {
-			Class c = Class.forName(pathToManager);
-			return (WebcamInterface) c.getConstructor().newInstance();
+			Class<WebcamInterface> c = (Class<WebcamInterface>) Class.forName(pathToManager);
+			return c.getConstructor().newInstance();
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Class not found.  Is it included in the class path?");
 		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
