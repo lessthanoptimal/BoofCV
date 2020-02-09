@@ -48,6 +48,8 @@ import boofcv.struct.image.ImageType;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_I16;
 import georegression.struct.point.Point2D_I32;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.UtilEjml;
 
@@ -82,13 +84,13 @@ import static boofcv.misc.CircularIndex.addOffset;
 public class DetectChessboardCornersX {
 	// The largest x-corner intensity is found in the image then multiplied by this factor to select the cut off point
 	// for non-max suppression
-	public float nonmaxThresholdRatio = 0.05f;
+	@Getter @Setter public float nonmaxThresholdRatio = 0.05f;
 	// Used to prune features with the smallest edge intensity in the image
-	public double edgeIntensityRatioThreshold = 0.01;
+	@Getter @Setter public double edgeIntensityRatioThreshold = 0.01;
 	// The smallest allowed edge ratio allowed
-	public double edgeAspectRatioThreshold = 0.1;
+	@Getter @Setter public double edgeAspectRatioThreshold = 0.1;
 	// The smallest allowed corner intensity.
-	public double refinedXCornerThreshold = 0.025;
+	@Getter @Setter public double refinedXCornerThreshold = 0.025;
 	/**
 	 * Tolerance number of "spokes" in the wheel which break symmetry. Symmetry is defined as both sides being above
 	 * or below the mean value. Larger the value more tolerant it is.
@@ -103,7 +105,7 @@ public class DetectChessboardCornersX {
 	// dynamically computed thresholds
 	float nonmaxThreshold;
 
-	GrayF32 blurred = new GrayF32(1,1);
+	@Getter GrayF32 blurred = new GrayF32(1,1);
 	BlurFilter<GrayF32> blurFilter;
 
 	SearchLocalPeak<GrayF32> meanShift;
@@ -112,8 +114,10 @@ public class DetectChessboardCornersX {
 	List<ChessboardCorner> filtered = new ArrayList<>();
 
 	// storage for corner detector output
-	GrayF32 intensity = new GrayF32(1,1);
-	GrayF32 intensity2x2 = new GrayF32(1,1);
+	@Getter GrayF32 intensityRaw = new GrayF32(1,1);
+	@Getter GrayF32 intensity2x2 = new GrayF32(1,1);
+	// Reference to the intensity image used to extract features from. it will be one of the two above
+	private GrayF32 _intensity;
 	/**
 	 * Maximum pixel value in the corner intensity image
 	 */
@@ -132,7 +136,6 @@ public class DetectChessboardCornersX {
 	// for mean-shift
 	final ImageBorder_F32 borderBlur = (ImageBorder_F32)FactoryImageBorder.generic(BorderType.EXTENDED,ImageType.SB_F32);
 	final InterpolatePixelS<GrayF32> inputInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class,BorderType.ZERO);
-	final InterpolatePixelS<GrayF32> intensityInterp = FactoryInterpolation.bilinearPixelS(GrayF32.class,BorderType.ZERO);
 	public boolean useMeanShift = true;
 
 	// Find corners in intensity image
@@ -191,8 +194,6 @@ public class DetectChessboardCornersX {
 		outsideCircleValues = new float[ outsideCircle4.size ];
 
 		borderBlur.setImage(blurred);
-		intensityInterp.setImage(intensity);
-		meanShift.setImage(intensity);
 	}
 
 	/**
@@ -210,11 +211,18 @@ public class DetectChessboardCornersX {
 
 		// The x-corner detector requires a little bit of blur to be applied ot the input image
 		blurFilter.process(input,blurred);
-		XCornerAbeles2019Intensity.process(blurred, intensity);
+		XCornerAbeles2019Intensity.process(blurred, intensityRaw);
 		// x-corner intensity is results in a symmetric 2x2 region under ideal conditions. Applying a 2x2 mean filter
 		// breaks the symmetry. There will be a single unique optimal value, but it will be biased by 0.5 of a pixel.
-		ConvolveImageMean.horizontal(intensity,tmp,0,2);
+		ConvolveImageMean.horizontal(intensityRaw,tmp,0,2);
 		ConvolveImageMean.vertical(tmp,intensity2x2,0,2,fwork);
+
+		// NOTE: There's a small improvement if raw is used after detection. That's why everything is so funky
+		//       the small performance improvement might be a result of over fitting to test set
+		this._intensity = intensityRaw;
+//		this._intensity = intensity2x2; // Don't forget to adjust means shift kernel, and add offset after mean shift
+//		double intensityOffset = _intensity==intensityRaw?0.0:0.5;
+		meanShift.setImage(_intensity);
 
 		// Compute the maximum value in the x-corner intensity image
 		// If computed as a pyramid the maximum value in another layer might be "considered"
@@ -275,7 +283,7 @@ public class DetectChessboardCornersX {
 			// Refines the corner location estimate using mean-shift
 			if( useMeanShift ) {
 				meanShift.search((float)c.x,(float)c.y);
-				c.x = meanShift.getPeakX();
+				c.x = meanShift.getPeakX(); // No shift here since mean-shift is run on RAW
 				c.y = meanShift.getPeakY();
 			}
 
@@ -333,7 +341,7 @@ public class DetectChessboardCornersX {
 		int count=0;
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
-				if( intensity.unsafe_get(x,y) >= nonmaxThreshold)
+				if( _intensity.unsafe_get(x,y) >= nonmaxThreshold)
 					count++;
 			}
 		}
@@ -354,7 +362,7 @@ public class DetectChessboardCornersX {
 		int count=0;
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
-				if( intensity.unsafe_get(x,y) <= -nonmaxThreshold )
+				if( _intensity.unsafe_get(x,y) <= -nonmaxThreshold )
 					count++;
 			}
 		}
@@ -551,36 +559,8 @@ public class DetectChessboardCornersX {
 		}
 	}
 
-	public GrayF32 getBlurred() {
-		return blurred;
-	}
-
-	public GrayF32 getIntensity() {
-		return intensity;
-	}
-
 	public List<ChessboardCorner> getCorners() {
 		return filtered;
-	}
-
-	public float getNonmaxThresholdRatio() {
-		return nonmaxThresholdRatio;
-	}
-
-	public void setNonmaxThresholdRatio(float nonmaxThresholdRatio) {
-		this.nonmaxThresholdRatio = nonmaxThresholdRatio;
-	}
-
-	public void setRefinedXCornerThreshold(double refinedXCornerThreshold) {
-		this.refinedXCornerThreshold = refinedXCornerThreshold;
-	}
-
-	public double getEdgeIntensityRatioThreshold() {
-		return edgeIntensityRatioThreshold;
-	}
-
-	public void setEdgeIntensityRatioThreshold(double edgeIntensityRatioThreshold) {
-		this.edgeIntensityRatioThreshold = edgeIntensityRatioThreshold;
 	}
 
 	public int getNonmaxRadius() {

@@ -241,7 +241,7 @@ public class DetectCalibrationChessboardXCornerApp
 			long time1 = System.nanoTime();
 			processingTime = (time1-time0)*1e-6; // milliseconds
 
-			featureImg = detector.getDetector().getDetector().getIntensity();
+			featureImg = detector.getDetector().getDetector().getIntensityRaw();
 //			featureImg = detector.getDetector().getDetector().getIntensity2x2();
 
 			if( controlPanel.logItensity ) {

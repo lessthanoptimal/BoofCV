@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -104,7 +104,7 @@ public class DetectXCornersVisualizeApp
 			public void mousePressed(MouseEvent e) {
 				if( SwingUtilities.isLeftMouseButton(e)) {
 					Point2D_F64 p = imagePanel.pixelToPoint(e.getX(), e.getY());
-					float value = detector.getDetector().getIntensity().get((int)p.x,(int)p.y);
+					float value = detector.getDetector().getIntensityRaw().get((int)p.x,(int)p.y);
 					System.out.printf("Clicked at ( %.2f , %.2f ) x-corner = %e \n",p.x,p.y,value);
 				}
 			}
@@ -179,7 +179,7 @@ public class DetectXCornersVisualizeApp
 			long time1 = System.nanoTime();
 			processingTime = (time1-time0)*1e-6; // milliseconds
 
-			featureImg = detector.getDetector().getIntensity();
+			featureImg = detector.getDetector().getIntensityRaw();
 
 			if( controlPanel.logItensity ) {
 				PixelMath.logSign(featureImg,1.0f,logIntensity);

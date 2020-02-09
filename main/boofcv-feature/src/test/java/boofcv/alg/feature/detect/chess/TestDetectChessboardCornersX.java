@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ class TestDetectChessboardCornersX {
 	@Test
 	void checkPositiveInside() {
 		DetectChessboardCornersX alg = new DetectChessboardCornersX();
-		GrayF32 intensity = alg.intensity;
+		GrayF32 intensity = alg.intensityRaw;
 		intensity.reshape(width,height);
 		alg.nonmaxThreshold = 1e-6f;
 		ImageMiscOps.fill(intensity,-1);
@@ -52,7 +52,7 @@ class TestDetectChessboardCornersX {
 	@Test
 	void checkNegativeInside() {
 		DetectChessboardCornersX alg = new DetectChessboardCornersX();
-		GrayF32 intensity = alg.intensity;
+		GrayF32 intensity = alg.intensityRaw;
 		intensity.reshape(width,height);
 		alg.nonmaxThreshold = 1e-6f;
 		ImageMiscOps.fill(intensity,-1);
