@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -357,7 +357,7 @@ class TestPruneStructureFromSceneMetric {
 
 				camera.project(cameraX.x,cameraX.y,cameraX.z, pixel);
 
-				if( !intrinsic.inside(pixel.x,pixel.y) )
+				if( !intrinsic.isInside(pixel.x,pixel.y) )
 					continue;
 
 				observations.views.data[viewIdx].add(pointIdx,(float)pixel.x,(float)pixel.y);

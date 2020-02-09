@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,12 +51,13 @@ public class AnimatePanel extends JPanel {
 		this.images = images;
 	}
 
-	public void start() {
+	public AnimatePanel start() {
 		if( timer != null )
 			throw new IllegalArgumentException("Already running");
 
 		timer = new Timer();
 		timer.start();
+		return this;
 	}
 
 	public void stop() {

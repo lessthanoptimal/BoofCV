@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 
 /**
- * Wrapper around the {@link boofcv.alg.feature.detect.extract.NonMaxExtractorNaive} class.
+ * Wrapper around the {@link boofcv.alg.feature.detect.extract.NonMaxBlock} class.
  *
  * @author Peter Abeles
  */

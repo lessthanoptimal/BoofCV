@@ -18,6 +18,10 @@
 
 package boofcv.struct.calib;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * <p>
  * Intrinsic camera parameters for a pinhole camera.  Specifies the calibration
@@ -32,17 +36,14 @@ package boofcv.struct.calib;
  *
  * @author Peter Abeles
  */
+@EqualsAndHashCode
 public class CameraPinhole extends CameraModel {
-
-	// serialization version
-	public static final long serialVersionUID = 1L;
-
 	/** focal length along x and y axis (units: pixels) */
-	public double fx,fy;
+	@Getter @Setter	public double fx,fy;
 	/** skew parameter, typically 0 (units: pixels)*/
-	public double skew;
+	@Getter @Setter	public double skew;
 	/** image center (units: pixels) */
-	public double cx,cy;
+	@Getter @Setter	public double cx,cy;
 
 	/**
 	 * Default constructor.  flipY is false and everything else is zero or null.
@@ -87,53 +88,26 @@ public class CameraPinhole extends CameraModel {
 	}
 
 	/**
-	 * Is the pixel coordinate inside the image
-	 * @param x pixel X
-	 * @param y pixel Y
+	 * Is the pixel coordinate inside the image.  For floating points numbers a pixel is inside the image if it is
+	 * less than width or height. Justification for this is if you converted it to an int it would round down and
+	 * be inside.
+	 *
+	 * @param x pixel location x-axis
+	 * @param y pixel location y-axis
 	 * @return true if inside or false if not
 	 */
-	public boolean inside(double x , double y ) {
-		return x >= 0 && y >= 0 && x < width-1 && y <= height-1;
+	public boolean isInside(double x , double y) {
+		return x >= 0 && y >= 0 && x < width && y < height;
 	}
 
-	public double getCx() {
-		return cx;
-	}
-
-	public void setCx(double cx) {
-		this.cx = cx;
-	}
-
-	public double getCy() {
-		return cy;
-	}
-
-	public void setCy(double cy) {
-		this.cy = cy;
-	}
-
-	public double getFx() {
-		return fx;
-	}
-
-	public void setFx(double fx) {
-		this.fx = fx;
-	}
-
-	public double getFy() {
-		return fy;
-	}
-
-	public void setFy(double fy) {
-		this.fy = fy;
-	}
-
-	public double getSkew() {
-		return skew;
-	}
-
-	public void setSkew(double skew) {
-		this.skew = skew;
+	/**
+	 * Returns true if the pixel coordinate is inside the image
+	 * @param x pixel location x-axis
+	 * @param y pixel location y-axis
+	 * @return true if inside or false if not
+	 */
+	public boolean isInside(int x, int y) {
+		return x >= 0 && y >= 0 && x < width && y < height;
 	}
 
 	public void print() {

@@ -27,6 +27,7 @@ import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.feature.VisualizeFeatures;
+import boofcv.gui.feature.VisualizeOpticalFlow;
 import boofcv.gui.image.ImagePanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
@@ -252,15 +253,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		Ellipse2D.Double ellipse = new Ellipse2D.Double();
 		Line2D.Double line = new Line2D.Double();
 
-		double maxVelocity=0;
-		int red,green,blue;
-
-		Stroke strokeLine = new BasicStroke(5);
-
-		// Used for computing log scale flow colors
-		double logBase = 0.0;
-		double logScale = 25.0;
-		double maxLog = Math.log(logScale+logBase);
+		VisualizeOpticalFlow visualizeFlow = new VisualizeOpticalFlow();
 
 		@Override
 		public void paintComponent(Graphics g) {
@@ -291,17 +284,17 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 					switch( colorization ) {
 						case TRACK_ID: {
-							red = (int) (2.5 * (p.featureId % 100));
-							green = (int) ((255.0 / 150.0) * (p.featureId % 150));
-							blue = (int) (p.featureId % 255);
+							visualizeFlow.red = (int) (2.5 * (p.featureId % 100));
+							visualizeFlow.green = (int) ((255.0 / 150.0) * (p.featureId % 150));
+							visualizeFlow.blue = (int) (p.featureId % 255);
 						} break;
 
 						case FLOW: {
-							colorizeFlow(p,tracksPrev.get(p.featureId));
+							visualizeFlow.computeColor(p,tracksPrev.get(p.featureId),false);
 						} break;
 
 						case FLOW_LOG: {
-							colorizeFlowLog(p,tracksPrev.get(p.featureId));
+							visualizeFlow.computeColor(p,tracksPrev.get(p.featureId), true);
 						} break;
 
 						default: throw new RuntimeException("BUG");
@@ -316,27 +309,22 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 					} else {
 						switch( markerType ) {
 							case Dot:
-								VisualizeFeatures.drawPoint(g2, x, y, 5, new Color(red, green, blue), true, ellipse);
+								VisualizeFeatures.drawPoint(g2, x, y, 5, visualizeFlow.createColor(), true, ellipse);
 								break;
 
 							case Circle:
-								g2.setColor(new Color(red, green, blue));
+								g2.setColor(visualizeFlow.createColor());
 								VisualizeFeatures.drawCircle(g2, x, y, 5, ellipse);
 								break;
 
 							case Line:
 								Point2D_F64 prev = tracksPrev.get(p.featureId);
-								g2.setColor(new Color(red, green, blue));
+
 								if( prev == null ) {
 									// this is a bug... show something so that we know there's a bug
-									VisualizeFeatures.drawPoint(g2, x, y, 5, new Color(red, green, blue), true, ellipse);
+									VisualizeFeatures.drawPoint(g2, x, y, 5, visualizeFlow.createColor(), true, ellipse);
 								} else {
-									line.x1 = x;
-									line.y1 = y;
-									line.x2 = offsetX+scale*prev.x;
-									line.y2 = offsetY+scale*prev.y;
-									g2.setStroke(strokeLine);
-									g2.draw(line);
+									visualizeFlow.drawLine(x,y,offsetX+scale*prev.x,offsetY+scale*prev.y,g2);
 								}
 								break;
 
@@ -356,6 +344,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		}
 
 		private void computeMaxFlowVelocity( int minDuration ) {
+			double maxVelocity = 0;
 			for (PointTrack p : tracksGui.toList() ) {
 				long duration = frameIdGui-p.spawnFrameID;
 
@@ -368,59 +357,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 					maxVelocity = Math.max(maxVelocity, prev.distance2(p));
 				}
 			}
-			maxVelocity = Math.sqrt(maxVelocity);
-		}
-
-		private void colorizeFlow( PointTrack p , Point2D_F64 prev ) {
-			if( prev == null ) {
-				red = blue = 0;
-				green = 0xFF;
-			} else {
-				red = blue = green = 0;
-				double dx = p.x-prev.x;
-				double dy = p.y-prev.y;
-
-				if( dx > 0 ) {
-					red = Math.min(255,(int)(255*dx/maxVelocity));
-				} else {
-					green = Math.min(255,(int)(-255*dx/maxVelocity));
-				}
-				if( dy > 0 ) {
-					blue = Math.min(255,(int)(255*dy/maxVelocity));
-				} else {
-					int v = Math.min(255,(int)(-255*dy/maxVelocity));
-					red += v;
-					green += v;
-					if( red > 255 ) red = 255;
-					if( green > 255 ) green = 255;
-				}
-			}
-		}
-
-		private void colorizeFlowLog( PointTrack p , Point2D_F64 prev ) {
-			if( prev == null ) {
-				red = blue = 0;
-				green = 0xFF;
-			} else {
-				red = blue = green = 0;
-				double dx = p.x-prev.x;
-				double dy = p.y-prev.y;
-
-				if( dx > 0 ) {
-					red = Math.max(0,(int)(255*Math.log(logBase+logScale*dx/maxVelocity)/maxLog));
-				} else {
-					green = Math.max(0,(int)(255*Math.log(logBase-logScale*dx/maxVelocity)/maxLog));
-				}
-				if( dy > 0 ) {
-					blue = Math.max(0,(int)(255*Math.log(logBase+logScale*dy/maxVelocity)/maxLog));
-				} else {
-					int v = Math.max(0,(int)(255*Math.log(logBase-logScale*dy/maxVelocity)/maxLog));
-					red += v;
-					green += v;
-					if( red > 255 ) red = 255;
-					if( green > 255 ) green = 255;
-				}
-			}
+			visualizeFlow.maxVelocity = Math.sqrt(maxVelocity);
 		}
 	}
 

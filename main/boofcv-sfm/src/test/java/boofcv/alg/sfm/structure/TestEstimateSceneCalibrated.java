@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -112,7 +112,7 @@ class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 				n2n.compute(Xv.x/Xv.z, Xv.y/Xv.z, n);
 				PerspectiveOps.convertNormToPixel(pinhole,n.x,n.y,p);
 
-				if( !pinhole.inside(p.x,p.y) )
+				if( !pinhole.isInside(p.x,p.y) )
 					continue;
 
 				((TupleDesc_F64)view.descriptions.grow()).set(X.x,X.y,X.z);

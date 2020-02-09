@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -136,6 +136,20 @@ public class AssociatedPair {
 
 	public AssociatedPair copy() {
 		return new AssociatedPair(p1,p2,true);
+	}
+
+	/**
+	 * Euclidean distance from p1 to p2
+	 */
+	public double distance() {
+		return p1.distance(p2);
+	}
+
+	/**
+	 * Euclidean distance squared from p1 to p2
+	 */
+	public double distance2() {
+		return p1.distance2(p2);
 	}
 
 	@Override
