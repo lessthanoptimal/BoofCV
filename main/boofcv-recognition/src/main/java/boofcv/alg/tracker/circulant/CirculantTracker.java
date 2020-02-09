@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -589,7 +589,7 @@ public class CirculantTracker<T extends ImageGray<T>> {
 
 				if( interp.isInFastBounds(xx,yy))
 					output.data[index++] = interp.get_fast(xx,yy);
-				else if( BoofMiscOps.checkInside(image, xx, yy))
+				else if( BoofMiscOps.isInside(image, xx, yy))
 					output.data[index++] = interp.get(xx, yy);
 				else {
 					// randomize to make pixels outside the image poorly correlate.  It will then focus on matching

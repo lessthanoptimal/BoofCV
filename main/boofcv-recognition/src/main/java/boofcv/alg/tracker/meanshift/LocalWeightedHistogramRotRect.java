@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -180,7 +180,7 @@ public class LocalWeightedHistogramRotRect<T extends ImageBase<T>> {
 			squareToImageSample(p.x, p.y, region);
 
 			// make sure its inside the image
-			if( !BoofMiscOps.checkInside(image, imageX, imageY)) {
+			if( !BoofMiscOps.isInside(image, imageX, imageY)) {
 				sampleHistIndex[ i ] = -1;
 			} else {
 				// use the slower interpolation which can handle the border

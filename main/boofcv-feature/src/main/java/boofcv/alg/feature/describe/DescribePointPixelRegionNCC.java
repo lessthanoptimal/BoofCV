@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public abstract class DescribePointPixelRegionNCC<T extends ImageGray<T>>
 	 * The entire region must be inside the image because any outside pixels will change the statistics
 	 */
 	public boolean isInBounds( int c_x , int c_y ) {
-		return BoofMiscOps.checkInside(image, c_x, c_y, radiusWidth, radiusHeight);
+		return BoofMiscOps.isInside(image, c_x, c_y, radiusWidth, radiusHeight);
 	}
 
 	/**

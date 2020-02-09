@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -120,7 +120,7 @@ public abstract class CreateSyntheticOverheadView<T extends ImageBase<T>>
 					float y = (float)pixel.y;
 
 					// make sure it's in the image
-					if(BoofMiscOps.checkInside(intrinsic.width,intrinsic.height,x,y) ){
+					if(BoofMiscOps.isInside(intrinsic.width,intrinsic.height,x,y) ){
 						Point2D_F32 p = points.grow();
 						p.set(x,y);
 						mapPixels[ indexOut ]= p;

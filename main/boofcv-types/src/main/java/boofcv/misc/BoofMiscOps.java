@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,6 +34,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("rawtypes")
 public class BoofMiscOps {
 
 	public static int bitsToWords( int bits , int wordBits ) {
@@ -187,7 +188,7 @@ public class BoofMiscOps {
 			r.y1 = b.height;
 	}
 
-	public static boolean checkInside(ImageBase b, ImageRectangle r) {
+	public static boolean isInside(ImageBase b, ImageRectangle r) {
 		if( r.x0 < 0 )
 			return false;
 		if( r.x1 > b.width )
@@ -209,7 +210,7 @@ public class BoofMiscOps {
 	 * @param radius How many pixels away from the border it needs to be to be considered inside
 	 * @return true if the point is inside and false if it is outside
 	 */
-	public static boolean checkInside(ImageBase b, int x , int y , int radius ) {
+	public static boolean isInside(ImageBase b, int x , int y , int radius ) {
 		if( x-radius < 0 )
 			return false;
 		if( x+radius >= b.width )
@@ -231,7 +232,7 @@ public class BoofMiscOps {
 	 * @param radius How many pixels away from the border it needs to be to be considered inside
 	 * @return true if the point is inside and false if it is outside
 	 */
-	public static boolean checkInside(ImageBase b, float x , float y , float radius ) {
+	public static boolean isInside(ImageBase b, float x , float y , float radius ) {
 		if( x-radius < 0 )
 			return false;
 		if( x+radius > b.width-1 )
@@ -253,7 +254,7 @@ public class BoofMiscOps {
 	 * @param radius How many pixels away from the border it needs to be to be considered inside
 	 * @return true if the point is inside and false if it is outside
 	 */
-	public static boolean checkInside(ImageBase b, double x , double y , double radius ) {
+	public static boolean isInside(ImageBase b, double x , double y , double radius ) {
 		if( x-radius < 0 )
 			return false;
 		if( x+radius > b.width-1 )
@@ -266,7 +267,7 @@ public class BoofMiscOps {
 		return true;
 	}
 
-	public static boolean checkInside(ImageBase b, int x , int y , int radiusWidth , int radiusHeight ) {
+	public static boolean isInside(ImageBase b, int x , int y , int radiusWidth , int radiusHeight ) {
 		if( x-radiusWidth < 0 )
 			return false;
 		if( x+radiusWidth >= b.width )
@@ -279,7 +280,7 @@ public class BoofMiscOps {
 		return true;
 	}
 
-	public static boolean checkInside(ImageBase b, int c_x , int c_y , int radius , double theta ) {
+	public static boolean isInside(ImageBase b, int c_x , int c_y , int radius , double theta ) {
 		int r = radius;
 		float c = (float)Math.cos(theta);
 		float s = (float)Math.sin(theta);
@@ -305,20 +306,20 @@ public class BoofMiscOps {
 		return b.isInBounds((int) x, (int) y);
 	}
 
-	public static boolean checkInside( ImageBase b , float x , float y ) {
-		return x >= 0 && x <= b.width-1 && y >= 0 && y <= b.height-1;
+	public static boolean isInside(ImageBase b , float x , float y ) {
+		return x >= 0 && x < b.width && y >= 0 && y < b.height;
 	}
 
-	public static boolean checkInside( ImageBase b , double x , double y ) {
-		return x >= 0 && x <= b.width-1 && y >= 0 && y <= b.height-1;
+	public static boolean isInside(ImageBase b , double x , double y ) {
+		return x >= 0 && x < b.width && y >= 0 && y < b.height;
 	}
 
-	public static boolean checkInside( int width , int height , float x , float y ) {
-		return x >= 0 && x <= width-1 && y >= 0 && y <= height-1;
+	public static boolean isInside(int width , int height , float x , float y ) {
+		return x >= 0 && x < width && y >= 0 && y < height;
 	}
 
-	public static boolean checkInside( int width , int height , double x , double y ) {
-		return x >= 0 && x <= width-1 && y >= 0 && y <= height-1;
+	public static boolean isInside(int width , int height , double x , double y ) {
+		return x >= 0 && x < width && y >= 0 && y < height;
 	}
 
 	/**

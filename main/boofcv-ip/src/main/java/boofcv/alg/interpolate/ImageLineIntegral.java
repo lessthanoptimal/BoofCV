@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.interpolate;
 
 import boofcv.core.image.GImageGray;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.ImageBorder;
 import org.ejml.UtilEjml;
 
@@ -183,7 +184,7 @@ public class ImageLineIntegral {
 	 * @return true if inside or false if outside
 	 */
 	public boolean isInside( double x, double y ) {
-		return x >= 0 && y >= 0 && x < image.getWidth() && y < image.getHeight();
+		return BoofMiscOps.isInside(image.getWidth(),image.getHeight(),x,y);
 	}
 
 	/**

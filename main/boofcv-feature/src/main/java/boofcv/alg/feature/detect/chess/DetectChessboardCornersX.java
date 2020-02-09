@@ -117,7 +117,7 @@ public class DetectChessboardCornersX {
 	@Getter GrayF32 intensityRaw = new GrayF32(1,1);
 	@Getter GrayF32 intensity2x2 = new GrayF32(1,1);
 	// Reference to the intensity image used to extract features from. it will be one of the two above
-	private GrayF32 _intensity;
+	GrayF32 _intensity;
 	/**
 	 * Maximum pixel value in the corner intensity image
 	 */

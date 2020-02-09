@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,7 +90,7 @@ public abstract class DescribePointBinaryCompare<T extends ImageGray<T>> {
 	 * @param feature Where the descriptor is written to.
 	 */
 	public void process( int c_x , int c_y , TupleDesc_B feature ) {
-		if( BoofMiscOps.checkInside(image,c_x, c_y, definition.radius) ) {
+		if( BoofMiscOps.isInside(image,c_x, c_y, definition.radius) ) {
 			processInside(c_x,c_y,feature);
 		} else {
 			processBorder(c_x,c_y,feature);

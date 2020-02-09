@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -508,7 +508,7 @@ class TestSgmCostAggregation {
 		int x = x0,y = y0;
 
 		int count = 0;
-		while(BoofMiscOps.checkInside(width,height,x,y)) {
+		while(BoofMiscOps.isInside(width,height,x,y)) {
 			count++;
 			x += dx;
 			y += dy;

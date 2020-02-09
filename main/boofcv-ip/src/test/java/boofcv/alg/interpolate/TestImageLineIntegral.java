@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -205,10 +205,13 @@ public class TestImageLineIntegral {
 		GrayU8 img = new GrayU8(12,14);
 		alg.setImage(FactoryGImageGray.wrap(img));
 		assertTrue(alg.isInside(0,0));
-		assertTrue(alg.isInside(12,14));
-		assertTrue(alg.isInside(12,0));
-		assertTrue(alg.isInside(0,14));
+		assertTrue(alg.isInside(11.99999,13.999));
+		assertTrue(alg.isInside(11.99999,0));
+		assertTrue(alg.isInside(0,13.999));
 
+		assertFalse(alg.isInside(12,14));
+		assertFalse(alg.isInside(12,0));
+		assertFalse(alg.isInside(0,14));
 		assertFalse(alg.isInside(-0.0001, 0));
 		assertFalse(alg.isInside(0, -0.00001));
 		assertFalse(alg.isInside(12.000001, 14));

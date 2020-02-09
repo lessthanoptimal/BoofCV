@@ -90,7 +90,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageGray<I>,D extends Imag
 
 			if( ret == KltTrackFault.SUCCESS ) {
 				// discard a track if its center drifts outside the image.
-				if( BoofMiscOps.checkInside(input, t.x, t.y)) {
+				if( BoofMiscOps.isInside(input, t.x, t.y)) {
 					active.add(t);
 					PointTrack p = t.getCookie();
 					p.set(t.x,t.y);
@@ -117,7 +117,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageGray<I>,D extends Imag
 
 			if( ret == KltTrackFault.SUCCESS ) {
 				// discard a track if its center drifts outside the image.
-				if(BoofMiscOps.checkInside(input, t.x, t.y)) {
+				if(BoofMiscOps.isInside(input, t.x, t.y)) {
 					active.add(t);
 					PointTrack p = t.getCookie();
 					p.set(t.x,t.y);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -85,7 +85,7 @@ public class DescribePointBriefSO<T extends ImageGray<T>> {
 		float scale = (float)(radius/BoofDefaults.BRIEF_SCALE_TO_RADIUS);
 		// NOTE: This doesn't seem to take in account the interpolation border.  Might not work algs
 		// other than bilinear interpolation
-		boolean isInside = BoofMiscOps.checkInside(blur, c_x, c_y, definition.radius*scale);
+		boolean isInside = BoofMiscOps.isInside(blur, c_x, c_y, definition.radius*scale);
 
 		float c = (float)Math.cos(orientation);
 		float s = (float)Math.sin(orientation);
@@ -109,7 +109,7 @@ public class DescribePointBriefSO<T extends ImageGray<T>> {
 				float x0 = c_x + (c*a.x - s*a.y)*scale;
 				float y0 = c_y + (s*a.x + c*a.y)*scale;
 
-				if( BoofMiscOps.checkInside(blur, x0, y0) ) {
+				if( BoofMiscOps.isInside(blur, x0, y0) ) {
 					// it might be inside the image but too close to the border for unsafe
 					values[i] = interp.get(x0,y0);
 				}

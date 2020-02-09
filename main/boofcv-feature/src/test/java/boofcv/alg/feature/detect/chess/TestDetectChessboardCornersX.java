@@ -35,7 +35,7 @@ class TestDetectChessboardCornersX {
 	@Test
 	void checkPositiveInside() {
 		DetectChessboardCornersX alg = new DetectChessboardCornersX();
-		GrayF32 intensity = alg.intensityRaw;
+		GrayF32 intensity = alg._intensity = alg.intensityRaw;
 		intensity.reshape(width,height);
 		alg.nonmaxThreshold = 1e-6f;
 		ImageMiscOps.fill(intensity,-1);
@@ -52,7 +52,7 @@ class TestDetectChessboardCornersX {
 	@Test
 	void checkNegativeInside() {
 		DetectChessboardCornersX alg = new DetectChessboardCornersX();
-		GrayF32 intensity = alg.intensityRaw;
+		GrayF32 intensity = alg._intensity = alg.intensityRaw;
 		intensity.reshape(width,height);
 		alg.nonmaxThreshold = 1e-6f;
 		ImageMiscOps.fill(intensity,-1);

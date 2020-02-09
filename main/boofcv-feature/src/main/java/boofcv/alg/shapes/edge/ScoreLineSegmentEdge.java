@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,12 +82,12 @@ public class ScoreLineSegmentEdge<T extends ImageGray<T>> extends BaseIntegralEd
 
 			double x0 = x+tanX;
 			double y0 = y+tanY;
-			if(!BoofMiscOps.checkInside(integralImage.getWidth(),integralImage.getHeight(),x0,y0))
+			if(!BoofMiscOps.isInside(integralImage.getWidth(),integralImage.getHeight(),x0,y0))
 				continue;
 
 			double x1 = x-tanX;
 			double y1 = y-tanY;
-			if(!BoofMiscOps.checkInside(integralImage.getWidth(),integralImage.getHeight(),x1,y1))
+			if(!BoofMiscOps.isInside(integralImage.getWidth(),integralImage.getHeight(),x1,y1))
 				continue;
 
 			samplesInside++;

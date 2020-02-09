@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,10 +29,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestBoofMiscOps {
+class TestBoofMiscOps {
 
 	@Test
-	public void numDigits() {
+	void numDigits() {
 		assertEquals(1,BoofMiscOps.numDigits(0));
 		assertEquals(1,BoofMiscOps.numDigits(1));
 		assertEquals(1,BoofMiscOps.numDigits(9));
@@ -49,7 +49,7 @@ public class TestBoofMiscOps {
 	}
 
 	@Test
-	public void boundRectangleInside() {
+	void boundRectangleInside() {
 		GrayU8 image = new GrayU8(20,25);
 
 		checkBound(-2,-3,5,6,0,0,5,6,image);
@@ -71,154 +71,154 @@ public class TestBoofMiscOps {
 	}
 
 	@Test
-	public void checkInside_img_float() {
+	void checkInside_img_float() {
 		GrayU8 image = new GrayU8(20,25);
 
-		assertTrue(BoofMiscOps.checkInside(image,0f,0f));
-		assertTrue(BoofMiscOps.checkInside(image,19f,24f));
-		assertTrue(BoofMiscOps.checkInside(image,5f,10f));
+		assertTrue(BoofMiscOps.isInside(image,0f,0f));
+		assertTrue(BoofMiscOps.isInside(image,19.99f,24.99f));
+		assertTrue(BoofMiscOps.isInside(image,5f,10f));
 
-		assertFalse(BoofMiscOps.checkInside(image,-0.01f,0));
-		assertFalse(BoofMiscOps.checkInside(image,0,-0.01f));
-		assertFalse(BoofMiscOps.checkInside(image,0,24.01f));
-		assertFalse(BoofMiscOps.checkInside(image,19.01f,0));
+		assertFalse(BoofMiscOps.isInside(image,-0.01f,0));
+		assertFalse(BoofMiscOps.isInside(image,0,-0.01f));
+		assertFalse(BoofMiscOps.isInside(image,0,25.01f));
+		assertFalse(BoofMiscOps.isInside(image,20.01f,0));
 	}
 
 	@Test
-	public void checkInside_wh_float() {
-		assertTrue(BoofMiscOps.checkInside(20,25,0f,0f));
-		assertTrue(BoofMiscOps.checkInside(20,25,19f,24f));
-		assertTrue(BoofMiscOps.checkInside(20,25,5f,10f));
+	void checkInside_wh_float() {
+		assertTrue(BoofMiscOps.isInside(20,25,0f,0f));
+		assertTrue(BoofMiscOps.isInside(20,25,19.99f,24.99f));
+		assertTrue(BoofMiscOps.isInside(20,25,5f,10f));
 
-		assertFalse(BoofMiscOps.checkInside(20,25,-0.01f,0));
-		assertFalse(BoofMiscOps.checkInside(20,25,0,-0.01f));
-		assertFalse(BoofMiscOps.checkInside(20,25,0,24.01f));
-		assertFalse(BoofMiscOps.checkInside(20,25,19.01f,0));
+		assertFalse(BoofMiscOps.isInside(20,25,-0.01f,0));
+		assertFalse(BoofMiscOps.isInside(20,25,0,-0.01f));
+		assertFalse(BoofMiscOps.isInside(20,25,0,25.01f));
+		assertFalse(BoofMiscOps.isInside(20,25,20.01f,0));
 	}
 
 	@Test
-	public void checkInside_img_double() {
+	void checkInside_img_double() {
 		GrayU8 image = new GrayU8(20,25);
 
-		assertTrue(BoofMiscOps.checkInside(image,0d,0d));
-		assertTrue(BoofMiscOps.checkInside(image,19d,24d));
-		assertTrue(BoofMiscOps.checkInside(image,5d,10d));
+		assertTrue(BoofMiscOps.isInside(image,0d,0d));
+		assertTrue(BoofMiscOps.isInside(image,19.99d,24.99d));
+		assertTrue(BoofMiscOps.isInside(image,5d,10d));
 
-		assertFalse(BoofMiscOps.checkInside(image,-0.01d,0));
-		assertFalse(BoofMiscOps.checkInside(image,0,-0.01d));
-		assertFalse(BoofMiscOps.checkInside(image,0,24.01d));
-		assertFalse(BoofMiscOps.checkInside(image,19.01d,0));
+		assertFalse(BoofMiscOps.isInside(image,-0.01d,0));
+		assertFalse(BoofMiscOps.isInside(image,0,-0.01d));
+		assertFalse(BoofMiscOps.isInside(image,0,25.01d));
+		assertFalse(BoofMiscOps.isInside(image,20.01d,0));
 	}
 
 	@Test
-	public void checkInside_wh_double() {
+	void checkInside_wh_double() {
 
-		assertTrue(BoofMiscOps.checkInside(20,25,0d,0d));
-		assertTrue(BoofMiscOps.checkInside(20,25,19d,24d));
-		assertTrue(BoofMiscOps.checkInside(20,25,5d,10d));
+		assertTrue(BoofMiscOps.isInside(20,25,0d,0d));
+		assertTrue(BoofMiscOps.isInside(20,25,19.99d,24.99d));
+		assertTrue(BoofMiscOps.isInside(20,25,5d,10d));
 
-		assertFalse(BoofMiscOps.checkInside(20,25,-0.01d,0));
-		assertFalse(BoofMiscOps.checkInside(20,25,0,-0.01d));
-		assertFalse(BoofMiscOps.checkInside(20,25,0,24.01d));
-		assertFalse(BoofMiscOps.checkInside(20,25,19.01d,0));
+		assertFalse(BoofMiscOps.isInside(20,25,-0.01d,0));
+		assertFalse(BoofMiscOps.isInside(20,25,0,-0.01d));
+		assertFalse(BoofMiscOps.isInside(20,25,0,25.01d));
+		assertFalse(BoofMiscOps.isInside(20,25,20.01d,0));
 	}
 
 	@Test
-	public void checkInside_w_h() {
+	void checkInside_w_h() {
 		GrayU8 image = new GrayU8(20,25);
 
-		assertTrue(BoofMiscOps.checkInside(image,2,3,2,3));
-		assertTrue(BoofMiscOps.checkInside(image,17,21,2,3));
-		assertTrue(BoofMiscOps.checkInside(image,6,7,2,3));
+		assertTrue(BoofMiscOps.isInside(image,2,3,2,3));
+		assertTrue(BoofMiscOps.isInside(image,17,21,2,3));
+		assertTrue(BoofMiscOps.isInside(image,6,7,2,3));
 
-		assertFalse(BoofMiscOps.checkInside(image,1,3,2,3));
-		assertFalse(BoofMiscOps.checkInside(image,2,2,2,3));
-		assertFalse(BoofMiscOps.checkInside(image,18,21,2,3));
-		assertFalse(BoofMiscOps.checkInside(image,17,22,2,3));
+		assertFalse(BoofMiscOps.isInside(image,1,3,2,3));
+		assertFalse(BoofMiscOps.isInside(image,2,2,2,3));
+		assertFalse(BoofMiscOps.isInside(image,18,21,2,3));
+		assertFalse(BoofMiscOps.isInside(image,17,22,2,3));
 	}
 
 	@Test
-	public void checkInside_radius_int() {
+	void checkInside_radius_int() {
 		GrayU8 image = new GrayU8(20,25);
 
-		assertTrue(BoofMiscOps.checkInside(image,2,2,2));
-		assertTrue(BoofMiscOps.checkInside(image,17,22,2));
-		assertTrue(BoofMiscOps.checkInside(image,15,20,4));
-		assertTrue(BoofMiscOps.checkInside(image,4,4,4));
-		assertTrue(BoofMiscOps.checkInside(image,0,0,0));
-		assertTrue(BoofMiscOps.checkInside(image,19,24,0));
+		assertTrue(BoofMiscOps.isInside(image,2,2,2));
+		assertTrue(BoofMiscOps.isInside(image,17,22,2));
+		assertTrue(BoofMiscOps.isInside(image,15,20,4));
+		assertTrue(BoofMiscOps.isInside(image,4,4,4));
+		assertTrue(BoofMiscOps.isInside(image,0,0,0));
+		assertTrue(BoofMiscOps.isInside(image,19,24,0));
 
-		assertFalse(BoofMiscOps.checkInside(image,1,2,2));
-		assertFalse(BoofMiscOps.checkInside(image,2,1,2));
-		assertFalse(BoofMiscOps.checkInside(image,18,22,2));
-		assertFalse(BoofMiscOps.checkInside(image,17,23,2));
-		assertFalse(BoofMiscOps.checkInside(image,-1,0,0));
-		assertFalse(BoofMiscOps.checkInside(image,0,-1,0));
+		assertFalse(BoofMiscOps.isInside(image,1,2,2));
+		assertFalse(BoofMiscOps.isInside(image,2,1,2));
+		assertFalse(BoofMiscOps.isInside(image,18,22,2));
+		assertFalse(BoofMiscOps.isInside(image,17,23,2));
+		assertFalse(BoofMiscOps.isInside(image,-1,0,0));
+		assertFalse(BoofMiscOps.isInside(image,0,-1,0));
 	}
 
 	@Test
-	public void checkInside_radius_F32() {
+	void checkInside_radius_F32() {
 		GrayU8 image = new GrayU8(20,25);
 
-		assertTrue(BoofMiscOps.checkInside(image,2f,2f,2f));
-		assertTrue(BoofMiscOps.checkInside(image,17f,22f,2f));
-		assertTrue(BoofMiscOps.checkInside(image,15f,20f,4f));
-		assertTrue(BoofMiscOps.checkInside(image,4f,4f,4f));
-		assertTrue(BoofMiscOps.checkInside(image,0f,0f,0f));
-		assertTrue(BoofMiscOps.checkInside(image,19f,24f,0f));
+		assertTrue(BoofMiscOps.isInside(image,2f,2f,2f));
+		assertTrue(BoofMiscOps.isInside(image,17f,22f,2f));
+		assertTrue(BoofMiscOps.isInside(image,15f,20f,4f));
+		assertTrue(BoofMiscOps.isInside(image,4f,4f,4f));
+		assertTrue(BoofMiscOps.isInside(image,0f,0f,0f));
+		assertTrue(BoofMiscOps.isInside(image,19f,24f,0f));
 
-		assertFalse(BoofMiscOps.checkInside(image,1f,2f,2f));
-		assertFalse(BoofMiscOps.checkInside(image,2f,1f,2f));
-		assertFalse(BoofMiscOps.checkInside(image,18f,22f,2f));
-		assertFalse(BoofMiscOps.checkInside(image,17f,23f,2f));
-		assertFalse(BoofMiscOps.checkInside(image,-1f,0f,0f));
-		assertFalse(BoofMiscOps.checkInside(image,0f,-1f,0f));
+		assertFalse(BoofMiscOps.isInside(image,1f,2f,2f));
+		assertFalse(BoofMiscOps.isInside(image,2f,1f,2f));
+		assertFalse(BoofMiscOps.isInside(image,18f,22f,2f));
+		assertFalse(BoofMiscOps.isInside(image,17f,23f,2f));
+		assertFalse(BoofMiscOps.isInside(image,-1f,0f,0f));
+		assertFalse(BoofMiscOps.isInside(image,0f,-1f,0f));
 
-		assertFalse(BoofMiscOps.checkInside(image,0f,-0.4f,0f));
-		assertFalse(BoofMiscOps.checkInside(image,-0.4f,0f,0f));
-		assertFalse(BoofMiscOps.checkInside(image,19.1f,24f,0f));
-		assertFalse(BoofMiscOps.checkInside(image,19.1f,24.1f,0f));
+		assertFalse(BoofMiscOps.isInside(image,0f,-0.4f,0f));
+		assertFalse(BoofMiscOps.isInside(image,-0.4f,0f,0f));
+		assertFalse(BoofMiscOps.isInside(image,19.1f,24f,0f));
+		assertFalse(BoofMiscOps.isInside(image,19.1f,24.1f,0f));
 
-		assertTrue(BoofMiscOps.checkInside(image,0.1f,0.1f,0f));
-		assertTrue(BoofMiscOps.checkInside(image,18.9f,23.9f,0f));
+		assertTrue(BoofMiscOps.isInside(image,0.1f,0.1f,0f));
+		assertTrue(BoofMiscOps.isInside(image,18.9f,23.9f,0f));
 	}
 
 	@Test
-	public void checkInside_radius_F64() {
+	void checkInside_radius_F64() {
 		GrayU8 image = new GrayU8(20,25);
 
-		assertTrue(BoofMiscOps.checkInside(image,2d,2d,2d));
-		assertTrue(BoofMiscOps.checkInside(image,17d,22d,2d));
-		assertTrue(BoofMiscOps.checkInside(image,15d,20d,4d));
-		assertTrue(BoofMiscOps.checkInside(image,4d,4d,4d));
-		assertTrue(BoofMiscOps.checkInside(image,0d,0d,0d));
-		assertTrue(BoofMiscOps.checkInside(image,19d,24d,0d));
+		assertTrue(BoofMiscOps.isInside(image,2d,2d,2d));
+		assertTrue(BoofMiscOps.isInside(image,17d,22d,2d));
+		assertTrue(BoofMiscOps.isInside(image,15d,20d,4d));
+		assertTrue(BoofMiscOps.isInside(image,4d,4d,4d));
+		assertTrue(BoofMiscOps.isInside(image,0d,0d,0d));
+		assertTrue(BoofMiscOps.isInside(image,19d,24d,0d));
 
-		assertFalse(BoofMiscOps.checkInside(image,1d,2d,2d));
-		assertFalse(BoofMiscOps.checkInside(image,2d,1d,2d));
-		assertFalse(BoofMiscOps.checkInside(image,18d,22d,2d));
-		assertFalse(BoofMiscOps.checkInside(image,17d,23d,2d));
-		assertFalse(BoofMiscOps.checkInside(image,-1d,0d,0d));
-		assertFalse(BoofMiscOps.checkInside(image,0d,-1d,0d));
+		assertFalse(BoofMiscOps.isInside(image,1d,2d,2d));
+		assertFalse(BoofMiscOps.isInside(image,2d,1d,2d));
+		assertFalse(BoofMiscOps.isInside(image,18d,22d,2d));
+		assertFalse(BoofMiscOps.isInside(image,17d,23d,2d));
+		assertFalse(BoofMiscOps.isInside(image,-1d,0d,0d));
+		assertFalse(BoofMiscOps.isInside(image,0d,-1d,0d));
 
-		assertFalse(BoofMiscOps.checkInside(image,0d,-0.4d,0d));
-		assertFalse(BoofMiscOps.checkInside(image,-0.4d,0d,0d));
-		assertFalse(BoofMiscOps.checkInside(image,19.1d,24d,0d));
-		assertFalse(BoofMiscOps.checkInside(image,19.1d,24.1d,0d));
+		assertFalse(BoofMiscOps.isInside(image,0d,-0.4d,0d));
+		assertFalse(BoofMiscOps.isInside(image,-0.4d,0d,0d));
+		assertFalse(BoofMiscOps.isInside(image,19.1d,24d,0d));
+		assertFalse(BoofMiscOps.isInside(image,19.1d,24.1d,0d));
 
-		assertTrue(BoofMiscOps.checkInside(image,0.1d,0.1d,0d));
-		assertTrue(BoofMiscOps.checkInside(image,18.9d,23.9d,0d));
+		assertTrue(BoofMiscOps.isInside(image,0.1d,0.1d,0d));
+		assertTrue(BoofMiscOps.isInside(image,18.9d,23.9d,0d));
 	}
 
 	@Test
-	public void checkInside_ImageRectangle() {
+	void checkInside_ImageRectangle() {
 		GrayU8 image = new GrayU8(20,25);
 
-		assertTrue(BoofMiscOps.checkInside(image,new ImageRectangle(0,0,20,25)));
-		assertTrue(BoofMiscOps.checkInside(image,new ImageRectangle(2,4,15,23)));
-		assertFalse(BoofMiscOps.checkInside(image,new ImageRectangle(-1,0,20,25)));
-		assertFalse(BoofMiscOps.checkInside(image,new ImageRectangle(0,-1,20,25)));
-		assertFalse(BoofMiscOps.checkInside(image,new ImageRectangle(0,0,21,25)));
-		assertFalse(BoofMiscOps.checkInside(image,new ImageRectangle(0,0,20,26)));
+		assertTrue(BoofMiscOps.isInside(image,new ImageRectangle(0,0,20,25)));
+		assertTrue(BoofMiscOps.isInside(image,new ImageRectangle(2,4,15,23)));
+		assertFalse(BoofMiscOps.isInside(image,new ImageRectangle(-1,0,20,25)));
+		assertFalse(BoofMiscOps.isInside(image,new ImageRectangle(0,-1,20,25)));
+		assertFalse(BoofMiscOps.isInside(image,new ImageRectangle(0,0,21,25)));
+		assertFalse(BoofMiscOps.isInside(image,new ImageRectangle(0,0,20,26)));
 	}
 }
