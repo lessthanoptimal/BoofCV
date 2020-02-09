@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,12 +18,17 @@
 
 package boofcv.alg.filter.binary;
 
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PackedSetsPoint2D_I32;
+import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
+import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
+
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,7 +36,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestLinearExternalContours {
+class TestLinearExternalContours {
+	Random rand = BoofTesting.createRandom(0);
+
 	public static GrayU8 TEST1 = new GrayU8(new byte[][]
 			{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 			 {0,0,0,0,0,0,0,0,1,0,0,0,1,1,0},
@@ -106,7 +113,34 @@ public class TestLinearExternalContours {
 			 {0,0,0,0,0,0,0,0}});
 
 	@Test
-	public void test1_4() {
+	void compareToChang2004() {
+		var binary = new GrayU8(200,190);
+		var labeled = new GrayS32(200,190);
+		GImageMiscOps.fillUniform(binary,rand,0,1);
+
+		var binaryExpanded = binary.createNew(binary.width+2, binary.height+2);
+		GImageMiscOps.copy(0,0, 1,1,binary.width,binary.height,binary,binaryExpanded);
+
+		for( var rule : ConnectRule.values() ) {
+			LinearContourLabelChang2004 chang = new LinearContourLabelChang2004(rule);
+			LinearExternalContours alg = new LinearExternalContours(rule);
+
+			chang.setSaveInternalContours(false);
+			chang.process(binary.clone(),labeled);
+
+			alg.process(binaryExpanded.clone(),1,1);
+
+			FastQueue<ContourPacked> expected = chang.getContours();
+			PackedSetsPoint2D_I32 found = alg.getExternalContours();
+
+			assertEquals(expected.size, found.size());
+
+			// individual contours should be tested, but this seems to catch major problems
+		}
+	}
+
+	@Test
+	void test1_4() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
 
 		GrayU8 binary = TEST1.clone();
@@ -118,7 +152,7 @@ public class TestLinearExternalContours {
 	}
 
 	@Test
-	public void test1_8() {
+	void test1_8() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.EIGHT);
 
 		GrayU8 binary = TEST1.clone();
@@ -130,7 +164,7 @@ public class TestLinearExternalContours {
 	}
 
 	@Test
-	public void test2_4() {
+	void test2_4() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
 
 		GrayU8 binary = TEST2.clone();
@@ -142,7 +176,7 @@ public class TestLinearExternalContours {
 	}
 
 	@Test
-	public void test2_8() {
+	void test2_8() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.EIGHT);
 
 		GrayU8 binary = TEST2.clone();
@@ -154,7 +188,7 @@ public class TestLinearExternalContours {
 	}
 
 	@Test
-	public void test3_4() {
+	void test3_4() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
 
 		GrayU8 binary = TEST3.clone();
@@ -166,7 +200,7 @@ public class TestLinearExternalContours {
 	}
 
 	@Test
-	public void test3_8() {
+	void test3_8() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.EIGHT);
 
 		GrayU8 binary = TEST3.clone();
@@ -178,7 +212,7 @@ public class TestLinearExternalContours {
 	}
 
 	@Test
-	public void test4() {
+	void test4() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
 		alg.process(TEST4.clone(),1,1);
 		checkExpectedExternal(new int[]{24},alg);
@@ -189,7 +223,7 @@ public class TestLinearExternalContours {
 	}
 
 	@Test
-	public void test5() {
+	void test5() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
 		alg.process(TEST5.clone(),1,1);
 		checkExpectedExternal(new int[]{20},alg);
@@ -200,7 +234,7 @@ public class TestLinearExternalContours {
 	}
 
 	@Test
-	public void test6() {
+	void test6() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
 		alg.process(TEST6.clone(),1,1);
 		checkExpectedExternal(new int[]{20},alg);
@@ -211,7 +245,7 @@ public class TestLinearExternalContours {
 	}
 
 	@Test
-	public void test7() {
+	void test7() {
 		LinearExternalContours alg = new LinearExternalContours(ConnectRule.FOUR);
 		alg.process(TEST7.clone(),1,1);
 		checkExpectedExternal(new int[]{4,20},alg);

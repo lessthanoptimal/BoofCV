@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -105,6 +105,7 @@ public interface BinaryContourInterface {
 		/**
 		 * If this is set o true then internally it will create a copy of the input image with a 1-pixel border added.
 		 *
+		 * You probably want to also adjust the coordinates using a value of (1,1)
 		 */
 		void setCreatePaddedCopy(boolean hasPadding );
 

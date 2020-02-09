@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ import boofcv.struct.image.GrayU8;
  *     <li>Iterate from "Begin Row" until the end of the row has been reached</li>
  *     <li>Move to the next row starting at point (1,y+1)</li>
  * </ol>
- * Look at the code for all the details. There are a couple of important points which are glosed over
+ * Look at the code for all the details. There are a couple of important points which are glossed over
  * in the description above.
  *
  * To get the external contours after processing call {@link #getExternalContours()}.

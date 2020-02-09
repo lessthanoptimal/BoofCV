@@ -18,10 +18,10 @@
 
 package boofcv.alg.fiducial.calib.circle;
 
-import boofcv.abst.filter.binary.BinaryContourInterface;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
+import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.curve.EllipseRotated_F64;
 
@@ -76,9 +76,9 @@ public class DetectCircleHexagonalGrid<T extends ImageGray<T>> extends DetectCir
 		// isn't correct
 		int diameter = Math.max(gray.width,gray.height)/(Math.max(numCols,numRows));
 
-		BinaryContourInterface contourFinder = ellipseDetector.getEllipseDetector().getContourFinder();
-		contourFinder.setMaxContour((int)(Math.PI*diameter*3)+1);
-		contourFinder.setSaveInnerContour(false);
+		BinaryEllipseDetectorPixel binaryDetector = ellipseDetector.getEllipseDetector();
+		binaryDetector.setMaximumContour((int)(Math.PI*diameter*3)+1);
+		binaryDetector.setInternalContour(false);
 	}
 
 	@Override

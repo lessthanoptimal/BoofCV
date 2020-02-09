@@ -18,10 +18,10 @@
 
 package boofcv.alg.fiducial.calib.circle;
 
-import boofcv.abst.filter.binary.BinaryContourInterface;
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.fiducial.calib.circle.EllipseClustersIntoGrid.Grid;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
+import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.curve.EllipseRotated_F64;
 
@@ -69,9 +69,9 @@ public class DetectCircleRegularGrid<T extends ImageGray<T>> extends DetectCircl
 		// overestimate the max diameter by not taking in account space between the circles
 		int diameter = Math.max(gray.width,gray.height)/Math.max(numCols,numRows);
 
-		BinaryContourInterface contourFinder = ellipseDetector.getEllipseDetector().getContourFinder();
-		contourFinder.setMaxContour((int)(Math.PI*diameter)*2);
-		contourFinder.setSaveInnerContour(false);
+		BinaryEllipseDetectorPixel contourFinder = ellipseDetector.getEllipseDetector();
+		contourFinder.setMaximumContour((int)(Math.PI*diameter)*2);
+		contourFinder.setInternalContour(false);
 	}
 
 	@Override

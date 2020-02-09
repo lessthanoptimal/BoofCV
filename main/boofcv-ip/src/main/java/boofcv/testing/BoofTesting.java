@@ -37,6 +37,18 @@ import java.util.Random;
 @SuppressWarnings("ALL")
 public class BoofTesting {
 
+	public static final long BASE_SEED = 0xBEEF;
+
+	/**
+	 * Creates Random but using a fixed seed with an offset. The idea if we want to test to see if a test is brittle
+	 * we can do that across the project by changing the base seed.
+	 * @param offset Value added to base seed.
+	 * @return Random
+	 */
+	public static Random createRandom( long offset ) {
+		return new Random(0xBEEF+offset);
+	}
+
 	public static <T> T convertToGenericType(Class<?> type) {
 		if (type == GrayS8.class || type == GrayU8.class)
 			return (T) GrayI8.class;

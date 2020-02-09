@@ -24,6 +24,7 @@ Version : 0.36
 - Image Processing
   * Fixed ImageDistort crashing if an invalid region is specified. It simply does nothing now.
   * FDistort now supports SKIP border. Thanks Nico Stuurman!
+  * Created ContourOps
 - Color
   * Can convert YUV, HSV, and YCbCr to 32-bit RGB color
 - Moved KLT from boofcv-geo to boofcv-feature

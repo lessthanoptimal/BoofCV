@@ -18,9 +18,10 @@
 
 package boofcv.alg.shapes.ellipse;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
+import boofcv.abst.filter.binary.BinaryContourFinderLinearExternal;
 import boofcv.abst.filter.binary.BinaryContourInterface;
 import boofcv.abst.filter.binary.BinaryLabelContourFinder;
+import boofcv.alg.filter.binary.ContourOps;
 import boofcv.alg.filter.binary.ContourPacked;
 import boofcv.factory.filter.binary.FactoryBinaryContourFinder;
 import boofcv.struct.ConnectRule;
@@ -67,7 +68,6 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class BinaryEllipseDetectorPixel {
-
 	// maximum distance from the ellipse in pixels
 	private double maxDistanceFromEllipse = 3.0;
 
@@ -84,10 +84,10 @@ public class BinaryEllipseDetectorPixel {
 
 	// connect rule used with contour finding
 	private ConnectRule connectRule;
-	// allow it to switch between two algortihms
+	// allow it to switch between two algorithms
 	private BinaryLabelContourFinder contourFinder;
 	private GrayS32 labeled = new GrayS32(1,1);
-	private BinaryContourFinder contourExternal;
+	private BinaryContourFinderLinearExternal contourExternal;
 
 	private FitEllipseAlgebraic_F64 algebraic = new FitEllipseAlgebraic_F64();
 
@@ -104,11 +104,11 @@ public class BinaryEllipseDetectorPixel {
 	private FastQueue<Found> found = new FastQueue<>(Found.class, true);
 
 	// temporary storage for a contour
-	private FastQueue<Point2D_I32> contourTmp = new FastQueue<>(Point2D_I32.class,true);
+	private FastQueue<Point2D_I32> contourTmp = new FastQueue<>(Point2D_I32::new);
 
 	public BinaryEllipseDetectorPixel( ConnectRule connectRule ) {
 		this.connectRule = connectRule;
-		setInternalContour(false);
+		declareContour(false);
 	}
 
 	public BinaryEllipseDetectorPixel() {
@@ -137,43 +137,45 @@ public class BinaryEllipseDetectorPixel {
 	public void process( GrayU8 binary ) {
 		found.reset();
 
-		List<ContourPacked> blobs;
-		if( contourFinder != null ) {
+		final BinaryContourInterface selectedFinder = getContourFinder();
+
+		selectedFinder.setMaxContour(maximumContour==0?Integer.MAX_VALUE:maximumContour);
+		selectedFinder.setMinContour(minimumContour);
+
+		if( isInternalContour() ) {
 			contourFinder.process(binary, labeled);
-			blobs = contourFinder.getContours();
 		} else {
 			contourExternal.process(binary);
-			blobs = contourExternal.getContours();
 		}
+
+		List<ContourPacked> blobs = selectedFinder.getContours();
 
 		for (int i = 0; i < blobs.size(); i++) {
 			ContourPacked c = blobs.get(i);
 
-			if( contourFinder != null ) {
-				contourFinder.loadContour(c.externalIndex, contourTmp);
-			} else {
-				contourExternal.loadContour(c.externalIndex, contourTmp);
-			}
-			proccessContour(contourTmp.toList());
+			selectedFinder.loadContour(c.externalIndex, contourTmp);
+			proccessContour(contourTmp.toList(), binary.width, binary.height);
 
-			if(contourFinder!=null) {
+			if(isInternalContour()) {
 				for( int j = 0; j < c.internalIndexes.size(); j++ ) {
-					contourFinder.loadContour(c.internalIndexes.get(j),contourTmp);
-					proccessContour(contourTmp.toList());
+					selectedFinder.loadContour(c.internalIndexes.get(j),contourTmp);
+					proccessContour(contourTmp.toList(), binary.width, binary.height);
 				}
 			}
 		}
 	}
 
-	private void proccessContour(List<Point2D_I32> contour) {
-		if (contour.size() < minimumContour || (maximumContour > 0 && contour.size() > maximumContour) ) {
-			if( verbose != null )
-				verbose.println("Rejecting: too small (or large) "+contour.size());
-			return;
-		}
+	private void proccessContour(List<Point2D_I32> contour, final int width , final int height) {
+		// No longer needed since contourFinder can have handle the limit internally now. Keeping this commented out
+		// for quick sanity checks in the future
+//		if (contour.size() < minimumContour || (maximumContour > 0 && contour.size() > maximumContour) ) {
+//			if( verbose != null )
+//				verbose.println("Rejecting: too small (or large) "+contour.size());
+//			return;
+//		}
 
 		// discard shapes which touch the image border
-		if( touchesBorder(contour) )
+		if(ContourOps.isTouchBorder(contour, width, height) )
 			return;
 
 		pointsF.reset();
@@ -229,21 +231,6 @@ public class BinaryEllipseDetectorPixel {
 		ellipse.b += 0.5;
 	}
 
-	protected final boolean touchesBorder( List<Point2D_I32> contour ) {
-		int endX = labeled.width-1;
-		int endY = labeled.height-1;
-
-		for (int j = 0; j < contour.size(); j++) {
-			Point2D_I32 p = contour.get(j);
-			if( p.x == 0 || p.y == 0 || p.x == endX || p.y == endY )
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	/**
 	 * Undistort the contour points and convert into a floating point format for the fitting operation
 	 *
@@ -296,6 +283,14 @@ public class BinaryEllipseDetectorPixel {
 		return true;
 	}
 
+	public List<ContourPacked> getContours() {
+		return getContourFinder().getContours();
+	}
+
+	public void loadContour( int id , FastQueue<Point2D_I32> storage ) {
+		getContourFinder().loadContour(id, storage);
+	}
+
 	public BinaryContourInterface getContourFinder() {
 		if( contourFinder != null )
 			return contourFinder;
@@ -312,6 +307,12 @@ public class BinaryEllipseDetectorPixel {
 	}
 
 	public void setInternalContour(boolean internalContour) {
+		if( internalContour == isInternalContour() )
+			return;
+		declareContour(internalContour);
+	}
+
+	private void declareContour(boolean internalContour) {
 		if( internalContour ) {
 			contourFinder = FactoryBinaryContourFinder.linearChang2004();
 			contourFinder.setConnectRule(connectRule);
@@ -319,6 +320,9 @@ public class BinaryEllipseDetectorPixel {
 		} else {
 			contourExternal = FactoryBinaryContourFinder.linearExternal();
 			contourExternal.setConnectRule(connectRule);
+			// If these are not set then a black border is added to the input image
+			contourExternal.setCreatePaddedCopy(true);
+			contourExternal.setCoordinateAdjustment(1,1);
 			contourFinder = null;
 		}
 	}

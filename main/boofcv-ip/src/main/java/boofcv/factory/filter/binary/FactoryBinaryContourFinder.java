@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.factory.filter.binary;
 
-import boofcv.abst.filter.binary.BinaryContourFinder;
 import boofcv.abst.filter.binary.BinaryContourFinderLinearExternal;
 import boofcv.abst.filter.binary.BinaryLabelContourFinder;
 import boofcv.abst.filter.binary.BinaryLabelContourFinderChang2004;
@@ -46,7 +45,7 @@ public class FactoryBinaryContourFinder {
 	/**
 	 * Binary contour finder for external contours only
 	 */
-	public static BinaryContourFinder linearExternal() {
+	public static BinaryContourFinderLinearExternal linearExternal() {
 		return new BinaryContourFinderLinearExternal();
 	}
 }

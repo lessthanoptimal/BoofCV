@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -178,7 +178,7 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 	}
 
 	public List<ContourPacked> getAllContours() {
-		return ellipseDetector.getContourFinder().getContours();
+		return ellipseDetector.getContours();
 	}
 
 	/**
