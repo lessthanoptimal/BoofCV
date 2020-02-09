@@ -20,13 +20,15 @@ package boofcv.abst.tracker;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.tracker.PointTrackerKltPyramid.PointTrackMod;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.tracker.klt.*;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -43,8 +45,7 @@ class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 	@Override
 	public PointTracker<GrayF32> createTracker() {
 		config = new ConfigPKlt();
-		return FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true),
-				GrayF32.class, GrayF32.class);
+		return createKLT(config);
 	}
 
 	/**
@@ -167,8 +168,7 @@ class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 		// Strict tolerance on check
 		config.toleranceFB = 1e-3;
 
-		var alg = FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true),
-				GrayF32.class, GrayF32.class);
+		PointTracker<GrayF32> alg = createKLT(config);
 
 		alg.process(image);
 		alg.spawnTracks();
@@ -187,6 +187,11 @@ class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 		assertTrue(alg.getActiveTracks(null).size() < originalTotal/30 );
 	}
 
+	private PointTrackerKltPyramid<GrayF32,GrayF32> createKLT(ConfigPKlt config) {
+		return FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true),
+				GrayF32.class, GrayF32.class);
+	}
+
 	/**
 	 * Shift the image and see if it still tracks with FB turned on
 	 */
@@ -196,8 +201,7 @@ class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 		config.templateRadius=3;
 		config.toleranceFB = 0.1;
 
-		var alg = FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true),
-				GrayF32.class, GrayF32.class);
+		PointTracker<GrayF32> alg = createKLT(config);
 
 		alg.process(image);
 		alg.spawnTracks();
@@ -222,7 +226,29 @@ class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 
 	@Test
 	void pruneClose() {
-		fail("Implement");
+		ConfigPKlt config = new ConfigPKlt();
+		config.pruneClose = true;
+
+		PointTrackerKltPyramid<GrayF32,GrayF32> alg = createKLT(config);
+
+		// create 10 tracks all in the same location
+		for (int i = 0; i < 10; i++) {
+			var t = new PyramidKltFeature(1,1);
+			var p = new PointTrackMod();
+			p.featureId = i;
+			t.x = t.y = 12;
+			t.cookie = p;
+			alg.active.add(t);
+		}
+
+		alg.input = new GrayF32(50,50);
+		alg.pruneCloseTracks();
+
+		// only oe will be saved
+		assertEquals(1,alg.active.size());
+		assertEquals(9, alg.dropped.size());
+		// save the oldest track
+		assertEquals(0, ((PointTrackMod)alg.active.get(0).cookie).featureId);
 	}
 
 	/**

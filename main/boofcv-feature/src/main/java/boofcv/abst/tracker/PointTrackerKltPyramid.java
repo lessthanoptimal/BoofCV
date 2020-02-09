@@ -324,12 +324,18 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 
 		// If configured to, drop features which are close by each other
 		if( pruneClose != null ) {
-			pruneClose.init(input.width,input.height);
-			pruneClose.process(active,closeDropped);
-			// TODO
-			active.removeAll(closeDropped);
-			dropped.addAll(closeDropped);
+			pruneCloseTracks();
 		}
+	}
+
+	/**
+	 * Prune tracks which are too close and adds them to the dropped list
+	 */
+	protected void pruneCloseTracks() {
+		pruneClose.init(input.width,input.height);
+		pruneClose.process(active,closeDropped);
+		active.removeAll(closeDropped);
+		dropped.addAll(closeDropped);
 	}
 
 	/**

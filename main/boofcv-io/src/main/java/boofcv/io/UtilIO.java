@@ -232,12 +232,15 @@ public class UtilIO {
 			if( files == null )
 				break;
 
+			boolean foundReadme = false;
 			boolean foundMain = false;
 			boolean foundExamples = false;
 			boolean foundIntegration = false;
 
 			for( String s : files ) {
-				if( s.compareToIgnoreCase("main") == 0 )
+				if( s.compareToIgnoreCase("README.md") == 0 )
+					foundReadme = true;
+				else if( s.compareToIgnoreCase("main") == 0 )
 					foundMain = true;
 				else if( s.compareToIgnoreCase("examples") == 0 )
 					foundExamples = true;
@@ -245,7 +248,7 @@ public class UtilIO {
 					foundIntegration = true;
 			}
 
-			if( foundMain && foundExamples && foundIntegration)
+			if( foundMain && foundExamples && foundIntegration && foundReadme)
 				return path;
 
 			path = f.getParent();

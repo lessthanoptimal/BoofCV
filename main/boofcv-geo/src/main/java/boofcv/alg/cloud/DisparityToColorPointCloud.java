@@ -21,7 +21,6 @@ package boofcv.alg.cloud;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F64;
@@ -33,7 +32,8 @@ import org.ejml.ops.ConvertMatrixData;
 
 /**
  * <p>
- * Renders a 3D point cloud using a perspective pin hole camera model.
+ * Renders a 3D point cloud using a perspective pin hole camera model. An ROI can be specified if only part
+ * of the image is desired
  * </p>
  *
  * <p>
@@ -106,14 +106,22 @@ public class DisparityToColorPointCloud {
 	 * @param disparity Disparity image
 	 * @param color Color image of left camera
 	 */
-	public void process(ImageGray disparity , ColorImage color , PointCloudWriter output ) {
+	public void process(ImageGray<?> disparity , ColorImage color , PointCloudWriter output ) {
 
 		if( disparity instanceof GrayU8)
 			process((GrayU8)disparity, color, output);
-		else
+		else if( disparity instanceof  GrayF32 )
 			process((GrayF32)disparity, color, output);
+		else
+			throw new IllegalArgumentException("Unsupported image type "+disparity.getClass().getSimpleName());
 	}
 
+	/**
+	 * Converts the disparity image into a color point cloud
+	 * @param disparity (Input) Disparity image
+	 * @param color (Input) Color image
+	 * @param output (Output) destination for the colorized point cloud
+	 */
 	private void process(GrayU8 disparity , ColorImage color , PointCloudWriter output ) {
 
 		final int x0 = Math.max(roi.x0,0);
@@ -145,19 +153,23 @@ public class DisparityToColorPointCloud {
 				// Bring it back into left camera frame
 				GeometryMath_F32.multTran(rectifiedR,p,p);
 
-				output.add(p.x,p.y,p.z,getColor(disparity, color, pixelX, pixelY));
+				output.add(p.x,p.y,p.z,getColor(color, pixelX, pixelY));
 			}
 		}
 	}
 
+	/**
+	 * Converts the disparity image into a color point cloud
+	 * @param disparity (Input) Disparity image
+	 * @param color (Input) Color image
+	 * @param output (Output) destination for the colorized point cloud
+	 */
 	private void process(GrayF32 disparity , ColorImage color , PointCloudWriter output) {
 
 		final int x0 = Math.max(roi.x0,0);
 		final int y0 = Math.max(roi.y0,0);
 		final int x1 = Math.min(roi.x1,disparity.width);
 		final int y1 = Math.min(roi.y1,disparity.height);
-
-//		System.out.println("ROI "+)
 
 		for( int pixelY = y0; pixelY < y1; pixelY++ ) {
 			int index = disparity.startIndex + disparity.stride*pixelY + x0;
@@ -182,12 +194,18 @@ public class DisparityToColorPointCloud {
 				// Bring it back into left camera frame
 				GeometryMath_F32.multTran(rectifiedR,p,p);
 
-				output.add(p.x,p.y,p.z,getColor(disparity, color, pixelX, pixelY));
+				output.add(p.x,p.y,p.z,getColor(color, pixelX, pixelY));
 			}
 		}
 	}
 
-	private int getColor(ImageBase disparity, ColorImage color, int x, int y ) {
+	/**
+	 * @param color color image
+	 * @param x coordinate in disparity image
+	 * @param y coordinate in disparity image
+	 * @return RGB
+	 */
+	private int getColor(ColorImage color, int x, int y ) {
 		rectifiedToColor.compute(x,y,colorPt);
 		int xx = (int)colorPt.getX();
 		int yy = (int)colorPt.getY();
@@ -199,10 +217,20 @@ public class DisparityToColorPointCloud {
 		}
 	}
 
+	/**
+	 * Specifies a ROI in the disparity image the cloud should come from
+	 * @param x0 lower extent, x-axis, inclusive
+	 * @param y0 lower extent, y-axis, inclusive
+	 * @param x1 upper extent, x-axis, exclusive
+	 * @param y1 upper extent, y-axis, exclusive
+	 */
 	public void setRegionOfInterest(int x0 , int y0 , int x1 , int y1 ) {
 		roi.set(x0, y0, x1, y1);
 	}
 
+	/**
+	 * Removes the ROI
+	 */
 	public void clearRegionOfInterest() {
 		roi.set(-1,-1,Integer.MAX_VALUE,Integer.MAX_VALUE);
 	}

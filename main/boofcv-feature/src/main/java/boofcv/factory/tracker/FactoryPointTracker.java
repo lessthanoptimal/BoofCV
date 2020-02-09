@@ -116,8 +116,8 @@ public class FactoryPointTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	PointTracker<I> klt(ConfigPKlt config, ConfigGeneralDetector configExtract,
-						Class<I> imageType, @Nullable Class<D> derivType ) {
+	PointTrackerKltPyramid<I,D> klt(ConfigPKlt config, ConfigGeneralDetector configExtract,
+									Class<I> imageType, @Nullable Class<D> derivType ) {
 
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
