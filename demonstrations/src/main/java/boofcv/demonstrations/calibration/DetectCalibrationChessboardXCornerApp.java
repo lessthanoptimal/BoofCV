@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -242,8 +242,7 @@ public class DetectCalibrationChessboardXCornerApp
 			processingTime = (time1-time0)*1e-6; // milliseconds
 
 			featureImg = detector.getDetector().getDetector().getIntensity();
-
-//			controlPanel.thresholdPanel.updateHistogram(featureImg);
+//			featureImg = detector.getDetector().getDetector().getIntensity2x2();
 
 			if( controlPanel.logItensity ) {
 				PixelMath.logSign(featureImg,0.2f,logIntensity);
@@ -407,7 +406,7 @@ public class DetectCalibrationChessboardXCornerApp
 						g2.draw(line);
 
 						g2.setStroke(thin);
-						g2.setColor(Color.CYAN);
+						g2.setColor(Color.ORANGE);
 
 						g2.draw(line);
 

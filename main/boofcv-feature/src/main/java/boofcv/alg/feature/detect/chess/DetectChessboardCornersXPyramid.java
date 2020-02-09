@@ -142,7 +142,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 		}
 
 		// Only keep flagged features for the final output
-		int dropped = 0;
+//		int dropped = 0;
 		for (int levelIdx = 0; levelIdx < pyramid.size(); levelIdx++) {
 			PyramidLevel level = featureLevels.get(levelIdx);
 			// only add corners if they were first seen in this level
@@ -150,8 +150,8 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 				ChessboardCorner c = level.corners.get(i);
 				if( c.first ) {
 					corners.grow().set(c);
-				} else {
-					dropped++;
+//				} else {
+//					dropped++;
 				}
 			}
 		}

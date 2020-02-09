@@ -75,6 +75,7 @@ TODO hough circle detector
 TODO concurrent SIFT
 TODO concurrent dense features?
 TODO Estimate focal lengths given disparity image
+TODO Scharr gradient http://www.hlevkin.com/articles/SobelScharrGradients5x5.pdf
 
 TODO SGM - Consider YDX order. Profile to see if it's faster
 TODO Calibration
