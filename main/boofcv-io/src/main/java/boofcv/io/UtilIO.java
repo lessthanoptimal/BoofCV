@@ -61,6 +61,7 @@ public class UtilIO {
 			URL url = UtilIO.class.getClassLoader().getResource(path);
 
 			if (url == null) {
+				System.err.println(path);
 				System.err.println();
 				System.err.println("Can't find data/example directory!  There are three likely causes for this problem.");
 				System.err.println();

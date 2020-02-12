@@ -76,7 +76,7 @@ public abstract class DemonstrationBase extends JPanel {
 	volatile boolean inputSizeKnown = false;
 
 	protected String inputFilePath;
-	protected String inputFileSet[];
+	protected String[] inputFileSet;
 
 	// Storage for input list of input streams.  always synchronize before manipulating
 	private final List<CacheSequenceStream> inputStreams = new ArrayList<>();
@@ -238,7 +238,7 @@ public abstract class DemonstrationBase extends JPanel {
 	/**
 	 * Updates the list in recent menu
 	 */
-	private void updateRecentItems() {
+	protected void updateRecentItems() {
 		if( menuRecent == null )
 			return;
 		menuRecent.removeAll();
@@ -476,7 +476,7 @@ public abstract class DemonstrationBase extends JPanel {
 			if( inputMethod == InputMethod.IMAGE ) {
 				if( !f.isFile() )
 					continue;
-				if( !BoofSwingUtil.isImage(f) )
+				if( !UtilImageIO.isImage(f) )
 					continue;
 			} else {
 				// filter out common non image/video files
@@ -725,7 +725,7 @@ public abstract class DemonstrationBase extends JPanel {
 			types.add(BoofSwingUtil.FileTypes.IMAGES);
 		if( allowVideos )
 			types.add(BoofSwingUtil.FileTypes.VIDEOS);
-		BoofSwingUtil.FileTypes array[] = types.toArray(new BoofSwingUtil.FileTypes[0]);
+		BoofSwingUtil.FileTypes[] array = types.toArray(new BoofSwingUtil.FileTypes[0]);
 
 		File file = BoofSwingUtil.openFileChooser(DemonstrationBase.this,array);
 		if (file != null) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.io.image;
 
 import boofcv.io.UtilIO;
 import boofcv.struct.image.*;
+import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.GrowQueue_I8;
 
 import javax.imageio.ImageIO;
@@ -27,6 +28,7 @@ import java.awt.image.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +39,32 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class UtilImageIO {
+
+	/**
+	 * List of supported image types
+	 */
+	public static final String[] IMAGE_SUFFIXES;
+
+	static {
+		// Add the known Java ones
+		String[] suffixes = ImageIO.getReaderFileSuffixes();
+		IMAGE_SUFFIXES = new String[suffixes.length+2];
+		for (int i = 0; i < suffixes.length; i++) {
+			IMAGE_SUFFIXES[i] = suffixes[i];
+		}
+		// Add ones supported by BoofCV
+		IMAGE_SUFFIXES[suffixes.length  ] = "ppm";
+		IMAGE_SUFFIXES[suffixes.length+1] = "pgm";
+	}
+
+	public static boolean isKnownSuffix( String suffix ) {
+		for( String s : UtilImageIO.IMAGE_SUFFIXES) {
+			if( s.equalsIgnoreCase(suffix)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * A function that load the specified image.  If anything goes wrong it returns a
@@ -528,4 +556,22 @@ public class UtilImageIO {
 		}
 	}
 
+	/**
+	 * Uses mime type to determine if it's an image or not. If mime fails it will look at the suffix. This
+	 * isn't 100% correct.
+	 */
+	public static boolean isImage( File file ){
+		try {
+			String mimeType = Files.probeContentType(file.toPath());
+			if( mimeType == null ) {
+				// In some OS there is a bug where it always returns null/
+				String extension = FilenameUtils.getExtension(file.getName()).toLowerCase();
+				if( isKnownSuffix(extension) )
+					return true;
+			} else {
+				return mimeType.startsWith("image");
+			}
+		} catch (IOException ignore) {}
+		return false;
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ class TestBoofSwingUtil {
 		out.print("not an empty file");
 		out.flush();
 		out.close();
-		assertFalse(BoofSwingUtil.isImage(f));
+		assertFalse(UtilImageIO.isImage(f));
 		// clean up
 		assertTrue(f.delete());
 
@@ -49,7 +49,7 @@ class TestBoofSwingUtil {
 
 		BufferedImage image = new BufferedImage(100,200,BufferedImage.TYPE_INT_RGB);
 		UtilImageIO.saveImage(image,f.getAbsolutePath());
-		assertTrue(BoofSwingUtil.isImage(f));
+		assertTrue(UtilImageIO.isImage(f));
 
 		// clean up
 		assertTrue(f.delete());

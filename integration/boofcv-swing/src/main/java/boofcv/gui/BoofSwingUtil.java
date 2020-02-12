@@ -20,6 +20,7 @@ package boofcv.gui;
 
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.core.image.ConvertImage;
+import boofcv.gui.dialogs.FilePreviewChooser;
 import boofcv.gui.dialogs.OpenImageSetDialog;
 import boofcv.io.image.ConvertImageMisc;
 import boofcv.io.image.UtilImageIO;
@@ -48,7 +49,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -166,12 +166,26 @@ public class BoofSwingUtil {
 		return fileChooser(preferenceName,null,true,new File(".").getPath(),filters);
 	}
 
+	public static File openFilePreview(String preferenceName, FileTypes ...filters) {
+		return fileChooserPreview(preferenceName,null,true,new File(".").getPath(),filters);
+	}
+
 	public static File openFileChooser(Component parent, FileTypes ...filters) {
 		return openFileChooser(parent,new File(".").getPath(),filters);
 	}
 
+	public static File openFilePreview(Component parent, FileTypes ...filters) {
+		return fileChooserPreview(null,parent,true,new File(".").getPath(),filters);
+	}
+
+
 	public static File openFileChooser(Component parent, String defaultPath , FileTypes ...filters) {
-		return fileChooser(null,parent,true,defaultPath,filters);
+		if( filters.length == 1 && filters[0] == FileTypes.IMAGES ) {
+			// Default to the new preview if they only want to see images
+			return fileChooserPreview(null, parent, true, defaultPath, filters);
+		} else {
+			return fileChooser(null, parent, true, defaultPath, filters);
+		}
 	}
 
 	public static File fileChooser(String preferenceName, Component parent, boolean openFile, String defaultPath , FileTypes ...filters) {
@@ -251,9 +265,93 @@ public class BoofSwingUtil {
 		return selected;
 	}
 
-	public static java.util.List<String> getListOfRecentFiles(Component parent) {
+	/**
+	 * File chooser with a preview. Work in progress for replacing the old file chooser
+	 */
+	public static File fileChooserPreview(String preferenceName, Component parent, boolean openFile, String defaultPath , FileTypes ...filters) {
 
-		Preferences prefs = Preferences.userRoot().node(parent.getClass().getSimpleName());
+		if( !openFile )
+			throw new RuntimeException("Save isn't yet supported");
+
+		if( preferenceName == null && parent != null ) {
+			preferenceName = parent.getClass().getSimpleName();
+		}
+
+		Preferences prefs;
+		if( preferenceName == null ) {
+			prefs = Preferences.userRoot();
+		} else {
+			prefs = Preferences.userRoot().node(preferenceName);
+		}
+		File previousPath=new File(prefs.get(KEY_PREVIOUS_SELECTION, defaultPath));
+		FilePreviewChooser chooser = new FilePreviewChooser(true);
+		chooser.getBrowser().setSelectedFile(previousPath);
+
+		boolean selectDirectories = false;
+		escape:for( FileTypes t : filters ) {
+			javax.swing.filechooser.FileFilter ff;
+			switch( t ) {
+				case FILES:
+					ff = new javax.swing.filechooser.FileFilter() {
+						@Override
+						public boolean accept(File pathname) {
+							return true;
+						}
+						@Override
+						public String getDescription() {
+							return "All";
+						}
+					};
+					break;
+
+				case YAML:
+					ff = new FileNameExtensionFilter("yaml", "yaml","yml");
+					break;
+
+				case XML:
+					ff = new FileNameExtensionFilter("xml", "xml");
+					break;
+
+				case IMAGES:
+					ff = new FileNameExtensionFilter("Images", ImageIO.getReaderFileSuffixes());
+					break;
+				case VIDEOS:
+					ff = new FileNameExtensionFilter("Videos","mpg","mp4","mov","avi","wmv");
+					break;
+
+				case DIRECTORIES:
+					selectDirectories = true;
+					break escape;
+				default:
+					throw new RuntimeException("Unknown file type");
+			}
+			chooser.getBrowser().addFileFilter(ff);
+		}
+
+//		if( selectDirectories ) {
+//			if( filters.length == 1 )
+//				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+//			else
+//				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+//		}
+//		if( chooser.getChoosableFileFilters().length > 1 ) {
+//			chooser.setFileFilter(chooser.getChoosableFileFilters()[1]);
+//		}
+
+		File selected = chooser.showDialog(parent);
+		if (selected != null ) {
+			prefs.put(KEY_PREVIOUS_SELECTION, selected.getPath());
+		}
+		return selected;
+	}
+
+	public static java.util.List<String> getListOfRecentFiles(Component parent) {
+		return getListOfRecentFiles(parent.getClass().getSimpleName());
+	}
+
+	public static java.util.List<String> getListOfRecentFiles( String preferenceName ) {
+
+		Preferences prefs = Preferences.userRoot().node(preferenceName);
 		String encodedString =prefs.get(KEY_RECENT_FILES, "");
 
 		String []fileNames = encodedString.split("\n");
@@ -264,7 +362,11 @@ public class BoofSwingUtil {
 	}
 
 	public static void addToRecentFiles( Component parent , String filePath ) {
-		java.util.List<String> files = getListOfRecentFiles(parent);
+		addToRecentFiles(parent.getClass().getSimpleName(), filePath);
+	}
+
+	public static void addToRecentFiles( String preferenceName , String filePath ) {
+		java.util.List<String> files = getListOfRecentFiles(preferenceName);
 
 		files.remove(filePath);
 
@@ -280,7 +382,7 @@ public class BoofSwingUtil {
 				encoded += "\n";
 			}
 		}
-		Preferences prefs = Preferences.userRoot().node(parent.getClass().getSimpleName());
+		Preferences prefs = Preferences.userRoot().node(preferenceName);
 		prefs.put(KEY_RECENT_FILES,encoded);
 	}
 
@@ -454,29 +556,6 @@ public class BoofSwingUtil {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	/**
-	 * Uses mime type to determine if it's an image or not. If mime fails it will look at the suffix. This
-	 * isn't 100% correct.
-	 */
-	public static boolean isImage( File file ){
-		try {
-			String mimeType = Files.probeContentType(file.toPath());
-			if( mimeType == null ) {
-				// In some OS there is a bug where it always returns null/
-				String extension = FilenameUtils.getExtension(file.getName()).toLowerCase();
-				String[] suffixes = ImageIO.getReaderFileSuffixes();
-				for( String s : suffixes ) {
-					if( s.equals(extension)) {
-						return true;
-					}
-				}
-			} else {
-				return mimeType.startsWith("image");
-			}
-		} catch (IOException ignore) {}
-		return false;
 	}
 
 	private static double computeButtonScale( int width , int height,

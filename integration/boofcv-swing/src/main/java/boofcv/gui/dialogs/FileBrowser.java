@@ -49,7 +49,7 @@ public class FileBrowser extends JSpringPanel {
 	JComboBox directoryPath;
 	// list of child files and directories
 	JList fileList;
-	DefaultListModel listModel = new DefaultListModel();
+	DefaultListModel<File> listModel = new DefaultListModel<>();
 
 	// directory path
 	List<File> directories = new ArrayList<>();
@@ -58,6 +58,9 @@ public class FileBrowser extends JSpringPanel {
 	ActionListener directoryListener;
 
 	Listener listener;
+
+	// Used to specify which files should be displayed
+	java.util.List<javax.swing.filechooser.FileFilter> filters = new ArrayList<>();
 
 	public FileBrowser( File directory , Listener listener) {
 		this.listener = listener;
@@ -125,6 +128,31 @@ public class FileBrowser extends JSpringPanel {
 		directoryPath.addActionListener(directoryListener);
 	}
 
+	public void addFileFilter( javax.swing.filechooser.FileFilter filter ) {
+		this.filters.add(filter);
+	}
+
+	/**
+	 * Sets the selected file to be the specified one
+	 */
+	public void setSelectedFile( File file ) {
+		if( file.isDirectory() ) {
+			setDirectory(file);
+		} else {
+			setDirectory(file.getParentFile());
+
+			for( int i = 0; i < listModel.size(); i++ ) {
+				File f = listModel.get(i);
+				if( f.getName().equals(file.getName()) ) {
+					fileList.setSelectedIndex(i);
+					fileList.ensureIndexIsVisible(i);
+					setSelected(file);
+					break;
+				}
+			}
+		}
+	}
+
 	/**
 	 *
 	 * @see ListSelectionModel#SINGLE_SELECTION
@@ -178,7 +206,7 @@ public class FileBrowser extends JSpringPanel {
 	/**
 	 * The selected file/directory has changed.  Just update the text
 	 */
-	public void setSelected( File file ) {
+	private void setSelected( File file ) {
 		fileName.setText(file.getAbsolutePath());
 	}
 
@@ -228,8 +256,7 @@ public class FileBrowser extends JSpringPanel {
 		fileName.setText(file.getAbsolutePath());
 
 		listModel.clear();
-		File[] fileArray = file.listFiles();
-		List<File> files = fileArray == null ? new ArrayList<>() : Arrays.asList(fileArray);
+		List<File> files = filterChildren(file);
 		Collections.sort(files,sorter);
 		for (File f : files) {
 			if( f.isHidden() )
@@ -266,6 +293,27 @@ public class FileBrowser extends JSpringPanel {
 		directoryPath.addActionListener(directoryListener);
 
 		listener.handleSelectedFile(null);
+	}
+
+	private List<File> filterChildren(File file) {
+		File[] fileArray = file.listFiles();
+		List<File> files = new ArrayList<>();
+		if( fileArray != null ) {
+			for (int i = 0; i < fileArray.length; i++) {
+				File f = fileArray[i];
+				boolean filtered = false;
+				for (int j = 0; j < filters.size(); j++) {
+					if( !filters.get(j).accept(f) ) {
+						filtered = true;
+						break;
+					}
+				}
+
+				if( !filtered )
+					files.add( f );
+			}
+		}
+		return files;
 	}
 
 	public List<File> getSelectedFiles() {

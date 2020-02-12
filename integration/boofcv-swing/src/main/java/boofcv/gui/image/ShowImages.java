@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -156,14 +156,26 @@ public class ShowImages {
 		return frame;
 	}
 
-	public static ImagePanel showWindow(ImageGray img , String title , boolean showMagnitude) {
+	public static ImagePanel showWindow(ImageGray img , Colorization type, String title, boolean closeOnExit ) {
 		double max = GImageStatistics.maxAbs(img);
 		BufferedImage buff;
-		if( showMagnitude )
-			buff = VisualizeImageData.grayMagnitude(img,null,max);
-		else
-			buff = VisualizeImageData.colorizeSign(img,null,max);
+		switch( type ) {
+			case MAGNITUDE:
+				buff = VisualizeImageData.grayMagnitude(img,null,max);
+				break;
 
-		return showWindow(buff,title);
+			case SIGN:
+				buff = VisualizeImageData.colorizeSign(img,null,max);
+				break;
+
+			default:throw new IllegalArgumentException("Unknown type. "+type);
+		}
+
+		return showWindow(buff,title, closeOnExit);
+	}
+
+	public enum Colorization {
+		MAGNITUDE,
+		SIGN
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -163,7 +163,7 @@ public abstract class GenericQrCodeDetectorChecks {
 		detector.process(simulator.getOutput());
 
 		if( display ) {
-			ShowImages.showWindow(simulator.getOutput(), "Foo", true);
+			ShowImages.showWindow(simulator.getOutput(), ShowImages.Colorization.MAGNITUDE, "Foo", true);
 			BoofMiscOps.sleep(10000);
 		}
 
@@ -187,7 +187,7 @@ public abstract class GenericQrCodeDetectorChecks {
 		detector.process(simulator.getOutput());
 
 		if( display ) {
-			ShowImages.showWindow(simulator.getOutput(), "Foo", true);
+			ShowImages.showWindow(simulator.getOutput(), ShowImages.Colorization.MAGNITUDE, "Foo", true);
 			BoofMiscOps.sleep(200);
 			UtilImageIO.saveImage(simulator.getOutput(),"qrcode_rendered.png");
 		}
