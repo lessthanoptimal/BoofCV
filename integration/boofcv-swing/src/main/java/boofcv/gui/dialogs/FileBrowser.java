@@ -32,8 +32,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.*;
 
 import static javax.swing.text.DefaultCaret.ALWAYS_UPDATE;
 
@@ -46,9 +48,9 @@ public class FileBrowser extends JSpringPanel {
 	// field containing the file name
 	JTextArea fileName;
 	// Path from root to current directory
-	JComboBox directoryPath;
+	JComboBox<String> directoryPath;
 	// list of child files and directories
-	JList fileList;
+	JList<File> fileList;
 	DefaultListModel<File> listModel = new DefaultListModel<>();
 
 	// directory path
@@ -80,8 +82,8 @@ public class FileBrowser extends JSpringPanel {
 		nameScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		nameScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 
-		directoryPath = new JComboBox();
-		fileList = new JList(listModel);
+		directoryPath = new JComboBox<>();
+		fileList = new JList<>(listModel);
 		fileList.setCellRenderer(new FileListCellRenderer());
 		fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		fileList.setLayoutOrientation(JList.VERTICAL);
@@ -89,11 +91,11 @@ public class FileBrowser extends JSpringPanel {
 		fileList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent evt) {
 				if (evt.getClickCount() == 2) {
-					File selected = (File)listModel.get(fileList.getSelectedIndex());
+					File selected = listModel.get(fileList.getSelectedIndex());
 					if( selected.isDirectory() ) {
 						setDirectory(selected);
 					} else {
-						setSelected(selected);
+						setSelectedName(selected);
 						listener.handleClickedFile(selected);
 					}
 				}
@@ -139,15 +141,15 @@ public class FileBrowser extends JSpringPanel {
 		if( file.isDirectory() ) {
 			setDirectory(file);
 		} else {
+			// bad file provided, set the directory instead
 			setDirectory(file.getParentFile());
-
 			for( int i = 0; i < listModel.size(); i++ ) {
 				File f = listModel.get(i);
 				if( f.getName().equals(file.getName()) ) {
 					fileList.setSelectedIndex(i);
 					fileList.ensureIndexIsVisible(i);
-					setSelected(file);
-					break;
+					setSelectedName(file);
+					return;
 				}
 			}
 		}
@@ -206,7 +208,7 @@ public class FileBrowser extends JSpringPanel {
 	/**
 	 * The selected file/directory has changed.  Just update the text
 	 */
-	private void setSelected( File file ) {
+	private void setSelectedName( File file ) {
 		fileName.setText(file.getAbsolutePath());
 	}
 
@@ -257,7 +259,7 @@ public class FileBrowser extends JSpringPanel {
 
 		listModel.clear();
 		List<File> files = filterChildren(file);
-		Collections.sort(files,sorter);
+		files.sort(sorter);
 		for (File f : files) {
 			if( f.isHidden() )
 				continue;
@@ -301,11 +303,17 @@ public class FileBrowser extends JSpringPanel {
 		if( fileArray != null ) {
 			for (int i = 0; i < fileArray.length; i++) {
 				File f = fileArray[i];
-				boolean filtered = false;
-				for (int j = 0; j < filters.size(); j++) {
-					if( !filters.get(j).accept(f) ) {
-						filtered = true;
-						break;
+				boolean filtered;
+				if( f.isDirectory() ) {
+					filtered = false;
+				} else {
+					// If there is at least one filter, only accept the file if at least one filter accepts it
+					filtered = filters.size() > 0;
+					for (int j = 0; j < filters.size(); j++) {
+						if (filters.get(j).accept(f)) {
+							filtered = false;
+							break;
+						}
 					}
 				}
 
@@ -317,19 +325,15 @@ public class FileBrowser extends JSpringPanel {
 	}
 
 	public List<File> getSelectedFiles() {
-		List selected = fileList.getSelectedValuesList();
+		List<File> selected = fileList.getSelectedValuesList();
 
-		List<File> out = new ArrayList<>();
-		for (int i = 0; i < selected.size(); i++) {
-			out.add( (File)selected.get(i));
-		}
-		return out;
+		return new ArrayList<>(selected);
 	}
 
 	/**
 	 * Needed to add System icons for each type of file
 	 */
-	private class FileListCellRenderer extends DefaultListCellRenderer {
+	private static class FileListCellRenderer extends DefaultListCellRenderer {
 
 		private FileSystemView fileSystemView;
 		private JLabel label;
@@ -390,13 +394,13 @@ public class FileBrowser extends JSpringPanel {
 			if( e.getValueIsAdjusting() )
 				return;
 
-			JList fileList = (JList)e.getSource();
-			DefaultListModel listModel = (DefaultListModel)fileList.getModel();
+			JList<File> fileList = (JList)e.getSource();
+			DefaultListModel<File> listModel = (DefaultListModel<File>)fileList.getModel();
 
 			int index = fileList.getSelectedIndex();
 			if( index >= 0 ) {
-				File f = (File)listModel.getElementAt(index);
-				browser.setSelected(f);
+				File f = listModel.getElementAt(index);
+				browser.setSelectedName(f);
 				listener.handleSelectedFile(f);
 			} else {
 				listener.handleSelectedFile(null);
@@ -404,7 +408,7 @@ public class FileBrowser extends JSpringPanel {
 		}
 	}
 
-	private class SortDirectoryFirst implements Comparator<File> {
+	private static class SortDirectoryFirst implements Comparator<File> {
 
 		@Override
 		public int compare(File a, File b) {

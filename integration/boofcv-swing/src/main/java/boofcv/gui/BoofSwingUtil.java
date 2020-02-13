@@ -180,7 +180,16 @@ public class BoofSwingUtil {
 
 
 	public static File openFileChooser(Component parent, String defaultPath , FileTypes ...filters) {
-		if( filters.length == 1 && filters[0] == FileTypes.IMAGES ) {
+
+		// For now don't use the preview chooser if there are directories
+		boolean directories = false;
+		for( var filter : filters ) {
+			if( filter == FileTypes.DIRECTORIES ) {
+				directories = true;
+				break;
+			}
+		}
+		if( !directories ) {
 			// Default to the new preview if they only want to see images
 			return fileChooserPreview(null, parent, true, defaultPath, filters);
 		} else {
@@ -270,9 +279,6 @@ public class BoofSwingUtil {
 	 */
 	public static File fileChooserPreview(String preferenceName, Component parent, boolean openFile, String defaultPath , FileTypes ...filters) {
 
-		if( !openFile )
-			throw new RuntimeException("Save isn't yet supported");
-
 		if( preferenceName == null && parent != null ) {
 			preferenceName = parent.getClass().getSimpleName();
 		}
@@ -283,8 +289,8 @@ public class BoofSwingUtil {
 		} else {
 			prefs = Preferences.userRoot().node(preferenceName);
 		}
-		File previousPath=new File(prefs.get(KEY_PREVIOUS_SELECTION, defaultPath));
-		FilePreviewChooser chooser = new FilePreviewChooser(true);
+		File previousPath=new File(prefs.get(KEY_PREVIOUS_SELECTION, defaultPath)).getAbsoluteFile();
+		FilePreviewChooser chooser = new FilePreviewChooser(openFile);
 		chooser.getBrowser().setSelectedFile(previousPath);
 
 		boolean selectDirectories = false;
@@ -313,7 +319,7 @@ public class BoofSwingUtil {
 					break;
 
 				case IMAGES:
-					ff = new FileNameExtensionFilter("Images", ImageIO.getReaderFileSuffixes());
+					ff = new FileNameExtensionFilter("Images", UtilImageIO.IMAGE_SUFFIXES);
 					break;
 				case VIDEOS:
 					ff = new FileNameExtensionFilter("Videos","mpg","mp4","mov","avi","wmv");
@@ -339,6 +345,7 @@ public class BoofSwingUtil {
 //		}
 
 		File selected = chooser.showDialog(parent);
+		System.out.println("Chooser file "+selected);
 		if (selected != null ) {
 			prefs.put(KEY_PREVIOUS_SELECTION, selected.getPath());
 		}

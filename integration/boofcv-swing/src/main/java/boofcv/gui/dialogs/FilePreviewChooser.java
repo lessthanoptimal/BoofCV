@@ -20,7 +20,12 @@ package boofcv.gui.dialogs;
 
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ImagePanel;
+import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.image.UtilImageIO;
+import boofcv.io.wrapper.DefaultMediaManager;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedU8;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,7 +40,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 // TODO preview text documents
-// TODO preview movies?
 
 /**
  * Opens a dialog which lets the user select a single file but shows a preview of whatever file is currently selected
@@ -127,6 +131,7 @@ public class FilePreviewChooser extends JPanel {
     }
 
     public void setDirectory( File directory ) {
+        BoofSwingUtil.checkGuiThread();
         if( directory.isFile() )
             directory = directory.getParentFile();
         browser.setDirectory(directory);
@@ -136,18 +141,28 @@ public class FilePreviewChooser extends JPanel {
 
         @Override
         public void handleSelectedFile(File file) {
-            selected = null;
+            // Do nothing if this file is already selected
+            if( selected == file )
+                return;
+            if( selected != null && file != null && file.getAbsolutePath().equals(selected.getAbsolutePath()) )
+                return;
+
+            // Update the preview
             if( file == null ) {
-                showPreview("");
+                selected = null;
+                showPreview(null);
                 setSelectEnabled(false);
             } else {
                 if (file.isFile()) {
-                    showPreview(file.getPath());
                     selected = file;
+                    showPreview(file.getPath());
                     setSelectEnabled(true);
                 } else {
-                    showPreview("");
-                    setSelectEnabled(false);
+                    if( selected != null ) {
+                        selected = null;
+                        showPreview(null);
+                        setSelectEnabled(false);
+                    }
                 }
             }
         }
@@ -211,8 +226,20 @@ public class FilePreviewChooser extends JPanel {
                     }
                 }
 
-                BufferedImage full = UtilImageIO.loadImage(path);
-//                System.out.println("Full is null " +(full==null));
+                File file = new File(path);
+                if( !file.exists() || file.isDirectory() )
+                    continue;
+
+                BufferedImage full = null;
+
+                if( UtilImageIO.isImage(file) ) {
+                    full = UtilImageIO.loadImage(path);
+                }
+                if( full == null ) {
+                    // That failed, now assume that the file is a video sequence
+                    full = loadVideoPreview(path);
+                }
+
                 if( full == null ) {
                     preview.setImageRepaint(null);
                 } else {
@@ -238,6 +265,20 @@ public class FilePreviewChooser extends JPanel {
                 }
             }
         }
+    }
+
+    private BufferedImage loadVideoPreview(String path) {
+        BufferedImage full = null;
+        try {
+            SimpleImageSequence<InterleavedU8> sequence =
+                    DefaultMediaManager.INSTANCE.openVideo(path, ImageType.IL_U8);
+
+            if( sequence.hasNext() ) {
+                InterleavedU8 frame = sequence.next();
+                full = ConvertBufferedImage.convertTo(frame,null,true);
+            }
+        } catch( RuntimeException ignore ) {}
+        return full;
     }
 
     /**
