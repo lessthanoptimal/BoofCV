@@ -19,6 +19,8 @@
 package boofcv.gui;
 
 import boofcv.gui.image.ShowImages;
+import boofcv.gui.settings.GlobalDemoSettings;
+import boofcv.gui.settings.GlobalSettingsControls;
 import boofcv.io.MediaManager;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
@@ -118,6 +120,8 @@ public abstract class DemonstrationBase extends JPanel {
 		} catch( Exception ignore ) {
 
 		}
+
+		GlobalDemoSettings.SETTINGS.changeTheme();
 	}
 
 	public DemonstrationBase(boolean openFile , boolean openWebcam, List<?> exampleInputs, ImageType ...defaultTypes) {
@@ -194,11 +198,15 @@ public abstract class DemonstrationBase extends JPanel {
 
 		customAddToFileMenu(menuFile);
 
+		JMenuItem menuSettings = new JMenuItem("Settings");
+		menuSettings.addActionListener(e->new GlobalSettingsControls().showDialog(window,this));
+
 		menuItenQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
 		menuItenQuit.addActionListener(listener);
 		BoofSwingUtil.setMenuItemKeys(menuItenQuit,KeyEvent.VK_Q,KeyEvent.VK_Q);
 
 		menuFile.addSeparator();
+		menuFile.add(menuSettings);
 		menuFile.add(menuItenQuit);
 
 		if( exampleInputs != null && exampleInputs.size() > 0 ) {
@@ -686,9 +694,7 @@ public abstract class DemonstrationBase extends JPanel {
 	 */
 	public void display(String appName ) {
 		waitUntilInputSizeIsKnown();
-		this.appName = appName;
-		window = ShowImages.showWindow(this,appName,true);
-		window.setJMenuBar(menuBar);
+		displayImmediate(appName);
 	}
 
 	public void displayImmediate(String appName ) {

@@ -357,16 +357,22 @@ public class FileBrowser extends JSpringPanel {
 
 		private FileSystemView fileSystemView;
 		private JLabel label;
-		private Color textSelectionColor = Color.BLACK;
-		private Color backgroundSelectionColor = Color.CYAN;
-		private Color textNonSelectionColor = Color.BLACK;
-		private Color backgroundNonSelectionColor = Color.WHITE;
+		private Color textSelectionColor;
+		private Color backgroundSelectionColor;
+		private Color textNonSelectionColor;
+		private Color backgroundNonSelectionColor;
 
 		FileListCellRenderer() {
 			label = new JLabel();
 			label.setBorder(new EmptyBorder(2,4,2,4));
 			label.setOpaque(true);
 			fileSystemView = FileSystemView.getFileSystemView();
+
+			UIDefaults defaults = UIManager.getDefaults();
+			backgroundSelectionColor = defaults.getColor("List.selectionBackground");
+			textSelectionColor = defaults.getColor("List.selectionForeground");
+			backgroundNonSelectionColor = defaults.getColor("List.background");
+			textNonSelectionColor = defaults.getColor("List.foreground");
 		}
 
 		@Override
