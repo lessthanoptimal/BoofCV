@@ -36,7 +36,7 @@ import lombok.Setter;
  *
  * @author Peter Abeles
  */
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 public class CameraPinhole extends CameraModel {
 	/** focal length along x and y axis (units: pixels) */
 	@Getter @Setter	public double fx,fy;

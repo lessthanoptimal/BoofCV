@@ -267,6 +267,9 @@ public class TestImageMotionPointTrackerKey {
 		}
 
 		@Override
+		public void reset() {}
+
+		@Override
 		public Class<AssociatedPair> getPointType() {
 			return AssociatedPair.class;
 		}

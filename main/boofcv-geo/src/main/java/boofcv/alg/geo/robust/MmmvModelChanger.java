@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,6 +36,11 @@ public abstract class MmmvModelChanger<ModelA,ModelB,Point> implements ModelMatc
 	}
 
 	public MmmvModelChanger() {
+	}
+
+	@Override
+	public void reset() {
+		mmmv.reset();
 	}
 
 	@Override

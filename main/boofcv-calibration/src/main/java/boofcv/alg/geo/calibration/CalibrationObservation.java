@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -86,7 +87,8 @@ public class CalibrationObservation {
 	}
 
 	public void sort() {
-		points.sort(Comparator.comparingInt(o -> o.index));
+		// Old style sort is used for java 1.8 compatibility
+		Collections.sort(points,Comparator.comparingInt(o -> o.index));
 	}
 
 	public int getWidth() {
