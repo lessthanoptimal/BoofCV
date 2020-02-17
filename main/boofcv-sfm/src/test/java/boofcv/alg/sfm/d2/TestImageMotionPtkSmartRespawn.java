@@ -256,9 +256,6 @@ public class TestImageMotionPtkSmartRespawn {
 		public boolean process(List<AssociatedPair> dataSet) {return false;}
 
 		@Override
-		public void reset() {}
-
-		@Override
 		public Affine2D_F64 getModelParameters() {return null;}
 
 		@Override
@@ -274,6 +271,9 @@ public class TestImageMotionPtkSmartRespawn {
 
 		@Override
 		public int getMinimumSize() {return 0;}
+
+		@Override
+		public void reset() {}
 
 		@Override
 		public Class<AssociatedPair> getPointType() {

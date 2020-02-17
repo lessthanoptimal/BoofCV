@@ -38,6 +38,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.affine.Affine2D_F32;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.point.Point2D_F32;
+import lombok.Getter;
 
 /**
  * <p>High level interface for rendering a distorted image into another one.  Uses a flow style interface to remove
@@ -55,20 +56,20 @@ import georegression.struct.point.Point2D_F32;
 public class FDistort
 {
 	// type of input image
-	ImageType inputType;
+	@Getter ImageType inputType;
 
 	// input and output images
 	ImageBase input,output;
 	// specifies how the borders are handled
 	ImageDistort distorter;
 	InterpolatePixel interp;
-	PixelTransform<Point2D_F32> outputToInput;
+	@Getter PixelTransform<Point2D_F32> outputToInput;
 
 	// type of border being used
-	BorderType borderType;
+	@Getter BorderType borderType;
 
 	// if the transform should be cached or not.
-	boolean cached = false;
+	@Getter boolean cached = false;
 
 	/**
 	 * Constructor in which input and output images are specified.  Equivalent to calling
@@ -338,7 +339,7 @@ public class FDistort
 	/**
 	 * Applies the distortion.
 	 */
-	public void apply() {
+	public FDistort apply() {
 		// see if the distortion class needs to be created again
 		if( distorter == null ) {
 			Class typeOut = output.getImageType().getImageClass();
@@ -363,5 +364,6 @@ public class FDistort
 
 		distorter.setRenderAll(borderType!=BorderType.SKIP);
 		distorter.apply(input,output);
+		return this;
 	}
 }

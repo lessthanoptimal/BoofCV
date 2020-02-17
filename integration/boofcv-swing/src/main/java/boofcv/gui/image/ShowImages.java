@@ -21,6 +21,7 @@ package boofcv.gui.image;
 import boofcv.alg.misc.GImageStatistics;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 
@@ -103,9 +104,24 @@ public class ShowImages {
 		return panel;
 	}
 
-	public static ImagePanel showWindow( ImageBase img, String title ) {
+	public static ImagePanel showWindow( ImageBase<?> img, String title ) {
 		BufferedImage buff = ConvertBufferedImage.convertTo(img,null,true);
 		return showWindow(buff,title);
+	}
+
+	/**
+	 * Show a window for a set amount of time. Blocks until that time has elapsed
+	 */
+	public static void showBlocking( ImageBase<?> img, String title , long milliseconds ) {
+		BufferedImage buff = ConvertBufferedImage.convertTo(img,null,true);
+		ImagePanel panel = showWindow(buff,title);
+		BoofMiscOps.sleep(milliseconds);
+		// close the window
+		SwingUtilities.invokeLater(()->{
+			JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(panel);
+			topFrame.setVisible(false);
+			topFrame.dispose();
+		});
 	}
 
 	public static JFrame showWindow( final JComponent component , String title ) {
@@ -156,7 +172,7 @@ public class ShowImages {
 		return frame;
 	}
 
-	public static ImagePanel showWindow(ImageGray img , Colorization type, String title, boolean closeOnExit ) {
+	public static ImagePanel showWindow(ImageGray<?> img , Colorization type, String title, boolean closeOnExit ) {
 		double max = GImageStatistics.maxAbs(img);
 		BufferedImage buff;
 		switch( type ) {

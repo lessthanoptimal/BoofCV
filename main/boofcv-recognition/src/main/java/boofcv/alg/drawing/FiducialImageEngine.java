@@ -23,6 +23,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.ConvertImage;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import georegression.struct.point.Point2D_F64;
 
 /**
  * Rendering engine for fiducials into a gray scale image.
@@ -128,6 +129,12 @@ public class FiducialImageEngine extends FiducialRenderEngine {
 		new FDistort(image,out).scale().apply();
 
 		gray.subimage(X0,Y0,X1,Y1).setTo(out);
+	}
+
+	@Override
+	public void inputToDocument(double x, double y, Point2D_F64 document) {
+		document.x = x + borderPixels;
+		document.y = y + borderPixels;
 	}
 
 	public int getBorderPixels() {

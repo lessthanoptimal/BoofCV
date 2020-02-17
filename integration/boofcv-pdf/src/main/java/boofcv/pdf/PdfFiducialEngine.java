@@ -21,6 +21,7 @@ package boofcv.pdf;
 import boofcv.alg.drawing.FiducialRenderEngine;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
+import georegression.struct.point.Point2D_F64;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
@@ -122,6 +123,12 @@ public class PdfFiducialEngine extends FiducialRenderEngine {
 		} catch( IOException e ) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public void inputToDocument(double x, double y, Point2D_F64 document) {
+		document.x = adjustX(x);
+		document.y = adjustY(y);
 	}
 
 	private float adjustX( double x ) {

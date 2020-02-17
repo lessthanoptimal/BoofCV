@@ -19,6 +19,7 @@
 package boofcv.alg.drawing;
 
 import boofcv.struct.image.GrayU8;
+import georegression.struct.point.Point2D_F64;
 
 /**
  * Interface for rendering fiducials to different document types. All units are in
@@ -43,6 +44,8 @@ public abstract class FiducialRenderEngine {
 	public abstract void rectangle( double x0 , double y0 , double x1 , double y1 );
 
 	public abstract void draw(GrayU8 image , double x0 , double y0 , double x1 , double y1);
+
+	public abstract void inputToDocument(double x , double y , Point2D_F64 document );
 }
 
 

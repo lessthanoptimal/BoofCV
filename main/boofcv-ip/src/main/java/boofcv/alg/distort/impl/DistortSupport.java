@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,6 +70,23 @@ public class DistortSupport {
 	 */
 	public static PixelTransformAffine_F32 transformRotate( float x0 , float y0 , float x1 , float y1 , float angle )
 	{
+		Affine2D_F32 affine = rotateCenterAffine(x0, y0, x1, y1, angle);
+		PixelTransformAffine_F32 distort = new PixelTransformAffine_F32();
+		distort.set(affine);
+
+		return distort;
+	}
+
+	/**
+	 * Creates a {@link boofcv.alg.distort.PixelTransformAffine_F32} from the dst image into the src image.
+	 *
+	 * @param x0 Center of rotation in input image coordinates.
+	 * @param y0 Center of rotation in input image coordinates.
+	 * @param x1 Center of rotation in output image coordinates.
+	 * @param y1 Center of rotation in output image coordinates.
+	 * @param angle Angle of rotation.
+	 */
+	public static Affine2D_F32 rotateCenterAffine( float x0 , float y0 , float x1 , float y1 , float angle ) {
 		// make the coordinate system's origin the image center
 		Se2_F32 imageToCenter = new Se2_F32(-x0,-y0,0);
 		Se2_F32 rotate = new Se2_F32(0,0,angle);
@@ -84,11 +101,7 @@ public class DistortSupport {
 		sequence.computeTransform(total);
 		Se2_F32 inv = total.invert(null);
 
-		Affine2D_F32 affine = ConvertTransform_F32.convert(inv,(Affine2D_F32)null);
-		PixelTransformAffine_F32 distort = new PixelTransformAffine_F32();
-		distort.set(affine);
-
-		return distort;
+		return ConvertTransform_F32.convert(inv,(Affine2D_F32)null);
 	}
 
 	/**
