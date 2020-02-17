@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,15 +21,23 @@ package boofcv.factory.fiducial;
 import boofcv.abst.fiducial.*;
 import boofcv.abst.fiducial.calib.*;
 import boofcv.abst.filter.binary.InputToBinary;
+import boofcv.alg.feature.describe.llah.LlahHasher;
+import boofcv.alg.feature.describe.llah.LlahOperations;
+import boofcv.alg.fiducial.dots.UchiyaMarkerImageTracker;
+import boofcv.alg.fiducial.dots.UchiyaMarkerTracker;
 import boofcv.alg.fiducial.qrcode.QrCodePositionPatternDetector;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.square.DetectFiducialSquareImage;
+import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.filter.binary.ThresholdType;
+import boofcv.factory.geo.ConfigHomography;
+import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 
 import javax.annotation.Nullable;
 
@@ -205,6 +213,47 @@ public class FactoryFiducial {
 	public static <T extends ImageGray<T>>
 	QrCodeDetectorPnP<T> qrcode3D(ConfigQrCode config, Class<T> imageType) {
 		return new QrCodeDetectorPnP<>(qrcode(config,imageType));
+	}
+
+	/**
+	 * Creates a Uchiya (a.k.a random dot) marker.
+	 *
+	 * @see UchiyaMarkerImageTracker
+	 *
+	 * @param config Specifies the configuration. If null then default is used
+	 * @param imageType Type of input gray scale image
+	 * @return The fiducial detector
+	 */
+	public static <T extends ImageGray<T>>
+	Uchiya_to_FiducialDetector<T> uchiya( @Nullable ConfigUchiyaMarker config , Class<T> imageType ) {
+		if( config == null )
+			config = new ConfigUchiyaMarker();
+
+		config.checkValidity();
+
+		var ellipseDetector = new BinaryEllipseDetectorPixel(config.contourRule);
+		ellipseDetector.setMaxDistanceFromEllipse(config.maxDistanceFromEllipse);
+		ellipseDetector.setMinimumMinorAxis(config.minimumMinorAxis);
+		ellipseDetector.setMaxMajorToMinorRatio(config.maxMajorToMinorRatio);
+
+		InputToBinary<T> inputToBinary = FactoryThresholdBinary.threshold(config.threshold,imageType);
+
+		ConfigLlah llah = config.llah;
+
+		LlahHasher hasher;
+		switch( config.llah.hashType ) {
+			case AFFINE: hasher = new LlahHasher.Affine(llah.quantizationK, llah.hashTableSize); break;
+			case CROSS_RATIO: hasher = new LlahHasher.CrossRatio(llah.quantizationK, llah.hashTableSize); break;
+			default: throw new IllegalArgumentException("Unknown hash type "+config.llah.hashType);
+		}
+
+		var ops = new LlahOperations(config.llah.numberOfNeighborsN, config.llah.sizeOfCombinationM,hasher);
+		var ransac = FactoryMultiViewRobust.homographyRansac(new ConfigHomography(false), config.ransac);
+		UchiyaMarkerTracker uchiya = new UchiyaMarkerTracker(ops,ransac);
+
+		UchiyaMarkerImageTracker<T> tracker = new UchiyaMarkerImageTracker<>(inputToBinary,ellipseDetector,uchiya);
+
+		return new Uchiya_to_FiducialDetector<T>(tracker, ImageType.single(imageType));
 	}
 
 }

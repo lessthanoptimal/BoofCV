@@ -16,6 +16,7 @@ Version : 0.36
 - Misc
   * Change the definition of a floating point value to be inside image bounds if it's less than width or height
     before it was < width-1, and < height-1. This conforms to rounding down standard.
+  * Created FiducialTracker interface
 - Added Project Lombok for auto generating setters/getters
 - Kotlin
   * Initial release with specialized support for Kotlin

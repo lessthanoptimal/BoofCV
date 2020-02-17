@@ -20,11 +20,15 @@ package boofcv.alg.feature.describe.llah;
 
 import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se2_F64;
+import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.combinatorics.Combinations;
 import org.ddogleg.sorting.QuickSort_F64;
+import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -68,7 +72,7 @@ class TestLlahOperations {
 
 		var found = new ArrayList<LlahOperations.FoundDocument>();
 
-		int maxDotHits = (int)llahOps.computeMaxUniqueHashPerPoint();
+		int maxDotHits = (int) llahOps.computeMaxUniqueHashPerPoint();
 
 		// See if the requested document is the best match
 		for (int docID = 0; docID < 5; docID++) {
@@ -92,19 +96,11 @@ class TestLlahOperations {
 			// there is a one-to-one relationship between dots and markers here. Make sure that's true
 			final int N = documents.get(docID).size();
 			for (int landmarkIdx = 0; landmarkIdx < N; landmarkIdx++) {
-				var map = best.landmarkToDots.get(landmarkIdx);
-				int zest = -1;
-				int bestCount = 0;
-				for (int dotIdx = 0; dotIdx < N; dotIdx++) {
-					LlahOperations.DotCount dot = map.get(dotIdx);
-					if( dot == null ) continue;
-					if( dot.counts > bestCount ) {
-						bestCount = dot.counts;
-						zest = dotIdx;
-					}
-				}
-				assertEquals(landmarkIdx, zest);
-				assertTrue(bestCount > maxDotHits*0.8);
+				int dotIdx = best.landmarkToDots.get(landmarkIdx);
+				int hits = best.landmarkHits.get(landmarkIdx);
+
+				assertEquals(landmarkIdx, dotIdx);
+				assertTrue(hits > maxDotHits * 0.8);
 				// won't always be the max since it stops on the first hash match
 			}
 		}
@@ -232,6 +228,135 @@ class TestLlahOperations {
 			llahOps.checkListSize(list);
 			fail("Should have thrown an exception");
 		} catch (Exception ignore) {
+		}
+	}
+
+	/**
+	 * Rotating the points should not affect the results.
+	 */
+	@Test
+	void invariantToRotation() {
+		for (var invariant : LlahInvariant.values()) {
+			invariantToRotation(createLlahOps(invariant));
+		}
+	}
+
+	private void invariantToRotation(LlahOperations llahOps) {
+		for (int docID = 0; docID < documents.size(); docID++) {
+			llahOps.createDocument(documents.get(docID));
+		}
+
+		List<Point2D_F64> target = documents.get(2);
+		List<LlahOperations.FoundDocument> foundDocuments = new ArrayList<>();
+		llahOps.lookupDocuments(target, 0.2, foundDocuments);
+		assertEquals(1, foundDocuments.size());
+		GrowQueue_I32 expected = foundDocuments.get(0).landmarkToDots;
+
+		for (int angleIdx = 0; angleIdx < 12; angleIdx++) {
+			var se = new Se2_F64(0, 0, angleIdx * Math.PI / 4);
+
+			// rotate and save into a new list of points
+			var rotated = new ArrayList<Point2D_F64>();
+			for (var p : target) {
+				var d = new Point2D_F64();
+				SePointOps_F64.transform(se, p, d);
+				rotated.add(d);
+			}
+			llahOps.lookupDocuments(rotated, 0.2, foundDocuments);
+			assertEquals(1, foundDocuments.size());
+			GrowQueue_I32 found = foundDocuments.get(0).landmarkToDots;
+
+			// Use the number of matches as a finger print
+			for (int i = 0; i < expected.size; i++) {
+				assertEquals(expected.data[i], found.data[i]);
+			}
+		}
+	}
+
+	/**
+	 * The input can be shuffled and it won't change the results
+	 */
+	@Test
+	void invariantToOrder() {
+		for (var invariant : LlahInvariant.values()) {
+			invariantToOrder(createLlahOps(invariant));
+		}
+	}
+
+	private void invariantToOrder(LlahOperations llahOps) {
+		for (int docID = 0; docID < documents.size(); docID++) {
+			llahOps.createDocument(documents.get(docID));
+		}
+
+		List<Point2D_F64> target = documents.get(2);
+		List<LlahOperations.FoundDocument> foundDocuments = new ArrayList<>();
+		llahOps.lookupDocuments(target, 0.2, foundDocuments);
+		assertEquals(1, foundDocuments.size());
+		GrowQueue_I32 expected = foundDocuments.get(0).landmarkToDots;
+
+		for (int trial = 0; trial < 12; trial++) {
+			// Change the input's order
+			var shuffled = new ArrayList<>(target);
+			Collections.shuffle(shuffled, rand);
+
+			// Look up the document
+			llahOps.lookupDocuments(shuffled, 0.2, foundDocuments);
+			assertEquals(1, foundDocuments.size());
+			GrowQueue_I32 found = foundDocuments.get(0).landmarkToDots;
+
+			// Use the number of matches as a finger print
+			for (int i = 0; i < expected.size; i++) {
+				assertEquals(expected.data[i], found.data[i]);
+			}
+		}
+	}
+
+	@Test
+	void invariantToNoise() {
+		for (var invariant : LlahInvariant.values()) {
+			invariantToNoise(createLlahOps(invariant));
+		}
+	}
+
+	private void invariantToNoise(LlahOperations llahOps) {
+		for (int docID = 0; docID < documents.size(); docID++) {
+			llahOps.createDocument(documents.get(docID));
+		}
+
+		List<Point2D_F64> target = documents.get(2);
+		List<LlahOperations.FoundDocument> foundDocuments = new ArrayList<>();
+
+		for (int trial = 0; trial < 10; trial++) {
+			// add noise
+			var noised = new ArrayList<Point2D_F64>();
+			for( var p : target ) {
+				p = p.copy();
+				p.x += rand.nextGaussian()*0.03;
+				p.y += rand.nextGaussian()*0.03;
+				noised.add(p);
+			}
+
+			// Look up the document
+			llahOps.lookupDocuments(noised,0.2,foundDocuments);
+			assertEquals(1, foundDocuments.size());
+			LlahOperations.FoundDocument doc = foundDocuments.get(0);
+			assertEquals(2,doc.document.documentID);
+
+			GrowQueue_I32 found = doc.landmarkToDots;
+
+			// The order should be the same, but a few misses are allowed
+			int totalMatched = 0;
+			int totalWrong = 0;
+			for (int i = 0; i < found.size; i++) {
+				if( found.data[i] < 0 )
+					continue;
+				if( i != found.data[i])
+					totalWrong++;
+				totalMatched++;
+			}
+
+			assertTrue( totalWrong <= 2 );
+			assertTrue(totalMatched>=found.size*3/4);
 		}
 	}
 }

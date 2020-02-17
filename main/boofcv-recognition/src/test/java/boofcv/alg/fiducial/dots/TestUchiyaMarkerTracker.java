@@ -18,21 +18,18 @@
 
 package boofcv.alg.fiducial.dots;
 
-import boofcv.abst.distort.FDistort;
-import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.feature.describe.llah.LlahDocument;
 import boofcv.alg.feature.describe.llah.LlahHasher;
 import boofcv.alg.feature.describe.llah.LlahOperations;
-import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
-import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.GrayU8;
 import boofcv.testing.BoofTesting;
 import georegression.geometry.UtilPoint2D_F64;
+import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.transform.affine.AffinePointOps_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
@@ -42,6 +39,7 @@ import org.ejml.dense.fixed.MatrixFeatures_DDF3;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -53,8 +51,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class TestUchiyaMarkerTracker {
 	Random rand = BoofTesting.createRandom(0);
-	int width = 100;
-	int height = 90;
 
 	List<List<Point2D_F64>> documents = new ArrayList<>();
 
@@ -72,20 +68,12 @@ class TestUchiyaMarkerTracker {
 		int targetID = 2;
 		List<Point2D_F64> dots = documents.get(targetID);
 
-		UchiyaMarkerGeneratorImage generator = new UchiyaMarkerGeneratorImage();
-		generator.configure(width,height,5);
-		generator.setRadius(4);
-		generator.render(dots);
-
-		UchiyaMarkerTracker<GrayU8> tracker = createTracker();
+		UchiyaMarkerTracker tracker = createTracker();
 		for( var doc : documents ) {
 			tracker.llahOps.createDocument(doc);
 		}
 
-//		ShowImages.showWindow(generator.getImage(),"Stuff");
-//		BoofMiscOps.sleep(10000);
-
-		tracker.process(generator.getImage());
+		tracker.process(dots);
 
 		FastQueue<UchiyaMarkerTracker.Track> tracks = tracker.getCurrentTracks();
 		assertEquals(1,tracks.size);
@@ -101,14 +89,7 @@ class TestUchiyaMarkerTracker {
 		int targetID = 2;
 		List<Point2D_F64> dots = documents.get(targetID);
 
-		UchiyaMarkerGeneratorImage generator = new UchiyaMarkerGeneratorImage();
-		generator.configure(width,height,5);
-		generator.setRadius(4);
-		generator.render(dots);
-
-		var image = new GrayU8(width*2, height*2);
-
-		UchiyaMarkerTracker<GrayU8> tracker = createTracker();
+		UchiyaMarkerTracker tracker = createTracker();
 		for( var doc : documents ) {
 			tracker.llahOps.createDocument(doc);
 		}
@@ -117,12 +98,14 @@ class TestUchiyaMarkerTracker {
 		var currMean = new Point2D_F64();
 
 		for (int frame = 0; frame < 10; frame++) {
-			new FDistort(generator.getImage(), image).affine(1,0,0,1,frame*5,frame).border(255).apply();
-
-//			ShowImages.showWindow(image,"Stuff");
-//			BoofMiscOps.sleep(1000);
-
-			tracker.process(image);
+			List<Point2D_F64> copied = new ArrayList<>();
+			var affine = new Affine2D_F64(1,0,0,1,frame*5,frame);
+			for (int i = 0; i < dots.size(); i++) {
+				Point2D_F64 c = new Point2D_F64();
+				AffinePointOps_F64.transform(affine,dots.get(i),c);
+				copied.add(c);
+			}
+			tracker.process(copied);
 
 			FastQueue<UchiyaMarkerTracker.Track> tracks = tracker.getCurrentTracks();
 			assertEquals(1,tracks.size);
@@ -140,7 +123,7 @@ class TestUchiyaMarkerTracker {
 
 	@Test
 	void performDetection() {
-		UchiyaMarkerTracker<GrayU8> tracker = createTracker();
+		UchiyaMarkerTracker tracker = createTracker();
 		for( var doc : documents ) {
 			tracker.llahOps.createDocument(doc);
 		}
@@ -185,6 +168,9 @@ class TestUchiyaMarkerTracker {
 			HomographyPointOps_F64.transform(doc_to_image,m,d);
 			dots.add(d);
 		}
+		// Shuffle the order to test to see if the correct book keeping is being done
+		List<Point2D_F64> dotsShuffled = new ArrayList<>(dots);
+		Collections.shuffle(dotsShuffled, rand);
 
 		var document = new LlahDocument();
 		document.landmarks.copyAll(landmarks,(src,dst)->dst.set(src));
@@ -194,15 +180,13 @@ class TestUchiyaMarkerTracker {
 
 
 		for (int i = 0; i < landmarks.size(); i++) {
-			LlahOperations.DotCount count = new LlahOperations.DotCount();
-			count.counts = 1000;
-			count.dotIdx = i;
-			observed.landmarkToDots.get(i).put(i,count);
+			observed.landmarkHits.data[i] = 1000;
+			observed.landmarkToDots.data[i] = dotsShuffled.indexOf(dots.get(i));
 		}
 
-		UchiyaMarkerTracker<GrayU8> alg = createTracker();
+		UchiyaMarkerTracker alg = createTracker();
 
-		assertTrue(alg.fitHomography(dots,observed));
+		assertTrue(alg.fitHomography(dotsShuffled,observed));
 		Homography2D_F64 found = alg.ransac.getModelParameters();
 
 		CommonOps_DDF3.divide(found,found.a33);
@@ -210,12 +194,10 @@ class TestUchiyaMarkerTracker {
 		assertTrue(MatrixFeatures_DDF3.isIdentical(doc_to_image, found, UtilEjml.TEST_F64));
 	}
 
-	UchiyaMarkerTracker<GrayU8> createTracker() {
-		InputToBinary<GrayU8> thresholder = FactoryThresholdBinary.globalOtsu(0,255,1.0,true,GrayU8.class);
-		var ellipseDetector = new BinaryEllipseDetectorPixel();
+	public static UchiyaMarkerTracker createTracker() {
 		var ops = new LlahOperations(7,5,new LlahHasher.Affine(100,500000));
 		Ransac<Homography2D_F64, AssociatedPair> ransac =
-				FactoryMultiViewRobust.homographyRansac(null,new ConfigRansac(100,2.0));
-		return new UchiyaMarkerTracker<>(thresholder,ellipseDetector,ops,ransac);
+				FactoryMultiViewRobust.homographyRansac(null,new ConfigRansac(100,1.0));
+		return new UchiyaMarkerTracker(ops,ransac);
 	}
 }

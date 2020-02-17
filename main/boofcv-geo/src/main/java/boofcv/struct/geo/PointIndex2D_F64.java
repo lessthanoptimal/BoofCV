@@ -41,6 +41,10 @@ public class PointIndex2D_F64 extends Point2D_F64 {
 	}
 
 	public PointIndex2D_F64( Point2D_F64 p , int index ) {
+		set(p,index);
+	}
+
+	public void set( Point2D_F64 p , int index ) {
 		this.x = p.x;
 		this.y = p.y;
 		this.index = index;

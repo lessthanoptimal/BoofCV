@@ -62,6 +62,8 @@ public abstract class GenericFiducialDetectorChecks {
 
 	Se3_F64 markerToWorld = eulerXyz(-0.2,0,1.2,0.1,Math.PI,0,null);
 
+	protected double stabilityShrink = 0.2;
+
 	/**
 	 * Renders everything in gray scale first then converts it
 	 * @param intrinsic camera model
@@ -102,7 +104,7 @@ public abstract class GenericFiducialDetectorChecks {
 		}
 	}
 
-	public abstract FiducialDetector createDetector( ImageType imageType );
+	public abstract<T extends ImageBase<T>> FiducialDetector<T> createDetector( ImageType<T> imageType );
 
 	public abstract GrayF32 renderFiducial();
 
@@ -129,7 +131,7 @@ public abstract class GenericFiducialDetectorChecks {
 			detector.setLensDistortion(new LensDistortionBrown(loadDistortion(false)),
 					image.width,image.height);
 			assertTrue(detector.is3D());
-			detector.detect(image);
+			detect(detector,image);
 
 			// it might not be able to detect the target
 			if( detector.totalFound() >= 1 ) {
@@ -139,7 +141,7 @@ public abstract class GenericFiducialDetectorChecks {
 			// Give it the correct model and this time it should work
 			detector.setLensDistortion(distortion,image.width,image.height);
 			assertTrue(detector.is3D());
-			detector.detect(image);
+			detect(detector,image);
 			checkBounds(detector);
 
 			assertTrue(detector.totalFound()>=1);
@@ -147,7 +149,7 @@ public abstract class GenericFiducialDetectorChecks {
 			// Now remove the distortion model
 			detector.setLensDistortion(null,image.width,image.height);
 			assertFalse(detector.is3D());
-			detector.detect(image);
+			detect(detector,image);
 			if( detector.totalFound() >= 1 ) {
 				checkBounds(detector);
 			}
@@ -173,7 +175,7 @@ public abstract class GenericFiducialDetectorChecks {
 
 			FiducialDetector detector = createDetector(type);
 			detector.setLensDistortion(lensUndistorted,imageUn.width,imageUn.height);
-			detector.detect(imageUn);
+			detect(detector,imageUn);
 
 			assertTrue(detector.totalFound()>=1);
 			Results results = extractResults(detector);
@@ -181,7 +183,7 @@ public abstract class GenericFiducialDetectorChecks {
 			// feed it a distorted with and give the detector the undistortion model
 			ImageBase imageD = renderImage(loadDistortion(true),type);
 			detector.setLensDistortion(lensDistorted,imageD.width,imageD.height);
-			detector.detect(imageD);
+			detect(detector,imageD);
 
 			// see if the results are the same
 			assertEquals(results.id.length,detector.totalFound());
@@ -215,7 +217,9 @@ public abstract class GenericFiducialDetectorChecks {
 
 				ImageBase imageD = renderImage(loadDistortion(distorted), type);
 				detector.setLensDistortion(lensDistorted, imageD.width, imageD.height);
-				detector.detect(imageD);
+				detect(detector,imageD);
+
+//				ShowImages.showBlocking(imageD,"Distorted", 2_000);
 
 				assertEquals(1, detector.totalFound());
 
@@ -249,7 +253,7 @@ public abstract class GenericFiducialDetectorChecks {
 
 			detector.setLensDistortion(lensDistorted,image.width,image.height);
 
-			detector.detect(image);
+			detect(detector,image);
 
 			BoofTesting.assertEquals(image,orig,0);
 		}
@@ -266,19 +270,24 @@ public abstract class GenericFiducialDetectorChecks {
 
 			detector.setLensDistortion(lensDistorted,image.width,image.height);
 
-			detector.detect(image);
+			detect(detector,image);
 
 			assertTrue(detector.totalFound()>= 1);
 
 			Results results = extractResults(detector);
 
 			// run it again
-			detector.detect(image);
+			detect(detector,image);
 
 			// see if it produced exactly the same results
 			assertEquals(results.id.length,detector.totalFound());
 			for (int i = 0; i < detector.totalFound(); i++) {
 				assertEquals(results.id[i],detector.getId(i));
+
+				Point2D_F64 centerPixel = new Point2D_F64();
+				detector.getCenter(i,centerPixel);
+				assertEquals(0.0, results.centerPixel.get(i).distance(centerPixel), 1e-8);
+
 				Se3_F64 pose = new Se3_F64();
 				detector.getFiducialToCamera(i, pose);
 				assertEquals(0,pose.getT().distance(results.pose.get(i).T),1e-8);
@@ -298,11 +307,11 @@ public abstract class GenericFiducialDetectorChecks {
 
 			detector.setLensDistortion(lensDistorted,image.width,image.height);
 
-			detector.detect(image);
+			detect(detector,image);
 
 			assertTrue(detector.totalFound()>= 1);
 
-			long foundID[] = new long[ detector.totalFound() ];
+			long[] foundID = new long[ detector.totalFound() ];
 			List<Se3_F64> foundPose = new ArrayList<>();
 
 			for (int i = 0; i < detector.totalFound(); i++) {
@@ -313,7 +322,7 @@ public abstract class GenericFiducialDetectorChecks {
 			}
 
 			// run it again with a sub-image
-			detector.detect(BoofTesting.createSubImageOf(image));
+			detect(detector,BoofTesting.createSubImageOf(image));
 
 			// see if it produced exactly the same results
 			assertEquals(foundID.length,detector.totalFound());
@@ -344,12 +353,14 @@ public abstract class GenericFiducialDetectorChecks {
 
 			detector.setLensDistortion(lensDistorted,image.width,image.height);
 
-			detector.detect(image);
+//			ShowImages.showBlocking(image,"First Detect", 3_000);
+
+			detect(detector,image);
 			assertTrue(detector.totalFound() >= 1);
 
-			long foundIds[] = new long[ detector.totalFound() ];
-			double location[] = new double[ detector.totalFound() ];
-			double orientation[] = new double[ detector.totalFound() ];
+			long[] foundIds      = new long[ detector.totalFound() ];
+			double[] location    = new double[ detector.totalFound() ];
+			double[] orientation = new double[ detector.totalFound() ];
 
 			FiducialStability results = new FiducialStability();
 			for (int i = 0; i < detector.totalFound(); i++) {
@@ -363,13 +374,11 @@ public abstract class GenericFiducialDetectorChecks {
 			// by shrinking the image a small pixel error should result
 			// in a larger pose error, hence more unstable
 			ImageBase shrunk = image.createSameShape();
-			new FDistort(image,shrunk).affine(0.2,0,0,0.2,image.width/2,image.height/2).apply();
+			new FDistort(image,shrunk).affine(stabilityShrink,0,0,stabilityShrink,image.width/4,image.height/4).apply();
 
-			detector.detect(shrunk);
+//			ShowImages.showBlocking(shrunk,"Shrunk", 2_000);
 
-//			ShowImages.showWindow(shrunk,"Shrunk");
-//			BoofMiscOps.sleep(10_000);
-
+			detect(detector,shrunk);
 
 			assertEquals(detector.totalFound(), foundIds.length);
 
@@ -407,7 +416,7 @@ public abstract class GenericFiducialDetectorChecks {
 //			ShowImages.showWindow(image,"asdfasdf");
 //			BoofMiscOps.sleep(10_000);
 
-			detector.detect(image);
+			detect(detector,image);
 
 			assertTrue(detector.totalFound() >= 1);
 			assertTrue(detector.is3D());
@@ -449,7 +458,7 @@ public abstract class GenericFiducialDetectorChecks {
 			Polygon2D_F64 listA = detector.getBounds(i,null);
 			Polygon2D_F64 listB = detector.getBounds(i,queue);
 
-			assertTrue(listB == queue);
+			assertSame(listB, queue);
 			assertEquals(listA.size(),listB.size());
 
 			Polygon2D_F64 polygon = new Polygon2D_F64(listA.size());
@@ -457,8 +466,8 @@ public abstract class GenericFiducialDetectorChecks {
 				Point2D_F64 pa = listA.get(j);
 				Point2D_F64 pb = listB.get(j);
 
-				assertTrue(pa.x == pb.x);
-				assertTrue(pa.y == pb.y);
+				assertEquals(pa.x, pb.x);
+				assertEquals(pa.y, pb.y);
 
 				// very simple sanity check on the results
 				assertFalse(UtilEjml.isUncountable(pa.x));
@@ -479,22 +488,29 @@ public abstract class GenericFiducialDetectorChecks {
 
 		for (int i = 0; i < detector.totalFound(); i++) {
 			Se3_F64 pose = new Se3_F64();
-			Point2D_F64 pixel = new Point2D_F64();
+			Point2D_F64 centerPixel = new Point2D_F64();
 			detector.getFiducialToCamera(i, pose);
-			detector.getCenter(i, pixel);
+			detector.getCenter(i, centerPixel);
 
 			out.id[i] = detector.getId(i);
 			out.pose.add(pose);
-			out.pixel.add(pixel);
+			out.centerPixel.add(centerPixel);
 		}
 
 		return out;
 	}
 
+	/**
+	 * Function for calling detect. Primarily used to enable the FiducialTracker tests to recycle code
+	 */
+	protected void detect( FiducialDetector detector , ImageBase image ) {
+		detector.detect(image);
+	}
+
 	private static class Results {
-		public long id[];
+		public long[] id;
 		public List<Se3_F64> pose = new ArrayList<>();
-		public List<Point2D_F64> pixel = new ArrayList<>();
+		public List<Point2D_F64> centerPixel = new ArrayList<>();
 
 		public Results( int N ) {
 			id = new long[ N ];

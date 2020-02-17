@@ -55,4 +55,11 @@ public class LlahHashTable {
 	public LlahFeature lookup( int hashCode ) {
 		return map.get(hashCode);
 	}
+
+	/**
+	 * Resets to original state
+	 */
+	public void reset() {
+		map.clear();
+	}
 }

@@ -40,16 +40,16 @@ import static java.lang.Math.max;
  */
 public class UchiyaMarkerGenerator {
 
-	// used to draw the fiducial
+	/** used to draw the fiducial */
 	@Getter protected FiducialRenderEngine render;
 
-	// Circle's radius. This will be in the same units as markerRegion
+	/** Circle's radius. This will be in the same units as markerRegion */
 	@Getter @Setter double radius;
 
-	// Region insid ethe document that the marker being rendered is specified to be inside of
+	/** Region inside the document that the marker being rendered is specified to be inside of */
 	@Getter protected final RectangleLength2D_F64 documentRegion = new RectangleLength2D_F64();
 
-	// dot locations after being transformed ot fit inside the region
+	/** dot locations after being transformed ot fit inside the region */
 	@Getter FastQueue<Point2D_F64> dotsAdjusted = new FastQueue<>(Point2D_F64::new);
 
 	//----------------- workspace variables
@@ -119,6 +119,7 @@ public class UchiyaMarkerGenerator {
 			a.x = (p.x - average.x)*point_to_pixel + regionCenterX;
 			a.y = (p.y - average.y)*point_to_pixel + regionCenterY;
 			render.circle(a.x,a.y,radius);
+			render.inputToDocument(a.x,a.y,a);
 		}
 	}
 }

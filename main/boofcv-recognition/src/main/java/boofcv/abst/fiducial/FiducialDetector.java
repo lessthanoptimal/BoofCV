@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,16 +28,20 @@ import georegression.struct.shapes.Polygon2D_F64;
 import javax.annotation.Nullable;
 
 /**
- * Interface for detecting fiducial fiducials and their location in the image.  Optionally, some implementations can produce
- * a unique ID for each fiducial and their 3D pose in the world.  If the fiducial supports 3D information then
+ * Interface for detecting fiducial markers and their location in the image.  Optionally, some implementations
+ * can produce a unique ID for each fiducial and their 3D pose in the world. Implementations of this interface
+ * will be detectors only, meaning that they are not trackers, meaning that each call to detect will produce
+ * identical results only dependent on the input image and not the past history.
  *
+ * @see FiducialTracker
  *
  * @author Peter Abeles
  */
 public interface FiducialDetector<T extends ImageBase<T>>
 {
 	/**
-	 * Detects fiducials inside the image
+	 * Detects fiducials inside the image. Each call to this function only depends upon the input image. The
+	 * previous calls do not affect it's outcome.
 	 *
 	 * @param input Input image.  Not modified.
 	 */
