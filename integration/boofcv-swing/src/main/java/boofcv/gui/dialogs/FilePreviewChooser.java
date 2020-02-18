@@ -57,6 +57,9 @@ public class FilePreviewChooser extends JPanel {
 
     File selected;
 
+    // Indicates if it's opening files (true) or saving files (false)
+    @Getter boolean openFile;
+
     // Clicks this when a file has been selected
     JButton bSelect;
 
@@ -68,6 +71,7 @@ public class FilePreviewChooser extends JPanel {
 
     public FilePreviewChooser(boolean openFile ) {
         setLayout(new BorderLayout());
+        this.openFile = openFile;
 
         String buttonText = openFile ? "Select" : "Save";
 
@@ -315,7 +319,7 @@ public class FilePreviewChooser extends JPanel {
 
     public File showDialog( Component parent )
     {
-        String title="";
+        String title= openFile ? "Open File" : "Save File";
 
         JDialog dialog = new JDialog(null,title, Dialog.ModalityType.APPLICATION_MODAL);
         DefaultListener listener = new DefaultListener(dialog);

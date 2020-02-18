@@ -291,7 +291,6 @@ public class BoofSwingUtil {
 		}
 		File previousPath=new File(prefs.get(KEY_PREVIOUS_SELECTION, defaultPath)).getAbsoluteFile();
 		FilePreviewChooser chooser = new FilePreviewChooser(openFile);
-		chooser.getBrowser().setSelectedFile(previousPath);
 
 		boolean selectDirectories = false;
 		escape:for( FileTypes t : filters ) {
@@ -333,6 +332,7 @@ public class BoofSwingUtil {
 			}
 			chooser.getBrowser().addFileFilter(ff);
 		}
+		chooser.getBrowser().setSelectedFile(previousPath);
 
 //		if( selectDirectories ) {
 //			if( filters.length == 1 )
