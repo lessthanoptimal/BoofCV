@@ -20,7 +20,7 @@ package boofcv.app.fiducials;
 
 import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.alg.fiducial.square.FiducialSquareGenerator;
-import boofcv.app.BaseFiducialSquare;
+import boofcv.app.BaseFiducialSquareBorder;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
@@ -123,7 +123,7 @@ public abstract class CreateSquareFiducialGui extends JPanel implements CreateSq
 		frame.setJMenuBar(menuBar);
 	}
 
-	protected void saveFile(boolean sendToPrinter, BaseFiducialSquare c) {
+	protected void saveFile(boolean sendToPrinter, BaseFiducialSquareBorder c) {
 		if( sendToPrinter ) {
 			if (controls.format.compareToIgnoreCase("pdf") != 0) {
 				JOptionPane.showMessageDialog(this, "Must select PDF document type to print");

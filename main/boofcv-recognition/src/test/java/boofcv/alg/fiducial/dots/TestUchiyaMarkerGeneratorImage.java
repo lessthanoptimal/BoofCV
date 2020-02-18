@@ -54,10 +54,11 @@ class TestUchiyaMarkerGeneratorImage {
 		points.add( new Point2D_F64(30,10));
 		points.add( new Point2D_F64(-10,50));
 		points.add( new Point2D_F64(30,50));
+		double markerWidth = 100;
 
 		alg.configure(width,height,5);
 		alg.setRadius(7);
-		alg.render(points);
+		alg.render(points,markerWidth);
 
 		GrayU8 image = alg.getImage();
 		assertEquals(width, image.width);
@@ -65,8 +66,7 @@ class TestUchiyaMarkerGeneratorImage {
 
 		int length = Math.min(width,height);
 
-//		ShowImages.showWindow(image,"Tada");
-//		BoofMiscOps.sleep(10_000);
+//		ShowImages.showBlocking(image,"Tada", 5_000);
 
 		BinaryEllipseDetector<GrayU8> detector = FactoryShapeDetector.ellipse(null, GrayU8.class);
 
@@ -90,8 +90,8 @@ class TestUchiyaMarkerGeneratorImage {
 		double dist23 = found.get(2).center.distance(found.get(3).center);
 		double dist30 = found.get(3).center.distance(found.get(0).center);
 
-		// should be spread out. width-2*border-2*radius
-		assertEquals(length-2*5-2*7,dist01,2);
+		// should be spread out. width-2*border-2*radius * relative distance
+		assertEquals((length-6*7)*(4.0/10.0),dist01,2);
 
 		assertEquals(dist01, dist12, 2);
 		assertEquals(dist01, dist23, 2);

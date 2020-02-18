@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,8 @@
 
 package boofcv.app;
 
+import boofcv.app.fiducials.CreateFiducialDocumentImage;
+import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.app.fiducials.CreateSquareFiducialDocumentImage;
 import boofcv.app.fiducials.CreateSquareFiducialDocumentPDF;
 import boofcv.gui.BoofSwingUtil;
@@ -31,11 +33,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Outputs an EPS document describing a binary square fiducial that encodes the specified number
+ * Outputs an PDF document describing a binary square fiducial that encodes the specified number
  *
  * @author Peter Abeles
  */
-public class CreateFiducialSquareBinary extends BaseFiducialSquare {
+public class CreateFiducialSquareBinary extends BaseFiducialSquareBorder {
 
 	@Option(name = "-n",aliases = {"--Numbers"},usage = "Specifies the numbers to encode", handler = LongArrayOptionHandler.class)
 	public Long[] numbers = new Long[0];
@@ -44,7 +46,7 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 	public int gridWidth = 4;
 
 	@Override
-	protected void callRenderPdf(CreateSquareFiducialDocumentPDF renderer) throws IOException {
+	protected void callRenderPdf(CreateFiducialDocumentPDF renderer) throws IOException {
 		List<String> names = new ArrayList<>();
 		GrowQueue_I64 numbers = new GrowQueue_I64();
 
@@ -53,11 +55,11 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 			numbers.add( this.numbers[i]);
 		}
 
-		renderer.render(names, numbers, gridWidth);
+		((CreateSquareFiducialDocumentPDF)renderer).render(names, numbers, gridWidth);
 	}
 
 	@Override
-	protected void callRenderImage(CreateSquareFiducialDocumentImage renderer) {
+	protected void callRenderImage(CreateFiducialDocumentImage renderer) {
 		List<String> names = new ArrayList<>();
 		GrowQueue_I64 numbers = new GrowQueue_I64();
 
@@ -66,7 +68,7 @@ public class CreateFiducialSquareBinary extends BaseFiducialSquare {
 			numbers.add( this.numbers[i]);
 		}
 
-		renderer.render(names, numbers, gridWidth);
+		((CreateSquareFiducialDocumentImage)renderer).render(names, numbers, gridWidth);
 	}
 
 	@Override

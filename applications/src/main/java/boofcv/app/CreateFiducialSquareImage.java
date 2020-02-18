@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.app;
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.misc.PixelMath;
+import boofcv.app.fiducials.CreateFiducialDocumentImage;
+import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.app.fiducials.CreateSquareFiducialDocumentImage;
 import boofcv.app.fiducials.CreateSquareFiducialDocumentPDF;
 import boofcv.gui.BoofSwingUtil;
@@ -37,11 +39,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Outputs an EPS document describing a binary square fiducial that encodes the specified number
+ * Outputs an PDF document describing a binary square fiducial that encodes the specified number
  *
  * @author Peter Abeles
  */
-public class CreateFiducialSquareImage extends BaseFiducialSquare {
+public class CreateFiducialSquareImage extends BaseFiducialSquareBorder {
 
 	// Paths to image files containing fiducial patterns
 	@Option(name = "-i",aliases = {"--Images"},usage = "Path to images", handler = StringArrayOptionHandler.class)
@@ -51,13 +53,13 @@ public class CreateFiducialSquareImage extends BaseFiducialSquare {
 	int threshold = 128;
 
 	@Override
-	protected void callRenderPdf(CreateSquareFiducialDocumentPDF renderer) throws IOException {
-		renderer.render(getNames(), loadPatterns());
+	protected void callRenderPdf(CreateFiducialDocumentPDF renderer) throws IOException {
+		((CreateSquareFiducialDocumentPDF)renderer).render(getNames(), loadPatterns());
 	}
 
 	@Override
-	protected void callRenderImage(CreateSquareFiducialDocumentImage renderer) {
-		renderer.render(getNames(), loadPatterns());
+	protected void callRenderImage(CreateFiducialDocumentImage renderer) {
+		((CreateSquareFiducialDocumentImage)renderer).render(getNames(), loadPatterns());
 	}
 
 	private List<GrayU8> loadPatterns() {

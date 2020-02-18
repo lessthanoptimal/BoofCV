@@ -46,6 +46,8 @@ public abstract class FiducialRenderEngine {
 	public abstract void draw(GrayU8 image , double x0 , double y0 , double x1 , double y1);
 
 	public abstract void inputToDocument(double x , double y , Point2D_F64 document );
+
+	// TODO add polyline with line thickness? How to manually do this?
 }
 
 

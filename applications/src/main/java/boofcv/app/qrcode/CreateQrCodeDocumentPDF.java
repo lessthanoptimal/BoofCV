@@ -43,6 +43,11 @@ public class CreateQrCodeDocumentPDF extends CreateFiducialDocumentPDF {
 	}
 
 	@Override
+	protected String getMarkerType() {
+		return "QRCode ";
+	}
+
+	@Override
 	protected void configureRenderer(PdfFiducialEngine r) {
 		g = new QrCodeGenerator(markerWidth*UNIT_TO_POINTS);
 		g.setRender(r);

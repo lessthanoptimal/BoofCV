@@ -131,10 +131,10 @@ public class PdfFiducialEngine extends FiducialRenderEngine {
 		document.y = adjustY(y);
 	}
 
-	private float adjustX( double x ) {
+	public float adjustX( double x ) {
 		return (float)(offsetX + x);
 	}
-	private float adjustY( double y ) {
+	public float adjustY( double y ) {
 		return (float)(offsetY + markerWidth - y);
 	}
 }

@@ -63,6 +63,9 @@ public abstract class GenericFiducialDetectorChecks {
 	Se3_F64 markerToWorld = eulerXyz(-0.2,0,1.2,0.1,Math.PI,0,null);
 
 	protected double stabilityShrink = 0.2;
+	protected double tolAccuracyT = 0.015;
+	protected double tolAccuracyTheta = 0.001;
+
 
 	/**
 	 * Renders everything in gray scale first then converts it
@@ -71,6 +74,9 @@ public abstract class GenericFiducialDetectorChecks {
 	 * @return rendered image
 	 */
 	public ImageBase renderImage(CameraPinholeBrown intrinsic  , ImageType imageType) {
+		return renderImage(intrinsic, markerToWorld, imageType);
+	}
+	public ImageBase renderImage(CameraPinholeBrown intrinsic  , Se3_F64 markerToWorld, ImageType imageType) {
 
 		SimulatePlanarWorld simulator = new SimulatePlanarWorld();
 		simulator.setCamera(intrinsic);
@@ -232,8 +238,8 @@ public abstract class GenericFiducialDetectorChecks {
 //				System.out.println("norm = "+diff.T.norm()+"  theta = "+theta);
 
 				// threshold selected through manual trial and error
-				assertEquals(0,diff.T.norm(), 0.015);
-				assertEquals(0,theta, 0.001);
+				assertEquals(0,diff.T.norm(), tolAccuracyT);
+				assertEquals(0,theta, tolAccuracyTheta);
 			}
 		}
 	}

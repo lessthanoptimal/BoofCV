@@ -225,10 +225,7 @@ public class FactoryFiducial {
 	 * @return The fiducial detector
 	 */
 	public static <T extends ImageGray<T>>
-	Uchiya_to_FiducialDetector<T> uchiya( @Nullable ConfigUchiyaMarker config , Class<T> imageType ) {
-		if( config == null )
-			config = new ConfigUchiyaMarker();
-
+	Uchiya_to_FiducialDetector<T> uchiya( ConfigUchiyaMarker config , Class<T> imageType ) {
 		config.checkValidity();
 
 		var ellipseDetector = new BinaryEllipseDetectorPixel(config.contourRule);
@@ -253,7 +250,7 @@ public class FactoryFiducial {
 
 		UchiyaMarkerImageTracker<T> tracker = new UchiyaMarkerImageTracker<>(inputToBinary,ellipseDetector,uchiya);
 
-		return new Uchiya_to_FiducialDetector<T>(tracker, ImageType.single(imageType));
+		return new Uchiya_to_FiducialDetector<T>(tracker, config.markerLength, ImageType.single(imageType));
 	}
 
 }

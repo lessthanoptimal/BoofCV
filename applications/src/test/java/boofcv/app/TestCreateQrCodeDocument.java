@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,6 @@ import boofcv.abst.fiducial.QrCodeDetector;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayF32;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +54,7 @@ public class TestCreateQrCodeDocument extends CommonFiducialPdfChecks {
 
 //		ShowImages.showWindow(image,"Rendered", true);
 //		BoofMiscOps.sleep(10000);
-		UtilImageIO.saveImage(image,"test.png");
+//		UtilImageIO.saveImage(image,"test.png");
 
 		QrCodeDetector<GrayF32> detector = FactoryFiducial.qrcode(null,GrayF32.class);
 

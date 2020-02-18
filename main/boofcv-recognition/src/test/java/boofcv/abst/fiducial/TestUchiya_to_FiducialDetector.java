@@ -40,15 +40,17 @@ class TestUchiya_to_FiducialDetector extends GenericFiducialTrackerChecks {
 
 	Random rand = BoofTesting.createRandom(0);
 	List<List<Point2D_F64>> documents = new ArrayList<>();
+	double markerLength = 90;
 
 	public TestUchiya_to_FiducialDetector() {
 		stabilityShrink = 0.5;
+		tolAccuracyTheta = 0.015;
 
 		types.add( ImageType.single(GrayU8.class));
 		types.add( ImageType.single(GrayF32.class));
 
 		for (int i = 0; i < 20; i++) {
-			documents.add( UchiyaMarkerGeneratorImage.createRandomMarker(rand,20,90,15));
+			documents.add( UchiyaMarkerGeneratorImage.createRandomMarker(rand,20, markerLength,15));
 		}
 	}
 
@@ -58,10 +60,11 @@ class TestUchiya_to_FiducialDetector extends GenericFiducialTrackerChecks {
 	{
 		var config = new ConfigUchiyaMarker();
 		config.ransac.inlierThreshold = 1.0;
+		config.markerLength = markerLength;
 
 		Uchiya_to_FiducialDetector detector = FactoryFiducial.uchiya(config,imageType.getImageClass());
 		for( var pts : documents ) {
-			detector.createDocument(pts);
+			detector.addMarker(pts);
 		}
 
 		return detector;
@@ -74,7 +77,7 @@ class TestUchiya_to_FiducialDetector extends GenericFiducialTrackerChecks {
 		var generator = new UchiyaMarkerGeneratorImage();
 		generator.setRadius(20);
 		generator.configure(600,600,20);
-		generator.render(documents.get(target));
+		generator.render(documents.get(target), markerLength);
 
 //		ShowImages.showBlocking(generator.getImage(),"Raw Render",1000);
 

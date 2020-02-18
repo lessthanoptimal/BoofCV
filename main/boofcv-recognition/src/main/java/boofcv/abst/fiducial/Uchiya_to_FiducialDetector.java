@@ -40,7 +40,7 @@ import java.util.List;
 
 /**
  * Wrapper around {@link UchiyaMarkerTracker} for {@link FiducialDetector}. To add documents call
- * {@link #createDocument(List)}
+ * {@link #addMarker(List)}
  *
  * @author Peter Abeles
  */
@@ -50,6 +50,9 @@ implements FiducialTracker<T>
 	ImageType<T> imageType;
 
 	@Getter UchiyaMarkerImageTracker<T> tracker;
+
+	// Length of a side on the marker.
+	final double markerLength;
 
 	// Storage
 	final FastQueue<Point2D3D> control3D = new FastQueue<>(Point2D3D::new);
@@ -62,8 +65,9 @@ implements FiducialTracker<T>
 	final Rectangle2D_F64 rectangle = new Rectangle2D_F64();
 	final Point2D_F64 norm = new Point2D_F64();
 
-	public Uchiya_to_FiducialDetector(UchiyaMarkerImageTracker<T> tracker, ImageType<T> imageType ) {
+	public Uchiya_to_FiducialDetector(UchiyaMarkerImageTracker<T> tracker, double markerLength, ImageType<T> imageType ) {
 		this.tracker = tracker;
+		this.markerLength = markerLength;
 		this.imageType = imageType;
 	}
 
@@ -118,42 +122,20 @@ implements FiducialTracker<T>
 		return "UCHIYA";
 	}
 
-	/**
-	 * Use the average distance from the center as the object's width
-	 * @param which Fiducial's index
-	 */
 	@Override
 	public double getWidth(int which) {
-		UchiyaMarkerTracker.Track track = tracker.getTracks().get(which);
-
-		// Use precomputed value if available
-		if( docToRadius.containsKey(track.globalDoc.documentID) ) {
-			return docToRadius.get(track.globalDoc.documentID);
-		} else {
-			FastQueue<Point2D_F64> landmarks = track.globalDoc.landmarks;
-
-			UtilPoint2D_F64.mean(landmarks.toList(), center);
-			double width = 0;
-			for (int i = 0; i < landmarks.size; i++) {
-				width += landmarks.get(i).distance(center);
-			}
-			width *= 2.0/landmarks.size;
-
-			docToRadius.put(track.globalDoc.documentID,width);
-
-			return width;
-		}
+		return markerLength;
 	}
 
 
 	@Override
 	public double getSideWidth(int which) {
-		return getWidth(which);
+		return markerLength;
 	}
 
 	@Override
 	public double getSideHeight(int which) {
-		return getWidth(which);
+		return markerLength;
 	}
 
 	@Override
@@ -171,7 +153,7 @@ implements FiducialTracker<T>
 			PointIndex2D_F64 dot = track.observed.get(dotIdx);
 			Point2D_F64 landmark = track.globalDoc.landmarks.get(dot.index);
 			pixelToNorm.compute(dot.x,dot.y, norm);
-			control3D.grow().set(norm.x,norm.y,landmark.x,landmark.y,0);
+			control3D.grow().set(norm.x,norm.y,landmark.x,-landmark.y,0);
 		}
 
 		return control3D.toList();
@@ -194,9 +176,19 @@ implements FiducialTracker<T>
 	}
 
 	/**
-	 * Convenience function for creating a document
+	 * Creates a document from a set of points.
 	 */
-	public LlahDocument createDocument(List<Point2D_F64> locations2D ) {
+	public LlahDocument addMarker(List<Point2D_F64> locations2D ) {
+
+		// sanity check the document
+		double radius = markerLength/2.0;
+
+		for (int i = 0; i < locations2D.size(); i++) {
+			Point2D_F64 p = locations2D.get(i);
+			if( p.x < -radius || p.x > radius || p.y < -radius || p.y > radius )
+				throw new IllegalArgumentException("Marker length is "+markerLength+" and "+p+" is out of bounds");
+		}
+
 		return getLlahOperations().createDocument(locations2D);
 	}
 

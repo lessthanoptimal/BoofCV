@@ -19,7 +19,6 @@
 package boofcv.alg.fiducial.dots;
 
 import boofcv.alg.drawing.FiducialRenderEngine;
-import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.RectangleLength2D_F64;
 import lombok.Getter;
@@ -30,9 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.max;
-
 /**
  * Renders Uchiya Markers
  *
@@ -41,7 +37,7 @@ import static java.lang.Math.max;
 public class UchiyaMarkerGenerator {
 
 	/** used to draw the fiducial */
-	@Getter protected FiducialRenderEngine render;
+	@Getter @Setter protected FiducialRenderEngine render;
 
 	/** Circle's radius. This will be in the same units as markerRegion */
 	@Getter @Setter double radius;
@@ -52,14 +48,16 @@ public class UchiyaMarkerGenerator {
 	/** dot locations after being transformed ot fit inside the region */
 	@Getter FastQueue<Point2D_F64> dotsAdjusted = new FastQueue<>(Point2D_F64::new);
 
-	//----------------- workspace variables
-	private Point2D_F64 average = new Point2D_F64();
-
 	/**
 	 * Randomly generates a marker within the allowed region. Ensures tat there is sufficient spacing between
-	 * points
+	 * points. The marker's center will be (0,0) with a range of -markerWidth/2 to markerWidth/2
+	 *
+	 * @param rand Random number generator
+	 * @param num Number of dots
+	 * @param markerWidth Length of each side on the marker
+	 * @param minDistance The minimum distance appart two dots can be
 	 */
-	public static List<Point2D_F64> createRandomMarker(Random rand , int num , double regionWidth , double minDistance ) {
+	public static List<Point2D_F64> createRandomMarker(Random rand , int num , double markerWidth , double minDistance ) {
 		final var points = new ArrayList<Point2D_F64>();
 		final var work = new Point2D_F64();
 
@@ -67,8 +65,8 @@ public class UchiyaMarkerGenerator {
 
 		int failedAttempts = 0;
 		while( failedAttempts < 100 && points.size() < num ) {
-			work.x = rand.nextDouble()*regionWidth;
-			work.y = rand.nextDouble()*regionWidth;
+			work.x = (rand.nextDouble()-0.5)*markerWidth;
+			work.y = (rand.nextDouble()-0.5)*markerWidth;
 
 			// See if there's a point in the list that's too close
 			boolean good = true;
@@ -91,33 +89,27 @@ public class UchiyaMarkerGenerator {
 
 	/**
 	 * Renders the marker. Automatically scales of offsets to fit inside the document's coordinate system
+	 *
+	 * @param dots dots on the marker. They should be inside a region -width/2 to width/2.
 	 */
-	public void render( List<Point2D_F64> dots ) {
-		UtilPoint2D_F64.mean(dots, average);
-		double maxDistance = 0;
-		for ( var p : dots ) {
-			maxDistance = max(maxDistance, abs(p.x-average.x));
-			maxDistance = max(maxDistance, abs(p.y-average.y));
-		}
-		if( maxDistance == 0.0 )
-			maxDistance = 1.0;
+	public void render( List<Point2D_F64> dots , double markerWidth ) {
 
 		// The length of the square the circle's centers can appear inside of
-		double drawLength = Math.min(documentRegion.width,documentRegion.height)-2*radius;
+		double drawLength = Math.min(documentRegion.width,documentRegion.height)-4*radius;
 
 		// nFind the shift needed to put a point in the center of the draw region
 		double regionCenterX = documentRegion.width/2;
 		double regionCenterY = documentRegion.height/2;
 
 		// transform from points to paper coordinates
-		double point_to_pixel = drawLength/(2.0*maxDistance);
+		double point_to_pixel = drawLength/markerWidth;
 
 		render.init();
 		dotsAdjusted.reset();
 		for( var p : dots ) {
 			Point2D_F64 a = dotsAdjusted.grow();
-			a.x = (p.x - average.x)*point_to_pixel + regionCenterX;
-			a.y = (p.y - average.y)*point_to_pixel + regionCenterY;
+			a.x = p.x*point_to_pixel + regionCenterX;
+			a.y = p.y*point_to_pixel + regionCenterY;
 			render.circle(a.x,a.y,radius);
 			render.inputToDocument(a.x,a.y,a);
 		}

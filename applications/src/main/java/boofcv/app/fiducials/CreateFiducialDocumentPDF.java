@@ -42,14 +42,15 @@ import java.io.IOException;
 public abstract class CreateFiducialDocumentPDF {
 
 	// objects for writing PDF document
-	PDDocument document;
+	protected PDDocument document;
 
-	PaperSize paper;
-	Unit units;
+	protected PaperSize paper;
+	protected Unit units;
 
 	public boolean showInfo = true;
 	public boolean gridFill = false;
 	public boolean drawGrid = false;
+	public boolean drawLineBorder = false;
 
 	public float markerWidth;
 	public float spaceBetween;
@@ -135,7 +136,7 @@ public abstract class CreateFiducialDocumentPDF {
 				pcs.beginText();
 				pcs.setFont(PDType1Font.TIMES_ROMAN,7);
 				pcs.newLineAtOffset( offX, offY );
-				pcs.showText(String.format("Created by BoofCV"));
+				pcs.showText(String.format("%sCreated by BoofCV",getMarkerType()));
 				pcs.endText();
 			}
 
@@ -165,20 +166,24 @@ public abstract class CreateFiducialDocumentPDF {
 						pcs.endText();
 						pcs.beginText();
 						pcs.newLineAtOffset( (float)r.offsetX, (float)r.offsetY+markerWidth*UNIT_TO_POINTS+offset-7);
-						pcs.showText(String.format("%4.1f %2s",markerWidth,units.getAbbreviation()));
+						pcs.showText(createMarkerSizeString());
 						pcs.endText();
 					}
 				}
 			}
 
 			if( drawGrid ) {
-				printGrid(pcs,
-						centerY ,
-						centerX ,numRows,numCols,sizeBox);
+				printGrid(pcs, centerY , centerX ,numRows,numCols,sizeBox);
 			}
 
 			pcs.close();
 		}
+	}
+
+	protected abstract String getMarkerType();
+
+	protected String createMarkerSizeString() {
+		return String.format("%4.1f %2s",markerWidth,units.getAbbreviation());
 	}
 
 	protected abstract void configureRenderer( PdfFiducialEngine pdfengine );

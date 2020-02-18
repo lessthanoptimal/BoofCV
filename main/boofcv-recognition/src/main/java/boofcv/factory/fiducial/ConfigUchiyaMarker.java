@@ -33,6 +33,12 @@ import boofcv.struct.ConnectRule;
  * @author Peter Abeles
  */
 public class ConfigUchiyaMarker implements Configuration {
+
+	/**
+	 * Specifies the marker's width and height. This must match width used to generate the random dots.
+	 */
+	public double markerLength = -1.0;
+
 	/**
 	 * Specifies how images are thresholded and converted into a binary format
 	 */
@@ -80,5 +86,7 @@ public class ConfigUchiyaMarker implements Configuration {
 	@Override
 	public void checkValidity() {
 		llah.checkValidity();
+		if( markerLength <= 0 )
+			throw new IllegalArgumentException("Marker length must set!");
 	}
 }

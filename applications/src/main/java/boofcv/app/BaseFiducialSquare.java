@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,8 +18,8 @@
 
 package boofcv.app;
 
-import boofcv.app.fiducials.CreateSquareFiducialDocumentImage;
-import boofcv.app.fiducials.CreateSquareFiducialDocumentPDF;
+import boofcv.app.fiducials.CreateFiducialDocumentImage;
+import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.generate.LengthUnit;
 import boofcv.generate.Unit;
 import org.apache.commons.io.FilenameUtils;
@@ -32,8 +32,8 @@ import java.io.IOException;
 /**
  * <p>
  * Base class for generating square fiducial PDF documents for printing.  Fiducials are placed in a regular grid.
- * The width of each element in the grid is the fiducial's width (pattern + black border) and a white border.  The
- * grid starts in the page's lower left and corner.
+ * The width of each element in the grid is the fiducial's width and a white border.  The  * grid starts in the
+ * page's lower left and corner.
  * </p>
  *
  * <pre>
@@ -48,11 +48,6 @@ import java.io.IOException;
  */
 public abstract class BaseFiducialSquare {
 
-	// TODO add back print grid
-
-	// threshold for converting to a binary image
-	public int threshold = 255 / 2;
-
 	@Option(name = "-u", aliases = {"--Units"}, usage = "Name of document units.  default: cm")
 	private String _unit = Unit.CENTIMETER.abbreviation;
 	public Unit unit;
@@ -66,9 +61,6 @@ public abstract class BaseFiducialSquare {
 
 	@Option(name = "-w", aliases = {"--MarkerWidth"}, usage = "Width of each marker.  In document units.")
 	public float markerWidth = -1;
-
-	@Option(name = "-bw", aliases = {"--BlackBorder"}, usage = "Fractional width of black border")
-	public float blackBorderFractionalWidth = 0.25f;
 
 	@Option(name = "-s", aliases = {"--Space"}, usage = "Spacing between the fiducials.  In document units.")
 	public float spaceBetween = 0;
@@ -126,8 +118,7 @@ public abstract class BaseFiducialSquare {
 
 		switch (fileType) {
 			case "pdf": {
-				CreateSquareFiducialDocumentPDF renderer = new CreateSquareFiducialDocumentPDF(fileName, paperSize, unit);
-				renderer.blackBorderFractionalWidth = blackBorderFractionalWidth;
+				CreateFiducialDocumentPDF renderer = createRendererPdf(fileName, paperSize, unit);
 				renderer.markerWidth = markerWidth;
 				renderer.spaceBetween = spaceBetween;
 				renderer.gridFill = gridFill;
@@ -147,19 +138,21 @@ public abstract class BaseFiducialSquare {
 			break;
 
 			default: {
-				CreateSquareFiducialDocumentImage renderer = new CreateSquareFiducialDocumentImage(fileName);
-				renderer.setBlackBorderFractionalWidth(blackBorderFractionalWidth);
-				renderer.setWhiteBorder((int)spaceBetween);
-				renderer.setMarkerWidth((int)markerWidth);
+				CreateFiducialDocumentImage renderer = createRendererImage(fileName);
+				renderer.markerWidth = (int)markerWidth;
 				callRenderImage(renderer);
 			}
 			break;
 		}
 	}
 
-	protected abstract void callRenderPdf(CreateSquareFiducialDocumentPDF renderer) throws IOException;
+	protected abstract CreateFiducialDocumentImage createRendererImage(String filename );
 
-	protected abstract void callRenderImage(CreateSquareFiducialDocumentImage renderer);
+	protected abstract CreateFiducialDocumentPDF createRendererPdf(String documentName, PaperSize paper, Unit units);
+
+	protected abstract void callRenderPdf(CreateFiducialDocumentPDF renderer) throws IOException;
+
+	protected abstract void callRenderImage(CreateFiducialDocumentImage renderer);
 
 	private void getFileTypeFromFileName() {
 		fileType = FilenameUtils.getExtension(fileName);

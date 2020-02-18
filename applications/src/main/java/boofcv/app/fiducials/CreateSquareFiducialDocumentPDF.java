@@ -42,8 +42,15 @@ public class CreateSquareFiducialDocumentPDF extends CreateFiducialDocumentPDF {
 	int gridWidth;
 	java.util.List<GrayU8> imagePatterns;
 
+	String markerType="";
+
 	public CreateSquareFiducialDocumentPDF(String documentName, PaperSize paper, Unit units) {
 		super(documentName, paper, units);
+	}
+
+	@Override
+	protected String getMarkerType() {
+		return markerType;
 	}
 
 	public void render( java.util.List<String> names , GrowQueue_I64 patterns , int gridWidth ) throws IOException {

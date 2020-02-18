@@ -77,7 +77,7 @@ class TestLlahOperations {
 		// See if the requested document is the best match
 		for (int docID = 0; docID < 5; docID++) {
 //			System.out.println("TESTING "+docID);
-			llahOps.lookupDocuments(documents.get(docID), 0.0, found);
+			llahOps.lookupDocuments(documents.get(docID), 8, found);
 			assertFalse(found.isEmpty());
 
 			LlahOperations.FoundDocument best = null;
@@ -107,7 +107,7 @@ class TestLlahOperations {
 
 		// If given a document not in the list all the matches should be very poor
 		for (int docID = 5; docID < documents.size(); docID++) {
-			llahOps.lookupDocuments(documents.get(docID), 0.0, found);
+			llahOps.lookupDocuments(documents.get(docID), 8, found);
 			if (found.isEmpty())
 				continue;
 
@@ -248,7 +248,7 @@ class TestLlahOperations {
 
 		List<Point2D_F64> target = documents.get(2);
 		List<LlahOperations.FoundDocument> foundDocuments = new ArrayList<>();
-		llahOps.lookupDocuments(target, 0.2, foundDocuments);
+		llahOps.lookupDocuments(target, 8, foundDocuments);
 		assertEquals(1, foundDocuments.size());
 		GrowQueue_I32 expected = foundDocuments.get(0).landmarkToDots;
 
@@ -262,7 +262,7 @@ class TestLlahOperations {
 				SePointOps_F64.transform(se, p, d);
 				rotated.add(d);
 			}
-			llahOps.lookupDocuments(rotated, 0.2, foundDocuments);
+			llahOps.lookupDocuments(rotated, 8, foundDocuments);
 			assertEquals(1, foundDocuments.size());
 			GrowQueue_I32 found = foundDocuments.get(0).landmarkToDots;
 
@@ -290,7 +290,7 @@ class TestLlahOperations {
 
 		List<Point2D_F64> target = documents.get(2);
 		List<LlahOperations.FoundDocument> foundDocuments = new ArrayList<>();
-		llahOps.lookupDocuments(target, 0.2, foundDocuments);
+		llahOps.lookupDocuments(target, 8, foundDocuments);
 		assertEquals(1, foundDocuments.size());
 		GrowQueue_I32 expected = foundDocuments.get(0).landmarkToDots;
 
@@ -300,7 +300,7 @@ class TestLlahOperations {
 			Collections.shuffle(shuffled, rand);
 
 			// Look up the document
-			llahOps.lookupDocuments(shuffled, 0.2, foundDocuments);
+			llahOps.lookupDocuments(shuffled, 8, foundDocuments);
 			assertEquals(1, foundDocuments.size());
 			GrowQueue_I32 found = foundDocuments.get(0).landmarkToDots;
 
@@ -337,7 +337,7 @@ class TestLlahOperations {
 			}
 
 			// Look up the document
-			llahOps.lookupDocuments(noised,0.2,foundDocuments);
+			llahOps.lookupDocuments(noised,8,foundDocuments);
 			assertEquals(1, foundDocuments.size());
 			LlahOperations.FoundDocument doc = foundDocuments.get(0);
 			assertEquals(2,doc.document.documentID);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,7 +70,7 @@ import static boofcv.alg.fiducial.qrcode.QrCode.Failure.ALIGNMENT;
  * @author Peter Abeles
  */
 public class DetectQrCodeApp<T extends ImageGray<T>>
-		extends DetectBlackShapeAppBase implements ShapeGuiListener, DetectQrCodeMessagePanel.Listener
+		extends DetectBlackShapeAppBase<T> implements ShapeGuiListener, DetectQrCodeMessagePanel.Listener
 {
 	QrCodePreciseDetector<T> detector;
 
@@ -80,7 +80,7 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	VisualizePanel gui = new VisualizePanel();
 	QrCodeBinaryGridToPixel locator = new QrCodeBinaryGridToPixel();
 
-	// Loack against detected
+	// Lock against detected
 	final FastQueue<QrCode> detected = new FastQueue<>(QrCode.class,true);
 	final FastQueue<QrCode> failures = new FastQueue<>(QrCode.class,true);
 
@@ -303,7 +303,6 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 					VisualizeBinaryData.render(contours, null, Color.CYAN, 1.0,scale, g2);
 				}
 
-
 				synchronized (detected) {
 					if (controls.bShowMarkers) {
 						for (int i = 0; i < detected.size(); i++) {
@@ -504,13 +503,9 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 		examples.add(UtilIO.pathExample("fiducial/qrcode/movie.mp4"));
 
 		SwingUtilities.invokeLater(()->{
-			DetectQrCodeApp app = new DetectQrCodeApp(examples,GrayF32.class);
-
+			var app = new DetectQrCodeApp<>(examples,GrayF32.class);
 			app.openExample(examples.get(0));
 			app.display("QR-Code Detector");
 		});
 	}
-
-
-
 }

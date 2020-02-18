@@ -46,12 +46,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TestUchiyaMarkerImageTracker {
 
 	Random rand = BoofTesting.createRandom(0);
+	double markerWidth = 90;
 
 	List<List<Point2D_F64>> documents = new ArrayList<>();
 
 	public TestUchiyaMarkerImageTracker() {
 		for (int i = 0; i < 20; i++) {
-			documents.add( UchiyaMarkerGeneratorImage.createRandomMarker(rand,20,90,15));
+			documents.add( UchiyaMarkerGeneratorImage.createRandomMarker(rand,20,markerWidth,15));
 		}
 	}
 
@@ -62,7 +63,7 @@ class TestUchiyaMarkerImageTracker {
 		var generator = new UchiyaMarkerGeneratorImage();
 		generator.setRadius(5);
 		generator.configure(200,200,50);
-		generator.render(documents.get(targetID));
+		generator.render(documents.get(targetID),markerWidth);
 
 		List<Point2D_F64> centers = generator.getDotsAdjusted().toList();
 
@@ -88,7 +89,7 @@ class TestUchiyaMarkerImageTracker {
 			// There should be one detected dot for each true dot. They should also be close to each other
 			List<Point2D_F64> foundCenters = trackerImage.getFoundDots();
 			assertEquals(centers.size(),foundCenters.size());
-			compareDots(centers, foundCenters, angle, rotated.width, rotated.height, 1.0);
+			compareDots(centers, foundCenters, angle, rotated.width, rotated.height, 1.2);
 
 			// Sanity check. This is an easy situation
 			assertEquals(20, tracker.ransac.getMatchSet().size());
@@ -102,7 +103,7 @@ class TestUchiyaMarkerImageTracker {
 
 			// Check extracted points to see if they are at the expected location
 			compareDots(centers, track.predicted.toList(), angle, rotated.width, rotated.height, 2.0);
-			compareDotsIdx(centers, track.observed.toList(), angle, rotated.width, rotated.height, 1.0);
+			compareDotsIdx(centers, track.observed.toList(), angle, rotated.width, rotated.height, 1.2);
 
 //			ShowImages.showBlocking(rotated,"Rotating", 1_000);
 		}

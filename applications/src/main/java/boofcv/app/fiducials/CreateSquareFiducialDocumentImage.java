@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,14 +20,9 @@ package boofcv.app.fiducials;
 
 import boofcv.alg.drawing.FiducialImageEngine;
 import boofcv.alg.fiducial.square.FiducialSquareGenerator;
-import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
-import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.GrowQueue_I64;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.List;
 
 /**
@@ -35,9 +30,8 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CreateSquareFiducialDocumentImage {
+public class CreateSquareFiducialDocumentImage extends CreateFiducialDocumentImage {
 
-	String documentName;
 	FiducialSquareGenerator generator;
 	FiducialImageEngine render = new FiducialImageEngine();
 	int whiteBorderPixels;
@@ -45,7 +39,7 @@ public class CreateSquareFiducialDocumentImage {
 	double blackBorderFractionalWidth;
 
 	public CreateSquareFiducialDocumentImage(String documentName ) {
-		this.documentName = documentName;
+		super(documentName);
 		this.generator = new FiducialSquareGenerator(render);
 	}
 
@@ -54,6 +48,7 @@ public class CreateSquareFiducialDocumentImage {
 	}
 
 	public void render( java.util.List<String> names , GrowQueue_I64 patterns , int gridWidth ) {
+		generator.setMarkerWidth(markerWidth);
 		generator.setBlackBorder(blackBorderFractionalWidth);
 		render.configure(whiteBorderPixels,(int)generator.getMarkerWidth());
 		for (int i = 0; i < patterns.size; i++) {
@@ -63,33 +58,12 @@ public class CreateSquareFiducialDocumentImage {
 	}
 
 	public void render( java.util.List<String> names , List<GrayU8> patterns ) {
+		generator.setMarkerWidth(markerWidth);
 		render.configure(whiteBorderPixels,(int)generator.getMarkerWidth());
 		for (int i = 0; i < patterns.size(); i++) {
 			generator.generate(patterns.get(i));
-			int count = patterns.size() > 1 ? i : -1;
 			save(render.getGray(),names.get(i));
 		}
-	}
-
-	private void save( GrayU8 fiducial , String name ) {
-		String fileName;
-		String ext = FilenameUtils.getExtension(documentName);
-		if( ext.length() == 0 ) {
-			fileName = documentName+".png";
-		} else {
-			File f = new File(documentName);
-			String n = f.getName();
-			fileName = new File(f.getParentFile(), n.substring(0, n.length() - ext.length() - 1) + name + "." + ext).getPath();
-		}
-		BufferedImage output = new BufferedImage(fiducial.width,fiducial.height,BufferedImage.TYPE_INT_RGB);
-		ConvertBufferedImage.convertTo(fiducial,output);
-
-		System.out.println("Saving "+fileName);
-		UtilImageIO.saveImage(output,fileName);
-	}
-
-	public void setMarkerWidth( int pixels ) {
-		generator.setMarkerWidth(pixels);
 	}
 
 	public void setWhiteBorder( int pixels ) {
