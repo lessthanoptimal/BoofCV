@@ -18,11 +18,15 @@
 
 package boofcv.alg.fiducial.dots;
 
+import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.feature.describe.llah.LlahDocument;
 import boofcv.alg.feature.describe.llah.LlahOperations;
+import boofcv.factory.geo.EpipolarError;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.geo.PointIndex2D_F64;
 import georegression.struct.homography.Homography2D_F64;
+import georegression.struct.homography.UtilHomography_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 import gnu.trove.map.hash.TIntIntHashMap;
@@ -32,24 +36,27 @@ import lombok.Setter;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ejml.data.DMatrixRMaj;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Detector and tracker for Uchiya Markers (a.k.a. Random Dot).
+ * <p>Detector and tracker for Uchiya Markers (a.k.a. Random Dot) see [1].</p>
  *
- * All known targets are stored in the "global" dictionary. The documentID in global dictionary are persistent.
+ * <p>All known targets are stored in the "global" dictionary. The documentID in global dictionary are persistent.
  * When documents are tracked between two frames they are assigned a temporary track ID. Tracking works by
  * taking the most recent observations and computing a new LLAH description from those. This allows the description
- * to change with a changing perspective.
+ * to change with a changing perspective.</p>
  *
  * When a document is detected a homography is computed from the canonical coordinates (global or previous track)
  * to the current image pixels. This homography is then used to recompute the predicted location of all features,
  * even ones which were not observed. The new track LLAH description is computed from these predicted landmarks.
  *
  * @see boofcv.alg.feature.describe.llah.LlahOperations
+ *
+ * <p>[1] Uchiyama, Hideaki, and Hideo Saito. "Random dot markers." 2011 IEEE Virtual Reality Conference. IEEE, 2011.</p>
  *
  * @author Peter Abeles
  */
@@ -82,8 +89,12 @@ public class UchiyaMarkerTracker {
 
 	// Used to compute homography
 	Ransac<Homography2D_F64, AssociatedPair> ransac;
+	RefineEpipolar refineHomography = FactoryMultiView.homographyRefine(0.01,50, EpipolarError.SAMPSON);
+	DMatrixRMaj foundH = new DMatrixRMaj(3,3);
+	DMatrixRMaj refinedH = new DMatrixRMaj(3,3);
 	// landmark -> dots
 	FastQueue<AssociatedPair> ransacPairs = new FastQueue<>(AssociatedPair::new);
+	List<AssociatedPair> inlierPairs = new ArrayList<>(); // for refinement
 	// which dots were given as input to RANSAC
 	GrowQueue_I32 ransacDotIdx = new GrowQueue_I32();
 
@@ -204,17 +215,23 @@ public class UchiyaMarkerTracker {
 		if( !fitHomography(detectedDots,doc) )
 			return false;
 
-		// Create a list of used landmarks
+		// Create a list of used landmarks from the inlier set
+		inlierPairs.clear();
 		int N = ransac.getMatchSet().size();
 		for (int i = 0; i < N; i++) {
 			int inputIdx = ransac.getInputIndex(i);
 			int dotIdx = ransacDotIdx.get(inputIdx);
 			int landmarkIdx = doc.landmarkToDots.indexOf(dotIdx);
 			track.observed.grow().set(detectedDots.get(dotIdx),landmarkIdx);
+			inlierPairs.add( ransacPairs.get(inputIdx) );
 		}
 
+		// Improve the fit parameters
+		UtilHomography_F64.convert(ransac.getModelParameters(),foundH);
+		refineHomography.fitModel(inlierPairs,foundH, refinedH);
+
 		// Use the homography to estimate where the landmarks would have appeared
-		track.doc_to_imagePixel.set(ransac.getModelParameters());
+		UtilHomography_F64.convert(refinedH,track.doc_to_imagePixel);
 		track.predicted.resize(doc.document.landmarks.size);
 
 		// Predict where all the observations shuld be based on the homography
@@ -248,7 +265,11 @@ public class UchiyaMarkerTracker {
 		if( ransacPairs.size < ransac.getMinimumSize() )
 			return false;
 
-		return ransac.process(ransacPairs.toList());
+		// Ransac needs to find an inlier set and the inlier set needs to be of sufficient size
+		if( ransac.process(ransacPairs.toList()) ) {
+			return ransac.getMatchSet().size() >= minLandmarkDoc;
+		}
+		return false;
 	}
 
 	/**

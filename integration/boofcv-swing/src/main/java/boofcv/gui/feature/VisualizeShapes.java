@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,6 +44,17 @@ public class VisualizeShapes {
 		Line2D.Double line = new Line2D.Double();
 
 		drawSubPixel(quad.a,quad.b,line,g2);
+		drawSubPixel(quad.b,quad.c,line,g2);
+		drawSubPixel(quad.c,quad.d,line,g2);
+		drawSubPixel(quad.d,quad.a,line,g2);
+	}
+
+	public static void draw( Quadrilateral_F64 quad , Color sideA , Color others , Graphics2D g2 ) {
+		Line2D.Double line = new Line2D.Double();
+
+		g2.setColor(sideA);
+		drawSubPixel(quad.a,quad.b,line,g2);
+		g2.setColor(others);
 		drawSubPixel(quad.b,quad.c,line,g2);
 		drawSubPixel(quad.c,quad.d,line,g2);
 		drawSubPixel(quad.d,quad.a,line,g2);
@@ -258,6 +269,37 @@ public class VisualizeShapes {
 			path.closePath();
 		}
 		g2.draw(path);
+	}
+
+	public static void drawPolygon( Polygon2D_F64 polygon, boolean loop,double scale, Color color0, Color colorOthers,  Graphics2D g2 ) {
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		Path2D path = new Path2D.Double();
+
+		for( int i = 1; i <= polygon.size(); i++ ) {
+			Point2D_F64 p = polygon.get(i%polygon.size());
+			if( i == 1 ) {
+				path.moveTo(scale * p.x, scale * p.y);
+			} else {
+				path.lineTo(scale * p.x, scale * p.y);
+			}
+		}
+		g2.setColor(colorOthers);
+		g2.draw(path);
+
+		path.reset();
+		for( int i = 0; i < 2; i++ ) {
+			Point2D_F64 p = polygon.get(i);
+			if( i == 0 ) {
+				path.moveTo(scale * p.x, scale * p.y);
+			} else {
+				path.lineTo(scale * p.x, scale * p.y);
+			}
+		}
+		g2.setColor(color0);
+		g2.draw(path);
+
 	}
 
 	public static void fillPolygon( Polygon2D_F64 polygon, double scale,  Graphics2D g2 ) {

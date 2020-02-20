@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 	protected final Object bufferedImageLock = new Object();
 	protected BufferedImage original;
 	protected BufferedImage work;
-	GrayU8 binary = new GrayU8(1,1);
+	protected GrayU8 binary = new GrayU8(1,1);
 
 	// how many input images have been saved to disk
 	protected int saveCounter = 0;
@@ -198,18 +198,20 @@ public abstract class DetectBlackShapeAppBase<T extends ImageGray<T>> extends De
 	 * Called when how the data is visualized has changed
 	 */
 	public void viewUpdated() {
-		BufferedImage active = null;
-		if( controls.selectedView == 0 ) {
-			active = original;
-		} else if( controls.selectedView == 1 ) {
-			VisualizeBinaryData.renderBinary(binary,false,work);
-			active = work;
-			work.setRGB(0, 0, work.getRGB(0, 0)); // hack so that Swing knows it's been modified
-		} else {
-			Graphics2D g2 = work.createGraphics();
-			g2.setColor(Color.BLACK);
-			g2.fillRect(0,0,work.getWidth(),work.getHeight());
-			active = work;
+		BufferedImage active;
+		synchronized (bufferedImageLock) {
+			if (controls.selectedView == 0) {
+				active = original;
+			} else if (controls.selectedView == 1) {
+				VisualizeBinaryData.renderBinary(binary, false, work);
+				active = work;
+				work.setRGB(0, 0, work.getRGB(0, 0)); // hack so that Swing knows it's been modified
+			} else {
+				Graphics2D g2 = work.createGraphics();
+				g2.setColor(Color.BLACK);
+				g2.fillRect(0, 0, work.getWidth(), work.getHeight());
+				active = work;
+			}
 		}
 
 		if( active != guiImage.getImage() )

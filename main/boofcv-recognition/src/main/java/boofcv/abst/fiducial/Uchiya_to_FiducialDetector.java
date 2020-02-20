@@ -26,7 +26,6 @@ import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import georegression.geometry.UtilPoint2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Rectangle2D_F64;
@@ -101,12 +100,19 @@ implements FiducialTracker<T>
 
 		UchiyaMarkerTracker.Track track = tracker.getTracks().get(which);
 
-		UtilPoint2D_F64.bounding(track.predicted.toList(),rectangle);
+		double r = markerLength/2.0;
+		HomographyPointOps_F64.transform(track.doc_to_imagePixel,-r,-r,storage.get(0));
+		HomographyPointOps_F64.transform(track.doc_to_imagePixel, r,-r,storage.get(1));
+		HomographyPointOps_F64.transform(track.doc_to_imagePixel, r, r,storage.get(2));
+		HomographyPointOps_F64.transform(track.doc_to_imagePixel,-r, r,storage.get(3));
 
-		storage.get(0).set(rectangle.p0);
-		storage.get(1).set(rectangle.p0.x,rectangle.p1.y);
-		storage.get(2).set(rectangle.p1);
-		storage.get(3).set(rectangle.p1.x,rectangle.p0.y);
+
+//		UtilPoint2D_F64.bounding(track.predicted.toList(),rectangle);
+//
+//		storage.get(0).set(rectangle.p0);
+//		storage.get(1).set(rectangle.p0.x,rectangle.p1.y);
+//		storage.get(2).set(rectangle.p1);
+//		storage.get(3).set(rectangle.p1.x,rectangle.p0.y);
 
 		return storage;
 	}
@@ -194,5 +200,9 @@ implements FiducialTracker<T>
 
 	public LlahOperations getLlahOperations() {
 		return tracker.getTracker().getLlahOps();
+	}
+
+	public FastQueue<UchiyaMarkerTracker.Track> getTracks() {
+		return tracker.getTracks();
 	}
 }
