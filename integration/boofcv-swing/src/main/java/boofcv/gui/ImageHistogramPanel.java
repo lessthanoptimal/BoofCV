@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,7 +111,7 @@ public class ImageHistogramPanel extends JPanel {
 
 			for (int y = 0; y < image.height; y += periodY) {
 				for (int x = 0; x < image.width; x += periodX ) {
-					int index = maxIndex * (image.unsafe_get(x, y) / maxValue);
+					int index = maxIndex * image.unsafe_get(x, y) / maxValue;
 					bins[index]++;
 				}
 			}
