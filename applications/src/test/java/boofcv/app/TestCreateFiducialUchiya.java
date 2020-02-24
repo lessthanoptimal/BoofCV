@@ -62,7 +62,7 @@ class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 
 		Random rand = new Random(defaults.randomSeed);
 		for (int i = 0; i < N; i++) {
-			detector.addMarker(UchiyaMarkerGenerator.createRandomMarker(rand,30,8,defaults.dotDiameter*2.0));
+			detector.addMarker(UchiyaMarkerGenerator.createRandomMarker(rand,30,8,8,defaults.dotDiameter*2.0));
 		}
 
 		detector.detect(gray);
@@ -87,7 +87,8 @@ class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 
 		Random rand = new Random(4445);
 		for (int i = 0; i < N; i++) {
-			detector.addMarker(UchiyaMarkerGenerator.createRandomMarker(rand,22,config.markerLength ,0.3*2));
+			detector.addMarker(UchiyaMarkerGenerator.createRandomMarker(
+					rand,22,config.markerLength,config.markerLength ,0.3*2));
 		}
 
 		detector.detect(gray);

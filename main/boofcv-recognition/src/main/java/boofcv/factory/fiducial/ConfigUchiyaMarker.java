@@ -21,6 +21,7 @@ package boofcv.factory.fiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.factory.geo.ConfigRansac;
+import boofcv.factory.shape.ConfigEllipseEdgeCheck;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.Configuration;
 import boofcv.struct.ConnectRule;
@@ -42,7 +43,7 @@ public class ConfigUchiyaMarker implements Configuration {
 	/**
 	 * Specifies how images are thresholded and converted into a binary format
 	 */
-	public ConfigThreshold threshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, ConfigLength.relative(0.2,20));
+	public ConfigThreshold threshold = ConfigThreshold.local(ThresholdType.BLOCK_OTSU, ConfigLength.fixed(50));
 
 	/**
 	 * Defines the feature descriptor
@@ -60,6 +61,11 @@ public class ConfigUchiyaMarker implements Configuration {
 	public ConnectRule contourRule = ConnectRule.FOUR;
 
 	/**
+	 * Minimum number of pixels in the contour to consider
+	 */
+	public int contourMinimumLength = 8;
+
+	/**
 	 * Detector: maximum distance from the ellipse in pixels
 	 */
 	public double maxDistanceFromEllipse = 3.0;
@@ -67,20 +73,29 @@ public class ConfigUchiyaMarker implements Configuration {
 	/**
 	 * Minimum number of pixels in the minor axis
 	 */
-	public double minimumMinorAxis = 1.5;
+	public double minimumMinorAxis = 0.5;
 
 	/**
 	 * The maximum ratio between the major to minor ratio
 	 */
 	public double maxMajorToMinorRatio = 20.0;
 
+	/**
+	 * Parameters for checking the intensity of the contour along an ellipse. When using adaptive thresholding
+	 * there can be a lot of false positives
+	 */
+	public ConfigEllipseEdgeCheck checkEdge = new ConfigEllipseEdgeCheck();
+
 	{
 		// Default values taken from paper and source code
 		llah.numberOfNeighborsN = 7;
 		llah.sizeOfCombinationM = 5;
-		llah.quantizationK = 4;
+		llah.quantizationK = 32;
 		llah.hashType = ConfigLlah.HashType.AFFINE;
 		llah.hashTableSize = Integer.MAX_VALUE; // this is 31-bits and the code has 32-bits. signed vs unsigned
+
+		// This seems to handle shadows better
+		threshold.thresholdFromLocalBlocks = false;
 	}
 
 	@Override

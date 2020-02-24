@@ -49,24 +49,36 @@ public class UchiyaMarkerGenerator {
 	@Getter FastQueue<Point2D_F64> dotsAdjusted = new FastQueue<>(Point2D_F64::new);
 
 	/**
-	 * Randomly generates a marker within the allowed region. Ensures tat there is sufficient spacing between
-	 * points. The marker's center will be (0,0) with a range of -markerWidth/2 to markerWidth/2
+	 * Randomly generates a marker within the allowed region. Ensures that dots do not overlap or touch the marker's
+	 * border.
 	 *
 	 * @param rand Random number generator
 	 * @param num Number of dots
-	 * @param markerWidth Length of each side on the marker
-	 * @param minDistance The minimum distance appart two dots can be
+	 * @param markerWidth Length of the marker along the x-axis
+	 * @param markerHeight Length of the marker along the y-axis
+	 * @param dotDiameter The dot's diameter
 	 */
-	public static List<Point2D_F64> createRandomMarker(Random rand , int num , double markerWidth , double minDistance ) {
+	public static List<Point2D_F64> createRandomMarker(Random rand , int num , double markerWidth, double markerHeight , double dotDiameter ) {
 		final var points = new ArrayList<Point2D_F64>();
 		final var work = new Point2D_F64();
 
-		double tol = minDistance*minDistance;
+		// Give it a bit of extra space
+		double borderCushion = dotDiameter*0.6;
+
+		// Don't want a circle touching the marker's border
+		double effectiveWidth = markerWidth - 2*borderCushion;
+		double effectiveHeight = markerHeight - 2*borderCushion;
+
+		if( effectiveWidth <= 0 || effectiveHeight <= 0)
+			throw new IllegalArgumentException("Marker isn't wide enough for dots to not touch border");
+
+		// The edges of two circle's cant be closer than 1 diameter
+		double tol = 2*dotDiameter*dotDiameter;
 
 		int failedAttempts = 0;
-		while( failedAttempts < 100 && points.size() < num ) {
-			work.x = (rand.nextDouble()-0.5)*markerWidth;
-			work.y = (rand.nextDouble()-0.5)*markerWidth;
+		while( failedAttempts < 1000 && points.size() < num ) {
+			work.x = (rand.nextDouble()-0.5)*effectiveWidth;
+			work.y = (rand.nextDouble()-0.5)*effectiveHeight;
 
 			// See if there's a point in the list that's too close
 			boolean good = true;
@@ -95,7 +107,8 @@ public class UchiyaMarkerGenerator {
 	public void render( List<Point2D_F64> dots , double markerWidth ) {
 
 		// The length of the square the circle's centers can appear inside of
-		double drawLength = Math.min(documentRegion.width,documentRegion.height)-4*radius;
+		// We assume the dots have already been adjusted to appear entirely inside the marker
+		double drawLength = Math.min(documentRegion.width,documentRegion.height);
 
 		// nFind the shift needed to put a point in the center of the draw region
 		double regionCenterX = documentRegion.width/2;

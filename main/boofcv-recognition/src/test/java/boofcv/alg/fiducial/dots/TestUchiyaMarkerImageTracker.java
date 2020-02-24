@@ -21,6 +21,7 @@ package boofcv.alg.fiducial.dots;
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
+import boofcv.alg.shapes.ellipse.EdgeIntensityEllipse;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayU8;
@@ -46,13 +47,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TestUchiyaMarkerImageTracker {
 
 	Random rand = BoofTesting.createRandom(0);
-	double markerWidth = 90;
+	double markerWidth = 130;
+	double dotDiameter = 9;
 
 	List<List<Point2D_F64>> documents = new ArrayList<>();
 
 	public TestUchiyaMarkerImageTracker() {
 		for (int i = 0; i < 20; i++) {
-			documents.add( UchiyaMarkerGeneratorImage.createRandomMarker(rand,20,markerWidth,15));
+			documents.add( UchiyaMarkerGeneratorImage.createRandomMarker(rand,20,markerWidth,markerWidth,dotDiameter));
 		}
 	}
 
@@ -61,8 +63,8 @@ class TestUchiyaMarkerImageTracker {
 		int targetID = 3;
 
 		var generator = new UchiyaMarkerGeneratorImage();
-		generator.setRadius(5);
-		generator.configure(200,200,50);
+		generator.setRadius(dotDiameter/2.0);
+		generator.configure(200,200,30);
 		generator.render(documents.get(targetID),markerWidth);
 
 		List<Point2D_F64> centers = generator.getDotsAdjusted().toList();
@@ -77,13 +79,15 @@ class TestUchiyaMarkerImageTracker {
 		for( var doc : documents ) {
 			tracker.llahOps.createDocument(doc);
 		}
-		var trackerImage = new UchiyaMarkerImageTracker<>(inputToBinary,ellipseDetector,tracker);
+		var check = new EdgeIntensityEllipse<>(1.5,20,20, GrayU8.class);
+		var trackerImage = new UchiyaMarkerImageTracker<>(inputToBinary,ellipseDetector,check,tracker);
 
 		// Test it on rotated images
 		for (int trial = 0; trial <= 4; trial++) {
 			double angle = 0.2*trial;
 			new FDistort(pattern,rotated).rotate(angle).apply();
 
+//			ShowImages.showBlocking(rotated,"Rotated",5_000);
 			trackerImage.detect(rotated);
 
 			// There should be one detected dot for each true dot. They should also be close to each other

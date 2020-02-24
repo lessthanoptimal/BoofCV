@@ -110,7 +110,7 @@ public class CreateFiducialUchiya extends BaseFiducialSquare {
 
 	@Override
 	protected void callRenderPdf(CreateFiducialDocumentPDF renderer) throws IOException {
-		((CreateUchiyaDocumentPDF)renderer).render(markers,randomSeed);
+		((CreateUchiyaDocumentPDF)renderer).render(markers,numberOfDots,randomSeed);
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public class CreateFiducialUchiya extends BaseFiducialSquare {
 		Random rand = new Random(randomSeed);
 		for( int i = 0; i < totalUnique; i++ ) {
 			List<Point2D_F64> marker = UchiyaMarkerGenerator.createRandomMarker(rand,
-					numberOfDots, markerWidth, dotDiameter * 2.0);
+					numberOfDots, markerWidth, markerWidth,dotDiameter * 2.0);
 			markers.add( marker );
 		}
 	}

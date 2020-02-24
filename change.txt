@@ -34,6 +34,9 @@ Version : 0.36
   * More informative error message when encoding a QR Code
   * Fixed incorrect conversion from bits to bytes. Can sometimes store more data!
   * Thanks phillip-fry for reporting the problem
+- Added Uchiya Markers (Random Dot)
+  * TODO add more controls to demo app
+  * TODO create regression tests
 - PointTracker
   * Added frameID for each processed frame
   * Added spawnFrameID to tracks

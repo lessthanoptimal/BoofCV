@@ -29,6 +29,7 @@ import boofcv.alg.fiducial.qrcode.QrCodePositionPatternDetector;
 import boofcv.alg.fiducial.square.DetectFiducialSquareBinary;
 import boofcv.alg.fiducial.square.DetectFiducialSquareImage;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
+import boofcv.alg.shapes.ellipse.EdgeIntensityEllipse;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
@@ -232,6 +233,12 @@ public class FactoryFiducial {
 		ellipseDetector.setMaxDistanceFromEllipse(config.maxDistanceFromEllipse);
 		ellipseDetector.setMinimumMinorAxis(config.minimumMinorAxis);
 		ellipseDetector.setMaxMajorToMinorRatio(config.maxMajorToMinorRatio);
+		ellipseDetector.setMinimumContour(config.contourMinimumLength);
+
+		EdgeIntensityEllipse<T> check = new EdgeIntensityEllipse<>(
+				config.checkEdge.checkRadialDistance,
+				config.checkEdge.numSampleContour,
+				config.checkEdge.minimumEdgeIntensity, imageType);
 
 		InputToBinary<T> inputToBinary = FactoryThresholdBinary.threshold(config.threshold,imageType);
 
@@ -248,7 +255,7 @@ public class FactoryFiducial {
 		var ransac = FactoryMultiViewRobust.homographyRansac(new ConfigHomography(false), config.ransac);
 		UchiyaMarkerTracker uchiya = new UchiyaMarkerTracker(ops,ransac);
 
-		UchiyaMarkerImageTracker<T> tracker = new UchiyaMarkerImageTracker<>(inputToBinary,ellipseDetector,uchiya);
+		UchiyaMarkerImageTracker<T> tracker = new UchiyaMarkerImageTracker<>(inputToBinary,ellipseDetector,check,uchiya);
 
 		return new Uchiya_to_FiducialDetector<T>(tracker, config.markerLength, ImageType.single(imageType));
 	}

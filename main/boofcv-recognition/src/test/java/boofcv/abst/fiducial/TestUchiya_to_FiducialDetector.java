@@ -50,7 +50,7 @@ class TestUchiya_to_FiducialDetector extends GenericFiducialTrackerChecks {
 		types.add( ImageType.single(GrayF32.class));
 
 		for (int i = 0; i < 20; i++) {
-			documents.add( UchiyaMarkerGeneratorImage.createRandomMarker(rand,20, markerLength,15));
+			documents.add( UchiyaMarkerGeneratorImage.createRandomMarker(rand,20, markerLength,markerLength,11));
 		}
 	}
 

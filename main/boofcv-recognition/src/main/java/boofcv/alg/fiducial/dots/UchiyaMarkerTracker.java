@@ -87,6 +87,14 @@ public class UchiyaMarkerTracker {
 	// LLAH dictionary for tracks in the previous frame
 	LlahOperations llahTrackingOps;
 
+	// Internal profiling
+	/** Time to track objects */
+	@Getter double timeTrack;
+	/** Time to detect objects */
+	@Getter double timeDetect;
+	/** Time to update track descriptions */
+	@Getter double timeUpdate;
+
 	// Used to compute homography
 	Ransac<Homography2D_F64, AssociatedPair> ransac;
 	RefineEpipolar refineHomography = FactoryMultiView.homographyRefine(0.01,50, EpipolarError.SAMPSON);
@@ -128,9 +136,17 @@ public class UchiyaMarkerTracker {
 		currentTracks.reset();
 		globalId_to_track.clear();
 
+		double nano0 = System.nanoTime();
 		performTracking(detectedDots);
+		double nano1 = System.nanoTime();
 		performDetection(detectedDots);
+		double nano2 = System.nanoTime();
 		setTrackDescriptionsAndID();
+		double nano3 = System.nanoTime();
+
+		this.timeTrack  = (nano1-nano0)*1e-6;
+		this.timeDetect = (nano2-nano1)*1e-6;
+		this.timeUpdate = (nano3-nano2)*1e-6;
 	}
 
 	/**

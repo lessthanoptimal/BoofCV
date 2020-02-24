@@ -106,13 +106,13 @@ public class CreateUchiyaDocumentPDF extends CreateFiducialDocumentPDF {
 		pcs.closeAndStroke();
 	}
 
-	public void render(List<List<Point2D_F64>> markers , long seed ) throws IOException {
+	public void render(List<List<Point2D_F64>> markers , int maxDots, long seed ) throws IOException {
 		this.markers = markers;
 
 		totalMarkers = markers.size();
 		names = new ArrayList<>();
 		for (int i = 0; i < markers.size(); i++) {
-			names.add(String.format("ID %d Seed 0x%4X",i,seed));
+			names.add(String.format("ID: %d N: %d Seed: 0x%4X",i,maxDots,seed));
 		}
 
 		render();

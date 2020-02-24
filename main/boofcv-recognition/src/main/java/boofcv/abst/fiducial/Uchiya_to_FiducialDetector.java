@@ -28,13 +28,13 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
-import georegression.struct.shapes.Rectangle2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
-import gnu.trove.map.hash.TIntDoubleHashMap;
 import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.FastQueue;
 
 import javax.annotation.Nullable;
+import java.io.PrintStream;
 import java.util.List;
 
 /**
@@ -50,18 +50,16 @@ implements FiducialTracker<T>
 
 	@Getter UchiyaMarkerImageTracker<T> tracker;
 
+	/** If not null timing information will be printed */
+	@Setter PrintStream printTiming;
+
 	// Length of a side on the marker.
 	final double markerLength;
 
 	// Storage
 	final FastQueue<Point2D3D> control3D = new FastQueue<>(Point2D3D::new);
 
-	// Compute and save the radius of each document
-	final TIntDoubleHashMap docToRadius = new TIntDoubleHashMap();
-
 	// Local work space
-	final Point2D_F64 center = new Point2D_F64();
-	final Rectangle2D_F64 rectangle = new Rectangle2D_F64();
 	final Point2D_F64 norm = new Point2D_F64();
 
 	public Uchiya_to_FiducialDetector(UchiyaMarkerImageTracker<T> tracker, double markerLength, ImageType<T> imageType ) {
@@ -73,6 +71,17 @@ implements FiducialTracker<T>
 	@Override
 	public void detect(T input) {
 		tracker.detect(input);
+
+		final PrintStream out = this.printTiming;
+		if( out != null ) {
+			double timeTrack  = tracker.getTracker().getTimeTrack();
+			double timeDetect = tracker.getTracker().getTimeDetect();
+			double timeUpdate = tracker.getTracker().getTimeUpdate();
+
+			out.printf(" Uchiya: BI %5.1f EL %5.1f ER %5.1f TR %5.1f DET %5.1f UP %5.1f\n",
+					tracker.getTimeBinary(),tracker.getTimeEllipse(),tracker.getTimeReject(),
+					timeTrack, timeDetect, timeUpdate );
+		}
 	}
 
 	@Override
@@ -105,14 +114,6 @@ implements FiducialTracker<T>
 		HomographyPointOps_F64.transform(track.doc_to_imagePixel, r,-r,storage.get(1));
 		HomographyPointOps_F64.transform(track.doc_to_imagePixel, r, r,storage.get(2));
 		HomographyPointOps_F64.transform(track.doc_to_imagePixel,-r, r,storage.get(3));
-
-
-//		UtilPoint2D_F64.bounding(track.predicted.toList(),rectangle);
-//
-//		storage.get(0).set(rectangle.p0);
-//		storage.get(1).set(rectangle.p0.x,rectangle.p1.y);
-//		storage.get(2).set(rectangle.p1);
-//		storage.get(3).set(rectangle.p1.x,rectangle.p0.y);
 
 		return storage;
 	}

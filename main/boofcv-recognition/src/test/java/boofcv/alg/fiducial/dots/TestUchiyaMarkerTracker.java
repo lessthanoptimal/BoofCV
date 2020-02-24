@@ -56,7 +56,7 @@ class TestUchiyaMarkerTracker {
 
 	public TestUchiyaMarkerTracker() {
 		for (int i = 0; i < 20; i++) {
-			documents.add( UchiyaMarkerGeneratorImage.createRandomMarker(rand,20,90,15));
+			documents.add( UchiyaMarkerGeneratorImage.createRandomMarker(rand,20,120,120,5));
 		}
 	}
 

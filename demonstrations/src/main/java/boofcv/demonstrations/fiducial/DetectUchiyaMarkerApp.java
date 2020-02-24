@@ -20,6 +20,7 @@ package boofcv.demonstrations.fiducial;
 
 import boofcv.abst.fiducial.Uchiya_to_FiducialDetector;
 import boofcv.abst.filter.binary.BinaryContourInterface;
+import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
@@ -27,6 +28,7 @@ import boofcv.demonstrations.shapes.DetectBlackShapeAppBase;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.demonstrations.shapes.ShapeVisualizePanel;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.fiducial.ConfigUchiyaMarker;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.gui.BoofSwingUtil;
@@ -35,9 +37,11 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.io.UtilIO;
+import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.fiducial.FiducialIO;
 import boofcv.io.fiducial.UchiyaDefinition;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
@@ -48,15 +52,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.FastQueue;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -74,14 +73,16 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase<T>
 {
-	// TODO draw dots
 	// TODO Add controls for settings
 	// TODO list all markers found
 
+	CameraPinholeBrown intrinsic;
 	ConfigUchiyaMarker config = new ConfigUchiyaMarker();
+	File fileDefinitions = new File("."); // used to see if the definition was already loaded
 
 	//------------ BEGIN LOCK
 	final Object lockTracker = new Object();
+	boolean addingMarkers=false;
 	Uchiya_to_FiducialDetector<T> tracker;
 	UchiyaDefinition definition;
 	FastQueue<DetectInfo> detections = new FastQueue<>(DetectInfo::new);
@@ -98,16 +99,37 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 
 	@Override
 	protected void createDetector(boolean initializing) {
-		synchronized (lockTracker) {
-			if( definition == null ) {
-				return;
-			}
-			config.markerLength = definition.markerWidth;
-			tracker = FactoryFiducial.uchiya(config, imageClass);
-			for (int i = 0; i < definition.markers.size(); i++) {
-				tracker.addMarker(definition.markers.get(i));
-			}
+		if( addingMarkers ) {
+			JOptionPane.showMessageDialog(this,"BUG: Still adding markers");
+			return;
 		}
+		if( definition == null ) {
+			return;
+		}
+		config.markerLength = definition.markerWidth;
+		var tracker = FactoryFiducial.uchiya(config, imageClass);
+		tracker.setPrintTiming(System.out);
+		if( intrinsic != null ) {
+			LensDistortionNarrowFOV lens = LensDistortionFactory.narrow(intrinsic);
+			tracker.setLensDistortion(lens,intrinsic.width, intrinsic.height);
+		}
+		addingMarkers = true;
+		new Thread(()->addAllMarkers(tracker)).start();
+	}
+
+	// TODO turn off controls
+	// TODO avoid reloading if a regular control was changed
+	protected void addAllMarkers( Uchiya_to_FiducialDetector<T> tracker ) {
+		SwingUtilities.invokeLater(()->setMenuBarEnabled(false));
+		for (int i = 0; i < definition.markers.size(); i++) {
+			tracker.addMarker(definition.markers.get(i));
+		}
+		SwingUtilities.invokeLater(()->setMenuBarEnabled(true));
+		synchronized (lockTracker) {
+			this.tracker = tracker;
+			addingMarkers = false;
+		}
+		reprocessImageOnly();
 	}
 
 	@Override
@@ -127,8 +149,10 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 			synchronized (lockTracker) {
 				definition = FiducialIO.loadUchiyaYaml(file);
 			}
+			fileDefinitions = file;
 			createDetector(false);
-		} catch (IOException e) {
+		} catch (RuntimeException e) {
+			e.printStackTrace();
 			JOptionPane.showMessageDialog(this, "Failed to read Uchiya YAML definition");
 		}
 	}
@@ -145,9 +169,16 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 			try {
 				String path = URLDecoder.decode(url.getPath(), "UTF-8");
 				File directory = new File(path).getParentFile();
-				File fileDef = new File(directory, "uchiya_description.yaml");
-				if (fileDef.exists()) {
-					System.out.println("Found uchiya_description");
+
+				File fileIntrinsic = new File(directory,"intrinsic.yaml");
+				if( fileIntrinsic.exists() ) {
+					intrinsic = CalibrationIO.load(fileIntrinsic);
+				} else {
+					intrinsic = null;
+				}
+
+				File fileDef = new File(directory, "uchiya.yaml");
+				if (fileDef.exists() && !fileDefinitions.getAbsolutePath().equals(fileDef.getAbsolutePath())) {
 					loadDefinition(fileDef);
 				}
 			} catch (UnsupportedEncodingException e) {
@@ -163,12 +194,22 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 			work = ConvertBufferedImage.checkDeclare(buffered, work);
 		}
 
+		// don't process the image if it's still loading the definitions file
+		synchronized (lockTracker) {
+			if( addingMarkers ) {
+				detections.reset();
+				SwingUtilities.invokeLater(()->{
+					guiImage.setImage(original);
+					guiImage.repaint();
+				});
+				return;
+			}
+		}
+
 		// After the tracker has been declared this is the only function which manipulates it
 		final Uchiya_to_FiducialDetector<T> tracker = this.tracker;
-		if( tracker == null ) {
-			System.err.println("Tried to process an image with no tracker");
-			return;
-		}
+		if( tracker == null ) return;
+
 		long before = System.nanoTime();
 		synchronized (tracker) { // ok some GUI operations do read directly from this specific instance of the tracker
 			tracker.detect((T) input);
@@ -185,6 +226,10 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 				d.id = (int)tracker.getId(i);
 				tracker.getBounds(i,d.bounds);
 				tracker.getCenter(i,d.center);
+
+				if( tracker.is3D() ) {
+					tracker.getFiducialToCamera(i,d.markerToCamera);
+				}
 
 				var track = tracker.getTracks().get(i);
 				d.dots.copyAll((List)track.observed.toList(),(src,dst)-> dst.set(src));
@@ -224,23 +269,26 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		reprocessImageOnly();
 	}
 
-	class ControlPanel extends DetectBlackShapePanel implements ActionListener, ChangeListener{
+	class ControlPanel extends DetectBlackShapePanel implements LlahControlPanel.Listener {
 		boolean showBounds = true;
 		boolean showID = true;
 		boolean showCenter = false;
 		boolean showEllipses = false;
 		boolean showDots = false;
 		boolean showContour = false;
+		boolean show3D = true;
 
-		JComboBox<String> comboView = combo(selectedView,"Input","Binary","Black");
-		JCheckBox checkBounds = checkbox("Show Bounds",showBounds);
-		JCheckBox checkID = checkbox("Show ID",showID);
-		JCheckBox checkCenter = checkbox("Show Center",showCenter);
-		JCheckBox checkEllipses = checkbox("Show Ellipses",showEllipses);
-		JCheckBox checkDots = checkbox("Show Dots",showDots);
-		JCheckBox checkContour = checkbox("Show Contour",showContour);
+		final JComboBox<String> comboView = combo(selectedView,"Input","Binary","Black");
+		final JCheckBox checkBounds = checkbox("Show Bounds",showBounds);
+		final JCheckBox checkID = checkbox("Show ID",showID);
+		final JCheckBox checkCenter = checkbox("Show Center",showCenter);
+		final JCheckBox checkEllipses = checkbox("Show Ellipses",showEllipses);
+		final JCheckBox checkDots = checkbox("Show Dots",showDots);
+		final JCheckBox checkContour = checkbox("Show Contour",showContour);
+		final JCheckBox check3D = checkbox("Show 3D",show3D);
 
-		ThresholdControlPanel thresholdPanel = new ThresholdControlPanel(DetectUchiyaMarkerApp.this,config.threshold);
+		final ThresholdControlPanel thresholdPanel = new ThresholdControlPanel(DetectUchiyaMarkerApp.this,config.threshold);
+		final LlahControlPanel llahPanel = new LlahControlPanel(this,config.llah);
 
 		public ControlPanel() {
 			thresholdPanel.addHistogramGraph();
@@ -256,52 +304,73 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 			addAlignLeft(checkEllipses);
 			addAlignLeft(checkDots);
 			addAlignLeft(checkContour);
+			addAlignLeft(check3D);
+			add(llahPanel);
 			add(thresholdPanel);
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == comboView ) {
+		public void controlChanged(Object source) {
+			if( source == comboView ) {
 				selectedView = comboView.getSelectedIndex();
 				viewUpdated(); return;
-			} else if( e.getSource() == checkBounds ) {
+			} else if( source == checkBounds ) {
 				showBounds = checkBounds.isSelected();
-			} else if( e.getSource() == checkID ) {
+			} else if( source == checkID ) {
 				showID = checkID.isSelected();
-			} else if( e.getSource() == checkCenter ) {
+			} else if( source == checkCenter ) {
 				showCenter = checkCenter.isSelected();
-			} else if( e.getSource() == checkEllipses ) {
+			} else if( source == checkEllipses ) {
 				showEllipses = checkEllipses.isSelected();
-			} else if( e.getSource() == checkDots ) {
+			} else if( source == checkDots ) {
 				showDots = checkDots.isSelected();
-			} else if( e.getSource() == checkContour ) {
+			} else if( source == checkContour ) {
 				showContour = checkContour.isSelected();
+			} else if( source == check3D ) {
+				show3D = check3D.isSelected();
+			} else if( source == selectZoom ) {
+				zoom = ((Number) selectZoom.getValue()).doubleValue();
+				guiImage.setScale(zoom);
 			}
 			gui.repaint();
 		}
 
 		@Override
-		public void stateChanged(ChangeEvent e) {
-			if( e.getSource() == selectZoom ) {
-				zoom = ((Number) selectZoom.getValue()).doubleValue();
-				guiImage.setScale(zoom);
-				gui.repaint();
-			}
+		public void configLlahChanged() {
+			createDetector(false);
+			reprocessImageOnly();
 		}
 	}
 
 	class VisualizePanel extends ShapeVisualizePanel {
+
+		final Font largeFont = new Font("Serif", Font.BOLD, 42);
+		final Font idFont = new Font("Serif", Font.BOLD, 24);
+		final Color bgColor = new Color(0,0,0,130);
+
+		@Override
+		protected void paintOverPanel(Graphics2D g2) {
+			if( addingMarkers ) {
+				g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+				g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+				float x = (float)((getWidth())/8.0-transX);
+				float y = (float)((getHeight())/2.0-transY);
+				g2.setFont(largeFont);
+				g2.setColor(Color.ORANGE);
+				g2.drawString("Loading Definitions",x,y);
+			}
+		}
 
 		@Override
 		protected void paintInPanel(AffineTransform tran, Graphics2D g2) {
 			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-			synchronized (lockTracker) {
-				final Uchiya_to_FiducialDetector<T> tracker = DetectUchiyaMarkerApp.this.tracker;
-				if( tracker == null )
-					return;
+			final Uchiya_to_FiducialDetector<T> tracker = DetectUchiyaMarkerApp.this.tracker;
+			if( tracker == null ) return;
 
+			synchronized (lockTracker) {
 				if (controlPanel.showContour) {
 					synchronized (tracker) {
 						BinaryContourInterface contour = tracker.getTracker().getEllipseDetector().getContourFinder();
@@ -319,7 +388,8 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 								tracker.getTracker().getEllipseDetector().getFound();
 						for (int i = 0; i < ellipses.size(); i++) {
 							var e = ellipses.get(i);
-							VisualizeShapes.drawEllipse(e.ellipse,scale,g2);
+							if( e.ellipse.a > 0 )
+								VisualizeShapes.drawEllipse(e.ellipse,scale,g2);
 						}
 					}
 				}
@@ -335,7 +405,6 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 					}
 				}
 
-				// TODO remove this option
 				if (controlPanel.showCenter) {
 					for (int i = 0; i < detections.size; i++) {
 						Point2D_F64 p = detections.get(i).center;
@@ -350,18 +419,25 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 					}
 				}
 
-				// TODO Draw a background color to make it visible
 				if (controlPanel.showID) {
 					for (int i = 0; i < detections.size; i++) {
 						int id = detections.get(i).id;
 						Point2D_F64 center = detections.get(i).center;
-						VisualizeFiducial.drawLabel(center,""+id,g2, scale);
+						VisualizeFiducial.drawLabel(center,""+id, idFont,Color.ORANGE,bgColor,g2, scale);
+					}
+				}
+
+				if( controlPanel.show3D && tracker.is3D() && intrinsic != null ) {
+					for (int i = 0; i < detections.size; i++) {
+						VisualizeFiducial.drawCube(detections.get(i).markerToCamera,
+								intrinsic,definition.markerWidth,4,g2);
 					}
 				}
 			}
 		}
 	}
 
+	// Copy of tracker data so that we don't have to lock the tracker when rendering this data, at least.
 	public static class DetectInfo {
 		int id;
 		final Polygon2D_F64 bounds = new Polygon2D_F64();
@@ -378,11 +454,13 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 
 	public static void main(String[] args) {
 		List<String> examples = new ArrayList<>();
+		examples.add(UtilIO.pathExample("fiducial/uchiya/image00.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/uchiya/image01.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/uchiya/image02.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/uchiya/image03.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/uchiya/image04.jpg"));
-		examples.add(UtilIO.pathExample("fiducial/qrcode/movie.mp4"));
+		examples.add(UtilIO.pathExample("fiducial/uchiya/image05.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/uchiya/movie.mp4"));
 
 		SwingUtilities.invokeLater(()->{
 			var app = new DetectUchiyaMarkerApp<>(examples, GrayU8.class);

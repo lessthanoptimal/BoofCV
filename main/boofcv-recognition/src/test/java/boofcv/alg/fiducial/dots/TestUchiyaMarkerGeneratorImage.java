@@ -40,8 +40,8 @@ class TestUchiyaMarkerGeneratorImage {
 	 */
 	@Test
 	void render() {
-		render(120, 120);
-		render(120, 80);
+		render(200, 200);
+		render(200, 180);
 	}
 
 	private void render(int width, int height) {
@@ -56,15 +56,13 @@ class TestUchiyaMarkerGeneratorImage {
 		points.add( new Point2D_F64(30,50));
 		double markerWidth = 100;
 
-		alg.configure(width,height,5);
+		alg.configure(width,height,40);
 		alg.setRadius(7);
 		alg.render(points,markerWidth);
 
 		GrayU8 image = alg.getImage();
 		assertEquals(width, image.width);
 		assertEquals(height, image.height);
-
-		int length = Math.min(width,height);
 
 //		ShowImages.showBlocking(image,"Tada", 5_000);
 
@@ -89,9 +87,6 @@ class TestUchiyaMarkerGeneratorImage {
 		double dist12 = found.get(1).center.distance(found.get(2).center);
 		double dist23 = found.get(2).center.distance(found.get(3).center);
 		double dist30 = found.get(3).center.distance(found.get(0).center);
-
-		// should be spread out. width-2*border-2*radius * relative distance
-		assertEquals((length-6*7)*(4.0/10.0),dist01,2);
 
 		assertEquals(dist01, dist12, 2);
 		assertEquals(dist01, dist23, 2);
