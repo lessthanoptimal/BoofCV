@@ -217,6 +217,9 @@ public class ImageZoomPanel extends JScrollPane {
 		// intentionally empty
 	}
 
+	/** Called very last when you don't want to draw in image coordinates */
+	protected void paintOverPanel( Graphics2D g2 ) {}
+
 	public class ImagePanel extends JPanel
 	{
 		SaveImageOnClick mouseListener = new SaveImageOnClick(ImageZoomPanel.this.getViewport());
@@ -231,8 +234,10 @@ public class ImageZoomPanel extends JScrollPane {
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
 
-
-			if( img == null ) return;
+			if( img == null ) {
+				paintOverPanel((Graphics2D)g);
+				return;
+			}
 
 			if( hasImageChanged ) {
 				hasImageChanged = false;
@@ -267,6 +272,8 @@ public class ImageZoomPanel extends JScrollPane {
 			g2.setTransform(orig);
 
 			g.drawImage(buffer,(int)-transX,(int)-transY,null);
+
+			paintOverPanel((Graphics2D)g);
 		}
 	}
 

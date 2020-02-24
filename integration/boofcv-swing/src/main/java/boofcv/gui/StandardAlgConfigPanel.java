@@ -22,8 +22,10 @@ import boofcv.struct.ConfigLength;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 
@@ -32,7 +34,7 @@ import java.text.DecimalFormat;
  *
  * @author Peter Abeles
  */
-public class StandardAlgConfigPanel extends JPanel {
+public class StandardAlgConfigPanel extends JPanel implements ActionListener, ChangeListener {
 
 	public StandardAlgConfigPanel() {
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
@@ -45,6 +47,17 @@ public class StandardAlgConfigPanel extends JPanel {
 		control.setLengthBounds(min,max);
 		control.setMaximumSize(control.getPreferredSize());
 		return control;
+	}
+
+	protected JButton button( String name , boolean enabled ) {
+		return button(name,enabled,(ActionListener)this);
+	}
+
+	protected JButton button( String name , boolean enabled , ActionListener listener ) {
+		JButton b = new JButton(name);
+		b.setEnabled(enabled);
+		b.addActionListener(listener);
+		return b;
 	}
 
 	protected JSlider slider( int min , int max , int initial , int widgetWidth ) {
@@ -239,7 +252,7 @@ public class StandardAlgConfigPanel extends JPanel {
 		owner.add(p);
 	}
 
-	public static JPanel createHorizontalPanel( JComponent ...children ) {
+	public static JPanel createHorizontalPanel( Component ...children ) {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
 		for( var c : children ) {
@@ -325,4 +338,21 @@ public class StandardAlgConfigPanel extends JPanel {
 	}
 
 
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		controlChanged(e.getSource());
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		controlChanged(e.getSource());
+	}
+
+	/**
+	 * In almost all situations we just need to know that the state of a control has changed. No need to implement
+	 * seperate listeners for all
+	 */
+	public void controlChanged( Object source ) {
+		throw new RuntimeException("You need to override controlChanges() or implement actionPerformed()/stateChanged()");
+	}
 }

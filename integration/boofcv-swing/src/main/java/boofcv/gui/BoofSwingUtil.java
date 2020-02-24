@@ -442,6 +442,19 @@ public class BoofSwingUtil {
 		}
 	}
 
+	public static JPanel gridPanel( int cols , Component ...children ) {
+		return gridPanel(0,2,0,0,children);
+	}
+
+	public static JPanel gridPanel( int rows, int cols , int hgap, int vgap, Component ...children ) {
+		JPanel panel = new JPanel(new GridLayout(rows,cols,hgap,vgap));
+		for (int i = 0; i < children.length; i++) {
+			panel.add( children[i] );
+		}
+		panel.setMaximumSize(panel.getPreferredSize());
+		return panel;
+	}
+
 	public static JFormattedTextField createTextField( int current , int min , int max ) {
 		NumberFormat format = NumberFormat.getInstance();
 		NumberFormatter formatter = new NumberFormatter(format);

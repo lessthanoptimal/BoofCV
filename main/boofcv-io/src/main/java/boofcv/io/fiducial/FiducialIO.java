@@ -75,11 +75,15 @@ public class FiducialIO {
 		createYmlObject().dump(map,out);
 	}
 
-	public static UchiyaDefinition loadUchiyaYaml( File file ) throws IOException {
-		FileReader reader = new FileReader(file);
-		UchiyaDefinition ret = loadUchiyaYaml(reader);
-		reader.close();
-		return ret;
+	public static UchiyaDefinition loadUchiyaYaml( File file ) {
+		try {
+			FileReader reader = new FileReader(file);
+			UchiyaDefinition ret = loadUchiyaYaml(reader);
+			reader.close();
+			return ret;
+		} catch( IOException e ) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

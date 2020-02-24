@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,6 +35,7 @@ import java.awt.geom.Rectangle2D;
 public class VisualizeFiducial {
 
 	private static final Font font = new Font("Serif", Font.BOLD, 24);
+	private static final Color black130 = new Color(0,0,0,130);
 
 	/**
 	 * Draws a flat cube to show where the square fiducial is on the image
@@ -65,12 +66,31 @@ public class VisualizeFiducial {
 
 	public static void drawLabel( Point2D_F64 locationPixel , String label, Graphics2D g2, double scale )
 	{
+		drawLabel(locationPixel,label,font,Color.ORANGE,black130,g2,scale);
+	}
+
+	public static void drawLabel( Point2D_F64 locationPixel , String label,
+								  Font font, Color cText , Color cBackground,
+								  Graphics2D g2, double scale )
+	{
 		// Draw the ID number approximately in the center
 		FontMetrics metrics = g2.getFontMetrics(font);
 		Rectangle2D r = metrics.getStringBounds(label,null);
-		g2.setColor(Color.ORANGE);
+
+		double extra = 5;
+		double w = r.getWidth();
+		double h = r.getHeight();
+		double tx = - r.getCenterX();
+		double ty = - r.getCenterY();
+
+		int rx = (int)(scale*locationPixel.x+tx-extra-r.getX()/4+0.5);
+		int ry = (int)(scale*locationPixel.y+ty-extra-h-r.getY()/4+0.5);
+
+		g2.setColor(cBackground);
+		g2.fillRoundRect(rx,ry,(int)(w+extra*2),(int)(h+extra*2),(int)(2*extra),(int)(2*extra));
+		g2.setColor(cText);
 		g2.setFont(font);
-		g2.drawString(label,(float)(scale*locationPixel.x-r.getWidth()/2),(float)(scale*locationPixel.y+r.getHeight()/2));
+		g2.drawString(label,(float)(scale*locationPixel.x+tx),(float)(scale*locationPixel.y+ty));
 	}
 
 	public static void drawCube(Se3_F64 targetToCamera, CameraPinholeBrown intrinsic, double width,

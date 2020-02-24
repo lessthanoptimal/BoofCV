@@ -110,6 +110,15 @@ public class UtilIO {
 		return url;
 	}
 
+	public static String ensureFilePath(String path ) {
+		URL url = ensureURL(path);
+		try {
+			return URLDecoder.decode(url.getPath(), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			return null;
+		}
+	}
+
 	/**
 	 * Jar paths don't work if they include up directory. this wills trip those out.
 	 */

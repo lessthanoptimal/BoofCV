@@ -53,7 +53,7 @@ public class BaseIntegralEdge<T extends ImageGray<T>> {
 	 * in undistorted coordinates this code needs to know how to go from undistorted back into distorted
 	 * image coordinates in order to read the pixel's value.
 	 *
-	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image..
+	 * @param undistToDist Pixel transformation from undistorted pixels into the actual distorted input image.
 	 */
 	public void setTransform( PixelTransform<Point2D_F32> undistToDist ) {
 		if( undistToDist != null ) {
