@@ -126,8 +126,10 @@ public class VisualizeFiducial {
 		Point2D_F64 p = new Point2D_F64();
 		WorldToCameraToPixel transform = PerspectiveOps.createWorldToPixel(intrinsic,targetToCamera);
 		for (int i = 0; i < 8; i++) {
-			if( !transform.transform(corners[i],p) )
-				throw new RuntimeException("Crap");
+			if( !transform.transform(corners[i],p) ) {
+				System.err.println("Crap transform failed in drawCube!");
+				return;
+			}
 			pixel[i] = p.copy();
 		}
 
