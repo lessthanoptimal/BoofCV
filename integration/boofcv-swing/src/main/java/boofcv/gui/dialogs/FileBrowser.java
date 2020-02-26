@@ -20,6 +20,7 @@ package boofcv.gui.dialogs;
 
 import boofcv.gui.BoofSwingUtil;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -46,7 +47,7 @@ import static javax.swing.text.DefaultCaret.ALWAYS_UPDATE;
  */
 public class FileBrowser extends JSpringPanel {
 	// field containing the file name
-	JTextArea fileName;
+	JTextArea textFileName;
 	// Path from root to current directory
 	JComboBox<String> directoryPath;
 	// list of child files and directories
@@ -64,23 +65,27 @@ public class FileBrowser extends JSpringPanel {
 	// Used to specify which files should be displayed
 	java.util.List<javax.swing.filechooser.FileFilter> filters = new ArrayList<>();
 
-	public FileBrowser( File directory , Listener listener) {
+	/**
+	 *
+	 * @param providedFileName If not null then this "provided" will be updated but not added to the browser's GUI
+	 */
+	public FileBrowser(File directory , @Nullable JTextArea providedFileName, Listener listener) {
 		this.listener = listener;
 
 		directory = directory.getAbsoluteFile();
 		if( directory.isDirectory() && directory.getName().equals(".")) {
 			directory = directory.getParentFile();
 		}
-		fileName = new JTextArea();
-		DefaultCaret caret = (DefaultCaret)fileName.getCaret();
-		caret.setUpdatePolicy(ALWAYS_UPDATE);
-		fileName.setRows(1);
-		fileName.setEditable(false);
-		fileName.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-
-		JScrollPane nameScrollPane = new JScrollPane(fileName);
-		nameScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		nameScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		if( providedFileName == null ) {
+			textFileName = new JTextArea();
+			DefaultCaret caret = (DefaultCaret) textFileName.getCaret();
+			caret.setUpdatePolicy(ALWAYS_UPDATE);
+			textFileName.setRows(1);
+			textFileName.setEditable(false);
+			textFileName.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+		} else {
+			textFileName = providedFileName;
+		}
 
 		directoryPath = new JComboBox<>();
 		fileList = new JList<>(listModel);
@@ -96,7 +101,7 @@ public class FileBrowser extends JSpringPanel {
 						setDirectory(selected);
 					} else {
 						setSelectedName(selected);
-						listener.handleClickedFile(selected);
+						listener.handleDoubleClickedFile(selected);
 					}
 				}
 			}});
@@ -107,15 +112,27 @@ public class FileBrowser extends JSpringPanel {
 
 		JPanel navigationPanel = createNavigationPanel();
 
-//            fileName.setPreferredSize(new Dimension(1,25));
 		JPanel directoryRow = new JPanel();
 		directoryRow.setLayout(new BoxLayout(directoryRow, BoxLayout.X_AXIS));
 		directoryRow.add(new JLabel("Location"));
 		directoryRow.add(Box.createHorizontalStrut(5));
 		directoryRow.add(directoryPath);
 
-		constrainWestNorthEast(nameScrollPane,null,5,5);
-		constrainWestNorthEast(directoryRow,nameScrollPane,5,5);
+		if( providedFileName == null ) {
+			// Put it into a horizontal panel and have text letting the user know this is just the file name
+			JPanel panel = new JPanel();
+			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+			JScrollPane nameScrollPane = new JScrollPane(textFileName);
+			nameScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+			nameScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+			panel.add( new JLabel("Name"));
+			panel.add(Box.createHorizontalStrut(5));
+			panel.add(nameScrollPane);
+			constrainWestNorthEast(panel, null, 5,5);
+			constrainWestNorthEast(directoryRow, panel, 5, 5);
+		} else {
+			constrainWestNorthEast(directoryRow, null, 5, 5);
+		}
 		constrainWestNorthEast(navigationPanel,directoryRow,5,5);
 		constrainWestNorthEast(scrollList,navigationPanel,5,5);
 		layout.putConstraint(SpringLayout.SOUTH, scrollList, -5, SpringLayout.SOUTH, this);
@@ -185,7 +202,7 @@ public class FileBrowser extends JSpringPanel {
 		JButton bUp = BoofSwingUtil.createButtonIconGUI("Up24.gif",26,26);
 		bUp.setToolTipText("Up Directory");
 		bUp.addActionListener(e->{
-			File f = new File(fileName.getText());
+			File f = new File(textFileName.getText());
 			if( f.isFile() ) {
 				f = f.getParentFile();
 			}
@@ -209,7 +226,7 @@ public class FileBrowser extends JSpringPanel {
 	 * The selected file/directory has changed.  Just update the text
 	 */
 	private void setSelectedName( File file ) {
-		fileName.setText(file.getAbsolutePath());
+		textFileName.setText(file.getName());
 	}
 
 	/**
@@ -239,7 +256,7 @@ public class FileBrowser extends JSpringPanel {
 			setDirectoryNormal(file);
 		} else {
 			// Present the user with a list of file system roots
-			fileName.setText("");
+			textFileName.setText("");
 
 			listModel.clear();
 			for (File f : roots) {
@@ -255,7 +272,10 @@ public class FileBrowser extends JSpringPanel {
 	}
 
 	private void setDirectoryNormal(File file) {
-		fileName.setText(file.getAbsolutePath());
+		if( file.isFile())
+			textFileName.setText(file.getName());
+		else
+			textFileName.setText("");
 
 		listModel.clear();
 		List<File> files = filterChildren(file);
@@ -429,6 +449,6 @@ public class FileBrowser extends JSpringPanel {
 	public interface Listener {
 		void handleSelectedFile( File file );
 
-		void handleClickedFile( File file );
+		void handleDoubleClickedFile(File file );
 	}
 }

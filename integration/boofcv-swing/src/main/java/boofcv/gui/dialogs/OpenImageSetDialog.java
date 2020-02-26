@@ -74,7 +74,7 @@ public class OpenImageSetDialog extends JPanel {
         this.dialog = dialog;
         this.defaultDirectory = directory;
 
-        browser = new FileBrowser(directory, new BrowserListener());
+        browser = new FileBrowser(directory, null, new BrowserListener());
         browser.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         SelectPanel selectPanel = new SelectPanel();
@@ -175,7 +175,7 @@ public class OpenImageSetDialog extends JPanel {
         }
 
         @Override
-        public void handleClickedFile(File file) {
+        public void handleDoubleClickedFile(File file) {
 //            if( BoofSwingUtil.isImage(file) )
                 selected.addPath(file);
         }

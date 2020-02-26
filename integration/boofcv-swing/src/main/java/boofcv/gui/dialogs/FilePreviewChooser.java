@@ -85,7 +85,7 @@ public class FilePreviewChooser extends JPanel {
         // it will draw the image centered in the split pane
         preview.setCentering(true);
 
-        browser = new FileBrowser(new File("."), new BrowserListener());
+        browser = new FileBrowser(new File("."), null, new BrowserListener());
         browser.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JPanel leftPanel = new JPanel(new BorderLayout());
@@ -172,8 +172,9 @@ public class FilePreviewChooser extends JPanel {
         }
 
         @Override
-        public void handleClickedFile(File file) {
+        public void handleDoubleClickedFile(File file) {
             selected = file;
+            handlePressedSelect();
         }
     }
 
