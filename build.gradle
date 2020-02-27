@@ -1,5 +1,5 @@
 plugins {
-    id "com.peterabeles.gversion" version "1.6.2" apply false
+    id "com.peterabeles.gversion" version "1.7.0" apply false
 }
 
 ext.libpath = file('./').absolutePath
@@ -170,6 +170,8 @@ subprojects {
 
     // Force the release build to fail if it depends on a SNAPSHOT
     jar.dependsOn checkDependsOnSNAPSHOT
+    // Force uploadArchives to fail if trying to upload a stable release and git is dirty
+    uploadArchives.dependsOn failDirtyNotSnapshot
 
     // if Maven central isn't setup in ~/.gradle/gradle.properties skip all of this
     if( project.hasProperty('ossrhUsername') ) {
