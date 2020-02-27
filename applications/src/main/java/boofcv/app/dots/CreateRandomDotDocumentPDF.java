@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.app.uchiya;
+package boofcv.app.dots;
 
-import boofcv.alg.fiducial.dots.UchiyaMarkerGenerator;
+import boofcv.alg.fiducial.dots.RandomDotMarkerGenerator;
 import boofcv.app.PaperSize;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
 import boofcv.generate.Unit;
@@ -36,17 +36,18 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CreateUchiyaDocumentPDF extends CreateFiducialDocumentPDF {
+public class CreateRandomDotDocumentPDF extends CreateFiducialDocumentPDF {
 
 	List<List<Point2D_F64>> markers;
-	@Getter UchiyaMarkerGenerator g;
+	@Getter
+	RandomDotMarkerGenerator g;
 
 	PdfFiducialEngine renderer;
 
 	public double dotDiameter;
 	public boolean drawBorderLine;
 
-	public CreateUchiyaDocumentPDF(String documentName, PaperSize paper, Unit units) {
+	public CreateRandomDotDocumentPDF(String documentName, PaperSize paper, Unit units) {
 		super(documentName, paper, units);
 	}
 
@@ -58,7 +59,7 @@ public class CreateUchiyaDocumentPDF extends CreateFiducialDocumentPDF {
 	@Override
 	protected void configureRenderer(PdfFiducialEngine renderer) {
 		this.renderer = renderer;
-		g = new UchiyaMarkerGenerator();
+		g = new RandomDotMarkerGenerator();
 		g.setRadius(UNIT_TO_POINTS*dotDiameter/2.0);
 		g.getDocumentRegion().setWidth(markerWidth*UNIT_TO_POINTS);
 		g.getDocumentRegion().setHeight(markerWidth*UNIT_TO_POINTS);

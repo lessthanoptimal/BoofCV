@@ -18,15 +18,15 @@
 
 package boofcv.app;
 
-import boofcv.alg.fiducial.dots.UchiyaMarkerGenerator;
+import boofcv.alg.fiducial.dots.RandomDotMarkerGenerator;
+import boofcv.app.dots.CreateRandomDotDocumentImage;
+import boofcv.app.dots.CreateRandomDotDocumentPDF;
 import boofcv.app.fiducials.CreateFiducialDocumentImage;
 import boofcv.app.fiducials.CreateFiducialDocumentPDF;
-import boofcv.app.uchiya.CreateUchiyaDocumentImage;
-import boofcv.app.uchiya.CreateUchiyaDocumentPDF;
 import boofcv.generate.Unit;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.io.fiducial.FiducialIO;
-import boofcv.io.fiducial.UchiyaDefinition;
+import boofcv.io.fiducial.RandomDotDefinition;
 import georegression.struct.point.Point2D_F64;
 import org.apache.commons.io.FilenameUtils;
 import org.kohsuke.args4j.CmdLineException;
@@ -41,11 +41,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Generates a printable Uchiya marker
+ * Generates a printable random dot marker
  *
  * @author Peter Abeles
  */
-public class CreateFiducialUchiya extends BaseFiducialSquare {
+public class CreateFiducialRandomDot extends BaseFiducialSquare {
 	@Option(name="-n",aliases = {"--DotsPerMarker"}, usage="Number of dots per marker")
 	public int numberOfDots=30;
 
@@ -54,6 +54,10 @@ public class CreateFiducialUchiya extends BaseFiducialSquare {
 
 	@Option(name = "-dd", aliases = {"--Diameter"}, usage = "The diameter of each dot. In document units")
 	public double dotDiameter =0.5;
+
+	@Option(name = "--SpaceDiameter", usage = "Specify to use space dots using a different diameter. In document units")
+	public double spaceDiameter = -1;
+
 
 	@Option(name = "-rs", aliases = {"--RandomSeed"}, usage = "Random seed used to create the markers")
 	public long randomSeed=0xDEAD_BEEFL;
@@ -81,7 +85,7 @@ public class CreateFiducialUchiya extends BaseFiducialSquare {
 		String nameYaml = FilenameUtils.getBaseName(fileName)+".yaml";
 		FileWriter writer = new FileWriter(new File(new File(fileName).getParentFile(),nameYaml));
 
-		var def = new UchiyaDefinition();
+		var def = new RandomDotDefinition();
 		def.randomSeed = randomSeed;
 		def.dotDiameter = dotDiameter;
 		def.maxDotsPerMarker = numberOfDots;
@@ -89,20 +93,20 @@ public class CreateFiducialUchiya extends BaseFiducialSquare {
 		def.units = unit.getAbbreviation();
 		def.markers.addAll( markers );
 
-		FiducialIO.saveUchiyaYaml(def,writer);
+		FiducialIO.saveRandomDotYaml(def,writer);
 		writer.close();
 	}
 
 	@Override
 	protected CreateFiducialDocumentImage createRendererImage(String filename) {
-		var ret = new CreateUchiyaDocumentImage(filename);
+		var ret = new CreateRandomDotDocumentImage(filename);
 		ret.dotDiameter = dotDiameter;
 		return ret;
 	}
 
 	@Override
 	protected CreateFiducialDocumentPDF createRendererPdf(String documentName, PaperSize paper, Unit units) {
-		var ret = new CreateUchiyaDocumentPDF(documentName, paper, units);
+		var ret = new CreateRandomDotDocumentPDF(documentName, paper, units);
 		ret.dotDiameter = dotDiameter;
 		ret.drawBorderLine = drawBorderLines;
 		return ret;
@@ -110,21 +114,24 @@ public class CreateFiducialUchiya extends BaseFiducialSquare {
 
 	@Override
 	protected void callRenderPdf(CreateFiducialDocumentPDF renderer) throws IOException {
-		((CreateUchiyaDocumentPDF)renderer).render(markers,numberOfDots,randomSeed);
+		((CreateRandomDotDocumentPDF)renderer).render(markers,numberOfDots,randomSeed);
 	}
 
 	@Override
 	protected void callRenderImage(CreateFiducialDocumentImage renderer) {
-		((CreateUchiyaDocumentImage)renderer).render(markers);
+		((CreateRandomDotDocumentImage)renderer).render(markers);
 	}
 
 	@Override
 	public void finishParsing() {
 		super.finishParsing();
 		Random rand = new Random(randomSeed);
+
+		double spaceDiameter = this.spaceDiameter<=0?dotDiameter:this.spaceDiameter;
+
 		for( int i = 0; i < totalUnique; i++ ) {
-			List<Point2D_F64> marker = UchiyaMarkerGenerator.createRandomMarker(rand,
-					numberOfDots, markerWidth, markerWidth,dotDiameter * 2.0);
+			List<Point2D_F64> marker = RandomDotMarkerGenerator.createRandomMarker(rand,
+					numberOfDots, markerWidth, markerWidth,spaceDiameter * 2.0);
 			markers.add( marker );
 		}
 	}
@@ -135,11 +142,11 @@ public class CreateFiducialUchiya extends BaseFiducialSquare {
 
 		System.out.println("Creates 3 images in PNG format 500x500 pixels. Circles with a diameter of 21 pixels." +
 				" Up to 32 dots per image");
-		System.out.println("-w 500 -dd 21 -um 3 -n 32 -o uchiya.png");
+		System.out.println("-w 500 -dd 21 -um 3 -n 32 -o dots.png");
 		System.out.println();
 		System.out.println("Creates a PDF document the fills in a grid with 4 markers, 8cm wide, 30 dots," +
 				" and dumps a description to yaml");
-		System.out.println("--MarkerBorder --DumpYaml -w 8 -um 4 -n 30 -o uchiya.pdf");
+		System.out.println("--MarkerBorder --DumpYaml -w 8 -um 4 -n 30 -o dots.pdf");
 		System.out.println();
 //		System.out.println("Opens a GUI");
 //		System.out.println("--GUI");
@@ -148,7 +155,7 @@ public class CreateFiducialUchiya extends BaseFiducialSquare {
 	}
 
 	public static void main(String[] args) {
-		CreateFiducialUchiya generator = new CreateFiducialUchiya();
+		CreateFiducialRandomDot generator = new CreateFiducialRandomDot();
 		CmdLineParser parser = new CmdLineParser(generator);
 
 		if( args.length == 0 ) {

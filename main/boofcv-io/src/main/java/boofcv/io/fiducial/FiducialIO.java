@@ -43,7 +43,7 @@ public class FiducialIO {
 	 * @param definition Definition to be saved.
 	 * @param outputWriter Stream writer
 	 */
-	public static void saveUchiyaYaml(UchiyaDefinition definition, Writer outputWriter ) {
+	public static void saveRandomDotYaml(RandomDotDefinition definition, Writer outputWriter ) {
 		Map<String,Object> map = new HashMap<>();
 		map.put("version",1); // not used, but there for the future
 		map.put("random_seed",definition.randomSeed);
@@ -78,10 +78,10 @@ public class FiducialIO {
 		createYmlObject().dump(map,out);
 	}
 
-	public static UchiyaDefinition loadUchiyaYaml( File file ) {
+	public static RandomDotDefinition loadUchiyaYaml(File file ) {
 		try {
 			FileReader reader = new FileReader(file);
-			UchiyaDefinition ret = loadUchiyaYaml(reader);
+			RandomDotDefinition ret = loadUchiyaYaml(reader);
 			reader.close();
 			return ret;
 		} catch( IOException e ) {
@@ -94,11 +94,11 @@ public class FiducialIO {
 	 * @param reader Stream reader
 	 * @return UchiyaDefinition
 	 */
-	public static UchiyaDefinition loadUchiyaYaml( Reader reader ) {
+	public static RandomDotDefinition loadUchiyaYaml(Reader reader ) {
 		Yaml yaml = createYmlObject();
 		Map<String,Object> data = yaml.load(reader);
 
-		var def = new UchiyaDefinition();
+		var def = new RandomDotDefinition();
 		if( data.containsKey("random_seed"))
 			def.randomSeed = ((Number)data.get("random_seed")).longValue(); // YAML only library only supports ints?
 		if( data.containsKey("dot_diameter"))

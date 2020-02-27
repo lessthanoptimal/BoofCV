@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestUchiyaMarkerGeneratorImage {
+class TestRandomDotMarkerGeneratorImage {
 	/**
 	 * Makes sure the dots are rendered and with the expected properties
 	 */
@@ -45,7 +45,7 @@ class TestUchiyaMarkerGeneratorImage {
 	}
 
 	private void render(int width, int height) {
-		var alg = new UchiyaMarkerGeneratorImage();
+		var alg = new RandomDotMarkerGeneratorImage();
 
 		// Create a set of points at known locations
 		// have locations be outside the image to test re-centering

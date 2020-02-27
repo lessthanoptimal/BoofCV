@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class UchiyaDefinition {
+public class RandomDotDefinition {
 	/** Random seed used to create the markers */
 	public long randomSeed = -1;
 	/** Diameter of a dot in the marker */

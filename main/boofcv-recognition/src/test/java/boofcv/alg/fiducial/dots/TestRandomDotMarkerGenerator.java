@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestUchiyaMarkerGenerator {
+class TestRandomDotMarkerGenerator {
 	Random rand = BoofTesting.createRandom(0);
 
 	/**
@@ -49,7 +49,7 @@ class TestUchiyaMarkerGenerator {
 		var bounds = new Rectangle2D_F64();
 
 		for (int trial = 0; trial < 10; trial++) {
-			List<Point2D_F64> marker = UchiyaMarkerGenerator.createRandomMarker(rand,N,w,w,r);
+			List<Point2D_F64> marker = RandomDotMarkerGenerator.createRandomMarker(rand,N,w,w,r);
 			assertEquals(N,marker.size());
 			checkMarkerProperties(w, r, bounds, marker);
 		}
@@ -65,7 +65,7 @@ class TestUchiyaMarkerGenerator {
 		double r = 2;
 		Rectangle2D_F64 bounds = new Rectangle2D_F64();
 
-		List<Point2D_F64> marker = UchiyaMarkerGenerator.createRandomMarker(rand,N,w,w,r);
+		List<Point2D_F64> marker = RandomDotMarkerGenerator.createRandomMarker(rand,N,w,w,r);
 		assertTrue(marker.size() < N);
 		assertTrue(marker.size() > 10);
 		checkMarkerProperties(w, r, bounds, marker);

@@ -34,7 +34,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class UchiyaMarkerGenerator {
+public class RandomDotMarkerGenerator {
 
 	/** used to draw the fiducial */
 	@Getter @Setter protected FiducialRenderEngine render;

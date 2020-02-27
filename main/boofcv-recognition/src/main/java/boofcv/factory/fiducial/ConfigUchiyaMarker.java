@@ -27,7 +27,7 @@ import boofcv.struct.Configuration;
 import boofcv.struct.ConnectRule;
 
 /**
- * Configuration for Uchiya Markers
+ * Configuration for Uchiya Marker approach to detect random dot markers
  *
  * @see boofcv.alg.fiducial.dots.UchiyaMarkerImageTracker
  *

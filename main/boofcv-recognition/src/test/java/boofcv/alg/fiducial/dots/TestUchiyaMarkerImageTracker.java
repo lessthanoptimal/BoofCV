@@ -54,7 +54,7 @@ class TestUchiyaMarkerImageTracker {
 
 	public TestUchiyaMarkerImageTracker() {
 		for (int i = 0; i < 20; i++) {
-			documents.add( UchiyaMarkerGeneratorImage.createRandomMarker(rand,20,markerWidth,markerWidth,dotDiameter));
+			documents.add( RandomDotMarkerGeneratorImage.createRandomMarker(rand,20,markerWidth,markerWidth,dotDiameter));
 		}
 	}
 
@@ -62,7 +62,7 @@ class TestUchiyaMarkerImageTracker {
 	void rotating() {
 		int targetID = 3;
 
-		var generator = new UchiyaMarkerGeneratorImage();
+		var generator = new RandomDotMarkerGeneratorImage();
 		generator.setRadius(dotDiameter/2.0);
 		generator.configure(200,200,30);
 		generator.render(documents.get(targetID),markerWidth);

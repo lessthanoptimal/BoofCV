@@ -18,7 +18,7 @@
 
 package boofcv.abst.fiducial;
 
-import boofcv.alg.fiducial.dots.UchiyaMarkerGeneratorImage;
+import boofcv.alg.fiducial.dots.RandomDotMarkerGeneratorImage;
 import boofcv.factory.fiducial.ConfigUchiyaMarker;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.struct.image.GrayF32;
@@ -50,7 +50,7 @@ class TestUchiya_to_FiducialDetector extends GenericFiducialTrackerChecks {
 		types.add( ImageType.single(GrayF32.class));
 
 		for (int i = 0; i < 20; i++) {
-			documents.add( UchiyaMarkerGeneratorImage.createRandomMarker(rand,20, markerLength,markerLength,11));
+			documents.add( RandomDotMarkerGeneratorImage.createRandomMarker(rand,20, markerLength,markerLength,11));
 		}
 	}
 
@@ -74,7 +74,7 @@ class TestUchiya_to_FiducialDetector extends GenericFiducialTrackerChecks {
 	public GrayF32 renderFiducial() {
 		int target = 3;
 
-		var generator = new UchiyaMarkerGeneratorImage();
+		var generator = new RandomDotMarkerGeneratorImage();
 		generator.setRadius(20);
 		generator.configure(600,600,20);
 		generator.render(documents.get(target), markerLength);

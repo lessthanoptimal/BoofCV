@@ -40,7 +40,7 @@ import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.fiducial.FiducialIO;
-import boofcv.io.fiducial.UchiyaDefinition;
+import boofcv.io.fiducial.RandomDotDefinition;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -72,6 +72,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"unchecked", "SynchronizationOnLocalVariableOrMethodParameter"})
 public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase<T>
 {
@@ -85,7 +86,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 	final Object lockTracker = new Object();
 	boolean addingMarkers=false;
 	Uchiya_to_FiducialDetector<T> tracker;
-	UchiyaDefinition definition;
+	RandomDotDefinition definition;
 	FastQueue<DetectInfo> detections = new FastQueue<>(DetectInfo::new);
 	//------------ END LOCK
 
@@ -132,7 +133,6 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 	}
 
 	// TODO turn off controls
-	// TODO avoid reloading if a regular control was changed
 	protected void addAllMarkers( Uchiya_to_FiducialDetector<T> tracker ) {
 		SwingUtilities.invokeLater(()->setMenuBarEnabled(false));
 		for (int i = 0; i < definition.markers.size(); i++) {
@@ -199,7 +199,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 					intrinsic = null;
 				}
 
-				File fileDef = new File(directory, "uchiya.yaml");
+				File fileDef = new File(directory, "descriptions.yaml");
 				if (fileDef.exists() && !fileDefinitions.getAbsolutePath().equals(fileDef.getAbsolutePath())) {
 					loadDefinition(fileDef);
 				}
@@ -399,6 +399,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		}
 	}
 
+	@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 	class VisualizePanel extends ShapeVisualizePanel {
 
 		final Font largeFont = new Font("Serif", Font.BOLD, 42);
@@ -511,12 +512,12 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 
 	public static void main(String[] args) {
 		List<String> examples = new ArrayList<>();
-		examples.add(UtilIO.pathExample("fiducial/uchiya/image00.jpg"));
-		examples.add(UtilIO.pathExample("fiducial/uchiya/image01.jpg"));
-		examples.add(UtilIO.pathExample("fiducial/uchiya/image02.jpg"));
-		examples.add(UtilIO.pathExample("fiducial/uchiya/image03.jpg"));
-		examples.add(UtilIO.pathExample("fiducial/uchiya/image04.jpg"));
-		examples.add(UtilIO.pathExample("fiducial/uchiya/movie.mp4"));
+		examples.add(UtilIO.pathExample("fiducial/random_dots/image00.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/random_dots/image01.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/random_dots/image02.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/random_dots/image03.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/random_dots/image04.jpg"));
+		examples.add(UtilIO.pathExample("fiducial/random_dots/movie.mp4"));
 
 		SwingUtilities.invokeLater(()->{
 			var app = new DetectUchiyaMarkerApp<>(examples, GrayU8.class);

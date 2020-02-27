@@ -27,10 +27,10 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class UchiyaMarkerGeneratorImage
-	extends UchiyaMarkerGenerator
+public class RandomDotMarkerGeneratorImage
+	extends RandomDotMarkerGenerator
 {
-	public UchiyaMarkerGeneratorImage() {
+	public RandomDotMarkerGeneratorImage() {
 		render = new FiducialImageEngine();
 	}
 

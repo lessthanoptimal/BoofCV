@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package boofcv.app.uchiya;
+package boofcv.app.dots;
 
-import boofcv.alg.fiducial.dots.UchiyaMarkerGeneratorImage;
+import boofcv.alg.fiducial.dots.RandomDotMarkerGeneratorImage;
 import boofcv.app.fiducials.CreateFiducialDocumentImage;
 import boofcv.misc.BoofMiscOps;
 import georegression.struct.point.Point2D_F64;
@@ -31,14 +31,14 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class CreateUchiyaDocumentImage extends CreateFiducialDocumentImage {
+public class CreateRandomDotDocumentImage extends CreateFiducialDocumentImage {
 
-	List<List<Point2D_F64>> markers;
-	@Getter UchiyaMarkerGeneratorImage g = new UchiyaMarkerGeneratorImage();
+	@Getter
+	RandomDotMarkerGeneratorImage g = new RandomDotMarkerGeneratorImage();
 
 	public double dotDiameter;
 
-	public CreateUchiyaDocumentImage(String documentName ) {
+	public CreateRandomDotDocumentImage(String documentName ) {
 		super(documentName);
 	}
 

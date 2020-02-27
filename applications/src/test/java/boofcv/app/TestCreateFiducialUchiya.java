@@ -19,7 +19,7 @@
 package boofcv.app;
 
 import boofcv.abst.fiducial.Uchiya_to_FiducialDetector;
-import boofcv.alg.fiducial.dots.UchiyaMarkerGenerator;
+import boofcv.alg.fiducial.dots.RandomDotMarkerGenerator;
 import boofcv.factory.fiducial.ConfigUchiyaMarker;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.io.image.ConvertBufferedImage;
@@ -37,14 +37,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 
-	CreateFiducialUchiya defaults = new CreateFiducialUchiya();
+	CreateFiducialRandomDot defaults = new CreateFiducialRandomDot();
 
 	public TestCreateFiducialUchiya() {
 		document_name = "uchiya";
 	}
 
 	public void createDocument(String args ) throws IOException, InterruptedException {
-		CreateFiducialUchiya.main(args.split("\\s+"));
+		CreateFiducialRandomDot.main(args.split("\\s+"));
 	}
 
 	@Test
@@ -62,7 +62,7 @@ class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 
 		Random rand = new Random(defaults.randomSeed);
 		for (int i = 0; i < N; i++) {
-			detector.addMarker(UchiyaMarkerGenerator.createRandomMarker(rand,30,8,8,defaults.dotDiameter*2.0));
+			detector.addMarker(RandomDotMarkerGenerator.createRandomMarker(rand,30,8,8,defaults.dotDiameter*2.0));
 		}
 
 		detector.detect(gray);
@@ -87,7 +87,7 @@ class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 
 		Random rand = new Random(4445);
 		for (int i = 0; i < N; i++) {
-			detector.addMarker(UchiyaMarkerGenerator.createRandomMarker(
+			detector.addMarker(RandomDotMarkerGenerator.createRandomMarker(
 					rand,22,config.markerLength,config.markerLength ,0.3*2));
 		}
 

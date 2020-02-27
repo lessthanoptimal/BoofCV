@@ -38,7 +38,7 @@ class TestFiducialIO {
 
 	@Test
 	void uchiya_yaml() {
-		var expected = new UchiyaDefinition();
+		var expected = new RandomDotDefinition();
 		expected.randomSeed = 99494;
 		expected.maxDotsPerMarker = 93;
 		expected.dotDiameter = 3.4;
@@ -51,10 +51,10 @@ class TestFiducialIO {
 		}
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		FiducialIO.saveUchiyaYaml(expected,new OutputStreamWriter(stream));
+		FiducialIO.saveRandomDotYaml(expected,new OutputStreamWriter(stream));
 
 		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()));
-		UchiyaDefinition found = FiducialIO.loadUchiyaYaml(reader);
+		RandomDotDefinition found = FiducialIO.loadUchiyaYaml(reader);
 
 		assertEquals(expected.randomSeed, found.randomSeed);
 		assertEquals(expected.maxDotsPerMarker, found.maxDotsPerMarker);

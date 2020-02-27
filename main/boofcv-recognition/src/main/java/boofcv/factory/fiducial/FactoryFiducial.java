@@ -217,7 +217,7 @@ public class FactoryFiducial {
 	}
 
 	/**
-	 * Creates a Uchiya (a.k.a random dot) marker.
+	 * Creates detector for random dot markers using Uchiya Marker approach.
 	 *
 	 * @see UchiyaMarkerImageTracker
 	 *

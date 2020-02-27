@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,11 +21,13 @@ package boofcv.demonstrations.fiducial;
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.FiducialStability;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
+import boofcv.abst.fiducial.Uchiya_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import boofcv.abst.fiducial.calib.ConfigSquareGridBinary;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.ConfigFiducialImage;
+import boofcv.factory.fiducial.ConfigUchiyaMarker;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
@@ -39,6 +41,8 @@ import boofcv.gui.image.ImagePanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
+import boofcv.io.fiducial.FiducialIO;
+import boofcv.io.fiducial.RandomDotDefinition;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.CameraPinholeBrown;
@@ -72,6 +76,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 	private static final String SQUARE_NUMBER = "Square Number";
 	private static final String SQUARE_PICTURE = "Square Picture";
 	private static final String QR_CODE = "QR Code";
+	private static final String RANDOM_DOTS = "Random Dots";
 	private static final String CALIB_CHESS = "Chessboard";
 	private static final String CALIB_SQUARE_GRID = "Square Grid";
 	private static final String CALIB_SQUARE_BINARY_GRID = "Square Binary Grid";
@@ -201,46 +206,69 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 
 		ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 21);
 
-		if( name.compareTo(SQUARE_NUMBER) == 0 ) {
-			detector = FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1), configThreshold, imageClass);
-		} else if( name.compareTo(SQUARE_PICTURE) == 0 ) {
-			double length = 0.1;
-			detector = FactoryFiducial.squareImage(new ConfigFiducialImage(), configThreshold, imageClass);
+		switch( name ) {
+			case SQUARE_NUMBER: {
+				detector = FactoryFiducial.squareBinary(new ConfigFiducialBinary(0.1), configThreshold, imageClass);
+			} break;
 
-			SquareImage_to_FiducialDetector<I> d = (SquareImage_to_FiducialDetector<I>)detector;
+			case SQUARE_PICTURE: {
+				double length = 0.1;
+				detector = FactoryFiducial.squareImage(new ConfigFiducialImage(), configThreshold, imageClass);
 
-			String pathImg = new File(path,"../patterns").getPath();
-			List<String> names = new ArrayList<>();
-			names.add("chicken.png");
-			names.add("yinyang.png");
+				SquareImage_to_FiducialDetector<I> d = (SquareImage_to_FiducialDetector<I>)detector;
 
-			for( String foo : names ) {
-				BufferedImage img = media.openImage(new File(pathImg,foo).getPath());
-				if( img == null )
-					throw new RuntimeException("Can't find file "+new File(pathImg,foo).getPath());
-				d.addPatternImage(ConvertBufferedImage.convertFromSingle(img, null, imageClass), 125, length);
-			}
-		} else if( name.compareTo(QR_CODE) == 0 ) {
-			detector = FactoryFiducial.qrcode3D(null, imageClass);
-		} else if( name.compareTo(CALIB_CHESS) == 0 ) {
-			detector = FactoryFiducial.calibChessboardX(null,new ConfigGridDimen(7, 5, 0.03), imageClass);
-		} else if( name.compareTo(CALIB_SQUARE_GRID) == 0 ) {
-			detector = FactoryFiducial.calibSquareGrid(null,new ConfigGridDimen(4, 3, 0.03, 0.03), imageClass);
-		} else if( name.compareTo(CALIB_SQUARE_BINARY_GRID) == 0 ) {
-			File configFile = new File(path,"description_4x3_3x3_4cm_2cm.txt");
-			try {
-				ConfigSquareGridBinary config =
-						ConfigSquareGridBinary.parseSimple(new BufferedReader(new FileReader(configFile)));
-				detector = FactoryFiducial.calibSquareGridBinary(config, imageClass);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		} else if( name.compareTo(CALIB_CIRCLE_HEXAGONAL_GRID) == 0 ) {
-			detector = FactoryFiducial.calibCircleHexagonalGrid(null,new ConfigGridDimen(24, 28, 1, 1.2), imageClass);
-		} else if( name.compareTo(CALIB_CIRCLE_REGULAR_GRID) == 0 ) {
-			detector = FactoryFiducial.calibCircleRegularGrid(null,new ConfigGridDimen(10, 8, 1.5, 2.5), imageClass);
-		} else {
-			throw new RuntimeException("Unknown selection");
+				String pathImg = new File(path,"../patterns").getPath();
+				List<String> names = new ArrayList<>();
+				names.add("chicken.png");
+				names.add("yinyang.png");
+
+				for( String foo : names ) {
+					BufferedImage img = media.openImage(new File(pathImg,foo).getPath());
+					if( img == null )
+						throw new RuntimeException("Can't find file "+new File(pathImg,foo).getPath());
+					d.addPatternImage(ConvertBufferedImage.convertFromSingle(img, null, imageClass), 125, length);
+				}
+			} break;
+
+			case RANDOM_DOTS: {
+				RandomDotDefinition defs = FiducialIO.loadUchiyaYaml(new File(path,"descriptions.yaml"));
+				var config = new ConfigUchiyaMarker();
+				config.markerLength = defs.markerWidth;
+				detector = FactoryFiducial.randomDots(config, imageClass);
+				Uchiya_to_FiducialDetector<I> tracker = (Uchiya_to_FiducialDetector<I>)detector;
+				for (int i = 0; i < defs.markers.size(); i++) {
+					tracker.addMarker(defs.markers.get(i));
+				}
+			} break;
+
+			case QR_CODE: {
+				detector = FactoryFiducial.qrcode3D(null, imageClass);
+			} break;
+			case CALIB_CHESS: {
+				detector = FactoryFiducial.calibChessboardX(null,new ConfigGridDimen(7, 5, 0.03), imageClass);
+			} break;
+			case CALIB_SQUARE_GRID: {
+				detector = FactoryFiducial.calibSquareGrid(null,new ConfigGridDimen(4, 3, 0.03, 0.03), imageClass);
+			} break;
+			case CALIB_SQUARE_BINARY_GRID: {
+				File configFile = new File(path,"description_4x3_3x3_4cm_2cm.txt");
+				try {
+					ConfigSquareGridBinary config =
+							ConfigSquareGridBinary.parseSimple(new BufferedReader(new FileReader(configFile)));
+					detector = FactoryFiducial.calibSquareGridBinary(config, imageClass);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			} break;
+			case CALIB_CIRCLE_HEXAGONAL_GRID: {
+				detector = FactoryFiducial.calibCircleHexagonalGrid(null,new ConfigGridDimen(24, 28, 1, 1.2), imageClass);
+			} break;
+			case CALIB_CIRCLE_REGULAR_GRID: {
+				detector = FactoryFiducial.calibCircleRegularGrid(null,new ConfigGridDimen(10, 8, 1.5, 2.5), imageClass);
+			} break;
+
+			default:
+				throw new RuntimeException("Unknown selection");
 		}
 		controls.setShowStability(true);
 
@@ -405,6 +433,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		java.util.List<PathLabel> inputs = new ArrayList<>();
 		inputs.add(new PathLabel(SQUARE_NUMBER, UtilIO.pathExample("fiducial/binary/movie.mjpeg")));
 		inputs.add(new PathLabel(SQUARE_PICTURE, UtilIO.pathExample("fiducial/image/video/movie.mjpeg")));
+		inputs.add(new PathLabel(RANDOM_DOTS, UtilIO.pathExample("fiducial/random_dots/movie.mp4")));
 		inputs.add(new PathLabel(QR_CODE, UtilIO.pathExample("fiducial/qrcode/movie.mp4")));
 		inputs.add(new PathLabel(CALIB_CHESS, UtilIO.pathExample("fiducial/chessboard/movie.mjpeg")));
 		inputs.add(new PathLabel(CALIB_SQUARE_GRID, UtilIO.pathExample("fiducial/square_grid/movie.mp4")));
