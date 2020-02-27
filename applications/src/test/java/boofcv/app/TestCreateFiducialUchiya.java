@@ -58,7 +58,7 @@ class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 
 		ConfigUchiyaMarker config = new ConfigUchiyaMarker();
 		config.markerLength = 8.0;
-		Uchiya_to_FiducialDetector<GrayU8> detector = FactoryFiducial.uchiya(config,GrayU8.class);
+		Uchiya_to_FiducialDetector<GrayU8> detector = FactoryFiducial.randomDots(config,GrayU8.class);
 
 		Random rand = new Random(defaults.randomSeed);
 		for (int i = 0; i < N; i++) {
@@ -83,7 +83,7 @@ class TestCreateFiducialUchiya extends CommonFiducialPdfChecks {
 
 		ConfigUchiyaMarker config = new ConfigUchiyaMarker();
 		config.markerLength = 5.0;
-		Uchiya_to_FiducialDetector<GrayU8> detector = FactoryFiducial.uchiya(config,GrayU8.class);
+		Uchiya_to_FiducialDetector<GrayU8> detector = FactoryFiducial.randomDots(config,GrayU8.class);
 
 		Random rand = new Random(4445);
 		for (int i = 0; i < N; i++) {

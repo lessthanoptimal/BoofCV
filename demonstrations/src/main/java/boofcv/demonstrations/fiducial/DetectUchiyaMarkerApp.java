@@ -21,6 +21,7 @@ package boofcv.demonstrations.fiducial;
 import boofcv.abst.fiducial.Uchiya_to_FiducialDetector;
 import boofcv.abst.filter.binary.BinaryContourInterface;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.feature.describe.llah.LlahOperations;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetectorPixel;
@@ -41,6 +42,7 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.fiducial.FiducialIO;
 import boofcv.io.fiducial.UchiyaDefinition;
 import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -73,11 +75,10 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase<T>
 {
-	// TODO Add controls for settings
 	// TODO list all markers found
 
 	CameraPinholeBrown intrinsic;
-	ConfigUchiyaMarker config = new ConfigUchiyaMarker();
+	final ConfigUchiyaMarker config = new ConfigUchiyaMarker();
 	File fileDefinitions = new File("."); // used to see if the definition was already loaded
 
 	//------------ BEGIN LOCK
@@ -99,6 +100,10 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 
 	@Override
 	protected void createDetector(boolean initializing) {
+		createUchiya(true);
+	}
+
+	private void createUchiya( boolean recomputeDictionary ) {
 		if( addingMarkers ) {
 			JOptionPane.showMessageDialog(this,"BUG: Still adding markers");
 			return;
@@ -107,14 +112,23 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 			return;
 		}
 		config.markerLength = definition.markerWidth;
-		var tracker = FactoryFiducial.uchiya(config, imageClass);
+		// Avoid recomputing the LLAH dictionary if possible
+		LlahOperations before = tracker != null ? tracker.getLlahOperations() : null;
+
+		var tracker = FactoryFiducial.randomDots(config, imageClass);
 		tracker.setPrintTiming(System.out);
 		if( intrinsic != null ) {
 			LensDistortionNarrowFOV lens = LensDistortionFactory.narrow(intrinsic);
 			tracker.setLensDistortion(lens,intrinsic.width, intrinsic.height);
 		}
-		addingMarkers = true;
-		new Thread(()->addAllMarkers(tracker)).start();
+
+		if( before == null || recomputeDictionary ) {
+			addingMarkers = true;
+			new Thread(() -> addAllMarkers(tracker)).start();
+		} else {
+			tracker.getTracker().getTracker().setLlahOps(before);
+			this.tracker = tracker;
+		}
 	}
 
 	// TODO turn off controls
@@ -163,6 +177,14 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 
 		if( method != InputMethod.IMAGE )
 			return;
+
+		// forget the previous state
+		if( tracker != null )
+			tracker.reset();
+
+		synchronized (lockTracker) {
+			detections.reset();
+		}
 
 		URL url = UtilIO.ensureURL(inputFilePath);
 		if( url != null && url.getProtocol().equals("file") ) {
@@ -265,7 +287,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 	public void imageThresholdUpdated() {
 		BoofSwingUtil.checkGuiThread();
 		config.threshold = controlPanel.thresholdPanel.createConfig();
-		createDetector(false);
+		createUchiya(false);
 		reprocessImageOnly();
 	}
 
@@ -290,6 +312,15 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		final ThresholdControlPanel thresholdPanel = new ThresholdControlPanel(DetectUchiyaMarkerApp.this,config.threshold);
 		final LlahControlPanel llahPanel = new LlahControlPanel(this,config.llah);
 
+		// Ellipse Filtering
+		final JSpinner spinMinEdge = spinner(config.checkEdge.minimumEdgeIntensity,0.0,1000.0,1.0);
+		// Contour Controls
+		final JComboBox<String> comboConnectRule = combo(config.contourRule.ordinal(), (Object[]) ConnectRule.values());
+		final JSpinner spinMinContour = spinner(config.contourMinimumLength,4,999,1);
+		final JSpinner spinMinAxis = spinner(config.minimumMinorAxis,0.0,999.0,1.0);
+		final JSpinner spinMaxAxisRatio = spinner(config.maxMajorToMinorRatio,1.0,1000.0,1.0);
+
+
 		public ControlPanel() {
 			thresholdPanel.addHistogramGraph();
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1);
@@ -306,11 +337,17 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 			addAlignLeft(checkContour);
 			addAlignLeft(check3D);
 			add(llahPanel);
+			addLabeled(spinMinEdge,"Min Edge Intensity");
+			addLabeled(comboConnectRule,"Connect Rule");
+			addLabeled(spinMinContour,"Min Contour");
+			addLabeled(spinMinAxis,"Min Axis");
+			addLabeled(spinMaxAxisRatio,"Max Axis Ratio");
 			add(thresholdPanel);
 		}
 
 		@Override
 		public void controlChanged(Object source) {
+			boolean control = false;
 			if( source == comboView ) {
 				selectedView = comboView.getSelectedIndex();
 				viewUpdated(); return;
@@ -331,13 +368,33 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 			} else if( source == selectZoom ) {
 				zoom = ((Number) selectZoom.getValue()).doubleValue();
 				guiImage.setScale(zoom);
+			} else if( source == spinMinEdge ) {
+				config.checkEdge.minimumEdgeIntensity = ((Number)spinMinEdge.getValue()).doubleValue();
+				control = true;
+			} else if( source == comboConnectRule ) {
+				config.contourRule = ConnectRule.values()[comboConnectRule.getSelectedIndex()];
+				control = true;
+			} else if( source == spinMinContour ) {
+				config.contourMinimumLength = ((Number)spinMinContour.getValue()).intValue();
+				control = true;
+			} else if( source == spinMinAxis ) {
+				config.minimumMinorAxis = ((Number)spinMinAxis.getValue()).doubleValue();
+				control = true;
+			} else if( source == spinMaxAxisRatio ) {
+				config.maxMajorToMinorRatio = ((Number)spinMaxAxisRatio.getValue()).doubleValue();
+				control = true;
 			}
-			gui.repaint();
+			if( control ) {
+				createUchiya(false);
+				reprocessImageOnly();
+			} else {
+				gui.repaint();
+			}
 		}
 
 		@Override
 		public void configLlahChanged() {
-			createDetector(false);
+			createUchiya(true);
 			reprocessImageOnly();
 		}
 	}
@@ -430,7 +487,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 				if( controlPanel.show3D && tracker.is3D() && intrinsic != null ) {
 					for (int i = 0; i < detections.size; i++) {
 						VisualizeFiducial.drawCube(detections.get(i).markerToCamera,
-								intrinsic,definition.markerWidth,4,g2);
+								intrinsic,definition.markerWidth,0.5,4,g2,scale);
 					}
 				}
 			}
@@ -459,7 +516,6 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		examples.add(UtilIO.pathExample("fiducial/uchiya/image02.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/uchiya/image03.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/uchiya/image04.jpg"));
-		examples.add(UtilIO.pathExample("fiducial/uchiya/image05.jpg"));
 		examples.add(UtilIO.pathExample("fiducial/uchiya/movie.mp4"));
 
 		SwingUtilities.invokeLater(()->{

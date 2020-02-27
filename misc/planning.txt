@@ -1,5 +1,13 @@
 TODO Perspective-n-conic
 
+TODO Uchiya Markers
+   - Compte to original implementation
+   - Speed up every step. See below
+   - Detect "dots" instead of ellipses. i.e. only look at radius. stdev for major/minor axis?
+   - Reduce amount of duplicate calculations related to LLAH
+     - combine tracker + detect into a single look up?
+     - Compute LLAH hash for each detected dot only once?
+
 TODO
   - Circle Target Detection
     * three choices; center point, tangent points, or conics.

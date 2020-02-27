@@ -44,6 +44,7 @@ class TestFiducialIO {
 		expected.dotDiameter = 3.4;
 		expected.units = "bite me";
 		expected.markerWidth = 100;
+		expected.markerHeight = 120;
 
 		for (int i = 0; i < 2; i++) {
 			expected.markers.add(UtilPoint2D_F64.random(-1,1,10+i,rand));
@@ -60,6 +61,7 @@ class TestFiducialIO {
 		assertEquals(expected.dotDiameter, found.dotDiameter);
 		assertEquals(expected.units, found.units);
 		assertEquals(expected.markerWidth, found.markerWidth);
+		assertEquals(expected.markerHeight, found.markerHeight);
 
 		assertEquals(expected.markers.size(), found.markers.size());
 

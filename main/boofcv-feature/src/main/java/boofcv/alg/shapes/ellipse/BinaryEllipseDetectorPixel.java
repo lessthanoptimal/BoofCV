@@ -36,6 +36,8 @@ import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.FastQueue;
 
 import java.io.PrintStream;
@@ -69,21 +71,21 @@ import java.util.List;
  */
 public class BinaryEllipseDetectorPixel {
 	// maximum distance from the ellipse in pixels
-	private double maxDistanceFromEllipse = 3.0;
+	private @Getter @Setter double maxDistanceFromEllipse = 3.0;
 
 	// minimum number of pixels in the contour
-	private int minimumContour = 20;
+	private @Getter @Setter int minimumContour = 20;
 	// maximum number of pixels in the contour. 0 == no limit
-	private int maximumContour = 0;
+	private @Getter @Setter int maximumContour = 0;
 
 	// minimum number of pixels along the minor axis
-	private double minimumMinorAxis = 1.5;
+	private @Getter @Setter double minimumMinorAxis = 1.5;
 
 	// Can be used to filter out shapes which are very skinny
-	private double maxMajorToMinorRatio = Double.MAX_VALUE;
+	private @Getter @Setter double maxMajorToMinorRatio = Double.MAX_VALUE;
 
 	// connect rule used with contour finding
-	private ConnectRule connectRule;
+	private @Getter ConnectRule connectRule;
 	// allow it to switch between two algorithms
 	private BinaryLabelContourFinder contourFinder;
 	private GrayS32 labeled = new GrayS32(1,1);
@@ -329,46 +331,6 @@ public class BinaryEllipseDetectorPixel {
 
 	public void setVerbose(PrintStream verbose) {
 		this.verbose = verbose;
-	}
-
-	public double getMaxDistanceFromEllipse() {
-		return maxDistanceFromEllipse;
-	}
-
-	public void setMaxDistanceFromEllipse(double maxDistanceFromEllipse) {
-		this.maxDistanceFromEllipse = maxDistanceFromEllipse;
-	}
-
-	public int getMinimumContour() {
-		return minimumContour;
-	}
-
-	public void setMinimumContour(int minimumContour) {
-		this.minimumContour = minimumContour;
-	}
-
-	public int getMaximumContour() {
-		return maximumContour;
-	}
-
-	public void setMaximumContour(int maximumContour) {
-		this.maximumContour = maximumContour;
-	}
-
-	public double getMaxMajorToMinorRatio() {
-		return maxMajorToMinorRatio;
-	}
-
-	public void setMaxMajorToMinorRatio(double maxMajorToMinorRatio) {
-		this.maxMajorToMinorRatio = maxMajorToMinorRatio;
-	}
-
-	public double getMinimumMinorAxis() {
-		return minimumMinorAxis;
-	}
-
-	public void setMinimumMinorAxis(double minimumMinorAxis) {
-		this.minimumMinorAxis = minimumMinorAxis;
 	}
 
 	public List<Found> getFound() {

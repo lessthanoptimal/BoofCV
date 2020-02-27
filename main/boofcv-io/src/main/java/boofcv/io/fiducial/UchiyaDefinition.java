@@ -35,8 +35,10 @@ public class UchiyaDefinition {
 	public double dotDiameter = -1;
 	/** Maximum number of dots on a marker */
 	public int maxDotsPerMarker = -1;
-	/** How wide the bounding square is on the marker */
+	/** How wide the marker's bounding rectangle is */
 	public double markerWidth = -1;
+	/** How tall the marker's bounding rectangle is. If this is not specified then it's assumed to be square */
+	public double markerHeight = -1;
 	/** Units the the marker is in */
 	public String units = "";
 

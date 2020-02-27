@@ -18,6 +18,7 @@
 
 package boofcv.alg.fiducial.dots;
 
+import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.RefineEpipolar;
 import boofcv.alg.feature.describe.llah.LlahDocument;
 import boofcv.alg.feature.describe.llah.LlahOperations;
@@ -63,7 +64,7 @@ import java.util.List;
 public class UchiyaMarkerTracker {
 
 	// Stores the "global" dictionary of documents
-	@Getter LlahOperations llahOps;
+	@Getter @Setter LlahOperations llahOps;
 
 	/** Threshold used to filter false positives documents. At least this many landmarks need to be seen. */
 	@Getter @Setter int minLandmarkDoc = 8;
@@ -95,8 +96,11 @@ public class UchiyaMarkerTracker {
 	/** Time to update track descriptions */
 	@Getter double timeUpdate;
 
-	// Used to compute homography
+	// Estimate the homography with noise
 	Ransac<Homography2D_F64, AssociatedPair> ransac;
+	// Estimate from a batch of observations
+	Estimate1ofEpipolar estimateHomography = FactoryMultiView.homographyTLS();
+	// Non-linear refinement with mixel errors
 	RefineEpipolar refineHomography = FactoryMultiView.homographyRefine(0.01,50, EpipolarError.SAMPSON);
 	DMatrixRMaj foundH = new DMatrixRMaj(3,3);
 	DMatrixRMaj refinedH = new DMatrixRMaj(3,3);
@@ -242,8 +246,9 @@ public class UchiyaMarkerTracker {
 			inlierPairs.add( ransacPairs.get(inputIdx) );
 		}
 
-		// Improve the fit parameters
-		UtilHomography_F64.convert(ransac.getModelParameters(),foundH);
+		// Estimate using all the inliers by minimizing algebraic errors
+		estimateHomography.process(inlierPairs,foundH);
+		// Non-linear refinement of reprojection error
 		refineHomography.fitModel(inlierPairs,foundH, refinedH);
 
 		// Use the homography to estimate where the landmarks would have appeared

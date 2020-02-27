@@ -62,7 +62,7 @@ class TestUchiya_to_FiducialDetector extends GenericFiducialTrackerChecks {
 		config.ransac.inlierThreshold = 1.0;
 		config.markerLength = markerLength;
 
-		Uchiya_to_FiducialDetector detector = FactoryFiducial.uchiya(config,imageType.getImageClass());
+		Uchiya_to_FiducialDetector detector = FactoryFiducial.randomDots(config,imageType.getImageClass());
 		for( var pts : documents ) {
 			detector.addMarker(pts);
 		}

@@ -43,7 +43,7 @@ public class ConfigUchiyaMarker implements Configuration {
 	/**
 	 * Specifies how images are thresholded and converted into a binary format
 	 */
-	public ConfigThreshold threshold = ConfigThreshold.local(ThresholdType.BLOCK_OTSU, ConfigLength.fixed(50));
+	public ConfigThreshold threshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, ConfigLength.fixed(20));
 
 	/**
 	 * Defines the feature descriptor
@@ -58,12 +58,12 @@ public class ConfigUchiyaMarker implements Configuration {
 	/**
 	 * Pixel connectivity rule for blob/contour finder.
 	 */
-	public ConnectRule contourRule = ConnectRule.FOUR;
+	public ConnectRule contourRule = ConnectRule.EIGHT;
 
 	/**
 	 * Minimum number of pixels in the contour to consider
 	 */
-	public int contourMinimumLength = 8;
+	public int contourMinimumLength = 5;
 
 	/**
 	 * Detector: maximum distance from the ellipse in pixels
@@ -78,7 +78,7 @@ public class ConfigUchiyaMarker implements Configuration {
 	/**
 	 * The maximum ratio between the major to minor ratio
 	 */
-	public double maxMajorToMinorRatio = 20.0;
+	public double maxMajorToMinorRatio = 5.0;
 
 	/**
 	 * Parameters for checking the intensity of the contour along an ellipse. When using adaptive thresholding
@@ -94,8 +94,8 @@ public class ConfigUchiyaMarker implements Configuration {
 		llah.hashType = ConfigLlah.HashType.AFFINE;
 		llah.hashTableSize = Integer.MAX_VALUE; // this is 31-bits and the code has 32-bits. signed vs unsigned
 
-		// This seems to handle shadows better
-		threshold.thresholdFromLocalBlocks = false;
+		// Can get more blurred images if this is reduced, BUT there's a massive speed hit in some complex scenes
+		// checkEdge.minimumEdgeIntensity = 15;
 	}
 
 	@Override

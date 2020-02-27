@@ -45,6 +45,7 @@ public class FiducialIO {
 	 */
 	public static void saveUchiyaYaml(UchiyaDefinition definition, Writer outputWriter ) {
 		Map<String,Object> map = new HashMap<>();
+		map.put("version",1); // not used, but there for the future
 		map.put("random_seed",definition.randomSeed);
 		if( definition.dotDiameter > 0 )
 			map.put("dot_diameter",definition.dotDiameter);
@@ -52,6 +53,8 @@ public class FiducialIO {
 			map.put("num_dots",definition.maxDotsPerMarker);
 		if( definition.markerWidth > 0 )
 			map.put("marker_width",definition.markerWidth);
+		if( definition.markerHeight > 0 )
+			map.put("marker_height",definition.markerHeight);
 		if( !definition.units.isEmpty() )
 			map.put("units",definition.units);
 
@@ -104,6 +107,8 @@ public class FiducialIO {
 			def.maxDotsPerMarker = (int) data.get("num_dots");
 		if( data.containsKey("marker_width"))
 			def.markerWidth = (double) data.get("marker_width");
+		if( data.containsKey("marker_height"))
+			def.markerHeight = (double) data.get("marker_height");
 		if( data.containsKey("units"))
 			def.units = (String) data.get("units");
 
