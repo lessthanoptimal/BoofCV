@@ -38,8 +38,10 @@ import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Date;
 
 // TODO preview text documents
+// TODO show size of input images and other meta data
 
 /**
  * Opens a dialog which lets the user select a single file but shows a preview of whatever file is currently selected
@@ -54,6 +56,7 @@ public class FilePreviewChooser extends JPanel {
     // GUI components
     @Getter FileBrowser browser; // file browser
     ImagePanel preview = new ImagePanel(); // shows preview of selected image
+    JTextArea metadataText = new JTextArea();
 
     File selected;
 
@@ -82,8 +85,20 @@ public class FilePreviewChooser extends JPanel {
         JPanel bottomPanel = JSpringPanel.createLockedSides(bCancel, bSelect,35);
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
+        // make so the user can copy but not edit the meta data text
+        metadataText.setEditable(false);
+        metadataText.setWrapStyleWord(true);
+        metadataText.setLineWrap(true);
+
         // it will draw the image centered in the split pane
         preview.setCentering(true);
+        // Need to specify a preferred size or the split pane does silly stuff
+        preview.setPreferredSize(new Dimension(PREVIEW_PIXELS+30,PREVIEW_PIXELS+30));
+
+        JSplitPane splitPreview = new JSplitPane(JSplitPane.VERTICAL_SPLIT,preview,metadataText);
+        splitPreview.setDividerLocation(0.9);
+//        splitPreview.setResizeWeight(0.0);
+        splitPreview.setContinuousLayout(true);
 
         browser = new FileBrowser(new File("."), null, new BrowserListener());
         browser.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -92,13 +107,12 @@ public class FilePreviewChooser extends JPanel {
         leftPanel.add(BorderLayout.CENTER, browser);
         leftPanel.add(BorderLayout.SOUTH, bottomPanel);
 
+        JSplitPane splitBrowserPreview = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPanel,splitPreview);
+        splitBrowserPreview.setDividerLocation(300);
+        splitBrowserPreview.setResizeWeight(0.0);
+        splitBrowserPreview.setContinuousLayout(true);
 
-        JSplitPane splitContent = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,leftPanel,preview);
-        splitContent.setDividerLocation(300);
-        splitContent.setResizeWeight(0.0);
-        splitContent.setContinuousLayout(true);
-
-        add(splitContent, BorderLayout.CENTER);
+        add(splitBrowserPreview, BorderLayout.CENTER);
 
         setPreferredSize(new Dimension(600,400));
 
@@ -245,8 +259,11 @@ public class FilePreviewChooser extends JPanel {
                     full = loadVideoPreview(path);
                 }
 
+                String date = new Date(file.lastModified()).toString();
+
                 if( full == null ) {
                     preview.setImageRepaint(null);
+                    metadataText.setText("File Size: "+file.length()+" B\nModified: "+date);
                 } else {
                     // shrink the image down to preview size
                     int w=full.getWidth(),h=full.getHeight();
@@ -267,6 +284,8 @@ public class FilePreviewChooser extends JPanel {
 
                     // don't need to run in the UI thread
                     preview.setImageRepaint(small);
+                    metadataText.setText(String.format("Shape: %d x %d\nModified: %s",
+                            full.getWidth(),full.getHeight(),date));
                 }
             }
         }
@@ -344,10 +363,6 @@ public class FilePreviewChooser extends JPanel {
         if( listener.canceled )
             return null;
         return listener.selectedFile;
-    }
-
-    public FileBrowser getBrowser() {
-        return browser;
     }
 
     public static void main(String[] args) {

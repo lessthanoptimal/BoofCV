@@ -49,7 +49,7 @@ public class FileBrowser extends JSpringPanel {
 	// field containing the file name
 	JTextArea textFileName;
 	// Path from root to current directory
-	JComboBox<String> directoryPath;
+	JComboBox<String> comboPath;
 	// list of child files and directories
 	JList<File> fileList;
 	DefaultListModel<File> listModel = new DefaultListModel<>();
@@ -87,7 +87,7 @@ public class FileBrowser extends JSpringPanel {
 			textFileName = providedFileName;
 		}
 
-		directoryPath = new JComboBox<>();
+		comboPath = new JComboBox<>();
 		fileList = new JList<>(listModel);
 		fileList.setCellRenderer(new FileListCellRenderer());
 		fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -116,7 +116,7 @@ public class FileBrowser extends JSpringPanel {
 		directoryRow.setLayout(new BoxLayout(directoryRow, BoxLayout.X_AXIS));
 		directoryRow.add(new JLabel("Location"));
 		directoryRow.add(Box.createHorizontalStrut(5));
-		directoryRow.add(directoryPath);
+		directoryRow.add(comboPath);
 
 		if( providedFileName == null ) {
 			// Put it into a horizontal panel and have text letting the user know this is just the file name
@@ -139,12 +139,12 @@ public class FileBrowser extends JSpringPanel {
 
 		setDirectory(directory);
 		directoryListener = e->{
-			if( directoryPath.getSelectedIndex() >= 0 ) {
-				File f = directories.get(directoryPath.getSelectedIndex());
+			if( comboPath.getSelectedIndex() >= 0 ) {
+				File f = directories.get(comboPath.getSelectedIndex());
 				setDirectory(f);
 			}
 		};
-		directoryPath.addActionListener(directoryListener);
+		comboPath.addActionListener(directoryListener);
 	}
 
 	public void addFileFilter( javax.swing.filechooser.FileFilter filter ) {
@@ -158,8 +158,9 @@ public class FileBrowser extends JSpringPanel {
 		if( file.isDirectory() ) {
 			setDirectory(file);
 		} else {
-			// bad file provided, set the directory instead
+			// File provided, set the directory to the parent
 			setDirectory(file.getParentFile());
+			// Then search for the in the list of files and select it
 			for( int i = 0; i < listModel.size(); i++ ) {
 				File f = listModel.get(i);
 				if( f.getName().equals(file.getName()) ) {
@@ -202,11 +203,10 @@ public class FileBrowser extends JSpringPanel {
 		JButton bUp = BoofSwingUtil.createButtonIconGUI("Up24.gif",26,26);
 		bUp.setToolTipText("Up Directory");
 		bUp.addActionListener(e->{
-			File f = new File(textFileName.getText());
-			if( f.isFile() ) {
-				f = f.getParentFile();
-			}
-			setDirectory(f.getParentFile());
+			if( directories.isEmpty() )
+				return;
+			File d = directories.get(directories.size()-1);
+			setDirectory(d.getParentFile());
 		});
 
 		panel.add(Box.createHorizontalGlue());
@@ -263,9 +263,9 @@ public class FileBrowser extends JSpringPanel {
 				listModel.addElement(f);
 			}
 
-			directoryPath.removeActionListener(directoryListener);
-			directoryPath.removeAllItems();
-			directoryPath.addActionListener(directoryListener);
+			comboPath.removeActionListener(directoryListener);
+			comboPath.removeAllItems();
+			comboPath.addActionListener(directoryListener);
 
 			listener.handleSelectedFile(null);
 		}
@@ -296,23 +296,23 @@ public class FileBrowser extends JSpringPanel {
 			file = file.getParentFile();
 		}
 
-		directoryPath.removeActionListener(directoryListener);
-		directoryPath.removeAllItems();
+		comboPath.removeActionListener(directoryListener);
+		comboPath.removeAllItems();
 		directories.clear();
 		for (int i = files.size()-1; i >=0; i--) {
 			File f = files.get(i);
 			if( f.getParentFile() == null ) {
 				try {
-					directoryPath.addItem(f.getCanonicalPath());
+					comboPath.addItem(f.getCanonicalPath());
 				} catch (IOException e) {
-					directoryPath.addItem("/");
+					comboPath.addItem("/");
 				}
 			} else
-				directoryPath.addItem( files.get(i).getName() );
+				comboPath.addItem( files.get(i).getName() );
 			directories.add(f);
 		}
-		directoryPath.setSelectedIndex( files.size()-1 );
-		directoryPath.addActionListener(directoryListener);
+		comboPath.setSelectedIndex( files.size()-1 );
+		comboPath.addActionListener(directoryListener);
 
 		listener.handleSelectedFile(null);
 	}
