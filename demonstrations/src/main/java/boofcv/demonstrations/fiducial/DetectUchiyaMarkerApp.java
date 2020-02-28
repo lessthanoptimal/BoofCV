@@ -161,7 +161,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 	private void loadDefinition(File file) {
 		try {
 			synchronized (lockTracker) {
-				definition = FiducialIO.loadUchiyaYaml(file);
+				definition = FiducialIO.loadRandomDotYaml(file);
 			}
 			fileDefinitions = file;
 			createDetector(false);

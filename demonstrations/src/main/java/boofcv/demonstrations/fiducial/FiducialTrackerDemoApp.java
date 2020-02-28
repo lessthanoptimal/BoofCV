@@ -231,7 +231,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 			} break;
 
 			case RANDOM_DOTS: {
-				RandomDotDefinition defs = FiducialIO.loadUchiyaYaml(new File(path,"descriptions.yaml"));
+				RandomDotDefinition defs = FiducialIO.loadRandomDotYaml(new File(path,"descriptions.yaml"));
 				var config = new ConfigUchiyaMarker();
 				config.markerLength = defs.markerWidth;
 				detector = FactoryFiducial.randomDots(config, imageClass);

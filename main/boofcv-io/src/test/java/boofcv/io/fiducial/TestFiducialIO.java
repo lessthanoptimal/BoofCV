@@ -54,7 +54,7 @@ class TestFiducialIO {
 		FiducialIO.saveRandomDotYaml(expected,new OutputStreamWriter(stream));
 
 		Reader reader = new InputStreamReader(new ByteArrayInputStream(stream.toByteArray()));
-		RandomDotDefinition found = FiducialIO.loadUchiyaYaml(reader);
+		RandomDotDefinition found = FiducialIO.loadRandomDotYaml(reader);
 
 		assertEquals(expected.randomSeed, found.randomSeed);
 		assertEquals(expected.maxDotsPerMarker, found.maxDotsPerMarker);

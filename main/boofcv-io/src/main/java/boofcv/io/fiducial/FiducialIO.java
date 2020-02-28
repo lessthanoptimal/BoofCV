@@ -78,10 +78,10 @@ public class FiducialIO {
 		createYmlObject().dump(map,out);
 	}
 
-	public static RandomDotDefinition loadUchiyaYaml(File file ) {
+	public static RandomDotDefinition loadRandomDotYaml(File file ) {
 		try {
 			FileReader reader = new FileReader(file);
-			RandomDotDefinition ret = loadUchiyaYaml(reader);
+			RandomDotDefinition ret = loadRandomDotYaml(reader);
 			reader.close();
 			return ret;
 		} catch( IOException e ) {
@@ -94,7 +94,7 @@ public class FiducialIO {
 	 * @param reader Stream reader
 	 * @return UchiyaDefinition
 	 */
-	public static RandomDotDefinition loadUchiyaYaml(Reader reader ) {
+	public static RandomDotDefinition loadRandomDotYaml(Reader reader ) {
 		Yaml yaml = createYmlObject();
 		Map<String,Object> data = yaml.load(reader);
 
