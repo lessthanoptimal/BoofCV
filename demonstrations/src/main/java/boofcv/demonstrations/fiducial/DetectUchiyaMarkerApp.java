@@ -38,7 +38,6 @@ import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.io.UtilIO;
-import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.fiducial.FiducialIO;
 import boofcv.io.fiducial.RandomDotDefinition;
 import boofcv.io.image.ConvertBufferedImage;
@@ -64,8 +63,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
-import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
+import static boofcv.gui.BoofSwingUtil.*;
 
 /**
  * Demonstration application for detecting {@link boofcv.alg.fiducial.dots.UchiyaMarkerTracker}.
@@ -175,29 +173,19 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 	protected void handleInputChange(int source, InputMethod method, int width, int height) {
 		super.handleInputChange(source, method, width, height);
 
-		if( method != InputMethod.IMAGE )
+		if( method != InputMethod.IMAGE && method != InputMethod.VIDEO )
 			return;
 
-		// forget the previous state
-		if( tracker != null )
-			tracker.reset();
-
-		synchronized (lockTracker) {
-			detections.reset();
-		}
 
 		URL url = UtilIO.ensureURL(inputFilePath);
 		if( url != null && url.getProtocol().equals("file") ) {
 			try {
 				String path = URLDecoder.decode(url.getPath(), "UTF-8");
-				File directory = new File(path).getParentFile();
+				File filePath = new File(path);
+				File directory = filePath.getParentFile();
 
-				File fileIntrinsic = new File(directory,"intrinsic.yaml");
-				if( fileIntrinsic.exists() ) {
-					intrinsic = CalibrationIO.load(fileIntrinsic);
-				} else {
-					intrinsic = null;
-				}
+				// first see if there's an intrinsic specialized for this object
+				intrinsic = UtilIO.loadExampleIntrinsic(media,filePath);
 
 				File fileDef = new File(directory, "descriptions.yaml");
 				if (fileDef.exists() && !fileDefinitions.getAbsolutePath().equals(fileDef.getAbsolutePath())) {
@@ -206,6 +194,16 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
+		}
+
+		// forget the previous state and update the camera model
+		synchronized (lockTracker) {
+			if( tracker != null ) {
+				tracker.reset();
+				LensDistortionNarrowFOV lens = LensDistortionFactory.narrow(intrinsic);
+				tracker.setLensDistortion(lens,intrinsic.width, intrinsic.height);
+			}
+			detections.reset();
 		}
 	}
 
@@ -301,13 +299,13 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		boolean show3D = true;
 
 		final JComboBox<String> comboView = combo(selectedView,"Input","Binary","Black");
-		final JCheckBox checkBounds = checkbox("Show Bounds",showBounds);
-		final JCheckBox checkID = checkbox("Show ID",showID);
-		final JCheckBox checkCenter = checkbox("Show Center",showCenter);
-		final JCheckBox checkEllipses = checkbox("Show Ellipses",showEllipses);
-		final JCheckBox checkDots = checkbox("Show Dots",showDots);
-		final JCheckBox checkContour = checkbox("Show Contour",showContour);
-		final JCheckBox check3D = checkbox("Show 3D",show3D);
+		final JCheckBox checkBounds = checkbox("Bounds",showBounds);
+		final JCheckBox checkID = checkbox("ID",showID);
+		final JCheckBox checkCenter = checkbox("Center",showCenter);
+		final JCheckBox checkEllipses = checkbox("Ellipses",showEllipses);
+		final JCheckBox checkDots = checkbox("Dots",showDots);
+		final JCheckBox checkContour = checkbox("Contour",showContour);
+		final JCheckBox check3D = checkbox("3D",show3D);
 
 		final ThresholdControlPanel thresholdPanel = new ThresholdControlPanel(DetectUchiyaMarkerApp.this,config.threshold);
 		final LlahControlPanel llahPanel = new LlahControlPanel(this,config.llah);
@@ -320,23 +318,21 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		final JSpinner spinMinAxis = spinner(config.minimumMinorAxis,0.0,999.0,1.0);
 		final JSpinner spinMaxAxisRatio = spinner(config.maxMajorToMinorRatio,1.0,1000.0,1.0);
 
-
 		public ControlPanel() {
+			super();
 			thresholdPanel.addHistogramGraph();
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1);
+
+			JPanel showPanel = gridPanel(0,2,0,0,
+					checkBounds,checkID,checkCenter,check3D,checkEllipses,checkDots,checkContour);
+			showPanel.setBorder(BorderFactory.createTitledBorder("Visualize"));
 
 			addLabeled(processingTimeLabel,"Time");
 			addLabeled(imageSizeLabel,"Size");
 			addLabeled(comboView, "View");
 			addLabeled(selectZoom,"Zoom");
-			addAlignLeft(checkBounds);
-			addAlignLeft(checkID);
-			addAlignLeft(checkCenter);
-			addAlignLeft(checkEllipses);
-			addAlignLeft(checkDots);
-			addAlignLeft(checkContour);
-			addAlignLeft(check3D);
-			add(llahPanel);
+			add(fillHorizontally(showPanel));
+			add(fillHorizontally(llahPanel));
 			addLabeled(spinMinEdge,"Min Edge Intensity");
 			addLabeled(comboConnectRule,"Connect Rule");
 			addLabeled(spinMinContour,"Min Contour");

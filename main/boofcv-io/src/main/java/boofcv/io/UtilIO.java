@@ -19,6 +19,9 @@
 package boofcv.io;
 
 import boofcv.BoofVersion;
+import boofcv.io.calibration.CalibrationIO;
+import boofcv.struct.calib.CameraPinholeBrown;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
 import java.io.*;
@@ -79,6 +82,26 @@ public class UtilIO {
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Loads camera model for an example input file. First checks to see if there's calibration specific to that file
+	 * if not it looks to see if there is a directory wide one. If all fails it returns null.
+	 */
+	public static CameraPinholeBrown loadExampleIntrinsic( MediaManager media, File exampleFile ) {
+		CameraPinholeBrown intrinsic = null;
+		String specialName = FilenameUtils.getBaseName(exampleFile.getName())+"_intrinsic.yaml";
+		File specialIntrinsic = new File(exampleFile.getParent(),specialName);
+		Reader reader = media.openFile(specialIntrinsic.getPath());
+		if( reader != null ) {
+			intrinsic = CalibrationIO.load(reader);
+		} else {
+			reader = media.openFile(new File(exampleFile.getParent(), "intrinsic.yaml").getPath());
+			if ( reader != null ) {
+				intrinsic = CalibrationIO.load(reader);
+			}
+		}
+		return intrinsic;
 	}
 
 	public static BufferedReader openBufferedReader(String fileName) throws FileNotFoundException {

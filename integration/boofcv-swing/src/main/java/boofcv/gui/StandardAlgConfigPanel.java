@@ -41,6 +41,33 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 	}
 
+	/**
+	 * Wraps the input panel inside another panel that will fill the control panel horizontally
+	 */
+	protected JPanel fillHorizontally( JPanel panel ) {
+		JPanel hack = new JPanel(new BorderLayout()) {
+			@Override
+			public Dimension getPreferredSize() {
+				Dimension d;
+				try {
+					d = StandardAlgConfigPanel.this.getPreferredSize();
+				} catch( RuntimeException ignore ) {
+					d = StandardAlgConfigPanel.this.getSize();
+				}
+
+				Dimension p = super.getPreferredSize();
+				return new Dimension(d.width-4,p.height);
+			}
+
+			@Override
+			public Dimension getMaximumSize() {
+				return getPreferredSize();
+			}
+		};
+		hack.add(BorderLayout.CENTER,panel);
+		return hack;
+	}
+
 	protected JConfigLength configLength(ConfigLength initial , int min , int max ) {
 		JConfigLength control = new JConfigLength((JConfigLength.Listener)this,true);
 		control.setValue(initial);

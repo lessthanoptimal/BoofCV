@@ -40,7 +40,6 @@ import boofcv.gui.fiducial.VisualizeFiducial;
 import boofcv.gui.image.ImagePanel;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
-import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.fiducial.FiducialIO;
 import boofcv.io.fiducial.RandomDotDefinition;
 import boofcv.io.image.ConvertBufferedImage;
@@ -61,7 +60,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -272,11 +274,10 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 		}
 		controls.setShowStability(true);
 
-		Reader reader = media.openFile(new File(path,"intrinsic.yaml").getPath());
-		if( reader == null ) {
-			throw new RuntimeException("BUG! can't open "+new File(path,"intrinsic.yaml").getPath());
+		intrinsic = UtilIO.loadExampleIntrinsic(media,new File(example.getPath()));
+		if( intrinsic == null ) {
+			throw new RuntimeException("BUG! can't open intrinsic calibration for "+example.getPath());
 		}
-		intrinsic = CalibrationIO.load(reader);
 
 		detector.setLensDistortion(new LensDistortionBrown(intrinsic),intrinsic.width,intrinsic.height);
 
