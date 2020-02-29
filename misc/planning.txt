@@ -1,3 +1,21 @@
+TODO Chessboard X-Corner
+     - Try computing Eigen corners first, then X-Corner scores for speed
+     - Make refined X-Corner a relative threshold
+     - Improve clustering. One image in Chessboard 2 should have pass but failed. MotionBlur image26, ... etc
+
+TODO assisted self calibration
+TODO hough circle detector
+TODO concurrent SIFT
+TODO concurrent dense features?
+TODO Estimate focal lengths given disparity image
+TODO Scharr gradient http://www.hlevkin.com/articles/SobelScharrGradients5x5.pdf
+
+TODO SGM - Consider YDX order. Profile to see if it's faster
+TODO Calibration
+     - TODO Calibrate using partially obscured chessboard patterns
+     - TODO Add ability to remove images and recalibrate from application
+     - TODO change high level API to be able to return more than one pattern. String ID
+
 TODO Perspective-n-conic
 
 TODO Uchiya Markers

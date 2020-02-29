@@ -232,6 +232,10 @@ public class UtilIO {
 		return pathExampleURL(path).toString();
 	}
 
+	public static File fileExample( String path ) {
+		return new File(pathExample(path));
+	}
+
 	/**
 	 * Searches for the root BoofCV directory and returns an absolute path from it.
 	 * @param path File path relative to root directory

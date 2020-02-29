@@ -60,9 +60,11 @@ Version : 0.36
   * Fixed issues with visualizing disparity
   * SimpleCamera2Activity::cameraIntrinsicNominal() returns false if it fails
 - Applications
-  * TODO assisted self calibration
   * Fixed calibration detector apps bug where scale got missed up when playing a movie
 - OpenKinect: Removed integration package since it hadn't been used in years
+- Demonstrations
+  * Added settings
+  * Added the ability to switch between different swing themes; darklaf and material-ui
 
 TODO Regression
    - Dump runtime results into their own directory for each device. Use hostname?
@@ -72,24 +74,6 @@ TODO Tech Reports for new chessboard detector, assisted calibration, line fittin
 TODO Videos - hough line detectors
             - chessboard corner detector + improvements
             - stereo and VO updates
-
-TODO Chessboard X-Corner
-     - Try computing Eigen corners first, then X-Corner scores for speed
-     - Make refined X-Corner a relative threshold
-     - Improve clustering. One image in Chessboard 2 should have pass but failed. MotionBlur image26, ... etc
-
-
-TODO hough circle detector
-TODO concurrent SIFT
-TODO concurrent dense features?
-TODO Estimate focal lengths given disparity image
-TODO Scharr gradient http://www.hlevkin.com/articles/SobelScharrGradients5x5.pdf
-
-TODO SGM - Consider YDX order. Profile to see if it's faster
-TODO Calibration
-     - TODO Calibrate using partially obscured chessboard patterns
-     - TODO Add ability to remove images and recalibrate from application
-     - TODO change high level API to be able to return more than one pattern. String ID
 
 ---------------------------------------------
 Date    : 2019-Dec-23
