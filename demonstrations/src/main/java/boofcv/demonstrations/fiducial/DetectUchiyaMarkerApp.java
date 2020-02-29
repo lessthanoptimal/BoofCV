@@ -200,8 +200,10 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 		synchronized (lockTracker) {
 			if( tracker != null ) {
 				tracker.reset();
-				LensDistortionNarrowFOV lens = LensDistortionFactory.narrow(intrinsic);
-				tracker.setLensDistortion(lens,intrinsic.width, intrinsic.height);
+				if( intrinsic != null ) {
+					LensDistortionNarrowFOV lens = LensDistortionFactory.narrow(intrinsic);
+					tracker.setLensDistortion(lens, intrinsic.width, intrinsic.height);
+				}
 			}
 			detections.reset();
 		}
