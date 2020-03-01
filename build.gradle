@@ -290,7 +290,9 @@ task createLibraryDirectory( dependsOn: javadocProjects.collect {[ it+':jar',it+
 task oneJarBin(type: Jar, dependsOn: javadocProjects.collect { it + ":compileJava" }) {
     baseName = 'BoofCV'
 
-    from files(javadocProjects.collect { project(it).sourceSets.main.output })
+    from files(javadocProjects.collect { project(it).sourceSets.main.output }) {
+        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+    }
 }
 
 task alljavadoc(type: Javadoc) {
