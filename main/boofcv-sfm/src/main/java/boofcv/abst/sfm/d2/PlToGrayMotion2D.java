@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.struct.image.Planar;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.point.Point2D_F64;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -79,13 +80,18 @@ public class PlToGrayMotion2D<T extends ImageGray<T>,IT extends InvertibleTransf
 	}
 
 	@Override
+	public int getTotal() {
+		return access.getTotal();
+	}
+
+	@Override
 	public long getTrackId(int index) {
 		return access.getTrackId(index);
 	}
 
 	@Override
-	public List<Point2D_F64> getAllTracks() {
-		return access.getAllTracks();
+	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
+		return access.getAllTracks(storage);
 	}
 
 	@Override

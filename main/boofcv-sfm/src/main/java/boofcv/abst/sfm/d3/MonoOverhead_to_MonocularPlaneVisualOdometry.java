@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,8 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.FastQueue;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -110,6 +112,12 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 	}
 
 	@Override
+	public int getTotal() {
+		computeTracks();
+		return pixels.size;
+	}
+
+	@Override
 	public long getTrackId(int index) {
 		AccessPointTracks accessPlane = (AccessPointTracks)alg.getMotion2D();
 
@@ -117,10 +125,16 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 	}
 
 	@Override
-	public List<Point2D_F64> getAllTracks() {
+	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
+		if( storage == null )
+			storage = new ArrayList<>();
+		else
+			storage.clear();
+
 		computeTracks();
 
-		return pixels.toList();
+		storage.addAll(pixels.toList());
+		return storage;
 	}
 
 	@Override
@@ -145,7 +159,7 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 			return;
 
 		AccessPointTracks accessPlane = (AccessPointTracks)alg.getMotion2D();
-		List<Point2D_F64> tracksPlane = accessPlane.getAllTracks();
+		List<Point2D_F64> tracksPlane = accessPlane.getAllTracks(null);
 
 		OverheadView<T> map = alg.getOverhead();
 

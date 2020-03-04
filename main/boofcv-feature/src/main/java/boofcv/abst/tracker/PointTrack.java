@@ -20,6 +20,10 @@ package boofcv.abst.tracker;
 
 import georegression.struct.point.Point2D_F64;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Current location of feature in a {@link PointTracker}.
  * 
@@ -53,7 +57,22 @@ public class PointTrack {
 
 	public PointTrack() {
 	}
-	
+
+	public static List<Point2D_F64> extractTrackPixels(@Nullable List<Point2D_F64> storage,
+													   List<PointTrack> tracks)
+	{
+		if( storage == null )
+			storage = new ArrayList<>();
+		else
+			storage.clear();
+
+		for (int i = 0; i < tracks.size(); i++) {
+			storage.add(tracks.get(i).pixel);
+		}
+
+		return storage;
+	}
+
 	public void set( PointTrack t ) {
 		featureId = t.featureId;
 		spawnFrameID = t.spawnFrameID;

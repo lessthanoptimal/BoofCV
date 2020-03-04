@@ -35,7 +35,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
-import java.util.ArrayList;
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -81,19 +81,18 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 	}
 
 	@Override
+	public int getTotal() {
+		return alg.getCandidates().size();
+	}
+
+	@Override
 	public long getTrackId(int index) {
 		return alg.getCandidates().get(index).featureId;
 	}
 
 	@Override
-	public List<Point2D_F64> getAllTracks() {
-		List<Point2D_F64> ret = new ArrayList<>();
-
-		for( PointTrack c : alg.getCandidates() ) {
-			ret.add(c.pixel);
-		}
-
-		return ret;
+	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
+		return PointTrack.extractTrackPixels(storage,alg.getCandidates());
 	}
 
 	@Override

@@ -25,8 +25,8 @@ import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.tracker.PointTrackerTwoPass;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.tracker.klt.ConfigPKlt;
-import boofcv.factory.tracker.FactoryPointTrackerTwoPass;
 import boofcv.factory.sfm.FactoryVisualOdometry;
+import boofcv.factory.tracker.FactoryPointTrackerTwoPass;
 import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -113,7 +113,7 @@ public class ExampleVisualOdometryDepth {
 		AccessPointTracks3D access = (AccessPointTracks3D)alg;
 
 		int count = 0;
-		int N = access.getAllTracks().size();
+		int N = access.getTotal();
 		for( int i = 0; i < N; i++ ) {
 			if( access.isInlier(i) )
 				count++;

@@ -24,8 +24,8 @@ import boofcv.abst.sfm.d3.MonocularPlaneVisualOdometry;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.tracker.klt.ConfigPKlt;
-import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryVisualOdometry;
+import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.VideoProcessAppBase;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.d2.PlaneView2D;
@@ -108,7 +108,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 
 		Graphics2D g2 = image.createGraphics();
 
-		List<Point2D_F64> points = tracker.getAllTracks();
+		List<Point2D_F64> points = tracker.getAllTracks(null);
 
 		if( points.size() == 0 )
 			return;

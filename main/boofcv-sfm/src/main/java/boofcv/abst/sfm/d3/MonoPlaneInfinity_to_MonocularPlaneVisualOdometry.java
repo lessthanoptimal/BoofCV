@@ -30,6 +30,8 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -135,6 +137,13 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	}
 
 	@Override
+	public int getTotal() {
+		if( active == null )
+			active = alg.getTracker().getActiveTracks(null);
+		return active.size();
+	}
+
+	@Override
 	public long getTrackId(int index) {
 		if( active == null )
 			active = alg.getTracker().getActiveTracks(null);
@@ -144,11 +153,20 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	}
 
 	@Override
-	public List<Point2D_F64> getAllTracks() {
+	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
+		if( storage == null )
+			storage = new ArrayList<>();
+		else
+			storage.clear();
+
 		if( active == null )
 			active = alg.getTracker().getActiveTracks(null);
 
-		return (List)active;
+		for (int i = 0; i < active.size(); i++) {
+			storage.add(active.get(i).pixel);
+		}
+
+		return storage;
 	}
 
 	@Override

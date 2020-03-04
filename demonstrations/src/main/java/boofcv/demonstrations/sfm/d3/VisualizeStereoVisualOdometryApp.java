@@ -126,7 +126,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 
 		Graphics2D g2 = image.createGraphics();
 
-		List<Point2D_F64> points = tracker.getAllTracks();
+		List<Point2D_F64> points = tracker.getAllTracks(null);
 
 		if( points.size() == 0 )
 			return;

@@ -109,7 +109,7 @@ public class ExampleVisualOdometryStereo {
 		AccessPointTracks3D access = (AccessPointTracks3D)alg;
 
 		int count = 0;
-		int N = access.getAllTracks().size();
+		int N = access.getTotal();
 		for( int i = 0; i < N; i++ ) {
 			if( access.isInlier(i) )
 				count++;

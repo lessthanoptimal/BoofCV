@@ -27,6 +27,7 @@ import georegression.struct.InvertibleTransform;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.GrowQueue_B;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,6 +88,12 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 	}
 
 	@Override
+	public int getTotal() {
+		checkInitialize();
+		return allTracks.size();
+	}
+
+	@Override
 	public long getTrackId(int index) {
 		return 0;
 	}
@@ -113,10 +120,16 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 	}
 
 	@Override
-	public List<Point2D_F64> getAllTracks() {
-		checkInitialize();
+	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
+		if( storage == null )
+			storage = new ArrayList<>();
+		else
+			storage.clear();
 
-		return allTracks;
+		checkInitialize();
+		storage.addAll(allTracks);
+
+		return storage;
 	}
 
 	@Override

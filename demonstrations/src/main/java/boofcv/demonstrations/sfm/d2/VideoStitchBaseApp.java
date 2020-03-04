@@ -230,7 +230,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 
 		AccessPointTracks access = (AccessPointTracks)alg.getMotion();
 
-		List<Point2D_F64> tracks = access.getAllTracks();
+		List<Point2D_F64> tracks = access.getAllTracks(null);
 		List<Point2D_F64> inliers = new ArrayList<>();
 
 		for( int i = 0; i < tracks.size(); i++ ) {

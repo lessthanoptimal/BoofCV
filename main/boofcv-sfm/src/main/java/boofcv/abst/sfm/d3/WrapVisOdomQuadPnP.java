@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,6 +36,7 @@ import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastQueue;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,19 +78,28 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	}
 
 	@Override
+	public int getTotal() {
+		return alg.getQuadViews().size;
+	}
+
+	@Override
 	public long getTrackId(int index) {
 		return 0;
 	}
 
 	@Override
-	public List<Point2D_F64> getAllTracks() {
+	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
+		if( storage == null )
+			storage = new ArrayList<>();
+		else
+			storage.clear();
+
 		FastQueue<VisOdomQuadPnP.QuadView> features =  alg.getQuadViews();
 
-		List<Point2D_F64> ret = new ArrayList<>();
 		for( VisOdomQuadPnP.QuadView v : features.toList() )
-			ret.add(v.v2); // new left camera
+			storage.add(v.v2); // new left camera
 
-		return ret;
+		return storage;
 	}
 
 	@Override
