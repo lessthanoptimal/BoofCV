@@ -188,6 +188,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 		tracker.setDescription(t);
 
 		PointTrackMod p = t.getCookie();
+		p.cookie = null;
 		p.set(x,y);
 		p.prev.set(x,y);
 
@@ -241,6 +242,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 			// set up point description
 			PointTrackMod p = t.getCookie();
 			p.set(t.x,t.y);
+			p.cookie = null;
 
 			if( checkValidSpawn(p) ) {
 				p.featureId = totalFeatures++;

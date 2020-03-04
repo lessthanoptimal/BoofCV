@@ -282,11 +282,13 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 				FactoryStereoDisparity.regionSparseWta(2,150,3,3,30,-1,true,imageType);
 
 		ConfigPKlt kltConfig = new ConfigPKlt();
+		kltConfig.toleranceFB = 3;
+		kltConfig.pruneClose = true;
 		kltConfig.templateRadius = 3;
 		kltConfig.pyramidScaling = new int[]{1, 2, 4, 8};
 
 		if( whichAlg == 0 ) {
-			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
+			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(1000,4,0.1f);
 
 			PointTrackerTwoPass<I> tracker = FactoryPointTrackerTwoPass.klt(kltConfig, configDetector,
 					imageType,derivType);
@@ -294,7 +296,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 			return FactoryVisualOdometry.stereoDepth(1.5,120,2,200,50, false, disparity, tracker, imageType);
 		} else if( whichAlg == 1 ) {
 
-			ConfigGeneralDetector configExtract = new ConfigGeneralDetector(600,3,1);
+			ConfigGeneralDetector configExtract = new ConfigGeneralDetector(1000,4,0.1f);
 
 			GeneralFeatureDetector detector = FactoryPointTracker.createShiTomasi(configExtract, derivType);
 			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(null,imageType);

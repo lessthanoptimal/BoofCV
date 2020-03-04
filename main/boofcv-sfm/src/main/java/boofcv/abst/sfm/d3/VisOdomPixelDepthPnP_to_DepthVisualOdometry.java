@@ -23,10 +23,10 @@ import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.sfm.DepthSparse3D;
+import boofcv.alg.sfm.d3.VisOdomBundleAdjustment;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
-import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
@@ -34,6 +34,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.sfm.Point2D3DTrack;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 
 import java.util.ArrayList;
@@ -74,12 +75,14 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	@Override
 	public Point3D_F64 getTrackLocation(int index) {
 		// TODO see comment above
+		PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
 		try {
-			PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
-			return ((Point2D3D)t.getCookie()).getLocation();
-		} catch( IndexOutOfBoundsException e ) {
-			return new Point3D_F64();
-		}
+			Point4D_F64 p = ((VisOdomBundleAdjustment.BTrack)t.getCookie()).worldLoc;
+			Point3D_F64 tmp = new Point3D_F64();
+			tmp.set( p.x/p.w, p.y/p.w, p.z/p.w);
+			return tmp;
+		} catch( RuntimeException ignore){}
+		return ((Point2D3D)t.getCookie()).getLocation();
 	}
 
 	@Override
@@ -94,8 +97,12 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 
 	@Override
 	public boolean isInlier(int index) {
-		Point2D3DTrack t = active.get(index).getCookie();
-		return t.lastInlier == alg.getTick();
+		try {
+			Point2D3DTrack t = active.get(index).getCookie();
+			return t.lastInlier == alg.getTick();
+		} catch( RuntimeException ignore){}
+		VisOdomPixelDepthPnP.Track t = active.get(index).getCookie();
+		return t.lastUsed == alg.getTick();
 	}
 
 	@Override
@@ -108,13 +115,7 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	public void setCalibration(CameraPinholeBrown paramVisual, Point2Transform2_F32 visToDepth) {
 		PointToPixelTransform_F32 visToDepth_pixel = new PointToPixelTransform_F32(visToDepth);
 		sparse3D.configure(narrow(paramVisual),visToDepth_pixel);
-
-		Point2Transform2_F64 leftPixelToNorm = narrow(paramVisual).undistort_F64(true,false);
-		Point2Transform2_F64 leftNormToPixel = narrow(paramVisual).distort_F64(false,true);
-
-		alg.setPixelToNorm(leftPixelToNorm);
-		alg.setNormToPixel(leftNormToPixel);
-
+		alg.setCamera(paramVisual);
 		distance.setIntrinsic(0,paramVisual);
 	}
 
