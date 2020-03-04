@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -156,10 +156,12 @@ public class ExampleStereoUncalibrated {
 
 		// Construct bundle adjustment data structure
 		var structure = new SceneStructureMetric(false);
-		var observations = new SceneObservations(2);
+		var observations = new SceneObservations();
 
 		// We will assume that the camera has fixed intrinsic parameters
 		structure.initialize(1,2,inliers.size());
+		observations.initialize(2);
+
 		var bp = new BundlePinholeSimplified();
 		bp.f = fx;
 		structure.setCamera(0,false,bp);

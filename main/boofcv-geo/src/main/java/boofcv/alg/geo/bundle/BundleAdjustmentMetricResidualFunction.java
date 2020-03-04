@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -188,7 +188,8 @@ public class BundleAdjustmentMetricResidualFunction
 					SceneStructureMetric.Point worldPt = structure.points.data[observedPixel.index];
 					worldPt.get(p4);
 
-					SePointOps_F64.transform(view.worldToView, p4, cameraPt);
+					// TODO Explain why this is correct. The last row is omited when converted to 3D
+					SePointOps_F64.transformV(view.worldToView, p4, cameraPt);
 
 					camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);
 
@@ -218,7 +219,7 @@ public class BundleAdjustmentMetricResidualFunction
 					objectPt.get(p4);
 
 					// Tranform to world frame and from world to camera
-					SePointOps_F64.transform(rigid.objectToWorld,p4, worldPt);
+					SePointOps_F64.transformV(rigid.objectToWorld,p4, worldPt);
 					SePointOps_F64.transform(view.worldToView,worldPt, cameraPt);
 
 					camera.model.project(cameraPt.x, cameraPt.y, cameraPt.z, predictedPixel);

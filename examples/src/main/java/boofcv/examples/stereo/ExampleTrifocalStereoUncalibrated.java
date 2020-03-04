@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -304,9 +304,11 @@ public class ExampleTrifocalStereoUncalibrated {
 
 		// Construct bundle adjustment data structure
 		SceneStructureMetric structure = new SceneStructureMetric(false);
-		SceneObservations observations = new SceneObservations(3);
-
 		structure.initialize(3,3,inliers.size());
+
+		SceneObservations observations = new SceneObservations();
+		observations.initialize(3);
+
 		for (int i = 0; i < listPinhole.size(); i++) {
 			BundlePinholeSimplified bp = new BundlePinholeSimplified();
 			bp.f = listPinhole.get(i).fx;

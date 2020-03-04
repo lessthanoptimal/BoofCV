@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -183,7 +183,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 				worldPt4.z = input[columnOfPointInJac + 2];
 				worldPt4.w = input[columnOfPointInJac + 3];
 
-				SePointOps_F64.transform(worldToView, worldPt4, cameraPt);
+				SePointOps_F64.transformV(worldToView, worldPt4, cameraPt);
 			} else {
 				worldPt3.x = input[columnOfPointInJac];
 				worldPt3.y = input[columnOfPointInJac + 1];
@@ -293,7 +293,7 @@ public abstract class BundleAdjustmentMetricSchurJacobian<M extends DMatrix>
 
 			if( structure.isHomogenous() ) {
 				rigid.getPoint(pointIndex,rigidPt4);
-				SePointOps_F64.transform(rigid.objectToWorld, rigidPt4, worldPt3);
+				SePointOps_F64.transformV(rigid.objectToWorld, rigidPt4, worldPt3);
 			} else {
 				rigid.getPoint(pointIndex,rigidPt3);
 				SePointOps_F64.transform(rigid.objectToWorld, rigidPt3, worldPt3);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import org.ddogleg.struct.GrowQueue_I32;
  * @author Peter Abeles
  */
 public abstract class SceneStructureCommon implements SceneStructure {
-	public FastQueue<Camera> cameras = new FastQueue<>(Camera.class,true);
+	public FastQueue<Camera> cameras = new FastQueue<>(Camera::new, Camera::reset);
 	public final FastQueue<Point> points;
 	/**
 	 * True if homogenous coordinates are being used

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -128,8 +128,8 @@ public abstract class CheckVisualOdometryStereoSim<I extends ImageGray<I>>
 			// Compare to truth.  Only go for a crude approximation
 			Se3_F64 foundWorldToLeft = algorithm.getCameraToWorld().invert(null);
 
-//			worldToLeft.getT().print();
-//			foundWorldToLeft.getT().print();
+			worldToLeft.getT().print();
+			foundWorldToLeft.getT().print();
 
 			assertTrue(MatrixFeatures_DDRM.isIdentical(foundWorldToLeft.getR(),worldToLeft.getR(),0.1));
 			assertTrue(foundWorldToLeft.getT().distance(worldToLeft.getT()) < tolerance );

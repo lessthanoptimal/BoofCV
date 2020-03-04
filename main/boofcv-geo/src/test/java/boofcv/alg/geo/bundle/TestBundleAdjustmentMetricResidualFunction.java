@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -109,7 +109,8 @@ class TestBundleAdjustmentMetricResidualFunction {
 	}
 
 	static SceneObservations createObservations(Random rand, SceneStructureMetric structure) {
-		SceneObservations obs = new SceneObservations(structure.views.size, structure.hasRigid());
+		SceneObservations obs = new SceneObservations();
+		obs.initialize(structure.views.size, structure.hasRigid());
 
 		for (int j = 0; j < structure.points.size; j++) {
 			SceneStructureMetric.Point p = structure.points.data[j];

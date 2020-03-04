@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -166,7 +166,8 @@ class TestScaleSceneStructure {
 		Random rand = new Random(seed);
 
 		scene.initialize(2,5,20);
-		SceneObservations observations = new SceneObservations(scene.views.size);
+		SceneObservations observations = new SceneObservations();
+		observations.initialize(scene.views.size);
 
 		CameraPinhole camera0 = new CameraPinhole(500+rand.nextDouble()*10,510+rand.nextDouble()*10,0,450,400,900,800);
 //		CameraPinhole camera1 = new CameraPinhole(456+rand.nextDouble()*10,510+rand.nextDouble()*10,0,420,410,900,800);
@@ -223,7 +224,8 @@ class TestScaleSceneStructure {
 		Random rand = new Random(seed);
 
 		scene.initialize(5,20);
-		SceneObservations observations = new SceneObservations(scene.views.size);
+		SceneObservations observations = new SceneObservations();
+		observations.initialize(scene.views.size);
 
 		CameraPinhole camera0 = new CameraPinhole(500+rand.nextDouble()*10,510+rand.nextDouble()*10,0,450,400,900,800);
 

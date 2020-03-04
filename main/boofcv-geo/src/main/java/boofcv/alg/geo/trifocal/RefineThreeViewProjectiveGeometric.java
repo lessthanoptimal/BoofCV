@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -144,7 +144,8 @@ public class RefineThreeViewProjectiveGeometric {
 
 		structure = new SceneStructureProjective(true);
 		structure.initialize(3,listObs.size());
-		observations = new SceneObservations(3);
+		observations = new SceneObservations();
+		observations.initialize(3);
 
 		structure.setView(0,true, P1,0,0);
 		structure.setView(1,false,P2,0,0);

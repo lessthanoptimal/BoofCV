@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,12 +36,13 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests which check to see if specific objects can be serialized or not
  *
- * WARNING: This will fail if the android module is loaded into memory at the same time.  It has a version of xmlstream
- * which isn't compatible and can't be excluded since Android is a massive jar.
+ * WARNING: This will fail if the android module is loaded into memory at the same time.  It has a version of xml 
+ * stream which isn't compatible and can't be excluded since Android is a massive jar.
  *
  * @author Peter Abeles
  */
-public class TestObjectSerialization {
+@SuppressWarnings({"rawtypes", "unchecked"})
+class TestObjectSerialization {
 
 	Random rand = new Random(234);
 
@@ -55,13 +56,14 @@ public class TestObjectSerialization {
 	}
 
 	@Test
-	public void testTupleDesc_F64() {
+	void testTupleDesc_F64() {
 		TupleDesc_F64 orig = new TupleDesc_F64(20);
 		for( int i = 0; i < orig.value.length; i++ ) {
 			orig.value[i] = i;
 		}
 
 		TupleDesc_F64 found = serializeDeSerialize(orig);
+		assertNotNull(found);
 
 		for( int i = 0; i < orig.value.length; i++ ) {
 			assertEquals(orig.value[i],found.value[i],1e-8);
@@ -69,7 +71,7 @@ public class TestObjectSerialization {
 	}
 
 	@Test
-	public void testSurfFeature() {
+	void testSurfFeature() {
 		BrightFeature orig = new BrightFeature(20);
 		orig.white = true;
 		for( int i = 0; i < orig.value.length; i++ ) {
@@ -78,6 +80,7 @@ public class TestObjectSerialization {
 
 		BrightFeature found = serializeDeSerialize(orig);
 
+		assertNotNull(found);
 		assertEquals(orig.white,found.white);
 		for( int i = 0; i < orig.value.length; i++ ) {
 			assertEquals(orig.value[i],found.value[i],1e-8);
@@ -85,7 +88,7 @@ public class TestObjectSerialization {
 	}
 
 	@Test
-	public void testNccFeature() {
+	void testNccFeature() {
 		NccFeature orig = new NccFeature(20);
 		orig.mean = 1.2;
 		orig.sigma = 3.4;
@@ -95,6 +98,7 @@ public class TestObjectSerialization {
 
 		NccFeature found = serializeDeSerialize(orig);
 
+		assertNotNull(found);
 		assertEquals(orig.mean,found.mean,1e-8);
 		assertEquals(orig.sigma,found.sigma,1e-8);
 		for( int i = 0; i < orig.value.length; i++ ) {
@@ -103,7 +107,7 @@ public class TestObjectSerialization {
 	}
 
 	@Test
-	public void testFastQueue() {
+	void testFastQueue() {
 		FastQueue<GrayU8> list = new FastQueue<>(GrayU8.class,false);
 
 		list.add(new GrayU8(1,2));
@@ -111,8 +115,9 @@ public class TestObjectSerialization {
 
 		FastQueue<GrayU8> found = serializeDeSerialize(list);
 
+		assertNotNull(found);
 		assertEquals(list.size(),found.size());
-		assertTrue(list.type == found.type);
+		assertSame(list.type, found.type);
 		assertFalse(found.isDeclareInstances());
 
 		for( int i = 0; i < list.size; i++ ) {
@@ -125,11 +130,12 @@ public class TestObjectSerialization {
 	}
 
 	@Test
-	public void testDMatrixRMaj() {
-		DMatrixRMaj orig = new DMatrixRMaj(2,3,true,new double[]{1,2,3,4,5,6});
+	void testDMatrixRMaj() {
+		DMatrixRMaj orig = new DMatrixRMaj(2,3,true, 1,2,3,4,5,6);
 
 		DMatrixRMaj found = serializeDeSerialize(orig);
 
+		assertNotNull(found);
 		assertEquals(orig.numRows, found.numRows);
 		assertEquals(orig.numCols, found.numCols);
 
@@ -139,7 +145,7 @@ public class TestObjectSerialization {
 	}
 
 	@Test
-	public void testSingleBandImages() {
+	void testSingleBandImages() {
 		Class []types = new Class[]{
 					GrayU8.class, GrayS8.class,
 					GrayU16.class,GrayS16.class,
@@ -152,6 +158,7 @@ public class TestObjectSerialization {
 
 			ImageGray found = serializeDeSerialize(original);
 
+			assertNotNull(found);
 			assertEquals(original.width,found.width);
 			assertEquals(original.height,found.height);
 			assertEquals(original.stride,found.stride);
@@ -162,19 +169,20 @@ public class TestObjectSerialization {
 					double a = GeneralizedImageOps.get(original,x,y);
 					double b = GeneralizedImageOps.get(found,x,y);
 
-					assertTrue(a == b);
+					assertEquals(a, b);
 				}
 			}
 		}
 	}
 
 	@Test
-	public void testPlanar() {
+	void testPlanar() {
 		Planar original = new Planar(GrayU8.class,40,50,3);
 		GImageMiscOps.addUniform(original, rand, 0, 100);
 
 		Planar found = serializeDeSerialize(original);
 
+		assertNotNull(found);
 		assertEquals(original.width,found.width);
 		assertEquals(original.height,found.height);
 		assertEquals(original.stride,found.stride);
@@ -185,12 +193,13 @@ public class TestObjectSerialization {
 	}
 
 	@Test
-	public void testIntrinsicParamters() {
+	void tebstIntrinsicParamters() {
 		CameraPinholeBrown original = new CameraPinholeBrown().
 				fsetK(1, 2, 3, 4, 5, 6, 7).fsetRadial(8,9).fsetTangental(10, 11);
 
 		CameraPinholeBrown found = serializeDeSerialize(original);
 
+		assertNotNull(found);
 		assertEquals(original.fx,found.fx,1e-8);
 		assertEquals(original.fy, found.fy, 1e-8);
 		assertEquals(original.skew,found.skew,1e-8);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import org.ejml.data.DMatrixRMaj;
  */
 public class SceneStructureProjective extends SceneStructureCommon
 {
-	public final FastQueue<View> views = new FastQueue<>(View.class,true);
+	public final FastQueue<View> views = new FastQueue<>(View::new,View::reset);
 
 	/**
 	 * Configure bundle adjustment
@@ -64,21 +64,12 @@ public class SceneStructureProjective extends SceneStructureCommon
 	 * @param totalPoints Number of points
 	 */
 	public void initialize( int totalCameras , int totalViews , int totalPoints ) {
+		cameras.reset();
+		views.reset();
+		points.reset();
 		cameras.resize(totalCameras);
 		views.resize(totalViews);
 		points.resize(totalPoints);
-
-		for (int i = 0; i < cameras.size; i++) {
-			cameras.data[i].reset();
-		}
-
-		for (int i = 0; i < views.size; i++) {
-			views.data[i].reset();
-		}
-
-		for (int i = 0; i < points.size; i++) {
-			points.data[i].reset();
-		}
 	}
 
 	/**

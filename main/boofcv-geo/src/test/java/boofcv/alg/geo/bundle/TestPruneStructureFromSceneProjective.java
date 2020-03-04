@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -170,7 +170,8 @@ class TestPruneStructureFromSceneProjective {
 	}
 
 	private void createRestOfScene() {
-		observations = new SceneObservations(structure.views.size);
+		observations = new SceneObservations();
+		observations.initialize(structure.views.size);
 
 		Point4D_F64 X = new Point4D_F64();
 		Point3D_F64 xx = new Point3D_F64();

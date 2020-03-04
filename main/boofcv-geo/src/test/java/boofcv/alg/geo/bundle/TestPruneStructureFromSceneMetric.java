@@ -337,7 +337,8 @@ class TestPruneStructureFromSceneMetric {
 			structure.connectViewToCamera(i,i%2);
 		}
 
-		observations = new SceneObservations(structure.views.size);
+		observations = new SceneObservations();
+		observations.initialize(structure.views.size);
 
 		// 3D point in camera coordinate system
 		Point3D_F64 cameraX = new Point3D_F64();

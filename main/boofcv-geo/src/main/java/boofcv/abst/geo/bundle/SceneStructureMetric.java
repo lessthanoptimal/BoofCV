@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,10 +36,10 @@ import org.ddogleg.struct.FastQueue;
  */
 public class SceneStructureMetric extends SceneStructureCommon {
 
-	public FastQueue<View> views = new FastQueue<>(View.class,true);
+	public FastQueue<View> views = new FastQueue<>(View::new, View::reset);
 
 	// data structures for rigid objects.
-	public FastQueue<Rigid> rigids = new FastQueue<>(Rigid.class,true);
+	public FastQueue<Rigid> rigids = new FastQueue<>(Rigid::new, Rigid::reset);
 	// Lookup table from rigid point to rigid object
 	public int[] lookupRigid;
 
@@ -71,22 +71,17 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * @param totalRigid Number of rigid objects
 	 */
 	public void initialize( int totalCameras , int totalViews , int totalPoints , int totalRigid ) {
+		// Reset first so that when it resizes it will call reset() on each object
+		cameras.reset();
+		views.reset();
+		points.reset();
+		rigids.reset();
+
 		cameras.resize(totalCameras);
 		views.resize(totalViews);
 		points.resize(totalPoints);
 		rigids.resize(totalRigid);
 
-		for (int i = 0; i < cameras.size; i++) {
-			cameras.data[i].reset();
-		}
-
-		for (int i = 0; i < points.size; i++) {
-			points.data[i].reset();
-		}
-
-		for (int i = 0; i < rigids.size; i++) {
-			rigids.get(i).reset();
-		}
 		// forget old assignments
 		lookupRigid = null;
 	}
@@ -124,7 +119,7 @@ public class SceneStructureMetric extends SceneStructureCommon {
 	 * Specifies the spacial transform for a view.
 	 * @param which Which view is being specified/
 	 * @param fixed If these parameters are fixed or not
-	 * @param worldToView The transform from world to view reference frames
+	 * @param worldToView The transform from world to view reference frames. Internal copy is saved.
 	 */
 	public void setView(int which , boolean fixed , Se3_F64 worldToView ) {
 		views.get(which).known = fixed;
@@ -248,6 +243,12 @@ public class SceneStructureMetric extends SceneStructureCommon {
 		 * The camera associated with this view
 		 */
 		public int camera = -1;
+
+		public void reset() {
+			known = true;
+			worldToView.reset();
+			camera = -1;
+		}
 	}
 
 	/**

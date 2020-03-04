@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -515,7 +515,8 @@ public class ProjectiveInitializeAllCommon {
 	 */
 	private SceneObservations createObservationsForBundleAdjustment(LookupSimilarImages db, View seed, GrowQueue_I32 motions) {
 		// seed view + the motions
-		SceneObservations observations = new SceneObservations(motions.size+1);
+		SceneObservations observations = new SceneObservations();
+		observations.initialize(motions.size+1);
 
 		// Observations for the seed view are a special case
 		SceneObservations.View obsView = observations.getView(0);

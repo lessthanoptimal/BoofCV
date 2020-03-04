@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -251,9 +251,10 @@ public abstract class GenericBundleAdjustmentMetricChecks {
 		int numFeatures = 200;
 
 		SceneStructureMetric structure = new SceneStructureMetric(false);
-		SceneObservations observations = new SceneObservations(numViews);
-
 		structure.initialize(1,numViews,numFeatures);
+
+		SceneObservations observations = new SceneObservations();
+		observations.initialize(numViews);
 
 		structure.setCamera(0,cameraFixed,intrinsic);
 

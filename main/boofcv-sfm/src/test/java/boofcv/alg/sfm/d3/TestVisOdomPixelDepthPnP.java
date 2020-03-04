@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,14 +20,18 @@ package boofcv.alg.sfm.d3;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
+ * Most testing is handled by wrapped classes
+ *
  * @author Peter Abeles
  */
-public class TestVisOdomPixelDepthPnP  {
+class TestVisOdomPixelDepthPnP  {
 
 	@Test
-	public void stuff() {
-		// This is intentionally left blank.  Tests are performed inside the abstract package
+	void selectFrameToDrop() {
+		fail("Implement");
 	}
 
 }

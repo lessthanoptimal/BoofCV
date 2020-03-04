@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,8 @@ public class CodecBundleAdjustmentInTheLarge {
         scene = new SceneStructureMetric(false);
         scene.initialize(numCameras,numCameras,numPoints);
 
-        observations = new SceneObservations(numCameras);
+        observations = new SceneObservations();
+        observations.initialize(numCameras);
 
         for (int i = 0; i < numObservations; i++) {
             words = reader.readLine().split("\\s+");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -339,9 +339,10 @@ public class ThreeViewEstimateMetricScene {
 	private void setupMetricBundleAdjustment(List<AssociatedTriple> inliers) {
 		// Construct bundle adjustment data structure
 		structure = new SceneStructureMetric(false);
-		observations = new SceneObservations(3);
-
 		structure.initialize(3,3,inliers.size());
+		observations = new SceneObservations();
+		observations.initialize(3);
+
 		for (int i = 0; i < listPinhole.size(); i++) {
 			CameraPinhole cp = listPinhole.get(i);
 			BundlePinholeSimplified bp = new BundlePinholeSimplified();

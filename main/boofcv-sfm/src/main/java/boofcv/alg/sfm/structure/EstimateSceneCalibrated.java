@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -239,7 +239,8 @@ public class EstimateSceneCalibrated implements EstimateSceneStructure<SceneStru
 	 */
 	private void convertToOutput( View origin ) {
 		structure = new SceneStructureMetric(false);
-		observations = new SceneObservations(viewsAdded.size());
+		observations = new SceneObservations();
+		observations.initialize(viewsAdded.size());
 
 		// TODO can this be simplified?
 		int idx = 0;

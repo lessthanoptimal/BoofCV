@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -236,8 +236,9 @@ abstract class GenericBundleAdjustmentProjectiveChecks {
 		int numFeatures = 200;
 
 		SceneStructureProjective structure = new SceneStructureProjective(false);
-		SceneObservations observations = new SceneObservations(numViews);
+		SceneObservations observations = new SceneObservations();
 
+		observations.initialize(numViews);
 		structure.initialize(numViews,numFeatures);
 
 		double minX = 0, maxX = 5;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,29 +34,30 @@ public class SceneObservations {
 	/**
 	 * Views of general points.
 	 */
-	public FastQueue<View> views = new FastQueue<>(View.class,true);
+	public final FastQueue<View> views = new FastQueue<>(View::new,View::reset);
 	/**
 	 * Views of points on rigid objects
 	 */
-	public FastQueue<View> viewsRigid = new FastQueue<>(View.class,true);
+	public final FastQueue<View> viewsRigid = new FastQueue<>(View::new,View::reset);
 
 	/**
-	 * Constructor with zero rigid objects assumed.
-	 *
+	 * Initialize the data structures for this number of views. Rigid is set to be false.
 	 * @param numViews Number of views
 	 */
-	public SceneObservations(int numViews ) {
-		this(numViews,false);
+	public void initialize(int numViews) {
+		this.initialize(numViews,false);
 	}
 
 	/**
-	 *
+	 * Initialize the data structures for this number of views
 	 * @param numViews Number of views
 	 * @param rigidObjects If true then there are rigid objects that can be observed
 	 */
-	public SceneObservations(int numViews , boolean rigidObjects ) {
+	public void initialize(int numViews , boolean rigidObjects ) {
+		views.reset();
 		views.resize(numViews);
 		if( rigidObjects ) {
+			viewsRigid.reset();
 			viewsRigid.resize(numViews);
 		}
 	}
@@ -159,6 +160,14 @@ public class SceneObservations {
 						throw new RuntimeException("Duplicates");
 				}
 			}
+		}
+
+		/**
+		 * Puts it back into its original state.
+		 */
+		public void reset() {
+			point.reset();
+			observations.reset();
 		}
 	}
 
