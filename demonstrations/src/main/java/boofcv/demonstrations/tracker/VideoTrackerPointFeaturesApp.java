@@ -222,7 +222,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 			double bestDistance = tol;
 			PointTrack best = null;
 			for (PointTrack p : tracksGui.toList()) {
-				double d = p.distance2(x,y);
+				double d = p.pixel.distance2(x,y);
 				if( d <= bestDistance ) {
 					best = p;
 					bestDistance = d;
@@ -245,7 +245,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		String text = "Track ID "+best.featureId+"\n";
 		text += "Set      "+best.setId+"\n";
 		text += "Duration "+(frameIdGui-best.spawnFrameID)+"\n";
-		text += String.format("Location %7.2f %7.2f",best.x,best.y);
+		text += String.format("Location %7.2f %7.2f",best.pixel.x,best.pixel.y);
 		return text;
 	}
 
@@ -290,18 +290,18 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 						} break;
 
 						case FLOW: {
-							visualizeFlow.computeColor(p,tracksPrev.get(p.featureId),false);
+							visualizeFlow.computeColor(p.pixel,tracksPrev.get(p.featureId),false);
 						} break;
 
 						case FLOW_LOG: {
-							visualizeFlow.computeColor(p,tracksPrev.get(p.featureId), true);
+							visualizeFlow.computeColor(p.pixel,tracksPrev.get(p.featureId), true);
 						} break;
 
 						default: throw new RuntimeException("BUG");
 					}
 
-					double x = offsetX + scale*p.x;
-					double y = offsetY + scale*p.y;
+					double x = offsetX + scale*p.pixel.x;
+					double y = offsetY + scale*p.pixel.y;
 
 					Stroke strokeBefore = g2.getStroke();
 					if( duration == 0 ) {
@@ -354,7 +354,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 				Point2D_F64 prev = tracksPrev.get(p.featureId);
 				if( prev != null ) {
 					// velocity Sq is much faster to compute than Euclidean distance
-					maxVelocity = Math.max(maxVelocity, prev.distance2(p));
+					maxVelocity = Math.max(maxVelocity, prev.distance2(p.pixel));
 				}
 			}
 			visualizeFlow.maxVelocity = Math.sqrt(maxVelocity);
@@ -402,7 +402,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 			tracksPrev.clear();
 			for (int i = 0; i < tracksGui.size(); i++) {
 				PointTrack t = tracksGui.get(i);
-				tracksPrev.put(t.featureId,t.copy());
+				tracksPrev.put(t.featureId,t.pixel.copy());
 			}
 
 			tracksGui.reset();

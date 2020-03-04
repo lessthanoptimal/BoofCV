@@ -25,7 +25,9 @@ import georegression.struct.point.Point2D_F64;
  * 
  * @author Peter Abeles
  */
-public class PointTrack extends Point2D_F64 {
+public class PointTrack {
+	/** Location of the track in the image */
+	public final Point2D_F64 pixel = new Point2D_F64();
 	/**
 	 * The type of feature it belongs to
 	 */
@@ -45,7 +47,7 @@ public class PointTrack extends Point2D_F64 {
 	private Object description;
 
 	public PointTrack(double x, double y, long featureId) {
-		super(x, y);
+		this.pixel.set(x,y);
 		this.featureId = featureId;
 	}
 
@@ -55,8 +57,7 @@ public class PointTrack extends Point2D_F64 {
 	public void set( PointTrack t ) {
 		featureId = t.featureId;
 		spawnFrameID = t.spawnFrameID;
-		x = t.x;
-		y = t.y;
+		pixel.set(t.pixel);
 		cookie = t.cookie;
 		description = t.description;
 	}
@@ -82,5 +83,10 @@ public class PointTrack extends Point2D_F64 {
 
 	public void setCookie(Object cookie) {
 		this.cookie = cookie;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return this == obj;
 	}
 }

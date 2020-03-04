@@ -113,12 +113,12 @@ public class ExamplePointFeatureTracker< T extends ImageGray<T>, D extends Image
 			int red = (int)(2.5*(p.featureId%100));
 			int green = (int)((255.0/150.0)*(p.featureId%150));
 			int blue = (int)(p.featureId%255);
-			VisualizeFeatures.drawPoint(g2, (int)p.x, (int)p.y, new Color(red,green,blue));
+			VisualizeFeatures.drawPoint(g2, (int)p.pixel.x, (int)p.pixel.y, new Color(red,green,blue));
 		}
 
 		// draw tracks which have just been spawned green
 		for( PointTrack p : tracker.getNewTracks(null) ) {
-			VisualizeFeatures.drawPoint(g2, (int)p.x, (int)p.y, Color.green);
+			VisualizeFeatures.drawPoint(g2, (int)p.pixel.x, (int)p.pixel.y, Color.green);
 		}
 
 		// tell the GUI to update

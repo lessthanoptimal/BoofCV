@@ -22,6 +22,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import georegression.struct.point.Point2D_F64;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("unchecked")
 public abstract class StandardPointTracker<T extends ImageGray<T>> {
 
 	public PointTracker<T> tracker;
@@ -74,7 +76,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		assertTrue(tracker.getAllTracks(null).size() > 0);
 
 		for( PointTrack t : tracker.getActiveTracks(null) ) {
-			assertTrue(t.cookie==null);
+			assertNull(t.cookie);
 		}
 	}
 
@@ -137,15 +139,14 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		processImage((T)image);
 		assertEquals(0,tracker.getAllTracks(null).size());
 		assertEquals(0,tracker.getActiveTracks(null).size());
-		assertTrue(tracker.getNewTracks(null).size() == 0 );
+		assertEquals(0, tracker.getNewTracks(null).size());
 
 		// Request that new tracks be spawned and ensure that all lists have been updated
 		tracker.spawnTracks();
 
 		assertTrue(tracker.getAllTracks(null).size() > 0);
 		assertTrue(tracker.getActiveTracks(null).size()>0);
-		assertTrue(tracker.getActiveTracks(null).size() ==
-				tracker.getNewTracks(null).size() );
+		assertEquals(tracker.getActiveTracks(null).size(), tracker.getNewTracks(null).size());
 		checkInside(tracker.getAllTracks(null));
 
 		// Tweak the input image and make sure that everything has the expected size
@@ -187,8 +188,8 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		// drop a track
 		PointTrack dropped = tracker.getActiveTracks(null).get(0);
 		tracker.dropTrack(dropped);
-		double x = dropped.x;
-		double y = dropped.y;
+		double x = dropped.pixel.x;
+		double y = dropped.pixel.y;
 
 		// process the exact same image
 		// I think in just about every tracker nothing should change. Might need to change this test for some
@@ -201,8 +202,8 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 
 		PointTrack found = tracker.getNewTracks(null).get(0);
 
-		assertTrue(x == found.x);
-		assertTrue(y == found.y);
+		assertEquals(x, found.pixel.x);
+		assertEquals(y, found.pixel.y);
 	}
 
 	/**
@@ -298,7 +299,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 			assertTrue(afterAll < BeforeEach );
 		} else  {
 			assertEquals(0,afterDropped);
-			assertTrue(afterAll == BeforeEach );
+			assertEquals(afterAll, BeforeEach);
 		}
 
 		if( shouldCreateInactive )
@@ -401,7 +402,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		tracker.spawnTracks();
 
 		List<PointTrack> input = new ArrayList<>();
-		assertTrue(input == tracker.getAllTracks(input));
+		assertSame(input, tracker.getAllTracks(input));
 
 		List<PointTrack> ret = tracker.getAllTracks(null);
 
@@ -418,7 +419,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		tracker.spawnTracks();
 
 		List<PointTrack> input = new ArrayList<>();
-		assertTrue(input == tracker.getActiveTracks(input));
+		assertSame(input, tracker.getActiveTracks(input));
 
 		List<PointTrack> ret = tracker.getActiveTracks(null);
 
@@ -439,7 +440,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		processImage((T)image);
 
 		List<PointTrack> input = new ArrayList<>();
-		assertTrue( input == tracker.getInactiveTracks(input));
+		assertSame(input, tracker.getInactiveTracks(input));
 
 		List<PointTrack> ret = tracker.getInactiveTracks(null);
 
@@ -457,7 +458,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		processImage((T)image);
 
 		List<PointTrack> input = new ArrayList<>();
-		assertTrue( input == tracker.getDroppedTracks(input));
+		assertSame(input, tracker.getDroppedTracks(input));
 		if( shouldDropTracks )
 			assertTrue( input.size() > 0 );
 
@@ -473,7 +474,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		tracker.spawnTracks();
 
 		List<PointTrack> input = new ArrayList<>();
-		assertTrue( input == tracker.getNewTracks(input));
+		assertSame(input, tracker.getNewTracks(input));
 
 		List<PointTrack> ret = tracker.getNewTracks(null);
 
@@ -487,7 +488,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		assertEquals(a.size(),b.size());
 
 		for( int i = 0; i < a.size(); i++ ) {
-			assertTrue(a.get(i) == b.get(i));
+			assertSame(a.get(i), b.get(i));
 		}
 	}
 
@@ -496,8 +497,9 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	 */
 	protected void checkInside( List<PointTrack> tracks ) {
 		for( PointTrack t : tracks ) {
-			if( t.x < 0 || t.y < 0 || t.x > width-1 || t.y > height-1 )
-				fail("track is outside of the image: "+t.x+" "+t.y);
+			Point2D_F64 p = t.pixel;
+			if( p.x < 0 || p.y < 0 || p.x > width-1 || p.y > height-1 )
+				fail("track is outside of the image: "+p.x+" "+p.y);
 		}
 	}
 
@@ -505,8 +507,6 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	 * Performs all the standard tracking steps.  Associates and updates tracks descriptions.  This function
 	 * is here for {@link DetectDescribeAssociateTwoPass} tests.  If overriden it should be
 	 * equivalent to just calling tracker.process()
-	 *
-	 * @param image
 	 */
 	protected void processImage( T image ) {
 		tracker.process(image);

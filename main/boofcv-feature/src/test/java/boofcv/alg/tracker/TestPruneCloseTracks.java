@@ -181,7 +181,7 @@ class TestPruneCloseTracks {
 			for (int j = 0; j < tracks.size(); j++) {
 				if( i == j )
 					continue;
-				if( tracks.get(i).distance(tracks.get(j)) <= radius ) {
+				if( tracks.get(i).pixel.distance(tracks.get(j).pixel) <= radius ) {
 					if( tracks.get(i).featureId > tracks.get(j).featureId ) {
 						keep = false;
 						break;
@@ -201,8 +201,8 @@ class TestPruneCloseTracks {
 
 		for (int i = 0; i < total; i++) {
 			PointTrack t = new PointTrack();
-			t.x = rand.nextDouble()*width;
-			t.y = rand.nextDouble()*height;
+			t.pixel.x = rand.nextDouble()*width;
+			t.pixel.y = rand.nextDouble()*height;
 			t.featureId = i;
 			t.spawnFrameID = rand.nextInt(100);
 			tracks.add(t);

@@ -199,7 +199,7 @@ public class PruneCloseTracks<T> {
 		return new PruneCloseTracks<>(radius, new TrackInfo<>() {
 			@Override
 			public void getLocation(PointTrack track, Point2D_F64 location) {
-				location.set(track);
+				location.set(track.pixel);
 			}
 
 			@Override

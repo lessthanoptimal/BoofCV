@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,8 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class CombinedTrack<TD extends TupleDesc> extends Point2D_F64 {
+public class CombinedTrack<TD extends TupleDesc> {
+	public final Point2D_F64 pixel = new Point2D_F64();
 	// KLT feature description
 	public PyramidKltFeature track;
 	// DDA type description

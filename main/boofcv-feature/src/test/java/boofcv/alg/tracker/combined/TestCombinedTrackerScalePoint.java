@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class TestCombinedTrackerScalePoint {
 
 	@Test
@@ -128,14 +128,14 @@ public class TestCombinedTrackerScalePoint {
 		// make sure the KLT tracks haven't been changed
 		for( Object a : alg.tracksPureKlt ) {
 			CombinedTrack c = (CombinedTrack)a;
-			assertEquals(0,c.x,1e-8);
-			assertEquals(0,c.y,1e-8);
+			assertEquals(0,c.pixel.x,1e-8);
+			assertEquals(0,c.pixel.y,1e-8);
 		}
 		// the others should have
 		for( Object a : alg.tracksReactivated ) {
 			CombinedTrack c = (CombinedTrack)a;
-			assertTrue(0 != c.x);
-			assertTrue(0 != c.y);
+			assertTrue(0 != c.pixel.x);
+			assertTrue(0 != c.pixel.y);
 		}
 	}
 

@@ -232,8 +232,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 
 			Stereo2D3D stereo = info.location;
 			// compute normalized image coordinate for track in left and right image
-			leftImageToNorm.compute(l.x,l.y,info.location.leftObs);
-			rightImageToNorm.compute(r.x,r.y,info.location.rightObs);
+			leftImageToNorm.compute(l.pixel.x,l.pixel.y,info.location.leftObs);
+			rightImageToNorm.compute(r.pixel.x,r.pixel.y,info.location.rightObs);
 
 			data.add(stereo);
 		}
@@ -260,8 +260,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 
 			Stereo2D3D stereo = info.location;
 			// compute normalized image coordinate for track in left and right image
-			leftImageToNorm.compute(l.x,l.y,info.location.leftObs);
-			rightImageToNorm.compute(r.x,r.y,info.location.rightObs);
+			leftImageToNorm.compute(l.pixel.x,l.pixel.y,info.location.leftObs);
+			rightImageToNorm.compute(r.pixel.x,r.pixel.y,info.location.rightObs);
 
 			data.add(stereo);
 		}
@@ -330,7 +330,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 			}
 
 			// check epipolar constraint and see if it is still valid
-			if( stereoCheck.checkPixel(left, info.right) ) {
+			if( stereoCheck.checkPixel(left.pixel, info.right.pixel) ) {
 				info.lastConsistent = tick;
 				candidates.add(left);
 			}
@@ -429,8 +429,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 			Stereo2D3D p2d3d = infoLeft.location;
 
 			// convert pixel observations into normalized image coordinates
-			leftImageToNorm.compute(trackL.x,trackL.y,p2d3d.leftObs);
-			rightImageToNorm.compute(trackR.x,trackR.y,p2d3d.rightObs);
+			leftImageToNorm.compute(trackL.pixel.x,trackL.pixel.y,p2d3d.leftObs);
+			rightImageToNorm.compute(trackR.pixel.x,trackR.pixel.y,p2d3d.rightObs);
 
 			// triangulate 3D coordinate in the current camera frame
 			if( triangulate.triangulate(p2d3d.leftObs,p2d3d.rightObs,leftToRight,cameraP3) )
@@ -490,9 +490,9 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 		for( int i = 0; i < tracks.size(); i++ ) {
 			PointTrack t = tracks.get(i);
 			// ignoring the return value.  most descriptors never return false and the ones that due will rarely do so
-			describe.process(t.x,t.y,0,describeRadius,descs.grow());
+			describe.process(t.pixel.x,t.pixel.y,0,describeRadius,descs.grow());
 
-			points.add( t );
+			points.add( t.pixel );
 		}
 	}
 

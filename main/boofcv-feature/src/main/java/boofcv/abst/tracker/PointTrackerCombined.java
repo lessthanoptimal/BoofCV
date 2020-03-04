@@ -114,11 +114,11 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 
 		// Update the PointTrack state for KLT tracks
 		for( CombinedTrack<Desc> t : tracker.getPureKlt() ) {
-			((PointTrack)t.getCookie()).set(t);
+			((PointTrack)t.getCookie()).pixel.set(t.pixel);
 		}
 
 		for( CombinedTrack<Desc> t : tracker.getReactivated() ) {
-			((PointTrack)t.getCookie()).set(t);
+			((PointTrack)t.getCookie()).pixel.set(t.pixel);
 		}
 	}
 
@@ -138,7 +138,7 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 				t.setCookie(p);
 			}
 
-			p.set(t);
+			p.pixel.set(t.pixel);
 			p.setDescription(t);
 			p.featureId = t.featureId;
 			p.spawnFrameID = frameID;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -148,7 +148,7 @@ public class CombinedTrackerScalePoint
 				tracks.remove(i);
 				tracksDormant.add(track);
 			} else {
-				track.set(track.track.x,track.track.y);
+				track.pixel.set(track.track.x,track.track.y);
 				i++;
 			}
 		}
@@ -196,7 +196,7 @@ public class CombinedTrackerScalePoint
 			// set track ID and location
 			track.featureId = totalTracks++;
 			track.desc.setTo(d);
-			track.set(p);
+			track.pixel.set(p);
 
 			// update list of active tracks
 			tracksPureKlt.add(track);
@@ -272,8 +272,8 @@ public class CombinedTrackerScalePoint
 
 			CombinedTrack<TD> t = all.get(a.src);
 
-			t.set(detector.getLocation(a.dst));
-			trackerKlt.setDescription((float) t.x, (float) t.y, t.track);
+			t.pixel.set(detector.getLocation(a.dst));
+			trackerKlt.setDescription((float) t.pixel.x, (float) t.pixel.y, t.track);
 			tracksReactivated.add(t);
 			associated[a.src] = true;
 		}

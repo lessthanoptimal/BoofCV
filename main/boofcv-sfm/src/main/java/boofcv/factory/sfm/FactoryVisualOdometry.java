@@ -186,7 +186,7 @@ public class FactoryVisualOdometry {
 										int refineIterations ,
 										boolean doublePass ,
 										StereoDisparitySparse<T> sparseDisparity,
-										PointTrackerTwoPass<T> tracker ,
+										PointTracker<T> tracker ,
 										Class<T> imageType) {
 
 		// Range from sparse disparity

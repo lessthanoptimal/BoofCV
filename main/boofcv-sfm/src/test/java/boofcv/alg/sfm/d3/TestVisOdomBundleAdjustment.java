@@ -97,7 +97,7 @@ class TestVisOdomBundleAdjustment {
 		assertEquals(1,trackA.observations.size);
 		BObservation obs = trackA.observations.get(0);
 		assertSame(frameA,obs.frame);
-		assertEquals(0.0, obs.distance(5,10), UtilEjml.TEST_F64);
+		assertEquals(0.0, obs.pixel.distance(5,10), UtilEjml.TEST_F64);
 	}
 
 	@Test

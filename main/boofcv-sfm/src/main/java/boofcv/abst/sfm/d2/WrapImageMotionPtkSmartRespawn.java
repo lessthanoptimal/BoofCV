@@ -105,7 +105,7 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 			for( int i = 0; i < active.size(); i++ ) {
 				PointTrack t = active.get(i);
 				AssociatedPairTrack info = t.getCookie();
-				allTracks.add(t);
+				allTracks.add(t.pixel);
 				// if it was used in the previous update then it is in the inlier set
 				inliers.data[i] = info.lastUsed == tick;
 			}

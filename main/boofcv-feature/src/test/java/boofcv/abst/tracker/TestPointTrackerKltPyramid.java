@@ -120,8 +120,8 @@ class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 		alg.process(image);
 		PointTrack track = alg.addTrack(10,20.5);
 		assertTrue(track != null );
-		assertEquals(10,track.x,1e-5);
-		assertEquals(20.5,track.y,1e-5);
+		assertEquals(10,track.pixel.x,1e-5);
+		assertEquals(20.5,track.pixel.y,1e-5);
 
 		PyramidKltFeature desc = track.getDescription();
 		assertEquals(10,desc.x,1e-5);

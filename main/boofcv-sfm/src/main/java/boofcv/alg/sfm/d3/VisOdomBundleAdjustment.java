@@ -113,7 +113,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 			for (int obsIdx = 0; obsIdx < t.observations.size; obsIdx++) {
 				BObservation o = t.observations.get(obsIdx);
 				SceneObservations.View view = observations.getView(o.frame.listIndex);
-				view.add(featureBundleIdx,(float)o.x,(float)o.y);
+				view.add(featureBundleIdx,(float)o.pixel.x,(float)o.pixel.y);
 			}
 			featureBundleIdx++;
 		}
@@ -155,8 +155,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	public void addObservation(BFrame frame , T track , double pixelX , double pixelY ) {
 		BObservation o = track.observations.grow();
 		o.frame = frame;
-		o.x = pixelX;
-		o.y = pixelY;
+		o.pixel.set(pixelX,pixelY);
 		frame.tracks.add(track);
 	}
 
@@ -194,6 +193,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 
 			// If the track no longer has observations remove it from the master track list
 			if( t.observations.size() == 0 ) {
+				System.out.println("Track has no observations. Dropping track.id="+t.id);
 				pruneObservations = true;
 			}
 		}
@@ -230,7 +230,11 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 				BTrack t = frame.tracks.get(trackIdx);
 				trackSet.add(t.id);
 				if( !t.isObservedBy(frame) ) {
-					throw new RuntimeException("Frame's track list is out of date. frame.id="+frame.id+" track.id="+t.id);
+					throw new RuntimeException("Frame's track list is out of date. frame.id="+frame.id+" track.id="+t.id+" obs.size "+t.observations.size);
+				} else {
+					if( tracks.isUnused((T)t) ) {
+						throw new RuntimeException("BUG! Track is in unused list. frame.id="+frame.id+" track.id="+t.id);
+					}
 				}
 			}
 		}
@@ -242,11 +246,12 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 //					trackSet.size()+" vs track.size "+tracks.size);
 	}
 
-	public static class BObservation extends Point2D_F64 {
+	public static class BObservation{
+		public final Point2D_F64 pixel = new Point2D_F64();
 		public BFrame frame;
 
 		public void reset() {
-			set(-1,-1);
+			pixel.set(-1,-1);
 			frame = null;
 		}
 	}

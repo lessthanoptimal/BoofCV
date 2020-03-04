@@ -39,6 +39,8 @@ Version : 0.36
 - PointTracker
   * Added frameID for each processed frame
   * Added spawnFrameID to tracks
+  * Tracks and similar data structures no longer extend Point2D. Serious unintended consequences from that.
+    Point2D overloads equals and hashcode which broke trackers.
 - Shape Detectors
   * BinaryEllipseDetectorPixel will use external only contour detector when it doesn't detect internal contours
 - PerspectiveOps
@@ -65,6 +67,8 @@ Version : 0.36
 - Demonstrations
   * Added settings
   * Added the ability to switch between different swing themes; darklaf and material-ui
+
+TODO Do not use GrowQueue with declare instances = false. Create a new data type for that
 
 TODO Regression
    - Dump runtime results into their own directory for each device. Use hostname?

@@ -21,7 +21,7 @@ package boofcv.alg.sfm.d3;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.abst.tracker.PointTrack;
-import boofcv.abst.tracker.PointTrackerTwoPass;
+import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BFrame;
@@ -32,8 +32,6 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
-import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import lombok.Getter;
@@ -72,7 +70,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 	private boolean doublePass;
 
 	// tracks features in the image
-	private final @Getter PointTrackerTwoPass<T> tracker;
+	private final @Getter PointTracker<T> tracker;
 	/** used to estimate a feature's 3D position from image range data */
 	private final @Getter ImagePixelTo3D pixelTo3D;
 	/** converts from pixel to normalized image coordinates */
@@ -126,7 +124,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 								ModelMatcher<Se3_F64, Point2D3D> motionEstimator,
 								ImagePixelTo3D pixelTo3D,
 								RefinePnP refine ,
-								PointTrackerTwoPass<T> tracker ,
+								PointTracker<T> tracker ,
 								Point2Transform2_F64 pixelToNorm ,
 								Point2Transform2_F64 normToPixel )
 	{
@@ -170,6 +168,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		framePrevious = first ? null : bundle.getLastFrame();
 		// Create a new frame for the current image
 		frameCurrent = bundle.addFrame(tracker.getFrameID());
+		if( frameCurrent.tracks.size != 0 )
+			throw new RuntimeException("Bug!");
 
 		// Handle the very first image differently
 		if( first ) {
@@ -181,7 +181,9 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 			if( framePrevious == null )
 				throw new RuntimeException("BUG! No previous frame and not the first frame");
 
+			bundle.sanityCheck();
 			if( !estimateMotion() ) {
+				System.out.println("********* Estimate motion failed");
 				// discard the current frame and attempt to jump over it
 				bundle.removeFrame(frameCurrent);
 				bundle.sanityCheck();
@@ -206,7 +208,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 //				System.out.println("Dropping frame "+(bundle.frames.indexOf(target)+" / "+bundle.frames.size));
 
 				bundle.sanityCheck();
-				bundle.removeFrame(target);
+				bundle.removeFrame(target); // TODO Need to remove reference of PointTrack too!!
 				bundle.sanityCheck();
 				if( target != frameCurrent ) {
 					// it decided to keep the current track. Spawn new tracks in the current frame
@@ -275,7 +277,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 				if( obsP == null )
 					continue;
 				totalCommon++;
-				averageMotion += obsI.distance(obsP);
+				averageMotion += obsI.pixel.distance(obsP.pixel);
 			}
 
 			listCommon.add(totalCommon);
@@ -341,16 +343,47 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		int num = 0;
 
 		for( PointTrack t : all ) {
+			int count = 0;
+			for (int i = 0; i < all.size(); i++) {
+				if( t == all.get(i) )
+					count++;
+			}
+			if( count != 1 )
+				throw new RuntimeException("Unexpected count in all "+count);
+
 			Track p = t.getCookie();
-			if( p==null|| (trackerFrame - p.lastUsed >= thresholdRetire) ) {
-				tracker.dropTrack(t);
+			if( p == null ) {
+				if( !tracker.dropTrack(t) )
+					throw new RuntimeException("Drop failed");
+			} else if( trackerFrame - p.lastUsed >= thresholdRetire ) {
+				System.out.println("Dropping unused track.id=" + p.id+" point.id="+t.featureId);
+				if( !tracker.dropTrack(t) )
+					throw new RuntimeException("Drop failed");
+				t.cookie = null;
 				p.observations.reset(); // This marks it as needing to be removed.
 				num++;
 			}
 		}
 
-		// TODO remove them from all frames
-		// todo remove from master track list
+		// Update data structures for the dropped track
+		for (int trackIdx = bundle.tracks.size-1; trackIdx >= 0; trackIdx-- ) {
+			Track t = bundle.tracks.get(trackIdx);
+			if( t.observations.size == 0 ) {
+				if( bundle.tracks.isUnused(t))
+					throw new RuntimeException("BUG!");
+				bundle.tracks.removeSwap(trackIdx);
+			}
+		}
+
+		for (int frameIdx = 0; frameIdx < bundle.frames.size; frameIdx++) {
+			BFrame f = bundle.frames.get(frameIdx);
+
+			for (int trackIdx = f.tracks.size-1; trackIdx >= 0; trackIdx--) {
+				if( f.tracks.get(trackIdx).observations.size == 0 ) {
+					f.tracks.removeSwap(trackIdx);
+				}
+			}
+		}
 
 		return num;
 	}
@@ -370,28 +403,30 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 
 		bundle.sanityCheck();
 
-
 		// estimate 3D coordinate using stereo vision
 		for( PointTrack t : spawned ) {
 //			if( t.cookie != null )
 //				throw new RuntimeException("BUG!");
 			// discard point if it can't localized
-			if( !pixelTo3D.process(t.x,t.y) || pixelTo3D.getW() == 0 ) { // TODO don't drop infinity
+			if( !pixelTo3D.process(t.pixel.x,t.pixel.y) || pixelTo3D.getW() == 0 ) { // TODO don't drop infinity
 				tracker.dropTrack(t);
 			} else {
 				bundle.sanityCheck();
 				// Save the track's 3D location and add it to the current frame
 				Track track = bundle.addTrack(t.featureId,pixelTo3D.getX(),pixelTo3D.getY(),pixelTo3D.getZ(),pixelTo3D.getW());
+				track.lastUsed = frameID;
+				t.cookie = track;
+				if( bundle.tracks.isUnused(track) )
+					throw new RuntimeException("Bug! track.id="+track.id+" is in unused");
+
 				System.out.println("Created track "+track.id+"  currentFrame "+frameCurrent.id+"  obs.size "+track.observations.size);
 				bundle.sanityCheck();
 				// Convert the location from local coordinate system to world coordinates
 				SePointOps_F64.transform(frameCurrent.frameToWorld,track.worldLoc,track.worldLoc);
 				bundle.sanityCheck();
 
-				bundle.addObservation(frameCurrent, track, t.x , t.y);
+				bundle.addObservation(frameCurrent, track, t.pixel.x , t.pixel.y);
 
-				track.lastUsed = frameID;
-				t.cookie = track;
 
 //				if( !track.isObservedBy(frameCurrent)) {
 //					throw new RuntimeException("WTF");
@@ -416,9 +451,12 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		observationsPnP.reset();
 		for( PointTrack pt : active ) {
 			Point2D3D p = observationsPnP.grow();
-			pixelToNorm.compute( pt.x , pt.y , p.observation );
+			pixelToNorm.compute( pt.pixel.x , pt.pixel.y , p.observation );
 			Track bt = pt.getCookie();
 
+			if( bundle.tracks.isUnused(bt) ) {
+				throw new RuntimeException("Bug! track.id="+bt.id+" is in unused! ptrack.id="+pt.featureId);
+			}
 			// TODO Handle infinity better. avoid divide by zero?
 			// Put the point into
 			double w = bt.worldLoc.w;
@@ -442,7 +480,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 //			if (!performSecondPass(active, observationsPnP.toList()))
 //				return false;
 //		}
-		tracker.finishTracking();
+//		tracker.finishTracking();
 
 		Se3_F64 keyToCurr;
 
@@ -457,6 +495,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		keyToCurr.invert(currToKey);
 		currToKey.concat(framePrevious.frameToWorld,frameCurrent.frameToWorld);
 
+		bundle.sanityCheck();
+
 		// mark tracks as being inliers and add to inlier list
 		int N = motionEstimator.getMatchSet().size();
 		long tick = tracker.getFrameID();
@@ -466,45 +506,49 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 			Track t = p.getCookie();
 			t.lastUsed = tick;
 			t.active = true;
-			bundle.addObservation(frameCurrent, t, p.x, p.y);
+			bundle.addObservation(frameCurrent, t, p.pixel.x, p.pixel.y);
 			inlierTracks.add( t );
+			if( bundle.tracks.isUnused(t) ) {
+				boolean used = bundle.tracks.contains(t);
+				throw new RuntimeException("Bug! track.id="+t.id+" is in unused! contains="+used+" ptrack.id="+p.featureId);
+			}
 		}
 		bundle.sanityCheck();
 
 		return true;
 	}
 
-	private boolean performSecondPass(List<PointTrack> active, List<Point2D3D> obs) {
-		Se3_F64 keyToCurr = motionEstimator.getModelParameters();
-
-		Point3D_F64 cameraPt = new Point3D_F64();
-		Point2D_F64 predicted = new Point2D_F64();
-
-		// predict where each track should be given the just estimated motion
-		List<PointTrack> all = tracker.getAllTracks(null);
-		for( PointTrack t : all ) {
-			Point2D3D p = t.getCookie();
-
-			SePointOps_F64.transform(keyToCurr, p.location, cameraPt);
-			normToPixel.compute(cameraPt.x / cameraPt.z, cameraPt.y / cameraPt.z, predicted);
-			tracker.setHint(predicted.x,predicted.y,t);
-		}
-
-		// redo tracking with the additional information
-		tracker.performSecondPass();
-
-		active.clear();
-		obs.clear();
-		tracker.getActiveTracks(active);
-
-		for( PointTrack t : active ) {
-			Point2D3D p = t.getCookie();
-			pixelToNorm.compute( t.x , t.y , p.observation );
-			obs.add( p );
-		}
-
-		return motionEstimator.process(obs);
-	}
+//	private boolean performSecondPass(List<PointTrack> active, List<Point2D3D> obs) {
+//		Se3_F64 keyToCurr = motionEstimator.getModelParameters();
+//
+//		Point3D_F64 cameraPt = new Point3D_F64();
+//		Point2D_F64 predicted = new Point2D_F64();
+//
+//		// predict where each track should be given the just estimated motion
+//		List<PointTrack> all = tracker.getAllTracks(null);
+//		for( PointTrack t : all ) {
+//			Point2D3D p = t.getCookie();
+//
+//			SePointOps_F64.transform(keyToCurr, p.location, cameraPt);
+//			normToPixel.compute(cameraPt.x / cameraPt.z, cameraPt.y / cameraPt.z, predicted);
+//			tracker.setHint(predicted.x,predicted.y,t);
+//		}
+//
+//		// redo tracking with the additional information
+//		tracker.performSecondPass();
+//
+//		active.clear();
+//		obs.clear();
+//		tracker.getActiveTracks(active);
+//
+//		for( PointTrack t : active ) {
+//			Point2D3D p = t.getCookie();
+//			pixelToNorm.compute( t.x , t.y , p.observation );
+//			obs.add( p );
+//		}
+//
+//		return motionEstimator.process(obs);
+//	}
 
 	public long getTick() {
 		return tracker.getFrameID();

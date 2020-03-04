@@ -33,7 +33,6 @@ import boofcv.abst.feature.detect.interest.GeneralToInterestMulti;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
-import boofcv.abst.tracker.ConfigTrackerDda;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.abst.tracker.PointTrackerToTwoPass;
 import boofcv.abst.tracker.PointTrackerTwoPass;
@@ -47,7 +46,6 @@ import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.FactoryPointTracker;
-import boofcv.factory.tracker.FactoryPointTrackerTwoPass;
 import boofcv.gui.StereoVideoAppBase;
 import boofcv.gui.VisualizeApp;
 import boofcv.gui.d3.Polygon3DSequenceViewer;
@@ -290,11 +288,11 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 		if( whichAlg == 0 ) {
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(1000,4,0.1f);
 
-			PointTrackerTwoPass<I> tracker = FactoryPointTrackerTwoPass.klt(kltConfig, configDetector,
-					imageType,derivType);
+			PointTracker<I> tracker = FactoryPointTracker.klt(kltConfig, configDetector,imageType,derivType);
 
 			return FactoryVisualOdometry.stereoDepth(1.5,120,2,200,50, false, disparity, tracker, imageType);
 		} else if( whichAlg == 1 ) {
+			System.out.println("########### DDA ########################");
 
 			ConfigGeneralDetector configExtract = new ConfigGeneralDetector(1000,4,0.1f);
 
@@ -306,8 +304,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 			AssociateDescription2D<TupleDesc_B> associate =
 					new AssociateDescTo2D<>(FactoryAssociation.greedy(score, 150, true));
 
-			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.dda(detector, describe, associate, null, 1,
-					new ConfigTrackerDda(), imageType);
+			PointTracker<I> tracker = FactoryPointTracker.dda(detector, describe, associate, 1, imageType);
 
 			return FactoryVisualOdometry.stereoDepth(1.5,80,3,200,50, false, disparity, tracker, imageType);
 		} else if( whichAlg == 2 ) {

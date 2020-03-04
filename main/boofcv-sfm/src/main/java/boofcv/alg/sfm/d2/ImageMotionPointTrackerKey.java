@@ -178,7 +178,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 		List<PointTrack> active = tracker.getActiveTracks(null);
 		for( PointTrack l : active ) {
 			AssociatedPairTrack p = l.getCookie();
-			p.p1.set(l);
+			p.p1.set(l.pixel);
 			p.lastUsed = totalFramesProcessed;
 		}
 
@@ -190,9 +190,9 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 				l.cookie = p = new AssociatedPairTrack();
 				// little bit of trickery here.  Save the reference so that the point
 				// in the current frame is updated for free as PointTrack is
-				p.p2 = l;
+				p.p2 = l.pixel;
 			}
-			p.p1.set(l);
+			p.p1.set(l.pixel);
 			p.lastUsed = totalFramesProcessed;
 		}
 

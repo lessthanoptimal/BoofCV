@@ -188,8 +188,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 		tracker.setDescription(t);
 
 		PointTrackMod p = t.getCookie();
-		p.cookie = null;
-		p.set(x,y);
+		p.pixel.set(x,y);
 		p.prev.set(x,y);
 
 		if( checkValidSpawn(p) ) {
@@ -241,8 +240,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 
 			// set up point description
 			PointTrackMod p = t.getCookie();
-			p.set(t.x,t.y);
-			p.cookie = null;
+			p.pixel.set(t.x,t.y);
 
 			if( checkValidSpawn(p) ) {
 				p.featureId = totalFeatures++;
@@ -303,7 +301,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 				// discard a track if its center drifts outside the image.
 				if( image.isInBounds((int)t.x,(int)t.y) && tracker.setDescription(t) ) {
 					PointTrack p = t.getCookie();
-					p.set(t.x,t.y);
+					p.pixel.set(t.x,t.y);
 					success = true;
 				}
 			}
@@ -360,10 +358,10 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 				unused.add( t );
 			} else {
 				// the new previous will be the current location
-				p.prev.set(p.x,p.y);
+				p.prev.set(p.pixel);
 				// Revert the update by KLT
-				t.x = (float)p.x;
-				t.y = (float)p.y;
+				t.x = (float)p.pixel.x;
+				t.y = (float)p.pixel.y;
 			}
 		}
 	}
@@ -445,7 +443,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 
 	static class PointTrackMod extends PointTrack {
 		// previous location of the track
-		public final Point2D_F64 prev = new PointTrack();
+		public final Point2D_F64 prev = new Point2D_F64();
 	}
 
 	/**

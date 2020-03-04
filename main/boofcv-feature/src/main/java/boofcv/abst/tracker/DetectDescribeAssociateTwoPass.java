@@ -148,14 +148,13 @@ public class DetectDescribeAssociateTwoPass<I extends ImageGray<I>, Desc extends
 			AssociatedIndex indexes = info.matches.data[i];
 			PointTrack track = info.tracks.get(indexes.src);
 			Point2D_F64 loc = info.locDst.data[indexes.dst];
-			track.set(loc.x, loc.y);
+			track.pixel.set(loc.x, loc.y);
 			tracksActive.add(track);
 		}
 	}
 
 	@Override
 	public void setHint( double pixelX , double pixelY , PointTrack track ) {
-		track.x = pixelX;
-		track.y = pixelY;
+		track.pixel.set(pixelX,pixelY);
 	}
 }

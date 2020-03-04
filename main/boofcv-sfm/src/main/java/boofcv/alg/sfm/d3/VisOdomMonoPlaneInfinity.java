@@ -271,7 +271,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 			}
 
 			// compute normalized image coordinate
-			pixelToNorm.compute(t.x, t.y, n);
+			pixelToNorm.compute(t.pixel.x, t.pixel.y, n);
 
 //			System.out.println("         pointing "+pointing.x+" "+pointing.y+" "+pointing.z);
 
@@ -346,7 +346,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 			VoTrack p = t.getCookie();
 
 			// compute normalized image coordinate
-			pixelToNorm.compute(t.x, t.y, n);
+			pixelToNorm.compute(t.pixel.x, t.pixel.y, n);
 
 			// rotate pointing vector into plane reference frame
 			pointing.set(n.x, n.y, 1);
@@ -405,7 +405,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 		normToPixel.compute(n.x, n.y, pixel);
 
 		// compute error
-		double error = pixel.distance2(t);
+		double error = pixel.distance2(t.pixel);
 
 		return error < thresholdPixelError * thresholdPixelError;
 	}

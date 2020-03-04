@@ -79,7 +79,7 @@ public class ExampleTrackingKlt {
 			Graphics2D g2 = image.createGraphics();
 
 			for( PointTrack t : tracks ) {
-				VisualizeFeatures.drawPoint(g2,(int)t.x,(int)t.y,Color.RED);
+				VisualizeFeatures.drawPoint(g2,(int)t.pixel.x,(int)t.pixel.y,Color.RED);
 			}
 
 			gui.setImageUI(image);

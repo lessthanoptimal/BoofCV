@@ -48,7 +48,7 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	// Detects features and manages descriptions
 	protected DdaFeatureManager<I,Desc> manager;
 
-	protected SetTrackInfo sets[];
+	protected SetTrackInfo<Desc>[] sets;
 
 	// all tracks
 	protected List<PointTrack> tracksAll = new ArrayList<>();
@@ -237,7 +237,7 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 			PointTrack t = info.tracks.get(i);
 			Desc desc = t.getDescription();
 			info.featSrc.add(desc);
-			info.locSrc.add(t);
+			info.locSrc.add(t.pixel);
 			info.isAssociated[i] = false;
 		}
 	}
@@ -251,7 +251,7 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 			AssociatedIndex indexes = info.matches.data[i];
 			PointTrack track = info.tracks.get(indexes.src);
 			Point2D_F64 loc = info.locDst.data[indexes.dst];
-			track.set(loc.x, loc.y);
+			track.pixel.set(loc.x, loc.y);
 			tracksActive.add(track);
 
 			// update the description
@@ -302,9 +302,13 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	 */
 	protected PointTrack addNewTrack( int setIndex, double x , double y , Desc desc ) {
 		PointTrack p = getUnused();
-		p.set(x, y);
+		p.pixel.set(x, y);
 		((Desc)p.getDescription()).setTo(desc);
 		if( checkValidSpawn(setIndex,p) ) {
+			if( tracksAll.contains(p))
+				throw new RuntimeException("Contained twice all! p.id="+p.featureId);
+			if( tracksActive.contains(p))
+				throw new RuntimeException("Contained twice active! p.id="+p.featureId);
 			p.spawnFrameID = frameID;
 			p.setId = setIndex;
 			p.featureId = featureID++;
@@ -315,6 +319,10 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 			tracksAll.add(p);
 			return p;
 		} else {
+			if( tracksAll.contains(p))
+				throw new RuntimeException("Contained??? ! p.id="+p.featureId);
+			if( unused.contains(p))
+				throw new RuntimeException("Already in unused!");
 			unused.add(p);
 			return null;
 		}
@@ -334,6 +342,8 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		PointTrack p;
 		if( unused.size() > 0 ) {
 			p = unused.remove( unused.size()-1 );
+			if( unused.contains(p))
+				throw new RuntimeException("BUG!");
 		} else {
 			p = new PointTrack();
 			p.setDescription(manager.createDescription());
@@ -343,6 +353,11 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 
 	@Override
 	public void dropAllTracks() {
+		for( var p : tracksAll ) {
+			if( unused.contains(p) ) {
+				throw new RuntimeException("Already in unused!");
+			}
+		}
 		unused.addAll(tracksAll);
 		tracksActive.clear();
 		tracksInactive.clear();
@@ -362,18 +377,29 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	 */
 	@Override
 	public boolean dropTrack(PointTrack track) {
+
 		if( !tracksAll.remove(track) )
 			return false;
+		if( tracksAll.contains(track))
+			throw new RuntimeException("Contained twice all! pt.id="+track.featureId);
+		if( unused.contains(track))
+			throw new RuntimeException("Already in unused!");
 
 		if( !sets[track.setId].tracks.remove(track) ) {
-			return false;
+			throw new RuntimeException("Not in set!?!");
+//			return false;
 		}
 		// the track may or may not be in the active list
 		tracksActive.remove(track);
 		tracksInactive.remove(track);
+		if( tracksActive.contains(track))
+			throw new RuntimeException("Contained twice active! pt.id="+track.featureId);
+
 		// it must be in the all list
 		// recycle the data
 		unused.add(track);
+		track.setId = -1;
+		track.featureId = -1;
 		return true;
 	}
 
@@ -381,6 +407,8 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
 		if( list == null )
 			list = new ArrayList<>();
+		else
+			list.clear();
 
 		list.addAll(tracksActive);
 		return list;
@@ -390,6 +418,8 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	public List<PointTrack> getDroppedTracks( List<PointTrack> list ) {
 		if( list == null )
 			list = new ArrayList<>();
+		else
+			list.clear();
 
 		list.addAll(tracksDropped);
 		return list;
@@ -408,6 +438,8 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	public List<PointTrack> getAllTracks( List<PointTrack> list ) {
 		if( list == null )
 			list = new ArrayList<>();
+		else
+			list.clear();
 
 		list.addAll(tracksAll);
 		return list;
@@ -417,6 +449,8 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	public List<PointTrack> getInactiveTracks(List<PointTrack> list) {
 		if( list == null )
 			list = new ArrayList<>();
+		else
+			list.clear();
 
 		list.addAll(tracksInactive);
 		return list;
