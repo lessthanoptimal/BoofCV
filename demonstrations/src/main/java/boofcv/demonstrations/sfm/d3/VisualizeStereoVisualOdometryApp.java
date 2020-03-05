@@ -258,6 +258,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 			whichAlg = (Integer)cookies[0];
 		alg = createStereoDepth(whichAlg);
 		alg.setCalibration(config);
+		alg.reset();
 
 		guiInfo.reset();
 
@@ -292,8 +293,6 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 
 			return FactoryVisualOdometry.stereoDepth(1.5,120,2,200,50, false, disparity, tracker, imageType);
 		} else if( whichAlg == 1 ) {
-			System.out.println("########### DDA ########################");
-
 			ConfigGeneralDetector configExtract = new ConfigGeneralDetector(1000,4,0.1f);
 
 			GeneralFeatureDetector detector = FactoryPointTracker.createShiTomasi(configExtract, derivType);

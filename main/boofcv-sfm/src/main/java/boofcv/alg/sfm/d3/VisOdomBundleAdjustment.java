@@ -21,6 +21,7 @@ package boofcv.alg.sfm.d3;
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.FactoryMultiView;
@@ -32,6 +33,8 @@ import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ddogleg.struct.Factory;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
+
+import java.util.List;
 
 /**
  * Bundle adjustment specifically intended for use with visual odometry algorithms.
@@ -177,7 +180,8 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	 * Removes the frame and all references to it. If a track has no observations after this
 	 * it is also removed from the master list.
 	 */
-	public void removeFrame( BFrame frame ) {
+	public void removeFrame( BFrame frame , List<BTrack> removedTracks ) {
+		removedTracks.clear();
 		int index = frames.indexOf(frame);
 		if( index < 0 )
 			throw new RuntimeException("BUG! frame not in frames list");
@@ -194,7 +198,6 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 
 			// If the track no longer has observations remove it from the master track list
 			if( t.observations.size() == 0 ) {
-				System.out.println("Track has no observations. Dropping track.id="+t.id);
 				pruneObservations = true;
 			}
 		}
@@ -203,7 +206,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 			// Search through all observations and remove the ones not in use nay more
 			for (int i = tracks.size - 1; i >= 0; i--) {
 				if (tracks.get(i).observations.size == 0) {
-					tracks.removeSwap(i);
+					removedTracks.add(tracks.removeSwap(i));
 				}
 			}
 		}
@@ -260,6 +263,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	public static class BTrack
 	{
 		public long id;
+		public PointTrack trackerTrack;
 		public final Point4D_F64 worldLoc = new Point4D_F64();
 		public final FastQueue<BObservation> observations = new FastQueue<>(BObservation::new, BObservation::reset);
 		/** if true then the track should be optimized inside of bundle adjustment */

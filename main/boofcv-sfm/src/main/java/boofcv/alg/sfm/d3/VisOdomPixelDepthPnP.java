@@ -103,6 +103,9 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 	// is this the first camera view being processed?
 	private boolean first = true;
 
+	// work space variables
+	List<BTrack> removedTracks = new ArrayList<>();
+
 	/**
 	 * Configures magic numbers and estimation algorithms.
 	 *
@@ -144,10 +147,10 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 	 * Resets the algorithm into its original state
 	 */
 	public void reset() {
+		System.out.println("RESET CALLED");
 		tracker.reset();
 		currToKey.reset();
 		bundle.reset();
-		first = true;
 	}
 
 	/**
@@ -160,6 +163,10 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 	public boolean process( T image ) {
 		tracker.process(image);
 
+		System.out.println("Input Frame Count "+tracker.getFrameID());
+		System.out.println("   Bundle Frames "+bundle.frames.size);
+		System.out.println("   Bundle tracks "+bundle.tracks.size);
+
 		inlierTracks.clear();
 
 		// TODO don't always use previous. Use frame that it has the most common tracks. This will enable it to skip
@@ -168,55 +175,47 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		framePrevious = first ? null : bundle.getLastFrame();
 		// Create a new frame for the current image
 		frameCurrent = bundle.addFrame(tracker.getFrameID());
-		if( frameCurrent.tracks.size != 0 )
-			throw new RuntimeException("Bug!");
 
 		// Handle the very first image differently
 		if( first ) {
 			addNewTracks();
-			bundle.sanityCheck();
 			currToWorld.reset();
 			first = false;
 		} else {
-			if( framePrevious == null )
-				throw new RuntimeException("BUG! No previous frame and not the first frame");
-
-			bundle.sanityCheck();
 			if( !estimateMotion() ) {
-				System.out.println("********* Estimate motion failed");
 				// discard the current frame and attempt to jump over it
-				bundle.removeFrame(frameCurrent);
-				bundle.sanityCheck();
+				bundle.removeFrame(frameCurrent,removedTracks);
+				for (int i = 0; i < removedTracks.size(); i++) {
+					tracker.dropTrack(removedTracks.get(i).trackerTrack);
+				}
 				return false;
 			}
 
 			// Update the state estimate
-			bundle.sanityCheck();
 			bundle.optimize();
 			// Save the output
 			currToWorld.set(frameCurrent.frameToWorld);
 
 			// Drop tracks which aren't being used
-			bundle.sanityCheck();
 			dropUnusedTracks();
-			bundle.sanityCheck();
 
 			// Always add key frames until it hits the limit
 			if( bundle.frames.size() >= maxKeyFrames ) {
 				// Select the "optimal" key frame to drop and drop it
 				BFrame target = selectFrameToDrop();
-//				System.out.println("Dropping frame "+(bundle.frames.indexOf(target)+" / "+bundle.frames.size));
 
-				bundle.sanityCheck();
-				bundle.removeFrame(target); // TODO Need to remove reference of PointTrack too!!
-				bundle.sanityCheck();
+				bundle.removeFrame(target,removedTracks);
+				for (int i = 0; i < removedTracks.size(); i++) {
+					tracker.dropTrack(removedTracks.get(i).trackerTrack);
+				}
 				if( target != frameCurrent ) {
 					// it decided to keep the current track. Spawn new tracks in the current frame
 					addNewTracks();
-					bundle.sanityCheck();
 				}
 			}
 		}
+
+//		bundle.sanityCheck();
 
 		return true;
 	}
@@ -237,7 +236,6 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 	 */
 	private BFrame selectFrameToDrop() {
 		// TODO avoid clusters of similar frames
-		System.out.println("Selecting frame to drop. prev = "+framePrevious.id);
 		// higher values are worse
 		double worstScore = Double.MAX_VALUE;
 		int worstIdx = -1;
@@ -289,7 +287,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		for (int frameIdx = 0; frameIdx < bundle.frames.size; frameIdx++) {
 			BFrame frameI = bundle.frames.get(frameIdx);
 			if( frameI == framePrevious ) {
-				System.out.printf("Frame ID %5d is the previous frame\n",frameI.id);
+//				System.out.printf("Frame ID %5d is the previous frame\n",frameI.id);
 				before = false;
 				continue;
 			}
@@ -312,9 +310,9 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 				}
 				score = score*(0.05+motion/largestMotion);
 
-				System.out.printf("Frame ID %5d score = %.5f common %4d / %4d motion %6.2f\n",frameI.id,score,totalCommon,N,(motion/largestMotion));
+//				System.out.printf("Frame ID %5d score = %.5f common %4d / %4d motion %6.2f\n",frameI.id,score,totalCommon,N,(motion/largestMotion));
 			} else {
-				System.out.printf("Frame ID %5d failed\n",frameI.id);
+//				System.out.printf("Frame ID %5d failed\n",frameI.id);
 				score = 0.0;
 			}
 
@@ -326,8 +324,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 
 		}
 
-		System.out.println("       dropping "+bundle.frames.get(worstIdx).id);
-
+//		System.out.println("   dropping frame "+bundle.frames.get(worstIdx).id);
 		return bundle.frames.get(worstIdx);
 	}
 
@@ -356,7 +353,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 				if( !tracker.dropTrack(t) )
 					throw new RuntimeException("Drop failed");
 			} else if( trackerFrame - p.lastUsed >= thresholdRetire ) {
-				System.out.println("Dropping unused track.id=" + p.id+" point.id="+t.featureId);
+//				System.out.println("Dropping unused track.id=" + p.id+" point.id="+t.featureId);
 				if( !tracker.dropTrack(t) )
 					throw new RuntimeException("Drop failed");
 				t.cookie = null;
@@ -369,8 +366,6 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		for (int trackIdx = bundle.tracks.size-1; trackIdx >= 0; trackIdx-- ) {
 			Track t = bundle.tracks.get(trackIdx);
 			if( t.observations.size == 0 ) {
-				if( bundle.tracks.isUnused(t))
-					throw new RuntimeException("BUG!");
 				bundle.tracks.removeSwap(trackIdx);
 			}
 		}
@@ -392,45 +387,30 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 	 * Detects new features and computes their 3D coordinates
 	 */
 	private void addNewTracks() {
-//		System.out.println("----------- Adding new tracks ---------------");
-
-		System.out.println("addNewTracks() current frame="+frameCurrent.id);
+//		System.out.println("addNewTracks() current frame="+frameCurrent.id);
 
 		long frameID = tracker.getFrameID();
 
 		tracker.spawnTracks();
 		List<PointTrack> spawned = tracker.getNewTracks(null);
 
-		bundle.sanityCheck();
-
 		// estimate 3D coordinate using stereo vision
 		for( PointTrack t : spawned ) {
-//			if( t.cookie != null )
-//				throw new RuntimeException("BUG!");
 			// discard point if it can't localized
 			if( !pixelTo3D.process(t.pixel.x,t.pixel.y) || pixelTo3D.getW() == 0 ) { // TODO don't drop infinity
 				tracker.dropTrack(t);
 			} else {
-				bundle.sanityCheck();
 				// Save the track's 3D location and add it to the current frame
 				Track track = bundle.addTrack(t.featureId,pixelTo3D.getX(),pixelTo3D.getY(),pixelTo3D.getZ(),pixelTo3D.getW());
 				track.lastUsed = frameID;
+				track.trackerTrack = t;
 				t.cookie = track;
-				if( bundle.tracks.isUnused(track) )
-					throw new RuntimeException("Bug! track.id="+track.id+" is in unused");
 
-				System.out.println("Created track "+track.id+"  currentFrame "+frameCurrent.id+"  obs.size "+track.observations.size);
-				bundle.sanityCheck();
+//				System.out.println("Created track "+track.id+"  currentFrame "+frameCurrent.id+"  obs.size "+track.observations.size);
 				// Convert the location from local coordinate system to world coordinates
 				SePointOps_F64.transform(frameCurrent.frameToWorld,track.worldLoc,track.worldLoc);
-				bundle.sanityCheck();
 
 				bundle.addObservation(frameCurrent, track, t.pixel.x , t.pixel.y);
-
-
-//				if( !track.isObservedBy(frameCurrent)) {
-//					throw new RuntimeException("WTF");
-//				}
 			}
 		}
 	}
@@ -454,9 +434,6 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 			pixelToNorm.compute( pt.pixel.x , pt.pixel.y , p.observation );
 			Track bt = pt.getCookie();
 
-			if( bundle.tracks.isUnused(bt) ) {
-				throw new RuntimeException("Bug! track.id="+bt.id+" is in unused! ptrack.id="+pt.featureId);
-			}
 			// TODO Handle infinity better. avoid divide by zero?
 			// Put the point into
 			double w = bt.worldLoc.w;
@@ -495,8 +472,6 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		keyToCurr.invert(currToKey);
 		currToKey.concat(framePrevious.frameToWorld,frameCurrent.frameToWorld);
 
-		bundle.sanityCheck();
-
 		// mark tracks as being inliers and add to inlier list
 		int N = motionEstimator.getMatchSet().size();
 		long tick = tracker.getFrameID();
@@ -508,12 +483,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 			t.active = true;
 			bundle.addObservation(frameCurrent, t, p.pixel.x, p.pixel.y);
 			inlierTracks.add( t );
-			if( bundle.tracks.isUnused(t) ) {
-				boolean used = bundle.tracks.contains(t);
-				throw new RuntimeException("Bug! track.id="+t.id+" is in unused! contains="+used+" ptrack.id="+p.featureId);
-			}
 		}
-		bundle.sanityCheck();
 
 		return true;
 	}
