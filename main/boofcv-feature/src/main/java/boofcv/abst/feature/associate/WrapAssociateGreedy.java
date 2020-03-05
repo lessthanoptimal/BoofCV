@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.alg.feature.associate.AssociateGreedyBase;
 import boofcv.alg.feature.associate.FindUnassociated;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -38,8 +39,8 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 	FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex.class, true);
 
 	// reference to input list
-	FastQueue<T> listSrc;
-	FastQueue<T> listDst;
+	FastAccess<T> listSrc;
+	FastAccess<T> listDst;
 
 	// indexes of unassociated features
 	GrowQueue_I32 unassocSrc = new GrowQueue_I32();
@@ -55,12 +56,12 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 	}
 
 	@Override
-	public void setSource(FastQueue<T> listSrc) {
+	public void setSource(FastAccess<T> listSrc) {
 		this.listSrc = listSrc;
 	}
 
 	@Override
-	public void setDestination(FastQueue<T> listDst) {
+	public void setDestination(FastAccess<T> listDst) {
 		this.listDst = listDst;
 	}
 

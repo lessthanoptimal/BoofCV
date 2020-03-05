@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -47,10 +48,10 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 	protected double maxError = Double.MAX_VALUE;
 
 	// input lists
-	private FastQueue<Point2D_F64> locationSrc;
-	private FastQueue<D> descSrc;
-	private FastQueue<Point2D_F64> locationDst;
-	private FastQueue<D> descDst;
+	private FastAccess<Point2D_F64> locationSrc;
+	private FastAccess<D> descSrc;
+	private FastAccess<Point2D_F64> locationDst;
+	private FastAccess<D> descDst;
 
 	// list of source features not associated
 	private GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
@@ -89,7 +90,7 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 	}
 
 	@Override
-	public void setSource(FastQueue<Point2D_F64> location, FastQueue<D> descriptions) {
+	public void setSource(FastAccess<Point2D_F64> location, FastAccess<D> descriptions) {
 		if( location.size() != descriptions.size() )
 			throw new IllegalArgumentException("The two lists must be the same size");
 
@@ -98,7 +99,7 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 	}
 
 	@Override
-	public void setDestination(FastQueue<Point2D_F64> location, FastQueue<D> descriptions) {
+	public void setDestination(FastAccess<Point2D_F64> location, FastAccess<D> descriptions) {
 		if( location.size() != descriptions.size() )
 			throw new IllegalArgumentException("The two lists must be the same size");
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.concurrency.IntRangeConsumer;
 import boofcv.struct.feature.AssociatedIndex;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -44,13 +45,13 @@ public class AssociateNearestNeighbor_MT<D>
 	}
 
 	@Override
-	public void setSource(FastQueue<D> listSrc) {
+	public void setSource(FastAccess<D> listSrc) {
 		this.sizeSrc = listSrc.size;
 		alg.setPoints((List)listSrc.toList(),true);
 	}
 
 	@Override
-	public void setDestination(FastQueue<D> listDst) {
+	public void setDestination(FastAccess<D> listDst) {
 		this.listDst = listDst;
 	}
 

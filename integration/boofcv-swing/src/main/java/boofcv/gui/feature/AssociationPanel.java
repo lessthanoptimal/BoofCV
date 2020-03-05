@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.gui.feature;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.geo.AssociatedPair;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastAccess;
 
 import java.awt.*;
 import java.awt.event.MouseListener;
@@ -52,7 +52,7 @@ public class AssociationPanel extends CompareTwoImagePanel implements MouseListe
 	}
 
 	public void setAssociation( List<Point2D_F64> leftPts , List<Point2D_F64> rightPts,
-											 FastQueue<AssociatedIndex> matches )
+								FastAccess<AssociatedIndex> matches )
 	{
 		synchronized ( lock) {
 			List<Point2D_F64> allLeft = new ArrayList<>();

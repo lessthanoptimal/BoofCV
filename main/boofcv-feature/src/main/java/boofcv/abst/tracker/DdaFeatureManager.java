@@ -22,7 +22,7 @@ import boofcv.abst.feature.describe.DescriptorInfo;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 
 /**
  * Interface while provides {@link DetectDescribeAssociate} a specific implementation for detecting features and
@@ -48,7 +48,7 @@ public interface DdaFeatureManager<I extends ImageGray<I>, Desc extends TupleDes
 	 * @param locations Location of each feature
 	 * @param descriptions Description of each feature
 	 */
-	void getFeatures( int set , FastQueue<Point2D_F64> locations , FastQueue<Desc> descriptions );
+	void getFeatures(int set , FastArray<Point2D_F64> locations , FastArray<Desc> descriptions );
 
 	int getNumberOfSets();
 }

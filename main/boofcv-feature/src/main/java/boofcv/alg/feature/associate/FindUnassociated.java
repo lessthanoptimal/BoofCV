@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.struct.feature.AssociatedIndex;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
@@ -35,7 +35,7 @@ public class FindUnassociated {
 	// list that indicates what was associated in the source list
 	GrowQueue_I32 matched = new GrowQueue_I32();
 
-	public GrowQueue_I32 checkSource( FastQueue<AssociatedIndex> matches , int num ) {
+	public GrowQueue_I32 checkSource(FastAccess<AssociatedIndex> matches , int num ) {
 		matched.resize(num);
 		for( int i = 0; i < matched.size; i++ ) {
 			matched.data[i] = 0;
@@ -53,7 +53,7 @@ public class FindUnassociated {
 		return unassociatedSrc;
 	}
 
-	public GrowQueue_I32 checkDestination( FastQueue<AssociatedIndex> matches , int num ) {
+	public GrowQueue_I32 checkDestination( FastAccess<AssociatedIndex> matches , int num ) {
 		matched.resize(num);
 		for( int i = 0; i < matched.size; i++ ) {
 			matched.data[i] = 0;

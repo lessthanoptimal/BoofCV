@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,6 +40,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.feature.TupleDesc_S8;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
 import java.awt.image.BufferedImage;
@@ -76,7 +77,7 @@ public class CompareConvertedDescriptionsApp {
 		assoc.setDestination(listDst);
 		assoc.associate();
 
-		FastQueue<AssociatedIndex> matches = assoc.getMatches();
+		FastAccess<AssociatedIndex> matches = assoc.getMatches();
 
 		AssociationPanel panel = new AssociationPanel(20);
 		panel.setImages(image1,image2);

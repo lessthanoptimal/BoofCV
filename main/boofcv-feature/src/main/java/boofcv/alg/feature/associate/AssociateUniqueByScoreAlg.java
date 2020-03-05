@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,8 @@ package boofcv.alg.feature.associate;
 
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -45,9 +46,9 @@ public class AssociateUniqueByScoreAlg {
 	private GrowQueue_F64 scores = new GrowQueue_F64();
 
 	// storage for found solutions
-	private FastQueue<AssociatedIndex> firstPass = new FastQueue<>(AssociatedIndex.class, false);
+	private final FastArray<AssociatedIndex> firstPass = new FastArray<>(AssociatedIndex.class);
 	// final output of pruned matches
-	private FastQueue<AssociatedIndex> pruned = new FastQueue<>(AssociatedIndex.class, false);
+	private final FastArray<AssociatedIndex> pruned = new FastArray<>(AssociatedIndex.class);
 
 	/**
 	 * Configures algorithm.
@@ -71,7 +72,7 @@ public class AssociateUniqueByScoreAlg {
 	 * @param numSource Number of source features
 	 * @param numDestination Number of destination features
 	 */
-	public void process( FastQueue<AssociatedIndex> matches , int numSource , int numDestination ) {
+	public void process(FastAccess<AssociatedIndex> matches , int numSource , int numDestination ) {
 
 		if( checkSource ) {
 			if( checkDestination ) {
@@ -84,15 +85,16 @@ public class AssociateUniqueByScoreAlg {
 			processDestination(matches,numDestination,pruned);
 		} else {
 			// well this was pointless, just return the input set
-			pruned = matches;
+			pruned.reset();
+			pruned.addAll(matches.toList());
 		}
 	}
 
 	/**
 	 * Selects a subset of matches that have at most one association for each source feature.
 	 */
-	private void processSource(FastQueue<AssociatedIndex> matches, int numSource,
-							   FastQueue<AssociatedIndex> output ) {
+	private void processSource(FastAccess<AssociatedIndex> matches, int numSource,
+							   FastArray<AssociatedIndex> output ) {
 		//set up data structures
 		scores.resize(numSource);
 		solutions.resize(numSource);
@@ -146,8 +148,8 @@ public class AssociateUniqueByScoreAlg {
 	/**
 	 * Selects a subset of matches that have at most one association for each destination feature.
 	 */
-	private void processDestination(FastQueue<AssociatedIndex> matches, int numDestination,
-									FastQueue<AssociatedIndex> output ) {
+	private void processDestination(FastAccess<AssociatedIndex> matches, int numDestination,
+									FastArray<AssociatedIndex> output ) {
 		//set up data structures
 		scores.resize(numDestination);
 		solutions.resize(numDestination);
@@ -198,7 +200,7 @@ public class AssociateUniqueByScoreAlg {
 		}
 	}
 
-	public FastQueue<AssociatedIndex> getMatches() {
+	public FastAccess<AssociatedIndex> getMatches() {
 		return pruned;
 	}
 

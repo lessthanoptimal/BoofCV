@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc_F64;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -39,14 +40,14 @@ public class AssociateSurfBasic {
 	AssociateDescription<TupleDesc_F64> assoc;
 
 	// features segmented by laplace sign
-	FastQueue<Helper> srcPositive = new FastQueue<>(10, Helper.class, true);
-	FastQueue<Helper> srcNegative = new FastQueue<>(10, Helper.class, true);
+	FastQueue<Helper> srcPositive = new FastQueue<>(Helper::new);
+	FastQueue<Helper> srcNegative = new FastQueue<>(Helper::new);
 
-	FastQueue<Helper> dstPositive = new FastQueue<>(10, Helper.class, true);
-	FastQueue<Helper> dstNegative = new FastQueue<>(10, Helper.class, true);
+	FastQueue<Helper> dstPositive = new FastQueue<>(Helper::new);
+	FastQueue<Helper> dstNegative = new FastQueue<>(Helper::new);
 
 	// stores output matches
-	FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex.class, true);
+	FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
 
 	// indexes of unassociated features
 	GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
@@ -55,11 +56,11 @@ public class AssociateSurfBasic {
 		this.assoc = assoc;
 	}
 
-	public void setSrc( FastQueue<BrightFeature> src ) {
+	public void setSrc( FastAccess<BrightFeature> src ) {
 		sort(src,srcPositive,srcNegative);
 	}
 
-	public void setDst( FastQueue<BrightFeature> dst ) {
+	public void setDst( FastAccess<BrightFeature> dst ) {
 		sort(dst,dstPositive,dstNegative);
 	}
 
@@ -95,7 +96,7 @@ public class AssociateSurfBasic {
 		assoc.setSource((FastQueue)srcPositive);
 		assoc.setDestination((FastQueue) dstPositive);
 		assoc.associate();
-		FastQueue<AssociatedIndex> m = assoc.getMatches();
+		FastAccess<AssociatedIndex> m = assoc.getMatches();
 		for( int i = 0; i < m.size; i++ ) {
 			AssociatedIndex a = m.data[i];
 			int globalSrcIndex = srcPositive.data[a.src].index;
@@ -134,7 +135,7 @@ public class AssociateSurfBasic {
 	 * Keep track of the feature's index in the original input list.  This is
 	 * the index that needs to be returned.
 	 */
-	private void sort(FastQueue<BrightFeature> input ,
+	private void sort(FastAccess<BrightFeature> input ,
 					  FastQueue<Helper> pos , FastQueue<Helper> neg ) {
 		pos.reset();
 		neg.reset();

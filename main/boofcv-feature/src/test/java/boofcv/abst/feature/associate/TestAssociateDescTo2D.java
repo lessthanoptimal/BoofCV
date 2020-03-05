@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,8 @@ package boofcv.abst.feature.associate;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_F64;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
@@ -57,21 +59,21 @@ public class TestAssociateDescTo2D {
 
 	private static class Dummy implements AssociateDescription<TupleDesc_F64> {
 
-		public FastQueue<TupleDesc_F64> listSrc;
-		public FastQueue<TupleDesc_F64> listDst;
+		public FastAccess<TupleDesc_F64> listSrc;
+		public FastAccess<TupleDesc_F64> listDst;
 		public boolean calledAssociate = false;
-		public FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex.class, false);
+		public FastArray<AssociatedIndex> matches = new FastArray<>(AssociatedIndex.class);
 		public GrowQueue_I32 unassociatedSrc = new GrowQueue_I32(10);
 		public GrowQueue_I32 unassociatedDst = new GrowQueue_I32(10);
 		public double threshold;
 
 		@Override
-		public void setSource(FastQueue<TupleDesc_F64> listSrc) {
+		public void setSource(FastAccess<TupleDesc_F64> listSrc) {
 			this.listSrc = listSrc;
 		}
 
 		@Override
-		public void setDestination(FastQueue<TupleDesc_F64> listDst) {
+		public void setDestination(FastAccess<TupleDesc_F64> listDst) {
 			this.listDst = listDst;
 		}
 
@@ -81,7 +83,7 @@ public class TestAssociateDescTo2D {
 		}
 
 		@Override
-		public FastQueue<AssociatedIndex> getMatches() {
+		public FastAccess<AssociatedIndex> getMatches() {
 			return matches;
 		}
 

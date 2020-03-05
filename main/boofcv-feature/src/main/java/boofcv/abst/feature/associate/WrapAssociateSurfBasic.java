@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.alg.feature.associate.FindUnassociated;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.MatchScoreType;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -43,12 +44,12 @@ public class WrapAssociateSurfBasic implements AssociateDescription<BrightFeatur
 	}
 
 	@Override
-	public void setSource(FastQueue<BrightFeature> listSrc) {
+	public void setSource(FastAccess<BrightFeature> listSrc) {
 		alg.setSrc(listSrc);
 	}
 
 	@Override
-	public void setDestination(FastQueue<BrightFeature> listDst) {
+	public void setDestination(FastAccess<BrightFeature> listDst) {
 		alg.setDst(listDst);
 	}
 

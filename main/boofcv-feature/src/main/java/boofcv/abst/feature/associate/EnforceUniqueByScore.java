@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,7 +23,7 @@ import boofcv.alg.feature.associate.FindUnassociated;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
@@ -79,8 +79,8 @@ public class EnforceUniqueByScore<A extends Associate> implements Associate {
 	}
 
 	@Override
-	public FastQueue<AssociatedIndex> getMatches() {
-		FastQueue<AssociatedIndex> matches = association.getMatches();
+	public FastAccess<AssociatedIndex> getMatches() {
+		FastAccess<AssociatedIndex> matches = association.getMatches();
 
 		uniqueByScore.process(matches,numSource,numDestination);
 
@@ -130,13 +130,13 @@ public class EnforceUniqueByScore<A extends Associate> implements Associate {
 		}
 
 		@Override
-		public void setSource(FastQueue<Desc> listSrc) {
+		public void setSource(FastAccess<Desc> listSrc) {
 			association.setSource(listSrc);
 			numSource = listSrc.size;
 		}
 
 		@Override
-		public void setDestination(FastQueue<Desc> listDst) {
+		public void setDestination(FastAccess<Desc> listDst) {
 			association.setDestination(listDst);
 			numDestination = listDst.size;
 		}
@@ -155,13 +155,13 @@ public class EnforceUniqueByScore<A extends Associate> implements Associate {
 		}
 
 		@Override
-		public void setSource( FastQueue<Point2D_F64> location , FastQueue<Desc> listSrc) {
+		public void setSource( FastAccess<Point2D_F64> location , FastAccess<Desc> listSrc) {
 			association.setSource(location, listSrc);
 			numSource = listSrc.size;
 		}
 
 		@Override
-		public void setDestination( FastQueue<Point2D_F64> location , FastQueue<Desc> listDst) {
+		public void setDestination( FastAccess<Point2D_F64> location , FastAccess<Desc> listDst) {
 			association.setDestination(location, listDst);
 			numDestination = listDst.size;
 		}

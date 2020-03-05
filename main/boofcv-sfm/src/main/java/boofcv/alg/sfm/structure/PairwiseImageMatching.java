@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.Stoppable;
 import org.ejml.data.DMatrixRMaj;
@@ -213,7 +214,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	 * features to the edge if they an inlier in essential. Save fit score of homography vs essential.
 	 */
 	protected boolean connectViews(PairwiseImageGraph.View viewA , PairwiseImageGraph.View viewB ,
-								   FastQueue<AssociatedIndex> matches) {
+								   FastAccess<AssociatedIndex> matches) {
 
 		// Estimate fundamental/essential with RANSAC
 		PairwiseImageGraph.Motion edge = new PairwiseImageGraph.Motion();
@@ -286,7 +287,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	 * @param edge Edge which will contain a description of found motion
 	 * @return true if no error
 	 */
-	boolean fitEpipolar(FastQueue<AssociatedIndex> matches ,
+	boolean fitEpipolar(FastAccess<AssociatedIndex> matches ,
 						List<Point2D_F64> pointsA , List<Point2D_F64> pointsB ,
 						ModelMatcher<?,AssociatedPair> ransac ,
 						PairwiseImageGraph.Motion edge )

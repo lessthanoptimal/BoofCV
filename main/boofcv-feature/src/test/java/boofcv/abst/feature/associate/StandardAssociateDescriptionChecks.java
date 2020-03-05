@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.abst.feature.associate;
 
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
@@ -94,7 +95,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 		alg.setDestination(listDst);
 		alg.associate();
 
-		FastQueue<AssociatedIndex> matches = alg.getMatches();
+		FastAccess<AssociatedIndex> matches = alg.getMatches();
 
 		// Every features should be associated
 		assertEquals(numFeatures,matches.size());
@@ -238,7 +239,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 		}
 	}
 
-	private int numMatchesSrc( int index , FastQueue<AssociatedIndex> list ) {
+	private int numMatchesSrc( int index , FastAccess<AssociatedIndex> list ) {
 		int ret = 0;
 		for( AssociatedIndex l : list.toList() ) {
 			if( l.src == index )
@@ -247,7 +248,7 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 		return ret;
 	}
 
-	private int numMatchesDst( int index , FastQueue<AssociatedIndex> list ) {
+	private int numMatchesDst( int index , FastAccess<AssociatedIndex> list ) {
 		int ret = 0;
 		for( AssociatedIndex l : list.toList() ) {
 			if( l.dst == index )

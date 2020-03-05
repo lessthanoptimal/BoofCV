@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.abst.feature.associate;
 import boofcv.alg.feature.associate.AssociateUniqueByScoreAlg;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
@@ -104,7 +105,7 @@ public class TestEnforceUniqueByScore {
 		}
 
 		@Override
-		public void process( FastQueue<AssociatedIndex> matches , int numSource , int numDestination ) {
+		public void process(FastAccess<AssociatedIndex> matches , int numSource , int numDestination ) {
 			calledProcess = true;
 			this.numSource = numSource;
 			this.numDestination = numDestination;

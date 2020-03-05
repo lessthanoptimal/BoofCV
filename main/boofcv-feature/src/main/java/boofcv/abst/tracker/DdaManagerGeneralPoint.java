@@ -26,6 +26,7 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -75,7 +76,7 @@ public class DdaManagerGeneralPoint<I extends ImageGray<I>, D extends ImageGray<
 	}
 
 	@Override
-	public void getFeatures(int set, FastQueue<Point2D_F64> locations, FastQueue<Desc> descriptions) {
+	public void getFeatures(int set, FastArray<Point2D_F64> locations, FastArray<Desc> descriptions) {
 		if( numSets == 2 ) {
 			if( set == 0 ) {
 				computeDescriptions(locations, descriptions, detector.getMinimums());
@@ -94,7 +95,7 @@ public class DdaManagerGeneralPoint<I extends ImageGray<I>, D extends ImageGray<
 		return numSets;
 	}
 
-	private void computeDescriptions(FastQueue<Point2D_F64> locDst, FastQueue<Desc> featDst, QueueCorner found) {
+	private void computeDescriptions(FastArray<Point2D_F64> locDst, FastArray<Desc> featDst, QueueCorner found) {
 		for( int i = 0; i < found.size; i++ ) {
 			Point2D_I16 p = found.get(i);
 			Desc desc = descriptors.grow();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,6 +50,7 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
 import java.awt.*;
@@ -101,7 +102,7 @@ public class ExampleImageStitching {
 		associate.associate();
 
 		// create a list of AssociatedPairs that tell the model matcher how a feature moved
-		FastQueue<AssociatedIndex> matches = associate.getMatches();
+		FastAccess<AssociatedIndex> matches = associate.getMatches();
 		List<AssociatedPair> pairs = new ArrayList<>();
 
 		for( int i = 0; i < matches.size(); i++ ) {

@@ -23,6 +23,8 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -98,9 +100,9 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		sets = new SetTrackInfo[manager.getNumberOfSets()];
 
 		for (int i = 0; i < sets.length; i++) {
-			sets[i] = new SetTrackInfo();
-			sets[i].featSrc = new FastQueue<>(10, manager.getDescriptionType(), false);
-			sets[i].featDst = new FastQueue<>(10, manager.getDescriptionType(), false);
+			sets[i] = new SetTrackInfo<>();
+			sets[i].featSrc = new FastArray<>(manager.getDescriptionType());
+			sets[i].featDst = new FastArray<>(manager.getDescriptionType());
 		}
 
 	}
@@ -210,7 +212,7 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		associate.associate();
 
 		// used in spawn tracks.  if null then no tracking data is assumed
-		FastQueue<AssociatedIndex> matches = associate.getMatches();
+		FastAccess<AssociatedIndex> matches = associate.getMatches();
 		// create a copy since the data will be recycled if there are multiple sets of points
 		info.matches.resize(matches.size);
 		for (int i = 0; i < matches.size; i++) {
@@ -458,11 +460,11 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 
 	protected static class SetTrackInfo<Desc> {
 		// location of interest points
-		protected FastQueue<Point2D_F64> locDst = new FastQueue<>(10, Point2D_F64.class, false);
-		protected FastQueue<Point2D_F64> locSrc = new FastQueue<>(10, Point2D_F64.class, true);
+		protected FastArray<Point2D_F64> locDst = new FastArray<>(Point2D_F64.class);
+		protected FastQueue<Point2D_F64> locSrc = new FastQueue<>(Point2D_F64::new,o->o.set(0,0));
 		// description of interest points
-		protected FastQueue<Desc> featSrc;
-		protected FastQueue<Desc> featDst;
+		protected FastArray<Desc> featSrc;
+		protected FastArray<Desc> featDst;
 
 		// indicates if a feature was associated or not
 		protected boolean isAssociated[] = new boolean[1];

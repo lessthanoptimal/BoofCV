@@ -20,7 +20,7 @@ package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.feature.TupleDesc_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastAccess;
 
 //CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
 
@@ -62,7 +62,7 @@ public class AssociateGreedy<D> extends AssociateGreedyBase<D> {
 	 * @param dst Destination list.
 	 */
 	@Override
-	public void associate( FastQueue<D> src , FastQueue<D> dst )
+	public void associate(FastAccess<D> src , FastAccess<D> dst )
 	{
 		fitQuality.reset();
 		pairs.reset();

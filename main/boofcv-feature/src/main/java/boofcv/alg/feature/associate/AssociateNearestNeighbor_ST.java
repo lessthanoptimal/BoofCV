@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,7 @@ package boofcv.alg.feature.associate;
 
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -45,7 +46,7 @@ public class AssociateNearestNeighbor_ST<D>
 	// Nearest Neighbor algorithm and storage for the results
 	private NearestNeighbor.Search<D> search;
 	NnData<D> result = new NnData<>();
-	FastQueue<NnData<D>> result2 = new FastQueue(NnData.class,true);
+	FastQueue<NnData<D>> result2 = new FastQueue<>(NnData<D>::new);
 
 	public AssociateNearestNeighbor_ST(NearestNeighbor<D> alg) {
 		super(alg);
@@ -53,12 +54,12 @@ public class AssociateNearestNeighbor_ST<D>
 	}
 
 	@Override
-	public void setSource(FastQueue<D> listSrc) {
+	public void setSource(FastAccess<D> listSrc) {
 		super.setSource(listSrc);
 	}
 
 	@Override
-	public void setDestination(FastQueue<D> listDst) {
+	public void setDestination(FastAccess<D> listDst) {
 		this.listDst = listDst;
 	}
 

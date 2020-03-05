@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,7 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastAccess;
 
 /**
  * Associates features from two images together using both 2D location and descriptor information.  Each
@@ -38,7 +38,7 @@ public interface AssociateDescription2D<Desc> extends Associate {
 	 * @param location Feature locations.
 	 * @param descriptions Feature descriptions.
 	 */
-	void setSource( FastQueue<Point2D_F64> location , FastQueue<Desc> descriptions );
+	void setSource( FastAccess<Point2D_F64> location , FastAccess<Desc> descriptions );
 
 	/**
 	 * Provide the location and descriptions for destination features.
@@ -46,5 +46,5 @@ public interface AssociateDescription2D<Desc> extends Associate {
 	 * @param location Feature locations.
 	 * @param descriptions Feature descriptions.
 	 */
-	void setDestination( FastQueue<Point2D_F64> location , FastQueue<Desc> descriptions );
+	void setDestination( FastAccess<Point2D_F64> location , FastAccess<Desc> descriptions );
 }

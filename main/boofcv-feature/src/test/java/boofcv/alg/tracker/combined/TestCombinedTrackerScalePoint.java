@@ -29,6 +29,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
@@ -171,11 +172,11 @@ public class TestCombinedTrackerScalePoint {
 		}
 
 		@Override
-		public void setSource(FastQueue listSrc) {
+		public void setSource(FastAccess listSrc) {
 		}
 
 		@Override
-		public void setDestination(FastQueue listDst) {
+		public void setDestination(FastAccess listDst) {
 		}
 
 		@Override

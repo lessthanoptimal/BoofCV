@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.feature.TupleDesc_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -75,7 +75,7 @@ public abstract class AssociateGreedyBase<D> {
 	 * @param src Source list.
 	 * @param dst Destination list.
 	 */
-	public abstract void associate( FastQueue<D> src , FastQueue<D> dst );
+	public abstract void associate( FastAccess<D> src , FastAccess<D> dst );
 
 	/**
 	 * Returns a list of association pairs.  Each element in the returned list corresponds

@@ -22,7 +22,7 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 
 
 /**
@@ -64,7 +64,7 @@ public class DdaManagerDetectDescribePoint<I extends ImageGray<I>, Desc extends 
 	}
 
 	@Override
-	public void getFeatures(int set, FastQueue<Point2D_F64> locations, FastQueue<Desc> descriptions) {
+	public void getFeatures(int set, FastArray<Point2D_F64> locations, FastArray<Desc> descriptions) {
 		if( set != 0 )
 			throw new RuntimeException("Set must be 0");
 

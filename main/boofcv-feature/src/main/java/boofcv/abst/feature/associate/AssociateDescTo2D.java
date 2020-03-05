@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.abst.feature.associate;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.GrowQueue_I32;
 
 /**
@@ -38,12 +38,12 @@ public class AssociateDescTo2D<D> implements AssociateDescription2D<D> {
 	}
 
 	@Override
-	public void setSource(FastQueue<Point2D_F64> location, FastQueue<D> descriptions) {
+	public void setSource(FastAccess<Point2D_F64> location, FastAccess<D> descriptions) {
 		alg.setSource(descriptions);
 	}
 
 	@Override
-	public void setDestination(FastQueue<Point2D_F64> location, FastQueue<D> descriptions) {
+	public void setDestination(FastAccess<Point2D_F64> location, FastAccess<D> descriptions) {
 		alg.setDestination(descriptions);
 	}
 
@@ -53,7 +53,7 @@ public class AssociateDescTo2D<D> implements AssociateDescription2D<D> {
 	}
 
 	@Override
-	public FastQueue<AssociatedIndex> getMatches() {
+	public FastAccess<AssociatedIndex> getMatches() {
 		return alg.getMatches();
 	}
 

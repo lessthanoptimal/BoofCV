@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.associate;
 
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
 
@@ -48,7 +49,7 @@ public interface AssociateDescription<Desc> extends Associate {
 	 *
 	 * @param listSrc List of features
 	 */
-	void setSource( FastQueue<Desc> listSrc );
+	void setSource( FastAccess<Desc> listSrc );
 
 	/**
 	 * Sets the list of destination features
@@ -57,5 +58,5 @@ public interface AssociateDescription<Desc> extends Associate {
 	 *
 	 * @param listDst List of features
 	 */
-	void setDestination( FastQueue<Desc> listDst );
+	void setDestination( FastAccess<Desc> listDst );
 }

@@ -25,6 +25,7 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -162,7 +163,7 @@ public class CombinedTrackerScalePoint
 	 */
 	public void spawnTracksFromDetected() {
 		// mark detected features with no matches as available
-		FastQueue<AssociatedIndex> matches = associate.getMatches();
+		FastAccess<AssociatedIndex> matches = associate.getMatches();
 
 		int N = detector.getNumberOfFeatures();
 		for( int i = 0; i < N; i++ )
@@ -258,7 +259,7 @@ public class CombinedTrackerScalePoint
 		// associate features
 		associateToDetected(all);
 
-		FastQueue<AssociatedIndex> matches = associate.getMatches();
+		FastAccess<AssociatedIndex> matches = associate.getMatches();
 
 		// See which features got respawned and which ones are made dormant
 		for( int i = 0; i < numTainted; i++ ) {

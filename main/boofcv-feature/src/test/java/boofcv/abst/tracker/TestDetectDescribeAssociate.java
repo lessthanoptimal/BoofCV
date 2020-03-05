@@ -21,7 +21,7 @@ package boofcv.abst.tracker;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -124,7 +124,7 @@ public class TestDetectDescribeAssociate {
 		}
 
 		@Override
-		public void getFeatures(int set, FastQueue<Point2D_F64> locations, FastQueue<TupleDesc_F64> descriptions) {
+		public void getFeatures(int set, FastArray<Point2D_F64> locations, FastArray<TupleDesc_F64> descriptions) {
 
 		}
 

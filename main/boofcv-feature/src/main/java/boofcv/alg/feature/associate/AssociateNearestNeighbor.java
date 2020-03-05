@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -52,7 +53,7 @@ public abstract class AssociateNearestNeighbor<D>
 	NearestNeighbor<D> alg;
 
 	// list of features in destination set that are to be searched for in the source list
-	FastQueue<D> listDst;
+	FastAccess<D> listDst;
 
 	int sizeSrc;
 
@@ -76,13 +77,13 @@ public abstract class AssociateNearestNeighbor<D>
 	}
 
 	@Override
-	public void setSource(FastQueue<D> listSrc) {
+	public void setSource(FastAccess<D> listSrc) {
 		this.sizeSrc = listSrc.size;
 		alg.setPoints((List)listSrc.toList(),true);
 	}
 
 	@Override
-	public void setDestination(FastQueue<D> listDst) {
+	public void setDestination(FastAccess<D> listDst) {
 		this.listDst = listDst;
 	}
 

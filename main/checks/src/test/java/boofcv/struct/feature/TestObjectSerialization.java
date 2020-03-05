@@ -23,7 +23,7 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 import org.ejml.data.DMatrixRMaj;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -107,18 +107,17 @@ class TestObjectSerialization {
 	}
 
 	@Test
-	void testFastQueue() {
-		FastQueue<GrayU8> list = new FastQueue<>(GrayU8.class,false);
+	void serialize_FastArray() {
+		FastArray<GrayU8> list = new FastArray<>(GrayU8.class);
 
 		list.add(new GrayU8(1,2));
 		list.add(new GrayU8(2,4));
 
-		FastQueue<GrayU8> found = serializeDeSerialize(list);
+		FastArray<GrayU8> found = serializeDeSerialize(list);
 
 		assertNotNull(found);
 		assertEquals(list.size(),found.size());
 		assertSame(list.type, found.type);
-		assertFalse(found.isDeclareInstances());
 
 		for( int i = 0; i < list.size; i++ ) {
 			GrayU8 a = list.get(i);

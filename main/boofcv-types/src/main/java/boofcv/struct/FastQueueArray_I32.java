@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,6 @@ import org.ddogleg.struct.FastQueue;
  */
 public class FastQueueArray_I32 extends FastQueue<int[]> {
 	public FastQueueArray_I32(int arrayLength) {
-		init(10,int[].class,()->new int[arrayLength]);
+		super(()->new int[arrayLength]);
 	}
 }

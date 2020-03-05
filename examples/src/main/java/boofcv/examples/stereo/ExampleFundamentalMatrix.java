@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,7 +37,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastAccess;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
@@ -142,7 +142,7 @@ public class ExampleFundamentalMatrix {
 		findMatches.associate(left,right);
 
 		List<AssociatedPair> matches = new ArrayList<>();
-		FastQueue<AssociatedIndex> matchIndexes = associate.getMatches();
+		FastAccess<AssociatedIndex> matchIndexes = associate.getMatches();
 
 		for( int i = 0; i < matchIndexes.size; i++ ) {
 			AssociatedIndex a = matchIndexes.get(i);

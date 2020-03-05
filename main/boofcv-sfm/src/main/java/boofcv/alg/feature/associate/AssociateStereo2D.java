@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -52,11 +53,11 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 
 
 	// stores rectified coordinates of observations in left and right images
-	private FastQueue<Point2D_F64> locationLeft = new FastQueue<>(Point2D_F64.class, true);
-	private FastQueue<Point2D_F64> locationRight = new FastQueue<>(Point2D_F64.class, true);
+	private FastQueue<Point2D_F64> locationLeft = new FastQueue<>(Point2D_F64::new);
+	private FastQueue<Point2D_F64> locationRight = new FastQueue<>(Point2D_F64::new);
 	// stores reference to descriptions in left and right iamges
-	private FastQueue<Desc> descriptionsLeft;
-	private FastQueue<Desc> descriptionsRight;
+	private FastAccess<Desc> descriptionsLeft;
+	private FastAccess<Desc> descriptionsRight;
 
 	public AssociateStereo2D( ScoreAssociation<Desc> scorer , double locationTolerance , Class<Desc> descType )
 	{
@@ -70,7 +71,7 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 	 * Converts location into rectified coordinates and saved a reference to the description.
 	 */
 	@Override
-	public void setSource(FastQueue<Point2D_F64> location, FastQueue<Desc> descriptions) {
+	public void setSource(FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions) {
 		locationLeft.reset();
 		for( int i = 0; i < location.size; i++ ) {
 			Point2D_F64 orig = location.get(i);
@@ -85,7 +86,7 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 	 * Converts location into rectified coordinates and saved a reference to the description.
 	 */
 	@Override
-	public void setDestination(FastQueue<Point2D_F64> location, FastQueue<Desc> descriptions) {
+	public void setDestination(FastAccess<Point2D_F64> location, FastAccess<Desc> descriptions) {
 		locationRight.reset();
 		for( int i = 0; i < location.size; i++ ) {
 			Point2D_F64 orig = location.get(i);

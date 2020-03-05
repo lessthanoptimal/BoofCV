@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.feature.associate.AssociateThreeDescription;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.MatchScoreType;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -88,7 +89,7 @@ public class AssociateThreeByPairs<Desc> implements AssociateThreeDescription<De
 		associator.setSource(featuresA);
 		associator.setDestination(featuresB);
 		associator.associate();
-		FastQueue<AssociatedIndex> pairs = associator.getMatches();
+		FastAccess<AssociatedIndex> pairs = associator.getMatches();
 		tmpB.reset();
 		tmpA.reset();
 		for (int i = 0; i < pairs.size; i++) {

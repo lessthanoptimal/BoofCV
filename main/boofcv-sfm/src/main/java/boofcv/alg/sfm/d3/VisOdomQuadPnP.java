@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,7 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -229,7 +230,7 @@ public class VisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc> {
 			assocL2R.setDestination(rightLoc, featsRight1.description[i]);
 			assocL2R.associate();
 
-			FastQueue<AssociatedIndex> found = assocL2R.getMatches();
+			FastAccess<AssociatedIndex> found = assocL2R.getMatches();
 
 //			removeUnassociated(leftLoc,featsLeft1.description[i],rightLoc,featsRight1.description[i],found);
 			setMatches(matches.match2to3, found, leftLoc.size);
@@ -362,7 +363,7 @@ public class VisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc> {
 	}
 
 	private void setMatches(GrowQueue_I32 matches,
-							FastQueue<AssociatedIndex> found,
+							FastAccess<AssociatedIndex> found,
 							int sizeSrc ) {
 		matches.resize(sizeSrc);
 		for( int j = 0; j < sizeSrc; j++ ) {

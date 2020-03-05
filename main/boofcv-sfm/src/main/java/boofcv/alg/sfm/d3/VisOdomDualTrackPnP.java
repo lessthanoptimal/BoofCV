@@ -37,6 +37,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -405,7 +406,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 		assocL2R.setSource(pointsLeft,descLeft);
 		assocL2R.setDestination(pointsRight, descRight);
 		assocL2R.associate();
-		FastQueue<AssociatedIndex> matches = assocL2R.getMatches();
+		FastAccess<AssociatedIndex> matches = assocL2R.getMatches();
 
 		// storage for the triangulated location in the camera frame
 		Point3D_F64 cameraP3 = new Point3D_F64();
