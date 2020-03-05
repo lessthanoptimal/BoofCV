@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -131,7 +131,7 @@ public class TestDetectCircleGrid {
 
 	@Test
 	public void pruneIncorrectShape() {
-		FastQueue<Grid> grids = new FastQueue<>(Grid.class,true);
+		FastQueue<Grid> grids = new FastQueue<>(Grid::new);
 		grids.grow().setShape(4,5);
 		grids.grow().setShape(5,4);
 		grids.grow().setShape(4,3);

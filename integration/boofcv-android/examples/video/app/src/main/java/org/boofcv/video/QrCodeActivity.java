@@ -73,7 +73,7 @@ public class QrCodeActivity extends VisualizeCamera2Activity
 	private Paint colorDetected = new Paint();
 
 	// Storage for bounds of found QR Codes
-	private final FastQueue<Polygon2D_F64> foundQR = new FastQueue<>(Polygon2D_F64.class,true);
+	private final FastQueue<Polygon2D_F64> foundQR = new FastQueue<>(Polygon2D_F64::new);
 	private String message=""; // most recently decoded QR code
 
 	// Used to compute average time in the detector

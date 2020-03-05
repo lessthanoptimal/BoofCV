@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -130,11 +130,11 @@ public class PnPLepetitEPnP {
 	protected List<Point3D_F64> nullPts[] = new ArrayList[4];
 
 	// control points in world coordinate frame
-	protected FastQueue<Point3D_F64> controlWorldPts = new FastQueue<>(4, Point3D_F64.class, true);
+	protected FastQueue<Point3D_F64> controlWorldPts = new FastQueue<>(4, Point3D_F64::new);
 
 	// list of found solutions
 	private List<double []> solutions = new ArrayList<>();
-	protected FastQueue<Point3D_F64> solutionPts = new FastQueue<>(4, Point3D_F64.class, true);
+	protected FastQueue<Point3D_F64> solutionPts = new FastQueue<>(4, Point3D_F64::new);
 
 	// estimates rigid body motion between two associated sets of points
 	private MotionTransformPoint<Se3_F64, Point3D_F64> motionFit = FitSpecialEuclideanOps_F64.fitPoints3D();

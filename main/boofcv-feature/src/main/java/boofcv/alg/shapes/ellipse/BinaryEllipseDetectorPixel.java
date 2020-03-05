@@ -101,9 +101,9 @@ public class BinaryEllipseDetectorPixel {
 
 	private PrintStream verbose = null;
 
-	private FastQueue<Point2D_F64> pointsF = new FastQueue<>(Point2D_F64.class, true);
+	private FastQueue<Point2D_F64> pointsF = new FastQueue<>(Point2D_F64::new);
 
-	private FastQueue<Found> found = new FastQueue<>(Found.class, true);
+	private FastQueue<Found> found = new FastQueue<>(Found::new);
 
 	// temporary storage for a contour
 	private FastQueue<Point2D_I32> contourTmp = new FastQueue<>(Point2D_I32::new);

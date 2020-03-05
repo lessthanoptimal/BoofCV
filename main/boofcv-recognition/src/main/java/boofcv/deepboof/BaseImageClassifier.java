@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,7 @@ public abstract class BaseImageClassifier implements ImageClassifier<Planar<Gray
 	protected Tensor_F32 tensorOutput;
 
 	// storage for the final output
-	protected FastQueue<Score> categoryScores = new FastQueue<>(Score.class,true);
+	protected FastQueue<Score> categoryScores = new FastQueue<>(Score::new);
 	protected int categoryBest;
 
 	Comparator<Score> comparator = new Comparator<Score>() {

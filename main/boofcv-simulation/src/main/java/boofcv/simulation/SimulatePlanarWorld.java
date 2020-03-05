@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -326,7 +326,7 @@ public class SimulatePlanarWorld {
 		double height3D;
 
 		// 3D point of corners in camera frame
-		FastQueue<Point3D_F64> rect3D = new FastQueue<>(Point3D_F64.class,true);
+		FastQueue<Point3D_F64> rect3D = new FastQueue<>(Point3D_F64::new);
 		// 2D point of corners in surface frame
 		Polygon2D_F64 rect2D = new Polygon2D_F64();
 		// bounding box of visible region in pixels

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -1683,7 +1683,7 @@ public class MultiViewOps {
 			list_p_to_n.add(p2n);
 		}
 
-		FastQueue<Point2D_F64> normObs = new FastQueue<>(Point2D_F64.class,true);
+		FastQueue<Point2D_F64> normObs = new FastQueue<>(Point2D_F64::new);
 		normObs.resize(3);
 
 		Point3D_F64 X = new Point3D_F64();

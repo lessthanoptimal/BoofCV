@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,7 +55,7 @@ public class SquaresIntoCrossClusters extends SquaresIntoClusters {
 	private NearestNeighbor.Search<Point2D_F64> search = nn.createSearch();
 	private List<Point2D_F64> searchPoints = new ArrayList<>();
 	private List<SquareNode> searchSquareList = new ArrayList<>();
-	private FastQueue<NnData<Point2D_F64>> searchResults = new FastQueue(NnData.class,true);
+	private FastQueue<NnData<Point2D_F64>> searchResults = new FastQueue(NnData::new);
 
 	/**
 	 * Declares data structures and configures algorithm

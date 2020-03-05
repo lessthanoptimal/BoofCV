@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,7 +76,7 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	private Track[] tracks;
 
 	// List showing how each active feature moved
-	private FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class, true);
+	private FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
 
 	// storage for computing error statistics
 	private double[] errorsFB;

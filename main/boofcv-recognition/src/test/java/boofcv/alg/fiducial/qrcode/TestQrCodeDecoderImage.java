@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class TestQrCodeDecoderImage {
 		helper.render();
 
 		// find location of postion patterns and create graph
-		FastQueue<PositionPatternNode> pps = new FastQueue<>(PositionPatternNode.class,true);
+		FastQueue<PositionPatternNode> pps = new FastQueue<>(PositionPatternNode::new);
 
 		pps.grow().square = new Polygon2D_F64(4);
 		pps.grow().square = new Polygon2D_F64(4);
@@ -287,7 +287,7 @@ public class TestQrCodeDecoderImage {
 	}
 
 	private FastQueue<PositionPatternNode> createPositionPatterns(QrCodeGeneratorImage generator) {
-		FastQueue<PositionPatternNode> pps = new FastQueue<>(PositionPatternNode.class,true);
+		FastQueue<PositionPatternNode> pps = new FastQueue<>(PositionPatternNode::new);
 
 		pps.grow().square = generator.qr.ppCorner;
 		pps.grow().square = generator.qr.ppRight;

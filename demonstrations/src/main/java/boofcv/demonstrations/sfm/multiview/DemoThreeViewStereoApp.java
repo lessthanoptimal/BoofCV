@@ -100,7 +100,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(scorer, 0.1, true);
 
 	AssociateThreeByPairs<BrightFeature> associateThree = new AssociateThreeByPairs<>(associate,BrightFeature.class);
-	FastQueue<AssociatedTriple> associated = new FastQueue<>(AssociatedTriple.class,true);
+	FastQueue<AssociatedTriple> associated = new FastQueue<>(AssociatedTriple::new);
 
 	ThreeViewEstimateMetricScene structureEstimator = new ThreeViewEstimateMetricScene();
 
@@ -149,7 +149,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 				0, 4, 1000, 1, 9, 4, 2), null,null, GrayU8.class);
 
 		for (int i = 0; i < 3; i++) {
-			locations[i] = new FastQueue<>(Point2D_F64.class,true);
+			locations[i] = new FastQueue<>(Point2D_F64::new);
 			features[i] = UtilFeature.createQueue(detDesc,100);
 			dimensions[i] = new ImageDimension();
 		}

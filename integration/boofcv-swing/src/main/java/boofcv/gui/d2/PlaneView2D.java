@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ import java.awt.event.*;
  */
 public class PlaneView2D extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener, KeyListener {
 
-	FastQueue<Point2D_F64> points = new FastQueue<>(Point2D_F64.class, true);
+	FastQueue<Point2D_F64> points = new FastQueue<>(Point2D_F64::new);
 
 	Se2_F64 transform = new Se2_F64();
 	double scale = 1;

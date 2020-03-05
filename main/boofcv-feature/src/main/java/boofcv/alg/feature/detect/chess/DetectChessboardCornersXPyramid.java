@@ -59,12 +59,12 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 	FastQueue<PyramidLevel> featureLevels = new FastQueue<>(PyramidLevel.class, PyramidLevel::new);
 
 	// Storage for final output corners
-	FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner.class,true);
+	FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner::new);
 
 	// Nearest-Neighbor search data structures
 	NearestNeighbor<ChessboardCorner> nn = FactoryNearestNeighbor.kdtree(new ChessboardCornerDistance());
 	NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
-	FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData.class,true);
+	FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData::new);
 
 	ImageType<T> imageType;
 
@@ -259,7 +259,7 @@ public class DetectChessboardCornersXPyramid<T extends ImageGray<T>> {
 	}
 
 	private static class PyramidLevel {
-		FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner.class,true);
+		FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner::new);
 	}
 
 	public DetectChessboardCornersX getDetector() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ public class SegmentMeanShiftSearchColor<T extends ImageMultiBand<T>> extends Se
 	protected float[] sumColor;
 
 	// Mean-shift trajectory history
-	protected FastQueue<Point2D_F32> history = new FastQueue<>(Point2D_F32.class, true);
+	protected FastQueue<Point2D_F32> history = new FastQueue<>(Point2D_F32::new);
 
 	ImageType<T> imageType;
 

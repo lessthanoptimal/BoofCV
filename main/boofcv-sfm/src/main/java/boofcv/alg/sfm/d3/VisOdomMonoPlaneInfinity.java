@@ -69,7 +69,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	// Motion estimator for points on plane.  Motion estimated is from key-frame to current-frame
 	private ModelMatcher<Se2_F64, PlanePtPixel> planeMotion;
 	// storage for data passed into planeMotion
-	private FastQueue<PlanePtPixel> planeSamples = new FastQueue<>(PlanePtPixel.class, true);
+	private FastQueue<PlanePtPixel> planeSamples = new FastQueue<>(PlanePtPixel::new);
 
 	// when the inlier set is less than this number new features are detected
 	private int thresholdAdd;

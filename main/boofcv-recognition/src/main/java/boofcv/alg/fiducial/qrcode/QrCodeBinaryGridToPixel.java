@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,12 +46,12 @@ public class QrCodeBinaryGridToPixel {
 	ModelGenerator<Homography2D_F64,AssociatedPair> generator = new GenerateHomographyLinear(true);
 	HomographyDirectLinearTransform dlt = new HomographyDirectLinearTransform(true);
 
-	FastQueue<AssociatedPair> storagePairs2D = new FastQueue<>(AssociatedPair.class,true);
-	FastQueue<AssociatedPair3D> storagePairs3D = new FastQueue<>(AssociatedPair3D.class,true);
+	FastQueue<AssociatedPair> storagePairs2D = new FastQueue<>(AssociatedPair::new);
+	FastQueue<AssociatedPair3D> storagePairs3D = new FastQueue<>(AssociatedPair3D::new);
 
 	List<AssociatedPair> pairs2D = new ArrayList<>();
 
-	FastQueue<Point2D_F64> adjustments = new FastQueue<>(Point2D_F64.class,true);
+	FastQueue<Point2D_F64> adjustments = new FastQueue<>(Point2D_F64::new);
 
 	Homography2D_F64 H = new Homography2D_F64();
 	Homography2D_F64 Hinv = new Homography2D_F64();

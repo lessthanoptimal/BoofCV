@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 
@@ -54,7 +55,7 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc>
 	// storage for found orientations
 	private GrowQueue_F64 featureRadiuses = new GrowQueue_F64(10);
 	private GrowQueue_F64 featureAngles = new GrowQueue_F64(10);
-	private FastQueue<Point2D_F64> location = new FastQueue<>(10, Point2D_F64.class, false);
+	private FastArray<Point2D_F64> location = new FastArray<>(Point2D_F64.class);
 
 	/**
 	 * Configures the algorithm.
@@ -71,9 +72,7 @@ public class DetectDescribeFusion<T extends ImageGray<T>, TD extends TupleDesc>
 		this.orientation = orientation;
 		this.detector = detector;
 
-		final DescribeRegionPoint<T, TD> locaDescribe = describe;
-
-		descs = new FastQueue<TD>(100,describe.getDescriptionType(),()->locaDescribe.createDescription());
+		descs = new FastQueue<>(100, describe::createDescription);
 	}
 
 	@Override

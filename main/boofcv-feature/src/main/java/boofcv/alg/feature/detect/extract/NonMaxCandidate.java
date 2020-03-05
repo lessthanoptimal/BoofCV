@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,10 @@
 
 package boofcv.alg.feature.detect.extract;
 
-import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastQueue;
 
 import javax.annotation.Nullable;
 
@@ -57,8 +58,9 @@ public class NonMaxCandidate {
 	 * null then that test is skipped.
 	 */
 	public void process(GrayF32 intensityImage,
-						@Nullable QueueCorner candidatesMin, @Nullable QueueCorner candidatesMax,
-						QueueCorner foundMin , QueueCorner foundMax ) {
+						@Nullable FastAccess<Point2D_I16> candidatesMin,
+						@Nullable FastAccess<Point2D_I16> candidatesMax,
+						FastQueue<Point2D_I16> foundMin , FastQueue<Point2D_I16> foundMax ) {
 
 		this.input = intensityImage;
 
@@ -79,7 +81,7 @@ public class NonMaxCandidate {
 
 	}
 
-	protected void examineMinimum(GrayF32 intensityImage , QueueCorner candidates , QueueCorner found ) {
+	protected void examineMinimum(GrayF32 intensityImage , FastAccess<Point2D_I16> candidates , FastQueue<Point2D_I16> found ) {
 		final int stride = intensityImage.stride;
 		final float inten[] = intensityImage.data;
 
@@ -100,11 +102,11 @@ public class NonMaxCandidate {
 			int y1 = Math.min(intensityImage.height, pt.y + radius + 1);
 
 			if( search.searchMin(x0,y0,x1,y1,center,val) )
-				found.add(pt.x,pt.y);
+				found.grow().set(pt.x,pt.y);
 		}
 	}
 
-	protected void examineMaximum(GrayF32 intensityImage , QueueCorner candidates , QueueCorner found ) {
+	protected void examineMaximum(GrayF32 intensityImage , FastAccess<Point2D_I16> candidates , FastQueue<Point2D_I16> found ) {
 		final int stride = intensityImage.stride;
 		final float inten[] = intensityImage.data;
 
@@ -125,7 +127,7 @@ public class NonMaxCandidate {
 			int y1 = Math.min(intensityImage.height, pt.y + radius + 1);
 
 			if( search.searchMax(x0,y0,x1,y1,center,val) )
-				found.add(pt.x,pt.y);
+				found.grow().set(pt.x,pt.y);
 		}
 	}
 

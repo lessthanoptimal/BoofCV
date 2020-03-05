@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -115,7 +115,7 @@ public class SelfCalibrationGuessAndCheckFocus {
 	PrintStream verbose;
 
 	public SelfCalibrationGuessAndCheckFocus() {
-		normalizedP = new FastQueue<DMatrixRMaj>(DMatrixRMaj.class,true ) {
+		normalizedP = new FastQueue<DMatrixRMaj>(DMatrixRMaj::new ) {
 			@Override
 			protected DMatrixRMaj createInstance() {
 				return new DMatrixRMaj(3,4);

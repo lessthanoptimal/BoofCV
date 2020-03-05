@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class RefinePolygonToContour {
 	private List<Point2D_I32> work = new ArrayList<>();
 	private LinePolar2D_F64 polar = new LinePolar2D_F64();
 
-	private FastQueue<LineGeneral2D_F64> lines = new FastQueue<>(LineGeneral2D_F64.class,true);
+	private FastQueue<LineGeneral2D_F64> lines = new FastQueue<>(LineGeneral2D_F64::new);
 
 	/**
 	 * Refines the estimate using all the points in the contour

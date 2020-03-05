@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ import java.util.List;
 public class SelfCalibrationBase {
 
 	// 3x4 camera matrices
-	FastQueue<Projective> cameras = new FastQueue<>(Projective.class,true);
+	FastQueue<Projective> cameras = new FastQueue<>(Projective::new);
 
 	// Minimum number of projective views/camera matrices to estimate the parameters
 	int minimumProjectives;

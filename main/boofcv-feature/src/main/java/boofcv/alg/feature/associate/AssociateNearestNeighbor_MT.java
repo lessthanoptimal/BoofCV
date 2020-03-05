@@ -148,9 +148,9 @@ public class AssociateNearestNeighbor_MT<D>
 	 */
 	private class Helper {
 		NearestNeighbor.Search<D> search;
-		FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex.class, true);
+		FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex::new);
 		private NnData<D> result = new NnData<>();
-		private FastQueue<NnData<D>> result2 = new FastQueue(NnData.class,true);
+		private FastQueue<NnData<D>> result2 = new FastQueue(NnData::new);
 
 		Helper() {
 			search = alg.createSearch();

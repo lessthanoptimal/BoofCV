@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.struct.feature.AssociatedIndex;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +33,7 @@ public class TestEnsureUniqueAssociation {
 	@Test
 	public void basicTest() {
 
-		FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex.class, true);
+		FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex::new);
 
 		matches.grow().setAssociation(0,1,10);
 		matches.grow().setAssociation(1,0,20);
@@ -44,7 +45,7 @@ public class TestEnsureUniqueAssociation {
 
 		alg.process(matches, 3);
 
-		FastQueue<AssociatedIndex> found = alg.getMatches();
+		FastAccess<AssociatedIndex> found = alg.getMatches();
 
 		assertEquals(3,found.size);
 		// the other shouldn't matter but it is easier to test this way

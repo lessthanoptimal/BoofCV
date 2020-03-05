@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,7 +101,7 @@ public class BenchmarkAssociationSpeedRandom {
 //	}
 
 	private FastQueue<TupleDesc_F64> createSet( Random rand ) {
-		FastQueue<TupleDesc_F64> ret = new FastQueue<>(10, TupleDesc_F64.class, () -> new TupleDesc_F64(DOF));
+		FastQueue<TupleDesc_F64> ret = new FastQueue<>(() -> new TupleDesc_F64(DOF));
 
 		for( int i = 0; i < NUM_FEATURES; i++ ) {
 			TupleDesc_F64 t = ret.grow();

@@ -69,7 +69,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 	VisualizePanel gui = new VisualizePanel();
 	// synchronized when manipulating
 	long frameIdGui = -1;
-	final FastQueue<PointTrack> tracksGui = new FastQueue<>(PointTrack.class,true);
+	final FastQueue<PointTrack> tracksGui = new FastQueue<>(PointTrack::new);
 	final Map<Long, Point2D_F64> tracksPrev = new HashMap<>();
 
 	long selectedTrackID = -1;

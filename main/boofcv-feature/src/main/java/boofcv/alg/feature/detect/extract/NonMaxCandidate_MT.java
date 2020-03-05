@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,8 @@ import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +45,7 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 	}
 
 	@Override
-	protected void examineMinimum(GrayF32 intensityImage , QueueCorner candidates , QueueCorner found ) {
+	protected void examineMinimum(GrayF32 intensityImage , FastAccess<Point2D_I16> candidates , FastQueue<Point2D_I16> found ) {
 		final int stride = intensityImage.stride;
 		final float inten[] = intensityImage.data;
 
@@ -79,7 +81,7 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 			}
 
 			synchronized (lock) {
-				found.addAll(threadCorners);
+				found.copyAll(threadCorners.toList(),(src,dst)->dst.set(src));
 				searches.add(search);
 				cornerLists.add(threadCorners);
 			}
@@ -87,7 +89,7 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 	}
 
 	@Override
-	protected void examineMaximum(GrayF32 intensityImage , QueueCorner candidates , QueueCorner found ) {
+	protected void examineMaximum(GrayF32 intensityImage , FastAccess<Point2D_I16> candidates , FastQueue<Point2D_I16> found ) {
 		final int stride = intensityImage.stride;
 		final float inten[] = intensityImage.data;
 
@@ -123,7 +125,8 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 			}
 
 			synchronized (lock) {
-				found.addAll(threadCorners);
+
+				found.copyAll(threadCorners.toList(),(src,dst)->dst.set(src));
 				searches.add(search);
 				cornerLists.add(threadCorners);
 			}

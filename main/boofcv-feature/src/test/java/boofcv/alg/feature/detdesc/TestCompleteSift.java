@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.GrayF32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.junit.jupiter.api.Test;
 
@@ -62,8 +62,8 @@ public class TestCompleteSift {
 		assertEquals(128,alg.getDescriptorLength());
 
 		GrowQueue_F64 orientations = alg.getOrientations();
-		FastQueue<ScalePoint> locations = alg.getLocations();
-		FastQueue<BrightFeature> descriptions = alg.getDescriptions();
+		FastAccess<ScalePoint> locations = alg.getLocations();
+		FastAccess<BrightFeature> descriptions = alg.getDescriptions();
 
 		assertTrue(orientations.size>10);
 		assertEquals(orientations.size,locations.size);

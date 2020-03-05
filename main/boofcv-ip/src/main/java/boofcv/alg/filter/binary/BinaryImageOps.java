@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -595,7 +595,7 @@ public class BinaryImageOps {
 			ret.add( new ArrayList<Point2D_I32>() );
 		}
 		if( queue == null ) {
-			queue = new FastQueue<>(numLabels, Point2D_I32.class, true);
+			queue = new FastQueue<>(numLabels, Point2D_I32::new);
 		} else
 			queue.reset();
 

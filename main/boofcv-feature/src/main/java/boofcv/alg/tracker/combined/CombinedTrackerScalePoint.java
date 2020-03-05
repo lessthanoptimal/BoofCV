@@ -26,7 +26,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,8 +69,8 @@ public class CombinedTrackerScalePoint
 	protected Stack<CombinedTrack<TD>> tracksUnused = new Stack<>();
 
 	// local storage used by association
-	protected FastQueue<TD> detectedDesc;
-	protected FastQueue<TD> knownDesc;
+	protected FastArray<TD> detectedDesc;
+	protected FastArray<TD> knownDesc;
 
 	// number of tracks it has created
 	protected long totalTracks = 0;
@@ -91,8 +91,8 @@ public class CombinedTrackerScalePoint
 		this.trackerKlt = trackerKlt;
 		this.detector = detector;
 
-		detectedDesc = new FastQueue<>(10, detector.getDescriptionType(), false);
-		knownDesc = new FastQueue<>(10, detector.getDescriptionType(), false);
+		detectedDesc = new FastArray<TD>(detector.getDescriptionType());
+		knownDesc = new FastArray<TD>( detector.getDescriptionType());
 
 		this.associate = associate;
 	}

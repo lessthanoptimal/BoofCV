@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import org.ddogleg.struct.FastQueue;
  */
 public class AdjustPolygonForThresholdBias {
 
-	private FastQueue<LineSegment2D_F64> segments = new FastQueue<>(LineSegment2D_F64.class,true);
+	private FastQueue<LineSegment2D_F64> segments = new FastQueue<>(LineSegment2D_F64::new);
 	private LineGeneral2D_F64 ga = new LineGeneral2D_F64();
 	private LineGeneral2D_F64 gb = new LineGeneral2D_F64();
 	private Point2D_F64 intersection = new Point2D_F64();

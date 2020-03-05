@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,7 @@ public abstract class GridRansacLineDetector<D extends ImageGray<D>> {
 	protected int minInlierSize;
 
 	// list of detected edge pixels in a region
-	protected FastQueue<Edgel> edgels = new FastQueue<>(30, Edgel.class, true);
+	protected FastQueue<Edgel> edgels = new FastQueue<>(30, Edgel::new);
 	// The maximum number of lines which can be detected in a region
 	protected int maxDetectLines;
 

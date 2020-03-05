@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv;
 
 import boofcv.misc.PerformerBase;
 import boofcv.misc.ProfileOperation;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,12 +92,12 @@ public class ArrayVsListAccess {
 		}
 	}
 
-	private static class FastQueueAccess extends PerformerBase
+	private static class FastAccess extends PerformerBase
 	{
-		FastQueue<Double> queue = new FastQueue<>(100, Double.class, false);
+		FastArray<Double> queue = new FastArray<>(Double.class, 100);
 		int ret;
 
-		public FastQueueAccess( double data [] ) {
+		public FastAccess(double data [] ) {
 			for( Double d : data ) {
 				queue.add(d);
 			}
@@ -119,12 +119,12 @@ public class ArrayVsListAccess {
 		}
 	}
 
-	private static class FastQueueAccessRaw extends PerformerBase
+	private static class FastAccessRaw extends PerformerBase
 	{
-		FastQueue<Double> queue = new FastQueue<>(100, Double.class, false);
+		FastArray<Double> queue = new FastArray<>(Double.class, 100);
 		int ret;
 
-		public FastQueueAccessRaw( double data [] ) {
+		public FastAccessRaw(double data [] ) {
 			for( Double d : data ) {
 				queue.add(d);
 			}
@@ -155,8 +155,8 @@ public class ArrayVsListAccess {
 
 		ListAccess list = new ListAccess(data);
 		ArrayAccess array = new ArrayAccess(data);
-		FastQueueAccess fastQueue = new FastQueueAccess(data);
-		FastQueueAccessRaw fastRaw = new FastQueueAccessRaw(data);
+		FastAccess fastQueue = new FastAccess(data);
+		FastAccessRaw fastRaw = new FastAccessRaw(data);
 
 		ProfileOperation.printOpsPerSec(fastRaw, TEST_TIME);
 		ProfileOperation.printOpsPerSec(fastQueue, TEST_TIME);

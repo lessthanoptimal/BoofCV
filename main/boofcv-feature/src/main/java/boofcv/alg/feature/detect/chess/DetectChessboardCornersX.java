@@ -110,7 +110,7 @@ public class DetectChessboardCornersX {
 
 	SearchLocalPeak<GrayF32> meanShift;
 
-	private FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner.class,true);
+	private FastQueue<ChessboardCorner> corners = new FastQueue<>(ChessboardCorner::new);
 	List<ChessboardCorner> filtered = new ArrayList<>();
 
 	// storage for corner detector output
@@ -152,8 +152,8 @@ public class DetectChessboardCornersX {
 	private final Kernel1D_F64 kernelSmooth = FactoryKernelGaussian.gaussian(1,true,64,-1,numSpokeDiam/4);
 
 	// used to check up and down patterns of intensity image
-	FastQueue<Point2D_I32> outsideCircle4 = new FastQueue<>(Point2D_I32.class,true);
-	FastQueue<Point2D_I32> outsideCircle3 = new FastQueue<>(Point2D_I32.class,true);
+	FastQueue<Point2D_I32> outsideCircle4 = new FastQueue<>(Point2D_I32::new);
+	FastQueue<Point2D_I32> outsideCircle3 = new FastQueue<>(Point2D_I32::new);
 	private final float[] outsideCircleValues;
 
 	// Workspace

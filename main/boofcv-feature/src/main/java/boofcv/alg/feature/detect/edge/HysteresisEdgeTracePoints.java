@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ public class HysteresisEdgeTracePoints {
 	// list of segments which have yet to be explored
 	private List<EdgeSegment> open = new ArrayList<>();
 
-	private FastQueue<Point2D_I32> queuePoints = new FastQueue<>(Point2D_I32.class, true);
+	private FastQueue<Point2D_I32> queuePoints = new FastQueue<>(Point2D_I32::new);
 
 	// the active contour which is being traced
 	private EdgeContour e;

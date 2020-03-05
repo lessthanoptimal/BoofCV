@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class TldDetection<T extends ImageGray<T>> {
 	private TldVarianceFilter<T> variance;
 
 	// Storage for results of the fern test on individual regions
-	protected FastQueue<TldRegionFernInfo> fernInfo = new FastQueue<>(TldRegionFernInfo.class, true);
+	protected FastQueue<TldRegionFernInfo> fernInfo = new FastQueue<>(TldRegionFernInfo::new);
 
 	protected TldParameters config;
 
@@ -58,9 +58,9 @@ public class TldDetection<T extends ImageGray<T>> {
 	protected List<ImageRectangle> fernRegions = new ArrayList<>();
 
 	// list all regions which had the template test run on them
-	protected FastQueue<TldRegion> candidateDetections = new FastQueue<>(TldRegion.class, true);
+	protected FastQueue<TldRegion> candidateDetections = new FastQueue<>(TldRegion::new);
 	// results from non-maximum suppression
-	private FastQueue<TldRegion> localMaximums = new FastQueue<>(TldRegion.class, true);
+	private FastQueue<TldRegion> localMaximums = new FastQueue<>(TldRegion::new);
 
 	// list of regions which have almost the same confidence as the maximum
 	private List<ImageRectangle> ambiguousRegions = new ArrayList<>();

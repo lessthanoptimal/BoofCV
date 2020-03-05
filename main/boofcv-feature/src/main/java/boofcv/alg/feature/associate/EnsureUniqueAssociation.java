@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.alg.feature.associate;
 
 import boofcv.struct.feature.AssociatedIndex;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -32,7 +34,7 @@ public class EnsureUniqueAssociation {
 	// An element for each 'dst' feature.  Only the best association with the lowest score is saved here.
 	AssociatedIndex[] bestScores = new AssociatedIndex[1];
 	// The final output list with the best associations
-	FastQueue<AssociatedIndex> unambiguous = new FastQueue<>(100, AssociatedIndex.class, false);
+	FastArray<AssociatedIndex> unambiguous = new FastArray<>(AssociatedIndex.class);
 
 	/**
 	 * Removes ambiguous associations.  Call {@link #getMatches()} to get the list of unambiguous
@@ -70,7 +72,7 @@ public class EnsureUniqueAssociation {
 	 *
 	 * @return list of matches
 	 */
-	public FastQueue<AssociatedIndex> getMatches() {
+	public FastAccess<AssociatedIndex> getMatches() {
 		return unambiguous;
 	}
 }

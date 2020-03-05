@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc_F64;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
@@ -44,8 +45,8 @@ public class TestAssociateSurfBasic {
 	 */
 	@Test
 	public void checkAssociateByIntensity() {
-		FastQueue<BrightFeature> src = new FastQueue<>(10, BrightFeature.class, false);
-		FastQueue<BrightFeature> dst = new FastQueue<>(10, BrightFeature.class, false);
+		FastArray<BrightFeature> src = new FastArray<>(BrightFeature.class);
+		FastArray<BrightFeature> dst = new FastArray<>(BrightFeature.class);
 
 		src.add( createDesc(true,10));
 		dst.add( createDesc(true,0));
@@ -63,8 +64,8 @@ public class TestAssociateSurfBasic {
 
 	@Test
 	public void basicAssociation() {
-		FastQueue<BrightFeature> src = new FastQueue<>(10, BrightFeature.class, false);
-		FastQueue<BrightFeature> dst = new FastQueue<>(10, BrightFeature.class, false);
+		FastArray<BrightFeature> src = new FastArray<>(BrightFeature.class);
+		FastArray<BrightFeature> dst = new FastArray<>(BrightFeature.class);
 
 		// create a list where some should be matched and others not
 		src.add( createDesc(true,10));
@@ -127,8 +128,8 @@ public class TestAssociateSurfBasic {
 
 	@Test
 	public void checkUnassociated() {
-		FastQueue<BrightFeature> src = new FastQueue<>(10, BrightFeature.class, false);
-		FastQueue<BrightFeature> dst = new FastQueue<>(10, BrightFeature.class, false);
+		FastArray<BrightFeature> src = new FastArray<>(BrightFeature.class);
+		FastArray<BrightFeature> dst = new FastArray<>(BrightFeature.class);
 
 		src.add( createDesc(true,10));
 		src.add( createDesc(true,12));
@@ -155,8 +156,8 @@ public class TestAssociateSurfBasic {
 	@Test
 	public void handleEmptyLists() {
 		// Initialize it with a successful association
-		FastQueue<BrightFeature> src = new FastQueue<>(10, BrightFeature.class, false);
-		FastQueue<BrightFeature> dst = new FastQueue<>(10, BrightFeature.class, false);
+		FastArray<BrightFeature> src = new FastArray<>(BrightFeature.class);
+		FastArray<BrightFeature> dst = new FastArray<>(BrightFeature.class);
 
 		src.add( createDesc(true,10));
 		src.add( createDesc(true,12));
@@ -173,7 +174,7 @@ public class TestAssociateSurfBasic {
 		assertTrue( alg.getMatches().size() > 0 );
 
 		// now have the src list be empty
-		alg.setSrc(new FastQueue<>(BrightFeature.class,false));
+		alg.setSrc(new FastArray<>(BrightFeature.class));
 		alg.setDst(dst);
 		alg.associate();
 		assertTrue( alg.getMatches().size() == 0 );
@@ -186,7 +187,7 @@ public class TestAssociateSurfBasic {
 
 		// dst list is empty now
 		alg.setSrc(src);
-		alg.setDst(new FastQueue<>(BrightFeature.class,false));
+		alg.setDst(new FastArray<>(BrightFeature.class));
 		alg.associate();
 		assertTrue( alg.getMatches().size() == 0 );
 

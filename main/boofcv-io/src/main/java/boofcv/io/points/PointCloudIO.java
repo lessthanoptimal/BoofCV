@@ -65,7 +65,7 @@ public class PointCloudIO {
 	public static FastQueue<Point3D_F32>
 	load3D32F( Format format , InputStream input , @Nullable FastQueue<Point3D_F32> storage  ) throws IOException {
 		if( storage == null )
-			storage = new FastQueue<>(Point3D_F32.class,true);
+			storage = new FastQueue<>(Point3D_F32::new);
 		PointCloudWriter output = PointCloudWriter.wrapF32(storage);
 		load(format,input,output);
 		return storage;
@@ -74,7 +74,7 @@ public class PointCloudIO {
 	public static FastQueue<Point3D_F64>
 	load3D64F( Format format , InputStream input , @Nullable FastQueue<Point3D_F64> storage  ) throws IOException {
 		if( storage == null )
-			storage = new FastQueue<>(Point3D_F64.class,true);
+			storage = new FastQueue<>(Point3D_F64::new);
 		PointCloudWriter output = PointCloudWriter.wrapF64(storage);
 		load(format,input,output);
 		return storage;
@@ -83,7 +83,7 @@ public class PointCloudIO {
 	public static FastQueue<Point3dRgbI_F64>
 	load3DRgb64F(Format format , InputStream input , @Nullable FastQueue<Point3dRgbI_F64> storage  ) throws IOException {
 		if( storage == null )
-			storage = new FastQueue<>(Point3dRgbI_F64.class,true);
+			storage = new FastQueue<>(Point3dRgbI_F64::new);
 		PointCloudWriter output = PointCloudWriter.wrapF64RGB(storage);
 		load(format,input,output);
 		return storage;

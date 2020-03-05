@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -224,7 +224,7 @@ public class ExampleColorHistogramLookup {
 		// Use a generic NN search algorithm.  This uses Euclidean distance as a distance metric.
 		NearestNeighbor<double[]> nn = FactoryNearestNeighbor.exhaustive(new KdTreeEuclideanSq_F64(targetPoint.length));
 		NearestNeighbor.Search<double[]> search = nn.createSearch();
-		FastQueue<NnData<double[]>> results = new FastQueue(NnData.class,true);
+		FastQueue<NnData<double[]>> results = new FastQueue(NnData::new);
 
 		nn.setPoints(points, true);
 		search.findNearest(targetPoint, -1, 10, results);

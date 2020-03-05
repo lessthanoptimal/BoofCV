@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 	private PyramidKltTracker<Image, Derivative> klt;
 	private PyramidKltFeature track;
 
-	private FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class, true);
+	private FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
 
 	// used for estimating motion from track locations
 	private LeastMedianOfSquares<ScaleTranslateRotate2D,AssociatedPair> estimateMotion;

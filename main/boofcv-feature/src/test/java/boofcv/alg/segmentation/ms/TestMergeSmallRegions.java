@@ -23,6 +23,7 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
@@ -247,7 +248,7 @@ public class TestMergeSmallRegions {
 		MergeSmallRegions alg = new MergeSmallRegions(10,ConnectRule.FOUR,null);
 		alg.initializeMerge(N);
 
-		FastQueue<float[]> regionColor = new FastQueue<>(float[].class, false);
+		FastArray<float[]> regionColor = new FastArray<>(float[].class);
 
 		for( int i = 0; i < N; i++ ) {
 			regionColor.add( new float[3]);

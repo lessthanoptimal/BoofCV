@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -54,10 +54,10 @@ public class EllipsesIntoClusters {
 
 	private NearestNeighbor<EllipseInfo> nn = FactoryNearestNeighbor.kdtree(new KdTreeEllipseInfo());
 	private NearestNeighbor.Search<EllipseInfo> search = nn.createSearch();
-	private FastQueue<NnData<EllipseInfo>> searchResults = new FastQueue(NnData.class,true);
+	private FastQueue<NnData<EllipseInfo>> searchResults = new FastQueue<>(NnData::new);
 
-	FastQueue<Node> nodes = new FastQueue<>(Node.class,true);
-	FastQueue<List<Node>> clusters;
+	FastQueue<Node> nodes = new FastQueue<>(Node::new);
+	FastQueue<List<Node>> clusters = new FastQueue<>(ArrayList::new);
 
 	/**
 	 * Configures clustering
@@ -77,13 +77,6 @@ public class EllipsesIntoClusters {
 		this.sizeSimilarityTolerance = sizeSimilarityTolerance;
 		this.ratioSimilarityTolerance = sizeSimilarityTolerance;
 		this.edgeIntensitySimilarityTolerance = edgeIntensitySimilarityTolerance;
-
-		clusters = new FastQueue(List.class,true) {
-			@Override
-			protected List<Node> createInstance() {
-				return new ArrayList<>();
-			}
-		};
 	}
 
 	/**

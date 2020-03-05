@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,7 +75,7 @@ public class ShapeFittingOps {
 		alg.process(sequence);
 		PolylineSplitMerge.CandidatePolyline best = alg.getBestPolyline();
 
-		FastQueue<PointIndex_I32> output = new FastQueue<>(PointIndex_I32.class, true);
+		FastQueue<PointIndex_I32> output = new FastQueue<>(PointIndex_I32::new);
 		if( best != null ) {
 			indexToPointIndex(sequence,best.splits,output);
 		}
@@ -174,7 +174,7 @@ public class ShapeFittingOps {
 
 	public static FastQueue<Point2D_F64> convert_I32_F64(List<Point2D_I32> input, FastQueue<Point2D_F64> output ) {
 		if( output == null )
-			output = new FastQueue<>(input.size(),Point2D_F64.class,true);
+			output = new FastQueue<>(input.size(),Point2D_F64::new);
 		else
 			output.reset();
 
@@ -191,7 +191,7 @@ public class ShapeFittingOps {
 
 	public static FastQueue<Point2D_F32> convert_I32_F32(List<Point2D_I32> input, FastQueue<Point2D_F32> output ) {
 		if( output == null )
-			output = new FastQueue<>(input.size(),Point2D_F32.class,true);
+			output = new FastQueue<>(input.size(),Point2D_F32::new);
 		else
 			output.reset();
 

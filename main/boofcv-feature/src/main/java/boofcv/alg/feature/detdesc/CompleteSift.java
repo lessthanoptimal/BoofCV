@@ -28,6 +28,8 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.GrayF32;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 
@@ -50,7 +52,7 @@ public class CompleteSift extends SiftDetector
 	// storage for found features
 	FastQueue<BrightFeature> features;
 	// found orientations and feature locations
-	FastQueue<ScalePoint> locations = new FastQueue<>(ScalePoint.class, false);
+	FastArray<ScalePoint> locations = new FastArray<>(ScalePoint.class);
 	GrowQueue_F64 orientations = new GrowQueue_F64();
 
 	// used to compute the image gradient
@@ -128,11 +130,11 @@ public class CompleteSift extends SiftDetector
 		}
 	}
 
-	public FastQueue<ScalePoint> getLocations() {
+	public FastAccess<ScalePoint> getLocations() {
 		return locations;
 	}
 
-	public FastQueue<BrightFeature> getDescriptions() {
+	public FastAccess<BrightFeature> getDescriptions() {
 		return features;
 	}
 

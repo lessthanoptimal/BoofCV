@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.feature.MatchScoreType;
 import georegression.struct.point.Point2D_F64;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,10 +32,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestBaseAssociateLocation2DFilter {
 
-	FastQueue<Point2D_F64> locationSrc = new FastQueue<>(Point2D_F64.class, false);
-	FastQueue<Integer> descSrc = new FastQueue<>(Integer.class, false);
-	FastQueue<Point2D_F64> locationDst = new FastQueue<>(Point2D_F64.class, false);
-	FastQueue<Integer> descDst = new FastQueue<>(Integer.class, false);
+	FastArray<Point2D_F64> locationSrc = new FastArray<>(Point2D_F64.class);
+	FastArray<Integer> descSrc = new FastArray<>(Integer.class);
+	FastArray<Point2D_F64> locationDst = new FastArray<>(Point2D_F64.class);
+	FastArray<Integer> descDst = new FastArray<>(Integer.class);
 
 	@BeforeEach
 	public void init() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.fiducial.qrcode;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.struct.image.ImageGray;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 
 /**
  * Searches the image for alignment patterns. First it computes a transform that removes perspective distortion
@@ -33,7 +33,7 @@ import org.ddogleg.struct.FastQueue;
 public class QrCodeAlignmentPatternLocator<T extends ImageGray<T>> {
 
 	// grid for quick look up of alignment patterns to adjust search
-	private FastQueue<QrCode.Alignment> lookup = new FastQueue<>(QrCode.Alignment.class,true);
+	private FastArray<QrCode.Alignment> lookup = new FastArray<>(QrCode.Alignment.class);
 
 	QrCodeBinaryGridReader<T> reader;
 

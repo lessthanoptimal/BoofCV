@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public class HoughTransformGradient_MT<D extends ImageGray<D>>
 {
 
 	// storage for candidates in each thread's block
-	private final FastQueue<QueueCorner> blockCandidates = new FastQueue<>(QueueCorner.class,true);
+	private final FastQueue<QueueCorner> blockCandidates = new FastQueue<>(QueueCorner::new);
 
 	/**
 	 * Specifies parameters of transform.

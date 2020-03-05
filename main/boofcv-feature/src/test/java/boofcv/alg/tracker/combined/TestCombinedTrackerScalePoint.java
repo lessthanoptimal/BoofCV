@@ -30,6 +30,7 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.pyramid.ImagePyramid;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
@@ -109,8 +110,8 @@ public class TestCombinedTrackerScalePoint {
 	public void associateAllToDetected() {
 		CombinedTrackerScalePoint alg = new CombinedTrackerScalePoint();
 
-		alg.detectedDesc = new FastQueue(10,BrightFeature.class,false);
-		alg.knownDesc = new FastQueue(10,BrightFeature.class,false);
+		alg.detectedDesc = new FastArray(BrightFeature.class);
+		alg.knownDesc = new FastArray(BrightFeature.class);
 		alg.associate = new DummyAssoc(15);
 		alg.detector = new DummyDetector(20);
 		alg.trackerKlt = new DummyKlt();
@@ -186,7 +187,7 @@ public class TestCombinedTrackerScalePoint {
 
 		@Override
 		public FastQueue<AssociatedIndex> getMatches() {
-			FastQueue<AssociatedIndex> queue = new FastQueue<>(N, AssociatedIndex.class, true);
+			FastQueue<AssociatedIndex> queue = new FastQueue<>(N, AssociatedIndex::new);
 
 			for( int i = 0; i < N; i++ ) {
 				queue.grow().setAssociation(i,i,1);

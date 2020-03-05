@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,7 +89,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private ContourEdgeIntensity<T> contourEdgeIntensity;
 
 	// extera information for found shapes
-	FastQueue<Info> foundInfo = new FastQueue<>(Info.class, true);
+	FastQueue<Info> foundInfo = new FastQueue<>(Info::new);
 
 	// true if points touching the border are NOT pruned
 	private boolean canTouchBorder;
@@ -114,7 +114,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private PolygonHelper helper;
 
 	// storage space for contour in undistorted pixels
-	private FastQueue<Point2D_I32> undistorted = new FastQueue<>(Point2D_I32.class,true);
+	private FastQueue<Point2D_I32> undistorted = new FastQueue<>(Point2D_I32::new);
 
 	// type of input gray scale image it can process
 	private Class<T> inputType;
@@ -123,7 +123,7 @@ public class DetectPolygonFromContour<T extends ImageGray<T>> {
 	private GrowQueue_B borderCorners = new GrowQueue_B();
 
 	// temporary storage for a contour
-	private FastQueue<Point2D_I32> contourTmp = new FastQueue<>(Point2D_I32.class,true);
+	private FastQueue<Point2D_I32> contourTmp = new FastQueue<>(Point2D_I32::new);
 	List<Point2D_I32> polygonPixel = new ArrayList<>();
 
 	// times for internal profiling

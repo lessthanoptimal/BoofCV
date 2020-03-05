@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -86,7 +86,7 @@ public class QrCode implements Cloneable {
 	/**
 	 * Alignment pattern information
 	 */
-	public FastQueue<Alignment> alignment = new FastQueue<>(Alignment.class,true);
+	public FastQueue<Alignment> alignment = new FastQueue<>(Alignment::new);
 
 	/**
 	 * Text encoding mode

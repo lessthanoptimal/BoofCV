@@ -45,7 +45,7 @@ public class BinaryEllipseDetector<T extends ImageGray<T>> {
 	EdgeIntensityEllipse<T> intensityCheck;
 
 	// storage for the output refined ellipses
-	FastQueue<EllipseInfo> results = new FastQueue<>(EllipseInfo.class, true);
+	FastQueue<EllipseInfo> results = new FastQueue<>(EllipseInfo::new);
 
 	Class<T> inputType;
 

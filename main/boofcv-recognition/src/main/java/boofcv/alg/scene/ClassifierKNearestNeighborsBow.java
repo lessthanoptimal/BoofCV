@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ public class ClassifierKNearestNeighborsBow<T extends ImageBase<T>,Desc extends 
 	private FeatureToWordHistogram<Desc> featureToHistogram;
 
 	// storage for NN results
-	private FastQueue<NnData<HistogramScene>> resultsNN = new FastQueue(NnData.class,true);
+	private FastQueue<NnData<HistogramScene>> resultsNN = new FastQueue(NnData::new);
 
 	// number of neighbors it will consider
 	private int numNeighbors;

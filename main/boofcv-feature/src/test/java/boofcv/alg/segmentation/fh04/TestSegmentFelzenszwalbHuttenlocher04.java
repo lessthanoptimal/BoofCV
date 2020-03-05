@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -79,18 +79,18 @@ public class TestSegmentFelzenszwalbHuttenlocher04 {
 	public void mergeRegions() {
 
 		// K is zero to make it easier to figure out if two edges should be merged or not
-		SegmentFelzenszwalbHuttenlocher04 alg = new SegmentFelzenszwalbHuttenlocher04(0,10,null);
+		SegmentFelzenszwalbHuttenlocher04<?> alg = new SegmentFelzenszwalbHuttenlocher04<>(0,10,null);
 
 		// add edges.  Design it such that order is important and to make sure the equality checks
 		// are done correctly
-		alg.edges.add( edge(1, 0, 20));
-		alg.edges.add( edge(2, 0, 25));
-		alg.edges.add( edge(14, 0, 40));
-		alg.edges.add( edge(3,4,20));
-		alg.edges.add( edge(5,4,20));
-		alg.edges.add( edge(10,11,20));
-		alg.edges.add( edge(12,11,5));
-		alg.edges.add( edge(13,11,5));
+		edge(alg.edges.grow(),1, 0, 20);
+		edge(alg.edges.grow(),2, 0, 25);
+		edge(alg.edges.grow(),14, 0, 40);
+		edge(alg.edges.grow(),3,4,20);
+		edge(alg.edges.grow(),5,4,20);
+		edge(alg.edges.grow(),10,11,20);
+		edge(alg.edges.grow(),12,11,5);
+		edge(alg.edges.grow(),13,11,5);
 
 		// randomize their order
 		Collections.shuffle(alg.edges.toList(),rand);
@@ -233,8 +233,8 @@ public class TestSegmentFelzenszwalbHuttenlocher04 {
 		BoofTesting.assertEquals(expected, alg.graph, 1e-4);
 	}
 
-	private SegmentFelzenszwalbHuttenlocher04.Edge edge( int indexA , int indexB , float weight ) {
-		SegmentFelzenszwalbHuttenlocher04.Edge e = new SegmentFelzenszwalbHuttenlocher04.Edge();
+	private SegmentFelzenszwalbHuttenlocher04.Edge edge( SegmentFelzenszwalbHuttenlocher04.Edge e,
+														 int indexA , int indexB , float weight ) {
 		e.indexA = indexA;
 		e.indexB = indexB;
 		e.sortValue = weight;

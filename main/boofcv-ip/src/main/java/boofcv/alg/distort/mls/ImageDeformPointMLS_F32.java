@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,12 +60,12 @@ import org.ejml.data.FMatrix2x2;
 public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 
 	// control points that specifiy the distortion
-	FastQueue<Control> controls = new FastQueue<>(Control.class,true);
+	FastQueue<Control> controls = new FastQueue<>(Control::new);
 
 	// size of interpolation grid
 	int gridRows,gridCols;
 	// points inside interpolation grid
-	FastQueue<Cache> grid = new FastQueue<>(Cache.class, true);
+	FastQueue<Cache> grid = new FastQueue<>(Cache::new);
 
 	// DESIGN NOTE:  Because the aspect ratio is maintained it's likely that some points in the grid are unreachable
 	//               a small speed boost could be brought about by adjusting the grid size so that the minimum number
@@ -538,7 +538,7 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 		Point2D_F32 aveP = new Point2D_F32(); // average control point for given weights
 		Point2D_F32 aveQ = new Point2D_F32(); // average distorted point for given weights
 
-		FastQueue<FMatrix2x2> A_s = new FastQueue<>(FMatrix2x2.class,true);
+		FastQueue<FMatrix2x2> A_s = new FastQueue<>(FMatrix2x2::new);
 
 		// mu for simularity
 		float mu;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -195,7 +195,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		renderObservations(0,true,worldPoints,pointsA);
 		renderObservations(1,true,worldPoints,pointsB);
 
-		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class,true);
+		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
 		for (int i = 0; i < pointsA.size(); i++) {
 			matches.grow().setAssociation(i,i,0);
 		}
@@ -249,7 +249,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 		Se3_F64 cameraToWorld = new Se3_F64();
 
 		GrowQueue_I32 visible = new GrowQueue_I32();
-		FastQueue<Point2D_F64> pixels = new FastQueue<>(Point2D_F64.class,true);
+		FastQueue<Point2D_F64> pixels = new FastQueue<>(Point2D_F64::new);
 
 		public MockDetector() {
 			// Two sets of points so that there can be a gap in the views

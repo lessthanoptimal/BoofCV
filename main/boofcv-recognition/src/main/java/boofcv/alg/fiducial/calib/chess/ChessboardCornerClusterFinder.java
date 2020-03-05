@@ -93,17 +93,17 @@ public class ChessboardCornerClusterFinder<T extends ImageGray<T>> {
 	private double thresholdEdgeIntensity = 0.05;
 
 	// Data structures for the crude graph
-	private FastQueue<Vertex> vertexes = new FastQueue<>(Vertex.class,true);
-	private FastQueue<Edge> edges = new FastQueue<>(Edge.class,true);
-	private FastQueue<LineInfo> lines = new FastQueue<>(LineInfo.class,true);
+	private FastQueue<Vertex> vertexes = new FastQueue<>(Vertex::new);
+	private FastQueue<Edge> edges = new FastQueue<>(Edge::new);
+	private FastQueue<LineInfo> lines = new FastQueue<>(LineInfo::new);
 
 	// data structures for nearest neighbor search
 	private NearestNeighbor<ChessboardCorner> nn = FactoryNearestNeighbor.kdtree(new ChessboardCornerDistance());
 	private NearestNeighbor.Search<ChessboardCorner> nnSearch = nn.createSearch();
-	private FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData.class,true);
+	private FastQueue<NnData<ChessboardCorner>> nnResults = new FastQueue(NnData::new);
 
 	// Output. Contains a graph of connected corners
-	private FastQueue<ChessboardCornerGraph> clusters = new FastQueue<>(ChessboardCornerGraph.class,true);
+	private FastQueue<ChessboardCornerGraph> clusters = new FastQueue<>(ChessboardCornerGraph::new);
 
 	// predeclared storage for results
 	private SearchResults results = new SearchResults();

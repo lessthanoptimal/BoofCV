@@ -48,7 +48,7 @@ class TestPointCloudIO {
 
 		Format[] formats = new Format[]{Format.PLY};
 		for( Format f : formats ) {
-			FastQueue<Point3D_F32> found = new FastQueue<>(Point3D_F32.class,true);
+			FastQueue<Point3D_F32> found = new FastQueue<>(Point3D_F32::new);
 			found.grow().set(1,1,1);
 
 			ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -73,7 +73,7 @@ class TestPointCloudIO {
 
 		Format[] formats = new Format[]{Format.PLY};
 		for( Format f : formats ) {
-			FastQueue<Point3D_F64> found = new FastQueue<>(Point3D_F64.class,true);
+			FastQueue<Point3D_F64> found = new FastQueue<>(Point3D_F64::new);
 			found.grow().set(1,1,1);
 
 			ByteArrayOutputStream stream = new ByteArrayOutputStream();

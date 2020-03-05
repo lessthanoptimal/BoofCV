@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,10 +23,10 @@ import georegression.metric.UtilAngle;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.sorting.QuickSortComparator;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -39,34 +39,30 @@ import java.util.List;
  */
 public abstract class EllipseClustersIntoGrid {
 
-	protected FastQueue<Grid> foundGrids = new FastQueue<>(Grid.class,true);
+	protected FastQueue<Grid> foundGrids = new FastQueue<>(Grid::new);
 
 	// When finding lines this is the largest change in angle between the two edges allowed for it to be on the line
 	protected static double MAX_LINE_ANGLE_CHANGE = UtilAngle.degreeToRadian(30);
 
 	// Information on each ellipse/node in a cluster
-	protected FastQueue<NodeInfo> listInfo = new FastQueue<>(NodeInfo.class,true);
+	protected FastQueue<NodeInfo> listInfo = new FastQueue<>(NodeInfo::new);
 	// Used to sort edges in a node.  used instead of built in sorting algorithm to maximize memory being recycled
 	protected QuickSortComparator<Edge> sorter;
 
 	// All ellipses in the contour around the grid
-	protected FastQueue<NodeInfo> contour = new FastQueue<>(NodeInfo.class,false);
+	protected FastArray<NodeInfo> contour = new FastArray<>(NodeInfo.class);
 
 	protected boolean verbose = false;
 
 	public EllipseClustersIntoGrid() {
 
-		sorter = new QuickSortComparator<>(new Comparator<Edge>() {
-
-			@Override
-			public int compare(Edge o1, Edge o2) {
-				if (o1.angle < o2.angle)
-					return -1;
-				else if (o1.angle > o2.angle)
-					return 1;
-				else
-					return 0;
-			}
+		sorter = new QuickSortComparator<>((o1, o2) -> {
+			if (o1.angle < o2.angle)
+				return -1;
+			else if (o1.angle > o2.angle)
+				return 1;
+			else
+				return 0;
 		});
 	}
 
@@ -446,7 +442,7 @@ public abstract class EllipseClustersIntoGrid {
 		EllipseRotated_F64 ellipse;
 
 		// List of all the ellipses connected to this one in CCW order
-		FastQueue<Edge> edges = new FastQueue<>(Edge.class, true);
+		FastQueue<Edge> edges = new FastQueue<>(Edge::new);
 
 		// flag used to indicate if a node is along the shape's contour
 		boolean contour;

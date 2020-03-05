@@ -57,7 +57,7 @@ public abstract class BaseAssociateLocation2DFilter<D> implements AssociateDescr
 	private GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
 
 	// list of features that have been matched with each other
-	private FastQueue<AssociatedIndex> matched = new FastQueue<>(10, AssociatedIndex.class, true);
+	private FastQueue<AssociatedIndex> matched = new FastQueue<>(10, AssociatedIndex::new);
 
 	// creates a list of unassociated features from the list of matches
 	private FindUnassociated unassociated = new FindUnassociated();

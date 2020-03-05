@@ -30,6 +30,7 @@ import georegression.struct.se.Se3_F64;
 import gnu.trove.set.hash.TLongHashSet;
 import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
 import org.ddogleg.struct.Factory;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 
 /**
@@ -303,7 +304,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		// ID of the image used to create the BFrame
 		public long id;
 		// List of tracks that were observed in this BFrame
-		public final FastQueue<BTrack> tracks = new FastQueue<>(BTrack.class,false);
+		public final FastArray<BTrack> tracks = new FastArray<>(BTrack.class);
 		// current estimated transform to world from this view
 		public final Se3_F64 frameToWorld = new Se3_F64();
 		public int listIndex; // index in the list of BFrames

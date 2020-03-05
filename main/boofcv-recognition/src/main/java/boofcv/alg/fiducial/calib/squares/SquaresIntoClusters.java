@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,10 +30,10 @@ import java.util.List;
  */
 public class SquaresIntoClusters {
 
-	protected FastQueue<SquareNode> nodes = new FastQueue<>(SquareNode.class, true);
+	protected FastQueue<SquareNode> nodes = new FastQueue<>(SquareNode::new);
 
 	// storage for found clusters
-	protected FastQueue<List<SquareNode>> clusters = new FastQueue(ArrayList.class,true);
+	protected FastQueue<List<SquareNode>> clusters = new FastQueue(ArrayList::new);
 
 	// storage for open list when clustering points
 	protected List<SquareNode> open = new ArrayList<>();

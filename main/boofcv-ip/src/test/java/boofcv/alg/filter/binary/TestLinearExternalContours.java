@@ -259,7 +259,7 @@ class TestLinearExternalContours {
 		PackedSetsPoint2D_I32 contours = alg.getExternalContours();
 		assertEquals(expected.length, contours.size());
 
-		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32.class,true);
+		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32::new);
 
 		boolean matched[] = new boolean[ expected.length ];
 

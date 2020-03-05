@@ -48,7 +48,7 @@ public class DdaManagerGeneralPoint<I extends ImageGray<I>, D extends ImageGray<
 
 	// storage for descriptors
 	private FastQueue<Desc> descriptors;
-	private FastQueue<Point2D_F64> locations = new FastQueue<>(100, Point2D_F64.class, true);
+	private FastQueue<Point2D_F64> locations = new FastQueue<>(100, Point2D_F64::new);
 
 	int numSets;
 

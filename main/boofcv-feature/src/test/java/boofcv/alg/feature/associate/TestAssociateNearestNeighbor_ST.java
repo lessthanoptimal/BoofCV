@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.nn.FactoryNearestNeighbor;
 import org.ddogleg.nn.NearestNeighbor;
 import org.ddogleg.nn.NnData;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
@@ -69,8 +70,8 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 
 		AssociateNearestNeighbor_ST<TupleDesc_F64> alg = new AssociateNearestNeighbor_ST<>(nn);
 
-		FastQueue<TupleDesc_F64> src = new FastQueue<>(10, TupleDesc_F64.class, false);
-		FastQueue<TupleDesc_F64> dst = new FastQueue<>(10, TupleDesc_F64.class, false);
+		FastArray<TupleDesc_F64> src = new FastArray<>(TupleDesc_F64.class);
+		FastArray<TupleDesc_F64> dst = new FastArray<>(TupleDesc_F64.class);
 
 		for( int i = 0; i < 5; i++ ) {
 			src.add( new TupleDesc_F64(10));
@@ -115,8 +116,8 @@ public class TestAssociateNearestNeighbor_ST extends StandardAssociateDescriptio
 
 		AssociateNearestNeighbor_ST<TupleDesc_F64> alg = new AssociateNearestNeighbor_ST<>(nn);
 
-		FastQueue<TupleDesc_F64> src = new FastQueue<>(10, TupleDesc_F64.class, false);
-		FastQueue<TupleDesc_F64> dst = new FastQueue<>(10, TupleDesc_F64.class, false);
+		FastArray<TupleDesc_F64> src = new FastArray<>( TupleDesc_F64.class);
+		FastArray<TupleDesc_F64> dst = new FastArray<>( TupleDesc_F64.class);
 
 		for( int i = 0; i < 5; i++ ) {
 			src.add( new TupleDesc_F64(10));

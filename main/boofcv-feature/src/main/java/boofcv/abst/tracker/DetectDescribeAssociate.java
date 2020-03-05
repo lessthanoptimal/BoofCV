@@ -461,7 +461,7 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	protected static class SetTrackInfo<Desc> {
 		// location of interest points
 		protected FastArray<Point2D_F64> locDst = new FastArray<>(Point2D_F64.class);
-		protected FastQueue<Point2D_F64> locSrc = new FastQueue<>(Point2D_F64::new,o->o.set(0,0));
+		protected FastArray<Point2D_F64> locSrc = new FastArray<>(Point2D_F64.class);
 		// description of interest points
 		protected FastArray<Desc> featSrc;
 		protected FastArray<Desc> featDst;
@@ -472,6 +472,6 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		protected List<PointTrack> tracks = new ArrayList<>();
 
 		// Data returned by associate
-		protected FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class,true);
+		protected FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
 	}
 }

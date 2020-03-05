@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -140,7 +140,7 @@ public class TestPackedSetsPoint2D_I32 {
 	private void checkPoint( int set , int point , int x , int y,
 							 PackedSetsPoint2D_I32 alg) {
 
-		FastQueue<Point2D_I32> list = new FastQueue<>(Point2D_I32.class,true);
+		FastQueue<Point2D_I32> list = new FastQueue<>(Point2D_I32::new);
 		alg.getSet(set,list);
 
 		assertEquals(x,list.get(point).x);

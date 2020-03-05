@@ -97,10 +97,10 @@ public class DetectCalibrationChessboardXCornerApp
 
 	//-----------------
 	private final Object lockCorners = new Object();
-	private FastQueue<ChessboardCorner> foundCorners = new FastQueue<>(ChessboardCorner.class,true);
-	private FastQueue<PointIndex2D_F64> foundChessboard = new FastQueue<>(PointIndex2D_F64.class,true);
-	private FastQueue<CalibrationObservation> foundGrids = new FastQueue<>(CalibrationObservation.class,true);
-	private FastQueue<FeatureGraph2D> foundClusters = new FastQueue<>(FeatureGraph2D.class,true);
+	private FastQueue<ChessboardCorner> foundCorners = new FastQueue<>(ChessboardCorner::new);
+	private FastQueue<PointIndex2D_F64> foundChessboard = new FastQueue<>(PointIndex2D_F64::new);
+	private FastQueue<CalibrationObservation> foundGrids = new FastQueue<>(CalibrationObservation::new);
+	private FastQueue<FeatureGraph2D> foundClusters = new FastQueue<>(FeatureGraph2D::new);
 	private boolean success;
 	//-----------------
 

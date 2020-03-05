@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,7 +93,7 @@ public abstract class SegmentMeanShiftSearch<T extends ImageBase<T>>
 	protected GrayS32 quickMode = new GrayS32(1,1);
 
 	// location of each peak in image pixel indexes
-	protected FastQueue<Point2D_I32> modeLocation = new FastQueue<>(Point2D_I32.class, true);
+	protected FastQueue<Point2D_I32> modeLocation = new FastQueue<>(Point2D_I32::new);
 
 	// number of members in this peak
 	protected GrowQueue_I32 modeMemberCount = new GrowQueue_I32();

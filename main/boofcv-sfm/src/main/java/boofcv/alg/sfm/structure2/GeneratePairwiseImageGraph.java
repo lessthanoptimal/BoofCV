@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -96,10 +96,10 @@ public class GeneratePairwiseImageGraph {
 		this.graph.reset();
 
 		List<String> similar = new ArrayList<>();
-		FastQueue<Point2D_F64> srcFeats = new FastQueue<>(Point2D_F64.class,true);
-		FastQueue<Point2D_F64> dstFeats = new FastQueue<>(Point2D_F64.class,true);
-		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class,true);
-		FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class,true);
+		FastQueue<Point2D_F64> srcFeats = new FastQueue<>(Point2D_F64::new);
+		FastQueue<Point2D_F64> dstFeats = new FastQueue<>(Point2D_F64::new);
+		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
+		FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
 
 		// map to quickly look up the ID of a view
 		Map<String,Integer> imageToindex = new HashMap<>();

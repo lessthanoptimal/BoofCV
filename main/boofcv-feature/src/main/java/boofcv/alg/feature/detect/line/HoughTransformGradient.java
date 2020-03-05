@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 	// extracts line from the transform
 	NonMaxSuppression extractor;
 	// stores returned lines
-	FastQueue<LineParametric2D_F32> linesAll = new FastQueue<>(10, LineParametric2D_F32.class, true);
+	FastQueue<LineParametric2D_F32> linesAll = new FastQueue<>(10, LineParametric2D_F32::new);
 	// Lines after similar ones have been merged together
 	List<LineParametric2D_F32> linesMerged = new ArrayList<>();
 

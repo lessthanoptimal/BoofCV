@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -122,12 +122,7 @@ public class VisOdomDirectColorDepth<I extends ImageGray<I>, D extends ImageGray
 		derivX = this.derivType.createImage(1,1);
 		derivY = this.derivType.createImage(1,1);
 
-		keypixels = new FastQueue<Pixel>(Pixel.class,true) {
-			@Override
-			protected Pixel createInstance() {
-				return new Pixel(numBands);
-			}
-		};
+		keypixels = new FastQueue<>(()->new Pixel(numBands));
 		computeD = FactoryDerivative.gradient(DerivativeType.THREE, this.imageType, this.derivType);
 	}
 

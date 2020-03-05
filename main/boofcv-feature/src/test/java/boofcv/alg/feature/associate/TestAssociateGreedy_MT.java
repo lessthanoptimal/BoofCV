@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ class TestAssociateGreedy_MT {
 	{
 		Random rand = new Random(234);
 
-		FastQueue<TupleDesc_F64> ret = new FastQueue<>(count,TupleDesc_F64.class, ()-> new TupleDesc_F64(1));
+		FastQueue<TupleDesc_F64> ret = new FastQueue<>(count,()-> new TupleDesc_F64(1));
 
 		for( int i = 0; i < count; i++ ) {
 			ret.grow().set(rand.nextDouble()*10);

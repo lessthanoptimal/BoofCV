@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,7 +59,7 @@ public class DetectChessboardSquarePoints<T extends ImageGray<T>>
 
 	SquareGridTools tools = new SquareGridTools();
 
-	FastQueue<Point2D_F64> calibrationPoints = new FastQueue<>(Point2D_F64.class, true);
+	FastQueue<Point2D_F64> calibrationPoints = new FastQueue<>(Point2D_F64::new);
 
 	// maximum distance two corners can be from each other
 	ConfigLength maxCornerDistance;

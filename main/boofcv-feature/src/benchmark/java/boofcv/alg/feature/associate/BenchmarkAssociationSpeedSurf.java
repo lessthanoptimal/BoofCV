@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import boofcv.misc.Performer;
 import boofcv.misc.ProfileOperation;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -48,8 +48,8 @@ public class BenchmarkAssociationSpeedSurf {
 
 	static final long TEST_TIME = 1000;
 
-	FastQueue<TupleDesc_F64> listA;
-	FastQueue<TupleDesc_F64> listB;
+	FastArray<TupleDesc_F64> listA;
+	FastArray<TupleDesc_F64> listB;
 
 	DetectDescribePoint<GrayF32,TupleDesc_F64> detector;
 
@@ -88,13 +88,13 @@ public class BenchmarkAssociationSpeedSurf {
 		}
 	}
 
-	private FastQueue<TupleDesc_F64> createSet( String imageName ) {
+	private FastArray<TupleDesc_F64> createSet( String imageName ) {
 
 		try {
 			BufferedImage image = ImageIO.read(new File(imageName));
 			GrayF32 gray = ConvertBufferedImage.convertFrom(image, (GrayF32) null);
 
-			FastQueue<TupleDesc_F64> ret = new FastQueue<>(10, TupleDesc_F64.class, false);
+			FastArray<TupleDesc_F64> ret = new FastArray<>(TupleDesc_F64.class);
 
 			detector.detect(gray);
 			

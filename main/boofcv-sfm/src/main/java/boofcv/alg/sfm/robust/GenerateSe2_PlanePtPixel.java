@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ public class GenerateSe2_PlanePtPixel implements
 	private CameraPlaneProjection planeProjection = new CameraPlaneProjection();
 
 	List<Point2D_F64> from = new ArrayList<>();
-	FastQueue<Point2D_F64> to = new FastQueue<>(Point2D_F64.class, true);
+	FastQueue<Point2D_F64> to = new FastQueue<>(Point2D_F64::new);
 
 	public GenerateSe2_PlanePtPixel(MotionTransformPoint<Se2_F64, Point2D_F64> estimator) {
 		this.estimator = estimator;

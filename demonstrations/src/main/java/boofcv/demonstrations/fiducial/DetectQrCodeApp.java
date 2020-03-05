@@ -81,8 +81,8 @@ public class DetectQrCodeApp<T extends ImageGray<T>>
 	QrCodeBinaryGridToPixel locator = new QrCodeBinaryGridToPixel();
 
 	// Lock against detected
-	final FastQueue<QrCode> detected = new FastQueue<>(QrCode.class,true);
-	final FastQueue<QrCode> failures = new FastQueue<>(QrCode.class,true);
+	final FastQueue<QrCode> detected = new FastQueue<>(QrCode::new);
+	final FastQueue<QrCode> failures = new FastQueue<>(QrCode::new);
 
 	public DetectQrCodeApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);

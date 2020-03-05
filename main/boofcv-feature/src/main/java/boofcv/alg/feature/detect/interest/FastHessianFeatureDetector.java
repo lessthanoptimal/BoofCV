@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,7 +97,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 	private QueueCorner foundFeatures = new QueueCorner(100);
 
 	// List of found feature points
-	private FastQueue<ScalePoint> foundPoints = new FastQueue<>(10, ScalePoint.class, true);
+	private FastQueue<ScalePoint> foundPoints = new FastQueue<>(10, ScalePoint::new);
 
 	// size of detected feature at the smallest scale
 	private int initialSize;

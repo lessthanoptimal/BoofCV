@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class BinaryContourFinderLinearExternal implements BinaryContourFinder, B
 
 	GrayU8 work = new GrayU8(1,1);
 
-	FastQueue<ContourPacked> contours = new FastQueue<>(ContourPacked.class,true);
+	FastQueue<ContourPacked> contours = new FastQueue<>(ContourPacked::new);
 
 	public BinaryContourFinderLinearExternal() {
 		this.alg = new LinearExternalContours(ConnectRule.FOUR);

@@ -38,6 +38,7 @@ import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -78,8 +79,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 	private double describeRadius=11.0;
 
 	// Data structures used when associating left and right cameras
-	private FastQueue<Point2D_F64> pointsLeft = new FastQueue<>(Point2D_F64.class, false);
-	private FastQueue<Point2D_F64> pointsRight = new FastQueue<>(Point2D_F64.class, false);
+	private FastArray<Point2D_F64> pointsLeft = new FastArray<>(Point2D_F64.class);
+	private FastArray<Point2D_F64> pointsRight = new FastArray<>(Point2D_F64.class);
 	private FastQueue<Desc> descLeft,descRight;
 
 	// matches features between left and right images
@@ -147,8 +148,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 		this.matcher = matcher;
 		this.modelRefiner = modelRefiner;
 
-		descLeft = new DescriptorQueue();
-		descRight = new DescriptorQueue();
+		descLeft = new FastQueue<>(describe::createDescription);
+		descRight = new FastQueue<>(describe::createDescription);
 
 		stereoCheck = new StereoConsistencyCheck(epilolarTol,epilolarTol);
 	}
@@ -483,7 +484,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 
 	private void addNewToList( T image,
 							   List<PointTrack> tracks ,
-							   FastQueue<Point2D_F64> points , FastQueue<Desc> descs )
+							   FastArray<Point2D_F64> points , FastQueue<Desc> descs )
 	{
 		describe.setImage(image);
 		points.reset(); descs.reset();
@@ -558,17 +559,5 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 		public int lastActiveList;
 		// left camera track it is associated with
 		public PointTrack left;
-	}
-
-	private class DescriptorQueue extends FastQueue<Desc>
-	{
-		private DescriptorQueue() {
-			super(describe.getDescriptionType(), true);
-		}
-
-		@Override
-		protected Desc createInstance() {
-			return describe.createDescription();
-		}
 	}
 }

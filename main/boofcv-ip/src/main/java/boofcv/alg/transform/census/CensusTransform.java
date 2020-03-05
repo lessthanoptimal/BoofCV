@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,7 +51,7 @@ import javax.annotation.Nullable;
 public class CensusTransform {
 
 	public static FastQueue<Point2D_I32> createBlockSamples( int radius ) {
-		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32.class,true);
+		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32::new);
 		int w = radius*2+1;
 		samples.growArray(w*w-1);
 
@@ -67,7 +67,7 @@ public class CensusTransform {
 	}
 
 	public static FastQueue<Point2D_I32> createBlockSamples( int radiusX , int radiusY) {
-		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32.class,true);
+		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32::new);
 		int wx = radiusX*2+1;
 		int wy = radiusY*2+1;
 		samples.growArray(wx*wy-1);
@@ -84,7 +84,7 @@ public class CensusTransform {
 	}
 
 	public static FastQueue<Point2D_I32> createCircleSamples(){
-		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32.class,true);
+		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32::new);
 		for (int row = 0; row < 9; row++) {
 			int col0 = row <= 4 ? Math.max(0,3-row) : row-5;
 			int col1 = 9-col0;

@@ -79,7 +79,7 @@ public class DetectXCornersVisualizeApp
 	final Object lockAlgorithm = new Object();
 
 	final Object lockCorners = new Object();
-	FastQueue<ChessboardCorner> foundCorners = new FastQueue<>(ChessboardCorner.class,true);
+	FastQueue<ChessboardCorner> foundCorners = new FastQueue<>(ChessboardCorner::new);
 
 	public DetectXCornersVisualizeApp(List<PathLabel> examples ) {
 		super(true,true,examples,ImageType.single(GrayF32.class));

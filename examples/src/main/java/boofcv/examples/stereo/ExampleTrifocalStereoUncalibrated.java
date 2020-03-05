@@ -147,9 +147,9 @@ public class ExampleTrifocalStereoUncalibrated {
 		DetectDescribePoint<GrayU8,BrightFeature> detDesc = FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(0, 4, 1000, 1, 9, 4, 2), null,null, GrayU8.class);
 
-		FastQueue<Point2D_F64> locations01 = new FastQueue<>(Point2D_F64.class,true);
-		FastQueue<Point2D_F64> locations02 = new FastQueue<>(Point2D_F64.class,true);
-		FastQueue<Point2D_F64> locations03 = new FastQueue<>(Point2D_F64.class,true);
+		FastQueue<Point2D_F64> locations01 = new FastQueue<>(Point2D_F64::new);
+		FastQueue<Point2D_F64> locations02 = new FastQueue<>(Point2D_F64::new);
+		FastQueue<Point2D_F64> locations03 = new FastQueue<>(Point2D_F64::new);
 
 		FastQueue<BrightFeature> features01 = UtilFeature.createQueue(detDesc,100);
 		FastQueue<BrightFeature> features02 = UtilFeature.createQueue(detDesc,100);
@@ -213,7 +213,7 @@ public class ExampleTrifocalStereoUncalibrated {
 				FactoryMultiViewRobust.trifocalRansac(configTri,configError,configRansac);
 
 		FastQueue<AssociatedTripleIndex> associatedIdx = associateThree.getMatches();
-		FastQueue<AssociatedTriple> associated = new FastQueue<>(AssociatedTriple.class,true);
+		FastQueue<AssociatedTriple> associated = new FastQueue<>(AssociatedTriple::new);
 		for (int i = 0; i < associatedIdx.size; i++) {
 			AssociatedTripleIndex p = associatedIdx.get(i);
 			associated.grow().set(locations01.get(p.a),locations02.get(p.b),locations03.get(p.c));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,7 +45,7 @@ public class TldVisualizationPanel extends JPanel implements MouseListener{
 	ImageRectangle selected = new ImageRectangle();
 	boolean hasSelected = false;
 
-	FastQueue<TldRegion> detections = new FastQueue<>(TldRegion.class, true);
+	FastQueue<TldRegion> detections = new FastQueue<>(TldRegion::new);
 
 	TldTemplatePanel positivePanel = new TldTemplatePanel(15);
 	TldTemplatePanel negativePanel = new TldTemplatePanel(15);

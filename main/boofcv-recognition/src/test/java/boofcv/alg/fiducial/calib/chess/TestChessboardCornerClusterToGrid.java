@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -304,7 +304,7 @@ class TestChessboardCornerClusterToGrid
 	}
 
 	private FastQueue<Node> createGrid(int rows, int cols, boolean cornerSquare) {
-		FastQueue<Node> corners = new FastQueue<>(Node.class,true);
+		FastQueue<Node> corners = new FastQueue<>(Node::new);
 
 		// declare the grid
 		for (int row = 0; row < rows; row++) {
@@ -336,7 +336,7 @@ class TestChessboardCornerClusterToGrid
 
 	@Test
 	void sortEdgesCCW() {
-		FastQueue<Node> corners = new FastQueue<>(Node.class,true);
+		FastQueue<Node> corners = new FastQueue<>(Node::new);
 
 		for (int nodeIdx = 0; nodeIdx < 6; nodeIdx++) {
 			Node target = corners.grow();
@@ -387,7 +387,7 @@ class TestChessboardCornerClusterToGrid
 	 */
 	@Test
 	void sortEdgesCCW_shift() {
-		FastQueue<Node> corners = new FastQueue<>(Node.class,true);
+		FastQueue<Node> corners = new FastQueue<>(Node::new);
 
 		// Add nodes with 3 edges
 		for (int jump = 0; jump < 3; jump++) {

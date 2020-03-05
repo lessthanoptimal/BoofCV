@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -115,21 +115,21 @@ public abstract class GenericBinaryContourInterface {
 
 	void checkExternalSize(BinaryContourInterface alg , int which , int expected )
 	{
-		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32.class,true);
+		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32::new);
 		alg.loadContour(alg.getContours().get(which).externalIndex,points);
 		assertEquals(expected,points.size);
 	}
 
 	void checkInternalSize(BinaryContourInterface alg , int blob, int which , int expected )
 	{
-		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32.class,true);
+		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32::new);
 		alg.loadContour(alg.getContours().get(blob).internalIndexes.get(which),points);
 		assertEquals(expected,points.size);
 	}
 
 	static void printResults( BinaryContourInterface alg ) {
 		List<ContourPacked> contours = alg.getContours();
-		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32.class,true);
+		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32::new);
 
 		int sizes[] = new int[contours.size()];
 
@@ -147,7 +147,7 @@ public abstract class GenericBinaryContourInterface {
 		List<ContourPacked> contours = alg.getContours();
 		assertEquals(expected.length, contours.size());
 
-		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32.class,true);
+		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32::new);
 
 		boolean matched[] = new boolean[ expected.length ];
 

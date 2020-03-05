@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public class DetectChessboardXCornerPatterns<T extends ImageGray<T>> {
 	protected ChessboardCornerClusterFinder<T> clusterFinder;
 	protected ChessboardCornerClusterToGrid clusterToGrid = new ChessboardCornerClusterToGrid();
 
-	protected FastQueue<GridInfo> found = new FastQueue<>(GridInfo.class,true);
+	protected FastQueue<GridInfo> found = new FastQueue<>(GridInfo::new);
 
 	public DetectChessboardXCornerPatterns(ConfigChessboardX config , Class<T> imageType ) {
 

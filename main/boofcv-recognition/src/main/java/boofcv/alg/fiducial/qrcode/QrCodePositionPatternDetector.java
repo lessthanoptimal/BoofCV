@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,13 +68,13 @@ public class QrCodePositionPatternDetector<T extends ImageGray<T>> {
 	// Detects squares inside the image
 	DetectPolygonBinaryGrayRefine<T> squareDetector;
 
-	FastQueue<PositionPatternNode> positionPatterns = new FastQueue<>(PositionPatternNode.class,true);
+	FastQueue<PositionPatternNode> positionPatterns = new FastQueue<>(PositionPatternNode::new);
 	SquareGraph graph = new SquareGraph();
 
 	// Nearst Neighbor Search related variables
 	private NearestNeighbor<SquareNode> nn = FactoryNearestNeighbor.kdtree(new SquareNode.KdTreeSquareNode());
 	private NearestNeighbor.Search<SquareNode> search = nn.createSearch();
-	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData.class,true);
+	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData::new);
 
 	// Workspace for checking to see if two squares should be connected
 	protected LineSegment2D_F64 lineA = new LineSegment2D_F64();

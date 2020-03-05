@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -67,7 +67,7 @@ public class SnapToLineEdge<T extends ImageGray<T>>extends BaseIntegralEdge<T> {
 
 	protected GrowQueue_F64 weights = new GrowQueue_F64();// storage for weights in line fitting
 	// storage for where the points that are sampled along the line
-	protected FastQueue<Point2D_F64> samplePts = new FastQueue<>(Point2D_F64.class, true);
+	protected FastQueue<Point2D_F64> samplePts = new FastQueue<>(Point2D_F64::new);
 
 
 	// storage for the line's center.  used to reduce numerical problems.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -49,7 +49,7 @@ public class HysteresisEdgeTraceMark {
 	private float lower;
 
 	// list of points which have yet to be explored
-	private FastQueue<Point2D_I32> open = new FastQueue<>(Point2D_I32.class, true);
+	private FastQueue<Point2D_I32> open = new FastQueue<>(Point2D_I32::new);
 
 	// point which is current being examined
 	private Point2D_I32 active = new Point2D_I32();

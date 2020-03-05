@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -111,7 +111,7 @@ public class TestRelinearlize {
 
 		// using the provided beta compute the world points
 		// this way the constraint matrix will be consistent
-		FastQueue<Point3D_F64> worldPts = new FastQueue<>(4, Point3D_F64.class, true);
+		FastQueue<Point3D_F64> worldPts = new FastQueue<>(4, Point3D_F64::new);
 		worldPts.grow().set(1,0,0);
 		worldPts.grow().set(0,1,0);
 		worldPts.grow().set(0,0,1);

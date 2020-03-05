@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,8 +60,8 @@ public class FitLinesToContour {
 	List<Point2D_I32> contour;
 
 	// storage for working space
-	FastQueue<LineGeneral2D_F64> lines = new FastQueue<>(LineGeneral2D_F64.class, true);
-	FastQueue<Point2D_F64> pointsFit = new FastQueue<>(Point2D_F64.class, true);
+	FastQueue<LineGeneral2D_F64> lines = new FastQueue<>(LineGeneral2D_F64::new);
+	FastQueue<Point2D_F64> pointsFit = new FastQueue<>(Point2D_F64::new);
 
 	private LinePolar2D_F64 linePolar = new LinePolar2D_F64();
 

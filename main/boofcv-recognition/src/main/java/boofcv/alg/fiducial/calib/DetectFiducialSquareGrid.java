@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -58,7 +58,7 @@ public class DetectFiducialSquareGrid<T extends ImageGray<T>> {
 	BaseDetectFiducialSquare<T> detector;
 
 	// found squares inside the image
-	FastQueue<Detection> detections = new FastQueue<>(Detection.class, true);
+	FastQueue<Detection> detections = new FastQueue<>(Detection::new);
 
 	/**
 	 * Configures the fiducial detector.

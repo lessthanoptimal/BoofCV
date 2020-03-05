@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -128,7 +128,7 @@ public class DetectDescribeMultiFusion<T extends ImageGray<T>, TD extends TupleD
 	 */
 	private class SetInfo<TD extends TupleDesc> implements PointDescSet<TD>
 	{
-		FastQueue<Point2D_F64> location = new FastQueue<>(10, Point2D_F64.class, true);
+		FastQueue<Point2D_F64> location = new FastQueue<>(10, Point2D_F64::new);
 		FastQueue<TD> descriptors;
 
 		public void reset() {

@@ -23,11 +23,10 @@ import boofcv.struct.feature.MatchScoreType;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
-import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
@@ -40,21 +39,21 @@ public class TestAssociateDescTo2D {
 
 		AssociateDescTo2D<TupleDesc_F64> alg = new AssociateDescTo2D<>(dummy);
 
-		FastQueue<TupleDesc_F64> listSrc = new FastQueue<>(10, TupleDesc_F64.class, false);
-		FastQueue<TupleDesc_F64> listDst = new FastQueue<>(10, TupleDesc_F64.class, false);
+		FastArray<TupleDesc_F64> listSrc = new FastArray<>(TupleDesc_F64.class);
+		FastArray<TupleDesc_F64> listDst = new FastArray<>(TupleDesc_F64.class);
 
 		alg.setSource(null,listSrc);
 		alg.setDestination(null,listDst);
 		alg.associate();
 		alg.setMaxScoreThreshold(10.5);
 
-		assertTrue(listSrc == dummy.listSrc);
-		assertTrue(listDst == dummy.listDst);
+		assertSame(listSrc, dummy.listSrc);
+		assertSame(listDst, dummy.listDst);
 		assertTrue(dummy.calledAssociate);
-		assertTrue(dummy.matches == alg.getMatches());
-		assertTrue(dummy.unassociatedSrc == alg.getUnassociatedSource());
-		assertTrue(10.5 == dummy.threshold);
-		assertTrue(MatchScoreType.CORRELATION==alg.getScoreType());
+		assertSame(dummy.matches, alg.getMatches());
+		assertSame(dummy.unassociatedSrc, alg.getUnassociatedSource());
+		assertEquals(10.5, dummy.threshold);
+		assertSame(MatchScoreType.CORRELATION, alg.getScoreType());
 	}
 
 	private static class Dummy implements AssociateDescription<TupleDesc_F64> {

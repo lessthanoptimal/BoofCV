@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,7 +103,7 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 
 	// storage for clusters and pixel information
 	protected FastQueue<Cluster> clusters;
-	protected FastQueue<Pixel> pixels = new FastQueue<>(Pixel.class, true);
+	protected FastQueue<Pixel> pixels = new FastQueue<>(Pixel::new);
 
 	// type of input image
 	protected ImageType<T> imageType;
@@ -399,7 +399,7 @@ public abstract class SegmentSlic<T extends ImageBase<T>>
 	public static class Pixel
 	{
 		// list of clusters it is interacting with
-		public FastQueue<ClusterDistance> clusters = new FastQueue<>(12, ClusterDistance.class, true);
+		public FastQueue<ClusterDistance> clusters = new FastQueue<>(12, ClusterDistance::new);
 
 		public void add( Cluster c , float distance ) {
 			// make sure it isn't already full.  THis should almost never happen

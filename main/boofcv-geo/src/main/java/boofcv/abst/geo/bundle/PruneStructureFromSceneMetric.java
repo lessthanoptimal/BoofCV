@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -246,7 +246,7 @@ public class PruneStructureFromSceneMetric {
 		NearestNeighbor<Point3D_F64> nn = FactoryNearestNeighbor.kdtree(new KdTreePoint3D_F64());
 		NearestNeighbor.Search<Point3D_F64> search = nn.createSearch();
 		nn.setPoints(cloud,false);
-		FastQueue<NnData<Point3D_F64>> resultsNN = new FastQueue(NnData.class,true);
+		FastQueue<NnData<Point3D_F64>> resultsNN = new FastQueue(NnData::new);
 
 		// Create a look up table containing from old to new indexes for each point
 		int[] oldToNew = new int[ structure.points.size ];

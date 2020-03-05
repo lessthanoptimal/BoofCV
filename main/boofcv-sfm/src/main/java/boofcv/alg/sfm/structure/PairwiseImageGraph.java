@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -88,8 +88,8 @@ public class PairwiseImageGraph {
 		// feature descriptor of all features in this image
 		public FastQueue<TupleDesc> descriptions;
 		// observed location of all features in pixels
-		public FastQueue<Point2D_F64> observationPixels = new FastQueue<>(Point2D_F64.class, true);
-		public FastQueue<Point2D_F64> observationNorm = new FastQueue<>(Point2D_F64.class, true);
+		public FastQueue<Point2D_F64> observationPixels = new FastQueue<>(Point2D_F64::new);
+		public FastQueue<Point2D_F64> observationNorm = new FastQueue<>(Point2D_F64::new);
 
 		public View(int index, FastQueue<TupleDesc> descriptions ) {
 			this.index = index;

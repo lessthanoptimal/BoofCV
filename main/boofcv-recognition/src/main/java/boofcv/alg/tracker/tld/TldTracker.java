@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,7 +76,7 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 	private ImageRectangle trackerRegion_I32 = new ImageRectangle();
 
 	// Region used inside detection cascade
-	private FastQueue<ImageRectangle> cascadeRegions = new FastQueue<>(ImageRectangle.class, true);
+	private FastQueue<ImageRectangle> cascadeRegions = new FastQueue<>(ImageRectangle::new);
 
 	// Image pyramid of input image
 	private PyramidDiscrete<T> imagePyramid;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,7 +93,7 @@ public class PnPInfinitesimalPlanePoseEstimation {
 	private DMatrixRMaj Wty = new DMatrixRMaj(1,1);
 
 	// Input adjust centering it
-	FastQueue<AssociatedPair> pointsAdj = new FastQueue<>(AssociatedPair.class,true);
+	FastQueue<AssociatedPair> pointsAdj = new FastQueue<>(AssociatedPair::new);
 	Point3D_F64 tmpP = new Point3D_F64();
 
 	public PnPInfinitesimalPlanePoseEstimation(Estimate1ofEpipolar estimateHomography) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,7 +93,7 @@ public class SiftDetector {
 	double edgeThreshold;
 
 	// all the found detections in a single octave
-	protected FastQueue<ScalePoint> detections = new FastQueue<>(ScalePoint.class, true);
+	protected FastQueue<ScalePoint> detections = new FastQueue<>(ScalePoint::new);
 
 	// Computes image derivatives. used in edge rejection
 	ImageConvolveSparse<GrayF32,?> derivXX;

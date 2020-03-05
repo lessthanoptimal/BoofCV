@@ -41,7 +41,7 @@ import boofcv.struct.feature.TupleDesc_S8;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -70,8 +70,8 @@ public class CompareConvertedDescriptionsApp {
 		GrayF32 input1 = ConvertBufferedImage.convertFrom(image1,(GrayF32)null);
 		GrayF32 input2 = ConvertBufferedImage.convertFrom(image2,(GrayF32)null);
 
-		FastQueue<TD> listSrc = describeImage(input1,detector,describe,locationSrc);
-		FastQueue<TD> listDst = describeImage(input2,detector,describe,locationDst);
+		FastAccess<TD> listSrc = describeImage(input1,detector,describe,locationSrc);
+		FastAccess<TD> listDst = describeImage(input2,detector,describe,locationDst);
 
 		assoc.setSource(listSrc);
 		assoc.setDestination(listDst);
@@ -87,12 +87,12 @@ public class CompareConvertedDescriptionsApp {
 	}
 
 	public static <TD extends TupleDesc>
-	FastQueue<TD>  describeImage( GrayF32 input ,
+	FastArray<TD>  describeImage( GrayF32 input ,
 								  InterestPointDetector<GrayF32> detector ,
 								  DescribeRegionPoint<GrayF32,TD> describe ,
 								  List<Point2D_F64> location )
 	{
-		FastQueue<TD> list = new FastQueue<>(100, describe.getDescriptionType(), false);
+		FastArray<TD> list = new FastArray<>(describe.getDescriptionType());
 
 		System.out.println("Detecting");
 		detector.detect(input);

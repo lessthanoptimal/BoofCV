@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,7 +35,7 @@ public class TestTldNonMaximalSuppression {
 	public void process() {
 		TldNonMaximalSuppression alg = new TldNonMaximalSuppression(0.5);
 
-		FastQueue<TldRegion> regions = new FastQueue<>(TldRegion.class, true);
+		FastQueue<TldRegion> regions = new FastQueue<>(TldRegion::new);
 		regions.grow().rect.set(0,100,10,120);
 		regions.grow().rect.set(2,3,8,33);
 		regions.grow().rect.set(0,100,9,119);
@@ -45,7 +45,7 @@ public class TestTldNonMaximalSuppression {
 		regions.get(2).confidence = 300;
 		regions.get(3).confidence = 400;
 
-		FastQueue<TldRegion> output = new FastQueue<>(TldRegion.class, true);
+		FastQueue<TldRegion> output = new FastQueue<>(TldRegion::new);
 
 		alg.process(regions,output);
 		assertEquals(output.size(), 3);

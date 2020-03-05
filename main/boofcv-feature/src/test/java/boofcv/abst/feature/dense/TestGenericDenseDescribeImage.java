@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -119,7 +119,7 @@ public class TestGenericDenseDescribeImage {
 		ImageType type = ImageType.single(GrayU8.class);
 		double inputRadius;
 		ImageBase image;
-		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32.class, true);
+		FastQueue<Point2D_I32> points = new FastQueue<>(Point2D_I32::new);
 		int count = 0;
 
 		@Override

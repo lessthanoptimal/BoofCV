@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,9 +80,9 @@ public class SelfCalibrationLinearRotationMulti {
 	// storage for null vector
 	DMatrixRMaj nv = new DMatrixRMaj(1,1);
 
-	FastQueue<Homography2D_F64> listHInv = new FastQueue<>(Homography2D_F64.class,true);
+	FastQueue<Homography2D_F64> listHInv = new FastQueue<>(Homography2D_F64::new);
 
-	FastQueue<CameraPinhole> calibration = new FastQueue<>(CameraPinhole.class,true);
+	FastQueue<CameraPinhole> calibration = new FastQueue<>(CameraPinhole::new);
 
 	/**
 	 * Specifies linear constraints

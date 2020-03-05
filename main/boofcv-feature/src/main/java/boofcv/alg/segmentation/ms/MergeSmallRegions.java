@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_B;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -49,7 +50,7 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	protected GrowQueue_I32 segmentToPruneID = new GrowQueue_I32();
 
 	// Used to mark pixels as not being a member of any region
-	protected FastQueue<Node> pruneGraph = new FastQueue<>(Node.class, true);
+	protected FastQueue<Node> pruneGraph = new FastQueue<>(Node::new);
 
 	// Relative location of neighbors according to connection rule
 	protected Point2D_I32 connect[];
@@ -340,7 +341,7 @@ public class MergeSmallRegions<T extends ImageBase<T>> extends RegionMergeTree {
 	 * @param pruneId The prune Id of the segment which is to be merged into another segment
 	 * @param regionColor List of region colors
 	 */
-	protected void selectMerge( int pruneId , FastQueue<float[]> regionColor ) {
+	protected void selectMerge( int pruneId , FastAccess<float[]> regionColor ) {
 		// Grab information on the region which is being pruned
 		Node n = pruneGraph.get(pruneId);
 		float[] targetColor = regionColor.get(n.segment);

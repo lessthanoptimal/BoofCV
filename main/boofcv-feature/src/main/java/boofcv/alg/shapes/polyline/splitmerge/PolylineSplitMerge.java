@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -106,14 +106,14 @@ public class PolylineSplitMerge {
 
 	// the corner list that's being built
 	LinkedList<Corner> list = new LinkedList<>();
-	FastQueue<Corner> corners = new FastQueue<>(Corner.class,true);
+	FastQueue<Corner> corners = new FastQueue<>(Corner::new);
 
 	private SplitSelector splitter = new MaximumLineDistance();
 	private SplitResults resultsA = new SplitResults();
 	private SplitResults resultsB = new SplitResults();
 
 	// List of all the found polylines and their score
-	private FastQueue<CandidatePolyline> polylines = new FastQueue<>(CandidatePolyline.class,true);
+	private FastQueue<CandidatePolyline> polylines = new FastQueue<>(CandidatePolyline::new);
 	private CandidatePolyline bestPolyline;
 
 	// if true that means a fatal error and no polygon can be fit

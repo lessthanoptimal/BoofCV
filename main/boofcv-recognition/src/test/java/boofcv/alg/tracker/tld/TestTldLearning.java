@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ public class TestTldLearning {
 		TldLearning alg = new TldLearning(rand,config,template,variance,fern,detection);
 
 
-		FastQueue<ImageRectangle> regions = new FastQueue<>(ImageRectangle.class, true);
+		FastQueue<ImageRectangle> regions = new FastQueue<>(ImageRectangle::new);
 		regions.grow();
 		regions.grow();
 		regions.grow();

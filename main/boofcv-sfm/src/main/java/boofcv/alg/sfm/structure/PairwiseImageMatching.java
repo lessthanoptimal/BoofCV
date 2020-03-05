@@ -67,7 +67,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	protected ConfigFundamental configFundamental = new ConfigFundamental();
 
 	// Temporary storage for feature pairs which are inliers
-	protected FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair.class,true);
+	protected FastQueue<AssociatedPair> pairs = new FastQueue<>(AssociatedPair::new);
 
 	protected ModelMatcherMultiview<DMatrixRMaj,AssociatedPair> ransacEssential;
 	protected ModelMatcher<DMatrixRMaj,AssociatedPair> ransacFundamental;
@@ -119,12 +119,7 @@ public class PairwiseImageMatching<T extends ImageBase<T>>
 	public void addImage(T image , String cameraName ) {
 
 		PairwiseImageGraph.View view = new PairwiseImageGraph.View(graph.nodes.size(),
-				new FastQueue<TupleDesc>(TupleDesc.class,true) {
-					@Override
-					protected TupleDesc createInstance() {
-						return detDesc.createDescription();
-					}
-				});
+				new FastQueue<>(detDesc::createDescription));
 
 		view.camera = graph.cameras.get(cameraName);
 		if( view.camera == null )

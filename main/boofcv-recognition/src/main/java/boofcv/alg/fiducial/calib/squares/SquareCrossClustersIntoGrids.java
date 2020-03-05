@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,7 +38,7 @@ public class SquareCrossClustersIntoGrids {
 	// verbose debug output
 	private boolean verbose = false;
 
-	FastQueue<SquareGrid> grids = new FastQueue<>(SquareGrid.class, true);
+	FastQueue<SquareGrid> grids = new FastQueue<>(SquareGrid::new);
 
 	// indicates if a fatal error was found in the grid
 	protected boolean invalid;

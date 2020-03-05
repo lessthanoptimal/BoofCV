@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,7 +61,7 @@ public class VisualizeTldDetectionApp<T extends ImageGray<T>,D extends ImageGray
 	int numClicks = 0;
 	ImageRectangle target = new ImageRectangle();
 
-	private FastQueue<TldRegion> candidateDetections = new FastQueue<>(TldRegion.class, true);
+	private FastQueue<TldRegion> candidateDetections = new FastQueue<>(TldRegion::new);
 
 
 	public VisualizeTldDetectionApp( BufferedImage input , Class<T> imageType ) {

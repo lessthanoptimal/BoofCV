@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class QrCodeDecoderImage<T extends ImageGray<T>> {
 	// used to compute error correction
 	QrCodeDecoderBits decoder;
 
-	FastQueue<QrCode> storageQR = new FastQueue<>(QrCode.class,true);
+	FastQueue<QrCode> storageQR = new FastQueue<>(QrCode::new);
 	List<QrCode> successes = new ArrayList<>();
 	List<QrCode> failures = new ArrayList<>();
 

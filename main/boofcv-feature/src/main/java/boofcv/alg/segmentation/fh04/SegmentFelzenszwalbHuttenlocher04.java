@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.struct.image.ImageType;
 import org.ddogleg.sorting.ApproximateSort_F32;
 import org.ddogleg.sorting.QuickSortObj_F32;
 import org.ddogleg.sorting.SortableParameter_F32;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -96,9 +97,9 @@ public class SegmentFelzenszwalbHuttenlocher04<T extends ImageBase<T>> {
 	private QuickSortObj_F32 sorter = new QuickSortObj_F32();
 	private ApproximateSort_F32 sorterApprox = null;
 	// storage for edges so that they can be recycled on the next call
-	protected FastQueue<Edge> edges = new FastQueue<>(Edge.class, true);
+	protected FastQueue<Edge> edges = new FastQueue<>(Edge::new);
 	// list of edges which were not matched to anything.  used to merge small regions
-	protected FastQueue<Edge> edgesNotMatched = new FastQueue<>(Edge.class, false);
+	protected FastArray<Edge> edgesNotMatched = new FastArray<>(Edge.class);
 	// Size of each region
 	protected GrowQueue_I32 regionSize = new GrowQueue_I32();
 	// This is equivalent to Int(C) + tau(C) in Equation 4.

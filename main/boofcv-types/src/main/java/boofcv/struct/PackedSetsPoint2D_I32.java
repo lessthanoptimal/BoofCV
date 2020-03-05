@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,7 +40,7 @@ public class PackedSetsPoint2D_I32 {
 	// arrays which store the points
 	final FastQueue<int[]> blocks;
 	// describes where there data for a set is stored
-	final FastQueue<BlockIndexLength> sets = new FastQueue<>(BlockIndexLength.class,true);
+	final FastQueue<BlockIndexLength> sets = new FastQueue<>(BlockIndexLength::new);
 
 	// the length/size of the last block
 	int tailBlockSize;
@@ -173,7 +173,7 @@ public class PackedSetsPoint2D_I32 {
 	}
 
 	public List<Point2D_I32> getSet(int which) {
-		FastQueue<Point2D_I32> tmp = new FastQueue<>(Point2D_I32.class,true);
+		FastQueue<Point2D_I32> tmp = new FastQueue<>(Point2D_I32::new);
 		getSet(which,tmp);
 		List<Point2D_I32> output = new ArrayList<>();
 		output.addAll( tmp.toList() );

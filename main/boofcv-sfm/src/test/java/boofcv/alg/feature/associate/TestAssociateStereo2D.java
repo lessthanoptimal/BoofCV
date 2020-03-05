@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,8 +47,8 @@ public class TestAssociateStereo2D {
 
 	Point2D_F64 leftP = new Point2D_F64();
 	Point2D_F64 rightP = new Point2D_F64();
-	FastQueue<Point2D_F64> pointsLeft = new FastQueue<>(Point2D_F64.class, true);
-	FastQueue<Point2D_F64> pointsRight = new FastQueue<>(Point2D_F64.class, true);
+	FastQueue<Point2D_F64> pointsLeft = new FastQueue<>(Point2D_F64::new);
+	FastQueue<Point2D_F64> pointsRight = new FastQueue<>(Point2D_F64::new);
 	FastQueue<TupleDesc_F64> descLeft,descRight;
 
 
@@ -67,18 +67,8 @@ public class TestAssociateStereo2D {
 		param.left = new CameraPinholeBrown(400,500,0.1,160,120,320,240).fsetRadial(0,0);
 		param.right = new CameraPinholeBrown(380,505,0.05,165,115,320,240).fsetRadial(0,0);
 
-		descLeft = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
-			@Override
-			protected TupleDesc_F64 createInstance() {
-				return new TupleDesc_F64(10);
-			}
-		};
-		descRight = new FastQueue<TupleDesc_F64>(TupleDesc_F64.class,true) {
-			@Override
-			protected TupleDesc_F64 createInstance() {
-				return new TupleDesc_F64(10);
-			}
-		};
+		descLeft = new FastQueue<>(()->new TupleDesc_F64(10));
+		descRight = new FastQueue<>(()->new TupleDesc_F64(10));
 
 		pointsLeft.reset();
 		pointsRight.reset();

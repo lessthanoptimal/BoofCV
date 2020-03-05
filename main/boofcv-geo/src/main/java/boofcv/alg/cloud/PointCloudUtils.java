@@ -101,7 +101,7 @@ public class PointCloudUtils {
 		NearestNeighbor.Search<Point3D_F64> search = nn.createSearch();
 
 		nn.setPoints(cloud,false);
-		FastQueue<NnData<Point3D_F64>> results = new FastQueue(NnData.class,true);
+		FastQueue<NnData<Point3D_F64>> results = new FastQueue(NnData::new);
 
 		// It will always find itself
 		minNeighbors += 1;
@@ -133,7 +133,7 @@ public class PointCloudUtils {
 		NearestNeighbor.Search<Point3D_F64> search = nn.createSearch();
 
 		nn.setPoints(cloud,false);
-		FastQueue<NnData<Point3D_F64>> results = new FastQueue(NnData.class,true);
+		FastQueue<NnData<Point3D_F64>> results = new FastQueue(NnData::new);
 
 		// It will always find itself
 		minNeighbors += 1;

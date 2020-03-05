@@ -21,7 +21,7 @@ package boofcv.abst.feature.associate;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.MatchScoreType;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastArray;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,12 +36,12 @@ public abstract class StandardAssociateDescriptionChecks<Desc> {
 
 	// if true then the error used is squared
 	boolean distanceIsSquared = true;
-	FastQueue<Desc> listSrc;
-	FastQueue<Desc> listDst;
+	FastArray<Desc> listSrc;
+	FastArray<Desc> listDst;
 
 	protected StandardAssociateDescriptionChecks( Class<Desc> descType ) {
-		listSrc = new FastQueue<>(descType, false);
-		listDst = new FastQueue<>(descType, false);
+		listSrc = new FastArray<>(descType);
+		listDst = new FastArray<>(descType);
 	}
 
 	public void allTests() {

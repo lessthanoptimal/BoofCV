@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,7 +75,7 @@ import java.util.List;
 public abstract class BaseDetectFiducialSquare<T extends ImageGray<T>> {
 
 	// Storage for the found fiducials
-	private FastQueue<FoundFiducial> found = new FastQueue<>(FoundFiducial.class, true);
+	private FastQueue<FoundFiducial> found = new FastQueue<>(FoundFiducial::new);
 
 	// converts input image into a binary image
 	InputToBinary<T> inputToBinary;

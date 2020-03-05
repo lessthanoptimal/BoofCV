@@ -96,7 +96,7 @@ public class TestEnforceUniqueByScore {
 	private static class Dummy extends AssociateUniqueByScoreAlg {
 
 		boolean calledProcess = false;
-		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class, true);
+		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
 		int numSource;
 		int numDestination;
 
@@ -127,7 +127,7 @@ public class TestEnforceUniqueByScore {
 		GrowQueue_I32 unSrc = new GrowQueue_I32();
 		GrowQueue_I32 unDst = new GrowQueue_I32();
 
-		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class, true);
+		FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
 
 		@Override
 		public void associate() {

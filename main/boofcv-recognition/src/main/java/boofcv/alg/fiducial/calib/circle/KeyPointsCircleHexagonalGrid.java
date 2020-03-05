@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,10 +46,10 @@ import org.ddogleg.struct.FastQueue;
 public class KeyPointsCircleHexagonalGrid {
 
 	// tangent points on each ellipse
-	FastQueue<Tangents> tangents = new FastQueue<>(Tangents.class,true);
+	FastQueue<Tangents> tangents = new FastQueue<>(Tangents::new);
 
 	// detected location
-	FastQueue<Point2D_F64> keypoints = new FastQueue<>(Point2D_F64.class,true);
+	FastQueue<Point2D_F64> keypoints = new FastQueue<>(Point2D_F64::new);
 
 	// used to compute tangent lines between two ellipses
 	private TangentLinesTwoEllipses_F64 tangentFinder = new TangentLinesTwoEllipses_F64(GrlConstants.TEST_F64,10);
@@ -250,7 +250,7 @@ public class KeyPointsCircleHexagonalGrid {
 
 	public static class Tangents extends FastQueue<Point2D_F64> {
 		public Tangents() {
-			super(8, Point2D_F64.class, true);
+			super(8, Point2D_F64::new);
 		}
 	}
 }

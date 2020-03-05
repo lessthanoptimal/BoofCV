@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class GeneralToInterestPoint<T extends ImageGray<T>, D extends ImageGray<
 	double radius;
 
 	// list of points it found
-	protected FastQueue<Point2D_F64> foundPoints = new FastQueue<>(10, Point2D_F64.class, true);
+	protected FastQueue<Point2D_F64> foundPoints = new FastQueue<>(10, Point2D_F64::new);
 
 	public GeneralToInterestPoint(GeneralFeatureDetector<T, D> detector,
 								  double radius,

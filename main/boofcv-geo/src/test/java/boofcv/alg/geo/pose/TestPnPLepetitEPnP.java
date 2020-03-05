@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -95,7 +95,7 @@ public class TestPnPLepetitEPnP {
 	public void selectWorldControlPoints_planar() {
 
 		List<Point3D_F64> worldPts = CommonHomographyChecks.createRandomPlane(rand, 3, 30);
-		FastQueue<Point3D_F64> controlPts = new FastQueue<>(4, Point3D_F64.class, true);
+		FastQueue<Point3D_F64> controlPts = new FastQueue<>(4, Point3D_F64::new);
 
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
@@ -125,7 +125,7 @@ public class TestPnPLepetitEPnP {
 	public void selectControlPoints() {
 
 		List<Point3D_F64> worldPts = GeoTestingOps.randomPoints_F64(-1, 10, -5, 20, 0.1, 0.5, 30, rand);
-		FastQueue<Point3D_F64> controlPts = new FastQueue<>(4, Point3D_F64.class, true);
+		FastQueue<Point3D_F64> controlPts = new FastQueue<>(4, Point3D_F64::new);
 
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 
@@ -152,7 +152,7 @@ public class TestPnPLepetitEPnP {
 	@Test
 	public void computeBarycentricCoordinates() {
 		List<Point3D_F64> worldPoints = GeoTestingOps.randomPoints_F64(-1, 10, -5, 20, 0.1, 0.5, 30, rand);
-		FastQueue<Point3D_F64> worldControlPts = new FastQueue<>(4, Point3D_F64.class, true);
+		FastQueue<Point3D_F64> worldControlPts = new FastQueue<>(4, Point3D_F64::new);
 
 		PnPLepetitEPnP alg = new PnPLepetitEPnP();
 

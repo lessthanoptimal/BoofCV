@@ -86,7 +86,7 @@ public interface BinaryContourInterface {
 	 * @return New copy of contour
 	 */
 	static List<Point2D_I32> copyContour(BinaryContourInterface finder , int contourID) {
-		FastQueue<Point2D_I32> storage = new FastQueue<>(Point2D_I32.class,true);
+		FastQueue<Point2D_I32> storage = new FastQueue<>(Point2D_I32::new);
 		finder.loadContour(contourID,storage);
 		List<Point2D_I32> list = new ArrayList<>(storage.size);
 		for (int i = 0; i < storage.size; i++) {

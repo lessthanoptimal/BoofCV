@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,11 +31,11 @@ import org.ddogleg.struct.FastQueue;
 public class QueueCorner extends FastQueue<Point2D_I16> {
 
 	public QueueCorner(int max) {
-		super(max,Point2D_I16.class,true);
+		super(max,Point2D_I16::new);
 	}
 
 	public QueueCorner() {
-		super(10,Point2D_I16.class,true);
+		super(10,Point2D_I16::new);
 	}
 
 	public final void add(int x, int y) {
@@ -44,5 +44,11 @@ public class QueueCorner extends FastQueue<Point2D_I16> {
 
 	public final void add( Point2D_I16 pt ) {
 		grow().set(pt.x, pt.y);
+	}
+
+	public final void addAll( QueueCorner list ) {
+		for (int i = 0; i < list.size; i++) {
+			grow().set(list.get(i));
+		}
 	}
 }

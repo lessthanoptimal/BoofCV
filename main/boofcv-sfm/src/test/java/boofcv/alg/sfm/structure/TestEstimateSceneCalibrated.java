@@ -177,8 +177,8 @@ class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 			final Motion edge = new Motion();
 			edge.viewSrc = new View();
 			edge.viewDst = new View();
-			edge.viewSrc.observationNorm = new FastQueue<>(Point2D_F64.class,true);
-			edge.viewDst.observationNorm = new FastQueue<>(Point2D_F64.class,true);
+			edge.viewSrc.observationNorm = new FastQueue<>(Point2D_F64::new);
+			edge.viewDst.observationNorm = new FastQueue<>(Point2D_F64::new);
 			edge.associated = new ArrayList<>();
 
 			double rotX = rand.nextGaussian()*0.02;
@@ -220,8 +220,8 @@ class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 		final Motion edge = new Motion();
 		edge.viewSrc = new View();
 		edge.viewDst = new View();
-		edge.viewSrc.observationNorm = new FastQueue<>(Point2D_F64.class,true);
-		edge.viewDst.observationNorm = new FastQueue<>(Point2D_F64.class,true);
+		edge.viewSrc.observationNorm = new FastQueue<>(Point2D_F64::new);
+		edge.viewDst.observationNorm = new FastQueue<>(Point2D_F64::new);
 		edge.associated = new ArrayList<>();
 		edge.a_to_b = SpecialEuclideanOps_F64.eulerXyz(-1,0,0,0,0,0,null);
 
@@ -362,8 +362,8 @@ class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 
 		edge.a_to_b.set(0.5,0,0,EulerType.XYZ,0.05,0,0);
 
-		edge.viewSrc.observationNorm = new FastQueue<>(Point2D_F64.class,true);
-		edge.viewDst.observationNorm = new FastQueue<>(Point2D_F64.class,true);
+		edge.viewSrc.observationNorm = new FastQueue<>(Point2D_F64::new);
+		edge.viewDst.observationNorm = new FastQueue<>(Point2D_F64::new);
 		edge.associated = new ArrayList<>();
 
 		CameraPinhole intrinsic = new CameraPinhole(400,400,0,500,500,1000,1000);
@@ -532,8 +532,8 @@ class TestEstimateSceneCalibrated extends GenericSceneStructureChecks {
 		edge.viewDst = new View();
 		edge.viewSrc.camera = edge.viewDst.camera = camera("camera", pinhole);
 
-		edge.viewSrc.observationNorm = new FastQueue<>(Point2D_F64.class,true);
-		edge.viewDst.observationNorm = new FastQueue<>(Point2D_F64.class,true);
+		edge.viewSrc.observationNorm = new FastQueue<>(Point2D_F64::new);
+		edge.viewDst.observationNorm = new FastQueue<>(Point2D_F64::new);
 		edge.associated = new ArrayList<>();
 
 		edge.a_to_b.set(rand.nextGaussian(),0,0,EulerType.XYZ, 0.05, 0.1,0);

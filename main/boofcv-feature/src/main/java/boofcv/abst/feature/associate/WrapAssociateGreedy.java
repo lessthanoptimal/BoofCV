@@ -36,7 +36,7 @@ public class WrapAssociateGreedy<T> implements AssociateDescription<T> {
 
 	AssociateGreedyBase<T> alg;
 
-	FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex.class, true);
+	FastQueue<AssociatedIndex> matches = new FastQueue<>(10, AssociatedIndex::new);
 
 	// reference to input list
 	FastAccess<T> listSrc;

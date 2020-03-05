@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public abstract class CheckEstimateNofPnP extends BaseChecksPnP {
 	// true if it can only process the minimum number of observations
 	boolean onlyMinimum;
 
-	FastQueue<Se3_F64> solutions = new FastQueue<>(1, Se3_F64.class, true);
+	FastQueue<Se3_F64> solutions = new FastQueue<>(1, Se3_F64::new);
 
 	Se3_F64 worldToCamera0 = new Se3_F64();
 	Se3_F64 worldToCamera1 = new Se3_F64();

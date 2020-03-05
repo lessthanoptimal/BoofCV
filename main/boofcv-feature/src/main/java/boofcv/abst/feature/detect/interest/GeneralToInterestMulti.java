@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,8 +42,8 @@ public class GeneralToInterestMulti<T extends ImageGray<T>, D extends ImageGray<
 	protected double radius;
 
 	// list of found points
-	protected FastQueue<Point2D_F64> foundMin = new FastQueue<>(10, Point2D_F64.class, true);
-	protected FastQueue<Point2D_F64> foundMax = new FastQueue<>(10, Point2D_F64.class, true);
+	protected FastQueue<Point2D_F64> foundMin = new FastQueue<>(10, Point2D_F64::new);
+	protected FastQueue<Point2D_F64> foundMax = new FastQueue<>(10, Point2D_F64::new);
 
 	// sets for each type of detected feature
 	protected FoundPointSO sets[];

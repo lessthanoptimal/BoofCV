@@ -92,9 +92,9 @@ public class ProjectiveInitializeAllCommon {
 	private LookupSimilarImages db;
 
 	// Location of features in the image. Pixels
-	FastQueue<Point2D_F64> featsA = new FastQueue<>(Point2D_F64.class,true);
-	FastQueue<Point2D_F64> featsB = new FastQueue<>(Point2D_F64.class,true);
-	FastQueue<Point2D_F64> featsC = new FastQueue<>(Point2D_F64.class,true);
+	FastQueue<Point2D_F64> featsA = new FastQueue<>(Point2D_F64::new);
+	FastQueue<Point2D_F64> featsB = new FastQueue<>(Point2D_F64::new);
+	FastQueue<Point2D_F64> featsC = new FastQueue<>(Point2D_F64::new);
 
 	// Indexes of common features after all but the inliers have been removed by RANSAC
 	GrowQueue_I32 inlierToSeed = new GrowQueue_I32();
@@ -105,12 +105,12 @@ public class ProjectiveInitializeAllCommon {
 
 	//-------------- Internal workspace variables
 	int selectedTriple[] = new int[2];
-	FastQueue<AssociatedTripleIndex> matchesTripleIdx = new FastQueue<>(AssociatedTripleIndex.class,true);
-	FastQueue<AssociatedTriple> matchesTriple = new FastQueue<>(AssociatedTriple.class,true);
+	FastQueue<AssociatedTripleIndex> matchesTripleIdx = new FastQueue<>(AssociatedTripleIndex::new);
+	FastQueue<AssociatedTriple> matchesTriple = new FastQueue<>(AssociatedTriple::new);
 	// triangulated 3D homogenous points in seed reference frame
-	FastQueue<Point4D_F64> points3D = new FastQueue<>(Point4D_F64.class,true);
+	FastQueue<Point4D_F64> points3D = new FastQueue<>(Point4D_F64::new);
 	// Associated pixel observations
-	FastQueue<AssociatedPair> assocPixel = new FastQueue<>(AssociatedPair.class,true);
+	FastQueue<AssociatedPair> assocPixel = new FastQueue<>(AssociatedPair::new);
 	ImageDimension shape = new ImageDimension();
 	// lookup table from feature ID in seed view to structure
 	GrowQueue_I32 seedToStructure = new GrowQueue_I32();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.alg.sfm.structure2;
 
 import boofcv.struct.feature.AssociatedIndex;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 
@@ -33,8 +34,8 @@ import java.util.Map;
  */
 public class PairwiseImageGraph2 {
 
-	public FastQueue<View> nodes = new FastQueue<>(View.class,true);
-	public FastQueue<Motion> edges = new FastQueue<>(Motion.class,true);
+	public FastQueue<View> nodes = new FastQueue<>(View::new);
+	public FastQueue<Motion> edges = new FastQueue<>(Motion::new);
 
 	public Map<String,View> mapNodes = new HashMap<>();
 
@@ -68,7 +69,7 @@ public class PairwiseImageGraph2 {
 		/**
 		 * List of motions associated with this view. It can be either the src or dst
 		 */
-		public FastQueue<Motion> connections = new FastQueue<>(Motion.class,false);
+		public FastArray<Motion> connections = new FastArray<>(Motion.class);
 
 		void init( String id ) {
 			this.id = id;
@@ -127,7 +128,7 @@ public class PairwiseImageGraph2 {
 		/**
 		 * indexes of features in the match list that are inliers to the found F and H matrix
 		 */
-		public FastQueue<AssociatedIndex> inliers = new FastQueue<>(AssociatedIndex.class,true);
+		public FastQueue<AssociatedIndex> inliers = new FastQueue<>(AssociatedIndex::new);
 
 		public View src;
 		public View dst;

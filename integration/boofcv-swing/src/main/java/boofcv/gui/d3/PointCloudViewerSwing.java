@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -184,7 +184,7 @@ public class PointCloudViewerSwing implements PointCloudViewer {
 	@Override
 	public FastQueue<Point3dRgbI_F64> copyCloud(@Nullable FastQueue<Point3dRgbI_F64> copy) {
 		if( copy == null )
-			copy = new FastQueue<>(Point3dRgbI_F64.class,true);
+			copy = new FastQueue<>(Point3dRgbI_F64::new);
 		else
 			copy.reset();
 

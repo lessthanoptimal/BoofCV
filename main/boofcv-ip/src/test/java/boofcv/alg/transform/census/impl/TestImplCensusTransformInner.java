@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -169,7 +169,7 @@ public class TestImplCensusTransformInner {
 	}
 
 	public static FastQueue<Point2D_I32> createSamples( int r ) {
-		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32.class,true);
+		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32::new);
 		for (int y = -r; y <= r; y++) {
 			for (int x = -r; x <= r; x++) {
 				samples.grow().set(x,y);

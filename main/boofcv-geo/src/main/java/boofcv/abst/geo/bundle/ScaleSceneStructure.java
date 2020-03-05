@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,7 +76,7 @@ public class ScaleSceneStructure {
 	/**
 	 * Pixel scaling for each view
 	 */
-	public FastQueue<NormalizationPoint2D> pixelScaling = new FastQueue<>(NormalizationPoint2D.class,true);
+	public FastQueue<NormalizationPoint2D> pixelScaling = new FastQueue<>(NormalizationPoint2D::new);
 
 	/**
 	 * Configures how scaling is applied

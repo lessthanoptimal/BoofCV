@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class TemplateMatching<T extends ImageBase<T>> {
 	private int indexes[] = new int[10];
 
 	// storage for final points
-	private FastQueue<Match> results = new FastQueue<>(10, Match.class, true);
+	private FastQueue<Match> results = new FastQueue<>(10, Match::new);
 
 	// shape of input image
 	int imageWidth,imageHeight;

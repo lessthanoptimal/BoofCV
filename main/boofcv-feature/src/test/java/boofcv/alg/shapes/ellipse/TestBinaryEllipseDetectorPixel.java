@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,7 +84,7 @@ public class TestBinaryEllipseDetectorPixel {
 	@Test
 	public void undistortContour() {
 		List<Point2D_I32> input = new ArrayList<>();
-		FastQueue<Point2D_F64> output = new FastQueue<>(Point2D_F64.class, true);
+		FastQueue<Point2D_F64> output = new FastQueue<>(Point2D_F64::new);
 
 		for (int i = 0; i < 10; i++) {
 			input.add( new Point2D_I32(i,i));
@@ -110,7 +110,7 @@ public class TestBinaryEllipseDetectorPixel {
 
 
 		List<Point2D_I32> input = new ArrayList<>();
-		FastQueue<Point2D_F64> output = new FastQueue<>(Point2D_F64.class, true);
+		FastQueue<Point2D_F64> output = new FastQueue<>(Point2D_F64::new);
 
 		for (int i = 0; i < 10; i++) {
 			input.add( new Point2D_I32(i,i));

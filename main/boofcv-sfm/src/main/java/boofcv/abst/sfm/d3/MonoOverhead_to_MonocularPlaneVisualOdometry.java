@@ -55,8 +55,8 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 	Se3_F64 cameraToWorld = new Se3_F64();
 
 	boolean computed;
-	FastQueue<Point2D_F64> pixels = new FastQueue<>(Point2D_F64.class, true);
-	FastQueue<Point3D_F64> points3D = new FastQueue<>(Point3D_F64.class, true);
+	FastQueue<Point2D_F64> pixels = new FastQueue<>(Point2D_F64::new);
+	FastQueue<Point3D_F64> points3D = new FastQueue<>(Point3D_F64::new);
 
 	Se3_F64 planeToCamera;
 	Point2Transform2_F64 normToPixel;

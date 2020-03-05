@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,7 +80,7 @@ public class QuadPoseEstimator {
 	protected List<Point2D_F64> listObs = new ArrayList<>();
 
 	private List<Point2D3D> inputP3P = new ArrayList<>();
-	private FastQueue<Se3_F64> solutions = new FastQueue(Se3_F64.class,true);
+	private FastQueue<Se3_F64> solutions = new FastQueue(Se3_F64::new);
 	private Se3_F64 outputFiducialToCamera = new Se3_F64();
 	private Se3_F64 foundEPNP = new Se3_F64();
 

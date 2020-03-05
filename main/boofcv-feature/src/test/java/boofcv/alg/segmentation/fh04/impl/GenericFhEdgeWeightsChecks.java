@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,7 +57,7 @@ public abstract class GenericFhEdgeWeightsChecks<T extends ImageBase<T>> {
 		GImageMiscOps.fillUniform(input, rand, 0, 200);
 
 		FhEdgeWeights<T> alg = createAlg();
-		FastQueue<Edge> edges = new FastQueue<>(Edge.class, true);
+		FastQueue<Edge> edges = new FastQueue<>(Edge::new);
 		alg.process(input,edges);
 
 		int hist[] = new int[input.width*input.height];
@@ -126,8 +126,8 @@ public abstract class GenericFhEdgeWeightsChecks<T extends ImageBase<T>> {
 		T inputSub = BoofTesting.createSubImageOf(input);
 
 		FhEdgeWeights<T> alg = createAlg();
-		FastQueue<Edge> edges0 = new FastQueue<>(Edge.class, true);
-		FastQueue<Edge> edges1 = new FastQueue<>(Edge.class, true);
+		FastQueue<Edge> edges0 = new FastQueue<>(Edge::new);
+		FastQueue<Edge> edges1 = new FastQueue<>(Edge::new);
 
 		alg.process(input,edges0);
 		alg.process(inputSub,edges1);

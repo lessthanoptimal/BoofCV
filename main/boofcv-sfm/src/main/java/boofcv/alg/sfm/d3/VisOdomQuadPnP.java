@@ -69,7 +69,7 @@ public class VisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc> {
 	private ModelMatcher<Se3_F64, Stereo2D3D> matcher;
 	private ModelFitter<Se3_F64, Stereo2D3D> modelRefiner;
 
-	private FastQueue<Stereo2D3D> modelFitData = new FastQueue<>(10, Stereo2D3D.class, true);
+	private FastQueue<Stereo2D3D> modelFitData = new FastQueue<>(10, Stereo2D3D::new);
 
 	// Detects feature inside the image
 	private DetectDescribeMulti<T,TD> detector;
@@ -79,7 +79,7 @@ public class VisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc> {
 	private AssociateDescription2D<TD> assocL2R;
 
 	// Set of associated features across all views
-	private FastQueue<QuadView> quadViews = new FastQueue<>(10, QuadView.class, true);
+	private FastQueue<QuadView> quadViews = new FastQueue<>(10, QuadView::new);
 
 	// features info extracted from the stereo pairs. 0 = previous 1 = current
 	private ImageInfo<TD> featsLeft0,featsLeft1;
@@ -481,7 +481,7 @@ public class VisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc> {
 			description = new FastQueue[ detector.getNumberOfSets() ];
 
 			for( int i = 0; i < location.length; i++ ) {
-				location[i] = new FastQueue<>(100, Point2D_F64.class, true);
+				location[i] = new FastQueue<>(100, Point2D_F64::new);
 				description[i] = UtilFeature.createQueue(detector,100);
 			}
 		}

@@ -64,7 +64,7 @@ public abstract class AssociateNearestNeighbor<D>
 	double scoreRatioThreshold =1.0;
 
 	// List of final associated points
-	protected final FastQueue<AssociatedIndex> matchesAll = new FastQueue<>(100, AssociatedIndex.class, true);
+	protected final FastQueue<AssociatedIndex> matchesAll = new FastQueue<>(100, AssociatedIndex::new);
 
 	// creates a list of unassociated features from the list of matches
 	private FindUnassociated unassociated = new FindUnassociated();

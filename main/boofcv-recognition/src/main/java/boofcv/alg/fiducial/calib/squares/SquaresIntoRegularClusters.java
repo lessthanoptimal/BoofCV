@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public class SquaresIntoRegularClusters extends SquaresIntoClusters {
 	// used to search for neighbors that which are candidates for connecting
 	private NearestNeighbor<SquareNode> nn = FactoryNearestNeighbor.kdtree(new SquareNode.KdTreeSquareNode());
 	private NearestNeighbor.Search<SquareNode> search = nn.createSearch();
-	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData.class,true);
+	private FastQueue<NnData<SquareNode>> searchResults = new FastQueue(NnData::new);
 
 	/**
 	 * Declares data structures and configures algorithm

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -295,7 +295,7 @@ public class AssistedCalibration {
 	}
 
 	boolean pictureTaken = false;
-	FastQueue<Polygon2D_F64> regions = new FastQueue<Polygon2D_F64>(Polygon2D_F64.class,true) {
+	FastQueue<Polygon2D_F64> regions = new FastQueue<Polygon2D_F64>(Polygon2D_F64::new) {
 		@Override
 		protected Polygon2D_F64 createInstance() {
 			return new Polygon2D_F64(4);

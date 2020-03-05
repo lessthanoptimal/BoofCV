@@ -24,6 +24,7 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.MatchScoreType;
 import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -42,11 +43,11 @@ public class AssociateThreeByPairs<Desc> implements AssociateThreeDescription<De
 	protected FastQueue<Desc> featuresA,featuresB,featuresC;
 
 	// work space varaibles
-	protected FastQueue<Desc> tmpB;
-	protected FastQueue<Desc> tmpA;
+	protected FastArray<Desc> tmpB;
+	protected FastArray<Desc> tmpA;
 
 	// storage for final output
-	protected FastQueue<AssociatedTripleIndex> matches = new FastQueue<>(AssociatedTripleIndex.class,true);
+	protected FastQueue<AssociatedTripleIndex> matches = new FastQueue<>(AssociatedTripleIndex::new);
 
 	// used to map indexes
 	protected GrowQueue_I32 srcToC = new GrowQueue_I32();
@@ -62,8 +63,8 @@ public class AssociateThreeByPairs<Desc> implements AssociateThreeDescription<De
 			throw new IllegalArgumentException("Both source and destination need to be unique");
 		this.associator = associator;
 
-		tmpB = new FastQueue<>(type,false);
-		tmpA = new FastQueue<>(type,false);
+		tmpB = new FastArray<>(type);
+		tmpA = new FastArray<>(type);
 	}
 
 	@Override
@@ -107,7 +108,7 @@ public class AssociateThreeByPairs<Desc> implements AssociateThreeDescription<De
 		pairs = associator.getMatches();
 		tmpB.reset();
 		srcToC.resize(pairs.size);
-		FastQueue<Desc> tmpC = tmpB; // do this to make the code easier to read
+		FastArray<Desc> tmpC = tmpB; // do this to make the code easier to read
 		for (int i = 0; i < pairs.size; i++) {
 			AssociatedIndex p = pairs.get(i);
 			// tmpSrc points to indexes in matches

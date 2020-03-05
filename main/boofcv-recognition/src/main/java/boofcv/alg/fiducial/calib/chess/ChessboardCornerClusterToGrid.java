@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -75,7 +75,7 @@ public class ChessboardCornerClusterToGrid {
 	// optional check on the shape
 	CheckShape checkShape;
 
-	FastQueue<GridElement> sparseGrid = new FastQueue<>(GridElement.class,true);
+	FastQueue<GridElement> sparseGrid = new FastQueue<>(GridElement::new);
 	int sparseCols,sparseRows;
 	GridElement[] denseGrid = new GridElement[0];
 

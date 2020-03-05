@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,7 +33,7 @@ public class FeatureSpatialDiversity_F32 {
 	FMatrix2x2 var = new FMatrix2x2();
 	float meanX,meanY;
 
-	FastQueue<Point2D_F32> norm = new FastQueue<>(Point2D_F32.class, true);
+	FastQueue<Point2D_F32> norm = new FastQueue<>(Point2D_F32::new);
 
 	// number of standard deviations that will be used to compute the spread
 	float sigmas = 3.0f;

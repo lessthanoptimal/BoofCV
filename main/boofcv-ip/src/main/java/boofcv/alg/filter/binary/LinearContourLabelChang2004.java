@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -73,7 +73,7 @@ public class LinearContourLabelChang2004 {
 
 	// predeclared/recycled data structures
 	PackedSetsPoint2D_I32 packedPoints = new PackedSetsPoint2D_I32(2000);
-	private FastQueue<ContourPacked> contours = new FastQueue<>(ContourPacked.class, true);
+	private FastQueue<ContourPacked> contours = new FastQueue<>(ContourPacked::new);
 
 	// internal book keeping variables
 	private int x,y,indexIn,indexOut;

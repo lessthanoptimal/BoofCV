@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,7 +103,7 @@ class TestGeneratePairwiseImageGraph {
 		alg.graph.createNode("foo");
 
 		FastQueue<AssociatedPair> associated = createAssociations(100,false,false);
-		FastQueue<AssociatedIndex> associtedIdx = new FastQueue<>(AssociatedIndex.class,true);
+		FastQueue<AssociatedIndex> associtedIdx = new FastQueue<>(AssociatedIndex::new);
 		for (int i = 0; i < associated.size; i++) {
 			associtedIdx.grow().setAssociation(i,i,1);
 		}
@@ -128,7 +128,7 @@ class TestGeneratePairwiseImageGraph {
 		alg.graph.createNode("foo");
 
 		FastQueue<AssociatedPair> associated = createAssociations(100,false,true);
-		FastQueue<AssociatedIndex> associtedIdx = new FastQueue<>(AssociatedIndex.class,true);
+		FastQueue<AssociatedIndex> associtedIdx = new FastQueue<>(AssociatedIndex::new);
 		for (int i = 0; i < associated.size; i++) {
 			associtedIdx.grow().setAssociation(i,i,1);
 		}
@@ -153,7 +153,7 @@ class TestGeneratePairwiseImageGraph {
 		alg.graph.createNode("foo");
 
 		FastQueue<AssociatedPair> associated = createAssociations(100,true,false);
-		FastQueue<AssociatedIndex> associtedIdx = new FastQueue<>(AssociatedIndex.class,true);
+		FastQueue<AssociatedIndex> associtedIdx = new FastQueue<>(AssociatedIndex::new);
 		for (int i = 0; i < associated.size; i++) {
 			associtedIdx.grow().setAssociation(i,i,1);
 		}
@@ -188,7 +188,7 @@ class TestGeneratePairwiseImageGraph {
 			feats3D = UtilPoint3D_F64.random(new Point3D_F64(0, 0, 1), -0.5, 0.5, N, rand);
 		}
 
-		FastQueue<AssociatedPair> associated = new FastQueue<>(AssociatedPair.class,true);
+		FastQueue<AssociatedPair> associated = new FastQueue<>(AssociatedPair::new);
 
 		for (int i = 0; i < feats3D.size(); i++) {
 			Point3D_F64 X = feats3D.get(i);

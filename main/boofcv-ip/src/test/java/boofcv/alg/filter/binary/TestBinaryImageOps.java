@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -289,7 +289,7 @@ public class TestBinaryImageOps {
 
 	@Test
 	public void labelToClusters() {
-		FastQueue<Point2D_I32> queue = new FastQueue<>(16, Point2D_I32.class, true);
+		FastQueue<Point2D_I32> queue = new FastQueue<>(16, Point2D_I32::new);
 		GrayS32 labels = new GrayS32(4,4);
 		labels.data = new int[]{
 				1,2,3,4,

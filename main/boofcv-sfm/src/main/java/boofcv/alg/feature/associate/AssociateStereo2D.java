@@ -42,7 +42,7 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 	// computes match score between two descriptions
 	private ScoreAssociation<Desc> scorer;
 	// storage for associated features
-	private FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex.class, true);
+	private FastQueue<AssociatedIndex> matches = new FastQueue<>(AssociatedIndex::new);
 	// stores indexes of unassociated source features
 	private GrowQueue_I32 unassociatedSrc = new GrowQueue_I32();
 	// creates a list of unassociated features from the list of matches
@@ -55,7 +55,7 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 	// stores rectified coordinates of observations in left and right images
 	private FastQueue<Point2D_F64> locationLeft = new FastQueue<>(Point2D_F64::new);
 	private FastQueue<Point2D_F64> locationRight = new FastQueue<>(Point2D_F64::new);
-	// stores reference to descriptions in left and right iamges
+	// stores reference to descriptions in left and right images
 	private FastAccess<Desc> descriptionsLeft;
 	private FastAccess<Desc> descriptionsRight;
 
@@ -63,8 +63,6 @@ public class AssociateStereo2D<Desc extends TupleDesc>
 	{
 		super(locationTolerance,locationTolerance);
 		this.scorer = scorer;
-		descriptionsLeft = new FastQueue<>(descType, false);
-		descriptionsRight = new FastQueue<>(descType, false);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -206,8 +206,11 @@ public class TestEllipsesIntoClusters {
 
 	@Test
 	public void joinClusters() {
-		List<EllipsesIntoClusters.Node> mouth = new ArrayList<>();
-		List<EllipsesIntoClusters.Node> food = new ArrayList<>();
+
+		EllipsesIntoClusters alg = new EllipsesIntoClusters(0.5,0.5,0.5);
+
+		List<EllipsesIntoClusters.Node> mouth = alg.clusters.grow();
+		List<EllipsesIntoClusters.Node> food = alg.clusters.grow();
 
 		mouth.add( new EllipsesIntoClusters.Node());
 		mouth.add( new EllipsesIntoClusters.Node());
@@ -215,10 +218,6 @@ public class TestEllipsesIntoClusters {
 		for (int i = 0; i < 4; i++) {
 			food.add( new EllipsesIntoClusters.Node());
 		}
-
-		EllipsesIntoClusters alg = new EllipsesIntoClusters(0.5,0.5,0.5);
-		alg.clusters.add(mouth);
-		alg.clusters.add(food);
 
 		alg.joinClusters(0,1);
 

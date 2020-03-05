@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -47,7 +47,7 @@ public class GenericDenseDescribeImageDense<T extends ImageBase<T>, Desc extends
 	int periodY;
 
 	FastQueue<Desc> descriptions;
-	FastQueue<Point2D_I32> locations = new FastQueue<>(Point2D_I32.class, true);
+	FastQueue<Point2D_I32> locations = new FastQueue<>(Point2D_I32::new);
 
 	/**
 	 * Configures dense description.
