@@ -36,6 +36,7 @@ import org.ejml.UtilEjml;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -178,7 +179,7 @@ class TestVisOdomBundleAdjustment {
 		alg.addObservation(frameB,trackB,1,4);
 		alg.addObservation(frameB,trackC,1,5);
 
-		alg.removeFrame(frameA);
+		alg.removeFrame(frameA,new ArrayList<>());
 		assertEquals(1,alg.frames.size);
 		assertEquals(2,alg.tracks.size);
 		assertSame(frameB, alg.frames.get(0));
