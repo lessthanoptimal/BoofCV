@@ -237,9 +237,24 @@ public abstract class DemonstrationBase extends JPanel {
 	protected void customAddToFileMenu(JMenu menuFile){}
 
 	protected void setMenuBarEnabled( boolean enabled ) {
-		menuBar.setEnabled(enabled);
+
+		// The commented out code is to be a reminder why this was done this way.
+		// In OS X it was possible to disable the menu bar but it would not become re-enabled. You had to switch
+		// away from the app and come back. Obvious workarounds did not work. What did work was disabling menu items
+		// instead of everything.
+		// https://stackoverflow.com/questions/32085966/jmenubar-does-not-enable-after-being-disabled
+
+		//		menuBar.setEnabled(enabled);
 		for (int i = 0; i < menuBar.getMenuCount(); i++) {
-			menuBar.getMenu(i).setEnabled(enabled);
+			//		menuBar.getMenu(i).setEnabled(enabled);
+			JMenu menu = menuBar.getMenu(i);
+			if( menu == null )
+				continue;
+			for (int j = 0; j < menu.getItemCount(); j++) {
+				if( menu.getItem(j) == null )
+					continue;
+				menu.getItem(j).setEnabled(enabled);
+			}
 		}
 	}
 
