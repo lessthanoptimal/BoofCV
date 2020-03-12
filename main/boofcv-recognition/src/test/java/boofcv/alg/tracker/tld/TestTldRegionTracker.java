@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,7 +20,7 @@ package boofcv.alg.tracker.tld;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.misc.GImageMiscOps;
-import boofcv.alg.tracker.klt.KltConfig;
+import boofcv.alg.tracker.klt.ConfigKlt;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.tracker.FactoryTrackerAlg;
@@ -125,7 +125,7 @@ public class TestTldRegionTracker {
 
 		ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.sobel(GrayU8.class,GrayS16.class);
 		PyramidKltTracker<GrayU8,GrayS16> tracker =
-				FactoryTrackerAlg.kltPyramid(new KltConfig(), GrayU8.class, GrayS16.class);
+				FactoryTrackerAlg.kltPyramid(new ConfigKlt(), GrayU8.class, GrayS16.class);
 
 		return new TldRegionTracker<>(10, 5, 100, gradient, tracker, GrayU8.class, GrayS16.class);
 	}

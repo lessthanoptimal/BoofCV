@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,7 @@ package boofcv.alg.tracker.combined;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.ImageStatistics;
-import boofcv.alg.tracker.klt.KltConfig;
+import boofcv.alg.tracker.klt.ConfigKlt;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.alg.transform.pyramid.PyramidOps;
 import boofcv.factory.filter.derivative.FactoryDerivative;
@@ -55,7 +55,7 @@ class TestPyramidKltForCombined {
 
 	public PyramidKltForCombined<GrayF32,GrayF32> createAlg()
 	{
-		KltConfig config = new KltConfig();
+		ConfigKlt config = new ConfigKlt();
 
 		return new PyramidKltForCombined<>(config, 5, scales,
 				GrayF32.class, GrayF32.class);

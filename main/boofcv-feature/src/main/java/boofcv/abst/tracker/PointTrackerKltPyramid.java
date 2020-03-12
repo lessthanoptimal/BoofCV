@@ -62,7 +62,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	protected ImageType<D> derivType;
 
 	// configuration for the KLT tracker
-	protected KltConfig config;
+	protected ConfigKlt config;
 	// size of the template/feature description
 	protected int templateRadius;
 
@@ -103,7 +103,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	 * @param interpDeriv Interpolation used on gradient images
 	 * @param derivType Type of image the gradient is
 	 */
-	public PointTrackerKltPyramid(KltConfig config,
+	public PointTrackerKltPyramid(ConfigKlt config,
 								  double toleranceFB,
 								  int templateRadius,
 								  boolean performPruneClose, PyramidDiscrete<I> pyramid,

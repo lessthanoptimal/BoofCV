@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ import boofcv.struct.pyramid.ImagePyramid;
  */
 public class PyramidKltForCombined<I extends ImageGray<I>, D extends ImageGray<D>> {
 	/** configuration for low level KLT tracker */
-	public KltConfig config;
+	public ConfigKlt config;
 
 	/** The radius of each feature. 3 is a reasonable number. */
 	public int featureRadius;
@@ -42,7 +42,7 @@ public class PyramidKltForCombined<I extends ImageGray<I>, D extends ImageGray<D
 	// the tracker
 	protected PyramidKltTracker<I, D> tracker;
 
-	public PyramidKltForCombined(KltConfig config,
+	public PyramidKltForCombined(ConfigKlt config,
 								 int featureRadius,
 								 int[] pyramidScaling,
 								 Class<I> inputType, Class<D> derivType) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.alg.tracker.sfot;
 
-import boofcv.alg.tracker.klt.KltConfig;
+import boofcv.alg.tracker.klt.ConfigKlt;
 
 /**
  * fContains configuration parameters for {@link SparseFlowObjectTracker}.
@@ -55,10 +55,10 @@ public class SfotConfig {
 	/**
 	 * Basic parameters for tracker.  KltConfig.createDefault() with maxIterations = 50 is suggested.
 	 */
-	public KltConfig trackerConfig;
+	public ConfigKlt trackerConfig;
 
 	public SfotConfig() {
-		trackerConfig = new KltConfig();
+		trackerConfig = new ConfigKlt();
 		trackerConfig.maxIterations = 50;
 	}
 }

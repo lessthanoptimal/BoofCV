@@ -21,7 +21,7 @@ package boofcv.abst.tracker;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.interpolate.InterpolateRectangle;
-import boofcv.alg.tracker.klt.KltConfig;
+import boofcv.alg.tracker.klt.ConfigKlt;
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.misc.BoofMiscOps;
@@ -48,7 +48,7 @@ public class PointTrackerTwoPassKltPyramid<I extends ImageGray<I>,D extends Imag
 	// has finished tracking been called
 	boolean finishedTracking;
 
-	public PointTrackerTwoPassKltPyramid(KltConfig config,
+	public PointTrackerTwoPassKltPyramid(ConfigKlt config,
 										 double toleranceRL,
 										 int templateRadius ,
 										 PyramidDiscrete<I> pyramid,

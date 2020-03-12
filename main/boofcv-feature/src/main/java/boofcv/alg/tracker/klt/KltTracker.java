@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,7 +64,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 	protected InterpolateRectangle<D> interpDeriv;
 
 	// tracker configuration
-	protected KltConfig config;
+	protected ConfigKlt config;
 
 	// feature description curvature information
 	protected float Gxx, Gyy, Gxy;
@@ -106,7 +106,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 
 	public KltTracker(InterpolateRectangle<I> interpInput,
 					  InterpolateRectangle<D> interpDeriv,
-					  KltConfig config) {
+					  ConfigKlt config) {
 		this.interpInput = interpInput;
 		this.interpDeriv = interpDeriv;
 		this.config = config;
@@ -506,7 +506,7 @@ public class KltTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 		return error;
 	}
 
-	public KltConfig getConfig() {
+	public ConfigKlt getConfig() {
 		return config;
 	}
 }

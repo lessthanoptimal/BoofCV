@@ -28,7 +28,7 @@ import boofcv.struct.Configuration;
 public class ConfigPKlt implements Configuration
 {
 	/** configuration for low level KLT tracker */
-	public KltConfig config = new KltConfig();
+	public ConfigKlt config = new ConfigKlt();
 
 	/**
 	 * Forwards-Backwards validation tolerance. If set to a value &ge; 0 it will track features from the current

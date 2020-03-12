@@ -24,8 +24,8 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
 import boofcv.alg.tracker.combined.PyramidKltForCombined;
+import boofcv.alg.tracker.klt.ConfigKlt;
 import boofcv.alg.tracker.klt.ConfigPKlt;
-import boofcv.alg.tracker.klt.KltConfig;
 import boofcv.alg.tracker.klt.KltTracker;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
 import boofcv.factory.interpolate.FactoryInterpolation;
@@ -54,10 +54,10 @@ public class FactoryTrackerAlg {
 	 * @return Tracker
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	KltTracker<I, D> klt(@Nullable KltConfig config, Class<I> imageType , Class<D> derivType )
+	KltTracker<I, D> klt(@Nullable ConfigKlt config, Class<I> imageType , Class<D> derivType )
 	{
 		if( config == null )
-			config = new KltConfig();
+			config = new ConfigKlt();
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
@@ -80,12 +80,12 @@ public class FactoryTrackerAlg {
 	 * @return Tracker
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	PyramidKltTracker<I, D> kltPyramid( @Nullable KltConfig config,
+	PyramidKltTracker<I, D> kltPyramid( @Nullable ConfigKlt config,
 										Class<I> imageType ,
 										Class<D> derivType )
 	{
 		if( config == null )
-			config = new KltConfig();
+			config = new ConfigKlt();
 		if( derivType == null )
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
