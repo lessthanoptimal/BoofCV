@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,10 +21,9 @@ package boofcv.alg.feature.detect.extract;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
+import org.ddogleg.struct.FastQueue;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * <p>Concurrent implementation of {@link NonMaxBlock_MT}. Every row of block is run in its own threads.
@@ -38,8 +37,11 @@ public class NonMaxBlock_MT extends NonMaxBlock {
 
 	// lock for variables below - which are lists used to store work space for individual threads
 	final Object lock = new Object();
-	final List<Search> searches = new ArrayList<>();
-	final List<QueueCorner> cornerLists = new ArrayList<>();
+	final FastQueue<Search> searches = new FastQueue<>(()->search.newInstance());
+
+	// Not owned by lock since everything is predeclared outside of concurrent code
+	final FastQueue<QueueCorner> cornerMinLists = new FastQueue<>(QueueCorner::new,QueueCorner::reset);
+	final FastQueue<QueueCorner> cornerMaxLists = new FastQueue<>(QueueCorner::new,QueueCorner::reset);
 
 	public NonMaxBlock_MT(Search search) {
 		super(search);
@@ -74,25 +76,22 @@ public class NonMaxBlock_MT extends NonMaxBlock {
 		if( range > N*step )
 			N += 1;
 
-		BoofConcurrency.loopFor(0,N, iterY -> {
+		// Predeclare storage for the results
+		cornerMinLists.reset(); cornerMinLists.resize(localMin!=null?N:0);
+		cornerMaxLists.reset(); cornerMaxLists.resize(localMax!=null?N:0);
+		searches.reset();
 
-			NonMaxBlock.Search search;
-			QueueCorner threadMin=null,threadMax=null;
+		BoofConcurrency.loopFor(0,N, iterY -> {
+			final NonMaxBlock.Search search;
 
 			// get work space for this thread
 			synchronized (lock) {
-				if( searches.isEmpty() ) {
-					search = this.search.newInstance();
-				} else {
-					search = searches.remove( searches.size()-1 );
-				}
-				if( search.isDetectMinimums() ) {
-					threadMin = pop();
-				}
-				if( search.isDetectMaximums() ) {
-					threadMax = pop();
-				}
+				search = searches.grow();
 			}
+
+			QueueCorner threadMin=localMin!=null?cornerMinLists.get(iterY):null;
+			QueueCorner threadMax=localMax!=null?cornerMaxLists.get(iterY):null;
+
 			search.initialize(configuration,intensityImage,threadMin,threadMax);
 
 			// search for local peaks along this block row
@@ -106,36 +105,20 @@ public class NonMaxBlock_MT extends NonMaxBlock {
 				search.searchBlock(x,y,x1,y1);
 			}
 
-			// Save the results and recycle thread working space
-			synchronized (lock) {
-				saveResults(localMin, threadMin);
-				saveResults(localMax, threadMax);
 
-				searches.add(search);
-				if( threadMin != null )
-					cornerLists.add(threadMin);
-				if( threadMax != null )
-					cornerLists.add(threadMax);
+			synchronized (lock) {
+				int index = searches.indexOf(search);
+				searches.removeSwap(index);
 			}
 		});
-	}
 
-	private QueueCorner pop() {
-		QueueCorner queue;
-		if (cornerLists.isEmpty()) {
-			queue = new QueueCorner();
-		} else {
-			queue = cornerLists.remove(cornerLists.size() - 1);
-		}
-		queue.reset();
-		return queue;
-	}
-
-	private void saveResults(QueueCorner output, QueueCorner thread) {
-		if( thread != null ) {
-			for (int i = 0; i < thread.size; i++) {
-				output.grow().set(thread.get(i));
-			}
+		// Save results outside of the thread. This ensures the order is not randomized. That was wrecking havoc
+		// on results that needed to be deterministic
+		for (int i = 0; i < N; i++) {
+			if( localMin != null )
+				localMin.addAll(cornerMinLists.get(i));
+			if( localMax != null )
+				localMax.addAll(cornerMaxLists.get(i));
 		}
 	}
 }
