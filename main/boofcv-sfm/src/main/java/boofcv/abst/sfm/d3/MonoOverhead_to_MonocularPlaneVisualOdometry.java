@@ -48,7 +48,6 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 	// motion estimation algorithm
 	VisOdomMonoOverheadMotion2D<T> alg;
 
-
 	ImageType<T> imageType;
 
 	boolean fault;
@@ -105,14 +104,19 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 	}
 
 	@Override
-	public Point3D_F64 getTrackLocation(int index) {
-		computeTracks();
-
-		return points3D.get(index);
+	public long getFrameID() {
+		return alg.getMotion2D().getFrameID();
 	}
 
 	@Override
-	public int getTotal() {
+	public boolean getTrackWorld3D(int index, Point3D_F64 world) {
+		computeTracks();
+		world.set( points3D.get(index) );
+		return true;
+	}
+
+	@Override
+	public int getTotalTracks() {
 		computeTracks();
 		return pixels.size;
 	}
@@ -122,6 +126,11 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 		AccessPointTracks accessPlane = (AccessPointTracks)alg.getMotion2D();
 
 		return accessPlane.getTrackId(index);
+	}
+
+	@Override
+	public void getTrackPixel(int index, Point2D_F64 pixel) {
+		pixel.set( this.pixels.get(index));
 	}
 
 	@Override
@@ -138,17 +147,17 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 	}
 
 	@Override
-	public boolean isInlier(int index) {
+	public boolean isTrackInlier(int index) {
 		AccessPointTracks accessPlane = (AccessPointTracks)alg.getMotion2D();
 
-		return accessPlane.isInlier(index);
+		return accessPlane.isTrackInlier(index);
 	}
 
 	@Override
-	public boolean isNew(int index) {
+	public boolean isTrackNew(int index) {
 		AccessPointTracks accessPlane = (AccessPointTracks)alg.getMotion2D();
 
-		return accessPlane.isNew(index);
+		return accessPlane.isTrackNew(index);
 	}
 
 	private void computeTracks() {

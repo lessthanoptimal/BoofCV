@@ -18,12 +18,15 @@
 
 package boofcv.alg.sfm.d3;
 
+import boofcv.abst.geo.bundle.BundleAdjustment;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BObservation;
 import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BTrack;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.testing.BoofTesting;
@@ -48,13 +51,18 @@ import static org.junit.jupiter.api.Assertions.*;
 class TestVisOdomBundleAdjustment {
 	Random rand = BoofTesting.createRandom(0);
 	CameraPinholeBrown pinhole = new CameraPinholeBrown(400,400,0,500,500,1000,1000);
+	BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(null);
+
+	public TestVisOdomBundleAdjustment() {
+		bundleAdjustment.configure(1e-3, 1e-3, 3);
+	}
 
 	/**
 	 * Perfect input and very little should change
 	 */
 	@Test
 	void optimize_perfect() {
-		var alg = new VisOdomBundleAdjustment<>(BTrack::new);
+		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
 		createPerfectScene(alg);
 		alg.optimize();
 		assertEquals(0.0, alg.bundleAdjustment.getFitScore(), 1e-4);
@@ -65,7 +73,7 @@ class TestVisOdomBundleAdjustment {
 	 */
 	@Test
 	void optimize_noise() {
-		var alg = new VisOdomBundleAdjustment<>(BTrack::new);
+		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
 		createPerfectScene(alg);
 		// Perfect observations with less than perfect location estimates
 		for (int i = 5; i < alg.tracks.size-5; i++) {
@@ -88,10 +96,10 @@ class TestVisOdomBundleAdjustment {
 
 	@Test
 	void addObservation() {
-		var alg = new VisOdomBundleAdjustment<>(BTrack::new);
+		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
 
 		BFrame frameA = alg.addFrame(0);
-		BTrack trackA = alg.addTrack(0,1,2,3,3);
+		BTrack trackA = alg.addTrack(1,2,3,3);
 
 		alg.addObservation(frameA,trackA,5,10);
 		assertEquals(1,frameA.tracks.size);
@@ -103,19 +111,17 @@ class TestVisOdomBundleAdjustment {
 
 	@Test
 	void addTrack() {
-		var alg = new VisOdomBundleAdjustment<>(BTrack::new);
-		BTrack trackA = alg.addTrack(0,1,2,3,3);
-		BTrack trackB = alg.addTrack(1,1,2,3,4);
-		BTrack trackC = alg.addTrack(2,1,2,3,5);
+		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
+		BTrack trackA = alg.addTrack(1,2,3,3);
+		BTrack trackB = alg.addTrack(1,2,3,4);
+		BTrack trackC = alg.addTrack(1,2,3,5);
 
 		assertEquals(3, alg.tracks.size);
 		assertTrue(alg.tracks.contains(trackA));
 		assertTrue(alg.tracks.contains(trackB));
 		assertTrue(alg.tracks.contains(trackC));
 
-		assertEquals(1,trackB.id);
 		assertEquals(0.0,trackB.worldLoc.distance(new Point4D_F64(1,2,3,4)), UtilEjml.TEST_F64);
-		assertEquals(2,trackC.id);
 		assertEquals(0.0,trackC.worldLoc.distance(new Point4D_F64(1,2,3,5)), UtilEjml.TEST_F64);
 
 		trackA.observations.grow();
@@ -123,27 +129,25 @@ class TestVisOdomBundleAdjustment {
 
 		// Test recycle
 		alg.reset();
-		trackA = alg.addTrack(2,2,2,3,3);
-		trackB = alg.addTrack(3,2,2,3,4);
-		trackC = alg.addTrack(4,2,2,3,5);
+		trackA = alg.addTrack(2,2,3,3);
+		trackB = alg.addTrack(2,2,3,4);
+		trackC = alg.addTrack(2,2,3,5);
 
 		assertTrue(alg.tracks.contains(trackA));
 		assertTrue(alg.tracks.contains(trackB));
 		assertTrue(alg.tracks.contains(trackC));
 
 		assertEquals(0,trackB.observations.size);
-		assertEquals(3,trackB.id);
 		assertEquals(0.0,trackB.worldLoc.distance(new Point4D_F64(2,2,3,4)), UtilEjml.TEST_F64);
 		assertEquals(0,trackC.observations.size);
-		assertEquals(4,trackC.id);
 		assertEquals(0.0,trackC.worldLoc.distance(new Point4D_F64(2,2,3,5)), UtilEjml.TEST_F64);
 	}
 
 	@Test
 	void addFrame() {
-		var alg = new VisOdomBundleAdjustment<>(BTrack::new);
+		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
 		BFrame frameA = alg.addFrame(0);
-		frameA.frameToWorld.T.x = 10;
+		frameA.frame_to_world.T.x = 10;
 
 		// Very simple test
 		assertEquals(1,alg.frames.size);
@@ -155,7 +159,7 @@ class TestVisOdomBundleAdjustment {
 		assertEquals(1,alg.frames.size);
 		assertSame(frameA,alg.frames.get(0));
 		assertEquals(2,frameA.id);
-		assertEquals(0,frameA.frameToWorld.T.x, UtilEjml.TEST_F64);
+		assertEquals(0,frameA.frame_to_world.T.x, UtilEjml.TEST_F64);
 
 		// Add one more frame now
 		BFrame frameB = alg.addFrame(11);
@@ -166,13 +170,13 @@ class TestVisOdomBundleAdjustment {
 
 	@Test
 	void removeFrame() {
-		var alg = new VisOdomBundleAdjustment<>(BTrack::new);
+		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
 		BFrame frameA = alg.addFrame(0);
 		BFrame frameB = alg.addFrame(1);
 
-		BTrack trackA = alg.addTrack(0,1,2,3,4);
-		BTrack trackB = alg.addTrack(1,1,2,3,4);
-		BTrack trackC = alg.addTrack(2,1,2,3,4);
+		BTrack trackA = alg.addTrack(1,2,3,4);
+		BTrack trackB = alg.addTrack(1,2,3,4);
+		BTrack trackC = alg.addTrack(1,2,3,4);
 
 		alg.addObservation(frameA,trackA,1,2);
 		alg.addObservation(frameA,trackC,1,3);
@@ -189,7 +193,7 @@ class TestVisOdomBundleAdjustment {
 
 	@Test
 	void getFirstFrame() {
-		var alg = new VisOdomBundleAdjustment<>(BTrack::new);
+		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
 		BFrame frameA = alg.frames.grow();
 		assertSame(frameA,alg.getFirstFrame());
 		alg.frames.grow();
@@ -198,7 +202,7 @@ class TestVisOdomBundleAdjustment {
 
 	@Test
 	void getLastFrame() {
-		var alg = new VisOdomBundleAdjustment<>(BTrack::new);
+		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
 		BFrame frameA = alg.frames.grow();
 		assertSame(frameA,alg.getLastFrame());
 		BFrame frameB = alg.frames.grow();
@@ -264,17 +268,17 @@ class TestVisOdomBundleAdjustment {
 
 		for (int i = 0; i < cloud.size(); i++) {
 			Point3D_F64 X = cloud.get(i);
-			vsba.addTrack(i,X.x,X.y,X.z,1.0).active = true;
+			vsba.addTrack(X.x,X.y,X.z,1.0).active = true;
 		}
 
 		for (int viewidx = 0; viewidx < 5; viewidx++) {
 			BFrame frame = vsba.addFrame(viewidx);
-			frame.frameToWorld.set(-1+2.0*viewidx/4.0,0,0, EulerType.XYZ,rand.nextGaussian()*0.1,0,0);
+			frame.frame_to_world.set(-1+2.0*viewidx/4.0,0,0, EulerType.XYZ,rand.nextGaussian()*0.1,0,0);
 
 			// add visible features to each view
 			for (int i = 0; i < cloud.size(); i++) {
 				Point3D_F64 X = cloud.get(i);
-				frame.frameToWorld.transformReverse(X,Xv);
+				frame.frame_to_world.transformReverse(X,Xv);
 				if( Xv.z <= 0 )
 					continue;
 

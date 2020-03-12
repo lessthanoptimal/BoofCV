@@ -75,13 +75,14 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 	}
 
 	@Override
-	public Point3D_F64 getTrackLocation(int index) {
+	public boolean getTrackWorld3D(int index, Point3D_F64 world ) {
 		VisOdomDualTrackPnP.LeftTrackInfo info = alg.getCandidates().get(index).getCookie();
-		return info.location.location;
+		world.set( info.location.location );
+		return true;
 	}
 
 	@Override
-	public int getTotal() {
+	public int getTotalTracks() {
 		return alg.getCandidates().size();
 	}
 
@@ -91,18 +92,23 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 	}
 
 	@Override
+	public void getTrackPixel(int index, Point2D_F64 pixel) {
+		pixel.set( alg.getCandidates().get(index).pixel );
+	}
+
+	@Override
 	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
 		return PointTrack.extractTrackPixels(storage,alg.getCandidates());
 	}
 
 	@Override
-	public boolean isInlier(int index) {
+	public boolean isTrackInlier(int index) {
 		VisOdomDualTrackPnP.LeftTrackInfo info = alg.getCandidates().get(index).getCookie();
-		return info.lastInlier == alg.getTick();
+		return info.lastInlier == alg.getFrameID();
 	}
 
 	@Override
-	public boolean isNew(int index) {
+	public boolean isTrackNew(int index) {
 		return false;
 	}
 
@@ -132,6 +138,11 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 	@Override
 	public Se3_F64 getCameraToWorld() {
 		return alg.getCurrToWorld();
+	}
+
+	@Override
+	public long getFrameID() {
+		return alg.getFrameID();
 	}
 
 	@Override

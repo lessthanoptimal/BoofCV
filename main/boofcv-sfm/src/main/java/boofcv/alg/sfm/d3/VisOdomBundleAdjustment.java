@@ -23,13 +23,12 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
-import boofcv.factory.geo.ConfigBundleAdjustment;
-import boofcv.factory.geo.FactoryMultiView;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.set.hash.TLongHashSet;
-import org.ddogleg.optimization.lm.ConfigLevenbergMarquardt;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.Factory;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
@@ -46,6 +45,9 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	public final FastQueue<T> tracks;
 	public final FastQueue<BFrame> frames = new FastQueue<>(BFrame::new,BFrame::reset);
 
+	/** Minimum number of observations a feature must have to be included */
+	@Getter @Setter private int minObservations = 2;
+
 	BundlePinholeBrown camera;
 
 	SceneStructureMetric structure = new SceneStructureMetric(true);
@@ -53,16 +55,10 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 
 	BundleAdjustment<SceneStructureMetric> bundleAdjustment;
 
-	public VisOdomBundleAdjustment( Factory<T> factoryTracks ) {
-		tracks = new FastQueue<>(factoryTracks,BTrack::reset);
-
-		ConfigLevenbergMarquardt configLM = new ConfigLevenbergMarquardt();
-		configLM.dampeningInitial = 1e-3;
-		configLM.hessianScaling = true;
-		ConfigBundleAdjustment configSBA = new ConfigBundleAdjustment();
-		configSBA.configOptimizer = configLM;
-		bundleAdjustment = FactoryMultiView.bundleSparseMetric(configSBA);
-		bundleAdjustment.configure(1e-3, 1e-3, 3);
+	public VisOdomBundleAdjustment( BundleAdjustment<SceneStructureMetric> bundleAdjustment,
+									Factory<T> factoryTracks ) {
+		this.tracks = new FastQueue<>(factoryTracks,BTrack::reset);
+		this.bundleAdjustment = bundleAdjustment;
 	}
 
 	/**
@@ -86,7 +82,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		int totalBundleTracks = 0;
 		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
 			BTrack t = tracks.get(trackIdx);
-			if (t.active && t.observations.size > 1)
+			if (t.active && t.observations.size >= minObservations)
 				totalBundleTracks++;
 		}
 
@@ -98,7 +94,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		// TODO make the first frame at origin. This is done to avoid numerical after traveling a good distance
 		final var worldToFrame = new Se3_F64();
 		for (int frameIdx = 0; frameIdx < frames.size; frameIdx++) {
-			frames.get(frameIdx).frameToWorld.invert(worldToFrame);
+			frames.get(frameIdx).frame_to_world.invert(worldToFrame);
 			structure.setView(frameIdx,frameIdx==0,worldToFrame);
 			structure.connectViewToCamera(frameIdx,0);
 			frames.get(frameIdx).listIndex = frameIdx; // save the index since it's needed in the next loop
@@ -109,7 +105,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		int featureBundleIdx = 0;
 		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
 			BTrack t = tracks.get(trackIdx);
-			if( !t.active || t.observations.size <= 1)
+			if( !t.active || t.observations.size < minObservations)
 				continue;
 			Point4D_F64 p = t.worldLoc;
 			structure.setPoint(featureBundleIdx,p.x,p.y,p.z,p.w);
@@ -134,13 +130,13 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		// skip the first frame since it's fixed
 		for (int frameIdx = 1; frameIdx < frames.size; frameIdx++) {
 			BFrame frame = frames.get(frameIdx);
-			structure.views.get(frameIdx).worldToView.invert(frame.frameToWorld);
+			structure.views.get(frameIdx).worldToView.invert(frame.frame_to_world);
 		}
 
 		int featureIdx = 0;
 		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
 			BTrack t = tracks.get(trackIdx);
-			if( !t.active || t.observations.size <= 1)
+			if( !t.active || t.observations.size < minObservations)
 				continue;
 			SceneStructureMetric.Point sp = structure.points.get(featureIdx);
 			sp.get(t.worldLoc);
@@ -163,9 +159,8 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		frame.tracks.add(track);
 	}
 
-	public T addTrack( long id , double x , double y , double z , double w ) {
+	public T addTrack( double x , double y , double z , double w ) {
 		T track = tracks.grow();
-		track.id = id;
 		track.worldLoc.set(x,y,z,w);
 		return track;
 	}
@@ -180,7 +175,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	 * Removes the frame and all references to it. If a track has no observations after this
 	 * it is also removed from the master list.
 	 */
-	public void removeFrame( BFrame frame , List<BTrack> removedTracks ) {
+	public void removeFrame( BFrame frame , List<PointTrack> removedTracks ) {
 		removedTracks.clear();
 		int index = frames.indexOf(frame);
 		if( index < 0 )
@@ -206,7 +201,13 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 			// Search through all observations and remove the ones not in use nay more
 			for (int i = tracks.size - 1; i >= 0; i--) {
 				if (tracks.get(i).observations.size == 0) {
-					removedTracks.add(tracks.removeSwap(i));
+					BTrack t = tracks.removeSwap(i);
+					if( t.trackerTrack != null ) {
+						removedTracks.add(t.trackerTrack);
+						if( t.trackerTrack.cookie != t )
+							throw new RuntimeException("BUG!");
+						t.trackerTrack = null; // mark it as null so that we know it has been dropped
+					}
 				}
 			}
 		}
@@ -262,7 +263,12 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 
 	public static class BTrack
 	{
+		// the ID of the PointTrack which created this
 		public long id;
+		/**
+		 * Reference to the image feature tracker track.
+		 * if null that means the track is no longer being tracked by the tracker
+		 */
 		public PointTrack trackerTrack;
 		public final Point4D_F64 worldLoc = new Point4D_F64();
 		public final FastQueue<BObservation> observations = new FastQueue<>(BObservation::new, BObservation::reset);
@@ -278,10 +284,11 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		}
 
 		public void reset() {
-			id = -1;
 			worldLoc.set(0,0,0,0);
 			observations.reset();
 			active = false;
+			trackerTrack = null;
+			id = -1;
 		}
 
 		/**
@@ -297,6 +304,11 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 			}
 			return false;
 		}
+
+		@Override
+		public boolean equals(Object obj) {
+			return this == obj;
+		}
 	}
 
 	/**
@@ -310,14 +322,14 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		// List of tracks that were observed in this BFrame
 		public final FastArray<BTrack> tracks = new FastArray<>(BTrack.class);
 		// current estimated transform to world from this view
-		public final Se3_F64 frameToWorld = new Se3_F64();
+		public final Se3_F64 frame_to_world = new Se3_F64();
 		public int listIndex; // index in the list of BFrames
 
 		public void reset() {
 			id = -1;
 			listIndex = -1;
 			tracks.reset();
-			frameToWorld.reset();
+			frame_to_world.reset();
 		}
 	}
 }

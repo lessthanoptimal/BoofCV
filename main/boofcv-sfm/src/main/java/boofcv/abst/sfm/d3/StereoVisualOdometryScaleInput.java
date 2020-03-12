@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -89,5 +89,10 @@ public class StereoVisualOdometryScaleInput<T extends ImageBase<T>> implements S
 	@Override
 	public Se3_F64 getCameraToWorld() {
 		return alg.getCameraToWorld();
+	}
+
+	@Override
+	public long getFrameID() {
+		return alg.getFrameID();
 	}
 }

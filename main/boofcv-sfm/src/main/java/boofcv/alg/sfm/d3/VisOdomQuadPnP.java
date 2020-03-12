@@ -35,6 +35,7 @@ import georegression.struct.EulerType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
+import lombok.Getter;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastAccess;
@@ -98,6 +99,9 @@ public class VisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc> {
 	private Se3_F64 newToOld = new Se3_F64();
 	// transform from the current camera view to the world frame
 	private Se3_F64 leftCamToWorld = new Se3_F64();
+
+	/** Unique ID for each frame processed */
+	private @Getter long frameID = -1;
 
 	// number of frames that have been processed
 	// is this the first frame
@@ -163,6 +167,7 @@ public class VisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc> {
 		newToOld.reset();
 		leftCamToWorld.reset();
 		first = true;
+		frameID = -1;
 	}
 
 	/**
@@ -172,7 +177,7 @@ public class VisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc> {
 	 * @return true if motion was estimated and false if not
 	 */
 	public boolean process( T left , T right ) {
-
+		frameID++;
 		if( first ) {
 			associateL2R(left, right);
 			first = false;

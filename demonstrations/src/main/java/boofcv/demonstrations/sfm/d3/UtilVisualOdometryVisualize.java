@@ -16,23 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.abst.sfm;
-
-import georegression.struct.point.Point3D_F64;
+package boofcv.demonstrations.sfm.d3;
 
 /**
- * Provides information on point feature based SFM tracking algorithm
- *
  * @author Peter Abeles
  */
-public interface AccessPointTracks3D extends AccessPointTracks {
-
-	/**
-	 * Returns the 3D location of the active track.
-	 *
-	 * @param index The track's index in the active list
-	 * @param world The world coordinate of the track
-	 * @return true if there's a location estimate or false if there isn't
-	 */
-	boolean getTrackWorld3D(int index , Point3D_F64 world );
+public class UtilVisualOdometryVisualize {
 }

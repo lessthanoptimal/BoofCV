@@ -34,7 +34,7 @@ public interface AccessPointTracks {
 	/**
 	 * Returns the total number of tracks
 	 */
-	int getTotal();
+	int getTotalTracks();
 
 	/**
 	 * Used to get the track ID of an active Track
@@ -45,10 +45,20 @@ public interface AccessPointTracks {
 	long getTrackId( int index );
 
 	/**
+	 * Gets the observed coordinate of a feature in the input image.
+	 *
+	 * @param index Which point in the list
+	 * @param pixel Where the coordinate will be writen to.
+	 *
+	 */
+	void getTrackPixel(int index , Point2D_F64 pixel );
+
+	/**
 	 * All the points being actively tracked in pixel coordinates.
 	 *
 	 * @return all active tracks in pixel coordinates
 	 */
+	@Deprecated
 	List<Point2D_F64> getAllTracks( @Nullable List<Point2D_F64> storage );
 
 	/**
@@ -57,7 +67,7 @@ public interface AccessPointTracks {
 	 * @param index The index in all
 	 * @return if it is an inlier or not
 	 */
-	boolean isInlier( int index );
+	boolean isTrackInlier(int index );
 
 	/**
 	 * True if the specified track was just spawned
@@ -65,6 +75,6 @@ public interface AccessPointTracks {
 	 * @param index The index in all
 	 * @return if it is new or not
 	 */
-	boolean isNew( int index );
+	boolean isTrackNew(int index );
 
 }

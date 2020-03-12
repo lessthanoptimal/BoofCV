@@ -108,8 +108,6 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 	// transform from the current camera view to the world frame
 	private Se3_F64 currToWorld = new Se3_F64();
 
-	// number of frames that have been processed
-	private int tick;
 	// is this the first frame
 	private boolean first = true;
 
@@ -171,7 +169,6 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 		keyToWorld.reset();
 		currToKey.reset();
 		first = true;
-		tick = 0;
 	}
 
 	/**
@@ -187,7 +184,6 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 		this.inputLeft = left;
 		this.inputRight = right;
 
-		tick++;
 		trackerLeft.process(left);
 		trackerRight.process(right);
 
@@ -280,7 +276,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 		for( int i = 0; i < N; i++ ) {
 			int index = matcher.getInputIndex(i);
 			LeftTrackInfo info = candidates.get(index).getCookie();
-			info.lastInlier = tick;
+			info.lastInlier = getFrameID();
 		}
 
 //		System.out.println("Inlier set size: "+N);
@@ -308,11 +304,12 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 	 * Searches for tracks which are active and meet the epipolar constraints
 	 */
 	private void selectCandidateTracks() {
+		final long frameID = getFrameID();
 		// mark tracks in right frame that are active
 		List<PointTrack> activeRight = trackerRight.getActiveTracks(null);
 		for( PointTrack t : activeRight ) {
 			RightTrackInfo info = t.getCookie();
-			info.lastActiveList = tick;
+			info.lastActiveList = frameID;
 		}
 
 		int mutualActive = 0;
@@ -327,13 +324,13 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 
 			// for each active left track, see if its right track has been marked as active
 			RightTrackInfo infoRight = info.right.getCookie();
-			if( infoRight.lastActiveList != tick ) {
+			if( infoRight.lastActiveList != frameID ) {
 				continue;
 			}
 
 			// check epipolar constraint and see if it is still valid
 			if( stereoCheck.checkPixel(left.pixel, info.right.pixel) ) {
-				info.lastConsistent = tick;
+				info.lastConsistent = frameID;
 				candidates.add(left);
 			}
 			mutualActive++;
@@ -353,13 +350,13 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 	 * @return Number of dropped tracks
 	 */
 	private int dropUnusedTracks() {
-
+		long frameID = getFrameID();
 		List<PointTrack> all = trackerLeft.getAllTracks(null);
 		int num = 0;
 
 		for( PointTrack t : all ) {
 			LeftTrackInfo info = t.getCookie();
-			if( tick - info.lastInlier > thresholdRetire ) {
+			if( frameID - info.lastInlier > thresholdRetire ) {
 				if( !trackerLeft.dropTrack(t) )
 					throw new IllegalArgumentException("failed to drop unused left track");
 				if( !trackerRight.dropTrack(info.right) )
@@ -393,6 +390,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 	 * Spawns tracks in each image and associates features together.
 	 */
 	private void addNewTracks() {
+		final long frameID = getFrameID();
 		trackerLeft.spawnTracks();
 		trackerRight.spawnTracks();
 
@@ -441,7 +439,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 				SePointOps_F64.transform(currToKey,cameraP3,p2d3d.location);
 				// save a reference to the matching track in the right camera frame
 				infoLeft.right = trackR;
-				infoLeft.lastConsistent = infoLeft.lastInlier = tick;
+				infoLeft.lastConsistent = infoLeft.lastInlier = frameID;
 				infoRight.left = trackL;
 			} else {
 				// triangulation failed, drop track
@@ -511,8 +509,8 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 		return currToWorld;
 	}
 
-	public int getTick() {
-		return tick;
+	public long getFrameID() {
+		return trackerLeft.getFrameID();
 	}
 
 	/**
@@ -546,9 +544,9 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 	{
 		public Stereo2D3D location = new Stereo2D3D();
 		// last time the track was declared as being geometrically consistent
-		public int lastConsistent;
+		public long lastConsistent;
 		// last time it was in the inlier list
-		public int lastInlier;
+		public long lastInlier;
 		// right camera track it is associated with
 		public PointTrack right;
 	}
@@ -556,7 +554,7 @@ public class VisOdomDualTrackPnP<T extends ImageBase<T>,Desc extends TupleDesc> 
 	public static class RightTrackInfo
 	{
 		// used to see if the right track is currently in the active list
-		public int lastActiveList;
+		public long lastActiveList;
 		// left camera track it is associated with
 		public PointTrack left;
 	}

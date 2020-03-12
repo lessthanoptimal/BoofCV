@@ -234,7 +234,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 		List<Point2D_F64> inliers = new ArrayList<>();
 
 		for( int i = 0; i < tracks.size(); i++ ) {
-			if( access.isInlier(i) )
+			if( access.isTrackInlier(i) )
 				inliers.add( tracks.get(i) );
 		}
 

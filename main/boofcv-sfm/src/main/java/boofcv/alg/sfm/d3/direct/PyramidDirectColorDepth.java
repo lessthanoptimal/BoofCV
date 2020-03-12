@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 import boofcv.struct.pyramid.ImagePyramid;
 import georegression.struct.se.Se3_F32;
+import lombok.Getter;
 
 /**
  * <p>Adds a pyramidal implementation on top of {@link VisOdomDirectColorDepth} to enable it to handle larger motions
@@ -60,6 +61,9 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 	private Se3_F32 work = new Se3_F32();
 	private Se3_F32 worldToCurrent = new Se3_F32();
 
+	/** Unique ID for each frame in the sequence it has processed */
+	private @Getter long frameID=-1;
+
 	public PyramidDirectColorDepth(ImagePyramid<Planar<T>> pyramid ) {
 		this.pyramid = pyramid;
 		imageType = this.pyramid.getImageType();
@@ -92,7 +96,7 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 	}
 
 	public boolean process( Planar<T> input , ImagePixelTo3D inputDepth ) {
-
+		frameID++;
 		if( fractionInBounds == 0 ) {
 			setKeyFrame( input, inputDepth );
 			fractionInBounds = 1.0;

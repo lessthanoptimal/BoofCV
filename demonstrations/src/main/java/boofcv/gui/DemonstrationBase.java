@@ -289,7 +289,10 @@ public abstract class DemonstrationBase extends JPanel {
 				openFile(new File(p.path[0]));
 			else {
 //				openFile(new File(p.path[0]));
-				openImageSet(false,p.path);
+				if( allowImages )
+					openImageSet(false,p.path);
+				else
+					openVideo(false,p.path);
 			}
 		} else if (o instanceof String) {
 			openFile(new File((String) o));
@@ -394,7 +397,7 @@ public abstract class DemonstrationBase extends JPanel {
 			updateRecentItems();
 		});
 
-		BufferedImage buffered = inputFilePath.endsWith("mjpeg") ? null : UtilImageIO.loadImage(inputFilePath);
+		BufferedImage buffered = inputFilePath.endsWith("mjpeg") || !allowImages ? null : UtilImageIO.loadImage(inputFilePath);
 		if( buffered == null ) {
 			if( allowVideos )
 				openVideo(false,inputFilePath);
@@ -443,7 +446,7 @@ public abstract class DemonstrationBase extends JPanel {
 	public void openImageSet(boolean reopen, String ...files ) {
 		synchronized (lockStartingProcess) {
 			if( startingProcess ) {
-				System.out.println("Ignoring open image set request.  Detected spamming");
+				System.out.println("Ignoring openImageSet() request.  Detected spamming");
 				return;
 			}
 			startingProcess = true;
@@ -541,6 +544,7 @@ public abstract class DemonstrationBase extends JPanel {
 			if (inputStreams.size() != filePaths.length)
 				throw new IllegalArgumentException("Input streams not equal to "+filePaths.length+".  Override openVideo()");
 		}
+		inputFileSet = filePaths;
 
 		stopAllInputProcessing();
 

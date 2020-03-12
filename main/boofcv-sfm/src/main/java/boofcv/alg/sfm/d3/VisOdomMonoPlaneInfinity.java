@@ -142,8 +142,6 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	private Se2_F64 closeMotionKeyToCurr;
 	private int closeInlierCount; // inliers count for close points on plane
 
-	// number of frames processed.  used to decide when tracks should get dropped
-	private int tick = 0;
 	// is this the first frame being processed?
 	private boolean first = true;
 
@@ -198,7 +196,6 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	 * Resets the algorithm into its initial state
 	 */
 	public void reset() {
-		tick = 0;
 		first = true;
 		tracker.reset();
 		keyToWorld.reset();
@@ -216,8 +213,6 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	public boolean process(T image) {
 		// update feature tracks
 		tracker.process(image);
-
-		tick++;
 
 		if (first) {
 			// start motion estimation by spawning tracks and estimating their pose
@@ -301,7 +296,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 				p.onPlane = false;
 			}
 
-			p.lastInlier = tick;
+			p.lastInlier = tracker.getFrameID();
 		}
 	}
 
@@ -315,10 +310,11 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 
 		List<PointTrack> all = tracker.getAllTracks(null);
 		int num = 0;
+		long frameID = tracker.getFrameID();
 
 		for (PointTrack t : all) {
 			VoTrack p = t.getCookie();
-			if (tick - p.lastInlier > thresholdRetire) {
+			if (frameID - p.lastInlier > thresholdRetire) {
 				tracker.dropTrack(t);
 				num++;
 			}
@@ -462,7 +458,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 			VoTrack p = t.getCookie();
 
 			if (UtilAngle.dist(farAngles.get(i), farAngle) <= thresholdFarAngleError) {
-				p.lastInlier = tick;
+				p.lastInlier = tracker.getFrameID();
 				farInlierCount++;
 			}
 		}
@@ -487,7 +483,7 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 		for (int i = 0; i < closeInlierCount; i++) {
 			int index = planeMotion.getInputIndex(i);
 			VoTrack p = tracksOnPlane.get(index).getCookie();
-			p.lastInlier = tick;
+			p.lastInlier = tracker.getFrameID();;
 		}
 
 		return true;
@@ -536,8 +532,8 @@ public class VisOdomMonoPlaneInfinity<T extends ImageBase<T>> {
 	 * Number of frames processed
 	 * @return Number of frames processed
 	 */
-	public int getTick() {
-		return tick;
+	public long getFrameID() {
+		return tracker.getFrameID();
 	}
 
 	/**

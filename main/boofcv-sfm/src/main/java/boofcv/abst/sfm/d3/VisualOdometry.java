@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ public interface VisualOdometry<M> {
 	/**
 	 * Forget past history and tracking results, returning it to its initial state.
 	 */
-	public void reset();
+	void reset();
 
 	/**
 	 * If a fatal error occurred while updating its state then this function will return true.
@@ -40,7 +40,7 @@ public interface VisualOdometry<M> {
 	 *
 	 * @return true if a fatal error has occurred.
 	 */
-	public boolean isFault();
+	boolean isFault();
 
 	/**
 	 * Returns the estimated motion relative to the first frame in which a fatal error
@@ -48,5 +48,10 @@ public interface VisualOdometry<M> {
 	 *
 	 * @return Found pose.
 	 */
-	public M getCameraToWorld();
+	M getCameraToWorld();
+
+	/**
+	 * Returns the ID of the most recently processed frame. Starts at zero and increments with each call to process.
+	 */
+	long getFrameID();
 }

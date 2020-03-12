@@ -63,13 +63,13 @@ import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
+import org.ddogleg.struct.GrowQueue_F64;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -122,43 +122,44 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 
 	private void drawFeatures( AccessPointTracks3D tracker , BufferedImage image )  {
 
-		numInliers=0;
 
 		Graphics2D g2 = image.createGraphics();
 
-		List<Point2D_F64> points = tracker.getAllTracks(null);
-
-		if( points.size() == 0 )
+		numInliers=0;
+		int N = numTracks = tracker.getTotalTracks();
+		if( N == 0 )
 			return;
 
-		double ranges[] = new double[points.size() ];
+		var ranges = new GrowQueue_F64(N);
 
-		for( int i = 0; i < points.size(); i++ ) {
-			ranges[i] = tracker.getTrackLocation(i).z;
+		var world = new Point3D_F64();
+		for( int i = 0; i < N; i++ ) {
+			tracker.getTrackWorld3D(i, world);
+			ranges.add(world.z);
 		}
-		Arrays.sort(ranges);
-		double maxRange = ranges[(int)(ranges.length*0.8)];
+		ranges.sort();
+		double maxRange = ranges.getFraction(0.8);
 
-		for( int i = 0; i < points.size(); i++ ) {
-			Point2D_F64 pixel = points.get(i);
+		var pixel = new Point2D_F64();
+		for( int i = 0; i < N; i++ ) {
+			tracker.getTrackPixel(i,pixel);
 
-			if( showTracks && tracker.isNew(i) ) {
-				VisualizeFeatures.drawPoint(g2,(int)pixel.x,(int)pixel.y,3,Color.GREEN);
-				continue;
-			}
-
-			if( tracker.isInlier(i) ) {
+			if( tracker.isTrackInlier(i) ) {
 				if( showInliers )
 					VisualizeFeatures.drawPoint(g2,(int)pixel.x,(int)pixel.y,7,Color.BLUE,false);
 				numInliers++;
 			}
 
+			if( showTracks && tracker.isTrackNew(i) ) {
+				VisualizeFeatures.drawPoint(g2,(int)pixel.x,(int)pixel.y,3,Color.GREEN);
+				continue;
+			}
+
 			if( !showTracks )
 				continue;
 
-			Point3D_F64 p3 = tracker.getTrackLocation(i);
-
-			double r = p3.z/maxRange;
+			tracker.getTrackWorld3D(i,world);
+			double r = world.z/maxRange;
 			if( r < 0 ) r = 0;
 			else if( r > 1 ) r = 1;
 
@@ -167,16 +168,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 
 			VisualizeFeatures.drawPoint(g2,(int)pixel.x,(int)pixel.y,3,new Color(color));
 		}
-
-		numTracks = points.size();
-
-//		g2.setColor(Color.BLACK);
-//		g2.fillRect(25,15,80,45);
-//		g2.setColor(Color.CYAN);
-//		g2.drawString("Total: " + numTracks, 30, 30);
-//		g2.drawString("Inliers: "+numInliers,30,50);
 	}
-
 
 	@Override
 	protected void process(SimpleImageSequence<I> sequence1, SimpleImageSequence<I> sequence2 ) {

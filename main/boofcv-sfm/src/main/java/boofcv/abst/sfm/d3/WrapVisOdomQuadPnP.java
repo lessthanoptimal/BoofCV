@@ -71,20 +71,25 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	}
 
 	@Override
-	public Point3D_F64 getTrackLocation(int index) {
+	public boolean getTrackWorld3D(int index, Point3D_F64 world) {
 		FastQueue<VisOdomQuadPnP.QuadView> features =  alg.getQuadViews();
-
-		return features.get(index).X;
+		world.set( features.get(index).X );
+		return true;
 	}
 
 	@Override
-	public int getTotal() {
+	public int getTotalTracks() {
 		return alg.getQuadViews().size;
 	}
 
 	@Override
 	public long getTrackId(int index) {
 		return 0;
+	}
+
+	@Override
+	public void getTrackPixel(int index, Point2D_F64 pixel) {
+		pixel.set(alg.getQuadViews().get(index).v2);
 	}
 
 	@Override
@@ -103,7 +108,7 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	}
 
 	@Override
-	public boolean isInlier(int index) {
+	public boolean isTrackInlier(int index) {
 		ModelMatcher<Se3_F64, Stereo2D3D> matcher = alg.getMatcher();
 		int N = matcher.getMatchSet().size();
 		for( int i = 0; i < N; i++ ) {
@@ -114,7 +119,7 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	}
 
 	@Override
-	public boolean isNew(int index) {
+	public boolean isTrackNew(int index) {
 		return false;// its always new
 	}
 
@@ -142,6 +147,11 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	@Override
 	public Se3_F64 getCameraToWorld() {
 		return alg.getLeftToWorld();
+	}
+
+	@Override
+	public long getFrameID() {
+		return alg.getFrameID();
 	}
 
 	@Override

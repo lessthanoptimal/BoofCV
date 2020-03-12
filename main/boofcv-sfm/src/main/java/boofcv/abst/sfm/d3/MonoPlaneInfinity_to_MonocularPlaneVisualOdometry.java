@@ -54,8 +54,6 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	// list of active tracks
 	List<PointTrack> active = null;
 
-	Point3D_F64 point3D = new Point3D_F64();
-
 	public MonoPlaneInfinity_to_MonocularPlaneVisualOdometry(VisOdomMonoPlaneInfinity<T> alg,
 															 DistancePlane2DToPixelSq distance,
 															 GenerateSe2_PlanePtPixel generator,
@@ -111,33 +109,35 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	}
 
 	@Override
-	public Point3D_F64 getTrackLocation(int index) {
+	public long getFrameID() {
+		return alg.getFrameID();
+	}
+
+	@Override
+	public boolean getTrackWorld3D(int index, Point3D_F64 world ) {
 		if( active == null )
 			active = alg.getTracker().getActiveTracks(null);
-
-		active.get(index);
-
 		VisOdomMonoPlaneInfinity.VoTrack track = active.get(index).getCookie();
 
 		if( track.onPlane ) {
-			point3D.x = -track.ground.y;
-			point3D.z = track.ground.x;
-			point3D.y = 0;
+			world.x = -track.ground.y;
+			world.z = track.ground.x;
+			world.y = 0;
 
 		} else {
 			// just put it some place far away
-			point3D.x = -track.ground.y*1000;
-			point3D.z = track.ground.x*1000;
-			point3D.y = 0;
+			world.x = -track.ground.y*1000;
+			world.z = track.ground.x*1000;
+			world.y = 0;
 		}
 
 //		SePointOps_F64.transform(cameraToWorld,point3D,point3D);
 
-		return point3D;
+		return true;
 	}
 
 	@Override
-	public int getTotal() {
+	public int getTotalTracks() {
 		if( active == null )
 			active = alg.getTracker().getActiveTracks(null);
 		return active.size();
@@ -150,6 +150,11 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 
 		PointTrack t = active.get(index);
 		return t.featureId;
+	}
+
+	@Override
+	public void getTrackPixel(int index, Point2D_F64 pixel) {
+		pixel.set( active.get(index).pixel );
 	}
 
 	@Override
@@ -170,18 +175,18 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 	}
 
 	@Override
-	public boolean isInlier(int index) {
+	public boolean isTrackInlier(int index) {
 		if( active == null )
 			active = alg.getTracker().getActiveTracks(null);
 
 		PointTrack t = active.get(index);
 		VisOdomMonoPlaneInfinity.VoTrack v = t.getCookie();
 
-		return v.lastInlier == alg.getTick();
+		return v.lastInlier == alg.getFrameID();
 	}
 
 	@Override
-	public boolean isNew(int index) {
+	public boolean isTrackNew(int index) {
 		// need to figure out a way to efficiently implement this
 		return false;
 	}

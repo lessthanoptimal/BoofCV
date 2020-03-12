@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,6 +53,11 @@ public interface ImageMotion2D<I extends ImageBase<I>, IT extends InvertibleTran
 	 * Turns the current image into the origin of the coordinate system.
 	 */
 	void setToFirst();
+
+	/**
+	 * Returns the ID of the most recently processed frame. Starts at zero and increments with each call to process.
+	 */
+	long getFrameID();
 
 	/**
 	 * Transform from first image into the current image.

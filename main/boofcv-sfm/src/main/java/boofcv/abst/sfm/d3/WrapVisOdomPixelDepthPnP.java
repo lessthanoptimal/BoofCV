@@ -22,13 +22,11 @@ import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.sfm.StereoSparse3D;
-import boofcv.alg.sfm.d3.VisOdomBundleAdjustment;
 import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.sfm.Point2D3DTrack;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
@@ -66,47 +64,43 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 	}
 
 	@Override
-	public Point3D_F64 getTrackLocation(int index) {
-		// TODO see comment above
-		PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
-		try {
-			Point4D_F64 p = ((VisOdomBundleAdjustment.BTrack)t.getCookie()).worldLoc;
-			Point3D_F64 tmp = new Point3D_F64();
-			tmp.set( p.x/p.w, p.y/p.w, p.z/p.w);
-			return tmp;
-		} catch( RuntimeException ignore){}
-		return ((Point2D3D)t.getCookie()).getLocation();
+	public boolean getTrackWorld3D(int index, Point3D_F64 world) {
+		Point4D_F64 p = alg.getVisibleTracks().get(index).worldLoc;
+		world.set(p.x/p.w, p.y/p.w, p.z/p.w);
+		return true;
 	}
 
 	@Override
-	public int getTotal() {
-		return active.size();
+	public int getTotalTracks() {
+		return alg.getVisibleTracks().size();
 	}
 
 	@Override
 	public long getTrackId(int index) {
-		return active.get(index).featureId;
+		return alg.getVisibleTracks().get(index).id;
+	}
+
+	@Override
+	public void getTrackPixel(int index, Point2D_F64 pixel) {
+		// If this throws a null pointer exception then that means there's a bug. The only way a visible track
+		// could have a null trackerTrack is if the trackerTrack was dropped. In that case it's no longer visible
+		pixel.set( alg.getVisibleTracks().get(index).trackerTrack.pixel );
 	}
 
 	@Override
 	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
-		return PointTrack.extractTrackPixels(storage,active);
+		throw new RuntimeException("Not supported any more");
 	}
 
 	@Override
-	public boolean isInlier(int index) {
-		try {
-			Point2D3DTrack t = active.get(index).getCookie();
-			return t.lastInlier == alg.getTick();
-		} catch( RuntimeException ignore){}
-		VisOdomPixelDepthPnP.Track t = active.get(index).getCookie();
-		return t.lastUsed == alg.getTick();
+	public boolean isTrackInlier(int index) {
+		return alg.getInlierTracks().contains(alg.getVisibleTracks().get(index));
 	}
 
 	@Override
-	public boolean isNew(int index) {
-		PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
-		return alg.getTracker().getNewTracks(null).contains(t);
+	public boolean isTrackNew(int index) {
+		VisOdomPixelDepthPnP.Track track = alg.getVisibleTracks().get(index);
+		return track.trackerTrack.spawnFrameID == alg.getFrameID();
 	}
 
 	@Override
@@ -145,5 +139,14 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 	@Override
 	public Se3_F64 getCameraToWorld() {
 		return alg.getCurrToWorld();
+	}
+
+	@Override
+	public long getFrameID() {
+		return alg.getFrameID();
+	}
+
+	public VisOdomPixelDepthPnP<T> getAlgorithm() {
+		return alg;
 	}
 }

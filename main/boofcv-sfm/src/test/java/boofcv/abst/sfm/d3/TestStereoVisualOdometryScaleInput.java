@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -107,7 +107,7 @@ public class TestStereoVisualOdometryScaleInput {
 	}
 
 	protected class Dummy implements StereoVisualOdometry<GrayF32> {
-
+		long frameID = -1;
 		@Override
 		public void setCalibration(StereoParameters p) {
 			parameters = p;
@@ -115,6 +115,7 @@ public class TestStereoVisualOdometryScaleInput {
 
 		@Override
 		public boolean process(GrayF32 l, GrayF32 r) {
+			frameID++;
 			leftImage = l;
 			rightImage = r;
 			return result;
@@ -126,9 +127,7 @@ public class TestStereoVisualOdometryScaleInput {
 		}
 
 		@Override
-		public void reset() {
-			resetCalled = true;
-		}
+		public void reset() {resetCalled = true;frameID=-1;}
 
 		@Override
 		public boolean isFault() {
@@ -139,6 +138,9 @@ public class TestStereoVisualOdometryScaleInput {
 		public Se3_F64 getCameraToWorld() {
 			return new Se3_F64();
 		}
+
+		@Override
+		public long getFrameID() { return frameID; }
 	}
 
 }

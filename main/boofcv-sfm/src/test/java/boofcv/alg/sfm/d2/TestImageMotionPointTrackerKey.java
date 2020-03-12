@@ -81,7 +81,7 @@ public class TestImageMotionPointTrackerKey {
 		assertEquals(0, tracker.numDropAll);
 		alg.reset();
 		assertEquals(1, tracker.numDropAll);
-		assertEquals(0, alg.getTotalFramesProcessed() );
+		assertEquals(-1, alg.getFrameID() );
 		assertEquals(0, alg.getKeyToCurr().getX(), 1e-8);
 		assertEquals(0, alg.getWorldToCurr().getX(), 1e-8);
 	}
@@ -136,7 +136,7 @@ public class TestImageMotionPointTrackerKey {
 		ImageMotionPointTrackerKey<GrayU8,Se2_F32> alg = new ImageMotionPointTrackerKey<>(tracker, matcher, null, model, 5);
 
 		// create tracks such that only some of them will be dropped
-		alg.totalFramesProcessed = 9;
+		alg.frameID = 9;
 		for( int i = 0; i < 10; i++ ) {
 			PointTrack t = new PointTrack();
 			AssociatedPairTrack a = new AssociatedPairTrack();

@@ -23,6 +23,7 @@ import boofcv.abst.tracker.PointTracker;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.InvertibleTransform;
+import lombok.Getter;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 
@@ -42,7 +43,7 @@ import java.util.List;
 public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends InvertibleTransform>
 {
 	// total number of frames processed
-	protected int totalFramesProcessed = 0;
+	protected @Getter long frameID = 0;
 	// feature tracker
 	protected PointTracker<I> tracker;
 	// Fits a model to the tracked features
@@ -96,7 +97,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 	 * Makes the current frame the first frame and discards its past history
 	 */
 	public void reset() {
-		totalFramesProcessed = 0;
+		frameID = -1;
 		tracker.dropAllTracks();
 		resetTransforms();
 	}
@@ -108,12 +109,11 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 	 * @return true if motion was estimated and false if no motion was estimated
 	 */
 	public boolean process( I frame ) {
+		frameID++;
 		keyFrame = false;
 
 		// update the feature tracker
 		tracker.process(frame);
-
-		totalFramesProcessed++;
 
 		List<PointTrack> tracks = tracker.getActiveTracks(null);
 
@@ -139,7 +139,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 
 		// mark that the track is in the inlier set
 		for( AssociatedPair p : modelMatcher.getMatchSet() ) {
-			((AssociatedPairTrack)p).lastUsed = totalFramesProcessed;
+			((AssociatedPairTrack)p).lastUsed = frameID;
 		}
 
 		// prune tracks which aren't being used
@@ -156,7 +156,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 		for( PointTrack t : all ) {
 			AssociatedPairTrack p = t.getCookie();
 
-			if( totalFramesProcessed - p.lastUsed >= outlierPrune) {
+			if( frameID - p.lastUsed >= outlierPrune) {
 				if( !tracker.dropTrack(t) )
 					throw new RuntimeException("Drop track failed. Must be a bug in the tracker");
 			}
@@ -179,7 +179,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 		for( PointTrack l : active ) {
 			AssociatedPairTrack p = l.getCookie();
 			p.p1.set(l.pixel);
-			p.lastUsed = totalFramesProcessed;
+			p.lastUsed = frameID;
 		}
 
 		tracker.spawnTracks();
@@ -193,7 +193,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 				p.p2 = l.pixel;
 			}
 			p.p1.set(l.pixel);
-			p.lastUsed = totalFramesProcessed;
+			p.lastUsed = frameID;
 		}
 
 		worldToKey.set(worldToCurr);
@@ -226,10 +226,6 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 
 	public ModelMatcher<IT, AssociatedPair> getModelMatcher() {
 		return modelMatcher;
-	}
-
-	public int getTotalFramesProcessed() {
-		return totalFramesProcessed;
 	}
 
 	public boolean isKeyFrame() {

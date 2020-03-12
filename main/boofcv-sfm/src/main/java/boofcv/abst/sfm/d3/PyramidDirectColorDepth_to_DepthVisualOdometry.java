@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -110,6 +110,11 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageBase<
 		alg.worldToCurrent().invert(worldToCurrent);
 		ConvertFloatType.convert(worldToCurrent, w2c_64);
 		return w2c_64;
+	}
+
+	@Override
+	public long getFrameID() {
+		return alg.getFrameID();
 	}
 
 	@Override

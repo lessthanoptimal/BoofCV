@@ -70,6 +70,11 @@ public class PlToGrayMotion2D<T extends ImageGray<T>,IT extends InvertibleTransf
 	}
 
 	@Override
+	public long getFrameID() {
+		return motion.getFrameID();
+	}
+
+	@Override
 	public IT getFirstToCurrent() {
 		return motion.getFirstToCurrent();
 	}
@@ -80,8 +85,8 @@ public class PlToGrayMotion2D<T extends ImageGray<T>,IT extends InvertibleTransf
 	}
 
 	@Override
-	public int getTotal() {
-		return access.getTotal();
+	public int getTotalTracks() {
+		return access.getTotalTracks();
 	}
 
 	@Override
@@ -90,17 +95,22 @@ public class PlToGrayMotion2D<T extends ImageGray<T>,IT extends InvertibleTransf
 	}
 
 	@Override
+	public void getTrackPixel(int index, Point2D_F64 pixel) {
+		access.getTrackPixel(index,pixel);
+	}
+
+	@Override
 	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
 		return access.getAllTracks(storage);
 	}
 
 	@Override
-	public boolean isInlier(int index) {
-		return access.isInlier(index);
+	public boolean isTrackInlier(int index) {
+		return access.isTrackInlier(index);
 	}
 
 	@Override
-	public boolean isNew(int index) {
-		return access.isNew(index);
+	public boolean isTrackNew(int index) {
+		return access.isTrackNew(index);
 	}
 }

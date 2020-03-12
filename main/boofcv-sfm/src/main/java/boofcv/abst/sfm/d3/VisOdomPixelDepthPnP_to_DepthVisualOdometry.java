@@ -74,20 +74,18 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	}
 
 	@Override
-	public Point3D_F64 getTrackLocation(int index) {
-		// TODO see comment above
-		PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
+	public boolean getTrackWorld3D(int index, Point3D_F64 world ) {
 		try {
-			Point4D_F64 p = ((VisOdomBundleAdjustment.BTrack)t.getCookie()).worldLoc;
-			Point3D_F64 tmp = new Point3D_F64();
-			tmp.set( p.x/p.w, p.y/p.w, p.z/p.w);
-			return tmp;
+			Point4D_F64 p = ((VisOdomBundleAdjustment.BTrack)active.get(index).getCookie()).worldLoc;
+			world.set( p.x/p.w, p.y/p.w, p.z/p.w);
+			return true;
 		} catch( RuntimeException ignore){}
-		return ((Point2D3D)t.getCookie()).getLocation();
+		world.set(((Point2D3D)active.get(index).getCookie()).getLocation());
+		return true;
 	}
 
 	@Override
-	public int getTotal() {
+	public int getTotalTracks() {
 		return active.size();
 	}
 
@@ -97,22 +95,27 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	}
 
 	@Override
+	public void getTrackPixel(int index, Point2D_F64 pixel) {
+		pixel.set(active.get(index).pixel);
+	}
+
+	@Override
 	public List<Point2D_F64> getAllTracks(@Nullable List<Point2D_F64> storage ) {
 		return PointTrack.extractTrackPixels(storage, active);
 	}
 
 	@Override
-	public boolean isInlier(int index) {
+	public boolean isTrackInlier(int index) {
 		try {
 			Point2D3DTrack t = active.get(index).getCookie();
-			return t.lastInlier == alg.getTick();
+			return t.lastInlier == alg.getFrameID();
 		} catch( RuntimeException ignore){}
 		VisOdomPixelDepthPnP.Track t = active.get(index).getCookie();
-		return t.lastUsed == alg.getTick();
+		return t.lastUsed == alg.getFrameID();
 	}
 
 	@Override
-	public boolean isNew(int index) {
+	public boolean isTrackNew(int index) {
 		PointTrack t = alg.getTracker().getActiveTracks(null).get(index);
 		return alg.getTracker().getNewTracks(null).contains(t);
 	}
@@ -149,6 +152,11 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	@Override
 	public Se3_F64 getCameraToWorld() {
 		return alg.getCurrToWorld();
+	}
+
+	@Override
+	public long getFrameID() {
+		return alg.getFrameID();
 	}
 
 	@Override

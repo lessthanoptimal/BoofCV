@@ -29,6 +29,8 @@ import boofcv.abst.geo.Estimate1ofPnP;
 import boofcv.abst.geo.EstimateNofPnP;
 import boofcv.abst.geo.RefinePnP;
 import boofcv.abst.geo.Triangulate2ViewsMetric;
+import boofcv.abst.geo.bundle.BundleAdjustment;
+import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.sfm.DepthSparse3D_to_PixelTo3D;
 import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.abst.sfm.d2.ImageMotion2D;
@@ -165,6 +167,47 @@ public class FactoryVisualOdometry {
 		return new MonoOverhead_to_MonocularPlaneVisualOdometry<>(alg, imageType);
 	}
 
+	public static <T extends ImageGray<T>>
+	StereoVisualOdometry<T> stereoDepthPnP( ConfigVoStereoPnP config ,
+											StereoDisparitySparse<T> sparseDisparity ,
+											PointTracker<T> tracker ,
+											Class<T> imageType)
+	{
+		if( config == null )
+			config = new ConfigVoStereoPnP();
+
+		// Range from sparse disparity
+		StereoSparse3D<T> pixelTo3D = new StereoSparse3D<>(sparseDisparity, imageType);
+
+		Estimate1ofPnP estimator = FactoryMultiView.pnp_1(EnumPNP.P3P_FINSTERWALDER,-1,1);
+		final DistanceFromModelMultiView<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
+
+		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
+		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
+				new EstimatorToGenerator<>(estimator);
+
+		// 1/2 a pixel tolerance for RANSAC inliers
+		double ransacTOL = config.ransacInlierTol * config.ransacInlierTol;
+
+		ModelMatcher<Se3_F64, Point2D3D> motion =
+				new Ransac<>(config.ransacSeed, manager, generator, distance, config.ransacIterations, ransacTOL);
+
+		RefinePnP refine = null;
+
+		if( config.refineIterations > 0 ) {
+			refine = FactoryMultiView.pnpRefine(1e-12,config.refineIterations);
+		}
+
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(config.sba);
+		bundleAdjustment.configure(1e-3,1e-3,config.maxBundleIterations);
+
+		VisOdomPixelDepthPnP<T> alg =
+				new VisOdomPixelDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
+		alg.setThresholdRetireTracks(config.retireOutlierTracks);
+		alg.setMaxKeyFrames(config.maxKeyFrames);
+		return new WrapVisOdomPixelDepthPnP<>(alg, pixelTo3D, distance, imageType);
+	}
+
 	/**
 	 * Stereo vision based visual odometry algorithm which runs a sparse feature tracker in the left camera and
 	 * estimates the range of tracks once when first detected using disparity between left and right cameras.
@@ -211,8 +254,12 @@ public class FactoryVisualOdometry {
 			refine = FactoryMultiView.pnpRefine(1e-12,refineIterations);
 		}
 
-		VisOdomPixelDepthPnP<T> alg =
-				new VisOdomPixelDepthPnP<>(thresholdAdd, thresholdRetire, doublePass, motion, pixelTo3D, refine, tracker, null, null);
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(null);
+		bundleAdjustment.configure(1e-3,1e-3,3);
+
+		VisOdomPixelDepthPnP<T> alg = new VisOdomPixelDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
+
+		alg.setThresholdRetireTracks(thresholdRetire);
 
 		return new WrapVisOdomPixelDepthPnP<>(alg, pixelTo3D, distance, imageType);
 	}
@@ -263,8 +310,11 @@ public class FactoryVisualOdometry {
 			refine = FactoryMultiView.pnpRefine(1e-12,refineIterations);
 		}
 
-		VisOdomPixelDepthPnP<Vis> alg = new VisOdomPixelDepthPnP<>
-				(thresholdAdd, thresholdRetire, doublePass, motion, pixelTo3D, refine, tracker, null, null);
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(null);
+		bundleAdjustment.configure(1e-3,1e-3,3);
+
+		VisOdomPixelDepthPnP<Vis> alg = new VisOdomPixelDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
+		alg.setThresholdRetireTracks(thresholdRetire);
 
 		return new VisOdomPixelDepthPnP_to_DepthVisualOdometry<>
 				(sparseDepth, alg, distance, ImageType.single(visualType), depthType);

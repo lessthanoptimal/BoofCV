@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -296,6 +296,9 @@ public class TestStitchingFromMotion2D {
 		public void setToFirst() {
 			numSetToFirst++;
 		}
+
+		@Override
+		public long getFrameID() { return 0; }
 
 		@Override
 		public Affine2D_F64 getFirstToCurrent() {

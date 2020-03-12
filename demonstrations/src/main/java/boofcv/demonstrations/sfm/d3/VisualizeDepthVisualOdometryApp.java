@@ -239,10 +239,12 @@ public class VisualizeDepthVisualOdometryApp
 		if( points.size() == 0 )
 			return;
 
-		double ranges[] = new double[points.size() ];
+		double[] ranges = new double[points.size() ];
 
+		Point3D_F64 world = new Point3D_F64();
 		for( int i = 0; i < points.size(); i++ ) {
-			ranges[i] = tracker.getTrackLocation(i).z;
+			tracker.getTrackWorld3D(i,world);
+			ranges[i] = world.z;
 		}
 		Arrays.sort(ranges);
 		double maxRange = ranges[(int)(ranges.length*0.8)];
@@ -250,12 +252,12 @@ public class VisualizeDepthVisualOdometryApp
 		for( int i = 0; i < points.size(); i++ ) {
 			Point2D_F64 pixel = points.get(i);
 
-			if( showTracks && tracker.isNew(i) ) {
+			if( showTracks && tracker.isTrackNew(i) ) {
 				VisualizeFeatures.drawPoint(g2,(int)pixel.x,(int)pixel.y,3,Color.GREEN);
 				continue;
 			}
 
-			if( tracker.isInlier(i) ) {
+			if( tracker.isTrackInlier(i) ) {
 				if( showInliers )
 					VisualizeFeatures.drawPoint(g2,(int)pixel.x,(int)pixel.y,7,Color.BLUE,false);
 				numInliers++;
@@ -264,9 +266,8 @@ public class VisualizeDepthVisualOdometryApp
 			if( !showTracks )
 				continue;
 
-			Point3D_F64 p3 = tracker.getTrackLocation(i);
-
-			double r = p3.z/maxRange;
+			tracker.getTrackWorld3D(i,world);
+			double r = world.z/maxRange;
 			if( r < 0 ) r = 0;
 			else if( r > 1 ) r = 1;
 

@@ -78,6 +78,11 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 	}
 
 	@Override
+	public long getFrameID() {
+		return alg.getMotion().getFrameID();
+	}
+
+	@Override
 	public IT getFirstToCurrent() {
 		return alg.getMotion().getWorldToCurr();
 	}
@@ -88,7 +93,7 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 	}
 
 	@Override
-	public int getTotal() {
+	public int getTotalTracks() {
 		checkInitialize();
 		return allTracks.size();
 	}
@@ -96,6 +101,11 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 	@Override
 	public long getTrackId(int index) {
 		return 0;
+	}
+
+	@Override
+	public void getTrackPixel(int index, Point2D_F64 pixel) {
+		pixel.set(allTracks.get(index));
 	}
 
 	private void checkInitialize() {
@@ -106,7 +116,7 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 
 			allTracks.clear();
 
-			long tick = alg.getMotion().getTotalFramesProcessed();
+			long tick = getFrameID();
 			inliers.resize(active.size());
 
 			for( int i = 0; i < active.size(); i++ ) {
@@ -133,14 +143,14 @@ public class WrapImageMotionPtkSmartRespawn<T extends ImageBase<T>, IT extends I
 	}
 
 	@Override
-	public boolean isInlier(int index) {
+	public boolean isTrackInlier(int index) {
 		checkInitialize();
 
 		return inliers.data[ index ];
 	}
 
 	@Override
-	public boolean isNew(int index) {
+	public boolean isTrackNew(int index) {
 		return false;
 	}
 }
