@@ -25,6 +25,7 @@ import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.shapes.Rectangle2D_F64;
 import org.ddogleg.struct.FastQueue;
@@ -150,8 +151,8 @@ public class TldTracker<T extends ImageGray<T>, D extends ImageGray<D>> {
 		if( imagePyramid == null ||
 				imagePyramid.getInputWidth() != image.width || imagePyramid.getInputHeight() != image.height ) {
 			int minSize = (config.trackerFeatureRadius*2+1)*5;
-			int scales[] = selectPyramidScale(image.width,image.height,minSize);
-			imagePyramid = FactoryPyramid.discreteGaussian(scales,-1,1,true,image.getImageType());
+			ConfigDiscreteLevels configLevels = ConfigDiscreteLevels.minSize(minSize);
+			imagePyramid = FactoryPyramid.discreteGaussian(configLevels,-1,1,true,image.getImageType());
 		}
 		imagePyramid.process(image);
 

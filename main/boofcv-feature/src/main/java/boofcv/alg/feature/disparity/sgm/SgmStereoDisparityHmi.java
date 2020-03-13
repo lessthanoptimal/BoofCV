@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,10 +22,10 @@ import boofcv.alg.InputSanityCheck;
 import boofcv.alg.feature.disparity.sgm.cost.SgmCostFromBlocks;
 import boofcv.alg.feature.disparity.sgm.cost.SgmMutualInformation_U8;
 import boofcv.alg.feature.disparity.sgm.cost.StereoMutualInformation;
-import boofcv.alg.transform.pyramid.ConfigPyramid2;
 import boofcv.alg.transform.pyramid.PyramidDiscreteNN2;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 import java.util.Random;
 
@@ -75,7 +75,7 @@ public class SgmStereoDisparityHmi extends SgmStereoDisparityError<GrayU8> {
 	 * @param stereoMI Computes mutual information from a stereo pair with known disparity
 	 * @param selector Selects the best disparity given the cost
 	 */
-	public SgmStereoDisparityHmi( ConfigPyramid2 configPyr,
+	public SgmStereoDisparityHmi( ConfigDiscreteLevels configPyr,
 								  StereoMutualInformation stereoMI ,
 								  SgmDisparitySelector selector ) {
 		super(new SgmMutualInformation_U8(stereoMI),selector);
@@ -84,7 +84,7 @@ public class SgmStereoDisparityHmi extends SgmStereoDisparityError<GrayU8> {
 		pyrRight.getConfigLayers().set(configPyr);
 	}
 
-	public SgmStereoDisparityHmi(ConfigPyramid2 configPyr,
+	public SgmStereoDisparityHmi(ConfigDiscreteLevels configPyr,
 								 StereoMutualInformation stereoMI ,
 								 SgmDisparitySelector selector ,
 								 SgmCostFromBlocks<GrayU8> blockScore ) {

@@ -25,7 +25,6 @@ import boofcv.alg.sfm.robust.ModelManagerScaleTranslateRotate2D;
 import boofcv.alg.tracker.klt.KltTrackFault;
 import boofcv.alg.tracker.klt.PyramidKltFeature;
 import boofcv.alg.tracker.klt.PyramidKltTracker;
-import boofcv.alg.tracker.tld.TldTracker;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.tracker.FactoryTrackerAlg;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
@@ -33,6 +32,7 @@ import boofcv.struct.RectangleRotate_F64;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.sfm.ScaleTranslateRotate2D;
 import georegression.geometry.UtilPoint2D_F32;
@@ -266,10 +266,10 @@ public class SparseFlowObjectTracker<Image extends ImageGray<Image>, Derivative 
 	 */
 	private void declarePyramid( int imageWidth , int imageHeight ) {
 		int minSize = (config.trackerFeatureRadius*2+1)*5;
-		int scales[] = TldTracker.selectPyramidScale(imageWidth, imageHeight, minSize);
-		currentImage = FactoryPyramid.discreteGaussian(scales,-1,1,false, ImageType.single(imageType));
+		ConfigDiscreteLevels configLevels = ConfigDiscreteLevels.minSize(minSize);
+		currentImage = FactoryPyramid.discreteGaussian(configLevels,-1,1,false, ImageType.single(imageType));
 		currentImage.initialize(imageWidth, imageHeight);
-		previousImage = FactoryPyramid.discreteGaussian(scales, -1, 1, false,ImageType.single(imageType));
+		previousImage = FactoryPyramid.discreteGaussian(configLevels, -1, 1, false,ImageType.single(imageType));
 		previousImage.initialize(imageWidth, imageHeight);
 
 		int numPyramidLayers = currentImage.getNumLayers();

@@ -66,6 +66,7 @@ import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.*;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import javax.annotation.Nullable;
@@ -89,7 +90,7 @@ public class FactoryPointTracker {
 	 *
 	 * @see boofcv.alg.tracker.klt.PyramidKltTracker
 	 *
-	 * @param scaling       Scales in the image pyramid. Recommend [1,2,4] or [2,4]
+	 * @param numLevels     Number of levels in the image pyramid
 	 * @param configExtract Configuration for extracting features
 	 * @param featureRadius Size of the tracked feature.  Try 3 or 5
 	 * @param imageType     Input image type.
@@ -97,10 +98,10 @@ public class FactoryPointTracker {
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	PointTracker<I> klt(int scaling[], ConfigGeneralDetector configExtract, int featureRadius,
+	PointTracker<I> klt(int numLevels, ConfigGeneralDetector configExtract, int featureRadius,
 							 Class<I> imageType, Class<D> derivType) {
 		ConfigPKlt config = new ConfigPKlt();
-		config.pyramidScaling = scaling;
+		config.pyramidLevels = ConfigDiscreteLevels.levels(numLevels);
 		config.templateRadius = featureRadius;
 
 		return klt(config, configExtract, imageType, derivType );
@@ -138,7 +139,7 @@ public class FactoryPointTracker {
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType, derivType);
 
-		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidScaling,-1,2,true, ImageType.single(imageType));
+		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(config.pyramidLevels,-1,2,true, ImageType.single(imageType));
 
 		return new PointTrackerKltPyramid<>(config.config, config.toleranceFB,
 				config.templateRadius, config.pruneClose, pyramid, detector,
@@ -508,7 +509,7 @@ public class FactoryPointTracker {
 		CombinedTrackerScalePoint<I, D,Desc> tracker =
 				FactoryTrackerAlg.combined(detector,associate, kltConfig,imageType,derivType);
 
-		return new PointTrackerCombined<>(tracker, reactivateThreshold, imageType, derivType);
+		return new PointTrackerCombined<>(tracker, kltConfig.pyramidLevels, reactivateThreshold, imageType, derivType);
 	}
 
 

@@ -75,7 +75,7 @@ public class ExampleBackgroundRemovalMoving {
 		confDetector.radius = 6;
 
 		// Use a KLT tracker
-		PointTracker tracker = FactoryPointTracker.klt(new int[]{1, 2, 4, 8}, confDetector, 3,
+		PointTracker tracker = FactoryPointTracker.klt(4, confDetector, 3,
 				GrayF32.class, null);
 
 		// This estimates the 2D image motion

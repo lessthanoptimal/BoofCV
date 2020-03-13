@@ -34,6 +34,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import javax.annotation.Nullable;
@@ -61,21 +62,21 @@ public class FactoryDenseOpticalFlow {
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	DenseOpticalFlow<I> flowKlt(@Nullable ConfigPKlt configKlt, int radius , Class<I> inputType , Class<D> derivType ) {
 
-		if( configKlt == null )
+		if( configKlt == null ) {
 			configKlt = new ConfigPKlt();
+			configKlt.pyramidLevels = ConfigDiscreteLevels.minSize(30);
+		}
 
 		if( derivType == null ) {
 			derivType = GImageDerivativeOps.getDerivativeType(inputType);
 		}
 
-		int numLayers = configKlt.pyramidScaling.length;
-
 		ImageType<I> imagetype = ImageType.single(inputType);
-		PyramidDiscrete<I> pyramidA = FactoryPyramid.discreteGaussian(configKlt.pyramidScaling, -1, 2, true, imagetype);
-		PyramidDiscrete<I> pyramidB = FactoryPyramid.discreteGaussian(configKlt.pyramidScaling, -1, 2, true, imagetype);
+		PyramidDiscrete<I> pyramidA = FactoryPyramid.discreteGaussian(configKlt.pyramidLevels, -1, 2, true, imagetype);
+		PyramidDiscrete<I> pyramidB = FactoryPyramid.discreteGaussian(configKlt.pyramidLevels, -1, 2, true, imagetype);
 
 		PyramidKltTracker<I, D> tracker = FactoryTrackerAlg.kltPyramid(configKlt.config, inputType, derivType);
-		DenseOpticalFlowKlt<I, D> flowKlt = new DenseOpticalFlowKlt<>(tracker, numLayers, radius);
+		DenseOpticalFlowKlt<I, D> flowKlt = new DenseOpticalFlowKlt<>(tracker, radius);
 		ImageGradient<I, D> gradient = FactoryDerivative.sobel(inputType,derivType);
 
 		return new FlowKlt_to_DenseOpticalFlow<>(flowKlt, gradient, pyramidA, pyramidB, inputType, derivType);

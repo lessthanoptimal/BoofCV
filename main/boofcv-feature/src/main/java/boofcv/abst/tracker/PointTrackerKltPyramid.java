@@ -456,12 +456,14 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 
 		public ImageStruct(PyramidDiscrete<I> o ) {
 			basePyramid = o.copyStructure();
-			derivX = PyramidOps.declareOutput(basePyramid, derivType);
-			derivY = PyramidOps.declareOutput(basePyramid, derivType);
 		}
 
 		public void update( I image ) {
 			basePyramid.process(image);
+			if( derivX == null ) {
+				derivX = PyramidOps.declareOutput(basePyramid, derivType);
+				derivY = PyramidOps.declareOutput(basePyramid, derivType);
+			}
 
 			if( derivX[0].width != basePyramid.getLayer(0).width ||
 					derivX[0].height != basePyramid.getLayer(0).height )

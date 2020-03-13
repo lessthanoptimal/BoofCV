@@ -36,6 +36,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -132,7 +133,7 @@ public class ExamplePointFeatureTracker< T extends ImageGray<T>, D extends Image
 	public void createKLT() {
 		ConfigPKlt config = new ConfigPKlt();
 		config.templateRadius = 3;
-		config.pyramidScaling = new int[]{1,2,4,8};
+		config.pyramidLevels = ConfigDiscreteLevels.levels(4);
 
 		tracker = FactoryPointTracker.klt(config, new ConfigGeneralDetector(600, 6, 1),
 				imageType, derivType);

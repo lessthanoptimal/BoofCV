@@ -64,7 +64,6 @@ public class ExampleVisualOdometryStereo {
 
 		// specify how the image features are going to be tracked
 		ConfigPKlt configKlt = new ConfigPKlt();
-		configKlt.pyramidScaling = new int[]{1, 2, 4, 8};
 		configKlt.templateRadius = 3;
 
 		PointTrackerTwoPass<GrayU8> tracker =

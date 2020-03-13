@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,6 +24,7 @@ import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +57,8 @@ public abstract class ChecksDenseOpticalFlowBlockPyramid<T extends ImageGray<T>>
 		DenseOpticalFlowBlockPyramid<T> alg = createAlg(2,3,10);
 
 		ImagePyramid<T> pyramid = FactoryPyramid.discreteGaussian(
-				new int[]{1,2,4},0,2,false, ImageType.single(imageType));
+				ConfigDiscreteLevels.levels(3),
+				0,2,false, ImageType.single(imageType));
 		GImageMiscOps.fillUniform(image,rand,0,200);
 		pyramid.process(image);
 

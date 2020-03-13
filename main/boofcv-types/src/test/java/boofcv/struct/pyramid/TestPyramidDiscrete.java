@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,6 @@ import boofcv.struct.image.ImageType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
@@ -35,48 +34,28 @@ public class TestPyramidDiscrete {
 	 * provide positive examples of working scales
 	 */
 	@Test
-	public void setScaling_positive() {
-		PyramidDiscrete<GrayU8> pyramid = new DummyDiscrete<>(GrayU8.class,false);
+	public void pyramidLevels() {
 
-		pyramid.setScaleFactors(1,2,4);
-		pyramid.initialize(100,200);
-		assertEquals(100,pyramid.getWidth(0));
+		ConfigDiscreteLevels config = ConfigDiscreteLevels.levels(3);
 
-		pyramid.setScaleFactors(2,4,8);
-		pyramid.initialize(100,200);
-		assertEquals(50,pyramid.getWidth(0));
+		PyramidDiscrete<GrayU8> pyramid = new DummyDiscrete<>(GrayU8.class,false,config);
 
-		pyramid.setScaleFactors(1,3,6);
-		pyramid.initialize(100,200);
-		assertEquals(100,pyramid.getWidth(0));
-		assertEquals(34,pyramid.getWidth(1));
-	}
+		int width = 100;
+		int height = 200;
 
-	/**
-	 * Try some illegal scale values
-	 */
-	@Test
-	public void setScaling_negative() {
-		PyramidDiscrete<GrayU8> pyramid = new DummyDiscrete<>(GrayU8.class,true);
-
-		try {
-			pyramid.setScaleFactors(1,2,5);
-			fail("didn't throw an exception");
-		} catch( RuntimeException e ){}
-		try {
-			pyramid.setScaleFactors(2,5,8);
-			fail("didn't throw an exception");
-		} catch( RuntimeException e ){}
-		try {
-			pyramid.setScaleFactors(-1,3,6);
-			fail("didn't throw an exception");
-		} catch( RuntimeException e ){}
+		pyramid.initialize(width,height);
+		assertEquals(3,pyramid.getNumLayers());
+		for (int i = 0,scale=1; i < 3; i++, scale *= 2) {
+			assertEquals(scale,pyramid.getScale(i));
+			assertEquals(width/scale, pyramid.getLayer(i).width);
+			assertEquals(height/scale, pyramid.getLayer(i).height);
+		}
 	}
 
 	private static class DummyDiscrete<T extends ImageGray<T>> extends PyramidDiscrete<T> {
 
-		public DummyDiscrete(Class<T> imageType, boolean saveOriginalReference) {
-			super(ImageType.single(imageType), saveOriginalReference);
+		public DummyDiscrete(Class<T> imageType, boolean saveOriginalReference, ConfigDiscreteLevels config ) {
+			super(ImageType.single(imageType), saveOriginalReference, config);
 		}
 
 		@Override

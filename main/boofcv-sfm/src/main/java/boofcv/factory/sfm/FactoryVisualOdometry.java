@@ -59,6 +59,7 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.sfm.PlanePtPixel;
 import boofcv.struct.sfm.Stereo2D3D;
@@ -494,7 +495,8 @@ public class FactoryVisualOdometry {
 	DepthVisualOdometry<Planar<Vis>,Depth> depthDirect( DepthSparse3D<Depth> sparse3D,
 														ImageType<Planar<Vis>> visualType , Class<Depth> depthType)
 	{
-		ImagePyramid<Planar<Vis>> pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4},
+		ImagePyramid<Planar<Vis>> pyramid = FactoryPyramid.discreteGaussian(
+				ConfigDiscreteLevels.levels(3),
 				-1,2,false, visualType);
 
 		PyramidDirectColorDepth<Vis> alg = new PyramidDirectColorDepth<>(pyramid);

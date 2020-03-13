@@ -36,19 +36,18 @@ public class PyramidKltForCombined<I extends ImageGray<I>, D extends ImageGray<D
 	/** The radius of each feature. 3 is a reasonable number. */
 	public int featureRadius;
 
-	/** Scale factor for each layer in the pyramid */
-	public int pyramidScaling[];
+	// Number of levels in the image pyramid
+	protected int numLevels=-1;
+
 
 	// the tracker
 	protected PyramidKltTracker<I, D> tracker;
 
 	public PyramidKltForCombined(ConfigKlt config,
 								 int featureRadius,
-								 int[] pyramidScaling,
 								 Class<I> inputType, Class<D> derivType) {
 		this.config = config;
 		this.featureRadius = featureRadius;
-		this.pyramidScaling = pyramidScaling;
 
 		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(inputType);
 		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
@@ -66,6 +65,10 @@ public class PyramidKltForCombined<I extends ImageGray<I>, D extends ImageGray<D
 	}
 
 	public void setInputs( ImagePyramid<I> image , D[] derivX , D[] derivY ) {
+		if( numLevels == -1)
+			this.numLevels = image.getNumLayers();
+		else if( numLevels != image.getNumLayers() )
+			throw new IllegalArgumentException("Number of levels pyramid changed!");
 		tracker.setImage(image,derivX,derivY);
 	}
 
@@ -89,6 +92,6 @@ public class PyramidKltForCombined<I extends ImageGray<I>, D extends ImageGray<D
 	}
 
 	public PyramidKltFeature createNewTrack() {
-		return new PyramidKltFeature(pyramidScaling.length, featureRadius);
+		return new PyramidKltFeature(numLevels, featureRadius);
 	}
 }

@@ -62,7 +62,7 @@ public class FactoryPointTrackerTwoPass {
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType, derivType);
 
 		PyramidDiscrete<I> pyramid = FactoryPyramid.discreteGaussian(
-				config.pyramidScaling,-1,2,true, ImageType.single(imageType));
+				config.pyramidLevels,-1,2,true, ImageType.single(imageType));
 
 		return new PointTrackerTwoPassKltPyramid<>(config.config, config.toleranceFB,
 				config.templateRadius, pyramid, detector, gradient, interpInput, interpDeriv);

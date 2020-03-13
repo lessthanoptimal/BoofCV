@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.misc.ProfileOperation;
 import boofcv.struct.convolve.Kernel1D_F32;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.struct.pyramid.PyramidFloat;
 
@@ -44,7 +45,7 @@ public class BenchmarkImagePyramids {
 
 	static GrayF32 input = new GrayF32(width,height);
 
-	static int scalesD[] = new int[]{1,2,4,8};
+	static ConfigDiscreteLevels configD = ConfigDiscreteLevels.levels(4);
 	static double scalesF[] = new double[]{1,2,4,8};
 
 	static PyramidDiscrete<GrayF32> pyramidD;
@@ -70,7 +71,7 @@ public class BenchmarkImagePyramids {
 
 	private static void createUpdate() {
 		Kernel1D_F32 kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class,-1.0,2);
-		pyramidD = new PyramidDiscreteSampleBlur<>(kernel,2, ImageType.single(GrayF32.class),true,scalesD);
+		pyramidD = new PyramidDiscreteSampleBlur<>(kernel,2, ImageType.single(GrayF32.class),true,configD);
 
 		pyramidF = FactoryPyramid.scaleSpacePyramid(scalesF, GrayF32.class);
 

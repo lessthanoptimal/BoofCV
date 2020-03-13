@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -16,24 +16,47 @@
  * limitations under the License.
  */
 
-package boofcv.alg.transform.pyramid;
+package boofcv.struct.pyramid;
+
+import boofcv.struct.Configuration;
 
 /**
- * Specifies number of layers in the pyramid. This can be done explicity or based on the minimum allowed width
+ * Specifies number of layers in the pyramid. This can be done explicitly or based on the minimum allowed width
  * and height.
  *
  * @author Peter Abeles
  */
-public class ConfigPyramid2 {
+public class ConfigDiscreteLevels implements Configuration {
 	/** if not -1 then it specifies the number of levels in the pyramid */
 	public int numLevelsRequested =-1;
 	/** if not -1 then it specifies the minimum width/height of the highest level in the pyramid */
 	public int minWidth=-1,minHeight=-1;
 
-	public ConfigPyramid2() {
+	/**
+	 * Creates a configuration where the number of levels in the pyramid is specified
+	 */
+	public static ConfigDiscreteLevels levels(int numLevels ) {
+		return new ConfigDiscreteLevels(numLevels,-1,-1);
 	}
 
-	public ConfigPyramid2(int numLevelsRequested, int minWidth, int minHeight) {
+	/**
+	 * Creates a configuration where the minimum image size is specified
+	 */
+	public static ConfigDiscreteLevels minSize(int minWidth, int minHeight ) {
+		return new ConfigDiscreteLevels(-1,minWidth,minHeight);
+	}
+
+	/**
+	 * Specifies that a pyramid should be created until the smallest size of width or height is the specified value
+	 */
+	public static ConfigDiscreteLevels minSize(int sideLength ) {
+		return new ConfigDiscreteLevels(-1,sideLength,sideLength);
+	}
+
+	public ConfigDiscreteLevels() {
+	}
+
+	public ConfigDiscreteLevels(int numLevelsRequested, int minWidth, int minHeight) {
 		this.numLevelsRequested = numLevelsRequested;
 		this.minWidth = minWidth;
 		this.minHeight = minHeight;
@@ -58,14 +81,21 @@ public class ConfigPyramid2 {
 	}
 
 	int computeNumLevels( int length , int minLength ) {
+		if( length <= minLength )
+			return 1;
 		double scale = length/(double)minLength;
 		double levels = Math.log(scale)/Math.log(2);
 		return (int)Math.floor(levels)+1;
 	}
 
-	public void set( ConfigPyramid2 config ) {
+	public void set( ConfigDiscreteLevels config ) {
 		this.numLevelsRequested = config.numLevelsRequested;
 		this.minWidth = config.minWidth;
 		this.minHeight = config.minHeight;
+	}
+
+	@Override
+	public void checkValidity() {
+
 	}
 }

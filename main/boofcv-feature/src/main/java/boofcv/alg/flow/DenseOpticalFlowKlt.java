@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,21 +46,23 @@ public class DenseOpticalFlowKlt<I extends ImageGray<I>, D extends ImageGray<D>>
 	private PyramidKltFeature feature;
 
 	// goodness of fit for each template
-	float scores[] = new float[1];
+	float[] scores = new float[1];
 
 	// size of template
 	private int regionRadius;
 	// image shape
 	private int width,height;
 
-	public DenseOpticalFlowKlt(PyramidKltTracker<I, D> tracker , int numLayers , int radius ) {
+	public DenseOpticalFlowKlt(PyramidKltTracker<I, D> tracker , int radius ) {
 		this.tracker = tracker;
-		feature = new PyramidKltFeature(numLayers,radius);
 		this.regionRadius = radius;
 	}
 
 	public void process( ImagePyramid<I> prev, D[] prevDerivX, D[] prevDerivY,
 						 ImagePyramid<I> curr , ImageFlow output ) {
+
+		if( feature == null )
+			feature = new PyramidKltFeature(prev.getNumLayers(),regionRadius);
 
 		this.width = output.width;
 		this.height = output.height;

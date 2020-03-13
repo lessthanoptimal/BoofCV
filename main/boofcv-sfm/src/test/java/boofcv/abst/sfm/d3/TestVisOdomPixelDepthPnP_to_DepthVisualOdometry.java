@@ -27,6 +27,7 @@ import boofcv.factory.tracker.FactoryPointTrackerTwoPass;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
  * @author Peter Abeles
@@ -42,7 +43,7 @@ public class TestVisOdomPixelDepthPnP_to_DepthVisualOdometry extends CheckVisual
 	protected DepthVisualOdometry<GrayU8,GrayU16> createAlgorithm() {
 
 		ConfigPKlt config = new ConfigPKlt();
-		config.pyramidScaling = new int[]{1,2,4,8};
+		config.pyramidLevels =  ConfigDiscreteLevels.levels(4);
 		config.templateRadius = 3;
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 

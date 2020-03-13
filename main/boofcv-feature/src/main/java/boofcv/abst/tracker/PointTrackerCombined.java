@@ -27,6 +27,7 @@ import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import java.util.ArrayList;
@@ -62,14 +63,14 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 	boolean detected;
 
 	public PointTrackerCombined(CombinedTrackerScalePoint<I, D, Desc> tracker,
+								ConfigDiscreteLevels configLevels,
 								int reactivateThreshold,
 								Class<I> imageType, Class<D> derivType) {
 		this.tracker = tracker;
 		this.reactivateThreshold = reactivateThreshold;
 		this.derivType = ImageType.single(derivType);
 
-		int pyramidScaling[] = tracker.getTrackerKlt().pyramidScaling;
-		pyramid = FactoryPyramid.discreteGaussian(pyramidScaling,-1,2,true, ImageType.single(imageType));
+		pyramid = FactoryPyramid.discreteGaussian(configLevels,-1,2,true, ImageType.single(imageType));
 		gradient = FactoryDerivative.sobel(imageType, derivType);
 
 		reset();

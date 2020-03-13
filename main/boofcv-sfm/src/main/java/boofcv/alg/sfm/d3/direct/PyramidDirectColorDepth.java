@@ -69,12 +69,6 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 		imageType = this.pyramid.getImageType();
 
 		layerTo3D = new LayerTo3D();
-
-		layersOdom = new VisOdomDirectColorDepth[pyramid.getNumLayers()];
-		for (int i = 0; i < layersOdom.length; i++) {
-			ImageType derivType = GImageDerivativeOps.getDerivativeType( imageType );
-			layersOdom[i] = new VisOdomDirectColorDepth(imageType.getNumBands(),imageType.getImageClass(), derivType.getImageClass());
-		}
 	}
 
 	public void setCameraParameters(float fx , float fy ,
@@ -82,6 +76,11 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 									int width , int height )
 	{
 		pyramid.initialize(width, height);
+		layersOdom = new VisOdomDirectColorDepth[pyramid.getNumLayers()];
+		for (int i = 0; i < layersOdom.length; i++) {
+			ImageType derivType = GImageDerivativeOps.getDerivativeType( imageType );
+			layersOdom[i] = new VisOdomDirectColorDepth(imageType.getNumBands(),imageType.getImageClass(), derivType.getImageClass());
+		}
 		for (int layer = 0; layer < layersOdom.length; layer++) {
 			VisOdomDirectColorDepth o = layersOdom[layer];
 
@@ -96,12 +95,14 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 	}
 
 	public boolean process( Planar<T> input , ImagePixelTo3D inputDepth ) {
+		pyramid.process(input);
+
 		frameID++;
 		if( fractionInBounds == 0 ) {
-			setKeyFrame( input, inputDepth );
+			setKeyFrame( inputDepth );
 			fractionInBounds = 1.0;
 		} else {
-			if( estimateMotion( input ) ) {
+			if( estimateMotion() ) {
 				boolean keyframeTriggered = false;
 
 //				System.out.printf("   d %6.2f  f %6.2f\n",UtilAngle.degree(diversity),fractionInBounds);
@@ -118,7 +119,7 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 				}
 
 				if( keyframeTriggered ) {
-					setKeyFrame( input, inputDepth );
+					setKeyFrame( inputDepth );
 				}
 			} else {
 				return false;
@@ -128,8 +129,7 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 		return true;
 	}
 
-	protected void setKeyFrame( Planar<T> input , ImagePixelTo3D inputDepth) {
-		pyramid.process(input);
+	protected void setKeyFrame( ImagePixelTo3D inputDepth) {
 		layerTo3D.wrap(inputDepth);
 
 		for (int layer = 0; layer < layersOdom.length; layer++) {
@@ -144,8 +144,7 @@ public class PyramidDirectColorDepth<T extends ImageGray<T>> {
 		keyframeDiversity = layersOdom[layersOdom.length-1].computeFeatureDiversity(keyToCurrent);
 	}
 
-	protected boolean estimateMotion( Planar<T> input ) {
-		pyramid.process(input);
+	protected boolean estimateMotion() {
 		work.set(keyToCurrent);
 
 		boolean oneLayerWorked = false;

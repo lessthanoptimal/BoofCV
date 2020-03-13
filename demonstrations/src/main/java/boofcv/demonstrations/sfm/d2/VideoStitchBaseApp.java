@@ -34,6 +34,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import georegression.struct.InvertibleTransform;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
@@ -132,7 +133,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 	protected PointTracker<I> createTracker() {
 		ConfigPKlt config = new ConfigPKlt();
 		config.templateRadius = 3;
-		config.pyramidScaling = new int[]{1,2,4,8};
+		config.pyramidLevels = ConfigDiscreteLevels.levels(4);
 
 		ConfigFastHessian configFH = new ConfigFastHessian();
 		configFH.initialSampleSize = 2;

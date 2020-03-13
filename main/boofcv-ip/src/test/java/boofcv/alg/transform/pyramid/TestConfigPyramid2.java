@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.alg.transform.pyramid;
 
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,12 +30,12 @@ class TestConfigPyramid2 {
 	@Test
 	void handleSelected() {
 		// well defined cases
-		assertEquals(3,new ConfigPyramid2(-1,10,-1).computeLayers(40,80));
-		assertEquals(3,new ConfigPyramid2(-1,-1,20).computeLayers(40,80));
-		assertEquals(3,new ConfigPyramid2(3,-1,-1).computeLayers(40,80));
+		assertEquals(3,new ConfigDiscreteLevels(-1,10,-1).computeLayers(40,80));
+		assertEquals(3,new ConfigDiscreteLevels(-1,-1,20).computeLayers(40,80));
+		assertEquals(3,new ConfigDiscreteLevels(3,-1,-1).computeLayers(40,80));
 
 		// ambiguous
-		assertEquals(2,new ConfigPyramid2(-1,11,-1).computeLayers(40,80));
-		assertEquals(2,new ConfigPyramid2(-1,-1,21).computeLayers(40,80));
+		assertEquals(2,new ConfigDiscreteLevels(-1,11,-1).computeLayers(40,80));
+		assertEquals(2,new ConfigDiscreteLevels(-1,-1,21).computeLayers(40,80));
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,6 +20,9 @@ package boofcv.struct.pyramid;
 
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import lombok.Getter;
+
+import javax.annotation.Nullable;
 
 
 /**
@@ -33,8 +36,11 @@ import boofcv.struct.image.ImageType;
 @SuppressWarnings({"unchecked"})
 public abstract class PyramidDiscrete<T extends ImageBase<T>> extends ImagePyramidBase<T> {
 
+	// Configuration for the number of layers in the pyramid
+	private @Getter ConfigDiscreteLevels configLayers = new ConfigDiscreteLevels();
+
 	// scale of each layer relative to the previous layer
-	public int[] scale;
+	protected int[] levelScales;
 
 	/**
 	 * Specifies input image size and behavior of top most layer.
@@ -42,50 +48,64 @@ public abstract class PyramidDiscrete<T extends ImageBase<T>> extends ImagePyram
 	 * @param imageType Type of image.
 	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of copied.
 	 *                              Set to false if you don't know what you are doing.
-	 * @param scaleFactors (optional) Specifies the scale of each layer in the pyramid.  See restrictions
-	 * on scaleFactor in {@link #setScaleFactors(int...)}.
+	 * @param configLayers Specifies how the levels are computed
 	 */
-	public PyramidDiscrete( ImageType<T> imageType , boolean saveOriginalReference, int ...scaleFactors)
+	public PyramidDiscrete( ImageType<T> imageType , boolean saveOriginalReference,
+							@Nullable ConfigDiscreteLevels configLayers)
 	{
 		super(imageType,saveOriginalReference);
-		if( scaleFactors.length > 0 )
-			setScaleFactors(scaleFactors);
+		if( configLayers != null )
+			this.configLayers.set(configLayers);
 	}
 
 	protected PyramidDiscrete( PyramidDiscrete<T> orig ) {
 		super(orig);
-		this.scale = orig.scale.clone();
+		this.configLayers.set(orig.configLayers);
 	}
 
-	/**
-	 * Specifies the pyramid's structure.  Scale factors are in relative to the input image.
-	 *
-	 * @param scaleFactors Change in scale factor for each layer in the pyramid.
-	 */
-	public void setScaleFactors( int ...scaleFactors ) {
-		for( int i = 1; i < scaleFactors.length; i++ ){
-			if( scaleFactors[i] % scaleFactors[i-1] != 0 ) {
-				throw new IllegalArgumentException("Layer "+i+" is not evenly divisible by its lower layer.");
-			}
+	@Override
+	public void initialize(int width, int height) {
+		computeScales(width,height);
+		super.initialize(width,height);
+	}
+
+	protected void computeScales( int width , int height ) {
+		levelScales = new int[ configLayers.computeLayers(width,height)];
+		levelScales[0] = 1;
+		for (int i = 1; i < levelScales.length; i++) {
+			levelScales[i] = 2* levelScales[i-1];
 		}
-
-		// set width/height to zero to force the image to be redeclared
-		bottomWidth = bottomHeight = 0;
-		this.scale = scaleFactors.clone();
-		checkScales();
 	}
+
+//	/**
+//	 * Specifies the pyramid's structure.  Scale factors are in relative to the input image.
+//	 *
+//	 * @param scaleFactors Change in scale factor for each layer in the pyramid.
+//	 */
+//	public void setScaleFactors( int ...scaleFactors ) {
+//		for( int i = 1; i < scaleFactors.length; i++ ){
+//			if( scaleFactors[i] % scaleFactors[i-1] != 0 ) {
+//				throw new IllegalArgumentException("Layer "+i+" is not evenly divisible by its lower layer.");
+//			}
+//		}
+//
+//		// set width/height to zero to force the image to be redeclared
+//		bottomWidth = bottomHeight = 0;
+//		this.scale = scaleFactors.clone();
+//		checkScales();
+//	}
 
 	public int[] getScales() {
-		return scale;
+		return levelScales;
 	}
 
 	@Override
 	public double getScale(int layer) {
-		return scale[layer];
+		return levelScales[layer];
 	}
 
 	@Override
 	public int getNumLayers() {
-		return scale.length;
+		return levelScales.length;
 	}
 }

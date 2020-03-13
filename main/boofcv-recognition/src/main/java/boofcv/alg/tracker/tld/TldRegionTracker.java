@@ -156,7 +156,7 @@ public class TldRegionTracker<I extends ImageGray<I>, D extends ImageGray<D>> {
 		}
 
 		Class imageClass = image.getImageType().getImageClass();
-		previousImage = FactoryPyramid.discreteGaussian(image.getScales(), -1, 1, false, ImageType.single(imageClass));
+		previousImage = FactoryPyramid.discreteGaussian(image.getConfigLayers(), -1, 1, false, ImageType.single(imageClass));
 		previousImage.initialize(image.getInputWidth(), image.getInputHeight());
 
 		for( int i = 0; i < tracks.length; i++ ) {

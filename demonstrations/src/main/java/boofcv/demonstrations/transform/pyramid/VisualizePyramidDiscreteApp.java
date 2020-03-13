@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,6 +29,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import javax.swing.*;
@@ -44,8 +45,6 @@ import java.util.List;
 public class VisualizePyramidDiscreteApp <T extends ImageGray<T>>
 	extends SelectInputPanel implements VisualizeApp
 {
-	int scales[] = new int[]{1,2,4,8,16};
-
 	Class<T> imageType;
 	DiscretePyramidPanel gui = new DiscretePyramidPanel();
 	PyramidDiscrete<T> pyramid;
@@ -54,8 +53,9 @@ public class VisualizePyramidDiscreteApp <T extends ImageGray<T>>
 
 	public VisualizePyramidDiscreteApp(Class<T> imageType) {
 		this.imageType = imageType;
+		ConfigDiscreteLevels configLevels = ConfigDiscreteLevels.levels(5);
 
-		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,true, ImageType.single(imageType));
+		pyramid = FactoryPyramid.discreteGaussian(configLevels,-1,2,true, ImageType.single(imageType));
 		gui = new DiscretePyramidPanel();
 
 		setMainGUI(gui);

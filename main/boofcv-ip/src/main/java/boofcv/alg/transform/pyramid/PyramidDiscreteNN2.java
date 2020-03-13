@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.transform.pyramid;
 import boofcv.abst.distort.FDistort;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
  * Discrete image pyramid where each level is always a factor of two and sub-sampled using nearest-neighbor
@@ -34,7 +35,7 @@ public class PyramidDiscreteNN2<T extends ImageBase<T>> {
 
 	FDistort distort;
 
-	private ConfigPyramid2 configLayers = new ConfigPyramid2();
+	private ConfigDiscreteLevels configLayers = new ConfigDiscreteLevels();
 
 	// Levels in the pyramid
 	T[] levels;
@@ -72,12 +73,6 @@ public class PyramidDiscreteNN2<T extends ImageBase<T>> {
 		}
 	}
 
-	private int computeNumLevels( int length , int minLengt ) {
-		double scale = length/(double)minLengt;
-		double levels = Math.log(scale)/Math.log(2);
-		return (int)Math.floor(levels)+1;
-	}
-
 	private void declareArray( int numLevels ) {
 		levels = imageType.createArray(numLevels);
 		for (int i = 1; i < levels.length; i++) {
@@ -102,7 +97,7 @@ public class PyramidDiscreteNN2<T extends ImageBase<T>> {
 		return levels.length;
 	}
 
-	public ConfigPyramid2 getConfigLayers() {
+	public ConfigDiscreteLevels getConfigLayers() {
 		return configLayers;
 	}
 }

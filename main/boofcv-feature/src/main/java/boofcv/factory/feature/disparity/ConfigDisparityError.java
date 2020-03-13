@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,9 @@
 
 package boofcv.factory.feature.disparity;
 
-import boofcv.alg.transform.pyramid.ConfigPyramid2;
 import boofcv.factory.transform.census.CensusVariants;
 import boofcv.struct.Configuration;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
  * Configurations for different types of disparity error metrics
@@ -71,7 +71,7 @@ public interface ConfigDisparityError extends Configuration {
 		/**
 		 * Specifies the smallest layer in pyramid. Used to compute Mutual Information Cost
 		 */
-		public ConfigPyramid2 pyramidLayers = new ConfigPyramid2(-1,50,-1);
+		public ConfigDiscreteLevels pyramidLayers = new ConfigDiscreteLevels(-1,50,-1);
 		/**
 		 * Radius of Gaussian kernel when applying smoothing during Mutual Information computation.
 		 */

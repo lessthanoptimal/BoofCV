@@ -34,6 +34,7 @@ import boofcv.io.wrapper.DefaultMediaManager;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -62,7 +63,7 @@ public class ExampleVisualOdometryMonocularPlane {
 
 		// specify how the image features are going to be tracked
 		ConfigPKlt configKlt = new ConfigPKlt();
-		configKlt.pyramidScaling = new int[]{1, 2, 4, 8};
+		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 		configKlt.templateRadius = 3;
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 

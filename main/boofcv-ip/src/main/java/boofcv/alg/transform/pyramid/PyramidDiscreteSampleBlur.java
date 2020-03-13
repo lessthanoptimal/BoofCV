@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,8 +24,11 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
+
+import javax.annotation.Nullable;
 
 /**
  * <p>
@@ -54,7 +57,8 @@ public class PyramidDiscreteSampleBlur<T extends ImageBase<T>> extends PyramidDi
 	ConvolveDown<T,T> vertical;
 
 	// amount of blur applied to each layer
-	double sigmas[];
+	double[] sigmas;
+	private double sigma;
 
 	/**
 	 *
@@ -63,23 +67,29 @@ public class PyramidDiscreteSampleBlur<T extends ImageBase<T>> extends PyramidDi
 	 * @param imageType Type of image processed
 	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of copied.
 	 *                              Set to false if you don't know what you are doing.
-	 * @param scaleFactors Scale factor for each layer in the pyramid relative to the input layer
+	 * @param configLayers Specifies how the levels are computed
 	 */
 	public PyramidDiscreteSampleBlur(Kernel1D kernel, double sigma, ImageType<T> imageType,
-									 boolean saveOriginalReference, int... scaleFactors)
+									 boolean saveOriginalReference,
+									 @Nullable ConfigDiscreteLevels configLayers)
 	{
-		super(imageType,saveOriginalReference,scaleFactors);
+		super(imageType,saveOriginalReference,configLayers);
 
 		horizontal = FactoryConvolveDown.convolve(kernel, BorderType.NORMALIZED, true, 1, imageType,imageType);
 		vertical = FactoryConvolveDown.convolve(kernel, BorderType.NORMALIZED, false, 1, imageType,imageType);
+		this.sigma = sigma;
+	}
 
-		sigmas = new double[ scaleFactors.length ];
+	private void lazyDeclareSigmas(double sigma) {
+		if( this.sigmas != null )
+			return;
+		sigmas = new double[ super.levelScales.length ];
 		sigmas[0] = 0;
 		for( int i = 1; i < sigmas.length; i++ ) {
 			// blur in previous layer
 			double prev = sigmas[i-1];
 			// the effective amount of blur applied to previous layer while being down sampled
-			double applied = sigma*scaleFactors[i-1];
+			double applied = sigma*super.levelScales[i-1];
 			// The amount of blur which has been applied to this layer
 			sigmas[i] = Math.sqrt(prev*prev + applied*applied);
 		}
@@ -91,26 +101,27 @@ public class PyramidDiscreteSampleBlur<T extends ImageBase<T>> extends PyramidDi
 
 		this.horizontal = orig.horizontal;
 		this.vertical = orig.vertical;
-		this.sigmas = orig.sigmas;
+		this.sigma = orig.sigma;
 	}
 
 	@Override
 	public void process(T input) {
 		super.initialize(input.width,input.height);
+		lazyDeclareSigmas(this.sigma);
 
 		if( temp == null ) {
 			// declare it to be the latest image that it might need to be, resize below
 			temp = (T)input.createNew(1,1);
 		}
 
-		if (scale[0] == 1) {
+		if (levelScales[0] == 1) {
 			if (isSaveOriginalReference()) {
 				setFirstLayer(input);
 			} else {
 				getLayer(0).setTo(input);
 			}
 		} else {
-			int skip = scale[0];
+			int skip = levelScales[0];
 
 			horizontal.setSkip(skip);
 			vertical.setSkip(skip);
@@ -121,7 +132,7 @@ public class PyramidDiscreteSampleBlur<T extends ImageBase<T>> extends PyramidDi
 		}
 
 		for (int index = 1; index < getNumLayers(); index++) {
-			int skip = scale[index]/scale[index-1];
+			int skip = levelScales[index]/ levelScales[index-1];
 			T prev = getLayer(index-1);
 			temp.reshape(prev.width/skip,prev.height);
 

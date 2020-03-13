@@ -52,6 +52,7 @@ import boofcv.struct.calib.VisualDepthParameters;
 import boofcv.struct.distort.DoNothing2Transform2_F32;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.*;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -410,7 +411,7 @@ public class VisualizeDepthVisualOdometryApp
 
 		ConfigPKlt configPKlt = new ConfigPKlt();
 		configPKlt.templateRadius = 3;
-		configPKlt.pyramidScaling = new int[]{1, 2, 4, 8};
+		configPKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 
 		algType = AlgType.UNKNOWN;
 		if (whichAlg == 0) {

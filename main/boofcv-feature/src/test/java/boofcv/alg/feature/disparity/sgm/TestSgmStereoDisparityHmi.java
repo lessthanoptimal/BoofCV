@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,9 +19,9 @@
 package boofcv.alg.feature.disparity.sgm;
 
 import boofcv.alg.feature.disparity.sgm.cost.StereoMutualInformation;
-import boofcv.alg.transform.pyramid.ConfigPyramid2;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -101,6 +101,6 @@ class TestSgmStereoDisparityHmi extends GenericSgmStereoDisparityChecks<GrayU8,G
 		stereoMI.configureHistogram(256);
 		SgmDisparitySelector selector = new SgmDisparitySelector();
 		selector.setRightToLeftTolerance(-1);
-		return new SgmStereoDisparityHmi(new ConfigPyramid2(-1,20,20),stereoMI,selector);
+		return new SgmStereoDisparityHmi(new ConfigDiscreteLevels(-1,20,20),stereoMI,selector);
 	}
 }

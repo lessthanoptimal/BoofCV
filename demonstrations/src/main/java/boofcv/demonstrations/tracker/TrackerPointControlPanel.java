@@ -21,6 +21,7 @@ package boofcv.demonstrations.tracker;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -232,6 +233,7 @@ public class TrackerPointControlPanel
 		ConfigPKlt klt = new ConfigPKlt();
 		klt.pruneClose = true;
 		klt.toleranceFB = 4;
+		klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 		return klt;
 	}
 
@@ -239,9 +241,7 @@ public class TrackerPointControlPanel
 		public ConfigGeneralDetector detector = new ConfigGeneralDetector(maxFeatures,5,3.0f);
 		public ConfigPKlt klt = createKltConfig();
 
-		private int pyramidLevels = 4;
-
-		private JSpinner spinnerLevels = spinner(pyramidLevels,1,20,1);
+		private JSpinner spinnerLevels = spinner(klt.pyramidLevels.numLevelsRequested,1,20,1);
 		private JCheckBox checkPruneClose = checkbox("Prune Close", klt.pruneClose);
 		private JSpinner spinnerIterations = spinner(klt.config.maxIterations,1,500,1);
 		private JSpinner spinnerMaxError = spinner(klt.config.maxPerPixelError,0.0,255.0,5.0);
@@ -252,7 +252,6 @@ public class TrackerPointControlPanel
 
 		public ControlsKLT() {
 			setBorder(BorderFactory.createEmptyBorder());
-			klt.pyramidScaling = createLevels();
 
 			addLabeled(spinnerLevels,"Pyr. Levels");
 			addAlignLeft(checkPruneClose);
@@ -262,16 +261,6 @@ public class TrackerPointControlPanel
 			addLabeled(spinnerDetectRadius,"Detect Radius");
 			addLabeled(spinnerDescRadius,"Desc. Radius");
 			addLabeled(spinnerForwardsBackwards,"F-to-B Tol.");
-		}
-
-		private int[] createLevels() {
-			int[] levels = new int[pyramidLevels];
-			int scale = 1;
-			for (int i = 0; i < levels.length; i++) {
-				levels[i] = scale;
-				scale *= 2;
-			}
-			return levels;
 		}
 
 		@Override
@@ -285,8 +274,7 @@ public class TrackerPointControlPanel
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			if( e.getSource() == spinnerLevels) {
-				pyramidLevels = ((Number) spinnerLevels.getValue()).intValue();
-				klt.pyramidScaling = createLevels();
+				klt.pyramidLevels.numLevelsRequested = ((Number) spinnerLevels.getValue()).intValue();
 				listener.handleAlgorithmUpdated();
 			} else if( e.getSource() == spinnerDescRadius) {
 				klt.templateRadius = ((Number) spinnerDescRadius.getValue()).intValue();

@@ -28,6 +28,7 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ class TestPyramidKltForCombined {
 	int width = 80;
 	int height = 100;
 
-	int scales[] = new int[]{1,2,4};
+	ConfigDiscreteLevels configLevels = ConfigDiscreteLevels.levels(3);
 
 	PyramidDiscrete<GrayF32> pyramid;
 	GrayF32[] derivX;
@@ -57,14 +58,13 @@ class TestPyramidKltForCombined {
 	{
 		ConfigKlt config = new ConfigKlt();
 
-		return new PyramidKltForCombined<>(config, 5, scales,
-				GrayF32.class, GrayF32.class);
+		return new PyramidKltForCombined<>(config, 5, GrayF32.class, GrayF32.class);
 	}
 
 	@BeforeEach
 	void init() {
 
-		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,false, ImageType.single(GrayF32.class));
+		pyramid = FactoryPyramid.discreteGaussian(configLevels,-1,2,false, ImageType.single(GrayF32.class));
 
 		GrayF32 input = new GrayF32(width,height);
 		ImageMiscOps.fillUniform(input,rand,0,100);

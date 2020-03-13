@@ -21,6 +21,7 @@ package boofcv.abst.tracker;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
  * Changes behavior of {@link PointTrackerCombined} so that it conforms to the {@link PointTrackerTwoPass} interface.
@@ -31,10 +32,11 @@ public class PointTrackerTwoPassCombined<I extends ImageGray<I>, D extends Image
 	extends PointTrackerCombined<I,D,Desc> implements PointTrackerTwoPass<I>
 {
 	public PointTrackerTwoPassCombined(CombinedTrackerScalePoint<I, D, Desc> tracker,
+									   ConfigDiscreteLevels configLevels,
 									   int reactivateThreshold,
 									   Class<I> imageType, Class<D> derivType)
 	{
-		super(tracker, reactivateThreshold, imageType, derivType);
+		super(tracker, configLevels, reactivateThreshold, imageType, derivType);
 	}
 
 	@Override

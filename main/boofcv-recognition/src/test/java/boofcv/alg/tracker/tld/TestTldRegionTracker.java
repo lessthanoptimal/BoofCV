@@ -28,6 +28,7 @@ import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import georegression.struct.shapes.Rectangle2D_F64;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Peter Abeles
  */
-public class TestTldRegionTracker {
+class TestTldRegionTracker {
 
 	int width = 120;
 	int height = 150;
@@ -54,7 +55,8 @@ public class TestTldRegionTracker {
 	public TestTldRegionTracker() {
 		GImageMiscOps.fillUniform(input, rand, 0, 200);
 
-		pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4},-1,1,true, ImageType.single(GrayU8.class));
+		var configLevels = ConfigDiscreteLevels.levels(3);
+		pyramid = FactoryPyramid.discreteGaussian(configLevels,-1,1,true, ImageType.single(GrayU8.class));
 		pyramid.process(input);
 	}
 
@@ -62,7 +64,7 @@ public class TestTldRegionTracker {
 	 * Very basic test.  Feeds it the same image twice and sees if it does nothing without blowing up.
 	 */
 	@Test
-	public void process() {
+	void process() {
 		TldRegionTracker alg = createAlg();
 
 		Rectangle2D_F64 rect = new Rectangle2D_F64(10,20,115,125);
@@ -78,7 +80,7 @@ public class TestTldRegionTracker {
 	 * See if the expected number of points are spawned
 	 */
 	@Test
-	public void spawnGrid() {
+	void spawnGrid() {
 		TldRegionTracker alg = createAlg();
 
 		alg.initialize(pyramid);
@@ -103,9 +105,10 @@ public class TestTldRegionTracker {
 	 * Empty image with no texture.  All spawn points should fail
 	 */
 	@Test
-	public void spawnGrid_fail() {
+	void spawnGrid_fail() {
+		var configLevels = ConfigDiscreteLevels.levels(3);
 		PyramidDiscrete<GrayU8> pyramid = FactoryPyramid.discreteGaussian(
-				new int[]{1,2,4},-1,1,true,ImageType.single(GrayU8.class));
+				configLevels,-1,1,true,ImageType.single(GrayU8.class));
 		pyramid.process(new GrayU8(width,height));
 
 		TldRegionTracker alg = createAlg();

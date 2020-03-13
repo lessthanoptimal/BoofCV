@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,17 +21,18 @@ package boofcv.alg.transform.pyramid;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Peter Abeles
  */
-public class TestPyramidDiscreteAverage {
+class TestPyramidDiscreteAverage {
 
 	Random rand = new Random(234);
 
@@ -39,16 +40,17 @@ public class TestPyramidDiscreteAverage {
 	 * Basis tests to see if it computes the expected pyramid
 	 */
 	@Test
-	public void basicTest() {
-		GrayF32 input = new GrayF32(40,80);
+	void basicTest() {
+		var input = new GrayF32(40,80);
 		ImageMiscOps.fillUniform(input, rand, -20, 50);
+		ConfigDiscreteLevels configLevels = ConfigDiscreteLevels.levels(3);
 
-		PyramidDiscreteAverage<GrayF32> alg = new PyramidDiscreteAverage<>(ImageType.single(GrayF32.class),true,1,2,4);
+		var alg = new PyramidDiscreteAverage<>(ImageType.single(GrayF32.class),true,configLevels);
 
 		alg.process(input);
 
 		// request was made use a reference to the input image
-		assertTrue(input == alg.getLayer(0));
+		assertSame(input, alg.getLayer(0));
 
 		float expected = (input.get(0,0) +  input.get(0,1) + input.get(1,0) + input.get(1,1))/4;
 		assertEquals(expected,alg.getLayer(1).get(0,0),1e-4);

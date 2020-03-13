@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,8 +21,11 @@ package boofcv.alg.transform.pyramid;
 import boofcv.alg.filter.misc.AverageDownSampleOps;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
+
+import javax.annotation.Nullable;
 
 /**
  * Creates an image pyramid by down sampling square regions using {@link AverageDownSampleOps}.
@@ -37,12 +40,13 @@ public class PyramidDiscreteAverage<T extends ImageBase<T>> extends PyramidDiscr
 	 * @param imageType Type of image processed
 	 * @param saveOriginalReference If a reference to the full resolution image should be saved instead of copied.
 	 *                              Set to false if you don't know what you are doing.
-	 * @param scaleFactors Scale factor for each layer in the pyramid relative to the input layer
+	 * @param configLayers Specifies how the levels are computed
 	 */
 	public PyramidDiscreteAverage(ImageType<T> imageType,
-								  boolean saveOriginalReference, int... scaleFactors)
+								  boolean saveOriginalReference,
+								  @Nullable ConfigDiscreteLevels configLayers)
 	{
-		super(imageType,saveOriginalReference,scaleFactors);
+		super(imageType,saveOriginalReference,configLayers);
 	}
 
 	protected PyramidDiscreteAverage( PyramidDiscreteAverage<T> orig ) {
@@ -53,18 +57,18 @@ public class PyramidDiscreteAverage<T extends ImageBase<T>> extends PyramidDiscr
 	public void process(T input) {
 		super.initialize(input.width,input.height);
 
-		if (scale[0] == 1) {
+		if (levelScales[0] == 1) {
 			if (isSaveOriginalReference()) {
 				setFirstLayer(input);
 			} else {
 				getLayer(0).setTo(input);
 			}
 		} else {
-			AverageDownSampleOps.down(input, scale[0], getLayer(0));
+			AverageDownSampleOps.down(input, levelScales[0], getLayer(0));
 		}
 
 		for (int index = 1; index < getNumLayers(); index++) {
-			int width = scale[index]/scale[index-1];
+			int width = levelScales[index]/ levelScales[index-1];
 			AverageDownSampleOps.down(getLayer(index-1),width,getLayer(index));
 		}
 	}
@@ -77,7 +81,7 @@ public class PyramidDiscreteAverage<T extends ImageBase<T>> extends PyramidDiscr
 	 */
 	@Override
 	public double getSampleOffset(int layer) {
-		return (scale[layer]-1)/2.0;
+		return (levelScales[layer]-1)/2.0;
 	}
 
 	@Override

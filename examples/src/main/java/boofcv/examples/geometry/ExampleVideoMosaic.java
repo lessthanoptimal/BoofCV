@@ -61,7 +61,7 @@ public class ExampleVideoMosaic {
 		confDetector.radius = 3;
 
 		// Use a KLT tracker
-		PointTracker<GrayF32> tracker = FactoryPointTracker.klt(new int[]{1,2,4,8},confDetector,3,
+		PointTracker<GrayF32> tracker = FactoryPointTracker.klt(4,confDetector,3,
 				GrayF32.class,GrayF32.class);
 
 		// This estimates the 2D image motion

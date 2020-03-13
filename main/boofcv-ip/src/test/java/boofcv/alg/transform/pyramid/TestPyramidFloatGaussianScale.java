@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,8 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TestPyramidFloatGaussianScale extends GenericPyramidTests<GrayF32> {
 
-	double sigmas[] = new double[]{1,2};
-	double scales[] = new double[]{3,5};
+	double[] sigmas = new double[]{1,2};
+	double[] scales = new double[]{3,5};
 
 	public TestPyramidFloatGaussianScale() {
 		super(GrayF32.class);
@@ -50,7 +50,7 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<GrayF32> 
 	 * Compares update to a convolution and sub-sampling of upper layers.
 	 */
 	@Test
-	public void update() {
+	void update() {
 
 		GrayF32 img = new GrayF32(width,height);
 
@@ -87,9 +87,13 @@ public class TestPyramidFloatGaussianScale extends GenericPyramidTests<GrayF32> 
 	}
 
 	@Override
-	protected ImagePyramid<GrayF32> createPyramid(int... scales) {
-		double a[] = BoofMiscOps.convertTo_F64(scales);
-		double sigmas[] = new double[ scales.length ];
+	protected ImagePyramid<GrayF32> createPyramid( int numLevels ) {
+		int[] scales = new int[ numLevels ];
+		for (int i = 0,scale=1; i < scales.length; i++,scale *= 2) {
+			scales[i] = scale;
+		}
+		double[] a = BoofMiscOps.convertTo_F64(scales);
+		double[] sigmas = new double[ scales.length ];
 		for( int i = 0; i < sigmas.length; i++ )
 			sigmas[i] = i+1;
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(imageType,BorderType.EXTENDED);

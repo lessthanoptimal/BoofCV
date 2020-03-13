@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,9 +53,9 @@ public abstract class GenericPyramidTests<T extends ImageGray<T>> {
 	 * Checks to see if every layer in the pyramid has been modified on a call to update
 	 */
 	@Test
-	public void checkModifiesLayersOnUpdate() {
+	void checkModifiesLayersOnUpdate() {
 		T input = GeneralizedImageOps.createSingleBand(imageType, width, height);
-		ImagePyramid<T> pyramid = createPyramid(1,2,4);
+		ImagePyramid<T> pyramid = createPyramid(3);
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		pyramid.process(input);
@@ -66,17 +66,19 @@ public abstract class GenericPyramidTests<T extends ImageGray<T>> {
 		}
 	}
 
-	protected abstract ImagePyramid<T> createPyramid( int... scales);
+	protected abstract ImagePyramid<T> createPyramid( int numLevels );
 
 	@Test
-	public void copyStructure() {
+	void copyStructure() {
 		T input = GeneralizedImageOps.createSingleBand(imageType, width, height);
-		ImagePyramid<T> src = createPyramid(1,2,4);
+		ImagePyramid<T> src = createPyramid(3);
 		GImageMiscOps.fillUniform(input, rand, 0, 100);
 
 		src.process(input);
 
 		ImagePyramid<T> cpy = src.copyStructure();
+
+		cpy.process(input);
 
 		// see if the structure is the same
 		assertEquals(src.getNumLayers(),cpy.getNumLayers());

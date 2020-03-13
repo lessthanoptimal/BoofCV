@@ -26,6 +26,7 @@ import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
  * @author Peter Abeles
@@ -42,7 +43,7 @@ public class TestWrapVisOdomDualTrackPnP extends CheckVisualOdometryStereoSim<Gr
 
 		ConfigPKlt kltConfig = new ConfigPKlt();
 		kltConfig.templateRadius = 3;
-		kltConfig.pyramidScaling =  new int[]{1, 2, 4, 8};
+		kltConfig.pyramidLevels = ConfigDiscreteLevels.levels(4);
 
 		PointTracker<GrayF32> trackerLeft = FactoryPointTracker.klt(kltConfig, configDetector,
 				GrayF32.class,GrayF32.class);

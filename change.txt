@@ -28,6 +28,8 @@ Version : 0.36
   * FDistort now supports SKIP border. Thanks Nico Stuurman!
   * Created ContourOps
   * Deterministic non-max block concurrent algorithm
+  * Discrete image pyramids can now be dynamically defined based on input image size
+  * Added a proper config for discrete image pyramid levels
   * TODO Deterministic non-max block candidate concurrent algorithm
 - Color
   * Can convert YUV, HSV, and YCbCr to 32-bit RGB color

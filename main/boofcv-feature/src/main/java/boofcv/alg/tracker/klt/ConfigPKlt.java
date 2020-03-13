@@ -19,6 +19,7 @@
 package boofcv.alg.tracker.klt;
 
 import boofcv.struct.Configuration;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
  * Configuration class for {@link PyramidKltTracker}.
@@ -40,8 +41,10 @@ public class ConfigPKlt implements Configuration
 	/** The radius of a feature descriptor in layer. 2 is a reasonable number. */
 	public int templateRadius = 2;
 
-	/** Scale factor for each layer in the pyramid */
-	public int pyramidScaling[] = new int[]{1,2,4};
+	/**
+	 * Specifies the number of layers in the pyramid
+	 */
+	public ConfigDiscreteLevels pyramidLevels = ConfigDiscreteLevels.minSize(100);
 
 	/**
 	 * If true it will prune tracks which come too close to each other. The default behavior is to
@@ -56,10 +59,6 @@ public class ConfigPKlt implements Configuration
 		this.templateRadius = templateRadius;
 	}
 
-	public ConfigPKlt(int templateRadius, int[] pyramidScaling) {
-		this.templateRadius = templateRadius;
-		this.pyramidScaling = pyramidScaling;
-	}
 
 	@Override
 	public void checkValidity() {

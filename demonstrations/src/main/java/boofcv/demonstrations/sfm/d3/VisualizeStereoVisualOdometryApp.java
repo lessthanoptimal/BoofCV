@@ -59,6 +59,7 @@ import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.feature.TupleDesc_B;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -276,7 +277,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 		kltConfig.toleranceFB = 3;
 		kltConfig.pruneClose = true;
 		kltConfig.templateRadius = 3;
-		kltConfig.pyramidScaling = new int[]{1, 2, 4, 8};
+		kltConfig.pyramidLevels = ConfigDiscreteLevels.levels(4);
 
 		if( whichAlg == 0 ) {
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(1000,4,0.1f);

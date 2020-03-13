@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,18 +18,16 @@
 
 package boofcv.examples.imageprocessing;
 
-import boofcv.core.image.GeneralizedImageOps;
-import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.gui.image.DiscretePyramidPanel;
 import boofcv.gui.image.ShowImages;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
-import boofcv.struct.convolve.Kernel1D;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import java.awt.image.BufferedImage;
@@ -45,35 +43,9 @@ public class ExamplePyramidDiscrete<T extends ImageGray<T>> {
 
 	// specifies the image type
 	Class<T> imageType;
-	// The pyramid data structure
-	PyramidDiscrete<T> pyramid;
 
 	public ExamplePyramidDiscrete(Class<T> imageType) {
 		this.imageType = imageType;
-	}
-
-	/**
-	 * Creates a fairly standard pyramid and updater.
-	 */
-	public void standard() {
-		// Each level in the pyramid must have a ratio with the previously layer that is an integer value
-		pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4,8},-1,2,true, ImageType.single(imageType));
-	}
-
-	/**
-	 * Creates a more unusual pyramid and updater.
-	 */
-	public void unusual() {
-		// Note that the first level does not have to be one
-		pyramid = FactoryPyramid.discreteGaussian(new int[]{2,6},-1,2,true, ImageType.single(imageType));
-
-		// Other kernels can also be used besides Gaussian
-		Kernel1D kernel;
-		if(GeneralizedImageOps.isFloatingPoint(imageType) ) {
-			kernel = FactoryKernel.table1D_F32(2,true);
-		} else {
-			kernel = FactoryKernel.table1D_S32(2);
-		}
 	}
 
 	/**
@@ -81,6 +53,8 @@ public class ExamplePyramidDiscrete<T extends ImageGray<T>> {
 	 */
 	public void process( BufferedImage image ) {
 		T input = ConvertBufferedImage.convertFromSingle(image, null, imageType);
+		PyramidDiscrete<T> pyramid = FactoryPyramid.discreteGaussian(
+				ConfigDiscreteLevels.levels(4),-1,2,true, ImageType.single(imageType));
 		pyramid.process(input);
 
 		DiscretePyramidPanel gui = new DiscretePyramidPanel();
@@ -101,8 +75,6 @@ public class ExamplePyramidDiscrete<T extends ImageGray<T>> {
 		ExamplePyramidDiscrete<GrayF32> app = new ExamplePyramidDiscrete<>(GrayF32.class);
 //		ExamplePyramidDiscrete<GrayU8> app = new ExamplePyramidDiscrete<>(GrayU8.class);
 
-		app.standard();
-//		app.unusual();
 		app.process(image);
 	}
 }

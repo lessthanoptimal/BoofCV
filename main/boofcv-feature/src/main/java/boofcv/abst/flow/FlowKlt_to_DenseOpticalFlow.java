@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,6 +43,7 @@ public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray<I>, D extends Image
 	ImagePyramid<I> pyramidSrc;
 	ImagePyramid<I> pyramidDst;
 
+	Class<D> derivType;
 	D[] srcDerivX;
 	D[] srcDerivY;
 
@@ -52,22 +53,14 @@ public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray<I>, D extends Image
 									   ImageGradient<I, D> gradient,
 									   ImagePyramid<I> pyramidSrc,
 									   ImagePyramid<I> pyramidDst,
-									   Class<I> inputType , Class<D> derivType ) {
-		if( pyramidSrc.getNumLayers() != pyramidDst.getNumLayers() )
-			throw new IllegalArgumentException("Pyramids do not have the same number of layers!");
-
+									   Class<I> inputType , Class<D> derivType )
+	{
 		this.flowKlt = flowKlt;
 		this.gradient = gradient;
 		this.pyramidSrc = pyramidSrc;
 		this.pyramidDst = pyramidDst;
+		this.derivType = derivType;
 
-		srcDerivX = (D[])Array.newInstance(derivType,pyramidSrc.getNumLayers());
-		srcDerivY = (D[])Array.newInstance(derivType,pyramidSrc.getNumLayers());
-
-		for( int i = 0; i < srcDerivX.length; i++ ) {
-			srcDerivX[i] = GeneralizedImageOps.createSingleBand(derivType,1,1);
-			srcDerivY[i] = GeneralizedImageOps.createSingleBand(derivType,1,1);
-		}
 
 		imageType = ImageType.single(inputType);
 	}
@@ -76,6 +69,19 @@ public class FlowKlt_to_DenseOpticalFlow<I extends ImageGray<I>, D extends Image
 	public void process(I source, I destination, ImageFlow flow) {
 		pyramidSrc.process(source);
 		pyramidDst.process(destination);
+
+		if( pyramidSrc.getNumLayers() != pyramidDst.getNumLayers() )
+			throw new IllegalArgumentException("Pyramids do not have the same number of layers!");
+
+		if( srcDerivX == null || srcDerivX.length != pyramidSrc.getNumLayers() ) {
+			srcDerivX = (D[]) Array.newInstance(derivType, pyramidSrc.getNumLayers());
+			srcDerivY = (D[]) Array.newInstance(derivType, pyramidSrc.getNumLayers());
+
+			for (int i = 0; i < srcDerivX.length; i++) {
+				srcDerivX[i] = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
+				srcDerivY[i] = GeneralizedImageOps.createSingleBand(derivType, 1, 1);
+			}
+		}
 
 		PyramidOps.reshapeOutput(pyramidSrc,srcDerivX);
 		PyramidOps.reshapeOutput(pyramidSrc,srcDerivY);

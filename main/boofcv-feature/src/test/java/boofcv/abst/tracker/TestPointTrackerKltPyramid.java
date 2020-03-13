@@ -25,6 +25,7 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.tracker.klt.*;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -200,6 +201,7 @@ class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
 		ConfigPKlt config = new ConfigPKlt();
 		config.templateRadius=3;
 		config.toleranceFB = 0.1;
+		config.pyramidLevels = ConfigDiscreteLevels.levels(3);
 
 		PointTracker<GrayF32> alg = createKLT(config);
 

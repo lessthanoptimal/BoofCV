@@ -29,6 +29,7 @@ import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.flow.ImageFlow;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,11 +56,11 @@ class TestDenseOpticalFlowKlt {
 
 	@BeforeEach
 	void setup() {
-		config.pyramidScaling = new int[]{1,2};
+		config.pyramidLevels = ConfigDiscreteLevels.levels(2);
 		config.config.maxPerPixelError = 15;
 
-		prev = FactoryPyramid.discreteGaussian(config.pyramidScaling, -1, 2, true, ImageType.single(GrayF32.class));
-		curr = FactoryPyramid.discreteGaussian(config.pyramidScaling, -1, 2, true, ImageType.single(GrayF32.class));
+		prev = FactoryPyramid.discreteGaussian(config.pyramidLevels, -1, 2, true, ImageType.single(GrayF32.class));
+		curr = FactoryPyramid.discreteGaussian(config.pyramidLevels, -1, 2, true, ImageType.single(GrayF32.class));
 
 		prev.process(image0);
 		curr.process(image0);
@@ -78,7 +79,7 @@ class TestDenseOpticalFlowKlt {
 	protected DenseOpticalFlowKlt<GrayF32,GrayF32> createAlg() {
 		PyramidKltTracker<GrayF32, GrayF32> tracker =
 				FactoryTrackerAlg.kltPyramid(config.config, GrayF32.class, GrayF32.class);
-		return new DenseOpticalFlowKlt<>(tracker, config.pyramidScaling.length, 3);
+		return new DenseOpticalFlowKlt<>(tracker, 3);
 	}
 
 	/**

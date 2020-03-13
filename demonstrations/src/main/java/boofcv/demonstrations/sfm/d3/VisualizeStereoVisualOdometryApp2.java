@@ -45,6 +45,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.visualize.PointCloudViewer;
 import boofcv.visualize.VisualizeData;
 import georegression.struct.point.Point2D_F64;
@@ -122,7 +123,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		kltConfig.toleranceFB = 3;
 		kltConfig.pruneClose = true;
 		kltConfig.templateRadius = 3;
-		kltConfig.pyramidScaling = new int[]{1, 2, 4, 8};
+		kltConfig.pyramidLevels = ConfigDiscreteLevels.levels(4);
 
 		StereoDisparitySparse<T> disparity =
 				FactoryStereoDisparity.regionSparseWta(2,150,3,3,30,-1,true,imageType);

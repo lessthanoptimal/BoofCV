@@ -40,6 +40,7 @@ import boofcv.io.image.SimpleImageSequence;
 import boofcv.struct.calib.MonoPlaneParameters;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
@@ -292,7 +293,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 
 		if( whichAlg == 0 ) {
 			ConfigPKlt config = new ConfigPKlt();
-			config.pyramidScaling = new int[]{1,2,4,8};
+			config.pyramidLevels = ConfigDiscreteLevels.levels(4);
 			config.templateRadius = 3;
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
@@ -301,7 +302,7 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 			return FactoryVisualOdometry.monoPlaneInfinity(75,2,1.5,200, tracker, imageType);
 		} else if( whichAlg == 1 ) {
 			ConfigPKlt config = new ConfigPKlt();
-			config.pyramidScaling = new int[]{1,2,4,8};
+			config.pyramidLevels = ConfigDiscreteLevels.levels(4);
 			config.templateRadius = 3;
 			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 

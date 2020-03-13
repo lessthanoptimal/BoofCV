@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.struct.image.GrayU16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
 
 /**
@@ -41,7 +42,9 @@ public class TestPyramidDirectColorDepth_to_DepthVisualOdometry extends CheckVis
 
 	protected DepthVisualOdometry<GrayU8,GrayU16> createAlgorithm() {
 
-		ImagePyramid<Planar<GrayU8>> pyramid = FactoryPyramid.discreteGaussian(new int[]{1,2,4},
+		ConfigDiscreteLevels config = ConfigDiscreteLevels.levels(3);
+
+		ImagePyramid<Planar<GrayU8>> pyramid = FactoryPyramid.discreteGaussian(config,
 				-1,2,false, ImageType.pl(1,GrayU8.class));
 
 		PyramidDirectColorDepth<GrayU8> alg = new PyramidDirectColorDepth<>(pyramid);

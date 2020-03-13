@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,7 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.pyramid.PyramidDiscrete;
 import boofcv.testing.BoofTesting;
@@ -46,11 +47,11 @@ public class TestPyramidOps {
 	int width = 60;
 	int height = 50;
 
-	int scales[] = new int[]{1,2,4};
+	ConfigDiscreteLevels configLevels = ConfigDiscreteLevels.levels(3);
 
 	@Test
 	public void declareOutput() {
-		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,scales);
+		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,configLevels);
 		in.initialize(width,height);
 		GrayF32[] out = PyramidOps.declareOutput(in,ImageType.SB_F32);
 
@@ -66,7 +67,7 @@ public class TestPyramidOps {
 	public void filter() {
 		FilterImageInterface<GrayF32,GrayF32> filter = FactoryBlurFilter.gaussian(ImageType.single(GrayF32.class),-1,1);
 
-		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,scales);
+		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,configLevels);
 
 		in.initialize(width,height);
 		GrayF32[] out = PyramidOps.declareOutput(in,ImageType.SB_F32);
@@ -74,7 +75,7 @@ public class TestPyramidOps {
 		randomize(in, rand, 0, 100);
 		PyramidOps.filter(in, filter, out);
 
-		for( int i = 0; i < scales.length; i++ ) {
+		for( int i = 0; i < configLevels.numLevelsRequested; i++ ) {
 			GrayF32 input = in.getLayer(i);
 			GrayF32 expected = new GrayF32(input.width,input.height);
 
@@ -87,7 +88,7 @@ public class TestPyramidOps {
 	public void gradient() {
 		ImageGradient<GrayF32,GrayF32> gradient = FactoryDerivative.sobel(GrayF32.class,null);
 
-		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,scales);
+		DummyDiscrete<GrayF32> in = new DummyDiscrete<>(GrayF32.class,false,configLevels);
 		in.initialize(width, height);
 
 		GrayF32[] outX = PyramidOps.declareOutput(in,ImageType.SB_F32);
@@ -96,7 +97,7 @@ public class TestPyramidOps {
 		randomize(in, rand, 0, 100);
 		PyramidOps.gradient(in, gradient, outX,outY);
 
-		for( int i = 0; i < scales.length; i++ ) {
+		for( int i = 0; i < configLevels.numLevelsRequested; i++ ) {
 			GrayF32 input = in.getLayer(i);
 			GrayF32 x = new GrayF32(input.width,input.height);
 			GrayF32 y = new GrayF32(input.width,input.height);
@@ -158,8 +159,8 @@ public class TestPyramidOps {
 
 	private static class DummyDiscrete<T extends ImageGray<T>> extends PyramidDiscrete<T> {
 
-		public DummyDiscrete(Class<T> imageType, boolean saveOriginalReference, int scales[] ) {
-			super(ImageType.single(imageType), saveOriginalReference,scales);
+		public DummyDiscrete(Class<T> imageType, boolean saveOriginalReference, ConfigDiscreteLevels configLevels) {
+			super(ImageType.single(imageType), saveOriginalReference,configLevels);
 		}
 
 		@Override

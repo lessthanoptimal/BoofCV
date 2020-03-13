@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ public class TestPyramidFloatScale extends GenericPyramidTests<GrayF32> {
 	 * Compares update to a convolution and sub-sampling of upper layers.
 	 */
 	@Test
-	public void update() {
+	void update() {
 
 		GrayF32 input = new GrayF32(width,height);
 		BoofTesting.checkSubImage(this, "_update", true, input);
@@ -74,9 +74,14 @@ public class TestPyramidFloatScale extends GenericPyramidTests<GrayF32> {
 
 
 	@Override
-	protected ImagePyramid<GrayF32> createPyramid(int... scales) {
+	protected ImagePyramid<GrayF32> createPyramid(int numLevels) {
+		int[] scales = new int[ numLevels ];
+		for (int i = 0,scale=1; i < scales.length; i++,scale *= 2) {
+			scales[i] = scale;
+		}
+
 		InterpolatePixelS<GrayF32> interp = FactoryInterpolation.bilinearPixelS(GrayF32.class, BorderType.EXTENDED);
-		double a[] = BoofMiscOps.convertTo_F64(scales);
+		double[] a = BoofMiscOps.convertTo_F64(scales);
 		return new PyramidFloatScale<>(interp,a,imageType);
 	}
 

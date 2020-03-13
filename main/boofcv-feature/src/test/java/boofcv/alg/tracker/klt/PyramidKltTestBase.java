@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.PyramidDiscrete;
 
 import java.util.Random;
@@ -54,12 +55,13 @@ public class PyramidKltTestBase {
 	int cornerY = 22;
 
 	public void setup() {
-		setup(1,2,4);
+		setup(3);
 	}
 
-	public void setup( int ...scales ) {
+	public void setup( int numLevels ) {
 
-		pyramid = FactoryPyramid.discreteGaussian(scales,-1,2,false, ImageType.single(GrayF32.class));
+		ConfigDiscreteLevels configLevels = ConfigDiscreteLevels.levels(numLevels);
+		pyramid = FactoryPyramid.discreteGaussian(configLevels,-1,2,false, ImageType.single(GrayF32.class));
 		ImageMiscOps.fillUniform(image,rand,0,10);
 		ImageMiscOps.fillRectangle(image,100,cornerX,cornerY,20,20);
 		pyramid.process(image);

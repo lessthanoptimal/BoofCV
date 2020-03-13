@@ -119,7 +119,7 @@ public class FactoryTrackerAlg {
 			derivType = GImageDerivativeOps.getDerivativeType(imageType);
 
 		PyramidKltForCombined<I,D> klt = new PyramidKltForCombined<>(kltConfig.config,
-				kltConfig.templateRadius, kltConfig.pyramidScaling, imageType, derivType);
+				kltConfig.templateRadius,imageType, derivType);
 
 		return new CombinedTrackerScalePoint<>(klt, detector, associate);
 	}

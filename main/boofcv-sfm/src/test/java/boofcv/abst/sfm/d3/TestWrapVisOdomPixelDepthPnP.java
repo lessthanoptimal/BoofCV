@@ -26,6 +26,7 @@ import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.FactoryPointTrackerTwoPass;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
  * @author Peter Abeles
@@ -42,7 +43,7 @@ public class TestWrapVisOdomPixelDepthPnP extends CheckVisualOdometryStereoSim<G
 				FactoryStereoDisparity.regionSparseWta(2, 150, 3, 3, 30, -1, true, GrayF32.class);
 
 		ConfigPKlt config = new ConfigPKlt();
-		config.pyramidScaling = new int[]{1,2,4,8};
+		config.pyramidLevels =  ConfigDiscreteLevels.levels(4);
 		config.templateRadius = 3;
 
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);

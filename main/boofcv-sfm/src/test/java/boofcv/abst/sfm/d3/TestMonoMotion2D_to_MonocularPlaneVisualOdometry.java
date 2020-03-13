@@ -26,6 +26,7 @@ import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
  * @author Peter Abeles
@@ -41,7 +42,7 @@ public class TestMonoMotion2D_to_MonocularPlaneVisualOdometry extends CheckVisua
 	protected MonocularPlaneVisualOdometry<GrayU8> createAlgorithm() {
 
 		ConfigPKlt config = new ConfigPKlt();
-		config.pyramidScaling = new int[]{1,2,4,8};
+		config.pyramidLevels =  ConfigDiscreteLevels.levels(4);
 		config.templateRadius = 3;
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
 
