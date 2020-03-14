@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,10 +66,10 @@ public class GeneralExtractConfigPanel extends StandardAlgConfigPanel implements
 		selectNumFeatures.setPreferredSize(new Dimension(w,h));
 		selectNumFeatures.setMaximumSize(new Dimension(w,h));
 
-		addLabeled(selectImage,"Display",this);
-		addLabeled(selectNumFeatures,"Total",this);
-		addLabeled(selectSeparation,"Separation",this);
-		addLabeled(selectThreshold,"Threshold",this);
+		addLabeled(selectImage,"Display");
+		addLabeled(selectNumFeatures,"Total");
+		addLabeled(selectSeparation,"Separation");
+		addLabeled(selectThreshold,"Threshold");
 		add(Box.createVerticalGlue());
 	}
 

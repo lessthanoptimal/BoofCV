@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,13 +72,13 @@ public class ViewedImageInfoPanel extends StandardAlgConfigPanel
 		selectZoom.addChangeListener(this);
 		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
 
-		addLabeled(textImageSize,"Input Shape",this);
+		addLabeled(textImageSize,"Input Shape");
 		addLabeled(processingTimeLabel,"Time (ms)");
 		if( showClick ) {
-			addLabeled(textCursorX, "Click X", this);
-			addLabeled(textCursorY, "Click Y", this);
+			addLabeled(textCursorX, "Click X");
+			addLabeled(textCursorY, "Click Y");
 		}
-		addLabeled(selectZoom,"Zoom", this);
+		addLabeled(selectZoom,"Zoom");
 	}
 
 	public void setImageSize( int width , int height ) {

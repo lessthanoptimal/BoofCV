@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -207,14 +207,14 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 			spinnerConvexTest     = spinner(config.convexTest, 0.0, 20.0, 0.25,2,2);
 			spinnerRefine         = spinner(config.refineIterations, 0, 20, 1);
 
-			addLabeled(controlMaxSideError, "Max Side Error", this);
-			addLabeled(controlExtraConsider, "Extra Side Consider", this);
-			addLabeled(spinnerMinSideLength, "Min Side Length", this);
-			addLabeled(spinnerCornerPenalty, "Corner Penalty", this);
-			addLabeled(spinnerSideSplitScore, "Side Split", this);
-			addLabeled(spinnerSideSamples, "Side Samples", this);
-			addLabeled(spinnerConvexTest, "Convex Test", this);
-			addLabeled(spinnerRefine, "Refine Iterations ", this);
+			addLabeled(controlMaxSideError, "Max Side Error");
+			addLabeled(controlExtraConsider, "Extra Side Consider");
+			addLabeled(spinnerMinSideLength, "Min Side Length");
+			addLabeled(spinnerCornerPenalty, "Corner Penalty");
+			addLabeled(spinnerSideSplitScore, "Side Split");
+			addLabeled(spinnerSideSamples, "Side Samples");
+			addLabeled(spinnerConvexTest, "Convex Test");
+			addLabeled(spinnerRefine, "Refine Iterations ");
 		}
 
 		@Override
@@ -274,10 +274,10 @@ public class PolylineControlPanel extends StandardAlgConfigPanel
 //			spinnerContourIterations.addChangeListener(this);
 			spinnerSplitPenalty = spinner(config.pruneSplitPenalty, 0.0, 100.0, 1.0,1,1);
 
-			addLabeled(spinnerContourSplit, "Split Fraction: ", this);
-			addLabeled(spinnerContourMinSplit, "Min Split: ", this);
-			addLabeled(spinnerContourIterations, "Max Iterations: ", this);
-			addLabeled(spinnerSplitPenalty, "Split Penalty: ", this);
+			addLabeled(spinnerContourSplit, "Split Fraction: ");
+			addLabeled(spinnerContourMinSplit, "Min Split: ");
+			addLabeled(spinnerContourIterations, "Max Iterations: ");
+			addLabeled(spinnerSplitPenalty, "Split Penalty: ");
 		}
 
 		@Override

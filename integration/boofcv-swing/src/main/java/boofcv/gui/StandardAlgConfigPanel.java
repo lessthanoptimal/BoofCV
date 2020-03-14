@@ -199,9 +199,17 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	}
 
 	protected JCheckBox checkbox( String text , boolean value ) {
+		return checkbox(text,value,null);
+	}
+
+	protected JCheckBox checkbox( String text , boolean value , String tooltip ) {
 		JCheckBox c = new JCheckBox(text);
 		c.setSelected(value);
 		c.addActionListener((ActionListener) this);
+
+		if( tooltip != null )
+			c.setToolTipText(tooltip);
+
 		return c;
 	}
 
@@ -243,6 +251,10 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		owner.add(p);
 	}
 
+	public void addCenterLabel( String text ) {
+		addCenterLabel(text,this);
+	}
+
 	public void addCenterLabel( String text , JPanel owner ) {
 		JLabel l = new JLabel(text);
 		l.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -265,10 +277,14 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	}
 
 	public void addLabeled( JComponent target , String text ) {
-		addLabeled(target,text,this);
+		addLabeled(target,text);
 	}
 
-	public static void addLabeled( JComponent target , String text , JPanel owner ) {
+	public void addLabeled( JComponent target , String text , String tooltip ) {
+		addLabeled(target,text, tooltip, this);
+	}
+
+	public static void addLabeled(JComponent target, String text, String tooltip, JPanel owner) {
 		JLabel label = new JLabel(text);
 		label.setLabelFor(target);
 		JPanel p = new JPanel();
@@ -277,6 +293,10 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		p.add(Box.createHorizontalGlue());
 		p.add(target);
 		owner.add(p);
+
+		if( tooltip != null ) {
+			label.setToolTipText(tooltip);
+		}
 	}
 
 	public static JPanel createHorizontalPanel( Component ...children ) {

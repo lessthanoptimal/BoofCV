@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -165,8 +165,8 @@ public class OpenWebcamDialog extends StandardAlgConfigPanel {
 		checkPanel.add( Box.createHorizontalGlue());
 //		checkPanel.setMaximumSize(checkPanel.getPreferredSize());
 
-		addLabeled(comboCameras,"Webcam",this);
-		addLabeled(sizePanel,"Size",this);
+		addLabeled(comboCameras,"Webcam");
+		addLabeled(sizePanel,"Size");
 		addAlignRight(comboSizes,this);
 		add(checkPanel);
 		add(buttonPanel);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -81,10 +81,10 @@ public class DetectBlackPolygonAppControlPanel extends DetectBlackShapePanel
 		visualsPanel.add(showLines);
 		visualsPanel.add(showContour);
 
-		addLabeled(processingTimeLabel,"Time (ms)", this);
-		addLabeled(imageSizeLabel,"Size", this);
-		addLabeled(imageView, "View: ", this);
-		addLabeled(selectZoom,"Zoom",this);
+		addLabeled(processingTimeLabel,"Time (ms)");
+		addLabeled(imageSizeLabel,"Size");
+		addLabeled(imageView, "View: ");
+		addLabeled(selectZoom,"Zoom");
 		add(visualsPanel);
 		add(polygonPanel);
 		addVerticalGlue(this);

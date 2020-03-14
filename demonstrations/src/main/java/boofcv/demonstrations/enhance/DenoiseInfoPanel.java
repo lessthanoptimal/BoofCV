@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -98,16 +98,16 @@ public class DenoiseInfoPanel extends StandardAlgConfigPanel implements ChangeLi
 		configHolder.add(createWaveletConfig());
 		createBlurConfig();
 
-		addLabeled(images,"View",this);
-		addLabeled(noiseLevel,"Noise",this);
+		addLabeled(images,"View");
+		addLabeled(noiseLevel,"Noise");
 		addSeparator(200);
-		addCenterLabel("Denoised",this);
-		addLabeled(algError,"Error",this);
-		addLabeled(algErrorEdge,"Edge Error",this);
+		addCenterLabel("Denoised");
+		addLabeled(algError,"Error");
+		addLabeled(algErrorEdge,"Edge Error");
 		addSeparator(200);
-		addCenterLabel("Noise Image",this);
-		addLabeled(noiseError,"Error",this);
-		addLabeled(noiseErrorEdge,"Edge Error",this);
+		addCenterLabel("Noise Image");
+		addLabeled(noiseError,"Error");
+		addLabeled(noiseErrorEdge,"Edge Error");
 		addSeparator(200);
 		add(configHolder);
 		add(Box.createVerticalGlue());
@@ -117,8 +117,8 @@ public class DenoiseInfoPanel extends StandardAlgConfigPanel implements ChangeLi
 		waveletConfig = new JPanel();
 		waveletConfig.setLayout(new BoxLayout(waveletConfig,BoxLayout.Y_AXIS));
 		addCenterLabel("Wavelet Config",waveletConfig);
-		addLabeled(waveletBox,"Wavelet",waveletConfig);
-		addLabeled(waveletLevel,"Level",waveletConfig);
+		addLabeled(waveletBox,"Wavelet", null, waveletConfig);
+		addLabeled(waveletLevel,"Level", null, waveletConfig);
 		return waveletConfig;
 	}
 
@@ -126,7 +126,7 @@ public class DenoiseInfoPanel extends StandardAlgConfigPanel implements ChangeLi
 		blurConfig = new JPanel();
 		blurConfig.setLayout(new BoxLayout(blurConfig,BoxLayout.Y_AXIS));
 		addCenterLabel("Blur Config",blurConfig);
-		addLabeled(blurRadius,"Radius",blurConfig);
+		addLabeled(blurRadius,"Radius", null, blurConfig);
 		return blurConfig;
 	}
 

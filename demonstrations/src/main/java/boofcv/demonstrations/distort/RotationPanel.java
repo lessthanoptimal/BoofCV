@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,9 +68,9 @@ public class RotationPanel extends StandardAlgConfigPanel
 
 		home.addActionListener(this);
 
-		addLabeled(selectPitch,"Pitch: ", this);
-		addLabeled(selectYaw,  "Yaw: ", this);
-		addLabeled(selectRoll, "Roll: ", this);
+		addLabeled(selectPitch,"Pitch: ");
+		addLabeled(selectYaw,  "Yaw: ");
+		addLabeled(selectRoll, "Roll: ");
 		addAlignCenter(home,this);
 	}
 

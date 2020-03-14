@@ -26,9 +26,10 @@ import boofcv.abst.sfm.d3.WrapVisOdomPixelDepthPnP;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.tracker.klt.ConfigPKlt;
+import boofcv.demonstrations.feature.disparity.ControlPanelDisparitySparse;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
-import boofcv.factory.feature.disparity.FactoryStereoDisparity;
-import boofcv.factory.sfm.ConfigVoStereoPnP;
+import boofcv.factory.feature.disparity.ConfigDisparityBM;
+import boofcv.factory.sfm.ConfigVisOdomDepthPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.BoofSwingUtil;
@@ -76,6 +77,7 @@ import static boofcv.io.image.ConvertBufferedImage.convertFrom;
 public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		extends DemonstrationBase
 {
+	// Main GUI elements for the app
 	ControlPanel controls = new ControlPanel();
 	StereoPanel stereoPanel = new StereoPanel();
 	PointCloudPanel cloudPanel = new PointCloudPanel();
@@ -108,31 +110,67 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,stereoPanel,cloudPanel);
 		split.setDividerLocation(320);
 
-		controls.setPreferredSize(new Dimension(160,0));
+		controls.setPreferredSize(new Dimension(200,0));
 
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, split);
 
-		setPreferredSize(new Dimension(1200,520));
+		setPreferredSize(new Dimension(1200,540));
+	}
+
+	/**
+	 * Stop whatever it's doing, create a new visual odometry instance, start processing input sequence from the start
+	 */
+	public void resetWithNewAlgorithm() {
+		BoofSwingUtil.checkGuiThread();
+
+		// disable now that we are using it's controls
+		controls.bUpdateAlg.setEnabled(false);
+
+		stopAllInputProcessing();
+		alg = createSelectedAlgorithm();
+		reprocessInput();
 	}
 
 	public StereoVisualOdometry<T> createSelectedAlgorithm() {
 		Class<T> imageType = getImageType(0).getImageClass();
 
-		ConfigPKlt kltConfig = new ConfigPKlt();
-		kltConfig.toleranceFB = 3;
-		kltConfig.pruneClose = true;
-		kltConfig.templateRadius = 3;
-		kltConfig.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		ConfigPKlt kltConfig = controls.controlKlt.configKlt;
+		ConfigGeneralDetector detConfig = controls.controlKlt.configDetector;
+		StereoDisparitySparse<T> disparity = controls.controlDisparity.createAlgorithm(imageType);
+		PointTracker<T> tracker = FactoryPointTracker.klt(kltConfig, detConfig,imageType,null);
+		ConfigVisOdomDepthPnP configPnpDepth = controls.controlPnpDepth.config;
+		return FactoryVisualOdometry.stereoDepthPnP(configPnpDepth,disparity,tracker,imageType);
+	}
 
-		StereoDisparitySparse<T> disparity =
-				FactoryStereoDisparity.regionSparseWta(2,150,3,3,30,-1,true,imageType);
+	private static ConfigPKlt createConfigKlt() {
+		var config = new ConfigPKlt();
+		config.toleranceFB = 3;
+		config.pruneClose = true;
+		config.templateRadius = 3;
+		config.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		return config;
+	}
 
+	private static ConfigGeneralDetector createConfigKltDetect() {
+		var config = new ConfigGeneralDetector();
+		config.maxFeatures = -1;
+		config.radius = 4;
+		config.threshold = 0.1f;
+		return config;
+	}
 
-		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(1000,4,0.1f);
-		PointTracker<T> tracker = FactoryPointTracker.klt(kltConfig, configDetector,imageType,null);
+	private static ConfigDisparityBM createConfigDisparity() {
+		var config = new ConfigDisparityBM();
+		config.disparityMin = 2;
+		config.disparityRange = 150;
+		config.regionRadiusX = 3;
+		config.regionRadiusY = 3;
+		config.maxPerPixelError = 30;
+		config.texture = 0.0;
+		config.subpixel = true;
 
-		return FactoryVisualOdometry.stereoDepthPnP(controls.configDepth,disparity,tracker,imageType);
+		return config;
 	}
 
 	@Override
@@ -308,9 +346,10 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		// the maximum number of frames in the past the track was first spawned and stuff be visible. 0 = infinite
 		int maxTrackAge=0;
 
-		final ConfigVoStereoPnP configDepth = new ConfigVoStereoPnP();
 		final JLabel videoFrameLabel = new JLabel();
 		final JButton bPause = button("Pause",true);
+		final JButton bStep = button("Step",true);
+		final JButton bUpdateAlg = button("Update",false,(e)->resetWithNewAlgorithm());
 
 		// Statistical Info
 		protected JLabel labelInliersN = new JLabel();
@@ -318,45 +357,75 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		protected JLabel labelBundleN = new JLabel();
 		protected JLabel labelTraveled = new JLabel();
 
+		// Panel which contains all controls
+		protected JPanel panelAlgControls = new JPanel(new BorderLayout());
+
 		// Stereo Visualization Controls
-		final JCheckBox checkInliers = checkbox("Inliers",showInliers);
-		final JCheckBox checkNew = checkbox("New",showNew);
+		final JCheckBox checkInliers = checkbox("Inliers",showInliers,"Only draw inliers");
+		final JCheckBox checkNew = checkbox("New",showNew,"Highlight new tracks");
 
 		// Cloud Visualization Controls
 		final JSpinner spinMaxDepth = spinner(maxDepth,0.0,100.0,1.0);
-		final JCheckBox checkCameras = checkbox("Cameras",showCameras);
-		final JCheckBox checkCloud = checkbox("cloud",showCloud);
+		final JCheckBox checkCameras = checkbox("Cameras",showCameras,"Render camera locations");
+		final JCheckBox checkCloud = checkbox("Cloud",showCloud,"Show sparse point cloud");
 		final JSpinner spinMaxTrackAge = spinner(maxTrackAge,0,999,5);
+
+		// controls for different algorithms
+		ControlPanelVisOdomDepthPnP controlPnpDepth = new ControlPanelVisOdomDepthPnP(()->bUpdateAlg.setEnabled(true));
+		ControlPanelPointTrackerKlt controlKlt = new ControlPanelPointTrackerKlt(
+				()->bUpdateAlg.setEnabled(true),createConfigKltDetect(),createConfigKlt());
+		ControlPanelDisparitySparse controlDisparity = new ControlPanelDisparitySparse(createConfigDisparity(),()->bUpdateAlg.setEnabled(true));
 
 		public ControlPanel() {
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1);
 
 			var panelInfo = new StandardAlgConfigPanel();
 			panelInfo.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Statistics"));
-			panelInfo.addLabeled(labelInliersN,"Inliers");
-			panelInfo.addLabeled(labelVisibleN,"Visible");
-			panelInfo.addLabeled(labelBundleN,"Bundle");
-			panelInfo.addLabeled(labelTraveled,"Traveled");
+			panelInfo.addLabeled(labelInliersN,"Inliers","Tracks that were inliers in this frame");
+			panelInfo.addLabeled(labelVisibleN,"Visible", "Total number of active visible tracks");
+			panelInfo.addLabeled(labelBundleN,"Bundle","Features included in bundle adjustment");
+			panelInfo.addLabeled(labelTraveled,"Traveled","Distance traveled in world units");
 
 			JPanel panelStereo = gridPanel(0,2,0,2,checkInliers, checkNew);
 			panelStereo.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Stereo"));
 
 			var panelCloud = new StandardAlgConfigPanel();
 			panelCloud.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Cloud"));
-			panelCloud.addLabeled(spinMaxDepth,"Max Depth");
-			panelCloud.addLabeled(spinMaxTrackAge,"Max Age");
+			panelCloud.addLabeled(spinMaxDepth,"Max Depth","Maximum distance a feature can be in the last frame it was seen");
+			panelCloud.addLabeled(spinMaxTrackAge,"Max Age","Only draw tracks which were first seen than this value");
 			panelCloud.addAlignLeft(checkCameras);
 			panelCloud.addAlignLeft(checkCloud);
 
+			var panelVisuals = new JPanel();
+			panelVisuals.setLayout(new BoxLayout(panelVisuals,BoxLayout.Y_AXIS));
+			panelVisuals.add(fillHorizontally(panelInfo));
+			panelVisuals.add(fillHorizontally(panelStereo));
+			panelVisuals.add(fillHorizontally(panelCloud));
+
+			var tuningTabs = new JTabbedPane();
+			tuningTabs.addTab("VO",panelAlgControls);
+			tuningTabs.addTab("Tracker",controlKlt);
+			tuningTabs.addTab("Stereo",controlDisparity);
+
+			var panelTuning = new JPanel();
+			panelTuning.setLayout(new BoxLayout(panelTuning,BoxLayout.Y_AXIS));
+			panelTuning.add(tuningTabs);
+			addVerticalGlue(panelTuning);
+			addAlignCenter(bUpdateAlg,panelTuning);
+
+			panelAlgControls.add(BorderLayout.CENTER, controlPnpDepth);
+
+			var tabbedPane = new JTabbedPane();
+			tabbedPane.addTab("Visuals",panelVisuals);
+			tabbedPane.addTab("Tuning",panelTuning);
+
 			addLabeled(videoFrameLabel,"Frame");
-			addLabeled(processingTimeLabel,"PeriodTime (ms)");
-			addLabeled(imageSizeLabel,"Size");
+			addLabeled(processingTimeLabel,"Processing (ms)");
+			addLabeled(imageSizeLabel,"Image");
 			addLabeled(selectZoom,"Zoom");
-			add(fillHorizontally(panelInfo));
-			add(fillHorizontally(panelStereo));
-			add(fillHorizontally(panelCloud));
+			add(tabbedPane);
 			addVerticalGlue();
-			addAlignCenter(bPause);
+			add(fillHorizontally(gridPanel(2,bPause,bStep)));
 		}
 
 		public void setInliersTracks( int count ) {
@@ -386,6 +455,11 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 				boolean paused = !streamPaused;
 				streamPaused = paused;
 				bPause.setText(paused?"Resume":"Paused");
+			} else if( source == bStep ) {
+				if( streamPaused )
+					streamPaused = false;
+				streamStepCounter = 1;
+				bPause.setText("Resume");
 			} else if( source == checkInliers ) {
 				showInliers = checkInliers.isSelected();
 				stereoPanel.repaint();
@@ -527,9 +601,9 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 	public static void main(String[] args) {
 		List<PathLabel> examples = new ArrayList<>();
 
-		examples.add(createExample("library"));
 		examples.add(createExample("backyard"));
 		examples.add(createExample("rockville"));
+		examples.add(createExample("library"));
 
 		SwingUtilities.invokeLater(()->{
 			var app = new VisualizeStereoVisualOdometryApp2<>(examples, GrayU8.class);

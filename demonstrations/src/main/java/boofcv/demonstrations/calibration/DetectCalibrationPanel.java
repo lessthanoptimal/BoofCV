@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -139,11 +139,11 @@ public class DetectCalibrationPanel extends StandardAlgConfigPanel
 		togglePanel.add(showContour);
 
 		addLabeled(labelSpeed, "Time (ms)");
-		addLabeled(successIndicator, "Found:", this);
+		addLabeled(successIndicator, "Found:");
 		add(viewInfo);
-		addLabeled(viewSelector, "View ", this);
-		addLabeled(selectRows, "Rows", this);
-		addLabeled(selectColumns, "Cols", this);
+		addLabeled(viewSelector, "View ");
+		addLabeled(selectRows, "Rows");
+		addLabeled(selectColumns, "Cols");
 
 		add(togglePanel);
 	}

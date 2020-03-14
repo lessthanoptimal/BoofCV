@@ -81,9 +81,9 @@ public class CreateCalibrationTargetGui extends JPanel
 		JPanel controlsPanel = new JPanel();
 		controlsPanel.setLayout(new BoxLayout(controlsPanel,BoxLayout.Y_AXIS) );
 		controlsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-		addLabeled(comboPaper,"Paper",controlsPanel);
+		addLabeled(comboPaper,"Paper", null, controlsPanel);
 		controlsPanel.add(controlsTarget);
-		addLabeled(comboUnits,"Target Units",controlsPanel);
+		addLabeled(comboUnits,"Target Units", null, controlsPanel);
 		controlsPanel.add(Box.createVerticalGlue());
 
 		renderingPanel.setPreferredSize(new Dimension(400,500));

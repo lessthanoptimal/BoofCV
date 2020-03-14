@@ -58,10 +58,7 @@ Version : 0.36
   * TODO Add SBA to all algorithms
   * TODO Update Demonstration Apps
 - Stereo
-     TODO Disparity post processing
-         - Filter small disparity regions
-         - Fill in holes
-         - mark small disparities as invalid
+  * TODO sparse disparity with census and NCC
 - Android
   * Changed image workspace from byte[] to GrowQueue_I8 so that it can be dynamically computed.
   * Fixed issues with visualizing disparity
@@ -72,8 +69,6 @@ Version : 0.36
 - Demonstrations
   * Added settings
   * Added the ability to switch between different swing themes; darklaf and material-ui
-
-TODO Do not use GrowQueue with declare instances = false. Create a new data type for that
 
 TODO Regression
    - Dump runtime results into their own directory for each device. Use hostname?

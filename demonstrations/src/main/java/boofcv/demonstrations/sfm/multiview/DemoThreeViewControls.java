@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.sfm.multiview;
 
-import boofcv.demonstrations.feature.disparity.DisparityControlPanel;
+import boofcv.demonstrations.feature.disparity.ControlPanelDisparity;
 import boofcv.factory.feature.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.feature.disparity.ConfigDisparitySGM;
 import boofcv.factory.feature.disparity.DisparityError;
@@ -58,7 +58,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	boolean autoFocal=true;
 	int focal = 500;
 
-	DisparityControlPanel controlDisparity;
+	ControlPanelDisparity controlDisparity;
 
 	DemoThreeViewStereoApp owner;
 
@@ -107,7 +107,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		configBM.errorType = DisparityError.CENSUS;
 		configBM.configCensus.variant = CensusVariants.BLOCK_7_7;
 
-		controlDisparity = new DisparityControlPanel(configBM,configSGM, GrayU8.class);
+		controlDisparity = new ControlPanelDisparity(configBM,configSGM, GrayU8.class);
 		controlDisparity.setListener(this::handleStereoChanged);
 	}
 

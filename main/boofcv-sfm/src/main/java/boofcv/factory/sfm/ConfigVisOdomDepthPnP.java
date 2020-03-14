@@ -19,6 +19,7 @@
 package boofcv.factory.sfm;
 
 import boofcv.factory.geo.ConfigBundleAdjustment;
+import boofcv.factory.geo.EnumPNP;
 import boofcv.struct.Configuration;
 
 /**
@@ -26,14 +27,14 @@ import boofcv.struct.Configuration;
  *
  * @author Peter Abeles
  */
-public class ConfigVoStereoPnP implements Configuration {
+public class ConfigVisOdomDepthPnP implements Configuration {
 
 	/** Configuration for Bundle Adjustment */
 	public ConfigBundleAdjustment sba = new ConfigBundleAdjustment();
 	/** Maximum number of iterations to do with sparse bundle adjustment. &le; 0 to disable. */
 	public int maxBundleIterations = 3;
 	/** Drop tracks if they have been outliers for this many frames in a row */
-	public int retireOutlierTracks = 2;
+	public int dropOutlierTracks = 2;
 	/** Maximum number of key frames it will save */
 	public int maxKeyFrames = 5;
 	/** Number of RANSAC iterations to perform when estimating motion using PNP */
@@ -43,7 +44,9 @@ public class ConfigVoStereoPnP implements Configuration {
 	/** Seed for the random number generator used by RANSAC */
 	public long ransacSeed = 0xDEADBEEF;
 	/** Number of iterations to perform when refining the initial frame-to-frame motion estimate. Disable &le; 0 */
-	public int refineIterations = 50;
+	public int pnpRefineIterations = 50;
+	/** Which PNP solution to use */
+	public EnumPNP pnp = EnumPNP.P3P_GRUNERT;
 
 	@Override
 	public void checkValidity() {

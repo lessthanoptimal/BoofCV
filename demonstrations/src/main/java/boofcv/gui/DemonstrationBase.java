@@ -577,11 +577,9 @@ public abstract class DemonstrationBase extends JPanel {
 					throw new RuntimeException("There was still an active stream thread!");
 				threadProcess = new SynchronizedStreamsThread();
 			}
-			if( !reopen ) {
-				for (int i = 0; i < inputStreams.size(); i++) {
-					CacheSequenceStream stream = inputStreams.get(i);
-					handleInputChange(i, inputMethod, stream.getWidth(), stream.getHeight());
-				}
+			for (int i = 0; i < inputStreams.size(); i++) {
+				CacheSequenceStream stream = inputStreams.get(i);
+				handleInputChange(i, inputMethod, stream.getWidth(), stream.getHeight());
 			}
 			threadPool.execute(threadProcess);
 		} else {
@@ -953,7 +951,10 @@ public abstract class DemonstrationBase extends JPanel {
 	 */
 	public void reprocessInput() {
 		if ( inputMethod == InputMethod.VIDEO ) {
-			openVideo(true,inputFilePath);
+			if( inputFilePath != null )
+				openVideo(true,inputFilePath);
+			else
+				openVideo(true,inputFileSet);
 		} else if( inputMethod == InputMethod.IMAGE ) {
 			BufferedImage buff = inputStreams.get(0).getBufferedImage();
 			openImage(true,new File(inputFilePath).getName(),buff);// TODO still does a pointless image conversion

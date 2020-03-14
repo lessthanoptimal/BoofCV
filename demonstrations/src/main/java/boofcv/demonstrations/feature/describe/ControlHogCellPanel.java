@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,13 +84,13 @@ public class ControlHogCellPanel extends StandardAlgConfigPanel
 		selectHistogram.addChangeListener(this);
 		selectHistogram.setMaximumSize(selectHistogram.getPreferredSize());
 
-		addAlignLeft(showInput, this);
-		addAlignLeft(showGrid, this);
-		addAlignLeft(showLog,this);
-		addAlignLeft(showLocal,this);
+		addAlignLeft(showInput);
+		addAlignLeft(showGrid);
+		addAlignLeft(showLog);
+		addAlignLeft(showLocal);
 
-		addLabeled(selectWidth, "Size:", this);
-		addLabeled(selectHistogram, "Histogram:", this);
+		addLabeled(selectWidth, "Size:");
+		addLabeled(selectHistogram, "Histogram:");
 	}
 
 	@Override

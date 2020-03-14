@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -293,7 +293,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 			scoreTypes.addActionListener(this);
 			scoreTypes.setMaximumSize(scoreTypes.getPreferredSize());
 			add(labelSize);
-			addLabeled(scoreTypes, "Score: ", this);
+			addLabeled(scoreTypes, "Score: ");
 		}
 
 		public void setImageSize( int width , int height ) {

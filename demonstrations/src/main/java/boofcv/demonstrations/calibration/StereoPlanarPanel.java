@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -306,13 +306,13 @@ public class StereoPlanarPanel extends JPanel
 		public SideBar() {
 			JScrollPane scroll = new JScrollPane(imageList);
 
-			addCenterLabel("Left",this);
-			addLabeled(meanErrorLeft,"Mean Error",this);
-			addLabeled(maxErrorLeft, "Max Error", this);
+			addCenterLabel("Left");
+			addLabeled(meanErrorLeft,"Mean Error");
+			addLabeled(maxErrorLeft, "Max Error");
 			addSeparator(200);
-			addCenterLabel("Right",this);
-			addLabeled(meanErrorRight,"Mean Error",this);
-			addLabeled(maxErrorRight, "Max Error", this);
+			addCenterLabel("Right");
+			addLabeled(meanErrorRight,"Mean Error");
+			addLabeled(maxErrorRight, "Max Error");
 			addSeparator(200);
 			add(scroll);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,23 +99,23 @@ public class VisualOdometryPanel2
 		buttonPause.addActionListener(this);
 		buttonStep.addActionListener(this);
 
-		addLabeled(selectView,  "View", this);
-		addAlignCenter(buttonPause, this);
-		addAlignCenter(buttonStep, this);
+		addLabeled(selectView,  "View");
+		addAlignCenter(buttonPause);
+		addAlignCenter(buttonStep);
 		addSeparator(150);
-		addLabeled(displayFrameNumber, "Frame", this);
-		addLabeled(displayFps, "FPS", this);
-		addLabeled(displayFaults, "Faults", this);
-		addLabeled(displayIntegral, "Integral", this);
-		addLabeled(displayOrigin, "Origin", this);
-		addAlignCenter(orientation, this);
+		addLabeled(displayFrameNumber, "Frame");
+		addLabeled(displayFps, "FPS");
+		addLabeled(displayFaults, "Faults");
+		addLabeled(displayIntegral, "Integral");
+		addLabeled(displayOrigin, "Origin");
+		addAlignCenter(orientation);
 		addSeparator(150);
-		addCenterLabel("Stop Frame", this);
-		addAlignCenter(spinnerStopFrame,this);
+		addCenterLabel("Stop Frame");
+		addAlignCenter(spinnerStopFrame);
 		addSeparator(150);
-		addAlignLeft(showAll, this);
-		addAlignLeft(showInliers, this);
-		addVerticalGlue(this);
+		addAlignLeft(showAll);
+		addAlignLeft(showInliers);
+		addVerticalGlue();
 	}
 
 	public void reset() {

@@ -100,8 +100,8 @@ public class CameraCalibrationGui extends JPanel
 		JPanel controlsPanel = new JPanel();
 		controlsPanel.setLayout(new BoxLayout(controlsPanel,BoxLayout.Y_AXIS) );
 		controlsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-		addLabeled(panelOutput,"Output",controlsPanel);
-		addLabeled(comboOutputFormat,"Format",controlsPanel);
+		addLabeled(panelOutput,"Output", null, controlsPanel);
+		addLabeled(comboOutputFormat,"Format", null, controlsPanel);
 		controlsPanel.add(Box.createRigidArea(new Dimension(5,5)));
 		controlsPanel.add(controlsTarget);
 		controlsPanel.add(controlsModel);

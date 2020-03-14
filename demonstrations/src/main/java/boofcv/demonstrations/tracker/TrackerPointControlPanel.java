@@ -20,6 +20,7 @@ package boofcv.demonstrations.tracker;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.alg.tracker.klt.ConfigPKlt;
+import boofcv.demonstrations.sfm.d3.ControlPanelPointTrackerKlt;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
@@ -50,7 +51,7 @@ public class TrackerPointControlPanel
 	public boolean step = false;
 
 	// algorithm specific controls
-	public ControlsKLT controlKlt = new ControlsKLT();
+	public ControlPanelPointTrackerKlt controlKlt;
 	public ControlsGeneric controlsGeneric = new ControlsGeneric();
 
 	JLabel labelSize = new JLabel();
@@ -83,6 +84,9 @@ public class TrackerPointControlPanel
 
 	public TrackerPointControlPanel( Listener listener ) {
 		this.listener = listener;
+
+		controlKlt = new ControlPanelPointTrackerKlt(listener::handleAlgorithmUpdated,
+				new ConfigGeneralDetector(maxFeatures,5,3.0f),createKltConfig());
 
 		textArea.setEditable(false);
 		textArea.setWrapStyleWord(true);
@@ -237,66 +241,66 @@ public class TrackerPointControlPanel
 		return klt;
 	}
 
-	class ControlsKLT extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
-		public ConfigGeneralDetector detector = new ConfigGeneralDetector(maxFeatures,5,3.0f);
-		public ConfigPKlt klt = createKltConfig();
-
-		private JSpinner spinnerLevels = spinner(klt.pyramidLevels.numLevelsRequested,1,20,1);
-		private JCheckBox checkPruneClose = checkbox("Prune Close", klt.pruneClose);
-		private JSpinner spinnerIterations = spinner(klt.config.maxIterations,1,500,1);
-		private JSpinner spinnerMaxError = spinner(klt.config.maxPerPixelError,0.0,255.0,5.0);
-		private JSpinner spinnerDescRadius = spinner(klt.templateRadius,1,100,1);
-		private JSpinner spinnerDetectThresh = spinner(detector.threshold,0.0,100.0,1.0);
-		private JSpinner spinnerDetectRadius = spinner(detector.radius,1,500,1);
-		private JSpinner spinnerForwardsBackwards = spinner(klt.toleranceFB,-1,100.0,1.0);
-
-		public ControlsKLT() {
-			setBorder(BorderFactory.createEmptyBorder());
-
-			addLabeled(spinnerLevels,"Pyr. Levels");
-			addAlignLeft(checkPruneClose);
-			addLabeled(spinnerIterations,"Max Iter.");
-			addLabeled(spinnerMaxError,"Max Error");
-			addLabeled(spinnerDetectThresh,"Detect Thresh");
-			addLabeled(spinnerDetectRadius,"Detect Radius");
-			addLabeled(spinnerDescRadius,"Desc. Radius");
-			addLabeled(spinnerForwardsBackwards,"F-to-B Tol.");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == checkPruneClose ) {
-				klt.pruneClose = checkPruneClose.isSelected();
-				listener.handleAlgorithmUpdated();
-			}
-		}
-
-		@Override
-		public void stateChanged(ChangeEvent e) {
-			if( e.getSource() == spinnerLevels) {
-				klt.pyramidLevels.numLevelsRequested = ((Number) spinnerLevels.getValue()).intValue();
-				listener.handleAlgorithmUpdated();
-			} else if( e.getSource() == spinnerDescRadius) {
-				klt.templateRadius = ((Number) spinnerDescRadius.getValue()).intValue();
-				listener.handleAlgorithmUpdated();
-			} else if( e.getSource() == spinnerMaxError) {
-				klt.config.maxPerPixelError = ((Number) spinnerMaxError.getValue()).floatValue();
-				listener.handleAlgorithmUpdated();
-			} else if( e.getSource() == spinnerDetectThresh) {
-				detector.threshold = ((Number) spinnerDetectThresh.getValue()).floatValue();
-				listener.handleAlgorithmUpdated();
-			} else if( e.getSource() == spinnerDetectRadius) {
-				detector.radius = ((Number) spinnerDetectRadius.getValue()).intValue();
-				listener.handleAlgorithmUpdated();
-			} else if( e.getSource() == spinnerForwardsBackwards ) {
-				klt.toleranceFB = ((Number) spinnerForwardsBackwards.getValue()).doubleValue();
-				listener.handleAlgorithmUpdated();
-			} else if( e.getSource() == spinnerIterations ) {
-				klt.config.maxIterations = ((Number) spinnerIterations.getValue()).intValue();
-				listener.handleAlgorithmUpdated();
-			}
-		}
-	}
+//	class ControlsKLT extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
+//		public ConfigGeneralDetector detector = new ConfigGeneralDetector(maxFeatures,5,3.0f);
+//		public ConfigPKlt klt = createKltConfig();
+//
+//		private JSpinner spinnerLevels = spinner(klt.pyramidLevels.numLevelsRequested,1,20,1);
+//		private JCheckBox checkPruneClose = checkbox("Prune Close", klt.pruneClose);
+//		private JSpinner spinnerIterations = spinner(klt.config.maxIterations,1,500,1);
+//		private JSpinner spinnerMaxError = spinner(klt.config.maxPerPixelError,0.0,255.0,5.0);
+//		private JSpinner spinnerDescRadius = spinner(klt.templateRadius,1,100,1);
+//		private JSpinner spinnerDetectThresh = spinner(detector.threshold,0.0,100.0,1.0);
+//		private JSpinner spinnerDetectRadius = spinner(detector.radius,1,500,1);
+//		private JSpinner spinnerForwardsBackwards = spinner(klt.toleranceFB,-1,100.0,1.0);
+//
+//		public ControlsKLT() {
+//			setBorder(BorderFactory.createEmptyBorder());
+//
+//			addLabeled(spinnerLevels,"Pyr. Levels");
+//			addAlignLeft(checkPruneClose);
+//			addLabeled(spinnerIterations,"Max Iter.");
+//			addLabeled(spinnerMaxError,"Max Error");
+//			addLabeled(spinnerDetectThresh,"Detect Thresh");
+//			addLabeled(spinnerDetectRadius,"Detect Radius");
+//			addLabeled(spinnerDescRadius,"Desc. Radius");
+//			addLabeled(spinnerForwardsBackwards,"F-to-B Tol.");
+//		}
+//
+//		@Override
+//		public void actionPerformed(ActionEvent e) {
+//			if( e.getSource() == checkPruneClose ) {
+//				klt.pruneClose = checkPruneClose.isSelected();
+//				listener.handleAlgorithmUpdated();
+//			}
+//		}
+//
+//		@Override
+//		public void stateChanged(ChangeEvent e) {
+//			if( e.getSource() == spinnerLevels) {
+//				klt.pyramidLevels.numLevelsRequested = ((Number) spinnerLevels.getValue()).intValue();
+//				listener.handleAlgorithmUpdated();
+//			} else if( e.getSource() == spinnerDescRadius) {
+//				klt.templateRadius = ((Number) spinnerDescRadius.getValue()).intValue();
+//				listener.handleAlgorithmUpdated();
+//			} else if( e.getSource() == spinnerMaxError) {
+//				klt.config.maxPerPixelError = ((Number) spinnerMaxError.getValue()).floatValue();
+//				listener.handleAlgorithmUpdated();
+//			} else if( e.getSource() == spinnerDetectThresh) {
+//				detector.threshold = ((Number) spinnerDetectThresh.getValue()).floatValue();
+//				listener.handleAlgorithmUpdated();
+//			} else if( e.getSource() == spinnerDetectRadius) {
+//				detector.radius = ((Number) spinnerDetectRadius.getValue()).intValue();
+//				listener.handleAlgorithmUpdated();
+//			} else if( e.getSource() == spinnerForwardsBackwards ) {
+//				klt.toleranceFB = ((Number) spinnerForwardsBackwards.getValue()).doubleValue();
+//				listener.handleAlgorithmUpdated();
+//			} else if( e.getSource() == spinnerIterations ) {
+//				klt.config.maxIterations = ((Number) spinnerIterations.getValue()).intValue();
+//				listener.handleAlgorithmUpdated();
+//			}
+//		}
+//	}
 
 	public interface Listener {
 		void handleAlgorithmUpdated();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,9 +68,9 @@ public class ImageCorruptPanel extends StandardAlgConfigPanel implements ChangeL
 		lightOffset.addChangeListener(this);
 		lightOffset.setMaximumSize(lightOffset.getPreferredSize());
 
-		addLabeled(noiseLevel,"Noise",this);
-		addLabeled(lightScale,"Light Scale",this);
-		addLabeled(lightOffset,"Light Offset",this);
+		addLabeled(noiseLevel,"Noise");
+		addLabeled(lightScale,"Light Scale");
+		addLabeled(lightOffset,"Light Offset");
 	}
 
 	public void setListener(Listener listener) {

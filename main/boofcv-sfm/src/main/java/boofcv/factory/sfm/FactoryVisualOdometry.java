@@ -169,23 +169,22 @@ public class FactoryVisualOdometry {
 	}
 
 	public static <T extends ImageGray<T>>
-	StereoVisualOdometry<T> stereoDepthPnP( ConfigVoStereoPnP config ,
+	StereoVisualOdometry<T> stereoDepthPnP( ConfigVisOdomDepthPnP config ,
 											StereoDisparitySparse<T> sparseDisparity ,
 											PointTracker<T> tracker ,
 											Class<T> imageType)
 	{
 		if( config == null )
-			config = new ConfigVoStereoPnP();
+			config = new ConfigVisOdomDepthPnP();
 
 		// Range from sparse disparity
 		StereoSparse3D<T> pixelTo3D = new StereoSparse3D<>(sparseDisparity, imageType);
 
-		Estimate1ofPnP estimator = FactoryMultiView.pnp_1(EnumPNP.P3P_FINSTERWALDER,-1,1);
+		Estimate1ofPnP estimator = FactoryMultiView.pnp_1(config.pnp,-1,1);
 		final DistanceFromModelMultiView<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 
 		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
-		EstimatorToGenerator<Se3_F64,Point2D3D> generator =
-				new EstimatorToGenerator<>(estimator);
+		EstimatorToGenerator<Se3_F64,Point2D3D> generator = new EstimatorToGenerator<>(estimator);
 
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = config.ransacInlierTol * config.ransacInlierTol;
@@ -195,8 +194,8 @@ public class FactoryVisualOdometry {
 
 		RefinePnP refine = null;
 
-		if( config.refineIterations > 0 ) {
-			refine = FactoryMultiView.pnpRefine(1e-12,config.refineIterations);
+		if( config.pnpRefineIterations > 0 ) {
+			refine = FactoryMultiView.pnpRefine(1e-12,config.pnpRefineIterations);
 		}
 
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(config.sba);
@@ -204,7 +203,7 @@ public class FactoryVisualOdometry {
 
 		VisOdomPixelDepthPnP<T> alg =
 				new VisOdomPixelDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
-		alg.setThresholdRetireTracks(config.retireOutlierTracks);
+		alg.setThresholdRetireTracks(config.dropOutlierTracks);
 		alg.setMaxKeyFrames(config.maxKeyFrames);
 		return new WrapVisOdomPixelDepthPnP<>(alg, pixelTo3D, distance, imageType);
 	}

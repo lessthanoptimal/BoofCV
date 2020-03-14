@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -224,15 +224,15 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 			});
 			checkWeighted.setMaximumSize(checkWeighted.getPreferredSize());
 
-			addLabeled(processingTimeLabel,"Time (ms)", this);
+			addLabeled(processingTimeLabel,"Time (ms)");
 			add(comboAlgorithms);
-			addLabeled(selectZoom,"Zoom",this);
-			addLabeled(spinnerRadius,"Radius", this);
-			addLabeled(spinnerMaxFeatures,"Max Features", this);
-			addLabeled(spinnerThreshold,"Threshold", this);
-			addAlignLeft(checkWeighted,this);
-			addLabeled(spinnerFastTol,"Fast Pixel Tol", this);
-			addVerticalGlue(this);
+			addLabeled(selectZoom,"Zoom");
+			addLabeled(spinnerRadius,"Radius");
+			addLabeled(spinnerMaxFeatures,"Max Features");
+			addLabeled(spinnerThreshold,"Threshold");
+			addAlignLeft(checkWeighted);
+			addLabeled(spinnerFastTol,"Fast Pixel Tol");
+			addVerticalGlue();
 		}
 
 		private void addAlgorithms() {

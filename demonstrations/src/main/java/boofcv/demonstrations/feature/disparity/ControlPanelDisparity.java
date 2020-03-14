@@ -39,7 +39,7 @@ import java.awt.event.ActionListener;
  *
  * @author Peter Abeles
  */
-public class DisparityControlPanel extends StandardAlgConfigPanel {
+public class ControlPanelDisparity extends StandardAlgConfigPanel {
 
 	private static String[] ERRORS_BLOCK = new String[]{"SAD","Census","NCC"};
 	private static String[] ERRORS_SGM = new String[]{"Absolute Diff","Census","HMI"};
@@ -68,9 +68,9 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 	Listener listener;
 	Class imageType;
 
-	public DisparityControlPanel( ConfigDisparityBMBest5 configBM,
-								  ConfigDisparitySGM configSGM,
-								  Class imageType)
+	public ControlPanelDisparity(ConfigDisparityBMBest5 configBM,
+								 ConfigDisparitySGM configSGM,
+								 Class imageType)
 	{
 		this.configBM = configBM;
 		this.configSGM = configSGM;
@@ -99,7 +99,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		add(tabbedPane);
 	}
 
-	public static DisparityControlPanel createRange( int disparityMin , int disparityRange, Class imageType) {
+	public static ControlPanelDisparity createRange(int disparityMin , int disparityRange, Class imageType) {
 		ConfigDisparityBMBest5 configBM = new ConfigDisparityBMBest5();
 		ConfigDisparitySGM configSGM = new ConfigDisparitySGM();
 
@@ -108,7 +108,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		configSGM.disparityMin = disparityMin;
 		configSGM.disparityRange = disparityRange;
 
-		return new DisparityControlPanel(configBM,configSGM,imageType);
+		return new ControlPanelDisparity(configBM,configSGM,imageType);
 	}
 
 	public void broadcastChange() {
@@ -272,16 +272,16 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 		JSpinner spinnerError = spinner(configBM.maxPerPixelError,-1,80,5);
 		JSpinner spinnerReverse = spinner(configBM.validateRtoL,-1,50,1);
 		JSpinner spinnerTexture = spinner(configBM.texture,0.0,1.0,0.05,1,3);
-		JCheckBox subpixelToggle = checkbox("Subpixel",configBM.subpixel);
+		JCheckBox subpixelToggle = checkbox("Subpixel",configBM.subpixel,"Subpixel Disparity Estimate");
 
 		ControlsBlockMatching() {
-			addLabeled(spinnerDisparityMin, "Min Disp.");
-			addLabeled(spinnerDisparityRange, "Range Disp.");
-			addLabeled(radiusXSpinner,    "Radius X");
-			addLabeled(radiusYSpinner,    "Radius Y");
-			addLabeled(spinnerError,     "Max Error");
-			addLabeled(spinnerTexture,   "Texture");
-			addLabeled(spinnerReverse,   "Reverse");
+			addLabeled(spinnerDisparityMin, "Min Disp.","Minimum disparity value considered. (Pixels)");
+			addLabeled(spinnerDisparityRange, "Range Disp.","Range of disparity values searched. (Pixels)");
+			addLabeled(radiusXSpinner,    "Radius X","Block Width. (Pixels)");
+			addLabeled(radiusYSpinner,    "Radius Y", "Block Height. (Pixels)");
+			addLabeled(spinnerError,     "Max Error","Maximum allowed matching error");
+			addLabeled(spinnerTexture,   "Texture","Texture validation. 0 = disabled. 1 = most strict.");
+			addLabeled(spinnerReverse,   "Reverse","Reverse Validation Tolerance. -1 = disable. (Pixels)");
 			addAlignLeft(subpixelToggle);
 		}
 
@@ -519,7 +519,7 @@ public class DisparityControlPanel extends StandardAlgConfigPanel {
 	}
 
 	public static void main(String[] args) {
-		DisparityControlPanel controls = DisparityControlPanel.createRange(0,150,null);
+		ControlPanelDisparity controls = ControlPanelDisparity.createRange(0,150,null);
 		ShowImages.showWindow(controls,"Controls");
 	}
 }

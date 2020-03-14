@@ -78,7 +78,7 @@ import static boofcv.gui.BoofSwingUtil.saveDisparityDialog;
  */
 public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGray<D>>
 		extends DemonstrationBase
-		implements DisparityDisplayPanel.Listener
+		implements ControlPanelDisparityDisplay.Listener
 {
 	// original input before rescaling
 	BufferedImage origLeft;
@@ -109,7 +109,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	private RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 	// GUI components
-	private final DisparityDisplayPanel control = new DisparityDisplayPanel(0,150,GrayU8.class);
+	private final ControlPanelDisparityDisplay control = new ControlPanelDisparityDisplay(0,150,GrayU8.class);
 	private final JPanel panel = new JPanel();
 	private final DisparityImageView imagePanel = new DisparityImageView();
 	private final PointCloudViewer pcv = VisualizeData.createPointCloudViewer();

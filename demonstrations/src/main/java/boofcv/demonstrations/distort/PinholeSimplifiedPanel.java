@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,9 +61,9 @@ public class PinholeSimplifiedPanel extends StandardAlgConfigPanel
 		selectHeight.setMaximumSize(selectHeight.getPreferredSize());
 		selectHeight.addChangeListener(this);
 
-		addLabeled(selectWidth,  "Image Width: ", this);
-		addLabeled(selectHeight, "Image Height: ", this);
-		addLabeled(selectFOV,    "Field-of-View: ", this);
+		addLabeled(selectWidth,  "Image Width: ");
+		addLabeled(selectHeight, "Image Height: ");
+		addLabeled(selectFOV,    "Field-of-View: ");
 	}
 
 	public void addToFOV( int degrees ) {

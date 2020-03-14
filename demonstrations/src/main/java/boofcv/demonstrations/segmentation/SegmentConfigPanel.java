@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,9 +74,9 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 
 		setMethodControls();
 
-		addLabeled(comboVisual, "Visualize", this);
+		addLabeled(comboVisual, "Visualize");
 		addSeparator(100);
-		addLabeled(comboAlgorithm, "Method", this);
+		addLabeled(comboAlgorithm, "Method");
 		addAlignCenter(recompute,this);
 		addAlignCenter(progress, this);
 		addAlignCenter(panelConfig,this);
@@ -148,8 +148,8 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 			configure();
 
 			addAlignCenter(selectConnect,this);
-			addLabeled(spinnerSize, "Min Size", this);
-			addLabeled(spinnerK, "K", this);
+			addLabeled(spinnerSize, "Min Size");
+			addLabeled(spinnerK, "K");
 			addAlignLeft(checkApproximate,this);
 		}
 
@@ -212,8 +212,8 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 			configure();
 
 			addAlignCenter(selectConnect,this);
-			addLabeled(spinnerTotal, "Regions", this);
-			addLabeled(spinnerWeight, "Weight", this);
+			addLabeled(spinnerTotal, "Regions");
+			addLabeled(spinnerWeight, "Weight");
 		}
 
 		private void configure() {
@@ -279,9 +279,9 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 			configure();
 
 			addAlignCenter(selectConnect,this);
-			addLabeled(spinnerSize, "Min Size", this);
-			addLabeled(spinnerSpacial, "Spacial Rad", this);
-			addLabeled(spinnerColor, "Color Rad", this);
+			addLabeled(spinnerSize, "Min Size");
+			addLabeled(spinnerSpacial, "Spacial Rad");
+			addLabeled(spinnerColor, "Color Rad");
 			addAlignCenter(toggleFast, this);
 		}
 
@@ -339,7 +339,7 @@ public class SegmentConfigPanel extends ViewedImageInfoPanel implements ActionLi
 			configure();
 
 			addAlignCenter(selectConnect, this);
-			addLabeled(spinnerSize, "Min Size", this);
+			addLabeled(spinnerSize, "Min Size");
 		}
 
 		private void configure() {

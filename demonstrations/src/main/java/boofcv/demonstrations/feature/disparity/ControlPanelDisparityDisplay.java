@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  *
  * @author Peter Abeles
  */
-public class DisparityDisplayPanel extends StandardAlgConfigPanel
+public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 		implements ChangeListener, ActionListener
 {
 	// which image to show
@@ -83,13 +83,13 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	JCheckBox checkRecompute  = checkbox("Recompute",recompute);
 	JCheckBox checkConcurrent = checkbox("concurrent",concurrent);
 
-	DisparityControlPanel controlDisparity;
+	ControlPanelDisparity controlDisparity;
 
 	// listener for changes in states
 	Listener listener;
 
-	public DisparityDisplayPanel( int disparityMin , int disparityRange,  Class imageType ) {
-		controlDisparity = DisparityControlPanel.createRange(disparityMin,disparityRange,imageType);
+	public ControlPanelDisparityDisplay(int disparityMin , int disparityRange, Class imageType ) {
+		controlDisparity = ControlPanelDisparity.createRange(disparityMin,disparityRange,imageType);
 		controlDisparity.setListener(()->listener.algorithmChanged());
 
 		update3DControls();
@@ -117,7 +117,7 @@ public class DisparityDisplayPanel extends StandardAlgConfigPanel
 	private JPanel createColorPanel() {
 		bColorBackGround.addActionListener(e->{
 			Color newColor = JColorChooser.showDialog(
-					DisparityDisplayPanel.this,
+					ControlPanelDisparityDisplay.this,
 					"Background Color",
 					new Color(getActiveBackgroundColor()));
 			int colorRGB = newColor.getRGB();

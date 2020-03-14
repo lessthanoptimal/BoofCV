@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -103,25 +103,25 @@ public class VisualOdometryPanel
 		displayFaults = createTextInfo();
 		displayFps = createTextInfo();
 
-		addAlignCenter(displayStatus, this);
-		addLabeled(selectView,  "View", this);
+		addAlignCenter(displayStatus);
+		addLabeled(selectView,  "View");
 		addSeparator(150);
-		addLabeled(displayTracks,  "Tracks", this);
-		addLabeled(displayInliers, "Inliers", this);
-		addLabeled(displayFaults, "Faults", this);
-		addLabeled(displayFps, "FPS", this);
+		addLabeled(displayTracks,  "Tracks");
+		addLabeled(displayInliers, "Inliers");
+		addLabeled(displayFaults, "Faults");
+		addLabeled(displayFps, "FPS");
 		addSeparator(150);
-		addLabeled(displayX, "X ", this);
-		addLabeled(displayY, "Y ", this);
-		addLabeled(displayZ, "Z ", this);
-		addAlignCenter(orientation, this);
+		addLabeled(displayX, "X ");
+		addLabeled(displayY, "Y ");
+		addLabeled(displayZ, "Z ");
+		addAlignCenter(orientation);
 		addSeparator(150);
-		addLabeled(displayIntegral, "Integral", this);
-		addLabeled(displayOrigin, "Origin", this);
+		addLabeled(displayIntegral, "Integral");
+		addLabeled(displayOrigin, "Origin");
 		addSeparator(150);
-		addAlignLeft(showAll, this);
-		addAlignLeft(showInliers, this);
-		addVerticalGlue(this);
+		addAlignLeft(showAll);
+		addAlignLeft(showInliers);
+		addVerticalGlue();
 	}
 
 	public void reset() {

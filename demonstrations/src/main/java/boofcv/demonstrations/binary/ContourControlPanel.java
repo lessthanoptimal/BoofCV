@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,9 +72,9 @@ public class ContourControlPanel extends StandardAlgConfigPanel
 
 		threshold = new ThresholdControlPanel(owner);
 
-		addLabeled(imageView,"View",this);
-		addLabeled(selectZoom,"Zoom",this);
-		addLabeled(connectCombo, "Connect", this);
+		addLabeled(imageView,"View");
+		addLabeled(selectZoom,"Zoom");
+		addLabeled(connectCombo, "Connect");
 		add(threshold);
 	}
 

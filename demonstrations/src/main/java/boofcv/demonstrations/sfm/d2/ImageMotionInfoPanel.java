@@ -80,17 +80,17 @@ public class ImageMotionInfoPanel extends StandardAlgConfigPanel
 		displayNumTracks = createTextInfo();
 		displayNumInliers = createTextInfo();
 
-		addLabeled(displayPeriodMS,"Period (ms)",this);
-		addAlignLeft(showView, this);
+		addLabeled(displayPeriodMS,"Period (ms)");
+		addAlignLeft(showView);
 		addLabeled(spinnerTracker,"Trackers");
 		addLabeled(spinnerModels,"Models");
-		addAlignLeft(showAll, this);
-		addAlignLeft(showInliers, this);
+		addAlignLeft(showAll);
+		addAlignLeft(showInliers);
 		addSeparator(200);
-		addLabeled(displayNumKeyFrames,"Resets:",this);
-		addLabeled(displayNumTracks,"Tracks:",this);
-		addLabeled(displayNumInliers,"Inliers:",this);
-		addAlignLeft(resetButton, this);
+		addLabeled(displayNumKeyFrames,"Resets:");
+		addLabeled(displayNumTracks,"Tracks:");
+		addLabeled(displayNumInliers,"Inliers:");
+		addAlignLeft(resetButton);
 
 		setPreferredSize(new Dimension(200,300));
 	}

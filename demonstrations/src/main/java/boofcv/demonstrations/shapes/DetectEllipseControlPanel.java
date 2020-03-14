@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -97,24 +97,24 @@ public class DetectEllipseControlPanel extends DetectBlackShapePanel
 		spinnerNumSample = spinner(config.numSampleContour,1,200,2);
 		spinnerRadiusSample = spinner(config.refineRadialSamples, 1, 5, 1);
 
-		addLabeled(processingTimeLabel,"Time (ms)", this);
-		addLabeled(imageSizeLabel,"Size", this);
-		addLabeled(imageView, "View: ", this);
-		addLabeled(selectZoom,"Zoom",this);
-		addAlignLeft(showEllipses, this);
-		addAlignLeft(showContour, this);
+		addLabeled(processingTimeLabel,"Time (ms)");
+		addLabeled(imageSizeLabel,"Size");
+		addLabeled(imageView, "View: ");
+		addLabeled(selectZoom,"Zoom");
+		addAlignLeft(showEllipses);
+		addAlignLeft(showContour);
 		add(threshold);
-		addCenterLabel("Contour", this);
-		addLabeled(spinnerMinContourSize, "Min Contour Size: ", this);
-		addLabeled(spinnerMaxContourSize, "Max Contour Size: ", this);
-		addLabeled(spinnerMinMinorAxisSize, "Min Minor Axis: ", this);
-		addLabeled(spinnerMinEdge, "Edge Intensity: ", this);
-		addCenterLabel("Refinement", this);
-		addLabeled(spinnerConvergeTol, "Converge Tol: ", this);
-		addLabeled(spinnerMaxIterations, "Max Iterations: ", this);
-		addLabeled(spinnerNumSample, "Contour Samples: ", this);
-		addLabeled(spinnerRadiusSample, "Radius Samples: ", this);
-		addVerticalGlue(this);
+		addCenterLabel("Contour");
+		addLabeled(spinnerMinContourSize, "Min Contour Size: ");
+		addLabeled(spinnerMaxContourSize, "Max Contour Size: ");
+		addLabeled(spinnerMinMinorAxisSize, "Min Minor Axis: ");
+		addLabeled(spinnerMinEdge, "Edge Intensity: ");
+		addCenterLabel("Refinement");
+		addLabeled(spinnerConvergeTol, "Converge Tol: ");
+		addLabeled(spinnerMaxIterations, "Max Iterations: ");
+		addLabeled(spinnerNumSample, "Contour Samples: ");
+		addLabeled(spinnerRadiusSample, "Radius Samples: ");
+		addVerticalGlue();
 	}
 
 	@Override

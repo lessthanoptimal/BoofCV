@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -226,11 +226,11 @@ public class ImageEnhanceApp extends DemonstrationBase {
 			comboAlgorithms.setMaximumSize(comboAlgorithms.getPreferredSize());
 
 			add(comboAlgorithms);
-			addLabeled(processingTimeLabel,"Time (ms)", this);
+			addLabeled(processingTimeLabel,"Time (ms)");
 			addAlignLeft(checkShowInput);
 			addAlignLeft(checkColor);
-			addLabeled(selectZoom,"Zoom",this);
-			addLabeled(spinnerRadius,"Radius", this);
+			addLabeled(selectZoom,"Zoom");
+			addLabeled(spinnerRadius,"Radius");
 			addVerticalGlue(this);
 		}
 

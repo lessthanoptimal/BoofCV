@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -247,13 +247,13 @@ public abstract class CalibratedPlanarPanel<CM extends CameraModel> extends JPan
 			selectErrorScale.setMaximumSize(selectErrorScale.getPreferredSize());
 
 			add(viewInfo);
-			addAlignLeft(checkPoints, this);
-			addAlignLeft(checkErrors, this);
-			addAlignLeft(checkAll, this);
-			addAlignLeft(checkUndistorted, this);
-			addAlignLeft(checkNumbers, this);
-			addAlignLeft(checkOrder, this);
-			addLabeled(selectErrorScale,"Error Scale", this);
+			addAlignLeft(checkPoints);
+			addAlignLeft(checkErrors);
+			addAlignLeft(checkAll);
+			addAlignLeft(checkUndistorted);
+			addAlignLeft(checkNumbers);
+			addAlignLeft(checkOrder);
+			addLabeled(selectErrorScale,"Error Scale");
 		}
 	}
 

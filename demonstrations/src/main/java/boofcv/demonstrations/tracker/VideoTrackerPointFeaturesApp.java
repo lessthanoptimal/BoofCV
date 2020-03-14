@@ -122,7 +122,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 		final int maxFeatures = controlPanel.maxFeatures;
 
-		controlPanel.controlKlt.detector.maxFeatures = maxFeatures;
+		controlPanel.controlKlt.configDetector.maxFeatures = maxFeatures;
 		controlPanel.controlsGeneric.detector.maxFeatures = maxFeatures;
 
 
@@ -132,7 +132,9 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		configFH.detectThreshold = 15f;
 
 		switch( which ) {
-			case 0: tracker = FactoryPointTracker.klt(controlPanel.controlKlt.klt,controlPanel.controlKlt.detector,
+			case 0: tracker = FactoryPointTracker.klt(
+					controlPanel.controlKlt.configKlt,
+					controlPanel.controlKlt.configDetector,
 					imageType,null); break;
 
 			case 1: tracker = FactoryPointTracker.dda_ST_BRIEF(
@@ -147,10 +149,10 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 			case 4: tracker = FactoryPointTracker.combined_ST_SURF_KLT(
 					new ConfigGeneralDetector(maxFeatures,  controlPanel.controlsGeneric.detector.radius, 1),
-					controlPanel.controlKlt.klt, 50, null, null, imageType, null); break;
+					controlPanel.controlKlt.configKlt, 50, null, null, imageType, null); break;
 
 			case 5: tracker = FactoryPointTracker.combined_FH_SURF_KLT(
-					controlPanel.controlKlt.klt, 50, configFH, null, null, imageType); break;
+					controlPanel.controlKlt.configKlt, 50, configFH, null, null, imageType); break;
 		}
 		processingTime.reset();
 	}

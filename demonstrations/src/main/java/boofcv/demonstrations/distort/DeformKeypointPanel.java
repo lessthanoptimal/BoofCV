@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -84,16 +84,16 @@ public class DeformKeypointPanel extends StandardAlgConfigPanel
 		selectGridCols = spinner(configMLS.cols, 5, 600, 5);
 		selectAlpha = spinner(configMLS.alpha, 0.5f, 20.f, 0.5f);
 
-		addAlignLeft(checkShowOriginal,this);
-		addLabeled(selectZoom,"Zoom",this);
-		addAlignLeft(checkShowPoints,this);
-		addAlignCenter(buttonClear,this);
+		addAlignLeft(checkShowOriginal);
+		addLabeled(selectZoom,"Zoom");
+		addAlignLeft(checkShowPoints);
+		addAlignCenter(buttonClear);
 		addSeparator(200);
-		addLabeled(selectModel, "Model", this);
-		addLabeled(selectGridRows, "Grid Rows", this);
-		addLabeled(selectGridCols, "Grid Cols", this);
-		addLabeled(selectAlpha, "Alpha", this);
-		addVerticalGlue(this);
+		addLabeled(selectModel, "Model");
+		addLabeled(selectGridRows, "Grid Rows");
+		addLabeled(selectGridCols, "Grid Cols");
+		addLabeled(selectAlpha, "Alpha");
+		addVerticalGlue();
 	}
 
 	public void setZoom( double _zoom ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -135,17 +135,17 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 
 		JPanel togglePanels = new JPanel();
 		togglePanels.setLayout(new GridLayout(0,2));
-		addLabeled(spinnerScale,"Scale",togglePanels);
+		addLabeled(spinnerScale,"Scale", null, togglePanels);
 		togglePanels.add(checkLocalBlock);
 		togglePanels.add(checkOtsu2);
 		togglePanels.setMaximumSize(togglePanels.getPreferredSize());
 
 		add(histogramHolder);
-		addLabeled(comboType, "Type", this);
-		addLabeled(spinnerThreshold, "Threshold", this);
+		addLabeled(comboType, "Type");
+		addLabeled(spinnerThreshold, "Threshold");
 		addLabeled(buttonUpDown,"Direction");
 		addLabeled(controlWidth,"Reg. Width");
-		addAlignCenter(togglePanels, this);
+		addAlignCenter(togglePanels);
 
 		updateEnabledByType();
 	}

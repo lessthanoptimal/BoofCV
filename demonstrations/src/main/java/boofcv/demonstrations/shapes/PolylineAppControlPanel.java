@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -93,19 +93,19 @@ public class PolylineAppControlPanel extends DetectBlackShapePanel
 		spinnerMinContourSize.setMaximumSize(spinnerMinContourSize.getPreferredSize());
 		spinnerMinContourSize.addChangeListener(this);
 
-		addLabeled(processingTimeLabel,"Time (ms)", this);
-		addLabeled(imageSizeLabel,"Size", this);
-		addLabeled(imageView, "View: ", this);
-		addLabeled(selectZoom,"Zoom",this);
-		addAlignLeft(showCorners, this);
-		addAlignLeft(showLines, this);
-		addAlignLeft(showContour, this);
+		addLabeled(processingTimeLabel,"Time (ms)");
+		addLabeled(imageSizeLabel,"Size");
+		addLabeled(imageView, "View: ");
+		addLabeled(selectZoom,"Zoom");
+		addAlignLeft(showCorners);
+		addAlignLeft(showLines);
+		addAlignLeft(showContour);
 		add(threshold);
-		addLabeled(spinnerMinContourSize, "Min Contour Size: ", this);
-		addLabeled(spinnerContourConnect, "Contour Connect: ", this);
-		addCenterLabel("Polyline",this);
+		addLabeled(spinnerMinContourSize, "Min Contour Size: ");
+		addLabeled(spinnerContourConnect, "Contour Connect: ");
+		addCenterLabel("Polyline");
 		add(polylinePanel);
-		addVerticalGlue(this);
+		addVerticalGlue();
 	}
 
 	@Override

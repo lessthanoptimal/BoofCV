@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,16 +90,16 @@ public class ControlHogDescriptorPanel extends StandardAlgConfigPanel
 		selectGridY.setMaximumSize(selectGridY.getPreferredSize());
 
 
-		addAlignLeft(showGrid, this);
-		addAlignLeft(showLogScaling, this);
-		addAlignLeft(useFast,this);
+		addAlignLeft(showGrid);
+		addAlignLeft(showLogScaling);
+		addAlignLeft(useFast);
 
-		addLabeled(selectWidth, "Cell Size:", this);
-		addLabeled(selectGridX, "Grid X:", this);
-		addLabeled(selectGridY, "Grid Y:", this);
-		addLabeled(selectHistogram, "Histogram:", this);
+		addLabeled(selectWidth, "Cell Size:");
+		addLabeled(selectGridX, "Grid X:");
+		addLabeled(selectGridY, "Grid Y:");
+		addLabeled(selectHistogram, "Histogram:");
 		add(Box.createVerticalGlue());
-		addCenterLabel("Click on Image",this);
+		addCenterLabel("Click on Image");
 	}
 
 	@Override

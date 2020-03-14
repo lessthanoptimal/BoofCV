@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,17 +72,17 @@ public class PinholePanel extends StandardAlgConfigPanel
 		selectR2 = spinner(original.radial[1], -3.0, 3.0, 0.05);
 		configureSpinnerFloat(selectR2, 1,3);
 
-		addLabeled(selectWidth,  "Image Width: ", this);
-		addLabeled(selectHeight, "Image Height: ", this);
-		addLabeled(selectFX,     "fx: ", this);
-		addLabeled(selectFY,     "fy: ", this);
-		addLabeled(selectCX,     "cx: ", this);
-		addLabeled(selectCY,     "cy: ", this);
-		addLabeled(selectSkew,   "skew: ", this);
-		addLabeled(selectT1,     "t1: ", this);
-		addLabeled(selectT2,     "t2: ", this);
-		addLabeled(selectR1,     "r1: ", this);
-		addLabeled(selectR2,     "r2: ", this);
+		addLabeled(selectWidth,  "Image Width: ");
+		addLabeled(selectHeight, "Image Height: ");
+		addLabeled(selectFX,     "fx: ");
+		addLabeled(selectFY,     "fy: ");
+		addLabeled(selectCX,     "cx: ");
+		addLabeled(selectCY,     "cy: ");
+		addLabeled(selectSkew,   "skew: ");
+		addLabeled(selectT1,     "t1: ");
+		addLabeled(selectT2,     "t2: ");
+		addLabeled(selectR1,     "r1: ");
+		addLabeled(selectR2,     "r2: ");
 
 	}
 

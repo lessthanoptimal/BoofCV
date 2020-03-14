@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -202,16 +202,16 @@ public class MonoPlanarPanel extends CalibratedPlanarPanel<CameraPinholeBrown>
 		public LeftPanel() {
 			JScrollPane scroll = new JScrollPane(imageList);
 
-			addLabeled(meanError,"Mean Error",this);
-			addLabeled(maxError, "Max Error", this);
+			addLabeled(meanError,"Mean Error");
+			addLabeled(maxError, "Max Error");
 			addSeparator(200);
-			addLabeled(paramCenterX,"Xc",this);
-			addLabeled(paramCenterY,"Yc",this);
-			addLabeled(paramFX,"fx",this);
-			addLabeled(paramFY,"fy",this);
-			addLabeled(paramSkew,"skew",this);
-			addLabeled(paramRadial,"radial",this);
-			addLabeled(paramTangental,"tangential",this);
+			addLabeled(paramCenterX,"Xc");
+			addLabeled(paramCenterY,"Yc");
+			addLabeled(paramFX,"fx");
+			addLabeled(paramFY,"fy");
+			addLabeled(paramSkew,"skew");
+			addLabeled(paramRadial,"radial");
+			addLabeled(paramTangental,"tangential");
 			addSeparator(200);
 			add(scroll);
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -101,16 +101,16 @@ public class ShapeFitContourPanel extends StandardAlgConfigPanel
 
 
 
-		addLabeled(algorithmCombo, "Shape", this);
+		addLabeled(algorithmCombo, "Shape");
 		addSeparator(200);
-		addLabeled(imageView, "Background", this);
-		addLabeled(selectZoom,"Zoom",this);
-		addAlignCenter(threshold,this);
-		addLabeled(selectMinimumSplitPixels, "Min Split Pixels", this);
-		addLabeled(selectCornerPenalty, "Corner Penalty",this);
-		addAlignLeft(showCorners, this);
-		addAlignLeft(showContour, this);
-		addVerticalGlue(this);
+		addLabeled(imageView, "Background");
+		addLabeled(selectZoom,"Zoom");
+		addAlignCenter(threshold);
+		addLabeled(selectMinimumSplitPixels, "Min Split Pixels");
+		addLabeled(selectCornerPenalty, "Corner Penalty");
+		addAlignLeft(showCorners);
+		addAlignLeft(showContour);
+		addVerticalGlue();
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -259,6 +259,42 @@ public class FactoryStereoDisparity {
 		}
 		alg.configure(config.disparityMin,config.disparityRange);
 		return alg;
+	}
+
+	public static <T extends ImageGray<T>> StereoDisparitySparse<T>
+	sparseBlockMatching(ConfigDisparityBM config, Class<T> imageType) {
+		double maxError = (config.regionRadiusX*2+1)*(config.regionRadiusY*2+1)*config.maxPerPixelError;
+
+		// TODO support error besides SAD
+
+		if( imageType == GrayU8.class ) {
+			DisparitySparseSelect<int[]> select;
+			if( config.subpixel)
+				select = selectDisparitySparseSubpixel_S32((int) maxError, config.texture);
+			else
+				select = selectDisparitySparse_S32((int) maxError, config.texture);
+
+			DisparitySparseScoreSadRect<int[],GrayU8>
+					score = scoreDisparitySparseSadRect_U8(config.regionRadiusX, config.regionRadiusY);
+			score.configure(config.disparityMin,config.disparityRange);
+			score.setBorder(FactoryImageBorder.generic(config.border, ImageType.SB_U8));
+
+			return new WrapDisparityBlockSparseSad(score,select);
+		} else if( imageType == GrayF32.class ) {
+			DisparitySparseSelect<float[]> select;
+			if( config.subpixel )
+				select = selectDisparitySparseSubpixel_F32((int) maxError, config.texture);
+			else
+				select = selectDisparitySparse_F32((int) maxError, config.texture);
+
+			DisparitySparseScoreSadRect<float[],GrayF32>
+					score = scoreDisparitySparseSadRect_F32(config.regionRadiusX, config.regionRadiusY);
+			score.configure(config.disparityMin,config.disparityRange);
+			score.setBorder(FactoryImageBorder.generic(config.border, ImageType.SB_F32));
+
+			return new WrapDisparityBlockSparseSad(score,select);
+		} else
+			throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
 	}
 
 	/**

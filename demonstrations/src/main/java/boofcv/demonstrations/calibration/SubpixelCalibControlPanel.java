@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -65,7 +65,7 @@ public class SubpixelCalibControlPanel extends StandardAlgConfigPanel
 		showSubpixel.addItemListener(this);
 		showSubpixel.setMaximumSize(showSubpixel.getPreferredSize());
 
-		addLabeled(selectZoom, "Zoom:",this);
+		addLabeled(selectZoom, "Zoom:");
 		addAlignLeft(showPixel, this);
 		addAlignLeft(showSubpixel,this);
 	}
