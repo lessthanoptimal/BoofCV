@@ -7,6 +7,6 @@ dependencies {
     api project(':main:boofcv-sfm')
     api project(':main:boofcv-recognition')
     api 'com.fifesoft:rsyntaxtextarea:2.6.1'
-    api 'io.github.vincenzopalazzo:material-ui-swing:1.1.1_beta'
-    api 'com.github.weisj:darklaf-core:1.3.3.6'
+    api 'io.github.vincenzopalazzo:material-ui-swing:1.1.1_pre-release_6.1'
+    api 'com.github.weisj:darklaf-core:1.4.1.0'
 }
