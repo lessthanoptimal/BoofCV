@@ -25,9 +25,6 @@ import georegression.struct.point.Point2D_I16;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Concurrent implementation of {@link NonMaxCandidate}.
  *
@@ -36,9 +33,7 @@ import java.util.List;
  */
 public class NonMaxCandidate_MT extends NonMaxCandidate {
 
-	final Object lock = new Object();
-	final List<NonMaxCandidate.Search> searches = new ArrayList<>();
-	final List<QueueCorner> cornerLists = new ArrayList<>();
+	final FastQueue<SearchData> searches = new FastQueue<>(this::createSearchData);
 
 	public NonMaxCandidate_MT(Search search) {
 		super(search);
@@ -46,18 +41,16 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 
 	@Override
 	protected void examineMinimum(GrayF32 intensityImage , FastAccess<Point2D_I16> candidates , FastQueue<Point2D_I16> found ) {
+		found.reset();
 		final int stride = intensityImage.stride;
 		final float inten[] = intensityImage.data;
 
 		// little cost to creating a thread so let it select the minimum block size
-		BoofConcurrency.loopBlocks(0,candidates.size,(idx0,idx1)->{
-			NonMaxCandidate.Search search;
-			QueueCorner threadCorners;
-			synchronized ( lock ) {
-				search = searches.isEmpty() ? this.search.newInstance() : searches.remove(searches.size()-1);
-				threadCorners = cornerLists.isEmpty() ? new QueueCorner() : cornerLists.remove(cornerLists.size()-1);
-				threadCorners.reset();
-			}
+		BoofConcurrency.loopBlocks(0,candidates.size,searches,(blockData,idx0,idx1)->{
+			final QueueCorner threadCorners = blockData.corners;
+			final NonMaxCandidate.Search search = blockData.search;
+
+			threadCorners.reset();
 			search.initialize(intensityImage);
 
 			for (int iter = idx0; iter < idx1; iter++) {
@@ -79,29 +72,27 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 				if( search.searchMin(x0,y0,x1,y1,center,val) )
 					threadCorners.add(pt.x,pt.y);
 			}
-
-			synchronized (lock) {
-				found.copyAll(threadCorners.toList(),(src,dst)->dst.set(src));
-				searches.add(search);
-				cornerLists.add(threadCorners);
-			}
 		});
+
+		// by doing the last step outside we ensure the corners are in a deterministic order and that no locking
+		// is required inside each thread
+		for (int i = 0; i < searches.size; i++) {
+			found.copyAll(searches.get(i).corners.toList(),(src,dst)->dst.set(src));
+		}
 	}
 
 	@Override
 	protected void examineMaximum(GrayF32 intensityImage , FastAccess<Point2D_I16> candidates , FastQueue<Point2D_I16> found ) {
+		found.reset();
 		final int stride = intensityImage.stride;
 		final float inten[] = intensityImage.data;
 
 		// little cost to creating a thread so let it select the minimum block size
-		BoofConcurrency.loopBlocks(0,candidates.size,(idx0,idx1)-> {
-			NonMaxCandidate.Search search;
-			QueueCorner threadCorners;
-			synchronized ( lock ) {
-				search = searches.isEmpty() ? this.search.newInstance() : searches.remove(searches.size()-1);
-				threadCorners = cornerLists.isEmpty() ? new QueueCorner() : cornerLists.remove(cornerLists.size()-1);
-				threadCorners.reset();
-			}
+		BoofConcurrency.loopBlocks(0,candidates.size,searches,(blockData,idx0,idx1)-> {
+			final QueueCorner threadCorners = blockData.corners;
+			final NonMaxCandidate.Search search = blockData.search;
+
+			threadCorners.reset();
 			search.initialize(intensityImage);
 
 			for (int iter = idx0; iter < idx1; iter++) {
@@ -123,13 +114,26 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 				if (search.searchMax(x0, y0, x1, y1, center, val))
 					threadCorners.add(pt.x, pt.y);
 			}
-
-			synchronized (lock) {
-
-				found.copyAll(threadCorners.toList(),(src,dst)->dst.set(src));
-				searches.add(search);
-				cornerLists.add(threadCorners);
-			}
 		});
+
+		// by doing the last step outside we ensure the corners are in a deterministic order and that no locking
+		// is required inside each thread
+		for (int i = 0; i < searches.size; i++) {
+			found.copyAll(searches.get(i).corners.toList(),(src,dst)->dst.set(src));
+		}
 	}
+
+	public SearchData createSearchData() {
+		return new SearchData(search.newInstance());
+	}
+
+	protected static class SearchData {
+		public final Search search;
+		public final QueueCorner corners = new QueueCorner();
+
+		public SearchData(Search search) {
+			this.search = search;
+		}
+	}
+
 }

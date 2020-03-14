@@ -36,12 +36,7 @@ import javax.annotation.Nullable;
 public class NonMaxBlock_MT extends NonMaxBlock {
 
 	// lock for variables below - which are lists used to store work space for individual threads
-	final Object lock = new Object();
-	final FastQueue<Search> searches = new FastQueue<>(()->search.newInstance());
-
-	// Not owned by lock since everything is predeclared outside of concurrent code
-	final FastQueue<QueueCorner> cornerMinLists = new FastQueue<>(QueueCorner::new,QueueCorner::reset);
-	final FastQueue<QueueCorner> cornerMaxLists = new FastQueue<>(QueueCorner::new,QueueCorner::reset);
+	final FastQueue<SearchData> searches = new FastQueue<>(this::createSearchData);
 
 	public NonMaxBlock_MT(Search search) {
 		super(search);
@@ -76,49 +71,54 @@ public class NonMaxBlock_MT extends NonMaxBlock {
 		if( range > N*step )
 			N += 1;
 
-		// Predeclare storage for the results
-		cornerMinLists.reset(); cornerMinLists.resize(localMin!=null?N:0);
-		cornerMaxLists.reset(); cornerMaxLists.resize(localMax!=null?N:0);
-		searches.reset();
-
-		BoofConcurrency.loopFor(0,N, iterY -> {
-			final NonMaxBlock.Search search;
-
-			// get work space for this thread
-			synchronized (lock) {
-				search = searches.grow();
-			}
-
-			QueueCorner threadMin=localMin!=null?cornerMinLists.get(iterY):null;
-			QueueCorner threadMax=localMax!=null?cornerMaxLists.get(iterY):null;
+		// The previous version required locks. In a benchmark in Java 11 this lock free version and the previous
+		// had identical performance.
+		BoofConcurrency.loopBlocks(0,N,searches, (blockInfo,iter0,iter1) -> {
+			final Search search = blockInfo.search;
+			blockInfo.cornersMin.reset();
+			blockInfo.cornersMax.reset();
+			QueueCorner threadMin=localMin!=null?blockInfo.cornersMin:null;
+			QueueCorner threadMax=localMax!=null?blockInfo.cornersMax:null;
 
 			search.initialize(configuration,intensityImage,threadMin,threadMax);
 
-			// search for local peaks along this block row
-			int y = border + iterY*step;
-			int y1 = y + step;
-			if( y1 > endY) y1 = endY;
+			for (int iterY = iter0; iterY < iter1; iterY++) {
+				// search for local peaks along this block row
+				int y = border + iterY*step;
+				int y1 = y + step;
+				if( y1 > endY) y1 = endY;
 
-			for(int x = border; x < endX; x += step ) {
-				int x1 = x + step;
-				if( x1 > endX) x1 = endX;
-				search.searchBlock(x,y,x1,y1);
-			}
-
-
-			synchronized (lock) {
-				int index = searches.indexOf(search);
-				searches.removeSwap(index);
+				for(int x = border; x < endX; x += step ) {
+					int x1 = x + step;
+					if( x1 > endX) x1 = endX;
+					search.searchBlock(x,y,x1,y1);
+				}
 			}
 		});
 
 		// Save results outside of the thread. This ensures the order is not randomized. That was wrecking havoc
 		// on results that needed to be deterministic
-		for (int i = 0; i < N; i++) {
+		for (int i = 0; i < searches.size; i++) {
+			SearchData data = searches.get(i);
+
 			if( localMin != null )
-				localMin.addAll(cornerMinLists.get(i));
+				localMin.copyAll(data.cornersMin);
 			if( localMax != null )
-				localMax.addAll(cornerMaxLists.get(i));
+				localMax.copyAll(data.cornersMax);
+		}
+	}
+
+	public SearchData createSearchData() {
+		return new SearchData(search.newInstance());
+	}
+
+	protected static class SearchData {
+		public final Search search;
+		public final QueueCorner cornersMin = new QueueCorner();
+		public final QueueCorner cornersMax = new QueueCorner();
+
+		public SearchData(Search search) {
+			this.search = search;
 		}
 	}
 }

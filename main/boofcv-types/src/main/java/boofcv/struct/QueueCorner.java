@@ -46,7 +46,11 @@ public class QueueCorner extends FastQueue<Point2D_I16> {
 		grow().set(pt.x, pt.y);
 	}
 
-	public final void addAll( QueueCorner list ) {
+	/**
+	 * Adds a copy of each element in 'list' which is owned by 'this' queue
+	 * @param list The list that is to added and copied
+	 */
+	public final void copyAll(QueueCorner list ) {
 		for (int i = 0; i < list.size; i++) {
 			grow().set(list.get(i));
 		}

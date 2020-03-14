@@ -30,7 +30,7 @@ Version : 0.36
   * Deterministic non-max block concurrent algorithm
   * Discrete image pyramids can now be dynamically defined based on input image size
   * Added a proper config for discrete image pyramid levels
-  * TODO Deterministic non-max block candidate concurrent algorithm
+  * Deterministic non-max suppression block candidate concurrent
 - Color
   * Can convert YUV, HSV, and YCbCr to 32-bit RGB color
 - Moved KLT from boofcv-geo to boofcv-feature
