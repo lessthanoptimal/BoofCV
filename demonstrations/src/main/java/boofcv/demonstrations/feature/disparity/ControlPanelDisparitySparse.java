@@ -53,7 +53,6 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 	ControlsSAD controlSad;
 	ControlsCensus controlCensus;
 	ControlsNCC controlNCC;
-	ControlsMutualInfo controlHMI;
 
 	boolean ignoreChanges=false;
 
@@ -67,6 +66,7 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 	 */
 	public ControlPanelDisparitySparse(ConfigDisparityBM config, Listener listener)
 	{
+		setBorder(BorderFactory.createEmptyBorder());
 		this.config = config;
 		this.listener = listener;
 
@@ -75,10 +75,10 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 		controlSad = new ControlsSAD();
 		controlCensus = new ControlsCensus();
 		controlNCC = new ControlsNCC();
-		controlHMI = new ControlsMutualInfo();
 
 		tabbedPane.addTab("Disparity",controlBM);
 		tabbedPane.addTab("Error",getErrorControl(comboError.getSelectedIndex()));
+		tabbedPane.setBorder(BorderFactory.createEmptyBorder());
 
 		addLabeled(comboError,"Error");
 		add(tabbedPane);
@@ -93,7 +93,6 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 
 		listener.handleSparseDisparityChange();
 	}
-
 
 	public <T extends ImageGray<T>>
 	StereoDisparitySparse<T> createAlgorithm(Class<T> imageType) {
@@ -157,6 +156,7 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 		JCheckBox subpixelToggle = checkbox("Subpixel", config.subpixel,"Subpixel Disparity Estimate");
 
 		ControlsBlockMatching() {
+			setBorder(BorderFactory.createEmptyBorder());
 			addLabeled(spinnerDisparityMin, "Min Disp.","Minimum disparity value considered. (Pixels)");
 			addLabeled(spinnerDisparityRange, "Range Disp.","Range of disparity values searched. (Pixels)");
 			addLabeled(radiusXSpinner,    "Radius X","Block Width. (Pixels)");
@@ -201,6 +201,7 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 		ConfigDisparityError.Census settings;
 
 		public ControlsCensus() {
+			setBorder(BorderFactory.createEmptyBorder());
 			addLabeled(comboVariant, "Variant");
 		}
 
@@ -225,6 +226,7 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 		ConfigDisparityError.NCC settings;
 
 		ControlsNCC() {
+			setBorder(BorderFactory.createEmptyBorder());
 			addLabeled(spinnerEps, "EPS");
 		}
 
@@ -237,42 +239,6 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 		public void controlChanged(final Object source) {
 			if( source == spinnerEps) {
 				settings.eps = ((Number) spinnerEps.getValue()).doubleValue();
-			} else {
-				throw new RuntimeException("Unknown");
-			}
-			broadcastChange();
-		}
-	}
-
-	class ControlsMutualInfo extends StandardAlgConfigPanel {
-		JSpinner spinnerBlur = spinner(1,0, 10,1);
-		JSpinner spinnerPyramidWidth = spinner(20,20, 10000,50);
-		JSpinner spinnerExtra = spinner(0,0, 5,1);
-
-		ConfigDisparityError.HMI settings;
-
-		ControlsMutualInfo() {
-			addLabeled(spinnerBlur, "Blur Radius");
-			addLabeled(spinnerPyramidWidth, "Pyr Min W");
-			addLabeled(spinnerExtra, "Extra Iter.");
-		}
-
-		public void update( ConfigDisparityError.HMI settings ) {
-			this.settings = settings;
-			spinnerBlur.setValue(settings.smoothingRadius);
-			spinnerPyramidWidth.setValue(settings.pyramidLayers.minWidth);
-			spinnerExtra.setValue(settings.extraIterations);
-		}
-
-		@Override
-		public void controlChanged(final Object source) {
-			if( source == spinnerBlur) {
-				settings.smoothingRadius = ((Number) spinnerBlur.getValue()).intValue();
-			} else if( source == spinnerPyramidWidth) {
-				settings.pyramidLayers.minWidth = ((Number) spinnerPyramidWidth.getValue()).intValue();
-				settings.pyramidLayers.minHeight = ((Number) spinnerPyramidWidth.getValue()).intValue();
-			} else if( source == spinnerExtra) {
-				settings.extraIterations = ((Number) spinnerExtra.getValue()).intValue();
 			} else {
 				throw new RuntimeException("Unknown");
 			}

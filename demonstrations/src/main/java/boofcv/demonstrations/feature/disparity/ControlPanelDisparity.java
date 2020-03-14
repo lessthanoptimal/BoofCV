@@ -28,11 +28,7 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Controls for configuring disparity algorithms
@@ -72,6 +68,7 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 								 ConfigDisparitySGM configSGM,
 								 Class imageType)
 	{
+		setBorder(BorderFactory.createEmptyBorder());
 		this.configBM = configBM;
 		this.configSGM = configSGM;
 		this.imageType = imageType;
@@ -264,10 +261,10 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 		return c;
 	}
 
-	public class ControlsBlockMatching extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
+	public class ControlsBlockMatching extends StandardAlgConfigPanel {
 		JSpinner spinnerDisparityMin = spinner(configBM.disparityMin,0, 1000,5);
 		JSpinner spinnerDisparityRange = spinner(configBM.disparityRange,1, 254,5);
-		JSpinner radiusXSpinner = spinner(configBM.regionRadiusX,0,50,1); // TODO move to error
+		JSpinner radiusXSpinner = spinner(configBM.regionRadiusX,0,50,1);
 		JSpinner radiusYSpinner = spinner(configBM.regionRadiusY,0,50,1);
 		JSpinner spinnerError = spinner(configBM.maxPerPixelError,-1,80,5);
 		JSpinner spinnerReverse = spinner(configBM.validateRtoL,-1,50,1);
@@ -275,6 +272,7 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 		JCheckBox subpixelToggle = checkbox("Subpixel",configBM.subpixel,"Subpixel Disparity Estimate");
 
 		ControlsBlockMatching() {
+			setBorder(BorderFactory.createEmptyBorder());
 			addLabeled(spinnerDisparityMin, "Min Disp.","Minimum disparity value considered. (Pixels)");
 			addLabeled(spinnerDisparityRange, "Range Disp.","Range of disparity values searched. (Pixels)");
 			addLabeled(radiusXSpinner,    "Radius X","Block Width. (Pixels)");
@@ -286,30 +284,22 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 		}
 
 		@Override
-		public void stateChanged(ChangeEvent e) {
-			if( e.getSource() == spinnerReverse) {
+		public void controlChanged(final Object source) {
+			if( source == spinnerReverse) {
 				configBM.validateRtoL = ((Number) spinnerReverse.getValue()).intValue();
-			} else if( e.getSource() == spinnerDisparityMin) {
+			} else if( source == spinnerDisparityMin) {
 				configBM.disparityMin = ((Number) spinnerDisparityMin.getValue()).intValue();
-			} else if( e.getSource() == spinnerDisparityRange) {
+			} else if( source == spinnerDisparityRange) {
 				configBM.disparityRange = ((Number) spinnerDisparityRange.getValue()).intValue();
-			} else if( e.getSource() == spinnerError) {
+			} else if( source == spinnerError) {
 				configBM.maxPerPixelError = ((Number) spinnerError.getValue()).intValue();
-			} else if( e.getSource() == radiusXSpinner) {
+			} else if( source == radiusXSpinner) {
 				configBM.regionRadiusX = ((Number) radiusXSpinner.getValue()).intValue();
-			} else if( e.getSource() == radiusYSpinner) {
+			} else if( source == radiusYSpinner) {
 				configBM.regionRadiusY = ((Number) radiusYSpinner.getValue()).intValue();
-			} else if( e.getSource() == spinnerTexture) {
+			} else if( source == spinnerTexture) {
 				configBM.texture = ((Number) spinnerTexture.getValue()).doubleValue();
-			} else {
-				throw new RuntimeException("Unknown");
-			}
-			broadcastChange();
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == subpixelToggle) {
+			} else if( source == subpixelToggle) {
 				configBM.subpixel = subpixelToggle.isSelected();
 			} else {
 				throw new RuntimeException("Unknown");
@@ -318,7 +308,7 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 		}
 	}
 
-	public class ControlsSemiGlobal extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
+	public class ControlsSemiGlobal extends StandardAlgConfigPanel {
 		JComboBox<String> comboPaths = combo(configSGM.paths.ordinal(),"1","2","4","8","16");
 
 		JSpinner spinnerPenaltySmall = spinner(configSGM.penaltySmallChange,0, SgmDisparityCost.MAX_COST,10);
@@ -336,6 +326,7 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 		JSpinner radiusYSpinner = spinner(configSGM.configBlockMatch.radiusY,0,50,1);
 
 		ControlsSemiGlobal() {
+			setBorder(BorderFactory.createEmptyBorder());
 			addLabeled(spinnerDisparityMin, "Min Disp.");
 			addLabeled(spinnerDisparityRange, "Range Disp.");
 			addLabeled(spinnerError,     "Max Error");
@@ -353,41 +344,33 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 		}
 
 		@Override
-		public void stateChanged(ChangeEvent e) {
-			if( e.getSource() == spinnerReverse) {
+		public void controlChanged(final Object source) {
+			if( source == spinnerReverse) {
 				configSGM.validateRtoL = ((Number) spinnerReverse.getValue()).intValue();
-			} else if( e.getSource() == spinnerDisparityMin) {
+			} else if( source == spinnerDisparityMin) {
 				configSGM.disparityMin = ((Number) spinnerDisparityMin.getValue()).intValue();
-			} else if( e.getSource() == spinnerDisparityRange) {
+			} else if( source == spinnerDisparityRange) {
 				configSGM.disparityRange = ((Number) spinnerDisparityRange.getValue()).intValue();
-			} else if( e.getSource() == spinnerError) {
+			} else if( source == spinnerError) {
 				configSGM.maxError = ((Number) spinnerError.getValue()).intValue();
-			} else if( e.getSource() == spinnerTexture) {
+			} else if( source == spinnerTexture) {
 				configSGM.texture = ((Number) spinnerTexture.getValue()).doubleValue();
-			} else if( e.getSource() == spinnerPenaltySmall) {
+			} else if( source == spinnerPenaltySmall) {
 				configSGM.penaltySmallChange = ((Number) spinnerPenaltySmall.getValue()).intValue();
-			} else if( e.getSource() == spinnerPenaltyLarge) {
+			} else if( source == spinnerPenaltyLarge) {
 				configSGM.penaltyLargeChange = ((Number) spinnerPenaltyLarge.getValue()).intValue();
-			} else if( e.getSource() == radiusXSpinner) {
+			} else if( source == radiusXSpinner) {
 				configSGM.configBlockMatch.radiusX = ((Number) radiusXSpinner.getValue()).intValue();
-			} else if( e.getSource() == radiusYSpinner) {
+			} else if( source == radiusYSpinner) {
 				configSGM.configBlockMatch.radiusY = ((Number) radiusYSpinner.getValue()).intValue();
-			} else {
-				throw new RuntimeException("Unknown");
-			}
-			broadcastChange();
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == comboPaths) {
+			} else if( source == comboPaths) {
 				configSGM.paths = ConfigDisparitySGM.Paths.values()[comboPaths.getSelectedIndex()];
-			} else if( e.getSource() == subpixelToggle) {
+			} else if( source == subpixelToggle) {
 				configSGM.subpixel = subpixelToggle.isSelected();
-			} else if( e.getSource() == useBlocks) {
+			} else if( source == useBlocks) {
 				configSGM.useBlocks = useBlocks.isSelected();
 				updateControlsEnabled();
-			} else if( e.getSource() == comboBlockApproach) {
+			} else if( source == comboBlockApproach) {
 				configSGM.configBlockMatch.approach = BlockMatchingApproach.values()[comboBlockApproach.getSelectedIndex()];
 			} else {
 				throw new RuntimeException("Unknown");
@@ -407,11 +390,12 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 
 	}
 
-	class ControlsCensus extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
+	class ControlsCensus extends StandardAlgConfigPanel {
 		JComboBox<String> comboVariant = combo(0, (Object[]) CensusVariants.values());
 		ConfigDisparityError.Census settings;
 
 		public ControlsCensus() {
+			setBorder(BorderFactory.createEmptyBorder());
 			addLabeled(comboVariant, "Variant");
 		}
 
@@ -421,13 +405,8 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 		}
 
 		@Override
-		public void stateChanged(ChangeEvent e) {
-
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == comboVariant) {
+		public void controlChanged(final Object source) {
+			if( source == comboVariant) {
 				settings.variant = CensusVariants.values()[comboVariant.getSelectedIndex()];
 			} else {
 				throw new RuntimeException("Unknown");
@@ -436,11 +415,12 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 		}
 	}
 
-	class ControlsNCC extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
+	class ControlsNCC extends StandardAlgConfigPanel {
 		JSpinner spinnerEps = spinner(0.0,0, 1.0,0.001,"0.0E0",10);
 		ConfigDisparityError.NCC settings;
 
 		ControlsNCC() {
+			setBorder(BorderFactory.createEmptyBorder());
 			addLabeled(spinnerEps, "EPS");
 		}
 
@@ -450,22 +430,17 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 		}
 
 		@Override
-		public void stateChanged(ChangeEvent e) {
-			if( e.getSource() == spinnerEps) {
+		public void controlChanged(final Object source) {
+			if( source == spinnerEps) {
 				settings.eps = ((Number) spinnerEps.getValue()).doubleValue();
 			} else {
 				throw new RuntimeException("Unknown");
 			}
 			broadcastChange();
 		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
-		}
 	}
 
-	class ControlsMutualInfo extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
+	class ControlsMutualInfo extends StandardAlgConfigPanel {
 		JSpinner spinnerBlur = spinner(1,0, 10,1);
 		JSpinner spinnerPyramidWidth = spinner(20,20, 10000,50);
 		JSpinner spinnerExtra = spinner(0,0, 5,1);
@@ -473,6 +448,7 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 		ConfigDisparityError.HMI settings;
 
 		ControlsMutualInfo() {
+			setBorder(BorderFactory.createEmptyBorder());
 			addLabeled(spinnerBlur, "Blur Radius");
 			addLabeled(spinnerPyramidWidth, "Pyr Min W");
 			addLabeled(spinnerExtra, "Extra Iter.");
@@ -486,23 +462,18 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 		}
 
 		@Override
-		public void stateChanged(ChangeEvent e) {
-			if( e.getSource() == spinnerBlur) {
+		public void controlChanged(final Object source) {
+			if( source == spinnerBlur) {
 				settings.smoothingRadius = ((Number) spinnerBlur.getValue()).intValue();
-			} else if( e.getSource() == spinnerPyramidWidth) {
+			} else if( source == spinnerPyramidWidth) {
 				settings.pyramidLayers.minWidth = ((Number) spinnerPyramidWidth.getValue()).intValue();
 				settings.pyramidLayers.minHeight = ((Number) spinnerPyramidWidth.getValue()).intValue();
-			} else if( e.getSource() == spinnerExtra) {
+			} else if( source == spinnerExtra) {
 				settings.extraIterations = ((Number) spinnerExtra.getValue()).intValue();
 			} else {
 				throw new RuntimeException("Unknown");
 			}
 			broadcastChange();
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-
 		}
 	}
 

@@ -415,15 +415,15 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 			panelAlgControls.add(BorderLayout.CENTER, controlPnpDepth);
 
-			var tabbedPane = new JTabbedPane();
-			tabbedPane.addTab("Visuals",panelVisuals);
-			tabbedPane.addTab("Tuning",panelTuning);
+			var tabbedTopPane = new JTabbedPane();
+			tabbedTopPane.addTab("Visuals",panelVisuals);
+			tabbedTopPane.addTab("Tuning",panelTuning);
 
 			addLabeled(videoFrameLabel,"Frame");
 			addLabeled(processingTimeLabel,"Processing (ms)");
 			addLabeled(imageSizeLabel,"Image");
 			addLabeled(selectZoom,"Zoom");
-			add(tabbedPane);
+			add(tabbedTopPane);
 			addVerticalGlue();
 			add(fillHorizontally(gridPanel(2,bPause,bStep)));
 		}

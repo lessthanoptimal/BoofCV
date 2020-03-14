@@ -121,6 +121,13 @@ public abstract class DemonstrationBase extends JPanel {
 
 		}
 
+		// If the default layout manager tabbed panes will get smaller and smaller since it has a border
+		Insets insets = UIManager.getInsets("TabbedPane.contentBorderInsets");
+		insets.bottom = 0; // because the sides are now mangled it looks better without the bottom border too
+		insets.left = 0;
+		insets.right = 0;
+		UIManager.put("TabbedPane.contentBorderInsets", insets);
+
 		GlobalDemoSettings.SETTINGS.changeTheme();
 	}
 

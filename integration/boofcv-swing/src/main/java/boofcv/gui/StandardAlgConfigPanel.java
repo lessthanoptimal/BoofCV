@@ -34,6 +34,7 @@ import java.text.DecimalFormat;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings({"unused", "SameParameterValue"})
 public class StandardAlgConfigPanel extends JPanel implements ActionListener, ChangeListener {
 
 	public StandardAlgConfigPanel() {
@@ -77,7 +78,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	}
 
 	protected JButton button( String name , boolean enabled ) {
-		return button(name,enabled,(ActionListener)this);
+		return button(name,enabled,this);
 	}
 
 	protected JButton button( String name , boolean enabled , ActionListener listener ) {
@@ -91,7 +92,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		JSlider slider = new JSlider(min,max,initial);
 		slider.setMaximumSize(new Dimension(widgetWidth,24));
 		slider.setPreferredSize(slider.getMaximumSize());
-		slider.addChangeListener((ChangeListener)this);
+		slider.addChangeListener(this);
 		return slider;
 	}
 
@@ -102,7 +103,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 			c.addItem(items[i].toString());
 		}
 		c.setSelectedIndex(initial);
-		c.addActionListener((ActionListener)this);
+		c.addActionListener(this);
 		c.setMaximumSize(c.getPreferredSize());
 		return c;
 	}
@@ -124,7 +125,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		JSpinner spinner = new JSpinner(new SpinnerListModel(items));
 		spinner.setValue(items[initial]);
 		spinner.setMaximumSize(spinner.getPreferredSize());
-		spinner.addChangeListener((ChangeListener)this);
+		spinner.addChangeListener(this);
 		return spinner;
 	}
 
@@ -138,14 +139,14 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	protected JSpinner spinner(int initial , int minimum , int maximum, int stepSize ) {
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
 		spinner.setMaximumSize(spinner.getPreferredSize());
-		spinner.addChangeListener((ChangeListener)this);
+		spinner.addChangeListener(this);
 		return spinner;
 	}
 
 	protected JSpinner spinner( double initial , double minimum , double maximum, double stepSize ) {
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(initial, minimum, maximum, stepSize));
 		spinner.setMaximumSize(spinner.getPreferredSize());
-		spinner.addChangeListener((ChangeListener)this);
+		spinner.addChangeListener(this);
 		return spinner;
 	}
 
@@ -163,7 +164,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		spinner.setMaximumSize(d);
 		// force it to render using the format specified above. A bit of a hack. Got a better idea?
 		spinner.setValue(1-initial);spinner.setValue(initial);
-		spinner.addChangeListener((ChangeListener)this);
+		spinner.addChangeListener(this);
 		return spinner;
 	}
 
@@ -180,7 +181,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		spinner.setMaximumSize(d);
 		// force it to render using the format specified above. A bit of a hack. Got a better idea?
 		spinner.setValue(1-initial);spinner.setValue(initial);
-		spinner.addChangeListener((ChangeListener)this);
+		spinner.addChangeListener(this);
 		return spinner;
 	}
 
@@ -205,7 +206,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	protected JCheckBox checkbox( String text , boolean value , String tooltip ) {
 		JCheckBox c = new JCheckBox(text);
 		c.setSelected(value);
-		c.addActionListener((ActionListener) this);
+		c.addActionListener( this);
 
 		if( tooltip != null )
 			c.setToolTipText(tooltip);
@@ -277,7 +278,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	}
 
 	public void addLabeled( JComponent target , String text ) {
-		addLabeled(target,text);
+		addLabeled(target,text,null);
 	}
 
 	public void addLabeled( JComponent target , String text , String tooltip ) {
