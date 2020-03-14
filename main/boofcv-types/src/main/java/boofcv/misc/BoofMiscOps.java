@@ -37,6 +37,22 @@ import java.util.List;
 @SuppressWarnings("rawtypes")
 public class BoofMiscOps {
 
+	public static String[] toStringArray( List<File> files ) {
+		String[] output = new String[files.size()];
+		for (int i = 0; i < files.size(); i++) {
+			output[i] = files.get(i).getPath();
+		}
+		return output;
+	}
+
+	public static List<File> toFileList( String[] files ) {
+		List<File> output = new ArrayList<>();
+		for( String s : files ) {
+			output.add( new File(s));
+		}
+		return output;
+	}
+
 	public static int bitsToWords( int bits , int wordBits ) {
 		return (bits/wordBits) + (bits%wordBits==0?0:1);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,13 +100,24 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 		if (!dir.isDirectory())
 			throw new IllegalArgumentException("directory must specify a directory.  path = "+directoryName);
 
-		String[] files = dir.list(new Filter());
+		fileNames.clear();
 
-		for (String s : files) {
-			fileNames.add(dir.getAbsolutePath() + '/' + s);
+		File[] files;
+		if( suffix != null )
+			files = dir.listFiles(new Filter());
+		else
+			files = dir.listFiles();
+
+		if( files == null )
+			return;
+
+		for (File f : files) {
+			if( UtilImageIO.isImage(f))
+				fileNames.add(f.getAbsolutePath());
 		}
 
 		Collections.sort(fileNames);
+		next();
 	}
 
 	@Override

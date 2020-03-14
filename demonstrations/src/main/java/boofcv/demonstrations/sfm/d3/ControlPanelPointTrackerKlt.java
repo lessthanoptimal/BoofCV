@@ -19,8 +19,12 @@
 package boofcv.demonstrations.sfm.d3;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
+import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
 
@@ -61,8 +65,6 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 		spinnerDetectThresh = spinner(configDetector.threshold,0.0,100.0,1.0);
 		spinnerDetectRadius = spinner(configDetector.radius,1,500,1);
 		spinnerForwardsBackwards = spinner(configKlt.toleranceFB,-1,100.0,1.0);
-		
-		setBorder(BorderFactory.createEmptyBorder());
 
 		addLabeled(spinnerLevels,"Pyr. Levels","Number of layers in image pyramid");
 		addAlignLeft(checkPruneClose);
@@ -72,6 +74,11 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 		addLabeled(spinnerDetectThresh,"Detect Threshold","Shi-Tomasi corner detection threshold");
 		addLabeled(spinnerDetectRadius,"Detect Radius","Non-maximum detection radius");
 		addLabeled(spinnerForwardsBackwards,"F-to-B Tol.","Forwards-Backwards tolerance. 0 = disable (Pixels)");
+	}
+
+	public <T extends ImageBase<T>>
+	PointTracker<T> createTracker(ImageType<T> imageType ) {
+		return FactoryPointTracker.klt(configKlt, configDetector, imageType.getImageClass(), null);
 	}
 
 	@Override

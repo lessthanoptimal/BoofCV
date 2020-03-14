@@ -94,6 +94,7 @@ public abstract class DemonstrationBase extends JPanel {
 	private volatile boolean startingProcess = false;
 
 	protected MediaManager media = new DefaultMediaManager();
+	protected boolean customFileInput = false;
 	protected boolean allowVideos = true;
 	protected boolean allowImages = true;
 
@@ -292,6 +293,11 @@ public abstract class DemonstrationBase extends JPanel {
 	public void openExample( Object o ) {
 		if (o instanceof PathLabel) {
 			PathLabel p = (PathLabel)o;
+			if( customFileInput ) {
+				openFiles(p.getPathFiles());
+				return;
+			}
+
 			if( p.path.length == 1 )
 				openFile(new File(p.path[0]));
 			else {
@@ -536,6 +542,63 @@ public abstract class DemonstrationBase extends JPanel {
 	}
 
 	/**
+	 * Opens a set of files using a custom function to extract images and sequences
+	 */
+	protected void openFiles( List<File> filePaths ) {
+		if( filePaths.size() == 0 )
+			return;
+		final String path = massageFilePath(filePaths.get(0));
+		if( path == null )
+			return;
+		inputFilePath = path;
+		inputFileSet = BoofMiscOps.toStringArray(filePaths);
+
+		// update recent items menu
+		BoofSwingUtil.invokeNowOrLater(() -> {
+			BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,path);
+			updateRecentItems();
+		});
+
+		stopAllInputProcessing();
+
+		List<File> sequences = new ArrayList<>();
+		List<File> images = new ArrayList<>();
+
+		if( !openFiles(filePaths,sequences,images) )
+			return;
+
+		if( !sequences.isEmpty() && !images.isEmpty() )
+			throw new IllegalArgumentException("Only one of these can be not empty");
+
+		if( !sequences.isEmpty() ) {
+			openVideo(false,toPathArray(sequences));
+		} else {
+			openImageSet(false,toPathArray(sequences));
+		}
+		inputFileSet = BoofMiscOps.toStringArray(filePaths);
+	}
+
+	private static String[] toPathArray( List<File> files ) {
+		String[] array = new String[files.size()];
+		for (int i = 0; i < files.size(); i++) {
+			array[i] = files.get(i).getAbsolutePath();
+		}
+		return array;
+	}
+
+	/**
+	 * Opens either image sequences of images given file paths. This also allows other information, such as calibration
+	 * to be opened and processed. Can only handle images OR sequences and not both.
+	 * @return true if it was successful or false if it failed
+	 */
+	protected boolean openFiles( List<File> filePaths ,
+								 List<File> outSequence ,
+								 List<File> outImages )
+	{
+		throw new RuntimeException("Override this function to implement custom file opening");
+	}
+
+	/**
 	 * Before invoking this function make sure waitingToOpenImage is false AND that the previous input has been stopped
 	 */
 	protected void openVideo(boolean reopen , String ...filePaths) {
@@ -750,6 +813,10 @@ public abstract class DemonstrationBase extends JPanel {
 	 * Open file in the menu bar was invoked by the user
 	 */
 	protected void openFileMenuBar() {
+		if( customFileInput) {
+			throw new RuntimeException("If customFileInput you must overload and provide a custom function");
+		}
+
 		List<BoofSwingUtil.FileTypes> types = new ArrayList<>();
 		if( allowImages )
 			types.add(BoofSwingUtil.FileTypes.IMAGES);
@@ -957,6 +1024,10 @@ public abstract class DemonstrationBase extends JPanel {
 	 * there is no need to reprocess, the next image will be handled soon enough.
 	 */
 	public void reprocessInput() {
+		if( customFileInput ) {
+			openFiles(BoofMiscOps.toFileList(inputFileSet));
+			return;
+		}
 		if ( inputMethod == InputMethod.VIDEO ) {
 			if( inputFilePath != null )
 				openVideo(true,inputFilePath);

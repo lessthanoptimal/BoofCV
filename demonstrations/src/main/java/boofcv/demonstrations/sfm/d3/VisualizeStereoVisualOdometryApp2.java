@@ -31,11 +31,10 @@ import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.sfm.ConfigVisOdomDepthPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
-import boofcv.gui.dialogs.OpenImageSetDialog;
+import boofcv.gui.dialogs.OpenStereoSequencesChooser;
 import boofcv.gui.feature.VisualizeFeatures;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
@@ -84,6 +83,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 	StereoVisualOdometry<T> alg;
 	T inputLeft, inputRight;
+	StereoParameters stereoParameters;
 
 	//-------------- Control lock on features
 	final FastQueue<FeatureInfo> features = new FastQueue<>(FeatureInfo::new);
@@ -100,8 +100,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 	public VisualizeStereoVisualOdometryApp2(List<PathLabel> examples,
 											 Class<T> imageType ) {
 		super(true, false, examples, ImageType.single(imageType),ImageType.single(imageType));
-		allowVideos = true;
-		allowImages = false; // videos only
+		customFileInput = true;
 
 		alg = createSelectedAlgorithm();
 		inputLeft = alg.getImageType().createImage(1,1);
@@ -135,10 +134,8 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 	public StereoVisualOdometry<T> createSelectedAlgorithm() {
 		Class<T> imageType = getImageType(0).getImageClass();
 
-		ConfigPKlt kltConfig = controls.controlKlt.configKlt;
-		ConfigGeneralDetector detConfig = controls.controlKlt.configDetector;
+		PointTracker<T> tracker = controls.controlTrackers.createTracker(getImageType(0));
 		StereoDisparitySparse<T> disparity = controls.controlDisparity.createAlgorithm(imageType);
-		PointTracker<T> tracker = FactoryPointTracker.klt(kltConfig, detConfig,imageType,null);
 		ConfigVisOdomDepthPnP configPnpDepth = controls.controlPnpDepth.config;
 		return FactoryVisualOdometry.stereoDepthPnP(configPnpDepth,disparity,tracker,imageType);
 	}
@@ -175,23 +172,43 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 	@Override
 	protected void openFileMenuBar() {
-		// TODO modify to select two videos
-		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY,2);
-		if( files == null )
+		OpenStereoSequencesChooser.Selected s = OpenStereoSequencesChooser.showDialog(window);
+		if( s == null )
 			return;
-		BoofSwingUtil.invokeNowOrLater(()->openImageSet(false,files));
+
+		final List<File> files = new ArrayList<>();
+		files.add(s.left);
+		files.add(s.right);
+		files.add(s.calibration);
+
+		openFiles(files);
+	}
+
+	@Override
+	protected boolean openFiles(List<File> filePaths, List<File> outSequence, List<File> outImages) {
+		if( filePaths.size() == 2 ) {
+			File pathCalibration = new File(filePaths.get(0).getParentFile(),"stereo.yaml");
+			stereoParameters = CalibrationIO.load(pathCalibration);
+		} else if( filePaths.size() == 3 ){
+			stereoParameters = CalibrationIO.load(filePaths.get(2));
+		} else {
+			throw new RuntimeException("Unexpected number of files "+filePaths.size());
+		}
+
+		outSequence.add( filePaths.get(0) );
+		outSequence.add( filePaths.get(1) );
+		return true;
 	}
 
 	@Override
 	protected void handleInputChange(int source, InputMethod method, int width, int height) {
-		File parent = new File(inputFileSet[0]).getParentFile();
-		File pathCalibration = new File(parent,"stereo.yaml");
-		StereoParameters stereo = CalibrationIO.load(pathCalibration);
+		if( stereoParameters == null )
+			throw new RuntimeException("stereoParameters should have been loaded in openFiles()");
 		frame = 0;
 		traveled = 0.0;
 		prev_to_world.reset();
 		alg.reset();
-		alg.setCalibration(stereo);
+		alg.setCalibration(stereoParameters);
 
 		synchronized (features) {
 			features.reset();
@@ -199,11 +216,11 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			visibleTracks.reset();
 		}
 
-		double hfov = PerspectiveOps.computeHFov(stereo.left);
+		double hfov = PerspectiveOps.computeHFov(stereoParameters.left);
 
 		SwingUtilities.invokeLater(()-> {
 			cloudPanel.configureViewer(hfov);
-			cloudPanel.gui.setTranslationStep(stereo.getBaseline());
+			cloudPanel.gui.setTranslationStep(stereoParameters.getBaseline());
 		});
 	}
 
@@ -372,8 +389,10 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 		// controls for different algorithms
 		ControlPanelVisOdomDepthPnP controlPnpDepth = new ControlPanelVisOdomDepthPnP(()->bUpdateAlg.setEnabled(true));
-		ControlPanelPointTrackerKlt controlKlt = new ControlPanelPointTrackerKlt(
-				()->bUpdateAlg.setEnabled(true),createConfigKltDetect(),createConfigKlt());
+		ControlPanelPointTrackers controlTrackers = new ControlPanelPointTrackers(()->bUpdateAlg.setEnabled(true),
+				new ControlPanelPointTrackerKlt( ()->bUpdateAlg.setEnabled(true),createConfigKltDetect(),createConfigKlt()),
+				new ControlPanelDdaTracker(()->bUpdateAlg.setEnabled(true)),
+				new ControlPanelHybridTracker(()->bUpdateAlg.setEnabled(true)));
 		ControlPanelDisparitySparse controlDisparity = new ControlPanelDisparitySparse(createConfigDisparity(),()->bUpdateAlg.setEnabled(true));
 
 		public ControlPanel() {
@@ -404,7 +423,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 			var tuningTabs = new JTabbedPane();
 			tuningTabs.addTab("VO",panelAlgControls);
-			tuningTabs.addTab("Tracker",controlKlt);
+			tuningTabs.addTab("Tracker",controlTrackers);
 			tuningTabs.addTab("Stereo",controlDisparity);
 
 			var panelTuning = new JPanel();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,8 @@
 package boofcv.io;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Object containing the path to a file and a label that is used to refer to the file
@@ -48,6 +50,14 @@ public class PathLabel {
 			this.label = label;
 			this.path = path;
 		}
+	}
+
+	public List<File> getPathFiles() {
+		List<File> files = new ArrayList<>();
+		for( String s : path ) {
+			files.add(new File(s));
+		}
+		return files;
 	}
 
 	public String getLabel() {

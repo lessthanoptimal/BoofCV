@@ -22,9 +22,11 @@ import boofcv.io.UtilIO;
 import boofcv.io.image.SimpleImageSequence;
 import boofcv.io.wrapper.images.ImageStreamSequence;
 import boofcv.io.wrapper.images.JpegByteImageSequence;
+import boofcv.io.wrapper.images.LoadFileImageSequence;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -58,6 +60,15 @@ public class DynamicVideoInterface implements VideoInterface {
 		URL url = UtilIO.ensureURL(fileName);
 		if( url == null )
 			throw new RuntimeException("Can't open "+fileName);
+
+		String protocol = url.getProtocol();
+
+		// See if it's a directory and then assume it's an image sequence
+		if( protocol.equals("file") ) {
+			File f = new File(url.getFile());
+			if( f.isDirectory() )
+				return new LoadFileImageSequence<>(imageType,url.getFile(),null);
+		}
 
 		InputStream stream=null;
 		try {
