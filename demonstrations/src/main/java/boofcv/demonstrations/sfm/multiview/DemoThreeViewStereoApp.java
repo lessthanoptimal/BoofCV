@@ -167,6 +167,13 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 	}
 
 	@Override
+	protected String selectRecentFileName(List<File> filePaths) {
+		File f = filePaths.get(0);
+		File path = new File(f.getParentFile().getName(),f.getName());
+		return path.getPath();
+	}
+
+	@Override
 	protected void openFileMenuBar() {
 		String[] files = BoofSwingUtil.openImageSetChooser(window, OpenImageSetDialog.Mode.EXACTLY,3);
 		if( files == null )

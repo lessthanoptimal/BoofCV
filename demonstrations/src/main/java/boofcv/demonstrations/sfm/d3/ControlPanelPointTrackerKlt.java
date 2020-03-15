@@ -62,7 +62,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 		spinnerIterations = spinner(configKlt.config.maxIterations,1,500,1);
 		spinnerMaxError = spinner(configKlt.config.maxPerPixelError,0.0,255.0,5.0);
 		spinnerDescRadius = spinner(configKlt.templateRadius,1,100,1);
-		spinnerDetectThresh = spinner(configDetector.threshold,0.0,100.0,1.0);
+		spinnerDetectThresh = spinner(Math.sqrt(configDetector.threshold),0.0,999.0,1.0);
 		spinnerDetectRadius = spinner(configDetector.radius,1,500,1);
 		spinnerForwardsBackwards = spinner(configKlt.toleranceFB,-1,100.0,1.0);
 
@@ -91,6 +91,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 			configKlt.config.maxPerPixelError = ((Number) spinnerMaxError.getValue()).floatValue();
 		} else if( source == spinnerDetectThresh) {
 			configDetector.threshold = ((Number) spinnerDetectThresh.getValue()).floatValue();
+			configDetector.threshold *= configDetector.threshold;
 		} else if( source == spinnerDetectRadius) {
 			configDetector.radius = ((Number) spinnerDetectRadius.getValue()).intValue();
 		} else if( source == spinnerForwardsBackwards ) {

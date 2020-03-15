@@ -47,17 +47,9 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 	boolean concurrent=true;
 	boolean recompute=true;
 
-	// range 0 to 1000
-	int periodAdjust=500;
-	int offsetAdjust=500;
-	int speedAdjust=500;
-
-	int colorScheme = 0;
 	// scale factor for input images
 	int inputScale = 100;
 
-	// Background color for 3D cloud
-	int backgroundColor3D = 0x000000;
 	// Background color for disparity
 	int backgroundColorDisparity = 0x000000;
 
@@ -73,35 +65,33 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 	JSpinner inputScaleSpinner = spinner(inputScale,5,100,10);
 	// selects which image to view
 	JComboBox viewSelector = combo(selectedView,"Disparity","Left","Right","View 3D");
-	// If the point cloud should be colorized or not
-	JComboBox comboColorizer = combo(0,"Color","X-YZ","Y-XZ","Z-XY","RB-X","RB-Y","RB-Z","RGB-X","RGB-Y","RGB-Z");
 
-	JSlider sliderPeriodColor = slider(0,1000,periodAdjust,120);
-	JSlider sliderOffsetColor = slider(0,1000,offsetAdjust,120);
-	JSlider sliderSpeed3D = slider(0,1000,speedAdjust,120);
+	ControlCustomCloud controlCloud = new ControlCustomCloud();
 
 	JCheckBox checkRecompute  = checkbox("Recompute",recompute);
 	JCheckBox checkConcurrent = checkbox("concurrent",concurrent);
 
-	ControlPanelDisparity controlDisparity;
+	ControlPanelDisparityDense controlDisparity;
 
 	// listener for changes in states
 	Listener listener;
 
 	public ControlPanelDisparityDisplay(int disparityMin , int disparityRange, Class imageType ) {
-		controlDisparity = ControlPanelDisparity.createRange(disparityMin,disparityRange,imageType);
+		controlDisparity = ControlPanelDisparityDense.createRange(disparityMin,disparityRange,imageType);
 		controlDisparity.setListener(()->listener.algorithmChanged());
 
-		update3DControls();
+		// Slim it down a little bit
+		controlCloud.setBorder(BorderFactory.createEmptyBorder());
+		controlCloud.setCallbackModified(()->listener.changeView3D());
+		controlCloud.setCallbackBackground(()->listener.changeBackgroundColor());
+
+		controlCloud.handleViewChange();
 
 		addLabeled(processingTimeLabel, "Time (ms)");
 		addLabeled(imageSizeLabel,"Image Size");
 		addLabeled(viewSelector, "View");
 		addLabeled(selectZoom,"Zoom");
-		addLabeled(createColorPanel(),"Color");
-		addLabeled(sliderOffsetColor,"Offset");
-		addLabeled(sliderPeriodColor,"Period");
-		addLabeled(sliderSpeed3D,"Speed");
+		add(controlCloud);
 		add(controlDisparity);
 		addLabeled(inputScaleSpinner, "Scale Input");
 		addAlignLeft(checkRecompute);
@@ -109,57 +99,6 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 		addVerticalGlue();
 
 		setPreferredSize(new Dimension(200,0));
-	}
-
-	/**
-	 * Button for selecting background color and another for selecting how to colorize
-	 */
-	private JPanel createColorPanel() {
-		bColorBackGround.addActionListener(e->{
-			Color newColor = JColorChooser.showDialog(
-					ControlPanelDisparityDisplay.this,
-					"Background Color",
-					new Color(getActiveBackgroundColor()));
-			int colorRGB = newColor.getRGB();
-			if( selectedView == 0 ) {
-				backgroundColorDisparity = colorRGB;
-			} else if( selectedView == 3 ) {
-				backgroundColor3D = colorRGB;
-			} else {
-				return;
-			}
-			setColorButtonColor();
-			listener.changeBackgroundColor();
-		});
-		bColorBackGround.setPreferredSize(new Dimension(20,20));
-		bColorBackGround.setMinimumSize(bColorBackGround.getPreferredSize());
-		bColorBackGround.setMaximumSize(bColorBackGround.getPreferredSize());
-		bColorBackGround.setBorder(BorderFactory.createEmptyBorder());
-		setColorButtonColor();
-
-		JPanel p = new JPanel();
-		p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
-		p.setBorder(BorderFactory.createEmptyBorder());
-		p.add(bColorBackGround);
-		p.add(Box.createRigidArea(new Dimension(5,5)));
-		p.add(comboColorizer);
-		return p;
-	}
-
-	private int getActiveBackgroundColor() {
-		if( selectedView == 0 ) {
-			return backgroundColorDisparity;
-		} else if( selectedView == 3 ) {
-			return backgroundColor3D;
-		} else {
-			return bColorBackGround.getBackground().getRGB();
-		}
-	}
-
-	private void setColorButtonColor() {
-		int color = getActiveBackgroundColor();
-		bColorBackGround.setBackground(new Color(color));
-		bColorBackGround.setForeground(new Color(color));
 	}
 
 	/**
@@ -194,18 +133,6 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 			inputScale = ((Number) inputScaleSpinner.getValue()).intValue();
 			listener.changeInputScale();
 			return;
-		} if( e.getSource() == sliderPeriodColor ) {
-			periodAdjust = sliderPeriodColor.getValue();
-			listener.changeView3D();
-			return;
-		} else if( e.getSource() == sliderOffsetColor ) {
-			offsetAdjust = sliderOffsetColor.getValue();
-			listener.changeView3D();
-			return;
-		} else if( e.getSource() == sliderSpeed3D) {
-			speedAdjust = sliderSpeed3D.getValue();
-			listener.changeView3D();
-			return;
 		} else if( e.getSource() == selectZoom ) {
 			zoom = ((Number) selectZoom.getValue()).doubleValue();
 			listener.changeZoom();
@@ -222,57 +149,14 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 
 		if( e.getSource() == viewSelector ) {
 			selectedView = viewSelector.getSelectedIndex();
-			setColorButtonColor();
-			update3DControls();
+			controlCloud.handleViewChange();
 			listener.disparityGuiChange();
-		} else if( e.getSource() == comboColorizer) {
-			colorScheme = comboColorizer.getSelectedIndex();
-			listener.changeView3D();
 		} else if( e.getSource() == checkRecompute ) {
 			recompute = checkRecompute.isSelected();
 			listener.recompute();
 		} else if( e.getSource() == checkConcurrent ) {
 			concurrent = checkConcurrent.isSelected();
 			listener.recompute();
-		}
-	}
-
-	private void update3DControls() {
-		// disable controls which can't be used
-		boolean view3D = selectedView==3;
-		comboColorizer.setEnabled(view3D);
-		sliderOffsetColor.setEnabled(view3D);
-		sliderPeriodColor.setEnabled(view3D);
-		sliderSpeed3D.setEnabled(view3D);
-		// Color is useful for disparity and 3D
-		bColorBackGround.setEnabled(selectedView==0||selectedView==3);
-	}
-
-	public double periodScale() {
-		if( periodAdjust > 500 ) {
-			double f = (periodAdjust-500)/500.0;
-			return 1.0+f*10;
-		} else if( periodAdjust < 500 ) {
-			double f = (500-periodAdjust)/500.0;
-			return 1.0-0.98*f;
-		} else {
-			return 1.0;
-		}
-	}
-
-	public double offsetScale() {
-		return (offsetAdjust-500)/500.0;
-	}
-
-	public double speedScale() {
-		if( speedAdjust > 500 ) {
-			double f = (speedAdjust-500)/500.0;
-			return Math.pow(2.0,f*6);
-		} else if( speedAdjust < 500 ) {
-			double f = (500-speedAdjust)/500.0;
-			return 1.0-0.98*f;
-		} else {
-			return 1.0;
 		}
 	}
 
@@ -287,6 +171,44 @@ public class ControlPanelDisparityDisplay extends StandardAlgConfigPanel
 
 	public void setListener(Listener listener ) {
 		this.listener = listener;
+	}
+
+	public class ControlCustomCloud extends ControlPanelPointCloud {
+
+		private void handleViewChange(){
+			setColorButtonColor(getActiveBackgroundColor());
+			// disable controls which can't be used
+			boolean view3D = selectedView==3;
+			comboColorizer.setEnabled(view3D);
+			sliderOffsetColor.setEnabled(view3D);
+			sliderPeriodColor.setEnabled(view3D);
+			sliderSpeed3D.setEnabled(view3D);
+			// Color is useful for disparity and 3D
+			bColorBackGround.setEnabled(selectedView==0||selectedView==3);
+		}
+
+		@Override
+		protected int getActiveBackgroundColor() {
+			if( selectedView == 0 ) {
+				return backgroundColorDisparity;
+			} else if( selectedView == 3 ) {
+				return backgroundColor3D;
+			} else {
+				return bColorBackGround.getBackground().getRGB();
+			}
+		}
+
+		@Override
+		protected void setColorButtonColor(int colorRGB) {
+			if( selectedView == 0 ) {
+				backgroundColorDisparity = colorRGB;
+			} else if( selectedView == 3 ) {
+				backgroundColor3D = colorRGB;
+			} else {
+				return;
+			}
+			bColorBackGround.repaint();
+		}
 	}
 
 	public interface Listener

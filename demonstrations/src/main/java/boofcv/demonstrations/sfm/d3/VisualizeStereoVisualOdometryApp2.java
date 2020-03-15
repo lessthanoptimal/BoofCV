@@ -27,6 +27,7 @@ import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.demonstrations.feature.disparity.ControlPanelDisparitySparse;
+import boofcv.demonstrations.feature.disparity.ControlPanelPointCloud;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.sfm.ConfigVisOdomDepthPnP;
@@ -390,6 +391,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		final JCheckBox checkCameras = checkbox("Cameras",showCameras,"Render camera locations");
 		final JCheckBox checkCloud = checkbox("Cloud",showCloud,"Show sparse point cloud");
 		final JSpinner spinMaxTrackAge = spinner(maxTrackAge,0,999,5);
+		final ControlPanelPointCloud cloudColor = new ControlPanelPointCloud(()->cloudPanel.updateVisuals(true));
 
 		// controls for different algorithms
 		ControlPanelVisOdomDepthPnP controlPnpDepth = new ControlPanelVisOdomDepthPnP(()->bUpdateAlg.setEnabled(true));
@@ -401,6 +403,8 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 		public ControlPanel() {
 			selectZoom = spinner(1.0,MIN_ZOOM,MAX_ZOOM,1);
+
+			cloudColor.setBorder(BorderFactory.createEmptyBorder()); // save screen real estate
 
 			var panelInfo = new StandardAlgConfigPanel();
 			panelInfo.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Statistics"));
@@ -414,10 +418,11 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 			var panelCloud = new StandardAlgConfigPanel();
 			panelCloud.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Cloud"));
-			panelCloud.addLabeled(spinMaxDepth,"Max Depth","Maximum distance a feature can be in the last frame it was seen");
+			panelCloud.addLabeled(spinMaxDepth,"Max Depth","Maximum distance relative to stereo baseline");
 			panelCloud.addLabeled(spinMaxTrackAge,"Max Age","Only draw tracks which were first seen than this value");
 			panelCloud.addAlignLeft(checkCameras);
 			panelCloud.addAlignLeft(checkCloud);
+			panelCloud.add(cloudColor);
 
 			var panelVisuals = new JPanel();
 			panelVisuals.setLayout(new BoxLayout(panelVisuals,BoxLayout.Y_AXIS));
@@ -588,21 +593,32 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			gui.setCameraHFov(hfov);
 		}
 
+		public void updateVisuals(boolean repaint) {
+			double d = stereoParameters.getBaseline();
+			controls.cloudColor.configure(gui,d*10,d/2.0);
+			if( repaint )
+				repaint();
+		}
+
 		/**
 		 * Updates using the latest set of features visible
 		 */
 		public void update()
 		{
 			BoofSwingUtil.checkGuiThread();
+
+			double maxDepth = controls.maxDepth*stereoParameters.getBaseline()*10;
+			updateVisuals(false);
 			gui.clearPoints();
 			if( controls.showCloud ) {
 				final long frameID = alg.getFrameID();
 				synchronized (features) {
+
 					for (int i = 0; i < features.size; i++) {
 						FeatureInfo f = features.get(i);
 						if (!f.inlier)
 							continue;
-						if (controls.maxDepth > 0 && f.depth > controls.maxDepth)
+						if (controls.maxDepth > 0 && f.depth > maxDepth)
 							continue;
 						if(controls.maxTrackAge > 0 && frameID > f.firstFrame+controls.maxTrackAge )
 							continue;

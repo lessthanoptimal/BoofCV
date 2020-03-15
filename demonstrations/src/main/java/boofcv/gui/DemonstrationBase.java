@@ -294,6 +294,7 @@ public abstract class DemonstrationBase extends JPanel {
 	public void openExample( Object o ) {
 		if (o instanceof PathLabel) {
 			PathLabel p = (PathLabel)o;
+
 			if( customFileInput ) {
 				openFiles(p.getPathFiles());
 				return;
@@ -302,6 +303,13 @@ public abstract class DemonstrationBase extends JPanel {
 			if( p.path.length == 1 )
 				openFile(new File(p.path[0]));
 			else {
+				// TODO clean up how there are multiple paths to open from a set of files
+				BoofSwingUtil.invokeNowOrLater(() -> {
+					BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,
+							selectRecentFileName(BoofMiscOps.toFileList(p.path)) , BoofMiscOps.asList(p.path));
+					updateRecentItems();
+				});
+
 //				openFile(new File(p.path[0]));
 				if( allowImages )
 					openImageSet(false,p.path);

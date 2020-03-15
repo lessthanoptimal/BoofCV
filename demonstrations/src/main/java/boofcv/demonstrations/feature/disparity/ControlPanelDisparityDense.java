@@ -35,7 +35,7 @@ import java.awt.*;
  *
  * @author Peter Abeles
  */
-public class ControlPanelDisparity extends StandardAlgConfigPanel {
+public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 
 	private static String[] ERRORS_BLOCK = new String[]{"SAD","Census","NCC"};
 	private static String[] ERRORS_SGM = new String[]{"Absolute Diff","Census","HMI"};
@@ -64,9 +64,9 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 	Listener listener;
 	Class imageType;
 
-	public ControlPanelDisparity(ConfigDisparityBMBest5 configBM,
-								 ConfigDisparitySGM configSGM,
-								 Class imageType)
+	public ControlPanelDisparityDense(ConfigDisparityBMBest5 configBM,
+									  ConfigDisparitySGM configSGM,
+									  Class imageType)
 	{
 		setBorder(BorderFactory.createEmptyBorder());
 		this.configBM = configBM;
@@ -96,7 +96,7 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 		add(tabbedPane);
 	}
 
-	public static ControlPanelDisparity createRange(int disparityMin , int disparityRange, Class imageType) {
+	public static ControlPanelDisparityDense createRange(int disparityMin , int disparityRange, Class imageType) {
 		ConfigDisparityBMBest5 configBM = new ConfigDisparityBMBest5();
 		ConfigDisparitySGM configSGM = new ConfigDisparitySGM();
 
@@ -105,7 +105,7 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 		configSGM.disparityMin = disparityMin;
 		configSGM.disparityRange = disparityRange;
 
-		return new ControlPanelDisparity(configBM,configSGM,imageType);
+		return new ControlPanelDisparityDense(configBM,configSGM,imageType);
 	}
 
 	public void broadcastChange() {
@@ -490,7 +490,7 @@ public class ControlPanelDisparity extends StandardAlgConfigPanel {
 	}
 
 	public static void main(String[] args) {
-		ControlPanelDisparity controls = ControlPanelDisparity.createRange(0,150,null);
+		ControlPanelDisparityDense controls = ControlPanelDisparityDense.createRange(0,150,null);
 		ShowImages.showWindow(controls,"Controls");
 	}
 }

@@ -46,7 +46,8 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.visualize.*;
+import boofcv.visualize.PointCloudViewer;
+import boofcv.visualize.VisualizeData;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ejml.data.DMatrixRMaj;
@@ -313,7 +314,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 
 				CameraPinhole rectifiedPinhole = PerspectiveOps.matrixToPinhole(
 						rectK,colorLeft.getWidth(),colorLeft.getHeight(),null);
-				pcv.setBackgroundColor(control.backgroundColor3D);
+
 				pcv.clearPoints();
 				pcv.setCameraHFov(PerspectiveOps.computeHFov(rectifiedPinhole));
 				pcv.addCloud(cloud.cloudXyz,cloud.cloudRgb);
@@ -470,27 +471,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 	@Override
 	public void changeView3D() {
 		double baseline = calib.getRightToLeft().getT().norm();
-		double periodColor = baseline*10*control.periodScale();
-		PeriodicColorizer colorizer=null;
-		switch( control.colorScheme ) {
-			case 0: pcv.removeColorizer();break;
-			case 1: colorizer = new TwoAxisRgbPlane.X_YZ(4.0); break;
-			case 2: colorizer = new TwoAxisRgbPlane.Y_XZ(4.0); break;
-			case 3: colorizer = new TwoAxisRgbPlane.Z_XY(4.0); break;
-			case 4: colorizer = new SingleAxisMagentaBlue.X(); break;
-			case 5: colorizer = new SingleAxisMagentaBlue.Y(); break;
-			case 6: colorizer = new SingleAxisMagentaBlue.Z(); break;
-			case 7: colorizer = new SingleAxisRgb.X(); break;
-			case 8: colorizer = new SingleAxisRgb.Y(); break;
-			case 9: colorizer = new SingleAxisRgb.Z(); break;
-		}
-		if( colorizer != null ) {
-			colorizer.setPeriod(periodColor);
-			colorizer.setOffset(control.offsetScale());
-			pcv.setColorizer(colorizer);
-		}
-
-		pcv.setTranslationStep(control.speedScale()*baseline/30);
+		control.controlCloud.configure(pcv,baseline*10,baseline/30.0);
 		pcv.getComponent().repaint();
 	}
 
@@ -504,7 +485,7 @@ public class VisualizeStereoDisparity <T extends ImageGray<T>, D extends ImageGr
 		if( control.selectedView == 0 ) {
 			disparityRender();
 		} else if( control.selectedView == 3 ) {
-			pcv.setBackgroundColor(control.backgroundColor3D);
+			pcv.setBackgroundColor(control.controlCloud.getActiveBackgroundColor());
 			pcv.getComponent().repaint();
 		}
 	}

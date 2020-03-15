@@ -18,7 +18,7 @@
 
 package boofcv.demonstrations.sfm.multiview;
 
-import boofcv.demonstrations.feature.disparity.ControlPanelDisparity;
+import boofcv.demonstrations.feature.disparity.ControlPanelDisparityDense;
 import boofcv.factory.feature.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.feature.disparity.ConfigDisparitySGM;
 import boofcv.factory.feature.disparity.DisparityError;
@@ -58,7 +58,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 	boolean autoFocal=true;
 	int focal = 500;
 
-	ControlPanelDisparity controlDisparity;
+	ControlPanelDisparityDense controlDisparity;
 
 	DemoThreeViewStereoApp owner;
 
@@ -107,7 +107,7 @@ public class DemoThreeViewControls extends StandardAlgConfigPanel
 		configBM.errorType = DisparityError.CENSUS;
 		configBM.configCensus.variant = CensusVariants.BLOCK_7_7;
 
-		controlDisparity = new ControlPanelDisparity(configBM,configSGM, GrayU8.class);
+		controlDisparity = new ControlPanelDisparityDense(configBM,configSGM, GrayU8.class);
 		controlDisparity.setListener(this::handleStereoChanged);
 	}
 
