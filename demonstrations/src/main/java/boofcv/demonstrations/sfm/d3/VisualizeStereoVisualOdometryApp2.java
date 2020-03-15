@@ -219,6 +219,10 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		double hfov = PerspectiveOps.computeHFov(stereoParameters.left);
 
 		SwingUtilities.invokeLater(()-> {
+			// change the scale so that the entire image is visible
+			stereoPanel.setPreferredSize(new Dimension(width,height*2));
+			double scale = BoofSwingUtil.selectZoomToShowAll(stereoPanel, width, height*2);
+			controls.setZoom(scale);
 			cloudPanel.configureViewer(hfov);
 			cloudPanel.gui.setTranslationStep(stereoParameters.getBaseline());
 		});

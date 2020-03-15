@@ -157,7 +157,7 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 		try {
 			stereoParameters = CalibrationIO.load(selected);
 			textCalibrationPath.setText(selected.getPath());
-			directory = selected.isDirectory() ? selected : selected.getParentFile();
+			directory = selected.getParentFile();
 			checkEverythingSet();
 		} catch( RuntimeException e ){
 			BoofSwingUtil.warningDialog(this,e);
@@ -185,7 +185,9 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 		textArea.setText(selected.getPath());
 		setPreview(selected,previewPanel);
 		checkEverythingSet();
-		directory = selected.isDirectory() ? selected : selected.getParentFile();
+		// If it's a file you want the directory it's in.
+		// If it's a directory containing images you want to open the parent directory
+		directory = selected.getParentFile();
 	}
 
 	/**
