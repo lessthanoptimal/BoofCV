@@ -33,6 +33,8 @@ import boofcv.struct.image.ImageGray;
 import boofcv.visualize.PointCloudViewer;
 import org.apache.commons.io.FilenameUtils;
 import org.ddogleg.struct.FastQueue;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -51,7 +53,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.prefs.Preferences;
 
 public class BoofSwingUtil {
@@ -352,45 +356,80 @@ public class BoofSwingUtil {
 		return selected;
 	}
 
-	public static java.util.List<String> getListOfRecentFiles(Component parent) {
+	public static java.util.List<RecentFiles> getListOfRecentFiles(Component parent) {
 		return getListOfRecentFiles(parent.getClass().getSimpleName());
 	}
 
-	public static java.util.List<String> getListOfRecentFiles( String preferenceName ) {
+	public static java.util.List<RecentFiles> getListOfRecentFiles( String preferenceName ) {
 
 		Preferences prefs = Preferences.userRoot().node(preferenceName);
-		String encodedString =prefs.get(KEY_RECENT_FILES, "");
-
-		String []fileNames = encodedString.split("\n");
-
-		java.util.List<String> output = new ArrayList<>();
-		Collections.addAll(output, fileNames);
-		return output;
+		String encodedString = prefs.get(KEY_RECENT_FILES, "");
+		try {
+			java.util.List<RecentFiles> results = new ArrayList<>();
+			java.util.List<Map<String,Object>> decoded = new Yaml().load(encodedString);
+			for( var d : decoded ) {
+				RecentFiles r = new RecentFiles();
+				r.name = (String)d.getOrDefault("name","DefaultName");
+				r.files = (java.util.List<String>)d.get("files");
+				results.add(r);
+			}
+			return results;
+		} catch( RuntimeException e ) {
+			e.printStackTrace();
+			return new java.util.ArrayList<>();
+		}
 	}
 
-	public static void addToRecentFiles( Component parent , String filePath ) {
-		addToRecentFiles(parent.getClass().getSimpleName(), filePath);
+	public static void addToRecentFiles(Component parent, String name, List<String> filePaths) {
+		addToRecentFiles(parent.getClass().getSimpleName(), name, filePaths );
 	}
 
-	public static void addToRecentFiles( String preferenceName , String filePath ) {
-		java.util.List<String> files = getListOfRecentFiles(preferenceName);
+	public static void addToRecentFiles(String preferenceName, String name, List<String> filePaths) {
+		java.util.List<RecentFiles> files = getListOfRecentFiles(preferenceName);
 
-		files.remove(filePath);
+		// Remove it from the list if it's already there
+		for( int i = 0; i < files.size(); i++ ) {
+			boolean matched = true;
+			RecentFiles list = files.get(i);
+			if( list.files.size() != filePaths.size() )
+				matched = false;
+			for (int j = 0; j < list.files.size() && matched; j++) {
+				if( !list.files.get(j).equals(filePaths.get(j) ) )
+					matched = false;
+			}
+			if( matched ) {
+				files.remove(i);
+				break;
+			}
+		}
 
 		if( files.size() >= 10 ) {
 			files.remove(9);
 		}
-		files.add(0,filePath);
+		RecentFiles r = new RecentFiles();
+		r.name = name;
+		r.files = filePaths;
+		files.add(0,r);
 
-		String encoded = "";
-		for (int i = 0; i < files.size(); i++) {
-			encoded += files.get(i);
-			if( i < files.size()-1 ) {
-				encoded += "\n";
-			}
-		}
+		DumperOptions options = new DumperOptions();
+		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+		Yaml yaml = new Yaml(options);
+		String encoded = yaml.dump(encodeForYaml(files));
 		Preferences prefs = Preferences.userRoot().node(preferenceName);
 		prefs.put(KEY_RECENT_FILES,encoded);
+	}
+
+	private static java.util.List<Map<String,Object>> encodeForYaml( java.util.List<RecentFiles> list ) {
+		java.util.List<Map<String,Object>> output = new ArrayList<>();
+
+		for( RecentFiles r : list ) {
+			Map<String,Object> m = new HashMap<>();
+			m.put("name",r.name);
+			m.put("files",r.files);
+			output.add(m);
+		}
+
+		return output;
 	}
 
 	public static void invokeNowOrLater(Runnable r ) {
@@ -670,6 +709,11 @@ public class BoofSwingUtil {
 			file = ensureSuffix(file,".png");
 			UtilImageIO.saveImage(output,file.getAbsolutePath());
 		}
+	}
+
+	public static class RecentFiles {
+		String name;
+		java.util.List<String> files;
 	}
 
 	public enum FileTypes

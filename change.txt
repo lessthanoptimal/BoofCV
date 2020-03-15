@@ -67,6 +67,7 @@ Version : 0.36
   * Fixed calibration detector apps bug where scale got missed up when playing a movie
 - OpenKinect: Removed integration package since it hadn't been used in years
 - Demonstrations
+  * Demonstration recent file list is now in YAML format and supports multiple files
   * Added settings
   * Added the ability to switch between different swing themes; darklaf and material-ui
 

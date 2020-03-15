@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -46,6 +47,23 @@ public class BoofMiscOps {
 	}
 
 	public static List<File> toFileList( String[] files ) {
+		List<File> output = new ArrayList<>();
+		for( String s : files ) {
+			output.add( new File(s));
+		}
+		return output;
+	}
+
+	// Remove when Minimum Java version is 11
+	public static <T>List<T> asList(T ...objects) {
+		List<T> list = new ArrayList<>();
+		for (int i = 0; i < objects.length; i++) {
+			list.add(objects[i]);
+		}
+		return list;
+	}
+
+	public static List<File> toFileList(List<String> files) {
 		List<File> output = new ArrayList<>();
 		for( String s : files ) {
 			output.add( new File(s));

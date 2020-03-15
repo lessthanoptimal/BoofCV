@@ -35,7 +35,6 @@ import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -273,14 +272,16 @@ public abstract class DemonstrationBase extends JPanel {
 		if( menuRecent == null )
 			return;
 		menuRecent.removeAll();
-		List<String> recentFiles = BoofSwingUtil.getListOfRecentFiles(this);
-		for( String filePath : recentFiles ) {
-			final File f = new File(filePath);
-			JMenuItem recentItem = new JMenuItem(f.getName());
-			recentItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					openFile(f);
+		List<BoofSwingUtil.RecentFiles> recentFiles = BoofSwingUtil.getListOfRecentFiles(this);
+		for( BoofSwingUtil.RecentFiles info : recentFiles ) {
+			JMenuItem recentItem = new JMenuItem(info.name);
+			recentItem.addActionListener(e -> {
+				if( customFileInput ) {
+					openFiles(BoofMiscOps.toFileList(info.files));
+				} else if( info.files.size() == 1 ) {
+					openFile(new File(info.files.get(0)));
+				} else {
+					System.err.println("updateRecentItems() Not custom and not one. Not sure what to do");
 				}
 			});
 			menuRecent.add(recentItem);
@@ -406,7 +407,8 @@ public abstract class DemonstrationBase extends JPanel {
 
 		// update recent items menu
 		BoofSwingUtil.invokeNowOrLater(() -> {
-			BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,path);
+			BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,
+					selectRecentFileName(BoofMiscOps.asList(file)) , BoofMiscOps.asList(path));
 			updateRecentItems();
 		});
 
@@ -555,7 +557,8 @@ public abstract class DemonstrationBase extends JPanel {
 
 		// update recent items menu
 		BoofSwingUtil.invokeNowOrLater(() -> {
-			BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,path);
+			BoofSwingUtil.addToRecentFiles(DemonstrationBase.this,
+					selectRecentFileName(filePaths), BoofMiscOps.asList(inputFileSet));
 			updateRecentItems();
 		});
 
@@ -576,6 +579,13 @@ public abstract class DemonstrationBase extends JPanel {
 			openImageSet(false,toPathArray(sequences));
 		}
 		inputFileSet = BoofMiscOps.toStringArray(filePaths);
+	}
+
+	protected String selectRecentFileName( List<File> filePaths ) {
+		if( filePaths.size() == 1 )
+			return filePaths.get(0).getName();
+		else
+			return filePaths.get(0).getParentFile().getName();
 	}
 
 	private static String[] toPathArray( List<File> files ) {
