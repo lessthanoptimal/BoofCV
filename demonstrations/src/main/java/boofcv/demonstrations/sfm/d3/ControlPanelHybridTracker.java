@@ -18,7 +18,14 @@
 
 package boofcv.demonstrations.sfm.d3;
 
+import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.tracker.klt.ConfigPKlt;
+import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.StandardAlgConfigPanel;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
  * Control panel for creating Detect-Describe-Associate style trackers
@@ -26,10 +33,26 @@ import boofcv.gui.StandardAlgConfigPanel;
  * @author Peter Abeles
  */
 public class ControlPanelHybridTracker extends StandardAlgConfigPanel {
-	Listener listner;
+	Listener listener;
 
-	public ControlPanelHybridTracker(Listener listner) {
-		this.listner = listner;
+	public ControlPanelHybridTracker(Listener listener) {
+		this.listener = listener;
+	}
+
+	public <T extends ImageBase<T>>
+	PointTracker<T> createTracker(ImageType<T> imageType ) {
+		Class inputType = imageType.getImageClass();
+
+		ConfigPKlt kltConfig = new ConfigPKlt();
+		kltConfig.toleranceFB = 3;
+		kltConfig.pruneClose = true;
+		kltConfig.templateRadius = 3;
+		kltConfig.pyramidLevels = ConfigDiscreteLevels.levels(4);
+
+		PointTracker<T> tracker = FactoryPointTracker.
+				combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 0),
+						kltConfig, 50, null, null, inputType, null);
+		return tracker;
 	}
 
 	public interface Listener {

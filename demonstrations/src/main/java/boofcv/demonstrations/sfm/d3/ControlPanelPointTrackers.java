@@ -78,6 +78,7 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 		switch( selectedFamily ) {
 			case 0: return controlKlt.createTracker(imageType);
 			case 1: return controlDda.createTracker(imageType);
+			case 2: return controlHybrid.createTracker(imageType);
 			default:
 				throw new RuntimeException("Not yet supported");
 		}
