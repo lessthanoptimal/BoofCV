@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,49 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
+@SuppressWarnings("rawtypes")
 public class GImageMiscOps {
+	/**
+	 * Copies a rectangular region from one image into another. Pixels can be outside the input image.<br>
+	 * output[dstX:(dstX+width) , dstY:(dstY+height-1)] = input[srcX:(srcX+width) , srcY:(srcY+height-1)]
+	 *
+	 * @param srcX x-coordinate of corner in input image
+	 * @param srcY y-coordinate of corner in input image
+	 * @param dstX x-coordinate of corner in output image
+	 * @param dstY y-coordinate of corner in output image
+	 * @param width Width of region to be copied
+	 * @param height Height of region to be copied
+	 * @param input Input image
+	 * @param border Method used to hand pixels outside the input image border
+	 * @param output output image
+	 */
+	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
+							 ImageBase input , ImageBorder border, ImageBase output ) {
+		if( input instanceof ImageGray) {
+			if (GrayI8.class.isAssignableFrom(input.getClass())) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayI8)input, (ImageBorder_S32)border, (GrayI8) output);
+			} else if (GrayI16.class.isAssignableFrom(input.getClass())) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayI16)input, (ImageBorder_S32)border, (GrayI16) output);
+			} else if (GrayS32.class == input.getClass()) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayS32) input, (ImageBorder_S32)border, (GrayS32) output);
+			} else if (GrayS64.class == input.getClass()) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayS64) input, (ImageBorder_S64) border, (GrayS64) output);
+			} else if (GrayF32.class == input.getClass()) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayF32) input, (ImageBorder_F32) border, (GrayF32) output);
+			} else if (GrayF64.class == input.getClass()) {
+				ImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, (GrayF64) input, (ImageBorder_F64) border, (GrayF64) output);
+			} else {
+				throw new IllegalArgumentException("Unknown image Type: " + input.getClass().getSimpleName());
+			}
+		} else if( input instanceof Planar) {
+			Planar mi = (Planar)input;
+			Planar mo = (Planar)output;
+			for( int i = 0; i < mi.getNumBands(); i++ )
+				copy(srcX,srcY,dstX,dstY,width,height,mi.getBand(i),border,mo.getBand(i));
+		} else {
+			throw new IllegalArgumentException("Unknown image type: " + input.getClass().getSimpleName());
+		}
+	}
 
 	/**
 	 * Copies a rectangular region from one image into another.<br>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -40,17 +40,17 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 class TestImageMiscOps {
 
 	int width = 10;
 	int height = 15;
 	int numBands = 3;
-	Random rand = new Random(234);
+	Random rand = BoofTesting.createRandom(123);
 
 	@Test
 	void checkAll() {
-		int numExpected = 25*6 + 4*8;
+		int numExpected = 26*6 + 4*8;
 		Method methods[] = ImageMiscOps.class.getMethods();
 
 		// sanity check to make sure the functions are being found
@@ -109,7 +109,7 @@ class TestImageMiscOps {
 
 	private boolean isTestMethod(Method m ) {
 
-		Class<?> param[] = m.getParameterTypes();
+		Class<?>[] param = m.getParameterTypes();
 
 		if( param.length < 1 )
 			return false;
@@ -122,16 +122,59 @@ class TestImageMiscOps {
 	}
 
 	private void testCopy( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
-		if( ImageGray.class.isAssignableFrom(paramTypes[6])) {
-			testCopy_Gray(m);
+		Class[] paramTypes = m.getParameterTypes();
+
+		if( paramTypes.length == 9 ) {
+			testCopy_Border_Gray(m);
+		} else if( paramTypes.length == 8 ) {
+			if (ImageGray.class.isAssignableFrom(paramTypes[6])) {
+				testCopy_Gray(m);
+			} else {
+				testCopy_Interleaved(m);
+			}
 		} else {
-			testCopy_Interleaved(m);
+			throw new RuntimeException("Unknown copy function. length = "+paramTypes.length);
+		}
+	}
+
+	private void testCopy_Border_Gray( Method m ) throws InvocationTargetException, IllegalAccessException {
+		Class[] paramTypes = m.getParameterTypes();
+		ImageGray src = GeneralizedImageOps.createSingleBand(paramTypes[6], width, height);
+		ImageBorder border = FactoryImageBorder.generic(BorderType.WRAP,src.getImageType());
+		ImageGray dst = GeneralizedImageOps.createSingleBand(paramTypes[8], width+3, height+2);
+
+		GImageMiscOps.fillUniform(src, rand, 0,20);
+		GImageMiscOps.fillUniform(dst, rand, 0,20);
+
+		// normal copy all inside
+		srcCopy_Border_Gray(m, src, border, dst, 5, 8, 1, 2, 3, 4);
+
+		// copy reader is larger and contains all of src
+		srcCopy_Border_Gray(m, src, border, dst, width+2, height+2, -1, -1, 0, 0);
+
+		// corner copy
+		srcCopy_Border_Gray(m, src, border, dst, 5, 6, -3, -2, 1, 2);
+	}
+
+	private void srcCopy_Border_Gray(Method m, ImageGray src, ImageBorder border, ImageGray dst,
+									 int w, int h, int x0, int y0, int x1, int y1)
+			throws IllegalAccessException, InvocationTargetException
+	{
+		m.invoke(null,x0,y0,x1,y1,w,h,src,border,dst);
+		border.setImage(src);
+		double[] value = new double[1];
+
+		GImageGray b = FactoryGImageGray.wrap(dst);
+		for( int i = 0; i < h; i++ ) {
+			for( int j = 0; j < w; j++ ) {
+				border.getGeneral(j+x0,i+y0,value);
+				assertEquals(value[0],b.get(x1+j,y1+i).doubleValue(),1e-4);
+			}
 		}
 	}
 
 	private void testCopy_Gray( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray src = GeneralizedImageOps.createSingleBand(paramTypes[6], width, height);
 		ImageGray dst = GeneralizedImageOps.createSingleBand(paramTypes[7], width, height);
 
@@ -153,7 +196,7 @@ class TestImageMiscOps {
 	}
 
 	private void testCopy_Interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageInterleaved src = GeneralizedImageOps.createInterleaved(paramTypes[6], width, height, 2);
 		ImageInterleaved dst = GeneralizedImageOps.createInterleaved(paramTypes[7], width, height, 2);
 
@@ -177,7 +220,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFill( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		if( ImageGray.class.isAssignableFrom(paramTypes[0])) {
 			testFill_Single(m);
 		} else {
@@ -189,7 +232,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFill_Single( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		GImageMiscOps.fillUniform(orig, rand, 0, 20);
 
@@ -208,7 +251,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFill_Interleaved(Method m) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
 		GImageMiscOps.fillUniform(orig, rand, 0, 20);
 
@@ -229,7 +272,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFill_Interleaved_array(Method m) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
 		GImageMiscOps.fillUniform(orig, rand, 0,20);
 
@@ -250,7 +293,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFillBand(Method m) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
 
 		for (int band = 0; band < numBands; band++) {
@@ -280,7 +323,7 @@ class TestImageMiscOps {
 	}
 
 	private void testInsertBand(Method m) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray input = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		ImageInterleaved output = GeneralizedImageOps.createInterleaved(paramTypes[2], width, height, numBands);
 
@@ -312,7 +355,7 @@ class TestImageMiscOps {
 	}
 
 	private void testExtractBand(Method m) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageInterleaved input = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
 		ImageGray output = GeneralizedImageOps.createSingleBand(paramTypes[2], width, height);
 
@@ -343,7 +386,7 @@ class TestImageMiscOps {
 
 
 	private void testFillBorder( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		GImageMiscOps.fill(orig, 4);
 
@@ -387,7 +430,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFillRectangle( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		if( ImageGray.class.isAssignableFrom(paramTypes[0])) {
 			testFillRectangle_Single(m);
 		} else {
@@ -396,7 +439,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFillRectangle_Single( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		int x0 = 2;
@@ -422,7 +465,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFillRectangle_Interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, 2);
 
 		int x0 = 2;
@@ -458,7 +501,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFillUniform( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		if( ImageGray.class.isAssignableFrom(paramTypes[0])) {
 			testFillUniform_Single(m);
 		} else {
@@ -467,7 +510,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFillUniform_Single(Method m) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		if( orig.getDataType().isInteger() ) {
@@ -496,7 +539,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFillUniform_Interleaved(Method m) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, numBands);
 
 		if( orig.getDataType().isInteger() ) {
@@ -526,7 +569,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFillGaussian( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		if( ImageGray.class.isAssignableFrom(paramTypes[0])) {
 			testFillGaussian_Single(m);
 		} else {
@@ -535,7 +578,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFillGaussian_Single(Method m) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		if( orig.getDataType().isSigned() )
@@ -566,7 +609,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFillGaussian_Interleaved(Method m) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, 2);
 
 		if( orig.getDataType().isSigned() )
@@ -598,7 +641,7 @@ class TestImageMiscOps {
 	}
 
 	private void testAddUniform( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		if( ImageGray.class.isAssignableFrom(paramTypes[0])) {
 			testAddUniform_Single(m);
 		} else {
@@ -607,7 +650,7 @@ class TestImageMiscOps {
 	}
 
 	private void testAddUniform_Single( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 		GImageMiscOps.fill(orig, 1);
 
@@ -627,7 +670,7 @@ class TestImageMiscOps {
 	}
 
 	private void testAddUniform_Interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, 2);
 		GImageMiscOps.fill(orig, 1);
 
@@ -648,7 +691,7 @@ class TestImageMiscOps {
 	}
 
 	private void testAddGaussian( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		if( ImageGray.class.isAssignableFrom(paramTypes[0])) {
 			testAddGaussian_Single(m);
 		} else {
@@ -660,7 +703,7 @@ class TestImageMiscOps {
 
 		double mean = 10;
 
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray orig = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		GImageMiscOps.fill(orig,mean);
@@ -694,7 +737,7 @@ class TestImageMiscOps {
 
 		double mean = 10;
 
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageInterleaved orig = GeneralizedImageOps.createInterleaved(paramTypes[0], width, height, 2);
 
 		GImageMiscOps.fill(orig,mean);
@@ -735,7 +778,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFlipVertical(Method m, int height) throws IllegalAccessException, InvocationTargetException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray imgA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		GImageMiscOps.fillUniform(imgA, rand, 0, 100);
@@ -760,7 +803,7 @@ class TestImageMiscOps {
 	}
 
 	private void testFlipHorizontal(Method m, int width) throws IllegalAccessException, InvocationTargetException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray imgA = GeneralizedImageOps.createSingleBand(paramTypes[0], width, height);
 
 		GImageMiscOps.fillUniform(imgA, rand, 0, 100);
@@ -778,7 +821,7 @@ class TestImageMiscOps {
 	}
 
 	void testRotateCW( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		if( paramTypes.length == 1 ) {
 			testRotateCW_one(m);
 		} else {
@@ -791,7 +834,7 @@ class TestImageMiscOps {
 	}
 
 	void testRotateCW_one( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 
 		// test even and odd width
 		for (int i = 0; i < 2; i++) {
@@ -814,7 +857,7 @@ class TestImageMiscOps {
 	}
 
 	void testRotateCW_two_single( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray a = GeneralizedImageOps.createSingleBand(paramTypes[0], 3, 2);
 		ImageGray b = GeneralizedImageOps.createSingleBand(paramTypes[0], 2, 3);
 
@@ -833,7 +876,7 @@ class TestImageMiscOps {
 	}
 
 	void testRotateCW_two_interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageInterleaved a = GeneralizedImageOps.createInterleaved(paramTypes[0], 3, 2,2);
 		ImageInterleaved b = GeneralizedImageOps.createInterleaved(paramTypes[0], 2, 3,2);
 
@@ -856,7 +899,7 @@ class TestImageMiscOps {
 	}
 
 	void testRotateCCW( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		if( paramTypes.length == 1 ) {
 			testRotateCCW_one(m);
 		} else {
@@ -869,7 +912,7 @@ class TestImageMiscOps {
 	}
 
 	void testRotateCCW_one( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		// test even and odd width
 		for (int i = 0; i < 2; i++) {
 			int w = 6+i;
@@ -891,7 +934,7 @@ class TestImageMiscOps {
 	}
 
 	void testRotateCCW_two_single( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageGray a = GeneralizedImageOps.createSingleBand(paramTypes[0], 3, 2);
 		ImageGray b = GeneralizedImageOps.createSingleBand(paramTypes[0], 2, 3);
 
@@ -910,7 +953,7 @@ class TestImageMiscOps {
 	}
 
 	void testRotateCCW_two_interleaved( Method m ) throws InvocationTargetException, IllegalAccessException {
-		Class paramTypes[] = m.getParameterTypes();
+		Class[] paramTypes = m.getParameterTypes();
 		ImageInterleaved a = GeneralizedImageOps.createInterleaved(paramTypes[0], 3, 2,2);
 		ImageInterleaved b = GeneralizedImageOps.createInterleaved(paramTypes[0], 2, 3,2);
 

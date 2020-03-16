@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,7 +46,7 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 
 	@Test
 	public void compareToPixelMath() {
-		performTests(19);
+		performTests(20);
 	}
 
 	@Override
@@ -85,9 +85,17 @@ public class TestGImageMiscOps extends BaseGClassChecksInMisc{
 			ret[0][3] = 8;
 			ret[0][4] = 5;
 			ret[0][5] = 6;
-			ret[0][6] = inputA;
-			ret[0][7] = inputB;
 
+			if( param.length == 9 ) {
+				ret[0][6] = inputA;
+				ret[0][7] = FactoryImageBorder.generic(BorderType.WRAP,inputA.getImageType());
+				ret[0][8] = inputB;
+			} else if( param.length == 8 ) {
+				ret[0][6] = inputA;
+				ret[0][7] = inputB;
+			} else {
+				throw new RuntimeException("Unexpected parameter length");
+			}
 		} else if( name.equals("fillBand")) {
 			ret[0][0] = inputA;
 			ret[0][1] = 1;

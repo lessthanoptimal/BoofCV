@@ -25,12 +25,13 @@ Version : 0.36
   * Operator overloading for PixelMath
 - Image Processing
   * Fixed ImageDistort crashing if an invalid region is specified. It simply does nothing now.
-  * FDistort now supports SKIP border. Thanks Nico Stuurman!
+  * FDistort now supports SKIP border. Thanks Nico Stuurman for reporting the issue!
   * Created ContourOps
   * Deterministic non-max block concurrent algorithm
   * Discrete image pyramids can now be dynamically defined based on input image size
   * Added a proper config for discrete image pyramid levels
   * Deterministic non-max suppression block candidate concurrent
+  * ImageMiscOps.copy() with border for input image
 - Color
   * Can convert YUV, HSV, and YCbCr to 32-bit RGB color
 - Moved KLT from boofcv-geo to boofcv-feature
