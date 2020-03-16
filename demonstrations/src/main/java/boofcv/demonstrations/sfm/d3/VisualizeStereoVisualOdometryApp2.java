@@ -71,7 +71,11 @@ import static boofcv.gui.BoofSwingUtil.*;
 import static boofcv.io.image.ConvertBufferedImage.checkCopy;
 import static boofcv.io.image.ConvertBufferedImage.convertFrom;
 
+// TODO visualize success and faults
+
 /**
+ * Visualizes stereo visual odometry.
+ *
  * @author Peter Abeles
  */
 public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
@@ -88,6 +92,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 	//-------------- Control lock on features
 	final FastQueue<FeatureInfo> features = new FastQueue<>(FeatureInfo::new);
+	final FastQueue<Se3_F64> egoMotion_cam_to_world = new FastQueue<>(Se3_F64::new); // estimated ego motion
 	final GrowQueue_I32 visibleTracks = new GrowQueue_I32(); // index of tracks visible in current frame in 'features'
 	final TLongIntMap trackId_to_arrayIdx = new TLongIntHashMap(); // track ID to array Index
 	//-------------- END lock
@@ -116,6 +121,39 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		add(BorderLayout.CENTER, split);
 
 		setPreferredSize(new Dimension(1200,540));
+	}
+
+	@Override
+	protected void openFileMenuBar() {
+		OpenStereoSequencesChooser.Selected s = BoofSwingUtil.openStereoChooser(window,true);
+		if( s == null )
+			return;
+
+		final List<File> files = new ArrayList<>();
+		files.add(s.left);
+		files.add(s.right);
+		files.add(s.calibration);
+
+		openFiles(files);
+	}
+
+	@Override
+	protected void customAddToFileMenu(JMenu menuFile) {
+		menuFile.addSeparator();
+
+		JMenuItem itemSaveCloud = new JMenuItem("Save Point Cloud");
+		itemSaveCloud.addActionListener(e -> savePointCloud());
+		menuFile.add(itemSaveCloud);
+	}
+
+	/**
+	 * Saves the sparse cloud created by VO
+	 */
+	private void savePointCloud() {
+		// Make sure the cloud isn't being modified by stopping any processing that might be going on
+		stopAllInputProcessing();
+		// Save it to disk
+		BoofSwingUtil.savePointCloudDialog(this,KEY_PREVIOUS_DIRECTORY,cloudPanel.gui);
 	}
 
 	/**
@@ -169,20 +207,6 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		config.subpixel = true;
 
 		return config;
-	}
-
-	@Override
-	protected void openFileMenuBar() {
-		OpenStereoSequencesChooser.Selected s = OpenStereoSequencesChooser.showDialog(window);
-		if( s == null )
-			return;
-
-		final List<File> files = new ArrayList<>();
-		files.add(s.left);
-		files.add(s.right);
-		files.add(s.calibration);
-
-		openFiles(files);
 	}
 
 	@Override
@@ -244,13 +268,15 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		if( sourceID == 0 )
 			return;
 
-		// TODO visualize success and faults
 		long time0 = System.nanoTime();
 		boolean success = alg.process(inputLeft,inputRight);
 		long time1 = System.nanoTime();
 
 		Se3_F64 camera_to_world = alg.getCameraToWorld();
 		Se3_F64 world_to_camera = camera_to_world.invert(null);
+
+		// Save the camera motion history
+		egoMotion_cam_to_world.grow().set(camera_to_world);
 
 		if( success ) {
 			// Sum up the total distance traveled. This will be approximate since it optimizes past history

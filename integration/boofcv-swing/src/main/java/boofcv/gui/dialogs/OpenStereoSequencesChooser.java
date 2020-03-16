@@ -32,9 +32,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.prefs.Preferences;
-
-import static boofcv.gui.BoofSwingUtil.KEY_PREVIOUS_SELECTION;
 
 /**
  * Presents a file choose that lets the user select two sequences for left and right stereo camera as well as
@@ -302,20 +299,22 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 		}
 	}
 
-	public static Selected showDialog(Window owner )
+	/**
+	 * Opens a blocking dialog to select stereo input
+	 *
+	 * @param owner The owner for this dialog
+	 * @param sequences True for sequences of images or false for still images
+	 * @param path Path to input file
+	 * @return The selected stereo files or null of it canceled
+	 */
+	public static Selected showDialog( Window owner , boolean sequences, File path )
 	{
-		Preferences prefs;
-		if( owner == null ) {
-			prefs = Preferences.userRoot();
-		} else {
-			prefs = Preferences.userRoot().node(owner.getClass().getSimpleName());
-		}
-		File defaultPath = BoofSwingUtil.directoryUserHome();
-		String previousPath=prefs.get(KEY_PREVIOUS_SELECTION, defaultPath.getPath());
+		if( !sequences )
+			throw new RuntimeException("Not yet supported");
 
 		JDialog dialog = new JDialog(owner,"Open Stereo Sequence", Dialog.ModalityType.APPLICATION_MODAL);
 		DefaultListener listener = new DefaultListener(dialog);
-		OpenStereoSequencesChooser panel = new OpenStereoSequencesChooser(dialog,listener,new File(previousPath));
+		OpenStereoSequencesChooser panel = new OpenStereoSequencesChooser(dialog,listener,path);
 
 		dialog.addWindowListener(new WindowAdapter() {
 			@Override
@@ -335,15 +334,6 @@ public class OpenStereoSequencesChooser extends JSpringPanel {
 		if( listener.canceled )
 			return null;
 
-		// save the path
-		prefs.put(KEY_PREVIOUS_SELECTION, listener.selected.calibration.getParent());
-
 		return listener.selected;
-	}
-
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(()->{
-			showDialog(null);
-		});
 	}
 }

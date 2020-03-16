@@ -22,6 +22,7 @@ import boofcv.alg.cloud.PointCloudReader;
 import boofcv.core.image.ConvertImage;
 import boofcv.gui.dialogs.FilePreviewChooser;
 import boofcv.gui.dialogs.OpenImageSetDialog;
+import boofcv.gui.dialogs.OpenStereoSequencesChooser;
 import boofcv.io.image.ConvertImageMisc;
 import boofcv.io.image.UtilImageIO;
 import boofcv.io.points.PointCloudIO;
@@ -61,6 +62,7 @@ import java.util.prefs.Preferences;
 public class BoofSwingUtil {
 	public static final String KEY_RECENT_FILES = "RecentFiles";
 	public static final String KEY_PREVIOUS_SELECTION = "PreviouslySelected";
+	public static final String KEY_PREVIOUS_DIRECTORY = "PreviousDirectory";
 
 	public static final double MIN_ZOOM = 0.01;
 	public static final double MAX_ZOOM = 50;
@@ -130,6 +132,25 @@ public class BoofSwingUtil {
 
 		if( response != null ) {
 			prefs.put(KEY_PREVIOUS_SELECTION, new File(response[0]).getParent());
+		}
+		return response;
+	}
+
+	public static OpenStereoSequencesChooser.Selected openStereoChooser(Window parent , boolean isSequence) {
+		Preferences prefs;
+		if( parent == null ) {
+			prefs = Preferences.userRoot();
+		} else {
+			prefs = Preferences.userRoot().node(parent.getClass().getSimpleName());
+		}
+		File defaultPath = BoofSwingUtil.directoryUserHome();
+		String previousPath=prefs.get(KEY_PREVIOUS_SELECTION, defaultPath.getPath());
+
+		OpenStereoSequencesChooser.Selected response =
+				OpenStereoSequencesChooser.showDialog(parent,isSequence,new File(previousPath));
+
+		if( response != null ) {
+			prefs.put(KEY_PREVIOUS_SELECTION, response.calibration.getParent());
 		}
 		return response;
 	}
@@ -657,6 +678,32 @@ public class BoofSwingUtil {
 	 * Opens a dialog, asks the user where to save the point cloud, then saves the point cloud
 	 */
 	public static void savePointCloudDialog(Component owner, String key ,PointCloudViewer pcv) {
+		String path = getDefaultPath(owner,key);
+
+		var fileChooser = new JFileChooser();
+		fileChooser.setSelectedFile(new File(path,"pointcloud.ply"));
+
+		if (fileChooser.showSaveDialog(owner) == JFileChooser.APPROVE_OPTION) {
+			File file = fileChooser.getSelectedFile();
+			saveDefaultPath(owner,key,file);
+
+			FastQueue<Point3dRgbI_F64> cloud = pcv.copyCloud(null);
+			String n = FilenameUtils.getBaseName(file.getName())+".ply";
+			try {
+				var f = new File(file.getParent(),n);
+				var w = new FileOutputStream(f);
+				PointCloudIO.save3D(PointCloudIO.Format.PLY, PointCloudReader.wrapF64RGB(cloud.toList()), true, w);
+				w.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Opens a dialog, asks the user where to save the sequence of Se3
+	 */
+	public static void saveListSe3Dialog(Component owner, String key ,PointCloudViewer pcv) {
 		String path = getDefaultPath(owner,key);
 
 		var fileChooser = new JFileChooser();

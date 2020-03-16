@@ -67,7 +67,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static boofcv.alg.geo.RectifyImageOps.transformRectToPixel;
-import static boofcv.demonstrations.sfm.multiview.DemoThreeViewStereoApp.KEY_PREVIOUS_DIRECTORY;
+import static boofcv.gui.BoofSwingUtil.KEY_PREVIOUS_DIRECTORY;
 import static boofcv.gui.BoofSwingUtil.saveDisparityDialog;
 
 /**

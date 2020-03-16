@@ -84,7 +84,6 @@ import java.util.List;
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class DemoThreeViewStereoApp extends DemonstrationBase {
-	public static final String KEY_PREVIOUS_DIRECTORY = "PreviousDirectory";
 
 	JPanel gui = new JPanel();
 	AssociatedTriplePanel guiAssoc = new AssociatedTriplePanel();
@@ -212,11 +211,11 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			return;
 		}
 
-		String home = BoofSwingUtil.getDefaultPath(this,KEY_PREVIOUS_DIRECTORY);
+		String home = BoofSwingUtil.getDefaultPath(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY);
 		File f = BoofSwingUtil.fileChooser(null,this,false,home, BoofSwingUtil.FileTypes.YAML);
 		if( f == null )
 			return;
-		BoofSwingUtil.saveDefaultPath(this,KEY_PREVIOUS_DIRECTORY,f);
+		BoofSwingUtil.saveDefaultPath(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY,f);
 
 		f = BoofSwingUtil.ensureSuffix(f,".yaml");
 
@@ -234,7 +233,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 			return;
 		}
 
-		String currentPath = BoofSwingUtil.getDefaultPath(this,KEY_PREVIOUS_DIRECTORY);
+		String currentPath = BoofSwingUtil.getDefaultPath(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY);
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setDialogTitle("Save Rectified Images");
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -244,7 +243,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		}
 
 		File parent = fileChooser.getSelectedFile();
-		BoofSwingUtil.saveDefaultPath(this,KEY_PREVIOUS_DIRECTORY,parent);
+		BoofSwingUtil.saveDefaultPath(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY,parent);
 
 		UtilImageIO.saveImage(visualRect1,new File(parent,"rectified_left.png").getAbsolutePath());
 		UtilImageIO.saveImage(visualRect2,new File(parent,"rectified_right.png").getAbsolutePath());
@@ -254,11 +253,11 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 		ImageGray disparity = this.disparity;
 		if( disparity == null )
 			return;
-		BoofSwingUtil.saveDisparityDialog(this,KEY_PREVIOUS_DIRECTORY,disparity);
+		BoofSwingUtil.saveDisparityDialog(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY,disparity);
 	}
 
 	private void savePointCloud() {
-		BoofSwingUtil.savePointCloudDialog(this,KEY_PREVIOUS_DIRECTORY,guiPointCloud);
+		BoofSwingUtil.savePointCloudDialog(this, BoofSwingUtil.KEY_PREVIOUS_DIRECTORY,guiPointCloud);
 	}
 
 	void updateVisibleGui() {
