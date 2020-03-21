@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -74,7 +74,7 @@ public class GenericConvolveDown<Input extends ImageBase<Input>, Output extends 
 	}
 
 	@Override
-	public int getHorizontalBorder() {
+	public int getBorderX() {
 		if( type == BorderType.SKIP)
 			return kernel.getRadius();
 		else
@@ -82,8 +82,8 @@ public class GenericConvolveDown<Input extends ImageBase<Input>, Output extends 
 	}
 
 	@Override
-	public int getVerticalBorder() {
-		return getHorizontalBorder();
+	public int getBorderY() {
+		return getBorderX();
 	}
 
 	@Override

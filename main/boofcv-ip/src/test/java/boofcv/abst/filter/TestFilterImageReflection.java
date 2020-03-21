@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,8 @@ public class TestFilterImageReflection {
 		GrayU16 out = new GrayU16(5,5);
 		filter.process(in,out);
 
-		assertEquals(2,filter.getHorizontalBorder());
-		assertEquals(3,filter.getVerticalBorder());
+		assertEquals(2,filter.getBorderX());
+		assertEquals(3,filter.getBorderY());
 		assertTrue(GrayU8.class==filter.getInputType().getImageClass());
 		assertTrue(GrayU16.class==filter.getOutputType().getImageClass());
 		assertEquals(1,out.get(0,0));
@@ -56,8 +56,8 @@ public class TestFilterImageReflection {
 		GrayU16 out = new GrayU16(5,5);
 		filter.process(in,out);
 
-		assertEquals(2,filter.getHorizontalBorder());
-		assertEquals(3,filter.getVerticalBorder());
+		assertEquals(2,filter.getBorderX());
+		assertEquals(3,filter.getBorderY());
 		assertTrue(GrayU8.class==filter.getInputType().getImageClass());
 		assertTrue(GrayU16.class==filter.getOutputType().getImageClass());
 		assertEquals(1,out.get(0,0));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,13 +51,13 @@ public class PlanarConvolveDown<In extends ImageGray<In>, Out extends ImageGray<
 	}
 
 	@Override
-	public int getHorizontalBorder() {
-		return down.getHorizontalBorder();
+	public int getBorderX() {
+		return down.getBorderX();
 	}
 
 	@Override
-	public int getVerticalBorder() {
-		return down.getVerticalBorder();
+	public int getBorderY() {
+		return down.getBorderY();
 	}
 
 	@Override

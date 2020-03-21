@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -125,12 +125,12 @@ public abstract class BinaryFilters implements FilterImageInterface<GrayU8,GrayU
 	}
 
 	@Override
-	public int getHorizontalBorder() {
+	public int getBorderX() {
 		return 0;
 	}
 
 	@Override
-	public int getVerticalBorder() {
+	public int getBorderY() {
 		return 0;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,33 +35,33 @@ public interface FilterImageInterface<Input extends ImageBase<Input>, Output ext
 	 * @param input Input image.
 	 * @param output Output image.
 	 */
-	public void process( Input input , Output output );
+	void process( Input input , Output output );
 
 	/**
-	 * How many pixels are not processed along the horizontal border.
+	 * How many pixels are not processed along the x-axis border, left and right.
 	 *
 	 * @return Border size in pixels.
 	 */
-	public int getHorizontalBorder();
+	int getBorderX();
 
 	/**
-	 * How many pixels are not processed along the vertical border.
+	 * How many pixels are not processed along the y-axis border, top and bottom.
 	 *
 	 * @return Border size in pixels.
 	 */
-	public int getVerticalBorder();
+	int getBorderY();
 
 	/**
 	 * Specifies the input image type
 	 *
 	 * @return Input image type.
 	 */
-	public ImageType<Input> getInputType();
+	ImageType<Input> getInputType();
 
 	/**
 	 * Specifies the output image type
 	 *
 	 * @return Output image type.
 	 */
-	public ImageType<Output> getOutputType();
+	ImageType<Output> getOutputType();
 }

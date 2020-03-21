@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -45,16 +45,16 @@ public class FilterSequence<Input extends ImageGray<Input>, Output extends Image
 		this.firstFilter = first;
 		this.sequence = sequence;
 
-		if( first.getHorizontalBorder() > borderHorizontal)
-			borderHorizontal = first.getHorizontalBorder();
-		if( first.getVerticalBorder() > borderVertical)
-			borderVertical = first.getVerticalBorder();
+		if( first.getBorderX() > borderHorizontal)
+			borderHorizontal = first.getBorderX();
+		if( first.getBorderY() > borderVertical)
+			borderVertical = first.getBorderY();
 
 		for( FilterImageInterface<Output,Output> f : sequence ) {
-			if( f.getHorizontalBorder() > borderHorizontal )
-				borderHorizontal = f.getHorizontalBorder();
-			if( f.getVerticalBorder() > borderVertical )
-				borderVertical = f.getVerticalBorder();
+			if( f.getBorderX() > borderHorizontal )
+				borderHorizontal = f.getBorderX();
+			if( f.getBorderY() > borderVertical )
+				borderVertical = f.getBorderY();
 		}
 	}
 
@@ -77,12 +77,12 @@ public class FilterSequence<Input extends ImageGray<Input>, Output extends Image
 	}
 
 	@Override
-	public int getHorizontalBorder() {
+	public int getBorderX() {
 		return borderHorizontal;
 	}
 
 	@Override
-	public int getVerticalBorder() {
+	public int getBorderY() {
 		return borderVertical;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -95,12 +95,12 @@ public class FilterImageReflection<Input extends ImageGray<Input>, Output extend
 	}
 
 	@Override
-	public int getHorizontalBorder() {
+	public int getBorderX() {
 		return borderX;
 	}
 
 	@Override
-	public int getVerticalBorder() {
+	public int getBorderY() {
 		return borderY;
 	}
 
