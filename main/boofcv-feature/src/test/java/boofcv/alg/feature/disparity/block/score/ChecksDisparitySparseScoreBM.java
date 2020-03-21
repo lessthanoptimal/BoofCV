@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,7 +21,6 @@ package boofcv.alg.feature.disparity.block.score;
 import boofcv.alg.feature.disparity.DisparityBlockMatch;
 import boofcv.alg.feature.disparity.block.BlockRowScore;
 import boofcv.alg.feature.disparity.block.DisparityBlockMatchNaive;
-import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
 import boofcv.alg.feature.disparity.block.select.SelectSparseErrorBasicWta_F32;
 import boofcv.alg.feature.disparity.block.select.SelectSparseErrorBasicWta_S32;
@@ -55,7 +54,7 @@ public abstract class ChecksDisparitySparseScoreBM<I extends ImageGray<I>,ArrayD
 
 	ImageBorder<I> imageBorder;
 
-	ChecksDisparitySparseScoreBM(Class<I> imageType) {
+	protected ChecksDisparitySparseScoreBM(Class<I> imageType) {
 		this.imageType = imageType;
 
 		if( imageType == GrayF32.class ) {
@@ -72,7 +71,7 @@ public abstract class ChecksDisparitySparseScoreBM<I extends ImageGray<I>,ArrayD
 
 	public abstract DisparityBlockMatch<I,GrayU8> createDense(int radiusX, int radiusY , BlockRowScore scoreRow);
 
-	public abstract DisparitySparseScoreSadRect<ArrayData, I> createSparse(int radiusX, int radiusY );
+	public abstract DisparitySparseRectifiedScoreBM<ArrayData, I> createSparse(int radiusX, int radiusY );
 
 	/**
 	 * Compute disparity using the equivalent dense algorithm and see if the sparse one produces the
@@ -106,7 +105,7 @@ public abstract class ChecksDisparitySparseScoreBM<I extends ImageGray<I>,ArrayD
 
 		DisparityBlockMatch<I,GrayU8> denseAlg = createDense(radiusX,radiusY,scoreRow);
 		denseAlg.setBorder(imageBorder);
-		DisparitySparseScoreSadRect<ArrayData, I> alg = createSparse(radiusX,radiusY);
+		DisparitySparseRectifiedScoreBM<ArrayData, I> alg = createSparse(radiusX,radiusY);
 		alg.setBorder(imageBorder);
 
 		denseAlg.configure(minDisparity,rangeDisparity);
@@ -122,7 +121,7 @@ public abstract class ChecksDisparitySparseScoreBM<I extends ImageGray<I>,ArrayD
 				if( !alg.process(x,y) )  {
 					assertEquals(expected,invalid);
 				} else {
-					selectAlg.select(alg.getScore(),alg.getLocalMaxRange());
+					selectAlg.select(alg.getScore(),alg.getLocalRange());
 					int found = (int)(alg.getDisparityMin()+selectAlg.getDisparity());
 					if( expected == invalid )
 						fail("Expected sparse to fail");

@@ -149,7 +149,7 @@ public class GenerateImageMiscOps extends CodeGeneratorBase {
 				"\t\t\t\t\t\t\t "+imageNameSrc+" input , "+borderName+" border, "+imageName+" output )\n" +
 				"\t{\n" +
 				"\t\tif( output.width < dstX+width || output.height < dstY+height )\n" +
-				"\t\t\tthrow new IllegalArgumentException(\"Copy region must be contained in the output image\");\n" +
+				"\t\t\tthrow new IllegalArgumentException(\"Copy region must be contained in the output image. w=\"+output.width+\" < \"+(dstX+width)+\" or y=\"+output.height+\" < \"+(dstY+height));\n" +
 				"\t\t\n" +
 				"\t\t// Check to see if it's entirely contained inside the input image\n" +
 				"\t\tif( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {\n" +

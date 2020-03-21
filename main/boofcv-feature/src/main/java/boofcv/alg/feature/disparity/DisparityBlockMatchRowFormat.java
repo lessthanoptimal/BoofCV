@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import lombok.Getter;
 
 /**
  * <p>
@@ -48,23 +49,23 @@ public abstract class DisparityBlockMatchRowFormat
 		<Input extends ImageBase<Input>, Disparity extends ImageGray<Disparity>>
 {
 	// the minimum disparity value (inclusive)
-	protected int disparityMin;
+	protected @Getter int disparityMin;
 	// maximum allowed image disparity (exclusive)
-	protected int disparityMax;
+	protected @Getter int disparityMax;
 	// difference between max and min
-	protected int disparityRange;
+	protected @Getter int disparityRange;
 
 	// number of score elements: image_width*rangeDisparity
 	protected int widthDisparityBlock;
 
 	// radius of the region along x and y axis
-	protected int radiusX,radiusY;
+	protected @Getter int radiusX,radiusY;
 	// size of the region: radius*2 + 1
-	protected int regionWidth,regionHeight;
+	protected @Getter int regionWidth,regionHeight;
 
 	// Used to extract a row with the border added to it
-	protected GrowBorder<Input,Object> growBorderL;
-	protected GrowBorder<Input,Object> growBorderR;
+	protected @Getter GrowBorder<Input,Object> growBorderL;
+	protected @Getter GrowBorder<Input,Object> growBorderR;
 
 	/**
 	 * Configures disparity calculation.
@@ -134,14 +135,6 @@ public abstract class DisparityBlockMatchRowFormat
 	public abstract ImageType<Input> getInputType();
 
 	public abstract Class<Disparity> getDisparityType();
-
-	public int getDisparityMin() {
-		return disparityMin;
-	}
-
-	public int getDisparityMax() {
-		return disparityMax;
-	}
 
 	public int getBorderX() {
 		return 0;

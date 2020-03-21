@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -35,11 +35,11 @@ public class SelectSparseErrorBasicWta_S32 implements DisparitySparseSelect<int[
 	int disparity;
 
 	@Override
-	public boolean select(int[] scores,  int disparityMax) {
+	public boolean select(int[] scores,  int disparityRange) {
 		disparity = 0;
 		int best = scores[0];
 
-		for( int i = 1; i < disparityMax; i++ ) {
+		for(int i = 1; i < disparityRange; i++ ) {
 			if( scores[i] < best ) {
 				best = scores[i];
 				disparity = i;

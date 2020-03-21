@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -143,7 +143,6 @@ public class DisparityScoreBM_S32<T extends ImageBase<T>,DI extends ImageGray<DI
 	 * rows.
 	 */
 	private void computeFirstRow(int row0 , WorkSpace ws) {
-		final T left = this.left, right = this.right;
 		// compute horizontal scores for first row block
 		for( int row = 0; row < regionHeight; row++ ) {
 			growBorderL.growRow(row0+row,radiusX,radiusX,ws.leftRow,0);

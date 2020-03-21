@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,29 +18,22 @@
 
 package boofcv.alg.feature.disparity.block.score;
 
-import boofcv.alg.feature.disparity.DisparityBlockMatch;
-import boofcv.alg.feature.disparity.block.BlockRowScore;
-import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
-import boofcv.alg.feature.disparity.block.select.SelectErrorBasicWta_F32_U8;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayU8;
-
-/**
- * @author Peter Abeles
- */
-public class TestDisparitySparseScoreBM_SAD_F32 extends ChecksDisparitySparseScoreBM<GrayF32,float[]> {
-
-	TestDisparitySparseScoreBM_SAD_F32() {
-		super(GrayF32.class);
-	}
-
-	@Override
-	public DisparityBlockMatch<GrayF32, GrayU8> createDense(int radiusX, int radiusY, BlockRowScore scoreRow) {
-		return new DisparityScoreBM_F32<>(radiusX,radiusY,scoreRow, new SelectErrorBasicWta_F32_U8());
-	}
-
-	@Override
-	public DisparitySparseScoreSadRect<float[], GrayF32> createSparse(int radiusX, int radiusY) {
-		return new DisparitySparseScoreBM_SAD_F32(radiusX,radiusY);
-	}
-}
+///**
+// * @author Peter Abeles
+// */
+//public class TestDisparitySparseScoreBM_SAD_F32 extends ChecksDisparitySparseScoreBM<GrayF32,float[]> {
+//
+//	TestDisparitySparseScoreBM_SAD_F32() {
+//		super(GrayF32.class);
+//	}
+//
+//	@Override
+//	public DisparityBlockMatch<GrayF32, GrayU8> createDense(int radiusX, int radiusY, BlockRowScore scoreRow) {
+//		return new DisparityScoreBM_F32<>(radiusX,radiusY,scoreRow, new SelectErrorBasicWta_F32_U8());
+//	}
+//
+//	@Override
+//	public DisparitySparseRectifiedScoreBM<float[], GrayF32> createSparse(int radiusX, int radiusY) {
+//		return new DisparitySparseScoreBM_SAD_F32(radiusX,radiusY);
+//	}
+//}

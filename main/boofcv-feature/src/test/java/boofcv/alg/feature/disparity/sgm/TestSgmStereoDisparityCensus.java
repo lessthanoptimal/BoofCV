@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ class TestSgmStereoDisparityCensus
 
 		@Override
 		public SgmStereoDisparity<GrayU8, GrayU8> createAlgorithm() {
-			FilterImageInterface censusTran = FactoryCensusTransform.variant(BLOCK_3_3, GrayU8.class);
+			FilterImageInterface censusTran = FactoryCensusTransform.variant(BLOCK_3_3, true, GrayU8.class);
 			SgmCostHamming<GrayU8> cost = new SgmCostHamming.U8();
 			return new SgmStereoDisparityCensus(censusTran,cost,new SgmDisparitySelector());
 		}
@@ -58,7 +58,7 @@ class TestSgmStereoDisparityCensus
 
 		@Override
 		public SgmStereoDisparity<GrayU8, GrayS32> createAlgorithm() {
-			FilterImageInterface censusTran = FactoryCensusTransform.variant(BLOCK_5_5, GrayU8.class);
+			FilterImageInterface censusTran = FactoryCensusTransform.variant(BLOCK_5_5, true, GrayU8.class);
 			SgmCostHamming<GrayS32> cost = new SgmCostHamming.S32();
 			return new SgmStereoDisparityCensus(censusTran,cost,new SgmDisparitySelector());
 		}

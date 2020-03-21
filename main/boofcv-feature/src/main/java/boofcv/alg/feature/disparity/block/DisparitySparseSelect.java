@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,9 +18,11 @@
 
 package boofcv.alg.feature.disparity.block;
 
+import boofcv.alg.feature.disparity.block.score.DisparitySparseRectifiedScoreBM;
+
 /**
  * Computes the disparity given disparity score calculations provided by
- * {@link DisparitySparseScoreSadRect}. Array specifies the
+ * {@link DisparitySparseRectifiedScoreBM}. Array specifies the
  * type of primitive array that stores the scores that it processes,
  *
  * @author Peter Abeles
@@ -32,10 +34,10 @@ public interface DisparitySparseSelect<ArrayType> {
 	 * can be found then false is returned.
 	 *
 	 * @param scores Set of disparity scores.
-	 * @param disparityMax Maximum allowed disparity.
+	 * @param disparityRange Number of possible disparity values estimated. The max possible disparity is min+range-1.
 	 * @return true if a valid correspondence was found
 	 */
-	boolean select( ArrayType scores , int disparityMax );
+	boolean select( ArrayType scores , int disparityRange );
 
 	/**
 	 * Returns the found disparity

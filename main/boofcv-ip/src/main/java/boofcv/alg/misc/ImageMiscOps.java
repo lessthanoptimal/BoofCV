@@ -60,7 +60,7 @@ public class ImageMiscOps {
 							 T input , ImageBorder_S32<T> border, GrayI8 output )
 	{
 		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image");
+			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
 		
 		// Check to see if it's entirely contained inside the input image
 		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
@@ -702,7 +702,7 @@ public class ImageMiscOps {
 							 T input , ImageBorder_S32<T> border, GrayI16 output )
 	{
 		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image");
+			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
 		
 		// Check to see if it's entirely contained inside the input image
 		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
@@ -1344,7 +1344,7 @@ public class ImageMiscOps {
 							 GrayS32 input , ImageBorder_S32 border, GrayS32 output )
 	{
 		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image");
+			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
 		
 		// Check to see if it's entirely contained inside the input image
 		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
@@ -1985,7 +1985,7 @@ public class ImageMiscOps {
 							 GrayS64 input , ImageBorder_S64 border, GrayS64 output )
 	{
 		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image");
+			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
 		
 		// Check to see if it's entirely contained inside the input image
 		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
@@ -2626,7 +2626,7 @@ public class ImageMiscOps {
 							 GrayF32 input , ImageBorder_F32 border, GrayF32 output )
 	{
 		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image");
+			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
 		
 		// Check to see if it's entirely contained inside the input image
 		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
@@ -3267,7 +3267,7 @@ public class ImageMiscOps {
 							 GrayF64 input , ImageBorder_F64 border, GrayF64 output )
 	{
 		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image");
+			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
 		
 		// Check to see if it's entirely contained inside the input image
 		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {

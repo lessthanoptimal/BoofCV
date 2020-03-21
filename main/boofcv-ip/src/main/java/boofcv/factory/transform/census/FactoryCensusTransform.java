@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,13 +18,14 @@
 
 package boofcv.factory.transform.census;
 
-import boofcv.abst.filter.FilterImageInterface;
+import boofcv.abst.transform.census.FilterCensusTransform;
 import boofcv.abst.transform.census.FilterCensusTransformD33U8;
 import boofcv.abst.transform.census.FilterCensusTransformD55S32;
 import boofcv.abst.transform.census.FilterCensusTransformSampleS64;
 import boofcv.alg.transform.census.CensusTransform;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I32;
@@ -46,16 +47,17 @@ public class FactoryCensusTransform {
 	public static BorderType CENSUS_BORDER = BorderType.REFLECT;
 
 	public static <In extends ImageGray<In>, Out extends ImageBase<Out>>
-	FilterImageInterface<In, Out> variant(CensusVariants type , Class<In> imageType) {
+	FilterCensusTransform<In, Out> variant(CensusVariants type, boolean border, Class<In> imageType) {
 		switch( type ) {
-			case BLOCK_3_3: return blockDense(1,imageType);
-			case BLOCK_5_5: return blockDense(2,imageType);
-			case BLOCK_7_7: return blockDense( 3, imageType);
-			case BLOCK_9_7: return blockDense(4,3,imageType);
-			case BLOCK_13_5: return blockDense(5,2,imageType);
+			case BLOCK_3_3: return blockDense(1, border, imageType);
+			case BLOCK_5_5: return blockDense(2, border, imageType);
+			case BLOCK_7_7: return blockDense( 3, border, imageType);
+			case BLOCK_9_7: return blockDense(4,3, border, imageType);
+			case BLOCK_13_5: return blockDense(5,2, border, imageType);
 			case CIRCLE_9: {
 				FastQueue<Point2D_I32> points = CensusTransform.createCircleSamples();
-				return new FilterCensusTransformSampleS64(points,FactoryImageBorder.single(CENSUS_BORDER,imageType), imageType);
+				ImageBorder<In> imageBorder = border ? FactoryImageBorder.single(CENSUS_BORDER,imageType) : null;
+				return new FilterCensusTransformSampleS64(points,imageBorder, imageType);
 			}
 			default: throw new IllegalArgumentException("Unknown type "+type);
 		}
@@ -64,22 +66,24 @@ public class FactoryCensusTransform {
 	/**
 	 * Samples a dense square block
 	 *
-	 * @param radius Radius of the block. Width = 2*radius+1
-	 * @param imageType Type of input image
 	 * @param <In> Input image
 	 * @param <Out> Output image
+	 * @param radius Radius of the block. Width = 2*radius+1
+	 * @param border If true then it will process the image border
+	 * @param imageType Type of input image
 	 * @return Census Transform
 	 */
 	public static <In extends ImageGray<In>, Out extends ImageBase<Out>>
-	FilterImageInterface<In, Out> blockDense( int radius , Class<In> imageType) {
+	FilterCensusTransform<In, Out> blockDense(int radius, boolean border, Class<In> imageType) {
+		ImageBorder<In> imageBorder = border ? FactoryImageBorder.single(CENSUS_BORDER,imageType) : null;
 		switch( radius ) {
 			case 1:
-				return new FilterCensusTransformD33U8(FactoryImageBorder.single(CENSUS_BORDER,imageType), imageType);
+				return new FilterCensusTransformD33U8(imageBorder, imageType);
 			case 2:
-				return new FilterCensusTransformD55S32(FactoryImageBorder.single(CENSUS_BORDER,imageType), imageType);
+				return new FilterCensusTransformD55S32(imageBorder, imageType);
 			case 3: {
 				FastQueue<Point2D_I32> points7x7 = CensusTransform.createBlockSamples(3);
-				return new FilterCensusTransformSampleS64(points7x7,FactoryImageBorder.single(CENSUS_BORDER,imageType), imageType);
+				return new FilterCensusTransformSampleS64(points7x7,imageBorder, imageType);
 			}
 
 			default:
@@ -87,8 +91,9 @@ public class FactoryCensusTransform {
 		}
 	}
 	public static <In extends ImageGray<In>, Out extends ImageBase<Out>>
-	FilterImageInterface<In, Out> blockDense( int radiusX , int radiusY , Class<In> imageType) {
+	FilterCensusTransform<In, Out> blockDense(int radiusX, int radiusY, boolean border, Class<In> imageType) {
+		ImageBorder<In> imageBorder = border ? FactoryImageBorder.single(CENSUS_BORDER,imageType) : null;
 		FastQueue<Point2D_I32> points = CensusTransform.createBlockSamples(radiusX,radiusY);
-		return new FilterCensusTransformSampleS64(points,FactoryImageBorder.single(CENSUS_BORDER,imageType), imageType);
+		return new FilterCensusTransformSampleS64(points,imageBorder, imageType);
 	}
 }

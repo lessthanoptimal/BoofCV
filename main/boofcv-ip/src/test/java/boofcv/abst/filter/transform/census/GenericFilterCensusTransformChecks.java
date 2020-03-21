@@ -16,26 +16,30 @@
  * limitations under the License.
  */
 
-package boofcv.abst.transform.census;
+package boofcv.abst.filter.transform.census;
 
-import boofcv.alg.transform.census.GCensusTransform;
-import boofcv.struct.border.ImageBorder;
-import boofcv.struct.image.GrayS32;
-import boofcv.struct.image.ImageGray;
-import boofcv.struct.image.ImageType;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Peter Abeles
  */
-public class FilterCensusTransformD55S32 <In extends ImageGray<In>>
-		extends FilterCensusTransform<In, GrayS32>
-{
-	public FilterCensusTransformD55S32(ImageBorder<In> border, Class<In> imageType ) {
-		super(2,border,imageType, ImageType.SB_S32);
+public abstract class GenericFilterCensusTransformChecks {
+
+	/**
+	 * Make sure the border radius is set correctly. If the border is null it should have a non-zero value
+	 */
+	@Test
+	public void checkBorderRadius() {
+		fail("Implement");
 	}
 
-	@Override
-	public void process(In in, GrayS32 out) {
-		GCensusTransform.dense5x5(in,out,border);
+	/**
+	 * Makes sure the filter produces the same results as the function
+	 */
+	@Test
+	public void compareToFunction() {
+		fail("Implement");
 	}
 }

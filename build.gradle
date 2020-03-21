@@ -40,7 +40,8 @@ subprojects {
 
     // Creates Java 8 byte code
     compileJava {
-        options.compilerArgs = [ "--release", "8"  ]
+        options.compilerArgs += [ "--release", "8"]
+//        options.compilerArgs += '--enable-preview'
     }
 
     // Fail on jar conflict
@@ -342,7 +343,7 @@ task testReport(type: TestReport) {
 
 wrapper {
     distributionType = Wrapper.DistributionType.BIN
-    gradleVersion = '5.6.4'
+    gradleVersion = '6.3.0-rc-4'
 }
 
 // Disable the creation of jars for distribution.  If you don't do this it will crash

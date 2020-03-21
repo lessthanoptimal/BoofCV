@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -20,9 +20,10 @@ package boofcv.factory.feature.disparity;
 
 import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.feature.disparity.DisparityBlockMatchRowFormat;
-import boofcv.alg.feature.disparity.block.*;
-import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_F32;
-import boofcv.alg.feature.disparity.block.score.DisparitySparseScoreBM_SAD_U8;
+import boofcv.alg.feature.disparity.block.BlockRowScore;
+import boofcv.alg.feature.disparity.block.BlockRowScoreMutualInformation;
+import boofcv.alg.feature.disparity.block.DisparitySelect;
+import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
 import boofcv.alg.feature.disparity.block.select.*;
 import boofcv.alg.feature.disparity.sgm.*;
 import boofcv.alg.feature.disparity.sgm.cost.SgmCostAbsoluteDifference;
@@ -92,7 +93,7 @@ public class FactoryStereoDisparityAlgs {
 			} break;
 
 			case CENSUS: {
-				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, GrayU8.class);
+				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, GrayU8.class);
 				Class censusType = censusTran.getOutputType().getImageClass();
 				SgmCostHamming cost;
 				if (censusType == GrayU8.class) {
@@ -149,7 +150,7 @@ public class FactoryStereoDisparityAlgs {
 			} break;
 
 			case CENSUS: {
-				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant,imageType);
+				FilterImageInterface censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType);
 				BlockRowScore rowScore = createCensusRowScore(configBM, censusTran);
 				blockScore = createSgmBlockMatch(config, censusTran.getOutputType().getImageClass(),
 						configBM, blockCost, rowScore);
@@ -246,17 +247,4 @@ public class FactoryStereoDisparityAlgs {
 	selectDisparitySparseSubpixel_F32( int maxError , double texture) {
 		return new SelectSparseErrorSubpixel.F32(maxError,texture);
 	}
-
-	public static DisparitySparseScoreSadRect<int[],GrayU8>
-	scoreDisparitySparseSadRect_U8( int regionRadiusX, int regionRadiusY )
-	{
-		return new DisparitySparseScoreBM_SAD_U8(regionRadiusX,regionRadiusY);
-	}
-
-	public static DisparitySparseScoreSadRect<float[],GrayF32>
-	scoreDisparitySparseSadRect_F32( int regionRadiusX, int regionRadiusY )
-	{
-		return new DisparitySparseScoreBM_SAD_F32(regionRadiusX,regionRadiusY);
-	}
-
 }

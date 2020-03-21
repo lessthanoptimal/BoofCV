@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public abstract class SelectErrorWithChecks_S32<DI extends ImageGray<DI>>
 
 	// texture threshold, use an integer value for speed.
 	protected int textureThreshold;
-	protected static final int discretizer = 10000;
+	protected static final int discretizer = SelectDisparityWithChecksWta.DISCRETIZER;
 
 	public SelectErrorWithChecks_S32(int maxError, int rightToLeftTolerance, double texture,Class<DI> disparityType) {
 		super(maxError,rightToLeftTolerance,texture,disparityType);

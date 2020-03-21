@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,7 +22,7 @@ import boofcv.struct.border.ImageBorder;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.annotation.Nullable;
@@ -71,7 +71,7 @@ public class GCensusTransform {
 
 	}
 
-	public static<T extends ImageGray<T>> void sample_S64(final T input , final FastQueue<Point2D_I32> sample,
+	public static<T extends ImageGray<T>> void sample_S64(final T input , final FastAccess<Point2D_I32> sample,
 														  final GrayS64 output ,
 														  @Nullable ImageBorder<T> border, @Nullable GrowQueue_I32 workSpace )
 	{
@@ -85,7 +85,7 @@ public class GCensusTransform {
 
 	}
 
-	public static<T extends ImageGray<T>> void sample_IU16(final T input , final FastQueue<Point2D_I32> sample,
+	public static<T extends ImageGray<T>> void sample_IU16(final T input , final FastAccess<Point2D_I32> sample,
 														   final InterleavedU16 output ,
 														   @Nullable ImageBorder<T> border, @Nullable GrowQueue_I32 workSpace )
 	{

@@ -27,6 +27,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -66,7 +67,7 @@ public class CensusTransform {
 		return samples;
 	}
 
-	public static FastQueue<Point2D_I32> createBlockSamples( int radiusX , int radiusY) {
+	public static FastQueue<Point2D_I32> createBlockSamples(int radiusX , int radiusY) {
 		FastQueue<Point2D_I32> samples = new FastQueue<>(Point2D_I32::new);
 		int wx = radiusX*2+1;
 		int wy = radiusY*2+1;
@@ -194,33 +195,26 @@ public class CensusTransform {
 	 * @param output Census transformed output image
 	 * @param border (Nullable) How the border is handled
 	 */
-	public static void sample_S64(final GrayU8 input , final FastQueue<Point2D_I32> sample,
+	public static void sample_S64(final GrayU8 input , final FastAccess<Point2D_I32> sample,
 								 final GrayS64 output , @Nullable ImageBorder_S32<GrayU8> border ,
 								 @Nullable GrowQueue_I32 workSpace ) {
 		output.reshape(input.width,input.height);
 
-		// The farthest away
-		int radius = 0;
 		// Precompute the offset in array indexes for the sample points
 		if( workSpace == null )
 			workSpace = new GrowQueue_I32();
-		workSpace.resize(sample.size);
-		for (int i = 0; i < sample.size; i++) {
-			Point2D_I32 p = sample.get(i);
-			workSpace.data[i] = p.y*input.stride + p.x;
-			radius = Math.max(radius,Math.abs(p.x));
-			radius = Math.max(radius,Math.abs(p.y));
-		}
+
+		int borderRadius = computeRadiusWorkspace(input, sample, workSpace);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplCensusTransformInner_MT.sample_S64(input,radius,workSpace,output);
+			ImplCensusTransformInner_MT.sample_S64(input,borderRadius,workSpace,output);
 		} else {
-			ImplCensusTransformInner.sample_S64(input,radius,workSpace,output);
+			ImplCensusTransformInner.sample_S64(input,borderRadius,workSpace,output);
 		}
 
 		if( border != null ) {
 			border.setImage(input);
-			ImplCensusTransformBorder.sample_S64(border,radius,sample,output);
+			ImplCensusTransformBorder.sample_S64(border,borderRadius,sample,output);
 		}
 	}
 
@@ -232,33 +226,26 @@ public class CensusTransform {
 	 * @param output Census transformed output image
 	 * @param border (Nullable) How the border is handled
 	 */
-	public static void sample_S64(final GrayU16 input , final FastQueue<Point2D_I32> sample,
+	public static void sample_S64(final GrayU16 input , final FastAccess<Point2D_I32> sample,
 								  final GrayS64 output , @Nullable ImageBorder_S32<GrayU16> border ,
 								  @Nullable GrowQueue_I32 workSpace ) {
 		output.reshape(input.width,input.height);
 
-		// The farthest away
-		int radius = 0;
 		// Precompute the offset in array indexes for the sample points
 		if( workSpace == null )
 			workSpace = new GrowQueue_I32();
-		workSpace.resize(sample.size);
-		for (int i = 0; i < sample.size; i++) {
-			Point2D_I32 p = sample.get(i);
-			workSpace.data[i] = p.y*input.stride + p.x;
-			radius = Math.max(radius,Math.abs(p.x));
-			radius = Math.max(radius,Math.abs(p.y));
-		}
+
+		int borderRadius = computeRadiusWorkspace(input, sample, workSpace);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplCensusTransformInner_MT.sample_S64(input,radius,workSpace,output);
+			ImplCensusTransformInner_MT.sample_S64(input,borderRadius,workSpace,output);
 		} else {
-			ImplCensusTransformInner.sample_S64(input,radius,workSpace,output);
+			ImplCensusTransformInner.sample_S64(input,borderRadius,workSpace,output);
 		}
 
 		if( border != null ) {
 			border.setImage(input);
-			ImplCensusTransformBorder.sample_S64(border,radius,sample,output);
+			ImplCensusTransformBorder.sample_S64(border,borderRadius,sample,output);
 		}
 	}
 
@@ -270,35 +257,28 @@ public class CensusTransform {
 	 * @param output Census transformed output image
 	 * @param border (Nullable) How the border is handled
 	 */
-	public static void sample_IU16(final GrayU8 input , final FastQueue<Point2D_I32> sample,
+	public static void sample_IU16(final GrayU8 input , final FastAccess<Point2D_I32> sample,
 								   final InterleavedU16 output , @Nullable ImageBorder_S32<GrayU8> border ,
 								   @Nullable GrowQueue_I32 workSpace ) {
 		// Compute the number of 16-bit values that are needed to store
 		int numBlocks = BoofMiscOps.bitsToWords(sample.size,16);
 		output.reshape(input.width,input.height,numBlocks);
 
-		// The farthest away
-		int radius = 0;
 		// Precompute the offset in array indexes for the sample points
 		if( workSpace == null )
 			workSpace = new GrowQueue_I32();
-		workSpace.resize(sample.size);
-		for (int i = 0; i < sample.size; i++) {
-			Point2D_I32 p = sample.get(i);
-			workSpace.data[i] = p.y*input.stride + p.x;
-			radius = Math.max(radius,Math.abs(p.x));
-			radius = Math.max(radius,Math.abs(p.y));
-		}
+
+		int borderRadius = computeRadiusWorkspace(input, sample, workSpace);
 
 		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplCensusTransformInner_MT.sample_IU16(input,radius,workSpace,output);
+			ImplCensusTransformInner_MT.sample_IU16(input,borderRadius,workSpace,output);
 		} else {
-			ImplCensusTransformInner.sample_IU16(input,radius,workSpace,output);
+			ImplCensusTransformInner.sample_IU16(input,borderRadius,workSpace,output);
 		}
 
 		if( border != null ) {
 			border.setImage(input);
-			ImplCensusTransformBorder.sample_IU16(border,radius,sample,output);
+			ImplCensusTransformBorder.sample_IU16(border,borderRadius,sample,output);
 		}
 	}
 
@@ -310,18 +290,40 @@ public class CensusTransform {
 	 * @param output Census transformed output image
 	 * @param border (Nullable) How the border is handled
 	 */
-	public static void sample_IU16(final GrayU16 input , final FastQueue<Point2D_I32> sample,
+	public static void sample_IU16(final GrayU16 input , final FastAccess<Point2D_I32> sample,
 								   final InterleavedU16 output , @Nullable ImageBorder_S32<GrayU16> border ,
 								   @Nullable GrowQueue_I32 workSpace ) {
 		// Compute the number of 16-bit values that are needed to store
 		int numBlocks = BoofMiscOps.bitsToWords(sample.size,16);
 		output.reshape(input.width,input.height,numBlocks);
 
-		// The farthest away
-		int radius = 0;
 		// Precompute the offset in array indexes for the sample points
 		if( workSpace == null )
 			workSpace = new GrowQueue_I32();
+
+		int borderRadius = computeRadiusWorkspace(input, sample, workSpace);
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplCensusTransformInner_MT.sample_IU16(input,borderRadius,workSpace,output);
+		} else {
+			ImplCensusTransformInner.sample_IU16(input,borderRadius,workSpace,output);
+		}
+
+		if( border != null ) {
+			border.setImage(input);
+			ImplCensusTransformBorder.sample_IU16(border,borderRadius,sample,output);
+		}
+	}
+
+	/**
+	 *
+	 * @param input (Input) Input image
+	 * @param sample (Input) Points being sampled
+	 * @param workSpace (Output) Stores the offsets from current point that need to be sampled
+	 * @return The maximum distance away (x and y) that a point is sampled
+	 */
+	private static int computeRadiusWorkspace(ImageBase input, FastAccess<Point2D_I32> sample, GrowQueue_I32 workSpace) {
+		int radius = 0;
 		workSpace.resize(sample.size);
 		for (int i = 0; i < sample.size; i++) {
 			Point2D_I32 p = sample.get(i);
@@ -329,16 +331,6 @@ public class CensusTransform {
 			radius = Math.max(radius,Math.abs(p.x));
 			radius = Math.max(radius,Math.abs(p.y));
 		}
-
-		if( BoofConcurrency.USE_CONCURRENT ) {
-			ImplCensusTransformInner_MT.sample_IU16(input,radius,workSpace,output);
-		} else {
-			ImplCensusTransformInner.sample_IU16(input,radius,workSpace,output);
-		}
-
-		if( border != null ) {
-			border.setImage(input);
-			ImplCensusTransformBorder.sample_IU16(border,radius,sample,output);
-		}
+		return radius;
 	}
 }

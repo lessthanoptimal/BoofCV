@@ -24,6 +24,7 @@ import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
 import boofcv.abst.tracker.PointTrackerTwoPass;
 import boofcv.alg.tracker.klt.ConfigPKlt;
+import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.FactoryPointTrackerTwoPass;
@@ -71,8 +72,15 @@ public class ExampleVisualOdometryStereo {
 						GrayU8.class, GrayS16.class);
 
 		// computes the depth of each point
-		StereoDisparitySparse<GrayU8> disparity =
-				FactoryStereoDisparity.regionSparseWta(0, 150, 3, 3, 30, -1, true, GrayU8.class);
+		var configBM = new ConfigDisparityBM();
+		configBM.disparityMin = 0;
+		configBM.disparityRange = 150;
+		configBM.regionRadiusX = 3;
+		configBM.regionRadiusY = 3;
+		configBM.maxPerPixelError = 30;
+		configBM.texture = -1;
+		configBM.subpixel = true;
+		StereoDisparitySparse<GrayU8> disparity = FactoryStereoDisparity.sparseRectifiedBM(configBM, GrayU8.class);
 
 		// declares the algorithm
 		StereoVisualOdometry<GrayU8> visualOdometry = FactoryVisualOdometry.stereoDepth(1.5,120, 2,200,50,true,

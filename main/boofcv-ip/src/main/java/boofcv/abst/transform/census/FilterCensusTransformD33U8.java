@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,7 +18,6 @@
 
 package boofcv.abst.transform.census;
 
-import boofcv.abst.filter.FilterImageInterface;
 import boofcv.alg.transform.census.GCensusTransform;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.GrayU8;
@@ -29,38 +28,14 @@ import boofcv.struct.image.ImageType;
  * @author Peter Abeles
  */
 public class FilterCensusTransformD33U8<In extends ImageGray<In>>
-		implements FilterImageInterface<In, GrayU8>
+		extends FilterCensusTransform<In, GrayU8>
 {
-	ImageBorder<In> border;
-	ImageType<In> inputType;
-
 	public FilterCensusTransformD33U8(ImageBorder<In> border, Class<In> imageType ) {
-		this.border = border;
-		this.inputType = ImageType.single(imageType);
+		super(1,border,imageType, ImageType.SB_U8);
 	}
 
 	@Override
 	public void process(In in, GrayU8 out) {
 		GCensusTransform.dense3x3(in,out,border);
-	}
-
-	@Override
-	public int getBorderX() {
-		return 0;
-	}
-
-	@Override
-	public int getBorderY() {
-		return 0;
-	}
-
-	@Override
-	public ImageType<In> getInputType() {
-		return inputType;
-	}
-
-	@Override
-	public ImageType<GrayU8> getOutputType() {
-		return ImageType.SB_U8;
 	}
 }

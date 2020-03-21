@@ -43,6 +43,7 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
+import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.sfm.FactoryVisualOdometry;
 import boofcv.factory.tracker.FactoryPointTracker;
@@ -269,9 +270,16 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 	private StereoVisualOdometry<I> createStereoDepth( int whichAlg ) {
 
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-
+		var configBM = new ConfigDisparityBM();
+		configBM.disparityMin = 2;
+		configBM.disparityRange = 150;
+		configBM.regionRadiusX = 3;
+		configBM.regionRadiusY = 3;
+		configBM.maxPerPixelError = 30;
+		configBM.texture = -1;
+		configBM.subpixel = true;
 		StereoDisparitySparse<I> disparity =
-				FactoryStereoDisparity.regionSparseWta(2,150,3,3,30,-1,true,imageType);
+				FactoryStereoDisparity.sparseRectifiedBM(configBM,imageType);
 
 		ConfigPKlt kltConfig = new ConfigPKlt();
 		kltConfig.toleranceFB = 3;

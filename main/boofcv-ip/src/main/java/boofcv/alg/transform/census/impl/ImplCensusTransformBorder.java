@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.image.GrayS64;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.InterleavedU16;
 import georegression.struct.point.Point2D_I32;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.FastAccess;
 
 /**
  * @author Peter Abeles
@@ -107,7 +107,7 @@ public class ImplCensusTransformBorder {
 		}
 	}
 
-	public static void sample_S64(final ImageBorder_S32 input, final int radius , final FastQueue<Point2D_I32> offsets,
+	public static void sample_S64(final ImageBorder_S32 input, final int radius , final FastAccess<Point2D_I32> offsets,
 								  GrayS64 output  )
 	{
 		final int width = output.width;
@@ -135,7 +135,7 @@ public class ImplCensusTransformBorder {
 	}
 
 	public static short sample( final ImageBorder_S32 input , int cx , int cy ,
-								  final FastQueue<Point2D_I32> offsets , int idx0 , int idx1 ) {
+								  final FastAccess<Point2D_I32> offsets , int idx0 , int idx1 ) {
 		int center = input.get(cx, cy);
 		int census = 0;
 
@@ -151,7 +151,7 @@ public class ImplCensusTransformBorder {
 	}
 
 	public static long sample_S64( final ImageBorder_S32 input , int cx , int cy ,
-								   final FastQueue<Point2D_I32> offsets ) {
+								   final FastAccess<Point2D_I32> offsets ) {
 		int center = input.get(cx, cy);
 		long census = 0;
 
@@ -166,7 +166,7 @@ public class ImplCensusTransformBorder {
 		return census;
 	}
 
-	public static void sample_IU16(final ImageBorder_S32 input , final int radius , final FastQueue<Point2D_I32> offsets,
+	public static void sample_IU16(final ImageBorder_S32 input , final int radius , final FastAccess<Point2D_I32> offsets,
 								   final InterleavedU16 output ) {
 		final int width = output.width;
 		final int height = output.height;

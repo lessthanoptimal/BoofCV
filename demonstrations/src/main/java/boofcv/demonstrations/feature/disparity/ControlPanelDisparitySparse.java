@@ -20,7 +20,6 @@ package boofcv.demonstrations.feature.disparity;
 
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
-import boofcv.factory.feature.disparity.ConfigDisparityError;
 import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.transform.census.CensusVariants;
@@ -70,6 +69,9 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 		this.config = config;
 		this.listener = listener;
 
+		// disable since it's not supported yet
+		config.validateRtoL = -1;
+
 		comboError = combo(e -> handleErrorSelected(false), config.errorType.ordinal(),(Object[])ERRORS_BLOCK);
 		controlBM = new ControlsBlockMatching();
 		controlSad = new ControlsSAD();
@@ -96,7 +98,7 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 
 	public <T extends ImageGray<T>>
 	StereoDisparitySparse<T> createAlgorithm(Class<T> imageType) {
-		return FactoryStereoDisparity.sparseBlockMatching(config,imageType);
+		return FactoryStereoDisparity.sparseRectifiedBM(config,imageType);
 	}
 
 	public int getDisparityMin() {
@@ -122,8 +124,8 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 //		System.out.println("error for block="+block+" idx="+selectedIdx);
 
 		config.errorType = DisparityError.values()[selectedIdx];
-		controlCensus.update(config.configCensus);
-		controlNCC.update(config.configNCC);
+		controlCensus.update();
+		controlNCC.update();
 
 		Component c = getErrorControl(selectedIdx);
 		tabbedPane.removeTabAt(1);
@@ -151,7 +153,6 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 		JSpinner radiusXSpinner = spinner(config.regionRadiusX,0,50,1);
 		JSpinner radiusYSpinner = spinner(config.regionRadiusY,0,50,1);
 		JSpinner spinnerError = spinner(config.maxPerPixelError,-1,80,5);
-		JSpinner spinnerReverse = spinner(config.validateRtoL,-1,50,1);
 		JSpinner spinnerTexture = spinner(config.texture,0.0,1.0,0.05,1,3);
 		JCheckBox subpixelToggle = checkbox("Subpixel", config.subpixel,"Subpixel Disparity Estimate");
 
@@ -163,15 +164,12 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 			addLabeled(radiusYSpinner,    "Radius Y", "Block Height. (Pixels)");
 			addLabeled(spinnerError,     "Max Error","Maximum allowed matching error");
 			addLabeled(spinnerTexture,   "Texture","Texture validation. 0 = disabled. 1 = most strict.");
-			addLabeled(spinnerReverse,   "Reverse","Reverse Validation Tolerance. -1 = disable. (Pixels)");
 			addAlignLeft(subpixelToggle);
 		}
 
 		@Override
 		public void controlChanged(final Object source) {
-			if( source == spinnerReverse) {
-				config.validateRtoL = ((Number) spinnerReverse.getValue()).intValue();
-			} else if( source == spinnerDisparityMin) {
+			if( source == spinnerDisparityMin) {
 				config.disparityMin = ((Number) spinnerDisparityMin.getValue()).intValue();
 			} else if( source == spinnerDisparityRange) {
 				config.disparityRange = ((Number) spinnerDisparityRange.getValue()).intValue();
@@ -197,23 +195,21 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 	}
 
 	class ControlsCensus extends StandardAlgConfigPanel {
-		JComboBox<String> comboVariant = combo(0, (Object[]) CensusVariants.values());
-		ConfigDisparityError.Census settings;
+		JComboBox<String> comboVariant = combo(config.configCensus.variant.ordinal(), (Object[]) CensusVariants.values());
 
 		public ControlsCensus() {
 			setBorder(BorderFactory.createEmptyBorder());
 			addLabeled(comboVariant, "Variant");
 		}
 
-		public void update( ConfigDisparityError.Census settings ) {
-			this.settings = settings;
-			comboVariant.setSelectedIndex(settings.variant.ordinal());
+		public void update() {
+			comboVariant.setSelectedIndex(config.configCensus.variant.ordinal());
 		}
 
 		@Override
 		public void controlChanged(final Object source) {
 			if( source == comboVariant) {
-				settings.variant = CensusVariants.values()[comboVariant.getSelectedIndex()];
+				config.configCensus.variant = CensusVariants.values()[comboVariant.getSelectedIndex()];
 			} else {
 				throw new RuntimeException("Unknown");
 			}
@@ -222,23 +218,21 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 	}
 
 	class ControlsNCC extends StandardAlgConfigPanel {
-		JSpinner spinnerEps = spinner(0.0,0, 1.0,0.001,"0.0E0",10);
-		ConfigDisparityError.NCC settings;
+		JSpinner spinnerEps = spinner(config.configNCC.eps,0, 1.0,0.001,"0.0E0",10);
 
 		ControlsNCC() {
 			setBorder(BorderFactory.createEmptyBorder());
 			addLabeled(spinnerEps, "EPS");
 		}
 
-		public void update( ConfigDisparityError.NCC settings) {
-			this.settings = settings;
-			spinnerEps.setValue(settings.eps);
+		public void update( ) {
+			spinnerEps.setValue(config.configNCC.eps);
 		}
 
 		@Override
 		public void controlChanged(final Object source) {
 			if( source == spinnerEps) {
-				settings.eps = ((Number) spinnerEps.getValue()).doubleValue();
+				config.configNCC.eps = ((Number) spinnerEps.getValue()).doubleValue();
 			} else {
 				throw new RuntimeException("Unknown");
 			}

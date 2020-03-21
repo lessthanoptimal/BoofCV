@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -46,38 +46,42 @@ public class SelectSparseErrorWithChecksWta_F32 extends SelectSparseStandardWta<
 	}
 
 	@Override
-	public boolean select(float[] scores, int disparityMax) {
-		int disparity = 0;
-		float best = scores[0];
+	public boolean select(float[] scores, int disparityRange) {
+		int bestDisparity = 0;
+		float scoreBest = scores[0];
 
-		for( int i = 1; i < disparityMax; i++ ) {
-			if( scores[i] < best ) {
-				best = scores[i];
-				disparity = i;
+		for(int i = 1; i < disparityRange; i++ ) {
+			if( scores[i] < scoreBest ) {
+				scoreBest = scores[i];
+				bestDisparity = i;
 			}
 		}
 
-		if( best > maxError ) {
+		if( scoreBest > maxError ) {
 			return false;
-		} else if( textureThreshold > 0 ) {
+		}
+		// test to see if the region lacks sufficient texture if:
+		// 1) not already eliminated 2) sufficient disparities to check, 3) it's activated
+		if( textureThreshold > 0 && disparityRange >= 3 ) {
 			// find the second best disparity value and exclude its neighbors
 			float secondBest = Float.MAX_VALUE;
-			for( int i = 0; i < disparity-1; i++ ) {
+			for( int i = 0; i < bestDisparity-1; i++ ) {
 				if( scores[i] < secondBest )
 					secondBest = scores[i];
 			}
-			for( int i = disparity+2; i < disparityMax; i++ ) {
+			for(int i = bestDisparity+2; i < disparityRange; i++ ) {
 				if( scores[i] < secondBest )
 					secondBest = scores[i];
 			}
 
 			// similar scores indicate lack of texture
 			// C = (C2-C1)/C1
-			if( secondBest-best <= textureThreshold*best )
+			if( secondBest-scoreBest <= textureThreshold*scoreBest )
 				return false;
+
 		}
 
-		this.disparity = disparity;
+		this.disparity = bestDisparity;
 
 		return true;
 	}

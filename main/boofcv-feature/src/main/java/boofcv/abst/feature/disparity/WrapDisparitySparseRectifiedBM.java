@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,24 +18,26 @@
 
 package boofcv.abst.feature.disparity;
 
-import boofcv.alg.feature.disparity.block.DisparitySparseScoreSadRect;
 import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
+import boofcv.alg.feature.disparity.block.score.DisparitySparseRectifiedScoreBM;
 import boofcv.struct.image.ImageGray;
 
 /**
+ * Wrapper around {@link DisparitySparseRectifiedScoreBM} for {@link StereoDisparitySparse}
+ *
  * @author Peter Abeles
  */
-public class WrapDisparityBlockSparseSad<ArrayData,T extends ImageGray<T>>
+public class WrapDisparitySparseRectifiedBM<ArrayData,T extends ImageGray<T>>
 		implements StereoDisparitySparse<T>
 {
-	DisparitySparseScoreSadRect<ArrayData,T> computeScore;
+	DisparitySparseRectifiedScoreBM<ArrayData,T> computeScore;
 	DisparitySparseSelect<ArrayData> select;
 
 	// for an insignificant speed boost save this constant as a floating point number
 	double minDisparityFloat;
 
-	public WrapDisparityBlockSparseSad(DisparitySparseScoreSadRect<ArrayData,T> computeScore,
-									   DisparitySparseSelect<ArrayData> select ) {
+	public WrapDisparitySparseRectifiedBM(DisparitySparseRectifiedScoreBM<ArrayData,T> computeScore,
+										  DisparitySparseSelect<ArrayData> select ) {
 		this.computeScore = computeScore;
 		this.select = select;
 	}
@@ -54,7 +56,7 @@ public class WrapDisparityBlockSparseSad<ArrayData,T extends ImageGray<T>>
 	@Override
 	public boolean process(int x, int y) {
 		if( computeScore.process(x,y) ) {
-			return select.select(computeScore.getScore(), computeScore.getLocalMaxRange());
+			return select.select(computeScore.getScore(), computeScore.getLocalRange());
 		}
 		return false;
 	}
@@ -84,7 +86,7 @@ public class WrapDisparityBlockSparseSad<ArrayData,T extends ImageGray<T>>
 		return computeScore.getImageType();
 	}
 
-	public DisparitySparseScoreSadRect<ArrayData, T> getComputeScore() {
+	public DisparitySparseRectifiedScoreBM<ArrayData, T> getComputeScore() {
 		return computeScore;
 	}
 

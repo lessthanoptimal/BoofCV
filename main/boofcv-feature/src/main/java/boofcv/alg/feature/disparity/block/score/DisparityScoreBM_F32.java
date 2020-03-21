@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -176,7 +176,6 @@ public class DisparityScoreBM_F32<DI extends ImageGray<DI>>
 	 */
 	private void computeRemainingRows(int row0 , int row1, WorkSpace ws  )
 	{
-		final GrayF32 left = this.left, right = this.right;
 		for( int row = row0+regionHeight; row < row1; row++ ) {
 			int oldRow = (row-row0)%regionHeight;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,12 +34,12 @@ public class SelectSparseErrorSubpixel {
 		}
 
 		@Override
-		public boolean select(int[] scores, int disparityMax) {
-			if( super.select(scores, disparityMax) ) {
+		public boolean select(int[] scores, int disparityRange) {
+			if( super.select(scores, disparityRange) ) {
 
 				int disparityValue = (int)disparity;
 
-				if( disparityValue == 0 || disparityValue == disparityMax-1) {
+				if( disparityValue == 0 || disparityValue == disparityRange -1) {
 					return true;
 				} else {
 					int c0 = scores[disparityValue-1];
@@ -65,12 +65,12 @@ public class SelectSparseErrorSubpixel {
 		}
 
 		@Override
-		public boolean select(float[] scores, int disparityMax) {
-			if( super.select(scores, disparityMax) ) {
+		public boolean select(float[] scores, int disparityRange) {
+			if( super.select(scores, disparityRange) ) {
 
 				int disparityValue = (int)disparity;
 
-				if( disparityValue == 0 || disparityValue == disparityMax-1) {
+				if( disparityValue == 0 || disparityValue == disparityRange -1) {
 					return true;
 				} else {
 					float c0 = scores[disparityValue-1];
