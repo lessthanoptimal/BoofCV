@@ -57,13 +57,6 @@ public class WrapDisparityBlockMatchCensus
 		censusTran.process(imageLeft,cleft);
 		censusTran.process(imageRight,cright);
 
-		System.out.println("Dense Input Image Right");
-		imageRight.print();
-
-//		System.out.println("Right Image Census");
-//		cright.print();
-//		System.out.println();
-
 		// Now compute the disparity
 		alg.process(cleft,cright,disparity);
 	}
