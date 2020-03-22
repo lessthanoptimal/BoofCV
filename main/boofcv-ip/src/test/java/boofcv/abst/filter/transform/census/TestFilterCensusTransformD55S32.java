@@ -18,16 +18,30 @@
 
 package boofcv.abst.filter.transform.census;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import boofcv.abst.transform.census.FilterCensusTransform;
+import boofcv.abst.transform.census.FilterCensusTransformD55S32;
+import boofcv.alg.transform.census.GCensusTransform;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 
 /**
  * @author Peter Abeles
  */
-public class TestFilterCensusTransformD55S32 extends GenericFilterCensusTransformChecks {
-	@Test
-	public void stuff() {
-		fail("implement");
+public class TestFilterCensusTransformD55S32 extends GenericFilterCensusTransformChecks<GrayU8,GrayS32> {
+
+	public TestFilterCensusTransformD55S32() {
+		super(GrayU8.class);
+		this.radius = 2;
+	}
+
+	@Override
+	public FilterCensusTransform<GrayU8, GrayS32> createAlg(ImageBorder<GrayU8> border) {
+		return new FilterCensusTransformD55S32<>(border,GrayU8.class);
+	}
+
+	@Override
+	public void callFunction(GrayU8 input, GrayS32 output) {
+		GCensusTransform.dense5x5(input,output,border);
 	}
 }

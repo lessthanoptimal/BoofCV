@@ -18,16 +18,35 @@
 
 package boofcv.abst.filter.transform.census;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import boofcv.abst.transform.census.FilterCensusTransform;
+import boofcv.abst.transform.census.FilterCensusTransformSampleIU16;
+import boofcv.alg.transform.census.CensusTransform;
+import boofcv.alg.transform.census.GCensusTransform;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.InterleavedU16;
+import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastAccess;
 
 /**
  * @author Peter Abeles
  */
-public class TestFilterCensusTransformSampleIU16 extends GenericFilterCensusTransformChecks {
-	@Test
-	public void stuff() {
-		fail("implement");
+public class TestFilterCensusTransformSampleIU16 extends GenericFilterCensusTransformChecks<GrayU8, InterleavedU16> {
+
+	FastAccess<Point2D_I32> samples = CensusTransform.createBlockSamples(3);
+
+	public TestFilterCensusTransformSampleIU16() {
+		super(GrayU8.class);
+		this.radius = 3;
+	}
+
+	@Override
+	public FilterCensusTransform<GrayU8, InterleavedU16> createAlg(ImageBorder<GrayU8> border) {
+		return new FilterCensusTransformSampleIU16<>(samples,border,GrayU8.class);
+	}
+
+	@Override
+	public void callFunction(GrayU8 input, InterleavedU16 output) {
+		GCensusTransform.sample_IU16(input,samples,output,border,null);
 	}
 }

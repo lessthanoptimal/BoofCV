@@ -18,21 +18,55 @@
 
 package boofcv.abst.filter.transform.census;
 
+import boofcv.abst.transform.census.FilterCensusTransform;
+import boofcv.alg.misc.GImageMiscOps;
+import boofcv.core.image.border.FactoryImageBorder;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
+import boofcv.testing.BoofTesting;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Peter Abeles
  */
-public abstract class GenericFilterCensusTransformChecks {
+public abstract class GenericFilterCensusTransformChecks<In extends ImageGray<In>, Out extends ImageBase<Out>> {
+
+	int width = 30;
+	int height = 25;
+	Random rand = BoofTesting.createRandom(0);
+	ImageBorder<In> border;
+	// The radius of the sample region. Must be set
+	protected int radius;
+
+	public GenericFilterCensusTransformChecks( Class<In> imageType ) {
+		border = FactoryImageBorder.generic(BorderType.REFLECT, ImageType.single(imageType));
+	}
+
+	public abstract FilterCensusTransform<In,Out> createAlg(ImageBorder<In> border);
 
 	/**
 	 * Make sure the border radius is set correctly. If the border is null it should have a non-zero value
 	 */
 	@Test
 	public void checkBorderRadius() {
-		fail("Implement");
+		FilterCensusTransform<In,Out> alg = createAlg(border);
+		assertEquals(radius,alg.getRadiusX());
+		assertEquals(radius,alg.getRadiusY());
+		assertEquals(0,alg.getBorderX());
+		assertEquals(0,alg.getBorderY());
+
+		alg = createAlg(null);
+		assertEquals(radius,alg.getRadiusX());
+		assertEquals(radius,alg.getRadiusY());
+		assertEquals(radius,alg.getBorderX());
+		assertEquals(radius,alg.getBorderY());
 	}
 
 	/**
@@ -40,6 +74,18 @@ public abstract class GenericFilterCensusTransformChecks {
 	 */
 	@Test
 	public void compareToFunction() {
-		fail("Implement");
+		FilterCensusTransform<In,Out> alg = createAlg(border);
+
+		In input = alg.getInputType().createImage(width,height);
+		Out found = alg.getOutputType().createImage(width,height);
+		Out expected = found.createSameShape();
+
+		GImageMiscOps.fillUniform(input,rand,0,250);
+		alg.process(input,found);
+		callFunction(input,expected);
+
+		BoofTesting.assertEquals(expected,found,1e-8);
 	}
+
+	public abstract void callFunction( In input , Out output );
 }
