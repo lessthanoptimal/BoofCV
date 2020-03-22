@@ -41,7 +41,7 @@ public abstract class DisparitySparseRectifiedScoreBM< ArrayData , Input extends
 	/** the local disparity range at the current image coordinate */
 	protected @Getter int localRange;
 
-	// radius of the region along x and y axis
+	/** radius of the region along x and y axis */
 	protected @Getter int radiusX,radiusY;
 	// size of the region: radius*2 + 1
 	protected int blockWidth, blockHeight;
@@ -55,8 +55,8 @@ public abstract class DisparitySparseRectifiedScoreBM< ArrayData , Input extends
 	// handles border pixels
 	protected ImageBorder<Input> border;
 
-	// Input image type
-	protected Class<Input> inputType;
+	/** Input image type */
+	protected @Getter Class<Input> inputType;
 
 	// Copies of only the pixels needed to compute the sparse disparity. These local patches are used
 	// instead of the raw images to make the code less complex at the image border
@@ -188,8 +188,4 @@ public abstract class DisparitySparseRectifiedScoreBM< ArrayData , Input extends
 	 * disparity values there are call {@link #getLocalRange()}
 	 */
 	public abstract ArrayData getScore();
-
-	public Class<Input> getImageType() {
-		return inputType;
-	}
 }

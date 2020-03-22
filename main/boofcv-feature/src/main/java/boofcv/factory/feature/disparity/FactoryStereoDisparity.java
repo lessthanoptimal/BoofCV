@@ -24,6 +24,8 @@ import boofcv.abst.transform.census.FilterCensusTransform;
 import boofcv.alg.feature.disparity.DisparityBlockMatchRowFormat;
 import boofcv.alg.feature.disparity.block.*;
 import boofcv.alg.feature.disparity.block.score.*;
+import boofcv.alg.feature.disparity.block.select.SelectSparseCorrelationSubpixel;
+import boofcv.alg.feature.disparity.block.select.SelectSparseCorrelationWithChecksWta_F32;
 import boofcv.alg.feature.disparity.sgm.SgmStereoDisparity;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.core.image.border.FactoryImageBorder;
@@ -55,7 +57,7 @@ import static boofcv.factory.feature.disparity.FactoryStereoDisparityAlgs.*;
  *
  * @author Peter Abeles
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class FactoryStereoDisparity {
 
 	public static <T extends ImageGray<T>, DI extends ImageGray<DI>> StereoDisparity<T,DI>
@@ -99,7 +101,9 @@ public class FactoryStereoDisparity {
 				BlockRowScore rowScore = createScoreRowNcc(config,GrayF32.class);
 				DisparityBlockMatchRowFormat alg = createBlockMatching(config, GrayF32.class, select, rowScore);
 				alg.setBorder(FactoryImageBorder.generic(config.border,rowScore.getImageType()));
-				return new DisparityBlockMatchCorrelation(alg,imageType);
+				DisparityBlockMatchCorrelation ret = new DisparityBlockMatchCorrelation(alg,imageType);
+				ret.setNormalizeInput(config.configNCC.normalizeInput);
+				return ret;
 			}
 
 			default:
@@ -266,9 +270,15 @@ public class FactoryStereoDisparity {
 
 		double maxError = (config.regionRadiusX*2+1)*(config.regionRadiusY*2+1)*config.maxPerPixelError;
 
-		// TODO support error besides SAD
 		DisparitySparseSelect select;
-		if( GeneralizedImageOps.isFloatingPoint(imageType)) {
+		if( config.errorType == DisparityError.NCC ) {
+			// All images types are converted to float internally
+			if(config.subpixel) {
+				select = new SelectSparseCorrelationSubpixel.F32(config.texture);
+			} else {
+				select = new SelectSparseCorrelationWithChecksWta_F32(config.texture);
+			}
+		} else if( GeneralizedImageOps.isFloatingPoint(imageType) ) {
 			if (config.subpixel)
 				select = selectDisparitySparseSubpixel_F32((int) maxError, config.texture);
 			else
@@ -291,7 +301,17 @@ public class FactoryStereoDisparity {
 					throw new RuntimeException("Image type not supported: "+imageType.getSimpleName() );
 			} break;
 
+			case NCC: {
+				SparseScoreRectifiedNcc _score_ =
+						new SparseScoreRectifiedNcc(config.regionRadiusX, config.regionRadiusY, imageType);
+				_score_.eps = (float)config.configNCC.eps;
+				_score_.normalizeInput = config.configNCC.normalizeInput;
+				score = _score_;
+			} break;
+
 			case CENSUS: {
+				// no border since only the inner portion of the image "patch" is needed.
+				// See the sparse code for details
 				FilterCensusTransform censusTran = FactoryCensusTransform.variant(config.configCensus.variant, false, imageType);
 
 				final Class censusType = censusTran.getOutputType().getImageClass();

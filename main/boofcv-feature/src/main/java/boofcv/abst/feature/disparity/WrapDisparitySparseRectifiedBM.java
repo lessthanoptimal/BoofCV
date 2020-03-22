@@ -83,7 +83,7 @@ public class WrapDisparitySparseRectifiedBM<ArrayData,T extends ImageGray<T>>
 
 	@Override
 	public Class<T> getInputType() {
-		return computeScore.getImageType();
+		return computeScore.getInputType();
 	}
 
 	public DisparitySparseRectifiedScoreBM<ArrayData, T> getComputeScore() {

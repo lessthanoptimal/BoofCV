@@ -52,6 +52,20 @@ public class TestWrapDisparitySparseRectifiedBM {
 	}
 
 	@Nested
+	class NCC_U8 extends CompareSparseToDenseDisparityChecks<GrayU8> {
+		public NCC_U8() {
+			super(DisparityError.NCC, ImageType.SB_U8);
+		}
+	}
+
+	@Nested
+	class NCC_F32 extends CompareSparseToDenseDisparityChecks<GrayF32> {
+		public NCC_F32() {
+			super(DisparityError.NCC, ImageType.SB_F32);
+		}
+	}
+
+	@Nested
 	class CENSUS_U8 extends CompareSparseToDenseDisparityChecks<GrayU8> {
 		public CENSUS_U8() {
 			super(DisparityError.CENSUS, ImageType.SB_U8);

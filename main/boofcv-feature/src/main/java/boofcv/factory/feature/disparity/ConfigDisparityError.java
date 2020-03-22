@@ -53,6 +53,12 @@ public interface ConfigDisparityError extends Configuration {
 		 */
 		public double eps = 5.5e-6;
 
+		/**
+		 * If true then the input will be normalized so that it has zero mean and a max absolute value of one. Reduces
+		 * numerical issues.
+		 */
+		public boolean normalizeInput=true;
+
 		@Override
 		public void checkValidity() {
 

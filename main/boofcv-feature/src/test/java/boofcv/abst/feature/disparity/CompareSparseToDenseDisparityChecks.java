@@ -143,6 +143,11 @@ public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>
 			}
 		}
 
+//		System.out.println("--------------- Expected");
+//		expected.print();
+//		System.out.println("--------------- Found");
+//		found.print();
+
 		BoofTesting.assertEquals(expected,found,1e-4);
 	}
 

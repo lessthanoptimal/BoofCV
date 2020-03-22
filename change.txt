@@ -61,7 +61,8 @@ Version : 0.36
   * TODO Add SBA to all algorithms
   * TODO Update Demonstration Apps
 - Stereo
-  * TODO sparse disparity with census and NCC
+  * Added sparse disparity with Census and NCC
+  * TODO Added sparse forwards-backwards validation
 - Android
   * Changed image workspace from byte[] to GrowQueue_I8 so that it can be dynamically computed.
   * Fixed issues with visualizing disparity

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,8 +26,8 @@ import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
- * Wrapper around {@link StereoDisparity} that will convert all inputs to float and normalize the input to have
- * zero mean and values between 0 and 1.
+ * Wrapper around {@link StereoDisparity} that will (optionally) convert all inputs to float and normalize the input to have
+ * zero mean and an absolute value of at most 1.
  *
  * @author Peter Abeles
  */
