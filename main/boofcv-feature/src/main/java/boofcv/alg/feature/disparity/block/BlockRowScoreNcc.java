@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -56,7 +56,7 @@ public class BlockRowScoreNcc<T extends ImageBase<T>>
 		powL = imageType.createImage(1,1);
 		powR = imageType.createImage(1,1);
 
-		meanFilter = FactoryBlurFilter.mean(imageType,radiusX,radiusY);
+		meanFilter = FactoryBlurFilter.meanB(imageType,radiusX,radiusY,null);
 
 		// save memory and use the same filter / images
 		tmpPow2 = meanL;

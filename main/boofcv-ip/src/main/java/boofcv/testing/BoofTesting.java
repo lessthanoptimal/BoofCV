@@ -739,7 +739,14 @@ public class BoofTesting {
 		if( imgA instanceof ImageGray ) {
 			assertEqualsBorder((ImageGray)imgA, (ImageGray)imgB, tol, borderX, borderY);
 		} else if ( imgA instanceof ImageInterleaved ) {
-			assertEqualsBorder((ImageInterleaved)imgA, (ImageInterleaved)imgB, tol, borderX, borderY);
+			assertEqualsBorder((ImageInterleaved) imgA, (ImageInterleaved) imgB, tol, borderX, borderY);
+		} else if( imgA instanceof Planar ) {
+			Planar _imgA_ = (Planar)imgA;
+			Planar _imgB_ = (Planar)imgB;
+			final int numBands = _imgA_.getNumBands();
+			for (int band = 0; band < numBands; band++) {
+				assertEqualsBorder(_imgA_.getBand(band), _imgB_.getBand(band), tol, borderX, borderY);
+			}
 		} else {
 			throw new RuntimeException("Unsupported image type");
 		}

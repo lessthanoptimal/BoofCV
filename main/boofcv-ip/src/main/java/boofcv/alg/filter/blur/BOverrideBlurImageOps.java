@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,8 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 	public static Gaussian gaussian;
 
 	public interface Mean<T extends ImageBase<T>> {
-		void processMean(T input, T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border , T storage);
+		void processMeanWeighted(T input, T output, int radiusX, int radiusY, T storage);
+		void processMeanBorder(T input, T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border , T storage);
 	}
 
 	public interface Median<T extends ImageBase<T>> {
@@ -52,12 +53,30 @@ public class BOverrideBlurImageOps extends BOverrideClass {
 		void processGaussian(T input, T output, double sigmaX , int radiusX, double sigmaY, int radiusY, T storage );
 	}
 
+	/**
+	 * Weighted average mean
+	 */
 	public static <T extends ImageBase<T>>
-	boolean invokeNativeMean(T input, T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border , T storage) {
+	boolean invokeNativeMeanWeighted(T input, T output, int radiusX, int radiusY, T storage) {
 		boolean processed = false;
 		if( BOverrideBlurImageOps.mean != null ) {
 			try {
-				BOverrideBlurImageOps.mean.processMean(input,output,radiusX,radiusY,border,storage);
+				BOverrideBlurImageOps.mean.processMeanWeighted(input,output,radiusX,radiusY,storage);
+				processed = true;
+			} catch( RuntimeException ignore ) {}
+		}
+		return processed;
+	}
+
+	/**
+	 * Extended border mean
+	 */
+	public static <T extends ImageBase<T>>
+	boolean invokeNativeMeanBorder(T input, T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border , T storage) {
+		boolean processed = false;
+		if( BOverrideBlurImageOps.mean != null ) {
+			try {
+				BOverrideBlurImageOps.mean.processMeanBorder(input,output,radiusX,radiusY,border,storage);
 				processed = true;
 			} catch( RuntimeException ignore ) {}
 		}

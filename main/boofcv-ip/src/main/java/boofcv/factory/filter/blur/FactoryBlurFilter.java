@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.factory.filter.blur;
 
 import boofcv.abst.filter.blur.BlurStorageFilter;
+import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -66,6 +67,12 @@ public class FactoryBlurFilter {
 
 	public static <T extends ImageGray<T>> BlurStorageFilter<T> mean(Class<T> type , int radiusX, int radiusY ) {
 		return mean(ImageType.single(type), radiusX,radiusY);
+	}
+
+	public static <T extends ImageBase<T>> BlurStorageFilter<T> meanB(ImageType<T> type , int radiusX, int radiusY, ImageBorder<T> border ) {
+		BlurStorageFilter<T> filter = new BlurStorageFilter<>("meanB", type, radiusX, radiusY);
+		filter.setBorder(border);
+		return filter;
 	}
 
 	/**

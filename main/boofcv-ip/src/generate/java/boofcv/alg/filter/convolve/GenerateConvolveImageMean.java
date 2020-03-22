@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -102,7 +102,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\t\t\treturn;\n" +
 				"\n" +
 				"\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(offset, length"+normalized+");\n" +
-				"\t\tif (kernel.width > input.width) {\n" +
+				"\t\tif (length > input.width) {\n" +
 				"\t\t\tConvolveImageNormalized.horizontal(kernel, input, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tConvolveNormalized_JustBorder_SB.horizontal(kernel, input, output);\n" +
@@ -136,7 +136,7 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 				"\t\t\treturn;\n" +
 				"\n" +
 				"\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(offset, length"+normalized+");\n" +
-				"\t\tif (kernel.width > input.height) {\n" +
+				"\t\tif (length > input.height) {\n" +
 				"\t\t\tConvolveImageNormalized.vertical(kernel, input, output);\n" +
 				"\t\t} else {\n" +
 				"\t\t\tConvolveNormalized_JustBorder_SB.vertical(kernel, input, output);\n" +
@@ -159,18 +159,21 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Performs a horizontal 1D mean box filter. Outside pixels are specified by a border.\n" +
 				"\t *\n" +
-				"\t * @param binput Input image with a border wrapper. Not modified.\n" +
+				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param output Where the resulting image is written to. Modified.\n" +
 				"\t * @param offset Start offset from pixel coordinate\n" +
+				"\t * @param binput Used to process image borders. If null borders are not processed.\n" +
 				"\t * @param length How long the mean filter is\n" +
 				"\t */\n" +
-				"\tpublic static void horizontal("+srcName+" input, "+dstName+" output, int offset, int length, ImageBorder_"+borderSuffix+" binput) {\n" +
+				"\tpublic static void horizontal("+srcName+" input, "+dstName+" output, int offset, int length, @Nullable ImageBorder_"+borderSuffix+" binput) {\n" +
 				"\t\toutput.reshape(input.width,output.height);\n" +
-				"\t\tbinput.setImage(input);\n" +
 				"\n" +
-				"\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(offset, length"+normalized+");\n" +
-				"\t\tConvolveJustBorder_General_SB.horizontal(kernel, binput, output"+divisor+");\n" +
-				"\t\tif (kernel.width <= input.width) {\n" +
+				"\t\tif( binput != null ) {\n" +
+				"\t\t\tbinput.setImage(input);\n" +
+				"\t\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(offset, length"+normalized+");\n" +
+				"\t\t\tConvolveJustBorder_General_SB.horizontal(kernel, binput, output"+divisor+");\n" +
+				"\t\t}\n" +
+				"\t\tif (length <= input.width) {\n" +
 				"\t\t\tif(BoofConcurrency.USE_CONCURRENT) {\n" +
 				"\t\t\t\tImplConvolveMean_MT.horizontal(input, output, offset, length);\n" +
 				"\t\t\t} else {\n" +
@@ -190,19 +193,21 @@ public class GenerateConvolveImageMean extends CodeGeneratorBase {
 		out.print("\t/**\n" +
 				"\t * Performs a vertical 1D mean box filter. Outside pixels are specified by a border.\n" +
 				"\t *\n" +
-				"\t * @param binput Input image with a border wrapper. Not modified.\n" +
+				"\t * @param input The input image. Not modified.\n" +
 				"\t * @param output Where the resulting image is written to. Modified.\n" +
 				"\t * @param offset Start offset from pixel coordinate\n" +
-				"\t * @param length How long the mean filter is\n" +
+				"\t * @param binput Used to process image borders. If null borders are not processed.\n" +
 				"\t * @param work (Optional) Storage for work array\n" +
 				"\t */\n" +
-				"\tpublic static void vertical("+srcName+" input, "+dstName+" output, int offset, int length, ImageBorder_"+borderSuffix+" binput, @Nullable "+workArray+" work) {\n" +
+				"\tpublic static void vertical("+srcName+" input, "+dstName+" output, int offset, int length, @Nullable ImageBorder_"+borderSuffix+" binput, @Nullable "+workArray+" work) {\n" +
 				"\t\toutput.reshape(input);\n" +
-				"\t\tbinput.setImage(input);\n" +
 				"\n" +
-				"\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(offset, length"+normalized+");\n" +
-				"\t\tConvolveJustBorder_General_SB.vertical(kernel, binput, output"+divisor+");\n" +
-				"\t\tif (kernel.width <= input.height) {\n" +
+				"\t\tif( binput != null ) {\n" +
+				"\t\t\tbinput.setImage(input);\n" +
+				"\t\t\tKernel1D_"+suffix+" kernel = FactoryKernel.table1D_"+suffix+"(offset, length"+normalized+");\n" +
+				"\t\t\tConvolveJustBorder_General_SB.vertical(kernel, binput, output"+divisor+");\n" +
+				"\t\t}\n" +
+				"\t\tif (length <= input.height) {\n" +
 				"\t\t\tif(BoofConcurrency.USE_CONCURRENT) {\n" +
 				"\t\t\t\tImplConvolveMean_MT.vertical(input, output, offset, length, work);\n" +
 				"\t\t\t} else {\n" +

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,9 +24,13 @@ import boofcv.alg.misc.GImageMiscOps;
 import boofcv.concurrency.IWorkArrays;
 import boofcv.concurrency.WorkArrays;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.factory.filter.kernel.FactoryKernel;
 import boofcv.factory.filter.kernel.FactoryKernelGaussian;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder_F32;
+import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.convolve.Kernel2D;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
@@ -39,7 +43,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestBlurImageOps {
+class TestBlurImageOps {
 	// TODO full support of interleaved image for all types
 	// TODO unit tests for different kernels along x and y axis. Can't do that just yet because
 	//      2D kernels have to have the same width along each axis!
@@ -60,7 +64,7 @@ public class TestBlurImageOps {
 			ImageType.il(2,InterleavedU8.class),ImageType.il(2,InterleavedF32.class)}; // delete after all support interleaved
 
 	@Test
-	public void mean() {
+	void mean() {
 		for( ImageType type : imageTypes ) {
 			ImageBase input = type.createImage(width,height);
 			ImageBase found = type.createImage(width,height);
@@ -85,8 +89,8 @@ public class TestBlurImageOps {
 					if( type.getFamily() == ImageType.Family.PLANAR ) {
 						work = WorkArrays.class;
 						Method m = BlurImageOps.class.getMethod(
-								"mean",input.getClass(), found.getClass(), int.class, ImageBorder.class,storage,work);
-						m.invoke(null,input,found, radius, null, null, null);
+								"mean",input.getClass(), found.getClass(), int.class, storage,work);
+						m.invoke(null,input,found, radius, null, null);
 					} else {
 						Method m = BlurImageOps.class.getMethod(
 								"mean",input.getClass(), found.getClass(), int.class, storage,work);
@@ -102,7 +106,81 @@ public class TestBlurImageOps {
 	}
 
 	@Test
-	public void gaussian() {
+	void meanBorder() {
+		for( ImageType type : imageTypes ) {
+			if( type.getFamily() == ImageType.Family.INTERLEAVED )
+				continue;
+			ImageBase input = type.createImage(width,height);
+			ImageBase found = type.createImage(width,height);
+			ImageBase expected = type.createImage(width,height);
+
+			GImageMiscOps.fillUniform(input, rand, 0, 20);
+
+			ImageBorder border = FactoryImageBorder.generic(BorderType.REFLECT,input.getImageType());
+
+			for( int radius = 1; radius <= 4; radius++ ) {
+				GImageMiscOps.fill(expected,0);
+				GImageMiscOps.fill(found,0);
+
+				int w = radius*2+1;
+
+				// convolve with a kernel to compute the expected value
+				Kernel2D kernel = FactoryKernel.createKernelForImage(w,w/2,2,type.getDataType());
+				FactoryKernel.setTable(kernel);
+				GConvolveImageOps.convolveNormalized(kernel, input, expected,border);
+				Class storage = type.getFamily() == ImageType.Family.PLANAR ?
+						ImageGray.class : input.getClass();
+				Class work = GeneralizedImageOps.createWorkArray(type).getClass();
+				Class borderType = ImageBorder.class;
+				if( type.getFamily() == ImageType.Family.GRAY ) {
+					switch( type.getDataType() ) {
+						case U8: borderType = ImageBorder_S32.class; break;
+						case F32: borderType = ImageBorder_F32.class; break;
+					}
+				}
+				try {
+					// Compare with image border
+					if( type.getFamily() == ImageType.Family.PLANAR ) {
+						work = WorkArrays.class;
+						Method m = BlurImageOps.class.getMethod(
+								"meanB",input.getClass(), found.getClass(), int.class, int.class, borderType,storage,work);
+						m.invoke(null,input,found, radius, radius, border, null, null);
+					} else {
+						Method m = BlurImageOps.class.getMethod(
+								"meanB",input.getClass(), found.getClass(),int.class, int.class, borderType,storage,work);
+						m.invoke(null,input,found, radius, radius, border, null, null);
+					}
+
+					BoofTesting.assertEquals(expected,found,2);
+
+					// Test will null border
+					GImageMiscOps.fill(found,0); // zero the image
+					if( type.getFamily() == ImageType.Family.PLANAR ) {
+						work = WorkArrays.class;
+						Method m = BlurImageOps.class.getMethod(
+								"meanB",input.getClass(), found.getClass(), int.class, int.class, borderType,storage,work);
+						m.invoke(null,input,found, radius, radius, border, null, null);
+					} else {
+						Method m = BlurImageOps.class.getMethod(
+								"meanB",input.getClass(), found.getClass(),int.class, int.class, borderType,storage,work);
+						m.invoke(null,input,found, radius, radius, border, null, null);
+					}
+					// Inner should be the same
+					BoofTesting.assertEqualsInner(expected,found,2, radius, radius,false);
+					// outer should be zeros
+					// When a new image is created it is filled with zeros. That's why this test works
+					BoofTesting.assertEqualsBorder(expected.createSameShape(),found,2,radius,radius);
+				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+					throw new RuntimeException(e);
+				}
+
+
+			}
+		}
+	}
+
+	@Test
+	void gaussian() {
 		for( ImageType type : imageTypesGaussian ) {
 			ImageBase input = type.createImage(width,height);
 			ImageBase found = type.createImage(width,height);
@@ -134,7 +212,7 @@ public class TestBlurImageOps {
 	}
 
 	@Test
-	public void median() {
+	void median() {
 		for( ImageType type : imageTypes ) {
 			ImageBase input = type.createImage(width, height);
 			ImageBase found = type.createImage(width, height);

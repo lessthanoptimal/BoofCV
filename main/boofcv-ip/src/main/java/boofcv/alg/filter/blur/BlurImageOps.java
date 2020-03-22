@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,7 +52,7 @@ import javax.annotation.Nullable;
 @SuppressWarnings("Duplicates")
 public class BlurImageOps {
 	/**
-	 * Applies a mean box filter.
+	 * Applies a mean box filter with re-weighted image borders.
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
@@ -63,11 +63,11 @@ public class BlurImageOps {
 	public static GrayU8 mean(GrayU8 input, @Nullable GrayU8 output, int radius,
 							  @Nullable GrayU8 storage, @Nullable IWorkArrays workVert ) {
 
-		return mean(input, output, radius, radius, null, storage, workVert);
+		return mean(input, output, radius, radius, storage, workVert);
 	}
 
 	/**
-	 * Applies a mean box filter.
+	 * Applies a mean box filter with re-weighted image borders.
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
@@ -77,6 +77,36 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU8 mean( GrayU8 input, @Nullable GrayU8 output, int radiusX, int radiusY,
+							  @Nullable GrayU8 storage, @Nullable IWorkArrays workVert ) {
+
+		if( radiusX <= 0 || radiusY <= 0)
+			throw new IllegalArgumentException("Radius must be > 0");
+
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		boolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);
+
+		if( processed )
+			return output;
+
+		ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1);
+		ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, workVert);
+
+		return output;
+	}
+
+	/**
+	 * Applies a mean box filter with image borders.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radiusX Radius of the box blur function along the x-axis
+	 * @param radiusY Radius of the box blur function along the y-axis
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @return Output blurred image.
+	 */
+	public static GrayU8 meanB( GrayU8 input, @Nullable GrayU8 output, int radiusX, int radiusY,
 							  @Nullable ImageBorder_S32<GrayU8> binput,
 							  @Nullable GrayU8 storage, @Nullable IWorkArrays workVert ) {
 
@@ -86,18 +116,13 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, binput, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeMeanBorder(input, output, radiusX, radiusY, binput, storage);
 
 		if( processed )
 			return output;
 
-		if( binput == null ) {
-			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1);
-			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, workVert);
-		} else {
-			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1, binput);
-			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, binput, workVert);
-		}
+		ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1, binput);
+		ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, binput, workVert);
 
 		return output;
 	}
@@ -201,7 +226,7 @@ public class BlurImageOps {
 	}
 
 	/**
-	 * Applies a mean box filter.
+	 * Applies a mean box filter with re-weighted image borders.
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
@@ -212,11 +237,11 @@ public class BlurImageOps {
 	public static GrayU16 mean(GrayU16 input, @Nullable GrayU16 output, int radius,
 							  @Nullable GrayU16 storage, @Nullable IWorkArrays workVert ) {
 
-		return mean(input, output, radius, radius, null, storage, workVert);
+		return mean(input, output, radius, radius, storage, workVert);
 	}
 
 	/**
-	 * Applies a mean box filter.
+	 * Applies a mean box filter with re-weighted image borders.
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
@@ -226,6 +251,36 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayU16 mean( GrayU16 input, @Nullable GrayU16 output, int radiusX, int radiusY,
+							  @Nullable GrayU16 storage, @Nullable IWorkArrays workVert ) {
+
+		if( radiusX <= 0 || radiusY <= 0)
+			throw new IllegalArgumentException("Radius must be > 0");
+
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		boolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);
+
+		if( processed )
+			return output;
+
+		ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1);
+		ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, workVert);
+
+		return output;
+	}
+
+	/**
+	 * Applies a mean box filter with image borders.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radiusX Radius of the box blur function along the x-axis
+	 * @param radiusY Radius of the box blur function along the y-axis
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @return Output blurred image.
+	 */
+	public static GrayU16 meanB( GrayU16 input, @Nullable GrayU16 output, int radiusX, int radiusY,
 							  @Nullable ImageBorder_S32<GrayU16> binput,
 							  @Nullable GrayU16 storage, @Nullable IWorkArrays workVert ) {
 
@@ -235,18 +290,13 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, binput, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeMeanBorder(input, output, radiusX, radiusY, binput, storage);
 
 		if( processed )
 			return output;
 
-		if( binput == null ) {
-			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1);
-			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, workVert);
-		} else {
-			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1, binput);
-			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, binput, workVert);
-		}
+		ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1, binput);
+		ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, binput, workVert);
 
 		return output;
 	}
@@ -350,7 +400,7 @@ public class BlurImageOps {
 	}
 
 	/**
-	 * Applies a mean box filter.
+	 * Applies a mean box filter with re-weighted image borders.
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
@@ -361,11 +411,11 @@ public class BlurImageOps {
 	public static GrayF32 mean(GrayF32 input, @Nullable GrayF32 output, int radius,
 							  @Nullable GrayF32 storage, @Nullable FWorkArrays workVert ) {
 
-		return mean(input, output, radius, radius, null, storage, workVert);
+		return mean(input, output, radius, radius, storage, workVert);
 	}
 
 	/**
-	 * Applies a mean box filter.
+	 * Applies a mean box filter with re-weighted image borders.
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
@@ -375,6 +425,36 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF32 mean( GrayF32 input, @Nullable GrayF32 output, int radiusX, int radiusY,
+							  @Nullable GrayF32 storage, @Nullable FWorkArrays workVert ) {
+
+		if( radiusX <= 0 || radiusY <= 0)
+			throw new IllegalArgumentException("Radius must be > 0");
+
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		boolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);
+
+		if( processed )
+			return output;
+
+		ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1);
+		ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, workVert);
+
+		return output;
+	}
+
+	/**
+	 * Applies a mean box filter with image borders.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radiusX Radius of the box blur function along the x-axis
+	 * @param radiusY Radius of the box blur function along the y-axis
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @return Output blurred image.
+	 */
+	public static GrayF32 meanB( GrayF32 input, @Nullable GrayF32 output, int radiusX, int radiusY,
 							  @Nullable ImageBorder_F32 binput,
 							  @Nullable GrayF32 storage, @Nullable FWorkArrays workVert ) {
 
@@ -384,18 +464,13 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, binput, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeMeanBorder(input, output, radiusX, radiusY, binput, storage);
 
 		if( processed )
 			return output;
 
-		if( binput == null ) {
-			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1);
-			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, workVert);
-		} else {
-			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1, binput);
-			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, binput, workVert);
-		}
+		ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1, binput);
+		ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, binput, workVert);
 
 		return output;
 	}
@@ -499,7 +574,7 @@ public class BlurImageOps {
 	}
 
 	/**
-	 * Applies a mean box filter.
+	 * Applies a mean box filter with re-weighted image borders.
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
@@ -510,11 +585,11 @@ public class BlurImageOps {
 	public static GrayF64 mean(GrayF64 input, @Nullable GrayF64 output, int radius,
 							  @Nullable GrayF64 storage, @Nullable DWorkArrays workVert ) {
 
-		return mean(input, output, radius, radius, null, storage, workVert);
+		return mean(input, output, radius, radius, storage, workVert);
 	}
 
 	/**
-	 * Applies a mean box filter.
+	 * Applies a mean box filter with re-weighted image borders.
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
@@ -524,6 +599,36 @@ public class BlurImageOps {
 	 * @return Output blurred image.
 	 */
 	public static GrayF64 mean( GrayF64 input, @Nullable GrayF64 output, int radiusX, int radiusY,
+							  @Nullable GrayF64 storage, @Nullable DWorkArrays workVert ) {
+
+		if( radiusX <= 0 || radiusY <= 0)
+			throw new IllegalArgumentException("Radius must be > 0");
+
+		output = InputSanityCheck.checkDeclare(input,output);
+		storage = InputSanityCheck.checkDeclare(input,storage);
+
+		boolean processed = BOverrideBlurImageOps.invokeNativeMeanWeighted(input, output, radiusX, radiusY, storage);
+
+		if( processed )
+			return output;
+
+		ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1);
+		ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, workVert);
+
+		return output;
+	}
+
+	/**
+	 * Applies a mean box filter with image borders.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radiusX Radius of the box blur function along the x-axis
+	 * @param radiusY Radius of the box blur function along the y-axis
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @return Output blurred image.
+	 */
+	public static GrayF64 meanB( GrayF64 input, @Nullable GrayF64 output, int radiusX, int radiusY,
 							  @Nullable ImageBorder_F64 binput,
 							  @Nullable GrayF64 storage, @Nullable DWorkArrays workVert ) {
 
@@ -533,18 +638,13 @@ public class BlurImageOps {
 		output = InputSanityCheck.checkDeclare(input,output);
 		storage = InputSanityCheck.checkDeclare(input,storage);
 
-		boolean processed = BOverrideBlurImageOps.invokeNativeMean(input, output, radiusX, radiusY, binput, storage);
+		boolean processed = BOverrideBlurImageOps.invokeNativeMeanBorder(input, output, radiusX, radiusY, binput, storage);
 
 		if( processed )
 			return output;
 
-		if( binput == null ) {
-			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1);
-			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, workVert);
-		} else {
-			ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1, binput);
-			ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, binput, workVert);
-		}
+		ConvolveImageMean.horizontal(input, storage, radiusX, radiusX*2+1, binput);
+		ConvolveImageMean.vertical(storage, output, radiusY, radiusY*2+1, binput, workVert);
 
 		return output;
 	}
@@ -710,13 +810,13 @@ public class BlurImageOps {
 	 */
 	public static <T extends ImageGray<T>>
 	Planar<T> mean(Planar<T> input, @Nullable Planar<T> output, int radius ,
-				   @Nullable ImageBorder<T> border, @Nullable T storage , @Nullable WorkArrays workVert )
+				   @Nullable T storage , @Nullable WorkArrays workVert )
 	{
-		return mean(input,output,radius,radius,border,storage,workVert);
+		return mean(input,output,radius,radius,storage,workVert);
 	}
 
 	/**
-	 * Applies a mean box filter.
+	 * Applies a mean box filter with weighted borders.
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
@@ -727,7 +827,7 @@ public class BlurImageOps {
 	 */
 	public static <T extends ImageGray<T>>
 	Planar<T> mean(Planar<T> input, @Nullable Planar<T> output, int radiusX , int radiusY,
-				   @Nullable ImageBorder<T> border, @Nullable T storage , @Nullable WorkArrays workVert )
+				   @Nullable T storage , @Nullable WorkArrays workVert )
 	{
 		if( storage == null )
 			storage = GeneralizedImageOps.createSingleBand(input.getBandType(),input.width,input.height);
@@ -735,7 +835,33 @@ public class BlurImageOps {
 			output = input.createNew(input.width,input.height);
 
 		for( int band = 0; band < input.getNumBands(); band++ ) {
-			GBlurImageOps.mean(input.getBand(band),output.getBand(band),radiusX,radiusY,border,storage, workVert);
+			GBlurImageOps.mean(input.getBand(band),output.getBand(band),radiusX,radiusY, storage, workVert);
+		}
+		return output;
+	}
+
+	/**
+	 * Applies a mean box filter with extended borders.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radiusX Radius of the box blur function along the x-axis
+	 * @param radiusY Radius of the box blur function along the y-axis
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @return Output blurred image.
+	 */
+	public static <T extends ImageGray<T>>
+	Planar<T> meanB(Planar<T> input, @Nullable Planar<T> output, int radiusX , int radiusY,
+				   @Nullable ImageBorder<T> binput,
+				   @Nullable T storage , @Nullable WorkArrays workVert )
+	{
+		if( storage == null )
+			storage = GeneralizedImageOps.createSingleBand(input.getBandType(),input.width,input.height);
+		if( output == null )
+			output = input.createNew(input.width,input.height);
+
+		for( int band = 0; band < input.getNumBands(); band++ ) {
+			GBlurImageOps.meanB(input.getBand(band),output.getBand(band),radiusX,radiusY, binput, storage, workVert);
 		}
 		return output;
 	}

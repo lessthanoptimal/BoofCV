@@ -32,6 +32,8 @@ Version : 0.36
   * Added a proper config for discrete image pyramid levels
   * Deterministic non-max suppression block candidate concurrent
   * ImageMiscOps.copy() with border for input image
+  * Split mean filter into BlurImageOps.mean() and BlurImageOps.meanB()
+  * BlurImageOps.meanB() requires a border to be specified, if null is specified then just the inner portion is processed
 - Color
   * Can convert YUV, HSV, and YCbCr to 32-bit RGB color
 - Moved KLT from boofcv-geo to boofcv-feature

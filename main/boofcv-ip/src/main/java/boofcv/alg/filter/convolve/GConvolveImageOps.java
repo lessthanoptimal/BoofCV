@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -499,6 +499,49 @@ public class GConvolveImageOps {
 
 				for (int i = 0; i < inp.getNumBands(); i++) {
 					convolveNormalized(kernel, inp.getBand(i), outp.getBand(i));
+				}
+			} break;
+
+			default:
+				throw new IllegalArgumentException("Unknown image family");
+		}
+	}
+
+	/**
+	 * Performs a 2D convolution across the image while re-normalizing the kernel depending on its
+	 * overlap with the image.
+	 *
+	 * @param input	 The original image. Not modified.
+	 * @param output	 Where the resulting image is written to. Modified.
+	 * @param kernel The kernel that is being convolved. Not modified.
+	 */
+	public static <T extends ImageBase<T>, K extends Kernel2D>
+	void convolveNormalized(K kernel, T input, T output , ImageBorder border ) {
+		switch (input.getImageType().getFamily()) {
+			case GRAY: {
+				if (input instanceof GrayF32) {
+					ConvolveImageNormalized.convolve((Kernel2D_F32) kernel, (GrayF32) input, (GrayF32) output, (ImageBorder_F32)border);
+				} else if (input instanceof GrayF64) {
+					ConvolveImageNormalized.convolve((Kernel2D_F64) kernel, (GrayF64) input, (GrayF64) output, (ImageBorder_F64)border);
+				} else if (input instanceof GrayU8) {
+					ConvolveImageNormalized.convolve((Kernel2D_S32) kernel, (GrayU8) input, (GrayI8) output, (ImageBorder_S32)border);
+				} else if (input instanceof GrayS16) {
+					ConvolveImageNormalized.convolve((Kernel2D_S32) kernel, (GrayS16) input, (GrayI16) output, (ImageBorder_S32)border);
+				} else {
+					throw new IllegalArgumentException("Unknown image type: " + input.getClass().getName());
+				}
+			} break;
+
+			case INTERLEAVED: {
+				throw new IllegalArgumentException("Interleaved images with border isn't yet supported. Create a ticket");
+			}
+
+			case PLANAR: {
+				Planar inp = (Planar) input;
+				Planar outp = (Planar) output;
+
+				for (int i = 0; i < inp.getNumBands(); i++) {
+					convolveNormalized(kernel, inp.getBand(i), outp.getBand(i), border);
 				}
 			} break;
 

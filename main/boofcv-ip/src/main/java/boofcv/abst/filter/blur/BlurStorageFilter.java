@@ -24,6 +24,8 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.border.ImageBorder;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Simplified interface for using a blur filter that requires storage.  Reflections are used to look up a function inside
@@ -47,8 +49,8 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	ImageType<T> inputType;
 	WorkArrays workArray;
 
-	// Specified how the border is handled for mean images. If null then it's normalized
-	ImageBorder<T> border = null;
+	/** Specified how the border is handled for mean images. If null then it's normalized */
+	@Getter	@Setter ImageBorder<T> border = null;
 
 	public BlurStorageFilter( String functionName , ImageType<T> inputType, int radius) {
 		this(functionName,inputType,-1,radius,-1,radius);
@@ -68,6 +70,9 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 
 		if( functionName.equals("mean")) {
 			operation = new MeanOperation();
+			createStorage();
+		} else if( functionName.equals("meanB")) {
+			operation = new MeanBorderOperation();
 			createStorage();
 		} else if( functionName.equals("gaussian")) {
 			operation = new GaussianOperation();
@@ -89,14 +94,6 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 		} else {
 			storage = inputType.createImage(1,1);
 		}
-	}
-
-	public ImageBorder<T> getBorder() {
-		return border;
-	}
-
-	public void setBorder(ImageBorder<T> border) {
-		this.border = border;
 	}
 
 	/**
@@ -123,7 +120,7 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	}
 
 	@Override
-	public int getBorderX() {
+	public int getBorderX() { // TODO meanBorder filter can now just process the inner image. This needs to be updated
 		return 0;
 	}
 
@@ -149,13 +146,25 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	private class MeanOperation implements BlurOperation {
 		@Override
 		public void process(ImageBase input, ImageBase output) {
-			GBlurImageOps.mean(input,output, radiusX,radiusY,(ImageBorder)border,storage,workArray);
+			if( border != null )
+				throw new IllegalArgumentException(
+						"Border has been set but will never be used. Must be a bug. Use meanB() instead");
+			GBlurImageOps.mean(input,output, radiusX,radiusY,storage,workArray);
+		}
+	}
+
+	private class MeanBorderOperation implements BlurOperation {
+		@Override
+		public void process(ImageBase input, ImageBase output) {
+			GBlurImageOps.meanB(input,output, radiusX,radiusY,(ImageBorder)border,storage,workArray);
 		}
 	}
 
 	private class GaussianOperation implements BlurOperation {
 		@Override
 		public void process(ImageBase input, ImageBase output) {
+			if( border != null )
+				throw new IllegalArgumentException("Border has been set but will never be used. Must be a bug.");
 			GBlurImageOps.gaussian(input,output,sigmaX, radiusX,sigmaY,radiusY,storage);
 		}
 	}
@@ -163,6 +172,8 @@ public class BlurStorageFilter<T extends ImageBase<T>> implements BlurFilter<T> 
 	private class MedianOperator implements BlurOperation {
 		@Override
 		public void process(ImageBase input, ImageBase output) {
+			if( border != null )
+				throw new IllegalArgumentException("Border has been set but will never be used. Must be a bug.");
 			GBlurImageOps.median(input,output, radiusX,workArray);
 		}
 	}

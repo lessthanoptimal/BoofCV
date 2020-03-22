@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -61,35 +61,64 @@ public class GBlurImageOps {
 		} else if( input instanceof GrayF64) {
 			return (T)BlurImageOps.mean((GrayF64)input,(GrayF64)output,radius,(GrayF64)storage, (DWorkArrays)workVert);
 		} else if( input instanceof Planar) {
-			return (T)BlurImageOps.mean((Planar)input,(Planar)output,radius,null,(ImageGray)storage, workVert);
+			return (T)BlurImageOps.mean((Planar)input,(Planar)output,radius,(ImageGray)storage, workVert);
 		} else  {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
 	}
 
 	/**
-	 * Applies a mean box filter.
+	 * Applies a mean box filter with re-weighted borders.
 	 *
 	 * @param input Input image.  Not modified.
 	 * @param output (Optional) Storage for output image, Can be null.  Modified.
 	 * @param radiusX Radius of the box blur function along the x-axis
-	 * @param radiusY Radius of the box blur function along the y-axis
+	 * @param radiusY Radius of the box blur function along the y-axis.
 	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
 	 * @param <T> Input image type.
 	 * @return Output blurred image.
 	 */
 	public static <T extends ImageBase<T>>
-	T mean(T input, @Nullable T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border, @Nullable ImageBase storage , @Nullable WorkArrays workVert ) {
+	T mean(T input, @Nullable T output, int radiusX, int radiusY, @Nullable ImageBase storage, @Nullable WorkArrays workVert ) {
 		if( input instanceof GrayU8) {
-			return (T) BlurImageOps.mean((GrayU8) input, (GrayU8) output, radiusX, radiusY, (ImageBorder_S32)border, (GrayU8) storage, (IWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayU8) input, (GrayU8) output, radiusX, radiusY, (GrayU8) storage, (IWorkArrays)workVert);
 		} else if( input instanceof GrayU16) {
-			return (T)BlurImageOps.mean((GrayU16)input,(GrayU16)output,radiusX, radiusY, (ImageBorder_S32)border,(GrayU16)storage, (IWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayU16)input,(GrayU16)output,radiusX, radiusY, (GrayU16)storage, (IWorkArrays)workVert);
 		} else if( input instanceof GrayF32) {
-			return (T)BlurImageOps.mean((GrayF32)input,(GrayF32)output,radiusX, radiusY, (ImageBorder_F32)border,(GrayF32)storage, (FWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayF32)input,(GrayF32)output,radiusX, radiusY, (GrayF32)storage, (FWorkArrays)workVert);
 		} else if( input instanceof GrayF64) {
-			return (T)BlurImageOps.mean((GrayF64)input,(GrayF64)output,radiusX, radiusY, (ImageBorder_F64)border, (GrayF64)storage, (DWorkArrays)workVert);
+			return (T)BlurImageOps.mean((GrayF64)input,(GrayF64)output,radiusX, radiusY, (GrayF64)storage, (DWorkArrays)workVert);
 		} else if( input instanceof Planar) {
-			return (T)BlurImageOps.mean((Planar)input,(Planar)output,radiusX, radiusY, (ImageBorder)border, (ImageGray)storage, workVert);
+			return (T)BlurImageOps.mean((Planar)input,(Planar)output,radiusX, radiusY, (ImageGray)storage, workVert);
+		} else  {
+			throw new IllegalArgumentException("Unsupported image type");
+		}
+	}
+
+	/**
+	 * Applies a mean box filter with borders.
+	 *
+	 * @param input Input image.  Not modified.
+	 * @param output (Optional) Storage for output image, Can be null.  Modified.
+	 * @param radiusX Radius of the box blur function along the x-axis
+	 * @param radiusY Radius of the box blur function along the y-axis
+	 * @param border (Optional) Specified how the image borders are handled. If null then only the inner portion is processed.
+	 * @param storage (Optional) Storage for intermediate results.  Same size as input image.  Can be null.
+	 * @param <T> Input image type.
+	 * @return Output blurred image.
+	 */
+	public static <T extends ImageBase<T>>
+	T meanB(T input, @Nullable T output, int radiusX, int radiusY, @Nullable ImageBorder<T> border, @Nullable ImageBase storage , @Nullable WorkArrays workVert ) {
+		if( input instanceof GrayU8) {
+			return (T)BlurImageOps.meanB((GrayU8) input, (GrayU8) output, radiusX, radiusY, (ImageBorder_S32)border, (GrayU8) storage, (IWorkArrays)workVert);
+		} else if( input instanceof GrayU16) {
+			return (T)BlurImageOps.meanB((GrayU16)input,(GrayU16)output,radiusX, radiusY, (ImageBorder_S32)border,(GrayU16)storage, (IWorkArrays)workVert);
+		} else if( input instanceof GrayF32) {
+			return (T)BlurImageOps.meanB((GrayF32)input,(GrayF32)output,radiusX, radiusY, (ImageBorder_F32)border,(GrayF32)storage, (FWorkArrays)workVert);
+		} else if( input instanceof GrayF64) {
+			return (T)BlurImageOps.meanB((GrayF64)input,(GrayF64)output,radiusX, radiusY, (ImageBorder_F64)border, (GrayF64)storage, (DWorkArrays)workVert);
+		} else if( input instanceof Planar) {
+			return (T)BlurImageOps.meanB((Planar)input,(Planar)output,radiusX, radiusY, (ImageBorder)border, (ImageGray)storage, workVert);
 		} else  {
 			throw new IllegalArgumentException("Unsupported image type");
 		}
