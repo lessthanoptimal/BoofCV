@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,11 +28,17 @@ import boofcv.struct.image.GrayS32;
 import boofcv.visualize.PointCloudViewer;
 import georegression.geometry.ConvertRotation3D_F32;
 import georegression.metric.UtilAngle;
+import georegression.struct.ConvertFloatType;
 import georegression.struct.EulerType;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point3D_F32;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Vector3D_F32;
 import georegression.struct.se.Se3_F32;
 import georegression.transform.se.SePointOps_F32;
+import lombok.Getter;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_B;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -43,6 +49,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -65,9 +72,12 @@ public class PointCloudViewerPanelSwing extends JPanel
 	// use vectors to figure out that rotation
 
 	// Storage for xyz coordinates of points in the count
-	GrowQueue_F32 cloudXyz = new GrowQueue_F32();
+	private @Getter final GrowQueue_F32 cloudXyz = new GrowQueue_F32(); // lock for reading/writing cloud data
 	// Storage for rgb values of points in the cloud
-	GrowQueue_I32 cloudColor = new GrowQueue_I32();
+	private @Getter final GrowQueue_I32 cloudColor = new GrowQueue_I32();
+
+	// Wireframes which will be rendered. Also the LOCK
+	private final FastQueue<Wireframe> wireframes = new FastQueue<>(Wireframe::new);
 
 	// Maximum render distance
 	float maxRenderDistance = Float.MAX_VALUE;
@@ -79,22 +89,32 @@ public class PointCloudViewerPanelSwing extends JPanel
 	// intrinsic camera parameters
 	float hfov = UtilAngle.radian(50);
 
+	//--------- Work Variables for Rendering
 	// transform from world frame to camera frame
 	// Only write to it inside the UI thread. If it is read outside of the UI thread then it needs to be locked
 	final Se3_F32 worldToCamera = new Se3_F32();
 
+	// used when rendering wireframes
+	private final FastQueue<Point3D_F32> cameraPts = new FastQueue<>(Point3D_F32::new);
+	private final FastQueue<Point2D_F32> pixels = new FastQueue<>(Point2D_F32::new);
+	private final GrowQueue_B visible = new GrowQueue_B();
+
+	// used when rendering the point cloud
+	private final Point3D_F32 worldPt = new Point3D_F32();
+	private final Point3D_F32 cameraPt = new Point3D_F32();
+	private final Point3D_F32 pixel = new Point3D_F32();
+
 	// how far it moves in the world frame for each key press
 	float stepSize;
 
-	final Object imageLock = new Object();
 	GrayS32 imageRgb = new GrayS32(1,1);
 	GrayF32 imageDepth = new GrayF32(1,1);
 
 	BufferedImage imageOutput = new BufferedImage(1,1,BufferedImage.TYPE_INT_RGB);
+	//--------- END work variables
 
-	private int dotRadius = 2;
-
-	int backgroundColor = 0;
+	private int dotRadius = 2; // radius of square dot
+	int backgroundColor = 0; // RGB 32-bit format
 
 	// previous mouse location
 	int prevX;
@@ -146,7 +166,25 @@ public class PointCloudViewerPanelSwing extends JPanel
 		shiftPressed = false;
 	}
 
-	synchronized public void setWorldToCamera( Se3_F32 worldToCamera ) {
+	public void addWireFrame(List<Point3D_F64> vertexes, boolean closed, int rgb, int radiusPixels) {
+		synchronized (wireframes) {
+			if (vertexes.size() <= 1)
+				return;
+			Wireframe wf = wireframes.grow();
+			wf.vertexes.reset();
+			wf.rgb = rgb;
+			wf.radiusPixels = radiusPixels;
+			for (int i = 0; i < vertexes.size(); i++) {
+				ConvertFloatType.convert(vertexes.get(i), wf.vertexes.grow());
+			}
+			// add an extra point instead of special logic to close the loop
+			if (closed) {
+				ConvertFloatType.convert(vertexes.get(0), wf.vertexes.grow());
+			}
+		}
+	}
+
+	public void setWorldToCamera( Se3_F32 worldToCamera ) {
 		this.worldToCamera.set(worldToCamera);
 	}
 
@@ -154,28 +192,37 @@ public class PointCloudViewerPanelSwing extends JPanel
 		this.hfov = radians;
 	}
 
-	synchronized public void clearCloud() {
-		cloudXyz.reset();
-		cloudColor.reset();
+	public void clearCloud() {
+		synchronized (cloudXyz) {
+			cloudXyz.reset();
+			cloudColor.reset();
+		}
+		synchronized (wireframes) {
+			wireframes.reset();
+		}
 	}
 
-	synchronized public void addPoint( float x , float y , float z , int rgb ) {
-		cloudXyz.add(x);
-		cloudXyz.add(y);
-		cloudXyz.add(z);
-		cloudColor.add(rgb);
+	public void addPoint( float x , float y , float z , int rgb ) {
+		synchronized (cloudXyz) {
+			cloudXyz.add(x);
+			cloudXyz.add(y);
+			cloudXyz.add(z);
+			cloudColor.add(rgb);
+		}
 	}
-	synchronized public void addPoints( float pointsXYZ[] , int pointsRGB[] , int length ) {
-		int idxSrc = cloudXyz.size*3;
+	public void addPoints( float pointsXYZ[] , int pointsRGB[] , int length ) {
+		synchronized (cloudXyz) {
+			int idxSrc = cloudXyz.size * 3;
 
-		cloudXyz.extend( cloudXyz.size + length*3 );
-		cloudColor.extend( cloudColor.size + length );
+			cloudXyz.extend(cloudXyz.size + length * 3);
+			cloudColor.extend(cloudColor.size + length);
 
-		for (int i = 0, idx=0; i < length; i++) {
-			cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
-			cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
-			cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
-			cloudColor.data[i] = pointsRGB[i];
+			for (int i = 0, idx = 0; i < length; i++) {
+				cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
+				cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
+				cloudXyz.data[idxSrc++] = pointsXYZ[idx++];
+				cloudColor.data[i] = pointsRGB[i];
+			}
 		}
 	}
 
@@ -202,9 +249,6 @@ public class PointCloudViewerPanelSwing extends JPanel
 		g.drawImage(imageOutput,0,0,null);
 	}
 
-	private Point3D_F32 worldPt = new Point3D_F32();
-	private Point3D_F32 cameraPt = new Point3D_F32();
-	private Point3D_F32 pixel = new Point3D_F32();
 	private synchronized void projectScene() {
 		int w = getWidth();
 		int h = getHeight();
@@ -214,20 +258,26 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 		CameraPinhole intrinsic = PerspectiveOps.createIntrinsic(w,h,UtilAngle.degree(hfov));
 
-		float fx = (float)intrinsic.fx;
-		float fy = (float)intrinsic.fy;
-		float cx = (float)intrinsic.cx;
-		float cy = (float)intrinsic.cy;
-
 		ImageMiscOps.fill(imageDepth,Float.MAX_VALUE);
 		ImageMiscOps.fill(imageRgb,backgroundColor);
-
-		PointCloudViewer.Colorizer colorizer = this.colorizer;
 
 		float maxDistanceSq = maxRenderDistance*maxRenderDistance;
 		if( Float.isInfinite(maxDistanceSq))
 			maxDistanceSq = Float.MAX_VALUE;
 
+		synchronized (cloudXyz) {
+			renderCloud(intrinsic, colorizer, maxDistanceSq);
+		}
+		synchronized (wireframes) {
+			renderWireframes(intrinsic, maxDistanceSq);
+		}
+	}
+
+	private void renderCloud(CameraPinhole intrinsic, final PointCloudViewer.Colorizer colorizer, float maxDistanceSq) {
+		final float fx = (float)intrinsic.fx;
+		final float fy = (float)intrinsic.fy;
+		final float cx = (float)intrinsic.cx;
+		final float cy = (float)intrinsic.cy;
 		// NOTE: To make this concurrent there needs to be a way to write the points and not run into race conditions
 		//       Each thread writing to its own image seems too expensive for large images and combining the results
 		int totalPoints = cloudXyz.size/3;
@@ -265,7 +315,82 @@ public class PointCloudViewerPanelSwing extends JPanel
 			if( fog ) {
 				rgb = applyFog(rgb, 1.0f-(float)Math.sqrt(r2)/maxRenderDistance );
 			}
-			renderDot(x,y,cameraPt.z,rgb);
+			renderDot(x,y,cameraPt.z,rgb,dotRadius);
+		}
+	}
+
+	/**
+	 * Draws wire frame sprites
+	 */
+	private void renderWireframes(CameraPinhole intrinsic, float maxDistanceSq ) {
+		final float fx = (float)intrinsic.fx;
+		final float fy = (float)intrinsic.fy;
+		final float cx = (float)intrinsic.cx;
+		final float cy = (float)intrinsic.cy;
+
+		for (int wireIdx = 0; wireIdx < wireframes.size; wireIdx++) {
+			Wireframe wf = wireframes.get(wireIdx);
+			pixels.reset();
+			visible.reset();
+			cameraPts.reset();
+
+			// Compute the pixel coordinates of each vertex and if it's visible or not
+			for (int i = 0; i < wf.vertexes.size; i++) {
+				Point3D_F32 cameraPt = cameraPts.grow();
+				Point2D_F32 pixel = pixels.grow();
+				SePointOps_F32.transform(worldToCamera, wf.vertexes.get(i), cameraPt);
+				pixel.x = fx * cameraPt.x / cameraPt.z + cx;
+				pixel.y = fy * cameraPt.y / cameraPt.z + cy;
+				boolean v = cameraPt.z > 0;//&& imageDepth.isInBounds((int)(pixel.x+0.5f),(int)(pixel.x+0.5f));
+				visible.add(v);
+			}
+
+			// if two consecutive pixels are visible draw that line
+			// A line is drawn by rending square dots every pixel. This was done because it was easy to program
+			// rendering a smooth line is a way someone could improve this code
+			for (int i = 0, j = 1; j < wf.vertexes.size; i = j, j++) {
+				if (!visible.get(i) || !visible.get(j))
+					continue;
+				Point2D_F32 a = pixels.get(i);
+				Point2D_F32 b = pixels.get(j);
+				Point3D_F32 A = cameraPts.get(i);
+				Point3D_F32 B = cameraPts.get(j);
+
+				float distance = a.distance(b);
+				// Draw the dots less often when the radius is larger make it render faster
+				int N = (int) Math.ceil(distance / (1.0 + 1.5 * wf.radiusPixels));
+
+				// skip the rest if it's too small
+				if (N < 1)
+					continue;
+
+				for (int locidx = 0; locidx < N; locidx++) {
+					// interpolate to find the coordinate along the line in 2D and 3D
+					float lineLoc = locidx / (float) N;
+					cameraPt.x = (B.x - A.x) * lineLoc + A.x;
+					cameraPt.y = (B.y - A.y) * lineLoc + A.y;
+					cameraPt.z = (B.z - A.z) * lineLoc + A.z;
+
+					float r2 = cameraPt.normSq();
+					if (r2 > maxDistanceSq)
+						continue;
+
+					// Since the two vertexes are inside the image the inner points must also be
+					float x = (b.x - a.x) * lineLoc + a.x;
+					float y = (b.y - a.y) * lineLoc + a.y;
+					int px = (int) (x + 0.5f);
+					int py = (int) (y + 0.5f);
+
+					if( !imageDepth.isInBounds(px,py) )
+						continue;
+
+					int rgb = wf.rgb;
+					if (fog) {
+						rgb = applyFog(rgb, 1.0f - (float) Math.sqrt(r2) / maxRenderDistance);
+					}
+					renderDot(px, py, cameraPt.z, rgb, wf.radiusPixels);
+				}
+			}
 		}
 	}
 
@@ -290,7 +415,7 @@ public class PointCloudViewerPanelSwing extends JPanel
 	/**
 	 * Renders a dot as a square sprite with the specified color
 	 */
-	private void renderDot( int cx , int cy , float Z , int rgb ) {
+	private void renderDot( int cx , int cy , float Z , int rgb, final int dotRadius ) {
 		for (int i = -dotRadius; i <= dotRadius; i++) {
 			int y = cy+i;
 			if( y < 0 || y >= imageRgb.height )
@@ -434,5 +559,11 @@ public class PointCloudViewerPanelSwing extends JPanel
 
 	public void setDotRadius(int dotRadius) {
 		this.dotRadius = dotRadius;
+	}
+
+	private static class Wireframe {
+		public final FastQueue<Point3D_F32> vertexes = new FastQueue<>(Point3D_F32::new);
+		public int radiusPixels = 1;
+		public int rgb;
 	}
 }

@@ -232,6 +232,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		frame = 0;
 		traveled = 0.0;
 		prev_to_world.reset();
+		egoMotion_cam_to_world.reset();
 		alg.reset();
 		alg.setCalibration(stereoParameters);
 
@@ -389,8 +390,9 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		boolean showNew = false;
 
 		double maxDepth=0; // Maximum depth a feature is from the camera when last viewed
-		boolean showCameras=false; // show camera locations in 3D view
+		boolean showCameras=true; // show camera locations in 3D view
 		boolean showCloud=true; // Show point cloud created from feature tracks
+		int showEveryCameraN = 5; // show the camera every N frames
 		// the maximum number of frames in the past the track was first spawned and stuff be visible. 0 = infinite
 		int maxTrackAge=0;
 
@@ -415,6 +417,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		// Cloud Visualization Controls
 		final JSpinner spinMaxDepth = spinner(maxDepth,0.0,100.0,1.0);
 		final JCheckBox checkCameras = checkbox("Cameras",showCameras,"Render camera locations");
+		final JSpinner spinCameraN = spinner(showEveryCameraN,1,500,1);
 		final JCheckBox checkCloud = checkbox("Cloud",showCloud,"Show sparse point cloud");
 		final JSpinner spinMaxTrackAge = spinner(maxTrackAge,0,999,5);
 		final ControlPanelPointCloud cloudColor = new ControlPanelPointCloud(()->cloudPanel.updateVisuals(true));
@@ -432,6 +435,8 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 			cloudColor.setBorder(BorderFactory.createEmptyBorder()); // save screen real estate
 
+			spinCameraN.setToolTipText("Show the camera location every N frames");
+
 			var panelInfo = new StandardAlgConfigPanel();
 			panelInfo.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Statistics"));
 			panelInfo.addLabeled(labelInliersN,"Inliers","Tracks that were inliers in this frame");
@@ -446,7 +451,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			panelCloud.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Cloud"));
 			panelCloud.addLabeled(spinMaxDepth,"Max Depth","Maximum distance relative to stereo baseline");
 			panelCloud.addLabeled(spinMaxTrackAge,"Max Age","Only draw tracks which were first seen than this value");
-			panelCloud.addAlignLeft(checkCameras);
+			panelCloud.add(fillHorizontally(gridPanel(2,checkCameras,spinCameraN)));
 			panelCloud.addAlignLeft(checkCloud);
 			panelCloud.add(cloudColor);
 
@@ -522,6 +527,13 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 				stereoPanel.repaint();
 			} else if( source == checkCloud ) {
 				showCloud = checkCloud.isSelected();
+				cloudPanel.update();
+			} else if( source == checkCameras ) {
+				showCameras = checkCameras.isSelected();
+				spinCameraN.setEnabled(showCameras);
+				cloudPanel.update();
+			} else if( source == spinCameraN ) {
+				showEveryCameraN = ((Number)spinCameraN.getValue()).intValue();
 				cloudPanel.update();
 			} else if( source == spinMaxDepth ) {
 				maxDepth = ((Number)spinMaxDepth.getValue()).doubleValue();
@@ -606,6 +618,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 	class PointCloudPanel extends JPanel {
 		PointCloudViewer gui = VisualizeData.createPointCloudViewer();
+		FastQueue<Point3D_F64> vertexes = new FastQueue<>(Point3D_F64::new);
 
 		public PointCloudPanel() {
 			super(new BorderLayout());
@@ -632,14 +645,40 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		public void update()
 		{
 			BoofSwingUtil.checkGuiThread();
-
-			double maxDepth = controls.maxDepth*stereoParameters.getBaseline()*10;
 			updateVisuals(false);
-			gui.clearPoints();
-			if( controls.showCloud ) {
-				final long frameID = alg.getFrameID();
-				synchronized (features) {
+			final double maxDepth = controls.maxDepth*stereoParameters.getBaseline()*10;
+			final double r = stereoParameters.getBaseline()/2.0;
+			final long frameID = alg.getFrameID();
 
+			gui.clearPoints();
+			if( controls.showCameras ) {
+				synchronized (features) {
+					// if configured to do so, only render the more recent cameras
+					int startIndex = 0;
+					if( controls.maxTrackAge > 0 )
+						startIndex = Math.max(0, egoMotion_cam_to_world.size-controls.maxTrackAge);
+					for (int i = startIndex; i < egoMotion_cam_to_world.size; i += controls.showEveryCameraN) {
+						Se3_F64 cam_to_world = egoMotion_cam_to_world.get(i);
+
+						// Represent the camera with a box
+						vertexes.reset();
+						vertexes.grow().set(-r, -r, 0);
+						vertexes.grow().set(r, -r, 0);
+						vertexes.grow().set(r, r, 0);
+						vertexes.grow().set(-r, r, 0);
+
+						for (int j = 0; j < vertexes.size; j++) {
+							var p = vertexes.get(j);
+							SePointOps_F64.transform(cam_to_world, p, p);
+						}
+
+						gui.addWireFrame(vertexes.toList(), true, 0xFF0000, 1);
+					}
+				}
+			}
+
+			if( controls.showCloud ) {
+				synchronized (features) {
 					for (int i = 0; i < features.size; i++) {
 						FeatureInfo f = features.get(i);
 						if (!f.inlier)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,6 +76,11 @@ public interface PointCloudViewer {
 	 * adds a single point to the point cloud. This method can be very slow compared to doing it in a batch
 	 */
 	void addPoint( double x , double y , double z , int rgb );
+
+	/**
+	 * Adds a spite wireframe to the view. Since it's a sprite the thickness is independent of distance.
+	 */
+	void addWireFrame( List<Point3D_F64> vertexes , boolean closed , int rgb , int radiusPixels );
 
 	/**
 	 * Removes all points from the point cloud

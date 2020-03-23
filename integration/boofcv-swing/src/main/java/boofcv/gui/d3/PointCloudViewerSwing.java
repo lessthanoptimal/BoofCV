@@ -139,6 +139,11 @@ public class PointCloudViewerSwing implements PointCloudViewer {
 	}
 
 	@Override
+	public void addWireFrame(List<Point3D_F64> vertexes, boolean closed, int rgb, int widthPixels) {
+		BoofSwingUtil.invokeNowOrLater(()-> panel.addWireFrame(vertexes,closed,rgb,widthPixels));
+	}
+
+	@Override
 	public void clearPoints() {
 		if( SwingUtilities.isEventDispatchThread() ) {
 			panel.clearCloud();
@@ -189,24 +194,28 @@ public class PointCloudViewerSwing implements PointCloudViewer {
 			copy.reset();
 
 		// See if it has color information on the points or not
-		int N = panel.cloudXyz.size/3;
-		if( N == panel.cloudColor.size ) {
-			int idxXyz = 0;
-			for (int i = 0; i < N; i++) {
-				Point3dRgbI_F64 p = copy.grow();
-				p.x = panel.cloudXyz.data[idxXyz++];
-				p.y = panel.cloudXyz.data[idxXyz++];
-				p.z = panel.cloudXyz.data[idxXyz++];
-				p.rgb = panel.cloudColor.data[i];
-			}
-		} else {
-			int idxXyz = 0;
-			for (int i = 0; i < N; i++) {
-				Point3dRgbI_F64 p = copy.grow();
-				p.x = panel.cloudXyz.data[idxXyz++];
-				p.y = panel.cloudXyz.data[idxXyz++];
-				p.z = panel.cloudXyz.data[idxXyz++];
-				p.rgb = 0;
+		final GrowQueue_F32 cloudXyz = panel.getCloudXyz();
+		final GrowQueue_I32 cloudColor = panel.getCloudColor();
+		synchronized (cloudXyz) {
+			int N = cloudXyz.size / 3;
+			if (N == cloudColor.size) {
+				int idxXyz = 0;
+				for (int i = 0; i < N; i++) {
+					Point3dRgbI_F64 p = copy.grow();
+					p.x = cloudXyz.data[idxXyz++];
+					p.y = cloudXyz.data[idxXyz++];
+					p.z = cloudXyz.data[idxXyz++];
+					p.rgb = cloudColor.data[i];
+				}
+			} else {
+				int idxXyz = 0;
+				for (int i = 0; i < N; i++) {
+					Point3dRgbI_F64 p = copy.grow();
+					p.x = cloudXyz.data[idxXyz++];
+					p.y = cloudXyz.data[idxXyz++];
+					p.z = cloudXyz.data[idxXyz++];
+					p.rgb = 0;
+				}
 			}
 		}
 
