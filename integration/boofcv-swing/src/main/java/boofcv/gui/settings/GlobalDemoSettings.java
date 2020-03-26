@@ -91,33 +91,19 @@ public class GlobalDemoSettings implements Cloneable {
 					selectedName = UIManager.getSystemLookAndFeelClassName();
 				else
 					selectedName = UIManager.getCrossPlatformLookAndFeelClassName();
-				JFrame.setDefaultLookAndFeelDecorated(false);
 				break;
 			case DARKULA:
 				LafManager.setTheme(new DarculaTheme());
 				selectedName = DarkLaf.class.getCanonicalName();
-				JFrame.setDefaultLookAndFeelDecorated(true);
 				break;
 			case INTELLIJ:
 				LafManager.setTheme(new IntelliJTheme());
 				selectedName = DarkLaf.class.getCanonicalName();
-				JFrame.setDefaultLookAndFeelDecorated(true);
 				break;
 			case SOLARIZED:
 				LafManager.setTheme(new SolarizedLightTheme());
 				selectedName = DarkLaf.class.getCanonicalName();
-				JFrame.setDefaultLookAndFeelDecorated(true);
 				break;
-//			case WEBLAF: selectedInstance = new WebLookAndFeel(); break;
-//			case TATOO_HiFi: {
-//				Properties props = new Properties();
-//				props.put("logoString", "");
-//				HiFiLookAndFeel.setCurrentTheme(props);
-//				selectedInstance = new HiFiLookAndFeel();
-//			}break;
-//			case TATOO_GRAPHITE: selectedInstance = new GraphiteLookAndFeel(); break;
-//			case TATOO_SMART: selectedInstance = new SmartLookAndFeel(); break;
-//			case TATOO_TEXTURE: selectedInstance = new TextureLookAndFeel(); break;
 			case MARS_DARK: selectedInstance = new MaterialLookAndFeel(new JMarsDarkTheme()); break;
 			case MATERIAL_LITE: selectedInstance = new MaterialLookAndFeel(new MaterialLiteTheme()); break;
 			case MATERIAL_OCEANIC: selectedInstance = new MaterialLookAndFeel(new MaterialOceanicTheme()); break;
@@ -147,11 +133,6 @@ public class GlobalDemoSettings implements Cloneable {
 		DARKULA("Darkula"),
 		INTELLIJ("IntelliJ"),
 		SOLARIZED("Solarized"),
-//		WEBLAF("Weblaf"),
-//		TATOO_HiFi("Tatoo HiFi"),
-//		TATOO_TEXTURE("Tatoo Texture"),
-//		TATOO_GRAPHITE("Tatoo Graphite"),
-//		TATOO_SMART("Tatoo Smart"),
 		MARS_DARK("Mars Dark"),
 		MATERIAL_LITE("Material Lite"),
 		MATERIAL_OCEANIC("Material Oceanic");

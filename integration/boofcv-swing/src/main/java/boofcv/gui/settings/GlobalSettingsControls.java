@@ -20,6 +20,7 @@ package boofcv.gui.settings;
 
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.dialogs.JSpringPanel;
+import com.github.weisj.darklaf.LafManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -117,7 +118,11 @@ public class GlobalSettingsControls extends StandardAlgConfigPanel implements Ac
 		if( !canceled ) {
 			if( changedTheme ) {
 				settings.changeTheme();
-				JOptionPane.showMessageDialog(parent,"Restart to change theme");
+				// Update the all windows with the new theme
+				LafManager.updateLaf();
+				// This warning is needed since not all changes from the previous LAF are reset and can result
+				// in really messed up looking themes
+				JOptionPane.showMessageDialog(parent,"Restart to ensure the theme renders correctly");
 			}
 		}
 	}

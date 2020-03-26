@@ -8,5 +8,5 @@ dependencies {
     api project(':main:boofcv-recognition')
     api 'com.fifesoft:rsyntaxtextarea:2.6.1'
     api 'io.github.vincenzopalazzo:material-ui-swing:1.1.1_pre-release_6.1'
-    api 'com.github.weisj:darklaf-core:1.4.1.0'
+    api 'com.github.weisj:darklaf-core:1.4.3.1'
 }
