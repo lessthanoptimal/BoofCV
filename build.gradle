@@ -343,7 +343,7 @@ task testReport(type: TestReport) {
 
 wrapper {
     distributionType = Wrapper.DistributionType.BIN
-    gradleVersion = '6.3.0-rc-4'
+    gradleVersion = '6.3'
 }
 
 // Disable the creation of jars for distribution.  If you don't do this it will crash
