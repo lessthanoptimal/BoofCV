@@ -18,16 +18,16 @@
 
 package boofcv.alg.feature.disparity.block.select;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import boofcv.alg.feature.disparity.block.SelectSparseStandardWta;
 
 /**
  * @author Peter Abeles
  */
-public class TestSelectSparseCorrelationSubpixel {
-	@Test
-	public void stuff() {
-		fail("implement");
+public class TestSelectSparseCorrelationSubpixel
+		extends ChecksBasicSelectSparseDisparityWithChecks.CheckCorrelation
+{
+	@Override
+	protected SelectSparseStandardWta<float[]> createAlg(int maxError, double texture) {
+		return new SelectSparseCorrelationSubpixel.F32(texture);
 	}
 }

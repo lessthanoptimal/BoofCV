@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class CheckBasicSelectDisparity<ArrayData , D extends ImageGray<D>> {
+public abstract class ChecksBasicSelectDisparity<ArrayData , D extends ImageGray<D>> {
 
 	Class<ArrayData> arrayType;
 
@@ -47,7 +47,7 @@ public abstract class CheckBasicSelectDisparity<ArrayData , D extends ImageGray<
 
 	DisparitySelect<ArrayData,D> alg;
 
-	protected CheckBasicSelectDisparity(Class<ArrayData> arrayType , Class<D> disparityType ) {
+	protected ChecksBasicSelectDisparity(Class<ArrayData> arrayType , Class<D> disparityType ) {
 
 		this.arrayType = arrayType;
 		disparity = GeneralizedImageOps.createSingleBand(disparityType,w,h);
@@ -121,7 +121,7 @@ public abstract class CheckBasicSelectDisparity<ArrayData , D extends ImageGray<
 	public abstract int computeError( int d );
 
 	public abstract static class ScoreError<ArrayData , D extends ImageGray<D>>
-			extends CheckBasicSelectDisparity<ArrayData,D>
+			extends ChecksBasicSelectDisparity<ArrayData,D>
 	{
 		protected ScoreError(Class<ArrayData> arrayType, Class<D> disparityType) {
 			super(arrayType, disparityType);
@@ -132,7 +132,7 @@ public abstract class CheckBasicSelectDisparity<ArrayData , D extends ImageGray<
 	}
 
 	public abstract static class ScoreCorrelation<ArrayData , D extends ImageGray<D>>
-			extends CheckBasicSelectDisparity<ArrayData,D>
+			extends ChecksBasicSelectDisparity<ArrayData,D>
 	{
 		protected ScoreCorrelation(Class<ArrayData> arrayType, Class<D> disparityType) {
 			super(arrayType, disparityType);

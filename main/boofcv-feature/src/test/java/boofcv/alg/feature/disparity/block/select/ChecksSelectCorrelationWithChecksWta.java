@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends ImageGray<T>>
-		extends CheckBasicSelectDisparity.ScoreCorrelation<ArrayData,T>
+		extends ChecksBasicSelectDisparity.ScoreCorrelation<ArrayData,T>
 {
 
 	int w=20;
@@ -136,7 +136,7 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 		int minValue = 3;
 		int y = 3;
 
-		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,3);
+		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,0.2);
 		alg.configure(disparity,minDisparity,maxDisparity,2);
 
 		int[] scores = new int[w*rangeDisparity];
@@ -169,7 +169,7 @@ public abstract class ChecksSelectCorrelationWithChecksWta<ArrayData,T extends I
 		int y = 3;
 		int r = 2;
 
-		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,3);
+		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,0.2);
 		alg.configure(disparity,minDisparity,maxDisparity,r);
 
 		int[] scores = new int[w*rangeDisparity];

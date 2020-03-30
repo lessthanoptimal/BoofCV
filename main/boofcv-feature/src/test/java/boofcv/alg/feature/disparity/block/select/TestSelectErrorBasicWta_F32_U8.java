@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -24,7 +24,7 @@ import boofcv.struct.image.GrayU8;
 /**
  * @author Peter Abeles
  */
-public class TestSelectErrorBasicWta_F32_U8 extends CheckBasicSelectDisparity.ScoreError<float[],GrayU8> {
+public class TestSelectErrorBasicWta_F32_U8 extends ChecksBasicSelectDisparity.ScoreError<float[],GrayU8> {
 
 	TestSelectErrorBasicWta_F32_U8() {
 		super(float[].class,GrayU8.class);

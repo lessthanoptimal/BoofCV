@@ -62,6 +62,7 @@ Version : 0.36
   * TODO Update Demonstration Apps
 - Stereo
   * Added sparse disparity with Census and NCC
+  * Changed how correlation texture check is done. Before two identical peaks didn't get filtered.
   * TODO Added sparse forwards-backwards validation
 - Android
   * Changed image workspace from byte[] to GrowQueue_I8 so that it can be dynamically computed.

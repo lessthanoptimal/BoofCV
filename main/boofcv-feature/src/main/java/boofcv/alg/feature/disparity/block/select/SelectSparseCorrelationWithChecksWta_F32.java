@@ -75,7 +75,7 @@ public class SelectSparseCorrelationWithChecksWta_F32 extends SelectSparseStanda
 
 			// similar scores indicate lack of texture
 			// C = (C2-C1)/C1
-			if( scoreBest-secondBest >= (1.0f-textureThreshold)*secondBest )
+			if( scoreBest-secondBest <= textureThreshold*secondBest )
 				return false;
 		}
 

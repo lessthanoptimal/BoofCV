@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -129,7 +129,7 @@ public abstract class SelectCorrelationWithChecks_F32<DI extends ImageGray<DI>>
 
 				// similar scores indicate lack of texture
 				// C = (C2-C1)/C1
-				if( scoreBest-secondBest >= (1.0f-textureThreshold)*secondBest )
+				if( scoreBest-secondBest <= textureThreshold*secondBest )
 					bestDisparity = invalidDisparity;
 			}
 

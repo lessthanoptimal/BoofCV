@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -57,9 +57,9 @@ public class ConfigDisparityBM implements Configuration {
 	public int validateRtoL=1;
 	/**
 	 * Tolerance for how similar optimal region is to other region.  Closer to zero is more tolerant.
-	 * Try 0.1 for SAD or 0.7 for NCC. Disable with a value &le; 0
+	 * Try 0.1. Disable with a value &le; 0
 	 */
-	public double texture = 0.15;
+	public double texture = 0.1;
 	/**
 	 * If subpixel should be used to find disparity or not. If on then output disparity image needs to me GrayF32.
 	 * If false then GrayU8.

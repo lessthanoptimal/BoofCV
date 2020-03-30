@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,9 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-public class TestSelectSparseStandardSubpixel_S32 extends ChecksSelectSparseStandardWta<int[]> {
+public class TestSelectSparseErrorSubpixel_S32
+		extends ChecksBasicSelectSparseDisparityWithChecks.CheckError<int[]> {
 
-	public TestSelectSparseStandardSubpixel_S32() {
+	TestSelectSparseErrorSubpixel_S32() {
 		super(int[].class);
 	}
 
@@ -43,7 +44,7 @@ public class TestSelectSparseStandardSubpixel_S32 extends ChecksSelectSparseStan
 	 * Given different local error values see if it is closer to the value with a smaller error
 	 */
 	@Test
-	public void addSubpixelBias() {
+	void addSubpixelBias() {
 
 		SelectSparseErrorSubpixel.S32 alg = new SelectSparseErrorSubpixel.S32(-1,-1);
 

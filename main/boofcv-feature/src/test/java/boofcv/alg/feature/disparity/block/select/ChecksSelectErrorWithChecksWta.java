@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGray<T>>
-		extends CheckBasicSelectDisparity.ScoreError<ArrayData,T>
+		extends ChecksBasicSelectDisparity.ScoreError<ArrayData,T>
 {
 
 	int w=20;

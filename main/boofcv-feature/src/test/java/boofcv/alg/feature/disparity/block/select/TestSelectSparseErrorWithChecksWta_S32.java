@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,8 +23,9 @@ import boofcv.alg.feature.disparity.block.SelectSparseStandardWta;
 /**
  * @author Peter Abeles
  */
-public class TestSelectSparseErrorWithChecksWta_S32 extends ChecksSelectSparseStandardWta<int[]> {
-
+public class TestSelectSparseErrorWithChecksWta_S32
+		extends ChecksBasicSelectSparseDisparityWithChecks.CheckError<int[]>
+{
 	TestSelectSparseErrorWithChecksWta_S32() {
 		super(int[].class);
 	}

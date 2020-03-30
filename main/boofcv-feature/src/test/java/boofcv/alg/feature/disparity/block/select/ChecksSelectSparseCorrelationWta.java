@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,14 +23,10 @@ import boofcv.alg.feature.disparity.block.SelectSparseStandardWta;
 /**
  * @author Peter Abeles
  */
-public class TestSelectSparseStandardWta_F32 extends ChecksSelectSparseStandardWta<float[]> {
-
-	public TestSelectSparseStandardWta_F32() {
-		super(float[].class);
-	}
+public abstract class ChecksSelectSparseCorrelationWta extends ChecksBasicSelectSparseDisparityWithChecks.CheckCorrelation {
 
 	@Override
 	protected SelectSparseStandardWta<float[]> createAlg(int maxError, double texture) {
-		return new SelectSparseErrorWithChecksWta_F32(maxError,texture);
+		return null;
 	}
 }
