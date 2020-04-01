@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,13 +25,12 @@ import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Peter Abeles
  */
-public class TestLoadFileImageSequence {
+class TestLoadFileImageSequence {
 
 	private String imagePath = getClass().getResource("/boofcv/io/image/wrapper/images/").getFile();
 
@@ -39,14 +38,14 @@ public class TestLoadFileImageSequence {
 	 * See if it loads the expected number of files.
 	 */
 	@Test
-	public void basicLoadTest() {
+	void basicLoadTest() {
 
-		LoadFileImageSequence<GrayF32> alg = new LoadFileImageSequence<>(ImageType.single(GrayF32.class),
+		var alg = new LoadFileImageSequence<>(ImageType.single(GrayF32.class),
 				imagePath,"png");
 
-		assertTrue(alg.getImageType().getFamily() == ImageType.Family.GRAY);
-		assertTrue(ImageDataType.F32 == alg.getImageType().getDataType());
-		assertTrue(!alg.isLoop());
+		assertSame(alg.getImageType().getFamily(), ImageType.Family.GRAY);
+		assertSame(ImageDataType.F32, alg.getImageType().getDataType());
+		assertFalse(alg.isLoop());
 
 		int total = 0;
 		while( alg.hasNext() ) {
@@ -67,7 +66,7 @@ public class TestLoadFileImageSequence {
 	 * See if it loads the expected number of files.
 	 */
 	@Test
-	public void checkLoop() {
+	void checkLoop() {
 		LoadFileImageSequence<GrayF32> alg = new LoadFileImageSequence<>(ImageType.single(GrayF32.class),
 				imagePath,"png");
 		alg.setLoop(true);

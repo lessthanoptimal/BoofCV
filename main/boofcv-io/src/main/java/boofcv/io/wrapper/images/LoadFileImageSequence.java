@@ -117,7 +117,6 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 		}
 
 		Collections.sort(fileNames);
-		next();
 	}
 
 	@Override
