@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestSelectErrorSubpixel {
 
 	@Nested
-	public class F32_F32 extends ChecksSelectErrorWithChecksWta<float[],GrayF32> {
+	public class F32_F32 extends ChecksSelectDisparityWithChecksWtaError<float[],GrayF32> {
 		public F32_F32() {
 			super(float[].class,GrayF32.class);
 		}
@@ -70,7 +70,7 @@ public class TestSelectErrorSubpixel {
 	}
 
 	@Nested
-	public class S32_F32 extends ChecksSelectErrorWithChecksWta<int[],GrayF32> {
+	public class S32_F32 extends ChecksSelectDisparityWithChecksWtaError<int[],GrayF32> {
 		public S32_F32() {
 			super(int[].class,GrayF32.class);
 		}

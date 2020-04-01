@@ -24,7 +24,7 @@ import boofcv.struct.image.GrayU8;
 /**
  * @author Peter Abeles
  */
-public class TestSelectErrorBasicWta_S32_U8 extends ChecksBasicSelectDisparity.ScoreError<int[],GrayU8> {
+public class TestSelectErrorBasicWta_S32_U8 extends ChecksSelectDisparity<int[],GrayU8> {
 
 	TestSelectErrorBasicWta_S32_U8() {
 		super(int[].class,GrayU8.class);
@@ -33,5 +33,10 @@ public class TestSelectErrorBasicWta_S32_U8 extends ChecksBasicSelectDisparity.S
 	@Override
 	public DisparitySelect<int[],GrayU8> createAlg() {
 		return new SelectErrorBasicWta_S32_U8();
+	}
+
+	@Override
+	public int convertErrorToScore(int d) {
+		return d;
 	}
 }

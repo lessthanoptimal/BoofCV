@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Peter Abeles
  */
 public class TestSelectSparseErrorSubpixel_S32
-		extends ChecksBasicSelectSparseDisparityWithChecks.CheckError<int[]> {
+		extends ChecksSelectSparseDisparityWithChecks.CheckError<int[]> {
 
 	TestSelectSparseErrorSubpixel_S32() {
 		super(int[].class);

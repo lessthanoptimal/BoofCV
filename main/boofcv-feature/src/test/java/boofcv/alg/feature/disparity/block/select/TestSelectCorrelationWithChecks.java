@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Nested;
  */
 class TestSelectCorrelationWithChecks {
 	@Nested
-	public class F32_U8 extends ChecksSelectCorrelationWithChecksWta<float[], GrayU8> {
+	public class F32_U8 extends ChecksSelectDisparityWithChecksWta<float[], GrayU8> {
 		F32_U8() {
 			super(float[].class,GrayU8.class);
 		}
@@ -34,6 +34,11 @@ class TestSelectCorrelationWithChecks {
 		@Override
 		public SelectCorrelationWithChecks_F32<GrayU8> createSelector(int rightToLeftTolerance, double texture) {
 			return new SelectCorrelationWithChecks_F32.DispU8(rightToLeftTolerance,texture);
+		}
+
+		@Override
+		public int convertErrorToScore(int d) {
+			return -d;
 		}
 	}
 }

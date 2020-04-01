@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Peter Abeles
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class ChecksBasicSelectDisparity<ArrayData , D extends ImageGray<D>> {
+public abstract class ChecksSelectDisparity<ArrayData , D extends ImageGray<D>> {
 
 	Class<ArrayData> arrayType;
 
@@ -47,7 +47,7 @@ public abstract class ChecksBasicSelectDisparity<ArrayData , D extends ImageGray
 
 	DisparitySelect<ArrayData,D> alg;
 
-	protected ChecksBasicSelectDisparity(Class<ArrayData> arrayType , Class<D> disparityType ) {
+	protected ChecksSelectDisparity(Class<ArrayData> arrayType , Class<D> disparityType ) {
 
 		this.arrayType = arrayType;
 		disparity = GeneralizedImageOps.createSingleBand(disparityType,w,h);
@@ -74,7 +74,11 @@ public abstract class ChecksBasicSelectDisparity<ArrayData , D extends ImageGray
 		simpleTest(4,11,3);
 	}
 
-	private ArrayData copyToCorrectType( int scores[] ) {
+	protected ArrayData copyToCorrectType( int[] scores ) {
+		return copyToCorrectType(scores, arrayType);
+	}
+
+	static <ArrayData> ArrayData copyToCorrectType( int[] scores , Class<ArrayData> arrayType ) {
 
 		if( arrayType == int[].class )
 			return (ArrayData)scores;
@@ -100,7 +104,7 @@ public abstract class ChecksBasicSelectDisparity<ArrayData , D extends ImageGray
 
 		for( int d = 0; d < rangeDisparity; d++ ) {
 			for( int x = 0; x < w-minDisparity; x++ ) {
-				scores[w*d+x] = computeError(d);
+				scores[w*d+x] = convertErrorToScore(Math.abs(d-5));
 			}
 		}
 
@@ -118,27 +122,5 @@ public abstract class ChecksBasicSelectDisparity<ArrayData , D extends ImageGray
 			assertEquals(5, GeneralizedImageOps.get(disparity, i, y),0.99);
 	}
 
-	public abstract int computeError( int d );
-
-	public abstract static class ScoreError<ArrayData , D extends ImageGray<D>>
-			extends ChecksBasicSelectDisparity<ArrayData,D>
-	{
-		protected ScoreError(Class<ArrayData> arrayType, Class<D> disparityType) {
-			super(arrayType, disparityType);
-		}
-		public int computeError( int d ) {
-			return Math.abs(d-5);
-		}
-	}
-
-	public abstract static class ScoreCorrelation<ArrayData , D extends ImageGray<D>>
-			extends ChecksBasicSelectDisparity<ArrayData,D>
-	{
-		protected ScoreCorrelation(Class<ArrayData> arrayType, Class<D> disparityType) {
-			super(arrayType, disparityType);
-		}
-		public int computeError( int d ) {
-			return 5-Math.abs(d-5);
-		}
-	}
+	public abstract int convertErrorToScore( int d );
 }

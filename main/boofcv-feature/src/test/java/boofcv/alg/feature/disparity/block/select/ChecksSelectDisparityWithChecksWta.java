@@ -28,15 +28,11 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit tests for implementers of {@link SelectDisparityWithChecksWta}
- *
  * @author Peter Abeles
  */
-@SuppressWarnings("WeakerAccess")
-public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGray<T>>
-		extends ChecksBasicSelectDisparity.ScoreError<ArrayData,T>
+public abstract class ChecksSelectDisparityWithChecksWta<ArrayData , D extends ImageGray<D>>
+	extends ChecksSelectDisparity<ArrayData,D>
 {
-
 	int w=20;
 	int h=25;
 	int minDisparity=-1;
@@ -44,9 +40,8 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 	int rangeDisparity;
 	int reject;
 
-	public ChecksSelectErrorWithChecksWta(Class<ArrayData> arrayType, Class<T> disparityType) {
-		super(arrayType,disparityType);
-		this.arrayType = arrayType;
+	protected ChecksSelectDisparityWithChecksWta(Class<ArrayData> arrayType, Class<D> disparityType) {
+		super(arrayType, disparityType);
 		disparity = GeneralizedImageOps.createSingleBand(disparityType,w,h);
 	}
 
@@ -58,63 +53,18 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 		GImageMiscOps.fill(disparity, reject);
 	}
 
-	public abstract SelectDisparityWithChecksWta<ArrayData,T> createSelector(int maxError, int rightToLeftTolerance, double texture );
+	public abstract SelectDisparityWithChecksWta<ArrayData,D> createSelector(int rightToLeftTolerance, double texture );
 
-	public DisparitySelect<ArrayData, T> createAlg() {
-		return createSelector(-1, -1, -1);
-	}
-
-	@Test
-	void maxError() {
-		init(0,10);
-
-		int y = 3;
-
-		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(2,-1,-1);
-		alg.configure(disparity,0,maxDisparity,2);
-
-		int[] scores = new int[w*rangeDisparity];
-
-		for( int d = 0; d < rangeDisparity; d++ ) {
-			for( int x = 0; x < w; x++ ) {
-				scores[w*d+x] = d==0 ? 5 : x;
-			}
-		}
-
-		alg.process(y, copyToCorrectType(scores,arrayType));
-
-		// Below error threshold and disparity of 1 should be optimal
-		assertEquals(1, getDisparity( 1, y), 1e-8);
-		assertEquals(1, getDisparity(2, y), 1);
-		// At this point the error should become too high
-		assertEquals(reject, getDisparity(3, y), 1e-8);
-		assertEquals(reject, getDisparity(4, y), 1e-8);
-
-		// Sanity check, much higher error threshold
-		alg = createSelector(20,-1,-1);
-		alg.configure(disparity,0,maxDisparity,2);
-		alg.process(y,copyToCorrectType(scores,arrayType));
-		assertEquals(1, getDisparity( 3, y), 1);
-		assertEquals(1, getDisparity(4, y), 1);
-	}
-
-	/**
-	 * Could potentially return a sub-pixel accuracy but tests are only for pixel accuracy.
-	 *
-	 * Will not work in all situations since the movement could be farther than 0.5 from
-	 * the "correct" value
-	 */
-	private int getDisparity( int x , int y ) {
-		double value = GeneralizedImageOps.get(disparity, x, y);
-		return (int)Math.round(value);
+	public DisparitySelect<ArrayData, D> createAlg() {
+		return createSelector(-1, -1);
 	}
 
 	/**
 	 * Similar to simpleTest but takes in account the effects of right to left validation
 	 */
 	@Test
-	void testRightToLeftValidation() {
-
+	void testRightToLeftValidation()
+	{
 		rightToLeftValidation(0);
 		rightToLeftValidation(2);
 	}
@@ -125,18 +75,18 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 		int y = 3;
 		int r = 2;
 
-		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,1,-1);
+		SelectDisparityWithChecksWta<ArrayData,D> alg = createSelector(1,-1);
 		alg.configure(disparity,minDisparity,maxDisparity,r);
 
 		int[] scores = new int[w*rangeDisparity];
 
 		for( int d = 0; d < rangeDisparity; d++ ) {
 			for( int x = 0; x < w; x++ ) {
-				scores[w*d+x] = Math.abs(d-5);
+				scores[w*d+x] = convertErrorToScore(Math.abs(d-5));
 			}
 		}
 
-		alg.process(y,copyToCorrectType(scores,arrayType));
+		alg.process(y,copyToCorrectType(scores));
 
 		// Less than the minimum disparity should be reject
 		for( int i = 0; i < minDisparity; i++ )
@@ -153,9 +103,9 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 			assertEquals(5, getDisparity(i, y), 1e-8);
 
 		// sanity check, I now set the tolerance to zero
-		alg = createSelector(-1,0,-1);
+		alg = createSelector(0,-1);
 		alg.configure(disparity,minDisparity,maxDisparity,2);
-		alg.process(y,copyToCorrectType(scores,arrayType));
+		alg.process(y,copyToCorrectType(scores));
 		assertEquals(reject, getDisparity(4 + minDisparity, y), 1e-8);
 	}
 
@@ -165,21 +115,25 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 	@Test
 	void confidenceFlatRegion() {
 		init( 0,10 );
-		int minValue = 3;
+		int minValue = 5;
 		int y = 3;
 
-		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,-1,3);
+		SelectDisparityWithChecksWta<ArrayData,D> alg = createSelector(-1,0.25);
 		alg.configure(disparity,minDisparity,maxDisparity,2);
 
 		int[] scores = new int[w*rangeDisparity];
 
 		for( int d = 0; d < rangeDisparity; d++ ) {
 			for( int x = 0; x < w; x++ ) {
-				scores[w*d+x] = minValue + Math.abs(2-d);
+				if( x == w/2 ) {
+					scores[w * d + x] = convertErrorToScore(minValue-1);
+				} else {
+					scores[w * d + x] = convertErrorToScore(minValue);
+				}
 			}
 		}
 
-		alg.process(y,copyToCorrectType(scores,arrayType));
+		alg.process(y,copyToCorrectType(scores));
 
 		// it should reject the solution
 		assertEquals(reject, getDisparity(4 + 2, y), 1e-8);
@@ -201,35 +155,32 @@ public abstract class ChecksSelectErrorWithChecksWta<ArrayData,T extends ImageGr
 		int y = 3;
 		int r = 2;
 
-		SelectDisparityWithChecksWta<ArrayData,T> alg = createSelector(-1,-1,3);
+		SelectDisparityWithChecksWta<ArrayData,D> alg = createSelector(-1,0.25);
 		alg.configure(disparity,minDisparity,maxDisparity,r);
 
 		int[] scores = new int[w*rangeDisparity];
 
 		for( int d = 0; d < rangeDisparity; d++ ) {
 			for( int x = 0; x < w; x++ ) {
-				scores[w*d+x] = minValue + (d % 3);
+				scores[w*d+x] = convertErrorToScore(minValue + (d % 3));
 			}
 		}
 
-		alg.process(y,copyToCorrectType(scores,arrayType));
+		alg.process(y,copyToCorrectType(scores));
 
 		// it should reject the solution
 		for( int i = r+minDisparity+3; i < w-r; i++)
 			assertEquals(reject, getDisparity(i, y), 1e-8);
 	}
 
-	static <ArrayData> ArrayData copyToCorrectType( int scores[] , Class<ArrayData> arrayType ) {
-
-		if( arrayType == int[].class )
-			return (ArrayData)scores;
-
-		float[] ret = new float[ scores.length ];
-
-		for( int i = 0; i < scores.length; i++ ) {
-			ret[i] = scores[i];
-		}
-
-		return (ArrayData)ret;
+	/**
+	 * Could potentially return a sub-pixel accuracy but tests are only for pixel accuracy.
+	 *
+	 * Will not work in all situations since the movement could be farther than 0.5 from
+	 * the "correct" value
+	 */
+	protected int getDisparity( int x , int y ) {
+		double value = GeneralizedImageOps.get(disparity, x, y);
+		return (int)Math.round(value);
 	}
 }

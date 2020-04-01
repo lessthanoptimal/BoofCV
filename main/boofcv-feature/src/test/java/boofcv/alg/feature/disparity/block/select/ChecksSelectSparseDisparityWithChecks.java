@@ -21,22 +21,30 @@ package boofcv.alg.feature.disparity.block.select;
 import boofcv.alg.feature.disparity.block.SelectSparseStandardWta;
 import org.junit.jupiter.api.Test;
 
-import static boofcv.alg.feature.disparity.block.select.ChecksSelectErrorWithChecksWta.copyToCorrectType;
+import static boofcv.alg.feature.disparity.block.select.ChecksSelectDisparity.copyToCorrectType;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
+ * Base class for sparse disparity checks
+ *
  * @author Peter Abeles
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class ChecksSelectSparseErrorWithChecks<ArrayData> {
+public abstract class ChecksSelectSparseDisparityWithChecks<ArrayData>
+{
 
 	Class<ArrayData> arrayType;
 
-	protected ChecksSelectSparseErrorWithChecks(Class<ArrayData> arrayType) {
+	protected ChecksSelectSparseDisparityWithChecks(Class<ArrayData> arrayType) {
 		this.arrayType = arrayType;
 	}
 
 	protected abstract SelectSparseStandardWta<ArrayData> createAlg(int maxError, double texture);
+
+	/**
+	 * Given an error return a score that's appropriate for the algorithm
+	 */
+	protected abstract int convertErrorToScore( int error );
 
 	/**
 	 * All validation tests are turned off
@@ -45,12 +53,12 @@ public abstract class ChecksSelectSparseErrorWithChecks<ArrayData> {
 	void everythingOff() {
 		int maxDisparity = 30;
 
-		int scores[] = new int[50];
+		int[] scores = new int[50];
 		for( int i = 0; i < maxDisparity; i++) {
-			scores[i] = Math.abs(i-5)+2;
+			scores[i] = convertErrorToScore(Math.abs(i-5)+2);
 		}
 		// if texture is left on then this will trigger bad stuff
-		scores[8]=3;
+		scores[8]=convertErrorToScore(3);
 
 		SelectSparseStandardWta<ArrayData> alg = createAlg(-1,-1);
 
@@ -67,12 +75,12 @@ public abstract class ChecksSelectSparseErrorWithChecks<ArrayData> {
 		int minValue = 3;
 		int maxDisparity=10;
 
-		SelectSparseStandardWta<ArrayData> alg = createAlg(-1,3);
+		SelectSparseStandardWta<ArrayData> alg = createAlg(-1,1.0);
 
-		int scores[] = new int[maxDisparity+10];
+		int[] scores = new int[maxDisparity+10];
 
 		for( int d = 0; d < 10; d++ ) {
-			scores[d] = minValue + Math.abs(2-d);
+			scores[d] = convertErrorToScore(minValue + Math.abs(2-d));
 		}
 
 		assertFalse(alg.select(copyToCorrectType(scores,arrayType), maxDisparity));
@@ -88,14 +96,14 @@ public abstract class ChecksSelectSparseErrorWithChecks<ArrayData> {
 	}
 
 	private void confidenceMultiplePeak(int minValue ) {
-		int maxDisparity=10;
+		int maxDisparity=15;
 
-		SelectSparseStandardWta<ArrayData> alg = createAlg(-1,3);
+		SelectSparseStandardWta<ArrayData> alg = createAlg(-1,0.5);
 
-		int scores[] = new int[maxDisparity+10];
+		int[] scores = new int[maxDisparity+10];
 
-		for( int d = 0; d < 10; d++ ) {
-			scores[d] = minValue + (d % 3);
+		for( int d = 0; d < maxDisparity; d++ ) {
+			scores[d] = convertErrorToScore(minValue + (d % 5));
 		}
 
 		assertFalse(alg.select(copyToCorrectType(scores,arrayType), maxDisparity));
@@ -107,15 +115,38 @@ public abstract class ChecksSelectSparseErrorWithChecks<ArrayData> {
 	 */
 	@Test
 	void multiplePeakFirstAtIndexZero() {
-
 		int maxDisparity=10;
-		SelectSparseStandardWta<ArrayData> alg = createAlg(-1,3);
-		int scores[] = new int[maxDisparity+10];
+		SelectSparseStandardWta<ArrayData> alg = createAlg(-1,0.1);
+		int[] scores = new int[maxDisparity+10];
 
 		for( int d = 0; d < 10; d++ ) {
-			scores[d] = d*2+1;
+			scores[d] = convertErrorToScore(d*2+1);
 		}
 
 		assertTrue(alg.select(copyToCorrectType(scores,arrayType), maxDisparity));
+	}
+
+	public static abstract class CheckError<ArrayData> extends ChecksSelectSparseDisparityWithChecks<ArrayData>
+	{
+		protected CheckError(Class<ArrayData> arrayType) {
+			super(arrayType);
+		}
+
+		@Override
+		protected int convertErrorToScore(int error) {
+			return error;
+		}
+	}
+
+	public static abstract class CheckCorrelation extends ChecksSelectSparseDisparityWithChecks<float[]>
+	{
+		protected CheckCorrelation() {
+			super(float[].class);
+		}
+
+		@Override
+		protected int convertErrorToScore(int error) {
+			return -error;
+		}
 	}
 }

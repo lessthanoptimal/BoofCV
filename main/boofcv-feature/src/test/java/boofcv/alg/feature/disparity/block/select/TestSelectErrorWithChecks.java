@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Nested;
 public class TestSelectErrorWithChecks {
 
 	@Nested
-	public class F32_U8 extends ChecksSelectErrorWithChecksWta<float[],GrayU8> {
+	public class F32_U8 extends ChecksSelectDisparityWithChecksWtaError<float[],GrayU8> {
 		F32_U8() {
 			super(float[].class,GrayU8.class);
 		}
@@ -39,7 +39,7 @@ public class TestSelectErrorWithChecks {
 	}
 
 	@Nested
-	public class S32_U8 extends ChecksSelectErrorWithChecksWta<int[],GrayU8> {
+	public class S32_U8 extends ChecksSelectDisparityWithChecksWtaError<int[],GrayU8> {
 		S32_U8() {
 			super(int[].class,GrayU8.class);
 		}

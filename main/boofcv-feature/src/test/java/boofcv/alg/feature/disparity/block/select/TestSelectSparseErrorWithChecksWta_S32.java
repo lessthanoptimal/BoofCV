@@ -24,7 +24,7 @@ import boofcv.alg.feature.disparity.block.SelectSparseStandardWta;
  * @author Peter Abeles
  */
 public class TestSelectSparseErrorWithChecksWta_S32
-		extends ChecksBasicSelectSparseDisparityWithChecks.CheckError<int[]>
+		extends ChecksSelectSparseDisparityWithChecks.CheckError<int[]>
 {
 	TestSelectSparseErrorWithChecksWta_S32() {
 		super(int[].class);
