@@ -158,6 +158,15 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		o.pixel.set(pixelX,pixelY);
 		frame.tracks.add(track);
 	}
+	/** Searches for a track that has the following tracker track. null is none were found */
+	public T findByTrackerTrack( PointTrack target ) {
+		for (int i = 0; i < tracks.size; i++) {
+			if( tracks.get(i).trackerTrack == target ) {
+				return tracks.get(i);
+			}
+		}
+		return null;
+	}
 
 	public T addTrack( double x , double y , double z , double w ) {
 		T track = tracks.grow();
@@ -198,14 +207,16 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		}
 
 		if( pruneObservations ) {
-			// Search through all observations and remove the ones not in use nay more
+			// Search through all observations and remove the ones not in use any more
 			for (int i = tracks.size - 1; i >= 0; i--) {
 				if (tracks.get(i).observations.size == 0) {
 					BTrack t = tracks.removeSwap(i);
 					if( t.trackerTrack != null ) {
 						removedTracks.add(t.trackerTrack);
-						if( t.trackerTrack.cookie != t )
+						if( t.trackerTrack.cookie != t ) {
+							System.out.println("BUG! bt="+t.id+" tt="+t.trackerTrack.featureId);
 							throw new RuntimeException("BUG!");
+						}
 						t.trackerTrack = null; // mark it as null so that we know it has been dropped
 					}
 				}

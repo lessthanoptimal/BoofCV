@@ -114,7 +114,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 
 	//=================================================================
 	// workspace variables
-	List<PointTrack> removedTracks = new ArrayList<>();
+	List<PointTrack> removedTrackerTracks = new ArrayList<>();
 	GrowQueue_I32 listCommon = new GrowQueue_I32();
 	GrowQueue_F64 listMotion = new GrowQueue_F64();
 
@@ -165,6 +165,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		long time1 = System.nanoTime();
 		timeTracking = (time1-time0)*1e-6;
 
+		System.out.println("-----------------------------------------------------------------------------------------");
 		System.out.println("Input Frame Count "+tracker.getFrameID());
 		System.out.println("   Bundle Frames "+bundle.frames.size);
 		System.out.println("   Bundle tracks "+bundle.tracks.size);
@@ -189,17 +190,19 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		}
 
 		// handle tracks that the visual tracker dropped
-		removedTracks.clear();
-		tracker.getDroppedTracks(removedTracks);
-		for (int i = 0; i < removedTracks.size(); i++) {
+		removedTrackerTracks.clear();
+		tracker.getDroppedTracks(removedTrackerTracks);
+		for (int i = 0; i < removedTrackerTracks.size(); i++) {
 			// Tell the bundle track that they are no longer associated with a visual track
-			BTrack bt = removedTracks.get(i).getCookie();
+			BTrack bt = removedTrackerTracks.get(i).getCookie();
+			System.out.println("tracker dropped bt="+bt.id+" tt.id="+bt.trackerTrack.featureId);
 			bt.trackerTrack = null;
 		}
 
 		if( !estimateMotion() ) {
+			System.out.println("ESTIMATE MOTION FAILED");
 			// discard the current frame and attempt to jump over it
-			bundle.removeFrame(frameCurrent,removedTracks);
+			bundle.removeFrame(frameCurrent, removedTrackerTracks);
 			dropRemovedBundleTracks();
 			keepStillVisibleTracks();
 			return false;
@@ -228,7 +231,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 			// Select the "optimal" key frame to drop and drop it
 			BFrame target = selectFrameToDrop();
 
-			bundle.removeFrame(target,removedTracks);
+			bundle.removeFrame(target, removedTrackerTracks);
 			dropRemovedBundleTracks();
 			// Drop tracks which are not visible in the latest frame and have fewer than 3 observations
 			dropTracksNotVisibleTooFewObservations();
@@ -271,6 +274,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		for (int bidx = bundle.tracks.size-1; bidx >= 0; bidx--) {
 			BTrack t = bundle.tracks.get(bidx);
 			if( t.trackerTrack == null && t.observations.size < 3 ) {
+				System.out.println("drop old bt="+t.id+" tt=NONE");
+				// this marks it as dropped. Formally remove it in the next loop
 				t.observations.reset();
 				bundle.tracks.removeSwap(bidx);
 			}
@@ -299,8 +304,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 
 	// TODO comments
 	private void dropRemovedBundleTracks() {
-		for (int i = 0; i < removedTracks.size(); i++) {
-			PointTrack pt = removedTracks.get(i);
+		for (int i = 0; i < removedTrackerTracks.size(); i++) {
+			PointTrack pt = removedTrackerTracks.get(i);
 			tracker.dropTrack(pt);
 		}
 	}
@@ -479,7 +484,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 				// sanity check
 				throw new RuntimeException("BUG!");
 			} else if( trackerFrame - p.lastUsed >= thresholdRetireTracks) {
-//				System.out.println("Dropping unused track.id=" + p.id+" point.id="+t.featureId);
+				System.out.println("drop unused tt=" + p.id+" bt="+t.featureId);
 				if( !tracker.dropTrack(t) )
 					throw new RuntimeException("Drop failed");
 				t.cookie = null;
@@ -530,15 +535,23 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 
 			// discard point if it can't localized
 			if( !pixelTo3D.process(t.pixel.x,t.pixel.y) || pixelTo3D.getW() == 0 ) { // TODO don't drop infinity
+				System.out.println("Dropped pixelTo3D  tt="+t.featureId);
 //				System.out.println("dropped inside of spawned "+t.featureId);
 				tracker.dropTrack(t);
 			} else {
+				if( bundle.findByTrackerTrack(t) != null ) {
+					Track btrack = bundle.findByTrackerTrack(t);
+					System.out.println("BUG! Tracker recycled... bt="+btrack.id+" tt="+t.featureId);
+					throw new RuntimeException("BUG! Recycled tracker track too early tt="+t.featureId);
+				}
 				// Save the track's 3D location and add it to the current frame
 				Track btrack = bundle.addTrack(pixelTo3D.getX(),pixelTo3D.getY(),pixelTo3D.getZ(),pixelTo3D.getW());
 				btrack.lastUsed = frameID;
 				btrack.trackerTrack = t;
 				btrack.id = t.featureId;
 				t.cookie = btrack;
+
+				System.out.println("new track bt="+btrack.id+" tt.id="+t.featureId);
 
 //				System.out.println("Created track "+track.id+"  currentFrame "+frameCurrent.id+"  obs.size "+track.observations.size);
 				// Convert the location from local coordinate system to world coordinates
