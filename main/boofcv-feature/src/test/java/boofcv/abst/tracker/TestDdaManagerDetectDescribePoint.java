@@ -42,7 +42,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestDdaManagerDetectDescribePoint extends StandardPointTracker<GrayF32> {
+public class TestDdaManagerDetectDescribePoint extends GenericChecksPointTracker<GrayF32> {
 
 	public TestDdaManagerDetectDescribePoint() {
 		super(true, false);

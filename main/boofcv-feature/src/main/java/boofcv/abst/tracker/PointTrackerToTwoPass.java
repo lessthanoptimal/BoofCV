@@ -55,6 +55,16 @@ public class PointTrackerToTwoPass<T extends ImageBase<T>>
 	}
 
 	@Override
+	public int getTotalActive() {
+		return tracker.getTotalActive();
+	}
+
+	@Override
+	public int getTotalInactive() {
+		return tracker.getTotalInactive();
+	}
+
+	@Override
 	public void dropAllTracks() {
 		tracker.dropAllTracks();
 	}
@@ -62,6 +72,11 @@ public class PointTrackerToTwoPass<T extends ImageBase<T>>
 	@Override
 	public boolean dropTrack(PointTrack track) {
 		return tracker.dropTrack(track);
+	}
+
+	@Override
+	public void dropTracks(Dropper dropper) {
+		tracker.dropTracks(dropper);
 	}
 
 	@Override

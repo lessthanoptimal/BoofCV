@@ -28,10 +28,6 @@ public class ConfigTrackerDda {
 	 * Update the description each time its successfully matched?
 	 */
 	public boolean updateDescription = false;
-	/**
-	 * If there are more than this number of unused tracks they will be randomly discarded.
-	 */
-	public int maxUnusedTracks=500;
 
 	/**
 	 * Random seed

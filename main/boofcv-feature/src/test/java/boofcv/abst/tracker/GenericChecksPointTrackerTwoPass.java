@@ -31,13 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Peter Abeles
  */
-public abstract class StandardPointTrackerTwoPass<T extends ImageGray<T>>
-		extends StandardPointTracker<T>
+public abstract class GenericChecksPointTrackerTwoPass<T extends ImageGray<T>>
+		extends GenericChecksPointTracker<T>
 {
 
 	PointTrackerTwoPass<T> tracker2;
 
-	protected StandardPointTrackerTwoPass(boolean shouldCreateInactive, boolean shouldDropTracks) {
+	protected GenericChecksPointTrackerTwoPass(boolean shouldCreateInactive, boolean shouldDropTracks) {
 		super(shouldCreateInactive, shouldDropTracks);
 	}
 

@@ -41,7 +41,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestPointTrackerCombined extends StandardPointTracker<GrayF32> {
+public class TestPointTrackerCombined extends GenericChecksPointTracker<GrayF32> {
 
 	public TestPointTrackerCombined() {
 		super(true, false);

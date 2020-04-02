@@ -235,4 +235,8 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 	public Class<IT> getModelType() {
 		return (Class<IT>)keyToCurr.getClass();
 	}
+
+	public long getFrameID() {
+		return tracker.getFrameID();
+	}
 }

@@ -44,6 +44,9 @@ import java.util.Random;
 public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleDesc>
 		implements PointTracker<I> {
 
+
+	// TODO add backwards validation?
+
 	// associates features between two images together
 	protected AssociateDescription2D<Desc> associate;
 
@@ -76,7 +79,6 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	boolean updateDescription;
 
 	// maximum number of tracks it will keep track of that were not associated before it starts discarding
-	protected int maxInactiveTracks;
 	protected GrowQueue_I32 unassociatedIdx = new GrowQueue_I32();
 
 	// Random number generator
@@ -94,7 +96,6 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		this.manager = manager;
 		this.associate = associate;
 		this.updateDescription = config.updateDescription;
-		this.maxInactiveTracks = config.maxUnusedTracks;
 		this.rand = new Random(config.seed);
 
 		sets = new SetTrackInfo[manager.getNumberOfSets()];
@@ -139,6 +140,16 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 	}
 
 	@Override
+	public int getTotalActive() {
+		return tracksActive.size();
+	}
+
+	@Override
+	public int getTotalInactive() {
+		return tracksInactive.size();
+	}
+
+	@Override
 	public void process( I input ) {
 		frameID++;
 		tracksActive.clear();
@@ -168,36 +179,11 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 					}
 				}
 
-				pruneTracks(info, unassociatedIdx);
-
 				// clean up
 				for (int j = 0; j < sets.length; j++) {
 					sets[j].featSrc.reset();
 					sets[j].locSrc.reset();
 				}
-			}
-		}
-	}
-
-	/**
-	 * If there are too many unassociated tracks, randomly select some of those tracks and drop them
-	 */
-	private void pruneTracks(SetTrackInfo<Desc> info, GrowQueue_I32 unassociated) {
-		if( unassociated.size > maxInactiveTracks ) {
-			// make the first N elements the ones which will be dropped
-			int numDrop = unassociated.size-maxInactiveTracks;
-			for (int i = 0; i < numDrop; i++) {
-				int selected = rand.nextInt(unassociated.size-i)+i;
-				int a = unassociated.get(i);
-				unassociated.data[i] = unassociated.data[selected];
-				unassociated.data[selected] = a;
-			}
-			List<PointTrack> dropList = new ArrayList<>();
-			for (int i = 0; i < numDrop; i++) {
-				dropList.add( info.tracks.get(unassociated.get(i)) );
-			}
-			for (int i = 0; i < dropList.size(); i++) {
-				dropTrack(dropList.get(i));
 			}
 		}
 	}
@@ -382,10 +368,10 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 
 		if( !tracksAll.remove(track) )
 			return false;
-		if( tracksAll.contains(track))
-			throw new RuntimeException("Contained twice all! pt.id="+track.featureId);
-		if( unused.contains(track))
-			throw new RuntimeException("Already in unused!");
+//		if( tracksAll.contains(track))
+//			throw new RuntimeException("Contained twice all! pt.id="+track.featureId);
+//		if( unused.contains(track))
+//			throw new RuntimeException("Already in unused!");
 
 		if( !sets[track.setId].tracks.remove(track) ) {
 			throw new RuntimeException("Not in set!?!");
@@ -394,8 +380,8 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		// the track may or may not be in the active list
 		tracksActive.remove(track);
 		tracksInactive.remove(track);
-		if( tracksActive.contains(track))
-			throw new RuntimeException("Contained twice active! pt.id="+track.featureId);
+//		if( tracksActive.contains(track))
+//			throw new RuntimeException("Contained twice active! pt.id="+track.featureId);
 
 		// it must be in the all list
 		// recycle the data
@@ -403,6 +389,25 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		track.setId = -1;
 		track.featureId = -1;
 		return true;
+	}
+
+	@Override
+	public void dropTracks(Dropper dropper) {
+		for (int i = tracksAll.size()-1; i >= 0; i--) {
+			PointTrack track = tracksAll.get(i);
+			if( !dropper.shouldDropTrack(track))
+				continue;
+			if( !sets[track.setId].tracks.remove(track) ) {
+				throw new RuntimeException("BUG! Not in set!?!");
+			}
+			tracksAll.remove(i);
+			tracksActive.remove(track);
+			tracksInactive.remove(track);
+			// recycle the data
+			unused.add(track);
+			track.setId = -1;
+			track.featureId = -1;
+		}
 	}
 
 	@Override

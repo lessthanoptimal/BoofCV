@@ -169,6 +169,12 @@ public class TestImageMotionPointTrackerKey {
 		public long getFrameID() { return 0; }
 
 		@Override
+		public int getTotalActive() { return 0; }
+
+		@Override
+		public int getTotalInactive() { return 0; }
+
+		@Override
 		public void process(GrayU8 image) {}
 
 		@Override
@@ -189,6 +195,11 @@ public class TestImageMotionPointTrackerKey {
 
 		@Override
 		public boolean dropTrack(PointTrack track) {numDropped++;return true;}
+
+		@Override
+		public void dropTracks(Dropper dropper) {
+			throw new RuntimeException("HMM");
+		}
 
 		@Override
 		public List<PointTrack> getAllTracks( List<PointTrack> list ) {

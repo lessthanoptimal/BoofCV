@@ -40,7 +40,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestDetectDescribeAssociateTwoPass extends StandardPointTrackerTwoPass<GrayF32> {
+public class TestDetectDescribeAssociateTwoPass extends GenericChecksPointTrackerTwoPass<GrayF32> {
 
 	public TestDetectDescribeAssociateTwoPass() {
 		super(true, false);

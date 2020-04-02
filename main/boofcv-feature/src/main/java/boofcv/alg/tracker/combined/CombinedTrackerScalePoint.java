@@ -340,4 +340,8 @@ public class CombinedTrackerScalePoint
 		tracksSpawned.clear();
 		tracksDormant.clear();
 	}
+
+	public void addUnused(CombinedTrack<TD> track) {
+		tracksUnused.add(track);
+	}
 }

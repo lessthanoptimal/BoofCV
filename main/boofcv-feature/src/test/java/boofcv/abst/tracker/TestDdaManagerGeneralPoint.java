@@ -41,7 +41,7 @@ import java.util.Random;
 /**
  * @author Peter Abeles
  */
-public class TestDdaManagerGeneralPoint extends StandardPointTracker<GrayF32> {
+public class TestDdaManagerGeneralPoint extends GenericChecksPointTracker<GrayF32> {
 
 	public TestDdaManagerGeneralPoint() {
 		super(true, false);

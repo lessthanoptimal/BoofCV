@@ -79,24 +79,45 @@ public interface PointTracker<T extends ImageBase<T>> {
 	long getFrameID();
 
 	/**
-	 * Drops all feature to be dropped and will no longer be tracked.  Tracks dropped using
-	 * this function will not appear in the dropped list.
+	 * Returns the total number of active tracks
+	 */
+	int getTotalActive();
+
+	/**
+	 * Returns total number of inactive tracks
+	 */
+	int getTotalInactive();
+
+	/**
+	 * Drops all feature to be dropped and will no longer be tracked.
+	 *
+	 * <p>NOTE: Tracks dropped using this function will not appear in the dropped list.</p>
 	 */
 	void dropAllTracks();
 
 	/**
-	 * Manually forces a track to be dropped.  Tracks dropped using this function will not
-	 * appear in the dropped list and their data is subject to being immediately recycled.  New requests to
-	 * all and active lists will not include the track after it has been dropped using this function.
+	 * Manually forces a track to be dropped. New requests to all and active lists will not include the track after
+	 * it has been dropped using this function.
 	 *
 	 * If request is made to drop a track that is not being tracked (in the internal all list), then the request
 	 * is ignored.
+	 *
+	 * <p>NOTE: Tracks dropped using this function will not appear in the dropped list.</p>
 	 *
 	 * @param track The track which is to be dropped
 	 * @return true if the request to drop the track was done or if it was ignored because the track wasn't being
 	 * tracked
 	 */
 	boolean dropTrack(PointTrack track);
+
+	/**
+	 * Used to drop multiple tracks using a rule. This can be more efficient than dropping them one at a time.
+	 *
+	 * <p>NOTE: Tracks dropped using this function will not appear in the dropped list.</p>
+	 *
+	 * @param dropper Rule for dropping the tracks
+	 */
+	void dropTracks( Dropper dropper );
 
 	/**
 	 * Returns a list of all features that are currently being tracked
@@ -154,5 +175,18 @@ public interface PointTracker<T extends ImageBase<T>> {
 	 * NOTE: This function may or may not also modify the active and inactive lists.
 	 */
 	void spawnTracks();
+
+	/**
+	 * Provides a custom rule for dropping tracks
+	 */
+	interface Dropper {
+		/**
+		 * Called to see if a track should be dropped. DO NOT MODIFY THE TRACK HERE.
+		 *
+		 * @param track The track which is being examined.
+		 * @return true means drop the track and false means keep it
+		 */
+		boolean shouldDropTrack( PointTrack track );
+	}
 }
 

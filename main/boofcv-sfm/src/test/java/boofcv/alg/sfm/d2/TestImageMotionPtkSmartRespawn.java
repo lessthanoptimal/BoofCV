@@ -286,9 +286,8 @@ public class TestImageMotionPtkSmartRespawn {
 		}
 	}
 
-	private class Tracker implements PointTracker<GrayF32>
+	private static class Tracker implements PointTracker<GrayF32>
 	{
-
 		@Override
 		public void process(GrayF32 image) {}
 
@@ -299,10 +298,21 @@ public class TestImageMotionPtkSmartRespawn {
 		public long getFrameID() { return 0; }
 
 		@Override
+		public int getTotalActive() { return 0; }
+
+		@Override
+		public int getTotalInactive() { return 0; }
+
+		@Override
 		public void dropAllTracks() {}
 
 		@Override
 		public boolean dropTrack(PointTrack track) {return false;}
+
+		@Override
+		public void dropTracks(Dropper dropper) {
+			throw new RuntimeException("HMM");
+		}
 
 		@Override
 		public List<PointTrack> getAllTracks(List<PointTrack> list) {

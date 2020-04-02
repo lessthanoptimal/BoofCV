@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Peter Abeles
  */
 @SuppressWarnings("unchecked")
-public abstract class StandardPointTracker<T extends ImageGray<T>> {
+public abstract class GenericChecksPointTracker<T extends ImageGray<T>> {
 
 	public PointTracker<T> tracker;
 	Random rand = new Random(234);
@@ -49,7 +49,9 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 	boolean shouldDropTracks;
 	boolean shouldCreateInactive;
 
-	protected StandardPointTracker(boolean shouldCreateInactive, boolean shouldDropTracks) {
+	int count;
+
+	protected GenericChecksPointTracker(boolean shouldCreateInactive, boolean shouldDropTracks) {
 		this.shouldCreateInactive = shouldCreateInactive;
 		this.shouldDropTracks = shouldDropTracks;
 	}
@@ -139,7 +141,7 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		processImage((T)image);
 		assertEquals(0,tracker.getAllTracks(null).size());
 		assertEquals(0,tracker.getActiveTracks(null).size());
-		assertEquals(0, tracker.getNewTracks(null).size());
+		assertEquals(0,tracker.getNewTracks(null).size());
 
 		// Request that new tracks be spawned and ensure that all lists have been updated
 		tracker.spawnTracks();
@@ -482,6 +484,58 @@ public abstract class StandardPointTracker<T extends ImageGray<T>> {
 		assertTrue(ret.size() > 0 );
 
 		checkIdentical(input, ret);
+	}
+
+	/**
+	 * Makes sure the number of active tracks makes sense
+	 */
+	@Test
+	void totalCounts() {
+		// create tracks
+		tracker = createTracker();
+		processImage((T)image);
+		tracker.spawnTracks();
+
+		// These should be in agreement
+		assertEquals(tracker.getActiveTracks(null).size(), tracker.getTotalActive());
+		assertEquals(tracker.getInactiveTracks(null).size(), tracker.getTotalInactive());
+		assertTrue(tracker.getTotalActive()>0);
+
+		// see if still works after the next frame is processed
+		processImage((T)image);
+		assertEquals(tracker.getActiveTracks(null).size(), tracker.getTotalActive());
+		assertEquals(tracker.getInactiveTracks(null).size(), tracker.getTotalInactive());
+		assertTrue(tracker.getTotalActive()>0);
+
+		// Make sure when tracks are dropped this count is reset too
+		tracker.dropAllTracks();
+		assertEquals(0, tracker.getTotalActive());
+		assertEquals(0, tracker.getTotalInactive());
+	}
+
+	@Test
+	void dropTracks() {
+		tracker = createTracker();
+		processImage((T)image);
+		tracker.spawnTracks();
+
+		// This is the number of tracks it should process
+		int expectedTotal = tracker.getTotalActive() + tracker.getTotalInactive();
+		// set a cookie in one of the tracks which will be dropped
+		tracker.getActiveTracks(null).get(0).setCookie(1);
+		tracker.getActiveTracks(null).get(1).setCookie(2);
+
+		count = 0;
+		tracker.dropTracks(t->{
+			count++;
+			return t.featureId%2 == 0;
+		});
+		assertEquals(expectedTotal, count);
+		int afterTotal = tracker.getTotalActive() + tracker.getTotalInactive();
+		assertEquals(expectedTotal/2,afterTotal);
+		List<PointTrack>  after = tracker.getActiveTracks(null);
+		assertNotNull(after.get(0).cookie);
+		assertNull(after.get(1).cookie);
 	}
 
 	private void checkIdentical( List<PointTrack> a , List<PointTrack> b ){

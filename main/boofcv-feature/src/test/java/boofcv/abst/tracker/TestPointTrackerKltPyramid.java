@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Peter Abeles
  */
-class TestPointTrackerKltPyramid extends StandardPointTracker<GrayF32> {
+class TestPointTrackerKltPyramid extends GenericChecksPointTracker<GrayF32> {
 
 	ConfigPKlt config;
 

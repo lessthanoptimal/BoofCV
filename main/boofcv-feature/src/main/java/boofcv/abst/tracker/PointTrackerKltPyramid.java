@@ -378,6 +378,17 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	}
 
 	@Override
+	public void dropTracks(Dropper dropper) {
+		for (int i = active.size()-1; i >= 0; i-- ) {
+			PointTrack t = (PointTrack)active.get(i).cookie;
+			if( dropper.shouldDropTrack(t) ) {
+				PyramidKltFeature klt = active.remove(i);
+				unused.add(klt);
+			}
+		}
+	}
+
+	@Override
 	public List<PointTrack> getActiveTracks( List<PointTrack> list ) {
 		if( list == null )
 			list = new ArrayList<>();
@@ -439,6 +450,17 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	@Override
 	public long getFrameID() {
 		return frameID;
+	}
+
+	@Override
+	public int getTotalActive() {
+		return active.size();
+	}
+
+	@Override
+	public int getTotalInactive() {
+		// there are no inactive tracks with KLT. If a match isn't found it is immediately dropped
+		return 0;
 	}
 
 	static class PointTrackMod extends PointTrack {
