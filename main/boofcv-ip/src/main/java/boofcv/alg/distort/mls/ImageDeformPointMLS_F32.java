@@ -24,6 +24,8 @@ import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F32;
 import org.ejml.data.FMatrix2x2;
 
+import java.util.Arrays;
+
 /**
  * <p>Implementation of 'Moving Least Squares' (MLS) control point based image deformation models described in [1].</p>
  *
@@ -31,9 +33,8 @@ import org.ejml.data.FMatrix2x2;
  * <ol>
  *     <li>Invoke {@link #configure}</li>
  *     <li>Invoke {@link #addControl} for each control point</li>
- *     <li>Invoke {@link #fixateUndistorted()} when all control points have been added</li>
  *     <li>Invoke {@link #setDistorted} to change the distorted location of a control point</li>
- *     <li>Invoke {@link #fixateDistorted()} after you are done changing distorted locations</li>
+ *     <li>Invoke {@link #fixate()} when all control points have been added and after you are done changing distorted locations</li>
  * </ol>
  *
  * <p>Each control point has an undistorted and distorted location.  The fixate functions are used to precompute
@@ -139,8 +140,8 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	public int addControl( float x , float y ) {
 		Control c = controls.grow();
 		c.q.set(x,y);
-		setUndistorted(controls.size()-1,x,y);
-		return controls.size()-1;
+		setUndistorted(controls.size-1,x,y);
+		return controls.size-1;
 	}
 
 	/**
@@ -183,37 +184,27 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	/**
 	 * Precompute the portion of the equation which only concerns the undistorted location of each point on the
 	 * grid even the current undistorted location of each control point.
+
+	 * Recompute the deformation of each point in the internal grid now that the location of control points is
+	 * not changing any more.
 	 */
-	public void fixateUndistorted() {
-		if( controls.size() < 2 )
-			throw new RuntimeException("Not enough control points specified.  Found "+controls.size());
+	public void fixate() {
+		if( controls.size < 2 )
+			throw new RuntimeException("Not enough control points specified.  Found "+controls.size);
 		for (int row = 0; row < gridRows; row++) {
 			for (int col = 0; col < gridCols; col++) {
 				Cache cache = getGrid(row,col);
-				cache.weights.resize(controls.size);
-				cache.A.resize(controls.size);
-				cache.A_s.resize(controls.size());
 
 				float v_x = col;
 				float v_y = row;
 
-				computeWeights(cache, v_x, v_y);
-				computeAverageP(cache);
-				model.computeCache(cache, v_x, v_y);
-			}
-		}
-	}
+				float[] weights = computeWeights(cache, v_x, v_y);
+				computeAverageP(cache, weights);
+				computeAverageQ(cache, weights);
 
-	/**
-	 * Recompute the deformation of each point in the internal grid now that the location of control points is
-	 * not changing any more.  Must call {@link #fixateUndistorted()} first.
-	 */
-	public void fixateDistorted() {
-		for (int row = 0; row < gridRows; row++) {
-			for (int col = 0; col < gridCols; col++) {
-				Cache cache = getGrid(row,col);
-				computeAverageQ( cache );
-				model.computeDeformed( cache , col, row );
+				float[] a = model.computeA(cache, weights, v_x, v_y);
+				FMatrix2x2[] matrix = model.computeMatrix(cache, weights, v_x, v_y);
+				model.computeDeformed(cache, a, matrix, col, row);
 			}
 		}
 	}
@@ -221,35 +212,33 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	/**
 	 * Computes the average P given the weights at this cached point
 	 */
-	void computeAverageP(Cache cache) {
-		float[] weights = cache.weights.data;
-		cache.aveP.set(0,0);
+	void computeAverageP(Cache cache, float[] weights) {
+		float x = 0;
+		float y = 0;
 
-		for (int i = 0; i < controls.size(); i++) {
+		for (int i = 0; i < controls.size; i++) {
 			Control c = controls.get(i);
 			float w = weights[i];
-			cache.aveP.x += c.p.x * w;
-			cache.aveP.y += c.p.y * w;
+			x += c.p.x * w;
+			y += c.p.y * w;
 		}
-		cache.aveP.x /= cache.totalWeight;
-		cache.aveP.y /= cache.totalWeight;
+		cache.aveP.set(x / cache.weight, y / cache.weight);
 	}
 
 	/**
 	 * Computes the average Q given the weights at this cached point
 	 */
-	void computeAverageQ(Cache cache) {
-		float[] weights = cache.weights.data;
-		cache.aveQ.set(0,0);
+	void computeAverageQ(Cache cache, float[] weights) {
+		float x = 0;
+		float y = 0;
 
-		for (int i = 0; i < controls.size(); i++) {
+		for (int i = 0; i < controls.size; i++) {
 			Control c = controls.get(i);
 			float w = weights[i];
-			cache.aveQ.x += c.q.x * w;
-			cache.aveQ.y += c.q.y * w;
+			x += c.q.x * w;
+			y += c.q.y * w;
 		}
-		cache.aveQ.x /= cache.totalWeight;
-		cache.aveQ.y /= cache.totalWeight;
+		cache.aveQ.set(x / cache.weight, y / cache.weight);
 	}
 
 	/**
@@ -258,26 +247,26 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	 * @param v_x undistorted grid coordinate of cached point.
 	 * @param v_y undistorted grid coordinate of cached point.
 	 */
-	void computeWeights(Cache cache, float v_x, float v_y) {
-		float[] weights = cache.weights.data;
+	float[] computeWeights(Cache cache, float v_x, float v_y) {
+		float[] weights = new float[controls.size];
 		// first compute the weights
 		float totalWeight = 0.0f;
-		for (int i = 0; i < controls.size(); i++) {
+		for (int i = 0; i < controls.size; i++) {
 			Control c = controls.get(i);
 
 			float d2 = c.p.distance2(v_x, v_y);
 			// check for the special case
 			if( d2 == 0 ) {
-				for (int j = 0; j < controls.size(); j++) {
-					weights[j] = i==j ? 1.0f : 0.0f;
-				}
+				Arrays.fill(weights, 0);
+				weights[i] = 1;
 				totalWeight = 1.0f;
 				break;
 			} else {
 				totalWeight += weights[i] = 1.0f/(float)Math.pow(d2,alpha);
 			}
 		}
-		cache.totalWeight = totalWeight;
+		cache.weight = totalWeight;
+		return weights;
 	}
 
 	@Override
@@ -358,15 +347,15 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	public class AffineModel implements Model {
 
 		@Override
-		public void computeCache(Cache cache, float v_x, float v_y) {
-			float[] weights = cache.weights.data;
+		public float[] computeA(Cache cache, float[] weights, float v_x, float v_y) {
+			float[] a = new float[controls.size];
 
 			// compute the weighted covariance 2x2 matrix
 			// Two below equation 5
 			// sum hat(p[i])'*w[i]*hat(p[i])
 			float inner00 = 0, inner01 = 0, inner11 = 0;
 
-			for (int i = 0; i < controls.size(); i++) {
+			for (int i = 0; i < controls.size; i++) {
 				Control c = controls.get(i);
 				float w = weights[i];
 
@@ -402,26 +391,34 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 			// (v-p*)*inv(stuff)
 			float tmp1 = v_m_ap_x * inv01 + v_m_ap_y * inv11;
 
-			for (int i = 0; i < controls.size(); i++) {
+			for (int i = 0; i < controls.size; i++) {
 				Control c = controls.get(i);
 
 				float hat_p_x = c.p.x-cache.aveP.x;
 				float hat_p_y = c.p.y-cache.aveP.y;
 
 				// mistake in paper that w[i] was omitted?
-				cache.A.data[i] = (tmp0 * hat_p_x + tmp1 * hat_p_y)*weights[i];
+				a[i] = (tmp0 * hat_p_x + tmp1 * hat_p_y)*weights[i];
 			}
+
+			return a;
 		}
 
 		@Override
-		public void computeDeformed(Cache cache, float v_x, float v_y ) {
+		public FMatrix2x2[] computeMatrix(Cache cache, float[] weights, float v_x, float v_y)
+		{
+			return null;
+		}
+
+		@Override
+		public void computeDeformed(Cache cache, float[] a2, FMatrix2x2[] matrix, float v_x, float v_y ) {
 			Point2D_F32 deformed = cache.deformed;
 			deformed.set(0,0);
 
-			int N = cache.A.size;
+			int N = a2.length;
 			for (int i = 0; i < N; i++) {
 				Control c = controls.get(i);
-				float a = cache.A.data[i];
+				float a = a2[i];
 				deformed.x += a*(c.q.x-cache.aveQ.x);
 				deformed.y += a*(c.q.y-cache.aveQ.y);
 			}
@@ -436,14 +433,21 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	public class SimilarityModel implements Model {
 
 		@Override
-		public void computeCache(Cache cache, float v_x, float v_y) {
-			float[] weights = cache.weights.data;
+		public float[] computeA(Cache cache, float[] weights, float v_x, float v_y)
+		{
+			return null;
+		}
+
+		@Override
+		public FMatrix2x2[] computeMatrix(Cache cache, float[] weights, float v_x, float v_y) {
+			FMatrix2x2[] matrix = new FMatrix2x2[controls.size];
+
 			cache.mu = 0;
 
 			// mu = sum{ w[i]*dot( hat(p). hat(p) ) }
 			// A[i] = w[i]*( hat(p); hat(p^|) )( v-p*; -(v-p*)^|)'
 			// where ^| means perpendicular to vector
-			for (int i = 0; i < controls.size(); i++) {
+			for (int i = 0; i < controls.size; i++) {
 				Control c = controls.get(i);
 				float w = weights[i];
 
@@ -455,7 +459,8 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 				float v_ps_x = v_x - cache.aveP.x;
 				float v_ps_y = v_y - cache.aveP.y;
 
-				FMatrix2x2 A = cache.A_s.get(i);
+				FMatrix2x2 A = new FMatrix2x2();
+				matrix[i] = A;
 
 				A.a11 = w*(hat_p_x*v_ps_x + hat_p_y*v_ps_y);
 				A.a12 = w*(hat_p_x*v_ps_y - hat_p_y*v_ps_x);
@@ -465,18 +470,20 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 			// point being sampled and the key point are exactly the same
 			if( cache.mu == 0.0f )
 				cache.mu = 1.0f;
+
+			return matrix;
 		}
 
 		@Override
-		public void computeDeformed(Cache cache, float v_x, float v_y ) {
+		public void computeDeformed(Cache cache, float[] a, FMatrix2x2[] matrix, float v_x, float v_y ) {
 			Point2D_F32 deformed = cache.deformed;
 			deformed.set(0,0);
 
-			int N = cache.A_s.size;
+			int N = matrix.length;
 			for (int i = 0; i < N; i++) {
 				Control c = controls.get(i);
 
-				FMatrix2x2 A = cache.A_s.get(i);
+				FMatrix2x2 A = matrix[i];
 				float hat_q_x = c.q.x-cache.aveQ.x;
 				float hat_q_y = c.q.y-cache.aveQ.y;
 
@@ -494,17 +501,17 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	public class RigidModel extends SimilarityModel {
 
 		@Override
-		public void computeDeformed(Cache cache, float v_x, float v_y ) {
+		public void computeDeformed(Cache cache, float[] a, FMatrix2x2[] matrix, float v_x, float v_y ) {
 
 			// f_r[v] equation just above equation 8
 			float fr_x = 0, fr_y = 0;
-			for (int i = 0; i < controls.size(); i++) {
+			for (int i = 0; i < controls.size; i++) {
 				Control c = controls.get(i);
 
 				float hat_q_x = c.q.x - cache.aveQ.x;
 				float hat_q_y = c.q.y - cache.aveQ.y;
 
-				FMatrix2x2 A = cache.A_s.get(i);
+				FMatrix2x2 A = matrix[i];
 				fr_x += (hat_q_x*A.a11 + hat_q_y*A.a21);
 				fr_y += (hat_q_x*A.a12 + hat_q_y*A.a22);
 			}
@@ -532,13 +539,9 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	public static class Cache {
 		// location of the final deformed point
 		Point2D_F32 deformed = new Point2D_F32();
-		GrowQueue_F32 weights = new GrowQueue_F32(); // weight of each control point
-		float totalWeight;
-		GrowQueue_F32 A = new GrowQueue_F32(); // As as the variable 'A' in the paper
+		float weight;
 		Point2D_F32 aveP = new Point2D_F32(); // average control point for given weights
 		Point2D_F32 aveQ = new Point2D_F32(); // average distorted point for given weights
-
-		FastQueue<FMatrix2x2> A_s = new FastQueue<>(FMatrix2x2::new);
 
 		// mu for simularity
 		float mu;
@@ -553,9 +556,11 @@ public class ImageDeformPointMLS_F32 implements Point2Transform2_F32 {
 	}
 
 	private interface Model {
-		void computeCache(Cache cache, float v_x, float v_y);
+		float[] computeA(Cache cache, float[] weights, float v_x, float v_y);
 
-		void computeDeformed( Cache cache , float v_x, float v_y );
+		FMatrix2x2[] computeMatrix(Cache cache, float[] weights, float v_x, float v_y);
+
+		void computeDeformed(Cache cache, float[] a, FMatrix2x2[] matrix, float v_x, float v_y);
 	}
 
 	public static class Control {
