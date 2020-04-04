@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -141,8 +141,8 @@ public class FactoryIntensityPoint {
 	 * @return Hessian based blob intensity
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	GeneralFeatureIntensity<I,D> hessianDet() {
-		return new WrapperHessianThreeImageDetIntensity<>();
+	GeneralFeatureIntensity<I,D> hessianDet( Class<I> imageType ) {
+		return new WrapperHessianThreeImageDetIntensity<>(imageType);
 	}
 
 	/**
@@ -150,7 +150,7 @@ public class FactoryIntensityPoint {
 	 * blob.
 	 */
 	public static <I extends ImageGray<I>>
-	GeneralFeatureIntensity<I,?> laplacian() {
-		return new WrapperLaplacianBlobIntensity();
+	GeneralFeatureIntensity<I,?> laplacian(Class<I> imageType) {
+		return new WrapperLaplacianBlobIntensity<>(imageType);
 	}
 }

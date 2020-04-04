@@ -271,4 +271,12 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	public int getSearchRadius() {
 		return extractor.getSearchRadius();
 	}
+
+	public Class<I> getImageType() {
+		return intensity.getImageType();
+	}
+
+	public Class<D> getDerivType() {
+		return intensity.getDerivType();
+	}
 }

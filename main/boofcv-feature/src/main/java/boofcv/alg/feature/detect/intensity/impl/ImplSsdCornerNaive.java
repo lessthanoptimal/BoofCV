@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -104,6 +104,11 @@ public class ImplSsdCornerNaive<T extends ImageGray<T>> implements GradientCorne
 				intensity.set(col, row, (float) (left - right));
 			}
 		}
+	}
+
+	@Override
+	public Class<T> getInputType() {
+		return null; // unknown until called.
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,22 +21,23 @@ package boofcv.demonstrations.feature.associate;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.describe.ConfigBrief;
+import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
+import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.demonstrations.feature.detect.interest.*;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
@@ -178,14 +179,12 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 	}
 
 	private boolean declareAlgorithms() {
-
 		switch( selectedDetector ) {
-			case 0: detector = FactoryInterestPoint.fastHessian(new ConfigFastHessian( 1, 2, 200, 1, 9, 4, 4)); break;
-			case 1: detector = FactoryInterestPoint.sift(null,new ConfigSiftDetector(400),imageType); break;
+			case 0: detector = FactoryInterestPoint.fastHessian(controls.configFastHessian); break;
+			case 1: detector = FactoryInterestPoint.sift(controls.configSiftScaleSpace,controls.configSiftDetector,imageType); break;
 			case 2: {
-				Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-				GeneralFeatureDetector<T, D> alg = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(500,2,1), null, derivType);
-				detector = FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType);
+				GeneralFeatureDetector<T, D> alg = controls.controlDetectPoint.create(imageType);
+				detector = FactoryInterestPoint.wrapPoint(alg, 1, imageType, alg.getDerivType());
 			} break;
 
 			default:
@@ -193,13 +192,26 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		}
 
 		switch( selectedDescriptor ) {
-			case 0:descriptor = FactoryDescribeRegionPoint.surfStable(null, imageType); break;
-			case 1:descriptor = FactoryDescribeRegionPoint.surfColorStable(null, ImageType.pl(3, imageType)); break;
-			case 2:descriptor = FactoryDescribeRegionPoint.sift(null,null, imageType); break;
-			case 3:descriptor = FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType); break;
-			case 4:descriptor = FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType); break;
-			case 5:descriptor = FactoryDescribeRegionPoint.pixel(11, 11, imageType); break;
-			case 6:descriptor = FactoryDescribeRegionPoint.pixelNCC(11, 11, imageType); break;
+			case 0:
+				if( controls.controlDescSurfSpeed.color ) {
+					descriptor = FactoryDescribeRegionPoint.surfColorFast(
+							controls.configSurfSpeed, ImageType.pl(3, imageType));
+				} else {
+					descriptor = FactoryDescribeRegionPoint.surfFast(controls.configSurfSpeed, imageType);
+				}
+				break;
+			case 1:
+				if( controls.controlDescSurfStable.color ) {
+					descriptor = FactoryDescribeRegionPoint.surfColorStable(
+							controls.configSurfStability, ImageType.pl(3, imageType));
+				} else {
+					descriptor = FactoryDescribeRegionPoint.surfStable(controls.configSurfStability, imageType);
+				}
+				break;
+			case 2:descriptor = FactoryDescribeRegionPoint.sift(
+					controls.configSiftScaleSpace,controls.controlDescSift.config, imageType); break;
+			case 3:descriptor = FactoryDescribeRegionPoint.brief(controls.controlDescBrief.config, imageType); break;
+			case 4:descriptor = FactoryDescribeRegionPoint.template(controls.controlDescTemplate.config, imageType); break;
 			default:
 				throw new IllegalArgumentException("Unknown descriptor");
 		}
@@ -340,19 +352,96 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		JComboBox<String> comboDescribe;
 		JComboBox<String> comboAssoc;
 
+		// Containers for different sets of controls
+		JPanel panelDetector = new JPanel();
+		JPanel panelDescriptor = new JPanel();
+		JPanel panelAssociate = new JPanel();
+
+		// Controls for different detectors / descriptors
+		ControlPanelSiftDetector controlDetectSift;
+		ControlPanelFastHessian controlDetectFastHessian;
+		ControlPanelPointDetector controlDetectPoint =
+				new ControlPanelPointDetector(500, PointDetectorTypes.SHI_TOMASI,this::handleControlsUpdated);
+		ControlPanelSurfDescribe.Speed controlDescSurfSpeed;
+		ControlPanelSurfDescribe.Stability controlDescSurfStable;
+		ControlPanelDescribeSift controlDescSift = new ControlPanelDescribeSift(null,this::handleControlsUpdated);
+		ControlPanelDescribeBrief controlDescBrief =
+				new ControlPanelDescribeBrief(new ConfigBrief(false),this::handleControlsUpdated);
+		ControlPanelDescribeTemplate controlDescTemplate =
+				new ControlPanelDescribeTemplate(null,this::handleControlsUpdated);
+
+		// Configurations for detectors / descriptors
+		ConfigFastHessian configFastHessian = new ConfigFastHessian( 1, 2, 200, 1, 9, 4, 4);
+		ConfigSiftDetector configSiftDetector = new ConfigSiftDetector();
+		ConfigSiftScaleSpace configSiftScaleSpace = new ConfigSiftScaleSpace();
+		ConfigSurfDescribe.Speed configSurfSpeed = new ConfigSurfDescribe.Speed();
+		ConfigSurfDescribe.Stability configSurfStability = new ConfigSurfDescribe.Stability();
+
 		public AssociateControls() {
-			comboDetect = combo(selectedDetector,"Fast Hessian","SIFT","Shi-Tomasi");
-			comboDescribe = combo(selectedDescriptor,"SURF-S","SURF-S Color","SIFT","BRIEF","BRIEFSO","Pixel 11x11","NCC 11x11");
+			comboDetect = combo(selectedDetector,"Fast Hessian","SIFT","Points");
+			comboDescribe = combo(selectedDescriptor,"SURF-F","SURF-S","SIFT","BRIEF","Template");
 			comboAssoc = combo(selectedAssoc,"Greedy","Greedy Backwards","K-D Tree BBF","Random Forest");
 
+			// custom configurations for this demo
+			configSiftDetector.maxFeaturesPerScale = 400;
+
+			// create the algorithm controls
+			controlDetectFastHessian = new ControlPanelFastHessian(configFastHessian,this::handleControlsUpdated);
+			controlDetectFastHessian.setBorder(BorderFactory.createEmptyBorder());
+			controlDetectSift = new ControlPanelSiftDetector(configSiftScaleSpace,configSiftDetector, this::handleControlsUpdated);
+			controlDetectSift.setBorder(BorderFactory.createEmptyBorder());
+			controlDescSurfSpeed = new ControlPanelSurfDescribe.Speed(configSurfSpeed,this::handleControlsUpdated);
+			controlDescSurfSpeed.setBorder(BorderFactory.createEmptyBorder());
+			controlDescSurfStable = new ControlPanelSurfDescribe.Stability(configSurfStability,this::handleControlsUpdated);
+			controlDescSurfStable.setBorder(BorderFactory.createEmptyBorder());
+			controlDescSift.setBorder(BorderFactory.createEmptyBorder());
+			controlDescTemplate.setBorder(BorderFactory.createEmptyBorder());
+
+			// Finish
 			labelTime.setPreferredSize(new Dimension(70,26));
 			labelTime.setHorizontalAlignment(SwingConstants.RIGHT);
 
+			JTabbedPane tabbed = new JTabbedPane();
+			tabbed.addTab("Detect",panelDetector);
+			tabbed.addTab("Describe",panelDescriptor);
+			tabbed.addTab("Associate",panelAssociate);
+
+			handleDetectorChanged();
+			handleDescriptorChanged();
+
 			addLabeled(labelTime,"Time (ms)");
 			add(labelSize);
-			addAlignLeft(comboDetect);
-			addAlignLeft(comboDescribe);
-			addAlignLeft(comboAssoc);
+			addLabeled(comboDetect,"Detect");
+			addLabeled(comboDescribe,"Describe");
+			addLabeled(comboAssoc,"Associate");
+			add(tabbed);
+		}
+
+		private void handleControlsUpdated() {
+			algorithmChange = true;
+			reprocessInput();
+		}
+
+		private void handleDetectorChanged() {
+			panelDetector.removeAll();
+			switch( selectedDetector ) {
+				case 0: panelDetector.add(controlDetectFastHessian); break;
+				case 1: panelDetector.add(controlDetectSift); break;
+				case 2: panelDetector.add(controlDetectPoint); break;
+			}
+			panelDescriptor.invalidate();
+		}
+
+		private void handleDescriptorChanged() {
+			panelDescriptor.removeAll();
+			switch( selectedDescriptor ) {
+				case 0: panelDescriptor.add(controlDescSurfSpeed); break;
+				case 1: panelDescriptor.add(controlDescSurfStable); break;
+				case 2: panelDescriptor.add(controlDescSift); break;
+				case 3: panelDescriptor.add(controlDescBrief); break;
+				case 4: panelDescriptor.add(controlDescTemplate); break;
+			}
+			panelDescriptor.invalidate();
 		}
 
 		public void setTime( double milliseconds ) {
@@ -367,8 +456,10 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		public void actionPerformed(ActionEvent e) {
 			if( comboDetect == e.getSource() ) {
 				selectedDetector = comboDetect.getSelectedIndex();
+				handleDetectorChanged();
 			} else if( comboDescribe == e.getSource() ){
 				selectedDescriptor = comboDescribe.getSelectedIndex();
+				handleDescriptorChanged();
 			} else if( comboAssoc == e.getSource() ){
 				selectedAssoc = comboAssoc.getSelectedIndex();
 			}

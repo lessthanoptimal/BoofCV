@@ -120,14 +120,14 @@ public class FactoryDetectPoint {
 	 * Creates a Fast corner detector with feature intensity for additional pruning. Fast features
 	 * have minimums and maximums.
 	 *
-	 * @param configFast Configuration for FAST feature detector
 	 * @param configDetector Configuration for feature extractor.
+	 * @param configFast Configuration for FAST feature detector
 	 * @param imageType ype of input image.
 	 * @see FastCornerDetector
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createFast( @Nullable ConfigFastCorner configFast ,
-											 ConfigGeneralDetector configDetector , Class<T> imageType) {
+	GeneralFeatureDetector<T, D> createFast(ConfigGeneralDetector configDetector, @Nullable ConfigFastCorner configFast,
+											Class<T> imageType) {
 
 		if( configFast == null )
 			configFast = new ConfigFastCorner();
@@ -203,18 +203,19 @@ public class FactoryDetectPoint {
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T, D> createHessianDirect(HessianBlobIntensity.Type type,
-													 @Nullable ConfigGeneralDetector configDetector) {
+													 @Nullable ConfigGeneralDetector configDetector,
+													 Class<T> imageType ) {
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
 		GeneralFeatureIntensity<T, D> intensity;
 		switch (type) {
 			case DETERMINANT:
-				intensity = FactoryIntensityPoint.hessianDet();
+				intensity = FactoryIntensityPoint.hessianDet(imageType);
 				break;
 
 			case TRACE:
-				intensity = (GeneralFeatureIntensity)FactoryIntensityPoint.laplacian();
+				intensity = (GeneralFeatureIntensity)FactoryIntensityPoint.laplacian(imageType);
 				break;
 
 			default:

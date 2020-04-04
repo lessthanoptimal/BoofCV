@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -53,7 +53,7 @@ public abstract class ConfigSurfDescribe implements Configuration {
 	 */
 	public static class Speed extends ConfigSurfDescribe {
 		/**
-		 * Weighting factor's sigma.  Try 3.8
+		 * Weighting factor's sigma.  Try 4.5
 		 */
 		public double weightSigma = 4.5;
 	}
@@ -80,11 +80,5 @@ public abstract class ConfigSurfDescribe implements Configuration {
 
 	@Override
 	public void checkValidity() {
-	}
-
-	public static void main(String[] args) throws ClassNotFoundException {
-		Class c = Class.forName("boofcv.abst.feature.describe.ConfigSurfDescribe$Speed");
-		System.out.println("c = "+c);
-		Configuration a;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,6 @@ import boofcv.struct.image.ImageGray;
  */
 
 public interface GeneralFeatureIntensity<I extends ImageGray<I>,D extends ImageGray<D>> {
-
 	/**
 	 * Computes the corner's intensity.  Before computing the various image derivatives call
 	 * {@link #getRequiresGradient()} and {@link #getRequiresHessian()} to see if they are needed.
@@ -49,7 +48,7 @@ public interface GeneralFeatureIntensity<I extends ImageGray<I>,D extends ImageG
 	 * @param derivXY Second derivative x-axis y-axis
 	 *
 	 */
-	public void process( I image , D derivX , D derivY , D derivXX , D derivYY , D derivXY );
+	void process( I image , D derivX , D derivY , D derivXX , D derivYY , D derivXY );
 
 	/**
 	 * Returns an image containing an intensity mapping showing how corner like each pixel is.
@@ -57,59 +56,69 @@ public interface GeneralFeatureIntensity<I extends ImageGray<I>,D extends ImageG
 	 *
 	 * @return Corner intensity image.
 	 */
-	public GrayF32 getIntensity();
+	GrayF32 getIntensity();
 
 	/**
 	 * (Optional) Returns a list of candidate for local minimums.
 	 *
 	 * @return List of potential features.  If not supported then null is returned.
 	 */
-	public QueueCorner getCandidatesMin();
+	QueueCorner getCandidatesMin();
 
 	/**
 	 *  (Optional) Returns a list of candidate for local maximums.
 	 *
 	 * @return List of potential features.  If not supported then null is returned.
 	 */
-	public QueueCorner getCandidatesMax();
+	QueueCorner getCandidatesMax();
 
 	/**
 	 * If the image gradient is required for calculations.
 	 *
 	 * @return true if the image gradient is required.
 	 */
-	public boolean getRequiresGradient();
+	boolean getRequiresGradient();
 
 	/**
 	 * Is the image's second derivative required?
 	 *
 	 * @return is the hessian required.
 	 */
-	public boolean getRequiresHessian();
+	boolean getRequiresHessian();
 
 	/**
 	 * If true there is a list of candidate corners for minimums and/or maximums.
 	 */
-	public boolean hasCandidates();
+	boolean hasCandidates();
 
 	/**
 	 * Pixels within this distance from the image border are not processed.
 	 *
 	 * @return Size of unprocessed border around the image.
 	 */
-	public int getIgnoreBorder();
+	int getIgnoreBorder();
 
 	/**
 	 * Indicates if local minimums are features or not.
 	 *
 	 * @return true for local minimum features.
 	 */
-	public boolean localMinimums();
+	boolean localMinimums();
 
 	/**
 	 * Indicates if local maximums are features or not.
 	 *
 	 * @return true for local maximum features.
 	 */
-	public boolean localMaximums();
+	boolean localMaximums();
+
+	/**
+	 * Input image type
+	 */
+	Class<I> getImageType();
+
+	/**
+	 * Derivative image type
+	 */
+	Class<D> getDerivType();
 }

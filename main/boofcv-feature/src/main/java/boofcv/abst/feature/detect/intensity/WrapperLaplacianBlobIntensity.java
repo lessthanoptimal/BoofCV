@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,10 @@ import boofcv.struct.image.ImageGray;
  */
 public class WrapperLaplacianBlobIntensity<I extends ImageGray<I>,D extends ImageGray<D>>
 		extends BaseGeneralFeatureIntensity<I,D> {
+
+	public WrapperLaplacianBlobIntensity(Class<I> imageType) {
+		super(imageType, null);
+	}
 
 	@Override
 	public void process(I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY) {

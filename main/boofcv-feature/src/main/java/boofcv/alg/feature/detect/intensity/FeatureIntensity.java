@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,12 +37,12 @@ public interface FeatureIntensity<T extends ImageGray<T>> {
 	 *
 	 * @return Radius of detected features.
 	 */
-	public int getRadius();
+	int getRadius();
 
 	/**
 	 * Size of the region surrounding the image's border in which pixels are not processed.
 	 *
 	 * @return The ignore border around the image.
 	 */
-	public int getIgnoreBorder();
+	int getIgnoreBorder();
 }

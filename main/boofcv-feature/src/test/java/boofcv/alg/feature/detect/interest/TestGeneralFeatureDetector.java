@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -413,6 +413,16 @@ public class TestGeneralFeatureDetector {
 		@Override
 		public boolean localMaximums() {
 			return maximums;
+		}
+
+		@Override
+		public Class<GrayF32> getImageType() {
+			return GrayF32.class;
+		}
+
+		@Override
+		public Class<GrayF32> getDerivType() {
+			return GrayF32.class;
 		}
 
 		@Override

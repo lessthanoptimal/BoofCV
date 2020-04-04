@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -76,6 +76,10 @@ public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends Image
 		return radius;
 	}
 
+	@Override
+	public Class<D> getInputType() {
+		return horizXX.imageType.getImageClass();
+	}
 
 	public interface CornerIntensity_S32 {
 		/**

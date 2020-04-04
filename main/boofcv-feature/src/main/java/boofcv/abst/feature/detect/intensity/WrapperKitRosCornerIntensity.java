@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -37,6 +37,7 @@ public class WrapperKitRosCornerIntensity<I extends ImageGray<I>,D extends Image
 	Method m;
 
 	public WrapperKitRosCornerIntensity(Class<D> derivType ) {
+		super(null,derivType);
 		try {
 			m = KitRosCornerIntensity.class.getMethod("process",GrayF32.class,derivType,derivType,derivType,derivType,derivType);
 		} catch (NoSuchMethodException e) {

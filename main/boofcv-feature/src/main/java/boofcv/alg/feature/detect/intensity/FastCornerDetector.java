@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -196,5 +196,9 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 		if( maxFeaturesFraction <= 0 || maxFeaturesFraction > 1 )
 			throw new IllegalArgumentException("0 to 1");
 		this.maxFeaturesFraction = maxFeaturesFraction;
+	}
+
+	public Class<T> getImageType() {
+		return helper.getImageType();
 	}
 }

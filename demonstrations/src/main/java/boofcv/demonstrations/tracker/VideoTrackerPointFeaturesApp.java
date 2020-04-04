@@ -128,8 +128,8 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 		ConfigFastHessian configFH = new ConfigFastHessian();
 		configFH.maxFeaturesPerScale = 200;
-		configFH.extractRadius =  controlPanel.controlsGeneric.detector.radius;
-		configFH.detectThreshold = 15f;
+		configFH.extract.radius =  controlPanel.controlsGeneric.detector.radius;
+		configFH.extract.threshold = 15f;
 
 		switch( which ) {
 			case 0: tracker = FactoryPointTracker.klt(

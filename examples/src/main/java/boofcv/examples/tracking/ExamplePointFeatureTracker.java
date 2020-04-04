@@ -145,8 +145,8 @@ public class ExamplePointFeatureTracker< T extends ImageGray<T>, D extends Image
 	public void createSURF() {
 		ConfigFastHessian configDetector = new ConfigFastHessian();
 		configDetector.maxFeaturesPerScale = 250;
-		configDetector.extractRadius = 3;
-		configDetector.initialSampleSize = 2;
+		configDetector.extract.radius = 3;
+		configDetector.initialSampleStep = 2;
 		tracker = FactoryPointTracker.dda_FH_SURF_Fast(configDetector, null, null, imageType);
 	}
 

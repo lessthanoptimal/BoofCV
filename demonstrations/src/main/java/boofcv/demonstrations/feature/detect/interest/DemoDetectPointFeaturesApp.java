@@ -313,7 +313,7 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 		controls.configExtract.detectMinimums = true;
 		controls.adjustControls(false,true);
 		changeDetector(FactoryDetectPoint.createFast(
-				new ConfigFastCorner(controls.fastPixelTol,9),controls.configExtract, imageClass));
+				controls.configExtract, new ConfigFastCorner(controls.fastPixelTol,9), imageClass));
 	}
 	private void createFast() {
 		controls.adjustControls(false,true);

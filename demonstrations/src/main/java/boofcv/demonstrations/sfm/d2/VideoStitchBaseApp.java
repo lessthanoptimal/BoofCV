@@ -136,7 +136,7 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 		config.pyramidLevels = ConfigDiscreteLevels.levels(4);
 
 		ConfigFastHessian configFH = new ConfigFastHessian();
-		configFH.initialSampleSize = 2;
+		configFH.initialSampleStep = 2;
 		configFH.maxFeaturesPerScale = 250;
 
 		ImageType imageType = super.getImageType(0);

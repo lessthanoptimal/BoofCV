@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -90,7 +90,7 @@ public class DetectPointsWithNoiseApp<T extends ImageGray<T>, D extends ImageGra
 		addAlgorithm(0, "Shi-Tomasi Weighted", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		configExtract.detectMinimums = true;
 		configExtract.threshold = 10;
-		alg = FactoryDetectPoint.createFast(new ConfigFastCorner(10,9),configExtract, imageType);
+		alg = FactoryDetectPoint.createFast(configExtract, new ConfigFastCorner(10,9), imageType);
 		configExtract.detectMinimums = false;
 		configExtract.threshold = thresh;
 		addAlgorithm(0, "Fast", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));

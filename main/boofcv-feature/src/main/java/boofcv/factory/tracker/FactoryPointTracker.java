@@ -274,7 +274,7 @@ public class FactoryPointTracker {
 		DescribePointBrief<I> brief = FactoryDescribePointAlgs.brief(FactoryBriefDefinition.gaussian2(new Random(123), 16, 512),
 				FactoryBlurFilter.gaussian(ImageType.single(imageType), 0, 4));
 
-		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createFast(configFast, configExtract, imageType);
+		GeneralFeatureDetector<I,D> corner = FactoryDetectPoint.createFast(configExtract, configFast, imageType);
 		EasyGeneralFeatureDetector<I,D> easy = new EasyGeneralFeatureDetector<>(corner, imageType, null);
 
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();

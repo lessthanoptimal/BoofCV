@@ -20,6 +20,7 @@ package boofcv.demonstrations.feature.associate;
 
 import boofcv.abst.feature.associate.*;
 import boofcv.abst.feature.describe.ConfigBrief;
+import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
@@ -31,6 +32,7 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.demonstrations.feature.detect.interest.ControlPanelSiftDetector;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
@@ -273,27 +275,60 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		JComboBox<String> comboDetect;
 		JComboBox<String> comboDescribe;
 
+		// Containers for different sets of controls
+		JPanel panelDetector = new JPanel();
+		JPanel panelDescriptor = new JPanel();
+
 		// selects which image to view
 		JComboBox scoreTypes = new JComboBox();
 
 		Class type;
 		ScoreAssociation selected;
 
-
 		public int selectedDetector;
 		public int selectedDescriptor;
+
+		// Controls for different detectors / descriptors
+		ControlPanelSiftDetector controlSiftDetector;
+
+		// Configurations for detectors / descriptors
+		ConfigSiftDetector configSiftDetector = new ConfigSiftDetector();
+		ConfigSiftScaleSpace configSiftScaleSpace = new ConfigSiftScaleSpace();
+		ConfigSiftDetector configSiftDescribe = new ConfigSiftDetector();
 
 		public VisualizeScorePanel() {
 			setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 			setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+
+			controlSiftDetector = new ControlPanelSiftDetector(configSiftScaleSpace,configSiftDetector, this::handleControlsUpdated);
 
 			comboDetect = combo(selectedDetector,"Fast Hessian","SIFT","Shi-Tomasi");
 			comboDescribe = combo(selectedDescriptor,"SURF-S","SURF-S Color","SIFT","BRIEF","BRIEFSO","Pixel 11x11","NCC 11x11");
 
 			scoreTypes.addActionListener(this);
 			scoreTypes.setMaximumSize(scoreTypes.getPreferredSize());
+
+			JTabbedPane tabbed = new JTabbedPane();
+			tabbed.addTab("Detect",panelDetector);
+			tabbed.addTab("Describe",panelDescriptor);
+
+			handleDetectorChanged();
+
 			add(labelSize);
 			addLabeled(scoreTypes, "Score: ");
+			add(tabbed);
+		}
+
+		private void handleControlsUpdated() {
+
+		}
+
+		private void handleDetectorChanged() {
+			panelDetector.removeAll();
+			switch( selectedDetector ) {
+				case 1: panelDetector.add(controlSiftDetector); break;
+			}
+			panelDescriptor.invalidate();
 		}
 
 		public void setImageSize( int width , int height ) {
@@ -334,6 +369,10 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			if( e.getSource() == comboDetect ) {
+
+			}
+
 			ScoreItem item = (ScoreItem)scoreTypes.getSelectedItem();
 			selected = item.assoc;
 

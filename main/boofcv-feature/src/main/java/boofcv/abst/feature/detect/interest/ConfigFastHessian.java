@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,6 +18,7 @@
 
 package boofcv.abst.feature.detect.interest;
 
+import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.struct.Configuration;
 
 /**
@@ -28,14 +29,9 @@ import boofcv.struct.Configuration;
 public class ConfigFastHessian implements Configuration {
 
 	/**
-	 * Minimum feature intensity. Image dependent.  Start tuning at 1.
+	 * Configuration for non-maximum thresholding
 	 */
-	public float detectThreshold = 1;
-
-	/**
-	 * Radius used for non-max-suppression.  Typically 1 or 2.
-	 */
-	public int extractRadius = 2;
+	public ConfigExtract extract = new ConfigExtract(2,1,0,true);
 
 	/**
 	 * Maximum number of features that non-maximum suppression (NMS) can return from each scale. Features with higher
@@ -46,7 +42,7 @@ public class ConfigFastHessian implements Configuration {
 	/**
 	 * How often pixels are sampled in the first octave.  Typically 1 or 2.
 	 */
-	public int initialSampleSize = 1;
+	public int initialSampleStep = 1;
 
 	/**
 	 * Typically 9.
@@ -72,14 +68,14 @@ public class ConfigFastHessian implements Configuration {
 	public ConfigFastHessian(float detectThreshold,
 							 int extractRadius,
 							 int maxFeaturesPerScale,
-							 int initialSampleSize,
+							 int initialSampleStep,
 							 int initialSize,
 							 int numberScalesPerOctave,
 							 int numberOfOctaves) {
-		this.detectThreshold = detectThreshold;
-		this.extractRadius = extractRadius;
+		this.extract.threshold = detectThreshold;
+		this.extract.radius = extractRadius;
 		this.maxFeaturesPerScale = maxFeaturesPerScale;
-		this.initialSampleSize = initialSampleSize;
+		this.initialSampleStep = initialSampleStep;
 		this.initialSize = initialSize;
 		this.numberScalesPerOctave = numberScalesPerOctave;
 		this.numberOfOctaves = numberOfOctaves;

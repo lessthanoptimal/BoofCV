@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,7 @@ public class WrapperGradientCornerIntensity<I extends ImageGray<I>,D extends Ima
 	GradientCornerIntensity<D> alg;
 
 	public WrapperGradientCornerIntensity(GradientCornerIntensity<D> alg) {
+		super(null,alg.getInputType());
 		this.alg = alg;
 	}
 
@@ -75,6 +76,16 @@ public class WrapperGradientCornerIntensity<I extends ImageGray<I>,D extends Ima
 	@Override
 	public boolean localMaximums() {
 		return true;
+	}
+
+	@Override
+	public Class<I> getImageType() {
+		return null;
+	}
+
+	@Override
+	public Class<D> getDerivType() {
+		return alg.getInputType();
 	}
 
 	@Override

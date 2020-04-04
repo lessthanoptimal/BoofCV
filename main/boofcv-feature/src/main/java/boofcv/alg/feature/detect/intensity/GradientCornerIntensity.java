@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,5 +59,10 @@ public interface GradientCornerIntensity<T extends ImageGray<T>> extends Feature
 	 * @param derivY Image derivative along the y-axis.
 	 * @param intensity Output intensity image
 	 */
-	public void process(T derivX, T derivY , GrayF32 intensity );
+	void process(T derivX, T derivY , GrayF32 intensity );
+
+	/**
+	 * Type of input image.
+	 */
+	Class<T> getInputType();
 }

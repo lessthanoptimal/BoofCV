@@ -273,7 +273,7 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 					break;
 				case "FAST":
 					config.detectMinimums = true;
-					detector = FactoryDetectPoint.createFast(null,config,imageType);
+					detector = FactoryDetectPoint.createFast(config, null, imageType);
 					break;
 				case "KitRos":
 					detector = FactoryDetectPoint.createKitRos(config,derivType);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -198,6 +198,30 @@ public class FactoryDescribeRegionPoint {
 			return new WrapDescribeBrief<>(FactoryDescribePointAlgs.brief(definition, filter), imageType);
 		} else {
 			return new WrapDescribeBriefSo<>(FactoryDescribePointAlgs.briefso(definition, filter), imageType);
+		}
+	}
+
+	/**
+	 * Creates a template based descriptor.
+	 *
+	 * @see ConfigTemplateDescribe
+	 *
+	 * @param config The configuration.
+	 * @param imageType Type of input image
+	 * @return Pixel region descriptor
+	 */
+	public static <T extends ImageGray<T>, D extends TupleDesc>
+	DescribeRegionPoint<T,D> template( @Nullable ConfigTemplateDescribe config , Class<T> imageType ) {
+		if( config == null )
+			config = new ConfigTemplateDescribe();
+
+		switch( config.type ) {
+			case PIXEL: return new WrapDescribePixelRegion(
+					FactoryDescribePointAlgs.pixelRegion(config.width,config.height,imageType),imageType);
+			case NCC: return new WrapDescribePixelRegionNCC(
+					FactoryDescribePointAlgs.pixelRegionNCC(config.width,config.height,imageType),imageType);
+			default:
+				throw new IllegalArgumentException("Unknown template type "+config.type);
 		}
 	}
 

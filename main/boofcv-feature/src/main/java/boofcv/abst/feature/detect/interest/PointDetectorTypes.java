@@ -16,27 +16,46 @@
  * limitations under the License.
  */
 
-package boofcv.abst.feature.detect.intensity;
+package boofcv.abst.feature.detect.interest;
 
-import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
-import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.GrayS16;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageGray;
+import boofcv.alg.feature.detect.intensity.FastCornerDetector;
+import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 
 /**
+ * List of all the built in point detectors
+ *
  * @author Peter Abeles
  */
-public class TestWrapperLaplacianBlobIntensity<I extends ImageGray<I>, D extends ImageGray<D>>
-		extends ChecksGeneralFeatureIntensity<I,D>
-{
-	public TestWrapperLaplacianBlobIntensity() {
-		addTypes(GrayF32.class,GrayF32.class);
-		addTypes(GrayU8.class, GrayS16.class);
-	}
-
-	@Override
-	public GeneralFeatureIntensity<I,D> createAlg(Class<I> imageType, Class<D> derivType) {
-		return (GeneralFeatureIntensity)FactoryIntensityPoint.laplacian(imageType);
-	}
+public enum PointDetectorTypes {
+	/**
+	 * Maximums only
+	 */
+	SHI_TOMASI,
+	/**
+	 * Maximums only
+	 */
+	HARRIS,
+	/**
+	 * Maximums and minimums
+	 * @see FastCornerDetector
+	 */
+	FAST,
+	/**
+	 * Maximums and minimums
+	 * @see HessianBlobIntensity
+	 */
+	LAPLACIAN,
+	/**
+	 * Maximums only
+	 * @see HessianBlobIntensity
+	 */
+	DETERMINANT,
+	/**
+	 *
+	 */
+	KIT_ROS,
+	/**
+	 *
+	 */
+	MEDIUM,
 }

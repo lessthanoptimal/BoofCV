@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -85,5 +85,10 @@ public abstract class ImplFastHelper_F32 implements FastCornerInterface<GrayF32>
 		centerValue = data[index];
 		lower = centerValue - tol;
 		upper = centerValue + tol;
+	}
+
+	@Override
+	public Class<GrayF32> getImageType() {
+		return GrayF32.class;
 	}
 }

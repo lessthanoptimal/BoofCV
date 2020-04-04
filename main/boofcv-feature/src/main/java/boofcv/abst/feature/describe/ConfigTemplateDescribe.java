@@ -18,36 +18,41 @@
 
 package boofcv.abst.feature.describe;
 
-import boofcv.alg.feature.describe.DescribePointSift;
 import boofcv.struct.Configuration;
 
 /**
- * Configuration for {@link DescribePointSift}
- * 
+ * Template based image descriptor. Template descriptors use each pixel in the region as a feature.
+ *
  * @author Peter Abeles
  */
-public class ConfigSiftDescribe implements Configuration {
+public class ConfigTemplateDescribe implements Configuration {
+	/**
+	 * The type of descriptor. Not all error types can be used with all descriptors.
+	 */
+	public Type type = Type.NCC;
 
-	/** Width of sub-region in samples.*/
-	public int widthSubregion=4;
-
-	/** Width of grid in subregions. */
-	public int widthGrid=4;
-
-	/** Number of histogram bins.*/
-	public int numHistogramBins=8;
-
-	/** Conversion of sigma to pixels.  Used to scale the descriptor region. */
-	public double sigmaToPixels=1.0;
-
-	/** Sigma for Gaussian weighting function is set to this value * region width.*/
-	public double weightingSigmaFraction=0.5;
-
-	/** Maximum fraction a single element can have in descriptor. Helps with non-affine changes in lighting. See paper.*/
-	public double maxDescriptorElementValue=0.2;
+	/**
+	 * The region's width
+	 */
+	public int width=11;
+	/**
+	 * The region's height.
+	 */
+	public int height=11;
 
 	@Override
 	public void checkValidity() {
-		
+
+	}
+
+	public enum Type {
+		/**
+		 * The raw image values are used.
+		 */
+		PIXEL,
+		/**
+		 * Normalized Cross Correlation. Tends to be more stable and lighting invariant than PIXEL
+		 */
+		NCC
 	}
 }

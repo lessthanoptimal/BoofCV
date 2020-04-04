@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,15 @@ public abstract class BaseGeneralFeatureIntensity <I extends ImageGray<I>, D ext
 {
 	GrayF32 intensity = new GrayF32(1,1);
 
+	Class<I> imageType;
+	Class<D> derivType;
 
-	public void init( int width , int height) {
+	public BaseGeneralFeatureIntensity(Class<I> imageType, Class<D> derivType) {
+		this.imageType = imageType;
+		this.derivType = derivType;
+	}
+
+	public void init(int width , int height) {
 		if( intensity.width != width || intensity.height != height ) {
 			intensity.reshape(width,height);
 			// zero the image to make sure it's borders values are zero
@@ -44,5 +51,15 @@ public abstract class BaseGeneralFeatureIntensity <I extends ImageGray<I>, D ext
 	@Override
 	public GrayF32 getIntensity() {
 		return intensity;
+	}
+
+	@Override
+	public Class<I> getImageType() {
+		return imageType;
+	}
+
+	@Override
+	public Class<D> getDerivType() {
+		return derivType;
 	}
 }

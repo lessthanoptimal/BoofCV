@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,6 +33,7 @@ public class WrapperFastCornerIntensity<I extends ImageGray<I>, D extends ImageG
 	FastCornerDetector<I> alg;
 
 	public WrapperFastCornerIntensity(FastCornerDetector<I> alg) {
+		super(alg.getImageType(),null);
 		this.alg = alg;
 	}
 
@@ -80,5 +81,15 @@ public class WrapperFastCornerIntensity<I extends ImageGray<I>, D extends ImageG
 	@Override
 	public boolean localMaximums() {
 		return true;
+	}
+
+	@Override
+	public Class<I> getImageType() {
+		return alg.getImageType();
+	}
+
+	@Override
+	public Class<D> getDerivType() {
+		return null;
 	}
 }

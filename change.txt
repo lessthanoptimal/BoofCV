@@ -53,6 +53,9 @@ Version : 0.36
   * BinaryEllipseDetectorPixel will use external only contour detector when it doesn't detect internal contours
 - PerspectiveOps
   * Added two types of point invariants
+- Association
+  * TODO Add score ratio test to greedy
+  * TODO Create a Config for greedy
 - Scene Reconstruction
   * Better cropping on rectified image using bounding box instead of rotation matrix
   * TODO try improving 3-view by estimating lens distortion in projective camera

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,6 +39,9 @@ public class WrapperHessianThreeImageDetIntensity<I extends ImageGray<I>,D exten
 	ImageBorder_F32 borderF32 = (ImageBorder_F32)FactoryImageBorder.single(BorderType.EXTENDED, GrayF32.class);
 	ImageBorder_S32 borderS32 = (ImageBorder_S32<GrayU8>)FactoryImageBorder.single(BorderType.EXTENDED, GrayU8.class);
 
+	public WrapperHessianThreeImageDetIntensity( Class<I> imageType ) {
+		super(imageType,null);
+	}
 
 	@Override
 	public void process(I image, D derivX, D derivY, D derivXX, D derivYY, D derivXY) {
