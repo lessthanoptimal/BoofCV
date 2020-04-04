@@ -21,6 +21,7 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociateEuclidean_F64;
 import boofcv.abst.feature.associate.ScoreAssociation;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.BrightFeature;
@@ -36,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestAssociateSurfBasic {
+class TestAssociateSurfBasic {
 
 	AssociateSurfBasic alg = createAlg();
 
@@ -44,7 +45,7 @@ public class TestAssociateSurfBasic {
 	 * Two features with different laplacian signs should never be associated
 	 */
 	@Test
-	public void checkAssociateByIntensity() {
+	void checkAssociateByIntensity() {
 		FastArray<BrightFeature> src = new FastArray<>(BrightFeature.class);
 		FastArray<BrightFeature> dst = new FastArray<>(BrightFeature.class);
 
@@ -63,7 +64,7 @@ public class TestAssociateSurfBasic {
 	}
 
 	@Test
-	public void basicAssociation() {
+	void basicAssociation() {
 		FastArray<BrightFeature> src = new FastArray<>(BrightFeature.class);
 		FastArray<BrightFeature> dst = new FastArray<>(BrightFeature.class);
 
@@ -112,7 +113,7 @@ public class TestAssociateSurfBasic {
 	private AssociateSurfBasic createAlg() {
 
 		ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclidean_F64();
-		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, 20, true);
+		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,20),score);
 
 		return new AssociateSurfBasic(assoc);
 	}
@@ -127,7 +128,7 @@ public class TestAssociateSurfBasic {
 	}
 
 	@Test
-	public void checkUnassociated() {
+	void checkUnassociated() {
 		FastArray<BrightFeature> src = new FastArray<>(BrightFeature.class);
 		FastArray<BrightFeature> dst = new FastArray<>(BrightFeature.class);
 
@@ -141,7 +142,7 @@ public class TestAssociateSurfBasic {
 		dst.add( createDesc(false,7));
 
 		ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclidean_F64();
-		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, 20, true);
+		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.greedy(new ConfigAssociateGreedy(false,20.0),score);
 		AssociateSurfBasic alg = new AssociateSurfBasic(assoc);
 
 		alg.setSrc(src);
@@ -154,7 +155,7 @@ public class TestAssociateSurfBasic {
 	 * Shouldn't crash in this case.  just do nothing and clear previous results
 	 */
 	@Test
-	public void handleEmptyLists() {
+	void handleEmptyLists() {
 		// Initialize it with a successful association
 		FastArray<BrightFeature> src = new FastArray<>(BrightFeature.class);
 		FastArray<BrightFeature> dst = new FastArray<>(BrightFeature.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,25 +42,22 @@ public class FactoryAssociation {
 	 * See {@link AssociateGreedy} for details.
 	 * 
 	 * @param score Computes the fit score between two features.
-	 * @param maxError Maximum allowed error/fit score between two features.  To disable set to Double.MAX_VALUE
-	 * @param backwardsValidation If true associations are validated by associating in the reverse direction.  If the 
-	 *                  forward and reverse matches fit an association is excepted.
+	 * @param config Configuration
 	 * @param <D> Data structure being associated
 	 * @return AssociateDescription
 	 */
 	public static <D> AssociateDescription<D>
-	greedy( ScoreAssociation<D> score ,
-			double maxError ,
-			boolean backwardsValidation )
+	greedy( ConfigAssociateGreedy config, ScoreAssociation<D> score )
 	{
 		AssociateGreedyBase<D> alg;
 
 		if(BoofConcurrency.USE_CONCURRENT ) {
-			alg = new AssociateGreedy_MT<>(score, backwardsValidation);
+			alg = new AssociateGreedy_MT<>(score, config.forwardsBackwards);
 		} else {
-			alg = new AssociateGreedy<>(score, backwardsValidation);
+			alg = new AssociateGreedy<>(score, config.forwardsBackwards);
 		}
-		alg.setMaxFitError(maxError);
+		alg.setMaxFitError(config.maxErrorThreshold);
+		alg.setRatioTest(config.scoreRatioThreshold);
 		return new WrapAssociateGreedy<>(alg);
 	}
 
@@ -88,7 +85,7 @@ public class FactoryAssociation {
 	 * freedom, e.g. &gt; 20
 	 *
 	 * @see AssociateNearestNeighbor_ST
-	 * @see org.ddogleg.nn.wrap.KdForestBbfSearch
+	 * @see org.ddogleg.nn.wrap.KdForestBbfNearestNeighbor
 	 *
 	 * @param dimension Number of elements in the feature vector
 	 * @param maxNodesSearched  Maximum number of nodes it will search.  Controls speed and accuracy.

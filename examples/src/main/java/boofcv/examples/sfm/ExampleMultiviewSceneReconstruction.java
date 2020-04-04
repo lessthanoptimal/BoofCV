@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,6 +25,7 @@ import boofcv.abst.geo.bundle.*;
 import boofcv.alg.sfm.structure.EstimateSceneCalibrated;
 import boofcv.alg.sfm.structure.PairwiseImageMatching;
 import boofcv.factory.distort.LensDistortionFactory;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.ConfigBundleAdjustment;
@@ -71,7 +72,7 @@ public class ExampleMultiviewSceneReconstruction {
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(null, null, null, GrayF32.class);
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 		AssociateDescription<TupleDesc> associate =
-				FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
+				FactoryAssociation.greedy(new ConfigAssociateGreedy(true),scorer);
 		PairwiseImageMatching<GrayF32> imageMatching = new PairwiseImageMatching<>(detDesc,associate);
 		imageMatching.setVerbose(System.out,0);
 

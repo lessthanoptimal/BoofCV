@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -28,6 +28,7 @@ import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -94,7 +95,7 @@ public class ExampleDetectDescribe {
 
 		// Might as well have this example do something useful, like associate two images
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
-		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
+		AssociateDescription associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true),scorer);
 
 		// load and match images
 		ExampleAssociatePoints app = new ExampleAssociatePoints(detDesc,associate,imageType);

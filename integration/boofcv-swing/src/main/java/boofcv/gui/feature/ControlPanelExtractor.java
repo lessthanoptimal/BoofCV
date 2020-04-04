@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.demonstrations.feature.detect.interest;
+package boofcv.gui.feature;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.gui.StandardAlgConfigPanel;

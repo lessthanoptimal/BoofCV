@@ -20,6 +20,8 @@ package boofcv.alg.feature.associate;
 
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.struct.feature.TupleDesc_F64;
+import lombok.Getter;
+import lombok.Setter;
 import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -44,18 +46,25 @@ import org.ddogleg.struct.GrowQueue_I32;
  */
 public abstract class AssociateGreedyBase<D> {
 
-	// computes association score
-	ScoreAssociation<D> score;
-	// worst allowed fit score to associate
-	double maxFitError = Double.MAX_VALUE;
+	/** computes association score */
+	@Getter ScoreAssociation<D> score;
+	/** worst allowed fit score to associate */
+	@Getter double maxFitError = Double.MAX_VALUE;
 	// stores the quality of fit score
 	GrowQueue_F64 fitQuality = new GrowQueue_F64(100);
 	// stores indexes of associated
 	GrowQueue_I32 pairs = new GrowQueue_I32(100);
 	// various
 	GrowQueue_F64 workBuffer = new GrowQueue_F64(100);
-	// if true backwardsValidation is done
-	boolean backwardsValidation;
+	/**
+	 * if true backwardsValidation is done
+	 */
+	@Getter @Setter boolean backwardsValidation;
+	/**
+	 * For a solution to be accepted the second best score must be better than the best score by this ratio.
+	 * A value &ge; 1.0 will effective turn this test off
+	 */
+	@Getter @Setter double ratioTest = 1.0;
 
 	/**
 	 * Configure association
@@ -64,7 +73,7 @@ public abstract class AssociateGreedyBase<D> {
 	 * @param backwardsValidation If true then backwards validation is performed.
 	 */
 	AssociateGreedyBase(ScoreAssociation<D> score,
-							   boolean backwardsValidation) {
+						boolean backwardsValidation) {
 		this.score = score;
 		this.backwardsValidation = backwardsValidation;
 	}
@@ -99,14 +108,9 @@ public abstract class AssociateGreedyBase<D> {
 	}
 
 	public void setMaxFitError(double maxFitError) {
-		this.maxFitError = maxFitError;
-	}
-
-	public ScoreAssociation<D> getScore() {
-		return score;
-	}
-
-	public boolean isBackwardsValidation() {
-		return backwardsValidation;
+		if( maxFitError <= 0.0 )
+			this.maxFitError = Double.MAX_VALUE;
+		else
+			this.maxFitError = maxFitError;
 	}
 }

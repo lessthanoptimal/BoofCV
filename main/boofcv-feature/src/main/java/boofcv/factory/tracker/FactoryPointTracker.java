@@ -50,6 +50,7 @@ import boofcv.alg.interpolate.InterpolateRectangle;
 import boofcv.alg.tracker.combined.CombinedTrackerScalePoint;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.alg.transform.ii.GIntegralImageOps;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -168,7 +169,7 @@ public class FactoryPointTracker {
 										  Class<I> imageType)
 	{
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 5, true));
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,5),score));
 
 		AssociateDescription2D<BrightFeature> generalAssoc =
 				new AssociateDescTo2D<>(new WrapAssociateSurfBasic(assoc));
@@ -203,7 +204,7 @@ public class FactoryPointTracker {
 											Class<I> imageType)
 	{
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 5, true));
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,5),score));
 
 		AssociateDescription2D<BrightFeature> generalAssoc =
 				new AssociateDescTo2D<>(new WrapAssociateSurfBasic(assoc));
@@ -245,7 +246,7 @@ public class FactoryPointTracker {
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
-				new AssociateDescTo2D<>(FactoryAssociation.greedy(score, maxAssociationError, true));
+				new AssociateDescTo2D<>(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxAssociationError),score));
 
 		DdaManagerGeneralPoint<I,D,TupleDesc_B> manager =
 				new DdaManagerGeneralPoint<>(easy, new WrapDescribeBrief<>(brief, imageType), 1.0);
@@ -281,7 +282,7 @@ public class FactoryPointTracker {
 
 		AssociateDescription2D<TupleDesc_B> association =
 				new AssociateDescTo2D<>(
-						FactoryAssociation.greedy(score, maxAssociationError, true));
+						FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxAssociationError),score));
 
 		DdaManagerGeneralPoint<I,D,TupleDesc_B> manager =
 				new DdaManagerGeneralPoint<>(easy, new WrapDescribeBrief<>(brief, imageType), 1.0);
@@ -318,7 +319,7 @@ public class FactoryPointTracker {
 
 		AssociateDescription2D<NccFeature> association =
 				new AssociateDescTo2D<>(
-						FactoryAssociation.greedy(score, Double.MAX_VALUE, true));
+						FactoryAssociation.greedy(new ConfigAssociateGreedy(true,Double.MAX_VALUE),score));
 
 		DdaManagerGeneralPoint<I,D,NccFeature> manager =
 				new DdaManagerGeneralPoint<>(easy, new WrapDescribePixelRegionNCC<>(alg, imageType), 1.0);
@@ -395,7 +396,7 @@ public class FactoryPointTracker {
 										  Class<I> imageType) {
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, true));
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,Double.MAX_VALUE),score));
 
 		AssociateDescription<BrightFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 
@@ -440,7 +441,7 @@ public class FactoryPointTracker {
 				= FactoryDescribeRegionPoint.surfStable(configDescribe, imageType);
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.scoreEuclidean(TupleDesc_F64.class, true);
-		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(score, 100000, true));
+		AssociateSurfBasic assoc = new AssociateSurfBasic(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,Double.MAX_VALUE),score));
 
 		AssociateDescription<BrightFeature> generalAssoc = new WrapAssociateSurfBasic(assoc);
 

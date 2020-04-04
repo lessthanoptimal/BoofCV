@@ -39,6 +39,7 @@ import boofcv.abst.tracker.PointTrackerTwoPass;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.tracker.klt.ConfigPKlt;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
@@ -302,7 +303,7 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 			ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 			AssociateDescription2D<TupleDesc_B> associate =
-					new AssociateDescTo2D<>(FactoryAssociation.greedy(score, 150, true));
+					new AssociateDescTo2D<>(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,150),score));
 
 			PointTracker<I> tracker = FactoryPointTracker.dda(detector, describe, associate, 1, imageType);
 

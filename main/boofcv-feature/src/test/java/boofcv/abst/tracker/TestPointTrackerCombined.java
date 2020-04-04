@@ -26,6 +26,7 @@ import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
@@ -60,7 +61,7 @@ public class TestPointTrackerCombined extends GenericChecksPointTracker<GrayF32>
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription<TupleDesc_B> association =
-				FactoryAssociation.greedy(score, 400, true);
+				FactoryAssociation.greedy(new ConfigAssociateGreedy(false,400),score);
 
 		PointTracker<GrayF32> pointTracker = FactoryPointTracker.combined(
 				detector, null,

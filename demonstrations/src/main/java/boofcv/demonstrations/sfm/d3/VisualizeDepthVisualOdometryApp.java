@@ -34,6 +34,7 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.tracker.klt.ConfigPKlt;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.sfm.FactoryVisualOdometry;
@@ -435,7 +436,7 @@ public class VisualizeDepthVisualOdometryApp
 			ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 			AssociateDescription2D<TupleDesc_B> associate =
-					new AssociateDescTo2D<>(FactoryAssociation.greedy(score, 150, true));
+					new AssociateDescTo2D<>(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,150),score));
 
 			PointTrackerTwoPass tracker = FactoryPointTrackerTwoPass.dda(detector, describe, associate, null, 1,
 					new ConfigTrackerDda(), imageType);

@@ -24,6 +24,7 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.tracker.ConfigTrackerDda;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.tracker.FactoryPointTracker;
@@ -85,7 +86,7 @@ public class ControlPanelDdaTracker extends StandardAlgConfigPanel {
 
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 		AssociateDescription2D associate = new AssociateDescTo2D(
-				FactoryAssociation.greedy(scorer,Double.MAX_VALUE,true));
+				FactoryAssociation.greedy(new ConfigAssociateGreedy(true),scorer));
 
 		return FactoryPointTracker.dda(detDesc,associate, configDDA);
 	}

@@ -25,6 +25,7 @@ import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.describe.DescribeRegionPointConvert;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryConvertTupleDesc;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -62,7 +63,7 @@ public class CompareConvertedDescriptionsApp {
 					DescribeRegionPoint<GrayF32,TD> describe ,
 					ScoreAssociation<TD> scorer ) {
 
-		AssociateDescription<TD> assoc = FactoryAssociation.greedy(scorer,Double.MAX_VALUE,false);
+		AssociateDescription<TD> assoc = FactoryAssociation.greedy(new ConfigAssociateGreedy(false),scorer);
 
 		List<Point2D_F64> locationSrc = new ArrayList<>();
 		List<Point2D_F64> locationDst = new ArrayList<>();

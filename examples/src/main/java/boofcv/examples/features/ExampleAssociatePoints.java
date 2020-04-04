@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -23,6 +23,7 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.alg.descriptor.UtilFeature;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.gui.feature.AssociationPanel;
@@ -127,7 +128,7 @@ public class ExampleAssociatePoints<T extends ImageGray<T>, TD extends TupleDesc
 //				sift(new ConfigCompleteSift(0,5,600));
 
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
-		AssociateDescription associate = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true);
+		AssociateDescription associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true),scorer);
 
 		// load and match images
 		ExampleAssociatePoints app = new ExampleAssociatePoints(detDesc,associate,imageType);

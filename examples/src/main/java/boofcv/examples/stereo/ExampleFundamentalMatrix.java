@@ -24,6 +24,7 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.examples.features.ExampleAssociatePoints;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.*;
@@ -134,7 +135,7 @@ public class ExampleFundamentalMatrix {
 //		DetectDescribePoint detDesc = FactoryDetectDescribe.sift(null,new ConfigSiftDetector(2,0,200,5),null,null);
 
 		ScoreAssociation<BrightFeature> scorer = FactoryAssociation.scoreEuclidean(BrightFeature.class,true);
-		AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(scorer, 0.1, true);
+		AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,0.1),scorer);
 
 		ExampleAssociatePoints<GrayF32,BrightFeature> findMatches =
 				new ExampleAssociatePoints<>(detDesc, associate, GrayF32.class);

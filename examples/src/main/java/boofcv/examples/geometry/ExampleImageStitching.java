@@ -28,6 +28,7 @@ import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.PixelTransformHomography_F32;
 import boofcv.alg.distort.impl.DistortSupport;
 import boofcv.alg.interpolate.InterpolatePixelS;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.geo.ConfigRansac;
@@ -152,7 +153,7 @@ public class ExampleImageStitching {
 		DetectDescribePoint detDesc = FactoryDetectDescribe.surfStable(
 				new ConfigFastHessian(1, 2, 200, 1, 9, 4, 4), null,null, imageType);
 		ScoreAssociation<BrightFeature> scorer = FactoryAssociation.scoreEuclidean(BrightFeature.class,true);
-		AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(scorer,2,true);
+		AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,2),scorer);
 
 		// fit the images using a homography.  This works well for rotations and distant objects.
 		ModelMatcher<Homography2D_F64,AssociatedPair> modelMatcher =

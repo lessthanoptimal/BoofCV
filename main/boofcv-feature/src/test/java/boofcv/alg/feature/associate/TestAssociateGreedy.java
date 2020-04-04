@@ -30,12 +30,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestAssociateGreedy {
+class TestAssociateGreedy {
 
 	ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclidean_F64();
 
 	@Test
-	public void basic() {
+	void basic() {
 		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
 		FastQueue<TupleDesc_F64> b = createData(3,4,1,40);
 
@@ -44,14 +44,14 @@ public class TestAssociateGreedy {
 
 		alg.associate(a,b);
 
-		int pairs[] = alg.getPairs();
+		int[] pairs = alg.getPairs();
 
 		assertEquals(2,pairs[0]);
 		assertEquals(-1,pairs[1]);
 		assertEquals(0,pairs[2]);
 		assertEquals(1,pairs[3]);
 
-		double fitScore[] = alg.getFitQuality();
+		double[] fitScore = alg.getFitQuality();
 
 		assertEquals(0,fitScore[0],1e-5);
 		assertEquals(0,fitScore[2],1e-5);
@@ -59,7 +59,7 @@ public class TestAssociateGreedy {
 	}
 
 	@Test
-	public void maxError() {
+	void maxError() {
 		FastQueue<TupleDesc_F64> a = createData(1,2,3,4);
 		FastQueue<TupleDesc_F64> b = createData(3,4,1.1,40);
 
@@ -78,7 +78,7 @@ public class TestAssociateGreedy {
 	}
 
 	@Test
-	public void backwards() {
+	void backwards() {
 		FastQueue<TupleDesc_F64> a = createData(1,2,3,8);
 		FastQueue<TupleDesc_F64> b = createData(3,4,1,10);
 
@@ -87,18 +87,44 @@ public class TestAssociateGreedy {
 
 		alg.associate(a,b);
 
-		int pairs[] = alg.getPairs();
+		int[] pairs = alg.getPairs();
 
 		assertEquals(2,pairs[0]);
 		assertEquals(-1,pairs[1]);
 		assertEquals(0,pairs[2]);
 		assertEquals(3,pairs[3]);
 
-		double fitScore[] = alg.getFitQuality();
+		double[] fitScore = alg.getFitQuality();
 
 		assertEquals(0,fitScore[0],1e-5);
 		assertEquals(0,fitScore[2],1e-5);
 		assertEquals(2,fitScore[3],1e-5);
+	}
+
+	@Test
+	void ratioTest() {
+		// perfect match is a special case
+		// [2] is a very good fit and should pass the ratio test, but is not zero
+		FastQueue<TupleDesc_F64> a = createData(1,2,3,10);
+		FastQueue<TupleDesc_F64> b = createData(1,2,3.01,4);
+
+		AssociateGreedy<TupleDesc_F64> alg = new AssociateGreedy<>(score, false);
+
+		// ratio test is turned off by default
+		alg.associate(a,b);
+		int[] pairs = alg.getPairs();
+		for (int i = 0; i < 4; i++) {
+			assertEquals(i,pairs[i]);
+		}
+
+		// set it so that 4 will be rejected
+		alg.setRatioTest(0.1);
+		alg.associate(a,b);
+		pairs = alg.getPairs();
+		assertEquals(0,pairs[0]);
+		assertEquals(1,pairs[1]);
+		assertEquals(2,pairs[2]);
+		assertEquals(-1,pairs[3]);
 	}
 
 	private FastQueue<TupleDesc_F64> createData( double ...values )

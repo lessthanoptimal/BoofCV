@@ -47,6 +47,7 @@ import boofcv.alg.sfm.d3.*;
 import boofcv.alg.sfm.d3.direct.PyramidDirectColorDepth;
 import boofcv.alg.sfm.robust.DistancePlane2DToPixelSq;
 import boofcv.alg.sfm.robust.GenerateSe2_PlanePtPixel;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.EnumPNP;
@@ -445,7 +446,7 @@ public class FactoryVisualOdometry {
 			a.setMaxDistance(maxDistanceF2F);
 			assocSame = a;
 		} else {
-			assocSame = new AssociateDescTo2D<>(FactoryAssociation.greedy(scorer, maxAssociationError, true));
+			assocSame = new AssociateDescTo2D<>(FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxAssociationError),scorer));
 		}
 
 		AssociateStereo2D<Desc> associateStereo = new AssociateStereo2D<>(scorer, epipolarPixelTol, descType);

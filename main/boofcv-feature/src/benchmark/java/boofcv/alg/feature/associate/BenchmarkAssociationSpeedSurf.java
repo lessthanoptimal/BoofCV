@@ -21,6 +21,7 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.io.UtilIO;
@@ -117,9 +118,9 @@ public class BenchmarkAssociationSpeedSurf {
 		int DOF = app.detector.createDescription().size();
 
 		ProfileOperation.printOpsPerSec(app.createProfile("Greedy",
-				FactoryAssociation.greedy(score, Double.MAX_VALUE,  false)),TEST_TIME);
+				FactoryAssociation.greedy(new ConfigAssociateGreedy(false),score)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(app.createProfile("Greedy Backwards",
-				FactoryAssociation.greedy(score, Double.MAX_VALUE,  true)),TEST_TIME);
+				FactoryAssociation.greedy(new ConfigAssociateGreedy(true),score)),TEST_TIME);
 		ProfileOperation.printOpsPerSec(app.createProfile("Random Forest",
 				FactoryAssociation.kdRandomForest(null,DOF, 500, 15, 5, 1233445565)),TEST_TIME);
 		

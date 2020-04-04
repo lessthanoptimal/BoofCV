@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -25,10 +25,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Peter Abeles
  */
-public class TestWrapAssociateGreedy {
+class TestWrapAssociateGreedy {
 
 	@Test
-	public void normal() {
+	void normal() {
 		new StandardTests() {
 			@Override
 			public AssociateDescription<TupleDesc_F64> createAlg() {
@@ -40,7 +40,7 @@ public class TestWrapAssociateGreedy {
 	}
 
 	@Test
-	public void backwards() {
+	void backwards() {
 		new StandardTests() {
 			@Override
 			public AssociateDescription<TupleDesc_F64> createAlg() {

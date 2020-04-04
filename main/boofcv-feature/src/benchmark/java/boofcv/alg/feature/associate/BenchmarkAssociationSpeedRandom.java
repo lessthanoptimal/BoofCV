@@ -21,6 +21,7 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.concurrency.BoofConcurrency;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.TupleDesc_F64;
 import org.ddogleg.struct.FastQueue;
@@ -64,8 +65,8 @@ public class BenchmarkAssociationSpeedRandom {
 	public void setup() {
 		BoofConcurrency.USE_CONCURRENT = concurrent;
 
-		greedy = FactoryAssociation.greedy(score, Double.MAX_VALUE, false);
-		greedyBackwards = FactoryAssociation.greedy(score, Double.MAX_VALUE, true);
+		greedy = FactoryAssociation.greedy(new ConfigAssociateGreedy(false),score);
+		greedyBackwards = FactoryAssociation.greedy(new ConfigAssociateGreedy(true),score);
 		kdtree = FactoryAssociation.kdtree(null,DOF,500);
 		forest = FactoryAssociation.kdRandomForest(null,DOF,500,15,5,1233445565);
 

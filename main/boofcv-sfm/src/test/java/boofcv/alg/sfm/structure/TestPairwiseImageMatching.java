@@ -24,6 +24,7 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.distort.brown.LensDistortionBrown;
 import boofcv.alg.geo.MultiViewOps;
 import boofcv.alg.geo.WorldToCameraToPixel;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -237,7 +238,7 @@ public class TestPairwiseImageMatching extends GenericSceneStructureChecks {
 	public PairwiseImageMatching create( MockDetector detector ) {
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detector.getDescriptionType());
 		AssociateDescription<TupleDesc> associate =
-				FactoryAssociation.greedy(scorer, 0.5, true);
+				FactoryAssociation.greedy(new ConfigAssociateGreedy(true,0.5),scorer);
 		return new PairwiseImageMatching(detector,associate);
 	}
 

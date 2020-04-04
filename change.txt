@@ -54,8 +54,8 @@ Version : 0.36
 - PerspectiveOps
   * Added two types of point invariants
 - Association
-  * TODO Add score ratio test to greedy
-  * TODO Create a Config for greedy
+  * Added score ratio test to Greedy
+  * Added Configuration for Greedy
 - Scene Reconstruction
   * Better cropping on rectified image using bounding box instead of rotation matrix
   * TODO try improving 3-view by estimating lens distortion in projective camera

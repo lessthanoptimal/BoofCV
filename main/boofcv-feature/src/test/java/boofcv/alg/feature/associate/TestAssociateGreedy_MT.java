@@ -30,18 +30,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class TestAssociateGreedy_MT {
 	@Test
 	void compare() {
-		compare(false);
-		compare(true);
+		compare(false, 1.0);
+		compare(true, 1.0);
+		compare(false, 0.1);
+		compare(true, 0.1);
 	}
-	void compare( boolean backwards ) {
+
+	void compare( boolean backwards , double ratioTest ) {
 		FastQueue<TupleDesc_F64> a = createData(200);
 		FastQueue<TupleDesc_F64> b = createData(200);
 
 		AssociateGreedy<TupleDesc_F64> sequentialAlg = new AssociateGreedy<>( new ScoreAssociateEuclidean_F64(), backwards);
+		sequentialAlg.setRatioTest(ratioTest);
 		sequentialAlg.setMaxFitError(0.5);
 		sequentialAlg.associate(a,b);
 
 		AssociateGreedy_MT<TupleDesc_F64> parallelAlg = new AssociateGreedy_MT<>( new ScoreAssociateEuclidean_F64(), backwards);
+		parallelAlg.setRatioTest(ratioTest);
 		parallelAlg.setMaxFitError(0.5);
 		parallelAlg.associate(a,b);
 

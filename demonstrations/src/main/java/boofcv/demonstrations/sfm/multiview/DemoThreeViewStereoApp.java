@@ -36,6 +36,7 @@ import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.sfm.structure.ThreeViewEstimateMetricScene;
 import boofcv.core.image.ConvertImage;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.gui.BoofSwingUtil;
@@ -96,7 +97,7 @@ public class DemoThreeViewStereoApp extends DemonstrationBase {
 
 	DetectDescribePoint<GrayU8, BrightFeature> detDesc;
 	ScoreAssociation<BrightFeature> scorer = FactoryAssociation.scoreEuclidean(BrightFeature.class,true);
-	AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(scorer, 0.1, true);
+	AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,0.1),scorer);
 
 	AssociateThreeByPairs<BrightFeature> associateThree = new AssociateThreeByPairs<>(associate,BrightFeature.class);
 	FastQueue<AssociatedTriple> associated = new FastQueue<>(AssociatedTriple::new);

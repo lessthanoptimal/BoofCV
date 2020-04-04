@@ -35,7 +35,7 @@ import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.demonstrations.feature.detect.interest.*;
+import boofcv.factory.feature.associate.ConfigAssociateNearestNeighbor;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
@@ -45,7 +45,7 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.dialogs.OpenImageSetDialog;
-import boofcv.gui.feature.AssociationPanel;
+import boofcv.gui.feature.*;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -224,20 +224,18 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(descriptor.getDescriptionType());
 		int DOF = descriptor.createDescription().size();
 
-		if( selectedAssoc < 2 ) {
-			switch( selectedAssoc ) {
-				case 0: matcher = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, false); break;
-				case 1: matcher = FactoryAssociation.greedy(scorer, Double.MAX_VALUE, true); break;
-			}
+		if( selectedAssoc == 0 ) {
+			matcher = FactoryAssociation.greedy(controls.controlAssocGreedy.config,scorer);
 		} else {
 			if( !TupleDesc_F64.class.isAssignableFrom(descriptor.getDescriptionType())) {
 				JOptionPane.showMessageDialog(this, "Requires TupleDesc_F64 description type");
 				return false;
 			}
 
+			ConfigAssociateNearestNeighbor configNN = controls.controlAssocNN.config;
 			switch( selectedAssoc ) {
-				case 2: matcher = (AssociateDescription)FactoryAssociation.kdtree(null,DOF, 75); break;
-				case 3: matcher = (AssociateDescription)FactoryAssociation.kdRandomForest(null,DOF, 75, 10, 5, 1233445565); break;
+				case 1: matcher = (AssociateDescription)FactoryAssociation.kdtree(configNN,DOF, 75); break;
+				case 2: matcher = (AssociateDescription)FactoryAssociation.kdRandomForest(configNN,DOF, 75, 10, 5, 1233445565); break;
 				default:
 					throw new IllegalArgumentException("Unknown association");
 			}
@@ -369,6 +367,10 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 				new ControlPanelDescribeBrief(new ConfigBrief(false),this::handleControlsUpdated);
 		ControlPanelDescribeTemplate controlDescTemplate =
 				new ControlPanelDescribeTemplate(null,this::handleControlsUpdated);
+		ControlPanelAssociateGreedy controlAssocGreedy =
+				new ControlPanelAssociateGreedy(null,this::handleControlsUpdated);
+		ControlPanelAssociateNearestNeighbor controlAssocNN =
+				new ControlPanelAssociateNearestNeighbor(null,this::handleControlsUpdated);
 
 		// Configurations for detectors / descriptors
 		ConfigFastHessian configFastHessian = new ConfigFastHessian( 1, 2, 200, 1, 9, 4, 4);
@@ -380,7 +382,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		public AssociateControls() {
 			comboDetect = combo(selectedDetector,"Fast Hessian","SIFT","Points");
 			comboDescribe = combo(selectedDescriptor,"SURF-F","SURF-S","SIFT","BRIEF","Template");
-			comboAssoc = combo(selectedAssoc,"Greedy","Greedy Backwards","K-D Tree BBF","Random Forest");
+			comboAssoc = combo(selectedAssoc,"Greedy","K-D Tree BBF","Random Forest");
 
 			// custom configurations for this demo
 			configSiftDetector.maxFeaturesPerScale = 400;
@@ -396,6 +398,8 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 			controlDescSurfStable.setBorder(BorderFactory.createEmptyBorder());
 			controlDescSift.setBorder(BorderFactory.createEmptyBorder());
 			controlDescTemplate.setBorder(BorderFactory.createEmptyBorder());
+			controlAssocGreedy.setBorder(BorderFactory.createEmptyBorder());
+			controlAssocNN.setBorder(BorderFactory.createEmptyBorder());
 
 			// Finish
 			labelTime.setPreferredSize(new Dimension(70,26));
@@ -408,6 +412,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 
 			handleDetectorChanged();
 			handleDescriptorChanged();
+			handleAssociatorChanged();
 
 			addLabeled(labelTime,"Time (ms)");
 			add(labelSize);
@@ -424,24 +429,43 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 
 		private void handleDetectorChanged() {
 			panelDetector.removeAll();
+			JPanel control = null;
 			switch( selectedDetector ) {
-				case 0: panelDetector.add(controlDetectFastHessian); break;
-				case 1: panelDetector.add(controlDetectSift); break;
-				case 2: panelDetector.add(controlDetectPoint); break;
+				case 0: control = controlDetectFastHessian; break;
+				case 1: control = controlDetectSift; break;
+				case 2: control = controlDetectPoint; break;
 			}
-			panelDescriptor.invalidate();
+			if( control != null )
+				panelDetector.add(fillHorizontally(control));
+			panelDetector.invalidate();
 		}
 
 		private void handleDescriptorChanged() {
 			panelDescriptor.removeAll();
+			JPanel control = null;
 			switch( selectedDescriptor ) {
-				case 0: panelDescriptor.add(controlDescSurfSpeed); break;
-				case 1: panelDescriptor.add(controlDescSurfStable); break;
-				case 2: panelDescriptor.add(controlDescSift); break;
-				case 3: panelDescriptor.add(controlDescBrief); break;
-				case 4: panelDescriptor.add(controlDescTemplate); break;
+				case 0: control = controlDescSurfSpeed; break;
+				case 1: control = controlDescSurfStable; break;
+				case 2: control = controlDescSift; break;
+				case 3: control = controlDescBrief; break;
+				case 4: control = controlDescTemplate; break;
 			}
+			if( control != null )
+				panelDescriptor.add(fillHorizontally(control));
 			panelDescriptor.invalidate();
+		}
+
+		private void handleAssociatorChanged() {
+			panelAssociate.removeAll();
+			JPanel control = null;
+			switch( selectedAssoc ) {
+				case 0: control = controlAssocGreedy; break;
+				case 1:
+				case 2: control = controlAssocNN; break;
+			}
+			if( control != null )
+				panelAssociate.add(fillHorizontally(control));
+			panelAssociate.invalidate();
 		}
 
 		public void setTime( double milliseconds ) {
@@ -462,6 +486,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 				handleDescriptorChanged();
 			} else if( comboAssoc == e.getSource() ){
 				selectedAssoc = comboAssoc.getSelectedIndex();
+				handleAssociatorChanged();
 			}
 			algorithmChange = true;
 			reprocessInput();

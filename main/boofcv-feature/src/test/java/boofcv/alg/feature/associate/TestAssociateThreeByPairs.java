@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -21,6 +21,7 @@ package boofcv.alg.feature.associate;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.alg.descriptor.UtilFeature;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.AssociatedTripleIndex;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -32,9 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestAssociateThreeByPairs {
+class TestAssociateThreeByPairs {
 	@Test
-	public void perfect() {
+	void perfect() {
 		FastQueue<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
@@ -50,7 +51,7 @@ public class TestAssociateThreeByPairs {
 		}
 
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
-		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(score,1e-8,true);
+		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,1e-8),score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
 
@@ -76,7 +77,7 @@ public class TestAssociateThreeByPairs {
 	 * A->B is good. B->C is good. C->A exceeds error margin
 	 */
 	@Test
-	public void failOnCtoA() {
+	void failOnCtoA() {
 		FastQueue<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
@@ -93,7 +94,7 @@ public class TestAssociateThreeByPairs {
 
 		double maxError = 0.1*0.1+0.00000001;
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
-		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(score,maxError,true);
+		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
 
@@ -112,7 +113,7 @@ public class TestAssociateThreeByPairs {
 	 * A->B is good. B->C is bad.
 	 */
 	@Test
-	public void failOnBtoC() {
+	void failOnBtoC() {
 		FastQueue<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
@@ -129,7 +130,7 @@ public class TestAssociateThreeByPairs {
 
 		double maxError = 0.1*0.1+0.00000001;
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
-		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(score,maxError,true);
+		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
 
@@ -148,7 +149,7 @@ public class TestAssociateThreeByPairs {
 	 * A->B is bad.
 	 */
 	@Test
-	public void failOnAtoB() {
+	void failOnAtoB() {
 		FastQueue<TupleDesc_F64> featuresA = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresB = UtilFeature.createQueueF64(1);
 		FastQueue<TupleDesc_F64> featuresC = UtilFeature.createQueueF64(1);
@@ -165,7 +166,7 @@ public class TestAssociateThreeByPairs {
 
 		double maxError = 0.1*0.1+0.00000001;
 		ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
-		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(score,maxError,true);
+		AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(new ConfigAssociateGreedy(true,maxError),score);
 
 		AssociateThreeByPairs<TupleDesc_F64> alg = new AssociateThreeByPairs<>(associate,TupleDesc_F64.class);
 

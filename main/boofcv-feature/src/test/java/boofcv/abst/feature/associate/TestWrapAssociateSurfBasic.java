@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.feature.associate;
 
 import boofcv.alg.feature.associate.AssociateSurfBasic;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.feature.TupleDesc_F64;
@@ -42,7 +43,7 @@ public class TestWrapAssociateSurfBasic extends StandardAssociateDescriptionChec
 	@Override
 	public AssociateDescription<BrightFeature> createAlg() {
 		ScoreAssociation<TupleDesc_F64> score = new ScoreAssociateEuclidean_F64();
-		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.greedy(score, Double.MAX_VALUE, false);
+		AssociateDescription<TupleDesc_F64> assoc = FactoryAssociation.greedy(new ConfigAssociateGreedy(false),score);
 
 		AssociateSurfBasic basic = new AssociateSurfBasic(assoc);
 

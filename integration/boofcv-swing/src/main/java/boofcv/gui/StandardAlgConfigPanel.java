@@ -50,14 +50,18 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 			@Override
 			public Dimension getPreferredSize() {
 				Dimension d;
+				int width;
 				try {
 					d = StandardAlgConfigPanel.this.getPreferredSize();
+					width = d.width-6; // not sure how to make this not a magic number
+					// if too small text goes outside
 				} catch( RuntimeException ignore ) {
 					d = StandardAlgConfigPanel.this.getSize();
+					width = d.width-20; // if this is too small it magically keeps on expanding
 				}
 
 				Dimension p = super.getPreferredSize();
-				return new Dimension(d.width-4,p.height);
+				return new Dimension(width,p.height);
 			}
 
 			@Override

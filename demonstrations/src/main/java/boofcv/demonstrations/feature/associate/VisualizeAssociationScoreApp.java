@@ -21,20 +21,18 @@ package boofcv.demonstrations.feature.associate;
 import boofcv.abst.feature.associate.*;
 import boofcv.abst.feature.describe.ConfigBrief;
 import boofcv.abst.feature.describe.ConfigSiftScaleSpace;
+import boofcv.abst.feature.describe.ConfigSurfDescribe;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
 import boofcv.core.image.GeneralizedImageOps;
-import boofcv.demonstrations.feature.detect.interest.ControlPanelSiftDetector;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
-import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
@@ -42,7 +40,7 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.dialogs.OpenImageSetDialog;
-import boofcv.gui.feature.AssociationScorePanel;
+import boofcv.gui.feature.*;
 import boofcv.io.PathLabel;
 import boofcv.io.UtilIO;
 import boofcv.io.image.ConvertBufferedImage;
@@ -88,7 +86,8 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 
 	// visualizes association score
 	AssociationScorePanel<TupleDesc> scorePanel;
-	VisualizeScorePanel controlPanel;
+	VisualizeScorePanel controls;
+	boolean configChanged = false;
 
 	public VisualizeAssociationScoreApp(java.util.List<PathLabel> examples , Class<T> imageType) {
 		super(true,false,examples, ImageType.single(imageType));
@@ -102,43 +101,55 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(null, integralType);
 		orientation = FactoryOrientation.convertImage(orientationII, imageType);
 
-		controlPanel = new VisualizeScorePanel();
+		controls = new VisualizeScorePanel();
 		scorePanel = new AssociationScorePanel<>(3);
 
 		declareAlgorithms();
 
-		add(BorderLayout.WEST, controlPanel);
+		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, scorePanel);
 	}
 
 	private void declareAlgorithms() {
-		switch( controlPanel.selectedDetector ) {
-			case 0: detector = FactoryInterestPoint.fastHessian(new ConfigFastHessian( 1, 2, 200, 1, 9, 4, 4)); break;
-			case 1: detector = FactoryInterestPoint.sift(null,new ConfigSiftDetector(400),imageType); break;
+		switch( controls.selectedDetector ) {
+			case 0: detector = FactoryInterestPoint.fastHessian(controls.configFastHessian); break;
+			case 1: detector = FactoryInterestPoint.sift(controls.configSiftScaleSpace,controls.configSiftDetector,imageType); break;
 			case 2: {
-				Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
-				GeneralFeatureDetector<T, D> alg = FactoryDetectPoint.createShiTomasi(new ConfigGeneralDetector(500,2,1), null, derivType);
-				detector = FactoryInterestPoint.wrapPoint(alg, 1, imageType, derivType);
+				GeneralFeatureDetector<T, D> alg = controls.controlDetectPoint.create(imageType);
+				detector = FactoryInterestPoint.wrapPoint(alg, 1, imageType, alg.getDerivType());
 			} break;
 
 			default:
 				throw new IllegalArgumentException("Unknown detector");
 		}
 
-		switch( controlPanel.selectedDescriptor ) {
-			case 0:descriptor = FactoryDescribeRegionPoint.surfStable(null, imageType); break;
-			case 1:descriptor = FactoryDescribeRegionPoint.surfColorStable(null, ImageType.pl(3, imageType)); break;
-			case 2:descriptor = FactoryDescribeRegionPoint.sift(null,null, imageType); break;
-			case 3:descriptor = FactoryDescribeRegionPoint.brief(new ConfigBrief(true), imageType); break;
-			case 4:descriptor = FactoryDescribeRegionPoint.brief(new ConfigBrief(false), imageType); break;
-			case 5:descriptor = FactoryDescribeRegionPoint.pixel(11, 11, imageType); break;
-			case 6:descriptor = FactoryDescribeRegionPoint.pixelNCC(11, 11, imageType); break;
+		switch( controls.selectedDescriptor ) {
+			case 0:
+				if( controls.controlDescSurfSpeed.color ) {
+					descriptor = FactoryDescribeRegionPoint.surfColorFast(
+							controls.configSurfSpeed, ImageType.pl(3, imageType));
+				} else {
+					descriptor = FactoryDescribeRegionPoint.surfFast(controls.configSurfSpeed, imageType);
+				}
+				break;
+			case 1:
+				if( controls.controlDescSurfStable.color ) {
+					descriptor = FactoryDescribeRegionPoint.surfColorStable(
+							controls.configSurfStability, ImageType.pl(3, imageType));
+				} else {
+					descriptor = FactoryDescribeRegionPoint.surfStable(controls.configSurfStability, imageType);
+				}
+				break;
+			case 2:descriptor = FactoryDescribeRegionPoint.sift(
+					controls.configSiftScaleSpace,controls.controlDescSift.config, imageType); break;
+			case 3:descriptor = FactoryDescribeRegionPoint.brief(controls.controlDescBrief.config, imageType); break;
+			case 4:descriptor = FactoryDescribeRegionPoint.template(controls.controlDescTemplate.config, imageType); break;
 			default:
 				throw new IllegalArgumentException("Unknown descriptor");
 		}
 
 		SwingUtilities.invokeLater(()-> {
-			controlPanel.setFeatureType(descriptor.getDescriptionType());
+			controls.setFeatureType(descriptor.getDescriptionType());
 		});
 
 		// estimate orientation using this once since it is fast and accurate
@@ -162,7 +173,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 				buffLeft = ConvertBufferedImage.checkDeclare(width,height,buffLeft,BufferedImage.TYPE_INT_RGB);
 				SwingUtilities.invokeLater(()->{
 					scorePanel.setPreferredSize(width,height,width,height);
-					controlPanel.setImageSize(width,height);
+					controls.setImageSize(width,height);
 				});
 				break;
 
@@ -208,7 +219,7 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 
 		SwingUtilities.invokeLater(() -> {
 			progressMonitor.close();
-			scorePanel.setScorer(controlPanel.getSelected());
+			scorePanel.setScorer(controls.getSelected());
 			scorePanel.setLocation(leftPts, rightPts, leftDesc, rightDesc);
 			repaint();
 		});
@@ -221,6 +232,11 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 	private void extractImageFeatures(final ProgressMonitor progressMonitor, final int progress,
 									  T image,
 									  List<TupleDesc> descs, List<Point2D_F64> locs) {
+		if( configChanged ) {
+			configChanged = false;
+			declareAlgorithms();
+		}
+
 		SwingUtilities.invokeLater(() -> progressMonitor.setNote("Detecting"));
 		detector.detect(image);
 		SwingUtilities.invokeLater(() -> {
@@ -289,21 +305,46 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		public int selectedDescriptor;
 
 		// Controls for different detectors / descriptors
-		ControlPanelSiftDetector controlSiftDetector;
+		ControlPanelSiftDetector controlDetectSift;
+		ControlPanelFastHessian controlDetectFastHessian;
+		ControlPanelPointDetector controlDetectPoint =
+				new ControlPanelPointDetector(500, PointDetectorTypes.SHI_TOMASI,this::handleControlsUpdated);
+		ControlPanelSurfDescribe.Speed controlDescSurfSpeed;
+		ControlPanelSurfDescribe.Stability controlDescSurfStable;
+		ControlPanelDescribeSift controlDescSift = new ControlPanelDescribeSift(null,this::handleControlsUpdated);
+		ControlPanelDescribeBrief controlDescBrief =
+				new ControlPanelDescribeBrief(new ConfigBrief(false),this::handleControlsUpdated);
+		ControlPanelDescribeTemplate controlDescTemplate =
+				new ControlPanelDescribeTemplate(null,this::handleControlsUpdated);
 
 		// Configurations for detectors / descriptors
+		ConfigFastHessian configFastHessian = new ConfigFastHessian( 1, 2, 200, 1, 9, 4, 4);
 		ConfigSiftDetector configSiftDetector = new ConfigSiftDetector();
 		ConfigSiftScaleSpace configSiftScaleSpace = new ConfigSiftScaleSpace();
-		ConfigSiftDetector configSiftDescribe = new ConfigSiftDetector();
+		ConfigSurfDescribe.Speed configSurfSpeed = new ConfigSurfDescribe.Speed();
+		ConfigSurfDescribe.Stability configSurfStability = new ConfigSurfDescribe.Stability();
 
 		public VisualizeScorePanel() {
 			setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 			setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
-			controlSiftDetector = new ControlPanelSiftDetector(configSiftScaleSpace,configSiftDetector, this::handleControlsUpdated);
+			comboDetect = combo(selectedDetector,"Fast Hessian","SIFT","Points");
+			comboDescribe = combo(selectedDescriptor,"SURF-F","SURF-S","SIFT","BRIEF","Template");
 
-			comboDetect = combo(selectedDetector,"Fast Hessian","SIFT","Shi-Tomasi");
-			comboDescribe = combo(selectedDescriptor,"SURF-S","SURF-S Color","SIFT","BRIEF","BRIEFSO","Pixel 11x11","NCC 11x11");
+			// custom configurations for this demo
+			configSiftDetector.maxFeaturesPerScale = 400;
+
+			// create the algorithm controls
+			controlDetectFastHessian = new ControlPanelFastHessian(configFastHessian,this::handleControlsUpdated);
+			controlDetectFastHessian.setBorder(BorderFactory.createEmptyBorder());
+			controlDetectSift = new ControlPanelSiftDetector(configSiftScaleSpace,configSiftDetector, this::handleControlsUpdated);
+			controlDetectSift.setBorder(BorderFactory.createEmptyBorder());
+			controlDescSurfSpeed = new ControlPanelSurfDescribe.Speed(configSurfSpeed,this::handleControlsUpdated);
+			controlDescSurfSpeed.setBorder(BorderFactory.createEmptyBorder());
+			controlDescSurfStable = new ControlPanelSurfDescribe.Stability(configSurfStability,this::handleControlsUpdated);
+			controlDescSurfStable.setBorder(BorderFactory.createEmptyBorder());
+			controlDescSift.setBorder(BorderFactory.createEmptyBorder());
+			controlDescTemplate.setBorder(BorderFactory.createEmptyBorder());
 
 			scoreTypes.addActionListener(this);
 			scoreTypes.setMaximumSize(scoreTypes.getPreferredSize());
@@ -313,21 +354,45 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 			tabbed.addTab("Describe",panelDescriptor);
 
 			handleDetectorChanged();
+			handleDescriptorChanged();
 
 			add(labelSize);
-			addLabeled(scoreTypes, "Score: ");
+			addLabeled(comboDetect,"Detect");
+			addLabeled(comboDescribe,"Describe");
+			addLabeled(scoreTypes, "Score");
 			add(tabbed);
 		}
 
 		private void handleControlsUpdated() {
-
+			configChanged = true;
+			reprocessInput();
 		}
 
 		private void handleDetectorChanged() {
 			panelDetector.removeAll();
+			JPanel control = null;
 			switch( selectedDetector ) {
-				case 1: panelDetector.add(controlSiftDetector); break;
+				case 0: control = controlDetectFastHessian; break;
+				case 1: control = controlDetectSift; break;
+				case 2: control = controlDetectPoint; break;
 			}
+			if( control != null )
+				panelDetector.add(fillHorizontally(control));
+			panelDetector.invalidate();
+		}
+
+		private void handleDescriptorChanged() {
+			panelDescriptor.removeAll();
+			JPanel control = null;
+			switch( selectedDescriptor ) {
+				case 0: control = controlDescSurfSpeed; break;
+				case 1: control = controlDescSurfStable; break;
+				case 2: control = controlDescSift; break;
+				case 3: control = controlDescBrief; break;
+				case 4: control = controlDescTemplate; break;
+			}
+			if( control != null )
+				panelDescriptor.add(fillHorizontally(control));
 			panelDescriptor.invalidate();
 		}
 
@@ -369,14 +434,19 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if( e.getSource() == comboDetect ) {
+			if( comboDetect == e.getSource() ) {
+				selectedDetector = comboDetect.getSelectedIndex();
+				handleDetectorChanged();
+			} else if( comboDescribe == e.getSource() ){
+				selectedDescriptor = comboDescribe.getSelectedIndex();
+				handleDescriptorChanged();
+			} else if( scoreTypes == e.getSource() ) {
+				ScoreItem item = (ScoreItem)scoreTypes.getSelectedItem();
+				selected = item.assoc;
 
+				scorePanel.setScorer(controls.getSelected());
 			}
 
-			ScoreItem item = (ScoreItem)scoreTypes.getSelectedItem();
-			selected = item.assoc;
-
-			scorePanel.setScorer(controlPanel.getSelected());
 		}
 
 		public ScoreAssociation getSelected() {

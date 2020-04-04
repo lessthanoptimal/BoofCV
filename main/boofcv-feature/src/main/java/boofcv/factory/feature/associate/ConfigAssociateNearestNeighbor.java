@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,7 +43,7 @@ public class ConfigAssociateNearestNeighbor implements Configuration {
 	 * If more than zero then this is the maximum allowed error/distance between two features for a match to
 	 * be accepted
 	 */
-	public double maxErrorThreshold = Double.MAX_VALUE;
+	public double maxErrorThreshold = -1;
 
 	@Override
 	public void checkValidity() {

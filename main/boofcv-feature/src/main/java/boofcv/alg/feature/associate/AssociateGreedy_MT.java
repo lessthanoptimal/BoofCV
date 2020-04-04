@@ -61,7 +61,7 @@ public class AssociateGreedy_MT<D> extends AssociateGreedyBase<D> {
 	 * @param dst Destination list.
 	 */
 	@Override
-	public void associate( FastAccess<D> src , FastAccess<D> dst )
+	public void associate(FastAccess<D> src , FastAccess<D> dst )
 	{
 		fitQuality.reset();
 		pairs.reset();
@@ -71,12 +71,15 @@ public class AssociateGreedy_MT<D> extends AssociateGreedyBase<D> {
 		fitQuality.resize(src.size);
 		workBuffer.resize(src.size*dst.size);
 
+		final double ratioTest = this.ratioTest;
+
 		BoofConcurrency.loopFor(0, src.size, i -> {
 			D a = src.data[i];
 			double bestScore = maxFitError;
+			double secondBest = bestScore;
 			int bestIndex = -1;
 
-			int workIdx = i*dst.size;
+			final int workIdx = i*dst.size;
 			for( int j = 0; j < dst.size; j++ ) {
 				D b = dst.data[j];
 
@@ -85,10 +88,24 @@ public class AssociateGreedy_MT<D> extends AssociateGreedyBase<D> {
 
 				if( fit <= bestScore ) {
 					bestIndex = j;
+					secondBest = bestScore;
 					bestScore = fit;
 				}
 			}
-			pairs.set(i,bestIndex);
+
+			if( ratioTest < 1.0 && bestIndex != -1 && bestScore != 0.0 ) {
+				// the second best could lie after the best was seen
+				for (int j = bestIndex+1; j < dst.size; j++) {
+					double fit = workBuffer.get(workIdx+j);
+					if( fit < secondBest ) {
+						secondBest = fit;
+					}
+				}
+				pairs.set(i,secondBest*ratioTest >= bestScore ? bestIndex : -1);
+			} else {
+				pairs.set(i,bestIndex);
+			}
+
 			fitQuality.set(i,bestScore);
 		});
 

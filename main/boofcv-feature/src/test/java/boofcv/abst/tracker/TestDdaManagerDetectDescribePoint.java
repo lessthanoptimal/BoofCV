@@ -28,6 +28,7 @@ import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.describe.DescribePointBrief;
 import boofcv.alg.feature.describe.brief.FactoryBriefDefinition;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.describe.FactoryDescribePointAlgs;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
@@ -62,7 +63,7 @@ public class TestDdaManagerDetectDescribePoint extends GenericChecksPointTracker
 		ScoreAssociateHamming_B score = new ScoreAssociateHamming_B();
 
 		AssociateDescription2D<TupleDesc_B> association =
-				new AssociateDescTo2D<>(FactoryAssociation.greedy(score, 400, true));
+				new AssociateDescTo2D<>(FactoryAssociation.greedy(new ConfigAssociateGreedy(false,400),score));
 
 		DetectDescribeFusion<GrayF32,TupleDesc_B> fused =
 				new DetectDescribeFusion<>(
