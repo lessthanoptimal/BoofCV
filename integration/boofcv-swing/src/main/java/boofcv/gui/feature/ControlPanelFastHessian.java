@@ -21,6 +21,7 @@ package boofcv.gui.feature;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.gui.StandardAlgConfigPanel;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 
 /**
@@ -41,8 +42,8 @@ public class ControlPanelFastHessian extends StandardAlgConfigPanel {
 
 	private final Listener listener;
 
-	public ControlPanelFastHessian(ConfigFastHessian config, Listener listener) {
-		this.config = config;
+	public ControlPanelFastHessian(@Nullable ConfigFastHessian config_, Listener listener) {
+		this.config = config_==null ? new ConfigFastHessian() : config_;
 		this.listener = listener;
 
 		this.controlExtractor = new ControlPanelExtractor(config.extract,listener::handleChangeFastHessian);

@@ -38,11 +38,7 @@ public class ControlPanelAssociateNearestNeighbor extends StandardAlgConfigPanel
 	private Listener listener;
 
 	public ControlPanelAssociateNearestNeighbor(@Nullable ConfigAssociateNearestNeighbor config_, Listener listener) {
-		if( config_ == null ) {
-			this.config = new ConfigAssociateNearestNeighbor();
-		} else {
-			this.config = config_;
-		}
+		config = config_==null?new ConfigAssociateNearestNeighbor():config_;
 		this.listener = listener;
 
 		spinnerRatio = spinner(config.scoreRatioThreshold,0.0,1.0,0.05,1,4);

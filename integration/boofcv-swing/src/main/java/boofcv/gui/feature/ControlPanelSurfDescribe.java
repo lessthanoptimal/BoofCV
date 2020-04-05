@@ -77,13 +77,13 @@ public abstract class ControlPanelSurfDescribe extends StandardAlgConfigPanel {
 	}
 
 	public static class Speed extends ControlPanelSurfDescribe {
-		ConfigSurfDescribe.Speed config;
+		public ConfigSurfDescribe.Fast config;
 
 		private final JSpinner spinnerWeightSigma;
 
-		public Speed(ConfigSurfDescribe.Speed config, Listener listener) {
-			super(config, listener);
-			this.config = config;
+		public Speed(ConfigSurfDescribe.Fast config_, Listener listener) {
+			super(config_==null?new ConfigSurfDescribe.Fast():config_, listener);
+			this.config = (ConfigSurfDescribe.Fast)super.config;
 
 			spinnerWeightSigma = spinner(config.weightSigma,0.5,100.0,0.5);
 
@@ -102,15 +102,15 @@ public abstract class ControlPanelSurfDescribe extends StandardAlgConfigPanel {
 	}
 
 	public static class Stability extends ControlPanelSurfDescribe {
-		ConfigSurfDescribe.Stability config;
+		public ConfigSurfDescribe.Stability config;
 
 		private final JSpinner spinnerOverlap;
 		private final JSpinner spinnerLargeGrid;
 		private final JSpinner spinnerSubRegion;
 
-		public Stability(ConfigSurfDescribe.Stability config, Listener listener) {
-			super(config, listener);
-			this.config = config;
+		public Stability(ConfigSurfDescribe.Stability config_, Listener listener) {
+			super(config_==null?new ConfigSurfDescribe.Stability():config_, listener);
+			this.config = (ConfigSurfDescribe.Stability)super.config;
 
 			spinnerOverlap = spinner(config.overLap,1,20,1);
 			spinnerLargeGrid = spinner(config.sigmaLargeGrid,1,20,1);

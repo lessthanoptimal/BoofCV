@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -117,7 +117,7 @@ public class FactoryDetectDescribe {
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
 	DetectDescribePoint<T,BrightFeature> surfFast( @Nullable ConfigFastHessian configDetector ,
-												   @Nullable ConfigSurfDescribe.Speed configDesc,
+												   @Nullable ConfigSurfDescribe.Fast configDesc,
 												   @Nullable ConfigAverageIntegral configOrientation,
 												   Class<T> imageType) {
 
@@ -152,7 +152,7 @@ public class FactoryDetectDescribe {
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
 	DetectDescribePoint<T,BrightFeature> surfColorFast( @Nullable ConfigFastHessian configDetector ,
-														@Nullable ConfigSurfDescribe.Speed configDesc,
+														@Nullable ConfigSurfDescribe.Fast configDesc,
 														@Nullable ConfigAverageIntegral configOrientation,
 														ImageType<T> imageType) {
 

@@ -51,7 +51,7 @@ public abstract class ConfigSurfDescribe implements Configuration {
 	 *
 	 * @see boofcv.alg.feature.describe.DescribePointSurf
 	 */
-	public static class Speed extends ConfigSurfDescribe {
+	public static class Fast extends ConfigSurfDescribe {
 		/**
 		 * Weighting factor's sigma.  Try 4.5
 		 */

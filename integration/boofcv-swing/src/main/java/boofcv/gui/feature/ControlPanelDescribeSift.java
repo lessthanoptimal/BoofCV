@@ -42,10 +42,7 @@ public class ControlPanelDescribeSift extends StandardAlgConfigPanel {
 	Listener listener;
 
 	public ControlPanelDescribeSift(@Nullable ConfigSiftDescribe config_, Listener listener) {
-		if( config_ == null )
-			this.config = new ConfigSiftDescribe();
-		else
-			this.config = config_;
+		config = config_==null?new ConfigSiftDescribe():config_;
 		this.listener = listener;
 
 		spinnerWidthSubregion = spinner(config.widthSubregion,1,50,1);

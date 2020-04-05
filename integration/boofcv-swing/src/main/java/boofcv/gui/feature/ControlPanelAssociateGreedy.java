@@ -39,11 +39,7 @@ public class ControlPanelAssociateGreedy extends StandardAlgConfigPanel {
 	private final Listener listener;
 
 	public ControlPanelAssociateGreedy(@Nullable ConfigAssociateGreedy config_, Listener listener) {
-		if( config_ == null ) {
-			this.config = new ConfigAssociateGreedy();
-		} else {
-			this.config = config_;
-		}
+		config = config_==null?new ConfigAssociateGreedy():config_;
 		this.listener = listener;
 
 		checkForwardsBackwards = checkbox("Validate FB",config.forwardsBackwards,"Forwards-Backwards validation");

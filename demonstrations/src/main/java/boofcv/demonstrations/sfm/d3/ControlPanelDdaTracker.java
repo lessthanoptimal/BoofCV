@@ -26,9 +26,7 @@ import boofcv.abst.tracker.ConfigTrackerDda;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.tracker.FactoryPointTracker;
-import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -39,27 +37,31 @@ import javax.swing.*;
  *
  * @author Peter Abeles
  */
-public class ControlPanelDdaTracker extends StandardAlgConfigPanel {
-	private static final String[] DETECT_TYPES = {"SIFT","SURF","Shi-Tomasi","Harris","FAST","Laplace"};
-	private static final String[] DESCRIBE_TYPES = {"SIFT","SURF","BRIEF","Pixel","NCC"};
-	private static final String[] ASSOCIATE_TYPES = {"Brute","KD-TREE","Forest"};
+public class ControlPanelDdaTracker extends ControlPanelDetDescAssoc {
 
-	int selectedDetect = 1;
-	int selectedDescribe = 1;
-	int selectedAssociate = 0;
-
-	JComboBox<String> comboDetect    = combo(selectedDetect,DETECT_TYPES);
-	JComboBox<String> comboDescribe  = combo(selectedDescribe,DESCRIBE_TYPES);
-	JComboBox<String> comboAssociate = combo(selectedAssociate,ASSOCIATE_TYPES);
+	JPanel controlPanel = new JPanel();
 
 	Listener listener;
 	public ControlPanelDdaTracker(Listener listener) {
 		setBorder(BorderFactory.createEmptyBorder());
 		this.listener = listener;
 
+		configFastHessian.maxFeaturesPerScale = 400;
+		configAssocGreedy.scoreRatioThreshold = 0.75;
+
+		initializeControlsGUI();
+
 		addLabeled(comboDetect,"Detect","Point feature detectors");
 		addLabeled(comboDescribe,"Describe","Point feature Descriptors");
 		addLabeled(comboAssociate,"Associate","Feature association Approach");
+		add(controlPanel);
+
+		updateActiveControls(0);
+	}
+
+	@Override
+	protected void handleControlsUpdated() {
+		listener.changedPointTrackerDda();
 	}
 
 	public <T extends ImageBase<T>>
@@ -68,22 +70,7 @@ public class ControlPanelDdaTracker extends StandardAlgConfigPanel {
 
 		ConfigTrackerDda configDDA = new ConfigTrackerDda();
 
-		DetectDescribePoint detDesc;
-
-		// TODO use enums for and not a string array
-
-		// handle the special case where they match
-		if( selectedDetect == selectedDescribe && selectedDetect < 2 ) {
-			if( selectedDetect == 0 )
-				detDesc = FactoryDetectDescribe.sift(null);
-			else if( selectedDetect == 1 )
-				detDesc = FactoryDetectDescribe.surfFast(null,null,null,inputType);
-			else
-				throw new RuntimeException("BUG");
-		} else {
-			throw new RuntimeException("Not supported");
-		}
-
+		DetectDescribePoint detDesc = createDetectDescribe(inputType);
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 		AssociateDescription2D associate = new AssociateDescTo2D(
 				FactoryAssociation.greedy(new ConfigAssociateGreedy(true),scorer));
@@ -91,15 +78,31 @@ public class ControlPanelDdaTracker extends StandardAlgConfigPanel {
 		return FactoryPointTracker.dda(detDesc,associate, configDDA);
 	}
 
+	private void updateActiveControls( int which ) {
+		controlPanel.removeAll();
+		switch( which ) {
+			case 0: controlPanel.add( getDetectorPanel() ); break;
+			case 1: controlPanel.add( getDescriptorPanel() ); break;
+			case 2: controlPanel.add( getAssociatePanel() ); break;
+		}
+		invalidate();
+		SwingUtilities.invokeLater(this::repaint);
+	}
+
 	@Override
 	public void controlChanged(final Object source) {
+		int which = -1;
 		if (source == comboDetect) {
-
+			selectedDetector = comboDetect.getSelectedIndex();
+			which = 0;
 		} else if (source == comboDescribe) {
-
+			selectedDescriptor = comboDescribe.getSelectedIndex();
+			which = 1;
 		} else if (source == comboAssociate) {
-
+			selectedAssociate = comboAssociate.getSelectedIndex();
+			which = 2;
 		}
+		updateActiveControls(which);
 		listener.changedPointTrackerDda();
 	}
 

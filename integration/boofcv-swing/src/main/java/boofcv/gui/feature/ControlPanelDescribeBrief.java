@@ -41,10 +41,7 @@ public class ControlPanelDescribeBrief extends StandardAlgConfigPanel {
 	private final Listener listener;
 
 	public ControlPanelDescribeBrief(@Nullable ConfigBrief config_, Listener listener) {
-		if( config_ == null )
-			config = new ConfigBrief();
-		else
-			this.config = config_;
+		config = config_==null?new ConfigBrief():config_;
 		this.listener = listener;
 
 		spinnerRadius = spinner(config.radius,1,999,2);

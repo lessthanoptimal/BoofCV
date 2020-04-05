@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -160,7 +160,7 @@ public class BenchmarkDescribe<I extends ImageGray<I>, D extends ImageGray<D>, I
 		System.out.println("=========  Profile Image Size " + width + " x " + height + " ========== "+imageType.getSimpleName());
 		System.out.println();
 
-		ConfigSurfDescribe.Speed surfSpeed = new ConfigSurfDescribe.Speed();
+		ConfigSurfDescribe.Fast surfSpeed = new ConfigSurfDescribe.Fast();
 		ConfigSurfDescribe.Stability surfStable = new ConfigSurfDescribe.Stability();
 
 		ProfileOperation.printOpsPerSec(new Describe("SURF-F",

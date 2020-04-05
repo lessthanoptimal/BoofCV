@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,9 +44,9 @@ import javax.annotation.Nullable;
 public class FactoryDescribePointAlgs {
 
 	public static <T extends ImageGray<T>>
-	DescribePointSurf<T> surfSpeed(@Nullable ConfigSurfDescribe.Speed config, Class<T> imageType) {
+	DescribePointSurf<T> surfSpeed(@Nullable ConfigSurfDescribe.Fast config, Class<T> imageType) {
 		if( config == null )
-			config = new ConfigSurfDescribe.Speed();
+			config = new ConfigSurfDescribe.Fast();
 		config.checkValidity();
 
 

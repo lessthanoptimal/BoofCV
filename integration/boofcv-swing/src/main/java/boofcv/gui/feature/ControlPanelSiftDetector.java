@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.gui.image.ShowImages;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 
 /**
@@ -43,10 +44,10 @@ public class ControlPanelSiftDetector extends StandardAlgConfigPanel {
 		this( new ConfigSiftScaleSpace(), new ConfigSiftDetector(), listener);
 	}
 
-	public ControlPanelSiftDetector(ConfigSiftScaleSpace configSS , ConfigSiftDetector configDetector, Listener listener )
+	public ControlPanelSiftDetector(@Nullable ConfigSiftScaleSpace configSS_ , @Nullable ConfigSiftDetector configDetector_, Listener listener )
 	{
-		this.configSS = configSS;
-		this.configDetector = configDetector;
+		this.configSS = configSS_==null?new ConfigSiftScaleSpace() : configSS_;
+		this.configDetector = configDetector_ == null? new ConfigSiftDetector() : configDetector_;
 		this.listener = listener;
 
 		this.controlExtractor = new ControlPanelExtractor(configDetector.extract,listener::handleChangeSiftDetector);

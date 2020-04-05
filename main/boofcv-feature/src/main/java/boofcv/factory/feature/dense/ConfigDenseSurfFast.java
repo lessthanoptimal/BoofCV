@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,7 +30,7 @@ public class ConfigDenseSurfFast implements Configuration {
 	/**
 	 * Configuration for Stable SURF descriptor
 	 */
-	public ConfigSurfDescribe.Speed surf = new ConfigSurfDescribe.Speed();
+	public ConfigSurfDescribe.Fast surf = new ConfigSurfDescribe.Fast();
 
 	/**
 	 * Specifies the frequency it will sample across the image in pixels.  Default ix period X = 8, period Y = 8.

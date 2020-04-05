@@ -56,7 +56,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF description extractor
 	 */
 	public static <T extends ImageGray<T>, II extends ImageGray<II>>
-	DescribeRegionPoint<T,BrightFeature> surfFast(@Nullable ConfigSurfDescribe.Speed config , Class<T> imageType) {
+	DescribeRegionPoint<T,BrightFeature> surfFast(@Nullable ConfigSurfDescribe.Fast config , Class<T> imageType) {
 
 
 		Class<II> integralType = GIntegralImageOps.getIntegralType(imageType);
@@ -76,7 +76,7 @@ public class FactoryDescribeRegionPoint {
 	 * @return SURF color description extractor
 	 */
 	public static <T extends ImageMultiBand<T>, II extends ImageGray<II>>
-	DescribeRegionPoint<T,BrightFeature> surfColorFast(@Nullable ConfigSurfDescribe.Speed config , ImageType<T> imageType) {
+	DescribeRegionPoint<T,BrightFeature> surfColorFast(@Nullable ConfigSurfDescribe.Fast config , ImageType<T> imageType) {
 
 		Class bandType = imageType.getImageClass();
 		Class<II> integralType = GIntegralImageOps.getIntegralType(bandType);

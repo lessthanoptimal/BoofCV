@@ -44,9 +44,6 @@ import java.util.Random;
 public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleDesc>
 		implements PointTracker<I> {
 
-
-	// TODO add backwards validation?
-
 	// associates features between two images together
 	protected AssociateDescription2D<Desc> associate;
 

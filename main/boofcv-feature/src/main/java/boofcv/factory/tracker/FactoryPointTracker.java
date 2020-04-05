@@ -164,7 +164,7 @@ public class FactoryPointTracker {
 	public static <I extends ImageGray<I>>
 	PointTracker<I> dda_FH_SURF_Fast(
 										  ConfigFastHessian configDetector ,
-										  ConfigSurfDescribe.Speed configDescribe ,
+										  ConfigSurfDescribe.Fast configDescribe ,
 										  ConfigAverageIntegral configOrientation ,
 										  Class<I> imageType)
 	{
