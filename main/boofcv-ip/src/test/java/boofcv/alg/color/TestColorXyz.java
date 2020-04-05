@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,47 +32,53 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-public class TestColorXyz {
+class TestColorXyz {
+	private Random rand = new Random(234);
 
-	public static final double tol = 1e-4;
+	private double[] rgb_F64 = new double[3];
+	private double[] xyz_F64 = new double[3];
 
-	Random rand = new Random(234);
-
-	double rgb_F64[] = new double[3];
-	double xyz_F64[] = new double[3];
-
-	float rgb_F32[] = new float[3];
-	float xyz_F32[] = new float[3];
-
+	private float[] rgb_F32 = new float[3];
+	private float[] xyz_F32 = new float[3];
 
 	@Test
-	public void compareRGB_to_SRGB_F32() {
-		float found[] = new float[3];
-		float expected[] = new float[3];
+	void RGB_to_XYZ_to_RGB_F32_I32() {
+		float[] tmp = new float[3];
+		ColorXyz.rgbToXyz(100,202,90,tmp);
+		int[] rgb = new int[3];
+		ColorXyz.xyzToRgb(tmp[0],tmp[1],tmp[2],tmp,rgb);
 
-		ColorXyz.rgbToXyz(100,202,90,found);
-		ColorXyz.srgbToXyz(100 / 255.0f, 202 / 255.0f, 90 / 255.0f, expected);
-
-		for( int i = 0; i < 3; i++ ) {
-			assertEquals(expected[i],found[i],1e-4);
-		}
+		assertEquals(100,rgb[0]);
+		assertEquals(202,rgb[1]);
+		assertEquals(90,rgb[2]);
 	}
 
 	@Test
-	public void compareRGB_to_SRGB_F64() {
-		double found[] = new double[3];
-		double expected[] = new double[3];
+	void RGB_to_XYZ_to_RGB_F64_I32() {
+		double[] tmp = new double[3];
+		ColorXyz.rgbToXyz(100,202,90,tmp);
+		int[] rgb = new int[3];
+		ColorXyz.xyzToRgb(tmp[0],tmp[1],tmp[2],tmp,rgb);
 
-		ColorXyz.rgbToXyz(100,202,90,found);
-		ColorXyz.srgbToXyz(100/255.0,202/255.0,90/255.0,expected);
-
-		for( int i = 0; i < 3; i++ ) {
-			assertEquals(expected[i],found[i],1e-8);
-		}
+		assertEquals(100,rgb[0]);
+		assertEquals(202,rgb[1]);
+		assertEquals(90,rgb[2]);
 	}
 
 	@Test
-	public void backAndForth_srgb_F64_and_F32() {
+	void RGB_to_XYZ_to_RGB_F64_F32() {
+		float[] tmp = new float[3];
+		ColorXyz.rgbToXyz(100,202,90,tmp);
+		float[] rgb = new float[3];
+		ColorXyz.xyzToRgb(tmp[0],tmp[1],tmp[2],tmp,rgb);
+
+		assertEquals(100,rgb[0], UtilEjml.TEST_F32);
+		assertEquals(202,rgb[1], UtilEjml.TEST_F32);
+		assertEquals(90 ,rgb[2], UtilEjml.TEST_F32);
+	}
+
+	@Test
+	void backAndForth_srgb_F64_and_F32() {
 
 		check(0.5, 0.3, 0.2);
 		check(0, 0, 0);
@@ -114,31 +120,27 @@ public class TestColorXyz {
 		check(rgb_F32,fr,fg,fb);
 	}
 
-	private static void check( double found[] , double a , double b , double c ) {
-		double tol = TestColorXyz.tol * Math.max(Math.max(a,b),c) + UtilEjml.EPS;
-
-		assertEquals(a,found[0],tol);
-		assertEquals(b,found[1],tol);
-		assertEquals(c, found[2], tol);
+	private static void check(double[] found, double a , double b , double c ) {
+		assertEquals(a,found[0],UtilEjml.TEST_F32);
+		assertEquals(b,found[1],UtilEjml.TEST_F32);
+		assertEquals(c,found[2],UtilEjml.TEST_F32);
 	}
 
-	private static void check( float found[] , float a , float b , float c ) {
-		double tol = TestColorXyz.tol * Math.max(Math.max(a,b),c) + UtilEjml.EPS;;
-
-		assertEquals(a,found[0],tol);
-		assertEquals(b,found[1],tol);
-		assertEquals(c, found[2], tol);
+	private static void check(float[] found, float a , float b , float c ) {
+		assertEquals(a,found[0],UtilEjml.TEST_F32);
+		assertEquals(b,found[1],UtilEjml.TEST_F32);
+		assertEquals(c,found[2],UtilEjml.TEST_F32);
 	}
 
 	@Test
-	public void rgbToXyz_F32() {
+	void rgbToXyz_F32() {
 		Planar<GrayF32> input = new Planar<>(GrayF32.class,20,25,3);
 		Planar<GrayF32> output = new Planar<>(GrayF32.class,20,25,3);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
 		ColorXyz.rgbToXyz(input,output);
 
-		float expected[] = new float[3];
+		float[] expected = new float[3];
 
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
@@ -146,7 +148,7 @@ public class TestColorXyz {
 				float G = input.getBand(1).get(x,y);
 				float B = input.getBand(2).get(x,y);
 
-				ColorXyz.srgbToXyz(R / 255f, G / 255f, B / 255f, expected);
+				ColorXyz.rgbToXyz(R, G, B, expected);
 
 				float X = output.getBand(0).get(x,y);
 				float Y = output.getBand(1).get(x,y);
@@ -160,14 +162,14 @@ public class TestColorXyz {
 	}
 
 	@Test
-	public void rgbToXyz_U8() {
+	void rgbToXyz_U8() {
 		Planar<GrayU8> input = new Planar<>(GrayU8.class,20,25,3);
 		Planar<GrayF32> output = new Planar<>(GrayF32.class,20,25,3);
 		GImageMiscOps.fillUniform(input, rand, 0, 255);
 
 		ColorXyz.rgbToXyz(input, output);
 
-		float expected[] = new float[3];
+		float[] expected = new float[3];
 
 		for (int y = 0; y < input.height; y++) {
 			for (int x = 0; x < input.width; x++) {
@@ -181,9 +183,69 @@ public class TestColorXyz {
 				float Y = output.getBand(1).get(x,y);
 				float Z = output.getBand(2).get(x,y);
 
-				assertEquals(expected[0],X,1e-4f);
-				assertEquals(expected[1],Y,1e-4f);
-				assertEquals(expected[2],Z,1e-4f);
+				assertEquals(expected[0],X,UtilEjml.TEST_F32);
+				assertEquals(expected[1],Y,UtilEjml.TEST_F32);
+				assertEquals(expected[2],Z,UtilEjml.TEST_F32);
+			}
+		}
+	}
+
+	@Test
+	void xyzToRgb_F32() {
+		Planar<GrayF32> input = new Planar<>(GrayF32.class,20,25,3);
+		Planar<GrayF32> output = new Planar<>(GrayF32.class,20,25,3);
+		GImageMiscOps.fillUniform(input, rand, 0, 1.0);
+
+		ColorXyz.xyzToRgb(input,output);
+
+		float[] srgb = new float[3];
+		float[] expected = new float[3];
+
+		for (int y = 0; y < input.height; y++) {
+			for (int x = 0; x < input.width; x++) {
+				float X = input.getBand(0).get(x,y);
+				float Y = input.getBand(1).get(x,y);
+				float Z = input.getBand(2).get(x,y);
+
+				ColorXyz.xyzToRgb(X,Y,Z, srgb,expected);
+
+				float R = output.getBand(0).get(x,y);
+				float G = output.getBand(1).get(x,y);
+				float B = output.getBand(2).get(x,y);
+
+				assertEquals(expected[0],R,UtilEjml.TEST_F32);
+				assertEquals(expected[1],G,UtilEjml.TEST_F32);
+				assertEquals(expected[2],B,UtilEjml.TEST_F32);
+			}
+		}
+	}
+
+	@Test
+	void xyzToRgb_U8() {
+		Planar<GrayF32> input = new Planar<>(GrayF32.class,20,25,3);
+		Planar<GrayU8> output = new Planar<>(GrayU8.class,20,25,3);
+		GImageMiscOps.fillUniform(input, rand, 0, 1.0);
+
+		ColorXyz.xyzToRgb(input,output);
+
+		float[] srgb = new float[3];
+		int[] expected = new int[3];
+
+		for (int y = 0; y < input.height; y++) {
+			for (int x = 0; x < input.width; x++) {
+				float X = input.getBand(0).get(x,y);
+				float Y = input.getBand(1).get(x,y);
+				float Z = input.getBand(2).get(x,y);
+
+				ColorXyz.xyzToRgb(X,Y,Z, srgb,expected);
+
+				int R = output.getBand(0).get(x,y);
+				int G = output.getBand(1).get(x,y);
+				int B = output.getBand(2).get(x,y);
+
+				assertEquals(expected[0],R);
+				assertEquals(expected[1],G);
+				assertEquals(expected[2],B);
 			}
 		}
 	}
