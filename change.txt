@@ -78,6 +78,9 @@ Version : 0.36
   * Demonstration recent file list is now in YAML format and supports multiple files
   * Added settings
   * Added the ability to switch between different swing themes; darklaf and material-ui
+- Color
+  * Fixed conversion between XYZ and RGB by applying Gamma correction.
+  * Thanks Jairo Rotava for finding/showing how to fix the bug!
 
 TODO Regression
    - Dump runtime results into their own directory for each device. Use hostname?
