@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -82,61 +82,29 @@ public class BenchmarkColorConvert {
 		isrc_U8 = new InterleavedU8(size,size,3);
 		idst_U8 = new InterleavedU8(size,size,3);
 
-		GImageMiscOps.fillUniform(src_F32,rand,0,255);
+		GImageMiscOps.fillUniform(src_F32,rand,0,1.0);
 		GImageMiscOps.fillUniform(src_U8,rand,0,255);
 		GImageMiscOps.fillUniform(isrc_F32,rand,0,255);
 		GImageMiscOps.fillUniform(isrc_U8,rand,0,255);
 	}
 
-	@Benchmark
-	public void RGB_to_HSV_F32() {
-		ColorHsv.rgbToHsv(src_F32,dst_F32);
-	}
-
-	@Benchmark
-	public void HSV_to_RGB_F32() {
-		ColorHsv.hsvToRgb(src_F32,dst_F32);
-	}
-
-	@Benchmark
-	public void RGB_to_YUV_F32() {
-		ColorYuv.rgbToYuv(src_F32,dst_F32);
-	}
-
-	@Benchmark
-	public void YUV_to_RGB_F32() {
-		ColorYuv.yuvToRgb(src_F32,dst_F32);
-	}
-
-	@Benchmark
-	public void YUV_to_RGB_U8() {
-		ColorYuv.yuvToRgb(src_U8,dst_U8);
-	}
-
-	@Benchmark
-	public void RGB_to_GRAY_IF32() {
-		ColorRgb.rgbToGray_Weighted(isrc_F32,gdst_F32);
-	}
-
-	@Benchmark
-	public void RGB_to_GRAY_IU8() {
-		ColorRgb.rgbToGray_Weighted(isrc_U8,gdst_U8);
-	}
-
-	@Benchmark
-	public void RGB_to_GRAY_F32() {
-		ColorRgb.rgbToGray_Weighted(src_F32,gdst_F32);
-	}
-
-	@Benchmark
-	public void RGB_to_GRAY_U8() {
-		ColorRgb.rgbToGray_Weighted(src_U8,gdst_U8);
-	}
-
-	@Benchmark
-	public void RGB_to_XYZ_F32() {
-		ColorXyz.rgbToXyz(src_F32,dst_F32);
-	}
+	@Benchmark public void RGB_to_HSV_F32() {ColorHsv.rgbToHsv(src_F32,dst_F32);}
+	@Benchmark public void HSV_to_RGB_F32() {ColorHsv.hsvToRgb(src_F32,dst_F32);}
+	@Benchmark public void RGB_to_YUV_F32() {ColorYuv.rgbToYuv(src_F32,dst_F32);}
+	@Benchmark public void YUV_to_RGB_F32() {ColorYuv.yuvToRgb(src_F32,dst_F32);}
+	@Benchmark public void YUV_to_RGB_U8() {ColorYuv.yuvToRgb(src_U8,dst_U8);}
+	@Benchmark public void RGB_to_GRAY_IF32() {ColorRgb.rgbToGray_Weighted(isrc_F32,gdst_F32);}
+	@Benchmark public void RGB_to_GRAY_IU8() {ColorRgb.rgbToGray_Weighted(isrc_U8,gdst_U8);}
+	@Benchmark public void RGB_to_GRAY_F32() {ColorRgb.rgbToGray_Weighted(src_F32,gdst_F32);}
+	@Benchmark public void RGB_to_GRAY_U8() {ColorRgb.rgbToGray_Weighted(src_U8,gdst_U8);}
+	@Benchmark public void RGB_to_XYZ_U8() {ColorXyz.rgbToXyz(src_U8,dst_F32);}
+	@Benchmark public void RGB_to_XYZ_F32() {ColorXyz.rgbToXyz(src_F32,dst_F32);}
+	@Benchmark public void RGB_to_LAB_U8() {ColorLab.rgbToLab(src_U8,dst_F32);}
+	@Benchmark public void RGB_to_LAB_F32() {ColorLab.rgbToLab(src_F32,dst_F32);}
+	@Benchmark public void XYZ_to_RGB_F32() {ColorXyz.xyzToRgb(src_F32,dst_F32);}
+	@Benchmark public void XYZ_to_RGB_U8() {ColorXyz.xyzToRgb(src_F32,dst_U8);}
+	@Benchmark public void LAB_to_RGB_F32() {ColorLab.labToRgb(src_F32,dst_F32);}
+	@Benchmark public void LAB_to_RGB_U8() {ColorLab.labToRgb(src_F32,dst_U8);}
 
 	public static void main(String[] args) throws RunnerException {
 		Options opt = new OptionsBuilder()
