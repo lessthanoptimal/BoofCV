@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,7 +69,7 @@ public class ExampleBackgroundRemovalStationary {
 //				media.openCamera(null,640,480,background.getImageType());
 
 		// Declare storage for segmented image.  1 = moving foreground and 0 = background
-		GrayU8 segmented = new GrayU8(video.getNextWidth(),video.getNextHeight());
+		GrayU8 segmented = new GrayU8(video.getWidth(),video.getHeight());
 
 		BufferedImage visualized = new BufferedImage(segmented.width,segmented.height,BufferedImage.TYPE_INT_RGB);
 		ImageGridPanel gui = new ImageGridPanel(1,2);

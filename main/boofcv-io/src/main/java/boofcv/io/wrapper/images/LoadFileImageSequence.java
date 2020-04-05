@@ -120,12 +120,12 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 	}
 
 	@Override
-	public int getNextWidth() {
+	public int getWidth() {
 		return image.getWidth();
 	}
 
 	@Override
-	public int getNextHeight() {
+	public int getHeight() {
 		return image.getHeight();
 	}
 
@@ -143,8 +143,6 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 	 * Loads the next image into a BufferedImage and returns it. The same instance
 	 * or a new instance of a BufferedImage might be returned each time.  Don't rely
 	 * on either behavior being consistent.
-	 *
-	 * @return A BufferedImage containing the next image.
 	 */
 	public T next() {
 		if( loop ) {
@@ -161,13 +159,14 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 			}
 		}
 
+		int indexbefore = index;
 		if( forwards )
 			imageGUI = UtilImageIO.loadImage(fileNames.get(index++));
 		else
 			imageGUI = UtilImageIO.loadImage(fileNames.get(index--));
 
 		if( imageGUI == null )
-			return null;
+			throw new RuntimeException("Could not load image at index "+indexbefore);
 
 		image = type.createImage(imageGUI.getWidth(),imageGUI.getHeight());
 		ConvertBufferedImage.convertFrom(imageGUI, image,true);
@@ -190,7 +189,11 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 
 		g2.drawImage(imageGUI, affine, null);
 		imageGUI = scaled;
+		return image;
+	}
 
+	@Override
+	public T getImage() {
 		return image;
 	}
 
@@ -217,6 +220,8 @@ public class LoadFileImageSequence<T extends ImageBase<T>> implements SimpleImag
 	public void reset() {
 		index = 0;
 		forwards = true;
+		image = null;
+		imageGUI = null;
 	}
 
 	public int getIndex() {

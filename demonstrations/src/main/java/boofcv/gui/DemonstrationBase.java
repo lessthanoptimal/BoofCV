@@ -667,7 +667,16 @@ public abstract class DemonstrationBase extends JPanel {
 			}
 			for (int i = 0; i < inputStreams.size(); i++) {
 				CacheSequenceStream stream = inputStreams.get(i);
-				handleInputChange(i, inputMethod, stream.getWidth(), stream.getHeight());
+				// load the first image to get the size then reset
+				// so that it starts processing at the first image
+				int width = 0, height = 0;
+				if( stream.hasNext() ) {
+					stream.cacheNext();
+					width = stream.getWidth();
+					height = stream.getHeight();
+					stream.reset();
+				}
+				handleInputChange(i, inputMethod, width, height);
 			}
 			threadPool.execute(threadProcess);
 		} else {
@@ -763,7 +772,7 @@ public abstract class DemonstrationBase extends JPanel {
 				if (threadProcess != null)
 					throw new RuntimeException("There was still an active stream thread!");
 				setInputName("Webcam");
-				handleInputChange(0, inputMethod, sequence.getNextWidth(), sequence.getNextHeight());
+				handleInputChange(0, inputMethod, sequence.getWidth(), sequence.getHeight());
 				threadProcess = new SynchronizedStreamsThread();
 				threadPool.execute(threadProcess);
 			}

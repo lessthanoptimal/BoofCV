@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,14 +30,14 @@ import boofcv.struct.image.ImageType;
 public interface SimpleImageSequence<T extends ImageBase<T>> {
 
 	/**
-	 * Returns the width of the next image
+	 * Returns the width of the current image
 	 */
-	int getNextWidth();
+	int getWidth();
 
 	/**
-	 * Returns the height of the next image
+	 * Returns the height of the current image
 	 */
-	int getNextHeight();
+	int getHeight();
 
 	/**
 	 * If a new image is available.
@@ -47,18 +47,20 @@ public interface SimpleImageSequence<T extends ImageBase<T>> {
 	boolean hasNext();
 
 	/**
-	 * Returns the next image available in the sequence.
-	 *
-	 * @return Next image in the sequence.
+	 * Steps to the next image in the sequence and loads it.
+	 * @return The next image in the sequence, which is now the current image.
 	 */
 	T next();
+
+	/**
+	 * Returns the currently loaded image in the sequence
+	 */
+	T getImage();
 
 	/**
 	 * Returns the image in the original format that it was read in as.  When dealing with swing or any standard
 	 * Java SE environment this will almost always be BufferedImage.  The type has been abstracted out
 	 * to provide better Android support.
-	 *
-	 * @return
 	 */
 	<InternalImage> InternalImage getGuiImage();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -69,12 +69,12 @@ public class JpegByteImageSequence<T extends ImageBase<T>> implements SimpleImag
 	}
 
 	@Override
-	public int getNextWidth() {
+	public int getWidth() {
 		return imageNext.getWidth();
 	}
 
 	@Override
-	public int getNextHeight() {
+	public int getHeight() {
 		return imageNext.getHeight();
 	}
 
@@ -104,7 +104,11 @@ public class JpegByteImageSequence<T extends ImageBase<T>> implements SimpleImag
 		}
 		if( hasNext())
 			loadNext();
+		return getImage();
+	}
 
+	@Override
+	public T getImage() {
 		return output;
 	}
 

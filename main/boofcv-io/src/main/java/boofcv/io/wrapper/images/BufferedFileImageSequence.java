@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,11 +39,12 @@ import java.util.List;
  */
 public class BufferedFileImageSequence<T extends ImageBase<T>> implements SimpleImageSequence<T> {
 
-	BufferedImage orig[];
+	BufferedImage[] orig;
 	T[] images;
 	int index;
 
 	BufferedImage imageGUI;
+	T image;
 
 	// type of image it outputs
 	ImageType<T> type;
@@ -101,18 +102,19 @@ public class BufferedFileImageSequence<T extends ImageBase<T>> implements Simple
 	}
 
 	@Override
-	public int getNextWidth() {
+	public int getWidth() {
 		return imageGUI.getWidth();
 	}
 
 	@Override
-	public int getNextHeight() {
+	public int getHeight() {
 		return imageGUI.getHeight();
 	}
 
 	/**
 	 * True if there is another image to read and false if there are no more.
 	 */
+	@Override
 	public boolean hasNext() {
 		if( loop )
 			return true;
@@ -124,9 +126,8 @@ public class BufferedFileImageSequence<T extends ImageBase<T>> implements Simple
 	 * Loads the next image into a BufferedImage and returns it. The same instance
 	 * or a new instance of a BufferedImage might be returned each time.  Don't rely
 	 * on either behavior being consistent.
-	 *
-	 * @return A BufferedImage containing the next image.
 	 */
+	@Override
 	public T next() {
 		if( loop ) {
 			if( forwards ) {
@@ -145,10 +146,15 @@ public class BufferedFileImageSequence<T extends ImageBase<T>> implements Simple
 		this.imageGUI = orig[index];
 
 		if( forwards )
-			return images[index++];
+			image = images[index++];
 		else
-			return images[index--];
+			image = images[index--];
+		return getImage();
+	}
 
+	@Override
+	public T getImage() {
+		return image;
 	}
 
 	@Override
@@ -188,5 +194,7 @@ public class BufferedFileImageSequence<T extends ImageBase<T>> implements Simple
 	public void reset() {
 		index = 0;
 		forwards = true;
+		image = null;
+		imageGUI = null;
 	}
 }

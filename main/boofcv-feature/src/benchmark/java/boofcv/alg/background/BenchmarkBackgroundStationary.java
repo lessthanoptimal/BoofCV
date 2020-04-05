@@ -101,7 +101,7 @@ public class BenchmarkBackgroundStationary {
 
 		public void process() {
 			sequence = DefaultMediaManager.INSTANCE.openVideo(file.getAbsolutePath(),imageType);
-			background.reshape(sequence.getNextWidth(),sequence.getNextHeight());
+			background.reshape(sequence.getWidth(),sequence.getHeight());
 
 			totalTime = 0;
 			frames = 0;

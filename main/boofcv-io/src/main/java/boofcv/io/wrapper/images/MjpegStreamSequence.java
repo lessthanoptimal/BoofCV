@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -71,12 +71,12 @@ public class MjpegStreamSequence<T extends ImageBase<T>>
 	}
 
 	@Override
-	public int getNextWidth() {
+	public int getWidth() {
 		return next.getWidth();
 	}
 
 	@Override
-	public int getNextHeight() {
+	public int getHeight() {
 		return next.getHeight();
 	}
 
@@ -91,6 +91,11 @@ public class MjpegStreamSequence<T extends ImageBase<T>>
 		image.reshape(original.getWidth(),original.getHeight());
 		ConvertBufferedImage.convertFrom(original,image, true);
 		readNext();
+		return getImage();
+	}
+
+	@Override
+	public T getImage() {
 		return image;
 	}
 

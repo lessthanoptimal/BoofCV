@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -87,12 +87,12 @@ public class WebcamCaptureWebcamInterface implements WebcamInterface {
 		}
 
 		@Override
-		public int getNextWidth() {
+		public int getWidth() {
 			return width;
 		}
 
 		@Override
-		public int getNextHeight() {
+		public int getHeight() {
 			return height;
 		}
 
@@ -107,6 +107,11 @@ public class WebcamCaptureWebcamInterface implements WebcamInterface {
 			if( bufferedImage == null )
 				bufferedImage = webcam.getImage();
 			ConvertBufferedImage.convertFrom(bufferedImage, output, true);
+			return output;
+		}
+
+		@Override
+		public T getImage() {
 			return output;
 		}
 

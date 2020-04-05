@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -51,10 +51,11 @@ public abstract class ProcessImageSequence<T extends ImageGray<T>> implements Mo
 
 	public ProcessImageSequence(SimpleImageSequence<T> sequence) {
 		this.sequence = sequence;
-		if (sequence.hasNext())
+		if (sequence.hasNext()) {
 			image = sequence.next();
-		else
+		} else {
 			throw new IllegalArgumentException("Image sequence must have at least one image in it.");
+		}
 
 		this.imgWidth = image.getWidth();
 		this.imgHeight = image.getHeight();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -540,7 +540,7 @@ public class FiducialDetection extends BaseStandardInputApp {
 				sequence = media.openVideo(filePath,ImageType.single(GrayU8.class));
 				sequence.setLoop(true);
 			}
-			intrinsic = handleIntrinsic(intrinsic, sequence.getNextWidth(), sequence.getNextHeight());
+			intrinsic = handleIntrinsic(intrinsic, sequence.getWidth(), sequence.getHeight());
 		} else {
 			buffered = UtilImageIO.loadImage(filePath);
 			if( buffered == null ) {

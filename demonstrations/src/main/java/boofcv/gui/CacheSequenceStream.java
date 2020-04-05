@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -60,7 +60,8 @@ public class CacheSequenceStream<T extends ImageBase<T>> {
 
 	public void reset() {
 		selected = 0;
-		sequence = null;
+		if( sequence != null )
+			sequence.reset();
 	}
 
 	public boolean hasNext() {
@@ -69,8 +70,8 @@ public class CacheSequenceStream<T extends ImageBase<T>> {
 
 	public void cacheNext() {
 		selected = (selected+1)%queueBoof.length;
-
-		T sBoof = sequence.next();
+		sequence.next();
+		T sBoof = sequence.getImage();
 		BufferedImage sBuff = sequence.getGuiImage();
 
 		queueBoof[selected].setTo(sBoof);
@@ -92,13 +93,13 @@ public class CacheSequenceStream<T extends ImageBase<T>> {
 	public int getWidth() {
 		if( sequence == null )
 			return queueBoof[selected].getWidth();
-		return sequence.getNextWidth();
+		return sequence.getWidth();
 	}
 
 	public int getHeight() {
 		if( sequence == null )
 			return queueBoof[selected].getHeight();
-		return sequence.getNextHeight();
+		return sequence.getHeight();
 	}
 
 	public ImageType<T> getImageType() {

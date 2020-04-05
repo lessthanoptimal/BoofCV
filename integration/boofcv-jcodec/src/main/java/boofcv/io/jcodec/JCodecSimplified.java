@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -38,8 +38,8 @@ import java.io.IOException;
  *
  * @author Peter Abeles
  */
-public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequence<T> {
-
+public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequence<T>
+{
 	FrameGrab grabber;
 
 	T image;
@@ -60,12 +60,12 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 	}
 
 	@Override
-	public int getNextWidth() {
+	public int getWidth() {
 		return frameNext.getWidth();
 	}
 
 	@Override
-	public int getNextHeight() {
+	public int getHeight() {
 		return frameNext.getHeight();
 	}
 
@@ -86,6 +86,11 @@ public class JCodecSimplified<T extends ImageBase<T>> implements SimpleImageSequ
 		image.reshape(frameCurrent.getWidth(), frameCurrent.getHeight());
 		UtilJCodec.convertToBoof(frameCurrent, image);
 		frame++;
+		return image;
+	}
+
+	@Override
+	public T getImage() {
 		return image;
 	}
 

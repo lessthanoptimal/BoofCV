@@ -112,7 +112,7 @@ public class ExampleBackgroundRemovalMoving {
 		//====== Initialize Images
 
 		// storage for segmented image.  Background = 0, Foreground = 1
-		GrayU8 segmented = new GrayU8(video.getNextWidth(),video.getNextHeight());
+		GrayU8 segmented = new GrayU8(video.getWidth(),video.getHeight());
 		// Grey scale image that's the input for motion estimation
 		GrayF32 grey = new GrayF32(segmented.width,segmented.height);
 

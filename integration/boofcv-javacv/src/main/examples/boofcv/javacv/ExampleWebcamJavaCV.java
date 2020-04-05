@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -41,7 +41,7 @@ public class ExampleWebcamJavaCV
 				ImageType.pl(3,GrayU8.class) );
 
 		BufferedImage output = new BufferedImage(
-				sequence.getNextWidth(),sequence.getNextHeight(),BufferedImage.TYPE_INT_RGB);
+				sequence.getWidth(),sequence.getHeight(),BufferedImage.TYPE_INT_RGB);
 
 		ImagePanel gui = new ImagePanel(output);
 		ShowImages.showWindow(gui,"Webam using JavaCV",true);

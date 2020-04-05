@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,12 +70,12 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 	}
 
 	@Override
-	public int getNextWidth() {
+	public int getWidth() {
 		return next.getWidth();
 	}
 
 	@Override
-	public int getNextHeight() {
+	public int getHeight() {
 		return next.getHeight();
 	}
 
@@ -99,6 +99,11 @@ public class FfmpegVideoImageSequence<T extends ImageBase<T>> implements SimpleI
 		if( frameNumber >= frameGrabber.getLengthInFrames() )
 			finished = true;
 		ConvertBufferedImage.convertFrom(current,currentBoof,true);
+		return currentBoof;
+	}
+
+	@Override
+	public T getImage() {
 		return currentBoof;
 	}
 
