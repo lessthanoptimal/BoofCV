@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,7 +39,7 @@ class TestImplColorXyz_MT extends CompareIdenticalFunctions {
 
 	@Test
 	void performTests() {
-		performTests(2);
+		performTests(4);
 	}
 
 	@Override
@@ -54,6 +54,14 @@ class TestImplColorXyz_MT extends CompareIdenticalFunctions {
 				break;
 			case "rgbToXyz_U8":
 				parameters[0] = new Planar<>(GrayU8.class ,width,height,3);
+				parameters[1] = new Planar<>(GrayF32.class,width,height,3);
+				break;
+			case "xyzToRgb_U8":
+				parameters[0] = new Planar<>(GrayF32.class,width,height,3);
+				parameters[1] = new Planar<>(GrayU8.class,width,height,3);
+				break;
+			case "xyzToRgb_F32":
+				parameters[0] = new Planar<>(GrayF32.class,width,height,3);
 				parameters[1] = new Planar<>(GrayF32.class,width,height,3);
 				break;
 		}

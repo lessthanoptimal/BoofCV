@@ -61,7 +61,7 @@ import boofcv.struct.image.Planar;
  * @author Peter Abeles
  */
 public class ColorXyz {
-	// Look up tables for inverse gamma function
+	// Look up tables for inverse gamma function. Should be faster than computing invGamma
 	public final static float[] table_invgamma_f = new float[256];
 	public final static double[] table_invgamma_d = new double[256];
 
@@ -86,10 +86,19 @@ public class ColorXyz {
 		srgbToXyz((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),xyz);
 	}
 
+	/**
+	 * Conversion from 8-bit RGB into XYZ.  8-bit = range of 0 to 255.
+	 */
 	public static void rgbToXyz( double r , double g , double b , float []xyz ) {
 		srgbToXyz((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),xyz);
 	}
 
+	/**
+	 * Conversion of CEI XYZ to 8-bit RGB. Converts to srgb and then applies gamma correction.
+	 *
+	 * @param srgb (output) Workspace to store intermediate srgb results
+	 * @param rgb (output) Output of gamma corrected RGB color 0 to 255
+	 */
 	public static void xyzToRgb( double x , double y , double z, double[]srgb , int[]rgb ) {
 		xyzToSrgb(x,y,z,srgb);
 		rgb[0] = (int)(255.0*gamma(srgb[0])+0.5) & 0xFF;
@@ -97,6 +106,12 @@ public class ColorXyz {
 		rgb[2] = (int)(255.0*gamma(srgb[2])+0.5) & 0xFF;
 	}
 
+	/**
+	 * Conversion of CEI XYZ to 8-bit RGB. Converts to srgb and then applies gamma correction.
+	 *
+	 * @param srgb (output) Workspace to store intermediate srgb results
+	 * @param rgb (output) Output of gamma corrected RGB color 0 to 255
+	 */
 	public static void xyzToRgb( float x , float y , float z, float[]srgb , int[]rgb ) {
 		xyzToSrgb(x,y,z,srgb);
 		rgb[0] = (int)(255.0*gamma(srgb[0])+0.5) & 0xFF;
@@ -104,6 +119,12 @@ public class ColorXyz {
 		rgb[2] = (int)(255.0*gamma(srgb[2])+0.5) & 0xFF;
 	}
 
+	/**
+	 * Conversion of CEI XYZ to 8-bit RGB. Converts to srgb and then applies gamma correction.
+	 *
+	 * @param srgb (output) Workspace to store intermediate srgb results
+	 * @param rgb (output) Output of gamma corrected RGB color.
+	 */
 	public static void xyzToRgb( float x , float y , float z, float[]srgb , float[]rgb ) {
 		xyzToSrgb(x,y,z,srgb);
 		rgb[0] = (float)(255.0*gamma(srgb[0]));
@@ -111,6 +132,9 @@ public class ColorXyz {
 		rgb[2] = (float)(255.0*gamma(srgb[2]));
 	}
 
+	/**
+	 * Inverse gamma correction function
+	 */
 	public static double invGamma( double v ) {
 		if (v<=0.04045) {
 			return(v / 12.92);
@@ -118,6 +142,9 @@ public class ColorXyz {
 		return(Math.pow((v + 0.055) / 1.055,2.4));
 	}
 
+	/**
+	 * Forward gamma correction function
+	 */
 	public static double gamma( double v ) {
 		if (v<=0.0031308) {
 			return (323.0/25.0)*v;

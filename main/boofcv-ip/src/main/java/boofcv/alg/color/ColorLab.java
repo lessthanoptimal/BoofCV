@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -26,6 +26,8 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.Planar;
 
+import static boofcv.alg.color.ColorXyz.*;
+
 /**
  * <p>Conversion between RGB and CIE LAB color space.  LAB color is designed to approximate human vision.
  * L for lightness and a and b for the color-opponent dimensions,  The reference white used in
@@ -38,6 +40,8 @@ import boofcv.struct.image.Planar;
  * <li>L = 0 is black and L* = 100 is diffuse white</li>
  * </ul>
  * </p>
+ *
+ * @see ColorXyz
  *
  * @author Peter Abeles
  */
@@ -60,16 +64,85 @@ public class ColorLab {
 	public static final float Zr_f = 1.088754f;	//reference white
 
 	/**
-	 * Conversion from normalized RGB into LAB.  Normalized RGB values have a range of 0:1
+	 * Conversion from 8-bit RGB into CIE LAB.  8-bit = range of 0 to 255.
 	 */
-	public static void srgbToLab( double r , double g , double b , double lab[] ) {
-		ColorXyz.srgbToXyz(r,g,b,lab);
+	public static void rgbToLab( int r , int g , int b , double []lab ) {
+		srgbToLab(invGamma(r/255.0),invGamma(g/255.0),invGamma(b/255.0),lab);
+	}
 
-		double X = lab[0];
-		double Y = lab[1];
-		double Z = lab[2];
+	/**
+	 * Conversion from 8-bit RGB into CIE LAB.  8-bit = range of 0 to 255.
+	 */
+	public static void rgbToLab( int r , int g , int b , float []lab ) {
+		srgbToLab((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),lab);
+	}
 
+	/**
+	 * Conversion from 8-bit RGB into CIE LAB.  8-bit = range of 0 to 255.
+	 */
+	public static void rgbToLab( double r , double g , double b , float []lab ) {
+		srgbToLab((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),lab);
+	}
 
+	/**
+	 * Conversion of CEI LAB to 8-bit RGB. Converts to srgb and then applies gamma correction.
+	 *
+	 * @param srgb (output) Workspace to store intermediate srgb results
+	 * @param rgb (output) Output of gamma corrected RGB color 0 to 255
+	 */
+	public static void labToRgb( double L , double a , double b, double[]srgb , int[]rgb ) {
+		labToSrgb(L,a,b,srgb);
+		rgb[0] = (int)(255.0*gamma(srgb[0])+0.5) & 0xFF;
+		rgb[1] = (int)(255.0*gamma(srgb[1])+0.5) & 0xFF;
+		rgb[2] = (int)(255.0*gamma(srgb[2])+0.5) & 0xFF;
+	}
+
+	/**
+	 * Conversion of CEI LAB to 8-bit RGB. Converts to srgb and then applies gamma correction.
+	 *
+	 * @param srgb (output) Workspace to store intermediate srgb results
+	 * @param rgb (output) Output of gamma corrected RGB color 0 to 255
+	 */
+	public static void labToRgb( float L , float a , float b, float[]srgb , int[]rgb ) {
+		labToSrgb(L,a,b,srgb);
+		rgb[0] = (int)(255.0*gamma(srgb[0])+0.5) & 0xFF;
+		rgb[1] = (int)(255.0*gamma(srgb[1])+0.5) & 0xFF;
+		rgb[2] = (int)(255.0*gamma(srgb[2])+0.5) & 0xFF;
+	}
+
+	/**
+	 * Conversion of CEI LAB to 8-bit RGB. Converts to srgb and then applies gamma correction.
+	 *
+	 * @param srgb (output) Workspace to store intermediate srgb results
+	 * @param rgb (output) Output of gamma corrected RGB color.
+	 */
+	public static void labToRgb( float L , float a , float b, float[]srgb , float[]rgb ) {
+		labToSrgb(L,a,b,srgb);
+		rgb[0] = (float)(255.0*gamma(srgb[0]));
+		rgb[1] = (float)(255.0*gamma(srgb[1]));
+		rgb[2] = (float)(255.0*gamma(srgb[2]));
+	}
+
+	/**
+	 * Conversion from CEI LAB to gamma corrected normalized R'G'B'.  Normalized RGB values have a range of 0:1
+	 */
+	public static void labToSrgb( float L , float a , float b , float []srgb ) {
+		labToXyz(L,a,b,srgb);
+		xyzToSrgb(srgb[0],srgb[1],srgb[2],srgb);
+	}
+
+	/**
+	 * Conversion from CEI LAB to gamma corrected normalized R'G'B'.  Normalized RGB values have a range of 0:1
+	 */
+	public static void labToSrgb( double L , double a , double b , double []srgb ) {
+		labToXyz(L,a,b,srgb);
+		xyzToSrgb(srgb[0],srgb[1],srgb[2],srgb);
+	}
+
+	/**
+	 * Convert CEI XYZ to CEI LAB color space
+	 */
+	public static void xyzToLab(double X, double Y, double Z, double[] lab ) {
 		double xr = X/Xr;
 		double yr = Y/Yr;
 		double zr = Z/Zr;
@@ -88,15 +161,9 @@ public class ColorLab {
 	}
 
 	/**
-	 * Conversion from normalized RGB into LAB.  Normalized RGB values have a range of 0:1
+	 * Convert CEI XYZ to CEI LAB color space
 	 */
-	public static void srgbToLab( float r , float g , float b , float lab[] ) {
-		ColorXyz.srgbToXyz(r,g,b,lab);
-
-		float X = lab[0];
-		float Y = lab[1];
-		float Z = lab[2];
-
+	public static void xyzToLab(float X, float Y, float Z, float[] lab ) {
 		float xr = X/Xr_f;
 		float yr = Y/Yr_f;
 		float zr = Z/Zr_f;
@@ -112,6 +179,58 @@ public class ColorLab {
 		lab[0] = 116.0f*fy-16.0f;
 		lab[1] = 500.0f*(fx-fy);
 		lab[2] = 200.0f*(fy-fz);
+	}
+
+	/**
+	 * Convert CEI LAB to CEI XYZ color space
+	 */
+	public static void labToXyz(double L, double a, double b, double[] xyz ) {
+		double left = (L+16.0)/116.0;
+		xyz[0] = Xr_f*invTran(left+a/500.0);
+		xyz[1] = Yr_f*invTran(left);
+		xyz[2] = Zr_f*invTran(left-b/200.0);
+	}
+
+	/**
+	 * Convert CEI LAB to CEI XYZ color space
+	 */
+	public static void labToXyz(float L, float a, float b, float[] xyz ) {
+		float left = (L+16.0f)/116.0f;
+		xyz[0] = Xr_f*invTran(left+a/500.0f);
+		xyz[1] = Yr_f*invTran(left);
+		xyz[2] = Zr_f*invTran(left-b/200.0f);
+	}
+
+	public static double invTran( double t ) {
+		if( t > epsilon ) {
+			return t*t*t;
+		} else {
+			return 3.0*t*t*(t-(4.0/29.0));
+		}
+	}
+
+	public static float invTran( float t ) {
+		if( t > epsilon_f ) {
+			return t*t*t;
+		} else {
+			return 3.0f*t*t*(t-(4.0f/29.0f));
+		}
+	}
+
+	/**
+	 * Conversion from gamma corrected normalized R'G'B' into CEI LAB.  Normalized RGB values have a range of 0:1
+	 */
+	public static void srgbToLab(double r , double g , double b , double[] lab) {
+		ColorXyz.srgbToXyz(r,g,b,lab);
+		xyzToLab(lab[0],lab[1],lab[2],lab);
+	}
+
+	/**
+	 * Conversion from gamma corrected normalized R'G'B' into LAB.  Normalized RGB values have a range of 0:1
+	 */
+	public static void srgbToLab(float r , float g , float b , float[] lab) {
+		ColorXyz.srgbToXyz(r,g,b,lab);
+		xyzToLab(lab[0],lab[1],lab[2],lab);
 	}
 
 	/**
@@ -138,6 +257,35 @@ public class ColorLab {
 				ImplColorLab_MT.rgbToLab_F32((Planar<GrayF32>)rgb,lab);
 			} else {
 				ImplColorLab.rgbToLab_F32((Planar<GrayF32>)rgb,lab);
+			}
+		} else {
+			throw new IllegalArgumentException("Unsupported band type "+rgb.getBandType().getSimpleName());
+		}
+	}
+
+	/**
+	 * Convert a 3-channel {@link Planar} image from LAB into RGB.  RGB will have a range from 0 to 255.
+	 *
+	 * NOTE: Input and output image can be the same instance.
+	 *
+	 * @param lab (Input) LAB encoded image. L = channel 0, A = channel 1, B = channel 2
+	 * @param rgb (Output) RGB encoded image
+	 */
+	public static <T extends ImageGray<T>>
+	void labToRgb(Planar<GrayF32> lab , Planar<T> rgb ) {
+		rgb.reshape(lab);
+
+		if( rgb.getBandType() == GrayU8.class ) {
+			if (BoofConcurrency.USE_CONCURRENT) {
+				ImplColorLab_MT.labToRgb_U8(lab,(Planar<GrayU8>) rgb);
+			} else {
+				ImplColorLab.labToRgb_U8(lab,(Planar<GrayU8>) rgb);
+			}
+		} else if( rgb.getBandType() == GrayF32.class ) {
+			if(BoofConcurrency.USE_CONCURRENT ) {
+				ImplColorLab_MT.labToRgb_F32(lab,(Planar<GrayF32>)rgb);
+			} else {
+				ImplColorLab.labToRgb_F32(lab,(Planar<GrayF32>)rgb);
 			}
 		} else {
 			throw new IllegalArgumentException("Unsupported band type "+rgb.getBandType().getSimpleName());
