@@ -76,60 +76,60 @@ public class ColorXyz {
 	 * Conversion from 8-bit RGB into XYZ.  8-bit = range of 0 to 255.
 	 */
 	public static void rgbToXyz( int r , int g , int b , double []xyz ) {
-		srgbToXyz(invGamma(r/255.0),invGamma(g/255.0),invGamma(b/255.0),xyz);
+		linearRgbToXyz(invGamma(r/255.0),invGamma(g/255.0),invGamma(b/255.0),xyz);
 	}
 
 	/**
 	 * Conversion from 8-bit RGB into XYZ.  8-bit = range of 0 to 255.
 	 */
 	public static void rgbToXyz( int r , int g , int b , float []xyz ) {
-		srgbToXyz((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),xyz);
+		linearRgbToXyz((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),xyz);
 	}
 
 	/**
 	 * Conversion from 8-bit RGB into XYZ.  8-bit = range of 0 to 255.
 	 */
 	public static void rgbToXyz( double r , double g , double b , float []xyz ) {
-		srgbToXyz((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),xyz);
+		linearRgbToXyz((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),xyz);
 	}
 
 	/**
-	 * Conversion of CEI XYZ to 8-bit RGB. Converts to srgb and then applies gamma correction.
+	 * Conversion of CEI XYZ to 8-bit RGB. Converts to linearR and then applies gamma correction.
 	 *
-	 * @param srgb (output) Workspace to store intermediate srgb results
+	 * @param linearRgb (output) Workspace to store intermediate linearRgb results
 	 * @param rgb (output) Output of gamma corrected RGB color 0 to 255
 	 */
-	public static void xyzToRgb( double x , double y , double z, double[]srgb , int[]rgb ) {
-		xyzToSrgb(x,y,z,srgb);
-		rgb[0] = (int)(255.0*gamma(srgb[0])+0.5) & 0xFF;
-		rgb[1] = (int)(255.0*gamma(srgb[1])+0.5) & 0xFF;
-		rgb[2] = (int)(255.0*gamma(srgb[2])+0.5) & 0xFF;
+	public static void xyzToRgb( double x , double y , double z, double[]linearRgb , int[]rgb ) {
+		xyzToLinearRgb(x,y,z,linearRgb);
+		rgb[0] = (int)(255.0*gamma(linearRgb[0])+0.5) & 0xFF;
+		rgb[1] = (int)(255.0*gamma(linearRgb[1])+0.5) & 0xFF;
+		rgb[2] = (int)(255.0*gamma(linearRgb[2])+0.5) & 0xFF;
 	}
 
 	/**
-	 * Conversion of CEI XYZ to 8-bit RGB. Converts to srgb and then applies gamma correction.
+	 * Conversion of CEI XYZ to 8-bit RGB. Converts to linearR and then applies gamma correction.
 	 *
-	 * @param srgb (output) Workspace to store intermediate srgb results
+	 * @param linearRgb (output) Workspace to store intermediate linearRgb results
 	 * @param rgb (output) Output of gamma corrected RGB color 0 to 255
 	 */
-	public static void xyzToRgb( float x , float y , float z, float[]srgb , int[]rgb ) {
-		xyzToSrgb(x,y,z,srgb);
-		rgb[0] = (int)(255.0*gamma(srgb[0])+0.5) & 0xFF;
-		rgb[1] = (int)(255.0*gamma(srgb[1])+0.5) & 0xFF;
-		rgb[2] = (int)(255.0*gamma(srgb[2])+0.5) & 0xFF;
+	public static void xyzToRgb( float x , float y , float z, float[]linearRgb , int[]rgb ) {
+		xyzToLinearRgb(x,y,z,linearRgb);
+		rgb[0] = (int)(255.0*gamma(linearRgb[0])+0.5) & 0xFF;
+		rgb[1] = (int)(255.0*gamma(linearRgb[1])+0.5) & 0xFF;
+		rgb[2] = (int)(255.0*gamma(linearRgb[2])+0.5) & 0xFF;
 	}
 
 	/**
-	 * Conversion of CEI XYZ to 8-bit RGB. Converts to srgb and then applies gamma correction.
+	 * Conversion of CEI XYZ to 8-bit RGB. Converts to linearRgb and then applies gamma correction.
 	 *
-	 * @param srgb (output) Workspace to store intermediate srgb results
+	 * @param linearRgb (output) Workspace to store intermediate linearRgb results
 	 * @param rgb (output) Output of gamma corrected RGB color.
 	 */
-	public static void xyzToRgb( float x , float y , float z, float[]srgb , float[]rgb ) {
-		xyzToSrgb(x,y,z,srgb);
-		rgb[0] = (float)(255.0*gamma(srgb[0]));
-		rgb[1] = (float)(255.0*gamma(srgb[1]));
-		rgb[2] = (float)(255.0*gamma(srgb[2]));
+	public static void xyzToRgb( float x , float y , float z, float[]linearRgb , float[]rgb ) {
+		xyzToLinearRgb(x,y,z,linearRgb);
+		rgb[0] = (float)(255.0*gamma(linearRgb[0]));
+		rgb[1] = (float)(255.0*gamma(linearRgb[1]));
+		rgb[2] = (float)(255.0*gamma(linearRgb[2]));
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class ColorXyz {
 	/**
 	 * Conversion from gamma corrected normalized R'G'B' into CEI XYZ.  Normalized RGB values have a range of 0:1
 	 */
-	public static void srgbToXyz( double r , double g , double b , double []xyz ) {
+	public static void linearRgbToXyz( double r , double g , double b , double []xyz ) {
 		xyz[0] = 0.412453*r + 0.35758 *g + 0.180423*b;
 		xyz[1] = 0.212671*r + 0.71516 *g + 0.072169*b;
 		xyz[2] = 0.019334*r + 0.119193*g + 0.950227*b;
@@ -164,7 +164,7 @@ public class ColorXyz {
 	/**
 	 * Conversion from gamma corrected normalized R'G'B' into CEI XYZ.  Normalized RGB values have a range of 0:1
 	 */
-	public static void srgbToXyz( float r , float g , float b , float []xyz ) {
+	public static void linearRgbToXyz( float r , float g , float b , float []xyz ) {
 		xyz[0] = 0.412453f*r + 0.35758f *g + 0.180423f*b;
 		xyz[1] = 0.212671f*r + 0.71516f *g + 0.072169f*b;
 		xyz[2] = 0.019334f*r + 0.119193f*g + 0.950227f*b;
@@ -173,19 +173,19 @@ public class ColorXyz {
 	/**
 	 * Conversion from CEI XYZ to gamma corrected normalized R'G'B'.  Normalized RGB values have a range of 0:1
 	 */
-	public static void xyzToSrgb( float x , float y , float z , float []srgb ) {
-		srgb[0] =  3.240479f*x - 1.53715f*y  - 0.498535f*z;
-		srgb[1] = -0.969256f*x + 1.875991f*y + 0.041556f*z;
-		srgb[2] =  0.055648f*x - 0.204043f*y + 1.057311f*z;
+	public static void xyzToLinearRgb( float x , float y , float z , float []linearRgb ) {
+		linearRgb[0] =  3.240479f*x - 1.53715f*y  - 0.498535f*z;
+		linearRgb[1] = -0.969256f*x + 1.875991f*y + 0.041556f*z;
+		linearRgb[2] =  0.055648f*x - 0.204043f*y + 1.057311f*z;
 	}
 
 	/**
 	 * Conversion from CEI XYZ to gamma corrected normalized R'G'B'.  Normalized RGB values have a range of 0:1
 	 */
-	public static void xyzToSrgb( double x , double y , double z , double []srgb ) {
-		srgb[0] =  3.240479*x - 1.53715*y  - 0.498535*z;
-		srgb[1] = -0.969256*x + 1.875991*y + 0.041556*z;
-		srgb[2] =  0.055648*x - 0.204043*y + 1.057311*z;
+	public static void xyzToLinearRgb( double x , double y , double z , double []linearRgb ) {
+		linearRgb[0] =  3.240479*x - 1.53715*y  - 0.498535*z;
+		linearRgb[1] = -0.969256*x + 1.875991*y + 0.041556*z;
+		linearRgb[2] =  0.055648*x - 0.204043*y + 1.057311*z;
 	}
 
 	/**

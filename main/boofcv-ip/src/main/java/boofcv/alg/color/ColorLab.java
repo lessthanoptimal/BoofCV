@@ -67,76 +67,76 @@ public class ColorLab {
 	 * Conversion from 8-bit RGB into CIE LAB.  8-bit = range of 0 to 255.
 	 */
 	public static void rgbToLab( int r , int g , int b , double []lab ) {
-		srgbToLab(invGamma(r/255.0),invGamma(g/255.0),invGamma(b/255.0),lab);
+		linearRgbToLab(invGamma(r/255.0),invGamma(g/255.0),invGamma(b/255.0),lab);
 	}
 
 	/**
 	 * Conversion from 8-bit RGB into CIE LAB.  8-bit = range of 0 to 255.
 	 */
 	public static void rgbToLab( int r , int g , int b , float []lab ) {
-		srgbToLab((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),lab);
+		linearRgbToLab((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),lab);
 	}
 
 	/**
 	 * Conversion from 8-bit RGB into CIE LAB.  8-bit = range of 0 to 255.
 	 */
 	public static void rgbToLab( double r , double g , double b , float []lab ) {
-		srgbToLab((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),lab);
+		linearRgbToLab((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),lab);
 	}
 
 	/**
-	 * Conversion of CEI LAB to 8-bit RGB. Converts to srgb and then applies gamma correction.
+	 * Conversion of CEI LAB to 8-bit RGB. Converts to linearRgb and then applies gamma correction.
 	 *
-	 * @param srgb (output) Workspace to store intermediate srgb results
+	 * @param linearRgb (output) Workspace to store intermediate linearRgb results
 	 * @param rgb (output) Output of gamma corrected RGB color 0 to 255
 	 */
-	public static void labToRgb( double L , double a , double b, double[]srgb , int[]rgb ) {
-		labToSrgb(L,a,b,srgb);
-		rgb[0] = (int)(255.0*gamma(srgb[0])+0.5) & 0xFF;
-		rgb[1] = (int)(255.0*gamma(srgb[1])+0.5) & 0xFF;
-		rgb[2] = (int)(255.0*gamma(srgb[2])+0.5) & 0xFF;
+	public static void labToRgb( double L , double a , double b, double[]linearRgb , int[]rgb ) {
+		labToLinearRgb(L,a,b,linearRgb);
+		rgb[0] = (int)(255.0*gamma(linearRgb[0])+0.5) & 0xFF;
+		rgb[1] = (int)(255.0*gamma(linearRgb[1])+0.5) & 0xFF;
+		rgb[2] = (int)(255.0*gamma(linearRgb[2])+0.5) & 0xFF;
 	}
 
 	/**
-	 * Conversion of CEI LAB to 8-bit RGB. Converts to srgb and then applies gamma correction.
+	 * Conversion of CEI LAB to 8-bit RGB. Converts to linearRgb and then applies gamma correction.
 	 *
-	 * @param srgb (output) Workspace to store intermediate srgb results
+	 * @param linearRgb (output) Workspace to store intermediate linearRgb results
 	 * @param rgb (output) Output of gamma corrected RGB color 0 to 255
 	 */
-	public static void labToRgb( float L , float a , float b, float[]srgb , int[]rgb ) {
-		labToSrgb(L,a,b,srgb);
-		rgb[0] = (int)(255.0*gamma(srgb[0])+0.5) & 0xFF;
-		rgb[1] = (int)(255.0*gamma(srgb[1])+0.5) & 0xFF;
-		rgb[2] = (int)(255.0*gamma(srgb[2])+0.5) & 0xFF;
+	public static void labToRgb( float L , float a , float b, float[]linearRgb , int[]rgb ) {
+		labToLinearRgb(L,a,b,linearRgb);
+		rgb[0] = (int)(255.0*gamma(linearRgb[0])+0.5) & 0xFF;
+		rgb[1] = (int)(255.0*gamma(linearRgb[1])+0.5) & 0xFF;
+		rgb[2] = (int)(255.0*gamma(linearRgb[2])+0.5) & 0xFF;
 	}
 
 	/**
-	 * Conversion of CEI LAB to 8-bit RGB. Converts to srgb and then applies gamma correction.
+	 * Conversion of CEI LAB to 8-bit RGB. Converts to linearR and then applies gamma correction.
 	 *
-	 * @param srgb (output) Workspace to store intermediate srgb results
+	 * @param linearRgb (output) Workspace to store intermediate linearRgb results
 	 * @param rgb (output) Output of gamma corrected RGB color.
 	 */
-	public static void labToRgb( float L , float a , float b, float[]srgb , float[]rgb ) {
-		labToSrgb(L,a,b,srgb);
-		rgb[0] = (float)(255.0*gamma(srgb[0]));
-		rgb[1] = (float)(255.0*gamma(srgb[1]));
-		rgb[2] = (float)(255.0*gamma(srgb[2]));
+	public static void labToRgb( float L , float a , float b, float[]linearRgb , float[]rgb ) {
+		labToLinearRgb(L,a,b,linearRgb);
+		rgb[0] = (float)(255.0*gamma(linearRgb[0]));
+		rgb[1] = (float)(255.0*gamma(linearRgb[1]));
+		rgb[2] = (float)(255.0*gamma(linearRgb[2]));
 	}
 
 	/**
 	 * Conversion from CEI LAB to gamma corrected normalized R'G'B'.  Normalized RGB values have a range of 0:1
 	 */
-	public static void labToSrgb( float L , float a , float b , float []srgb ) {
-		labToXyz(L,a,b,srgb);
-		xyzToSrgb(srgb[0],srgb[1],srgb[2],srgb);
+	public static void labToLinearRgb( float L , float a , float b , float []linearRgb ) {
+		labToXyz(L,a,b,linearRgb);
+		xyzToLinearRgb(linearRgb[0],linearRgb[1],linearRgb[2],linearRgb);
 	}
 
 	/**
 	 * Conversion from CEI LAB to gamma corrected normalized R'G'B'.  Normalized RGB values have a range of 0:1
 	 */
-	public static void labToSrgb( double L , double a , double b , double []srgb ) {
-		labToXyz(L,a,b,srgb);
-		xyzToSrgb(srgb[0],srgb[1],srgb[2],srgb);
+	public static void labToLinearRgb( double L , double a , double b , double []linearRgb ) {
+		labToXyz(L,a,b,linearRgb);
+		xyzToLinearRgb(linearRgb[0],linearRgb[1],linearRgb[2],linearRgb);
 	}
 
 	/**
@@ -220,16 +220,16 @@ public class ColorLab {
 	/**
 	 * Conversion from gamma corrected normalized R'G'B' into CEI LAB.  Normalized RGB values have a range of 0:1
 	 */
-	public static void srgbToLab(double r , double g , double b , double[] lab) {
-		ColorXyz.srgbToXyz(r,g,b,lab);
+	public static void linearRgbToLab(double r , double g , double b , double[] lab) {
+		ColorXyz.linearRgbToXyz(r,g,b,lab);
 		xyzToLab(lab[0],lab[1],lab[2],lab);
 	}
 
 	/**
 	 * Conversion from gamma corrected normalized R'G'B' into LAB.  Normalized RGB values have a range of 0:1
 	 */
-	public static void srgbToLab(float r , float g , float b , float[] lab) {
-		ColorXyz.srgbToXyz(r,g,b,lab);
+	public static void linearRgbToLab(float r , float g , float b , float[] lab) {
+		ColorXyz.linearRgbToXyz(r,g,b,lab);
 		xyzToLab(lab[0],lab[1],lab[2],lab);
 	}
 

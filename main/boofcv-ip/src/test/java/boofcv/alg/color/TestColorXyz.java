@@ -109,14 +109,14 @@ class TestColorXyz {
 
 	private void check( double r , double g , double b ) {
 		// check F64
-		ColorXyz.srgbToXyz(r, g, b, xyz_F64);
-		ColorXyz.xyzToSrgb(xyz_F64[0], xyz_F64[1], xyz_F64[2], rgb_F64);
+		ColorXyz.linearRgbToXyz(r, g, b, xyz_F64);
+		ColorXyz.xyzToLinearRgb(xyz_F64[0], xyz_F64[1], xyz_F64[2], rgb_F64);
 		check(rgb_F64,r,g,b);
 
 		// Check F32
 		float fr = (float)r, fg = (float)g, fb = (float)b;
-		ColorXyz.srgbToXyz(fr, fg, fb, xyz_F32);
-		ColorXyz.xyzToSrgb(xyz_F32[0], xyz_F32[1], xyz_F32[2], rgb_F32);
+		ColorXyz.linearRgbToXyz(fr, fg, fb, xyz_F32);
+		ColorXyz.xyzToLinearRgb(xyz_F32[0], xyz_F32[1], xyz_F32[2], rgb_F32);
 		check(rgb_F32,fr,fg,fb);
 	}
 
