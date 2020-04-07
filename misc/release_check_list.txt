@@ -45,12 +45,8 @@ Gradle
 
 To post a SNAPSHOT or full release:
 
-1) ./gradlew assemble
-2) In gradle.properties comment out "org.gradle.parallel=true"
-3) Uncomment the following line in build.gradle so that it creates javadoc. Commented out to speed up build
-   archives javadocJar
-4) Upload to Sonatype
-   - ./gradlew clean;./gradlew $JDK uploadArchives
+Clean, build, and upload to Sonatype
+  ./gradlew clean;./gradlew assemble;./gradlew uploadArchives -Dorg.gradle.parallel=false
 
 A SNAPSHOT is created if SNAPSHOT is in its name.
 

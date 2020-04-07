@@ -164,7 +164,6 @@ subprojects {
     javadoc.failOnError = false
     artifacts {
         archives sourcesJar
-//        archives javadocJar
     }
 
     // Force the release build to fail if it depends on a SNAPSHOT
@@ -179,6 +178,9 @@ subprojects {
         }
 
         uploadArchives {
+            artifacts {
+                archives javadocJar
+            }
             repositories {
                 mavenDeployer {
                     beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
