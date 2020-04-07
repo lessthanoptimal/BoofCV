@@ -57,7 +57,8 @@ public class TestColorDiff {
         assertEquals(CIE94C,  ColorDiff.deltaECIE94(colorC1, colorC2), precision);
         assertEquals(CIE94D,  ColorDiff.deltaECIE94( colorD1, colorD2), precision);
         assertEquals(CIE94E,  ColorDiff.deltaECIE94( colorE1, colorE2), precision);
-
+        assertEquals(CIE94E,  ColorDiff.deltaECIE94( colorE1, colorE2, 1,1,1,0.045,0.015),
+                precision);
     }
 
     @Test
@@ -76,6 +77,6 @@ public class TestColorDiff {
         assertEquals(CMCC,  ColorDiff.deltaECMC(colorC1, colorC2), precision);
         assertEquals(CMCD,  ColorDiff.deltaECMC(colorD1, colorD2), precision);
         assertEquals(CMCE,  ColorDiff.deltaECMC(colorE1, colorE2), precision);
-
+        assertEquals(CMCE,  ColorDiff.deltaECMC(colorE1, colorE2, 1, 1), precision);
     }
 }

@@ -33,8 +33,13 @@ public class ColorDiff {
      * @return colors distance
      */
     public static double deltaECIE76(double[] lab1, double [] lab2) {
-        return (Math.sqrt(Math.pow(lab1[l]-lab2[l],2) + Math.pow(lab1[a]-lab2[a],2) + Math.pow(lab1[b]-lab2[b],2)));
+        return (deltaECIE76(lab1[l], lab1[a], lab1[b], lab2[l], lab2[a], lab2[b] ));
     }
+
+    public static double deltaECIE76(double l1, double a1, double b1, double l2, double a2, double b2) {
+        return (Math.sqrt(Math.pow(l1-l2,2) + Math.pow(a1-a2,2) + Math.pow(b1-b2,2)));
+    }
+
 
     /**
      * CIE94 color difference equation.
@@ -50,12 +55,17 @@ public class ColorDiff {
      * @return colors distance
      */
     public static double deltaECIE94(double[] lab1, double [] lab2, double KL, double KC, double KH,
-                                        double K1, double K2) {
-        double deltaL = lab1[l] - lab2[l];
-        double deltaA = lab1[a] - lab2[a];
-        double deltaB = lab1[b] - lab2[b];
-        double C1 = Math.sqrt(Math.pow(lab1[a],2) + Math.pow(lab1[b],2));
-        double C2 = Math.sqrt(Math.pow(lab2[a],2) + Math.pow(lab2[b],2));
+                                     double K1, double K2) {
+        return (deltaECIE94(lab1[l], lab1[a], lab1[b], lab2[l], lab2[a], lab2[b], KL, KC, KH, K1, K2 ));
+    }
+
+    public static double deltaECIE94(double l1, double a1, double b1, double l2, double a2, double b2,
+                                     double KL, double KC, double KH, double K1, double K2) {
+        double deltaL = l1 - l2;
+        double deltaA = a1 - a2;
+        double deltaB = b1 - b2;
+        double C1 = Math.sqrt(Math.pow(a1,2) + Math.pow(b1,2));
+        double C2 = Math.sqrt(Math.pow(a2,2) + Math.pow(b2,2));
         double deltaC = C1 - C2;
         // Changed to avoid NaN due limited arithmetic precision
         //double deltaH = Math.sqrt(Math.pow(deltaA,2) + Math.pow(deltaB,2) - Math.pow(deltaC,2));
@@ -68,17 +78,23 @@ public class ColorDiff {
         return (Math.sqrt(Math.pow(deltaL / (KL * SL),2) + Math.pow(deltaC / (KC * SC),2) + deltaH * Math.pow( 1 / (KH * SH),2)));
     }
 
-    /**
-     * CIE94 color difference equation.
-     * CIE94 with reasonably parameters (graphics arts). In doubt, use this one!!
-     *
-     * @param lab1 color1
-     * @param lab2 color2
-     * @return colors distance
-     */
+
+        /**
+		 * CIE94 color difference equation.
+		 * CIE94 with reasonably parameters (graphics arts). In doubt, use this one!!
+		 *
+		 * @param lab1 color1
+		 * @param lab2 color2
+		 * @return colors distance
+		 */
     public static double deltaECIE94(double[] lab1, double [] lab2) {
-        return(deltaECIE94(lab1,lab2,1,1,1,0.045,0.015));
+        return(deltaECIE94(lab1[l], lab1[a], lab1[b], lab2[l], lab2[a], lab2[b]));
     }
+
+    public static double deltaECIE94(double l1, double a1, double b1, double l2, double a2, double b2) {
+        return(deltaECIE94(l1, a1, b1, l2, a2, b2,1,1,1,0.045,0.015));
+    }
+
 
     /**
      * CIEDE2000 color difference equation.
@@ -91,25 +107,29 @@ public class ColorDiff {
      * @return color distance
      */
     public static double deltaECIEDE2000(double[] lab1, double [] lab2) {
-        double C1 = Math.sqrt(Math.pow(lab1[a],2) + Math.pow(lab1[b],2));
-        double C2 = Math.sqrt(Math.pow(lab2[a],2) + Math.pow(lab2[b],2));
+        return (deltaECIEDE2000(lab1[l], lab1[a], lab1[b], lab2[l], lab2[a], lab2[b]));
+    }
+
+    public static double deltaECIEDE2000(double l1, double a1, double b1, double l2, double a2, double b2) {
+        double C1 = Math.sqrt(Math.pow(a1,2) + Math.pow(b1,2));
+        double C2 = Math.sqrt(Math.pow(a2,2) + Math.pow(b2,2));
         double avgC = (C1 + C2)/2.0;
         double G = 0.5 * (1.0 - Math.sqrt(Math.pow(avgC, 7) / (Math.pow(avgC, 7) + Math.pow(25.0, 7))));
-        double a1p = lab1[ColorDiff.a] * (1.0 + G);
-        double a2p = lab2[ColorDiff.a] * (1.0 + G);
-        double C1p = Math.sqrt(Math.pow(a1p,2) + Math.pow(lab1[b],2));
-        double C2p = Math.sqrt(Math.pow(a2p,2) + Math.pow(lab2[b],2));
+        double a1p = a1 * (1.0 + G);
+        double a2p = a2 * (1.0 + G);
+        double C1p = Math.sqrt(Math.pow(a1p,2) + Math.pow(b1,2));
+        double C2p = Math.sqrt(Math.pow(a2p,2) + Math.pow(b2,2));
         double h1p = 0;
-        if (!(lab1[b] == 0 && a1p == 0)) {
-            h1p = Math.toDegrees( Math.atan2(lab1[b],a1p));
+        if (!(b1 == 0 && a1p == 0)) {
+            h1p = Math.toDegrees( Math.atan2(b1,a1p));
             if (h1p<0) { h1p += 360.0; }
         }
         double h2p = 0;
-        if (!(lab2[b] == 0 && a2p == 0)) {
-            h2p = Math.toDegrees( Math.atan2(lab2[b],a2p));
+        if (!(b2 == 0 && a2p == 0)) {
+            h2p = Math.toDegrees( Math.atan2(b2,a2p));
             if (h2p<0) {h2p += 360.0; }
         }
-        double deltaLp = lab2[l] - lab1[l];
+        double deltaLp = l2 - l1;
         double deltaCp = C2p - C1p;
         double deltahp = 0;
         if (C1p*C2p != 0) {
@@ -122,7 +142,7 @@ public class ColorDiff {
             }
         }
         double deltaHp = 2*Math.sqrt(C1p*C2p)*Math.sin(Math.toRadians(deltahp/2.0));
-        double avgLp = (lab1[l] + lab2[l])/2;
+        double avgLp = (l1 + l2)/2;
         double avgCp = (C1p + C2p)/2;
         double avghp = 0;
         if (C1p*C2p != 0) {
@@ -157,26 +177,31 @@ public class ColorDiff {
      *
      * @param lab1 color1
      * @param lab2 color2
-     * @param l lightness.
-     * @param c chroma.
+     * @param lightness lightness.
+     * @param chroma chroma.
      * @return
      */
-    public static double deltaECMC(double[] lab1, double [] lab2, double l, double c) {
-        double C1 = Math.sqrt(Math.pow(lab1[a],2) + Math.pow(lab1[b],2));
-        double C2 = Math.sqrt(Math.pow(lab2[a],2) + Math.pow(lab2[b],2));
+    public static double deltaECMC(double[] lab1, double [] lab2, double lightness, double chroma) {
+        return (deltaECMC(lab1[l], lab1[a], lab1[b], lab2[l], lab2[a], lab2[b], lightness, chroma));
+    }
+
+    public static double deltaECMC(double l1, double a1, double b1, double l2, double a2, double b2,
+                                   double lightness, double chroma) {
+        double C1 = Math.sqrt(Math.pow(a1,2) + Math.pow(b1,2));
+        double C2 = Math.sqrt(Math.pow(a2,2) + Math.pow(b2,2));
         double deltaC = C1 - C2;
-        double deltaL = lab1[ColorDiff.l] - lab2[ColorDiff.l];
-        double deltaA = lab1[a] - lab2[a];
-        double deltaB = lab1[b] - lab2[b];
+        double deltaL = l1 - l2;
+        double deltaA = a1 - a2;
+        double deltaB = b1 - b2;
         // Changed to avoid NaN due limited arithmetic precision
         //double deltaH = Math.sqrt(Math.pow(deltaA,2) + Math.pow(deltaB,2) - Math.pow(deltaC,2));
         double deltaH = Math.pow(deltaA,2) + Math.pow(deltaB,2) - Math.pow(deltaC,2);
         double SL = 0.511;
-        if (lab1[ColorDiff.l] >= 16.0) {
-            SL = 0.040975*lab1[ColorDiff.l]/(1.0 + 0.01765*lab1[ColorDiff.l]);
+        if (l1 >= 16.0) {
+            SL = 0.040975*l1/(1.0 + 0.01765*l1);
         }
         double SC = 0.0638*C1/(1 + 0.0131*C1) + 0.638;
-        double H = Math.toDegrees(Math.atan2(lab1[b],lab1[a]));
+        double H = Math.toDegrees(Math.atan2(b1,a1));
         double H1 = H;
         if (H < 0) {
             H1 += 360;
@@ -191,7 +216,7 @@ public class ColorDiff {
         double SH = SC*(F*T + 1.0 - F);
         // Changed to avoid NaN due limited arithmetic precision
         //return(Math.sqrt(Math.pow(deltaL/(l*SL),2) + Math.pow(deltaC/(c*SC),2) + Math.pow(deltaH/SH,2)));
-        return(Math.sqrt(Math.pow(deltaL/(l*SL),2) + Math.pow(deltaC/(c*SC),2) + deltaH * Math.pow(1/SH,2)));
+        return(Math.sqrt(Math.pow(deltaL/(lightness*SL),2) + Math.pow(deltaC/(chroma*SC),2) + deltaH * Math.pow(1/SH,2)));
     }
 
     /**
@@ -204,7 +229,11 @@ public class ColorDiff {
      * @return color distance
      */
     public static double deltaECMC(double[] lab1, double [] lab2) {
-        return (deltaECMC(lab1,lab2,1,1));
+        return (deltaECMC(lab1[l], lab1[a], lab1[b], lab2[l], lab2[a], lab2[b]));
+    }
+
+    public static double deltaECMC(double l1, double a1, double b1, double l2, double a2, double b2) {
+        return (deltaECMC(l1, a1, b1, l2, a2, b2,1,1));
     }
 
 
