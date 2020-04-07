@@ -38,6 +38,60 @@ class TestColorLab {
 	Random rand = new Random(234);
 
 	@Test
+	void rgb_to_lag_srgb_gamma() {
+		// Test RGB to lab with standard gamma for sRGB, D65
+		int R = 187;
+		int G = 33;
+		int B = 226;
+		double[] lab = new double[3];
+		double[] expected_lab = new double[]{48.44f, 79.80f, -64.27f};
+
+		ColorLab.rgbToLab(R,G,B,lab);
+		assertEquals(expected_lab[0], lab[0],0.01f);
+		assertEquals(expected_lab[1], lab[1],0.01f);
+		assertEquals(expected_lab[2], lab[2],0.01f);
+
+		// One more test. Two is better than one
+		R = 10;
+		G = 160;
+		B = 35;
+		expected_lab[0] = 57.39;
+		expected_lab[1] = -58.74;
+		expected_lab[2] = 51.31;
+		ColorLab.rgbToLab(R, G, B, lab);
+		assertEquals(expected_lab[0], lab[0],0.01f);
+		assertEquals(expected_lab[1], lab[1],0.01f);
+		assertEquals(expected_lab[2], lab[2],0.01f);
+
+
+	}
+
+	@Test
+	void rgb_to_lab_no_gamma() {
+		// Test RGB to lab with gamma = 1 (linear), D65
+		double R = 187.0/255.0;
+		double G = 33.0/255.0;
+		double B = 226.0/255.0;
+		double[] lab = new double[3];
+		double[] expected_lab = new double[]{62.72, 66.65, -50.00};
+
+		ColorLab.linearRgbToLab(R,G,B,lab);
+		assertEquals(expected_lab[0], lab[0],0.01);
+		assertEquals(expected_lab[1], lab[1],0.01);
+		assertEquals(expected_lab[2], lab[2],0.01);
+
+		R = 10.0/255.0;
+		G = 160.0/255.0;
+		B = 35.0/255.0;
+		expected_lab = new double[]{73.996, -61.15, 40.35};
+
+		ColorLab.linearRgbToLab(R,G,B,lab);
+		assertEquals(expected_lab[0], lab[0],0.01);
+		assertEquals(expected_lab[1], lab[1],0.01);
+		assertEquals(expected_lab[2], lab[2],0.01);
+	}
+
+	@Test
 	void rgb_to_lab_to_rgb__F64_F32() {
 		float[] tmp = new float[3];
 		float[] found = new float[3];
@@ -131,7 +185,7 @@ class TestColorLab {
 				float G = input.getBand(1).get(x,y);
 				float B = input.getBand(2).get(x,y);
 
-				ColorLab.srgbToLab(R/255f,G/255f,B/255f,expected);
+				ColorLab.rgbToLab(R,G,B,expected);
 
 				float L = output.getBand(0).get(x,y);
 				float A = output.getBand(1).get(x,y);
@@ -162,7 +216,7 @@ class TestColorLab {
 				float G = input.getBand(1).get(x,y);
 				float B = input.getBand(2).get(x,y);
 
-				ColorLab.srgbToLab(R / 255f, G / 255f, B / 255f, expected);
+				ColorLab.rgbToLab(R, G, B, expected);
 
 				float L = output.getBand(0).get(x,y);
 				float A = output.getBand(1).get(x,y);
