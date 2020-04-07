@@ -103,9 +103,9 @@ public class ImplColorXyz_MT {
 				float y = Y.data[indexXyz];
 				float z = Z.data[indexXyz];
 
-				R.data[indexRgb] = (float)(255.0*ColorXyz.gamma( 3.240479*x - 1.53715*y  - 0.498535*z));
-				G.data[indexRgb] = (float)(255.0*ColorXyz.gamma(-0.969256*x + 1.875991*y + 0.041556*z));
-				B.data[indexRgb] = (float)(255.0*ColorXyz.gamma( 0.055648*x - 0.204043*y + 1.057311*z));
+				R.data[indexRgb] = (float)(255.0*ColorXyz.gamma( 3.240479f*x - 1.53715f*y  - 0.498535f*z));
+				G.data[indexRgb] = (float)(255.0*ColorXyz.gamma(-0.969256f*x + 1.875991f*y + 0.041556f*z));
+				B.data[indexRgb] = (float)(255.0*ColorXyz.gamma( 0.055648f*x - 0.204043f*y + 1.057311f*z));
 			}
 		});
 	}
@@ -130,9 +130,9 @@ public class ImplColorXyz_MT {
 				float y = Y.data[indexXyz];
 				float z = Z.data[indexXyz];
 
-				R.data[indexRgb] = (byte)(255.0*ColorXyz.gamma( 3.240479*x - 1.53715*y  - 0.498535*z)+0.5f);
-				G.data[indexRgb] = (byte)(255.0*ColorXyz.gamma(-0.969256*x + 1.875991*y + 0.041556*z)+0.5f);
-				B.data[indexRgb] = (byte)(255.0*ColorXyz.gamma( 0.055648*x - 0.204043*y + 1.057311*z)+0.5f);
+				R.data[indexRgb] = (byte)(255.0*ColorXyz.gamma( 3.240479f*x - 1.53715f*y  - 0.498535f*z)+0.5f);
+				G.data[indexRgb] = (byte)(255.0*ColorXyz.gamma(-0.969256f*x + 1.875991f*y + 0.041556f*z)+0.5f);
+				B.data[indexRgb] = (byte)(255.0*ColorXyz.gamma( 0.055648f*x - 0.204043f*y + 1.057311f*z)+0.5f);
 			}
 		});
 	}

@@ -129,7 +129,7 @@ public class ImplColorLab {
 		GrayF32 G = rgb.getBand(1);
 		GrayF32 B = rgb.getBand(2);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,xyz.height,row->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,lab.height,row->{
 		for( int row = 0; row < lab.height; row++ ) {
 			int indexLab = lab.startIndex + row*lab.stride;
 			int indexRgb = rgb.startIndex + row*rgb.stride;
@@ -144,9 +144,9 @@ public class ImplColorLab {
 				float y = Yr_f*invTran(left);
 				float z = Zr_f*invTran(left-b/200.0f);
 
-				R.data[indexRgb] = (float)(255.0*ColorXyz.gamma( 3.240479*x - 1.53715*y  - 0.498535*z));
-				G.data[indexRgb] = (float)(255.0*ColorXyz.gamma(-0.969256*x + 1.875991*y + 0.041556*z));
-				B.data[indexRgb] = (float)(255.0*ColorXyz.gamma( 0.055648*x - 0.204043*y + 1.057311*z));
+				R.data[indexRgb] = (float)(255.0*ColorXyz.gamma( 3.240479f*x - 1.53715f*y  - 0.498535f*z));
+				G.data[indexRgb] = (float)(255.0*ColorXyz.gamma(-0.969256f*x + 1.875991f*y + 0.041556f*z));
+				B.data[indexRgb] = (float)(255.0*ColorXyz.gamma( 0.055648f*x - 0.204043f*y + 1.057311f*z));
 			}
 		}
 		//CONCURRENT_ABOVE });
@@ -163,7 +163,7 @@ public class ImplColorLab {
 		GrayU8 G = rgb.getBand(1);
 		GrayU8 B = rgb.getBand(2);
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,xyz.height,row->{
+		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,lab.height,row->{
 		for( int row = 0; row < lab.height; row++ ) {
 			int indexLab = lab.startIndex + row*lab.stride;
 			int indexRgb = rgb.startIndex + row*rgb.stride;
