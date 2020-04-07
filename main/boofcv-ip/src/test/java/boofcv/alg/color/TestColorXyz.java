@@ -78,7 +78,7 @@ class TestColorXyz {
 	}
 
 	@Test
-	void backAndForth_srgb_F64_and_F32() {
+	void backAndForth_linearRGB_F64_and_F32() {
 
 		check(0.5, 0.3, 0.2);
 		check(0, 0, 0);
@@ -154,9 +154,9 @@ class TestColorXyz {
 				float Y = output.getBand(1).get(x,y);
 				float Z = output.getBand(2).get(x,y);
 
-				assertEquals(expected[0],X,1e-4f);
-				assertEquals(expected[1],Y,1e-4f);
-				assertEquals(expected[2],Z,1e-4f);
+				assertEquals(expected[0],X,UtilEjml.TEST_F32);
+				assertEquals(expected[1],Y,UtilEjml.TEST_F32);
+				assertEquals(expected[2],Z,UtilEjml.TEST_F32);
 			}
 		}
 	}

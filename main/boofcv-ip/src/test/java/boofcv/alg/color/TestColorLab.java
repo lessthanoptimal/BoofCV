@@ -38,7 +38,7 @@ class TestColorLab {
 	Random rand = new Random(234);
 
 	@Test
-	void rgb_to_lag_srgb_gamma() {
+	void rgb_to_lab_srgb_gamma() {
 		// Test RGB to lab with standard gamma for sRGB, D65
 		int R = 187;
 		int G = 33;
@@ -62,8 +62,6 @@ class TestColorLab {
 		assertEquals(expected_lab[0], lab[0],0.01f);
 		assertEquals(expected_lab[1], lab[1],0.01f);
 		assertEquals(expected_lab[2], lab[2],0.01f);
-
-
 	}
 
 	@Test
@@ -103,7 +101,6 @@ class TestColorLab {
 		assertEquals(200, found[1], UtilEjml.TEST_F32);
 		assertEquals( 70, found[2], UtilEjml.TEST_F32);
 	}
-
 
 	@Test
 	void rgb_to_lab_to_rgb__F32_F32() {
@@ -193,9 +190,9 @@ class TestColorLab {
 
 				assertTrue( L >= 0f && L <= 100.0f);
 
-				assertEquals(expected[0],L,1e-4f);
-				assertEquals(expected[1],A,1e-4f);
-				assertEquals(expected[2],B_,1e-4f);
+				assertEquals(expected[0],L,UtilEjml.TEST_F32);
+				assertEquals(expected[1],A,UtilEjml.TEST_F32);
+				assertEquals(expected[2],B_,UtilEjml.TEST_F32);
 			}
 		}
 	}
@@ -224,9 +221,9 @@ class TestColorLab {
 
 				assertTrue( L >= 0f && L <= 100.0f);
 
-				assertEquals(expected[0],L,1e-4f);
-				assertEquals(expected[1],A,1e-4f);
-				assertEquals(expected[2],B_,1e-4f);
+				assertEquals(expected[0],L,UtilEjml.TEST_F32);
+				assertEquals(expected[1],A,UtilEjml.TEST_F32);
+				assertEquals(expected[2],B_,UtilEjml.TEST_F32);
 			}
 		}
 	}
@@ -284,9 +281,9 @@ class TestColorLab {
 				float G = output.getBand(1).get(x,y);
 				float B = output.getBand(2).get(x,y);
 
-				assertEquals(expected[0],R,1e-4f);
-				assertEquals(expected[1],G,1e-4f);
-				assertEquals(expected[2],B,1e-4f);
+				assertEquals(expected[0],R,UtilEjml.TEST_F32);
+				assertEquals(expected[1],G,UtilEjml.TEST_F32);
+				assertEquals(expected[2],B,UtilEjml.TEST_F32);
 			}
 		}
 	}
