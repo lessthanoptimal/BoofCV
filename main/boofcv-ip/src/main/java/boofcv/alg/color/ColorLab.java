@@ -29,8 +29,8 @@ import boofcv.struct.image.Planar;
 import static boofcv.alg.color.ColorXyz.*;
 
 /**
- * <p>Conversion between RGB and CIE LAB color space.  LAB color is designed to approximate human vision.
- * L for lightness and a and b for the color-opponent dimensions,  The reference white used in
+ * <p>Conversion between RGB and CIE LAB color space. LAB color is designed to approximate human vision.
+ * L for lightness and a and b for the color-opponent dimensions, The reference white used in
  * the conversions below is D65.</p>
  *
  * <p>
@@ -64,21 +64,21 @@ public class ColorLab {
 	public static final float Zr_f = 1.088754f;	//reference white
 
 	/**
-	 * Conversion from 8-bit RGB into CIE LAB.  8-bit = range of 0 to 255.
+	 * Conversion from 8-bit RGB into CIE LAB. 8-bit = range of 0 to 255.
 	 */
 	public static void rgbToLab( int r , int g , int b , double []lab ) {
 		linearRgbToLab(invGamma(r/255.0),invGamma(g/255.0),invGamma(b/255.0),lab);
 	}
 
 	/**
-	 * Conversion from 8-bit RGB into CIE LAB.  8-bit = range of 0 to 255.
+	 * Conversion from 8-bit RGB into CIE LAB. 8-bit = range of 0 to 255.
 	 */
 	public static void rgbToLab( int r , int g , int b , float []lab ) {
 		linearRgbToLab((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),lab);
 	}
 
 	/**
-	 * Conversion from 8-bit RGB into CIE LAB.  8-bit = range of 0 to 255.
+	 * Conversion from 8-bit RGB into CIE LAB. 8-bit = range of 0 to 255.
 	 */
 	public static void rgbToLab( double r , double g , double b , float []lab ) {
 		linearRgbToLab((float)invGamma(r/255.0f),(float)invGamma(g/255.0f),(float)invGamma(b/255.0f),lab);
@@ -88,7 +88,7 @@ public class ColorLab {
 	 * Conversion of CEI LAB to 8-bit RGB. Converts to linearRgb and then applies gamma correction.
 	 *
 	 * @param linearRgb (output) Workspace to store intermediate linearRgb results
-	 * @param rgb (output) Output of gamma corrected RGB color 0 to 255
+	 * @param rgb (output) 8-bit RGB color. 0 to 255
 	 */
 	public static void labToRgb( double L , double a , double b, double[]linearRgb , int[]rgb ) {
 		labToLinearRgb(L,a,b,linearRgb);
@@ -98,10 +98,10 @@ public class ColorLab {
 	}
 
 	/**
-	 * Conversion of CEI LAB to 8-bit RGB. Converts to linearRgb and then applies gamma correction.
+	 * Conversion of CEI LAB to 8-bit RGB. Converts to Linear RGB and then applies gamma correction.
 	 *
 	 * @param linearRgb (output) Workspace to store intermediate linearRgb results
-	 * @param rgb (output) Output of gamma corrected RGB color 0 to 255
+	 * @param rgb (output) 8-bit RGB color. 0 to 255
 	 */
 	public static void labToRgb( float L , float a , float b, float[]linearRgb , int[]rgb ) {
 		labToLinearRgb(L,a,b,linearRgb);
@@ -111,10 +111,10 @@ public class ColorLab {
 	}
 
 	/**
-	 * Conversion of CEI LAB to 8-bit RGB. Converts to linearR and then applies gamma correction.
+	 * Conversion of CEI LAB to 8-bit RGB. Converts to Linear RGB and then applies gamma correction.
 	 *
-	 * @param linearRgb (output) Workspace to store intermediate linearRgb results
-	 * @param rgb (output) Output of gamma corrected RGB color.
+	 * @param linearRgb (output) Workspace to store intermediate Linear RGB results
+	 * @param rgb (output) 8-bit RGB color. 0 to 255
 	 */
 	public static void labToRgb( float L , float a , float b, float[]linearRgb , float[]rgb ) {
 		labToLinearRgb(L,a,b,linearRgb);
@@ -124,7 +124,7 @@ public class ColorLab {
 	}
 
 	/**
-	 * Conversion from CEI LAB to gamma corrected normalized R'G'B'.  Normalized RGB values have a range of 0:1
+	 * Conversion from CEI LAB to gamma corrected linear RGB. Linear RGB values have a range of 0:1
 	 */
 	public static void labToLinearRgb( float L , float a , float b , float []linearRgb ) {
 		labToXyz(L,a,b,linearRgb);
@@ -132,7 +132,7 @@ public class ColorLab {
 	}
 
 	/**
-	 * Conversion from CEI LAB to gamma corrected normalized R'G'B'.  Normalized RGB values have a range of 0:1
+	 * Conversion from CEI LAB to gamma corrected linear RGB. Linear RGB values have a range of 0:1
 	 */
 	public static void labToLinearRgb( double L , double a , double b , double []linearRgb ) {
 		labToXyz(L,a,b,linearRgb);
@@ -218,7 +218,7 @@ public class ColorLab {
 	}
 
 	/**
-	 * Conversion from gamma corrected normalized R'G'B' into CEI LAB.  Normalized RGB values have a range of 0:1
+	 * Conversion from gamma corrected linear RGB into CEI LAB. Normalized RGB values have a range of 0:1
 	 */
 	public static void linearRgbToLab(double r , double g , double b , double[] lab) {
 		ColorXyz.linearRgbToXyz(r,g,b,lab);
@@ -226,7 +226,7 @@ public class ColorLab {
 	}
 
 	/**
-	 * Conversion from gamma corrected normalized R'G'B' into LAB.  Normalized RGB values have a range of 0:1
+	 * Conversion from gamma corrected linear RGB into LAB. Normalized RGB values have a range of 0:1
 	 */
 	public static void linearRgbToLab(float r , float g , float b , float[] lab) {
 		ColorXyz.linearRgbToXyz(r,g,b,lab);
@@ -234,12 +234,12 @@ public class ColorLab {
 	}
 
 	/**
-	 * Convert a 3-channel {@link Planar} image from RGB into LAB.  RGB is assumed
+	 * Convert a 3-channel {@link Planar} image from RGB into LAB. RGB is assumed
 	 * to have a range from 0:255
 	 *
 	 * NOTE: Input and output image can be the same instance.
 	 *
-	 * @param rgb (Input) RGB encoded image
+	 * @param rgb (Input) 8-bit RGB encoded image. R = channel 0, G = channel 1, B = channel 2
 	 * @param lab (Output) LAB encoded image. L = channel 0, A = channel 1, B = channel 2
 	 */
 	public static <T extends ImageGray<T>>
@@ -264,12 +264,12 @@ public class ColorLab {
 	}
 
 	/**
-	 * Convert a 3-channel {@link Planar} image from LAB into RGB.  RGB will have a range from 0 to 255.
+	 * Convert a 3-channel {@link Planar} image from LAB into RGB. RGB will have a range from 0 to 255.
 	 *
 	 * NOTE: Input and output image can be the same instance.
 	 *
 	 * @param lab (Input) LAB encoded image. L = channel 0, A = channel 1, B = channel 2
-	 * @param rgb (Output) RGB encoded image
+	 * @param rgb (Output) 8-bit RGB encoded image. R = channel 0, G = channel 1, B = channel 2
 	 */
 	public static <T extends ImageGray<T>>
 	void labToRgb(Planar<GrayF32> lab , Planar<T> rgb ) {

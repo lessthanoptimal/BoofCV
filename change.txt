@@ -34,8 +34,6 @@ Version : 0.36
   * ImageMiscOps.copy() with border for input image
   * Split mean filter into BlurImageOps.mean() and BlurImageOps.meanB()
   * BlurImageOps.meanB() requires a border to be specified, if null is specified then just the inner portion is processed
-- Color
-  * Can convert YUV, HSV, and YCbCr to 32-bit RGB color
 - Moved KLT from boofcv-geo to boofcv-feature
   * No idea what it was doing in geo originally but it didn't belong there!
 - QR Code
@@ -79,11 +77,12 @@ Version : 0.36
   * Added settings
   * Added the ability to switch between different swing themes; darklaf and material-ui
 - Color
-  * Fixed conversion between XYZ and RGB by applying Gamma correction.
-  * Added XYZ to RGB conversion.
-  * Fixed conversion between LAB and RGB by applying Gamma correction.
-  * Added LAB to RGB conversion.
-  * Thanks Jairo Rotava for finding/showing how to fix the bug!
+  * Can convert YUV, HSV, and YCbCr to 32-bit RGB color
+  * Fixed conversion between XYZ/LAB and RGB by applying Gamma correction.
+    - Thanks Jairo Rotava for finding/showing/helping to fix the XYZ/LAB bugs!
+  * Added XYZ/LAB to RGB conversion.
+  * Added ColorDiff - Computes metrics for the difference between colors
+    - Thanks Jairo Rotava for the code contribution!
 
 TODO Regression
    - Dump runtime results into their own directory for each device. Use hostname?
