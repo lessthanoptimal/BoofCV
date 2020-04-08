@@ -1,7 +1,11 @@
 package boofcv.alg.color;
 
 import org.junit.jupiter.api.Test;
+
+import java.util.Random;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * ColorDiff methods tests.
@@ -79,4 +83,27 @@ public class TestColorDiff {
         assertEquals(CMCE,  ColorDiff.deltaECMC(colorE1, colorE2), precision);
         assertEquals(CMCE,  ColorDiff.deltaECMC(colorE1, colorE2, 1, 1), precision);
     }
+
+    @Test
+    public void testRange() {
+        // Feed a lot of different numbers to see if we break things
+        Random rand = new Random(234);
+        for (int i = 0; i<100; i++) {
+            double l1 = rand.nextDouble() * 100.0;
+            double l2 = rand.nextDouble() * 100.0;
+            double a1 = rand.nextDouble() * (128 * 2) - 128;
+            double a2 = rand.nextDouble() * (128 * 2) - 128;
+            double b1 = rand.nextDouble() * (128 * 2) - 128;
+            double b2 = rand.nextDouble() * (128 * 2) - 128;
+
+            assertTrue(ColorDiff.deltaECIE76(l1, a1, b1, l2, a2, b2) >= 0);
+            assertTrue(ColorDiff.deltaECIE94(l1, a1, b1, l2, a2, b2) >= 0);
+            assertTrue(ColorDiff.deltaECIEDE2000(l1, a1, b1, l2, a2, b2) >= 0);
+            assertTrue(ColorDiff.deltaECMC(l1, a1, b1, l2, a2, b2) >= 0);
+        }
+
+
+
+    }
+
 }
