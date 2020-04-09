@@ -1,8 +1,25 @@
+/*
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
+ *
+ * This file is part of BoofCV (http://boofcv.org).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package boofcv.alg.color;
 
 /**
- * Methods for computing the difference (or error) between two colors in CIELAB color space
- *
+ * <p>Methods for computing the difference (or error) between two colors in CIELAB color space</p>
  *
  * Colour difference deltaE: difference between two colors is a metric that allow quantified examination of a notion
  * of color similarity. These methods uses Lab color space. Color distance is a positive value, and lower values
@@ -22,28 +39,31 @@ package boofcv.alg.color;
  * [4] is also a good source of information.
  *
  * Equation from:
- * [1] Sharma G, Wu W, Dalal EN.The CIEDE2000 Color-Difference Formula: Implementation Notes, Supplementary Test
- *      Data and Mathematical Observations. 2004.
- * [2] Mokrzycki WS, Tatol M. Colour difference delta E - A survey
- * [3] http://brucelindbloom.com/index.html?ColorDifferenceCalc.html
- * [4] https://en.wikipedia.org/wiki/Color_difference
+ * <ol>
+ * <li> Sharma G, Wu W, Dalal EN.The CIEDE2000 Color-Difference Formula: Implementation Notes, Supplementary Test
+ *      Data and Mathematical Observations. 2004. </li>
+ * <li> Mokrzycki WS, Tatol M. Colour difference delta E - A survey </li>
+ * <li> <a href="http://brucelindbloom.com/index.html?ColorDifferenceCalc.html">brucelindbloom.com</a> </li>
+ * <li> <a href="https://en.wikipedia.org/wiki/Color_difference">Wikipedia</a> </li>
+ * </ol>
  *
  * @author  Jairo Rotava
- *
  */
-public class ColorDiff {
+public class ColorDifference {
     // indexes to values L, a and b in the lab array used as input
     final static int l = 0;
     final static int a = 1;
     final static int b = 2;
 
     /**
-     * CIE76 simple color difference equation in CIELAB color space.
-     * Calculate distance between color1 and color2 close to human perception.
+     * <p>CIE76 simple color difference equation in CIELAB color space.
+     * Calculate distance between color1 and color2 close to human perception.</p>
      *
-     * l range 0:100
-     * a range -128:+128
-     * b range -128:+128
+     * <p>
+     * l range 0:100        <br>
+     * a range -128:+128    <br>
+     * b range -128:+128    <br>
+     * </p>
      *
      * @param lab1 color1
      * @param lab2 color2
@@ -63,12 +83,14 @@ public class ColorDiff {
 
 
     /**
-     * CIE94 color difference equation.
-     * This is the an extended CIE76 to address perceptual non-uniformities in CIELAB color space.
+     * <p>CIE94 color difference equation.
+     * This is the an extended CIE76 to address perceptual non-uniformities in CIELAB color space.</p>
      *
-     * l range 0:100
-     * a range -128:+128
-     * b range -128:+128
+     * <p>
+     * l range 0:100        <br>
+     * a range -128:+128    <br>
+     * b range -128:+128    <br>
+     * </p>
      *
      * @param lab1 color1
      * @param lab2 color2
@@ -112,12 +134,14 @@ public class ColorDiff {
 
 
     /**
-     * CIE94 color difference equation.
-     * CIE94 with reasonably parameters (graphics arts). In doubt, use this one!!
+     * <p>CIE94 color difference equation.
+     * CIE94 with reasonably parameters (graphics arts). In doubt, use this one!!</p>
      *
-     * l range 0:100
-     * a range -128:+128
-     * b range -128:+128
+     * <p>
+     * l range 0:100        <br>
+     * a range -128:+128    <br>
+     * b range -128:+128    <br>
+     * </p>
      *
      * @param lab1 color1
      * @param lab2 color2
@@ -133,14 +157,16 @@ public class ColorDiff {
 
 
     /**
-     * CIEDE2000 color difference equation.
+     * <p>CIEDE2000 color difference equation.</p>
      * Super crazy color difference equation. Extends the CIE94 to a very nerdy level. Should be better than CIE94,
      * but more expensive and should make no difference in practical applications according
      * to [Color Apperance Models, Mark D Fairchild]
      *
-     * l range 0:100
-     * a range -128:+128
-     * b range -128:+128
+     * <p>
+     * l range 0:100        <br>
+     * a range -128:+128    <br>
+     * b range -128:+128    <br>
+     * </p>
      *
      * @param lab1 color1
      * @param lab2 color2
@@ -227,13 +253,16 @@ public class ColorDiff {
     }
 
     /**
-     * CMC l:c  color difference equation defined by Colour Measurement Committee of the Society of Dyers and Colourist.
+     * CMC l:c  color difference equation defined by Colour Measurement Committee of the Society of
+     * Dyers and Colourist.</p>
      *
      * Commonly used values are 2:1 (l=2,c=1) for acceptability and 1:1 (l=1,c=1) for the threshold of imperceptibility.
      *
-     * l range 0:100
-     * a range -128:+128
-     * b range -128:+128
+     * <p>
+     * l range 0:100        <br>
+     * a range -128:+128    <br>
+     * b range -128:+128    <br>
+     * </p>
      *
      * @param lab1 color1
      * @param lab2 color2
@@ -289,13 +318,16 @@ public class ColorDiff {
     }
 
     /**
-     * CMC l:c  color difference equation defined by Colour Measurement Committee of the Society of Dyers and Colourist.
+     * <p>CMC l:c  color difference equation defined by Colour Measurement Committee of the
+     * Society of Dyers and Colourist.</p>
      *
      * Default to l:c = 1:1
      *
-     * l range 0:100
-     * a range -128:+128
-     * b range -128:+128
+     * <p>
+     * l range 0:100        <br>
+     * a range -128:+128    <br>
+     * b range -128:+128    <br>
+     * </p>
      *
      * @param lab1 color1
      * @param lab2 color2
@@ -308,6 +340,4 @@ public class ColorDiff {
     public static double deltaECMC(double l1, double a1, double b1, double l2, double a2, double b2) {
         return (deltaECMC(l1, a1, b1, l2, a2, b2,1,1));
     }
-
-
 }
