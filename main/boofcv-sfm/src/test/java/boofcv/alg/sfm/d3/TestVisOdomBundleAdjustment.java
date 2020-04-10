@@ -22,7 +22,6 @@ import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BObservation;
 import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BTrack;
@@ -260,7 +259,7 @@ class TestVisOdomBundleAdjustment {
 		LensDistortionPinhole distortion = new LensDistortionPinhole(pinhole);
 		Point2Transform2_F64 n2n = distortion.distort_F64(false,false);
 
-		vsba.camera = new BundlePinholeBrown(pinhole);
+		vsba.setCamera(pinhole);
 
 		Point3D_F64 Xv = new Point3D_F64(); // 3D point in view reference frame
 		Point2D_F64 n = new Point2D_F64();  // normalized image coordinate

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,6 +48,13 @@ public class BundlePinholeBrown implements BundleAdjustmentCamera {
 	}
 
 	public BundlePinholeBrown(CameraPinholeBrown intrinsic ) {
+		set(intrinsic);
+	}
+
+	/**
+	 * Assigns this class to match the intrinsics parameters provided.
+	 */
+	public void set( CameraPinholeBrown intrinsic ) {
 		if( intrinsic.radial == null )
 			radial = new double[0];
 		else

@@ -19,21 +19,25 @@
 package boofcv.alg.sfm.d3;
 
 import boofcv.abst.geo.RefinePnP;
+import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
 import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BObservation;
 import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BTrack;
 import boofcv.factory.distort.LensDistortionFactory;
+import boofcv.factory.geo.ConfigTriangulation;
+import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.geo.Point2D3D;
 import boofcv.struct.image.ImageBase;
+import georegression.struct.point.Point2D_F64;
+import georegression.struct.point.Point3D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -221,6 +225,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		// Save the output
 		current_to_world.set(frameCurrent.frame_to_world);
 
+		triangulateNotSelectedBundleTracks();
 		dropBadBundleTracks();
 
 		double time3 = System.nanoTime();
@@ -314,6 +319,45 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 	}
 
 	/**
+	 * Triangulate tracks which were not included in the optimization
+	 */
+	private void triangulateNotSelectedBundleTracks() {
+		ConfigTriangulation config = new ConfigTriangulation();
+		config.type = ConfigTriangulation.Type.GEOMETRIC;
+		config.optimization.maxIterations = 10;
+
+		// TODO would be best if this reduced pixel error
+		// TODO remove and replace with calibrated homogenous coordinates when it exists
+		TriangulateNViewsMetric triangulator = FactoryMultiView.triangulateNViewCalibrated(config);
+
+		FastQueue<Point2D_F64> observationsNorm = new FastQueue<>(Point2D_F64::new);
+		FastQueue<Se3_F64> world_to_frame = new FastQueue<>(Se3_F64::new);
+		Point3D_F64 found3D = new Point3D_F64();
+
+		for (int trackIdx = 0; trackIdx < bundle.tracks.size; trackIdx++) {
+			BTrack bt = bundle.tracks.data[trackIdx];
+			// skip selected since they have already been optimized or only two observations
+			if( bt.selected || bt.observations.size < 3)
+				continue;
+
+			observationsNorm.reset();
+			world_to_frame.reset();
+			for (int obsIdx = 0; obsIdx < bt.observations.size; obsIdx++) {
+				BObservation bo = bt.observations.get(obsIdx);
+				pixelToNorm.compute(bo.pixel.x,bo.pixel.y,observationsNorm.grow());
+				bo.frame.frame_to_world.invert(world_to_frame.grow());
+			}
+
+			if( triangulator.triangulate(observationsNorm.toList(),world_to_frame.toList(),found3D) ) {
+				bt.worldLoc.x = found3D.x;
+				bt.worldLoc.y = found3D.y;
+				bt.worldLoc.z = found3D.z;
+				bt.worldLoc.w = 1.0;
+			}
+		}
+	}
+
+	/**
 	 * Remove tracks with large errors and impossible geometry
 	 */
 	private void dropBadBundleTracks() {
@@ -364,7 +408,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 	 * Sets the known fixed camera parameters
 	 */
 	public void setCamera( CameraPinholeBrown camera ) {
-		bundle.camera = new BundlePinholeBrown(camera);
+		bundle.setCamera(camera);
 		LensDistortionNarrowFOV factory = LensDistortionFactory.narrow(camera);
 		pixelToNorm = factory.undistort_F64(true,false);
 		normToPixel = factory.distort_F64(false,true);

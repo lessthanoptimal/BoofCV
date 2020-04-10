@@ -588,7 +588,7 @@ public class FactoryMultiView {
 	 *
 	 * @see TriangulateMetricLinearDLT
 	 *
-	 * @return Two view triangulation algorithm
+	 * @return N-view triangulation algorithm
 	 */
 	public static TriangulateNViewsMetric triangulateNViewCalibrated(@Nullable ConfigTriangulation config ) {
 		if( config == null )
@@ -613,7 +613,7 @@ public class FactoryMultiView {
 	 *
 	 * @see TriangulateProjectiveLinearDLT
 	 *
-	 * @return Two view triangulation algorithm
+	 * @return N-view triangulation algorithm
 	 */
 	public static TriangulateNViewsProjective triangulateNView( @Nullable ConfigTriangulation config ) {
 		if( config == null )

@@ -23,6 +23,7 @@ import boofcv.abst.geo.bundle.SceneObservations;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeBrown;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
@@ -33,6 +34,7 @@ import org.ddogleg.struct.Factory;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,29 +44,45 @@ import java.util.List;
  */
 public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 
+	/** List of all tracks that can be feed into bundle adjustment */
 	public final FastQueue<T> tracks;
+	/** List of all frames that can be feed into bundle adjustment */
 	public final FastQueue<BFrame> frames = new FastQueue<>(BFrame::new,BFrame::reset);
 
 	/** Minimum number of observations a feature must have to be included */
 	@Getter @Setter private int minObservations = 2;
 
-	BundlePinholeBrown camera;
+	// Reference to the original camera model passed in
+	CameraPinholeBrown originalCamera;
+	// The camera model which is being optimized
+	BundlePinholeBrown bundleCamera = new BundlePinholeBrown();
 
 	SceneStructureMetric structure = new SceneStructureMetric(true);
 	SceneObservations observations = new SceneObservations();
 
 	BundleAdjustment<SceneStructureMetric> bundleAdjustment;
+	List<BTrack> selectedTracks = new ArrayList<>();
+
+	// Reduce the number of tracks feed into bundle adjustment to make it run at a reasonable speed
+	@Getter VisOdomSelectFrameTracks selectTracks = new VisOdomSelectFrameTracks(0xBEEF);
 
 	public VisOdomBundleAdjustment( BundleAdjustment<SceneStructureMetric> bundleAdjustment,
 									Factory<T> factoryTracks ) {
 		this.tracks = new FastQueue<>(factoryTracks,BTrack::reset);
 		this.bundleAdjustment = bundleAdjustment;
+		this.selectTracks.maxFeaturesPerFrame = 50; // TODO make this configurable
+	}
+
+	public void setCamera( CameraPinholeBrown camera ) {
+		originalCamera = camera;
+		bundleCamera.set(camera);
 	}
 
 	/**
 	 * Performs bundle adjustment on the scene and updates parameters
 	 */
 	public void optimize() {
+		selectTracks.selectTracks(this,originalCamera.width,originalCamera.height,selectedTracks);
 		setupBundleStructure();
 
 		bundleAdjustment.setParameters(structure,observations);
@@ -77,19 +95,13 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	 * Converts input data into a format that bundle adjustment can understand
 	 */
 	private void setupBundleStructure() {
-
 		// Need to count the total number of tracks that will be feed into bundle adjustment
-		int totalBundleTracks = 0;
-		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
-			BTrack t = tracks.get(trackIdx);
-			if (t.active && t.observations.size >= minObservations)
-				totalBundleTracks++;
-		}
+		int totalBundleTracks = selectedTracks.size();
 
 		// Initialize data structures
 		observations.initialize(frames.size);
 		structure.initialize(1,frames.size,totalBundleTracks);
-		structure.setCamera(0,true,camera);
+		structure.setCamera(0,true, bundleCamera);
 
 		// TODO make the first frame at origin. This is done to avoid numerical after traveling a good distance
 		final var worldToFrame = new Se3_F64();
@@ -105,7 +117,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		int featureBundleIdx = 0;
 		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
 			BTrack t = tracks.get(trackIdx);
-			if( !t.active || t.observations.size < minObservations)
+			if( !t.selected)
 				continue;
 			Point4D_F64 p = t.worldLoc;
 			structure.setPoint(featureBundleIdx,p.x,p.y,p.z,p.w);
@@ -136,7 +148,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		int featureIdx = 0;
 		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
 			BTrack t = tracks.get(trackIdx);
-			if( !t.active || t.observations.size < minObservations)
+			if( !t.selected)
 				continue;
 			SceneStructureMetric.Point sp = structure.points.get(featureIdx);
 			sp.get(t.worldLoc);
@@ -285,6 +297,8 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		public final FastQueue<BObservation> observations = new FastQueue<>(BObservation::new, BObservation::reset);
 		/** if true then the track should be optimized inside of bundle adjustment */
 		public boolean active;
+		/** true if it was selected for inclusion in the optimization */
+		public boolean selected;
 
 		public boolean isObservedBy( BFrame frame ) {
 			for (int i = 0; i < observations.size; i++) {
@@ -294,10 +308,19 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 			return false;
 		}
 
+		public BObservation findObservationBy( BFrame frame ) {
+			for (int i = 0; i < observations.size; i++) {
+				if( observations.data[i].frame == frame )
+					return observations.data[i];
+			}
+			return null;
+		}
+
 		public void reset() {
 			worldLoc.set(0,0,0,0);
 			observations.reset();
 			active = false;
+			selected = false;
 			trackerTrack = null;
 			id = -1;
 		}

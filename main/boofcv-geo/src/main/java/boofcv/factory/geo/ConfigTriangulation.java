@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -66,7 +66,7 @@ public class ConfigTriangulation {
 		 */
 		ALGEBRAIC,
 		/**
-		 * Optimal solution for geometric error
+		 * Optimal solution for geometric error. Finds a solution using DLT then refines the geometric error.
 		 *
 		 * @see Triangulate2ViewsGeometricMetric
 		 * @see TriangulateRefineMetricLS

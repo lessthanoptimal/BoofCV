@@ -33,7 +33,7 @@ import java.awt.*;
  */
 public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 	public static final String[] FAMILIES = {"KLT","DDA","Hybrid"};
-	int selectedFamily = 1;
+	int selectedFamily = 0;
 
 	JComboBox<String> cFamily = combo(selectedFamily, FAMILIES);
 	JPanel mainPanel = new JPanel(new BorderLayout());

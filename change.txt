@@ -58,6 +58,7 @@ Version : 0.36
   * Better cropping on rectified image using bounding box instead of rotation matrix
   * TODO try improving 3-view by estimating lens distortion in projective camera
   * TODO Scene Reconstruction from arbitrary number of photos
+  * TODO triangulate N-points calibrated homogenous coordinates
 - Visual Odometry
   * TODO Add SBA to all algorithms
   * TODO Update Demonstration Apps
