@@ -38,6 +38,22 @@ import java.util.List;
 @SuppressWarnings("rawtypes")
 public class BoofMiscOps {
 
+	public static float bound( float value , float min , float max ) {
+		if( value <= min )
+			return min;
+		if( value >= max )
+			return max;
+		return value;
+	}
+
+	public static double bound( double value , double min , double max ) {
+		if( value <= min )
+			return min;
+		if( value >= max )
+			return max;
+		return value;
+	}
+
 	public static String[] toStringArray( List<File> files ) {
 		String[] output = new String[files.size()];
 		for (int i = 0; i < files.size(); i++) {
