@@ -34,6 +34,9 @@ import javax.swing.*;
  * @author Peter Abeles
  */
 public class ControlPanelPointDetector extends StandardAlgConfigPanel {
+	// TODO make configurable and move into a Config class
+	public double pointDetectRadius = 10.0;
+
 	public final ConfigGeneralDetector configGeneral = new ConfigGeneralDetector();
 	public final ConfigHarrisCorner configHarris = new ConfigHarrisCorner();
 	public final ConfigShiTomasi configShiTomasi = new ConfigShiTomasi();
@@ -41,6 +44,7 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 	public PointDetectorTypes type;
 
 	private final JComboBox<String> comboType;
+	private final JSpinner spinnerRadius = spinner(pointDetectRadius,1.0,500.0,1.0);
 	private final ControlPanelExtractor controlExtractor;
 	private final JSpinner spinnerMaxFeatures;
 
@@ -61,6 +65,7 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 		addLabeled(comboType,"Type","Type of corner or blob detector");
 		add(controlExtractor);
 		addLabeled(spinnerMaxFeatures,"Max Features","Maximum features it will detect. <= 0 for no limit");
+		addLabeled(spinnerRadius,"Scale/Radius","Specified size given to scale invariant descriptors");
 	}
 
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
@@ -91,7 +96,9 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 		if (source == comboType) {
 			type = PointDetectorTypes.values()[comboType.getSelectedIndex()];
 		} else if( source == spinnerMaxFeatures ) {
-			configGeneral.maxFeatures = ((Number)spinnerMaxFeatures.getValue()).intValue();
+			configGeneral.maxFeatures = ((Number) spinnerMaxFeatures.getValue()).intValue();
+		} else if( source == spinnerRadius ) {
+			pointDetectRadius = ((Number) spinnerRadius.getValue()).doubleValue();
 		} else {
 			throw new RuntimeException("Unknown source");
 		}

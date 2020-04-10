@@ -18,44 +18,120 @@
 
 package boofcv.demonstrations.sfm.d3;
 
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.describe.ConfigTemplateDescribe;
+import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.tracker.FactoryPointTracker;
-import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Control panel for creating Detect-Describe-Associate style trackers
  *
  * @author Peter Abeles
  */
-public class ControlPanelHybridTracker extends StandardAlgConfigPanel {
+public class ControlPanelHybridTracker extends ControlPanelDetDescAssoc {
 	Listener listener;
+
+	int selectedSelection = 0;
+	JComboBox<String> spinnerSelection = combo(selectedSelection,"KLT","Detect","Describe","Associate");
+
+	ControlPanelPointTrackerKlt controlKlt;
+	ConfigPKlt configKlt = new ConfigPKlt();
+
+	// Container that specific controls are inserted into
+	private JPanel controlPanel = new JPanel(new BorderLayout());
+	private JPanel ddaPanel = new JPanel();
 
 	public ControlPanelHybridTracker(Listener listener) {
 		this.listener = listener;
+
+		ddaPanel.setLayout(new BoxLayout(ddaPanel,BoxLayout.Y_AXIS));
+
+		// Customize the tracker
+		configKlt.toleranceFB = 3;
+		configKlt.pruneClose = true;
+		configKlt.templateRadius = 3;
+		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		configAssocGreedy.scoreRatioThreshold = 0.75;
+
+		selectedDetector = 2; // point
+		selectedDescriptor = 4; // template
+		configTemplate.type = ConfigTemplateDescribe.Type.NCC;
+
+		initializeControlsGUI();
+		updateActiveControls(selectedSelection);
+
+		addLabeled(spinnerSelection,"Component","Select a component of the tracker to modify");
+		add(controlPanel);
+	}
+
+	@Override
+	public void initializeControlsGUI() {
+		super.initializeControlsGUI();
+		controlKlt = new ControlPanelPointTrackerKlt(()->listener.changedHybridTracker(),null,configKlt);
+		controlKlt.setBorder(BorderFactory.createEmptyBorder());
+	}
+
+	private void updateActiveControls( int which ) {
+		this.selectedSelection = which;
+		controlPanel.removeAll();
+		JPanel inside;
+		if( which == 0 ) {
+			inside = controlKlt;
+		} else {
+			inside = ddaPanel;
+			ddaPanel.removeAll();
+			switch ( which ) {
+				case 1: ddaPanel.add(comboDetect); ddaPanel.add(getDetectorPanel()); break;
+				case 2: ddaPanel.add(comboDescribe); ddaPanel.add(getDescriptorPanel()); break;
+				case 3: ddaPanel.add(comboAssociate); ddaPanel.add(getAssociatePanel()); break;
+			}
+			ddaPanel.validate();
+		}
+		if( inside != null ) {
+			controlPanel.add(BorderLayout.CENTER, inside);
+		}
+		controlPanel.validate();
+		SwingUtilities.invokeLater(this::repaint);
 	}
 
 	public <T extends ImageBase<T>>
 	PointTracker<T> createTracker(ImageType<T> imageType ) {
 		Class inputType = imageType.getImageClass();
 
-		ConfigPKlt kltConfig = new ConfigPKlt();
-		kltConfig.toleranceFB = 3;
-		kltConfig.pruneClose = true;
-		kltConfig.templateRadius = 3;
-		kltConfig.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		DetectDescribePoint detDesc = createDetectDescribe(inputType);
 
-		PointTracker<T> tracker = FactoryPointTracker.
-				combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 0),
-						kltConfig, 50, null, null, inputType, null);
+		PointTracker<T> tracker = FactoryPointTracker.combined(detDesc,createAssociate(detDesc),
+				configKlt,50,imageType.getImageClass());
 		return tracker;
 	}
 
+	@Override
+	protected void handleControlsUpdated() {
+		listener.changedHybridTracker();
+	}
+
+	@Override
+	public void controlChanged(final Object source) {
+		System.out.println("Control changed");
+		if( source == comboDetect ) {
+			selectedDetector = comboDetect.getSelectedIndex();
+		} else if( source == comboDescribe ) {
+			selectedDescriptor = comboDescribe.getSelectedIndex();
+		} else if( source == comboAssociate ) {
+			selectedAssociate = comboAssociate.getSelectedIndex();
+		}
+		updateActiveControls(spinnerSelection.getSelectedIndex());
+		listener.changedHybridTracker();
+	}
+
 	public interface Listener {
-		void changedPointTrackerDda();
+		void changedHybridTracker();
 	}
 }

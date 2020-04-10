@@ -20,17 +20,15 @@ package boofcv.demonstrations.sfm.d3;
 
 import boofcv.abst.feature.associate.AssociateDescTo2D;
 import boofcv.abst.feature.associate.AssociateDescription2D;
-import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.tracker.ConfigTrackerDda;
 import boofcv.abst.tracker.PointTracker;
-import boofcv.factory.feature.associate.ConfigAssociateGreedy;
-import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * Control panel for creating Detect-Describe-Associate style trackers
@@ -39,11 +37,10 @@ import javax.swing.*;
  */
 public class ControlPanelDdaTracker extends ControlPanelDetDescAssoc {
 
-	JPanel controlPanel = new JPanel();
+	private JPanel controlPanel = new JPanel(new BorderLayout());
 
-	Listener listener;
+	private Listener listener;
 	public ControlPanelDdaTracker(Listener listener) {
-		setBorder(BorderFactory.createEmptyBorder());
 		this.listener = listener;
 
 		configFastHessian.maxFeaturesPerScale = 400;
@@ -71,21 +68,22 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssoc {
 		ConfigTrackerDda configDDA = new ConfigTrackerDda();
 
 		DetectDescribePoint detDesc = createDetectDescribe(inputType);
-		ScoreAssociation scorer = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
-		AssociateDescription2D associate = new AssociateDescTo2D(
-				FactoryAssociation.greedy(new ConfigAssociateGreedy(true),scorer));
+		AssociateDescription2D associate = new AssociateDescTo2D(createAssociate(detDesc));
 
 		return FactoryPointTracker.dda(detDesc,associate, configDDA);
 	}
 
 	private void updateActiveControls( int which ) {
 		controlPanel.removeAll();
+		JPanel inside = null;
 		switch( which ) {
-			case 0: controlPanel.add( getDetectorPanel() ); break;
-			case 1: controlPanel.add( getDescriptorPanel() ); break;
-			case 2: controlPanel.add( getAssociatePanel() ); break;
+			case 0: inside = getDetectorPanel(); break;
+			case 1: inside = getDescriptorPanel(); break;
+			case 2: inside = getAssociatePanel(); break;
 		}
-		invalidate();
+		if( inside != null )
+			controlPanel.add(BorderLayout.CENTER,inside);
+		controlPanel.validate();
 		SwingUtilities.invokeLater(this::repaint);
 	}
 

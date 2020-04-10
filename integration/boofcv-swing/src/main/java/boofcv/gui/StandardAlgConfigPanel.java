@@ -45,23 +45,13 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 	/**
 	 * Wraps the input panel inside another panel that will fill the control panel horizontally
 	 */
-	protected JPanel fillHorizontally( JPanel panel ) {
+	protected static JPanel fillHorizontally( JPanel panel ) {
 		JPanel hack = new JPanel(new BorderLayout()) {
 			@Override
 			public Dimension getPreferredSize() {
-				Dimension d;
-				int width;
-				try {
-					d = StandardAlgConfigPanel.this.getPreferredSize();
-					width = d.width-6; // not sure how to make this not a magic number
-					// if too small text goes outside
-				} catch( RuntimeException ignore ) {
-					d = StandardAlgConfigPanel.this.getSize();
-					width = d.width-20; // if this is too small it magically keeps on expanding
-				}
-
 				Dimension p = super.getPreferredSize();
-				return new Dimension(width,p.height);
+				p.width = Short.MAX_VALUE;
+				return p;
 			}
 
 			@Override

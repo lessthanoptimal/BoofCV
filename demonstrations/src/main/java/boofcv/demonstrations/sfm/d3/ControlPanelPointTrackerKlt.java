@@ -26,6 +26,7 @@ import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 
 /**
@@ -48,11 +49,21 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 	private final JSpinner spinnerDetectRadius;
 	private final JSpinner spinnerForwardsBackwards;
 
+	/**
+	 * Constructor that uses default settings
+	 */
 	public ControlPanelPointTrackerKlt(Listener listener) {
 		this(listener, new ConfigGeneralDetector(), new ConfigPKlt());
 	}
-	
-	public ControlPanelPointTrackerKlt(Listener listener, ConfigGeneralDetector configDetector, ConfigPKlt configKlt ) {
+
+	/**
+	 * Constructor with initial configurations
+	 *
+	 * @param listener Listener for changes
+	 * @param configDetector Initial configuration for detector. If null then the detector will not be configurable
+	 * @param configKlt Initial configuration for tracker
+	 */
+	public ControlPanelPointTrackerKlt(Listener listener, @Nullable ConfigGeneralDetector configDetector, ConfigPKlt configKlt ) {
 		this.listener = listener;
 		this.configDetector = configDetector;
 		this.configKlt = configKlt;
@@ -62,18 +73,29 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 		spinnerIterations = spinner(configKlt.config.maxIterations,1,500,1);
 		spinnerMaxError = spinner(configKlt.config.maxPerPixelError,0.0,255.0,5.0);
 		spinnerDescRadius = spinner(configKlt.templateRadius,1,100,1);
-		spinnerDetectThresh = spinner(Math.sqrt(configDetector.threshold),0.0,999.0,1.0);
-		spinnerDetectRadius = spinner(configDetector.radius,1,500,1);
 		spinnerForwardsBackwards = spinner(configKlt.toleranceFB,-1,100.0,1.0);
+		if( configDetector != null ) {
+			spinnerDetectThresh = spinner(Math.sqrt(configDetector.threshold), 0.0, 999.0, 1.0);
+			spinnerDetectRadius = spinner(configDetector.radius, 1, 500, 1);
+		} else {
+			spinnerDetectThresh = null;
+			spinnerDetectRadius = null;
+		}
 
 		addLabeled(spinnerLevels,"Pyr. Levels","Number of layers in image pyramid");
 		addAlignLeft(checkPruneClose);
 		addLabeled(spinnerDescRadius,"Template Radius","Radius of square template that is tracked");
 		addLabeled(spinnerIterations,"Max Iterations","KLT iterations when tracking");
 		addLabeled(spinnerMaxError,"Max Error","Drop tracks with an error larger than this value");
-		addLabeled(spinnerDetectThresh,"Detect Threshold","Shi-Tomasi corner detection threshold");
-		addLabeled(spinnerDetectRadius,"Detect Radius","Non-maximum detection radius");
+		if( isConfigureDetector() ) {
+			addLabeled(spinnerDetectThresh, "Detect Threshold", "Shi-Tomasi corner detection threshold");
+			addLabeled(spinnerDetectRadius, "Detect Radius", "Non-maximum detection radius");
+		}
 		addLabeled(spinnerForwardsBackwards,"F-to-B Tol.","Forwards-Backwards tolerance. 0 = disable (Pixels)");
+	}
+
+	public boolean isConfigureDetector() {
+		return configDetector != null;
 	}
 
 	public <T extends ImageBase<T>>

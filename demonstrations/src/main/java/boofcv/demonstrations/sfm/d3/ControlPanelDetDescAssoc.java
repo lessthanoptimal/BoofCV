@@ -63,9 +63,9 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel  {
 	protected int selectedDescriptor = 0;
 	protected int selectedAssociate = 0;
 
-	protected JComboBox<String> comboDetect    = combo(selectedDetector,DETECT_TYPES);
-	protected JComboBox<String> comboDescribe  = combo(selectedDescriptor,DESCRIBE_TYPES);
-	protected JComboBox<String> comboAssociate = combo(selectedAssociate,ASSOCIATE_TYPES);
+	protected JComboBox<String> comboDetect;
+	protected JComboBox<String> comboDescribe;
+	protected JComboBox<String> comboAssociate;
 
 	// Configurations. Modify these before calling initializeControlsGUI
 	public ConfigFastHessian configFastHessian = new ConfigFastHessian();
@@ -92,9 +92,13 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel  {
 	public ControlPanelAssociateNearestNeighbor controlAssocNN;
 
 	public void initializeControlsGUI() {
+		comboDetect    = combo(selectedDetector,DETECT_TYPES);
+		comboDescribe  = combo(selectedDescriptor,DESCRIBE_TYPES);
+		comboAssociate = combo(selectedAssociate,ASSOCIATE_TYPES);
+
 		controlDetectSift = new ControlPanelSiftDetector(configSiftScaleSpace,configSiftDetector,this::handleControlsUpdated);
 		controlDetectFastHessian = new ControlPanelFastHessian(configFastHessian,this::handleControlsUpdated);
-		controlDetectPoint = new ControlPanelPointDetector(500, PointDetectorTypes.SHI_TOMASI,this::handleControlsUpdated);
+		controlDetectPoint = new ControlPanelPointDetector(-1, PointDetectorTypes.SHI_TOMASI,this::handleControlsUpdated);
 		controlDescSurfFast = new ControlPanelSurfDescribe.Speed(configSurfFast,this::handleControlsUpdated);
 		controlDescSurfStable = new ControlPanelSurfDescribe.Stability(configSurfStability,this::handleControlsUpdated);
 		controlDescSift = new ControlPanelDescribeSift(configSiftDescribe,this::handleControlsUpdated);
@@ -157,6 +161,7 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel  {
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
 	DetectDescribePoint<T,?> createDetectDescribe( Class<T> imageType )
 	{
+		// See if a special combined detector/descriptor is available
 		DetectDescribePoint<T,?> output = null;
 		if( selectedDetector == 0 ) {
 			if( selectedDescriptor == 0 ) {
@@ -177,13 +182,18 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel  {
 		if( output != null )
 			return output;
 
+		// Create detector/descriptor using independent components
 		var detector = createDetector(imageType);
 		var describe = createDescriptor(imageType);
 
-		Class integralType = GIntegralImageOps.getIntegralType(imageType);
-		OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(null, integralType);
-		OrientationImage<T> orientation = FactoryOrientation.convertImage(orientationII,imageType);
+		OrientationImage<T> orientation = null;
 
+		// only compute orientation if the descriptor will use it
+		if( describe.isOriented() ) {
+			Class integralType = GIntegralImageOps.getIntegralType(imageType);
+			OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(null, integralType);
+			orientation = FactoryOrientation.convertImage(orientationII, imageType);
+		}
 		return FactoryDetectDescribe.fuseTogether(detector,orientation,describe);
 	}
 
@@ -195,7 +205,7 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel  {
 					controlDetectSift.configSS,controlDetectSift.configDetector,imageType);
 			case 2: {
 				GeneralFeatureDetector<T, D> alg = controlDetectPoint.create(imageType);
-				return FactoryInterestPoint.wrapPoint(alg, 1, imageType, alg.getDerivType());
+				return FactoryInterestPoint.wrapPoint(alg, controlDetectPoint.pointDetectRadius, imageType, alg.getDerivType());
 			}
 			default:
 				throw new IllegalArgumentException("Unknown detector");
@@ -228,7 +238,7 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel  {
 		}
 	}
 
-	public AssociateDescription createAssociate( DescribeRegionPoint descriptor ) {
+	public AssociateDescription createAssociate( DescriptorInfo descriptor ) {
 		ScoreAssociation scorer = FactoryAssociation.defaultScore(descriptor.getDescriptionType());
 		int DOF = descriptor.createDescription().size();
 
