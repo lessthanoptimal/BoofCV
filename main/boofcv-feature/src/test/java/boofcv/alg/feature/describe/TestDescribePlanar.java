@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -64,12 +64,12 @@ public class TestDescribePlanar {
 
 		scale = true;
 		ori = false;
-		assertTrue(alg.requiresRadius());
-		assertFalse(alg.requiresOrientation());
+		assertTrue(alg.isScalable());
+		assertFalse(alg.isOriented());
 		scale = false;
 		ori = true;
-		assertFalse(alg.requiresRadius());
-		assertTrue(alg.requiresOrientation());
+		assertFalse(alg.isScalable());
+		assertTrue(alg.isOriented());
 	}
 
 	@Test
@@ -131,12 +131,12 @@ public class TestDescribePlanar {
 		}
 
 		@Override
-		public boolean requiresRadius() {
+		public boolean isScalable() {
 			return scale;
 		}
 
 		@Override
-		public boolean requiresOrientation() {
+		public boolean isOriented() {
 			return ori;
 		}
 

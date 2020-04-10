@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -99,13 +99,13 @@ public abstract class DescribePlanar<T extends ImageGray<T>, Desc extends TupleD
 	protected abstract void combine( Desc description );
 
 	@Override
-	public boolean requiresRadius() {
-		return describers[0].requiresRadius();
+	public boolean isScalable() {
+		return describers[0].isScalable();
 	}
 
 	@Override
-	public boolean requiresOrientation() {
-		return describers[0].requiresOrientation();
+	public boolean isOriented() {
+		return describers[0].isOriented();
 	}
 
 	@Override

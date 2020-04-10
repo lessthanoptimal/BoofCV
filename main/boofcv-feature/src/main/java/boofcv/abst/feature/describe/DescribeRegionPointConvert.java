@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -68,13 +68,13 @@ public class DescribeRegionPointConvert<T extends ImageGray<T>,In extends TupleD
 	}
 
 	@Override
-	public boolean requiresRadius() {
-		return original.requiresRadius();
+	public boolean isScalable() {
+		return original.isScalable();
 	}
 
 	@Override
-	public boolean requiresOrientation() {
-		return original.requiresOrientation();
+	public boolean isOriented() {
+		return original.isOriented();
 	}
 
 	@Override

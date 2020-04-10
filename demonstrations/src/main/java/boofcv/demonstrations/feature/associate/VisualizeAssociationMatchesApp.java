@@ -240,7 +240,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 
 				Point2D_F64 pt = detector.getLocation(i);
 				double radius = detector.getRadius(i);
-				if (descriptor.requiresOrientation()) {
+				if (descriptor.isOriented()) {
 					orientation.setObjectRadius(radius);
 					yaw = orientation.compute(pt.x, pt.y);
 				}
@@ -258,7 +258,7 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 				double yaw = 0;
 
 				Point2D_F64 pt = detector.getLocation(i);
-				if (descriptor.requiresOrientation()) {
+				if (descriptor.isOriented()) {
 					yaw = orientation.compute(pt.x, pt.y);
 				}
 

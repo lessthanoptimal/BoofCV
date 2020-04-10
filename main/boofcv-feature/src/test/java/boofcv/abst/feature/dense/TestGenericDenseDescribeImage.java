@@ -140,9 +140,9 @@ public class TestGenericDenseDescribeImage {
 			}
 		}
 
-		@Override public boolean requiresRadius() {return false;}
+		@Override public boolean isScalable() {return false;}
 
-		@Override public boolean requiresOrientation() {return false;}
+		@Override public boolean isOriented() {return false;}
 
 		@Override
 		public ImageType getImageType() {

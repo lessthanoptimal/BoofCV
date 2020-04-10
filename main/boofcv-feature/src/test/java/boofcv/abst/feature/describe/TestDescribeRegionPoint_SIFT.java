@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -43,8 +43,8 @@ class TestDescribeRegionPoint_SIFT extends GenericDescribeRegionPointChecks<Gray
 	void flags() {
 		DescribeRegionPoint_SIFT<GrayF32> alg = declare();
 
-		assertTrue(alg.requiresOrientation());
-		assertTrue(alg.requiresRadius());
+		assertTrue(alg.isOriented());
+		assertTrue(alg.isScalable());
 
 		TupleDesc_F64 desc = alg.createDescription();
 		assertEquals(128,desc.size());

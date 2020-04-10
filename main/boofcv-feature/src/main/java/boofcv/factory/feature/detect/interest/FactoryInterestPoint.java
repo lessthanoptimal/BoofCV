@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -48,14 +48,14 @@ public class FactoryInterestPoint {
 	/**
 	 * Wraps {@link GeneralFeatureDetector} inside an {@link InterestPointDetector}.
 	 *
-	 * @param feature   Feature detector.
-	 * @param scale Scale of detected features
+	 * @param feature Feature detector.
+	 * @param radius Radius of descriptor used by scale invariant features
 	 * @param inputType Image type of input image.
 	 * @param derivType Image type for gradient.
 	 * @return The interest point detector.
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	InterestPointDetector<T> wrapPoint(GeneralFeatureDetector<T, D> feature, double scale , Class<T> inputType, Class<D> derivType) {
+	InterestPointDetector<T> wrapPoint(GeneralFeatureDetector<T, D> feature, double radius , Class<T> inputType, Class<D> derivType) {
 
 		ImageGradient<T, D> gradient = null;
 		ImageHessian<D> hessian = null;
@@ -65,7 +65,7 @@ public class FactoryInterestPoint {
 		if (feature.getRequiresHessian())
 			hessian = FactoryDerivative.hessianSobel(derivType);
 
-		return new GeneralToInterestPoint<>(feature, gradient, hessian, scale, derivType);
+		return new GeneralToInterestPoint<>(feature, gradient, hessian, radius, derivType);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -50,8 +50,8 @@ public class TestDescribeRegionPointConvert {
 		alg.process(1,2,2,2,found);
 		assertEquals(5,found.value[0]);
 
-		assertTrue(alg.requiresOrientation()==original.requiresOrientation());
-		assertTrue(alg.requiresRadius()==original.requiresRadius());
+		assertTrue(alg.isOriented()==original.isOriented());
+		assertTrue(alg.isScalable()==original.isScalable());
 		assertTrue(alg.getDescriptionType()==TupleDesc_S8.class);
 
 	}
@@ -96,12 +96,12 @@ public class TestDescribeRegionPointConvert {
 		}
 
 		@Override
-		public boolean requiresRadius() {
+		public boolean isScalable() {
 			return false;
 		}
 
 		@Override
-		public boolean requiresOrientation() {
+		public boolean isOriented() {
 			return true;
 		}
 

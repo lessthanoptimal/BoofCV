@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -59,19 +59,15 @@ public interface DescribeRegionPoint<T extends ImageBase<T>, Desc extends TupleD
 	 * If size information is used when computing the descriptor.
 	 *
 	 * @return true is the radius is used when computing the descriptor or false if not
-	 * @deprecated Likely to be removed in the near future.  if this flag is true or not won't change the input it
-	 * gets when paired with {@link boofcv.abst.feature.detect.interest.InterestPointDetector}
 	 */
-	boolean requiresRadius();
+	boolean isScalable();
 
 	/**
 	 * True if the descriptor uses orientation information.
 	 *
-	 * @deprecated Likely to be removed in the near future.  if this flag is true or not won't change the input it
-	 * gets when paired with {@link boofcv.abst.feature.detect.interest.InterestPointDetector}
 	 * @return if orientation needs to be provided or not
 	 */
-	boolean requiresOrientation();
+	boolean isOriented();
 
 	/**
 	 * Description of the type of image it can process

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -55,12 +55,12 @@ public class WrapDescribeBrief<T extends ImageGray<T>> implements DescribeRegion
 	}
 
 	@Override
-	public boolean requiresRadius() {
+	public boolean isScalable() {
 		return false;
 	}
 
 	@Override
-	public boolean requiresOrientation() {
+	public boolean isOriented() {
 		return false;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -70,12 +70,12 @@ public class WrapDescribeSurf<T extends ImageGray<T>, II extends ImageGray<II>>
 	}
 
 	@Override
-	public boolean requiresRadius() {
+	public boolean isScalable() {
 		return true;
 	}
 
 	@Override
-	public boolean requiresOrientation() {
+	public boolean isOriented() {
 		return true;
 	}
 
