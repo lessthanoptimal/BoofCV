@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -33,8 +33,8 @@ import boofcv.struct.image.ImageGray;
 public abstract class ImplSsdCornerBox<D extends ImageGray<D>, D2 extends ImageGray<D2>>
 		extends ImplSsdCornerBase<D,D2>
 {
-	protected ImplSsdCornerBox(int windowRadius , Class<D2> secondDerivType ) {
-		super(windowRadius,secondDerivType);
+	protected ImplSsdCornerBox(int windowRadius , Class<D> derivType, Class<D2> secondDerivType ) {
+		super(windowRadius,derivType,secondDerivType);
 	}
 	@Override
 	public void process(D derivX, D derivY, GrayF32 intensity ) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -42,7 +42,7 @@ public class ImplSsdCorner_F32_MT extends ImplSsdCornerBox<GrayF32,GrayF32> {
 	private CornerIntensity_F32 intensity;
 
 	public ImplSsdCorner_F32_MT( int windowRadius, CornerIntensity_F32 intensity) {
-		super(windowRadius,GrayF32.class);
+		super(windowRadius,GrayF32.class,GrayF32.class);
 		this.intensity = intensity;
 	}
 

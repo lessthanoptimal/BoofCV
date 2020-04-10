@@ -52,8 +52,11 @@ public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends Image
 	protected D2 horizXY;
 	protected D2 horizYY;
 
-	protected ImplSsdCornerBase( int windowRadius , Class<D2> secondDerivType ) {
+	Class<D> derivType;
+
+	protected ImplSsdCornerBase( int windowRadius , Class<D> derivType, Class<D2> secondDerivType ) {
 		this.radius = windowRadius;
+		this.derivType = derivType;
 
 		horizXX = GeneralizedImageOps.createSingleBand(secondDerivType,1,1);
 		horizXY = GeneralizedImageOps.createSingleBand(secondDerivType,1,1);
@@ -78,7 +81,7 @@ public abstract class ImplSsdCornerBase<D extends ImageGray<D>, D2 extends Image
 
 	@Override
 	public Class<D> getInputType() {
-		return horizXX.imageType.getImageClass();
+		return derivType;
 	}
 
 	public interface CornerIntensity_S32 {

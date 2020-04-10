@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public class ImplSsdCornerWeighted_F32_MT extends ImplSsdCornerBase<GrayF32,Gray
 	GrayF32 temp = new GrayF32(1,1);
 
 	public ImplSsdCornerWeighted_F32_MT(int radius, CornerIntensity_F32 intensity) {
-		super(radius,GrayF32.class);
+		super(radius,GrayF32.class,GrayF32.class);
 		this.intensity = intensity;
 		kernel = FactoryKernelGaussian.gaussian(Kernel1D_F32.class, -1, radius);
 	}
