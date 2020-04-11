@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -62,7 +62,7 @@ public class PointDeform_MLS implements PointDeformKeyPoints
 			Point2D_F32 p = locations.get(i);
 			alg.addControl(p.x, p.y);
 		}
-		alg.fixateUndistorted();
+		alg.fixate();
 	}
 
 	@Override
@@ -71,19 +71,19 @@ public class PointDeform_MLS implements PointDeformKeyPoints
 			Point2D_F32 p = locations.get(i);
 			alg.setDistorted(i, p.x, p.y);
 		}
-		alg.fixateDistorted();
+		alg.fixate();
 	}
 
 	@Override
 	public void setSource(int which, float x, float y) {
 		alg.setUndistorted(which, x , y );
-		alg.fixateUndistorted();
+		alg.fixate();
 	}
 
 	@Override
 	public void setDestination(int which, float x, float y) {
 		alg.setDistorted(which, x , y );
-		alg.fixateDistorted();
+		alg.fixate();
 	}
 
 	public ImageDeformPointMLS_F32 getAlgorithm() {

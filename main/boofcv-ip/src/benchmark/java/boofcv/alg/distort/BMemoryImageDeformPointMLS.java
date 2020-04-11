@@ -30,16 +30,17 @@ import java.util.Random;
  */
 public class BMemoryImageDeformPointMLS {
 	public static void main(String[] args) {
-		ImageDeformPointMLS_F32 alg = new ImageDeformPointMLS_F32(TypeDeformMLS.RIGID);
+		var alg = new ImageDeformPointMLS_F32(TypeDeformMLS.RIGID);
+		var rand = new Random(2345);
+		var out = new Point2D_F32();
 
 		int N = 20_000;
 		int size = 1000;
 
 		long beforeUsedMem=Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-		for (int trial = 0; trial < 200; trial++) {
+		for (int trial = 0; trial < 10; trial++) {
 			alg.reset();
 			alg.configure(size,size,30,30);
-			Random rand = new Random(2345);
 			for (int i = 0; i < N; i++) {
 				float sx = rand.nextFloat()*(size-1);
 				float sy = rand.nextFloat()*(size-1);
@@ -50,10 +51,8 @@ public class BMemoryImageDeformPointMLS {
 
 				alg.add(sx,sy,dx,dy);
 			}
-			alg.fixateUndistorted();
-			alg.fixateDistorted();
+			alg.fixate();
 
-			Point2D_F32 out = new Point2D_F32();
 			for (int y = 0; y < size; y++) {
 				for (int x = 0; x < size; x++) {
 					alg.compute(x,y,out);
@@ -63,6 +62,5 @@ public class BMemoryImageDeformPointMLS {
 			long memory = afterUsedMem-beforeUsedMem;
 			System.out.printf("Memory Usage %6.2f MB\n",memory/1024.0/1024.0);
 		}
-
 	}
 }

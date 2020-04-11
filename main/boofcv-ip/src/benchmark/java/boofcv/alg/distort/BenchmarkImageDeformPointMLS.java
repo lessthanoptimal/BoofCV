@@ -48,16 +48,14 @@ public class BenchmarkImageDeformPointMLS {
 	@Param({"1000"})
 	public int size;
 
-	ImageDeformPointMLS_F32 affine20 = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
-	ImageDeformPointMLS_F32 rigid20 = new ImageDeformPointMLS_F32(TypeDeformMLS.RIGID);
-	ImageDeformPointMLS_F32 similarity20 = new ImageDeformPointMLS_F32(TypeDeformMLS.SIMILARITY);
-	ImageDeformPointMLS_F32 rigid200000 = new ImageDeformPointMLS_F32(TypeDeformMLS.RIGID);
+	ImageDeformPointMLS_F32 affine = new ImageDeformPointMLS_F32(TypeDeformMLS.AFFINE);
+	ImageDeformPointMLS_F32 rigid = new ImageDeformPointMLS_F32(TypeDeformMLS.RIGID);
+	ImageDeformPointMLS_F32 similarity = new ImageDeformPointMLS_F32(TypeDeformMLS.SIMILARITY);
 	@Setup
 	public void configure() {
-		addPoints(20, affine20);
-		addPoints(20, rigid20);
-		addPoints(20, similarity20);
-		addPoints(200000, rigid200000);
+		addPoints(20, affine);
+		addPoints(20, rigid);
+		addPoints(20, similarity);
 	}
 
 	private void addPoints( int N , ImageDeformPointMLS_F32 alg ) {
@@ -74,8 +72,7 @@ public class BenchmarkImageDeformPointMLS {
 
 			alg.add(sx,sy,dx,dy);
 		}
-		alg.fixateUndistorted();
-		alg.fixateDistorted();
+		alg.fixate();
 	}
 
 	private void apply( ImageDeformPointMLS_F32 alg ) {
@@ -89,22 +86,23 @@ public class BenchmarkImageDeformPointMLS {
 
 	@Benchmark
 	public void affine_distort() {
-		apply(affine20);
+		apply(affine);
 	}
 
 	@Benchmark
 	public void rigid_distort() {
-		apply(rigid20);
+		apply(rigid);
 	}
 
 	@Benchmark
 	public void similarity_distort() {
-		apply(similarity20);
+		apply(similarity);
 	}
 
 	@Benchmark
-	public void rigid_distort_200000() {
-		apply(rigid200000);
+	public void rigid_distort_fixate() {
+		rigid.fixate();
+		apply(rigid);
 	}
 
 	public static void main(String[] args) throws RunnerException {

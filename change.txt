@@ -34,6 +34,10 @@ Version : 0.36
   * ImageMiscOps.copy() with border for input image
   * Split mean filter into BlurImageOps.mean() and BlurImageOps.meanB()
   * BlurImageOps.meanB() requires a border to be specified, if null is specified then just the inner portion is processed
+- DeformPointMLS
+  * Massive reduction in memory usage. 20k control points: 800 MB to 3.4 MB
+    See BMemoryImageDeformPointsMLS
+  * Thanks olegvakulenko for finding the problem and submitting the initial fix!
 - Moved KLT from boofcv-geo to boofcv-feature
   * No idea what it was doing in geo originally but it didn't belong there!
 - QR Code
