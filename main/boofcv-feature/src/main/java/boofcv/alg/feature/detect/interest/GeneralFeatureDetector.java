@@ -20,7 +20,7 @@ package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
-import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
@@ -55,7 +55,8 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	protected QueueCorner excludeMinimum;
 
 	// selects the features with the largest intensity
-	protected SelectNBestFeatures selectBest = new SelectNBestFeatures(10);
+	protected FeatureSelectLimit selectMax;
+	protected QueueCorner selected = new QueueCorner();
 	// maximum number of features it will detect across the image
 	protected int maxFeatures;
 
@@ -72,7 +73,8 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	 * @param extractor Extracts the corners from intensity image
 	 */
 	public GeneralFeatureDetector(GeneralFeatureIntensity<I, D> intensity,
-								  NonMaxSuppression extractor ) {
+								  NonMaxSuppression extractor ,
+								  FeatureSelectLimit selectMax) {
 		if( extractor.canDetectMinimums() && !intensity.localMinimums() )
 			throw new IllegalArgumentException("Extracting local minimums, but intensity has minimums set to false");
 		if( extractor.canDetectMaximums() && !intensity.localMaximums() )
@@ -83,6 +85,7 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 
 		this.intensity = intensity;
 		this.extractor = extractor;
+		this.selectMax = selectMax;
 
 		// sanity check ignore borders and increase the size of the extractor's ignore border
 		// if its ignore border is too small then false positive are highly likely
@@ -144,19 +147,20 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 		}
 
 		// optionally select the most intense features only
-		selectBest(intensityImage, foundMinimum, numSelectMin, false);
-		selectBest(intensityImage, foundMaximum, numSelectMax, true);
+		resolveSelectAmbiguity(intensityImage, excludeMaximum, foundMinimum, numSelectMin, false);
+		resolveSelectAmbiguity(intensityImage, excludeMinimum, foundMaximum, numSelectMax, true);
 	}
 
-	private void selectBest(GrayF32 intensityImage, QueueCorner found , int numSelect, boolean positive) {
+	/**
+	 * More features were detected than requested. Need to select a subset of them
+	 */
+	private void resolveSelectAmbiguity(GrayF32 intensity, QueueCorner excluded, QueueCorner detected ,
+										int numSelect, boolean positive) {
 		if (numSelect > 0) {
-			selectBest.setN(numSelect);
-			selectBest.process(intensityImage, found,positive);
-			QueueCorner best = selectBest.getBestCorners();
-			found.reset();
-			for( int i = 0; i < best.size; i++ ) {
-				found.grow().set(best.get(i));
-			}
+			selectMax.select(intensity,positive,excluded,detected,numSelect,selected);
+			// selected is filled with corners from found, so hopefully implementation details of reset don't change
+			detected.reset();
+			detected.copyAll(selected);
 		}
 	}
 

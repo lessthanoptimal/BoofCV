@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,6 +22,7 @@ import boofcv.abst.feature.detect.extract.*;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.extract.*;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.image.ImageGray;
 
@@ -41,14 +42,16 @@ public class FactoryFeatureExtractor {
 	 *
 	 * @param intensity   Feature intensity algorithm
 	 * @param extractor   Feature extraction algorithm.
+	 * @param selector    Selects features when there is more than the maximum allowed
 	 * @param maxFeatures Maximum number of features it should return. -1 to return them all.
 	 * @return General feature detector
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
 	GeneralFeatureDetector<I, D> general(GeneralFeatureIntensity<I, D> intensity,
 										 NonMaxSuppression extractor,
+										 FeatureSelectLimit selector,
 										 int maxFeatures ) {
-		GeneralFeatureDetector<I, D> det = new GeneralFeatureDetector<>(intensity, extractor);
+		GeneralFeatureDetector<I, D> det = new GeneralFeatureDetector<>(intensity, extractor, selector);
 		det.setMaxFeatures(maxFeatures);
 
 		return det;

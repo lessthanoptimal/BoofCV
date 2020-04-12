@@ -21,6 +21,7 @@ package boofcv.demonstrations.sfm.d3;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
+import boofcv.factory.feature.detect.selector.SelectLimitTypes;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageBase;
@@ -47,6 +48,8 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 	private final JSpinner spinnerDescRadius;
 	private final JSpinner spinnerDetectThresh;
 	private final JSpinner spinnerDetectRadius;
+	private final JSpinner spinnerDetectMax;
+	private final JComboBox<String> comboDetectSelector;
 	private final JSpinner spinnerForwardsBackwards;
 
 	/**
@@ -75,11 +78,15 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 		spinnerDescRadius = spinner(configKlt.templateRadius,1,100,1);
 		spinnerForwardsBackwards = spinner(configKlt.toleranceFB,-1,100.0,1.0);
 		if( configDetector != null ) {
+			spinnerDetectMax = spinner(configDetector.maxFeatures, -1, 10000, 10);
 			spinnerDetectThresh = spinner(Math.sqrt(configDetector.threshold), 0.0, 999.0, 1.0);
 			spinnerDetectRadius = spinner(configDetector.radius, 1, 500, 1);
+			comboDetectSelector = combo(configDetector.maxSelector.type.ordinal(), SelectLimitTypes.values());
 		} else {
+			spinnerDetectMax = null;
 			spinnerDetectThresh = null;
 			spinnerDetectRadius = null;
+			comboDetectSelector = null;
 		}
 
 		addLabeled(spinnerLevels,"Pyr. Levels","Number of layers in image pyramid");
@@ -87,11 +94,14 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 		addLabeled(spinnerDescRadius,"Template Radius","Radius of square template that is tracked");
 		addLabeled(spinnerIterations,"Max Iterations","KLT iterations when tracking");
 		addLabeled(spinnerMaxError,"Max Error","Drop tracks with an error larger than this value");
+		addLabeled(spinnerForwardsBackwards,"F-to-B Tol.","Forwards-Backwards tolerance. 0 = disable (Pixels)");
 		if( isConfigureDetector() ) {
+			addLabeled(spinnerDetectMax, "Detect Max", "Max Features it can detect. -1 is unlimited");
 			addLabeled(spinnerDetectThresh, "Detect Threshold", "Shi-Tomasi corner detection threshold");
 			addLabeled(spinnerDetectRadius, "Detect Radius", "Non-maximum detection radius");
+			addLabeled(comboDetectSelector,  "Det. Select",
+					"Method used to select points when more have been detected than the maximum allowed");
 		}
-		addLabeled(spinnerForwardsBackwards,"F-to-B Tol.","Forwards-Backwards tolerance. 0 = disable (Pixels)");
 	}
 
 	public boolean isConfigureDetector() {
@@ -111,11 +121,15 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 			configKlt.templateRadius = ((Number) spinnerDescRadius.getValue()).intValue();
 		} else if( source == spinnerMaxError) {
 			configKlt.config.maxPerPixelError = ((Number) spinnerMaxError.getValue()).floatValue();
+		} else if( source == spinnerDetectMax) {
+			configDetector.maxFeatures = ((Number) spinnerDetectMax.getValue()).intValue();
 		} else if( source == spinnerDetectThresh) {
 			configDetector.threshold = ((Number) spinnerDetectThresh.getValue()).floatValue();
 			configDetector.threshold *= configDetector.threshold;
 		} else if( source == spinnerDetectRadius) {
 			configDetector.radius = ((Number) spinnerDetectRadius.getValue()).intValue();
+		} else if( source == comboDetectSelector) {
+			configDetector.maxSelector.type = SelectLimitTypes.values()[comboDetectSelector.getSelectedIndex()];
 		} else if( source == spinnerForwardsBackwards ) {
 			configKlt.toleranceFB = ((Number) spinnerForwardsBackwards.getValue()).doubleValue();
 		} else if( source == spinnerIterations ) {

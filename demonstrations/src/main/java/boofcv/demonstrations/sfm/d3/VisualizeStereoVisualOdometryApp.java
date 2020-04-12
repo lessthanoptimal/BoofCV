@@ -37,6 +37,8 @@ import boofcv.abst.tracker.PointTracker;
 import boofcv.abst.tracker.PointTrackerToTwoPass;
 import boofcv.abst.tracker.PointTrackerTwoPass;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
@@ -333,7 +335,8 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 			GeneralFeatureIntensity intensity =
 					FactoryIntensityPoint.shiTomasi(2,false,imageType);
 			NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(2,50,0,true,false,true));
-			GeneralFeatureDetector general = new GeneralFeatureDetector(intensity,nonmax);
+			FeatureSelectLimit selector = new FeatureSelectNBest();
+			GeneralFeatureDetector general = new GeneralFeatureDetector(intensity,nonmax,selector);
 			general.setMaxFeatures(1000);
 			DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,11.0,imageType,derivType);
 //			DescribeRegionPoint describe = FactoryDescribeRegionPoint.brief(new ConfigBrief(true),defaultType);

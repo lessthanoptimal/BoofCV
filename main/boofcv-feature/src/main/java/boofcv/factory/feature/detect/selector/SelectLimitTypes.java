@@ -16,33 +16,36 @@
  * limitations under the License.
  */
 
-package boofcv.misc;
+package boofcv.factory.feature.detect.selector;
 
-import java.util.List;
+import boofcv.alg.feature.detect.selector.FeatureSelectFirst;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.feature.detect.selector.FeatureSelectRandom;
+import boofcv.alg.feature.detect.selector.FeatureSelectUniformBest;
 
 /**
- * Set of commonly used functions for Lambdas
+ * Different types of built in methods for enforcing the maximum allowed number of detected features inside
+ * an intensity image.
+ *
+ * @see FeatureSelectLimit
  *
  * @author Peter Abeles
  */
-public interface BoofLambdas {
-	interface Process {
-		void process();
-	}
-
-	interface ProcessObject<T> {
-		void process(T object);
-	}
-
-	interface ProcessI {
-		void process( int a );
-	}
-
-	interface ProcessII {
-		void process( int a, int b );
-	}
-
-	interface SelectElement<T> {
-		int select(List<T> list);
-	}
+public enum SelectLimitTypes {
+	/**
+	 * @see FeatureSelectUniformBest
+	 */
+	BEST_N,
+	/**
+	 * @see FeatureSelectUniformBest
+	 */
+	UNIFORM_BEST,
+	/**
+	 * @see FeatureSelectRandom
+	 */
+	RANDOM,
+	/**
+	 * @see FeatureSelectFirst
+	 */
+	FIRST
 }

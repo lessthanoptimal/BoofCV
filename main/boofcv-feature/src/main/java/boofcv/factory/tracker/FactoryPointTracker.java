@@ -132,6 +132,7 @@ public class FactoryPointTracker {
 		if( configExtract == null ) {
 			configExtract = new ConfigGeneralDetector();
 		}
+		configExtract.checkValidity();
 
 		GeneralFeatureDetector<I, D> detector = createShiTomasi(configExtract, derivType);
 

@@ -16,33 +16,27 @@
  * limitations under the License.
  */
 
-package boofcv.misc;
+package boofcv.factory.feature.detect.selector;
 
-import java.util.List;
+import boofcv.alg.feature.detect.selector.*;
+
+import javax.annotation.Nullable;
 
 /**
- * Set of commonly used functions for Lambdas
+ * Factory that creates {@link FeatureSelectLimit}
  *
  * @author Peter Abeles
  */
-public interface BoofLambdas {
-	interface Process {
-		void process();
-	}
-
-	interface ProcessObject<T> {
-		void process(T object);
-	}
-
-	interface ProcessI {
-		void process( int a );
-	}
-
-	interface ProcessII {
-		void process( int a, int b );
-	}
-
-	interface SelectElement<T> {
-		int select(List<T> list);
+public class FactoryMaxSelector {
+	public static FeatureSelectLimit create(@Nullable ConfigSelectLimit config ) {
+		if( config == null )
+			config = new ConfigSelectLimit();
+		switch( config.type ) {
+			case BEST_N: return new FeatureSelectNBest();
+			case RANDOM: return new FeatureSelectRandom(config.randomSeed);
+			case UNIFORM_BEST: return new FeatureSelectUniformBest();
+			case FIRST: return new FeatureSelectFirst();
+		}
+		throw new RuntimeException("Unknown type "+config.type);
 	}
 }

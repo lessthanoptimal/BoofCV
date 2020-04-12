@@ -18,6 +18,7 @@
 
 package boofcv.struct;
 
+import boofcv.concurrency.BoofConcurrency;
 import lombok.Getter;
 import org.ddogleg.struct.Factory;
 import org.ddogleg.struct.FastQueue;
@@ -88,6 +89,18 @@ public class ImageGrid<T> {
 				processor.process(row,col, cells.data[i] );
 			}
 		}
+	}
+
+	/**
+	 * Same as {@link #processCells} but threaded.
+	 */
+	public void processCellsThreads( ProcessCell<T> processor )
+	{
+		BoofConcurrency.loopFor(0,cells.size,cellIdx->{
+			int row = cellIdx/cols;
+			int col = cellIdx%cols;
+			processor.process(row,col, cells.data[cellIdx] );
+		});
 	}
 
 	public interface ProcessCell<T>

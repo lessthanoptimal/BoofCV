@@ -43,7 +43,7 @@ import java.util.List;
 public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends InvertibleTransform>
 {
 	// total number of frames processed
-	protected @Getter long frameID = 0;
+	protected @Getter long frameID;
 	// feature tracker
 	protected PointTracker<I> tracker;
 	// Fits a model to the tracked features
@@ -88,6 +88,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 		worldToKey = (IT)model.createInstance();
 		keyToCurr = (IT)model.createInstance();
 		worldToCurr = (IT)model.createInstance();
+		reset();
 	}
 
 	protected ImageMotionPointTrackerKey() {

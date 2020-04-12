@@ -21,6 +21,8 @@ package boofcv.alg.feature.detect.interest;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
@@ -32,16 +34,17 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-public class TestGeneralFeatureDetector {
+class TestGeneralFeatureDetector {
 
 	int width = 10;
 	int height = 12;
+	FeatureSelectLimit selector = new FeatureSelectNBest();
 
 	/**
 	 * Several basic detection tests
 	 */
 	@Test
-	public void testDetection() {
+	void basics() {
 		// use a real extractor
 		NonMaxSuppression extractor;
 
@@ -64,7 +67,7 @@ public class TestGeneralFeatureDetector {
 		intensity.minimums = false;
 		extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, false, true));
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor, selector);
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 		assertEquals(6, detector.getMaximums().size());
 		assertEquals(0, detector.getMinimums().size());
@@ -72,7 +75,7 @@ public class TestGeneralFeatureDetector {
 		// try detecting the negative features too
 		intensity.minimums = true;
 		extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true, true, true));
-		detector = new GeneralFeatureDetector<>(intensity, extractor);
+		detector = new GeneralFeatureDetector<>(intensity, extractor, selector);
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 		assertEquals(6, detector.getMaximums().size());
 		assertEquals(2, detector.getMinimums().size());
@@ -87,7 +90,7 @@ public class TestGeneralFeatureDetector {
 	 * If the intensity image has an ignore border is that border request actually followed?
 	 */
 	@Test
-	public void ignoreBorder() {
+	void ignoreBorder() {
 		HelperIntensity intensity = new HelperIntensity(false, false, false);
 		intensity.ignoreBorder = 2;
 		intensity.minimums = true;
@@ -111,7 +114,7 @@ public class TestGeneralFeatureDetector {
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(new ConfigExtract(1, 0.001f, 1, true,true,true));
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor, selector);
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
 		// only features inside the image should be found
@@ -120,19 +123,19 @@ public class TestGeneralFeatureDetector {
 	}
 
 	@Test
-	public void testPositiveNoCandidates() {
+	void testPositiveNoCandidates() {
 		HelperExtractor extractor = new HelperExtractor(false, true);
 		HelperIntensity intensity = new HelperIntensity(false, false, false);
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor, selector);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
-		assertTrue(intensity.candidatesMinCalled == 0);
-		assertTrue(intensity.candidatesMaxCalled == 0);
-		assertTrue(intensity.processCalled == 1);
-		assertTrue(extractor.numTimesProcessed == 1);
+		assertEquals(0, intensity.candidatesMinCalled);
+		assertEquals(0, intensity.candidatesMaxCalled);
+		assertEquals(1, intensity.processCalled);
+		assertEquals(1, extractor.numTimesProcessed);
 	}
 
 	@Test
@@ -151,17 +154,17 @@ public class TestGeneralFeatureDetector {
 		extractor.maximums = max;
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor, selector);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
 		//  since candidates returns null if not supported it is still ok for it to be invoked
 		if( min )
-			assertTrue(intensity.candidatesMinCalled == 1);
+			assertEquals(1, intensity.candidatesMinCalled);
 		if( max )
-			assertTrue(intensity.candidatesMaxCalled == 1);
-		assertTrue(intensity.processCalled == 1);
-		assertTrue(extractor.numTimesProcessed == 1);
+			assertEquals(1, intensity.candidatesMaxCalled);
+		assertEquals(1, intensity.processCalled);
+		assertEquals(1, extractor.numTimesProcessed);
 	}
 
 	/**
@@ -173,7 +176,7 @@ public class TestGeneralFeatureDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		assertThrows(IllegalArgumentException.class,
-				()->new GeneralFeatureDetector<>(intensity, extractor));
+				()->new GeneralFeatureDetector<>(intensity, extractor, selector));
 	}
 
 	/**
@@ -185,7 +188,7 @@ public class TestGeneralFeatureDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor, selector);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
@@ -202,7 +205,7 @@ public class TestGeneralFeatureDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor, selector);
 		detector.setMaxFeatures(1);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
@@ -220,7 +223,7 @@ public class TestGeneralFeatureDetector {
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor, selector);
 
 		detector.process(new GrayF32(width, height), null, null, null, null, null);
 
@@ -244,33 +247,33 @@ public class TestGeneralFeatureDetector {
 		HelperIntensity intensity = new HelperIntensity(false, false, true);
 		HelperExtractor extractor = new HelperExtractor(true, true);
 
-		intensity.minimums = false; intensity.minimums = false;
+		intensity.minimums = false; extractor.minimums = false;
 		intensity.maximums = false; extractor.maximums = false;
 
 		GeneralFeatureDetector<GrayF32, GrayF32> detector =
-				new GeneralFeatureDetector<>(intensity, extractor);
+				new GeneralFeatureDetector<>(intensity, extractor, selector);
 
 		assertFalse(detector.isDetectMinimums());
 		assertFalse(detector.isDetectMaximums());
 
-		intensity.minimums = true;  intensity.minimums = true;
+		intensity.minimums = true;  extractor.minimums = true;
 		intensity.maximums = false; extractor.maximums = false;
 
-		detector = new GeneralFeatureDetector<>(intensity, extractor);
+		detector = new GeneralFeatureDetector<>(intensity, extractor, selector);
 
 		assertTrue(detector.isDetectMinimums());
 		assertFalse(detector.isDetectMaximums());
 
-		intensity.minimums = false; intensity.minimums = false;
+		intensity.minimums = false; extractor.minimums = false;
 		intensity.maximums = true;  extractor.maximums = true;
 
-		detector = new GeneralFeatureDetector<>(intensity, extractor);
+		detector = new GeneralFeatureDetector<>(intensity, extractor, selector);
 
 		assertFalse(detector.isDetectMinimums());
 		assertTrue(detector.isDetectMaximums());
 	}
 
-	public class HelperExtractor implements NonMaxSuppression {
+	public static class HelperExtractor implements NonMaxSuppression {
 
 		boolean usesCandidates;
 		boolean acceptsRequests;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -27,6 +27,8 @@ import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.interest.DetectorInterestPointMulti;
 import boofcv.abst.feature.detect.interest.GeneralToInterestMulti;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
@@ -47,8 +49,9 @@ public class TestWrapVisOdomQuadPnP extends CheckVisualOdometryStereoSim<GrayF32
 		GeneralFeatureIntensity intensity =
 				FactoryIntensityPoint.shiTomasi(1, false, GrayF32.class);
 		NonMaxSuppression nonmax = FactoryFeatureExtractor.nonmax(new ConfigExtract(2, 1, 0, true, false, true));
+		FeatureSelectLimit selector = new FeatureSelectNBest();
 		GeneralFeatureDetector<GrayF32,GrayF32> general =
-				new GeneralFeatureDetector<>(intensity, nonmax);
+				new GeneralFeatureDetector<>(intensity, nonmax, selector);
 		general.setMaxFeatures(600);
 		DetectorInterestPointMulti detector = new GeneralToInterestMulti(general,2,GrayF32.class,GrayF32.class);
 		DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, GrayF32.class);

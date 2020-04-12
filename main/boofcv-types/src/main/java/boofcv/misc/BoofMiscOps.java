@@ -20,6 +20,9 @@ package boofcv.misc;
 
 import boofcv.struct.ImageRectangle;
 import boofcv.struct.image.*;
+import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastAccess;
+import org.ddogleg.struct.FastQueue;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,6 +63,12 @@ public class BoofMiscOps {
 			output[i] = files.get(i).getPath();
 		}
 		return output;
+	}
+
+	public static void copyAll_2D_I16(FastAccess<Point2D_I16> src, FastQueue<Point2D_I16> dst ) {
+		for (int i = 0; i < src.size; i++) {
+			dst.grow().set(src.get(i));
+		}
 	}
 
 	public static List<File> toFileList( String[] files ) {

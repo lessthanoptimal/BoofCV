@@ -19,8 +19,9 @@
 package boofcv.alg.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.alg.feature.detect.extract.SelectNBestFeatures;
 import boofcv.alg.feature.detect.intensity.GIntegralImageFeatureIntensity;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
 import boofcv.core.image.border.FactoryImageBorderAlgs;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.border.ImageBorder_F32;
@@ -28,6 +29,7 @@ import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I16;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
@@ -86,8 +88,9 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 
 	// finds features from 2D intensity image
 	private NonMaxSuppression extractor;
-	// sorts feature by their intensity
-	private SelectNBestFeatures sortBest;
+	// If too many features have been selected this is used to resolve the ambiguity
+	private FeatureSelectLimit selectMax;
+	private FastQueue<Point2D_I16> selected = new FastQueue<>(Point2D_I16::new);
 	// the maximum number of returned feature per scale
 	private int maxFeaturesPerScale;
 
@@ -138,7 +141,7 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 		this.extractor = extractor;
 		if( maxFeaturesPerScale > 0 ) {
 			this.maxFeaturesPerScale = maxFeaturesPerScale;
-			sortBest = new SelectNBestFeatures(maxFeaturesPerScale);
+			selectMax = new FeatureSelectNBest();
 		}
 		this.initialSampleRate = initialSampleRate;
 		this.initialSize = initialSize;
@@ -249,25 +252,21 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 		int ignoreWidth = intensity[index1].width-ignoreRadius;
 		int ignoreHeight = intensity[index1].height-ignoreRadius;
 
-		// number of features which can be added
-		int numberRemaining;
 
 		// if configured to do so, only select the features with the highest intensity
-		QueueCorner features;
-		if( sortBest != null ) {
-			sortBest.process(intensity[index1],foundFeatures,true);
-			features = sortBest.getBestCorners();
-			numberRemaining = maxFeaturesPerScale;
+		FastAccess<Point2D_I16> features;
+		if( selectMax != null ) {
+			selectMax.select(intensity[index1],true,null,foundFeatures,maxFeaturesPerScale,selected);
+			features = selected;
 		} else {
 			features = foundFeatures;
-			numberRemaining = Integer.MAX_VALUE;
 		}
 
 		int levelSize = size[level];
 		int sizeStep = levelSize-size[level-1];
 
 		// see if these local maximums are also a maximum in scale-space
-		for( int i = 0; i < features.size && numberRemaining > 0; i++ ) {
+		for( int i = 0; i < features.size; i++ ) {
 			Point2D_I16 f = features.get(i);
 
 			// avoid false positives.  see above comment
@@ -292,7 +291,6 @@ public class FastHessianFeatureDetector<II extends ImageGray<II>> {
 
 				double scale =  1.2*interpS/9.0;
 				foundPoints.grow().set(interpX,interpY,scale);
-				numberRemaining--;
 			}
 		}
 	}

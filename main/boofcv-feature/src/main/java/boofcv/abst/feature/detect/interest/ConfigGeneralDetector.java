@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -19,6 +19,7 @@
 package boofcv.abst.feature.detect.interest;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
+import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 
 /**
  * Configuration for {@link boofcv.alg.feature.detect.interest.GeneralFeatureDetector}.
@@ -32,6 +33,10 @@ public class ConfigGeneralDetector extends ConfigExtract {
 	 * intense features are returned.  Set to a value &le; 0 to return all selected features.  Default is -1.
 	 */
 	public int maxFeatures = -1;
+	/**
+	 * Specifies how the features are selected if more than max have been detected
+	 */
+	public ConfigSelectLimit maxSelector = ConfigSelectLimit.selectBestN();
 
 	public ConfigGeneralDetector(int maxFeatures ,
 								 int radius, float threshold, int ignoreBorder, boolean useStrictRule,
@@ -67,5 +72,6 @@ public class ConfigGeneralDetector extends ConfigExtract {
 	public void setTo(ConfigGeneralDetector orig) {
 		super.setTo(orig);
 		this.maxFeatures = orig.maxFeatures;
+		this.maxSelector = orig.maxSelector;
 	}
 }

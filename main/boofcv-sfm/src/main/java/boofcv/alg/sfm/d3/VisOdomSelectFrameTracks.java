@@ -20,6 +20,7 @@ package boofcv.alg.sfm.d3;
 
 import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BTrack;
+import boofcv.struct.ConfigGridUniform;
 import boofcv.struct.ImageGrid;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
@@ -35,17 +36,18 @@ import java.util.Random;
  */
 public class VisOdomSelectFrameTracks {
 	private final Random rand;
-	/** The targeted maximum number of features it can detect */
+
+	/** Configuration for uniformally selecting a grid */
+	public final ConfigGridUniform configUniform = new ConfigGridUniform();
+
+	/** maximum number of features per frame that can be used */
 	public int maxFeaturesPerFrame;
-	/** Scales the size of a region up by the inverse of this number */
-	public double inverseRegionScale = 0.25;
-	/** The smallest allowed cell size */
-	public int minCellLength = 5;
+
 	/** The minimum number of observations to process */
-	public int minObservations = 3;
+	public int minTrackObservations = 3;
 
 	// grid cells. Stored in row major format
-	ImageGrid<List<BTrack>> imageGrid = new ImageGrid<>(ArrayList::new, List::clear);
+	ImageGrid<Info> grid = new ImageGrid<>(Info::new,Info::reset);
 
 	public VisOdomSelectFrameTracks( long randSeed ) {
 		rand = new Random(randSeed);
@@ -80,83 +82,64 @@ public class VisOdomSelectFrameTracks {
 	{
 		// This is the length of a side in the square grid that's to be selected
 		// designed to avoid divide by zero error and have larger cells when fewer features are requested
-		int targetLength = selectTargetLength(imageWidth, imageHeight);
+		int targetSize = configUniform.selectTargetCellSize(maxFeaturesPerFrame,imageWidth, imageHeight);
 
 		// Fill each grid cell with tracks that are inside of it
-		initializeGrid(frame, imageWidth, imageHeight, targetLength);
+		initializeGrid(frame, imageWidth, imageHeight, targetSize);
 
-		int totalInFrame = handleAlreadySelected();
-		selectNewTracks(selected, totalInFrame);
+		selectNewTracks(selected);
 	}
 
-	/**
-	 * Selects the target length of a cell
-	 */
-	private int selectTargetLength(int imageWidth, int imageHeight) {
-		int targetLength = (int)Math.ceil(Math.sqrt(imageWidth*imageHeight)/
-				(0.1+Math.sqrt(maxFeaturesPerFrame *inverseRegionScale)));
-		targetLength = Math.max(minCellLength,targetLength);
-		return targetLength;
-	}
 
 	/**
-	 * Initializes the grid data structure
+	 * Initializes the grid data structure. Counts number of already selected tracks and adds unselected
+	 * tracks to the list. A track is only considered for selection if it has the minimum number of observations.
+	 * Otherwise it's likely to be a false positive.
 	 */
 	private void initializeGrid(BFrame frame, int imageWidth, int imageHeight, int targetLength) {
-		imageGrid.initialize(targetLength,imageWidth, imageHeight);
+		grid.initialize(targetLength,imageWidth, imageHeight);
 		final FastArray<BTrack> tracks = frame.tracks;
 		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
 			BTrack t = tracks.get(trackIdx);
 			VisOdomBundleAdjustment.BObservation o = t.findObservationBy(frame);
 			if( o == null )
 				throw new RuntimeException("BUG! track in frame not observed by frame");
-			imageGrid.getCellAtPixel((int)o.pixel.x, (int)o.pixel.y).add(t);
+			Info cell = grid.getCellAtPixel((int)o.pixel.x, (int)o.pixel.y);
+			if( t.selected )
+				cell.alreadySelected++;
+			else if( t.observations.size >= minTrackObservations )
+				cell.unselected.add(t);
 		}
 	}
 
 	/**
-	 * Add all cells which have been selected previously remove them from each cell while incrementing the total
+	 * Selects new tracks such that it is uniform across the image. This takes in account the location of already
+	 * selected tracks.
 	 */
-	private int handleAlreadySelected() {
+	private void selectNewTracks(List<BTrack> selected) {
 		int total = 0;
-		// In the first pass deal with tracks that have already been selected
-		for (int i = 0; i < imageGrid.cells.size; i++) {
-			List<BTrack> cell = imageGrid.cells.data[i];
-			if( cell.isEmpty() )
-				continue;
-			// see if there are any tracks that have already been selected, add them towards the total but remove them
-			// from the list since we are forced to use them
-			for (int j = cell.size()-1; j >= 0; j-- ) {
-				BTrack bt = cell.get(j);
-				if( bt.selected ) {
-					total++;
-					cell.remove(j);
-				} else if( !bt.active || bt.observations.size < minObservations) {
-					// Remove inactive tracks since they should not be considered by bundle adjustment
-					// Tracks with too few observations are more likely to be false positives
-					cell.remove(j);
-				}
-			}
-		}
-		return total;
-	}
 
-	/**
-	 * Go through the remaining tracks which have not been previously selected and picks them in a way which
-	 * is approximately uniform across cells
-	 */
-	private void selectNewTracks(List<BTrack> selected, int total) {
 		// Go through each grid cell one at a time and add a feature if there are any remaining
 		// this will result in a more even distribution.
 		while( true ) {
 			int before = total;
-			for (int i = 0; i < imageGrid.cells.size && total < maxFeaturesPerFrame; i++) {
-				List<BTrack> cell = imageGrid.cells.data[i];
-				if( cell.isEmpty() )
+			for (int i = 0; i < grid.cells.size && total < maxFeaturesPerFrame; i++) {
+				Info cell = grid.cells.data[i];
+
+				// See if there are remaining points that have already been selected. If so count that as a selection
+				// and move on
+				if( cell.alreadySelected > 0 ) {
+					cell.alreadySelected--;
+					total++;
 					continue;
+				}
+				// nothing to select
+				if( cell.unselected.isEmpty() )
+					continue;
+
 				// Randomly select one of the available. Could probably do better but this is reasonable and "unbiased"
-				int chosen = rand.nextInt(cell.size());
-				BTrack bt = cell.remove(chosen);
+				int chosen = rand.nextInt(cell.unselected.size());
+				BTrack bt = cell.unselected.remove(chosen);
 				bt.selected = true;
 				selected.add(bt);
 				total++;
@@ -164,6 +147,22 @@ public class VisOdomSelectFrameTracks {
 			// See if exit condition has been meet
 			if( before == total || total >= maxFeaturesPerFrame)
 				break;
+		}
+	}
+
+	/**
+	 * Info for each cell
+	 */
+	private static class Info
+	{
+		// counter for tracks which were selected in a previous frame
+		public int alreadySelected = 0;
+		// list of tracks which have not been selected yet
+		public final List<BTrack> unselected = new ArrayList<>();
+
+		public void reset() {
+			alreadySelected = 0;
+			unselected.clear();
 		}
 	}
 }
