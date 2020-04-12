@@ -53,6 +53,8 @@ public class TestImageMotionPointTrackerKey {
 
 		ImageMotionPointTrackerKey<GrayU8,Se2_F32> alg =
 				new ImageMotionPointTrackerKey<>(tracker, matcher, null, model, 1000);
+		// it calls reset in the constructor. This ensures reset() and the initial state are the same
+		assertEquals(1, tracker.numReset);
 
 		// the first time it processes an image it should always return false since no motion can be estimated
 		assertFalse(alg.process(input));
@@ -78,9 +80,9 @@ public class TestImageMotionPointTrackerKey {
 		assertEquals(computed.getX(), alg.getWorldToCurr().getX(), 1e-8);
 
 		// see if reset does its job
-		assertEquals(0, tracker.numDropAll);
 		alg.reset();
-		assertEquals(1, tracker.numDropAll);
+		assertEquals(0, tracker.numDropAll);
+		assertEquals(2, tracker.numReset);
 		assertEquals(-1, alg.getFrameID() );
 		assertEquals(0, alg.getKeyToCurr().getX(), 1e-8);
 		assertEquals(0, alg.getWorldToCurr().getX(), 1e-8);
@@ -136,7 +138,7 @@ public class TestImageMotionPointTrackerKey {
 		ImageMotionPointTrackerKey<GrayU8,Se2_F32> alg = new ImageMotionPointTrackerKey<>(tracker, matcher, null, model, 5);
 
 		// create tracks such that only some of them will be dropped
-		alg.frameID = 9;
+		tracker.frameID = 9;
 		for( int i = 0; i < 10; i++ ) {
 			PointTrack t = new PointTrack();
 			AssociatedPairTrack a = new AssociatedPairTrack();
@@ -158,15 +160,17 @@ public class TestImageMotionPointTrackerKey {
 		public int numSpawn = 0;
 		public int numDropped = 0;
 		public int numDropAll = 0;
+		public int numReset = 0;
+		public long frameID = -1;
 
 		List<PointTrack> list = new ArrayList<>();
 		List<PointTrack> listSpawned = new ArrayList<>();
 
 		@Override
-		public void reset() {}
+		public void reset() {numReset++;frameID=-1;}
 
 		@Override
-		public long getFrameID() { return 0; }
+		public long getFrameID() { return frameID; }
 
 		@Override
 		public int getTotalActive() { return 0; }
@@ -175,7 +179,7 @@ public class TestImageMotionPointTrackerKey {
 		public int getTotalInactive() { return 0; }
 
 		@Override
-		public void process(GrayU8 image) {}
+		public void process(GrayU8 image) {frameID++;}
 
 		@Override
 		public void spawnTracks() {

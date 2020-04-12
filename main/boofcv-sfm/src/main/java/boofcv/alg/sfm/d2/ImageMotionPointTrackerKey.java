@@ -23,7 +23,6 @@ import boofcv.abst.tracker.PointTracker;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.InvertibleTransform;
-import lombok.Getter;
 import org.ddogleg.fitting.modelset.ModelFitter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 
@@ -42,8 +41,6 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends InvertibleTransform>
 {
-	// total number of frames processed
-	protected @Getter long frameID;
 	// feature tracker
 	protected PointTracker<I> tracker;
 	// Fits a model to the tracked features
@@ -58,8 +55,8 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 	// transform from world to current frame
 	protected IT worldToCurr;
 
-	// tracks which are not in the inlier set for this many frames in a row are pruned
-	protected int outlierPrune;
+	// Threshold that specified when tracks that have not been inliers for this many frames in a row are pruned
+	protected int thresholdOutlierPrune;
 
 	// if the current frame is a keyframe or not
 	protected boolean keyFrame;
@@ -72,18 +69,18 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 	 * @param modelMatcher Fits model to track data
 	 * @param modelRefiner (Optional) Refines the found model using the entire inlier set. Can be null.
 	 * @param model Motion model data structure
-	 * @param outlierPrune If a track is an outlier for this many frames in a row they are pruned
+	 * @param thresholdOutlierPrune If a track is an outlier for this many frames in a row they are pruned
 	 */
 	public ImageMotionPointTrackerKey(PointTracker<I> tracker,
 									  ModelMatcher<IT, AssociatedPair> modelMatcher,
 									  ModelFitter<IT, AssociatedPair> modelRefiner,
 									  IT model,
-									  int outlierPrune)
+									  int thresholdOutlierPrune)
 	{
 		this.tracker = tracker;
 		this.modelMatcher = modelMatcher;
 		this.modelRefiner = modelRefiner;
-		this.outlierPrune = outlierPrune;
+		this.thresholdOutlierPrune = thresholdOutlierPrune;
 
 		worldToKey = (IT)model.createInstance();
 		keyToCurr = (IT)model.createInstance();
@@ -98,8 +95,8 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 	 * Makes the current frame the first frame and discards its past history
 	 */
 	public void reset() {
-		frameID = -1;
-		tracker.dropAllTracks();
+		keyFrame = false;
+		tracker.reset();
 		resetTransforms();
 	}
 
@@ -110,7 +107,6 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 	 * @return true if motion was estimated and false if no motion was estimated
 	 */
 	public boolean process( I frame ) {
-		frameID++;
 		keyFrame = false;
 
 		// update the feature tracker
@@ -139,6 +135,7 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 		}
 
 		// mark that the track is in the inlier set
+		final long frameID = tracker.getFrameID();
 		for( AssociatedPair p : modelMatcher.getMatchSet() ) {
 			((AssociatedPairTrack)p).lastUsed = frameID;
 		}
@@ -153,11 +150,12 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 	}
 
 	private void pruneUnusedTracks() {
+		final long frameID = tracker.getFrameID();
 		List<PointTrack> all = tracker.getAllTracks(null);
 		for( PointTrack t : all ) {
 			AssociatedPairTrack p = t.getCookie();
 
-			if( frameID - p.lastUsed >= outlierPrune) {
+			if( frameID - p.lastUsed >= thresholdOutlierPrune) {
 				if( !tracker.dropTrack(t) )
 					throw new RuntimeException("Drop track failed. Must be a bug in the tracker");
 			}
@@ -169,6 +167,8 @@ public class ImageMotionPointTrackerKey<I extends ImageBase<I>, IT extends Inver
 	 * their current location and new tracks are spawned.  Reference frame transformations are also updated
 	 */
 	public void changeKeyFrame() {
+		final long frameID = tracker.getFrameID();
+
 		// drop all inactive tracks since their location is unknown in the current frame
 		List<PointTrack> inactive = tracker.getInactiveTracks(null);
 		for( PointTrack l : inactive ) {
