@@ -50,7 +50,7 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 		this.listener = listener;
 
 		spinnerRadius = spinner(config.scaleRadius,1.0,500.0,1.0);
-		comboType = combo(config.type.ordinal(),PointDetectorTypes.values());
+		comboType = combo(config.type.ordinal(),PointDetectorTypes.FIRST_ONLY);
 		controlExtractor = new ControlPanelExtractor(config.general,listener::handleChangePointDetector);
 		spinnerMaxFeatures = spinner(config.general.maxFeatures,-1,9999,50);
 
@@ -73,7 +73,7 @@ public class ControlPanelPointDetector extends StandardAlgConfigPanel {
 	@Override
 	public void controlChanged(final Object source) {
 		if (source == comboType) {
-			config.type = PointDetectorTypes.values()[comboType.getSelectedIndex()];
+			config.type = PointDetectorTypes.FIRST_ONLY[comboType.getSelectedIndex()];
 		} else if( source == spinnerMaxFeatures ) {
 			config.general.maxFeatures = ((Number) spinnerMaxFeatures.getValue()).intValue();
 		} else if( source == comboSelector) {

@@ -75,8 +75,10 @@ public class FactoryDetectPoint {
 			case FAST: return FactoryDetectPoint.createFast(config.general, config.fast, imageType);
 			case KIT_ROS: return FactoryDetectPoint.createKitRos(config.general,derivType);
 			case MEDIUM: return FactoryDetectPoint.createMedian(config.general,imageType);
-			case DETERMINANT: return FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.DETERMINANT, derivType);
-			case LAPLACIAN: return FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.TRACE, derivType);
+			case DETERMINANT: return FactoryDetectPoint.createHessianDirect(HessianBlobIntensity.Type.DETERMINANT,config.general,imageType);
+			case LAPLACIAN: return FactoryDetectPoint.createHessianDirect(HessianBlobIntensity.Type.TRACE, config.general, imageType);
+			case DETERMINANT_H: return FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.DETERMINANT, derivType);
+			case LAPLACIAN_H: return FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.TRACE, derivType);
 			default: throw new IllegalArgumentException("Unknown type "+config.type);
 		}
 	}
@@ -227,7 +229,7 @@ public class FactoryDetectPoint {
 	/**
 	 * Creates a Hessian based blob detector. Minimums and Maximums. Direct from input image.
 	 *
-	 * @param type            The type of Hessian based blob detector to use. DETERMINANT often works well.
+	 * @param type The type of Hessian based blob detector to use. DETERMINANT often works well.
 	 * @param configDetector Configuration for feature detector.
 	 * @see HessianBlobIntensity
 	 */
