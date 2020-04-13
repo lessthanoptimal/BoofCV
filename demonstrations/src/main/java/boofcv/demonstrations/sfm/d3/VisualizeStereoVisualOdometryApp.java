@@ -27,9 +27,7 @@ import boofcv.abst.feature.detdesc.DetectDescribeMultiFusion;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.detect.interest.DetectorInterestPointMulti;
-import boofcv.abst.feature.detect.interest.GeneralToInterestMulti;
+import boofcv.abst.feature.detect.interest.*;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
@@ -284,16 +282,20 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 		StereoDisparitySparse<I> disparity =
 				FactoryStereoDisparity.sparseRectifiedBM(configBM,imageType);
 
-		ConfigPKlt kltConfig = new ConfigPKlt();
-		kltConfig.toleranceFB = 3;
-		kltConfig.pruneClose = true;
-		kltConfig.templateRadius = 3;
-		kltConfig.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		ConfigPKlt configKlt = new ConfigPKlt();
+		configKlt.toleranceFB = 3;
+		configKlt.pruneClose = true;
+		configKlt.templateRadius = 3;
+		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+
+		ConfigPointDetector configDetKlt = new ConfigPointDetector();
+		configDetKlt.type = PointDetectorTypes.SHI_TOMASI;
+		configDetKlt.general.maxFeatures = 1000;
+		configDetKlt.general.radius = 4;
+		configDetKlt.general.threshold = 0.1f;
 
 		if( whichAlg == 0 ) {
-			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(1000,4,0.1f);
-
-			PointTracker<I> tracker = FactoryPointTracker.klt(kltConfig, configDetector,imageType,derivType);
+			PointTracker<I> tracker = FactoryPointTracker.klt(configKlt, configDetKlt,imageType,derivType);
 
 			return FactoryVisualOdometry.stereoDepth(1.5,120,2,200,50, false, disparity, tracker, imageType);
 		} else if( whichAlg == 1 ) {
@@ -313,16 +315,14 @@ public class VisualizeStereoVisualOdometryApp <I extends ImageGray<I>>
 		} else if( whichAlg == 2 ) {
 			PointTracker<I> tracker = FactoryPointTracker.
 					combined_ST_SURF_KLT(new ConfigGeneralDetector(600, 3, 0),
-							kltConfig, 50, null, null, imageType, derivType);
+							configKlt, 50, null, null, imageType, derivType);
 
 			PointTrackerTwoPass<I> twopass = new PointTrackerToTwoPass<>(tracker);
 
 			return FactoryVisualOdometry.stereoDepth(1.5,80,3,200,50, false, disparity, twopass, imageType);
 		} else if( whichAlg == 3 ) {
-			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
-
-			PointTracker<I> trackerLeft = FactoryPointTracker.klt(kltConfig, configDetector,imageType,derivType);
-			PointTracker<I> trackerRight = FactoryPointTracker.klt(kltConfig, configDetector,imageType,derivType);
+			PointTracker<I> trackerLeft = FactoryPointTracker.klt(configKlt, configDetKlt,imageType,derivType);
+			PointTracker<I> trackerRight = FactoryPointTracker.klt(configKlt, configDetKlt,imageType,derivType);
 
 			DescribeRegionPoint describe = FactoryDescribeRegionPoint.surfFast(null, imageType);
 

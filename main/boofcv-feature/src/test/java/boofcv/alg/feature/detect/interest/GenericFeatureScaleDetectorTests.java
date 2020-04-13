@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,8 +31,8 @@ public abstract class GenericFeatureScaleDetectorTests extends GenericFeatureDet
 	int r = 2;
 
 	private GeneralFeatureDetector<GrayF32, GrayF32> createBlobDetector(int maxFeatures) {
-		return FactoryDetectPoint.createHessianDeriv(HessianBlobIntensity.Type.TRACE,
-				new ConfigGeneralDetector(maxFeatures,r,0,0,true,true,true), GrayF32.class);
+		return FactoryDetectPoint.createHessianDeriv(new ConfigGeneralDetector(maxFeatures,r,0,0,true,true,true), HessianBlobIntensity.Type.TRACE,
+				GrayF32.class);
 	}
 
 	@Override

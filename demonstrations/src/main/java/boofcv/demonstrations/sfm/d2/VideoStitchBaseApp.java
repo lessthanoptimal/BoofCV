@@ -20,6 +20,8 @@ package boofcv.demonstrations.sfm.d2;
 
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d2.PlToGrayMotion2D;
@@ -139,15 +141,21 @@ public abstract class VideoStitchBaseApp<I extends ImageBase<I>, IT extends Inve
 		configFH.initialSampleStep = 2;
 		configFH.maxFeaturesPerScale = 250;
 
+
 		ImageType imageType = super.getImageType(0);
 		Class imageClass = imageType.getImageClass();
 		Class derivClass = GImageDerivativeOps.getDerivativeType(imageClass);
 
 		FeatureTrackerTypes type = FeatureTrackerTypes.values()[infoPanel.tracker];
 		switch( type ) {
-			case KLT:
-				return FactoryPointTracker.klt(config, new ConfigGeneralDetector(maxFeatures, 3, 1),
-						imageClass, derivClass);
+			case KLT: {
+				ConfigPointDetector configDetector = new ConfigPointDetector();
+				configDetector.type = PointDetectorTypes.SHI_TOMASI;
+				configDetector.general.maxFeatures = maxFeatures;
+				configDetector.general.radius = 3;
+				configDetector.general.threshold = 1;
+				return FactoryPointTracker.klt(config, configDetector, imageClass, derivClass);
+			}
 			case ST_BRIEF:
 				return FactoryPointTracker. dda_ST_BRIEF(150,
 						new ConfigGeneralDetector(400, 1, 10), imageClass, null);

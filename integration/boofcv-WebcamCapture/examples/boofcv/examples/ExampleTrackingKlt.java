@@ -18,7 +18,8 @@
 
 package boofcv.examples;
 
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
@@ -45,7 +46,11 @@ public class ExampleTrackingKlt {
 	public static void main(String[] args) {
 
 		// tune the tracker for the image size and visual appearance
-		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(-1,8,1);
+		ConfigPointDetector configDetector = new ConfigPointDetector();
+		configDetector.type = PointDetectorTypes.SHI_TOMASI;
+		configDetector.general.radius = 8;
+		configDetector.general.threshold = 1;
+
 		ConfigPKlt configKlt = new ConfigPKlt(3);
 
 		PointTracker<GrayF32> tracker = FactoryPointTracker.klt(configKlt,configDetector,GrayF32.class,null);

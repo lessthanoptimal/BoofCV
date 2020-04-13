@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -36,7 +36,7 @@ public class ConfigShiTomasi implements Configuration {
 	/**
 	 * Radius of the kernel.
 	 */
-	public int radius = 2;
+	public int radius = 1;
 
 	public ConfigShiTomasi(boolean weighted, int radius) {
 		this.weighted = weighted;

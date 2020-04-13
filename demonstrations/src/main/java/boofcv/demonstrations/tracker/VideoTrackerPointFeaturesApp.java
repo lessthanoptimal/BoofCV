@@ -122,7 +122,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 
 		final int maxFeatures = controlPanel.maxFeatures;
 
-		controlPanel.controlKlt.configDetector.maxFeatures = maxFeatures;
+		controlPanel.controlKlt.configDetect.general.maxFeatures = maxFeatures;
 		controlPanel.controlsGeneric.detector.maxFeatures = maxFeatures;
 
 
@@ -134,7 +134,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 		switch( which ) {
 			case 0: tracker = FactoryPointTracker.klt(
 					controlPanel.controlKlt.configKlt,
-					controlPanel.controlKlt.configDetector,
+					controlPanel.controlKlt.configDetect,
 					imageType,null); break;
 
 			case 1: tracker = FactoryPointTracker.dda_ST_BRIEF(

@@ -19,7 +19,8 @@
 package boofcv.abst.tracker;
 
 import boofcv.abst.distort.FDistort;
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.tracker.PointTrackerKltPyramid.PointTrackMod;
 import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.tracker.klt.*;
@@ -189,8 +190,13 @@ class TestPointTrackerKltPyramid extends GenericChecksPointTracker<GrayF32> {
 	}
 
 	private PointTrackerKltPyramid<GrayF32,GrayF32> createKLT(ConfigPKlt config) {
-		return FactoryPointTracker.klt(config, new ConfigGeneralDetector(200, 3, 1000, 0, true),
-				GrayF32.class, GrayF32.class);
+		ConfigPointDetector configDetector = new ConfigPointDetector();
+		configDetector.type = PointDetectorTypes.SHI_TOMASI;
+		configDetector.general.maxFeatures = 200;
+		configDetector.general.radius = 3;
+		configDetector.general.threshold = 1000;
+
+		return FactoryPointTracker.klt(config, configDetector, GrayF32.class, GrayF32.class);
 	}
 
 	/**

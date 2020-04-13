@@ -256,11 +256,11 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 			switch (controlPanel.selected) {
 				case "Laplacian":
 					config.detectMinimums = true;
-					detector = FactoryDetectPoint.createHessianDeriv(HessianBlobIntensity.Type.TRACE,config,derivType);
+					detector = FactoryDetectPoint.createHessianDeriv(config, HessianBlobIntensity.Type.TRACE, derivType);
 					break;
 				case "Hessian Det":
 					config.detectMinimums = true;
-					detector = FactoryDetectPoint.createHessianDeriv(HessianBlobIntensity.Type.DETERMINANT,config,derivType);
+					detector = FactoryDetectPoint.createHessianDeriv(config, HessianBlobIntensity.Type.DETERMINANT, derivType);
 					break;
 
 				case "Harris":

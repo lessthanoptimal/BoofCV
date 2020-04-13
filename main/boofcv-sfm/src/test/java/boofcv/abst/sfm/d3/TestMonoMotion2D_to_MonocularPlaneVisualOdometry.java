@@ -18,7 +18,8 @@
 
 package boofcv.abst.sfm.d3;
 
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.sfm.FactoryVisualOdometry;
@@ -44,7 +45,11 @@ public class TestMonoMotion2D_to_MonocularPlaneVisualOdometry extends CheckVisua
 		ConfigPKlt config = new ConfigPKlt();
 		config.pyramidLevels =  ConfigDiscreteLevels.levels(4);
 		config.templateRadius = 3;
-		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
+		ConfigPointDetector configDetector = new ConfigPointDetector();
+		configDetector.type = PointDetectorTypes.SHI_TOMASI;
+		configDetector.general.maxFeatures = 600;
+		configDetector.general.radius = 3;
+		configDetector.general.threshold = 1;
 
 		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(config, configDetector,
 				GrayU8.class, GrayS16.class);

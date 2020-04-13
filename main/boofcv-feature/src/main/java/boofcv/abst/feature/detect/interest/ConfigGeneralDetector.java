@@ -34,9 +34,9 @@ public class ConfigGeneralDetector extends ConfigExtract {
 	 */
 	public int maxFeatures = -1;
 	/**
-	 * Specifies how the features are selected if more than max have been detected
+	 * Specifies how the features are selected if more than {@link #maxFeatures} have been detected
 	 */
-	public ConfigSelectLimit maxSelector = ConfigSelectLimit.selectBestN();
+	public ConfigSelectLimit selector = ConfigSelectLimit.selectBestN();
 
 	public ConfigGeneralDetector(int maxFeatures ,
 								 int radius, float threshold, int ignoreBorder, boolean useStrictRule,
@@ -72,6 +72,6 @@ public class ConfigGeneralDetector extends ConfigExtract {
 	public void setTo(ConfigGeneralDetector orig) {
 		super.setTo(orig);
 		this.maxFeatures = orig.maxFeatures;
-		this.maxSelector = orig.maxSelector;
+		this.selector = orig.selector;
 	}
 }

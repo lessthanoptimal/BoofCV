@@ -24,9 +24,9 @@ import boofcv.abst.feature.describe.*;
 import boofcv.abst.feature.detdesc.ConfigCompleteSift;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
@@ -68,6 +68,7 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel  {
 	protected JComboBox<String> comboAssociate;
 
 	// Configurations. Modify these before calling initializeControlsGUI
+	public ConfigPointDetector configPointDetector = new ConfigPointDetector();
 	public ConfigFastHessian configFastHessian = new ConfigFastHessian();
 	public ConfigSiftDetector configSiftDetector = new ConfigSiftDetector();
 	public ConfigSiftScaleSpace configSiftScaleSpace = new ConfigSiftScaleSpace();
@@ -98,7 +99,7 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel  {
 
 		controlDetectSift = new ControlPanelSiftDetector(configSiftScaleSpace,configSiftDetector,this::handleControlsUpdated);
 		controlDetectFastHessian = new ControlPanelFastHessian(configFastHessian,this::handleControlsUpdated);
-		controlDetectPoint = new ControlPanelPointDetector(-1, PointDetectorTypes.SHI_TOMASI,this::handleControlsUpdated);
+		controlDetectPoint = new ControlPanelPointDetector(configPointDetector,this::handleControlsUpdated);
 		controlDescSurfFast = new ControlPanelSurfDescribe.Speed(configSurfFast,this::handleControlsUpdated);
 		controlDescSurfStable = new ControlPanelSurfDescribe.Stability(configSurfStability,this::handleControlsUpdated);
 		controlDescSift = new ControlPanelDescribeSift(configSiftDescribe,this::handleControlsUpdated);
@@ -205,7 +206,7 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel  {
 					controlDetectSift.configSS,controlDetectSift.configDetector,imageType);
 			case 2: {
 				GeneralFeatureDetector<T, D> alg = controlDetectPoint.create(imageType);
-				return FactoryInterestPoint.wrapPoint(alg, controlDetectPoint.pointDetectRadius, imageType, alg.getDerivType());
+				return FactoryInterestPoint.wrapPoint(alg, configPointDetector.scaleRadius, imageType, alg.getDerivType());
 			}
 			default:
 				throw new IllegalArgumentException("Unknown detector");

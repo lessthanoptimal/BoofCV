@@ -18,11 +18,11 @@
 
 package boofcv.gui.feature;
 
-import boofcv.abst.feature.detect.interest.*;
-import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
+import boofcv.factory.feature.detect.selector.SelectLimitTypes;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageGray;
 
@@ -34,71 +34,52 @@ import javax.swing.*;
  * @author Peter Abeles
  */
 public class ControlPanelPointDetector extends StandardAlgConfigPanel {
-	// TODO make configurable and move into a Config class
-	public double pointDetectRadius = 10.0;
-
-	public final ConfigGeneralDetector configGeneral = new ConfigGeneralDetector();
-	public final ConfigHarrisCorner configHarris = new ConfigHarrisCorner();
-	public final ConfigShiTomasi configShiTomasi = new ConfigShiTomasi();
-	public final ConfigFastCorner configFast = new ConfigFastCorner();
-	public PointDetectorTypes type;
+	public ConfigPointDetector config;
 
 	private final JComboBox<String> comboType;
-	private final JSpinner spinnerRadius = spinner(pointDetectRadius,1.0,500.0,1.0);
+	private final JSpinner spinnerRadius;
 	private final ControlPanelExtractor controlExtractor;
 	private final JSpinner spinnerMaxFeatures;
+	private final JComboBox<String> comboSelector;
 
 	Listener listener;
 
-	public ControlPanelPointDetector( int maxFeatures , PointDetectorTypes type , Listener listener )
+	public ControlPanelPointDetector( ConfigPointDetector config , Listener listener )
 	{
-		this.configGeneral.maxFeatures = maxFeatures;
-		this.type = type;
+		this.config = config;
 		this.listener = listener;
 
-		comboType = combo(type.ordinal(),PointDetectorTypes.values());
-		controlExtractor = new ControlPanelExtractor(configGeneral,listener::handleChangePointDetector);
-		spinnerMaxFeatures = spinner(configGeneral.maxFeatures,-1,9999,50);
+		spinnerRadius = spinner(config.scaleRadius,1.0,500.0,1.0);
+		comboType = combo(config.type.ordinal(),PointDetectorTypes.values());
+		controlExtractor = new ControlPanelExtractor(config.general,listener::handleChangePointDetector);
+		spinnerMaxFeatures = spinner(config.general.maxFeatures,-1,9999,50);
 
 		controlExtractor.setBorder(BorderFactory.createEmptyBorder());
+		comboSelector = combo(config.general.selector.type.ordinal(), SelectLimitTypes.values());
 
 		addLabeled(comboType,"Type","Type of corner or blob detector");
+		addLabeled(spinnerRadius,"Scale/Radius","Specified size given to scale invariant descriptors");
 		add(controlExtractor);
 		addLabeled(spinnerMaxFeatures,"Max Features","Maximum features it will detect. <= 0 for no limit");
-		addLabeled(spinnerRadius,"Scale/Radius","Specified size given to scale invariant descriptors");
+		addLabeled(comboSelector,  "Select",
+				"Method used to select points when more have been detected than the maximum allowed");
 	}
 
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
 	GeneralFeatureDetector<T,D> create( Class<T> imageType ) {
-		Class<D> derivType = GImageDerivativeOps.getDerivativeType(imageType);
-
-		configGeneral.detectMaximums = true;
-		configGeneral.detectMinimums = false;
-		switch( type ) {
-			case FAST:
-			case LAPLACIAN: configGeneral.detectMinimums = true; break;
-		}
-
-		switch( type ) {
-			case HARRIS: return FactoryDetectPoint.createHarris(configGeneral,configHarris,derivType);
-			case SHI_TOMASI: return FactoryDetectPoint.createShiTomasi(configGeneral,configShiTomasi,derivType);
-			case FAST: return FactoryDetectPoint.createFast(configGeneral, configFast, imageType);
-			case KIT_ROS: return FactoryDetectPoint.createKitRos(configGeneral,derivType);
-			case MEDIUM: return FactoryDetectPoint.createMedian(configGeneral,imageType);
-			case DETERMINANT: return FactoryDetectPoint.createHessianDeriv(HessianBlobIntensity.Type.DETERMINANT,configGeneral,derivType);
-			case LAPLACIAN: return FactoryDetectPoint.createHessianDeriv(HessianBlobIntensity.Type.TRACE,configGeneral,derivType);
-			default: throw new IllegalArgumentException("Unknown type "+type);
-		}
+		return FactoryDetectPoint.create(config,imageType,null);
 	}
 
 	@Override
 	public void controlChanged(final Object source) {
 		if (source == comboType) {
-			type = PointDetectorTypes.values()[comboType.getSelectedIndex()];
+			config.type = PointDetectorTypes.values()[comboType.getSelectedIndex()];
 		} else if( source == spinnerMaxFeatures ) {
-			configGeneral.maxFeatures = ((Number) spinnerMaxFeatures.getValue()).intValue();
+			config.general.maxFeatures = ((Number) spinnerMaxFeatures.getValue()).intValue();
+		} else if( source == comboSelector) {
+			config.general.selector.type = SelectLimitTypes.values()[comboSelector.getSelectedIndex()];
 		} else if( source == spinnerRadius ) {
-			pointDetectRadius = ((Number) spinnerRadius.getValue()).doubleValue();
+			config.scaleRadius = ((Number) spinnerRadius.getValue()).doubleValue();
 		} else {
 			throw new RuntimeException("Unknown source");
 		}

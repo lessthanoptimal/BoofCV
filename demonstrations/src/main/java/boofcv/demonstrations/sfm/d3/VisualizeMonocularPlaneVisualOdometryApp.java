@@ -18,7 +18,8 @@
 
 package boofcv.demonstrations.sfm.d3;
 
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.MonocularPlaneVisualOdometry;
 import boofcv.abst.tracker.PointTracker;
@@ -292,21 +293,30 @@ public class VisualizeMonocularPlaneVisualOdometryApp<I extends ImageGray<I>>
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageClass);
 
 		if( whichAlg == 0 ) {
-			ConfigPKlt config = new ConfigPKlt();
-			config.pyramidLevels = ConfigDiscreteLevels.levels(4);
-			config.templateRadius = 3;
-			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
+			ConfigPKlt configKlt = new ConfigPKlt();
+			configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+			configKlt.templateRadius = 3;
 
-			PointTracker<I> tracker = FactoryPointTracker.klt(config, configDetector,imageClass,derivType);
+			ConfigPointDetector configDetector = new ConfigPointDetector();
+			configDetector.type = PointDetectorTypes.SHI_TOMASI;
+			configDetector.general.maxFeatures = 600;
+			configDetector.general.radius = 3;
+			configDetector.general.threshold = 1;
+
+			PointTracker<I> tracker = FactoryPointTracker.klt(configKlt, configDetector,imageClass,derivType);
 
 			return FactoryVisualOdometry.monoPlaneInfinity(75,2,1.5,200, tracker, imageType);
 		} else if( whichAlg == 1 ) {
-			ConfigPKlt config = new ConfigPKlt();
-			config.pyramidLevels = ConfigDiscreteLevels.levels(4);
-			config.templateRadius = 3;
-			ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
+			ConfigPKlt configKlt = new ConfigPKlt();
+			configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+			configKlt.templateRadius = 3;
+			ConfigPointDetector configDetector = new ConfigPointDetector();
+			configDetector.type = PointDetectorTypes.SHI_TOMASI;
+			configDetector.general.maxFeatures = 600;
+			configDetector.general.radius = 3;
+			configDetector.general.threshold = 1;
 
-			PointTracker<I> tracker = FactoryPointTracker.klt(config, configDetector,imageClass,derivType);
+			PointTracker<I> tracker = FactoryPointTracker.klt(configKlt, configDetector,imageClass,derivType);
 
 			double cellSize = 0.06;
 			double inlierGroundTol = 1.5;

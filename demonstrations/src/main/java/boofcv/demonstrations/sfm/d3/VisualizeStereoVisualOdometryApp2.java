@@ -18,7 +18,8 @@
 
 package boofcv.demonstrations.sfm.d3;
 
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
@@ -183,16 +184,17 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		var config = new ConfigPKlt();
 		config.toleranceFB = 3;
 		config.pruneClose = true;
-		config.templateRadius = 3;
+		config.templateRadius = 4;
 		config.pyramidLevels = ConfigDiscreteLevels.levels(4);
 		return config;
 	}
 
-	private static ConfigGeneralDetector createConfigKltDetect() {
-		var config = new ConfigGeneralDetector();
-		config.maxFeatures = -1;
-		config.radius = 4;
-		config.threshold = 0.1f;
+	private static ConfigPointDetector createConfigKltDetect() {
+		var config = new ConfigPointDetector();
+		config.type = PointDetectorTypes.SHI_TOMASI;
+		config.general.threshold = -1;
+		config.general.radius = 4;
+		config.general.threshold = 100.0f;
 		return config;
 	}
 

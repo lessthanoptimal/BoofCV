@@ -19,7 +19,8 @@
 package boofcv.examples.tracking;
 
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
@@ -131,12 +132,18 @@ public class ExamplePointFeatureTracker< T extends ImageGray<T>, D extends Image
 	 * A simple way to create a Kanade-Lucas-Tomasi (KLT) tracker.
 	 */
 	public void createKLT() {
-		ConfigPKlt config = new ConfigPKlt();
-		config.templateRadius = 3;
-		config.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		ConfigPKlt configKlt = new ConfigPKlt();
+		configKlt.templateRadius = 3;
+		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 
-		tracker = FactoryPointTracker.klt(config, new ConfigGeneralDetector(600, 6, 1),
-				imageType, derivType);
+		ConfigPointDetector configDetector = new ConfigPointDetector();
+		configDetector.type = PointDetectorTypes.SHI_TOMASI;
+		configDetector.general.maxFeatures = 600;
+		configDetector.general.radius = 6;
+		configDetector.general.threshold = 1;
+
+
+		tracker = FactoryPointTracker.klt(configKlt, configDetector, imageType, derivType);
 	}
 
 	/**

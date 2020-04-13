@@ -18,7 +18,8 @@
 
 package boofcv.examples.sfm;
 
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.MonocularPlaneVisualOdometry;
 import boofcv.abst.sfm.d3.VisualOdometry;
@@ -65,7 +66,11 @@ public class ExampleVisualOdometryMonocularPlane {
 		ConfigPKlt configKlt = new ConfigPKlt();
 		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 		configKlt.templateRadius = 3;
-		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);
+		ConfigPointDetector configDetector = new ConfigPointDetector();
+		configDetector.type = PointDetectorTypes.SHI_TOMASI;
+		configDetector.general.maxFeatures = 600;
+		configDetector.general.radius = 3;
+		configDetector.general.threshold = 1;
 
 		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(configKlt, configDetector, GrayU8.class, null);
 

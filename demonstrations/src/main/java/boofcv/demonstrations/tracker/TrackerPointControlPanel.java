@@ -19,6 +19,8 @@
 package boofcv.demonstrations.tracker;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.demonstrations.sfm.d3.ControlPanelPointTrackerKlt;
 import boofcv.gui.StandardAlgConfigPanel;
@@ -86,7 +88,7 @@ public class TrackerPointControlPanel
 		this.listener = listener;
 
 		controlKlt = new ControlPanelPointTrackerKlt(listener::handleAlgorithmUpdated,
-				new ConfigGeneralDetector(maxFeatures,5,3.0f),createKltConfig());
+				createKltDetectConfig(maxFeatures),createKltConfig());
 
 		textArea.setEditable(false);
 		textArea.setWrapStyleWord(true);
@@ -239,6 +241,15 @@ public class TrackerPointControlPanel
 		klt.toleranceFB = 4;
 		klt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 		return klt;
+	}
+
+	static ConfigPointDetector createKltDetectConfig( int maxFeatures ) {
+		ConfigPointDetector config = new ConfigPointDetector();
+		config.type = PointDetectorTypes.SHI_TOMASI;
+		config.general.maxFeatures = maxFeatures;
+		config.general.radius = 5;
+		config.general.threshold = 3.0f;
+		return config;
 	}
 
 //	class ControlsKLT extends StandardAlgConfigPanel implements ChangeListener, ActionListener {

@@ -19,7 +19,8 @@
 package boofcv.abst.sfm.d3;
 
 import boofcv.abst.feature.describe.DescribeRegionPoint;
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
@@ -39,7 +40,11 @@ public class TestWrapVisOdomDualTrackPnP extends CheckVisualOdometryStereoSim<Gr
 
 	@Override
 	public StereoVisualOdometry<GrayF32> createAlgorithm() {
-		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,2,1);
+		ConfigPointDetector configDetector = new ConfigPointDetector();
+		configDetector.type = PointDetectorTypes.SHI_TOMASI;
+		configDetector.general.maxFeatures = 600;
+		configDetector.general.radius = 3;
+		configDetector.general.threshold = 1;
 
 		ConfigPKlt kltConfig = new ConfigPKlt();
 		kltConfig.templateRadius = 3;

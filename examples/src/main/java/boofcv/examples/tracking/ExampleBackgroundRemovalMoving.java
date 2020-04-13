@@ -18,7 +18,8 @@
 
 package boofcv.examples.tracking;
 
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.background.BackgroundModelMoving;
@@ -69,14 +70,14 @@ public class ExampleBackgroundRemovalMoving {
 //		ImageType imageType = ImageType.il(3, InterleavedU8.class);
 
 		// Configure the feature detector
-		ConfigGeneralDetector confDetector = new ConfigGeneralDetector();
-		confDetector.threshold = 10;
-		confDetector.maxFeatures = 300;
-		confDetector.radius = 6;
+		ConfigPointDetector configDetector = new ConfigPointDetector();
+		configDetector.type = PointDetectorTypes.SHI_TOMASI;
+		configDetector.general.maxFeatures = 300;
+		configDetector.general.radius = 6;
+		configDetector.general.threshold = 10;
 
 		// Use a KLT tracker
-		PointTracker tracker = FactoryPointTracker.klt(4, confDetector, 3,
-				GrayF32.class, null);
+		PointTracker tracker = FactoryPointTracker.klt(4, configDetector, 3, GrayF32.class, null);
 
 		// This estimates the 2D image motion
 		ImageMotion2D<GrayF32,Homography2D_F64> motion2D =

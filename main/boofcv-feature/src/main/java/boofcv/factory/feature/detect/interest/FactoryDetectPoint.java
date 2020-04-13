@@ -27,6 +27,7 @@ import boofcv.alg.feature.detect.intensity.GradientCornerIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
@@ -42,7 +43,7 @@ import javax.annotation.Nullable;
  * Creates instances of {@link GeneralFeatureDetector}, which detects the location of
  * point features inside an image.
  * </p>
- * <p/>
+ *
  * <p>
  * NOTE: Sometimes the image border is ignored and some times it is not.  If feature intensities are not
  * computed along the image border then it will be full of zeros.  In that case the ignore border region
@@ -52,6 +53,33 @@ import javax.annotation.Nullable;
  * @author Peter Abeles
  */
 public class FactoryDetectPoint {
+
+	/**
+	 * Creates a point detector from the generic configuration
+	 */
+	public static <T extends ImageGray<T>, D extends ImageGray<D>>
+	GeneralFeatureDetector<T, D> create( ConfigPointDetector config, @Nullable Class<T> imageType, @Nullable Class<D> derivType) {
+		if( derivType == null )
+			derivType = GImageDerivativeOps.getDerivativeType(imageType);
+
+		config.general.detectMaximums = true;
+		config.general.detectMinimums = false;
+		switch( config.type ) {
+			case FAST:
+			case LAPLACIAN: config.general.detectMinimums = true; break;
+		}
+
+		switch( config.type ) {
+			case HARRIS: return FactoryDetectPoint.createHarris(config.general,config.harris,derivType);
+			case SHI_TOMASI: return FactoryDetectPoint.createShiTomasi(config.general,config.shiTomasi,derivType);
+			case FAST: return FactoryDetectPoint.createFast(config.general, config.fast, imageType);
+			case KIT_ROS: return FactoryDetectPoint.createKitRos(config.general,derivType);
+			case MEDIUM: return FactoryDetectPoint.createMedian(config.general,imageType);
+			case DETERMINANT: return FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.DETERMINANT, derivType);
+			case LAPLACIAN: return FactoryDetectPoint.createHessianDeriv(config.general, HessianBlobIntensity.Type.TRACE, derivType);
+			default: throw new IllegalArgumentException("Unknown type "+config.type);
+		}
+	}
 
 	/**
 	 * Detects Harris corners.
@@ -181,14 +209,14 @@ public class FactoryDetectPoint {
 	/**
 	 * Creates a Hessian based blob detector. Minimums and Maximums. Uses gradient images.
 	 *
-	 * @param type            The type of Hessian based blob detector to use. DETERMINANT often works well.
 	 * @param configDetector Configuration for feature detector.
+	 * @param type            The type of Hessian based blob detector to use. DETERMINANT often works well.
 	 * @param derivType       Type of derivative image.
 	 * @see HessianBlobIntensity
 	 */
 	public static <T extends ImageGray<T>, D extends ImageGray<D>>
-	GeneralFeatureDetector<T, D> createHessianDeriv(HessianBlobIntensity.Type type,
-													@Nullable ConfigGeneralDetector configDetector, Class<D> derivType) {
+	GeneralFeatureDetector<T, D> createHessianDeriv(@Nullable ConfigGeneralDetector configDetector, HessianBlobIntensity.Type type,
+													Class<D> derivType) {
 		if( configDetector == null)
 			configDetector = new ConfigGeneralDetector();
 
@@ -246,7 +274,7 @@ public class FactoryDetectPoint {
 		if( !intensity.localMinimums() )
 			config.detectMinimums = false;
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(config);
-		FeatureSelectLimit selector = FactoryMaxSelector.create(config.maxSelector);
+		FeatureSelectLimit selector = FactoryMaxSelector.create(config.selector);
 		GeneralFeatureDetector<T, D> det = new GeneralFeatureDetector<>(intensity, extractor, selector);
 		det.setMaxFeatures(config.maxFeatures);
 

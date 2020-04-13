@@ -18,7 +18,8 @@
 
 package boofcv.examples.geometry;
 
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d2.PlToGrayMotion2D;
 import boofcv.abst.tracker.PointTracker;
@@ -55,14 +56,14 @@ public class ExampleVideoMosaic {
 	public static void main( String args[] ) {
 
 		// Configure the feature detector
-		ConfigGeneralDetector confDetector = new ConfigGeneralDetector();
-		confDetector.threshold = 1;
-		confDetector.maxFeatures = 300;
-		confDetector.radius = 3;
+		ConfigPointDetector configDetector = new ConfigPointDetector();
+		configDetector.type = PointDetectorTypes.SHI_TOMASI;
+		configDetector.general.maxFeatures = 300;
+		configDetector.general.radius = 3;
+		configDetector.general.threshold = 1;
 
 		// Use a KLT tracker
-		PointTracker<GrayF32> tracker = FactoryPointTracker.klt(4,confDetector,3,
-				GrayF32.class,GrayF32.class);
+		PointTracker<GrayF32> tracker = FactoryPointTracker.klt(4,configDetector,3,GrayF32.class,GrayF32.class);
 
 		// This estimates the 2D image motion
 		// An Affine2D_F64 model also works quite well.

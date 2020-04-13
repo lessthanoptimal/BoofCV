@@ -98,10 +98,10 @@ public class DetectPointsWithNoiseApp<T extends ImageGray<T>, D extends ImageGra
 		addAlgorithm(0, "KitRos", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		alg = FactoryDetectPoint.createMedian(configExtract, imageType);
 		addAlgorithm(0, "Median", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
-		alg = FactoryDetectPoint.createHessianDeriv(HessianBlobIntensity.Type.DETERMINANT, configExtract, derivType);
+		alg = FactoryDetectPoint.createHessianDeriv(configExtract, HessianBlobIntensity.Type.DETERMINANT, derivType);
 		addAlgorithm(0, "Hessian", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 		configExtract.detectMinimums = true;
-		alg = FactoryDetectPoint.createHessianDeriv(HessianBlobIntensity.Type.TRACE, configExtract, derivType);
+		alg = FactoryDetectPoint.createHessianDeriv(configExtract, HessianBlobIntensity.Type.TRACE, derivType);
 		addAlgorithm(0, "Laplace", new EasyGeneralFeatureDetector<>(alg, imageType, derivType));
 
 		JPanel viewArea = new JPanel(new BorderLayout());

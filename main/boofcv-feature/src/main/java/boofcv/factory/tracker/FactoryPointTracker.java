@@ -25,10 +25,7 @@ import boofcv.abst.feature.describe.WrapDescribeBrief;
 import boofcv.abst.feature.describe.WrapDescribePixelRegionNCC;
 import boofcv.abst.feature.detdesc.DetectDescribeFusion;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.feature.detect.interest.ConfigFastCorner;
-import boofcv.abst.feature.detect.interest.ConfigFastHessian;
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.detect.interest.*;
 import boofcv.abst.feature.orientation.ConfigAverageIntegral;
 import boofcv.abst.feature.orientation.ConfigSlidingIntegral;
 import boofcv.abst.feature.orientation.OrientationImage;
@@ -92,20 +89,20 @@ public class FactoryPointTracker {
 	 * @see boofcv.alg.tracker.klt.PyramidKltTracker
 	 *
 	 * @param numLevels     Number of levels in the image pyramid
-	 * @param configExtract Configuration for extracting features
+	 * @param configDetect Configuration for detecting point features
 	 * @param featureRadius Size of the tracked feature.  Try 3 or 5
 	 * @param imageType     Input image type.
 	 * @param derivType     Image derivative  type.
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	PointTracker<I> klt(int numLevels, ConfigGeneralDetector configExtract, int featureRadius,
+	PointTracker<I> klt(int numLevels, @Nullable ConfigPointDetector configDetect, int featureRadius,
 							 Class<I> imageType, Class<D> derivType) {
 		ConfigPKlt config = new ConfigPKlt();
 		config.pyramidLevels = ConfigDiscreteLevels.levels(numLevels);
 		config.templateRadius = featureRadius;
 
-		return klt(config, configExtract, imageType, derivType );
+		return klt(config, configDetect, imageType, derivType );
 	}
 
 	/**
@@ -114,11 +111,11 @@ public class FactoryPointTracker {
 	 * @see boofcv.alg.tracker.klt.PyramidKltTracker
 	 *
 	 * @param config Config for the tracker. Try PkltConfig.createDefault().
-	 * @param configExtract Configuration for extracting features
+	 * @param configDetect Configuration for detecting point features
 	 * @return KLT based tracker.
 	 */
 	public static <I extends ImageGray<I>, D extends ImageGray<D>>
-	PointTrackerKltPyramid<I,D> klt(ConfigPKlt config, ConfigGeneralDetector configExtract,
+	PointTrackerKltPyramid<I,D> klt(@Nullable ConfigPKlt config, @Nullable ConfigPointDetector configDetect,
 									Class<I> imageType, @Nullable Class<D> derivType ) {
 
 		if( derivType == null )
@@ -129,15 +126,16 @@ public class FactoryPointTracker {
 		}
 		config.checkValidity();
 
-		if( configExtract == null ) {
-			configExtract = new ConfigGeneralDetector();
+		if( configDetect == null ) {
+			configDetect = new ConfigPointDetector();
+			configDetect.type = PointDetectorTypes.SHI_TOMASI;
 		}
-		configExtract.checkValidity();
+		configDetect.checkValidity();
 
-		GeneralFeatureDetector<I, D> detector = createShiTomasi(configExtract, derivType);
+		GeneralFeatureDetector<I, D> detector = FactoryDetectPoint.create(configDetect,imageType,derivType);
 
-		InterpolateRectangle<I> interpInput = FactoryInterpolation.<I>bilinearRectangle(imageType);
-		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.<D>bilinearRectangle(derivType);
+		InterpolateRectangle<I> interpInput = FactoryInterpolation.bilinearRectangle(imageType);
+		InterpolateRectangle<D> interpDeriv = FactoryInterpolation.bilinearRectangle(derivType);
 
 		ImageGradient<I,D> gradient = FactoryDerivative.sobel(imageType, derivType);
 
