@@ -45,6 +45,9 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssoc {
 
 		configFastHessian.maxFeaturesPerScale = 400;
 		configAssocGreedy.scoreRatioThreshold = 0.75;
+		configPointDetector.general.threshold = 100;
+		configPointDetector.general.radius = 4;
+		configPointDetector.shiTomasi.radius = 4;
 
 		initializeControlsGUI();
 

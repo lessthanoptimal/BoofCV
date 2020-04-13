@@ -59,6 +59,9 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssoc {
 		configKlt.templateRadius = 3;
 		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
 		configAssocGreedy.scoreRatioThreshold = 0.75;
+		configPointDetector.general.threshold = 100;
+		configPointDetector.general.radius = 4;
+		configPointDetector.shiTomasi.radius = 4;
 
 		selectedDetector = 2; // point
 		selectedDescriptor = 4; // template
