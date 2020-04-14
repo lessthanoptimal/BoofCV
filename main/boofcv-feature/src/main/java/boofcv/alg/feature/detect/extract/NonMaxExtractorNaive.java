@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -120,7 +120,7 @@ public class NonMaxExtractorNaive {
 
 				// add points which are local maximums and are not already contained in the corners list
 				if (max && val != Float.MAX_VALUE) {
-					corners.add(x, y);
+					corners.append(x, y);
 				}
 			}
 		}
@@ -165,7 +165,7 @@ public class NonMaxExtractorNaive {
 
 				// add points which are local maximums and are not already contained in the corners list
 				if (max && val != Float.MAX_VALUE) {
-					corners.add(x, y);
+					corners.append(x, y);
 				}
 			}
 		}

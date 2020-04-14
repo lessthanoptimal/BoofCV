@@ -16,32 +16,22 @@
  * limitations under the License.
  */
 
-package boofcv.struct;
+package boofcv.struct.sparse;
 
-import georegression.struct.point.Point2D_I32;
-import lombok.Getter;
-import lombok.Setter;
+import org.ejml.UtilEjml;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Combination of a point and an index in an array
- *
  * @author Peter Abeles
  */
-public class PointIndex_I32 extends Point2D_I32 {
-	/**
-	 * Index of point in an array/list
-	 */
-	@Getter	@Setter	public int index;
-
-	public PointIndex_I32() {
-	}
-
-	public PointIndex_I32(int x, int y, int index) {
-		super(x, y);
-		this.index = index;
-	}
-
-	public PointIndex_I32 copy() {
-		return new PointIndex_I32(x,y,index);
+class TestGradientValue_F64 {
+	@Test
+	void set_get() {
+		var alg = new GradientValue_F64();
+		alg.set(2.3,4.5);
+		assertEquals(2.3, alg.getX(), UtilEjml.TEST_F64);
+		assertEquals(4.5, alg.getY(), UtilEjml.TEST_F64);
 	}
 }

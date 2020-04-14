@@ -102,9 +102,9 @@ public class NonMaxBlock_MT extends NonMaxBlock {
 			SearchData data = searches.get(i);
 
 			if( localMin != null )
-				localMin.copyAll(data.cornersMin);
+				localMin.appendAll(data.cornersMin);
 			if( localMax != null )
-				localMax.copyAll(data.cornersMax);
+				localMax.appendAll(data.cornersMax);
 		}
 	}
 

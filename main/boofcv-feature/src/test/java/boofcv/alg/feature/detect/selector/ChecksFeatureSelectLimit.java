@@ -117,7 +117,7 @@ public abstract class ChecksFeatureSelectLimit {
 	protected QueueCorner createRandom(int i2) {
 		QueueCorner detected = new QueueCorner(i2);
 		for (int i = 0; i < i2; i++) {
-			detected.add(rand.nextInt(width), rand.nextInt(height));
+			detected.append(rand.nextInt(width), rand.nextInt(height));
 		}
 		return detected;
 	}

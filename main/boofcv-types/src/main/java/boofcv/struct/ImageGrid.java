@@ -62,6 +62,9 @@ public class ImageGrid<T> {
 		cells.resize(rows*cols);
 	}
 
+	/**
+	 * Returns the cell at the specified pixel. Coordinate must be inside image bounds
+	 */
 	public T getCellAtPixel( int pixelX , int pixelY )
 	{
 		int row = pixelY/lengthY;
@@ -73,6 +76,9 @@ public class ImageGrid<T> {
 		return cells.data[ row*cols + col ];
 	}
 
+	/**
+	 * Returns the cell element at the specified grid coordinate
+	 */
 	public T get( int row , int col )
 	{
 		return cells.data[ row*cols + col ];

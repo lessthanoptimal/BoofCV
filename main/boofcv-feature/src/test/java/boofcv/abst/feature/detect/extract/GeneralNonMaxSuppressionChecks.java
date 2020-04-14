@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -265,9 +265,9 @@ public abstract class GeneralNonMaxSuppressionChecks {
 		for( int i = 0; i < image.height; i++ )
 			for( int j = 0; j < image.width; j++ ) {
 				if( candidatesMin != null )
-					candidatesMin.add(j,i);
+					candidatesMin.append(j,i);
 				if( candidatesMax != null )
-					candidatesMax.add(j,i);
+					candidatesMax.append(j,i);
 			}
 
 		// the original input image
@@ -318,9 +318,9 @@ public abstract class GeneralNonMaxSuppressionChecks {
 		image.set(x,y,intensity);
 		if( alg.getUsesCandidates() ) {
 			if( isMax )
-				candidatesMax.add(x,y);
+				candidatesMax.append(x,y);
 			else
-				candidatesMin.add(x,y);
+				candidatesMin.append(x,y);
 		}
 	}
 }

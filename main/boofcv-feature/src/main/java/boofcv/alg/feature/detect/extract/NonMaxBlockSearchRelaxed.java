@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -247,7 +247,7 @@ public abstract class NonMaxBlockSearchRelaxed implements NonMaxBlock.Search {
 			}
 		}
 
-		localMax.add(x_c,y_c);
+		localMax.append(x_c,y_c);
 	}
 
 	protected void checkLocalMin( int x_c , int y_c , float peakVal , GrayF32 img ) {
@@ -273,6 +273,6 @@ public abstract class NonMaxBlockSearchRelaxed implements NonMaxBlock.Search {
 			}
 		}
 
-		localMin.add(x_c,y_c);
+		localMin.append(x_c,y_c);
 	}
 }

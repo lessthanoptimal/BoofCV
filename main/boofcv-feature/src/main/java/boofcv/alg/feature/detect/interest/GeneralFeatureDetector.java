@@ -160,7 +160,7 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 			selectMax.select(intensity,positive,excluded,detected,numSelect,selected);
 			// selected is filled with corners from found, so hopefully implementation details of reset don't change
 			detected.reset();
-			detected.copyAll(selected);
+			detected.appendAll(selected);
 		}
 	}
 

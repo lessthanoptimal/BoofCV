@@ -125,7 +125,7 @@ public class DemoDetectPointFeaturesApp<T extends ImageGray<T>> extends Demonstr
 				QueueCorner src = detector.getPointSet(i);
 				QueueCorner dst = sets.get(i);
 				dst.reset();
-				dst.copyAll(src);
+				dst.appendAll(src);
 			}
 		}
 

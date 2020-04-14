@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -100,7 +100,7 @@ public class TestGeneralToInterestPoint {
 		public QueueCorner getMinimums() {
 			QueueCorner ret = new QueueCorner();
 			for( int i = 0; i < 5; i++ )
-				ret.add(1,2);
+				ret.append(1,2);
 			return ret;
 		}
 
@@ -108,7 +108,7 @@ public class TestGeneralToInterestPoint {
 		public QueueCorner getMaximums() {
 			QueueCorner ret = new QueueCorner();
 			for( int i = 0; i < 6; i++ )
-				ret.add(1,2);
+				ret.append(1,2);
 			return ret;
 		}
 

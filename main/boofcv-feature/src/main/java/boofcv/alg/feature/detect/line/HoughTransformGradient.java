@@ -207,7 +207,7 @@ public class HoughTransformGradient<D extends ImageGray<D>> {
 			// keep track of candidate pixels so that a sparse search can be done
 			// to detect lines
 			if( transform.data[index] == 0 )
-				candidates.add(x,y);
+				candidates.append(x,y);
 			transform.data[index] += amount;
 		}
 	}

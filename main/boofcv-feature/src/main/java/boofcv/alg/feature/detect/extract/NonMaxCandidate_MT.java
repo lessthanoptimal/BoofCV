@@ -70,7 +70,7 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 				int y1 = Math.min(intensityImage.height, pt.y + radius + 1);
 
 				if( search.searchMin(x0,y0,x1,y1,center,val) )
-					threadCorners.add(pt.x,pt.y);
+					threadCorners.append(pt.x,pt.y);
 			}
 		});
 
@@ -112,7 +112,7 @@ public class NonMaxCandidate_MT extends NonMaxCandidate {
 				int y1 = Math.min(intensityImage.height, pt.y + radius + 1);
 
 				if (search.searchMax(x0, y0, x1, y1, center, val))
-					threadCorners.add(pt.x, pt.y);
+					threadCorners.append(pt.x, pt.y);
 			}
 		});
 

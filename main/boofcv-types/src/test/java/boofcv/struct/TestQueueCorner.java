@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -22,23 +22,23 @@ import georegression.struct.point.Point2D_I16;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 
 /**
  * @author Peter Abeles
  */
-public class TestQueueCorner {
+class TestQueueCorner {
 
     /**
      * Tests add() and get()
      */
     @Test
-    public void add_get() {
+    void add_get() {
         QueueCorner queue = new QueueCorner(20);
 
         assertEquals(0,queue.size());
-        queue.add(1,2);
+        queue.append(1,2);
         assertEquals(1,queue.size());
         Point2D_I16 pt = queue.get(0);
         assertEquals(1,pt.getX());
@@ -46,25 +46,40 @@ public class TestQueueCorner {
     }
 
     @Test
-    public void getMaxSize() {
+    void getMaxSize() {
         QueueCorner queue = new QueueCorner(20);
 
         assertEquals(0,queue.size());
         assertEquals(20,queue.getMaxSize());
     }
 
+    @Test
+    void appendAll() {
+        QueueCorner queue = new QueueCorner(20);
+        QueueCorner copy = new QueueCorner(1);
+
+        copy.appendAll(queue);
+        assertEquals(0,copy.size);
+
+        queue.append(1,1);
+        queue.append(2,3);
+        copy.appendAll(queue);
+        assertEquals(2,copy.size);
+        assertEquals(queue.get(0), copy.get(0));
+        assertEquals(queue.get(1), copy.get(1));
+    }
 
     @Test
-    public void reset() {
+    void reset() {
         QueueCorner queue = new QueueCorner(20);
 
         assertEquals(0,queue.size());
-        queue.add(1,2);
+        queue.append(1,2);
         Point2D_I16 p = queue.get(0);
         assertEquals(1,queue.size());
         queue.reset();
         assertEquals(0,queue.size());
-        queue.add(1,2);
-        assertTrue(p==queue.get(0));
+        queue.append(1,2);
+        assertSame(p, queue.get(0));
     }
 }

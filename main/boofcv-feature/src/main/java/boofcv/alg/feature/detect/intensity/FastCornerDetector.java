@@ -141,10 +141,10 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 
 				if( result < 0 ) {
 					intensity.data[indexIntensity] = helper.scoreLower(index);
-					candidatesLow.add(x,y);
+					candidatesLow.append(x,y);
 				} else if( result > 0) {
 					intensity.data[indexIntensity] = helper.scoreUpper(index);
-					candidatesHigh.add(x,y);
+					candidatesHigh.append(x,y);
 				} else {
 					intensity.data[indexIntensity] = 0;
 				}
@@ -177,9 +177,9 @@ public class FastCornerDetector<T extends ImageGray<T>> implements FeatureIntens
 				int result = helper.checkPixel(index);
 
 				if( result < 0 ) {
-					candidatesLow.add(x,y);
+					candidatesLow.append(x,y);
 				} else if( result > 0 ) {
-					candidatesHigh.add(x,y);
+					candidatesHigh.append(x,y);
 				}
 			}
 			// check on a per row basis to reduce impact on performance

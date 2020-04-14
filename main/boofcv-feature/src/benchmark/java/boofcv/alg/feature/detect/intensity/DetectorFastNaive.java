@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -80,7 +80,7 @@ public class DetectorFastNaive {
 					}
 				}
 				if( isCorner ) {
-					candidatesLow.add(x,y);
+					candidatesLow.append(x,y);
 					continue;
 				}
 
@@ -101,7 +101,7 @@ public class DetectorFastNaive {
 				}
 
 				if( isCorner ) {
-					candidatesHigh.add(x,y);
+					candidatesHigh.append(x,y);
 				}
 			}
 		}

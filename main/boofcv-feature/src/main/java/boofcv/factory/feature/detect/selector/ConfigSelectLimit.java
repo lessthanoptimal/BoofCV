@@ -62,7 +62,7 @@ public class ConfigSelectLimit implements Configuration {
 
 	public static ConfigSelectLimit selectUniform(double inverseRegionScale) {
 		ConfigSelectLimit config = new ConfigSelectLimit(SelectLimitTypes.UNIFORM_BEST,-1);
-		config.uniform.inverseRegionScale = inverseRegionScale;
+		config.uniform.regionScaleFactor = inverseRegionScale;
 		return config;
 	}
 }

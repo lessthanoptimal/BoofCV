@@ -294,8 +294,8 @@ class TestGeneralFeatureDetector {
 							QueueCorner foundMin, QueueCorner foundMax) {
 			numTimesProcessed++;
 
-			foundMax.add(1, 1);
-			foundMax.add(2, 2);
+			foundMax.append(1, 1);
+			foundMax.append(2, 2);
 		}
 
 		@Override

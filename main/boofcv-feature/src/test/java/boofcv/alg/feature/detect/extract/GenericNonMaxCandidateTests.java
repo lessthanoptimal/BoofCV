@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -72,8 +72,8 @@ public abstract class GenericNonMaxCandidateTests extends GenericNonMaxTests {
 
 		for( int y = 0; y < h; y++ ) {
 			for( int x = 0; x < w; x++ ) {
-				candidatesMin.add(x,y);
-				candidatesMax.add(x,y);
+				candidatesMin.append(x,y);
+				candidatesMax.append(x,y);
 			}
 		}
 	}
@@ -95,8 +95,8 @@ public abstract class GenericNonMaxCandidateTests extends GenericNonMaxTests {
 
 		intensity.set(2, 5, -30);
 
-		candidatesMin.add(2,5);
-		candidatesMax.add(3,5);
+		candidatesMin.append(2,5);
+		candidatesMax.append(3,5);
 
 		foundMinimum.reset();foundMaximum.reset();
 		findMaximums(intensity, 0.5f, 1, 0, null, candidatesMax, foundMinimum, foundMaximum);

@@ -24,23 +24,40 @@ package boofcv.struct;
  * @author Peter Abeles
  */
 public class ConfigGridUniform implements Configuration {
-	/** Scales the size of a region up by the inverse of this number */
-	public double inverseRegionScale = 0.25;
+	/** Scales the size of a region up by this amount */
+	public double regionScaleFactor = 4.0;
 	/** The smallest allowed cell size in pixels */
 	public int minCellLength = 5;
 
+	public ConfigGridUniform(double regionScaleFactor, int minCellLength) {
+		this.regionScaleFactor = regionScaleFactor;
+		this.minCellLength = minCellLength;
+	}
+
+	public ConfigGridUniform() {
+	}
+
 	/**
-	 * Selects the desired length of a cell
+	 * Selects the desired length of a cell based on the input image size and maximum number of points returned
+	 *
+	 * @param maxSample The maximum number of points/features which can be returned.
 	 */
 	public int selectTargetCellSize( int maxSample, int imageWidth, int imageHeight) {
-		int targetLength = (int)Math.ceil(Math.sqrt(imageWidth*imageHeight)/
-				(0.1+Math.sqrt(maxSample*inverseRegionScale)));
+		if( maxSample <= 0 )
+			throw new IllegalArgumentException("maxSample must be a positive number");
+		int targetLength = (int)Math.ceil(regionScaleFactor *Math.sqrt(imageWidth*imageHeight)/
+				Math.sqrt(maxSample));
 		targetLength = Math.max(minCellLength,targetLength);
 		return targetLength;
 	}
 
 	@Override
 	public void checkValidity() {
-
+		if( regionScaleFactor <= 0 )
+			throw new IllegalArgumentException("Must be greater than 0");
+		if( minCellLength <= 0 )
+			throw new IllegalArgumentException("Must be greater than 0");
+		if( regionScaleFactor < 1.0 )
+			throw new IllegalArgumentException("Scale factor must be greater than zero");
 	}
 }

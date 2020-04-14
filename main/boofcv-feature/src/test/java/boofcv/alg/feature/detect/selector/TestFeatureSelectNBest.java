@@ -46,10 +46,10 @@ class TestFeatureSelectNBest extends ChecksFeatureSelectLimit {
 		intensity.set(8,8,10);
 
 		QueueCorner detected = new QueueCorner();
-		detected.add(5,10);
-		detected.add(4,10);
-		detected.add(5,11);
-		detected.add(8,8);
+		detected.append(5,10);
+		detected.append(4,10);
+		detected.append(5,11);
+		detected.append(8,8);
 
 		QueueCorner found = new QueueCorner();
 		FeatureSelectNBest alg = new FeatureSelectNBest();

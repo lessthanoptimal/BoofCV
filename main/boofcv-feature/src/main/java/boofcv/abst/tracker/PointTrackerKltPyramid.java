@@ -214,7 +214,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 		excludeList.reset();
 		for (int i = 0; i < active.size(); i++) {
 			PyramidKltFeature f = active.get(i);
-			excludeList.add((int) (f.x / scaleBottom), (int) (f.y / scaleBottom));
+			excludeList.append((int) (f.x / scaleBottom), (int) (f.y / scaleBottom));
 		}
 
 		// find new tracks, but no more than the max

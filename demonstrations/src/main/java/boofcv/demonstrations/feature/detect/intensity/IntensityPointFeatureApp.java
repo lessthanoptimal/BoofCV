@@ -177,10 +177,10 @@ public class IntensityPointFeatureApp<T extends ImageGray<T>, D extends ImageGra
 
 			synchronized (lockCorners) {
 				minimums.reset();
-				minimums.copyAll(detector.getMinimums());
+				minimums.appendAll(detector.getMinimums());
 
 				maximums.reset();
-				maximums.copyAll(detector.getMaximums());
+				maximums.appendAll(detector.getMaximums());
 			}
 		}
 
