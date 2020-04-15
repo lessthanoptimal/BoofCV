@@ -106,6 +106,9 @@ public abstract class SimpleCamera2Activity extends Activity {
 	private volatile boolean firstFrame;
 	private volatile boolean canProcessImages;
 
+	// Count the number of times decoding failed to decide if there's a serious problem or not
+	private int failuresToDecodeImage;
+
 	// If true there will be verbose output to Log
 	protected boolean verbose = false;
 
@@ -397,6 +400,7 @@ public abstract class SimpleCamera2Activity extends Activity {
 			this.viewHeight = heightTexture;
 			this.cameraToDisplayDensity = 0;
 			this.firstFrame = true;
+			this.failuresToDecodeImage = 0;
 
 			String[] cameras = manager.getCameraIdList();
 			for( String cameraId : cameras ) {
@@ -1022,6 +1026,8 @@ public abstract class SimpleCamera2Activity extends Activity {
 			}
 			if (canProcessImages) {
 				processFrame(image);
+				// reset the failure count
+				failuresToDecodeImage = 0;
 			}
 		} catch( IllegalStateException e ) {
 			// Looks like there are situations where a camera is closed and the images
@@ -1031,6 +1037,15 @@ public abstract class SimpleCamera2Activity extends Activity {
 				Log.e(TAG,"OnImageAvailableListener exception="+e.getMessage());
 			}
 			handleOnImageAvailableException(e);
+		} catch( RuntimeException e ) {
+			// Been getting these weird "buffer is inaccessible" exceptions in the log and can't reproduce them
+			// search online shows that they might be bad hardware. Code below attempts to skip over a single
+			// bad frame, but will still crash if there are too many in a row
+			Log.e(TAG, "OnImageAvailableListener exception=" + e.getClass().getName()+" message="+e.getMessage());
+			failuresToDecodeImage++;
+			if( failuresToDecodeImage >= 10 ) {
+				throw e;
+			}
 		} finally {
 			// WARNING: It's not documented if Image is thread safe or not. it's implied that it because
 			// Google's examples show it being closed and processed in a thread other than looper.
