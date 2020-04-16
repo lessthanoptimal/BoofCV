@@ -27,7 +27,11 @@ import javax.annotation.Nullable;
  *
  * @author Peter Abeles
  */
-public class FactoryMaxSelector {
+public class FactorySelectLimit {
+	/**
+	 * Creates and returns {@link FeatureSelectLimit} using a {@link ConfigSelectLimit configuration}.
+	 * @param config Creates the specified select limit. if null it defaults to {@link ConfigSelectLimit}.
+	 */
 	public static FeatureSelectLimit create(@Nullable ConfigSelectLimit config ) {
 		if( config == null )
 			config = new ConfigSelectLimit();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -39,16 +39,14 @@ public interface InterestPointDetector< T extends ImageBase> extends FoundPointS
 	/**
 	 * Does the interest point detector have scale information
 	 *
-	 * @deprecated Likely to be removed since this flag has no use in actual algorithms to date.
 	 * @return true if it has scale information and false otherwise
 	 */
-	public boolean hasScale();
+	boolean hasScale();
 
 	/**
 	 * If the interest point detector estimates the feature's orientation
 	 *
-	 * @deprecated Likely to be removed since this flag has no use in actual algorithms to date.
 	 * @return true if it estimates the orientation
 	 */
-	public boolean hasOrientation();
+	boolean hasOrientation();
 }

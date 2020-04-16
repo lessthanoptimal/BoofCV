@@ -52,6 +52,10 @@ Version : 0.36
   * Added spawnFrameID to tracks
   * Tracks and similar data structures no longer extend Point2D. Serious unintended consequences from that.
     Point2D overloads equals and hashcode which broke trackers.
+- FeatureSelectLimit
+  * When the number of detected corners/features exceeds a specified limit these are used to resolve the ambiguity
+  * Most of this code existed in some form but was not formalized and centrally implemented
+  * Four different variants are provided
 - Shape Detectors
   * BinaryEllipseDetectorPixel will use external only contour detector when it doesn't detect internal contours
 - PerspectiveOps

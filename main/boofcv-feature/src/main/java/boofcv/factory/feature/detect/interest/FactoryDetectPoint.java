@@ -31,7 +31,7 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPointAlg;
-import boofcv.factory.feature.detect.selector.FactoryMaxSelector;
+import boofcv.factory.feature.detect.selector.FactorySelectLimit;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
@@ -276,7 +276,7 @@ public class FactoryDetectPoint {
 		if( !intensity.localMinimums() )
 			config.detectMinimums = false;
 		NonMaxSuppression extractor = FactoryFeatureExtractor.nonmax(config);
-		FeatureSelectLimit selector = FactoryMaxSelector.create(config.selector);
+		FeatureSelectLimit selector = FactorySelectLimit.create(config.selector);
 		GeneralFeatureDetector<T, D> det = new GeneralFeatureDetector<>(intensity, extractor, selector);
 		det.setMaxFeatures(config.maxFeatures);
 
