@@ -18,9 +18,8 @@
 
 package boofcv.alg.misc.impl;
 
-//CONCURRENT_INLINE import boofcv.concurrency.BoofConcurrency;
-
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_F64;
 import boofcv.struct.border.ImageBorder_S32;
@@ -41,7 +40,7 @@ import java.util.Random;
  * @author Peter Abeles
  */
 @Generated("boofcv.alg.misc.impl.GenerateImplImageMiscOps")
-public class ImplImageMiscOps {
+public class ImplImageMiscOps_MT {
 
 	public static < T extends GrayI8<T>> void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 T input , ImageBorder_S32<T> border, GrayI8 output )
@@ -51,27 +50,23 @@ public class ImplImageMiscOps {
 		
 		// Check to see if it's entirely contained inside the input image
 		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-			for (int y = 0; y < height; y++) {
+			BoofConcurrency.loopFor(0,height,y->{
 				int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
 				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 
 				System.arraycopy(input.data,indexSrc,output.data,indexDst,width);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
 			// If any part is outside use the border. This isn't terribly efficient. A better approach is to
 			// handle all the possible outside regions independently. That code is significantly more complex so I'm
 			// punting it for a future person to write since this is good enough as it.
 			border.setImage(input);
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-			for (int y = 0; y < height; y++) {
+			BoofConcurrency.loopFor(0,height,y->{
 				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 				for (int x = 0; x < width; x++) {
 					output.data[indexDst++] = (byte)border.get(srcX+x,srcY+y);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -83,14 +78,12 @@ public class ImplImageMiscOps {
 		if( output.width < dstX+width || output.height < dstY+height )
 			throw new IllegalArgumentException("Copy region must be contained in the output image");
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-		for (int y = 0; y < height; y++) {
+		BoofConcurrency.loopFor(0,height,y->{
 			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
 			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 
 			System.arraycopy(input.data,indexSrc,output.data,indexDst,width);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
@@ -105,24 +98,20 @@ public class ImplImageMiscOps {
 
 		final int numBands = input.numBands;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-		for (int y = 0; y < height; y++) {
+		BoofConcurrency.loopFor(0,height,y->{
 			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
 			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
 
 			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fill(GrayI8 input, int value) {
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int index = input.getStartIndex() + y * input.getStride();
 			Arrays.fill(input.data,index,index+input.width, (byte)value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fill(InterleavedI8 input, int value) {
@@ -137,8 +126,7 @@ public class ImplImageMiscOps {
 	public static void fill(InterleavedI8 input, int[] values) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			for( int band = 0; band < numBands; band++ ) {
 				int index = input.getStartIndex() + y * input.getStride() + band;
 				int end = index + input.width*numBands - band;
@@ -147,73 +135,63 @@ public class ImplImageMiscOps {
 					input.data[index] = (byte)value;
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBand(InterleavedI8 input, int band , int value) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int index = input.getStartIndex() + y * input.getStride() + band;
 			int end = index + input.width*numBands - band;
 			for (; index < end; index += numBands ) {
 				input.data[index] = (byte)value;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void insertBand( GrayI8 input, int band , InterleavedI8 output) {
 
 		final int numBands = output.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.getStartIndex() + y * input.getStride();
 			int indexOut = output.getStartIndex() + y * output.getStride() + band;
 			int end = indexOut + output.width*numBands - band;
 			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void extractBand( InterleavedI8 input, int band , GrayI8 output) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.getStartIndex() + y * input.getStride() + band;
 			int indexOut = output.getStartIndex() + y * output.getStride();
 			int end = indexOut + output.width;
 			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBorder(GrayI8 input, int value, int radius ) {
 
 		// top and bottom
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,radius,y->{
-		for (int y = 0; y < radius; y++) {
+		BoofConcurrency.loopFor(0,radius,y->{
 			int indexTop = input.startIndex + y * input.stride;
 			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
 			for (int x = 0; x < input.width; x++) {
 				input.data[indexTop++] = (byte)value;
 				input.data[indexBottom++] = (byte)value;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		// left and right
 		int h = input.height-radius;
 		int indexStart = input.startIndex + radius*input.stride;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,radius,x->{
-		for (int x = 0; x < radius; x++) {
+		BoofConcurrency.loopFor(0,radius,x->{
 			int indexLeft = indexStart + x;
 			int indexRight = indexStart + input.width-1-x;
 			for (int y = radius; y < h; y++) {
@@ -223,8 +201,7 @@ public class ImplImageMiscOps {
 				indexLeft += input.stride;
 				indexRight += input.stride;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBorder(GrayI8 input, int value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
@@ -270,12 +247,10 @@ public class ImplImageMiscOps {
 		final int _x0 = x0;
 		final int _x1 = x1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(y0,y1,y->{
-		for (int y = y0; y < y1; y++) {
+		BoofConcurrency.loopFor(y0,y1,y->{
 			int index = image.startIndex + y*image.stride + _x0;
 			Arrays.fill(image.data,index,index+_x1-_x0, (byte)value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillRectangle(InterleavedI8 image, int value, int x0, int y0, int width, int height) {
@@ -287,12 +262,10 @@ public class ImplImageMiscOps {
 		final int _x0 = x0;
 
 		int length = (x1-x0)*image.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(y0,y1,y->{
-		for (int y = y0; y < y1; y++) {
+		BoofConcurrency.loopFor(y0,y1,y->{
 			int index = image.startIndex + y*image.stride + _x0*image.numBands;
 			Arrays.fill(image.data,index,index+length, (byte)value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillUniform(GrayI8 image, Random rand , int min , int max) {
@@ -356,8 +329,7 @@ public class ImplImageMiscOps {
 	public static void flipVertical( GrayI8 image ) {
 		int h2 = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h2,y->{
-		for( int y = 0; y < h2; y++ ) {
+		BoofConcurrency.loopFor(0,h2,y->{
 			int index1 = image.getStartIndex() + y * image.getStride();
 			int index2 = image.getStartIndex() + (image.height - y - 1) * image.getStride();
 
@@ -368,15 +340,13 @@ public class ImplImageMiscOps {
 				image.data[index1++] = image.data[index2];
 				image.data[index2++] = (byte)tmp;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void flipHorizontal( GrayI8 image ) {
 		int w2 = image.width/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,image.height,y->{
-		for( int y = 0; y < image.height; y++ ) {
+		BoofConcurrency.loopFor(0,image.height,y->{
 			int index1 = image.getStartIndex() + y * image.getStride();
 			int index2 = index1 + image.width-1;
 
@@ -387,8 +357,7 @@ public class ImplImageMiscOps {
 				image.data[index1++] = image.data[index2];
 				image.data[index2--] = (byte)tmp;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( GrayI8 image ) {
@@ -398,8 +367,7 @@ public class ImplImageMiscOps {
 		int w = image.height/2 + image.height%2;
 		int h = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y0->{
-		for( int y0 = 0; y0 < h; y0++ ) {
+		BoofConcurrency.loopFor(0,h,y0->{
 			int y1 = image.height-y0-1;
 
 			for( int x0 = 0; x0 < w; x0++ ) {
@@ -417,8 +385,7 @@ public class ImplImageMiscOps {
 				image.data[index1] = image.data[index0];
 				image.data[index0] = (byte)tmp3;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( GrayI8 input , GrayI8 output ) {
@@ -426,14 +393,12 @@ public class ImplImageMiscOps {
 
 		int h = input.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(h-y,x,input.data[indexIn++]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( InterleavedI8 input , InterleavedI8 output ) {
@@ -441,8 +406,7 @@ public class ImplImageMiscOps {
 
 		int h = input.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexSrc = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				int indexDst = output.getIndex(h-y,x);
@@ -452,8 +416,7 @@ public class ImplImageMiscOps {
 					output.data[indexDst++] = input.data[indexSrc++];
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( GrayI8 image ) {
@@ -463,8 +426,7 @@ public class ImplImageMiscOps {
 		int w = image.height/2 + image.height%2;
 		int h = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y0->{
-		for( int y0 = 0; y0 < h; y0++ ) {
+		BoofConcurrency.loopFor(0,h,y0->{
 			int y1 = image.height-y0-1;
 
 			for( int x0 = 0; x0 < w; x0++ ) {
@@ -482,8 +444,7 @@ public class ImplImageMiscOps {
 				image.data[index2] = image.data[index3];
 				image.data[index3] = (byte)tmp0;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( GrayI8 input , GrayI8 output ) {
@@ -491,14 +452,12 @@ public class ImplImageMiscOps {
 
 		int w = input.width-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(y,w-x,input.data[indexIn++]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( InterleavedI8 input , InterleavedI8 output ) {
@@ -506,8 +465,7 @@ public class ImplImageMiscOps {
 
 		int w = input.width-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexSrc = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				int indexDst = output.getIndex(y,w-x);
@@ -517,8 +475,7 @@ public class ImplImageMiscOps {
 					output.data[indexDst++] = input.data[indexSrc++];
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static <T extends GrayI8<T>>
@@ -565,27 +522,23 @@ public class ImplImageMiscOps {
 		
 		// Check to see if it's entirely contained inside the input image
 		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-			for (int y = 0; y < height; y++) {
+			BoofConcurrency.loopFor(0,height,y->{
 				int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
 				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 
 				System.arraycopy(input.data,indexSrc,output.data,indexDst,width);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
 			// If any part is outside use the border. This isn't terribly efficient. A better approach is to
 			// handle all the possible outside regions independently. That code is significantly more complex so I'm
 			// punting it for a future person to write since this is good enough as it.
 			border.setImage(input);
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-			for (int y = 0; y < height; y++) {
+			BoofConcurrency.loopFor(0,height,y->{
 				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 				for (int x = 0; x < width; x++) {
 					output.data[indexDst++] = (short)border.get(srcX+x,srcY+y);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -597,14 +550,12 @@ public class ImplImageMiscOps {
 		if( output.width < dstX+width || output.height < dstY+height )
 			throw new IllegalArgumentException("Copy region must be contained in the output image");
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-		for (int y = 0; y < height; y++) {
+		BoofConcurrency.loopFor(0,height,y->{
 			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
 			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 
 			System.arraycopy(input.data,indexSrc,output.data,indexDst,width);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
@@ -619,24 +570,20 @@ public class ImplImageMiscOps {
 
 		final int numBands = input.numBands;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-		for (int y = 0; y < height; y++) {
+		BoofConcurrency.loopFor(0,height,y->{
 			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
 			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
 
 			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fill(GrayI16 input, int value) {
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int index = input.getStartIndex() + y * input.getStride();
 			Arrays.fill(input.data,index,index+input.width, (short)value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fill(InterleavedI16 input, int value) {
@@ -651,8 +598,7 @@ public class ImplImageMiscOps {
 	public static void fill(InterleavedI16 input, int[] values) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			for( int band = 0; band < numBands; band++ ) {
 				int index = input.getStartIndex() + y * input.getStride() + band;
 				int end = index + input.width*numBands - band;
@@ -661,73 +607,63 @@ public class ImplImageMiscOps {
 					input.data[index] = (short)value;
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBand(InterleavedI16 input, int band , int value) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int index = input.getStartIndex() + y * input.getStride() + band;
 			int end = index + input.width*numBands - band;
 			for (; index < end; index += numBands ) {
 				input.data[index] = (short)value;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void insertBand( GrayI16 input, int band , InterleavedI16 output) {
 
 		final int numBands = output.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.getStartIndex() + y * input.getStride();
 			int indexOut = output.getStartIndex() + y * output.getStride() + band;
 			int end = indexOut + output.width*numBands - band;
 			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void extractBand( InterleavedI16 input, int band , GrayI16 output) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.getStartIndex() + y * input.getStride() + band;
 			int indexOut = output.getStartIndex() + y * output.getStride();
 			int end = indexOut + output.width;
 			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBorder(GrayI16 input, int value, int radius ) {
 
 		// top and bottom
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,radius,y->{
-		for (int y = 0; y < radius; y++) {
+		BoofConcurrency.loopFor(0,radius,y->{
 			int indexTop = input.startIndex + y * input.stride;
 			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
 			for (int x = 0; x < input.width; x++) {
 				input.data[indexTop++] = (short)value;
 				input.data[indexBottom++] = (short)value;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		// left and right
 		int h = input.height-radius;
 		int indexStart = input.startIndex + radius*input.stride;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,radius,x->{
-		for (int x = 0; x < radius; x++) {
+		BoofConcurrency.loopFor(0,radius,x->{
 			int indexLeft = indexStart + x;
 			int indexRight = indexStart + input.width-1-x;
 			for (int y = radius; y < h; y++) {
@@ -737,8 +673,7 @@ public class ImplImageMiscOps {
 				indexLeft += input.stride;
 				indexRight += input.stride;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBorder(GrayI16 input, int value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
@@ -784,12 +719,10 @@ public class ImplImageMiscOps {
 		final int _x0 = x0;
 		final int _x1 = x1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(y0,y1,y->{
-		for (int y = y0; y < y1; y++) {
+		BoofConcurrency.loopFor(y0,y1,y->{
 			int index = image.startIndex + y*image.stride + _x0;
 			Arrays.fill(image.data,index,index+_x1-_x0, (short)value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillRectangle(InterleavedI16 image, int value, int x0, int y0, int width, int height) {
@@ -801,12 +734,10 @@ public class ImplImageMiscOps {
 		final int _x0 = x0;
 
 		int length = (x1-x0)*image.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(y0,y1,y->{
-		for (int y = y0; y < y1; y++) {
+		BoofConcurrency.loopFor(y0,y1,y->{
 			int index = image.startIndex + y*image.stride + _x0*image.numBands;
 			Arrays.fill(image.data,index,index+length, (short)value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillUniform(GrayI16 image, Random rand , int min , int max) {
@@ -870,8 +801,7 @@ public class ImplImageMiscOps {
 	public static void flipVertical( GrayI16 image ) {
 		int h2 = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h2,y->{
-		for( int y = 0; y < h2; y++ ) {
+		BoofConcurrency.loopFor(0,h2,y->{
 			int index1 = image.getStartIndex() + y * image.getStride();
 			int index2 = image.getStartIndex() + (image.height - y - 1) * image.getStride();
 
@@ -882,15 +812,13 @@ public class ImplImageMiscOps {
 				image.data[index1++] = image.data[index2];
 				image.data[index2++] = (short)tmp;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void flipHorizontal( GrayI16 image ) {
 		int w2 = image.width/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,image.height,y->{
-		for( int y = 0; y < image.height; y++ ) {
+		BoofConcurrency.loopFor(0,image.height,y->{
 			int index1 = image.getStartIndex() + y * image.getStride();
 			int index2 = index1 + image.width-1;
 
@@ -901,8 +829,7 @@ public class ImplImageMiscOps {
 				image.data[index1++] = image.data[index2];
 				image.data[index2--] = (short)tmp;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( GrayI16 image ) {
@@ -912,8 +839,7 @@ public class ImplImageMiscOps {
 		int w = image.height/2 + image.height%2;
 		int h = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y0->{
-		for( int y0 = 0; y0 < h; y0++ ) {
+		BoofConcurrency.loopFor(0,h,y0->{
 			int y1 = image.height-y0-1;
 
 			for( int x0 = 0; x0 < w; x0++ ) {
@@ -931,8 +857,7 @@ public class ImplImageMiscOps {
 				image.data[index1] = image.data[index0];
 				image.data[index0] = (short)tmp3;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( GrayI16 input , GrayI16 output ) {
@@ -940,14 +865,12 @@ public class ImplImageMiscOps {
 
 		int h = input.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(h-y,x,input.data[indexIn++]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( InterleavedI16 input , InterleavedI16 output ) {
@@ -955,8 +878,7 @@ public class ImplImageMiscOps {
 
 		int h = input.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexSrc = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				int indexDst = output.getIndex(h-y,x);
@@ -966,8 +888,7 @@ public class ImplImageMiscOps {
 					output.data[indexDst++] = input.data[indexSrc++];
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( GrayI16 image ) {
@@ -977,8 +898,7 @@ public class ImplImageMiscOps {
 		int w = image.height/2 + image.height%2;
 		int h = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y0->{
-		for( int y0 = 0; y0 < h; y0++ ) {
+		BoofConcurrency.loopFor(0,h,y0->{
 			int y1 = image.height-y0-1;
 
 			for( int x0 = 0; x0 < w; x0++ ) {
@@ -996,8 +916,7 @@ public class ImplImageMiscOps {
 				image.data[index2] = image.data[index3];
 				image.data[index3] = (short)tmp0;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( GrayI16 input , GrayI16 output ) {
@@ -1005,14 +924,12 @@ public class ImplImageMiscOps {
 
 		int w = input.width-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(y,w-x,input.data[indexIn++]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( InterleavedI16 input , InterleavedI16 output ) {
@@ -1020,8 +937,7 @@ public class ImplImageMiscOps {
 
 		int w = input.width-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexSrc = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				int indexDst = output.getIndex(y,w-x);
@@ -1031,8 +947,7 @@ public class ImplImageMiscOps {
 					output.data[indexDst++] = input.data[indexSrc++];
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static <T extends GrayI16<T>>
@@ -1079,27 +994,23 @@ public class ImplImageMiscOps {
 		
 		// Check to see if it's entirely contained inside the input image
 		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-			for (int y = 0; y < height; y++) {
+			BoofConcurrency.loopFor(0,height,y->{
 				int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
 				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 
 				System.arraycopy(input.data,indexSrc,output.data,indexDst,width);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
 			// If any part is outside use the border. This isn't terribly efficient. A better approach is to
 			// handle all the possible outside regions independently. That code is significantly more complex so I'm
 			// punting it for a future person to write since this is good enough as it.
 			border.setImage(input);
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-			for (int y = 0; y < height; y++) {
+			BoofConcurrency.loopFor(0,height,y->{
 				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 				for (int x = 0; x < width; x++) {
 					output.data[indexDst++] = border.get(srcX+x,srcY+y);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -1111,14 +1022,12 @@ public class ImplImageMiscOps {
 		if( output.width < dstX+width || output.height < dstY+height )
 			throw new IllegalArgumentException("Copy region must be contained in the output image");
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-		for (int y = 0; y < height; y++) {
+		BoofConcurrency.loopFor(0,height,y->{
 			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
 			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 
 			System.arraycopy(input.data,indexSrc,output.data,indexDst,width);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
@@ -1133,24 +1042,20 @@ public class ImplImageMiscOps {
 
 		final int numBands = input.numBands;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-		for (int y = 0; y < height; y++) {
+		BoofConcurrency.loopFor(0,height,y->{
 			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
 			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
 
 			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fill(GrayS32 input, int value) {
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int index = input.getStartIndex() + y * input.getStride();
 			Arrays.fill(input.data,index,index+input.width, value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fill(InterleavedS32 input, int value) {
@@ -1165,8 +1070,7 @@ public class ImplImageMiscOps {
 	public static void fill(InterleavedS32 input, int[] values) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			for( int band = 0; band < numBands; band++ ) {
 				int index = input.getStartIndex() + y * input.getStride() + band;
 				int end = index + input.width*numBands - band;
@@ -1175,73 +1079,63 @@ public class ImplImageMiscOps {
 					input.data[index] = value;
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBand(InterleavedS32 input, int band , int value) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int index = input.getStartIndex() + y * input.getStride() + band;
 			int end = index + input.width*numBands - band;
 			for (; index < end; index += numBands ) {
 				input.data[index] = value;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void insertBand( GrayS32 input, int band , InterleavedS32 output) {
 
 		final int numBands = output.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.getStartIndex() + y * input.getStride();
 			int indexOut = output.getStartIndex() + y * output.getStride() + band;
 			int end = indexOut + output.width*numBands - band;
 			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void extractBand( InterleavedS32 input, int band , GrayS32 output) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.getStartIndex() + y * input.getStride() + band;
 			int indexOut = output.getStartIndex() + y * output.getStride();
 			int end = indexOut + output.width;
 			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBorder(GrayS32 input, int value, int radius ) {
 
 		// top and bottom
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,radius,y->{
-		for (int y = 0; y < radius; y++) {
+		BoofConcurrency.loopFor(0,radius,y->{
 			int indexTop = input.startIndex + y * input.stride;
 			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
 			for (int x = 0; x < input.width; x++) {
 				input.data[indexTop++] = value;
 				input.data[indexBottom++] = value;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		// left and right
 		int h = input.height-radius;
 		int indexStart = input.startIndex + radius*input.stride;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,radius,x->{
-		for (int x = 0; x < radius; x++) {
+		BoofConcurrency.loopFor(0,radius,x->{
 			int indexLeft = indexStart + x;
 			int indexRight = indexStart + input.width-1-x;
 			for (int y = radius; y < h; y++) {
@@ -1251,8 +1145,7 @@ public class ImplImageMiscOps {
 				indexLeft += input.stride;
 				indexRight += input.stride;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBorder(GrayS32 input, int value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
@@ -1298,12 +1191,10 @@ public class ImplImageMiscOps {
 		final int _x0 = x0;
 		final int _x1 = x1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(y0,y1,y->{
-		for (int y = y0; y < y1; y++) {
+		BoofConcurrency.loopFor(y0,y1,y->{
 			int index = image.startIndex + y*image.stride + _x0;
 			Arrays.fill(image.data,index,index+_x1-_x0, value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillRectangle(InterleavedS32 image, int value, int x0, int y0, int width, int height) {
@@ -1315,12 +1206,10 @@ public class ImplImageMiscOps {
 		final int _x0 = x0;
 
 		int length = (x1-x0)*image.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(y0,y1,y->{
-		for (int y = y0; y < y1; y++) {
+		BoofConcurrency.loopFor(y0,y1,y->{
 			int index = image.startIndex + y*image.stride + _x0*image.numBands;
 			Arrays.fill(image.data,index,index+length, value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillUniform(GrayS32 image, Random rand , int min , int max) {
@@ -1384,8 +1273,7 @@ public class ImplImageMiscOps {
 	public static void flipVertical( GrayS32 image ) {
 		int h2 = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h2,y->{
-		for( int y = 0; y < h2; y++ ) {
+		BoofConcurrency.loopFor(0,h2,y->{
 			int index1 = image.getStartIndex() + y * image.getStride();
 			int index2 = image.getStartIndex() + (image.height - y - 1) * image.getStride();
 
@@ -1396,15 +1284,13 @@ public class ImplImageMiscOps {
 				image.data[index1++] = image.data[index2];
 				image.data[index2++] = (int)tmp;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void flipHorizontal( GrayS32 image ) {
 		int w2 = image.width/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,image.height,y->{
-		for( int y = 0; y < image.height; y++ ) {
+		BoofConcurrency.loopFor(0,image.height,y->{
 			int index1 = image.getStartIndex() + y * image.getStride();
 			int index2 = index1 + image.width-1;
 
@@ -1415,8 +1301,7 @@ public class ImplImageMiscOps {
 				image.data[index1++] = image.data[index2];
 				image.data[index2--] = (int)tmp;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( GrayS32 image ) {
@@ -1426,8 +1311,7 @@ public class ImplImageMiscOps {
 		int w = image.height/2 + image.height%2;
 		int h = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y0->{
-		for( int y0 = 0; y0 < h; y0++ ) {
+		BoofConcurrency.loopFor(0,h,y0->{
 			int y1 = image.height-y0-1;
 
 			for( int x0 = 0; x0 < w; x0++ ) {
@@ -1445,8 +1329,7 @@ public class ImplImageMiscOps {
 				image.data[index1] = image.data[index0];
 				image.data[index0] = (int)tmp3;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( GrayS32 input , GrayS32 output ) {
@@ -1454,14 +1337,12 @@ public class ImplImageMiscOps {
 
 		int h = input.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(h-y,x,input.data[indexIn++]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( InterleavedS32 input , InterleavedS32 output ) {
@@ -1469,8 +1350,7 @@ public class ImplImageMiscOps {
 
 		int h = input.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexSrc = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				int indexDst = output.getIndex(h-y,x);
@@ -1480,8 +1360,7 @@ public class ImplImageMiscOps {
 					output.data[indexDst++] = input.data[indexSrc++];
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( GrayS32 image ) {
@@ -1491,8 +1370,7 @@ public class ImplImageMiscOps {
 		int w = image.height/2 + image.height%2;
 		int h = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y0->{
-		for( int y0 = 0; y0 < h; y0++ ) {
+		BoofConcurrency.loopFor(0,h,y0->{
 			int y1 = image.height-y0-1;
 
 			for( int x0 = 0; x0 < w; x0++ ) {
@@ -1510,8 +1388,7 @@ public class ImplImageMiscOps {
 				image.data[index2] = image.data[index3];
 				image.data[index3] = (int)tmp0;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( GrayS32 input , GrayS32 output ) {
@@ -1519,14 +1396,12 @@ public class ImplImageMiscOps {
 
 		int w = input.width-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(y,w-x,input.data[indexIn++]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( InterleavedS32 input , InterleavedS32 output ) {
@@ -1534,8 +1409,7 @@ public class ImplImageMiscOps {
 
 		int w = input.width-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexSrc = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				int indexDst = output.getIndex(y,w-x);
@@ -1545,8 +1419,7 @@ public class ImplImageMiscOps {
 					output.data[indexDst++] = input.data[indexSrc++];
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void growBorder(GrayS32 src , ImageBorder_S32 border, int borderX0, int borderY0, int borderX1, int borderY1 , GrayS32 dst )
@@ -1592,27 +1465,23 @@ public class ImplImageMiscOps {
 		
 		// Check to see if it's entirely contained inside the input image
 		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-			for (int y = 0; y < height; y++) {
+			BoofConcurrency.loopFor(0,height,y->{
 				int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
 				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 
 				System.arraycopy(input.data,indexSrc,output.data,indexDst,width);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
 			// If any part is outside use the border. This isn't terribly efficient. A better approach is to
 			// handle all the possible outside regions independently. That code is significantly more complex so I'm
 			// punting it for a future person to write since this is good enough as it.
 			border.setImage(input);
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-			for (int y = 0; y < height; y++) {
+			BoofConcurrency.loopFor(0,height,y->{
 				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 				for (int x = 0; x < width; x++) {
 					output.data[indexDst++] = border.get(srcX+x,srcY+y);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -1624,14 +1493,12 @@ public class ImplImageMiscOps {
 		if( output.width < dstX+width || output.height < dstY+height )
 			throw new IllegalArgumentException("Copy region must be contained in the output image");
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-		for (int y = 0; y < height; y++) {
+		BoofConcurrency.loopFor(0,height,y->{
 			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
 			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 
 			System.arraycopy(input.data,indexSrc,output.data,indexDst,width);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
@@ -1646,24 +1513,20 @@ public class ImplImageMiscOps {
 
 		final int numBands = input.numBands;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-		for (int y = 0; y < height; y++) {
+		BoofConcurrency.loopFor(0,height,y->{
 			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
 			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
 
 			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fill(GrayS64 input, long value) {
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int index = input.getStartIndex() + y * input.getStride();
 			Arrays.fill(input.data,index,index+input.width, value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fill(InterleavedS64 input, long value) {
@@ -1678,8 +1541,7 @@ public class ImplImageMiscOps {
 	public static void fill(InterleavedS64 input, long[] values) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			for( int band = 0; band < numBands; band++ ) {
 				int index = input.getStartIndex() + y * input.getStride() + band;
 				int end = index + input.width*numBands - band;
@@ -1688,73 +1550,63 @@ public class ImplImageMiscOps {
 					input.data[index] = value;
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBand(InterleavedS64 input, int band , long value) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int index = input.getStartIndex() + y * input.getStride() + band;
 			int end = index + input.width*numBands - band;
 			for (; index < end; index += numBands ) {
 				input.data[index] = value;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void insertBand( GrayS64 input, int band , InterleavedS64 output) {
 
 		final int numBands = output.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.getStartIndex() + y * input.getStride();
 			int indexOut = output.getStartIndex() + y * output.getStride() + band;
 			int end = indexOut + output.width*numBands - band;
 			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void extractBand( InterleavedS64 input, int band , GrayS64 output) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.getStartIndex() + y * input.getStride() + band;
 			int indexOut = output.getStartIndex() + y * output.getStride();
 			int end = indexOut + output.width;
 			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBorder(GrayS64 input, long value, int radius ) {
 
 		// top and bottom
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,radius,y->{
-		for (int y = 0; y < radius; y++) {
+		BoofConcurrency.loopFor(0,radius,y->{
 			int indexTop = input.startIndex + y * input.stride;
 			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
 			for (int x = 0; x < input.width; x++) {
 				input.data[indexTop++] = value;
 				input.data[indexBottom++] = value;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		// left and right
 		int h = input.height-radius;
 		int indexStart = input.startIndex + radius*input.stride;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,radius,x->{
-		for (int x = 0; x < radius; x++) {
+		BoofConcurrency.loopFor(0,radius,x->{
 			int indexLeft = indexStart + x;
 			int indexRight = indexStart + input.width-1-x;
 			for (int y = radius; y < h; y++) {
@@ -1764,8 +1616,7 @@ public class ImplImageMiscOps {
 				indexLeft += input.stride;
 				indexRight += input.stride;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBorder(GrayS64 input, long value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
@@ -1811,12 +1662,10 @@ public class ImplImageMiscOps {
 		final int _x0 = x0;
 		final int _x1 = x1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(y0,y1,y->{
-		for (int y = y0; y < y1; y++) {
+		BoofConcurrency.loopFor(y0,y1,y->{
 			int index = image.startIndex + y*image.stride + _x0;
 			Arrays.fill(image.data,index,index+_x1-_x0, value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillRectangle(InterleavedS64 image, long value, int x0, int y0, int width, int height) {
@@ -1828,12 +1677,10 @@ public class ImplImageMiscOps {
 		final int _x0 = x0;
 
 		int length = (x1-x0)*image.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(y0,y1,y->{
-		for (int y = y0; y < y1; y++) {
+		BoofConcurrency.loopFor(y0,y1,y->{
 			int index = image.startIndex + y*image.stride + _x0*image.numBands;
 			Arrays.fill(image.data,index,index+length, value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillUniform(GrayS64 image, Random rand , long min , long max) {
@@ -1897,8 +1744,7 @@ public class ImplImageMiscOps {
 	public static void flipVertical( GrayS64 image ) {
 		int h2 = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h2,y->{
-		for( int y = 0; y < h2; y++ ) {
+		BoofConcurrency.loopFor(0,h2,y->{
 			int index1 = image.getStartIndex() + y * image.getStride();
 			int index2 = image.getStartIndex() + (image.height - y - 1) * image.getStride();
 
@@ -1909,15 +1755,13 @@ public class ImplImageMiscOps {
 				image.data[index1++] = image.data[index2];
 				image.data[index2++] = (long)tmp;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void flipHorizontal( GrayS64 image ) {
 		int w2 = image.width/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,image.height,y->{
-		for( int y = 0; y < image.height; y++ ) {
+		BoofConcurrency.loopFor(0,image.height,y->{
 			int index1 = image.getStartIndex() + y * image.getStride();
 			int index2 = index1 + image.width-1;
 
@@ -1928,8 +1772,7 @@ public class ImplImageMiscOps {
 				image.data[index1++] = image.data[index2];
 				image.data[index2--] = (long)tmp;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( GrayS64 image ) {
@@ -1939,8 +1782,7 @@ public class ImplImageMiscOps {
 		int w = image.height/2 + image.height%2;
 		int h = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y0->{
-		for( int y0 = 0; y0 < h; y0++ ) {
+		BoofConcurrency.loopFor(0,h,y0->{
 			int y1 = image.height-y0-1;
 
 			for( int x0 = 0; x0 < w; x0++ ) {
@@ -1958,8 +1800,7 @@ public class ImplImageMiscOps {
 				image.data[index1] = image.data[index0];
 				image.data[index0] = (long)tmp3;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( GrayS64 input , GrayS64 output ) {
@@ -1967,14 +1808,12 @@ public class ImplImageMiscOps {
 
 		int h = input.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(h-y,x,input.data[indexIn++]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( InterleavedS64 input , InterleavedS64 output ) {
@@ -1982,8 +1821,7 @@ public class ImplImageMiscOps {
 
 		int h = input.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexSrc = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				int indexDst = output.getIndex(h-y,x);
@@ -1993,8 +1831,7 @@ public class ImplImageMiscOps {
 					output.data[indexDst++] = input.data[indexSrc++];
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( GrayS64 image ) {
@@ -2004,8 +1841,7 @@ public class ImplImageMiscOps {
 		int w = image.height/2 + image.height%2;
 		int h = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y0->{
-		for( int y0 = 0; y0 < h; y0++ ) {
+		BoofConcurrency.loopFor(0,h,y0->{
 			int y1 = image.height-y0-1;
 
 			for( int x0 = 0; x0 < w; x0++ ) {
@@ -2023,8 +1859,7 @@ public class ImplImageMiscOps {
 				image.data[index2] = image.data[index3];
 				image.data[index3] = (long)tmp0;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( GrayS64 input , GrayS64 output ) {
@@ -2032,14 +1867,12 @@ public class ImplImageMiscOps {
 
 		int w = input.width-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(y,w-x,input.data[indexIn++]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( InterleavedS64 input , InterleavedS64 output ) {
@@ -2047,8 +1880,7 @@ public class ImplImageMiscOps {
 
 		int w = input.width-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexSrc = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				int indexDst = output.getIndex(y,w-x);
@@ -2058,8 +1890,7 @@ public class ImplImageMiscOps {
 					output.data[indexDst++] = input.data[indexSrc++];
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void growBorder(GrayS64 src , ImageBorder_S64 border, int borderX0, int borderY0, int borderX1, int borderY1 , GrayS64 dst )
@@ -2105,27 +1936,23 @@ public class ImplImageMiscOps {
 		
 		// Check to see if it's entirely contained inside the input image
 		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-			for (int y = 0; y < height; y++) {
+			BoofConcurrency.loopFor(0,height,y->{
 				int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
 				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 
 				System.arraycopy(input.data,indexSrc,output.data,indexDst,width);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
 			// If any part is outside use the border. This isn't terribly efficient. A better approach is to
 			// handle all the possible outside regions independently. That code is significantly more complex so I'm
 			// punting it for a future person to write since this is good enough as it.
 			border.setImage(input);
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-			for (int y = 0; y < height; y++) {
+			BoofConcurrency.loopFor(0,height,y->{
 				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 				for (int x = 0; x < width; x++) {
 					output.data[indexDst++] = border.get(srcX+x,srcY+y);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -2137,14 +1964,12 @@ public class ImplImageMiscOps {
 		if( output.width < dstX+width || output.height < dstY+height )
 			throw new IllegalArgumentException("Copy region must be contained in the output image");
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-		for (int y = 0; y < height; y++) {
+		BoofConcurrency.loopFor(0,height,y->{
 			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
 			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 
 			System.arraycopy(input.data,indexSrc,output.data,indexDst,width);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
@@ -2159,24 +1984,20 @@ public class ImplImageMiscOps {
 
 		final int numBands = input.numBands;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-		for (int y = 0; y < height; y++) {
+		BoofConcurrency.loopFor(0,height,y->{
 			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
 			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
 
 			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fill(GrayF32 input, float value) {
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int index = input.getStartIndex() + y * input.getStride();
 			Arrays.fill(input.data,index,index+input.width, value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fill(InterleavedF32 input, float value) {
@@ -2191,8 +2012,7 @@ public class ImplImageMiscOps {
 	public static void fill(InterleavedF32 input, float[] values) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			for( int band = 0; band < numBands; band++ ) {
 				int index = input.getStartIndex() + y * input.getStride() + band;
 				int end = index + input.width*numBands - band;
@@ -2201,73 +2021,63 @@ public class ImplImageMiscOps {
 					input.data[index] = value;
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBand(InterleavedF32 input, int band , float value) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int index = input.getStartIndex() + y * input.getStride() + band;
 			int end = index + input.width*numBands - band;
 			for (; index < end; index += numBands ) {
 				input.data[index] = value;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void insertBand( GrayF32 input, int band , InterleavedF32 output) {
 
 		final int numBands = output.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.getStartIndex() + y * input.getStride();
 			int indexOut = output.getStartIndex() + y * output.getStride() + band;
 			int end = indexOut + output.width*numBands - band;
 			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void extractBand( InterleavedF32 input, int band , GrayF32 output) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.getStartIndex() + y * input.getStride() + band;
 			int indexOut = output.getStartIndex() + y * output.getStride();
 			int end = indexOut + output.width;
 			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBorder(GrayF32 input, float value, int radius ) {
 
 		// top and bottom
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,radius,y->{
-		for (int y = 0; y < radius; y++) {
+		BoofConcurrency.loopFor(0,radius,y->{
 			int indexTop = input.startIndex + y * input.stride;
 			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
 			for (int x = 0; x < input.width; x++) {
 				input.data[indexTop++] = value;
 				input.data[indexBottom++] = value;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		// left and right
 		int h = input.height-radius;
 		int indexStart = input.startIndex + radius*input.stride;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,radius,x->{
-		for (int x = 0; x < radius; x++) {
+		BoofConcurrency.loopFor(0,radius,x->{
 			int indexLeft = indexStart + x;
 			int indexRight = indexStart + input.width-1-x;
 			for (int y = radius; y < h; y++) {
@@ -2277,8 +2087,7 @@ public class ImplImageMiscOps {
 				indexLeft += input.stride;
 				indexRight += input.stride;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBorder(GrayF32 input, float value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
@@ -2324,12 +2133,10 @@ public class ImplImageMiscOps {
 		final int _x0 = x0;
 		final int _x1 = x1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(y0,y1,y->{
-		for (int y = y0; y < y1; y++) {
+		BoofConcurrency.loopFor(y0,y1,y->{
 			int index = image.startIndex + y*image.stride + _x0;
 			Arrays.fill(image.data,index,index+_x1-_x0, value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillRectangle(InterleavedF32 image, float value, int x0, int y0, int width, int height) {
@@ -2341,12 +2148,10 @@ public class ImplImageMiscOps {
 		final int _x0 = x0;
 
 		int length = (x1-x0)*image.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(y0,y1,y->{
-		for (int y = y0; y < y1; y++) {
+		BoofConcurrency.loopFor(y0,y1,y->{
 			int index = image.startIndex + y*image.stride + _x0*image.numBands;
 			Arrays.fill(image.data,index,index+length, value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillUniform(GrayF32 image, Random rand , float min , float max) {
@@ -2410,8 +2215,7 @@ public class ImplImageMiscOps {
 	public static void flipVertical( GrayF32 image ) {
 		int h2 = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h2,y->{
-		for( int y = 0; y < h2; y++ ) {
+		BoofConcurrency.loopFor(0,h2,y->{
 			int index1 = image.getStartIndex() + y * image.getStride();
 			int index2 = image.getStartIndex() + (image.height - y - 1) * image.getStride();
 
@@ -2422,15 +2226,13 @@ public class ImplImageMiscOps {
 				image.data[index1++] = image.data[index2];
 				image.data[index2++] = (float)tmp;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void flipHorizontal( GrayF32 image ) {
 		int w2 = image.width/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,image.height,y->{
-		for( int y = 0; y < image.height; y++ ) {
+		BoofConcurrency.loopFor(0,image.height,y->{
 			int index1 = image.getStartIndex() + y * image.getStride();
 			int index2 = index1 + image.width-1;
 
@@ -2441,8 +2243,7 @@ public class ImplImageMiscOps {
 				image.data[index1++] = image.data[index2];
 				image.data[index2--] = (float)tmp;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( GrayF32 image ) {
@@ -2452,8 +2253,7 @@ public class ImplImageMiscOps {
 		int w = image.height/2 + image.height%2;
 		int h = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y0->{
-		for( int y0 = 0; y0 < h; y0++ ) {
+		BoofConcurrency.loopFor(0,h,y0->{
 			int y1 = image.height-y0-1;
 
 			for( int x0 = 0; x0 < w; x0++ ) {
@@ -2471,8 +2271,7 @@ public class ImplImageMiscOps {
 				image.data[index1] = image.data[index0];
 				image.data[index0] = (float)tmp3;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( GrayF32 input , GrayF32 output ) {
@@ -2480,14 +2279,12 @@ public class ImplImageMiscOps {
 
 		int h = input.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(h-y,x,input.data[indexIn++]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( InterleavedF32 input , InterleavedF32 output ) {
@@ -2495,8 +2292,7 @@ public class ImplImageMiscOps {
 
 		int h = input.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexSrc = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				int indexDst = output.getIndex(h-y,x);
@@ -2506,8 +2302,7 @@ public class ImplImageMiscOps {
 					output.data[indexDst++] = input.data[indexSrc++];
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( GrayF32 image ) {
@@ -2517,8 +2312,7 @@ public class ImplImageMiscOps {
 		int w = image.height/2 + image.height%2;
 		int h = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y0->{
-		for( int y0 = 0; y0 < h; y0++ ) {
+		BoofConcurrency.loopFor(0,h,y0->{
 			int y1 = image.height-y0-1;
 
 			for( int x0 = 0; x0 < w; x0++ ) {
@@ -2536,8 +2330,7 @@ public class ImplImageMiscOps {
 				image.data[index2] = image.data[index3];
 				image.data[index3] = (float)tmp0;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( GrayF32 input , GrayF32 output ) {
@@ -2545,14 +2338,12 @@ public class ImplImageMiscOps {
 
 		int w = input.width-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(y,w-x,input.data[indexIn++]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( InterleavedF32 input , InterleavedF32 output ) {
@@ -2560,8 +2351,7 @@ public class ImplImageMiscOps {
 
 		int w = input.width-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexSrc = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				int indexDst = output.getIndex(y,w-x);
@@ -2571,8 +2361,7 @@ public class ImplImageMiscOps {
 					output.data[indexDst++] = input.data[indexSrc++];
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void growBorder(GrayF32 src , ImageBorder_F32 border, int borderX0, int borderY0, int borderX1, int borderY1 , GrayF32 dst )
@@ -2618,27 +2407,23 @@ public class ImplImageMiscOps {
 		
 		// Check to see if it's entirely contained inside the input image
 		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-			for (int y = 0; y < height; y++) {
+			BoofConcurrency.loopFor(0,height,y->{
 				int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
 				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 
 				System.arraycopy(input.data,indexSrc,output.data,indexDst,width);
-			}
-			//CONCURRENT_ABOVE });
+			});
 		} else {
 			// If any part is outside use the border. This isn't terribly efficient. A better approach is to
 			// handle all the possible outside regions independently. That code is significantly more complex so I'm
 			// punting it for a future person to write since this is good enough as it.
 			border.setImage(input);
-			//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-			for (int y = 0; y < height; y++) {
+			BoofConcurrency.loopFor(0,height,y->{
 				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 				for (int x = 0; x < width; x++) {
 					output.data[indexDst++] = border.get(srcX+x,srcY+y);
 				}
-			}
-			//CONCURRENT_ABOVE });
+			});
 		}
 	}
 
@@ -2650,14 +2435,12 @@ public class ImplImageMiscOps {
 		if( output.width < dstX+width || output.height < dstY+height )
 			throw new IllegalArgumentException("Copy region must be contained in the output image");
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-		for (int y = 0; y < height; y++) {
+		BoofConcurrency.loopFor(0,height,y->{
 			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
 			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
 
 			System.arraycopy(input.data,indexSrc,output.data,indexDst,width);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
@@ -2672,24 +2455,20 @@ public class ImplImageMiscOps {
 
 		final int numBands = input.numBands;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,height,y->{
-		for (int y = 0; y < height; y++) {
+		BoofConcurrency.loopFor(0,height,y->{
 			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
 			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
 
 			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fill(GrayF64 input, double value) {
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int index = input.getStartIndex() + y * input.getStride();
 			Arrays.fill(input.data,index,index+input.width, value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fill(InterleavedF64 input, double value) {
@@ -2704,8 +2483,7 @@ public class ImplImageMiscOps {
 	public static void fill(InterleavedF64 input, double[] values) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			for( int band = 0; band < numBands; band++ ) {
 				int index = input.getStartIndex() + y * input.getStride() + band;
 				int end = index + input.width*numBands - band;
@@ -2714,73 +2492,63 @@ public class ImplImageMiscOps {
 					input.data[index] = value;
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBand(InterleavedF64 input, int band , double value) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int index = input.getStartIndex() + y * input.getStride() + band;
 			int end = index + input.width*numBands - band;
 			for (; index < end; index += numBands ) {
 				input.data[index] = value;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void insertBand( GrayF64 input, int band , InterleavedF64 output) {
 
 		final int numBands = output.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.getStartIndex() + y * input.getStride();
 			int indexOut = output.getStartIndex() + y * output.getStride() + band;
 			int end = indexOut + output.width*numBands - band;
 			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void extractBand( InterleavedF64 input, int band , GrayF64 output) {
 
 		final int numBands = input.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for (int y = 0; y < input.height; y++) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.getStartIndex() + y * input.getStride() + band;
 			int indexOut = output.getStartIndex() + y * output.getStride();
 			int end = indexOut + output.width;
 			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
 				output.data[indexOut] = input.data[indexIn];
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBorder(GrayF64 input, double value, int radius ) {
 
 		// top and bottom
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,radius,y->{
-		for (int y = 0; y < radius; y++) {
+		BoofConcurrency.loopFor(0,radius,y->{
 			int indexTop = input.startIndex + y * input.stride;
 			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
 			for (int x = 0; x < input.width; x++) {
 				input.data[indexTop++] = value;
 				input.data[indexBottom++] = value;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 
 		// left and right
 		int h = input.height-radius;
 		int indexStart = input.startIndex + radius*input.stride;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,radius,x->{
-		for (int x = 0; x < radius; x++) {
+		BoofConcurrency.loopFor(0,radius,x->{
 			int indexLeft = indexStart + x;
 			int indexRight = indexStart + input.width-1-x;
 			for (int y = radius; y < h; y++) {
@@ -2790,8 +2558,7 @@ public class ImplImageMiscOps {
 				indexLeft += input.stride;
 				indexRight += input.stride;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillBorder(GrayF64 input, double value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
@@ -2837,12 +2604,10 @@ public class ImplImageMiscOps {
 		final int _x0 = x0;
 		final int _x1 = x1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(y0,y1,y->{
-		for (int y = y0; y < y1; y++) {
+		BoofConcurrency.loopFor(y0,y1,y->{
 			int index = image.startIndex + y*image.stride + _x0;
 			Arrays.fill(image.data,index,index+_x1-_x0, value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillRectangle(InterleavedF64 image, double value, int x0, int y0, int width, int height) {
@@ -2854,12 +2619,10 @@ public class ImplImageMiscOps {
 		final int _x0 = x0;
 
 		int length = (x1-x0)*image.numBands;
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(y0,y1,y->{
-		for (int y = y0; y < y1; y++) {
+		BoofConcurrency.loopFor(y0,y1,y->{
 			int index = image.startIndex + y*image.stride + _x0*image.numBands;
 			Arrays.fill(image.data,index,index+length, value);
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void fillUniform(GrayF64 image, Random rand , double min , double max) {
@@ -2923,8 +2686,7 @@ public class ImplImageMiscOps {
 	public static void flipVertical( GrayF64 image ) {
 		int h2 = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h2,y->{
-		for( int y = 0; y < h2; y++ ) {
+		BoofConcurrency.loopFor(0,h2,y->{
 			int index1 = image.getStartIndex() + y * image.getStride();
 			int index2 = image.getStartIndex() + (image.height - y - 1) * image.getStride();
 
@@ -2935,15 +2697,13 @@ public class ImplImageMiscOps {
 				image.data[index1++] = image.data[index2];
 				image.data[index2++] = (double)tmp;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void flipHorizontal( GrayF64 image ) {
 		int w2 = image.width/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,image.height,y->{
-		for( int y = 0; y < image.height; y++ ) {
+		BoofConcurrency.loopFor(0,image.height,y->{
 			int index1 = image.getStartIndex() + y * image.getStride();
 			int index2 = index1 + image.width-1;
 
@@ -2954,8 +2714,7 @@ public class ImplImageMiscOps {
 				image.data[index1++] = image.data[index2];
 				image.data[index2--] = (double)tmp;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( GrayF64 image ) {
@@ -2965,8 +2724,7 @@ public class ImplImageMiscOps {
 		int w = image.height/2 + image.height%2;
 		int h = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y0->{
-		for( int y0 = 0; y0 < h; y0++ ) {
+		BoofConcurrency.loopFor(0,h,y0->{
 			int y1 = image.height-y0-1;
 
 			for( int x0 = 0; x0 < w; x0++ ) {
@@ -2984,8 +2742,7 @@ public class ImplImageMiscOps {
 				image.data[index1] = image.data[index0];
 				image.data[index0] = (double)tmp3;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( GrayF64 input , GrayF64 output ) {
@@ -2993,14 +2750,12 @@ public class ImplImageMiscOps {
 
 		int h = input.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(h-y,x,input.data[indexIn++]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCW( InterleavedF64 input , InterleavedF64 output ) {
@@ -3008,8 +2763,7 @@ public class ImplImageMiscOps {
 
 		int h = input.height-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexSrc = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				int indexDst = output.getIndex(h-y,x);
@@ -3019,8 +2773,7 @@ public class ImplImageMiscOps {
 					output.data[indexDst++] = input.data[indexSrc++];
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( GrayF64 image ) {
@@ -3030,8 +2783,7 @@ public class ImplImageMiscOps {
 		int w = image.height/2 + image.height%2;
 		int h = image.height/2;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,h,y0->{
-		for( int y0 = 0; y0 < h; y0++ ) {
+		BoofConcurrency.loopFor(0,h,y0->{
 			int y1 = image.height-y0-1;
 
 			for( int x0 = 0; x0 < w; x0++ ) {
@@ -3049,8 +2801,7 @@ public class ImplImageMiscOps {
 				image.data[index2] = image.data[index3];
 				image.data[index3] = (double)tmp0;
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( GrayF64 input , GrayF64 output ) {
@@ -3058,14 +2809,12 @@ public class ImplImageMiscOps {
 
 		int w = input.width-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexIn = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				output.unsafe_set(y,w-x,input.data[indexIn++]);
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void rotateCCW( InterleavedF64 input , InterleavedF64 output ) {
@@ -3073,8 +2822,7 @@ public class ImplImageMiscOps {
 
 		int w = input.width-1;
 
-		//CONCURRENT_BELOW BoofConcurrency.loopFor(0,input.height,y->{
-		for( int y = 0; y < input.height; y++ ) {
+		BoofConcurrency.loopFor(0,input.height,y->{
 			int indexSrc = input.startIndex + y*input.stride;
 			for (int x = 0; x < input.width; x++) {
 				int indexDst = output.getIndex(y,w-x);
@@ -3084,8 +2832,7 @@ public class ImplImageMiscOps {
 					output.data[indexDst++] = input.data[indexSrc++];
 				}
 			}
-		}
-		//CONCURRENT_ABOVE });
+		});
 	}
 
 	public static void growBorder(GrayF64 src , ImageBorder_F64 border, int borderX0, int borderY0, int borderX1, int borderY1 , GrayF64 dst )

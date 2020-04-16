@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package boofcv.alg.misc;
+package boofcv.alg.misc.impl;
 
-/**
- * @author Peter Abeles
- */
-@SuppressWarnings({"unchecked", "rawtypes"})
-class TestImageMiscOps extends CompareToImplImageMiscOps {
-	TestImageMiscOps() {
-		super(ImageMiscOps.class, 40, 50);
+import boofcv.alg.misc.CompareToImplImageMiscOps;
+
+class TestImplImageMiscOps_MT extends CompareToImplImageMiscOps {
+
+	TestImplImageMiscOps_MT() {
+		super(ImplImageMiscOps_MT.class, 40, 50);
 	}
 }
+

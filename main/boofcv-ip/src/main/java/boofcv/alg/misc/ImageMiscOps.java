@@ -19,6 +19,8 @@
 package boofcv.alg.misc;
 
 import boofcv.alg.misc.impl.ImplImageMiscOps;
+import boofcv.alg.misc.impl.ImplImageMiscOps_MT;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_F64;
 import boofcv.struct.border.ImageBorder_S32;
@@ -26,7 +28,6 @@ import boofcv.struct.border.ImageBorder_S64;
 import boofcv.struct.image.*;
 
 import javax.annotation.Generated;
-import java.util.Arrays;
 import java.util.Random;
 
 
@@ -41,6 +42,18 @@ import java.util.Random;
  */
 @Generated("boofcv.alg.misc.GenerateImageMiscOps")
 public class ImageMiscOps {
+	/**
+	 * If the image has fewer than this elements do not run the concurrent version of the function since it could
+	 * run slower
+	 */
+	public static int MIN_ELEMENTS_CONCURRENT = 400*400;
+	
+	public static boolean runConcurrent( ImageBase image ) {
+		return runConcurrent(image.width*image.height);
+	}
+	public static boolean runConcurrent( int numElements ) {
+		return BoofConcurrency.isUseConcurrent() && (numElements >= MIN_ELEMENTS_CONCURRENT);
+	}
 
 	/**
 	 * Copies a rectangular region from one image into another. The region can go outside the input image's border.<br>
@@ -57,33 +70,13 @@ public class ImageMiscOps {
 	 * @param output output image
 	 */
 	public static < T extends GrayI8<T>> void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
-							 T input , ImageBorder_S32<T> border, GrayI8 output )
-	{
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
-		
-		// Check to see if it's entirely contained inside the input image
-		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
-			for (int y = 0; y < height; y++) {
-				int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
-				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-
-				for (int x = 0; x < width; x++) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
-		} else {
-			// If any part is outside use the border. This isn't terribly efficient. A better approach is to
-			// handle all the possible outside regions independently. That code is significantly more complex so I'm
-			// punting it for a future person to write since this is good enough as it.
-			border.setImage(input);
-			for (int y = 0; y < height; y++) {
-				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-				for (int x = 0; x < width; x++) {
-					output.data[indexDst++] = (byte)border.get(srcX+x,srcY+y);
-				}
-			}
-		}
+							 T input , ImageBorder_S32<T> border, GrayI8 output ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, border, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, border, output);
+//		}
 	}
 
 	/**
@@ -101,20 +94,12 @@ public class ImageMiscOps {
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 GrayI8 input , GrayI8 output ) {
-
-		if( input.width < srcX+width || input.height < srcY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the input image");
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image");
-
-		for (int y = 0; y < height; y++) {
-			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
-			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-
-			for (int x = 0; x < width; x++) {
-				output.data[indexDst++] = input.data[indexSrc++];
-			}
-		}
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		}
 	}
 
 	/**
@@ -132,90 +117,69 @@ public class ImageMiscOps {
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 InterleavedI8 input , InterleavedI8 output ) {
-
-		if( input.width < srcX+width || input.height < srcY+height )
-			throw new IllegalArgumentException("Copy region must be contained input image");
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained output image");
-		if( output.numBands != input.numBands )
-			throw new IllegalArgumentException("Number of bands must match. "+input.numBands+" != "+output.numBands);
-
-		final int numBands = input.numBands;
-
-		for (int y = 0; y < height; y++) {
-			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
-			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
-
-			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
-		}
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		}
 	}
 
 	/**
 	 * Fills the whole image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(GrayI8 input, int value) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			Arrays.fill(input.data,index,index+input.width, (byte)value);
-		}
+	public static void fill(GrayI8 image, int value) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fill(image, value);
+//		} else {
+		ImplImageMiscOps.fill(image, value);
+//		}
 	}
 
 	/**
 	 * Fills the whole image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(InterleavedI8 input, int value) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int end = index + input.width*input.numBands;
-			Arrays.fill(input.data,index,end, (byte)value);
+	public static void fill(InterleavedI8 image, int value) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fill(image, value);
+		} else {
+			ImplImageMiscOps.fill(image, value);
 		}
 	}
 
 	/**
 	 * Fills each band in the image with the specified values
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param values Array which contains the values each band is to be filled with.
 	 */
-	public static void fill(InterleavedI8 input, int[] values) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			for( int band = 0; band < numBands; band++ ) {
-				int index = input.getStartIndex() + y * input.getStride() + band;
-				int end = index + input.width*numBands - band;
-				int value = values[band];
-				for (; index < end; index += numBands ) {
-					input.data[index] = (byte)value;
-				}
-			}
+	public static void fill(InterleavedI8 image, int[] values) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fill(image, values);
+		} else {
+			ImplImageMiscOps.fill(image, values);
 		}
 	}
 
 	/**
 	 * Fills one band in the image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param band Which band is to be filled with the specified value   
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fillBand(InterleavedI8 input, int band , int value) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride() + band;
-			int end = index + input.width*numBands - band;
-			for (; index < end; index += numBands ) {
-				input.data[index] = (byte)value;
-			}
+	public static void fillBand(InterleavedI8 image, int band , int value) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fillBand(image, band, value);
+		} else {
+			ImplImageMiscOps.fillBand(image, band, value);
 		}
 	}
 
@@ -227,167 +191,100 @@ public class ImageMiscOps {
 	 * @param output The multi-band image which the input image is to be inserted into
 	 */
 	public static void insertBand( GrayI8 input, int band , InterleavedI8 output) {
-
-		final int numBands = output.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexIn = input.getStartIndex() + y * input.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride() + band;
-			int end = indexOut + output.width*numBands - band;
-			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
-				output.data[indexOut] = input.data[indexIn];
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.insertBand(input, band, output);
+		} else {
+			ImplImageMiscOps.insertBand(input, band, output);
 		}
 	}
 
 	/**
 	 * Extracts a single band from a multi-band image
 	 *
-	 * @param input Multi-band image
-	 * @param band which bad is to be extracted   
-	 * @param output The single band image
+	 * @param input Multi-band image.
+	 * @param band which bad is to be extracted
+	 * @param output The single band image. Modified.
 	 */
 	public static void extractBand( InterleavedI8 input, int band , GrayI8 output) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexIn = input.getStartIndex() + y * input.getStride() + band;
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			int end = indexOut + output.width;
-			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
-				output.data[indexOut] = input.data[indexIn];
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.extractBand(input, band, output);
+		} else {
+			ImplImageMiscOps.extractBand(input, band, output);
 		}
 	}
 
 	/**
 	 * Fills the outside border with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
-	 * @param radius Border width.   
+	 * @param radius Border width.
 	 */
-	public static void fillBorder(GrayI8 input, int value, int radius ) {
-
-		// top and bottom
-		for (int y = 0; y < radius; y++) {
-			int indexTop = input.startIndex + y * input.stride;
-			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[indexTop++] = (byte)value;
-				input.data[indexBottom++] = (byte)value;
-			}
-		}
-
-		// left and right
-		int h = input.height-radius;
-		int indexStart = input.startIndex + radius*input.stride;
-		for (int x = 0; x < radius; x++) {
-			int indexLeft = indexStart + x;
-			int indexRight = indexStart + input.width-1-x;
-			for (int y = radius; y < h; y++) {
-				input.data[indexLeft] = (byte)value;
-				input.data[indexRight] = (byte)value;
-				
-				indexLeft += input.stride;
-				indexRight += input.stride;
-			}
-		}
+	public static void fillBorder(GrayI8 image, int value, int radius ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillBorder(image, value, radius);
+//		} else {
+		ImplImageMiscOps.fillBorder(image, value, radius);
+//		}
 	}
 
 	/**
 	 * Fills the border with independent border widths for each side
 	 *
-	 * @param input An image.
+	 * @param image An image.
 	 * @param value The value that the image is being filled with.
 	 * @param borderX0 Width of border on left
-	 * @param borderY0 Width of border on top   
+	 * @param borderY0 Width of border on top
 	 * @param borderX1 Width of border on right
 	 * @param borderY1 Width of border on bottom
 	 */
-	public static void fillBorder(GrayI8 input, int value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
-
-		// top and bottom
-		for (int y = 0; y < borderY0; y++) {
-			int srcIdx = input.startIndex + y * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[srcIdx++] = (byte)value;
-			}
-		}
-		for (int y = input.height-borderY1; y < input.height; y++) {
-			int srcIdx = input.startIndex + y * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[srcIdx++] = (byte)value;
-			}
-		}
-
-		// left and right
-		int h = input.height-borderY1;
-		for (int x = 0; x < borderX0; x++) {
-			int srcIdx = input.startIndex + borderY0*input.stride + x;
-			for (int y = borderY0; y < h; y++) {
-				input.data[srcIdx] = (byte)value;
-				srcIdx += input.stride;
-			}
-		}
-		for (int x = input.width-borderX1; x < input.width; x++) {
-			int srcIdx = input.startIndex + borderY0*input.stride + x;
-			for (int y = borderY0; y < h; y++) {
-				input.data[srcIdx] = (byte)value;
-				srcIdx += input.stride;
-			}
-		}
+	public static void fillBorder(GrayI8 image, int value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillBorder(image, value, borderX0, borderY0, borderX1, borderY1);
+//		} else {
+		ImplImageMiscOps.fillBorder(image, value, borderX0, borderY0, borderX1, borderY1);
+//		}
 	}
 
 	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
-	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param image The image the rectangle is drawn in. Modified
 	 * @param value Value of the rectangle
 	 * @param x0 Top left x-coordinate
 	 * @param y0 Top left y-coordinate
 	 * @param width Rectangle width
 	 * @param height Rectangle height
 	 */
-	public static void fillRectangle(GrayI8 img, int value, int x0, int y0, int width, int height) {
-		int x1 = x0 + width;
-		int y1 = y0 + height;
-
-		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
-		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
-
-		for (int y = y0; y < y1; y++) {
-			for (int x = x0; x < x1; x++) {
-				img.set(x, y, value);
-			}
-		}
+	public static void fillRectangle(GrayI8 image, int value, int x0, int y0, int width, int height) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillRectangle(image, value, x0, y0, width, height);
+//		} else {
+		ImplImageMiscOps.fillRectangle(image, value, x0, y0, width, height);
+//		}
 	}
 
 	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.  All bands
 	 * are filled with the same value.
 	 *
-	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param image The image the rectangle is drawn in. Modified
 	 * @param value Value of the rectangle
 	 * @param x0 Top left x-coordinate
 	 * @param y0 Top left y-coordinate
 	 * @param width Rectangle width
 	 * @param height Rectangle height
 	 */
-	public static void fillRectangle(InterleavedI8 img, byte value, int x0, int y0, int width, int height) {
-		int x1 = x0 + width;
-		int y1 = y0 + height;
-
-		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
-		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
-
-		int length = (x1-x0)*img.numBands;
-		for (int y = y0; y < y1; y++) {
-			int index = img.startIndex + y*img.stride + x0*img.numBands;
-			int indexEnd = index + length;
-			while( index < indexEnd ) {
-				img.data[index++] = value;
-			}
-		}
+	public static void fillRectangle(InterleavedI8 image, int value, int x0, int y0, int width, int height) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillRectangle(image, value, x0, y0, width, height);
+//		} else {
+		ImplImageMiscOps.fillRectangle(image, value, x0, y0, width, height);
+//		}
 	}	/**
 	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
@@ -397,16 +294,7 @@ public class ImageMiscOps {
 	 * @param max Maximum value of the distribution, exclusive
 	 */
 	public static void fillUniform(GrayI8 img, Random rand , int min , int max) {
-		int range = max-min;
-
-		byte[] data = img.data;
-
-		for (int y = 0; y < img.height; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			for (int x = 0; x < img.width; x++) {
-				data[index++] = (byte)(rand.nextInt(range)+min);
-			}
-		}
+		ImplImageMiscOps.fillUniform(img, rand, min, max);
 	}
 
 	/**
@@ -418,17 +306,7 @@ public class ImageMiscOps {
 	 * @param max Maximum value of the distribution, exclusive
 	 */
 	public static void fillUniform(InterleavedI8 img, Random rand , int min , int max) {
-		int range = max-min;
-
-		byte[] data = img.data;
-
-		for (int y = 0; y < img.height; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			int end = index + img.width*img.numBands;
-			for (; index <  end; index++) {
-				data[index] = (byte)(rand.nextInt(range)+min);
-			}
-		}
+		ImplImageMiscOps.fillUniform(img, rand, min, max);
 	}
 
 	/**
@@ -444,17 +322,7 @@ public class ImageMiscOps {
 	 * @param upperBound Upper bound of value clip
 	 */
 	public static void fillGaussian(GrayI8 input, Random rand , double mean , double sigma , int lowerBound , int upperBound ) {
-		byte[] data = input.data;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				int value = (int)(rand.nextGaussian()*sigma+mean);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				data[index++] = (byte)value;
-			}
-		}
+		ImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);
 	}
 
 	/**
@@ -470,59 +338,28 @@ public class ImageMiscOps {
 	 * @param upperBound Upper bound of value clip
 	 */
 	public static void fillGaussian(InterleavedI8 input, Random rand , double mean , double sigma , int lowerBound , int upperBound ) {
-		byte[] data = input.data;
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int indexEnd = index+length;
-
-			while( index < indexEnd ) {
-				int value = (int)(rand.nextGaussian()*sigma+mean);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				data[index++] = (byte)value;
-			}
-		}
+		ImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Flips the image from top to bottom
 	 */
-	public static void flipVertical( GrayI8 input ) {
-		int h2 = input.height/2;
-
-		for( int y = 0; y < h2; y++ ) {
-			int index1 = input.getStartIndex() + y * input.getStride();
-			int index2 = input.getStartIndex() + (input.height - y - 1) * input.getStride();
-
-			int end = index1 + input.width;
-
-			while( index1 < end ) {
-				int tmp = input.data[index1];
-				input.data[index1++] = input.data[index2];
-				input.data[index2++] = (byte)tmp;
-			}
+	public static void flipVertical( GrayI8 image ) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.flipVertical(image);
+		} else {
+			ImplImageMiscOps.flipVertical(image);
 		}
 	}
 
 	/**
 	 * Flips the image from left to right
 	 */
-	public static void flipHorizontal( GrayI8 input ) {
-		int w2 = input.width/2;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int index1 = input.getStartIndex() + y * input.getStride();
-			int index2 = index1 + input.width-1;
-
-			int end = index1 + w2;
-
-			while( index1 < end ) {
-				int tmp = input.data[index1];
-				input.data[index1++] = input.data[index2];
-				input.data[index2--] = (byte)tmp;
-			}
+	public static void flipHorizontal( GrayI8 image ) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.flipHorizontal(image);
+		} else {
+			ImplImageMiscOps.flipHorizontal(image);
 		}
 	}
 
@@ -531,30 +368,10 @@ public class ImageMiscOps {
 	 * square images.
 	 */
 	public static void rotateCW( GrayI8 image ) {
-		if( image.width != image.height )
-			throw new IllegalArgumentException("Image must be square");
-
-		int w = image.height/2 + image.height%2;
-		int h = image.height/2;
-
-		for( int y0 = 0; y0 < h; y0++ ) {
-			int y1 = image.height-y0-1;
-
-			for( int x0 = 0; x0 < w; x0++ ) {
-				int x1 = image.width-x0-1;
-
-				int index0 = image.startIndex + y0*image.stride + x0;
-				int index1 = image.startIndex + x0*image.stride + y1;
-				int index2 = image.startIndex + y1*image.stride + x1;
-				int index3 = image.startIndex + x1*image.stride + y0;
-				
-				int tmp3 = image.data[index3];
-
-				image.data[index3] = image.data[index2];
-				image.data[index2] = image.data[index1];
-				image.data[index1] = image.data[index0];
-				image.data[index0] = (byte)tmp3;
-			}
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.rotateCW(image);
+		} else {
+			ImplImageMiscOps.rotateCW(image);
 		}
 	}
 
@@ -562,16 +379,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( GrayI8 input , GrayI8 output ) {
-		if( input.width != output.height || input.height != output.width )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int h = input.height-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexIn = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				output.unsafe_set(h-y,x,input.data[indexIn++]);
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCW(input, output);
 		}
 	}
 
@@ -579,21 +390,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( InterleavedI8 input , InterleavedI8 output ) {
-		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int h = input.height-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				int indexDst = output.getIndex(h-y,x);
-
-				int end = indexSrc + input.numBands;
-				while( indexSrc != end ) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCW(input, output);
 		}
 	}
 
@@ -602,30 +402,10 @@ public class ImageMiscOps {
 	 * square images.
 	 */
 	public static void rotateCCW( GrayI8 image ) {
-		if( image.width != image.height )
-			throw new IllegalArgumentException("Image must be square");
-
-		int w = image.height/2 + image.height%2;
-		int h = image.height/2;
-
-		for( int y0 = 0; y0 < h; y0++ ) {
-			int y1 = image.height-y0-1;
-
-			for( int x0 = 0; x0 < w; x0++ ) {
-				int x1 = image.width-x0-1;
-
-				int index0 = image.startIndex + y0*image.stride + x0;
-				int index1 = image.startIndex + x0*image.stride + y1;
-				int index2 = image.startIndex + y1*image.stride + x1;
-				int index3 = image.startIndex + x1*image.stride + y0;
-				
-				int tmp0 = image.data[index0];
-
-				image.data[index0] = image.data[index1];
-				image.data[index1] = image.data[index2];
-				image.data[index2] = image.data[index3];
-				image.data[index3] = (byte)tmp0;
-			}
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.rotateCCW(image);
+		} else {
+			ImplImageMiscOps.rotateCCW(image);
 		}
 	}
 
@@ -633,16 +413,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
 	public static void rotateCCW( GrayI8 input , GrayI8 output ) {
-		if( input.width != output.height || input.height != output.width )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int w = input.width-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexIn = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				output.unsafe_set(y,w-x,input.data[indexIn++]);
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCCW(input, output);
 		}
 	}
 
@@ -650,21 +424,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
 	public static void rotateCCW( InterleavedI8 input , InterleavedI8 output ) {
-		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int w = input.width-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				int indexDst = output.getIndex(y,w-x);
-
-				int end = indexSrc + input.numBands;
-				while( indexSrc != end ) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCCW(input, output);
 		}
 	}
 
@@ -681,7 +444,11 @@ public class ImageMiscOps {
 	 */
 	public static <T extends GrayI8<T>>
 	void growBorder(T src , ImageBorder_S32<T> border, int borderX0, int borderY0, int borderX1, int borderY1, T dst ) {
-		ImplImageMiscOps.growBorder(src,border,borderX0,borderY0,borderX1,borderY1,dst);
+		if( runConcurrent(src) ) {
+			ImplImageMiscOps_MT.growBorder(src, border, borderX0, borderY0, borderX1, borderY1, dst);
+		} else {
+			ImplImageMiscOps.growBorder(src, border, borderX0, borderY0, borderX1, borderY1, dst);
+		}
 	}
 
 	/**
@@ -699,33 +466,13 @@ public class ImageMiscOps {
 	 * @param output output image
 	 */
 	public static < T extends GrayI16<T>> void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
-							 T input , ImageBorder_S32<T> border, GrayI16 output )
-	{
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
-		
-		// Check to see if it's entirely contained inside the input image
-		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
-			for (int y = 0; y < height; y++) {
-				int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
-				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-
-				for (int x = 0; x < width; x++) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
-		} else {
-			// If any part is outside use the border. This isn't terribly efficient. A better approach is to
-			// handle all the possible outside regions independently. That code is significantly more complex so I'm
-			// punting it for a future person to write since this is good enough as it.
-			border.setImage(input);
-			for (int y = 0; y < height; y++) {
-				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-				for (int x = 0; x < width; x++) {
-					output.data[indexDst++] = (short)border.get(srcX+x,srcY+y);
-				}
-			}
-		}
+							 T input , ImageBorder_S32<T> border, GrayI16 output ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, border, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, border, output);
+//		}
 	}
 
 	/**
@@ -743,20 +490,12 @@ public class ImageMiscOps {
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 GrayI16 input , GrayI16 output ) {
-
-		if( input.width < srcX+width || input.height < srcY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the input image");
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image");
-
-		for (int y = 0; y < height; y++) {
-			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
-			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-
-			for (int x = 0; x < width; x++) {
-				output.data[indexDst++] = input.data[indexSrc++];
-			}
-		}
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		}
 	}
 
 	/**
@@ -774,90 +513,69 @@ public class ImageMiscOps {
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 InterleavedI16 input , InterleavedI16 output ) {
-
-		if( input.width < srcX+width || input.height < srcY+height )
-			throw new IllegalArgumentException("Copy region must be contained input image");
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained output image");
-		if( output.numBands != input.numBands )
-			throw new IllegalArgumentException("Number of bands must match. "+input.numBands+" != "+output.numBands);
-
-		final int numBands = input.numBands;
-
-		for (int y = 0; y < height; y++) {
-			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
-			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
-
-			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
-		}
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		}
 	}
 
 	/**
 	 * Fills the whole image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(GrayI16 input, int value) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			Arrays.fill(input.data,index,index+input.width, (short)value);
-		}
+	public static void fill(GrayI16 image, int value) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fill(image, value);
+//		} else {
+		ImplImageMiscOps.fill(image, value);
+//		}
 	}
 
 	/**
 	 * Fills the whole image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(InterleavedI16 input, int value) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int end = index + input.width*input.numBands;
-			Arrays.fill(input.data,index,end, (short)value);
+	public static void fill(InterleavedI16 image, int value) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fill(image, value);
+		} else {
+			ImplImageMiscOps.fill(image, value);
 		}
 	}
 
 	/**
 	 * Fills each band in the image with the specified values
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param values Array which contains the values each band is to be filled with.
 	 */
-	public static void fill(InterleavedI16 input, int[] values) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			for( int band = 0; band < numBands; band++ ) {
-				int index = input.getStartIndex() + y * input.getStride() + band;
-				int end = index + input.width*numBands - band;
-				int value = values[band];
-				for (; index < end; index += numBands ) {
-					input.data[index] = (short)value;
-				}
-			}
+	public static void fill(InterleavedI16 image, int[] values) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fill(image, values);
+		} else {
+			ImplImageMiscOps.fill(image, values);
 		}
 	}
 
 	/**
 	 * Fills one band in the image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param band Which band is to be filled with the specified value   
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fillBand(InterleavedI16 input, int band , int value) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride() + band;
-			int end = index + input.width*numBands - band;
-			for (; index < end; index += numBands ) {
-				input.data[index] = (short)value;
-			}
+	public static void fillBand(InterleavedI16 image, int band , int value) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fillBand(image, band, value);
+		} else {
+			ImplImageMiscOps.fillBand(image, band, value);
 		}
 	}
 
@@ -869,167 +587,100 @@ public class ImageMiscOps {
 	 * @param output The multi-band image which the input image is to be inserted into
 	 */
 	public static void insertBand( GrayI16 input, int band , InterleavedI16 output) {
-
-		final int numBands = output.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexIn = input.getStartIndex() + y * input.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride() + band;
-			int end = indexOut + output.width*numBands - band;
-			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
-				output.data[indexOut] = input.data[indexIn];
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.insertBand(input, band, output);
+		} else {
+			ImplImageMiscOps.insertBand(input, band, output);
 		}
 	}
 
 	/**
 	 * Extracts a single band from a multi-band image
 	 *
-	 * @param input Multi-band image
-	 * @param band which bad is to be extracted   
-	 * @param output The single band image
+	 * @param input Multi-band image.
+	 * @param band which bad is to be extracted
+	 * @param output The single band image. Modified.
 	 */
 	public static void extractBand( InterleavedI16 input, int band , GrayI16 output) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexIn = input.getStartIndex() + y * input.getStride() + band;
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			int end = indexOut + output.width;
-			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
-				output.data[indexOut] = input.data[indexIn];
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.extractBand(input, band, output);
+		} else {
+			ImplImageMiscOps.extractBand(input, band, output);
 		}
 	}
 
 	/**
 	 * Fills the outside border with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
-	 * @param radius Border width.   
+	 * @param radius Border width.
 	 */
-	public static void fillBorder(GrayI16 input, int value, int radius ) {
-
-		// top and bottom
-		for (int y = 0; y < radius; y++) {
-			int indexTop = input.startIndex + y * input.stride;
-			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[indexTop++] = (short)value;
-				input.data[indexBottom++] = (short)value;
-			}
-		}
-
-		// left and right
-		int h = input.height-radius;
-		int indexStart = input.startIndex + radius*input.stride;
-		for (int x = 0; x < radius; x++) {
-			int indexLeft = indexStart + x;
-			int indexRight = indexStart + input.width-1-x;
-			for (int y = radius; y < h; y++) {
-				input.data[indexLeft] = (short)value;
-				input.data[indexRight] = (short)value;
-				
-				indexLeft += input.stride;
-				indexRight += input.stride;
-			}
-		}
+	public static void fillBorder(GrayI16 image, int value, int radius ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillBorder(image, value, radius);
+//		} else {
+		ImplImageMiscOps.fillBorder(image, value, radius);
+//		}
 	}
 
 	/**
 	 * Fills the border with independent border widths for each side
 	 *
-	 * @param input An image.
+	 * @param image An image.
 	 * @param value The value that the image is being filled with.
 	 * @param borderX0 Width of border on left
-	 * @param borderY0 Width of border on top   
+	 * @param borderY0 Width of border on top
 	 * @param borderX1 Width of border on right
 	 * @param borderY1 Width of border on bottom
 	 */
-	public static void fillBorder(GrayI16 input, int value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
-
-		// top and bottom
-		for (int y = 0; y < borderY0; y++) {
-			int srcIdx = input.startIndex + y * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[srcIdx++] = (short)value;
-			}
-		}
-		for (int y = input.height-borderY1; y < input.height; y++) {
-			int srcIdx = input.startIndex + y * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[srcIdx++] = (short)value;
-			}
-		}
-
-		// left and right
-		int h = input.height-borderY1;
-		for (int x = 0; x < borderX0; x++) {
-			int srcIdx = input.startIndex + borderY0*input.stride + x;
-			for (int y = borderY0; y < h; y++) {
-				input.data[srcIdx] = (short)value;
-				srcIdx += input.stride;
-			}
-		}
-		for (int x = input.width-borderX1; x < input.width; x++) {
-			int srcIdx = input.startIndex + borderY0*input.stride + x;
-			for (int y = borderY0; y < h; y++) {
-				input.data[srcIdx] = (short)value;
-				srcIdx += input.stride;
-			}
-		}
+	public static void fillBorder(GrayI16 image, int value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillBorder(image, value, borderX0, borderY0, borderX1, borderY1);
+//		} else {
+		ImplImageMiscOps.fillBorder(image, value, borderX0, borderY0, borderX1, borderY1);
+//		}
 	}
 
 	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
-	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param image The image the rectangle is drawn in. Modified
 	 * @param value Value of the rectangle
 	 * @param x0 Top left x-coordinate
 	 * @param y0 Top left y-coordinate
 	 * @param width Rectangle width
 	 * @param height Rectangle height
 	 */
-	public static void fillRectangle(GrayI16 img, int value, int x0, int y0, int width, int height) {
-		int x1 = x0 + width;
-		int y1 = y0 + height;
-
-		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
-		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
-
-		for (int y = y0; y < y1; y++) {
-			for (int x = x0; x < x1; x++) {
-				img.set(x, y, value);
-			}
-		}
+	public static void fillRectangle(GrayI16 image, int value, int x0, int y0, int width, int height) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillRectangle(image, value, x0, y0, width, height);
+//		} else {
+		ImplImageMiscOps.fillRectangle(image, value, x0, y0, width, height);
+//		}
 	}
 
 	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.  All bands
 	 * are filled with the same value.
 	 *
-	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param image The image the rectangle is drawn in. Modified
 	 * @param value Value of the rectangle
 	 * @param x0 Top left x-coordinate
 	 * @param y0 Top left y-coordinate
 	 * @param width Rectangle width
 	 * @param height Rectangle height
 	 */
-	public static void fillRectangle(InterleavedI16 img, short value, int x0, int y0, int width, int height) {
-		int x1 = x0 + width;
-		int y1 = y0 + height;
-
-		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
-		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
-
-		int length = (x1-x0)*img.numBands;
-		for (int y = y0; y < y1; y++) {
-			int index = img.startIndex + y*img.stride + x0*img.numBands;
-			int indexEnd = index + length;
-			while( index < indexEnd ) {
-				img.data[index++] = value;
-			}
-		}
+	public static void fillRectangle(InterleavedI16 image, int value, int x0, int y0, int width, int height) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillRectangle(image, value, x0, y0, width, height);
+//		} else {
+		ImplImageMiscOps.fillRectangle(image, value, x0, y0, width, height);
+//		}
 	}	/**
 	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
@@ -1039,16 +690,7 @@ public class ImageMiscOps {
 	 * @param max Maximum value of the distribution, exclusive
 	 */
 	public static void fillUniform(GrayI16 img, Random rand , int min , int max) {
-		int range = max-min;
-
-		short[] data = img.data;
-
-		for (int y = 0; y < img.height; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			for (int x = 0; x < img.width; x++) {
-				data[index++] = (short)(rand.nextInt(range)+min);
-			}
-		}
+		ImplImageMiscOps.fillUniform(img, rand, min, max);
 	}
 
 	/**
@@ -1060,17 +702,7 @@ public class ImageMiscOps {
 	 * @param max Maximum value of the distribution, exclusive
 	 */
 	public static void fillUniform(InterleavedI16 img, Random rand , int min , int max) {
-		int range = max-min;
-
-		short[] data = img.data;
-
-		for (int y = 0; y < img.height; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			int end = index + img.width*img.numBands;
-			for (; index <  end; index++) {
-				data[index] = (short)(rand.nextInt(range)+min);
-			}
-		}
+		ImplImageMiscOps.fillUniform(img, rand, min, max);
 	}
 
 	/**
@@ -1086,17 +718,7 @@ public class ImageMiscOps {
 	 * @param upperBound Upper bound of value clip
 	 */
 	public static void fillGaussian(GrayI16 input, Random rand , double mean , double sigma , int lowerBound , int upperBound ) {
-		short[] data = input.data;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				int value = (int)(rand.nextGaussian()*sigma+mean);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				data[index++] = (short)value;
-			}
-		}
+		ImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);
 	}
 
 	/**
@@ -1112,59 +734,28 @@ public class ImageMiscOps {
 	 * @param upperBound Upper bound of value clip
 	 */
 	public static void fillGaussian(InterleavedI16 input, Random rand , double mean , double sigma , int lowerBound , int upperBound ) {
-		short[] data = input.data;
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int indexEnd = index+length;
-
-			while( index < indexEnd ) {
-				int value = (int)(rand.nextGaussian()*sigma+mean);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				data[index++] = (short)value;
-			}
-		}
+		ImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Flips the image from top to bottom
 	 */
-	public static void flipVertical( GrayI16 input ) {
-		int h2 = input.height/2;
-
-		for( int y = 0; y < h2; y++ ) {
-			int index1 = input.getStartIndex() + y * input.getStride();
-			int index2 = input.getStartIndex() + (input.height - y - 1) * input.getStride();
-
-			int end = index1 + input.width;
-
-			while( index1 < end ) {
-				int tmp = input.data[index1];
-				input.data[index1++] = input.data[index2];
-				input.data[index2++] = (short)tmp;
-			}
+	public static void flipVertical( GrayI16 image ) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.flipVertical(image);
+		} else {
+			ImplImageMiscOps.flipVertical(image);
 		}
 	}
 
 	/**
 	 * Flips the image from left to right
 	 */
-	public static void flipHorizontal( GrayI16 input ) {
-		int w2 = input.width/2;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int index1 = input.getStartIndex() + y * input.getStride();
-			int index2 = index1 + input.width-1;
-
-			int end = index1 + w2;
-
-			while( index1 < end ) {
-				int tmp = input.data[index1];
-				input.data[index1++] = input.data[index2];
-				input.data[index2--] = (short)tmp;
-			}
+	public static void flipHorizontal( GrayI16 image ) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.flipHorizontal(image);
+		} else {
+			ImplImageMiscOps.flipHorizontal(image);
 		}
 	}
 
@@ -1173,30 +764,10 @@ public class ImageMiscOps {
 	 * square images.
 	 */
 	public static void rotateCW( GrayI16 image ) {
-		if( image.width != image.height )
-			throw new IllegalArgumentException("Image must be square");
-
-		int w = image.height/2 + image.height%2;
-		int h = image.height/2;
-
-		for( int y0 = 0; y0 < h; y0++ ) {
-			int y1 = image.height-y0-1;
-
-			for( int x0 = 0; x0 < w; x0++ ) {
-				int x1 = image.width-x0-1;
-
-				int index0 = image.startIndex + y0*image.stride + x0;
-				int index1 = image.startIndex + x0*image.stride + y1;
-				int index2 = image.startIndex + y1*image.stride + x1;
-				int index3 = image.startIndex + x1*image.stride + y0;
-				
-				int tmp3 = image.data[index3];
-
-				image.data[index3] = image.data[index2];
-				image.data[index2] = image.data[index1];
-				image.data[index1] = image.data[index0];
-				image.data[index0] = (short)tmp3;
-			}
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.rotateCW(image);
+		} else {
+			ImplImageMiscOps.rotateCW(image);
 		}
 	}
 
@@ -1204,16 +775,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( GrayI16 input , GrayI16 output ) {
-		if( input.width != output.height || input.height != output.width )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int h = input.height-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexIn = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				output.unsafe_set(h-y,x,input.data[indexIn++]);
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCW(input, output);
 		}
 	}
 
@@ -1221,21 +786,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( InterleavedI16 input , InterleavedI16 output ) {
-		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int h = input.height-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				int indexDst = output.getIndex(h-y,x);
-
-				int end = indexSrc + input.numBands;
-				while( indexSrc != end ) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCW(input, output);
 		}
 	}
 
@@ -1244,30 +798,10 @@ public class ImageMiscOps {
 	 * square images.
 	 */
 	public static void rotateCCW( GrayI16 image ) {
-		if( image.width != image.height )
-			throw new IllegalArgumentException("Image must be square");
-
-		int w = image.height/2 + image.height%2;
-		int h = image.height/2;
-
-		for( int y0 = 0; y0 < h; y0++ ) {
-			int y1 = image.height-y0-1;
-
-			for( int x0 = 0; x0 < w; x0++ ) {
-				int x1 = image.width-x0-1;
-
-				int index0 = image.startIndex + y0*image.stride + x0;
-				int index1 = image.startIndex + x0*image.stride + y1;
-				int index2 = image.startIndex + y1*image.stride + x1;
-				int index3 = image.startIndex + x1*image.stride + y0;
-				
-				int tmp0 = image.data[index0];
-
-				image.data[index0] = image.data[index1];
-				image.data[index1] = image.data[index2];
-				image.data[index2] = image.data[index3];
-				image.data[index3] = (short)tmp0;
-			}
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.rotateCCW(image);
+		} else {
+			ImplImageMiscOps.rotateCCW(image);
 		}
 	}
 
@@ -1275,16 +809,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
 	public static void rotateCCW( GrayI16 input , GrayI16 output ) {
-		if( input.width != output.height || input.height != output.width )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int w = input.width-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexIn = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				output.unsafe_set(y,w-x,input.data[indexIn++]);
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCCW(input, output);
 		}
 	}
 
@@ -1292,21 +820,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
 	public static void rotateCCW( InterleavedI16 input , InterleavedI16 output ) {
-		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int w = input.width-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				int indexDst = output.getIndex(y,w-x);
-
-				int end = indexSrc + input.numBands;
-				while( indexSrc != end ) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCCW(input, output);
 		}
 	}
 
@@ -1323,7 +840,11 @@ public class ImageMiscOps {
 	 */
 	public static <T extends GrayI16<T>>
 	void growBorder(T src , ImageBorder_S32<T> border, int borderX0, int borderY0, int borderX1, int borderY1, T dst ) {
-		ImplImageMiscOps.growBorder(src,border,borderX0,borderY0,borderX1,borderY1,dst);
+		if( runConcurrent(src) ) {
+			ImplImageMiscOps_MT.growBorder(src, border, borderX0, borderY0, borderX1, borderY1, dst);
+		} else {
+			ImplImageMiscOps.growBorder(src, border, borderX0, borderY0, borderX1, borderY1, dst);
+		}
 	}
 
 	/**
@@ -1341,33 +862,13 @@ public class ImageMiscOps {
 	 * @param output output image
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
-							 GrayS32 input , ImageBorder_S32 border, GrayS32 output )
-	{
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
-		
-		// Check to see if it's entirely contained inside the input image
-		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
-			for (int y = 0; y < height; y++) {
-				int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
-				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-
-				for (int x = 0; x < width; x++) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
-		} else {
-			// If any part is outside use the border. This isn't terribly efficient. A better approach is to
-			// handle all the possible outside regions independently. That code is significantly more complex so I'm
-			// punting it for a future person to write since this is good enough as it.
-			border.setImage(input);
-			for (int y = 0; y < height; y++) {
-				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-				for (int x = 0; x < width; x++) {
-					output.data[indexDst++] = border.get(srcX+x,srcY+y);
-				}
-			}
-		}
+							 GrayS32 input , ImageBorder_S32 border, GrayS32 output ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, border, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, border, output);
+//		}
 	}
 
 	/**
@@ -1385,20 +886,12 @@ public class ImageMiscOps {
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 GrayS32 input , GrayS32 output ) {
-
-		if( input.width < srcX+width || input.height < srcY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the input image");
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image");
-
-		for (int y = 0; y < height; y++) {
-			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
-			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-
-			for (int x = 0; x < width; x++) {
-				output.data[indexDst++] = input.data[indexSrc++];
-			}
-		}
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		}
 	}
 
 	/**
@@ -1416,90 +909,69 @@ public class ImageMiscOps {
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 InterleavedS32 input , InterleavedS32 output ) {
-
-		if( input.width < srcX+width || input.height < srcY+height )
-			throw new IllegalArgumentException("Copy region must be contained input image");
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained output image");
-		if( output.numBands != input.numBands )
-			throw new IllegalArgumentException("Number of bands must match. "+input.numBands+" != "+output.numBands);
-
-		final int numBands = input.numBands;
-
-		for (int y = 0; y < height; y++) {
-			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
-			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
-
-			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
-		}
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		}
 	}
 
 	/**
 	 * Fills the whole image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(GrayS32 input, int value) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			Arrays.fill(input.data,index,index+input.width, value);
-		}
+	public static void fill(GrayS32 image, int value) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fill(image, value);
+//		} else {
+		ImplImageMiscOps.fill(image, value);
+//		}
 	}
 
 	/**
 	 * Fills the whole image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(InterleavedS32 input, int value) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int end = index + input.width*input.numBands;
-			Arrays.fill(input.data,index,end, value);
+	public static void fill(InterleavedS32 image, int value) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fill(image, value);
+		} else {
+			ImplImageMiscOps.fill(image, value);
 		}
 	}
 
 	/**
 	 * Fills each band in the image with the specified values
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param values Array which contains the values each band is to be filled with.
 	 */
-	public static void fill(InterleavedS32 input, int[] values) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			for( int band = 0; band < numBands; band++ ) {
-				int index = input.getStartIndex() + y * input.getStride() + band;
-				int end = index + input.width*numBands - band;
-				int value = values[band];
-				for (; index < end; index += numBands ) {
-					input.data[index] = value;
-				}
-			}
+	public static void fill(InterleavedS32 image, int[] values) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fill(image, values);
+		} else {
+			ImplImageMiscOps.fill(image, values);
 		}
 	}
 
 	/**
 	 * Fills one band in the image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param band Which band is to be filled with the specified value   
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fillBand(InterleavedS32 input, int band , int value) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride() + band;
-			int end = index + input.width*numBands - band;
-			for (; index < end; index += numBands ) {
-				input.data[index] = value;
-			}
+	public static void fillBand(InterleavedS32 image, int band , int value) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fillBand(image, band, value);
+		} else {
+			ImplImageMiscOps.fillBand(image, band, value);
 		}
 	}
 
@@ -1511,167 +983,100 @@ public class ImageMiscOps {
 	 * @param output The multi-band image which the input image is to be inserted into
 	 */
 	public static void insertBand( GrayS32 input, int band , InterleavedS32 output) {
-
-		final int numBands = output.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexIn = input.getStartIndex() + y * input.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride() + band;
-			int end = indexOut + output.width*numBands - band;
-			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
-				output.data[indexOut] = input.data[indexIn];
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.insertBand(input, band, output);
+		} else {
+			ImplImageMiscOps.insertBand(input, band, output);
 		}
 	}
 
 	/**
 	 * Extracts a single band from a multi-band image
 	 *
-	 * @param input Multi-band image
-	 * @param band which bad is to be extracted   
-	 * @param output The single band image
+	 * @param input Multi-band image.
+	 * @param band which bad is to be extracted
+	 * @param output The single band image. Modified.
 	 */
 	public static void extractBand( InterleavedS32 input, int band , GrayS32 output) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexIn = input.getStartIndex() + y * input.getStride() + band;
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			int end = indexOut + output.width;
-			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
-				output.data[indexOut] = input.data[indexIn];
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.extractBand(input, band, output);
+		} else {
+			ImplImageMiscOps.extractBand(input, band, output);
 		}
 	}
 
 	/**
 	 * Fills the outside border with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
-	 * @param radius Border width.   
+	 * @param radius Border width.
 	 */
-	public static void fillBorder(GrayS32 input, int value, int radius ) {
-
-		// top and bottom
-		for (int y = 0; y < radius; y++) {
-			int indexTop = input.startIndex + y * input.stride;
-			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[indexTop++] = value;
-				input.data[indexBottom++] = value;
-			}
-		}
-
-		// left and right
-		int h = input.height-radius;
-		int indexStart = input.startIndex + radius*input.stride;
-		for (int x = 0; x < radius; x++) {
-			int indexLeft = indexStart + x;
-			int indexRight = indexStart + input.width-1-x;
-			for (int y = radius; y < h; y++) {
-				input.data[indexLeft] = value;
-				input.data[indexRight] = value;
-				
-				indexLeft += input.stride;
-				indexRight += input.stride;
-			}
-		}
+	public static void fillBorder(GrayS32 image, int value, int radius ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillBorder(image, value, radius);
+//		} else {
+		ImplImageMiscOps.fillBorder(image, value, radius);
+//		}
 	}
 
 	/**
 	 * Fills the border with independent border widths for each side
 	 *
-	 * @param input An image.
+	 * @param image An image.
 	 * @param value The value that the image is being filled with.
 	 * @param borderX0 Width of border on left
-	 * @param borderY0 Width of border on top   
+	 * @param borderY0 Width of border on top
 	 * @param borderX1 Width of border on right
 	 * @param borderY1 Width of border on bottom
 	 */
-	public static void fillBorder(GrayS32 input, int value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
-
-		// top and bottom
-		for (int y = 0; y < borderY0; y++) {
-			int srcIdx = input.startIndex + y * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[srcIdx++] = value;
-			}
-		}
-		for (int y = input.height-borderY1; y < input.height; y++) {
-			int srcIdx = input.startIndex + y * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[srcIdx++] = value;
-			}
-		}
-
-		// left and right
-		int h = input.height-borderY1;
-		for (int x = 0; x < borderX0; x++) {
-			int srcIdx = input.startIndex + borderY0*input.stride + x;
-			for (int y = borderY0; y < h; y++) {
-				input.data[srcIdx] = value;
-				srcIdx += input.stride;
-			}
-		}
-		for (int x = input.width-borderX1; x < input.width; x++) {
-			int srcIdx = input.startIndex + borderY0*input.stride + x;
-			for (int y = borderY0; y < h; y++) {
-				input.data[srcIdx] = value;
-				srcIdx += input.stride;
-			}
-		}
+	public static void fillBorder(GrayS32 image, int value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillBorder(image, value, borderX0, borderY0, borderX1, borderY1);
+//		} else {
+		ImplImageMiscOps.fillBorder(image, value, borderX0, borderY0, borderX1, borderY1);
+//		}
 	}
 
 	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
-	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param image The image the rectangle is drawn in. Modified
 	 * @param value Value of the rectangle
 	 * @param x0 Top left x-coordinate
 	 * @param y0 Top left y-coordinate
 	 * @param width Rectangle width
 	 * @param height Rectangle height
 	 */
-	public static void fillRectangle(GrayS32 img, int value, int x0, int y0, int width, int height) {
-		int x1 = x0 + width;
-		int y1 = y0 + height;
-
-		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
-		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
-
-		for (int y = y0; y < y1; y++) {
-			for (int x = x0; x < x1; x++) {
-				img.set(x, y, value);
-			}
-		}
+	public static void fillRectangle(GrayS32 image, int value, int x0, int y0, int width, int height) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillRectangle(image, value, x0, y0, width, height);
+//		} else {
+		ImplImageMiscOps.fillRectangle(image, value, x0, y0, width, height);
+//		}
 	}
 
 	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.  All bands
 	 * are filled with the same value.
 	 *
-	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param image The image the rectangle is drawn in. Modified
 	 * @param value Value of the rectangle
 	 * @param x0 Top left x-coordinate
 	 * @param y0 Top left y-coordinate
 	 * @param width Rectangle width
 	 * @param height Rectangle height
 	 */
-	public static void fillRectangle(InterleavedS32 img, int value, int x0, int y0, int width, int height) {
-		int x1 = x0 + width;
-		int y1 = y0 + height;
-
-		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
-		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
-
-		int length = (x1-x0)*img.numBands;
-		for (int y = y0; y < y1; y++) {
-			int index = img.startIndex + y*img.stride + x0*img.numBands;
-			int indexEnd = index + length;
-			while( index < indexEnd ) {
-				img.data[index++] = value;
-			}
-		}
+	public static void fillRectangle(InterleavedS32 image, int value, int x0, int y0, int width, int height) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillRectangle(image, value, x0, y0, width, height);
+//		} else {
+		ImplImageMiscOps.fillRectangle(image, value, x0, y0, width, height);
+//		}
 	}	/**
 	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
@@ -1681,16 +1086,7 @@ public class ImageMiscOps {
 	 * @param max Maximum value of the distribution, exclusive
 	 */
 	public static void fillUniform(GrayS32 img, Random rand , int min , int max) {
-		int range = max-min;
-
-		int[] data = img.data;
-
-		for (int y = 0; y < img.height; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			for (int x = 0; x < img.width; x++) {
-				data[index++] = rand.nextInt((int)range)+min;
-			}
-		}
+		ImplImageMiscOps.fillUniform(img, rand, min, max);
 	}
 
 	/**
@@ -1702,17 +1098,7 @@ public class ImageMiscOps {
 	 * @param max Maximum value of the distribution, exclusive
 	 */
 	public static void fillUniform(InterleavedS32 img, Random rand , int min , int max) {
-		int range = max-min;
-
-		int[] data = img.data;
-
-		for (int y = 0; y < img.height; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			int end = index + img.width*img.numBands;
-			for (; index <  end; index++) {
-				data[index] = rand.nextInt((int)range)+min;
-			}
-		}
+		ImplImageMiscOps.fillUniform(img, rand, min, max);
 	}
 
 	/**
@@ -1728,17 +1114,7 @@ public class ImageMiscOps {
 	 * @param upperBound Upper bound of value clip
 	 */
 	public static void fillGaussian(GrayS32 input, Random rand , double mean , double sigma , int lowerBound , int upperBound ) {
-		int[] data = input.data;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				int value = (int)(rand.nextGaussian()*sigma+mean);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				data[index++] = value;
-			}
-		}
+		ImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);
 	}
 
 	/**
@@ -1754,59 +1130,28 @@ public class ImageMiscOps {
 	 * @param upperBound Upper bound of value clip
 	 */
 	public static void fillGaussian(InterleavedS32 input, Random rand , double mean , double sigma , int lowerBound , int upperBound ) {
-		int[] data = input.data;
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int indexEnd = index+length;
-
-			while( index < indexEnd ) {
-				int value = (int)(rand.nextGaussian()*sigma+mean);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				data[index++] = value;
-			}
-		}
+		ImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Flips the image from top to bottom
 	 */
-	public static void flipVertical( GrayS32 input ) {
-		int h2 = input.height/2;
-
-		for( int y = 0; y < h2; y++ ) {
-			int index1 = input.getStartIndex() + y * input.getStride();
-			int index2 = input.getStartIndex() + (input.height - y - 1) * input.getStride();
-
-			int end = index1 + input.width;
-
-			while( index1 < end ) {
-				int tmp = input.data[index1];
-				input.data[index1++] = input.data[index2];
-				input.data[index2++] = (int)tmp;
-			}
+	public static void flipVertical( GrayS32 image ) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.flipVertical(image);
+		} else {
+			ImplImageMiscOps.flipVertical(image);
 		}
 	}
 
 	/**
 	 * Flips the image from left to right
 	 */
-	public static void flipHorizontal( GrayS32 input ) {
-		int w2 = input.width/2;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int index1 = input.getStartIndex() + y * input.getStride();
-			int index2 = index1 + input.width-1;
-
-			int end = index1 + w2;
-
-			while( index1 < end ) {
-				int tmp = input.data[index1];
-				input.data[index1++] = input.data[index2];
-				input.data[index2--] = (int)tmp;
-			}
+	public static void flipHorizontal( GrayS32 image ) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.flipHorizontal(image);
+		} else {
+			ImplImageMiscOps.flipHorizontal(image);
 		}
 	}
 
@@ -1815,30 +1160,10 @@ public class ImageMiscOps {
 	 * square images.
 	 */
 	public static void rotateCW( GrayS32 image ) {
-		if( image.width != image.height )
-			throw new IllegalArgumentException("Image must be square");
-
-		int w = image.height/2 + image.height%2;
-		int h = image.height/2;
-
-		for( int y0 = 0; y0 < h; y0++ ) {
-			int y1 = image.height-y0-1;
-
-			for( int x0 = 0; x0 < w; x0++ ) {
-				int x1 = image.width-x0-1;
-
-				int index0 = image.startIndex + y0*image.stride + x0;
-				int index1 = image.startIndex + x0*image.stride + y1;
-				int index2 = image.startIndex + y1*image.stride + x1;
-				int index3 = image.startIndex + x1*image.stride + y0;
-				
-				int tmp3 = image.data[index3];
-
-				image.data[index3] = image.data[index2];
-				image.data[index2] = image.data[index1];
-				image.data[index1] = image.data[index0];
-				image.data[index0] = (int)tmp3;
-			}
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.rotateCW(image);
+		} else {
+			ImplImageMiscOps.rotateCW(image);
 		}
 	}
 
@@ -1846,16 +1171,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( GrayS32 input , GrayS32 output ) {
-		if( input.width != output.height || input.height != output.width )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int h = input.height-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexIn = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				output.unsafe_set(h-y,x,input.data[indexIn++]);
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCW(input, output);
 		}
 	}
 
@@ -1863,21 +1182,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( InterleavedS32 input , InterleavedS32 output ) {
-		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int h = input.height-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				int indexDst = output.getIndex(h-y,x);
-
-				int end = indexSrc + input.numBands;
-				while( indexSrc != end ) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCW(input, output);
 		}
 	}
 
@@ -1886,30 +1194,10 @@ public class ImageMiscOps {
 	 * square images.
 	 */
 	public static void rotateCCW( GrayS32 image ) {
-		if( image.width != image.height )
-			throw new IllegalArgumentException("Image must be square");
-
-		int w = image.height/2 + image.height%2;
-		int h = image.height/2;
-
-		for( int y0 = 0; y0 < h; y0++ ) {
-			int y1 = image.height-y0-1;
-
-			for( int x0 = 0; x0 < w; x0++ ) {
-				int x1 = image.width-x0-1;
-
-				int index0 = image.startIndex + y0*image.stride + x0;
-				int index1 = image.startIndex + x0*image.stride + y1;
-				int index2 = image.startIndex + y1*image.stride + x1;
-				int index3 = image.startIndex + x1*image.stride + y0;
-				
-				int tmp0 = image.data[index0];
-
-				image.data[index0] = image.data[index1];
-				image.data[index1] = image.data[index2];
-				image.data[index2] = image.data[index3];
-				image.data[index3] = (int)tmp0;
-			}
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.rotateCCW(image);
+		} else {
+			ImplImageMiscOps.rotateCCW(image);
 		}
 	}
 
@@ -1917,16 +1205,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
 	public static void rotateCCW( GrayS32 input , GrayS32 output ) {
-		if( input.width != output.height || input.height != output.width )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int w = input.width-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexIn = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				output.unsafe_set(y,w-x,input.data[indexIn++]);
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCCW(input, output);
 		}
 	}
 
@@ -1934,21 +1216,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
 	public static void rotateCCW( InterleavedS32 input , InterleavedS32 output ) {
-		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int w = input.width-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				int indexDst = output.getIndex(y,w-x);
-
-				int end = indexSrc + input.numBands;
-				while( indexSrc != end ) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCCW(input, output);
 		}
 	}
 
@@ -1964,7 +1235,11 @@ public class ImageMiscOps {
 	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
 	 */
 	public static void growBorder(GrayS32 src , ImageBorder_S32 border, int borderX0, int borderY0, int borderX1, int borderY1, GrayS32 dst ) {
-		ImplImageMiscOps.growBorder(src,border,borderX0,borderY0,borderX1,borderY1,dst);
+		if( runConcurrent(src) ) {
+			ImplImageMiscOps_MT.growBorder(src, border, borderX0, borderY0, borderX1, borderY1, dst);
+		} else {
+			ImplImageMiscOps.growBorder(src, border, borderX0, borderY0, borderX1, borderY1, dst);
+		}
 	}
 
 	/**
@@ -1982,33 +1257,13 @@ public class ImageMiscOps {
 	 * @param output output image
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
-							 GrayS64 input , ImageBorder_S64 border, GrayS64 output )
-	{
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
-		
-		// Check to see if it's entirely contained inside the input image
-		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
-			for (int y = 0; y < height; y++) {
-				int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
-				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-
-				for (int x = 0; x < width; x++) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
-		} else {
-			// If any part is outside use the border. This isn't terribly efficient. A better approach is to
-			// handle all the possible outside regions independently. That code is significantly more complex so I'm
-			// punting it for a future person to write since this is good enough as it.
-			border.setImage(input);
-			for (int y = 0; y < height; y++) {
-				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-				for (int x = 0; x < width; x++) {
-					output.data[indexDst++] = border.get(srcX+x,srcY+y);
-				}
-			}
-		}
+							 GrayS64 input , ImageBorder_S64 border, GrayS64 output ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, border, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, border, output);
+//		}
 	}
 
 	/**
@@ -2026,20 +1281,12 @@ public class ImageMiscOps {
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 GrayS64 input , GrayS64 output ) {
-
-		if( input.width < srcX+width || input.height < srcY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the input image");
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image");
-
-		for (int y = 0; y < height; y++) {
-			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
-			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-
-			for (int x = 0; x < width; x++) {
-				output.data[indexDst++] = input.data[indexSrc++];
-			}
-		}
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		}
 	}
 
 	/**
@@ -2057,90 +1304,69 @@ public class ImageMiscOps {
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 InterleavedS64 input , InterleavedS64 output ) {
-
-		if( input.width < srcX+width || input.height < srcY+height )
-			throw new IllegalArgumentException("Copy region must be contained input image");
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained output image");
-		if( output.numBands != input.numBands )
-			throw new IllegalArgumentException("Number of bands must match. "+input.numBands+" != "+output.numBands);
-
-		final int numBands = input.numBands;
-
-		for (int y = 0; y < height; y++) {
-			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
-			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
-
-			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
-		}
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		}
 	}
 
 	/**
 	 * Fills the whole image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(GrayS64 input, long value) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			Arrays.fill(input.data,index,index+input.width, value);
-		}
+	public static void fill(GrayS64 image, long value) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fill(image, value);
+//		} else {
+		ImplImageMiscOps.fill(image, value);
+//		}
 	}
 
 	/**
 	 * Fills the whole image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(InterleavedS64 input, long value) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int end = index + input.width*input.numBands;
-			Arrays.fill(input.data,index,end, value);
+	public static void fill(InterleavedS64 image, long value) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fill(image, value);
+		} else {
+			ImplImageMiscOps.fill(image, value);
 		}
 	}
 
 	/**
 	 * Fills each band in the image with the specified values
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param values Array which contains the values each band is to be filled with.
 	 */
-	public static void fill(InterleavedS64 input, long[] values) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			for( int band = 0; band < numBands; band++ ) {
-				int index = input.getStartIndex() + y * input.getStride() + band;
-				int end = index + input.width*numBands - band;
-				long value = values[band];
-				for (; index < end; index += numBands ) {
-					input.data[index] = value;
-				}
-			}
+	public static void fill(InterleavedS64 image, long[] values) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fill(image, values);
+		} else {
+			ImplImageMiscOps.fill(image, values);
 		}
 	}
 
 	/**
 	 * Fills one band in the image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param band Which band is to be filled with the specified value   
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fillBand(InterleavedS64 input, int band , long value) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride() + band;
-			int end = index + input.width*numBands - band;
-			for (; index < end; index += numBands ) {
-				input.data[index] = value;
-			}
+	public static void fillBand(InterleavedS64 image, int band , long value) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fillBand(image, band, value);
+		} else {
+			ImplImageMiscOps.fillBand(image, band, value);
 		}
 	}
 
@@ -2152,167 +1378,100 @@ public class ImageMiscOps {
 	 * @param output The multi-band image which the input image is to be inserted into
 	 */
 	public static void insertBand( GrayS64 input, int band , InterleavedS64 output) {
-
-		final int numBands = output.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexIn = input.getStartIndex() + y * input.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride() + band;
-			int end = indexOut + output.width*numBands - band;
-			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
-				output.data[indexOut] = input.data[indexIn];
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.insertBand(input, band, output);
+		} else {
+			ImplImageMiscOps.insertBand(input, band, output);
 		}
 	}
 
 	/**
 	 * Extracts a single band from a multi-band image
 	 *
-	 * @param input Multi-band image
-	 * @param band which bad is to be extracted   
-	 * @param output The single band image
+	 * @param input Multi-band image.
+	 * @param band which bad is to be extracted
+	 * @param output The single band image. Modified.
 	 */
 	public static void extractBand( InterleavedS64 input, int band , GrayS64 output) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexIn = input.getStartIndex() + y * input.getStride() + band;
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			int end = indexOut + output.width;
-			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
-				output.data[indexOut] = input.data[indexIn];
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.extractBand(input, band, output);
+		} else {
+			ImplImageMiscOps.extractBand(input, band, output);
 		}
 	}
 
 	/**
 	 * Fills the outside border with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
-	 * @param radius Border width.   
+	 * @param radius Border width.
 	 */
-	public static void fillBorder(GrayS64 input, long value, int radius ) {
-
-		// top and bottom
-		for (int y = 0; y < radius; y++) {
-			int indexTop = input.startIndex + y * input.stride;
-			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[indexTop++] = value;
-				input.data[indexBottom++] = value;
-			}
-		}
-
-		// left and right
-		int h = input.height-radius;
-		int indexStart = input.startIndex + radius*input.stride;
-		for (int x = 0; x < radius; x++) {
-			int indexLeft = indexStart + x;
-			int indexRight = indexStart + input.width-1-x;
-			for (int y = radius; y < h; y++) {
-				input.data[indexLeft] = value;
-				input.data[indexRight] = value;
-				
-				indexLeft += input.stride;
-				indexRight += input.stride;
-			}
-		}
+	public static void fillBorder(GrayS64 image, long value, int radius ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillBorder(image, value, radius);
+//		} else {
+		ImplImageMiscOps.fillBorder(image, value, radius);
+//		}
 	}
 
 	/**
 	 * Fills the border with independent border widths for each side
 	 *
-	 * @param input An image.
+	 * @param image An image.
 	 * @param value The value that the image is being filled with.
 	 * @param borderX0 Width of border on left
-	 * @param borderY0 Width of border on top   
+	 * @param borderY0 Width of border on top
 	 * @param borderX1 Width of border on right
 	 * @param borderY1 Width of border on bottom
 	 */
-	public static void fillBorder(GrayS64 input, long value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
-
-		// top and bottom
-		for (int y = 0; y < borderY0; y++) {
-			int srcIdx = input.startIndex + y * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[srcIdx++] = value;
-			}
-		}
-		for (int y = input.height-borderY1; y < input.height; y++) {
-			int srcIdx = input.startIndex + y * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[srcIdx++] = value;
-			}
-		}
-
-		// left and right
-		int h = input.height-borderY1;
-		for (int x = 0; x < borderX0; x++) {
-			int srcIdx = input.startIndex + borderY0*input.stride + x;
-			for (int y = borderY0; y < h; y++) {
-				input.data[srcIdx] = value;
-				srcIdx += input.stride;
-			}
-		}
-		for (int x = input.width-borderX1; x < input.width; x++) {
-			int srcIdx = input.startIndex + borderY0*input.stride + x;
-			for (int y = borderY0; y < h; y++) {
-				input.data[srcIdx] = value;
-				srcIdx += input.stride;
-			}
-		}
+	public static void fillBorder(GrayS64 image, long value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillBorder(image, value, borderX0, borderY0, borderX1, borderY1);
+//		} else {
+		ImplImageMiscOps.fillBorder(image, value, borderX0, borderY0, borderX1, borderY1);
+//		}
 	}
 
 	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
-	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param image The image the rectangle is drawn in. Modified
 	 * @param value Value of the rectangle
 	 * @param x0 Top left x-coordinate
 	 * @param y0 Top left y-coordinate
 	 * @param width Rectangle width
 	 * @param height Rectangle height
 	 */
-	public static void fillRectangle(GrayS64 img, long value, int x0, int y0, int width, int height) {
-		int x1 = x0 + width;
-		int y1 = y0 + height;
-
-		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
-		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
-
-		for (int y = y0; y < y1; y++) {
-			for (int x = x0; x < x1; x++) {
-				img.set(x, y, value);
-			}
-		}
+	public static void fillRectangle(GrayS64 image, long value, int x0, int y0, int width, int height) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillRectangle(image, value, x0, y0, width, height);
+//		} else {
+		ImplImageMiscOps.fillRectangle(image, value, x0, y0, width, height);
+//		}
 	}
 
 	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.  All bands
 	 * are filled with the same value.
 	 *
-	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param image The image the rectangle is drawn in. Modified
 	 * @param value Value of the rectangle
 	 * @param x0 Top left x-coordinate
 	 * @param y0 Top left y-coordinate
 	 * @param width Rectangle width
 	 * @param height Rectangle height
 	 */
-	public static void fillRectangle(InterleavedS64 img, long value, int x0, int y0, int width, int height) {
-		int x1 = x0 + width;
-		int y1 = y0 + height;
-
-		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
-		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
-
-		int length = (x1-x0)*img.numBands;
-		for (int y = y0; y < y1; y++) {
-			int index = img.startIndex + y*img.stride + x0*img.numBands;
-			int indexEnd = index + length;
-			while( index < indexEnd ) {
-				img.data[index++] = value;
-			}
-		}
+	public static void fillRectangle(InterleavedS64 image, long value, int x0, int y0, int width, int height) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillRectangle(image, value, x0, y0, width, height);
+//		} else {
+		ImplImageMiscOps.fillRectangle(image, value, x0, y0, width, height);
+//		}
 	}	/**
 	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
@@ -2322,16 +1481,7 @@ public class ImageMiscOps {
 	 * @param max Maximum value of the distribution, exclusive
 	 */
 	public static void fillUniform(GrayS64 img, Random rand , long min , long max) {
-		long range = max-min;
-
-		long[] data = img.data;
-
-		for (int y = 0; y < img.height; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			for (int x = 0; x < img.width; x++) {
-				data[index++] = (long)(rand.nextDouble()*0.9999*range)+min;
-			}
-		}
+		ImplImageMiscOps.fillUniform(img, rand, min, max);
 	}
 
 	/**
@@ -2343,17 +1493,7 @@ public class ImageMiscOps {
 	 * @param max Maximum value of the distribution, exclusive
 	 */
 	public static void fillUniform(InterleavedS64 img, Random rand , long min , long max) {
-		long range = max-min;
-
-		long[] data = img.data;
-
-		for (int y = 0; y < img.height; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			int end = index + img.width*img.numBands;
-			for (; index <  end; index++) {
-				data[index] = (long)(rand.nextDouble()*0.9999*range)+min;
-			}
-		}
+		ImplImageMiscOps.fillUniform(img, rand, min, max);
 	}
 
 	/**
@@ -2369,17 +1509,7 @@ public class ImageMiscOps {
 	 * @param upperBound Upper bound of value clip
 	 */
 	public static void fillGaussian(GrayS64 input, Random rand , double mean , double sigma , long lowerBound , long upperBound ) {
-		long[] data = input.data;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				long value = (long)(rand.nextGaussian()*sigma+mean);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				data[index++] = value;
-			}
-		}
+		ImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);
 	}
 
 	/**
@@ -2395,59 +1525,28 @@ public class ImageMiscOps {
 	 * @param upperBound Upper bound of value clip
 	 */
 	public static void fillGaussian(InterleavedS64 input, Random rand , double mean , double sigma , long lowerBound , long upperBound ) {
-		long[] data = input.data;
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int indexEnd = index+length;
-
-			while( index < indexEnd ) {
-				long value = (long)(rand.nextGaussian()*sigma+mean);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				data[index++] = value;
-			}
-		}
+		ImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Flips the image from top to bottom
 	 */
-	public static void flipVertical( GrayS64 input ) {
-		int h2 = input.height/2;
-
-		for( int y = 0; y < h2; y++ ) {
-			int index1 = input.getStartIndex() + y * input.getStride();
-			int index2 = input.getStartIndex() + (input.height - y - 1) * input.getStride();
-
-			int end = index1 + input.width;
-
-			while( index1 < end ) {
-				long tmp = input.data[index1];
-				input.data[index1++] = input.data[index2];
-				input.data[index2++] = (long)tmp;
-			}
+	public static void flipVertical( GrayS64 image ) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.flipVertical(image);
+		} else {
+			ImplImageMiscOps.flipVertical(image);
 		}
 	}
 
 	/**
 	 * Flips the image from left to right
 	 */
-	public static void flipHorizontal( GrayS64 input ) {
-		int w2 = input.width/2;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int index1 = input.getStartIndex() + y * input.getStride();
-			int index2 = index1 + input.width-1;
-
-			int end = index1 + w2;
-
-			while( index1 < end ) {
-				long tmp = input.data[index1];
-				input.data[index1++] = input.data[index2];
-				input.data[index2--] = (long)tmp;
-			}
+	public static void flipHorizontal( GrayS64 image ) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.flipHorizontal(image);
+		} else {
+			ImplImageMiscOps.flipHorizontal(image);
 		}
 	}
 
@@ -2456,30 +1555,10 @@ public class ImageMiscOps {
 	 * square images.
 	 */
 	public static void rotateCW( GrayS64 image ) {
-		if( image.width != image.height )
-			throw new IllegalArgumentException("Image must be square");
-
-		int w = image.height/2 + image.height%2;
-		int h = image.height/2;
-
-		for( int y0 = 0; y0 < h; y0++ ) {
-			int y1 = image.height-y0-1;
-
-			for( int x0 = 0; x0 < w; x0++ ) {
-				int x1 = image.width-x0-1;
-
-				int index0 = image.startIndex + y0*image.stride + x0;
-				int index1 = image.startIndex + x0*image.stride + y1;
-				int index2 = image.startIndex + y1*image.stride + x1;
-				int index3 = image.startIndex + x1*image.stride + y0;
-				
-				long tmp3 = image.data[index3];
-
-				image.data[index3] = image.data[index2];
-				image.data[index2] = image.data[index1];
-				image.data[index1] = image.data[index0];
-				image.data[index0] = (long)tmp3;
-			}
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.rotateCW(image);
+		} else {
+			ImplImageMiscOps.rotateCW(image);
 		}
 	}
 
@@ -2487,16 +1566,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( GrayS64 input , GrayS64 output ) {
-		if( input.width != output.height || input.height != output.width )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int h = input.height-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexIn = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				output.unsafe_set(h-y,x,input.data[indexIn++]);
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCW(input, output);
 		}
 	}
 
@@ -2504,21 +1577,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( InterleavedS64 input , InterleavedS64 output ) {
-		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int h = input.height-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				int indexDst = output.getIndex(h-y,x);
-
-				int end = indexSrc + input.numBands;
-				while( indexSrc != end ) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCW(input, output);
 		}
 	}
 
@@ -2527,30 +1589,10 @@ public class ImageMiscOps {
 	 * square images.
 	 */
 	public static void rotateCCW( GrayS64 image ) {
-		if( image.width != image.height )
-			throw new IllegalArgumentException("Image must be square");
-
-		int w = image.height/2 + image.height%2;
-		int h = image.height/2;
-
-		for( int y0 = 0; y0 < h; y0++ ) {
-			int y1 = image.height-y0-1;
-
-			for( int x0 = 0; x0 < w; x0++ ) {
-				int x1 = image.width-x0-1;
-
-				int index0 = image.startIndex + y0*image.stride + x0;
-				int index1 = image.startIndex + x0*image.stride + y1;
-				int index2 = image.startIndex + y1*image.stride + x1;
-				int index3 = image.startIndex + x1*image.stride + y0;
-				
-				long tmp0 = image.data[index0];
-
-				image.data[index0] = image.data[index1];
-				image.data[index1] = image.data[index2];
-				image.data[index2] = image.data[index3];
-				image.data[index3] = (long)tmp0;
-			}
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.rotateCCW(image);
+		} else {
+			ImplImageMiscOps.rotateCCW(image);
 		}
 	}
 
@@ -2558,16 +1600,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
 	public static void rotateCCW( GrayS64 input , GrayS64 output ) {
-		if( input.width != output.height || input.height != output.width )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int w = input.width-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexIn = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				output.unsafe_set(y,w-x,input.data[indexIn++]);
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCCW(input, output);
 		}
 	}
 
@@ -2575,21 +1611,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
 	public static void rotateCCW( InterleavedS64 input , InterleavedS64 output ) {
-		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int w = input.width-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				int indexDst = output.getIndex(y,w-x);
-
-				int end = indexSrc + input.numBands;
-				while( indexSrc != end ) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCCW(input, output);
 		}
 	}
 
@@ -2605,7 +1630,11 @@ public class ImageMiscOps {
 	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
 	 */
 	public static void growBorder(GrayS64 src , ImageBorder_S64 border, int borderX0, int borderY0, int borderX1, int borderY1, GrayS64 dst ) {
-		ImplImageMiscOps.growBorder(src,border,borderX0,borderY0,borderX1,borderY1,dst);
+		if( runConcurrent(src) ) {
+			ImplImageMiscOps_MT.growBorder(src, border, borderX0, borderY0, borderX1, borderY1, dst);
+		} else {
+			ImplImageMiscOps.growBorder(src, border, borderX0, borderY0, borderX1, borderY1, dst);
+		}
 	}
 
 	/**
@@ -2623,33 +1652,13 @@ public class ImageMiscOps {
 	 * @param output output image
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
-							 GrayF32 input , ImageBorder_F32 border, GrayF32 output )
-	{
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
-		
-		// Check to see if it's entirely contained inside the input image
-		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
-			for (int y = 0; y < height; y++) {
-				int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
-				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-
-				for (int x = 0; x < width; x++) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
-		} else {
-			// If any part is outside use the border. This isn't terribly efficient. A better approach is to
-			// handle all the possible outside regions independently. That code is significantly more complex so I'm
-			// punting it for a future person to write since this is good enough as it.
-			border.setImage(input);
-			for (int y = 0; y < height; y++) {
-				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-				for (int x = 0; x < width; x++) {
-					output.data[indexDst++] = border.get(srcX+x,srcY+y);
-				}
-			}
-		}
+							 GrayF32 input , ImageBorder_F32 border, GrayF32 output ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, border, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, border, output);
+//		}
 	}
 
 	/**
@@ -2667,20 +1676,12 @@ public class ImageMiscOps {
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 GrayF32 input , GrayF32 output ) {
-
-		if( input.width < srcX+width || input.height < srcY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the input image");
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image");
-
-		for (int y = 0; y < height; y++) {
-			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
-			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-
-			for (int x = 0; x < width; x++) {
-				output.data[indexDst++] = input.data[indexSrc++];
-			}
-		}
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		}
 	}
 
 	/**
@@ -2698,90 +1699,69 @@ public class ImageMiscOps {
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 InterleavedF32 input , InterleavedF32 output ) {
-
-		if( input.width < srcX+width || input.height < srcY+height )
-			throw new IllegalArgumentException("Copy region must be contained input image");
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained output image");
-		if( output.numBands != input.numBands )
-			throw new IllegalArgumentException("Number of bands must match. "+input.numBands+" != "+output.numBands);
-
-		final int numBands = input.numBands;
-
-		for (int y = 0; y < height; y++) {
-			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
-			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
-
-			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
-		}
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		}
 	}
 
 	/**
 	 * Fills the whole image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(GrayF32 input, float value) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			Arrays.fill(input.data,index,index+input.width, value);
-		}
+	public static void fill(GrayF32 image, float value) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fill(image, value);
+//		} else {
+		ImplImageMiscOps.fill(image, value);
+//		}
 	}
 
 	/**
 	 * Fills the whole image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(InterleavedF32 input, float value) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int end = index + input.width*input.numBands;
-			Arrays.fill(input.data,index,end, value);
+	public static void fill(InterleavedF32 image, float value) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fill(image, value);
+		} else {
+			ImplImageMiscOps.fill(image, value);
 		}
 	}
 
 	/**
 	 * Fills each band in the image with the specified values
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param values Array which contains the values each band is to be filled with.
 	 */
-	public static void fill(InterleavedF32 input, float[] values) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			for( int band = 0; band < numBands; band++ ) {
-				int index = input.getStartIndex() + y * input.getStride() + band;
-				int end = index + input.width*numBands - band;
-				float value = values[band];
-				for (; index < end; index += numBands ) {
-					input.data[index] = value;
-				}
-			}
+	public static void fill(InterleavedF32 image, float[] values) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fill(image, values);
+		} else {
+			ImplImageMiscOps.fill(image, values);
 		}
 	}
 
 	/**
 	 * Fills one band in the image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param band Which band is to be filled with the specified value   
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fillBand(InterleavedF32 input, int band , float value) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride() + band;
-			int end = index + input.width*numBands - band;
-			for (; index < end; index += numBands ) {
-				input.data[index] = value;
-			}
+	public static void fillBand(InterleavedF32 image, int band , float value) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fillBand(image, band, value);
+		} else {
+			ImplImageMiscOps.fillBand(image, band, value);
 		}
 	}
 
@@ -2793,167 +1773,100 @@ public class ImageMiscOps {
 	 * @param output The multi-band image which the input image is to be inserted into
 	 */
 	public static void insertBand( GrayF32 input, int band , InterleavedF32 output) {
-
-		final int numBands = output.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexIn = input.getStartIndex() + y * input.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride() + band;
-			int end = indexOut + output.width*numBands - band;
-			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
-				output.data[indexOut] = input.data[indexIn];
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.insertBand(input, band, output);
+		} else {
+			ImplImageMiscOps.insertBand(input, band, output);
 		}
 	}
 
 	/**
 	 * Extracts a single band from a multi-band image
 	 *
-	 * @param input Multi-band image
-	 * @param band which bad is to be extracted   
-	 * @param output The single band image
+	 * @param input Multi-band image.
+	 * @param band which bad is to be extracted
+	 * @param output The single band image. Modified.
 	 */
 	public static void extractBand( InterleavedF32 input, int band , GrayF32 output) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexIn = input.getStartIndex() + y * input.getStride() + band;
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			int end = indexOut + output.width;
-			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
-				output.data[indexOut] = input.data[indexIn];
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.extractBand(input, band, output);
+		} else {
+			ImplImageMiscOps.extractBand(input, band, output);
 		}
 	}
 
 	/**
 	 * Fills the outside border with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
-	 * @param radius Border width.   
+	 * @param radius Border width.
 	 */
-	public static void fillBorder(GrayF32 input, float value, int radius ) {
-
-		// top and bottom
-		for (int y = 0; y < radius; y++) {
-			int indexTop = input.startIndex + y * input.stride;
-			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[indexTop++] = value;
-				input.data[indexBottom++] = value;
-			}
-		}
-
-		// left and right
-		int h = input.height-radius;
-		int indexStart = input.startIndex + radius*input.stride;
-		for (int x = 0; x < radius; x++) {
-			int indexLeft = indexStart + x;
-			int indexRight = indexStart + input.width-1-x;
-			for (int y = radius; y < h; y++) {
-				input.data[indexLeft] = value;
-				input.data[indexRight] = value;
-				
-				indexLeft += input.stride;
-				indexRight += input.stride;
-			}
-		}
+	public static void fillBorder(GrayF32 image, float value, int radius ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillBorder(image, value, radius);
+//		} else {
+		ImplImageMiscOps.fillBorder(image, value, radius);
+//		}
 	}
 
 	/**
 	 * Fills the border with independent border widths for each side
 	 *
-	 * @param input An image.
+	 * @param image An image.
 	 * @param value The value that the image is being filled with.
 	 * @param borderX0 Width of border on left
-	 * @param borderY0 Width of border on top   
+	 * @param borderY0 Width of border on top
 	 * @param borderX1 Width of border on right
 	 * @param borderY1 Width of border on bottom
 	 */
-	public static void fillBorder(GrayF32 input, float value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
-
-		// top and bottom
-		for (int y = 0; y < borderY0; y++) {
-			int srcIdx = input.startIndex + y * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[srcIdx++] = value;
-			}
-		}
-		for (int y = input.height-borderY1; y < input.height; y++) {
-			int srcIdx = input.startIndex + y * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[srcIdx++] = value;
-			}
-		}
-
-		// left and right
-		int h = input.height-borderY1;
-		for (int x = 0; x < borderX0; x++) {
-			int srcIdx = input.startIndex + borderY0*input.stride + x;
-			for (int y = borderY0; y < h; y++) {
-				input.data[srcIdx] = value;
-				srcIdx += input.stride;
-			}
-		}
-		for (int x = input.width-borderX1; x < input.width; x++) {
-			int srcIdx = input.startIndex + borderY0*input.stride + x;
-			for (int y = borderY0; y < h; y++) {
-				input.data[srcIdx] = value;
-				srcIdx += input.stride;
-			}
-		}
+	public static void fillBorder(GrayF32 image, float value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillBorder(image, value, borderX0, borderY0, borderX1, borderY1);
+//		} else {
+		ImplImageMiscOps.fillBorder(image, value, borderX0, borderY0, borderX1, borderY1);
+//		}
 	}
 
 	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
-	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param image The image the rectangle is drawn in. Modified
 	 * @param value Value of the rectangle
 	 * @param x0 Top left x-coordinate
 	 * @param y0 Top left y-coordinate
 	 * @param width Rectangle width
 	 * @param height Rectangle height
 	 */
-	public static void fillRectangle(GrayF32 img, float value, int x0, int y0, int width, int height) {
-		int x1 = x0 + width;
-		int y1 = y0 + height;
-
-		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
-		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
-
-		for (int y = y0; y < y1; y++) {
-			for (int x = x0; x < x1; x++) {
-				img.set(x, y, value);
-			}
-		}
+	public static void fillRectangle(GrayF32 image, float value, int x0, int y0, int width, int height) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillRectangle(image, value, x0, y0, width, height);
+//		} else {
+		ImplImageMiscOps.fillRectangle(image, value, x0, y0, width, height);
+//		}
 	}
 
 	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.  All bands
 	 * are filled with the same value.
 	 *
-	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param image The image the rectangle is drawn in. Modified
 	 * @param value Value of the rectangle
 	 * @param x0 Top left x-coordinate
 	 * @param y0 Top left y-coordinate
 	 * @param width Rectangle width
 	 * @param height Rectangle height
 	 */
-	public static void fillRectangle(InterleavedF32 img, float value, int x0, int y0, int width, int height) {
-		int x1 = x0 + width;
-		int y1 = y0 + height;
-
-		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
-		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
-
-		int length = (x1-x0)*img.numBands;
-		for (int y = y0; y < y1; y++) {
-			int index = img.startIndex + y*img.stride + x0*img.numBands;
-			int indexEnd = index + length;
-			while( index < indexEnd ) {
-				img.data[index++] = value;
-			}
-		}
+	public static void fillRectangle(InterleavedF32 image, float value, int x0, int y0, int width, int height) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillRectangle(image, value, x0, y0, width, height);
+//		} else {
+		ImplImageMiscOps.fillRectangle(image, value, x0, y0, width, height);
+//		}
 	}	/**
 	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
@@ -2963,16 +1876,7 @@ public class ImageMiscOps {
 	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(GrayF32 img, Random rand , float min , float max) {
-		float range = max-min;
-
-		float[] data = img.data;
-
-		for (int y = 0; y < img.height; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			for (int x = 0; x < img.width; x++) {
-				data[index++] = rand.nextFloat()*range+min;
-			}
-		}
+		ImplImageMiscOps.fillUniform(img, rand, min, max);
 	}
 
 	/**
@@ -2984,17 +1888,7 @@ public class ImageMiscOps {
 	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(InterleavedF32 img, Random rand , float min , float max) {
-		float range = max-min;
-
-		float[] data = img.data;
-
-		for (int y = 0; y < img.height; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			int end = index + img.width*img.numBands;
-			for (; index <  end; index++) {
-				data[index] = rand.nextFloat()*range+min;
-			}
-		}
+		ImplImageMiscOps.fillUniform(img, rand, min, max);
 	}
 
 	/**
@@ -3010,17 +1904,7 @@ public class ImageMiscOps {
 	 * @param upperBound Upper bound of value clip
 	 */
 	public static void fillGaussian(GrayF32 input, Random rand , double mean , double sigma , float lowerBound , float upperBound ) {
-		float[] data = input.data;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				float value = (float)(rand.nextGaussian()*sigma+mean);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				data[index++] = value;
-			}
-		}
+		ImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);
 	}
 
 	/**
@@ -3036,59 +1920,28 @@ public class ImageMiscOps {
 	 * @param upperBound Upper bound of value clip
 	 */
 	public static void fillGaussian(InterleavedF32 input, Random rand , double mean , double sigma , float lowerBound , float upperBound ) {
-		float[] data = input.data;
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int indexEnd = index+length;
-
-			while( index < indexEnd ) {
-				float value = (float)(rand.nextGaussian()*sigma+mean);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				data[index++] = value;
-			}
-		}
+		ImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Flips the image from top to bottom
 	 */
-	public static void flipVertical( GrayF32 input ) {
-		int h2 = input.height/2;
-
-		for( int y = 0; y < h2; y++ ) {
-			int index1 = input.getStartIndex() + y * input.getStride();
-			int index2 = input.getStartIndex() + (input.height - y - 1) * input.getStride();
-
-			int end = index1 + input.width;
-
-			while( index1 < end ) {
-				float tmp = input.data[index1];
-				input.data[index1++] = input.data[index2];
-				input.data[index2++] = (float)tmp;
-			}
+	public static void flipVertical( GrayF32 image ) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.flipVertical(image);
+		} else {
+			ImplImageMiscOps.flipVertical(image);
 		}
 	}
 
 	/**
 	 * Flips the image from left to right
 	 */
-	public static void flipHorizontal( GrayF32 input ) {
-		int w2 = input.width/2;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int index1 = input.getStartIndex() + y * input.getStride();
-			int index2 = index1 + input.width-1;
-
-			int end = index1 + w2;
-
-			while( index1 < end ) {
-				float tmp = input.data[index1];
-				input.data[index1++] = input.data[index2];
-				input.data[index2--] = (float)tmp;
-			}
+	public static void flipHorizontal( GrayF32 image ) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.flipHorizontal(image);
+		} else {
+			ImplImageMiscOps.flipHorizontal(image);
 		}
 	}
 
@@ -3097,30 +1950,10 @@ public class ImageMiscOps {
 	 * square images.
 	 */
 	public static void rotateCW( GrayF32 image ) {
-		if( image.width != image.height )
-			throw new IllegalArgumentException("Image must be square");
-
-		int w = image.height/2 + image.height%2;
-		int h = image.height/2;
-
-		for( int y0 = 0; y0 < h; y0++ ) {
-			int y1 = image.height-y0-1;
-
-			for( int x0 = 0; x0 < w; x0++ ) {
-				int x1 = image.width-x0-1;
-
-				int index0 = image.startIndex + y0*image.stride + x0;
-				int index1 = image.startIndex + x0*image.stride + y1;
-				int index2 = image.startIndex + y1*image.stride + x1;
-				int index3 = image.startIndex + x1*image.stride + y0;
-				
-				float tmp3 = image.data[index3];
-
-				image.data[index3] = image.data[index2];
-				image.data[index2] = image.data[index1];
-				image.data[index1] = image.data[index0];
-				image.data[index0] = (float)tmp3;
-			}
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.rotateCW(image);
+		} else {
+			ImplImageMiscOps.rotateCW(image);
 		}
 	}
 
@@ -3128,16 +1961,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( GrayF32 input , GrayF32 output ) {
-		if( input.width != output.height || input.height != output.width )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int h = input.height-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexIn = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				output.unsafe_set(h-y,x,input.data[indexIn++]);
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCW(input, output);
 		}
 	}
 
@@ -3145,21 +1972,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( InterleavedF32 input , InterleavedF32 output ) {
-		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int h = input.height-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				int indexDst = output.getIndex(h-y,x);
-
-				int end = indexSrc + input.numBands;
-				while( indexSrc != end ) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCW(input, output);
 		}
 	}
 
@@ -3168,30 +1984,10 @@ public class ImageMiscOps {
 	 * square images.
 	 */
 	public static void rotateCCW( GrayF32 image ) {
-		if( image.width != image.height )
-			throw new IllegalArgumentException("Image must be square");
-
-		int w = image.height/2 + image.height%2;
-		int h = image.height/2;
-
-		for( int y0 = 0; y0 < h; y0++ ) {
-			int y1 = image.height-y0-1;
-
-			for( int x0 = 0; x0 < w; x0++ ) {
-				int x1 = image.width-x0-1;
-
-				int index0 = image.startIndex + y0*image.stride + x0;
-				int index1 = image.startIndex + x0*image.stride + y1;
-				int index2 = image.startIndex + y1*image.stride + x1;
-				int index3 = image.startIndex + x1*image.stride + y0;
-				
-				float tmp0 = image.data[index0];
-
-				image.data[index0] = image.data[index1];
-				image.data[index1] = image.data[index2];
-				image.data[index2] = image.data[index3];
-				image.data[index3] = (float)tmp0;
-			}
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.rotateCCW(image);
+		} else {
+			ImplImageMiscOps.rotateCCW(image);
 		}
 	}
 
@@ -3199,16 +1995,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
 	public static void rotateCCW( GrayF32 input , GrayF32 output ) {
-		if( input.width != output.height || input.height != output.width )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int w = input.width-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexIn = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				output.unsafe_set(y,w-x,input.data[indexIn++]);
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCCW(input, output);
 		}
 	}
 
@@ -3216,21 +2006,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
 	public static void rotateCCW( InterleavedF32 input , InterleavedF32 output ) {
-		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int w = input.width-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				int indexDst = output.getIndex(y,w-x);
-
-				int end = indexSrc + input.numBands;
-				while( indexSrc != end ) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCCW(input, output);
 		}
 	}
 
@@ -3246,7 +2025,11 @@ public class ImageMiscOps {
 	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
 	 */
 	public static void growBorder(GrayF32 src , ImageBorder_F32 border, int borderX0, int borderY0, int borderX1, int borderY1, GrayF32 dst ) {
-		ImplImageMiscOps.growBorder(src,border,borderX0,borderY0,borderX1,borderY1,dst);
+		if( runConcurrent(src) ) {
+			ImplImageMiscOps_MT.growBorder(src, border, borderX0, borderY0, borderX1, borderY1, dst);
+		} else {
+			ImplImageMiscOps.growBorder(src, border, borderX0, borderY0, borderX1, borderY1, dst);
+		}
 	}
 
 	/**
@@ -3264,33 +2047,13 @@ public class ImageMiscOps {
 	 * @param output output image
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
-							 GrayF64 input , ImageBorder_F64 border, GrayF64 output )
-	{
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image. w="+output.width+" < "+(dstX+width)+" or y="+output.height+" < "+(dstY+height));
-		
-		// Check to see if it's entirely contained inside the input image
-		if( srcX >= 0 && srcX+width <= input.width && srcY >= 0 && srcY+height <= input.height ) {
-			for (int y = 0; y < height; y++) {
-				int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
-				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-
-				for (int x = 0; x < width; x++) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
-		} else {
-			// If any part is outside use the border. This isn't terribly efficient. A better approach is to
-			// handle all the possible outside regions independently. That code is significantly more complex so I'm
-			// punting it for a future person to write since this is good enough as it.
-			border.setImage(input);
-			for (int y = 0; y < height; y++) {
-				int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-				for (int x = 0; x < width; x++) {
-					output.data[indexDst++] = border.get(srcX+x,srcY+y);
-				}
-			}
-		}
+							 GrayF64 input , ImageBorder_F64 border, GrayF64 output ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, border, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, border, output);
+//		}
 	}
 
 	/**
@@ -3308,20 +2071,12 @@ public class ImageMiscOps {
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 GrayF64 input , GrayF64 output ) {
-
-		if( input.width < srcX+width || input.height < srcY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the input image");
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained in the output image");
-
-		for (int y = 0; y < height; y++) {
-			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX;
-			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX;
-
-			for (int x = 0; x < width; x++) {
-				output.data[indexDst++] = input.data[indexSrc++];
-			}
-		}
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		}
 	}
 
 	/**
@@ -3339,90 +2094,69 @@ public class ImageMiscOps {
 	 */
 	public static void copy( int srcX , int srcY , int dstX , int dstY , int width , int height ,
 							 InterleavedF64 input , InterleavedF64 output ) {
-
-		if( input.width < srcX+width || input.height < srcY+height )
-			throw new IllegalArgumentException("Copy region must be contained input image");
-		if( output.width < dstX+width || output.height < dstY+height )
-			throw new IllegalArgumentException("Copy region must be contained output image");
-		if( output.numBands != input.numBands )
-			throw new IllegalArgumentException("Number of bands must match. "+input.numBands+" != "+output.numBands);
-
-		final int numBands = input.numBands;
-
-		for (int y = 0; y < height; y++) {
-			int indexSrc = input.startIndex + (srcY + y) * input.stride + srcX*numBands;
-			int indexDst = output.startIndex + (dstY + y) * output.stride + dstX*numBands;
-
-			System.arraycopy(input.data,indexSrc,output.data,indexDst,width*numBands);
-		}
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent((dstY-srcY)*(dstX-srcX)) ) {
+//			ImplImageMiscOps_MT.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		} else {
+		ImplImageMiscOps.copy(srcX, srcY, dstX, dstY, width, height, input, output);
+//		}
 	}
 
 	/**
 	 * Fills the whole image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(GrayF64 input, double value) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			Arrays.fill(input.data,index,index+input.width, value);
-		}
+	public static void fill(GrayF64 image, double value) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fill(image, value);
+//		} else {
+		ImplImageMiscOps.fill(image, value);
+//		}
 	}
 
 	/**
 	 * Fills the whole image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fill(InterleavedF64 input, double value) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int end = index + input.width*input.numBands;
-			Arrays.fill(input.data,index,end, value);
+	public static void fill(InterleavedF64 image, double value) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fill(image, value);
+		} else {
+			ImplImageMiscOps.fill(image, value);
 		}
 	}
 
 	/**
 	 * Fills each band in the image with the specified values
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param values Array which contains the values each band is to be filled with.
 	 */
-	public static void fill(InterleavedF64 input, double[] values) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			for( int band = 0; band < numBands; band++ ) {
-				int index = input.getStartIndex() + y * input.getStride() + band;
-				int end = index + input.width*numBands - band;
-				double value = values[band];
-				for (; index < end; index += numBands ) {
-					input.data[index] = value;
-				}
-			}
+	public static void fill(InterleavedF64 image, double[] values) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fill(image, values);
+		} else {
+			ImplImageMiscOps.fill(image, values);
 		}
 	}
 
 	/**
 	 * Fills one band in the image with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param band Which band is to be filled with the specified value   
 	 * @param value The value that the image is being filled with.
 	 */
-	public static void fillBand(InterleavedF64 input, int band , double value) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride() + band;
-			int end = index + input.width*numBands - band;
-			for (; index < end; index += numBands ) {
-				input.data[index] = value;
-			}
+	public static void fillBand(InterleavedF64 image, int band , double value) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.fillBand(image, band, value);
+		} else {
+			ImplImageMiscOps.fillBand(image, band, value);
 		}
 	}
 
@@ -3434,167 +2168,100 @@ public class ImageMiscOps {
 	 * @param output The multi-band image which the input image is to be inserted into
 	 */
 	public static void insertBand( GrayF64 input, int band , InterleavedF64 output) {
-
-		final int numBands = output.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexIn = input.getStartIndex() + y * input.getStride();
-			int indexOut = output.getStartIndex() + y * output.getStride() + band;
-			int end = indexOut + output.width*numBands - band;
-			for (; indexOut < end; indexOut += numBands , indexIn++ ) {
-				output.data[indexOut] = input.data[indexIn];
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.insertBand(input, band, output);
+		} else {
+			ImplImageMiscOps.insertBand(input, band, output);
 		}
 	}
 
 	/**
 	 * Extracts a single band from a multi-band image
 	 *
-	 * @param input Multi-band image
-	 * @param band which bad is to be extracted   
-	 * @param output The single band image
+	 * @param input Multi-band image.
+	 * @param band which bad is to be extracted
+	 * @param output The single band image. Modified.
 	 */
 	public static void extractBand( InterleavedF64 input, int band , GrayF64 output) {
-
-		final int numBands = input.numBands;
-		for (int y = 0; y < input.height; y++) {
-			int indexIn = input.getStartIndex() + y * input.getStride() + band;
-			int indexOut = output.getStartIndex() + y * output.getStride();
-			int end = indexOut + output.width;
-			for (; indexOut < end; indexIn += numBands , indexOut++ ) {
-				output.data[indexOut] = input.data[indexIn];
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.extractBand(input, band, output);
+		} else {
+			ImplImageMiscOps.extractBand(input, band, output);
 		}
 	}
 
 	/**
 	 * Fills the outside border with the specified value
 	 *
-	 * @param input An image.
+	 * @param image An image. Modified.
 	 * @param value The value that the image is being filled with.
-	 * @param radius Border width.   
+	 * @param radius Border width.
 	 */
-	public static void fillBorder(GrayF64 input, double value, int radius ) {
-
-		// top and bottom
-		for (int y = 0; y < radius; y++) {
-			int indexTop = input.startIndex + y * input.stride;
-			int indexBottom = input.startIndex + (input.height-y-1) * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[indexTop++] = value;
-				input.data[indexBottom++] = value;
-			}
-		}
-
-		// left and right
-		int h = input.height-radius;
-		int indexStart = input.startIndex + radius*input.stride;
-		for (int x = 0; x < radius; x++) {
-			int indexLeft = indexStart + x;
-			int indexRight = indexStart + input.width-1-x;
-			for (int y = radius; y < h; y++) {
-				input.data[indexLeft] = value;
-				input.data[indexRight] = value;
-				
-				indexLeft += input.stride;
-				indexRight += input.stride;
-			}
-		}
+	public static void fillBorder(GrayF64 image, double value, int radius ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillBorder(image, value, radius);
+//		} else {
+		ImplImageMiscOps.fillBorder(image, value, radius);
+//		}
 	}
 
 	/**
 	 * Fills the border with independent border widths for each side
 	 *
-	 * @param input An image.
+	 * @param image An image.
 	 * @param value The value that the image is being filled with.
 	 * @param borderX0 Width of border on left
-	 * @param borderY0 Width of border on top   
+	 * @param borderY0 Width of border on top
 	 * @param borderX1 Width of border on right
 	 * @param borderY1 Width of border on bottom
 	 */
-	public static void fillBorder(GrayF64 input, double value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
-
-		// top and bottom
-		for (int y = 0; y < borderY0; y++) {
-			int srcIdx = input.startIndex + y * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[srcIdx++] = value;
-			}
-		}
-		for (int y = input.height-borderY1; y < input.height; y++) {
-			int srcIdx = input.startIndex + y * input.stride;
-			for (int x = 0; x < input.width; x++) {
-				input.data[srcIdx++] = value;
-			}
-		}
-
-		// left and right
-		int h = input.height-borderY1;
-		for (int x = 0; x < borderX0; x++) {
-			int srcIdx = input.startIndex + borderY0*input.stride + x;
-			for (int y = borderY0; y < h; y++) {
-				input.data[srcIdx] = value;
-				srcIdx += input.stride;
-			}
-		}
-		for (int x = input.width-borderX1; x < input.width; x++) {
-			int srcIdx = input.startIndex + borderY0*input.stride + x;
-			for (int y = borderY0; y < h; y++) {
-				input.data[srcIdx] = value;
-				srcIdx += input.stride;
-			}
-		}
+	public static void fillBorder(GrayF64 image, double value, int borderX0 , int borderY0 , int borderX1 , int borderY1 ) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillBorder(image, value, borderX0, borderY0, borderX1, borderY1);
+//		} else {
+		ImplImageMiscOps.fillBorder(image, value, borderX0, borderY0, borderX1, borderY1);
+//		}
 	}
 
 	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.
 	 *
-	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param image The image the rectangle is drawn in. Modified
 	 * @param value Value of the rectangle
 	 * @param x0 Top left x-coordinate
 	 * @param y0 Top left y-coordinate
 	 * @param width Rectangle width
 	 * @param height Rectangle height
 	 */
-	public static void fillRectangle(GrayF64 img, double value, int x0, int y0, int width, int height) {
-		int x1 = x0 + width;
-		int y1 = y0 + height;
-
-		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
-		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
-
-		for (int y = y0; y < y1; y++) {
-			for (int x = x0; x < x1; x++) {
-				img.set(x, y, value);
-			}
-		}
+	public static void fillRectangle(GrayF64 image, double value, int x0, int y0, int width, int height) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillRectangle(image, value, x0, y0, width, height);
+//		} else {
+		ImplImageMiscOps.fillRectangle(image, value, x0, y0, width, height);
+//		}
 	}
 
 	/**
 	 * Draws a filled rectangle that is aligned along the image axis inside the image.  All bands
 	 * are filled with the same value.
 	 *
-	 * @param img Image the rectangle is drawn in.  Modified
+	 * @param image The image the rectangle is drawn in. Modified
 	 * @param value Value of the rectangle
 	 * @param x0 Top left x-coordinate
 	 * @param y0 Top left y-coordinate
 	 * @param width Rectangle width
 	 * @param height Rectangle height
 	 */
-	public static void fillRectangle(InterleavedF64 img, double value, int x0, int y0, int width, int height) {
-		int x1 = x0 + width;
-		int y1 = y0 + height;
-
-		if( x0 < 0 ) x0 = 0; if( x1 > img.width ) x1 = img.width;
-		if( y0 < 0 ) y0 = 0; if( y1 > img.height ) y1 = img.height;
-
-		int length = (x1-x0)*img.numBands;
-		for (int y = y0; y < y1; y++) {
-			int index = img.startIndex + y*img.stride + x0*img.numBands;
-			int indexEnd = index + length;
-			while( index < indexEnd ) {
-				img.data[index++] = value;
-			}
-		}
+	public static void fillRectangle(InterleavedF64 image, double value, int x0, int y0, int width, int height) {
+//		concurrent isn't faster in benchmark results
+//		if( runConcurrent(image) ) {
+//			ImplImageMiscOps_MT.fillRectangle(image, value, x0, y0, width, height);
+//		} else {
+		ImplImageMiscOps.fillRectangle(image, value, x0, y0, width, height);
+//		}
 	}	/**
 	 * Sets each value in the image to a value drawn from an uniform distribution that has a range of min &le; X &lt; max.
 	 *
@@ -3604,16 +2271,7 @@ public class ImageMiscOps {
 	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(GrayF64 img, Random rand , double min , double max) {
-		double range = max-min;
-
-		double[] data = img.data;
-
-		for (int y = 0; y < img.height; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			for (int x = 0; x < img.width; x++) {
-				data[index++] = rand.nextDouble()*range+min;
-			}
-		}
+		ImplImageMiscOps.fillUniform(img, rand, min, max);
 	}
 
 	/**
@@ -3625,17 +2283,7 @@ public class ImageMiscOps {
 	 * @param max Maximum value of the distribution, inclusive
 	 */
 	public static void fillUniform(InterleavedF64 img, Random rand , double min , double max) {
-		double range = max-min;
-
-		double[] data = img.data;
-
-		for (int y = 0; y < img.height; y++) {
-			int index = img.getStartIndex() + y * img.getStride();
-			int end = index + img.width*img.numBands;
-			for (; index <  end; index++) {
-				data[index] = rand.nextDouble()*range+min;
-			}
-		}
+		ImplImageMiscOps.fillUniform(img, rand, min, max);
 	}
 
 	/**
@@ -3651,17 +2299,7 @@ public class ImageMiscOps {
 	 * @param upperBound Upper bound of value clip
 	 */
 	public static void fillGaussian(GrayF64 input, Random rand , double mean , double sigma , double lowerBound , double upperBound ) {
-		double[] data = input.data;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				double value = (rand.nextGaussian()*sigma+mean);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				data[index++] = value;
-			}
-		}
+		ImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);
 	}
 
 	/**
@@ -3677,59 +2315,28 @@ public class ImageMiscOps {
 	 * @param upperBound Upper bound of value clip
 	 */
 	public static void fillGaussian(InterleavedF64 input, Random rand , double mean , double sigma , double lowerBound , double upperBound ) {
-		double[] data = input.data;
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int indexEnd = index+length;
-
-			while( index < indexEnd ) {
-				double value = (rand.nextGaussian()*sigma+mean);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				data[index++] = value;
-			}
-		}
+		ImplImageMiscOps.fillGaussian(input, rand, mean, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Flips the image from top to bottom
 	 */
-	public static void flipVertical( GrayF64 input ) {
-		int h2 = input.height/2;
-
-		for( int y = 0; y < h2; y++ ) {
-			int index1 = input.getStartIndex() + y * input.getStride();
-			int index2 = input.getStartIndex() + (input.height - y - 1) * input.getStride();
-
-			int end = index1 + input.width;
-
-			while( index1 < end ) {
-				double tmp = input.data[index1];
-				input.data[index1++] = input.data[index2];
-				input.data[index2++] = (double)tmp;
-			}
+	public static void flipVertical( GrayF64 image ) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.flipVertical(image);
+		} else {
+			ImplImageMiscOps.flipVertical(image);
 		}
 	}
 
 	/**
 	 * Flips the image from left to right
 	 */
-	public static void flipHorizontal( GrayF64 input ) {
-		int w2 = input.width/2;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int index1 = input.getStartIndex() + y * input.getStride();
-			int index2 = index1 + input.width-1;
-
-			int end = index1 + w2;
-
-			while( index1 < end ) {
-				double tmp = input.data[index1];
-				input.data[index1++] = input.data[index2];
-				input.data[index2--] = (double)tmp;
-			}
+	public static void flipHorizontal( GrayF64 image ) {
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.flipHorizontal(image);
+		} else {
+			ImplImageMiscOps.flipHorizontal(image);
 		}
 	}
 
@@ -3738,30 +2345,10 @@ public class ImageMiscOps {
 	 * square images.
 	 */
 	public static void rotateCW( GrayF64 image ) {
-		if( image.width != image.height )
-			throw new IllegalArgumentException("Image must be square");
-
-		int w = image.height/2 + image.height%2;
-		int h = image.height/2;
-
-		for( int y0 = 0; y0 < h; y0++ ) {
-			int y1 = image.height-y0-1;
-
-			for( int x0 = 0; x0 < w; x0++ ) {
-				int x1 = image.width-x0-1;
-
-				int index0 = image.startIndex + y0*image.stride + x0;
-				int index1 = image.startIndex + x0*image.stride + y1;
-				int index2 = image.startIndex + y1*image.stride + x1;
-				int index3 = image.startIndex + x1*image.stride + y0;
-				
-				double tmp3 = image.data[index3];
-
-				image.data[index3] = image.data[index2];
-				image.data[index2] = image.data[index1];
-				image.data[index1] = image.data[index0];
-				image.data[index0] = (double)tmp3;
-			}
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.rotateCW(image);
+		} else {
+			ImplImageMiscOps.rotateCW(image);
 		}
 	}
 
@@ -3769,16 +2356,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( GrayF64 input , GrayF64 output ) {
-		if( input.width != output.height || input.height != output.width )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int h = input.height-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexIn = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				output.unsafe_set(h-y,x,input.data[indexIn++]);
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCW(input, output);
 		}
 	}
 
@@ -3786,21 +2367,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the clockwise direction.
 	 */
 	public static void rotateCW( InterleavedF64 input , InterleavedF64 output ) {
-		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int h = input.height-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				int indexDst = output.getIndex(h-y,x);
-
-				int end = indexSrc + input.numBands;
-				while( indexSrc != end ) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCW(input, output);
 		}
 	}
 
@@ -3809,30 +2379,10 @@ public class ImageMiscOps {
 	 * square images.
 	 */
 	public static void rotateCCW( GrayF64 image ) {
-		if( image.width != image.height )
-			throw new IllegalArgumentException("Image must be square");
-
-		int w = image.height/2 + image.height%2;
-		int h = image.height/2;
-
-		for( int y0 = 0; y0 < h; y0++ ) {
-			int y1 = image.height-y0-1;
-
-			for( int x0 = 0; x0 < w; x0++ ) {
-				int x1 = image.width-x0-1;
-
-				int index0 = image.startIndex + y0*image.stride + x0;
-				int index1 = image.startIndex + x0*image.stride + y1;
-				int index2 = image.startIndex + y1*image.stride + x1;
-				int index3 = image.startIndex + x1*image.stride + y0;
-				
-				double tmp0 = image.data[index0];
-
-				image.data[index0] = image.data[index1];
-				image.data[index1] = image.data[index2];
-				image.data[index2] = image.data[index3];
-				image.data[index3] = (double)tmp0;
-			}
+		if( runConcurrent(image) ) {
+			ImplImageMiscOps_MT.rotateCCW(image);
+		} else {
+			ImplImageMiscOps.rotateCCW(image);
 		}
 	}
 
@@ -3840,16 +2390,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
 	public static void rotateCCW( GrayF64 input , GrayF64 output ) {
-		if( input.width != output.height || input.height != output.width )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int w = input.width-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexIn = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				output.unsafe_set(y,w-x,input.data[indexIn++]);
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCCW(input, output);
 		}
 	}
 
@@ -3857,21 +2401,10 @@ public class ImageMiscOps {
 	 * Rotates the image 90 degrees in the counter-clockwise direction.
 	 */
 	public static void rotateCCW( InterleavedF64 input , InterleavedF64 output ) {
-		if( input.width != output.height || input.height != output.width || input.numBands != output.numBands )
-			throw new IllegalArgumentException("Incompatible shapes");
-
-		int w = input.width-1;
-
-		for( int y = 0; y < input.height; y++ ) {
-			int indexSrc = input.startIndex + y*input.stride;
-			for (int x = 0; x < input.width; x++) {
-				int indexDst = output.getIndex(y,w-x);
-
-				int end = indexSrc + input.numBands;
-				while( indexSrc != end ) {
-					output.data[indexDst++] = input.data[indexSrc++];
-				}
-			}
+		if( runConcurrent(input) ) {
+			ImplImageMiscOps_MT.rotateCCW(input, output);
+		} else {
+			ImplImageMiscOps.rotateCCW(input, output);
 		}
 	}
 
@@ -3887,703 +2420,331 @@ public class ImageMiscOps {
 	 * @param dst (Output) Output image. width=src.width+2*radiusX and height=src.height+2*radiusY
 	 */
 	public static void growBorder(GrayF64 src , ImageBorder_F64 border, int borderX0, int borderY0, int borderX1, int borderY1, GrayF64 dst ) {
-		ImplImageMiscOps.growBorder(src,border,borderX0,borderY0,borderX1,borderY1,dst);
+		if( runConcurrent(src) ) {
+			ImplImageMiscOps_MT.growBorder(src, border, borderX0, borderY0, borderX1, borderY1, dst);
+		} else {
+			ImplImageMiscOps.growBorder(src, border, borderX0, borderY0, borderX1, borderY1, dst);
+		}
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayU8 input, Random rand , int min , int max) {
-		int range = max-min;
-
-		byte[] data = input.data;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				int value = (data[index] & 0xFF) + rand.nextInt(range)+min;
-				if( value < 0 ) value = 0;
-				if( value > 255 ) value = 255;
-
-				data[index++] = (byte) value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedU8 input, Random rand , int min , int max) {
-		int range = max-min;
-
-		byte[] data = input.data;
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-
-				int indexEnd = index+length;
-				while( index < indexEnd ) {
-				int value = (data[index] & 0xFF) + rand.nextInt(range)+min;
-				if( value < 0 ) value = 0;
-				if( value > 255 ) value = 255;
-
-				data[index++] = (byte) value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(GrayU8 input, Random rand , double sigma , int lowerBound , int upperBound ) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				int value = (input.data[index] & 0xFF) + (int)(rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] = (byte) value;
-			}
-		}
+	public static void addGaussian(GrayU8 image, Random rand , double sigma , int lowerBound , int upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(InterleavedU8 input, Random rand , double sigma , int lowerBound , int upperBound ) {
-
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int indexEnd = index+length;
-			while( index < indexEnd ) {
-				int value = (input.data[index]& 0xFF) + (int)(rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] = (byte)value;
-			}
-		}
+	public static void addGaussian(InterleavedU8 image, Random rand , double sigma , int lowerBound , int upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayS8 input, Random rand , int min , int max) {
-		int range = max-min;
-
-		byte[] data = input.data;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				int value = (data[index] ) + rand.nextInt(range)+min;
-				if( value < -128 ) value = -128;
-				if( value > 127 ) value = 127;
-
-				data[index++] = (byte) value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedS8 input, Random rand , int min , int max) {
-		int range = max-min;
-
-		byte[] data = input.data;
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-
-				int indexEnd = index+length;
-				while( index < indexEnd ) {
-				int value = (data[index] ) + rand.nextInt(range)+min;
-				if( value < -128 ) value = -128;
-				if( value > 127 ) value = 127;
-
-				data[index++] = (byte) value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(GrayS8 input, Random rand , double sigma , int lowerBound , int upperBound ) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				int value = (input.data[index] ) + (int)(rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] = (byte) value;
-			}
-		}
+	public static void addGaussian(GrayS8 image, Random rand , double sigma , int lowerBound , int upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(InterleavedS8 input, Random rand , double sigma , int lowerBound , int upperBound ) {
-
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int indexEnd = index+length;
-			while( index < indexEnd ) {
-				int value = (input.data[index]) + (int)(rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] = (byte)value;
-			}
-		}
+	public static void addGaussian(InterleavedS8 image, Random rand , double sigma , int lowerBound , int upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayU16 input, Random rand , int min , int max) {
-		int range = max-min;
-
-		short[] data = input.data;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				int value = (data[index] & 0xFFFF) + rand.nextInt(range)+min;
-				if( value < 0 ) value = 0;
-				if( value > 65535 ) value = 65535;
-
-				data[index++] = (short) value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedU16 input, Random rand , int min , int max) {
-		int range = max-min;
-
-		short[] data = input.data;
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-
-				int indexEnd = index+length;
-				while( index < indexEnd ) {
-				int value = (data[index] & 0xFFFF) + rand.nextInt(range)+min;
-				if( value < 0 ) value = 0;
-				if( value > 65535 ) value = 65535;
-
-				data[index++] = (short) value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(GrayU16 input, Random rand , double sigma , int lowerBound , int upperBound ) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				int value = (input.data[index] & 0xFFFF) + (int)(rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] = (short) value;
-			}
-		}
+	public static void addGaussian(GrayU16 image, Random rand , double sigma , int lowerBound , int upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(InterleavedU16 input, Random rand , double sigma , int lowerBound , int upperBound ) {
-
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int indexEnd = index+length;
-			while( index < indexEnd ) {
-				int value = (input.data[index]& 0xFFFF) + (int)(rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] = (short)value;
-			}
-		}
+	public static void addGaussian(InterleavedU16 image, Random rand , double sigma , int lowerBound , int upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayS16 input, Random rand , int min , int max) {
-		int range = max-min;
-
-		short[] data = input.data;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				int value = (data[index] ) + rand.nextInt(range)+min;
-				if( value < -32768 ) value = -32768;
-				if( value > 32767 ) value = 32767;
-
-				data[index++] = (short) value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedS16 input, Random rand , int min , int max) {
-		int range = max-min;
-
-		short[] data = input.data;
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-
-				int indexEnd = index+length;
-				while( index < indexEnd ) {
-				int value = (data[index] ) + rand.nextInt(range)+min;
-				if( value < -32768 ) value = -32768;
-				if( value > 32767 ) value = 32767;
-
-				data[index++] = (short) value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(GrayS16 input, Random rand , double sigma , int lowerBound , int upperBound ) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				int value = (input.data[index] ) + (int)(rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] = (short) value;
-			}
-		}
+	public static void addGaussian(GrayS16 image, Random rand , double sigma , int lowerBound , int upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(InterleavedS16 input, Random rand , double sigma , int lowerBound , int upperBound ) {
-
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int indexEnd = index+length;
-			while( index < indexEnd ) {
-				int value = (input.data[index]) + (int)(rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] = (short)value;
-			}
-		}
+	public static void addGaussian(InterleavedS16 image, Random rand , double sigma , int lowerBound , int upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayS32 input, Random rand , int min , int max) {
-		int range = max-min;
-
-		int[] data = input.data;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				int value = (data[index] ) + rand.nextInt(range)+min;
-				data[index++] =  value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedS32 input, Random rand , int min , int max) {
-		int range = max-min;
-
-		int[] data = input.data;
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-
-				int indexEnd = index+length;
-				while( index < indexEnd ) {
-				int value = (data[index] ) + rand.nextInt(range)+min;
-				data[index++] =  value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(GrayS32 input, Random rand , double sigma , int lowerBound , int upperBound ) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				int value = (input.data[index] ) + (int)(rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] =  value;
-			}
-		}
+	public static void addGaussian(GrayS32 image, Random rand , double sigma , int lowerBound , int upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(InterleavedS32 input, Random rand , double sigma , int lowerBound , int upperBound ) {
-
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int indexEnd = index+length;
-			while( index < indexEnd ) {
-				int value = (input.data[index]) + (int)(rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] = value;
-			}
-		}
+	public static void addGaussian(InterleavedS32 image, Random rand , double sigma , int lowerBound , int upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayS64 input, Random rand , long min , long max) {
-		long range = max-min;
-
-		long[] data = input.data;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				long value = data[index] + rand.nextInt((int)range)+min;
-				data[index++] =  value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedS64 input, Random rand , long min , long max) {
-		long range = max-min;
-
-		long[] data = input.data;
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-
-				int indexEnd = index+length;
-				while( index < indexEnd ) {
-				long value = data[index] + rand.nextInt((int)range)+min;
-				data[index++] =  value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(GrayS64 input, Random rand , double sigma , long lowerBound , long upperBound ) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				long value = (input.data[index] ) + (long)(rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] =  value;
-			}
-		}
+	public static void addGaussian(GrayS64 image, Random rand , double sigma , long lowerBound , long upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(InterleavedS64 input, Random rand , double sigma , long lowerBound , long upperBound ) {
-
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int indexEnd = index+length;
-			while( index < indexEnd ) {
-				long value = (input.data[index]) + (long)(rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] = value;
-			}
-		}
+	public static void addGaussian(InterleavedS64 image, Random rand , double sigma , long lowerBound , long upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayF32 input, Random rand , float min , float max) {
-		float range = max-min;
-
-		float[] data = input.data;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				float value = data[index] + rand.nextFloat()*range+min;
-				data[index++] =  value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedF32 input, Random rand , float min , float max) {
-		float range = max-min;
-
-		float[] data = input.data;
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-
-				int indexEnd = index+length;
-				while( index < indexEnd ) {
-				float value = data[index] + rand.nextFloat()*range+min;
-				data[index++] =  value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(GrayF32 input, Random rand , double sigma , float lowerBound , float upperBound ) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				float value = (input.data[index] ) + (float)(rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] =  value;
-			}
-		}
+	public static void addGaussian(GrayF32 image, Random rand , double sigma , float lowerBound , float upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(InterleavedF32 input, Random rand , double sigma , float lowerBound , float upperBound ) {
-
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int indexEnd = index+length;
-			while( index < indexEnd ) {
-				float value = (input.data[index]) + (float)(rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] = value;
-			}
-		}
+	public static void addGaussian(InterleavedF32 image, Random rand , double sigma , float lowerBound , float upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(GrayF64 input, Random rand , double min , double max) {
-		double range = max-min;
-
-		double[] data = input.data;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				double value = data[index] + rand.nextDouble()*range+min;
-				data[index++] =  value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds uniform i.i.d noise to each pixel in the image.  Noise range is min &le; X &lt; max.
 	 */
 	public static void addUniform(InterleavedF64 input, Random rand , double min , double max) {
-		double range = max-min;
-
-		double[] data = input.data;
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-
-				int indexEnd = index+length;
-				while( index < indexEnd ) {
-				double value = data[index] + rand.nextDouble()*range+min;
-				data[index++] =  value;
-			}
-		}
+		ImplImageMiscOps.addUniform(input, rand, min, max);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(GrayF64 input, Random rand , double sigma , double lowerBound , double upperBound ) {
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			for (int x = 0; x < input.width; x++) {
-				double value = (input.data[index] ) + (rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] =  value;
-			}
-		}
+	public static void addGaussian(GrayF64 image, Random rand , double sigma , double lowerBound , double upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 	/**
 	 * Adds Gaussian/normal i.i.d noise to each pixel in the image.  If a value exceeds the specified
 	 * it will be set to the closest bound.
-	 * @param input Input image.  Modified.
+	 * @param image Input image. Modified.
 	 * @param rand Random number generator.
 	 * @param sigma Distributions standard deviation.
 	 * @param lowerBound Allowed lower bound
 	 * @param upperBound Allowed upper bound
 	 */
-	public static void addGaussian(InterleavedF64 input, Random rand , double sigma , double lowerBound , double upperBound ) {
-
-		int length = input.width*input.numBands;
-
-		for (int y = 0; y < input.height; y++) {
-			int index = input.getStartIndex() + y * input.getStride();
-			int indexEnd = index+length;
-			while( index < indexEnd ) {
-				double value = (input.data[index]) + (rand.nextGaussian()*sigma);
-				if( value < lowerBound ) value = lowerBound;
-				if( value > upperBound ) value = upperBound;
-				input.data[index++] = value;
-			}
-		}
+	public static void addGaussian(InterleavedF64 image, Random rand , double sigma , double lowerBound , double upperBound ) {
+		ImplImageMiscOps.addGaussian(image, rand, sigma, lowerBound, upperBound);
 	}
 
 }
