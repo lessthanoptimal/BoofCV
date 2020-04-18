@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,8 +32,11 @@ import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+
+import static boofcv.io.UtilIO.UTF8;
 
 /**
  * @author Peter Abeles
@@ -51,7 +54,7 @@ public class DefaultMediaManager implements MediaManager {
 		InputStream stream = UtilIO.openStream(fileName);
 		if( stream == null )
 			return null;
-		return new InputStreamReader(stream);
+		return new InputStreamReader(stream,Charset.forName(UTF8));
 	}
 
 	@Override

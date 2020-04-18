@@ -26,6 +26,7 @@ import org.apache.commons.io.FilenameUtils;
 import javax.swing.*;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +40,8 @@ import java.util.zip.ZipEntry;
  * @author Peter Abeles
  */
 public class UtilIO {
+	public static final String UTF8 = "UTF-8";
+
 	/**
 	 * Returns an absolute path to the file that is relative to the example directory
 	 * @param path File path relative to root directory
@@ -108,7 +111,7 @@ public class UtilIO {
 		InputStream stream = UtilIO.openStream(fileName);
 		if( stream == null )
 			throw new FileNotFoundException("Can't open "+fileName);
-		return new BufferedReader(new InputStreamReader(stream));
+		return new BufferedReader(new InputStreamReader(stream, Charset.forName(UTF8)));
 	}
 
 	/**
@@ -135,8 +138,10 @@ public class UtilIO {
 
 	public static String ensureFilePath(String path ) {
 		URL url = ensureURL(path);
+		if( url == null )
+			return null;
 		try {
-			return URLDecoder.decode(url.getPath(), "UTF-8");
+			return URLDecoder.decode(url.getPath(), UTF8);
 		} catch (UnsupportedEncodingException e) {
 			return null;
 		}

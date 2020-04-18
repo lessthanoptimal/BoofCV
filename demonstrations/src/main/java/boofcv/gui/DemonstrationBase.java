@@ -49,6 +49,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static boofcv.io.UtilIO.UTF8;
 import static boofcv.io.UtilIO.systemToUnix;
 
 /**
@@ -504,7 +505,7 @@ public abstract class DemonstrationBase extends JPanel {
 		String path;
 		try {
 			// need to remove annoying %20 from the path is there is whitespace
-			path = URLDecoder.decode(inputFilePath, "utf-8");
+			path = URLDecoder.decode(inputFilePath, UTF8);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			return;

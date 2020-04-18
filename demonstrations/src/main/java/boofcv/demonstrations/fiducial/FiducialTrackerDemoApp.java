@@ -60,10 +60,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -256,7 +255,7 @@ public class FiducialTrackerDemoApp<I extends ImageGray<I>>
 				File configFile = new File(path,"description_4x3_3x3_4cm_2cm.txt");
 				try {
 					ConfigSquareGridBinary config =
-							ConfigSquareGridBinary.parseSimple(new BufferedReader(new FileReader(configFile)));
+							ConfigSquareGridBinary.parseSimple(Files.newBufferedReader(configFile.toPath()));
 					detector = FactoryFiducial.calibSquareGridBinary(config, imageClass);
 				} catch (IOException e) {
 					throw new RuntimeException(e);

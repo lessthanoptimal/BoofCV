@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static boofcv.io.UtilIO.UTF8;
+
 /**
  * Class for loading and saving images.
  *
@@ -118,7 +120,7 @@ public class UtilImageIO {
 			if( buffered != null )
 				return buffered;
 			if( url.getProtocol().equals("file")) {
-				String path = URLDecoder.decode(url.getPath(), "UTF-8");
+				String path = URLDecoder.decode(url.getPath(), UTF8);
 				if( !new File(path).exists() ) {
 					System.err.println("File does not exist: "+path);
 					return null;
