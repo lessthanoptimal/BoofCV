@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.d3;
+package boofcv.alg.sfm.d3.structure;
 
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.SceneObservations;
@@ -53,18 +53,19 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	@Getter @Setter private int minObservations = 2;
 
 	// Reference to the original camera model passed in
-	CameraPinholeBrown originalCamera;
+	public CameraPinholeBrown originalCamera;
 	// The camera model which is being optimized
-	BundlePinholeBrown bundleCamera = new BundlePinholeBrown();
+	public BundlePinholeBrown bundleCamera = new BundlePinholeBrown();
 
-	SceneStructureMetric structure = new SceneStructureMetric(true);
-	SceneObservations observations = new SceneObservations();
+	public SceneStructureMetric structure = new SceneStructureMetric(true);
+	public SceneObservations observations = new SceneObservations();
 
-	BundleAdjustment<SceneStructureMetric> bundleAdjustment;
-	List<BTrack> selectedTracks = new ArrayList<>();
+	public BundleAdjustment<SceneStructureMetric> bundleAdjustment;
+	public List<BTrack> selectedTracks = new ArrayList<>();
 
 	// Reduce the number of tracks feed into bundle adjustment to make it run at a reasonable speed
-	@Getter VisOdomSelectFrameTracks selectTracks = new VisOdomSelectFrameTracks(0xBEEF);
+	@Getter
+	SelectTracksInFrameForBundleAdjustment selectTracks = new SelectTracksInFrameForBundleAdjustment(0xBEEF);
 
 	public VisOdomBundleAdjustment( BundleAdjustment<SceneStructureMetric> bundleAdjustment,
 									Factory<T> factoryTracks ) {

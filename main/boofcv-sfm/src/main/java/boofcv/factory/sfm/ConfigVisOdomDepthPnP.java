@@ -18,12 +18,13 @@
 
 package boofcv.factory.sfm;
 
+import boofcv.alg.sfm.d3.VisOdomPixelDepthPnP;
 import boofcv.factory.geo.ConfigBundleAdjustment;
 import boofcv.factory.geo.EnumPNP;
 import boofcv.struct.Configuration;
 
 /**
- * Stereo configuration for {@link boofcv.alg.sfm.d3.VisOdomPixelDepthPnP}
+ * Stereo configuration for {@link VisOdomPixelDepthPnP}
  *
  * @author Peter Abeles
  */

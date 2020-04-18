@@ -20,8 +20,6 @@ package boofcv.alg.sfm.d3;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 /**
  * Most testing is handled by wrapped classes
  *
@@ -30,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 class TestVisOdomPixelDepthPnP  {
 
 	@Test
-	void selectFrameToDrop() {
-		fail("Implement");
+	public void stuff() {
+		// This is intentionally left blank.  Tests are performed inside the abstract package
 	}
-
 }

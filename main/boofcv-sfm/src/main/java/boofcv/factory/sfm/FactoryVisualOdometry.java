@@ -205,7 +205,8 @@ public class FactoryVisualOdometry {
 		VisOdomPixelDepthPnP<T> alg =
 				new VisOdomPixelDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
 		alg.setThresholdRetireTracks(config.dropOutlierTracks);
-		alg.setMaxKeyFrames(config.maxKeyFrames);
+		// TODO reimplement
+//		alg.setMaxKeyFrames(config.maxKeyFrames);
 		return new WrapVisOdomPixelDepthPnP<>(alg, pixelTo3D, distance, imageType);
 	}
 

@@ -16,15 +16,15 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.d3;
+package boofcv.alg.sfm.d3.structure;
 
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.alg.distort.pinhole.LensDistortionPinhole;
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BFrame;
-import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BObservation;
-import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BTrack;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BObservation;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;

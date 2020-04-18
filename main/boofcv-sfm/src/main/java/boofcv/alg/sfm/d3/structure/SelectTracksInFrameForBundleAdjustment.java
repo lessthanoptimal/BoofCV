@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package boofcv.alg.sfm.d3;
+package boofcv.alg.sfm.d3.structure;
 
-import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BFrame;
-import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BTrack;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.struct.ConfigGridUniform;
 import boofcv.struct.ImageGrid;
 import org.ddogleg.struct.FastArray;
@@ -34,7 +34,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class VisOdomSelectFrameTracks {
+public class SelectTracksInFrameForBundleAdjustment {
 	private final Random rand;
 
 	/** Configuration for uniformally selecting a grid */
@@ -49,11 +49,11 @@ public class VisOdomSelectFrameTracks {
 	// grid cells. Stored in row major format
 	ImageGrid<Info> grid = new ImageGrid<>(Info::new,Info::reset);
 
-	public VisOdomSelectFrameTracks( long randSeed ) {
+	public SelectTracksInFrameForBundleAdjustment(long randSeed ) {
 		rand = new Random(randSeed);
 	}
 
-	public void selectTracks( VisOdomBundleAdjustment<?> sba, int imageWidth , int imageHeight, List<BTrack> selected )
+	public void selectTracks(VisOdomBundleAdjustment<?> sba, int imageWidth , int imageHeight, List<BTrack> selected )
 	{
 		// Initialize data structures
 		selected.clear();
@@ -95,8 +95,10 @@ public class VisOdomSelectFrameTracks {
 	 * Initializes the grid data structure. Counts number of already selected tracks and adds unselected
 	 * tracks to the list. A track is only considered for selection if it has the minimum number of observations.
 	 * Otherwise it's likely to be a false positive.
+	 *
+	 * @param targetLength See {@link ImageGrid#initialize(int, int, int)}
 	 */
-	private void initializeGrid(BFrame frame, int imageWidth, int imageHeight, int targetLength) {
+	void initializeGrid(BFrame frame, int imageWidth, int imageHeight, int targetLength) {
 		grid.initialize(targetLength,imageWidth, imageHeight);
 		final FastArray<BTrack> tracks = frame.tracks;
 		for (int trackIdx = 0; trackIdx < tracks.size; trackIdx++) {
@@ -116,7 +118,7 @@ public class VisOdomSelectFrameTracks {
 	 * Selects new tracks such that it is uniform across the image. This takes in account the location of already
 	 * selected tracks.
 	 */
-	private void selectNewTracks(List<BTrack> selected) {
+	void selectNewTracks(List<BTrack> selected) {
 		int total = 0;
 
 		// Go through each grid cell one at a time and add a feature if there are any remaining
@@ -153,7 +155,7 @@ public class VisOdomSelectFrameTracks {
 	/**
 	 * Info for each cell
 	 */
-	private static class Info
+	static class Info
 	{
 		// counter for tracks which were selected in a previous frame
 		public int alreadySelected = 0;

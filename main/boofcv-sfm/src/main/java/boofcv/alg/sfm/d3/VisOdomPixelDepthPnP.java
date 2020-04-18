@@ -26,9 +26,12 @@ import boofcv.abst.sfm.ImagePixelTo3D;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BFrame;
-import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BObservation;
-import boofcv.alg.sfm.d3.VisOdomBundleAdjustment.BTrack;
+import boofcv.alg.sfm.d3.structure.MaxGeoKeyFrameManager;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BObservation;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
+import boofcv.alg.sfm.d3.structure.VisOdomKeyFrameManager;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.geo.ConfigTriangulation;
 import boofcv.factory.geo.FactoryMultiView;
@@ -45,12 +48,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.VerbosePrint;
 
+import javax.annotation.Nullable;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Full 6-DOF visual odometry where a ranging device is assumed for pixels in the primary view and the motion is estimated
@@ -69,7 +74,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
+public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrint {
 
 	// discard tracks after they have not been in the inlier set for this many updates in a row
 	private @Getter @Setter int thresholdRetireTracks;
@@ -86,8 +91,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 	// non-linear refinement of pose estimate
 	private final RefinePnP refine;
 
-	/** Maximum number of key frames */
-	private @Getter @Setter int maxKeyFrames = 5;
+	/** Decides when to create a new keyframe and discard them */
+	private @Getter @Setter	VisOdomKeyFrameManager frameManager = new MaxGeoKeyFrameManager();//new TickTocKeyFrameManager();
 
 	private @Getter final VisOdomBundleAdjustment<Track> bundle;
 	private BFrame frameCurrent;
@@ -99,9 +104,9 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 
 	/** location of tracks in the image that are included in the inlier set */
 	private @Getter final List<Track> inlierTracks = new ArrayList<>();
-	/** tracks which are currently visible */
+	/** Tracks which are visible in the most recently processed frame */
 	private @Getter final List<Track> visibleTracks = new ArrayList<>();
-	// initial list of visible tracks before dropping
+	// initial list of visible tracks before dropping during maintenance
 	final List<Track> initialVisible = new ArrayList<>();
 
 	// transform from the current camera view to the key frame
@@ -116,11 +121,12 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 	private @Getter @Setter	PrintStream profileOut;
 	private @Getter double timeTracking,timeEstimate,timeBundle,timeDropUnused,timeDropFrame,timeSpawn;
 
+	// Verbose debug information
+	private PrintStream verbose;
+
 	//=================================================================
 	// workspace variables
 	List<PointTrack> removedTrackerTracks = new ArrayList<>();
-	GrowQueue_I32 listCommon = new GrowQueue_I32();
-	GrowQueue_F64 listMotion = new GrowQueue_F64();
 
 	/**
 	 * Configures magic numbers and estimation algorithms.
@@ -147,7 +153,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 	 * Resets the algorithm into its original state
 	 */
 	public void reset() {
-		System.out.println("RESET CALLED");
+		if( verbose != null ) verbose.println("VO: reset()");
 		tracker.reset();
 		current_to_key.reset();
 		bundle.reset();
@@ -169,12 +175,14 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		long time1 = System.nanoTime();
 		timeTracking = (time1-time0)*1e-6;
 
-		System.out.println("-----------------------------------------------------------------------------------------");
-		System.out.println("Input Frame Count   "+tracker.getFrameID());
-		System.out.println("   Bundle Frames    "+bundle.frames.size);
-		System.out.println("   Bundle tracks    "+bundle.tracks.size);
-		System.out.println("   Tracker active   "+tracker.getTotalActive());
-		System.out.println("   Tracker inactive "+tracker.getTotalInactive());
+		if( verbose != null ) {
+			verbose.println("-----------------------------------------------------------------------------------------");
+			verbose.println("Input Frame Count   " + tracker.getFrameID());
+			verbose.println("   Bundle Frames    " + bundle.frames.size);
+			verbose.println("   Bundle tracks    " + bundle.tracks.size);
+			verbose.println("   Tracker active   " + tracker.getTotalActive());
+			verbose.println("   Tracker inactive " + tracker.getTotalInactive());
+		}
 
 
 		inlierTracks.clear();
@@ -190,8 +198,10 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 
 		// Handle the very first image differently
 		if( first ) {
+			if( verbose != null ) verbose.println("VO: First Frame");
 			current_to_world.reset();
-			addNewTracks(visibleTracks);
+			spawnNewTracksForNewKeyFrame(visibleTracks);
+			frameManager.configure(image.width,image.height);
 			first = false;
 			return true;
 		}
@@ -207,11 +217,11 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		}
 
 		if( !estimateMotion() ) {
-			System.out.println("ESTIMATE MOTION FAILED");
+			if( verbose != null ) verbose.println("VO: estimate motion failed");
 			// discard the current frame and attempt to jump over it
 			bundle.removeFrame(frameCurrent, removedTrackerTracks);
 			dropRemovedBundleTracks();
-			keepStillVisibleTracks();
+			updateListOfVisibleTracksForOutput();
 			return false;
 		}
 		// Drop tracker tracks which aren't being used inside of the inlier set
@@ -234,30 +244,31 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 		long time4 = System.nanoTime();
 		timeDropUnused = (time4-time3)*1e-6;
 
-		// Always add key frames until it hits the limit
-		if( bundle.frames.size() >= maxKeyFrames ) {
-			// Select the "optimal" key frame to drop and drop it
-			BFrame target = selectFrameToDrop();
+		// Update the list of keyframes depending on what the frame manager says to do
+		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker,bundle);
+		boolean droppedCurrentFrame = false;
+		for (int i = dropFrameIndexes.size-1; i >= 0; i--) {
+			// indexes are ordered from lowest to highest, so you can remove frames without
+			// changing the index in the list
+			BFrame frameToDrop = bundle.frames.get(dropFrameIndexes.get(i));
+			droppedCurrentFrame |= frameToDrop == bundle.frames.getTail();
 
-			bundle.removeFrame(target, removedTrackerTracks);
+			// update data structures
+			bundle.removeFrame(frameToDrop, removedTrackerTracks);
+			// TODO Revisit when more than one frame can be dropped
 			dropRemovedBundleTracks();
-			// Drop tracks which are not visible in the latest frame and have fewer than 3 observations
-			dropTracksNotVisibleTooFewObservations();
-			keepStillVisibleTracks();
+			dropTracksNotVisibleAndTooFewObservations();
+			updateListOfVisibleTracksForOutput();
+		}
 
-			if( target != frameCurrent ) {
-				System.out.println("   Spawning new tracks");
-				// it decided to keep the current track. Spawn new tracks in the current frame
-				long timeSpawn0 = System.nanoTime();
-				addNewTracks(visibleTracks);
-				timeSpawn = (System.nanoTime()-timeSpawn0)*1e-6;
-			}
-		} else {
-			keepStillVisibleTracks();
+		if( !droppedCurrentFrame ) {
 			// it decided to keep the current track. Spawn new tracks in the current frame
 			long timeSpawn0 = System.nanoTime();
-			addNewTracks(visibleTracks);
+			spawnNewTracksForNewKeyFrame(visibleTracks);
 			timeSpawn = (System.nanoTime()-timeSpawn0)*1e-6;
+			frameManager.handleSpawnedTracks(tracker);
+		} else {
+			timeSpawn = 0;
 		}
 
 		long time5 = System.nanoTime();
@@ -278,7 +289,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 	 * Drop tracks which are no longer being visually tracked and have less than two observations. In general
 	 * 3 observations is much more stable than two and less prone to be a false positive.
 	 */
-	private void dropTracksNotVisibleTooFewObservations() {
+	private void dropTracksNotVisibleAndTooFewObservations() {
 		for (int bidx = bundle.tracks.size-1; bidx >= 0; bidx--) {
 			BTrack t = bundle.tracks.get(bidx);
 			if( t.trackerTrack == null && t.observations.size < 3 ) {
@@ -301,7 +312,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 	/**
 	 * Goes through the list of initially visible tracks and see which ones have not been dropped
 	 */
-	private void keepStillVisibleTracks() {
+	private void updateListOfVisibleTracksForOutput() {
 		for (int i = 0; i < initialVisible.size(); i++) {
 			Track t = initialVisible.get(i);
 			if( t.trackerTrack != null ) {
@@ -415,109 +426,6 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 	}
 
 	/**
-	 * Selects a key frame to drop. A frame is dropped based on two values which measure relative
-	 * to the previous key frame X.. 1) How similar it is X in appearance. 2) How correlated the state is to X.
-	 */
-	private BFrame selectFrameToDrop() {
-		// higher values are worse
-		double worstScore = Double.MAX_VALUE;
-		int worstIdx = -1;
-
-		listCommon.reset();
-		listMotion.reset();
-
-		double largestMotion = 0;
-
-		for( int frameIdx = 0; frameIdx < bundle.frames.size(); frameIdx++ ) {
-			BFrame frameI = bundle.frames.get(frameIdx);
-			if( frameI == framePrevious ) {
-				// dummy value to keep the indexes te same
-				listCommon.add(0);
-				listMotion.add(0);
-				continue;
-			}
-
-			int totalCommon = 0;      // total number of tracks in common
-			double averageMotion = 0; // average motion in image pixels of distorted image
-			for (int trackIdx = 0; trackIdx < frameI.tracks.size; trackIdx++) {
-				BObservation obsI = null;
-				BObservation obsP = null;
-
-				BTrack t = frameI.tracks.get(trackIdx);
-
-				for (int i = 0; i < t.observations.size; i++) {
-					BObservation o = t.observations.data[i];
-					if( o.frame == frameI ) {
-						obsI = o;
-					} else if( o.frame == framePrevious ) {
-						obsP = o;
-					}
-				}
-
-				if( obsI == null )
-					throw new RuntimeException(
-							"BUG! No observation of frame I inside of the observation that was in its tracks list");
-				if( obsP == null )
-					continue;
-				totalCommon++;
-				averageMotion += obsI.pixel.distance(obsP.pixel);
-			}
-
-			listCommon.add(totalCommon);
-			listMotion.add(averageMotion/(1+totalCommon));
-			largestMotion = Math.max(largestMotion, averageMotion/(1+totalCommon));
-		}
-
-		boolean before = true;
-		for (int frameIdx = 0; frameIdx < bundle.frames.size; frameIdx++) {
-			BFrame frameI = bundle.frames.get(frameIdx);
-			if( frameI == framePrevious ) {
-				System.out.printf("Frame ID %5d is the previous frame\n",frameI.id);
-				before = false;
-				continue;
-			}
-
-			int totalCommon = listCommon.get(frameIdx);
-			double motion = listMotion.get(frameIdx);
-
-			double score;
-			if( totalCommon > 0 ) {
-				int N = framePrevious.tracks.size;
-				double fractionInCommon = totalCommon/(double)N;
-
-				if( before ) {
-					// Keep older frames if they have a lot of features in common since that means they are
-					// more relevant
-					score = fractionInCommon;
-				} else {
-					// if the latest has lots in common that means not much has changed and you can skip it
-					score = 1.0-fractionInCommon;
-				}
-				score = score*(0.05+motion/largestMotion);
-
-				// TODO remove back. this makes it want to keep the most recent frame and spawn tracks
-				if( frameIdx == bundle.frames.size-1 )
-					score *= 1.5;
-
-				System.out.printf("Frame ID %5d score = %.5f common %4d / %4d motion %6.2f\n",frameI.id,score,totalCommon,N,(motion/largestMotion));
-			} else {
-				System.out.printf("Frame ID %5d failed\n",frameI.id);
-				score = 0.0;
-			}
-
-//			System.out.println("Frame ID "+frameI.id+" score "+score+"  common "+totalCommon+" motion "+averageMotion);
-			if( score < worstScore ) {
-				worstIdx = frameIdx;
-				worstScore = score;
-			}
-
-		}
-
-		System.out.println("   dropping frame "+bundle.frames.get(worstIdx).id);
-		return bundle.frames.get(worstIdx);
-	}
-
-	/**
 	 * Removes tracks which have not been included in the inlier set recently
 	 */
 	private void dropUnusedTrackerTracks() {
@@ -557,8 +465,10 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 
 	/**
 	 * Detects new features and computes their 3D coordinates
+	 *
+	 * @param visibleTracks newly spawned tracks are added to this list
 	 */
-	private void addNewTracks( List<Track> visibleTracks ) {
+	private void spawnNewTracksForNewKeyFrame(List<Track> visibleTracks ) {
 //		System.out.println("addNewTracks() current frame="+frameCurrent.id);
 
 		long frameID = tracker.getFrameID();
@@ -695,6 +605,11 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> {
 
 	public Se3_F64 getCurrToWorld() {
 		return current_to_world;
+	}
+
+	@Override
+	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+		this.verbose = out;
 	}
 
 	public static class Track extends BTrack {

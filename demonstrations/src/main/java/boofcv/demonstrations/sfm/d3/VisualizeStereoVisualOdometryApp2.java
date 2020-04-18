@@ -541,7 +541,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 	class StereoPanel extends JPanel {
 		BufferedImage left,right;
 		double scale = 1.0;
-		BasicStroke strokeThin = new BasicStroke(2.0f);
+		BasicStroke strokeThin = new BasicStroke(3.0f);
 
 		public void setScale( double scale ) {
 			if( this.scale == scale )
@@ -563,6 +563,9 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			final double scale = this.scale;
 
 			var g2 = (Graphics2D)g;
+			// improve graphics quality
+			g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 			// Draw the scaled images
 			var tranLeft = new AffineTransform(scale,0,0,scale,0,0);
@@ -601,7 +604,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 					// if requested, draw a circle around tracks spawned in this frame
 					if( controls.showNew && f.firstFrame == (frame-1) ) {
 						g2.setStroke(strokeThin);
-						g2.setColor(Color.CYAN);
+						g2.setColor(Color.GREEN);
 						VisualizeFeatures.drawCircle(g2,f.pixel.x*scale, f.pixel.y*scale,5.0);
 					}
 				}

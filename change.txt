@@ -35,6 +35,8 @@ Version : 0.36
   * ImageMiscOps now has concurrent code
   * Split mean filter into BlurImageOps.mean() and BlurImageOps.meanB()
   * BlurImageOps.meanB() requires a border to be specified, if null is specified then just the inner portion is processed
+  * Created Histogram2D_S32 to easily create and process 2D histograms
+  * Created ImageCoverage which is used to compute the fraction of an image covered by features
 - DeformPointMLS
   * Massive reduction in memory usage. 20k control points: 800 MB to 3.4 MB
     See BMemoryImageDeformPointsMLS
@@ -65,12 +67,11 @@ Version : 0.36
   * Added Configuration for Greedy
 - Scene Reconstruction
   * Better cropping on rectified image using bounding box instead of rotation matrix
-  * TODO try improving 3-view by estimating lens distortion in projective camera
-  * TODO Scene Reconstruction from arbitrary number of photos
-  * TODO triangulate N-points calibrated homogenous coordinates
 - Visual Odometry
-  * TODO Add SBA to all algorithms
-  * TODO Update Demonstration Apps
+  * Re-wrote VisualizeStereoVisualOdometryApp; Much better visualization and more configurable
+  * All stereo visual odometry algorithms now support multiple key frames and bundle adjustment
+  * TODO update DualTrack
+  * TODO update Quad
 - Stereo
   * Added sparse disparity with Census and NCC
   * Changed how correlation texture check is done. Before two identical peaks didn't get filtered.
@@ -97,6 +98,11 @@ Version : 0.36
 TODO Regression
    - Dump runtime results into their own directory for each device. Use hostname?
    - Template matching
+
+- Scene Reconstruction
+  * TODO try improving 3-view by estimating lens distortion in projective camera
+  * TODO Scene Reconstruction from arbitrary number of photos
+  * TODO triangulate N-points calibrated homogenous coordinates
 
 TODO Tech Reports for new chessboard detector, assisted calibration, line fitting, stereo
 TODO Videos - hough line detectors

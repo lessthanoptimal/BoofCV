@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestHistogramStatistics {
 	@Test
 	public void variance() {
-		int histogram[] = new int[]{0,3,10,3,6};
+		int[] histogram = new int[]{0,3,10,3,6};
 
 		double mean = HistogramStatistics.mean(histogram,4);
 		double found = HistogramStatistics.variance(histogram,mean,4);
@@ -38,7 +38,7 @@ public class TestHistogramStatistics {
 
 	@Test
 	public void count() {
-		int histogram[] = new int[]{0,3,10,3,6};
+		int[] histogram = new int[]{0,3,10,3,6};
 
 		int found = HistogramStatistics.count(histogram,4);
 		assertEquals(16,found);
@@ -46,7 +46,7 @@ public class TestHistogramStatistics {
 
 	@Test
 	public void mean() {
-		int histogram[] = new int[]{0,3,10,3,6};
+		int[] histogram = new int[]{0,3,10,3,6};
 
 		double found = HistogramStatistics.mean(histogram,4);
 		assertEquals((3+10*2+3*3)/(16.0),found, UtilEjml.TEST_F64);
@@ -54,7 +54,7 @@ public class TestHistogramStatistics {
 
 	@Test
 	public void percentile() {
-		int histogram[] = new int[]{0,3,10,3,6};
+		int[] histogram = new int[]{0,3,10,3,6};
 
 		int found = HistogramStatistics.percentile(histogram,0,4);
 		assertEquals(0,found, UtilEjml.TEST_F64);
