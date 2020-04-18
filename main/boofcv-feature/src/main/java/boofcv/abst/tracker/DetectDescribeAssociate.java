@@ -355,6 +355,11 @@ public class DetectDescribeAssociate<I extends ImageGray<I>, Desc extends TupleD
 		}
 	}
 
+	@Override
+	public int getMaxSpawn() {
+		return 0; // a hard max is not supported by the detector
+	}
+
 	/**
 	 * Remove from active list and mark so that it is dropped in the next cycle
 	 *

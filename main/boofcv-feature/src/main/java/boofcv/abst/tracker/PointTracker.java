@@ -96,6 +96,13 @@ public interface PointTracker<T extends ImageBase<T>> {
 	void dropAllTracks();
 
 	/**
+	 * Returns the maximum total number of tracks that it can spawn in a single frame. This number is reduced
+	 * by the number of active tracks. So if the maximum number of tracks it can spawn is 200 and 50 tracks are
+	 * active then it will spawn at most 150 tracks. If there is no limit then a number &le; 0 is returned.
+	 */
+	int getMaxSpawn();
+
+	/**
 	 * Manually forces a track to be dropped. New requests to all and active lists will not include the track after
 	 * it has been dropped using this function.
 	 *

@@ -271,6 +271,11 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 	}
 
 	@Override
+	public int getMaxSpawn() {
+		return detector.getMaxFeatures();
+	}
+
+	@Override
 	public void process(I image) {
 		this.input = image;
 		this.frameID++;

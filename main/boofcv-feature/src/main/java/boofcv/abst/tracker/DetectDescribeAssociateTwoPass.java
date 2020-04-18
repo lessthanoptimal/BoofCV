@@ -28,7 +28,7 @@ import org.ddogleg.struct.FastAccess;
 /**
  * Changes behavior of {@link DetectDescribeAssociate} so that it conforms to the {@link PointTrackerTwoPass} interface.
  * It can now take hints for where tracks might appear in the image.   If possible
- * {@link AssociateDescription2D#setSource(org.ddogleg.struct.FastQueue, org.ddogleg.struct.FastQueue)} will only be called once
+ * {@link AssociateDescription2D#setSource} will only be called once
  * on the second pass.
  *
  * @author Peter Abeles

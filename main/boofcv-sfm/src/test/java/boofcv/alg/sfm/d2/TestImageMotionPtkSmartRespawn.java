@@ -307,6 +307,9 @@ public class TestImageMotionPtkSmartRespawn {
 		public void dropAllTracks() {}
 
 		@Override
+		public int getMaxSpawn() {return 0;}
+
+		@Override
 		public boolean dropTrack(PointTrack track) {return false;}
 
 		@Override

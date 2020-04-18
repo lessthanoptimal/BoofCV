@@ -25,6 +25,8 @@ import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import georegression.struct.point.Point2D_I16;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -55,13 +57,17 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 	protected QueueCorner excludeMinimum;
 
 	// selects the features with the largest intensity
-	protected FeatureSelectLimit selectMax;
+	protected @Getter FeatureSelectLimit selectMax;
 	protected QueueCorner selected = new QueueCorner();
-	// maximum number of features it will detect across the image
-	protected int maxFeatures;
+	/**
+	 * Turns on select best features and sets the number it should return.  If a list of excluded features
+	 * is passed in, then the maximum number of returned features is 'numFeatures' minus the number of
+	 * excluded features. A value &le; 0 means there is no limit
+	 */
+	protected @Getter @Setter int maxFeatures;
 
 	// extracts corners from the intensity image
-	protected NonMaxSuppression extractor;
+	protected @Getter NonMaxSuppression extractor;
 
 	// computes the feature intensity image
 	protected GeneralFeatureIntensity<I, D> intensity;
@@ -162,17 +168,6 @@ public class GeneralFeatureDetector<I extends ImageGray<I>, D extends ImageGray<
 			detected.reset();
 			detected.appendAll(selected);
 		}
-	}
-
-	/**
-	 * Turns on select best features and sets the number it should return.  If a list of excluded features
-	 * is passed in, then the maximum number of returned features is 'numFeatures' minus the number of
-	 * excluded features.
-	 *
-	 * @param numFeatures Return at most this many features, which are the best.
-	 */
-	public void setMaxFeatures(int numFeatures) {
-		this.maxFeatures = numFeatures;
 	}
 
 	/**

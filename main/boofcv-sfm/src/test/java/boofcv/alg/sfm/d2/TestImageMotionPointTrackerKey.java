@@ -193,17 +193,16 @@ public class TestImageMotionPointTrackerKey {
 		}
 
 		@Override
-		public void dropAllTracks() {
-			numDropAll++;
-		}
+		public void dropAllTracks() {numDropAll++;}
+
+		@Override
+		public int getMaxSpawn() {return 0;}
 
 		@Override
 		public boolean dropTrack(PointTrack track) {numDropped++;return true;}
 
 		@Override
-		public void dropTracks(Dropper dropper) {
-			throw new RuntimeException("HMM");
-		}
+		public void dropTracks(Dropper dropper) {throw new RuntimeException("HMM");}
 
 		@Override
 		public List<PointTrack> getAllTracks( List<PointTrack> list ) {

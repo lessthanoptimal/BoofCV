@@ -164,6 +164,13 @@ public class PointTrackerCombined<I extends ImageGray<I>, D extends ImageGray<D>
 	}
 
 	@Override
+	public int getMaxSpawn() {
+		return 0;
+		// returning zero here since there is no good answer.
+		// The detector employed doesn't have a normal hard limit
+	}
+
+	@Override
 	public boolean dropTrack(PointTrack track) {
 		if( tracker.dropTrack((CombinedTrack<Desc>) track.getDescription()) ) {
 			// make sure if the user drops a lot of tracks that doesn't force a constant respawn

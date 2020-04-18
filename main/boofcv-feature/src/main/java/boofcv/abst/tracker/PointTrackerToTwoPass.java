@@ -70,6 +70,9 @@ public class PointTrackerToTwoPass<T extends ImageBase<T>>
 	}
 
 	@Override
+	public int getMaxSpawn() { return tracker.getMaxSpawn(); }
+
+	@Override
 	public boolean dropTrack(PointTrack track) {
 		return tracker.dropTrack(track);
 	}
