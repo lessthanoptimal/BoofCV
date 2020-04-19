@@ -10,8 +10,9 @@ dependencies {
     api project(':main:boofcv-geo')
     api project(':main:boofcv-sfm')
     api project(':main:boofcv-recognition')
+    api project(':integration:boofcv-swing')
 
-    testApi project(':integration:boofcv-swing')
+    testApi project(':integration:boofcv-WebcamCapture')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
