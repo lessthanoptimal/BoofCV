@@ -341,6 +341,7 @@ public class DetectUchiyaMarkerApp<T extends ImageGray<T>>
 			addLabeled(spinMinAxis,"Min Axis");
 			addLabeled(spinMaxAxisRatio,"Max Axis Ratio");
 			add(thresholdPanel);
+			setPreferredSize(new Dimension(200,300));
 		}
 
 		@Override

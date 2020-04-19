@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -133,6 +133,7 @@ public class DetectQrCodeControlPanel extends DetectBlackShapePanel
 		addLabeled(spinnerMaximumVersion,"Max. Version");
 		add(tabbedPanel);
 		addVerticalGlue();
+		setPreferredSize(new Dimension(225,200));
 	}
 
 	@Override
