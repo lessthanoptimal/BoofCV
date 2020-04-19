@@ -30,6 +30,7 @@ import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.demonstrations.feature.disparity.ControlPanelDisparitySparse;
 import boofcv.demonstrations.feature.disparity.ControlPanelPointCloud;
 import boofcv.demonstrations.shapes.DetectBlackShapePanel;
+import boofcv.factory.feature.detect.selector.SelectLimitTypes;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
 import boofcv.factory.sfm.ConfigVisOdomDepthPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
@@ -192,20 +193,21 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 	private static ConfigPointDetector createConfigKltDetect() {
 		var config = new ConfigPointDetector();
 		config.type = PointDetectorTypes.SHI_TOMASI;
-		config.general.threshold = -1;
+		config.general.threshold = 1.0f;
 		config.general.radius = 4;
-		config.general.threshold = 100.0f;
+		config.general.maxFeatures = 400;
+		config.general.selector.type = SelectLimitTypes.BEST_N;
 		return config;
 	}
 
 	private static ConfigDisparityBM createConfigDisparity() {
 		var config = new ConfigDisparityBM();
 		config.disparityMin = 2;
-		config.disparityRange = 150;
+		config.disparityRange = 100;
 		config.regionRadiusX = 3;
 		config.regionRadiusY = 3;
 		config.maxPerPixelError = 30;
-		config.texture = 0.0;
+		config.texture = 0.05;
 		config.subpixel = true;
 		return config;
 	}

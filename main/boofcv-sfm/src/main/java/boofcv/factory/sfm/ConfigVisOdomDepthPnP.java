@@ -38,7 +38,7 @@ public class ConfigVisOdomDepthPnP implements Configuration {
 	/** Maximum number of key frames it will save */
 	public int maxKeyFrames = 5;
 	/** Number of RANSAC iterations to perform when estimating motion using PNP */
-	public int ransacIterations = 200;
+	public int ransacIterations = 1000;
 	/** RANSAC inlier tolerance in Pixels */
 	public double ransacInlierTol = 1.5;
 	/** Seed for the random number generator used by RANSAC */
