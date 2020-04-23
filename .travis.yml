@@ -1,5 +1,5 @@
 language: java
 jdk:
-  - openjdk11
+  - openjdk14
 install:
   - ./gradlew assemble
