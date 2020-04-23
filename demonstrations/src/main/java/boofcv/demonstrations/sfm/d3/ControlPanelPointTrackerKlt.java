@@ -92,9 +92,7 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 		}
 	}
 
-	public boolean isConfigureDetector() {
-		return controlDetector != null;
-	}
+	public boolean isConfigureDetector() { return controlDetector != null; }
 
 	public <T extends ImageBase<T>>
 	PointTracker<T> createTracker(ImageType<T> imageType ) {

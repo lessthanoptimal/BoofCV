@@ -37,9 +37,9 @@ import java.awt.*;
  */
 public class ControlPanelDdaTracker extends ControlPanelDetDescAssoc {
 
-	private JPanel controlPanel = new JPanel(new BorderLayout());
+	private final JPanel controlPanel = new JPanel(new BorderLayout());
+	private final Listener listener;
 
-	private Listener listener;
 	public ControlPanelDdaTracker(Listener listener) {
 		this.listener = listener;
 
@@ -60,9 +60,7 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssoc {
 	}
 
 	@Override
-	protected void handleControlsUpdated() {
-		listener.changedPointTrackerDda();
-	}
+	protected void handleControlsUpdated() {listener.changedPointTrackerDda();}
 
 	public <T extends ImageBase<T>>
 	PointTracker<T> createTracker(ImageType<T> imageType ) {
@@ -78,12 +76,12 @@ public class ControlPanelDdaTracker extends ControlPanelDetDescAssoc {
 
 	private void updateActiveControls( int which ) {
 		controlPanel.removeAll();
-		JPanel inside = null;
-		switch( which ) {
-			case 0: inside = getDetectorPanel(); break;
-			case 1: inside = getDescriptorPanel(); break;
-			case 2: inside = getAssociatePanel(); break;
-		}
+		JPanel inside = switch( which ) {
+			case 0 -> getDetectorPanel();
+			case 1 -> getDescriptorPanel();
+			case 2 -> getAssociatePanel();
+			default -> null;
+		};
 		if( inside != null )
 			controlPanel.add(BorderLayout.CENTER,inside);
 		controlPanel.validate();

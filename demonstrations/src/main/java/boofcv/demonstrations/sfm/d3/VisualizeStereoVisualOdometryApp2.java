@@ -113,7 +113,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		inputLeft = alg.getImageType().createImage(1,1);
 		inputRight = alg.getImageType().createImage(1,1);
 
-		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,stereoPanel,cloudPanel);
+		var split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,stereoPanel,cloudPanel);
 		split.setDividerLocation(320);
 
 		controls.setPreferredSize(new Dimension(200,0));
@@ -130,7 +130,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		if( s == null )
 			return;
 
-		final List<File> files = new ArrayList<>();
+		final var files = new ArrayList<File>();
 		files.add(s.left);
 		files.add(s.right);
 		files.add(s.calibration);
@@ -207,7 +207,6 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		config.maxPerPixelError = 30;
 		config.texture = 0.0;
 		config.subpixel = true;
-
 		return config;
 	}
 
@@ -258,14 +257,16 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 	@Override
 	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
-		switch( sourceID ) {
-			case 0:
-				stereoPanel.left = checkCopy(buffered,stereoPanel.left);
-				convertFrom(buffered,true,inputLeft); break;
-			case 1:
-				stereoPanel.right = checkCopy(buffered,stereoPanel.right);
-				convertFrom(buffered,true,inputRight);break;
-			default: throw new RuntimeException("BUG");
+		switch (sourceID) {
+			case 0 -> {
+				stereoPanel.left = checkCopy(buffered, stereoPanel.left);
+				convertFrom(buffered, true, inputLeft);
+			}
+			case 1 -> {
+				stereoPanel.right = checkCopy(buffered, stereoPanel.right);
+				convertFrom(buffered, true, inputRight);
+			}
+			default -> throw new RuntimeException("BUG");
 		}
 
 		if( sourceID == 0 )
@@ -319,7 +320,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 	public void extractFeatures(Se3_F64 world_to_camera, AccessPointTracks3D access , BufferedImage image ) {
 		synchronized (features) {
 			visibleTracks.reset();
-			var camera3D = new Point3D_F64();
+			final var camera3D = new Point3D_F64();
 			final int N = access.getTotalTracks();
 			int totalInliers = 0;
 			for (int i = 0; i < N; i++) {
@@ -489,23 +490,11 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			add(fillHorizontally(gridPanel(2,bPause,bStep)));
 		}
 
-		public void setInliersTracks( int count ) {
-			labelInliersN.setText(""+count);
-		}
-
-		public void setVisibleTracks( int count ) {
-			labelVisibleN.setText(""+count);
-		}
-		public void setBundleTracks( int count ) {
-			labelBundleN.setText(""+count);
-		}
-		public void setDistanceTraveled( double distance ) {
-			labelTraveled.setText(String.format("%.1f",distance));
-		}
-
-		public void setFrame( int frame ) {
-			videoFrameLabel.setText(""+frame);
-		}
+		public void setInliersTracks( int count ) { labelInliersN.setText(""+count); }
+		public void setVisibleTracks( int count ) { labelVisibleN.setText(""+count); }
+		public void setBundleTracks( int count ) { labelBundleN.setText(""+count); }
+		public void setDistanceTraveled( double distance ) { labelTraveled.setText(String.format("%.1f",distance)); }
+		public void setFrame( int frame ) { videoFrameLabel.setText(""+frame); }
 
 		@Override
 		public void controlChanged(Object source) {
@@ -571,12 +560,12 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 			final int lh = left.getHeight();
 			final double scale = this.scale;
 
-			Graphics2D g2 = (Graphics2D)g;
+			var g2 = (Graphics2D)g;
 
 			// Draw the scaled images
-			AffineTransform tranLeft = new AffineTransform(scale,0,0,scale,0,0);
+			var tranLeft = new AffineTransform(scale,0,0,scale,0,0);
 			g2.drawImage(left,tranLeft,null);
-			AffineTransform tranRight = new AffineTransform(scale,0,0,scale,0,lh*scale);
+			var tranRight = new AffineTransform(scale,0,0,scale,0,lh*scale);
 			g2.drawImage(right,tranRight,null);
 
 			// Draw point features
@@ -585,7 +574,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 					return;
 
 				// Adaptive colorize depths based on distribution in current frame
-				GrowQueue_F64 depths = new GrowQueue_F64();
+				var depths = new GrowQueue_F64();
 				depths.reset();
 				for (int i = 0; i < visibleTracks.size; i++) {
 					depths.add( features.get(visibleTracks.get(i)).depth );

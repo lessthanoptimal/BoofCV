@@ -29,13 +29,12 @@ if( project.hasProperty("native_arch")) {
 
 subprojects {
     apply plugin: 'java-library'
-//    apply plugin: 'osgi'
     apply plugin: 'maven'
     apply plugin: 'signing'
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_14
+        targetCompatibility = JavaVersion.VERSION_14
     }
 
     // Creates Java 8 byte code
@@ -75,29 +74,17 @@ subprojects {
 
     sourceSets {
         benchmark {
-            java {
-                srcDir 'src/benchmark/java'
-            }
-            resources {
-                srcDir 'src/benchmark/resources'
-            }
+            java { srcDir 'src/benchmark/java'  }
+            resources {  srcDir 'src/benchmark/resources' }
         }
         generate {
-            java {
-                srcDir 'src/generate/java'
-            }
-            resources {
-                srcDir 'src/generate/resources'
-            }
+            java { srcDir 'src/generate/java' }
+            resources { srcDir 'src/generate/resources' }
         }
 
         experimental {
-            java {
-                srcDir 'src/experimental/java'
-            }
-            resources {
-                srcDir 'src/experimental/resources'
-            }
+            java { srcDir 'src/experimental/java' }
+            resources { srcDir 'src/experimental/resources' }
         }
     }
 
@@ -112,12 +99,8 @@ subprojects {
         implementation 'com.google.code.findbugs:jsr305:3.0.2' // @Nullable
         implementation 'javax.annotation:jsr250-api:1.0'       // @Generated
 
-        testImplementation(
-                'org.junit.jupiter:junit-jupiter-api:5.4.0'
-        )
-        testRuntimeOnly(
-                'org.junit.jupiter:junit-jupiter-engine:5.4.0'
-        )
+        testImplementation( 'org.junit.jupiter:junit-jupiter-api:5.4.0' )
+        testRuntimeOnly( 'org.junit.jupiter:junit-jupiter-engine:5.4.0' )
 
         experimentalImplementation project.sourceSets.main.compileClasspath
         experimentalImplementation project.sourceSets.main.runtimeClasspath
@@ -142,14 +125,6 @@ subprojects {
         // @Getter @Setter
         annotationProcessor 'org.projectlombok:lombok:1.18.10'
     }
-
-//    jar {
-//        manifest { // the manifest of the default jar is of type OsgiManifest
-//            instruction 'Bundle-Vendor', 'BoofCV'
-////            instruction 'Bundle-Description', 'BoofCV'
-//            instruction 'Bundle-DocURL', 'http://boofcv.org'
-//        }
-//    }
 
     task javadocJar(type: Jar) {
         classifier = 'javadoc'

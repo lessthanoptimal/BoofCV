@@ -90,10 +90,10 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssoc {
 		} else {
 			inside = ddaPanel;
 			ddaPanel.removeAll();
-			switch ( which ) {
-				case 1: ddaPanel.add(comboDetect); ddaPanel.add(getDetectorPanel()); break;
-				case 2: ddaPanel.add(comboDescribe); ddaPanel.add(getDescriptorPanel()); break;
-				case 3: ddaPanel.add(comboAssociate); ddaPanel.add(getAssociatePanel()); break;
+			switch (which) {
+				case 1 -> { ddaPanel.add(comboDetect); ddaPanel.add(getDetectorPanel()); }
+				case 2 -> { ddaPanel.add(comboDescribe); ddaPanel.add(getDescriptorPanel()); }
+				case 3 -> { ddaPanel.add(comboAssociate); ddaPanel.add(getAssociatePanel()); }
 			}
 			ddaPanel.validate();
 		}
@@ -116,9 +116,7 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssoc {
 	}
 
 	@Override
-	protected void handleControlsUpdated() {
-		listener.changedHybridTracker();
-	}
+	protected void handleControlsUpdated() { listener.changedHybridTracker(); }
 
 	@Override
 	public void controlChanged(final Object source) {

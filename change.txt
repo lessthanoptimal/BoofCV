@@ -11,7 +11,7 @@ Version : 0.36
   * If stable release, fail uploadArchives if dirty
 - Android
   * Changed a sort function in ChessboardCornerClusterFinder for Android compatibility
-- Starting to use Java 11 syntax (e.g. var) but still will produce Java 1.8 byte code
+- Starting to use Java 14 syntax (e.g. var and switch expression) but still will produce Java 1.8 byte code
   https://github.com/bsideup/jabel
 - Misc
   * Change the definition of a floating point value to be inside image bounds if it's less than width or height

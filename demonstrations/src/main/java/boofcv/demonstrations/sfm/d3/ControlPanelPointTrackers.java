@@ -74,13 +74,12 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 
 	public <T extends ImageBase<T>>
 	PointTracker<T> createTracker( ImageType<T> imageType ) {
-		switch( selectedFamily ) {
-			case 0: return controlKlt.createTracker(imageType);
-			case 1: return controlDda.createTracker(imageType);
-			case 2: return controlHybrid.createTracker(imageType);
-			default:
-				throw new RuntimeException("Not yet supported");
-		}
+		return switch (selectedFamily) {
+			case 0 -> controlKlt.createTracker(imageType);
+			case 1 -> controlDda.createTracker(imageType);
+			case 2 -> controlHybrid.createTracker(imageType);
+			default -> throw new RuntimeException("Not yet supported");
+		};
 	}
 
 	private void changeFamily( int which ) {
@@ -88,11 +87,11 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 			return;
 		if( previous != null )
 			mainPanel.remove(previous);
-		switch( which ) {
-			case 0: previous = controlKlt; break;
-			case 1: previous = controlDda; break;
-			case 2: previous = controlHybrid; break;
-			default: throw new RuntimeException("BUG");
+		switch (which) {
+			case 0 -> previous = controlKlt;
+			case 1 -> previous = controlDda;
+			case 2 -> previous = controlHybrid;
+			default -> throw new RuntimeException("BUG");
 		}
 		selectedFamily = which;
 		mainPanel.add(BorderLayout.CENTER,previous);
