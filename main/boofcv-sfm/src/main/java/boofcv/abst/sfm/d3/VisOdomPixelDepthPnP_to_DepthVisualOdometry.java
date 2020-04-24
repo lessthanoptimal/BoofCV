@@ -38,8 +38,10 @@ import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 
 import javax.annotation.Nullable;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static boofcv.factory.distort.LensDistortionFactory.narrow;
 
@@ -167,5 +169,10 @@ public class VisOdomPixelDepthPnP_to_DepthVisualOdometry<Vis extends ImageBase<V
 	@Override
 	public Class<Depth> getDepthType() {
 		return depthType;
+	}
+
+	@Override
+	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+		alg.setVerbose(out,configuration);
 	}
 }

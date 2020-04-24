@@ -25,6 +25,10 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 
+import javax.annotation.Nullable;
+import java.io.PrintStream;
+import java.util.Set;
+
 /**
  * Wrapper around {@link StereoVisualOdometry} which scales the input images.
  *
@@ -94,5 +98,10 @@ public class StereoVisualOdometryScaleInput<T extends ImageBase<T>> implements S
 	@Override
 	public long getFrameID() {
 		return alg.getFrameID();
+	}
+
+	@Override
+	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+
 	}
 }

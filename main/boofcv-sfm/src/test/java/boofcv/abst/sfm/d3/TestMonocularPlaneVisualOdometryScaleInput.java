@@ -25,6 +25,10 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.se.Se3_F64;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Nullable;
+import java.io.PrintStream;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -130,6 +134,9 @@ public class TestMonocularPlaneVisualOdometryScaleInput {
 
 		@Override
 		public long getFrameID() { return 0; }
+
+		@Override
+		public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {}
 	}
 
 }

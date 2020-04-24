@@ -31,8 +31,10 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
 import javax.annotation.Nullable;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Wrapper around {@link VisOdomMonoPlaneInfinity} for {@link MonocularPlaneVisualOdometry}.
@@ -191,4 +193,8 @@ public class MonoPlaneInfinity_to_MonocularPlaneVisualOdometry<T extends ImageBa
 		return false;
 	}
 
+	@Override
+	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+
+	}
 }

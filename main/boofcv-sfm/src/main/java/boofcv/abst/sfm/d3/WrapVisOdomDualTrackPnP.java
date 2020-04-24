@@ -36,7 +36,9 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 
 import javax.annotation.Nullable;
+import java.io.PrintStream;
 import java.util.List;
+import java.util.Set;
 
 /**
  * TODO comment
@@ -161,5 +163,10 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 	@Override
 	public ImageType<T> getImageType() {
 		return ImageType.single(imageType);
+	}
+
+	@Override
+	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+
 	}
 }

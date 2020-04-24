@@ -18,6 +18,8 @@
 
 package boofcv.abst.sfm.d3;
 
+import org.ddogleg.struct.VerbosePrint;
+
 /**
  * Interface for Visual Odometry (VO) algorithms.  VO estimates the camera's motion (egomotion) by tracking
  * the locations of image features and by applying geometric constraints.   The motion estimate is relative
@@ -26,7 +28,11 @@ package boofcv.abst.sfm.d3;
  *
  * @author Peter Abeles
  */
-public interface VisualOdometry<M> {
+public interface VisualOdometry<M> extends VerbosePrint {
+	/** Key used to indicate that it should print out profile information */
+	String VERBOSE_RUNTIME = "runtime";
+	/** Key used to indicate that it should print out feature tracking information */
+	String VERBOSE_TRACKING = "tracking";
 
 	/**
 	 * Forget past history and tracking results, returning it to its initial state.

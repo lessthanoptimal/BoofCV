@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
+import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.sfm.d3.WrapVisOdomPixelDepthPnP;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.geo.PerspectiveOps;
@@ -69,7 +70,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static boofcv.gui.BoofSwingUtil.*;
 import static boofcv.io.image.ConvertBufferedImage.checkCopy;
@@ -180,7 +183,14 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		PointTracker<T> tracker = controls.controlTrackers.createTracker(getImageType(0));
 		StereoDisparitySparse<T> disparity = controls.controlDisparity.createAlgorithm(imageType);
 		ConfigVisOdomDepthPnP configPnpDepth = controls.controlPnpDepth.config;
-		return FactoryVisualOdometry.stereoDepthPnP(configPnpDepth,disparity,tracker,imageType);
+		StereoVisualOdometry<T>  alg = FactoryVisualOdometry.stereoDepthPnP(configPnpDepth,disparity,tracker,imageType);
+
+		Set<String> configuration = new HashSet<>();
+		configuration.add(VisualOdometry.VERBOSE_RUNTIME);
+//		configuration.add(VisualOdometry.VERBOSE_TRACKING);
+
+		alg.setVerbose(System.out,configuration);
+		return alg;
 	}
 
 	private static ConfigPKlt createConfigKlt() {

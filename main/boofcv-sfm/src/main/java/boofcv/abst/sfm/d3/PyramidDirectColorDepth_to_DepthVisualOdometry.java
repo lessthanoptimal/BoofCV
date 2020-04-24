@@ -39,6 +39,10 @@ import georegression.struct.point.Point2D_F32;
 import georegression.struct.se.Se3_F32;
 import georegression.struct.se.Se3_F64;
 
+import javax.annotation.Nullable;
+import java.io.PrintStream;
+import java.util.Set;
+
 /**
  * TODO write
  *
@@ -181,5 +185,10 @@ public class PyramidDirectColorDepth_to_DepthVisualOdometry<T extends ImageBase<
 
 	public Planar getUndistorted() {
 		return undistorted;
+	}
+
+	@Override
+	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+
 	}
 }

@@ -37,8 +37,10 @@ import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.struct.FastQueue;
 
 import javax.annotation.Nullable;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Wrapper around {@link VisOdomQuadPnP} for {@link StereoVisualOdometry}.
@@ -167,5 +169,10 @@ public class WrapVisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc>
 	@Override
 	public ImageType<T> getImageType() {
 		return ImageType.single(imageType);
+	}
+
+	@Override
+	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+
 	}
 }

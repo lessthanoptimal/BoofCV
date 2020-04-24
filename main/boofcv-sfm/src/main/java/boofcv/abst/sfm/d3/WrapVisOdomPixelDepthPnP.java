@@ -33,8 +33,10 @@ import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 
 import javax.annotation.Nullable;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Peter Abeles
@@ -148,5 +150,10 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 
 	public VisOdomPixelDepthPnP<T> getAlgorithm() {
 		return alg;
+	}
+
+	@Override
+	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+		alg.setVerbose(out,configuration);
 	}
 }

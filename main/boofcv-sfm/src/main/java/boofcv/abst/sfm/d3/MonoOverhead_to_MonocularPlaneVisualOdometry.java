@@ -34,8 +34,10 @@ import georegression.transform.se.SePointOps_F64;
 import org.ddogleg.struct.FastQueue;
 
 import javax.annotation.Nullable;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Wrapper around {@link VisOdomMonoOverheadMotion2D} for {@link MonocularPlaneVisualOdometry}.
@@ -190,5 +192,10 @@ public class MonoOverhead_to_MonocularPlaneVisualOdometry<T extends ImageBase<T>
 		}
 
 		computed = true;
+	}
+
+	@Override
+	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
+
 	}
 }

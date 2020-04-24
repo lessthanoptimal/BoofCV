@@ -23,6 +23,7 @@ import boofcv.abst.geo.TriangulateNViewsMetric;
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.sfm.ImagePixelTo3D;
+import boofcv.abst.sfm.d3.VisualOdometry;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.distort.LensDistortionNarrowFOV;
@@ -121,7 +122,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 
 	// Internal profiling
 	private @Getter @Setter	PrintStream profileOut;
-	private @Getter double timeTracking,timeEstimate,timeBundle,timeDropUnused,timeDropFrame,timeSpawn;
+	private @Getter double timeTracking,timeEstimate,timeBundle,timeDropUnused, timeSceneMaintenance,timeSpawn;
 
 	// Verbose debug information
 	private PrintStream verbose;
@@ -170,7 +171,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 	 * @return true if successful or false if it failed
 	 */
 	public boolean process( T image ) {
-		timeTracking = timeBundle = timeDropFrame = timeDropUnused = timeEstimate = timeSpawn = 0;
+		timeTracking = timeBundle = timeSceneMaintenance = timeDropUnused = timeEstimate = timeSpawn = 0;
 
 		long time0 = System.nanoTime();
 		tracker.process(image);
@@ -186,13 +187,10 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 			verbose.println("   Tracker inactive " + tracker.getTotalInactive());
 		}
 
-
 		inlierTracks.clear();
 		visibleTracks.clear();
 		initialVisible.clear();
 
-		// TODO don't always use previous. Use frame that it has the most common tracks. This will enable it to skip
-		//      over bad frames
 		// Previous key frame is the most recently added one, which is the last
 		framePrevious = first ? null : bundle.getLastFrame();
 		// Create a new frame for the current image
@@ -214,7 +212,6 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 		for (int i = 0; i < removedTrackerTracks.size(); i++) {
 			// Tell the bundle track that they are no longer associated with a visual track
 			BTrack bt = removedTrackerTracks.get(i).getCookie();
-//			System.out.println("tracker dropped bt="+bt.id+" tt.id="+bt.trackerTrack.featureId);
 			bt.trackerTrack = null;
 		}
 
@@ -236,13 +233,11 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 		bundle.optimize();
 		// Save the output
 		current_to_world.set(frameCurrent.frame_to_world);
-
 		triangulateNotSelectedBundleTracks();
-		dropBadBundleTracks();
-
 		double time3 = System.nanoTime();
-		timeBundle = (time3-time2)*1e-6; // todo update
+		timeBundle = (time3-time2)*1e-6;
 
+		dropBadBundleTracks();
 		long time4 = System.nanoTime();
 		timeDropUnused = (time4-time3)*1e-6;
 
@@ -257,29 +252,28 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 
 			// update data structures
 			bundle.removeFrame(frameToDrop, removedTrackerTracks);
-			// TODO Revisit when more than one frame can be dropped
 			dropRemovedBundleTracks();
 			dropTracksNotVisibleAndTooFewObservations();
 			updateListOfVisibleTracksForOutput();
 		}
 
+		long time5 = System.nanoTime();
+		timeSceneMaintenance = (time5-time4)*1e-6;
+
 		if( !droppedCurrentFrame ) {
 			// it decided to keep the current track. Spawn new tracks in the current frame
-			long timeSpawn0 = System.nanoTime();
 			spawnNewTracksForNewKeyFrame(visibleTracks);
-			timeSpawn = (System.nanoTime()-timeSpawn0)*1e-6;
 			frameManager.handleSpawnedTracks(tracker);
-		} else {
-			timeSpawn = 0;
 		}
 
-		long time5 = System.nanoTime();
-		timeDropFrame = (time5-time4)*1e-6;
-		double timeTotal = (time5-time0)*1e-6;
+		long time6 = System.nanoTime();
+		timeSpawn = (time6-time5)*1e-6;
+
+		double timeTotal = (time6-time0)*1e-6;
 
 		if( profileOut != null ) {
-			profileOut.printf("StereoVO: TRK %5.1f Est %5.1f Bun %5.1f DU %5.1f DF %5.1f Swn %5.1f TOTAL %5.1f\n",
-					timeTracking, timeEstimate, timeBundle, timeDropUnused, timeDropFrame,timeSpawn,timeTotal);
+			profileOut.printf("StereoVO: TRK %5.1f Est %5.1f Bun %5.1f DU %5.1f Scene %5.1f Spn  %5.1f TOTAL %5.1f\n",
+					timeTracking, timeEstimate, timeBundle, timeDropUnused, timeSceneMaintenance,timeSpawn,timeTotal);
 		}
 
 //		bundle.sanityCheck();
@@ -611,7 +605,15 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 
 	@Override
 	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
-		this.verbose = out;
+		if( configuration == null ) {
+			this.verbose = out;
+			return;
+		}
+
+		if( configuration.contains(VisualOdometry.VERBOSE_RUNTIME))
+			this.profileOut = out;
+		if( configuration.contains(VisualOdometry.VERBOSE_TRACKING))
+			this.verbose = out;
 	}
 
 	public static class Track extends BTrack {
