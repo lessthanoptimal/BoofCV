@@ -135,6 +135,13 @@ public class Histogram2D_S32 {
 	}
 
 	/**
+	 * Value at the specified coordinate in the histogram
+	 */
+	public void set( int row , int col , int value ) {
+		data[row*cols+col] = value;
+	}
+
+	/**
 	 * Index of the specified coordinate
 	 */
 	public int indexOf( int row , int col ) {

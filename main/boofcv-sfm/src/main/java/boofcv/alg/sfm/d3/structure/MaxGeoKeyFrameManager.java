@@ -28,6 +28,7 @@ import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import georegression.struct.point.Point2D_F64;
 import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
+import org.ddogleg.sorting.QuickSort_S32;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.GrowQueue_I32;
 
@@ -42,18 +43,16 @@ import java.util.Set;
  * @author Peter Abeles
  */
 public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
-	/** Maximum number of keyframes it will keep */
-	public int maxKeyFrames = 5;
 	/** If the fraction of the image covered by features drops below this the current frame is a new keyframe */
 	public double minimumCoverage = 0.4;
 
 	// list of frames to discard
-	private final GrowQueue_I32 keyframeIndexes = new GrowQueue_I32();
+	protected final GrowQueue_I32 keyframeIndexes = new GrowQueue_I32();
 
 	// the maximum number (known or inferred) of features visible in a frame
 	protected int maxFeaturesPerFrame;
 
-	// used to compute the feature coverage on the iamge
+	// used to compute the feature coverage on the image
 	protected ImageCoverage coverage = new ImageCoverage();
 	protected int imageWidth, imageHeight;
 
@@ -61,12 +60,13 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	protected FastArray<PointTrack> activeTracks = new FastArray<>(PointTrack.class);
 	protected Histogram2D_S32 histogram = new Histogram2D_S32();
 	TLongIntMap frameToIndex = new TLongIntHashMap();
+	QuickSort_S32 sorter = new QuickSort_S32(); // Used this to avoid calling new like other sorts do
 
 	// if not null it prints debugging messages to this stream
 	protected PrintStream verbose;
 
 	@Override
-	public void configure(int imageWidth, int imageHeight) {
+	public void initialize(int imageWidth, int imageHeight) {
 		this.imageWidth = imageWidth;
 		this.imageHeight = imageHeight;
 		this.maxFeaturesPerFrame = 0;
@@ -74,7 +74,7 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	}
 
 	@Override
-	public GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker , VisOdomBundleAdjustment<?> sba) {
+	public GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker , int maxKeyFrames, VisOdomBundleAdjustment<?> sba) {
 		// always add a new keyframe until it hits the max
 		keyframeIndexes.reset();
 		if( sba.frames.size <= maxKeyFrames )
@@ -84,16 +84,18 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 		activeTracks.reset();
 		tracker.getActiveTracks(activeTracks.toList());
 
-		// See if it should keep the current frame.
-		if( keepCurrentFrame() ) {
-			// discard an older key frame so that the current frame can be kept
-			if( verbose != null) verbose.println("Keeping current    at="+activeTracks.size+" coverage="+coverage.getFraction());
-			keyframeIndexes.add(selectOldToDiscard(sba));
-		} else {
-			if( verbose != null) verbose.println("discarding current at="+activeTracks.size+" coverage="+coverage.getFraction());
+		boolean keepCurrent = keepCurrentFrame();
+		if( !keepCurrent) {
 			// The current frame is too similar to the a previous key frame
 			keyframeIndexes.add( sba.frames.size-1 );
 		}
+		if( verbose != null) verbose.println("keep_current="+keepCurrent+" coverage="+coverage.getFraction());
+
+		// Discard enough older frames to be at the desired number
+		selectOldToDiscard(sba,sba.frames.size-maxKeyFrames-keyframeIndexes.size);
+
+		// Ensure the post condition is true
+		sorter.sort(keyframeIndexes.data,keyframeIndexes.size);
 
 		return keyframeIndexes;
 	}
@@ -120,9 +122,12 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	 * will be selected. After that it scores frames based on how many features it has in common with the other
 	 * frames, excluding the current frame.
 	 *
-	 * @return frame's index
+	 * @param totalDiscard How many need to be discarded
 	 */
-	protected int selectOldToDiscard(VisOdomBundleAdjustment<?> sba) {
+	protected void selectOldToDiscard(VisOdomBundleAdjustment<?> sba, int totalDiscard) {
+		if( totalDiscard <= 0 || sba.frames.size < 2 )
+			return;
+
 		frameToIndex.clear();
 		for (int i = 0; i < sba.frames.size; i++) {
 			frameToIndex.put(sba.frames.get(i).id,i);
@@ -154,29 +159,39 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 		// not be...
 		int bestFrame = histogram.maximumRowIdx(N-1);
 		if( verbose != null) verbose.println("Frame with best connection to current "+bestFrame);
+		histogram.set(bestFrame,bestFrame,Integer.MAX_VALUE); // mark it so that it's skipped
 
-		// Select the frame with the worst connection to the bestFrame. The reason the bestFrame is used and not
-		// the current frame is that the current frame could be blurred too and might get discarded
-		int lowestCount = Integer.MAX_VALUE;
-		int worstIdx = -1;
-		for (int frameIdx = 0; frameIdx < N - 1; frameIdx++) {
-			if( frameIdx==bestFrame )
-				continue;
-			// if a node has no connection to the frame with bestFrame drop it since it's unlikely to have much
-			// influence over the current frame's state and have no direct influence over bestFrame's state
-			int connection = histogram.get(frameIdx,bestFrame);
-			if( connection == 0 ) {
-				if( verbose != null) verbose.println("No connection index "+frameIdx);
-				return frameIdx;
-			}
+		for (int i = 0; i < totalDiscard; i++) {
+			// Select the frame with the worst connection to the bestFrame. The reason the bestFrame is used and not
+			// the current frame is that the current frame could be blurred too and might get discarded
+			int lowestCount = Integer.MAX_VALUE;
+			int worstIdx = -1;
+			// N-1 to avoid the current frame
+			for (int frameIdx = 0; frameIdx < N - 1; frameIdx++) {
+				int connection = histogram.get(frameIdx,bestFrame);
+				if( connection==Integer.MAX_VALUE )
+					continue;
 
-			if( connection < lowestCount ) {
-				lowestCount = connection;
-				worstIdx = frameIdx;
+				// if a node has no connection to the frame with bestFrame drop it since it's unlikely to have much
+				// influence over the current frame's state and have no direct influence over bestFrame's state
+				if( connection == 0 ) {
+					if( verbose != null) verbose.println("No connection index "+frameIdx);
+					lowestCount = 0;
+					worstIdx = frameIdx;
+					break;
+				}
+
+				if( connection < lowestCount ) {
+					lowestCount = connection;
+					worstIdx = frameIdx;
+				}
 			}
+			if( verbose != null) verbose.println("Worst index "+worstIdx+"  count "+lowestCount);
+
+			keyframeIndexes.add(worstIdx);
+			// Mark the worst keyframe so it won't be selected again
+			histogram.set(worstIdx,bestFrame,Integer.MAX_VALUE);
 		}
-		if( verbose != null) verbose.println("Worst index "+worstIdx+"  count "+lowestCount);
-		return worstIdx;
 	}
 
 	@Override

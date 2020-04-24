@@ -18,10 +18,7 @@
 
 package boofcv.alg.sfm.d3.structure;
 
-import boofcv.abst.geo.bundle.BundleAdjustment;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrackerDefault;
-import boofcv.factory.geo.FactoryMultiView;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
@@ -32,8 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestTickTocKeyFrameManager {
-	BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleSparseMetric(null);
+class TestTickTocKeyFrameManager extends ChecksVisOdomKeyFrameManager {
+	int maxKeyFrames = 5;
 
 	@Test
 	void alwaysAddBeforeMax() {
@@ -41,14 +38,13 @@ class TestTickTocKeyFrameManager {
 		var visBundle = new VisOdomBundleAdjustment<>(sba, VisOdomBundleAdjustment.BTrack::new);
 
 		var alg = new TickTocKeyFrameManager();
-		alg.maxKeyFrames = 5;
 		alg.keyframePeriod=10000; // don't want it to add a new keyframe right afterwards
 
 		// not used but call it just in case that changes in the future
-		alg.configure(300,200);
+		alg.initialize(300,200);
 		// add the initial set of frames
 		for (int i = 0; i < 5; i++) {
-			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,visBundle);
+			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,maxKeyFrames,visBundle);
 			assertEquals(0,discard.size);
 			visBundle.addFrame(i);
 			tracker.process(null);
@@ -56,7 +52,7 @@ class TestTickTocKeyFrameManager {
 		// add one more frame. It should now want to discard the current frame
 		visBundle.addFrame(6);
 		tracker.process(null);
-		GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,visBundle);
+		GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,maxKeyFrames,visBundle);
 		assertEquals(1,discard.size);
 		assertEquals(5,discard.get(0));
 	}
@@ -70,7 +66,6 @@ class TestTickTocKeyFrameManager {
 		var visBundle = new VisOdomBundleAdjustment<>(sba, VisOdomBundleAdjustment.BTrack::new);
 
 		var alg = new TickTocKeyFrameManager();
-		alg.maxKeyFrames = 5;
 		alg.keyframePeriod = 3;
 		// add the initial set of frames
 		for (int i = 0; i < 5; i++) {
@@ -81,7 +76,7 @@ class TestTickTocKeyFrameManager {
 		for (int i = 0; i < 10; i++) {
 			tracker.process(null);
 			visBundle.addFrame(i+5);
-			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,visBundle);
+			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,maxKeyFrames,visBundle);
 			assertEquals(1,discard.size);
 			long id = tracker.getFrameID();
 			if( id%3 == 0 ) {
@@ -93,6 +88,11 @@ class TestTickTocKeyFrameManager {
 			VisOdomBundleAdjustment.BFrame frame = visBundle.frames.get(discard.get(0));
 			visBundle.removeFrame(frame,new ArrayList<>());
 		}
+	}
+
+	@Override
+	public VisOdomKeyFrameManager createFrameManager() {
+		return new TickTocKeyFrameManager();
 	}
 
 	private static class DummyTracker extends PointTrackerDefault {}

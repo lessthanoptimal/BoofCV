@@ -200,13 +200,12 @@ public class FactoryVisualOdometry {
 		}
 
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(config.sba);
-		bundleAdjustment.configure(1e-3,1e-3,config.maxBundleIterations);
+		bundleAdjustment.configure(1e-3,1e-3,config.bundleIterations);
 
-		VisOdomPixelDepthPnP<T> alg =
-				new VisOdomPixelDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
+		VisOdomPixelDepthPnP<T> alg = new VisOdomPixelDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
 		alg.setThresholdRetireTracks(config.dropOutlierTracks);
-		// TODO reimplement
-//		alg.setMaxKeyFrames(config.maxKeyFrames);
+		alg.getBundle().getSelectTracks().maxFeaturesPerFrame = config.bundleMaxFeaturesPerFrame;
+		alg.getBundle().getSelectTracks().minTrackObservations = config.bundleMinObservations;
 		return new WrapVisOdomPixelDepthPnP<>(alg, pixelTo3D, distance, imageType);
 	}
 

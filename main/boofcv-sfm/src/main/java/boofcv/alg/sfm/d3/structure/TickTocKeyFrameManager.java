@@ -32,10 +32,6 @@ import java.util.Set;
  */
 public class TickTocKeyFrameManager implements VisOdomKeyFrameManager {
 	/**
-	 * Maximum number of keyframes it will keep
-	 */
-	public int maxKeyFrames = 5;
-	/**
 	 * The period at which the current frame is turned into a new keyframe
 	 */
 	public int keyframePeriod = 1;
@@ -47,25 +43,29 @@ public class TickTocKeyFrameManager implements VisOdomKeyFrameManager {
 	 * No need to configure or initialize anything
 	 */
 	@Override
-	public void configure(int imageWidth, int imageHeight) {}
+	public void initialize(int imageWidth, int imageHeight) {}
 
 	@Override
-	public GrowQueue_I32 selectFramesToDiscard(PointTracker<?> tracker, VisOdomBundleAdjustment<?> sba) {
+	public GrowQueue_I32 selectFramesToDiscard(PointTracker<?> tracker, int maxKeyFrames, VisOdomBundleAdjustment<?> sba) {
 		keyframeIndexes.reset();
 		// Add key frames until it hits the max
 		if( sba.frames.size <= maxKeyFrames)
 			return keyframeIndexes;
 
-		// See if it's a frame where it should make the current frame a key frame or not
-		if( tracker.getFrameID()%keyframePeriod == 0 ) {
-			// make the current a frame a key frame by removing the oldest keyframe and leaving it
-			for (int i = 0; i < sba.frames.size - maxKeyFrames; i++) {
-				keyframeIndexes.add(i);
-			}
-		} else {
-			// Remove the current frame from the list
+		// See if the current keyframe should be removed from the list and prevent it from becoming a real keyframe
+		boolean removeCurrent = tracker.getFrameID()%keyframePeriod != 0;
+		maxKeyFrames += removeCurrent ? 1 : 0;
+
+		// Remove older keyframes until it has the correct number of keyframes
+		for (int i = 0; i < sba.frames.size - maxKeyFrames; i++) {
+			keyframeIndexes.add(i);
+		}
+
+		// Now remove the current frame. This is done at the end to ensure the order of key frame indexes
+		if( removeCurrent ) {
 			keyframeIndexes.add( sba.frames.size-1 );
 		}
+
 		return keyframeIndexes;
 	}
 

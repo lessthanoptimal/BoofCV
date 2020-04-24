@@ -76,8 +76,10 @@ import java.util.Set;
  */
 public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrint {
 
-	// discard tracks after they have not been in the inlier set for this many updates in a row
+	/** discard tracks after they have not been in the inlier set for this many updates in a row */
 	private @Getter @Setter int thresholdRetireTracks;
+	/** Maximum number of allowed key frames */
+	private @Getter @Setter int maxKeyFrames = 5;
 
 	// tracks features in the image
 	private final @Getter PointTracker<T> tracker;
@@ -201,7 +203,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 			if( verbose != null ) verbose.println("VO: First Frame");
 			current_to_world.reset();
 			spawnNewTracksForNewKeyFrame(visibleTracks);
-			frameManager.configure(image.width,image.height);
+			frameManager.initialize(image.width,image.height);
 			first = false;
 			return true;
 		}
@@ -245,7 +247,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 		timeDropUnused = (time4-time3)*1e-6;
 
 		// Update the list of keyframes depending on what the frame manager says to do
-		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker,bundle);
+		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker,maxKeyFrames,bundle);
 		boolean droppedCurrentFrame = false;
 		for (int i = dropFrameIndexes.size-1; i >= 0; i--) {
 			// indexes are ordered from lowest to highest, so you can remove frames without
@@ -591,7 +593,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 			PointTrack p = active.get(index);
 			Track t = p.getCookie();
 			t.lastUsed = tick;
-			t.active = true;
+			t.inlier = true;
 			bundle.addObservation(frameCurrent, t, p.pixel.x, p.pixel.y);
 			inlierTracks.add( t );
 		}

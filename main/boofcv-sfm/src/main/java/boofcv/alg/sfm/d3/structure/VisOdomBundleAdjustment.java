@@ -29,7 +29,6 @@ import georegression.struct.point.Point4D_F64;
 import georegression.struct.se.Se3_F64;
 import gnu.trove.set.hash.TLongHashSet;
 import lombok.Getter;
-import lombok.Setter;
 import org.ddogleg.struct.Factory;
 import org.ddogleg.struct.FastArray;
 import org.ddogleg.struct.FastQueue;
@@ -49,9 +48,6 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	/** List of all frames that can be feed into bundle adjustment */
 	public final FastQueue<BFrame> frames = new FastQueue<>(BFrame::new,BFrame::reset);
 
-	/** Minimum number of observations a feature must have to be included */
-	@Getter @Setter private int minObservations = 2;
-
 	// Reference to the original camera model passed in
 	public CameraPinholeBrown originalCamera;
 	// The camera model which is being optimized
@@ -64,14 +60,13 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	public List<BTrack> selectedTracks = new ArrayList<>();
 
 	// Reduce the number of tracks feed into bundle adjustment to make it run at a reasonable speed
-	@Getter
-	SelectTracksInFrameForBundleAdjustment selectTracks = new SelectTracksInFrameForBundleAdjustment(0xBEEF);
+	@Getter SelectTracksInFrameForBundleAdjustment selectTracks =
+			new SelectTracksInFrameForBundleAdjustment(0xBEEF);
 
 	public VisOdomBundleAdjustment( BundleAdjustment<SceneStructureMetric> bundleAdjustment,
 									Factory<T> factoryTracks ) {
 		this.tracks = new FastQueue<>(factoryTracks,BTrack::reset);
 		this.bundleAdjustment = bundleAdjustment;
-		this.selectTracks.maxFeaturesPerFrame = 50; // TODO make this configurable
 	}
 
 	public void setCamera( CameraPinholeBrown camera ) {
@@ -247,7 +242,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	}
 
 	/**
-	 * Sees if the graph structure is internally consistent
+	 * Sees if the graph structure is internally consistent. Used for debugging
 	 */
 	public void sanityCheck() {
 		var trackSet = new TLongHashSet();
@@ -296,8 +291,8 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		public PointTrack trackerTrack;
 		public final Point4D_F64 worldLoc = new Point4D_F64();
 		public final FastQueue<BObservation> observations = new FastQueue<>(BObservation::new, BObservation::reset);
-		/** if true then the track should be optimized inside of bundle adjustment */
-		public boolean active;
+		/** if true then the track should be considered for optimization inside of bundle adjustment */
+		public boolean inlier;
 		/** true if it was selected for inclusion in the optimization */
 		public boolean selected;
 
@@ -320,7 +315,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		public void reset() {
 			worldLoc.set(0,0,0,0);
 			observations.reset();
-			active = false;
+			inlier = false;
 			selected = false;
 			trackerTrack = null;
 			id = -1;

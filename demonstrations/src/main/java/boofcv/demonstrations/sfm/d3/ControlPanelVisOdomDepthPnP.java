@@ -38,9 +38,12 @@ public class ControlPanelVisOdomDepthPnP extends StandardAlgConfigPanel {
 	private final JSpinner spinRansacTol = spinner(config.ransacInlierTol,0.0,50.0,0.2);
 	private final JSpinner spinRefinePnP = spinner(config.pnpRefineIterations,0,999,1);
 	private final JComboBox<String> comboPnpType = combo(config.pnp.ordinal(),VALUES_PNP);
-	private final JSpinner spinMaxBundle = spinner(config.maxBundleIterations,0,999,1);
+	private final JSpinner spinBundleMaxIter = spinner(config.bundleIterations,0,999,1);
+	private final JSpinner spinBundleFeatFrame = spinner(config.bundleMaxFeaturesPerFrame,0,999,1);
+	private final JSpinner spinBundleMinObs = spinner(config.bundleMinObservations,2,50,1);
+
 	private final JSpinner spinDropOutliers = spinner(config.dropOutlierTracks,0,999,1);
-	private final JSpinner spinMaxKeyFrames = spinner(config.maxKeyFrames,0,999,1);
+	private final JSpinner spinMaxKeyFrames = spinner(config.maxKeyFrames,2,999,1);
 
 	private final Listener listener;
 
@@ -57,7 +60,9 @@ public class ControlPanelVisOdomDepthPnP extends StandardAlgConfigPanel {
 
 		var panelBundle= new StandardAlgConfigPanel();
 		panelBundle.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Bundle"));
-		panelBundle.addLabeled(spinMaxBundle,"Iteration","Bundle Adjustment Iterations. 0 = disable");
+		panelBundle.addLabeled(spinBundleMaxIter,"Iteration","Bundle Adjustment Iterations. 0 = disable");
+		panelBundle.addLabeled(spinBundleFeatFrame,"Feat Frame","Maximum number of features per frame. 0 = disable");
+		panelBundle.addLabeled(spinBundleMinObs,"Min Obs","Minimum observations for a track. 3 is minimum for max stability.");
 
 		var panelMaintenance = new StandardAlgConfigPanel();
 		panelMaintenance.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Maintenance"));
@@ -77,8 +82,12 @@ public class ControlPanelVisOdomDepthPnP extends StandardAlgConfigPanel {
 			config.ransacInlierTol = (Double) spinRansacTol.getValue();
 		} else if( spinRefinePnP == source ) {
 			config.pnpRefineIterations = (Integer)spinRefinePnP.getValue();
-		} else if( spinMaxBundle == source ) {
-			config.maxBundleIterations = (Integer)spinMaxBundle.getValue();
+		} else if( spinBundleMaxIter == source ) {
+			config.bundleIterations = (Integer) spinBundleMaxIter.getValue();
+		} else if( spinBundleFeatFrame == source ) {
+			config.bundleMaxFeaturesPerFrame = (Integer) spinBundleFeatFrame.getValue();
+		} else if( spinBundleMinObs == source ) {
+			config.bundleMinObservations = (Integer) spinBundleMinObs.getValue();
 		} else if( spinDropOutliers == source ) {
 			config.dropOutlierTracks = (Integer)spinDropOutliers.getValue();
 		} else if( spinMaxKeyFrames == source ) {

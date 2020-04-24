@@ -26,6 +26,7 @@ import boofcv.abst.sfm.d3.StereoVisualOdometry;
 import boofcv.abst.sfm.d3.WrapVisOdomPixelDepthPnP;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.demonstrations.feature.disparity.ControlPanelDisparitySparse;
 import boofcv.demonstrations.feature.disparity.ControlPanelPointCloud;
@@ -57,6 +58,7 @@ import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
 import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -122,7 +124,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, split);
 
-		setPreferredSize(new Dimension(1200,540));
+		setPreferredSize(new Dimension(1200,600));
 	}
 
 	@Override
@@ -297,7 +299,14 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		// Number of tracks being optimized by bundle adjustment
 		final int bundleTracks;
 		if( alg instanceof WrapVisOdomPixelDepthPnP) {
-			bundleTracks = ((WrapVisOdomPixelDepthPnP)alg).getAlgorithm().getBundle().tracks.size;
+			FastAccess<BTrack> tracks = ((WrapVisOdomPixelDepthPnP)alg).getAlgorithm().getBundle().tracks;
+			int count = 0;
+			for (int i = 0; i < tracks.size; i++) {
+				if( tracks.get(i).selected ) {
+					count++;
+				}
+			}
+			bundleTracks = count;
 		} else {
 			bundleTracks = -1;
 		}
@@ -444,10 +453,10 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 			var panelInfo = new StandardAlgConfigPanel();
 			panelInfo.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Statistics"));
-			panelInfo.addLabeled(labelInliersN,"Inliers","Tracks that were inliers in this frame");
-			panelInfo.addLabeled(labelVisibleN,"Visible", "Total number of active visible tracks");
-			panelInfo.addLabeled(labelBundleN,"Bundle","Features included in bundle adjustment");
-			panelInfo.addLabeled(labelTraveled,"Traveled","Distance traveled in world units");
+			panelInfo.addLabeled(labelInliersN,"Inliers Tracks","Tracks that were inliers in this frame");
+			panelInfo.addLabeled(labelVisibleN,"Visible Tracks", "Total number of active visible tracks");
+			panelInfo.addLabeled(labelBundleN,"Bundle Tracks","Features included in bundle adjustment");
+			panelInfo.addLabeled(labelTraveled,"Distance","Distance traveled in world units");
 
 			JPanel panelStereo = gridPanel(0,2,0,2,checkInliers, checkNew);
 			panelStereo.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Stereo"));

@@ -18,13 +18,10 @@
 
 package boofcv.alg.sfm.d3.structure;
 
-import boofcv.abst.geo.bundle.BundleAdjustment;
-import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrackerDefault;
 import boofcv.alg.misc.ImageCoverage;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
-import boofcv.factory.geo.FactoryMultiView;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,10 +29,12 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Peter Abeles
  */
-class TestMaxGeoKeyFrameManager {
-	final int width = 100;
-	final int height = 200;
-	BundleAdjustment<SceneStructureMetric> sba = FactoryMultiView.bundleSparseMetric(null);
+class TestMaxGeoKeyFrameManager extends ChecksVisOdomKeyFrameManager {
+
+	@Override
+	public VisOdomKeyFrameManager createFrameManager() {
+		return new MaxGeoKeyFrameManager();
+	}
 
 	/**
 	 * Give it a simple sequence and see how it does
@@ -51,22 +50,22 @@ class TestMaxGeoKeyFrameManager {
 		var alg = new MaxGeoKeyFrameManager();
 		alg.coverage = coverage;
 		alg.minimumCoverage = 0.25;
-		alg.maxKeyFrames = 3;
+		int maxKeyFrames = 3;
 
 		// Always add new key frames as it has not hit the max yet
-		alg.configure(width,height);
+		alg.initialize(width,height);
 		alg.handleSpawnedTracks(tracker);
 		scene.addFrame(0);
-		assertEquals(0,alg.selectFramesToDiscard(tracker,scene).size);
+		assertEquals(0,alg.selectFramesToDiscard(tracker,maxKeyFrames,scene).size);
 		scene.addFrame(1);
 		alg.handleSpawnedTracks(tracker);
-		assertEquals(0,alg.selectFramesToDiscard(tracker,scene).size);
+		assertEquals(0,alg.selectFramesToDiscard(tracker,maxKeyFrames,scene).size);
 		scene.addFrame(2);
 		alg.handleSpawnedTracks(tracker);
-		assertEquals(0,alg.selectFramesToDiscard(tracker,scene).size);
+		assertEquals(0,alg.selectFramesToDiscard(tracker,maxKeyFrames,scene).size);
 		// there will now be an extra frame. The coverage threshold is high so it will not keep the current frame
 		scene.addFrame(3);
-		assertEquals(3,alg.selectFramesToDiscard(tracker,scene).get(0));
+		assertEquals(3,alg.selectFramesToDiscard(tracker,maxKeyFrames,scene).get(0));
 		// cover is now low so it will select an older frame to discard
 		coverage.fraction = 0.1;
 		scene.addFrame(4);
@@ -78,24 +77,22 @@ class TestMaxGeoKeyFrameManager {
 		}
 		// make best connect to current be frame 1
 		connectFrames(0,3,20,scene);
-		assertEquals(1,alg.selectFramesToDiscard(tracker,scene).get(0));
+		assertEquals(1,alg.selectFramesToDiscard(tracker,maxKeyFrames,scene).get(0));
 	}
 
 	@Test
 	void configure() {
 		var alg = new MaxGeoKeyFrameManager();
 		alg.minimumCoverage = 0.7;
-		alg.maxKeyFrames = 6;
 		alg.maxFeaturesPerFrame = 101;
 
-		alg.configure(width,height);
+		alg.initialize(width,height);
 		assertEquals(width,alg.imageWidth);
 		assertEquals(height,alg.imageHeight);
 		assertEquals(0,alg.maxFeaturesPerFrame);
 
 		// make sure these are not accidentally reset
 		assertEquals(0.7,alg.minimumCoverage);
-		assertEquals(6,alg.maxKeyFrames);
 	}
 
 	@Test
@@ -136,7 +133,9 @@ class TestMaxGeoKeyFrameManager {
 		connectFrames(4,bestConnect,20,scene);
 
 		var alg = new MaxGeoKeyFrameManager();
-		assertEquals(1,alg.selectOldToDiscard(scene));
+		alg.selectOldToDiscard(scene,1);
+		assertEquals(1,alg.keyframeIndexes.size);
+		assertEquals(1,alg.keyframeIndexes.get(0));
 	}
 
 	/**
@@ -159,10 +158,15 @@ class TestMaxGeoKeyFrameManager {
 		connectFrames(4,2,20,scene);
 
 		var alg = new MaxGeoKeyFrameManager();
-		assertEquals(0,alg.selectOldToDiscard(scene));
+		alg.selectOldToDiscard(scene,1);
+		assertEquals(1,alg.keyframeIndexes.size);
+		assertEquals(0,alg.keyframeIndexes.get(0));
 		// add to the oldest track to make it no longer the worst
 		connectFrames(0,2,3,scene);
-		assertEquals(1,alg.selectOldToDiscard(scene));
+		alg.keyframeIndexes.reset();
+		alg.selectOldToDiscard(scene,1);
+		assertEquals(1,alg.keyframeIndexes.size);
+		assertEquals(1,alg.keyframeIndexes.get(0));
 	}
 
 	public static void connectFrames( int a , int b , int count , VisOdomBundleAdjustment<BTrack> scene ) {
@@ -204,7 +208,7 @@ class TestMaxGeoKeyFrameManager {
 		assertEquals(230, alg.maxFeaturesPerFrame);
 	}
 
-	private static class DummyTracker extends PointTrackerDefault
+	static class DummyTracker extends PointTrackerDefault
 	{
 		public int maxSpawn;
 		public int activeTracks;

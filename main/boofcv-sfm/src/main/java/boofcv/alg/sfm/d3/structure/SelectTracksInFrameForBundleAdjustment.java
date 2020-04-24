@@ -35,13 +35,14 @@ import java.util.Random;
  * @author Peter Abeles
  */
 public class SelectTracksInFrameForBundleAdjustment {
+	// used to resolve ambiguity when multiple features can be selected
 	private final Random rand;
 
 	/** Configuration for uniformally selecting a grid */
 	public final ConfigGridUniform configUniform = new ConfigGridUniform();
 
 	/** maximum number of features per frame that can be used */
-	public int maxFeaturesPerFrame;
+	public int maxFeaturesPerFrame=1; // give it a horrible initial value
 
 	/** The minimum number of observations to process */
 	public int minTrackObservations = 3;
@@ -53,6 +54,13 @@ public class SelectTracksInFrameForBundleAdjustment {
 		rand = new Random(randSeed);
 	}
 
+	/**
+	 * Selects tracks to include in bundle adjustment
+	 * @param sba The scene graph
+	 * @param imageWidth input image width in pixels
+	 * @param imageHeight input image height in pixels
+	 * @param selected (Output) list of selected tracks
+	 */
 	public void selectTracks(VisOdomBundleAdjustment<?> sba, int imageWidth , int imageHeight, List<BTrack> selected )
 	{
 		// Initialize data structures
@@ -68,9 +76,20 @@ public class SelectTracksInFrameForBundleAdjustment {
 		if( frames.size < 1 )
 			return;
 
-		// Start with older frames since we want to be biased to select tracks that have been seen by more frames
-		for (int frameIdx = 0; frameIdx < frames.size; frameIdx++) {
-			selectTracksInFrame(frames.get(frameIdx),imageWidth,imageHeight,selected);
+		if( maxFeaturesPerFrame <= 0 ) {
+			// handle the case where it's unlimited differently
+			for (int trackIdx = 0; trackIdx < sba.tracks.size; trackIdx++) {
+				BTrack track = sba.tracks.get(trackIdx);
+				if( track.observations.size >= minTrackObservations ) {
+					track.selected = true;
+					selected.add(track);
+				}
+			}
+		} else {
+			// Start with older frames since we want to be biased to select tracks that have been seen by more frames
+			for (int frameIdx = 0; frameIdx < frames.size; frameIdx++) {
+				selectTracksInFrame(frames.get(frameIdx), imageWidth, imageHeight, selected);
+			}
 		}
 	}
 

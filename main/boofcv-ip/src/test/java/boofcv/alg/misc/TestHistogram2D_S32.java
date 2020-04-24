@@ -143,6 +143,19 @@ class TestHistogram2D_S32 {
 	}
 
 	@Test
+	void set() {
+		Histogram2D_S32 alg = new Histogram2D_S32();
+		alg.reshape(2,3);
+		for (int row = 0; row < 2; row++) {
+			for (int col = 0; col < 3; col++) {
+				int expected = 10+row+col;
+				alg.set(1,2,expected);
+				assertEquals(expected,alg.get(1,2));
+			}
+		}
+	}
+
+	@Test
 	void indexOf() {
 		Histogram2D_S32 alg = new Histogram2D_S32();
 		alg.reshape(2,3);

@@ -32,16 +32,17 @@ public interface VisOdomKeyFrameManager extends VerbosePrint {
 	/**
 	 * Specifies the size of the image and resets the manager to its initial state
 	 */
-	void configure( int imageWidth , int imageHeight );
+	void initialize(int imageWidth , int imageHeight );
 
 	/**
 	 * Selects frames to discard from the scene graph. The most recent is assumed to be the current tracker frame.
 	 *
 	 * @param tracker Feature tracker
+	 * @param limit Maximum number of allowed key frames
 	 * @param sba scene graph
 	 * @return Returns a list of frames to discard. They are in sequential order from least to greatest.
 	 */
-	GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker , VisOdomBundleAdjustment<?> sba);
+	GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker , int limit, VisOdomBundleAdjustment<?> sba);
 
 	/**
 	 * After the current frame becomes a keyframe new tracks are spawned from it. This passes in that new information

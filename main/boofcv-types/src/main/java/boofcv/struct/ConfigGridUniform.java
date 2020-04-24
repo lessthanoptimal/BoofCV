@@ -19,13 +19,13 @@
 package boofcv.struct;
 
 /**
- * Configuration for uniformally sampling points inside an image using a grid.
+ * Configuration for uniformly sampling points inside an image using a grid.
  *
  * @author Peter Abeles
  */
 public class ConfigGridUniform implements Configuration {
 	/** Scales the size of a region up by this amount */
-	public double regionScaleFactor = 4.0;
+	public double regionScaleFactor = 2.0;
 	/** The smallest allowed cell size in pixels */
 	public int minCellLength = 5;
 
