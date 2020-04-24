@@ -127,32 +127,33 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel  {
 	protected abstract void handleControlsUpdated();
 
 	public JPanel getDetectorPanel() {
-		return switch(selectedDetector) {
-			case 0 -> controlDetectFastHessian;
-			case 1 -> controlDetectSift;
-			case 2 -> controlDetectPoint;
-			default -> throw new IllegalArgumentException("Unknown");
-		};
+		switch(selectedDetector) {
+			case 0: return controlDetectFastHessian;
+			case 1: return controlDetectSift;
+			case 2: return controlDetectPoint;
+			default: throw new IllegalArgumentException("Unknown");
+		}
 	}
 
 	public JPanel getDescriptorPanel() {
-		return switch(selectedDescriptor) {
-			case 0 -> controlDescSurfFast;
-			case 1 -> controlDescSurfStable;
-			case 2 -> controlDescSift;
-			case 3 -> controlDescBrief;
-			case 4 -> controlDescTemplate;
-			default -> throw new IllegalArgumentException("Unknown");
-		};
+		switch(selectedDescriptor) {
+			case 0: return controlDescSurfFast;
+			case 1: return controlDescSurfStable;
+			case 2: return controlDescSift;
+			case 3: return controlDescBrief;
+			case 4: return controlDescTemplate;
+			default: throw new IllegalArgumentException("Unknown");
+		}
 	}
 
 	public JPanel getAssociatePanel() {
 		System.out.println("Selected associate "+selectedAssociate);
-		return switch(selectedAssociate) {
-			case 0 -> controlAssocGreedy;
-			case 1,2 -> controlAssocNN;
-			default -> throw new IllegalArgumentException("Unknown");
-		};
+		switch(selectedAssociate) {
+			case 0: return controlAssocGreedy;
+			case 1:
+			case 2: return controlAssocNN;
+			default: throw new IllegalArgumentException("Unknown");
+		}
 	}
 
 	/**
@@ -199,41 +200,43 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel  {
 
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
 	InterestPointDetector<T> createDetector( Class<T> imageType ) {
-		return switch(selectedDetector) {
-			case 0 -> FactoryInterestPoint.fastHessian(controlDetectFastHessian.config);
-			case 1 -> FactoryInterestPoint.sift(controlDetectSift.configSS,controlDetectSift.configDetector,imageType);
-			case 2 -> {
+		switch(selectedDetector) {
+			case 0: return FactoryInterestPoint.fastHessian(controlDetectFastHessian.config);
+			case 1: return FactoryInterestPoint.sift(
+					controlDetectSift.configSS,controlDetectSift.configDetector,imageType);
+			case 2: {
 				GeneralFeatureDetector<T, D> alg = controlDetectPoint.create(imageType);
-				yield FactoryInterestPoint.wrapPoint(alg, configPointDetector.scaleRadius, imageType, alg.getDerivType());
+				return FactoryInterestPoint.wrapPoint(alg, configPointDetector.scaleRadius, imageType, alg.getDerivType());
 			}
-			default -> throw new IllegalArgumentException("Unknown detector");
-		};
+			default:
+				throw new IllegalArgumentException("Unknown detector");
+		}
 	}
 
 	public <T extends ImageGray<T>, D extends ImageGray<D>>
 	DescribeRegionPoint<T,?> createDescriptor(Class<T> imageType ) {
-		return switch(selectedDescriptor) {
-			case 0 -> {
-				if (controlDescSurfFast.color) {
-					yield (DescribeRegionPoint) FactoryDescribeRegionPoint.surfColorFast(
+		switch(selectedDescriptor) {
+			case 0:
+				if( controlDescSurfFast.color ) {
+					return (DescribeRegionPoint)FactoryDescribeRegionPoint.surfColorFast(
 							controlDescSurfFast.config, ImageType.pl(3, imageType));
 				} else {
-					yield FactoryDescribeRegionPoint.surfFast(controlDescSurfFast.config, imageType);
+					return FactoryDescribeRegionPoint.surfFast(controlDescSurfFast.config, imageType);
 				}
-			}
-			case 1 -> {
+			case 1:
 				if( controlDescSurfStable.color ) {
-					yield (DescribeRegionPoint)FactoryDescribeRegionPoint.surfColorStable(
+					return (DescribeRegionPoint)FactoryDescribeRegionPoint.surfColorStable(
 							controlDescSurfStable.config, ImageType.pl(3, imageType));
 				} else {
-					yield FactoryDescribeRegionPoint.surfStable(controlDescSurfStable.config, imageType);
+					return FactoryDescribeRegionPoint.surfStable(controlDescSurfStable.config, imageType);
 				}
-			}
-			case 2 -> FactoryDescribeRegionPoint.sift(controlDetectSift.configSS, controlDescSift.config, imageType);
-			case 3 -> FactoryDescribeRegionPoint.brief(controlDescBrief.config, imageType);
-			case 4 -> FactoryDescribeRegionPoint.template(controlDescTemplate.config, imageType);
-			default -> throw new IllegalArgumentException("Unknown descriptor");
-		};
+			case 2: return FactoryDescribeRegionPoint.sift(
+					controlDetectSift.configSS,controlDescSift.config, imageType);
+			case 3: return FactoryDescribeRegionPoint.brief(controlDescBrief.config, imageType);
+			case 4: return FactoryDescribeRegionPoint.template(controlDescTemplate.config, imageType);
+			default:
+				throw new IllegalArgumentException("Unknown descriptor");
+		}
 	}
 
 	public AssociateDescription createAssociate( DescriptorInfo descriptor ) {
@@ -249,12 +252,13 @@ public abstract class ControlPanelDetDescAssoc extends StandardAlgConfigPanel  {
 			}
 
 			ConfigAssociateNearestNeighbor configNN = controlAssocNN.config;
-			return switch (selectedAssociate) {
-				case 1 -> FactoryAssociation.kdtree(configNN, DOF, 75);
-				case 2 -> FactoryAssociation.kdRandomForest(
-						configNN, DOF, 75, 10, 5, 1233445565);
-				default -> throw new IllegalArgumentException("Unknown association");
-			};
+			switch( selectedAssociate ) {
+				case 1: return FactoryAssociation.kdtree(configNN,DOF, 75);
+				case 2: return FactoryAssociation.kdRandomForest(
+						configNN,DOF, 75, 10, 5, 1233445565);
+				default:
+					throw new IllegalArgumentException("Unknown association");
+			}
 		}
 	}
 }

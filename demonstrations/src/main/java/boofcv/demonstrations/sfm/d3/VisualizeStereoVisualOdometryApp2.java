@@ -261,16 +261,14 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 
 	@Override
 	public void processImage(int sourceID, long frameID, BufferedImage buffered, ImageBase input) {
-		switch (sourceID) {
-			case 0 -> {
-				stereoPanel.left = checkCopy(buffered, stereoPanel.left);
-				convertFrom(buffered, true, inputLeft);
-			}
-			case 1 -> {
-				stereoPanel.right = checkCopy(buffered, stereoPanel.right);
-				convertFrom(buffered, true, inputRight);
-			}
-			default -> throw new RuntimeException("BUG");
+		switch( sourceID ) {
+			case 0:
+				stereoPanel.left = checkCopy(buffered,stereoPanel.left);
+				convertFrom(buffered,true,inputLeft); break;
+			case 1:
+				stereoPanel.right = checkCopy(buffered,stereoPanel.right);
+				convertFrom(buffered,true,inputRight);break;
+			default: throw new RuntimeException("BUG");
 		}
 
 		if( sourceID == 0 )
