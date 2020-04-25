@@ -101,6 +101,8 @@ TODO Regression
    - Dump runtime results into their own directory for each device. Use hostname?
    - Template matching
 
+TODO Sparse Disparity Undistort using camera model
+
 - Scene Reconstruction
   * TODO try improving 3-view by estimating lens distortion in projective camera
   * TODO Scene Reconstruction from arbitrary number of photos

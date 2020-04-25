@@ -44,6 +44,7 @@ public class ControlPanelVisOdomDepthPnP extends StandardAlgConfigPanel {
 
 	private final JSpinner spinDropOutliers = spinner(config.dropOutlierTracks,0,999,1);
 	private final JSpinner spinMaxKeyFrames = spinner(config.maxKeyFrames,2,999,1);
+	private final JSpinner spinKeyCoverage = spinner(config.keyframes.geoMinCoverage,0.0,1.0,0.05,"0.0E0",8);
 
 	private final Listener listener;
 
@@ -68,6 +69,7 @@ public class ControlPanelVisOdomDepthPnP extends StandardAlgConfigPanel {
 		panelMaintenance.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(),"Maintenance"));
 		panelMaintenance.addLabeled(spinMaxKeyFrames,"Key Frames", "Number of key frames");
 		panelMaintenance.addLabeled(spinDropOutliers,"Drop Outliers","Discards features which are outliers for this many frames. 0 = disable");
+		panelMaintenance.addLabeled(spinKeyCoverage,"Key Coverage","If tracks cover less than this fraction of the image a new keyframe is forced");
 
 		add(fillHorizontally(panelPnP));
 		add(fillHorizontally(panelBundle));
@@ -90,6 +92,8 @@ public class ControlPanelVisOdomDepthPnP extends StandardAlgConfigPanel {
 			config.bundleMinObservations = (Integer) spinBundleMinObs.getValue();
 		} else if( spinDropOutliers == source ) {
 			config.dropOutlierTracks = (Integer)spinDropOutliers.getValue();
+		} else if( spinKeyCoverage == source ) {
+			config.keyframes.geoMinCoverage = (Double)spinKeyCoverage.getValue();
 		} else if( spinMaxKeyFrames == source ) {
 			config.maxKeyFrames = (Integer)spinMaxKeyFrames.getValue();
 		} else if( comboPnpType == source ) {

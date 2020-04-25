@@ -95,7 +95,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 	private final RefinePnP refine;
 
 	/** Decides when to create a new keyframe and discard them */
-	private @Getter @Setter	VisOdomKeyFrameManager frameManager = new MaxGeoKeyFrameManager();//new TickTocKeyFrameManager();
+	private @Getter @Setter	VisOdomKeyFrameManager frameManager = new MaxGeoKeyFrameManager();
 
 	private @Getter final VisOdomBundleAdjustment<Track> bundle;
 	private BFrame frameCurrent;
@@ -472,6 +472,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 		tracker.spawnTracks();
 		List<PointTrack> spawned = tracker.getNewTracks(null);
 
+		// TODO make this optionally concurrent
 		// estimate 3D coordinate using stereo vision
 		for( PointTrack t : spawned ) {
 			for (int i = 0; i < visibleTracks.size(); i++) {

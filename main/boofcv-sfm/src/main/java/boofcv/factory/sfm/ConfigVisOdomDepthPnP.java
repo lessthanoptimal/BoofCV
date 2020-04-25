@@ -60,10 +60,14 @@ public class ConfigVisOdomDepthPnP implements Configuration {
 	public int pnpRefineIterations = 25;
 	/** Which PNP solution to use */
 	public EnumPNP pnp = EnumPNP.P3P_GRUNERT;
+	/** Specifies when a new key frame is created */
+	public ConfigKeyFrameManager keyframes = new ConfigKeyFrameManager();
 
 	@Override
 	public void checkValidity() {
 		if( bundleMinObservations < 2 )
 			throw new IllegalArgumentException("bundleMinObservations must be >= 2");
+
+		keyframes.checkValidity();
 	}
 }

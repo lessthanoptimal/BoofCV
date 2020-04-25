@@ -65,6 +65,13 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	// if not null it prints debugging messages to this stream
 	protected PrintStream verbose;
 
+	public MaxGeoKeyFrameManager() {
+	}
+
+	public MaxGeoKeyFrameManager(double minimumCoverage) {
+		this.minimumCoverage = minimumCoverage;
+	}
+
 	@Override
 	public void initialize(int imageWidth, int imageHeight) {
 		this.imageWidth = imageWidth;

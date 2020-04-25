@@ -30,7 +30,7 @@ import java.util.Set;
  *
  * @author Peter Abeles
  */
-public class TickTocKeyFrameManager implements VisOdomKeyFrameManager {
+public class TickTockKeyFrameManager implements VisOdomKeyFrameManager {
 	/**
 	 * The period at which the current frame is turned into a new keyframe
 	 */
@@ -38,6 +38,13 @@ public class TickTocKeyFrameManager implements VisOdomKeyFrameManager {
 
 	// list of frames to discard
 	private final GrowQueue_I32 keyframeIndexes = new GrowQueue_I32();
+
+	public TickTockKeyFrameManager(int keyframePeriod) {
+		this.keyframePeriod = keyframePeriod;
+	}
+
+	public TickTockKeyFrameManager() {
+	}
 
 	/**
 	 * No need to configure or initialize anything

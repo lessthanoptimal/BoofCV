@@ -162,6 +162,10 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 		return spinner;
 	}
 
+	/**
+	 *
+	 * @param formatString Example of a format. "0.0E0". See {@link DecimalFormat}
+	 */
 	protected JSpinner spinner( double initial , double minimum , double maximum, double stepSize,
 								String formatString , int digits  ) {
 

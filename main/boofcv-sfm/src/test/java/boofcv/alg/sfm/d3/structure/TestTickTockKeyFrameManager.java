@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Peter Abeles
  */
-class TestTickTocKeyFrameManager extends ChecksVisOdomKeyFrameManager {
+class TestTickTockKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 	int maxKeyFrames = 5;
 
 	@Test
@@ -37,7 +37,7 @@ class TestTickTocKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 		var tracker = new DummyTracker();
 		var visBundle = new VisOdomBundleAdjustment<>(sba, VisOdomBundleAdjustment.BTrack::new);
 
-		var alg = new TickTocKeyFrameManager();
+		var alg = new TickTockKeyFrameManager();
 		alg.keyframePeriod=10000; // don't want it to add a new keyframe right afterwards
 
 		// not used but call it just in case that changes in the future
@@ -65,7 +65,7 @@ class TestTickTocKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 		var tracker = new DummyTracker();
 		var visBundle = new VisOdomBundleAdjustment<>(sba, VisOdomBundleAdjustment.BTrack::new);
 
-		var alg = new TickTocKeyFrameManager();
+		var alg = new TickTockKeyFrameManager();
 		alg.keyframePeriod = 3;
 		// add the initial set of frames
 		for (int i = 0; i < 5; i++) {
@@ -92,7 +92,7 @@ class TestTickTocKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 
 	@Override
 	public VisOdomKeyFrameManager createFrameManager() {
-		return new TickTocKeyFrameManager();
+		return new TickTockKeyFrameManager();
 	}
 
 	private static class DummyTracker extends PointTrackerDefault {}

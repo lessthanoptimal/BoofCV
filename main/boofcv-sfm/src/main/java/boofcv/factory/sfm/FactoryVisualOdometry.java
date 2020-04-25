@@ -45,6 +45,9 @@ import boofcv.alg.sfm.DepthSparse3D;
 import boofcv.alg.sfm.StereoSparse3D;
 import boofcv.alg.sfm.d3.*;
 import boofcv.alg.sfm.d3.direct.PyramidDirectColorDepth;
+import boofcv.alg.sfm.d3.structure.MaxGeoKeyFrameManager;
+import boofcv.alg.sfm.d3.structure.TickTockKeyFrameManager;
+import boofcv.alg.sfm.d3.structure.VisOdomKeyFrameManager;
 import boofcv.alg.sfm.robust.DistancePlane2DToPixelSq;
 import boofcv.alg.sfm.robust.GenerateSe2_PlanePtPixel;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
@@ -202,7 +205,15 @@ public class FactoryVisualOdometry {
 		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(config.sba);
 		bundleAdjustment.configure(1e-3,1e-3,config.bundleIterations);
 
+		VisOdomKeyFrameManager keyframe;
+		switch (config.keyframes.type) {
+			case MAX_GEO: keyframe = new MaxGeoKeyFrameManager(config.keyframes.geoMinCoverage);break;
+			case TICK_TOCK: keyframe = new TickTockKeyFrameManager(config.keyframes.tickPeriod);break;
+			default: throw new IllegalArgumentException("Unknown type "+config.keyframes.type);
+		}
+
 		VisOdomPixelDepthPnP<T> alg = new VisOdomPixelDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
+		alg.setFrameManager(keyframe);
 		alg.setThresholdRetireTracks(config.dropOutlierTracks);
 		alg.getBundle().getSelectTracks().maxFeaturesPerFrame = config.bundleMaxFeaturesPerFrame;
 		alg.getBundle().getSelectTracks().minTrackObservations = config.bundleMinObservations;
