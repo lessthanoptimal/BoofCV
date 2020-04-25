@@ -41,18 +41,19 @@ public class TestWrapVisOdomPixelDepthPnP extends CheckVisualOdometryStereoSim<G
 	@Override
 	public StereoVisualOdometry<GrayF32> createAlgorithm() {
 		var configBM = new ConfigDisparityBM();
-		configBM.disparityMin = 2;
-		configBM.disparityRange = 150;
-		configBM.regionRadiusX = 3;
-		configBM.regionRadiusY = 3;
+		configBM.disparityMin = 0;
+		configBM.disparityRange = 60;
+		configBM.regionRadiusX = 2;
+		configBM.regionRadiusY = 2;
 		configBM.maxPerPixelError = 30;
 		configBM.texture = -1;
+		configBM.validateRtoL = 1;
 		configBM.subpixel = true;
 		StereoDisparitySparse<GrayF32> disparity =
 				FactoryStereoDisparity.sparseRectifiedBM(configBM, GrayF32.class);
 
 		var configKLT = new ConfigPKlt();
-		configKLT.pyramidLevels =  ConfigDiscreteLevels.levels(4);
+		configKLT.pyramidLevels =  ConfigDiscreteLevels.minSize(40);
 		configKLT.templateRadius = 3;
 
 		ConfigGeneralDetector configDetector = new ConfigGeneralDetector(600,3,1);

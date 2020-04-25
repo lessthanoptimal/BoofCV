@@ -48,7 +48,7 @@ import java.util.List;
 /**
  * Stereo visual odometry algorithm which relies on tracking features independently in the left and right images
  * and then matching those tracks together.  The idea behind this tracker is that the expensive task of association
- * features between left and right cameras only needs to be done once eat time a track is spawned.  Triangulation
+ * features between left and right cameras only needs to be done once when track is spawned.  Triangulation
  * is used to estimate each feature's 3D location.  Motion is estimated robustly using a RANSAC type algorithm
  * provided by the user which internally uses {@link boofcv.abst.geo.Estimate1ofPnP PnP} type algorithm.
  *
