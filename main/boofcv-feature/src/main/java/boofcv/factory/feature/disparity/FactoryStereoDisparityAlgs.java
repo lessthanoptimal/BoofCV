@@ -223,28 +223,28 @@ public class FactoryStereoDisparityAlgs {
 	}
 
 	public static DisparitySparseSelect<int[]>
-	selectDisparitySparse_S32( int maxError , double texture) {
+	selectDisparitySparse_S32( int maxError , double texture, int tolRightToLeft) {
 		if( maxError < 0 && texture <= 0 )
 			return new SelectSparseErrorBasicWta_S32();
 		else
-			return new SelectSparseErrorWithChecksWta_S32(maxError,texture);
+			return new SelectSparseErrorWithChecksWta_S32(maxError,texture,tolRightToLeft);
 	}
 
 	public static DisparitySparseSelect<float[]>
-	selectDisparitySparse_F32( int maxError , double texture) {
+	selectDisparitySparse_F32( int maxError , double texture, int tolRightToLeft) {
 		if( maxError < 0 && texture <= 0 )
 			return new SelectSparseErrorBasicWta_F32();
 		else
-			return new SelectSparseErrorWithChecksWta_F32(maxError,texture);
+			return new SelectSparseErrorWithChecksWta_F32(maxError,texture,tolRightToLeft);
 	}
 
 	public static DisparitySparseSelect<int[]>
-	selectDisparitySparseSubpixel_S32( int maxError , double texture) {
-		return new SelectSparseErrorSubpixel.S32(maxError,texture);
+	selectDisparitySparseSubpixel_S32( int maxError , double texture, int tolRightToLeft) {
+		return new SelectSparseErrorSubpixel.S32(maxError,texture,tolRightToLeft);
 	}
 
 	public static DisparitySparseSelect<float[]>
-	selectDisparitySparseSubpixel_F32( int maxError , double texture) {
-		return new SelectSparseErrorSubpixel.F32(maxError,texture);
+	selectDisparitySparseSubpixel_F32( int maxError , double texture, int tolRightToLeft) {
+		return new SelectSparseErrorSubpixel.F32(maxError,texture,tolRightToLeft);
 	}
 }

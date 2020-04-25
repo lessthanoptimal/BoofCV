@@ -28,6 +28,7 @@ import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
+import lombok.Getter;
 import org.ejml.UtilEjml;
 
 /**
@@ -58,7 +59,8 @@ public class SparseScoreRectifiedNcc<T extends ImageGray<T>> extends DisparitySp
 	NormalizeParameters parameters = new NormalizeParameters();
 
 	// Fit scores as a function of disparity. scores[0] = score at disparity of disparityMin
-	protected float[] scores;
+	@Getter protected float[] scoreLtoR; // left to right
+	@Getter protected float[] scoreRtoL; // right to left
 
 	public SparseScoreRectifiedNcc(int blockRadiusX, int blockRadiusY, Class<T> imageType ) {
 		super(blockRadiusX, blockRadiusY, imageType);
@@ -70,26 +72,22 @@ public class SparseScoreRectifiedNcc<T extends ImageGray<T>> extends DisparitySp
 	@Override
 	public void configure(int disparityMin, int disparityRange) {
 		super.configure(disparityMin, disparityRange);
-		scores = new float[ disparityRange ];
+		scoreLtoR = new float[ disparityRange ];
+		scoreRtoL = new float[ disparityRange ];
 	}
 
 	@Override
-	public float[] getScore() {
-		return scores;
-	}
-
-	@Override
-	protected void scoreDisparity(int disparityRange) {
+	protected void scoreDisparity(int disparityRange, final boolean leftToRight) {
 		if( normalizeInput ) {
 			// Apply normalization to the right patch because it tends to be larger. In the batch algorithm
 			// normalization is computed against the entire left image. Since doing so would make the runtime
 			// be O(width*height) that's not done here.
-			ImageNormalization.zeroMeanMaxOne(patchRight, adjustedRight, parameters);
-			ImageNormalization.apply(patchLeft, parameters, adjustedLeft);
+			ImageNormalization.zeroMeanMaxOne(patchCompare, adjustedRight, parameters);
+			ImageNormalization.apply(patchTemplate, parameters, adjustedLeft);
 		} else {
 			// Don't normalize the image and just copy/convert the image type to float
-			GConvertImage.convert(patchLeft,adjustedLeft);
-			GConvertImage.convert(patchRight,adjustedRight);
+			GConvertImage.convert(patchTemplate,adjustedLeft);
+			GConvertImage.convert(patchCompare,adjustedRight);
 		}
 
 		// Compute local image statics for divisor in NCC error
@@ -112,6 +110,7 @@ public class SparseScoreRectifiedNcc<T extends ImageGray<T>> extends DisparitySp
 		// Area the mean filter is being applied to
 		final float area = blockWidth*blockHeight;
 
+		final float[] scores = leftToRight ? scoreLtoR : scoreRtoL;
 		for (int d = 0; d < disparityRange; d++) {
 			final float meanR = statsRight.mean.unsafe_get(rx+d,ry);
 			final float meanP2R = statsRight.pow2mean.unsafe_get(rx+d,ry);
@@ -125,8 +124,9 @@ public class SparseScoreRectifiedNcc<T extends ImageGray<T>> extends DisparitySp
 					correlation += dataLeft[idxLeft++] * dataRight[idxRight++];
 				}
 			}
+			int index = leftToRight ? disparityRange-d-1 : d;
 			correlation /= area;
-			scores[disparityRange-d-1] = (correlation - meanL*meanR)/(eps+sigmaL*sigmaR);
+			scores[index] = (correlation - meanL*meanR)/(eps+sigmaL*sigmaR);
 		}
 	}
 

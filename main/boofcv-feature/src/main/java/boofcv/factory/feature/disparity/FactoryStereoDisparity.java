@@ -266,29 +266,26 @@ public class FactoryStereoDisparity {
 	public static <T extends ImageGray<T>> StereoDisparitySparse<T>
 	sparseRectifiedBM(ConfigDisparityBM config, final Class<T> imageType) {
 
-		if( config.validateRtoL >= 0 )
-			throw new IllegalArgumentException("validateRtoL must be set to a value < 0. Not supported, yet.");
-
 		double maxError = (config.regionRadiusX*2+1)*(config.regionRadiusY*2+1)*config.maxPerPixelError;
 
 		DisparitySparseSelect select;
 		if( config.errorType == DisparityError.NCC ) {
 			// All images types are converted to float internally
 			if(config.subpixel) {
-				select = new SelectSparseCorrelationSubpixel.F32(config.texture);
+				select = new SelectSparseCorrelationSubpixel.F32(config.texture,config.validateRtoL);
 			} else {
-				select = new SelectSparseCorrelationWithChecksWta_F32(config.texture);
+				select = new SelectSparseCorrelationWithChecksWta_F32(config.texture,config.validateRtoL);
 			}
 		} else if( GeneralizedImageOps.isFloatingPoint(imageType) && config.errorType != DisparityError.CENSUS  ) {
 			if (config.subpixel)
-				select = selectDisparitySparseSubpixel_F32((int) maxError, config.texture);
+				select = selectDisparitySparseSubpixel_F32((int) maxError, config.texture,config.validateRtoL);
 			else
-				select = selectDisparitySparse_F32((int) maxError, config.texture);
+				select = selectDisparitySparse_F32((int) maxError, config.texture,config.validateRtoL);
 		} else {
 			if (config.subpixel)
-				select = selectDisparitySparseSubpixel_S32((int) maxError, config.texture);
+				select = selectDisparitySparseSubpixel_S32((int) maxError, config.texture,config.validateRtoL);
 			else
-				select = selectDisparitySparse_S32((int) maxError, config.texture);
+				select = selectDisparitySparse_S32((int) maxError, config.texture,config.validateRtoL);
 		}
 
 		DisparitySparseRectifiedScoreBM score = null;

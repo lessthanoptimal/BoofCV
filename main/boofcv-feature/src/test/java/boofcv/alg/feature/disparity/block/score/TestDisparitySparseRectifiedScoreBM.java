@@ -70,7 +70,7 @@ class TestDisparitySparseRectifiedScoreBM {
 	 * See if it copies the correct region and truncates the maximum local disparity range
 	 */
 	@Test
-	void process() {
+	void processLeftToRight() {
 		var leftImage = new GrayU8(width,height);
 		var rightImage = new GrayU8(width,height);
 		ImageMiscOps.fillUniform(leftImage,rand,0,200);
@@ -85,24 +85,64 @@ class TestDisparitySparseRectifiedScoreBM {
 		alg.configure(2,range);
 
 		// Test it all the way inside
-		assertTrue(alg.process(30,12));
-		assertEquals(range,alg.foundRange);
-		checkRegion(leftImage,30,12,1,alg.patchLeft);
-		checkRegion(rightImage,30-1-range,12,range,alg.patchRight);
+		assertTrue(alg.processLeftToRight(30,12));
+		assertTrue(alg.foundLtoR);
+		assertEquals(range,alg.getLocalRangeLtoR());
+		checkRegion(leftImage,30,12,1,alg.patchTemplate);
+		checkRegion(rightImage,30-1-range,12,range,alg.patchCompare);
 
 		// Test a few negative cases
-		assertFalse(alg.process(0,0));
-		assertFalse(alg.process(1,0));
+		assertFalse(alg.processLeftToRight(0,0));
+		assertFalse(alg.processLeftToRight(1,0));
 
 		// Test partially outside
-		assertTrue(alg.process(2,0));
-		assertEquals(1,alg.foundRange);
-		checkRegion(leftImage,2,0,1,alg.patchLeft);
-		checkRegion(rightImage,0,0,1,alg.patchRight);
-		assertTrue(alg.process(width-1,height-1));
-		assertEquals(range,alg.foundRange);
-		checkRegion(leftImage,width-1,height-1,1,alg.patchLeft);
-		checkRegion(rightImage,width-2-range,height-1,range,alg.patchRight);
+		assertTrue(alg.processLeftToRight(2,0));
+		assertTrue(alg.foundLtoR);
+		assertEquals(1,alg.getLocalRangeLtoR());
+		checkRegion(leftImage,2,0,1,alg.patchTemplate);
+		checkRegion(rightImage,0,0,1,alg.patchCompare);
+		assertTrue(alg.processLeftToRight(width-1,height-1));
+		assertEquals(range,alg.getLocalRangeLtoR());
+		checkRegion(leftImage,width-1,height-1,1,alg.patchTemplate);
+		checkRegion(rightImage,width-2-range,height-1,range,alg.patchCompare);
+	}
+
+	@Test
+	void processRightToLeft() {
+		var leftImage = new GrayU8(width,height);
+		var rightImage = new GrayU8(width,height);
+		ImageMiscOps.fillUniform(leftImage,rand,0,200);
+		ImageMiscOps.fillUniform(rightImage,rand,0,200);
+
+		var alg = new Mock(sampleX,sampleY);
+		alg.setImages(leftImage,rightImage);
+		alg.setBorder(border);
+		alg.setSampleRegion(radiusX,radiusY);
+
+		int range = 15;
+		alg.configure(2,range);
+
+		// Test it all the way inside
+		assertTrue(alg.processRightToLeft(20,12));
+		assertFalse(alg.foundLtoR);
+		assertEquals(range,alg.getLocalRangeRtoL());
+		checkRegion(rightImage,20,12,1,alg.patchTemplate);
+		checkRegion(leftImage,20+2,12,range,alg.patchCompare);
+
+		// Test a few negative cases
+		assertFalse(alg.processRightToLeft(width-1,12));
+		assertFalse(alg.processRightToLeft(width-2,12));
+
+		// Test partially outside
+		assertTrue(alg.processRightToLeft(width-3,0));
+		assertFalse(alg.foundLtoR);
+		assertEquals(1,alg.getLocalRangeRtoL());
+		checkRegion(rightImage,width-3,0,1,alg.patchTemplate);
+		checkRegion(leftImage,width-1,0,1,alg.patchCompare);
+		assertTrue(alg.processRightToLeft(0,height-1));
+		assertEquals(range,alg.getLocalRangeRtoL());
+		checkRegion(rightImage,0,height-1,1,alg.patchTemplate);
+		checkRegion(leftImage,2,height-1,range,alg.patchCompare);
 	}
 
 	/**
@@ -118,23 +158,23 @@ class TestDisparitySparseRectifiedScoreBM {
 		alg.setSampleRegion(radiusX,radiusY);
 
 		alg.configure(2,15);
-		alg.patchRight.reshape(alg.sampledWidth+14,alg.sampledHeight);
+		alg.patchCompare.reshape(alg.sampledWidth+14,alg.sampledHeight);
 
 		// Test entirely inside the image
-		alg.copy(10,12,5,image,alg.patchRight);
-		checkRegion(image,10,12,5,alg.patchRight);
+		alg.copy(10,12,5,image,alg.patchCompare);
+		checkRegion(image,10,12,5,alg.patchCompare);
 
 		// Test where it touches the border
-		alg.copy(1,height-3,6,image,alg.patchRight);
-		checkRegion(image,1,height-3,6,alg.patchRight);
+		alg.copy(1,height-3,6,image,alg.patchCompare);
+		checkRegion(image,1,height-3,6,alg.patchCompare);
 	}
 
 	private void checkRegion( GrayU8 input, int cx , int cy , int length , GrayU8 patch ) {
 		border.setImage(input);
-		int y0 = cy-radiusY-sampleY;
-		int y1 = cy+radiusY+sampleY+1;
-		int x0 = cx - radiusX - sampleX;
-		int x1 = cx + radiusX + sampleX + length;
+		int y0 = cy-radiusY - sampleY;
+		int y1 = cy+radiusY + sampleY+1;
+		int x0 = cx-radiusX - sampleX;
+		int x1 = cx+radiusX + sampleX + length;
 
 		for (int y = 0; y < y1-y0; y++) {
 			for (int x = 0; x < x1-x0; x++) {
@@ -146,19 +186,21 @@ class TestDisparitySparseRectifiedScoreBM {
 	private class Mock extends DisparitySparseRectifiedScoreBM<int[],GrayU8> {
 
 		public int foundRange;
+		public boolean foundLtoR;
 
 		public Mock(int radiusX, int radiusY) {
 			super(radiusX, radiusY, GrayU8.class);
 		}
 
 		@Override
-		protected void scoreDisparity(int disparityRange) {
+		protected void scoreDisparity(int disparityRange, boolean leftToRight) {
 			this.foundRange = disparityRange;
+			this.foundLtoR = leftToRight;
 		}
 
 		@Override
-		public int[] getScore() {
-			return null;
-		}
+		public int[] getScoreLtoR() {return null;}
+		@Override
+		public int[] getScoreRtoL() {return null;}
 	}
 }

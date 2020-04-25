@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -144,7 +144,7 @@ public abstract class SelectErrorWithChecks_F32<DI extends ImageGray<DI>>
 	 */
 	private int selectRightToLeft( int col , float[] scores ) {
 		// The range of disparities it can search
-		int maxLocalDisparity = Math.min(imageWidth, col+disparityMax)-col-disparityMin;
+		int maxLocalDisparity = Math.min(imageWidth, col+disparityMax+1)-col-disparityMin;
 
 		int indexBest = 0;
 		int indexScore = col;

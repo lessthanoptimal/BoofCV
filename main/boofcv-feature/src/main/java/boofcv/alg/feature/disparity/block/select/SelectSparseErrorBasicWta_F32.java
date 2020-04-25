@@ -19,6 +19,7 @@
 package boofcv.alg.feature.disparity.block.select;
 
 import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
+import boofcv.alg.feature.disparity.block.score.DisparitySparseRectifiedScoreBM;
 
 /**
  * <p>
@@ -35,7 +36,12 @@ public class SelectSparseErrorBasicWta_F32 implements DisparitySparseSelect<floa
 	int disparity;
 
 	@Override
-	public boolean select(float[] scores, int disparityRange) {
+	public boolean select(DisparitySparseRectifiedScoreBM<float[],?> scorer, int x, int y) {
+		if( !scorer.processLeftToRight(x,y) )
+			return false;
+		float[] scores = scorer.getScoreLtoR();
+		int disparityRange = scorer.getLocalRangeLtoR();
+
 		disparity = 0;
 		float best = scores[0];
 

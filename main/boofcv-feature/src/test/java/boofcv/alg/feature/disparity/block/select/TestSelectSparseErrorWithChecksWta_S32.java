@@ -31,7 +31,7 @@ public class TestSelectSparseErrorWithChecksWta_S32
 	}
 
 	@Override
-	protected SelectSparseStandardWta<int[]> createAlg(int maxError, double texture) {
-		return new SelectSparseErrorWithChecksWta_S32(maxError,texture);
+	protected SelectSparseStandardWta<int[]> createAlg(int maxError, double texture, int tolRightToLeft) {
+		return new SelectSparseErrorWithChecksWta_S32(maxError,texture,tolRightToLeft);
 	}
 }

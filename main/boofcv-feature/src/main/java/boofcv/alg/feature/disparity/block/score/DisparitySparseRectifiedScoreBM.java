@@ -38,8 +38,10 @@ public abstract class DisparitySparseRectifiedScoreBM< ArrayData , Input extends
 	protected @Getter int disparityMax;
 	/** difference between max and min */
 	protected @Getter int disparityRange;
-	/** the local disparity range at the current image coordinate */
-	protected @Getter int localRange;
+	/** the local disparity range at the current image coordinate in left to right direction*/
+	protected @Getter int localRangeLtoR;
+	/** the local disparity range at the current image coordinate in right to left direction*/
+	protected @Getter int localRangeRtoL;
 
 	/** radius of the region along x and y axis */
 	protected @Getter int radiusX,radiusY;
@@ -60,8 +62,9 @@ public abstract class DisparitySparseRectifiedScoreBM< ArrayData , Input extends
 
 	// Copies of only the pixels needed to compute the sparse disparity. These local patches are used
 	// instead of the raw images to make the code less complex at the image border
-	protected final Input patchLeft;
-	protected final Input patchRight;
+	// left to right: template = left, compare = right.
+	protected final Input patchTemplate;
+	protected final Input patchCompare;
 
 	// Radius around a pixel that is sampled. This is for functions like Census which define a pixel's value based on
 	// it's neighbors. For SAD this will be 0
@@ -81,8 +84,15 @@ public abstract class DisparitySparseRectifiedScoreBM< ArrayData , Input extends
 		this.blockHeight = radiusY*2 + 1;
 		this.inputType = inputType;
 
-		patchLeft = GeneralizedImageOps.createSingleBand(inputType,1,1);
-		patchRight = GeneralizedImageOps.createSingleBand(inputType,1,1);
+		patchTemplate = GeneralizedImageOps.createSingleBand(inputType,1,1);
+		patchCompare = GeneralizedImageOps.createSingleBand(inputType,1,1);
+	}
+
+	/** Default constructor primarily for unit tests */
+	protected DisparitySparseRectifiedScoreBM(Class<Input> inputType){
+		this.inputType = inputType;
+		patchTemplate = GeneralizedImageOps.createSingleBand(inputType,1,1);
+		patchCompare = GeneralizedImageOps.createSingleBand(inputType,1,1);
 	}
 
 	protected void setSampleRegion( int radiusX , int radiusY ) {
@@ -119,7 +129,7 @@ public abstract class DisparitySparseRectifiedScoreBM< ArrayData , Input extends
 		// size of a single patch that needs to be copied
 		this.sampledWidth = 2*(sampleRadiusX +radiusX)+1;
 		this.sampledHeight = 2*(sampleRadiusY +radiusY)+1;
-		patchLeft.reshape(sampledWidth,sampledHeight);
+		patchTemplate.reshape(sampledWidth,sampledHeight);
 	}
 
 	/**
@@ -130,36 +140,64 @@ public abstract class DisparitySparseRectifiedScoreBM< ArrayData , Input extends
 	 */
 	public void setImages( Input left , Input right ) {
 		InputSanityCheck.checkSameShape(left, right);
-
 		this.left = left;
 		this.right = right;
 	}
 
 	/**
-	 * Compute disparity scores for the specified pixel.  Be sure that its not too close to
+	 * Compute disparity scores for the specified pixel in left to right direction.  Be sure that its not too close to
 	 * the image border.
 	 *
 	 * @param x x-coordinate of point
 	 * @param y y-coordinate of point.
 	 */
-	public boolean process( int x , int y ) {
+	public boolean processLeftToRight(int x , int y ) {
 		// can't estimate disparity if there are no pixels it can estimate disparity from
 		if( x < disparityMin)
 			return false;
 
 		// adjust disparity range for image border
-		localRange = Math.min(x, disparityMax)-disparityMin+1;
+		localRangeLtoR = Math.min(x, disparityMax)-disparityMin+1;
 
-		patchRight.reshape(sampledWidth + localRange -1, sampledHeight);
+		patchCompare.reshape(sampledWidth + localRangeLtoR -1, sampledHeight);
 		// -1 because 'w' includes a range of 1 implicitly
 
 		// Create local copies that include the image border
-		copy(x,y,1,left,patchLeft);
-		copy(x-disparityMin- localRange +1,y, localRange,right,patchRight);
+		copy(x,y,1,left, patchTemplate);
+		copy(x-disparityMin-localRangeLtoR+1,y, localRangeLtoR,right, patchCompare);
 		// Maximum disparity will be at the beginning of the right path and decrease as x increases
 
 		// Compute scores from the copied local patches
-		scoreDisparity(localRange);
+		scoreDisparity(localRangeLtoR, true);
+
+		return true;
+	}
+
+	/**
+	 * Compute disparity scores for the specified pixel in right to left direction.  Be sure that its not too close to
+	 * the image border.
+	 *
+	 * @param x x-coordinate of point
+	 * @param y y-coordinate of point.
+	 */
+	public boolean processRightToLeft( int x , int y ) {
+		// can't estimate disparity if there are no pixels it can estimate disparity from
+		if( x+disparityMin >= left.width )
+			return false;
+
+		// adjust disparity range for image border
+		localRangeRtoL = Math.min(x+disparityMin+disparityRange,left.width)-x-disparityMin;
+
+		patchCompare.reshape(sampledWidth + localRangeRtoL -1, sampledHeight);
+		// -1 because 'w' includes a range of 1 implicitly
+
+		// Create local copies that include the image border
+		copy(x,y,1,right, patchTemplate);
+		copy(x+disparityMin,y, localRangeRtoL,left, patchCompare);
+		// Maximum disparity will be at the beginning of the right path and decrease as x increases
+
+		// Compute scores from the copied local patches
+		scoreDisparity(localRangeRtoL, false);
 
 		return true;
 	}
@@ -179,13 +217,21 @@ public abstract class DisparitySparseRectifiedScoreBM< ArrayData , Input extends
 	/**
 	 * Scores the disparity using image patches.
 	 * @param disparityRange The local range for disparity
+	 * @param leftToRight If true then the disparity is being from in left to right direction (the typical)
 	 */
-	protected abstract void scoreDisparity(int disparityRange );
+	protected abstract void scoreDisparity( int disparityRange , boolean leftToRight );
 
 	/**
-	 * Array containing disparity score values at most recently processed point.  Array
-	 * indices correspond to disparity.  score[i] = score at disparity i.  To know how many
-	 * disparity values there are call {@link #getLocalRange()}
+	 * Array containing disparity score computed by calling {@link #processLeftToRight}. Each element corresponds
+	 * to the disparity score relative to {@link #disparityMin} and has a max value specified by
+	 * {@link #getLocalRangeLtoR()}
 	 */
-	public abstract ArrayData getScore();
+	public abstract ArrayData getScoreLtoR();
+
+	/**
+	 * Array containing disparity score computed by calling {@link #processRightToLeft}. Each element corresponds
+	 * to the disparity score relative to {@link #disparityMin} and has a max value specified by
+	 * {@link #getLocalRangeRtoL()}
+	 */
+	public abstract ArrayData getScoreRtoL();
 }

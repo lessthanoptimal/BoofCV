@@ -69,9 +69,6 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 		this.config = config;
 		this.listener = listener;
 
-		// disable since it's not supported yet
-		config.validateRtoL = -1;
-
 		comboError = combo(e -> handleErrorSelected(false), config.errorType.ordinal(),(Object[])ERRORS_BLOCK);
 		controlBM = new ControlsBlockMatching();
 		controlSad = new ControlsSAD();
@@ -153,6 +150,7 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 		JSpinner radiusXSpinner = spinner(config.regionRadiusX,0,50,1);
 		JSpinner radiusYSpinner = spinner(config.regionRadiusY,0,50,1);
 		JSpinner spinnerError = spinner(config.maxPerPixelError,-1,80,5);
+		JSpinner spinnerReverse = spinner(config.validateRtoL,-1,50,1);
 		JSpinner spinnerTexture = spinner(config.texture,0.0,1.0,0.05,1,3);
 		JCheckBox subpixelToggle = checkbox("Subpixel", config.subpixel,"Subpixel Disparity Estimate");
 
@@ -164,6 +162,7 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 			addLabeled(radiusYSpinner,    "Radius Y", "Block Height. (Pixels)");
 			addLabeled(spinnerError,     "Max Error","Maximum allowed matching error");
 			addLabeled(spinnerTexture,   "Texture","Texture validation. 0 = disabled. 1 = most strict.");
+			addLabeled(spinnerReverse,   "Reverse","Reverse Validation Tolerance. -1 = disable. (Pixels)");
 			addAlignLeft(subpixelToggle);
 		}
 
@@ -183,6 +182,8 @@ public class ControlPanelDisparitySparse extends StandardAlgConfigPanel {
 				config.texture = ((Number) spinnerTexture.getValue()).doubleValue();
 			} else if( source == subpixelToggle) {
 				config.subpixel = subpixelToggle.isSelected();
+			} else if( source == spinnerReverse) {
+				config.validateRtoL = ((Number) spinnerReverse.getValue()).intValue();
 			} else {
 				throw new RuntimeException("Unknown");
 			}

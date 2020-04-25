@@ -143,7 +143,7 @@ public abstract class SelectCorrelationWithChecks_F32<DI extends ImageGray<DI>>
 	 */
 	private int selectRightToLeft( int col , float[] scores ) {
 		// see how far it can search
-		int localMax = Math.min(imageWidth,col+disparityMax)-col-disparityMin;
+		int localMax = Math.min(imageWidth,col+disparityMax+1)-col-disparityMin;
 
 		int indexBest = 0;
 		int indexScore = col;

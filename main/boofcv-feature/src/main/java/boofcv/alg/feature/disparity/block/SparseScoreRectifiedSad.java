@@ -37,19 +37,21 @@ public interface SparseScoreRectifiedSad {
 		}
 
 		@Override
-		protected void scoreDisparity(final int disparityRange) {
-			final float[] dataLeft = patchLeft.data;
-			final float[] dataRight = patchRight.data;
+		protected void scoreDisparity(final int disparityRange, final boolean leftToRight) {
+			final float[] scores = leftToRight ? scoreLtoR : scoreRtoL;
+			final float[] dataLeft = patchTemplate.data;
+			final float[] dataRight = patchCompare.data;
 			for (int d = 0; d < disparityRange; d++) {
 				float total = 0;
 				int idxLeft = 0;
 				for (int y = 0; y < blockHeight; y++) {
-					int idxRight = y*patchRight.stride+d;
+					int idxRight = y* patchCompare.stride+d;
 					for (int x = 0; x < blockWidth; x++) {
 						total += Math.abs(dataLeft[idxLeft++] - dataRight[idxRight++]);
 					}
 				}
-				scores[disparityRange-d-1] = total;
+				int index = leftToRight ? disparityRange-d-1 : d;
+				scores[index] = total;
 			}
 		}
 	}
@@ -61,19 +63,21 @@ public interface SparseScoreRectifiedSad {
 		}
 
 		@Override
-		protected void scoreDisparity(final int disparityRange) {
-			final byte[] dataLeft = patchLeft.data;
-			final byte[] dataRight = patchRight.data;
+		protected void scoreDisparity(final int disparityRange, final boolean leftToRight) {
+			final int[] scores = leftToRight ? scoreLtoR : scoreRtoL;
+			final byte[] dataLeft = patchTemplate.data;
+			final byte[] dataRight = patchCompare.data;
 			for (int d = 0; d < disparityRange; d++) {
 				int total = 0;
 				int idxLeft = 0;
 				for (int y = 0; y < blockHeight; y++) {
-					int idxRight = y*patchRight.stride+d;
+					int idxRight = y* patchCompare.stride+d;
 					for (int x = 0; x < blockWidth; x++) {
 						total += Math.abs( (dataLeft[idxLeft++]&0xFF) - (dataRight[idxRight++]&0xFF) );
 					}
 				}
-				scores[disparityRange-d-1] = total;
+				int index = leftToRight ? disparityRange-d-1 : d;
+				scores[index] = total;
 			}
 		}
 	}
@@ -85,19 +89,21 @@ public interface SparseScoreRectifiedSad {
 		}
 
 		@Override
-		protected void scoreDisparity(final int disparityRange) {
-			final short[] dataLeft = patchLeft.data;
-			final short[] dataRight = patchRight.data;
+		protected void scoreDisparity(final int disparityRange, final boolean leftToRight) {
+			final int[] scores = leftToRight ? scoreLtoR : scoreRtoL;
+			final short[] dataLeft = patchTemplate.data;
+			final short[] dataRight = patchCompare.data;
 			for (int d = 0; d < disparityRange; d++) {
 				int total = 0;
 				int idxLeft = 0;
 				for (int y = 0; y < blockHeight; y++) {
-					int idxRight = y*patchRight.stride+d;
+					int idxRight = y* patchCompare.stride+d;
 					for (int x = 0; x < blockWidth; x++) {
 						total += Math.abs( (dataLeft[idxLeft++]&0xFFFF) - (dataRight[idxRight++]&0xFFFF) );
 					}
 				}
-				scores[disparityRange-d-1] = total;
+				int index = leftToRight ? disparityRange-d-1 : d;
+				scores[index] = total;
 			}
 		}
 	}
@@ -109,19 +115,21 @@ public interface SparseScoreRectifiedSad {
 		}
 
 		@Override
-		protected void scoreDisparity(final int disparityRange) {
-			final short[] dataLeft = patchLeft.data;
-			final short[] dataRight = patchRight.data;
+		protected void scoreDisparity(final int disparityRange, final boolean leftToRight) {
+			final int[] scores = leftToRight ? scoreLtoR : scoreRtoL;
+			final short[] dataLeft = patchTemplate.data;
+			final short[] dataRight = patchCompare.data;
 			for (int d = 0; d < disparityRange; d++) {
 				int total = 0;
 				int idxLeft = 0;
 				for (int y = 0; y < blockHeight; y++) {
-					int idxRight = y*patchRight.stride+d;
+					int idxRight = y* patchCompare.stride+d;
 					for (int x = 0; x < blockWidth; x++) {
 						total += Math.abs( (dataLeft[idxLeft++]&0xFFFF) - (dataRight[idxRight++]&0xFFFF) );
 					}
 				}
-				scores[disparityRange-d-1] = total;
+				int index = leftToRight ? disparityRange-d-1 : d;
+				scores[index] = total;
 			}
 		}
 	}

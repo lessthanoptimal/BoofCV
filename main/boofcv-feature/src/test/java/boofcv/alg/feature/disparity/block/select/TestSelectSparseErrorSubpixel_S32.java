@@ -36,8 +36,8 @@ public class TestSelectSparseErrorSubpixel_S32
 	}
 
 	@Override
-	protected SelectSparseStandardWta<int[]> createAlg(int maxError, double texture) {
-		return new SelectSparseErrorSubpixel.S32(maxError,texture);
+	protected SelectSparseStandardWta<int[]> createAlg(int maxError, double texture, int tolRightToLeft) {
+		return new SelectSparseErrorSubpixel.S32(maxError,texture,tolRightToLeft);
 	}
 
 	/**
@@ -45,10 +45,9 @@ public class TestSelectSparseErrorSubpixel_S32
 	 */
 	@Test
 	void addSubpixelBias() {
+		var alg = new SelectSparseErrorSubpixel.S32(-1,-1,-1);
 
-		SelectSparseErrorSubpixel.S32 alg = new SelectSparseErrorSubpixel.S32(-1,-1);
-
-		int scores[] = new int[30];
+		int[] scores = new int[30];
 		Arrays.fill(scores,0,10,500);
 
 		// should be biased towards 4
@@ -56,7 +55,7 @@ public class TestSelectSparseErrorSubpixel_S32
 		scores[5] = 50;
 		scores[6] = 200;
 
-		assertTrue(alg.select(scores, 10));
+		assertTrue(alg.select(new DummyScore_S32(scores,null,10,-1),-1,-1));
 
 		double found = alg.getDisparity();
 		assertTrue( found < 5 && found > 4);
@@ -64,7 +63,7 @@ public class TestSelectSparseErrorSubpixel_S32
 		// now biased towards 6
 		scores[4] = 200;
 		scores[6] = 100;
-		assertTrue(alg.select(scores, 10));
+		assertTrue(alg.select(new DummyScore_S32(scores,null,10,-1),-1,-1));
 		found = alg.getDisparity();
 
 		assertTrue( found < 6 && found > 5);

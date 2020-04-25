@@ -76,7 +76,8 @@ Version : 0.36
   * Added sparse disparity with Census and NCC
   * Added Census support for F32 images
   * Changed how correlation texture check is done. Before two identical peaks didn't get filtered.
-  * TODO Added sparse forwards-backwards validation
+  * Added sparse forwards-backwards validation
+  * Fixed subtle bug in dense forwards-backwards validation where it was truncated by one is most situations
 - Android
   * Changed image workspace from byte[] to GrowQueue_I8 so that it can be dynamically computed.
   * Fixed issues with visualizing disparity

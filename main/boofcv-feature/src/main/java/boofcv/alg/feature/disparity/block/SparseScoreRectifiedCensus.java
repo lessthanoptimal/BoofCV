@@ -60,21 +60,21 @@ public interface SparseScoreRectifiedCensus {
 		@Override
 		public void configure( int disparityMin , int disparityRange ) {
 			super.configure(disparityMin,disparityRange);
-			censusLeft.reshape(patchLeft);
+			censusLeft.reshape(patchTemplate);
 		}
 
 		@Override
-		protected void scoreDisparity(int disparityRange) {
-			censusRight.reshape(patchRight);
+		protected void scoreDisparity(int disparityRange, final boolean leftToRight) {
+			censusRight.reshape(patchCompare);
 
 			// NOTE: the borders do not need to be processed
-			censusTran.process(patchLeft,censusLeft);
-			censusTran.process(patchRight,censusRight);
+			censusTran.process(patchTemplate,censusLeft);
+			censusTran.process(patchCompare,censusRight);
 
-			scoreCensus(disparityRange);
+			scoreCensus(disparityRange,leftToRight);
 		}
 
-		protected abstract void scoreCensus( int disparityRange );
+		protected abstract void scoreCensus( int disparityRange, final boolean leftToRight);
 	}
 
 	/**
@@ -89,7 +89,8 @@ public interface SparseScoreRectifiedCensus {
 		}
 
 		@Override
-		protected void scoreCensus(int disparityRange) {
+		protected void scoreCensus(int disparityRange, final boolean leftToRight) {
+			final int[] scores = leftToRight ? scoreLtoR : scoreRtoL;
 			final byte[] dataLeft  = censusLeft.data;
 			final byte[] dataRight = censusRight.data;
 			for (int d = 0; d < disparityRange; d++) {
@@ -103,7 +104,8 @@ public interface SparseScoreRectifiedCensus {
 						total += DescriptorDistance.hamming(a^b);
 					}
 				}
-				scores[disparityRange-d-1] = total;
+				int index = leftToRight ? disparityRange-d-1 : d;
+				scores[index] = total;
 			}
 		}
 	}
@@ -120,7 +122,8 @@ public interface SparseScoreRectifiedCensus {
 		}
 
 		@Override
-		protected void scoreCensus(int disparityRange) {
+		protected void scoreCensus(int disparityRange, final boolean leftToRight) {
+			final int[] scores = leftToRight ? scoreLtoR : scoreRtoL;
 			final int[] dataLeft  = censusLeft.data;
 			final int[] dataRight = censusRight.data;
 			for (int d = 0; d < disparityRange; d++) {
@@ -134,7 +137,8 @@ public interface SparseScoreRectifiedCensus {
 						total += DescriptorDistance.hamming(a^b);
 					}
 				}
-				scores[disparityRange-d-1] = total;
+				int index = leftToRight ? disparityRange-d-1 : d;
+				scores[index] = total;
 			}
 		}
 	}
@@ -151,7 +155,8 @@ public interface SparseScoreRectifiedCensus {
 		}
 
 		@Override
-		protected void scoreCensus(int disparityRange) {
+		protected void scoreCensus(int disparityRange, final boolean leftToRight) {
+			final int[] scores = leftToRight ? scoreLtoR : scoreRtoL;
 			final long[] dataLeft  = censusLeft.data;
 			final long[] dataRight = censusRight.data;
 			for (int d = 0; d < disparityRange; d++) {
@@ -165,7 +170,8 @@ public interface SparseScoreRectifiedCensus {
 						total += DescriptorDistance.hamming(a^b);
 					}
 				}
-				scores[disparityRange-d-1] = total;
+				int index = leftToRight ? disparityRange-d-1 : d;
+				scores[index] = total;
 			}
 		}
 	}

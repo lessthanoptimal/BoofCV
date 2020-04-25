@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -32,15 +32,19 @@ class TestSelectSparseErrorBasicWta_F32 {
 	void simple() {
 		int maxDisparity = 30;
 
-		float scores[] = new float[50];
+		float[] scores = new float[50];
 		for( int i = 0; i < maxDisparity; i++) {
 			scores[i] = Math.abs(i-5)+2;
 		}
 
+		var dummy = new ChecksSelectSparseDisparityWithChecks.DummyScore_F32();
+		dummy.scoreLeftToRight = scores;
+		dummy.setLocalRangeLtoR(maxDisparity);
+
 		SelectSparseErrorBasicWta_F32 alg = new SelectSparseErrorBasicWta_F32();
 
-		assertTrue(alg.select(scores,maxDisparity));
-
+		// (x,y) is ignored and any value will work
+		assertTrue(alg.select(dummy,-1,-1));
 		assertEquals(5,(int)alg.getDisparity());
 	}
 }

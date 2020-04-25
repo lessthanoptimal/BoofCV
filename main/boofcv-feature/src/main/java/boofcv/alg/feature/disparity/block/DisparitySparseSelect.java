@@ -33,11 +33,12 @@ public interface DisparitySparseSelect<ArrayType> {
 	 * Examines disparity scores and looks for the best correspondence. If no correspondence
 	 * can be found then false is returned.
 	 *
-	 * @param scores Set of disparity scores.
-	 * @param disparityRange Number of possible disparity values estimated. The max possible disparity is min+range-1.
+	 * @param scorer Computes the disparity score
+	 * @param x Pixel coordinate x-axis
+	 * @param y Pixel coordinate y-axis
 	 * @return true if a valid correspondence was found
 	 */
-	boolean select( ArrayType scores , int disparityRange );
+	boolean select(DisparitySparseRectifiedScoreBM<ArrayType,?> scorer , int x, int y);
 
 	/**
 	 * Returns the found disparity

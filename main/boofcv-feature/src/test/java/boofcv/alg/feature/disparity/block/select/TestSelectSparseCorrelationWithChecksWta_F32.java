@@ -27,7 +27,7 @@ public class TestSelectSparseCorrelationWithChecksWta_F32
 		extends ChecksSelectSparseDisparityWithChecks.CheckCorrelation
 {
 	@Override
-	protected SelectSparseStandardWta<float[]> createAlg(int maxError, double texture) {
-		return new SelectSparseCorrelationWithChecksWta_F32(texture);
+	protected SelectSparseStandardWta<float[]> createAlg(int maxError, double texture, int tolRightToLeft) {
+		return new SelectSparseCorrelationWithChecksWta_F32(texture, tolRightToLeft);
 	}
 }

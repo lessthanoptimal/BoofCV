@@ -21,6 +21,7 @@ package boofcv.abst.feature.disparity;
 import boofcv.alg.feature.disparity.block.DisparitySparseSelect;
 import boofcv.alg.feature.disparity.block.score.DisparitySparseRectifiedScoreBM;
 import boofcv.struct.image.ImageGray;
+import lombok.Getter;
 
 /**
  * Wrapper around {@link DisparitySparseRectifiedScoreBM} for {@link StereoDisparitySparse}
@@ -30,8 +31,8 @@ import boofcv.struct.image.ImageGray;
 public class WrapDisparitySparseRectifiedBM<ArrayData,T extends ImageGray<T>>
 		implements StereoDisparitySparse<T>
 {
-	DisparitySparseRectifiedScoreBM<ArrayData,T> computeScore;
-	DisparitySparseSelect<ArrayData> select;
+	@Getter DisparitySparseRectifiedScoreBM<ArrayData,T> computeScore;
+	@Getter DisparitySparseSelect<ArrayData> select;
 
 	// for an insignificant speed boost save this constant as a floating point number
 	double minDisparityFloat;
@@ -55,10 +56,7 @@ public class WrapDisparitySparseRectifiedBM<ArrayData,T extends ImageGray<T>>
 
 	@Override
 	public boolean process(int x, int y) {
-		if( computeScore.process(x,y) ) {
-			return select.select(computeScore.getScore(), computeScore.getLocalRange());
-		}
-		return false;
+		return select.select(computeScore,x,y);
 	}
 
 	@Override
@@ -84,13 +82,5 @@ public class WrapDisparitySparseRectifiedBM<ArrayData,T extends ImageGray<T>>
 	@Override
 	public Class<T> getInputType() {
 		return computeScore.getInputType();
-	}
-
-	public DisparitySparseRectifiedScoreBM<ArrayData, T> getComputeScore() {
-		return computeScore;
-	}
-
-	public DisparitySparseSelect<ArrayData> getSelect() {
-		return select;
 	}
 }

@@ -18,6 +18,8 @@
 
 package boofcv.alg.feature.disparity.block.select;
 
+import boofcv.alg.feature.disparity.block.score.DisparitySparseRectifiedScoreBM;
+
 /**
  * <p>
  * Subpixel accuracy for disparity.  See {@link SelectErrorSubpixel} for more details on the
@@ -29,14 +31,15 @@ package boofcv.alg.feature.disparity.block.select;
 public class SelectSparseCorrelationSubpixel {
 
 	public static class F32 extends SelectSparseCorrelationWithChecksWta_F32 {
-		public F32( double texture) {
-			super(texture);
+		public F32( double texture, int tolRightToLeft) {
+			super(texture,tolRightToLeft);
 		}
 
 		@Override
-		public boolean select(float[] scores, int disparityRange) {
-			if( super.select(scores, disparityRange) ) {
-
+		public boolean select(DisparitySparseRectifiedScoreBM<float[],?> scorer, int x, int y) {
+			if( super.select(scorer, x, y) ) {
+				int disparityRange = scorer.getLocalRangeLtoR();
+				float[] scores = scorer.getScoreLtoR();
 				int disparityValue = (int)disparity;
 
 				if( disparityValue == 0 || disparityValue == disparityRange -1) {

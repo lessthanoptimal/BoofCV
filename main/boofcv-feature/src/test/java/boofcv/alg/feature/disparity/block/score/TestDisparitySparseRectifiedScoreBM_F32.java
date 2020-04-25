@@ -29,12 +29,12 @@ class TestDisparitySparseRectifiedScoreBM_F32 {
 	@Test
 	void array() {
 		var alg = new DisparitySparseRectifiedScoreBM_F32(2,3) {
-			@Override protected void scoreDisparity(int disparityRange) {}
+			@Override protected void scoreDisparity(int disparityRange, boolean leftToRight) {}
 		};
 		alg.setSampleRegion(1,2);
 		alg.configure(2,10);
 
 		// this is the only thing this class does really. The array needs to be able to store the entire range
-		assertEquals(10,alg.scores.length);
+		assertEquals(10,alg.scoreLtoR.length);
 	}
 }

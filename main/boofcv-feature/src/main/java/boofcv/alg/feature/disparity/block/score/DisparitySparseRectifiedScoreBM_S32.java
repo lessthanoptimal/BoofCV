@@ -19,6 +19,7 @@
 package boofcv.alg.feature.disparity.block.score;
 
 import boofcv.struct.image.ImageGray;
+import lombok.Getter;
 
 /**
  * <p>
@@ -30,7 +31,8 @@ public abstract class DisparitySparseRectifiedScoreBM_S32<T extends ImageGray<T>
 		extends DisparitySparseRectifiedScoreBM<int[], T>
 {
 	// Fit scores as a function of disparity. scores[0] = score at disparity of disparityMin
-	protected int[] scores;
+	@Getter protected int[] scoreLtoR; // left to right
+	@Getter protected int[] scoreRtoL; // right to left
 
 	public DisparitySparseRectifiedScoreBM_S32(int radiusX, int radiusY, Class<T> imageType ) {
 		super(radiusX, radiusY, imageType);
@@ -39,11 +41,7 @@ public abstract class DisparitySparseRectifiedScoreBM_S32<T extends ImageGray<T>
 	@Override
 	public void configure(int disparityMin, int disparityRange) {
 		super.configure(disparityMin, disparityRange);
-		scores = new int[ disparityRange ];
-	}
-
-	@Override
-	public int[] getScore() {
-		return scores;
+		scoreLtoR = new int[ disparityRange ];
+		scoreRtoL = new int[ disparityRange ];
 	}
 }

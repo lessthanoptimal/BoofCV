@@ -142,7 +142,7 @@ public abstract class SelectErrorWithChecks_S32<DI extends ImageGray<DI>>
 	 */
 	private int selectRightToLeft( int col , int[] scores ) {
 		// The range of disparities it can search
-		int maxLocalDisparity = Math.min(imageWidth,col+disparityMax)-col-disparityMin;
+		int maxLocalDisparity = Math.min(imageWidth,col+disparityMax+1)-col-disparityMin;
 
 		int indexBest = 0;
 		int indexScore = col;

@@ -24,7 +24,6 @@ import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -35,8 +34,8 @@ import java.util.Random;
 public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>>
 {
 	Random rand = BoofTesting.createRandom(0);
-	int width = 15;
-	int height = 12;
+	int width = 25;
+	int height = 20;
 
 	T left;
 	T right;
@@ -62,7 +61,7 @@ public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>
 		config.disparityMin = 0;
 		config.disparityRange = 15;
 		config.texture = 0.15;
-		config.validateRtoL = -1; // disable since it's not supported yet
+		config.validateRtoL = -1;
 		return config;
 	}
 
@@ -93,12 +92,19 @@ public abstract class CompareSparseToDenseDisparityChecks<T extends ImageGray<T>
 
 	@Test
 	public void checkRtoL() {
-		// this isn't supported yet and a IllegalArgumentException should be thrown
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
-			ConfigDisparityBM config = createConfig();
-			config.validateRtoL = 1;
+		ConfigDisparityBM config = createConfig();
+		// Set the min to be not zero as a way to make sure it's handled correctly
+		config.disparityMin = 2;
+		config.disparityRange = 12;
+
+		// go through several different tolerances for this validation
+		for( int tol : new int[]{-1,0,1,5} ) {
+			config.validateRtoL = tol;
+			config.subpixel = true;
 			compareResults(config);
-		});
+			config.subpixel = false;
+			compareResults(config);
+		}
 	}
 
 	@Test

@@ -18,6 +18,8 @@
 
 package boofcv.alg.feature.disparity.block.select;
 
+import boofcv.alg.feature.disparity.block.score.DisparitySparseRectifiedScoreBM;
+
 /**
  * <p>
  * Subpixel accuracy for disparity.  See {@link SelectErrorSubpixel} for more details on the
@@ -29,14 +31,15 @@ package boofcv.alg.feature.disparity.block.select;
 public class SelectSparseErrorSubpixel {
 
 	public static class S32 extends SelectSparseErrorWithChecksWta_S32 {
-		public S32(int maxError, double texture) {
-			super(maxError, texture);
+		public S32(int maxError, double texture, int tolRightToLeft) {
+			super(maxError, texture, tolRightToLeft);
 		}
 
 		@Override
-		public boolean select(int[] scores, int disparityRange) {
-			if( super.select(scores, disparityRange) ) {
-
+		public boolean select(DisparitySparseRectifiedScoreBM<int[],?> scorer, int x, int y) {
+			if( super.select(scorer,x,y) ) {
+				int disparityRange = scorer.getLocalRangeLtoR();
+				int[] scores = scorer.getScoreLtoR();
 				int disparityValue = (int)disparity;
 
 				if( disparityValue == 0 || disparityValue == disparityRange -1) {
@@ -60,14 +63,15 @@ public class SelectSparseErrorSubpixel {
 	}
 
 	public static class F32 extends SelectSparseErrorWithChecksWta_F32 {
-		public F32(int maxError, double texture) {
-			super(maxError, texture);
+		public F32(int maxError, double texture, int tolRightToLeft) {
+			super(maxError, texture, tolRightToLeft);
 		}
 
 		@Override
-		public boolean select(float[] scores, int disparityRange) {
-			if( super.select(scores, disparityRange) ) {
-
+		public boolean select(DisparitySparseRectifiedScoreBM<float[],?> scorer, int x, int y) {
+			if( super.select(scorer,x,y) ) {
+				int disparityRange = scorer.getLocalRangeLtoR();
+				float[] scores = scorer.getScoreLtoR();
 				int disparityValue = (int)disparity;
 
 				if( disparityValue == 0 || disparityValue == disparityRange -1) {

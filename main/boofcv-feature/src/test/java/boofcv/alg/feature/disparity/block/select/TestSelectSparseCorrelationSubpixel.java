@@ -27,7 +27,7 @@ public class TestSelectSparseCorrelationSubpixel
 		extends ChecksSelectSparseDisparityWithChecks.CheckCorrelation
 {
 	@Override
-	protected SelectSparseStandardWta<float[]> createAlg(int maxError, double texture) {
-		return new SelectSparseCorrelationSubpixel.F32(texture);
+	protected SelectSparseStandardWta<float[]> createAlg(int maxError, double texture, int tolRightToLeft) {
+		return new SelectSparseCorrelationSubpixel.F32(texture,tolRightToLeft);
 	}
 }
