@@ -42,8 +42,8 @@ public class TestImplCensusTransformInner {
 
 	@Test
 	void checkAll() {
-		int numExpected = 2*4;
-		Method methods[] = ImplCensusTransformInner.class.getMethods();
+		int numExpected = 3*4;
+		Method[] methods = ImplCensusTransformInner.class.getMethods();
 
 		// sanity check to make sure the functions are being found
 		int numFound = 0;
@@ -95,8 +95,7 @@ public class TestImplCensusTransformInner {
 		GrayU8 found = new GrayU8(w,h);
 		GrayU8 expected = new GrayU8(w,h);
 
-		int maxValue = (int)input.getDataType().getMaxValue();
-		GImageMiscOps.fillUniform(input,rand,0,maxValue);
+		fillUniform(input);
 
 		m.invoke(null,input,found);
 		CensusNaive.region3x3(input,expected);
@@ -111,8 +110,7 @@ public class TestImplCensusTransformInner {
 		GrayS32 found = new GrayS32(w,h);
 		GrayS32 expected = new GrayS32(w,h);
 
-		int maxValue = (int)input.getDataType().getMaxValue();
-		GImageMiscOps.fillUniform(input,rand,0,maxValue);
+		fillUniform(input);
 
 		m.invoke(null,input,found);
 		CensusNaive.region5x5(input,expected);
@@ -127,8 +125,7 @@ public class TestImplCensusTransformInner {
 		GrayS64 found = new GrayS64(w,h);
 		GrayS64 expected = new GrayS64(w,h);
 
-		int maxValue = (int)input.getDataType().getMaxValue();
-		GImageMiscOps.fillUniform(input,rand,0,maxValue);
+		fillUniform(input);
 
 		int r = 3;
 		FastQueue<Point2D_I32> samples = createSamples(r);
@@ -147,8 +144,7 @@ public class TestImplCensusTransformInner {
 		InterleavedU16 found = new InterleavedU16(w,h,2);
 		InterleavedU16 expected = new InterleavedU16(w,h,2);
 
-		int maxValue = (int)input.getDataType().getMaxValue();
-		GImageMiscOps.fillUniform(input,rand,0,maxValue);
+		fillUniform(input);
 
 		FastQueue<Point2D_I32> samples5x5 = createSamples(2);
 		GrowQueue_I32 indexes = samplesToIndexes(input,samples5x5);
@@ -157,6 +153,15 @@ public class TestImplCensusTransformInner {
 		CensusNaive.sample(input,samples5x5,expected);
 
 		BoofTesting.assertEqualsInner(expected,found,0,2,2,2,2,false);
+	}
+
+	private void fillUniform(ImageGray input) {
+		if (input.getDataType().isInteger()) {
+			int maxValue = (int) input.getDataType().getMaxValue();
+			GImageMiscOps.fillUniform(input, rand, 0, maxValue);
+		} else {
+			GImageMiscOps.fillUniform(input, rand, -5, 5);
+		}
 	}
 
 	public static GrowQueue_I32 samplesToIndexes( ImageGray input , FastQueue<Point2D_I32> samples ) {

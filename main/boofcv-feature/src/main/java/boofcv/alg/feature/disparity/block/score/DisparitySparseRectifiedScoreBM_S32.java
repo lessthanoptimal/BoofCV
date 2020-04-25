@@ -18,7 +18,7 @@
 
 package boofcv.alg.feature.disparity.block.score;
 
-import boofcv.struct.image.GrayI;
+import boofcv.struct.image.ImageGray;
 
 /**
  * <p>
@@ -26,8 +26,9 @@ import boofcv.struct.image.GrayI;
  * </p>
  * @author Peter Abeles
  */
-public abstract class DisparitySparseRectifiedScoreBM_S32<T extends GrayI<T>> extends DisparitySparseRectifiedScoreBM<int[], T> {
-
+public abstract class DisparitySparseRectifiedScoreBM_S32<T extends ImageGray<T>>
+		extends DisparitySparseRectifiedScoreBM<int[], T>
+{
 	// Fit scores as a function of disparity. scores[0] = score at disparity of disparityMin
 	protected int[] scores;
 

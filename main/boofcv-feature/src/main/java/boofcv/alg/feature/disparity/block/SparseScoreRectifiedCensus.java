@@ -39,7 +39,7 @@ public interface SparseScoreRectifiedCensus {
 	/**
 	 * Applies a census transform to the input image and creates a new transformed image patch for later processing
 	 */
-	abstract class Census<In extends GrayI<In>, Out extends ImageGray<Out>>
+	abstract class Census<In extends ImageGray<In>, Out extends ImageGray<Out>>
 			extends DisparitySparseRectifiedScoreBM_S32<In>
 	{
 		// Applies census transform to input iamges

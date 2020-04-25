@@ -107,4 +107,25 @@ public class TestWrapDisparitySparseRectifiedBM {
 		}
 	}
 
+	@Nested
+	class CENSUS_F32 extends CompareSparseToDenseDisparityChecks<GrayF32> {
+		public CENSUS_F32() {
+			super(DisparityError.CENSUS, ImageType.SB_F32);
+		}
+
+		@Override
+		public <D extends ImageGray<D>> StereoDisparity<GrayF32, D> createDense(ConfigDisparityBM config) {
+			double maxError = (config.regionRadiusX*2+1)*(config.regionRadiusY*2+1)*config.maxPerPixelError;
+			DisparitySelect select = createDisparitySelect(config, imageType.getImageClass(), (int) maxError);
+			FilterCensusTransform censusTran = FactoryCensusTransform.variant(config.configCensus.variant, true, imageType.getImageClass());
+			BlockRowScore rowScore = createCensusRowScore(config, censusTran);
+
+			DisparityBlockMatchRowFormat alg = createBlockMatching(config,
+					censusTran.getOutputType().getImageClass(), select, rowScore);
+			alg.setBorder(FactoryImageBorder.generic(config.border,censusTran.getOutputType()));
+			ImageBorder censusBorder = FactoryImageBorder.single(CENSUS_BORDER,imageType.getImageClass());
+			return new MakeCensusDenseLikeSparse<>(censusTran,censusBorder, alg);
+		}
+	}
+
 }

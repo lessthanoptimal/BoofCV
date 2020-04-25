@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -44,7 +44,7 @@ class TestImplCensusTransformInner_MT extends CompareIdenticalFunctions {
 
 	@Test
 	void performTests() {
-		performTests(8);
+		performTests(12);
 	}
 
 	@Override

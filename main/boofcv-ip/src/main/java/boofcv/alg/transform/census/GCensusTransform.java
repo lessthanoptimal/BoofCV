@@ -19,6 +19,7 @@
 package boofcv.alg.transform.census;
 
 import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I32;
@@ -53,6 +54,8 @@ public class GCensusTransform {
 			CensusTransform.dense3x3((GrayU8)input,output,(ImageBorder_S32)border);
 		} else if( input.getClass() == GrayU16.class ) {
 			CensusTransform.dense3x3((GrayU16)input,output,(ImageBorder_S32)border);
+		} else if( input.getClass() == GrayF32.class ) {
+			CensusTransform.dense3x3((GrayF32)input,output,(ImageBorder_F32)border);
 		} else {
 			throw new IllegalArgumentException("Unknown input image type. "+input.getClass().getSimpleName());
 		}
@@ -65,10 +68,11 @@ public class GCensusTransform {
 			CensusTransform.dense5x5((GrayU8)input,output,(ImageBorder_S32)border);
 		} else if( input.getClass() == GrayU16.class ) {
 			CensusTransform.dense5x5((GrayU16)input,output,(ImageBorder_S32)border);
+		} else if( input.getClass() == GrayF32.class ) {
+			CensusTransform.dense5x5((GrayF32)input,output,(ImageBorder_F32)border);
 		} else {
 			throw new IllegalArgumentException("Unknown input image type. "+input.getClass().getSimpleName());
 		}
-
 	}
 
 	public static<T extends ImageGray<T>> void sample_S64(final T input , final FastAccess<Point2D_I32> sample,
@@ -79,10 +83,11 @@ public class GCensusTransform {
 			CensusTransform.sample_S64((GrayU8)input,sample,output,(ImageBorder_S32)border,workSpace);
 		} else if( input.getClass() == GrayU16.class ) {
 			CensusTransform.sample_S64((GrayU16)input,sample,output,(ImageBorder_S32)border,workSpace);
+		} else if( input.getClass() == GrayF32.class ) {
+			CensusTransform.sample_S64((GrayF32)input,sample,output,(ImageBorder_F32)border,workSpace);
 		} else {
 			throw new IllegalArgumentException("Unknown input image type. "+input.getClass().getSimpleName());
 		}
-
 	}
 
 	public static<T extends ImageGray<T>> void sample_IU16(final T input , final FastAccess<Point2D_I32> sample,
@@ -93,6 +98,8 @@ public class GCensusTransform {
 			CensusTransform.sample_IU16((GrayU8)input,sample,output,(ImageBorder_S32)border,workSpace);
 		} else if( input.getClass() == GrayU16.class ) {
 			CensusTransform.sample_IU16((GrayU16)input,sample,output,(ImageBorder_S32)border,workSpace);
+		} else if( input.getClass() == GrayF32.class ) {
+			CensusTransform.sample_IU16((GrayF32)input,sample,output,(ImageBorder_F32)border,workSpace);
 		} else {
 			throw new IllegalArgumentException("Unknown input image type. "+input.getClass().getSimpleName());
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -31,7 +31,7 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 	public void generate() throws FileNotFoundException {
 		printPreamble();
 
-		for( AutoTypeImage type : new AutoTypeImage[]{AutoTypeImage.U8,AutoTypeImage.U16}) {
+		for( AutoTypeImage type : new AutoTypeImage[]{AutoTypeImage.U8,AutoTypeImage.U16,AutoTypeImage.F32}) {
 			print3x3(type);
 			print5x5(type);
 			sample_S64(type);
@@ -63,6 +63,7 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 	private void print3x3(AutoTypeImage src ) {
 		String bitwise = src.getBitWise();
 		String dataType = src.getDataType();
+		String sumType = src.getSumType();
 
 		out.print("\tpublic static void dense3x3(final "+src.getSingleBandName()+" input , final GrayU8 output ) {\n" +
 				"\t\tfinal int height = input.height-1;\n" +
@@ -86,7 +87,7 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 				"\t\t\tfinal int end = indexDst+input.width-2;\n" +
 				"//\t\t\tfor (int x = 1; x < width-1; x++) {\n" +
 				"\t\t\twhile( indexDst < end ) {\n" +
-				"\t\t\t\tint center = src[indexSrc]"+bitwise+";\n" +
+				"\t\t\t\t"+sumType+" center = src[indexSrc]"+bitwise+";\n" +
 				"\n" +
 				"\t\t\t\tint census = 0;\n" +
 				"\n" +
@@ -120,6 +121,7 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 	private void print5x5( AutoTypeImage src ) {
 		String bitwise = src.getBitWise();
 		String dataType = src.getDataType();
+		String sumType = src.getSumType();
 
 		out.print("\tpublic static void dense5x5(final "+src.getSingleBandName()+" input , final GrayS32 output ) {\n" +
 				"\t\tfinal int height = input.height-2;\n" +
@@ -159,7 +161,7 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 				"\t\t\tfinal int end = indexDst+input.width-4;\n" +
 				"//\t\t\tfor (int x = 2; x < width-2; x++) {\n" +
 				"\t\t\twhile( indexDst < end ) {\n" +
-				"\t\t\t\tint center = src[indexSrc]"+bitwise+";\n" +
+				"\t\t\t\t"+sumType+" center = src[indexSrc]"+bitwise+";\n" +
 				"\n" +
 				"\t\t\t\tint census = 0;\n" +
 				"\n" +
@@ -225,6 +227,7 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 	void sample_S64( AutoTypeImage src ) {
 		String bitwise = src.getBitWise();
 		String dataType = src.getDataType();
+		String sumType = src.getSumType();
 
 		out.print("\tpublic static void sample_S64(final "+src.getSingleBandName()+" input , final int radius , final GrowQueue_I32 offsets,\n" +
 				"\t\t\t\t\t\t\t\t  final GrayS64 output ) {\n" +
@@ -239,7 +242,7 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 				"\t\t\tfinal int end = indexDst + input.width - 2 * radius;\n" +
 				"//\t\t\tfor (int x = radius; x < width-radius; x++) {\n" +
 				"\t\t\twhile (indexDst < end) {\n" +
-				"\t\t\t\tint center = src[indexSrc]"+bitwise+";\n" +
+				"\t\t\t\t"+sumType+" center = src[indexSrc]"+bitwise+";\n" +
 				"\n" +
 				"\t\t\t\tlong census = 0;\n" +
 				"\t\t\t\tint bit = 1;\n" +
@@ -259,6 +262,7 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 	void sample_IU16( AutoTypeImage src ) {
 		String bitwise = src.getBitWise();
 		String dataType = src.getDataType();
+		String sumType = src.getSumType();
 
 		out.print("\tpublic static void sample_IU16(final "+src.getSingleBandName()+" input , final int radius , final GrowQueue_I32 offsets,\n" +
 				"\t\t\t\t\t\t\t\t   final InterleavedU16 output ) {\n" +
@@ -275,7 +279,7 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 				"\t\t\tfinal int end = indexDst+(input.width-2*radius)*output.numBands;\n" +
 				"//\t\t\tfor (int x = radius; x < width-radius; x++) {\n" +
 				"\t\t\twhile( indexDst < end ) {\n" +
-				"\t\t\t\tint center = src[indexSrc]"+bitwise+";\n" +
+				"\t\t\t\t"+sumType+" center = src[indexSrc]"+bitwise+";\n" +
 				"\n" +
 				"\t\t\t\tint idx = 0;\n" +
 				"\t\t\t\tfor (int block = 0; block < bitBlocks; block++) {\n" +
@@ -332,9 +336,8 @@ public class GenerateImplCensusTransformInner extends CodeGeneratorBase {
 				"\t}\n\n");
 	}
 
-	public static void main( String args[] ) throws FileNotFoundException {
+	public static void main( String[] args ) throws FileNotFoundException {
 		GenerateImplCensusTransformInner app = new GenerateImplCensusTransformInner();
-
 		app.generate();
 	}
 }

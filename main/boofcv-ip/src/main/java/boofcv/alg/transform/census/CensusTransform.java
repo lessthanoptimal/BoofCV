@@ -24,6 +24,7 @@ import boofcv.alg.transform.census.impl.ImplCensusTransformInner;
 import boofcv.alg.transform.census.impl.ImplCensusTransformInner_MT;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_I32;
@@ -142,6 +143,27 @@ public class CensusTransform {
 		}
 	}
 
+	/**
+	 * Census transform for local 3x3 region around each pixel.
+	 *
+	 * @param input Input image
+	 * @param output Census transformed output image
+	 * @param border (Nullable) How the border is handled
+	 */
+	public static void dense3x3(final GrayF32 input , final GrayU8 output , @Nullable ImageBorder_F32 border ) {
+		InputSanityCheck.checkReshape(input,output);
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplCensusTransformInner_MT.dense3x3(input,output);
+		} else {
+			ImplCensusTransformInner.dense3x3(input,output);
+		}
+
+		if( border != null ) {
+			border.setImage(input);
+			ImplCensusTransformBorder.dense3x3_F32(border,output);
+		}
+	}
 
 	/**
 	 * Census transform for local 5x5 region around each pixel.
@@ -184,6 +206,28 @@ public class CensusTransform {
 		if( border != null ) {
 			border.setImage(input);
 			ImplCensusTransformBorder.dense5x5_U8(border,output);
+		}
+	}
+
+	/**
+	 * Census transform for local 5x5 region around each pixel.
+	 *
+	 * @param input Input image
+	 * @param output Census transformed output image
+	 * @param border (Nullable) How the border is handled
+	 */
+	public static void dense5x5(final GrayF32 input , final GrayS32 output , @Nullable ImageBorder_F32 border ) {
+		InputSanityCheck.checkReshape(input,output);
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplCensusTransformInner_MT.dense5x5(input,output);
+		} else {
+			ImplCensusTransformInner.dense5x5(input,output);
+		}
+
+		if( border != null ) {
+			border.setImage(input);
+			ImplCensusTransformBorder.dense5x5_F32(border,output);
 		}
 	}
 
@@ -257,6 +301,37 @@ public class CensusTransform {
 	 * @param output Census transformed output image
 	 * @param border (Nullable) How the border is handled
 	 */
+	public static void sample_S64(final GrayF32 input , final FastAccess<Point2D_I32> sample,
+								  final GrayS64 output , @Nullable ImageBorder_F32 border ,
+								  @Nullable GrowQueue_I32 workSpace ) {
+		output.reshape(input.width,input.height);
+
+		// Precompute the offset in array indexes for the sample points
+		if( workSpace == null )
+			workSpace = new GrowQueue_I32();
+
+		int borderRadius = computeRadiusWorkspace(input, sample, workSpace);
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplCensusTransformInner_MT.sample_S64(input,borderRadius,workSpace,output);
+		} else {
+			ImplCensusTransformInner.sample_S64(input,borderRadius,workSpace,output);
+		}
+
+		if( border != null ) {
+			border.setImage(input);
+			ImplCensusTransformBorder.sample_S64(border,borderRadius,sample,output);
+		}
+	}
+
+	/**
+	 * Census transform for an arbitrary region specified by the provided sample points
+	 *
+	 * @param input Input image
+	 * @param sample Relative coordinates that are sampled when computing the
+	 * @param output Census transformed output image
+	 * @param border (Nullable) How the border is handled
+	 */
 	public static void sample_IU16(final GrayU8 input , final FastAccess<Point2D_I32> sample,
 								   final InterleavedU16 output , @Nullable ImageBorder_S32<GrayU8> border ,
 								   @Nullable GrowQueue_I32 workSpace ) {
@@ -292,6 +367,39 @@ public class CensusTransform {
 	 */
 	public static void sample_IU16(final GrayU16 input , final FastAccess<Point2D_I32> sample,
 								   final InterleavedU16 output , @Nullable ImageBorder_S32<GrayU16> border ,
+								   @Nullable GrowQueue_I32 workSpace ) {
+		// Compute the number of 16-bit values that are needed to store
+		int numBlocks = BoofMiscOps.bitsToWords(sample.size,16);
+		output.reshape(input.width,input.height,numBlocks);
+
+		// Precompute the offset in array indexes for the sample points
+		if( workSpace == null )
+			workSpace = new GrowQueue_I32();
+
+		int borderRadius = computeRadiusWorkspace(input, sample, workSpace);
+
+		if( BoofConcurrency.USE_CONCURRENT ) {
+			ImplCensusTransformInner_MT.sample_IU16(input,borderRadius,workSpace,output);
+		} else {
+			ImplCensusTransformInner.sample_IU16(input,borderRadius,workSpace,output);
+		}
+
+		if( border != null ) {
+			border.setImage(input);
+			ImplCensusTransformBorder.sample_IU16(border,borderRadius,sample,output);
+		}
+	}
+
+	/**
+	 * Census transform for an arbitrary region specified by the provided sample points
+	 *
+	 * @param input Input image
+	 * @param sample Relative coordinates that are sampled when computing the
+	 * @param output Census transformed output image
+	 * @param border (Nullable) How the border is handled
+	 */
+	public static void sample_IU16(final GrayF32 input , final FastAccess<Point2D_I32> sample,
+								   final InterleavedU16 output , @Nullable ImageBorder_F32 border ,
 								   @Nullable GrowQueue_I32 workSpace ) {
 		// Compute the number of 16-bit values that are needed to store
 		int numBlocks = BoofMiscOps.bitsToWords(sample.size,16);

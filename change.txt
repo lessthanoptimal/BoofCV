@@ -68,12 +68,13 @@ Version : 0.36
 - Scene Reconstruction
   * Better cropping on rectified image using bounding box instead of rotation matrix
 - Visual Odometry
-  * Re-wrote VisualizeStereoVisualOdometryApp; Much better visualization and more configurable
+  * Re-wrote VisualizeStereoVisualOdometryApp. Much better visualization and more configurable
   * All stereo visual odometry algorithms now support multiple key frames and bundle adjustment
   * TODO update DualTrack
   * TODO update Quad
 - Stereo
   * Added sparse disparity with Census and NCC
+  * Added Census support for F32 images
   * Changed how correlation texture check is done. Before two identical peaks didn't get filtered.
   * TODO Added sparse forwards-backwards validation
 - Android

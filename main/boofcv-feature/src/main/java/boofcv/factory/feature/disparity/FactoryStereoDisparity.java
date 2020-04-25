@@ -131,7 +131,8 @@ public class FactoryStereoDisparity {
 	public static <T extends ImageGray<T>> DisparitySelect
 	createDisparitySelect(ConfigDisparityBM config, Class<T> imageType, int maxError) {
 		DisparitySelect select;
-		if( !GeneralizedImageOps.isFloatingPoint(imageType) ) {
+		if( !GeneralizedImageOps.isFloatingPoint(imageType) || config.errorType == DisparityError.CENSUS) {
+			// Census can have a float input but always scores as an integer since it converts it into a Census image
 			if( config.errorType.isCorrelation() )
 				throw new IllegalArgumentException("Can't do correlation scores for integer image types");
 			if( config.subpixel ) {
@@ -278,7 +279,7 @@ public class FactoryStereoDisparity {
 			} else {
 				select = new SelectSparseCorrelationWithChecksWta_F32(config.texture);
 			}
-		} else if( GeneralizedImageOps.isFloatingPoint(imageType) ) {
+		} else if( GeneralizedImageOps.isFloatingPoint(imageType) && config.errorType != DisparityError.CENSUS  ) {
 			if (config.subpixel)
 				select = selectDisparitySparseSubpixel_F32((int) maxError, config.texture);
 			else

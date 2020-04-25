@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -18,15 +18,14 @@
 
 package boofcv.alg.transform.census.impl;
 
-import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.alg.transform.census.CensusNaive;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.struct.border.BorderType;
+import boofcv.struct.border.ImageBorder;
+import boofcv.struct.border.ImageBorder_F32;
 import boofcv.struct.border.ImageBorder_S32;
-import boofcv.struct.image.GrayS32;
-import boofcv.struct.image.GrayS64;
-import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.InterleavedU16;
+import boofcv.struct.image.*;
 import boofcv.testing.BoofTesting;
 import georegression.struct.point.Point2D_I32;
 import org.ddogleg.struct.FastQueue;
@@ -39,6 +38,7 @@ import static boofcv.alg.transform.census.impl.TestImplCensusTransformInner.crea
 /**
  * @author Peter Abeles
  */
+@SuppressWarnings("rawtypes")
 class TestImplCensusTransformBorder {
 	int w = 20, h = 30;
 
@@ -46,32 +46,49 @@ class TestImplCensusTransformBorder {
 	void region3x3() {
 		Random rand = new Random(234);
 
-		GrayU8 input = new GrayU8(w,h);
-		GrayU8 found = new GrayU8(w,h);
-		GrayU8 expected = new GrayU8(w,h);
+		for(ImageType type : new ImageType[]{ImageType.SB_U8,ImageType.SB_F32}) {
+			ImageGray input = (ImageGray)type.createImage(w, h);
+			var found = new GrayU8(w, h);
+			var expected = new GrayU8(w, h);
 
-		ImageMiscOps.fillUniform(input,rand,0,255);
+			ImageBorder border = FactoryImageBorder.wrap(BorderType.EXTENDED, input);
 
-		ImplCensusTransformBorder.dense3x3_U8((ImageBorder_S32)FactoryImageBorder.wrap(BorderType.EXTENDED,input),found);
-		CensusNaive.region3x3(input,expected);
+			if( type.getDataType().isInteger() ) {
+				GImageMiscOps.fillUniform(input, rand, 0, 255);
+				ImplCensusTransformBorder.dense3x3_U8((ImageBorder_S32) border, found);
+			} else {
+				GImageMiscOps.fillUniform(input, rand, -2, 2);
+				ImplCensusTransformBorder.dense3x3_F32((ImageBorder_F32) border, found);
+			}
 
-		BoofTesting.assertEqualsBorder(expected,found,0,1,1);
+			CensusNaive.region3x3(input, expected);
+
+			BoofTesting.assertEqualsBorder(expected, found, 0, 1, 1);
+		}
 	}
 
 	@Test
 	void region5x5() {
 		Random rand = new Random(234);
 
-		GrayU8 input = new GrayU8(w,h);
-		GrayS32 found = new GrayS32(w,h);
-		GrayS32 expected = new GrayS32(w,h);
+		for(ImageType type : new ImageType[]{ImageType.SB_U8,ImageType.SB_F32}) {
+			ImageGray input = (ImageGray) type.createImage(w, h);
+			var found = new GrayS32(w, h);
+			var expected = new GrayS32(w, h);
+			ImageBorder border = FactoryImageBorder.wrap(BorderType.EXTENDED, input);
 
-		ImageMiscOps.fillUniform(input,rand,0,255);
+			if( type.getDataType().isInteger() ) {
+				GImageMiscOps.fillUniform(input, rand, 0, 255);
+				ImplCensusTransformBorder.dense5x5_U8((ImageBorder_S32) border, found);
+			} else {
+				GImageMiscOps.fillUniform(input, rand, -2, 2);
+				ImplCensusTransformBorder.dense5x5_F32((ImageBorder_F32) border, found);
+			}
 
-		ImplCensusTransformBorder.dense5x5_U8((ImageBorder_S32)FactoryImageBorder.wrap(BorderType.EXTENDED,input),found);
-		CensusNaive.region5x5(input,expected);
+			CensusNaive.region5x5(input, expected);
 
-		BoofTesting.assertEqualsBorder(expected,found,0,2,2);
+			BoofTesting.assertEqualsBorder(expected, found, 0, 2, 2);
+		}
 	}
 
 	@Test
@@ -79,35 +96,50 @@ class TestImplCensusTransformBorder {
 		Random rand = new Random(234);
 		int r = 3;
 
-		GrayU8 input = new GrayU8(w,h);
-		GrayS64 found = new GrayS64(w,h);
-		GrayS64 expected = new GrayS64(w,h);
+		for(ImageType type : new ImageType[]{ImageType.SB_U8,ImageType.SB_F32}) {
+			ImageGray input = (ImageGray) type.createImage(w, h);
+			var found = new GrayS64(w, h);
+			var expected = new GrayS64(w, h);
+			ImageBorder border = FactoryImageBorder.wrap(BorderType.EXTENDED, input);
 
-		ImageMiscOps.fillUniform(input,rand,0,255);
+			FastQueue<Point2D_I32> samples = createSamples(r);
 
-		FastQueue<Point2D_I32> samples = createSamples(r);
+			if( type.getDataType().isInteger() ) {
+				GImageMiscOps.fillUniform(input, rand, 0, 255);
+				ImplCensusTransformBorder.sample_S64((ImageBorder_S32) border, r, samples, found);
+			} else {
+				GImageMiscOps.fillUniform(input, rand, -2, 2);
+				ImplCensusTransformBorder.sample_S64((ImageBorder_F32) border, r, samples, found);
+			}
 
-		ImplCensusTransformBorder.sample_S64((ImageBorder_S32)FactoryImageBorder.wrap(BorderType.EXTENDED,input),r,samples,found);
-		CensusNaive.sample(input,samples,expected);
+			CensusNaive.sample(input, samples, expected);
 
-		BoofTesting.assertEqualsBorder(expected,found,0,r,r);
+			BoofTesting.assertEqualsBorder(expected, found, 0, r, r);
+		}
 	}
 
 	@Test
 	void sample_compare5x5() {
 		Random rand = new Random(234);
 
-		GrayU8 input = new GrayU8(w,h);
-		InterleavedU16 found = new InterleavedU16(w,h,2);
-		InterleavedU16 expected = new InterleavedU16(w,h,2);
+		for(ImageType type : new ImageType[]{ImageType.SB_U8,ImageType.SB_F32}) {
+			ImageGray input = (ImageGray) type.createImage(w, h);
+			InterleavedU16 found = new InterleavedU16(w, h, 2);
+			InterleavedU16 expected = new InterleavedU16(w, h, 2);
+			ImageBorder border = FactoryImageBorder.wrap(BorderType.EXTENDED, input);
+			FastQueue<Point2D_I32> samples5x5 = createSamples(2);
 
-		ImageMiscOps.fillUniform(input,rand,0,255);
+			if( type.getDataType().isInteger() ) {
+				GImageMiscOps.fillUniform(input, rand, 0, 255);
+				ImplCensusTransformBorder.sample_IU16((ImageBorder_S32) border, 2, samples5x5, found);
+			} else {
+				GImageMiscOps.fillUniform(input, rand, -2, 2);
+				ImplCensusTransformBorder.sample_IU16((ImageBorder_F32) border, 2, samples5x5, found);
+			}
 
-		FastQueue<Point2D_I32> samples5x5 = createSamples(2);
+			CensusNaive.sample(input, samples5x5, expected);
 
-		ImplCensusTransformBorder.sample_IU16((ImageBorder_S32)FactoryImageBorder.wrap(BorderType.EXTENDED,input),2,samples5x5,found);
-		CensusNaive.sample(input,samples5x5,expected);
-
-		BoofTesting.assertEqualsBorder(expected,found,0.0,2,2);
+			BoofTesting.assertEqualsBorder(expected, found, 0.0, 2, 2);
+		}
 	}
 }
