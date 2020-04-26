@@ -97,6 +97,9 @@ public class ThresholdControlPanel extends StandardAlgConfigPanel
 		this.maxGrayLevels = configThreshold.maxPixelValue;
 		this.thresholdLocalBlocks = configThreshold.thresholdFromLocalBlocks;
 
+		// hide the histogram if it's not added
+		histogramHolder.setMaximumSize(new Dimension(1,1));
+
 		if( configThreshold instanceof ConfigThresholdLocalOtsu ) {
 			otsuTuning = (int)((ConfigThresholdLocalOtsu)configThreshold).tuning;
 			useOtsu2 = ((ConfigThresholdLocalOtsu)configThreshold).useOtsu2;

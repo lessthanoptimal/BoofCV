@@ -27,7 +27,6 @@ import boofcv.gui.feature.ControlPanelPointDetector;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
-import javax.annotation.Nullable;
 import javax.swing.*;
 
 /**
@@ -36,8 +35,8 @@ import javax.swing.*;
  * @author Peter Abeles
  */
 public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
-	public final ConfigPKlt configKlt;
-	public final ConfigPointDetector configDetect;
+	public ConfigPKlt configKlt;
+	public ConfigPointDetector configDetect ;
 
 	private final Listener listener;
 
@@ -49,33 +48,25 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 	private final JSpinner spinnerForwardsBackwards;
 	private final ControlPanelPointDetector controlDetector;
 
-	/**
-	 * Constructor that uses default settings
-	 */
 	public ControlPanelPointTrackerKlt(Listener listener) {
-		this(listener, new ConfigPointDetector(), new ConfigPKlt());
+		this(listener,new ConfigPointDetector(),ConfigPKlt.levels(4));
 	}
 
-	/**
-	 * Constructor with initial configurations
-	 *
-	 * @param listener Listener for changes
-	 * @param configDetect configuration for the detector
-	 * @param configKlt Initial configuration for tracker
-	 */
-	public ControlPanelPointTrackerKlt(Listener listener, @Nullable ConfigPointDetector configDetect, ConfigPKlt configKlt ) {
+	public ControlPanelPointTrackerKlt(Listener listener, ConfigPointDetector configDetect, ConfigPKlt configKlt ) {
 		this.listener = listener;
 		this.configDetect = configDetect;
 		this.configKlt = configKlt;
 
-		spinnerLevels = spinner(configKlt.pyramidLevels.numLevelsRequested,1,20,1);
-		checkPruneClose = checkbox("Prune Close", configKlt.pruneClose,"If true then tracks which are clustered close to each other are pruned");
-		spinnerIterations = spinner(configKlt.config.maxIterations,1,500,1);
-		spinnerMaxError = spinner(configKlt.config.maxPerPixelError,0.0,255.0,5.0);
-		spinnerDescRadius = spinner(configKlt.templateRadius,1,100,1);
-		spinnerForwardsBackwards = spinner(configKlt.toleranceFB,-1,100.0,1.0);
+		initializeConfiguration();
+
+		spinnerLevels = spinner(this.configKlt.pyramidLevels.numLevelsRequested,1,20,1);
+		checkPruneClose = checkbox("Prune Close", this.configKlt.pruneClose,"If true then tracks which are clustered close to each other are pruned");
+		spinnerIterations = spinner(this.configKlt.config.maxIterations,1,500,1);
+		spinnerMaxError = spinner(this.configKlt.config.maxPerPixelError,0.0,255.0,5.0);
+		spinnerDescRadius = spinner(this.configKlt.templateRadius,1,100,1);
+		spinnerForwardsBackwards = spinner(this.configKlt.toleranceFB,-1,100.0,1.0);
 		if( configDetect != null ) {
-			controlDetector = new ControlPanelPointDetector(configDetect, listener::changedPointTrackerKlt);
+			controlDetector = new ControlPanelPointDetector(this.configDetect, listener::changedPointTrackerKlt);
 			controlDetector.setBorder(BorderFactory.createTitledBorder("Detect"));
 		} else {
 			controlDetector = null;
@@ -90,6 +81,13 @@ public class ControlPanelPointTrackerKlt extends StandardAlgConfigPanel {
 		if( isConfigureDetector() ) {
 			add(controlDetector);
 		}
+	}
+
+	/**
+	 * Called before the controls are initialized to let one adjust the controls
+	 */
+	protected void initializeConfiguration() {
+
 	}
 
 	public boolean isConfigureDetector() { return controlDetector != null; }

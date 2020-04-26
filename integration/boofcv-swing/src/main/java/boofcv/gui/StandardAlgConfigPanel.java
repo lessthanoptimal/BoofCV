@@ -59,7 +59,7 @@ public class StandardAlgConfigPanel extends JPanel implements ActionListener, Ch
 				return getPreferredSize();
 			}
 		};
-		hack.add(BorderLayout.CENTER,panel);
+		hack.add(panel,BorderLayout.CENTER);
 		return hack;
 	}
 

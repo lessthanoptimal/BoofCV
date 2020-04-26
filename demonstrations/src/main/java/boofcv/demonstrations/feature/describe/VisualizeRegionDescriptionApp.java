@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -156,12 +156,10 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>>
 	}
 
 	class Controls extends StandardAlgConfigPanel implements ActionListener {
-		JComboBox<String> comboDescribe;
-
 		int selectedDescriptor = 0;
+		JComboBox<String> comboDescribe = combo(selectedDescriptor, "SURF-S", "SURF-S Color", "SIFT", "BRIEF", "BRIEFSO", "Pixel 5x5", "NCC 5x5");
 
 		Controls() {
-			comboDescribe = combo(selectedDescriptor, "SURF-S", "SURF-S Color", "SIFT", "BRIEF", "BRIEFSO", "Pixel 5x5", "NCC 5x5");
 			addAlignLeft(comboDescribe);
 		}
 
@@ -182,7 +180,7 @@ public class VisualizeRegionDescriptionApp <T extends ImageGray<T>>
 		inputs.add(new PathLabel("Forest",UtilIO.pathExample("scale/rainforest_01.jpg")));
 
 		SwingUtilities.invokeLater(()->{
-			VisualizeRegionDescriptionApp app = new VisualizeRegionDescriptionApp(inputs,GrayF32.class);
+			var app = new VisualizeRegionDescriptionApp<>(inputs,GrayF32.class);
 
 			// Processing time takes a bit so don't open right away
 			app.openExample(inputs.get(0));

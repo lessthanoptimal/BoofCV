@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -83,6 +83,7 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		thresholdPanel = configThreshold == null ?
 				new ThresholdControlPanel(owner) :
 				new ThresholdControlPanel(owner,configThreshold);
+		thresholdPanel.setBorder(BorderFactory.createEmptyBorder());
 
 		spinnerMinContourSize = configLength(configPolygon.detector.minimumContour,5,99999);
 
@@ -109,6 +110,7 @@ public class DetectBlackPolygonControlPanel extends StandardAlgConfigPanel
 		spinnerMaxCornerChange = spinner(refineGray.maxCornerChangePixel, 0.0, 50.0, 1.0,1,3);
 
 		StandardAlgConfigPanel refinePanel = new StandardAlgConfigPanel();
+		refinePanel.setBorder(BorderFactory.createEmptyBorder());
 		refinePanel.addAlignLeft(setRemoveBias);
 		refinePanel.addAlignLeft(setRefineContour);
 		refinePanel.addAlignLeft(setRefineGray);

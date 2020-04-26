@@ -22,14 +22,16 @@ import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.alg.tracker.klt.ConfigPKlt;
+import boofcv.demonstrations.sfm.d3.ControlPanelDdaTracker;
+import boofcv.demonstrations.sfm.d3.ControlPanelHybridTracker;
 import boofcv.demonstrations.sfm.d3.ControlPanelPointTrackerKlt;
+import boofcv.demonstrations.sfm.d3.ControlPanelPointTrackers;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -43,18 +45,14 @@ public class TrackerPointControlPanel
 		implements ActionListener , ChangeListener
 {
 	public Colorization colorization = Colorization.TRACK_ID;
-	public int algorithm=0;
 	public int videoPeriod = 33;
 	public int minFeatures = 600;
-	public int maxFeatures = 1000;
 	public int minDuration = 2;
 	public Marker markerType = Marker.Dot;
 	public boolean paused = false;
 	public boolean step = false;
 
-	// algorithm specific controls
-	public ControlPanelPointTrackerKlt controlKlt;
-	public ControlsGeneric controlsGeneric = new ControlsGeneric();
+	public
 
 	JLabel labelSize = new JLabel();
 	JLabel labelFrame = new JLabel();
@@ -63,20 +61,16 @@ public class TrackerPointControlPanel
 	JLabel labelDuration50 = new JLabel();
 	JLabel labelDuration95 = new JLabel();
 
-	// Which algorithm to run
-	JComboBox<String> comboAlg = combo(algorithm,"KLT","ST-BRIEF","ST-NCC","FH-SURF","ST-SURF-KLT","FH-SURF-KLT");
+	ControlPanelPointTrackers controlTracker;
 	JComboBox<String> comboColor = combo(colorization.ordinal(),(Object[])Colorization.values());
 
 	// Spawn features when tracks drop below this value
 	JSpinner spinnerMinFeats = spinner(minFeatures,50,10000,10);
-	JSpinner spinnerMaxFeats = spinner(maxFeatures,50,10000,10);
 
 	JTextArea textArea = new JTextArea();
 
 	JButton buttonPause = new JButton("Pause");
 	JButton buttonStep = new JButton("Step");
-
-	JPanel controlsPanel = new JPanel(new BorderLayout());
 
 	JSpinner spinnerTargetPeriod = spinner(videoPeriod,0,1000,5);
 	JSpinner spinnerMinDuration = spinner(minDuration,0,1000,1);
@@ -87,8 +81,40 @@ public class TrackerPointControlPanel
 	public TrackerPointControlPanel( Listener listener ) {
 		this.listener = listener;
 
-		controlKlt = new ControlPanelPointTrackerKlt(listener::handleAlgorithmUpdated,
-				createKltDetectConfig(maxFeatures),createKltConfig());
+		int maxFeatures = 800;
+		int detRadius = 5;
+
+		var controlKlt = new ControlPanelPointTrackerKlt(listener::handleAlgorithmUpdated) {
+			@Override
+			public void initializeConfiguration() {
+				configDetect.general.maxFeatures = maxFeatures;
+				configDetect.general.radius = detRadius;
+				configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+				configKlt.templateRadius = 3;
+				super.initializeConfiguration();
+			}
+		};
+		var controlDda = new ControlPanelDdaTracker(listener::handleAlgorithmUpdated) {
+			@Override
+			public void initializeControlsGUI() {
+				configPointDetector.general.maxFeatures = maxFeatures;
+				configPointDetector.general.radius = detRadius;
+				super.initializeControlsGUI();
+			}
+		};
+		var controlHybrid = new ControlPanelHybridTracker(listener::handleAlgorithmUpdated) {
+			@Override
+			public void initializeControlsGUI() {
+				configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+				configKlt.templateRadius = 3;
+
+				configPointDetector.general.radius = detRadius;
+				configPointDetector.general.maxFeatures = maxFeatures;
+				super.initializeControlsGUI();
+			}
+		};
+
+		controlTracker = new ControlPanelPointTrackers(listener::handleAlgorithmUpdated,controlKlt,controlDda,controlHybrid);
 
 		textArea.setEditable(false);
 		textArea.setWrapStyleWord(true);
@@ -107,11 +133,6 @@ public class TrackerPointControlPanel
 			}
 		});
 
-		controlKlt.setMaximumSize(controlKlt.getPreferredSize());
-		controlsGeneric.setMaximumSize(controlsGeneric.getPreferredSize());
-
-		updateAlgorithmControls();
-
 		addLabeled(labelSize,"Size");
 		addLabeled(labelFrame,"Frame");
 		addLabeled(labelTimeMS,"Track Speed");
@@ -122,32 +143,13 @@ public class TrackerPointControlPanel
 		addLabeled(comboMarker,"Markers");
 		addLabeled(comboColor,"Colors");
 		addLabeled(spinnerMinDuration,"Min. Duration");
-		addLabeled(comboAlg,"Tracker");
 		addLabeled(spinnerMinFeats,"Min. Feats");
-		addLabeled(spinnerMaxFeats,"Max. Feats");
-		add(controlsPanel);
+		add(controlTracker);
 		add(textArea);
 		addVerticalGlue();
 		add(createHorizontalPanel(buttonStep,buttonPause));
 	}
 
-	public void updateAlgorithmControls() {
-		JPanel selected;
-		switch( algorithm ) {
-			case 0: selected = controlKlt; break;
-			default: selected = controlsGeneric; break;
-		}
-		// see if the this is already the active controls
-		for (int i = 0; i < controlsPanel.getComponentCount(); i++) {
-			if( controlsPanel.getComponent(i) == selected ) {
-				return;
-			}
-		}
-
-		controlsPanel.removeAll();
-		controlsPanel.add(BorderLayout.CENTER,selected);
-		controlsPanel.repaint();
-	}
 
 	public void setPauseState( boolean paused ) {
 		this.paused = paused;
@@ -183,11 +185,7 @@ public class TrackerPointControlPanel
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == comboAlg ) {
-			algorithm = comboAlg.getSelectedIndex();
-			updateAlgorithmControls();
-			listener.handleAlgorithmUpdated();
-		} else if( e.getSource() == comboColor ) {
+		if( e.getSource() == comboColor ) {
 			colorization = Colorization.values()[comboColor.getSelectedIndex()];
 			listener.handleVisualizationUpdated();
 		} else if( e.getSource() == comboMarker ) {
@@ -200,9 +198,6 @@ public class TrackerPointControlPanel
 	public void stateChanged(ChangeEvent e) {
 		if( e.getSource() == spinnerMinFeats ) {
 			minFeatures = ((Number)spinnerMinFeats.getValue()).intValue();
-		} else if( e.getSource() == spinnerMaxFeats ) {
-			maxFeatures = ((Number)spinnerMaxFeats.getValue()).intValue();
-			listener.handleAlgorithmUpdated();
 		} else if( e.getSource() == spinnerMinDuration ) {
 			minDuration = ((Number) spinnerMinDuration.getValue()).intValue();
 			listener.handleVisualizationUpdated();
@@ -213,7 +208,7 @@ public class TrackerPointControlPanel
 	}
 
 	class ControlsGeneric extends StandardAlgConfigPanel implements ChangeListener, ActionListener {
-		public ConfigGeneralDetector detector = new ConfigGeneralDetector(maxFeatures,4,3.0f);
+		public ConfigGeneralDetector detector = new ConfigGeneralDetector(1000,4,3.0f);
 		private JSpinner spinnerDetectRadius = spinner(detector.radius,1,500,1);
 
 		public ControlsGeneric() {

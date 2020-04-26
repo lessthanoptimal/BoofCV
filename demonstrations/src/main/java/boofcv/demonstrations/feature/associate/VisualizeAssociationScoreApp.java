@@ -244,8 +244,8 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 		JLabel labelSize = new JLabel();
 
 		// Containers for different sets of controls
-		JPanel panelDetector = new JPanel();
-		JPanel panelDescriptor = new JPanel();
+		JPanel panelDetector = new JPanel(new BorderLayout());
+		JPanel panelDescriptor = new JPanel(new BorderLayout());
 
 		// selects which image to view
 		JComboBox scoreTypes = new JComboBox();
@@ -289,14 +289,14 @@ public class VisualizeAssociationScoreApp<T extends ImageGray<T>, D extends Imag
 
 		private void handleDetectorChanged() {
 			panelDetector.removeAll();
-			panelDetector.add(fillHorizontally(getDetectorPanel()));
+			panelDetector.add(getDetectorPanel(), BorderLayout.CENTER);
 			panelDetector.invalidate();
 			handleControlsUpdated();
 		}
 
 		private void handleDescriptorChanged() {
 			panelDescriptor.removeAll();
-			panelDescriptor.add(fillHorizontally(getDescriptorPanel()));
+			panelDescriptor.add(getDescriptorPanel(), BorderLayout.CENTER);
 			panelDescriptor.invalidate();
 			handleControlsUpdated();
 		}

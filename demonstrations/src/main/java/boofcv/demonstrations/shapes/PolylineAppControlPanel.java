@@ -18,13 +18,11 @@
 
 package boofcv.demonstrations.shapes;
 
+import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.ConnectRule;
+import lombok.Getter;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
 import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
@@ -33,7 +31,6 @@ import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
  * @author Peter Abeles
  */
 public class PolylineAppControlPanel extends DetectBlackShapePanel
-		implements ActionListener, ChangeListener
 {
 	ShapeGuiListener owner;
 
@@ -48,8 +45,8 @@ public class PolylineAppControlPanel extends DetectBlackShapePanel
 	boolean bShowLines = true;
 	boolean bShowContour = false;
 
-	ThresholdControlPanel threshold;
-	PolylineControlPanel polylinePanel;
+	@Getter ThresholdControlPanel threshold;
+	@Getter PolylineControlPanel polylinePanel;
 
 	JSpinner spinnerContourConnect;
 	JSpinner spinnerMinContourSize;
@@ -62,91 +59,64 @@ public class PolylineAppControlPanel extends DetectBlackShapePanel
 		this.owner = owner;
 
 		this.polylinePanel = new PolylineControlPanel(owner);
+		this.polylinePanel.setBorder(BorderFactory.createTitledBorder("Polyline"));
 
-		imageView = new JComboBox();
-		imageView.addItem("Input");
-		imageView.addItem("Binary");
-		imageView.addItem("Black");
-		imageView.addActionListener(this);
-		imageView.setMaximumSize(imageView.getPreferredSize());
-
-		selectZoom = new JSpinner(new SpinnerNumberModel(1,MIN_ZOOM,MAX_ZOOM,1));
-		selectZoom.addChangeListener(this);
-		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
-
-		spinnerContourConnect = spinner(connectRule.ordinal(), ConnectRule.values());
-
-		showCorners = new JCheckBox("Corners");
-		showCorners.addActionListener(this);
-		showCorners.setSelected(bShowCorners);
-		showLines = new JCheckBox("Lines");
-		showLines.setSelected(bShowLines);
-		showLines.addActionListener(this);
-		showContour = new JCheckBox("Contour");
-		showContour.addActionListener(this);
-		showContour.setSelected(bShowContour);
+		imageView = combo(0,"Input","Binary","Black");
+		selectZoom = spinner(1,MIN_ZOOM,MAX_ZOOM,1);
+		showCorners = checkbox("Corners",bShowCorners,"Show corners in the polyline");
+		showLines = checkbox("Lines",bShowLines,"Show lines");
+		showContour = checkbox("Contour",bShowContour,"Show the input contours used to compute polyline");
 
 		threshold = new ThresholdControlPanel(owner);
+		threshold.setBorder(BorderFactory.createTitledBorder("Threshold"));
 
-		spinnerMinContourSize = new JSpinner(new SpinnerNumberModel(minimumContourSize,
-				5,10000,2));
-		spinnerMinContourSize.setMaximumSize(spinnerMinContourSize.getPreferredSize());
-		spinnerMinContourSize.addChangeListener(this);
+		spinnerMinContourSize = spinner(minimumContourSize,5,10000,2);
+		spinnerContourConnect = spinner(connectRule.ordinal(), ConnectRule.values());
+
+		var contourPanel = new StandardAlgConfigPanel();
+		contourPanel.setBorder(BorderFactory.createTitledBorder("Contour"));
+		contourPanel.addLabeled(spinnerMinContourSize, "Min Size","Minimum number of pixels in a contour allowed");
+		contourPanel.addLabeled(spinnerContourConnect, "Connect Rule","Connectivity rule between pixels in the contour");
 
 		addLabeled(processingTimeLabel,"Time (ms)");
-		addLabeled(imageSizeLabel,"Size");
-		addLabeled(imageView, "View: ");
-		addLabeled(selectZoom,"Zoom");
+		addLabeled(imageSizeLabel,"Size","Size of input image");
+		addLabeled(imageView, "View","Which view to show in the main image panel");
+		addLabeled(selectZoom,"Zoom","Zoom factor of image panel");
 		addAlignLeft(showCorners);
 		addAlignLeft(showLines);
 		addAlignLeft(showContour);
-		add(threshold);
-		addLabeled(spinnerMinContourSize, "Min Contour Size: ");
-		addLabeled(spinnerContourConnect, "Contour Connect: ");
-		addCenterLabel("Polyline");
 		add(polylinePanel);
+		add(contourPanel);
+		add(threshold);
 		addVerticalGlue();
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == imageView ) {
+	public void controlChanged(final Object source) {
+		if( source == imageView ) {
 			selectedView = imageView.getSelectedIndex();
 			owner.viewUpdated();
-		} else if( e.getSource() == showCorners ) {
+		} else if( source == showCorners ) {
 			bShowCorners = showCorners.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == showLines ) {
+		} else if( source == showLines ) {
 			bShowLines = showLines.isSelected();
 			owner.viewUpdated();
-		} else if( e.getSource() == showContour ) {
+		} else if( source == showContour ) {
 			bShowContour = showContour.isSelected();
 			owner.viewUpdated();
-		}
-	}
-
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		if( e.getSource() == selectZoom ) {
+		} else if( source == selectZoom ) {
 			zoom = ((Number) selectZoom.getValue()).doubleValue();
 			owner.viewUpdated();
 			return;
-		} else if( e.getSource() == spinnerMinContourSize ) {
+		} else if( source == spinnerMinContourSize ) {
 			minimumContourSize = ((Number) spinnerMinContourSize.getValue()).intValue();
-		} else if( e.getSource() == spinnerContourConnect ) {
+		} else if( source == spinnerContourConnect ) {
 			connectRule = (ConnectRule)spinnerContourConnect.getValue();
 		} else {
 			throw new RuntimeException("Egads");
 		}
 
 		owner.configUpdate();
-	}
-
-	public ThresholdControlPanel getThreshold() {
-		return threshold;
-	}
-
-	public PolylineControlPanel getPolylinePanel() {
-		return polylinePanel;
 	}
 }

@@ -23,6 +23,7 @@ import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 
@@ -48,15 +49,15 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 	Listener listener;
 
 	public ControlPanelPointTrackers( Listener listener ,
-									  ControlPanelPointTrackerKlt klt,
-									  ControlPanelDdaTracker dda,
-									  ControlPanelHybridTracker hybrid ) {
+									  @Nullable ControlPanelPointTrackerKlt klt,
+									  @Nullable ControlPanelDdaTracker dda,
+									  @Nullable ControlPanelHybridTracker hybrid ) {
 		setBorder(BorderFactory.createEmptyBorder());
 		this.listener = listener;
 
-		controlKlt = klt;
-		controlDda = dda;
-		controlHybrid = hybrid;
+		controlKlt = klt != null ? klt : new ControlPanelPointTrackerKlt(listener::changePointTracker);
+		controlDda = dda != null ? dda : new ControlPanelDdaTracker(listener::changePointTracker);
+		controlHybrid = hybrid != null ? hybrid : new ControlPanelHybridTracker(listener::changePointTracker);
 
 		int selected = selectedFamily;
 		selectedFamily = -1; // so that it will update
@@ -67,9 +68,7 @@ public class ControlPanelPointTrackers extends StandardAlgConfigPanel {
 	}
 
 	public ControlPanelPointTrackers( Listener listener ) {
-		this(listener,new ControlPanelPointTrackerKlt(listener::changePointTracker),
-				new ControlPanelDdaTracker(listener::changePointTracker),
-				new ControlPanelHybridTracker(listener::changePointTracker));
+		this(listener,null,null,null);
 	}
 
 	public <T extends ImageBase<T>>

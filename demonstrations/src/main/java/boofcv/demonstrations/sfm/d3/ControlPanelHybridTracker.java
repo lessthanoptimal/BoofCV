@@ -41,8 +41,8 @@ public class ControlPanelHybridTracker extends ControlPanelDetDescAssoc {
 	int selectedSelection = 0;
 	JComboBox<String> spinnerSelection = combo(selectedSelection,"KLT","Detect","Describe","Associate");
 
-	ControlPanelPointTrackerKlt controlKlt;
-	ConfigPKlt configKlt = new ConfigPKlt();
+	public ControlPanelPointTrackerKlt controlKlt;
+	protected ConfigPKlt configKlt = new ConfigPKlt();
 
 	// Container that specific controls are inserted into
 	private JPanel controlPanel = new JPanel(new BorderLayout());

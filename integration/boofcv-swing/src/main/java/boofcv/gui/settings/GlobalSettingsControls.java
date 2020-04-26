@@ -98,18 +98,28 @@ public class GlobalSettingsControls extends StandardAlgConfigPanel implements Ac
 
 		dialog = new JDialog(owner,"Demonstration Settings", Dialog.ModalityType.APPLICATION_MODAL);
 
-		dialog.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				handleCancel();
-			}
-		});
-		dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		dialog.getContentPane().setLayout(new BorderLayout());
-		dialog.getContentPane().add(this, BorderLayout.CENTER);
-		dialog.pack();
-		dialog.setLocationRelativeTo(parent);
-		dialog.setVisible(true);
+		try {
+			dialog.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent e) {
+					handleCancel();
+				}
+			});
+			dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+			dialog.getContentPane().setLayout(new BorderLayout());
+			dialog.getContentPane().add(this, BorderLayout.CENTER);
+			dialog.pack();
+			dialog.setLocationRelativeTo(parent);
+			dialog.setVisible(true);
+		} catch( RuntimeException e ) {
+			e.printStackTrace();
+			System.err.println("Handling exception by resetting LAF");
+			// if something went horribly wrong here it's probably look and feel related. Revert to the default
+			settings.theme = GlobalDemoSettings.ThemesUI.DEFAULT;
+			settings.changeTheme();
+			changedTheme = true;
+		}
+
 		// should block at this point
 		dialog.dispose();
 		dialog = null;

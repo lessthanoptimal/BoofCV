@@ -277,9 +277,9 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 		JLabel labelSize = new JLabel();
 
 		// Containers for different sets of controls
-		JPanel panelDetector = new JPanel();
-		JPanel panelDescriptor = new JPanel();
-		JPanel panelAssociate = new JPanel();
+		JPanel panelDetector = new JPanel(new BorderLayout());
+		JPanel panelDescriptor = new JPanel(new BorderLayout());
+		JPanel panelAssociate = new JPanel(new BorderLayout());
 
 		public AssociateControls() {
 
@@ -319,19 +319,19 @@ public class VisualizeAssociationMatchesApp<T extends ImageGray<T>, D extends Im
 
 		private void handleDetectorChanged() {
 			panelDetector.removeAll();
-			panelDetector.add(fillHorizontally(getDetectorPanel()));
+			panelDetector.add(getDetectorPanel(),BorderLayout.CENTER);
 			panelDetector.invalidate();
 		}
 
 		private void handleDescriptorChanged() {
 			panelDescriptor.removeAll();
-			panelDescriptor.add(fillHorizontally(getDescriptorPanel()));
+			panelDescriptor.add(getDescriptorPanel(),BorderLayout.CENTER);
 			panelDescriptor.invalidate();
 		}
 
 		private void handleAssociatorChanged() {
 			panelAssociate.removeAll();
-			panelAssociate.add(fillHorizontally(getAssociatePanel()));
+			panelAssociate.add(getAssociatePanel(),BorderLayout.CENTER);
 			panelAssociate.invalidate();
 		}
 

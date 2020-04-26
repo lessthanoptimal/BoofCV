@@ -21,56 +21,38 @@ package boofcv.demonstrations.binary;
 import boofcv.demonstrations.shapes.ThresholdControlPanel;
 import boofcv.gui.StandardAlgConfigPanel;
 import boofcv.struct.ConnectRule;
+import lombok.Getter;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
+import static boofcv.gui.BoofSwingUtil.MAX_ZOOM;
+import static boofcv.gui.BoofSwingUtil.MIN_ZOOM;
 
 /**
  * @author Peter Abeles
  */
 public class ContourControlPanel extends StandardAlgConfigPanel
-	implements ActionListener, ChangeListener
 {
+	public int selectedView;
+	public double zoom = 1.0;
+	@Getter private ConnectRule connectRule = ConnectRule.FOUR;
 
 	VisualizeBinaryContourApp<?> owner;
 
-	ThresholdControlPanel threshold;
+	@Getter ThresholdControlPanel threshold;
 
 	// selects which image to view
-	JComboBox imageView;
+	JComboBox<String> imageView = combo(selectedView,"Input","Binary","Black");
 	// connection rule
-	JComboBox connectCombo;
-
-	JSpinner selectZoom;
-
-	private ConnectRule connectRule = ConnectRule.FOUR;
-	public int selectedView;
-	public double zoom = 1.0;
+	JComboBox<String> connectCombo = combo(connectRule.ordinal(),"4-Connect","8-Connect");
+	// Image scale
+	JSpinner selectZoom = spinner(zoom,MIN_ZOOM,MAX_ZOOM,1);
 
 	public ContourControlPanel(VisualizeBinaryContourApp<?> owner) {
 		this.owner = owner;
 
-		imageView = new JComboBox();
-		imageView.addItem("Input");
-		imageView.addItem("Binary");
-		imageView.addItem("Black");
-		imageView.addActionListener(this);
-		imageView.setMaximumSize(imageView.getPreferredSize());
-
-		connectCombo = new JComboBox();
-		connectCombo.addItem("4-Connect");
-		connectCombo.addItem("8-Connect");
-		connectCombo.addActionListener(this);
-		connectCombo.setMaximumSize(connectCombo.getPreferredSize());
-
-		selectZoom = new JSpinner(new SpinnerNumberModel(zoom,0.1,50,1));
-		selectZoom.addChangeListener(this);
-		selectZoom.setMaximumSize(selectZoom.getPreferredSize());
-
 		threshold = new ThresholdControlPanel(owner);
+		threshold.setMaximumSize(threshold.getPreferredSize());
 
 		addLabeled(imageView,"View");
 		addLabeled(selectZoom,"Zoom");
@@ -79,30 +61,17 @@ public class ContourControlPanel extends StandardAlgConfigPanel
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		if( e.getSource() == connectCombo ) {
+	public void controlChanged(final Object source) {
+		if( source == connectCombo ) {
 			connectRule = ConnectRule.values()[connectCombo.getSelectedIndex()];
 			owner.contourAlgUpdated();
-		} else if( e.getSource() == imageView ) {
+		} else if( source == imageView ) {
 			selectedView = imageView.getSelectedIndex();
 			owner.viewUpdated();
-		}
-	}
-
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		if (e.getSource() == selectZoom) {
+		} else if ( source == selectZoom) {
 			zoom = ((Number) selectZoom.getValue()).doubleValue();
 			owner.viewUpdated();
 		}
-	}
-
-	public ThresholdControlPanel getThreshold() {
-		return threshold;
-	}
-
-	public ConnectRule getConnectRule() {
-		return connectRule;
 	}
 
 	public void setZoom(double zoom) {

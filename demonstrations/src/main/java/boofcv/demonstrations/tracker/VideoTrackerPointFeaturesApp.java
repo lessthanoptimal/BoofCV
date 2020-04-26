@@ -18,12 +18,9 @@
 
 package boofcv.demonstrations.tracker;
 
-import boofcv.abst.feature.detect.interest.ConfigFastHessian;
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.demonstrations.tracker.TrackerPointControlPanel.Marker;
-import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.feature.VisualizeFeatures;
@@ -115,46 +112,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 			}
 		});
 
-		setAlgorithm(0);
-	}
-
-	public void setAlgorithm( int which ) {
-
-		final int maxFeatures = controlPanel.maxFeatures;
-
-		controlPanel.controlKlt.configDetect.general.maxFeatures = maxFeatures;
-		controlPanel.controlsGeneric.detector.maxFeatures = maxFeatures;
-
-
-		ConfigFastHessian configFH = new ConfigFastHessian();
-		configFH.maxFeaturesPerScale = 200;
-		configFH.extract.radius =  controlPanel.controlsGeneric.detector.radius;
-		configFH.extract.threshold = 15f;
-
-		switch( which ) {
-			case 0: tracker = FactoryPointTracker.klt(
-					controlPanel.controlKlt.configKlt,
-					controlPanel.controlKlt.configDetect,
-					imageType,null); break;
-
-			case 1: tracker = FactoryPointTracker.dda_ST_BRIEF(
-					200, new ConfigGeneralDetector(maxFeatures, 3, 1),
-					imageType, null); break;
-
-			case 2: tracker = FactoryPointTracker.dda_ST_NCC(new ConfigGeneralDetector(
-					maxFeatures, controlPanel.controlsGeneric.detector.radius, 2), 5, imageType, null); break;
-
-			case 3: tracker = FactoryPointTracker.dda_FH_SURF_Fast(
-					configFH, null, null, imageType); break;
-
-			case 4: tracker = FactoryPointTracker.combined_ST_SURF_KLT(
-					new ConfigGeneralDetector(maxFeatures,  controlPanel.controlsGeneric.detector.radius, 1),
-					controlPanel.controlKlt.configKlt, 50, null, null, imageType, null); break;
-
-			case 5: tracker = FactoryPointTracker.combined_FH_SURF_KLT(
-					controlPanel.controlKlt.configKlt, 50, configFH, null, null, imageType); break;
-		}
-		processingTime.reset();
+		tracker = controlPanel.controlTracker.createTracker(super.getImageType(0));
 	}
 
 	@Override
@@ -198,7 +156,7 @@ public class VideoTrackerPointFeaturesApp<I extends ImageGray<I>>
 	@Override
 	public void handleAlgorithmUpdated() {
 		synchronized (this) {
-			setAlgorithm(controlPanel.algorithm);
+			tracker = controlPanel.controlTracker.createTracker(super.getImageType(0));
 		}
 	}
 

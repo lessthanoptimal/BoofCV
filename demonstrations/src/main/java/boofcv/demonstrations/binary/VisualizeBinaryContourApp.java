@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -30,12 +30,13 @@ import boofcv.gui.BoofSwingUtil;
 import boofcv.gui.DemonstrationBase;
 import boofcv.gui.binary.VisualizeBinaryData;
 import boofcv.gui.image.ImageZoomPanel;
-import boofcv.gui.image.ShowImages;
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -65,6 +66,13 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 
 		guiImage = new VisualizePanel();
 		guiImage.setPreferredSize(new Dimension(800,800));
+
+		guiImage.getImagePanel().addMouseWheelListener(new MouseAdapter() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				controls.setZoom(BoofSwingUtil.mouseWheelImageZoom(controls.zoom,e));
+			}
+		});
 
 		add(BorderLayout.WEST, controls);
 		add(BorderLayout.CENTER, guiImage);
@@ -178,7 +186,6 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 
 				List<Contour> contours = BinaryImageOps.convertContours(contourAlg);
 
-				g2.setStroke(new BasicStroke(1));
 				VisualizeBinaryData.render(contours,Color.BLUE, Color.RED, 1.0,scale, g2);
 			}
 		}
@@ -191,12 +198,11 @@ public class VisualizeBinaryContourApp <T extends ImageGray<T>> extends Demonstr
 		examples.add("shapes/concave01.jpg");
 		examples.add("shapes/polygons01.jpg");
 
-		VisualizeBinaryContourApp app = new VisualizeBinaryContourApp(examples,ImageType.single(GrayF32.class));
+		SwingUtilities.invokeLater(()->{
+			VisualizeBinaryContourApp app = new VisualizeBinaryContourApp(examples, ImageType.single(GrayF32.class));
 
-		app.openFile(new File(examples.get(0)));
-
-		app.waitUntilInputSizeIsKnown();
-
-		ShowImages.showWindow(app,"Binary Contour Visualization",true);
+			app.openFile(new File(examples.get(0)));
+			app.display("Binary Contour Visualization");
+		});
 	}
 }

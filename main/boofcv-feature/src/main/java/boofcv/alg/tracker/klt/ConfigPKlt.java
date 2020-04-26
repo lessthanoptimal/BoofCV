@@ -59,6 +59,11 @@ public class ConfigPKlt implements Configuration
 		this.templateRadius = templateRadius;
 	}
 
+	public static ConfigPKlt levels( int levels ) {
+		ConfigPKlt config = new ConfigPKlt();
+		config.pyramidLevels = ConfigDiscreteLevels.levels(levels);
+		return config;
+	}
 
 	@Override
 	public void checkValidity() {

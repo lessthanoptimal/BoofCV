@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, Peter Abeles. All Rights Reserved.
+ * Copyright (c) 2011-2020, Peter Abeles. All Rights Reserved.
  *
  * This file is part of BoofCV (http://boofcv.org).
  *
@@ -52,11 +52,13 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 		extends DetectBlackShapeAppBase implements ShapeGuiListener
 {
 	DetectPolygonBinaryGrayRefine<T> detector;
+	DetectBlackPolygonAppControlPanel controlPanel = new DetectBlackPolygonAppControlPanel(this);
 
 	public DetectBlackPolygonApp(List<String> examples , Class<T> imageType) {
 		super(examples, imageType);
 
-		setupGui(new VisualizePanel(),new DetectBlackPolygonAppControlPanel(this));
+		controlPanel.polygonPanel.thresholdPanel.addHistogramGraph();
+		setupGui(new VisualizePanel(),controlPanel);
 	}
 
 	@Override
@@ -101,6 +103,8 @@ public class DetectBlackPolygonApp<T extends ImageGray<T>>
 //		System.out.println("processing image "+count++);
 		detector.process((T) input, binary);
 		detector.refineAll();
+
+		controlPanel.polygonPanel.thresholdPanel.updateHistogram(input);
 	}
 
 	class VisualizePanel extends ShapeVisualizePanel {
