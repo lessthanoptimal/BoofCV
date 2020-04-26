@@ -385,6 +385,10 @@ public class BoofSwingUtil {
 
 		Preferences prefs = Preferences.userRoot().node(preferenceName);
 		String encodedString = prefs.get(KEY_RECENT_FILES, "");
+		// See if recent file list exists, if not just return an empty list
+		if( encodedString.length() == 0 ) {
+			return new java.util.ArrayList<>();
+		}
 		try {
 			java.util.List<RecentFiles> results = new ArrayList<>();
 			java.util.List<Map<String,Object>> decoded = new Yaml().load(encodedString);
