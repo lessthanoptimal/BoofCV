@@ -188,8 +188,8 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		Set<String> configuration = new HashSet<>();
 		configuration.add(VisualOdometry.VERBOSE_RUNTIME);
 //		configuration.add(VisualOdometry.VERBOSE_TRACKING);
-
 		alg.setVerbose(System.out,configuration);
+
 		return alg;
 	}
 
@@ -206,6 +206,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 	private static ConfigPointDetector createConfigKltDetect() {
 		var config = new ConfigPointDetector();
 		config.type = PointDetectorTypes.SHI_TOMASI;
+		config.shiTomasi.radius = 3;
 		config.general.threshold = 1.0f;
 		config.general.radius = 5;
 		config.general.maxFeatures = 300;

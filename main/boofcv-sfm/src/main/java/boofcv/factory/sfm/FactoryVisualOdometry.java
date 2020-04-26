@@ -172,51 +172,63 @@ public class FactoryVisualOdometry {
 		return new MonoOverhead_to_MonocularPlaneVisualOdometry<>(alg, imageType);
 	}
 
+	/**
+	 * Stereo vision based visual odometry algorithm which runs a sparse feature tracker in the left camera and
+	 * estimates the range of tracks once when first detected using disparity between left and right cameras.
+	 *
+	 * @see VisOdomPixelDepthPnP
+	 *
+	 * @param configVO Configuration for visual odometry
+	 * @param sparseDisparity Estimates the 3D location of features
+	 * @param tracker Image point feature tracker.
+	 * @param imageType Type of image being processed.
+	 * @return StereoVisualOdometry
+	 */
 	public static <T extends ImageGray<T>>
-	StereoVisualOdometry<T> stereoDepthPnP( ConfigVisOdomDepthPnP config ,
+	StereoVisualOdometry<T> stereoDepthPnP( ConfigVisOdomDepthPnP configVO ,
 											StereoDisparitySparse<T> sparseDisparity ,
 											PointTracker<T> tracker ,
 											Class<T> imageType)
 	{
-		if( config == null )
-			config = new ConfigVisOdomDepthPnP();
+		if( configVO == null )
+			configVO = new ConfigVisOdomDepthPnP();
 
 		// Range from sparse disparity
-		StereoSparse3D<T> pixelTo3D = new StereoSparse3D<>(sparseDisparity, imageType);
+		var pixelTo3D = new StereoSparse3D<>(sparseDisparity, imageType);
 
-		Estimate1ofPnP estimator = FactoryMultiView.pnp_1(config.pnp,-1,1);
+		Estimate1ofPnP estimator = FactoryMultiView.pnp_1(configVO.pnp,-1,1);
 		final DistanceFromModelMultiView<Se3_F64,Point2D3D> distance = new PnPDistanceReprojectionSq();
 
-		ModelManagerSe3_F64 manager = new ModelManagerSe3_F64();
+		var manager = new ModelManagerSe3_F64();
 		EstimatorToGenerator<Se3_F64,Point2D3D> generator = new EstimatorToGenerator<>(estimator);
 
-		// 1/2 a pixel tolerance for RANSAC inliers
-		double ransacTOL = config.ransacInlierTol * config.ransacInlierTol;
+		// Need to square the error RANSAC inliers
+		double ransacTOL = configVO.ransacInlierTol * configVO.ransacInlierTol;
 
-		ModelMatcher<Se3_F64, Point2D3D> motion =
-				new Ransac<>(config.ransacSeed, manager, generator, distance, config.ransacIterations, ransacTOL);
+		var motion = new Ransac<>(configVO.ransacSeed, manager, generator, distance,
+				configVO.ransacIterations, ransacTOL);
 
 		RefinePnP refine = null;
 
-		if( config.pnpRefineIterations > 0 ) {
-			refine = FactoryMultiView.pnpRefine(1e-12,config.pnpRefineIterations);
+		if( configVO.pnpRefineIterations > 0 ) {
+			refine = FactoryMultiView.pnpRefine(1e-12,configVO.pnpRefineIterations);
 		}
 
-		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(config.sba);
-		bundleAdjustment.configure(1e-3,1e-3,config.bundleIterations);
+		BundleAdjustment<SceneStructureMetric> bundleAdjustment = FactoryMultiView.bundleSparseMetric(configVO.sba);
+		bundleAdjustment.configure(1e-3,1e-3,configVO.bundleIterations);
 
 		VisOdomKeyFrameManager keyframe;
-		switch (config.keyframes.type) {
-			case MAX_GEO: keyframe = new MaxGeoKeyFrameManager(config.keyframes.geoMinCoverage);break;
-			case TICK_TOCK: keyframe = new TickTockKeyFrameManager(config.keyframes.tickPeriod);break;
-			default: throw new IllegalArgumentException("Unknown type "+config.keyframes.type);
+		switch (configVO.keyframes.type) {
+			case MAX_GEO: keyframe = new MaxGeoKeyFrameManager(configVO.keyframes.geoMinCoverage);break;
+			case TICK_TOCK: keyframe = new TickTockKeyFrameManager(configVO.keyframes.tickPeriod);break;
+			default: throw new IllegalArgumentException("Unknown type "+configVO.keyframes.type);
 		}
 
 		VisOdomPixelDepthPnP<T> alg = new VisOdomPixelDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
 		alg.setFrameManager(keyframe);
-		alg.setThresholdRetireTracks(config.dropOutlierTracks);
-		alg.getBundle().getSelectTracks().maxFeaturesPerFrame = config.bundleMaxFeaturesPerFrame;
-		alg.getBundle().getSelectTracks().minTrackObservations = config.bundleMinObservations;
+		alg.setThresholdRetireTracks(configVO.dropOutlierTracks);
+		alg.getBundle().getSelectTracks().maxFeaturesPerFrame = configVO.bundleMaxFeaturesPerFrame;
+		alg.getBundle().getSelectTracks().minTrackObservations = configVO.bundleMinObservations;
 		return new WrapVisOdomPixelDepthPnP<>(alg, pixelTo3D, distance, imageType);
 	}
 

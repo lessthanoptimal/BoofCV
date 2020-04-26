@@ -254,8 +254,8 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 			bundle.removeFrame(frameToDrop, removedTrackerTracks);
 			dropRemovedBundleTracks();
 			dropTracksNotVisibleAndTooFewObservations();
-			updateListOfVisibleTracksForOutput();
 		}
+		updateListOfVisibleTracksForOutput();
 
 		long time5 = System.nanoTime();
 		timeSceneMaintenance = (time5-time4)*1e-6;

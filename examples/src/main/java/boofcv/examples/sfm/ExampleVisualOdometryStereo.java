@@ -18,16 +18,19 @@
 
 package boofcv.examples.sfm;
 
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.feature.disparity.StereoDisparitySparse;
 import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.sfm.d3.StereoVisualOdometry;
-import boofcv.abst.tracker.PointTrackerTwoPass;
+import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
+import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
+import boofcv.factory.sfm.ConfigVisOdomDepthPnP;
 import boofcv.factory.sfm.FactoryVisualOdometry;
-import boofcv.factory.tracker.FactoryPointTrackerTwoPass;
+import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.io.MediaManager;
 import boofcv.io.UtilIO;
 import boofcv.io.calibration.CalibrationIO;
@@ -37,6 +40,7 @@ import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import georegression.struct.point.Vector3D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -63,53 +67,71 @@ public class ExampleVisualOdometryStereo {
 		SimpleImageSequence<GrayU8> video2 = media.openVideo(
 				new File(directory,"right.mjpeg").getPath(), ImageType.single(GrayU8.class));
 
-		// specify how the image features are going to be tracked
-		ConfigPKlt configKlt = new ConfigPKlt();
-		configKlt.templateRadius = 3;
+		// Specify which tracker and how it will behave
+		var configKlt = new ConfigPKlt();
+		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(4);
+		configKlt.templateRadius = 4;
+		configKlt.toleranceFB = 3;
+		configKlt.pruneClose = true;
 
-		PointTrackerTwoPass<GrayU8> tracker =
-				FactoryPointTrackerTwoPass.klt(configKlt, new ConfigGeneralDetector(600, 3, 1),
-						GrayU8.class, GrayS16.class);
+		var configDet = new ConfigPointDetector();
+		configDet.type = PointDetectorTypes.SHI_TOMASI;
+		configDet.shiTomasi.radius = 2;
+		configDet.general.maxFeatures = 400;
+		configDet.general.radius = 4;
 
-		// computes the depth of each point
+		// We will estimate the location of features using block matching stereo
 		var configBM = new ConfigDisparityBM();
+		configBM.errorType = DisparityError.CENSUS;
 		configBM.disparityMin = 0;
-		configBM.disparityRange = 150;
+		configBM.disparityRange = 100;
 		configBM.regionRadiusX = 3;
 		configBM.regionRadiusY = 3;
 		configBM.maxPerPixelError = 30;
-		configBM.texture = -1;
+		configBM.texture = 0.05;
+		configBM.validateRtoL = 1;
 		configBM.subpixel = true;
-		StereoDisparitySparse<GrayU8> disparity = FactoryStereoDisparity.sparseRectifiedBM(configBM, GrayU8.class);
 
-		// declares the algorithm
-		StereoVisualOdometry<GrayU8> visualOdometry = FactoryVisualOdometry.stereoDepth(1.5,120, 2,200,50,true,
-				disparity, tracker, GrayU8.class);
+		// Configurations related to how the structure is chained together frame to frame
+		var configPnP = new ConfigVisOdomDepthPnP();
+		configPnP.keyframes.geoMinCoverage = 0.4;
+		configPnP.ransacIterations = 500;
+		configPnP.ransacInlierTol = 1.5;
+
+		// Declare each component then visual odometry
+		PointTracker<GrayU8> tracker = FactoryPointTracker.klt(configKlt, configDet,GrayU8.class, GrayS16.class);
+		StereoDisparitySparse<GrayU8> disparity = FactoryStereoDisparity.sparseRectifiedBM(configBM, GrayU8.class);
+		StereoVisualOdometry<GrayU8> visodom = FactoryVisualOdometry.stereoDepthPnP(configPnP,disparity,tracker, GrayU8.class);
+
+		// Optionally dump verbose debugging information to stdout
+//		Set<String> configuration = new HashSet<>();
+//		configuration.add(VisualOdometry.VERBOSE_RUNTIME);
+//		configuration.add(VisualOdometry.VERBOSE_TRACKING);
+//		visodom.setVerbose(System.out,configuration);
 
 		// Pass in intrinsic/extrinsic calibration.  This can be changed in the future.
-		visualOdometry.setCalibration(stereoParam);
+		visodom.setCalibration(stereoParam);
 
 		// Process the video sequence and output the location plus number of inliers
 		while( video1.hasNext() ) {
 			GrayU8 left = video1.next();
 			GrayU8 right = video2.next();
 
-			if( !visualOdometry.process(left,right) ) {
+			if( !visodom.process(left,right) ) {
 				throw new RuntimeException("VO Failed!");
 			}
 
-			Se3_F64 leftToWorld = visualOdometry.getCameraToWorld();
+			Se3_F64 leftToWorld = visodom.getCameraToWorld();
 			Vector3D_F64 T = leftToWorld.getT();
 
-			System.out.printf("Location %8.2f %8.2f %8.2f      inliers %s\n", T.x, T.y, T.z, inlierPercent(visualOdometry));
+			System.out.printf("Location %8.2f %8.2f %8.2f    %s\n", T.x, T.y, T.z, trackStats(visodom));
 		}
 	}
 
 	/**
-	 * If the algorithm implements AccessPointTracks3D, then count the number of inlier features
-	 * and return a string.
+	 * If the algorithm implements AccessPointTracks3D create a string which summarizing different tracking information
 	 */
-	public static String inlierPercent(StereoVisualOdometry alg) {
+	public static String trackStats(StereoVisualOdometry alg) {
 		if( !(alg instanceof AccessPointTracks3D))
 			return "";
 
@@ -117,11 +139,15 @@ public class ExampleVisualOdometryStereo {
 
 		int count = 0;
 		int N = access.getTotalTracks();
+		int totalNew = 0;
 		for( int i = 0; i < N; i++ ) {
 			if( access.isTrackInlier(i) )
 				count++;
+			else if( access.isTrackNew(i) ) {
+				totalNew++;
+			}
 		}
 
-		return String.format("%%%5.3f", 100.0 * count / N);
+		return String.format("inlier %5.1f%% new %4d total %d", 100.0 * count / (N-totalNew),totalNew,N);
 	}
 }

@@ -44,7 +44,7 @@ public class ConfigPKlt implements Configuration
 	/**
 	 * Specifies the number of layers in the pyramid
 	 */
-	public ConfigDiscreteLevels pyramidLevels = ConfigDiscreteLevels.minSize(100);
+	public ConfigDiscreteLevels pyramidLevels = ConfigDiscreteLevels.minSize(40);
 
 	/**
 	 * If true it will prune tracks which come too close to each other. The default behavior is to

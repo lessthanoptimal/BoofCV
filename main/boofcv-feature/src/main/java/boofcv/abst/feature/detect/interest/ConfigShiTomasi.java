@@ -28,13 +28,15 @@ import boofcv.struct.Configuration;
 public class ConfigShiTomasi implements Configuration {
 
 	/**
-	 * If true a Gaussian kernel will be used. False runs much faster but selects a different location. Application
+	 * If true a Gaussian kernel will be used otherwise a table/block filter is used.
+	 * False runs much faster but selects a different location. Application
 	 * specific which one is preferred. False is more commonly used.
 	 */
 	public boolean weighted = false;
 
 	/**
-	 * Radius of the kernel.
+	 * Radius of the kernel convolved across the image. Larger values act as a low pass filter.
+	 * 2 or more is recommended but 1 is default for backwards compatibility.
 	 */
 	public int radius = 1;
 
