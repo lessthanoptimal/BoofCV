@@ -94,6 +94,9 @@ public class ControlPanelDisparityDense extends StandardAlgConfigPanel {
 		addLabeled(comboMethod,"Method");
 		addLabeled(comboError,"Error");
 		add(tabbedPane);
+
+		// Make sure the GUI is updated with the latest selection
+		handleErrorSelected(true);
 	}
 
 	public static ControlPanelDisparityDense createRange(int disparityMin , int disparityRange, Class imageType) {
