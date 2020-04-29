@@ -57,11 +57,9 @@ public class SelectTracksInFrameForBundleAdjustment {
 	/**
 	 * Selects tracks to include in bundle adjustment
 	 * @param sba The scene graph
-	 * @param imageWidth input image width in pixels
-	 * @param imageHeight input image height in pixels
 	 * @param selected (Output) list of selected tracks
 	 */
-	public void selectTracks(VisOdomBundleAdjustment<?> sba, int imageWidth , int imageHeight, List<BTrack> selected )
+	public void selectTracks(VisOdomBundleAdjustment<?> sba, List<BTrack> selected )
 	{
 		// Initialize data structures
 		selected.clear();
@@ -88,7 +86,7 @@ public class SelectTracksInFrameForBundleAdjustment {
 		} else {
 			// Start with older frames since we want to be biased to select tracks that have been seen by more frames
 			for (int frameIdx = 0; frameIdx < frames.size; frameIdx++) {
-				selectTracksInFrame(frames.get(frameIdx), imageWidth, imageHeight, selected);
+				selectTracksInFrame(frames.get(frameIdx), selected);
 			}
 		}
 	}
@@ -97,8 +95,12 @@ public class SelectTracksInFrameForBundleAdjustment {
 	 * Select tracks inside a single frame. All tracks which have previously been selected are automatically selected
 	 * again and count towards the max per frame
 	 */
-	protected void selectTracksInFrame(BFrame frame, int imageWidth , int imageHeight, List<BTrack> selected)
+	protected void selectTracksInFrame(BFrame frame, List<BTrack> selected)
 	{
+		// Get the size of an image from the camera
+		int imageWidth = frame.camera.original.width;
+		int imageHeight = frame.camera.original.height;
+
 		// This is the length of a side in the square grid that's to be selected
 		// designed to avoid divide by zero error and have larger cells when fewer features are requested
 		int targetSize = configUniform.selectTargetCellSize(maxFeaturesPerFrame,imageWidth, imageHeight);

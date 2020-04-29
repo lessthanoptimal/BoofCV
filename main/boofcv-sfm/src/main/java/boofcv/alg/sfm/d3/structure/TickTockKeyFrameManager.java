@@ -19,6 +19,8 @@
 package boofcv.alg.sfm.d3.structure;
 
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BCamera;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.annotation.Nullable;
@@ -50,10 +52,10 @@ public class TickTockKeyFrameManager implements VisOdomKeyFrameManager {
 	 * No need to configure or initialize anything
 	 */
 	@Override
-	public void initialize(int imageWidth, int imageHeight) {}
+	public void initialize(FastAccess<BCamera> cameras) {}
 
 	@Override
-	public GrowQueue_I32 selectFramesToDiscard(PointTracker<?> tracker, int maxKeyFrames, VisOdomBundleAdjustment<?> sba) {
+	public GrowQueue_I32 selectFramesToDiscard(PointTracker<?> tracker, int maxKeyFrames, int newFrames, VisOdomBundleAdjustment<?> sba) {
 		keyframeIndexes.reset();
 		// Add key frames until it hits the max
 		if( sba.frames.size <= maxKeyFrames)
@@ -61,16 +63,18 @@ public class TickTockKeyFrameManager implements VisOdomKeyFrameManager {
 
 		// See if the current keyframe should be removed from the list and prevent it from becoming a real keyframe
 		boolean removeCurrent = tracker.getFrameID()%keyframePeriod != 0;
-		maxKeyFrames += removeCurrent ? 1 : 0;
+		maxKeyFrames += removeCurrent ? newFrames : 0;
 
 		// Remove older keyframes until it has the correct number of keyframes
 		for (int i = 0; i < sba.frames.size - maxKeyFrames; i++) {
 			keyframeIndexes.add(i);
 		}
 
-		// Now remove the current frame. This is done at the end to ensure the order of key frame indexes
+		// Now remove the current frames. This is done at the end to ensure the order of key frame indexes
 		if( removeCurrent ) {
-			keyframeIndexes.add( sba.frames.size-1 );
+			for (int i = newFrames-1; i >= 0; i-- ) {
+				keyframeIndexes.add( sba.frames.size-1-i );
+			}
 		}
 
 		return keyframeIndexes;
@@ -80,7 +84,7 @@ public class TickTockKeyFrameManager implements VisOdomKeyFrameManager {
 	 * Tracker information is ignored
 	 */
 	@Override
-	public void handleSpawnedTracks(PointTracker<?> tracker) {}
+	public void handleSpawnedTracks(PointTracker<?> tracker, BCamera camera) {}
 
 	@Override
 	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {}

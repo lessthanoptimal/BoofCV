@@ -19,6 +19,7 @@
 package boofcv.alg.sfm.d3.structure;
 
 import boofcv.abst.tracker.PointTrackerDefault;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
@@ -35,24 +36,24 @@ class TestTickTockKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 	@Test
 	void alwaysAddBeforeMax() {
 		var tracker = new DummyTracker();
-		var visBundle = new VisOdomBundleAdjustment<>(sba, VisOdomBundleAdjustment.BTrack::new);
+		VisOdomBundleAdjustment<BTrack> scene = createScene();
 
 		var alg = new TickTockKeyFrameManager();
 		alg.keyframePeriod=10000; // don't want it to add a new keyframe right afterwards
 
 		// not used but call it just in case that changes in the future
-		alg.initialize(300,200);
+		alg.initialize(scene.cameras);
 		// add the initial set of frames
 		for (int i = 0; i < 5; i++) {
-			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,maxKeyFrames,visBundle);
+			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,maxKeyFrames,1,scene);
 			assertEquals(0,discard.size);
-			visBundle.addFrame(i);
+			scene.addFrame(i);
 			tracker.process(null);
 		}
 		// add one more frame. It should now want to discard the current frame
-		visBundle.addFrame(6);
+		scene.addFrame(6);
 		tracker.process(null);
-		GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,maxKeyFrames,visBundle);
+		GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,maxKeyFrames,1,scene);
 		assertEquals(1,discard.size);
 		assertEquals(5,discard.get(0));
 	}
@@ -63,20 +64,20 @@ class TestTickTockKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 	@Test
 	void savePeriodically() {
 		var tracker = new DummyTracker();
-		var visBundle = new VisOdomBundleAdjustment<>(sba, VisOdomBundleAdjustment.BTrack::new);
+		VisOdomBundleAdjustment<BTrack> scene = createScene();
 
 		var alg = new TickTockKeyFrameManager();
 		alg.keyframePeriod = 3;
 		// add the initial set of frames
 		for (int i = 0; i < 5; i++) {
 			tracker.process(null);
-			visBundle.addFrame(i);
+			scene.addFrame(i);
 		}
 
 		for (int i = 0; i < 10; i++) {
 			tracker.process(null);
-			visBundle.addFrame(i+5);
-			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,maxKeyFrames,visBundle);
+			scene.addFrame(i+5);
+			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,maxKeyFrames,1,scene);
 			assertEquals(1,discard.size);
 			long id = tracker.getFrameID();
 			if( id%3 == 0 ) {
@@ -85,8 +86,49 @@ class TestTickTockKeyFrameManager extends ChecksVisOdomKeyFrameManager {
 				assertEquals(5,discard.get(0));
 			}
 			// remove the frame to make it realistic
-			VisOdomBundleAdjustment.BFrame frame = visBundle.frames.get(discard.get(0));
-			visBundle.removeFrame(frame,new ArrayList<>());
+			VisOdomBundleAdjustment.BFrame frame = scene.frames.get(discard.get(0));
+			scene.removeFrame(frame,new ArrayList<>());
+		}
+	}
+
+	/**
+	 * Tell it there are two new frames and see if it discard that many
+	 */
+	@Test
+	void discardMultipleNewFrames() {
+		var tracker = new DummyTracker();
+		VisOdomBundleAdjustment<BTrack> scene = createScene();
+
+		int maxKeyFrames = 10;
+
+		var alg = new TickTockKeyFrameManager();
+		alg.keyframePeriod = 3;
+		// add the initial set of frames
+		for (int i = 0; i < 5; i++) {
+			tracker.process(null);
+			scene.addFrame(i*2);
+			scene.addFrame(i*2+1);
+		}
+
+		for (int i = 0; i < 10; i++) {
+			tracker.process(null);
+			scene.addFrame((i+5)*2);
+			scene.addFrame((i+5)*2+1);
+			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,maxKeyFrames,2,scene);
+			assertEquals(2,discard.size);
+			long id = tracker.getFrameID();
+			if( id%3 == 0 ) {
+				assertEquals(0,discard.get(0));
+				assertEquals(1,discard.get(1));
+			} else {
+				assertEquals(10,discard.get(0));
+				assertEquals(11,discard.get(1));
+			}
+			// remove the frame to make it realistic
+			for (int idxDiscard = 0; idxDiscard < discard.size; idxDiscard++) {
+				VisOdomBundleAdjustment.BFrame frame = scene.frames.get(discard.get(0));
+				scene.removeFrame(frame,new ArrayList<>());
+			}
 		}
 	}
 

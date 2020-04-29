@@ -201,7 +201,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 			if( verbose != null ) verbose.println("VO: First Frame");
 			current_to_world.reset();
 			spawnNewTracksForNewKeyFrame(visibleTracks);
-			frameManager.initialize(image.width,image.height);
+			frameManager.initialize(bundle.cameras);
 			first = false;
 			return true;
 		}
@@ -242,7 +242,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 		timeDropUnused = (time4-time3)*1e-6;
 
 		// Update the list of keyframes depending on what the frame manager says to do
-		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker,maxKeyFrames,bundle);
+		GrowQueue_I32 dropFrameIndexes = frameManager.selectFramesToDiscard(tracker,maxKeyFrames,1,bundle);
 		boolean droppedCurrentFrame = false;
 		for (int i = dropFrameIndexes.size-1; i >= 0; i--) {
 			// indexes are ordered from lowest to highest, so you can remove frames without
@@ -263,7 +263,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 		if( !droppedCurrentFrame ) {
 			// it decided to keep the current track. Spawn new tracks in the current frame
 			spawnNewTracksForNewKeyFrame(visibleTracks);
-			frameManager.handleSpawnedTracks(tracker);
+			frameManager.handleSpawnedTracks(tracker,bundle.cameras.getTail());
 		}
 
 		long time6 = System.nanoTime();
@@ -415,7 +415,7 @@ public class VisOdomPixelDepthPnP<T extends ImageBase<T>> implements VerbosePrin
 	 * Sets the known fixed camera parameters
 	 */
 	public void setCamera( CameraPinholeBrown camera ) {
-		bundle.setCamera(camera);
+		bundle.addCamera(camera);
 		LensDistortionNarrowFOV factory = LensDistortionFactory.narrow(camera);
 		pixelToNorm = factory.undistort_F64(true,false);
 		normToPixel = factory.distort_F64(false,true);

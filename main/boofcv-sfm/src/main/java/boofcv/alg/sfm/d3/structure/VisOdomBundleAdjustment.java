@@ -47,11 +47,8 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	public final FastQueue<T> tracks;
 	/** List of all frames that can be feed into bundle adjustment */
 	public final FastQueue<BFrame> frames = new FastQueue<>(BFrame::new,BFrame::reset);
-
-	// Reference to the original camera model passed in
-	public CameraPinholeBrown originalCamera;
-	// The camera model which is being optimized
-	public BundlePinholeBrown bundleCamera = new BundlePinholeBrown();
+	/** List of all the cameras */
+	public final FastQueue<BCamera> cameras = new FastQueue<>(BCamera::new,BCamera::reset);
 
 	public SceneStructureMetric structure = new SceneStructureMetric(true);
 	public SceneObservations observations = new SceneObservations();
@@ -69,22 +66,28 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		this.bundleAdjustment = bundleAdjustment;
 	}
 
-	public void setCamera( CameraPinholeBrown camera ) {
-		originalCamera = camera;
-		bundleCamera.set(camera);
-	}
-
 	/**
 	 * Performs bundle adjustment on the scene and updates parameters
 	 */
 	public void optimize() {
-		selectTracks.selectTracks(this,originalCamera.width,originalCamera.height,selectedTracks);
+		selectTracks.selectTracks(this,selectedTracks);
 		setupBundleStructure();
 
 		bundleAdjustment.setParameters(structure,observations);
 		bundleAdjustment.optimize(structure);
 
 		copyResults();
+	}
+
+	/**
+	 * Adds a new camera to the scene
+	 */
+	public BCamera addCamera( CameraPinholeBrown camera ) {
+		BCamera output = cameras.grow();
+		output.index = cameras.size-1;
+		output.original = camera;
+		output.bundleCamera.set(camera);
+		return output;
 	}
 
 	/**
@@ -96,8 +99,10 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 
 		// Initialize data structures
 		observations.initialize(frames.size);
-		structure.initialize(1,frames.size,totalBundleTracks);
-		structure.setCamera(0,true, bundleCamera);
+		structure.initialize(cameras.size,frames.size,totalBundleTracks);
+		for (int cameraIdx = 0; cameraIdx < cameras.size; cameraIdx++) {
+			structure.setCamera(cameraIdx,true, cameras.get(cameraIdx).bundleCamera);
+		}
 
 		// TODO make the first frame at origin. This is done to avoid numerical after traveling a good distance
 		final var worldToFrame = new Se3_F64();
@@ -158,6 +163,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	public void reset() {
 		frames.reset();
 		tracks.reset();
+		cameras.reset();
 	}
 
 	public void addObservation(BFrame frame , T track , double pixelX , double pixelY ) {
@@ -182,8 +188,15 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		return track;
 	}
 
-	public BFrame addFrame(long id ) {
+	public BFrame addFrame( long id ) {
+		if( cameras.size != 1 )
+			throw new IllegalArgumentException("To use this function there must be one and only one camera");
+		return addFrame(cameras.get(0),id);
+	}
+
+	public BFrame addFrame( BCamera camera , long id ) {
 		BFrame frame = frames.grow();
+		frame.camera = camera;
 		frame.id = id;
 		return frame;
 	}
@@ -240,7 +253,9 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	public BFrame getFirstFrame() {
 		return frames.get(0);
 	}
-
+	public BCamera getCamera( int index ) {
+		return cameras.get(index);
+	}
 	/**
 	 * Sees if the graph structure is internally consistent. Used for debugging
 	 */
@@ -349,6 +364,8 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	{
 		// ID of the image used to create the BFrame
 		public long id;
+		// Which camera generated the image the BFrame is derived from
+		public BCamera camera;
 		// List of tracks that were observed in this BFrame
 		public final FastArray<BTrack> tracks = new FastArray<>(BTrack.class);
 		// current estimated transform to world from this view
@@ -360,6 +377,19 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 			listIndex = -1;
 			tracks.reset();
 			frame_to_world.reset();
+		}
+	}
+
+	public static class BCamera
+	{
+		// array index
+		public int index;
+		public CameraPinholeBrown original;
+		public BundlePinholeBrown bundleCamera = new BundlePinholeBrown();
+
+		public void reset() {
+			index = -1;
+			original = null;
 		}
 	}
 }

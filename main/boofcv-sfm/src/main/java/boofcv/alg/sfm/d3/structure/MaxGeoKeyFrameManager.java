@@ -22,6 +22,7 @@ import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.misc.Histogram2D_S32;
 import boofcv.alg.misc.ImageCoverage;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BCamera;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BObservation;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
@@ -29,7 +30,9 @@ import georegression.struct.point.Point2D_F64;
 import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
 import org.ddogleg.sorting.QuickSort_S32;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastArray;
+import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
 
 import javax.annotation.Nullable;
@@ -47,14 +50,13 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	public double minimumCoverage = 0.4;
 
 	// list of frames to discard
-	protected final GrowQueue_I32 keyframeIndexes = new GrowQueue_I32();
+	protected final GrowQueue_I32 discardKeyIndices = new GrowQueue_I32();
 
-	// the maximum number (known or inferred) of features visible in a frame
-	protected int maxFeaturesPerFrame;
+	// Information of each camera and is used to compute the coverage
+	protected FastQueue<CameraInfo> cameras = new FastQueue<>(CameraInfo::new,CameraInfo::reset);
 
 	// used to compute the feature coverage on the image
-	protected ImageCoverage coverage = new ImageCoverage();
-	protected int imageWidth, imageHeight;
+	ImageCoverage coverage = new ImageCoverage();
 
 	//------------ Internal Workspace
 	protected FastArray<PointTrack> activeTracks = new FastArray<>(PointTrack.class);
@@ -72,39 +74,60 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 		this.minimumCoverage = minimumCoverage;
 	}
 
-	@Override
-	public void initialize(int imageWidth, int imageHeight) {
-		this.imageWidth = imageWidth;
-		this.imageHeight = imageHeight;
-		this.maxFeaturesPerFrame = 0;
-		this.keyframeIndexes.reset();
+	protected static class CameraInfo
+	{
+		// Camera's shape in pixels
+		public int imageWidth, imageHeight;
+		// the maximum number (known or inferred) of features visible in a frame
+		public int maxFeaturesPerFrame;
+
+		public void reset() {
+			imageWidth = -1;
+			imageHeight = -1;
+			maxFeaturesPerFrame = 0;
+		}
 	}
 
 	@Override
-	public GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker , int maxKeyFrames, VisOdomBundleAdjustment<?> sba) {
+	public void initialize(FastAccess<BCamera> bundleCameras) {
+		cameras.reset();
+		for (int i = 0; i < bundleCameras.size; i++) {
+			BCamera bc = bundleCameras.get(i);
+			CameraInfo ic = cameras.grow();
+
+			ic.imageWidth = bc.original.width;
+			ic.imageHeight = bc.original.height;
+		}
+		this.discardKeyIndices.reset();
+	}
+
+	@Override
+	public GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker , int maxKeyFrames, int newFrames,  VisOdomBundleAdjustment<?> sba) {
 		// always add a new keyframe until it hits the max
-		keyframeIndexes.reset();
+		discardKeyIndices.reset();
 		if( sba.frames.size <= maxKeyFrames )
-			return keyframeIndexes;
+			return discardKeyIndices;
 
 		// Initialize data structures
 		activeTracks.reset();
 		tracker.getActiveTracks(activeTracks.toList());
 
-		boolean keepCurrent = keepCurrentFrame();
+		boolean keepCurrent = keepCurrentFrame(sba);
 		if( !keepCurrent) {
 			// The current frame is too similar to the a previous key frame
-			keyframeIndexes.add( sba.frames.size-1 );
+			for (int i = 0; i < newFrames; i++) {
+				discardKeyIndices.add( sba.frames.size-i-1 );
+			}
 		}
 		if( verbose != null) verbose.println("keep_current="+keepCurrent+" coverage="+coverage.getFraction());
 
 		// Discard enough older frames to be at the desired number
-		selectOldToDiscard(sba,sba.frames.size-maxKeyFrames-keyframeIndexes.size);
+		selectOldToDiscard(sba,sba.frames.size-maxKeyFrames- discardKeyIndices.size);
 
 		// Ensure the post condition is true
-		sorter.sort(keyframeIndexes.data,keyframeIndexes.size);
+		sorter.sort(discardKeyIndices.data, discardKeyIndices.size);
 
-		return keyframeIndexes;
+		return discardKeyIndices;
 	}
 
 	/**
@@ -112,9 +135,12 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 	 * current keyframe should be kept so that new features can be spawned and starvation avoided.
 	 * @return true if it should keep the current frame
 	 */
-	protected boolean keepCurrentFrame() {
+	protected boolean keepCurrentFrame( VisOdomBundleAdjustment<?> sba ) {
+		BFrame current = sba.frames.getTail();
+		CameraInfo camera = cameras.get(current.camera.index);
+
 		// Compute fraction of the image covered by tracks
-		coverage.reset(maxFeaturesPerFrame,imageWidth,imageHeight);
+		coverage.reset(camera.maxFeaturesPerFrame,camera.imageWidth,camera.imageHeight);
 		for (int i = 0; i < activeTracks.size; i++) {
 			Point2D_F64 p = activeTracks.get(i).pixel;
 			coverage.markPixel((int)p.x,(int)p.y);
@@ -195,19 +221,20 @@ public class MaxGeoKeyFrameManager implements VisOdomKeyFrameManager {
 			}
 			if( verbose != null) verbose.println("Worst index "+worstIdx+"  count "+lowestCount);
 
-			keyframeIndexes.add(worstIdx);
+			discardKeyIndices.add(worstIdx);
 			// Mark the worst keyframe so it won't be selected again
 			histogram.set(worstIdx,bestFrame,Integer.MAX_VALUE);
 		}
 	}
 
 	@Override
-	public void handleSpawnedTracks(PointTracker<?> tracker) {
+	public void handleSpawnedTracks(PointTracker<?> tracker, BCamera camera) {
+		CameraInfo info = cameras.get(camera.index);
 		// If the max spawn is known use it, otherwise keep track of the max seen
 		if( tracker.getMaxSpawn() <= 0 ) {
-			maxFeaturesPerFrame = Math.max(tracker.getTotalActive(),maxFeaturesPerFrame);
+			info.maxFeaturesPerFrame = Math.max(tracker.getTotalActive(),info.maxFeaturesPerFrame);
 		} else {
-			maxFeaturesPerFrame = tracker.getMaxSpawn();
+			info.maxFeaturesPerFrame = tracker.getMaxSpawn();
 		}
 	}
 

@@ -20,7 +20,9 @@ package boofcv.alg.sfm.d3.structure;
 
 import boofcv.abst.geo.bundle.BundleAdjustment;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.struct.calib.CameraPinholeBrown;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.junit.jupiter.api.Test;
 
@@ -39,29 +41,38 @@ public abstract class ChecksVisOdomKeyFrameManager {
 
 	@Test
 	void discardMultipleFramesWithNothing() {
-		var scene = new VisOdomBundleAdjustment<>(sba, VisOdomBundleAdjustment.BTrack::new);
+		VisOdomBundleAdjustment<BTrack> scene = createScene();
 		var tracker = new TestMaxGeoKeyFrameManager.DummyTracker();
 		tracker.activeTracks = 50;
 		tracker.maxSpawn = 60;
 		VisOdomKeyFrameManager alg = createFrameManager();
-		alg.initialize(width,height);
+		alg.initialize(scene.cameras);
 
 		for (int i = 0; i < 5; i++) {
 			scene.addFrame(i);
-			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,5,scene);
+			GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,5,1,scene);
 			assertEquals(0,discard.size);
-			alg.handleSpawnedTracks(tracker);
+			alg.handleSpawnedTracks(tracker,scene.cameras.getTail());
 		}
 		// connect the two most recent frames
 		scene.addFrame(5);
 		connectFrames(4,5,10,scene);
 
 		// tell it to only keep 3
-		GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,3,scene);
+		GrowQueue_I32 discard = alg.selectFramesToDiscard(tracker,3,1,scene);
 		// there should only be 3 dropped in this order
 		assertEquals(3,discard.size);
 		for (int i = 0; i < 3; i++) {
 			assertEquals(i,discard.get(i));
 		}
+	}
+
+	// friendly reminder that this needs to be manually implemented for every class
+	abstract void discardMultipleNewFrames();
+
+	public VisOdomBundleAdjustment<BTrack> createScene() {
+		VisOdomBundleAdjustment<BTrack> scene = new VisOdomBundleAdjustment<>(sba, BTrack::new);
+		scene.addCamera(new CameraPinholeBrown(0,0,0,0,0,width,height));
+		return scene;
 	}
 }

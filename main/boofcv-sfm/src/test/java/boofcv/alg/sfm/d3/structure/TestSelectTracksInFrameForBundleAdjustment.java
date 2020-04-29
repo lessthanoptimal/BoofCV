@@ -24,6 +24,7 @@ import boofcv.alg.sfm.d3.structure.SelectTracksInFrameForBundleAdjustment.Info;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BFrame;
 import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BTrack;
 import boofcv.factory.geo.FactoryMultiView;
+import boofcv.struct.calib.CameraPinholeBrown;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ class TestSelectTracksInFrameForBundleAdjustment {
 		alg.maxFeaturesPerFrame = 200;
 		var selected = new ArrayList<BTrack>();
 
+		scene.addCamera(new CameraPinholeBrown(0,0,0,0,0,width,height));
 		for (int i = 0; i < 5; i++) {
 			scene.addFrame(i);
 		}
@@ -71,8 +73,7 @@ class TestSelectTracksInFrameForBundleAdjustment {
 				o.pixel.set(x,y);
 			}
 		}
-
-		alg.selectTracks(scene,width,height,selected);
+		alg.selectTracks(scene,selected);
 		assertEquals(200,selected.size());
 	}
 
@@ -82,6 +83,7 @@ class TestSelectTracksInFrameForBundleAdjustment {
 		var alg = new SelectTracksInFrameForBundleAdjustment(0xBEEF);
 		alg.minTrackObservations = 1;
 
+		scene.addCamera(new CameraPinholeBrown(0,0,0,0,0,width,height));
 		for (int i = 0; i < 3; i++) {
 			scene.addFrame(i);
 		}

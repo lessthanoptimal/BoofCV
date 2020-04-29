@@ -61,7 +61,8 @@ class TestVisOdomBundleAdjustment {
 	 */
 	@Test
 	void optimize_perfect() {
-		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
+		VisOdomBundleAdjustment<BTrack> alg = createAlgSingleCamera();
+
 		createPerfectScene(alg);
 		alg.optimize();
 		assertEquals(0.0, alg.bundleAdjustment.getFitScore(), 1e-4);
@@ -72,7 +73,7 @@ class TestVisOdomBundleAdjustment {
 	 */
 	@Test
 	void optimize_noise() {
-		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
+		VisOdomBundleAdjustment<BTrack> alg = createAlgSingleCamera();
 		createPerfectScene(alg);
 		// Perfect observations with less than perfect location estimates
 		for (int i = 5; i < alg.tracks.size-5; i++) {
@@ -95,7 +96,7 @@ class TestVisOdomBundleAdjustment {
 
 	@Test
 	void addObservation() {
-		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
+		VisOdomBundleAdjustment<BTrack> alg = createAlgSingleCamera();
 
 		BFrame frameA = alg.addFrame(0);
 		BTrack trackA = alg.addTrack(1,2,3,3);
@@ -110,7 +111,7 @@ class TestVisOdomBundleAdjustment {
 
 	@Test
 	void addTrack() {
-		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
+		VisOdomBundleAdjustment<BTrack> alg = createAlgSingleCamera();
 		BTrack trackA = alg.addTrack(1,2,3,3);
 		BTrack trackB = alg.addTrack(1,2,3,4);
 		BTrack trackC = alg.addTrack(1,2,3,5);
@@ -144,7 +145,7 @@ class TestVisOdomBundleAdjustment {
 
 	@Test
 	void addFrame() {
-		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
+		VisOdomBundleAdjustment<BTrack> alg = createAlgSingleCamera();
 		BFrame frameA = alg.addFrame(0);
 		frameA.frame_to_world.T.x = 10;
 
@@ -154,22 +155,29 @@ class TestVisOdomBundleAdjustment {
 
 		// See if the frame is recycled correctly
 		alg.reset();
-		alg.addFrame(2);
+		alg.addFrame(null,2);
 		assertEquals(1,alg.frames.size);
 		assertSame(frameA,alg.frames.get(0));
 		assertEquals(2,frameA.id);
 		assertEquals(0,frameA.frame_to_world.T.x, UtilEjml.TEST_F64);
 
 		// Add one more frame now
-		BFrame frameB = alg.addFrame(11);
+		BFrame frameB = alg.addFrame(null,11);
 		assertEquals(2,alg.frames.size);
 		assertSame(frameB,alg.getLastFrame());
 		assertEquals(11,frameB.id);
 	}
 
+	private VisOdomBundleAdjustment<BTrack> createAlgSingleCamera() {
+		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment, BTrack::new);
+		alg.addCamera(new CameraPinholeBrown(0,0,0,0,0,100,200));
+		return alg;
+	}
+
 	@Test
 	void removeFrame() {
-		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
+		VisOdomBundleAdjustment<BTrack> alg = createAlgSingleCamera();
+
 		BFrame frameA = alg.addFrame(0);
 		BFrame frameB = alg.addFrame(1);
 
@@ -192,7 +200,8 @@ class TestVisOdomBundleAdjustment {
 
 	@Test
 	void getFirstFrame() {
-		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
+		VisOdomBundleAdjustment<BTrack> alg = createAlgSingleCamera();
+
 		BFrame frameA = alg.frames.grow();
 		assertSame(frameA,alg.getFirstFrame());
 		alg.frames.grow();
@@ -201,7 +210,8 @@ class TestVisOdomBundleAdjustment {
 
 	@Test
 	void getLastFrame() {
-		var alg = new VisOdomBundleAdjustment<>(bundleAdjustment,BTrack::new);
+		VisOdomBundleAdjustment<BTrack> alg = createAlgSingleCamera();
+
 		BFrame frameA = alg.frames.grow();
 		assertSame(frameA,alg.getLastFrame());
 		BFrame frameB = alg.frames.grow();
@@ -259,7 +269,7 @@ class TestVisOdomBundleAdjustment {
 		LensDistortionPinhole distortion = new LensDistortionPinhole(pinhole);
 		Point2Transform2_F64 n2n = distortion.distort_F64(false,false);
 
-		vsba.setCamera(pinhole);
+		vsba.addCamera(pinhole);
 
 		Point3D_F64 Xv = new Point3D_F64(); // 3D point in view reference frame
 		Point2D_F64 n = new Point2D_F64();  // normalized image coordinate

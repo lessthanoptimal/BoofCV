@@ -19,6 +19,8 @@
 package boofcv.alg.sfm.d3.structure;
 
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.sfm.d3.structure.VisOdomBundleAdjustment.BCamera;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.GrowQueue_I32;
 import org.ddogleg.struct.VerbosePrint;
 
@@ -30,22 +32,25 @@ import org.ddogleg.struct.VerbosePrint;
 public interface VisOdomKeyFrameManager extends VerbosePrint {
 
 	/**
-	 * Specifies the size of the image and resets the manager to its initial state
+	 * Resets the manager into it's initial state. Specifies number of cameras and their shape.
 	 */
-	void initialize(int imageWidth , int imageHeight );
+	void initialize( FastAccess<BCamera> bundleCameras );
 
 	/**
-	 * Selects frames to discard from the scene graph. The most recent is assumed to be the current tracker frame.
+	 * Selects frames to discard from the scene graph. The most recent frame(s) (highest index value)
+	 * is assumed to be the current tracker frame.
 	 *
 	 * @param tracker Feature tracker
 	 * @param limit Maximum number of allowed key frames
+	 * @param newFrames Number of new frames added
 	 * @param sba scene graph
 	 * @return Returns a list of frames to discard. They are in sequential order from least to greatest.
 	 */
-	GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker , int limit, VisOdomBundleAdjustment<?> sba);
+	GrowQueue_I32 selectFramesToDiscard( PointTracker<?> tracker , int limit, int newFrames,
+										 VisOdomBundleAdjustment<?> sba);
 
 	/**
 	 * After the current frame becomes a keyframe new tracks are spawned from it. This passes in that new information
 	 */
-	void handleSpawnedTracks( PointTracker<?> tracker );
+	void handleSpawnedTracks( PointTracker<?> tracker , BCamera camera  );
 }
