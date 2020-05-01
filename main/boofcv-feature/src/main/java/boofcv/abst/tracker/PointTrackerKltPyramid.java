@@ -155,15 +155,16 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 		}
 	}
 
-	private void addTrackToUnused() {
+	/**
+	 * Declares a new track and puts it into the unused list
+	 */
+	private PyramidKltFeature createNewTrack() {
 		int numLayers = currPyr.basePyramid.getNumLayers();
 		var t = new PyramidKltFeature(numLayers, templateRadius);
-
 		var p = new PointTrackMod();
 		p.setDescription(t);
 		t.cookie = p;
-
-		unused.add(t);
+		return t;
 	}
 
 	/**
@@ -179,11 +180,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 		if( !input.isInBounds((int)x,(int)y))
 			return null;
 
-		// grow the number of tracks if needed
-		if( unused.isEmpty() )
-			addTrackToUnused();
-
-		PyramidKltFeature t = unused.remove(unused.size() - 1);
+		PyramidKltFeature t = getUnusedTrack();
 		t.setPosition((float)x,(float)y);
 		tracker.setDescription(t);
 
@@ -199,6 +196,17 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 		}
 
 		return null;
+	}
+
+	/**
+	 * Checks to see if there's an unused track that can be recycled. if not it will create a new one
+	 */
+	protected PyramidKltFeature getUnusedTrack() {
+		if( unused.isEmpty() )
+			return createNewTrack();
+		PyramidKltFeature t = unused.remove(unused.size() - 1);
+		t.checkUpdateLayers(currPyr.derivX.length);
+		return t;
 	}
 
 	@Override
@@ -224,15 +232,11 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 		// extract the features
 		QueueCorner found = detector.getMaximums();
 
-		// grow the number of tracks if needed
-		while( unused.size() < found.size() )
-			addTrackToUnused();
-
-		for (int i = 0; i < found.size() && !unused.isEmpty(); i++) {
+		for (int i = 0; i < found.size(); i++) {
 			Point2D_I16 pt = found.get(i);
 
 			// set up pyramid description
-			PyramidKltFeature t = unused.remove(unused.size() - 1);
+			PyramidKltFeature t = getUnusedTrack();
 			t.x = pt.x * scaleBottom;
 			t.y = pt.y * scaleBottom;
 
@@ -487,7 +491,7 @@ public class PointTrackerKltPyramid<I extends ImageGray<I>,D extends ImageGray<D
 
 		public void update( I image ) {
 			basePyramid.process(image);
-			if( derivX == null ) {
+			if( derivX == null || derivX.length != basePyramid.layers.length ) {
 				derivX = PyramidOps.declareOutput(basePyramid, derivType);
 				derivY = PyramidOps.declareOutput(basePyramid, derivType);
 			}

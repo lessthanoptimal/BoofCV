@@ -260,6 +260,28 @@ class TestPointTrackerKltPyramid extends GenericChecksPointTracker<GrayF32> {
 	}
 
 	/**
+	 * There was a bug where it didn't just the number of layers in the gradient if the pyramid changed the number
+	 * of layers.
+	 */
+	@Test
+	void dynamicPyramidLayers() {
+		ConfigPKlt config = new ConfigPKlt();
+		config.pyramidLevels = ConfigDiscreteLevels.minSize(5);
+
+		PointTrackerKltPyramid<GrayF32,GrayF32> alg = createKLT(config);
+		alg.process(new GrayF32(100, 100));
+		alg.addTrack(1,2);
+		assertEquals(alg.currPyr.basePyramid.layers.length, alg.currPyr.derivX.length);
+		assertEquals(alg.currPyr.basePyramid.getWidth(0), alg.currPyr.derivX[0].width);
+		alg.reset();
+		alg.process(new GrayF32(300, 300));
+		int N = alg.currPyr.basePyramid.layers.length;
+		assertEquals(((PyramidKltFeature)alg.addTrack(1,2).getDescription()).desc.length,N);
+		assertEquals(N, alg.currPyr.derivX.length);
+		assertEquals(alg.currPyr.basePyramid.getWidth(0), alg.currPyr.derivX[0].width);
+	}
+
+	/**
 	 * Don't change the track state
 	 */
 	private static class DummyTracker extends PyramidKltTracker {

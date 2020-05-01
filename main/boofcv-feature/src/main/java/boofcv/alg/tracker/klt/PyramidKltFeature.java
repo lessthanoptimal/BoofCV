@@ -40,9 +40,18 @@ public class PyramidKltFeature {
 	 */
 	public PyramidKltFeature(int numLayers, int radius) {
 		desc = new KltFeature[numLayers];
-
 		for (int i = 0; i < numLayers; i++) {
 			desc[i] = new KltFeature(radius);
+		}
+	}
+
+	public void checkUpdateLayers( int numLayers ) {
+		if( desc.length != numLayers ) {
+			int radius = desc[0].radius;
+			desc = new KltFeature[numLayers];
+			for (int i = 0; i < numLayers; i++) {
+				desc[i] = new KltFeature(radius);
+			}
 		}
 	}
 
