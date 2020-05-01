@@ -33,12 +33,12 @@ public class ConfigVisOdomDepthPnP implements Configuration {
 	/** Configuration for Bundle Adjustment */
 	public ConfigBundleAdjustment sba = new ConfigBundleAdjustment();
 	/** Maximum number of iterations to do with sparse bundle adjustment. &le; 0 to disable. */
-	public int bundleIterations = 3;
+	public int bundleIterations = 1;
 	/**
 	 * Maximum number of features optimized in bundle adjustment per key frame. This is a very good way to limit
 	 * the amount of CPU used. If not positive then unlimited. &le; 0 to disable.
 	 */
-	public int bundleMaxFeaturesPerFrame = 400;
+	public int bundleMaxFeaturesPerFrame = 200;
 	/**
 	 * Minimum number of observations a track must have before it is included in bundle adjustment. Has to be
 	 * >= 2 and it's strongly recommended that this is set to 3 or higher. Due to ambiguity along epipolar lines
@@ -51,7 +51,7 @@ public class ConfigVisOdomDepthPnP implements Configuration {
 	/** Maximum number of key frames it will save */
 	public int maxKeyFrames = 5;
 	/** Number of RANSAC iterations to perform when estimating motion using PNP */
-	public int ransacIterations = 1000;
+	public int ransacIterations = 500;
 	/** RANSAC inlier tolerance in Pixels */
 	public double ransacInlierTol = 1.5;
 	/** Seed for the random number generator used by RANSAC */

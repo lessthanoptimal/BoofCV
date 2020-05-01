@@ -197,6 +197,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		var config = new ConfigPKlt();
 		config.toleranceFB = 3;
 		config.pruneClose = true;
+		config.config.maxIterations = 25;
 		config.templateRadius = 4;
 		config.pyramidLevels = ConfigDiscreteLevels.levels(4);
 		return config;
@@ -206,21 +207,22 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		var config = new ConfigPointDetector();
 		config.type = PointDetectorTypes.SHI_TOMASI;
 		config.general.threshold = 1.0f;
-		config.general.radius = 4;
-		config.general.maxFeatures = 400;
+		config.general.radius = 5;
+		config.general.maxFeatures = 300;
 		config.general.selector.type = SelectLimitTypes.BEST_N;
 		return config;
 	}
 
 	private static ConfigDisparityBM createConfigDisparity() {
 		var config = new ConfigDisparityBM();
-		config.disparityMin = 2;
-		config.disparityRange = 100;
+		config.disparityMin = 0;
+		config.disparityRange = 50;
 		config.regionRadiusX = 3;
 		config.regionRadiusY = 3;
 		config.maxPerPixelError = 30;
 		config.texture = 0.05;
 		config.subpixel = true;
+		config.validateRtoL = 1;
 		return config;
 	}
 
