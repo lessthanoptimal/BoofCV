@@ -22,6 +22,7 @@ import boofcv.abst.sfm.AccessPointTracks3D;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.feature.associate.AssociateStereo2D;
 import boofcv.alg.geo.DistanceFromModelMultiView;
+import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.pose.PnPStereoDistanceReprojectionSq;
 import boofcv.alg.geo.pose.PnPStereoEstimator;
 import boofcv.alg.geo.pose.RefinePnPStereo;
@@ -78,20 +79,13 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 
 	@Override
 	public boolean getTrackWorld3D(int index, Point3D_F64 world ) {
-		VisOdomDualTrackPnP.LeftTrackInfo info = alg.getCandidates().get(index).getCookie();
-		world.set( info.location.location );
+		VisOdomDualTrackPnP.TrackInfo info = alg.getCandidates().get(index).getCookie();
+		PerspectiveOps.homogenousTo3dPositiveZ(info.worldLoc,1e8,1e-8,world);
 		return true;
 	}
 
-	@Override
-	public int getTotalTracks() {
-		return alg.getCandidates().size();
-	}
-
-	@Override
-	public long getTrackId(int index) {
-		return alg.getCandidates().get(index).featureId;
-	}
+	@Override public int getTotalTracks() {return alg.getCandidates().size();}
+	@Override public long getTrackId(int index) {return alg.getCandidates().get(index).featureId;}
 
 	@Override
 	public void getTrackPixel(int index, Point2D_F64 pixel) {
@@ -105,18 +99,17 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 
 	@Override
 	public boolean isTrackInlier(int index) {
-		VisOdomDualTrackPnP.LeftTrackInfo info = alg.getCandidates().get(index).getCookie();
+		VisOdomDualTrackPnP.TrackInfo info = alg.getCandidates().get(index).getCookie();
 		return info.lastInlier == alg.getFrameID();
 	}
 
-	@Override
-	public boolean isTrackNew(int index) {
-		return false;
+	@Override public boolean isTrackNew(int index) {
+		VisOdomDualTrackPnP.TrackInfo info = alg.getCandidates().get(index).getCookie();
+		return info.visualTrack.spawnFrameID == alg.getFrameID();
 	}
 
 	@Override
 	public void setCalibration(StereoParameters parameters) {
-
 		Se3_F64 leftToRight = parameters.getRightToLeft().invert(null);
 
 		pnp.setLeftToRight(leftToRight);
@@ -132,25 +125,10 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 		assoc.setCalibration(parameters);
 	}
 
-	@Override
-	public void reset() {
-		alg.reset();
-	}
-
-	@Override
-	public Se3_F64 getCameraToWorld() {
-		return alg.getCurrToWorld();
-	}
-
-	@Override
-	public long getFrameID() {
-		return alg.getFrameID();
-	}
-
-	@Override
-	public boolean process(T leftImage, T rightImage) {
-		return success = alg.process(leftImage,rightImage);
-	}
+	@Override public void reset() {alg.reset();}
+	@Override public Se3_F64 getCameraToWorld() {return alg.getCurrentToWorld();}
+	@Override public long getFrameID() {return alg.getFrameID();}
+	@Override public boolean process(T leftImage, T rightImage) {return success = alg.process(leftImage,rightImage);}
 
 	@Override
 	public boolean isFault() {
@@ -160,13 +138,10 @@ public class WrapVisOdomDualTrackPnP<T extends ImageGray<T>>
 			return false;
 	}
 
-	@Override
-	public ImageType<T> getImageType() {
-		return ImageType.single(imageType);
-	}
+	@Override public ImageType<T> getImageType() {return ImageType.single(imageType);}
 
 	@Override
 	public void setVerbose(@Nullable PrintStream out, @Nullable Set<String> configuration) {
-
+		alg.setVerbose(out,configuration);
 	}
 }

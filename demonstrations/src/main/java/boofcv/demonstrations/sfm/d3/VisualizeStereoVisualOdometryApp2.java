@@ -310,7 +310,7 @@ public class VisualizeStereoVisualOdometryApp2<T extends ImageGray<T>>
 		// Number of tracks being optimized by bundle adjustment
 		final int bundleTracks;
 		if( alg instanceof WrapVisOdomPixelDepthPnP) {
-			FastAccess<BTrack> tracks = ((WrapVisOdomPixelDepthPnP)alg).getAlgorithm().getBundle().tracks;
+			FastAccess<BTrack> tracks = ((WrapVisOdomPixelDepthPnP)alg).getAlgorithm().getScene().tracks;
 			int count = 0;
 			for (int i = 0; i < tracks.size; i++) {
 				if( tracks.get(i).selected ) {

@@ -36,6 +36,7 @@ import georegression.metric.UtilAngle;
 import georegression.struct.GeoTuple3D_F64;
 import georegression.struct.point.*;
 import georegression.struct.se.Se3_F64;
+import org.ejml.UtilEjml;
 import org.ejml.data.DMatrix3;
 import org.ejml.data.DMatrix3x3;
 import org.ejml.data.DMatrixRMaj;
@@ -973,5 +974,33 @@ public class PerspectiveOps {
 		double b = Area2D_F64.triangle(p1,p2,p3);
 
 		return a/b;
+	}
+
+	/**
+	 * Converts a 3D homogenous coordinate into a non-homogenous coordinate. Things get tricky when a point is at or
+	 * "close to" infinity. This situation is handled by throwing it at some distant location.
+	 * This is a reasonable approach when you can't just skip the point. It's assumed that points at
+	 * infinity have a positive Z value.
+	 *
+	 * @param p4 (Input) Homogenous coordinate.
+	 * @param farAway (Input) How far away points at infinity should be put. Application dependent. Try 1e9
+	 * @param tol (Input) Tolerance for defining a point at infinity. If p4 has a norm of 1 then 1e-7 is
+	 *            probably reasonable.
+	 * @param p3 (output) Cartesian coordinate.
+	 */
+	public static void homogenousTo3dPositiveZ(Point4D_F64 p4 , double farAway, double tol , Point3D_F64 p3 )
+	{
+		double norm = p4.norm();
+		double w = p4.w;
+		if( Math.abs(w) <= tol*norm ) {
+			// the object is off at infinity. The code below can't handle that situation so we will hack it
+			double scale = farAway/(UtilEjml.EPS+norm);
+			// it was observed so it has to be in front of the camera
+			if( p4.z < 0 )
+				scale *= -1;
+			p3.set(scale*p4.x, scale*p4.y, scale*p4.z);
+		} else {
+			p3.set(p4.x/w, p4.y/w, p4.z/w);
+		}
 	}
 }

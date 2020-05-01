@@ -537,6 +537,5 @@ public class VisOdomQuadPnP<T extends ImageGray<T>,TD extends TupleDesc> {
 		public Point3D_F64 X = new Point3D_F64();
 		// pixel observation in each camera view
 		public Point2D_F64 v0,v1,v2,v3;
-
 	}
 }

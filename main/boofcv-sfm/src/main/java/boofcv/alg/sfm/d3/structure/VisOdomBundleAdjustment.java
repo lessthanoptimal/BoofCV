@@ -175,7 +175,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	/** Searches for a track that has the following tracker track. null is none were found */
 	public T findByTrackerTrack( PointTrack target ) {
 		for (int i = 0; i < tracks.size; i++) {
-			if( tracks.get(i).trackerTrack == target ) {
+			if( tracks.get(i).visualTrack == target ) {
 				return tracks.get(i);
 			}
 		}
@@ -205,7 +205,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 	 * Removes the frame and all references to it. If a track has no observations after this
 	 * it is also removed from the master list.
 	 */
-	public void removeFrame( BFrame frame , List<PointTrack> removedTracks ) {
+	public void removeFrame( BFrame frame , List<BTrack> removedTracks ) {
 		removedTracks.clear();
 		int index = frames.indexOf(frame);
 		if( index < 0 )
@@ -232,13 +232,13 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 			for (int i = tracks.size - 1; i >= 0; i--) {
 				if (tracks.get(i).observations.size == 0) {
 					BTrack t = tracks.removeSwap(i);
-					if( t.trackerTrack != null ) {
-						removedTracks.add(t.trackerTrack);
-						if( t.trackerTrack.cookie != t ) {
-							System.out.println("BUG! bt="+t.id+" tt="+t.trackerTrack.featureId);
+					if( t.visualTrack != null ) {
+						removedTracks.add(t);
+						if( t.visualTrack.cookie != t ) {
+							System.out.println("BUG! bt="+t.id+" tt="+t.visualTrack.featureId);
 							throw new RuntimeException("BUG!");
 						}
-						t.trackerTrack = null; // mark it as null so that we know it has been dropped
+						t.visualTrack = null; // mark it as null so that we know it has been dropped
 					}
 				}
 			}
@@ -300,10 +300,10 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 		// the ID of the PointTrack which created this
 		public long id;
 		/**
-		 * Reference to the image feature tracker track.
+		 * Reference to the a track in the image based tracker
 		 * if null that means the track is no longer being tracked by the tracker
 		 */
-		public PointTrack trackerTrack;
+		public PointTrack visualTrack;
 		public final Point4D_F64 worldLoc = new Point4D_F64();
 		public final FastQueue<BObservation> observations = new FastQueue<>(BObservation::new, BObservation::reset);
 		/** if true then the track should be considered for optimization inside of bundle adjustment */
@@ -332,7 +332,7 @@ public class VisOdomBundleAdjustment<T extends VisOdomBundleAdjustment.BTrack> {
 			observations.reset();
 			inlier = false;
 			selected = false;
-			trackerTrack = null;
+			visualTrack = null;
 			id = -1;
 		}
 

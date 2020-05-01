@@ -227,8 +227,8 @@ public class FactoryVisualOdometry {
 		VisOdomPixelDepthPnP<T> alg = new VisOdomPixelDepthPnP<>(motion, pixelTo3D, refine, tracker, bundleAdjustment);
 		alg.setFrameManager(keyframe);
 		alg.setThresholdRetireTracks(configVO.dropOutlierTracks);
-		alg.getBundle().getSelectTracks().maxFeaturesPerFrame = configVO.bundleMaxFeaturesPerFrame;
-		alg.getBundle().getSelectTracks().minTrackObservations = configVO.bundleMinObservations;
+		alg.getScene().getSelectTracks().maxFeaturesPerFrame = configVO.bundleMaxFeaturesPerFrame;
+		alg.getScene().getSelectTracks().minTrackObservations = configVO.bundleMinObservations;
 		return new WrapVisOdomPixelDepthPnP<>(alg, pixelTo3D, distance, imageType);
 	}
 
@@ -407,7 +407,7 @@ public class FactoryVisualOdometry {
 				new ConfigTriangulation(ConfigTriangulation.Type.GEOMETRIC));
 
 		VisOdomDualTrackPnP<T,Desc> alg = new VisOdomDualTrackPnP<>(thresholdAdd, thresholdRetire, epipolarPixelTol,
-				trackerLeft, trackerRight, descriptor, associateUnique, triangulate, motion, refinePnP);
+				trackerLeft, trackerRight, descriptor, associateUnique, triangulate, motion, refinePnP,null);
 		alg.setDescribeRadius(describeRadius);
 
 		return new WrapVisOdomDualTrackPnP<>(pnpStereo, distanceMono, distanceStereo, associateStereo, alg, refinePnP, imageType);

@@ -86,7 +86,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 	public void getTrackPixel(int index, Point2D_F64 pixel) {
 		// If this throws a null pointer exception then that means there's a bug. The only way a visible track
 		// could have a null trackerTrack is if the trackerTrack was dropped. In that case it's no longer visible
-		pixel.set( alg.getVisibleTracks().get(index).trackerTrack.pixel );
+		pixel.set( alg.getVisibleTracks().get(index).visualTrack.pixel );
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 	@Override
 	public boolean isTrackNew(int index) {
 		VisOdomPixelDepthPnP.Track track = alg.getVisibleTracks().get(index);
-		return track.trackerTrack.spawnFrameID == alg.getFrameID();
+		return track.visualTrack.spawnFrameID == alg.getFrameID();
 	}
 
 	@Override
@@ -140,7 +140,7 @@ public class WrapVisOdomPixelDepthPnP<T extends ImageGray<T>>
 
 	@Override
 	public Se3_F64 getCameraToWorld() {
-		return alg.getCurrToWorld();
+		return alg.getCurrentToWorld();
 	}
 
 	@Override

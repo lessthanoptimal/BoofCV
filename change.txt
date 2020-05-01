@@ -101,6 +101,10 @@ TODO Regression
    - Dump runtime results into their own directory for each device. Use hostname?
    - Template matching
 
+TODO Geometry
+   - Triangulation which minimizes pixel error
+   - Triangulation for a calibrated camera and homogenous coordinates
+
 TODO Sparse Disparity Undistort using camera model
 
 - Scene Reconstruction
